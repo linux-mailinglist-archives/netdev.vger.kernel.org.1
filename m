@@ -1,188 +1,151 @@
-Return-Path: <netdev+bounces-45153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795877DB2FA
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 06:52:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394A67DB30C
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BA2E1C208A8
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 05:52:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 962F3B20B93
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 06:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82DB1368;
-	Mon, 30 Oct 2023 05:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF55137D;
+	Mon, 30 Oct 2023 06:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073491866
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:52:22 +0000 (UTC)
-Received: from mail-ot1-f78.google.com (mail-ot1-f78.google.com [209.85.210.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D953BD
-	for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 22:52:21 -0700 (PDT)
-Received: by mail-ot1-f78.google.com with SMTP id 46e09a7af769-6cd91356d52so5769797a34.2
-        for <netdev@vger.kernel.org>; Sun, 29 Oct 2023 22:52:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698645140; x=1699249940;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hBfdO/RhCB/Iy6DY0lnEId3NOPicW2yAdEaziERx33Y=;
-        b=f0B4jEBrivOz5WZswBKQMIjYupZ8usNy7R2WDq6chMQtGNSB7YV8Me99JaMeKQY1ek
-         F2edqDN/euoWCKu/dNZ2JznLEKqUSP5qQm2ZEYBRzgT1PEwwMmal3Mcv1rrZzMHfmWqB
-         wy3FAmGF0jCcBzEDyCOShZdx1atV3xFxxZVkQ5+hRr9PG6ruYUItWny+pVgvY8MeDKhP
-         loRgE3JpdBlLuDsvk30pMSmtq3LQTNVEDjxU2+bXcGL3Hm5wbU1BN3isv0qSqNxUy8bt
-         V4+G7wpSBHVmizFCLq25w9lHON4llmRLGL251u3rcdrTgpwhPIu0Vw7ozKvyV50u8zhp
-         LxcA==
-X-Gm-Message-State: AOJu0YxvOOGtG3zSRFZiu1rh9iElHCJAu2eFWXS0PAPoS5KxtaqeHVgj
-	MA8lZDHDPFnJtu5liR+9kjtwcIGymZsBmeUuSWqx7K5zO+wO
-X-Google-Smtp-Source: AGHT+IEsmNsVfeWACmYMw6i/EQwgAm3YDN0n9U8hhyZrzM1BEWh133D/GO/CKqRs4ORr/KuncNQ4P4XKPC9rh2Thh0oVvAUYkdBl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48FF61376
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:01:04 +0000 (UTC)
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02olkn2078.outbound.protection.outlook.com [40.92.50.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80E3694;
+	Sun, 29 Oct 2023 23:01:02 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kjl2l2yvYvZrf05hK7LgvgXiMiqdNzifmrsOk9N1gU1BWB2YmIQ8CLfswryMiX6i8Ao4l5FShobU9bheenHqSmGoRQU0XjDyUUj6s/MWQjeAit0RTFOjvtjAsKe508IBzC0oHdEX+uRxWubpK7yMHoCrBKhA2aAQbnU7utcqj5Ytks/WZiakzJsYw+/c7vfepG+Gt+Mjn6Dd68ltPUNK24BxAXcnOA69smNsflITrN7SKskDSn0SuLwRToAKjjawrS0dRgahKb+NF87MiyLpNLmEsd6n45Vlzzztyib82dBgsZBLIZl0pnV8sF4ejP2IUVeK+Mv9uvr5ihoXDOj9GA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=t5DZNpf+qOfjj3gM57iNET/DMzd/j0XUj1yxtK5Cykk=;
+ b=Q6Jc1YnHs3KDuzvtoGIBGri4E/xsO6f1PgNGrUqdLkg0QLENkKsgZZDeC1KUQ3LaKObdLBCPOa4aXNitWfReZMwXWa9C7aEOQOfX9CiY+LZNNQKzXGcJFD1PXGYj/NQUDWEZoz7ZzA4x4+/CHngBQcMLSBrkIK8HqFaE1H0ZYdogkWsAEiUPdUrShoNI6v2UAy0EihM+SbauALHsTnl2WhjKM2dp4sgvYkCdRDyoVGsOrWd5pSCALE33XY2Gq6zVZ4kMPdsDRHwvEddTuwB/JZNgLn0r5RcTPpg6mqVYh+mHbTZdqgBKGCeFnlnV6a6SfzY5A8zh3vxwIac+kpZ+ug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
+ by DB8P193MB0695.EURP193.PROD.OUTLOOK.COM (2603:10a6:10:147::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28; Mon, 30 Oct
+ 2023 06:01:00 +0000
+Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
+ ([fe80::b89e:5e18:1a08:409d]) by AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
+ ([fe80::b89e:5e18:1a08:409d%6]) with mapi id 15.20.6933.027; Mon, 30 Oct 2023
+ 06:01:00 +0000
+Message-ID:
+ <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
+Date: Mon, 30 Oct 2023 07:01:11 +0100
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From: Bernd Edlinger <bernd.edlinger@hotmail.de>
+Subject: [PATCH] net: stmmac: Wait a bit for the reset to take effect
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TMN: [5TayCGdesDPDyQeQVdMawVO0/gmh2YV/Su02BQrexM/V2tY3DQ/87gEVr2nSsLjQ]
+X-ClientProxiedBy: BE1P281CA0320.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:87::10) To AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:20b:333::21)
+X-Microsoft-Original-Message-ID:
+ <72fb07eb-137d-4b8b-b930-a568788de591@hotmail.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:50d:b0:1e9:a417:e8de with SMTP id
- j13-20020a056870050d00b001e9a417e8demr4652726oao.4.1698645140599; Sun, 29 Oct
- 2023 22:52:20 -0700 (PDT)
-Date: Sun, 29 Oct 2023 22:52:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000347a250608e8a4d1@google.com>
-Subject: [syzbot] [net?] general protection fault in tls_merge_open_record
-From: syzbot <syzbot+40d43509a099ea756317@syzkaller.appspotmail.com>
-To: borisp@nvidia.com, davem@davemloft.net, edumazet@google.com, 
-	john.fastabend@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8P193MB1285:EE_|DB8P193MB0695:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54336de4-b497-45c6-a0f5-08dbd90d9725
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Qo8HgyfwVdmtID+Zz0bi8HE2SyFhbyzFDTgJIimm6pEL86oJEHmJ03ZMYBsZbEVs9gQjmB6quqvZnhrpKk9CW7Yda8twt1xOxs6h+48ZDBjVOiHtVnkhQGt+NwKmIWWoq9BzuXwk+40BG8AyVvxmxsNweEN0apXkCXpluH39YrkFb0PDcJPGMXKIUJnW6tnsfs3zw72fs7NCNmv0WX6dCQWChHfZeARZNyoyrocLhZSWeWmzkd/SDDgAiXpKi4Y5vtiB23ckT/yAUSk3xbZWw5FE5+91GVnX36fMJWcceRMjLHdepW14L3+qhAve+PRyzrdlAExCH+hNv3FSDYRb/IWato9SUDRPGO2gcrCvQJhk06tiSiUUj7RHDGenrJ9WN8vjiqmF1lI/pu2lWOZO+o5HGVewtOI9Gj1CkzUbMwjd0akf9DzIGmXZJQfnCSTZhpqXB7XprW4jqIbq+/HQ1JSa9gqN8eY3MV9gMOkJaQZQuyk8GxyVq34haR2Q+GrXKX2Wc/gPW4zO3icBz5PpYDGG4LIZV+4IpKZIg4ecwx7wUB+/iJ7pzqBqG9MtBSp9
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WjV3Zk1EMkxSdS9GSlhlZDBsTS9mcmkvQ2NGRzdiem15NVJyOUY5amp3ZkhP?=
+ =?utf-8?B?UFRtZGNBdnhhUE11YUpTVU1KL0RQc1UyNCt6YU1INElSMTkySkZmR1VSNHJs?=
+ =?utf-8?B?VzJWKzhmcytUVUhQaGhVRjZ4UFlLa3B6QytiOU10RjEvSG83ZXE2aEl5cjlI?=
+ =?utf-8?B?b3dGUHhQYWdGRVFZNGNrM240aXdyRkxrblZvbTl1VUZOc1N0WlJySDcxSFZ4?=
+ =?utf-8?B?MzlTc1NZSFJOaUlwdVRBajRxMXVHT05Wd0NmcGdPeWNZTitKKzNNanFxSk5W?=
+ =?utf-8?B?QWZtODVsc3REZnFTclhzQkR0TW8zSlJYZnp6M2czc29sS3dSRG1pbUJEZEFa?=
+ =?utf-8?B?L2tSM0VpWFhxZGZYelhlVTh6bGYwNnh0UXVEdm9qQjloNHBQdURnY3EzMDc4?=
+ =?utf-8?B?V2Vna2RMeEtrc2k1Ymx5NjZkdGRMSnFRMHkreDBIWksvdkpiV0FkVFJudksy?=
+ =?utf-8?B?QVg1NTBMUU1NekJWRWFobGVrbUhTN1IxR3Arc2tzUTNoYW5iSjJuTmZBM0Ny?=
+ =?utf-8?B?c080Q056NWZwSHBJMTZOaDBhTUNNUjNKNGpzQVZrbkZYUjBIRlNkUmdCL3Ux?=
+ =?utf-8?B?TDhZdHRJL1R5QTlzQTN0dkEyTXBPTjFKYWt6NDlma0FSSE1yVHprWnA0c0RB?=
+ =?utf-8?B?ZjVxOFhXZ3ZBR1BBR0Q4SDUwNzVtRENISXJNTnhaY2ozS0xpaWFtTDg0aFpS?=
+ =?utf-8?B?bkNNaEZyT3R2QzhHMTRhT0ZZTmVUNDlZTitYY0E5ZDlTUytuUmdHMUF2cm9Y?=
+ =?utf-8?B?RWRiZWZFNWtwRFF1VVBERTlmZlRXZnZ0cXlsZS9BRnNaUXZUM0IybW90aTAz?=
+ =?utf-8?B?d0dQbEZRdTk1aTJKdXJOSWJjV29nUnp1bk9NNHZEMmltS3ZXQWpaZjF3a2Ex?=
+ =?utf-8?B?SXFHbFd0Z2RxT01mZVBvZWtXM0VLa0t6TTRUU3B6KzB4NC94Nmk5MlVURGF4?=
+ =?utf-8?B?QWlUeFRNTU1QQ3I2cDdHZG9KUnhmRjdmeXBpVUhhaEppUjEyV1VmWEdiMWF0?=
+ =?utf-8?B?SHZIM2VxS3R0Nk51ZnpUWlJYSEVualhEYnAvcEFEbUVhM0dqVG8rYVlqemwx?=
+ =?utf-8?B?eXZWanJleXFWZk9iSSt2dFVxNUlQOG1MMFRhMUp0cWdnSWt1UURPWmdzVUYz?=
+ =?utf-8?B?ME1oM2lmd080ay83SE5SbnFYRGdHeE9ia28xQkhJcFVGRlBJdTU1YmZGbHJR?=
+ =?utf-8?B?M21YSUQ5YXUrVjBkMGJOUmdCcHIwZ2hxNHZKV3Q4S3lYSVdPL3duL0NSeWhy?=
+ =?utf-8?B?Q2QrNnB3bVE1d2RTYjlHditxUkdDUktqS1hZM0ZWMUZMSjNzejBkVTkrZE9K?=
+ =?utf-8?B?TGJNeHhFMC91RkEzai9JVjk0eW5SK3REUXZYdjEvMUFoQUJhQnVQNHMrU3hi?=
+ =?utf-8?B?b2NkN09tZmxaa1lOUXluaEUwdEY0a2xneksyMUROV29OdXlPZDJ3MTREdUtQ?=
+ =?utf-8?B?b1ptSHF4NXBiYTBneDYzRGdjYkZZOXBnR2R0UzJ4M0h4cmE5Tm9PQlZVekVp?=
+ =?utf-8?B?bkpHMlgyR0pCNE5PUEw1ejNhUVV5R2g4RG1VMXJZMVZ0Mlp6S0pIZkNmVjFI?=
+ =?utf-8?B?Ry9PQzlEckVaY0htbm00M3FTRlpDTlBSbU5SOEJwekRnTFI5cU5vQ2ZJMmor?=
+ =?utf-8?B?VzNPVDZGZThJd29VUytIVTUxTXI3VVY1bzlPUWRGVnU2STZhV1NWeWtyYSt3?=
+ =?utf-8?B?L05HNXlDNHdQQXg2azJkZUVaSWFJWnk4eDByMFc5c3VQRlZLSkZlYUo2cFRu?=
+ =?utf-8?Q?iBOfTnF2H+4/bqPEmk=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-80ceb.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54336de4-b497-45c6-a0f5-08dbd90d9725
+X-MS-Exchange-CrossTenant-AuthSource: AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 06:01:00.0699
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8P193MB0695
 
-Hello,
+otherwise the synopsys_id value may be read out wrong,
+because the GMAC_VERSION register might still be in reset
+state, for at least 1 us after the reset is de-asserted.
 
-syzbot found the following issue on:
+Add a wait for 10 us before continuing to be on the safe side.
 
-HEAD commit:    66f1e1ea3548 Add linux-next specific files for 20231027
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11b621fd680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2911330219149de4
-dashboard link: https://syzkaller.appspot.com/bug?extid=40d43509a099ea756317
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1552332d680000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e0bf12f215f2/disk-66f1e1ea.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5e854ca6e2c3/vmlinux-66f1e1ea.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/25e8c098714e/bzImage-66f1e1ea.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+40d43509a099ea756317@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 PID: 12569 Comm: syz-executor.0 Not tainted 6.6.0-rc7-next-20231027-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
-RIP: 0010:_compound_head include/linux/page-flags.h:247 [inline]
-RIP: 0010:put_page include/linux/mm.h:1544 [inline]
-RIP: 0010:tls_merge_open_record+0x4b9/0x7f0 net/tls/tls_sw.c:669
-Code: 85 e4 0f 85 b6 02 00 00 e8 54 62 67 f8 4d 89 f4 48 b8 00 00 00 00 00 fc ff df 49 83 e4 fc 49 8d 7c 24 08 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 ed 02 00 00 4d 8b 6c 24 08 31 ff 4d 89 ef 41 83
-RSP: 0018:ffffc9000ae9f498 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffff888068caa000 RCX: ffffffff89219a8e
-RDX: 0000000000000001 RSI: ffffffff89219a9c RDI: 0000000000000008
-RBP: ffff888068cab000 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffffff81dfefa3 R12: 0000000000000000
-R13: 0000000000000020 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fa3e0ea76c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020173000 CR3: 00000000279dd000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- tls_push_record+0x290f/0x3070 net/tls/tls_sw.c:726
- bpf_exec_tx_verdict+0xdee/0x1230 net/tls/tls_sw.c:819
- tls_sw_splice_eof+0x194/0x470 net/tls/tls_sw.c:1242
- sock_splice_eof+0x86/0xb0 net/socket.c:1116
- direct_file_splice_eof+0x86/0xb0 fs/splice.c:1151
- do_splice_eof fs/splice.c:944 [inline]
- splice_direct_to_actor+0x710/0xa30 fs/splice.c:1117
- do_splice_direct+0x1af/0x280 fs/splice.c:1194
- do_sendfile+0xb3a/0x1310 fs/read_write.c:1254
- __do_sys_sendfile64 fs/read_write.c:1322 [inline]
- __se_sys_sendfile64 fs/read_write.c:1308 [inline]
- __x64_sys_sendfile64+0x1d6/0x220 fs/read_write.c:1308
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x62/0x6a
-RIP: 0033:0x7fa3e007cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa3e0ea70c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-RAX: ffffffffffffffda RBX: 00007fa3e019c050 RCX: 00007fa3e007cae9
-RDX: 0000000000000000 RSI: 0000000000000004 RDI: 0000000000000003
-RBP: 00007fa3e00c847a R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000f2090293 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fa3e019c050 R15: 00007ffcc0dbba98
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:_compound_head include/linux/page-flags.h:247 [inline]
-RIP: 0010:put_page include/linux/mm.h:1544 [inline]
-RIP: 0010:tls_merge_open_record+0x4b9/0x7f0 net/tls/tls_sw.c:669
-Code: 85 e4 0f 85 b6 02 00 00 e8 54 62 67 f8 4d 89 f4 48 b8 00 00 00 00 00 fc ff df 49 83 e4 fc 49 8d 7c 24 08 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 ed 02 00 00 4d 8b 6c 24 08 31 ff 4d 89 ef 41 83
-RSP: 0018:ffffc9000ae9f498 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: ffff888068caa000 RCX: ffffffff89219a8e
-RDX: 0000000000000001 RSI: ffffffff89219a9c RDI: 0000000000000008
-RBP: ffff888068cab000 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffffff81dfefa3 R12: 0000000000000000
-R13: 0000000000000020 R14: 0000000000000000 R15: 0000000000000000
-FS:  00007fa3e0ea76c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020347000 CR3: 00000000279dd000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	85 e4                	test   %esp,%esp
-   2:	0f 85 b6 02 00 00    	jne    0x2be
-   8:	e8 54 62 67 f8       	call   0xf8676261
-   d:	4d 89 f4             	mov    %r14,%r12
-  10:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  17:	fc ff df
-  1a:	49 83 e4 fc          	and    $0xfffffffffffffffc,%r12
-  1e:	49 8d 7c 24 08       	lea    0x8(%r12),%rdi
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 ed 02 00 00    	jne    0x321
-  34:	4d 8b 6c 24 08       	mov    0x8(%r12),%r13
-  39:	31 ff                	xor    %edi,%edi
-  3b:	4d 89 ef             	mov    %r13,%r15
-  3e:	41                   	rex.B
-  3f:	83                   	.byte 0x83
-
-
+Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 5801f4d50f95..e485f4db3605 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7398,6 +7398,9 @@ int stmmac_dvr_probe(struct device *device,
+ 		dev_err(priv->device, "unable to bring out of ahb reset: %pe\n",
+ 			ERR_PTR(ret));
+ 
++	/* Wait a bit for the reset to take effect */
++	udelay(10);
++
+ 	/* Init MAC and get the capabilities */
+ 	ret = stmmac_hw_init(priv);
+ 	if (ret)
+-- 
+2.39.2
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
