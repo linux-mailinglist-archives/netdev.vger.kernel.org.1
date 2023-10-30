@@ -1,104 +1,171 @@
-Return-Path: <netdev+bounces-45228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A847DB9C1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:20:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E30A87DB9EA
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:26:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3875B20EC1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:20:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83C26B20D90
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:26:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E6A156FD;
-	Mon, 30 Oct 2023 12:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9513A15E8F;
+	Mon, 30 Oct 2023 12:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqcCLdy5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdKyJ+rs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E50E156EE;
-	Mon, 30 Oct 2023 12:20:42 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7466C9;
-	Mon, 30 Oct 2023 05:20:40 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-53d9f001b35so7014859a12.2;
-        Mon, 30 Oct 2023 05:20:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FBE7111A7
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 12:26:31 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E460FF5;
+	Mon, 30 Oct 2023 05:26:25 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507bd644a96so6336009e87.3;
+        Mon, 30 Oct 2023 05:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698668439; x=1699273239; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:from:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=tRAvOgi6qogXEjImiUor+DkPqw1Ot9Ogtre0wvi5M6k=;
-        b=nqcCLdy5BkfZ2ly+kvgp4RantdlvoU4aMWj2ag9y62CfeIFVxBhT4sDv8MWxxHhQz6
-         AwOjnIq0UrQE6WfcY4MoQR4Q9aHmkCLPpe05h7UhWsb1yTbYx5N/n8vMAeqa+7Z3mFBK
-         sakoRSaiZya+jKItdc8TbAS0Tsnl+qRa0fK9m0gYKnh9eobWDKUE4KT0SyOqhvLx1zue
-         /8rDcyS0eX1MLFNRwds0vKf+RbKFKYroq2hGVuuqXotl2YR0+KmNLn96d3aahl6Pmf+d
-         A6ODm5bw3BennCXc+dZpagOltGe4tQ+SxCgxTQ6NmxpuWe/gz0Y/bVjOe+V5j+h18KZH
-         Zq4g==
+        d=gmail.com; s=20230601; t=1698668784; x=1699273584; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T8RFmRMPaCavpWEVO+hqLK8PHwyFGH3KHrLeyNssBXM=;
+        b=UdKyJ+rsudAa7WW1rfYRih6IN3RfAwHjhb8AXPmnIH6D54PWYc9vd6no9ScvBrlqvi
+         BtmzQmfhAQysmxUTwBij2iawOabo8J0cyIuyjHZMmhqOLsAaEzPJCoLgVHNOGUZnG7p3
+         qHnLY9EpqCRJvdWavk+ZM+nklseFyl1RCeZUb2iGhRe9g9on/Q5Qxm8qsyXH1Y/qZZEi
+         SXNS0iS7z0cfpZaq0Rl2+IkNPRdKIOt4X4JJMBZT6r3BYoAHwE5oeVO00uFflvCaV+Bf
+         /d7MX8ROm9KGw0HpoyqRA1E9RH4X+SwluhIJhe4hjF8pXhpBclDSujbfBVZHriq/iU4H
+         orlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698668439; x=1699273239;
-        h=content-transfer-encoding:in-reply-to:content-language:subject
-         :references:cc:to:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tRAvOgi6qogXEjImiUor+DkPqw1Ot9Ogtre0wvi5M6k=;
-        b=XqEaZzdyqBQkCdeitvkanUmaT3WpkpKZYIbpLtTymS6ZlnkpE8pQKraKYlrEqxkPhO
-         iiahUaALC53aBIfI2nyAxJ1hBkAODODk/Col2Qke8wynAJc9NGtdw+H8BUMFh8USGPAV
-         gIpFSHFRPNFOgJBjzeC9Xiem2JsDrlOJ4qHTXkA26bHmKrIRfa6u9yqWNuJruPrqXQLp
-         Zwyo4XQg/EfFMqaJdCg938G33ozjGJ8QjcVUpWEauj7BR1xWXhI0WjObbPqY6uYiF3ox
-         ftOynquIH065e/s10l8hXEiaPyu2adru8lb9kbryHiJ34i/87S22gzxxMtksqsASg4cN
-         j9dw==
-X-Gm-Message-State: AOJu0YwriaYqxZ9iNBs6p8Xqdmi+owWA3v9IJ53EghsMwPQt7gdqclTT
-	+gliFFhPCa/Rv5dsF/8ubSY=
-X-Google-Smtp-Source: AGHT+IEA4HEagqHQDt4CQKteRzlCff1bThN0D10TLJ2IhOR2hdu91b9A3yPlJ/I94joRwFOXZlnzxA==
-X-Received: by 2002:a17:907:72c5:b0:9b2:f941:6916 with SMTP id du5-20020a17090772c500b009b2f9416916mr8109533ejc.17.1698668439086;
-        Mon, 30 Oct 2023 05:20:39 -0700 (PDT)
-Received: from [192.168.0.105] (5401D598.dsl.pool.telekom.hu. [84.1.213.152])
-        by smtp.gmail.com with ESMTPSA id ci6-20020a170906c34600b009a1dbf55665sm5802219ejb.161.2023.10.30.05.20.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 05:20:38 -0700 (PDT)
-From: Kira <nyakov13@gmail.com>
-X-Google-Original-From: Kira <Nyakov13@gmail.com>
-Message-ID: <566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com>
-Date: Mon, 30 Oct 2023 13:20:36 +0100
+        d=1e100.net; s=20230601; t=1698668784; x=1699273584;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T8RFmRMPaCavpWEVO+hqLK8PHwyFGH3KHrLeyNssBXM=;
+        b=acg4RxoprEh+l3tZkHDp2xCJWC8Z1dYiEsCyC1E7seW5GZzFkzD+HTY342qyvLXDSw
+         dW1eK3TEJeTtaMRE45ZI+Hw0zs1Uo7iGVNHTInie1bou2VSCNs6CTEHEaagZT5EOkf5K
+         2SzMmsGxJ+CIFAcYevA8pU6WJzD+xN9OLX1IpD6OpAjBbphYgH2drrL2mooxkoPd/wcM
+         anZIOqjW/DjQeB5J3JmHtkMHwfTMlI5dhxVA5wVgCddn6Rg3YNGGUg+TZkdpKdxQZii6
+         +JXTHtsAMlyZcAr1gnFNeICwCt/pEbvvso9cfho9mhPfEtQ/pC6xSw3n3qSogQvMQT3A
+         My4Q==
+X-Gm-Message-State: AOJu0YwF5ODWL1+X80yptVIEHtnimNITSfsRk5prwzYpMbqtMv/UNnDg
+	EYqBZbM8s6K71m5OyINetK0=
+X-Google-Smtp-Source: AGHT+IFg9cpzQXCYcHL4V6vW7U7XlYIDrLSpu4W2WLWjccR6BSlhTXw8Kl384Nxe+59YUTZpJQER+A==
+X-Received: by 2002:a05:6512:10d6:b0:4fb:9168:1fce with SMTP id k22-20020a05651210d600b004fb91681fcemr8970346lfg.59.1698668783553;
+        Mon, 30 Oct 2023 05:26:23 -0700 (PDT)
+Received: from mobilestation (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id w10-20020ac254aa000000b00507a387c4c4sm1421843lfk.229.2023.10.30.05.26.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 05:26:23 -0700 (PDT)
+Date: Mon, 30 Oct 2023 15:26:21 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Joao Pinto <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>, 
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, xfr@outlook.com, rock.xu@nio.com
+Subject: Re: [PATCH net-next v2] net: stmmac: xgmac: Enable support for
+ multiple Flexible PPS outputs
+Message-ID: <ayttoykypfn6obrysve6ivdom7it3wdyexeawoucekeivx236t@o7rljbjrofiz>
+References: <20231030035550.2340514-1-0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: benjamin.poirier@gmail.com
-Cc: James.Bottomley@HansenPartnership.com, coiby.xu@gmail.com,
- corbet@lwn.net, davem@davemloft.net, deller@gmx.de, edumazet@google.com,
- error27@gmail.com, gregkh@linuxfoundation.org, kuba@kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev,
- manishc@marvell.com, nandhakumar.singaram@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com, raven@themaw.net, ricardoapl.dev@gmail.com,
- sumitraartsy@gmail.com, svenjoac@gmx.de
-References: <20231020124457.312449-3-benjamin.poirier@gmail.com>
-Subject: Re: [PATCH 2/2] staging: qlge: Retire the driver
-Content-Language: en-US, ru-RU
-In-Reply-To: <20231020124457.312449-3-benjamin.poirier@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231030035550.2340514-1-0x1207@gmail.com>
 
-I have a couple of QLogic QLE8142 10GbE Converged Network adapters.
+On Mon, Oct 30, 2023 at 11:55:50AM +0800, Furong Xu wrote:
+> From XGMAC Core 3.20 and later, each Flexible PPS has individual PPSEN bit
+> to select Fixed mode or Flexible mode. The PPSEN must be set, or it stays
+> in Fixed PPS mode by default.
+> XGMAC Core prior 3.20, only PPSEN0(bit 4) is writable. PPSEN{1,2,3} are
+> read-only reserved, and they are already in Flexible mode by default, our
+> new code always set PPSEN{1,2,3} do not make things worse ;-)
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
 
-They are pretty old yes, but also working well and energy efficient. 
-They still can be considered as modern hardware because they was so 
-advance back in the days.
+Please don't forget to add the already got tags shall you need more
+patch revisions.
 
-And I think there is a lots of them out there, maybe not in 
-production(but somewhere still is), but in used market.
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-So it will be really nice if drivers were still in kernel.
+> ---
+> Changes in v2:
+>   - Add comment for XGMAC_PPSEN description among different XGMAC core versions.
+>   - Update commit message, thanks Serge Semin and Jacob Keller for your advices.
 
+BTW Why have you dropped the Fixes tag? Moreover you didn't address
+Jacob' comment regarding the actual problematic commit. This isn't the
+way the review process normally goes. I'll copy what Jacob said in v1
+so to restore the discussion here:
 
-With best regards
+On Mon, Oct 27, 2023 at 2:15:50AM +0800, Jacob Keller  wrote:
+> The original code was added in 95eaf3cd0a90 ("net: stmmac: dwxgmac: Add
+> Flexible PPS support"), which landed in v5.4
+> 
+> It looks like XGMAC Core 3.20 support was not added until possibly
+> commit 669a55560e4b ("net: stmmac: Check more MAC HW features for XGMAC
+> Core 3.20") which appears to be new enough that its not in any official
+> Linux release, though it looks like it was already in net.
+> 
+> Perhaps this should be tagged Fixes: and sent through net, hopefully to
+> try and hit 6.6 or at least a stable release shortly after?
+> 
 
-Kira.
+Regards
+-Serge(y)
 
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h     |  2 +-
+>  .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    | 14 +++++++++++++-
+>  2 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> index 7a8f47e7b728..a4e8b498dea9 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> @@ -259,7 +259,7 @@
+>  	((val) << XGMAC_PPS_MINIDX(x))
+>  #define XGMAC_PPSCMD_START		0x2
+>  #define XGMAC_PPSCMD_STOP		0x5
+> -#define XGMAC_PPSEN0			BIT(4)
+> +#define XGMAC_PPSENx(x)			BIT(4 + (x) * 8)
+>  #define XGMAC_PPSx_TARGET_TIME_SEC(x)	(0x00000d80 + (x) * 0x10)
+>  #define XGMAC_PPSx_TARGET_TIME_NSEC(x)	(0x00000d84 + (x) * 0x10)
+>  #define XGMAC_TRGTBUSY0			BIT(31)
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> index f352be269deb..453e88b75be0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> @@ -1178,7 +1178,19 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
+>  
+>  	val |= XGMAC_PPSCMDx(index, XGMAC_PPSCMD_START);
+>  	val |= XGMAC_TRGTMODSELx(index, XGMAC_PPSCMD_START);
+> -	val |= XGMAC_PPSEN0;
+> +
+> +	/* XGMAC Core has 4 PPS outputs at most.
+> +	 *
+> +	 * Prior XGMAC Core 3.20, Fixed mode or Flexible mode are selectable for
+> +	 * PPS0 only via PPSEN0. PPS{1,2,3} are in Flexible mode by default,
+> +	 * and can not be switched to Fixed mode, since PPSEN{1,2,3} are
+> +	 * read-only reserved to 0.
+> +	 * But we always set PPSEN{1,2,3} do not make things worse ;-)
+> +	 *
+> +	 * From XGMAC Core 3.20 and later, PPSEN{0,1,2,3} are writable and must
+> +	 * be set, or the PPS outputs stay in Fixed PPS mode by default.
+> +	 */
+> +	val |= XGMAC_PPSENx(index);
+>  
+>  	writel(cfg->start.tv_sec, ioaddr + XGMAC_PPSx_TARGET_TIME_SEC(index));
+>  
+> -- 
+> 2.34.1
+> 
 
