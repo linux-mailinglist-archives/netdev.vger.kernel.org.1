@@ -1,124 +1,131 @@
-Return-Path: <netdev+bounces-45271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A837DBCA1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:34:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21AA7DBCD3
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:40:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E30C2813D1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:34:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41A38B20CBA
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19A5179AF;
-	Mon, 30 Oct 2023 15:34:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A82C18B04;
+	Mon, 30 Oct 2023 15:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="rKGnRkg1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Imd4/4nA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E58818AED
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:34:27 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34569D9
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:34:25 -0700 (PDT)
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EE3FE3F19A
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:34:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1698680061;
-	bh=U+HzRWWfe445TTBhBAgXB/2ejF+ftXkNxDYm8dN+cP8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=rKGnRkg1j8hQGzJ4I6NxLg9c3DUXq6/zVaHnd1UALhaxBhxLnEi7CCbf7qUmMHCO6
-	 e9WpfnpYk1pUe0VxG+v5BvTFhh7pw8VFlDMxWZHFelk021DVKOPt+YnFjolxBo/hcP
-	 TEgfoAufMySHW6mOF386tKntxG2NamSBur0Ua8Vfh5o1Ol3vzZKqOeroBZAoy4e7+L
-	 QD3Uv3uZhTsIrYYF39Ud1y/0brgYGDccOzqlk4GMo1/Uzd8AbLa5QgCmwXWhKyHnzA
-	 3Kj2ABcYqP5AE7wwi6wbu59nph8klXAXCy7kCUF71/3OYZ0DrIRUc4VhRjcVrBZS1p
-	 +QaiQcddRqkCA==
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3b3ebbbdbf9so5995159b6e.0
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:34:21 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9980818AF0;
+	Mon, 30 Oct 2023 15:40:29 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A5BADE;
+	Mon, 30 Oct 2023 08:40:28 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cc5b705769so4363385ad.0;
+        Mon, 30 Oct 2023 08:40:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698680428; x=1699285228; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CPRLTSWuTrsZ1XKe1+EbPZ7W3J1mWgSbUoqx7ta8svE=;
+        b=Imd4/4nAlvx0SbmN8SUvvCoJmfe74m/srOrF5PZlFEDTrN1POFtep4t0yjKf8G3h/R
+         RMKZ50A/EV3qCkSmc61xaveB1Vk6XmUUZ2SFTDAC0T7o5sI3v3SpR9gHQSaujussF0JB
+         77Kx+wKlxQwJicKjq71YVDq308n2GRd5dac0Z26hhezMxxdhGJ461KgFVfnQocSknwJZ
+         bm2yToycRuif1EX+Z7m1nMcWFRo9TW4+76PkKONHcpDjXT038RUihfIScL9lOPoIemI5
+         2I6egt5scWZM/HcJfpUCW18hz/92gGCBatQX+MHyHmUzHuEq4ttMSWXp6vT9SWYIvSop
+         F/1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698680061; x=1699284861;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U+HzRWWfe445TTBhBAgXB/2ejF+ftXkNxDYm8dN+cP8=;
-        b=Sl/NXTi2UL/0aWc8jk6jGE3Wsd0z9KoZAv4NKB8GiExkG8qGUJPYIhYdrPQQJ+28MM
-         o1Gr7EQ4QQlzY+SOsgmMiknfKkDyMDoPa+ypyGnc1quAJJwLwId0avSrlUaevGACxn9z
-         3OlOebo5iv85ngCjWktfdq3S5nMXydoi/o9SXxQxdegnk+TJVxQ8ZHpecba6X5KeRrYp
-         BfAsamf3oJv/lys8A/Y8Lzkx7esi8efyAyjfRrEDux4NhRAoZQpCKJLDbzXEIu5c23ij
-         bw/lhblyTQX4i1iMTrC/pEn8aHHLM4vlqZsfRyG1fXm1spSQOpUbOZjO0z/T5htJ8bTy
-         rPng==
-X-Gm-Message-State: AOJu0YzTB+fqcACKAJOi3+s8DYqc0OkQzKy6zp07ddKig1/6sRgp+AF+
-	g7mblYBxsTLYeJha2O2kYiYqO8RBtOAq2bROgg9ynaoAyKKI9hwn168Q9e9LSW5YPEYJ7MjFWc5
-	VsBbe/BivL+vpNVRIfiCUUZPnd1RuT1fesX7XCGCKKTC118dx
-X-Received: by 2002:a05:6870:d914:b0:1ef:bae0:4bb8 with SMTP id gq20-20020a056870d91400b001efbae04bb8mr4656730oab.29.1698680060903;
-        Mon, 30 Oct 2023 08:34:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGLmaoGBFAeuxipughz1BuzObURNyX+TjwBCwyAeiZQHdITLI4GtggdgVl6tKynDeG2pL6pFJ40Rp0BudyOPSQ=
-X-Received: by 2002:a05:6870:d914:b0:1ef:bae0:4bb8 with SMTP id
- gq20-20020a056870d91400b001efbae04bb8mr4656716oab.29.1698680060568; Mon, 30
- Oct 2023 08:34:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698680428; x=1699285228;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CPRLTSWuTrsZ1XKe1+EbPZ7W3J1mWgSbUoqx7ta8svE=;
+        b=K/Np4Jx3CM1FK/vX5eB59fybHZGRKhUKdN9RfNOarFmiOkoB5vkvXiB/IuUzA2Sazq
+         q4dkXGdHkvbdNjw3I7u5D+qkedY8NuLEfPD/O9OcuJtd5VXYc/RXpt5s06IrqmpYFN7X
+         wEIYnBSQa9xf9krCOPjF9O3E+ZJc1GzyxUwyzETyZMiKbC1v1IGhxHeepFo9459rEv3r
+         +sNUux3Nl3zj+ulz6TM2Reau9eRfDjQ8HgqT47TXtLm09U9YE0fTGOjeGuW+8/QWLchb
+         bUdQQD4PNvPKItbc5HAifnbZ5pAFPL9nnOxfvYbDjjUfZBqCIKsGL51HxoVHSFTgdJYi
+         zsHg==
+X-Gm-Message-State: AOJu0YywLLEQJI+cG5aJOJz6eCB1ROfDPooaCKtYccO93Qtaswq9i9OA
+	fb6DdekyTxyRj6sdeTl6s1Q=
+X-Google-Smtp-Source: AGHT+IGkdxXcXZhNWzt6zXyZIfokX4mYgZMOOfyvR/9a8d85RMFYGJ5KWukB9siUh/E5/K7TW16gQQ==
+X-Received: by 2002:a17:903:11cc:b0:1cc:5549:aab2 with SMTP id q12-20020a17090311cc00b001cc5549aab2mr1689200plh.36.1698680427752;
+        Mon, 30 Oct 2023 08:40:27 -0700 (PDT)
+Received: from [192.168.1.11] ([27.4.124.129])
+        by smtp.gmail.com with ESMTPSA id d9-20020a170902cec900b001cc307bcdbdsm4648823plg.211.2023.10.30.08.40.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 08:40:27 -0700 (PDT)
+Message-ID: <e38353e7-ea99-434b-9700-151ab2de6f85@gmail.com>
+Date: Mon, 30 Oct 2023 21:10:21 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030094555.3333551-1-liuhangbin@gmail.com>
-In-Reply-To: <20231030094555.3333551-1-liuhangbin@gmail.com>
-From: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Date: Mon, 30 Oct 2023 23:34:09 +0800
-Message-ID: <CAMy_GT-8fKJ1+y9Dgi5R2kuPiRJfC4gg-K0GW5NWL_vDbuTALA@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: pmtu.sh: fix result checking
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] dccp: check for ccid in ccid_hc_tx_send_packet
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+References: <20231028144136.3462-1-bragathemanick0908@gmail.com>
+ <CANn89iJyLWy6WEa_1p+jKpGBfq=h=TX=_7p_-_i4j6mHcMXbgA@mail.gmail.com>
+From: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+In-Reply-To: <CANn89iJyLWy6WEa_1p+jKpGBfq=h=TX=_7p_-_i4j6mHcMXbgA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 30, 2023 at 5:46=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com> =
-wrote:
->
-> In the PMTU test, when all previous tests are skipped and the new test
-> passes, the exit code is set to 0. However, the current check mistakenly
-> treats this as an assignment, causing the check to pass every time.
->
-> Consequently, regardless of how many tests have failed, if the latest tes=
-t
-> passes, the PMTU test will report a pass.
->
-> Fixes: 2a9d3716b810 ("selftests: pmtu.sh: improve the test result process=
-ing")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  tools/testing/selftests/net/pmtu.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftest=
-s/net/pmtu.sh
-> index f838dd370f6a..b9648da4c371 100755
-> --- a/tools/testing/selftests/net/pmtu.sh
-> +++ b/tools/testing/selftests/net/pmtu.sh
-> @@ -2048,7 +2048,7 @@ run_test() {
->         case $ret in
->                 0)
->                         all_skipped=3Dfalse
-> -                       [ $exitcode=3D$ksft_skip ] && exitcode=3D0
-> +                       [ $exitcode =3D $ksft_skip ] && exitcode=3D0
-Perhaps replacing "=3D" with -eq here will be less error-prone?
-Thanks for catching this!
 
->                 ;;
->                 $ksft_skip)
->                         [ $all_skipped =3D true ] && exitcode=3D$ksft_ski=
-p
-> --
-> 2.41.0
+On 30/10/23 14:29, Eric Dumazet wrote:
+> On Sat, Oct 28, 2023 at 4:41 PM Bragatheswaran Manickavel
+> <bragathemanick0908@gmail.com> wrote:
+>> ccid_hc_tx_send_packet might be called with a NULL ccid pointer
+>> leading to a NULL pointer dereference
+>>
+>> Below mentioned commit has similarly changes
+>> commit 276bdb82dedb ("dccp: check ccid before dereferencing")
+>>
+>> Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
+>> Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+>> ---
+>>   net/dccp/ccid.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/dccp/ccid.h b/net/dccp/ccid.h
+>> index 105f3734dadb..1015dc2b9392 100644
+>> --- a/net/dccp/ccid.h
+>> +++ b/net/dccp/ccid.h
+>> @@ -163,7 +163,7 @@ static inline int ccid_packet_dequeue_eval(const int return_code)
+>>   static inline int ccid_hc_tx_send_packet(struct ccid *ccid, struct sock *sk,
+>>                                           struct sk_buff *skb)
+>>   {
+>> -       if (ccid->ccid_ops->ccid_hc_tx_send_packet != NULL)
+>> +       if (ccid != NULL && ccid->ccid_ops->ccid_hc_tx_send_packet != NULL)
+>>                  return ccid->ccid_ops->ccid_hc_tx_send_packet(sk, skb);
+>>          return CCID_PACKET_SEND_AT_ONCE;
+>>   }
+>> --
+>> 2.34.1
+>>
+> If you are willing to fix dccp, I would make sure that some of
+> lockless accesses to dccps_hc_tx_ccid
+> are also double checked and fixed.
 >
+> do_dccp_getsockopt() and dccp_get_info()
+
+
+Hi Eric,
+
+In both do_dccp_getsockopt() and dccp_get_info(), dccps_hc_rx_ccid are 
+checked properly before access.
+
+Thanks,
+Bragathe
+
 
