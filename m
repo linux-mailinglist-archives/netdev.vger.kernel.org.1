@@ -1,156 +1,153 @@
-Return-Path: <netdev+bounces-45314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037DC7DC103
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 21:12:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52067DC13D
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 21:35:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41C63B20CD8
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 20:12:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAD991C20B1F
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 20:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077661B26E;
-	Mon, 30 Oct 2023 20:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C591CA7C;
+	Mon, 30 Oct 2023 20:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DzSo2njk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SU8CnUDU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B15A1B264;
-	Mon, 30 Oct 2023 20:12:08 +0000 (UTC)
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A257EE;
-	Mon, 30 Oct 2023 13:12:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852531CF84
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 20:35:33 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A3FADF
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 13:35:32 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so4595a12.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 13:35:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1698696727; x=1730232727;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6D8jozM7hlxpoJDs8NW6wHWs2AyXFU+odsgu2PbgbLc=;
-  b=DzSo2njk/iZMiGzt9Fq7R4MQFkeliIPyruP4B3iLHAornjbnuT0QLy1p
-   Wafvp6wwaUj9tRbTUxXlvtue67IJHokHQOUMUdOJxAoVAVS4Vv37nYVu2
-   3ukbceLLDsqc5XiTU5ZqQP8X3KL86IlLfE2JkWiKpKFBPH3MJLgyOwTxP
-   g=;
-X-IronPort-AV: E=Sophos;i="6.03,264,1694736000"; 
-   d="scan'208";a="681869741"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 20:12:00 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1a-m6i4x-54a853e6.us-east-1.amazon.com (Postfix) with ESMTPS id ABF7448A83;
-	Mon, 30 Oct 2023 20:11:56 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:9222]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.46:2525] with esmtp (Farcaster)
- id b6ce74ca-60c7-4fa5-a2de-c6acfb0b2ea1; Mon, 30 Oct 2023 20:11:55 +0000 (UTC)
-X-Farcaster-Flow-ID: b6ce74ca-60c7-4fa5-a2de-c6acfb0b2ea1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 30 Oct 2023 20:11:48 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 30 Oct 2023 20:11:45 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <dccp@vger.kernel.org>, "Huw
- Davies" <huw@codeweavers.com>, Paul Moore <paul@paul-moore.com>
-Subject: [PATCH v1 net 2/2] dccp/tcp: Call security_inet_conn_request() after setting IPv6 addresses.
-Date: Mon, 30 Oct 2023 13:10:42 -0700
-Message-ID: <20231030201042.32885-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20231030201042.32885-1-kuniyu@amazon.com>
-References: <20231030201042.32885-1-kuniyu@amazon.com>
+        d=google.com; s=20230601; t=1698698130; x=1699302930; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4vFDjtAEsjttTI22sc8G5a8nAtIAx3Cy/lcAcpUigTY=;
+        b=SU8CnUDUyoZlJpXvqMJkWC+vPGTkTDyBMerx/C/B4IWlvmtpGHb5yLQ5IsEG4IZeoA
+         k8H0fggV7DvD5UwkM0cc1EcRY38tLsenUJSwZ4QNStbyUH8Q/xpq++su6yxSN1f8Li4y
+         HF/F6yoWX9mF/CY9DqkGQ1Lawz9547uCEMrbul71fXxGorqOgQC8TlVrfx8fdQHVi7GS
+         HpuIAkNrOIHLvMRSRDfkJgMCFq73KWgc4voaBZSMxkkQje81nKw4S8xUVcy8Sg9UUDeG
+         68rmAkod+JNp3nce/7hCgaXY8eoDtbV7PQ7AJfaWz7hTKMLg6LmxnPQWiJJ5eXtlhnGZ
+         5y6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698698130; x=1699302930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4vFDjtAEsjttTI22sc8G5a8nAtIAx3Cy/lcAcpUigTY=;
+        b=WoUxi+aD+AdlZ8k/JznTRyE+HKhaJVcfDArfjEtBIkgmsBMlTjirjUlgCztHT6ZJnp
+         gX+eVuRz2KUBHdlRpsLiJV+3qjtH1S/BiFzggq4JCKLny629PBOgKupIcmYvfM7Co4vz
+         cAmhxmHwtixQ2oJME9h9P7Yd1dI9UgMXNIifteIpYjrE+GIsvkX6yI2+5s1Ft7MG6Pnf
+         9LyvSejoNR+/er+/V54jGpwr7/FUYpHSzJsPIBApLW5vXcW3W9NipSaPbtriroban4QE
+         TwVgBE3/t5KsGu5W+54nhk0gUzvjtXK8/HkJcV6LQG+rHLze/l1CKb4Bpfl84JU0aHmi
+         5Z3Q==
+X-Gm-Message-State: AOJu0YzPunTYW0ZGNuc9z4sAfN4MygKNsSks/fxJz2VsTBhb5abRZ7ek
+	BB+gMp8gdCAs+evAKcF/AP9PRGfiMDlJed6CVpYMZw==
+X-Google-Smtp-Source: AGHT+IH31+TiFXNuUyrjrcqRDXnwTQqwKlPmSQHk8e8Z0SC06WDOD05Veu2EH0W5nMXTlXnkAfTM4lJUkj0e/XKNmcM=
+X-Received: by 2002:a05:6402:d69:b0:542:d79b:9529 with SMTP id
+ ec41-20020a0564020d6900b00542d79b9529mr8777edb.7.1698698130518; Mon, 30 Oct
+ 2023 13:35:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.32]
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+References: <20231027213059.3550747-1-ptf@google.com> <415e0355-7d71-4b82-b4fc-37dad22486a9@gmail.com>
+ <CAJs+hrEi8oo1q5mMfNbaUi8x1H-sBGmYToTkRfVXs=ga9LPupQ@mail.gmail.com> <cd23aed9-a792-4baa-ba1a-701e6512ce30@gmail.com>
+In-Reply-To: <cd23aed9-a792-4baa-ba1a-701e6512ce30@gmail.com>
+From: Patrick Thompson <ptf@google.com>
+Date: Mon, 30 Oct 2023 16:35:19 -0400
+Message-ID: <CAJs+hrGe=uyxa3Pp9sAQphjfopGRWKiRY55Tamwa6X68faBsyg@mail.gmail.com>
+Subject: Re: [PATCH v2] net: r8169: Disable multicast filter for RTL_GIGA_MAC_VER_46
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, Chun-Hao Lin <hau@realtek.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	nic_swsd@realtek.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Initially, commit 4237c75c0a35 ("[MLSXFRM]: Auto-labeling of child
-sockets") introduced security_inet_conn_request() in some functions
-where reqsk is allocated.  The hook is added just after the allocation,
-so reqsk's IPv6 remote address was not initialised then.
+The packet being filtered out by the multicast filter has a unicast
+destination address matching the device, the frame only contains the
+eapol protocol and does not have an IPv4 address associated with it.
 
-However, SELinux/Smack started to read it in netlbl_req_setattr()
-after commit e1adea927080 ("calipso: Allow request sockets to be
-relabelled by the lsm.").
+I will send out a v3 patch with VER_48 included.
 
-Commit 284904aa7946 ("lsm: Relocate the IPv4 security_inet_conn_request()
-hooks") fixed that kind of issue only in TCPv4 because IPv6 labeling was
-not supported at that time.  Finally, the same issue was introduced again
-in IPv6.
+Sorry, I sent a non-plaintext email previously so I am resending it.
 
-Let's apply the same fix on DCCPv6 and TCPv6.
-
-Fixes: e1adea927080 ("calipso: Allow request sockets to be relabelled by the lsm.")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-Cc: Huw Davies <huw@codeweavers.com>
-Cc: Paul Moore <paul@paul-moore.com>
----
- net/dccp/ipv6.c       | 6 +++---
- net/ipv6/syncookies.c | 7 ++++---
- 2 files changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index 8d344b219f84..4550b680665a 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -360,15 +360,15 @@ static int dccp_v6_conn_request(struct sock *sk, struct sk_buff *skb)
- 	if (dccp_parse_options(sk, dreq, skb))
- 		goto drop_and_free;
- 
--	if (security_inet_conn_request(sk, skb, req))
--		goto drop_and_free;
--
- 	ireq = inet_rsk(req);
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
- 	ireq->ireq_family = AF_INET6;
- 	ireq->ir_mark = inet_request_mark(sk, skb);
- 
-+	if (security_inet_conn_request(sk, skb, req))
-+		goto drop_and_free;
-+
- 	if (ipv6_opt_accepted(sk, skb, IP6CB(skb)) ||
- 	    np->rxopt.bits.rxinfo || np->rxopt.bits.rxoinfo ||
- 	    np->rxopt.bits.rxhlim || np->rxopt.bits.rxohlim) {
-diff --git a/net/ipv6/syncookies.c b/net/ipv6/syncookies.c
-index 500f6ed3b8cf..12eedc6ca2cc 100644
---- a/net/ipv6/syncookies.c
-+++ b/net/ipv6/syncookies.c
-@@ -181,14 +181,15 @@ struct sock *cookie_v6_check(struct sock *sk, struct sk_buff *skb)
- 	treq = tcp_rsk(req);
- 	treq->tfo_listener = false;
- 
--	if (security_inet_conn_request(sk, skb, req))
--		goto out_free;
--
- 	req->mss = mss;
- 	ireq->ir_rmt_port = th->source;
- 	ireq->ir_num = ntohs(th->dest);
- 	ireq->ir_v6_rmt_addr = ipv6_hdr(skb)->saddr;
- 	ireq->ir_v6_loc_addr = ipv6_hdr(skb)->daddr;
-+
-+	if (security_inet_conn_request(sk, skb, req))
-+		goto out_free;
-+
- 	if (ipv6_opt_accepted(sk, skb, &TCP_SKB_CB(skb)->header.h6) ||
- 	    np->rxopt.bits.rxinfo || np->rxopt.bits.rxoinfo ||
- 	    np->rxopt.bits.rxhlim || np->rxopt.bits.rxohlim) {
--- 
-2.30.2
-
+On Mon, Oct 30, 2023 at 3:38=E2=80=AFPM Heiner Kallweit <hkallweit1@gmail.c=
+om> wrote:
+>
+> On 30.10.2023 17:52, Patrick Thompson wrote:
+> > I wouldn't trust the mc filter, the eap packet being filtered is not a
+> > multicast packet so I wonder what else could be erroneously filtered.
+> > I do agree that it would be nice to be able to override it for testing
+> > purposes.
+> >
+>
+> I'm not an EAP(OL) expert, just read that EAPOL can use unicast,
+> broadcast , and ethernet multicast (01:80:C2:00:00:03).
+> What's that target MAC and IP4 address of the packet being
+> filtered out in your case?
+>
+> > Would you like me to add MAC_VER_48 to the patch? I would not be able
+> > to test and confirm that it affects it in the same way I have for
+> > VER_46.
+> >
+> Yes, VER_48 should be included because it has the same MAC as VER_46.
+>
+> > It is unfortunate that the naming doesn't quite line up.
+> >
+> > On Sat, Oct 28, 2023 at 4:38=E2=80=AFAM Heiner Kallweit <hkallweit1@gma=
+il.com> wrote:
+> >>
+> >> On 27.10.2023 23:30, Patrick Thompson wrote:
+> >>> MAC_VER_46 ethernet adapters fail to detect eapol packets unless
+> >>> allmulti is enabled. Add exception for VER_46 in the same way VER_35
+> >>> has an exception.
+> >>>
+> >> MAC_VER_48 (RTL8107E) has the same MAC, just a different PHY.
+> >> So I would expect that the same quirk is needed for MAC_VER_48.
+> >>
+> >> MAC_VER_xx is a little misleading, actually it should be NIC_VER_xx
+> >>
+> >>> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
+> >>> Signed-off-by: Patrick Thompson <ptf@google.com>
+> >>> ---
+> >>>
+> >>> Changes in v2:
+> >>> - add Fixes tag
+> >>> - add net annotation
+> >>> - update description
+> >>>
+> >>>  drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
+> >>>  1 file changed, 2 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/=
+ethernet/realtek/r8169_main.c
+> >>> index 361b90007148b..a775090650e3a 100644
+> >>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> >>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> >>> @@ -2584,7 +2584,8 @@ static void rtl_set_rx_mode(struct net_device *=
+dev)
+> >>>               rx_mode |=3D AcceptAllPhys;
+> >>>       } else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
+> >>>                  dev->flags & IFF_ALLMULTI ||
+> >>> -                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_35) {
+> >>> +                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_35 ||
+> >>> +                tp->mac_version =3D=3D RTL_GIGA_MAC_VER_46) {
+> >>>               /* accept all multicasts */
+> >>>       } else if (netdev_mc_empty(dev)) {
+> >>>               rx_mode &=3D ~AcceptMulticast;
+> >>
+>
 
