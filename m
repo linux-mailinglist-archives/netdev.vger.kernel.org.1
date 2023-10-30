@@ -1,125 +1,240 @@
-Return-Path: <netdev+bounces-45287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 371467DBF2C
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 18:40:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C787DBF33
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 18:40:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5E03281655
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:40:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 229682816D1
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:40:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B76199AE;
-	Mon, 30 Oct 2023 17:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68E0199B5;
+	Mon, 30 Oct 2023 17:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NXJV8sSs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apDiZUTE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F614199AC
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 17:40:25 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D032A9
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 10:40:23 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507c8316abcso6729409e87.1
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 10:40:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698687621; x=1699292421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A0ir2D4QCfLQnWbR8rXv+lrdC0LI67HN6g7rBTtSt0E=;
-        b=NXJV8sSsllAMLgEMWhKoi37VXaPI/zzX0I/gohKQjl8rwk/6NOPsk6rorWKvRpx1EY
-         0725YuMejBHp+XkhjbolRMvkXSCw3LIysfnDT6SsFZLgvxL1gugwZzoDUfQuo/vzt9wZ
-         YJG4QCRFcBkwrYzgC7H8vGqbNmP0dGIj3YzQ3xwUzFSElUIzgQI125hiG9tC7yihh/h3
-         14RO6mlMzcaoXiEsYeURMTTJCu2pRDZQJ849xFeq7tG6ZQidonKk+BusJii5KQggMzbK
-         tFY8SJGpY0CDYyIBu2RPvVdK8kFIFj1D2ctXoWgiFUheiGUznVdERJRFnImsInnvZC8Y
-         hlAw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C3A199AC
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 17:40:45 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7177E8
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 10:40:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698687642;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=I2JHh73zIxCYXhkBKGYhrEXftWXIPybkxG0xOR3on7I=;
+	b=apDiZUTE+VOGH0AHqRqnMeWn2XnU4DrV4OAzrWoxaKWzGpL9Qgs6ciaF/jTSnRAofes2og
+	FMD+xEFBAesacqxHa63MmlDjlcmJZSOf3MoypuIhKhEdCV++HPNxfxHHqXOneI/N69fWYS
+	HH7JZnU674qxyfar4nB9TiOFB+6xVoQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-MPTuxcquNeeiGB_8uXHVng-1; Mon, 30 Oct 2023 13:40:41 -0400
+X-MC-Unique: MPTuxcquNeeiGB_8uXHVng-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-778ac2308e6so599629985a.3
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 10:40:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698687621; x=1699292421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A0ir2D4QCfLQnWbR8rXv+lrdC0LI67HN6g7rBTtSt0E=;
-        b=Rw2icAn0CGGPBGxA4yJUgXu/mPkPKp8QnU1p+i3xVytreXdjYGY47tA7O07x4dO29F
-         LEUVyKJhnPvDqcUzNIU3WNSKixBVssYib/0+hnV37E5sPm6YgjpXbJAQefMNNep+Jys2
-         nrxpgou02QMWOAAvVKkMabZwSWTRo1pEt2oJtnygc3/jSjatItYz/EFTAHM4UG3aVowk
-         ApUpsbbbC+94YqEGBe96aGl0JzNWI2Nbvgo5UZVh8lrUqWevyXmJ7c97f57j7DHUTxkA
-         S8fNRvpS3EL+5ZQjYlu0PU9hLF3WKwn/vsX+0kucte2aQn71kY4waOxjO+r3f1QKQpT4
-         ShgQ==
-X-Gm-Message-State: AOJu0Yx84esqIv+7S/QxjrANOZG82tvmNKr0gomU7E4I7qrfH/zMl3Oo
-	fxdORNM1IIL+XTQsdd9/HvmOH6HE88TeJBGD1hHEmg==
-X-Google-Smtp-Source: AGHT+IGVUD6diH5ENQ4J/fApQAHbs0bzqg4El0Q54SM7Jan2NxauyGPeedCJqSM3NOBGaw3YFoQFSWASkx8JzdIELYA=
-X-Received: by 2002:a05:6512:1081:b0:507:a5e7:724 with SMTP id
- j1-20020a056512108100b00507a5e70724mr8955304lfg.38.1698687621042; Mon, 30 Oct
- 2023 10:40:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698687641; x=1699292441;
+        h=user-agent:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I2JHh73zIxCYXhkBKGYhrEXftWXIPybkxG0xOR3on7I=;
+        b=Um5SSBtl+7vymxzEtMhHDZg90tK+POPUD7M/jRvoxinGAVZE8PWAEB3SBbTd/qp8u2
+         LdMcDZwscwmxD9OMD/4b1hrUkpt03CG8W9cEoOk0rPKyJSOt3gr59HV5XFALd/3UCku+
+         wxGhhq5bAVM8FWWNk4h5GdGMYyxUsz27qmLbmoCgko1/4FpkgVWHqw5yp3sUijmYpcV8
+         EAMu0/OX1rhU07yrjfWe0aM6aA7HRVOrd0xHDwdp8ogYr3ytrxwjvWtbG+BMWTHkr7ih
+         KHvLnXBLgvb76iNgNaHq+pi4sxSbrKrwd70xgvbpX5kxgFe9WKlAUMrNc1VEsgUdLw+Q
+         KYdw==
+X-Gm-Message-State: AOJu0Yz9Jr7C2wrOYhBKojCuibsYUPImyq2t7tPIhpiGOTobRDCbuPyA
+	1lymBjgW63rFPm7W9Go8HyCj7VIfcA3V6fsZKXvl4rt9B6R/mrT78FMQZEAJkZuFJawRfnO7LLP
+	BIJNFkXESs9JaXGap
+X-Received: by 2002:a05:620a:2589:b0:778:94cc:723 with SMTP id x9-20020a05620a258900b0077894cc0723mr12430096qko.1.1698687641238;
+        Mon, 30 Oct 2023 10:40:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGoqut/KAS12Hj1elfEzt5W6duWsTX0hSRvTSrWXOatBJSSICCKoO+CiCrF5FveWevaaikHtA==
+X-Received: by 2002:a05:620a:2589:b0:778:94cc:723 with SMTP id x9-20020a05620a258900b0077894cc0723mr12430079qko.1.1698687640998;
+        Mon, 30 Oct 2023 10:40:40 -0700 (PDT)
+Received: from fedora ([142.181.225.135])
+        by smtp.gmail.com with ESMTPSA id w7-20020a05620a094700b007742c6823a3sm3501927qkw.108.2023.10.30.10.40.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 10:40:40 -0700 (PDT)
+Date: Mon, 30 Oct 2023 13:40:39 -0400
+From: Lucas Karpinski <lkarpins@redhat.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] selftests/net: synchronize udpgso_bench rx and tx
+Message-ID: <6ceki76bcv7qz6de5rxc26ot6aezdmeoz2g4ubtve7qwozmyyw@zibbg64wsdjp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231028192511.100001-1-andrew@lunn.ch>
-In-Reply-To: <20231028192511.100001-1-andrew@lunn.ch>
-From: Justin Stitt <justinstitt@google.com>
-Date: Mon, 30 Oct 2023 10:40:09 -0700
-Message-ID: <CAFhGd8rdziUZXH4=CxnZZKuS3X2EpTajxBgat+fvr-5RRzAekg@mail.gmail.com>
-Subject: Re: [PATCH v1 net] net: ethtool: Fix documentation of ethtool_sprintf()
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>, Alexander Duyck <alexanderduyck@fb.com>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20231006
 
-On Sat, Oct 28, 2023 at 12:25=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> This function takes a pointer to a pointer, unlike sprintf() which is
-> passed a plain pointer. Fix up the documentation to make this clear.
->
-> Fixes: 7888fe53b706 ("ethtool: Add common function for filling out string=
-s")
-> Cc: Alexander Duyck <alexanderduyck@fb.com>
-> Cc: Justin Stitt <justinstitt@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  include/linux/ethtool.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> index 62b61527bcc4..1b523fd48586 100644
-> --- a/include/linux/ethtool.h
-> +++ b/include/linux/ethtool.h
-> @@ -1045,10 +1045,10 @@ static inline int ethtool_mm_frag_size_min_to_add=
-(u32 val_min, u32 *val_add,
->
->  /**
->   * ethtool_sprintf - Write formatted string to ethtool string data
-> - * @data: Pointer to start of string to update
-> + * @data: Pointer to a pointer to the start of string to update
->   * @fmt: Format of string to write
->   *
-> - * Write formatted string to data. Update data to point at start of
-> + * Write formatted string to *data. Update *data to point at start of
->   * next string.
->   */
->  extern __printf(2, 3) void ethtool_sprintf(u8 **data, const char *fmt, .=
-..);
-> --
-> 2.42.0
->
+The sockets used by udpgso_bench_tx aren't always ready when
+udpgso_bench_tx transmits packets. This issue is more prevalent in -rt
+kernels, but can occur in both. Replace the hacky sleep calls with a
+function that checks whether the ports in the namespace are ready for
+use.
 
-Great! Now the docs more appropriately describe the behavior. My patch [1]
-for ethtool_puts() will use this same wording you've introduced.
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Lucas Karpinski <lkarpins@redhat.com>
+---
+https://lore.kernel.org/all/t7v6mmuobrbucyfpwqbcujtvpa3wxnsrc36cz5rr6kzzrzkwtj@toz6mr4ggnyp/
 
-Reviewed-by: Justin Stitt <justinstitt@google.com>
+Changelog v2: 
+- applied synchronization method suggested by Pablo
+- changed commit message to code 
 
-[1]: https://lore.kernel.org/all/20231027-ethtool_puts_impl-v3-0-3466ac6793=
-04@google.com/
+ tools/testing/selftests/net/udpgro.sh         | 27 ++++++++++++++-----
+ tools/testing/selftests/net/udpgro_bench.sh   | 19 +++++++++++--
+ tools/testing/selftests/net/udpgro_frglist.sh | 19 +++++++++++--
+ 3 files changed, 54 insertions(+), 11 deletions(-)
 
-Thanks
-Justin
+diff --git a/tools/testing/selftests/net/udpgro.sh b/tools/testing/selftests/net/udpgro.sh
+index 0c743752669a..04792a315729 100755
+--- a/tools/testing/selftests/net/udpgro.sh
++++ b/tools/testing/selftests/net/udpgro.sh
+@@ -24,6 +24,22 @@ cleanup() {
+ }
+ trap cleanup EXIT
+ 
++wait_local_port_listen()
++{
++	local port="${1}"
++
++	local port_hex
++	port_hex="$(printf "%04X" "${port}")"
++
++	local i
++	for i in $(seq 10); do
++		ip netns exec "${PEER_NS}" cat /proc/net/udp* | \
++			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/) {rc=0; exit}} END {exit rc}" &&
++			break
++		sleep 0.1
++	done
++}
++
+ cfg_veth() {
+ 	ip netns add "${PEER_NS}"
+ 	ip -netns "${PEER_NS}" link set lo up
+@@ -51,8 +67,7 @@ run_one() {
+ 		echo "ok" || \
+ 		echo "failed" &
+ 
+-	# Hack: let bg programs complete the startup
+-	sleep 0.2
++	wait_local_port_listen 8000
+ 	./udpgso_bench_tx ${tx_args}
+ 	ret=$?
+ 	wait $(jobs -p)
+@@ -97,7 +112,7 @@ run_one_nat() {
+ 		echo "ok" || \
+ 		echo "failed"&
+ 
+-	sleep 0.1
++	wait_local_port_listen 8000
+ 	./udpgso_bench_tx ${tx_args}
+ 	ret=$?
+ 	kill -INT $pid
+@@ -118,11 +133,9 @@ run_one_2sock() {
+ 		echo "ok" || \
+ 		echo "failed" &
+ 
+-	# Hack: let bg programs complete the startup
+-	sleep 0.2
++	wait_local_port_listen 12345
+ 	./udpgso_bench_tx ${tx_args} -p 12345
+-	sleep 0.1
+-	# first UDP GSO socket should be closed at this point
++	wait_local_port_listen 8000
+ 	./udpgso_bench_tx ${tx_args}
+ 	ret=$?
+ 	wait $(jobs -p)
+diff --git a/tools/testing/selftests/net/udpgro_bench.sh b/tools/testing/selftests/net/udpgro_bench.sh
+index 894972877e8b..91833518e80b 100755
+--- a/tools/testing/selftests/net/udpgro_bench.sh
++++ b/tools/testing/selftests/net/udpgro_bench.sh
+@@ -16,6 +16,22 @@ cleanup() {
+ }
+ trap cleanup EXIT
+ 
++wait_local_port_listen()
++{
++	local port="${1}"
++
++	local port_hex
++	port_hex="$(printf "%04X" "${port}")"
++
++	local i
++	for i in $(seq 10); do
++		ip netns exec "${PEER_NS}" cat /proc/net/udp* | \
++			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/) {rc=0; exit}} END {exit rc}" &&
++			break
++		sleep 0.1
++	done
++}
++
+ run_one() {
+ 	# use 'rx' as separator between sender args and receiver args
+ 	local -r all="$@"
+@@ -40,8 +56,7 @@ run_one() {
+ 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx ${rx_args} -r &
+ 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx -t ${rx_args} -r &
+ 
+-	# Hack: let bg programs complete the startup
+-	sleep 0.2
++	wait_local_port_listen 8000
+ 	./udpgso_bench_tx ${tx_args}
+ }
+ 
+diff --git a/tools/testing/selftests/net/udpgro_frglist.sh b/tools/testing/selftests/net/udpgro_frglist.sh
+index 0a6359bed0b9..0aa2068f122c 100755
+--- a/tools/testing/selftests/net/udpgro_frglist.sh
++++ b/tools/testing/selftests/net/udpgro_frglist.sh
+@@ -16,6 +16,22 @@ cleanup() {
+ }
+ trap cleanup EXIT
+ 
++wait_local_port_listen()
++{
++	local port="${1}"
++
++	local port_hex
++	port_hex="$(printf "%04X" "${port}")"
++
++	local i
++	for i in $(seq 10); do
++		ip netns exec "${PEER_NS}" cat /proc/net/udp* | \
++			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/) {rc=0; exit}} END {exit rc}" &&
++			break
++		sleep 0.1
++	done
++}
++
+ run_one() {
+ 	# use 'rx' as separator between sender args and receiver args
+ 	local -r all="$@"
+@@ -45,8 +61,7 @@ run_one() {
+         echo ${rx_args}
+ 	ip netns exec "${PEER_NS}" ./udpgso_bench_rx ${rx_args} -r &
+ 
+-	# Hack: let bg programs complete the startup
+-	sleep 0.2
++	wait_local_port_listen 8000
+ 	./udpgso_bench_tx ${tx_args}
+ }
+ 
+-- 
+2.41.0
+
 
