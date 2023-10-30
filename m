@@ -1,127 +1,149 @@
-Return-Path: <netdev+bounces-45142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B68B7DB1D6
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 02:37:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDFA97DB25A
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 04:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 244B4B20C9A
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 01:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D2142813B5
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 03:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1337EA;
-	Mon, 30 Oct 2023 01:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E66ECF;
+	Mon, 30 Oct 2023 03:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/S2rZ5+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52076650;
-	Mon, 30 Oct 2023 01:37:39 +0000 (UTC)
-Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2E20A9;
-	Sun, 29 Oct 2023 18:37:37 -0700 (PDT)
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-1dceb2b8823so1997557fac.1;
-        Sun, 29 Oct 2023 18:37:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF5CEC7
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 03:56:15 +0000 (UTC)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D23E19B;
+	Sun, 29 Oct 2023 20:56:13 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1c5cd27b1acso35906405ad.2;
+        Sun, 29 Oct 2023 20:56:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698638173; x=1699242973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2LKPRDN6GCfDpHNmFLj1e87YJK73PiRp76sihBNMTM=;
+        b=G/S2rZ5+JEMyqHAyowQAJHhBu5/E3DmDo/fS7Gi3+8QHuj9QYLAWDg+6DKMS2AYnIN
+         59WuepT1I+tLXZrU1fCfR3GmOCc8l3AG/fyYRglAizWPB3J9sMMMX5DELiUWdtkF+XBK
+         hQFFJAVaGKKX+D4CxN4yIvT/qSoXHf44GT5BcbIz3QRkshwJWsO4KQnntrpPUGJKhGCW
+         5VDQh/nKj3jXrI5qdMr1AcwoqI5mAY+3pCJ5VWFEURU/CZB8qemYSDxuSJQ4z9HLtBV+
+         J+xP5F5j63Qn4TH/rv3hVDeNS7Gg2pe+Fz1gdIR1pfA7DoMhWuTPG2v1PXDv1KLu8JoE
+         Iqtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698629857; x=1699234657;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xlMGuUk+qnsLF+L/nJQTBfbm1MmfORWq7xKQHDc9EXw=;
-        b=sww6DIpJN3i+/vBDDYO89UA727YeWI1Uwim6Y6a8hjng7efFLaBe+aOvfwXcQ5iS12
-         t9vAPpoR65OqpBASDNO+GnId83dwcCPOquTQPZva0ExHW0hS2iXFXtRnScf8TdtcwBMI
-         WIVn1oppO1U1WDop9MVYdC9JlRFp/GIFnIS5JkSOYrTLsRhFwQyh7o4yy2Uk1xdSNy4n
-         8Jzm+ioPuqfCtqmPdkYg/6Brvm8EnIHivMdwxFqGrAiN2DxJE2Y1CTAsYZXWXpiLG6fh
-         obKziwKK3lDj7NW04lR3rFgldN+aZ2azwDu2tS0zpSN1xn6DOnA2Sc02vOa021e1QV0F
-         OYow==
-X-Gm-Message-State: AOJu0YxvwvTr4igBuzAtE4iK+d13SJM7y5w8CasokujOqv8bpPZawzQ5
-	fgQn3J2oNAGiIEi8Mn2LXQ==
-X-Google-Smtp-Source: AGHT+IEZOFMr5EN0MHiSMfj7O+mvk+nZJRx3Z3xGz3bf8eovU7M0pK4cWM0M+2uMsKvCWYSf9lROTw==
-X-Received: by 2002:a05:6871:5a9a:b0:1e9:ae60:de68 with SMTP id oo26-20020a0568715a9a00b001e9ae60de68mr6512318oac.26.1698629856926;
-        Sun, 29 Oct 2023 18:37:36 -0700 (PDT)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id n3-20020a056870e40300b001ea17894928sm1372256oag.21.2023.10.29.18.37.34
+        d=1e100.net; s=20230601; t=1698638173; x=1699242973;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=y2LKPRDN6GCfDpHNmFLj1e87YJK73PiRp76sihBNMTM=;
+        b=cydBVcAicUIThvXQJizcVgpRutfo/SlEDyvoMs/VP78t5CQMXW22tfip/XB87LjTlJ
+         fRatRdNgiPDMPH1XLmEbed8Ry/IH9pIaekgE26ugpX5el5cNK3JubKMhDo/2Cp4pWnsa
+         zGYtUq0Pd6ooxlbAnsCE2DZnD4dzDQaLqv9efP1cK9RPUkjQ6G2pYxLPp7zOvLxo1fYV
+         1Ylwo0C2f74Sz1UxiBkDLqOwPybrMhjvabYiJ1G7VVVHMk2X8u8ni4GYtwYk0qzJvt8E
+         3JhLaNZo2MWv6cZJNC8nZB91j5cotNg05RvrfW/su8xC9ctXBmsXi9YDNoAhk7ONyW41
+         2mdw==
+X-Gm-Message-State: AOJu0YwiDUIRIdcyvH0h+3VE/lnlqMvIdk9JIRvsD2nmHr3C4QM5H52R
+	56icS4D2VoY/lUJFwoLEAm8=
+X-Google-Smtp-Source: AGHT+IFtziW0YEt+qaY773vj4t1QmwQ2WxPAPa4J4C8WbaX4O7OoKTqUrQZRKxurTVOpf3PHJN/cmQ==
+X-Received: by 2002:a17:903:2054:b0:1cc:4146:9ecb with SMTP id q20-20020a170903205400b001cc41469ecbmr2679315pla.47.1698638173229;
+        Sun, 29 Oct 2023 20:56:13 -0700 (PDT)
+Received: from localhost.localdomain ([74.48.130.204])
+        by smtp.googlemail.com with ESMTPSA id f7-20020a170902860700b001ca773d674bsm5159445plo.278.2023.10.29.20.56.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Oct 2023 18:37:36 -0700 (PDT)
-Received: (nullmailer pid 3840493 invoked by uid 1000);
-	Mon, 30 Oct 2023 01:37:34 -0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Sun, 29 Oct 2023 20:56:12 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Serge Semin <fancer.lancer@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	xfr@outlook.com,
+	rock.xu@nio.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v2] net: stmmac: xgmac: Enable support for multiple Flexible PPS outputs
+Date: Mon, 30 Oct 2023 11:55:50 +0800
+Message-Id: <20231030035550.2340514-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, linux-riscv@lists.infradead.org, Eric Dumazet <edumazet@google.com>, Richard Cochran <richardcochran@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>, Jose Abreu <joabreu@synopsys.com>, Conor Dooley <conor+dt@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, linux-stm32@st-md-mailman.stormreply.com, linux-kernel@vger.kernel.org, Paul Walmsley <paul.walmsley@sifive.com>, Samin Guo <samin.guo@starfivetech.com>, netdev@vger.kernel.org, Albert Ou <aou@eecs.berkeley.edu>, kernel@collabora.com, "David S. Miller" <davem@davemloft.net>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, linux-arm-kernel@lists.infradead.org, Giuseppe Cavallaro <peppe.cavallaro@st.com>, devicetree@vger.kernel.org, Rob Herring <robh+dt@kernel.org>
-In-Reply-To: <20231029042712.520010-5-cristian.ciocaltea@collabora.com>
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-5-cristian.ciocaltea@collabora.com>
-Message-Id: <169855920979.2226136.3264200658228005554.robh@kernel.org>
-Subject: Re: [PATCH v2 04/12] dt-bindings: net: starfive,jh7110-dwmac: Add
- JH7100 SoC compatible
-Date: Sun, 29 Oct 2023 20:37:34 -0500
+Content-Transfer-Encoding: 8bit
 
+From XGMAC Core 3.20 and later, each Flexible PPS has individual PPSEN bit
+to select Fixed mode or Flexible mode. The PPSEN must be set, or it stays
+in Fixed PPS mode by default.
+XGMAC Core prior 3.20, only PPSEN0(bit 4) is writable. PPSEN{1,2,3} are
+read-only reserved, and they are already in Flexible mode by default, our
+new code always set PPSEN{1,2,3} do not make things worse ;-)
 
-On Sun, 29 Oct 2023 06:27:04 +0200, Cristian Ciocaltea wrote:
-> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is quite
-> similar to the newer JH7110, but it requires only two interrupts and a
-> single reset line.
-> 
-> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
->  .../bindings/net/starfive,jh7110-dwmac.yaml   | 74 +++++++++++++------
->  2 files changed, 54 insertions(+), 21 deletions(-)
-> 
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+Changes in v2:
+  - Add comment for XGMAC_PPSEN description among different XGMAC core versions.
+  - Update commit message, thanks Serge Semin and Jacob Keller for your advices.
+---
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h     |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    | 14 +++++++++++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: compatible: 'oneOf' conditional failed, one must be fixed:
-	'starfive,jh7100-dwmac' was expected
-	'amlogic,meson-gxbb-dwmac' is not one of ['starfive,jh7110-dwmac']
-	'snps,dwmac-5.20' was expected
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: reg: [[3376480256, 65536], [3364046144, 8]] is too long
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: clocks: [[4294967295], [4294967295], [4294967295], [4294967295]] is too short
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: clock-names:1: 'pclk' was expected
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: clock-names:2: 'ptp_ref' was expected
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: clock-names:3: 'tx' was expected
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: clock-names: ['stmmaceth', 'clkin0', 'clkin1', 'timing-adjustment'] is too short
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: 'resets' is a required property
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.example.dtb: ethernet@c9410000: 'reset-names' is a required property
-	from schema $id: http://devicetree.org/schemas/net/starfive,jh7110-dwmac.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231029042712.520010-5-cristian.ciocaltea@collabora.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+index 7a8f47e7b728..a4e8b498dea9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+@@ -259,7 +259,7 @@
+ 	((val) << XGMAC_PPS_MINIDX(x))
+ #define XGMAC_PPSCMD_START		0x2
+ #define XGMAC_PPSCMD_STOP		0x5
+-#define XGMAC_PPSEN0			BIT(4)
++#define XGMAC_PPSENx(x)			BIT(4 + (x) * 8)
+ #define XGMAC_PPSx_TARGET_TIME_SEC(x)	(0x00000d80 + (x) * 0x10)
+ #define XGMAC_PPSx_TARGET_TIME_NSEC(x)	(0x00000d84 + (x) * 0x10)
+ #define XGMAC_TRGTBUSY0			BIT(31)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index f352be269deb..453e88b75be0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -1178,7 +1178,19 @@ static int dwxgmac2_flex_pps_config(void __iomem *ioaddr, int index,
+ 
+ 	val |= XGMAC_PPSCMDx(index, XGMAC_PPSCMD_START);
+ 	val |= XGMAC_TRGTMODSELx(index, XGMAC_PPSCMD_START);
+-	val |= XGMAC_PPSEN0;
++
++	/* XGMAC Core has 4 PPS outputs at most.
++	 *
++	 * Prior XGMAC Core 3.20, Fixed mode or Flexible mode are selectable for
++	 * PPS0 only via PPSEN0. PPS{1,2,3} are in Flexible mode by default,
++	 * and can not be switched to Fixed mode, since PPSEN{1,2,3} are
++	 * read-only reserved to 0.
++	 * But we always set PPSEN{1,2,3} do not make things worse ;-)
++	 *
++	 * From XGMAC Core 3.20 and later, PPSEN{0,1,2,3} are writable and must
++	 * be set, or the PPS outputs stay in Fixed PPS mode by default.
++	 */
++	val |= XGMAC_PPSENx(index);
+ 
+ 	writel(cfg->start.tv_sec, ioaddr + XGMAC_PPSx_TARGET_TIME_SEC(index));
+ 
+-- 
+2.34.1
 
 
