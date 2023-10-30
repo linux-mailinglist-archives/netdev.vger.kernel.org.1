@@ -1,82 +1,80 @@
-Return-Path: <netdev+bounces-45174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865A17DB416
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:21:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C8C7DB42F
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 08:25:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B79D61C208F0
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:21:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14D59B20BC3
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 07:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5294C7F;
-	Mon, 30 Oct 2023 07:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D687523A;
+	Mon, 30 Oct 2023 07:25:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pvXBG2Vd"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tdFHuA9v"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26109610B;
-	Mon, 30 Oct 2023 07:20:57 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1B961B3;
-	Mon, 30 Oct 2023 00:20:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774BE4C7F
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 07:25:14 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D0A3EA
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 00:25:08 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GL0NhqPVCzjSRPxWHZ7HvXa5gAG0ZT5+h3Kp6EB1AwEw1uZsudFx2MoVylDQimnZCXOjNRmtnp8iCnpdhY+rvXkUhDbBSRdJpplhz6fiJMFrsLyYGVeuyJfgzE5hOxVB5N9oBi8I4caWGNWzy6mHnyhbRpcH8c/fBEE9qRbEdR/9G+Jti38efmPLTedUO1FFq1nJudvQHefjNOQQ3jEs4D4ZM3nVPAJSIv1IuRRflgf5EA/7cujGnTDRGCr6AlYesq7h0qrLIGAb5FJm2JhKwtZDtjUEVGef5qkvluLgEbDvMPbKOeppB5s3lw1f1SaTNW9hOOysXJLoWACBtbQkjg==
+ b=dWT2H89p2i579D5wAkAR/zM3IHidXZx48Dw1jxjudeqpbgijV0fy6Wdz96RV/1jsbzIhhl/fy4luPp1O8w02DxFAB7uKaRgZC8vpiw35bdi0r/gkcajHfGKKqJi35V8dsVGVBNYNlZuePJhrvZ+r0eeUehNFuJw7prFQ9aJVQT+p8tRzT4dTLE7gDuKlRiZwoi2f0qWiARsokxXK7/+/eF6Ctog6pkrMNL3OnXEgcham+72nG8VpkRa2Ev3IGz8DT2x1Wxy1Vm36B7jitIk/PMJTwfvAToO211ZRGzCSndkIsCYUCkhNjAsQqsenseSellBhkogbQgZ47AVxRFHQwg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vP1wCT9rAxWtNY+/Zm6kmN9ULRiGso0luVIOZ4aFcfo=;
- b=FerVBxRYw0Rlx83211VMzI42GXQm3rnAsbSAZ5wl1mAKoPcI8HnH/FdTrhsCUEMTu3qqioHWLwkiuHTRFaA3CyoDYoOVGMA/gT4AtvL/0gak1sFzPQgFWsocaxYP+XRsa2yQJ5948b+DxMp/HgdG64vuWeqNmvo8Pa26KaeuMhued0q8LWNz0TA/48M4GbCUVqAPpyj7LEC04jfaehDb367DhhnI8K2tNJBYz+5oMkPXK3GrZVGHz1aetPLHAYZYAUSMGJQDXkL9TaowDfGy0goY8K/mu3xJSCS5erfSa6FBzuGcA99i//YbWs8Zs55sYpLw1ql6v5P7JoIxvSHhow==
+ bh=07umMMh5k62yZiyeA6IvK/kAHioUq+vPsGUSjjisM/E=;
+ b=GJVrBpyYp7qMh+8oSHawtJ1AfQijj4Zm8UtnlL49c2DaYNGWteMTLvr3kFnuvFGLlfFACE6o3tQCslyBHH2eU9hAucN7sto/ygI9NxCoZ81+WEGFmdLsY7VmyyVkpKBd7sqlvApJi/GVFW6VIkXixmL0fS14vE3yCkMEHpYo9iCTNXlKnTkngglSqKLGgojj0wHBwFvnvbxU1ItTMrUzP+c2Q+G7PM87rE6BG2s6OW5YoMV4KtixlvJL+SmXoW0GwZYYwv30bVZPLWARRO8ejo1F+lGGNRvwhZeyKK29R7hEUJylUVof66okd9ZlTnEBlaAmytaWKyXNI346Z6GUFw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lists.freedesktop.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vP1wCT9rAxWtNY+/Zm6kmN9ULRiGso0luVIOZ4aFcfo=;
- b=pvXBG2VdpyFGle/E2C2O1ep3+caWlvKBbvoU978WSVxaZFVd9Cg+gH8q1zJHRD1ljUjBsMX59dtWlHM6kiUuR42O7AUWrfKYBEn/D1F4BTfKzBpiH7endYEPFtn4+tkbj4W8SMNXF3I4g/FsHQDzSy5T0AKW2scv7bwsNo/YvuY=
-Received: from CY5PR04CA0029.namprd04.prod.outlook.com (2603:10b6:930:1e::20)
- by MW4PR12MB8609.namprd12.prod.outlook.com (2603:10b6:303:1e2::22) with
+ bh=07umMMh5k62yZiyeA6IvK/kAHioUq+vPsGUSjjisM/E=;
+ b=tdFHuA9vCa2nbPRazygHn4hdiXpJBMYQvFbozD4R316BH/okO25ivF/7uqpgmzfZowBg6iGX+wAYj8LEodwl7g9ga+Ss4V5yPQFLUWIfeIyWBSROd20RQRFhepHyaeer7vMMpIOvR3UwwaYv7VlHrcQBUXK/3FI1JdANcM3BNzKPuTdEI++EK21McMGqA5y8zlie72CIyDRBWHehkWz3ZdcaWCW/BRhfTdm4FNUBYwSeJVc+TX+VyqQ5Ycm5ezYSexL6pOBe13ZgzEaAaJg7ByofIXJzs+hPeh8m3nKZUYz4TmyaqoeUO8JUgJ9GGJfNYD1lEJzhXkn3Fg2jvZg2bQ==
+Received: from DM6PR07CA0106.namprd07.prod.outlook.com (2603:10b6:5:330::15)
+ by CH3PR12MB8483.namprd12.prod.outlook.com (2603:10b6:610:15c::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27; Mon, 30 Oct
- 2023 07:20:48 +0000
-Received: from CY4PEPF0000E9D7.namprd05.prod.outlook.com
- (2603:10b6:930:1e:cafe::58) by CY5PR04CA0029.outlook.office365.com
- (2603:10b6:930:1e::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27 via Frontend
- Transport; Mon, 30 Oct 2023 07:20:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000E9D7.mail.protection.outlook.com (10.167.241.78) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6933.15 via Frontend Transport; Mon, 30 Oct 2023 07:20:48 +0000
-Received: from compile-server.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.32; Mon, 30 Oct
- 2023 02:20:18 -0500
-From: Ma Jun <Jun.Ma2@amd.com>
-To: <amd-gfx@lists.freedesktop.org>, <lenb@kernel.org>,
-	<johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <alexander.deucher@amd.com>,
-	<Lijo.Lazar@amd.com>, <mario.limonciello@amd.com>, <netdev@vger.kernel.org>,
-	<linux-wireless@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>
-CC: <majun@amd.com>, Evan Quan <quanliangl@hotmail.com>, Ma Jun
-	<Jun.Ma2@amd.com>
-Subject: [Patch v13 9/9] drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-Date: Mon, 30 Oct 2023 15:18:32 +0800
-Message-ID: <20231030071832.2217118-10-Jun.Ma2@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231030071832.2217118-1-Jun.Ma2@amd.com>
-References: <20231030071832.2217118-1-Jun.Ma2@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.26; Mon, 30 Oct
+ 2023 07:25:06 +0000
+Received: from DS1PEPF00017096.namprd05.prod.outlook.com
+ (2603:10b6:5:330:cafe::9d) by DM6PR07CA0106.outlook.office365.com
+ (2603:10b6:5:330::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28 via Frontend
+ Transport; Mon, 30 Oct 2023 07:25:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF00017096.mail.protection.outlook.com (10.167.18.100) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6933.18 via Frontend Transport; Mon, 30 Oct 2023 07:25:05 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 30 Oct
+ 2023 00:24:57 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Mon, 30 Oct 2023 00:24:54 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <mkubecek@suse.cz>, <markwang@nvidia.com>, <mlxsw@nvidia.com>, "Ido
+ Schimmel" <idosch@nvidia.com>
+Subject: [PATCH ethtool-next] ethtool: Add support for more CMIS transceiver modules
+Date: Mon, 30 Oct 2023 09:23:53 +0200
+Message-ID: <20231030072353.1031217-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,102 +83,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D7:EE_|MW4PR12MB8609:EE_
-X-MS-Office365-Filtering-Correlation-Id: d1594655-bfbf-41dd-0411-08dbd918bdba
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017096:EE_|CH3PR12MB8483:EE_
+X-MS-Office365-Filtering-Correlation-Id: 88c25529-b6b7-4073-555e-08dbd91956f7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	f8oe0FE4JukUW7NrkweqT26aUuySbTkrW5cs5FR7y33SczOd6slSv28z0mfZ1Czmz4PYIfSx5hF7xa1USLZVSd172FyFXShmEQ9bxqmyPrmLLad03oCiToB2akTbVDN0ZwjKx6HoOzUKXBOCXFWygKctgUExA2/WNKyWFMx/8KjPkp2IlcZ7FeHnW8BsP2/MGBRFEPDa/QVdY50lSlePNBuRCyDIDYtSBirlKOu4mU8XqXDAWdQuIN76fWex8D0PzlM8oR+C/rs5Gpjx05eZ0PQmm3XDN/nkkU0MilDcE/VY0dJUbJLSoBeLeulQFhXX7Q94hwG3DnyGrf+EcNeFHjMTthhA7GdXg6VTzgLeqSdBUQkHgI12R5q8NrlL4wh4lebiwXcTYJz1/uGUEBL1hghpnW1zfAQ1dJD9b6PbRDG2uxiW2ijvVaN73afTof6qMcOBh4ruRsOvjP3FuTJQWv/lPtfndZ4SQKIyllE28FFJYrMB1AKPSaxtoo0KLeuG7su3cK3ZSMO8g97MsNGrqmL3Rs0elW3rtYyCjiAZ+qbJukfN7pK+NoPxEflhzaMH1SuLiHYzXjmEDVtWBWZ02F7owJV+zztfbSgRDt0Z5tItPq1gCgAjLyL+iIQctScczqUbNIQ2C/+cee+uSvHALiSQ9aa88s+lBXjkX9FtuIMp1JibQjNnJwwX4Uz+bZ4dJTS30DHIG5BB/CNlp7icf+xCYQM+VD5Z/PR+kyEtmm2DAbmsb/6Xz6HvODsRvRUPlOqwE1ZN12Jxe0quoQVEGGQ2yZddyZ6H3q7wy90NoWQHsY4KcvtGCWCUY5AylrgMUZ/UT/WET885mYPlhB1+Nw==
+	ctNOeVj7RgTJGvMmX9al7c/1XkyorvR0DcUMuyOynvn+wENmoj4fIiBLqJlXETdPVTIw0779uIW763pERBOdtY7tGRojhHNMgBgzW+6UYYIE6J9Gu4dtPlZAdGZ5YYooRZZnR/6QF6iKom/3+KjTmD2cc/wsm/yWBwkoNKnkYaQiiiBXlE5lDCJ2xZmH6tQYQLEDLBiDajFXJhtyv7Aeoxq634UGICC5kkwRlqag2HsrykzLLMiMgyW7BvhUfQ2drrxjTuwqrdblrmofia0LmQhfQ5xDLytzdaPg6usWUm7btJ1JjfWHIAPICExpZqU2UMC7DBwzrFxK2gjDS38YQZZfvQQJpIhjl8kcyrs1d5imaTthHMC0ZGFyg2hPN9TITxgrbvUrzEbLYz/w6C+2ewnICoEhQy81ivpRP76yc+8BlNdQYQXAufWHOFAAcPkpT2xpo0g2e7odiP+HUP7r5M0BBl8VauCZAUKnD1KyIQkx3fIFTUcH/a2xY3hktObvDd2pGrWjNl917Xh7iGvhhL5tbExkHzCcu89pUtgdtvhNXgtQLMYWCk9WGIwdgxj6qIxQDlQe6v7uI3kf/r9TI3+W7Y8Sb9jBoTWO9OlbUNDcfa1b6wELNsE3MpMoKIVOflmNjdqorxIR1RGu26K91ygPkJA2EP9iJ7HTvhxeBcd63S3f9Z1qeyRFL3hoa2YwTbnY4idXy+LxQ6rSwMK5SGwD6lQh1l4r6T0ZvcQpWVITtRNdvpcay7Icwrb1jf6t
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(396003)(376002)(346002)(136003)(39860400002)(230273577357003)(230173577357003)(230922051799003)(82310400011)(64100799003)(1800799009)(186009)(451199024)(36840700001)(40470700004)(83380400001)(16526019)(110136005)(41300700001)(2906002)(7416002)(5660300002)(2616005)(86362001)(36756003)(40480700001)(1076003)(426003)(336012)(26005)(40460700003)(32650700002)(81166007)(36860700001)(7696005)(478600001)(54906003)(70586007)(70206006)(4326008)(8936002)(8676002)(316002)(45080400002)(921008)(82740400003)(356005)(6666004)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 07:20:48.7490
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(396003)(39860400002)(346002)(136003)(230922051799003)(186009)(451199024)(82310400011)(64100799003)(1800799009)(40470700004)(46966006)(36840700001)(82740400003)(83380400001)(40480700001)(40460700003)(47076005)(356005)(7636003)(36860700001)(478600001)(2906002)(8676002)(8936002)(107886003)(4326008)(70586007)(70206006)(316002)(6916009)(54906003)(5660300002)(41300700001)(426003)(1076003)(16526019)(336012)(26005)(2616005)(86362001)(36756003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 07:25:05.7954
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1594655-bfbf-41dd-0411-08dbd918bdba
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88c25529-b6b7-4073-555e-08dbd91956f7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D7.namprd05.prod.outlook.com
+	DS1PEPF00017096.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB8609
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8483
 
-From: Evan Quan <quanliangl@hotmail.com>
+Add three more SFF-8024 Identifier Values that according to the standard
+support the Common Management Interface Specification (CMIS) memory map
+so that ethtool will be able to dump, parse and print their EEPROM
+contents.
 
-Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
-
-Signed-off-by: Evan Quan <quanliangl@hotmail.com>
-Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
-Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
---
-v10->v11:
-  - downgrade the prompt level on message failure(Lijo)
-v13:
- - Fix the format issue (IIpo Jarvinen)
- - Remove duplicate code (IIpo Jarvinen)
+Reported-by: Mark Wang <markwang@nvidia.com>
+Tested-by: Mark Wang <markwang@nvidia.com>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c    | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ netlink/module-eeprom.c |  3 +++
+ qsfp.c                  | 10 +++++++---
+ sff-common.c            |  9 +++++++++
+ sff-common.h            |  5 ++++-
+ 4 files changed, 23 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-index 94ef5b4d116d..b230d13fc5b0 100644
---- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-+++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-@@ -134,6 +134,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
- 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
- 	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
- 	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
-+	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
- };
+diff --git a/netlink/module-eeprom.c b/netlink/module-eeprom.c
+index 49833a2a6a38..09ad58011d2a 100644
+--- a/netlink/module-eeprom.c
++++ b/netlink/module-eeprom.c
+@@ -225,6 +225,9 @@ static int eeprom_parse(struct cmd_context *ctx)
+ 	case SFF8024_ID_QSFP_DD:
+ 	case SFF8024_ID_OSFP:
+ 	case SFF8024_ID_DSFP:
++	case SFF8024_ID_QSFP_PLUS_CMIS:
++	case SFF8024_ID_SFP_DD_CMIS:
++	case SFF8024_ID_SFP_PLUS_CMIS:
+ 		return cmis_show_all_nl(ctx);
+ #endif
+ 	default:
+diff --git a/qsfp.c b/qsfp.c
+index 5a535c5c092b..eedf6883f7a3 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -977,9 +977,13 @@ void sff8636_show_all_ioctl(const __u8 *id, __u32 eeprom_len)
+ {
+ 	struct sff8636_memory_map map = {};
  
- static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
-@@ -215,6 +216,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
- 	TAB_MAP(ACTIVITY_MONITOR_COEFF),
- 	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
- 	TAB_MAP(OVERDRIVE),
-+	TAB_MAP(WIFIBAND),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
-@@ -510,6 +512,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
- 		       AMDGPU_GEM_DOMAIN_VRAM);
- 	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
- 			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
-+	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
-+		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
-+		       AMDGPU_GEM_DOMAIN_VRAM);
- 
- 	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
- 	if (!smu_table->metrics_table)
-@@ -2178,6 +2183,11 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
- 					       NULL);
- }
- 
-+static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
-+{
-+	return smu->smc_fw_version > 0x00524600;
-+}
-+
- static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
- 	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
-@@ -2246,6 +2256,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
- 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
- 	.gpo_control = smu_v13_0_gpo_control,
-+	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
-+	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
-+	.set_wbrf_exclusion_ranges = smu_v13_0_set_wbrf_exclusion_ranges,
- };
- 
- void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
+-	if (id[SFF8636_ID_OFFSET] == SFF8024_ID_QSFP_DD ||
+-	    id[SFF8636_ID_OFFSET] == SFF8024_ID_OSFP ||
+-	    id[SFF8636_ID_OFFSET] == SFF8024_ID_DSFP) {
++	switch (id[SFF8636_ID_OFFSET]) {
++	case SFF8024_ID_QSFP_DD:
++	case SFF8024_ID_OSFP:
++	case SFF8024_ID_DSFP:
++	case SFF8024_ID_QSFP_PLUS_CMIS:
++	case SFF8024_ID_SFP_DD_CMIS:
++	case SFF8024_ID_SFP_PLUS_CMIS:
+ 		cmis_show_all_ioctl(id);
+ 		return;
+ 	}
+diff --git a/sff-common.c b/sff-common.c
+index a5c1510302a6..a412a6ec0a4e 100644
+--- a/sff-common.c
++++ b/sff-common.c
+@@ -162,6 +162,15 @@ void sff8024_show_identifier(const __u8 *id, int id_offset)
+ 	case SFF8024_ID_DSFP:
+ 		printf(" (DSFP Dual Small Form Factor Pluggable Transceiver)\n");
+ 		break;
++	case SFF8024_ID_QSFP_PLUS_CMIS:
++		printf(" (QSFP+ or later with Common Management Interface Specification (CMIS))\n");
++		break;
++	case SFF8024_ID_SFP_DD_CMIS:
++		printf(" (SFP-DD Double Density 2X Pluggable Transceiver with Common Management Interface Specification (CMIS))\n");
++		break;
++	case SFF8024_ID_SFP_PLUS_CMIS:
++		printf(" (SFP+ and later with Common Management Interface Specification (CMIS))\n");
++		break;
+ 	default:
+ 		printf(" (reserved or unknown)\n");
+ 		break;
+diff --git a/sff-common.h b/sff-common.h
+index 57bcc4a415fe..899dc5be15b1 100644
+--- a/sff-common.h
++++ b/sff-common.h
+@@ -64,7 +64,10 @@
+ #define  SFF8024_ID_QSFP_DD				0x18
+ #define  SFF8024_ID_OSFP				0x19
+ #define  SFF8024_ID_DSFP				0x1B
+-#define  SFF8024_ID_LAST				SFF8024_ID_DSFP
++#define  SFF8024_ID_QSFP_PLUS_CMIS			0x1E
++#define  SFF8024_ID_SFP_DD_CMIS				0x1F
++#define  SFF8024_ID_SFP_PLUS_CMIS			0x20
++#define  SFF8024_ID_LAST				SFF8024_ID_SFP_PLUS_CMIS
+ #define  SFF8024_ID_UNALLOCATED_LAST	0x7F
+ #define  SFF8024_ID_VENDOR_START		0x80
+ #define  SFF8024_ID_VENDOR_LAST			0xFF
 -- 
-2.34.1
+2.40.1
 
 
