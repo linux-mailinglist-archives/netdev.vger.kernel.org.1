@@ -1,163 +1,124 @@
-Return-Path: <netdev+bounces-45270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81E637DBC9C
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:31:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A837DBCA1
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:34:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2350CB20CB7
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:31:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E30C2813D1
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8601A18AE6;
-	Mon, 30 Oct 2023 15:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C19A5179AF;
+	Mon, 30 Oct 2023 15:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVEDM77g"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="rKGnRkg1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04C6182C6
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:31:03 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06409C9;
-	Mon, 30 Oct 2023 08:31:02 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso7804062a12.3;
-        Mon, 30 Oct 2023 08:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698679860; x=1699284660; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OwEL6Pg+GghxIBTWLg7sNVv9RjmOZEAEG7bBzkZXR7g=;
-        b=EVEDM77gRD/J82tHhTVAt8AC9BcvlPT0H9Tnp+5FBeeXkVb84ebjVyCMLASxN5hxzG
-         b5J32MB/SqxFYfkJ1kkCsU/0rhIditGfLEyVjI+rMpE6kcXJ4zzJmvZgmjVRytXzH3FB
-         e0N22jPvUpjbTMprvKm0QdpvDwOmR7nHrsleGX9x0JXUjFoyZ3DcaUkfnznv8o0e6QlH
-         ZGGYbvZxt8xbYOk5Bl3AXTSavLsxlLGB3d0+eK3TfJqXSBCF/DvngBHpEx017aPIbK56
-         qtzXgu6W/1qQlZ2x+Mr1eoEZfdtfF2KmWMTAHdETzVea3GGxCYRHzfGzJUD4QHHrH6nH
-         cmsw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E58818AED
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:34:27 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34569D9
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:34:25 -0700 (PDT)
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com [209.85.167.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EE3FE3F19A
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 15:34:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1698680061;
+	bh=U+HzRWWfe445TTBhBAgXB/2ejF+ftXkNxDYm8dN+cP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=rKGnRkg1j8hQGzJ4I6NxLg9c3DUXq6/zVaHnd1UALhaxBhxLnEi7CCbf7qUmMHCO6
+	 e9WpfnpYk1pUe0VxG+v5BvTFhh7pw8VFlDMxWZHFelk021DVKOPt+YnFjolxBo/hcP
+	 TEgfoAufMySHW6mOF386tKntxG2NamSBur0Ua8Vfh5o1Ol3vzZKqOeroBZAoy4e7+L
+	 QD3Uv3uZhTsIrYYF39Ud1y/0brgYGDccOzqlk4GMo1/Uzd8AbLa5QgCmwXWhKyHnzA
+	 3Kj2ABcYqP5AE7wwi6wbu59nph8klXAXCy7kCUF71/3OYZ0DrIRUc4VhRjcVrBZS1p
+	 +QaiQcddRqkCA==
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3b3ebbbdbf9so5995159b6e.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 08:34:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698679860; x=1699284660;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OwEL6Pg+GghxIBTWLg7sNVv9RjmOZEAEG7bBzkZXR7g=;
-        b=uUkAPUC/TadKpHvlnMZs+xRL2MhBMT3SZS86LN06OhK80b83z1BqLJHyJnp7CcDnu+
-         M2xL9Uxi0tB/KmCCRWPYRZG9R67gkAZPDtwvHHqumSX+zm6dWHAHnseaqpW+iJUBfWPX
-         JQ1thtgqC39fNfWr87FeisqtObTDhB+lHrybkr8Wvr9ZwE7+aNXhKCA77xsDXH48MUSe
-         OXN2U22/pm/FKwF6gLalNGByXF5QcNCelmUJmdzifgehYzp+ZC01mykY+RLj+BObUERa
-         5XRweQxlB8qLvsoO7CE6d6dgtT9tVvPyQRnGQtvsB631K18L+Wk06h+nCVQ82pf6/9Db
-         silw==
-X-Gm-Message-State: AOJu0YwP9NQT2isZtTRJkokeaq63eBuh/FwiX9DpqC86TuqCu3MUAX1S
-	e0pkLB/FXwrHv/iQpCSqj4M=
-X-Google-Smtp-Source: AGHT+IG9pPQq9f7S7tZBTZOUFwtWw3/Nj1u7nONKa0vBEqjmp+oqajxd/j3IOP8Fo2JfnZ1SGfxFyA==
-X-Received: by 2002:a17:906:2b55:b0:9d2:810f:4922 with SMTP id b21-20020a1709062b5500b009d2810f4922mr3407648ejg.33.1698679860170;
-        Mon, 30 Oct 2023 08:31:00 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id g10-20020a17090613ca00b00992b8d56f3asm6172905ejc.105.2023.10.30.08.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 08:30:59 -0700 (PDT)
-Date: Mon, 30 Oct 2023 17:30:57 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231030153057.3ofydbzh7q2um3os@skbuf>
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
- <CACRpkdYg8hattBC1esfh3WBNLZdMM5rLWhn4HTRLMfr2ubbzAA@mail.gmail.com>
- <20231030152325.qdpvv4nbczhal35c@skbuf>
+        d=1e100.net; s=20230601; t=1698680061; x=1699284861;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U+HzRWWfe445TTBhBAgXB/2ejF+ftXkNxDYm8dN+cP8=;
+        b=Sl/NXTi2UL/0aWc8jk6jGE3Wsd0z9KoZAv4NKB8GiExkG8qGUJPYIhYdrPQQJ+28MM
+         o1Gr7EQ4QQlzY+SOsgmMiknfKkDyMDoPa+ypyGnc1quAJJwLwId0avSrlUaevGACxn9z
+         3OlOebo5iv85ngCjWktfdq3S5nMXydoi/o9SXxQxdegnk+TJVxQ8ZHpecba6X5KeRrYp
+         BfAsamf3oJv/lys8A/Y8Lzkx7esi8efyAyjfRrEDux4NhRAoZQpCKJLDbzXEIu5c23ij
+         bw/lhblyTQX4i1iMTrC/pEn8aHHLM4vlqZsfRyG1fXm1spSQOpUbOZjO0z/T5htJ8bTy
+         rPng==
+X-Gm-Message-State: AOJu0YzTB+fqcACKAJOi3+s8DYqc0OkQzKy6zp07ddKig1/6sRgp+AF+
+	g7mblYBxsTLYeJha2O2kYiYqO8RBtOAq2bROgg9ynaoAyKKI9hwn168Q9e9LSW5YPEYJ7MjFWc5
+	VsBbe/BivL+vpNVRIfiCUUZPnd1RuT1fesX7XCGCKKTC118dx
+X-Received: by 2002:a05:6870:d914:b0:1ef:bae0:4bb8 with SMTP id gq20-20020a056870d91400b001efbae04bb8mr4656730oab.29.1698680060903;
+        Mon, 30 Oct 2023 08:34:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGLmaoGBFAeuxipughz1BuzObURNyX+TjwBCwyAeiZQHdITLI4GtggdgVl6tKynDeG2pL6pFJ40Rp0BudyOPSQ=
+X-Received: by 2002:a05:6870:d914:b0:1ef:bae0:4bb8 with SMTP id
+ gq20-20020a056870d91400b001efbae04bb8mr4656716oab.29.1698680060568; Mon, 30
+ Oct 2023 08:34:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231030152325.qdpvv4nbczhal35c@skbuf>
+References: <20231030094555.3333551-1-liuhangbin@gmail.com>
+In-Reply-To: <20231030094555.3333551-1-liuhangbin@gmail.com>
+From: Po-Hsu Lin <po-hsu.lin@canonical.com>
+Date: Mon, 30 Oct 2023 23:34:09 +0800
+Message-ID: <CAMy_GT-8fKJ1+y9Dgi5R2kuPiRJfC4gg-K0GW5NWL_vDbuTALA@mail.gmail.com>
+Subject: Re: [PATCH net] selftests: pmtu.sh: fix result checking
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 30, 2023 at 05:23:25PM +0200, Vladimir Oltean wrote:
-> On Mon, Oct 30, 2023 at 03:37:24PM +0100, Linus Walleij wrote:
-> > On Mon, Oct 30, 2023 at 3:16 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> > 
-> > > Could you please try to revert the effect of commit 339133f6c318 ("net:
-> > > dsa: tag_rtl4_a: Drop bit 9 from egress frames") by setting that bit in
-> > > the egress tag again? Who knows, maybe it is the bit which tells the
-> > > switch to bypass the forwarding process.
-> > 
-> > I have already tried that, it was one of the first things I tried,
-> > just looking over the git log and looking for usual suspects.
-> > 
-> > Sadly it has no effect whatsoever, the problem persists :(
-> > 
-> > > Or maybe there is a bit in a
-> > > different position which does this. You could try to fill in all bits in
-> > > unknown positions, check that there are no regressions with packet sizes
-> > > < 1496, and then see if that made any changes to packet sizes >= 1496.
-> > > If it did, try to see which bit made the difference.
-> > 
-> > Hehe now we're talking :D
-> > 
-> > I did something similar before, I think just switching a different bit
-> > every 10 packets or so and running a persistent ping until it succeeds
-> > or not.
-> > 
-> > I'll see what I can come up with.
-> > 
-> > Yours,
-> > Linus Walleij
-> 
-> And the drop reason in ethtool -S also stays unchanged despite all the
-> extra bits set in the tag? It still behaves as if the packet goes
-> through the forwarding path?
+On Mon, Oct 30, 2023 at 5:46=E2=80=AFPM Hangbin Liu <liuhangbin@gmail.com> =
+wrote:
+>
+> In the PMTU test, when all previous tests are skipped and the new test
+> passes, the exit code is set to 0. However, the current check mistakenly
+> treats this as an assignment, causing the check to pass every time.
+>
+> Consequently, regardless of how many tests have failed, if the latest tes=
+t
+> passes, the PMTU test will report a pass.
+>
+> Fixes: 2a9d3716b810 ("selftests: pmtu.sh: improve the test result process=
+ing")
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+>  tools/testing/selftests/net/pmtu.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftest=
+s/net/pmtu.sh
+> index f838dd370f6a..b9648da4c371 100755
+> --- a/tools/testing/selftests/net/pmtu.sh
+> +++ b/tools/testing/selftests/net/pmtu.sh
+> @@ -2048,7 +2048,7 @@ run_test() {
+>         case $ret in
+>                 0)
+>                         all_skipped=3Dfalse
+> -                       [ $exitcode=3D$ksft_skip ] && exitcode=3D0
+> +                       [ $exitcode =3D $ksft_skip ] && exitcode=3D0
+Perhaps replacing "=3D" with -eq here will be less error-prone?
+Thanks for catching this!
 
-Could you please place these skb_dump() calls before and after the magic
-__skb_put_padto() call, for us to see if anything unexpected changes?
-Maybe the socket buffers have some unusual geometry which the conduit
-interface doesn't like, for some reason.
-
-The number of skb dumps that you provide back should be even, and
-ideally the first one should be the unaltered packet, to avoid confusion :)
-
-diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
-index 25238093686c..2ca189b5125e 100644
---- a/net/dsa/tag_rtl4_a.c
-+++ b/net/dsa/tag_rtl4_a.c
-@@ -41,18 +41,22 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
- 	u8 *tag;
- 	u16 out;
- 
--	/* Pad out to at least 60 bytes */
--	if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
--		return NULL;
--
- 	/* Packets over 1496 bytes get dropped unless they get padded
- 	 * out to 1518 bytes. 1496 is ETH_DATA_LEN - tag which is hardly
- 	 * a coinicidence, and 1518 is ETH_FRAME_LEN + FCS so we define
- 	 * the threshold size and padding like this.
- 	 */
- 	if (skb->len >= (ETH_DATA_LEN - RTL4_A_HDR_LEN)) {
-+		skb_dump(KERN_ERR, skb, true);
-+
- 		if (unlikely(__skb_put_padto(skb, ETH_FRAME_LEN + ETH_FCS_LEN, false)))
- 			return NULL;
-+
-+		skb_dump(KERN_ERR, skb, true);
-+	} else {
-+		/* Pad out to at least 60 bytes */
-+		if (unlikely(__skb_put_padto(skb, ETH_ZLEN, false)))
-+			return NULL;
- 	}
- 
- 	netdev_dbg(dev, "add realtek tag to package to port %d\n",
--- 
-2.34.1
-
+>                 ;;
+>                 $ksft_skip)
+>                         [ $all_skipped =3D true ] && exitcode=3D$ksft_ski=
+p
+> --
+> 2.41.0
+>
 
