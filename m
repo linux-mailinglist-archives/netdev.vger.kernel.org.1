@@ -1,220 +1,567 @@
-Return-Path: <netdev+bounces-45241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420277DBB10
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:44:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2ED7DBB54
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96A60B20CF7
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:44:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45C64B20F47
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1218171B0;
-	Mon, 30 Oct 2023 13:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8D0182A4;
+	Mon, 30 Oct 2023 14:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KBLye+MI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPzy8Pjh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3D9EEDE
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 13:44:29 +0000 (UTC)
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF2C97
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:44:27 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-7b6cd2afaf2so1867398241.0
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:44:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CFA13239
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:04:09 +0000 (UTC)
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40052B7;
+	Mon, 30 Oct 2023 07:04:04 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso7606133a12.3;
+        Mon, 30 Oct 2023 07:04:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1698673467; x=1699278267; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cp6Ha2d0GCuSdJFpoKLjTi78MtHF39hFwPYkdZYqy8I=;
-        b=KBLye+MIZInY6uE33Z5g2IoC3DS/uCijaTNsztQaZq7GJeK1+EMkwfgb6eX4t0nOSc
-         IqOSGfs2rBZGYPXxalEEnKO/KUixUprB01emf0ORaGjziMk7X3DI59C5Xev2I3ARoCmK
-         sUtfxC3Bnb4RJqetc0GQl8u3ohy9eQ/mSkoPs=
+        d=gmail.com; s=20230601; t=1698674642; x=1699279442; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5EB3rdOOoDhUyIvhXpN5ETbcGOsHihkW6zcFmlBlHb8=;
+        b=LPzy8PjhzRi1zR3kNslX6AL+eBZEnz7y5bwKfh35TwT5TpvaRz56DyV6lQCLDDCBKK
+         g7xuD8LPUIqn9XPNKRVInb2kNk8cvVLaAmJMy4J+etWhlJIgoDSAbnUNABWkZ1U8eEFf
+         fXLLSGjCOefJu1DMBrL63JCLKvNsCYeTS4dboTkVzV4oPLlwzTOir2MrOb20rIJ9Q+N/
+         BKIbkQYM/k+9XTifD1BPBDFC//bOmVeeIC1oC1nbLKHNzKOodgmUSlNeVZ4bE02aMii6
+         SZlHfwvMrWfyh89g75Uyk3zECcl264UdRMkSzDhCN4dfxHsmE2PgG5DwvoWE5mt8MvvV
+         /+Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698673467; x=1699278267;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cp6Ha2d0GCuSdJFpoKLjTi78MtHF39hFwPYkdZYqy8I=;
-        b=DN2tca2iLnAAhHtC3fM4t4kqDouTGTnRbzkSBcyPKFxk5ih1TD+qCk7pP9q99Keoj6
-         tiWdyVnyXBTxWyd5/Baa7ElhaRpP5NMh/fpAJKcVAeBbiiJNhCAc7rSSWe3GnyEBuCWV
-         5yWcNF1DaYDQ11bN+NYr80Vhh23gicqrLMOfDK0Cq4nzFa76ArPPRgnzFnDIaY6LJMnl
-         Drm1N2FyIBU0bfJneDAlBtGlSIE0MaObX+Eqk43oW4eyOI3a1Z9etUKO8LInlJr5aka0
-         rUFOeJaLubOv6wXbHFVrV3RZTihiPTeBpXQ/FQFNN9dxMYXYKlpNR/4Qfl7ZHWkNzDyH
-         bl2g==
-X-Gm-Message-State: AOJu0YyOI8jlTMw2yozqPvpe2HQZGWl9jLJwKQitmAyS6yMjK/Tou1TA
-	+20dhFUodOvyKKm7bKHJMPdmC50IsHYIJ7AGZbGobg==
-X-Google-Smtp-Source: AGHT+IF76Y4/Jl+cJ+jAr3lR3LJmWONDC2kDd1Q9HJkH3tBOmPeuLAevDrk5Q4NF4sEGrAfQeGgyolVQTNdGSZIvrNc=
-X-Received: by 2002:a67:e08e:0:b0:457:cca9:a922 with SMTP id
- f14-20020a67e08e000000b00457cca9a922mr8467004vsl.24.1698673466950; Mon, 30
- Oct 2023 06:44:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698674642; x=1699279442;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5EB3rdOOoDhUyIvhXpN5ETbcGOsHihkW6zcFmlBlHb8=;
+        b=I2xH75vREcknCXwygFH5fjEyzH44GnxfF3m/k4itvAtx/X0p9fsJl309llibfliidJ
+         joYk0ZCrJBdFuDkxwofiWPvCB0qKs0Qyured0qMYD3RZwwl1Xk4PuNEy84QjLZR2aFEM
+         OS0GHzTO7pST4Rke0wBZ7wSq7U4rFpH+Cjg6qpcMMLi8tjqCcmqY124jUi0VgE6aIlN5
+         /nAIS9uuZ4D1SC4meJ4ug2q0T6Eb4CNrtqyH0HBIgcCLBT7o90hBlZf2O59VQ6Vror8K
+         o8p35NaYtRXOBNqtHpkfcNLIEE97Yi7Hb2hxyORjeJsXdr/dWOk99MLXhxQSvk1EcCLS
+         impQ==
+X-Gm-Message-State: AOJu0Ywm0zrEQi610IDpVez6Nq5x/03oRYruO9jyPdikG/6aQcpVMARZ
+	B3xt8i6VGvCOj4pQnMJSXxQ=
+X-Google-Smtp-Source: AGHT+IF5ZltJwgVXIL6WYLmUpba9HED/QyrVZ8bjfnqiAlQMtnG7LcWHEVzJug4N9q7i9SeyPt0LJw==
+X-Received: by 2002:a05:6402:1852:b0:53f:1ce2:a3ac with SMTP id v18-20020a056402185200b0053f1ce2a3acmr8006151edy.41.1698674642413;
+        Mon, 30 Oct 2023 07:04:02 -0700 (PDT)
+Received: from ?IPV6:2a01:c23:bc31:8900:5db7:a938:1060:35a3? (dynamic-2a01-0c23-bc31-8900-5db7-a938-1060-35a3.c23.pool.telefonica.de. [2a01:c23:bc31:8900:5db7:a938:1060:35a3])
+        by smtp.googlemail.com with ESMTPSA id n27-20020a5099db000000b0053116e45317sm6278564edb.44.2023.10.30.07.04.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Oct 2023 07:04:01 -0700 (PDT)
+Message-ID: <fd56b4ef-921d-492f-8d92-e50d2facd1d4@gmail.com>
+Date: Mon, 30 Oct 2023 14:45:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030091256.2915394-1-shaojijie@huawei.com> <ZT+cb4sO3PK1EbT5@nanopsycho>
-In-Reply-To: <ZT+cb4sO3PK1EbT5@nanopsycho>
-From: Somnath Kotur <somnath.kotur@broadcom.com>
-Date: Mon, 30 Oct 2023 19:14:14 +0530
-Message-ID: <CAOBf=mvvnfv6HcG7D5Oo9p3F9nr1k9rRdqMP_N1ZnRG9foGZxQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: page_pool: add missing free_percpu when
- page_pool_init fail
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jijie Shao <shaojijie@huawei.com>, hawk@kernel.org, ilias.apalodimas@linaro.org, 
-	davem@davemloft.net, edumazet@google.com, Jakub Kicinski <kuba@kernel.org>, 
-	pabeni@redhat.com, jdamato@fastly.com, shenjian15@huawei.com, 
-	wangjie125@huawei.com, liuyonglong@huawei.com, linyunsheng@huawei.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009aaca30608ef3c27"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/1] r8169: Coalesce RTL8411b PHY power-down recovery
+ programming instructions to reduce spinlock stalls
+Content-Language: en-US
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: nic_swsd@realtek.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Marco Elver <elver@google.com>
+References: <20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr>
+ <376db5ae-1bb0-4682-b132-b9852be3c7aa@gmail.com>
+ <23428695-fcff-495b-ac43-07639b4f5d08@alu.unizg.hr>
+ <30e15e9a-d82e-4d24-be37-1b9d1534c082@gmail.com>
+ <9f99c3a4-2752-464b-b37d-58a4f8041804@alu.unizg.hr>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <9f99c3a4-2752-464b-b37d-58a4f8041804@alu.unizg.hr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---0000000000009aaca30608ef3c27
-Content-Type: multipart/alternative; boundary="00000000000096747d0608ef3c10"
+On 30.10.2023 14:30, Mirsad Todorovac wrote:
+> 
+> 
+> On 10/30/23 14:17, Heiner Kallweit wrote:
+>> On 29.10.2023 05:56, Mirsad Todorovac wrote:
+>>>
+>>>
+>>> On 10/28/23 21:21, Heiner Kallweit wrote:
+>>>> On 28.10.2023 13:05, Mirsad Goran Todorovac wrote:
+>>>>> On RTL8411b the RX unit gets confused if the PHY is powered-down.
+>>>>> This was reported in [0] and confirmed by Realtek. Realtek provided
+>>>>> a sequence to fix the RX unit after PHY wakeup.
+>>>>>
+>>>>> A series of about 130 r8168_mac_ocp_write() calls is performed to
+>>>>> program the RTL registers for recovery.
+>>>>>
+>>>>> r8168_mac_ocp_write() expands to this code:
+>>>>>
+>>>>>           static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg, u32 data)
+>>>>>           {
+>>>>>                   if (rtl_ocp_reg_failure(reg))
+>>>>>                           return;
+>>>>>
+>>>>>                   RTL_W32(tp, OCPDR, OCPAR_FLAG | (reg << 15) | data);
+>>>>>           }
+>>>>>
+>>>>>           static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg, u32 data)
+>>>>>           {
+>>>>>                   unsigned long flags;
+>>>>>
+>>>>>                   raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
+>>>>>                   __r8168_mac_ocp_write(tp, reg, data);
+>>>>>                   raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+>>>>>           }
+>>>>>
+>>>>> Register programming is done through RTL_W32() macro which expands into
+>>>>>
+>>>>>           #define RTL_W32(tp, reg, val32) writel((val32), tp->mmio_addr + (reg))
+>>>>>
+>>>>> which is further (on Alpha):
+>>>>>
+>>>>>           extern inline void writel(u32 b, volatile void __iomem *addr)
+>>>>>           {
+>>>>>                   mb();
+>>>>>                   __raw_writel(b, addr);
+>>>>>           }
+>>>>>
+>>>>> or on i386/x86_64:
+>>>>>
+>>>>>       #define build_mmio_write(name, size, type, reg, barrier) \
+>>>>>       static inline void name(type val, volatile void __iomem *addr) \
+>>>>>       { asm volatile("mov" size " %0,%1": :reg (val), \
+>>>>>       "m" (*(volatile type __force *)addr) barrier); }
+>>>>>
+>>>>>       build_mmio_write(writel, "l", unsigned int, "r", :"memory")
+>>>>>
+>>>>> This obviously involves iat least a compiler barrier.
+>>>>>
+>>>>> mb() expands into something like this i.e. on x86_64:
+>>>>>
+>>>>>           #define mb()    asm volatile("lock; addl $0,0(%%esp)" ::: "memory")
+>>>>>
+>>>>> This means a whole lot of memory bus barriers: for spin_lock_irqsave(),
+>>>>> memory barrier, writel(), and spin_unlock_irqrestore().
+>>>>>
+>>>>> With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
+>>>>> a LOCK storm that will thunder all of the cores and CPUs on the same memory controller
+>>>>> for certain time that locked memory read-modify-write cyclo or I/O takes to finish.
+>>>>>
+>>>>> In a sequential case of RTL register programming, the writes to RTL registers
+>>>>> can be coalesced under a same raw spinlock. This can dramatically decrease the
+>>>>> number of bus stalls in a multicore or multi-CPU system:
+>>>>>
+>>>>>           static void __r8168_mac_ocp_write_seq(struct rtl8169_private *tp,
+>>>>>                                                 const struct recover_8411b_info *array)
+>>>>>           {
+>>>>>                   struct recover_8411b_info const *p = array;
+>>>>>
+>>>>>                   while (p->reg) {
+>>>>>                           if (!rtl_ocp_reg_failure(p->reg))
+>>>>>                                   RTL_W32(tp, OCPDR, OCPAR_FLAG | (p->reg << 15) | p->data);
+>>>>>                           p++;
+>>>>>                   }
+>>>>>           }
+>>>>>
+>>>>>           static void r8168_mac_ocp_write_seq(struct rtl8169_private *tp,
+>>>>>                                               const struct recover_8411b_info *array)
+>>>>>           {
+>>>>>                   unsigned long flags;
+>>>>>
+>>>>>                   raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
+>>>>>                   __r8168_mac_ocp_write_seq(tp, array);
+>>>>>                   raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+>>>>>           }
+>>>>>
+>>>>>           static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
+>>>>>           {
+>>>>>
+>>>>>                   ...
+>>>>>
+>>>>>                   /* The following Realtek-provided magic fixes an issue with the RX unit
+>>>>>                    * getting confused after the PHY having been powered-down.
+>>>>>                    */
+>>>>>
+>>>>>                   static const struct recover_8411b_info init_zero_seq[] = {
+>>>>>                           { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 }, { 0xFC2E, 0x0000 },
+>>>>>              ...
+>>>>>                   };
+>>>>>
+>>>>>                   static const struct recover_8411b_info recover_seq[] = {
+>>>>>                           { 0xF800, 0xE008 }, { 0xF802, 0xE00A }, { 0xF804, 0xE00C }, { 0xF806, 0xE00E },
+>>>>>              ...
+>>>>>                   };
+>>>>>
+>>>>>                   static const struct recover_8411b_info final_seq[] = {
+>>>>>                           { 0xFC2A, 0x0743 }, { 0xFC2C, 0x0801 }, { 0xFC2E, 0x0BE9 }, { 0xFC30, 0x02FD },
+>>>>>              ...
+>>>>>                   };
+>>>>>
+>>>>>                   r8168_mac_ocp_write_seq(tp, init_zero_seq);
+>>>>>                   mdelay(3);
+>>>>>                   r8168_mac_ocp_write(tp, 0xFC26, 0x0000);
+>>>>>                   r8168_mac_ocp_write_seq(tp, recover_seq);
+>>>>>                   r8168_mac_ocp_write(tp, 0xFC26, 0x8000);
+>>>>>                   r8168_mac_ocp_write_seq(tp, final_seq);
+>>>>>           }
+>>>>>
+>>>>> The hex data is preserved intact through s/r8168_mac_ocp_write[(]tp,/{ / and s/[)];/ },/
+>>>>> functions that only changed the function names and the ending of the line, so the actual
+>>>>> hex data is unchanged.
+>>>>>
+>>>>> Note that the original reason for the introduction of the commit fe4e8db0392a6
+>>>>> was to enable recovery of the RX unit on the RTL8411b which was confused by the
+>>>>> powered-down PHY. This sequence of r8168_mac_ocp_write() calls amplifies the problem
+>>>>
+>>>> I still have a problem with this statement as you're saying that the original
+>>>> problem still exists. I don't think that's the case.
+>>>
+>>> I will not disagree about it.
+>>>
+>>> But we have only reduced the number of spin_lock_irqsave/spin_unlock_irqrestore()
+>>> pairs.
+>>>
+>>> Maybe additionally, on the low level, memory barrier isn't required for each write to
+>>> MMIO?
+>>>
+>> One could argue whether in several places writel_relaxed() could be used.
+>> But it's not really worth it, because we're not in a hot path.
+> 
+> I see. Thank you for your evaluation.
+> 
+> Using writel_relaxed() sounds clever. It expands to:
+> 
+>     #define build_mmio_write(name, size, type, reg, barrier) \
+>         static inline void name(type val, volatile void __iomem *addr) \
+>          { asm volatile("mov" size " %0,%1": :reg (val), \
+>                         "m" (*(volatile type __force *)addr) barrier); }
+>     build_mmio_write(__writel, "l", unsigned int, "r", )
+>     #define writel_relaxed(v, a) __writel(v, a)
+> 
+> Here "barrier" is an empty string. Really clever. ;-)
+> 
+> I will not contradict, but the cummulative amount of memory barriers on each MMIO read/write
+> in each single one of the drivers could amount to some degrading of overall performance and
+> latency in a multicore system.
+> 
+> As I understood Mr. Jonathan Corbet on LWN, the initiative and trend is to reduce overall
+> kernel latency.
+> 
+Sure, but there's better places to look at first than a rarely used path in a driver.
+See e.g. the history of threadad NAPI (and in general the RT Linux developments) or
+the optimizations deep in the network stack Eric is working on.
 
---00000000000096747d0608ef3c10
-Content-Type: text/plain; charset="UTF-8"
+> Thanks,
+> Mirsad
+> 
+>>> If it still uses a LOCK addl $0, m32/m64, then it still creates 130 instances of all core
+>>> bus locks for this NIC reset after the lost PHY? I'm just thinking, this is nothing
+>>> authoritative ...
+>>>
+>>>>> into a series of about 500+ memory bus locks, most waiting for the main memory read,
+>>>>> modify and write under a LOCK. The memory barrier in RTL_W32 should suffice for
+>>>>> the programming sequence to reach RTL NIC registers.
+>>>>>
+>>>>> [0] https://bugzilla.redhat.com/show_bug.cgi?id=1692075
+>>>>>
+>>>>> Fixes: fe4e8db0392a6 ("r8169: fix issue with confused RX unit after PHY power-down on RTL8411b")
+>>>>> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+>>>>> Cc: Marco Elver <elver@google.com>
+>>>>> Cc: nic_swsd@realtek.com
+>>>>> Cc: "David S. Miller" <davem@davemloft.net>
+>>>>> Cc: Eric Dumazet <edumazet@google.com>
+>>>>> Cc: Jakub Kicinski <kuba@kernel.org>
+>>>>> Cc: Paolo Abeni <pabeni@redhat.com>
+>>>>> Cc: netdev@vger.kernel.org
+>>>>> Cc: linux-kernel@vger.kernel.org
+>>>>> Link: https://lore.kernel.org/lkml/20231028005153.2180411-1-mirsad.todorovac@alu.unizg.hr/
+>>>>> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+>>>>> ---
+>>>>> v3:
+>>>>>    removed register/mask pair array sentinels, so using ARRAY_SIZE().
+>>>>>    avoided duplication of RTL_W32() call code as advised by Heiner.
+>>>>>
+>>>>>    drivers/net/ethernet/realtek/r8169_main.c | 198 ++++++++--------------
+>>>>>    1 file changed, 72 insertions(+), 126 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> index 361b90007148..3b28bec7098b 100644
+>>>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> @@ -939,6 +939,32 @@ static void r8168_mac_ocp_modify(struct rtl8169_private *tp, u32 reg, u16 mask,
+>>>>>        raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+>>>>>    }
+>>>>>    +struct e_info_regmask_pair {
+>>>>> +    u32    reg;
+>>>>> +    u32    data;
+>>>>> +};
+>>>>> +
+>>>>> +static void __r8168_mac_ocp_write_seq(struct rtl8169_private *tp,
+>>>>> +                      const struct e_info_regmask_pair *array, int len)
+>>>>> +{
+>>>>> +    struct e_info_regmask_pair const *p;
+>>>>> +
+>>>>> +    for (p = array; len--; p++)
+>>>>> +        __r8168_mac_ocp_write(tp, p->reg, p->data);
+>>>>> +}
+>>>>> +
+>>>>> +static void _r8168_mac_ocp_write_seq(struct rtl8169_private *tp,
+>>>>> +                     const struct e_info_regmask_pair *array, int len)
+>>>>> +{
+>>>>> +    unsigned long flags;
+>>>>> +
+>>>>> +    raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
+>>>>> +    __r8168_mac_ocp_write_seq(tp, array, len);
+>>>>> +    raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
+>>>>> +}
+>>>>> +
+>>>>> +#define r8168_mac_ocp_write_seq(tp, a) _r8168_mac_ocp_write_seq(tp, a, ARRAY_SIZE(a))
+>>>>> +
+>>>>>    /* Work around a hw issue with RTL8168g PHY, the quirk disables
+>>>>>     * PHY MCU interrupts before PHY power-down.
+>>>>>     */
+>>>>> @@ -3107,138 +3133,58 @@ static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
+>>>>>        /* The following Realtek-provided magic fixes an issue with the RX unit
+>>>>>         * getting confused after the PHY having been powered-down.
+>>>>>         */
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC28, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC2A, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC2C, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC2E, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC30, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC32, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC34, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC36, 0x0000);
+>>>>> +
+>>>>> +    static const struct e_info_regmask_pair init_zero_seq[] = {
+>>>>> +        { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 }, { 0xFC2E, 0x0000 },
+>>>>> +        { 0xFC30, 0x0000 }, { 0xFC32, 0x0000 }, { 0xFC34, 0x0000 }, { 0xFC36, 0x0000 },
+>>>>> +    };
+>>>>> +
+>>>> Don't mix code and variable declarations. Did you run checkpatch?
+>>>> I think it would complain here.
+>>>
+>>> Thank you for the warning, I will fix it.
+>>>
+>>> As I said to Mr. Greg, I will do the required number of iterations to fix this issue.
+>>>
+>>> I will add checkpatch to my routine handling of my submitted patches.
+>>>
+>>> Thanks,
+>>> Mirsad
+>>>
+>>>>> +    static const struct e_info_regmask_pair recover_seq[] = {
+>>>>> +        { 0xF800, 0xE008 }, { 0xF802, 0xE00A }, { 0xF804, 0xE00C }, { 0xF806, 0xE00E },
+>>>>> +        { 0xF808, 0xE027 }, { 0xF80A, 0xE04F }, { 0xF80C, 0xE05E }, { 0xF80E, 0xE065 },
+>>>>> +        { 0xF810, 0xC602 }, { 0xF812, 0xBE00 }, { 0xF814, 0x0000 }, { 0xF816, 0xC502 },
+>>>>> +        { 0xF818, 0xBD00 }, { 0xF81A, 0x074C }, { 0xF81C, 0xC302 }, { 0xF81E, 0xBB00 },
+>>>>> +        { 0xF820, 0x080A }, { 0xF822, 0x6420 }, { 0xF824, 0x48C2 }, { 0xF826, 0x8C20 },
+>>>>> +        { 0xF828, 0xC516 }, { 0xF82A, 0x64A4 }, { 0xF82C, 0x49C0 }, { 0xF82E, 0xF009 },
+>>>>> +        { 0xF830, 0x74A2 }, { 0xF832, 0x8CA5 }, { 0xF834, 0x74A0 }, { 0xF836, 0xC50E },
+>>>>> +        { 0xF838, 0x9CA2 }, { 0xF83A, 0x1C11 }, { 0xF83C, 0x9CA0 }, { 0xF83E, 0xE006 },
+>>>>> +        { 0xF840, 0x74F8 }, { 0xF842, 0x48C4 }, { 0xF844, 0x8CF8 }, { 0xF846, 0xC404 },
+>>>>> +        { 0xF848, 0xBC00 }, { 0xF84A, 0xC403 }, { 0xF84C, 0xBC00 }, { 0xF84E, 0x0BF2 },
+>>>>> +        { 0xF850, 0x0C0A }, { 0xF852, 0xE434 }, { 0xF854, 0xD3C0 }, { 0xF856, 0x49D9 },
+>>>>> +        { 0xF858, 0xF01F }, { 0xF85A, 0xC526 }, { 0xF85C, 0x64A5 }, { 0xF85E, 0x1400 },
+>>>>> +        { 0xF860, 0xF007 }, { 0xF862, 0x0C01 }, { 0xF864, 0x8CA5 }, { 0xF866, 0x1C15 },
+>>>>> +        { 0xF868, 0xC51B }, { 0xF86A, 0x9CA0 }, { 0xF86C, 0xE013 }, { 0xF86E, 0xC519 },
+>>>>> +        { 0xF870, 0x74A0 }, { 0xF872, 0x48C4 }, { 0xF874, 0x8CA0 }, { 0xF876, 0xC516 },
+>>>>> +        { 0xF878, 0x74A4 }, { 0xF87A, 0x48C8 }, { 0xF87C, 0x48CA }, { 0xF87E, 0x9CA4 },
+>>>>> +        { 0xF880, 0xC512 }, { 0xF882, 0x1B00 }, { 0xF884, 0x9BA0 }, { 0xF886, 0x1B1C },
+>>>>> +        { 0xF888, 0x483F }, { 0xF88A, 0x9BA2 }, { 0xF88C, 0x1B04 }, { 0xF88E, 0xC508 },
+>>>>> +        { 0xF890, 0x9BA0 }, { 0xF892, 0xC505 }, { 0xF894, 0xBD00 }, { 0xF896, 0xC502 },
+>>>>> +        { 0xF898, 0xBD00 }, { 0xF89A, 0x0300 }, { 0xF89C, 0x051E }, { 0xF89E, 0xE434 },
+>>>>> +        { 0xF8A0, 0xE018 }, { 0xF8A2, 0xE092 }, { 0xF8A4, 0xDE20 }, { 0xF8A6, 0xD3C0 },
+>>>>> +        { 0xF8A8, 0xC50F }, { 0xF8AA, 0x76A4 }, { 0xF8AC, 0x49E3 }, { 0xF8AE, 0xF007 },
+>>>>> +        { 0xF8B0, 0x49C0 }, { 0xF8B2, 0xF103 }, { 0xF8B4, 0xC607 }, { 0xF8B6, 0xBE00 },
+>>>>> +        { 0xF8B8, 0xC606 }, { 0xF8BA, 0xBE00 }, { 0xF8BC, 0xC602 }, { 0xF8BE, 0xBE00 },
+>>>>> +        { 0xF8C0, 0x0C4C }, { 0xF8C2, 0x0C28 }, { 0xF8C4, 0x0C2C }, { 0xF8C6, 0xDC00 },
+>>>>> +        { 0xF8C8, 0xC707 }, { 0xF8CA, 0x1D00 }, { 0xF8CC, 0x8DE2 }, { 0xF8CE, 0x48C1 },
+>>>>> +        { 0xF8D0, 0xC502 }, { 0xF8D2, 0xBD00 }, { 0xF8D4, 0x00AA }, { 0xF8D6, 0xE0C0 },
+>>>>> +        { 0xF8D8, 0xC502 }, { 0xF8DA, 0xBD00 }, { 0xF8DC, 0x0132 },
+>>>>> +    };
+>>>>> +
+>>>>> +    static const struct e_info_regmask_pair final_seq[] = {
+>>>>> +        { 0xFC2A, 0x0743 }, { 0xFC2C, 0x0801 }, { 0xFC2E, 0x0BE9 }, { 0xFC30, 0x02FD },
+>>>>> +        { 0xFC32, 0x0C25 }, { 0xFC34, 0x00A9 }, { 0xFC36, 0x012D },
+>>>>> +    };
+>>>>> +
+>>>>> +    r8168_mac_ocp_write_seq(tp, init_zero_seq);
+>>>>>        mdelay(3);
+>>>>>        r8168_mac_ocp_write(tp, 0xFC26, 0x0000);
+>>>>>    -    r8168_mac_ocp_write(tp, 0xF800, 0xE008);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF802, 0xE00A);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF804, 0xE00C);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF806, 0xE00E);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF808, 0xE027);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF80A, 0xE04F);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF80C, 0xE05E);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF80E, 0xE065);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF810, 0xC602);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF812, 0xBE00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF814, 0x0000);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF816, 0xC502);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF818, 0xBD00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF81A, 0x074C);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF81C, 0xC302);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF81E, 0xBB00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF820, 0x080A);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF822, 0x6420);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF824, 0x48C2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF826, 0x8C20);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF828, 0xC516);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF82A, 0x64A4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF82C, 0x49C0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF82E, 0xF009);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF830, 0x74A2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF832, 0x8CA5);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF834, 0x74A0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF836, 0xC50E);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF838, 0x9CA2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF83A, 0x1C11);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF83C, 0x9CA0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF83E, 0xE006);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF840, 0x74F8);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF842, 0x48C4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF844, 0x8CF8);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF846, 0xC404);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF848, 0xBC00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF84A, 0xC403);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF84C, 0xBC00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF84E, 0x0BF2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF850, 0x0C0A);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF852, 0xE434);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF854, 0xD3C0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF856, 0x49D9);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF858, 0xF01F);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF85A, 0xC526);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF85C, 0x64A5);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF85E, 0x1400);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF860, 0xF007);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF862, 0x0C01);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF864, 0x8CA5);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF866, 0x1C15);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF868, 0xC51B);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF86A, 0x9CA0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF86C, 0xE013);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF86E, 0xC519);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF870, 0x74A0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF872, 0x48C4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF874, 0x8CA0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF876, 0xC516);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF878, 0x74A4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF87A, 0x48C8);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF87C, 0x48CA);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF87E, 0x9CA4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF880, 0xC512);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF882, 0x1B00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF884, 0x9BA0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF886, 0x1B1C);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF888, 0x483F);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF88A, 0x9BA2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF88C, 0x1B04);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF88E, 0xC508);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF890, 0x9BA0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF892, 0xC505);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF894, 0xBD00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF896, 0xC502);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF898, 0xBD00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF89A, 0x0300);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF89C, 0x051E);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF89E, 0xE434);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8A0, 0xE018);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8A2, 0xE092);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8A4, 0xDE20);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8A6, 0xD3C0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8A8, 0xC50F);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8AA, 0x76A4);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8AC, 0x49E3);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8AE, 0xF007);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8B0, 0x49C0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8B2, 0xF103);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8B4, 0xC607);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8B6, 0xBE00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8B8, 0xC606);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8BA, 0xBE00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8BC, 0xC602);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8BE, 0xBE00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8C0, 0x0C4C);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8C2, 0x0C28);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8C4, 0x0C2C);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8C6, 0xDC00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8C8, 0xC707);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8CA, 0x1D00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8CC, 0x8DE2);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8CE, 0x48C1);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8D0, 0xC502);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8D2, 0xBD00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8D4, 0x00AA);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8D6, 0xE0C0);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8D8, 0xC502);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8DA, 0xBD00);
+>>>>> -    r8168_mac_ocp_write(tp, 0xF8DC, 0x0132);
+>>>>> +    r8168_mac_ocp_write_seq(tp, recover_seq);
+>>>>>          r8168_mac_ocp_write(tp, 0xFC26, 0x8000);
+>>>>>    -    r8168_mac_ocp_write(tp, 0xFC2A, 0x0743);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC2C, 0x0801);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC2E, 0x0BE9);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC30, 0x02FD);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC32, 0x0C25);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC34, 0x00A9);
+>>>>> -    r8168_mac_ocp_write(tp, 0xFC36, 0x012D);
+>>>>> +    r8168_mac_ocp_write_seq(tp, final_seq);
+>>>>> +
+>>>>>    }
+>>>>>      static void rtl_hw_start_8168h_1(struct rtl8169_private *tp)
 
-On Mon, 30 Oct, 2023, 18:02 Jiri Pirko, <jiri@resnulli.us> wrote:
-
-> Mon, Oct 30, 2023 at 10:12:56AM CET, shaojijie@huawei.com wrote:
-> >From: Jian Shen <shenjian15@huawei.com>
-> >
-> >When ptr_ring_init() returns failure in page_pool_init(), free_percpu()
-> >is not called to free pool->recycle_stats, which may cause memory
-> >leak.
->
-> Would be nice to see the use of imperative mood in the patch description
-> too, not only patch subject. Nevertheless, fix looks fine:
->
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
->
->
-Reviewed-by: Somnath Kotur
->
-<somnath.kotur@broadcom.com >
-
---00000000000096747d0608ef3c10
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><br><br><div class=3D"gmail_quote" dir=3D"auto"><div dir=
-=3D"ltr" class=3D"gmail_attr">On Mon, 30 Oct, 2023, 18:02 Jiri Pirko, &lt;<=
-a href=3D"mailto:jiri@resnulli.us" target=3D"_blank" rel=3D"noreferrer">jir=
-i@resnulli.us</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" sty=
-le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Mon, O=
-ct 30, 2023 at 10:12:56AM CET, <a href=3D"mailto:shaojijie@huawei.com" rel=
-=3D"noreferrer noreferrer" target=3D"_blank">shaojijie@huawei.com</a> wrote=
-:<br>
-&gt;From: Jian Shen &lt;<a href=3D"mailto:shenjian15@huawei.com" rel=3D"nor=
-eferrer noreferrer" target=3D"_blank">shenjian15@huawei.com</a>&gt;<br>
-&gt;<br>
-&gt;When ptr_ring_init() returns failure in page_pool_init(), free_percpu()=
-<br>
-&gt;is not called to free pool-&gt;recycle_stats, which may cause memory<br=
->
-&gt;leak.<br>
-<br>
-Would be nice to see the use of imperative mood in the patch description<br=
->
-too, not only patch subject. Nevertheless, fix looks fine:<br>
-<br>
-Reviewed-by: Jiri Pirko &lt;<a href=3D"mailto:jiri@nvidia.com" rel=3D"noref=
-errer noreferrer" target=3D"_blank">jiri@nvidia.com</a>&gt;<br>
-<br>
-</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
-order-left:1px #ccc solid;padding-left:1ex"></blockquote></div><div dir=3D"=
-auto"><br></div><div class=3D"gmail_quote" dir=3D"auto"><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">Reviewed-by: Somnath Kotur<br></blockquote></div><div dir=3D"=
-auto">&lt;<a href=3D"mailto:somnath.kotur@broadcom.com">somnath.kotur@broad=
-com.com</a> &gt;</div><div class=3D"gmail_quote" dir=3D"auto"></div></div>
-
---00000000000096747d0608ef3c10--
-
---0000000000009aaca30608ef3c27
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-MIIQcAYJKoZIhvcNAQcCoIIQYTCCEF0CAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3HMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBU8wggQ3oAMCAQICDHrACvo11BjSxMYbtzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE4NDJaFw0yNTA5MTAwODE4NDJaMIGQ
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFjAUBgNVBAMTDVNvbW5hdGggS290dXIxKTAnBgkqhkiG9w0B
-CQEWGnNvbW5hdGgua290dXJAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
-CgKCAQEAwSM6HryOBKGRppHga4G18QnbgnWFlW7A7HePfwcVN3QOMgkXq0EfqT2hd3VAX9Dgoi2U
-JeG28tGwAJpNxAD+aAlL0MVG7D4IcsTW9MrBzUGFMBpeUqG+81YWwUNqxL47kkNHZU5ecEbaUto9
-ochP8uGU16ud4wv60eNK59ZvoBDzhc5Po2bEQxrJ5c8V5JHX1K2czTnR6IH6aPmycffF/qHXfWHN
-nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
-gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
-BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
-YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
-BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
-MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
-YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
-Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
-HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
-BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
-yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
-IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
-sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
-R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
-r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJt
-MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
-VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
-G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFETj3Wa0YMHefpgHazB/vpiaULm
-w1P4KqbOGfoXXDoaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIz
-MTAzMDEzNDQyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
-CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
-AwQCATANBgkqhkiG9w0BAQEFAASCAQCTRKk7KFhRYzj1U7C4oEu/Q17eKAe9NyMRRDOvFzyEGPyq
-/DNW8c8kPFJQisn5SwOvEC9Yf43cA8ssUfebQeUyz4VFovf4JuCNGvZP4VIJ09fUi0whLNyoLrsq
-7DngW9SRSqiVCNQqQHTMzWJ/xX/Dd4D+6d5OpVn5vPoo2MZIaJqmRDUvRLgX5AcU0nD2fJQ7wafB
-VHnnfmj73I7Bp7tjHODp0glulZoB3B925YXu5nNddoh5EGsloXI6negOe6BERYDBVO29GYIGhtT6
-rP1Lr99Phxmi8bN2YFI8OjstSL2PmFzdP7FD7/94v2lgWAY4W7GsAtZX2ie5aEi0mlK7
---0000000000009aaca30608ef3c27--
 
