@@ -1,189 +1,174 @@
-Return-Path: <netdev+bounces-45329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68657DC20B
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 22:44:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582BD7DC219
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 22:50:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDAA9281688
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 21:44:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 241F1B20D1D
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 21:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19891CA9D;
-	Mon, 30 Oct 2023 21:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 690631CA9D;
+	Mon, 30 Oct 2023 21:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RS48tr5L"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p23vkwZ5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5305F19442
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 21:44:49 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A52F7;
-	Mon, 30 Oct 2023 14:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698702288; x=1730238288;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xojSoYfBD3QBEDkKaHBxM0G2L3UT0WMb3t4U4bZVd1w=;
-  b=RS48tr5L1eGT1Bjhd+qCAOJ1Yt6MMpuZF3A/SBiU2oGm5EWK6AFvKU4s
-   5x+su9s83r5lU05Szods0ah8bsHMk7z6QQRIDVYY4Xdu25pijhqc9ATih
-   j9oh/bs827MrQW0EDU3IPo2CXiVof1ZOFYTmVma1dfS+CTU2EDo6vaYaL
-   GJagnfrpe7MPl8vSQzM3X5oRKxkXbf4+4NfI77/3Tq0u9NQemcO8WwxNC
-   bb67zeNGia+1pBdooHFDqaUoXlsYIT9/NrkG3Hb28PEHX38t8B3rFkLxx
-   X8pupyjQ5RIglIi/sKs8BUDC/kvJh24aUBRZ4fVuzFFL0xzTRGjUyGXx2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="373218334"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="373218334"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 14:44:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="760420383"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="760420383"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 14:44:47 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 30 Oct 2023 14:44:47 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 14:44:47 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 30 Oct 2023 14:44:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hSGq3SO8NTR+hpt3ktZOhs9x20Yuk/6IIZkwIlJfRNj6fQbRD6vbn/zZ0ntLbg6oMkNYsmRnTJs0ZdMPJwPfEGunOLx0r732wNHvgBsw0nEGAJhIdQM+f55zT07KjljVnDkNnJoqT6gZZWeOXwhbqaQD34qvIIIo/jUJotRJ8geo6V+zWH0oXsOIQjtSIaXn6WNvvXjtoIn0aPYvCviXCkj4iMvWr5LoicO0fX+Ro4/vu272NOYVJV+TT31vrgOmOfQfa7YEqJDLreZzhjeATgKyVKfjd8/OaOG/s1UDT+ZB/4ivVVHP3morsHxNmUFBTTT0Tf7HDF+iy7ihYKp+pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OCwLKjyPn8q0ADNIP2LnmBEXd7+93G0ECiNxScswLbY=;
- b=PyYScSopPCI+U9NWRhm1o+oxeiwIEIMONTMWfgzW5dxzOeeWZih+J8AidB23dG0d5U34sFYUE2Qn5771uPWfKNJUjfQ79S0yzcvckp7n3Oq6zMRQzfCnMpcd1X3CbZq/c1HYfjLymRDyswXfWlNl0rRLYH2pQjRQ8eyN08A7n+eZfYsoweDn4QGJ7ZSsZWvdC5shyCukGfrjaAFIE9Pfx+Rrl90YD9TgdCFdty4wdlwwxGdaT7axWRXAwKDCzrIuKrUfi5dCEMbEmYofztolD5fUEV0DQRazziN3ruMD+LDRDwKjvfnvzF9zgPMNs8rj/fl5bKY/OdNr8I9NGAS4oA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com (2603:10b6:510:3b::14)
- by SN7PR11MB6728.namprd11.prod.outlook.com (2603:10b6:806:264::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.27; Mon, 30 Oct
- 2023 21:44:45 +0000
-Received: from PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::f815:7804:d9a8:fdce]) by PH0PR11MB5095.namprd11.prod.outlook.com
- ([fe80::f815:7804:d9a8:fdce%6]) with mapi id 15.20.6933.028; Mon, 30 Oct 2023
- 21:44:45 +0000
-Message-ID: <72d0fdeb-b08b-45f2-8a24-d20db69c4a02@intel.com>
-Date: Mon, 30 Oct 2023 14:44:39 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: r8169: Disable multicast filter for RTL8168H and
- RTL8107E
-Content-Language: en-US
-To: Patrick Thompson <ptf@google.com>, <netdev@vger.kernel.org>
-CC: Chun-Hao Lin <hau@realtek.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <nic_swsd@realtek.com>
-References: <20231030205031.177855-1-ptf@google.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20231030205031.177855-1-ptf@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0194.namprd03.prod.outlook.com
- (2603:10b6:303:b8::19) To PH0PR11MB5095.namprd11.prod.outlook.com
- (2603:10b6:510:3b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D842B1CF84
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 21:50:45 +0000 (UTC)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5223FED
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:50:44 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5a7d9d357faso48065197b3.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:50:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698702643; x=1699307443; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=niDN24Fg/PuyXgPOwyMMJfQf0J5VnyR/odMo+tCbwS4=;
+        b=p23vkwZ5WdA14p7xhsgeCNykNLusz/euHtEHK3zZ/qsyLGt91XxDnR7t4C8Q0Wzaj8
+         t5hfdeuWa33VJGKmcHAbKiSQ20c8mHyRZiInpF8nf0X7kMIZYLo5Hh4m4S1t2rpMm4Un
+         /lfFf2mj6rAq+ZA0ZJ4VtsKWIZ5ttxLcSEuuBUi7ynVJC0GL09pfJZBLRfqi+GLLyeZ+
+         yTYlIr3ulW6azfnyjoHdumsKQ4+p9dm8WsLIhoXugT9OcJGJFa/fDzVihjHlop3aJqSS
+         iYuS55LPMZ9CS0lgI9negO1E1YAJXEStKhZYxB05tP2SKSq4f0N0wQVImQGi6hShbLfv
+         RS8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698702643; x=1699307443;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=niDN24Fg/PuyXgPOwyMMJfQf0J5VnyR/odMo+tCbwS4=;
+        b=Ch8mxSyx2LAOLPQoe9K1xVDTQl8rjBXzlTyVgc+598qxdtU7Y2XL0Fba3wZraMI7Sj
+         yb+QLCMBdwYuxuLjdWmNwpdJPMvTXd4ERyc5kjyTPPjZH4fHlUtcaO3nQDyNqtiQewKL
+         ctiq6QMD3G+AmT9+X14PQHTEIkH081LhxD3pvw8QSdbMlCuJRtCQYYPIdWNcKliP5enr
+         IT2+EwxkpCeViyL+Nj7uBnxlYfi2xrvMKT5IfS2LQ48foC2om9vLaWzoEQ0C1i3Ercee
+         QgavNWbvjgBy+Od8NLIoPbiPjvu6NJTlXoFLoiTPykhKxpUQc8huC9CENlzFP9sF9XO+
+         ycJg==
+X-Gm-Message-State: AOJu0YwYOPY/BZcgWgIREC1phBtz3oE+vs6nLmFrP9DAxlCOV249ScBE
+	m/e1yabRm+0z8csmQjBHSiuJTstgSDM2uW14PjMHUQ==
+X-Google-Smtp-Source: AGHT+IHETvp3ka4K2AK9N3TEG8BYpyVa5ASsI4zyEOnk9YKJgwo/uAXGwKTWQmzBGHWSFGdmyOo8EFkII11lBrQDNC8=
+X-Received: by 2002:a81:aa46:0:b0:5ad:716b:ead3 with SMTP id
+ z6-20020a81aa46000000b005ad716bead3mr10420573ywk.28.1698702643460; Mon, 30
+ Oct 2023 14:50:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5095:EE_|SN7PR11MB6728:EE_
-X-MS-Office365-Filtering-Correlation-Id: 664b33df-eb68-414c-3fd9-08dbd9916eaf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: idLTfvI0KkUYUtrVVuEx48SmeG0eCGQJgrhpnoZNISbtMdUXk1xAFJ/SHhVQMcyMP5fxQiOaFjcZo3owPFGsoMnlhXT2Ia98oVrgal7aU5/7R2BLv3+wvZs5Y6a3J4ETc0K+em9rxAqaO+z1J2t8k/RjqlCX/R/7ePQTL7vnh7t/QkmBvG5ifrqLQYnE7StIa5n5WuVCnKh56AqkH251eNVOR21kWX9Fb2jYKwPbfL8NgvLQlUhfqy43UX77D294d00PrTZcEZ8Zwa9XEcfKyorC2XePjIVHchgasgGtXIOK2Rxhp2ptWedZ5VpOJYYoks5KXlzzMtJ4GeOlrD2kBql7+te+zDqD91NRLDKdBZhxcUtiyQhbJ4BW0AOBqjPBe1YckkBl6Kar6nh6epXPmGfLpJON3hOxE7xXfy4GKcybttSIfCvU//Eeg/L+ofdCq8wgAzXL4oXITklQ4Neu/G/eci16ga8PYPyyGeL9BzzexqMtknefgKaZWqzwfpfPrNkLrivdMQF/fbXwsVpLLz2sFepzwKVNyWCIFeC9DIws5MHRL7yki6rTtxXdTloYhZUrDTd+KLyLSET/JcxgdANGHiqgzVQZO9Luaz8gh0c6/xTrOrEED8SUjnYk1zyaLSoG3t7IgTaGhY91Ni598w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5095.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(376002)(39860400002)(396003)(366004)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(36756003)(86362001)(31696002)(31686004)(4744005)(6486002)(2906002)(6512007)(478600001)(8936002)(4326008)(8676002)(6666004)(41300700001)(6506007)(53546011)(83380400001)(66476007)(54906003)(66556008)(26005)(5660300002)(2616005)(7416002)(66946007)(316002)(82960400001)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T0dyY0RBclp1bnk0RjZNOUJVMkRGOEx6WVFQWG1hVk9nVWh6RnUyR0ZDbzdL?=
- =?utf-8?B?dmIwVndqK0xMa2gyT1BtU1FoS0UrczYzWmdQT2RneWVEcGZpdGVsY0hMajFO?=
- =?utf-8?B?SXBpL05wVWpGSVh3YzMyV0JqbGhMRHV6ZHIrcnh4cGFnK0tFOU5QM0MvZ2N2?=
- =?utf-8?B?aGh0U3pLWW1sOTdzK1lNZzVUZ3l5clRsUnM1Q2FRL2dIM3g1N1V0djZpTTZI?=
- =?utf-8?B?SnFKTXdNd3pIaytWaEJYS092cGdnNDRxZnZJd1cwR2lnTHdrNmxFQjNFc2Np?=
- =?utf-8?B?Z21BYVVueWsrQkZ5RDhlSEh6NktDZFlISE8yRzNUMlFwbnUyd2dPY3Nwb0N4?=
- =?utf-8?B?TzdjN1djZlI2WHlFRVNLRXRmKzg1Z2FNdllQejlid3JVUTVSbEpaeVVhek5z?=
- =?utf-8?B?QjZsb2ZyRnZNTjVoU1BLNkRQd1h5V0JwQVF6RkNKVmVPK3kwekdHcEE2OG5I?=
- =?utf-8?B?VHdON2lyZ09ZYWE1ZTJsSHJqZ3hOQkU3TUdIMks3bUZncUt6MXYydEVPZDY5?=
- =?utf-8?B?dVlId1BTY2VucWFRZmNwbDZHOHVwKzRWbTQvbFh1ekFmeHpUZXFiUWNJMFNm?=
- =?utf-8?B?Nm80Z0ZKT1V0Y3hJRk43encwaU1HSlUyMjl6U0tUMlpPQytYVHBsaTdBUXNU?=
- =?utf-8?B?ZThNQ0VCcEJybnJBZzZPUTlkRUlrbnBTazVKQWgxS1NVRHdiaDdiQnBVaTY3?=
- =?utf-8?B?REM1OGJGRXpvQlVkaWE5N2J0OFYwcmM4OUdxVmJnVVlwWHpnb1hkdFNMRk9x?=
- =?utf-8?B?cXFHTmNSK0hHOUkxQXBkOXo2c0hyV3cwWCs1Rkw1alBocVRZRFNMc3ViMU5E?=
- =?utf-8?B?WjQ4eG9rdTRPRkcrbUMzbHljdDE5L2FUQllucHFEWTBBWmNSbVYybEthclpM?=
- =?utf-8?B?REl0Sithb25xOEo3UmtJVVJjbHdQT1UwOE1qU1Z6ckNrQ0MrOUhoOGZYcXFF?=
- =?utf-8?B?dWJ4blJzYjZwZHJYcU9zYkxmV1NsMG5VNVdjR0dGczl6UGVFbTU3cW4xN25z?=
- =?utf-8?B?MzdUalNSaUVOSThaWE5WcEhHNVNDSVZrQ0pSU2tPUnJaeWRSM3pSNmhSMU9M?=
- =?utf-8?B?MThzNStyb1E2aTVtS2ZvRVcxY0NqVmVGM002ekJYdmtCaUFGWUNzUSs4TEJz?=
- =?utf-8?B?U25jOXh5U3pCc0tic1I5TjU3YVJjNTcra3JKUzFWazUwRVhkcEIxV2luRUFs?=
- =?utf-8?B?bDk2WklTSFpjN1p1ZHJzVEdFdVFWUlY4akVGaEFTVUxKbWh3dmRmM2Z0N004?=
- =?utf-8?B?SFR0di9ZalRNMjhEZFI1b2I0NzlVWFF0L0ZFQTk5dmt0SXk2VngxU3JZWG4v?=
- =?utf-8?B?S2VYR3dJQm9UNDkzeWJhUTl1WlFrTmV5SVVUcWpUeGREWmhZRGNGMGl2Vmlz?=
- =?utf-8?B?b3A1YWpVTXM0UzRvNVN4bXhKSDA0dmxrVnozYjhUSEUxc2Y4eUFDanZHZTVD?=
- =?utf-8?B?Z1B5aytLUjd2N3pGaDlyVThjNmtLNTdET2JmSWxzZ1ZGdUhMWXl2SThpSDBB?=
- =?utf-8?B?Q2FJalZJRGp5cUN1NElQaURVdWVKamhncDAzanIxbWJ4WExUc0doNWhOeHF1?=
- =?utf-8?B?d2hJY2N0NC93RTdpbS9idzJnVkVKZ2NlSEU1ZzZqeTloZFJObHZtc2hQc0h3?=
- =?utf-8?B?QnRESXNiaUZyazNPWnQrRlV6WU10Y2c0cldlZVFmcXg2dDVCNis1eUovQW81?=
- =?utf-8?B?eHFMWmdkM0xlRnFoUUlBTk84aUlEVXFiZDVrS2I0SnR5SHhrZ0ZJWWl3U1gx?=
- =?utf-8?B?SDFhaGYrbmUrdUhLV2RXSk1aRVJtdDdZUmk5cnZLZUMvVDBQbTJjUkdISk9x?=
- =?utf-8?B?WTAxUTRMYm54QnAzT3dPcU15b3F1UGtXMkt5eVZ6WFpFRFpqdGVkcjFTaEFG?=
- =?utf-8?B?S2RlekVJbm1uNjFjR2JYSGVIREcyVnhMTXpmc1pURGh4bDJvUWxrTGgzMXA0?=
- =?utf-8?B?SE1MYTNQc1BkZUdqRW92SFRaUXdJbkhka1EyUHQrZkUxTlkvMHNYUW5jN1Qx?=
- =?utf-8?B?QTZIZTF0dFpEV2JLYjdUOXRSaXJSUGc3dmptYzJpbmJ0WDNmb2lTNU4xZUNm?=
- =?utf-8?B?NkZzUmU0aTJFSDd6MGVXbXRKaXczYjRFUVkra1pEZkRaaEMxTUlmbWMvQ3FT?=
- =?utf-8?B?UkREYlp0a1VKVlFpYW5pMndFZ0ZyQmcwRmh4eXBjQ1lPbFB6TWp1Nzg5SzdI?=
- =?utf-8?B?U3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 664b33df-eb68-414c-3fd9-08dbd9916eaf
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5095.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2023 21:44:45.5438
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Eg5NJqiwdRRznAjdxDrxp/kqdJGcIiV1veTZMUmTvubTXlgpZndI4wVh9oxLvLF57BhHgDzczyLi+mKJunVUpxi4xQ7Dz+npsJjPt1nYVzA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6728
-X-OriginatorOrg: intel.com
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org> <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+In-Reply-To: <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 30 Oct 2023 22:50:31 +0100
+Message-ID: <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Oct 30, 2023 at 3:16=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
 
+> which means that here, skb->len will be 1522, if it was originally 1496.
+> So the code adds 26 extra octets, and only 4 of those are legitimate (a t=
+ag).
 
-On 10/30/2023 1:50 PM, Patrick Thompson wrote:
-> RTL8168H and RTL8107E ethernet adapters erroneously filter unicast
-> eapol packets unless allmulti is enabled. These devices correspond to
-> RTL_GIGA_MAC_VER_46 and VER_48. Add an exception for VER_46 and VER_48
-> in the same way that VER_35 has an exception.
-> 
-> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
-> Signed-off-by: Patrick Thompson <ptf@google.com>
-> ---
-> 
-> Changes in v3:
-> - disable mc filter for VER_48
-> - update description
-> 
-> Changes in v2:
-> - add Fixes tag
-> - add net annotation
-> - update description
-> 
+Yeah I know :/
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> The rest is absolutely unexplained, which means that until there is a
+> valid explanation for them:
+>
+> pw-bot: cr
+>
+> (sorry, but if it works and we don't know why it works, then at some
+> point it will break and we won't know why it stopped working)
+
+Yeah it broke now and we don't know why...
+
+> you said that what increments is Dot1dTpPortInDiscards. 802.1Q-2018 says
+> about it: "Count of received valid frames that were discarded (i.e.,
+> filtered) by the Forwarding Process." which is odd enough to me, since
+> packets sent by rtl4a_tag_xmit() should *not* be processed by the forward=
+ing
+> layer of the switch, but rather, force-delivered to the specified egress
+> port.
+
+No this was a coincidence, we can rule this out. There are always
+a few (2-3) Dot1dTpPortInDiscards on the switch port when it
+is connected, sorry for getting this wrong :/
+
+What happens is way more disturbing: packets are dropped
+*silently* if not padded.
+
+I added the following patch:
+
+@@ -37,6 +37,8 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb=
+,
+                                      struct net_device *dev)
+ {
+        struct dsa_port *dp =3D dsa_slave_to_port(dev);
++       static u16 mask =3D BIT(6);
++       static int cnt =3D 0;
+        __be16 *p;
+        u8 *tag;
+        u16 out;
+@@ -60,6 +62,19 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *sk=
+b,
+        /* The lower bits indicate the port number */
+        out |=3D BIT(dp->index);
+
++       if (skb->len >=3D (ETH_DATA_LEN - RTL4_A_HDR_LEN)) {
++               /* Test bits... */
++               out |=3D mask;
++               netdev_info(dev, "add mask %04x to big package\n", mask);
++               cnt ++;
++               if (cnt =3D=3D 10) {
++                       cnt =3D 0;
++                       mask <<=3D 1;
++                       if (mask =3D=3D BIT(15))
++                               mask =3D BIT(6);
++               }
++       }
++
+        p =3D (__be16 *)(tag + 2);
+        *p =3D htons(out);
+
+This loops over all the bits not used by the port mask and test them
+one by one to see if any of them help.
+
+Then ran a few rounds of ping -s 1472 and ping -s 1470.
+
+There are console prints:
+
+realtek-smi switch lan0: add mask 0040 to big package
+realtek-smi switch lan0: add mask 0040 to big package
+realtek-smi switch lan0: add mask 0040 to big package
+(...)
+
+Then bits 6,7,8,9,10,11,12,13,14 and 15 are tested in succession.
+
+No error counters increase in ethtool -S lan0.
+
+I can see the big packets leave the eth0 interface
+(from ethtool -S eth0)
+
+     p05_EtherStatsPkts1024to1518Octe: 370
+
+But they do not appear in the targeted switch port stats:
+
+     EtherStatsPkts1024to1518Octets: 22
+
+(these 22 are some unrelated -s 1400 packets I sent to test)
+
+Yours,
+Linus Walleij
 
