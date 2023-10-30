@@ -1,106 +1,93 @@
-Return-Path: <netdev+bounces-45226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1F57DB97E
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:07:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13BD87DB97D
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:07:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD87528156C
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:07:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B69111F21F25
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 12:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0AC014F9A;
-	Mon, 30 Oct 2023 12:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676F114F9A;
+	Mon, 30 Oct 2023 12:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A8p6hP3K"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tk6cYUSb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CC2156E3;
-	Mon, 30 Oct 2023 12:07:20 +0000 (UTC)
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F22C9;
-	Mon, 30 Oct 2023 05:07:19 -0700 (PDT)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5a7ac4c3666so39137627b3.3;
-        Mon, 30 Oct 2023 05:07:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1F2D29E
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 12:07:15 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68A44C6
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:07:14 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9d34b2b51a5so170330566b.2
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 05:07:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698667638; x=1699272438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Geny68wyKIYRNw/ofoi1ZcAYsWz5RTKIJcZMA1cucDQ=;
-        b=A8p6hP3KKB74V+rPGCJXZ89ApW3DgFNmkHHqGY4Fegj+HgP5PGMs/RtBI0Xb/C+Ow9
-         4wMR7UUwi9dCzYbUH7QjEuD9jsKll/cVHIUAukmdH1hoFVuqdtp55qh/MGv2i+UD9z1h
-         QrOKn/6VuQeHk10zExD7vE1KYNH1GTuyi3rduYKlzW2pAbr9kJSL8SsG3WWivpuy8ccD
-         mXwk2yuqKeWE5ys/3DlVtgZcIMsZRe3AqI4LZjSGHY8h0e5pBQe0T/euqw+PK2RiddmS
-         bMXa6fSI5uaBML0MTd/JexCK3Zf+yNeAYYZBpOOIcYVPV7OpoHYuaoTRGYXOUlzAW/gj
-         2tbQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698667633; x=1699272433; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mAof5WwCREHhgYvZP5oL9OZtxCJg/p8F1Qyqhopa2tA=;
+        b=tk6cYUSbwPm94Sddc5HmcF/6xvZycbisb6NRMHiZRwgedeVomxu3fOpnu6SFB6HRBg
+         MFm8fYFiVFe601gpfhjoylVsQ2emYZ6f3CfjrHGe4iHfAZTlo9gvs7rHC9IZF0i0zqaj
+         jRiW7zPCD0XZUK95q67FEETmOUgJMG27sQ8Ttr2UUvpKNxCReYXBHTWNrxCdUkq2djIu
+         Z9fzGEHsY2rx3rcEXZbPJAAxPYt78Deq2OtFLyKVKKy1Zgbz+VaFT62P9lKdqYH2t7WG
+         O4V8mJIsJzONMWKcHpdZh+55xgav5BYEUCBdB6i8fg1Fw6HAmiEB0XXnRvQtfs+mWHFn
+         C/tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698667638; x=1699272438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Geny68wyKIYRNw/ofoi1ZcAYsWz5RTKIJcZMA1cucDQ=;
-        b=m9ycWUz1fL5mrxxSNJUIom51uGXlQnlO9L74IS6dIxIOBA8xwYbnPXFtqpwbkzrcNT
-         YixYzi7u4R0osCnBfOt51ql4UhKLX+RntYyBkGF6pmbm1+BLWSHgYBIhh8WzI7UWLcXs
-         GYUEsAUGQVFMtQk8m+2XRn2bKtZzOvshdegRVrT7/rkE+kyrzl+upIw2rt9vDgDo+1J7
-         7RTKTbtKVRIPNio6Ne591BuW6D8N1SHTAI3uwtJSGrhKaYtXLXhQXEjlHH/kJqAHXed4
-         EdiD5L0u3yFtOfTWfE0X/uqVgQ3zl1Y0D3R2pLBPxUQdQKObaoGcHeVBLiEUvYHWSZ1P
-         DvpA==
-X-Gm-Message-State: AOJu0YwETt7jCUbX9XM3sAxuOTJoYk9HuEhg42KzfaXV65WS4kl3gwEH
-	/FPlZim86CZ6V6Xn33mMO7oeuDsemXJMiBzp6I5qtmUB
-X-Google-Smtp-Source: AGHT+IExgxxm9QoVjWZCTqd/Up4WNX8sDzKrDbmHi4Hs5+a+2KCuqiNsIcVzYFaJC0sf5Guh3hP6AICxryVI/snpe9A=
-X-Received: by 2002:a81:d00d:0:b0:592:ffc:c787 with SMTP id
- v13-20020a81d00d000000b005920ffcc787mr8974441ywi.30.1698667638583; Mon, 30
- Oct 2023 05:07:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698667633; x=1699272433;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mAof5WwCREHhgYvZP5oL9OZtxCJg/p8F1Qyqhopa2tA=;
+        b=hzvGxqsTPiQJuuz4V6qUdrAYUD/LgTaKzQguHX91Oejohr2izBV5IpScSGCrosDVdy
+         AVV+0tqiOn2lyuyFVkznKModLmL7IahyHsvRbTgbg9eXny4f++pE4w7NWBFHZ4/+sEAw
+         nxO1HjupgyiWGxtiINIDbQFtNP/9mJdFXulr35mc7pCAgXR6eRRx4zSXnRN9fcv9vO/r
+         OLVl9FUwQSLx+1ph+lzuf5oAzoS4EQlX1DosOE5OnlBOr64CAQsJO3cINJ0Aqe8XaGxh
+         HKjEghiMazaOVkzYzYDq6HKaVaw4IIM6rnFSDmSWIQObsmDR2Ailgnhmgb1bkrtWxLYZ
+         agmw==
+X-Gm-Message-State: AOJu0YwVrrZLsNBla7OFqr8ogTtv+kx+KP79tKj/O9hydE+qu9ePTYJh
+	Scn9QOE8sRVMm8L4Bpgp+OJc5A==
+X-Google-Smtp-Source: AGHT+IGBHK0i5fSOAaHDaa1kq/y9l+3D/IFB+FmpFVFFTGvhuxbi2H37szUupGExcwAp3AVcfJetTw==
+X-Received: by 2002:a17:907:7f1e:b0:9c3:e66e:2006 with SMTP id qf30-20020a1709077f1e00b009c3e66e2006mr9039051ejc.9.1698667632723;
+        Mon, 30 Oct 2023 05:07:12 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d26-20020a17090648da00b00988dbbd1f7esm5870031ejt.213.2023.10.30.05.07.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 05:07:12 -0700 (PDT)
+Date: Mon, 30 Oct 2023 13:07:11 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: hawk@kernel.org, ilias.apalodimas@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	jdamato@fastly.com, shenjian15@huawei.com, wangjie125@huawei.com,
+	liuyonglong@huawei.com, linyunsheng@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: page_pool: add missing free_percpu when
+ page_pool_init fail
+Message-ID: <ZT+cb4sO3PK1EbT5@nanopsycho>
+References: <20231030091256.2915394-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <45b9c77c-e19c-4c06-a2ea-0cf7e4f17422@proton.me>
- <b045970a-9d0f-48a1-9a06-a8057d97f371@lunn.ch> <0e858596-51b7-458c-a4eb-fa1e192e1ab3@proton.me>
- <20231029.132112.1989077223203124314.fujita.tomonori@gmail.com>
- <ZT6M6WPrCaLb-0QO@Boquns-Mac-mini.home> <ZT6fzfV9GUQOZnlx@boqun-archlinux> <c8d6d56f-bd8f-4d2c-a95a-4ed11bf952b8@lunn.ch>
-In-Reply-To: <c8d6d56f-bd8f-4d2c-a95a-4ed11bf952b8@lunn.ch>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Mon, 30 Oct 2023 13:07:07 +0100
-Message-ID: <CANiq72=_6HsRbMGgWcyKqX-W=xpmw0njGoVRvRRe-c23o7sJyA@mail.gmail.com>
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Boqun Feng <boqun.feng@gmail.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	benno.lossin@proton.me, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu, wedsonaf@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231030091256.2915394-1-shaojijie@huawei.com>
 
-On Sun, Oct 29, 2023 at 8:39=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+Mon, Oct 30, 2023 at 10:12:56AM CET, shaojijie@huawei.com wrote:
+>From: Jian Shen <shenjian15@huawei.com>
 >
-> We have probably missed the merge window for v6.7. So there is around
+>When ptr_ring_init() returns failure in page_pool_init(), free_percpu()
+>is not called to free pool->recycle_stats, which may cause memory
+>leak.
 
-Definitely missed. We aim to send our PRs in advance of the merge
-window, e.g. this cycle it has already been sent.
+Would be nice to see the use of imperative mood in the patch description
+too, not only patch subject. Nevertheless, fix looks fine:
 
-But even if it wasn't, for `rust-next`, feature patches should be sent
-early in the cycle anyway.
-
-> 9 weeks to the next merge window. If a working bindgen is likely to be
-> available by then, we should not bother with a workaround, just wait.
-
-In general, it is better to avoid workarounds if something is going to
-be implemented properly. However, `bindgen` is a third-party project
-which we do not control.
-
-In the case of the exhaustiveness check, they looked interested in the
-feature, which is why I wanted to avoid the workaround if possible.
-
-In this instance though, we don't even know yet what they think about
-the feature we requested. We will give them some time to see what they
-think, and then decide based on that.
-
-Cheers,
-Miguel
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
