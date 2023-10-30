@@ -1,135 +1,168 @@
-Return-Path: <netdev+bounces-45276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6EE7DBD9E
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:18:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82DE37DBDC1
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 17:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 547B7B20CDC
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:18:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23B00B20BDE
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 16:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD8218C23;
-	Mon, 30 Oct 2023 16:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C2B18C3B;
+	Mon, 30 Oct 2023 16:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="WNmucrI4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bkiLgJkO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9157518E03
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 16:17:56 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97817DF
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:17:53 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507a98517f3so6544837e87.0
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:17:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CB818E04
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 16:24:39 +0000 (UTC)
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CE51D9
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:24:37 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so16010a12.1
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:24:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698682672; x=1699287472; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7cwnCkvKtR/PL1gWbn3Z0/7iTEdGVLg59+0VHbaXZHg=;
-        b=WNmucrI4c6TAsdO3h9BC0kSUvmHkEPVejw43m4RgoqD/YHzf40/HH9I0A1gTlmzQkO
-         SsuMPYZS6RAA/t9+iZKDavT1DEzcJjmE751WzNOGqFRCoxyPY9QVW/lvEORYHhAZor2m
-         0loylaPxGN+96lmzZNkJ8lEtsWOZw/6Eh7Qm1GOX6uyjRT2c4MTuP8ZwGZPxC6hzBucP
-         VZutguJPWD+Fi2zElNObkSa77dNQS9zoBZ2gasY1GqXVIUzJr+m81/Twg0STBn3BH/nH
-         yAeIhd3zoJuNszZBjZZle5+sNjEy+q3ynL7OgfNZy5LQT/tzAs2tyNTrUMMBRMX9ATAO
-         Dchw==
+        d=google.com; s=20230601; t=1698683076; x=1699287876; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=47sn375hVOLfjdPqjUMe7dOzcxEppJhVtYv+fY0NC7c=;
+        b=bkiLgJkOD+ZUPH7WnoNKa0E2I2xae9kJdkoFcAaHxexMLs1186J6/GUQiqXIx03T1C
+         cDdPXlRSOSl1Et6Isuk1xSlTunoaRYIBOHZ4LlO48V7bSb8o/9moFfPGJ3+RIG55+BUj
+         F3Vz13z6hFtNg72ZOj+emCKLp+Q9V1zzi3OBvN6/SviUphFrAFugwL0NPv9MuuV1vtyq
+         epFxqodC+x0hr88+fr/iIcwoIAfkZ4OJkU1v5F9GaAfLQefWH5qZ88Hgjan7d6pLfIlx
+         q1xwNonYgroJlS77CDGY0L7dncqE1jK54Msf475brZbrAN51qFdQi8a4n7JN0vuNR+MG
+         Dcxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698682672; x=1699287472;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7cwnCkvKtR/PL1gWbn3Z0/7iTEdGVLg59+0VHbaXZHg=;
-        b=S8Ou1shjYq0CGXDC9iI2+M91Ar4mItTHVvxcqYAnhEseHQVYesgd8Z4UUlZ4SKD4J/
-         BScfDiYc0tiegW7lOowPWwCtV6/bc9OV+VEgrGtkHOsRzY2v2R3fsvrYsWGa1Uo6C5aB
-         5puRnmy2+O2ZtuE3rTa7JmVFAEFo9DM3pti07Pn9WdT3kL+vBicKgMqR5oavqjK1QiR6
-         1WSR9W14QrsdlyERM1wdVXOLoF5AZU0tPgKoxov3S1y7IEalx0pJ1zY4OMJg+8sJlj6v
-         qVTvUxASVp0yoI2DJeXHGJMCFVK+OnIWHal5uIG6c9OSKOMWFE1jHGgYIzC6oQvgIuim
-         4t1A==
-X-Gm-Message-State: AOJu0Ywmipy5/oXTqO4LGp+18s50eIW8YnALXycHJSFLw+dwsX511GPN
-	f/CC+AEtXRexFLP/TE8z4X5VVTGG3FsX3Myqyos=
-X-Google-Smtp-Source: AGHT+IGJeGbGfwqMYnUZJ8vpMgs4LSTXWYkYlaGQoIbnnzuAwofMC5hFLAH4B7GBQk3/Pgs8USwJow==
-X-Received: by 2002:ac2:5104:0:b0:507:a624:3f36 with SMTP id q4-20020ac25104000000b00507a6243f36mr7270644lfb.11.1698682671683;
-        Mon, 30 Oct 2023 09:17:51 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id r17-20020a50aad1000000b0053e2a64b5f8sm6362787edc.14.2023.10.30.09.17.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 09:17:51 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jacob.e.keller@intel.com
-Subject: [patch net] netlink: specs: devlink: add forgotten port function caps enum values
-Date: Mon, 30 Oct 2023 17:17:50 +0100
-Message-ID: <20231030161750.110420-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
+        d=1e100.net; s=20230601; t=1698683076; x=1699287876;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=47sn375hVOLfjdPqjUMe7dOzcxEppJhVtYv+fY0NC7c=;
+        b=tM16I2wnwfkm3OrvX4fMw8qVAG9i7rFAw2HSsXVDQnSRSRQ3QxqdxfsAGazumRld0z
+         iDy3odlxaIunf9bJKRmyXGptI88LtYv4cwWjn/8xBGaZJQhmgndOs1DI+eMDfriabs+j
+         htu3NORmFRWJ7W6Qj6d1wrjuO1fcyIntp/ZqZvfMsbIyzss67nfHUmlcgUnMsVcS5jNa
+         xbcITQjKT2JxceosTjgRFospoCRpW3InPJpwKcHk55bYwd5iWbytnozEHkf42noohqmz
+         Nxvs/MqNG9IYierGvPtjtvrXM4I0bzJTj7uKnDFDoDq32/a37/wo/IQL1Tbd8C6dcoui
+         vNcg==
+X-Gm-Message-State: AOJu0YyhnFVVwXUV69D/nG3TwkirdttmNVITJyR+rBzloz7LvRBSboft
+	xLOYUQlPJnw/3Uz89Jafb1uyMQ1BJ9rvds3/i+Jdkw==
+X-Google-Smtp-Source: AGHT+IGrXKMdli+cacqoxiuLEK7gZy+RUNBAXh2mBrV+tlY/AV/o7JUnKAU442dPQkj/qLo5ypyyQDdH1m4qBLAxRTo=
+X-Received: by 2002:a50:9552:0:b0:540:9dbd:4b8 with SMTP id
+ v18-20020a509552000000b005409dbd04b8mr141388eda.2.1698683075628; Mon, 30 Oct
+ 2023 09:24:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231028144136.3462-1-bragathemanick0908@gmail.com>
+ <CANn89iJyLWy6WEa_1p+jKpGBfq=h=TX=_7p_-_i4j6mHcMXbgA@mail.gmail.com>
+ <e38353e7-ea99-434b-9700-151ab2de6f85@gmail.com> <CANn89iKPTdE+oAB30gp4koC7ddnga20R8H6V3qismvvEP80aqg@mail.gmail.com>
+ <4fffeb15-52b1-4f2c-93bb-c3988ddfbf43@gmail.com>
+In-Reply-To: <4fffeb15-52b1-4f2c-93bb-c3988ddfbf43@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 30 Oct 2023 17:24:22 +0100
+Message-ID: <CANn89iKsYu0_zWwsR97zyC7uuAKqEdJYC33-4eezBFVb3pj8Qw@mail.gmail.com>
+Subject: Re: [PATCH net] dccp: check for ccid in ccid_hc_tx_send_packet
+To: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Mon, Oct 30, 2023 at 5:22=E2=80=AFPM Bragatheswaran Manickavel
+<bragathemanick0908@gmail.com> wrote:
+>
+>
+> On 30/10/23 21:19, Eric Dumazet wrote:
+>
+> On Mon, Oct 30, 2023 at 4:40=E2=80=AFPM Bragatheswaran Manickavel
+> <bragathemanick0908@gmail.com> wrote:
+>
+> On 30/10/23 14:29, Eric Dumazet wrote:
+>
+> On Sat, Oct 28, 2023 at 4:41=E2=80=AFPM Bragatheswaran Manickavel
+> <bragathemanick0908@gmail.com> wrote:
+>
+> ccid_hc_tx_send_packet might be called with a NULL ccid pointer
+> leading to a NULL pointer dereference
+>
+> Below mentioned commit has similarly changes
+> commit 276bdb82dedb ("dccp: check ccid before dereferencing")
+>
+> Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Dc71bc336c5061153b502
+> Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
+> ---
+>   net/dccp/ccid.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/dccp/ccid.h b/net/dccp/ccid.h
+> index 105f3734dadb..1015dc2b9392 100644
+> --- a/net/dccp/ccid.h
+> +++ b/net/dccp/ccid.h
+> @@ -163,7 +163,7 @@ static inline int ccid_packet_dequeue_eval(const int =
+return_code)
+>   static inline int ccid_hc_tx_send_packet(struct ccid *ccid, struct sock=
+ *sk,
+>                                           struct sk_buff *skb)
+>   {
+> -       if (ccid->ccid_ops->ccid_hc_tx_send_packet !=3D NULL)
+> +       if (ccid !=3D NULL && ccid->ccid_ops->ccid_hc_tx_send_packet !=3D=
+ NULL)
+>                  return ccid->ccid_ops->ccid_hc_tx_send_packet(sk, skb);
+>          return CCID_PACKET_SEND_AT_ONCE;
+>   }
+> --
+> 2.34.1
+>
+> If you are willing to fix dccp, I would make sure that some of
+> lockless accesses to dccps_hc_tx_ccid
+> are also double checked and fixed.
+>
+> do_dccp_getsockopt() and dccp_get_info()
+>
+> Hi Eric,
+>
+> In both do_dccp_getsockopt() and dccp_get_info(), dccps_hc_rx_ccid are
+> checked properly before access.
+>
+> Not really, because another thread can change the value at the same time.
+>
+> Adding checks is not solving races.
+>
+> Understood. But when I see function similar to ccid_hc_tx_send_packet all=
+ of
+> them has ccid check and few of them have addressed same issue.
+>
+> dccp_get_info()
+>         if (dp->dccps_hc_rx_ccid !=3D NULL)
+>                 ccid_hc_rx_get_info(dp->dccps_hc_rx_ccid, sk, info);
+>         if (dp->dccps_hc_tx_ccid !=3D NULL)
+>                 ccid_hc_tx_get_info(dp->dccps_hc_tx_ccid, sk, info);
+>
 
-Add two enum values that the blamed commit omitted.
+All I am saying is that these changes are not correct.
 
-Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- Documentation/netlink/specs/devlink.yaml | 4 ++++
- net/devlink/netlink_gen.c                | 2 +-
- tools/net/ynl/generated/devlink-user.c   | 2 ++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+They are simply adding some 'checks' that are unsafe.
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index c6ba4889575a..572d83a414d0 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -71,6 +71,10 @@ definitions:
-         name: roce-bit
-       -
-         name: migratable-bit
-+      -
-+        name: ipsec-crypto-bit
-+      -
-+        name: ipsec-packet-bit
-   -
-     type: enum
-     name: sb-threshold-type
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 9cbae0169249..788dfdc498a9 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -15,7 +15,7 @@ const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_FN_ATTR_
- 	[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR] = { .type = NLA_BINARY, },
- 	[DEVLINK_PORT_FN_ATTR_STATE] = NLA_POLICY_MAX(NLA_U8, 1),
- 	[DEVLINK_PORT_FN_ATTR_OPSTATE] = NLA_POLICY_MAX(NLA_U8, 1),
--	[DEVLINK_PORT_FN_ATTR_CAPS] = NLA_POLICY_BITFIELD32(3),
-+	[DEVLINK_PORT_FN_ATTR_CAPS] = NLA_POLICY_BITFIELD32(15),
- };
- 
- const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1] = {
-diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
-index 75b744b47986..bc5065bd99b2 100644
---- a/tools/net/ynl/generated/devlink-user.c
-+++ b/tools/net/ynl/generated/devlink-user.c
-@@ -121,6 +121,8 @@ const char *devlink_port_fn_opstate_str(enum devlink_port_fn_opstate value)
- static const char * const devlink_port_fn_attr_cap_strmap[] = {
- 	[0] = "roce-bit",
- 	[1] = "migratable-bit",
-+	[2] = "ipsec-crypto-bit",
-+	[3] = "ipsec-packet-bit",
- };
- 
- const char *devlink_port_fn_attr_cap_str(enum devlink_port_fn_attr_cap value)
--- 
-2.41.0
+Compiler can absolutely fetch dp->dccps_hc_tx_ccid a second time,
+and a NULL could be read this second time.
 
+> do_dccp_getsockopt()
+>     ccid_hc_rx_getsockopt
+>     ccid_hc_tx_getsockopt
+>     ccid_get_current_rx_ccid
+>     ccid_get_current_tx_ccid   =3D=3D=3D> All of them have ccid check
+>
+> So, I went on with this changes.
+> If you have another suggestion of fixing this issue please let me know. I=
+ will take a look.
 
