@@ -1,408 +1,220 @@
-Return-Path: <netdev+bounces-45244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F4B7DBB49
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 15:04:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420277DBB10
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BC821C20863
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 14:04:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96A60B20CF7
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 13:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3923A17757;
-	Mon, 30 Oct 2023 14:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1218171B0;
+	Mon, 30 Oct 2023 13:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVQObYp2"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KBLye+MI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 268F617734
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 14:04:08 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FA4DC0;
-	Mon, 30 Oct 2023 07:04:02 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9d34b2b51a5so192336366b.2;
-        Mon, 30 Oct 2023 07:04:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3D9EEDE
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 13:44:29 +0000 (UTC)
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF2C97
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:44:27 -0700 (PDT)
+Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-7b6cd2afaf2so1867398241.0
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 06:44:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698674641; x=1699279441; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tqym31TjxbtaWdc4iL62cAqdr3Bt3BI3Pwe8MUfHDAA=;
-        b=XVQObYp26zK2wIPPSMMItyKptmFDQXN/8jgaAZizT+3U5fKIUBAaP45kx2450yRjS9
-         SamH/zgrFeMDRp7JuuW5/OhttJO6BvqDSYlLoPd2PQbiFoGC2al29twKVF0DzaN2FdSQ
-         HLHs+Nyp+8SneEr9GHLYKbHxM+EC0f+H626O78INDHW3JrkIHqw8g/BrMqcF2H2bHvXB
-         2cHdLIi3Mw+DzfoI4hQFUOwGoFA121/jj/lIwKQXwjn2IUzcOxmWPFj/nex4USMG4TWA
-         fv8JwWB9Iz0Ki2rpNlgy7tT8JJ1uKfr4bJFQsKSrRSoe1RC9QYq5I3eSK0Wk16hIsphv
-         gsPg==
+        d=broadcom.com; s=google; t=1698673467; x=1699278267; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=cp6Ha2d0GCuSdJFpoKLjTi78MtHF39hFwPYkdZYqy8I=;
+        b=KBLye+MIZInY6uE33Z5g2IoC3DS/uCijaTNsztQaZq7GJeK1+EMkwfgb6eX4t0nOSc
+         IqOSGfs2rBZGYPXxalEEnKO/KUixUprB01emf0ORaGjziMk7X3DI59C5Xev2I3ARoCmK
+         sUtfxC3Bnb4RJqetc0GQl8u3ohy9eQ/mSkoPs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698674641; x=1699279441;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tqym31TjxbtaWdc4iL62cAqdr3Bt3BI3Pwe8MUfHDAA=;
-        b=F6891Xw7VLm1EniEregr9tLzVrhoOehX7cbmLhZqHLYV9CMmvQ1vimGAc6UXt/BRFv
-         ZAIm9ycFGjIVyblG0ejWDDXggrbNlVroLrz2eo/44zBlhpconeaoWYUdJuy8I1JMGiuI
-         KxAoU7USIA4CMZ9s+22Swv/sg4i12eRYCx5JJ0Y78D0+lBowww2cTnL/uNkqtEwwP9JK
-         F1heqjGAploSq+Rlig5Q9RFyHtRl/GgkQKtAjk9WMx/Jl6kABlPj+2IJR5CGnZOO1kzj
-         +57FoLY6Tx/o9manCqGPY8DrYZop1KlG8R88z2OlGaLqxD4FdLS5h8pP7Vk+ZBXSZbW6
-         UWdA==
-X-Gm-Message-State: AOJu0YyRMUwdb2MGx301scdFK+Oid6o2swkDeNsp9N3RgspeDZMfT6VL
-	mYUPtsQxI0Gq6O8ffdh2KmpmNPdK1qE=
-X-Google-Smtp-Source: AGHT+IGEXWDlNqEt/q62H+39ILUjYF0RZE7Et9udug0UMd9IUiZ7Uhf1VAM/oQE94p3dk1uEkxGjHA==
-X-Received: by 2002:a17:907:930a:b0:9bd:abb2:d4e0 with SMTP id bu10-20020a170907930a00b009bdabb2d4e0mr7462497ejc.22.1698674640748;
-        Mon, 30 Oct 2023 07:04:00 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:bc31:8900:5db7:a938:1060:35a3? (dynamic-2a01-0c23-bc31-8900-5db7-a938-1060-35a3.c23.pool.telefonica.de. [2a01:c23:bc31:8900:5db7:a938:1060:35a3])
-        by smtp.googlemail.com with ESMTPSA id n27-20020a5099db000000b0053116e45317sm6278564edb.44.2023.10.30.07.03.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 07:04:00 -0700 (PDT)
-Message-ID: <34e2d832-a1ed-4a9f-a38c-4ab8b1ee72f0@gmail.com>
-Date: Mon, 30 Oct 2023 14:39:33 +0100
+        d=1e100.net; s=20230601; t=1698673467; x=1699278267;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cp6Ha2d0GCuSdJFpoKLjTi78MtHF39hFwPYkdZYqy8I=;
+        b=DN2tca2iLnAAhHtC3fM4t4kqDouTGTnRbzkSBcyPKFxk5ih1TD+qCk7pP9q99Keoj6
+         tiWdyVnyXBTxWyd5/Baa7ElhaRpP5NMh/fpAJKcVAeBbiiJNhCAc7rSSWe3GnyEBuCWV
+         5yWcNF1DaYDQ11bN+NYr80Vhh23gicqrLMOfDK0Cq4nzFa76ArPPRgnzFnDIaY6LJMnl
+         Drm1N2FyIBU0bfJneDAlBtGlSIE0MaObX+Eqk43oW4eyOI3a1Z9etUKO8LInlJr5aka0
+         rUFOeJaLubOv6wXbHFVrV3RZTihiPTeBpXQ/FQFNN9dxMYXYKlpNR/4Qfl7ZHWkNzDyH
+         bl2g==
+X-Gm-Message-State: AOJu0YyOI8jlTMw2yozqPvpe2HQZGWl9jLJwKQitmAyS6yMjK/Tou1TA
+	+20dhFUodOvyKKm7bKHJMPdmC50IsHYIJ7AGZbGobg==
+X-Google-Smtp-Source: AGHT+IF76Y4/Jl+cJ+jAr3lR3LJmWONDC2kDd1Q9HJkH3tBOmPeuLAevDrk5Q4NF4sEGrAfQeGgyolVQTNdGSZIvrNc=
+X-Received: by 2002:a67:e08e:0:b0:457:cca9:a922 with SMTP id
+ f14-20020a67e08e000000b00457cca9a922mr8467004vsl.24.1698673466950; Mon, 30
+ Oct 2023 06:44:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/7] r8169: Add r8169_mac_ocp_(write|modify)_seq
- helpers to reduce spinlock contention
-Content-Language: en-US
-To: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
- Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <jroedel@suse.de>,
- Lu Baolu <baolu.lu@linux.intel.com>, iommu@lists.linux.dev,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, nic_swsd@realtek.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Marco Elver <elver@google.com>
-References: <20231029183600.451694-1-mirsad.todorovac@alu.unizg.hr>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20231029183600.451694-1-mirsad.todorovac@alu.unizg.hr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231030091256.2915394-1-shaojijie@huawei.com> <ZT+cb4sO3PK1EbT5@nanopsycho>
+In-Reply-To: <ZT+cb4sO3PK1EbT5@nanopsycho>
+From: Somnath Kotur <somnath.kotur@broadcom.com>
+Date: Mon, 30 Oct 2023 19:14:14 +0530
+Message-ID: <CAOBf=mvvnfv6HcG7D5Oo9p3F9nr1k9rRdqMP_N1ZnRG9foGZxQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: page_pool: add missing free_percpu when
+ page_pool_init fail
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jijie Shao <shaojijie@huawei.com>, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	davem@davemloft.net, edumazet@google.com, Jakub Kicinski <kuba@kernel.org>, 
+	pabeni@redhat.com, jdamato@fastly.com, shenjian15@huawei.com, 
+	wangjie125@huawei.com, liuyonglong@huawei.com, linyunsheng@huawei.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009aaca30608ef3c27"
 
-On 29.10.2023 19:35, Mirsad Goran Todorovac wrote:
-> A pair of new helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq()
-> are introduced.
-> 
-At first one more formal remark: series is missing a cover letter
+--0000000000009aaca30608ef3c27
+Content-Type: multipart/alternative; boundary="00000000000096747d0608ef3c10"
 
-> The motivation for these helpers was the locking overhead of 130 consecutive
-> r8168_mac_ocp_write() calls in the RTL8411b reset after the NIC gets confused
-> if the PHY is powered-down.
-> 
-> To quote Heiner:
-> 
->     On RTL8411b the RX unit gets confused if the PHY is powered-down.
->     This was reported in [0] and confirmed by Realtek. Realtek provided
->     a sequence to fix the RX unit after PHY wakeup.
-> 
-> A series of about 130 r8168_mac_ocp_write() calls is performed to program the
-> RTL registers for recovery, each doing an expensive spin_lock_irqsave() and
-> spin_unlock_irqrestore().
-> 
-> Each mac ocp write is made of:
-> 
->     static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
-> 		      u32 data)
->     {
-> 	if (rtl_ocp_reg_failure(reg))
-> 	    return;
-> 
-> 	RTL_W32(tp, OCPDR, OCPAR_FLAG | (reg << 15) | data);
->     }
-> 
->     static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
-> 		    u32 data)
->     {
-> 	unsigned long flags;
-> 
-> 	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
-> 	__r8168_mac_ocp_write(tp, reg, data);
-> 	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
->     }
-> 
-> Register programming is done through RTL_W32() macro which expands into
-> 
->     #define RTL_W32(tp, reg, val32) writel((val32), tp->mmio_addr + (reg))
-> 
-> which is further (on Alpha):
-> 
->     extern inline void writel(u32 b, volatile void __iomem *addr)
->     {
-> 	mb();
-> 	__raw_writel(b, addr);
->     }
-> 
-> or on i386/x86_64:
-> 
->     #define build_mmio_write(name, size, type, reg, barrier) \
->     static inline void name(type val, volatile void __iomem *addr) \
->     { asm volatile("mov" size " %0,%1": :reg (val), \
->     "m" (*(volatile type __force *)addr) barrier); }
-> 
->     build_mmio_write(writel, "l", unsigned int, "r", :"memory")
-> 
-> This obviously involves iat least a compiler barrier.
-> 
-> mb() expands into something like this i.e. on x86_64:
-> 
->     #define mb()    asm volatile("lock; addl $0,0(%%esp)" ::: "memory")
-> 
-> This means a whole lot of memory bus stalls: for spin_lock_irqsave(),
-> memory barrier, writel(), and spin_unlock_irqrestore().
-> 
-> With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
-> a lock storm that will stall all of the cores and CPUs on the same memory controller
-> for certain time I/O takes to finish.
-> 
-> In a sequential case of RTL register programming, the writes to RTL registers
-> can be coalesced under a same raw spinlock. This can dramatically decrease the
-> number of bus stalls in a multicore or multi-CPU system.
-> 
-> Macro helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq() are
-> provided to reduce lock contention:
-> 
->     static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
->     {
-> 
-> 	...
-> 
-> 	/* The following Realtek-provided magic fixes an issue with the RX unit
-> 	 * getting confused after the PHY having been powered-down.
-> 	 */
-> 
-> 	static const struct recover_8411b_info init_zero_seq[] = {
-> 	    { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 },
-> 	    ...
-> 	};
-> 
-> 	...
-> 
-> 	r8168_mac_ocp_write_seq(tp, init_zero_seq);
-> 
-> 	...
-> 
->     }
-> 
-> The hex data is preserved intact through s/r8168_mac_ocp_write[(]tp,/{ / and s/[)];/ },/
-> functions that only changed the function names and the ending of the line, so the actual
-> hex data is unchanged.
-> 
-> To repeat, the reason for the introduction of the original commit
-> was to enable recovery of the RX unit on the RTL8411b which was confused by the
-> powered-down PHY. This sequence of r8168_mac_ocp_write() calls amplifies the problem
-> into a series of about 500+ memory bus locks, most waiting for the main memory read,
-> modify and write under a LOCK. The memory barrier in RTL_W32 should suffice for
-> the programming sequence to reach RTL NIC registers.
-> 
-> [0] https://bugzilla.redhat.com/show_bug.cgi?id=1692075
-> 
-The motivation for the original change isn't relevant here.
-In general I'd prefer a shorter commit message that comes to the point immediately.
+--00000000000096747d0608ef3c10
+Content-Type: text/plain; charset="UTF-8"
 
+On Mon, 30 Oct, 2023, 18:02 Jiri Pirko, <jiri@resnulli.us> wrote:
 
-> Fixes: fe4e8db0392a6 ("r8169: fix issue with confused RX unit after PHY power-down on RTL8411b")
-> Fixes: 91c8643578a21 ("r8169: use spinlock to protect mac ocp register access")
-> Fixes: d6c36cbc5e533 ("r8169: Use a raw_spinlock_t for the register locks.")
+> Mon, Oct 30, 2023 at 10:12:56AM CET, shaojijie@huawei.com wrote:
+> >From: Jian Shen <shenjian15@huawei.com>
+> >
+> >When ptr_ring_init() returns failure in page_pool_init(), free_percpu()
+> >is not called to free pool->recycle_stats, which may cause memory
+> >leak.
+>
+> Would be nice to see the use of imperative mood in the patch description
+> too, not only patch subject. Nevertheless, fix looks fine:
+>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>
+>
+Reviewed-by: Somnath Kotur
+>
+<somnath.kotur@broadcom.com >
 
-Please submit the patches as net-next material and remove the Fixes tags as there's no
-evidence of any actual issue. See stable submission criteria:
-https://www.kernel.org/doc/html/next/process/stable-kernel-rules.html#:~:text=It%20or%20an%20equivalent%20fix,%2Fprocess%2Fsubmitting%2Dpatches.
+--00000000000096747d0608ef3c10
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-No "This could be a problem..." type of things like a "theoretical race condition",
-unless an explanation of how the bug can be exploited is also provided. See
+<div dir=3D"auto"><br><br><div class=3D"gmail_quote" dir=3D"auto"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Mon, 30 Oct, 2023, 18:02 Jiri Pirko, &lt;<=
+a href=3D"mailto:jiri@resnulli.us" target=3D"_blank" rel=3D"noreferrer">jir=
+i@resnulli.us</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" sty=
+le=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Mon, O=
+ct 30, 2023 at 10:12:56AM CET, <a href=3D"mailto:shaojijie@huawei.com" rel=
+=3D"noreferrer noreferrer" target=3D"_blank">shaojijie@huawei.com</a> wrote=
+:<br>
+&gt;From: Jian Shen &lt;<a href=3D"mailto:shenjian15@huawei.com" rel=3D"nor=
+eferrer noreferrer" target=3D"_blank">shenjian15@huawei.com</a>&gt;<br>
+&gt;<br>
+&gt;When ptr_ring_init() returns failure in page_pool_init(), free_percpu()=
+<br>
+&gt;is not called to free pool-&gt;recycle_stats, which may cause memory<br=
+>
+&gt;leak.<br>
+<br>
+Would be nice to see the use of imperative mood in the patch description<br=
+>
+too, not only patch subject. Nevertheless, fix looks fine:<br>
+<br>
+Reviewed-by: Jiri Pirko &lt;<a href=3D"mailto:jiri@nvidia.com" rel=3D"noref=
+errer noreferrer" target=3D"_blank">jiri@nvidia.com</a>&gt;<br>
+<br>
+</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;b=
+order-left:1px #ccc solid;padding-left:1ex"></blockquote></div><div dir=3D"=
+auto"><br></div><div class=3D"gmail_quote" dir=3D"auto"><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">Reviewed-by: Somnath Kotur<br></blockquote></div><div dir=3D"=
+auto">&lt;<a href=3D"mailto:somnath.kotur@broadcom.com">somnath.kotur@broad=
+com.com</a> &gt;</div><div class=3D"gmail_quote" dir=3D"auto"></div></div>
 
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: Marco Elver <elver@google.com>
-> Cc: nic_swsd@realtek.com
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Link: https://lore.kernel.org/lkml/20231028005153.2180411-1-mirsad.todorovac@alu.unizg.hr/
-> Link: https://lore.kernel.org/lkml/20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr/
-> Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
-> ---
-> v5:
->  added unlocked primitives to allow mac ocs modify grouping
->  applied coalescing of mac ocp writes/modifies for 8168ep and 8117
->  some formatting fixes to please checkpatch.pl
-> 
-> v4:
->  fixed complaints as advised by Heiner and checkpatch.pl
->  split the patch into five sections to be more easily manipulated and reviewed
->  introduced r8168_mac_ocp_write_seq()
->  applied coalescing of mac ocp writes/modifies for 8168H, 8125 and 8125B
-> 
-> v3:
->  removed register/mask pair array sentinels, so using ARRAY_SIZE().
->  avoided duplication of RTL_W32() call code as advised by Heiner.
-> 
->  drivers/net/ethernet/realtek/r8169_main.c | 71 +++++++++++++++++++++--
->  1 file changed, 66 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 361b90007148..da1f5d1b4fd5 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -888,7 +888,7 @@ static int r8168_phy_ocp_read(struct rtl8169_private *tp, u32 reg)
->  		(RTL_R32(tp, GPHY_OCP) & 0xffff) : -ETIMEDOUT;
->  }
->  
-> -static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg, u32 data)
-> +static inline void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg, u32 data)
+--00000000000096747d0608ef3c10--
 
-No inline declarations please, let the compiler decide.
+--0000000000009aaca30608ef3c27
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
->  {
->  	if (rtl_ocp_reg_failure(reg))
->  		return;
-> @@ -905,7 +905,7 @@ static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg, u32 data)
->  	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
->  }
->  
-> -static u16 __r8168_mac_ocp_read(struct rtl8169_private *tp, u32 reg)
-> +static inline u16 __r8168_mac_ocp_read(struct rtl8169_private *tp, u32 reg)
->  {
->  	if (rtl_ocp_reg_failure(reg))
->  		return 0;
-> @@ -927,18 +927,79 @@ static u16 r8168_mac_ocp_read(struct rtl8169_private *tp, u32 reg)
->  	return val;
->  }
->  
-> +static inline void __r8168_mac_ocp_modify(struct rtl8169_private *tp, u32 reg, u16 mask,
-> +					  u16 set)
-> +{
-> +	u16 data;
-> +
-> +	data = __r8168_mac_ocp_read(tp, reg);
-> +	__r8168_mac_ocp_write(tp, reg, (data & ~mask) | set);
-> +}
-> +
->  static void r8168_mac_ocp_modify(struct rtl8169_private *tp, u32 reg, u16 mask,
->  				 u16 set)
->  {
->  	unsigned long flags;
-> -	u16 data;
->  
->  	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
-> -	data = __r8168_mac_ocp_read(tp, reg);
-> -	__r8168_mac_ocp_write(tp, reg, (data & ~mask) | set);
-> +	__r8168_mac_ocp_modify(tp, reg, mask, set);
->  	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
->  }
->  
-> +struct e_info_regdata {
-
-What does the e prefix stand for? Maybe macocp_info_write and
-macocp_info_modify would be better names and more in line with
-e.g. struct ephy_info.
-
-> +	u32	reg;
-> +	u32	data;
-> +};
-> +
-> +struct e_info_regmaskset {
-> +	u32	reg;
-> +	u16	mask;
-> +	u16	set;
-> +};
-> +
-> +static void __r8168_mac_ocp_write_seqlen(struct rtl8169_private *tp,
-> +					 const struct e_info_regdata *array, int len)
-> +{
-> +	struct e_info_regdata const *p;
-> +
-> +	for (p = array; len--; p++)
-> +		__r8168_mac_ocp_write(tp, p->reg, p->data);
-> +}
-> +
-> +static void r8168_mac_ocp_write_seqlen(struct rtl8169_private *tp,
-> +				       const struct e_info_regdata *array, int len)
-> +{
-> +	unsigned long flags;
-> +
-> +	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
-> +	__r8168_mac_ocp_write_seqlen(tp, array, len);
-> +	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
-> +}
-> +
-> +static void __r8168_mac_ocp_modify_seqlen(struct rtl8169_private *tp,
-> +					  const struct e_info_regmaskset *array, int len)
-> +{
-> +	struct e_info_regmaskset const *p;
-> +
-> +	for (p = array; len--; p++)
-> +		__r8168_mac_ocp_modify(tp, p->reg, p->mask, p->set);
-> +}
-> +
-> +static void r8168_mac_ocp_modify_seqlen(struct rtl8169_private *tp,
-> +					const struct e_info_regmaskset *array, int len)
-> +{
-> +	unsigned long flags;
-> +
-> +	raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
-> +	__r8168_mac_ocp_modify_seqlen(tp, array, len);
-> +	raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
-> +}
-> +
-> +#define r8168_mac_ocp_write_seq(tp, a) r8168_mac_ocp_write_seqlen(tp, a, ARRAY_SIZE(a))
-> +#define r8168_mac_ocp_modify_seq(tp, a) r8168_mac_ocp_modify_seqlen(tp, a, ARRAY_SIZE(a))
-> +#define __r8168_mac_ocp_write_seq(tp, a) __r8168_mac_ocp_write_seqlen(tp, a, ARRAY_SIZE(a))
-> +#define __r8168_mac_ocp_modify_seq(tp, a) __r8168_mac_ocp_modify_seqlen(tp, a, ARRAY_SIZE(a))
-> +
->  /* Work around a hw issue with RTL8168g PHY, the quirk disables
->   * PHY MCU interrupts before PHY power-down.
->   */
-
+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
+nSGLsSobByQoGh1GyLfFTXI7QOGn/6qvrJ7x9Oem5V7miUTD0wGAIozD7MCVoluf5Psa4Q2a5AFV
+gROLty059Ex4oK55Op/0e3Aa/a8hZD/tPBT3WE70owdiCwIDAQABo4IB2zCCAdcwDgYDVR0PAQH/
+BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3VyZS5nbG9i
+YWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEGCCsGAQUF
+BzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAy
+MDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xv
+YmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6hjhodHRw
+Oi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNybDAlBgNV
+HREEHjAcgRpzb21uYXRoLmtvdHVyQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAf
+BgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUabMpSsFcjDNUWMvGf76o
+yB7jBJUwDQYJKoZIhvcNAQELBQADggEBAJBDQpQ1TqY57vpQbwtXYP0N01q8J3tfNA/K2vOiNOpv
+IufqZ5WKdKEtmT21nujCeuaCQ6SmpWqCUJVkLd+u/sHR62vCo8j2fb1pTkA7jeuCAuT9YMPRE86M
+sUphsGDq2ylriQ7y5kvl728hZ0Oakm3xUCnZ9DYS/32sFGSZyrCGZipTBnjK4n5uLQ0yekSLACiD
+R0zi4nzkbhwXqDbDaB+Duk52ec/Vj4xuc2uWu9rTmJNVjdk0qu9vh48xcd/BzrlmwY0crGTijAC/
+r4x2/y9OfG0FyVmakU0qwDnZX982aa66tXnKNgae2k20WCDVMM5FPTrbMsQyz6Hrv3bg6qgxggJt
+MIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYD
+VQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgx6wAr6NdQY0sTG
+G7cwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFETj3Wa0YMHefpgHazB/vpiaULm
+w1P4KqbOGfoXXDoaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIz
+MTAzMDEzNDQyN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsG
+CWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFl
+AwQCATANBgkqhkiG9w0BAQEFAASCAQCTRKk7KFhRYzj1U7C4oEu/Q17eKAe9NyMRRDOvFzyEGPyq
+/DNW8c8kPFJQisn5SwOvEC9Yf43cA8ssUfebQeUyz4VFovf4JuCNGvZP4VIJ09fUi0whLNyoLrsq
+7DngW9SRSqiVCNQqQHTMzWJ/xX/Dd4D+6d5OpVn5vPoo2MZIaJqmRDUvRLgX5AcU0nD2fJQ7wafB
+VHnnfmj73I7Bp7tjHODp0glulZoB3B925YXu5nNddoh5EGsloXI6negOe6BERYDBVO29GYIGhtT6
+rP1Lr99Phxmi8bN2YFI8OjstSL2PmFzdP7FD7/94v2lgWAY4W7GsAtZX2ie5aEi0mlK7
+--0000000000009aaca30608ef3c27--
 
