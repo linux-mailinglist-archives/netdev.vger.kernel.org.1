@@ -1,147 +1,189 @@
-Return-Path: <netdev+bounces-45195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D2E7DB5DF
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 10:12:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D8317DB5CA
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 10:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8CF3B20C47
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 09:12:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE38DB20AAD
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 09:09:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90ECDD526;
-	Mon, 30 Oct 2023 09:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9781ED302;
+	Mon, 30 Oct 2023 09:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ME+oxpv5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PHr+ltU3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FD96AD9
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:11:57 +0000 (UTC)
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 820E9B6
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 02:11:52 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-53e04b17132so6830562a12.0
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 02:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1698657111; x=1699261911; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=68F4Nugtl6JmNyuxi5kC0lowONV3iMbK9eM0e7VxFDE=;
-        b=ME+oxpv56vEn1NDi3glLaaZ2NB/d5Yy8M9xlKUPMR+cvcuFmmZnxPV3efnCH8Eq59d
-         +/jePruzVNCAdpjNU5BraIq4BchxVzmfZXN6OpZ7ECjipxpP/4w2rrZI+J0Ejbp/Con4
-         ZcuMNqijY9BcR8oadJSjs6dvim2LvF+7j9CX3+hik/gkp0dJGWEKbeTPjiq7wbSjYhkX
-         v0fmhotPj7FFrY8udi59CarRMvfHJAawoz/5exJ/R+kRdRTfPsn3k7UmnMCMteL9B5wb
-         nCOWdS2oCg65UEIneUpb+DbNc4HL+WYIV6VRp6Cir8lF40/+Bwms5JPg74RvY+a8FbiP
-         CpKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698657111; x=1699261911;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=68F4Nugtl6JmNyuxi5kC0lowONV3iMbK9eM0e7VxFDE=;
-        b=Tgk2kq4zzhg9F4+YGKrc9Cq5lGNNku1vvWkVwFJLOAt1XUY/1jPbiol0JfDsEoUeFr
-         A2DSZ9pWQNTcpKoZO6hAB1iMjK6sAXFBEMfUToN4OmstjUXg04V7EOxHDJ2nuXwwz78u
-         suEH3j3txk+Iruq4d18/voKI6St+D3ahLZrP3HUGFQQdXVuw0i20MMrNGGXCpv+2xdEg
-         b02xsXXqgFqmXEYshY5ZQ1HR15GfImVX+S0oWQVqCUoH+EZ3HebKerJ6tardaKmdfjr7
-         Xds8E/nhRY0smEh6+GSTWqVMUYlH/+1u1zbmMPjXhE/9vdUeEabGcUcQphBKto6/oe8+
-         p/gg==
-X-Gm-Message-State: AOJu0Yy9f4dA14eifm/dq52PTG7dKftagkEMVb5PDKZ8AthRr+ouclYH
-	q57lqzeLDlMhRWCqhdYBxU124w==
-X-Google-Smtp-Source: AGHT+IGgMDyiGE1uiui2ycx+5YGKiTLigU2lmyJm3sD7BkIU7BEPVbulx6Ppd2BUsQxuxgAfTWxcsg==
-X-Received: by 2002:a50:9ec2:0:b0:53e:e6eb:c838 with SMTP id a60-20020a509ec2000000b0053ee6ebc838mr7136522edf.8.1698657111004;
-        Mon, 30 Oct 2023 02:11:51 -0700 (PDT)
-Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
-        by smtp.gmail.com with ESMTPSA id fd10-20020a056402388a00b0053e5a1bf77dsm5747877edb.88.2023.10.30.02.11.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 02:11:49 -0700 (PDT)
-References: <20231028100552.2444158-1-liujian56@huawei.com>
- <20231028100552.2444158-8-liujian56@huawei.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Liu Jian <liujian56@huawei.com>
-Cc: john.fastabend@gmail.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v7 7/7] selftests/bpf: add tests for verdict
- skmsg to closed socket
-Date: Mon, 30 Oct 2023 10:04:35 +0100
-In-reply-to: <20231028100552.2444158-8-liujian56@huawei.com>
-Message-ID: <87fs1s1nl2.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A95CA6F
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 09:09:09 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECF918E;
+	Mon, 30 Oct 2023 02:09:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698656947; x=1730192947;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sgMyyWSj3yKoypIkqcOsGd58fOW1oAV50svosHvNn4A=;
+  b=PHr+ltU3EjyBRAPFNHg4EtVNo0gi9eAVZaxpGDOOfHHPOEiqzPDHd5uH
+   BiPV8csiZmazaqIXggrlo1iYe4AFxP4DijqYwmIvzSUYpVHEFAI+OkmK6
+   cZxbEe4zsS1wVx7pkwO8eRAkKOfe0b5joCTbY+TVNbjIpQ2IQXLSTCJ6P
+   K4pp/E8HrdR4r6Z9Rc8LRwGAP2zT8BFwbj5FPD4t9+c25cUs2aNdxELir
+   UkmuyN4Nck/szj5ripHouFAiYkS1BHeLUdHRM6ECe0nGZuNn2BgmJuK47
+   iLFTfJ2tzm7pOYjGUNGklZqs8fzE4DKWYZiGr7fsqKl0+ojaWDWJvx/Wa
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="419151404"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="419151404"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 02:09:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10878"; a="850852730"
+X-IronPort-AV: E=Sophos;i="6.03,263,1694761200"; 
+   d="scan'208";a="850852730"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 02:09:06 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 30 Oct 2023 02:09:05 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 02:09:05 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 30 Oct 2023 02:09:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BBFDe8pAL/l4MscfXCSOEiuJo4mf4Ds8/2caFVoJEm46nO/KR7WDgVM3dZc7H13SIVfWfH3BrBNMa/sgLG5WB8kf874trSSo5i9as6EAbJQD8Uo+G12jAxmlHgQfiLt7LorI4Tlp6wwhvSS42Y01eg8+bk5OEkn7GajfcYW12QoQei/wJVIh+K5203XYuvpUVmicfJ+UAC/ehWosIPkPP1cSGHWUX0/n5pzJPtRkl5XbwaexB5UPDeB/F2tE7AEB2eAHTO1ZR8qoi1jyHzKvq379mDPNtExfebEF9qMXd9NC6Mzlxj9mOGcRBQQyuPFNL/95KopVxOgLPozvIglsmA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vMHy1MRv2WwgRzNnqgp/45kFOSgJOOd3bAuxef8jGrU=;
+ b=e2XOQuwci18h8N58bJu/b/Tm1GQZuSVGBHAKF0TC6uANr+VVprZGBTc6znD13i3lliA+o1daPivg03HJjC1VsWn4eD8rltKKqgaT7cbGcBUPicP2Wki5VB2zCRXSoPqUEFG6c1wsCDetecSuHdC4xSJQtLlUGgEP3Qb4y9I6/R+SyEXxTKoE5zlBk1u9NVU5K0fGh9GqlW+MF6/ISixQiQC6i7lDOqrCoG6hCyS0ebvev4sGd3Ob4h9nERzy9PpYf3X4L/NNwKXnuriC+E4Qk2V5oVMM56X/VM6RsoTOG5VCoWMV8vZhsGsN3jdAPTskiieyp4JqmZ83/b3LdfkMgQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by IA1PR11MB7856.namprd11.prod.outlook.com (2603:10b6:208:3f5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.26; Mon, 30 Oct
+ 2023 09:09:02 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::7911:8ae6:fc73:1097]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::7911:8ae6:fc73:1097%6]) with mapi id 15.20.6907.032; Mon, 30 Oct 2023
+ 09:09:02 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next 1/2] i40e: Remove VF MAC types
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 1/2] i40e: Remove VF MAC types
+Thread-Index: AQHaBy7IFFl+HOqgok+vgSyUBngox7BiEspA
+Date: Mon, 30 Oct 2023 09:09:02 +0000
+Message-ID: <BL0PR11MB312295F5DC3408006E5820D5BDA1A@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231025103315.1149589-1-ivecera@redhat.com>
+ <20231025103315.1149589-2-ivecera@redhat.com>
+In-Reply-To: <20231025103315.1149589-2-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|IA1PR11MB7856:EE_
+x-ms-office365-filtering-correlation-id: dc83b69a-1d75-4230-1e90-08dbd927dc1f
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: X6dXW8j6gvZrlgMAKs/QzvoAl4eBrjyVKCXJJqu2RyK85PYhyvUOgDKBrHtiK1KSexTWSMxTQVB1CGw5SbZt+UQTKcs/CSD03vb/jMZ4yTy2bgIT2KvKzD3EnonWx1yUJKi1Cn1vsztKVOo+2xL73wPwjS7cMGBSuOIfj9fKLCBmdxCMB+Nui5UFIxwAGVVq7pBvBjxZqR/euPxZCGWvgMQ1pSrFo6AAA48Am+eyGU1AnCZjwYbuuFkEMIQDPRbdWkhVK0sqrelZgq5amyEt1b3am6X+tR9whmy/FNDKUhxt8b8jKFr+wVd3TJYaO8YknQYe6yaBBiAJUfOX561//G1zx+K2B7FqmER9twzfZgR1MYmWSvEdWpvRO6TwbjwAoFqicZOTSTNQzIDIY+/ZY2W2xmbvS0n5muXpv/C15RyaMYR8dWY0TneUcu3oeDd9mHgubZq2dT5WC7Uea1bFjmGZjZOMvFJy5CChPXWEdzRC2S6BWyDt7F359sxZ9pxZ2pORlVKtYEj++fHA6B3RV4YhWY1tyRVAt+oiRfZYVnT+MrV/X0d95z5ETMpFlsVDdJWwTMYuFE4hj95iepQPEDerzpSFI037l7Uqit0dGfrzwNWjYCgLBjF1pc7xw3Gy
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(366004)(396003)(346002)(136003)(376002)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(55016003)(9686003)(26005)(53546011)(478600001)(4326008)(6506007)(71200400001)(7696005)(2906002)(4744005)(83380400001)(66556008)(110136005)(76116006)(66946007)(5660300002)(41300700001)(66476007)(8936002)(66446008)(52536014)(8676002)(54906003)(64756008)(316002)(38070700009)(38100700002)(82960400001)(122000001)(86362001)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?A0nsjOpA/FASk44CYE/B2+vWgLALd/4WKdh8m1Vg/T6KA9PZQ6JJfMP7kf0c?=
+ =?us-ascii?Q?GjOP4qsd9Yktf2hy9Tj8PCHHtRXHadA9tToPTrvbkFeVOLZuqhfGOF6wFr7c?=
+ =?us-ascii?Q?1Zbtp7SEHIAPf42rUToESnpzsFHzbXKXd8KTRn64NWXO/RE8UEDS0NFMw9Mc?=
+ =?us-ascii?Q?oDttl7Y9OwZdK6U7q4SjMo/Tay/8DfMhWj4LQL+JiQA3v3TFIgk/+eEZR4pW?=
+ =?us-ascii?Q?8PZ0FM8S4DeGhX+coRnHhRxvXpy9N0b4hz6nDMPsImjpGDCIXJerXU+ZeHYC?=
+ =?us-ascii?Q?0KB6+Iq8j6bNt7MO4ksvIukV175N6gjbxkEm3AYnlBpjp/WMN0Mtc/tLM2gj?=
+ =?us-ascii?Q?XGR7vmod8zpMAk6Ur4poflNDGq31+C+T+Q2Fknj+8hjoU/XPjh2SOIfQz8Vq?=
+ =?us-ascii?Q?6ZyFD5Rm9kB8j0/dDFCsigL/A2o6ww/+ockP8OLgB6UuSeZWCc8GGsfMOpAR?=
+ =?us-ascii?Q?sRAcNxFxvnbefwHWUQ1ikipmd9fCU0LWonwjeRGwphdxPDpR6MGVSCqp6UC2?=
+ =?us-ascii?Q?tv4yncEMVPcPwdaVaM03I6iBqu4gSyfh8YBaN/mkWCGvut7+vyBi4rLjI5O9?=
+ =?us-ascii?Q?pzuZ307jOSt2xvAzUHAEk2dwIDD+H7V2g1E44fz+vn56COfQo3m3Oa/OLB3F?=
+ =?us-ascii?Q?Kdl/4iHgoy8oIGmcTP7k1AGf+LiuRX2S2Zo5RtqUakLsdbinAD2lCpEKS1Px?=
+ =?us-ascii?Q?K36KaTKgFv+l2zCfX+c3TivlSeKItyYcCfPZrUYZooly8IByykdXbiWhosb8?=
+ =?us-ascii?Q?4Ao98ZyWkOVyrDAYVM7QOiv3hb+O3El7oYfReTy4nKUbkFXJ3ywjztM2K/rK?=
+ =?us-ascii?Q?tRHskB6zwDkomGMJ9h6MdE4M+sDmRbmGBNchFtLpnK7Ayje0YMX/WvSGn/WC?=
+ =?us-ascii?Q?rza28I47Qjn+AjkxToBDYPg8FT39F7LuzdnVbPEaDoYUe5lbr1clFJO1gF9E?=
+ =?us-ascii?Q?keE8kvAafktgb9m9r/4Ox04o2K1+QRmGBjAdcreU4N+/5mUP3jYkw+c1gNKl?=
+ =?us-ascii?Q?/EVRU7ObGDBePCRi9qwL+SOp4mKmyrGJy3Dkt2jEjxlBH5lQqWnkc7ZqskoL?=
+ =?us-ascii?Q?/xfJ8Ro6c5g9cZylPP2IXqFQWrAhmEpxUdgaQ6wDLmQPGw1CX3T31izTiZAj?=
+ =?us-ascii?Q?FMFy5HZGiNcn+FRECSsOOd4V/GoKIyjhRqnDUy5DAOQMN4Kx3MMWMykxxhMS?=
+ =?us-ascii?Q?iPeVE9nZdRx949tlnmblaU5YMF8ESF2qvIgj98W0ZMr7HGZSyef7aM4h3ybv?=
+ =?us-ascii?Q?pmmKZwI8v57Z8PqAq7yH6ItUC9TbHlMlSAkEHF+FTUoKA9gUmtliuD4eO+Qd?=
+ =?us-ascii?Q?n47YcUZODg6AZwFGACaIaX/NI6sE/mzcmLfoDQj/xffZY5W4fLy4ENPu3/lo?=
+ =?us-ascii?Q?A3ld0ukiGDtAYF3s78xddvMPZSD8MCUMS29gU7e9KApYc1cBgJc+5MoNjshc?=
+ =?us-ascii?Q?oZ/4Klo+mlhNhhjjHQNWqtQBwr6WYOWIk9ZApyF3ArlmVWsK6qztTLO4NuI2?=
+ =?us-ascii?Q?+CJ+Tne4mCIyKVhK9++iofJZVka4KTcdSbSPBRGgiE8mlu5Yj0Yq3CsizT8r?=
+ =?us-ascii?Q?I77bqr6SivlZ4USlm56s4tcHWatWSo4Gs1J6a+uwSqNVlryedKpJ/emDpdAk?=
+ =?us-ascii?Q?Xw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc83b69a-1d75-4230-1e90-08dbd927dc1f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2023 09:09:02.2527
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 28Ti3jrX7P9dGHvfehqnvrPQ1N5xdNh7IP1tWUfPfFTomYlUG7q6lZzxDUpDaoxH94Q4Aoojx2H1u/hQSD8Lv8bpKnYGD/c42VhsIsu4DM6Sh2/yUaLHORYUNR0tPJ0B
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7856
+X-OriginatorOrg: intel.com
 
-On Sat, Oct 28, 2023 at 06:05 PM +08, Liu Jian wrote:
-> Add four tests for verdict skmsg to closed socket in sockmap_basic.c.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+van Vecera
+> Sent: Wednesday, October 25, 2023 4:03 PM
+> To: netdev@vger.kernel.org
+> Cc: intel-wired-lan@lists.osuosl.org; Brandeburg, Jesse <jesse.brandeburg=
+@intel.com>; linux-kernel@vger.kernel.org; Eric Dumazet <edumazet@google.co=
+m>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Keller, Jacob E <jacob.=
+e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@=
+redhat.com>; David S. Miller <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH iwl-next 1/2] i40e: Remove VF MAC types
 >
-> Signed-off-by: Liu Jian <liujian56@huawei.com>
+> The i40e_hw.mac.type cannot to be equal to I40E_MAC_VF or
+> I40E_MAC_X722_VF so remove helper i40e_is_vf(), simplify
+> i40e_adminq_init_regs() and remove enums for these VF MAC types.
+>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->  .../selftests/bpf/prog_tests/sockmap_basic.c  | 42 +++++++++++++++----
->  1 file changed, 34 insertions(+), 8 deletions(-)
+>  drivers/net/ethernet/intel/i40e/i40e_adminq.c | 33 ++++++-------------
+>  drivers/net/ethernet/intel/i40e/i40e_type.h   |  8 -----
+>  2 files changed, 10 insertions(+), 31 deletions(-)
 >
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-> index 75107762a86e..4d49129cdd6b 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_basic.c
 
-[...]
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-> @@ -651,15 +669,23 @@ void test_sockmap_basic(void)
->  	if (test__start_subtest("sockmap skb_verdict msg_f_peek"))
->  		test_sockmap_skb_verdict_peek();
->  	if (test__start_subtest("sockmap msg_verdict"))
-> -		test_sockmap_msg_verdict(false, false, false);
-> +		test_sockmap_msg_verdict(false, false, false, false);
->  	if (test__start_subtest("sockmap msg_verdict ingress"))
-> -		test_sockmap_msg_verdict(true, false, false);
-> +		test_sockmap_msg_verdict(true, false, false, false);
->  	if (test__start_subtest("sockmap msg_verdict permanent"))
-> -		test_sockmap_msg_verdict(false, true, false);
-> +		test_sockmap_msg_verdict(false, true, false, false);
->  	if (test__start_subtest("sockmap msg_verdict ingress permanent"))
-> -		test_sockmap_msg_verdict(true, true, false);
-> +		test_sockmap_msg_verdict(true, true, false, false);
->  	if (test__start_subtest("sockmap msg_verdict permanent self"))
-> -		test_sockmap_msg_verdict(false, true, true);
-> +		test_sockmap_msg_verdict(false, true, true, false);
->  	if (test__start_subtest("sockmap msg_verdict ingress permanent self"))
-> -		test_sockmap_msg_verdict(true, true, true);
-> +		test_sockmap_msg_verdict(true, true, true, false);
-> +	if (test__start_subtest("sockmap msg_verdict permanent shutdown"))
-> +		test_sockmap_msg_verdict(false, true, false, true);
-> +	if (test__start_subtest("sockmap msg_verdict ingress permanent shutdown"))
-> +		test_sockmap_msg_verdict(true, true, false, true);
-> +	if (test__start_subtest("sockmap msg_verdict shutdown"))
-> +		test_sockmap_msg_verdict(false, false, false, true);
-> +	if (test__start_subtest("sockmap msg_verdict ingress shutdown"))
-> +		test_sockmap_msg_verdict(true, false, false, true);
->  }
-
-I appreciate the split up of test changes into commits. Thanks.
-
-As you see, the args for test_sockmap_msg_verdict became quite cryptic.
-I think having dedicated aliases for 'true' would make it more readable:
-
-        const bool INGRESS = true;
-        const bool PERMANENT = true;
-        const bool TO_SELF = true;
-        const bool TARGET_SHUTDOWN = true;
-
-Then invocations as:
-
-        test_sockmap_msg_verdict(true, false, false, true);
-
-become:
-
-        test_sockmap_msg_verdict(INGRESS, !PERMANENT, !TO_SELF, TARGET_SHUTDOWN);
 
