@@ -1,89 +1,120 @@
-Return-Path: <netdev+bounces-45293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADAB97DBF81
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 19:04:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D4A17DBFFF
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 19:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66AF72812F1
-	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 18:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 640581C209AB
+	for <lists+netdev@lfdr.de>; Mon, 30 Oct 2023 18:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADE818C23;
-	Mon, 30 Oct 2023 18:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B59182AB;
+	Mon, 30 Oct 2023 18:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cDMu9reU"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="cA9C26xn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A1C128EF
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 18:04:05 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7F989E
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:04:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ngb1tGQEgFyStSDK6ULr3DVN9Yw14nuVEE4gzJAArFc=; b=cDMu9reUIM+MDHH3AooNmZGfuA
-	CENCvOqDkKl1pC6iD678RpzpE3izb+Zge0hWBfgmmRwlK20fgD67RXfu2NpSlnbV4+S3WNbfYNutc
-	3NJPWIj7YS5KFnbE6vcsfmasrLbMOM+GJHUxlsTrRkJIA3sVDlI2g5AfCNSLg+bMfFQYTR7QTsCHb
-	WyGsFgaJ5pEZm+DpxdptZNtvb3uCGPeg1ojBXzQvsEXEpL8RGme5MlEwPmsx71Ic2IG4m2XzUfTf6
-	RFOuwcNtaWVXupqvaQHllRqy+uvoGcG1xnuD9fy/PeRMt5cWx9tzvODVo5KzjfngIlqqbFUDuy4HN
-	Qf3QnQWA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44640)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qxWcI-0001y0-2X;
-	Mon, 30 Oct 2023 18:03:58 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qxWcI-0004D2-QI; Mon, 30 Oct 2023 18:03:58 +0000
-Date: Mon, 30 Oct 2023 18:03:58 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>
-Subject: Re: [PATCH v1 net-next 1/2] net: phy: fill in missing
- MODULE_DESCRIPTION()s
-Message-ID: <ZT/wDmwiwMuGFJYa@shell.armlinux.org.uk>
-References: <20231028184458.99448-1-andrew@lunn.ch>
- <20231028184458.99448-2-andrew@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7CE18C01
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 18:42:09 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCC8EB7
+	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:42:07 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6b1d1099a84so4753897b3a.1
+        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 11:42:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1698691327; x=1699296127; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cg55PGleKVAZ5FKT9rqw3cl5WH0ZVJATb9N16MUYRFI=;
+        b=cA9C26xnUXEiz/e5BBt7DZC8bszFsBHKfg4mQhW9nA0Ui3valcBMGj46DF4SuFbyqa
+         8F2OT9Qrw+AsYJcxzEscS0fh1VUH2cq9mEYf9swyGq4olufxQ7dakYyfmXS1mLBfm6mC
+         sY+zS8Ox5GCM+OGdDU13HPnx7Yj+Htx4iZokcfO1vMh1xfm5Ef2XhDMeX+RhGDRAtbQU
+         ap8Z4VH+uhfHzo1GWAuU/hiUBKmJjAl9gU8UR2XvT0StD5WQUtfd2PuHl7nLKgh3iS3y
+         mIZjxz9LF26N6qDFIkViViZKbYE256rS0ElE/Rd5miGD63XXX+CtWBid8IMV+bLSR7y/
+         7LUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698691327; x=1699296127;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cg55PGleKVAZ5FKT9rqw3cl5WH0ZVJATb9N16MUYRFI=;
+        b=Pu+KMZVh6Och7uBH7hcjctQy3b5BQawmEUbC1TflQNRtKWGSzDBg5ImlSRJ2et7oFN
+         XOCZUrUH/WvZ2ZgjBUqYFe2PzKX9PSv1uSvk95J8CJAIgn7j9gJy7GYBqzDQ6BenlSIo
+         my/Y40yVX6JJv4BmtL5n1A1OoOa4339SqLbkEpUkDQkX/2465JCewoQLaiwLWlq9xuwK
+         mMzDwQGDFCRU+mUTfIs759psqfG9lPefFUF05YFxQOJqm648QV0I+fRysWK2eWRscVKu
+         IK290IzbSuDE98LGmU6RtYPMlrYa65YRHPzT9xABYo0TNImZLnFPwUKIieJ6TolvPHrI
+         N/wQ==
+X-Gm-Message-State: AOJu0Yzq2bGg1WVBuXLnjZIpsVF5Yz+EJoNKt9TiLSXhAODbgu0V73tN
+	IwEOwGtvzROURrZ20BcOJ9DWIH+mHYzGXMLexIyKJorEjGs=
+X-Google-Smtp-Source: AGHT+IEcN/XW2qctcjxe79T/6bMCevYWLNDBer1L2TlsyKktRVuL/HX3t08fBqLisQoI3CL+AGaexg==
+X-Received: by 2002:a05:6a20:8e2a:b0:132:ff57:7fab with SMTP id y42-20020a056a208e2a00b00132ff577fabmr14372484pzj.2.1698691326881;
+        Mon, 30 Oct 2023 11:42:06 -0700 (PDT)
+Received: from fedora.. ([38.142.2.14])
+        by smtp.gmail.com with ESMTPSA id d5-20020a056a0010c500b006bfb903599esm6206962pfu.139.2023.10.30.11.42.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Oct 2023 11:42:06 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH v2 iproute2 0/4] Remove retired features
+Date: Mon, 30 Oct 2023 11:39:45 -0700
+Message-ID: <20231030184100.30264-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231028184458.99448-2-andrew@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 28, 2023 at 08:44:57PM +0200, Andrew Lunn wrote:
-> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> index b8c0961daf53..5468bd209fab 100644
-> --- a/drivers/net/phy/sfp.c
-> +++ b/drivers/net/phy/sfp.c
-> @@ -3153,3 +3153,4 @@ module_exit(sfp_exit);
->  MODULE_ALIAS("platform:sfp");
->  MODULE_AUTHOR("Russell King");
->  MODULE_LICENSE("GPL v2");
-> +MODULE_DESCRIPTION("SFP cage support");
+Remove support in iproute2 for features removed from 6.3 kernel.
 
-Acked-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Stephen Hemminger (4):
+  tc: remove support for CBQ
+  tc: remove support for RSVP classifier
+  tc: remove tcindex classifier
+  tc: remove dsmark qdisc
 
-Thanks!
+ bash-completion/tc           |  24 +-
+ man/man7/tc-hfsc.7           |   2 +-
+ man/man8/tc-cbq-details.8    | 423 -------------------------
+ man/man8/tc-cbq.8            | 351 ---------------------
+ man/man8/tc-htb.8            |   8 +-
+ man/man8/tc-tcindex.8        |  58 ----
+ man/man8/tc.8                |  23 +-
+ tc/Makefile                  |   5 -
+ tc/f_rsvp.c                  | 417 -------------------------
+ tc/f_tcindex.c               | 185 -----------
+ tc/q_cbq.c                   | 589 -----------------------------------
+ tc/q_dsmark.c                | 165 ----------
+ tc/tc_cbq.c                  |  53 ----
+ tc/tc_cbq.h                  |  10 -
+ tc/tc_class.c                |   2 +-
+ tc/tc_filter.c               |   2 +-
+ tc/tc_qdisc.c                |   2 +-
+ testsuite/tests/tc/cbq.t     |  10 -
+ testsuite/tests/tc/dsmark.t  |  31 --
+ testsuite/tests/tc/policer.t |  13 -
+ 20 files changed, 11 insertions(+), 2362 deletions(-)
+ delete mode 100644 man/man8/tc-cbq-details.8
+ delete mode 100644 man/man8/tc-cbq.8
+ delete mode 100644 man/man8/tc-tcindex.8
+ delete mode 100644 tc/f_rsvp.c
+ delete mode 100644 tc/f_tcindex.c
+ delete mode 100644 tc/q_cbq.c
+ delete mode 100644 tc/q_dsmark.c
+ delete mode 100644 tc/tc_cbq.c
+ delete mode 100644 tc/tc_cbq.h
+ delete mode 100755 testsuite/tests/tc/cbq.t
+ delete mode 100755 testsuite/tests/tc/dsmark.t
+ delete mode 100755 testsuite/tests/tc/policer.t
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.41.0
+
 
