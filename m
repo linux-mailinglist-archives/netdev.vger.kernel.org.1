@@ -1,59 +1,54 @@
-Return-Path: <netdev+bounces-45365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 513127DC503
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 04:51:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 421887DC537
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 05:16:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C8A7B20F87
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 03:51:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74D701C208CB
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 04:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7875566C;
-	Tue, 31 Oct 2023 03:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCF95698;
+	Tue, 31 Oct 2023 04:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="inDV0yol";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="J3nLHOze"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ge9ZRhHc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF328568C
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 03:51:21 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D867DA;
-	Mon, 30 Oct 2023 20:51:19 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 38F3360173;
-	Tue, 31 Oct 2023 04:51:16 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1698724276; bh=wAByPrIeqskUlLE5RJQre4suY8u+DwNLdrNXyDdTsSg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=inDV0yolir6Ic66YpXC80ySoacQmO2MCqqhqSHsrxpvvlndmGQzX3H7muovkIdkIQ
-	 fckqBOLheeXOgUjNJLViPpQyIl+XeiX1Iy53rk5YOYNxbQjsrRVkl5FidiHYK77Eqc
-	 YBtF4xublh8qBFW98M6KNE8uqTHMdrIDdZkZ44PIJH72QCaOUmM0lUZAh2o9pX4ROd
-	 hWkXFLL++Yridv0aSxPq3vQHHRHRpnLcpqQ8Yo5QJyel4CjKPnzziYZTwkUfZ520Yu
-	 2RnPllUoH9B/NUuPON5s8PU+3YLU1/NJUhHbP7osoX+VygnnlH/jXsFaMvbUP9wdDJ
-	 TNwIRQGUDhALA==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id h9CMYgsOMj6U; Tue, 31 Oct 2023 04:51:13 +0100 (CET)
-Received: from [192.168.1.6] (78-3-40-166.adsl.net.t-com.hr [78.3.40.166])
-	by domac.alu.hr (Postfix) with ESMTPSA id 43C9860171;
-	Tue, 31 Oct 2023 04:51:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1698724273; bh=wAByPrIeqskUlLE5RJQre4suY8u+DwNLdrNXyDdTsSg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J3nLHOzebMra/rg4q957eSJhSLZIo9aPqPOmEbGe515ZaRUzQVGMlDrue8bBOkkCf
-	 9LBZfDl1XtP3MSrv6y5GhZdNReOs/e8ckTa8hSwJmdWBHQYOs87Y+4lqsOUlaXkOnn
-	 BHlUR0z1xrPyUZ5idHLuKY/UlMogU0KBSXAoXeYGVq4l9JFWxQEuH0VFqVL4DxX6VD
-	 h8ksADkhvpEnx9VZ9JOn6Xqjmz9hiORgT+/unkZeZOsd6LTpCW3fHhgMNqDr3m/J9L
-	 RxXb7dnQzyznfzk2eq/v+ndKBtkbEqj3GKVPKazQ8MUEv/oasEeUm4J5K7FIVKBGgM
-	 FFFTB8xpy2PCw==
-Message-ID: <19e2d5fc-7e30-4bb2-943c-f83b44099192@alu.unizg.hr>
-Date: Tue, 31 Oct 2023 04:51:10 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CD9D5672;
+	Tue, 31 Oct 2023 04:16:39 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4C0C0;
+	Mon, 30 Oct 2023 21:16:37 -0700 (PDT)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39V1DlXX023759;
+	Tue, 31 Oct 2023 04:16:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=Mr9UzqvLhnzLnqru6L2w2RDsyzGZuGqsh2flGIiGQxM=;
+ b=Ge9ZRhHcKz1a5jEKuPbpJbXQpoN09ZD715A1ZfuaCHOcIv8FwbsOXsVa2sUqnaX/HBsW
+ ewEwCasnzEievJCIyl669/RZ4tUYx4qPoRMLdSvW9O4iy/P2ktRWodMH6CobsmPnYaFY
+ Vm+ySLl9joorm9mvUCtjzZ5/OEIBNktUUTkulCaHzj2DmIon+uSKXn5TeFNxd57vefMP
+ HzPHuKNuuxgGY1SNxsfORbC2of6AQGAzi8+gXoSZFRi3v24UXOP8e6BApUtTE/as0ovr
+ 0sSmnbCRdouadcHLg1PallNgkkQCcas98Pde+MFsUFwrz9X4jmkXIbGVtyZvAb48R9Us yg== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u2mcygkvm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 31 Oct 2023 04:16:26 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 39V4GPUn001733
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 31 Oct 2023 04:16:25 GMT
+Received: from [10.201.2.96] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Mon, 30 Oct
+ 2023 21:16:19 -0700
+Message-ID: <7904c396-c11e-40eb-b82c-eb187818b602@quicinc.com>
+Date: Tue, 31 Oct 2023 09:46:16 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,195 +56,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/5] r8169: Coalesce r8169_mac_ocp_write/modify calls
- to reduce spinlock stalls
+Subject: Re: [PATCH 8/8] arm64: defconfig: build NSS Clock Controller driver
+ for IPQ5332
 Content-Language: en-US
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Joerg Roedel <jroedel@suse.de>, Lu Baolu <baolu.lu@linux.intel.com>,
- iommu@lists.linux.dev, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, nic_swsd@realtek.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Marco Elver <elver@google.com>
-References: <20231029110442.347448-1-mirsad.todorovac@alu.unizg.hr>
- <e7a6b0c1-9fc6-480c-a135-7e142514d0e7@intel.com>
- <a85e41ab-7cfa-413a-a446-f1b65c09c9ab@gmail.com>
- <e1c666d8-c7f0-440e-b362-3dbb7a67b242@intel.com>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <e1c666d8-c7f0-440e-b362-3dbb7a67b242@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        Michael Turquette <mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+References: <20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com>
+ <20231030-ipq5332-nsscc-v1-8-6162a2c65f0a@quicinc.com>
+ <18ca181a-8aee-46f5-9e2d-bfba4c8bd99e@linaro.org>
+From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+In-Reply-To: <18ca181a-8aee-46f5-9e2d-bfba4c8bd99e@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4BwK5Ub-NFxCi3ptb6Sgyu7ORcT8Q65h
+X-Proofpoint-ORIG-GUID: 4BwK5Ub-NFxCi3ptb6Sgyu7ORcT8Q65h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-30_13,2023-10-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 mlxscore=0 impostorscore=0 mlxlogscore=710 phishscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2310310031
 
 
 
-On 10/31/23 00:14, Jacob Keller wrote:
+On 10/30/2023 4:38 PM, Krzysztof Kozlowski wrote:
+> On 30/10/2023 10:47, Kathiravan Thirumoorthy wrote:
+>> Build Qualcomm IPQ9574 NSSCC driver as module.
 > 
+> Why? Commit msg should answer this.
+
+
+Sure, will fix it in V2.
+
 > 
-> On 10/30/2023 3:08 PM, Heiner Kallweit wrote:
->> On 30.10.2023 22:50, Jacob Keller wrote:
->>>
->>>
->>> On 10/29/2023 4:04 AM, Mirsad Goran Todorovac wrote:> A pair of new
->>> helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq()
->>>> are introduced.
->>>>
->>>> The motivation for these helpers was the locking overhead of 130 consecutive
->>>> r8168_mac_ocp_write() calls in the RTL8411b reset after the NIC gets confused
->>>> if the PHY is powered-down.
->>>>
->>>> To quote Heiner:
->>>>
->>>>      On RTL8411b the RX unit gets confused if the PHY is powered-down.
->>>>      This was reported in [0] and confirmed by Realtek. Realtek provided
->>>>      a sequence to fix the RX unit after PHY wakeup.
->>>>
->>>> A series of about 130 r8168_mac_ocp_write() calls is performed to program the
->>>> RTL registers for recovery, each doing an expensive spin_lock_irqsave() and
->>>> spin_unlock_irqrestore().
->>>>
->>>> Each mac ocp write is made of:
->>>>
->>>>      static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
->>>>                        u32 data)
->>>>      {
->>>>          if (rtl_ocp_reg_failure(reg))
->>>>              return;
->>>>
->>>>          RTL_W32(tp, OCPDR, OCPAR_FLAG | (reg << 15) | data);
->>>>      }
->>>>
->>>>      static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
->>>>                      u32 data)
->>>>      {
->>>>          unsigned long flags;
->>>>
->>>>          raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
->>>>          __r8168_mac_ocp_write(tp, reg, data);
->>>>          raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
->>>>      }
->>>>
->>>> Register programming is done through RTL_W32() macro which expands into
->>>>
->>>>      #define RTL_W32(tp, reg, val32) writel((val32), tp->mmio_addr + (reg))
->>>>
->>>> which is further (on Alpha):
->>>>
->>>>      extern inline void writel(u32 b, volatile void __iomem *addr)
->>>>      {
->>>>          mb();
->>>>          __raw_writel(b, addr);
->>>>      }
->>>>
->>>> or on i386/x86_64:
->>>>
->>>>      #define build_mmio_write(name, size, type, reg, barrier) \
->>>>      static inline void name(type val, volatile void __iomem *addr) \
->>>>      { asm volatile("mov" size " %0,%1": :reg (val), \
->>>>      "m" (*(volatile type __force *)addr) barrier); }
->>>>
->>>>      build_mmio_write(writel, "l", unsigned int, "r", :"memory")
->>>>
->>>> This obviously involves iat least a compiler barrier.
->>>>
->>>> mb() expands into something like this i.e. on x86_64:
->>>>
->>>>      #define mb()    asm volatile("lock; addl $0,0(%%esp)" ::: "memory")
->>>>
->>>> This means a whole lot of memory bus stalls: for spin_lock_irqsave(),
->>>> memory barrier, writel(), and spin_unlock_irqrestore().
->>>>
->>>> With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
->>>> a lock storm that will stall all of the cores and CPUs on the same memory controller
->>>> for certain time I/O takes to finish.
->>>>
->>>> In a sequential case of RTL register programming, the writes to RTL registers
->>>> can be coalesced under a same raw spinlock. This can dramatically decrease the
->>>> number of bus stalls in a multicore or multi-CPU system.
->>>>
->>>> Macro helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq() are
->>>> provided to reduce lock contention:
->>>>
->>>>      static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
->>>>      {
->>>>
->>>>          ...
->>>>
->>>>          /* The following Realtek-provided magic fixes an issue with the RX unit
->>>>           * getting confused after the PHY having been powered-down.
->>>>           */
->>>>
->>>>          static const struct recover_8411b_info init_zero_seq[] = {
->>>>              { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 },
->>>>              ...
->>>>          };
->>>>
->>>>          ...
->>>>
->>>>          r8168_mac_ocp_write_seq(tp, init_zero_seq);
->>>>
->>>>          ...
->>>>
->>>>      }
->>>>
->>>> The hex data is preserved intact through s/r8168_mac_ocp_write[(]tp,/{ / and s/[)];/ },/
->>>> functions that only changed the function names and the ending of the line, so the actual
->>>> hex data is unchanged.
->>>>
->>>> To repeat, the reason for the introduction of the original commit
->>>> was to enable recovery of the RX unit on the RTL8411b which was confused by the
->>>> powered-down PHY. This sequence of r8168_mac_ocp_write() calls amplifies the problem
->>>> into a series of about 500+ memory bus locks, most waiting for the main memory read,
->>>> modify and write under a LOCK. The memory barrier in RTL_W32 should suffice for
->>>> the programming sequence to reach RTL NIC registers.
->>>>
->>>> [0] https://bugzilla.redhat.com/show_bug.cgi?id=1692075
->>>>
->>>
->>>
->>> I might have chosen to send some of this information as the cover letter
->>> for the series instead of just as part of the commit message for [1/5],
->>> but either way:
->>>
->>> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
->>
->> Cover letter is still missing, and there's a v5 already.
->> Good example why we have the "max one version per day" rule.
->>
->> There's still some issues with the series, see my review comments
->> for v5. As-is I'd NAK the series.
-
-I realise we need to keep the development process coherent. I am sorry that
-my inexperience in the patch submission process made the whole series look bad.
-
-As I previously stated to Mr. Kallweit, I will do the required number of iterations
-to ensure the quality of the patches (I saw some go up to over 20 versions).
-
-> Heh, ya. A v5 was sent without there being a single (public) comment on
-> the list prior to my reviewing. I didn't notice the v5, and my mail
-> scripts pointed out this series didn't have anyone who'd looked at it
-> yet.. I guess I could have searched for and noticed a newer version.
-
-Well, dear Sir,
-
-I see I owe you an apology for I did not know about the "max one version per day"
-rule. I was warned however not to overwhelm the maintainers by Guillaume Nault in
-January and somehow I hypomanicaly OCD'd on this. My fault entirely.
-
-I hope we can mend this.
-
-I guess this is my time to take a break, do some homework and return to the drawing
-board.
-
-Besides, now we are in the merge window anyway, so I should thank Mr. Kallweit for
-the special attention and for making an exception.
-
-Am I allowed to keep Mr. Keller's Reviewed-by: tags on the reviewed diffs provided
-that I fix the cover letter issue and objections?
-
-Have a nice day.
-
-Regards,
-Mirsad
+> Best regards,
+> Krzysztof
+> 
 
