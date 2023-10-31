@@ -1,267 +1,244 @@
-Return-Path: <netdev+bounces-45435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1077DCF58
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:40:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E6547DCF5B
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:41:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC791C20C19
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:40:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B99F4B20F68
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B281946E;
-	Tue, 31 Oct 2023 14:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2000E19450;
+	Tue, 31 Oct 2023 14:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LUx9zlxA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VNZ6Xdqt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5D913FEE;
-	Tue, 31 Oct 2023 14:40:42 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0BAED;
-	Tue, 31 Oct 2023 07:40:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698763241; x=1730299241;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=p1L/nnVscxXgvNMn3MJ44t0e5nShHdlmqkNbCb6uvBM=;
-  b=LUx9zlxAWWtUHYbzwwSlzu8ZRScNR9nUg3FwD+lahNn/mp4dx8jF4C92
-   7ygDHzXUOH2WA5Mx6Zd1+2uaq981DQC2SF/C6iWQ9wg3zmnVJqzBrxC+E
-   ESqTskDSq+CuOs9dXoFnqH5+ysEV15Zh+V1tz9NozFAUZXMmMcMmYIPeT
-   CbsUD93g/xiy60rWBvv1txcq+mskyas7Q7ONN482n2GUdkn6Dcg7vD5hb
-   rcAz2eyA1dsCuNma752T7gbK/wEoZx74byLe+vUfMe5r6KCYfs213X/BV
-   pYq8MLn8ZKrx1tef8Gd8vw4KI/oxQy5cGP26kfdC+aPA+Z1tCSDwfokiE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="387188039"
-X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="387188039"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 07:40:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="934133326"
-X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="934133326"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Oct 2023 07:40:18 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 31 Oct 2023 07:40:17 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 31 Oct 2023 07:40:17 -0700
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 31 Oct 2023 07:40:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SVKZ2xfebmDI9xI3Odigi+PBg67sn72fHUAlqwhDnvh4k5gRqPQJMlavsnkn+c+fm0jhF80JfS6W+kz5gNVKQUH/xGU29A1ZmEuugeAzbAFczqgQAlhbQEw0Jc55O5lssNnS3BJZns8DF9luP6P5lt7rEDHGZdCj1NAMJQg31pgmid2m4Y3WONVAnW8pvMVPM6Oet0J7jGL3H+GhctpA+VFPgpULx+DBmPQ7j3cVaNbIw8UufbYLTH57o69QhFIeVvkSD/eFgTciseyG15Ad+zWi39/NEPGAtRmXKuee7RzBmhL9BO6aUEFy5LHB0qkYOfICxj6I5nvSBaxQHtkh5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OJklk9aokwrkqRpccHhQEssilVpk3X9fFyUEKuQ6bno=;
- b=C0+SFH+0+OG1BKzKxEngMD8edfVAsovaUtQfsrOFQcI8ImPsCFNqb0EpcO1st+OlkpRqAiv0JiB2yw6/gDUCGO3XGJtsa2hHRTvQgyXZ5FjIEjZUlGp/hWexuvNZt2Rv3LrEItF8wNY2628AZ+lSqv1ZdnrDGAP13mg/g1EMNKeTy2iA5TUkA0TrxBmnrdIpcg8uNx7NJ3i2wHTdvSWL7EAyZa0CAUjBfLEM23jH7vfjMftnGOhxWeWTJWdSGSVG8b98uWgejNOTGHMMnoZBLsi0Pt31JNBBrxEU1hKKnipz6Alg5MjoNOtTy7yoaVdPwJWOdTTgu+zJgQYJrDvU0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by DM6PR11MB4707.namprd11.prod.outlook.com (2603:10b6:5:2a6::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Tue, 31 Oct
- 2023 14:40:15 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8%7]) with mapi id 15.20.6933.024; Tue, 31 Oct 2023
- 14:40:15 +0000
-Message-ID: <aa1dd347-a16c-44f8-95ad-5d50bcba8f34@intel.com>
-Date: Tue, 31 Oct 2023 08:40:06 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-To: Gal Pressman <gal@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	"Alexander H Duyck" <alexander.duyck@gmail.com>
-CC: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
-	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<jesse.brandeburg@intel.com>, <edumazet@google.com>,
-	<anthony.l.nguyen@intel.com>, <horms@kernel.org>, <vladimir.oltean@nxp.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
-	<pabeni@redhat.com>, <davem@davemloft.net>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
- <CAKgT0UfcT5cEDRBzCxU9UrQzbBEgFt89vJZjz8Tow=yAfEYERw@mail.gmail.com>
- <20231016163059.23799429@kernel.org>
- <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
- <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
- <20231017173448.3f1c35aa@kernel.org>
- <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
- <20231018165020.55cc4a79@kernel.org>
- <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
- <20231020153316.1c152c80@kernel.org>
- <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
- <20231020164917.69d5cd44@kernel.org>
- <f6ab0dc1-b5d5-4fff-9ee2-69d21388d4ca@intel.com>
- <89e63967-46c4-49fe-87bc-331c7c2f6aab@nvidia.com>
- <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
- <e471519b-b253-4121-9eec-f7f05948c258@nvidia.com>
- <a2a1164f-1492-43d1-9667-5917d0ececcb@intel.com>
- <d097e7d3-5e16-44ba-aa92-dfb7fbedc600@nvidia.com>
-Content-Language: en-US
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <d097e7d3-5e16-44ba-aa92-dfb7fbedc600@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0065.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:ce::8) To SN7PR11MB7420.namprd11.prod.outlook.com
- (2603:10b6:806:328::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF4D1DDCC
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:40:54 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45068DA
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:40:52 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9d267605ceeso418339866b.2
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:40:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698763251; x=1699368051; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lEH+4AEz+h7AhpdVGi2yLtqThDU2acsUlLm3D4qTdcQ=;
+        b=VNZ6XdqtQYWMMvEZxcA0UCMZruiet2sC6qHAoAsfIdDxCMYb+wrVeFy19MCKVU4HI5
+         U5ZfgNPj46H+D5QxEqYZ3UKdJpdNuPVVMMP6TJt2qku2SI+MqMADuPJK0HnREsC0r6OK
+         cmUnowgb0ev/qI147z77OhYshxEBRgxsRBv7fiF6oqrf9CuQB4xsIkt8LtYQ5VT+rkH0
+         wC8vUcNtJhsVx5/TYRtbaBtrNAdkYKWodVZ5eVMHdagMSxBffenHkrB40xrqkX5tCHPY
+         8F+G0DTA+mcynZ6NZM/PMBIsUuevrDpeOa1Cull6yIW21P036sDG61fsEEI/4i8fAddP
+         46/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698763251; x=1699368051;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lEH+4AEz+h7AhpdVGi2yLtqThDU2acsUlLm3D4qTdcQ=;
+        b=tfWdI9G1VJEP9yTOaehb6QpCvu3kTP/NkU6zGGZ5RxxcyvusSj4AZJ4CPylt4YYOqw
+         hwUL3L4PXtIt84Q724tc9AzLfqVwFvc9jbJY4E5SiMBjsiDpZ42Y0kHk/iA5iElrMNjs
+         1bguv/4b7u7c0IVITrdYVnIgXnNytPcZPNSoS2oyB849c2WjPOnsbtBO5SwFIY3IwIHD
+         Z8Hk2+fdXOzVYGsHPs8cRamlcJIeiBxdNgRP3m/kiAEfiGv0nfbzjausp6JjFSPNuBzz
+         8joe1QERf20kJvi2y28hnyku+wKz1jp/b6w55iSbwoZcOxxx4NtOKLSlho5czNtCCVbv
+         UldQ==
+X-Gm-Message-State: AOJu0Ywqe/KHW84GZWMuNIrV513wHeyem8V/VT1niCneVhgS2ZGC+hKP
+	3rbNRPvXnq8awpKA+N+pB3A=
+X-Google-Smtp-Source: AGHT+IFbFN+6vIT4audvmsaN8aOBM3HXOYClcyDXhBtgKuPnC/qwuMqufmgK8y/y1EkqGm342nylzQ==
+X-Received: by 2002:a17:907:608a:b0:9ae:73ca:bbad with SMTP id ht10-20020a170907608a00b009ae73cabbadmr9842279ejc.43.1698763250250;
+        Tue, 31 Oct 2023 07:40:50 -0700 (PDT)
+Received: from localhost ([185.220.101.160])
+        by smtp.gmail.com with ESMTPSA id fy23-20020a170906b7d700b009b2f2451381sm1073271ejb.182.2023.10.31.07.40.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Oct 2023 07:40:49 -0700 (PDT)
+Date: Tue, 31 Oct 2023 16:40:44 +0200
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>
+Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
+Message-ID: <ZUEQzsKiIlgtbN-S@mail.gmail.com>
+References: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
+ <ZTvBoQHfu23ynWf-@mail.gmail.com>
+ <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|DM6PR11MB4707:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24852447-9376-4346-65c2-08dbda1f4b71
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: SPUKLf117h7+t1GwkZ+2fMyxPIdC6YaghSQyiEhUHAmHHWgIQ2qbP9V5UivZ2xYF4vf55gqXJrk5wYQKIfUYvMUhDHs5IBZ0zSvQA8Xco0ZEoF8kxfM+eq04L0SPfTTmhKYa9ZLTrdn7LFW2OmnXphqA+/vSM9dmJZWu/ob5qhPhGWK8V+k06TX428e697Ck+2E58LtgKysHHqg4mhHKFp0i/20CbgKBNyxcdV2P9EH70KKldiEcD94D1GNYPvstwvmn8MvSbyIzfsjfFG2YoA4C61Vur4bbBDxZgncfLSrsq1k60E7dOKBmnIt1VjIBfORczU1mnU2IRdcDiIW56eT2Mg/nMSUP8Opk5PvDkAE+2JIqCHxhfXxT966Tv99VfG6w0QRauUhfuwyz9ZNq509NpfknFUoxapQ2QBjaxvrJucL7M92ymcQYOclckGADL5RXQ2uhGsWDJOnE+Ow9Mxc39+YJsyfvmkchw1E254L1miexRkO9I2IojqI5rz+5bhKElVxvSB9KoCOBU5Lzj06yWin4LlLstV5RMyqFhylP6NLIyunxYFRJHfZAyV1GWScPZW5FMYbq9o0P3/ucvKwdbDVriNvTo/KRp/n/tt7OjVwl4jF1edn9p+MpnqThnuibzrqSsscjfiOP5YVG/w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(346002)(376002)(39860400002)(396003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(83380400001)(53546011)(6666004)(6512007)(6506007)(2616005)(26005)(38100700002)(82960400001)(86362001)(36756003)(31696002)(2906002)(4001150100001)(41300700001)(5660300002)(7416002)(6486002)(966005)(478600001)(4326008)(8936002)(44832011)(8676002)(110136005)(316002)(66946007)(66476007)(54906003)(66556008)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cThOZDlNam8rWGFSQmtmbzU4aEtWaVdzS1dycFlkaUEzYVZib1UwaGpwbU9z?=
- =?utf-8?B?czVPR2k1QzUwMU1MaTFmSkd0S0NtSjlWUXhXWlVMRHlmYm9PanVMMld6Witz?=
- =?utf-8?B?eWFRMWZldFZHalc2dFhOMWRFZitJclE1MHpOQnBiazJobi9mKzRQNlhEMCtN?=
- =?utf-8?B?ZEJiU2ZNckd5Q1cwZE14MEFNUlBEbHFPWXl5ZmpmOU5IWGxCdGxhYkFGbUZU?=
- =?utf-8?B?K3VkWm9iT0o5S1VtZHZ6S2paNFhRQzYyRWY1VkVubTdsU2tGUHJhNG1KczQ3?=
- =?utf-8?B?MnBEeGo3QXNobVJQQlhzSUVETlNsc1NDcVMzMDlldjB6VTlYYnk2SWVQQVlq?=
- =?utf-8?B?UFkyZ3p4NzJ0MGVUUjYxY1ZZd3dzVy9kVmxvY05penFCU29yclBJQk9oUEN0?=
- =?utf-8?B?M1BFakZhaFprZXJxNnNOTEVSb3JrQzBsV0JVVHo0eVVKaG0zMTdSMVZ3czBa?=
- =?utf-8?B?UjF5WDFncWsrMHVWT2FkVDBlOSt3cUp3MjljeXNRTTY1YjFzS2pqTFhKdkVK?=
- =?utf-8?B?TkhpeEVhSmJLSTI5V3dTRndDbmlOVFVoTXNHSDlUakRYaWV1ajlBNWFCam1U?=
- =?utf-8?B?RW1RZzhmbEMrUVpVemM1eE1pTkVzU2o5b0dSNmxVbDVhaGVhRFJxSW00cUI5?=
- =?utf-8?B?QW80V1FYK1pKSUYwZ0RhdDdISXF2dHgwaFIza2lFdU9wd28rMTNLeCtON0Zl?=
- =?utf-8?B?U3k1NzZZUmRSTTQrWjYrbGplbU9iUHVjVURVRVRPaGN5WGVCUUltVTIwc0xW?=
- =?utf-8?B?ajJTc1Rnak12WmRFWVZqWjU4NlVEL2ZhcWlkTW5EcDI3TUFJZE9salhObGE1?=
- =?utf-8?B?VjVUeVVVMjFpamJYakkrUVAzdDg4bFNLQ3g3cUw2cFBiQVY4VEhzdHBZMGVV?=
- =?utf-8?B?QU0yYVdIK3JmU3RBbEVPTWVwSS9oZHhJbHJiSS92TlgwRWJuMXNzV05UL2hX?=
- =?utf-8?B?TnpwbjFnUHJscGtCWW1PakEyVkE1UDNvRzhDbjlYQ3NkU0ErcjVhNVYzYXNJ?=
- =?utf-8?B?VUw3aTRvY1VRMXpFN0xqQmJ2UEhQbXN3RkNlWUo1N0tsRTcxcmxnT1ZYNTFG?=
- =?utf-8?B?UTFsZE1sM3dxQnl3OFdKaDB1RXpYWmpIbmtCbjlsakwzUmxaTnNTT043V2xR?=
- =?utf-8?B?UllqL2ZyWUROOGxqM0JncG9Zb0dscTRQeDZ6bkV4QnB4SDl0RkZpVi8yUHZs?=
- =?utf-8?B?dDRxRnA1YklzWWRNZHkxeDJZVGFTMld6ZDB3bWozUDV6RzVSRkp3UXdpQXN0?=
- =?utf-8?B?K1ZJcGt0Q21kOHhkWVB3ZTZOd2d6dzZQenRMQ2J5VlVhVGpFZnE5blR0Yzlo?=
- =?utf-8?B?dm5xc1NSK0NUTnllOE51SEQ0ZEdhWklXQ3BwU0pBTk8xS3dQSXc1dFF0WHM5?=
- =?utf-8?B?R2dTSHR6dlZtbVJJdTBNaEZUZjJKK2dNT0Q1c2MzUmZVMWhqTzltNGlVNC8y?=
- =?utf-8?B?RnYyN0YzNXU5Zzh1STBoREVKRmpTWVBVeXhyNHdreTBMZUhyYnhtY3ZYaEIw?=
- =?utf-8?B?Znh1MVJXQ0xOSDZkc2hsbzNXUytuUndFSzJNaHYvaGFCazIyRndSOTdZL2dU?=
- =?utf-8?B?L0plbnNBSzhZRXZMMnJ4Z2N0aWZSWHVVL2lxMUswbHl1SGExQUlpYkhRa2th?=
- =?utf-8?B?Q09BMmY3V0lPaVdQbFYzdlQwR2ZOOW9pRHgvQklybEJ2YjFYZ2w3TjcxQmpH?=
- =?utf-8?B?T0dtcW5La0VJZUhDN1d3dVNQdUxGL3Y2TmF2WTlmWWk3K1NVSUJNQjVmM0M2?=
- =?utf-8?B?SzhybkVNc3d3STh3Zm8vN0VyWUt2c0V2N21CcGYwUzVRQ1VncWNncGdKaFlY?=
- =?utf-8?B?OU1FK1ZWTWNZVEIzbXM3WmFOd0ZFczhPWmdZYnk1VTNqNys0TXNSOGRGQkpS?=
- =?utf-8?B?VUJ5SDRDOXpzaklaWnFpRFNVZ3NKVjBuQjVFcTZsby9NZHljY1ZCN09DdWkw?=
- =?utf-8?B?bUpuQ2o5SytDOGMxMjgxSjFLOWFjby9iNHFpRDFFbkxHZ1E3aFowL0tjTlBm?=
- =?utf-8?B?ZjhBL1RjY2dTbzZXNGkvZituUHZwNHdJWjhyc1dDMk1rU1U0VE1GcHVZalhR?=
- =?utf-8?B?dzdOaUtPZTJNbDVOUTBROS9FZGQ3cHJQU2lzZHpjcjRqOG5hWFREM3M0TldH?=
- =?utf-8?Q?DiHwodrpXODs/c9gLoONIgo4h?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24852447-9376-4346-65c2-08dbda1f4b71
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 14:40:14.9916
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C1tN7rr6PKt2mhF5LMW9PA+BX+4oQVcnDwX50TiONO2xJiFva+l8Rx8yzYgA01rYaR2sPDc1UUjnkyFDf1lqgg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4707
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
+X-Spam-Level: **
 
-
-
-On 2023-10-31 06:00, Gal Pressman wrote:
-> On 29/10/2023 18:59, Ahmed Zaki wrote:
->>
->>
->> On 2023-10-29 06:48, Gal Pressman wrote:
->>> On 29/10/2023 14:42, Ahmed Zaki wrote:
->>>>
->>>>
->>>> On 2023-10-29 06:25, Gal Pressman wrote:
->>>>> On 21/10/2023 3:00, Ahmed Zaki wrote:
->>>>>>
->>>>>>
->>>>>> On 2023-10-20 17:49, Jakub Kicinski wrote:
->>>>>>> On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
->>>>>>>> I replied to that here:
->>>>>>>>
->>>>>>>> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
->>>>>>>>
->>>>>>>> I am kind of confused now so please bear with me. ethtool either
->>>>>>>> sends
->>>>>>>> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the
->>>>>>>> interface
->>>>>>>> for "ethtool -X" which is used to set the RSS algorithm. But we
->>>>>>>> kind of
->>>>>>>> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses
->>>>>>>> "ethtool_rxnfc" (as implemented in this series).
->>>>>>>
->>>>>>> I have no strong preference. Sounds like Alex prefers to keep it
->>>>>>> closer
->>>>>>> to algo, which is "ethtool_rxfh".
->>>>>>>
->>>>>>>> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would
->>>>>>>> that work on the ethtool user interface?
->>>>>>>
->>>>>>> I don't know what you're asking of us. If you find the code to
->>>>>>> confusing
->>>>>>> maybe someone at Intel can help you :|
->>>>>>
->>>>>> The code is straightforward. I am confused by the requirements: don't
->>>>>> add a new algorithm but use "ethtool_rxfh".
->>>>>>
->>>>>> I'll see if I can get more help, may be I am missing something.
->>>>>>
->>>>>
->>>>> What was the decision here?
->>>>> Is this going to be exposed through ethtool -N or -X?
->>>>
->>>> I am working on a new version that uses "ethtool_rxfh" to set the
->>>> symmetric-xor. The user will set per-device via:
->>>>
->>>> ethtool -X eth0 hfunc toeplitz symmetric-xor
->>>>
->>>> then specify the per-flow type RSS fields as usual:
->>>>
->>>> ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
->>>>
->>>> The downside is that all flow-types will have to be either symmetric or
->>>> asymmetric.
->>>
->>> Why are we making the interface less flexible than it can be with -N?
->>
->> Alexander Duyck prefers to implement the "symmetric-xor" interface as an
->> algorithm or extension (please refer to previous messages), but ethtool
->> does not provide flowtype/RSS fields setting via "-X". The above was the
->> best solution that we (at Intel) could think of.
+On Tue, 31 Oct 2023 at 10:11:14 +0100, Paolo Abeni wrote:
+> Hi,
 > 
-> OK, it's a weird we're deliberately limiting our interface, given
-> there's already hardware that supports controlling symmetric hashing per
-> flow type.
+> I'm sorry for the late reply.
 > 
-> I saw you mentioned the way ice hardware implements symmetric-xor
-> somewhere, it definitely needs to be added somewhere in our
-> documentation to prevent confusion.
-> mlx5 hardware also does symmetric hashing with xor, but not exactly as
-> you described, we need the algorithm to be clear.
+> On Fri, 2023-10-27 at 16:57 +0300, Maxim Mikityanskiy wrote:
+> > I believe this is not the right fix.
+> > 
+> > On Thu, 26 Oct 2023 at 17:36:48 +0200, Paolo Abeni wrote:
+> > > The following commands:
+> > > 
+> > > tc qdisc add dev eth1 handle 2: root htb offload
+> > > tc class add dev eth1 parent 2: classid 2:1 htb rate 5mbit burst 15k
+> > > 
+> > > yeld to a WARN in the HTB qdisc:
+> > 
+> > Something is off here. These are literally the most basic commands one
+> > could invoke with HTB offload, I'm sure they worked. Is it something
+> > that broke recently? Tariq/Gal/Saeed, could you check them on a Mellanox
+> > NIC?
+> > 
+> > > 
+> > >  WARNING: CPU: 2 PID: 1583 at net/sched/sch_htb.c:1959
+> > >  CPU: 2 PID: 1583 Comm: tc Kdump: loaded 6.6.0-rc2.mptcp_7895773e5235+ #59
+> > >  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
+> > >  RIP: 0010:htb_change_class+0x25c4/0x2e30 [sch_htb]
+> > >  Code: 24 58 48 b8 00 00 00 00 00 fc ff df 48 89 ca 48 c1 ea 03 80 3c 02 00 0f 85 92 01 00 00 49 89 8c 24 b0 01 00 00 e9 77 fc ff ff <0f> 0b e9 15 ec ff ff 80 3d f8 35 00 00 00 0f 85 d4 f9 ff ff ba 32
+> > >  RSP: 0018:ffffc900015df240 EFLAGS: 00010246
+> > >  RAX: 0000000000000000 RBX: ffff88811b4ca000 RCX: ffff88811db42800
+> > >  RDX: 1ffff11023b68502 RSI: ffffffffaf2e6a00 RDI: ffff88811db42810
+> > >  RBP: ffff88811db45000 R08: 0000000000000001 R09: fffffbfff664bbc9
+> > >  R10: ffffffffb325de4f R11: ffffffffb2d33748 R12: 0000000000000000
+> > >  R13: ffff88811db43000 R14: ffff88811b4caaac R15: ffff8881252c0030
+> > >  FS:  00007f6c1f126740(0000) GS:ffff88815aa00000(0000) knlGS:0000000000000000
+> > >  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > >  CR2: 000055dca8e5b4a8 CR3: 000000011bc7a006 CR4: 0000000000370ee0
+> > >  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > >  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > >  Call Trace:
+> > >  <TASK>
+> > >   tc_ctl_tclass+0x394/0xeb0
+> > >   rtnetlink_rcv_msg+0x2f5/0xaa0
+> > >   netlink_rcv_skb+0x12e/0x3a0
+> > >   netlink_unicast+0x421/0x730
+> > >   netlink_sendmsg+0x79e/0xc60
+> > >   ____sys_sendmsg+0x95a/0xc20
+> > >   ___sys_sendmsg+0xee/0x170
+> > >   __sys_sendmsg+0xc6/0x170
+> > >  do_syscall_64+0x58/0x80
+> > >  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> > > 
+> > > The first command creates per TX queue pfifo qdiscs in
+> > > tc_modify_qdisc() -> htb_init() and grafts the pfifo to each dev_queue
+> > > via tc_modify_qdisc() ->  qdisc_graft() -> htb_attach().
+> > 
+> > Not exactly; it grafts pfifo to direct queues only. htb_attach_offload
+> > explicitly grafts noop to all the remaining queues.
+> 
+> num_direct_qdiscs == real_num_tx_queues:
+> 
+> https://elixir.bootlin.com/linux/latest/source/net/sched/sch_htb.c#L1101
+> 
+> pfifo will be configured on all the TX queues available at TC creation
+> time, right?
 
-Sure. I will add more ice-specific doc in:
-Documentation/networking/device_drivers/ethernet/intel/ice.rst
+Yes, all real TX queues will be used as direct queues (for unclassified
+traffic). num_tx_queues should be somewhat bigger than
+real_num_tx_queues - it should reserve a queue per potential leaf class.
+
+pfifo is configured on direct queues, and the reserved queues have noop.
+Then, when a new leaf class is added (TC_HTB_LEAF_ALLOC_QUEUE), the
+driver allocates a new queue and increases real_num_tx_queues. HTB
+assigns a pfifo qdisc to the newly allocated queue.
+
+Changing the hierarchy (deleting a node or converting an inner node to a
+leaf) may reorder the classful queues (with indexes >= the initial
+real_num_tx_queues), so that there are no gaps.
+
+> Lacking a mlx card with offload support I hack basic htb support in
+> netdevsim and I observe the splat on top of such device. I can as well
+> share the netdevsim patch - it will need some clean-up.
+
+I will be happy to review the netdevsim patch, but I don't promise
+prompt responsiveness.
+
+> > 
+> > > When the command completes, the qdisc_sleeping for each dev_queue is a
+> > > pfifo one. The next class creation will trigger the reported splat.
+> > > 
+> > > Address the issue taking care of old non-builtin qdisc in
+> > > htb_change_class().
+> > > 
+> > > Fixes: d03b195b5aa0 ("sch_htb: Hierarchical QoS hardware offload")
+> > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > > ---
+> > >  net/sched/sch_htb.c | 3 +--
+> > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > > 
+> > > diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> > > index 0d947414e616..dc682bd542b4 100644
+> > > --- a/net/sched/sch_htb.c
+> > > +++ b/net/sched/sch_htb.c
+> > > @@ -1955,8 +1955,7 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
+> > >  				qdisc_refcount_inc(new_q);
+> > >  			}
+> > >  			old_q = htb_graft_helper(dev_queue, new_q);
+> > > -			/* No qdisc_put needed. */
+> > > -			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
+> > > +			qdisc_put(old_q);
+> > 
+> > We can get here after one of two cases above:
+> > 
+> > 1. A new queue is allocated with TC_HTB_LEAF_ALLOC_QUEUE. It's supposed
+> > to have a noop qdisc by default (after htb_attach_offload).
+> 
+> So most likely the trivial netdevsim implementation I used was not good
+> enough.
+> 
+> Which constrains should respect TC_HTB_LEAF_ALLOC_QUEUE WRT the
+> returned qid value? should it in the (real_num_tx_queues,
+> num_tx_queues] range?
+
+Let's say N is real_num_tx_queues as it was at the moment of attaching.
+HTB queues should be allocated from [N, num_tx_queues), and
+real_num_tx_queues should be increased accordingly. It should not return
+queues number [0, N).
+
+Deletions should fill the gaps: if queue X is being deleted, N <= X <
+real_num_tx_queues - 1, then the gap should be filled with queue number
+real_num_tx_queues - 1 by swapping the queues (real_num_tx_queues will
+be decreased by 1 accordingly). Some care also needs to be taken when
+converting inner-to-leaf (TC_HTB_LEAF_DEL_LAST) and leaf-to-inner (it's
+better to get insights from [1], there are also some comments).
+
+> Can HTB actually configure H/W shaping on
+> real_num_tx_queues?
+
+It will be on real_num_tx_queues, but after it's increased to add new
+HTB queues. The original queues [0, N) are used for direct traffic, same
+as the non-offloaded HTB's direct_queue (it's not shaped).
+
+> I find no clear documentation WRT the above.
+
+I'm sorry for the lack of documentation. All I have is the commit
+message [2] and a netdev talk [3]. Maybe the slides could be of some
+use...
+
+I hope the above explanation clarifies something, and feel free to ask
+further questions, I'll be glad to explain what hasn't been documented
+properly.
+
+[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/en/htb.c?id=5a6a09e97199d6600d31383055f9d43fbbcbe86f
+[2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=d03b195b5aa015f6c11988b86a3625f8d5dbac52
+[3]: https://netdevconf.info/0x14/session.html?talk-hierarchical-QoS-hardware-offload
+
+> Thanks!
+> 
+> Paolo
+> 
 
