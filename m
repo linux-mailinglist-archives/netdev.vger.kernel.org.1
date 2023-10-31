@@ -1,187 +1,265 @@
-Return-Path: <netdev+bounces-45450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0617DD140
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 17:10:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE7C7DD146
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 17:12:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C1AE2812F4
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 16:10:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D687B20E1D
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 16:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3A6200C9;
-	Tue, 31 Oct 2023 16:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71941200D0;
+	Tue, 31 Oct 2023 16:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="P88gtIDt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD4216418
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 16:10:15 +0000 (UTC)
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03olkn2027.outbound.protection.outlook.com [40.92.58.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3748BA6;
-	Tue, 31 Oct 2023 09:10:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB431DFC6;
+	Tue, 31 Oct 2023 16:12:06 +0000 (UTC)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2079.outbound.protection.outlook.com [40.107.96.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 881B0A6;
+	Tue, 31 Oct 2023 09:12:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bUWEzCX2yLvUiXi0lvKujfKsrspl90piFWQk5prehXbbvI+otCGKyETQqpgvEvW0EoPgOlbjOSuIXu0wEjxrlG3R1cetyFTrTWka7CKg1dRRq19nY+0y0fGC7iCqkFoWn1/YACtIEWk0k07CoZa5EEJiTHcGVUl3VUuVJC/si+Zvey2yv/z+If7JCQjSNKbuHAgAdzPlXz5MD3V3HpC9Z5+iOfDbD44v04yfj8MnSlCdyFADJu4pkVV5SIfV9lPHF9dta86LcAzdcmMukJKGGNkmvW5GfqPGv6hhJvHgWVAm5UMw9A4lChzf7qDLbECAn65e6I98ngGpLmpexqR7Xg==
+ b=MgutdSL+rg6ab6d9GuWsVrKZYFaypOZctA0CPiYRYuRBw4RL2bUyIgYn4FgiuaHTZxC+zW4w695jVBJxpkorgbzYxx0wXPx2ySzcC8EyTWOxJirg4cFwHPkj3AVXNxbZGM1X+DQC2AS4AcCURjEpj4amWu5AjJfuJ8Q5AZwta99Il1TTl1UOTorA8LvUtFodtmxwfkcyXCoAVN6swcIn6g7iIUv2cpJbo4cTOSOuDKKuTlSLxOEns8jOTrOkUsKViH75VX4Osj4AfStxCTlEj/eNCy/YGuGV/O9AE65hsjX+OplP5m2NoAMt6+FcS9r/un8/qErF/1qAtVOs714obA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0gfmPxWwXeaM6QWXK4y4FDkrdgrE/dEuHe+DiD9zSqk=;
- b=eq3c6UatFlcMgRddrMi/nHWq8L4KksR4ViVWTnRHkFpgtsODzYBMDZQUfoynR8Wz4tPDCIBdkz4+3XZ9IYsnwDWnmhTvLl5PJrL2HZoIqORX2F+lKMyyJcS9ARgU/w0Crqip02hzJS6IYefCASWsbSyxFHzPd+qYhcqx+cLgyMulg6F37PP5boKSbozKgIw0xjT4GvOryOqlaHMUgbnsGsJRUGqogr95mkvbAZS+S6x2hMbO/yrd+fqKDZLUUrtmjoSiNTwyDThwVzi6Wb42laZ9SJe0VLEKkQiOSnSq4OvlHv27vEx0JM+OI8ZhZ23OAa+wX3WFJShoLd/22V+8Fw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM (2603:10a6:20b:333::21)
- by DB9P193MB1177.EURP193.PROD.OUTLOOK.COM (2603:10a6:10:23c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.29; Tue, 31 Oct
- 2023 16:10:12 +0000
-Received: from AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::b89e:5e18:1a08:409d]) by AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- ([fe80::b89e:5e18:1a08:409d%6]) with mapi id 15.20.6933.029; Tue, 31 Oct 2023
- 16:10:12 +0000
-Message-ID:
- <AS8P193MB1285473EE92FEDB65C08C131E4A0A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
-Date: Tue, 31 Oct 2023 17:10:24 +0100
+ bh=t74Wmi2XG1PDpMT/xqRNiSXdsY4mVLHUdi75n/Y/tY0=;
+ b=eK/ASs3hLndWfydV3JvaF5QB6EgNXistLomZkQHJ+ZEiQIu4VuUckeeotdJsvCT51tz8FWJbuyiYMFSNVHhSL+VlfStgoJxp0npIpYBExrPMqItY/Bggi763+febJVbkZFnfmwEDxECvW+F/BbUOztdQ48NMT+xDqxyfyfc3Lnr6USClqKp3H1EvtCIYN3wGrEETflXPIZuloed2lH/SHubT2z8Ykz44LJIj90uS7mkYfSk//9NFoyKSH/XdWr3r7xl7iOowvEkGvySOBYZiz/OIMckBLbTxBiewCM+k4DFajw/YpaKcvXHMDfXwhTdor2JEVii0+1fY+yZtDVOOuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=t74Wmi2XG1PDpMT/xqRNiSXdsY4mVLHUdi75n/Y/tY0=;
+ b=P88gtIDtLuAnpkPYrxXer6bAPgKLKfFRKXG8rJ82gF+wTDQGAJL0iAxXS2eBkN2Gb1mZOjO5PytqZFtnBzaSBgqrz+3etckgNj+HzyDlXOJN004mtUq61Qhw2wSgNILe1RGm05mWGToqAwBMVI5C4G3PdG12TymqGu9YB7iFY0g5Onkxb3PogtMY7Al1LptGzovpgMzBOd+4ImBQOiIbRlq1aF8WZZAO/WkoerxRXZZnu9nIgXhi4ux3j/mvRQP2HGlixnVYQa6RY7947gYQ1orn6WTSJqd11pQLpBuIdZt5RdXObwiB0DkcIJkJO9pddyewdb4G2AT9n3XNHdRk3Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
+ CH3PR12MB9393.namprd12.prod.outlook.com (2603:10b6:610:1c5::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6933.28; Tue, 31 Oct 2023 16:12:03 +0000
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::8cde:e637:db89:eae6]) by DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::8cde:e637:db89:eae6%5]) with mapi id 15.20.6933.028; Tue, 31 Oct 2023
+ 16:12:02 +0000
+Message-ID: <b4116027-8045-42a0-afa2-1dd8b17ea9ea@nvidia.com>
+Date: Tue, 31 Oct 2023 18:11:53 +0200
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: Wait a bit for the reset to take effect
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <AS8P193MB1285DECD77863E02EF45828BE4A1A@AS8P193MB1285.EURP193.PROD.OUTLOOK.COM>
- <j37ktiug7vwbb7h7s44zmng5a2bjzbd663p7pfowbehapjv3by@vrxfmapscaln>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
+ symmetric-xor RSS hash for any flow type
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Ahmed Zaki <ahmed.zaki@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ mkubecek@suse.cz, andrew@lunn.ch, willemdebruijn.kernel@gmail.com,
+ Wojciech Drewek <wojciech.drewek@intel.com>, corbet@lwn.net,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ jesse.brandeburg@intel.com, edumazet@google.com, anthony.l.nguyen@intel.com,
+ horms@kernel.org, vladimir.oltean@nxp.com,
+ Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
+ pabeni@redhat.com, davem@davemloft.net
+References: <20231016154937.41224-1-ahmed.zaki@intel.com>
+ <20231016163059.23799429@kernel.org>
+ <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
+ <20231017131727.78e96449@kernel.org>
+ <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
+ <20231017173448.3f1c35aa@kernel.org>
+ <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
+ <20231018165020.55cc4a79@kernel.org>
+ <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
+ <20231020153316.1c152c80@kernel.org>
+ <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
+ <20231020164917.69d5cd44@kernel.org>
+ <f6ab0dc1-b5d5-4fff-9ee2-69d21388d4ca@intel.com>
+ <89e63967-46c4-49fe-87bc-331c7c2f6aab@nvidia.com>
+ <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
+ <e471519b-b253-4121-9eec-f7f05948c258@nvidia.com>
+ <a2a1164f-1492-43d1-9667-5917d0ececcb@intel.com>
+ <d097e7d3-5e16-44ba-aa92-dfb7fbedc600@nvidia.com>
+ <CAKgT0UdObrDUGKMC7Tneqc4j3tU1jxRugoEB=u63drHhxOeKyw@mail.gmail.com>
 Content-Language: en-US
-From: Bernd Edlinger <bernd.edlinger@hotmail.de>
-In-Reply-To: <j37ktiug7vwbb7h7s44zmng5a2bjzbd663p7pfowbehapjv3by@vrxfmapscaln>
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <CAKgT0UdObrDUGKMC7Tneqc4j3tU1jxRugoEB=u63drHhxOeKyw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TMN: [6BUMgrm7791Q8ukIitnp+kUXt4NXH5ko7uCO9WIm+B+8QZ39lD9bhPkZw20dpltg]
-X-ClientProxiedBy: FR4P281CA0400.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:cf::20) To AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:333::21)
-X-Microsoft-Original-Message-ID:
- <9fbb31ed-5164-4869-ab18-0a4a93591f53@hotmail.de>
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO3P265CA0021.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:387::8) To DS7PR12MB6288.namprd12.prod.outlook.com
+ (2603:10b6:8:93::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8P193MB1285:EE_|DB9P193MB1177:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f3a2d28-bb3e-4be5-227e-08dbda2bdc3a
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|CH3PR12MB9393:EE_
+X-MS-Office365-Filtering-Correlation-Id: a672c2c7-855a-40bb-e47e-08dbda2c1e6a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	YUuRZFdzgSQNqTzmAMxBDixU6J0QC3TjL2f+WWSj1EtSHPJW+veijF/RPY7X2cEEP4curW13L7gPE+VWh4ncwEYxBoNEe+o+Uxqor6RV3Ms36ZQPp+wrC5w+Qd3JJPlpSPFJLvcP7tGbEj4LCWnEjdSgctxtj5IOtfAyOnpfEtCupOHU4L4Z/jG6vmsNkBLb+19wy127KweQhGYgp8ymRFoV8d6iNEEOZgSHr3GssB19cEtw9swD4QEU+rZWss9hW5iE25dhnJ0GnAh/ti8M7yL7Rce1W3AXTcHyREyqBzUk7cYQQodqRwEm3anGKxiymzVVkcNhgZ2o9O5YVf/wjG4aN5AanY1iqHezSbjMDoz/nCvDQvfhQalh4VdJWHl1JZoKsCOzT173r9l+RXy1tY9CNu/G5An2uOeQGJtASvEUe9nxYeU2Q9crt4zh1kxDZr/UGpblXgsuU940Wv4cWTMrPlpO1xsTtWB487ZLtK0e+4diFQeku87yHVBxz4nDm/hSgdmJsBHdnrVT8FC52ZPYwZ9EbjrovNHxhG4oqt3NTWYrNRS8AYxPqd/B94ae
+	kR7giDjOYTZuwE2xk1NZQc2Ug6plirtCx4u6RHOdAg1uBan3f4RuPpI24lg0S47wp6azCG2K6I8yKD9Y8cdurwuPJkv2eGzCp8de/3eo2+1jReAjHWJO4tpywcUZIcpZ15bVAO9LLamgrJbX8acB8JmK7OUOwAt+c+3SWB2JnjN052YhUJdF+yjLT328TiYl02hvEWRz7I829B0Y+VNUklqJH1cNbAX/Mr9AEkAXwHoxanFKh9tMBcO0zxJ3GSXXBrszji/sg++5vBsymkk//ASFPQKC26Ir7a6Ju5Ef0vjSLJWUXaK+t/F/c7IRYYfzFauX2VHJ8IUXT/C+ffsT1QK3N8YnMJHUJyMomOapPn5oD42p9lDO3QIbDLJfnJwYE5MZ0Y/5HOOAT2b1oYi5Vy4eLJifO80TVjdyTSkE158AE7BPBTSTQj7qw8Zv3XnRrzJTqYQZ2HzK9BJWm1oJr4g74+7rFC/3z2Ep04M67OCWWZnA1oOuzVP83FFTOqap45ekVxPHKLMuwh6Q+8jOzr8mKRqw76LTaHhJiATf9jpKsZ+ggIW4xKZ6NyUI8J8gLofgwH9y7JfPBCRUb06BznE+Zb49qUWIq6f+XjkF1XLdXxj8pZWgYQIc/NGhkXbsdvu7lWrG5FtoDrm5JUO9UACbH0QBMX6CEpB/PTrpNE8uzird0wXwbSEymprEC96t
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(136003)(39860400002)(346002)(396003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(31686004)(6512007)(26005)(2616005)(4001150100001)(38100700002)(31696002)(36756003)(86362001)(316002)(2906002)(6486002)(5660300002)(7416002)(83380400001)(6506007)(53546011)(478600001)(6666004)(8676002)(8936002)(54906003)(4326008)(6916009)(41300700001)(966005)(66556008)(66946007)(66476007)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OHpXS0xUeHdGcU45THpFWm5rL25lQS9wVVR2a0hTcHdwWWE2eEpqYkNicmhp?=
- =?utf-8?B?WkJueE9HUG14TkNheGtJNFkwNmIxTjFBYTBVSVUwejlhZTEwdDBsU1FidGNF?=
- =?utf-8?B?eEZMa1d1b3h6QTdWZTNxZEM4VE9nMTRkVjRqLzgzNFRRd2pDTGFDcEYzTWdE?=
- =?utf-8?B?bnNGYU5HUEMzY2FWRmFCNGUwRWRpZ0F4NHAxSW9pZC9yMEVDdkN5TlcxcFBn?=
- =?utf-8?B?Zm03cEJxNU9DRkdtQnY3WmdsWitYWjU2VU5wSXlOWmZnb3p6TGVHbjliRUpS?=
- =?utf-8?B?RGxxL1YzSTByNy9ISFNkdzNNMzI5YXhhcG5YY3BvajNDc1pMSWV5a3I0cTh1?=
- =?utf-8?B?aEVuQUQ4eDVZTjNLNUMxNTNjNWdTRkpSYVJ4RVFBRjllcisvdXczMUZITlk0?=
- =?utf-8?B?VXFaZng4U3lIeUwySXY2K3YwRUpBN2VuZXR0d3BlMEZ1cFNqZ3U1WmRzaExi?=
- =?utf-8?B?UzNBRlhXb0dXbDZGL0YvdmlyVGNkN1g3ZDhmWUo3M2xkNXl6dGluNnFxN2pD?=
- =?utf-8?B?TkI3N0dJejNTUDdjRzBsSTIwT3l5aDh5bXZxTTRaa2lOY3pZV24wSURiY2RG?=
- =?utf-8?B?THo3VVVJejhHVlBKRkdvOEZsUEtySDYydk1HcVR3L2pOQUFUS0U1cmd3MjN4?=
- =?utf-8?B?YVRhU3VBSjdFRWtmM1BXYk9Vc3Z0UTZvbnVEaEVSemY1Q0JreFg3K0lXMnFY?=
- =?utf-8?B?cWNKbW9IekpESVE5czNxdHo4UDI4VkREbFpHLzBUS1I3YTRYdG85NkpCcEVr?=
- =?utf-8?B?c2JWS3Y0Z0t5OWRTdnhsZ21YeUhjaStQQnhlQnBFNXRBZ3REUytNcTNrSWQr?=
- =?utf-8?B?dWFuRWl0bHA1Z2ZyUEppVHJQdndOYVl0Y1ZaaFlJc3h4eGtrQkI3MDh5aGRr?=
- =?utf-8?B?VmUvZlJkV2N2RzQwWTRPUFdsSXlFaEVBY0RKYVVYRmhMNWMvMXpIRGhWblRQ?=
- =?utf-8?B?eXUxZ3lsSm44Q2hzUVl3UHZlT2JiZlBXamowVkJMMkRjSHhIcFpMczZlSTVq?=
- =?utf-8?B?RXZUTUpaVkZSZXUvb1YwNjFLcm1YaW1wWXlIN3VZbzhxN0YvNFQrR1ZDZFBm?=
- =?utf-8?B?QVIwVkVqZzFXRVJYcXg2UHNEWXZMS1JTNGZ3eDNIRjlQclExNC9CRktLdTha?=
- =?utf-8?B?ZGdKTjRLd1lXT0E5aytTNFk3UWZ5QS9yc1BDZEVIVHA3bHdmNWE2R0ZaWHJS?=
- =?utf-8?B?dDRJclljeERZRHBLTmVpejJuSFJKS1oyOVZrcThQTmlHVlNjVEQ3M0ZyYjBy?=
- =?utf-8?B?WDZKQWxUMnFCQVJ0aVFqZ3Azai9PWHc2ZFYxL3hiSXhjL3h6NjRwdmM0OFhM?=
- =?utf-8?B?cGNjSnpDaG9WNzNnaGlkS2xqeFlDYSs4QzA3b3NiTURzZ1U4U2ZlempZUXVO?=
- =?utf-8?B?NHJWTzdMS2xuR3d1N1dOSnNISVhZamxFZkh2V1NxZG9ZSHAzNTl3ZXQxSEo0?=
- =?utf-8?B?UW50VkhFVHo4cmlqM1RldnJhTEVOdWFrWVVYaVM3ajVwZnVvTXpXRUF1aDRn?=
- =?utf-8?B?NHYyUVRPVkhOaE9tcjNTMjV5OEpCalJkaWlpU0JYSytnWEZPbmg5U3VVZlVL?=
- =?utf-8?B?bEVUS1pvdDMxMVBMNEFFMjhlTXBYOUdaMW9RRmVYMjJWUmZNR1dLV0cyaURo?=
- =?utf-8?B?dUpTYWZSeGhSZ1NlMlU0c1ZlbDdWaWF4QUtXS2xXdmlGMXdNSjlvYkVnMHU4?=
- =?utf-8?B?VTBPb2VycDlIYllhdC9FQWFhNUZWZi9BK0c2clZ4em5pMHk1TnEzeHdPaWIx?=
- =?utf-8?Q?sAnUoVdoHeWPNyyAI8=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-80ceb.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f3a2d28-bb3e-4be5-227e-08dbda2bdc3a
-X-MS-Exchange-CrossTenant-AuthSource: AS8P193MB1285.EURP193.PROD.OUTLOOK.COM
+	=?utf-8?B?NyszSDR4RE1FRUEyZFRVekRMY1FTVG1iaGpRTXhrZ05FUk5TUVZPbk9XYWRK?=
+ =?utf-8?B?OEtGRFBYd3QwZDUya2JxTHlTWWVFaDJxVW1WVjFUMEgvazlCTSt3ZXNPZW9v?=
+ =?utf-8?B?a2NSZjdadDNvbHFQWE1rWi9KRy92L0l6YXJXbFRDYVhUT1RGWGNxTHVGZzhD?=
+ =?utf-8?B?c1RyN3N1bFRHT05jM3Rjb0p6cTUwYTRIMlZ5OWMvbFhjaE43ZE8zM0JzQ3Zz?=
+ =?utf-8?B?QndiSWRXcktWeHJYUHlhUGVuTlg3N3BTc0xsWHdlTld3M2tkbFI2WDEweWdS?=
+ =?utf-8?B?QnhvbXpjNHN4ajBkc0NtUTFydHZHR3ZseUpNUEpBRE0yYjhMaDMxQ1JmN3Yz?=
+ =?utf-8?B?RGdNVnhnUUE1OUZOeUdmelZrbng4Ym1YR3pkTWxpU3Z0OEQzYm9XMVVPcWZy?=
+ =?utf-8?B?T3diU29pN2hhNlY0WUZKRFhoOFhBczNXallTVzQwL0V5eUtNMllJTXJlWVk0?=
+ =?utf-8?B?U0JsSUl6eVBsNHI3QTFuRG9WTFlLZmU2VnN0T0R6QU5kZS9KUng1c0ZXT2hD?=
+ =?utf-8?B?SG5zRW04dEs1MDZwck9PWHVLWmhoWm5Ib3ZvL2JHWHA2d3o0QXRNSzVjWDBy?=
+ =?utf-8?B?Y0VmSllsS0phazc3WGVyYm43ME1JR1hSdHl5ZVJrMWhiSExqTzZITGRPWHZU?=
+ =?utf-8?B?R1RIRjcxTzgzT1dDWHd2RlhmMXpaaElhRkZMaS8yczBSQmVwdUl3MmtVM3l0?=
+ =?utf-8?B?bVJNa3hNTk5EVmdoTkZudjAxOVhoWEVJUXc3WFB2Q3IybXRkMVo1OGtHV2tX?=
+ =?utf-8?B?Qm03bHhXUTNzd3BBZWUwMFJrakVHZzBPSDZlVFJlWWFWTXlhQVRqU0xEaWFw?=
+ =?utf-8?B?eVJJakVaUWlud1B0RFVRaGlObHNIdTJtSE92My9zL2N5Ulhaam9oZENzck9W?=
+ =?utf-8?B?dWtVUGZvcktrV2k3ZXRyQ3Z4alRKZlJNVFQ2SnZhV0o4bTJjc1hyczJNZi9p?=
+ =?utf-8?B?ZEJ4dmxIUmtMTWV1VlFEMDI4S2orU1U4Qkd1eFQyU1phOHlaQjNkangwMkZ6?=
+ =?utf-8?B?VUhUeG11TEZIZGRIeTA3Q2lOV1RIQWhYV2VMV01JU0RZN2JzYWtWK2dLT0JX?=
+ =?utf-8?B?YWQraXVORkwwYTYwMHNaK3V1a1lMTUtxRE82TjhhbDdmMjF0TTFyUEJuOFZD?=
+ =?utf-8?B?SkR5VXpWYlR3ek5MT2xVaHZvVm1QSXg4dkhtSGxiZFlXT2s5SmRkY0hLYVB4?=
+ =?utf-8?B?L3NrVXgrUTN0WUJaOHVYQkxTY0UreGJSeFNuQ3pHbWNMSVBwaE9WbHk5dzhu?=
+ =?utf-8?B?NU4wVmx0TkYzTktlVnZEUnVncDlYZ2dUaW9vRjd1RnpjMWhUVWwyaG9obEJO?=
+ =?utf-8?B?QjhjcW1Eb29nUmNQVXFFRVhuakpUeUFHam9qNnR4bnpZS1gzN0F3V0JZY25L?=
+ =?utf-8?B?SmZSOWxVay9XengwaXhGekJoU0d0bWQwS3pSNHJpaXJma3ZtNVltSFNLUGtj?=
+ =?utf-8?B?bnU5MFJZdmsxbTVBb01MZlA5U2ovMTFKSlhRM3dHRDR4OWlRNG93WCtMYjFP?=
+ =?utf-8?B?ekFyY09GQ29kV2cvM0xuN1R5WndGRTdLVk9qYnV5VmRMVzUzWFFYQ05zTFdV?=
+ =?utf-8?B?djdQZHpaem5XWmZLNlRnZStrVzMvMWQ2WXFkVW5jZUx3UDNRNDh4L0ZDSnhj?=
+ =?utf-8?B?aDgvZUk2TXZNWnFnSXhEa2s4SEFhQUQrUVRIUm9mOVE1d2VUL1VraVBtdGdL?=
+ =?utf-8?B?SjJkeEQxRmwvbnU1SVpDUXU2QUVBbGRQcmNDME9nWEtZbUROZjY0MWNtS0dn?=
+ =?utf-8?B?S2QzNi9vMUxRMTNQZ2QyMXdkS0k3Y3V0ZzNHazZxYVFMVlh5cERuZmJnSWlm?=
+ =?utf-8?B?aURGc0E2MmJJWG0vTnhna1NxYzRnV2QwbVNEeFBsS0UyUUljdGZhZ25Vb0dP?=
+ =?utf-8?B?RWowVHI1dnFKV0FVTmpsdWZLVVlQRmVGZ0ZRSkJZRXRxckxtbmZ5VUxWZHJ1?=
+ =?utf-8?B?N3QyNDllYVlUbk5TZnMveWlKMzVnWXNDek9NTHQyNUFNdFBtQUxXRFdLY1Qx?=
+ =?utf-8?B?VmN6UlZiVW8vNWFYakVUWjVTRVdlUjRrQ1dVbWZtZEJDZjZXUjIzQW45S0NF?=
+ =?utf-8?B?Y0xadWtRajdpZHExTTdPWi9wbENGMGZjV3BmZzczMldWQ1VXM2ZkSUVGbHRG?=
+ =?utf-8?Q?WStA6eNhQtIU3Y9yk4klkpI0R?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a672c2c7-855a-40bb-e47e-08dbda2c1e6a
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 16:10:12.0736
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 16:12:02.9098
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9P193MB1177
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gC8WaZsH+1aIt3ST7LpoNoRM5RCUzTblHcDg6DofOJ38MfWSaaTGb4uUPEDcxcfT
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9393
 
-
-
-On 10/31/23 11:32, Serge Semin wrote:
-> On Mon, Oct 30, 2023 at 07:01:11AM +0100, Bernd Edlinger wrote:
->> otherwise the synopsys_id value may be read out wrong,
->> because the GMAC_VERSION register might still be in reset
->> state, for at least 1 us after the reset is de-asserted.
+On 31/10/2023 16:59, Alexander Duyck wrote:
+> On Tue, Oct 31, 2023 at 5:01 AM Gal Pressman <gal@nvidia.com> wrote:
+>>
+>> On 29/10/2023 18:59, Ahmed Zaki wrote:
+>>>
+>>>
+>>> On 2023-10-29 06:48, Gal Pressman wrote:
+>>>> On 29/10/2023 14:42, Ahmed Zaki wrote:
+>>>>>
+>>>>>
+>>>>> On 2023-10-29 06:25, Gal Pressman wrote:
+>>>>>> On 21/10/2023 3:00, Ahmed Zaki wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> On 2023-10-20 17:49, Jakub Kicinski wrote:
+>>>>>>>> On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
+>>>>>>>>> I replied to that here:
+>>>>>>>>>
+>>>>>>>>> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
+>>>>>>>>>
+>>>>>>>>> I am kind of confused now so please bear with me. ethtool either
+>>>>>>>>> sends
+>>>>>>>>> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the
+>>>>>>>>> interface
+>>>>>>>>> for "ethtool -X" which is used to set the RSS algorithm. But we
+>>>>>>>>> kind of
+>>>>>>>>> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses
+>>>>>>>>> "ethtool_rxnfc" (as implemented in this series).
+>>>>>>>>
+>>>>>>>> I have no strong preference. Sounds like Alex prefers to keep it
+>>>>>>>> closer
+>>>>>>>> to algo, which is "ethtool_rxfh".
+>>>>>>>>
+>>>>>>>>> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how would
+>>>>>>>>> that work on the ethtool user interface?
+>>>>>>>>
+>>>>>>>> I don't know what you're asking of us. If you find the code to
+>>>>>>>> confusing
+>>>>>>>> maybe someone at Intel can help you :|
+>>>>>>>
+>>>>>>> The code is straightforward. I am confused by the requirements: don't
+>>>>>>> add a new algorithm but use "ethtool_rxfh".
+>>>>>>>
+>>>>>>> I'll see if I can get more help, may be I am missing something.
+>>>>>>>
+>>>>>>
+>>>>>> What was the decision here?
+>>>>>> Is this going to be exposed through ethtool -N or -X?
+>>>>>
+>>>>> I am working on a new version that uses "ethtool_rxfh" to set the
+>>>>> symmetric-xor. The user will set per-device via:
+>>>>>
+>>>>> ethtool -X eth0 hfunc toeplitz symmetric-xor
+>>>>>
+>>>>> then specify the per-flow type RSS fields as usual:
+>>>>>
+>>>>> ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
+>>>>>
+>>>>> The downside is that all flow-types will have to be either symmetric or
+>>>>> asymmetric.
+>>>>
+>>>> Why are we making the interface less flexible than it can be with -N?
+>>>
+>>> Alexander Duyck prefers to implement the "symmetric-xor" interface as an
+>>> algorithm or extension (please refer to previous messages), but ethtool
+>>> does not provide flowtype/RSS fields setting via "-X". The above was the
+>>> best solution that we (at Intel) could think of.
+>>
+>> OK, it's a weird we're deliberately limiting our interface, given
+>> there's already hardware that supports controlling symmetric hashing per
+>> flow type.
+>>
+>> I saw you mentioned the way ice hardware implements symmetric-xor
+>> somewhere, it definitely needs to be added somewhere in our
+>> documentation to prevent confusion.
+>> mlx5 hardware also does symmetric hashing with xor, but not exactly as
+>> you described, we need the algorithm to be clear.
 > 
-> From what have you got that delay value?
+> It is precisely because of the way the symmetric-xor implements it
+> that I suggested that they change the algo type instead of the input
+> fields.
 > 
-
-Just try and error, with very old linux versions and old gcc versions
-the synopsys_id was read out correctly most of the time (but not always),
-with recent linux versions and recnet gcc versions it was read out
-wrongly most of the time, but again not always.
-I don't have access to the VHDL code in question, so I cannot
-tell why it takes so long to get the correct values, I also do not
-have more than a few hardware samples, so I cannot tell how long
-this timeout must be in worst case.
-Experimentally I can tell that the register is read several times
-as zero immediately after the reset is de-asserted, also adding several
-no-ops is not enough, adding a printk is enough, also udelay(1) seems to
-be enough but I tried that not very often, and I have not access to many
-hardware samples to be 100% sure about the necessary delay.
-And since the udelay here is only executed once per device instance,
-it seems acceptable to delay the boot for 10 us.
-
-BTW: my hardware's synopsys id is 0x37.
-
-
-Bernd.
-
-> -Serge(y)
+> Instead of doing something such as rearranging the inputs, what they
+> do is start XORing them together and then using those values for both
+> the source and destination ports. It would be one thing if they
+> swapped them, but instead they destroy the entropy provided by XORing
+> the values together and then doubling them up in the source and
+> destination fields. The result is the hash value becomes predictable
+> in that once you know the target you just have to offset the source
+> and destination port/IP by the same amount so that they hash out to
+> the same values, and as a result it would make DDoS attacks based on
+> the RSS hash much easier.
 > 
->>
->> Add a wait for 10 us before continuing to be on the safe side.
->>
->> Signed-off-by: Bernd Edlinger <bernd.edlinger@hotmail.de>
->> ---
->>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> index 5801f4d50f95..e485f4db3605 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->> @@ -7398,6 +7398,9 @@ int stmmac_dvr_probe(struct device *device,
->>  		dev_err(priv->device, "unable to bring out of ahb reset: %pe\n",
->>  			ERR_PTR(ret));
->>  
->> +	/* Wait a bit for the reset to take effect */
->> +	udelay(10);
->> +
->>  	/* Init MAC and get the capabilities */
->>  	ret = stmmac_hw_init(priv);
->>  	if (ret)
->> -- 
->> 2.39.2
->>
->>
+> Where I draw the line in this is if we start losing entropy without
+> explicitly removing the value then it is part of the algo, whereas if
+> it is something such as placement or us explicitly saying we don't
+> want certain fields in there then it would be part of the input.
+> Adding fields to the input should increase or at least maintain the
+> entropy is my point of view.
+
+Thanks for the detailed summary, that was helpful.
+
+Though, if a vendor chooses to implement symmetric by sorting, we will
+still have it as part of the algorithm, not input.
+
+My main concern was about losing the ability to control symmetric per
+flow-type, but I guess we can resolve that if the need arises.
 
