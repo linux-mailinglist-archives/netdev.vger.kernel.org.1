@@ -1,263 +1,121 @@
-Return-Path: <netdev+bounces-45407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55DD57DCB67
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:06:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E81A17DCB9D
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0736D2815BC
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 11:06:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88331B20DE7
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 11:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B86E19442;
-	Tue, 31 Oct 2023 11:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B968219BB1;
+	Tue, 31 Oct 2023 11:17:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxtdNaYt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aEZY68v8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1142105
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 11:06:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8279EBB
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 04:06:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698750402;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qeNTgEg8tsCK+iB2JBATlgJcpJ/vml1SpbMe3EquNfs=;
-	b=DxtdNaYt+5CyTsu2rYhoUl91G+BUjzKGvY/uZ9Laip1t7bM5AhLJBD0egl77fUY4T0DAgr
-	ZNB+i5ZZwxVDw+5PF3vEL7WeCzAlBqutQ+OMd1KICDCWoCMO7bowDtaCMWKLZrgrFF5fGh
-	hPlche+sOAbCIu0nwFX8DBOjUSvffNE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-270-77YnTtd1Pyu4Odn3ceiJvg-1; Tue, 31 Oct 2023 07:06:31 -0400
-X-MC-Unique: 77YnTtd1Pyu4Odn3ceiJvg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-542d011ca7dso535399a12.1
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 04:06:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4827A12B79
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 11:17:24 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17BA097
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 04:17:23 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d86dac81f8fso5798656276.1
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 04:17:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698751042; x=1699355842; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VxBLANg6EmmWnADl2MRD0kfvMVo4SQZhTWg/EXI4LVA=;
+        b=aEZY68v8+fZNh/McICkZZBS4uGv7RwL4hrHI2FrR3lN6oOcgOJW92tR7mxxHtdCOhT
+         K6FWo66x34KLwjj1VmF06aH0nmre5y28rkmXFZceiJhw174qXi36M4y8NONem5DT4Ov2
+         qzTUO3E8E9JSLnPEO0u8a4NRElYh92alFHB9iLFRzoLNtyytk/trmC0ZxG0MIx2IZTGA
+         yzd6Fd9dYHmkBctoaN1LBG9bnl9clhV9G9vovkkb4IXhRSFVE2VWrJ8bE39AFuGodWXt
+         ew00mbtbC/IU2Lf43KmFZadnlUWsnMWwRXH5uesGpXxXIEH3wqNN5g+9605d7gSsY+aG
+         fSag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698750390; x=1699355190;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20230601; t=1698751042; x=1699355842;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=qeNTgEg8tsCK+iB2JBATlgJcpJ/vml1SpbMe3EquNfs=;
-        b=KZMlVWWfu0/3QgqoUk3KzfZ5vFIBEytAFCQwEcWvL3f7cjLy4KVc0wITw8auiCdD6x
-         s/Vo6O33Lom4PQTKfI+/fOASTXvm5P42YfUeELjpVdt2K7Az/POmTUaalDcYzhKR3t+I
-         kl/u4hX9kH9a0t35icbY0P0DfnVOjXNCa2Piwkogytr03iAeohS9E25jdWxP1CeQuDHh
-         RBEAltYZWHWXJrt4Hnt8iizCzKj4Y37I+nJuaNkBunl/xdTZ5FlX/9Y/XgdYcR0ZBCjl
-         eGi7AYsftQ2/ulsmAIKdF7dQV1WubrFI2Ggv0rMWV5x7rUp3225qSWVJhb6ZsnZ+A8dD
-         zNWA==
-X-Gm-Message-State: AOJu0Yx1JmIdBwDmMfaSHqaw7wpHJTjevqg8pxWVD2HBRFTm6JpT2mzo
-	JvK0uHpnI9BEt9mHKwRYfQ8SqmE0hDDHv6S4mt77dCvMzAYUu+E27TWFh+FyMl8/iuMT3HQcTUk
-	FtEPcU9BDNmKL/f0M
-X-Received: by 2002:a50:d49e:0:b0:53f:18f6:a153 with SMTP id s30-20020a50d49e000000b0053f18f6a153mr9697627edi.3.1698750389878;
-        Tue, 31 Oct 2023 04:06:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFU3fW9CjMF9NxM2NJf+1GvsoCwESzcm25+DVXEtCmrvZvzCFMKH+ZzuSFKY7gpsIMYtpRC6w==
-X-Received: by 2002:a50:d49e:0:b0:53f:18f6:a153 with SMTP id s30-20020a50d49e000000b0053f18f6a153mr9697604edi.3.1698750389448;
-        Tue, 31 Oct 2023 04:06:29 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-227-179.dyn.eolo.it. [146.241.227.179])
-        by smtp.gmail.com with ESMTPSA id 28-20020a508e5c000000b005434095b179sm942853edx.92.2023.10.31.04.06.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 04:06:29 -0700 (PDT)
-Message-ID: <5a46ffb675addbed8a3dac176effb96eb2c8ca3e.camel@redhat.com>
-Subject: Re: [PATCH net v1 2/2] octeontx2-pf: Fix holes in error code
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
- hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  wojciech.drewek@intel.com
-Date: Tue, 31 Oct 2023 12:06:27 +0100
-In-Reply-To: <20231027021953.1819959-2-rkannoth@marvell.com>
-References: <20231027021953.1819959-1-rkannoth@marvell.com>
-	 <20231027021953.1819959-2-rkannoth@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        bh=VxBLANg6EmmWnADl2MRD0kfvMVo4SQZhTWg/EXI4LVA=;
+        b=YKGtuRl774gsKpr2GsXHXruVwKDTi86IEP2RJn6JbLmzrwOx+Zsrfe1wD5wDzvOO/+
+         7PIoR0go3fpDaJCJGEaCvNtkCZYQaaw8MJz5f1JjLp97S+hR+93UqbUeNVLfn8OMijVc
+         6lwO9Yr88AVXTmrY4C3X+aEbbbt901Yuu4UMDOuDlVAj1zXCmqEt+T+bqQMDMJReckP9
+         U+/TtouPYGOisj6tReCY9h2TOLroaRiJOUwCKVfwSawhjKDYOjERjMMZppne0zH7zCfK
+         VRv0hM6V8g4CweOp+X3eBxmi+PngQC7ICodvzHymPfAxulgjWyoukroIDs5Ee7RTMrjc
+         CzbQ==
+X-Gm-Message-State: AOJu0YyTDWhMso91+5fTd6cG/fFgCK5xmIVIJlQ+rJDds4bX1fryJ/F4
+	CnIGEEAL6Gw50+MtAd2XXE6NnexoWloJpg==
+X-Google-Smtp-Source: AGHT+IF3ZLG1XGSt/tjNgfv8nbJdR76a+FDfXSlDxsAi+nGLX0guVUiXmnUBWXYumXEB53PEUByBv2c+6yq0mA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:5f4c:0:b0:da0:3e20:658d with SMTP id
+ h12-20020a255f4c000000b00da03e20658dmr233405ybm.10.1698751042244; Tue, 31 Oct
+ 2023 04:17:22 -0700 (PDT)
+Date: Tue, 31 Oct 2023 11:17:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.820.g83a721a137-goog
+Message-ID: <20231031111720.2871511-1-edumazet@google.com>
+Subject: [PATCH iproute2] ss: add support for rcv_wnd and rehash
+From: Eric Dumazet <edumazet@google.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger <stephen@networkplumber.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2023-10-27 at 07:49 +0530, Ratheesh Kannoth wrote:
-> Error code strings are not getting printed properly
-> due to holes. Print error code as well.
->=20
-> Fixes: 51afe9026d0c ("octeontx2-pf: NIX TX overwrites SQ_CTX_HW_S[SQ_INT]=
-")
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
->=20
-> ---
-> ChangeLog:
->=20
-> v0 -> v1: Splitted patch into two
-> ---
->  .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 80 +++++++++++--------
->  1 file changed, 46 insertions(+), 34 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drive=
-rs/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> index 6daf4d58c25d..125fe231702a 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-> @@ -1193,31 +1193,32 @@ static char *nix_mnqerr_e_str[NIX_MNQERR_MAX] =3D=
- {
->  };
-> =20
->  static char *nix_snd_status_e_str[NIX_SND_STATUS_MAX] =3D  {
-> -	"NIX_SND_STATUS_GOOD",
-> -	"NIX_SND_STATUS_SQ_CTX_FAULT",
-> -	"NIX_SND_STATUS_SQ_CTX_POISON",
-> -	"NIX_SND_STATUS_SQB_FAULT",
-> -	"NIX_SND_STATUS_SQB_POISON",
-> -	"NIX_SND_STATUS_HDR_ERR",
-> -	"NIX_SND_STATUS_EXT_ERR",
-> -	"NIX_SND_STATUS_JUMP_FAULT",
-> -	"NIX_SND_STATUS_JUMP_POISON",
-> -	"NIX_SND_STATUS_CRC_ERR",
-> -	"NIX_SND_STATUS_IMM_ERR",
-> -	"NIX_SND_STATUS_SG_ERR",
-> -	"NIX_SND_STATUS_MEM_ERR",
-> -	"NIX_SND_STATUS_INVALID_SUBDC",
-> -	"NIX_SND_STATUS_SUBDC_ORDER_ERR",
-> -	"NIX_SND_STATUS_DATA_FAULT",
-> -	"NIX_SND_STATUS_DATA_POISON",
-> -	"NIX_SND_STATUS_NPC_DROP_ACTION",
-> -	"NIX_SND_STATUS_LOCK_VIOL",
-> -	"NIX_SND_STATUS_NPC_UCAST_CHAN_ERR",
-> -	"NIX_SND_STATUS_NPC_MCAST_CHAN_ERR",
-> -	"NIX_SND_STATUS_NPC_MCAST_ABORT",
-> -	"NIX_SND_STATUS_NPC_VTAG_PTR_ERR",
-> -	"NIX_SND_STATUS_NPC_VTAG_SIZE_ERR",
-> -	"NIX_SND_STATUS_SEND_STATS_ERR",
-> +	[NIX_SND_STATUS_GOOD] =3D "NIX_SND_STATUS_GOOD",
-> +	[NIX_SND_STATUS_SQ_CTX_FAULT] =3D "NIX_SND_STATUS_SQ_CTX_FAULT",
-> +	[NIX_SND_STATUS_SQ_CTX_POISON] =3D "NIX_SND_STATUS_SQ_CTX_POISON",
-> +	[NIX_SND_STATUS_SQB_FAULT] =3D "NIX_SND_STATUS_SQB_FAULT",
-> +	[NIX_SND_STATUS_SQB_POISON] =3D "NIX_SND_STATUS_SQB_POISON",
-> +	[NIX_SND_STATUS_HDR_ERR] =3D "NIX_SND_STATUS_HDR_ERR",
-> +	[NIX_SND_STATUS_EXT_ERR] =3D "NIX_SND_STATUS_EXT_ERR",
-> +	[NIX_SND_STATUS_JUMP_FAULT] =3D "NIX_SND_STATUS_JUMP_FAULT",
-> +	[NIX_SND_STATUS_JUMP_POISON] =3D "NIX_SND_STATUS_JUMP_POISON",
-> +	[NIX_SND_STATUS_CRC_ERR] =3D "NIX_SND_STATUS_CRC_ERR",
-> +	[NIX_SND_STATUS_IMM_ERR] =3D "NIX_SND_STATUS_IMM_ERR",
-> +	[NIX_SND_STATUS_SG_ERR] =3D "NIX_SND_STATUS_SG_ERR",
-> +	[NIX_SND_STATUS_MEM_ERR] =3D "NIX_SND_STATUS_MEM_ERR",
-> +	[NIX_SND_STATUS_INVALID_SUBDC] =3D "NIX_SND_STATUS_INVALID_SUBDC",
-> +	[NIX_SND_STATUS_SUBDC_ORDER_ERR] =3D "NIX_SND_STATUS_SUBDC_ORDER_ERR",
-> +	[NIX_SND_STATUS_DATA_FAULT] =3D "NIX_SND_STATUS_DATA_FAULT",
-> +	[NIX_SND_STATUS_DATA_POISON] =3D "NIX_SND_STATUS_DATA_POISON",
-> +	[NIX_SND_STATUS_NPC_DROP_ACTION] =3D "NIX_SND_STATUS_NPC_DROP_ACTION",
-> +	[NIX_SND_STATUS_LOCK_VIOL] =3D "NIX_SND_STATUS_LOCK_VIOL",
-> +	[NIX_SND_STATUS_NPC_UCAST_CHAN_ERR] =3D "NIX_SND_STAT_NPC_UCAST_CHAN_ER=
-R",
-> +	[NIX_SND_STATUS_NPC_MCAST_CHAN_ERR] =3D "NIX_SND_STAT_NPC_MCAST_CHAN_ER=
-R",
-> +	[NIX_SND_STATUS_NPC_MCAST_ABORT] =3D "NIX_SND_STATUS_NPC_MCAST_ABORT",
-> +	[NIX_SND_STATUS_NPC_VTAG_PTR_ERR] =3D "NIX_SND_STATUS_NPC_VTAG_PTR_ERR"=
-,
-> +	[NIX_SND_STATUS_NPC_VTAG_SIZE_ERR] =3D "NIX_SND_STATUS_NPC_VTAG_SIZE_ER=
-R",
-> +	[NIX_SND_STATUS_SEND_MEM_FAULT] =3D "NIX_SND_STATUS_SEND_MEM_FAULT",
-> +	[NIX_SND_STATUS_SEND_STATS_ERR] =3D "NIX_SND_STATUS_SEND_STATS_ERR",
->  };
-> =20
->  static irqreturn_t otx2_q_intr_handler(int irq, void *data)
-> @@ -1238,14 +1239,16 @@ static irqreturn_t otx2_q_intr_handler(int irq, v=
-oid *data)
->  			continue;
-> =20
->  		if (val & BIT_ULL(42)) {
-> -			netdev_err(pf->netdev, "CQ%lld: error reading NIX_LF_CQ_OP_INT, NIX_L=
-F_ERR_INT 0x%llx\n",
-> +			netdev_err(pf->netdev,
-> +				   "CQ%lld: error reading NIX_LF_CQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n"=
-,
->  				   qidx, otx2_read64(pf, NIX_LF_ERR_INT));
->  		} else {
->  			if (val & BIT_ULL(NIX_CQERRINT_DOOR_ERR))
->  				netdev_err(pf->netdev, "CQ%lld: Doorbell error",
->  					   qidx);
->  			if (val & BIT_ULL(NIX_CQERRINT_CQE_FAULT))
-> -				netdev_err(pf->netdev, "CQ%lld: Memory fault on CQE write to LLC/DRA=
-M",
-> +				netdev_err(pf->netdev,
-> +					   "CQ%lld: Memory fault on CQE write to LLC/DRAM",
->  					   qidx);
->  		}
+tcpi_rcv_wnd and tcpi_rehash were added in linux-6.2.
 
-It's not a big deal (no need to repost just for this), but the above
-chunk (and a couple below, too) is not related to the current fix, you
-should have not included it here.
+$ ss -ti
+...
+ cubic wscale:7,7 ... minrtt:0.01 snd_wnd:65536 rcv_wnd:458496
 
-Cheers,
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ misc/ss.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Paolo
-
-> =20
-> @@ -1272,7 +1275,8 @@ static irqreturn_t otx2_q_intr_handler(int irq, voi=
-d *data)
->  			     (val & NIX_SQINT_BITS));
-> =20
->  		if (val & BIT_ULL(42)) {
-> -			netdev_err(pf->netdev, "SQ%lld: error reading NIX_LF_SQ_OP_INT, NIX_L=
-F_ERR_INT 0x%llx\n",
-> +			netdev_err(pf->netdev,
-> +				   "SQ%lld: error reading NIX_LF_SQ_OP_INT, NIX_LF_ERR_INT 0x%llx\n"=
-,
->  				   qidx, otx2_read64(pf, NIX_LF_ERR_INT));
->  			goto done;
->  		}
-> @@ -1282,8 +1286,11 @@ static irqreturn_t otx2_q_intr_handler(int irq, vo=
-id *data)
->  			goto chk_mnq_err_dbg;
-> =20
->  		sq_op_err_code =3D FIELD_GET(GENMASK(7, 0), sq_op_err_dbg);
-> -		netdev_err(pf->netdev, "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(%llx)  err=3D%s\n=
-",
-> -			   qidx, sq_op_err_dbg, nix_sqoperr_e_str[sq_op_err_code]);
-> +		netdev_err(pf->netdev,
-> +			   "SQ%lld: NIX_LF_SQ_OP_ERR_DBG(0x%llx)  err=3D%s(%#x)\n",
-> +			   qidx, sq_op_err_dbg,
-> +			   nix_sqoperr_e_str[sq_op_err_code],
-> +			   sq_op_err_code);
-> =20
->  		otx2_write64(pf, NIX_LF_SQ_OP_ERR_DBG, BIT_ULL(44));
-> =20
-> @@ -1300,16 +1307,21 @@ static irqreturn_t otx2_q_intr_handler(int irq, v=
-oid *data)
->  			goto chk_snd_err_dbg;
-> =20
->  		mnq_err_code =3D FIELD_GET(GENMASK(7, 0), mnq_err_dbg);
-> -		netdev_err(pf->netdev, "SQ%lld: NIX_LF_MNQ_ERR_DBG(%llx)  err=3D%s\n",
-> -			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code]);
-> +		netdev_err(pf->netdev,
-> +			   "SQ%lld: NIX_LF_MNQ_ERR_DBG(0x%llx)  err=3D%s(%#x)\n",
-> +			   qidx, mnq_err_dbg,  nix_mnqerr_e_str[mnq_err_code],
-> +			   mnq_err_code);
->  		otx2_write64(pf, NIX_LF_MNQ_ERR_DBG, BIT_ULL(44));
-> =20
->  chk_snd_err_dbg:
->  		snd_err_dbg =3D otx2_read64(pf, NIX_LF_SEND_ERR_DBG);
->  		if (snd_err_dbg & BIT(44)) {
->  			snd_err_code =3D FIELD_GET(GENMASK(7, 0), snd_err_dbg);
-> -			netdev_err(pf->netdev, "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=3D%s\n"=
-,
-> -				   qidx, snd_err_dbg, nix_snd_status_e_str[snd_err_code]);
-> +			netdev_err(pf->netdev,
-> +				   "SQ%lld: NIX_LF_SND_ERR_DBG:0x%llx err=3D%s(%#x)\n",
-> +				   qidx, snd_err_dbg,
-> +				   nix_snd_status_e_str[snd_err_code],
-> +				   snd_err_code);
->  			otx2_write64(pf, NIX_LF_SEND_ERR_DBG, BIT_ULL(44));
->  		}
-> =20
+diff --git a/misc/ss.c b/misc/ss.c
+index 2628c2e042f1cdb616ec8aa80d4f413b41dfd3f4..9438382b8e667529dc2cf4b020d8696a4175e992 100644
+--- a/misc/ss.c
++++ b/misc/ss.c
+@@ -865,6 +865,8 @@ struct tcpstat {
+ 	double		    min_rtt;
+ 	unsigned int 	    rcv_ooopack;
+ 	unsigned int	    snd_wnd;
++	unsigned int	    rcv_wnd;
++	unsigned int	    rehash;
+ 	int		    rcv_space;
+ 	unsigned int        rcv_ssthresh;
+ 	unsigned long long  busy_time;
+@@ -2711,6 +2713,10 @@ static void tcp_stats_print(struct tcpstat *s)
+ 		out(" rcv_ooopack:%u", s->rcv_ooopack);
+ 	if (s->snd_wnd)
+ 		out(" snd_wnd:%u", s->snd_wnd);
++	if (s->rcv_wnd)
++		out(" rcv_wnd:%u", s->rcv_wnd);
++	if (s->rehash)
++		out(" rehash:%u", s->rehash);
+ }
+ 
+ static void tcp_timer_print(struct tcpstat *s)
+@@ -3147,6 +3153,8 @@ static void tcp_show_info(const struct nlmsghdr *nlh, struct inet_diag_msg *r,
+ 		s.bytes_retrans = info->tcpi_bytes_retrans;
+ 		s.rcv_ooopack = info->tcpi_rcv_ooopack;
+ 		s.snd_wnd = info->tcpi_snd_wnd;
++		s.rcv_wnd = info->tcpi_rcv_wnd;
++		s.rehash = info->tcpi_rehash;
+ 		tcp_stats_print(&s);
+ 		free(s.dctcp);
+ 		free(s.bbr_info);
+-- 
+2.42.0.820.g83a721a137-goog
 
 
