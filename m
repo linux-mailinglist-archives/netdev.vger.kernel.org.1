@@ -1,142 +1,148 @@
-Return-Path: <netdev+bounces-45484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C9627DD7EC
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:50:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A3B77DD829
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:20:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D2511C20C69
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 21:50:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54233B20E8B
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D105249FA;
-	Tue, 31 Oct 2023 21:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF1B27444;
+	Tue, 31 Oct 2023 22:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jL8rQp6H"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="B3fP9cX5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE19827442
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 21:50:05 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E8AF4
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:50:04 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32dc9ff4a8fso3828486f8f.1
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:50:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698789002; x=1699393802; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GKyb1hV1vtUSZDqLnTgdX5n0+OXLN+juvNSKnK7I5Q0=;
-        b=jL8rQp6Hvy65dLFqx+xznsHESedyRmcvA2n1x0ncCVQdD7MSGLoIfrdq6fHf1KDpmi
-         IuRjwikhb21FUxfCHgo4Lj37v7cGTTNwJ+SEKFIqubZvIOZlIqoctl8l26oeKOJj07G5
-         EiUqdCVHil2ZiwXiNEtJl3nIxUSS23wpoEA95gnGSSfhp430RDXVT3oY6Zmq28FUZYQM
-         1m4EwfA9Xs+tCgVqTlVpstM+VBBHpZXondUMBGs6ZWDmm8m2j1GKXJ4vxOCzx5v/X20u
-         qTRghWjifGdpMQtCsETf+nGTKErxBuyNFfEpjsk2/nWS7gt5NMwjis+7ckw41DOrF3LB
-         T6MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698789002; x=1699393802;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GKyb1hV1vtUSZDqLnTgdX5n0+OXLN+juvNSKnK7I5Q0=;
-        b=mvi9YOFoVrN25PKuAi7HkjXAb3JLnbbHkrk07a3BkOPLRRboHXza9jCdbNbSMtzT0c
-         EvfIWc3F4EMsUhLanp2dgR6avpEKcPSIlc2hZYKxc/QsNAy+KWTZj1FLfP3Nrlcl+c9b
-         ZJumX5rnrB9eEJgqlvijvjXP2hcoDQbl2jNUW0dbhWdrNijJ2je4kc6+VpYAVV6+kh3O
-         CFfpsWuxn9sF49bVcp32WBJ2DRy8sUyKkTAtfwZXysV5hwex33oYnZiVqVhZjUrK2vra
-         F9kcWG44l0vzKm0JssZiK29BGS5xKtTs71kQMWmSyP9XMmCKjZd0I+t6JKustwinliI3
-         5UVg==
-X-Gm-Message-State: AOJu0Ywp7b6GogldZHcczWrR8ODfMInRuHOzbDZDJap2xbdofxTlcHQL
-	pSEfKGvI0EnVljAkJmqU7pWDFBfrMo2CT1QEcpcN6g==
-X-Google-Smtp-Source: AGHT+IFryCasodoGUQr+d/4GX14lqOug/C63+v0x+SVaHw1GimgEBCDcf3pc/kFUY3kFJsdoKLmo/dqwwMQDTEbCNHk=
-X-Received: by 2002:a5d:4fc9:0:b0:31f:9b4f:1910 with SMTP id
- h9-20020a5d4fc9000000b0031f9b4f1910mr9964196wrw.63.1698789002364; Tue, 31 Oct
- 2023 14:50:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F53A28;
+	Tue, 31 Oct 2023 22:20:46 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38AC2F3;
+	Tue, 31 Oct 2023 15:20:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=NfaUNK9Gnj3jV65G++Jz1u69ma76y4R62RU6zrUykfs=; b=B3fP9cX5+GEozlK4l6bigX6CuZ
+	lT42tJF+EPt9WJw7oBh4z+EYjqV7oH36njpu2YEbN9FbWoiy7sA3lDs8maIXRAukKSxNyCYOOrUwV
+	4geNMJlQWeM7PXdUsBgxX27DIxZIVyRgbxq5FfwS2KPJMik5q0mqRLzB5sO3FaELAgjQCpSMxTx2f
+	geSMoqnlkcrGbIwXXdT7cawzaVuTRqk9bronV7WiEnh1bcRvMIrB4xFkeoCZU63WVcK2583hlOt9g
+	DCgSPdOXP9nEh9nNtm9Zz7jZTI+Q+1//WfCZHt2lNGq0k7Yv/GnKA1M/imfWIfxOhgRatcCVlCnz/
+	shy3DGWg==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qxx60-000N13-Lj; Tue, 31 Oct 2023 23:20:24 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qxx5z-000GcY-Rd; Tue, 31 Oct 2023 23:20:23 +0100
+Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Peilin Ye <yepeilin.cs@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Cong Wang <cong.wang@bytedance.com>, Jiang Wang <jiang.wang@bytedance.com>,
+ Youlun Zhang <zhangyoulun@bytedance.com>
+References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
+ <20231027190254.GA88444@n191-129-154.byted.org>
+ <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
+ <20231028231135.GA2236124@n191-129-154.byted.org>
+ <94c88020-5282-c82b-8f88-a2d012444699@iogearbox.net>
+ <20231031125348.70fc975e@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <6d5cb0ef-fabc-7ca3-94b2-5b1925a6805f@iogearbox.net>
+Date: Tue, 31 Oct 2023 23:20:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
-In-Reply-To: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 31 Oct 2023 14:49:51 -0700
-Message-ID: <CAKwvOd=CsF8B2i6f6d95J=n3zAZ7P2+bddBGBt0st=Q-f-OniA@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
-	kuba@kernel.org, pabeni@redhat.com, trix@redhat.com, 0x7f454c46@gmail.com, 
-	fruggeri@arista.com, noureddine@arista.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231031125348.70fc975e@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27078/Tue Oct 31 08:41:25 2023)
 
-On Tue, Oct 31, 2023 at 1:23=E2=80=AFPM Nathan Chancellor <nathan@kernel.or=
-g> wrote:
->
-> Clang warns (or errors with CONFIG_WERROR=3Dy) when CONFIG_TCP_AO is set:
->
->   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement =
-is a C23 extension [-Werror,-Wc23-extensions]
->     663 |         }
->         |         ^
->   1 error generated.
->
-> On earlier releases (such as clang-11, the current minimum supported
-> version for building the kernel) that do not support C23, this was a
-> hard error unconditionally:
->
->   net/ipv4/tcp_output.c:663:2: error: expected statement
->           }
->           ^
->   1 error generated.
->
-> Add a semicolon after the label to create an empty statement, which
-> resolves the warning or error for all compilers.
->
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
-> Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+On 10/31/23 8:53 PM, Jakub Kicinski wrote:
+> On Mon, 30 Oct 2023 15:19:26 +0100 Daniel Borkmann wrote:
+>>> Since I didn't want to update host-veth's TX counters.  If we
+>>> bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
+>>> I think it means we've bypassed host-veth TX?
+>>
+>> Yes. So the idea is to transition to tstats replace the location where
+>> we used to bump lstats with tstat's tx counter, and only the peer redirect
+>> would bump the rx counter.. then upon stats traversal we fold the latter into
+>> the rx stats which was populated by the opposite's tx counters. Makes sense.
+>>
+>> OT: does cadvisor run inside the Pod to collect the device stats? Just
+>> curious how it gathers them.
+> 
+> Somewhat related - where does netkit count stats?
 
-Well, at least ISO fixed that in C23...I found it annoying. One day we
-might have nice things.  Thanks for the patch!
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Yeap, it needs it as well, I have a local branch here where I pushed all
+of it - coming out soon; I was planning to add some selftests in addition
+till end of this week:
 
-> ---
->  net/ipv4/tcp_output.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index f558c054cf6e..6064895daece 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -658,7 +658,7 @@ static void tcp_options_write(struct tcphdr *th, stru=
-ct tcp_sock *tp,
->                         memset(ptr, TCPOPT_NOP, sizeof(*ptr));
->                         ptr++;
->                 }
-> -out_ao:
-> +out_ao:;
->  #endif
->         }
->         if (unlikely(opts->mss)) {
->
-> ---
-> base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
-> change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9=
-978498
->
-> Best regards,
-> --
-> Nathan Chancellor <nathan@kernel.org>
->
+https://github.com/cilium/linux/commits/pr/ndo_peer
 
+>>>> Definitely no new stats ndo resp indirect call in fast path.
+>>>
+>>> Yeah, I think I'll put a comment saying that all devices that support
+>>> BPF_F_PEER must use tstats (or must use lstats), then.
+>>
+>> sgtm.
+> 
+> Is comment good enough? Can we try to do something more robust?
+> Move the allocation of stats into the core at registration based
+> on some u8 assigned in the driver? (I haven't looked at the code TBH)
+Hm, not sure. One thing that comes to mind is lazy one-time allocation
+like in case of netdev_core_stats_inc(), so whenever one of the helpers
+like dev_sw_netstats_{rx,tx}_add() are called and dev->tstats are still
+NULL, the core knows about the driver's intent, but tbh that doesn't
+feel overly clean and in case of netdev_core_stats_inc() it's more in
+the exception case rather than fast-path.
 
---=20
+Other option could be to have two small helpers in the core which then
+set a flag as well:
+
+static inline int netdev_tstats_alloc(struct net_device *dev)
+{
+	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+	if (!dev->tstats)
+		return -ENOMEM;
+	dev->priv_flags |= IFF_USES_TSTATS;
+	return 0;
+}
+
+static inline void netdev_tstats_free(struct net_device *dev)
+{
+	free_percpu(dev->tstats);
+}
+
+They can then be used from .ndo_init/uninit - not sure if this would
+be overall nicer.. or just leaving it at the .ndo callback comment for
+the time being until really more users show up (which I doubt tbh).
+
 Thanks,
-~Nick Desaulniers
+Daniel
 
