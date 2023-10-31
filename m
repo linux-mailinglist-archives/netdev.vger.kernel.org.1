@@ -1,228 +1,252 @@
-Return-Path: <netdev+bounces-45361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B34E7DC4C2
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 04:11:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B817DC4E3
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 04:35:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DF0F1C20B04
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 03:11:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4B681C20B04
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 03:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8939111A;
-	Tue, 31 Oct 2023 03:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC708ECD;
+	Tue, 31 Oct 2023 03:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ze9zyWDj"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="YcpsOHX6";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="s4jJX3oC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21061110C
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 03:11:23 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91FF8A6;
-	Mon, 30 Oct 2023 20:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698721881; x=1730257881;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FyWJ6RB0ywCmqvPSLSgs/2QhWwJnlGYUN1BYC20v9uA=;
-  b=Ze9zyWDj41yZ1x3B5xEidegEAbpaf4QQNJkbRRCNHoEb18MZ9/+5qony
-   Ea13fNz/RbXS5efUwid3TakFUqJ/Zwcja0DG1NJHC8FuJAWMXlRqjXTdz
-   hNpLxtgtKnEffwM+Ub4Fdq7Tn1q8FJ+6HVkxAlnGRMuSJY34HRaC+iI26
-   ogfk/LqPTy+VF3OXDbAQt4YtaifoNMk5VXOa9TjauqYfJThmZ2e4+Tt1c
-   5NpqDUdur3y8sxBGH8AsZg3GQI/UC/s51wOvuuHyEtTh/HstvRwk6iaDs
-   mKkK/ydoyJ6Xsl6iBSeZ7WdXJER2WdR1v3KSEL1WFh5QsMa3OPZE1/TRo
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="391080433"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="391080433"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2023 20:11:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10879"; a="754008546"
-X-IronPort-AV: E=Sophos;i="6.03,264,1694761200"; 
-   d="scan'208";a="754008546"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2023 20:11:20 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 30 Oct 2023 20:11:20 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 30 Oct 2023 20:11:20 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 30 Oct 2023 20:11:19 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 30 Oct 2023 20:11:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Iv9GcpUMZQ6OP7NBr2cS/uaTuhLvnl+IsV/Ho2EEbObR4lhehRpOiQ6L9d20ie5hxpmvu7kJjvXrcPjGTuWZ48ddvIqDonPMG1jUfsQbqt0MYRmeVpLUJbLay+ysgFOk3q8QQy1/LJk97udGwZHRPq+6Jo0strY4qaGrNVMtEOX6+3Q+77VQwACwQ4AtLQ7JwrjioRBSb8aXFWqy+U2S+hLdtdzYll1IePo0SHJE6eqzCsyDMprzxgQaQHYOQ0IIYzCyQJOW4h1ezOJICsFSv67eBTQZxx/Da1g3PXruX8YvhPFQgVwYD9MF4PCPIJSlPBycwGzTrLq7dAWz/21UBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FyWJ6RB0ywCmqvPSLSgs/2QhWwJnlGYUN1BYC20v9uA=;
- b=JCL9+h91g9zzwVg/IBp9Vukb5Nv2NkYRlR+/0ws1MwEhBfDaRhsFLzqzbrb0Uod6Xn3aTs7InyaUotbIXWoZgiRJ22Yeh/8EvetaSXaX3yljU1yqJXrzXHT0q37R1/w59zat8p4g9VXS+9APAvFIEjZCChUzoU7W/Gp3276OVGY+QYpJ5Yuud15v16SxXY6uJCLz2MpODrHEowGj9bc0dmZwKKdnd2HUdkFNDlzWlMcbGPikRsPjTNjTdu0MTQ0oD+dSOjdxJ2qeqqj/12MnubaP7AL/zge/YMFtdLZty4RlYq2pIyfOxyoPJyqQgD809ayHt4ku6kASKYze5ubsHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB3306.namprd11.prod.outlook.com (2603:10b6:5:5c::18) by
- BL3PR11MB6411.namprd11.prod.outlook.com (2603:10b6:208:3ba::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.29; Tue, 31 Oct 2023 03:11:12 +0000
-Received: from DM6PR11MB3306.namprd11.prod.outlook.com
- ([fe80::2126:3b64:585d:7da9]) by DM6PR11MB3306.namprd11.prod.outlook.com
- ([fe80::2126:3b64:585d:7da9%7]) with mapi id 15.20.6933.029; Tue, 31 Oct 2023
- 03:11:10 +0000
-From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-To: "Drewek, Wojciech" <wojciech.drewek@intel.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-CC: "Looi, Hong Aun" <hong.aun.looi@intel.com>, "Voon, Weifeng"
-	<weifeng.voon@intel.com>, "Song, Yoong Siang" <yoong.siang.song@intel.com>,
-	"Sit, Michael Wei Hong" <michael.wei.hong.sit@intel.com>
-Subject: RE: [PATCH net-next 1/1] net: stmmac: check CBS input values before
- configuration
-Thread-Topic: [PATCH net-next 1/1] net: stmmac: check CBS input values before
- configuration
-Thread-Index: AQHaCJzakEPiAidBQUW5oe8eW8MjxrBdaaCAgAXUTvA=
-Date: Tue, 31 Oct 2023 03:11:10 +0000
-Message-ID: <DM6PR11MB330631ACFA1BC5FCA1318D03B9A0A@DM6PR11MB3306.namprd11.prod.outlook.com>
-References: <20231027061114.3792619-1-yi.fang.gan@intel.com>
- <99233115-89ca-4ae8-8679-a16e1f959727@intel.com>
-In-Reply-To: <99233115-89ca-4ae8-8679-a16e1f959727@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB3306:EE_|BL3PR11MB6411:EE_
-x-ms-office365-filtering-correlation-id: 1c0b7579-2f11-484e-1b18-08dbd9bf082c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: aipRBJQhDwABdS9lcC563xqR7M+m60q/+5IFtUDIoz2B7hTAg7Ll6CZTNqI9ExOyO08ZBi6bhg6hWRvC6Dv5woQofGvFplflLb0uNBcG1EOWSP9084M4wWcybHY0wdvauBUoZhocZ21R/HpT3ln4OKe2G3T6z8X5N1JT8ENqQr27+vL7VoO7cZc8TqZjrzzMUAVMyxGEbzs0q76SX1XpKoN6wMI3Wy1e53GV1ZfG/AiZGd+GhNydTkJpS2eezIM4W5xhcKH2EkNlzTk5JeYL7w7tpR8NqRGurix0vtkq53mFjLnrIz0/N7QDlYZqkRWy0FPYbJcSkAIvJl/sWRchh/CxoWEfudnLT9GDZkH+HiMPPh0DhSpAO9wXScgq37zAY6h4dYWauYiE1wEL1a1ZzrrZQD2//jFH2d1hshZPAAVWZI5QoxqNKKZXHLtfxkDgfPqLKGpOTiwWaguwG7Ec+614mENcCqoLxJIy7lkgVitziqZ0maRidVcIkKjYJvmCaJs+0z8HHJggCPiOZnVmYDo26P09ke609EIAMqzkC2m8j+QDuHR/NamHonR126AYnU+Z7X3lUgkRsifZyDdwA/dxSQ7OdmG5WlXIv1SEBzd9LI5Bfza0n7FocLJMKxfPDSpmqiUM2C0HEwq50Yc7iA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3306.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(346002)(39860400002)(136003)(376002)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(55016003)(66946007)(76116006)(66446008)(66556008)(66476007)(64756008)(54906003)(110136005)(316002)(26005)(8936002)(8676002)(4326008)(52536014)(83380400001)(5660300002)(38100700002)(53546011)(478600001)(122000001)(82960400001)(33656002)(7696005)(6506007)(2906002)(9686003)(86362001)(71200400001)(921008)(38070700009)(41300700001)(107886003)(7416002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NDU3REtXSHlkK3NZTExFc3F6QThabnpNRzFNNUVsQVRFQ2Y0V3R3SHVPWVYv?=
- =?utf-8?B?bnJzamJFbWtYaGJub3B3V3FOUUY0dGp3bktCSGZ0SEFsTFFOd3REUHJ5TEtt?=
- =?utf-8?B?V2hueUN4bmRNRzBQNEZhMkhocVdteGdrZ3daaU40UjZFMzJWeitZNjNsSWtS?=
- =?utf-8?B?ajVscG5US0YvOUNHNkFoUzkwZEJMaWlkT2ovZ0p0NTE0THBQeXlKN3hxQnRu?=
- =?utf-8?B?WGlHeWo0QVovOW8weEpFN3hxRDN0bXAxT0ZPSWkxMWM3aGpBcmd2WDdWVmdp?=
- =?utf-8?B?THZUeXp5eDVXc0YvY09IOERHWW5RdUxrUjVOVXpqYkJBK2M0eklDMWptRmh1?=
- =?utf-8?B?YTBPNFNuMUhOeFoxUGtyYXRPWTNPcUp5RWZPNi9qN002c0Vla2g4aVFrOXdM?=
- =?utf-8?B?bnpMdWZXaW1mWHZNUFpzUm9XRHdoRmdVUS91dHZPRENocTBxOTNZWnVIV2g4?=
- =?utf-8?B?TXFsL3JMWEJoekFzOGpzOWZrNVlWT3hrUTBsVTI5VEowS3JHc3ZwczBncTNw?=
- =?utf-8?B?N3NTSGZQditVRWxKL1I2ZmdkL3lIdHpWT05EQzV0TzdURlpuNlZVZ2xlbFcr?=
- =?utf-8?B?aHpVMWN4V1BYejQ3K3QzOGQremhuanpzQ205TGQ0UkFzdVA1OFF1NUV0dnhX?=
- =?utf-8?B?bUNoZWxFdlRhdGlWSTM4blNzWDZsUnNMNlpXajdGYk9qNVRhdDJmUUFOU1JM?=
- =?utf-8?B?Q3FPL2U4TDRJQmJSVXRKWDRHYUtoVS9STEx3U1UybmY3ZDU2Y0FzSVk3OVJY?=
- =?utf-8?B?UXVkR3FtTGRIWWZTK2gxVmw2SkxULzZoRVJIcktrL2ZWeWR0VGlxcFRabHFU?=
- =?utf-8?B?Y1Brc29pTEpCekVWMWFJcm5zSjR1eHlqNTQwOUpyb1pXcjZlcUI1MjhQeWtT?=
- =?utf-8?B?czFsSjlMRXlVa0tZYUVLQ29lTU9SeGFvNzNRTFNNMjBlMGR5R0czSTEvKzVJ?=
- =?utf-8?B?OTJjQzZHd1pNbzZIS0VoeG95d1JsTHNiVHVVdmVaN0gzYU1RSHY0cUtvM2hP?=
- =?utf-8?B?TW1wclFGMEcyM0lFUXhQbEk3RjFwZks1RDR2UUhUUk83L1V6ZmF1VkN0MHFW?=
- =?utf-8?B?Q3A2VmpnQmRHV090bytrcnlGN2dMeGtpWFdNRkJPWHdneDVqdjVVTjdGWDBy?=
- =?utf-8?B?dWF3dkhUOG1oYlV2NjhGQ0NDTWpFOGlyNlVtaVBqcElsVE5ON2dNU0kzc0hL?=
- =?utf-8?B?M3ZoaVFmYUx5MHlxMllISW1xcldQT3VOSDJaNkFyYTQ3cW56V3N0ZG9ZV2JZ?=
- =?utf-8?B?b3lhOVVKa3hTNzRYZDJNWFlCc212dkQ5aEFtdnI5dzFNQk5iTUxJVmZXT3ZL?=
- =?utf-8?B?NVpjQXN5THh3eTVBcVlRdFhOQ1NyMGRUbXZYS0VSRnlwT3lYOUwyZUlhNHJN?=
- =?utf-8?B?SEtjSUpqUmZ3VVhVTmJWMTVSR2lCeko5aTg3cXUyMSt5cjNHS04vZ0grYS9i?=
- =?utf-8?B?NzgyeFZ6RUZ0QWlWVDJ4UTdjcWJ5SURORWl2eUlETTlmSEZXVnpiRVFMYWcz?=
- =?utf-8?B?eVVqTDBzOUJNRk5zRWMvYlBSY2lkaFlEOHBIMXFrVVZiZWkrdkVaUlBhc2Fw?=
- =?utf-8?B?SzFjWXloRWl6bGt5M0xYS2hNOW5palJtZllJVFNjUHNMSEx4NWUwbGN6bERl?=
- =?utf-8?B?TTRKMkVvY29TcDFZVG9LMWlzWkpzaElDMDUwS1ZGY2ZJbG5VbzRXMlFHNXNM?=
- =?utf-8?B?MjYwRkcxYVA5ZUkrYnhRc0RSQnQ5aFBnRDE2cmo2RVVqRGRaWlZ5eVpHc1VR?=
- =?utf-8?B?VGhjSVlrUk4reXgvRDRzZ0ZMZGxoVE1oSlM4VUsxNkZ3M3JWMzRieFFOUkRU?=
- =?utf-8?B?WjZXSVpIUzNwWjdCMHJsa01uU1lsYjloOTlBMnhXdS94elpsVks2anplOXJR?=
- =?utf-8?B?Q21jNHBSNFp3K3JBKzNhbzh1K016aHdycVF4ZlN2eEo3eTh2RlRlTFlOR0Ns?=
- =?utf-8?B?QVY2bldtRW5FWFQxTzk1M0Q2dGFaYmR1WmtJb0Z2V3dZUnBSbEQrZFc4cE1K?=
- =?utf-8?B?MTAxbHNXVXZRYWM3L2F4N0xWOVdkNnJXUDUrQmdqaGhxaUVoMEJnNGJTcWhu?=
- =?utf-8?B?MG42SXl0bVhiUXNLaHJKZGcvVE9kOURqNkw5eCs2NnppdmtSemoyYnhjYW16?=
- =?utf-8?Q?HUowgy0Ose+BKY0cR4ReYN1Ct?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C465663
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 03:35:31 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0A97C6;
+	Mon, 30 Oct 2023 20:35:28 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id EA4BD60173;
+	Tue, 31 Oct 2023 04:35:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1698723324; bh=iNtfxNB5pt2eCNNHJFfnKIbTVqU89Z6PVc3EJaMDuN8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YcpsOHX6tS3WnlRciLwR2cLukVL2s6JR5doHLpA1qMqN5EnJZ8D0JpvoMlk0yyW+t
+	 oEA5D+ROOTB1BwQkQHzs74ddJLmb4aGad8nKk0NLaGCKZmLTWBIX93k+ZUEqUcRVJu
+	 7RjQVO33OuBOQl7ScYh44d8v2N+9zUftC7d2TK/3r7/Zrutxz0Qwm3jVAVsvNYZDoj
+	 7a+N+pmbJghWKl+PczQUEcU7ApY4mB8EliHk/KKirNjmu+Bgt6DuPLhWbRqHaTe6y+
+	 1qRoyhIJvNTjlAD/xQyEzcIsXPJRaMfDA81DT2/Fi/TqfG9zuhOjlZKVLD8EyCqUn/
+	 YP3y6YAdy02LA==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id Sw94jxlZRWTT; Tue, 31 Oct 2023 04:35:21 +0100 (CET)
+Received: from [192.168.1.6] (78-3-40-166.adsl.net.t-com.hr [78.3.40.166])
+	by domac.alu.hr (Postfix) with ESMTPSA id EF9CF60171;
+	Tue, 31 Oct 2023 04:35:19 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1698723321; bh=iNtfxNB5pt2eCNNHJFfnKIbTVqU89Z6PVc3EJaMDuN8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s4jJX3oCn3a/bhmI5FUq8L0sdoKWz7PTg2N/WhftWsq9j6NdA1mJBk1uhIGBqsB9W
+	 zuYAu0QsZqru3o9LETWpnn8GuAXlcZtMhNeb9en/y/SlHt8uIyeZ6SGVrIhfA4mhqZ
+	 IzlYnPnEvRkxSpPhM8j6imf/J69EWiDn918SQxVDT+BxyBUBn/+wfD/qhd38ZDZ2hi
+	 l1NI+prPMnIoOwPPG7gETIIepGnw8wJtwtjX9pUHGyLU59fXFQ15kyn/tS4is6Pfa3
+	 UES8gWIQlsG/vptg+aj1uivn7Z08wpJIkEm066COozJuzXvEUT/lA7Lx4rosGEVkGL
+	 AlZgFvAJ3sX8Q==
+Message-ID: <11f59506-406a-463b-94c1-fe20246a102f@alu.unizg.hr>
+Date: Tue, 31 Oct 2023 04:35:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3306.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1c0b7579-2f11-484e-1b18-08dbd9bf082c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2023 03:11:10.1775
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CGH4vCvWF2McafFTtgIVrCBFra+BHKY7Ns9zJ0Jzd0H77MxYjo9a9X5aFMmMSpo9JBPbpy8BV2piSAhehi3E9w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6411
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/1] r8169: Coalesce RTL8411b PHY power-down recovery
+ programming instructions to reduce spinlock stalls
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marco Elver <elver@google.com>
+References: <20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr>
+ <376db5ae-1bb0-4682-b132-b9852be3c7aa@gmail.com>
+ <23428695-fcff-495b-ac43-07639b4f5d08@alu.unizg.hr>
+ <30e15e9a-d82e-4d24-be37-1b9d1534c082@gmail.com>
+ <9f99c3a4-2752-464b-b37d-58a4f8041804@alu.unizg.hr>
+ <bd4a59be-c393-4302-9d32-759e7cbfe255@lunn.ch>
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <bd4a59be-c393-4302-9d32-759e7cbfe255@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-SGksDQoNClZhbHVlIHplcm8gaXMgYWxsb3dlZC4gSSB3aWxsIHVwZGF0ZSBWMiB3aXRoIHRoZSBj
-b21taXQgbXNnIHVwZGF0ZWQuDQoNCkJlc3QgcmVnYXJkcywNCkdhbiBZaSBGYW5nDQoNCj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRHJld2VrLCBXb2pjaWVjaCA8d29qY2ll
-Y2guZHJld2VrQGludGVsLmNvbT4NCj4gU2VudDogRnJpZGF5LCBPY3RvYmVyIDI3LCAyMDIzIDY6
-MDggUE0NCj4gVG86IEdhbiwgWWkgRmFuZyA8eWkuZmFuZy5nYW5AaW50ZWwuY29tPjsgQWxleGFu
-ZHJlIFRvcmd1ZQ0KPiA8YWxleGFuZHJlLnRvcmd1ZUBmb3NzLnN0LmNvbT47IEpvc2UgQWJyZXUg
-PGpvYWJyZXVAc3lub3BzeXMuY29tPjsNCj4gRGF2aWQgUyAuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1s
-b2Z0Lm5ldD47IEVyaWMgRHVtYXpldA0KPiA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47IEpha3ViIEtp
-Y2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBQYW9sbyBBYmVuaQ0KPiA8cGFiZW5pQHJlZGhhdC5j
-b20+OyBNYXhpbWUgQ29xdWVsaW4gPG1jb3F1ZWxpbi5zdG0zMkBnbWFpbC5jb20+Ow0KPiBuZXRk
-ZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1zdG0zMkBzdC1tZC1tYWlsbWFuLnN0b3JtcmVwbHku
-Y29tOyBsaW51eC0NCj4gYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC1rZXJu
-ZWxAdmdlci5rZXJuZWwub3JnDQo+IENjOiBMb29pLCBIb25nIEF1biA8aG9uZy5hdW4ubG9vaUBp
-bnRlbC5jb20+OyBWb29uLCBXZWlmZW5nDQo+IDx3ZWlmZW5nLnZvb25AaW50ZWwuY29tPjsgU29u
-ZywgWW9vbmcgU2lhbmcNCj4gPHlvb25nLnNpYW5nLnNvbmdAaW50ZWwuY29tPjsgU2l0LCBNaWNo
-YWVsIFdlaSBIb25nDQo+IDxtaWNoYWVsLndlaS5ob25nLnNpdEBpbnRlbC5jb20+DQo+IFN1Ympl
-Y3Q6IFJlOiBbUEFUQ0ggbmV0LW5leHQgMS8xXSBuZXQ6IHN0bW1hYzogY2hlY2sgQ0JTIGlucHV0
-IHZhbHVlcyBiZWZvcmUNCj4gY29uZmlndXJhdGlvbg0KPiANCj4gDQo+IA0KPiBPbiAyNy4xMC4y
-MDIzIDA4OjExLCBHYW4gWWkgRmFuZyB3cm90ZToNCj4gPiBGcm9tOiBNaWNoYWVsIFNpdCBXZWkg
-SG9uZyA8bWljaGFlbC53ZWkuaG9uZy5zaXRAaW50ZWwuY29tPg0KPiA+DQo+ID4gQWRkIGNoZWNr
-IGZvciBiZWxvdyBjb25kaXRpb25zIGJlZm9yZSBwcm9jZWVkaW5nIHRvIGNvbmZpZ3VyYXRpb24u
-DQo+ID4gQSBtZXNzYWdlIHdpbGwgYmUgcHJvbXB0ZWQgaWYgdGhlIGlucHV0IHZhbHVlIGlzIGlu
-dmFsaWQuDQo+ID4NCj4gPiBJZGxlc2xvcGUgbWludXMgc2VuZHNsb3BlIHNob3VsZCBlcXVhbCBz
-cGVlZF9kaXYuDQo+ID4gSWRsZXNsb3BlIGlzIGFsd2F5cyBhIHBvc2l0aXZlIHZhbHVlLg0KPiA+
-IFNlbmRzbG9wZSBpcyBhbHdheXMgYSBuZWdhdGl2ZSB2YWx1ZS4NCj4gPiBIaWNyZWRpdCBpcyBh
-bHdheXMgYSBwb3NpdGl2ZSB2YWx1ZS4NCj4gPiBMb2NyZWRpdCBpcyBhbHdheXMgYSBuZWdhdGl2
-ZSB2YWx1ZS4NCj4gDQo+IENhbiB0aG9zZSB2YWx1ZXMgYmUgZXF1YWwgdG8gMD8gVGhlIGNvZGUg
-YWxsb3dzIGl0IGJ1dCB0aGUgY29tbWl0IG1zZw0KPiBkb2Vzbid0IG1lbnRpb24gdGhhdC4NCj4g
-U29tZSBkcml2ZXJzIGRvZXMgbm90IGFsbG93IDAsIGxhbjk2NnhfY2JzX2FkZCBlLmcuIFdvdWxk
-IGJlIGdvb2QgdG8NCj4gZG91YmxlIGNoZWNrIHRoYXQuDQo+IA0KPiA+DQo+ID4gU2lnbmVkLW9m
-Zi1ieTogTWljaGFlbCBTaXQgV2VpIEhvbmcgPG1pY2hhZWwud2VpLmhvbmcuc2l0QGludGVsLmNv
-bT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHYW4sIFlpIEZhbmcgPHlpLmZhbmcuZ2FuQGludGVsLmNv
-bT4NCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3Rt
-bWFjX3RjLmMgfCA1ICsrKysrDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCA1IGluc2VydGlvbnMoKykN
-Cj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1h
-Yy9zdG1tYWNfdGMuYw0KPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L3N0bWljcm8vc3RtbWFjL3N0
-bW1hY190Yy5jDQo+ID4gaW5kZXggYWM0MWVmNGNiZDJmLi5lOGEwNzk5NDZmODQgMTAwNjQ0DQo+
-ID4gLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvc3RtaWNyby9zdG1tYWMvc3RtbWFjX3RjLmMN
-Cj4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9zdG1pY3JvL3N0bW1hYy9zdG1tYWNfdGMu
-Yw0KPiA+IEBAIC0zODEsNiArMzgxLDExIEBAIHN0YXRpYyBpbnQgdGNfc2V0dXBfY2JzKHN0cnVj
-dCBzdG1tYWNfcHJpdiAqcHJpdiwNCj4gPiAgCQlyZXR1cm4gLUVPUE5PVFNVUFA7DQo+ID4gIAl9
-DQo+ID4NCj4gPiArCWlmICgocW9wdC0+aWRsZXNsb3BlIC0gcW9wdC0+c2VuZHNsb3BlICE9IHNw
-ZWVkX2RpdikgfHwNCj4gPiArCSAgICBxb3B0LT5pZGxlc2xvcGUgPCAwIHx8IHFvcHQtPnNlbmRz
-bG9wZSA+IDAgfHwNCj4gPiArCSAgICBxb3B0LT5oaWNyZWRpdCA8IDAgfHwgcW9wdC0+bG9jcmVk
-aXQgPiAwKQ0KPiA+ICsJCXJldHVybiAtRUlOVkFMOw0KPiA+ICsNCj4gPiAgCW1vZGVfdG9fdXNl
-ID0gcHJpdi0+cGxhdC0+dHhfcXVldWVzX2NmZ1txdWV1ZV0ubW9kZV90b191c2U7DQo+ID4gIAlp
-ZiAobW9kZV90b191c2UgPT0gTVRMX1FVRVVFX0RDQiAmJiBxb3B0LT5lbmFibGUpIHsNCj4gPiAg
-CQlyZXQgPSBzdG1tYWNfZG1hX3Ftb2RlKHByaXYsIHByaXYtPmlvYWRkciwgcXVldWUsDQo+IE1U
-TF9RVUVVRV9BVkIpOw0K
+On 10/31/23 02:21, Andrew Lunn wrote:
+>> I will not contradict, but the cummulative amount of memory barriers on each MMIO read/write
+>> in each single one of the drivers could amount to some degrading of overall performance and
+>> latency in a multicore system.
+> 
+> For optimisations, we like to see benchmark results which show some
+> improvements. Do you have any numbers?
+
+Hi, Andrew,
+
+Thank you for your interest in RTL NIC driver optimisations.
+
+My knowledge about the timing costs of synchronisation is mostly theoretical.
+
+By the table below, the cost of LOCK CHPXCHG m,616/32/64 is 52 cycles (in case the
+memory location is already in the L3 cache I suppose, cache miss can makes things worse,
+but we are hitting the same lock repeatedly).
+
+So, we have (in the best case) 52 clocks for lock, 52 for unlock (for the uncontentended
+case).
+
+This means 104 cycle x 130 sequential lock+unlock pairs = 13520 clk ~ 3.38 us on a 4 GHz
+machine (5.633 us on a 2.4 GHz CPU) while the multicore system does nothing but locking
+and unclocking after therecovery from the loss of PHY.
+
+We are talking about the RTl8411b.
+
+The other case it the rather new 8125/8125b.
+
+     static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+     {
+         rtl_pcie_state_l2l3_disable(tp);
+
+         RTL_W16(tp, 0x382, 0x221b);
+         RTL_W8(tp, 0x4500, 0);
+         RTL_W16(tp, 0x4800, 0);
+
+         /* disable UPS */
+         r8168_mac_ocp_modify(tp, 0xd40a, 0x0010, 0x0000);
+
+         RTL_W8(tp, Config1, RTL_R8(tp, Config1) & ~0x10);
+
+         r8168_mac_ocp_write(tp, 0xc140, 0xffff);
+         r8168_mac_ocp_write(tp, 0xc142, 0xffff);
+
+         r8168_mac_ocp_modify(tp, 0xd3e2, 0x0fff, 0x03a9);
+         r8168_mac_ocp_modify(tp, 0xd3e4, 0x00ff, 0x0000);
+         r8168_mac_ocp_modify(tp, 0xe860, 0x0000, 0x0080);
+
+         /* disable new tx descriptor format */
+         r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
+
+         if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+                 r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0200);
+         else
+                 r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
+
+         if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+                 r8168_mac_ocp_modify(tp, 0xe63e, 0x0c30, 0x0000);
+         else
+                 r8168_mac_ocp_modify(tp, 0xe63e, 0x0c30, 0x0020);
+
+         r8168_mac_ocp_modify(tp, 0xc0b4, 0x0000, 0x000c);
+         r8168_mac_ocp_modify(tp, 0xeb6a, 0x00ff, 0x0033);
+         r8168_mac_ocp_modify(tp, 0xeb50, 0x03e0, 0x0040);
+         r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
+         r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
+         r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
+         r8168_mac_ocp_modify(tp, 0xe0c0, 0x4f0f, 0x4403);
+         r8168_mac_ocp_modify(tp, 0xe052, 0x0080, 0x0068);
+         r8168_mac_ocp_modify(tp, 0xd430, 0x0fff, 0x047f);
+
+         r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
+         r8168_mac_ocp_modify(tp, 0xeb54, 0x0000, 0x0001);
+         udelay(1);
+         r8168_mac_ocp_modify(tp, 0xeb54, 0x0001, 0x0000);
+         RTL_W16(tp, 0x1880, RTL_R16(tp, 0x1880) & ~0x0030);
+
+         r8168_mac_ocp_write(tp, 0xe098, 0xc302);
+
+         rtl_loop_wait_low(tp, &rtl_mac_ocp_e00e_cond, 1000, 10);
+
+         if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+                 rtl8125b_config_eee_mac(tp);
+         else
+                 rtl8125a_config_eee_mac(tp);
+
+         rtl_disable_rxdvgate(tp);
+    }
+
+There are 22 calls to mac ocp write/modify, each having a raw_spin_lock_irqsave()/
+raw_spin_unlock_irqrestore() pair.
+
+The minimal timing cost is 22x104 = 2288 cycles or a total of 0.572 us on a 4 GHz CPU,
+preventing all cores from the memory access. (0.953 us on a 2.4 GHz system).
+
+This does happen only at the startup apparently, but also at each rtl_reset_work(tp)
+and rtl8169_up(tp), rtl_open() at driver load, and rtl8169_runtime_resume() called by
+the rtl8169_resume().
+
+The revised version does only 2 pairs of raw_spin_lock_irqsave()/
+raw_sping_unlock_irqrestore(), but I admit it might be harder to read and maintain.
+
+My knowledge of the Linux kernel network stack isn't that deep, and I can't tell how
+often rtl8169_resume() is called in real life and how to reproduce and benchmark that
+call.
+
+This is a sort of a "loophole optimisation", I don't have the numbers on the impact
+on the entire Linux on i.e. 16 core/32 threads Ryzen 9 7950X CPU.
+
+Probably things would be worse on a 64 core CPU, because the 5.633 us and 0.953 us
+would have to be multiplied by the number of blocked cores, amounting to estimated
+total CPU cost of 360 us and 61 us respectively. Per NIC reset.
+
+However, I am relatively new to the r8169 driver, I came across while analysing
+KCSAN reports since the beginning of August. So ATM I don't have any benchmarks
+to confirm the theoretical findings.
+
+I realise that maintainers have to cherry pick patches or the kernel of +35M lines
+would become way too cluttered and unmaintainable.
+
+NOTE: The numbers are only valid for a x86_64 system.
+
+Regards,
+Mirsad
+
+SOURCE AND REFERENCES:
+
+Synchronization (Source: [1])
+===============================================
+instruction	operands	ops	latency			
+===============================================	
+LOCK ADD 	m,r		1	 ~55
+XADD 		m,r		4	 10
+LOCK XADD 	m,r 		4	 ~51
+CMPXCHG 	m8,r8		5	 15
+LOCK CMPXCHG 	m8,r8		5	 ~51
+CMPXCHG 	m,r16/32/64	6	 14
+LOCK CMPXCHG 	m,r16/32/64	6	 ~52
+CMPXCHG8B 	m64		18	 15
+LOCK CMPXCHG8B 	m64		18	 ~53
+CMPXCHG16B 	m128		22	 52
+LOCK CMPXCHG16B m128		22	 ~94
+===============================================
+
+Explanation of column headings:
+Instruction:
+	Instruction name. cc means any condition code. For example, Jcc can be JB, JNE,
+	etc.
+
+Operands:
+	i = immediate constant, r = any register, r32 = 32-bit register, etc., mm = 64 bit
+	mmx register, x = 128 bit xmm register, y = 256 bit ymm register, m = any memory
+	operand including indirect operands, m64 means 64-bit memory operand, etc.
+Ops:
+	Number of macro-operations issued from instruction decoder to schedulers. In-
+	structions with more than 2 macro-operations use microcode.
+Latency:
+	This is the delay that the instruction generates in a dependency chain. The num-
+	bers are minimum values. Cache misses, misalignment, and exceptions may in-
+	crease the clock counts considerably. Floating point operands are presumed to be
+	normal numbers. Denormal numbers, NAN's, infinity and exceptions increase the
+	delays. The latency listed does not include the memory operand where the listing
+	for register and memory operand are joined (r/m).
+
+[1] TL;DR https://www.agner.org/optimize/instruction_tables.pdf
+[2] TL;DR http://www.rdrop.com/users/paulmck/scalability/paper/whymb.2010.07.23a.pdf
+
 
