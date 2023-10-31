@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-45495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC8E17DD931
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 00:18:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179707DD947
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 00:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E89281288
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:18:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 427B5B20E1C
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9157827468;
-	Tue, 31 Oct 2023 23:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065322747D;
+	Tue, 31 Oct 2023 23:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KlHV/fJ0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOsagdkd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EC81DFCD
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 23:18:18 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C090B9
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 16:18:17 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39VNHMij024026;
-	Tue, 31 Oct 2023 23:18:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=U192Vdp1edkllngGm6yPyW2+sNEHHgHznX9yvP9PDEg=;
- b=KlHV/fJ0DsuBUHK/BnTlpKitUvidb7bfdznhJyULeSPdMgkYdO9woaOpJTrHZMUXm4jQ
- x8DKryE41tqufwN4Izs7pRhFHDLYYmsz1h3+75yknNnDxHAgBYTWobzOycVwCdlXE0G8
- fGlGnb8D96UI63Jl3Lh8sTtqFMXYac8SXOkNxqmOaL12emRWWgDT/wYrUnYQHaKKMR55
- ltdE7rh14xLqhYhsZMQzdB+l1D8/V+PQfUvo3SKWLtKDkf569KS2n7JEjYdoPz0Qo9ex
- MY7xjXs9WlX/WPbhsjTjQY6eqhKDYB4whOFkHIkOftJsnBgXkSxDvstKJupXU6CvMg6f dQ== 
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u3b4a80e9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 31 Oct 2023 23:18:15 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 39VKo27e007681;
-	Tue, 31 Oct 2023 23:18:14 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1dmnm2d2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 31 Oct 2023 23:18:14 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 39VNIDnL2622168
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 31 Oct 2023 23:18:13 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8189D5803F;
-	Tue, 31 Oct 2023 23:18:13 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 55EA45805A;
-	Tue, 31 Oct 2023 23:18:13 +0000 (GMT)
-Received: from [9.41.99.4] (unknown [9.41.99.4])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 31 Oct 2023 23:18:13 +0000 (GMT)
-Message-ID: <6852b406-1301-4570-b448-6fd58694d219@linux.vnet.ibm.com>
-Date: Tue, 31 Oct 2023 18:18:14 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E41712E4A;
+	Tue, 31 Oct 2023 23:34:55 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C09C0FE;
+	Tue, 31 Oct 2023 16:34:53 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-5a7c011e113so65558337b3.1;
+        Tue, 31 Oct 2023 16:34:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698795293; x=1699400093; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YdvQw2Qs5SO7hTUQEBkbdcD6QXRGZAvvMCZ6134eAuA=;
+        b=EOsagdkdivwizqsL/a58qmycP264ff+qv0cx0P8OCd0pOdYgSjbXm6l14nacaU2/3w
+         TOaz+9EUfmbXzFZ4kpBLOlBhxnTcpCrWnEfygzruKpsAS1qj92Ns8gLl7LheUIN8k8R9
+         AdJFhk+AehTxpPahsNrZNwuK810Bl3gb7+MqxZ8IcZzDGamAkfPbGzzPAmS5BwWrO4ln
+         mOU2YyBMv0Kk3jornnK04GTsrTRJU8gjEiMZ7tF3cD2I7YQY9E1V7fixhWBKCu3bHwQU
+         ZpCW3gWBvpvp3M2ci4hCqILZx8CJLzgj+pQdeYtTXEDHmtcznVsAaHXzLykKWLMaV88w
+         AhJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698795293; x=1699400093;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YdvQw2Qs5SO7hTUQEBkbdcD6QXRGZAvvMCZ6134eAuA=;
+        b=pYAOVSc2Z8a8ezK2xaAD5DsQwrM0yb7DID1LquIXE9T1kUDV9v2Vaz3oKqLpNHQSxj
+         oYU/R89S8/xszphaoB0SKmMif2g0fpL26KSw+4h8J92dW8LSKbHF5TxmmVATF4jHh2Na
+         1s9mNIyqLue7cutUMytWK0nEttq7tJtQAhxesfSept4eiZCDkcW7Ad78hBs/znJjrrAp
+         Jy6zJeznJHi4pszawaVEKIdVwird8nkryZ7NEXCSARIazA5k3m10G/KNyvAgqW2tLFBs
+         PRa7YLlMzrpMNWXec9mwc3qCaFh2auXJF3EsDQevt/uF6iLdHW3z+qdFZckbL6qcegel
+         6c5A==
+X-Gm-Message-State: AOJu0YzGIVnOhj5pMfCAG4F46Pr7VRH4Aty4pkH80SJKrHmT3xCizfQw
+	WaLT0fS3LL5CPqBg3ymjmsQ=
+X-Google-Smtp-Source: AGHT+IH+lNZaDt2v39EJR+H/df+qNXo2TwAma0F6La4CT/BkKlgRTvnfoygszAxH4Fpar5Mri2WfMw==
+X-Received: by 2002:a81:c64b:0:b0:578:5e60:dcc9 with SMTP id q11-20020a81c64b000000b005785e60dcc9mr13190088ywj.10.1698795292709;
+        Tue, 31 Oct 2023 16:34:52 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:ac50:f3c6:2a0c:d29? ([2600:1700:6cf8:1240:ac50:f3c6:2a0c:d29])
+        by smtp.gmail.com with ESMTPSA id u77-20020a818450000000b0059f4f30a32bsm1471379ywf.24.2023.10.31.16.34.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Oct 2023 16:34:52 -0700 (PDT)
+Message-ID: <10f383a2-c83b-4a40-a1f9-bcf33c76c164@gmail.com>
+Date: Tue, 31 Oct 2023 16:34:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,52 +67,304 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/tg3: fix race condition in tg3_reset_task_cancel()
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com,
-        mchan@broadcom.com, drc@linux.vnet.ibm.com,
-        Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
-References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
- <CALs4sv1-aw8UgXNOcAJOc5NdrGqjsgLhTBzx7bn0GxUZ072e6Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v8 07/10] bpf, net: switch to dynamic
+ registration
 Content-Language: en-US
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-In-Reply-To: <CALs4sv1-aw8UgXNOcAJOc5NdrGqjsgLhTBzx7bn0GxUZ072e6Q@mail.gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, thinker.li@gmail.com
+Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
+ drosen@google.com
+References: <20231030192810.382942-1-thinker.li@gmail.com>
+ <20231030192810.382942-8-thinker.li@gmail.com>
+ <183fd964-8910-b7e6-436a-f5f82c2bafb0@linux.dev>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <183fd964-8910-b7e6-436a-f5f82c2bafb0@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Bbpxklsxkm2PIMhikiFe5wTNKY7Wj7KM
-X-Proofpoint-ORIG-GUID: Bbpxklsxkm2PIMhikiFe5wTNKY7Wj7KM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-31_10,2023-10-31_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 clxscore=1011 adultscore=0 spamscore=0
- bulkscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2310310193
+Content-Transfer-Encoding: 8bit
 
-Thanks for the review and I apologize for the delayed response. I had 
-some trouble accessing the system, which delayed my investigation.
 
-On 10/2/2023 11:34 PM, Pavan Chebbi wrote:
+
+On 10/30/23 23:36, Martin KaFai Lau wrote:
+> On 10/30/23 12:28 PM, thinker.li@gmail.com wrote:
+>> From: Kui-Feng Lee <thinker.li@gmail.com>
+>>
+>> Replace the static list of struct_ops types with per-btf 
+>> struct_ops_tab to
+>> enable dynamic registration.
+>>
+>> Both bpf_dummy_ops and bpf_tcp_ca now utilize the registration function
+>> instead of being listed in bpf_struct_ops_types.h.
+>>
+>> Cc: netdev@vger.kernel.org
+>> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
+>> ---
+>>   include/linux/bpf.h               |  36 ++++++--
+>>   include/linux/btf.h               |   5 +-
+>>   kernel/bpf/bpf_struct_ops.c       | 140 +++++++++---------------------
+>>   kernel/bpf/bpf_struct_ops_types.h |  12 ---
+>>   kernel/bpf/btf.c                  |  41 ++++++++-
+>>   net/bpf/bpf_dummy_struct_ops.c    |  14 ++-
+>>   net/ipv4/bpf_tcp_ca.c             |  16 +++-
+>>   7 files changed, 140 insertions(+), 124 deletions(-)
+>>   delete mode 100644 kernel/bpf/bpf_struct_ops_types.h
+>>
+>> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+>> index c993df3cf699..9d7105ff06db 100644
+>> --- a/include/linux/bpf.h
+>> +++ b/include/linux/bpf.h
+>> @@ -1644,7 +1644,6 @@ struct bpf_struct_ops_desc {
+>>   #if defined(CONFIG_BPF_JIT) && defined(CONFIG_BPF_SYSCALL)
+>>   #define BPF_MODULE_OWNER ((void *)((0xeB9FUL << 2) + 
+>> POISON_POINTER_DELTA))
+>>   const struct bpf_struct_ops_desc *bpf_struct_ops_find(struct btf 
+>> *btf, u32 type_id);
+>> -void bpf_struct_ops_init(struct btf *btf, struct bpf_verifier_log *log);
+>>   bool bpf_struct_ops_get(const void *kdata);
+>>   void bpf_struct_ops_put(const void *kdata);
+>>   int bpf_struct_ops_map_sys_lookup_elem(struct bpf_map *map, void *key,
+>> @@ -1690,10 +1689,6 @@ static inline const struct bpf_struct_ops_desc 
+>> *bpf_struct_ops_find(struct btf *
+>>   {
+>>       return NULL;
+>>   }
+>> -static inline void bpf_struct_ops_init(struct btf *btf,
+>> -                       struct bpf_verifier_log *log)
+>> -{
+>> -}
+>>   static inline bool bpf_try_module_get(const void *data, struct 
+>> module *owner)
+>>   {
+>>       return try_module_get(owner);
+>> @@ -3232,4 +3227,35 @@ static inline bool bpf_is_subprog(const struct 
+>> bpf_prog *prog)
+>>       return prog->aux->func_idx != 0;
+>>   }
+>> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops);
+>> +
+>> +enum bpf_struct_ops_state {
+>> +    BPF_STRUCT_OPS_STATE_INIT,
+>> +    BPF_STRUCT_OPS_STATE_INUSE,
+>> +    BPF_STRUCT_OPS_STATE_TOBEFREE,
+>> +    BPF_STRUCT_OPS_STATE_READY,
+>> +};
+>> +
+>> +struct bpf_struct_ops_common_value {
+>> +    refcount_t refcnt;
+>> +    enum bpf_struct_ops_state state;
+>> +};
+>> +
+>> +/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
+>> + * the map's value exposed to the userspace and its btf-type-id is
+>> + * stored at the map->btf_vmlinux_value_type_id.
+>> + *
+>> + */
+>> +#define DEFINE_STRUCT_OPS_VALUE_TYPE(_name)            \
+>> +extern struct bpf_struct_ops bpf_##_name;            \
+>> +                                \
+>> +struct bpf_struct_ops_##_name {                    \
+>> +    struct bpf_struct_ops_common_value common;        \
+>> +    struct _name data ____cacheline_aligned_in_smp;        \
+>> +}
+>> +
+>> +extern int bpf_struct_ops_init(struct bpf_struct_ops_desc *st_ops_desc,
+>> +                   struct btf *btf,
+>> +                   struct bpf_verifier_log *log);
+>> +
+>>   #endif /* _LINUX_BPF_H */
+>> diff --git a/include/linux/btf.h b/include/linux/btf.h
+>> index a8813605f2f6..954536431e0b 100644
+>> --- a/include/linux/btf.h
+>> +++ b/include/linux/btf.h
+>> @@ -12,6 +12,8 @@
+>>   #include <uapi/linux/bpf.h>
+>>   #define BTF_TYPE_EMIT(type) ((void)(type *)0)
+>> +#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type *)0);    \
 > 
-> Can you elaborate on the race condition please? Are you saying
-> tg3_reset_task_cancel() cleared the flag and tg3_tx_recover() set it
-> again and the reset task never got a chance to run?
-> Is that what is leading to TX stall?
+> ((void)(struct type *)0); is new. Why is it needed?
 
-This code path only triggered once, and after updating both the system 
-and adapter firmware, I haven't encountered it again. However, the race 
-condition issue still persists, causing the interfaces to go down.
+This is a trick of BTF to force compiler generate type info for
+the given type. Without trick, compiler may skip these types if these
+type are not used at all in the module.  For example, modules usually
+don't use value types of struct_ops directly.
 
-Implementing the memory barrier, smp_mb__after_atomic(), as suggested by 
-Michael Chan, the intermittent problem still persists. Upon closer 
-investigation, I identified the root cause, details in the next version 
-of the patch. When I commented out the call to the tg3_dump_state() 
-function in the tg3_tx_timeout() function, the issue occurred quicker.
+> 
+>> +        ((void)(struct bpf_struct_ops_##type *)0); }
+>>   #define BTF_TYPE_EMIT_ENUM(enum_val) ((void)enum_val)
+>>   /* These need to be macros, as the expressions are used in assembler 
+>> input */
+>> @@ -201,6 +203,7 @@ u32 btf_obj_id(const struct btf *btf);
+>>   bool btf_is_kernel(const struct btf *btf);
+>>   bool btf_is_module(const struct btf *btf);
+>>   struct module *btf_try_get_module(const struct btf *btf);
+>> +struct btf *btf_get_module_btf(const struct module *module);
+>>   u32 btf_nr_types(const struct btf *btf);
+>>   bool btf_member_is_reg_int(const struct btf *btf, const struct 
+>> btf_type *s,
+>>                  const struct btf_member *m,
+>> @@ -575,8 +578,6 @@ static inline bool btf_type_is_struct_ptr(struct 
+>> btf *btf, const struct btf_type
+>>   struct bpf_struct_ops;
+>>   struct bpf_struct_ops_desc;
+>> -struct bpf_struct_ops_desc *
+>> -btf_add_struct_ops(struct btf *btf, struct bpf_struct_ops *st_ops);
+>>   const struct bpf_struct_ops_desc *
+>>   btf_get_struct_ops(struct btf *btf, u32 *ret_cnt);
+>> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
+>> index db2bbba50e38..f3ec72be9c63 100644
+>> --- a/kernel/bpf/bpf_struct_ops.c
+>> +++ b/kernel/bpf/bpf_struct_ops.c
+>> @@ -13,21 +13,8 @@
+>>   #include <linux/btf_ids.h>
+>>   #include <linux/rcupdate_wait.h>
+>> -enum bpf_struct_ops_state {
+>> -    BPF_STRUCT_OPS_STATE_INIT,
+>> -    BPF_STRUCT_OPS_STATE_INUSE,
+>> -    BPF_STRUCT_OPS_STATE_TOBEFREE,
+>> -    BPF_STRUCT_OPS_STATE_READY,
+>> -};
+>> -
+>> -struct bpf_struct_ops_common_value {
+>> -    refcount_t refcnt;
+>> -    enum bpf_struct_ops_state state;
+>> -};
+>> -#define BPF_STRUCT_OPS_COMMON_VALUE struct 
+>> bpf_struct_ops_common_value common
+>> -
+>>   struct bpf_struct_ops_value {
+>> -    BPF_STRUCT_OPS_COMMON_VALUE;
+>> +    struct bpf_struct_ops_common_value common;
+> 
+> This cleanup is good. It should have been done together in patch 5 
+> instead when refcnt and state were grouped into a new 'struct 
+> bpf_struct_ops_common_value'.
 
-I'm working on submitting the v2 of the patch.
+Got it!
 
-Regards,
-Thinh Tran
+> 
+>>       char data[] ____cacheline_aligned_in_smp;
+>>   };
+>> @@ -72,35 +59,6 @@ static DEFINE_MUTEX(update_mutex);
+>>   #define VALUE_PREFIX "bpf_struct_ops_"
+>>   #define VALUE_PREFIX_LEN (sizeof(VALUE_PREFIX) - 1)
+>> -/* bpf_struct_ops_##_name (e.g. bpf_struct_ops_tcp_congestion_ops) is
+>> - * the map's value exposed to the userspace and its btf-type-id is
+>> - * stored at the map->btf_vmlinux_value_type_id.
+>> - *
+>> - */
+>> -#define BPF_STRUCT_OPS_TYPE(_name)                \
+>> -extern struct bpf_struct_ops bpf_##_name;            \
+>> -                                \
+>> -struct bpf_struct_ops_##_name {                        \
+>> -    BPF_STRUCT_OPS_COMMON_VALUE;                \
+>> -    struct _name data ____cacheline_aligned_in_smp;        \
+>> -};
+>> -#include "bpf_struct_ops_types.h"
+>> -#undef BPF_STRUCT_OPS_TYPE
+>> -
+>> -enum {
+>> -#define BPF_STRUCT_OPS_TYPE(_name) BPF_STRUCT_OPS_TYPE_##_name,
+>> -#include "bpf_struct_ops_types.h"
+>> -#undef BPF_STRUCT_OPS_TYPE
+>> -    __NR_BPF_STRUCT_OPS_TYPE,
+>> -};
+>> -
+>> -static struct bpf_struct_ops_desc bpf_struct_ops[] = {
+>> -#define BPF_STRUCT_OPS_TYPE(_name)                \
+>> -    [BPF_STRUCT_OPS_TYPE_##_name] = { .st_ops = &bpf_##_name },
+>> -#include "bpf_struct_ops_types.h"
+>> -#undef BPF_STRUCT_OPS_TYPE
+>> -};
+>> -
+>>   const struct bpf_verifier_ops bpf_struct_ops_verifier_ops = {
+>>   };
+>> @@ -110,13 +68,22 @@ const struct bpf_prog_ops bpf_struct_ops_prog_ops 
+>> = {
+>>   #endif
+>>   };
+>> -static const struct btf_type *module_type;
+>> -static const struct btf_type *common_value_type;
+>> +BTF_ID_LIST(st_ops_ids)
+>> +BTF_ID(struct, module)
+>> +BTF_ID(struct, bpf_struct_ops_common_value)
+> 
+> This should have been done in a separated patch immediately after patch 
+> 1. The patch 7 has unrelated changes/cleanups like this and the above 
+> BPF_STRUCT_OPS_COMMON_VALUE which could have been done earlier as 
+> preparation patches instead of packing them together with the main 
+> change here: "switch to dynamic registration". The commit message for 
+> the BTF_ID_LIST changes could be like: "A preparation to completely 
+> retire the bpf_struct_ops_init() function in the latter patch...".
+> 
+
+Got it!
+
+>> +
+>> +enum {
+>> +    idx_module_id,
+>> +    idx_st_ops_common_value_id,
+> 
+> nit. upper case to stay consistent with other similar usages.
+> 
+
+>> +};
+>> +
+> 
+> [ ... ]
+> 
+>> +int register_bpf_struct_ops(struct bpf_struct_ops *st_ops)
+>> +{
+>> +    struct bpf_struct_ops_desc *desc;
+>> +    struct bpf_verifier_log *log;
+>> +    struct btf *btf;
+>> +    int err = 0;
+>> +
+>> +    if (st_ops == NULL)
+> 
+> NULL check is not needed. caller will never do that. If it really wanted 
+> to try, other values would have similar effect.
+
+
+Ok!
+
+> 
+>> +        return -EINVAL;
+>> +
+>> +    btf = btf_get_module_btf(st_ops->owner);
+>> +    if (!btf)
+>> +        return -EINVAL;
+>> +
+>> +    log = kzalloc(sizeof(*log), GFP_KERNEL | __GFP_NOWARN);
+>> +    if (!log) {
+>> +        err = -ENOMEM;
+>> +        goto errout;
+>> +    }
+>> +
+>> +    log->level = BPF_LOG_KERNEL;
+>> +
+>> +    desc = btf_add_struct_ops(btf, st_ops);
+>> +    if (IS_ERR(desc)) {
+>> +        err = PTR_ERR(desc);
+>> +        goto errout;
+>> +    }
+>> +
+>> +    err = bpf_struct_ops_init(desc, btf, log);
+> 
+> When bpf_struct_ops_init() returns err, desc is in btf_struct_ops_tab 
+> but it is in an uninitialized state. May be do the bpf_struct_ops_init() 
+> in btf_add_struct_ops() and only increment struct_ops_tab->cnt when 
+> everything is correct.
+
+agree
+
+> 
+>> +
+>> +errout:
+>> +    kfree(log);
+>> +    btf_put(btf);
+>> +
+>> +    return err;
+>> +}
+>> +EXPORT_SYMBOL_GPL(register_bpf_struct_ops);
+> 
+> 
 
