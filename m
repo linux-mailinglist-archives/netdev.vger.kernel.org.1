@@ -1,112 +1,87 @@
-Return-Path: <netdev+bounces-45418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EFED7DCCD5
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:20:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AFF97DCD15
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505DB1C20A48
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5231828173B
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:38:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92B11DA4D;
-	Tue, 31 Oct 2023 12:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0194A57;
+	Tue, 31 Oct 2023 12:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=rwahl@gmx.de header.b="jWlSz667"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U9skVJ4L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC02B1DA46
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:20:39 +0000 (UTC)
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56A4B97;
-	Tue, 31 Oct 2023 05:20:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
-	t=1698754823; x=1699359623; i=rwahl@gmx.de;
-	bh=NStq/1toEyL2yGD2/Gm0voRirfeE5zhvxMJ9KWtuvUg=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-	b=jWlSz6671yy7MX/H1w5WZReaIvIZ4Yl8brSpQdfWUTlMMumYWwrzX13WUhtmGk5X
-	 SQND4GvcwBf1oQF5bA6XuDFDC9o6GexSLHxHJXb71pulKREfV21LelcWdaKO7KTIc
-	 c5uwHe3fV6ihhltIMPxlLOYDRZixsrNXz3AXff58BmtjAd1HdNQqbcwh7QbF9vSvp
-	 LsogsC1w+Edgo/aII2qejplW7ifQw64/P775LBDgy/GtbALEddCTBjs62NmLu5FQO
-	 +T2RnQPsykPlrNgPjLUL2+CyX4hLe4o5DFGoXp9TzXoCJvjvEcryxNMH3bclbKqHE
-	 SY0WNE9Wizejpd4Syg==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from rohan.localdomain ([84.156.147.134]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MvbBk-1rGqob2HIs-00seLG; Tue, 31
- Oct 2023 13:20:23 +0100
-From: Ronald Wahl <rwahl@gmx.de>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Roger Quadros <rogerq@kernel.org>,
-	Ronald Wahl <ronald.wahl@raritan.com>
-Subject: [PATCH] net: ethernet: ti: am65-cpsw: rx_pause/tx_pause controls wrong direction
-Date: Tue, 31 Oct 2023 13:20:05 +0100
-Message-ID: <20231031122005.13368-1-rwahl@gmx.de>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F9B807
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:38:38 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF3AD97;
+	Tue, 31 Oct 2023 05:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KyXQpc8AXiGy6JfaWDKN47mA7BYnKlEsLUhMJAG3kDo=; b=U9skVJ4Leh3/l/gNvkw6v+TGQM
+	n+ETP0A806oMc+WbhIxsTd6PbAFDNFCD8ZTWxKyOLqC96jGY92PDJpBcz7TzvYFF/v/CBJSm3XJn3
+	c7o+Bs0SsPqB2hHqrlAPAgX+RQnZS3YzIi9HEID4GhoCrBVC4nF18Iqe0YPxPXar4lgI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qxo0t-000c0c-MQ; Tue, 31 Oct 2023 13:38:31 +0100
+Date: Tue, 31 Oct 2023 13:38:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marco Elver <elver@google.com>
+Subject: Re: [PATCH v3 1/1] r8169: Coalesce RTL8411b PHY power-down recovery
+ programming instructions to reduce spinlock stalls
+Message-ID: <7fa02dd1-c894-4980-8439-4dc1e22d3634@lunn.ch>
+References: <20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr>
+ <376db5ae-1bb0-4682-b132-b9852be3c7aa@gmail.com>
+ <23428695-fcff-495b-ac43-07639b4f5d08@alu.unizg.hr>
+ <30e15e9a-d82e-4d24-be37-1b9d1534c082@gmail.com>
+ <9f99c3a4-2752-464b-b37d-58a4f8041804@alu.unizg.hr>
+ <bd4a59be-c393-4302-9d32-759e7cbfe255@lunn.ch>
+ <11f59506-406a-463b-94c1-fe20246a102f@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:7vBPN4Q5j4pDzPs1jE0Z5uapPSwVNQl6CIBfHfEPTf8+HE7OXSe
- 7hldx3wv5mEH/71uMrLu2kCpI4Ri9AOx0W9uSavfnlf+x+bC63tpFIGv2GnUW0maXUNBM8u
- Wy1gfXJGApL1Jg9thXW9lDegYNwQBuUXyZuqkfH21GVFudsNddWvAq5xW1L/VNWPhzirO/+
- RpVIyEb9j/gK5u/SFMErA==
-UI-OutboundReport: notjunk:1;M01:P0:QuDYqB6ayrI=;bqfCBUO6VPEsPZV/2Y/HOZVQ/KR
- S7kuwd5y2giZ0J/a+QMDEmFppMYz+5T1VBrShrX/I5pjhUWR6XUR/NF8jhOTxhi6lcaThiFe2
- xTKm0JTUdKkylPGHCzN8QDwjpYjQeo90W4F0Xgo8q4/F1juF7rMyGHzX27GsHM52UElzcQ0yY
- l7GHSnQzw+UMk4M82UvriMRSu0Zn8fexlFwgqNcBrl6U8M6CHY2DhyP/XnGQyTtLcXsyiyZTM
- zhlvY31iGbmhd8t3Jy+SCx0Bg6gzwozEpJt1oG0xpXNEJHexZZ/sdx5DD0Yj+1oj7K0xkwdi5
- pV+lru+oqi2iP3bEPKEPQcvLyWRQex3nUg76no1a8FbjpRVjanzeXQwWPSe/Cpg0bKcjG6WUL
- y06AZawNJKd9ba6WXhw/E7XKM+WfV83Jt8ok7FPPe8ln6e+QzmvOpbDh8PwEPe9Sy3pRQ5gMI
- gfW7vzDreVKbK7+PbEppu0ss8tQbWYasO9GYM5CtKRCEQ+q4VaeT+EGx2MEaOKXIDk7gu2uey
- aW/1aexC1iTKPoC78l92GoghsdIK/SXFBdgpcYj+OMfqharir59Z3DCWgQnLLH/ZH6pcy6Lb/
- FGEyAdU0Z0vrRBzfHxwmjgNUSGr/BBUntOeH+R9ehSOLcXvJ4rTFFcS3Y/aX9C8iz+zt0THEt
- sOQEtASvctkEWpLo3178CFwgHKv+RbR7uv7zedbLWsiddW2o3yFTqGIzF8b+Hvdu8u76FLhnY
- IWcmcD0jtO5/nJnLRFbqgAuSdQgEKorzKL7k8iecXBr/pH2DnYUAqoK7Bbxy+Kd5cqVDQITm9
- u8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11f59506-406a-463b-94c1-fe20246a102f@alu.unizg.hr>
 
-From: Ronald Wahl <ronald.wahl@raritan.com>
+On Tue, Oct 31, 2023 at 04:35:19AM +0100, Mirsad Todorovac wrote:
+> On 10/31/23 02:21, Andrew Lunn wrote:
+> > > I will not contradict, but the cummulative amount of memory barriers on each MMIO read/write
+> > > in each single one of the drivers could amount to some degrading of overall performance and
+> > > latency in a multicore system.
+> > 
+> > For optimisations, we like to see benchmark results which show some
+> > improvements. Do you have any numbers?
+> 
+> Hi, Andrew,
+> 
+> Thank you for your interest in RTL NIC driver optimisations.
+> 
+> My knowledge about the timing costs of synchronisation is mostly theoretical.
 
-The rx_pause flag says that whether we support receiving Pause frames.
-When a Pause frame is received TX is delayed for some time. This is TX
-flow control. In the same manner tx_pause is actually RX flow control.
+The kernel tends to be very practical. Maybe try to turn the
+theoretical knowledge into practice. Write a benchmark test, or see if
+any of the existing RT Linux tests show there is a real problem here,
+and your changes fix it.
 
-Signed-off-by: Ronald Wahl <ronald.wahl@raritan.com>
-=2D--
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethern=
-et/ti/am65-cpsw-nuss.c
-index 24120605502f..ece9f8df98ae 100644
-=2D-- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -1588,10 +1588,10 @@ static void am65_cpsw_nuss_mac_link_up(struct phyl=
-ink_config *config, struct phy
-
- 	/* rx_pause/tx_pause */
- 	if (rx_pause)
--		mac_control |=3D CPSW_SL_CTL_RX_FLOW_EN;
-+		mac_control |=3D CPSW_SL_CTL_TX_FLOW_EN;
-
- 	if (tx_pause)
--		mac_control |=3D CPSW_SL_CTL_TX_FLOW_EN;
-+		mac_control |=3D CPSW_SL_CTL_RX_FLOW_EN;
-
- 	cpsw_sl_ctl_set(port->slave.mac_sl, mac_control);
-
-=2D-
-2.41.0
-
+	Andrew
 
