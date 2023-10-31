@@ -1,76 +1,54 @@
-Return-Path: <netdev+bounces-45355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62A07DC3B8
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 01:56:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D127B7DC3BE
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 02:00:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 964B8281275
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 00:56:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4898C2814DA
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 01:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E06936F;
-	Tue, 31 Oct 2023 00:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E8037C;
+	Tue, 31 Oct 2023 01:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ua1nDrbv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MvQr4gRt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89436D
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 00:56:37 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7ABB9C;
-	Mon, 30 Oct 2023 17:56:35 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-5079f6efd64so7137015e87.2;
-        Mon, 30 Oct 2023 17:56:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698713794; x=1699318594; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0TwmeoKlgpoZDhppTQ2PaW5Q6vbRQDwHsZCqGM48uso=;
-        b=Ua1nDrbv859/UjxMWo9nXpDAA/1+/t9Yx8HFvPHUvP4cz+b9q6Ak35fHVEU34P95+8
-         jVmAGq/o2WePhjTwixRwl78kqTEjlClWzNBhgbbhsU4e44hIg5BGT2CMB8epuN7vsBxv
-         iphEqUVaPgai4Rc5B6wR+gGYezU2ACmf38/klCuiYjKSxEhbnOqVKxGizy/8p3Q738/c
-         7woODWr5BzFUcN9gMFHsMOsPU2nabVLSDUgxYx+MJoqm8YP69uFfTskbPoCazpb61fWP
-         cl0xJc44XhikgXJN3AGVEuPNJ1gMm8iiYJ1cXGN+yBNxO/ZGajhkAbv+eWdrSX7n76MY
-         ZaAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698713794; x=1699318594;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0TwmeoKlgpoZDhppTQ2PaW5Q6vbRQDwHsZCqGM48uso=;
-        b=nOTC3NRt1yYRP1Idnwj7Lb9a/udWiYM4ffgjzapS2HNoCcwJ31qp8hdqvMc0Wkeme/
-         olPZtX+Lr3nqU/Q3P5PbaQi132hbPXtz447u+vzruNg2VwOoqQoBp6m4Cwb6f+WzHq96
-         Tjyh+rrQRxCi9pDUxDtLHyr8F/RCYWCSYm8yjXSNLnODXLu4P4KzPJtAR18y3oybBL4t
-         nSOj5+mMXDx8d1+05z20hLf315QeasVYwOsulK996KrO1i3YRiCSbKAonUt58lAZFyYC
-         K5CaKNVgpN28HaKV90sEP49ENCX5eXSFnBJQ5oc+h3V9/cgEIV3RjDdAlSN7aGmLrSlW
-         +0Tg==
-X-Gm-Message-State: AOJu0YxTG4ugdandFFSO5nfza9hpX5mcSlKANyS5jgntD9j0FW7VvmiX
-	mMje7TbiY3en2XDsHWr/huE7QO76Qlg=
-X-Google-Smtp-Source: AGHT+IEMoIvLPNMWvMpJuau3xvpGX3VFFk8Y8I+d2J8br/XPW9eXki51Km3lshIAAFFetnZhY7gD4Q==
-X-Received: by 2002:ac2:4306:0:b0:503:2deb:bbc1 with SMTP id l6-20020ac24306000000b005032debbbc1mr6865405lfh.22.1698713793502;
-        Mon, 30 Oct 2023 17:56:33 -0700 (PDT)
-Received: from mobilestation ([89.113.151.243])
-        by smtp.gmail.com with ESMTPSA id z9-20020a19f709000000b00507a0098424sm21381lfe.109.2023.10.30.17.56.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Oct 2023 17:56:33 -0700 (PDT)
-Date: Tue, 31 Oct 2023 03:56:29 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, andrew@lunn.ch, 
-	Jose.Abreu@synopsys.com, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V3] net: pcs: xpcs: Add 2500BASE-X case in get
- state for XPCS drivers
-Message-ID: <i6i5q64zfji3ohwsi3ikybpjulcbfce7zjgh3y44zj5gv4rqmp@jvzptfeotz2m>
-References: <20231027044306.291250-1-Raju.Lakkaraju@microchip.com>
- <ghpmbmfjps24x7xvojk4gbkl55wjcuufd4v6mz6ws5htv35g2b@ugqsbet7t73p>
- <ZTuk/OF01M24nBeG@shell.armlinux.org.uk>
- <6j7szthl34z5q2ea4qnno7e2fnde3djxifx7chhhaihqty23q6@7j42bte7b3dv>
- <ZTuvwnGZKEueGDwa@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A62D36D;
+	Tue, 31 Oct 2023 01:00:15 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AB2C1;
+	Mon, 30 Oct 2023 18:00:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=dQjReZhnkb4AP5DzfEzONPc2UVwhei3iUP21q72heac=; b=MvQr4gRtP5TUQzFcesFdjRrYme
+	5SXVO0QJTaYOP+EGzcQcN2ctQLXVp6Ppzk7tt8Zu7kE70nqeeKNu3DKtWXDCtEMVk4gQSpxPcpb49
+	Id365M9q0gSIlDJDxDrF2Cbq6lqo91fLnN0adXfK6zF7kVXekX0xMz9zeE8DKApQ6l8Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qxd6z-000Zkf-Ik; Tue, 31 Oct 2023 02:00:05 +0100
+Date: Tue, 31 Oct 2023 02:00:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Ante Knezic <ante.knezic@helmholz.de>, conor+dt@kernel.org,
+	o.rempel@pengutronix.de, UNGLinuxDriver@microchip.com,
+	davem@davemloft.net, devicetree@vger.kernel.org,
+	edumazet@google.com, f.fainelli@gmail.com,
+	krzysztof.kozlowski+dt@linaro.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, marex@denx.de, netdev@vger.kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org, woojung.huh@microchip.com
+Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
+Message-ID: <aad5ac41-3c05-421d-a483-0546b579585c@lunn.ch>
+References: <20231024142426.GE3803936@pengutronix.de>
+ <20231027063743.28747-1-ante.knezic@helmholz.de>
+ <20231030174225.hqhc3afbayi7dmos@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,112 +57,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZTuvwnGZKEueGDwa@shell.armlinux.org.uk>
+In-Reply-To: <20231030174225.hqhc3afbayi7dmos@skbuf>
 
-On Fri, Oct 27, 2023 at 01:40:34PM +0100, Russell King (Oracle) wrote:
-> On Fri, Oct 27, 2023 at 03:06:19PM +0300, Serge Semin wrote:
-> > Hi Russell
-> > 
-> > On Fri, Oct 27, 2023 at 12:54:36PM +0100, Russell King (Oracle) wrote:
-> > > On Fri, Oct 27, 2023 at 02:04:15PM +0300, Serge Semin wrote:
-> > > > Cc += Russell
-> > > > 
-> > > > * It's a good practice to add all the reviewers to Cc in the new patch
-> > > > * revisions.
-> > > > 
-> > > > On Fri, Oct 27, 2023 at 10:13:06AM +0530, Raju Lakkaraju wrote:
-> > > > > Add DW_2500BASEX case in xpcs_get_state( ) to update speed, duplex and pause
-> > > > > 
-> > > > > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> > > > 
-> > > > With a nitpick below clarified, feel free to add:
-> > > > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-> > > > 
-> > > > > ---
-> > > > >  drivers/net/pcs/pcs-xpcs.c | 29 +++++++++++++++++++++++++++++
-> > > > >  drivers/net/pcs/pcs-xpcs.h |  2 ++
-> > > > >  2 files changed, 31 insertions(+)
-> > > > > 
-> > > > > diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-> > > > > index 4dbc21f604f2..31f0beba638a 100644
-> > > > > --- a/drivers/net/pcs/pcs-xpcs.c
-> > > > > +++ b/drivers/net/pcs/pcs-xpcs.c
-> > > > > @@ -1090,6 +1090,28 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
-> > > > >  	return 0;
-> > > > >  }
-> > > > >  
-> > > > > +static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
-> > > > > +				    struct phylink_link_state *state)
-> > > > > +{
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	ret = xpcs_read(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_STS);
-> > > > > +	if (ret < 0) {
-> > > > > +		state->link = 0;
-> > > > > +		return ret;
-> > > > > +	}
-> > > > > +
-> > > > > +	state->link = !!(ret & DW_VR_MII_MMD_STS_LINK_STS);
-> > > > > +	if (!state->link)
-> > > > > +		return 0;
-> > > > > +
-> > > > > +	state->speed = SPEED_2500;
-> > > > 
-> > > > > +	state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
-> > > > 
-> > > > Why is it '|=' instead of just '='? Is it possible to have the 'pause'
-> > > > field having some additional flags set which would be required to
-> > > > preserve?
-> > > 
-> > > The code is correct. There are other flags on state->pause other than
-> > > these, and phylink initialises state->pause prior to calling the
-> > > function. The only flags that should be modified here are these two
-> > > bits that the code is setting.
-> > > 
-> > > Phylink will initialise it to MLO_PAUSE_NONE if expecting autoneg, or
-> > > the configured values if autoneg on the link is disabled.
-> > 
-> > Thanks for clarification. Then no more comments from my side in this
-> > patch regard.
-> > 
-> > Regarding the XPCS driver in general. Based on what you said the rest
-> > of the XPCS state getters are wrong in fully re-writing the 'pause'
-> > field. Right?
-> 
-> Yes.
-> 
-> xpcs_resolve_pma:
->         state->pause = MLO_PAUSE_TX | MLO_PAUSE_RX;
-> 
-> xpcs_get_state_c37_sgmii:
->         state->pause = 0;
-> 
-> are both incorrect. The former should be |=, the latter is totally
-> unnecessary.
-> 
-> Documentation:
->  * pcs_get_state() - Read the current inband link state from the hardware
->  * @pcs: a pointer to a &struct phylink_pcs.
->  * @state: a pointer to a &struct phylink_link_state.
->  *
->  * Read the current inband link state from the MAC PCS, reporting the
->  * current speed in @state->speed, duplex mode in @state->duplex, pause
->                                                                   ^^^^^
->  * mode in @state->pause using the %MLO_PAUSE_RX and %MLO_PAUSE_TX bits,
->    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> 
-> I guess I need to make that more explicit that pcs_get_state() methods
-> are only expected to _set_ these two bits as appropriate, leaving all
-> other bits as-is.
+> So, my opinion is that although what Oleksij would like to see is
+> admirable, I don't think that the REF_CLK direction is a matter of RMII
+> MAC vs PHY role, and thus, we wouldn't need to change "rmii" to "rev-rmii"
+> and cause breakage everywhere. It's just that - a matter of REF_CLK
+> direction. It's true, though, that this is a generic problem and that
+> the generic bindings for RMII that we currently have are under-specified.
+> We could try to devise an extended RMII binding which makes it clear for
+> both the MAC and the PHY who is responsible to drive this signal. You
+> are not attempting that, you are just coming up with yet another
+> vendor-specific MAC property which solves a generic problem. I can't say
+> I am completely opposed to that, either, which is why I haven't really
+> spoken out against it. The PHY maintainers would also have to weigh in,
+> and not all of them are CCed here.
 
-Thanks for the detailed response. I'll send fixup patches for the
-denoted problems as soon as I get some free time for it. Hopefully
-within a month if nobody does it sooner.
+I would recommend looking around other PHYs and find a property which
+does what you want, and copy it.
 
--Serge(y)
+We do have all sorts of properties. There are some to enable the
+REF_CLK out of the PHY. Some to disable the REF_CLK out, some to
+disable it when the link is down, some to indicate what frequency it
+should tick at, etc.
 
-> 
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+If you want to go the extra mile, maybe you can make a summary of all
+these properties, and maybe we can produce a guide line for what we
+want the properties to be called going forward.
+
+> I am afraid that creating a CCF style binding for REF_CLK will be an
+> enormous hammer for a very small nail and will see very limited adoption
+> to other drivers, but I might as well be wrong about it. Compatibility
+> between RMII MACs and PHYs which may or may not be CCF-ready might also
+> be a concern.
+
+I also don't think using the CCF makes too much sense, except for
+where the SoC provides the lock, and already has a CCF covering it.
+
+I would also be hesitant to add more dependencies between the MAC and
+the PHY. The DT often has circular dependencies and we have had issues
+with probing being deferred because the core does not always
+understand these circular dependencies.
+
+	   Andrew
 
