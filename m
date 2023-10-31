@@ -1,247 +1,108 @@
-Return-Path: <netdev+bounces-45438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 637CA7DCF8B
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:45:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AB217DCF9E
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852631C20C16
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:45:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48E711C20BC6
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B651DA56;
-	Tue, 31 Oct 2023 14:45:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691661DDF5;
+	Tue, 31 Oct 2023 14:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y0ez1H87"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6xGdnp+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20851C3A;
-	Tue, 31 Oct 2023 14:45:45 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9452ED;
-	Tue, 31 Oct 2023 07:45:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C76bQhVs/eNeA4lDtFP7wq1KUxaYbE7iWqly4YHgaAFu4j6o4zzd0vNCLKtHdhagh55MUcjNbTieJ6ma6DEi/RKchl+brPOpRu9Kvz5uqLPktGsyUYiBBZ4cmDQqjZ1/lpwVGjq3ToTdMLcCfKBRSEEaZuP8o3/uCzlUCZbVvJlgPNjMnHlIfKomuBAwFq5mafXHCvTUdOkKR2ouwvdqerA16+sY7F0Hv8C5+MfIfrzPRTOfv4xGPIDIp2+C8qhxKVWBkQeEkxUF9eYm/LRsKCB3BNSSfQv6Uv0VjmqRMSB9GBHDt8sqHVOfdbxFvNGwrMBW2o7HDrxtvWQG6pthnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=npQeRcDcBwpoHGxzLwJrIL/Rzfo0Fa0GkrQPXLsXu0k=;
- b=Frt33ZhnW+MU+Rik6/UCvPKGHbviTcZDxxjEwvUv97FfytbfAWQqRs7JaOgN3f7tt1lR6K7sS+aqeUjFK8zrnmrzdsWxN6nQhlwW2Lj2X1Su5kbq6FO39pZXYIWQyGNNec1qBlL9ty+nR77c5Ghg5ooVm02bSruGvxpgad49cFMyH/730iz5V8pD0HIinceJoxqgKQkUej8vPqvislaw0Hhr9ap0bRC+AwM0SneoM1VgOfR06PND0EPCP/nHKRZ2/bsZ9/NQW2clHnSNw56gL1IJ6IqYGx4ZCaTjZTwMkv8XOBhPwumehntA6rgFS190uEvxbf+kkum990twXSLd8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=npQeRcDcBwpoHGxzLwJrIL/Rzfo0Fa0GkrQPXLsXu0k=;
- b=Y0ez1H87ykcobyFUI5exP1VrWHovNzZos+zsN+yxXJl7dUwrUWt4o0Su9bViTEjrCQ3zutWEbrauDM0dbdoKZAV4mzv+R2wGxAXqv/9ORRNwaUatkrY+Xc7NLLJ4wWqwY31ad4KGxMkCVItVYf/g1r65P3NDdNbyPNKeltLFOVJs8MllIjX0EtSwIUb0bODF55uFK3KG4jcmX271wZAzxhuVdD4TQpw9e78RLt8BWlUf7mBoCUPgv6RMnAmIz+5ZqDwY1jUcMUcVaWn8BVuaA9PbizQC2LHyB+GfZK/H6F3LVTJesLV7n1W50PNyv4o24kVGSTjswMagJm9Tnccftw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- DS0PR12MB8248.namprd12.prod.outlook.com (2603:10b6:8:f3::17) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6933.24; Tue, 31 Oct 2023 14:45:42 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::8cde:e637:db89:eae6]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::8cde:e637:db89:eae6%5]) with mapi id 15.20.6933.028; Tue, 31 Oct 2023
- 14:45:41 +0000
-Message-ID: <70132b6f-542f-4fe6-971f-ab9ea80acbe4@nvidia.com>
-Date: Tue, 31 Oct 2023 16:45:31 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-To: Ahmed Zaki <ahmed.zaki@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Alexander H Duyck <alexander.duyck@gmail.com>
-Cc: mkubecek@suse.cz, andrew@lunn.ch, willemdebruijn.kernel@gmail.com,
- Wojciech Drewek <wojciech.drewek@intel.com>, corbet@lwn.net,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- jesse.brandeburg@intel.com, edumazet@google.com, anthony.l.nguyen@intel.com,
- horms@kernel.org, vladimir.oltean@nxp.com,
- Jacob Keller <jacob.e.keller@intel.com>, intel-wired-lan@lists.osuosl.org,
- pabeni@redhat.com, davem@davemloft.net
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
- <20231016163059.23799429@kernel.org>
- <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
- <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
- <20231017173448.3f1c35aa@kernel.org>
- <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
- <20231018165020.55cc4a79@kernel.org>
- <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
- <20231020153316.1c152c80@kernel.org>
- <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
- <20231020164917.69d5cd44@kernel.org>
- <f6ab0dc1-b5d5-4fff-9ee2-69d21388d4ca@intel.com>
- <89e63967-46c4-49fe-87bc-331c7c2f6aab@nvidia.com>
- <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
- <e471519b-b253-4121-9eec-f7f05948c258@nvidia.com>
- <a2a1164f-1492-43d1-9667-5917d0ececcb@intel.com>
- <d097e7d3-5e16-44ba-aa92-dfb7fbedc600@nvidia.com>
- <aa1dd347-a16c-44f8-95ad-5d50bcba8f34@intel.com>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <aa1dd347-a16c-44f8-95ad-5d50bcba8f34@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0623.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:294::18) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FBF1C69D
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:49:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95A01EA
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698763790;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wC70NjzSUr4LvW8CC2+ZDGZgQqRztYwHl/WFtd4ZzKQ=;
+	b=W6xGdnp+NZrX3XnWnClDT7ZKWRYiqIFD7LgZH4OPjQbqwMtSd5aHV8iypJDmQxJAurdy+o
+	KseLHRM4OZgEEx20EsUWjsk4bzuFx+Br5ORl2NjG+JsX+cAamueEyMlzf0BTWwkUnrE9Lj
+	xw8byqRJtb/bV6XBcLw7zrQormqznRo=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43-u1PcotP4Olue4U5OfQ73Mw-1; Tue, 31 Oct 2023 10:49:49 -0400
+X-MC-Unique: u1PcotP4Olue4U5OfQ73Mw-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-41e1899175eso13690941cf.1
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:49:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698763789; x=1699368589;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wC70NjzSUr4LvW8CC2+ZDGZgQqRztYwHl/WFtd4ZzKQ=;
+        b=sbSSBqmtteFQF40lWP4+jE5FNn7qRr9bAthTJqIg/JIsjD3HgAAPOdGPZHxW3vERuA
+         UeH/hO/6lIhT/h+V8XQHjtzVVeUjRwyAMtn0Cq4aEP4vxnPWnaQcnq7mp5f6r0DrPLY4
+         1mPT/uYPyPGRztBwBOdXNHLPfBFdxQNmQTxpOEYFbWGbLnbkeJywzYJB3d0Zi0ShlLE2
+         uvfP+aIhGSjG0dpMNcH/DgTZxFinffLSxmYcgfAh019XQ9GdMmmL2Nq+fIJnBUFKBkB7
+         KiGMr9Jr2dY6rlZ/GERB+0or3FfSzDLZxCaRSMQ1mZXmbjU/XsrwR086D662WFw5cBZ/
+         ydMA==
+X-Gm-Message-State: AOJu0YwPxaGayp/LJNLi6Lq+HGA479OuUqIiNcfNfWnnYwiukQUqRIZ4
+	H0xe3luL4+VRC1YnR1o4F4jfBtc0gMC9lpdLgt4VlN1hosLR8DuJVymNS7srWCqmq39Haow+PKK
+	3tns+mSmjX1VdKiUm
+X-Received: by 2002:ac8:7f55:0:b0:412:3189:9fd6 with SMTP id g21-20020ac87f55000000b0041231899fd6mr17244327qtk.5.1698763788678;
+        Tue, 31 Oct 2023 07:49:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERjLWjRB1kJMdKCpg3B7l9DrSVVOpzcHbJPKkiapAIsGI8t+/ULpCGqcZBZO9DVV9mcj7SuA==
+X-Received: by 2002:ac8:7f55:0:b0:412:3189:9fd6 with SMTP id g21-20020ac87f55000000b0041231899fd6mr17244308qtk.5.1698763788353;
+        Tue, 31 Oct 2023 07:49:48 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-227-179.dyn.eolo.it. [146.241.227.179])
+        by smtp.gmail.com with ESMTPSA id jt21-20020a05622aa01500b0041b3deef647sm558815qtb.8.2023.10.31.07.49.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Oct 2023 07:49:48 -0700 (PDT)
+Message-ID: <c1f3236d0a2a2f540f65815633e709accdbc197a.camel@redhat.com>
+Subject: Re: [PATCH v2] selftests/net: synchronize udpgso_bench rx and tx
+From: Paolo Abeni <pabeni@redhat.com>
+To: Lucas Karpinski <lkarpins@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ shuah@kernel.org,  netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Date: Tue, 31 Oct 2023 15:49:45 +0100
+In-Reply-To: <vzz3qfbfq52qja24y25lopif27sdwyvz3jmmcbx5wm6jc5l53b@fy7ym6xk4zsb>
+References: 
+	<6ceki76bcv7qz6de5rxc26ot6aezdmeoz2g4ubtve7qwozmyyw@zibbg64wsdjp>
+	 <e8a55d0518da5c1f9aba739359150cad58c03b2b.camel@redhat.com>
+	 <vzz3qfbfq52qja24y25lopif27sdwyvz3jmmcbx5wm6jc5l53b@fy7ym6xk4zsb>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|DS0PR12MB8248:EE_
-X-MS-Office365-Filtering-Correlation-Id: 59432015-67f4-4857-90bf-08dbda200e1e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	xR6NzK4pMYvlt7juNDGW9LIPTBeN924E2ELDOnb1/QymdfDSE4YML0qWDY4Kbh/uM8dPiY1dhoLTapINRqhXHeMg8E6QbkQVfEXngSFuf9YYMzLOd5TeMMd4awxuKgSIiJvOBm4Whl8NIEN1WH8UUTQMPj+GAEY/Sjq/qxDPgFe1NpISgsGLKF1ZQDAJwggo6gbXr7DDpfkvrV0FRwstncBnbYCvNyiL1haN1R4sK2wbBidgE9n8Y+zYqtQ6svZ8GFVWp7AjvVB1yooG/WT5IplXoCG21w0NmgDAKV1WOxQIeGZmm1JDtGWITWTUDQIUV93gJs0cVDo4l4tpdiNU03hkKRHn1K8pp5hcV12P9PP8wG/IOsvhesvzUJ+6Narkdml5qZ0Rdf6OHl+R1jCBVD7/yVbtdCvpQaHRZpv3bsOvhyzNmSG6Vgxfp7nEhv06ovJMeBfb5v0R9AAeSqCQvvvDkbetc5qZG8g27WaWhFo4P598bqektbCBlCBo3nVQ+gIN2zXSBLy39bcn8xC+p4Ga9lIlsWHYZhA6iI/R1bF8ly0tqE9RV20eTDHVkjjAUBk/IrfhZE6uhsgKoE/waDeZgsRWzA/z9k0cA+khLjNDnJveVv/9mUwrmgowkoUgTSeXcT9A9lgeQylt+7x8yNNyuqiMUAvRoP4Q+ZmfiIKvYHko27s4vhEcZxvpI/TV
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(366004)(136003)(346002)(396003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(38100700002)(31686004)(66946007)(110136005)(66476007)(6506007)(316002)(54906003)(66556008)(966005)(6486002)(478600001)(2906002)(6512007)(41300700001)(4326008)(8676002)(5660300002)(6666004)(2616005)(31696002)(4001150100001)(86362001)(8936002)(53546011)(83380400001)(7416002)(26005)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?d2xXZzk5RGhtclh4MVNmdHJaZmRWcVlpRk0yQXN1a2ROc2QzOEVNSmdtZkN3?=
- =?utf-8?B?ZEhzYWdWTVgyNEQ4V1NkWjdOWEhLRnVNbWlzbFNlRytPdFgxNDV3ZVNpRlZX?=
- =?utf-8?B?VHByMEZuUXpLUG1FVWFXMlB5RFhBbFZuQ2xYWFdPMzlaV2FETlM4d0h6VUF0?=
- =?utf-8?B?bkFEZEZDd1pxbHdMVFMxTXhVUzlRRndQUGhWcXMvWmlleXFCcEgzVGRTckFX?=
- =?utf-8?B?TW1XNGl0dEJScU5aZTl1VGNWM1RuZGZVVVcwSytnUWQyL2lJVk1qakhPcWY0?=
- =?utf-8?B?bm01b2ZURUVBdFY2MmZxcDZYcTlveDhGN3dkdWdMWVlqYXJ2R2ZHd2F5SkM5?=
- =?utf-8?B?TnY5MFlsMzVVY3VkZXQ4b0xkSXZ6Unc2MkxBYnplVFE1cmN4d2J6QW1oMW9z?=
- =?utf-8?B?R21Eb1VkcUZ5Q0lpTjUyV21CeDFEMXRUVUJHMGtPWUVKSUR4ZnRTc1E1NHRG?=
- =?utf-8?B?TTZ6OFN2UjdiaU1USHlDYWd2SVA4MUIzUWt5Z2FsU1JGdDNHSGVYYVZwcVNT?=
- =?utf-8?B?MTB1cnhVUnpGNmN4YkFCbFl5NGR0S00rejhhSndMdHhPbXFxbXpmYkhWWXJl?=
- =?utf-8?B?YlRRbUZPcnJhblVDY2x1SzA2NUlLU1VRNEZkeFNtdkJ0U0VYSzN5OWNKZzVQ?=
- =?utf-8?B?S3l1T3J0TlpETzFpQ3p0VHlvYkdEKzQwdTVtaDlMTmhaSHM0U3ZpZm9Yc1FB?=
- =?utf-8?B?ekkxVU5GaS82cVljaVhjY2F3eHBmOC9aelg5WnA2cjdIbC9GT1I2b0F4VEtC?=
- =?utf-8?B?UFUxeFNqNGVqWWVIbjY0dU1IQThTdStkLy9UUS82MnFVRkJET3B2Y1hPbVRy?=
- =?utf-8?B?cDJRdDJxbUVwLzJXMi9rS3JGSW13ZDJYSWhhS0dIZ28xYlZzYUVXTzFycElR?=
- =?utf-8?B?bXN0V3p4ZUpLRXFCbDVnNnl2VzZzTUdCcUJuRWVCaElsL0tNNTJUbUpYZml5?=
- =?utf-8?B?NEpFR1Y0d2Q2VFNIdWZTRzF4WHMweHVVNWsvelhnbjNzS05xQ0daVVgzdFFN?=
- =?utf-8?B?UnFWYVlpWlBxdzR0Tm1EWVdXV1R3RHRNVWxkTnBrV3BGSFB0K3ZWNU83YUk2?=
- =?utf-8?B?TitYbjJkb0c4ajJKSlBPczVaRThWVk9KUUZ6R1JFWEhUNDEvQkp3T0pJcWRn?=
- =?utf-8?B?ZlBZRS8yUFJraTUxeEhQcDY5aGM5SklmbW82eEFnUGI4eFl4SVh2UDVQZmhH?=
- =?utf-8?B?QTB6MFRRMmQzNEVBY2JyRS9oUUFiTjZxWDZFRitkMk82TlNDRDRndXFMb0h6?=
- =?utf-8?B?SUFna3U5Wkd0RmVBc1NtcHE3SHpNVFVsTlB0WjhocSt5V2RvRDJPSFFTbTU4?=
- =?utf-8?B?SWJnWS9VMWhUOFVQWVJ1NGp2eWtqUnEwcUQ0UzR3VExFdlZSaHRQYWd1clBD?=
- =?utf-8?B?QTZ3Z3hOdlgzdW9sbU9iQ1JkYmt6LzVBZXNPczhQL0JsRHhVRkRDR0NhQVhE?=
- =?utf-8?B?OXNOdk1IYmJzdS85OWFjaUNOWXJGekRiTzgvOU05NFNFa1c4ZmI0QllldVdm?=
- =?utf-8?B?SUZUSmJVWngzbkFPVXM5b3RhbStpcjVYdkl0MGxSbTJJcWUxSWF3dTNaUFN4?=
- =?utf-8?B?K0xvNitGK2Y2ckRtWTlpNVpTV3ZvWEpjeVU3UUk5SHZOVmUxSjgzbzdGakty?=
- =?utf-8?B?LzkrYktCR1pNUTZVRlJPS2I0Zkt0OHFiSVRMRzNHMW9pd0hnWlJoT09tdy9C?=
- =?utf-8?B?RGdOc1I3ekQ0dHgwYVR0eGpaVzJPWUZVamRMZmFqMCtKR0dwalM5Qmd5SE8w?=
- =?utf-8?B?aE5EemMwSUFiK0R3aEticE1VSlZrSGljZXZxKzYyZmlBUmpkempGVXdXYzVL?=
- =?utf-8?B?ZmZyRDRLdGYySm9oc00rY210bCszdHBxcEQ2aWNhZ1ZreFhubHJlamxmY0Qx?=
- =?utf-8?B?bjcyWjZRalFkb09NdVZiN28vaHNHSGxwTjVlRkJPdUxSZytiNWRQUnNRVVVs?=
- =?utf-8?B?MGZkbHlsZHdkSVdCRVAvT0MyRWd4NVorMGVVdUIva295SVhRdVVvUndFUDNU?=
- =?utf-8?B?RDJyRWxqeFhuR2cxbGdyMVVxVGFNeVFHL1JHL0s4R3pEWkppdzBtSllZYlV2?=
- =?utf-8?B?aEorQ0RzVFNKcXVhdkhaNmh6MWljSzQzS0U3ZlNDMWYzc0M2UnQ2Y1c3dUps?=
- =?utf-8?Q?ECsFgZt97G4JVSxgxdCJqxVgv?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59432015-67f4-4857-90bf-08dbda200e1e
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 14:45:41.6184
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0MLIqNZYgsl9ZYUi1TLKzlbS9vCrOjNYpB6zY2oiy6R3nyNla8HiO29lKNpGfXup
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8248
 
-On 31/10/2023 16:40, Ahmed Zaki wrote:
-> 
-> 
-> On 2023-10-31 06:00, Gal Pressman wrote:
->> On 29/10/2023 18:59, Ahmed Zaki wrote:
->>>
->>>
->>> On 2023-10-29 06:48, Gal Pressman wrote:
->>>> On 29/10/2023 14:42, Ahmed Zaki wrote:
->>>>>
->>>>>
->>>>> On 2023-10-29 06:25, Gal Pressman wrote:
->>>>>> On 21/10/2023 3:00, Ahmed Zaki wrote:
->>>>>>>
->>>>>>>
->>>>>>> On 2023-10-20 17:49, Jakub Kicinski wrote:
->>>>>>>> On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
->>>>>>>>> I replied to that here:
->>>>>>>>>
->>>>>>>>> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
->>>>>>>>>
->>>>>>>>> I am kind of confused now so please bear with me. ethtool either
->>>>>>>>> sends
->>>>>>>>> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the
->>>>>>>>> interface
->>>>>>>>> for "ethtool -X" which is used to set the RSS algorithm. But we
->>>>>>>>> kind of
->>>>>>>>> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses
->>>>>>>>> "ethtool_rxnfc" (as implemented in this series).
->>>>>>>>
->>>>>>>> I have no strong preference. Sounds like Alex prefers to keep it
->>>>>>>> closer
->>>>>>>> to algo, which is "ethtool_rxfh".
->>>>>>>>
->>>>>>>>> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how
->>>>>>>>> would
->>>>>>>>> that work on the ethtool user interface?
->>>>>>>>
->>>>>>>> I don't know what you're asking of us. If you find the code to
->>>>>>>> confusing
->>>>>>>> maybe someone at Intel can help you :|
->>>>>>>
->>>>>>> The code is straightforward. I am confused by the requirements:
->>>>>>> don't
->>>>>>> add a new algorithm but use "ethtool_rxfh".
->>>>>>>
->>>>>>> I'll see if I can get more help, may be I am missing something.
->>>>>>>
->>>>>>
->>>>>> What was the decision here?
->>>>>> Is this going to be exposed through ethtool -N or -X?
->>>>>
->>>>> I am working on a new version that uses "ethtool_rxfh" to set the
->>>>> symmetric-xor. The user will set per-device via:
->>>>>
->>>>> ethtool -X eth0 hfunc toeplitz symmetric-xor
->>>>>
->>>>> then specify the per-flow type RSS fields as usual:
->>>>>
->>>>> ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
->>>>>
->>>>> The downside is that all flow-types will have to be either
->>>>> symmetric or
->>>>> asymmetric.
->>>>
->>>> Why are we making the interface less flexible than it can be with -N?
->>>
->>> Alexander Duyck prefers to implement the "symmetric-xor" interface as an
->>> algorithm or extension (please refer to previous messages), but ethtool
->>> does not provide flowtype/RSS fields setting via "-X". The above was the
->>> best solution that we (at Intel) could think of.
->>
->> OK, it's a weird we're deliberately limiting our interface, given
->> there's already hardware that supports controlling symmetric hashing per
->> flow type.
->>
->> I saw you mentioned the way ice hardware implements symmetric-xor
->> somewhere, it definitely needs to be added somewhere in our
->> documentation to prevent confusion.
->> mlx5 hardware also does symmetric hashing with xor, but not exactly as
->> you described, we need the algorithm to be clear.
-> 
-> Sure. I will add more ice-specific doc in:
-> Documentation/networking/device_drivers/ethernet/intel/ice.rst
+On Tue, 2023-10-31 at 09:26 -0400, Lucas Karpinski wrote:
+> > Since you wrote the same function verbatim in 3 different files, I
+> > think it would be better place it in separate, new, net_helper.sh
+> > file
+> > and include such file from the various callers. Possibly
+> > additionally
+> > rename the function as wait_local_udp_port_listen.
+> >=20
+> Thanks, I'll move it over. I think it would be best though to leave
+> udp out of the name and to just pass the protocol as an argument.
 
-I was thinking of somewhere more generic, where ethtool users (not
-necessarily ice users) can refer to.
+Indeed. I suggested the other option just to keep it the simpler, but
+if you have time and will, please go ahead!
 
-Perhaps Documentation/networking/ethtool-netlink.rst? Or ethtool man page?
+Cheers,
+
+Paolo
+
 
