@@ -1,124 +1,199 @@
-Return-Path: <netdev+bounces-45413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0C7E7DCC76
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:04:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2601D7DCC8C
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AD44281703
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:03:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D7711C20B59
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 12:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A841CF96;
-	Tue, 31 Oct 2023 12:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2XVDRC83"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533771D55F;
+	Tue, 31 Oct 2023 12:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F331F107B4
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:03:55 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871D35587
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 05:03:54 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7b747c9b067so1626395241.3
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 05:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698753833; x=1699358633; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNv5fvxCI1H/SoX6PwFYUditFSgyB5ulH9BPKrUlntk=;
-        b=2XVDRC83yYL9zlg+OUM87+5S0+8jq+rG4Wz5ICcYT8+VAZ6puAXcGtuGS4cWVuweGT
-         9fDBwVCcGbOzGXsrdTOibQVdU3CloBXhWtUlkG1pIJ236rkGoqCpca/rGPIDF9smhLdz
-         X/uB822kM2AxN3MPHECeTYvoJ14SkvEDG/3LspcGi9mB5QL+Omt4fEApdoQs18YH0hJM
-         m3FZrLHPStDRZ0wNAwCynn6T+sVuoNiItX3BEcTz7b5ZCwR3z0FroBOr0d25Juf5xGp7
-         9TiSCDr1EINOyg4PE64zYzz5QCtj3Sp8AdMIp34kgFbk9Bgc4NYD499G/iFU7c/rqK17
-         GrBg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D4C1D53B
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:04:32 +0000 (UTC)
+Received: from mail-oi1-f208.google.com (mail-oi1-f208.google.com [209.85.167.208])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657355591
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 05:04:28 -0700 (PDT)
+Received: by mail-oi1-f208.google.com with SMTP id 5614622812f47-3b3f4ab1238so7262085b6e.3
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 05:04:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698753833; x=1699358633;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BNv5fvxCI1H/SoX6PwFYUditFSgyB5ulH9BPKrUlntk=;
-        b=bwTHX9774ra2x21x2JFhzmpkesl1B1aZGqt34kRw23YkzSUjKEPaEfL0PuhAwxbk5/
-         EDZxp1x2HJ9EopAO3eor9yKkK8LTRMabjlF7j5mtXrJ+KZcWPnN1beK1O4jnCbdFrDCJ
-         WjhZbN/jR8CjVB20jdpqWujaYOKPYLE7FbOOT8QfnD3/J1d3YMi8gsJ8R7pY0dx7rO7L
-         EgllN3q1/+Ig7cI44qTEOXcKke6CDe1Cfwx3B+XgLJ9i2lP4nz2LEkBTy57ZcXLPovoD
-         bk4ElF+xNIGzF/nQH2ohKRmU6v7ygZPJqQPQpWX5Wur2DGK8j59w9Ah82R3pcjpbf+iq
-         PWow==
-X-Gm-Message-State: AOJu0YyTyEUxR3GENPDcivEVouHpfkraELSMhyZ3NJr9EjPUBsKJ3YrZ
-	Q/KArbl/Htfw3Dx0eTuXvPOXXLunQ5536Xp85wvvmw==
-X-Google-Smtp-Source: AGHT+IHexuhndpduQqd8sNyxnuqBYhfRTa2AQGW2vltSeRJhS8pWrqjhYWsKWcUo2kBvO8i/HFTHlG1kJXlPELysp1s=
-X-Received: by 2002:a1f:2748:0:b0:49d:9916:5740 with SMTP id
- n69-20020a1f2748000000b0049d99165740mr7922526vkn.9.1698753833334; Tue, 31 Oct
- 2023 05:03:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698753867; x=1699358667;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5wpJcbiTL0xJL6GMyqbrLywFGyvMuibD1Wk7yDfqWH8=;
+        b=cdmIo3fCd4XjMTja7IVVzdPuvq79hqMhndjFq+xP56rvY0Glfxn5Zqx3FCDPaYvfNs
+         XCxxnNQebdf6H3wJUdrT+eaEi1UKrwZGtCdTdc4mPZetwIhFZbWO6zhc+pswVW9mtbtw
+         11DRFgryfbh3ovZhgJAT/wS1QSZFj0uSXU/Gj9y2jgMXccGDg3c7/1zkjLGtuKjysjgZ
+         m4Daeb27zdK9npX8stKk+lwoll15EGJp3V1iqBH/9zDNMqgCU6+yVVIjz2ekA9ybhd8z
+         N8cjKS32+jh4mdMawvu5It/EZdmD1v6qtDYDQCDRNXc5V3e5jI0GU7ywsaBV7r2jeCHV
+         x+7Q==
+X-Gm-Message-State: AOJu0YwuSmB9LOYdgao1zywrcA0YfiZXblrx4Ri+1dloHnGLHRXHfhV4
+	vflHzCWtpAQbyi57uo+0YUr7S7+JhCsTr+r1skGYjOInyzSF
+X-Google-Smtp-Source: AGHT+IECTl9BHc7Xo+eIDGD78FhZDF9tZPb8wtlq4b6kUyiccDDr8CFbxc3/vUMUV9xfIkAnk5UK3TkNRRiV4V7dKwW+YsxvLxPi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031061945.2801972-1-edumazet@google.com>
-In-Reply-To: <20231031061945.2801972-1-edumazet@google.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Tue, 31 Oct 2023 08:03:33 -0400
-Message-ID: <CADVnQy=Ln_SyA=VBxNNSPBqt8KY11k0tDtXZtHMxBoyatcF5Wg@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: fix fastopen code vs usec TS
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	kernel test robot <oliver.sang@intel.com>, David Morley <morleyd@google.com>
+X-Received: by 2002:a05:6808:23d1:b0:3b2:f33d:f22e with SMTP id
+ bq17-20020a05680823d100b003b2f33df22emr4634894oib.0.1698753867758; Tue, 31
+ Oct 2023 05:04:27 -0700 (PDT)
+Date: Tue, 31 Oct 2023 05:04:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d9483d060901f460@google.com>
+Subject: [syzbot] [perf?] general protection fault in inherit_task_group
+From: syzbot <syzbot+756fe9affda890e892ae@syzkaller.appspotmail.com>
+To: acme@kernel.org, adrian.hunter@intel.com, 
+	alexander.shishkin@linux.intel.com, bpf@vger.kernel.org, irogers@google.com, 
+	jolsa@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com, 
+	namhyung@kernel.org, netdev@vger.kernel.org, peterz@infradead.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 31, 2023 at 2:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> After blamed commit, TFO client-ack-dropped-then-recovery-ms-timestamps
-> packetdrill test failed.
->
-> David Morley and Neal Cardwell started investigating and Neal pointed
-> that we had :
->
-> tcp_conn_request()
->   tcp_try_fastopen()
->    -> tcp_fastopen_create_child
->      -> child =3D inet_csk(sk)->icsk_af_ops->syn_recv_sock()
->        -> tcp_create_openreq_child()
->           -> copy req_usec_ts from req:
->           newtp->tcp_usec_ts =3D treq->req_usec_ts;
->           // now the new TFO server socket always does usec TS, no matter
->           // what the route options are...
->   send_synack()
->     -> tcp_make_synack()
->         // disable tcp_rsk(req)->req_usec_ts if route option is not prese=
-nt:
->         if (tcp_rsk(req)->req_usec_ts < 0)
->                 tcp_rsk(req)->req_usec_ts =3D dst_tcp_usec_ts(dst);
->
-> tcp_conn_request() has the initial dst, we can initialize
-> tcp_rsk(req)->req_usec_ts there instead of later in send_synack();
->
-> This means tcp_rsk(req)->req_usec_ts can be a boolean.
->
-> Many thanks to David an Neal for their help.
->
-> Fixes: 614e8316aa4c ("tcp: add support for usec resolution in TCP TS valu=
-es")
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Closes: https://lore.kernel.org/oe-lkp/202310302216.f79d78bc-oliver.sang@=
-intel.com
-> Suggested-by: Neal Cardwell <ncardwell@google.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: David Morley <morleyd@google.com>
-> ---
+Hello,
 
-Looks great to me. Thanks, Eric!
+syzbot found the following issue on:
 
-Acked-by: Neal Cardwell <ncardwell@google.com>
+HEAD commit:    c17cda15cc86 Merge tag 'net-6.6-rc8' of git://git.kernel.o..
+git tree:       bpf
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=151ab177680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d1f30869bb78ec6
+dashboard link: https://syzkaller.appspot.com/bug?extid=756fe9affda890e892ae
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103b572b680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=143a82c3680000
 
-neal
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d47cb341912c/disk-c17cda15.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f37f0cf41858/vmlinux-c17cda15.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e256afecf3c3/bzImage-c17cda15.xz
+
+The issue was bisected to:
+
+commit 32671e3799ca2e4590773fd0e63aaa4229e50c06
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Wed Oct 18 11:56:54 2023 +0000
+
+    perf: Disallow mis-matched inherited group reads
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10fdf71d680000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12fdf71d680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14fdf71d680000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+756fe9affda890e892ae@syzkaller.appspotmail.com
+Fixes: 32671e3799ca ("perf: Disallow mis-matched inherited group reads")
+
+general protection fault, probably for non-canonical address 0xdffffc0000000011: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000088-0x000000000000008f]
+CPU: 0 PID: 5052 Comm: syz-executor420 Not tainted 6.6.0-rc7-syzkaller-00089-gc17cda15cc86 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
+RIP: 0010:inherit_group kernel/events/core.c:13375 [inline]
+RIP: 0010:inherit_task_group.isra.0+0x248/0x5e0 kernel/events/core.c:13422
+Code: 38 d0 7c 08 84 d2 0f 85 18 03 00 00 49 8d bf 8c 00 00 00 8b 9b 8c 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 eb
+RSP: 0018:ffffc90003b1fa48 EFLAGS: 00010207
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000011 RSI: ffffffff81b0fbc9 RDI: 000000000000008c
+RBP: ffff88801ce578a0 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000001 R11: ffffffff8a60008b R12: 0000000000000000
+R13: ffff88807532bb80 R14: ffffc90003b1fae0 R15: 0000000000000000
+FS:  00007f07e8df36c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f07e8df3fe8 CR3: 0000000078a1f000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ perf_event_init_context kernel/events/core.c:13487 [inline]
+ perf_event_init_task+0x330/0x740 kernel/events/core.c:13538
+ copy_process+0x242c/0x73f0 kernel/fork.c:2475
+ kernel_clone+0xfd/0x920 kernel/fork.c:2909
+ __do_sys_clone+0xba/0x100 kernel/fork.c:3052
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f07e8e324d9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f07e8df3228 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
+RAX: ffffffffffffffda RBX: 00007f07e8ebc308 RCX: 00007f07e8e324d9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 00007f07e8ebc300 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f07e8ebc30c
+R13: 0000000000000016 R14: 00007ffca721dd10 R15: 00007ffca721ddf8
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:inherit_group kernel/events/core.c:13375 [inline]
+RIP: 0010:inherit_task_group.isra.0+0x248/0x5e0 kernel/events/core.c:13422
+Code: 38 d0 7c 08 84 d2 0f 85 18 03 00 00 49 8d bf 8c 00 00 00 8b 9b 8c 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 eb
+RSP: 0018:ffffc90003b1fa48 EFLAGS: 00010207
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000011 RSI: ffffffff81b0fbc9 RDI: 000000000000008c
+RBP: ffff88801ce578a0 R08: 0000000000000005 R09: 0000000000000001
+R10: 0000000000000001 R11: ffffffff8a60008b R12: 0000000000000000
+R13: ffff88807532bb80 R14: ffffc90003b1fae0 R15: 0000000000000000
+FS:  00007f07e8df36c0(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f07e8e5ef20 CR3: 0000000078a1f000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	38 d0                	cmp    %dl,%al
+   2:	7c 08                	jl     0xc
+   4:	84 d2                	test   %dl,%dl
+   6:	0f 85 18 03 00 00    	jne    0x324
+   c:	49 8d bf 8c 00 00 00 	lea    0x8c(%r15),%rdi
+  13:	8b 9b 8c 00 00 00    	mov    0x8c(%rbx),%ebx
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx <-- trapping instruction
+  2e:	48 89 f8             	mov    %rdi,%rax
+  31:	83 e0 07             	and    $0x7,%eax
+  34:	83 c0 03             	add    $0x3,%eax
+  37:	38 d0                	cmp    %dl,%al
+  39:	7c 08                	jl     0x43
+  3b:	84 d2                	test   %dl,%dl
+  3d:	0f                   	.byte 0xf
+  3e:	85 eb                	test   %ebp,%ebx
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
