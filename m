@@ -1,247 +1,151 @@
-Return-Path: <netdev+bounces-45458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C33DD7DD352
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 17:53:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505B97DD3A7
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 18:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E316F1C2091E
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 16:53:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C935CB20E2F
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 17:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477AE200A4;
-	Tue, 31 Oct 2023 16:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D51152031C;
+	Tue, 31 Oct 2023 17:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="G1Nhf9p8"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="XbZK8yxe"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FB01DDD0
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 16:53:30 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE7494219;
-	Tue, 31 Oct 2023 09:53:16 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39VChRRD009055;
-	Tue, 31 Oct 2023 09:53:04 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-type; s=pfpt0220;
- bh=zJX9OraBPoQtVGMWg3Ag4V88rlWgf87SKNnKfSKQV6s=;
- b=G1Nhf9p8SrMpVztR4N8iCLZYqG7EGaLRaZiOMA6UsPdlqm555G7sqoxr7FOVLJfr38cQ
- I9U7Vjn482NpocsWS/EVcagdWMMXbFQpFhjMWmtqw/8eP05zj5qtuAUD2KgpgNbpuVjj
- 8m7VbrujdCngJe7W5mp0C5k7/EjGHmdssR29o3C3ncpFOg1PB7KYQ3XEe4+htdCfLrYp
- jlcRiDquTyHQVa3RMWDqTzc3cAS8M7XKmXIPBQpWwHZ4VJru/Z7M31kf9lFSXUbK+p78
- QoqjxGrTgvmjvW8PFBVjVISJrcVhMW+Ufc8FwF60znh8b8IFnmIdPr4mLtctFn9er4Q6 1A== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3u31u8sae2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 31 Oct 2023 09:53:04 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 31 Oct
- 2023 09:53:03 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 31 Oct 2023 09:53:02 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id CEE0E3F703F;
-	Tue, 31 Oct 2023 09:52:59 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next v2 PATCH] octeontx2-pf: TC flower offload support for ICMP type and code
-Date: Tue, 31 Oct 2023 22:22:58 +0530
-Message-ID: <20231031165258.30002-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B07200D4
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 17:01:01 +0000 (UTC)
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CECF35B3
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:58:50 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id 38308e7fff4ca-2c54c8934abso82177691fa.0
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:58:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=arista.com; s=google; t=1698771528; x=1699376328; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q5huLM+ruuR9r8bhIQkyby3oySC0L2SsIXLHU8PQQvs=;
+        b=XbZK8yxeSGH9D8WwMS7kFbOCYK/cOSYAxSV1cBsiIFiQ65IUSmi1y9ydHb6I7vPlb+
+         DC2MFlw2fESVX3Iyv8B6WgJ5bcRAxTzdxMco8I1NOr24SubpEaVWfEUn1K157LR2+PDZ
+         twF3N9XdXBtX5J3eWGKKAtvNx70yOAcLffBRqQsumIxiYeumcJByUJ+JBJtX/X209q7u
+         vgY05Jnzgmt8B1qJQcfXwrMzisKOKfk6RRGYo5FbQD0Zn6iwwnP8Tx4WuqqUA3auonVt
+         IeLHARCiN08OeajEuMsI+x4SfWouLWyHHOfBCuwq4K8AsV3cAnRGBN9K4EsPDk2WkXe0
+         JlLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698771528; x=1699376328;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q5huLM+ruuR9r8bhIQkyby3oySC0L2SsIXLHU8PQQvs=;
+        b=PwEdHniIaWwp5UKiaSkvMDSe3wZ+kv7XMkNn5xJjXy9ya75i+y7yieUgJ0UGdkamQz
+         rppvyKzGTtqOlcp4xpvZZ8fcZrxmDd+FsHgxNFNDHrNNR15jPrC+/ruTGXFcYNAA2ZKa
+         17Nd0hADnhF67PrJsoB6F+N2LYLeGtrY2/Id5h2ZzDA2enkvKRLXHCNYy1PnSExn8b58
+         mFI8uawP5XnP5icGR6uN+Nx+cPIccAF2psgub9aPIrmWPHJDNqqs9nFm+vbaST8OFUR2
+         YVDoKpdzY02Z/RGsNUh0GPF5opiLQRDl9Tn5dEwPI4hD4OdABWYoaugEPktakZtn+Uha
+         Q+Fw==
+X-Gm-Message-State: AOJu0YwkOmZjo3mzNG7K+pX5UhTuufrZmGNHnZQatXKDDyzxS472dOlR
+	k+ScW49JANIqLC4No++uj8jLLw==
+X-Google-Smtp-Source: AGHT+IH9dgjnNtj2krBlBhHyGbG5mxlYMKSxONczPYvNzDWasZVNvqdZZIXCzFLOURVs3cZCaNYIWw==
+X-Received: by 2002:a2e:b817:0:b0:2c5:994:ed72 with SMTP id u23-20020a2eb817000000b002c50994ed72mr9596540ljo.21.1698771522970;
+        Tue, 31 Oct 2023 09:58:42 -0700 (PDT)
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id u11-20020a05600c19cb00b0040535648639sm2240865wmq.36.2023.10.31.09.58.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Oct 2023 09:58:42 -0700 (PDT)
+Message-ID: <64cded2c-f939-4df9-ac14-f17dd1a1378f@arista.com>
+Date: Tue, 31 Oct 2023 16:58:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: GihrB8W7iemoZ9IFWVaDy_9eHk4WBGRA
-X-Proofpoint-ORIG-GUID: GihrB8W7iemoZ9IFWVaDy_9eHk4WBGRA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-10-31_04,2023-10-31_03,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/tcp_sigpool: Fix some off by one bugs
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <ce915d61-04bc-44fb-b450-35fcc9fc8831@moroto.mountain>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <ce915d61-04bc-44fb-b450-35fcc9fc8831@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Adds tc offload support for matching on ICMP type and code.
+Hi Dan,
 
-Example usage:
-To enable adding tc ingress rules
-        tc qdisc add dev eth0 ingress
+On 10/31/23 09:51, Dan Carpenter wrote:
+> The "cpool_populated" variable is the number of elements in the cpool[]
+> array that have been populated.  It is incremented in
+> tcp_sigpool_alloc_ahash() every time we populate a new element.
+> Unpopulated elements are NULL but if we have populated every element then
+> this code will read one element beyond the end of the array.
+> 
+> Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-TC rule drop the ICMP echo reply:
-        tc filter add dev eth0 protocol ip parent ffff: \
-        flower ip_proto icmp type 8 code 0 skip_sw action drop
+Yeah, those are barriers for any issues in the caller-code, so that's
+not too critical but nice to have. Thanks for the patch!
 
-TC rule to drop ICMPv6 echo reply:
-        tc filter add dev eth0 protocol ipv6 parent ffff: flower \
-        indev eth0 ip_proto icmpv6 type 128 code 0 action drop
+Reviewed-by: Dmitry Safonov <dima@arista.com>
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
-v1-v2:
--Rebased on latest net-next branch.
+> ---
+> From static analysis and review.
+> 
+>  net/ipv4/tcp_sigpool.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
+> index 65a8eaae2fec..55b310a722c7 100644
+> --- a/net/ipv4/tcp_sigpool.c
+> +++ b/net/ipv4/tcp_sigpool.c
+> @@ -231,7 +231,7 @@ static void cpool_schedule_cleanup(struct kref *kref)
+>   */
+>  void tcp_sigpool_release(unsigned int id)
+>  {
+> -	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
+> +	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+>  		return;
+>  
+>  	/* slow-path */
+> @@ -245,7 +245,7 @@ EXPORT_SYMBOL_GPL(tcp_sigpool_release);
+>   */
+>  void tcp_sigpool_get(unsigned int id)
+>  {
+> -	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
+> +	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+>  		return;
+>  	kref_get(&cpool[id].kref);
+>  }
+> @@ -256,7 +256,7 @@ int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(RC
+>  	struct crypto_ahash *hash;
+>  
+>  	rcu_read_lock_bh();
+> -	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg)) {
+> +	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
+>  		rcu_read_unlock_bh();
+>  		return -EINVAL;
+>  	}
+> @@ -301,7 +301,7 @@ EXPORT_SYMBOL_GPL(tcp_sigpool_end);
+>   */
+>  size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
+>  {
+> -	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
+> +	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+>  		return -EINVAL;
+>  
+>  	return strscpy(buf, cpool[id].alg, buf_len);
 
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  2 ++
- .../net/ethernet/marvell/octeontx2/af/npc.h   |  2 ++
- .../marvell/octeontx2/af/rvu_debugfs.c        |  8 +++++++
- .../marvell/octeontx2/af/rvu_npc_fs.c         | 23 ++++++++++++++-----
- .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 14 +++++++++++
- 5 files changed, 43 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 6845556581c3..b4ced739ae44 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1479,6 +1479,8 @@ struct flow_msg {
- #define OTX2_FLOWER_MASK_MPLS_TTL		GENMASK(7, 0)
- #define OTX2_FLOWER_MASK_MPLS_NON_TTL		GENMASK(31, 8)
- 	u32 mpls_lse[4];
-+	u8 icmp_type;
-+	u8 icmp_code;
- };
- 
- struct npc_install_flow_req {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-index ab3e39eef2eb..ffc0aa0a7b47 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
-@@ -214,6 +214,8 @@ enum key_fields {
- 	NPC_MPLS3_TTL,
- 	NPC_MPLS4_LBTCBOS,
- 	NPC_MPLS4_TTL,
-+	NPC_TYPE_ICMP,
-+	NPC_CODE_ICMP,
- 	NPC_HEADER_FIELDS_MAX,
- 	NPC_CHAN = NPC_HEADER_FIELDS_MAX, /* Valid when Rx */
- 	NPC_PF_FUNC, /* Valid when Tx */
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index bd817ee88735..468b6561ed3f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -2889,6 +2889,14 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
- 			RVU_DBG_PRINT_MPLS_TTL(rule->packet.mpls_lse[3],
- 					       rule->mask.mpls_lse[3]);
- 			break;
-+		case NPC_TYPE_ICMP:
-+			seq_printf(s, "%d ", rule->packet.icmp_type);
-+			seq_printf(s, "mask 0x%x\n", rule->mask.icmp_type);
-+			break;
-+		case NPC_CODE_ICMP:
-+			seq_printf(s, "%d ", rule->packet.icmp_code);
-+			seq_printf(s, "mask 0x%x\n", rule->mask.icmp_code);
-+			break;
- 		default:
- 			seq_puts(s, "\n");
- 			break;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-index 114e4ec21802..db8f151636af 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-@@ -51,6 +51,8 @@ static const char * const npc_flow_names[] = {
- 	[NPC_MPLS3_TTL]     = "lse depth 3 ttl",
- 	[NPC_MPLS4_LBTCBOS] = "lse depth 4 label tc bos",
- 	[NPC_MPLS4_TTL]     = "lse depth 4",
-+	[NPC_TYPE_ICMP] = "icmp type",
-+	[NPC_CODE_ICMP] = "icmp code",
- 	[NPC_UNKNOWN]	= "unknown",
- };
- 
-@@ -526,6 +528,8 @@ do {									       \
- 	NPC_SCAN_HDR(NPC_DPORT_TCP, NPC_LID_LD, NPC_LT_LD_TCP, 2, 2);
- 	NPC_SCAN_HDR(NPC_SPORT_SCTP, NPC_LID_LD, NPC_LT_LD_SCTP, 0, 2);
- 	NPC_SCAN_HDR(NPC_DPORT_SCTP, NPC_LID_LD, NPC_LT_LD_SCTP, 2, 2);
-+	NPC_SCAN_HDR(NPC_TYPE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 0, 1);
-+	NPC_SCAN_HDR(NPC_CODE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 1, 1);
- 	NPC_SCAN_HDR(NPC_ETYPE_ETHER, NPC_LID_LA, NPC_LT_LA_ETHER, 12, 2);
- 	NPC_SCAN_HDR(NPC_ETYPE_TAG1, NPC_LID_LB, NPC_LT_LB_CTAG, 4, 2);
- 	NPC_SCAN_HDR(NPC_ETYPE_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 8, 2);
-@@ -555,7 +559,7 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
- {
- 	struct npc_mcam *mcam = &rvu->hw->mcam;
- 	u64 *features = &mcam->rx_features;
--	u64 tcp_udp_sctp;
-+	u64 proto_flags;
- 	int hdr;
- 
- 	if (is_npc_intf_tx(intf))
-@@ -566,18 +570,21 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
- 			*features |= BIT_ULL(hdr);
- 	}
- 
--	tcp_udp_sctp = BIT_ULL(NPC_SPORT_TCP) | BIT_ULL(NPC_SPORT_UDP) |
-+	proto_flags = BIT_ULL(NPC_SPORT_TCP) | BIT_ULL(NPC_SPORT_UDP) |
- 		       BIT_ULL(NPC_DPORT_TCP) | BIT_ULL(NPC_DPORT_UDP) |
--		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP);
-+		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
-+		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
-+		       BIT_ULL(NPC_TYPE_ICMP) | BIT_ULL(NPC_CODE_ICMP);
- 
- 	/* for tcp/udp/sctp corresponding layer type should be in the key */
--	if (*features & tcp_udp_sctp) {
-+	if (*features & proto_flags) {
- 		if (!npc_check_field(rvu, blkaddr, NPC_LD, intf))
--			*features &= ~tcp_udp_sctp;
-+			*features &= ~proto_flags;
- 		else
- 			*features |= BIT_ULL(NPC_IPPROTO_TCP) |
- 				     BIT_ULL(NPC_IPPROTO_UDP) |
--				     BIT_ULL(NPC_IPPROTO_SCTP);
-+				     BIT_ULL(NPC_IPPROTO_SCTP) |
-+				     BIT_ULL(NPC_IPPROTO_ICMP);
- 	}
- 
- 	/* for AH/ICMP/ICMPv6/, check if corresponding layer type is present in the key */
-@@ -971,6 +978,10 @@ do {									      \
- 		       ntohs(mask->sport), 0);
- 	NPC_WRITE_FLOW(NPC_DPORT_SCTP, dport, ntohs(pkt->dport), 0,
- 		       ntohs(mask->dport), 0);
-+	NPC_WRITE_FLOW(NPC_TYPE_ICMP, icmp_type, pkt->icmp_type, 0,
-+		       mask->icmp_type, 0);
-+	NPC_WRITE_FLOW(NPC_CODE_ICMP, icmp_code, pkt->icmp_code, 0,
-+		       mask->icmp_code, 0);
- 
- 	NPC_WRITE_FLOW(NPC_IPSEC_SPI, spi, ntohl(pkt->spi), 0,
- 		       ntohl(mask->spi), 0);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 8a5e3987a482..10657a7559d7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -522,6 +522,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
- 	      BIT(FLOW_DISSECTOR_KEY_IPSEC) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_MPLS) |
-+	      BIT_ULL(FLOW_DISSECTOR_KEY_ICMP) |
- 	      BIT_ULL(FLOW_DISSECTOR_KEY_IP))))  {
- 		netdev_info(nic->netdev, "unsupported flow used key 0x%llx",
- 			    dissector->used_keys);
-@@ -796,6 +797,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 		}
- 	}
- 
-+	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ICMP)) {
-+		struct flow_match_icmp match;
-+
-+		flow_rule_match_icmp(rule, &match);
-+
-+		flow_spec->icmp_type = match.key->type;
-+		flow_mask->icmp_type = match.mask->type;
-+		req->features |= BIT_ULL(NPC_TYPE_ICMP);
-+
-+		flow_spec->icmp_code = match.key->code;
-+		flow_mask->icmp_code = match.mask->code;
-+		req->features |= BIT_ULL(NPC_CODE_ICMP);
-+	}
- 	return otx2_tc_parse_actions(nic, &rule->action, req, f, node);
- }
- 
--- 
-2.25.1
+Thanks,
+            Dmitry
 
 
