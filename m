@@ -1,330 +1,273 @@
-Return-Path: <netdev+bounces-45489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC9EE7DD842
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:27:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1767DD86F
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:38:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B63F61C20D69
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:27:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03267281854
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EA82746E;
-	Tue, 31 Oct 2023 22:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D46B27461;
+	Tue, 31 Oct 2023 22:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lHruS27N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+30KIRB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031D727456
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 22:27:35 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A96DF5
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 15:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698791254; x=1730327254;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=P27lxnlAWasQFC0+jz6kgXc7QIVxyBR7ifBrmlXUlKI=;
-  b=lHruS27NTI1kIctliJ5Itzwqi5x80a98XJL3D7L2fKNMZsrUsrI+G70m
-   qyV5Tzc1fMGrOTrt5CrEDoQtRDTlF4smC7JRT4rdk9/UIcrpopnFRZWXo
-   C4JGAj77BPXZeuRthti+tx87j77eal4gcUi2bSJZekwyHOpPwPlIssFMH
-   TKypWIx2veAfcKrj8od44RuTldAmROmTWj3514cgH1d//H8DjHSb2EcdV
-   beNglWPsYE4+hvPlTapnx3CRr7n8gCB8gVgaEMHH3ybNPOv0Q/uJ+zA73
-   ep8Z/gh/SznyX5iwuPuLQrkzL0ruTv129GbmR7nqiIlCgHG173g0SCppV
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="1236100"
-X-IronPort-AV: E=Sophos;i="6.03,266,1694761200"; 
-   d="scan'208";a="1236100"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 15:27:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,266,1694761200"; 
-   d="scan'208";a="1988807"
-Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 15:27:32 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: netdev@vger.kernel.org,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
-	Anthony Nguyen <anthony.l.nguyen@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net v2 3/3] ice: restore timestamp configuration after device reset
-Date: Tue, 31 Oct 2023 15:27:25 -0700
-Message-ID: <20231031222725.2819172-4-jacob.e.keller@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231031222725.2819172-1-jacob.e.keller@intel.com>
-References: <20231031222725.2819172-1-jacob.e.keller@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C485625103;
+	Tue, 31 Oct 2023 22:38:41 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1477F4;
+	Tue, 31 Oct 2023 15:38:39 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-407c3adef8eso50468025e9.2;
+        Tue, 31 Oct 2023 15:38:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698791918; x=1699396718; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6yNnFVQiHIMKBbkJdP4Bo88uYPZR71YVjxbz/oPSYuw=;
+        b=T+30KIRBjXelxp/eUrY79RSq3lnD4/L/JgiGnYGg4RGo5g6Mx72bHsatzJmAvUFT4z
+         Myc5elYlM3vXPRPL2MhKa+ppAUyECudv4Nj1m39lt0Ih5Qgs+wownL3DOutrMTQHORjT
+         LFp2E+8enQwTDnDHCXJGWCyXTYN0ag6BT2PDE1tUXJ7OJv10Qde7Vhx4HZgsGcFFdy7I
+         Aa2PvmqMir0tofk4IpL4kzodncAg65hDw8iHKauYz8+uZdumfIvx2RWwZA+iuCo5uRah
+         /5xFZ1vL1vrS8IRmDJTUI+teE70tms/rYZu9XnaWq9A4+Z1wFqxWPaGHpyBcxitNC74E
+         jPbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698791918; x=1699396718;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6yNnFVQiHIMKBbkJdP4Bo88uYPZR71YVjxbz/oPSYuw=;
+        b=ITToJUzbwVvP3rDxoqCZSkFwMsVT3kLsTd/zUK9sPqOAipW0c9LYBXY2dZh4/V2xLn
+         E+YxRVs2hE55Bu5ABQdUC0AedtdX+yXlGH708M/ksS6MUs5vyHEWNG6KQ5X2OjqX6t09
+         wwbzLcYR8a5T2IRBJxCvgHLJ5bGq6G0XLtlDP3M1cutBPBlyKHeNV09BN4MOWdV/Piaz
+         ECcn/JJ9RM1bM+AIgEeciMw/cEwMf7BffDL4NOey1MqJ9/dYi73bAarEtNV4eunqz76n
+         aWACcKe14R9DKihWt8/4kYMG7fk5BqcEe3DxQw0oELIpzwwWOf23daCmEX6QlujafKRy
+         jFJA==
+X-Gm-Message-State: AOJu0Yw0ZDkRlZwsN3fxXJn8G0DZag0Eqlsgjewmww9BSCPXAcl3b5Di
+	CN+9pf1wChaHqfGEIykVWM8Xgq0eavA07+KOEfE=
+X-Google-Smtp-Source: AGHT+IFEToQ0jaQCfZXrT3l50xsZYDINQsLq8vB9PcCCTGW9BFC0ZBcZbfg9XiVETDdXg4hLeUrkhPB8IZ36tT+SD7U=
+X-Received: by 2002:a05:600c:19d1:b0:401:be5a:989 with SMTP id
+ u17-20020a05600c19d100b00401be5a0989mr10650711wmq.23.1698791918006; Tue, 31
+ Oct 2023 15:38:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1698431765.git.dxu@dxuuu.xyz> <ee5513e6384696147da9bdccd2e22ea27d690084.1698431765.git.dxu@dxuuu.xyz>
+ <CAADnVQ+UUsJvrPp=YhtpwuC6xVWGB=OgwXZwXtHi=2Je6n5a=A@mail.gmail.com> <io26znzyhw4t4drmcqkmvgyykyblxzxpizuntgk5fhqasipfyo@r5tpoqo3djkp>
+In-Reply-To: <io26znzyhw4t4drmcqkmvgyykyblxzxpizuntgk5fhqasipfyo@r5tpoqo3djkp>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 31 Oct 2023 15:38:26 -0700
+Message-ID: <CAADnVQJkfAGG9_868tLW9m-9V2husAaRK5afnrLL1HqaxN_3vQ@mail.gmail.com>
+Subject: Re: [RFC bpf-next 1/6] bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	antony.antony@secunet.com, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, devel@linux-ipsec.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The driver calls ice_ptp_cfg_timestamp() during ice_ptp_prepare_for_reset()
-to disable timestamping while the device is resetting. This operation
-destroys the user requested configuration. While the driver does call
-ice_ptp_cfg_timestamp in ice_rebuild() to restore some hardware settings
-after a reset, it unconditionally passes true or false, resulting in
-failure to restore previous user space configuration.
+On Sun, Oct 29, 2023 at 3:55=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+> Hi Alexei,
+>
+> On Sat, Oct 28, 2023 at 04:49:45PM -0700, Alexei Starovoitov wrote:
+> > On Fri, Oct 27, 2023 at 11:46=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrot=
+e:
+> > >
+> > > This commit adds an unstable kfunc helper to access internal xfrm_sta=
+te
+> > > associated with an SA. This is intended to be used for the upcoming
+> > > IPsec pcpu work to assign special pcpu SAs to a particular CPU. In ot=
+her
+> > > words: for custom software RSS.
+> > >
+> > > That being said, the function that this kfunc wraps is fairly generic
+> > > and used for a lot of xfrm tasks. I'm sure people will find uses
+> > > elsewhere over time.
+> > >
+> > > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> > > ---
+> > >  include/net/xfrm.h        |   9 ++++
+> > >  net/xfrm/Makefile         |   1 +
+> > >  net/xfrm/xfrm_policy.c    |   2 +
+> > >  net/xfrm/xfrm_state_bpf.c | 105 ++++++++++++++++++++++++++++++++++++=
+++
+> > >  4 files changed, 117 insertions(+)
+> > >  create mode 100644 net/xfrm/xfrm_state_bpf.c
+> > >
+> > > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > > index 98d7aa78adda..ab4cf66480f3 100644
+> > > --- a/include/net/xfrm.h
+> > > +++ b/include/net/xfrm.h
+> > > @@ -2188,4 +2188,13 @@ static inline int register_xfrm_interface_bpf(=
+void)
+> > >
+> > >  #endif
+> > >
+> > > +#if IS_ENABLED(CONFIG_DEBUG_INFO_BTF)
+> > > +int register_xfrm_state_bpf(void);
+> > > +#else
+> > > +static inline int register_xfrm_state_bpf(void)
+> > > +{
+> > > +       return 0;
+> > > +}
+> > > +#endif
+> > > +
+> > >  #endif /* _NET_XFRM_H */
+> > > diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
+> > > index cd47f88921f5..547cec77ba03 100644
+> > > --- a/net/xfrm/Makefile
+> > > +++ b/net/xfrm/Makefile
+> > > @@ -21,3 +21,4 @@ obj-$(CONFIG_XFRM_USER_COMPAT) +=3D xfrm_compat.o
+> > >  obj-$(CONFIG_XFRM_IPCOMP) +=3D xfrm_ipcomp.o
+> > >  obj-$(CONFIG_XFRM_INTERFACE) +=3D xfrm_interface.o
+> > >  obj-$(CONFIG_XFRM_ESPINTCP) +=3D espintcp.o
+> > > +obj-$(CONFIG_DEBUG_INFO_BTF) +=3D xfrm_state_bpf.o
+> > > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> > > index 5cdd3bca3637..62e64fa7ae5c 100644
+> > > --- a/net/xfrm/xfrm_policy.c
+> > > +++ b/net/xfrm/xfrm_policy.c
+> > > @@ -4267,6 +4267,8 @@ void __init xfrm_init(void)
+> > >  #ifdef CONFIG_XFRM_ESPINTCP
+> > >         espintcp_init();
+> > >  #endif
+> > > +
+> > > +       register_xfrm_state_bpf();
+> > >  }
+> > >
+> > >  #ifdef CONFIG_AUDITSYSCALL
+> > > diff --git a/net/xfrm/xfrm_state_bpf.c b/net/xfrm/xfrm_state_bpf.c
+> > > new file mode 100644
+> > > index 000000000000..a73a17a6497b
+> > > --- /dev/null
+> > > +++ b/net/xfrm/xfrm_state_bpf.c
+> > > @@ -0,0 +1,105 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/* Unstable XFRM state BPF helpers.
+> > > + *
+> > > + * Note that it is allowed to break compatibility for these function=
+s since the
+> > > + * interface they are exposed through to BPF programs is explicitly =
+unstable.
+> > > + */
+> > > +
+> > > +#include <linux/bpf.h>
+> > > +#include <linux/btf_ids.h>
+> > > +#include <net/xdp.h>
+> > > +#include <net/xfrm.h>
+> > > +
+> > > +/* bpf_xfrm_state_opts - Options for XFRM state lookup helpers
+> > > + *
+> > > + * Members:
+> > > + * @error      - Out parameter, set for any errors encountered
+> > > + *              Values:
+> > > + *                -EINVAL - netns_id is less than -1
+> > > + *                -EINVAL - Passed NULL for opts
+> > > + *                -EINVAL - opts__sz isn't BPF_XFRM_STATE_OPTS_SZ
+> > > + *                -ENONET - No network namespace found for netns_id
+> > > + * @netns_id   - Specify the network namespace for lookup
+> > > + *              Values:
+> > > + *                BPF_F_CURRENT_NETNS (-1)
+> > > + *                  Use namespace associated with ctx
+> > > + *                [0, S32_MAX]
+> > > + *                  Network Namespace ID
+> > > + * @mark       - XFRM mark to match on
+> > > + * @daddr      - Destination address to match on
+> > > + * @spi                - Security parameter index to match on
+> > > + * @proto      - L3 protocol to match on
+> > > + * @family     - L3 protocol family to match on
+> > > + */
+> > > +struct bpf_xfrm_state_opts {
+> > > +       s32 error;
+> > > +       s32 netns_id;
+> > > +       u32 mark;
+> > > +       xfrm_address_t daddr;
+> > > +       __be32 spi;
+> > > +       u8 proto;
+> > > +       u16 family;
+> > > +};
+> > > +
+> > > +enum {
+> > > +       BPF_XFRM_STATE_OPTS_SZ =3D sizeof(struct bpf_xfrm_state_opts)=
+,
+> > > +};
+> > > +
+> > > +__diag_push();
+> > > +__diag_ignore_all("-Wmissing-prototypes",
+> > > +                 "Global functions as their definitions will be in x=
+frm_state BTF");
+> > > +
+> > > +/* bpf_xdp_get_xfrm_state - Get XFRM state
+> > > + *
+> > > + * Parameters:
+> > > + * @ctx        - Pointer to ctx (xdp_md) in XDP program
+> > > + *                 Cannot be NULL
+> > > + * @opts       - Options for lookup (documented above)
+> > > + *                 Cannot be NULL
+> > > + * @opts__sz   - Length of the bpf_xfrm_state_opts structure
+> > > + *                 Must be BPF_XFRM_STATE_OPTS_SZ
+> > > + */
+> > > +__bpf_kfunc struct xfrm_state *
+> > > +bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opt=
+s *opts, u32 opts__sz)
+> > > +{
+> > > +       struct xdp_buff *xdp =3D (struct xdp_buff *)ctx;
+> > > +       struct net *net =3D dev_net(xdp->rxq->dev);
+> > > +
+> > > +       if (!opts || opts__sz !=3D BPF_XFRM_STATE_OPTS_SZ) {
+> > > +               opts->error =3D -EINVAL;
+> > > +               return NULL;
+> > > +       }
+> > > +
+> > > +       if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS)) {
+> > > +               opts->error =3D -EINVAL;
+> > > +               return NULL;
+> > > +       }
+> > > +
+> > > +       if (opts->netns_id >=3D 0) {
+> > > +               net =3D get_net_ns_by_id(net, opts->netns_id);
+> > > +               if (unlikely(!net)) {
+> > > +                       opts->error =3D -ENONET;
+> > > +                       return NULL;
+> > > +               }
+> > > +       }
+> > > +
+> > > +       return xfrm_state_lookup(net, opts->mark, &opts->daddr, opts-=
+>spi,
+> > > +                                opts->proto, opts->family);
+> > > +}
+> >
+> > Patch 6 example does little to explain how this kfunc can be used.
+> > Cover letter sounds promising, but no code to demonstrate the result.
+>
+> Part of the reason for that is this kfunc is intended to be used with a
+> not-yet-upstreamed xfrm patchset. The other is that the usage is quite
+> trivial. This is the code the experiments were run with:
+>
+> https://github.com/danobi/xdp-tools/blob/e89a1c617aba3b50d990f779357d6ce2=
+863ecb27/xdp-bench/xdp_redirect_cpumap.bpf.c#L385-L406
+>
+> We intend to upstream that cpumap mode to xdp-tools as soon as the xfrm
+> patches are in. (Note the linked code is a little buggy but the
+> main idea is there).
 
-This results in a device reset forcibly disabling timestamp configuration
-regardless of current user settings.
-
-This was not detected previously due to a quirk of the LinuxPTP ptp4l
-application. If ptp4l detects a missing timestamp, it enters a fault state
-and performs recovery logic which includes executing SIOCSHWTSTAMP again,
-restoring the now accidentally cleared configuration.
-
-Not every application does this, and for these applications, timestamps
-will mysteriously stop after a PF reset, without being restored until an
-application restart.
-
-Fix this by replacing ice_ptp_cfg_timestamp() with two new functions:
-
-1) ice_ptp_disable_timestamp_mode() which unconditionally disables the
-   timestamping logic in ice_ptp_prepare_for_reset() and ice_ptp_release()
-
-2) ice_ptp_restore_timestamp_mode() which calls
-   ice_ptp_restore_tx_interrupt() to restore Tx timestamping configuration,
-   calls ice_set_rx_tstamp() to restore Rx timestamping configuration, and
-   issues an immediate TSYN_TX interrupt to ensure that timestamps which
-   may have occurred during the device reset get processed.
-
-Modify the ice_ptp_set_timestamp_mode to directly save the user
-configuration and then call ice_ptp_restore_timestamp_mode. This way, reset
-no longer destroys the saved user configuration.
-
-This obsoletes the ice_set_tx_tstamp() function which can now be safely
-removed.
-
-With this change, all devices should now restore Tx and Rx timestamping
-functionality correctly after a PF reset without application intervention.
-
-Fixes: 77a781155a65 ("ice: enable receive hardware timestamping")
-Fixes: ea9b847cda64 ("ice: enable transmit timestamps for E810 devices")
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
----
-Changes since v1:
-* Picked up Jesse's Reviewed-by.
-
- drivers/net/ethernet/intel/ice/ice_main.c | 12 +---
- drivers/net/ethernet/intel/ice/ice_ptp.c  | 76 ++++++++++++++---------
- drivers/net/ethernet/intel/ice/ice_ptp.h  |  5 +-
- 3 files changed, 52 insertions(+), 41 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 6607fa6fe556..fb9c93f37e84 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7401,15 +7401,6 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 		goto err_vsi_rebuild;
- 	}
- 
--	/* configure PTP timestamping after VSI rebuild */
--	if (test_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags)) {
--		if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_SELF)
--			ice_ptp_cfg_timestamp(pf, false);
--		else if (pf->ptp.tx_interrupt_mode == ICE_PTP_TX_INTERRUPT_ALL)
--			/* for E82x PHC owner always need to have interrupts */
--			ice_ptp_cfg_timestamp(pf, true);
--	}
--
- 	err = ice_vsi_rebuild_by_type(pf, ICE_VSI_SWITCHDEV_CTRL);
- 	if (err) {
- 		dev_err(dev, "Switchdev CTRL VSI rebuild failed: %d\n", err);
-@@ -7461,6 +7452,9 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	ice_plug_aux_dev(pf);
- 	if (ice_is_feature_supported(pf, ICE_F_SRIOV_LAG))
- 		ice_lag_rebuild(pf);
-+
-+	/* Restore timestamp mode settings after VSI rebuild */
-+	ice_ptp_restore_timestamp_mode(pf);
- 	return;
- 
- err_vsi_rebuild:
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 624d05b4bbd9..71f405f8a6fe 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -294,18 +294,6 @@ static void ice_ptp_cfg_tx_interrupt(struct ice_pf *pf)
- 	wr32(hw, PFINT_OICR_ENA, val);
- }
- 
--/**
-- * ice_set_tx_tstamp - Enable or disable Tx timestamping
-- * @pf: The PF pointer to search in
-- * @on: bool value for whether timestamps are enabled or disabled
-- */
--static void ice_set_tx_tstamp(struct ice_pf *pf, bool on)
--{
--	pf->ptp.tstamp_config.tx_type = on ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
--
--	ice_ptp_cfg_tx_interrupt(pf);
--}
--
- /**
-  * ice_set_rx_tstamp - Enable or disable Rx timestamping
-  * @pf: The PF pointer to search in
-@@ -317,7 +305,7 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
- 	u16 i;
- 
- 	vsi = ice_get_main_vsi(pf);
--	if (!vsi)
-+	if (!vsi || !vsi->rx_rings)
- 		return;
- 
- 	/* Set the timestamp flag for all the Rx rings */
-@@ -326,23 +314,50 @@ static void ice_set_rx_tstamp(struct ice_pf *pf, bool on)
- 			continue;
- 		vsi->rx_rings[i]->ptp_rx = on;
- 	}
--
--	pf->ptp.tstamp_config.rx_filter = on ? HWTSTAMP_FILTER_ALL :
--					       HWTSTAMP_FILTER_NONE;
- }
- 
- /**
-- * ice_ptp_cfg_timestamp - Configure timestamp for init/deinit
-+ * ice_ptp_disable_timestamp_mode - Disable current timestamp mode
-  * @pf: Board private structure
-- * @ena: bool value to enable or disable time stamp
-  *
-- * This function will configure timestamping during PTP initialization
-- * and deinitialization
-+ * Called during preparation for reset to temporarily disable timestamping on
-+ * the device. Called during remove to disable timestamping while cleaning up
-+ * driver resources.
-  */
--void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena)
-+static void ice_ptp_disable_timestamp_mode(struct ice_pf *pf)
- {
--	ice_set_tx_tstamp(pf, ena);
--	ice_set_rx_tstamp(pf, ena);
-+	struct ice_hw *hw = &pf->hw;
-+	u32 val;
-+
-+	val = rd32(hw, PFINT_OICR_ENA);
-+	val &= ~PFINT_OICR_TSYN_TX_M;
-+	wr32(hw, PFINT_OICR_ENA, val);
-+
-+	ice_set_rx_tstamp(pf, false);
-+}
-+
-+/**
-+ * ice_ptp_restore_timestamp_mode - Restore timestamp configuration
-+ * @pf: Board private structure
-+ *
-+ * Called at the end of rebuild to restore timestamp configuration after
-+ * a device reset.
-+ */
-+void ice_ptp_restore_timestamp_mode(struct ice_pf *pf)
-+{
-+	struct ice_hw *hw = &pf->hw;
-+	bool enable_rx;
-+
-+	ice_ptp_cfg_tx_interrupt(pf);
-+
-+	enable_rx = pf->ptp.tstamp_config.rx_filter == HWTSTAMP_FILTER_ALL;
-+	ice_set_rx_tstamp(pf, enable_rx);
-+
-+	/* Trigger an immediate software interrupt to ensure that timestamps
-+	 * which occurred during reset are handled now.
-+	 */
-+	wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
-+	ice_flush(hw);
- }
- 
- /**
-@@ -2043,10 +2058,10 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
- {
- 	switch (config->tx_type) {
- 	case HWTSTAMP_TX_OFF:
--		ice_set_tx_tstamp(pf, false);
-+		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_OFF;
- 		break;
- 	case HWTSTAMP_TX_ON:
--		ice_set_tx_tstamp(pf, true);
-+		pf->ptp.tstamp_config.tx_type = HWTSTAMP_TX_ON;
- 		break;
- 	default:
- 		return -ERANGE;
-@@ -2054,7 +2069,7 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
- 
- 	switch (config->rx_filter) {
- 	case HWTSTAMP_FILTER_NONE:
--		ice_set_rx_tstamp(pf, false);
-+		pf->ptp.tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
- 		break;
- 	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
- 	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-@@ -2070,12 +2085,15 @@ ice_ptp_set_timestamp_mode(struct ice_pf *pf, struct hwtstamp_config *config)
- 	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
- 	case HWTSTAMP_FILTER_NTP_ALL:
- 	case HWTSTAMP_FILTER_ALL:
--		ice_set_rx_tstamp(pf, true);
-+		pf->ptp.tstamp_config.rx_filter = HWTSTAMP_FILTER_ALL;
- 		break;
- 	default:
- 		return -ERANGE;
- 	}
- 
-+	/* Immediately update the device timestamping mode */
-+	ice_ptp_restore_timestamp_mode(pf);
-+
- 	return 0;
- }
- 
-@@ -2743,7 +2761,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf)
- 	clear_bit(ICE_FLAG_PTP, pf->flags);
- 
- 	/* Disable timestamping for both Tx and Rx */
--	ice_ptp_cfg_timestamp(pf, false);
-+	ice_ptp_disable_timestamp_mode(pf);
- 
- 	kthread_cancel_delayed_work_sync(&ptp->work);
- 
-@@ -3061,7 +3079,7 @@ void ice_ptp_release(struct ice_pf *pf)
- 		return;
- 
- 	/* Disable timestamping for both Tx and Rx */
--	ice_ptp_cfg_timestamp(pf, false);
-+	ice_ptp_disable_timestamp_mode(pf);
- 
- 	ice_ptp_remove_auxbus_device(pf);
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 8f6f94392756..06a330867fc9 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -292,7 +292,7 @@ int ice_ptp_clock_index(struct ice_pf *pf);
- struct ice_pf;
- int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr);
- int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr);
--void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena);
-+void ice_ptp_restore_timestamp_mode(struct ice_pf *pf);
- 
- void ice_ptp_extts_event(struct ice_pf *pf);
- s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
-@@ -317,8 +317,7 @@ static inline int ice_ptp_get_ts_config(struct ice_pf *pf, struct ifreq *ifr)
- 	return -EOPNOTSUPP;
- }
- 
--static inline void ice_ptp_cfg_timestamp(struct ice_pf *pf, bool ena) { }
--
-+static inline void ice_ptp_restore_timestamp_mode(struct ice_pf *pf) { }
- static inline void ice_ptp_extts_event(struct ice_pf *pf) { }
- static inline s8
- ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb)
--- 
-2.41.0
-
+I don't understand how it survives anything, but sanity check.
+To measure perf gains it needs to be under traffic for some time,
+but
+x =3D bpf_xdp_get_xfrm_state(ctx, &opts, sizeof(opts));
+will keep refcnt++ that state for every packet.
+Minimum -> memory leak or refcnt overflow.
 
