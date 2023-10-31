@@ -1,117 +1,157 @@
-Return-Path: <netdev+bounces-45470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51BF67DD678
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 20:02:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 329897DD69C
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 20:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACE72817D5
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 19:02:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B56A9B20E57
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 19:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3975922301;
-	Tue, 31 Oct 2023 19:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D592230F;
+	Tue, 31 Oct 2023 19:16:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yQz4eMEI"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="UWkapJHF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9435121A16
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 19:02:43 +0000 (UTC)
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B0CED
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:02:41 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 3f1490d57ef6-da2b9211dc0so3397535276.3
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 12:02:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698778961; x=1699383761; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H4KGArxAse9OlmNDHK67l7i0Cf0qekzekrdh/xlwJmQ=;
-        b=yQz4eMEItzBmFMC4dabipGKrJS1ip23YbP8+4da9G2lnbELZFRJaCROodOwdtrGgha
-         cUY9sB+uLHDXjaSlo0M570FH62VcuBCTk1UfPiCchgOyGp+peuL1iawzEnWqViPVcqMH
-         vtdh8E4g39daL/AlMHA/fBUM9RtOF25BcoZbW/NCnj+FaZ7wkIhOJGibL/aIY252AiAS
-         o+q5t/QNOsS9Dv/HXnhpadiWupdGzwv7zOTyywOdiOelUfym/Fr+XN2orVQ4DPDfT34M
-         6xbg6GWxRUKfki3n2HoB6GZrh+48OUaOzDsUdIrn/sUWDaYlJ57yd6XfeqTguzQhBBu6
-         cB8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698778961; x=1699383761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H4KGArxAse9OlmNDHK67l7i0Cf0qekzekrdh/xlwJmQ=;
-        b=HVmiGQ296syOWE1OavB8YTIxxMTkekeWTbZbVx/UKtGK0HoY+xwz3UQWvogq3d83Hc
-         +lS8kOv/CeLmXBYIFumfnB/Cu6R5Hsdau9j1n0COMpR0OueLjOmEmKobjb3ER0LRPmxi
-         m8yv+OrUcLSADCWSMyW6qM450mPIpkyBDfnRDI+B5hEeSdEzGPGSK6NVmc6kdqcYxlX7
-         uz6Kw8G6WiFx9g8mbugLlvaP6QonC7dO23EBpW5rHJm0vVKoKvYo3+b1UO7xkhIuto/1
-         QEWETv7ewNH25GS4/LCu3M7PDmQx2QyFHvM85CYOqeCLMqhi6B9GPdoi8hQAgiRbri5K
-         roGQ==
-X-Gm-Message-State: AOJu0YwqzqR/GPt+PWk+NCiw2rY2Atw4fQjW+Jrs7B9G0iviUNCkwLsg
-	Sp1KSjA2bp8Mfg6Oz8X9RsobfuKN+VookGf+3lfBZxqBTeFA4M3a
-X-Google-Smtp-Source: AGHT+IFr3vYMDVg5evYLFpLKM2lZT9hhsdNKErYMijLOZGzm/zFiSNML75lGDwp7FixY5bxqeWQAteCakEzmlrwjtcc=
-X-Received: by 2002:a25:ab73:0:b0:da0:48df:cafa with SMTP id
- u106-20020a25ab73000000b00da048dfcafamr12634653ybi.16.1698778960745; Tue, 31
- Oct 2023 12:02:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718491DFD8;
+	Tue, 31 Oct 2023 19:16:32 +0000 (UTC)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A71F4;
+	Tue, 31 Oct 2023 12:16:31 -0700 (PDT)
+Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 87088660739C;
+	Tue, 31 Oct 2023 19:16:27 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1698779789;
+	bh=/gTUn35pxMVNvhON2z5RDIeqdGQZeEsVkG1xfnFFQu8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UWkapJHFI0QYA0BZgDKo7pkdKSfFUwRupE33rQsOG/HwaQdLomOj5pA3pua3dlPdO
+	 H0tXuKf0U2/4B6lQeLgvLnjlEfOG4t2z0p4MH1isl4fuO5fvFG5gkFgRi8URHiYKpX
+	 bs8HbD5ChMP3FIDNjmni5IDoGVQ1y5+uq7gH5TpsxHVzcec9UEy8xXtmRWncwfaeEK
+	 aErXYgvGzEDLuNlVKog3f+cHiJxt3+6KrSqAC5uVAerQD+M9meZ/jjt+XUcbyXoXwH
+	 o7rd5eyc4hnmvwGFUDLz+yOGxYcQeR0IO0XyJxRaqb/tFm+OpQy1mDdx7C1oNMDFtw
+	 FTOFXjIqtPDyw==
+Message-ID: <4f661818-1585-41d8-a305-96fd359bc8b8@collabora.com>
+Date: Tue, 31 Oct 2023 21:16:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <20231031163439.tqab5axhk5q2r62i@skbuf>
-In-Reply-To: <20231031163439.tqab5axhk5q2r62i@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 31 Oct 2023 20:02:29 +0100
-Message-ID: <CACRpkdb=16uLhsXhktLCwUByDAMv9Arg2zzCA+oJW2HBJ35-Bg@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/12] riscv: dts: starfive: Add pool for coherent DMA
+ memory on JH7100 boards
+Content-Language: en-US
+To: Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-9-cristian.ciocaltea@collabora.com>
+ <CAJM55Z_2hdsvw8gdYLs2kZbRrH6xcM6+xCZn8BCf5zsWYyhY3w@mail.gmail.com>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <CAJM55Z_2hdsvw8gdYLs2kZbRrH6xcM6+xCZn8BCf5zsWYyhY3w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 31, 2023 at 5:34=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
+On 10/31/23 16:40, Emil Renner Berthing wrote:
+> Cristian Ciocaltea wrote:
+>> From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>>
+>> The StarFive JH7100 SoC has non-coherent device DMAs, but most drivers
+>> expect to be able to allocate coherent memory for DMA descriptors and
+>> such. However on the JH7100 DDR memory appears twice in the physical
+>> memory map, once cached and once uncached:
+>>
+>>   0x00_8000_0000 - 0x08_7fff_ffff : Off chip DDR memory, cached
+>>   0x10_0000_0000 - 0x17_ffff_ffff : Off chip DDR memory, uncached
+>>
+>> To use this uncached region we create a global DMA memory pool there and
+>> reserve the corresponding area in the cached region.
+>>
+>> However the uncached region is fully above the 32bit address limit, so add
+>> a dma-ranges map so the DMA address used for peripherals is still in the
+>> regular cached region below the limit.
+> 
+> Adding these nodes to the device tree won't actually do anything without
+> enabling CONFIG_DMA_GLOBAL_POOL as is done here:
+> 
+> https://github.com/esmil/linux/commit/e14ad9ff67fd51dcc76415d4cc7f3a30ffcba379
 
-> Ok, so we don't have a confirmation of breakage with other conduit
-> interface than the Gemini driver, either. So a problem there is still
-> not off the table.
+Should I pick this up for v3 or maybe it would be better to be handled
+as part of your ccache series?
 
-True!
+Thanks,
+Cristian
 
-> So on the gemini-dlink-dir-685.dts platform, you can also use &gmac1 as
-> a plain Ethernet port, right?
-
-As a port it exist on the SoC yes but it is not connected physically
-to anything.
-
-&gmac0 is connected to the switch, and the switch has all the PHYs.
-
-(I don't know if I misunderstand the question...)
-
-> If possible, could you set up dsa_loop (enable CONFIG_NET_DSA_LOOP, repla=
-ce
-> "eth0" in dsa_loop_pdata with the netdev name of &gmac1, replace DSA_TAG_=
-PROTO_NONE
-> in dsa_loop_get_protocol() with your tagging protocol) and put a tcpdump
-> on the remote end of the gmac1 port, to see if the issue isn't, in fact,
-> somewhere else, maybe gmac_start_xmit()?
-
-If you by remote end mean the end of a physical cable there is
-no way I can do that, as I have no PHY on gmac1.
-
-But I have other Gemini platforms, so I will try to do it on one
-of them! Let's see if I can do this thing....
-
-Yours,
-Linus Walleij
+>>
+>> Link: https://github.com/starfive-tech/JH7100_Docs/blob/main/JH7100%20Data%20Sheet%20V01.01.04-EN%20(4-21-2021).pdf
+>> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+>> ---
+>>  .../boot/dts/starfive/jh7100-common.dtsi      | 24 +++++++++++++++++++
+>>  1 file changed, 24 insertions(+)
+>>
+>> diff --git a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi b/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> index b93ce351a90f..504c73f01f14 100644
+>> --- a/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> +++ b/arch/riscv/boot/dts/starfive/jh7100-common.dtsi
+>> @@ -39,6 +39,30 @@ led-ack {
+>>  			label = "ack";
+>>  		};
+>>  	};
+>> +
+>> +	reserved-memory {
+>> +		#address-cells = <2>;
+>> +		#size-cells = <2>;
+>> +		ranges;
+>> +
+>> +		dma-reserved {
+>> +			reg = <0x0 0xfa000000 0x0 0x1000000>;
+>> +			no-map;
+>> +		};
+>> +
+>> +		linux,dma {
+>> +			compatible = "shared-dma-pool";
+>> +			reg = <0x10 0x7a000000 0x0 0x1000000>;
+>> +			no-map;
+>> +			linux,dma-default;
+>> +		};
+>> +	};
+>> +
+>> +	soc {
+>> +		dma-ranges = <0x00 0x80000000 0x00 0x80000000 0x00 0x7a000000>,
+>> +			     <0x00 0xfa000000 0x10 0x7a000000 0x00 0x01000000>,
+>> +			     <0x00 0xfb000000 0x00 0xfb000000 0x07 0x85000000>;
+>> +	};
+>>  };
+>>
+>>  &gpio {
+>> --
+>> 2.42.0
+>>
 
