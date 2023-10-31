@@ -1,98 +1,120 @@
-Return-Path: <netdev+bounces-45424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD5A27DCDC4
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:26:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 235497DCDC7
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:27:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E003B20D93
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:26:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F7E7B20DD9
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 13:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004C812E7D;
-	Tue, 31 Oct 2023 13:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C0C912E7D;
+	Tue, 31 Oct 2023 13:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpUfFZKA"
+	dkim=pass (2048-bit key) header.d=alu.hr header.i=@alu.hr header.b="ItcdqIY9";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="fOxCpz9X"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920F110FC
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 13:26:50 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6044FDE
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 06:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698758808;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eI/NB+UK7wm+ikX7wMjjd1LtGrSm/qZ7Qv6AHobbkPs=;
-	b=hpUfFZKARRkCLpjWMlxRttLcYrMRYNxZsMflA2YWlO//3xRtLIb2TsSykVZRLIX3YMSSdp
-	Kf7wwNAFgoWWOJma991VFYi+UFhfqmnv5lH0p9+1NnbMDEqSeLJeFBVuc6VIEQkdpatokZ
-	jafEQJ08HMS/wKbDcvwj3CkQ/GpTfjc=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-257-pJpyFkLbNyetnDk1CeVP_Q-1; Tue, 31 Oct 2023 09:26:47 -0400
-X-MC-Unique: pJpyFkLbNyetnDk1CeVP_Q-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-41cdffe4d1cso70178191cf.0
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 06:26:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698758806; x=1699363606;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eI/NB+UK7wm+ikX7wMjjd1LtGrSm/qZ7Qv6AHobbkPs=;
-        b=izCGxq5QyFTGbmwvS7+LMX13gPXwBQ8WWMAUrkC/JJJKTvYjzMpdTarxs3qiobWqzu
-         OeAJNZFZnOpom1EUw7Wf2NVbTsWJOCBwsorQGURd8vEeagouyvT/7RHdD5C3oFefMDf0
-         M1pf5lUc9X+4URIEEgzRfR6EOD1ODqRQ53kMdUIs/WpZNebsp8sRK407QafpQhUEG4RI
-         quZIm2hU146rYbW9m5Lc+jG7dLYOwUt9ZP44UWHvGw9tvaAwyCeZCD2kHtcP4+xCjKY1
-         hNFav63sBnGhszeK88IIrza0QVpX3tX1H9y3OY15Z+YdiaHYs1PJjKsIntDL8QW5I38w
-         4VTA==
-X-Gm-Message-State: AOJu0YwVNPx9QD4IIVhCw2Bxrl+j2rES+PXtAnLiD8ujT6bwhNZX/SN2
-	U5M9FpYeIkHJy1Va6xSijlBMfbGi8XaUoYGCJSeS0ngK4fMBW6HUVVDgeUfN/ua2OsOZOAXkUvb
-	jBj8EWwRmfjYGProM
-X-Received: by 2002:ac8:5c07:0:b0:412:395c:e794 with SMTP id i7-20020ac85c07000000b00412395ce794mr16506854qti.50.1698758806646;
-        Tue, 31 Oct 2023 06:26:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQJ+JdW34kAi/vPRSUYYZ/SunG5KPuPwv6RMEn5yGHPjewye+0V9zLeMALeZ3Oa1GIJGE7BQ==
-X-Received: by 2002:ac8:5c07:0:b0:412:395c:e794 with SMTP id i7-20020ac85c07000000b00412395ce794mr16506834qti.50.1698758806379;
-        Tue, 31 Oct 2023 06:26:46 -0700 (PDT)
-Received: from fedora ([142.181.225.135])
-        by smtp.gmail.com with ESMTPSA id w26-20020ac84d1a000000b00405502aaf76sm492115qtv.57.2023.10.31.06.26.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 06:26:46 -0700 (PDT)
-Date: Tue, 31 Oct 2023 09:26:44 -0400
-From: Lucas Karpinski <lkarpins@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] selftests/net: synchronize udpgso_bench rx and tx
-Message-ID: <vzz3qfbfq52qja24y25lopif27sdwyvz3jmmcbx5wm6jc5l53b@fy7ym6xk4zsb>
-References: <6ceki76bcv7qz6de5rxc26ot6aezdmeoz2g4ubtve7qwozmyyw@zibbg64wsdjp>
- <e8a55d0518da5c1f9aba739359150cad58c03b2b.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FE218B0D
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 13:27:10 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [IPv6:2001:b68:2:2800::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D326DE;
+	Tue, 31 Oct 2023 06:27:08 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id CFCFF60173;
+	Tue, 31 Oct 2023 14:27:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.hr; s=mail;
+	t=1698758825; bh=DanNm88XUgY4cCmYA7veb/t2Jr/OILbimm0AI4lsrT0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ItcdqIY9GM5QifCpq9Abm65YP4B7CzfMMwuseV7iSD+uB+clgHtlFNJuF8SI2m5dS
+	 Uj6jJprtTm3yqEtuQGuKvxCy77zAiL6dsh9RDiQY5Y5sE8KL/fTP31W2XuaiKSNC6z
+	 NL2nS8sFUB4wSZ0+XIpGFoUo4A8JuIPmjFHIGHeUaVLRr8cTuf4qpodODFCJYzND9D
+	 E7xBBgiTFQMGYyMG0TeotoR9tEF2I7BRb3jDVuzInTblxSNSn8dzfYLax5Z+8ydcK7
+	 w6bgxbHeGjlfg0xtCDVkRsr9qiYC5CfFJVbOd99A4wCJ5hlF2oiP/QcCpW+Zhfgujz
+	 kYz2qPjmyKhIQ==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 0iR53ivx4SLh; Tue, 31 Oct 2023 14:27:03 +0100 (CET)
+Received: from [IPV6:2001:b68:2:2600:14cd:7d53:817e:e1c2] (unknown [IPv6:2001:b68:2:2600:14cd:7d53:817e:e1c2])
+	by domac.alu.hr (Postfix) with ESMTPSA id 5285460171;
+	Tue, 31 Oct 2023 14:27:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1698758823; bh=DanNm88XUgY4cCmYA7veb/t2Jr/OILbimm0AI4lsrT0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fOxCpz9X2f0LPSlfhPwMC0UeFb48WzHt0CGBgfS2vTv1wNxl7c4MXxpmcnQDs5r69
+	 y2dMPSuzPmCleLCIldt5s0+NWbASYvLCThFvOPCtrAauqM9MF2hfBTuuAIzVEuxlVQ
+	 eI90jOFPv0UzyQhv8lRNe9K3tA5jNo15rfERel7BMNa3r21WneDjsK3NOYIYX96OPG
+	 4xRli/Hp7nCvxYeoay3aPWd3bGXa+ljtstrRZRsWTpg2sF0940Jgx0mC9HDBpvnLoJ
+	 AXRG8z+HmuMK8wL/aafwKUIPLJJX/nLSnIVdQ0DbHqZ2xlD3gMfcoI1n6bW8WIzBxC
+	 HJauN30ew34rw==
+Message-ID: <06ac1128-92dc-4330-a68b-ae29dfd7105e@alu.unizg.hr>
+Date: Tue, 31 Oct 2023 14:27:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8a55d0518da5c1f9aba739359150cad58c03b2b.camel@redhat.com>
-User-Agent: NeoMutt/20231006
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/1] r8169: Coalesce RTL8411b PHY power-down recovery
+ programming instructions to reduce spinlock stalls
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>,
+ Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nic_swsd@realtek.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marco Elver <elver@google.com>
+References: <20231028110459.2644926-1-mirsad.todorovac@alu.unizg.hr>
+ <376db5ae-1bb0-4682-b132-b9852be3c7aa@gmail.com>
+ <23428695-fcff-495b-ac43-07639b4f5d08@alu.unizg.hr>
+ <30e15e9a-d82e-4d24-be37-1b9d1534c082@gmail.com>
+ <9f99c3a4-2752-464b-b37d-58a4f8041804@alu.unizg.hr>
+ <bd4a59be-c393-4302-9d32-759e7cbfe255@lunn.ch>
+ <11f59506-406a-463b-94c1-fe20246a102f@alu.unizg.hr>
+ <7fa02dd1-c894-4980-8439-4dc1e22d3634@lunn.ch>
+From: Mirsad Todorovac <mirsad.todorovac@alu.hr>
+In-Reply-To: <7fa02dd1-c894-4980-8439-4dc1e22d3634@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> Since you wrote the same function verbatim in 3 different files, I
-> think it would be better place it in separate, new, net_helper.sh file
-> and include such file from the various callers. Possibly additionally
-> rename the function as wait_local_udp_port_listen.
->
-Thanks, I'll move it over. I think it would be best though to leave udp
-out of the name and to just pass the protocol as an argument. That way
-any future tcp tests can also take advantage of it.
 
-Lucas
 
+On 10/31/2023 1:38 PM, Andrew Lunn wrote:
+> On Tue, Oct 31, 2023 at 04:35:19AM +0100, Mirsad Todorovac wrote:
+>> On 10/31/23 02:21, Andrew Lunn wrote:
+>>>> I will not contradict, but the cummulative amount of memory barriers on each MMIO read/write
+>>>> in each single one of the drivers could amount to some degrading of overall performance and
+>>>> latency in a multicore system.
+>>>
+>>> For optimisations, we like to see benchmark results which show some
+>>> improvements. Do you have any numbers?
+>>
+>> Hi, Andrew,
+>>
+>> Thank you for your interest in RTL NIC driver optimisations.
+>>
+>> My knowledge about the timing costs of synchronisation is mostly theoretical.
+> 
+> The kernel tends to be very practical. Maybe try to turn the
+> theoretical knowledge into practice. Write a benchmark test, or see if
+> any of the existing RT Linux tests show there is a real problem here,
+> and your changes fix it.
+
+I stand corrected. Real benchmarks would indeed say more than the visual
+inspection of the code.
+
+As I see, as a maintainer of the PHYLIB you certainly have a greater
+insight. What I've done is maybe too aggressive "loophole optimisation",
+without much consideration of what Mr. Heiner Kallweit addressed as hot 
+paths and not so hot (less trodden) paths.
+
+Best regards,
+Mirsad Todorovac
 
