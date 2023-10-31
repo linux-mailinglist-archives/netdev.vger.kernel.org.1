@@ -1,180 +1,137 @@
-Return-Path: <netdev+bounces-45392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F32C7DC9D6
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 10:47:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51FC27DCA10
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 10:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B1BFB20DD1
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 09:47:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C392281189
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 09:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6FB15EB6;
-	Tue, 31 Oct 2023 09:47:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04FFA182A4;
+	Tue, 31 Oct 2023 09:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zFEhtmaj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qaavC45i"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D7E13AE5
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:47:07 +0000 (UTC)
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7DCBC2
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:47:03 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32dbbf3c782so3892886f8f.1
-        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:47:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AC9179B9
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:51:19 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92B331737
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:51:14 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32dc9ff4a8fso3416643f8f.1
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:51:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698745622; x=1699350422; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=wp+G2Y0kUCo4IJDDbdOBo/ZQnoQFINk+z53Z+UNOY4c=;
-        b=zFEhtmaj+in90xfM/+FCbtoUxY3Dpi3dYv2nRaIygbghOO70qmeZwdFCWVSVjkDz9o
-         BW1TPJ4/tWGkK6uVgDMD2Au+29iLgnNl/BgalGH2zVnf2af08DIStAmQiH5xNfA7nMrC
-         Vjtg93aQ4BM9+TuGQOKTkUtobRESwC4dn2YjoGDtkCE0U3FZpd1hy+0FxmFPEZJjvboC
-         0VOs8Wk37rNJgLDJZ4Pv1oysHMrP3nig6U+wC0yWKRhHYDSlOSVcixLhla1i28Rd3E/Q
-         rDd4HOrSlt5NjWYw1Wy7PCuTcPNimmQ3jAwux8Fl4mt/wtOaA8zADyOaEuRaZK0cGS2i
-         rNdQ==
+        d=linaro.org; s=google; t=1698745873; x=1699350673; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uS5kIhEwY6Pd5tMtZfalMIAUckhOrrSMyGLxR7DTu2A=;
+        b=qaavC45iYB81LDUVzRaQXLG5jsLNkdDvIA8YID89QwGO3ihOzevOS/2+gYT6J9eZox
+         BGCIdUNrALsjbVTpXgul/Cb3fQbUAz015I3UMx+LSyZ9+kXw/WC4U2ZtyIQOr+xUNI4c
+         rAIiWFvhjIdZnbbxqV6BcNzOL1jM0/9bkEL8fq+O7ldtdLWn7Z8u4rIsWja6OsNigvTU
+         hSGxLDY7f9nZh0rRZrPQyfPfr3pCZY1HVdkZ8rs/W2gyGapl1i744Mh+wzJZk9beS8YO
+         cqlCiHQSnTEuiiTe7w7kAKHwIb5XXKiGxD0gEdD5/5cGEgm9ouGdjLv17uohw3FZFab4
+         jvPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698745622; x=1699350422;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1698745873; x=1699350673;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wp+G2Y0kUCo4IJDDbdOBo/ZQnoQFINk+z53Z+UNOY4c=;
-        b=CW4JKH8TSiijrUq3j3x3N/SYyVtKbINY/hYe/AK+0xT8GwNcC0bjuUPEu2vrukq8vP
-         BtKOCHNKWA1UdEAE0hufeynp4UY3x7VPk6LVgLaIQSyugg2SjhKnTcO11w3aKOYG2Veb
-         zfv7eB7+KaB8V8gzsxdlBLdoL2OVJBUHNcIcMPPp1z5xGhSYo/jCRq+S2aB/D+As4kDN
-         6i1Z/ZS1FBhOi0VPDPluzG02K2Y47Yq864NGHmgHR27emTwl9qW7JfSJh+gQLZw/VQX/
-         t0TOOfhaxHHaUe+3jpxGmkomVBOl1/QvIADC840kQ0fWEgjj1A0QdkRMxQvY48i/tpoS
-         gc3g==
-X-Gm-Message-State: AOJu0YyCNj34NjesTln0BCnifsLsi6UY19hLXH2BvZZ7VsPVh30taoTX
-	eFbs7K2rKkIgcruau/15iQDUDg==
-X-Google-Smtp-Source: AGHT+IGn8SP/xXjHKwdkZ0bPOm/kbVTYJ4bFQJVsQu1xLfpeZT18Ofr7kXVDesnbqXwrLabLpgR5oA==
-X-Received: by 2002:a5d:6da9:0:b0:32f:7260:1220 with SMTP id u9-20020a5d6da9000000b0032f72601220mr2335983wrs.17.1698745621939;
-        Tue, 31 Oct 2023 02:47:01 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id s26-20020adfa29a000000b003232380ffd5sm1059487wra.106.2023.10.31.02.47.00
+        bh=uS5kIhEwY6Pd5tMtZfalMIAUckhOrrSMyGLxR7DTu2A=;
+        b=grt4WBDk+ftEWkDOA+OXHDCG3xGJSV0pKOuwgBOz1G2UhowQVytvT+T2xjBVTVFPtK
+         nG6jUk+8SVNJwhT6V5TogIqPjO0+ZKAHF+8yQjJnXcWbIRYWILxC+9KyDV7EOXZuMEkA
+         830Eg7GgTUXAwjyGBPOByFQIgAFRJLot2jCjBsUEZE5kFQHngVY7AeAOd/+BKwwrAFSe
+         6C/QbwQnjPmNyCYPw9mMxMeQ32+Eehehc2rQLZ+z0w1WrWRwRV386zgia7MNZPOUKYhA
+         OeL0LKgiaUPMiQIHR6EV7ygxvvN4lSJJZm+T+uSXvLmYJoqod1Q7/MajjiRXZLuHKR1m
+         VJOg==
+X-Gm-Message-State: AOJu0YxbS5kVd0S5qPCmNnOFip3D4FFlyoCxYNMhV7B5arAi9NNFnL0H
+	5bxokKDaTsGZxKSJsnyoNLSaWg==
+X-Google-Smtp-Source: AGHT+IHJgWi4F34SEWxXBx7HVimrqe6w3C5UDD/SMZQZcN7gHe6mZAEbNQV6GWWsNWZh8BZwodgqdA==
+X-Received: by 2002:a5d:6208:0:b0:32d:9e62:b443 with SMTP id y8-20020a5d6208000000b0032d9e62b443mr7103616wru.71.1698745872918;
+        Tue, 31 Oct 2023 02:51:12 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id p11-20020a5d458b000000b0032d9337e7d1sm1106962wrq.11.2023.10.31.02.51.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Oct 2023 02:47:01 -0700 (PDT)
-Date: Tue, 31 Oct 2023 10:47:00 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Michalik <michal.michalik@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com, jonathan.lemon@gmail.com,
-	pabeni@redhat.com, poros@redhat.com, milena.olech@intel.com,
-	mschmidt@redhat.com, linux-clk@vger.kernel.org, bvanassche@acm.org,
-	kuba@kernel.org, davem@davemloft.net, edumazet@google.com
-Subject: Re: [PATCH RFC net-next v2 0/2] selftests/dpll: DPLL subsystem
- integration tests
-Message-ID: <ZUDNFHlO4GtA/UAh@nanopsycho>
-References: <20231030165326.24453-1-michal.michalik@intel.com>
+        Tue, 31 Oct 2023 02:51:12 -0700 (PDT)
+Date: Tue, 31 Oct 2023 12:51:09 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net/tcp_sigpool: Fix some off by one bugs
+Message-ID: <ce915d61-04bc-44fb-b450-35fcc9fc8831@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231030165326.24453-1-michal.michalik@intel.com>
+X-Mailer: git-send-email haha only kidding
 
-Mon, Oct 30, 2023 at 05:53:24PM CET, michal.michalik@intel.com wrote:
->The recently merged common DPLL interface discussed on a newsletter[1]
+The "cpool_populated" variable is the number of elements in the cpool[]
+array that have been populated.  It is incremented in
+tcp_sigpool_alloc_ahash() every time we populate a new element.
+Unpopulated elements are NULL but if we have populated every element then
+this code will read one element beyond the end of the array.
 
-"newsletter"? Sounds a bit odd to me :)
+Fixes: 8c73b26315aa ("net/tcp: Prepare tcp_md5sig_pool for TCP-AO")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+From static analysis and review.
 
+ net/ipv4/tcp_sigpool.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
->is introducing new, complex subsystem which requires proper integration
->testing - this patch adds core for such framework, as well as the
+diff --git a/net/ipv4/tcp_sigpool.c b/net/ipv4/tcp_sigpool.c
+index 65a8eaae2fec..55b310a722c7 100644
+--- a/net/ipv4/tcp_sigpool.c
++++ b/net/ipv4/tcp_sigpool.c
+@@ -231,7 +231,7 @@ static void cpool_schedule_cleanup(struct kref *kref)
+  */
+ void tcp_sigpool_release(unsigned int id)
+ {
+-	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
++	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+ 		return;
+ 
+ 	/* slow-path */
+@@ -245,7 +245,7 @@ EXPORT_SYMBOL_GPL(tcp_sigpool_release);
+  */
+ void tcp_sigpool_get(unsigned int id)
+ {
+-	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
++	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+ 		return;
+ 	kref_get(&cpool[id].kref);
+ }
+@@ -256,7 +256,7 @@ int tcp_sigpool_start(unsigned int id, struct tcp_sigpool *c) __cond_acquires(RC
+ 	struct crypto_ahash *hash;
+ 
+ 	rcu_read_lock_bh();
+-	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg)) {
++	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg)) {
+ 		rcu_read_unlock_bh();
+ 		return -EINVAL;
+ 	}
+@@ -301,7 +301,7 @@ EXPORT_SYMBOL_GPL(tcp_sigpool_end);
+  */
+ size_t tcp_sigpool_algo(unsigned int id, char *buf, size_t buf_len)
+ {
+-	if (WARN_ON_ONCE(id > cpool_populated || !cpool[id].alg))
++	if (WARN_ON_ONCE(id >= cpool_populated || !cpool[id].alg))
+ 		return -EINVAL;
+ 
+ 	return strscpy(buf, cpool[id].alg, buf_len);
+-- 
+2.42.0
 
-"Patchset" perhaps? Also, what do you mean by "core"? The sentence
-sounds a bit weird to me.
-
-
->initial test cases. Framework does not require neither any special
->hardware nor any special system architecture.
->
->To properly test the DPLL subsystem this patch adds fake DPLL devices and it's
-
-For patch desctiption, please stay within 72cols.
-Also, "it's" is most probably wrong in this sentence.
-
-
->pins implementation to netdevsim. Creating netdevsim devices and adding ports
->to it register new DPLL devices and pins. First port of each netdevsim device
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This sentence does not make
-sense to me. Pehaps rephrase a bit?
-
-
->acts as a entitiy which registers two DPLL devices: EEC and PPS DPLLs. First
-
-typo: "entitiy"
-
->port also register the common pins: PPS and GNSS. Additionally each port
->register also RCLK (recovered clock) pin for itself. That allow us to check
->mutliple scenarios which might be problematic in real implementations (like
->different ordering etc.)
->
->Patch adds few helper scripts, which are:
->1) tools/testing/selftests/dpll/run_dpll_tests.sh
-
-Please make this part of
-tools/testing/selftests/drivers/net/netdevsim/
-No special threat of dpll needed.
-
-
->    Script is checking for all dependencies, creates temporary
->    environment, installs required libraries and run all tests - can be
->    used standalone
->2) tools/testing/selftests/dpll/ynlfamilyhandler.py˙
->    Library for easier ynl use in the pytest framework - can be used
->    standalone
->
->[1] https://lore.kernel.org/netdev/169494842736.21621.10730860855645661664.git-patchwork-notify@kernel.org/
->
->Changelog:
->v1 -> v2:
->- moved from separate module to implementation in netdevsim
->
->Michal Michalik (2):
->  netdevsim: implement DPLL for subsystem selftests
->  selftests/dpll: add DPLL system integration selftests
->
-> drivers/net/Kconfig                              |   1 +
-> drivers/net/netdevsim/Makefile                   |   2 +-
-> drivers/net/netdevsim/dpll.c                     | 438 +++++++++++++++++++++++
-> drivers/net/netdevsim/dpll.h                     |  81 +++++
-> drivers/net/netdevsim/netdev.c                   |  20 ++
-> drivers/net/netdevsim/netdevsim.h                |   4 +
-> tools/testing/selftests/Makefile                 |   1 +
-> tools/testing/selftests/dpll/Makefile            |   8 +
-> tools/testing/selftests/dpll/__init__.py         |   0
-> tools/testing/selftests/dpll/config              |   2 +
-> tools/testing/selftests/dpll/consts.py           |  34 ++
-> tools/testing/selftests/dpll/dpll_utils.py       | 109 ++++++
-> tools/testing/selftests/dpll/requirements.txt    |   3 +
-> tools/testing/selftests/dpll/run_dpll_tests.sh   |  75 ++++
-> tools/testing/selftests/dpll/test_dpll.py        | 414 +++++++++++++++++++++
-> tools/testing/selftests/dpll/ynlfamilyhandler.py |  49 +++
-> 16 files changed, 1240 insertions(+), 1 deletion(-)
-> create mode 100644 drivers/net/netdevsim/dpll.c
-> create mode 100644 drivers/net/netdevsim/dpll.h
-> create mode 100644 tools/testing/selftests/dpll/Makefile
-> create mode 100644 tools/testing/selftests/dpll/__init__.py
-> create mode 100644 tools/testing/selftests/dpll/config
-> create mode 100644 tools/testing/selftests/dpll/consts.py
-> create mode 100644 tools/testing/selftests/dpll/dpll_utils.py
-> create mode 100644 tools/testing/selftests/dpll/requirements.txt
-> create mode 100755 tools/testing/selftests/dpll/run_dpll_tests.sh
-> create mode 100644 tools/testing/selftests/dpll/test_dpll.py
-> create mode 100644 tools/testing/selftests/dpll/ynlfamilyhandler.py
->
->-- 
->2.9.5
->
->base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
 
