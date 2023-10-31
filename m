@@ -1,126 +1,69 @@
-Return-Path: <netdev+bounces-45442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A3C77DD056
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 16:19:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99D277DD06A
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 16:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC5EA1C20C5B
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:19:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11D76B20D44
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 298961E504;
-	Tue, 31 Oct 2023 15:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3521E514;
+	Tue, 31 Oct 2023 15:21:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X1Rz6VMn"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iS2gfuJi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93967107A4;
-	Tue, 31 Oct 2023 15:19:32 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E35D52;
-	Tue, 31 Oct 2023 08:18:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698765492; x=1730301492;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sAuzb4e2KIEKHN5BAFJWJHoBO79tMx1HQ4juFph27t4=;
-  b=X1Rz6VMnN8Dk/QzJ6cTV3wKlQ2ToKwTyZfS4pyBhGJraUKZUuNUWkBZ6
-   QzkMgY77CJeRRJAnLcZp3/xzjbCjyyNrq47mQ6fKVhSvFd5Y68GiHeAIg
-   3DyE/p4eRQ+FrV8cMPxPXogXg9HBmAMNn94Q0Z8xlXOd4+WqvSUVkyXQX
-   k4k1cASbFzLF1cHaLBnlQPO5FZu/S9NqmUrT+uqJyGYQPsq4msms2rvC2
-   NjXJhYwtZAeBdciNcFt4Cm0uYTjyQvAQf0BhLZxXQeM6sFasHfUZKE2Vm
-   YYMTb8JrhvuwvaRR9cpwPlIWWeN7Mw/ka2BE43MBdJZqxN9+iXNtn4Xu0
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="378698905"
-X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="378698905"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 08:15:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="934143066"
-X-IronPort-AV: E=Sophos;i="6.03,265,1694761200"; 
-   d="scan'208";a="934143066"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Oct 2023 08:15:09 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 31 Oct 2023 08:15:09 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 31 Oct 2023 08:15:09 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 31 Oct 2023 08:15:09 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0398A1DFE6
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 15:21:44 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F2D51FEE;
+	Tue, 31 Oct 2023 08:19:31 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fin1DYt8jlwv+BcWs+H38i2dDBKfPARmFx5DnRGrxiOC8jHJl4wuGV+em8Q6PjcynZMzIMGDyzJCuv4HNjnH6vWj2CGobv/O2FmMtKUrFrlLx02LhJoRa3BLakr311fCTnknnxBAHBhGCm65Vxqg8NCunPn9sULoxTHBWYgZ4mlb2XJSff13IWSaAZtAcGCUF2gV0FmiaNcStWwUtpcXhtV1/O+bjvtShCXgPWxKYPl/fPZ0gkqfEkiUy7A8+MA9I0Bm7Ag7HIZI05en8EWCJFnzQAAnxxcwuKm04CAoxmcomDAZS2Z/cgPaxsoXpTN+w7D096+q208U4F99suM0sw==
+ b=mURESrwhrGRQK4UtY7Vc1HjK3qUW8jzhhP9/r1G8fxGKJmmm9J4lno09AGMTv9UAZv6gAKMYHTphKN+4h413dvLwOAoPQ9p9DRF/C59jP1fYeppBymhcZlnnapo9FWnyh2HwsiBslnudBmZXXvhg7FEZ/19fl93Xmm6EKat0D7N2EG1SuS6AuEswz8uO9X7cRxk7ndCm/WoToichfubRnrTovJ5gIS2+iGZHWl4XwV9hUq237/KS9hbf01Xbg9N1W6yqZUYVfZubRVnkNSZu2RdtyjrZUKPOCfMl3G8oOj/2Lz6VGneSdXXaU8f4nTFJQFxAdQRuZLw8I35H3Zi4dw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=28EIKFYMxgAFdUm4njcxVqFYoMcPx3qXYI1/g11nIvo=;
- b=Cs6HH2gU9MhpOvXWDvoN3KqAhcLEta6x0tlp+K8/gjOPg58RmY/1Zp6QBPLqmGGgAjUazmszwPnCtdy+ycqYTAWFLfH34zH/4ebpm49gJeEkPz9i4DPIzYxiBcJQeNqXAmolA2OmUHrgm34SILrazRGARiJgShOCh1sJT3nND4k/gCJmUHUrYkvdDa2vD7KCsHMb3tVWQ9IXhN1fRbg3iENwxzBztsV6QTFb/3+m90zHB0O1NZFICJE2kTj2iRZWlvo2HixszOdtpjncib6ds0PO5Yd+dXI2WVu0vb575wGO07VyvCO62yIeUD7/59Lb2GoJm7ArKC9P8StPchioPA==
+ bh=g8bpcT7iMXcPZxilQeyqxw+Vfi7N3wcdf4r9oHu+8Gw=;
+ b=K7ygF1TL//rF8SgLGigN0cgSEIfHpN0tU5+h8q48OFItxTFQ1wCO7mkBZj/678Fb58NxJuoDQckaN8g0vjYBiVdzadDFKL3GNXegk8AVyGVBTyRpXYFVgrBD8MbgxfTQw97bAbalXCl57ZfE8Ygb0OfrUDwNwdFgHXv6LAvpkz6EE8tBII5N5zchttoXwRwZtI7KWLV6y2YYXK/FjMD16p5LKmw86Ot3yZ68IoTseWKZ1MZI6uFhhw+Od1W3arYN4+ofEScuqM8UFAn+qqV1yk64XW1MlTe0sdgQuR2+3ape71EQqK7aOgtfEpxEajzzlzlpxFky0XKh+GjRfb76Gg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=g8bpcT7iMXcPZxilQeyqxw+Vfi7N3wcdf4r9oHu+8Gw=;
+ b=iS2gfuJiYFdoD/ZxJ1qBTmMqOcQgBiknumPuIM5UDP+F+koSO5n8o9BGYLh1kxSs3iQ9PGGAYk3vP3uxCsWHeWjonlBJ55ERjFLhQcobbrulntL6peMTcplEUzWQjmHd0jZtzHTETLtgox8onI3ebAWquEA4oLpIWFXQtBrPSRnscIjEYk4ZGNBOEgXtLstZLNF9OEY8zPMIedAEbky6cI6x7BUPLxXVhhh++G7X+nGDIyuNi2dJuNe5giioMdta2ugNT8RvEz/KuJXB6wOgWFEwyWN5jHhNMYJL4GTo7PSR1T8b3RYbw8oAJy2Xmt+l7KyiVoRWVCLb6SyXbW8F8Q==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
- by SA2PR11MB4956.namprd11.prod.outlook.com (2603:10b6:806:112::20) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB7735.namprd12.prod.outlook.com (2603:10b6:208:421::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.30; Tue, 31 Oct
- 2023 15:15:07 +0000
-Received: from SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8]) by SN7PR11MB7420.namprd11.prod.outlook.com
- ([fe80::2329:7c5f:350:9f8%7]) with mapi id 15.20.6933.024; Tue, 31 Oct 2023
- 15:15:07 +0000
-Message-ID: <e7679b57-af11-42b1-91c7-b18cbcc70119@intel.com>
-Date: Tue, 31 Oct 2023 09:14:58 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next v4 1/6] net: ethtool: allow
- symmetric-xor RSS hash for any flow type
-Content-Language: en-US
-To: Gal Pressman <gal@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	"Alexander H Duyck" <alexander.duyck@gmail.com>
-CC: <mkubecek@suse.cz>, <andrew@lunn.ch>, <willemdebruijn.kernel@gmail.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>, <corbet@lwn.net>,
-	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<jesse.brandeburg@intel.com>, <edumazet@google.com>,
-	<anthony.l.nguyen@intel.com>, <horms@kernel.org>, <vladimir.oltean@nxp.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, <intel-wired-lan@lists.osuosl.org>,
-	<pabeni@redhat.com>, <davem@davemloft.net>
-References: <20231016154937.41224-1-ahmed.zaki@intel.com>
- <20231016163059.23799429@kernel.org>
- <CAKgT0Udyvmxap_F+yFJZiY44sKi+_zOjUjbVYO=TqeW4p0hxrA@mail.gmail.com>
- <20231017131727.78e96449@kernel.org>
- <CAKgT0Ud4PX1Y6GO9rW+Nvr_y862Cbv3Fpn+YX4wFHEos9rugJA@mail.gmail.com>
- <20231017173448.3f1c35aa@kernel.org>
- <CAKgT0Udz+YdkmtO2Gbhr7CccHtBbTpKich4er3qQXY-b2inUoA@mail.gmail.com>
- <20231018165020.55cc4a79@kernel.org>
- <45c6ab9f-50f6-4e9e-a035-060a4491bded@intel.com>
- <20231020153316.1c152c80@kernel.org>
- <c2c0dbe8-eee5-4e87-a115-7424ba06d21b@intel.com>
- <20231020164917.69d5cd44@kernel.org>
- <f6ab0dc1-b5d5-4fff-9ee2-69d21388d4ca@intel.com>
- <89e63967-46c4-49fe-87bc-331c7c2f6aab@nvidia.com>
- <e644840d-7f3d-4e3c-9e0f-6d958ec865e0@intel.com>
- <e471519b-b253-4121-9eec-f7f05948c258@nvidia.com>
- <a2a1164f-1492-43d1-9667-5917d0ececcb@intel.com>
- <d097e7d3-5e16-44ba-aa92-dfb7fbedc600@nvidia.com>
- <aa1dd347-a16c-44f8-95ad-5d50bcba8f34@intel.com>
- <70132b6f-542f-4fe6-971f-ab9ea80acbe4@nvidia.com>
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-In-Reply-To: <70132b6f-542f-4fe6-971f-ab9ea80acbe4@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB3PR06CA0002.eurprd06.prod.outlook.com (2603:10a6:8:1::15)
- To SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.29; Tue, 31 Oct
+ 2023 15:19:28 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::b53a:1092:9be2:cfb9]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::b53a:1092:9be2:cfb9%4]) with mapi id 15.20.6933.027; Tue, 31 Oct 2023
+ 15:19:28 +0000
+Date: Tue, 31 Oct 2023 12:19:26 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: George Kennedy <george.kennedy@oracle.com>
+Cc: leon@kernel.org, sd@queasysnail.net, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	tom.hromatka@oracle.com, harshit.m.mogalapalli@oracle.com
+Subject: Re: [PATCH v2] mlx5: fix init stage error handling to avoid double
+ free of same QP and UAF
+Message-ID: <20231031151926.GA1849146@nvidia.com>
+References: <1698170518-4006-1-git-send-email-george.kennedy@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1698170518-4006-1-git-send-email-george.kennedy@oracle.com>
+X-ClientProxiedBy: MN2PR01CA0045.prod.exchangelabs.com (2603:10b6:208:23f::14)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -128,159 +71,141 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|SA2PR11MB4956:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6ea60263-664c-402a-bf2a-08dbda242a6f
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB7735:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7ac5c792-d062-42d2-336a-08dbda24c5cd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: T0dVLgWBmDYKE7sS04JH2kNF91/HAFymjq0ouuHJAXqpT9O/ibt6Ek2CHD0NgyV9LCG3kKif/rU6F7XDCINRT/uzx53vLhxHAOac6v1EmCC2nWhBy7DppllViQS1+2bOX1FiHxHUuoBeaa10XrQQbwk8CnnXBfaXClssyTRK/SONIJhRrON6AjGTt/CSSbkzR7BLq2nJcfzDtE/IAsn9kVkNcn3/19owqfIoyyOwTRVNeRll53shJzzXCLfspmBcg2mzcpr2SEKtpN//WJvlU3UfBDLlQkDPoBYfVLRP1onxLZf+ZoO9ZAM9HckRwgznsWD2nKPMOKDhD4Y2q079SMaInYfRkJzC9clL46nseHY3S8wgsKQXBLXdAOX8mlaSjyq6NtjtzZ/DaAiXG363+SRJ+3Z5QdhzqDk4Blh40yneXAVdOSIWUWA1HUiBHlwcnCm+NegVgqCKfYIEPsPU/25UI71tQMBeDkjG1Q9S0hHFRhm/3owEn93QjcGL7y4rdIADe2Pkb7pXy4L1wYoxHDLjDtitp0R4oLnmTelEQj4tYeFJyIcd2yahsEbc985wIRYBn+x0N+qzwKXXhIYFaw4mteXB5cHo+Ei9ryZ+Y4fn/+yLWnUQUdLW5u1jQRsaHE/70fZsCllQkLqOmCTc6g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(39860400002)(136003)(396003)(230922051799003)(451199024)(186009)(1800799009)(64100799003)(316002)(38100700002)(2906002)(6666004)(6512007)(7416002)(6506007)(41300700001)(4001150100001)(53546011)(36756003)(966005)(6486002)(478600001)(54906003)(66476007)(66556008)(110136005)(66946007)(8936002)(8676002)(4326008)(44832011)(5660300002)(83380400001)(86362001)(2616005)(26005)(31696002)(82960400001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	awji/jgqwKoK0hqFcwb1jp9XHmy6F9kA/NE9N67SARB4L54YTy90QtgDJeN75/k52vjmvB5BS70ixs5Z43182qOL0VofIPDoQy2DlrwzEVnT7OqFXt4fXaJ27H3l04E1MX5bvTj9v/ZViLIc8kcSo6gDvHJY9gXgx+Cw7t0yZrBAUewikkA/pfj/Jm7s/DlF5bvqS4qLHdaOSGSuhGVD1P9KCMGDJAJOc9voDKfVhKFWp2Saep2SJp8bukGmHJW/gwb41Y4CeqziToAZvjd7evS7ZUIn/yD8LaaVoIOLKMsnt7hz70KMdkQSB1w9PTt7wLDNC605Cxy3G7RQ9/bz1QAjj6HUoim3eDI3WWjfEggj7Kgr+KbnOK0YyORTxafwJhQYCmW7Utl3n44L7TRcF5+yAFpmT+A/YzqG7JnkLskJ5a3Mx4N9n4vkd17uJWR/wZBRpVU7LUc2GnoTUtBp8W9CgnEY4e4hJxmEUC1hL0HjJESxtcTZpA65ppDoEkAIStwb1Tmu4bwJHp95aYlzRV5aOuzCdjML4hUpSNCSSbKTPqf+PpF1JN6c3NRRqokd
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(366004)(346002)(39860400002)(376002)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(26005)(1076003)(6512007)(478600001)(6506007)(83380400001)(2906002)(41300700001)(5660300002)(66556008)(66946007)(66476007)(6486002)(8676002)(8936002)(2616005)(4326008)(6916009)(316002)(33656002)(38100700002)(86362001)(36756003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aEY0VkRoUllPbUplUGg3UmJ6Vkc4Ulo1dmhWV0lWL2pJaUhycVgwNTZCTmdF?=
- =?utf-8?B?MFBJOWZleHNwblU5OHYwUC9hZjFUVTJsVUwvMnlLWDNrVWViT0Z2RG1pNUNO?=
- =?utf-8?B?enJUVHkyakhUQWZFbHFkOWF3ZWVNSkNhbklWak5DcjhDRnpncUtqMTJITkg4?=
- =?utf-8?B?RWR2aHY0dzZXN2dPNklWTm1LUWxiVkVxV3IwZWRyQ0RCV0NlbHcxV09BVnJP?=
- =?utf-8?B?b2RzZDRYMDcrUHFoMU81WGtOcHdFOFJ6aGtmYis5QTBEbC9OR2Q5YjlXTmV5?=
- =?utf-8?B?WHFUWHljMWNraEFjMUF6MnJyMll3akJMbk90OG81OWNDOVcwc0x3MjVibzlI?=
- =?utf-8?B?L1E4d3pDQlNjaGlUWWxhWS92dlhtSWlLTExaZjNEeEN3OW5FQzJKSVpmcko4?=
- =?utf-8?B?VE0zWHY5azBSckFIbEFlR3RXT2o0R1JPMkZtL2RWQllWQld3ZDk5K0VHUi8w?=
- =?utf-8?B?NE5yNnhIL25YZkdDdFdyRmI1VmhNelg0TU0zekVhM1RaMWsvSW1VdUlUZDZW?=
- =?utf-8?B?VzZyV2JLM2wxRDlaVThEWFBjZlBtdGU1bmVESDVJbldWbFpzb2xkRHVwODhF?=
- =?utf-8?B?aEhQT2M5TzJsdzc3TzcvWVhNZThJR09Fb0VYbWpTZ3RBUHFqcG1mWFlpM3Y1?=
- =?utf-8?B?d2FzSDlJSnF5QTE5VTl5Y3lYL1JyYVpuZjRsYTNvNUtmMllML3NIdFM4VWsr?=
- =?utf-8?B?YXUyRGxteWNDTmQvVVNmcmxFaTN2NUpHY1JVbEFWVS9KUTFIMmt6TlYwWk5Y?=
- =?utf-8?B?azlUamVkaVQ4Qkc0anlQTjEzcVVwWjZMVnJRbVg3aUxlbHhjRHpQWVcxTWwr?=
- =?utf-8?B?RXF5QldsalUvdklmeVhzRkZCV0hjcm41THFyc0xzZzFQMVlJU2U3UmhNRmU3?=
- =?utf-8?B?UHBpNkdXaUlMVjRnQXI2NXUyem90aVdSTzRWRGU1Y0VRd1QwT1ZxNkVGcEtu?=
- =?utf-8?B?MHYzclF5cDA2RGwyK2xySHZ5MW13YnZrQmg1SmJIZnVBWHI1WUpkVDZ4T1hN?=
- =?utf-8?B?dDRWcWQwbkYvM3VIN3o4OWloaEhBRStYOXUxYVQ3N1ZVL3hwWXd1Um96T0I2?=
- =?utf-8?B?ak5sYStGWXlVQmhuQisvWTc3Wm9lMzBHcUFZVDlhSExiMFJhUWtRWmEzdmNV?=
- =?utf-8?B?RW5YWkdHL2tsUXRMdC9nekp3QXlaa04yRWJlY1JTUk1XUWl2Qm9Ga2krbXA2?=
- =?utf-8?B?TURRUXU2SEtEUnVnMkUrTHl0NWczZG53SkM3Rk1wY0Y1LzRyVGp3REdkVzJj?=
- =?utf-8?B?TlY1MUFyNzlTaFRlak5Qd1BtbEh6ZFd4VUptZEUreTZheVFoczZ4MWF0eFBM?=
- =?utf-8?B?ZTZtK0NDL1d5VlFDZUVWSVhFWWZRYWp5Q2l6VTd0cC9sdUFNdEtWRXNjdU5M?=
- =?utf-8?B?NzI5b04yRUhFSG1FLzZrSzZUeGwwSlZFbStMd0FKNHljamxVUW8xb2FqUm52?=
- =?utf-8?B?R0xXQnhpdFZiWVhOaEQvblc1VEJxaDk5WVRSSWxDT1J4em5peGdBSmlKRVJG?=
- =?utf-8?B?VExIZU5PYnBoczdNT1pMWCtocmVMYkJ2aG5LN0NHL09LWXJpSENjL3hSbEZG?=
- =?utf-8?B?VU1CUCtGeDRRUmRvb3pwWkRqREpndEpxaGNUVVhHUXoyZ2JISkxYazlpd2ZX?=
- =?utf-8?B?RXFLcllmUzRrT3lLb3hSUCtlRVhmQVlLKys0TkdNb0xnd0ZLVVY5bTl5WnRs?=
- =?utf-8?B?OEdQdTIyT0ZHMEExZ2JTU3lwMW1WSnYxV2hWNitjUUtWOXhPR0hKUWNjZlI0?=
- =?utf-8?B?TmVGTnFpdHBQdnFqWXpwM1NzK2JZeVhYQXZQWnkwTFZVSXg5MGF1aEY0eFYx?=
- =?utf-8?B?TUJDL1hkSEpZbGV5d0FkTVdLbGU4SnVVdkJnREswd3ZIMUV1SnE5VTkzL3A3?=
- =?utf-8?B?RVFOZDhZcmRET25mMkNLeVZCYmEydDdOd2krbVIxQkpvdnN3SnlXVWl6OHor?=
- =?utf-8?B?bXI0a1hQN1VWWnBuRUNJa0lCNllPczF0cHpxTnptc0l3VDNJbEMyWVJPSTRO?=
- =?utf-8?B?Qk1McnNjMFByNlQ2M3ZuaU1mOFVJNlBKYzhJRTRlYU8wYjJTUVJNMDhlTy8v?=
- =?utf-8?B?UDBhb0k0elRtMlJoYnVQWWMzRzZoVFdPSS9ya1JMN1F5MlB0WVY5SjNnUmRk?=
- =?utf-8?Q?6lDLbP0vGjceLMcbGuwsnmayX?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ea60263-664c-402a-bf2a-08dbda242a6f
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?JWiqcMPHoBq5f0sumxT1ISQmfwNDLeZdr6b4PsHCYBpBgx5YBln0Z3006dFX?=
+ =?us-ascii?Q?XPS3q1UUzLNVhfvRBCwZhC0ebA3nPmiYVnnciAaEpBBcJ/J94MrEGIW1mgza?=
+ =?us-ascii?Q?8qUd3pWy/cnAwD6muTuLUyuNpaBP6LX/cDeD2p4rqi7cWw/yEqEwwQuupRPp?=
+ =?us-ascii?Q?oZX52WWJ8W2U6N8rt1JgUKEfg3m46hUU2Ld4Hhu938ydxsB8oGWrVZkyRsLR?=
+ =?us-ascii?Q?dwp4DKDd8rTx3Yl6d0CaZwROwvEp6dHvwOwUZ9h965nj42lRsBRuIzl5OSnN?=
+ =?us-ascii?Q?ou4vjJI1+JOWQVaoLYBaiU3XTdFRsA7qaAg+U6gD81xfK4tWt7tH+ejFB/bN?=
+ =?us-ascii?Q?wY0bvKYluENDJFOjt2u3sfP1O9B/Tz/mh3E1vU8zwhH5ADg2c0nEEctOxza7?=
+ =?us-ascii?Q?6i++VMco/Af4FxfMvRki52dUznEDB/4Z4quM10AeKN6f+BeSLdw4s4RyM4kO?=
+ =?us-ascii?Q?uD1p4751QXlJlywLW0/nnT1l+7PzO0HYw3s7du0zwaKtjDuVdzgBABIH/xXJ?=
+ =?us-ascii?Q?v9QxIz74JkDw5X0aFYJZEMUUCFNeMyx+EHgnxPYxLgqLhcrYtf7be3QHhVBN?=
+ =?us-ascii?Q?woPZt9IK1v3zrjvJolthm9LpBpnDxhrWq89k6xEQLQCPVOpMq9Xwvuq0omPO?=
+ =?us-ascii?Q?6xjFD9BWzFKbxh8O58tiRO3wJrRLmBW2i/ia9OJokBxoelA/pyi61y11lZLi?=
+ =?us-ascii?Q?7RyiI35asdtNTZgdtAQNVa7Gaz0b170ae0Ikk3MA+kArRecQaCMv2fXGxkz9?=
+ =?us-ascii?Q?xlRQs8LHnXwp/qdx7w+vT/YiBB0HQtXZ4+cR6CSCedWBIjMW/IXWbjlS1O2E?=
+ =?us-ascii?Q?wgW7peFpsZIAgNinRnzzyn27nWCKgrZ0aL4Ie+LjGahg9V8gHX1RCOIDLGhP?=
+ =?us-ascii?Q?kAZ0gGUzuuqz46HrK3FtAf2SObvR1aHmBc8yALzftZD0MqWNsemybzYQADgn?=
+ =?us-ascii?Q?P91qTtmjvfKDWddjLOIdIkGwcjZpiXL3gDpa4eR4My0D4YCUDL2F4DrIiycL?=
+ =?us-ascii?Q?xbSp+3vuIYhAdTAn8iNHGtrdnCFyD7NnXDVcPqrArW1xD7j3vPeJBko0k7AX?=
+ =?us-ascii?Q?mvXwW14az8789bcBXMexmgrLNIWWZfqRp+R07ZaFr11nKChtophJJTYg0G6R?=
+ =?us-ascii?Q?2ArlzvDEYxLnm6W6f7ArgsXuxVFzt8zbDVOMhwBBOjvsIPMLqPpR6oiGwqMi?=
+ =?us-ascii?Q?Pydl4+zljEvMT8jeT4NG5jjxZlwNoe3U9SoY/AZQj295w+yj12xNCudRugRo?=
+ =?us-ascii?Q?+NGZSpw5GiqTkYtT/WocJpYQv5p8sqHZGiSsJfOOBv1KoQROFbvjf60hbF6T?=
+ =?us-ascii?Q?7eyJDlXAtcmH/b2c6VjFvQ/7pIl1S0cQ4bNHdofQFfS4FkOaIk2D0DVG41Wj?=
+ =?us-ascii?Q?lrxM6gHiDfkDMhhd/706p5bwjw97v3juAbcP7x/NeamKunxQTSw6IsoHJBpD?=
+ =?us-ascii?Q?mGvkdxGgqkoBT++g4bkiGnMmpl1h8ZxFaDxsvWKVwggzAycDfJdV6O8jGDYz?=
+ =?us-ascii?Q?q7WyDRyst3RqgcyvRdLRVSmYBMr5qPhGJI/ciDW+l4zTVFNLiYFnGQlj6uWA?=
+ =?us-ascii?Q?31ahSDirNCa3p7nzF1z4vqfdlFlktxusr3848yff?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac5c792-d062-42d2-336a-08dbda24c5cd
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 15:15:07.0730
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 15:19:28.5498
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cqxrUm6tg9mv4z4rhMwXPdPUtNokbwaIyV3hhtmzVggk5odJ0PVRt1N7qLKb+E8dWz+yS6rQFdL6olaFx5xgNA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4956
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: l1aQx0ocCUtpfxmeJ0GrYoDTN5Ult3rNG+NilfqmCuqMfmmZIfrHgyjLpTXqjYZ8
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7735
 
-
-
-On 2023-10-31 08:45, Gal Pressman wrote:
-> On 31/10/2023 16:40, Ahmed Zaki wrote:
->>
->>
->> On 2023-10-31 06:00, Gal Pressman wrote:
->>> On 29/10/2023 18:59, Ahmed Zaki wrote:
->>>>
->>>>
->>>> On 2023-10-29 06:48, Gal Pressman wrote:
->>>>> On 29/10/2023 14:42, Ahmed Zaki wrote:
->>>>>>
->>>>>>
->>>>>> On 2023-10-29 06:25, Gal Pressman wrote:
->>>>>>> On 21/10/2023 3:00, Ahmed Zaki wrote:
->>>>>>>>
->>>>>>>>
->>>>>>>> On 2023-10-20 17:49, Jakub Kicinski wrote:
->>>>>>>>> On Fri, 20 Oct 2023 17:14:11 -0600 Ahmed Zaki wrote:
->>>>>>>>>> I replied to that here:
->>>>>>>>>>
->>>>>>>>>> https://lore.kernel.org/all/afb4a06f-cfba-47ba-adb3-09bea7cb5f00@intel.com/
->>>>>>>>>>
->>>>>>>>>> I am kind of confused now so please bear with me. ethtool either
->>>>>>>>>> sends
->>>>>>>>>> "ethtool_rxfh" or "ethtool_rxnfc". AFAIK "ethtool_rxfh" is the
->>>>>>>>>> interface
->>>>>>>>>> for "ethtool -X" which is used to set the RSS algorithm. But we
->>>>>>>>>> kind of
->>>>>>>>>> agreed to go with "ethtool -U|-N" for symmetric-xor, and that uses
->>>>>>>>>> "ethtool_rxnfc" (as implemented in this series).
->>>>>>>>>
->>>>>>>>> I have no strong preference. Sounds like Alex prefers to keep it
->>>>>>>>> closer
->>>>>>>>> to algo, which is "ethtool_rxfh".
->>>>>>>>>
->>>>>>>>>> Do you mean use "ethtool_rxfh" instead of "ethtool_rxnfc"? how
->>>>>>>>>> would
->>>>>>>>>> that work on the ethtool user interface?
->>>>>>>>>
->>>>>>>>> I don't know what you're asking of us. If you find the code to
->>>>>>>>> confusing
->>>>>>>>> maybe someone at Intel can help you :|
->>>>>>>>
->>>>>>>> The code is straightforward. I am confused by the requirements:
->>>>>>>> don't
->>>>>>>> add a new algorithm but use "ethtool_rxfh".
->>>>>>>>
->>>>>>>> I'll see if I can get more help, may be I am missing something.
->>>>>>>>
->>>>>>>
->>>>>>> What was the decision here?
->>>>>>> Is this going to be exposed through ethtool -N or -X?
->>>>>>
->>>>>> I am working on a new version that uses "ethtool_rxfh" to set the
->>>>>> symmetric-xor. The user will set per-device via:
->>>>>>
->>>>>> ethtool -X eth0 hfunc toeplitz symmetric-xor
->>>>>>
->>>>>> then specify the per-flow type RSS fields as usual:
->>>>>>
->>>>>> ethtool -N|-U eth0 rx-flow-hash <flow_type> s|d|f|n
->>>>>>
->>>>>> The downside is that all flow-types will have to be either
->>>>>> symmetric or
->>>>>> asymmetric.
->>>>>
->>>>> Why are we making the interface less flexible than it can be with -N?
->>>>
->>>> Alexander Duyck prefers to implement the "symmetric-xor" interface as an
->>>> algorithm or extension (please refer to previous messages), but ethtool
->>>> does not provide flowtype/RSS fields setting via "-X". The above was the
->>>> best solution that we (at Intel) could think of.
->>>
->>> OK, it's a weird we're deliberately limiting our interface, given
->>> there's already hardware that supports controlling symmetric hashing per
->>> flow type.
->>>
->>> I saw you mentioned the way ice hardware implements symmetric-xor
->>> somewhere, it definitely needs to be added somewhere in our
->>> documentation to prevent confusion.
->>> mlx5 hardware also does symmetric hashing with xor, but not exactly as
->>> you described, we need the algorithm to be clear.
->>
->> Sure. I will add more ice-specific doc in:
->> Documentation/networking/device_drivers/ethernet/intel/ice.rst
+On Tue, Oct 24, 2023 at 01:01:58PM -0500, George Kennedy wrote:
+> In the unlikely event that workqueue allocation fails and returns
+> NULL in mlx5_mkey_cache_init(), delete the call to
+> mlx5r_umr_resource_cleanup() (which frees the QP) in
+> mlx5_ib_stage_post_ib_reg_umr_init().  This will avoid attempted
+> double free of the same QP when __mlx5_ib_add() does its cleanup.
 > 
-> I was thinking of somewhere more generic, where ethtool users (not
-> necessarily ice users) can refer to.
+> Syzkaller reported a UAF in ib_destroy_qp_user
 > 
-> Perhaps Documentation/networking/ethtool-netlink.rst? Or ethtool man page?
+> workqueue: Failed to create a rescuer kthread for wq "mkey_cache": -EINTR
+> infiniband mlx5_0: mlx5_mkey_cache_init:981:(pid 1642):
+> failed to create work queue
+> infiniband mlx5_0: mlx5_ib_stage_post_ib_reg_umr_init:4075:(pid 1642):
+> mr cache init failed -12
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+> Read of size 8 at addr ffff88810da310a8 by task repro_upstream/1642
+> 
+> Call Trace:
+> <TASK>
+> kasan_report (mm/kasan/report.c:590)
+> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2073)
+> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4178)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
+> </TASK>
+> 
+> Allocated by task 1642:
+> __kmalloc (./include/linux/kasan.h:198 mm/slab_common.c:1026
+> mm/slab_common.c:1039)
+> create_qp (./include/linux/slab.h:603 ./include/linux/slab.h:720
+> ./include/rdma/ib_verbs.h:2795 drivers/infiniband/core/verbs.c:1209)
+> ib_create_qp_kernel (drivers/infiniband/core/verbs.c:1347)
+> mlx5r_umr_resource_init (drivers/infiniband/hw/mlx5/umr.c:164)
+> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4070)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
+> 
+> Freed by task 1642:
+> __kmem_cache_free (mm/slub.c:1826 mm/slub.c:3809 mm/slub.c:3822)
+> ib_destroy_qp_user (drivers/infiniband/core/verbs.c:2112)
+> mlx5r_umr_resource_cleanup (drivers/infiniband/hw/mlx5/umr.c:198)
+> mlx5_ib_stage_post_ib_reg_umr_init (drivers/infiniband/hw/mlx5/main.c:4076
+> drivers/infiniband/hw/mlx5/main.c:4065)
+> __mlx5_ib_add (drivers/infiniband/hw/mlx5/main.c:4168)
+> mlx5r_probe (drivers/infiniband/hw/mlx5/main.c:4402)
+> ...
+> 
+> The buggy address belongs to the object at ffff88810da31000
+> which belongs to the cache kmalloc-2k of size 2048
+> The buggy address is located 168 bytes inside of
+> freed 2048-byte region [ffff88810da31000, ffff88810da31800)
+> 
+> The buggy address belongs to the physical page:
+> page:000000003b5e469d refcount:1 mapcount:0 mapping:0000000000000000
+> index:0x0 pfn:0x10da30
+> head:000000003b5e469d order:3 entire_mapcount:0 nr_pages_mapped:0
+> pincount:0
+> flags: 0x17ffffc0000840(slab|head|node=0|zone=2|lastcpupid=0x1fffff)
+> page_type: 0xffffffff()
+> raw: 0017ffffc0000840 ffff888100042f00 ffffea0004180800 dead000000000002
+> raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+> ffff88810da30f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> ffff88810da31000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> >ffff88810da31080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> 			      ^
+> ffff88810da31100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff88810da31180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
+> Disabling lock debugging due to kernel taint
+> 
+> Fixes: 04876c12c19e ("RDMA/mlx5: Move init and cleanup of UMR to umr.c")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Suggested-by: Leon Romanovsky <leon@kernel.org>
+> Signed-off-by: George Kennedy <george.kennedy@oracle.com>
+> ---
+> v2: went with fix suggested by: Leon Romanovsky <leon@kernel.org>
 
-Do you mean add vendor-specific implementation details to common docs? 
-Not sure if I have seen this before. Any examples?
+Applied to for-next
 
-Or, we can add a note in ethtool doc that each vendor's implementation 
-is different and "Refer to your vendor's specifications for more info".
-
+Thanks,
+Jason
 
