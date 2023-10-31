@@ -1,143 +1,208 @@
-Return-Path: <netdev+bounces-45385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73F9A7DC91D
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 10:09:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 079EF7DC92A
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 10:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE9A32815CF
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 09:09:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 288DB1C20BA7
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 09:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A2134B3;
-	Tue, 31 Oct 2023 09:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D16134C2;
+	Tue, 31 Oct 2023 09:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sUZmG/RF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APkLOveo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF65A29
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:09:10 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050C4B3;
-	Tue, 31 Oct 2023 02:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IMJYz5PL4lee6U7IF6ZC/L+9tCsfFfPvBLsrgdkwPIk=; b=sUZmG/RFEtT5CUSTwWE84dNfmj
-	Lu7041AN7U9klqaW8qufPLdh7gVEr/ZttDINRJsQeInEQtiIoabyLVUanZcXffJzzUVd96iQvvYUq
-	sj0QBZbpJHd0kFjId7JBvALESJjns77y0mHAIctZa8yWM1gIlVkTRkkdj/KULHoRtV/Y7wYUWhDtO
-	xS3ZRlsrjYMja2FXFObosjqMAceNoaU8FvOL044cJnhW8Sfu9b27Q4ab+4hPezKHPAdGf/wrtsVJ0
-	gio1oRWo/stVF+v137iItzb57Vav67q3/e+5cFrrFR9LyY/FcJUihQwZdE94xxH+z96kSEzGoXVTx
-	1hrCZMxA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44018)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qxkjy-0002V5-1u;
-	Tue, 31 Oct 2023 09:08:50 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qxkjx-0004yS-7I; Tue, 31 Oct 2023 09:08:49 +0000
-Date: Tue, 31 Oct 2023 09:08:49 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Gan, Yi Fang" <yi.fang.gan@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"Looi, Hong Aun" <hong.aun.looi@intel.com>,
-	"Voon, Weifeng" <weifeng.voon@intel.com>,
-	"Song, Yoong Siang" <yoong.siang.song@intel.com>,
-	"Ahmad Tarmizi, Noor Azura" <noor.azura.ahmad.tarmizi@intel.com>
-Subject: Re: [PATCH net-next 1/1] net: stmmac: add check for advertising
- linkmode request for set-eee
-Message-ID: <ZUDEIZwKMl88hGcX@shell.armlinux.org.uk>
-References: <20231027065054.3808352-1-yi.fang.gan@intel.com>
- <ZTtpBCZuB+bjVt9D@shell.armlinux.org.uk>
- <DM6PR11MB3306A3162F6A6086A4CBA049B9A0A@DM6PR11MB3306.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE63134B3
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 09:11:25 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD83C1
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698743479;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DuGikEkfltFMdgsAJ8jY84VlCvsNPDZp/v+6NfZt8h0=;
+	b=APkLOveoO8aMbB9g98EE/6OdGBpDvzNQgHXHtTipff7qoQcJMUIsarVxk0QJOgHcNGFRqL
+	EqQMhgw4UgpNW1kG3LoiEW8+RZstuEP8Cs5ccmPlx0Pxezn5SUXVR08q/uJ1+EUsubngJM
+	q2OPD2j08sF6sG65lUU/QG/E1WUCyt0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-Ty5tP9d-OwWjlEdB4h82Jw-1; Tue, 31 Oct 2023 05:11:18 -0400
+X-MC-Unique: Ty5tP9d-OwWjlEdB4h82Jw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-32f7b52caf2so269760f8f.1
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 02:11:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698743477; x=1699348277;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DuGikEkfltFMdgsAJ8jY84VlCvsNPDZp/v+6NfZt8h0=;
+        b=AcZzia6F9dJkNuHgsvVSnT8YvUp0Hd2k+TMt3xiWPnRER5SN4Ul5uyzd2f/PXRAo5r
+         4FBGMBsa/dLs2anhWC6ifhu0trzLXvq2vm/mJR5ESB48LBMu5a8bjt+9p0op3EzG3z4A
+         wnqOPu5tsHWpxp9ZXTwvbtzTqXP0ndY7DaG5Jw3eiCfrNQs4TfagVVqQ9ajJ3PaNn/kW
+         hRiW+4tUfjOZucEP4kPT2Cj74Oi1RrgPDDpaYG+AF7VCgcNRzO0edonSIbmkJtixDzbD
+         +3ZAfMw1LaeTEjzdOi1EieaLiQDlogrfleydgQYoA90TwpfCxKvL7RnHqvpRtlCTlybC
+         DCPg==
+X-Gm-Message-State: AOJu0YwZ98cb6qzTZKdTeLHdcf+LdJs9vlkYSidC/ylzVonTDtQlE/Fq
+	efUp6ptasZX6h6rnNMTLCwrLCEjSfDSYS1bsKoslNCrOaXZfllC9xyInc/zt6Xx90cY7PgpbjFE
+	mglVw183LEuM5jhTF
+X-Received: by 2002:a5d:598f:0:b0:32d:d932:5848 with SMTP id n15-20020a5d598f000000b0032dd9325848mr9939417wri.2.1698743476777;
+        Tue, 31 Oct 2023 02:11:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGucAxvmcpWNem37easpghDPo97H4g5C9unnEYJ4zG2yp34R8sbard0OhSh+LJpVtuDHj3raQ==
+X-Received: by 2002:a5d:598f:0:b0:32d:d932:5848 with SMTP id n15-20020a5d598f000000b0032dd9325848mr9939400wri.2.1698743476397;
+        Tue, 31 Oct 2023 02:11:16 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-227-179.dyn.eolo.it. [146.241.227.179])
+        by smtp.gmail.com with ESMTPSA id z10-20020adff74a000000b0032f78feb826sm987360wrp.104.2023.10.31.02.11.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Oct 2023 02:11:16 -0700 (PDT)
+Message-ID: <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
+Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
+From: Paolo Abeni <pabeni@redhat.com>
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>,  Saeed Mahameed <saeedm@nvidia.com>
+Date: Tue, 31 Oct 2023 10:11:14 +0100
+In-Reply-To: <ZTvBoQHfu23ynWf-@mail.gmail.com>
+References: 
+	<ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
+	 <ZTvBoQHfu23ynWf-@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB3306A3162F6A6086A4CBA049B9A0A@DM6PR11MB3306.namprd11.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Oct 31, 2023 at 08:44:23AM +0000, Gan, Yi Fang wrote:
-> Hi Russell King,
-> 
-> > Why should this functionality be specific to stmmac?
-> This functionality is not specific to stmmac but other drivers can have their
->  own implementation. 
-> (e.g. https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/qlogic/qede/qede_ethtool.c#L1855)
+Hi,
 
-This is probably wrong (see below.)
+I'm sorry for the late reply.
 
-> 
-> > Why do we need this?
-> Current implementation will not take any effect if user enters unsupported value but user might
-> not aware. With this, an error will be prompted if unsupported value is given.
+On Fri, 2023-10-27 at 16:57 +0300, Maxim Mikityanskiy wrote:
+> I believe this is not the right fix.
+>=20
+> On Thu, 26 Oct 2023 at 17:36:48 +0200, Paolo Abeni wrote:
+> > The following commands:
+> >=20
+> > tc qdisc add dev eth1 handle 2: root htb offload
+> > tc class add dev eth1 parent 2: classid 2:1 htb rate 5mbit burst 15k
+> >=20
+> > yeld to a WARN in the HTB qdisc:
+>=20
+> Something is off here. These are literally the most basic commands one
+> could invoke with HTB offload, I'm sure they worked. Is it something
+> that broke recently? Tariq/Gal/Saeed, could you check them on a Mellanox
+> NIC?
+>=20
+> >=20
+> >  WARNING: CPU: 2 PID: 1583 at net/sched/sch_htb.c:1959
+> >  CPU: 2 PID: 1583 Comm: tc Kdump: loaded 6.6.0-rc2.mptcp_7895773e5235+ =
+#59
+> >  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37=
+ 04/01/2014
+> >  RIP: 0010:htb_change_class+0x25c4/0x2e30 [sch_htb]
+> >  Code: 24 58 48 b8 00 00 00 00 00 fc ff df 48 89 ca 48 c1 ea 03 80 3c 0=
+2 00 0f 85 92 01 00 00 49 89 8c 24 b0 01 00 00 e9 77 fc ff ff <0f> 0b e9 15=
+ ec ff ff 80 3d f8 35 00 00 00 0f 85 d4 f9 ff ff ba 32
+> >  RSP: 0018:ffffc900015df240 EFLAGS: 00010246
+> >  RAX: 0000000000000000 RBX: ffff88811b4ca000 RCX: ffff88811db42800
+> >  RDX: 1ffff11023b68502 RSI: ffffffffaf2e6a00 RDI: ffff88811db42810
+> >  RBP: ffff88811db45000 R08: 0000000000000001 R09: fffffbfff664bbc9
+> >  R10: ffffffffb325de4f R11: ffffffffb2d33748 R12: 0000000000000000
+> >  R13: ffff88811db43000 R14: ffff88811b4caaac R15: ffff8881252c0030
+> >  FS:  00007f6c1f126740(0000) GS:ffff88815aa00000(0000) knlGS:0000000000=
+000000
+> >  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >  CR2: 000055dca8e5b4a8 CR3: 000000011bc7a006 CR4: 0000000000370ee0
+> >  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> >  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> >  Call Trace:
+> >  <TASK>
+> >   tc_ctl_tclass+0x394/0xeb0
+> >   rtnetlink_rcv_msg+0x2f5/0xaa0
+> >   netlink_rcv_skb+0x12e/0x3a0
+> >   netlink_unicast+0x421/0x730
+> >   netlink_sendmsg+0x79e/0xc60
+> >   ____sys_sendmsg+0x95a/0xc20
+> >   ___sys_sendmsg+0xee/0x170
+> >   __sys_sendmsg+0xc6/0x170
+> >  do_syscall_64+0x58/0x80
+> >  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> >=20
+> > The first command creates per TX queue pfifo qdiscs in
+> > tc_modify_qdisc() -> htb_init() and grafts the pfifo to each dev_queue
+> > via tc_modify_qdisc() ->  qdisc_graft() -> htb_attach().
+>=20
+> Not exactly; it grafts pfifo to direct queues only. htb_attach_offload
+> explicitly grafts noop to all the remaining queues.
 
-Why can't the user read back what settings were actually set like the
-other ethtool APIs? This is how ETHTOOL_GLINKSETTINGS works.
+num_direct_qdiscs =3D=3D real_num_tx_queues:
 
-> > What is wrong with the checking and masking that phylib is doing?
-> Nothing wrong with the phylib but there is no error return back to ethtool commands 
-> if unsupported value is given.
+https://elixir.bootlin.com/linux/latest/source/net/sched/sch_htb.c#L1101
 
-Maybe because that is the correct implementation?
+pfifo will be configured on all the TX queues available at TC creation
+time, right?
 
-> > Why should we trust the value in edata->supported provided by the user?
-> The edata->supported is getting from the current setting and the value is set upon bootup.
-> Users are not allowed to change it.
+Lacking a mlx card with offload support I hack basic htb support in
+netdevsim and I observe the splat on top of such device. I can as well
+share the netdevsim patch - it will need some clean-up.
+>=20
+> > When the command completes, the qdisc_sleeping for each dev_queue is a
+> > pfifo one. The next class creation will trigger the reported splat.
+> >=20
+> > Address the issue taking care of old non-builtin qdisc in
+> > htb_change_class().
+> >=20
+> > Fixes: d03b195b5aa0 ("sch_htb: Hierarchical QoS hardware offload")
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> >  net/sched/sch_htb.c | 3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> >=20
+> > diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+> > index 0d947414e616..dc682bd542b4 100644
+> > --- a/net/sched/sch_htb.c
+> > +++ b/net/sched/sch_htb.c
+> > @@ -1955,8 +1955,7 @@ static int htb_change_class(struct Qdisc *sch, u3=
+2 classid,
+> >  				qdisc_refcount_inc(new_q);
+> >  			}
+> >  			old_q =3D htb_graft_helper(dev_queue, new_q);
+> > -			/* No qdisc_put needed. */
+> > -			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
+> > +			qdisc_put(old_q);
+>=20
+> We can get here after one of two cases above:
+>=20
+> 1. A new queue is allocated with TC_HTB_LEAF_ALLOC_QUEUE. It's supposed
+> to have a noop qdisc by default (after htb_attach_offload).
 
-"not allowed" but there is nothing that prevents it. So an easy way to
-bypass your check is:
+So most likely the trivial netdevsim implementation I used was not good
+enough.
 
-	struct ethtool_eee eeecmd;
+Which constrains should respect TC_HTB_LEAF_ALLOC_QUEUE WRT the
+returned qid value? should it in the (real_num_tx_queues,
+num_tx_queues] range? Can HTB actually configure H/W shaping on
+real_num_tx_queues?
 
-	eeecmd.cmd = ETHTOOL_GEEE;
-	send_ioctl(..., &eeecmd);
+I find no clear documentation WRT the above.
 
-	eeecmd.cmd = ETHTOOL_SEEE;
-	eeecmd.supported = ~0;
-	eeecmd.advertised = ~0;
-	error = send_ioctl(..., &eeecmd);
+Thanks!
 
-and that won't return any error. So your check is weak at best, and
-relies upon the user doing the right thing.
+Paolo
 
-> > Sorry, but no. I see no reason that this should be done, especially not in the stmmac driver.
-> I understand your reasoning. From your point of view, is this kind of error message/ error handling 
-> not needed?
-
-It is not - ethtool APIs don't return errors if the advertise mask is
-larger than the supported mask - they merely limit to what is supported
-and set that. When subsequently querying the settings, they return what
-is actually set (so the advertise mask will always be a subset of the
-supported mask at that point.)
-
-So, if in userspace you really want to know if some modes were dropped,
-then you have to do a set-get-check sequence.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
