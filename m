@@ -1,127 +1,154 @@
-Return-Path: <netdev+bounces-45381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195E97DC6CC
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 08:00:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D89D97DC749
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 08:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AB821C20B58
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 07:00:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90634281742
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 07:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF66D524;
-	Tue, 31 Oct 2023 07:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="jqAGUspu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF3410966;
+	Tue, 31 Oct 2023 07:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA58D297;
-	Tue, 31 Oct 2023 07:00:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD5D7C433C8;
-	Tue, 31 Oct 2023 07:00:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1698735614;
-	bh=n7FSvkZDOHEm4+nPhmb2+a5uE4UXO7K+Etegdgo2ssY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jqAGUspuLQD8adfUT9YwhL/Z34yCBTYdUzhkG5wb4L56NW7ITyq4eS/IrJvEpUQe6
-	 nI4rjwusjGGdY4j0xMbUg47O26XtMAZ9CUN6Wb7THKWZy+1mlPMZv4g9j9aLv3bSYF
-	 hBIdgHi3wJ6fmtqoJnWq8Fn6k49BPd/VTrM/SS+A=
-Date: Tue, 31 Oct 2023 08:00:11 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Kira <nyakov13@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Sven Joachim <svenjoac@gmx.de>,
-	Ian Kent <raven@themaw.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev
-Subject: Re: [PATCH] staging: Revert "staging: qlge: Retire the driver"
-Message-ID: <2023103125-preshow-pencil-c1e5@gregkh>
-References: <20231030150400.74178-1-benjamin.poirier@gmail.com>
- <2023103001-drew-parmesan-c61a@gregkh>
- <ZT_YntDOYEdlpx5x@d3>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA5210949
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:28:57 +0000 (UTC)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE8BDC0
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 00:28:55 -0700 (PDT)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qxjBA-0007rN-RG; Tue, 31 Oct 2023 08:28:48 +0100
+Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qxjB9-005WBK-7y; Tue, 31 Oct 2023 08:28:47 +0100
+Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1qxjB9-00HDPi-56; Tue, 31 Oct 2023 08:28:47 +0100
+Date: Tue, 31 Oct 2023 08:28:47 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Ante Knezic <ante.knezic@helmholz.de>, conor+dt@kernel.org,
+	UNGLinuxDriver@microchip.com, davem@davemloft.net,
+	devicetree@vger.kernel.org, edumazet@google.com,
+	f.fainelli@gmail.com, krzysztof.kozlowski+dt@linaro.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
+	netdev@vger.kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	woojung.huh@microchip.com
+Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
+Message-ID: <20231031072847.GP3803936@pengutronix.de>
+References: <20231024142426.GE3803936@pengutronix.de>
+ <20231027063743.28747-1-ante.knezic@helmholz.de>
+ <20231030174225.hqhc3afbayi7dmos@skbuf>
+ <aad5ac41-3c05-421d-a483-0546b579585c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZT_YntDOYEdlpx5x@d3>
+In-Reply-To: <aad5ac41-3c05-421d-a483-0546b579585c@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Oct 30, 2023 at 12:33:55PM -0400, Benjamin Poirier wrote:
-> On 2023-10-30 16:25 +0100, Greg Kroah-Hartman wrote:
-> > On Tue, Oct 31, 2023 at 02:04:00AM +1100, Benjamin Poirier wrote:
-> > > This reverts commit 875be090928d19ff4ae7cbaadb54707abb3befdf.
-> > > 
-> > > On All Hallows' Eve, fear and cower for it is the return of the undead
-> > > driver.
-> > > 
-> > > There was a report [1] from a user of a QLE8142 device. They would like for
-> > > the driver to remain in the kernel. Therefore, revert the removal of the
-> > > qlge driver.
-> > > 
-> > > [1] https://lore.kernel.org/netdev/566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com/
-> > 
-> > Who's going to maintain this?
+On Tue, Oct 31, 2023 at 02:00:05AM +0100, Andrew Lunn wrote:
+> > So, my opinion is that although what Oleksij would like to see is
+> > admirable, I don't think that the REF_CLK direction is a matter of RMII
+> > MAC vs PHY role, and thus, we wouldn't need to change "rmii" to "rev-rmii"
+> > and cause breakage everywhere. It's just that - a matter of REF_CLK
+> > direction. It's true, though, that this is a generic problem and that
+> > the generic bindings for RMII that we currently have are under-specified.
+> > We could try to devise an extended RMII binding which makes it clear for
+> > both the MAC and the PHY who is responsible to drive this signal. You
+> > are not attempting that, you are just coming up with yet another
+> > vendor-specific MAC property which solves a generic problem. I can't say
+> > I am completely opposed to that, either, which is why I haven't really
+> > spoken out against it. The PHY maintainers would also have to weigh in,
+> > and not all of them are CCed here.
 > 
-> I was planning to update the MAINTAINERS entry to
-> S:	Orphan
-> when moving it back to drivers/net/. Would you prefer that I do that
-> change in a second patch right after the revert in staging? That would
-> certainly make things clearer.
-
-I would prefer not having orphaned code in the kernel tree.  Again, who
-is going to support this?  It was dropped because there is no owner and
-the company doesn't care anymore.  We can't add it back if there is no
-one who will do the real-work to fix it up and get it out of staging.
-Just magically moving it there isn't going to be a solution either.
-
-> > > Reported by: Kira <nyakov13@gmail.com>
-> > > Signed-off-by: Benjamin Poirier <benjamin.poirier@gmail.com>
-> > > ---
-> > > 
-> > > Notes:
-> > >     Once the removal and revert show up in the net-next tree, I plan to send a
-> > >     followup patch to move the driver to drivers/net/ as discussed earlier:
-> > >     https://lore.kernel.org/netdev/20231019074237.7ef255d7@kernel.org/
-> > 
-> > are you going to be willing to maintain this and keep it alive?
+> I would recommend looking around other PHYs and find a property which
+> does what you want, and copy it.
 > 
-> No.
+> We do have all sorts of properties. There are some to enable the
+> REF_CLK out of the PHY. Some to disable the REF_CLK out, some to
+> disable it when the link is down, some to indicate what frequency it
+> should tick at, etc.
 > 
-> > I'm all this, if you want to, but I would like it out of staging.  So
+> If you want to go the extra mile, maybe you can make a summary of all
+> these properties, and maybe we can produce a guide line for what we
+> want the properties to be called going forward.
 > 
-> I'd like it out of staging as well. Since nobody wants to maintain it, I
-> think it should be deleted. However, my understanding is that Jakub is
-> willing to take it back into drivers/net/ as-is given that there is at
-> least one user. Jakub, did I understand that correctly?
+> > I am afraid that creating a CCF style binding for REF_CLK will be an
+> > enormous hammer for a very small nail and will see very limited adoption
+> > to other drivers, but I might as well be wrong about it. Compatibility
+> > between RMII MACs and PHYs which may or may not be CCF-ready might also
+> > be a concern.
 > 
-> > how about applying this, and a follow-on one that moves it there once
-> > -rc1 is out?  And it probably should be in the 'net' tree, as you don't
-> > want 6.7 to come out without the driver at all, right?
+> I also don't think using the CCF makes too much sense, except for
+> where the SoC provides the lock, and already has a CCF covering it.
 > 
-> Right about making sure 6.7 includes the driver. The 'net' tree is
-> usually for fixes hence why I would send to net-next. So the driver
-> would still be in staging for 6.7 (if you include the revert in your
-> 6.7-rc1 submission) and would be back in drivers/net/ for 6.8.
+> I would also be hesitant to add more dependencies between the MAC and
+> the PHY. The DT often has circular dependencies and we have had issues
+> with probing being deferred because the core does not always
+> understand these circular dependencies.
 
-Let's wait until 6.7-rc1 is out and then, if the netdev developers want
-to take this on, they can revert it and move it to drivers/net/.
+Heh, this are unsolved problems making me pain in different projects.
 
-But right now, my tree is frozen, it's the middle of the merge window,
-let's wait 2 weeks please.
+Here are some real life examples, which are unsolved in one or another project
+and till now didn't went mainline:
 
-thanks,
+1. In scenarios where PHYs require an RMII clock from the MAC, initialization
+becomes complex. This is often resolved through bootloader and kernel
+modifications. Right now it kind of works and postponed until it will make
+real pain :)
 
-greg k-h
+2. Complexity increases in designs with multiple PHYs used by different MACs
+but connected to one MDIO bus. Same is here, there was already some
+regressions but the pain is still not enough for making things right.
+
+3. For some MACs like STMMAC, configuration is challenging without an external
+clock from the PHY. For example, VLAN configuration isn't possible with EEE
+enabled unless deep power saving states are disabled during register access.
+If I remember it correctly, there was floating discussions and patches trying
+to address similar issues.
+
+Transferring these issues to KSZ8863, we might face difficulties configuring
+STMMAC if KSZ8863, acting as the clock provider, isn't enabled early before MAC
+driver probing, a tricky scenario in the DSA framework.
+
+Working on deep sleep states for the KSZ switch driver, I find that dynamic
+clock control, potentially offered by CCF, could be quite handy.
+
+Please do not see this answer as a request to Ante for complex rework. It's
+more of a red flag notifying that the clocking issue is still unsolved, and
+someone (may be me), sooner or later, will have enough motivation to jump into
+this wasp nest :)
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
