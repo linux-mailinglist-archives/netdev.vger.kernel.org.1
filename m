@@ -1,154 +1,121 @@
-Return-Path: <netdev+bounces-45382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89D97DC749
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 08:29:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E7397DCB34
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 11:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90634281742
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 07:29:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22FA6B20DAD
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 10:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDF3410966;
-	Tue, 31 Oct 2023 07:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 812AF12E64;
+	Tue, 31 Oct 2023 10:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA5210949
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:28:57 +0000 (UTC)
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE8BDC0
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 00:28:55 -0700 (PDT)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qxjBA-0007rN-RG; Tue, 31 Oct 2023 08:28:48 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qxjB9-005WBK-7y; Tue, 31 Oct 2023 08:28:47 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1qxjB9-00HDPi-56; Tue, 31 Oct 2023 08:28:47 +0100
-Date: Tue, 31 Oct 2023 08:28:47 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	Ante Knezic <ante.knezic@helmholz.de>, conor+dt@kernel.org,
-	UNGLinuxDriver@microchip.com, davem@davemloft.net,
-	devicetree@vger.kernel.org, edumazet@google.com,
-	f.fainelli@gmail.com, krzysztof.kozlowski+dt@linaro.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
-	netdev@vger.kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	woojung.huh@microchip.com
-Subject: Re: [PATCH net-next v4 2/2] net:dsa:microchip: add property to select
-Message-ID: <20231031072847.GP3803936@pengutronix.de>
-References: <20231024142426.GE3803936@pengutronix.de>
- <20231027063743.28747-1-ante.knezic@helmholz.de>
- <20231030174225.hqhc3afbayi7dmos@skbuf>
- <aad5ac41-3c05-421d-a483-0546b579585c@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9BF2105
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 10:55:37 +0000 (UTC)
+X-Greylist: delayed 562 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 31 Oct 2023 03:55:35 PDT
+Received: from relay.sandelman.ca (relay.cooperix.net [IPv6:2a01:7e00:e000:2bb::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF20A1
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 03:55:35 -0700 (PDT)
+Received: from dyas.sandelman.ca (unknown [5.148.108.163])
+	by relay.sandelman.ca (Postfix) with ESMTPS id 2317120B51;
+	Tue, 31 Oct 2023 10:46:11 +0000 (UTC)
+Received: by dyas.sandelman.ca (Postfix, from userid 1000)
+	id 589BCA1482; Tue, 31 Oct 2023 03:59:57 -0400 (EDT)
+Received: from dyas (localhost [127.0.0.1])
+	by dyas.sandelman.ca (Postfix) with ESMTP id 565CEA1467;
+	Tue, 31 Oct 2023 03:59:57 -0400 (EDT)
+From: Michael Richardson <mcr@sandelman.ca>
+To: Antony Antony <antony@phenome.org>
+cc: antony.antony@secunet.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    netdev@vger.kernel.org, devel@linux-ipsec.org,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>
+Subject: Re: [devel-ipsec] [PATCH v2 ipsec-next 2/2] xfrm: fix source address in icmp error generation from IPsec gateway
+In-reply-to: <ZT4zUnhvbW2VZlRm@Antony2201.local>
+References: <e9b8e0f951662162cc761ee5473be7a3f54183a7.1639872656.git.antony.antony@secunet.com> <300c36a0644b63228cee8d0a74be0e1e81d0fe98.1698394516.git.antony.antony@secunet.com> <16810.1698413407@localhost> <ZT4zUnhvbW2VZlRm@Antony2201.local>
+Comments: In-reply-to Antony Antony <antony@phenome.org>
+   message dated "Sun, 29 Oct 2023 11:26:26 +0100."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; GNU Emacs 26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aad5ac41-3c05-421d-a483-0546b579585c@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+Date: Tue, 31 Oct 2023 03:59:57 -0400
+Message-ID: <3211020.1698739197@dyas>
 
-On Tue, Oct 31, 2023 at 02:00:05AM +0100, Andrew Lunn wrote:
-> > So, my opinion is that although what Oleksij would like to see is
-> > admirable, I don't think that the REF_CLK direction is a matter of RMII
-> > MAC vs PHY role, and thus, we wouldn't need to change "rmii" to "rev-rmii"
-> > and cause breakage everywhere. It's just that - a matter of REF_CLK
-> > direction. It's true, though, that this is a generic problem and that
-> > the generic bindings for RMII that we currently have are under-specified.
-> > We could try to devise an extended RMII binding which makes it clear for
-> > both the MAC and the PHY who is responsible to drive this signal. You
-> > are not attempting that, you are just coming up with yet another
-> > vendor-specific MAC property which solves a generic problem. I can't say
-> > I am completely opposed to that, either, which is why I haven't really
-> > spoken out against it. The PHY maintainers would also have to weigh in,
-> > and not all of them are CCed here.
-> 
-> I would recommend looking around other PHYs and find a property which
-> does what you want, and copy it.
-> 
-> We do have all sorts of properties. There are some to enable the
-> REF_CLK out of the PHY. Some to disable the REF_CLK out, some to
-> disable it when the link is down, some to indicate what frequency it
-> should tick at, etc.
-> 
-> If you want to go the extra mile, maybe you can make a summary of all
-> these properties, and maybe we can produce a guide line for what we
-> want the properties to be called going forward.
-> 
-> > I am afraid that creating a CCF style binding for REF_CLK will be an
-> > enormous hammer for a very small nail and will see very limited adoption
-> > to other drivers, but I might as well be wrong about it. Compatibility
-> > between RMII MACs and PHYs which may or may not be CCF-ready might also
-> > be a concern.
-> 
-> I also don't think using the CCF makes too much sense, except for
-> where the SoC provides the lock, and already has a CCF covering it.
-> 
-> I would also be hesitant to add more dependencies between the MAC and
-> the PHY. The DT often has circular dependencies and we have had issues
-> with probing being deferred because the core does not always
-> understand these circular dependencies.
+--=-=-=
+Content-Type: text/plain
 
-Heh, this are unsolved problems making me pain in different projects.
 
-Here are some real life examples, which are unsolved in one or another project
-and till now didn't went mainline:
+Antony Antony <antony@phenome.org> wrote:
+    > On Fri, Oct 27, 2023 at 09:30:07AM -0400, Michael Richardson via Devel
+    > wrote:
+    >>
+    >> Antony Antony via Devel <devel@linux-ipsec.org> wrote: > When enabling
+    >> support for xfrm lookup using reverse ICMP payload, > We have
+    >> identified an issue where the source address of the IPv4 e.g >
+    >> "Destination Host Unreachable" message is incorrect. The IPv6 appear >
+    >> to do the right thing.
+    >>
+    >> One thing that operators of routers with a multitude of interfaces
+    >> want to do is send all ICMP messages from a specific IP address.
+    >> Often the public address, that has the sane reverse DNS name.
 
-1. In scenarios where PHYs require an RMII clock from the MAC, initialization
-becomes complex. This is often resolved through bootloader and kernel
-modifications. Right now it kind of works and postponed until it will make
-real pain :)
+    > While it makes sense for routers with multiple interfaces, receiving
+    > ICMP errors from private addresses can be confusing. However, wouldn't
+    > this also make it more challenging to adhere to BCP 32 and BCP 38?
+    > Routing with multiple interfaces is tricky on Linux, especially when it
+    > comes to compliance with these BCPs.
 
-2. Complexity increases in designs with multiple PHYs used by different MACs
-but connected to one MDIO bus. Same is here, there was already some
-regressions but the pain is still not enough for making things right.
+Yes, that's why sending from a public, topically significant source address
+is really important.  Yet, many links are numbered in 1918 because..
 
-3. For some MACs like STMMAC, configuration is challenging without an external
-clock from the PHY. For example, VLAN configuration isn't possible with EEE
-enabled unless deep power saving states are disabled during register access.
-If I remember it correctly, there was floating discussions and patches trying
-to address similar issues.
+    > I wonder if a netfilter rule would be a solution for you, something
+    > like:
 
-Transferring these issues to KSZ8863, we might face difficulties configuring
-STMMAC if KSZ8863, acting as the clock provider, isn't enabled early before MAC
-driver probing, a tricky scenario in the DSA framework.
+    > I would love see a simple option instead of a SNAT hack. May be a
+    > routing rule that will choose sourse address for ICMP error code.
 
-Working on deep sleep states for the KSZ switch driver, I find that dynamic
-clock control, potentially offered by CCF, could be quite handy.
+yeah, I really don't want to do SNAT stuff.
+I'd like to have a flag on each interface that says to use the "global" ICMP
+source or use the heuristic we have now.  And then we need a way to set that
+source address.  Most routing platforms put a /32 address (and /128) on lo
+(or a dummy) as the device's reachable address, and then spread that through
+OSPF.
 
-Please do not see this answer as a request to Ante for complex rework. It's
-more of a red flag notifying that the clocking issue is still unsolved, and
-someone (may be me), sooner or later, will have enough motivation to jump into
-this wasp nest :)
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
+
+
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBCgAdFiEEow/1qDVgAbWL2zxYcAKuwszYgEMFAmVAs/0ACgkQcAKuwszY
+gENa2wv/aY1nMGVyYMwwjHqVMgwTTqYbr+qQ8+jjQOsJ1h5cW3gNsL0rN5gsJhbk
+jPujWpO+hbkfM+h9THGKFdkXoNv/v5qZLI3hb2IrqLgtAohS5paH9/d4QVi0pVzy
+AekvhDe7fce6ilxq6rVxwBpN/9DeGBvkssyFMPJFzfb41h461wCZ58PUURqwbwzS
+2oXw4GdWGH7rRrIkM5nI+zsnIeWpkxCBkF4otPLlQUnA3UYhFeaPKlh4LElmuWou
+YsR70pKg0v4CltGRx7wqawKS0zTs61WE5b7n4SKvTK/e7X1wkBE0KxCbdS8xRRYx
+3rO5N7Kh82bvbITZpR/o4staseN6ux4vhkqOqpsDB8d/NxIAo1ncJO/IKV6bQ8hV
+fV5NVrzx4dMlk+fK2He61vTxwjuwbAGGjF1Y4aIcqAwtuRBSET4WqGTqAwEmFv6X
+vKnzvQmKMml7h17XoyLDs32iPHWi4q7tfAE/+Q50dN+Kuh1wARK+RGPHO+c67gvV
+2Hq8dWFa
+=iYXI
+-----END PGP SIGNATURE-----
+--=-=-=--
 
