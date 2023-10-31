@@ -1,138 +1,155 @@
-Return-Path: <netdev+bounces-45433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26907DCF4D
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:38:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1781C7DCF4F
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 15:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D320B20D40
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:37:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F2C281335
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 14:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB78107B1;
-	Tue, 31 Oct 2023 14:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7B9134DB;
+	Tue, 31 Oct 2023 14:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="jzxzOe7I"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="emLQyzkX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC11EDF65
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:37:53 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2040.outbound.protection.outlook.com [40.107.212.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0ABDA
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:37:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GGpHINfz/nmpwWt6S4knX8PQ3Sn5NXWVkvsaAFj27St+IUgASZTqSPYdNkmgt7P6Aw7JU4xenOFEueTiLhrsJWv1C/WUa1Hvv4rS6z2koEUG4jVRCcjCWX1FWgfInmOGuhwi7OPxbq95swYC1usOQBBP2dE6Bwn8LbF//wJWTxAq07129Tpq4uQuVWzgdfn5aim7scuBLt4FIAn8QwP/w3US8DhkhaglP/t7RQLcJGfUY6iGe/e3+PUCmJ0FbB1cQA5Ds6I1i4leEFcCtDrce8AOq8iI8XQc0SSiNc3Ocu0CzuvPiaa2oOUpe+7NE+C0moYVkeUn2wk0YJlbdY+fIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lE+vExUOurk0s7YJ1HPC0F4C0l1psAorc2YCu6bFkUQ=;
- b=XsVYOypq+PibjWUcaq7uUT616CQB9/lXX8gabq82gfpxGb0xOmvZKlI3Far6svI3oBjLWIuit25MqjerlBDb7bUw+FLW6sJvN/+TReMY+E+DTrVacHDsVu1h2vDr+fqZ4+rEHFjoosYY5ZTxgCli1JU0c5b+e3456tnq9uGmPjPh3IgE7SwKRiZnLnY+Wi8DEcdILpNc2QyTZxg1+LMEmI7bS0O9qa1eR3dDhpS/QEasdieEoLnm+hbAIOJlgGAVnF/odvD8cvEm3cOykEGPQFf9mh9QyLMU41XYGDWu5OJmlMBmz5nxUiJmBuBKHXEuMfwtk8PLaE+ni5Aaf0zWjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lE+vExUOurk0s7YJ1HPC0F4C0l1psAorc2YCu6bFkUQ=;
- b=jzxzOe7IRWgIhYtvc8jOMf+CRB8ea1reWNJXcvt428gsktf+Ridquae91Xf0QtyhtnNhfS3BSKzDW//S/ViJ2l/NZ61aPdG5GftDks8kUimEUN9DeUcxPlGTFtsQOZT3SJb5EgkA19qfCwa8U/3uGkqkUUsSPfX/7Zyk9q9n/ddIKuaFBtopfDbMVZeogDIi31c+Jv1KJgv8Supw4sJwamTa+ALv4QSHCErXQma3izE61JCrNFmLBok/TOu+j/V60b9ouafc/aRXmPx0w/M19StB2M+vcI/3vYOOJP0r9pBnHLT6nrq13T4NzVfimEF/gGBwhfyaxlguJhJmMH423Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by LV2PR12MB5943.namprd12.prod.outlook.com (2603:10b6:408:170::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.28; Tue, 31 Oct
- 2023 14:37:50 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::6f24:e252:5c2f:d3c9%7]) with mapi id 15.20.6933.024; Tue, 31 Oct 2023
- 14:37:50 +0000
-Date: Tue, 31 Oct 2023 16:37:46 +0200
-From: Ido Schimmel <idosch@nvidia.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
-	mlxsw@nvidia.com
-Subject: Re: [PATCH iproute2-next] bridge: mdb: Add get support
-Message-ID: <ZUEROoKoo/hQsCSS@shredder>
-References: <20231030154654.1202094-1-idosch@nvidia.com>
- <f5823dfb-4ba7-f32c-d8a3-9b8b7cdb7c5d@blackwall.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f5823dfb-4ba7-f32c-d8a3-9b8b7cdb7c5d@blackwall.org>
-X-ClientProxiedBy: LO4P123CA0218.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:1a6::7) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90DE2107B1
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:38:44 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE282DB
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:38:42 -0700 (PDT)
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id D30BF40821
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 14:38:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1698763117;
+	bh=au17QPiJsjAocXmUfByZs1Bf5AaxfhY0/xgh3nLmqCY=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=emLQyzkXfH2plJ5IAT/SYUmLNGHO2MH+DQjBFLQFL1T7URe8efv7oejLLbQgaXNR4
+	 lrzv+X2rm/F0skQaJgxZpgolcdcezpPP4NWsCGP0n1RXhNWhjoeQzP/p5xNewKnA85
+	 KufxUueAfdmDURpFK5ndjp+IJf7CPYygmQG3C+vNY54L7qTzm6B8Jx4DVUPgU0Fh11
+	 i7tla2pTlC3lCM2nzwEuAEtV7C0yY96KMoQU3NSMqUF/c0Rrxr3HAoiuwSJ17KnyXk
+	 033NZEwuEzE82AoMtPPMLFJp75m+KLYPDuXDaZ9FSrQzzJTOIneqHi7CKJiH1JPDJP
+	 SNVQKPY1npk3w==
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-670b675b2c5so38738826d6.0
+        for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 07:38:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698763109; x=1699367909;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=au17QPiJsjAocXmUfByZs1Bf5AaxfhY0/xgh3nLmqCY=;
+        b=tDodRSvx1UHwNkigZI4ZSigt8PiQDsKJjMCv9KVpDbsFsXTzF+PVHC8YcwgsCY1kz9
+         jc5SGN1eZG2wj1j1vc1IeHAA/H6TqHrp5uSh4TfXGGRXdfvOZgyeG2EDyjsiMwzZNZsu
+         wHG3L/H+cREMiACXi2ksJ8d8NRO7tzrYGQ34pSsRxeq39E5jRjlOQWKX6rUg3E/qDrZ7
+         zefM5HryKFF4Pc6EE902xrMEZQFFNkMfINizauU3oN5Ylxa3ChPKYovkifEqEFF7b4Ii
+         /4eB3zw/9v74nQaVGAfv5iX2JROIqdMApvuHCve8ICF1A07c5pCKPYODPrGi+jDPDC4C
+         qOIA==
+X-Gm-Message-State: AOJu0YxJZ0/BbtpxOx7/kkboSaLnSWdwAPnsU/AHnQiAzhglrtAMC5Yl
+	tlaIe9JABqGPm04PkaDrLtEoNuJWEgnpgVMB0fhP4KXWdGpn28Nh8C/FyJ2YctA/S3p/2YsWw6J
+	YBFKM2Dnl6iVlGgvGlJVdfehyMH258sWY8gJPJ3jYgpTdX3lXzQ==
+X-Received: by 2002:a05:622a:1009:b0:419:7623:ef6c with SMTP id d9-20020a05622a100900b004197623ef6cmr16897763qte.60.1698763109677;
+        Tue, 31 Oct 2023 07:38:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEManiQqpXLt0b01D3i/c6XioIV3LcDFDS3I/YsKWQWlnlDlbI16LCgriOnJiUp81AuiFuChC8BPHTNIdY05AA=
+X-Received: by 2002:a05:622a:1009:b0:419:7623:ef6c with SMTP id
+ d9-20020a05622a100900b004197623ef6cmr16897742qte.60.1698763109425; Tue, 31
+ Oct 2023 07:38:29 -0700 (PDT)
+Received: from 348282803490 named unknown by gmailapi.google.com with
+ HTTPREST; Tue, 31 Oct 2023 07:38:29 -0700
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+In-Reply-To: <20231029042712.520010-8-cristian.ciocaltea@collabora.com>
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com> <20231029042712.520010-8-cristian.ciocaltea@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|LV2PR12MB5943:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f172f45-bf56-492b-72d9-08dbda1ef561
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	WcxRGx3hKjBAJMGP+rV9mp3irOIMQWyQVcEGwVCgCuPG6d6f0L+h7bEo5WVRYmaUpL7JONPvdcQlQXtZFyQiu6gXTD1N9CKNoDKqA52Lhz9YC6vbOl3gVrFz1RGv2qTfT3jgMWqVXe28hFuNFr2rJuubqdqHXVoPl5nZxvi/o0RBNWncpjCeG927c+KPuVMis72RryaAIEorbfwW1vd4jRMgoItNxnItehJCXXIu2PhCKTE/5/MzhO5Uh4yhEQbtpR6bZPyZwZix+jxrPoscseAx1gA+9irdWjN03J+Qa1byN7Tta3gFhI10pj2x6xk3yTequx15OJu1gGnDxMavGRKhKcNqKUDRDjkQOj1n/rB3afEWnjlW4XqJWFtdArIs0kT8qqjRmauBb7w9/XSvTSa9h5kd6NBrksWh+gI8bHHFIxprIHAzxJNQoLhjbMpwqwKvxNxfIYWdy6JpeQ/XWBahRlLBrgxcu9cKMo5vezY+MMEjGYC8QDNFaH2XrGTXjcLyrxIn8xU6C4ODRXedzdHI+O6M1SSfTQQvKC4RAQl3BWa3xqG0ou5Mb3rVc000
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(346002)(366004)(376002)(396003)(136003)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(6512007)(9686003)(26005)(6506007)(6666004)(478600001)(6486002)(4744005)(2906002)(107886003)(5660300002)(33716001)(41300700001)(66946007)(66556008)(66476007)(8676002)(8936002)(6916009)(316002)(4326008)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?G1B+jErOfBTZKL6Ao+lNpCH6zKwf1WBdTKN9yboPiA6A2Df3Jf+zZFs1r8uH?=
- =?us-ascii?Q?RBuSKrjaG4FI/Yx50Xi5x3fI+4BY5MsACuTsHlldNttQJl8gvxu2IFUzYBP6?=
- =?us-ascii?Q?V5TN6g1cKyFOK++7PIW3/VrLO5v89Ip1PTsgHk2f72aPZ6tRey7mQXVZgc4W?=
- =?us-ascii?Q?uI30BnUzL+FdpQHeMJM95BUn3xxYUzcVaSpL9QBLgqqzTb+GWpb5XMxdeXfv?=
- =?us-ascii?Q?1i1Hi3ZT5HUAJ49YrijHKjbXvRRL2908QtcEVxdWbu+igG1gAApNf3Z9gLv0?=
- =?us-ascii?Q?B03PrseG9xHvKQVdIZQyncEg4wJ4CKxqGEB1h52DIADufTEpvVBWYurN/z19?=
- =?us-ascii?Q?jgwvTlj4x9INk6nYtzTuAralzNBleBPucVKjkmtU54uOfZIfsQc1syOG/yY3?=
- =?us-ascii?Q?7b1Daz695oJLe2IJ3nOLaoYBCNX4A8s0hYPHygamSbJu893OOuS82XfDoPdy?=
- =?us-ascii?Q?516cTTSvlDX7Gkwsyk5zW/cFKtfaMdLpX776SxdblrrkuAkwK2rqqJwKN9tP?=
- =?us-ascii?Q?pLWEjNXSLL1stLqlg0OcTkzfjPyt9Sm/uKhi+N2wU4KIX7oHZsJJquVc6UQq?=
- =?us-ascii?Q?LmELAyLe3oC86AO9OYjGMbXIjYfDrqWtgoKQm24FSA3d0k692U6PIHf2ofan?=
- =?us-ascii?Q?18rurNnzE6bhpmD+tqtLclc9hldkjZc5nFQu7kDtAWzDfjXkVF3fmsiDeXUa?=
- =?us-ascii?Q?AjObtjCpdyAaFHCDxs0S2EW5j3udRiHCleGxJtA15xRReMrZJ+6ScMkko+Kw?=
- =?us-ascii?Q?kE3IZGM9SLkRK51UYXodM3Ok2aVD6VefSY232VuMAPUZt9l7XfRowATqLzqA?=
- =?us-ascii?Q?PI5nr0nTcssVNnYiJDFbMRFV+cEgQmlm9FfqIUoTp3H+aL6NrVZIVerF1FHA?=
- =?us-ascii?Q?qq9iflnplYZO+6eRy99UbggbEP9rB18J+BDMhc/WwvzN1g6V9AeuMMTVuS5O?=
- =?us-ascii?Q?m1dnSBpyJgPLmNFNyYwqBPCN3KcDMe5XiGbULtomoh8pTKyuOVdPX911VRGb?=
- =?us-ascii?Q?+P3fVJuUdjufHL9foyol11zwmc5Y25y6mjKqsfVziEuI8MVw0AMS4NGTyO8m?=
- =?us-ascii?Q?6HkLjON57X4KbeKGBPZpKSr77QirsNDXSaZH8Tfz2aWx17N5xyEUAu9kEiXr?=
- =?us-ascii?Q?nWsxvS4cIet7LLtOwVcoUnaz/MbUqI9/Oxk7Eao+nzp9Lbg6okUywHRcq0LC?=
- =?us-ascii?Q?pmBDx6pGNPJ82nN/9WNbKoUu4yxsls14q4fPwV9QYgEIx3wK252Gkj9hw4XH?=
- =?us-ascii?Q?VAQkmkrV4WV21blQKQVDiVOOFqO4Bk+wqMFkwO3/BhrTKMhGzcwNMO8+dA+e?=
- =?us-ascii?Q?VyN6VZak21LMkZxx2W5qZRs2v0lvIZuuzorWu/pIjaE+0Ptl/QGJWh+SJORI?=
- =?us-ascii?Q?WWjxkK1/iQOed9xxphGPiC/k7K1NMHOOnGC4++POegKVJ4g/QEcDrwZZRzVn?=
- =?us-ascii?Q?gOVzTbzhCx1CjhdsycDCcB/lhUL1OZL5npxm+NCvzN3/p72Mae9bm/+gpG+v?=
- =?us-ascii?Q?Znj+R65p58961wDXCNPCMEI+OOOhQ+/p1ME3uDax+yjmE/jt0lsdo9N4+e1o?=
- =?us-ascii?Q?lcNNzIbfRMIL4Zy9CiPnku21vg5PSf1D+XQH4ruo?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f172f45-bf56-492b-72d9-08dbda1ef561
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2023 14:37:50.4968
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3Z1KyDsGoCOpAl3qKrhpyXjub/qHup+3sdWrnCUBmDpl4VTcaDfDkSVEyM5Lq5a/sBwA6xZmo1L/e/TSX7LRcg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5943
+Mime-Version: 1.0
+Date: Tue, 31 Oct 2023 07:38:29 -0700
+Message-ID: <CAJM55Z8D12XoRG4WGaf=PG0_yp7d_xk9EhOk7bnCKQRMok9eBA@mail.gmail.com>
+Subject: Re: [PATCH v2 07/12] riscv: dts: starfive: jh7100: Add ccache DT node
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Emil Renner Berthing <kernel@esmil.dk>, Samin Guo <samin.guo@starfivetech.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Oct 31, 2023 at 04:29:58PM +0200, Nikolay Aleksandrov wrote:
-> > @@ -865,6 +960,8 @@ int do_mdb(int argc, char **argv)
-> >   		    matches(*argv, "lst") == 0 ||
-> >   		    matches(*argv, "list") == 0)
-> >   			return mdb_show(argc-1, argv+1);
-> > +		if (matches(*argv, "get") == 0)
-> > +			return mdb_get(argc-1, argv+1);
-> 
-> I can't recall if it was agreed to add only strcmp even if the rest uses
-> matches()?
+Cristian Ciocaltea wrote:
+> Provide a DT node for the SiFive Composable Cache controller found on
+> the StarFive JH7100 SoC.
+>
+> Note this is also used to support non-coherent DMA, via the
+> sifive,cache-ops cache flushing operations.
 
-Yea, not sure how I missed it... Will fix in v2.
+This property is no longer needed:
+https://lore.kernel.org/linux-riscv/20231031141444.53426-1-emil.renner.berthing@canonical.com/
 
-Thanks!
+Also it would be nice to mention that these nodes are copied from my
+visionfive patches ;)
+
+>
+> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+> ---
+>  arch/riscv/boot/dts/starfive/jh7100.dtsi | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/arch/riscv/boot/dts/starfive/jh7100.dtsi b/arch/riscv/boot/dts/starfive/jh7100.dtsi
+> index 06bb157ce111..a8a5bb00b0d8 100644
+> --- a/arch/riscv/boot/dts/starfive/jh7100.dtsi
+> +++ b/arch/riscv/boot/dts/starfive/jh7100.dtsi
+> @@ -32,6 +32,7 @@ U74_0: cpu@0 {
+>  			i-tlb-sets = <1>;
+>  			i-tlb-size = <32>;
+>  			mmu-type = "riscv,sv39";
+> +			next-level-cache = <&ccache>;
+>  			riscv,isa = "rv64imafdc";
+>  			riscv,isa-base = "rv64i";
+>  			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+> @@ -60,6 +61,7 @@ U74_1: cpu@1 {
+>  			i-tlb-sets = <1>;
+>  			i-tlb-size = <32>;
+>  			mmu-type = "riscv,sv39";
+> +			next-level-cache = <&ccache>;
+>  			riscv,isa = "rv64imafdc";
+>  			riscv,isa-base = "rv64i";
+>  			riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zicntr", "zicsr",
+> @@ -147,6 +149,18 @@ soc {
+>  		dma-noncoherent;
+>  		ranges;
+>
+> +		ccache: cache-controller@2010000 {
+> +			compatible = "starfive,jh7100-ccache", "sifive,ccache0", "cache";
+> +			reg = <0x0 0x2010000 0x0 0x1000>;
+> +			interrupts = <128>, <130>, <131>, <129>;
+> +			cache-block-size = <64>;
+> +			cache-level = <2>;
+> +			cache-sets = <2048>;
+> +			cache-size = <2097152>;
+> +			cache-unified;
+> +			sifive,cache-ops;
+> +		};
+> +
+>  		clint: clint@2000000 {
+>  			compatible = "starfive,jh7100-clint", "sifive,clint0";
+>  			reg = <0x0 0x2000000 0x0 0x10000>;
+> --
+> 2.42.0
+>
 
