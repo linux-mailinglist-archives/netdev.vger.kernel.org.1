@@ -1,148 +1,125 @@
-Return-Path: <netdev+bounces-45485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3B77DD829
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:20:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A377E7DD83F
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 23:27:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54233B20E8B
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:20:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 312602812C1
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 22:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF1B27444;
-	Tue, 31 Oct 2023 22:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1F727445;
+	Tue, 31 Oct 2023 22:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="B3fP9cX5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PtpWeLTF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F53A28;
-	Tue, 31 Oct 2023 22:20:46 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38AC2F3;
-	Tue, 31 Oct 2023 15:20:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=NfaUNK9Gnj3jV65G++Jz1u69ma76y4R62RU6zrUykfs=; b=B3fP9cX5+GEozlK4l6bigX6CuZ
-	lT42tJF+EPt9WJw7oBh4z+EYjqV7oH36njpu2YEbN9FbWoiy7sA3lDs8maIXRAukKSxNyCYOOrUwV
-	4geNMJlQWeM7PXdUsBgxX27DIxZIVyRgbxq5FfwS2KPJMik5q0mqRLzB5sO3FaELAgjQCpSMxTx2f
-	geSMoqnlkcrGbIwXXdT7cawzaVuTRqk9bronV7WiEnh1bcRvMIrB4xFkeoCZU63WVcK2583hlOt9g
-	DCgSPdOXP9nEh9nNtm9Zz7jZTI+Q+1//WfCZHt2lNGq0k7Yv/GnKA1M/imfWIfxOhgRatcCVlCnz/
-	shy3DGWg==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qxx60-000N13-Lj; Tue, 31 Oct 2023 23:20:24 +0100
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy02.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qxx5z-000GcY-Rd; Tue, 31 Oct 2023 23:20:23 +0100
-Subject: Re: [PATCH net] veth: Fix RX stats for bpf_redirect_peer() traffic
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Peilin Ye <yepeilin.cs@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Peilin Ye <peilin.ye@bytedance.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Cong Wang <cong.wang@bytedance.com>, Jiang Wang <jiang.wang@bytedance.com>,
- Youlun Zhang <zhangyoulun@bytedance.com>
-References: <20231027184657.83978-1-yepeilin.cs@gmail.com>
- <20231027190254.GA88444@n191-129-154.byted.org>
- <59be18ff-dabc-2a07-3d78-039461b0f3f7@iogearbox.net>
- <20231028231135.GA2236124@n191-129-154.byted.org>
- <94c88020-5282-c82b-8f88-a2d012444699@iogearbox.net>
- <20231031125348.70fc975e@kernel.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <6d5cb0ef-fabc-7ca3-94b2-5b1925a6805f@iogearbox.net>
-Date: Tue, 31 Oct 2023 23:20:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4024417
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 22:27:33 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C61101
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 15:27:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698791251; x=1730327251;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=56b5MfCFIFAlLzHYVZ+0IIbcoP+h5LznhRfG4s6vWUs=;
+  b=PtpWeLTF2WsK8dsg/Qcdq1r4dC26x+HZJSSLhI23GlyvYRpYnQfV2Cdc
+   Hm/wKFpd0z7ehCQXafqbezyQImfLyE+h/LQl3hyLfkhIbzf0ntGB+icC6
+   mM6KCAEwL7gtgabGmpI0WSfjvir9KIdCliPYfh0jEdD7jy2aq+bsQ7sr+
+   cUGi+IfKInpFisw1ljXWUTKtjkRWI13Z8LQFxZLvOUiCJXRNP3OFNovgl
+   VLKDfc8XutTFkMVi2asjW4WHYmgoIUKoP7DIstOfrsEQHkX6pp4fXUeib
+   ENrZSxY/032j7SaYVfZq1GuKern49k5AVo/z9SSVhUpkKRDkdz0GBDQa/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10880"; a="1236091"
+X-IronPort-AV: E=Sophos;i="6.03,266,1694761200"; 
+   d="scan'208";a="1236091"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 15:27:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,266,1694761200"; 
+   d="scan'208";a="1988797"
+Received: from jekeller-desk.amr.corp.intel.com (HELO jekeller-desk.jekeller.internal) ([10.166.241.1])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2023 15:27:31 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+To: netdev@vger.kernel.org,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
+	Anthony Nguyen <anthony.l.nguyen@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net v2 0/3] ice: restore timestamp config after reset
+Date: Tue, 31 Oct 2023 15:27:22 -0700
+Message-ID: <20231031222725.2819172-1-jacob.e.keller@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231031125348.70fc975e@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27078/Tue Oct 31 08:41:25 2023)
+Content-Transfer-Encoding: 8bit
 
-On 10/31/23 8:53 PM, Jakub Kicinski wrote:
-> On Mon, 30 Oct 2023 15:19:26 +0100 Daniel Borkmann wrote:
->>> Since I didn't want to update host-veth's TX counters.  If we
->>> bpf_redirect_peer()ed a packet from NIC TC ingress to Pod-veth TC ingress,
->>> I think it means we've bypassed host-veth TX?
->>
->> Yes. So the idea is to transition to tstats replace the location where
->> we used to bump lstats with tstat's tx counter, and only the peer redirect
->> would bump the rx counter.. then upon stats traversal we fold the latter into
->> the rx stats which was populated by the opposite's tx counters. Makes sense.
->>
->> OT: does cadvisor run inside the Pod to collect the device stats? Just
->> curious how it gathers them.
-> 
-> Somewhat related - where does netkit count stats?
+We recently discovered during internal validation that the ice driver has
+not been properly restoring Tx timestamp configuration after a device reset,
+which resulted in application failures after a device reset.
 
-Yeap, it needs it as well, I have a local branch here where I pushed all
-of it - coming out soon; I was planning to add some selftests in addition
-till end of this week:
+After some digging, it turned out this problem is two-fold. Since the
+introduction of the PTP support the driver has been clobbering the storage
+of the current timestamp configuration during reset. Thus after a reset, the
+driver will no longer perform Tx or Rx timestamps, and will report
+timestamp configuration as disabled if SIOCGHWTSTAMP ioctl is issued.
 
-https://github.com/cilium/linux/commits/pr/ndo_peer
+In addition, the recently merged auxiliary bus support code missed that
+PFINT_TSYN_MSK must be reprogrammed on the clock owner for E822 devices.
+Failure to restore this register configuration results in the driver no
+longer responding to interrupts from other ports. Depending on the traffic
+pattern, this can either result in increased latency responding to
+timestamps on the non-owner ports, or it can result in the driver never
+reporting any timestamps. The configuration of PFINT_TSYN_MSK was only done
+during initialization. Due to this, the Tx timestamp issue persists even if
+userspace reconfigures timestamping.
 
->>>> Definitely no new stats ndo resp indirect call in fast path.
->>>
->>> Yeah, I think I'll put a comment saying that all devices that support
->>> BPF_F_PEER must use tstats (or must use lstats), then.
->>
->> sgtm.
-> 
-> Is comment good enough? Can we try to do something more robust?
-> Move the allocation of stats into the core at registration based
-> on some u8 assigned in the driver? (I haven't looked at the code TBH)
-Hm, not sure. One thing that comes to mind is lazy one-time allocation
-like in case of netdev_core_stats_inc(), so whenever one of the helpers
-like dev_sw_netstats_{rx,tx}_add() are called and dev->tstats are still
-NULL, the core knows about the driver's intent, but tbh that doesn't
-feel overly clean and in case of netdev_core_stats_inc() it's more in
-the exception case rather than fast-path.
+This series fixes both issues, as well as removes a redundant Tx ring field
+since we can rely on the skb flag as the primary detector for a Tx timestamp
+request.
 
-Other option could be to have two small helpers in the core which then
-set a flag as well:
+Note that I don't think this series will directly apply to older stable
+releases (even v6.6) as we recently refactored a lot of the PTP code to
+support auxiliary bus. Patch 2/3 only matters for the post-auxiliary bus
+implementation. The principle of patch 1/3 and 3/3 could apply as far back
+as the initial PTP support, but I don't think it will apply cleanly as-is.
 
-static inline int netdev_tstats_alloc(struct net_device *dev)
-{
-	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
-	if (!dev->tstats)
-		return -ENOMEM;
-	dev->priv_flags |= IFF_USES_TSTATS;
-	return 0;
-}
+Changes since v1
+* Update target to net and rebase onto current net tree.
+* Add appropriate fixes tag to 1/3.
+* Slightly update the cover message.
+* picked up Jesse's Reviewed-by tag.
 
-static inline void netdev_tstats_free(struct net_device *dev)
-{
-	free_percpu(dev->tstats);
-}
+V1 was posted here:
+https://lore.kernel.org/netdev/20231028002322.2224777-1-jacob.e.keller@intel.com/
 
-They can then be used from .ndo_init/uninit - not sure if this would
-be overall nicer.. or just leaving it at the .ndo callback comment for
-the time being until really more users show up (which I doubt tbh).
+Jacob Keller (3):
+  ice: remove ptp_tx ring parameter flag
+  ice: unify logic for programming PFINT_TSYN_MSK
+  ice: restore timestamp configuration after device reset
 
-Thanks,
-Daniel
+ drivers/net/ethernet/intel/ice/ice_main.c |  12 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 146 ++++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |   5 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c |   3 -
+ drivers/net/ethernet/intel/ice/ice_txrx.h |   1 -
+ 5 files changed, 84 insertions(+), 83 deletions(-)
+
+
+base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
+-- 
+2.41.0
+
 
