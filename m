@@ -1,223 +1,245 @@
-Return-Path: <netdev+bounces-45375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A777DC618
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 06:48:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 992977DC671
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 07:20:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AB4A1C20B56
-	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 05:48:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D33F2815DC
+	for <lists+netdev@lfdr.de>; Tue, 31 Oct 2023 06:20:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C75D523;
-	Tue, 31 Oct 2023 05:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5CF883D;
+	Tue, 31 Oct 2023 06:20:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oDrea8wB"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="igzCzjfu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6B72599
-	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 05:48:41 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE11EE6
-	for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 22:48:38 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53e08b60febso8284853a12.1
-        for <netdev@vger.kernel.org>; Mon, 30 Oct 2023 22:48:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698731317; x=1699336117; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d8tsL5oB87Rx8sJrlG5ElUtswTptcOb5Z68cZ32EAsY=;
-        b=oDrea8wBuYrj+l8rGGG8zZp7F9CUUPlnFZy2a3K9lKCYdnB5Bacf2nA8cGPDGHwYcw
-         NQKvclcI2qkplBlAqd8pmavKV97rHt7WOmZtqjohcyhuO0+y9d+dq0OOnmOcCBBvXtKU
-         58+4oxAFmeAI/+5ngy8wxGYfhY+HUE5zJxzrJ4lxCqppSDH7F1PmbhOqZ+np25s5Nwyd
-         eI+DKStmO9gNB3qDwHyrSqZ4vBGZtoBn37YOAn1x/oC5EfPSLX0kn3FV5hL3D3Q+N3qd
-         VvD6o+yGTx/JoCVRYnzzszLrXmCL5q9KzmEIhLUyeOGso64pUkn3QZDqWq88Z7+znMA8
-         4O9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698731317; x=1699336117;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d8tsL5oB87Rx8sJrlG5ElUtswTptcOb5Z68cZ32EAsY=;
-        b=aTgLlRT/rlC71DgqPCszU7ZdDwu6L8lEhMGC7UbF3VnHfhCPJayzMHfyUTWfUHRVgH
-         7P3Pvo/+LvLT1MaTPebFnQN2iskni6nDWlyAuoweCz1VS6j+Rygn3WLHjdDM2v1Y7hFz
-         QA2Lua0ldcfuxh4ex8OXG622uV+1T4Ib+2iiziE8O+nmC0Q0sYpDN5nG1hItfiWSY30v
-         i6BGSTJ9tEeqZjnaFWsvne7X+xs8F8MQ/tsCsreBuIqGB+gMXxKZoUuJ6jyko5g0JTHj
-         UyYBiqvzG79rBjMvLQeEqYibAsPT6l3mzJ6ixQRvtrZ258NZgGPU4B2pz60IAo2ZNRNZ
-         Fqzg==
-X-Gm-Message-State: AOJu0Yxr31/vwsMchEx0+lymsjgi+dG+L8WPaijmizmXgpzbO18352Bd
-	ceZAGGPb4cLCrOQbVExCnZmkMA==
-X-Google-Smtp-Source: AGHT+IH7TmlrhHtGaYMSqpY2i7vK1vgWIGw5a4YiJB8UtrNg8R8oC1mb+KBwD5+C5OPY2DzZOFMUxQ==
-X-Received: by 2002:a05:6402:379:b0:540:9b47:4f70 with SMTP id s25-20020a056402037900b005409b474f70mr9028247edw.26.1698731317311;
-        Mon, 30 Oct 2023 22:48:37 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id ks24-20020a170906f85800b009ad8acac02asm361918ejb.172.2023.10.30.22.48.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Oct 2023 22:48:36 -0700 (PDT)
-Message-ID: <b67ee496-397b-42f1-8109-542878934385@linaro.org>
-Date: Tue, 31 Oct 2023 06:48:34 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BAA10784
+	for <netdev@vger.kernel.org>; Tue, 31 Oct 2023 06:20:01 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA1B91;
+	Mon, 30 Oct 2023 23:20:00 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 39UK7eAZ026041;
+	Mon, 30 Oct 2023 23:19:48 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=xWrQJr89+eLrLsnsPDitsCD3AyalGG7UX3b15wzIHQw=;
+ b=igzCzjfuT3F6Su/3fmvzSJK2Fv9m2GRrhXvUo3w+BvP5H46kOvwWQlVhTW5bh8FTF/J1
+ mO5g2ZPi+P5remp9ENmA7pNjWmyXRvTbVjFz3BtUPdIk9vrD4iMWDIurYYVdwYErBVxs
+ N0q/sAfRt1yr9xZ9zJol9KD53qjsZBwNcD1owGbfJ3CrJt8PzNM3vSzw+EP3OF3cUD8z
+ hW3nnI+pbb/g309n9qAN4CXF9iwweJza8q675UVKtL6aXlGQ6iJg7G7+Np2gpgaxedXh
+ /wXZmIcR2FZvJIVTyWVhEYBfixfov8pGMG99s+Pem0o0L77y4mzeKpJ/8HAKzartZ+JM tg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3u2a9f3xeu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 30 Oct 2023 23:19:48 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 30 Oct
+ 2023 23:19:46 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 30 Oct 2023 23:19:46 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 568703F70BB;
+	Mon, 30 Oct 2023 23:19:43 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH] octeontx2-pf: TC flower offload support for ICMP type and code
+Date: Tue, 31 Oct 2023 11:49:42 +0530
+Message-ID: <20231031061942.18553-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/12] dt-bindings: net: snps,dwmac: Allow exclusive
- usage of ahb reset
-Content-Language: en-US
-To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-2-cristian.ciocaltea@collabora.com>
- <3016eff2-fce5-4b5e-bbb2-d56cbb45df85@linaro.org>
- <05186c62-fcad-4d56-8ae8-d802f87a39e2@collabora.com>
- <98d90ba9-7e69-4b54-830d-bdbc0e6c54fe@linaro.org>
- <d532514a-524c-4607-b97b-2f89bc563406@collabora.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <d532514a-524c-4607-b97b-2f89bc563406@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-GUID: _nIVOTjhQ4zdyXAraAQaeWntIHoL-AX1
+X-Proofpoint-ORIG-GUID: _nIVOTjhQ4zdyXAraAQaeWntIHoL-AX1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-10-30_13,2023-10-31_02,2023-05-22_02
 
-On 30/10/2023 20:07, Cristian Ciocaltea wrote:
-> On 10/30/23 09:26, Krzysztof Kozlowski wrote:
->> On 29/10/2023 23:24, Cristian Ciocaltea wrote:
->>> On 10/29/23 13:25, Krzysztof Kozlowski wrote:
->>>> On 29/10/2023 05:27, Cristian Ciocaltea wrote:
->>>>> The Synopsys DesignWare MAC found on the StarFive JH7100 SoC requires
->>>>> just the 'ahb' reset name, but the binding allows selecting it only in
->>>>> conjunction with 'stmmaceth'.
->>>>>
->>>>> Fix the issue by permitting exclusive usage of the 'ahb' reset name.
->>>>>
->>>>> Signed-off-by: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
->>>>> ---
->>>>>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 +-
->>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>>>> index 5c2769dc689a..a4d7172ea701 100644
->>>>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>>>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
->>>>> @@ -146,7 +146,7 @@ properties:
->>>>>    reset-names:
->>>>>      minItems: 1
->>>>>      items:
->>>>> -      - const: stmmaceth
->>>>> +      - enum: [stmmaceth, ahb]
->>>>
->>>> Also, this makes sense only with patch #4, so this should be squashed there.
->>>
->>> I added this as a separate patch since it changes the generic schema
->>> which is included by many other bindings.  JH7100 just happens to be the
->>> first use-case requiring this update.  But I can squash the patch if
->>> that's not a good enough reason to keep it separately.
->>
->> If there is no single user of this, why changing this? I would even
->> argue that it is not correct from existing bindings point of view -
->> nothing allows and uses ahb as the only reset. Even the commit msg
->> mentions your hardware from patch 4.
-> 
-> Sorry, I'm not sure I follow. JH7100 is (or will be) the user of it and,
-> as a matter of fact, something similar has been done recently while
-> adding support for JH7110.
+Adds tc offload support for matching on ICMP type and code.
 
-Every patch should stand on its own and at this point nothing uses it.
-We apply this patch #1 and we add dead code, unused case.
+Example usage:
+To enable adding tc ingress rules
+        tc qdisc add dev eth0 ingress
 
-> 
-> In particular, commit [1] changed this binding before the JH7110
-> compatible was introduced in a subsequent patch. On a closer look that
-> commit made a statement which is not entirely correct:
-> 
-> "dwmac controller may require one (stmmaceth) or two (stmmaceth+ahb)
-> reset signals"
-> 
-> That's because stmmaceth is also optional in dwmac's driver, hence the
-> correct message would have been:
-> 
-> "[...] may require one (stmmaceth OR ahb) [...]"
+TC rule drop the ICMP echo reply:
+        tc filter add dev eth0 protocol ip parent ffff: \
+        flower ip_proto icmp type 8 code 0 skip_sw action drop
 
-Driver does not describe the hardware. The bindings do, so according to
-that description all supported hardware required MAC reset (stmmaceth).
-Otherwise please point me to any hardware which skips MAC reset and
-requires AHB reset instead (not future hardware, but current).
+TC rule to drop ICMPv6 echo reply:
+        tc filter add dev eth0 protocol ipv6 parent ffff: flower \
+        indev eth0 ip_proto icmpv6 type 128 code 0 action drop
 
-> 
-> Hence, I think it makes sense to keep this patch, after adding the above
-> details in the commit message.
-> 
-> [1] 843f603762a5 ("dt-bindings: net: snps,dwmac: Add 'ahb'
-> reset/reset-name")
-> 
-> Thanks,
-> Cristian
+Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  2 ++
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |  2 ++
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  8 +++++++
+ .../marvell/octeontx2/af/rvu_npc_fs.c         | 23 ++++++++++++++-----
+ .../ethernet/marvell/octeontx2/nic/otx2_tc.c  | 14 +++++++++++
+ 5 files changed, 43 insertions(+), 6 deletions(-)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index 6b5b06c2b4e9..78088dd4e2f9 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -1473,6 +1473,8 @@ struct flow_msg {
+ 		u8 next_header;
+ 	};
+ 	__be16 vlan_itci;
++	u8 icmp_type;
++	u8 icmp_code;
+ };
+ 
+ struct npc_install_flow_req {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/npc.h b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+index de9fbd98dfb7..2f1ed5411d75 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/npc.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/npc.h
+@@ -206,6 +206,8 @@ enum key_fields {
+ 	NPC_SPORT_SCTP,
+ 	NPC_DPORT_SCTP,
+ 	NPC_IPSEC_SPI,
++	NPC_TYPE_ICMP,
++	NPC_CODE_ICMP,
+ 	NPC_HEADER_FIELDS_MAX,
+ 	NPC_CHAN = NPC_HEADER_FIELDS_MAX, /* Valid when Rx */
+ 	NPC_PF_FUNC, /* Valid when Tx */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index d30e84803481..2b32b9d6c625 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -2836,6 +2836,14 @@ static void rvu_dbg_npc_mcam_show_flows(struct seq_file *s,
+ 			seq_printf(s, "0x%x ", ntohl(rule->packet.spi));
+ 			seq_printf(s, "mask 0x%x\n", ntohl(rule->mask.spi));
+ 			break;
++		case NPC_TYPE_ICMP:
++			seq_printf(s, "%d ", rule->packet.icmp_type);
++			seq_printf(s, "mask 0x%x\n", rule->mask.icmp_type);
++			break;
++		case NPC_CODE_ICMP:
++			seq_printf(s, "%d ", rule->packet.icmp_code);
++			seq_printf(s, "mask 0x%x\n", rule->mask.icmp_code);
++			break;
+ 		default:
+ 			seq_puts(s, "\n");
+ 			break;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 237f82082ebe..ad204e21867b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -43,6 +43,8 @@ static const char * const npc_flow_names[] = {
+ 	[NPC_DPORT_SCTP] = "sctp destination port",
+ 	[NPC_LXMB]	= "Mcast/Bcast header ",
+ 	[NPC_IPSEC_SPI] = "SPI ",
++	[NPC_TYPE_ICMP] = "icmp type",
++	[NPC_CODE_ICMP] = "icmp code",
+ 	[NPC_UNKNOWN]	= "unknown",
+ };
+ 
+@@ -518,6 +520,8 @@ do {									       \
+ 	NPC_SCAN_HDR(NPC_DPORT_TCP, NPC_LID_LD, NPC_LT_LD_TCP, 2, 2);
+ 	NPC_SCAN_HDR(NPC_SPORT_SCTP, NPC_LID_LD, NPC_LT_LD_SCTP, 0, 2);
+ 	NPC_SCAN_HDR(NPC_DPORT_SCTP, NPC_LID_LD, NPC_LT_LD_SCTP, 2, 2);
++	NPC_SCAN_HDR(NPC_TYPE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 0, 1);
++	NPC_SCAN_HDR(NPC_CODE_ICMP, NPC_LID_LD, NPC_LT_LD_ICMP, 1, 1);
+ 	NPC_SCAN_HDR(NPC_ETYPE_ETHER, NPC_LID_LA, NPC_LT_LA_ETHER, 12, 2);
+ 	NPC_SCAN_HDR(NPC_ETYPE_TAG1, NPC_LID_LB, NPC_LT_LB_CTAG, 4, 2);
+ 	NPC_SCAN_HDR(NPC_ETYPE_TAG2, NPC_LID_LB, NPC_LT_LB_STAG_QINQ, 8, 2);
+@@ -539,7 +543,7 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
+ {
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 	u64 *features = &mcam->rx_features;
+-	u64 tcp_udp_sctp;
++	u64 proto_flags;
+ 	int hdr;
+ 
+ 	if (is_npc_intf_tx(intf))
+@@ -550,18 +554,21 @@ static void npc_set_features(struct rvu *rvu, int blkaddr, u8 intf)
+ 			*features |= BIT_ULL(hdr);
+ 	}
+ 
+-	tcp_udp_sctp = BIT_ULL(NPC_SPORT_TCP) | BIT_ULL(NPC_SPORT_UDP) |
++	proto_flags = BIT_ULL(NPC_SPORT_TCP) | BIT_ULL(NPC_SPORT_UDP) |
+ 		       BIT_ULL(NPC_DPORT_TCP) | BIT_ULL(NPC_DPORT_UDP) |
+-		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP);
++		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
++		       BIT_ULL(NPC_SPORT_SCTP) | BIT_ULL(NPC_DPORT_SCTP) |
++		       BIT_ULL(NPC_TYPE_ICMP) | BIT_ULL(NPC_CODE_ICMP);
+ 
+ 	/* for tcp/udp/sctp corresponding layer type should be in the key */
+-	if (*features & tcp_udp_sctp) {
++	if (*features & proto_flags) {
+ 		if (!npc_check_field(rvu, blkaddr, NPC_LD, intf))
+-			*features &= ~tcp_udp_sctp;
++			*features &= ~proto_flags;
+ 		else
+ 			*features |= BIT_ULL(NPC_IPPROTO_TCP) |
+ 				     BIT_ULL(NPC_IPPROTO_UDP) |
+-				     BIT_ULL(NPC_IPPROTO_SCTP);
++				     BIT_ULL(NPC_IPPROTO_SCTP) |
++				     BIT_ULL(NPC_IPPROTO_ICMP);
+ 	}
+ 
+ 	/* for AH/ICMP/ICMPv6/, check if corresponding layer type is present in the key */
+@@ -950,6 +957,10 @@ do {									      \
+ 		       ntohs(mask->sport), 0);
+ 	NPC_WRITE_FLOW(NPC_DPORT_SCTP, dport, ntohs(pkt->dport), 0,
+ 		       ntohs(mask->dport), 0);
++	NPC_WRITE_FLOW(NPC_TYPE_ICMP, icmp_type, pkt->icmp_type, 0,
++		       mask->icmp_type, 0);
++	NPC_WRITE_FLOW(NPC_CODE_ICMP, icmp_code, pkt->icmp_code, 0,
++		       mask->icmp_code, 0);
+ 
+ 	NPC_WRITE_FLOW(NPC_IPSEC_SPI, spi, ntohl(pkt->spi), 0,
+ 		       ntohl(mask->spi), 0);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index fab9d85bfb37..bede05dfad7b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -519,6 +519,7 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 	      BIT_ULL(FLOW_DISSECTOR_KEY_IPV6_ADDRS) |
+ 	      BIT_ULL(FLOW_DISSECTOR_KEY_PORTS) |
+ 	      BIT(FLOW_DISSECTOR_KEY_IPSEC) |
++	      BIT_ULL(FLOW_DISSECTOR_KEY_ICMP) |
+ 	      BIT_ULL(FLOW_DISSECTOR_KEY_IP))))  {
+ 		netdev_info(nic->netdev, "unsupported flow used key 0x%llx",
+ 			    dissector->used_keys);
+@@ -738,6 +739,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 		}
+ 	}
+ 
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_ICMP)) {
++		struct flow_match_icmp match;
++
++		flow_rule_match_icmp(rule, &match);
++
++		flow_spec->icmp_type = match.key->type;
++		flow_mask->icmp_type = match.mask->type;
++		req->features |= BIT_ULL(NPC_TYPE_ICMP);
++
++		flow_spec->icmp_code = match.key->code;
++		flow_mask->icmp_code = match.mask->code;
++		req->features |= BIT_ULL(NPC_CODE_ICMP);
++	}
+ 	return otx2_tc_parse_actions(nic, &rule->action, req, f, node);
+ }
+ 
+-- 
+2.25.1
 
 
