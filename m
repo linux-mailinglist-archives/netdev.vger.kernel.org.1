@@ -1,147 +1,134 @@
-Return-Path: <netdev+bounces-45591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1907DE7B0
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 22:53:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FC4B7DE7C6
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 22:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 962C9B20DD8
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:53:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE9CE1C209B8
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B391B294;
-	Wed,  1 Nov 2023 21:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE50F1BDC9;
+	Wed,  1 Nov 2023 21:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ie6s0Sq/"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="ikJERYTz";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="AehbrKHU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6643F33FA
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 21:53:27 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F20119
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 14:53:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698875605;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nVOrNNEvEeNpHZhIU0FeOrFYxSmUjF+L9aGYQKszoBM=;
-	b=ie6s0Sq/W9/nuViG+n14/w6mT4xKtxt3LPGi31rIhUtIx5abx8+BIYeVWJFD+aOqmq/aCH
-	zC+Z+bY4E/SYoeTCJ5YrPyucBFbnqr6RRPOLodw1U8KhQOhzJfgVjmvi8V8f5PO4ZusWDB
-	UnK9bMPoUNnRE2yHtH2H+W3IlyLd4tQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-HQtPyiL5MASzO23C9z4MFQ-1; Wed,
- 01 Nov 2023 17:53:20 -0400
-X-MC-Unique: HQtPyiL5MASzO23C9z4MFQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D3FC3299E74C;
-	Wed,  1 Nov 2023 21:53:19 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.94])
-	by smtp.corp.redhat.com (Postfix) with SMTP id 67D5F25C0;
-	Wed,  1 Nov 2023 21:53:17 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Wed,  1 Nov 2023 22:52:18 +0100 (CET)
-Date: Wed, 1 Nov 2023 22:52:15 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather
- than read_seqbegin_or_lock()
-Message-ID: <20231101215214.GD32034@redhat.com>
-References: <20231027095842.GA30868@redhat.com>
- <1952182.1698853516@warthog.procyon.org.uk>
- <20231101202302.GB32034@redhat.com>
- <20231101205238.GI1957730@ZenIV>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A331B10A09;
+	Wed,  1 Nov 2023 21:58:37 +0000 (UTC)
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95FC3110;
+	Wed,  1 Nov 2023 14:58:32 -0700 (PDT)
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailout.west.internal (Postfix) with ESMTP id 9C5D332009F4;
+	Wed,  1 Nov 2023 17:58:29 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute3.internal (MEProxy); Wed, 01 Nov 2023 17:58:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to; s=fm2; t=1698875909; x=1698962309; bh=iHvV4xCaLT
+	5/MQ/ZV/9e1rtl0TLVC998xFKkYBnpOgo=; b=ikJERYTztDLF/1z688Yvxbgwhc
+	cnTUVG3+xXOjkUJ8rfYPbw/SByIGsKVnL8ohXE7wYh3vHhgf7rJXiPKyz3fTsEdL
+	kBwAo3BhD5730yI2EYIx+LKN+4FrjPPIMvtmjhTbbIh2so3QQq0AJpmR3DhTLsJK
+	2k4s7XhCyTbJJ5LTcLWtmv+IyQEPSumNXdQoR8GiR+NBQwoKTMORiPmI2+WcwYtM
+	n+f4INyyyvRujvyqwW78gaCajQo/gyCUx7etmQFsP/7C3IW/6hMQy2c/lCVg+u1x
+	KhNvtVhIt1qZJHL4rgfGdoiSp16s1AqEJ4JM+K0uxoiJdBX+F09RXsKISiug==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm3; t=1698875909; x=1698962309; bh=iHvV4xCaLT5/M
+	Q/ZV/9e1rtl0TLVC998xFKkYBnpOgo=; b=AehbrKHUy5roV1YSJo3D6cA/YH1MK
+	OxLVS6h8sB+OAQ/BtLA73mgcucQeK5yQHgI2HB9oZrctQHQTT377bLARQh1TlvLw
+	xIBVfXsIcHvo0w/jPeNt2HY2mye1jPNCck8W/KqHJ5NvVH97yQwaIPxL9ck4fsfx
+	Hv5w98FJB2f1xz0UCYp3QujKM4gfrmrLCQOec06uGiJTaTRYYojec18JCoRRdRHD
+	okaKqJbEaLGAillx6eVbO6Q7FTsM0lU6mTvUmBaPSQhoaAhSlwpggRuraEchh0hQ
+	ATxU5bF/ha9N6IEMHGsm65jRQNTZn7eA+pL/VJEyghJydbYstm0uUqaMw==
+X-ME-Sender: <xms:BMpCZabpuvGDgowagnwnkINVCEyTh5kCQcZzr7fWtMLwQVc_wIJ4TA>
+    <xme:BMpCZda7fnt_ngY1qpjMdR5Lu2AcwtZpYl5k7wVrtv5zAKdKrIlDbjVf3k5iJqSEu
+    Stuaz5LfsJ-booz0w>
+X-ME-Received: <xmr:BMpCZU-WYCalgYkBQsWdys1B03jlgFyeKSoOAnU3gO-BTvOBg3dlDw3DI6cAe3WXaX9OCw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedruddtgedgudehgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecufghrlhcuvffnffculddvfedmnecujfgurhephf
+    fvvefufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegu
+    gihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeikeehudegteevuddthf
+    eilefhjefgueeuueffveevheeggfeufeejfeeuudekfeenucffohhmrghinhepihgvthhf
+    rdhorhhgpdhgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    grmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
+X-ME-Proxy: <xmx:BMpCZcpl4nU_PbMXkDdtxPNogLrfqORT6TtCme3R5r_LKt8w19_A8A>
+    <xmx:BMpCZVqXVNdgzF23j_J7mX_Tji2Pi8JjXZmIgZvqhZtT8ct9I-H2NQ>
+    <xmx:BMpCZaTp3cI57Xw8gUJJkOaw7dCWDO6cCRN3jPp7KVOShiy45gqmSA>
+    <xmx:BcpCZeAM0fDkQA8n0BIffVhHR8UJvDhNqvHjSl10a_eY2vhujgceNw>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 1 Nov 2023 17:58:27 -0400 (EDT)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	steffen.klassert@secunet.com,
+	antony.antony@secunet.com
+Cc: devel@linux-ipsec.org
+Subject: [RFCv2 bpf-next 0/7] Add bpf_xdp_get_xfrm_state() kfunc
+Date: Wed,  1 Nov 2023 14:57:44 -0700
+Message-ID: <cover.1698875025.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231101205238.GI1957730@ZenIV>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+Content-Transfer-Encoding: 8bit
 
-On 11/01, Al Viro wrote:
->
-> On Wed, Nov 01, 2023 at 09:23:03PM +0100, Oleg Nesterov wrote:
->
-> > Yes this is confusing. Again, even the documentation is wrong! That is why
-> > I am trying to remove the misuse of read_seqbegin_or_lock(), then I am going
-> > to change the semantics of need_seqretry() to enforce the locking on the 2nd
-> > pass.
->
-> What for?  Sure, documentation needs to be fixed,
+This patchset adds two kfunc helpers, bpf_xdp_get_xfrm_state() and
+bpf_xdp_xfrm_state_release() that wrap xfrm_state_lookup() and
+xfrm_state_put(). The intent is to support software RSS (via XDP) for
+the ongoing/upcoming ipsec pcpu work [0]. Recent experiments performed
+on (hopefully) reproducible AWS testbeds indicate that single tunnel
+pcpu ipsec can reach line rate on 100G ENA nics.
 
-So do you agree that the current usage of read_seqbegin_or_lock() in
-rxrpc_find_service_conn_rcu() is misleading ? Do you agree it can use
-read_seqbegin/read_seqretry without changing the current behaviour?
+Note this patchset only tests/shows generic xfrm_state access. The
+"secret sauce" (if you can really even call it that) involves accessing
+a soon-to-be-upstreamed pcpu_num field in xfrm_state. Early example is
+available here [1].
 
-> but *not* in direction you
-> suggested in that patch.
+[0]: https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-multi-sa-performance-02
+[1]: https://github.com/danobi/xdp-tools/blob/e89a1c617aba3b50d990f779357d6ce2863ecb27/xdp-bench/xdp_redirect_cpumap.bpf.c#L385-L406
 
-Hmm. then how do you think the doc should be changed? To describe the
-current behaviour.
+Changes from RFCv1:
+* Add Antony's commit tags
+* Add KF_ACQUIRE and KF_RELEASE semantics
 
-> Why would you want to force that "switch to locked on the second pass" policy
-> on every possible caller?
+Daniel Xu (7):
+  bpf: xfrm: Add bpf_xdp_get_xfrm_state() kfunc
+  bpf: xfrm: Add bpf_xdp_xfrm_state_release() kfunc
+  bpf: selftests: test_tunnel: Use ping -6 over ping6
+  bpf: selftests: test_tunnel: Mount bpffs if necessary
+  bpf: selftests: test_tunnel: Use vmlinux.h declarations
+  bpf: selftests: test_tunnel: Disable CO-RE relocations
+  bpf: xfrm: Add selftest for bpf_xdp_get_xfrm_state()
 
-Because this is what (I think) read_seqbegin_or_lock() is supposed to do.
-It should take the lock for writing if the lockless access failed. At least
-according to the documentation.
+ include/net/xfrm.h                            |   9 ++
+ net/xfrm/Makefile                             |   1 +
+ net/xfrm/xfrm_policy.c                        |   2 +
+ net/xfrm/xfrm_state_bpf.c                     | 121 ++++++++++++++++++
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/test_tunnel_kern.c    |  98 ++++++++------
+ tools/testing/selftests/bpf/test_tunnel.sh    |  43 +++++--
+ 7 files changed, 221 insertions(+), 54 deletions(-)
+ create mode 100644 net/xfrm/xfrm_state_bpf.c
 
-This needs another discussion and perhaps this makes no sense. But I'd
-like to turn need_seqretry(seq) into something like
-
-	static inline int need_seqretry(seqlock_t *lock, int *seq)
-	{
-		int ret = !(*seq & 1) && read_seqretry(lock, *seq);
-
-		if (ret)
-			*seq = 1; /* make this counter odd */
-
-		return ret;
-	}
-
-and update the users which actually want read_seqlock_excl() on the 2nd pass.
-thread_group_cputime(), fs/d_path.c and fs/dcache.c.
-
-For example, __dentry_path()
-
-	--- a/fs/d_path.c
-	+++ b/fs/d_path.c
-	@@ -349,10 +349,9 @@ static char *__dentry_path(const struct dentry *d, struct prepend_buffer *p)
-		}
-		if (!(seq & 1))
-			rcu_read_unlock();
-	-	if (need_seqretry(&rename_lock, seq)) {
-	-		seq = 1;
-	+	if (need_seqretry(&rename_lock, &seq))
-			goto restart;
-	-	}
-	+
-		done_seqretry(&rename_lock, seq);
-		if (b.len == p->len)
-			prepend_char(&b, '/');
-
-
-but again, this need another discussion.
-
-Oleg.
+-- 
+2.42.0
 
 
