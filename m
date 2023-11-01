@@ -1,127 +1,112 @@
-Return-Path: <netdev+bounces-45580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091297DE6BD
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:27:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A837DE6BF
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:27:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38D121C20BC9
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:27:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5C3DB20F76
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA741B26F;
-	Wed,  1 Nov 2023 20:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 806A41B28C;
+	Wed,  1 Nov 2023 20:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFxX+nmj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbCfsTV/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7F214AAE
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 20:27:06 +0000 (UTC)
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29813110
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 13:27:02 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-da2e786743aso198415276.0
-        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 13:27:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698870421; x=1699475221; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Od7geAUO03xnUMzUzl75DCFJAJ0NbP3Lvnn4+QKHjsU=;
-        b=fFxX+nmjf8auP6ELv8OU+J7F/2kaXNgndRo7QT3fxgez8gbPJp5hH1iJArQ6TKdCdR
-         zh6VPgLjVOz73GtcDryexoYD8QHZxn8wRkyR3pz7NWI0CsGFsurlUmU1582zuUKO82RG
-         k2z0U3o0oziyrmw7F+CaQO1xFbSMvkDtg0aaCycBMfaLIdLETmCU5PV/65RJciVPr3Ud
-         5fQUAldGRCP9Py0rzLFRynEc6BiWSuri/F21X9wpqF/VNJSNld+yPQmJhGqPwtu+K3QF
-         DQXvjmzgRs/uUMAAL48tcemFt48d7BBWCjPXvFdBpMZsVOZfeK8xv/NzR78hLup8l63S
-         ZWiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698870421; x=1699475221;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Od7geAUO03xnUMzUzl75DCFJAJ0NbP3Lvnn4+QKHjsU=;
-        b=PjBGXbFcZMzk8tgbY9Og4fdcPo3VI46x+D5v+pQVaXaWJdBDkbmISIXTtlr5sKYhqs
-         kSijHyliPpuOaH483i88MqJ0KoBjWne3ITLl1/53IByKgfkXrKr147wDHZFRJILqhTmO
-         8G2ru0OyyIXwEvkF5cLiEGYB8+OOVZdawWjQiom42T24SSHW2/i6Mwp3q0gjVCU+JOo+
-         vqIMId3pYc2OwdSNr7iwshh1hRR+VlZWkm3psUlZWwQlGSFYjKMhPRl2hYeqDZzNBfVP
-         U8WTu/wbrQS84AqMJyp9P0lpyLA/4jETnALWIz4YNxKZnZA5Kr4lbKiMd/a3SVkUso4e
-         MIJA==
-X-Gm-Message-State: AOJu0Yw47beVtjSbu2m1/QB+5rTy/eBwHlyd9vzXUMIJS5hRYAimelbC
-	w/RwXyHILY8T2gMUIr3hrECA0WEefr025okWKw/PFQ==
-X-Google-Smtp-Source: AGHT+IERUS9wZpG0G9tTSAI7ntlLEE1Up8/dHJ77FkgP7CXWZVBWN2fratkaV2J3fGu67QsCNqw7x/nnpRe4KxM4H2w=
-X-Received: by 2002:a25:40c7:0:b0:d9b:9aeb:8c26 with SMTP id
- n190-20020a2540c7000000b00d9b9aeb8c26mr14111496yba.40.1698870421285; Wed, 01
- Nov 2023 13:27:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B761B281
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 20:27:34 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895FB11C
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 13:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698870451;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sUlB9Zey7+viE7qsX1uDxY/6yuVcf/6ZYKLf2CdDwkY=;
+	b=AbCfsTV/RSWgm4eRTOiJNi+CTlT4hCom+pPymIOmoq+m+ujdgdb6ANNrtd+OVWpg1FjcFD
+	nbo6yFs+6D5qaixQjYkKu6/5fnu3dO2aJbFHTTrFMZmFgvoJoGEIcNgjloEl28VicOCV6S
+	9et5uucps/Gq/nH0/iPXjQc1ovoDM90=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-Kxn8zXZFNUS2IdSCga1DSw-1; Wed, 01 Nov 2023 16:27:30 -0400
+X-MC-Unique: Kxn8zXZFNUS2IdSCga1DSw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BBFBD101A53B;
+	Wed,  1 Nov 2023 20:27:29 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.22.48.12])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 99F821121308;
+	Wed,  1 Nov 2023 20:27:28 +0000 (UTC)
+Message-ID: <79b7f88e3dd6536fe69c63ed3b4cc1f2c551ce8d.camel@redhat.com>
+Subject: Re: Does anyone use Appletalk?
+From: Dan Williams <dcbw@redhat.com>
+To: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Geert
+	Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-m68k <linux-m68k@lists.linux-m68k.org>, Arnd Bergmann
+ <arnd@arndb.de>,  Jakub Kicinski <kuba@kernel.org>, netdev
+ <netdev@vger.kernel.org>
+Date: Wed, 01 Nov 2023 15:27:27 -0500
+In-Reply-To: <5e3e52a48ba9cc0109a98cf4c5371c3f80c4b4cc.camel@physik.fu-berlin.de>
+References: 
+	<CAMuHMdWL2TnYmkt2W6=ohBuKmyof8kR3p7ZPzmXmWSGnKj9c3g@mail.gmail.com>
+	 <594446aaf91b282ff3cbd95953576ffd29f38dab.camel@physik.fu-berlin.de>
+	 <CAMuHMdWv=A6MiVwUuOp8zOCcf21HxKb8cdrndzdbAZik3VRXiw@mail.gmail.com>
+	 <5e3e52a48ba9cc0109a98cf4c5371c3f80c4b4cc.camel@physik.fu-berlin.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com> <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
-In-Reply-To: <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 1 Nov 2023 21:26:50 +0100
-Message-ID: <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, Nov 1, 2023 at 1:35=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+On Wed, 2023-11-01 at 13:26 +0100, John Paul Adrian Glaubitz wrote:
+> Hi Geert,
+>=20
+> On Wed, 2023-11-01 at 13:19 +0100, Geert Uytterhoeven wrote:
+> > > Isn't that a bit late?
+> >=20
+> > It can always be reverted...
+>=20
+> Sure, but I'd rather see such discussions before merging the removal
+> patch. Best would have been to reach out to the netatalk project, for
+> example and ask [1]. They just released version 3.1.18 of the
+> netatalk
+> server in October 2023.
+>=20
+> It's an incredibly cool project because it allows you to replace the
+> expensive Apple TimeMachine hardware with a cheap Raspberry Pi ;-).
 
-> Sorry but I noticed no issues:
+But... Time Machine debuted with 10.5 and AppleTalk got removed in
+10.6; did the actual TimeCapsules ever support AppleTalk, or were they
+always TCP/IP-based?
 
-Don't be sorry about that, it's good news because now I know
-where to look, i.e. in the ethernet controller.
+(also TimeMachine-capable Airport Extremes [A1354] are like $15 on
+eBay; that's cheaper than a Raspberry Pi)
 
-> My device is using
-> https://github.com/luizluca/openwrt/tree/ath79_dsa_prep%2Bdevices . In
-> summary, kernel 6.1 with openwrt generic patches and the
-> reset-controller patch I sent net-next recently.
+This patch only removes the Linux-side ipddp driver (eg MacIP) so if
+Time Capsules never supported AppleTalk, this patch is unrelated to
+TimeMachine.
 
-Looking good to me.
+What this patch *may* break is Linux as a MacIP gateway, allowing
+AppleTalk-only machines to talk TCP/IP to systems. But that's like
+what, the 128/512/Plus and PowerBook Duo/1xx? Everything else had a
+PDS/NuBus slot or onboard Ethernet and could do native
+MacTCP/OpenTransport...
 
-> [    3.888540] realtek-smi switch: found an RTL8366RB switch
-> [    3.952366] realtek-smi switch: RTL5937 ver 3 chip found
+Dan
 
-Same version as mine too.
-
-> [    3.967086] realtek-smi switch: set MAC: 42:E4:F5:XX:XX:XX
-
-Unrelated: I have seen other DSA switches "inherit" the MAC of the
-conduit interface (BRCM). I wonder if we could do that too instead
-of this random MAC number. Usually the conduit interface has a
-properly configured MAC.
-
-> [    3.976779] realtek-smi switch: missing child interrupt-controller nod=
-e
-> [    3.983455] realtek-smi switch: no interrupt support
-> [    4.158891] realtek-smi switch: no LED for port 5
-
-Are the LEDs working? My device has no LEDs so I have never
-tested it, despite I coded it. (Also these days we can actually
-support each LED individually configured from device tree using
-the LED API, but that would be quite a bit of code, so only some
-fun for the aspiring developer...)
-
-> Maybe the ag71xx driver is doing something differently.
-
-I'll look at it!
-
-Thanks a lot Luiz,
-Linus Walleij
 
