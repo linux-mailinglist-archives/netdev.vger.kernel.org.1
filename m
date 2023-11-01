@@ -1,227 +1,190 @@
-Return-Path: <netdev+bounces-45570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E647DE665
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:32:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E3D7DE671
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:39:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 369BAB21113
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:32:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C06F428112B
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEC719BD7;
-	Wed,  1 Nov 2023 19:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="C4pRglll"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0E019BB9;
+	Wed,  1 Nov 2023 19:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0286B2571
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 19:32:09 +0000 (UTC)
-X-Greylist: delayed 764 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Nov 2023 12:32:04 PDT
-Received: from mx1.spacex.com (mx1.spacex.com [192.31.242.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1D1128;
-	Wed,  1 Nov 2023 12:32:04 -0700 (PDT)
-Received: from pps.filterd (mx1.spacex.com [127.0.0.1])
-	by mx1.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3A1HtFT9023061;
-	Wed, 1 Nov 2023 12:19:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=dkim;
- bh=/Dlz0YpAY0TsUhBNX5gU/gYYXHV6NhkMM/b9choGzAs=;
- b=C4pRglllJYw08C7CMzzO/fLfqgmVJRb1JjewCotErDc4bnPlVvj6N4+cT/uPW1y3//ZK
- Vm5RHrhIo4Eu3+iJCauPmFjfzGDIYQO6lFilw7BSxbz9o4TvcXbfGxI2j1mGF4Zt/7HW
- f1VlZXjr/HSjyJDqX5gSg0Lk+Sp2cmb0atnwtZIunMF3QZKZrNpnisELThhbMdiOv1El
- xWkiP0KWBWwYEDJ94G6d1ruVlQN+VcsJYzGL8iT672nHZ17K5WlAJPlQb5bF2j+hR/sT
- QgU++hzvXf1ykM4ygpx2OZGWHaIEBSQaUnFcSZkW61X2ZnCiwfu1KYmqwvX19LclIqeR uQ== 
-Received: from smtp.spacex.corp ([10.34.3.234])
-	by mx1.spacex.com (PPS) with ESMTPS id 3u0yqhg6da-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 01 Nov 2023 12:19:23 -0700
-Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 1 Nov 2023 12:19:22 -0700
-From: <alexey.pakhunov@spacex.com>
-To: <siva.kallam@broadcom.com>
-CC: <vincent.wong2@spacex.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <prashant@broadcom.com>,
-        <mchan@broadcom.com>, Alex Pakhunov <alexey.pakhunov@spacex.com>
-Subject: [PATCH 2/2] tg3: Fix the TX ring stall
-Date: Wed, 1 Nov 2023 12:18:58 -0700
-Message-ID: <20231101191858.2611154-3-alexey.pakhunov@spacex.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231101191858.2611154-1-alexey.pakhunov@spacex.com>
-References: <20231101191858.2611154-1-alexey.pakhunov@spacex.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D42963A3
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 19:39:35 +0000 (UTC)
+Received: from mail-oo1-f78.google.com (mail-oo1-f78.google.com [209.85.161.78])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD01DA
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 12:39:29 -0700 (PDT)
+Received: by mail-oo1-f78.google.com with SMTP id 006d021491bc7-581ed663023so201472eaf.2
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 12:39:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698867569; x=1699472369;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fDr+aT0CPwYoMVHOl15SqJscCmodMyvuqLh/g6iSDLM=;
+        b=WWqhj1XNTmeJDjTscTkM85hmfuM2bGJ8s0w0zci85lEnt4dRe10cEwmFp0uHbxOGMR
+         0fvTxgxEMWtYkHL+hXuFYYDv8/Uk4uRd82LGHQAzga9C7W3hM90AkuIpGSqonpWtbuDn
+         zqsa7EU0kbtvAswpEJdae0giPW94vRoCTmO4Cq+KWtwcz1GhtZs5XefMKewN2ciWqC9u
+         jWDQifuclDNEZeBQFnUAYu3wSq7pTJe4dIRKD/FPeEGkuoyD4PaJiWmISYr/hwZJzcwR
+         TzMEcryRdbaC2le9Mnh3R2zefuc8ZVkvzLOLHxOKeqKeYflsF2t10MdXJUOofesgHEBd
+         DwbQ==
+X-Gm-Message-State: AOJu0Yxp90wVcRtuaoNaEm2Jd6vY4LOuxhKqS0IEpKC28+krBklInhU3
+	QYD7WgTXszxJwTsQPbQTQZDTVktjvJw2O/JMC+EMvLt8nbDM
+X-Google-Smtp-Source: AGHT+IFnYCsyRYUiexXp9LJ27H2i/hyNQr4Aj55cGc5K/7cHsJjNSSOclI12nVlp1yhOpZatI3bmkv/fOfEFBBaxJln2/WLhSeST
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ht-dc-ex-d3-n1.spacex.corp (10.34.3.236) To
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
-X-Proofpoint-GUID: L7KKw2T8BnCM97S03tkBpofpJBgWpFHQ
-X-Proofpoint-ORIG-GUID: L7KKw2T8BnCM97S03tkBpofpJBgWpFHQ
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 malwarescore=0 impostorscore=0 spamscore=0 bulkscore=0
- phishscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311010142
+X-Received: by 2002:a4a:5295:0:b0:57b:6b2a:df8 with SMTP id
+ d143-20020a4a5295000000b0057b6b2a0df8mr4931120oob.1.1698867568896; Wed, 01
+ Nov 2023 12:39:28 -0700 (PDT)
+Date: Wed, 01 Nov 2023 12:39:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f6effc06091c6d49@google.com>
+Subject: [syzbot] [can?] WARNING in j1939_xtp_rx_rts
+From: syzbot <syzbot+daa36413a5cedf799ae4@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
+	kuba@kernel.org, linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	mkl@pengutronix.de, netdev@vger.kernel.org, o.rempel@pengutronix.de, 
+	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Hello,
 
-The TX ring maintained by the tg3 driver can end up in a state, when it
-has packets queued for sending but the NIC hardware is not informed, so no
-progress is made. This leads to a multi-second interruption in network
-traffic followed by dev_watchdog() firing and resetting the queue.
+syzbot found the following issue on:
 
-The specific sequence of steps is:
+HEAD commit:    2af9b20dbb39 Merge tag 'x86-urgent-2023-10-28' of git://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12257ac3680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d1f30869bb78ec6
+dashboard link: https://syzkaller.appspot.com/bug?extid=daa36413a5cedf799ae4
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
 
-1. tg3_start_xmit() is called at least once and queues packet(s) without
-   updating tnapi->prodmbox (netdev_xmit_more() returns true)
-2. tg3_start_xmit() is called with an SKB which causes tg3_tso_bug() to be
-   called.
-3. tg3_tso_bug() determines that the SKB is too large, ...
+Unfortunately, I don't have any reproducer for this issue yet.
 
-        if (unlikely(tg3_tx_avail(tnapi) <= frag_cnt_est)) {
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2af9b20d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1e66f0c379e2/vmlinux-2af9b20d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3732b6e62161/bzImage-2af9b20d.xz
 
-   ... stops the queue, and returns NETDEV_TX_BUSY:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+daa36413a5cedf799ae4@syzkaller.appspotmail.com
 
-        netif_tx_stop_queue(txq);
-        ...
-        if (tg3_tx_avail(tnapi) <= frag_cnt_est)
-                return NETDEV_TX_BUSY;
+WARNING: CPU: 2 PID: 5504 at net/can/j1939/transport.c:1656 j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1656 [inline]
+WARNING: CPU: 2 PID: 5504 at net/can/j1939/transport.c:1656 j1939_xtp_rx_rts+0x1553/0x17e0 net/can/j1939/transport.c:1735
+Modules linked in:
+CPU: 2 PID: 5504 Comm: syz-executor.3 Not tainted 6.6.0-rc7-syzkaller-00195-g2af9b20dbb39 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:j1939_xtp_rx_rts_session_new net/can/j1939/transport.c:1656 [inline]
+RIP: 0010:j1939_xtp_rx_rts+0x1553/0x17e0 net/can/j1939/transport.c:1735
+Code: 00 48 89 ef e8 fe d9 eb fa e9 42 ef ff ff e8 b4 1b 4e f8 be 01 00 00 00 48 89 ef e8 e7 d9 eb fa e9 a8 f9 ff ff e8 9d 1b 4e f8 <0f> 0b 48 8d 83 c0 00 00 00 4c 8d b3 c2 00 00 00 48 89 44 24 10 e9
+RSP: 0018:ffffc90000520950 EFLAGS: 00010246
 
-4. Since all tg3_tso_bug() call sites directly return, the code updating
-   tnapi->prodmbox is skipped.
+RAX: 0000000000000000 RBX: ffff8880267b8400 RCX: 0000000000000100
+RDX: ffff88807058c800 RSI: ffffffff8939be93 RDI: 0000000000000005
+RBP: 00000000fffffff5 R08: 0000000000000005 R09: 0000000000000000
+R10: 00000000fffffff5 R11: dffffc0000000000 R12: ffff8880198ec000
+R13: 0000000000000002 R14: ffff888074db3c1b R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ffff88802c800000(0063) knlGS:00000000f7fc4b40
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 000000002fa23000 CR3: 000000004a9cd000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ j1939_tp_cmd_recv net/can/j1939/transport.c:2057 [inline]
+ j1939_tp_recv+0x366/0xf50 net/can/j1939/transport.c:2144
+ j1939_can_recv+0x78b/0xa70 net/can/j1939/main.c:112
+ deliver net/can/af_can.c:572 [inline]
+ can_rcv_filter+0x2a5/0x8e0 net/can/af_can.c:606
+ can_receive+0x31b/0x5c0 net/can/af_can.c:663
+ can_rcv+0x1dc/0x270 net/can/af_can.c:687
+ __netif_receive_skb_one_core+0x115/0x180 net/core/dev.c:5552
+ __netif_receive_skb+0x1f/0x1b0 net/core/dev.c:5666
+ process_backlog+0x101/0x6b0 net/core/dev.c:5994
+ __napi_poll.constprop.0+0xb4/0x530 net/core/dev.c:6556
+ napi_poll net/core/dev.c:6623 [inline]
+ net_rx_action+0x956/0xe90 net/core/dev.c:6756
+ __do_softirq+0x218/0x965 kernel/softirq.c:553
+ do_softirq kernel/softirq.c:454 [inline]
+ do_softirq+0xaa/0xe0 kernel/softirq.c:441
+ </IRQ>
+ <TASK>
+ __local_bh_enable_ip+0xf8/0x120 kernel/softirq.c:381
+ j1939_sk_sendmsg+0xeb7/0x13a0 net/can/j1939/socket.c:1266
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2558
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2612
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2641
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0x61/0xe0 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x33/0x70 arch/x86/entry/common.c:203
+ entry_SYSENTER_compat_after_hwframe+0x70/0x82
+RIP: 0023:0xf7fc9579
+Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000f7fc45ac EFLAGS: 00000292 ORIG_RAX: 0000000000000172
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000020000200
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000292 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess), 2 bytes skipped:
+   0:	10 06                	adc    %al,(%rsi)
+   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+   6:	10 07                	adc    %al,(%rdi)
+   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+   c:	10 08                	adc    %cl,(%rax)
+   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1e:	00 51 52             	add    %dl,0x52(%rcx)
+  21:	55                   	push   %rbp
+  22:	89 e5                	mov    %esp,%ebp
+  24:	0f 34                	sysenter
+  26:	cd 80                	int    $0x80
+* 28:	5d                   	pop    %rbp <-- trapping instruction
+  29:	5a                   	pop    %rdx
+  2a:	59                   	pop    %rcx
+  2b:	c3                   	ret
+  2c:	90                   	nop
+  2d:	90                   	nop
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
 
-5. The queue is stuck now. tg3_start_xmit() is not called while the queue
-   is stopped. The NIC is not processing new packets because
-   tnapi->prodmbox wasn't updated. tg3_tx() is not called by
-   tg3_poll_work() because the all TX descriptions that could be freed has
-   been freed:
 
-        /* run TX completion thread */
-        if (tnapi->hw_status->idx[0].tx_consumer != tnapi->tx_cons) {
-                tg3_tx(tnapi);
-
-6. Eventually, dev_watchdog() fires triggering a reset of the queue.
-
-This fix makes sure that the tnapi->prodmbox update happens regardless of
-the reason tg3_start_xmit() returned.
-
-Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
-Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 46 ++++++++++++++++++++++-------
- 1 file changed, 35 insertions(+), 11 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 99638e6c9e16..c3512409434e 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6603,9 +6603,9 @@ static void tg3_tx(struct tg3_napi *tnapi)
- 
- 	tnapi->tx_cons = sw_idx;
- 
--	/* Need to make the tx_cons update visible to tg3_start_xmit()
-+	/* Need to make the tx_cons update visible to __tg3_start_xmit()
- 	 * before checking for netif_queue_stopped().  Without the
--	 * memory barrier, there is a small possibility that tg3_start_xmit()
-+	 * memory barrier, there is a small possibility that __tg3_start_xmit()
- 	 * will miss it and cause the queue to be stopped forever.
- 	 */
- 	smp_mb();
-@@ -7845,7 +7845,7 @@ static bool tg3_tso_bug_gso_check(struct tg3_napi *tnapi, struct sk_buff *skb)
- 	return skb_shinfo(skb)->gso_segs < tnapi->tx_pending / 3;
- }
- 
--static netdev_tx_t tg3_start_xmit(struct sk_buff *, struct net_device *);
-+static netdev_tx_t __tg3_start_xmit(struct sk_buff *, struct net_device *);
- 
- /* Use GSO to workaround all TSO packets that meet HW bug conditions
-  * indicated in tg3_tx_frag_set()
-@@ -7881,7 +7881,7 @@ static int tg3_tso_bug(struct tg3 *tp, struct tg3_napi *tnapi,
- 
- 	skb_list_walk_safe(segs, seg, next) {
- 		skb_mark_not_on_list(seg);
--		tg3_start_xmit(seg, tp->dev);
-+		__tg3_start_xmit(seg, tp->dev);
- 	}
- 
- tg3_tso_bug_end:
-@@ -7891,7 +7891,7 @@ static int tg3_tso_bug(struct tg3 *tp, struct tg3_napi *tnapi,
- }
- 
- /* hard_start_xmit for all devices */
--static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
-+static netdev_tx_t __tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct tg3 *tp = netdev_priv(dev);
- 	u32 len, entry, base_flags, mss, vlan = 0;
-@@ -8135,11 +8135,6 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			netif_tx_wake_queue(txq);
- 	}
- 
--	if (!netdev_xmit_more() || netif_xmit_stopped(txq)) {
--		/* Packets are ready, update Tx producer idx on card. */
--		tw32_tx_mbox(tnapi->prodmbox, entry);
--	}
--
- 	return NETDEV_TX_OK;
- 
- dma_error:
-@@ -8152,6 +8147,35 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- }
- 
-+static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
-+{
-+	u16 skb_queue_mapping = skb_get_queue_mapping(skb);
-+	struct netdev_queue *txq = netdev_get_tx_queue(dev, skb_queue_mapping);
-+
-+	netdev_tx_t ret = __tg3_start_xmit(skb, dev);
-+
-+	/* Notify the hardware that packets are ready by updating the TX ring
-+	 * tail pointer. We respect netdev_xmit_more() thus avoiding poking
-+	 * the hardware for every packet. To guarantee forward progress the TX
-+	 * ring must be drained when it is full as indicated by
-+	 * netif_xmit_stopped(). This needs to happen even when the current
-+	 * skb was dropped or rejected with NETDEV_TX_BUSY. Otherwise packets
-+	 * queued by previous __tg3_start_xmit() calls might get stuck in
-+	 * the queue forever.
-+	 */
-+	if (!netdev_xmit_more() || netif_xmit_stopped(txq)) {
-+		struct tg3 *tp = netdev_priv(dev);
-+		struct tg3_napi *tnapi = &tp->napi[skb_queue_mapping];
-+
-+		if (tg3_flag(tp, ENABLE_TSS))
-+			tnapi++;
-+
-+		tw32_tx_mbox(tnapi->prodmbox, tnapi->tx_prod);
-+	}
-+
-+	return ret;
-+}
-+
- static void tg3_mac_loopback(struct tg3 *tp, bool enable)
- {
- 	if (enable) {
-@@ -17682,7 +17706,7 @@ static int tg3_init_one(struct pci_dev *pdev,
- 	 * device behind the EPB cannot support DMA addresses > 40-bit.
- 	 * On 64-bit systems with IOMMU, use 40-bit dma_mask.
- 	 * On 64-bit systems without IOMMU, use 64-bit dma_mask and
--	 * do DMA address check in tg3_start_xmit().
-+	 * do DMA address check in __tg3_start_xmit().
- 	 */
- 	if (tg3_flag(tp, IS_5788))
- 		persist_dma_mask = dma_mask = DMA_BIT_MASK(32);
--- 
-2.39.3
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
