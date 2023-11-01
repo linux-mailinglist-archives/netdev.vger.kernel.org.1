@@ -1,80 +1,89 @@
-Return-Path: <netdev+bounces-45545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 907657DE112
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 13:42:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B45F7DE126
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 13:55:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28530B20D93
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 12:42:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC18E1C20DA2
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 12:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FEC11C9B;
-	Wed,  1 Nov 2023 12:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yg8omY7O"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D18211CAC;
+	Wed,  1 Nov 2023 12:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845221FC4
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 12:42:33 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E964DB7;
-	Wed,  1 Nov 2023 05:42:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/rSzh2CBUdRpxCG4aPjW7h8lo8I4+wNi85x2FnwfJu0=; b=Yg8omY7OdOxly0zWXtqXNofPfu
-	gSvV6lsiWyVKDGi23r6OPqadcW1KKOWDZGJH56gepezgQMGkPJqR8IYqhnyw/sfRXye5DuFkxKv2/
-	hWHS6Eri/xBYRff3IdgQ9M8AguvvdPjaQspwk0+283Hw5IT/SlqeN9rZBKLVfRSn/uL4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qyAYC-000gX1-ME; Wed, 01 Nov 2023 13:42:24 +0100
-Date: Wed, 1 Nov 2023 13:42:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, horms@kernel.org,
-	Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: Re: [net PATCH] octeontx2: Fix klockwork and coverity issues
-Message-ID: <335216cc-3412-4898-8b88-10405ff7c316@lunn.ch>
-References: <20231101074919.2614608-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB81EDDA4
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 12:55:18 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A15101;
+	Wed,  1 Nov 2023 05:55:16 -0700 (PDT)
+Received: from dggpemm500011.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SL6M03b1RzPnmN;
+	Wed,  1 Nov 2023 20:51:08 +0800 (CST)
+Received: from huawei.com (10.175.104.170) by dggpemm500011.china.huawei.com
+ (7.185.36.110) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 1 Nov
+ 2023 20:55:14 +0800
+From: Ren Mingshuai <renmingshuai@huawei.com>
+To: <renmingshuai@huawei.com>
+CC: <caowangbao@huawei.com>, <davem@davemloft.net>, <khlebnikov@openvz.org>,
+	<liaichun@huawei.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <oneukum@suse.com>, <yanan@huawei.com>
+Subject: Re: [PATCH] net: usbnet: Fix potential NULL pointer dereference
+Date: Wed, 1 Nov 2023 20:55:11 +0800
+Message-ID: <20231101125511.222629-1-renmingshuai@huawei.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20231101123559.210756-1-renmingshuai@huawei.com>
+References: <20231101123559.210756-1-renmingshuai@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231101074919.2614608-1-sumang@marvell.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.170]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500011.china.huawei.com (7.185.36.110)
+X-CFilter-Loop: Reflected
 
-On Wed, Nov 01, 2023 at 01:19:19PM +0530, Suman Ghosh wrote:
-> Fix all klockwork and coverity issues reported on AF and PF/VF driver.
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+>23ba07991dad said SKB can be NULL without describing the triggering
+>scenario. Always Check it before dereference to void potential NULL
+>pointer dereference.
+I've tried to find out the scenarios where SKB is NULL, but failed.
+It seems impossible for SKB to be NULL. If SKB can be NULL, please tell
+me the reason and I'd be very grateful.
 
-The subject line is:
-[net PATCH] octeontx2: Fix klockwork and coverity issues
-
-So you want these fixes backported to net? If so, you need to provide
-Fixes: tags.
-
-This patch is way too big. A fix patch generally fixes one thing, and
-it documents what it fixes. Or it could be one class of problems, like
-uninitialised variables etc. Its good to include the message from the
-static analyser in the commit message.
-
-    Andrew
-
----
-pw-bot: cr
+>Fix smatch warning:
+>drivers/net/usb/usbnet.c:1380 usbnet_start_xmit() error: we previously assumed 'skb' could be null (see line 1359)
+>
+>Signed-off-by: Ren Mingshuai <renmingshuai@huawei.com>
+>---
+> drivers/net/usb/usbnet.c | 5 +++++
+> 1 file changed, 5 insertions(+)
+>
+>diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+>index 64a9a80b2309..386cb1a4ff03 100644
+>--- a/drivers/net/usb/usbnet.c
+>+++ b/drivers/net/usb/usbnet.c
+>@@ -1374,6 +1374,11 @@ netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
+>                }
+>        }
+>
+>+       if (!skb) {
+>+               netif_dbg(dev, tx_err, dev->net, "tx skb is NULL\n");
+>+               goto drop;
+>+       }
+>+
+>        if (!(urb = usb_alloc_urb (0, GFP_ATOMIC))) {
+>                netif_dbg(dev, tx_err, dev->net, "no urb\n");
+>                goto drop;
+>--
+>2.33.0
 
