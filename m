@@ -1,80 +1,63 @@
-Return-Path: <netdev+bounces-45522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AAF37DDD62
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:46:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A567DDD73
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9351DB20DD9
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 07:46:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 596EF2811EC
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 07:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB992184F;
-	Wed,  1 Nov 2023 07:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5635663BC;
+	Wed,  1 Nov 2023 07:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hs9rp+YD"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ia2ete46"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61902F48
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 07:46:00 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B292EA
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 00:45:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=arFcEF1nQylz4WJ5/tziz13YpTv9Uvkf3vWzJTaV4xTuTM8yWx+MZqNVKV3y1L3sOOmtMb+pIXxj2Kk0H0enNI7X05ol525kY7wmZPpI4Xyu4eIeGBlBnRpF0TppoCMdo7UiUd7tnPjFVkLE+JV+m4n84Sp165bm43N94KXqlrf6FlY/jATqETIk+AmZHGU00R4pXPGo1xEucarKBreyVzlZu+F/2UJnBcDCU3ZTGEn1nD3sUoK1/4lrlFUPjSNqjt7neWwuuN8UwHGeRdIF3Wc99Y/vZNtKx8wR04tv6h7tOSLJRNoede8eQHS5wMgdVDveokZI1TkMl8cyrYuwig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oeyXaao0dKhQZbfuA6iM7WcDw/iLzyiOoiIQniOGEng=;
- b=PC5AcgsXfDG7pbxESQ4jhikWNWzToQtMk68WdUiTNOsKWb0KrFKY5zeyAOV60QuFa24c9PVhev5lWUMK8IzQJBCCNettvZvnhWsmBWLCuEOte94gWkgL1+qcma6mOXhVjafwUdZPlOa74E9xFgSey99DcbHhZueGo4V+BJcD4WefJPOWuB0c074JmAITBJtRW/TN50YJRfeH/bHREUYvffN8AR+YxSIRkfGtGtLFioWboUZOq31PlYdJEO6PQoF6JF8x6yPU6ig6wvKIf+garYAPTUA16N4aGisDN4l7Ef4RhWgx1vdbMxGp91BxzBakld4xU9g+uOYPYdyDuLz+Ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oeyXaao0dKhQZbfuA6iM7WcDw/iLzyiOoiIQniOGEng=;
- b=hs9rp+YDFCfZB227Hl/C7NsrucFWw2dJWQnW/RYXhZbfMghRVuEW5UFbaoGVoTjoBIgcXVzSdZoLNP+4jz7I6NBL3CZ5ZhT2Zyv5A0eCIcRNLzlEma1yq/uFZ19VNLYMTzwBt5g97OuRz7gcEFRBaEAYCRNAu2F64ltdqKr4fN6LmbU7X0UYLGWAIG4nief3WUKGERXirvFKZ12SU8LwFE7X12f3Gq1RpO5W1R9OEVnyQaAPHbg1DhnCaezGLE8LkEKexbpTf36EzPgXmL70VQIfE0dSynMj6Nu4/6IBpLNIrYyn3NLeBWzRkkQSK1CnOGlEZDl9iwvhwlIiflXTvg==
-Received: from SJ0PR03CA0092.namprd03.prod.outlook.com (2603:10b6:a03:333::7)
- by MN2PR12MB4469.namprd12.prod.outlook.com (2603:10b6:208:268::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Wed, 1 Nov
- 2023 07:45:53 +0000
-Received: from CO1PEPF000044EE.namprd05.prod.outlook.com
- (2603:10b6:a03:333:cafe::5c) by SJ0PR03CA0092.outlook.office365.com
- (2603:10b6:a03:333::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19 via Frontend
- Transport; Wed, 1 Nov 2023 07:45:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000044EE.mail.protection.outlook.com (10.167.241.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6954.19 via Frontend Transport; Wed, 1 Nov 2023 07:45:52 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 1 Nov 2023
- 00:45:37 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Wed, 1 Nov 2023 00:45:35 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <dsahern@gmail.com>, <stephen@networkplumber.org>, <razor@blackwall.org>,
-	<mlxsw@nvidia.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH iproute2-next v2] bridge: mdb: Add get support
-Date: Wed, 1 Nov 2023 09:45:10 +0200
-Message-ID: <20231101074510.1471018-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453AE63B4
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 07:50:01 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1243B101;
+	Wed,  1 Nov 2023 00:49:55 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A144Qdi017803;
+	Wed, 1 Nov 2023 00:49:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=SM2epVf6nDHb8xWPQceLmBlNM1r/lEggltHtY9bgEEc=;
+ b=ia2ete46676/4j68Uqtxx8MT3B0oIlSwsfAMPBylfxPyRcIYKQcoE422rbocrCvlLIPc
+ 3xtzNOoCU3M0iS2gCl+2dc922mqEk3Pvz2kPyTYUgE0MCUgkCUUs/OoB2kJTCYQY9bsT
+ HUQ+QuALLL4g1P73TlPxDM3Eb6UXuBH+G0YHZPduYhRcVLmHOgc15kK3TITdw2s6MFui
+ hrXlbol21HRGc5gBF72L7XeqguoVykQRrqLiv+L0tjexbigpiEzOQuMYeT/hiJYXX6ox
+ OykS2O85KFmMr2B7C2E4Y0ELdiexCrEVmQQqDgSB1HZXGgTeylWCrE2ZwGZzqGv0mzCZ ng== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3u11tper0c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Wed, 01 Nov 2023 00:49:46 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 1 Nov
+ 2023 00:49:27 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Wed, 1 Nov 2023 00:49:27 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 603363F70BF;
+	Wed,  1 Nov 2023 00:49:23 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>, Ratheesh Kannoth <rkannoth@marvell.com>
+Subject: [net PATCH] octeontx2: Fix klockwork and coverity issues
+Date: Wed, 1 Nov 2023 13:19:19 +0530
+Message-ID: <20231101074919.2614608-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,255 +66,378 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [10.126.231.35]
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000044EE:EE_|MN2PR12MB4469:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4540cefb-2cf1-4610-2b45-08dbdaae92c5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Axafx9/zN+Mw/xnpH170qixvD3sro0yiI+vxGKIhakZyfnMGR+LJs2SqGLVNPC4RllN9mRjumAppSr2LqHeu2wi1ffbzSrQ94jaOfvl1VzLhDRTpq2W65ArWbWykVelofH2rhxHXCABeQQ8SDXeFFjB5qcI5ECrGmVG5jtsiKcKG6E/dPkOG8a9DPchZYWBS0RA8WxT3TbWmBI81h4jCbAEo4c0l+XoL73fydh5oR0IKIYpKi3LAWIKL+LHaYYbTnnBvCEQ5ZXBfmNWRHoFYVw8H39PAFuD5TVN8RpHW18BlEDCxp4iX+n24YuF+Dki4Q8QYA/Ng6BbiReZGSZkL3J0hv4YXOttk5vok3Hdf/pQ/7N5bB6zAQnRWsWKl0xxJXoOns0njyjrk5KU5/EfTtxHNFWwZ4htiXVhDy4LiXLp/zRwVJSPabPgn9DtpzFNdP/st4TPJkP5rKZiw/cKRZp4Wim6RuX64v4PS5VyzJfdrPP1mmvt7CRfxAVOfiGkkKiVOcd0va0HdLTEUR2UGePp69NDy93RcAWyuMdLSmtzgMzKaXvn7XC80PSwZBS5LlQvNGa2tkZN2Q6A2tPc30kv8fV+KDLwxafTLsk+XkPsolTXXH+KodwARnPBCGyJPrrMSUNYijOitDHtOI2mQxe+ZR9tBHeKHAyLCQSfcxkHJfktI/1bQZSiyu1lelCJdfgZGuoLsaZ1MxSy9H6Wr4W2TztxsErZkesizv8vsC4km9yAF+XKe3U+YZQLHd5ZfTx4VtnbO+CgaAPD5ud1YL8VQn/JZ02IlHC5jQ7g2LgY=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(376002)(396003)(136003)(39860400002)(230922051799003)(230273577357003)(230173577357003)(1800799009)(82310400011)(451199024)(186009)(64100799003)(46966006)(36840700001)(40470700004)(26005)(2616005)(16526019)(40460700003)(40480700001)(86362001)(36756003)(356005)(7636003)(82740400003)(66574015)(426003)(336012)(2906002)(5660300002)(83380400001)(478600001)(1076003)(107886003)(36860700001)(47076005)(6666004)(8676002)(316002)(4326008)(8936002)(6916009)(54906003)(41300700001)(70586007)(70206006);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2023 07:45:52.3679
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4540cefb-2cf1-4610-2b45-08dbdaae92c5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000044EE.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4469
+X-Proofpoint-GUID: RKjGHjhU5FgotjBfbdsW46e28xIQNHV1
+X-Proofpoint-ORIG-GUID: RKjGHjhU5FgotjBfbdsW46e28xIQNHV1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-01_05,2023-10-31_03,2023-05-22_02
 
-Implement MDB get functionality, allowing user space to query a single
-MDB entry from the kernel instead of dumping all the entries. Example
-usage:
+Fix all klockwork and coverity issues reported on AF and PF/VF driver.
 
- # bridge mdb add dev br0 port swp1 grp 239.1.1.1 vid 10
- # bridge mdb add dev br0 port swp2 grp 239.1.1.1 vid 10
- # bridge mdb add dev br0 port swp2 grp 239.1.1.5 vid 10
- # bridge mdb get dev br0 grp 239.1.1.1 vid 10
- dev br0 port swp1 grp 239.1.1.1 temp vid 10
- dev br0 port swp2 grp 239.1.1.1 temp vid 10
- # bridge -j -p mdb get dev br0 grp 239.1.1.1 vid 10
- [ {
-         "index": 10,
-         "dev": "br0",
-         "port": "swp1",
-         "grp": "239.1.1.1",
-         "state": "temp",
-         "flags": [ ],
-         "vid": 10
-     },{
-         "index": 10,
-         "dev": "br0",
-         "port": "swp2",
-         "grp": "239.1.1.1",
-         "state": "temp",
-         "flags": [ ],
-         "vid": 10
-     } ]
- # bridge mdb get dev br0 grp 239.1.1.1 vid 20
- Error: bridge: MDB entry not found.
- # bridge mdb get dev br0 grp 239.1.1.2 vid 10
- Error: bridge: MDB entry not found.
-
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
 ---
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 14 ++++-
+ .../marvell/octeontx2/af/mcs_rvu_if.c         |  8 ++-
+ .../net/ethernet/marvell/octeontx2/af/ptp.c   | 11 +++-
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  2 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  8 ++-
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  2 +-
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  2 +-
+ .../marvell/octeontx2/nic/otx2_common.c       |  8 +--
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h | 55 ++++++++++---------
+ .../marvell/octeontx2/nic/otx2_txrx.c         |  2 +-
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  |  7 ++-
+ 12 files changed, 77 insertions(+), 45 deletions(-)
 
-Notes:
-    v2:
-    * Use strcmp() instead of matches().
-
- bridge/mdb.c      | 99 ++++++++++++++++++++++++++++++++++++++++++++++-
- man/man8/bridge.8 | 35 +++++++++++++++++
- 2 files changed, 133 insertions(+), 1 deletion(-)
-
-diff --git a/bridge/mdb.c b/bridge/mdb.c
-index 18793458ecca..dc8007914a37 100644
---- a/bridge/mdb.c
-+++ b/bridge/mdb.c
-@@ -36,7 +36,8 @@ static void usage(void)
- 		"Usage: bridge mdb { add | del | replace } dev DEV port PORT grp GROUP [src SOURCE] [permanent | temp] [vid VID]\n"
- 		"              [ filter_mode { include | exclude } ] [ source_list SOURCE_LIST ] [ proto PROTO ] [ dst IPADDR ]\n"
- 		"              [ dst_port DST_PORT ] [ vni VNI ] [ src_vni SRC_VNI ] [ via DEV ]\n"
--		"       bridge mdb {show} [ dev DEV ] [ vid VID ]\n");
-+		"       bridge mdb {show} [ dev DEV ] [ vid VID ]\n"
-+		"       bridge mdb get dev DEV grp GROUP [ src SOURCE ] [ vid VID ] [ src_vni SRC_VNI ]\n");
- 	exit(-1);
- }
- 
-@@ -848,6 +849,100 @@ static int mdb_modify(int cmd, int flags, int argc, char **argv)
- 	return 0;
- }
- 
-+static int mdb_get(int argc, char **argv)
-+{
-+	struct {
-+		struct nlmsghdr	n;
-+		struct br_port_msg	bpm;
-+		char			buf[1024];
-+	} req = {
-+		.n.nlmsg_len = NLMSG_LENGTH(sizeof(struct br_port_msg)),
-+		.n.nlmsg_flags = NLM_F_REQUEST,
-+		.n.nlmsg_type = RTM_GETMDB,
-+		.bpm.family = PF_BRIDGE,
-+	};
-+	char *d = NULL, *grp = NULL, *src = NULL, *src_vni = NULL;
-+	struct br_mdb_entry entry = {};
-+	struct nlmsghdr *answer;
-+	bool get_attrs = false;
-+	short vid = 0;
-+	int ret = 0;
-+
-+	while (argc > 0) {
-+		if (strcmp(*argv, "dev") == 0) {
-+			NEXT_ARG();
-+			d = *argv;
-+		} else if (strcmp(*argv, "grp") == 0) {
-+			NEXT_ARG();
-+			grp = *argv;
-+		} else if (strcmp(*argv, "vid") == 0) {
-+			NEXT_ARG();
-+			vid = atoi(*argv);
-+		} else if (strcmp(*argv, "src") == 0) {
-+			NEXT_ARG();
-+			src = *argv;
-+			get_attrs = true;
-+		} else if (strcmp(*argv, "src_vni") == 0) {
-+			NEXT_ARG();
-+			src_vni = *argv;
-+			get_attrs = true;
-+		} else {
-+			if (strcmp(*argv, "help") == 0)
-+				usage();
-+		}
-+		argc--; argv++;
-+	}
-+
-+	if (d == NULL || grp == NULL) {
-+		fprintf(stderr, "Device and group address are required arguments.\n");
-+		return -1;
-+	}
-+
-+	req.bpm.ifindex = ll_name_to_index(d);
-+	if (!req.bpm.ifindex)
-+		return nodev(d);
-+
-+	if (mdb_parse_grp(grp, &entry)) {
-+		fprintf(stderr, "Invalid address \"%s\"\n", grp);
-+		return -1;
-+	}
-+
-+	entry.vid = vid;
-+	addattr_l(&req.n, sizeof(req), MDBA_GET_ENTRY, &entry, sizeof(entry));
-+	if (get_attrs) {
-+		struct rtattr *nest = addattr_nest(&req.n, sizeof(req),
-+						   MDBA_GET_ENTRY_ATTRS);
-+
-+		nest->rta_type |= NLA_F_NESTED;
-+
-+		if (src && mdb_parse_src(&req.n, sizeof(req), src)) {
-+			fprintf(stderr, "Invalid source address \"%s\"\n", src);
-+			return -1;
-+		}
-+
-+		if (src_vni && mdb_parse_vni(&req.n, sizeof(req), src_vni,
-+					     MDBE_ATTR_SRC_VNI)) {
-+			fprintf(stderr, "Invalid source VNI \"%s\"\n", src_vni);
-+			return -1;
-+		}
-+
-+		addattr_nest_end(&req.n, nest);
-+	}
-+
-+	if (rtnl_talk(&rth, &req.n, &answer) < 0)
-+		return -2;
-+
-+	new_json_obj(json);
-+
-+	if (print_mdbs(answer, stdout) < 0)
-+		ret = -1;
-+
-+	delete_json_obj();
-+	free(answer);
-+
-+	return ret;
-+}
-+
- int do_mdb(int argc, char **argv)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 6c70c8498690..5a672888577e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -457,12 +457,19 @@ int cgx_lmac_addr_max_entries_get(u8 cgx_id, u8 lmac_id)
+ u64 cgx_lmac_addr_get(u8 cgx_id, u8 lmac_id)
  {
- 	ll_init_map(&rth);
-@@ -865,6 +960,8 @@ int do_mdb(int argc, char **argv)
- 		    matches(*argv, "lst") == 0 ||
- 		    matches(*argv, "list") == 0)
- 			return mdb_show(argc-1, argv+1);
-+		if (strcmp(*argv, "get") == 0)
-+			return mdb_get(argc-1, argv+1);
- 		if (matches(*argv, "help") == 0)
- 			usage();
- 	} else
-diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
-index 07bb97878554..7c1b22f6435e 100644
---- a/man/man8/bridge.8
-+++ b/man/man8/bridge.8
-@@ -177,6 +177,16 @@ bridge \- show / manipulate bridge addresses and devices
- .B dev
- .IR DEV " ]"
+ 	struct cgx *cgx_dev = cgx_get_pdata(cgx_id);
+-	struct lmac *lmac = lmac_pdata(lmac_id, cgx_dev);
+ 	struct mac_ops *mac_ops;
++	struct lmac *lmac;
+ 	int index;
+ 	u64 cfg;
+ 	int id;
  
-+.ti -8
-+.B "bridge mdb get"
-+.BI dev " DEV " grp " GROUP "
-+.RB "[ " src
-+.IR SOURCE " ]"
-+.RB "[ " vid
-+.IR VID " ]"
-+.RB "[ " src_vni
-+.IR SRC_VNI " ]"
++	if (!cgx_dev)
++		return 0;
 +
- .ti -8
- .BR "bridge vlan" " { " add " | " del " } "
- .B dev
-@@ -1137,6 +1147,31 @@ With the
- .B -statistics
- option, the command displays timer values for mdb and router port entries.
++	lmac = lmac_pdata(lmac_id, cgx_dev);
++	if (!lmac)
++		return 0;
++
+ 	mac_ops = cgx_dev->mac_ops;
  
-+.SS bridge mdb get - get multicast group database entry.
-+
-+This command retrieves a multicast group database entry based on its key.
-+
-+.TP
-+.BI dev " DEV"
-+the interface where this group address is associated.
-+
-+.TP
-+.BI grp " GROUP"
-+the multicast group address (IPv4, IPv6 or L2 multicast).
-+
-+.TP
-+.BI src " SOURCE"
-+the source IP address. Only relevant when retrieving an (S, G) entry.
-+
-+.TP
-+.BI vid " VID"
-+the VLAN ID. Only relevant when the bridge is VLAN-aware.
-+
-+.TP
-+.BI src_vni " SRC_VNI"
-+the source VNI Network Identifier. Only relevant when the VXLAN device is in
-+external mode.
-+
- .SH bridge vlan - VLAN filter list
+ 	id = get_sequence_id_of_lmac(cgx_dev, lmac_id);
+@@ -955,6 +962,9 @@ int cgx_lmac_pfc_config(void *cgxd, int lmac_id, u8 tx_pause,
  
- .B vlan
+ 	/* Write source MAC address which will be filled into PFC packet */
+ 	cfg = cgx_lmac_addr_get(cgx->cgx_id, lmac_id);
++	if (!cfg)
++		return -ENODEV;
++
+ 	cgx_write(cgx, lmac_id, CGXX_SMUX_SMAC, cfg);
+ 
+ 	return 0;
+@@ -1617,7 +1627,7 @@ unsigned long cgx_get_lmac_bmap(void *cgxd)
+ static int cgx_lmac_init(struct cgx *cgx)
+ {
+ 	struct lmac *lmac;
+-	u64 lmac_list;
++	u64 lmac_list = 0;
+ 	int i, err;
+ 
+ 	/* lmac_list specifies which lmacs are enabled
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+index dfd23580e3b8..1b0b022f5493 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+@@ -625,8 +625,8 @@ int rvu_mbox_handler_mcs_free_resources(struct rvu *rvu,
+ {
+ 	u16 pcifunc = req->hdr.pcifunc;
+ 	struct mcs_rsrc_map *map;
++	int rc = -EINVAL;
+ 	struct mcs *mcs;
+-	int rc = 0;
+ 
+ 	if (req->mcs_id >= rvu->mcs_blk_cnt)
+ 		return MCS_AF_ERR_INVALID_MCSID;
+@@ -675,8 +675,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
+ {
+ 	u16 pcifunc = req->hdr.pcifunc;
+ 	struct mcs_rsrc_map *map;
++	int rsrc_id = -EINVAL, i;
+ 	struct mcs *mcs;
+-	int rsrc_id, i;
+ 
+ 	if (req->mcs_id >= rvu->mcs_blk_cnt)
+ 		return MCS_AF_ERR_INVALID_MCSID;
+@@ -737,6 +737,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
+ 			rsp->rsrc_cnt++;
+ 		}
+ 		break;
++	default:
++		goto exit;
+ 	}
+ 
+ 	rsp->rsrc_type = req->rsrc_type;
+@@ -849,7 +851,7 @@ int rvu_mbox_handler_mcs_ctrl_pkt_rule_write(struct rvu *rvu,
+ static void rvu_mcs_set_lmac_bmap(struct rvu *rvu)
+ {
+ 	struct mcs *mcs = mcs_get_pdata(0);
+-	unsigned long lmac_bmap;
++	unsigned long lmac_bmap = 0;
+ 	int cgx, lmac, port;
+ 
+ 	for (port = 0; port < mcs->hw->lmac_cnt; port++) {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+index bcc96eed2481..a199b1123ba7 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+@@ -518,6 +518,7 @@ static int ptp_probe(struct pci_dev *pdev,
+ 		     const struct pci_device_id *ent)
+ {
+ 	struct ptp *ptp;
++	void __iomem * const *base;
+ 	int err;
+ 
+ 	ptp = kzalloc(sizeof(*ptp), GFP_KERNEL);
+@@ -536,7 +537,15 @@ static int ptp_probe(struct pci_dev *pdev,
+ 	if (err)
+ 		goto error_free;
+ 
+-	ptp->reg_base = pcim_iomap_table(pdev)[PCI_PTP_BAR_NO];
++	base = pcim_iomap_table(pdev);
++	if (!base)
++		goto error_free;
++
++	ptp->reg_base = base[PCI_PTP_BAR_NO];
++	if (!ptp->reg_base) {
++		err = -ENODEV;
++		goto error_free;
++	}
+ 
+ 	pci_set_drvdata(pdev, ptp);
+ 	if (!first_ptp_block)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+index f047185f38e0..a1a919fcda47 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+@@ -43,7 +43,7 @@ static irqreturn_t cpt_af_flt_intr_handler(int vec, void *ptr)
+ 	struct rvu *rvu = block->rvu;
+ 	int blkaddr = block->addr;
+ 	u64 reg, val;
+-	int i, eng;
++	int i, eng = 0;
+ 	u8 grp;
+ 
+ 	reg = rvu_read64(rvu, blkaddr, CPT_AF_FLTX_INT(vec));
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index bd817ee88735..307942ff1b10 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -519,12 +519,16 @@ RVU_DEBUG_SEQ_FOPS(mcs_rx_secy_stats, mcs_rx_secy_stats_display, NULL);
+ static void rvu_dbg_mcs_init(struct rvu *rvu)
+ {
+ 	struct mcs *mcs;
+-	char dname[10];
++	char *dname = NULL;
+ 	int i;
+ 
+ 	if (!rvu->mcs_blk_cnt)
+ 		return;
+ 
++	dname = kmalloc_array(rvu->mcs_blk_cnt, sizeof(char), GFP_KERNEL);
++	if (!dname)
++		return;
++
+ 	rvu->rvu_dbg.mcs_root = debugfs_create_dir("mcs", rvu->rvu_dbg.root);
+ 
+ 	for (i = 0; i < rvu->mcs_blk_cnt; i++) {
+@@ -568,6 +572,8 @@ static void rvu_dbg_mcs_init(struct rvu *rvu)
+ 		debugfs_create_file("port", 0600, rvu->rvu_dbg.mcs_tx, mcs,
+ 				    &rvu_dbg_mcs_tx_port_stats_fops);
+ 	}
++
++	kfree(dname);
+ }
+ 
+ #define LMT_MAPTBL_ENTRY_SIZE 16
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 23c2f2ed2fb8..2fa2ef970e88 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -5033,7 +5033,7 @@ static void nix_inline_ipsec_cfg(struct rvu *rvu, struct nix_inline_ipsec_cfg *r
+ 				 int blkaddr)
+ {
+ 	u8 cpt_idx, cpt_blkaddr;
+-	u64 val;
++	u64 val = 0;
+ 
+ 	cpt_idx = (blkaddr == BLKADDR_NIX0) ? 0 : 1;
+ 	if (req->enable) {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 16cfc802e348..b25ecd36ca61 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1734,8 +1734,8 @@ static void npc_load_kpu_profile(struct rvu *rvu)
+ 				rvu->kpu_prfl_addr = NULL;
+ 			} else {
+ 				kfree(rvu->kpu_fwdata);
++				rvu->kpu_fwdata = NULL;
+ 			}
+-			rvu->kpu_fwdata = NULL;
+ 			rvu->kpu_fwdata_sz = 0;
+ 			if (retry_fwdb) {
+ 				retry_fwdb = false;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 1a42bfded872..628251e940e8 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -648,14 +648,14 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl, int prio, bool txschq_for
+ 	} else if (lvl == NIX_TXSCH_LVL_TL4) {
+ 		parent = schq_list[NIX_TXSCH_LVL_TL3][prio];
+ 		req->reg[0] = NIX_AF_TL4X_PARENT(schq);
+-		req->regval[0] = parent << 16;
++		req->regval[0] = (u64)parent << 16;
+ 		req->num_regs++;
+ 		req->reg[1] = NIX_AF_TL4X_SCHEDULE(schq);
+ 		req->regval[1] = dwrr_val;
+ 	} else if (lvl == NIX_TXSCH_LVL_TL3) {
+ 		parent = schq_list[NIX_TXSCH_LVL_TL2][prio];
+ 		req->reg[0] = NIX_AF_TL3X_PARENT(schq);
+-		req->regval[0] = parent << 16;
++		req->regval[0] = (u64)parent << 16;
+ 		req->num_regs++;
+ 		req->reg[1] = NIX_AF_TL3X_SCHEDULE(schq);
+ 		req->regval[1] = dwrr_val;
+@@ -670,11 +670,11 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl, int prio, bool txschq_for
+ 	} else if (lvl == NIX_TXSCH_LVL_TL2) {
+ 		parent = schq_list[NIX_TXSCH_LVL_TL1][prio];
+ 		req->reg[0] = NIX_AF_TL2X_PARENT(schq);
+-		req->regval[0] = parent << 16;
++		req->regval[0] = (u64)parent << 16;
+ 
+ 		req->num_regs++;
+ 		req->reg[1] = NIX_AF_TL2X_SCHEDULE(schq);
+-		req->regval[1] = TXSCH_TL1_DFLT_RR_PRIO << 24 | dwrr_val;
++		req->regval[1] = (u64)hw->txschq_aggr_lvl_rr_prio << 24 | dwrr_val;
+ 
+ 		if (lvl == hw->txschq_link_cfg_lvl) {
+ 			req->num_regs++;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 6daf4d58c25d..62702ff6f3ea 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -496,6 +496,9 @@ static void otx2_pfvf_mbox_handler(struct work_struct *work)
+ 	return;
+ 
+ inval_msg:
++	if (!msg)
++		return;
++
+ 	otx2_reply_invalid_msg(mbox, vf_idx, 0, msg->id);
+ 	otx2_mbox_msg_send(mbox, vf_idx);
+ }
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
+index 45a32e4b49d1..e3aee6e36215 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
+@@ -139,33 +139,34 @@
+ #define	NIX_LF_CINTX_ENA_W1C(a)		(NIX_LFBASE | 0xD50 | (a) << 12)
+ 
+ /* NIX AF transmit scheduler registers */
+-#define NIX_AF_SMQX_CFG(a)		(0x700 | (a) << 16)
+-#define NIX_AF_TL1X_SCHEDULE(a)		(0xC00 | (a) << 16)
+-#define NIX_AF_TL1X_CIR(a)		(0xC20 | (a) << 16)
+-#define NIX_AF_TL1X_TOPOLOGY(a)		(0xC80 | (a) << 16)
+-#define NIX_AF_TL2X_PARENT(a)		(0xE88 | (a) << 16)
+-#define NIX_AF_TL2X_SCHEDULE(a)		(0xE00 | (a) << 16)
+-#define NIX_AF_TL2X_TOPOLOGY(a)		(0xE80 | (a) << 16)
+-#define NIX_AF_TL2X_CIR(a)              (0xE20 | (a) << 16)
+-#define NIX_AF_TL2X_PIR(a)              (0xE30 | (a) << 16)
+-#define NIX_AF_TL3X_PARENT(a)		(0x1088 | (a) << 16)
+-#define NIX_AF_TL3X_SCHEDULE(a)		(0x1000 | (a) << 16)
+-#define NIX_AF_TL3X_SHAPE(a)		(0x1010 | (a) << 16)
+-#define NIX_AF_TL3X_CIR(a)		(0x1020 | (a) << 16)
+-#define NIX_AF_TL3X_PIR(a)		(0x1030 | (a) << 16)
+-#define NIX_AF_TL3X_TOPOLOGY(a)		(0x1080 | (a) << 16)
+-#define NIX_AF_TL4X_PARENT(a)		(0x1288 | (a) << 16)
+-#define NIX_AF_TL4X_SCHEDULE(a)		(0x1200 | (a) << 16)
+-#define NIX_AF_TL4X_SHAPE(a)		(0x1210 | (a) << 16)
+-#define NIX_AF_TL4X_CIR(a)		(0x1220 | (a) << 16)
+-#define NIX_AF_TL4X_PIR(a)		(0x1230 | (a) << 16)
+-#define NIX_AF_TL4X_TOPOLOGY(a)		(0x1280 | (a) << 16)
+-#define NIX_AF_MDQX_SCHEDULE(a)		(0x1400 | (a) << 16)
+-#define NIX_AF_MDQX_SHAPE(a)		(0x1410 | (a) << 16)
+-#define NIX_AF_MDQX_CIR(a)		(0x1420 | (a) << 16)
+-#define NIX_AF_MDQX_PIR(a)		(0x1430 | (a) << 16)
+-#define NIX_AF_MDQX_PARENT(a)		(0x1480 | (a) << 16)
+-#define NIX_AF_TL3_TL2X_LINKX_CFG(a, b)	(0x1700 | (a) << 16 | (b) << 3)
++#define NIX_AF_SMQX_CFG(a)		(0x700 | (u64)(a) << 16)
++#define NIX_AF_TL4X_SDP_LINK_CFG(a)	(0xB10 | (u64)(a) << 16)
++#define NIX_AF_TL1X_SCHEDULE(a)		(0xC00 | (u64)(a) << 16)
++#define NIX_AF_TL1X_CIR(a)		(0xC20 | (u64)(a) << 16)
++#define NIX_AF_TL1X_TOPOLOGY(a)		(0xC80 | (u64)(a) << 16)
++#define NIX_AF_TL2X_PARENT(a)		(0xE88 | (u64)(a) << 16)
++#define NIX_AF_TL2X_SCHEDULE(a)		(0xE00 | (u64)(a) << 16)
++#define NIX_AF_TL2X_TOPOLOGY(a)		(0xE80 | (u64)(a) << 16)
++#define NIX_AF_TL2X_CIR(a)		(0xE20 | (u64)(a) << 16)
++#define NIX_AF_TL2X_PIR(a)		(0xE30 | (u64)(a) << 16)
++#define NIX_AF_TL3X_PARENT(a)		(0x1088 | (u64)(a) << 16)
++#define NIX_AF_TL3X_SCHEDULE(a)		(0x1000 | (u64)(a) << 16)
++#define NIX_AF_TL3X_SHAPE(a)		(0x1010 | (u64)(a) << 16)
++#define NIX_AF_TL3X_CIR(a)		(0x1020 | (u64)(a) << 16)
++#define NIX_AF_TL3X_PIR(a)		(0x1030 | (u64)(a) << 16)
++#define NIX_AF_TL3X_TOPOLOGY(a)		(0x1080 | (u64)(a) << 16)
++#define NIX_AF_TL4X_PARENT(a)		(0x1288 | (u64)(a) << 16)
++#define NIX_AF_TL4X_SCHEDULE(a)		(0x1200 | (u64)(a) << 16)
++#define NIX_AF_TL4X_SHAPE(a)		(0x1210 | (u64)(a) << 16)
++#define NIX_AF_TL4X_CIR(a)		(0x1220 | (u64)(a) << 16)
++#define NIX_AF_TL4X_PIR(a)		(0x1230 | (u64)(a) << 16)
++#define NIX_AF_TL4X_TOPOLOGY(a)		(0x1280 | (u64)(a) << 16)
++#define NIX_AF_MDQX_SCHEDULE(a)		(0x1400 | (u64)(a) << 16)
++#define NIX_AF_MDQX_SHAPE(a)		(0x1410 | (u64)(a) << 16)
++#define NIX_AF_MDQX_CIR(a)		(0x1420 | (u64)(a) << 16)
++#define NIX_AF_MDQX_PIR(a)		(0x1430 | (u64)(a) << 16)
++#define NIX_AF_MDQX_PARENT(a)		(0x1480 | (u64)(a) << 16)
++#define NIX_AF_TL3_TL2X_LINKX_CFG(a, b)	(0x1700 | (u64)(a) << 16 | (b) << 3)
+ 
+ /* LMT LF registers */
+ #define LMT_LFBASE			BIT_ULL(RVU_FUNC_BLKADDR_SHIFT)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 53b2a4ef5298..04a462b3e638 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -510,7 +510,7 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
+ 
+ static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_poll *cq_poll)
+ {
+-	struct dim_sample dim_sample;
++	struct dim_sample dim_sample = { 0 };
+ 	u64 rx_frames, rx_bytes;
+ 
+ 	rx_frames = OTX2_GET_RX_STATS(RX_BCAST) + OTX2_GET_RX_STATS(RX_MCAST) +
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+index 1e77bbf5d22a..7b23120a3e60 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
+@@ -153,7 +153,6 @@ static void __otx2_qos_txschq_cfg(struct otx2_nic *pfvf,
+ 		num_regs++;
+ 
+ 		otx2_config_sched_shaping(pfvf, node, cfg, &num_regs);
+-
+ 	} else if (level == NIX_TXSCH_LVL_TL4) {
+ 		otx2_config_sched_shaping(pfvf, node, cfg, &num_regs);
+ 	} else if (level == NIX_TXSCH_LVL_TL3) {
+@@ -528,6 +527,7 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
+ 	err = otx2_qos_add_child_node(parent, node);
+ 	if (err) {
+ 		mutex_unlock(&pfvf->qos.qos_lock);
++		kfree(node);
+ 		return ERR_PTR(err);
+ 	}
+ 	mutex_unlock(&pfvf->qos.qos_lock);
+@@ -1028,8 +1028,9 @@ static int otx2_qos_root_add(struct otx2_nic *pfvf, u16 htb_maj_id, u16 htb_defc
+ 	new_cfg = kzalloc(sizeof(*new_cfg), GFP_KERNEL);
+ 	if (!new_cfg) {
+ 		NL_SET_ERR_MSG_MOD(extack, "Memory allocation error");
+-		err = -ENOMEM;
+-		goto free_root_node;
++		otx2_qos_sw_node_delete(pfvf, root);
++		mutex_destroy(&pfvf->qos.qos_lock);
++		return -ENOMEM;
+ 	}
+ 	/* allocate htb root node */
+ 	new_cfg->schq[root->level] = 1;
 -- 
-2.40.1
+2.25.1
 
 
