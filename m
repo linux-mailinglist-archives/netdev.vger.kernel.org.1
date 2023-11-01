@@ -1,308 +1,148 @@
-Return-Path: <netdev+bounces-45557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041747DE42D
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 16:51:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE9A7DE45D
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 17:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 223C01C20B5B
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 15:51:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D66351C20CA9
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 16:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B483414A85;
-	Wed,  1 Nov 2023 15:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+lxu02r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF42412B8B;
+	Wed,  1 Nov 2023 16:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1776B6ABB;
-	Wed,  1 Nov 2023 15:51:32 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F43E4;
-	Wed,  1 Nov 2023 08:51:30 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507973f3b65so10488653e87.3;
-        Wed, 01 Nov 2023 08:51:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698853889; x=1699458689; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wb0D0LJEi05xwQk6CsVxJcO6PBY8HZV7xQTgB2a9XVw=;
-        b=c+lxu02rDBj0w8mV+wEdg5fs6AZZQirAmtoMSUKRNgHVn4TTWVAFaEUnAy0dwgdfRH
-         c8uiS7YRml7zgpHei/mYqAz61hcRIgZ1o6saYG45Dg+xLfSXrR+INjX/C9bQr8oeX8g6
-         lcPMo0NaubkhHBeqgW6IpuQowdxPRM1cgLksMzcfcTGTSKyo7m3t0NZeuNejHeGdTmls
-         Wvuw9QBQC/B3uJO6bkicVKSBSkszHUFFKUypyXlOILIy3OxmqHv8R1LNwGhQj2qUBb6a
-         zjFm3tFKon9iODS4XSqcVY27/ZqJdhZ3Z4992qUnxWLCUN7gtqamPQo4Is+i9r3BVbQ9
-         MByw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9967480
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 16:03:37 +0000 (UTC)
+Received: from mail-ot1-f79.google.com (mail-ot1-f79.google.com [209.85.210.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED928ED
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 09:03:32 -0700 (PDT)
+Received: by mail-ot1-f79.google.com with SMTP id 46e09a7af769-6c0f174540cso9614866a34.2
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 09:03:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698853889; x=1699458689;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wb0D0LJEi05xwQk6CsVxJcO6PBY8HZV7xQTgB2a9XVw=;
-        b=ORUB5+e/Vh1iReprRtXmRIBtKeWIhhHitI5sRqWfOeEVsTZSjZYKkwQKArudu022l7
-         jtVbzuLsgIdQhKH9UCFMRALbegysIrLd+7BTnqxrpDj7iyDLn6E5ltg8DTGgX9bAx1kx
-         Sj6KMLfhSeJwDVJv/InPiAI+7AIMtew3gfxCTxiyAc2+Pv1hJJnBaQB4T/c6rR980OQy
-         O/80Q35DA3RVnCq6Bf++Kd9uYKIUhfDiUZyGyOlQDKoDtPxIuao2FQytlvf4bRsnZVK2
-         kbM6uCeo32M9LvH0NGMjm2cHjoPDYhS+y/Fjh45JoQcU7vq0kZrjaQ0kUPlBYGkZRHh7
-         kcEQ==
-X-Gm-Message-State: AOJu0YxzU7fuWLNJeBeC+hMO68CgY7MuJmHoi7oZUYIbpufGjTgOJejT
-	xv++oGgx6PSuUkhxT4t7G1c=
-X-Google-Smtp-Source: AGHT+IE9QeWHdiVo83ZsHOu1o033dhfQl9c8uQ1h/NOF2IvJFHmXaV30nqgvvI6ZxGlBldMqZB+2qQ==
-X-Received: by 2002:a05:6512:2248:b0:4fe:7e7f:1328 with SMTP id i8-20020a056512224800b004fe7e7f1328mr15484763lfu.16.1698853888568;
-        Wed, 01 Nov 2023 08:51:28 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id x3-20020a5d4903000000b0032f7e832cabsm139349wrq.90.2023.11.01.08.51.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 08:51:28 -0700 (PDT)
-Message-ID: <65427400.5d0a0220.41c58.0ded@mx.google.com>
-X-Google-Original-Message-ID: <ZUJz/icrdWW94IQI@Ansuel-xps.>
-Date: Wed, 1 Nov 2023 16:51:26 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Robert Marko <robimarko@gmail.com>
-Subject: Re: [net-next PATCH v2 1/2] net: phy: aquantia: add firmware load
- support
-References: <20231101123608.11157-1-ansuelsmth@gmail.com>
- <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
+        d=1e100.net; s=20230601; t=1698854612; x=1699459412;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EdeQV2pIkNcTK7spnDytELNGhzvPyiLiMoKr4E/iFYg=;
+        b=kMbIWC8gR4FkgAuI9rMsdDo3OSs6ISLUX8zNqoNfYd7DFQH8dTFWWk0dezk9QZ+r8A
+         GYTYK9dLkeChFDPtlngyYFo+cvIqBy8bTdS5kOe1z7fHLaCsj3D/maDzi1VVVlPxiPmS
+         s4KYqZPHM8yzGC2DPtE5YOzMcUWwvrxB2sLV7fO8cfTqA7rc5dIYHyA5MZVd5GrJ4t2p
+         9jbqAqGatIcwvb6/FXIg/32TqpoOX6y81hxv269YjkZerTAHQeuCHiD4+f1w4pN6JlVA
+         Vurq1DyAMfwiScdITxpyT6i+nDv7AkMQ9xv4/6g+tgYB1LMOClE778I9ohzVh4eNqLH5
+         3LHA==
+X-Gm-Message-State: AOJu0Yxd/lX1c/46ag495V4K7kNz3levOkHIadXtoMOyDT6YXTq5UAl6
+	REqwTgHppF8MU8bd6gnQI5sFHlAo3WMENwAQdzgUzMabIjVp
+X-Google-Smtp-Source: AGHT+IH6pqVhlK4/Ye6KVhcJbYipZaAOhCbWXksV5EcB8uznUSLjN1FhgL37OGuTiwA8CZARxfvOE3cYNM20XJsKeYF/0HOi5Wdq
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
+X-Received: by 2002:a05:6871:5813:b0:1ef:ac35:a2fe with SMTP id
+ oj19-20020a056871581300b001efac35a2femr5752413oac.6.1698854611993; Wed, 01
+ Nov 2023 09:03:31 -0700 (PDT)
+Date: Wed, 01 Nov 2023 09:03:31 -0700
+In-Reply-To: <000000000000ffc87a06086172a0@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ac4b37060919693b@google.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in ptp_release
+From: syzbot <syzbot+8a676a50d4eee2f21539@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	richardcochran@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 01, 2023 at 02:13:05PM +0100, Andrew Lunn wrote:
-> On Wed, Nov 01, 2023 at 01:36:07PM +0100, Christian Marangi wrote:
-> > From: Robert Marko <robimarko@gmail.com>
-> > 
-> > Aquantia PHY-s require firmware to be loaded before they start operating.
-> > It can be automatically loaded in case when there is a SPI-NOR connected
-> > to Aquantia PHY-s or can be loaded from the host via MDIO.
-> > 
-> > This patch adds support for loading the firmware via MDIO as in most cases
-> > there is no SPI-NOR being used to save on cost.
-> > Firmware loading code itself is ported from mainline U-boot with cleanups.
-> > 
-> > The firmware has mixed values both in big and little endian.
-> > PHY core itself is big-endian but it expects values to be in little-endian.
-> > The firmware is little-endian but CRC-16 value for it is stored at the end
-> > of firmware in big-endian.
-> > 
-> > It seems the PHY does the conversion internally from firmware that is
-> > little-endian to the PHY that is big-endian on using the mailbox
-> > but mailbox returns a big-endian CRC-16 to verify the written data
-> > integrity.
-> > 
-> > Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
-> > Signed-off-by: Robert Marko <robimarko@gmail.com>
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> > Changes v2:
-> > - Move out of RFC
-> 
-> Actually, since we are in the merge window, RFC would be correct.
->
+syzbot has found a reproducer for the following issue on:
 
-My bad!
+HEAD commit:    89ed67ef126c Merge tag 'net-next-6.7' of git://git.kernel...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=150b105f680000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6e3b1d98cf5a2cca
+dashboard link: https://syzkaller.appspot.com/bug?extid=8a676a50d4eee2f21539
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13dd173b680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16ce0840e80000
 
-> > - Address sanity check for offsets
-> > - Add additional comments on firmware load check
-> > - Fix some typo
-> > - Capitalize CRC in comments
-> > - Rename load_sysfs to load_fs
-> > 
-> >  drivers/net/phy/Kconfig         |   1 +
-> >  drivers/net/phy/aquantia_main.c | 304 ++++++++++++++++++++++++++++++++
-> >  2 files changed, 305 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> > index 421d2b62918f..46c7194efcea 100644
-> > --- a/drivers/net/phy/Kconfig
-> > +++ b/drivers/net/phy/Kconfig
-> > @@ -98,6 +98,7 @@ config ADIN1100_PHY
-> >  
-> >  config AQUANTIA_PHY
-> >  	tristate "Aquantia PHYs"
-> > +	select CRC_CCITT
-> >  	help
-> >  	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
-> >  
-> > diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
-> > index 334a6904ca5a..0f1b8d75cca0 100644
-> > --- a/drivers/net/phy/aquantia_main.c
-> > +++ b/drivers/net/phy/aquantia_main.c
-> > @@ -12,6 +12,10 @@
-> >  #include <linux/delay.h>
-> >  #include <linux/bitfield.h>
-> >  #include <linux/phy.h>
-> > +#include <linux/of.h>
-> > +#include <linux/firmware.h>
-> > +#include <linux/crc-ccitt.h>
-> > +#include <linux/nvmem-consumer.h>
-> >  
-> >  #include "aquantia.h"
-> >  
-> > @@ -92,10 +96,40 @@
-> >  #define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
-> >  
-> >  /* Vendor specific 1, MDIO_MMD_VEND1 */
-> > +#define VEND1_GLOBAL_SC				0x0
-> > +#define VEND1_GLOBAL_SC_SOFT_RESET		BIT(15)
-> > +#define VEND1_GLOBAL_SC_LOW_POWER		BIT(11)
-> > +
-> >  #define VEND1_GLOBAL_FW_ID			0x0020
-> >  #define VEND1_GLOBAL_FW_ID_MAJOR		GENMASK(15, 8)
-> >  #define VEND1_GLOBAL_FW_ID_MINOR		GENMASK(7, 0)
-> >  
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1			0x0200
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE		BIT(15)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE		BIT(14)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET	BIT(12)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_BUSY		BIT(8)
-> > +
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE2			0x0201
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3			0x0202
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK	GENMASK(15, 0)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK, (u16)((x) >> 16))
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4			0x0203
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK	GENMASK(15, 2)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK, (u16)(x))
-> > +
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5			0x0204
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK	GENMASK(15, 0)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK, (u16)((x) >> 16))
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6			0x0205
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK	GENMASK(15, 0)
-> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK, (u16)(x))
-> > +
-> > +#define VEND1_GLOBAL_CONTROL2			0xc001
-> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_RST	BIT(15)
-> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
-> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
-> > +
-> >  #define VEND1_GLOBAL_GEN_STAT2			0xc831
-> >  #define VEND1_GLOBAL_GEN_STAT2_OP_IN_PROG	BIT(15)
-> >  
-> > @@ -152,6 +186,30 @@
-> >  #define AQR107_OP_IN_PROG_SLEEP		1000
-> >  #define AQR107_OP_IN_PROG_TIMEOUT	100000
-> >  
-> > +#define UP_RESET_SLEEP		100
-> > +
-> > +/* addresses of memory segments in the phy */
-> > +#define DRAM_BASE_ADDR		0x3FFE0000
-> > +#define IRAM_BASE_ADDR		0x40000000
-> > +
-> > +/* firmware image format constants */
-> > +#define VERSION_STRING_SIZE		0x40
-> > +#define VERSION_STRING_OFFSET		0x0200
-> > +/* primary offset is written at an offset from the start of the fw blob */
-> > +#define PRIMARY_OFFSET_OFFSET		0x8
-> > +/* primary offset needs to be then added to a base offset */
-> > +#define PRIMARY_OFFSET_SHIFT		12
-> > +#define PRIMARY_OFFSET(x)		((x) << PRIMARY_OFFSET_SHIFT)
-> > +#define HEADER_OFFSET			0x300
-> > +
-> > +struct aqr_fw_header {
-> > +	u32 padding;
-> > +	u8 iram_offset[3];
-> > +	u8 iram_size[3];
-> > +	u8 dram_offset[3];
-> > +	u8 dram_size[3];
-> > +} __packed;
-> > +
-> >  struct aqr107_hw_stat {
-> >  	const char *name;
-> >  	int reg;
-> > @@ -677,6 +735,166 @@ static int aqr107_wait_processor_intensive_op(struct phy_device *phydev)
-> >  	return 0;
-> >  }
-> >  
-> > +/* load data into the phy's memory */
-> > +static int aquantia_load_memory(struct phy_device *phydev, u32 addr,
-> > +				const u8 *data, size_t len)
-> > +{
-> 
-> > +	for (pos = 0; pos < len; pos += min(sizeof(u32), len - pos)) {
-> > +		u32 word = 0;
-> > +
-> > +		memcpy(&word, data + pos, min(sizeof(u32), len - pos));
-> 
-> Rather than do a memcpy, use the get_unaligned_ macros. They might map
-> to a memcpy(), but some architectures can do unaligned accesses
-> without problems.
-> 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b69c238dd56a/disk-89ed67ef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f555d654a8ba/vmlinux-89ed67ef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/335bbfb6c442/bzImage-89ed67ef.xz
 
-I don't think this is doable for this loop, think we would end up in
-some funny situation where for the last run we have to copy less than
-u32. (get_unaligned would always take u32 of data and that would end up
-reading more than requested) Am I wrong?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8a676a50d4eee2f21539@syzkaller.appspotmail.com
 
-Aside from this, in the other part of the code I can use the macro and
-skip having to convert them.
+list_del corruption. next->prev should be ffff88802a019048, but was ffff88802a401048. (next=ffff88802515e5e8)
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:67!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 6526 Comm: syz-executor155 Not tainted 6.6.0-syzkaller-05843-g89ed67ef126c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
+RIP: 0010:__list_del_entry_valid_or_report+0x122/0x130 lib/list_debug.c:65
+Code: 85 06 0f 0b 48 c7 c7 20 5f 9d 8b 4c 89 fe 48 89 d9 e8 52 db 85 06 0f 0b 48 c7 c7 a0 5f 9d 8b 4c 89 fe 4c 89 f1 e8 3e db 85 06 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 80 3d 1d 6e
+RSP: 0018:ffffc90009d67b18 EFLAGS: 00010046
+RAX: 000000000000006d RBX: ffff88802515e5f0 RCX: 58e87076363f5a00
+RDX: 0000000000000000 RSI: 0000000080000001 RDI: 0000000000000000
+RBP: ffff88802a019008 R08: ffffffff81717aac R09: 1ffff920013acf04
+R10: dffffc0000000000 R11: fffff520013acf05 R12: dffffc0000000000
+R13: ffff88802a018000 R14: ffff88802515e5e8 R15: ffff88802a019048
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff08f2c4110 CR3: 0000000074918000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del include/linux/list.h:229 [inline]
+ ptp_release+0xa8/0x1e0 drivers/ptp/ptp_chardev.c:147
+ posix_clock_release+0x8c/0x100 kernel/time/posix-clock.c:157
+ __fput+0x3cc/0xa10 fs/file_table.c:394
+ task_work_run+0x24a/0x300 kernel/task_work.c:180
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xa2c/0x2650 kernel/exit.c:874
+ do_group_exit+0x206/0x2c0 kernel/exit.c:1024
+ __do_sys_exit_group kernel/exit.c:1035 [inline]
+ __se_sys_exit_group kernel/exit.c:1033 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1033
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7ff08f248bf9
+Code: Unable to access opcode bytes at 0x7ff08f248bcf.
+RSP: 002b:00007ffc5a8eb438 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff08f248bf9
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
+RBP: 00007ff08f2c3290 R08: ffffffffffffffb8 R09: 00000000000000a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ff08f2c3290
+R13: 0000000000000000 R14: 00007ff08f2c3d00 R15: 00007ff08f219da0
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0x122/0x130 lib/list_debug.c:65
+Code: 85 06 0f 0b 48 c7 c7 20 5f 9d 8b 4c 89 fe 48 89 d9 e8 52 db 85 06 0f 0b 48 c7 c7 a0 5f 9d 8b 4c 89 fe 4c 89 f1 e8 3e db 85 06 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 80 3d 1d 6e
+RSP: 0018:ffffc90009d67b18 EFLAGS: 00010046
 
-> > +static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size)
-> > +{
-> > +	const struct aqr_fw_header *header;
-> > +	u32 iram_offset = 0, iram_size = 0;
-> > +	u32 dram_offset = 0, dram_size = 0;
-> > +	char version[VERSION_STRING_SIZE];
-> > +	u16 calculated_crc, read_crc;
-> > +	u32 primary_offset = 0;
-> > +	int ret;
-> > +
-> > +	/* extract saved CRC at the end of the fw */
-> > +	memcpy(&read_crc, data + size - 2, sizeof(read_crc));
-> 
-> Say size == 1. You just had a buffer underrun.
-> 
-> > +	/* CRC is saved in big-endian as PHY is BE */
-> > +	read_crc = be16_to_cpu(read_crc);
-> > +	calculated_crc = crc_ccitt_false(0, data, size - 2);
-> > +	if (read_crc != calculated_crc) {
-> > +		phydev_err(phydev, "bad firmware CRC: file 0x%04x calculated 0x%04x\n",
-> > +			   read_crc, calculated_crc);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	/* Get the primary offset to extract DRAM and IRAM sections. */
-> > +	memcpy(&primary_offset, data + PRIMARY_OFFSET_OFFSET, sizeof(u16));
-> 
-> What if PRIMARY_OFFSET_OFFSET + sizeof(u16) is greater than size? A
-> buffer overrun.
-> 
-> Assume the firmware is evil and is trying to hack you. Always test
-> everything.
-> 
-> I would suggest some helpers, something like
-> 
-> int aqr_fw_get_u16(const u8 *data, size_t size, size_t offset, u16 *value)
-> 
-> Check that offset + sizeof(u16) is within the firmware, and if not return -EINVAL.
-> Otherwise set *value to the u16 from the firmware and return 0.
-> 
-> This is where Rust would be nice :-)
-> 
-> 	Andrew
-> 
-> ---
-> pw-bot: cr
+RAX: 000000000000006d RBX: ffff88802515e5f0 RCX: 58e87076363f5a00
+RDX: 0000000000000000 RSI: 0000000080000001 RDI: 0000000000000000
+RBP: ffff88802a019008 R08: ffffffff81717aac R09: 1ffff920013acf04
+R10: dffffc0000000000 R11: fffff520013acf05 R12: dffffc0000000000
+R13: ffff88802a018000 R14: ffff88802515e5e8 R15: ffff88802a019048
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff08f2c4110 CR3: 0000000074918000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
--- 
-	Ansuel
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
