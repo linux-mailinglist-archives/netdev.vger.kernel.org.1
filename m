@@ -1,128 +1,308 @@
-Return-Path: <netdev+bounces-45556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB387DE3F7
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 16:45:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 041747DE42D
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 16:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 233D4B20E0E
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 15:45:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 223C01C20B5B
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 15:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD45514292;
-	Wed,  1 Nov 2023 15:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B483414A85;
+	Wed,  1 Nov 2023 15:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fyYXbe5W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+lxu02r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4011514A8A
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 15:45:26 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 705E5111
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 08:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698853523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sZfmnba+tHGz8pqoH154foHS+YLTOXshRrCAdJjTAkk=;
-	b=fyYXbe5WhIy7TlCvLlDqCHtj1qr1uTDdUoAEMpr4cShCVYqLq+JR6aPXaTIlqGnqfJoUt+
-	sWXFp9f+Dp5QiCMw80TPWbdf9KEJu/d2DxLUXzb9d/atOZNfWUeeWvfTxElBKOlEVDx7iC
-	LXjnPU/pGEGfHAemGyo6PmRoCuhr8+Q=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-rUr5MMA-OZqMoERtx8pLZQ-1; Wed, 01 Nov 2023 11:45:20 -0400
-X-MC-Unique: rUr5MMA-OZqMoERtx8pLZQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 69EB1811E88;
-	Wed,  1 Nov 2023 15:45:19 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BCFC1C1290F;
-	Wed,  1 Nov 2023 15:45:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20231027095842.GA30868@redhat.com>
-References: <20231027095842.GA30868@redhat.com>
-To: Oleg Nesterov <oleg@redhat.com>
-Cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Alexander Viro <viro@zeniv.linux.org.uk>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather than read_seqbegin_or_lock()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1776B6ABB;
+	Wed,  1 Nov 2023 15:51:32 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F43E4;
+	Wed,  1 Nov 2023 08:51:30 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507973f3b65so10488653e87.3;
+        Wed, 01 Nov 2023 08:51:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698853889; x=1699458689; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wb0D0LJEi05xwQk6CsVxJcO6PBY8HZV7xQTgB2a9XVw=;
+        b=c+lxu02rDBj0w8mV+wEdg5fs6AZZQirAmtoMSUKRNgHVn4TTWVAFaEUnAy0dwgdfRH
+         c8uiS7YRml7zgpHei/mYqAz61hcRIgZ1o6saYG45Dg+xLfSXrR+INjX/C9bQr8oeX8g6
+         lcPMo0NaubkhHBeqgW6IpuQowdxPRM1cgLksMzcfcTGTSKyo7m3t0NZeuNejHeGdTmls
+         Wvuw9QBQC/B3uJO6bkicVKSBSkszHUFFKUypyXlOILIy3OxmqHv8R1LNwGhQj2qUBb6a
+         zjFm3tFKon9iODS4XSqcVY27/ZqJdhZ3Z4992qUnxWLCUN7gtqamPQo4Is+i9r3BVbQ9
+         MByw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698853889; x=1699458689;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wb0D0LJEi05xwQk6CsVxJcO6PBY8HZV7xQTgB2a9XVw=;
+        b=ORUB5+e/Vh1iReprRtXmRIBtKeWIhhHitI5sRqWfOeEVsTZSjZYKkwQKArudu022l7
+         jtVbzuLsgIdQhKH9UCFMRALbegysIrLd+7BTnqxrpDj7iyDLn6E5ltg8DTGgX9bAx1kx
+         Sj6KMLfhSeJwDVJv/InPiAI+7AIMtew3gfxCTxiyAc2+Pv1hJJnBaQB4T/c6rR980OQy
+         O/80Q35DA3RVnCq6Bf++Kd9uYKIUhfDiUZyGyOlQDKoDtPxIuao2FQytlvf4bRsnZVK2
+         kbM6uCeo32M9LvH0NGMjm2cHjoPDYhS+y/Fjh45JoQcU7vq0kZrjaQ0kUPlBYGkZRHh7
+         kcEQ==
+X-Gm-Message-State: AOJu0YxzU7fuWLNJeBeC+hMO68CgY7MuJmHoi7oZUYIbpufGjTgOJejT
+	xv++oGgx6PSuUkhxT4t7G1c=
+X-Google-Smtp-Source: AGHT+IE9QeWHdiVo83ZsHOu1o033dhfQl9c8uQ1h/NOF2IvJFHmXaV30nqgvvI6ZxGlBldMqZB+2qQ==
+X-Received: by 2002:a05:6512:2248:b0:4fe:7e7f:1328 with SMTP id i8-20020a056512224800b004fe7e7f1328mr15484763lfu.16.1698853888568;
+        Wed, 01 Nov 2023 08:51:28 -0700 (PDT)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id x3-20020a5d4903000000b0032f7e832cabsm139349wrq.90.2023.11.01.08.51.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Nov 2023 08:51:28 -0700 (PDT)
+Message-ID: <65427400.5d0a0220.41c58.0ded@mx.google.com>
+X-Google-Original-Message-ID: <ZUJz/icrdWW94IQI@Ansuel-xps.>
+Date: Wed, 1 Nov 2023 16:51:26 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>
+Subject: Re: [net-next PATCH v2 1/2] net: phy: aquantia: add firmware load
+ support
+References: <20231101123608.11157-1-ansuelsmth@gmail.com>
+ <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1952181.1698853516.1@warthog.procyon.org.uk>
-Date: Wed, 01 Nov 2023 15:45:16 +0000
-Message-ID: <1952182.1698853516@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
 
-Oleg Nesterov <oleg@redhat.com> wrote:
+On Wed, Nov 01, 2023 at 02:13:05PM +0100, Andrew Lunn wrote:
+> On Wed, Nov 01, 2023 at 01:36:07PM +0100, Christian Marangi wrote:
+> > From: Robert Marko <robimarko@gmail.com>
+> > 
+> > Aquantia PHY-s require firmware to be loaded before they start operating.
+> > It can be automatically loaded in case when there is a SPI-NOR connected
+> > to Aquantia PHY-s or can be loaded from the host via MDIO.
+> > 
+> > This patch adds support for loading the firmware via MDIO as in most cases
+> > there is no SPI-NOR being used to save on cost.
+> > Firmware loading code itself is ported from mainline U-boot with cleanups.
+> > 
+> > The firmware has mixed values both in big and little endian.
+> > PHY core itself is big-endian but it expects values to be in little-endian.
+> > The firmware is little-endian but CRC-16 value for it is stored at the end
+> > of firmware in big-endian.
+> > 
+> > It seems the PHY does the conversion internally from firmware that is
+> > little-endian to the PHY that is big-endian on using the mailbox
+> > but mailbox returns a big-endian CRC-16 to verify the written data
+> > integrity.
+> > 
+> > Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+> > Signed-off-by: Robert Marko <robimarko@gmail.com>
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> > Changes v2:
+> > - Move out of RFC
+> 
+> Actually, since we are in the merge window, RFC would be correct.
+>
 
-> read_seqbegin_or_lock() makes no sense unless you make "seq" odd
-> after the lockless access failed.
+My bad!
 
-I think you're wrong.
+> > - Address sanity check for offsets
+> > - Add additional comments on firmware load check
+> > - Fix some typo
+> > - Capitalize CRC in comments
+> > - Rename load_sysfs to load_fs
+> > 
+> >  drivers/net/phy/Kconfig         |   1 +
+> >  drivers/net/phy/aquantia_main.c | 304 ++++++++++++++++++++++++++++++++
+> >  2 files changed, 305 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> > index 421d2b62918f..46c7194efcea 100644
+> > --- a/drivers/net/phy/Kconfig
+> > +++ b/drivers/net/phy/Kconfig
+> > @@ -98,6 +98,7 @@ config ADIN1100_PHY
+> >  
+> >  config AQUANTIA_PHY
+> >  	tristate "Aquantia PHYs"
+> > +	select CRC_CCITT
+> >  	help
+> >  	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+> >  
+> > diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
+> > index 334a6904ca5a..0f1b8d75cca0 100644
+> > --- a/drivers/net/phy/aquantia_main.c
+> > +++ b/drivers/net/phy/aquantia_main.c
+> > @@ -12,6 +12,10 @@
+> >  #include <linux/delay.h>
+> >  #include <linux/bitfield.h>
+> >  #include <linux/phy.h>
+> > +#include <linux/of.h>
+> > +#include <linux/firmware.h>
+> > +#include <linux/crc-ccitt.h>
+> > +#include <linux/nvmem-consumer.h>
+> >  
+> >  #include "aquantia.h"
+> >  
+> > @@ -92,10 +96,40 @@
+> >  #define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
+> >  
+> >  /* Vendor specific 1, MDIO_MMD_VEND1 */
+> > +#define VEND1_GLOBAL_SC				0x0
+> > +#define VEND1_GLOBAL_SC_SOFT_RESET		BIT(15)
+> > +#define VEND1_GLOBAL_SC_LOW_POWER		BIT(11)
+> > +
+> >  #define VEND1_GLOBAL_FW_ID			0x0020
+> >  #define VEND1_GLOBAL_FW_ID_MAJOR		GENMASK(15, 8)
+> >  #define VEND1_GLOBAL_FW_ID_MINOR		GENMASK(7, 0)
+> >  
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1			0x0200
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE		BIT(15)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE		BIT(14)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET	BIT(12)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_BUSY		BIT(8)
+> > +
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE2			0x0201
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3			0x0202
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK	GENMASK(15, 0)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK, (u16)((x) >> 16))
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4			0x0203
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK	GENMASK(15, 2)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK, (u16)(x))
+> > +
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5			0x0204
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK	GENMASK(15, 0)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK, (u16)((x) >> 16))
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6			0x0205
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK	GENMASK(15, 0)
+> > +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK, (u16)(x))
+> > +
+> > +#define VEND1_GLOBAL_CONTROL2			0xc001
+> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_RST	BIT(15)
+> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
+> > +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
+> > +
+> >  #define VEND1_GLOBAL_GEN_STAT2			0xc831
+> >  #define VEND1_GLOBAL_GEN_STAT2_OP_IN_PROG	BIT(15)
+> >  
+> > @@ -152,6 +186,30 @@
+> >  #define AQR107_OP_IN_PROG_SLEEP		1000
+> >  #define AQR107_OP_IN_PROG_TIMEOUT	100000
+> >  
+> > +#define UP_RESET_SLEEP		100
+> > +
+> > +/* addresses of memory segments in the phy */
+> > +#define DRAM_BASE_ADDR		0x3FFE0000
+> > +#define IRAM_BASE_ADDR		0x40000000
+> > +
+> > +/* firmware image format constants */
+> > +#define VERSION_STRING_SIZE		0x40
+> > +#define VERSION_STRING_OFFSET		0x0200
+> > +/* primary offset is written at an offset from the start of the fw blob */
+> > +#define PRIMARY_OFFSET_OFFSET		0x8
+> > +/* primary offset needs to be then added to a base offset */
+> > +#define PRIMARY_OFFSET_SHIFT		12
+> > +#define PRIMARY_OFFSET(x)		((x) << PRIMARY_OFFSET_SHIFT)
+> > +#define HEADER_OFFSET			0x300
+> > +
+> > +struct aqr_fw_header {
+> > +	u32 padding;
+> > +	u8 iram_offset[3];
+> > +	u8 iram_size[3];
+> > +	u8 dram_offset[3];
+> > +	u8 dram_size[3];
+> > +} __packed;
+> > +
+> >  struct aqr107_hw_stat {
+> >  	const char *name;
+> >  	int reg;
+> > @@ -677,6 +735,166 @@ static int aqr107_wait_processor_intensive_op(struct phy_device *phydev)
+> >  	return 0;
+> >  }
+> >  
+> > +/* load data into the phy's memory */
+> > +static int aquantia_load_memory(struct phy_device *phydev, u32 addr,
+> > +				const u8 *data, size_t len)
+> > +{
+> 
+> > +	for (pos = 0; pos < len; pos += min(sizeof(u32), len - pos)) {
+> > +		u32 word = 0;
+> > +
+> > +		memcpy(&word, data + pos, min(sizeof(u32), len - pos));
+> 
+> Rather than do a memcpy, use the get_unaligned_ macros. They might map
+> to a memcpy(), but some architectures can do unaligned accesses
+> without problems.
+> 
 
-write_seqlock() turns it odd.  For instance, if the read lock is taken first:
+I don't think this is doable for this loop, think we would end up in
+some funny situation where for the last run we have to copy less than
+u32. (get_unaligned would always take u32 of data and that would end up
+reading more than requested) Am I wrong?
 
-	sequence seq	CPU 1				CPU 2
-	======= =======	===============================	===============
-	0
-	0	0	seq = 0 // MUST BE EVEN ACCORDING TO DOC
-	0	0	read_seqbegin_or_lock() [lockless]
-			...
-	1	0					write_seqlock()
-	1	0	need_seqretry() [seq=even; sequence!=seq: retry]
-	1	1	read_seqbegin_or_lock() [exclusive]
-			-->spin_lock(lock);
-	2	1					write_sequnlock()
-			<--locked
-			...
-	2	1	need_seqretry()
+Aside from this, in the other part of the code I can use the macro and
+skip having to convert them.
 
-However, if the write lock is taken first:
+> > +static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size)
+> > +{
+> > +	const struct aqr_fw_header *header;
+> > +	u32 iram_offset = 0, iram_size = 0;
+> > +	u32 dram_offset = 0, dram_size = 0;
+> > +	char version[VERSION_STRING_SIZE];
+> > +	u16 calculated_crc, read_crc;
+> > +	u32 primary_offset = 0;
+> > +	int ret;
+> > +
+> > +	/* extract saved CRC at the end of the fw */
+> > +	memcpy(&read_crc, data + size - 2, sizeof(read_crc));
+> 
+> Say size == 1. You just had a buffer underrun.
+> 
+> > +	/* CRC is saved in big-endian as PHY is BE */
+> > +	read_crc = be16_to_cpu(read_crc);
+> > +	calculated_crc = crc_ccitt_false(0, data, size - 2);
+> > +	if (read_crc != calculated_crc) {
+> > +		phydev_err(phydev, "bad firmware CRC: file 0x%04x calculated 0x%04x\n",
+> > +			   read_crc, calculated_crc);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	/* Get the primary offset to extract DRAM and IRAM sections. */
+> > +	memcpy(&primary_offset, data + PRIMARY_OFFSET_OFFSET, sizeof(u16));
+> 
+> What if PRIMARY_OFFSET_OFFSET + sizeof(u16) is greater than size? A
+> buffer overrun.
+> 
+> Assume the firmware is evil and is trying to hack you. Always test
+> everything.
+> 
+> I would suggest some helpers, something like
+> 
+> int aqr_fw_get_u16(const u8 *data, size_t size, size_t offset, u16 *value)
+> 
+> Check that offset + sizeof(u16) is within the firmware, and if not return -EINVAL.
+> Otherwise set *value to the u16 from the firmware and return 0.
+> 
+> This is where Rust would be nice :-)
+> 
+> 	Andrew
+> 
+> ---
+> pw-bot: cr
 
-	sequence seq	CPU 1				CPU 2
-	======= =======	===============================	===============
-	0
-	1						write_seqlock()
-	1	0	seq = 0 // MUST BE EVEN ACCORDING TO DOC
-	1	0	read_seqbegin_or_lock() [lockless]
-	1	0	    __read_seqcount_begin()
-				while (lock.sequence is odd)
-				    cpu_relax();
-	2	0					write_sequnlock()
-	2	2		[loop end]
-			...
-	2	2	need_seqretry() [seq=even; sequence==seq; done]
-
-Note that it spins in __read_seqcount_begin() until we get an even seq,
-indicating that no write is currently in progress - at which point we can
-perform a lockless pass.
-
-> See thread_group_cputime() as an example, note that it does nextseq = 1 for
-> the 2nd round.
-
-That's not especially convincing.
-
-David
-
+-- 
+	Ansuel
 
