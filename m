@@ -1,145 +1,111 @@
-Return-Path: <netdev+bounces-45575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07D587DE68D
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:55:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6F77DE691
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:58:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D774B20E22
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DC4AB20E1D
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC13B18E22;
-	Wed,  1 Nov 2023 19:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A45019BDB;
+	Wed,  1 Nov 2023 19:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAFF6cJ+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jk9GWi1U"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C221134B6
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 19:55:34 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53233110
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 12:55:33 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-507975d34e8so132807e87.1
-        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 12:55:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E6618040
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 19:58:20 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B48F99F
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 12:58:15 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53e2308198eso269683a12.1
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 12:58:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698868531; x=1699473331; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7VOxunMHxAsStaiWEVeFBOXToL/YaB8picVEyKTPrus=;
-        b=AAFF6cJ+erBl6NkQsmoBU/AOYyH60+PXjMKf4kBQ5OWnBdrAceOvH3e3zg5vb/M2Q2
-         vfmiP4F9XwNvRhJaL9Gn18+4GWc6umX2VQYc15i6wrxD86blKJ6gQ/zTCW59v1wiaFnq
-         3HW45/Sx4R0E73RSwxKKkfjwiU/CbdoY87GpVeHqYIogKw1v7gupouSDMmBeetPXpLae
-         XAag55cpyM1dBBZsFf3kuNHGRj8kdoSBYqLJEOXP7TKJA3Emskui6C0jJVIIn+yUjpwm
-         o3RryosBdjX4DYddCLxE9ntSfmSYY7GpptxEvSG8SOrQHbwZAn/oNsg4u4NkP4HOiweI
-         Y9Ig==
+        d=gmail.com; s=20230601; t=1698868694; x=1699473494; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l7ltzMCn2siBmD8yun9Uf7pKX6TP4IHro5wicVbd6Mc=;
+        b=Jk9GWi1UIbA44qkHqOyH2O9oJKLH4/0/Ue1WF6jGjvQRLdwOEUEyniDWpOGHuPlZnQ
+         SZ3dzG5jcFQ1laFodtGe9mWcOMGSlIltsDxXGCw2guF/iMJuLWUffRR+DSAYN9wRFTzn
+         8c7KcVktv4zD/g436aG3TaEVJstjxNjaD05DsCsCSSWj5CQBaeLX7pNpHCUQqN9pKivL
+         0yTtxo0eY2SYulcC2yn6HmlnyBPX1cW+prEX0Q/n7PtzH6o4hwbIU6zEpSX47dkV5Ilz
+         nJHwH8AO3T/aSeDXXzoRurz7Lq3YZmHBQHSSUAVeuAa53L+H/Xvl/Zgz2NhRZAcjAfp4
+         BSLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698868531; x=1699473331;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7VOxunMHxAsStaiWEVeFBOXToL/YaB8picVEyKTPrus=;
-        b=GW6gDRw6jNdzvvgy15fo7NeE472CzUN1nKiA/9/1MtDMOu4M4zkapk5dVKTQR4PcOV
-         hi7uSkrm3kaP8Um7/W7csPvMfU/PcYWA+F5pxnUUGRJng3gXa3XqEmb8lPIxYIta/kjt
-         emiUEpXewcIsrJ1sSMdnHjXjENSWLHI0v6veWdbS6PCSSzgS1vibmb1BGMmqbxMyw8C1
-         vmiYib7kHtmOmx0aVoKcNYo4Ps0KPLLt6SCydfPZVa1PzGs/Lo7I+LBvOpYTAEI7apuK
-         7KDrOmNckupHdrB2US1ijWNv8SFGquxhg1POOaqGO6uiWe2L28ULBXllzneO8UEnvftj
-         dyzA==
-X-Gm-Message-State: AOJu0Yz9hczLSdVgsw5Hh6Gv5ve9QBCiw9/4a/f9d4pyhTLqc3zIUZVV
-	Y8IW92TooyijZ2OEn1IKNVkHOxdUNFeKIEmOobQ=
-X-Google-Smtp-Source: AGHT+IHOiZCZDGRuPqKgAPGcrzghdaR2JeNmyR2ZNzP099EEftlRBfHqo1kcdzIHeUmkBxbZLztFXqyC1vmFJk9UfJM=
-X-Received: by 2002:a05:6512:e95:b0:509:4405:d5a8 with SMTP id
- bi21-20020a0565120e9500b005094405d5a8mr1451677lfb.68.1698868531216; Wed, 01
- Nov 2023 12:55:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698868694; x=1699473494;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l7ltzMCn2siBmD8yun9Uf7pKX6TP4IHro5wicVbd6Mc=;
+        b=oPjmfGRGXFSoWtCATykDfcBu3pevfSz90/FjnwkZrdxbanM8vrtis13VGDGq07ZyNY
+         JGAPeQYuchqpNqTN9ursyEaqqf0/Ah83p+yx4ltx58v5g8Iynf+JP2Z8jRAp3U7952g6
+         7u6ETWsUXBLCLoVzdFbK8PW45RfrwXNLwTA9QMuc9EwUtwGDWgyRbI5SP6qYFxnO65XB
+         fwTuFZqHmt89FnXZQfP/m1o2XVdYVD2NLsOsjX2Hjl0wPB4GeLEqP0zq9JkPWU+DG2uS
+         XWCYohc8iDi4eOpjVsWiFXWuE6NPy7Y9Gty/b/7+Sh3wMquREvQ0kujNqAtVBJQY2Mx4
+         9/ZQ==
+X-Gm-Message-State: AOJu0YwilAJKaLwuHKCoai5HHZUMS1UB4N1qsxAIaPplrCPZwe6+pDFi
+	Oy4FbwRnDxKV1b5VBdnxdSA=
+X-Google-Smtp-Source: AGHT+IGGNpLsrSBAQ6Q79Z4gRHerVd/N4Chmdlxf89gMtOxi9An2BpXMuNeHzFY1iOLefIyC0tATaA==
+X-Received: by 2002:a17:907:1b10:b0:9be:834a:f80b with SMTP id mp16-20020a1709071b1000b009be834af80bmr2644332ejc.75.1698868693986;
+        Wed, 01 Nov 2023 12:58:13 -0700 (PDT)
+Received: from [172.16.42.2] ([188.42.216.83])
+        by smtp.gmail.com with ESMTPSA id l12-20020a1709062a8c00b0099315454e76sm298298eje.211.2023.11.01.12.58.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Nov 2023 12:58:13 -0700 (PDT)
+Message-ID: <31a5cfe8-133d-4548-9814-cf3e61d89307@gmail.com>
+Date: Wed, 1 Nov 2023 21:58:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027190910.27044-1-luizluca@gmail.com> <20231027190910.27044-4-luizluca@gmail.com>
- <20231030205025.b4dryzqzuunrjils@skbuf> <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
-In-Reply-To: <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Wed, 1 Nov 2023 16:55:19 -0300
-Message-ID: <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset controller
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzk+dt@kernel.org, arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] [PATCH net] tg3: power down device only on
+ SYSTEM_POWER_OFF
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: netdev@vger.kernel.org, Andrew Gospodarek
+ <andrew.gospodarek@broadcom.com>, Michael Chan <michael.chan@broadcom.com>
+References: <20231101130418.44164-1-george.shuklin@gmail.com>
+ <CALs4sv37sniGKkYADvHwwMjFzp5tBbBnpfOnyK-peM=rnp63Bw@mail.gmail.com>
+Content-Language: en-US
+From: George Shuklin <george.shuklin@gmail.com>
+In-Reply-To: <CALs4sv37sniGKkYADvHwwMjFzp5tBbBnpfOnyK-peM=rnp63Bw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Vladimir,
+On 01/11/2023 17:20, Pavan Chebbi wrote:
+> On Wed, Nov 1, 2023 at 6:34 PM George Shuklin <george.shuklin@gmail.com> wrote:
+>> Dell R650xs servers hangs if tg3 driver calls tg3_power_down.
+>>
+>> This happens only if network adapters (BCM5720 for R650xs) were
+>> initialized using SNP (e.g. by booting ipxe.efi).
+>>
+>> This is partial revert of commit 2ca1c94ce0b.
+>>
+>> The actual problem is on Dell side, but this fix allow servers
+>> to come back alive after reboot.
+> How are you sure that the problem solved by 2ca1c94ce0b is not
+> reintroduced with this change?
 
-> realtek-mdio is an MDIO driver while realtek-smi is a platform driver
-> implementing a bitbang protocol. They might never be used together in
-> a system to share RAM and not even installed together in small
-> systems. If I do need to share the code, I would just link it twice.
-> Would something like this be acceptable?
->
-> drivers/net/dsa/realtek/Makefile
-> -obj-$(CONFIG_NET_DSA_REALTEK_MDIO)     += realtek-mdio.o
-> -obj-$(CONFIG_NET_DSA_REALTEK_SMI)      += realtek-smi.o
-> +obj-$(CONFIG_NET_DSA_REALTEK_MDIO)     += realtek-mdio.o realtek_common.o
-> +obj-$(CONFIG_NET_DSA_REALTEK_SMI)      += realtek-smi.o realtek_common.o
+I contacted the author of original patch, no reply yet (1st day). Also, 
+I tested it on few generations of available Dell servers (R330, R340, 
+R350 and R650sx, for which this fix should help). It does produce log 
+message from 
+https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1917471, but, at 
+least, it reboots without issues.
 
-Just a follow up.
+Actually, original patch is regression: 5.19 rebooting just fine, 6.0 
+start to hang. I also reported it to dell support forum, but I'm not 
+sure if they pick it up or not.
 
-It is not that simple to include a .c file into an existing single
-file module. It looks like you need to rename the original file as all
-linked objects must not conflict with the module name. The kernel
-build seems to create a new object file for each module. Is there a
-clearer way? I think #include a common .c file would not be
-acceptable.
+What would be the proper course of actions for such problem (outside of 
+fixing UEFI SNP, for which I don't have access to sources)?
 
-I tested your shared module suggestion. It is the clearest one but it
-also increased the overall size quite a bit. Even linking two objects
-seems to use the double of space used by the functions alone. These
-are some values (mips)
-
-drivers/net/dsa/realtek/realtek_common.o  5744  without exports
-drivers/net/dsa/realtek/realtek_common.o 33472  exporting the two
-reset functions (assert/deassert)
-
-drivers/net/dsa/realtek/realtek-mdio.o   18756  without the reset
-funcs (to be used as a module)
-drivers/net/dsa/realtek/realtek-mdio.o   20480  including the
-realtek_common.c (#include <realtek_common.c>)
-drivers/net/dsa/realtek/realtek-mdio.o   22696  linking the realtek_common.o
-
-drivers/net/dsa/realtek/realtek-smi.o    30712  without the reset
-funcs (to be used as a module)
-drivers/net/dsa/realtek/realtek-smi.o    34604  linking the realtek_common.o
-
-drivers/net/dsa/realtek/realtek-mdio.ko  28800  without the reset
-funcs (it will use realtek_common.ko)
-drivers/net/dsa/realtek/realtek-mdio.ko  32736  linking the realtek_common.o
-
-drivers/net/dsa/realtek/realtek-smi.ko   40708  without the reset
-funcs (it will use realtek_common.ko)
-drivers/net/dsa/realtek/realtek-smi.ko   44612  linking the realtek_common.o
-
-In summary, we get about 1.5kb of code with the extra functions,
-almost 4kb if we link a common object containing the functions and
-33kb if we use a module for those two functions.
-
-I can go with any option. I just need to know which one would be
-accepted to update my patches.
-1) keep duplicated functions on each file
-2) share the code including the .c on both
-3) share the code linking a common object in both modules (and
-renaming existing .c files)
-4) create a new module used by both modules.
-
-The devices that would use this driver have very restricted storage
-space. Every kbyte counts.
-
-Regards,
-
-Luiz
 
