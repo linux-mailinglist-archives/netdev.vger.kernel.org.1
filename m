@@ -1,32 +1,32 @@
-Return-Path: <netdev+bounces-45524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4397DDD99
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 09:13:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF03B7DDDA1
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 09:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48331281417
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:13:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 541C0B20E39
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAE963DC;
-	Wed,  1 Nov 2023 08:13:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8989B6AAC;
+	Wed,  1 Nov 2023 08:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B35063AB
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 08:13:36 +0000 (UTC)
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98963B4;
-	Wed,  1 Nov 2023 01:13:32 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VvQMaox_1698826408;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VvQMaox_1698826408)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91FA263BE
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 08:14:08 +0000 (UTC)
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E39E4A6;
+	Wed,  1 Nov 2023 01:14:05 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VvQMb0F_1698826440;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VvQMb0F_1698826440)
           by smtp.aliyun-inc.com;
-          Wed, 01 Nov 2023 16:13:29 +0800
-Date: Wed, 1 Nov 2023 16:13:28 +0800
+          Wed, 01 Nov 2023 16:14:01 +0800
+Date: Wed, 1 Nov 2023 16:14:00 +0800
 From: Dust Li <dust.li@linux.alibaba.com>
 To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
 	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
@@ -34,7 +34,7 @@ Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
 	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
 Subject: Re: [PATCH net 1/3] net/smc: fix dangling sock under state
  SMC_APPFINCLOSEWAIT
-Message-ID: <20231101081328.GE92403@linux.alibaba.com>
+Message-ID: <20231101081400.GF92403@linux.alibaba.com>
 Reply-To: dust.li@linux.alibaba.com
 References: <1698810177-69740-1-git-send-email-alibuda@linux.alibaba.com>
  <1698810177-69740-2-git-send-email-alibuda@linux.alibaba.com>
@@ -54,6 +54,9 @@ On Wed, Nov 01, 2023 at 11:42:55AM +0800, D. Wythe wrote:
 >Considering scenario:
 >
 >				smc_cdc_rx_handler_rwwi
+
+Nit, smc_cdc_rx_handler_rwwi should be smc_cdc_rx_handler()
+
 >__smc_release
 >				sock_set_flag
 >smc_close_active()
@@ -78,9 +81,6 @@ On Wed, Nov 01, 2023 at 11:42:55AM +0800, D. Wythe wrote:
 >
 >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 >Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-
 >---
 > net/smc/af_smc.c    | 4 ++--
 > net/smc/smc.h       | 5 +++++
