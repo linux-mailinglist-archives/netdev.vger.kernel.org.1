@@ -1,203 +1,114 @@
-Return-Path: <netdev+bounces-45535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C93B07DE00D
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 12:04:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54A3B7DE02C
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 12:11:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57D81B211BF
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 11:04:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0589A28134C
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 11:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A3910A22;
-	Wed,  1 Nov 2023 11:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710BA10974;
+	Wed,  1 Nov 2023 11:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EiD8IRTA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4832810967
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 11:03:53 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 253BE11A
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 04:03:49 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R421e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0VvS8RIU_1698836624;
-Received: from 30.221.147.182(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VvS8RIU_1698836624)
-          by smtp.aliyun-inc.com;
-          Wed, 01 Nov 2023 19:03:45 +0800
-Message-ID: <d3b9e9e8-1ef4-48ac-8a2f-4fa647ae4372@linux.alibaba.com>
-Date: Wed, 1 Nov 2023 19:03:41 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9221B101CE
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 11:11:52 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D9ABF7
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 04:11:48 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2c501bd6ff1so92240901fa.3
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 04:11:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698837106; x=1699441906; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=WljMIn9oOVQ8xvgl/cyiqAsCMw6Ur1FNTMuZ2oBE+gw=;
+        b=EiD8IRTAcbxeZLYteg296XQlerco54RyGGC+tc6wu+uf5ffFOII7WNDwO2r1fX3SgT
+         Y4PUBMiM/6wO7lvP1iV58KZ2I/9TTChZTs95P6/wO9YIBnR67LSCdUcEmT2LXDua3WE3
+         xTk/OkowTg0E3mtN8aAmYKSHiJicRRWEwiJNjVnJEKsbfyJsKEuR7b06d/jfFvHyaIR6
+         RzrIYtBiUasApFXhkIaZMHOetSZR8WBdQNxpcP9sB5ZkwojWRhCvpIFkAJICl560Fqis
+         mEANTNW+QdYkKaETOi0ljA5SoTF36ReJayvLZ+wXtrQIwEjmkL4e3IAAa1gN+BYRK2QY
+         B3BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698837106; x=1699441906;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WljMIn9oOVQ8xvgl/cyiqAsCMw6Ur1FNTMuZ2oBE+gw=;
+        b=g2yWWToxpnAcbYQ69q67sDUJjnos0KgLZ5DngmXx/KASYAQkxh5VvEVg3+YwpUBbYC
+         f6o86pml6ERxqqVPx05+Yh4TXaeEt5pnDx8NlCNG0nDQFpRnRLXSjyRTHeKJZrcd/UZW
+         9Dg0qPeVrcfMu+U4rli4H5qzxVCxTUBa153wyQCdIiLNo1coZoVeyIcENTud3S0my+3p
+         9AmDy7lxh4PVjzlMCSix71iBb9UHnruRMSLZA4clKKDXdm+dn4wagq4nfZYAA59o8JVe
+         P6fR08DhwCWNA2Tb/imEfSWyKxcLQuzyjXxZfWVZlNKNTcwsbM1UOP7pEIPUgJRuRAIp
+         kk0w==
+X-Gm-Message-State: AOJu0Yw+x5sbYvp0b419FOcQ2E+4SstdaivnC+jZ9PWcv++obPXgpJK6
+	UcGShUI35i4HU+kig5ZvOS8hxyTPqF4mRYaF7MAh5A==
+X-Google-Smtp-Source: AGHT+IEERy59/IWp+6dIDuWyJKEXUBb4ORPPPzSmdWnQwEDxVK4Rm6OzsdMBvXm42b1Hb5I5OFDnRRjHTqziQDUvCJs=
+X-Received: by 2002:ac2:4846:0:b0:507:aaa4:e3b3 with SMTP id
+ 6-20020ac24846000000b00507aaa4e3b3mr10709203lfy.50.1698837106260; Wed, 01 Nov
+ 2023 04:11:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/5] virtio-net: support dynamic coalescing
- moderation
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, "Liu, Yujie" <yujie.liu@intel.com>
-References: <cover.1697093455.git.hengqi@linux.alibaba.com>
- <CACGkMEthktJjPdptHo3EDQxjRqdPELOSbMw4k-d0MyYmR4i9KA@mail.gmail.com>
- <d215566f-8185-463b-aa0b-5925f2a0853c@linux.alibaba.com>
- <CACGkMEseRoUBHOJ2CgPqVe=HNkAJqdj+Sh3pWsRaPCvcjwD9Gw@mail.gmail.com>
- <20231025015243-mutt-send-email-mst@kernel.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20231025015243-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231030091256.2915394-1-shaojijie@huawei.com>
+In-Reply-To: <20231030091256.2915394-1-shaojijie@huawei.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Wed, 1 Nov 2023 13:11:10 +0200
+Message-ID: <CAC_iWj+V8KB2TE=6e0z4SRoq7pY+3gStKawX_-8UfYh+cP9ndQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: page_pool: add missing free_percpu when
+ page_pool_init fail
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: hawk@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, jdamato@fastly.com, shenjian15@huawei.com, 
+	wangjie125@huawei.com, liuyonglong@huawei.com, linyunsheng@huawei.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-
-
-在 2023/10/25 下午1:53, Michael S. Tsirkin 写道:
-> On Wed, Oct 25, 2023 at 09:18:27AM +0800, Jason Wang wrote:
->> On Tue, Oct 24, 2023 at 8:03 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>
->>>
->>> 在 2023/10/12 下午4:29, Jason Wang 写道:
->>>> On Thu, Oct 12, 2023 at 3:44 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>>> Now, virtio-net already supports per-queue moderation parameter
->>>>> setting. Based on this, we use the netdim library of linux to support
->>>>> dynamic coalescing moderation for virtio-net.
->>>>>
->>>>> Due to hardware scheduling issues, we only tested rx dim.
->>>> Do you have PPS numbers? And TX numbers are also important as the
->>>> throughput could be misleading due to various reasons.
->>> Hi Jason!
->>>
->>> The comparison of rx netdim performance is as follows:
->>> (the backend supporting tx dim is not yet ready)
->> Thanks a lot for the numbers.
->>
->> I'd still expect the TX result as I did play tx interrupt coalescing
->> about 10 years ago.
->>
->> I will start to review the series but let's try to have some TX numbers as well.
->>
->> Btw, it would be more convenient to have a raw PPS benchmark. E.g you
->> can try to use a software or hardware packet generator.
->>
->> Thanks
-> Latency results are also kind of interesting.
-
-I test the latency using sockperf pp:
-
-@Rx cmd
-taskset -c 0 sockperf sr -p 8989
-
-@Tx cmd
-taskset -c 0 sockperf pp -i ${ip} -p 8989 -t 10
-
-After running this cmd 5 times and averaging the results,
-we get the following data:
-
-dim off: 17.7735 usec
-dim on: 18.0110 usec
-
-Thanks!
-
+On Mon, 30 Oct 2023 at 11:17, Jijie Shao <shaojijie@huawei.com> wrote:
 >
+> From: Jian Shen <shenjian15@huawei.com>
 >
->>>
->>> I. Sockperf UDP
->>> =================================================
->>> 1. Env
->>> rxq_0 is affinity to cpu_0
->>>
->>> 2. Cmd
->>> client:  taskset -c 0 sockperf tp -p 8989 -i $IP -t 10 -m 16B
->>> server: taskset -c 0 sockperf sr -p 8989
->>>
->>> 3. Result
->>> dim off: 1143277.00 rxpps, throughput 17.844 MBps, cpu is 100%.
->>> dim on: 1124161.00 rxpps, throughput 17.610 MBps, cpu is 83.5%.
->>> =================================================
->>>
->>>
->>> II. Redis
->>> =================================================
->>> 1. Env
->>> There are 8 rxqs and rxq_i is affinity to cpu_i.
->>>
->>> 2. Result
->>> When all cpus are 100%, ops/sec of memtier_benchmark client is
->>> dim off:   978437.23
->>> dim on: 1143638.28
->>> =================================================
->>>
->>>
->>> III. Nginx
->>> =================================================
->>> 1. Env
->>> There are 8 rxqs and rxq_i is affinity to cpu_i.
->>>
->>> 2. Result
->>> When all cpus are 100%, requests/sec of wrk client is
->>> dim off:   877931.67
->>> dim on: 1019160.31
->>> =================================================
->>>
->>> Thanks!
->>>
->>>> Thanks
->>>>
->>>>> @Test env
->>>>> rxq0 has affinity to cpu0.
->>>>>
->>>>> @Test cmd
->>>>> client: taskset -c 0 sockperf tp -i ${IP} -t 30 --tcp -m ${msg_size}
->>>>> server: taskset -c 0 sockperf sr --tcp
->>>>>
->>>>> @Test res
->>>>> The second column is the ratio of the result returned by client
->>>>> when rx dim is enabled to the result returned by client when
->>>>> rx dim is disabled.
->>>>>           --------------------------------------
->>>>>           | msg_size |  rx_dim=on / rx_dim=off |
->>>>>           --------------------------------------
->>>>>           |   14B    |         + 3%            |
->>>>>           --------------------------------------
->>>>>           |   100B   |         + 16%           |
->>>>>           --------------------------------------
->>>>>           |   500B   |         + 25%           |
->>>>>           --------------------------------------
->>>>>           |   1400B  |         + 28%           |
->>>>>           --------------------------------------
->>>>>           |   2048B  |         + 22%           |
->>>>>           --------------------------------------
->>>>>           |   4096B  |         + 5%            |
->>>>>           --------------------------------------
->>>>>
->>>>> ---
->>>>> This patch set was part of the previous netdim patch set[1].
->>>>> [1] was split into a merged bugfix set[2] and the current set.
->>>>> The previous relevant commentators have been Cced.
->>>>>
->>>>> [1] https://lore.kernel.org/all/20230811065512.22190-1-hengqi@linux.alibaba.com/
->>>>> [2] https://lore.kernel.org/all/cover.1696745452.git.hengqi@linux.alibaba.com/
->>>>>
->>>>> Heng Qi (5):
->>>>>     virtio-net: returns whether napi is complete
->>>>>     virtio-net: separate rx/tx coalescing moderation cmds
->>>>>     virtio-net: extract virtqueue coalescig cmd for reuse
->>>>>     virtio-net: support rx netdim
->>>>>     virtio-net: support tx netdim
->>>>>
->>>>>    drivers/net/virtio_net.c | 394 ++++++++++++++++++++++++++++++++-------
->>>>>    1 file changed, 322 insertions(+), 72 deletions(-)
->>>>>
->>>>> --
->>>>> 2.19.1.6.gb485710b
->>>>>
->>>>>
->>>
-
+> When ptr_ring_init() returns failure in page_pool_init(), free_percpu()
+> is not called to free pool->recycle_stats, which may cause memory
+> leak.
+>
+> Fixes: ad6fa1e1ab1b ("page_pool: Add recycle stats")
+> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  net/core/page_pool.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 77cb75e63aca..31f923e7b5c4 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -221,8 +221,12 @@ static int page_pool_init(struct page_pool *pool,
+>                 return -ENOMEM;
+>  #endif
+>
+> -       if (ptr_ring_init(&pool->ring, ring_qsize, GFP_KERNEL) < 0)
+> +       if (ptr_ring_init(&pool->ring, ring_qsize, GFP_KERNEL) < 0) {
+> +#ifdef CONFIG_PAGE_POOL_STATS
+> +               free_percpu(pool->recycle_stats);
+> +#endif
+>                 return -ENOMEM;
+> +       }
+>
+>         atomic_set(&pool->pages_state_release_cnt, 0);
+>
+> --
+> 2.30.0
+>
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
