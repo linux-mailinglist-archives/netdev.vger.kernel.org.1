@@ -1,101 +1,77 @@
-Return-Path: <netdev+bounces-45573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598CE7DE674
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:42:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB017DE685
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1804A1C20CFC
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CF362812C9
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 19:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8D519BB9;
-	Wed,  1 Nov 2023 19:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C1119BDC;
+	Wed,  1 Nov 2023 19:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="RgKkttjK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tvLD5QyP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F66911C9B
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 19:41:53 +0000 (UTC)
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC4FBD;
-	Wed,  1 Nov 2023 12:41:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1698867702;
-	bh=6kOOEsQgA20o02ni+Bbcpima7j16ISpDSfIVR3lmAHo=;
-	h=From:Date:Subject:To:Cc:From;
-	b=RgKkttjK6JHbUkNCJEGKwSUQBo2D1LVV/CtJA/BRdiAsNkuvWgT6mc1CrYE1EBw+T
-	 JDfPyoDOK7LpDXTsVsBEHmLc55HZpiHWgHv1Hg09HxHobbPMFTnwWzpJyyRkzOmBCq
-	 H7uX0orZAkqBQSWVtQ1Rlo5aSIiV+UnbFeXwktDs=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Wed, 01 Nov 2023 20:41:38 +0100
-Subject: [PATCH] rfkill: return ENOTTY on invalid ioctl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3685E125B4;
+	Wed,  1 Nov 2023 19:47:03 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 954209F;
+	Wed,  1 Nov 2023 12:46:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wYk75WWjhfRsVSIrzNnwPLbfZGcI7ZKnOifzPb2PiLY=; b=tvLD5QyPRht3WABrSXs9QsyqgP
+	AbCUa6QUcXE+QcecXR0Ri9H5FmW4mJfpQqR85pOJ+v3J80KphGVmNeE2GwZIaE5vMmKyf2ncclPqx
+	EIOnskEg7gE6oqw6PRMGXqHrQFKsvBRmVUzdPoaQ5KZZjL7v2hgka38ahFjbgtqmq/Og=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qyHAs-000hdr-5r; Wed, 01 Nov 2023 20:46:46 +0100
+Date: Wed, 1 Nov 2023 20:46:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>
+Subject: Re: [net-next PATCH v2 1/2] net: phy: aquantia: add firmware load
+ support
+Message-ID: <6dca432f-2a25-4e34-b44e-7cca0b045566@lunn.ch>
+References: <20231101123608.11157-1-ansuelsmth@gmail.com>
+ <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
+ <65427400.5d0a0220.41c58.0ded@mx.google.com>
+ <34a0b76e-aa0e-4148-ba01-c3b4608f17f7@lunn.ch>
+ <65427fd4.df0a0220.28d26.1955@mx.google.com>
+ <c9dad91a-1de1-4c30-ab7f-414552702009@lunn.ch>
+ <65428629.050a0220.b2431.1edc@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20231101-rfkill-ioctl-enosys-v1-1-5bf374fabffe@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAPGpQmUC/x3MwQqDMAyA4VeRnBdIqqe9iuzQ1tQFSzuaMSbiu
- 1s8fof/P8CkqRg8hwOa/NS0lg5+DBDfvqyCunSDIzcyE2NLm+aMWuM3o5RquyGRdyGQn3xg6OW
- nSdL/fZ1f53kBxrK472UAAAA=
-To: Johannes Berg <johannes@sipsolutions.net>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1698867702; l=1027;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=6kOOEsQgA20o02ni+Bbcpima7j16ISpDSfIVR3lmAHo=;
- b=PCouzUkWjCX8b4EyQv4Oh3mGh+icPABvcaSCwi8ZKWWfm0MN7wtPhGOZZZJDZDHZZRhHXGuo9
- tX5Sr1txgKVDl411lumTlUJq0mY1eBz57bA4bczvxT3dg+jVfF8vYW3
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65428629.050a0220.b2431.1edc@mx.google.com>
 
-For unknown ioctls the correct error is
-ENOTTY "Inappropriate ioctl for device".
+> Do we have API to check this? Or I think I should just check the iram
+> and dram size and see if iram_size % sizeof(u32) is zero and return
+> error otherwise.
 
-ENOSYS as returned before should only be used to indicate that a syscall
-is not available at all.
+Yes, that sounds correct.
 
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- net/rfkill/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/rfkill/core.c b/net/rfkill/core.c
-index 14cc8fe8584b..c3feb4f49d09 100644
---- a/net/rfkill/core.c
-+++ b/net/rfkill/core.c
-@@ -1351,11 +1351,11 @@ static long rfkill_fop_ioctl(struct file *file, unsigned int cmd,
- 			     unsigned long arg)
- {
- 	struct rfkill_data *data = file->private_data;
--	int ret = -ENOSYS;
-+	int ret = -ENOTTY;
- 	u32 size;
- 
- 	if (_IOC_TYPE(cmd) != RFKILL_IOC_MAGIC)
--		return -ENOSYS;
-+		return -ENOTTY;
- 
- 	mutex_lock(&data->mtx);
- 	switch (_IOC_NR(cmd)) {
-
----
-base-commit: 7d461b291e65938f15f56fe58da2303b07578a76
-change-id: 20231101-rfkill-ioctl-enosys-00a2bb0a4ab1
-
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+     Andrew
 
