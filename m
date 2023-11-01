@@ -1,443 +1,155 @@
-Return-Path: <netdev+bounces-45523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A567DDD73
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:50:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC4397DDD99
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 09:13:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 596EF2811EC
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 07:50:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48331281417
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 08:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5635663BC;
-	Wed,  1 Nov 2023 07:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ia2ete46"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAE963DC;
+	Wed,  1 Nov 2023 08:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453AE63B4
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 07:50:01 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1243B101;
-	Wed,  1 Nov 2023 00:49:55 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A144Qdi017803;
-	Wed, 1 Nov 2023 00:49:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=SM2epVf6nDHb8xWPQceLmBlNM1r/lEggltHtY9bgEEc=;
- b=ia2ete46676/4j68Uqtxx8MT3B0oIlSwsfAMPBylfxPyRcIYKQcoE422rbocrCvlLIPc
- 3xtzNOoCU3M0iS2gCl+2dc922mqEk3Pvz2kPyTYUgE0MCUgkCUUs/OoB2kJTCYQY9bsT
- HUQ+QuALLL4g1P73TlPxDM3Eb6UXuBH+G0YHZPduYhRcVLmHOgc15kK3TITdw2s6MFui
- hrXlbol21HRGc5gBF72L7XeqguoVykQRrqLiv+L0tjexbigpiEzOQuMYeT/hiJYXX6ox
- OykS2O85KFmMr2B7C2E4Y0ELdiexCrEVmQQqDgSB1HZXGgTeylWCrE2ZwGZzqGv0mzCZ ng== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3u11tper0c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 01 Nov 2023 00:49:46 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 1 Nov
- 2023 00:49:27 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 1 Nov 2023 00:49:27 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 603363F70BF;
-	Wed,  1 Nov 2023 00:49:23 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>, Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: [net PATCH] octeontx2: Fix klockwork and coverity issues
-Date: Wed, 1 Nov 2023 13:19:19 +0530
-Message-ID: <20231101074919.2614608-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B35063AB
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 08:13:36 +0000 (UTC)
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98963B4;
+	Wed,  1 Nov 2023 01:13:32 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VvQMaox_1698826408;
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VvQMaox_1698826408)
+          by smtp.aliyun-inc.com;
+          Wed, 01 Nov 2023 16:13:29 +0800
+Date: Wed, 1 Nov 2023 16:13:28 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net 1/3] net/smc: fix dangling sock under state
+ SMC_APPFINCLOSEWAIT
+Message-ID: <20231101081328.GE92403@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <1698810177-69740-1-git-send-email-alibuda@linux.alibaba.com>
+ <1698810177-69740-2-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: RKjGHjhU5FgotjBfbdsW46e28xIQNHV1
-X-Proofpoint-ORIG-GUID: RKjGHjhU5FgotjBfbdsW46e28xIQNHV1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-01_05,2023-10-31_03,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1698810177-69740-2-git-send-email-alibuda@linux.alibaba.com>
 
-Fix all klockwork and coverity issues reported on AF and PF/VF driver.
+On Wed, Nov 01, 2023 at 11:42:55AM +0800, D. Wythe wrote:
+>From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+>Considering scenario:
+>
+>				smc_cdc_rx_handler_rwwi
+>__smc_release
+>				sock_set_flag
+>smc_close_active()
+>sock_set_flag
+>
+>__set_bit(DEAD)			__set_bit(DONE)
+>
+>Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+>if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
+>in smc_close_passive_work:
+>
+>if (sock_flag(sk, SOCK_DEAD) &&
+>	smc_close_sent_any_close(conn)) {
+>	sk->sk_state = SMC_CLOSED;
+>} else {
+>	/* just shutdown, but not yet closed locally */
+>	sk->sk_state = SMC_APPFINCLOSEWAIT;
+>}
+>
+>Replace sock_set_flags or __set_bit to set_bit will fix this problem.
+>Since set_bit is atomic.
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
----
- .../net/ethernet/marvell/octeontx2/af/cgx.c   | 14 ++++-
- .../marvell/octeontx2/af/mcs_rvu_if.c         |  8 ++-
- .../net/ethernet/marvell/octeontx2/af/ptp.c   | 11 +++-
- .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  2 +-
- .../marvell/octeontx2/af/rvu_debugfs.c        |  8 ++-
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  2 +-
- .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  2 +-
- .../marvell/octeontx2/nic/otx2_common.c       |  8 +--
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  3 +
- .../ethernet/marvell/octeontx2/nic/otx2_reg.h | 55 ++++++++++---------
- .../marvell/octeontx2/nic/otx2_txrx.c         |  2 +-
- .../net/ethernet/marvell/octeontx2/nic/qos.c  |  7 ++-
- 12 files changed, 77 insertions(+), 45 deletions(-)
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-index 6c70c8498690..5a672888577e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
-@@ -457,12 +457,19 @@ int cgx_lmac_addr_max_entries_get(u8 cgx_id, u8 lmac_id)
- u64 cgx_lmac_addr_get(u8 cgx_id, u8 lmac_id)
- {
- 	struct cgx *cgx_dev = cgx_get_pdata(cgx_id);
--	struct lmac *lmac = lmac_pdata(lmac_id, cgx_dev);
- 	struct mac_ops *mac_ops;
-+	struct lmac *lmac;
- 	int index;
- 	u64 cfg;
- 	int id;
- 
-+	if (!cgx_dev)
-+		return 0;
-+
-+	lmac = lmac_pdata(lmac_id, cgx_dev);
-+	if (!lmac)
-+		return 0;
-+
- 	mac_ops = cgx_dev->mac_ops;
- 
- 	id = get_sequence_id_of_lmac(cgx_dev, lmac_id);
-@@ -955,6 +962,9 @@ int cgx_lmac_pfc_config(void *cgxd, int lmac_id, u8 tx_pause,
- 
- 	/* Write source MAC address which will be filled into PFC packet */
- 	cfg = cgx_lmac_addr_get(cgx->cgx_id, lmac_id);
-+	if (!cfg)
-+		return -ENODEV;
-+
- 	cgx_write(cgx, lmac_id, CGXX_SMUX_SMAC, cfg);
- 
- 	return 0;
-@@ -1617,7 +1627,7 @@ unsigned long cgx_get_lmac_bmap(void *cgxd)
- static int cgx_lmac_init(struct cgx *cgx)
- {
- 	struct lmac *lmac;
--	u64 lmac_list;
-+	u64 lmac_list = 0;
- 	int i, err;
- 
- 	/* lmac_list specifies which lmacs are enabled
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-index dfd23580e3b8..1b0b022f5493 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
-@@ -625,8 +625,8 @@ int rvu_mbox_handler_mcs_free_resources(struct rvu *rvu,
- {
- 	u16 pcifunc = req->hdr.pcifunc;
- 	struct mcs_rsrc_map *map;
-+	int rc = -EINVAL;
- 	struct mcs *mcs;
--	int rc = 0;
- 
- 	if (req->mcs_id >= rvu->mcs_blk_cnt)
- 		return MCS_AF_ERR_INVALID_MCSID;
-@@ -675,8 +675,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
- {
- 	u16 pcifunc = req->hdr.pcifunc;
- 	struct mcs_rsrc_map *map;
-+	int rsrc_id = -EINVAL, i;
- 	struct mcs *mcs;
--	int rsrc_id, i;
- 
- 	if (req->mcs_id >= rvu->mcs_blk_cnt)
- 		return MCS_AF_ERR_INVALID_MCSID;
-@@ -737,6 +737,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
- 			rsp->rsrc_cnt++;
- 		}
- 		break;
-+	default:
-+		goto exit;
- 	}
- 
- 	rsp->rsrc_type = req->rsrc_type;
-@@ -849,7 +851,7 @@ int rvu_mbox_handler_mcs_ctrl_pkt_rule_write(struct rvu *rvu,
- static void rvu_mcs_set_lmac_bmap(struct rvu *rvu)
- {
- 	struct mcs *mcs = mcs_get_pdata(0);
--	unsigned long lmac_bmap;
-+	unsigned long lmac_bmap = 0;
- 	int cgx, lmac, port;
- 
- 	for (port = 0; port < mcs->hw->lmac_cnt; port++) {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
-index bcc96eed2481..a199b1123ba7 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
-@@ -518,6 +518,7 @@ static int ptp_probe(struct pci_dev *pdev,
- 		     const struct pci_device_id *ent)
- {
- 	struct ptp *ptp;
-+	void __iomem * const *base;
- 	int err;
- 
- 	ptp = kzalloc(sizeof(*ptp), GFP_KERNEL);
-@@ -536,7 +537,15 @@ static int ptp_probe(struct pci_dev *pdev,
- 	if (err)
- 		goto error_free;
- 
--	ptp->reg_base = pcim_iomap_table(pdev)[PCI_PTP_BAR_NO];
-+	base = pcim_iomap_table(pdev);
-+	if (!base)
-+		goto error_free;
-+
-+	ptp->reg_base = base[PCI_PTP_BAR_NO];
-+	if (!ptp->reg_base) {
-+		err = -ENODEV;
-+		goto error_free;
-+	}
- 
- 	pci_set_drvdata(pdev, ptp);
- 	if (!first_ptp_block)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
-index f047185f38e0..a1a919fcda47 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
-@@ -43,7 +43,7 @@ static irqreturn_t cpt_af_flt_intr_handler(int vec, void *ptr)
- 	struct rvu *rvu = block->rvu;
- 	int blkaddr = block->addr;
- 	u64 reg, val;
--	int i, eng;
-+	int i, eng = 0;
- 	u8 grp;
- 
- 	reg = rvu_read64(rvu, blkaddr, CPT_AF_FLTX_INT(vec));
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-index bd817ee88735..307942ff1b10 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
-@@ -519,12 +519,16 @@ RVU_DEBUG_SEQ_FOPS(mcs_rx_secy_stats, mcs_rx_secy_stats_display, NULL);
- static void rvu_dbg_mcs_init(struct rvu *rvu)
- {
- 	struct mcs *mcs;
--	char dname[10];
-+	char *dname = NULL;
- 	int i;
- 
- 	if (!rvu->mcs_blk_cnt)
- 		return;
- 
-+	dname = kmalloc_array(rvu->mcs_blk_cnt, sizeof(char), GFP_KERNEL);
-+	if (!dname)
-+		return;
-+
- 	rvu->rvu_dbg.mcs_root = debugfs_create_dir("mcs", rvu->rvu_dbg.root);
- 
- 	for (i = 0; i < rvu->mcs_blk_cnt; i++) {
-@@ -568,6 +572,8 @@ static void rvu_dbg_mcs_init(struct rvu *rvu)
- 		debugfs_create_file("port", 0600, rvu->rvu_dbg.mcs_tx, mcs,
- 				    &rvu_dbg_mcs_tx_port_stats_fops);
- 	}
-+
-+	kfree(dname);
- }
- 
- #define LMT_MAPTBL_ENTRY_SIZE 16
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 23c2f2ed2fb8..2fa2ef970e88 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -5033,7 +5033,7 @@ static void nix_inline_ipsec_cfg(struct rvu *rvu, struct nix_inline_ipsec_cfg *r
- 				 int blkaddr)
- {
- 	u8 cpt_idx, cpt_blkaddr;
--	u64 val;
-+	u64 val = 0;
- 
- 	cpt_idx = (blkaddr == BLKADDR_NIX0) ? 0 : 1;
- 	if (req->enable) {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-index 16cfc802e348..b25ecd36ca61 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-@@ -1734,8 +1734,8 @@ static void npc_load_kpu_profile(struct rvu *rvu)
- 				rvu->kpu_prfl_addr = NULL;
- 			} else {
- 				kfree(rvu->kpu_fwdata);
-+				rvu->kpu_fwdata = NULL;
- 			}
--			rvu->kpu_fwdata = NULL;
- 			rvu->kpu_fwdata_sz = 0;
- 			if (retry_fwdb) {
- 				retry_fwdb = false;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 1a42bfded872..628251e940e8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -648,14 +648,14 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl, int prio, bool txschq_for
- 	} else if (lvl == NIX_TXSCH_LVL_TL4) {
- 		parent = schq_list[NIX_TXSCH_LVL_TL3][prio];
- 		req->reg[0] = NIX_AF_TL4X_PARENT(schq);
--		req->regval[0] = parent << 16;
-+		req->regval[0] = (u64)parent << 16;
- 		req->num_regs++;
- 		req->reg[1] = NIX_AF_TL4X_SCHEDULE(schq);
- 		req->regval[1] = dwrr_val;
- 	} else if (lvl == NIX_TXSCH_LVL_TL3) {
- 		parent = schq_list[NIX_TXSCH_LVL_TL2][prio];
- 		req->reg[0] = NIX_AF_TL3X_PARENT(schq);
--		req->regval[0] = parent << 16;
-+		req->regval[0] = (u64)parent << 16;
- 		req->num_regs++;
- 		req->reg[1] = NIX_AF_TL3X_SCHEDULE(schq);
- 		req->regval[1] = dwrr_val;
-@@ -670,11 +670,11 @@ int otx2_txschq_config(struct otx2_nic *pfvf, int lvl, int prio, bool txschq_for
- 	} else if (lvl == NIX_TXSCH_LVL_TL2) {
- 		parent = schq_list[NIX_TXSCH_LVL_TL1][prio];
- 		req->reg[0] = NIX_AF_TL2X_PARENT(schq);
--		req->regval[0] = parent << 16;
-+		req->regval[0] = (u64)parent << 16;
- 
- 		req->num_regs++;
- 		req->reg[1] = NIX_AF_TL2X_SCHEDULE(schq);
--		req->regval[1] = TXSCH_TL1_DFLT_RR_PRIO << 24 | dwrr_val;
-+		req->regval[1] = (u64)hw->txschq_aggr_lvl_rr_prio << 24 | dwrr_val;
- 
- 		if (lvl == hw->txschq_link_cfg_lvl) {
- 			req->num_regs++;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 6daf4d58c25d..62702ff6f3ea 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -496,6 +496,9 @@ static void otx2_pfvf_mbox_handler(struct work_struct *work)
- 	return;
- 
- inval_msg:
-+	if (!msg)
-+		return;
-+
- 	otx2_reply_invalid_msg(mbox, vf_idx, 0, msg->id);
- 	otx2_mbox_msg_send(mbox, vf_idx);
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
-index 45a32e4b49d1..e3aee6e36215 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_reg.h
-@@ -139,33 +139,34 @@
- #define	NIX_LF_CINTX_ENA_W1C(a)		(NIX_LFBASE | 0xD50 | (a) << 12)
- 
- /* NIX AF transmit scheduler registers */
--#define NIX_AF_SMQX_CFG(a)		(0x700 | (a) << 16)
--#define NIX_AF_TL1X_SCHEDULE(a)		(0xC00 | (a) << 16)
--#define NIX_AF_TL1X_CIR(a)		(0xC20 | (a) << 16)
--#define NIX_AF_TL1X_TOPOLOGY(a)		(0xC80 | (a) << 16)
--#define NIX_AF_TL2X_PARENT(a)		(0xE88 | (a) << 16)
--#define NIX_AF_TL2X_SCHEDULE(a)		(0xE00 | (a) << 16)
--#define NIX_AF_TL2X_TOPOLOGY(a)		(0xE80 | (a) << 16)
--#define NIX_AF_TL2X_CIR(a)              (0xE20 | (a) << 16)
--#define NIX_AF_TL2X_PIR(a)              (0xE30 | (a) << 16)
--#define NIX_AF_TL3X_PARENT(a)		(0x1088 | (a) << 16)
--#define NIX_AF_TL3X_SCHEDULE(a)		(0x1000 | (a) << 16)
--#define NIX_AF_TL3X_SHAPE(a)		(0x1010 | (a) << 16)
--#define NIX_AF_TL3X_CIR(a)		(0x1020 | (a) << 16)
--#define NIX_AF_TL3X_PIR(a)		(0x1030 | (a) << 16)
--#define NIX_AF_TL3X_TOPOLOGY(a)		(0x1080 | (a) << 16)
--#define NIX_AF_TL4X_PARENT(a)		(0x1288 | (a) << 16)
--#define NIX_AF_TL4X_SCHEDULE(a)		(0x1200 | (a) << 16)
--#define NIX_AF_TL4X_SHAPE(a)		(0x1210 | (a) << 16)
--#define NIX_AF_TL4X_CIR(a)		(0x1220 | (a) << 16)
--#define NIX_AF_TL4X_PIR(a)		(0x1230 | (a) << 16)
--#define NIX_AF_TL4X_TOPOLOGY(a)		(0x1280 | (a) << 16)
--#define NIX_AF_MDQX_SCHEDULE(a)		(0x1400 | (a) << 16)
--#define NIX_AF_MDQX_SHAPE(a)		(0x1410 | (a) << 16)
--#define NIX_AF_MDQX_CIR(a)		(0x1420 | (a) << 16)
--#define NIX_AF_MDQX_PIR(a)		(0x1430 | (a) << 16)
--#define NIX_AF_MDQX_PARENT(a)		(0x1480 | (a) << 16)
--#define NIX_AF_TL3_TL2X_LINKX_CFG(a, b)	(0x1700 | (a) << 16 | (b) << 3)
-+#define NIX_AF_SMQX_CFG(a)		(0x700 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_SDP_LINK_CFG(a)	(0xB10 | (u64)(a) << 16)
-+#define NIX_AF_TL1X_SCHEDULE(a)		(0xC00 | (u64)(a) << 16)
-+#define NIX_AF_TL1X_CIR(a)		(0xC20 | (u64)(a) << 16)
-+#define NIX_AF_TL1X_TOPOLOGY(a)		(0xC80 | (u64)(a) << 16)
-+#define NIX_AF_TL2X_PARENT(a)		(0xE88 | (u64)(a) << 16)
-+#define NIX_AF_TL2X_SCHEDULE(a)		(0xE00 | (u64)(a) << 16)
-+#define NIX_AF_TL2X_TOPOLOGY(a)		(0xE80 | (u64)(a) << 16)
-+#define NIX_AF_TL2X_CIR(a)		(0xE20 | (u64)(a) << 16)
-+#define NIX_AF_TL2X_PIR(a)		(0xE30 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_PARENT(a)		(0x1088 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_SCHEDULE(a)		(0x1000 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_SHAPE(a)		(0x1010 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_CIR(a)		(0x1020 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_PIR(a)		(0x1030 | (u64)(a) << 16)
-+#define NIX_AF_TL3X_TOPOLOGY(a)		(0x1080 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_PARENT(a)		(0x1288 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_SCHEDULE(a)		(0x1200 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_SHAPE(a)		(0x1210 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_CIR(a)		(0x1220 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_PIR(a)		(0x1230 | (u64)(a) << 16)
-+#define NIX_AF_TL4X_TOPOLOGY(a)		(0x1280 | (u64)(a) << 16)
-+#define NIX_AF_MDQX_SCHEDULE(a)		(0x1400 | (u64)(a) << 16)
-+#define NIX_AF_MDQX_SHAPE(a)		(0x1410 | (u64)(a) << 16)
-+#define NIX_AF_MDQX_CIR(a)		(0x1420 | (u64)(a) << 16)
-+#define NIX_AF_MDQX_PIR(a)		(0x1430 | (u64)(a) << 16)
-+#define NIX_AF_MDQX_PARENT(a)		(0x1480 | (u64)(a) << 16)
-+#define NIX_AF_TL3_TL2X_LINKX_CFG(a, b)	(0x1700 | (u64)(a) << 16 | (b) << 3)
- 
- /* LMT LF registers */
- #define LMT_LFBASE			BIT_ULL(RVU_FUNC_BLKADDR_SHIFT)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 53b2a4ef5298..04a462b3e638 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -510,7 +510,7 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
- 
- static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_poll *cq_poll)
- {
--	struct dim_sample dim_sample;
-+	struct dim_sample dim_sample = { 0 };
- 	u64 rx_frames, rx_bytes;
- 
- 	rx_frames = OTX2_GET_RX_STATS(RX_BCAST) + OTX2_GET_RX_STATS(RX_MCAST) +
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 1e77bbf5d22a..7b23120a3e60 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -153,7 +153,6 @@ static void __otx2_qos_txschq_cfg(struct otx2_nic *pfvf,
- 		num_regs++;
- 
- 		otx2_config_sched_shaping(pfvf, node, cfg, &num_regs);
--
- 	} else if (level == NIX_TXSCH_LVL_TL4) {
- 		otx2_config_sched_shaping(pfvf, node, cfg, &num_regs);
- 	} else if (level == NIX_TXSCH_LVL_TL3) {
-@@ -528,6 +527,7 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
- 	err = otx2_qos_add_child_node(parent, node);
- 	if (err) {
- 		mutex_unlock(&pfvf->qos.qos_lock);
-+		kfree(node);
- 		return ERR_PTR(err);
- 	}
- 	mutex_unlock(&pfvf->qos.qos_lock);
-@@ -1028,8 +1028,9 @@ static int otx2_qos_root_add(struct otx2_nic *pfvf, u16 htb_maj_id, u16 htb_defc
- 	new_cfg = kzalloc(sizeof(*new_cfg), GFP_KERNEL);
- 	if (!new_cfg) {
- 		NL_SET_ERR_MSG_MOD(extack, "Memory allocation error");
--		err = -ENOMEM;
--		goto free_root_node;
-+		otx2_qos_sw_node_delete(pfvf, root);
-+		mutex_destroy(&pfvf->qos.qos_lock);
-+		return -ENOMEM;
- 	}
- 	/* allocate htb root node */
- 	new_cfg->schq[root->level] = 1;
--- 
-2.25.1
-
+>---
+> net/smc/af_smc.c    | 4 ++--
+> net/smc/smc.h       | 5 +++++
+> net/smc/smc_cdc.c   | 2 +-
+> net/smc/smc_close.c | 2 +-
+> 4 files changed, 9 insertions(+), 4 deletions(-)
+>
+>diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>index abd2667..da97f94 100644
+>--- a/net/smc/af_smc.c
+>+++ b/net/smc/af_smc.c
+>@@ -275,7 +275,7 @@ static int __smc_release(struct smc_sock *smc)
+> 
+> 	if (!smc->use_fallback) {
+> 		rc = smc_close_active(smc);
+>-		sock_set_flag(sk, SOCK_DEAD);
+>+		smc_sock_set_flag(sk, SOCK_DEAD);
+> 		sk->sk_shutdown |= SHUTDOWN_MASK;
+> 	} else {
+> 		if (sk->sk_state != SMC_CLOSED) {
+>@@ -1743,7 +1743,7 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
+> 		if (new_clcsock)
+> 			sock_release(new_clcsock);
+> 		new_sk->sk_state = SMC_CLOSED;
+>-		sock_set_flag(new_sk, SOCK_DEAD);
+>+		smc_sock_set_flag(new_sk, SOCK_DEAD);
+> 		sock_put(new_sk); /* final */
+> 		*new_smc = NULL;
+> 		goto out;
+>diff --git a/net/smc/smc.h b/net/smc/smc.h
+>index 24745fd..e377980 100644
+>--- a/net/smc/smc.h
+>+++ b/net/smc/smc.h
+>@@ -377,4 +377,9 @@ void smc_fill_gid_list(struct smc_link_group *lgr,
+> int smc_nl_enable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+> int smc_nl_disable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+> 
+>+static inline void smc_sock_set_flag(struct sock *sk, enum sock_flags flag)
+>+{
+>+	set_bit(flag, &sk->sk_flags);
+>+}
+>+
+> #endif	/* __SMC_H */
+>diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+>index 89105e9..01bdb79 100644
+>--- a/net/smc/smc_cdc.c
+>+++ b/net/smc/smc_cdc.c
+>@@ -385,7 +385,7 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
+> 		smc->sk.sk_shutdown |= RCV_SHUTDOWN;
+> 		if (smc->clcsock && smc->clcsock->sk)
+> 			smc->clcsock->sk->sk_shutdown |= RCV_SHUTDOWN;
+>-		sock_set_flag(&smc->sk, SOCK_DONE);
+>+		smc_sock_set_flag(&smc->sk, SOCK_DONE);
+> 		sock_hold(&smc->sk); /* sock_put in close_work */
+> 		if (!queue_work(smc_close_wq, &conn->close_work))
+> 			sock_put(&smc->sk);
+>diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+>index dbdf03e..449ef45 100644
+>--- a/net/smc/smc_close.c
+>+++ b/net/smc/smc_close.c
+>@@ -173,7 +173,7 @@ void smc_close_active_abort(struct smc_sock *smc)
+> 		break;
+> 	}
+> 
+>-	sock_set_flag(sk, SOCK_DEAD);
+>+	smc_sock_set_flag(sk, SOCK_DEAD);
+> 	sk->sk_state_change(sk);
+> 
+> 	if (release_clcsock) {
+>-- 
+>1.8.3.1
 
