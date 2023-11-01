@@ -1,98 +1,167 @@
-Return-Path: <netdev+bounces-45502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A8D7DDA82
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 02:07:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E687DDA8B
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 02:18:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 265A2B20ED2
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 01:07:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 344A8B20E71
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 01:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B8D64B;
-	Wed,  1 Nov 2023 01:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE68964B;
+	Wed,  1 Nov 2023 01:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iF+04qsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBDE627;
-	Wed,  1 Nov 2023 01:07:19 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A041C9;
-	Tue, 31 Oct 2023 18:07:17 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0VvIt0M9_1698800833;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VvIt0M9_1698800833)
-          by smtp.aliyun-inc.com;
-          Wed, 01 Nov 2023 09:07:14 +0800
-Date: Wed, 1 Nov 2023 09:07:12 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Gerd Bayer <gbayer@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Jan Karcher <jaka@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-	Tony Lu <tonylu@linux.alibaba.com>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: fix documentation of buffer sizes
-Message-ID: <20231101010712.GD92403@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231030170343.748097-1-gbayer@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B71F62B
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 01:18:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5EE9C433C8;
+	Wed,  1 Nov 2023 01:18:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698801493;
+	bh=Nba6ylNwvuUvLsMHOnd7vDr6OTFeqrwEKUClJP8rdnA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=iF+04qsFm7WOrh/U7P0/T0+sj3jQ47DijetytK2c9/ikYhcGOQww9O7cuLDCCqkMi
+	 iNQPWVMYK7zpUARn0FxRDQ8WATBrv05Ht8J8/0fwXHVyZYiu7bV253UzA7xY+MEAJU
+	 AF/8etJSBYrnbGi7xf7xGKa7Fn8K0CFI99mc7Om+hNojGg86maoUrP//GOcf2VUutA
+	 rJegixJIvSYQX5rumxGXGn9ANhceVkMmpS2d5P0ZHtgZGzu+krYAeHgDeufOj85cra
+	 n1Drwdw+pxLUx57Z4DBpq4qrd+kTUbBEVTjT4VO3l5meByCasosCCXFzeXVj5UrM9e
+	 KF9y8OGqqMXPw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking follow up for 6.7
+Date: Tue, 31 Oct 2023 18:18:12 -0700
+Message-ID: <20231101011812.2653409-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <CAHk-=wjTWHVjEA2wfU+eHMXygyuh4Jf_tqXRxv8VnzqAPB4htg@mail.gmail.com>
+References: <CAHk-=wjTWHVjEA2wfU+eHMXygyuh4Jf_tqXRxv8VnzqAPB4htg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030170343.748097-1-gbayer@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 30, 2023 at 06:03:43PM +0100, Gerd Bayer wrote:
->Since commit 833bac7ec392 ("net/smc: Fix setsockopt and sysctl to
->specify same buffer size again") the SMC protocol uses its own
->default values for the smc.rmem and smc.wmem sysctl variables
->which are no longer derived from the TCP IPv4 buffer sizes.
->
->Fixup the kernel documentation to reflect this change, too.
->
->Fixes: 833bac7ec392 ("net/smc: Fix setsockopt and sysctl to specify same buffer size again")
->Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> Well, I had actually already merged the original pull request, and
+> then started a full allmodconfig build.
+> 
+> And because I'm off gallivanting and traveling, that takes 2h on this
+> poor little laptop, so I had left to do more fun things than watch
+> paint dry.
 
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Eish. Sorry.
 
->---
-> Documentation/networking/smc-sysctl.rst | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
->
->diff --git a/Documentation/networking/smc-sysctl.rst b/Documentation/networking/smc-sysctl.rst
->index 6d8acdbe9be1..769149d98773 100644
->--- a/Documentation/networking/smc-sysctl.rst
->+++ b/Documentation/networking/smc-sysctl.rst
->@@ -44,18 +44,16 @@ smcr_testlink_time - INTEGER
-> 
-> wmem - INTEGER
-> 	Initial size of send buffer used by SMC sockets.
->-	The default value inherits from net.ipv4.tcp_wmem[1].
-> 
-> 	The minimum value is 16KiB and there is no hard limit for max value, but
-> 	only allowed 512KiB for SMC-R and 1MiB for SMC-D.
-> 
->-	Default: 16K
->+	Default: 64KiB
-> 
-> rmem - INTEGER
-> 	Initial size of receive buffer (RMB) used by SMC sockets.
->-	The default value inherits from net.ipv4.tcp_rmem[1].
-> 
-> 	The minimum value is 16KiB and there is no hard limit for max value, but
-> 	only allowed 512KiB for SMC-R and 1MiB for SMC-D.
-> 
->-	Default: 128K
->+	Default: 64KiB
->-- 
->2.41.0
+> I pushed out my original merge. I'll pull the updates later.
+
+In case it's helpful here's a tag with just the delta described.
+Running a risk of another race condition :)
+
+
+The following changes since commit f1c73396133cb3d913e2075298005644ee8dfade:
+
+  net: pcs: xpcs: Add 2500BASE-X case in get state for XPCS drivers (2023-10-27 15:59:44 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.7-followup
+
+for you to fetch changes up to f2fbb908112311423b09cd0d2b4978f174b99585:
+
+  net: tcp: remove call to obsolete crypto_ahash_alignmask() (2023-10-31 13:11:51 -0700)
+
+----------------------------------------------------------------
+Follow up to networking PR for 6.7
+
+ - Support GRO decapsulation for IPsec ESP in UDP.
+
+ - Add a handful of MODULE_DESCRIPTION()s.
+
+ - Drop questionable alignment check in TCP AO to avoid
+   build issue after changes in the crypto tree.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Florian Westphal (4):
+      xfrm: pass struct net to xfrm_decode_session wrappers
+      xfrm: move mark and oif flowi decode into common code
+      xfrm: policy: replace session decode with flow dissector
+      xfrm: policy: fix layer 4 flowi decoding
+
+Jakub Kicinski (5):
+      net: fill in MODULE_DESCRIPTION()s in kuba@'s modules
+      net: fill in MODULE_DESCRIPTION()s under net/core
+      net: fill in MODULE_DESCRIPTION()s under net/802*
+      net: fill in MODULE_DESCRIPTION()s under drivers/net/
+      Merge tag 'ipsec-next-2023-10-28' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next
+
+Kees Cook (1):
+      xfrm: Annotate struct xfrm_sec_ctx with __counted_by
+
+Steffen Klassert (6):
+      xfrm: Use the XFRM_GRO to indicate a GRO call on input
+      xfrm: Support GRO for IPv4 ESP in UDP encapsulation
+      xfrm: Support GRO for IPv6 ESP in UDP encapsulation
+      Merge  branch 'xfrm: Support GRO decapsulation for ESP in UDP encapsulation'
+      Merge branch 'xfrm: policy: replace session decode with flow dissector'
+      xfrm Fix use after free in __xfrm6_udp_encap_rcv.
+
+Stephen Rothwell (1):
+      net: tcp: remove call to obsolete crypto_ahash_alignmask()
+
+Yue Haibing (1):
+      xfrm: Remove unused function declarations
+
+ drivers/net/amt.c                           |   1 +
+ drivers/net/dummy.c                         |   1 +
+ drivers/net/eql.c                           |   1 +
+ drivers/net/ifb.c                           |   1 +
+ drivers/net/macvtap.c                       |   1 +
+ drivers/net/netdevsim/netdev.c              |   1 +
+ drivers/net/sungem_phy.c                    |   1 +
+ drivers/net/tap.c                           |   1 +
+ drivers/net/wireless/mediatek/mt7601u/usb.c |   1 +
+ include/net/gro.h                           |   2 +-
+ include/net/ipv6_stubs.h                    |   3 +
+ include/net/xfrm.h                          |  18 +-
+ include/uapi/linux/xfrm.h                   |   3 +-
+ net/802/fddi.c                              |   1 +
+ net/802/garp.c                              |   1 +
+ net/802/mrp.c                               |   1 +
+ net/802/p8022.c                             |   1 +
+ net/802/psnap.c                             |   1 +
+ net/802/stp.c                               |   1 +
+ net/8021q/vlan.c                            |   1 +
+ net/core/dev_addr_lists_test.c              |   1 +
+ net/core/selftests.c                        |   1 +
+ net/ipv4/esp4_offload.c                     |   6 +-
+ net/ipv4/icmp.c                             |   2 +-
+ net/ipv4/ip_vti.c                           |   4 +-
+ net/ipv4/netfilter.c                        |   2 +-
+ net/ipv4/tcp_ao.c                           |   6 -
+ net/ipv4/udp.c                              |  16 ++
+ net/ipv4/xfrm4_input.c                      |  95 +++++++--
+ net/ipv6/af_inet6.c                         |   1 +
+ net/ipv6/esp6_offload.c                     |  10 +-
+ net/ipv6/icmp.c                             |   2 +-
+ net/ipv6/ip6_vti.c                          |   4 +-
+ net/ipv6/netfilter.c                        |   2 +-
+ net/ipv6/xfrm6_input.c                      | 103 ++++++++--
+ net/netfilter/nf_nat_proto.c                |   2 +-
+ net/xfrm/xfrm_input.c                       |   6 +-
+ net/xfrm/xfrm_interface_core.c              |   4 +-
+ net/xfrm/xfrm_policy.c                      | 301 ++++++++++++----------------
+ 39 files changed, 362 insertions(+), 248 deletions(-)
 
