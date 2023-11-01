@@ -1,105 +1,267 @@
-Return-Path: <netdev+bounces-45548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B9A87DE134
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 14:04:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4717DE158
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 14:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAA582810E9
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 13:04:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD5042811AE
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 13:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8135412B75;
-	Wed,  1 Nov 2023 13:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2417312B95;
+	Wed,  1 Nov 2023 13:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUtQi+3k"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2ghNnb9O"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0FF134A3
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 13:04:26 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0964ADC
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 06:04:25 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32dbbf3c782so491176f8f.1
-        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 06:04:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698843863; x=1699448663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ddS1dzfDb0y0/Ppu2eB1oC7DBMR7a5pZAW8Ut40Xh0=;
-        b=MUtQi+3kPWDs3mOVor8uTvzZNHzLwbH88DgoZC9OqGIWdd/RQuIGcD38NVHOJTwnyR
-         m7MFMMSzsGikprg7VBp9McCNyjZkAYy8gH6vINhmPa6rUppXBLUgn2vqx1GfcB/5aFxx
-         VMUduHqSHobaOlspnXG57Hi2rRakFM+moly65MF4zW2co7qOCcOdw3yQ8GfmrJR1iDzD
-         k9nRwUh9A/3zpe4u9I8IyHDHu8ImV2moHHDgRzaUzTV/X2hUrAU5dswADydPHuIuZn0r
-         Hr1w0zglVztoB4Rp/n7n88VaqtsLlY8g6LmCZpNXum/1EyvY+9wPgngavo91f56sVcfn
-         mIrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698843863; x=1699448663;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3ddS1dzfDb0y0/Ppu2eB1oC7DBMR7a5pZAW8Ut40Xh0=;
-        b=IjmF5RHzrnSWk8e1SFd7nZkAIGJXnMAyFpc2BgkSBVpUcrR4MkTjsKA/TGnCOdGjQK
-         aBerjo31/5r7OrhcQ5/95wBrQSsPESZsIk5JVsYEvT/iIbMjGeLmX4oYv7Shxq3njYes
-         foa8DLFgmEc1ZV6eHyMfDKrqYrKMyp3FjhLNWwIbOfXevTJWi1CvDx108p4TEQC+1dsu
-         BaiOCV4B53sUODYjELM9Wa0/HR9CzWYcglQ/I/Ex214myfbQoHrVmarU2aW+7gVSiso6
-         unfxV75gmhEadlP8DiLuwl/R/9NZ1kZ2pXStKGSNOP7hbkx9q/FBQj/bwkEvHeDOfzWE
-         WkrA==
-X-Gm-Message-State: AOJu0Yyfhnsn5oflLqeR4gxjk2VGbpVP73bjicaZlaAmYh4HE/mXtSJM
-	owVP+RAuippthvxI46mG1cD3TM1GL6049Q==
-X-Google-Smtp-Source: AGHT+IGUXluReWqw43i8lrprfraA9y2qyAirP25QltzE8e5Ru0OR6aCqD8SmNCNB424ZFX8eHRd4zA==
-X-Received: by 2002:a05:6000:1544:b0:32f:7502:fba9 with SMTP id 4-20020a056000154400b0032f7502fba9mr3156244wry.1.1698843863272;
-        Wed, 01 Nov 2023 06:04:23 -0700 (PDT)
-Received: from localhost.localdomain (buscust41-118.static.cytanet.com.cy. [212.31.107.118])
-        by smtp.gmail.com with ESMTPSA id s8-20020a05600c45c800b004064ac107cfsm1500108wmo.39.2023.11.01.06.04.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 06:04:22 -0700 (PDT)
-From: George Shuklin <george.shuklin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: George Shuklin <george.shuklin@gmail.com>
-Subject: [PATCH] [PATCH net] tg3: power down device only on SYSTEM_POWER_OFF
-Date: Wed,  1 Nov 2023 15:04:18 +0200
-Message-ID: <20231101130418.44164-1-george.shuklin@gmail.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E6AAEA6;
+	Wed,  1 Nov 2023 13:13:19 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDD95F7;
+	Wed,  1 Nov 2023 06:13:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=M+45Cj+tlJeBIKbQjG4guIFlM9iJ4DhgslzHQZ4dQoQ=; b=2ghNnb9OFRnFp3yANrj+Cgbehf
+	yXJwnwpkjmmah0/cU5QPbq08RYscc9du4ze3KitcNM4+NhZbR+qhPUtr4asIZplqCwwN5da10Q/zo
+	AIK/a6WeqS19FMGu//86WpHT4BOCA/c/qCoUatVICbTlKLjyBaKojfaYqOPPdKUQimAw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qyB1t-000gf4-2l; Wed, 01 Nov 2023 14:13:05 +0100
+Date: Wed, 1 Nov 2023 14:13:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Robert Marko <robimarko@gmail.com>
+Subject: Re: [net-next PATCH v2 1/2] net: phy: aquantia: add firmware load
+ support
+Message-ID: <4b536ad3-2112-4f28-90e4-586b5745be20@lunn.ch>
+References: <20231101123608.11157-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231101123608.11157-1-ansuelsmth@gmail.com>
 
-Dell R650xs servers hangs if tg3 driver calls tg3_power_down.
+On Wed, Nov 01, 2023 at 01:36:07PM +0100, Christian Marangi wrote:
+> From: Robert Marko <robimarko@gmail.com>
+> 
+> Aquantia PHY-s require firmware to be loaded before they start operating.
+> It can be automatically loaded in case when there is a SPI-NOR connected
+> to Aquantia PHY-s or can be loaded from the host via MDIO.
+> 
+> This patch adds support for loading the firmware via MDIO as in most cases
+> there is no SPI-NOR being used to save on cost.
+> Firmware loading code itself is ported from mainline U-boot with cleanups.
+> 
+> The firmware has mixed values both in big and little endian.
+> PHY core itself is big-endian but it expects values to be in little-endian.
+> The firmware is little-endian but CRC-16 value for it is stored at the end
+> of firmware in big-endian.
+> 
+> It seems the PHY does the conversion internally from firmware that is
+> little-endian to the PHY that is big-endian on using the mailbox
+> but mailbox returns a big-endian CRC-16 to verify the written data
+> integrity.
+> 
+> Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Robert Marko <robimarko@gmail.com>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> Changes v2:
+> - Move out of RFC
 
-This happens only if network adapters (BCM5720 for R650xs) were
-initialized using SNP (e.g. by booting ipxe.efi).
+Actually, since we are in the merge window, RFC would be correct.
 
-This is partial revert of commit 2ca1c94ce0b.
+> - Address sanity check for offsets
+> - Add additional comments on firmware load check
+> - Fix some typo
+> - Capitalize CRC in comments
+> - Rename load_sysfs to load_fs
+> 
+>  drivers/net/phy/Kconfig         |   1 +
+>  drivers/net/phy/aquantia_main.c | 304 ++++++++++++++++++++++++++++++++
+>  2 files changed, 305 insertions(+)
+> 
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 421d2b62918f..46c7194efcea 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -98,6 +98,7 @@ config ADIN1100_PHY
+>  
+>  config AQUANTIA_PHY
+>  	tristate "Aquantia PHYs"
+> +	select CRC_CCITT
+>  	help
+>  	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+>  
+> diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
+> index 334a6904ca5a..0f1b8d75cca0 100644
+> --- a/drivers/net/phy/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia_main.c
+> @@ -12,6 +12,10 @@
+>  #include <linux/delay.h>
+>  #include <linux/bitfield.h>
+>  #include <linux/phy.h>
+> +#include <linux/of.h>
+> +#include <linux/firmware.h>
+> +#include <linux/crc-ccitt.h>
+> +#include <linux/nvmem-consumer.h>
+>  
+>  #include "aquantia.h"
+>  
+> @@ -92,10 +96,40 @@
+>  #define MDIO_C22EXT_STAT_SGMII_TX_RUNT_FRAMES		0xd31b
+>  
+>  /* Vendor specific 1, MDIO_MMD_VEND1 */
+> +#define VEND1_GLOBAL_SC				0x0
+> +#define VEND1_GLOBAL_SC_SOFT_RESET		BIT(15)
+> +#define VEND1_GLOBAL_SC_LOW_POWER		BIT(11)
+> +
+>  #define VEND1_GLOBAL_FW_ID			0x0020
+>  #define VEND1_GLOBAL_FW_ID_MAJOR		GENMASK(15, 8)
+>  #define VEND1_GLOBAL_FW_ID_MINOR		GENMASK(7, 0)
+>  
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE1			0x0200
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_EXECUTE		BIT(15)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE		BIT(14)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET	BIT(12)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE1_BUSY		BIT(8)
+> +
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE2			0x0201
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE3			0x0202
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK	GENMASK(15, 0)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK, (u16)((x) >> 16))
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE4			0x0203
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK	GENMASK(15, 2)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK, (u16)(x))
+> +
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE5			0x0204
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK	GENMASK(15, 0)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK, (u16)((x) >> 16))
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE6			0x0205
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK	GENMASK(15, 0)
+> +#define VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE6_LSW_DATA_MASK, (u16)(x))
+> +
+> +#define VEND1_GLOBAL_CONTROL2			0xc001
+> +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_RST	BIT(15)
+> +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD	BIT(6)
+> +#define VEND1_GLOBAL_CONTROL2_UP_RUN_STALL	BIT(0)
+> +
+>  #define VEND1_GLOBAL_GEN_STAT2			0xc831
+>  #define VEND1_GLOBAL_GEN_STAT2_OP_IN_PROG	BIT(15)
+>  
+> @@ -152,6 +186,30 @@
+>  #define AQR107_OP_IN_PROG_SLEEP		1000
+>  #define AQR107_OP_IN_PROG_TIMEOUT	100000
+>  
+> +#define UP_RESET_SLEEP		100
+> +
+> +/* addresses of memory segments in the phy */
+> +#define DRAM_BASE_ADDR		0x3FFE0000
+> +#define IRAM_BASE_ADDR		0x40000000
+> +
+> +/* firmware image format constants */
+> +#define VERSION_STRING_SIZE		0x40
+> +#define VERSION_STRING_OFFSET		0x0200
+> +/* primary offset is written at an offset from the start of the fw blob */
+> +#define PRIMARY_OFFSET_OFFSET		0x8
+> +/* primary offset needs to be then added to a base offset */
+> +#define PRIMARY_OFFSET_SHIFT		12
+> +#define PRIMARY_OFFSET(x)		((x) << PRIMARY_OFFSET_SHIFT)
+> +#define HEADER_OFFSET			0x300
+> +
+> +struct aqr_fw_header {
+> +	u32 padding;
+> +	u8 iram_offset[3];
+> +	u8 iram_size[3];
+> +	u8 dram_offset[3];
+> +	u8 dram_size[3];
+> +} __packed;
+> +
+>  struct aqr107_hw_stat {
+>  	const char *name;
+>  	int reg;
+> @@ -677,6 +735,166 @@ static int aqr107_wait_processor_intensive_op(struct phy_device *phydev)
+>  	return 0;
+>  }
+>  
+> +/* load data into the phy's memory */
+> +static int aquantia_load_memory(struct phy_device *phydev, u32 addr,
+> +				const u8 *data, size_t len)
+> +{
 
-The actual problem is on Dell side, but this fix allow servers
-to come back alive after reboot.
+> +	for (pos = 0; pos < len; pos += min(sizeof(u32), len - pos)) {
+> +		u32 word = 0;
+> +
+> +		memcpy(&word, data + pos, min(sizeof(u32), len - pos));
+
+Rather than do a memcpy, use the get_unaligned_ macros. They might map
+to a memcpy(), but some architectures can do unaligned accesses
+without problems.
+
+> +static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size)
+> +{
+> +	const struct aqr_fw_header *header;
+> +	u32 iram_offset = 0, iram_size = 0;
+> +	u32 dram_offset = 0, dram_size = 0;
+> +	char version[VERSION_STRING_SIZE];
+> +	u16 calculated_crc, read_crc;
+> +	u32 primary_offset = 0;
+> +	int ret;
+> +
+> +	/* extract saved CRC at the end of the fw */
+> +	memcpy(&read_crc, data + size - 2, sizeof(read_crc));
+
+Say size == 1. You just had a buffer underrun.
+
+> +	/* CRC is saved in big-endian as PHY is BE */
+> +	read_crc = be16_to_cpu(read_crc);
+> +	calculated_crc = crc_ccitt_false(0, data, size - 2);
+> +	if (read_crc != calculated_crc) {
+> +		phydev_err(phydev, "bad firmware CRC: file 0x%04x calculated 0x%04x\n",
+> +			   read_crc, calculated_crc);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Get the primary offset to extract DRAM and IRAM sections. */
+> +	memcpy(&primary_offset, data + PRIMARY_OFFSET_OFFSET, sizeof(u16));
+
+What if PRIMARY_OFFSET_OFFSET + sizeof(u16) is greater than size? A
+buffer overrun.
+
+Assume the firmware is evil and is trying to hack you. Always test
+everything.
+
+I would suggest some helpers, something like
+
+int aqr_fw_get_u16(const u8 *data, size_t size, size_t offset, u16 *value)
+
+Check that offset + sizeof(u16) is within the firmware, and if not return -EINVAL.
+Otherwise set *value to the u16 from the firmware and return 0.
+
+This is where Rust would be nice :-)
+
+	Andrew
+
 ---
- drivers/net/ethernet/broadcom/tg3.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 14b311196b8f..22b00912f7ac 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -18078,7 +18078,8 @@ static void tg3_shutdown(struct pci_dev *pdev)
- 	if (netif_running(dev))
- 		dev_close(dev);
- 
--	tg3_power_down(tp);
-+	if (system_state == SYSTEM_POWER_OFF)
-+		tg3_power_down(tp);
- 
- 	rtnl_unlock();
- 
--- 
-2.42.0
-
+pw-bot: cr
 
