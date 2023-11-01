@@ -1,184 +1,127 @@
-Return-Path: <netdev+bounces-45579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA087DE6BB
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:24:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091297DE6BD
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:27:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79D8E1C20C59
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:24:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38D121C20BC9
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 20:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032E51B27B;
-	Wed,  1 Nov 2023 20:24:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA741B26F;
+	Wed,  1 Nov 2023 20:27:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGAGQBd7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFxX+nmj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53D6F13FF0
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 20:24:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7E90C1
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 13:24:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698870251;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sOSUTYODY3s3dQC+LMM2Wx0F9jbAg04FBi/zoSh47ZA=;
-	b=MGAGQBd70qeKAUILdfpNhJ7nJdTkhwNJUZLI8BSmuEwhqdWIPIf7+QbUA+LuKSxQop5IcW
-	KW0Lr/a4jqbYoMkAIlH3uLdZdjaCke0wRhlVR+gUsEHxQMIuX6bSoz1M1+ILFSM8xtJSqt
-	jkanc1DHI2+CWmBEFPixz7HzfypeF+0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-psFQYNJxPYC0ZuysJrnt1Q-1; Wed, 01 Nov 2023 16:24:08 -0400
-X-MC-Unique: psFQYNJxPYC0ZuysJrnt1Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8588185A780;
-	Wed,  1 Nov 2023 20:24:07 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.94])
-	by smtp.corp.redhat.com (Postfix) with SMTP id 7436D1121308;
-	Wed,  1 Nov 2023 20:24:05 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-	oleg@redhat.com; Wed,  1 Nov 2023 21:23:06 +0100 (CET)
-Date: Wed, 1 Nov 2023 21:23:03 +0100
-From: Oleg Nesterov <oleg@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather
- than read_seqbegin_or_lock()
-Message-ID: <20231101202302.GB32034@redhat.com>
-References: <20231027095842.GA30868@redhat.com>
- <1952182.1698853516@warthog.procyon.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7F214AAE
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 20:27:06 +0000 (UTC)
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29813110
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 13:27:02 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id 3f1490d57ef6-da2e786743aso198415276.0
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 13:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698870421; x=1699475221; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Od7geAUO03xnUMzUzl75DCFJAJ0NbP3Lvnn4+QKHjsU=;
+        b=fFxX+nmjf8auP6ELv8OU+J7F/2kaXNgndRo7QT3fxgez8gbPJp5hH1iJArQ6TKdCdR
+         zh6VPgLjVOz73GtcDryexoYD8QHZxn8wRkyR3pz7NWI0CsGFsurlUmU1582zuUKO82RG
+         k2z0U3o0oziyrmw7F+CaQO1xFbSMvkDtg0aaCycBMfaLIdLETmCU5PV/65RJciVPr3Ud
+         5fQUAldGRCP9Py0rzLFRynEc6BiWSuri/F21X9wpqF/VNJSNld+yPQmJhGqPwtu+K3QF
+         DQXvjmzgRs/uUMAAL48tcemFt48d7BBWCjPXvFdBpMZsVOZfeK8xv/NzR78hLup8l63S
+         ZWiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698870421; x=1699475221;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Od7geAUO03xnUMzUzl75DCFJAJ0NbP3Lvnn4+QKHjsU=;
+        b=PjBGXbFcZMzk8tgbY9Og4fdcPo3VI46x+D5v+pQVaXaWJdBDkbmISIXTtlr5sKYhqs
+         kSijHyliPpuOaH483i88MqJ0KoBjWne3ITLl1/53IByKgfkXrKr147wDHZFRJILqhTmO
+         8G2ru0OyyIXwEvkF5cLiEGYB8+OOVZdawWjQiom42T24SSHW2/i6Mwp3q0gjVCU+JOo+
+         vqIMId3pYc2OwdSNr7iwshh1hRR+VlZWkm3psUlZWwQlGSFYjKMhPRl2hYeqDZzNBfVP
+         U8WTu/wbrQS84AqMJyp9P0lpyLA/4jETnALWIz4YNxKZnZA5Kr4lbKiMd/a3SVkUso4e
+         MIJA==
+X-Gm-Message-State: AOJu0Yw47beVtjSbu2m1/QB+5rTy/eBwHlyd9vzXUMIJS5hRYAimelbC
+	w/RwXyHILY8T2gMUIr3hrECA0WEefr025okWKw/PFQ==
+X-Google-Smtp-Source: AGHT+IERUS9wZpG0G9tTSAI7ntlLEE1Up8/dHJ77FkgP7CXWZVBWN2fratkaV2J3fGu67QsCNqw7x/nnpRe4KxM4H2w=
+X-Received: by 2002:a25:40c7:0:b0:d9b:9aeb:8c26 with SMTP id
+ n190-20020a2540c7000000b00d9b9aeb8c26mr14111496yba.40.1698870421285; Wed, 01
+ Nov 2023 13:27:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1952182.1698853516@warthog.procyon.org.uk>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
+ <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
+ <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
+ <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com> <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
+In-Reply-To: <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Wed, 1 Nov 2023 21:26:50 +0100
+Message-ID: <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/01, David Howells wrote:
->
-> Oleg Nesterov <oleg@redhat.com> wrote:
->
-> > read_seqbegin_or_lock() makes no sense unless you make "seq" odd
-> > after the lockless access failed.
->
-> I think you're wrong.
+On Wed, Nov 1, 2023 at 1:35=E2=80=AFPM Luiz Angelo Daros de Luca
+<luizluca@gmail.com> wrote:
 
-I think you missed the point ;)
+> Sorry but I noticed no issues:
 
-> write_seqlock() turns it odd.
+Don't be sorry about that, it's good news because now I know
+where to look, i.e. in the ethernet controller.
 
-It changes seqcount_t->sequence but not "seq" so this doesn't matter.
+> My device is using
+> https://github.com/luizluca/openwrt/tree/ath79_dsa_prep%2Bdevices . In
+> summary, kernel 6.1 with openwrt generic patches and the
+> reset-controller patch I sent net-next recently.
 
-> For instance, if the read lock is taken first:
->
-> 	sequence seq	CPU 1				CPU 2
-> 	======= =======	===============================	===============
-> 	0
-> 	0	0	seq = 0  MUST BE EVEN
+Looking good to me.
 
-This is correct,
+> [    3.888540] realtek-smi switch: found an RTL8366RB switch
+> [    3.952366] realtek-smi switch: RTL5937 ver 3 chip found
 
-> ACCORDING TO DOC
+Same version as mine too.
 
-documentation is wrong, please see
+> [    3.967086] realtek-smi switch: set MAC: 42:E4:F5:XX:XX:XX
 
-	[PATCH 1/2] seqlock: fix the wrong read_seqbegin_or_lock/need_seqretry documentation
-	https://lore.kernel.org/all/20231024120808.GA15382@redhat.com/
+Unrelated: I have seen other DSA switches "inherit" the MAC of the
+conduit interface (BRCM). I wonder if we could do that too instead
+of this random MAC number. Usually the conduit interface has a
+properly configured MAC.
 
-> 	0	0	read_seqbegin_or_lock() [lockless]
-> 			...
-> 	1	0					write_seqlock()
-> 	1	0	need_seqretry() [seq=even; sequence!=seq: retry]
+> [    3.976779] realtek-smi switch: missing child interrupt-controller nod=
+e
+> [    3.983455] realtek-smi switch: no interrupt support
+> [    4.158891] realtek-smi switch: no LED for port 5
 
-Yes, if CPU_1 races with write_seqlock() need_seqretry() returns true,
+Are the LEDs working? My device has no LEDs so I have never
+tested it, despite I coded it. (Also these days we can actually
+support each LED individually configured from device tree using
+the LED API, but that would be quite a bit of code, so only some
+fun for the aspiring developer...)
 
-> 	1	1	read_seqbegin_or_lock() [exclusive]
+> Maybe the ag71xx driver is doing something differently.
 
-No. "seq" is still even, so read_seqbegin_or_lock() won't do read_seqlock_excl(),
-it will do
+I'll look at it!
 
-	seq = read_seqbegin(lock);
-
-again.
-
-> Note that it spins in __read_seqcount_begin() until we get an even seq,
-> indicating that no write is currently in progress - at which point we can
-> perform a lockless pass.
-
-Exactly. And this means that "seq" is always even.
-
-> > See thread_group_cputime() as an example, note that it does nextseq = 1 for
-> > the 2nd round.
->
-> That's not especially convincing.
-
-See also the usage of read_seqbegin_or_lock() in fs/dcache.c and fs/d_path.c.
-All other users are wrong.
-
-Lets start from the very beginning. This code does
-
-        int seq = 0;
-        do {
-                read_seqbegin_or_lock(service_conn_lock, &seq);
-
-                do_something();
-
-        } while (need_seqretry(service_conn_lock, seq));
-
-        done_seqretry(service_conn_lock, seq);
-
-Initially seq is even (it is zero), so read_seqbegin_or_lock(&seq) does
-
-	*seq = read_seqbegin(lock);
-
-and returns. Note that "seq" is still even.
-
-Now. If need_seqretry(seq) detects the race with write_seqlock() it returns
-true but it does NOT change this "seq", it is still even. So on the next
-iteration read_seqbegin_or_lock() will do
-
-	*seq = read_seqbegin(lock);
-
-again, it won't take this lock for writing. And again, seq will be even.
-And so on.
-
-And this means that the code above is equivalent to
-
-	do {
-		seq = read_seqbegin(service_conn_lock);
-
-		do_something();
-
-	} while (read_seqretry(service_conn_lock, seq));
-
-and this is what this patch does.
-
-Yes this is confusing. Again, even the documentation is wrong! That is why
-I am trying to remove the misuse of read_seqbegin_or_lock(), then I am going
-to change the semantics of need_seqretry() to enforce the locking on the 2nd
-pass.
-
-Oleg.
-
+Thanks a lot Luiz,
+Linus Walleij
 
