@@ -1,88 +1,91 @@
-Return-Path: <netdev+bounces-45588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D6427DE756
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 22:22:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3277DE77A
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 22:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1B0BB20CE8
-	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:22:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBB77B20DFC
+	for <lists+netdev@lfdr.de>; Wed,  1 Nov 2023 21:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B921818E2A;
-	Wed,  1 Nov 2023 21:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C381B290;
+	Wed,  1 Nov 2023 21:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfPUQ2Nc"
+	dkim=pass (2048-bit key) header.d=selfnet.de header.i=@selfnet.de header.b="sDticAD4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8FD19BA1
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 21:22:39 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11E1D127
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 14:22:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1698873757;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E36847A
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 21:43:04 +0000 (UTC)
+Received: from mail-1.server.selfnet.de (mail-1.server.selfnet.de [141.70.126.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B938C2;
+	Wed,  1 Nov 2023 14:43:00 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 414A640B22;
+	Wed,  1 Nov 2023 22:42:53 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=selfnet.de; s=selfnet;
+	t=1698874975;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j4Q5+IwvvLZciE9qd6dWmjNxBjBLvEzq9VGta2vDxk4=;
-	b=DfPUQ2NcDCxE0extyQGpHKWkgsxsL95Et5Xe2YVJO2CGvdLxAvCi9nb13xFoBEOurLkW6g
-	FkyYY+Kv7k7N/V/vY8EunmqYGb8u2Q3/1dbEsveHseEKcVMbpZDvEWTSeTO/JqZ9fLfitx
-	0m0Pme8188J1Kqrkw0dMHn6f+mXWRJE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-532-0sCK311YMxGieL5ndhB_xg-1; Wed, 01 Nov 2023 17:22:33 -0400
-X-MC-Unique: 0sCK311YMxGieL5ndhB_xg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 55D8C101A529;
-	Wed,  1 Nov 2023 21:22:32 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E7CC91C060BA;
-	Wed,  1 Nov 2023 21:22:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20231101204023.GC32034@redhat.com>
-References: <20231101204023.GC32034@redhat.com> <20231027095842.GA30868@redhat.com> <1952182.1698853516@warthog.procyon.org.uk> <20231101202302.GB32034@redhat.com>
-To: Oleg Nesterov <oleg@redhat.com>
-Cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Alexander Viro <viro@zeniv.linux.org.uk>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Chuck Lever <chuck.lever@oracle.com>, linux-afs@lists.infradead.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] rxrpc_find_service_conn_rcu: use read_seqbegin() rather than read_seqbegin_or_lock()
+	bh=va3XCjklqhVnk8nRt7rwHJhvzQs626rlhIiOy82dkiU=;
+	b=sDticAD4B4yy/EtzxiuuGt8WH1tpeIDa7IMcixC4f82xDYP85913Nbpoy8hbt6CiBI+JSg
+	fwMeQCB/No5AW7/bTUHgwF+2vOnA1KB8zqebeCMD81EzpxQEOZtUsHw5sm9i3lirC+ct1u
+	dw+Hiati+o1Mgu+23rIhLXTvw0mGFmIOfH6NC8TCns3sHrMmCq2ZxXyGHsuWotJ9pDVXFZ
+	6xLxlfZQaLXhjnhJphd1M8rQa11F1yR4H0j10O1iYox1zD4qUxlsY6VXNV5Vp5lFXswwDo
+	Drz0CzhjjFi88WbtqT9izTsDql7hICRHd8GIH13WAg1uX02F1wbkdguNIayRfg==
+Authentication-Results: mail-1.server.selfnet.de;
+	auth=pass smtp.auth=marcovr smtp.mailfrom=marcovr@selfnet.de
+From: Marco von Rosenberg <marcovr@selfnet.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: broadcom: Wire suspend/resume for BCM54612E
+Date: Wed, 01 Nov 2023 22:42:52 +0100
+Message-ID: <5414570.Sb9uPGUboI@5cd116mnfx>
+In-Reply-To: <9cb4f059-edea-4c81-9ee4-e6020cccb8a5@lunn.ch>
+References:
+ <20231030225446.17422-1-marcovr@selfnet.de>
+ <9cb4f059-edea-4c81-9ee4-e6020cccb8a5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1959104.1698873750.1@warthog.procyon.org.uk>
-Date: Wed, 01 Nov 2023 21:22:30 +0000
-Message-ID: <1959105.1698873750@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Oleg Nesterov <oleg@redhat.com> wrote:
+On Tuesday, October 31, 2023 1:31:11 AM CET Andrew Lunn wrote:
+> Are we talking about a device which as been suspended? The PHY has
+> been left running because there is no suspend callback? Something then
+> triggers a resume. The bootloader then suspends the active PHY? Linux
+> then boots, detects its a resume, so does not touch the hardware
+> because there is no resume callback? The suspended PHY is then
+> useless.
 
-> Just none of read_seqbegin_or_lock/need_seqretry/done_seqretry
-> helpers make any sense in this code.
+Hi Andrew,
 
-I disagree.  I think in at least a couple of cases I do want a locked second
-path - ideally locked shared if seqlock can be made to use an rwlock instead
-of a spinlock.
+thanks for your feedback. I guess a bit of context is missing here. The issue 
+has nothing to do with an ordinary suspension of the OS. The main point is 
+that on initial power-up, the bootloader suspends the PHY before booting 
+Linux. With a resume callback defined, Linux would call it on boot and make the 
+PHY usable. However, since there is no resume callback defined for this PHY, 
+Linux doesn't touch the hardware and thus the PHY is not usable.
+So this specific issue is primarily solved by adding the resume callback. The 
+suspend callback is just added for completeness.
 
-David
+Does this clarify the issue? If so, I'll adjust the commit message and submit
+an updated patch.
+
+	Marco
+
 
 
