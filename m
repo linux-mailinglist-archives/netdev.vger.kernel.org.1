@@ -1,112 +1,97 @@
-Return-Path: <netdev+bounces-45717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A897DF275
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:32:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1CB77DF2A4
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:39:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C0BD1C20E69
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:32:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D09441C20EBA
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7EA13AF9;
-	Thu,  2 Nov 2023 12:32:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213492FB6;
+	Thu,  2 Nov 2023 12:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efmsZab6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wLOyVWzd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825DE18E2D
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:32:36 +0000 (UTC)
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2225F137;
-	Thu,  2 Nov 2023 05:32:35 -0700 (PDT)
-Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso1440639a12.3;
-        Thu, 02 Nov 2023 05:32:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698928353; x=1699533153; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pM8zlt4obzxoJwrjk3uA0SX3/4WusjoDm/ScOgDY3EQ=;
-        b=efmsZab6cESdm9WKcEjMxynzAg0I/RqXRTgAXIEuHgc+cKkoLjgna59bd0+C+HXlc7
-         q0i5Z97FbVP7InT9Dz6vgyBaBKSOgxT88ls71Rd4W/26R2v53hydht8eyKo0+BNii7ks
-         i3lVg5jVREmrvypjFxx7b58kC0z2ksxLUcY7PHAkBVoeLlUQMcjoh8iCOZr7Sokevryu
-         lbqfdpcg5MFUvI+OctynNmTadQrUlWNcxGYK2fklzp5J7j4+0KIm42k5TQwElw9JoyQe
-         7CbH8ITZya8K2iuZytuT60IWtwSR/Bpe4njbRgMKOo/9yz8pi3FhaudtRPgB7DwTNn8J
-         +jBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698928353; x=1699533153;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pM8zlt4obzxoJwrjk3uA0SX3/4WusjoDm/ScOgDY3EQ=;
-        b=l635X4WuRXvlPL8PL5uFZNn6688uvHMLa7XF4M4YcjGHSPjora38HoHUDVtZr+g/0G
-         87oojnyUhWpTPg4tFe21PqxkF0go46+3Ad2siFJtfFZjEqECK1RHRpmufFT9eLlZ5mK9
-         BLppb/bFKjgz9kgmqRtlYjp81V30jBas752QwGsSkzQMEB48RAgNq/brpwwbvX0Jgmrx
-         EIEHHrQo0qm9opV7Sjkas+R9KA2B+dcHaQkpyWBDF+D1ulGtvoOH/M+UnQ7iVsp3NVcm
-         2NbECBK5XqqmA/j2h7mOevUymFvi0jb83C0LKqlAtIZugCMYrJdQLGOYnlS8JQ4iV74b
-         muXg==
-X-Gm-Message-State: AOJu0YzhayVrZVBgN5CgoKTBvRUYwPyXR9MDz0qPfQXzKJo997e5fIoI
-	rI7wrw7b317fWcTUaU6MKjM=
-X-Google-Smtp-Source: AGHT+IGpWEQw/lrAY3504ljM8AOISqQkQ25WLINqL0dId7TMKisUKJ2cfbrp1dPqiVaJUysFZFPlCQ==
-X-Received: by 2002:a17:907:608a:b0:9a5:7f99:be54 with SMTP id ht10-20020a170907608a00b009a57f99be54mr4395989ejc.67.1698928353180;
-        Thu, 02 Nov 2023 05:32:33 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id jx3-20020a170906ca4300b009930c80b87csm1104868ejb.142.2023.11.02.05.32.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 05:32:32 -0700 (PDT)
-Date: Thu, 2 Nov 2023 14:32:30 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231102123230.luoyrh2j4r4bbwjf@skbuf>
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
- <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf>
- <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf>
- <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <20231031163439.tqab5axhk5q2r62i@skbuf>
- <CACRpkdb=16uLhsXhktLCwUByDAMv9Arg2zzCA+oJW2HBJ35-Bg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0907863AD;
+	Thu,  2 Nov 2023 12:39:31 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 616D918A;
+	Thu,  2 Nov 2023 05:39:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=TIQojWmE9MxmAPu4pmyVMZLAi3i+e6rSjQXCU7X4YpY=; b=wLOyVWzdffZ8kcZX/6Ys3nEbse
+	myM3WjCJSuj+r5vPeouDkpm2JbV6fEKka8u7SxZhQ6P2wrdhh3luyxWDwjBApw2IGeXfP3MJUZn+i
+	PmNaGyoYQQ7MjLJSSb66v2oUTnAKON8bv3cCDXlcRDTqoELixgcF70JeADqxhB0ozSf4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qyWyS-000kd6-Az; Thu, 02 Nov 2023 13:39:00 +0100
+Date: Thu, 2 Nov 2023 13:39:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?Q?Ram=F3n?= Nordin Rodriguez <ramon.nordin.rodriguez@ferroamp.se>
+Cc: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	corbet@lwn.net, steen.hegelund@microchip.com, rdunlap@infradead.org,
+	horms@kernel.org, casper.casan@gmail.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, horatiu.vultur@microchip.com,
+	Woojung.Huh@microchip.com, Nicolas.Ferre@microchip.com,
+	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
+Subject: Re: [PATCH net-next v2 8/9] microchip: lan865x: add driver support
+ for Microchip's LAN865X MACPHY
+Message-ID: <f95b42ef-b7e0-44dc-b7c8-9353e9edc2df@lunn.ch>
+References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
+ <20231023154649.45931-9-Parthiban.Veerasooran@microchip.com>
+ <ZUOUGf-PMGo8z1s-@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdb=16uLhsXhktLCwUByDAMv9Arg2zzCA+oJW2HBJ35-Bg@mail.gmail.com>
+In-Reply-To: <ZUOUGf-PMGo8z1s-@debian>
 
-On Tue, Oct 31, 2023 at 08:02:29PM +0100, Linus Walleij wrote:
-> On Tue, Oct 31, 2023 at 5:34 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> > So on the gemini-dlink-dir-685.dts platform, you can also use &gmac1 as
-> > a plain Ethernet port, right?
+> 	spe1: ethernet@1{
+> 		compatible = "microchip,lan865x";
+> 		reg = <1>;
+> 		interrupt-parent = <&gpio5>;
+> 		interrupts = <0 IRQ_TYPE_EDGE_FALLING>;
+> 		spi-max-frequency = <50000000>;
+
+That is a pretty high frequency. It is actually running at that speed?
+
+Have you tried lower speed?
+
+> 		oa-tc6{
+> 			#address-cells = <1>;
+> 			#size-cells = <0>;
+> 			oa-cps = <32>;
+> 			oa-prote;
+> 			oa-dprac;
+> 		};
+> 	};
+> };
 > 
-> As a port it exist on the SoC yes but it is not connected physically
-> to anything.
-> 
-> &gmac0 is connected to the switch, and the switch has all the PHYs.
-(...)
-> If you by remote end mean the end of a physical cable there is
-> no way I can do that, as I have no PHY on gmac1.
-> 
-> (I don't know if I misunderstand the question...)
+> With this setup I'm getting a maximum throughput of about 90kB/s.
+> If I increase the chunk size / oa-cps to 64 I get a might higher
+> throughput ~900kB/s, but after 0-2s I get dump below (or similar).
 
-No, you aren't.
+Is this tcp traffic? Lost packets will have a big impact. You might
+want to look at the link peer with tcpdump and look for retries. Also,
+look if there are frames with bad checksums.
 
-> But I have other Gemini platforms, so I will try to do it on one
-> of them! Let's see if I can do this thing....
+     Andrew
 
-Ok.
 
