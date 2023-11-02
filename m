@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-45659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E222A7DEC8D
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:52:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 550D37DEC8E
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4CA1B21033
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC87E281B2C
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54554C9A;
-	Thu,  2 Nov 2023 05:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79915240;
+	Thu,  2 Nov 2023 05:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8515E2114
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:52:21 +0000 (UTC)
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911D8131;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379B146B8
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:52:22 +0000 (UTC)
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18527182;
 	Wed,  1 Nov 2023 22:52:17 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VvUokvD_1698904324;
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VvUokvD_1698904324)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VvUokzo_1698904334;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VvUokzo_1698904334)
           by smtp.aliyun-inc.com;
           Thu, 02 Nov 2023 13:52:14 +0800
 From: "D. Wythe" <alibuda@linux.alibaba.com>
@@ -36,10 +36,12 @@ Cc: kuba@kernel.org,
 	netdev@vger.kernel.org,
 	linux-s390@vger.kernel.org,
 	linux-rdma@vger.kernel.org
-Subject: [PATCH net v1 0/3] bugfixs for smc
-Date: Thu,  2 Nov 2023 13:52:01 +0800
-Message-Id: <1698904324-33238-1-git-send-email-alibuda@linux.alibaba.com>
+Subject: [PATCH net v1 1/3] net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
+Date: Thu,  2 Nov 2023 13:52:02 +0800
+Message-Id: <1698904324-33238-2-git-send-email-alibuda@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1698904324-33238-1-git-send-email-alibuda@linux.alibaba.com>
+References: <1698904324-33238-1-git-send-email-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,30 +50,102 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
 From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-This patches includes bugfix following:
+Considering scenario:
 
-1. hung state
-2. sock leak
-3. potential panic 
+				smc_cdc_rx_handler
+__smc_release
+				sock_set_flag
+smc_close_active()
+sock_set_flag
 
-We have been testing these patches for some time, but
-if you have any questions, please let us know.
+__set_bit(DEAD)			__set_bit(DONE)
 
---
-v1:
-Fix spelling errors and incorrect function names in descriptions
+Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
+in smc_close_passive_work:
 
-D. Wythe (3):
-  net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
-  net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
-  net/smc: put sk reference if close work was canceled
+if (sock_flag(sk, SOCK_DEAD) &&
+	smc_close_sent_any_close(conn)) {
+	sk->sk_state = SMC_CLOSED;
+} else {
+	/* just shutdown, but not yet closed locally */
+	sk->sk_state = SMC_APPFINCLOSEWAIT;
+}
 
- net/smc/af_smc.c    |  4 ++--
- net/smc/smc.h       |  5 +++++
- net/smc/smc_cdc.c   | 11 +++++------
- net/smc/smc_close.c |  5 +++--
- 4 files changed, 15 insertions(+), 10 deletions(-)
+Replace sock_set_flags or __set_bit to set_bit will fix this problem.
+Since set_bit is atomic.
 
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+---
+ net/smc/af_smc.c    | 4 ++--
+ net/smc/smc.h       | 5 +++++
+ net/smc/smc_cdc.c   | 2 +-
+ net/smc/smc_close.c | 2 +-
+ 4 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index abd2667..da97f94 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -275,7 +275,7 @@ static int __smc_release(struct smc_sock *smc)
+ 
+ 	if (!smc->use_fallback) {
+ 		rc = smc_close_active(smc);
+-		sock_set_flag(sk, SOCK_DEAD);
++		smc_sock_set_flag(sk, SOCK_DEAD);
+ 		sk->sk_shutdown |= SHUTDOWN_MASK;
+ 	} else {
+ 		if (sk->sk_state != SMC_CLOSED) {
+@@ -1743,7 +1743,7 @@ static int smc_clcsock_accept(struct smc_sock *lsmc, struct smc_sock **new_smc)
+ 		if (new_clcsock)
+ 			sock_release(new_clcsock);
+ 		new_sk->sk_state = SMC_CLOSED;
+-		sock_set_flag(new_sk, SOCK_DEAD);
++		smc_sock_set_flag(new_sk, SOCK_DEAD);
+ 		sock_put(new_sk); /* final */
+ 		*new_smc = NULL;
+ 		goto out;
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index 24745fd..e377980 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -377,4 +377,9 @@ void smc_fill_gid_list(struct smc_link_group *lgr,
+ int smc_nl_enable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+ int smc_nl_disable_hs_limitation(struct sk_buff *skb, struct genl_info *info);
+ 
++static inline void smc_sock_set_flag(struct sock *sk, enum sock_flags flag)
++{
++	set_bit(flag, &sk->sk_flags);
++}
++
+ #endif	/* __SMC_H */
+diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
+index 89105e9..01bdb79 100644
+--- a/net/smc/smc_cdc.c
++++ b/net/smc/smc_cdc.c
+@@ -385,7 +385,7 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
+ 		smc->sk.sk_shutdown |= RCV_SHUTDOWN;
+ 		if (smc->clcsock && smc->clcsock->sk)
+ 			smc->clcsock->sk->sk_shutdown |= RCV_SHUTDOWN;
+-		sock_set_flag(&smc->sk, SOCK_DONE);
++		smc_sock_set_flag(&smc->sk, SOCK_DONE);
+ 		sock_hold(&smc->sk); /* sock_put in close_work */
+ 		if (!queue_work(smc_close_wq, &conn->close_work))
+ 			sock_put(&smc->sk);
+diff --git a/net/smc/smc_close.c b/net/smc/smc_close.c
+index dbdf03e..449ef45 100644
+--- a/net/smc/smc_close.c
++++ b/net/smc/smc_close.c
+@@ -173,7 +173,7 @@ void smc_close_active_abort(struct smc_sock *smc)
+ 		break;
+ 	}
+ 
+-	sock_set_flag(sk, SOCK_DEAD);
++	smc_sock_set_flag(sk, SOCK_DEAD);
+ 	sk->sk_state_change(sk);
+ 
+ 	if (release_clcsock) {
 -- 
 1.8.3.1
 
