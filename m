@@ -1,36 +1,39 @@
-Return-Path: <netdev+bounces-45664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B467DECE9
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 07:37:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00B207DECE8
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 07:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBB4E281AE1
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:37:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 798B5B20DFC
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEFCA53B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E59B524C;
 	Thu,  2 Nov 2023 06:37:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE545250
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB852D60C
 	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 06:37:03 +0000 (UTC)
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx314.baidu.com [180.101.52.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 08A241A3
+X-Greylist: delayed 496 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Nov 2023 23:36:53 PDT
+Received: from njjs-sys-mailin01.njjs.baidu.com (mx315.baidu.com [180.101.52.204])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CCC7D1A2
 	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 23:36:53 -0700 (PDT)
 Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 286017F0003D
+	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 5CFC27F00053
 	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 14:28:36 +0800 (CST)
 From: Li RongQing <lirongqing@baidu.com>
 To: netdev@vger.kernel.org
-Subject: [PATCH 1/2][net-next] skbuff: move netlink_large_alloc_large_skb() to skbuff.c
-Date: Thu,  2 Nov 2023 14:28:35 +0800
-Message-Id: <20231102062836.19074-1-lirongqing@baidu.com>
+Subject: [PATCH 2/2][net-next] rtnetlink: using alloc_large_skb in rtnl_getlink
+Date: Thu,  2 Nov 2023 14:28:36 +0800
+Message-Id: <20231102062836.19074-2-lirongqing@baidu.com>
 X-Mailer: git-send-email 2.9.4
+In-Reply-To: <20231102062836.19074-1-lirongqing@baidu.com>
+References: <20231102062836.19074-1-lirongqing@baidu.com>
 X-Spam-Level: *
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -38,146 +41,57 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-move netlink_alloc_large_skb and netlink_skb_destructor to skbuff.c
-and rename them more generic, so they can be used elsewhere large
-non-contiguous physical memory is needed
+if a PF has 256 or more VFs, ip link command will allocate a order 3
+memory and maybe trigger OOM due to memory fragement, rtnl_vfinfo_size
+is used to compute the VFs needed memory size
+
+so using alloc_large_skb in which vmalloc is used for large memory,
+to avoid the failure of allocating memory
+
+    ip invoked oom-killer: gfp_mask=0xc2cc0(GFP_KERNEL|__GFP_NOWARN|\
+	__GFP_COMP|__GFP_NOMEMALLOC), order=3, oom_score_adj=0
+    CPU: 74 PID: 204414 Comm: ip Kdump: loaded Tainted: P           OE
+    Call Trace:
+    dump_stack+0x57/0x6a
+    dump_header+0x4a/0x210
+    oom_kill_process+0xe4/0x140
+    out_of_memory+0x3e8/0x790
+    __alloc_pages_slowpath.constprop.116+0x953/0xc50
+    __alloc_pages_nodemask+0x2af/0x310
+    kmalloc_large_node+0x38/0xf0
+    __kmalloc_node_track_caller+0x417/0x4d0
+    __kmalloc_reserve.isra.61+0x2e/0x80
+    __alloc_skb+0x82/0x1c0
+    rtnl_getlink+0x24f/0x370
+    rtnetlink_rcv_msg+0x12c/0x350
+    netlink_rcv_skb+0x50/0x100
+    netlink_unicast+0x1b2/0x280
+    netlink_sendmsg+0x355/0x4a0
+    sock_sendmsg+0x5b/0x60
+    ____sys_sendmsg+0x1ea/0x250
+    ___sys_sendmsg+0x88/0xd0
+    __sys_sendmsg+0x5e/0xa0
+    do_syscall_64+0x33/0x40
+    entry_SYSCALL_64_after_hwframe+0x44/0xa9
+    RIP: 0033:0x7f95a65a5b70
 
 Signed-off-by: Li RongQing <lirongqing@baidu.com>
 ---
- include/linux/skbuff.h   |  3 +++
- net/core/skbuff.c        | 40 ++++++++++++++++++++++++++++++++++++++++
- net/netlink/af_netlink.c | 41 ++---------------------------------------
- 3 files changed, 45 insertions(+), 39 deletions(-)
+ net/core/rtnetlink.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 4174c4b..774a401 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -5063,5 +5063,8 @@ static inline void skb_mark_for_recycle(struct sk_buff *skb)
- ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
- 			     ssize_t maxsize, gfp_t gfp);
- 
-+
-+void large_skb_destructor(struct sk_buff *skb);
-+struct sk_buff *alloc_large_skb(unsigned int size, int broadcast);
- #endif	/* __KERNEL__ */
- #endif	/* _LINUX_SKBUFF_H */
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4570705..20ffcd5 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6917,3 +6917,43 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
- 	return spliced ?: ret;
- }
- EXPORT_SYMBOL(skb_splice_from_iter);
-+
-+void large_skb_destructor(struct sk_buff *skb)
-+{
-+	if (is_vmalloc_addr(skb->head)) {
-+		if (!skb->cloned ||
-+		    !atomic_dec_return(&(skb_shinfo(skb)->dataref)))
-+			vfree(skb->head);
-+
-+		skb->head = NULL;
-+	}
-+	if (skb->sk)
-+		sock_rfree(skb);
-+}
-+EXPORT_SYMBOL(large_skb_destructor);
-+
-+struct sk_buff *alloc_large_skb(unsigned int size,
-+					       int broadcast)
-+{
-+	struct sk_buff *skb;
-+	void *data;
-+
-+	if (size <= NLMSG_GOODSIZE || broadcast)
-+		return alloc_skb(size, GFP_KERNEL);
-+
-+	size = SKB_DATA_ALIGN(size) +
-+	       SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+
-+	data = vmalloc(size);
-+	if (!data)
-+		return NULL;
-+
-+	skb = __build_skb(data, size);
-+	if (!skb)
-+		vfree(data);
-+	else
-+		skb->destructor = large_skb_destructor;
-+
-+	return skb;
-+}
-+EXPORT_SYMBOL(alloc_large_skb);
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 642b9d3..1d50b68 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -369,24 +369,11 @@ static void netlink_rcv_wake(struct sock *sk)
- 		wake_up_interruptible(&nlk->wait);
- }
- 
--static void netlink_skb_destructor(struct sk_buff *skb)
--{
--	if (is_vmalloc_addr(skb->head)) {
--		if (!skb->cloned ||
--		    !atomic_dec_return(&(skb_shinfo(skb)->dataref)))
--			vfree(skb->head);
--
--		skb->head = NULL;
--	}
--	if (skb->sk != NULL)
--		sock_rfree(skb);
--}
--
- static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
- {
- 	WARN_ON(skb->sk != NULL);
- 	skb->sk = sk;
--	skb->destructor = netlink_skb_destructor;
-+	skb->destructor = large_skb_destructor;
- 	atomic_add(skb->truesize, &sk->sk_rmem_alloc);
- 	sk_mem_charge(sk, skb->truesize);
- }
-@@ -1204,30 +1191,6 @@ struct sock *netlink_getsockbyfilp(struct file *filp)
- 	return sock;
- }
- 
--static struct sk_buff *netlink_alloc_large_skb(unsigned int size,
--					       int broadcast)
--{
--	struct sk_buff *skb;
--	void *data;
--
--	if (size <= NLMSG_GOODSIZE || broadcast)
--		return alloc_skb(size, GFP_KERNEL);
--
--	size = SKB_DATA_ALIGN(size) +
--	       SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
--
--	data = vmalloc(size);
--	if (data == NULL)
--		return NULL;
--
--	skb = __build_skb(data, size);
--	if (skb == NULL)
--		vfree(data);
--	else
--		skb->destructor = netlink_skb_destructor;
--
--	return skb;
--}
- 
- /*
-  * Attach a skb to a netlink socket.
-@@ -1882,7 +1845,7 @@ static int netlink_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 	if (len > sk->sk_sndbuf - 32)
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 4a2ec33..be43044 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3813,7 +3813,8 @@ static int rtnl_getlink(struct sk_buff *skb, struct nlmsghdr *nlh,
  		goto out;
+ 
  	err = -ENOBUFS;
--	skb = netlink_alloc_large_skb(len, dst_group);
-+	skb = alloc_large_skb(len, dst_group);
- 	if (skb == NULL)
+-	nskb = nlmsg_new(if_nlmsg_size(dev, ext_filter_mask), GFP_KERNEL);
++	nskb = alloc_large_skb(
++			nlmsg_total_size(if_nlmsg_size(dev, ext_filter_mask)), 0);
+ 	if (nskb == NULL)
  		goto out;
  
 -- 
