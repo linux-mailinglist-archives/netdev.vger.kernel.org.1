@@ -1,84 +1,85 @@
-Return-Path: <netdev+bounces-45703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D657DF1DC
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:00:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A45E7DF1ED
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:03:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7891C20E3B
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53AE51C20D5F
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC9B14F86;
-	Thu,  2 Nov 2023 12:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C907E15490;
+	Thu,  2 Nov 2023 12:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L0XUspGD"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="d/pbwT+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CD914F6E;
-	Thu,  2 Nov 2023 12:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E988BC433C8;
-	Thu,  2 Nov 2023 12:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698926424;
-	bh=Z32Rs3pGCBmghy3mdxI1n1S0eXbTLmN7BHJA9eLZN68=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=L0XUspGDU/fsERrq9n2OH/zzwAjTetTHMp9Lmfh0e8y9BXx22if6L8P0fkdIedS0w
-	 /POEcMBKI87OQA2dHrVgjS5Gm7ZdT8j4yeKp7Na+FWUC3zg84le5rAlRqW4bLS+Enr
-	 JUuwim+nzjyiuCVoFR99OKmn+I9ZsJwoGP2B2/RNOHdAImaWbYVX2b6pMTc9m45KM3
-	 y7Lc8xyF0PqL7IWkvlKT/mWdmgAR/r2jkMSQVzweTfjAupvJrShX8iuZo0B4N2Ljgu
-	 TsM8lPQUhnpPmxrqJiEAd+dkVHkfxlo4a6UmKS8snoFd6QUlFglbRaqrjurnXLudFL
-	 RBVJJgYMiR0Ow==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D2154C4316B;
-	Thu,  2 Nov 2023 12:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E966618629
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:03:00 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEC4B19A8
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:02:58 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c514cbbe7eso12117971fa.1
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 05:02:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1698926577; x=1699531377; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fTe22ucl21toPbP0OqVOvi+LxGoUbLZHCXRrDvLCa90=;
+        b=d/pbwT+y9749QZqpGiwGHoh1qsND9uPfZUV3AfKIr2q9/PTTJSsGsiqgzIKT2c6mdm
+         4IAO7YxCmKxp5673d7faqZd55f7a2uFgveks8QV9DOy5osk6r8N0OijB9v8zbE5hvlzu
+         c2ZwcrQWqJS8IFlAXcF2VZLy0d0pmR4R8Erzafk41YMSrzH+Nem4R5AIXY+PnXrG/lIS
+         BQ+3zXCEcUNAbJ01Syn7GFZ/6LVfn0KEbZgJ4D9hwfopeDW32y6OA5myOA/2PK1U/lWy
+         caAQ4BU5PCoVW8dZyHhKh4+r6Uv9UG5IOZyUppoed3fmiVOJ6VXWx5tnN4kwNLfiywxt
+         9WRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698926577; x=1699531377;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fTe22ucl21toPbP0OqVOvi+LxGoUbLZHCXRrDvLCa90=;
+        b=mlnwRf5LUycW2BB2cNEk5QdYnlTIxrtx3XNUULSq2d4F608zFLNtoeBM+VpECRDwr7
+         TAF3VgkB20NuWxzRmgOpFWWJ5tyco9lnWgzMrPDotd9UR0CA24IvxK0w9vozgMvAgKHP
+         xAQPGY1fI8Az++4asDpFEYSVKckrjbwahJHa0KBeleGYHmbLDqMFOmbf98ectFBD97WN
+         eHqjMrWUviWJ1Dj7u341fKDckhIqcwRqytSIk8SfLSPuyvWQEx+t9N7UUAgeQADQX7It
+         +uNfL6151YktlRbKAL1OfaFhSgHIgmpPUy2c61LbnDNJn6AyHcNxX3oQza35u7DmKvKO
+         2utg==
+X-Gm-Message-State: AOJu0Yw7Y/e7/2VOqfjOv+TP7HOdKq+mnCCKFpN9icl44U9Jj+CRMk1i
+	MR1yvCZ/f/X3fHYj+lZc7WF/jQ==
+X-Google-Smtp-Source: AGHT+IHEbFoQHnnUS64cWYcXS8jfgEaqgDAVQde3ejDo5UHqfVTXmd/51ACdjkcz/wah3QDyHGs3ZQ==
+X-Received: by 2002:a2e:9bc2:0:b0:2c1:6b9c:48d6 with SMTP id w2-20020a2e9bc2000000b002c16b9c48d6mr14025857ljj.16.1698926576832;
+        Thu, 02 Nov 2023 05:02:56 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id k9-20020a5d6289000000b0032da022855fsm2231629wru.111.2023.11.02.05.02.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 05:02:55 -0700 (PDT)
+Date: Thu, 2 Nov 2023 13:02:54 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net] netlink: fill in missing MODULE_DESCRIPTION()
+Message-ID: <ZUOP7tOSK2ysyuUc@nanopsycho>
+References: <20231102045724.2516647-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/smc: fix documentation of buffer sizes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169892642385.2809.13321976556181124228.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Nov 2023 12:00:23 +0000
-References: <20231030170343.748097-1-gbayer@linux.ibm.com>
-In-Reply-To: <20231030170343.748097-1-gbayer@linux.ibm.com>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, corbet@lwn.net, jaka@linux.ibm.com, wenjia@linux.ibm.com,
- tonylu@linux.alibaba.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231102045724.2516647-1-kuba@kernel.org>
 
-Hello:
+Thu, Nov 02, 2023 at 05:57:24AM CET, kuba@kernel.org wrote:
+>W=1 builds now warn if a module is built without
+>a MODULE_DESCRIPTION(). Fill it in for sock_diag.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 30 Oct 2023 18:03:43 +0100 you wrote:
-> Since commit 833bac7ec392 ("net/smc: Fix setsockopt and sysctl to
-> specify same buffer size again") the SMC protocol uses its own
-> default values for the smc.rmem and smc.wmem sysctl variables
-> which are no longer derived from the TCP IPv4 buffer sizes.
-> 
-> Fixup the kernel documentation to reflect this change, too.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] net/smc: fix documentation of buffer sizes
-    https://git.kernel.org/netdev/net/c/a1602d749097
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+It's a bit odd to target -net with this, isn't it?
 
