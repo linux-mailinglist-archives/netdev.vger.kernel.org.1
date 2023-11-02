@@ -1,161 +1,215 @@
-Return-Path: <netdev+bounces-45678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0A1E7DEFA3
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:16:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F677DEFAA
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DBAA1C20E04
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:16:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36548281352
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D423310969;
-	Thu,  2 Nov 2023 10:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557E9134CB;
+	Thu,  2 Nov 2023 10:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dsc6HVVl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJFDrfDG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733E879C7
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:16:39 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C8A128
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 03:16:34 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-52bd9ddb741so1229641a12.0
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 03:16:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698920193; x=1699524993; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=02xkZqOKKz9d+moFfG7ERv43EDw24szAgy8uy4/RXNc=;
-        b=Dsc6HVVl0B5n+tG36McAUl9jsQbCec3w4zgQobK2LkQS+8NYuc8Dk3PhhVrYi0HSCS
-         98ha4aiSpab1vlIouEGstnJiTkUb0ObG+5b7TsuWsNwH3iMscOESBIeAIobPdHU6C52j
-         lPRynfl0kc9on886tJNG0yc68UXR8VE8D6Sezjbfvk+tzKs+xAyS5xdXQg/Slo5cTaXb
-         ynqyZ4tvid7jYFkBE6ifqZ3UgeYQuPLPx5iSeY54KE7PU7ydg+A41audtycFah+UUd9C
-         0gzzP4bFaTOG5U3yvHoOuj+bfYWtf60mq9c/DaXrkCORbvZPdzcjYb2pZn5pi+oLbWcc
-         AD+w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34CBE134BD
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:17:32 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A4F18B
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 03:17:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698920248;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W/Wg2X4YPo+Bjzx5La1XsB4E8EgNOpRP54tEssaUvFk=;
+	b=TJFDrfDGxE0sBbLY3b4vCaA+Cjuef4KbwVEoesfMxn/5Vrf0+YG/gznQFKXRQfAWXO6VAq
+	j2/5lVZtPVSIm+PWAnYphREM3ChonbX6ekbdgwEH6jgogTnk3aiepAevckfbqB7oseCDty
+	kIvZDyNPQPZi4rypxC2ucv1MMC7V8b4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-241-vP29_od1N7iGiKRsWlvd1Q-1; Thu, 02 Nov 2023 06:17:27 -0400
+X-MC-Unique: vP29_od1N7iGiKRsWlvd1Q-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4083e371a18so854475e9.0
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 03:17:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698920193; x=1699524993;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=02xkZqOKKz9d+moFfG7ERv43EDw24szAgy8uy4/RXNc=;
-        b=P2d7W3o4pWAR6VvuC+1R6q15Nx27JJDZp1gS+bfOmBkp88lu7JyN0+HIv+7zFX4+fL
-         nBhQXBCX7h+T3UpaksecdFIHw/Nl3iymerLqAvv9nPJNC2IgI1J17+iyDZE20WGKjDyp
-         c1Jv/hcLu9cazyC9Z2aVy+NTExg/chQrxI6rcqpErC1sKI1LGFtS+zbRWPyvuZAEpj2h
-         fgoPZ/QZqZL1HLWIEpwxq/KCoo/OzYB76mQtmp2QyWCtrQcSjQDkiQGZ8b5v7GglwjNF
-         vEm3OfI4kKp3ZmI8vHuHfgrrFiY7fjiPwtjueZQFviG4TXITJYgtA82OOxRd8pNRCgRB
-         TXMg==
-X-Gm-Message-State: AOJu0Ywr7ep5NdwYVTCqRHM/2PFMYxkipJxO2G6vNLFCy7X7F1jSA7RW
-	sRG7VinYGRcsYt1shGNRI64J4g==
-X-Google-Smtp-Source: AGHT+IGAIpKlpb139ceS6EcClNVt5Z+NaIbDHk76iPL/T7wUBC0B/lAuYL7CQFzy391iCAo+wQDcCA==
-X-Received: by 2002:a50:9544:0:b0:543:595a:8280 with SMTP id v4-20020a509544000000b00543595a8280mr7273567eda.37.1698920193032;
-        Thu, 02 Nov 2023 03:16:33 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id u22-20020aa7d896000000b0054354da96e5sm2146543edq.55.2023.11.02.03.16.31
+        d=1e100.net; s=20230601; t=1698920246; x=1699525046;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W/Wg2X4YPo+Bjzx5La1XsB4E8EgNOpRP54tEssaUvFk=;
+        b=Jgi1CnnV2QqxT3I7ExRIrGTMgTDhYZrnz3iidMGpJuuPexNT8O3LSd9/b5VY8CBY2A
+         iBqpA/2bSV6pyFTMNYPK1qFgFB1cW2mTtgqNR7oWErw7Iyyd84enLPOovdfUEsP+47NN
+         ++V6dgePoZJ6xwt5GJ8XRGiJpWRvuEYGOwD+gCYtYd2OZY+WUoInsM5JE6uc9qib9cob
+         wfUYUJ8yLY0eosLtxUTEvapo+1R0ocnxgWmLV06BMndQveu5zbnuIKa+HtYOjf/q8ZhB
+         rxthLUo3weSL9odh1GRPU9kWaVF611syPJBb9A9rLR7P6PQpiZpbdpKgRgZ8TFmlltXH
+         CSBw==
+X-Gm-Message-State: AOJu0Yw2ClOSRAyG4hXflQNdha1ONCIHCpLXrr5ZY5v8ZMKBq4SyMpJX
+	pU77wAhZqi8a8FI2q12o/ARPZ88Pjnk9qJUpgbt4uiaw+pbUcMeKCsy249EwsgjG6E7CrGYBvb8
+	tCSsJbnvQwR3jEHtG
+X-Received: by 2002:a05:600c:3b8a:b0:408:3a29:d7e8 with SMTP id n10-20020a05600c3b8a00b004083a29d7e8mr14602888wms.3.1698920246008;
+        Thu, 02 Nov 2023 03:17:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8JtjjJhmTWfixm105iEMyvMB1gRRMVzmXNWbA4dx+U8ZluROzNae9MKjaEt3KfuC5KAanWg==
+X-Received: by 2002:a05:600c:3b8a:b0:408:3a29:d7e8 with SMTP id n10-20020a05600c3b8a00b004083a29d7e8mr14602871wms.3.1698920245582;
+        Thu, 02 Nov 2023 03:17:25 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-153.dyn.eolo.it. [146.241.226.153])
+        by smtp.gmail.com with ESMTPSA id o20-20020a05600c511400b004078d71be9csm2431299wms.13.2023.11.02.03.17.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 03:16:32 -0700 (PDT)
-Date: Thu, 2 Nov 2023 13:16:28 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Harshit Mogalapalli <harshit.m.mogalapalli@gmail.com>
-Subject: Re: [PATCH v2] netfilter: nf_tables: prevent OOB access in
- nft_byteorder_eval
-Message-ID: <d7e42ffd-aabf-46d7-b02a-a7337708a29a@moroto.mountain>
-References: <20230705201232.GG3751@breakpoint.cc>
- <20230705210535.943194-1-cascardo@canonical.com>
+        Thu, 02 Nov 2023 03:17:25 -0700 (PDT)
+Message-ID: <5ca2062477738b804ce805847f7aec024ad5988c.camel@redhat.com>
+Subject: Re: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat
+ under debug config
+From: Paolo Abeni <pabeni@redhat.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, Jamal Hadi Salim
+ <jhs@mojatatu.com>
+Cc: kuba@kernel.org, idosch@idosch.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org
+Date: Thu, 02 Nov 2023 11:17:23 +0100
+In-Reply-To: <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net>
+References: <20231027135142.11555-1-daniel@iogearbox.net>
+	 <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
+	 <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705210535.943194-1-cascardo@canonical.com>
 
-On Wed, Jul 05, 2023 at 06:05:35PM -0300, Thadeu Lima de Souza Cascardo wrote:
-> diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-> index 9a85e797ed58..e596d1a842f7 100644
-> --- a/net/netfilter/nft_byteorder.c
-> +++ b/net/netfilter/nft_byteorder.c
-> @@ -30,11 +30,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
->  	const struct nft_byteorder *priv = nft_expr_priv(expr);
->  	u32 *src = &regs->data[priv->sreg];
->  	u32 *dst = &regs->data[priv->dreg];
-> -	union { u32 u32; u16 u16; } *s, *d;
-> +	u16 *s16, *d16;
->  	unsigned int i;
->  
-> -	s = (void *)src;
-> -	d = (void *)dst;
-> +	s16 = (void *)src;
-> +	d16 = (void *)dst;
->  
->  	switch (priv->size) {
->  	case 8: {
+On Fri, 2023-10-27 at 20:21 +0200, Daniel Borkmann wrote:
+> On 10/27/23 7:24 PM, Jamal Hadi Salim wrote:
+> > On Fri, Oct 27, 2023 at 9:51=E2=80=AFAM Daniel Borkmann <daniel@iogearb=
+ox.net> wrote:
+> > >=20
+> > > Ido reported:
+> > >=20
+> > >    [...] getting the following splat [1] with CONFIG_DEBUG_NET=3Dy an=
+d this
+> > >    reproducer [2]. Problem seems to be that classifiers clear 'struct
+> > >    tcf_result::drop_reason', thereby triggering the warning in
+> > >    __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0)=
+. [...]
+> > >=20
+> > >    [1]
+> > >    WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reaso=
+n+0x38/0x130
+> > >    Modules linked in:
+> > >    CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e=
+6d9582e0 #682
+> > >    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2=
+-1.fc37 04/01/2014
+> > >    RIP: 0010:kfree_skb_reason+0x38/0x130
+> > >    [...]
+> > >    Call Trace:
+> > >     <IRQ>
+> > >     __netif_receive_skb_core.constprop.0+0x837/0xdb0
+> > >     __netif_receive_skb_one_core+0x3c/0x70
+> > >     process_backlog+0x95/0x130
+> > >     __napi_poll+0x25/0x1b0
+> > >     net_rx_action+0x29b/0x310
+> > >     __do_softirq+0xc0/0x29b
+> > >     do_softirq+0x43/0x60
+> > >     </IRQ>
+> > >=20
+> > >    [2]
+> > >    #!/bin/bash
+> > >=20
+> > >    ip link add name veth0 type veth peer name veth1
+> > >    ip link set dev veth0 up
+> > >    ip link set dev veth1 up
+> > >    tc qdisc add dev veth1 clsact
+> > >    tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00=
+:11:22:33:44:55 action drop
+> > >    mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+> > >=20
+> > > What happens is that inside most classifiers the tcf_result is copied=
+ over
+> > > from a filter template e.g. *res =3D f->res which then implicitly ove=
+rrides
+> > > the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which=
+ was
+> > > set via sch_handle_{ingress,egress}() for kfree_skb_reason().
+> > >=20
+> > > Add a small helper tcf_set_result() and convert classifiers over to i=
+t.
+> > > The latter leaves the drop code intact and classifiers, actions as we=
+ll
+> > > as the action engine in tcf_exts_exec() can then in future make use o=
+f
+> > > tcf_set_drop_reason(), too.
+> > >=20
+> > > Tested that the splat is fixed under CONFIG_DEBUG_NET=3Dy with the re=
+pro.
+> > >=20
+> > > Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more fl=
+exible")
+> > > Reported-by: Ido Schimmel <idosch@idosch.org>
+> > > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> > > Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+> > > Cc: Jakub Kicinski <kuba@kernel.org>
+> > > Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
+> > > ---
+> > >   include/net/pkt_cls.h    | 12 ++++++++++++
+> > >   net/sched/cls_basic.c    |  2 +-
+> > >   net/sched/cls_bpf.c      |  2 +-
+> > >   net/sched/cls_flower.c   |  2 +-
+> > >   net/sched/cls_fw.c       |  2 +-
+> > >   net/sched/cls_matchall.c |  2 +-
+> > >   net/sched/cls_route.c    |  4 ++--
+> > >   net/sched/cls_u32.c      |  2 +-
+> > >   8 files changed, 20 insertions(+), 8 deletions(-)
+> > >=20
+> > > diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> > > index a76c9171db0e..31d8e8587824 100644
+> > > --- a/include/net/pkt_cls.h
+> > > +++ b/include/net/pkt_cls.h
+> > > @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct tc=
+f_result *res,
+> > >          res->drop_reason =3D reason;
+> > >   }
+> > >=20
+> > > +static inline void tcf_set_result(struct tcf_result *to,
+> > > +                                 const struct tcf_result *from)
+> > > +{
+> > > +       /* tcf_result's drop_reason which is the last member must be
+> > > +        * preserved and cannot be copied from the cls'es tcf_result
+> > > +        * template given this is carried all the way and potentially
+> > > +        * set to a concrete tc drop reason upon error or intentional
+> > > +        * drop. See tcf_set_drop_reason() locations.
+> > > +        */
+> > > +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
+> > > +}
+> >=20
+> > I believe our bigger issue here is we are using this struct now for
+> > both policy set by the control plane and for runtime decisions
+>=20
+> Hm, but that was also either way in the original rfc.
+>=20
+> > (drop_reason) - whereas the original assumption was this struct only
+> > held set policy. In retrospect we should have put the verdict(which is
+> > policy) here and return the error code (as was in the first patch). I
+> > am also not sure humans would not make a mistake on "this field must
+> > be at the end of the struct". Can we put some assert (or big comment
+> > on the struct) to make sure someone does not overwrite this field?
+>=20
+> Yeah that can be done.
 
-This patch is correct, but shouldn't we fix the code for 64 bit writes
-as well?
+FTR, I agree the comment or even better a build_bug_on() somewhere
+should be better.
 
-net/netfilter/nft_byteorder.c
-    26  void nft_byteorder_eval(const struct nft_expr *expr,
-    27                          struct nft_regs *regs,
-    28                          const struct nft_pktinfo *pkt)
-    29  {
-    30          const struct nft_byteorder *priv = nft_expr_priv(expr);
-    31          u32 *src = &regs->data[priv->sreg];
-    32          u32 *dst = &regs->data[priv->dreg];
-    33          u16 *s16, *d16;
-    34          unsigned int i;
-    35  
-    36          s16 = (void *)src;
-    37          d16 = (void *)dst;
-    38  
-    39          switch (priv->size) {
-    40          case 8: {
-    41                  u64 src64;
-    42  
-    43                  switch (priv->op) {
-    44                  case NFT_BYTEORDER_NTOH:
-    45                          for (i = 0; i < priv->len / 8; i++) {
-    46                                  src64 = nft_reg_load64(&src[i]);
-    47                                  nft_reg_store64(&dst[i],
-    48                                                  be64_to_cpu((__force __be64)src64));
+Thanks!
 
-We're writing 8 bytes, then moving forward 4 bytes and writing 8 bytes
-again.  Each subsequent write over-writes 4 bytes from the previous
-write.
-
-    49                          }
-    50                          break;
-    51                  case NFT_BYTEORDER_HTON:
-    52                          for (i = 0; i < priv->len / 8; i++) {
-    53                                  src64 = (__force __u64)
-    54                                          cpu_to_be64(nft_reg_load64(&src[i]));
-    55                                  nft_reg_store64(&dst[i], src64);
-
-Same.
-
-    56                          }
-    57                          break;
-    58                  }
-    59                  break;
-    60          }
-    61          case 4:
-    62                  switch (priv->op) {
-    63                  case NFT_BYTEORDER_NTOH:
-    64                          for (i = 0; i < priv->len / 4; i++)
-    65                                  dst[i] = ntohl((__force __be32)src[i]);
-    66                          break;
-    67                  case NFT_BYTEORDER_HTON:
-
-regards,
-dan carpenter
+Paolo
 
 
