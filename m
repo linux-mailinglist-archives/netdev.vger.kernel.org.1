@@ -1,87 +1,114 @@
-Return-Path: <netdev+bounces-45692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098677DF0A7
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F40FF7DF0CA
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25DB1B2112C
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:55:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F730B2137C
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B75B13FED;
-	Thu,  2 Nov 2023 10:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AFE14006;
+	Thu,  2 Nov 2023 11:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25128821
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:55:09 +0000 (UTC)
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com [209.85.210.69])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8381B185
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 03:55:04 -0700 (PDT)
-Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6d32c33f7b7so133012a34.1
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 03:55:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698922503; x=1699527303;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=la7hzjP2zBKUn3oiit+lIJoZEhMcvAayTPixEdh76yQ=;
-        b=Eqq2WNRFKO+yopiUqOPgffMIwgWLr19kIqonBC2s4c+FU4rRRH+emuWmXXyY+1pZGB
-         2OhTjfYA13N3cmdJJaZr3f83VeTEw0bqhd4NKWqPEuYd5h0DH9865NY3dd7yd5IXeShC
-         LnIFjIWdF6Rv7zhaSpUDLu5IXDPayH9TAPJ2QL2crDNragXbipXIXuoDEx1tvf3kGGfU
-         e9jvs7iN6epHDff5wLvpeyLpsKlhmd4Sx0gmIAazi9c7Mi/aEN7ZwehxPqPlMSHaEoQH
-         X9RnUWZUiR1JL/aIyN4hnlb7XzFC7M3wMF2mBHONiWVAKVMSqFIhvWGw4Sx3Zasju9R9
-         V4iA==
-X-Gm-Message-State: AOJu0YwStRilkJPHClVNVL2Q82bFjrFaOU84cN0ssWUC1yjdJkybUb5B
-	sGnMH91R3923dMkdR5FsudaqHq9gjmEK0otzepfJtkfDNZjO
-X-Google-Smtp-Source: AGHT+IElbKg+EeRIp1W9TwX1La69cw8Mn5P2aiLEy92t+6/mJ3coq2apA+VdMgsutl5EcPvBfgvYaOyr/g+K7qN1O8/97/Nr1hUF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70E814A89
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:01:58 +0000 (UTC)
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109D7185
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 04:01:56 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SLgpz57BMz1P7tB;
+	Thu,  2 Nov 2023 18:58:51 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 2 Nov
+ 2023 19:01:54 +0800
+Subject: Re: [PATCH 1/2][net-next] skbuff: move
+ netlink_large_alloc_large_skb() to skbuff.c
+To: Li RongQing <lirongqing@baidu.com>, <netdev@vger.kernel.org>
+References: <20231102062836.19074-1-lirongqing@baidu.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <50622ac2-0939-af35-5d62-c56249e7bd26@huawei.com>
+Date: Thu, 2 Nov 2023 19:01:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:1d0:b0:1e9:90f0:613f with SMTP id
- n16-20020a05687001d000b001e990f0613fmr8462067oad.0.1698922503157; Thu, 02 Nov
- 2023 03:55:03 -0700 (PDT)
-Date: Thu, 02 Nov 2023 03:55:03 -0700
-In-Reply-To: <0000000000009ee19a0609135c34@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004d3e3d0609293891@google.com>
-Subject: Re: [syzbot] [net?] [usb?] INFO: rcu detected stall in
- nsim_dev_trap_report_work (2)
-From: syzbot <syzbot+193dae06b6680599fbab@syzkaller.appspotmail.com>
-To: davem@davemloft.net, eadavis@qq.com, edumazet@google.com, 
-	idosch@nvidia.com, jiri@nvidia.com, kuba@kernel.org, leon@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	petrm@nvidia.com, saeedm@nvidia.com, syzkaller-bugs@googlegroups.com, 
-	tariqt@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20231102062836.19074-1-lirongqing@baidu.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-syzbot has bisected this issue to:
+On 2023/11/2 14:28, Li RongQing wrote:
+> move netlink_alloc_large_skb and netlink_skb_destructor to skbuff.c
+> and rename them more generic, so they can be used elsewhere large
+> non-contiguous physical memory is needed
+> 
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  include/linux/skbuff.h   |  3 +++
+>  net/core/skbuff.c        | 40 ++++++++++++++++++++++++++++++++++++++++
+>  net/netlink/af_netlink.c | 41 ++---------------------------------------
+>  3 files changed, 45 insertions(+), 39 deletions(-)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 4174c4b..774a401 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -5063,5 +5063,8 @@ static inline void skb_mark_for_recycle(struct sk_buff *skb)
+>  ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
+>  			     ssize_t maxsize, gfp_t gfp);
+>  
+> +
+> +void large_skb_destructor(struct sk_buff *skb);
+> +struct sk_buff *alloc_large_skb(unsigned int size, int broadcast);
+>  #endif	/* __KERNEL__ */
+>  #endif	/* _LINUX_SKBUFF_H */
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 4570705..20ffcd5 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -6917,3 +6917,43 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
+>  	return spliced ?: ret;
+>  }
+>  EXPORT_SYMBOL(skb_splice_from_iter);
+> +
+> +void large_skb_destructor(struct sk_buff *skb)
+> +{
+> +	if (is_vmalloc_addr(skb->head)) {
+> +		if (!skb->cloned ||
+> +		    !atomic_dec_return(&(skb_shinfo(skb)->dataref)))
+> +			vfree(skb->head);
+> +
+> +		skb->head = NULL;
 
-commit 644a66c60f02f302d82c3008ae2ffe67cf495383
-Author: Jiri Pirko <jiri@nvidia.com>
-Date:   Fri Jul 29 07:10:36 2022 +0000
+There seems to be an assumption that skb returned from
+netlink_alloc_large_skb() is not expecting the frag page
+for shinfo->frags*, as the above NULL setting will bypass
+most of the handling in skb_release_data(),then how can we
+ensure that the user is not breaking the assumption if we
+make it more generic?
 
-    net: devlink: convert reload command to take implicit devlink->lock
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13c76cf3680000
-start commit:   66f1e1ea3548 Add linux-next specific files for 20231027
-git tree:       linux-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10276cf3680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c76cf3680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2911330219149de4
-dashboard link: https://syzkaller.appspot.com/bug?extid=193dae06b6680599fbab
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b8e977680000
+> +	}
+> +	if (skb->sk)
+> +		sock_rfree(skb);
+> +}
+> +EXPORT_SYMBOL(large_skb_destructor);
+> +
 
-Reported-by: syzbot+193dae06b6680599fbab@syzkaller.appspotmail.com
-Fixes: 644a66c60f02 ("net: devlink: convert reload command to take implicit devlink->lock")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
