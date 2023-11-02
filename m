@@ -1,191 +1,109 @@
-Return-Path: <netdev+bounces-45810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D2AE7DFB78
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:24:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C64C7DFB9B
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC001C20F66
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 20:24:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A4531C20319
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 20:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD7C219FB;
-	Thu,  2 Nov 2023 20:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41839E550;
+	Thu,  2 Nov 2023 20:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="1qAmgj4z"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GTq0rZua"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB1321A06
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:23:58 +0000 (UTC)
-Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC4D182
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 13:23:56 -0700 (PDT)
-Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-5875e2b27c5so465197eaf.3
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 13:23:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1698956635; x=1699561435; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZYxqorYTLyNgH4Ys5lNUekyUrwpkE+NAoR9Xx/kQ8MQ=;
-        b=1qAmgj4zLduDhMvPJzRi0HkTyUVdhhRV4+LAgpxiP2wloWJaqbEz040uaaSBCnLYXT
-         Q6urspTLANP3FvNUuoDOxFoaz5xs6RC6rDGQegCqJDMrCh9e1MOooGYnhOHps2TWjD6D
-         vjY3M/ClCf4g3eLnGHgnLGwbb4kmND7Mzsu26SMby5b7s2i/8nHy8ZwjJWXTM3tbNoir
-         3h0o6IURTx6DN67BeqMxipopgwEnUt34+zWpnTBb3QqvyOwtkWfQ2Rsd5tTkCUbYdy86
-         4jPo6ruIOUhB89BtBnO36nlD3Uw5bjlSDa783eNRv5J6/Kh/acohwJ0RYh7Bcr+tdWGt
-         PX2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698956635; x=1699561435;
-        h=content-transfer-encoding:mime-version:message-id:to:from:cc
-         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZYxqorYTLyNgH4Ys5lNUekyUrwpkE+NAoR9Xx/kQ8MQ=;
-        b=qlT4mNOF44ST/5fiZWlnt3KhqfpjmYCRNuimqhCqGH0dnvuKVpWrnmsJovoU3eztTX
-         yuChp1IkaNjuCmtr1UapO8RFJF5nEhBQhJK1kQ4muqF1pmHdjShTdG7ypQoc7Pbi1PHF
-         Vrdd/Tzkosf/IikPhsd96cT5S9aJoIi7BoWHpujyVoFriGmPZ+rGth2fb2cXCweTldzm
-         nPg+Fbt8t703hSiXEfpice6HSdUsNXHLm6CV5jsbyn2QEqm/rmz4swphjQjLTLqkhOve
-         uXgaBzxY5EMyReUxuAnNQdKXI+76dyow2rvgJT5EMJv4eM8Jcu34PIRTEGXyc14UCI7q
-         xyXw==
-X-Gm-Message-State: AOJu0Yy/vSqsekV0lWmffxIJdQ/sFPvGR4u+beTb5/rwr3OZvML+J9DD
-	uSc955z6eMzB8USfTWxL5TIsJg==
-X-Google-Smtp-Source: AGHT+IHvjzSJSgbbFHJHFSPQEfHZb0G1dwFxE6QUSYdRHcKUimuPg3oA0e89k53MrVMNkydfp+r/RA==
-X-Received: by 2002:a4a:b487:0:b0:581:ff09:62e4 with SMTP id b7-20020a4ab487000000b00581ff0962e4mr19252180ooo.2.1698956635428;
-        Thu, 02 Nov 2023 13:23:55 -0700 (PDT)
-Received: from localhost ([192.184.165.199])
-        by smtp.gmail.com with ESMTPSA id 64-20020a4a0943000000b0057b43a25deasm52070ooa.3.2023.11.02.13.23.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 13:23:54 -0700 (PDT)
-Date: Thu, 02 Nov 2023 13:23:54 -0700 (PDT)
-X-Google-Original-Date: Thu, 02 Nov 2023 13:23:51 PDT (-0700)
-Subject:     Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
-In-Reply-To: <mhng-41e9fb36-f703-461e-b585-9e8dd5984714@palmer-ri-x1c9a>
-CC: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-  pabeni@redhat.com, ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com,
-  fruggeri@arista.com, noureddine@arista.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-  llvm@lists.linux.dev, patches@lists.linux.dev
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: nathan@kernel.org
-Message-ID: <mhng-7500e386-1e83-4303-a1ee-cd2d5688e73e@palmer-ri-x1c9>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F17C3D65
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:37:10 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B8D7138
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 13:37:09 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2K7Mmr019084;
+	Thu, 2 Nov 2023 20:37:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=v/cvZQZy8zKBXDlAQeSYsNAF0OocxXiLiv/KmlTPj68=;
+ b=GTq0rZuaSrpQxzXNgDA0BphKkzc3SLCT9Nw0hJmLrskZnWa3+fz8mxESkAZNvrrgOsDt
+ K97YTt2GPjFQtcrChzBMPynA0vbWQFhI0z/wfXu+gfSfH6WK0eDO22hp272i0IqhQ7Jj
+ tIaRIhObD1hUJkDvnW/aBwoYwjW/fZfGhAx3PYxZc+bSA+kkmqnASUlVD5n48NQdE9fR
+ BpvQsKwaeOTj99zxot85ySnlSc6zm4DB5BozYYQJQoU8vrlL61YqVP+Q5xFRamL7bAGx
+ tWQUXraqmG3klJbw73MOoloYg4gvrChZBslKDlZlByW7UeecuoH3+xq53JcTiR9ZIwkN XQ== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4jhb8t3r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 20:37:06 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2JX9PH000614;
+	Thu, 2 Nov 2023 20:37:06 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1cmthmd6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 20:37:06 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A2Kb5Rs41615774
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Nov 2023 20:37:05 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3302D5805D;
+	Thu,  2 Nov 2023 20:37:05 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B9C1258053;
+	Thu,  2 Nov 2023 20:37:04 +0000 (GMT)
+Received: from [9.41.99.4] (unknown [9.41.99.4])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  2 Nov 2023 20:37:04 +0000 (GMT)
+Message-ID: <14584a37-2882-4cd8-9380-40a532d07731@linux.vnet.ibm.com>
+Date: Thu, 2 Nov 2023 15:37:04 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/tg3: fix race condition in tg3_reset_task()
+Content-Language: en-US
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com,
+        mchan@broadcom.com, pavan.chebbi@broadcom.com, drc@linux.vnet.ibm.com,
+        venkata.sai.duggi@ibm.com
+References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
+ <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
+ <CACKFLimX4Pjm89cneeTa36B519DN3mdXXo5FXfDFi6e0SBwUSA@mail.gmail.com>
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+In-Reply-To: <CACKFLimX4Pjm89cneeTa36B519DN3mdXXo5FXfDFi6e0SBwUSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BK6J8qCYzTABgikkR3Hg094ixXyOEak1
+X-Proofpoint-ORIG-GUID: BK6J8qCYzTABgikkR3Hg094ixXyOEak1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-02_10,2023-11-02_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 priorityscore=1501 mlxlogscore=620 malwarescore=0
+ bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0 impostorscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311020168
 
-On Wed, 01 Nov 2023 18:42:10 PDT (-0700), Palmer Dabbelt wrote:
-> On Wed, 01 Nov 2023 18:07:23 PDT (-0700), nathan@kernel.org wrote:
->> On Wed, Nov 01, 2023 at 05:41:10PM -0700, Palmer Dabbelt wrote:
->>> On Tue, 31 Oct 2023 13:23:35 PDT (-0700), nathan@kernel.org wrote:
->>> > Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
->>> >
->>> >   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
->>> >     663 |         }
->>> >         |         ^
->>> >   1 error generated.
->>> >
->>> > On earlier releases (such as clang-11, the current minimum supported
->>> > version for building the kernel) that do not support C23, this was a
->>> > hard error unconditionally:
->>> >
->>> >   net/ipv4/tcp_output.c:663:2: error: expected statement
->>> >           }
->>> >           ^
->>> >   1 error generated.
->>> >
->>> > Add a semicolon after the label to create an empty statement, which
->>> > resolves the warning or error for all compilers.
->>> >
->>> > Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
->>> > Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
->>> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
->>> > ---
->>> >  net/ipv4/tcp_output.c | 2 +-
->>> >  1 file changed, 1 insertion(+), 1 deletion(-)
->>> >
->>> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->>> > index f558c054cf6e..6064895daece 100644
->>> > --- a/net/ipv4/tcp_output.c
->>> > +++ b/net/ipv4/tcp_output.c
->>> > @@ -658,7 +658,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->>> >  			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
->>> >  			ptr++;
->>> >  		}
->>> > -out_ao:
->>> > +out_ao:;
->>> >  #endif
->>> >  	}
->>> >  	if (unlikely(opts->mss)) {
->>> >
->>> > ---
->>> > base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
->>> > change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
->>> >
->>> > Best regards,
->>>
->>> This gives me a
->>>
->>> linux/net/ipv4/tcp_output.c:663:2: error: expected statement
->>>        }
->>>
->>> on GCC for me.
->>
->> What GCC version?
->
-> 12.1, though I can't get a smaller reproducer so I'm going to roll back
-> to your change and double-check.  Might take a bit...
+Thanks for the review.
 
-Looks like there was just some bug in my test scripts and the original 
-patch wasn't actually picked up for all the configs.  It's working now, 
-so
+On 11/2/2023 12:27 PM, Michael Chan wrote:
+> 
+> This scenario can affect other drivers too, right?  Shouldn't this be
+> handled in a higher layer before calling ->ndo_tx_timeout() so we
+> don't have to add this logic to all the other drivers?  Thanks.
 
-Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
+Yes, it does. We can add this into the dev_watchdog() function, but 
+further investigations are required. This is because each driver may 
+have a different approach to handling its own ->ndo_tx_timeout() function.
 
-Sorry for the confusion!
-
->> I cannot reproduce that error with my patch applied. I tested mainline
->> at commit deefd5024f07 ("Merge tag 'vfio-v6.7-rc1' of
->> https://github.com/awilliam/linux-vfio") using GCC 6 from kernel.org and
->> I can reproduce a similar failure with ARCH=x86_64 allyesconfig:
->>
->>   net/ipv4/tcp_output.c: In function 'tcp_options_write':
->>   net/ipv4/tcp_output.c:661:1: error: label at end of compound statement
->>    out_ao:
->>    ^~~~~~
->>
->> With this change applied, the error disappears for GCC 6 and GCC 13
->> continues to build without error. I can try the other supported versions
->> later, I just did an older and newer one for a quick test.
->>
->>> So I think something like
->>>
->>> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->>> index f558c054cf6e..ca09763acaa8 100644
->>> --- a/net/ipv4/tcp_output.c
->>> +++ b/net/ipv4/tcp_output.c
->>> @@ -659,6 +659,11 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->>> 			ptr++;
->>> 		}
->>> out_ao:
->>> +	/*
->>> +	 * Labels at the end of compound statements are a C23 feature, so
->>> +	 * introduce a block to avoid a warning/error on strict toolchains.
->>> +	 */
->>> +	{}
->>> #endif
->>> 	}
->>> 	if (unlikely(opts->mss)) {
->>>
->>> should do it (though it's still build testing...)
->>
->> I am not opposed to this once we understand what versions are affected
->> by this so that we have some timeline of removing this workaround.
->>
->> Cheers,
->> Nathan
+Thinh Tran
 
