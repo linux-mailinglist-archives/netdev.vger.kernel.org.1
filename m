@@ -1,172 +1,246 @@
-Return-Path: <netdev+bounces-45701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3714D7DF1B7
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:53:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 662E07DF1C7
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DBF6281A13
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:52:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2ECC281AB3
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81FAB14F6C;
-	Thu,  2 Nov 2023 11:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C6614F82;
+	Thu,  2 Nov 2023 11:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wXMCXtqs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F8E3VKIT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7AC14F67
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:52:52 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E238D193
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 04:52:48 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-408c6ec1fd1so33295e9.1
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 04:52:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1698925967; x=1699530767; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LA/pGPBpS4VOuZlfRoaJVtaEalS/p9Ufx9nsvl1VPEo=;
-        b=wXMCXtqsM1mlEWKpp50A9R0i8Nhfz6mxZE931ZoUjS9sArX14Z36P/zxlJtCvKMQK/
-         8LIp0hU6vnx95ddahCAy2pnlUygl0Sci71wyxQhuA5QMpURgbSPrwacc+4i5ZC8I91Vi
-         SOLdbVG2squ4lMw9d7VtdHYA4l+9PzCM9yFKvZBnkW9Y4rQBvgNDNkTgwRw1W5BT2153
-         CHGOE8YKxfZrW3YCHga2J7Uz+3A5/fbq2qvdNFLh/j0W8yyMtyvHwHxBkoUwL7PtKzPb
-         oOgZ4v4laxLB8hxSjGH13zbZVCjVc/yuzntTGdUWg8a3auHjg7KYC1Xbrxt037jpADa/
-         Ccsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698925967; x=1699530767;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LA/pGPBpS4VOuZlfRoaJVtaEalS/p9Ufx9nsvl1VPEo=;
-        b=L5axT8Ln9mVRr+GecMcZzn98XIRrazwtdmJ6b5Vv/DCC7EztEjWRhw3D54Ch2dVsle
-         br7ZM6YkQdhSpA5RfjZOPEnh+HORx2JKTAbsYw7v+0HnV+mjRKaqJPhXuTfYfcImnNLv
-         7yQGScP9U9ASLzT5kwh03+s34UHuTYxC8mhZTs2QtbHVcH1Ybp8luQjYN90fL3IPGxfE
-         lTubPs3tMADhQ6HqnrGk4OevLlBdY0MKv2LCoDRA1CGqHVyBHfk1TDCtFOfgPlbxFbtK
-         MDVyfdhs29jkR6Mm3CBR7T+a8lebiRPhBmADWfzGjXPTbyujexx9BcZxJmiLa2AZTPL+
-         TYlw==
-X-Gm-Message-State: AOJu0YwqdczXGuChNVlbYvPObE7k8T4Ck2W0g9Me8vlkfo/A2ofTi37O
-	YqKXVkbniMvtZ0XO3zxOqoHfj+UiWtha3ih/opimCadDAcln+ob5aHC7Pn6tfGs=
-X-Google-Smtp-Source: AGHT+IHshEeW6f6eoywR3OQqU9pBwRBr/5Z6a59HmAhsZd8dgJ8qSeyKaF7ChSh7Ew9J+bk9QFYAjD9AHznPnsu/23w=
-X-Received: by 2002:a05:600c:35c8:b0:405:320a:44f9 with SMTP id
- r8-20020a05600c35c800b00405320a44f9mr32477wmq.5.1698925967017; Thu, 02 Nov
- 2023 04:52:47 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B31748D;
+	Thu,  2 Nov 2023 11:55:27 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB836C2;
+	Thu,  2 Nov 2023 04:55:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698926122; x=1730462122;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=LN2zsFLqmMKh/7dbnLz+vFNRTOnaAK8H94eqPAfKQj4=;
+  b=F8E3VKITOsdg61omRXWQ/NIqn93FhfKdal8/ypjm6RviE3ROXFgX4zck
+   9iv6Sf5gcq2jT+nYsr7/L95FclqdSf2D+83aJSZAwzqnlZchBSHW7rvR7
+   2gfg8uLlKsvQ0ZwqOGLQ/WSDff/p/u0QVZR9CCDkVHIRR/P2lVQhpggSr
+   tjV74QpJDzJbIAgpBRunhwSgDGfDZoIYV1wtNQPcPKMF2qVIrQm1rbGPQ
+   1igAQkcm5HeFotWu8+hu30Pd7dDZv9NA818YI8eIaseU8X0buy8VAoJlR
+   vHglcWYSOmUD/r/MfLv4XeEYmb/Iq1MUvE6dosCDiFyUhdyi69WApY6qm
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="455176350"
+X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
+   d="scan'208";a="455176350"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 04:55:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="904988180"
+X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
+   d="scan'208";a="904988180"
+Received: from sdsadara-mobl.ger.corp.intel.com ([10.251.215.6])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 04:55:17 -0700
+Date: Thu, 2 Nov 2023 13:55:11 +0200 (EET)
+From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Ma Jun <Jun.Ma2@amd.com>
+cc: amd-gfx@lists.freedesktop.org, lenb@kernel.org, johannes@sipsolutions.net, 
+    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+    pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com, 
+    mario.limonciello@amd.com, Netdev <netdev@vger.kernel.org>, 
+    linux-wireless@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+    linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
+    majun@amd.com, Evan Quan <quanliangl@hotmail.com>
+Subject: Re: [Patch v13 4/9] wifi: mac80211: Add support for WBRF features
+In-Reply-To: <20231030071832.2217118-5-Jun.Ma2@amd.com>
+Message-ID: <5b8ea81c-dd4c-7f2a-c862-b9a0aab16044@linux.intel.com>
+References: <20231030071832.2217118-1-Jun.Ma2@amd.com> <20231030071832.2217118-5-Jun.Ma2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031015756.1843599-1-sunytt@google.com> <ZUNxcxMq8EW0cVUT@shredder>
-In-Reply-To: <ZUNxcxMq8EW0cVUT@shredder>
-From: Yang Sun <sunytt@google.com>
-Date: Thu, 2 Nov 2023 19:52:28 +0800
-Message-ID: <CAF+qgb4A9ge4JTqeQvQPx1cAkP_MUMMpCOzmgGk1BnDe1dVa6g@mail.gmail.com>
-Subject: Re: [PATCH] net: ipmr_base: Check iif when returning a (*, G) MFC
-To: Ido Schimmel <idosch@idosch.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	nicolas.dichtel@6wind.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
 
-> Is this a regression (doesn't seem that way)? If not, the change should
-> be targeted at net-next which is closed right now:
+On Mon, 30 Oct 2023, Ma Jun wrote:
 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+> From: Evan Quan <quanliangl@hotmail.com>
+> 
+> To support the WBRF mechanism, Wifi adapters utilized in the system must
+> register the frequencies in use (or unregister those frequencies no longer
+> used) via the dedicated calls. So that, other drivers responding to the
+> frequencies can take proper actions to mitigate possible interference.
+> 
+> Co-developed-by: Mario Limonciello <mario.limonciello@amd.com>
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> Co-developed-by: Evan Quan <quanliangl@hotmail.com>
+> Signed-off-by: Evan Quan <quanliangl@hotmail.com>
+> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
+> --
+> v1->v2:
+>   - place the new added member(`wbrf_supported`) in
+>     ieee80211_local(Johannes)
+>   - handle chandefs change scenario properly(Johannes)
+>   - some minor fixes around code sharing and possible invalid input
+>     checks(Johannes)
+> v2->v3:
+>   - drop unnecessary input checks and intermediate APIs(Mario)
+>   - Separate some mac80211 common code(Mario, Johannes)
+> v3->v4:
+>   - some minor fixes around return values(Johannes)
+> v9->v10:
+>   - get ranges_in->num_of_ranges set and passed in(Johannes)
+> v12:
+>   - use acpi_amd_wbrf_add_remove to replace the acpi_amd_wbrf_add_exclusion
+>     acpi_amd_wbrf_remove_exclusion
+> v13:
+>   - Fix the format issue (IIpo Jarvinen)
+>   - Remove KHZ_TO_HZ and use HZ_PER_KHZ in linux/units.h (IIpo Jarvinen)
+> ---
+>  net/mac80211/Makefile      |  2 +
+>  net/mac80211/chan.c        |  9 ++++
+>  net/mac80211/ieee80211_i.h |  7 +++
+>  net/mac80211/main.c        |  2 +
+>  net/mac80211/wbrf.c        | 95 ++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 115 insertions(+)
+>  create mode 100644 net/mac80211/wbrf.c
+> 
+> diff --git a/net/mac80211/Makefile b/net/mac80211/Makefile
+> index b8de44da1fb8..d46c36f55fd3 100644
+> --- a/net/mac80211/Makefile
+> +++ b/net/mac80211/Makefile
+> @@ -65,4 +65,6 @@ rc80211_minstrel-$(CONFIG_MAC80211_DEBUGFS) += \
+>  
+>  mac80211-$(CONFIG_MAC80211_RC_MINSTREL) += $(rc80211_minstrel-y)
+>  
+> +mac80211-y += wbrf.o
+> +
+>  ccflags-y += -DDEBUG
+> diff --git a/net/mac80211/chan.c b/net/mac80211/chan.c
+> index 68952752b599..458469c224ae 100644
+> --- a/net/mac80211/chan.c
+> +++ b/net/mac80211/chan.c
+> @@ -506,11 +506,16 @@ static void _ieee80211_change_chanctx(struct ieee80211_local *local,
+>  
+>  	WARN_ON(!cfg80211_chandef_compatible(&ctx->conf.def, chandef));
+>  
+> +	ieee80211_remove_wbrf(local, &ctx->conf.def);
+> +
+>  	ctx->conf.def = *chandef;
+>  
+>  	/* check if min chanctx also changed */
+>  	changed = IEEE80211_CHANCTX_CHANGE_WIDTH |
+>  		  _ieee80211_recalc_chanctx_min_def(local, ctx, rsvd_for);
+> +
+> +	ieee80211_add_wbrf(local, &ctx->conf.def);
+> +
+>  	drv_change_chanctx(local, ctx, changed);
+>  
+>  	if (!local->use_chanctx) {
+> @@ -668,6 +673,8 @@ static int ieee80211_add_chanctx(struct ieee80211_local *local,
+>  	lockdep_assert_held(&local->mtx);
+>  	lockdep_assert_held(&local->chanctx_mtx);
+>  
+> +	ieee80211_add_wbrf(local, &ctx->conf.def);
+> +
+>  	if (!local->use_chanctx)
+>  		local->hw.conf.radar_enabled = ctx->conf.radar_enabled;
+>  
+> @@ -748,6 +755,8 @@ static void ieee80211_del_chanctx(struct ieee80211_local *local,
+>  	}
+>  
+>  	ieee80211_recalc_idle(local);
+> +
+> +	ieee80211_remove_wbrf(local, &ctx->conf.def);
+>  }
+>  
+>  static void ieee80211_free_chanctx(struct ieee80211_local *local,
+> diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+> index 98ef1fe1226e..1172554bd831 100644
+> --- a/net/mac80211/ieee80211_i.h
+> +++ b/net/mac80211/ieee80211_i.h
+> @@ -1600,6 +1600,8 @@ struct ieee80211_local {
+>  
+>  	/* extended capabilities provided by mac80211 */
+>  	u8 ext_capa[8];
+> +
+> +	bool wbrf_supported;
+>  };
+>  
+>  static inline struct ieee80211_sub_if_data *
+> @@ -2637,4 +2639,9 @@ ieee80211_eht_cap_ie_to_sta_eht_cap(struct ieee80211_sub_if_data *sdata,
+>  				    const struct ieee80211_eht_cap_elem *eht_cap_ie_elem,
+>  				    u8 eht_cap_len,
+>  				    struct link_sta_info *link_sta);
+> +
+> +void ieee80211_check_wbrf_support(struct ieee80211_local *local);
+> +void ieee80211_add_wbrf(struct ieee80211_local *local, struct cfg80211_chan_def *chandef);
+> +void ieee80211_remove_wbrf(struct ieee80211_local *local, struct cfg80211_chan_def *chandef);
+> +
+>  #endif /* IEEE80211_I_H */
+> diff --git a/net/mac80211/main.c b/net/mac80211/main.c
+> index 24315d7b3126..b20bdaac84db 100644
+> --- a/net/mac80211/main.c
+> +++ b/net/mac80211/main.c
+> @@ -1396,6 +1396,8 @@ int ieee80211_register_hw(struct ieee80211_hw *hw)
+>  	debugfs_hw_add(local);
+>  	rate_control_add_debugfs(local);
+>  
+> +	ieee80211_check_wbrf_support(local);
+> +
+>  	rtnl_lock();
+>  	wiphy_lock(hw->wiphy);
+>  
+> diff --git a/net/mac80211/wbrf.c b/net/mac80211/wbrf.c
+> new file mode 100644
+> index 000000000000..ca3f30b58476
+> --- /dev/null
+> +++ b/net/mac80211/wbrf.c
+> @@ -0,0 +1,95 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Wifi Band Exclusion Interface for WLAN
+> + * Copyright (C) 2023 Advanced Micro Devices
+> + *
+> + */
+> +
+> +#include <linux/acpi_amd_wbrf.h>
+> +#include <linux/units.h>
+> +#include <net/cfg80211.h>
+> +#include "ieee80211_i.h"
+> +
+> +void ieee80211_check_wbrf_support(struct ieee80211_local *local)
+> +{
+> +	struct wiphy *wiphy = local->hw.wiphy;
+> +	struct device *dev;
+> +
+> +	if (!wiphy)
+> +		return;
+> +
+> +	dev = wiphy->dev.parent;
+> +	if (!dev)
+> +		return;
+> +
+> +	local->wbrf_supported = acpi_amd_wbrf_supported_producer(dev);
+> +	dev_dbg(dev, "WBRF is %s supported\n",
+> +		local->wbrf_supported ? "" : "not");
+> +}
+> +
+> +static void get_chan_freq_boundary(u32 center_freq, u32 bandwidth, u64 *start, u64 *end)
+> +{
+> +	bandwidth = MHZ_TO_KHZ(bandwidth);
+> +	center_freq = MHZ_TO_KHZ(center_freq);
 
-I see.
+Please use include/linux/units.h ones for these too.
 
-> > - if (c->mfc_un.res.ttls[vifi] < 255)
-> > + if (c->mfc_parent =3D=3D vifi && c->mfc_un.res.ttls[vifi] < 255)
+-- 
+ i.
 
-> What happens if the route doesn't have an iif (-1)? It won't match
-> anymore?
-
-Looks like the mfc_parent can't be -1? There is the check:
-    if (mfc->mf6cc_parent >=3D MAXMIFS)
-        return -ENFILE;
-before setting the parent:
-    c->_c.mfc_parent =3D mfc->mf6cc_parent;
-
-I wrote this patch thinking (*, G) MFCs could be per iif, similar to the
-(S, G) MFCs, like we can add the following MFCs to forward packets from
-any address with group destination ff05::aa from if1 to if2, and forward
-packets from any address with group destination ff05::aa from if2 to
-both if1 and if3.
-
-(::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
-(::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
-
-But reading Nicolas's initial commit message again, it seems to me that
-(*, G) has to be used together with (*, *) and there should be only one
-(*, G) entry per group address and include all relevant interfaces in
-the oifs? Like the following:
-
-(::, ::)         Iif: if1 Oifs: if1 if2 if3   State: resolved
-(::, ff05::aa)   Iif: if1 Oifs: if1 if2 if3   State: resolved
-
-Is this how the (*, *|G) MFCs are intended to be used? which means packets
-to ff05::aa are forwarded from any one of the interfaces to all the other
-interfaces? If this is the intended way it works then my patch would break
-things and should be rejected.
-
-Is there a way to achieve the use case I described above? Like having
-different oifs for different iif?
-
-Thanks!
-
-
-On Thu, Nov 2, 2023 at 5:52=E2=80=AFPM Ido Schimmel <idosch@idosch.org> wro=
-te:
->
-> + Nicolas
->
-> On Tue, Oct 31, 2023 at 09:57:56AM +0800, Yang Sun wrote:
-> > Looking for a (*, G) MFC returns the first match without checking
-> > the iif. This can return a MFC not intended for a packet's iif and
-> > forwarding the packet with this MFC will not work correctly.
-> >
-> > When looking up for a (*, G) MFC, check that the MFC's iif is
-> > the same as the packet's iif.
->
-> Is this a regression (doesn't seem that way)? If not, the change should
-> be targeted at net-next which is closed right now:
->
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->
-> >
-> > Signed-off-by: Yang Sun <sunytt@google.com>
-> > ---
-> >  net/ipv4/ipmr_base.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
-> > index 271dc03fc6db..5cf7c7088dfe 100644
-> > --- a/net/ipv4/ipmr_base.c
-> > +++ b/net/ipv4/ipmr_base.c
-> > @@ -97,7 +97,7 @@ void *mr_mfc_find_any(struct mr_table *mrt, int vifi,=
- void *hasharg)
-> >
-> >       list =3D rhltable_lookup(&mrt->mfc_hash, hasharg, *mrt->ops.rht_p=
-arams);
-> >       rhl_for_each_entry_rcu(c, tmp, list, mnode) {
-> > -             if (c->mfc_un.res.ttls[vifi] < 255)
-> > +             if (c->mfc_parent =3D=3D vifi && c->mfc_un.res.ttls[vifi]=
- < 255)
->
-> What happens if the route doesn't have an iif (-1)? It won't match
-> anymore?
->
-> >                       return c;
-> >
-> >               /* It's ok if the vifi is part of the static tree */
-> > --
-> > 2.42.0.820.g83a721a137-goog
-> >
-> >
 
