@@ -1,137 +1,165 @@
-Return-Path: <netdev+bounces-45751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1319E7DF694
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:36:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7064C7DF6CC
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1619281103
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:36:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BF19281CA3
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE9C1CF80;
-	Thu,  2 Nov 2023 15:36:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ablWAJNk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35661D553;
+	Thu,  2 Nov 2023 15:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657B61CF90;
-	Thu,  2 Nov 2023 15:36:22 +0000 (UTC)
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2018913D;
-	Thu,  2 Nov 2023 08:36:21 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-32d895584f1so590607f8f.1;
-        Thu, 02 Nov 2023 08:36:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698939379; x=1699544179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rMOgTTQfwkBYFLdv7N61GXnKXP7EQxg4GSCDuZfxSVE=;
-        b=ablWAJNkQQWGVKn+b9pesKMaI+ip0/gUGr5aSysYd4CdbcP4R04p1DemSukWlf9JSV
-         ifPq+hdkX7stZ1vVxbAmXU4+d25nt3CUcYEZsIbsQSstmtotzQ7aj0K0UVHiuaSyhZcg
-         kF8SrnU1KnURlTOdQZMWNZRJIlIzeJix/KOuO0FIxA8gcSuTLqkMBUcM6HlnyQhfzayr
-         tSs8l/Ddby2STqHO7B/psBqdHihpSSsGqg12uiwcoeOaPp1ZXThgBSjxa7Te39AcA63y
-         Ziv3Jfo1fBL56O57LenZRxgOGwfGq93MA85EV18xS+VOxiocChzN4oSOg60IPoBdJ/5I
-         qLrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698939379; x=1699544179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rMOgTTQfwkBYFLdv7N61GXnKXP7EQxg4GSCDuZfxSVE=;
-        b=HhPfPO8PoTfKf0VE15X5Yn026HCeE/TVtQ66KZaOytfJZsRNxcK3qug2zzAyZSwBJr
-         wEA7QVR/FrYfKAFv9pecTf6OjKFfpZIM3piNZH2BlsuZo1UQbX2A6h7DsamYckWfY8Pa
-         wS2dKnAl6mehF0kVKdZ66AFTq+oJCH3Re3EE2MMb4kt1V3EHT7wqReFHnS8lFhlVUED1
-         zDUPvi0JK4doFEmAIEGCjId/3skODcz3TqAeRNwIC8rm4FA6nbXAku/vOlgUzqgaTO4l
-         PzSUZCDpiTsRg7aTNdMPGzCdVaSoxLyyZH8Ar93iiZ6QLoHBjCk9ecDEpdvuGMsnAPOW
-         UhUg==
-X-Gm-Message-State: AOJu0YzJL9ZSUTmZGK4EG4NU2UyC640vjlWHPfBUJ3qPKcr0BZKu4aYT
-	/BJsZgTJbUYxX5S4PDHgPuAb1NsdV8oHKdyvDGE=
-X-Google-Smtp-Source: AGHT+IGtErLNE5/niYv6UuFqjxP/VaBMOcBOA3J+nOQd1xQlkmfPqC0fXne7mIfUuUFrUfZQSx+rtAb5Tt2ImrEHILw=
-X-Received: by 2002:adf:d1cb:0:b0:32f:8966:c39c with SMTP id
- b11-20020adfd1cb000000b0032f8966c39cmr9632234wrd.71.1698939379259; Thu, 02
- Nov 2023 08:36:19 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733DB1CFA7
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 15:45:46 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7907E186;
+	Thu,  2 Nov 2023 08:45:42 -0700 (PDT)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3A2FjCdL53125129, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3A2FjCdL53125129
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Nov 2023 23:45:12 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Thu, 2 Nov 2023 23:45:13 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Thu, 2 Nov 2023
+ 23:45:12 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v10 00/13] Add Realtek automotive PCIe driver
+Date: Thu, 2 Nov 2023 23:44:52 +0800
+Message-ID: <20231102154505.940783-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031134900.1432945-1-vadfed@meta.com> <dac97b74-5ff1-172b-9cd5-4cdcf07386ec@linux.dev>
- <91a6d5a7-7b18-48a2-9a74-7c00509467f8@linux.dev> <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
- <4258aabd-5f7b-4b7f-ab43-408b69bfdc58@linux.dev>
-In-Reply-To: <4258aabd-5f7b-4b7f-ab43-408b69bfdc58@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 2 Nov 2023 08:36:06 -0700
-Message-ID: <CAADnVQ+9pp33zv9DxouEmg24o7w27OKFUcvKChHuby_+d6-bLg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: add skcipher API support to TC/XDP programs
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
-	Vadim Fedorenko <vadfed@meta.com>, "David S. Miller" <davem@davemloft.net>, 
-	Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.21.210.160]
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: license violation
+X-KSE-Antivirus-Attachment-Filter-Interceptor-Info: license violation
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Thu, Nov 2, 2023 at 6:44=E2=80=AFAM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 01/11/2023 23:41, Martin KaFai Lau wrote:
-> > On 11/1/23 3:50=E2=80=AFPM, Vadim Fedorenko wrote:
-> >>>> +static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *pt=
-r)
-> >>>> +{
-> >>>> +    enum bpf_dynptr_type type;
-> >>>> +
-> >>>> +    if (!ptr->data)
-> >>>> +        return NULL;
-> >>>> +
-> >>>> +    type =3D bpf_dynptr_get_type(ptr);
-> >>>> +
-> >>>> +    switch (type) {
-> >>>> +    case BPF_DYNPTR_TYPE_LOCAL:
-> >>>> +    case BPF_DYNPTR_TYPE_RINGBUF:
-> >>>> +        return ptr->data + ptr->offset;
-> >>>> +    case BPF_DYNPTR_TYPE_SKB:
-> >>>> +        return skb_pointer_if_linear(ptr->data, ptr->offset,
-> >>>> __bpf_dynptr_size(ptr));
-> >>>> +    case BPF_DYNPTR_TYPE_XDP:
-> >>>> +    {
-> >>>> +        void *xdp_ptr =3D bpf_xdp_pointer(ptr->data, ptr->offset,
-> >>>> __bpf_dynptr_size(ptr));
-> >>>
-> >>> I suspect what it is doing here (for skb and xdp in particular) is
-> >>> very similar to bpf_dynptr_slice. Please check if
-> >>> bpf_dynptr_slice(ptr, 0, NULL, sz) will work.
-> >>>
-> >>
-> >> Well, yes, it's simplified version of bpf_dynptr_slice. The problem is
-> >> that bpf_dynptr_slice bpf_kfunc which cannot be used in another
-> >> bpf_kfunc. Should I refactor the code to use it in both places? Like
-> >
-> > Sorry, scrolled too fast in my earlier reply :(
-> >
-> > I am not aware of this limitation. What error does it have?
-> > The bpf_dynptr_slice_rdwr kfunc() is also calling the bpf_dynptr_slice(=
-)
-> > kfunc.
-> >
-> >> create __bpf_dynptr_slice() which will be internal part of bpf_kfunc?
->
-> Apparently Song has a patch to expose these bpf_dynptr_slice* functions
-> ton in-kernel users.
->
-> https://lore.kernel.org/bpf/20231024235551.2769174-2-song@kernel.org/
->
-> Should I wait for it to be merged before sending next version?
+This series includes adding realtek automotive ethernet driver 
+and adding rtase ethernet driver entry in MAINTAINERS file.
 
-If you need something from another developer it's best to ask them
-explicitly :)
-In this case Song can respin with just that change that you need.
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
+
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
+
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
+
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+Justin Lai (13):
+  net:ethernet:realtek:rtase: Add pci table supported in this module
+  net:ethernet:realtek:rtase: Implement the .ndo_open function
+  net:ethernet:realtek:rtase: Implement the rtase_down function
+  net:ethernet:realtek:rtase: Implement the interrupt routine and
+    rtase_poll
+  net:ethernet:realtek:rtase: Implement hardware configuration function
+  net:ethernet:realtek:rtase: Implement .ndo_start_xmit function
+  net:ethernet:realtek:rtase: Implement a function to receive packets
+  net:ethernet:realtek:rtase: Implement net_device_ops
+  net:ethernet:realtek:rtase: Implement pci_driver suspend and resume
+    function
+  net:ethernet:realtek:rtase: Implement ethtool function
+  net:ethernet:realtek:rtase: Add a Makefile in the rtase folder
+  net:ethernet:realtek: Update the Makefile and Kconfig in the realtek
+    folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   17 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  353 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2541 +++++++++++++++++
+ 6 files changed, 2929 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+-- 
+2.34.1
+
 
