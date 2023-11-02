@@ -1,79 +1,108 @@
-Return-Path: <netdev+bounces-45792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E55E7DF9DC
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:25:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9117DFA14
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:38:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86C1DB20BB1
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:25:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28CE281CA6
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6A521344;
-	Thu,  2 Nov 2023 18:25:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D581C2A0;
+	Thu,  2 Nov 2023 18:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOhNT1rZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2D11DFE6
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:25:40 +0000 (UTC)
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB99F128
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:25:38 -0700 (PDT)
-Received: from [192.168.1.129] ([37.4.248.43]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
- 1MC3H1-1rAP1B2nhF-00CRul for <netdev@vger.kernel.org>; Thu, 02 Nov 2023
- 19:25:36 +0100
-Message-ID: <25e38ad0-fecc-469a-acfb-2ff276e5d0e8@i2se.com>
-Date: Thu, 2 Nov 2023 19:25:36 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412CC208D3;
+	Thu,  2 Nov 2023 18:38:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E77C433C7;
+	Thu,  2 Nov 2023 18:38:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698950333;
+	bh=ZCl2RJW3X7nBpybcBZiwAWuq4xViEFQLDT5FyMu/Wjk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=ZOhNT1rZk9HvPuPXUusS9Il3Dq1kPF2wLIBaVwFlfMsuPCI5iSr85UEBTtqyFJ7Ir
+	 /eAdFr/eMhKjL9ffTdNv5dtqsJGmM+HI1cwrTtOjNCZ2IwdhNS0gZaA/wJAQE+lYNY
+	 xf7uFWTH3ENRChl4sB+OUl46tL1cgg1FwpFmjqNsOh8EMt5ja5JyIw+Pt4NfLGcuYe
+	 IwlIvaAwQ1n1HjyBJwV7pIpfW2jd85xayZmzT3nXrE7bb1z0HafMUNMPHcJTWg0aDc
+	 +bpweElWLfh3+ujUWDNWbuFIt349rOjwXoWkr2iRnWmyHEtQe/3eFVQ0vapbl7bF3N
+	 xYlHo/4aTXSnw==
+Date: Thu, 2 Nov 2023 11:38:51 -0700 (PDT)
+From: Mat Martineau <martineau@kernel.org>
+To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+    Matthieu Baerts <matttbe@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+    netdev@vger.kernel.org, mptcp@lists.linux.dev
+Subject: Re: [PATCH net-next 9/9] mptcp: refactor sndbuf auto-tuning
+In-Reply-To: <CANn89iLZUA6S2a=K8GObnS62KK6Jt4B7PsAs7meMFooM8xaTgw@mail.gmail.com>
+Message-ID: <a41bacc1-fc92-01db-79a1-10327628a5f1@kernel.org>
+References: <20231023-send-net-next-20231023-2-v1-0-9dc60939d371@kernel.org> <20231023-send-net-next-20231023-2-v1-9-9dc60939d371@kernel.org> <CANn89iLZUA6S2a=K8GObnS62KK6Jt4B7PsAs7meMFooM8xaTgw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Reach out to the QCA7000 users
+Content-Type: multipart/mixed; boundary="0-709216980-1698950333=:19746"
+
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--0-709216980-1698950333=:19746
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:mbmkfP6sxw2ccUqzVTHcjCvYljCNslt+CM4iwSrmMqxTC1VZ0QN
- EpPaHwjwKueFRhyvrZUf5E+r/nBijAMdri2jpsbal8nLSKtvzTqlQ1+HdCfdtIDBcTw5GLA
- l50n6HvA1WG83/6dQI8bXC1yINWRb5zB62mOn1wsVjCJGN/JdBE0ggUC1A44byihs5l+1ur
- uJUnwAASro3bLfrOF7L6w==
-UI-OutboundReport: notjunk:1;M01:P0:Vlw9TSQg5y4=;6AbzAzZ3GRkiuQlcJBygHYkPZyN
- 9eCEXJVRK82jl0a4wAhx2rv2uamI74ALrd0CSiAoBuNUZP4ZyU7CmTWWb4VsoSIyBUnBSjmNu
- yov48cCvii4sColx836C0juapsTufq02bDYJGn7mj8YIaSsslbe4THzl0xjOpPsYcpFPoTlD1
- r5nIFCmFnDgNBjq5TJvoQ15UqZgf65oKvuJZfVpcvgM2l4UxFpvaSHzWaBIMvqAHAuJVDWfK/
- 14binaSal5mc3V8a3qcizyvMEOuG4T6G0v1RPCj3vJfjbV3gYO5i/gsaZWRMTdMvh6NZJlBpu
- nCTx1H6SfNBE7HMvLvCal2r/zHqjVsdBIEPbBV5k2KHJfhiHQ0eCbK0vfBXMMwIRo6y6oteEO
- IUakifnnl7qcyfqUE4n4EPewkWec9i4O8ExDdaHs8YdqUrV79MmKdsoHWfZr22spLmOdWbgaL
- DpZDZQVggcL2IM+/riEKg/sZhtigW+eO1pmzFfYW4m3cN0ihYuMux0rIw9LskkKeYBrylPEQU
- iOSzqh0/lLkL9Fyqz74pZNJwOU9Xb1UBkGueDBqUwsxfbxqw9+are1zwzqKE+LjVhBEF9YLLZ
- QPD+d0u54/kpsYdkakNPG45pMtWvcZJYjEIwuubDSu2v0rsQfSm6UQbXaW/nuLaHpiU1Q144x
- DycRA2Wzmjx+/kAVvjvBEv2CQteGaxMoyDlbb51uMSIvUUU9gxfUMg7+svzMrIexfo6Yq/l77
- 4O7bQuE95osIGHsF2sKxZcOkelYEsArPOWKvUWFnrESq13DT7FvjzCSZ5hMWpBWohzA3UFkMo
- G/wtY8UiqYtXiZnpI9I/oDlOulQWJWflzQ5NemLwNB4gJM/uJKN/0tO13d7Qbyxw+ZlPDl94U
- 4qAAjwb+K/cXetw==
+Content-Transfer-Encoding: 8BIT
 
-Hi,
+On Thu, 2 Nov 2023, Eric Dumazet wrote:
 
-it's now 9 years ago, that the SPI driver for the QCA7000 (qca_spi) has 
-been mainlined from this Qualcomm repo [1]. Since then Electric Mobility 
-become quite popular and a significant amount of CCS charging stations 
-use this chip or a compatible variant.
+> On Mon, Oct 23, 2023 at 10:45 PM Mat Martineau <martineau@kernel.org> wrote:
+>>
+>> From: Paolo Abeni <pabeni@redhat.com>
+>>
+>> The MPTCP protocol account for the data enqueued on all the subflows
+>> to the main socket send buffer, while the send buffer auto-tuning
+>> algorithm set the main socket send buffer size as the max size among
+>> the subflows.
+>>
+>> That causes bad performances when at least one subflow is sndbuf
+>> limited, e.g. due to very high latency, as the MPTCP scheduler can't
+>> even fill such buffer.
+>>
+>> Change the send-buffer auto-tuning algorithm to compute the main socket
+>> send buffer size as the sum of all the subflows buffer size.
+>>
+>> Reviewed-by: Mat Martineau <martineau@kernel.org>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> Signed-off-by: Mat Martineau <martineau@kernel.org
+>
+> ...
+>
+>> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+>> index df208666fd19..2b43577f952e 100644
+>> --- a/net/mptcp/subflow.c
+>> +++ b/net/mptcp/subflow.c
+>> @@ -421,6 +421,7 @@ static bool subflow_use_different_dport(struct mptcp_sock *msk, const struct soc
+>>
+>>  void __mptcp_set_connected(struct sock *sk)
+>>  {
+>> +       __mptcp_propagate_sndbuf(sk, mptcp_sk(sk)->first);
+>
+> ->first can be NULL here, according to syzbot.
+>
 
-So i assume there are a lot of users of the qca_spi driver.
+Thanks for reporting this, Eric. We will get a fix to the net tree.
 
-Here are my questions to the community:
-- Are you aware of any issues with this driver?
-- Are there any feature requests?
 
-Thanks in advance
+Paolo & Matthieu, I created a github issue to track this:
 
-[1] - https://github.com/qca/qca7000/
+https://github.com/multipath-tcp/mptcp_net-next/issues/454
+
+
+
+- Mat
+--0-709216980-1698950333=:19746--
 
