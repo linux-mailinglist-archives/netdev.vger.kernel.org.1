@@ -1,105 +1,123 @@
-Return-Path: <netdev+bounces-45688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 733337DF072
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:46:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3171B7DF080
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:48:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB96EB20F14
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 617691C20EA9
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31888830;
-	Thu,  2 Nov 2023 10:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB31411185;
+	Thu,  2 Nov 2023 10:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2tlDWgX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaUxYJCx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7491379F4
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:45:56 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A037138;
-	Thu,  2 Nov 2023 03:45:55 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-540fb78363bso1288023a12.0;
-        Thu, 02 Nov 2023 03:45:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F237496
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:48:19 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACBA0E7;
+	Thu,  2 Nov 2023 03:48:17 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53f9af41444so1328540a12.1;
+        Thu, 02 Nov 2023 03:48:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698921953; x=1699526753; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XjL++vViYaDWI2YtfsqD0BSYvDF9i1i+EJlr9p5UOfE=;
-        b=F2tlDWgX41deut2CSj+12fzK/QWrx3oA4+ifHIyxF3xUA7NbSZ6ioLx/2maxgrl9OC
-         5RaDeSvA36z7XohbDTypZE52hswz3FfgwAtwJXdb16gUgWmncARiSUH+ltaGEkpInwBa
-         makr6+EIW/5Q06AomJm2pVhBZwm4huvM+MmCGwp4/SLe37Awt0spXuBnt5b5s/rf3j/w
-         +alOAnEA03UAuiIPxChSIbM+LOtfQ0ICZPHfHtbGapbZjTj70JuCimMPbUZbp1kbrwY/
-         MN/wuy1B2JZZ07qJGCZgLfHFqgF8gDxubJLBnwiRW1uFBVg3xessjXv29EcRjZDpZE9t
-         hcAw==
+        d=gmail.com; s=20230601; t=1698922096; x=1699526896; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nMaBjdOanD6UfLLPmERhth0x95+hV9dH23o364JxPro=;
+        b=aaUxYJCx5AnCXDwJcZO1j5gnJyXeGAFTN4zH/d7mwkAp24oGnx+2qfweHkvSKiCbKi
+         x6PuqrzeQKrYZOkuryVRhV6M0idTX500++t23GYaTjOFiQvgD76jlAjMq+aBNS4E2Di0
+         5SYivMqQQgMDFzTcipdoTKagdXjHHr5jdX+xuSAhpTRBQCNKl5UveO8lDifmpWURKkL7
+         zq9NbH/p6O9RVWY55IJ9kp5tqnI1YWJnaeNskJUHwii3Q4OQh37ip3jKuP8gZqoqvm4M
+         /8kKBDoV4e0TLBd7vvMCFVv12ahMtunLZWckzqMiMWaVS7eLwmbarAiAsf6P0paQQAaq
+         W3JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698921953; x=1699526753;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XjL++vViYaDWI2YtfsqD0BSYvDF9i1i+EJlr9p5UOfE=;
-        b=ddAMrYiRTgTFvM6JVqw0GWmBgeTog8nYAVVA58kX4HsWcrd4D+yP5ibK72zBS8N5D4
-         KRDmvwlRTrrUj3f7jWnlRnQclsvbFVUM2W5LkOPM8NCpH+qiBkby/JXgYb4HP2bNnV09
-         bJKyo/wRUHD+7nljHQkKu9M57iCl/JxbGrVuSNm6ZW35rBv3cUQ6lZMczxWTmWyVXmCO
-         TlkSoNxdV77MELGPj//cQnWIUlebyjKx1xQLDEx/L9WXA2DY/LrejcZDX6eAi5WLtx30
-         bqf6FpD1MYIsCDBkLdMXAaQ2EPI65vFEp2cENy7d0Wpca6UEmXBwopJ+asfc7nyvk+/4
-         3ceQ==
-X-Gm-Message-State: AOJu0YzMlKq6ly8xvfSjb+pGPgBfgkihl68z0RjKc7XQdOwlNZTw9ydG
-	MdJHwsQNG1Mb/jxcaQ/RquU=
-X-Google-Smtp-Source: AGHT+IFj4hzOG4wSgbi6JwMGNCHVvolStewuOWlcu3gxxyWR4UxSSlAg7EilxG3Tyqxpq+VKL0er9w==
-X-Received: by 2002:a17:906:fe41:b0:9b6:aac1:6fa5 with SMTP id wz1-20020a170906fe4100b009b6aac16fa5mr4194163ejb.55.1698921953286;
-        Thu, 02 Nov 2023 03:45:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1698922096; x=1699526896;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nMaBjdOanD6UfLLPmERhth0x95+hV9dH23o364JxPro=;
+        b=cndx9Bp0MMZYEGayjhvaoOH03R/kOsSH2hSvMpM2vECyTC/S0sULLwjtFYC3ybgtXE
+         nXdnbbMNgx7usEZHuh/G6R5mpekR/9D0Lil668MDPkbgVXn+1qzmLEmH/bWjxhUixdu0
+         ejjrbNUdUYA/cnTKRJIo+3x/ef6j5han10iJ1KImOqVl/mH0LTgHmJHoKst4WMeRtZbe
+         lQ3NcjtBxM42ixJQ0AU9Dins56GGz90gQhn9CCkaFdTiR7Uxl4lRl31ElQPyOKPkDBmq
+         u8+1DuWn7C19jKupbrdMKaW6g4Pt90J9GUEUMUifem+sHsaz2/T28+qKHRO10Qvxqmw2
+         lebg==
+X-Gm-Message-State: AOJu0YwZ2D8tV0SNRcFIHAD9YrNxwTDfmz0EJ+fl4tXeUBD0nJ+pcbs+
+	jaAJ3G1tbNJZ9oPD9AjlAnI=
+X-Google-Smtp-Source: AGHT+IFaCaMcqsAOr5kJWfaBesPw7XV+nUul5sr9n72b9RXPba2xHe0OLSJeXp4tWqlflxwgUsQo0A==
+X-Received: by 2002:a50:d689:0:b0:543:5281:ac73 with SMTP id r9-20020a50d689000000b005435281ac73mr7889059edi.30.1698922095992;
+        Thu, 02 Nov 2023 03:48:15 -0700 (PDT)
 Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id j19-20020a170906279300b009ae69c303aasm976244ejc.137.2023.11.02.03.45.52
+        by smtp.gmail.com with ESMTPSA id o15-20020aa7dd4f000000b00530a9488623sm2149246edw.46.2023.11.02.03.48.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 03:45:53 -0700 (PDT)
-Date: Thu, 2 Nov 2023 12:45:50 +0200
+        Thu, 02 Nov 2023 03:48:15 -0700 (PDT)
+Date: Thu, 2 Nov 2023 12:48:13 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231102104550.iuw5ozfchbm3u667@skbuf>
-References: <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
- <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf>
- <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf>
- <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
- <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
- <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
+Message-ID: <20231102104813.qyzkfpbwz4kiloez@skbuf>
+References: <CACRpkdYg8hattBC1esfh3WBNLZdMM5rLWhn4HTRLMfr2ubbzAA@mail.gmail.com>
+ <20231030152325.qdpvv4nbczhal35c@skbuf>
+ <20231030153057.3ofydbzh7q2um3os@skbuf>
+ <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+ <CACRpkdYg8hattBC1esfh3WBNLZdMM5rLWhn4HTRLMfr2ubbzAA@mail.gmail.com>
+ <20231030152325.qdpvv4nbczhal35c@skbuf>
+ <20231030153057.3ofydbzh7q2um3os@skbuf>
+ <CACRpkdYb6v6dpFFySSHdQ0H+KYRDNr2V4ShZTVA2A0ar_h9D=A@mail.gmail.com>
+ <CACRpkdYb6v6dpFFySSHdQ0H+KYRDNr2V4ShZTVA2A0ar_h9D=A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
+In-Reply-To: <CACRpkdYb6v6dpFFySSHdQ0H+KYRDNr2V4ShZTVA2A0ar_h9D=A@mail.gmail.com>
+ <CACRpkdYb6v6dpFFySSHdQ0H+KYRDNr2V4ShZTVA2A0ar_h9D=A@mail.gmail.com>
 
-On Wed, Nov 01, 2023 at 09:26:50PM +0100, Linus Walleij wrote:
-> On Wed, Nov 1, 2023 at 1:35 PM Luiz Angelo Daros de Luca <luizluca@gmail.com> wrote:
+On Tue, Oct 31, 2023 at 10:22:05PM +0100, Linus Walleij wrote:
+> Hi Vladimir,
 > 
-> > Sorry but I noticed no issues:
+> I got around to testing this too:
 > 
-> Don't be sorry about that, it's good news because now I know
-> where to look, i.e. in the ethernet controller.
+> # ping -s 1472 192.168.1.137
+> 
+> The result:
+> 
+> SKB before padding:
+> 37 (192.168.1.13skb len=1514 headroom=18 headlen=1514 tailroom=260
+> mac=(18,14) net=(32,20) trans=52
+> shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+> csum(0xd4ef2b1 ip_summed=0 complete_sw=0 valid=0 level=0)
+> hash(0x0 sw=0 l4=0) proto=0x0800 pkttype=0 iif=0
+> 7): 1472 data bydev name=lan0 feat=0x0002000000005020
+> tes
+> sk family=2 type=3 proto=1
+> 
+> SKB after padding:
+> skb len=1518 headroom=18 headlen=1518 tailroom=256
+> mac=(18,14) net=(32,20) trans=52
+> shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+> csum(0xd4ef2b1 ip_summed=0 complete_sw=0 valid=0 level=0)
+> hash(0x0 sw=0 l4=0) proto=0x0800 pkttype=0 iif=0
+> dev name=lan0 feat=0x0002000000005020
+> sk family=2 type=3 proto=1
+> 
+> As expected the linear SKB is 4 bytes longer in this case.
 
-Don't look too deeply into the code just yet, just try to see what
-happens with dsa_loop on an identical Ethernet controller that isn't
-physically attached to a switch.
+Ok, I'm not seeing anything unusual about the skb geometry in the
+skb_dump() output.
 
