@@ -1,114 +1,140 @@
-Return-Path: <netdev+bounces-45693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F40FF7DF0CA
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:02:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 614627DF0FB
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:14:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F730B2137C
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:02:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E59E7B210CB
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AFE14006;
-	Thu,  2 Nov 2023 11:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B91C1426F;
+	Thu,  2 Nov 2023 11:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U53jqP9V"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70E814A89
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:01:58 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109D7185
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 04:01:56 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SLgpz57BMz1P7tB;
-	Thu,  2 Nov 2023 18:58:51 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 2 Nov
- 2023 19:01:54 +0800
-Subject: Re: [PATCH 1/2][net-next] skbuff: move
- netlink_large_alloc_large_skb() to skbuff.c
-To: Li RongQing <lirongqing@baidu.com>, <netdev@vger.kernel.org>
-References: <20231102062836.19074-1-lirongqing@baidu.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <50622ac2-0939-af35-5d62-c56249e7bd26@huawei.com>
-Date: Thu, 2 Nov 2023 19:01:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE03314A81
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:14:42 +0000 (UTC)
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD80111
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 04:14:37 -0700 (PDT)
+Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso9975381fa.3
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 04:14:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698923676; x=1699528476; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o58wFnf6szPGgzlryUFb1pArzVhpE+Bc8B/ye0mh1Ic=;
+        b=U53jqP9VsUBak53Y5BfKYfegk3kaVH4KZAkUP0KAhHPKM/eAbu3Dhyy2tSC/G70F16
+         pLEfg6e/NzHbe30i0hvgPA2D0qvph/Iza4vRoYLPLavuHyAUlz21bQsaWMWWffq31Y/u
+         BLEEulyy+BSJz7zVF24Xj6Se21AQ9seOR9HcWAhMTrGE4tC6zAS1BN7rRb2XDSOze1MP
+         Ggox8NcFXFQVfDLjqcbHTzinBsBtnaRybKmPymlBwQRt74BVx6uM/mwSMWFg5aCzr23Q
+         L4yJLhnYyNYhwmgWa8c4VKYmMz+sT5S266ehiOmXNS09PIS+a+sOHgXWTOI3UMvwe4yK
+         Fkrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698923676; x=1699528476;
+        h=user-agent:in-reply-to:content-transfer-encoding
+         :content-disposition:mime-version:references:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o58wFnf6szPGgzlryUFb1pArzVhpE+Bc8B/ye0mh1Ic=;
+        b=FD9HFK5LgCghRzQ5h5lXoWqwimxpkGORHxXRo8quxB3kZaoRLbQxXaC/f7B9BDBRrI
+         ubgOJSoyAfiHyvnx/N421Jl1irqv1eb1kDtSDPxg6cSGzKaKMWr14iPFmk3TjaVXlX/t
+         K0vi9s3iztUQOtCzmSBkCiVoTY45vAk0jiwHgFvW90akvT6YozTENXemA+XcmXeEKJ1K
+         96qm9lKIgLdhWRPtknhC8y7W27kX4sf0ZuZxkjWQcd+OB+f6eW5L1njOGGqmKU3m5wTs
+         58fnr/Y3snxbIXat7b8cHw0CiwQso7Qhm57DbMKE3Lv6Rcys7K+7uejUzNy/LK5KfiiX
+         ULqA==
+X-Gm-Message-State: AOJu0YzTmEJXRLuUpA8KETHceuuOZ7uMmn8L+qsx0XKmPiwADoyf94al
+	Ryz7v7gJH3p5ZAQMEJarQ8aUwg==
+X-Google-Smtp-Source: AGHT+IH9UK7cZnl9aI1aNQH4ht0Hk9DmI3/B0c72F9p/BRC6XUjOOYp1gCJA1VqoiNTczqzaa+kmgQ==
+X-Received: by 2002:a2e:be10:0:b0:2c4:fdc9:c8a3 with SMTP id z16-20020a2ebe10000000b002c4fdc9c8a3mr16743697ljq.50.1698923676107;
+        Thu, 02 Nov 2023 04:14:36 -0700 (PDT)
+Received: from mutt (c-9b0ee555.07-21-73746f28.bbcust.telenor.se. [85.229.14.155])
+        by smtp.gmail.com with ESMTPSA id bd4-20020a05651c168400b002c6ee08c2casm215421ljb.105.2023.11.02.04.14.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 04:14:35 -0700 (PDT)
+Date: Thu, 2 Nov 2023 12:14:33 +0100
+From: Anders Roxell <anders.roxell@linaro.org>
+To: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+	bpf@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>,
+	netdev@vger.kernel.org,
+	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Larysa Zaremba <larysa.zaremba@intel.com>
+Subject: Re: [PATCH bpf] selftests/bpf: Fix broken build where char is
+ unsigned
+Message-ID: <20231102111433.GA364395@mutt>
+References: <20231102103537.247336-1-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231102062836.19074-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231102103537.247336-1-bjorn@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 2023/11/2 14:28, Li RongQing wrote:
-> move netlink_alloc_large_skb and netlink_skb_destructor to skbuff.c
-> and rename them more generic, so they can be used elsewhere large
-> non-contiguous physical memory is needed
+On 2023-11-02 11:35, Björn Töpel wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
 > 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> There are architectures where char is not signed. If so, the following
+> error is triggered:
+> 
+>   | xdp_hw_metadata.c:435:42: error: result of comparison of constant -1 \
+>   |   with expression of type 'char' is always true \
+>   |   [-Werror,-Wtautological-constant-out-of-range-compare]
+>   |   435 |         while ((opt = getopt(argc, argv, "mh")) != -1) {
+>   |       |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~
+>   | 1 error generated.
+> 
+> Correct by changing the char to int.
+> 
+> Fixes: bb6a88885fde ("selftests/bpf: Add options and frags to xdp_hw_metadata")
+> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
+
+Thank you for the patch.
+I saw the same failure when I built selftests/bpf for arm64.
+
+With this patch ontop of today's next-20231102, fixes that build issue.
+
+Tested-by: Anders Roxell <anders.roxell@linaro.org>
+
+
+Cheers,
+Anders
+
 > ---
->  include/linux/skbuff.h   |  3 +++
->  net/core/skbuff.c        | 40 ++++++++++++++++++++++++++++++++++++++++
->  net/netlink/af_netlink.c | 41 ++---------------------------------------
->  3 files changed, 45 insertions(+), 39 deletions(-)
+>  tools/testing/selftests/bpf/xdp_hw_metadata.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 4174c4b..774a401 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -5063,5 +5063,8 @@ static inline void skb_mark_for_recycle(struct sk_buff *skb)
->  ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
->  			     ssize_t maxsize, gfp_t gfp);
+> diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+> index 17c0f92ff160..c3ba40d0b9de 100644
+> --- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
+> +++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
+> @@ -430,7 +430,7 @@ static void print_usage(void)
 >  
-> +
-> +void large_skb_destructor(struct sk_buff *skb);
-> +struct sk_buff *alloc_large_skb(unsigned int size, int broadcast);
->  #endif	/* __KERNEL__ */
->  #endif	/* _LINUX_SKBUFF_H */
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 4570705..20ffcd5 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6917,3 +6917,43 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
->  	return spliced ?: ret;
->  }
->  EXPORT_SYMBOL(skb_splice_from_iter);
-> +
-> +void large_skb_destructor(struct sk_buff *skb)
-> +{
-> +	if (is_vmalloc_addr(skb->head)) {
-> +		if (!skb->cloned ||
-> +		    !atomic_dec_return(&(skb_shinfo(skb)->dataref)))
-> +			vfree(skb->head);
-> +
-> +		skb->head = NULL;
-
-There seems to be an assumption that skb returned from
-netlink_alloc_large_skb() is not expecting the frag page
-for shinfo->frags*, as the above NULL setting will bypass
-most of the handling in skb_release_data(),then how can we
-ensure that the user is not breaking the assumption if we
-make it more generic?
-
-
-> +	}
-> +	if (skb->sk)
-> +		sock_rfree(skb);
-> +}
-> +EXPORT_SYMBOL(large_skb_destructor);
-> +
+>  static void read_args(int argc, char *argv[])
+>  {
+> -	char opt;
+> +	int opt;
+>  
+>  	while ((opt = getopt(argc, argv, "mh")) != -1) {
+>  		switch (opt) {
+> 
+> base-commit: cb3c6a58be50c65014296aa3455cae0fa1e82eac
+> -- 
+> 2.40.1
+> 
 
 
