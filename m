@@ -1,110 +1,97 @@
-Return-Path: <netdev+bounces-45712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4357DF244
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:24:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC08C7DF251
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF8C71C20EB1
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA4E281B15
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC441864C;
-	Thu,  2 Nov 2023 12:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7D018650;
+	Thu,  2 Nov 2023 12:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zu2OGUil"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="miheRlgn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028E714F6C;
-	Thu,  2 Nov 2023 12:24:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F612112;
-	Thu,  2 Nov 2023 05:24:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1698927854; x=1730463854;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version:content-id;
-  bh=Hn3HxLIchr3g7rx6JvOiqgfPvzN/KUrJgEv9IL8moEQ=;
-  b=Zu2OGUilRUEJA+Te4WPvqSffFzvSwG0MsE2OEIZKbXvJWnq4n2MeAu6g
-   pARWg1MBBo6D2UGGFtjclSrRT9FSdURMqMxRoWSj9lo9LjE1P1CY8iah8
-   mrRZZudvj5oR3He03L9b4rfbIwq6hmHgkwE0s1eWeJeUrffnkNmzLEVN9
-   cjcAYC0H5oA/OH7b35txgJ5Fxtl+9Id3KHnpwj5S+2zt1zeoTEEnFNMtT
-   vK22KWoR7WxQr+3YBA8hN4422lKgFoM7RiGNPvl4Jf9ARoZhiVbfx9H77
-   +o/BTEp/OHL5K8dqg/spGrGKgA6ZJrvOZxkwofnTnsDKM+kRwcYYe5STf
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="7340674"
-X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
-   d="scan'208";a="7340674"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 05:24:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,271,1694761200"; 
-   d="scan'208";a="2523649"
-Received: from sdsadara-mobl.ger.corp.intel.com ([10.251.215.6])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 05:24:09 -0700
-Date: Thu, 2 Nov 2023 14:24:06 +0200 (EET)
-From: =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-cc: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org, lenb@kernel.org, 
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, alexander.deucher@amd.com, Lijo.Lazar@amd.com, 
-    mario.limonciello@amd.com, Netdev <netdev@vger.kernel.org>, 
-    linux-wireless@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
-    linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-    majun@amd.com, Evan Quan <quanliangl@hotmail.com>
-Subject: Re: [Patch v13 4/9] wifi: mac80211: Add support for WBRF features
-In-Reply-To: <b080757463a1f55a38484e3ea39fd3697e98409e.camel@sipsolutions.net>
-Message-ID: <e42c5484-d66-e41a-8b2e-a1fa4495ce2@linux.intel.com>
-References: <20231030071832.2217118-1-Jun.Ma2@amd.com>  <20231030071832.2217118-5-Jun.Ma2@amd.com>  <5b8ea81c-dd4c-7f2a-c862-b9a0aab16044@linux.intel.com> <b080757463a1f55a38484e3ea39fd3697e98409e.camel@sipsolutions.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC4818629
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:27:39 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4D4128
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:27:34 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9d2d8343dc4so136664066b.0
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 05:27:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1698928053; x=1699532853; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+IlzWzsPzAqK/9VX5A1Cz696kpR/WLJvKy9oVavGOwE=;
+        b=miheRlgn2VI7Gw4+l7yGtlPSUcI7qunnd2NS3l8JRonwHJmAw1FVw/qk8HI0BoEv+U
+         PKQ8Zgv0OsZSxXSubfIpdIsFPAdGSA/Kv4TE+M0ueUdQYd+16y21IdvO1xTt7+bXDlEh
+         yr5gnoFiGYTro/C3Eja3jY21ppUPyJQ419/Onx3Y/APGzL8PxzchQQNgyJhXypgolIie
+         N4yDDrVN7igLsLO3hXKq5VP3Q06lQ0aCZURpVrpIFzqUjRKDKQ/pPcX1pLYnt5awV6Aw
+         d4cu2MyYbEkpTv10H5TKl1rXSZwf7Og36k+oJC8oGCu9KBnsHORpUMMlCzD4VyybTtQs
+         9XMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698928053; x=1699532853;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+IlzWzsPzAqK/9VX5A1Cz696kpR/WLJvKy9oVavGOwE=;
+        b=BjT5sz1RxuwYRblID5KYKo/qmkX+ZRmGoHoc3JAs1bi7hWZBfMZXaFYWHQJFJ6AMzF
+         J8olfYWucw+8MFWYKVVj0onBavn8S9q7mMXYSntSx5+54nfXHfpV3OyYaz3IxcuYi2K5
+         b3wUncJ1XiLnzOpv0GGCSIaaiedl4Ww1jsnQSCKBWEMXx9C5ovU/HYYiFh+8hiQUKnJI
+         +2UGFyyQCJijBSKnE9jO8kQrvABuRQ/6UBbW9dGSssSyyfgEg0f/0HHIU5aJ/9NcSntO
+         TkB1KgSsATL+7oVkxQ8D2CjYg37YJxWFicTeSAtBmyb/8XN8chqp+DjR2ElxXtakwIpS
+         gGbA==
+X-Gm-Message-State: AOJu0YwGfF+eA+aCA9J+zY0DnVgwBe6QOeAxGarVH0JbcRH0HeaPqgkU
+	Acf9YoPo7y48O+d6h71/ngdcpw==
+X-Google-Smtp-Source: AGHT+IGWszk6J5oumn/g+kI0XIK3jFZLR+YKmegTZFfG8Z5Pys1g97UFM5dl5Wk+Zo/hdL47i+Sp9w==
+X-Received: by 2002:a17:907:9496:b0:9c7:59d1:b2c4 with SMTP id dm22-20020a170907949600b009c759d1b2c4mr4030509ejc.64.1698928053238;
+        Thu, 02 Nov 2023 05:27:33 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id i9-20020a1709061cc900b009b2cc87b8c3sm1074554ejh.52.2023.11.02.05.27.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 05:27:32 -0700 (PDT)
+Date: Thu, 2 Nov 2023 15:27:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Harshit Mogalapalli <harshit.m.mogalapalli@gmail.com>
+Subject: Re: [PATCH v2] netfilter: nf_tables: prevent OOB access in
+ nft_byteorder_eval
+Message-ID: <d493e2f5-4dad-424c-801e-54c959aab8ef@kadam.mountain>
+References: <20230705201232.GG3751@breakpoint.cc>
+ <20230705210535.943194-1-cascardo@canonical.com>
+ <d7e42ffd-aabf-46d7-b02a-a7337708a29a@moroto.mountain>
+ <20231102102846.GE6174@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="8323329-387861400-1698927329=:2124"
-Content-ID: <8f10c3aa-da5e-8e6-b212-dcb8f7f64325@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231102102846.GE6174@breakpoint.cc>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---8323329-387861400-1698927329=:2124
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <163c94a-bfac-2984-64c1-1c2281e27410@linux.intel.com>
-
-On Thu, 2 Nov 2023, Johannes Berg wrote:
-> On Thu, 2023-11-02 at 13:55 +0200, Ilpo Järvinen wrote:
+On Thu, Nov 02, 2023 at 11:28:46AM +0100, Florian Westphal wrote:
+> Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> > This patch is correct, but shouldn't we fix the code for 64 bit writes
+> > as well?
 > 
-> > > +static void get_chan_freq_boundary(u32 center_freq, u32 bandwidth, u64 *start, u64 *end)
-> > > +{
-> > > +	bandwidth = MHZ_TO_KHZ(bandwidth);
-> > > +	center_freq = MHZ_TO_KHZ(center_freq);
-> > 
-> > Please use include/linux/units.h ones for these too.
+> Care to send a patch?
 > 
-> Now we're feature creeping though - this has existed for *years* in the
-> wireless stack with many instances? We can convert them over, I guess,
-> but not sure that makes much sense here - we'd want to add such macros
-> to units.h, but ... moving them can be independent of this patch?
 
-What new macros you're talking about? Nothing new needs to be added 
-as there's already KHZ_PER_MHZ so these would just be:
+Sure.  Will do.
 
-	bandwidth *= KHZ_PER_MHZ;
-	center_freq *= KHZ_PER_MHZ;
+regads,
+dan carpenter
 
-Everything can of course be postponed by the argument that some 
-subsystem specific mechanism has been there before the generic one
-but the end of that road won't be pretty... What I was trying to do
-here was to point out the new stuff introduced by this series into the 
-direction of the generic thing.
-
--- 
- i.
---8323329-387861400-1698927329=:2124--
 
