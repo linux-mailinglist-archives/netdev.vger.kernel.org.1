@@ -1,113 +1,153 @@
-Return-Path: <netdev+bounces-45617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A0827DE97F
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:38:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A2B7DE98F
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DC17B20F91
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 00:38:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DE181C20756
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 00:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB381EDB;
-	Thu,  2 Nov 2023 00:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC2B372;
+	Thu,  2 Nov 2023 00:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Pd15eFvk"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="pmRqAN68"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62CD1372
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 00:38:08 +0000 (UTC)
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1525101
-	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 17:38:03 -0700 (PDT)
-Message-ID: <5bd504bb-6d0b-0a6c-0c12-37174ff22a2e@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1698885482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+V3C17W+NUJRqaDBjl23ZCi2Matx5/XILyFgz0Y7j34=;
-	b=Pd15eFvkGfkcFcFakNa21xg/MqsDjv5OM5YwT/t3/41aBS8JGw4nRqRN7+m0x4tj2Hifmu
-	mKQ/6hiRTS5PLEW1FWlFXwKlmO2mkwOf/cF050H35x1Q5coHZvMrgQ4iZVju62cMIJDIot
-	Uv9xfjVAUAlbaEhQBlIdD2HOr7t8yqg=
-Date: Thu, 2 Nov 2023 00:38:00 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D395010F6
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 00:41:14 +0000 (UTC)
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB73119
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 17:41:11 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1e993765c1bso249549fac.3
+        for <netdev@vger.kernel.org>; Wed, 01 Nov 2023 17:41:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1698885671; x=1699490471; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PAmpgjdK8hmw86qRod49rM//sCJ8Bz8+YBV91rFwGG4=;
+        b=pmRqAN68uA/Z+sMMnSXl8Vq1vVwhLK0wu4dZKngIJHgdls8NWpwRc0eH1l4einry14
+         yJ5O9IxPQ6fvGbC+xHtD6mzff5OEYFRYrgFuy75tBX1kLlmAHwoZ+OBd4EarNNPGQ5zV
+         Z9dL1+jfk7VmScDUdeYCCDir/OzPIh8gMa+23zPVD4MujDfwGUKKuYlUccAOd4y9GDpN
+         1rFip/8WBKwGAqt+A5Fh9SPq1U9wPeUxiN0KBfanHnaVHrn2ew50EJtv5wzmMhSvOS0S
+         QFDogJzqR3+36UXf6arBW/k3pVPm7rTEEbC89JQjT5yUnMwkDMRvcGyhTCSKg8/aAeVI
+         /+TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698885671; x=1699490471;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PAmpgjdK8hmw86qRod49rM//sCJ8Bz8+YBV91rFwGG4=;
+        b=daBh1eX7ySzu+UfA6vQ64tiG0uUlNuPXKp7lBPdLy7mZlcPJBFSxDfQYYMNYujDhzr
+         OiAt0pltp450SdkBduW65S8UfAruzTVrs/KgioMBMjj17bdZuu++3HEkc8JkhZ+aq8Ee
+         LF/l2Y1K+o28S624ZGQSzuJwOh3R317Wcan0I2Vu6C3zqiJCx6n9FplWa3WOW2+AkNY1
+         NytMHQEVSNUl843pi8pQVp8U0RxhzQZ+tzIrFrO1rjYX12US+TMrVm5zVH0RAyQ8pA0P
+         Z62SYnih5VTcaSVzsdfiAU/y8EwTsbhPofXOp1ENxSIJOaf1dtQ5freDXo9Ydc+Os1BN
+         pKjg==
+X-Gm-Message-State: AOJu0Yx3mswwiFluhMINyUX5LvFV9BjteLGbR0QlodwQrxsgkhxYO2+k
+	pVfC7XLwsCB8MhajKhz1XUeYjw==
+X-Google-Smtp-Source: AGHT+IFFaftpgSzJhJuGLJNG/sHeW9v22Ui/IWzm0dd7hWk1pkaNfdav4oOzey1zsg3meE6Ku8MPMQ==
+X-Received: by 2002:a05:6871:528e:b0:1ea:6883:9a01 with SMTP id hu14-20020a056871528e00b001ea68839a01mr24276948oac.32.1698885670962;
+        Wed, 01 Nov 2023 17:41:10 -0700 (PDT)
+Received: from localhost ([12.44.203.122])
+        by smtp.gmail.com with ESMTPSA id s15-20020a63b40f000000b00588e8421fa8sm308240pgf.84.2023.11.01.17.41.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Nov 2023 17:41:10 -0700 (PDT)
+Date: Wed, 01 Nov 2023 17:41:10 -0700 (PDT)
+X-Google-Original-Date: Wed, 01 Nov 2023 17:31:33 PDT (-0700)
+Subject:     Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
+In-Reply-To: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
+CC: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+  pabeni@redhat.com, ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com,
+  fruggeri@arista.com, noureddine@arista.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+  llvm@lists.linux.dev, patches@lists.linux.dev, nathan@kernel.org
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: nathan@kernel.org
+Message-ID: <mhng-df0ad8f4-f79c-427c-9798-8682fca4f516@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: add skcipher API support to TC/XDP
- programs
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-crypto@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Vadim Fedorenko <vadfed@meta.com>
-References: <20231031134900.1432945-1-vadfed@meta.com>
- <dac97b74-5ff1-172b-9cd5-4cdcf07386ec@linux.dev>
- <91a6d5a7-7b18-48a2-9a74-7c00509467f8@linux.dev>
- <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <6947046d-27e3-90ee-3419-0b480af0abb0@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 01.11.2023 23:41, Martin KaFai Lau wrote:
-> On 11/1/23 3:50 PM, Vadim Fedorenko wrote:
->>>> +static void *__bpf_dynptr_data_ptr(const struct bpf_dynptr_kern *ptr)
->>>> +{
->>>> +    enum bpf_dynptr_type type;
->>>> +
->>>> +    if (!ptr->data)
->>>> +        return NULL;
->>>> +
->>>> +    type = bpf_dynptr_get_type(ptr);
->>>> +
->>>> +    switch (type) {
->>>> +    case BPF_DYNPTR_TYPE_LOCAL:
->>>> +    case BPF_DYNPTR_TYPE_RINGBUF:
->>>> +        return ptr->data + ptr->offset;
->>>> +    case BPF_DYNPTR_TYPE_SKB:
->>>> +        return skb_pointer_if_linear(ptr->data, ptr->offset, 
->>>> __bpf_dynptr_size(ptr));
->>>> +    case BPF_DYNPTR_TYPE_XDP:
->>>> +    {
->>>> +        void *xdp_ptr = bpf_xdp_pointer(ptr->data, ptr->offset, 
->>>> __bpf_dynptr_size(ptr));
->>>
->>> I suspect what it is doing here (for skb and xdp in particular) is very 
->>> similar to bpf_dynptr_slice. Please check if bpf_dynptr_slice(ptr, 0, NULL, 
->>> sz) will work.
->>>
->>
->> Well, yes, it's simplified version of bpf_dynptr_slice. The problem is
->> that bpf_dynptr_slice bpf_kfunc which cannot be used in another
->> bpf_kfunc. Should I refactor the code to use it in both places? Like
-> 
-> Sorry, scrolled too fast in my earlier reply :(
-> 
-> I am not aware of this limitation. What error does it have?
-> The bpf_dynptr_slice_rdwr kfunc() is also calling the bpf_dynptr_slice() kfunc.
-> 
+On Tue, 31 Oct 2023 13:23:35 PDT (-0700), nathan@kernel.org wrote:
+> Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
+>
+>   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+>     663 |         }
+>         |         ^
+>   1 error generated.
+>
+> On earlier releases (such as clang-11, the current minimum supported
+> version for building the kernel) that do not support C23, this was a
+> hard error unconditionally:
+>
+>   net/ipv4/tcp_output.c:663:2: error: expected statement
+>           }
+>           ^
+>   1 error generated.
+>
+> Add a semicolon after the label to create an empty statement, which
+> resolves the warning or error for all compilers.
+>
+> Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
+> Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+>  net/ipv4/tcp_output.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index f558c054cf6e..6064895daece 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -658,7 +658,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>  			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
+>  			ptr++;
+>  		}
+> -out_ao:
+> +out_ao:;
+>  #endif
+>  	}
+>  	if (unlikely(opts->mss)) {
+>
+> ---
+> base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
+> change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
+>
+> Best regards,
 
-Yeah, but they are in the same module. We do not declare prototypes of kfuncs in
-linux/bpf.h and that's why we cannot use them outside of helpers.c.
-The same problem was with bpf_dynptr_is_rdonly() I believe.
+This gives me a
 
->> create __bpf_dynptr_slice() which will be internal part of bpf_kfunc?
-> 
-> 
-> 
-> 
-> 
-> 
+linux/net/ipv4/tcp_output.c:663:2: error: expected statement
+        }
 
+on GCC for me.  So I think something like
+
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index f558c054cf6e..ca09763acaa8 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -659,6 +659,11 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+ 			ptr++;
+ 		}
+ out_ao:
++	/*
++	 * Labels at the end of compound statements are a C23 feature, so
++	 * introduce a block to avoid a warning/error on strict toolchains.
++	 */
++	{}
+ #endif
+ 	}
+ 	if (unlikely(opts->mss)) {
+
+should do it (though it's still build testing...)
 
