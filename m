@@ -1,85 +1,112 @@
-Return-Path: <netdev+bounces-45716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76B947DF26E
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:30:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A897DF275
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079EC281C18
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:30:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C0BD1C20E69
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F48F11724;
-	Thu,  2 Nov 2023 12:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7EA13AF9;
+	Thu,  2 Nov 2023 12:32:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MfUgaVpV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efmsZab6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCAE1B273
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:30:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 91504C433B9;
-	Thu,  2 Nov 2023 12:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698928223;
-	bh=9ZFkjK8joE0DrTuUP9Z7RKa5d1tIRR1miySEmmgwcuc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MfUgaVpVKEFN+0GmWGjWYx4+7kOWPQvrDi02LZyCGLvaYJaKKo81Uba2TI+tr51tD
-	 6jbxtliQrV3IFK/Vsl7/cyan87Id7QBEuWBgT0GW7xlWKbQFRKSCp2tytNMBdyKEan
-	 wnMbeow0S0ceBMsFnllzI+pZsJ3/uqHeEphYMl6UKun/MoqYHSrlwaPM6uDnFysk0F
-	 1tky3ErYda/wUfOzmammznqhx86+E4QOxEtEQer1B3Huhf+Xg1WUhHKilCO6xAKlCz
-	 1Qd9gTXLFNVtwKwK+PS5NLbvwQViwjCxlPE1PigtVC2h9F4vYtC761zZ4K9hGoSz6q
-	 YLzzyKp03fBiQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 772C3EAB08B;
-	Thu,  2 Nov 2023 12:30:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825DE18E2D
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:32:36 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2225F137;
+	Thu,  2 Nov 2023 05:32:35 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso1440639a12.3;
+        Thu, 02 Nov 2023 05:32:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698928353; x=1699533153; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=pM8zlt4obzxoJwrjk3uA0SX3/4WusjoDm/ScOgDY3EQ=;
+        b=efmsZab6cESdm9WKcEjMxynzAg0I/RqXRTgAXIEuHgc+cKkoLjgna59bd0+C+HXlc7
+         q0i5Z97FbVP7InT9Dz6vgyBaBKSOgxT88ls71Rd4W/26R2v53hydht8eyKo0+BNii7ks
+         i3lVg5jVREmrvypjFxx7b58kC0z2ksxLUcY7PHAkBVoeLlUQMcjoh8iCOZr7Sokevryu
+         lbqfdpcg5MFUvI+OctynNmTadQrUlWNcxGYK2fklzp5J7j4+0KIm42k5TQwElw9JoyQe
+         7CbH8ITZya8K2iuZytuT60IWtwSR/Bpe4njbRgMKOo/9yz8pi3FhaudtRPgB7DwTNn8J
+         +jBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698928353; x=1699533153;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pM8zlt4obzxoJwrjk3uA0SX3/4WusjoDm/ScOgDY3EQ=;
+        b=l635X4WuRXvlPL8PL5uFZNn6688uvHMLa7XF4M4YcjGHSPjora38HoHUDVtZr+g/0G
+         87oojnyUhWpTPg4tFe21PqxkF0go46+3Ad2siFJtfFZjEqECK1RHRpmufFT9eLlZ5mK9
+         BLppb/bFKjgz9kgmqRtlYjp81V30jBas752QwGsSkzQMEB48RAgNq/brpwwbvX0Jgmrx
+         EIEHHrQo0qm9opV7Sjkas+R9KA2B+dcHaQkpyWBDF+D1ulGtvoOH/M+UnQ7iVsp3NVcm
+         2NbECBK5XqqmA/j2h7mOevUymFvi0jb83C0LKqlAtIZugCMYrJdQLGOYnlS8JQ4iV74b
+         muXg==
+X-Gm-Message-State: AOJu0YzhayVrZVBgN5CgoKTBvRUYwPyXR9MDz0qPfQXzKJo997e5fIoI
+	rI7wrw7b317fWcTUaU6MKjM=
+X-Google-Smtp-Source: AGHT+IGpWEQw/lrAY3504ljM8AOISqQkQ25WLINqL0dId7TMKisUKJ2cfbrp1dPqiVaJUysFZFPlCQ==
+X-Received: by 2002:a17:907:608a:b0:9a5:7f99:be54 with SMTP id ht10-20020a170907608a00b009a57f99be54mr4395989ejc.67.1698928353180;
+        Thu, 02 Nov 2023 05:32:33 -0700 (PDT)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id jx3-20020a170906ca4300b009930c80b87csm1104868ejb.142.2023.11.02.05.32.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 05:32:32 -0700 (PDT)
+Date: Thu, 2 Nov 2023 14:32:30 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+Message-ID: <20231102123230.luoyrh2j4r4bbwjf@skbuf>
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
+ <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf>
+ <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
+ <20231030233334.jcd5dnojruo57hfk@skbuf>
+ <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
+ <20231031163439.tqab5axhk5q2r62i@skbuf>
+ <CACRpkdb=16uLhsXhktLCwUByDAMv9Arg2zzCA+oJW2HBJ35-Bg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] net: r8169: Disable multicast filter for RTL8168H and
- RTL8107E
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169892822348.20787.14826789912068070095.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Nov 2023 12:30:23 +0000
-References: <20231030205031.177855-1-ptf@google.com>
-In-Reply-To: <20231030205031.177855-1-ptf@google.com>
-To: Patrick Thompson <ptf@google.com>
-Cc: netdev@vger.kernel.org, hau@realtek.com, davem@davemloft.net,
- edumazet@google.com, hkallweit1@gmail.com, kuba@kernel.org,
- pabeni@redhat.com, linux-kernel@vger.kernel.org, nic_swsd@realtek.com
+In-Reply-To: <CACRpkdb=16uLhsXhktLCwUByDAMv9Arg2zzCA+oJW2HBJ35-Bg@mail.gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 30 Oct 2023 16:50:14 -0400 you wrote:
-> RTL8168H and RTL8107E ethernet adapters erroneously filter unicast
-> eapol packets unless allmulti is enabled. These devices correspond to
-> RTL_GIGA_MAC_VER_46 and VER_48. Add an exception for VER_46 and VER_48
-> in the same way that VER_35 has an exception.
+On Tue, Oct 31, 2023 at 08:02:29PM +0100, Linus Walleij wrote:
+> On Tue, Oct 31, 2023 at 5:34 PM Vladimir Oltean <olteanv@gmail.com> wrote:
+> > So on the gemini-dlink-dir-685.dts platform, you can also use &gmac1 as
+> > a plain Ethernet port, right?
 > 
-> Fixes: 6e1d0b898818 ("r8169:add support for RTL8168H and RTL8107E")
-> Signed-off-by: Patrick Thompson <ptf@google.com>
+> As a port it exist on the SoC yes but it is not connected physically
+> to anything.
 > 
-> [...]
+> &gmac0 is connected to the switch, and the switch has all the PHYs.
+(...)
+> If you by remote end mean the end of a physical cable there is
+> no way I can do that, as I have no PHY on gmac1.
+> 
+> (I don't know if I misunderstand the question...)
 
-Here is the summary with links:
-  - [v3] net: r8169: Disable multicast filter for RTL8168H and RTL8107E
-    https://git.kernel.org/netdev/net/c/efa5f1311c49
+No, you aren't.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> But I have other Gemini platforms, so I will try to do it on one
+> of them! Let's see if I can do this thing....
 
-
+Ok.
 
