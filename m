@@ -1,95 +1,108 @@
-Return-Path: <netdev+bounces-45615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCC007DE940
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:18:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C207DE954
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87935281291
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 00:18:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF9831C20DD2
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 00:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410DB39D;
-	Thu,  2 Nov 2023 00:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8828D371;
+	Thu,  2 Nov 2023 00:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JKkP9IYb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AfhTKVv5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB0B7E
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 00:18:48 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E34FDB;
-	Wed,  1 Nov 2023 17:18:47 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6bcdfcde944so94208b3a.1;
-        Wed, 01 Nov 2023 17:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698884327; x=1699489127; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s8957ZXAMokJVu3Z7wnJ8VE74hgqLOzUJ6al4SM64Ng=;
-        b=JKkP9IYbru2m2sGLIKUPz/TIVekLUsqWanPUqh5f8Ht0fOUS1yxZyAd0MjiNirMb7u
-         0uCJD17ETntvRXi015vO+xfzMvM2BVk7k8PWSGEa7WhmumWfIeuC6SjzIu+Q7LfchdY4
-         Lkvn6e74KrAQlxEO0USCjRY+n74vi7Dm1ldUFhfd4bQQyJFYmDyqOXuwS+BY3COnU8zt
-         PTUNSpwFpqK+V//oiEVBzwKt5z2XAd8VmUj9JO780C6vsHL9aqiIcSSEaQKZkW5TEDwO
-         CAL4Cm4JrEgPN/Ewz6lCyC/cvT+Pid1A2fTD7bj3xngWC8l//k2dXlY/kIn8xGtudWgt
-         VClg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698884327; x=1699489127;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s8957ZXAMokJVu3Z7wnJ8VE74hgqLOzUJ6al4SM64Ng=;
-        b=gpBBclWMdjx6c/zXCSIxkYGExGABZuCV9xGDy25rayHQcdX4MktB39sd/jMfr+MDzt
-         gcHu8kZJwBohIC6NCFriN+YRNi80a4uPBoxOA3P54sNdQdQBocJgiTlh7mvbSU4c07Y9
-         unk29A+3/EGD+bvSA6h+JDnAxCjqBZC7J99NEBuX4qUQPwI4dK8xmsxiwShc3cAU/3rJ
-         RL/+X/67jzW0TQxzXR2e2ArCZdFdsA8ymn1Hm3Gr1xsfjZohtNh6wQTmKK+xXzNTSBAe
-         nIOGzNq3ZcUQq1SJ6Uq1EcSG3PWLyr8UCR+0OtitpCECZzcBfTj4LNz/nGr/qKuPWpEh
-         xxug==
-X-Gm-Message-State: AOJu0Ywd3jpry52lZdooUO2F45DvevLkE4401LzyKONRJq32wJ1Ndhfk
-	4tsUeKovcOVzVB5IlE6Hg5Q=
-X-Google-Smtp-Source: AGHT+IFflYaHUWBqCJRXS9+gKRfaZkgRQi57kLnq0Fw4deD2a8UANa0uI1zHkwc6lO2flirPhblOmA==
-X-Received: by 2002:a05:6a20:2d22:b0:163:c167:964a with SMTP id g34-20020a056a202d2200b00163c167964amr20592204pzl.1.1698884326940;
-        Wed, 01 Nov 2023 17:18:46 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id l13-20020a056a00140d00b006c2fcb25c15sm1583592pfu.162.2023.11.01.17.18.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Nov 2023 17:18:46 -0700 (PDT)
-Date: Wed, 1 Nov 2023 17:18:44 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: habetsm.xilinx@gmail.com, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	reibax@gmail.com,
-	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net-next V2] ptp: fix corrupted list in ptp_open
-Message-ID: <ZULq5ILoM07oH1wr@hoboy.vegasvil.org>
-References: <tencent_2C67C6D2537B236F497823BCC457976F9705@qq.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AEA2113
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 00:31:15 +0000 (UTC)
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [IPv6:2001:41d0:203:375::aa])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F2E119
+	for <netdev@vger.kernel.org>; Wed,  1 Nov 2023 17:31:07 -0700 (PDT)
+Message-ID: <b07fbb30-92a5-7c96-339c-ffbdf40ea1bf@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1698885065;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DYyCqd0cmrSjG084WqxLPqA2/nJgQp5TviiyD9gAa58=;
+	b=AfhTKVv5CFyGMnt1TteJDVqyRwYnFzpW/gx22EfntCf3ITt2CV3DoB2gisZStZ8WttZEYi
+	FRhowJlpq9vLvhONTC+qAOo32w/z8HpU0I2iinUSBgo74HivpSUMx9MMVpfE4DNC8tNKpC
+	ewjCdoK5NZZ/P9iRlEUwAFyEF/vLPcs=
+Date: Thu, 2 Nov 2023 00:31:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_2C67C6D2537B236F497823BCC457976F9705@qq.com>
+Subject: Re: [PATCH bpf-next v3 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Content-Language: en-US
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Vadim Fedorenko <vadfed@meta.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20231031134900.1432945-1-vadfed@meta.com>
+ <dac97b74-5ff1-172b-9cd5-4cdcf07386ec@linux.dev>
+ <91a6d5a7-7b18-48a2-9a74-7c00509467f8@linux.dev>
+ <4adea710-72ca-0908-d280-625bc3682aa1@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <4adea710-72ca-0908-d280-625bc3682aa1@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 31, 2023 at 06:25:42PM +0800, Edward Adam Davis wrote:
-> There is no lock protection when writing ptp->tsevqs in ptp_open(),
-> ptp_release(), which can cause data corruption,
+On 01.11.2023 22:59, Martin KaFai Lau wrote:
+> On 11/1/23 3:50 PM, Vadim Fedorenko wrote:
+>>>> +static int bpf_crypto_skcipher_crypt(struct crypto_sync_skcipher *tfm,
+>>>> +                     const struct bpf_dynptr_kern *src,
+>>>> +                     struct bpf_dynptr_kern *dst,
+>>>> +                     const struct bpf_dynptr_kern *iv,
+>>>> +                     bool decrypt)
+>>>> +{
+>>>> +    struct skcipher_request *req = NULL;
+>>>> +    struct scatterlist sgin, sgout;
+>>>> +    int err;
+>>>> +
+>>>> +    if (crypto_sync_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (__bpf_dynptr_is_rdonly(dst))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (!__bpf_dynptr_size(dst) || !__bpf_dynptr_size(src))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    if (__bpf_dynptr_size(iv) != crypto_sync_skcipher_ivsize(tfm))
+>>>> +        return -EINVAL;
+>>>> +
+>>>> +    req = skcipher_request_alloc(&tfm->base, GFP_ATOMIC);
+>>>
+>>> Doing alloc per packet may kill performance. Is it possible to optimize it 
+>>> somehow? What is the usual size of the req (e.g. the example in the selftest)?
+>>>
+>>
+>> In ktls code aead_request is allocated every time encryption is invoked, see 
+>> tls_decrypt_sg(), apparently per skb. Doesn't look like performance
+>> killer. For selftest it's only sizeof(struct skcipher_request).
+> 
+> ktls is doing the en/decrypt on the userspace behalf to compensate the cost.
+> 
+> When this kfunc is used in xdp to decrypt a few bytes for each packet and then 
+> XDP_TX out, this extra alloc will be quite noticeable. If the size is usually 
+> small, can it be done in the stack memory?
 
-NAK.
-
-You haven't identified any actual data corruption issue.
-
-If there is an issue, please state what it is.
-
-Thanks,
-Richard
-
+Hmm... looks like SYNC_SKCIPHER_REQUEST_ON_STACK will help us. Ok, I'll change 
+this part to use stack allocations.
 
 
