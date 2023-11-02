@@ -1,128 +1,89 @@
-Return-Path: <netdev+bounces-45743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37ECF7DF57A
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:00:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0097DF57D
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33B7281B52
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:00:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 256EAB211A3
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E303015483;
-	Thu,  2 Nov 2023 15:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAC71B27E;
+	Thu,  2 Nov 2023 15:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/E+PpbV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q3WQnene"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC421B274
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 15:00:05 +0000 (UTC)
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096FD182
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 08:00:00 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id 3f1490d57ef6-d84f18e908aso1056056276.1
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 07:59:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1698937199; x=1699541999; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1eFVUXwI8Om81YbJ5xdsRINOsftGAbfoj6aCqyXr5Co=;
-        b=h/E+PpbVscsc5y7l/zbDsI0fXZMIrF9259PoxvBhLdOxbiwdOp5weasO0NCxkKgaHu
-         9uk4DI0GRoEMZ/aNJ9Do90iL50Foww2nL43z05YBTPRCnAMts41Gmfijp5v5YCcwVOJt
-         W6GKIppGLmJ9nYS52X2FAigtN5WDd8WPisA8RhI+rBIqmYKkXgxLcWiOP/+mLLaNprXe
-         NuRfz1AcEHPRT+S9PwCOU3AiPYatwxeS3832psdsMccYUemLBvbQq+rZrk6awpAs2iIz
-         1TNZWsptPHOwM11XVn/fZlOBWoZMIaeBHGNKsF6Y7xLzyZv7A/bUFGdUxNRYUTkTzLHA
-         Bccw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698937199; x=1699541999;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1eFVUXwI8Om81YbJ5xdsRINOsftGAbfoj6aCqyXr5Co=;
-        b=eaWnp/kDKENK+d+2/11dGvuDpcjphZWAn1dJmZcm8D79q/E0Knmwsekmf+ecslvZjI
-         PcpLdDzi8uROaGS9VHi07s3jYDVUiU7xEETedPRM7buvwQgcNgG8CeV3i7Y5r9CRUla9
-         XzuQZuK7P8AwXdh5b93E9aILzV9u8pO5TyU8vWcZT1G0j7LnqhVPTn7pF9rvhm/xDBUc
-         Rc0xrucNAj8rbCOgJWEApbV7G0V2Fgdy804JcYBKZ7KWukrs+txfw/GUvA/J5L/7XISz
-         2qnv2srpR+L10zPX5fNOEprTxMn/wH5cC9lkV4pEok0DD4oU21BTHpvn2BVFbNHfhQwG
-         6Emg==
-X-Gm-Message-State: AOJu0YxX/HVxrMCguMoW6BZz9RoX7Fh+k+8HE9TxoEux3ktmcVxNInPP
-	Y0xr/lb78K0UFinh8Ra5BnZ70GrwetkTvdgXk0B+sw==
-X-Google-Smtp-Source: AGHT+IHt0ogOOesCjoaujZGiEDIaJLtV2OUpefnZTtSx83FmIxxGdbVDgo/1usP8QYiM+nKfXTb3G/afJSRm6IweMjw=
-X-Received: by 2002:a25:cfc2:0:b0:da0:c746:386c with SMTP id
- f185-20020a25cfc2000000b00da0c746386cmr18756029ybg.51.1698937199200; Thu, 02
- Nov 2023 07:59:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B291A282;
+	Thu,  2 Nov 2023 15:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E5A0C433CA;
+	Thu,  2 Nov 2023 15:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698937224;
+	bh=/pwXL3xPFaDrTXVpsvGKDsQbN572XgEVZY6X5R/2wv8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q3WQnener8mT20A0H8cb6McxoU2dvu1vrkXKZSFMhnYLH8XHSHzLrPB7dKGWPOSq+
+	 Ck0+6Nw1+9v3RRv/+JJQw8Jyv31S98tgeDM/XR45xeDMCFYMEEmsTryDrQwoJi19mQ
+	 ogtUzTX3ubjslziGZ3wnu77O1xFLyv77cpXzwEJi4AbVXyvv9XE0mT3flc9zJQ+f4Z
+	 MT9IivVaWiVULj6OP5vW+bnjoG1vikPy8yRoaL3H5WvUjozXyujHzdne7wL0HJjBta
+	 NxFn+kqeO14RGTedQOHwUsdDPmfMY0VmSCG1N4PIhPD4jlP8N4B+yA5iczAILyhW67
+	 hXMBWmo42pBuQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 03A44C395FC;
+	Thu,  2 Nov 2023 15:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027190910.27044-1-luizluca@gmail.com> <20231027190910.27044-4-luizluca@gmail.com>
- <20231030205025.b4dryzqzuunrjils@skbuf> <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
- <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
-In-Reply-To: <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 2 Nov 2023 15:59:48 +0100
-Message-ID: <CACRpkdairxqm_YVshEuk_KbnZw9oH2sKiHapY_sTrgc85_+AmQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset controller
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzk+dt@kernel.org, arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf] selftests/bpf: Fix broken build where char is unsigned
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169893722400.13991.10009432921960035904.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Nov 2023 15:00:24 +0000
+References: <20231102103537.247336-1-bjorn@kernel.org>
+In-Reply-To: <20231102103537.247336-1-bjorn@kernel.org>
+To: =?utf-8?b?QmrDtnJuIFTDtnBlbCA8Ympvcm5Aa2VybmVsLm9yZz4=?=@codeaurora.org
+Cc: andrii@kernel.org, mykolal@fb.com, bpf@vger.kernel.org,
+ daniel@iogearbox.net, netdev@vger.kernel.org, bjorn@rivosinc.com,
+ ast@kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, larysa.zaremba@intel.com
 
-On Wed, Nov 1, 2023 at 8:55=E2=80=AFPM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+Hello:
 
-> > drivers/net/dsa/realtek/Makefile
-> > -obj-$(CONFIG_NET_DSA_REALTEK_MDIO)     +=3D realtek-mdio.o
-> > -obj-$(CONFIG_NET_DSA_REALTEK_SMI)      +=3D realtek-smi.o
-> > +obj-$(CONFIG_NET_DSA_REALTEK_MDIO)     +=3D realtek-mdio.o realtek_com=
-mon.o
-> > +obj-$(CONFIG_NET_DSA_REALTEK_SMI)      +=3D realtek-smi.o realtek_comm=
-on.o
->
-> Just a follow up.
->
-> It is not that simple to include a .c file into an existing single
-> file module. It looks like you need to rename the original file as all
-> linked objects must not conflict with the module name. The kernel
-> build seems to create a new object file for each module. Is there a
-> clearer way? I think #include a common .c file would not be
-> acceptable.
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-I don't know if this is an answer to your question, but look at what I did =
-in
+On Thu,  2 Nov 2023 11:35:37 +0100 you wrote:
+> From: Björn Töpel <bjorn@rivosinc.com>
+> 
+> There are architectures where char is not signed. If so, the following
+> error is triggered:
+> 
+>   | xdp_hw_metadata.c:435:42: error: result of comparison of constant -1 \
+>   |   with expression of type 'char' is always true \
+>   |   [-Werror,-Wtautological-constant-out-of-range-compare]
+>   |   435 |         while ((opt = getopt(argc, argv, "mh")) != -1) {
+>   |       |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^  ~~
+>   | 1 error generated.
+> 
+> [...]
 
-drivers/usb/fotg210/Makefile:
+Here is the summary with links:
+  - [bpf] selftests/bpf: Fix broken build where char is unsigned
+    https://git.kernel.org/bpf/bpf/c/d84b139f53e8
 
-# This setup links the different object files into one single
-# module so we don't have to EXPORT() a lot of internal symbols
-# or create unnecessary submodules.
-fotg210-objs-y                          +=3D fotg210-core.o
-fotg210-objs-$(CONFIG_USB_FOTG210_HCD)  +=3D fotg210-hcd.o
-fotg210-objs-$(CONFIG_USB_FOTG210_UDC)  +=3D fotg210-udc.o
-fotg210-objs                            :=3D $(fotg210-objs-y)
-obj-$(CONFIG_USB_FOTG210)               +=3D fotg210.o
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Everything starting with CONFIG_* is a Kconfig option obviously.
 
-The final module is just one file named fotg210.ko no matter whether
-HCD (host controller), UDC (device controller) or both parts were
-compiled into it. Often you just need one of them, sometimes you may
-need both.
-
-It's a pretty clean example of how you do this "one module from
-several optional parts" using Kbuild.
-
-It's not super-intuitive, copy/paste/modify is a viable way to get to this.
-
-Yours,
-Linus Walleij
 
