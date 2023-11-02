@@ -1,140 +1,302 @@
-Return-Path: <netdev+bounces-45794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC29F7DFA2B
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:43:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F9D07DFA5D
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:52:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B061C20F23
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32AF6281230
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:52:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527181CFB6;
-	Thu,  2 Nov 2023 18:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3A31DDD6;
+	Thu,  2 Nov 2023 18:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6Rpl/+9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlRso0A0"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA2D15484
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:43:30 +0000 (UTC)
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7987128;
-	Thu,  2 Nov 2023 11:43:28 -0700 (PDT)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5a86b6391e9so15332427b3.0;
-        Thu, 02 Nov 2023 11:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698950608; x=1699555408; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T3OCUKIJblthjBAmG3vt22DDyNrmU9MlYinLfZ0K7Xs=;
-        b=b6Rpl/+9pbDKsIkHONmDhCUAgzXGp2bbE1fEyseaqzBjEubY2BQpFpFYzdBQef3/2z
-         DU1IP2hIQa42iuHDR0HMa4hgYeqigYGY32fi2akAqjXNxvQ0amgeDbAb+o4xi8wJFN7H
-         TMgD2/BMvygwi8bZ01b7G1RG9Xcwms6GQHtLtPT7KBMM63XZlPave7+v6W7dVC4P7Gvx
-         YU8B5JV3SqXVYPjh/vzCIRrv2RgJR2OQft6LQqEkq3Y4f/aisjJO7Cdwt2akN1A6o54M
-         xxE2ZPE6BTvrzUIDWHUMdKN5Q6Y1sXhbGVr0JAwQodTFDrQ2OoEQcBHFTohdpKVPs8ev
-         NOgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698950608; x=1699555408;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T3OCUKIJblthjBAmG3vt22DDyNrmU9MlYinLfZ0K7Xs=;
-        b=KDVqr5/oiXZnis6A5zUc1VgaCTYYtllXtp6b0NKMokoeuOmHwLxNY4I/SD7UI4MhIU
-         udQY+bL+tS35rTn4QsUe6CSUTctX5Opok1hzEj/d+XYHMSHq796VzS2txuUBV3WMKr13
-         yzpvC30MGeZqp1drPStgNC/4MJ6g9ZHu1ajDzv8x8Cdlz1I5N7VVd9+KASD55WIOcM7f
-         FvKvK7j5XPvlaDeFhH8iPpTH3hr16IVFkS9YTF5gIuZxXhtmfnXClYtcI84wHCMiijje
-         adTyMKvyK1o9Yzdpy77jH+HXxj5CGItZA8OpY5cso39FnNDuktg3ohoA16DJgjM9NFNx
-         hdig==
-X-Gm-Message-State: AOJu0YxnIYm1H9SdaqmJnoz8Kijw/P5x526+BOEQZmOfjlALFuHtH2Wf
-	6lcVtPamFYDfyEawqRGMpZM=
-X-Google-Smtp-Source: AGHT+IHcn+D7Mz9xrTHEz8hxFzaHe+Xzq2rCHcr2HsELphZUue1M+Zu+ivtlx9djqs8B693fXUCn7w==
-X-Received: by 2002:a81:a115:0:b0:5a7:af86:8d3b with SMTP id y21-20020a81a115000000b005a7af868d3bmr575857ywg.37.1698950608056;
-        Thu, 02 Nov 2023 11:43:28 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id t10-20020a0cea2a000000b0065b1f90ff8csm1671qvp.40.2023.11.02.11.43.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 11:43:27 -0700 (PDT)
-Message-ID: <ff7e60bf-13c9-44fe-b9e0-0f1ef4904745@gmail.com>
-Date: Thu, 2 Nov 2023 11:43:25 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C768C8D6
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:52:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08AFC433C8;
+	Thu,  2 Nov 2023 18:52:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698951155;
+	bh=hXDWnrfL3OTN0MYUNnUbKci7Ji1PBcGttUuRsSZ8yHQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dlRso0A0pF6o5yWGx9Zy3K6mFwYPjigvy0l1QZJeMSYpP9lniG5Z0IZyVgCQL9BXJ
+	 SqFWbD6DFnQjsGyEi5S9/kKBRfvhsQ5dzK3lb7QD2JDMit3U1ZN/zwQ0c7Bfc9ZiDP
+	 t114H8jz3vtV1Dk1wyewG6M5ekY6/SLRZCTIEic6m195Y3M/qD+ZOS02Y8mrz6IuBz
+	 QR4zdgiiTwMohqQ372IhHbrBzJHxivPiPeH5cDcdwEPg3HLkkbIT4+1kiuTBQsgeKl
+	 VNhdfy8V6byC6MRvuJI+HoKDpLZ629ZjCqmHVljHPiV9QOPU/i+AXLjHDJES/wix2t
+	 rqhSDDeWKvcFQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	chuck.lever@oracle.com,
+	lorenzo@kernel.org
+Subject: [PATCH net] nfsd: regenerate user space parsers after ynl-gen changes
+Date: Thu,  2 Nov 2023 11:52:27 -0700
+Message-ID: <20231102185227.2604416-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: dsa: tag_rtl4_a: Bump min packet size
-Content-Language: en-US
-To: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231031-fix-rtl8366rb-v3-1-04dfc4e7d90e@linaro.org>
- <CACRpkdYiZHXMK1jmG2Ht5kU3bfi_Cor6jvKKRLKOX0KWX3AW9Q@mail.gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <CACRpkdYiZHXMK1jmG2Ht5kU3bfi_Cor6jvKKRLKOX0KWX3AW9Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/1/23 13:18, Linus Walleij wrote:
-> On Tue, Oct 31, 2023 at 11:45 PM Linus Walleij <linus.walleij@linaro.org> wrote:
-> 
->> It was reported that the "LuCI" web UI was not working properly
->> with a device using the RTL8366RB switch. Disabling the egress
->> port tagging code made the switch work again, but this is not
->> a good solution as we want to be able to direct traffic to a
->> certain port.
-> 
-> Luiz is not seeing this on his ethernet controller so:
-> 
-> pw-bot: cr
-> 
-> (I've seen Vladmir do this, I don't know what it means, but seems
-> to be how to hold back patches.)
+Commit 8cea95b0bd79 ("tools: ynl-gen: handle do ops with no input attrs")
+added support for some of the previously-skipped ops in nfsd.
+Regenerate the user space parsers to fill them in.
 
-Looking at drivers/net/ethernet/cortina/gemini.c, should not we account 
-for when the MAC is used as a conduit and include the right amount of 
-"MTU" bytes? Something like this (compile tested only):
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: chuck.lever@oracle.com
+CC: lorenzo@kernel.org
+---
+ include/uapi/linux/nfsd_netlink.h   |   6 +-
+ tools/net/ynl/generated/nfsd-user.c | 120 ++++++++++++++++++++++++++--
+ tools/net/ynl/generated/nfsd-user.h |  44 ++++++++--
+ 3 files changed, 156 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ethernet/cortina/gemini.c 
-b/drivers/net/ethernet/cortina/gemini.c
-index 5423fe26b4ef..5143f3734c3b 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -36,6 +36,7 @@
-  #include <linux/ethtool.h>
-  #include <linux/tcp.h>
-  #include <linux/u64_stats_sync.h>
-+#include <net/dsa.h>
-
-  #include <linux/in.h>
-  #include <linux/ip.h>
-@@ -1151,6 +1152,13 @@ static int gmac_map_tx_bufs(struct net_device 
-*netdev, struct sk_buff *skb,
-         if (skb->protocol == htons(ETH_P_8021Q))
-                 mtu += VLAN_HLEN;
-
-+#if IS_ENABLED(CONFIG_NET_DSA)
-+       if (netdev_uses_dsa(netdev)) {
-+               const struct dsa_device_ops *ops = 
-skb->dev->dsa_ptr->tag_ops;
-+               mtu += ops->needed_headroom;
-+       }
-+#endif
+diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
+index c8ae72466ee6..3cd044edee5d 100644
+--- a/include/uapi/linux/nfsd_netlink.h
++++ b/include/uapi/linux/nfsd_netlink.h
+@@ -3,8 +3,8 @@
+ /*	Documentation/netlink/specs/nfsd.yaml */
+ /* YNL-GEN uapi header */
+ 
+-#ifndef _UAPI_LINUX_NFSD_H
+-#define _UAPI_LINUX_NFSD_H
++#ifndef _UAPI_LINUX_NFSD_NETLINK_H
++#define _UAPI_LINUX_NFSD_NETLINK_H
+ 
+ #define NFSD_FAMILY_NAME	"nfsd"
+ #define NFSD_FAMILY_VERSION	1
+@@ -36,4 +36,4 @@ enum {
+ 	NFSD_CMD_MAX = (__NFSD_CMD_MAX - 1)
+ };
+ 
+-#endif /* _UAPI_LINUX_NFSD_H */
++#endif /* _UAPI_LINUX_NFSD_NETLINK_H */
+diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/generated/nfsd-user.c
+index fec6828680ce..360b6448c6e9 100644
+--- a/tools/net/ynl/generated/nfsd-user.c
++++ b/tools/net/ynl/generated/nfsd-user.c
+@@ -50,9 +50,116 @@ struct ynl_policy_nest nfsd_rpc_status_nest = {
+ /* Common nested types */
+ /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
+ /* NFSD_CMD_RPC_STATUS_GET - dump */
+-void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp)
++int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh, void *data)
+ {
+-	struct nfsd_rpc_status_get_list *next = rsp;
++	struct nfsd_rpc_status_get_rsp_dump *dst;
++	struct ynl_parse_arg *yarg = data;
++	unsigned int n_compound_ops = 0;
++	const struct nlattr *attr;
++	int i;
 +
-         word1 = skb->len;
-         word3 = SOF_BIT;
-
-Also, as a separate check, might be worth annotating the various 
-descriptor words with __le32 and appropriate le32_to_cpu() and 
-cpu_to_le32() accessors for each of those fields.
++	dst = yarg->data;
++
++	if (dst->compound_ops)
++		return ynl_error_parse(yarg, "attribute already present (rpc-status.compound-ops)");
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == NFSD_A_RPC_STATUS_XID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.xid = 1;
++			dst->xid = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_FLAGS) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.flags = 1;
++			dst->flags = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_PROG) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.prog = 1;
++			dst->prog = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_VERSION) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.version = 1;
++			dst->version = mnl_attr_get_u8(attr);
++		} else if (type == NFSD_A_RPC_STATUS_PROC) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.proc = 1;
++			dst->proc = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_SERVICE_TIME) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.service_time = 1;
++			dst->service_time = mnl_attr_get_u64(attr);
++		} else if (type == NFSD_A_RPC_STATUS_SADDR4) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.saddr4 = 1;
++			dst->saddr4 = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_DADDR4) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.daddr4 = 1;
++			dst->daddr4 = mnl_attr_get_u32(attr);
++		} else if (type == NFSD_A_RPC_STATUS_SADDR6) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = mnl_attr_get_payload_len(attr);
++			dst->_present.saddr6_len = len;
++			dst->saddr6 = malloc(len);
++			memcpy(dst->saddr6, mnl_attr_get_payload(attr), len);
++		} else if (type == NFSD_A_RPC_STATUS_DADDR6) {
++			unsigned int len;
++
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++
++			len = mnl_attr_get_payload_len(attr);
++			dst->_present.daddr6_len = len;
++			dst->daddr6 = malloc(len);
++			memcpy(dst->daddr6, mnl_attr_get_payload(attr), len);
++		} else if (type == NFSD_A_RPC_STATUS_SPORT) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.sport = 1;
++			dst->sport = mnl_attr_get_u16(attr);
++		} else if (type == NFSD_A_RPC_STATUS_DPORT) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.dport = 1;
++			dst->dport = mnl_attr_get_u16(attr);
++		} else if (type == NFSD_A_RPC_STATUS_COMPOUND_OPS) {
++			n_compound_ops++;
++		}
++	}
++
++	if (n_compound_ops) {
++		dst->compound_ops = calloc(n_compound_ops, sizeof(*dst->compound_ops));
++		dst->n_compound_ops = n_compound_ops;
++		i = 0;
++		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++			if (mnl_attr_get_type(attr) == NFSD_A_RPC_STATUS_COMPOUND_OPS) {
++				dst->compound_ops[i] = mnl_attr_get_u32(attr);
++				i++;
++			}
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++void
++nfsd_rpc_status_get_rsp_list_free(struct nfsd_rpc_status_get_rsp_list *rsp)
++{
++	struct nfsd_rpc_status_get_rsp_list *next = rsp;
+ 
+ 	while ((void *)next != YNL_LIST_END) {
+ 		rsp = next;
+@@ -65,15 +172,16 @@ void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp)
+ 	}
+ }
+ 
+-struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys)
++struct nfsd_rpc_status_get_rsp_list *
++nfsd_rpc_status_get_dump(struct ynl_sock *ys)
+ {
+ 	struct ynl_dump_state yds = {};
+ 	struct nlmsghdr *nlh;
+ 	int err;
+ 
+ 	yds.ys = ys;
+-	yds.alloc_sz = sizeof(struct nfsd_rpc_status_get_list);
+-	yds.cb = nfsd_rpc_status_get_rsp_parse;
++	yds.alloc_sz = sizeof(struct nfsd_rpc_status_get_rsp_list);
++	yds.cb = nfsd_rpc_status_get_rsp_dump_parse;
+ 	yds.rsp_cmd = NFSD_CMD_RPC_STATUS_GET;
+ 	yds.rsp_policy = &nfsd_rpc_status_nest;
+ 
+@@ -86,7 +194,7 @@ struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys)
+ 	return yds.first;
+ 
+ free_list:
+-	nfsd_rpc_status_get_list_free(yds.first);
++	nfsd_rpc_status_get_rsp_list_free(yds.first);
+ 	return NULL;
+ }
+ 
+diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/generated/nfsd-user.h
+index b6b69501031a..989c6e209ced 100644
+--- a/tools/net/ynl/generated/nfsd-user.h
++++ b/tools/net/ynl/generated/nfsd-user.h
+@@ -21,13 +21,47 @@ const char *nfsd_op_str(int op);
+ /* Common nested types */
+ /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
+ /* NFSD_CMD_RPC_STATUS_GET - dump */
+-struct nfsd_rpc_status_get_list {
+-	struct nfsd_rpc_status_get_list *next;
+-	struct nfsd_rpc_status_get_rsp obj __attribute__ ((aligned (8)));
++struct nfsd_rpc_status_get_rsp_dump {
++	struct {
++		__u32 xid:1;
++		__u32 flags:1;
++		__u32 prog:1;
++		__u32 version:1;
++		__u32 proc:1;
++		__u32 service_time:1;
++		__u32 saddr4:1;
++		__u32 daddr4:1;
++		__u32 saddr6_len;
++		__u32 daddr6_len;
++		__u32 sport:1;
++		__u32 dport:1;
++	} _present;
++
++	__u32 xid /* big-endian */;
++	__u32 flags;
++	__u32 prog;
++	__u8 version;
++	__u32 proc;
++	__s64 service_time;
++	__u32 saddr4 /* big-endian */;
++	__u32 daddr4 /* big-endian */;
++	void *saddr6;
++	void *daddr6;
++	__u16 sport /* big-endian */;
++	__u16 dport /* big-endian */;
++	unsigned int n_compound_ops;
++	__u32 *compound_ops;
+ };
+ 
+-void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp);
++struct nfsd_rpc_status_get_rsp_list {
++	struct nfsd_rpc_status_get_rsp_list *next;
++	struct nfsd_rpc_status_get_rsp_dump obj __attribute__((aligned(8)));
++};
+ 
+-struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys);
++void
++nfsd_rpc_status_get_rsp_list_free(struct nfsd_rpc_status_get_rsp_list *rsp);
++
++struct nfsd_rpc_status_get_rsp_list *
++nfsd_rpc_status_get_dump(struct ynl_sock *ys);
+ 
+ #endif /* _LINUX_NFSD_GEN_H */
 -- 
-Florian
+2.41.0
 
 
