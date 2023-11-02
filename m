@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-45708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 774707DF20D
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:10:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 042B17DF21F
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A039B20E74
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:10:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72715B21255
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D2613FFC;
-	Thu,  2 Nov 2023 12:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2OXjBVY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C878C18AFA;
+	Thu,  2 Nov 2023 12:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0481613FED;
-	Thu,  2 Nov 2023 12:10:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 74FE6C433C8;
-	Thu,  2 Nov 2023 12:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698927025;
-	bh=WlJKzWqaEBjS2Pn1K0gjn4aYhMZTAtlKcn1gZ31mKbs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o2OXjBVYNayAuX5vbWWZXfaMWRMHkxxDjHRQ2dK5nq7adIyKP1T1Vl/02xEqwk0u/
-	 g+aSIZ/hAg1igJtcgVcm4dV21F6qJupMdNw/O7lMVIyMT+dMSSIvh9hiXVs+viBhOS
-	 nlLWmz7NXRtZxedQ0Z1Wne6svuc4z3ragFGZ7oY6+seK2oCZ3dfRBncDlQgg+KFF36
-	 jXEuYX6YJuGJoEXi6t8DxrUSyQQresvPohExSoEYV2R7wFd4BMF94sYxI7sKbA5RAy
-	 BW1z1q11m5OGEVS4fL5gx/da+NktcBweBFEWVejUQQYxW3mdsCSZpPBlt6vvH0FFgt
-	 EWeKR4I+waQaQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54928EAB08B;
-	Thu,  2 Nov 2023 12:10:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977DC6FC3
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:16:49 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6657AD40;
+	Thu,  2 Nov 2023 05:16:47 -0700 (PDT)
+Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SLjTH6PLjzrTvq;
+	Thu,  2 Nov 2023 20:13:39 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Thu, 2 Nov 2023 20:16:42 +0800
+Message-ID: <c87cfcbc-8cd6-4a01-bac0-74113f7ca904@huawei.com>
+Date: Thu, 2 Nov 2023 20:16:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net 0/2] dccp/tcp: Relocate security_inet_conn_request().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169892702534.9917.11670611602722170451.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Nov 2023 12:10:25 +0000
-References: <20231030201042.32885-1-kuniyu@amazon.com>
-In-Reply-To: <20231030201042.32885-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, kuni1840@gmail.com,
- netdev@vger.kernel.org, dccp@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 6/7] net: hns3: fix VF reset fail issue
+To: Paolo Abeni <pabeni@redhat.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>
+References: <20231028025917.314305-1-shaojijie@huawei.com>
+ <20231028025917.314305-7-shaojijie@huawei.com>
+ <9bc9514044063bc57155fb786f970ca1d69758b4.camel@redhat.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <9bc9514044063bc57155fb786f970ca1d69758b4.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.120.192]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
+X-CFilter-Loop: Reflected
 
-Hello:
+on 2023/11/2 18:45, Paolo Abeni wrote:
+> On Sat, 2023-10-28 at 10:59 +0800, Jijie Shao wrote:
+>>   
+>> -static void hclgevf_clear_event_cause(struct hclgevf_dev *hdev, u32 regclr)
+>> +static void hclgevf_clear_event_cause(struct hclgevf_dev *hdev, u32 regclr,
+>> +				      bool need_dalay)
+>>   {
+>> +#define HCLGEVF_RESET_DELAY		5
+>> +
+>> +	if (need_dalay)
+>> +		mdelay(HCLGEVF_RESET_DELAY);
+> 5ms delay in an interrupt handler is quite a lot. What about scheduling
+> a timer from the IH to clear the register when such delay is needed?
+>
+> Thanks!
+>
+> Paolo
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Using timer in this case will complicate the code and make maintenance difficult.
 
-On Mon, 30 Oct 2023 13:10:40 -0700 you wrote:
-> security_inet_conn_request() reads reqsk's remote address, but it's not
-> initialised in some places.
-> 
-> Let's make sure the address is set before security_inet_conn_request().
-> 
-> 
-> Kuniyuki Iwashima (2):
->   dccp: Call security_inet_conn_request() after setting IPv4 addresses.
->   dccp/tcp: Call security_inet_conn_request() after setting IPv6
->     addresses.
-> 
-> [...]
+We consider reducing the delay time by polling. For example,
+the code cycles every 50 us to check whether the write register takes effect.
+If yes, the function returns immediately. or the code cycles until 5 ms.
 
-Here is the summary with links:
-  - [v1,net,1/2] dccp: Call security_inet_conn_request() after setting IPv4 addresses.
-    https://git.kernel.org/netdev/net/c/fa2df45af130
-  - [v1,net,2/2] dccp/tcp: Call security_inet_conn_request() after setting IPv6 addresses.
-    https://git.kernel.org/netdev/net/c/23be1e0e2a83
+Is this method appropriate?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Thanks!
+Jijie
 
 
