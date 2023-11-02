@@ -1,90 +1,192 @@
-Return-Path: <netdev+bounces-45682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD6677DEFEF
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:28:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A948C7DF001
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:31:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9C6EB20D54
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:28:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7611B211DB
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B9413AE0;
-	Thu,  2 Nov 2023 10:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5A413AE6;
+	Thu,  2 Nov 2023 10:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EkyJeWUo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD75E134C6
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:28:49 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94053128;
-	Thu,  2 Nov 2023 03:28:48 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qyUwQ-0006r4-7q; Thu, 02 Nov 2023 11:28:46 +0100
-Date: Thu, 2 Nov 2023 11:28:46 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Harshit Mogalapalli <harshit.m.mogalapalli@gmail.com>
-Subject: Re: [PATCH v2] netfilter: nf_tables: prevent OOB access in
- nft_byteorder_eval
-Message-ID: <20231102102846.GE6174@breakpoint.cc>
-References: <20230705201232.GG3751@breakpoint.cc>
- <20230705210535.943194-1-cascardo@canonical.com>
- <d7e42ffd-aabf-46d7-b02a-a7337708a29a@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BD013AFA
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:31:31 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45383DC
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 03:31:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698921088;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uya6qCwp9TX55b7qKcTEgjZRX+1aFslaiEbQanZjulo=;
+	b=EkyJeWUo5cwuqjKuQWuQKD8ReA7bDJ+HZkUusbHl52RaRc8gPu2Fd2d4rnXFVgFMXqAHxQ
+	lyPWZT6TBSjcbmU9KROHtEKDjI2n25ABWZRTUacX+w5Kr4ElYRrrPcC9aOS0n5xgM/NxKb
+	/HSabtg1JCfO7ZccT7yrjig39wLStiU=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-auOL_2KUOAegOG3eCaRJDQ-1; Thu, 02 Nov 2023 06:31:27 -0400
+X-MC-Unique: auOL_2KUOAegOG3eCaRJDQ-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6716c2696c7so2485986d6.1
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 03:31:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698921086; x=1699525886;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uya6qCwp9TX55b7qKcTEgjZRX+1aFslaiEbQanZjulo=;
+        b=gK9EMp6mH61QDGioUvJyYXxclZcVxrX1YJZ/NYAp/aeggNwTarg+jR0xhxdtDUVdZh
+         mTg6yHc0IIvD03P6wcYWHC9+tqQFJJq2Zdf8n83hnQT9JTWifq8cxS8QSILycmr5C6TK
+         NuvoDljvg1WpzECRdMAnciSXZi/irQoTil/m1o7XjF29SvgGk12wgouO1HP5dEjDJIzZ
+         9kJ1aWv43pay18eE46NKFHV5ZeJtg4uwMk2Uo66hdepeTGR3h5Y2zPpYHAxuZUGkX/eA
+         EGq2P3RzS1fOwR9qVGix/uPQgErhHIxmFiEgyx7/5YKKRMXZIcxJTEWEePbFLICs60AD
+         hMSA==
+X-Gm-Message-State: AOJu0YxCUHRl3t3wij0pZRx/EgCBNLnfsIdSiOM0x/DDlF88+ZDE2CnK
+	Qjr79H6uoj+e63GORH3a7CCFQxTA3KSKeCLFJGOTplUWzlhNj5ez+YzBYAtIhpyyS+FVkcOkVq4
+	LnXfqbUEvGygBRk+I
+X-Received: by 2002:a05:6214:5582:b0:66d:1ff9:321f with SMTP id mi2-20020a056214558200b0066d1ff9321fmr19025177qvb.6.1698921086475;
+        Thu, 02 Nov 2023 03:31:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEfwwYzxDn43o+6DdeqmVaDeLew80HGhBZMXezzUylt0dZXS6cPsK52nRgvg6FHsLPBgYaZow==
+X-Received: by 2002:a05:6214:5582:b0:66d:1ff9:321f with SMTP id mi2-20020a056214558200b0066d1ff9321fmr19025152qvb.6.1698921086197;
+        Thu, 02 Nov 2023 03:31:26 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-153.dyn.eolo.it. [146.241.226.153])
+        by smtp.gmail.com with ESMTPSA id em15-20020ad44f8f000000b0065b229ecb8dsm2272455qvb.3.2023.11.02.03.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 03:31:25 -0700 (PDT)
+Message-ID: <6603e0480feea2e7a28a865705da52bb99679a35.camel@redhat.com>
+Subject: Re: [PATCH net 1/7] net: hns3: fix add VLAN fail issue
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jijie Shao <shaojijie@huawei.com>, yisen.zhuang@huawei.com, 
+ salil.mehta@huawei.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org
+Cc: shenjian15@huawei.com, wangjie125@huawei.com, liuyonglong@huawei.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 02 Nov 2023 11:31:22 +0100
+In-Reply-To: <20231028025917.314305-2-shaojijie@huawei.com>
+References: <20231028025917.314305-1-shaojijie@huawei.com>
+	 <20231028025917.314305-2-shaojijie@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7e42ffd-aabf-46d7-b02a-a7337708a29a@moroto.mountain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> This patch is correct, but shouldn't we fix the code for 64 bit writes
-> as well?
+On Sat, 2023-10-28 at 10:59 +0800, Jijie Shao wrote:
+> From: Jian Shen <shenjian15@huawei.com>
+>=20
+> The hclge_sync_vlan_filter is called in periodic task,
+> trying to remove VLAN from vlan_del_fail_bmap. It can
+> be concurrence with VLAN adding operation from user.
+> So once user failed to delete a VLAN id, and add it
+> again soon, it may be removed by the periodic task,
+> which may cause the software configuration being
+> inconsistent with hardware. So add mutex handling
+> to avoid this.
+>=20
+>      user                        hns3 driver
+>=20
+>                                            periodic task
+>                                                 =E2=94=82
+>   add vlan 10 =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80 hns3_vlan_rx_=
+add_vid        =E2=94=82
+>        =E2=94=82             (suppose success)          =E2=94=82
+>        =E2=94=82                                        =E2=94=82
+>   del vlan 10 =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80  hns3_vlan_rx=
+_kill_vid      =E2=94=82
+>        =E2=94=82           (suppose fail,add to         =E2=94=82
+>        =E2=94=82             vlan_del_fail_bmap)        =E2=94=82
+>        =E2=94=82                                        =E2=94=82
+>   add vlan 10 =E2=94=80=E2=94=80=E2=94=80=E2=94=80=E2=94=80 hns3_vlan_rx_=
+add_vid        =E2=94=82
+>                      (suppose success)          =E2=94=82
+>                                        foreach vlan_del_fail_bmp
+>                                             del vlan 10
+>=20
+> Fixes: fe4144d47eef ("net: hns3: sync VLAN filter entries when kill VLAN =
+ID failed")
+> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+>  .../hisilicon/hns3/hns3pf/hclge_main.c        | 21 +++++++++++++------
+>  .../hisilicon/hns3/hns3vf/hclgevf_main.c      | 11 ++++++++--
+>  2 files changed, 24 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/dr=
+ivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> index c42574e29747..a3230ac928a9 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+> @@ -10026,8 +10026,6 @@ static void hclge_rm_vport_vlan_table(struct hclg=
+e_vport *vport, u16 vlan_id,
+>  	struct hclge_vport_vlan_cfg *vlan, *tmp;
+>  	struct hclge_dev *hdev =3D vport->back;
+> =20
+> -	mutex_lock(&hdev->vport_lock);
+> -
+>  	list_for_each_entry_safe(vlan, tmp, &vport->vlan_list, node) {
+>  		if (vlan->vlan_id =3D=3D vlan_id) {
+>  			if (is_write_tbl && vlan->hd_tbl_status)
+> @@ -10042,8 +10040,6 @@ static void hclge_rm_vport_vlan_table(struct hclg=
+e_vport *vport, u16 vlan_id,
+>  			break;
+>  		}
+>  	}
+> -
+> -	mutex_unlock(&hdev->vport_lock);
+>  }
+> =20
+>  void hclge_rm_vport_all_vlan_table(struct hclge_vport *vport, bool is_de=
+l_list)
+> @@ -10452,11 +10448,16 @@ int hclge_set_vlan_filter(struct hnae3_handle *=
+handle, __be16 proto,
+>  	 * handle mailbox. Just record the vlan id, and remove it after
+>  	 * reset finished.
+>  	 */
+> +	mutex_lock(&hdev->vport_lock);
+>  	if ((test_bit(HCLGE_STATE_RST_HANDLING, &hdev->state) ||
+>  	     test_bit(HCLGE_STATE_RST_FAIL, &hdev->state)) && is_kill) {
+>  		set_bit(vlan_id, vport->vlan_del_fail_bmap);
+> +		mutex_unlock(&hdev->vport_lock);
+>  		return -EBUSY;
+> +	} else if (!is_kill && test_bit(vlan_id, vport->vlan_del_fail_bmap)) {
+> +		clear_bit(vlan_id, vport->vlan_del_fail_bmap);
+>  	}
+> +	mutex_unlock(&hdev->vport_lock);
+> =20
+>  	/* when port base vlan enabled, we use port base vlan as the vlan
+>  	 * filter entry. In this case, we don't update vlan filter table
+> @@ -10481,7 +10482,9 @@ int hclge_set_vlan_filter(struct hnae3_handle *ha=
+ndle, __be16 proto,
+>  		 * and try to remove it from hw later, to be consistence
+>  		 * with stack
+>  		 */
+> +		mutex_lock(&hdev->vport_lock);
+>  		set_bit(vlan_id, vport->vlan_del_fail_bmap);
+> +		mutex_unlock(&hdev->vport_lock);
 
-Care to send a patch?
+It looks like that the 'hclge_rm_vport_vlan_table()' call a few lines
+above will now happen with the vport_lock unlocked.
 
-> net/netfilter/nft_byteorder.c
->     26  void nft_byteorder_eval(const struct nft_expr *expr,
->     27                          struct nft_regs *regs,
->     28                          const struct nft_pktinfo *pkt)
->     29  {
->     30          const struct nft_byteorder *priv = nft_expr_priv(expr);
->     31          u32 *src = &regs->data[priv->sreg];
->     32          u32 *dst = &regs->data[priv->dreg];
->     33          u16 *s16, *d16;
->     34          unsigned int i;
->     35  
->     36          s16 = (void *)src;
->     37          d16 = (void *)dst;
->     38  
->     39          switch (priv->size) {
->     40          case 8: {
->     41                  u64 src64;
->     42  
->     43                  switch (priv->op) {
->     44                  case NFT_BYTEORDER_NTOH:
->     45                          for (i = 0; i < priv->len / 8; i++) {
->     46                                  src64 = nft_reg_load64(&src[i]);
->     47                                  nft_reg_store64(&dst[i],
->     48                                                  be64_to_cpu((__force __be64)src64));
-> 
-> We're writing 8 bytes, then moving forward 4 bytes and writing 8 bytes
-> again.  Each subsequent write over-writes 4 bytes from the previous
-> write.
+That looks racy and would deserve at least a comment explaining why
+it's safe.
 
-Yes.  I can't think if a case where we'd do two swaps back-to-back,
-which is probably the reason noone noticed this so far.
+Thanks,
+
+Paolo
+
 
