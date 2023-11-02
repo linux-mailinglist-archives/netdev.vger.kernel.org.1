@@ -1,104 +1,88 @@
-Return-Path: <netdev+bounces-45820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2870C7DFC58
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 23:25:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 602357DFC6A
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 23:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84566281D3C
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 22:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 181CA281D74
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 22:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC3522314;
-	Thu,  2 Nov 2023 22:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B547E1FA4;
+	Thu,  2 Nov 2023 22:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwADAbxm"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="jqfpFZJp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F002230A
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 22:25:05 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8962B138;
-	Thu,  2 Nov 2023 15:24:59 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cc330e8f58so11963785ad.3;
-        Thu, 02 Nov 2023 15:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698963899; x=1699568699; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vavql0gOFP7X20anq8HgeOWwM7lJhURUerirAcwtVGo=;
-        b=YwADAbxmqXBvi0Wo5VZPwjvzTo+pdp4JYRplxlYOZvVyNTBL3vXP0XGdLq4zGY0Uht
-         qQLGsOkGEw6gDW2y9TehusI/tnIvAUw030DEfEZ7O33sAtb3ABctodrawihYddZWGUTz
-         fT8wbqhLWFycwBmUfgME3nrMgdq8uQ5CsW+kdHshe2Si6qidyIu4kiiouq1dy3yd67C1
-         BwlhFR/hAIsl+bNcON3FXwNTJ9vW0Bep3mPSYWBYUn7EqD458mBb2e8LJ7u1NO7jo747
-         dM+tBibNa8+HJcW51xBQR0CTJf3CEUEdn4imCpWDRB21GBIaSXZ/J+ojBF+Dyi/xBsZ+
-         7wEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698963899; x=1699568699;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vavql0gOFP7X20anq8HgeOWwM7lJhURUerirAcwtVGo=;
-        b=ffiKe38bMy7cglcIdo+378EhLxe3WeEd+nATlgwVCUzignF/VErz9RfrymQ/L4ufOm
-         C2nhC9WDR3G0H9SGaAiXJYLHGYULg02iIXy0JZGTQrO536EkBuZtul6fmpgS0ScBzpYn
-         lzFlKlwkFcOsHUtrb/vhhGWaAthkAEOrxo7uw0KujegiEviiKiC7wJMJMaRl1jtabD6e
-         EHF4aulc/FpCs+uuN/8TWTFztF1ipQF+4BN7lOW5eowgEyJMDMJ1tgQl4ADAdOyEefrQ
-         Iq9lh8Ii4msZ9E/zXDspbBoE6X0Rn0a8pPuInZhM9QoNRJXJuLsvF+TzxFscugWamprd
-         Ojjg==
-X-Gm-Message-State: AOJu0YxEkBBCQsqq4ZvKVgjrGD0odNAo3CLfREeOxa60imujtP+Z9Zf9
-	lmopCtEzQziXAYQw1wYrbho=
-X-Google-Smtp-Source: AGHT+IFoMRruO2yiPqOkXbSx+uBINdCWa6XJIOyhpha02qPLV8SR+dUdejRCQDNQMB9PEdbgEbVeJw==
-X-Received: by 2002:a17:902:f687:b0:1cc:4a23:c5fc with SMTP id l7-20020a170902f68700b001cc4a23c5fcmr14195864plg.2.1698963898858;
-        Thu, 02 Nov 2023 15:24:58 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id t12-20020a1709028c8c00b001c444106bcasm191875plo.46.2023.11.02.15.24.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 15:24:58 -0700 (PDT)
-Message-ID: <05fbf600-027c-45b6-8f09-a3c03dde025c@gmail.com>
-Date: Thu, 2 Nov 2023 15:24:56 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949F0224C4
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 22:30:31 +0000 (UTC)
+Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC94EDC;
+	Thu,  2 Nov 2023 15:30:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=G6ROTX3/i26xHE7RlpY5IFNyJGFvI/2topyQtl8SOM8=; b=jqfpFZJpXbVr10t1Ve5lrWXj9H
+	UESXuwg/8yGcOfYM4sDPvoF0l1MBrirBPG4LxJ7k5QpC7+88G4i+lc+9ydy2+wzgv1W3VhogZgI63
+	kBJpllcfkvVCKCMDjpxhyJCA+Cu6EyzaRUQ/HZIJ9AoX2lSn3qDghHHkddk4OA4HoD77NtAKRZP8J
+	nwSu3rXaYSy5af/hG1gG9GkFdZhJ6L6lFwxofaNigqYs1f4MEqifC6Bj0jyz9U0eWu9Vw8QXmzssT
+	4rBuU5hHW2+IEf8CGqhFnta+Q2nT1gVA0Wc+eTpvSaa/I00fULMSran9vUTxwaBathezmxDBR1Zel
+	hvFYb96A==;
+Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
+	id 1qygCf-009zAh-2z;
+	Thu, 02 Nov 2023 22:30:18 +0000
+Date: Thu, 2 Nov 2023 22:30:17 +0000
+From: Al Viro <viro@zeniv.linux.org.uk>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Dave Airlie <airlied@redhat.com>
+Subject: Re: [PATCH] drivers/net/ppp: copy userspace array safely
+Message-ID: <20231102223017.GO1957730@ZenIV>
+References: <20231102191914.52957-2-pstanner@redhat.com>
+ <20231102200943.GK1957730@ZenIV>
+ <7a26cd1bafb22b16eab3868255706d44fa4f255d.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: dsa: tag_rtl4_a: Bump min packet size
-Content-Language: en-US
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231031-fix-rtl8366rb-v3-1-04dfc4e7d90e@linaro.org>
- <CACRpkdYiZHXMK1jmG2Ht5kU3bfi_Cor6jvKKRLKOX0KWX3AW9Q@mail.gmail.com>
- <ff7e60bf-13c9-44fe-b9e0-0f1ef4904745@gmail.com>
- <CACRpkdY2UiFyTvF=zuk-rSZBi+yH6cP-QRkegMgc3wf=9JD_Wg@mail.gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <CACRpkdY2UiFyTvF=zuk-rSZBi+yH6cP-QRkegMgc3wf=9JD_Wg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a26cd1bafb22b16eab3868255706d44fa4f255d.camel@redhat.com>
+Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On 11/2/23 15:09, Linus Walleij wrote:
-> On Thu, Nov 2, 2023 at 7:43 PM Florian Fainelli <f.fainelli@gmail.com> wrote:
-> 
->> Looking at drivers/net/ethernet/cortina/gemini.c, should not we account
->> for when the MAC is used as a conduit and include the right amount of
->> "MTU" bytes? Something like this (compile tested only):
-> 
-> The DSA core already fixes this by adding the tag size to the MTU
-> of the conduit interface, so netdev->mtu is already 1504 for this
-> switch.
-> 
-> I found other oddities though so I'm digging into the driver!
+On Thu, Nov 02, 2023 at 11:02:35PM +0100, Philipp Stanner wrote:
 
-Yes indeed, I forgot about that, never mind :)
--- 
-Florian
+> We introduced those wrappers to string.h hoping they will be useful.
+> Now that they're merged, I quickly wanted to establish them as the
+> standard for copying user-arrays, ideally in the current merge window.
+> Because its convenient, easy to read and, at times, safer.
 
+	They also save future readers a git grep to find the sizes, etc.
+Again, the only suggestion is that regarding the commit message;
+_some_ of those might end up fixing real overflows and you obviously
+want to see how far do those need to be backported, etc.  And "in this
+case the overflow doesn't actually happen because <reasons>, but
+not having to do such analysis is a good thing" is not a bad explanation
+why the primitive in question is useful, IMO.  Granted, in cases like
+256 * sizeof(u32) that would be pointless, but for the ones that
+are less obvious...
+
+> I just didn't see it in ppp. Maybe I should have looked more
+> intensively for all 13 patches. But we'll get there, that's what v2 and
+> v3 are for :)
+
+In any case you want to check if there are real bugs caught in that.
 
