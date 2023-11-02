@@ -1,92 +1,191 @@
-Return-Path: <netdev+bounces-45809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CED27DFB45
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:10:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2AE7DFB78
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 520401C20F6E
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 20:10:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EC001C20F66
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 20:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C72B219FC;
-	Thu,  2 Nov 2023 20:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD7C219FB;
+	Thu,  2 Nov 2023 20:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="aHT35T9I"
+	dkim=pass (2048-bit key) header.d=dabbelt-com.20230601.gappssmtp.com header.i=@dabbelt-com.20230601.gappssmtp.com header.b="1qAmgj4z"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1823D219ED
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:10:00 +0000 (UTC)
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [IPv6:2a03:a000:7:0:5054:ff:fe1c:15ff])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58511134;
-	Thu,  2 Nov 2023 13:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=q2W1VCZdvfcA1TvVxXUd1wwMlA+b5wW2gVN59Ibyspc=; b=aHT35T9Ietusi+0XZYIXiBINUJ
-	eAUi5eDPtSXy7tipUD14EmKIbdFtl5ZIe07MLB8laIK8XFiYommLBXXMFg6ZajQ2Ae6J+iUm2/tk9
-	Jmwz/B/hiRzkfMxfUKwAVllzR0uDXOnJFoBQ9kKfKuil/VIcrasJe60saPARy9Qa75jUaLJ7GPjDu
-	bIR41JKecfeLxkC+omQzMMfqER2bqSNWArHV181kHuYA/Wr1qwZeLLXQqBOA9J4jM1BivqGu5OCcN
-	sB7I1paSx5pZYa0JUl1WNMDch2jdmJk2d4kCCm1JjxyB0RNSLmZYLIUSVX2NXIcgz2erurPEuut8l
-	PnftacoA==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qye0d-009w63-1T;
-	Thu, 02 Nov 2023 20:09:43 +0000
-Date: Thu, 2 Nov 2023 20:09:43 +0000
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Dave Airlie <airlied@redhat.com>
-Subject: Re: [PATCH] drivers/net/ppp: copy userspace array safely
-Message-ID: <20231102200943.GK1957730@ZenIV>
-References: <20231102191914.52957-2-pstanner@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB1321A06
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:23:58 +0000 (UTC)
+Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC4D182
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 13:23:56 -0700 (PDT)
+Received: by mail-oo1-xc30.google.com with SMTP id 006d021491bc7-5875e2b27c5so465197eaf.3
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 13:23:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=dabbelt-com.20230601.gappssmtp.com; s=20230601; t=1698956635; x=1699561435; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZYxqorYTLyNgH4Ys5lNUekyUrwpkE+NAoR9Xx/kQ8MQ=;
+        b=1qAmgj4zLduDhMvPJzRi0HkTyUVdhhRV4+LAgpxiP2wloWJaqbEz040uaaSBCnLYXT
+         Q6urspTLANP3FvNUuoDOxFoaz5xs6RC6rDGQegCqJDMrCh9e1MOooGYnhOHps2TWjD6D
+         vjY3M/ClCf4g3eLnGHgnLGwbb4kmND7Mzsu26SMby5b7s2i/8nHy8ZwjJWXTM3tbNoir
+         3h0o6IURTx6DN67BeqMxipopgwEnUt34+zWpnTBb3QqvyOwtkWfQ2Rsd5tTkCUbYdy86
+         4jPo6ruIOUhB89BtBnO36nlD3Uw5bjlSDa783eNRv5J6/Kh/acohwJ0RYh7Bcr+tdWGt
+         PX2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698956635; x=1699561435;
+        h=content-transfer-encoding:mime-version:message-id:to:from:cc
+         :in-reply-to:subject:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZYxqorYTLyNgH4Ys5lNUekyUrwpkE+NAoR9Xx/kQ8MQ=;
+        b=qlT4mNOF44ST/5fiZWlnt3KhqfpjmYCRNuimqhCqGH0dnvuKVpWrnmsJovoU3eztTX
+         yuChp1IkaNjuCmtr1UapO8RFJF5nEhBQhJK1kQ4muqF1pmHdjShTdG7ypQoc7Pbi1PHF
+         Vrdd/Tzkosf/IikPhsd96cT5S9aJoIi7BoWHpujyVoFriGmPZ+rGth2fb2cXCweTldzm
+         nPg+Fbt8t703hSiXEfpice6HSdUsNXHLm6CV5jsbyn2QEqm/rmz4swphjQjLTLqkhOve
+         uXgaBzxY5EMyReUxuAnNQdKXI+76dyow2rvgJT5EMJv4eM8Jcu34PIRTEGXyc14UCI7q
+         xyXw==
+X-Gm-Message-State: AOJu0Yy/vSqsekV0lWmffxIJdQ/sFPvGR4u+beTb5/rwr3OZvML+J9DD
+	uSc955z6eMzB8USfTWxL5TIsJg==
+X-Google-Smtp-Source: AGHT+IHvjzSJSgbbFHJHFSPQEfHZb0G1dwFxE6QUSYdRHcKUimuPg3oA0e89k53MrVMNkydfp+r/RA==
+X-Received: by 2002:a4a:b487:0:b0:581:ff09:62e4 with SMTP id b7-20020a4ab487000000b00581ff0962e4mr19252180ooo.2.1698956635428;
+        Thu, 02 Nov 2023 13:23:55 -0700 (PDT)
+Received: from localhost ([192.184.165.199])
+        by smtp.gmail.com with ESMTPSA id 64-20020a4a0943000000b0057b43a25deasm52070ooa.3.2023.11.02.13.23.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 13:23:54 -0700 (PDT)
+Date: Thu, 02 Nov 2023 13:23:54 -0700 (PDT)
+X-Google-Original-Date: Thu, 02 Nov 2023 13:23:51 PDT (-0700)
+Subject:     Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
+In-Reply-To: <mhng-41e9fb36-f703-461e-b585-9e8dd5984714@palmer-ri-x1c9a>
+CC: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+  pabeni@redhat.com, ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com,
+  fruggeri@arista.com, noureddine@arista.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+  llvm@lists.linux.dev, patches@lists.linux.dev
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: nathan@kernel.org
+Message-ID: <mhng-7500e386-1e83-4303-a1ee-cd2d5688e73e@palmer-ri-x1c9>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231102191914.52957-2-pstanner@redhat.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 02, 2023 at 08:19:15PM +0100, Philipp Stanner wrote:
-> In ppp_generic.c memdup_user() is utilized to copy a userspace array.
-> This is done without an overflow check.
-> 
-> Use the new wrapper memdup_array_user() to copy the array more safely.
+On Wed, 01 Nov 2023 18:42:10 PDT (-0700), Palmer Dabbelt wrote:
+> On Wed, 01 Nov 2023 18:07:23 PDT (-0700), nathan@kernel.org wrote:
+>> On Wed, Nov 01, 2023 at 05:41:10PM -0700, Palmer Dabbelt wrote:
+>>> On Tue, 31 Oct 2023 13:23:35 PDT (-0700), nathan@kernel.org wrote:
+>>> > Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
+>>> >
+>>> >   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+>>> >     663 |         }
+>>> >         |         ^
+>>> >   1 error generated.
+>>> >
+>>> > On earlier releases (such as clang-11, the current minimum supported
+>>> > version for building the kernel) that do not support C23, this was a
+>>> > hard error unconditionally:
+>>> >
+>>> >   net/ipv4/tcp_output.c:663:2: error: expected statement
+>>> >           }
+>>> >           ^
+>>> >   1 error generated.
+>>> >
+>>> > Add a semicolon after the label to create an empty statement, which
+>>> > resolves the warning or error for all compilers.
+>>> >
+>>> > Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
+>>> > Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
+>>> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+>>> > ---
+>>> >  net/ipv4/tcp_output.c | 2 +-
+>>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>>> >
+>>> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+>>> > index f558c054cf6e..6064895daece 100644
+>>> > --- a/net/ipv4/tcp_output.c
+>>> > +++ b/net/ipv4/tcp_output.c
+>>> > @@ -658,7 +658,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>>> >  			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
+>>> >  			ptr++;
+>>> >  		}
+>>> > -out_ao:
+>>> > +out_ao:;
+>>> >  #endif
+>>> >  	}
+>>> >  	if (unlikely(opts->mss)) {
+>>> >
+>>> > ---
+>>> > base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
+>>> > change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
+>>> >
+>>> > Best regards,
+>>>
+>>> This gives me a
+>>>
+>>> linux/net/ipv4/tcp_output.c:663:2: error: expected statement
+>>>        }
+>>>
+>>> on GCC for me.
+>>
+>> What GCC version?
+>
+> 12.1, though I can't get a smaller reproducer so I'm going to roll back
+> to your change and double-check.  Might take a bit...
 
->  	fprog.len = uprog->len;
-> -	fprog.filter = memdup_user(uprog->filter,
-> -				   uprog->len * sizeof(struct sock_filter));
-> +	fprog.filter = memdup_array_user(uprog->filter,
-> +					 uprog->len, sizeof(struct sock_filter));
+Looks like there was just some bug in my test scripts and the original 
+patch wasn't actually picked up for all the configs.  It's working now, 
+so
 
-Far be it from me to discourage security theat^Whardening, but
+Reviewed-by: Palmer Dabbelt <palmer@rivosinc.com>
 
-struct sock_fprog {     /* Required for SO_ATTACH_FILTER. */
-        unsigned short          len;    /* Number of filter blocks */
-	struct sock_filter __user *filter;
-};
+Sorry for the confusion!
 
-struct sock_filter {    /* Filter block */
-        __u16   code;   /* Actual filter code */
-        __u8    jt;     /* Jump true */
-        __u8    jf;     /* Jump false */
-        __u32   k;      /* Generic multiuse field */
-};
-
-so you might want to mention that overflow in question would have to be
-in multiplying an untrusted 16bit value by 8...
+>> I cannot reproduce that error with my patch applied. I tested mainline
+>> at commit deefd5024f07 ("Merge tag 'vfio-v6.7-rc1' of
+>> https://github.com/awilliam/linux-vfio") using GCC 6 from kernel.org and
+>> I can reproduce a similar failure with ARCH=x86_64 allyesconfig:
+>>
+>>   net/ipv4/tcp_output.c: In function 'tcp_options_write':
+>>   net/ipv4/tcp_output.c:661:1: error: label at end of compound statement
+>>    out_ao:
+>>    ^~~~~~
+>>
+>> With this change applied, the error disappears for GCC 6 and GCC 13
+>> continues to build without error. I can try the other supported versions
+>> later, I just did an older and newer one for a quick test.
+>>
+>>> So I think something like
+>>>
+>>> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+>>> index f558c054cf6e..ca09763acaa8 100644
+>>> --- a/net/ipv4/tcp_output.c
+>>> +++ b/net/ipv4/tcp_output.c
+>>> @@ -659,6 +659,11 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+>>> 			ptr++;
+>>> 		}
+>>> out_ao:
+>>> +	/*
+>>> +	 * Labels at the end of compound statements are a C23 feature, so
+>>> +	 * introduce a block to avoid a warning/error on strict toolchains.
+>>> +	 */
+>>> +	{}
+>>> #endif
+>>> 	}
+>>> 	if (unlikely(opts->mss)) {
+>>>
+>>> should do it (though it's still build testing...)
+>>
+>> I am not opposed to this once we understand what versions are affected
+>> by this so that we have some timeline of removing this workaround.
+>>
+>> Cheers,
+>> Nathan
 
