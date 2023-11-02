@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-45738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0ABF7DF4B4
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:15:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A297DF4C9
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1172B2105F
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 14:15:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C32C281ABD
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 14:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4F01B280;
-	Thu,  2 Nov 2023 14:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF361B28C;
+	Thu,  2 Nov 2023 14:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XmQ/FvDb"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="fMNYqOei"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC29F18E23
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 14:15:02 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0849E128
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 07:14:58 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50931355d48so1207002e87.3
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 07:14:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1252819BC2
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 14:19:29 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F65C12D
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 07:19:24 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso12457785e9.0
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 07:19:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698934496; x=1699539296; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y7ZDPYaEXidRnVjS2Ex4y3Rshx/fWtd37iAYju4s7Go=;
-        b=XmQ/FvDbcs5lUV6oeTcp6X5bF9VlzXeqm1fIOcBoq3WWjF3VxjcanvpDAHu32snmnY
-         4Im3LtW4mLYyRUqibjZmj0ZZ/9d4muAvMILZwiJW7II0Ol+HVD01xQyIeHBbUNumQVu3
-         wV1DZqrYmIpMvDZfnAseEXTGilrQSZuiX36vrMFLFXvfLW76JJ3HFiikKy0NRv8qhM4d
-         nkpZbxkut4LG24+mhPnMsYLFUNh/HHbTmqNPl4Uy67EO7oB9exe8hy0sFMqluLYBG/HR
-         HAu+cCuhUeemWwP5JtJ+naArdQaxNulNyOIud2ZF7gu3ZGHGEQ08Xytd021utTESs3jU
-         T5Ag==
+        d=6wind.com; s=google; t=1698934762; x=1699539562; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EGCcsNJEZ1WAFmjraApH761w2N1/YB+/0qgHvh23Dhs=;
+        b=fMNYqOei8PS2pvu2eYlZjbMGHwVJEXVunNqT/Egn7fyUpOf6dtAehD7F9/OfRl8AXd
+         QE7jWt02P2wx0KZUdI19Us6dyX6CT6tlKKfFij3IbMW3Jo+nnmHctx5ozb3oRgBAvp42
+         Wrk9bQnjcgJItQvjnI0zV9yc5rulqzfBbsbhrJQFyfBBE5nKyGdjTb/6y6bgzq5OcjJf
+         bUQOw7ao6s78lF2mBrDjSvZgnH5x47IYXVRUVtReK5ykSGj1bnN+yYCIoNxQpSEK6N/p
+         dG4bhkNkU5Bg30/OGLvXL1PNgsVsfiZq3iqCbXst42UFx1d7kBvOA54cNEuodIjsT9px
+         dPRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698934496; x=1699539296;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y7ZDPYaEXidRnVjS2Ex4y3Rshx/fWtd37iAYju4s7Go=;
-        b=EXlyolvbfYYWDUeoTcBfDssGQvzgAsfqNPXRf0JSx1/sNQlP+wXxDnUdafrRbMeH6u
-         lxyxGo+M1kmwOgY92QwWOh6tjJr1yuKPTN5x51M72rR8tsGKJPVZ8bVdDnrDjyML4I5m
-         Zg2kTnFTf2CQ9Cd8dO63VBt8XqUXbwWcOyNhTtczYtbLAYnFTNBdFMWrn586rUb753SP
-         S1cFd9FT0SuvZ5W3PUNLKvJvfuIUtNzGW9wfR5uvV3MQRlWJQLsAG9bJUm04b74qbPWY
-         k/CHJ/xq2M2x9LB2iqNRxJYOqCWE6XT2RQg/JzXKFaRJigBrzNnHnuwwoCjDC6ElcPlq
-         vogA==
-X-Gm-Message-State: AOJu0YyLUOyjvJ2qHklgjUcyUAuSLS+YSVJExOdhINg2CeIDLzi5wHUv
-	orfGDr6aU0cTQafZqPocX28=
-X-Google-Smtp-Source: AGHT+IGSf/xYiAlURsvECGiCwA1UX8F3SdpBtRxFQ77OboS+6FLzxa8WG/bBZVZFs+2+qUNuTzhLNA==
-X-Received: by 2002:a05:6512:491:b0:507:b0a1:6088 with SMTP id v17-20020a056512049100b00507b0a16088mr14603373lfq.46.1698934495955;
-        Thu, 02 Nov 2023 07:14:55 -0700 (PDT)
-Received: from [192.168.7.165] (buscust41-118.static.cytanet.com.cy. [212.31.107.118])
-        by smtp.googlemail.com with ESMTPSA id e5-20020a05600c4e4500b0040772934b12sm3262761wmq.7.2023.11.02.07.14.54
+        d=1e100.net; s=20230601; t=1698934762; x=1699539562;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EGCcsNJEZ1WAFmjraApH761w2N1/YB+/0qgHvh23Dhs=;
+        b=M7UE5r12wQms9zUW2QRqnopkvCuzbJxrvmOVD4fK1NPS7Hgf1RbspPdhIR49ziZSck
+         nmHKTs5RKLCEwGBY6l59E4ZhGOWdvGQoEk8B2fM87UkiIzfBLull2jYSomHC/fVzHy0e
+         W0pfAUhaezBKAtQrYK3415PE2MHT7Uly4+QB24amOfn5Ib2wtEFlTZfObpTgPONrU9J9
+         9HWMoRnsOsx3CQr+r97js+2HJkmm6bSvmCk2jGqcbRTg6sw1+ceOA/2xFdYGCjKshFb+
+         GjMJj0rf5oKCpYFElrf9p3K2rTznWzf3tcj51B8HyFicgi9MM4+wLdi5iBY1ZVLVgTkm
+         aNTA==
+X-Gm-Message-State: AOJu0Yxr16r9VtmO3zKMUbvrDVKBhYL8Kdsii08q1vRY/cIX8UAr80Ot
+	MzK0Kqm1/omL0taGaL4WtIvFRg==
+X-Google-Smtp-Source: AGHT+IFFHyc/HXDjKsNe5SPOkeKwkiAUxXYYUjZdqDGG02orb8ZoesxI9+2FNgBSVuNAjUFk/uy2/Q==
+X-Received: by 2002:a05:600c:4f49:b0:405:3924:3cad with SMTP id m9-20020a05600c4f4900b0040539243cadmr10618987wmq.15.1698934762119;
+        Thu, 02 Nov 2023 07:19:22 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:9ba7:9bce:3d04:2592? ([2a01:e0a:b41:c160:9ba7:9bce:3d04:2592])
+        by smtp.gmail.com with ESMTPSA id o9-20020adfeac9000000b0032f7cc56509sm2552746wrn.98.2023.11.02.07.19.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 07:14:55 -0700 (PDT)
-Message-ID: <5c778d51-ec87-4e74-9fd6-63dc4a9ae2a6@gmail.com>
-Date: Thu, 2 Nov 2023 16:14:53 +0200
+        Thu, 02 Nov 2023 07:19:21 -0700 (PDT)
+Message-ID: <fc356b9d-d7fc-4db8-b26c-8c786758d3e5@6wind.com>
+Date: Thu, 2 Nov 2023 15:19:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,61 +68,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [PATCH net] tg3: power down device only on
- SYSTEM_POWER_OFF
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH] net: ipmr_base: Check iif when returning a (*, G) MFC
 Content-Language: en-US
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: netdev@vger.kernel.org, Andrew Gospodarek
- <andrew.gospodarek@broadcom.com>, Michael Chan <michael.chan@broadcom.com>
-References: <20231101130418.44164-1-george.shuklin@gmail.com>
- <CALs4sv37sniGKkYADvHwwMjFzp5tBbBnpfOnyK-peM=rnp63Bw@mail.gmail.com>
- <31a5cfe8-133d-4548-9814-cf3e61d89307@gmail.com>
- <CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5aWj1tGP0OPJg@mail.gmail.com>
-From: George Shuklin <george.shuklin@gmail.com>
-In-Reply-To: <CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5aWj1tGP0OPJg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Yang Sun <sunytt@google.com>, Ido Schimmel <idosch@idosch.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20231031015756.1843599-1-sunytt@google.com>
+ <ZUNxcxMq8EW0cVUT@shredder>
+ <CAF+qgb4gW8vBb8c2xDHfsXsm1-O2KCwXMCTUcT2mYqED51fHoQ@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <CAF+qgb4gW8vBb8c2xDHfsXsm1-O2KCwXMCTUcT2mYqED51fHoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 11/2/23 09:04, Pavan Chebbi wrote:
-> On Thu, Nov 2, 2023 at 1:28 AM George Shuklin <george.shuklin@gmail.com> wrote:
->> On 01/11/2023 17:20, Pavan Chebbi wrote:
->>> On Wed, Nov 1, 2023 at 6:34 PM George Shuklin <george.shuklin@gmail.com> wrote:
->>>> Dell R650xs servers hangs if tg3 driver calls tg3_power_down.
->>>>
->>>> This happens only if network adapters (BCM5720 for R650xs) were
->>>> initialized using SNP (e.g. by booting ipxe.efi).
->>>>
->>>> This is partial revert of commit 2ca1c94ce0b.
->>>>
->>>> The actual problem is on Dell side, but this fix allow servers
->>>> to come back alive after reboot.
->>> How are you sure that the problem solved by 2ca1c94ce0b is not
->>> reintroduced with this change?
->> I contacted the author of original patch, no reply yet (1st day). Also,
->> I tested it on few generations of available Dell servers (R330, R340,
->> R350 and R650sx, for which this fix should help). It does produce log
->> message from
->> https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1917471, but, at
->> least, it reboots without issues.
->>
->> Actually, original patch is regression: 5.19 rebooting just fine, 6.0
->> start to hang. I also reported it to dell support forum, but I'm not
->> sure if they pick it up or not.
->>
->> What would be the proper course of actions for such problem (outside of
->> fixing UEFI SNP, for which I don't have access to sources)?
->>
-> Thanks for the explanation. I am not sure if we should make this
-> change unless we are 100pc sure that this patch won't cause
-> regression.
-> I feel Dell is in the best position to debug this and they can even
-> contact Broadcom if they see any problem in UEFI.
+Le 02/11/2023 à 12:48, Yang Sun a écrit :
+>> Is this a regression (doesn't seem that way)? If not, the change should
+>> be targeted at net-next which is closed right now:
+> 
+>> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+> 
+> I see.
+> 
+>>> - if (c->mfc_un.res.ttls[vifi] < 255)
+>>> + if (c->mfc_parent == vifi && c->mfc_un.res.ttls[vifi] < 255)
+> 
+>> What happens if the route doesn't have an iif (-1)? It won't match
+>> anymore?
+> 
+> Looks like the mfc_parent can't be -1? There is the check:
+>     if (mfc->mf6cc_parent >= MAXMIFS)
+>         return -ENFILE;
+> before setting the parent:
+>     c->_c.mfc_parent = mfc->mf6cc_parent;
+> 
+> I wrote this patch thinking (*, G) MFCs could be per iif, similar to the
+> (S, G) MFCs, like we can add the following MFCs to forward packets from
+> any address with group destination ff05::aa from if1 to if2, and forward
+> packets from any address with group destination ff05::aa from if2 to
+> both if1 and if3.
+> 
+> (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
+> (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
+> 
+> But reading Nicolas's initial commit message again, it seems to me that
+> (*, G) has to be used together with (*, *) and there should be only one
+> (*, G) entry per group address and include all relevant interfaces in
+> the oifs? Like the following:
+> 
+> (::, ::)         Iif: if1 Oifs: if1 if2 if3   State: resolved
+> (::, ff05::aa)   Iif: if1 Oifs: if1 if2 if3   State: resolved
+> 
+> Is this how the (*, *|G) MFCs are intended to be used? which means packets
+> to ff05::aa are forwarded from any one of the interfaces to all the other
+> interfaces? If this is the intended way it works then my patch would break
+> things and should be rejected.
+Yes, this was the intend. Only one (*, G) entry was expected (per G).
 
-I'm right now with dell support, and what they asked is to 'try this on 
-supported distros', which at newest are 5.15. I'll try to bypass their 
-L1 with Ubuntu + HWE to get to 6+ versions...
+> 
+> Is there a way to achieve the use case I described above? Like having
+> different oifs for different iif?
+Instead of being too strict, maybe you could try to return the 'best' entry.
 
-I was able to reproduce hanging at reboot there (without ACPI messages), 
-and patching helps there too.
+#1 (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
+#2 (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
 
+If a packet comes from if2, returns #2, but if a packet comes from if3, returns
+the first matching entry, ie #1 here.
+
+
+Regards,
+Nicolas
 
