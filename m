@@ -1,236 +1,206 @@
-Return-Path: <netdev+bounces-45781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568117DF8A7
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:25:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A2E7DF8B1
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DD96B21256
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 17:25:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57A63B211D7
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 17:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D752032B;
-	Thu,  2 Nov 2023 17:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1775C200B7;
+	Thu,  2 Nov 2023 17:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="n+ILVyBK"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IlLpq4q2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8E91DFF5
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 17:25:34 +0000 (UTC)
-Received: from mx1.spacex.com (mx1.spacex.com [192.31.242.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23DA184;
-	Thu,  2 Nov 2023 10:25:28 -0700 (PDT)
-Received: from pps.filterd (mx1.spacex.com [127.0.0.1])
-	by mx1.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2FpdVN024140;
-	Thu, 2 Nov 2023 10:25:27 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=dkim;
- bh=6bH3O6kj5vlPADrl3hGbjcQerEjTQCUhR5OQniuZxLM=;
- b=n+ILVyBK/PQfQwggiPuQprMeLti//kKwfsSkFnBksF5A0soHAppynbjSEeaG/AW4Ux62
- yd2ahZcbateOUtoELMlV+sM8K0mgO76syueEliboPkn39R3aI7s86jUsQaozIEDfgGNS
- j7rP9WHgXDzD3vCiJvTeSP/zAdtai9O0JqulTpgo9n9CQRctsKcvm3qZCgSSsP5WyEhP
- bUFHYseUHDg3Ddn43Oe1QJE6oUzvT0tUTeL2wmRMbumciB0EJB+KBwDFUOTZmH4tkbIH
- z+E3KQDYJMjhsiq4yC3pyz44cqUYOb39oL/gAAH6f03+VfQQL70qBXix3QdDBn3IfbWB HQ== 
-Received: from smtp.spacex.corp ([10.34.3.234])
-	by mx1.spacex.com (PPS) with ESMTPS id 3u0yqhja34-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 02 Nov 2023 10:25:27 -0700
-Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 2 Nov 2023 10:25:26 -0700
-From: <alexey.pakhunov@spacex.com>
-To: <mchan@broadcom.com>
-CC: <vincent.wong2@spacex.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <siva.kallam@broadcom.com>,
-        <prashant@broadcom.com>, Alex Pakhunov <alexey.pakhunov@spacex.com>
-Subject: [PATCH v2 2/2] tg3: Fix the TX ring stall
-Date: Thu, 2 Nov 2023 10:25:03 -0700
-Message-ID: <20231102172503.3413318-3-alexey.pakhunov@spacex.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20231102172503.3413318-1-alexey.pakhunov@spacex.com>
-References: <20231102172503.3413318-1-alexey.pakhunov@spacex.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E7C6FAE
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 17:27:46 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C229A123
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:27:41 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9a58dbd5daeso196477566b.2
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 10:27:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1698946060; x=1699550860; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1VAdEHo549a9UhaHA8u8MIvABqDPM8hD8NLbt41iBBY=;
+        b=IlLpq4q2ia+v6klB605LJ6I5TVXnmI5qGSMjmnztZb4jGLLLwCShoOYTwmeqDhoZ1i
+         v1xepNvy6Ac1f/HrdPeqOMGiBF/s+Sl7v30fZH6HVkgePuFM4xFs37n51zb7e8YrHGNb
+         FvjftmzLBSaWe5WmJ/IehtwEarFc8k7GP/gwg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698946060; x=1699550860;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1VAdEHo549a9UhaHA8u8MIvABqDPM8hD8NLbt41iBBY=;
+        b=GCDrb9mTJtUTZjFwHDLJdCUcuQXVPHQJBf0r9ZkzGIYRXL9vQsmcHT40EK32K+S8Mx
+         d11RYainBuN7e/qhc24H3RzXxEGKTdp0IY2FGq7FRxq2IA2Qarw9jk7usz38ZtsoU6Uy
+         60n1j8P09OIT0s4M3vACSSc96Ytr5B6xoTrTXgavqYHSYAX3Dw4TJjObllrDmxy1mV76
+         UlinrqKLeTYsEYNn/IRUWAN/m4zrlK/3IJvQ+bQ8FEoqB3OPUOorM1XK27qMRF/VPQAz
+         8avhlWXNU7OXiQOk9apSTEmUupJM0WAfyyOA7UFnN6CguOux3gtgPxaYAJ5wBkttuI75
+         un/Q==
+X-Gm-Message-State: AOJu0YzXOQ5eGeiQmH1T9XSIXMlFNBjM5PbT5X86a3aG2r5dUD+iWRsW
+	ZTIlZAamZvpoXotadtUvmchPjtGAkhf/nh9VnJwHRw==
+X-Google-Smtp-Source: AGHT+IH7GNAB6dQUBkWxSRo9t20RtcTVZ1UCivZ5MyBW3cdUGBbKTsNVa76mUIKX3o7CEH4nelLNITBdb5gG9ZwRlXU=
+X-Received: by 2002:a17:907:9714:b0:9be:6395:6b12 with SMTP id
+ jg20-20020a170907971400b009be63956b12mr6159750ejc.27.1698946060045; Thu, 02
+ Nov 2023 10:27:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HT-DC-EX-D2-N1.spacex.corp (10.34.3.233) To
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
-X-Proofpoint-GUID: HLP40OawTODhoOThXtav86lIA0KqcaQF
-X-Proofpoint-ORIG-GUID: HLP40OawTODhoOThXtav86lIA0KqcaQF
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 malwarescore=0 impostorscore=0 spamscore=0 bulkscore=0
- phishscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311020143
+References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com> <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
+In-Reply-To: <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Thu, 2 Nov 2023 10:27:27 -0700
+Message-ID: <CACKFLimX4Pjm89cneeTa36B519DN3mdXXo5FXfDFi6e0SBwUSA@mail.gmail.com>
+Subject: Re: [PATCH v2] net/tg3: fix race condition in tg3_reset_task()
+To: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com, 
+	mchan@broadcom.com, pavan.chebbi@broadcom.com, drc@linux.vnet.ibm.com, 
+	venkata.sai.duggi@ibm.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000006e1d2306092eb400"
 
-From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+--0000000000006e1d2306092eb400
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The TX ring maintained by the tg3 driver can end up in the state, when it
-has packets queued for sending but the NIC hardware is not informed, so no
-progress is made. This leads to a multi-second interruption in network
-traffic followed by dev_watchdog() firing and resetting the queue.
+On Thu, Nov 2, 2023 at 9:16=E2=80=AFAM Thinh Tran <thinhtr@linux.vnet.ibm.c=
+om> wrote:
+>
+> When an EEH error is encountered by a PCI adapter, the EEH driver
+> modifies the PCI channel's state as shown below:
+>
+>    enum {
+>       /* I/O channel is in normal state */
+>       pci_channel_io_normal =3D (__force pci_channel_state_t) 1,
+>
+>       /* I/O to channel is blocked */
+>       pci_channel_io_frozen =3D (__force pci_channel_state_t) 2,
+>
+>       /* PCI card is dead */
+>       pci_channel_io_perm_failure =3D (__force pci_channel_state_t) 3,
+>    };
+>
+> If the same EEH error then causes the tg3 driver's transmit timeout
+> logic to execute, the tg3_tx_timeout() function schedules a reset
+> task via tg3_reset_task_schedule(), which may cause a race condition
+> between the tg3 and EEH driver as both attempt to recover the HW via
+> a reset action.
+>
+> EEH driver gets error event
+> --> eeh_set_channel_state()
+>     and set device to one of
+>     error state above           scheduler: tg3_reset_task() get
+>                                 returned error from tg3_init_hw()
+>                              --> dev_close() shuts down the interface
+>
+> tg3_io_slot_reset() and
+> tg3_io_resume() fail to
+> reset/resume the device
+>
+>
+> To resolve this issue, we avoid the race condition by checking the PCI
+> channel state in the tg3_tx_timeout() function and skip the tg3 driver
+> initiated reset when the PCI channel is not in the normal state.  (The
+> driver has no access to tg3 device registers at this point and cannot
+> even complete the reset task successfully without external assistance.)
+> We'll leave the reset procedure to be managed by the EEH driver which
+> calls the tg3_io_error_detected(), tg3_io_slot_reset() and
+> tg3_io_resume() functions as appropriate.
 
-The specific sequence of steps is:
+This scenario can affect other drivers too, right?  Shouldn't this be
+handled in a higher layer before calling ->ndo_tx_timeout() so we
+don't have to add this logic to all the other drivers?  Thanks.
 
-1. tg3_start_xmit() is called at least once and queues packet(s) without
-   updating tnapi->prodmbox (netdev_xmit_more() returns true)
-2. tg3_start_xmit() is called with an SKB which causes tg3_tso_bug() to be
-   called.
-3. tg3_tso_bug() determines that the SKB is too large, ...
+--0000000000006e1d2306092eb400
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-        if (unlikely(tg3_tx_avail(tnapi) <= frag_cnt_est)) {
-
-   ... stops the queue, and returns NETDEV_TX_BUSY:
-
-        netif_tx_stop_queue(txq);
-        ...
-        if (tg3_tx_avail(tnapi) <= frag_cnt_est)
-                return NETDEV_TX_BUSY;
-
-4. Since all tg3_tso_bug() call sites directly return, the code updating
-   tnapi->prodmbox is skipped.
-
-5. The queue is stuck now. tg3_start_xmit() is not called while the queue
-   is stopped. The NIC is not processing new packets because
-   tnapi->prodmbox wasn't updated. tg3_tx() is not called by
-   tg3_poll_work() because the all TX descriptions that could be freed has
-   been freed:
-
-        /* run TX completion thread */
-        if (tnapi->hw_status->idx[0].tx_consumer != tnapi->tx_cons) {
-                tg3_tx(tnapi);
-
-6. Eventually, dev_watchdog() fires triggering a reset of the queue.
-
-This fix makes sure that the tnapi->prodmbox update happens regardless of
-the reason tg3_start_xmit() returned.
-
-Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
-Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
----
-v2: Sort Order the local variables in tg3_start_xmit() in the RCS order
-v1: https://lore.kernel.org/netdev/20231101191858.2611154-1-alexey.pakhunov@spacex.com/T/#t
----
- drivers/net/ethernet/broadcom/tg3.c | 53 +++++++++++++++++++++++------
- 1 file changed, 42 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 99638e6c9e16..f7680d3e46da 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -6603,9 +6603,9 @@ static void tg3_tx(struct tg3_napi *tnapi)
- 
- 	tnapi->tx_cons = sw_idx;
- 
--	/* Need to make the tx_cons update visible to tg3_start_xmit()
-+	/* Need to make the tx_cons update visible to __tg3_start_xmit()
- 	 * before checking for netif_queue_stopped().  Without the
--	 * memory barrier, there is a small possibility that tg3_start_xmit()
-+	 * memory barrier, there is a small possibility that __tg3_start_xmit()
- 	 * will miss it and cause the queue to be stopped forever.
- 	 */
- 	smp_mb();
-@@ -7845,7 +7845,7 @@ static bool tg3_tso_bug_gso_check(struct tg3_napi *tnapi, struct sk_buff *skb)
- 	return skb_shinfo(skb)->gso_segs < tnapi->tx_pending / 3;
- }
- 
--static netdev_tx_t tg3_start_xmit(struct sk_buff *, struct net_device *);
-+static netdev_tx_t __tg3_start_xmit(struct sk_buff *, struct net_device *);
- 
- /* Use GSO to workaround all TSO packets that meet HW bug conditions
-  * indicated in tg3_tx_frag_set()
-@@ -7881,7 +7881,7 @@ static int tg3_tso_bug(struct tg3 *tp, struct tg3_napi *tnapi,
- 
- 	skb_list_walk_safe(segs, seg, next) {
- 		skb_mark_not_on_list(seg);
--		tg3_start_xmit(seg, tp->dev);
-+		__tg3_start_xmit(seg, tp->dev);
- 	}
- 
- tg3_tso_bug_end:
-@@ -7891,7 +7891,7 @@ static int tg3_tso_bug(struct tg3 *tp, struct tg3_napi *tnapi,
- }
- 
- /* hard_start_xmit for all devices */
--static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
-+static netdev_tx_t __tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct tg3 *tp = netdev_priv(dev);
- 	u32 len, entry, base_flags, mss, vlan = 0;
-@@ -8135,11 +8135,6 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 			netif_tx_wake_queue(txq);
- 	}
- 
--	if (!netdev_xmit_more() || netif_xmit_stopped(txq)) {
--		/* Packets are ready, update Tx producer idx on card. */
--		tw32_tx_mbox(tnapi->prodmbox, entry);
--	}
--
- 	return NETDEV_TX_OK;
- 
- dma_error:
-@@ -8152,6 +8147,42 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 	return NETDEV_TX_OK;
- }
- 
-+static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
-+{
-+	struct netdev_queue *txq;
-+	u16 skb_queue_mapping;
-+	netdev_tx_t ret;
-+
-+	skb_queue_mapping = skb_get_queue_mapping(skb);
-+	txq = netdev_get_tx_queue(dev, skb_queue_mapping);
-+
-+	ret = __tg3_start_xmit(skb, dev);
-+
-+	/* Notify the hardware that packets are ready by updating the TX ring
-+	 * tail pointer. We respect netdev_xmit_more() thus avoiding poking
-+	 * the hardware for every packet. To guarantee forward progress the TX
-+	 * ring must be drained when it is full as indicated by
-+	 * netif_xmit_stopped(). This needs to happen even when the current
-+	 * skb was dropped or rejected with NETDEV_TX_BUSY. Otherwise packets
-+	 * queued by previous __tg3_start_xmit() calls might get stuck in
-+	 * the queue forever.
-+	 */
-+	if (!netdev_xmit_more() || netif_xmit_stopped(txq)) {
-+		struct tg3_napi *tnapi;
-+		struct tg3 *tp;
-+
-+		tp = netdev_priv(dev);
-+		tnapi = &tp->napi[skb_queue_mapping];
-+
-+		if (tg3_flag(tp, ENABLE_TSS))
-+			tnapi++;
-+
-+		tw32_tx_mbox(tnapi->prodmbox, tnapi->tx_prod);
-+	}
-+
-+	return ret;
-+}
-+
- static void tg3_mac_loopback(struct tg3 *tp, bool enable)
- {
- 	if (enable) {
-@@ -17682,7 +17713,7 @@ static int tg3_init_one(struct pci_dev *pdev,
- 	 * device behind the EPB cannot support DMA addresses > 40-bit.
- 	 * On 64-bit systems with IOMMU, use 40-bit dma_mask.
- 	 * On 64-bit systems without IOMMU, use 64-bit dma_mask and
--	 * do DMA address check in tg3_start_xmit().
-+	 * do DMA address check in __tg3_start_xmit().
- 	 */
- 	if (tg3_flag(tp, IS_5788))
- 		persist_dma_mask = dma_mask = DMA_BIT_MASK(32);
--- 
-2.39.3
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIACNS9r+8vGXKZ8PbUYIipm8UCjvu3Wg
+Zrs297ngBjqTMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+MjE3Mjc0MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCjV8+S3Fyj+/nzKDahDJS9QeKDTYizlkMmkunfyvhKB5Fc7m81
+lFK3z+taxFyaWeUX1H9EmzkvGs7jymfJ/ICdzq5PfzaNLHG9HSkhd01kfFxwjtBehO2k5B+ZUA/j
+pRf106Sy6fWDi5+6p8UYT1YF0IHdNgtIu+6sWwNWRuM6KbVvPicQP3Rj6VyRCv3fYNtI/KaaFNEt
+7zbtuGU2wFwiVthUa3qQy2V47gQAShA0tNXRZSEOmVYzZfVWYM7MxhvgfQK2J0v7FHiZlNUyJf9R
+cnjIql28HkU2PaSMKoMEQLfpg5KekW8Jqhdd7wKgZkRE/Bh/jDxhYsbpC4mUlTqZ
+--0000000000006e1d2306092eb400--
 
