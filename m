@@ -1,302 +1,229 @@
-Return-Path: <netdev+bounces-45795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F9D07DFA5D
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:52:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4327DFA6A
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:56:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32AF6281230
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7CE31C21033
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3A31DDD6;
-	Thu,  2 Nov 2023 18:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC62D200AB;
+	Thu,  2 Nov 2023 18:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlRso0A0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xR8b+XNw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C768C8D6
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:52:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E08AFC433C8;
-	Thu,  2 Nov 2023 18:52:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698951155;
-	bh=hXDWnrfL3OTN0MYUNnUbKci7Ji1PBcGttUuRsSZ8yHQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dlRso0A0pF6o5yWGx9Zy3K6mFwYPjigvy0l1QZJeMSYpP9lniG5Z0IZyVgCQL9BXJ
-	 SqFWbD6DFnQjsGyEi5S9/kKBRfvhsQ5dzK3lb7QD2JDMit3U1ZN/zwQ0c7Bfc9ZiDP
-	 t114H8jz3vtV1Dk1wyewG6M5ekY6/SLRZCTIEic6m195Y3M/qD+ZOS02Y8mrz6IuBz
-	 QR4zdgiiTwMohqQ372IhHbrBzJHxivPiPeH5cDcdwEPg3HLkkbIT4+1kiuTBQsgeKl
-	 VNhdfy8V6byC6MRvuJI+HoKDpLZ629ZjCqmHVljHPiV9QOPU/i+AXLjHDJES/wix2t
-	 rqhSDDeWKvcFQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	chuck.lever@oracle.com,
-	lorenzo@kernel.org
-Subject: [PATCH net] nfsd: regenerate user space parsers after ynl-gen changes
-Date: Thu,  2 Nov 2023 11:52:27 -0700
-Message-ID: <20231102185227.2604416-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41CC221341
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:55:57 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB73136
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 11:55:49 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5acac8b6575so19021227b3.1
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 11:55:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698951349; x=1699556149; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=GwZROZlK9UfWkKR+Oep5UTLdUA8cSVn3j1Qp9AwudVw=;
+        b=xR8b+XNwCjZzW7ewFmpbefe+kFVHnWi7cUTdQ+q/Z/mdgeN+ge8WTJOtZC06ksc0IN
+         6GRKp0tp6pde2Y1xyAGKAViGYZ1UC5Ftb4IJeZ74dYrfelnYVRfY631b0F3YWLZuDCI2
+         Tt4yzTzHHIjRznepVEEczPavOnsx/vS2h1CXeTvWr9IhUvhFerwYyN4arohfKe1dHm/F
+         M7Oxjskfv6SKRV4QQN5NQwPB+KvG7MDS/rvPHfwoNE2CvcYo9u4neBiJM7Eio2AkZfjE
+         96v9miCvJvqgiPI8bFL5uvPrQnBzn4gcJuQ1r3DeT9lUZElvtepbqHMQ8B0Xvn+sNFcI
+         K/JA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698951349; x=1699556149;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GwZROZlK9UfWkKR+Oep5UTLdUA8cSVn3j1Qp9AwudVw=;
+        b=VHN2lTrclFcCRbiir7XTyOAZ4PVa7OCJZUzeXBXy874Y3bo4GhpxEeWFglqb3802Rl
+         Cv+XWh/MbwinPqznU9NAr1k5pxGCrAtHCM/25DlcvOuz6H0GvihYQqs/Ni7/lYUopm6U
+         06cBbOWwghojNAxXXylSXvwDaqyflq0n536DMHG4l2ZYudbDGSVpcHyF62yNDMXmTo7t
+         I0W5JimQbdzqSRqmOV5VzHW+zMP89Qmg5efWjOyEHfaqS0E5hpGHwYyuR9K1dkKbXxTE
+         qVpHsY8uVIHMhH9Gb+uhQCtrpdr4GCui4yjKFnpajJDvHslF0Hsxs/NACwPLtLVWRKZ4
+         ejgA==
+X-Gm-Message-State: AOJu0YzMRTRKVIl5nHNXydiMqpWL/nho8/9k182eATX1mwEVxsxN+8rJ
+	Ip2BOF7bEQzsrk0bFUWPIuRlPA9rYEHxIM4ujw==
+X-Google-Smtp-Source: AGHT+IHU+DjdhGyfLwL6+kKjSdSmxJWkpryViec8cwwDoWtQDNOiyfbquBqPfJ/wOCFKMWI8x2MjGy7G4ggPBzP5Kg==
+X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
+ (user=justinstitt job=sendgmr) by 2002:a05:6902:45:b0:d9b:59c3:6eef with SMTP
+ id m5-20020a056902004500b00d9b59c36eefmr8657ybh.0.1698951348803; Thu, 02 Nov
+ 2023 11:55:48 -0700 (PDT)
+Date: Thu, 02 Nov 2023 18:55:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-B4-Tracking: v=1; b=H4sIAK3wQ2UC/33NQQqDMBQE0KuUrJsS8zWpXfUepUhMvhpQIyYVi
+ 3j3BleWSpfDMG8W4nG06MnttJARJ+ut62NIzyeiG9XXSK2JmXDGIWE8oxia4FxbDK/gC9sNLVV
+ JKvOqKrVERuJuGLGy82Y+SI+B9jgH8oxNY31w43s7m5Kt/+NOCWVUqAxUDgZKye+1c3WLF+26j Zv4nhBHBI8EM0Lq0hiWwfWHgD0hjwiIBKRCKC1kDiz9ItZ1/QDJe1zHQwEAAA==
+X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1698951347; l=4723;
+ i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
+ bh=jFTdO8kx/UlazPhR0MRqYdFyWA/L3tuMaQQIucen34M=; b=v2F1dfbbHaeo64cGZOjBP3/iolmGrFIsPfCBQHud2JK2GSSDr5CUsMsWVAeI/q16gcG+J6OW+
+ QYzrftVSbVSBn7OqwukQ4KtKDMdJQi+bVfKV5GmEwqA8bEfbAtqp47F
+X-Mailer: b4 0.12.3
+Message-ID: <20231102-ethtool_puts_impl-v4-0-14e1e9278496@google.com>
+Subject: [PATCH net-next v4 0/3] ethtool: Add ethtool_puts()
+From: Justin Stitt <justinstitt@google.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shay Agroskin <shayagr@amazon.com>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, David Arinzon <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, 
+	Saeed Bishara <saeedb@amazon.com>, Rasesh Mody <rmody@marvell.com>, 
+	Sudarsana Kalluru <skalluru@marvell.com>, GR-Linux-NIC-Dev@marvell.com, 
+	Dimitris Michailidis <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Louis Peens <louis.peens@corigine.com>, 
+	Shannon Nelson <shannon.nelson@amd.com>, Brett Creeley <brett.creeley@amd.com>, drivers@pensando.io, 
+	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, Ronak Doshi <doshir@vmware.com>, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, 
+	Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"=?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?=" <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, 
+	Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, 
+	"=?utf-8?q?Alvin_=C5=A0ipraga?=" <alsi@bang-olufsen.dk>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	NXP Linux Team <linux-imx@nxp.com>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	UNGLinuxDriver@microchip.com, Jiawen Wu <jiawenwu@trustnetic.com>, 
+	Mengyuan Lou <mengyuanlou@net-swift.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Nick Desaulniers <ndesaulniers@google.com>, Nathan Chancellor <nathan@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, intel-wired-lan@lists.osuosl.org, 
+	oss-drivers@corigine.com, linux-hyperv@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	bpf@vger.kernel.org, Justin Stitt <justinstitt@google.com>
+Content-Type: text/plain; charset="utf-8"
 
-Commit 8cea95b0bd79 ("tools: ynl-gen: handle do ops with no input attrs")
-added support for some of the previously-skipped ops in nfsd.
-Regenerate the user space parsers to fill them in.
+Hi,
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+This series aims to implement ethtool_puts() and send out a wave 1 of
+conversions from ethtool_sprintf(). There's also a checkpatch patch
+included to check for the cases listed below.
+
+This was sparked from recent discussion here [1]
+
+The conversions are used in cases where ethtool_sprintf() was being used
+with just two arguments:
+|       ethtool_sprintf(&data, buffer[i].name);
+or when it's used with format string: "%s"
+|       ethtool_sprintf(&data, "%s", buffer[i].name);
+which both now become:
+|       ethtool_puts(&data, buffer[i].name);
+
+The first case commonly triggers a -Wformat-security warning with Clang
+due to potential problems with format flags present in the strings [3].
+
+The second is just a bit weird with a plain-ol' "%s".
+
+Changes found with Cocci [4] and grep [5].
+
+[1]: https://lore.kernel.org/all/202310141935.B326C9E@keescook/
+[2]: https://lore.kernel.org/all/?q=dfb%3Aethtool_sprintf+AND+f%3Ajustinstitt
+[3]: https://lore.kernel.org/all/202310101528.9496539BE@keescook/
+[4]: (script authored by Kees w/ modifications from Joe)
+@replace_2_args@
+expression BUF;
+expression VAR;
+@@
+
+-       ethtool_sprintf(BUF, VAR)
++       ethtool_puts(BUF, VAR)
+
+@replace_3_args@
+expression BUF;
+expression VAR;
+@@
+
+-       ethtool_sprintf(BUF, "%s", VAR)
++       ethtool_puts(BUF, VAR)
+
+-       ethtool_sprintf(&BUF, "%s", VAR)
++       ethtool_puts(&BUF, VAR)
+
+[5]: $ rg "ethtool_sprintf\(\s*[^,)]+\s*,\s*[^,)]+\s*\)"
+
+Signed-off-by: Justin Stitt <justinstitt@google.com>
 ---
-CC: chuck.lever@oracle.com
-CC: lorenzo@kernel.org
----
- include/uapi/linux/nfsd_netlink.h   |   6 +-
- tools/net/ynl/generated/nfsd-user.c | 120 ++++++++++++++++++++++++++--
- tools/net/ynl/generated/nfsd-user.h |  44 ++++++++--
- 3 files changed, 156 insertions(+), 14 deletions(-)
+Changes in v4:
+- update documentation to match:
+  https://lore.kernel.org/all/20231028192511.100001-1-andrew@lunn.ch/
 
-diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
-index c8ae72466ee6..3cd044edee5d 100644
---- a/include/uapi/linux/nfsd_netlink.h
-+++ b/include/uapi/linux/nfsd_netlink.h
-@@ -3,8 +3,8 @@
- /*	Documentation/netlink/specs/nfsd.yaml */
- /* YNL-GEN uapi header */
- 
--#ifndef _UAPI_LINUX_NFSD_H
--#define _UAPI_LINUX_NFSD_H
-+#ifndef _UAPI_LINUX_NFSD_NETLINK_H
-+#define _UAPI_LINUX_NFSD_NETLINK_H
- 
- #define NFSD_FAMILY_NAME	"nfsd"
- #define NFSD_FAMILY_VERSION	1
-@@ -36,4 +36,4 @@ enum {
- 	NFSD_CMD_MAX = (__NFSD_CMD_MAX - 1)
- };
- 
--#endif /* _UAPI_LINUX_NFSD_H */
-+#endif /* _UAPI_LINUX_NFSD_NETLINK_H */
-diff --git a/tools/net/ynl/generated/nfsd-user.c b/tools/net/ynl/generated/nfsd-user.c
-index fec6828680ce..360b6448c6e9 100644
---- a/tools/net/ynl/generated/nfsd-user.c
-+++ b/tools/net/ynl/generated/nfsd-user.c
-@@ -50,9 +50,116 @@ struct ynl_policy_nest nfsd_rpc_status_nest = {
- /* Common nested types */
- /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
- /* NFSD_CMD_RPC_STATUS_GET - dump */
--void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp)
-+int nfsd_rpc_status_get_rsp_dump_parse(const struct nlmsghdr *nlh, void *data)
- {
--	struct nfsd_rpc_status_get_list *next = rsp;
-+	struct nfsd_rpc_status_get_rsp_dump *dst;
-+	struct ynl_parse_arg *yarg = data;
-+	unsigned int n_compound_ops = 0;
-+	const struct nlattr *attr;
-+	int i;
-+
-+	dst = yarg->data;
-+
-+	if (dst->compound_ops)
-+		return ynl_error_parse(yarg, "attribute already present (rpc-status.compound-ops)");
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NFSD_A_RPC_STATUS_XID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.xid = 1;
-+			dst->xid = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_FLAGS) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.flags = 1;
-+			dst->flags = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_PROG) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.prog = 1;
-+			dst->prog = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_VERSION) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.version = 1;
-+			dst->version = mnl_attr_get_u8(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_PROC) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.proc = 1;
-+			dst->proc = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_SERVICE_TIME) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.service_time = 1;
-+			dst->service_time = mnl_attr_get_u64(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_SADDR4) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.saddr4 = 1;
-+			dst->saddr4 = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_DADDR4) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.daddr4 = 1;
-+			dst->daddr4 = mnl_attr_get_u32(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_SADDR6) {
-+			unsigned int len;
-+
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+
-+			len = mnl_attr_get_payload_len(attr);
-+			dst->_present.saddr6_len = len;
-+			dst->saddr6 = malloc(len);
-+			memcpy(dst->saddr6, mnl_attr_get_payload(attr), len);
-+		} else if (type == NFSD_A_RPC_STATUS_DADDR6) {
-+			unsigned int len;
-+
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+
-+			len = mnl_attr_get_payload_len(attr);
-+			dst->_present.daddr6_len = len;
-+			dst->daddr6 = malloc(len);
-+			memcpy(dst->daddr6, mnl_attr_get_payload(attr), len);
-+		} else if (type == NFSD_A_RPC_STATUS_SPORT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.sport = 1;
-+			dst->sport = mnl_attr_get_u16(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_DPORT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.dport = 1;
-+			dst->dport = mnl_attr_get_u16(attr);
-+		} else if (type == NFSD_A_RPC_STATUS_COMPOUND_OPS) {
-+			n_compound_ops++;
-+		}
-+	}
-+
-+	if (n_compound_ops) {
-+		dst->compound_ops = calloc(n_compound_ops, sizeof(*dst->compound_ops));
-+		dst->n_compound_ops = n_compound_ops;
-+		i = 0;
-+		mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+			if (mnl_attr_get_type(attr) == NFSD_A_RPC_STATUS_COMPOUND_OPS) {
-+				dst->compound_ops[i] = mnl_attr_get_u32(attr);
-+				i++;
-+			}
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+void
-+nfsd_rpc_status_get_rsp_list_free(struct nfsd_rpc_status_get_rsp_list *rsp)
-+{
-+	struct nfsd_rpc_status_get_rsp_list *next = rsp;
- 
- 	while ((void *)next != YNL_LIST_END) {
- 		rsp = next;
-@@ -65,15 +172,16 @@ void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp)
- 	}
- }
- 
--struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys)
-+struct nfsd_rpc_status_get_rsp_list *
-+nfsd_rpc_status_get_dump(struct ynl_sock *ys)
- {
- 	struct ynl_dump_state yds = {};
- 	struct nlmsghdr *nlh;
- 	int err;
- 
- 	yds.ys = ys;
--	yds.alloc_sz = sizeof(struct nfsd_rpc_status_get_list);
--	yds.cb = nfsd_rpc_status_get_rsp_parse;
-+	yds.alloc_sz = sizeof(struct nfsd_rpc_status_get_rsp_list);
-+	yds.cb = nfsd_rpc_status_get_rsp_dump_parse;
- 	yds.rsp_cmd = NFSD_CMD_RPC_STATUS_GET;
- 	yds.rsp_policy = &nfsd_rpc_status_nest;
- 
-@@ -86,7 +194,7 @@ struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys)
- 	return yds.first;
- 
- free_list:
--	nfsd_rpc_status_get_list_free(yds.first);
-+	nfsd_rpc_status_get_rsp_list_free(yds.first);
- 	return NULL;
- }
- 
-diff --git a/tools/net/ynl/generated/nfsd-user.h b/tools/net/ynl/generated/nfsd-user.h
-index b6b69501031a..989c6e209ced 100644
---- a/tools/net/ynl/generated/nfsd-user.h
-+++ b/tools/net/ynl/generated/nfsd-user.h
-@@ -21,13 +21,47 @@ const char *nfsd_op_str(int op);
- /* Common nested types */
- /* ============== NFSD_CMD_RPC_STATUS_GET ============== */
- /* NFSD_CMD_RPC_STATUS_GET - dump */
--struct nfsd_rpc_status_get_list {
--	struct nfsd_rpc_status_get_list *next;
--	struct nfsd_rpc_status_get_rsp obj __attribute__ ((aligned (8)));
-+struct nfsd_rpc_status_get_rsp_dump {
-+	struct {
-+		__u32 xid:1;
-+		__u32 flags:1;
-+		__u32 prog:1;
-+		__u32 version:1;
-+		__u32 proc:1;
-+		__u32 service_time:1;
-+		__u32 saddr4:1;
-+		__u32 daddr4:1;
-+		__u32 saddr6_len;
-+		__u32 daddr6_len;
-+		__u32 sport:1;
-+		__u32 dport:1;
-+	} _present;
-+
-+	__u32 xid /* big-endian */;
-+	__u32 flags;
-+	__u32 prog;
-+	__u8 version;
-+	__u32 proc;
-+	__s64 service_time;
-+	__u32 saddr4 /* big-endian */;
-+	__u32 daddr4 /* big-endian */;
-+	void *saddr6;
-+	void *daddr6;
-+	__u16 sport /* big-endian */;
-+	__u16 dport /* big-endian */;
-+	unsigned int n_compound_ops;
-+	__u32 *compound_ops;
- };
- 
--void nfsd_rpc_status_get_list_free(struct nfsd_rpc_status_get_list *rsp);
-+struct nfsd_rpc_status_get_rsp_list {
-+	struct nfsd_rpc_status_get_rsp_list *next;
-+	struct nfsd_rpc_status_get_rsp_dump obj __attribute__((aligned(8)));
-+};
- 
--struct nfsd_rpc_status_get_list *nfsd_rpc_status_get_dump(struct ynl_sock *ys);
-+void
-+nfsd_rpc_status_get_rsp_list_free(struct nfsd_rpc_status_get_rsp_list *rsp);
-+
-+struct nfsd_rpc_status_get_rsp_list *
-+nfsd_rpc_status_get_dump(struct ynl_sock *ys);
- 
- #endif /* _LINUX_NFSD_GEN_H */
--- 
-2.41.0
+- Link to v3: https://lore.kernel.org/r/20231027-ethtool_puts_impl-v3-0-3466ac679304@google.com
+
+Changes in v3:
+- fix force_speed_maps merge conflict + formatting (thanks Vladimir)
+- rebase onto net-next (thanks Andrew, Vladimir)
+- change subject (thanks Vladimir)
+- fix checkpatch formatting + implementation (thanks Joe)
+- Link to v2: https://lore.kernel.org/r/20231026-ethtool_puts_impl-v2-0-0d67cbdd0538@google.com
+
+Changes in v2:
+- wrap lines better in replacement (thanks Joe, Kees)
+- add --fix to checkpatch (thanks Joe)
+- clean up checkpatch formatting (thanks Joe, et al.)
+- rebase against next
+- Link to v1: https://lore.kernel.org/r/20231025-ethtool_puts_impl-v1-0-6a53a93d3b72@google.com
+
+---
+Justin Stitt (3):
+      ethtool: Implement ethtool_puts()
+      checkpatch: add ethtool_sprintf rules
+      net: Convert some ethtool_sprintf() to ethtool_puts()
+
+ drivers/net/dsa/lantiq_gswip.c                     |  2 +-
+ drivers/net/dsa/mt7530.c                           |  2 +-
+ drivers/net/dsa/qca/qca8k-common.c                 |  2 +-
+ drivers/net/dsa/realtek/rtl8365mb.c                |  2 +-
+ drivers/net/dsa/realtek/rtl8366-core.c             |  2 +-
+ drivers/net/dsa/vitesse-vsc73xx-core.c             |  8 +--
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c      |  4 +-
+ drivers/net/ethernet/brocade/bna/bnad_ethtool.c    |  2 +-
+ drivers/net/ethernet/freescale/fec_main.c          |  4 +-
+ .../net/ethernet/fungible/funeth/funeth_ethtool.c  |  8 +--
+ drivers/net/ethernet/hisilicon/hns/hns_dsaf_gmac.c |  2 +-
+ .../net/ethernet/hisilicon/hns/hns_dsaf_xgmac.c    |  2 +-
+ drivers/net/ethernet/hisilicon/hns/hns_ethtool.c   | 65 +++++++++++-----------
+ drivers/net/ethernet/intel/i40e/i40e_ethtool.c     |  6 +-
+ drivers/net/ethernet/intel/iavf/iavf_ethtool.c     |  3 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c       |  9 +--
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  2 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c       |  6 +-
+ drivers/net/ethernet/intel/igc/igc_ethtool.c       |  6 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c   |  5 +-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_net_ethtool.c   | 44 +++++++--------
+ drivers/net/ethernet/pensando/ionic/ionic_stats.c  |  4 +-
+ drivers/net/ethernet/wangxun/libwx/wx_ethtool.c    |  2 +-
+ drivers/net/hyperv/netvsc_drv.c                    |  4 +-
+ drivers/net/phy/nxp-tja11xx.c                      |  2 +-
+ drivers/net/phy/smsc.c                             |  2 +-
+ drivers/net/vmxnet3/vmxnet3_ethtool.c              | 10 ++--
+ include/linux/ethtool.h                            | 13 +++++
+ net/ethtool/ioctl.c                                |  7 +++
+ scripts/checkpatch.pl                              | 19 +++++++
+ 31 files changed, 139 insertions(+), 112 deletions(-)
+---
+base-commit: 3a04927f8d4b7a4f008f04af41e31173002eb1ea
+change-id: 20231025-ethtool_puts_impl-a1479ffbc7e0
+
+Best regards,
+--
+Justin Stitt <justinstitt@google.com>
 
 
