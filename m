@@ -1,97 +1,106 @@
-Return-Path: <netdev+bounces-45730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B857DF3BF
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 14:28:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2CE7DF3CD
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 14:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7201281AE6
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:28:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10F35281ABE
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2B61548B;
-	Thu,  2 Nov 2023 13:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6157715E9F;
+	Thu,  2 Nov 2023 13:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UyLHq8LL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D96D14A89
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 13:28:16 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAFB4182;
-	Thu,  2 Nov 2023 06:28:12 -0700 (PDT)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VvWC0w6_1698931688;
-Received: from 30.221.148.226(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VvWC0w6_1698931688)
-          by smtp.aliyun-inc.com;
-          Thu, 02 Nov 2023 21:28:09 +0800
-Message-ID: <1c5ac71a-4685-c962-cbe6-9d907bfcd4fa@linux.alibaba.com>
-Date: Thu, 2 Nov 2023 21:28:07 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DBC125D8
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 13:30:20 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2FC819A
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 06:30:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698931818;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=G4kaapn3liY1zTPGQnPDgzqDOBnuNLhFYbLOwMSHOTc=;
+	b=UyLHq8LL+JRPNoytAOcF0QejtFzKbY0qkDWJp4NU/Ax24PP/HrgmXb2JTjX2xtKHY5MCDi
+	GffamIbqJJazr1tMONxJFRDLK/HRBUWH9T9mYjQlHBoEhr9tQ9v2MFUNCUNnMI/9/iAiRV
+	AEcvArBri/q5tOVEvZ3s4ip9ivmR3zY=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-404-RNbbK_rAO9KA9e0j-9j_oA-1; Thu, 02 Nov 2023 09:30:14 -0400
+X-MC-Unique: RNbbK_rAO9KA9e0j-9j_oA-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1cc2786a8ebso8532025ad.0
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 06:30:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698931813; x=1699536613;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=G4kaapn3liY1zTPGQnPDgzqDOBnuNLhFYbLOwMSHOTc=;
+        b=anbktwgBOmMsjt/UwfJzGKkESIYLcg7CYNGJfW/fHX5rIVzwb2nfyh1XcnwcG00+rr
+         udH0g5mOevXc0z44AuOTBNkUWggHnLr2kZOPbEayvN18LICQcDWxd9mwePyc1blpsv4F
+         uuLaGiMkOBvS55QX4pT1ZHFr3VUcgA6nvLbQwf3CIbvO5VRy9NpShu/yXx9FWhCBBFm/
+         ehIkC4M4fIgewBEDw3l3TctPjNokK3cJV6e54ZwpVsLjMcurugIE5E68r/DX6iCH8lbA
+         p9Phk0dRhXfEjM+12LQzwH3tExOP3i6MTpQkK0PvpCWQwgiSvf4O0obG+RqpKd8G5eih
+         mnyA==
+X-Gm-Message-State: AOJu0YykoafGQjKiXXpiVoXPHu5OPZryZQa7qU934YybPy9Ut9mi9ZWg
+	beuiMCKsQ1AiVXA5ODzbkQwe63/pVD20YPJU9YYVwDbtVQzwqpn+LFlRQ5aKZrwKVfbGHTvTY7O
+	fso+esp4GrX3pjRXr
+X-Received: by 2002:a17:902:f943:b0:1cc:449b:689e with SMTP id kx3-20020a170902f94300b001cc449b689emr11958474plb.20.1698931813249;
+        Thu, 02 Nov 2023 06:30:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEpaf34EgGKqQhxqqvUP6ThPV7LvGkD3nyVPIKABjoFRGOKKdsCUmtWGPXXtO+YRCkk5SfLBA==
+X-Received: by 2002:a17:902:f943:b0:1cc:449b:689e with SMTP id kx3-20020a170902f94300b001cc449b689emr11958445plb.20.1698931812829;
+        Thu, 02 Nov 2023 06:30:12 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:91ec:2f0b:ae2b:204a])
+        by smtp.gmail.com with ESMTPSA id a7-20020a170902ecc700b001c877f27d1fsm1940634plh.11.2023.11.02.06.30.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Nov 2023 06:30:12 -0700 (PDT)
+Date: Thu, 02 Nov 2023 22:30:08 +0900 (JST)
+Message-Id: <20231102.223008.2284405204869772112.syoshida@redhat.com>
+To: kuba@kernel.org
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] virtio/vsock: Fix uninit-value in
+ virtio_transport_recv_pkt()
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <20231101222045.5f7cca01@kernel.org>
+References: <20231026150154.3536433-1-syoshida@redhat.com>
+	<20231101222045.5f7cca01@kernel.org>
+X-Mailer: Mew version 6.9 on Emacs 28.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net v1 1/3] net/smc: fix dangling sock under state
- SMC_APPFINCLOSEWAIT
-Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
- jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1698904324-33238-1-git-send-email-alibuda@linux.alibaba.com>
- <1698904324-33238-2-git-send-email-alibuda@linux.alibaba.com>
- <72b57457-43e1-49f7-9670-08bbf03231e1@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <72b57457-43e1-49f7-9670-08bbf03231e1@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
+On Wed, 1 Nov 2023 22:20:45 -0700, Jakub Kicinski wrote:
+> On Fri, 27 Oct 2023 00:01:54 +0900 Shigeru Yoshida wrote:
+>> This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
+>> `struct virtio_vsock_hdr` are not initialized when a new skb is allocated
+>> in `virtio_transport_alloc_skb()`. This patch resolves the issue by
+>> initializing these fields during allocation.
+> 
+> We didn't manage to apply this before the merge window, and now the
+> trees have converged. Patch no longer applies cleanly to net.
+> Please rebase & repost.
 
+I got it. I'll rebase the patch to the latest net tree and resend it.
 
-On 11/2/23 6:34 PM, Wenjia Zhang wrote:
->
->
-> On 02.11.23 06:52, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> Considering scenario:
->>
->>                 smc_cdc_rx_handler
->> __smc_release
->>                 sock_set_flag
->> smc_close_active()
->> sock_set_flag
->>
->> __set_bit(DEAD)            __set_bit(DONE)
->>
->> Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
->> if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
->> in smc_close_passive_work:
->>
->> if (sock_flag(sk, SOCK_DEAD) &&
->>     smc_close_sent_any_close(conn)) {
->>     sk->sk_state = SMC_CLOSED;
->> } else {
->>     /* just shutdown, but not yet closed locally */
->>     sk->sk_state = SMC_APPFINCLOSEWAIT;
->> }
->>
->> Replace sock_set_flags or __set_bit to set_bit will fix this problem.
->> Since set_bit is atomic.
->>
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
->
-> Fixes tag?
+Thanks,
+Shigeru
 
-ops, i forget that. 🙁
-I will fix it in next version.
-
-Thanks.
-D. Wythe
 
