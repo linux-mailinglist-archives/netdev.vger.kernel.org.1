@@ -1,108 +1,140 @@
-Return-Path: <netdev+bounces-45793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA9117DFA14
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:38:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC29F7DFA2B
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 19:43:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28CE281CA6
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:38:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B061C20F23
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 18:43:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66D581C2A0;
-	Thu,  2 Nov 2023 18:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527181CFB6;
+	Thu,  2 Nov 2023 18:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOhNT1rZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6Rpl/+9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412CC208D3;
-	Thu,  2 Nov 2023 18:38:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E77C433C7;
-	Thu,  2 Nov 2023 18:38:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698950333;
-	bh=ZCl2RJW3X7nBpybcBZiwAWuq4xViEFQLDT5FyMu/Wjk=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=ZOhNT1rZk9HvPuPXUusS9Il3Dq1kPF2wLIBaVwFlfMsuPCI5iSr85UEBTtqyFJ7Ir
-	 /eAdFr/eMhKjL9ffTdNv5dtqsJGmM+HI1cwrTtOjNCZ2IwdhNS0gZaA/wJAQE+lYNY
-	 xf7uFWTH3ENRChl4sB+OUl46tL1cgg1FwpFmjqNsOh8EMt5ja5JyIw+Pt4NfLGcuYe
-	 IwlIvaAwQ1n1HjyBJwV7pIpfW2jd85xayZmzT3nXrE7bb1z0HafMUNMPHcJTWg0aDc
-	 +bpweElWLfh3+ujUWDNWbuFIt349rOjwXoWkr2iRnWmyHEtQe/3eFVQ0vapbl7bF3N
-	 xYlHo/4aTXSnw==
-Date: Thu, 2 Nov 2023 11:38:51 -0700 (PDT)
-From: Mat Martineau <martineau@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Matthieu Baerts <matttbe@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-    netdev@vger.kernel.org, mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next 9/9] mptcp: refactor sndbuf auto-tuning
-In-Reply-To: <CANn89iLZUA6S2a=K8GObnS62KK6Jt4B7PsAs7meMFooM8xaTgw@mail.gmail.com>
-Message-ID: <a41bacc1-fc92-01db-79a1-10327628a5f1@kernel.org>
-References: <20231023-send-net-next-20231023-2-v1-0-9dc60939d371@kernel.org> <20231023-send-net-next-20231023-2-v1-9-9dc60939d371@kernel.org> <CANn89iLZUA6S2a=K8GObnS62KK6Jt4B7PsAs7meMFooM8xaTgw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA2D15484
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 18:43:30 +0000 (UTC)
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7987128;
+	Thu,  2 Nov 2023 11:43:28 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5a86b6391e9so15332427b3.0;
+        Thu, 02 Nov 2023 11:43:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1698950608; x=1699555408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T3OCUKIJblthjBAmG3vt22DDyNrmU9MlYinLfZ0K7Xs=;
+        b=b6Rpl/+9pbDKsIkHONmDhCUAgzXGp2bbE1fEyseaqzBjEubY2BQpFpFYzdBQef3/2z
+         DU1IP2hIQa42iuHDR0HMa4hgYeqigYGY32fi2akAqjXNxvQ0amgeDbAb+o4xi8wJFN7H
+         TMgD2/BMvygwi8bZ01b7G1RG9Xcwms6GQHtLtPT7KBMM63XZlPave7+v6W7dVC4P7Gvx
+         YU8B5JV3SqXVYPjh/vzCIRrv2RgJR2OQft6LQqEkq3Y4f/aisjJO7Cdwt2akN1A6o54M
+         xxE2ZPE6BTvrzUIDWHUMdKN5Q6Y1sXhbGVr0JAwQodTFDrQ2OoEQcBHFTohdpKVPs8ev
+         NOgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698950608; x=1699555408;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T3OCUKIJblthjBAmG3vt22DDyNrmU9MlYinLfZ0K7Xs=;
+        b=KDVqr5/oiXZnis6A5zUc1VgaCTYYtllXtp6b0NKMokoeuOmHwLxNY4I/SD7UI4MhIU
+         udQY+bL+tS35rTn4QsUe6CSUTctX5Opok1hzEj/d+XYHMSHq796VzS2txuUBV3WMKr13
+         yzpvC30MGeZqp1drPStgNC/4MJ6g9ZHu1ajDzv8x8Cdlz1I5N7VVd9+KASD55WIOcM7f
+         FvKvK7j5XPvlaDeFhH8iPpTH3hr16IVFkS9YTF5gIuZxXhtmfnXClYtcI84wHCMiijje
+         adTyMKvyK1o9Yzdpy77jH+HXxj5CGItZA8OpY5cso39FnNDuktg3ohoA16DJgjM9NFNx
+         hdig==
+X-Gm-Message-State: AOJu0YxnIYm1H9SdaqmJnoz8Kijw/P5x526+BOEQZmOfjlALFuHtH2Wf
+	6lcVtPamFYDfyEawqRGMpZM=
+X-Google-Smtp-Source: AGHT+IHcn+D7Mz9xrTHEz8hxFzaHe+Xzq2rCHcr2HsELphZUue1M+Zu+ivtlx9djqs8B693fXUCn7w==
+X-Received: by 2002:a81:a115:0:b0:5a7:af86:8d3b with SMTP id y21-20020a81a115000000b005a7af868d3bmr575857ywg.37.1698950608056;
+        Thu, 02 Nov 2023 11:43:28 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id t10-20020a0cea2a000000b0065b1f90ff8csm1671qvp.40.2023.11.02.11.43.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Nov 2023 11:43:27 -0700 (PDT)
+Message-ID: <ff7e60bf-13c9-44fe-b9e0-0f1ef4904745@gmail.com>
+Date: Thu, 2 Nov 2023 11:43:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="0-709216980-1698950333=:19746"
-
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
---0-709216980-1698950333=:19746
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: dsa: tag_rtl4_a: Bump min packet size
+Content-Language: en-US
+To: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231031-fix-rtl8366rb-v3-1-04dfc4e7d90e@linaro.org>
+ <CACRpkdYiZHXMK1jmG2Ht5kU3bfi_Cor6jvKKRLKOX0KWX3AW9Q@mail.gmail.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <CACRpkdYiZHXMK1jmG2Ht5kU3bfi_Cor6jvKKRLKOX0KWX3AW9Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2 Nov 2023, Eric Dumazet wrote:
+On 11/1/23 13:18, Linus Walleij wrote:
+> On Tue, Oct 31, 2023 at 11:45 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> 
+>> It was reported that the "LuCI" web UI was not working properly
+>> with a device using the RTL8366RB switch. Disabling the egress
+>> port tagging code made the switch work again, but this is not
+>> a good solution as we want to be able to direct traffic to a
+>> certain port.
+> 
+> Luiz is not seeing this on his ethernet controller so:
+> 
+> pw-bot: cr
+> 
+> (I've seen Vladmir do this, I don't know what it means, but seems
+> to be how to hold back patches.)
 
-> On Mon, Oct 23, 2023 at 10:45 PM Mat Martineau <martineau@kernel.org> wrote:
->>
->> From: Paolo Abeni <pabeni@redhat.com>
->>
->> The MPTCP protocol account for the data enqueued on all the subflows
->> to the main socket send buffer, while the send buffer auto-tuning
->> algorithm set the main socket send buffer size as the max size among
->> the subflows.
->>
->> That causes bad performances when at least one subflow is sndbuf
->> limited, e.g. due to very high latency, as the MPTCP scheduler can't
->> even fill such buffer.
->>
->> Change the send-buffer auto-tuning algorithm to compute the main socket
->> send buffer size as the sum of all the subflows buffer size.
->>
->> Reviewed-by: Mat Martineau <martineau@kernel.org>
->> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
->> Signed-off-by: Mat Martineau <martineau@kernel.org
->
-> ...
->
->> diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
->> index df208666fd19..2b43577f952e 100644
->> --- a/net/mptcp/subflow.c
->> +++ b/net/mptcp/subflow.c
->> @@ -421,6 +421,7 @@ static bool subflow_use_different_dport(struct mptcp_sock *msk, const struct soc
->>
->>  void __mptcp_set_connected(struct sock *sk)
->>  {
->> +       __mptcp_propagate_sndbuf(sk, mptcp_sk(sk)->first);
->
-> ->first can be NULL here, according to syzbot.
->
+Looking at drivers/net/ethernet/cortina/gemini.c, should not we account 
+for when the MAC is used as a conduit and include the right amount of 
+"MTU" bytes? Something like this (compile tested only):
 
-Thanks for reporting this, Eric. We will get a fix to the net tree.
+diff --git a/drivers/net/ethernet/cortina/gemini.c 
+b/drivers/net/ethernet/cortina/gemini.c
+index 5423fe26b4ef..5143f3734c3b 100644
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -36,6 +36,7 @@
+  #include <linux/ethtool.h>
+  #include <linux/tcp.h>
+  #include <linux/u64_stats_sync.h>
++#include <net/dsa.h>
 
+  #include <linux/in.h>
+  #include <linux/ip.h>
+@@ -1151,6 +1152,13 @@ static int gmac_map_tx_bufs(struct net_device 
+*netdev, struct sk_buff *skb,
+         if (skb->protocol == htons(ETH_P_8021Q))
+                 mtu += VLAN_HLEN;
 
-Paolo & Matthieu, I created a github issue to track this:
++#if IS_ENABLED(CONFIG_NET_DSA)
++       if (netdev_uses_dsa(netdev)) {
++               const struct dsa_device_ops *ops = 
+skb->dev->dsa_ptr->tag_ops;
++               mtu += ops->needed_headroom;
++       }
++#endif
++
+         word1 = skb->len;
+         word3 = SOF_BIT;
 
-https://github.com/multipath-tcp/mptcp_net-next/issues/454
+Also, as a separate check, might be worth annotating the various 
+descriptor words with __le32 and appropriate le32_to_cpu() and 
+cpu_to_le32() accessors for each of those fields.
+-- 
+Florian
 
-
-
-- Mat
---0-709216980-1698950333=:19746--
 
