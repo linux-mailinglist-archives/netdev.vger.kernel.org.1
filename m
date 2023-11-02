@@ -1,149 +1,155 @@
-Return-Path: <netdev+bounces-45620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440F57DE9CE
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:59:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53DF67DE9DA
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 02:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E9EA1C20E1F
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 00:59:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3CB1C20DFB
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 01:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1357810ED;
-	Thu,  2 Nov 2023 00:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2AA10ED;
+	Thu,  2 Nov 2023 01:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7CkjyMn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eHlHp2PM"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8994710E7;
-	Thu,  2 Nov 2023 00:59:35 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6615E8;
-	Wed,  1 Nov 2023 17:59:33 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5b499b18b28so5522047b3.0;
-        Wed, 01 Nov 2023 17:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698886773; x=1699491573; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9V4JXN+dcGRzeaE5V8SxgYSNwz57A00kFhKDPhYPWC0=;
-        b=B7CkjyMnaCQe61H4+EMbKrxoVPy7TZcguooJNmGaVvWIPrWUiYSg6IDmwJjUgzF4TQ
-         rYXa3q7jaAhmtRo+jF7CAMigzhG+0lKsnddBiqxB36sn680wlqwOOHcfPorGtkqFwSMz
-         USzGu5YNu/rsH9Kk7gQzyNYkcTxco1rnk+vSc9cLySu4qgMGGKkqdgZWMggeZal9Ea/A
-         8XnfKECIvJ/bHa3l4dmRgXI9+Xku6/LNKJHLnsbHW/NE2aLwNnTV/lYldif/0Sczm3es
-         Ey+lPVG8u/xOoYTIS5UiIWGjnBQrq9QhYwIqmZAnp2i48/SI6un7B8qZxzDPeY2Nu6mj
-         HuEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698886773; x=1699491573;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9V4JXN+dcGRzeaE5V8SxgYSNwz57A00kFhKDPhYPWC0=;
-        b=B6nOwngqGdbrInAXFVU8YxynuMT399VzQpcpb+Tpx6O4771EGuQZSm4tsHRil8C5tM
-         3wQ65A9t4EuZT3MGgqmIKK98vKhbFVSkO04rFpXz6PtxL2oitf3swab2A8ghrJYJTYwK
-         6YhaxQLQb09yTmUrDSfr9DKcS35JPUjc2SE9J2LoZP+LsjgGgOw7MUnQbvTM4wT11QOv
-         Nk5QPTnlp/sx13qUtecHQO4AUwW+YV8BdTRI9qMw1kjIwG2iCm4nvNAQtD42VzScA5EZ
-         ea9uBzXtPjnnA6Fc/h7AaBGSwB/FMCTnowS9w8FLH3hbBqr6J/LUs+zzK2vOLVutj+VY
-         gKZg==
-X-Gm-Message-State: AOJu0Yw9FawYyPGMCLy8eYl2T/B/T+09CGp2J2f/j+L/ycPyb17dIpbd
-	LskGt7CY4wEKHXIWM5WYySM=
-X-Google-Smtp-Source: AGHT+IGZfXgxMti9LJh05JRHRMmGvJej6cUB8N2PXANSqNZzj5BkQH6WknTeC1AWHh1RD+ZBZfWWvQ==
-X-Received: by 2002:a81:b659:0:b0:5a8:f9fa:aba4 with SMTP id h25-20020a81b659000000b005a8f9faaba4mr18595791ywk.2.1698886772956;
-        Wed, 01 Nov 2023 17:59:32 -0700 (PDT)
-Received: from ?IPV6:2600:1700:6cf8:1240:eea0:6f66:c57d:6b7c? ([2600:1700:6cf8:1240:eea0:6f66:c57d:6b7c])
-        by smtp.gmail.com with ESMTPSA id d8-20020a814f08000000b005845e6f9b50sm623867ywb.113.2023.11.01.17.59.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 01 Nov 2023 17:59:32 -0700 (PDT)
-Message-ID: <c4427a57-aea9-4acc-a6be-e30cfb1dbaad@gmail.com>
-Date: Wed, 1 Nov 2023 17:59:30 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0C3ED8;
+	Thu,  2 Nov 2023 01:07:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DC4C433C8;
+	Thu,  2 Nov 2023 01:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698887245;
+	bh=bt/lkt4dy1gi54m725q76c9DzTFRJyTNf0BQmwj5u4k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eHlHp2PMIvBUDVHR661JJDncqlkJTtIwaAU336jsUHR4qVZk+FTMK9am4VpDUDLiK
+	 18jdtk9x2GnYkK5wzz1V+/2ybMp7JfaUBU6sWRRrAGdnPFs1lFUWqvruiuwlqQM3EO
+	 M5gzBv4HlODQWcBpk7gEq171ZPxY4R1d6EVYWJd4GqnBSng+/k0b+3YDBkhFnrvkkP
+	 5ddGTgjfl93NJ9qXbIBgnAPMqKLCxAd39WXvugA4Dn9XBwSKio++tmfoQ2F3W8meJA
+	 3x1Lx+hCwzpMYYwP9YopRfhBfYWg9yxOcK0DvqfPfGSZZy/HLNMpi+KPIKxdLSGrRn
+	 F1ZcXRtYYjROA==
+Date: Wed, 1 Nov 2023 18:07:23 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, ndesaulniers@google.com,
+	trix@redhat.com, 0x7f454c46@gmail.com, fruggeri@arista.com,
+	noureddine@arista.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	patches@lists.linux.dev
+Subject: Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
+Message-ID: <20231102010723.GA406542@dev-arch.thelio-3990X>
+References: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
+ <mhng-df0ad8f4-f79c-427c-9798-8682fca4f516@palmer-ri-x1c9a>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v8 07/10] bpf, net: switch to dynamic
- registration
-Content-Language: en-US
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: kuifeng@meta.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- ast@kernel.org, song@kernel.org, kernel-team@meta.com, andrii@kernel.org,
- thinker.li@gmail.com, drosen@google.com
-References: <20231030192810.382942-1-thinker.li@gmail.com>
- <20231030192810.382942-8-thinker.li@gmail.com>
- <183fd964-8910-b7e6-436a-f5f82c2bafb0@linux.dev>
- <10f383a2-c83b-4a40-a1f9-bcf33c76c164@gmail.com>
- <5a8520dd-0dd6-4d51-9e4a-6eebcf7e792d@linux.dev>
- <51be2e5e-8def-45c5-8864-6b0dcc794300@gmail.com>
- <331802b3-07bd-7fec-32a7-b85a8dae1391@linux.dev>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <331802b3-07bd-7fec-32a7-b85a8dae1391@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mhng-df0ad8f4-f79c-427c-9798-8682fca4f516@palmer-ri-x1c9a>
 
+On Wed, Nov 01, 2023 at 05:41:10PM -0700, Palmer Dabbelt wrote:
+> On Tue, 31 Oct 2023 13:23:35 PDT (-0700), nathan@kernel.org wrote:
+> > Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
+> > 
+> >   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+> >     663 |         }
+> >         |         ^
+> >   1 error generated.
+> > 
+> > On earlier releases (such as clang-11, the current minimum supported
+> > version for building the kernel) that do not support C23, this was a
+> > hard error unconditionally:
+> > 
+> >   net/ipv4/tcp_output.c:663:2: error: expected statement
+> >           }
+> >           ^
+> >   1 error generated.
+> > 
+> > Add a semicolon after the label to create an empty statement, which
+> > resolves the warning or error for all compilers.
+> > 
+> > Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
+> > Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
+> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> > ---
+> >  net/ipv4/tcp_output.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > index f558c054cf6e..6064895daece 100644
+> > --- a/net/ipv4/tcp_output.c
+> > +++ b/net/ipv4/tcp_output.c
+> > @@ -658,7 +658,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+> >  			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
+> >  			ptr++;
+> >  		}
+> > -out_ao:
+> > +out_ao:;
+> >  #endif
+> >  	}
+> >  	if (unlikely(opts->mss)) {
+> > 
+> > ---
+> > base-commit: 55c900477f5b3897d9038446f72a281cae0efd86
+> > change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
+> > 
+> > Best regards,
+> 
+> This gives me a
+> 
+> linux/net/ipv4/tcp_output.c:663:2: error: expected statement
+>        }
+> 
+> on GCC for me.
 
+What GCC version?
 
-On 11/1/23 17:17, Martin KaFai Lau wrote:
-> On 10/31/23 5:19 PM, Kui-Feng Lee wrote:
->>
->>
->> On 10/31/23 17:02, Martin KaFai Lau wrote:
->>> On 10/31/23 4:34 PM, Kui-Feng Lee wrote:
->>>>>> diff --git a/include/linux/btf.h b/include/linux/btf.h
->>>>>> index a8813605f2f6..954536431e0b 100644
->>>>>> --- a/include/linux/btf.h
->>>>>> +++ b/include/linux/btf.h
->>>>>> @@ -12,6 +12,8 @@
->>>>>>   #include <uapi/linux/bpf.h>
->>>>>>   #define BTF_TYPE_EMIT(type) ((void)(type *)0)
->>>>>> +#define BTF_STRUCT_OPS_TYPE_EMIT(type) {((void)(struct type 
->>>>>> *)0);    \
->>>>>
->>>>> ((void)(struct type *)0); is new. Why is it needed?
->>>>
->>>> This is a trick of BTF to force compiler generate type info for
->>>> the given type. Without trick, compiler may skip these types if these
->>>> type are not used at all in the module.  For example, modules usually
->>>> don't use value types of struct_ops directly.
->>> It is not the value type and value type emit is understood. It is the 
->>> struct_ops type itself and it is new addition in this patchset 
->>> afaict. The value type emit is in the next line which was cut out 
->>> from the context here.
->>>
->> I mean both of them are required.
->> In the case of a dummy implementation, struct_ops type itself properly 
->> never being used, only being declared by the module. Without this line,
-> 
-> Other than bpf_dummy_ops, after reg(), the struct_ops->func() must be 
-> used somewhere in the kernel or module. Like tcp must be using the 
-> tcp_congestion_ops after reg(). bpf_dummy_ops is very special and 
-> probably should be moved out to bpf_testmod somehow but this is for 
-> later. Even bpf_dummy_ops does not have an issue now. Why it is needed 
-> after the kmod support change?
-> 
-> or it is a preemptive addition to be future proof only?
-> 
-> Addition is fine if it is required to work. I am trying to understand 
-> why this new addition is needed after the kmod support change. The 
-> reason why this is needed after the kmod support change is not obvious 
-> from looking at the code. The commit message didn't mention why and what 
-> broke after this kmod change. If someone wants to clean it up a few 
-> months later, we will need to figure out why it was added in the first 
-> place.
+I cannot reproduce that error with my patch applied. I tested mainline
+at commit deefd5024f07 ("Merge tag 'vfio-v6.7-rc1' of
+https://github.com/awilliam/linux-vfio") using GCC 6 from kernel.org and
+I can reproduce a similar failure with ARCH=x86_64 allyesconfig:
 
+  net/ipv4/tcp_output.c: In function 'tcp_options_write':
+  net/ipv4/tcp_output.c:661:1: error: label at end of compound statement
+   out_ao:
+   ^~~~~~
 
-It is a future proof.
-What do you think if I add a comment in the code?
+With this change applied, the error disappears for GCC 6 and GCC 13
+continues to build without error. I can try the other supported versions
+later, I just did an older and newer one for a quick test.
 
+> So I think something like
 > 
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index f558c054cf6e..ca09763acaa8 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -659,6 +659,11 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+> 			ptr++;
+> 		}
+> out_ao:
+> +	/*
+> +	 * Labels at the end of compound statements are a C23 feature, so
+> +	 * introduce a block to avoid a warning/error on strict toolchains.
+> +	 */
+> +	{}
+> #endif
+> 	}
+> 	if (unlikely(opts->mss)) {
 > 
->> the module developer will fail to load a struct_ops map of the dummy
->> type. This line is added to avoid this awful situation.
->>
-> 
+> should do it (though it's still build testing...)
+
+I am not opposed to this once we understand what versions are affected
+by this so that we have some timeline of removing this workaround.
+
+Cheers,
+Nathan
 
