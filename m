@@ -1,91 +1,198 @@
-Return-Path: <netdev+bounces-45650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50E07DEC40
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:29:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DEF7DEC49
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62DE6281A07
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E4091C2012B
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABD61FCA;
-	Thu,  2 Nov 2023 05:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC7221FDB;
+	Thu,  2 Nov 2023 05:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="PKV08OY9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XOZ6dGV6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C29C1FB9
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:29:20 +0000 (UTC)
-Received: from mx4.spacex.com (mx4.spacex.com [192.31.242.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1AD2112;
-	Wed,  1 Nov 2023 22:29:15 -0700 (PDT)
-Received: from pps.filterd (mx4.spacex.com [127.0.0.1])
-	by mx4.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3A25HwKi009350;
-	Wed, 1 Nov 2023 22:29:13 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=dkim;
- bh=Zr+QxWsvtCyo8uor4ixTMhNR7r7rrnW/AV3MxmJqFak=;
- b=PKV08OY9Ez0bKJ2kCEM1DRWCLQ4EeEAWOd4rjApMHlD+cDVcOFGmwwgBHY7f4hyZMwi/
- eJ+WN++uEGFlazzsVCAuKj3e8w9G3up0Lz46It9G+jWLdNeFZLCVzkx7MLI9Z/XUDhkS
- kER5uw0JfY2hmT7PW5Eeja5WI+s4wDmr6PEwU9TIxGkiZyvU9ZIyh+Nzd2hoJH7nXjYi
- Deq7ss9QzwNspSy9ZFJL/a7/gypfbfxF3IdLvpX1LbfqO7QgaXBXvOt0hW1+YJjrk/0o
- 5uLXv+mUwOJTa6cmbAJh0HIuDjT/owk28h4Rjtf3dOdLJQf6MSb2gwdtoVUCPCuj/1NO SA== 
-Received: from smtp.spacex.corp ([10.34.3.234])
-	by mx4.spacex.com (PPS) with ESMTPS id 3u0yqn6cce-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 01 Nov 2023 22:29:13 -0700
-Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19121FCA
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:30:36 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B36C12B;
+	Wed,  1 Nov 2023 22:30:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698903032; x=1730439032;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vbp+HO/+7vTchnzn873ypyP3+zh6I8tjjn70pzl7rl4=;
+  b=XOZ6dGV6x4jgKJZG9kr5g3R37XSxIlpg8ghIAP+qSeIAgBD8MX7DuWNI
+   4EYYTzsUIBFkOIXB1gTnp9DwTB0mVk6z0PwIi0mJ1ER08oCZK3FheClsp
+   Q75nFqphoUTJmzq6/aCeTpYKsB+8z2HLUBcvP1e/P163j8URP2QFCaWUj
+   5RwVjJFbeYjGiSgjP8QaBwrqJz6mAO1DXwXq8aHoXlzd3GmRFGmBR2t6t
+   ewEF6JxYAN44IISz744PA3a45KFF5vai8pc0AJJZuiPnZV5pn/0DWpxX4
+   Ga/6ZVAFWMY8iFhEK0vD2WMZ0uqvsc5bboxohwGzqlEQ3zZnBbkkXLFY7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10881"; a="388458950"
+X-IronPort-AV: E=Sophos;i="6.03,270,1694761200"; 
+   d="scan'208";a="388458950"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2023 22:30:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,270,1694761200"; 
+   d="scan'208";a="2420245"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Nov 2023 22:30:30 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Wed, 1 Nov 2023 22:29:12 -0700
-From: <alexey.pakhunov@spacex.com>
-To: <michael.chan@broadcom.com>
-CC: <alexey.pakhunov@spacex.com>, <linux-kernel@vger.kernel.org>,
-        <mchan@broadcom.com>, <netdev@vger.kernel.org>,
-        <prashant@broadcom.com>, <siva.kallam@broadcom.com>,
-        <vincent.wong2@spacex.com>
-Subject: Re: [PATCH 2/2] tg3: Fix the TX ring stall
-Date: Wed, 1 Nov 2023 22:29:02 -0700
-Message-ID: <20231102052902.3272319-1-alexey.pakhunov@spacex.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <CACKFLi=Eh2ase5qnQ0ioYL+yS6-oSeZreHsaqAn9Zgwkv_d-Bw@mail.gmail.com>
-References: <CACKFLi=Eh2ase5qnQ0ioYL+yS6-oSeZreHsaqAn9Zgwkv_d-Bw@mail.gmail.com>
+ 15.1.2507.34; Wed, 1 Nov 2023 22:30:29 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 1 Nov 2023 22:30:29 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Wed, 1 Nov 2023 22:30:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CNMLX8t5HvF5B1780gbkzyXNYVYVovzqw8cRWIdmtzjUcuNS2UGx3Lp1mBCgnxlm0KQ/md68I0c6ZvOb1P7u/r+FiRTAAj9VLDZgXzRdIGHopLL/2xTqP4oxPMfrgmNcbIAw3yYypz2c35p2XrNYjfpmvXjW7caWujfXJt2YiFJepSSjGcv9IItaouwPdYFzdAdnNQCt8otLifjC5hlcZC86bfgvOfw8Rh3W8LQBcaDWwuVUo39lWm9gmeIF8d9oyCzzrflzXuN+XTPCDOqyWAga6v5bIt5sASD31VpMlg+3xrWrnvVM06y8laFyh0T20k2KfOIpqWVdimE0R0KJcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6BUkUgTTJ5IXTWNw17hcoqHW4N1eJU4OTUwAfEyw9O0=;
+ b=jiWLsOejgqfgvVF/CFr1QJqtjo3muoLH2yu38eElRYDzqw1hVaDkAXzgkhJMlOKN+DoR0QVskrUyXWuS9EbvaDzN0swNHpFGrawIkkDtmvzAJwGnJuvfI1rZNshLmmRWTThDTCA1MUwMpvPxwpdxj+FxNOWOaPXHNX/nbgod61O78Oel+KlWsABJXSctpDeUuRCc+E+nkre/55t2aIvznTuRK2h96aigwMfZLhOSJxWJFEroRPdxrfQGh6VywIzpRsHQQKifVvmZjkatmMX1JUiiBSAd7+YpsNaKE6dVu+Hgh2HN9ea72FV9Er5Pp3lHhjIl8iJ4lHma2wjm1+EVDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com (2603:10b6:208:75::32)
+ by DM4PR11MB6358.namprd11.prod.outlook.com (2603:10b6:8:b7::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 2 Nov
+ 2023 05:30:27 +0000
+Received: from BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::7911:8ae6:fc73:1097]) by BL0PR11MB3122.namprd11.prod.outlook.com
+ ([fe80::7911:8ae6:fc73:1097%6]) with mapi id 15.20.6954.021; Thu, 2 Nov 2023
+ 05:30:27 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net-next 1/2] i40e: Do not call
+ devlink_port_type_clear()
+Thread-Topic: [Intel-wired-lan] [PATCH net-next 1/2] i40e: Do not call
+ devlink_port_type_clear()
+Thread-Index: AQHaBnjohJsFQcSJYECrCylOHbGyJrBmjV0A
+Date: Thu, 2 Nov 2023 05:30:26 +0000
+Message-ID: <BL0PR11MB312273E0F55036CE9514D61BBDA6A@BL0PR11MB3122.namprd11.prod.outlook.com>
+References: <20231024125109.844045-1-ivecera@redhat.com>
+In-Reply-To: <20231024125109.844045-1-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB3122:EE_|DM4PR11MB6358:EE_
+x-ms-office365-filtering-correlation-id: b1d8ad79-4f9b-41a6-d19b-08dbdb64d1fa
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DAH4sXuYN4X0XT6WdpIGirk+5s00D6rVdM0XzHpJuDLbDQKARRaed2Z2OhvUvF/gxHxc/DfguE2JOg6MImzwi9mqlAD7lKNSWvPKOC19Q7lP2fK+Xy7Mj22oqRIqXqQb3jelc9SUkIxbBNdrVeE2DHVkuPNVK4tYT8e9LrA/6fjgSLi4KQ9OViDJR7BeSE/1xs9fmPQH5fULiTHBb2wW7B1IrL4CaOz03XYalczzai8FRnN1hEB2/4cid7dKVLozbnOB9I792QcAEU8tMQLt3QjNpfP5WKhIqNIX3OhpK1qGa0aj4VMx/bQqjVcoD0S8Hifbzd1bsaPqfMjyk3PmNV869VL6xaSYWpgHyTz8/rwaO+OKwMXxf0C18wZk+e3dANMZcYKFgrOv/I0zFIOsZHxcRJllxoxa96Gf8jgL6DtWcjCJPMM9bHkxaooSDHhGo4Zz3a3pKWLa+lMXHTBACrLIQvpDf7uSI/6c2aKbFaNzwpPCRLmyHijAnXz5rgnz5yKpKvbQVQ3XX2IIWnDr1mk+fwwVd5gTkRTgmq5bgnP0sFxyvozAngdhDcX0Ui00YDIWT4KauxeIcPVOhnbt+fl265C+eA3NycJHLwE+2tLbcBQtzPf4SV3c7lCx+YN6
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3122.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(376002)(366004)(136003)(346002)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(38100700002)(76116006)(52536014)(122000001)(2906002)(110136005)(66446008)(66556008)(66946007)(66476007)(9686003)(54906003)(64756008)(53546011)(316002)(82960400001)(41300700001)(8676002)(4326008)(83380400001)(8936002)(26005)(86362001)(55016003)(33656002)(5660300002)(7696005)(71200400001)(478600001)(6506007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yHuHWcWeNGYYKQGgvq7H2zZhcUHHajpWsJwOYbby+ddwk9Yo2TRHx5dv7qif?=
+ =?us-ascii?Q?W4JgXKYtwSQX2oUo2IW1JFLKh1GE/ggw1puRiVm35g25dGAu6CK2vu0s5bza?=
+ =?us-ascii?Q?nI+8sJzKLn4pOlzKI7s+f1Q3e0E+eJZHtoL82Nlj771j995FvByakWUWtFSE?=
+ =?us-ascii?Q?APqwy18D7pIYuj2D6uilI7WLPK+qA8JD4ZH8L2ik//8D2twcFr4R8QtiN0XC?=
+ =?us-ascii?Q?/7EjvHuQrD5aEAjFOKR1MTZ5f12RFQkclBgXk5qBcaoyxgpXVYAATU9ptL7w?=
+ =?us-ascii?Q?n4+D9yEA0iFolw0PFF9sZoo5RnmRDUHTBhm+VlHqbR9NAnlgtL7tb65RJhlr?=
+ =?us-ascii?Q?47vhpwPZPW59FS/ror68Dpn+Vm6RV6Fgfbw05OWcxRSBrsYDamSqklU2P/dm?=
+ =?us-ascii?Q?7cE8M0DUOElvoE6ixJZ87pLnrUStY1KlFpecy4To62FcuP3ZkpYFDSJtNGNG?=
+ =?us-ascii?Q?ib4ztHsDMZOvnk0bF6V6p3gBPnnjRUFfqqh1gEDRtB+xI+ZqizpPARFMoW4a?=
+ =?us-ascii?Q?cwgMyt9mj9WWwG+jL1gFU/QCY/RSeEpxLgXBo8NfX8qRIzyGJD3ffy32p7Yu?=
+ =?us-ascii?Q?4mUkl01gHOLgmpk5n4wXM35JAp0Ly7Cta1S9ErIDCuoe3Vp8zXQGxhKiMrCi?=
+ =?us-ascii?Q?zd4wLfGp3gYGgnw67CcIX1rdFii47vE4MPu+M7KGGvMgR1xqA7TlWLWwQM6C?=
+ =?us-ascii?Q?cxMPA0Af0sMwoeMEVrP6eiOWsF8hxRivNiQK6yXkzLCMPkxbLWhy4Cnv89SF?=
+ =?us-ascii?Q?Y3dKFw46iDH1h+UXAqixwu7HpxtCW2Trjv50eqX/O7dSSQnB9yPEvA0XoM/v?=
+ =?us-ascii?Q?r9+tpfGUUr2/zYzoOwkzmtiDxP39Foyao7wKQ+OAxM4UcsUMqhE9tcw1bys2?=
+ =?us-ascii?Q?2//IndSW+28Hb5QlTpnmJDczTZFdz9ykEUR90pQGugeh/Bw5pT8ftgAPxuB5?=
+ =?us-ascii?Q?nxHqXy3XoYX+0Av91Kvmy7zeKK9/FkeY3QpI6+kMb7FA3DwyWh+IHXNm8u2I?=
+ =?us-ascii?Q?PYGpIOb6RLfQuk3x3uDA2mIQPcxiMnk+4meql2bIya6dkOaISd2Gsoh12GEb?=
+ =?us-ascii?Q?F9XHB3pkhTXqG6zmmZIsi9daJ1IP5rpt85X7VmZWU1xnVdMrDcCjDv5zQTve?=
+ =?us-ascii?Q?S/21lKC7c+0poCH1cbdaY7posBT3zke331E2iibeM1doZXENOPT1vuj0a4KB?=
+ =?us-ascii?Q?Vi4bMLEEkRWR4zLuljHDji/U1RAOrgoMnLIfoFAUL3M4zFqkhDUxSte3siOT?=
+ =?us-ascii?Q?jr0rzuydrbjGxKYAZwuSSotwuo+9jbCLrJLkRMWSMAxiWRGqYHtSwsLdQCDP?=
+ =?us-ascii?Q?8uM9FoTBavZBJj9gjgp66qXmxzYNGa5T+O3J4MowK28XTd076tpjr7zwfMle?=
+ =?us-ascii?Q?cFiVNsc+JZgk4l2fM2v6p9v0HEzvpKLg2zRdl760HFZBFozciDYtIBgOc2TC?=
+ =?us-ascii?Q?C8SJGtPZKPLZlZtzsz1OED6uSHhqlgGk3b6GeEtB0jXXmtBnfvtUA52aQIkW?=
+ =?us-ascii?Q?RxLwfzcptbKGYSe7Smgu9z2AMxyaHSyVMVhudy5V7TaD06eWnj+I8iisSaVo?=
+ =?us-ascii?Q?EGSWOmCtH2Yh8resUqq+hG0xkdzXPh+aXXpZ+/A+1u+tOY9oBMEI5OPz/t2W?=
+ =?us-ascii?Q?gw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ht-dc-ex-d3-n2.spacex.corp (10.34.3.237) To
- HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
-X-Proofpoint-ORIG-GUID: tPgsIivSKCgySAzI5He5wXBOmRf0JHWU
-X-Proofpoint-GUID: tPgsIivSKCgySAzI5He5wXBOmRf0JHWU
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- phishscore=0 mlxlogscore=797 adultscore=0 spamscore=0 malwarescore=0
- suspectscore=0 priorityscore=1501 clxscore=1015 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311020042
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3122.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1d8ad79-4f9b-41a6-d19b-08dbdb64d1fa
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Nov 2023 05:30:26.8826
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WbcE3KnsGsoUgkMRiGLoLEU7borU3qC5hvCNbhZXijfbEfluJB4jDDlJrnvzfojzGTCVoG8GzbFmPgUjGBBAWhUWoLeZ7SN3G3ehgs2u9dqw42wvXeFGyQzM4rcY7xSk
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6358
+X-OriginatorOrg: intel.com
 
-> > Let me re-test the goto version and resubmit it as v2. Please let me know
-> > which version of the patch you prefer more.
-> >
-> 
-> I did not realize the goto version is almost as big.  In that case,
-> your original version is fine.
-> 
-> You might want to declare the variables in reverse Xmas tree style for
-> any new code.  This driver is old and most of the existing code does
-> not follow that style.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+van Vecera
+> Sent: Tuesday, October 24, 2023 6:21 PM
+> To: netdev@vger.kernel.org
+> Cc: intel-wired-lan@lists.osuosl.org; Brandeburg, Jesse <jesse.brandeburg=
+@intel.com>; linux-kernel@vger.kernel.org; Eric Dumazet <edumazet@google.co=
+m>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Keller, Jacob E <jacob.=
+e.keller@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@=
+redhat.com>; David S. Miller <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH net-next 1/2] i40e: Do not call devlink=
+_port_type_clear()
+>
+> Do not call devlink_port_type_clear() prior devlink port unregister
+> and let devlink core to take care about it.
+>
+> Reproducer:
+> [root@host ~]# rmmod i40e
+> [ 4539.964699] i40e 0000:02:00.0: devlink port type for port 0 cleared wi=
+thout a software interface reference, device type not supported by the kern=
+el?
+> [ 4540.319811] i40e 0000:02:00.1: devlink port type for port 1 cleared wi=
+thout a software interface reference, device type not supported by the kern=
+el?
+>
+> Fixes: 9e479d64dc58 ("i40e: Add initial devlink support")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_devlink.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
 
-Copy, thanks. I'll reorder the locals in tg3_start_xmit() and resubmit that
-as v2.
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-Alex.
 
