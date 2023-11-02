@@ -1,217 +1,115 @@
-Return-Path: <netdev+bounces-45719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C557DF2B0
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:47:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE01B7DF330
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 14:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EE681C20D7A
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 12:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21DD81C20E82
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 13:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CC83C29;
-	Thu,  2 Nov 2023 12:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD5A7498;
+	Thu,  2 Nov 2023 13:04:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="qaL5UL9r"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="axIh+OQs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADB22FB6
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 12:47:38 +0000 (UTC)
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BCA1125
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:47:36 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id 3f1490d57ef6-da2b9234a9fso889993276.3
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 05:47:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1698929255; x=1699534055; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N1zu9A/Y66l6k7HUDKBsy+9wtQVKOaiFBawPW4zOPhg=;
-        b=qaL5UL9r0rw6Fe16B+uJA3rO2/TB+hCU+6QT0tHzf4aHuloRVAIJSVHmO98TEi+dLg
-         lcXECUjPE/1NMStrL+gOK/nAKRmG1mwN0w9H9EzEwHz62zybyJCkeLsfdzs67e5bfmJH
-         tHHPh1ksCy5cdNF6tQfxftpkTCEDQAMfuTF2O/xIXbKJZNh0O2iMoqS66LhESfgevJ+W
-         ATgkjainWBfFUwZJocuGbSTaXQyDaUuP39qvLhw68/XqLWW0pnS3PIoK7CjJcqoZqtAi
-         OS7sA3fTXbtpU5s62/7YSBtotqNmSiQoyEnGFhyEqhbsVgATcvdNnSO0Nn8W9cy8xA7H
-         V8Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698929255; x=1699534055;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N1zu9A/Y66l6k7HUDKBsy+9wtQVKOaiFBawPW4zOPhg=;
-        b=F9jR5KH01m1kiVstthc6IWc4Iqb26up+acW2YNePU0XIUPS2BdiQiEHYo+gf0RTw2S
-         x/XnqF7qxLtH+xwZaG2bfeKHwKmERFwn/vLGrpMNMwN1cjxQILP2392VWPITuWTZ/pFk
-         QkbAnhxUs3FRoysxpJyOQ7Se7fmXk+tFwn+bZfdaDjtqtyYW/w+FoJYhdxZ8YJ09YFQq
-         Wq5cPjHVhipBxEne1Rgluqy473r5LUOarkmAw4cX0wep2bsy1GQqfI+wZU3yeJPnwsXM
-         tENarFChnFp6CeGuZkTSjfDhpXfgSBeFtAYR+gM5MnFMarWiDZexU+CuDcrBCVofRLX1
-         3qdQ==
-X-Gm-Message-State: AOJu0YzhcFOTi3gB7IWG6n9PQMPooMIb0qucMkj3SsYdLJsP9GrGtKhg
-	tp6XMn6TmjAplWJ8zv5edajlzYNSzWKeH5gxLudmQQ==
-X-Google-Smtp-Source: AGHT+IEkE3jWPdPwXl0jrSr0XIFQMIlrQgkSEBtgPFY35xhA+TgdPPOAdc268A07JS73sPKSarPqBBLr6+3M8XvRrjg=
-X-Received: by 2002:a25:d8d0:0:b0:d86:9fd5:9350 with SMTP id
- p199-20020a25d8d0000000b00d869fd59350mr16876322ybg.59.1698929255445; Thu, 02
- Nov 2023 05:47:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13946FBE;
+	Thu,  2 Nov 2023 13:04:54 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:242:246e::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6067E193;
+	Thu,  2 Nov 2023 06:04:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=lhnHvgPTUerCavcKvy4VoFNn9k17Ymmjx4Tbd3bshik=;
+	t=1698930289; x=1700139889; b=axIh+OQs/8lt1/eCYxHEd6sdY68CsoLKtnX3H8kQwIL2R9T
+	zrcHkoQiiL6mQPu8UReBO+NoXxOSaafybY8xtaCYh2PIlqJtOHavjMqBB/WFNzlyFVWTJDvKYqz6H
+	ZnpD8tIKRq69VUxxGGwxF6EQI06974EwMFdxkTVPCvro3Ksfsav0Nmq/Z9DFqQkl0Gwj4R/OT1nkd
+	ThcikbeZ6oRrjaof0DHOmaonV/KtEVxVHtQ7GuRhUWrxw1youZF98Gd+VcYRJ1ir7Ar5DEhu1lVJs
+	WGfYlaDWfTtJokAS8YbUfi4qADPzC+rrH5y5ttw/y8JL3+h3BxAxfEtUP9oWj8LA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97-RC1)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qyXNL-0000000BJWz-3w9i;
+	Thu, 02 Nov 2023 14:04:44 +0100
+Message-ID: <d0d35561b80b873d9f78c9ca4ad304b6e0f16cb2.camel@sipsolutions.net>
+Subject: Re: [Patch v13 4/9] wifi: mac80211: Add support for WBRF features
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Ilpo =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org,
+ lenb@kernel.org,  davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com,  alexander.deucher@amd.com,
+ Lijo.Lazar@amd.com, mario.limonciello@amd.com, Netdev
+ <netdev@vger.kernel.org>, linux-wireless@vger.kernel.org, LKML
+ <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org, 
+ platform-driver-x86@vger.kernel.org, majun@amd.com, Evan Quan
+ <quanliangl@hotmail.com>
+Date: Thu, 02 Nov 2023 14:04:42 +0100
+In-Reply-To: <e42c5484-d66-e41a-8b2e-a1fa4495ce2@linux.intel.com>
+References: <20231030071832.2217118-1-Jun.Ma2@amd.com>
+	  <20231030071832.2217118-5-Jun.Ma2@amd.com>
+	  <5b8ea81c-dd4c-7f2a-c862-b9a0aab16044@linux.intel.com>
+	 <b080757463a1f55a38484e3ea39fd3697e98409e.camel@sipsolutions.net>
+	 <e42c5484-d66-e41a-8b2e-a1fa4495ce2@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027135142.11555-1-daniel@iogearbox.net> <CAM0EoMm9K=jS=JZUNXo+C6qs=p=r7CtjWK20ocmTKEDxN3Bz-w@mail.gmail.com>
- <5ab182b6-6ac7-16f7-7eae-7001be2b6da7@iogearbox.net> <5ca2062477738b804ce805847f7aec024ad5988c.camel@redhat.com>
-In-Reply-To: <5ca2062477738b804ce805847f7aec024ad5988c.camel@redhat.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 2 Nov 2023 08:47:24 -0400
-Message-ID: <CAM0EoMnb8nGJ8U6czNix-qnf9pawZMzmdGKwyfAhbA3nsoWsRA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net, sched: Fix SKB_NOT_DROPPED_YET splat under
- debug config
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, kuba@kernel.org, idosch@idosch.org, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Thu, Nov 2, 2023 at 6:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On Fri, 2023-10-27 at 20:21 +0200, Daniel Borkmann wrote:
-> > On 10/27/23 7:24 PM, Jamal Hadi Salim wrote:
-> > > On Fri, Oct 27, 2023 at 9:51=E2=80=AFAM Daniel Borkmann <daniel@iogea=
-rbox.net> wrote:
-> > > >
-> > > > Ido reported:
-> > > >
-> > > >    [...] getting the following splat [1] with CONFIG_DEBUG_NET=3Dy =
-and this
-> > > >    reproducer [2]. Problem seems to be that classifiers clear 'stru=
-ct
-> > > >    tcf_result::drop_reason', thereby triggering the warning in
-> > > >    __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (=
-0). [...]
-> > > >
-> > > >    [1]
-> > > >    WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_rea=
-son+0x38/0x130
-> > > >    Modules linked in:
-> > > >    CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge4=
-3e6d9582e0 #682
-> > > >    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16=
-.2-1.fc37 04/01/2014
-> > > >    RIP: 0010:kfree_skb_reason+0x38/0x130
-> > > >    [...]
-> > > >    Call Trace:
-> > > >     <IRQ>
-> > > >     __netif_receive_skb_core.constprop.0+0x837/0xdb0
-> > > >     __netif_receive_skb_one_core+0x3c/0x70
-> > > >     process_backlog+0x95/0x130
-> > > >     __napi_poll+0x25/0x1b0
-> > > >     net_rx_action+0x29b/0x310
-> > > >     __do_softirq+0xc0/0x29b
-> > > >     do_softirq+0x43/0x60
-> > > >     </IRQ>
-> > > >
-> > > >    [2]
-> > > >    #!/bin/bash
-> > > >
-> > > >    ip link add name veth0 type veth peer name veth1
-> > > >    ip link set dev veth0 up
-> > > >    ip link set dev veth1 up
-> > > >    tc qdisc add dev veth1 clsact
-> > > >    tc filter add dev veth1 ingress pref 1 proto all flower dst_mac =
-00:11:22:33:44:55 action drop
-> > > >    mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
-> > > >
-> > > > What happens is that inside most classifiers the tcf_result is copi=
-ed over
-> > > > from a filter template e.g. *res =3D f->res which then implicitly o=
-verrides
-> > > > the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code whi=
-ch was
-> > > > set via sch_handle_{ingress,egress}() for kfree_skb_reason().
-> > > >
-> > > > Add a small helper tcf_set_result() and convert classifiers over to=
- it.
-> > > > The latter leaves the drop code intact and classifiers, actions as =
-well
-> > > > as the action engine in tcf_exts_exec() can then in future make use=
- of
-> > > > tcf_set_drop_reason(), too.
-> > > >
-> > > > Tested that the splat is fixed under CONFIG_DEBUG_NET=3Dy with the =
-repro.
-> > > >
-> > > > Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more =
-flexible")
-> > > > Reported-by: Ido Schimmel <idosch@idosch.org>
-> > > > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> > > > Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > > Cc: Jakub Kicinski <kuba@kernel.org>
-> > > > Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
-> > > > ---
-> > > >   include/net/pkt_cls.h    | 12 ++++++++++++
-> > > >   net/sched/cls_basic.c    |  2 +-
-> > > >   net/sched/cls_bpf.c      |  2 +-
-> > > >   net/sched/cls_flower.c   |  2 +-
-> > > >   net/sched/cls_fw.c       |  2 +-
-> > > >   net/sched/cls_matchall.c |  2 +-
-> > > >   net/sched/cls_route.c    |  4 ++--
-> > > >   net/sched/cls_u32.c      |  2 +-
-> > > >   8 files changed, 20 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> > > > index a76c9171db0e..31d8e8587824 100644
-> > > > --- a/include/net/pkt_cls.h
-> > > > +++ b/include/net/pkt_cls.h
-> > > > @@ -160,6 +160,18 @@ static inline void tcf_set_drop_reason(struct =
-tcf_result *res,
-> > > >          res->drop_reason =3D reason;
-> > > >   }
-> > > >
-> > > > +static inline void tcf_set_result(struct tcf_result *to,
-> > > > +                                 const struct tcf_result *from)
+On Thu, 2023-11-02 at 14:24 +0200, Ilpo J=C3=A4rvinen wrote:
+> On Thu, 2 Nov 2023, Johannes Berg wrote:
+> > On Thu, 2023-11-02 at 13:55 +0200, Ilpo J=C3=A4rvinen wrote:
+> >=20
+> > > > +static void get_chan_freq_boundary(u32 center_freq, u32 bandwidth,=
+ u64 *start, u64 *end)
 > > > > +{
-> > > > +       /* tcf_result's drop_reason which is the last member must b=
-e
-> > > > +        * preserved and cannot be copied from the cls'es tcf_resul=
-t
-> > > > +        * template given this is carried all the way and potential=
-ly
-> > > > +        * set to a concrete tc drop reason upon error or intention=
-al
-> > > > +        * drop. See tcf_set_drop_reason() locations.
-> > > > +        */
-> > > > +       memcpy(to, from, offsetof(typeof(*to), drop_reason));
-> > > > +}
-> > >
-> > > I believe our bigger issue here is we are using this struct now for
-> > > both policy set by the control plane and for runtime decisions
-> >
-> > Hm, but that was also either way in the original rfc.
-> >
-> > > (drop_reason) - whereas the original assumption was this struct only
-> > > held set policy. In retrospect we should have put the verdict(which i=
-s
-> > > policy) here and return the error code (as was in the first patch). I
-> > > am also not sure humans would not make a mistake on "this field must
-> > > be at the end of the struct". Can we put some assert (or big comment
-> > > on the struct) to make sure someone does not overwrite this field?
-> >
-> > Yeah that can be done.
->
-> FTR, I agree the comment or even better a build_bug_on() somewhere
-> should be better.
+> > > > +	bandwidth =3D MHZ_TO_KHZ(bandwidth);
+> > > > +	center_freq =3D MHZ_TO_KHZ(center_freq);
+> > >=20
+> > > Please use include/linux/units.h ones for these too.
+> >=20
+> > Now we're feature creeping though - this has existed for *years* in the
+> > wireless stack with many instances? We can convert them over, I guess,
+> > but not sure that makes much sense here - we'd want to add such macros
+> > to units.h, but ... moving them can be independent of this patch?
+>=20
+> What new macros you're talking about?=C2=A0
 
-Paolo - Did you see the patch i posted? Ido/Daniel?
+Sorry, I got confused - for some reason I was pretty sure something here
+was already being added to units.h in this patchset.
 
-cheers,
-jamal
->
-> Thanks!
->
-> Paolo
->
+> Nothing new needs to be added=20
+> as there's already KHZ_PER_MHZ so these would just be:
+>=20
+> 	bandwidth *=3D KHZ_PER_MHZ;
+> 	center_freq *=3D KHZ_PER_MHZ;
+
+Sure, and in this case that's probably pretty much equivalent. But
+having a MHZ_TO_KHZ() macro isn't inherently *bad*, and I'm not sure
+you're objection to it on anything other than "it's not defined in
+units.h".
+
+> Everything can of course be postponed by the argument that some=20
+> subsystem specific mechanism has been there before the generic one
+> but the end of that road won't be pretty... What I was trying to do
+> here was to point out the new stuff introduced by this series into the=
+=20
+> direction of the generic thing.
+
+I just think that the better course of action would be to eventually
+move MHZ_TO_KHZ() to units.h ...
+
+johannes
 
