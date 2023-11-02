@@ -1,85 +1,56 @@
-Return-Path: <netdev+bounces-45748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEF97DF58B
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:01:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4B77DF59B
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:04:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7FAD1C20F4C
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49E51C20F35
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 305B31B29E;
-	Thu,  2 Nov 2023 15:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19F11BDE2;
+	Thu,  2 Nov 2023 15:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TttEmsxM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ikcgjN67"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5F61BDEF;
-	Thu,  2 Nov 2023 15:01:19 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD59B19A;
-	Thu,  2 Nov 2023 08:01:14 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-4083ac51d8aso7952675e9.2;
-        Thu, 02 Nov 2023 08:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698937273; x=1699542073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yjqMreabRsDRLtUlqL50Lj0Jf1Dc8tKq0A0FqOYk3vI=;
-        b=TttEmsxMvK5+GPzFXabFceaz/QsyYWbpIxKlLRwMdcC/BRPmz//Tv56W96nmZwrODE
-         rR3vBIdFVA2S89ydd3RBdaEwo3HCCKT9jupjtjplSYGoOFFcGEH0htN6jeRAGjstf7gl
-         e+LX2S0nOolC4hLtEVmNRkFdZhLMWPjf26FAkEizOM1B+AGUZn2ICCfRRknmS/GpHsqN
-         q9jLn6K+FpH8+hb0jlDRw+F/UE5puDvF4w84ry8lJSFHQIGzCTqOxPMvohd7d7uzc71N
-         zSFK3qnyXHrSitql2MstTAFPMyyw/V1sGvgCyjZpC0rieq7GukFyzxtvw8Lid9oKWFoa
-         gHxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698937273; x=1699542073;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yjqMreabRsDRLtUlqL50Lj0Jf1Dc8tKq0A0FqOYk3vI=;
-        b=sIHwkyLMAU71suaIig7P4Dn2V1u483cPhaDn3FgkzvsF7d51A/885E+R0AbUFF3I3F
-         G8ZLw15YJeg+BI1p85p0RLgUndOOOjSDNfJ65y5HNTAziGCX/EAaY9EUBfEdGDgvFZgF
-         7JjuK4QBGvqVu2ZoBncWKAlF2Zgfs7/jTIiba6fWh6WKoPUnkoHhIEy2GCNsT4dV6Hhu
-         WFkR1oMpxlrYlrs2DraPfcTIepBv6AIIIIOhsfrPSbxqrLY9GPHNH4pty3OuHV/tTQMZ
-         pjafRdRF6FcGZgPQhNNCl76djCONGxFHltIl/AMBGT1tc2NglVHkr9iqPSxVctdr42R6
-         lv5g==
-X-Gm-Message-State: AOJu0YxWU3c+LDBz+6s+47PDt6VgIQuMsrQFYuQNchXYbMV2Xjrp8jJP
-	M3LUycwrIZR1kHvhcRX+oiw=
-X-Google-Smtp-Source: AGHT+IGZKjrDa8RVJiFx8Yu7fGNuwAdECwzrX7tDnU5cyYtmKvaAcHpkPDmHp6CGfUjEIjQ24cyP5w==
-X-Received: by 2002:a05:600c:310d:b0:405:3dee:3515 with SMTP id g13-20020a05600c310d00b004053dee3515mr17339953wmo.27.1698937272911;
-        Thu, 02 Nov 2023 08:01:12 -0700 (PDT)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id j15-20020a05600c130f00b003fbe4cecc3bsm3131007wmf.16.2023.11.02.08.01.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 08:01:08 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581971B29E;
+	Thu,  2 Nov 2023 15:03:56 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E37B718B;
+	Thu,  2 Nov 2023 08:03:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=O+sDd6BIqD7/T4iz8epXXGIsz006xpgyEhdsjBsc25M=; b=ikcgjN67fIx8DAR/kdecyTu6c8
+	tBQ+pr+I416gvEST/6hFYJ6oQ5YwZ1VU0sJtZtXupz1r70wLWXUnS2gybH8OYGmcW0p+U4Mkf/tLh
+	0d1cbMbnU2efyF/ATc9qpQzsF+wGiYJyBOrtwdWCLEduNH3yf/x6zztJyfs+S1Dl1+HU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qyZEL-000l7X-Jn; Thu, 02 Nov 2023 16:03:33 +0100
+Date: Thu, 2 Nov 2023 16:03:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
 	Robert Marko <robimarko@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next RFC PATCH v3 4/4] dt-bindings: Document bindings for Marvell Aquantia PHY
-Date: Thu,  2 Nov 2023 16:00:32 +0100
-Message-Id: <20231102150032.10740-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231102150032.10740-1-ansuelsmth@gmail.com>
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v3 1/4] net: phy: aquantia: move to separate
+ directory
+Message-ID: <5f60b2dc-4e97-49dc-8427-306400fb1b71@lunn.ch>
 References: <20231102150032.10740-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -87,161 +58,35 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231102150032.10740-1-ansuelsmth@gmail.com>
 
-Document bindings for Marvell Aquantia PHY.
+> diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+> index 421d2b62918f..4b2451dd6c45 100644
+> --- a/drivers/net/phy/Kconfig
+> +++ b/drivers/net/phy/Kconfig
+> @@ -68,6 +68,8 @@ config SFP
+>  
+>  comment "MII PHY device drivers"
+>  
+> +source "drivers/net/phy/aquantia/Kconfig"
+> +
+>  config AMD_PHY
+>  	tristate "AMD and Altima PHYs"
+>  	help
+> @@ -96,11 +98,6 @@ config ADIN1100_PHY
+>  	  Currently supports the:
+>  	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
+>  
+> -config AQUANTIA_PHY
+> -	tristate "Aquantia PHYs"
+> -	help
+> -	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+> -
 
-The Marvell Aquantia PHY require a firmware to work correctly and there
-at least 3 way to load this firmware.
+Does this move the PHY in the make menuconfig menu? We try to keep it
+sorted based on the tristate string.
 
-Describe all the different way and document the binding "firmware-name"
-to load the PHY firmware from userspace.
-
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
-Changes v3:
-- Make DT description more OS agnostic
-- Use custom select to fix dtbs checks
-Changes v2:
-- Add DT patch
-
- .../bindings/net/marvell,aquantia.yaml        | 126 ++++++++++++++++++
- 1 file changed, 126 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-new file mode 100644
-index 000000000000..d43cf28a4d61
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-@@ -0,0 +1,126 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/marvell,aquantia.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Marvell Aquantia Ethernet PHY
-+
-+maintainers:
-+  - Christian Marangi <ansuelsmth@gmail.com>
-+
-+description: |
-+  Marvell Aquantia Ethernet PHY require a firmware to be loaded to actually
-+  work.
-+
-+  This can be done and is implemented by OEM in 3 different way:
-+    - Attached SPI directly to the PHY with the firmware. The PHY will
-+      self load the firmware in the presence of this configuration.
-+    - Dedicated partition on system NAND with firmware in it. NVMEM
-+      subsystem will be used and the declared NVMEM cell will load
-+      the firmware to the PHY using the PHY mailbox interface.
-+    - Manually provided firmware loaded from a file in the filesystem.
-+
-+  If declared, NVMEM will always take priority over filesystem provided
-+  firmware.
-+
-+allOf:
-+  - $ref: ethernet-phy.yaml#
-+
-+select:
-+  properties:
-+    compatible:
-+      contains:
-+        enum:
-+          - ethernet-phy-id03a1.b445
-+          - ethernet-phy-id03a1.b460
-+          - ethernet-phy-id03a1.b4a2
-+          - ethernet-phy-id03a1.b4d0
-+          - ethernet-phy-id03a1.b4e0
-+          - ethernet-phy-id03a1.b5c2
-+          - ethernet-phy-id03a1.b4b0
-+          - ethernet-phy-id03a1.b662
-+          - ethernet-phy-id03a1.b712
-+          - ethernet-phy-id31c3.1c12
-+  required:
-+    - compatible
-+
-+properties:
-+  reg:
-+    maxItems: 1
-+
-+  firmware-name:
-+    description: specify the name of PHY firmware to load
-+
-+  nvmem-cells:
-+    description: phandle to the firmware nvmem cell
-+    maxItems: 1
-+
-+  nvmem-cell-names:
-+    const: firmware
-+
-+required:
-+  - compatible
-+  - reg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet-phy@0 {
-+            /*  Only needed to make DT lint tools work. Do not copy/paste
-+             *  into real DTS files.
-+             */
-+            compatible = "ethernet-phy-id31c3.1c12",
-+                         "ethernet-phy-ieee802.3-c45";
-+
-+            reg = <0>;
-+            firmware-name = "AQR-G4_v5.4.C-AQR_CIG_WF-1945_0x8_ID44776_VER1630.cld";
-+        };
-+
-+        ethernet-phy@1 {
-+            /*  Only needed to make DT lint tools work. Do not copy/paste
-+             *  into real DTS files.
-+             */
-+            compatible = "ethernet-phy-id31c3.1c12",
-+                         "ethernet-phy-ieee802.3-c45";
-+
-+            reg = <0>;
-+            nvmem-cells = <&aqr_fw>;
-+            nvmem-cell-names = "firmware";
-+        };
-+    };
-+
-+    flash {
-+        compatible = "jedec,spi-nor";
-+        #address-cells = <1>;
-+        #size-cells = <1>;
-+
-+        partitions {
-+            compatible = "fixed-partitions";
-+            #address-cells = <1>;
-+            #size-cells = <1>;
-+
-+            /* ... */
-+
-+            partition@650000 {
-+                compatible = "nvmem-cells";
-+                label = "0:ethphyfw";
-+                reg = <0x650000 0x80000>;
-+                read-only;
-+                #address-cells = <1>;
-+                #size-cells = <1>;
-+
-+                aqr_fw: aqr_fw@0 {
-+                    reg = <0x0 0x5f42a>;
-+                };
-+            };
-+
-+            /* ... */
-+
-+        };
-+    };
--- 
-2.40.1
-
+       Andrew
 
