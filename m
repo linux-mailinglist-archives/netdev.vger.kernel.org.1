@@ -1,139 +1,106 @@
-Return-Path: <netdev+bounces-45812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0797DFBA7
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:42:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1E807DFBD1
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 22:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EAF9281D12
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 20:42:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26360281D5D
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 21:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110221CABA;
-	Thu,  2 Nov 2023 20:42:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E9F20335;
+	Thu,  2 Nov 2023 21:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DI5kpa0w"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JZIyIVCw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E1F11736
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:42:39 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80633181;
-	Thu,  2 Nov 2023 13:42:38 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2K7Our019191;
-	Thu, 2 Nov 2023 20:42:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : references : from : cc : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=6T2zyMbjK1cZjAPB5KZIio/2H5h9yh3osA1ZwvHqBNM=;
- b=DI5kpa0wjyCc0khDQO4v0u1cZcRthGGEGzZFbN8kVu+viRJ1ww/eg33jYcTiniUpm567
- 7phin9+dsCDkfzlFHJizPJ4kLUh616zczkUxhKwkV9Sp0iAHc8IRHawcl9d/KCu06gO6
- eLbF5ALvmMRb174ADnxCnpt4Z6/jkp3gKZytsb38CP60KskVDANoAom4IijqBiN0pGSt
- Kj29yDNT/Rjj8+2UzURm/auVNkDV6HEfyR1gjZ/JPqyWggMpf2bsIO+id4uWWrzKbRt9
- MN8FhitNR3d5f90MUXgIIK9Gr5XDLqOk6WYgwMDzyiE1QGUa96/kX3b2PxPWpANLMPyN 6A== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4jhb9088-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Nov 2023 20:42:30 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2J3w6M011286;
-	Thu, 2 Nov 2023 20:42:29 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1eukgy4r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 02 Nov 2023 20:42:29 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A2KgSKa46072402
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 2 Nov 2023 20:42:29 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BA54A58058;
-	Thu,  2 Nov 2023 20:42:28 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2B33D5805D;
-	Thu,  2 Nov 2023 20:42:28 +0000 (GMT)
-Received: from [9.171.80.36] (unknown [9.171.80.36])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  2 Nov 2023 20:42:27 +0000 (GMT)
-Message-ID: <4b1c9303-9ad1-42f3-a1a2-b9ccfcafd022@linux.ibm.com>
-Date: Thu, 2 Nov 2023 21:42:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423B11D680
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 21:00:31 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1AF618C
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 14:00:22 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6bd0e1b1890so1289051b3a.3
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 14:00:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1698958822; x=1699563622; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=E8KFumTag/+mfUr046qXGDZHDIauHHYyGcdwD8EXFRY=;
+        b=JZIyIVCwD0ECTxQVk3G1/Ci2yYOqLuqNmMu2KPCbmd4HFX/q2nNzTTZYxyfmFDLYg0
+         bgFDBtojDff9NEPVAdbup66Ulfsc/yAOnuKDctVk7jf6dalWD5meSdtrbkSTA7uqjiZK
+         3UFg71SQe1vaYzXXRWpxMU9Kz777urhB4z6ts=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698958822; x=1699563622;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=E8KFumTag/+mfUr046qXGDZHDIauHHYyGcdwD8EXFRY=;
+        b=FwfxKRuXCCsJfNTh/70NEDyVCdry0dX8nwgFCMCAeNfzv6MrEOgkQTurq2oA+PcAue
+         gi3W7twVZE2wz7EaPmOkY6nSdrOZEBZxRp19mAvkyQpV78Mwj4EXmw0n0V8mmLwLRUyC
+         oPRHUYvZEWcfwtHFNHw5pt4yrxH04rmgCUEwb8xDKzUNoJgphB4DFN0Xg8Hxs36FW3r1
+         1xfkZqESsagF8EI+9uTt6WuZhkHs5q/azAUGnvwcGpb6cn6PbISqtOawF+6qq/HHq5Y6
+         yBsayaMbxSrBsufvUJu5DUhazF/RLG4j8s3RngpIQCeBP5oPbVWOXRlRoui8e8yW3Dke
+         ij6g==
+X-Gm-Message-State: AOJu0YxDaq2SKn+S1dx7uzqMj2vssbdtIlSUgilZP7viIbIMiUm3HBDt
+	I8unqwND01HSS/yT1FhU6YeP9w==
+X-Google-Smtp-Source: AGHT+IHpWfHMpmZgu3Ki0ANwOyVLt9nZosdSKPzywMjZQkoftSaNFtV+rbheqzdq77GxD/borUX1wg==
+X-Received: by 2002:a05:6a21:18a:b0:181:74fe:ba83 with SMTP id le10-20020a056a21018a00b0018174feba83mr5241243pzb.40.1698958822357;
+        Thu, 02 Nov 2023 14:00:22 -0700 (PDT)
+Received: from localhost ([2620:15c:9d:2:a601:95c2:1e12:1936])
+        by smtp.gmail.com with UTF8SMTPSA id b7-20020a62cf07000000b0068842ebfd10sm174384pfg.160.2023.11.02.14.00.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Nov 2023 14:00:20 -0700 (PDT)
+Date: Thu, 2 Nov 2023 14:00:17 -0700
+From: Brian Norris <briannorris@chromium.org>
+To: Karel Balej <balejk@matfyz.cz>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	Duje =?utf-8?Q?Mihanovi=C4=87?= <duje.mihanovic@skole.hr>,
+	~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org
+Subject: Re: [PATCH 0/2] net: mwifiex: add support for the SD8777 chipset
+Message-ID: <ZUQN4Ua8byy-Fsy8@google.com>
+References: <20231029111807.19261-1-balejk@matfyz.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/smc: avoid atomic_set and smp_wmb in the tx path when
- possible
-Content-Language: en-GB
-To: Li RongQing <lirongqing@baidu.com>
-References: <20231102092712.30793-1-lirongqing@baidu.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org
-In-Reply-To: <20231102092712.30793-1-lirongqing@baidu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vQOBN3Z0hfpzgLBfQlDo9MBCzKCLGO83
-X-Proofpoint-ORIG-GUID: vQOBN3Z0hfpzgLBfQlDo9MBCzKCLGO83
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-02_10,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 priorityscore=1501 mlxlogscore=687 malwarescore=0
- bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0 impostorscore=0
- clxscore=1011 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311020168
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231029111807.19261-1-balejk@matfyz.cz>
 
+On Sun, Oct 29, 2023 at 12:08:15PM +0100, Karel Balej wrote:
+> The driver requires proprietary firmware which is not yet part of
+> linux-firmware, but it is packaged in postmarketOS.
 
+You gotta get that done:
 
-On 02.11.23 10:27, Li RongQing wrote:
-> these is less opportunity that conn->tx_pushing is not 1, since
-> tx_pushing is just checked with 1, so move the setting tx_pushing
-> to 1 after atomic_dec_and_test() return false, to avoid atomic_set
-> and smp_wmb in tx path when possible
-> 
-I think we should avoid to use argument like "less opportunity" in 
-commit message. Because "less opportunity" does not mean "no 
-opportunity". Once it occurs, does it mean that what the patch changes 
-is useless or wrong?
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches#new_driver
 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
->   net/smc/smc_tx.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
-> index 3b0ff3b..72dbdee 100644
-> --- a/net/smc/smc_tx.c
-> +++ b/net/smc/smc_tx.c
-> @@ -667,8 +667,6 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
->   		return 0;
->   
->   again:
-> -	atomic_set(&conn->tx_pushing, 1);
-> -	smp_wmb(); /* Make sure tx_pushing is 1 before real send */
->   	rc = __smc_tx_sndbuf_nonempty(conn);
->   
->   	/* We need to check whether someone else have added some data into
-> @@ -677,8 +675,11 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
->   	 * If so, we need to push again to prevent those data hang in the send
->   	 * queue.
->   	 */
-> -	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing)))
-> +	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing))) {
-> +		atomic_set(&conn->tx_pushing, 1);
-> +		smp_wmb(); /* Make sure tx_pushing is 1 before real send */
->   		goto again;
-> +	}
->   
->   	return rc;
->   }
-I'm afraid that the *if* statement would never be true, without setting 
-the value of &conn->tx_pushing firstly.
+"have firmware images submitted for linux-firmware with an acceptable
+license allowing redistribution"
+
+We can't have a driver requesting a mrvl/sd8777_uapsta.bin firmware that
+isn't available for anyone [1].
+
+Until that's done, NAK.
+
+[1] I think you might be referring to this:
+https://github.com/xcover3/android_vendor_samsung_xcover3lte/commit/6e324b43b32dc607327d89148dd5d83a14429ee6
+
+But I don't see any license info, so I don't think that's going to be
+appropriate for linux-firmware.
 
