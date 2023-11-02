@@ -1,114 +1,137 @@
-Return-Path: <netdev+bounces-45683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8351D7DEFFF
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:31:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AF2A7DF031
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 11:35:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6456B20F14
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3DF1C20E82
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E8C12B74;
-	Thu,  2 Nov 2023 10:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EA714293;
+	Thu,  2 Nov 2023 10:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EwgFi+Js"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JmKOXiwp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EB714267
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:31:29 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0FAE187;
-	Thu,  2 Nov 2023 03:31:27 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9d242846194so111823066b.1;
-        Thu, 02 Nov 2023 03:31:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698921086; x=1699525886; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CpjOzif0QjYVITE4SJqbyNSX7vVCExngH+2bDixVO2k=;
-        b=EwgFi+JsreEx26PQchIxW9xob6QlXxDTvO9COoSPNCvMBhEp9rre2XRhvrX3i/uPro
-         NKeNAwil1do8CU0Rpw3RjyMzQL7Gao1WsPM4UzR67/yy74tBtmQgSrOO6Bebo+ritXjN
-         3e4l+3uNOTyOg7sSgNjtdOUUDSRnAvHINqTqMD3V5jBN8kZoOr7b0Mu9eNj1hxkh3vSZ
-         FqEiY43YJI3W4xhVtQYmZhz4ziRCWH7xlJR0PfyE4b7DuoGPOLlW5O5KmL0wumGMiqLk
-         itkqoYh3uHyQmIuWDlq5M5yc/7HQpoNBiMu8WityL+ZyiY+uB9hM7ZkIzmcQk8WWH0It
-         MDqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698921086; x=1699525886;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CpjOzif0QjYVITE4SJqbyNSX7vVCExngH+2bDixVO2k=;
-        b=aaZbk+fKTUxVAiQ7RzTcMt5+F7vb50ADaTvRzTOPwKCkBqbQP1k+TQbDSY34Kb9osA
-         bVAVZ0A1zNXA9FHdZi3MOnHFKWkoHtIEcrKfqesPBhfgZj2bmxL15hB3b8qMYrsSffnv
-         s6RlwI+PnaQeCMcqH886B7I5yIGWALnqLU9oscTc+xuUwHZ6IVECwXHPYkybceF8SYpn
-         8cBtAxwRmNekViIcjkbrHda8Q3POlv/2eJ9VoeDv7ux8pcaOvl4UWeqiPqdY7NfbRIRY
-         dG5WYpaad/4Q1OA6iKzBY2xoOS2hYXb4/3z4Gl0/SG6uRfxq4rsKpaFPj+Prqv03d0Ae
-         zpHw==
-X-Gm-Message-State: AOJu0YyMG4TSER5TsXJtwmtW/90syhA7I2rqe+MSzf+xtAhzSEgbe3kR
-	rQ7LVM/itQxgRKbthDa4iPRpjFKvofzoxA==
-X-Google-Smtp-Source: AGHT+IEgF66vZ93tpDzSJ96lPj90OBOGERBzlE/mKany2i7Stpw9vhjKWrwM/6gBEQu265ysQYNbFA==
-X-Received: by 2002:a17:906:3b53:b0:9c3:afd3:6136 with SMTP id h19-20020a1709063b5300b009c3afd36136mr3685529ejf.72.1698921086079;
-        Thu, 02 Nov 2023 03:31:26 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id d14-20020a170906370e00b009b2d46425absm969205ejc.85.2023.11.02.03.31.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 03:31:25 -0700 (PDT)
-Date: Thu, 2 Nov 2023 12:31:23 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
-Message-ID: <20231102103123.hklqlsbb5kbq53mm@skbuf>
-References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
- <20231030141623.ufzhb4ttvxi3ukbj@skbuf>
- <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
- <20231030222035.oqos7v7sdq5u6mti@skbuf>
- <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
- <20231030233334.jcd5dnojruo57hfk@skbuf>
- <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
- <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
- <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
- <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FA714270
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 10:34:56 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E70E112;
+	Thu,  2 Nov 2023 03:34:54 -0700 (PDT)
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2ABDvV011474;
+	Thu, 2 Nov 2023 10:34:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=nh1329+76M5nOlVOJuDKkaq9p7EiHpfEVsDI3xmnhpA=;
+ b=JmKOXiwp9rD1i+P0hDjCfr9Ih0l8Qyt72ni8Q4h4prnlo8EGeaeTQ1BEuIyF3DvBVv0N
+ rdC75cQL+W2v6Bw6a0i0gi6fo8idIdG9cBIKlYJLkwsJdk92FcuiLKm2cDlkv3p8W76g
+ fQOlm73/ORU/YFkNsFVXVEumyljdlN+DddDzVZC7TClVqoEE37e2bGjfKZ9w15O5ZtrH
+ pNHfnGxjCCb0Th6X+NQl/o8MfSBYbfYloDOvzydI5Jbp9PXmpyDN0n/AI05/aajq1vMz
+ RufhHqML9RzvVEh+VSzmrsluVx8+2y0QqyRxBauu5UfXniQwBzEn2k50ZRS7+WjUPT3s rg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u49ca16ck-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 10:34:44 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A2AIZcm002402;
+	Thu, 2 Nov 2023 10:34:44 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u49ca16a4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 10:34:44 +0000
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A281BdR011533;
+	Thu, 2 Nov 2023 10:34:40 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3u1e4m5qgb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 10:34:39 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A2AYcZb30606074
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Nov 2023 10:34:38 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9D91C58062;
+	Thu,  2 Nov 2023 10:34:38 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2D74058057;
+	Thu,  2 Nov 2023 10:34:37 +0000 (GMT)
+Received: from [9.171.80.36] (unknown [9.171.80.36])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  2 Nov 2023 10:34:36 +0000 (GMT)
+Message-ID: <72b57457-43e1-49f7-9670-08bbf03231e1@linux.ibm.com>
+Date: Thu, 2 Nov 2023 11:34:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 1/3] net/smc: fix dangling sock under state
+ SMC_APPFINCLOSEWAIT
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1698904324-33238-1-git-send-email-alibuda@linux.alibaba.com>
+ <1698904324-33238-2-git-send-email-alibuda@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1698904324-33238-2-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4UCN7fX6S7yhT0S3250Irt4531Lf5wCt
+X-Proofpoint-ORIG-GUID: nR28fanZk61zekQwhGB696oH3mq08EQ8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-01_23,2023-11-02_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ clxscore=1011 adultscore=0 phishscore=0 priorityscore=1501 suspectscore=0
+ mlxlogscore=841 malwarescore=0 impostorscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311020084
 
-Hi Luiz,
 
-On Wed, Nov 01, 2023 at 09:35:30AM -0300, Luiz Angelo Daros de Luca wrote:
-> Hi Linus,
-> 
-> Sorry but I noticed no issues:
-> 
-> From the router:
-> 
-> No. Time Source Destination Protocol Length Info
-> 1 0.000000000 192.168.1.1 192.168.1.2 ICMP 1514 Echo (ping) request id=0x0789, seq=23/5888, ttl=64 (reply in 2)
-> 2 0.000040094 192.168.1.2 192.168.1.1 ICMP 1514 Echo (ping) reply id=0x0789, seq=23/5888, ttl=64 (request in 1)
-> 
-> From the host:
-> 
-> No. Time Source Destination Protocol Length Info
-> 1 0.000000000 192.168.1.2 192.168.1.1 ICMP 1514 Echo (ping) request id=0x0002, seq=8/2048, ttl=64 (reply in 2)
-> 2 0.000391800 192.168.1.1 192.168.1.2 ICMP 1514 Echo (ping) reply id=0x0002, seq=8/2048, ttl=64 (request in 1)
-> 
-> If I go over that limit, it fragments the packet as expected.
 
-Could you run the shell command that sweeps over the entire range, fromhere?
-https://lore.kernel.org/netdev/20231030222035.oqos7v7sdq5u6mti@skbuf/
+On 02.11.23 06:52, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> Considering scenario:
+> 
+> 				smc_cdc_rx_handler
+> __smc_release
+> 				sock_set_flag
+> smc_close_active()
+> sock_set_flag
+> 
+> __set_bit(DEAD)			__set_bit(DONE)
+> 
+> Dues to __set_bit is not atomic, the DEAD or DONE might be lost.
+> if the DEAD flag lost, the state SMC_CLOSED  will be never be reached
+> in smc_close_passive_work:
+> 
+> if (sock_flag(sk, SOCK_DEAD) &&
+> 	smc_close_sent_any_close(conn)) {
+> 	sk->sk_state = SMC_CLOSED;
+> } else {
+> 	/* just shutdown, but not yet closed locally */
+> 	sk->sk_state = SMC_APPFINCLOSEWAIT;
+> }
+> 
+> Replace sock_set_flags or __set_bit to set_bit will fix this problem.
+> Since set_bit is atomic.
+> 
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+
+Fixes tag?
 
