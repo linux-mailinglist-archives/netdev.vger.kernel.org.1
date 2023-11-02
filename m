@@ -1,83 +1,67 @@
-Return-Path: <netdev+bounces-45646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C947DEC32
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8F27DEC35
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 06:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 826EE281A35
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BCFCB21033
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 05:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7594B1FB4;
-	Thu,  2 Nov 2023 05:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB7B1FB4;
+	Thu,  2 Nov 2023 05:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g5exa0iQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YwvoDwyl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A501FA7
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 05:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BAB1BC433CA;
-	Thu,  2 Nov 2023 05:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06FB1FA7;
+	Thu,  2 Nov 2023 05:20:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11B99C433C7;
+	Thu,  2 Nov 2023 05:20:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1698902424;
-	bh=p72ZJpQH4fj5igLMUDdC8ykQB9sao0fAt04Lzxcjm8M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g5exa0iQDZ+LBvxyqKbO1es46o6oy4giVdwvn3PjvEf8vhAXQtzz+WHuLWO6UgzCY
-	 CzVhHg9BgzpZvgZ2gp3X9mO6DD1Jk9yi6JU2Ppf3Cj2G1YUpO5CnKjoN2fFmfk6S5t
-	 3iC0g7gQBxkF5YQIlTqPOEpWis0Fb6wA5rdIdIrREaayLUvL7g7Cm3AOd+VL5lxgWd
-	 VfVzbe3dG6D6gpxmw/u9w77lKH41ilyHc8ZMP6W3VbaPX8XMVpPnk32xJIrBWP4vzm
-	 zUgP6Q0Gst2VwFb2bxHgDJsKXyKNi/nzDcMmT8dI/1qmcRqLfkTLRvfK5yYq3G6Djf
-	 ICwJk4Q8/jGQA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 97917E00091;
-	Thu,  2 Nov 2023 05:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1698902447;
+	bh=YhTfqLur7/NQtlk8H9Cl3X4eNRRBK1DfeII4CpjFXWA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YwvoDwylHxhrQyMNZbt0YmegaTf9VzAd4jgxPYpYAtTO7666H2DmLp8VFckNRA7h1
+	 MMgYO7qoq1L+fb9FEEvfpWyPcBvJSHz0jDxas40g1w+CMBmtqL4HomNCruvYXQUu6h
+	 MdoRq11FdCH0bqi9SUsWu0BNt6L6jwgdPj+mj9HDCTnxoVTTqUmNDuXPE/9bXHl425
+	 NVBxLI5LTI2EfOQHyIVSlTpBEKh9gy15O/+HvoojJmvaQ/5eAaA9U41USFeRQpZCj9
+	 rYPr6zaDl6y5IMr6Uy2isOl4Ul8QenaA9LN6IG/iWVE5Uz+XegdK3EjzVXBM03nvFt
+	 ZMMDQT1Q4fIig==
+Date: Wed, 1 Nov 2023 22:20:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] virtio/vsock: Fix uninit-value in
+ virtio_transport_recv_pkt()
+Message-ID: <20231101222045.5f7cca01@kernel.org>
+In-Reply-To: <20231026150154.3536433-1-syoshida@redhat.com>
+References: <20231026150154.3536433-1-syoshida@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [patch net] netlink: specs: devlink: add forgotten port function caps
- enum values
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169890242461.25325.6115706587318020271.git-patchwork-notify@kernel.org>
-Date: Thu, 02 Nov 2023 05:20:24 +0000
-References: <20231030161750.110420-1-jiri@resnulli.us>
-In-Reply-To: <20231030161750.110420-1-jiri@resnulli.us>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 27 Oct 2023 00:01:54 +0900 Shigeru Yoshida wrote:
+> This issue occurs because the `buf_alloc` and `fwd_cnt` fields of the
+> `struct virtio_vsock_hdr` are not initialized when a new skb is allocated
+> in `virtio_transport_alloc_skb()`. This patch resolves the issue by
+> initializing these fields during allocation.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 30 Oct 2023 17:17:50 +0100 you wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> Add two enum values that the blamed commit omitted.
-> 
-> Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] netlink: specs: devlink: add forgotten port function caps enum values
-    https://git.kernel.org/netdev/net/c/05f0431bb90f
-
-You are awesome, thank you!
+We didn't manage to apply this before the merge window, and now the
+trees have converged. Patch no longer applies cleanly to net.
+Please rebase & repost.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
