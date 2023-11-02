@@ -1,147 +1,118 @@
-Return-Path: <netdev+bounces-45769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF697DF72C
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:57:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0488D7DF746
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 17:03:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CCA61C20ED8
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:57:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EEBAB20E57
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC491D529;
-	Thu,  2 Nov 2023 15:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2EF1D559;
+	Thu,  2 Nov 2023 16:03:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgLBuAWA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CehxJM0Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C2E1D69F
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 15:57:09 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D62193
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 08:57:08 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53dfc28a2afso1868051a12.1
-        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 08:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698940626; x=1699545426; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OvCowQJSJm1whGqTVCCk9/+0nMBKi55ty4a9YvRCK2w=;
-        b=DgLBuAWAqLthql2fgNy0YETo1/aD1bZlEVI03pZvIELkv+7nB5/FdXK3YUK3p2WRGI
-         Wdo3Surqsrz1zRkK4TwHbjN3Vnff5p5bGawKqLBlYLW/i87Q1OEuwhDbWZQ1ZhMRHzBI
-         o91yliwip6Br79Mk+SzlzN+LLgD3e6KfLJUZqK47QDqxjh/dBVZofdvz35A0v8syR99O
-         5I+8ye7kHnVRgHn/sAXZA5DAj533LJYBJ0HcMFb5s+q43YicyFQWhGqbEAlhI9fYA3Jo
-         Zs14Gyf9w5fE13OMWxnKx+RB8pvpinB0r+W4H/eB6jQ8tDZEWDpS8zp2O4lw+iz3iNHK
-         x5fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698940626; x=1699545426;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OvCowQJSJm1whGqTVCCk9/+0nMBKi55ty4a9YvRCK2w=;
-        b=XsNiL3H4bXR+BVJ1uspq/SdRJQnpRBCYCXLCrrjYT5hzOR3YgnNdTGQJ5Z3nPMlIqk
-         yy8nm3fi8cUoBhK3sqzE2mrrBeZ0EbP7WdPzpuyu/OwFJUY87HCN470ylghH3DQu6Yin
-         svtw61zZmeXLl17wq90aCaNiA0bzH+6ObquFaHhV+u/5E5L7V1ZX0AhYmfX4QxbMbojv
-         qhAK+mQO7sxG+vFv8+O6FnNbBDyKi+Wuv5MsgXStFwcY+fziI/E4ptl1Z0+vSF6qhvKD
-         Dm5l2jyIMrc2jt6xaKlgirPRgbqvdm9Of5Gb3SCJzHGVeKAel92+0mAE+td4rk6sZ4zj
-         tIkg==
-X-Gm-Message-State: AOJu0Yz7NJpkyjvPVvzFnIOCbPlYCgmIE+BgQZuuKc4ifqLN2giLwN8P
-	K+Dwy2qmKBL7bbgFZM6e5kk=
-X-Google-Smtp-Source: AGHT+IHS6w68B51vYhWGQhAszTVy/Sx7clPyA8znn4ITWnaCgVu7SeOXycSl9LPshqJ+6hhtVhJy8A==
-X-Received: by 2002:a50:c318:0:b0:543:cec6:c00b with SMTP id a24-20020a50c318000000b00543cec6c00bmr2818093edb.24.1698940626090;
-        Thu, 02 Nov 2023 08:57:06 -0700 (PDT)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id n13-20020aa7db4d000000b00533e915923asm33268edt.49.2023.11.02.08.57.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Nov 2023 08:57:05 -0700 (PDT)
-Date: Thu, 2 Nov 2023 17:57:03 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
-	alsi@bang-olufsen.dk, andrew@lunn.ch, vivien.didelot@gmail.com,
-	f.fainelli@gmail.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, robh+dt@kernel.org, krzk+dt@kernel.org,
-	arinc.unal@arinc9.com
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset
- controller
-Message-ID: <20231102155703.2itwweekjr7uqbsg@skbuf>
-References: <20231027190910.27044-1-luizluca@gmail.com>
- <20231027190910.27044-4-luizluca@gmail.com>
- <20231030205025.b4dryzqzuunrjils@skbuf>
- <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
- <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
- <CACRpkdairxqm_YVshEuk_KbnZw9oH2sKiHapY_sTrgc85_+AmQ@mail.gmail.com>
- <20231102155521.2yo5qpugdhkjy22x@skbuf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F74D1CF86
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 16:03:01 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870108E
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 09:03:00 -0700 (PDT)
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2Fnq4T004171;
+	Thu, 2 Nov 2023 16:02:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=I0uR0BdNrHt9d/AyCP9KkyCUNtIu5r2lI7qMRwAlkoc=;
+ b=CehxJM0Z9jI3VspJF7y6K7q1OuPsIk9l4gpDR9y17MC5tr+QUPlNqkif1pxvhJ65iPqp
+ ywCDJtchi0fxPvwbcmaNh5Hw1/t6/yo+PPwzJpM6dvnjPHUxCk8rbxFa8gMx9xmxSnIl
+ e1vt0n0AfWNhahhF4gZZvEI9Hdw5yyHOpe1Nh6Vgd+s81igJDd0R0TAUUqKoDScY8UF6
+ K0AEs6dsJQoChYhxaXzhGfpbQxmx+zeVBDkU1R/1Eny38AfZBCpJ29BnCbLQe3+sZd4t
+ N6mE5HQ1oq8D8GIoTv4zIcvPiPI9Ui02KmQv5V9MSrdSda+5eXBLgzE7o1ATx9n3VOom tg== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4erk0cd5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 16:02:58 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2EJBpW031381;
+	Thu, 2 Nov 2023 16:02:58 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1fb2f6ty-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 16:02:58 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A2G2vVm17826468
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Nov 2023 16:02:57 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6A2B25805B;
+	Thu,  2 Nov 2023 16:02:57 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DC16958058;
+	Thu,  2 Nov 2023 16:02:56 +0000 (GMT)
+Received: from [9.41.99.4] (unknown [9.41.99.4])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  2 Nov 2023 16:02:56 +0000 (GMT)
+Message-ID: <95e0ba26-7153-4b92-9a20-412ee4e1490d@linux.vnet.ibm.com>
+Date: Thu, 2 Nov 2023 11:02:56 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231102155521.2yo5qpugdhkjy22x@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/tg3: fix race condition in tg3_reset_task_cancel()
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com,
+        mchan@broadcom.com, drc@linux.vnet.ibm.com, pavan.chebbi@broadcom.com,
+        Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
+ <CACKFLinpJgLvYAg+nALVb6RpddXXzXSoXbRAq+nddZvwf5+f3Q@mail.gmail.com>
+ <09dbfd72-0efb-0275-9589-6178c9aca8a1@linux.vnet.ibm.com>
+Content-Language: en-US
+In-Reply-To: <09dbfd72-0efb-0275-9589-6178c9aca8a1@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vdBgy1FoP8pZ_pR4Pcv4eclWBSGUPHzQ
+X-Proofpoint-ORIG-GUID: vdBgy1FoP8pZ_pR4Pcv4eclWBSGUPHzQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-02_05,2023-11-02_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011 phishscore=0
+ priorityscore=1501 suspectscore=0 mlxscore=0 mlxlogscore=736
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311020130
 
-On Thu, Nov 02, 2023 at 05:55:21PM +0200, Vladimir Oltean wrote:
-> diff --git a/drivers/net/dsa/realtek/Kconfig b/drivers/net/dsa/realtek/Kconfig
-> index 060165a85fb7..857a039fb0f1 100644
-> --- a/drivers/net/dsa/realtek/Kconfig
-> +++ b/drivers/net/dsa/realtek/Kconfig
-> @@ -15,39 +15,37 @@ menuconfig NET_DSA_REALTEK
->  
->  if NET_DSA_REALTEK
->  
-> +config NET_DSA_REALTEK_INTERFACE
-> +	tristate
-> +	help
-> +	  Common interface driver for accessing Realtek switches, either
-> +	  through MDIO or SMI.
-> +
->  config NET_DSA_REALTEK_MDIO
-> -	tristate "Realtek MDIO interface driver"
-> -	depends on OF
-> -	depends on NET_DSA_REALTEK_RTL8365MB || NET_DSA_REALTEK_RTL8366RB
-> -	depends on NET_DSA_REALTEK_RTL8365MB || !NET_DSA_REALTEK_RTL8365MB
-> -	depends on NET_DSA_REALTEK_RTL8366RB || !NET_DSA_REALTEK_RTL8366RB
-> +	tristate "Realtek MDIO interface support"
+Hi Michael,
 
-I meant to also make "config NET_DSA_REALTEK_MDIO" a bool and not tristate.
+On 10/3/2023 5:05 PM, Thinh Tran wrote:
+> Thanks for the review.
+> 
+> On 10/3/2023 4:37 AM, Michael Chan wrote:
+> 
+>>
+>> tg3_flag_set() calls set_bit() which is atomic.  The same is true for
+>> tg3_flag_clear().  Maybe we just need some smp_mb__after_atomic() or
+>> similar memory barriers.
+>>
+> 
+> I did not see it being used in this driver. I'll try that.
+> 
+> Thinh Tran
+> 
 
->  	help
->  	  Select to enable support for registering switches configured
->  	  through MDIO.
->  
->  config NET_DSA_REALTEK_SMI
-> -	tristate "Realtek SMI interface driver"
-> -	depends on OF
-> -	depends on NET_DSA_REALTEK_RTL8365MB || NET_DSA_REALTEK_RTL8366RB
-> -	depends on NET_DSA_REALTEK_RTL8365MB || !NET_DSA_REALTEK_RTL8365MB
-> -	depends on NET_DSA_REALTEK_RTL8366RB || !NET_DSA_REALTEK_RTL8366RB
-> +	bool "Realtek SMI interface support"
->  	help
->  	  Select to enable support for registering switches connected
->  	  through SMI.
->  
->  config NET_DSA_REALTEK_RTL8365MB
->  	tristate "Realtek RTL8365MB switch subdriver"
-> -	imply NET_DSA_REALTEK_SMI
-> -	imply NET_DSA_REALTEK_MDIO
-> +	select NET_DSA_REALTEK_INTERFACE
->  	select NET_DSA_TAG_RTL8_4
-> +	depends on OF
->  	help
->  	  Select to enable support for Realtek RTL8365MB-VC and RTL8367S.
->  
->  config NET_DSA_REALTEK_RTL8366RB
->  	tristate "Realtek RTL8366RB switch subdriver"
-> -	imply NET_DSA_REALTEK_SMI
-> -	imply NET_DSA_REALTEK_MDIO
-> +	select NET_DSA_REALTEK_INTERFACE
->  	select NET_DSA_TAG_RTL4_A
-> +	depends on OF
->  	help
->  	  Select to enable support for Realtek RTL8366RB.
+I tried that but still the intermittent problem still persists.
+I have a fix that I'll describe in V2 of the patch
+
+Thinh Tran
 
