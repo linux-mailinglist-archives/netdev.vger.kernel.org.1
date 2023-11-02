@@ -1,108 +1,126 @@
-Return-Path: <netdev+bounces-45766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B3E7DF707
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:50:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE3777DF721
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 16:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11F128061E
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:50:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE811C20EF9
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 15:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72631D529;
-	Thu,  2 Nov 2023 15:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AFA1CAA2;
+	Thu,  2 Nov 2023 15:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uFE0xkaq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S3tChDEy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52F21D523;
-	Thu,  2 Nov 2023 15:49:58 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3E3192;
-	Thu,  2 Nov 2023 08:49:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1mL40+ExHNZuGaOB+rQdlmEOkODuu6jCTNDp6aVzkic=; b=uFE0xkaqy6iZ53No0pBhtodBPX
-	h/9SjeSRIwhwfwJFnK07vJv5ibpiyHuCps5CLD9qlsDJVRzhq56OVCo28GXOkaI5GaNn3MrTy8Pf4
-	lZzRMm+5Tvae5bkpZrVc/f1sqADUwinAG6Wi2EJamJvSu46rAh9ORfk+SmEvP7BnoB+Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qyZwg-000lND-68; Thu, 02 Nov 2023 16:49:22 +0100
-Date: Thu, 2 Nov 2023 16:49:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert Marko <robimarko@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v3 1/4] net: phy: aquantia: move to separate
- directory
-Message-ID: <3af56cbe-dd9a-4747-b7a7-376367df6f79@lunn.ch>
-References: <20231102150032.10740-1-ansuelsmth@gmail.com>
- <5f60b2dc-4e97-49dc-8427-306400fb1b71@lunn.ch>
- <6543bb3e.df0a0220.385df.cdb1@mx.google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DF11D529
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 15:56:11 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDA712E
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 08:56:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698940567; x=1730476567;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/HOS4o57OIc05Uh+PE17GQ53W44y+VwquMnvqen8CPw=;
+  b=S3tChDEypoCGnAd2wrcFYXAm35CtZAb5IZNlZ08qAe+hEjEuq6q5dK1g
+   FvN40lx5mq0755+SrP16Ue0PmpB13YAc58PIKLnoKrCDYLOTofY6Dtlr2
+   mLso1aqvRwFfmH4FGcjHIdTRPa33t0d0Ixyp/pzo8FpEiNceGeHxhiTUX
+   C9BEhitleoStkFRQfwPy/CN5O6vwEOUnV2RbQgyvN0CmP0tPOFzB3X0wo
+   L7bFitt0ZmTILHW1n7/eOsswHPSPPt/hxoxVqfjr6DxD/iVkHZmW+V4Eb
+   BekOUVc0t+SKiPH2ZeRgJ8NuMj5kXVvdpn3uxVsRGS4XuIYJCG9TPKJkz
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="388559553"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="388559553"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 08:56:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="796278345"
+X-IronPort-AV: E=Sophos;i="6.03,272,1694761200"; 
+   d="scan'208";a="796278345"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga001.jf.intel.com with ESMTP; 02 Nov 2023 08:55:41 -0700
+Received: from baltimore.igk.intel.com (baltimore.igk.intel.com [10.102.21.1])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 106FF122E3;
+	Thu,  2 Nov 2023 15:55:40 +0000 (GMT)
+From: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	lukasz.czapnik@intel.com,
+	Liang-Min Wang <liang-min.wang@intel.com>,
+	Pawel Chmielewski <pawel.chmielewski@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-next v2] ice: Reset VF on Tx MDD event
+Date: Thu,  2 Nov 2023 16:51:49 +0100
+Message-Id: <20231102155149.2574209-1-pawel.chmielewski@intel.com>
+X-Mailer: git-send-email 2.37.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6543bb3e.df0a0220.385df.cdb1@mx.google.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 02, 2023 at 04:07:41PM +0100, Christian Marangi wrote:
-> On Thu, Nov 02, 2023 at 04:03:33PM +0100, Andrew Lunn wrote:
-> > > diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-> > > index 421d2b62918f..4b2451dd6c45 100644
-> > > --- a/drivers/net/phy/Kconfig
-> > > +++ b/drivers/net/phy/Kconfig
-> > > @@ -68,6 +68,8 @@ config SFP
-> > >  
-> > >  comment "MII PHY device drivers"
-> > >  
-> > > +source "drivers/net/phy/aquantia/Kconfig"
-> > > +
-> > >  config AMD_PHY
-> > >  	tristate "AMD and Altima PHYs"
-> > >  	help
-> > > @@ -96,11 +98,6 @@ config ADIN1100_PHY
-> > >  	  Currently supports the:
-> > >  	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
-> > >  
-> > > -config AQUANTIA_PHY
-> > > -	tristate "Aquantia PHYs"
-> > > -	help
-> > > -	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
-> > > -
-> > 
-> > Does this move the PHY in the make menuconfig menu? We try to keep it
-> > sorted based on the tristate string.
-> >
-> 
-> Oh wasn't aware... Yes it does move it to the top of the list... I can
-> just move the source entry where AQUANTIA_PHY was...
+From: Liang-Min Wang <liang-min.wang@intel.com>
 
-Yes, that would be best.
+In cases when VF sends malformed packets that are classified as malicious,
+sometimes it causes Tx queue to freeze. This frozen queue can be stuck
+for several minutes being unusable. This behavior can be reproduced with
+DPDK application, testpmd.
 
-Thanks
+When Malicious Driver Detection event occurs, perform graceful VF reset
+to quickly bring VF back to operational state. Add a log message to
+notify about the cause of the reset.
 
-    Andrew
-
+Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
+Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
-pw-bot: cr
+Changelog
+v1->v2:
+Reverted unneeded formatting change, fixed commit message, fixed a log
+message with a correct event name.
+---
+
+ drivers/net/ethernet/intel/ice/ice_main.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 3c9419b05a2a..ee9752af6397 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -1839,6 +1839,10 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 			if (netif_msg_tx_err(pf))
+ 				dev_info(dev, "Malicious Driver Detection event TX_TCLAN detected on VF %d\n",
+ 					 vf->vf_id);
++			dev_info(dev,
++				 "PF-to-VF reset on VF %d due to Tx MDD TX_TCLAN event\n",
++				 vf->vf_id);
++			ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
+ 		}
+ 
+ 		reg = rd32(hw, VP_MDET_TX_TDPU(vf->vf_id));
+@@ -1849,6 +1853,10 @@ static void ice_handle_mdd_event(struct ice_pf *pf)
+ 			if (netif_msg_tx_err(pf))
+ 				dev_info(dev, "Malicious Driver Detection event TX_TDPU detected on VF %d\n",
+ 					 vf->vf_id);
++			dev_info(dev,
++				 "PF-to-VF reset on VF %d due to Tx MDD TX_TDPU event\n",
++				 vf->vf_id);
++			ice_reset_vf(vf, ICE_VF_RESET_NOTIFY);
+ 		}
+ 
+ 		reg = rd32(hw, VP_MDET_RX(vf->vf_id));
+-- 
+2.37.3
 
 
