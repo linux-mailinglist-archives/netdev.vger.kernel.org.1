@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-45671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9F17DEED2
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:27:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 686DD7DEF14
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 10:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443F01C20E3E
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 09:27:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21A7B2819F0
+	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 09:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5C61170F;
-	Thu,  2 Nov 2023 09:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A874811C91;
+	Thu,  2 Nov 2023 09:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k7BwknFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64CF11701
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 09:27:17 +0000 (UTC)
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx311.baidu.com [180.101.52.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE7C2181
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 02:27:15 -0700 (PDT)
-Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 69DDC7F0003D;
-	Thu,  2 Nov 2023 17:27:12 +0800 (CST)
-From: Li RongQing <lirongqing@baidu.com>
-To: linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] net/smc: avoid atomic_set and smp_wmb in the tx path when possible
-Date: Thu,  2 Nov 2023 17:27:12 +0800
-Message-Id: <20231102092712.30793-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.9.4
-X-Spam-Level: *
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F956FBD
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 09:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E99E2C433C9;
+	Thu,  2 Nov 2023 09:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1698918024;
+	bh=7UEs7fJ1ZxH7Ku2sKGa7TMrZJ/vd/dBfaI1oaM2315s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k7BwknFGCRgcRPzOdGQVSurloOYmp58TDksCUTH7gDeEj7sGs8u/2+VPyUTY0gDYx
+	 yY2bIiOxqb08VyLyXZzMn98mgF4znfbXjWOnTr54+jZjrT8WYupnJsK8ZTketXmB4c
+	 ZiHQoNR3PwWU0QYImkWNpW80MbizjiqjzW1ppGs/bkNAiCnLZz8q0zWvtM3hbX5WUW
+	 I0Aq6E9tYZMeUs2jLngJaevFmJzfLe3WcH2OFvOXv8VfhMh838kMzqPVNrLR8OVmOD
+	 BM+Uc6yU1rZgGTERYPl5wvGZ/iUSnbIo6QegCdALEfktPOgf+kQqGC1KOZPbPnSRIU
+	 xisUa3LP+ueFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC98AC4316B;
+	Thu,  2 Nov 2023 09:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] inet: shrink struct flowi_common
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169891802383.16011.17304879305279564451.git-patchwork-notify@kernel.org>
+Date: Thu, 02 Nov 2023 09:40:23 +0000
+References: <20231025141037.3448203-1-edumazet@google.com>
+In-Reply-To: <20231025141037.3448203-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, wenxu@ucloud.cn
 
-these is less opportunity that conn->tx_pushing is not 1, since
-tx_pushing is just checked with 1, so move the setting tx_pushing
-to 1 after atomic_dec_and_test() return false, to avoid atomic_set
-and smp_wmb in tx path when possible
+Hello:
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- net/smc/smc_tx.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
-index 3b0ff3b..72dbdee 100644
---- a/net/smc/smc_tx.c
-+++ b/net/smc/smc_tx.c
-@@ -667,8 +667,6 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
- 		return 0;
- 
- again:
--	atomic_set(&conn->tx_pushing, 1);
--	smp_wmb(); /* Make sure tx_pushing is 1 before real send */
- 	rc = __smc_tx_sndbuf_nonempty(conn);
- 
- 	/* We need to check whether someone else have added some data into
-@@ -677,8 +675,11 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
- 	 * If so, we need to push again to prevent those data hang in the send
- 	 * queue.
- 	 */
--	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing)))
-+	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing))) {
-+		atomic_set(&conn->tx_pushing, 1);
-+		smp_wmb(); /* Make sure tx_pushing is 1 before real send */
- 		goto again;
-+	}
- 
- 	return rc;
- }
+On Wed, 25 Oct 2023 14:10:37 +0000 you wrote:
+> I am looking at syzbot reports triggering kernel stack overflows
+> involving a cascade of ipvlan devices.
+> 
+> We can save 8 bytes in struct flowi_common.
+> 
+> This patch alone will not fix the issue, but is a start.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] inet: shrink struct flowi_common
+    https://git.kernel.org/netdev/net/c/1726483b79a7
+
+You are awesome, thank you!
 -- 
-2.9.4
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
