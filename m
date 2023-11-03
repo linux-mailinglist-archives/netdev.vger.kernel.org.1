@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-45836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7550D7DFD3B
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 00:12:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 736437DFDC9
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 02:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A41E31C20F55
-	for <lists+netdev@lfdr.de>; Thu,  2 Nov 2023 23:12:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB15C281D85
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 01:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A577C224D1;
-	Thu,  2 Nov 2023 23:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C15E71101;
+	Fri,  3 Nov 2023 01:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="WHiTrOzb"
+	dkim=pass (2048-bit key) header.d=selfnet.de header.i=@selfnet.de header.b="bjoNWvY1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6BF224CA
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 23:12:22 +0000 (UTC)
-Received: from out203-205-251-82.mail.qq.com (out203-205-251-82.mail.qq.com [203.205.251.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F3A1A8;
-	Thu,  2 Nov 2023 16:12:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1698966729; bh=UYgiV3kDQvNhdJuIIAC0WmDVYjGsyq5maK2QWju/Aqk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WHiTrOzbDrgl0lSAnGxDAowQozRrC90b3+405bfQ5U2wmeEVA2dZv+Jnaxl6lfra8
-	 OEGV7p/S0CMVKRie/CwoM5PBDXl+oY4aKKeR3JOuIWKMDVH0WyYryzZtjCUPNJEMcR
-	 zsi9v/8jxVJVRBdJ78pNFRsxtwdPFT59YjjI3gKQ=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
-	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
-	id 3062ECDD; Fri, 03 Nov 2023 07:12:06 +0800
-X-QQ-mid: xmsmtpt1698966726tduk86oje
-Message-ID: <tencent_66A4C45E9778B760C6C3D36AE37509600305@qq.com>
-X-QQ-XMAILINFO: MyIXMys/8kCtDsSJJtgLNyGQJASOPSiqxqF5hCwxi3KR2iRxGsfw6go/ewnJfj
-	 jI/72sIPJUrAFkl06ZIzVmHZs3qXZNXQK3cPDEbLkgvJrcCyREeFV1913sUPEG6ha2Gs5mINMElE
-	 jSFu/KKpxSJVV8uKAzD8ulvQxb5tqibzke8q1O1v+gzFbHepb2dUig7GJyknNykNgWHPbhKm09cx
-	 yD4QM36yv17uDLWkusYtm/QGmJ9eVg4++eiouzsVud2bqA7HipvAT731H7KEl5Qjmd9rJ80uZlj8
-	 TPUuurONyWaVkb46R7zZ/EpUTwK+Qul2IX9WJIKEDouCci/FBkaEMDUx34EgLdVjG1JXR5y7ouyI
-	 olMkSKTiyqNo4tTHTveF+2ZKq6SOukyqSXTna1aLeK960zP4T+Okha8P8UYnRwS7EqLzaYUR18o3
-	 DM5SgarLvqRLIZObTKok1XdSzO/K+o960ROzg+sySBT/f++EFDI/aYzmNOirnu8IYsbgU76XcKiY
-	 JmPML07c9pkNyOzRHn1AmPMUDYhiG4wU2Xy5vnwnmP0yXadc0gLCWa/uiuXqXRdnKOOGcDyLkfs9
-	 3ar5tEGbduENjwEAmkT2EMz9ZyBnPzHA4/tuDz/YXp8NK71gkRce1xQJ/2lGJGB7Q00T8DDg+g07
-	 o85vbwWoaVpuQVJTz77JIh1kMW+1bqXYTUkrHO4uQaaLvITiUOww3aQT9M0QEr78yAERtx4PNZ5h
-	 lcWnNTdJ5LwNqyBOOTSbXq6xUuEfldyiYTJW6qNE71tKaE0sMS3PHVbIVptipynuEtGgveN4ac5U
-	 g0WqmtKrwLeX87S7GmTt9Mo6DnZ2XiNJZKmLiwi4z/DvVdXJqrtQ9hqyuuKovzCCEvf82+EqUF1N
-	 6sA1TcqTAvN0AlhqTaDVgrRiQYYNqxOqjP0keIC+IK2tcS/azkSZPY0atEQm5DVnwFeBB1T8iVOl
-	 8zMUxU98E=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Edward Adam Davis <eadavis@qq.com>
-To: jeremy@jcline.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	habetsm.xilinx@gmail.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	reibax@gmail.com,
-	richardcochran@gmail.com,
-	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net-next V2] ptp: fix corrupted list in ptp_open
-Date: Fri,  3 Nov 2023 07:12:07 +0800
-X-OQ-MSGID: <20231102231206.358053-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <ZUPnlsm91R72MBs7@dev>
-References: <ZUPnlsm91R72MBs7@dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2D910E5
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 01:47:55 +0000 (UTC)
+Received: from mail-1.server.selfnet.de (mail-1.server.selfnet.de [141.70.126.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEC2198;
+	Thu,  2 Nov 2023 18:47:48 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 43838402F7;
+	Fri,  3 Nov 2023 02:47:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=selfnet.de; s=selfnet;
+	t=1698976060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CS7Jy0RmpWKZtYX8kkokoR7rFAe5FlYr840NCfh7jGU=;
+	b=bjoNWvY1keqSIO+m4yp4akMI8QlxQKPYRDoRp7Sbh27P0kcta/SNNIil/fQ05zb4hUd6Dy
+	baeWW5qpvJ0PDcWeesr48kSrYdMsQbqNycpQouOLmy8WnYCRQllZkXIU8yOwBXvwnU8t6q
+	7w8h1lQ+EHb9wiCkB566Giv30kjc7Mo6XkgdA1rGTgERPV51TIcxNcRaednOD80w3ApvA1
+	j5npJUb2BReiEmkJod2HYzgl+XpZF/IQAy8vQvInaqld2Gnk2Xe8lSoV5VOzZNyxafEyJy
+	/l3Cz+Jxz7DEEOt8JaGIrR5rkcaj1F6WLNYoVE1o/tIqttNXYNsng6ttRjl8Zg==
+Authentication-Results: mail-1.server.selfnet.de;
+	auth=pass smtp.auth=marcovr smtp.mailfrom=marcovr@selfnet.de
+From: Marco von Rosenberg <marcovr@selfnet.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Marco von Rosenberg <marcovr@selfnet.de>
+Subject: Re: [PATCH] net: phy: broadcom: Wire suspend/resume for BCM54612E
+Date: Fri, 03 Nov 2023 02:47:38 +0100
+Message-ID: <4890615.31r3eYUQgx@5cd116mnfx>
+In-Reply-To: <fe3ad92f-31d9-4509-b851-017218229e19@lunn.ch>
+References:
+ <20231030225446.17422-1-marcovr@selfnet.de> <5414570.Sb9uPGUboI@5cd116mnfx>
+ <fe3ad92f-31d9-4509-b851-017218229e19@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Jeremy,
+On Wednesday, November 1, 2023 11:06:56 PM CET Andrew Lunn wrote:
+> On Wed, Nov 01, 2023 at 10:42:52PM +0100, Marco von Rosenberg wrote:
+> > On Tuesday, October 31, 2023 1:31:11 AM CET Andrew Lunn wrote:
+> > > Are we talking about a device which as been suspended? The PHY has
+> > > been left running because there is no suspend callback? Something then
+> > > triggers a resume. The bootloader then suspends the active PHY? Linux
+> > > then boots, detects its a resume, so does not touch the hardware
+> > > because there is no resume callback? The suspended PHY is then
+> > > useless.
+> > 
+> > Hi Andrew,
+> > 
+> > thanks for your feedback. I guess a bit of context is missing here. The
+> > issue has nothing to do with an ordinary suspension of the OS. The main
+> > point is that on initial power-up, the bootloader suspends the PHY before
+> > booting Linux. With a resume callback defined, Linux would call it on
+> > boot and make the PHY usable.
+> 
+> Ah, so you rely on phy_attach_direct() calling phy_resume(phydev).
+> 
+> This seems an odd way to solve the problem. It was not Linux which
+> suspend the PHY, so using resume is asymmetric.
+> 
+> I think soft_reset() or config_init() should be taking the PHY out of
+> suspend.
 
-On Thu, 2 Nov 2023 14:16:54 -0400 Jeremy Cline wrote:
->> There is no lock protection when writing ptp->tsevqs in ptp_open(),
->> ptp_release(), which can cause data corruption, use mutex lock to avoid this 
->> issue.
->> 
->> Moreover, ptp_release() should not be used to release the queue in ptp_read(),
->> and it should be deleted together.
->> 
->> Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
->> Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
->> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->> ---
->>  drivers/ptp/ptp_chardev.c | 11 +++++++++--
->>  drivers/ptp/ptp_clock.c   |  3 +++
->>  drivers/ptp/ptp_private.h |  1 +
->>  3 files changed, 13 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
->> index 282cd7d24077..e31551d2697d 100644
->> --- a/drivers/ptp/ptp_chardev.c
->> +++ b/drivers/ptp/ptp_chardev.c
->> @@ -109,6 +109,9 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
->>  	struct timestamp_event_queue *queue;
->>  	char debugfsname[32];
->>  
->> +	if (mutex_lock_interruptible(&ptp->tsevq_mux)) 
->> +		return -ERESTARTSYS;
->> +
->>  	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
->>  	if (!queue)
->>  		return -EINVAL;
->> @@ -132,15 +135,20 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
->>  	debugfs_create_u32_array("mask", 0444, queue->debugfs_instance,
->>  				 &queue->dfs_bitmap);
->>  
->> +	mutex_unlock(&ptp->tsevq_mux);
->
->The lock doesn't need to be held so long here. Doing so causes a bit of
->an issue, actually, because the memory allocation for the queue can fail
->which will cause the function to return early without releasing the
->mutex.
->
->The lock only needs to be held for the list_add_tail() call.
->
->>  	return 0;
->>  }
->>  
->>  int ptp_release(struct posix_clock_context *pccontext)
->>  {
->>  	struct timestamp_event_queue *queue = pccontext->private_clkdata;
->> +	struct ptp_clock *ptp =
->> +		container_of(pccontext->clk, struct ptp_clock, clock);
->>  	unsigned long flags;
->>  
->>  	if (queue) {
->> +		if (mutex_lock_interruptible(&ptp->tsevq_mux)) 
->> +			return -ERESTARTSYS;
->>  		debugfs_remove(queue->debugfs_instance);
->>  		pccontext->private_clkdata = NULL;
->>  		spin_lock_irqsave(&queue->lock, flags);
->> @@ -148,6 +156,7 @@ int ptp_release(struct posix_clock_context *pccontext)
->>  		spin_unlock_irqrestore(&queue->lock, flags);
->>  		bitmap_free(queue->mask);
->>  		kfree(queue);
->> +		mutex_unlock(&ptp->tsevq_mux);
->
->Similar to the above note, you don't want to hold the lock any longer
->than you must.
->
->While this patch looks to cover adding and removing items from the list,
->the code that iterates over the list isn't covered which can be
->problematic. If the list is modified while it is being iterated, the
->iterating code could chase an invalid pointer.
-Thanks for your opinions, I will double check it.
+I agree with all of your points. This is just one way which happens to solve
+this specific problem. Of course it might be asymmetric to see the patch as
+a solution to my problem. However is there anything fundamentally wrong with
+adding suspend/resume callbacks? I see some other drivers having these
+callbacks defined and some not (it seems a bit inconsistent throughout the
+drivers in broadcom.c to be honest).
 
-Thanks,
-edward
+I'm wondering if I should just omit this whole "motivation" paragraph in the 
+commit message and just use the commit message of commit 38b6a9073007 ("net: 
+phy: broadcom: Wire suspend/resume for BCM50610 and BCM50610M") as a template.
+I mean, regardless of my motivation, I would say it makes sense for this PHY 
+to support suspend and resume.
+
+	Marco
+
 
 
