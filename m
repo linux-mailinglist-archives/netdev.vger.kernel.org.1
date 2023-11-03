@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-45989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F6F7E0BBD
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 00:03:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B737E0BD9
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 00:04:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4031281F4F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 23:03:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0759AB215AC
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 23:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3252250E2;
-	Fri,  3 Nov 2023 23:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61831250E4;
+	Fri,  3 Nov 2023 23:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ca9/CG2X"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ba6tRctK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA4C2374F
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 23:03:04 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C19D61
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:03:02 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5435336ab0bso4305807a12.1
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 16:03:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DC524A1C
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 23:04:45 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D49D48
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:04:43 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53dd752685fso4384513a12.3
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 16:04:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1699052581; x=1699657381; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1699052682; x=1699657482; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jb/RCnbHQEqLI2m14Uypn4J41pZATvb3gAI0kusrGiM=;
-        b=Ca9/CG2XCJp0OakbkGIL552KETLHtWKzELjMvauJaXvBJCRQmd8ikFkg4kh7XoRaiA
-         sKTnlEhTN8VXDSeG9FiWx8yJ7P7j2RcI2CqF3PAkzmi03JMfiFhz6RcnGVtrmJGxqq3V
-         PZPcNCyRSJ90ZVKcisQJRnVyHcDsS6Ums6YcM=
+        bh=7JpWbuxpncRWdavZzRt06uVfG5vROahSu4ieKsNHNJA=;
+        b=ba6tRctK892rJbPhcwYcOnZxGZoJhobzvpd6b6yoK95/uuDknENV/8qpjFR5BLE0B0
+         F2Ke5PXTbohUqQXoHiopCKHhwq9xkbClTKVWqqOBovpMTnnYhzgMt61zM1Q4Wu223wfK
+         EhtZK8zsUgnTIb69JKFYJJpShq7jTO0GmKd4o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699052581; x=1699657381;
+        d=1e100.net; s=20230601; t=1699052682; x=1699657482;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jb/RCnbHQEqLI2m14Uypn4J41pZATvb3gAI0kusrGiM=;
-        b=Ex/inglVzazUjRprZKEjVn5bVBR6tDCVG12zrMxEfNn0BvJtZEyLqVFK7oxSX8BKGH
-         QtskqKo+qzGZ/Tmujy2BqSJB0wrhVXTH3DPbGad4MX+HXHueEBSV0nFJHlGER10Ls5wE
-         gHJWRfL261P22zvVsl1MbY7ePCxnxf9eyuEut2Wa/ng/cThzHDzU+QCMYVSRKzufc7HT
-         pm5Ryc7v6qb3ii46UU8cowoq9OwcbwdSZmo+d6Vj0WcBo4bu3ugbEMd23i3gRjgk7AE2
-         jLZOlY92skyfhDvyRuxu+MUQKnK61laHpJ+EjwGEJF8jcFklyN7WSEwNeJyMsLhrLG22
-         ZQiQ==
-X-Gm-Message-State: AOJu0Yww2isdmVMgxf8fCgFToKucSNEvAhZxtcybBNFXPzdUPIyMA7yC
-	veNo8kWK3qve6vjh1ad4kSSyORZ8pvrwY25ccKe8Yg==
-X-Google-Smtp-Source: AGHT+IG+gHNS6mRTI5uNDyOUDcWAqhsbZusA0xrfnF6OpESfdGP1U4TzGrLjg5gsK/e3rD4uEqNnSX60C4DnUrtJcCg=
-X-Received: by 2002:a50:9f24:0:b0:543:e42e:128e with SMTP id
- b33-20020a509f24000000b00543e42e128emr5721744edf.37.1699052580992; Fri, 03
- Nov 2023 16:03:00 -0700 (PDT)
+        bh=7JpWbuxpncRWdavZzRt06uVfG5vROahSu4ieKsNHNJA=;
+        b=TPWokIn5ILzuTt7wS3WUicexwEctLQ0ek30IoL+Dt+jAWuyi8wmMYeQ9MZVd4kmJWS
+         Du4C3Ap9zc5z+V91Z4k5W9PbJm74eiELF0PFwU/aRe21tMISvQ7WvJI5ACG1811i3yf7
+         JW18XI4uk8uGfmQnHE6U9zeLHxT9cmken2/GRv8cQRjrtmTDrv4zFaewhdDl2RY4sAsH
+         gaVDcVbFW1hb/gb6J9IVJcr6Nm+UwF5XUxUGBx6m2ph8ocEZ/xhylG58UwLs7Qfn2Vr5
+         3KayDv90mzsR2V31X6ece4ErgUJN9S9ADnZEElnDEOLuxmzZWWRO1Q2cOuUreGYsKKrG
+         XWpw==
+X-Gm-Message-State: AOJu0YyMciNzNNwcwGeeXW7qtyabEGv+IKlwY2hFe68d8mK4KrJJQr9j
+	ATrE0VWmXyOzAH0zgTLjUjhkDMsnunHjbOrQM5bivA==
+X-Google-Smtp-Source: AGHT+IG6VAaIwj0xJPL0vPONhzef1XDv34ViGhQs7jYkNrd93Tp357IXa0Nt8EzP2IiQAOvmX2FbbdjfMDXHKuGCUjs=
+X-Received: by 2002:a50:ab12:0:b0:543:5db5:2fb7 with SMTP id
+ s18-20020a50ab12000000b005435db52fb7mr10198023edc.6.1699052681958; Fri, 03
+ Nov 2023 16:04:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CACKFLik-Ey1eptrCkhSEp0Oi66kBKnVWa+yDk7-_uzxqSTHb6A@mail.gmail.com>
- <20231103170711.4006756-1-alexey.pakhunov@spacex.com>
-In-Reply-To: <20231103170711.4006756-1-alexey.pakhunov@spacex.com>
+References: <20231103115029.83273-1-george.shuklin@gmail.com> <CALs4sv2XAm1zWw=tHAR2_tXXoBD4WahdpQd9XeUA19xSpx-w_A@mail.gmail.com>
+In-Reply-To: <CALs4sv2XAm1zWw=tHAR2_tXXoBD4WahdpQd9XeUA19xSpx-w_A@mail.gmail.com>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 3 Nov 2023 16:02:49 -0700
-Message-ID: <CACKFLi=ZLAb1Y92LwvqjOGPCuinka7qbHwDP2pkG4-_a7DMorQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] tg3: Increment tx_dropped in tg3_tso_bug()
-To: Alex Pakhunov <alexey.pakhunov@spacex.com>
-Cc: linux-kernel@vger.kernel.org, mchan@broadcom.com, netdev@vger.kernel.org, 
-	prashant@broadcom.com, siva.kallam@broadcom.com, vincent.wong2@spacex.com
+Date: Fri, 3 Nov 2023 16:04:30 -0700
+Message-ID: <CACKFLik-gjwSGRGVX0meuhXs6=YPQX4s=MPpGV+1v7TF0z_X+Q@mail.gmail.com>
+Subject: Re: [PATCH v2] tg3: power down device only on SYSTEM_POWER_OFF
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: George Shuklin <george.shuklin@gmail.com>, netdev@vger.kernel.org, 
+	kai.heng.feng@canonical.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000931d1206094781ea"
+	boundary="000000000000977ca0060947870c"
 
---000000000000931d1206094781ea
+--000000000000977ca0060947870c
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 3, 2023 at 10:07=E2=80=AFAM Alex Pakhunov
-<alexey.pakhunov@spacex.com> wrote:
-> I'm not super familiar with the recommended approach for handling locks i=
-n
-> network drivers, so I spent a bit of tme looking at what tg3 does.
+On Fri, Nov 3, 2023 at 5:19=E2=80=AFAM Pavan Chebbi <pavan.chebbi@broadcom.=
+com> wrote:
 >
-> It seems that there are a few ways to remove the race condition when
-> working with these counters:
->
-> 1. Use atomic increments. It is easy but every update is more expensive
->    than it needs to be. We might be able to say that there specific
->    counters are updated rarely, so maybe we don't care too much.
-> 2. netif_tx_lock is already taken when tx_droped is incremented - wrap
->    rx_dropped increment and reading both counters in netif_tx_lock. This
->    seems legal since tg3_tx() can take netif_tx_lock. I'm not sure how to
->    order netif_tx_lock and tp->lock, since tg3_get_stats64() takes
->    the latter. Should netif_tx_lock be takes inside tp->lock? Should they
->    be not nested?
-> 3. Using tp->lock to protect rx_dropped (tg3_poll_link() already takes it
->    so it must be legal) and netif_tx_lock to protect tx_dropped.
->
-> There are probably other options. Can you recommend an aproach?
+> On Fri, Nov 3, 2023 at 5:21=E2=80=AFPM George Shuklin <george.shuklin@gma=
+il.com> wrote:
+> >
+> > Dell R650xs servers hangs on reboot if tg3 driver calls
+> > tg3_power_down.
+> >
+> > This happens only if network adapters (BCM5720 for R650xs) were
+> > initialized using SNP (e.g. by booting ipxe.efi).
+> >
+> > The actual problem is on Dell side, but this fix allows servers
+> > to come back alive after reboot.
+> >
+> > Signed-off-by: George Shuklin <george.shuklin@gmail.com>
+> > Fixes: 2ca1c94ce0b6 ("tg3: Disable tg3 device on system reboot to avoid=
+ triggering AER")
 
-I recommend using per queue counters as briefly mentioned in my
-earlier reply.  Move the tx_dropped and rx_dropped counters to the per
-queue tg3_napi struct.  Incrementing tnapi->tx_dropped in
-tg3_start_xmit() is serialized by the netif_tx_lock held by the stack.
+Thanks.
 
-Similarly, incrementing tnapi->rx_dropped in the tg3_rx() is serialized by =
-NAPI.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-tg3_get_stats64() can just loop and sum all the tx_dropped and
-rx_dropped counters in each tg3_napi struct.  We don't worry about
-locks here since we are just reading.
-
->
-> Also, this seems like a larger change that should be done separately from
-> fixing the TX stall. Should we land just "[PATCH v2 2/2]"? Should we land
-> the whole patch (since it does not make race condition much worse) and fi=
-x
-> the race condition separately?
->
-
-Yes, we can merge patch #2 first which fixes the stall.  Please repost
-just patch #2 standalone if you want to do that.  Thanks.
-
---000000000000931d1206094781ea
+--000000000000977ca0060947870c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -191,14 +167,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHpaGUr1Gfniq7uxB5AdShrXeGPOIK/5
-upCox3Ttj3V1MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
-MzIzMDMwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINJ/cv5lOWn2i4Q79M5lCxxPbHFwwPYp
+9NBQwC7W6O3qMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+MzIzMDQ0MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQArXs19U79oeBS8UwnkwKCgIOa6Lxp54SRllR0SmIz7pUz/4hVi
-2vHcWVFRbf9Km7/gR9QnM7es8Zk9SITZwF/ZJDoW/TxagpgfbM9px+biVJJnOl9VIxzyCs5KnaP1
-r+YCcyOP3D81hsAM6O8R/tn2UOOt8zLJ43QFVkZ/w8kUH0n9jRu29hnxJOUbLOEMZ5pRBm8LyrLr
-50uZ0ulAKat5LI0z0bWB5xug5rD5zmdggbseBVG3Ufivo3FX0wgZDDfpJqggScvZkF+XslOXv0Uk
-W4Oghub39f2nEyRW6n+LJ83ERXRlPFBWuXrVTF41eWiP5ds9jj5Otc9YkebJ2pNG
---000000000000931d1206094781ea--
+ATANBgkqhkiG9w0BAQEFAASCAQBBf3pHm9E/Bi2I/tReIJq36qH7MEe6DokNNA2EOjy1oSY9bRib
+C8F+OxIBB9QXVQrV0fR+KnGVkc5eoYCaAjrVp6PyCfP0ITWoMQMXnpuGplQdfRxui5YHFSwIfCXF
+5Sqp//CWI7u7xOT1EVxv4tJvQmYdkWq/nrJdLdMo4ANFnPdTENDa5PHCw28sy1KUrbwpE+OiM7sn
+Iwv/11HcXDJnlX/U+Z6Xo8F2nY6ZJEUg/VLLDu+cCYpuBfDM//y3Wyk+4ogdhpbfZobzB6lIdSz1
+2bCJz5+9fAI5UQPzQbR9UbEqq0YX8q9tHn0zWCvsmMpKLMU00YRb3AhjL12psICU
+--000000000000977ca0060947870c--
 
