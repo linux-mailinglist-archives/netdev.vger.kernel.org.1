@@ -1,87 +1,111 @@
-Return-Path: <netdev+bounces-45928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289857E072F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:06:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A94FF7E0730
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1973B2127A
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:06:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 577BB1F217C7
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A921EA78;
-	Fri,  3 Nov 2023 17:06:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107921DFC2;
+	Fri,  3 Nov 2023 17:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vm9C2bhQ"
+	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="WAWiV5Aa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51631DFE8
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:06:23 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8EA4D47;
-	Fri,  3 Nov 2023 10:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zceykpx/VhpqN1zRb1lvrV0ipA+xbJD7LJTS3nOqa80=; b=vm9C2bhQR1dTP96MoYHCSqw2HI
-	9CyvuRDnDaHdB1dlqTbSrfS0Ma9rtBnj4J1g03waAew+KhWboI35fnY3asv7byH8Ed89ZIKBu3eC7
-	9DxARIHREFWkcEEKe33qz83GQSAZfptSMwJnag+cRFpMMjBcvEqAyid38qIHNToC0JnE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qyxcW-000peM-Vr; Fri, 03 Nov 2023 18:06:08 +0100
-Date: Fri, 3 Nov 2023 18:06:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Jerin Jacob Kollanukkaran <jerinj@marvell.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>,
-	Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: Re: [EXT] Re: [net PATCH] octeontx2: Fix klockwork and coverity
- issues
-Message-ID: <bafea4cc-9bf9-4485-a85b-206b82e0b21c@lunn.ch>
-References: <20231101074919.2614608-1-sumang@marvell.com>
- <335216cc-3412-4898-8b88-10405ff7c316@lunn.ch>
- <SJ0PR18MB521648A973DF026521B57D39DBA5A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4392C2107
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:07:29 +0000 (UTC)
+Received: from mx4.spacex.com (mx4.spacex.com [192.31.242.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08488E;
+	Fri,  3 Nov 2023 10:07:24 -0700 (PDT)
+Received: from pps.filterd (mx4.spacex.com [127.0.0.1])
+	by mx4.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3GiWa6010607;
+	Fri, 3 Nov 2023 10:07:21 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=dkim;
+ bh=Jqxpo9JM76UDQUoSzJ4bWswVG1V5NnihjPx+B3E+hw0=;
+ b=WAWiV5AaBYkTA4iJHnjMAkZMV6Lf8ZaXT+Yp/SkJ7eBNhVAKLlZqFnaW3MDSckmnVfaX
+ hRDRrFTngcT2bfbuck8/Nqb3V5s1XbgJHTufXKqsv623zjxVCYSNlriizbLbmfD97PXl
+ darkarofvWANMH50AKqSnlDjykKL+pHV9EUibPbJKUeqwAnNqI+PQ61ezeA1n5WX5cWA
+ bMBx2V5y49mvL/WJqRhhhcr8AhydpYXInetS3lYSd9oMyydzSb+Njg1XfLP1NBZ//QnL
+ UtzRJz58Z0QdOpUvqqtk5I+rHU826dAaW+u9O6tnxsUAYHHegyXDo44O9Yt+Gw5J3EhP lQ== 
+Received: from smtp.spacex.corp ([10.34.3.234])
+	by mx4.spacex.com (PPS) with ESMTPS id 3u0yqn8mwh-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 03 Nov 2023 10:07:21 -0700
+Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 3 Nov 2023 10:07:21 -0700
+From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+To: <michael.chan@broadcom.com>
+CC: <alexey.pakhunov@spacex.com>, <linux-kernel@vger.kernel.org>,
+        <mchan@broadcom.com>, <netdev@vger.kernel.org>,
+        <prashant@broadcom.com>, <siva.kallam@broadcom.com>,
+        <vincent.wong2@spacex.com>
+Subject: Re: [PATCH v2 1/2] tg3: Increment tx_dropped in tg3_tso_bug()
+Date: Fri, 3 Nov 2023 10:07:11 -0700
+Message-ID: <20231103170711.4006756-1-alexey.pakhunov@spacex.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <CACKFLik-Ey1eptrCkhSEp0Oi66kBKnVWa+yDk7-_uzxqSTHb6A@mail.gmail.com>
+References: <CACKFLik-Ey1eptrCkhSEp0Oi66kBKnVWa+yDk7-_uzxqSTHb6A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ0PR18MB521648A973DF026521B57D39DBA5A@SJ0PR18MB5216.namprd18.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ht-dc-ex-d4-n3.spacex.corp (10.34.3.241) To
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
+X-Proofpoint-ORIG-GUID: Slrv5khXa-Qp2xS2LvVH4u5DDRv_8ShW
+X-Proofpoint-GUID: Slrv5khXa-Qp2xS2LvVH4u5DDRv_8ShW
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=972 adultscore=0 spamscore=0 malwarescore=0
+ suspectscore=0 priorityscore=1501 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2310240000 definitions=main-2311030143
 
-> [Suman] Yes, backporting to net was the intention. Do we need to put all the fixes tags? Because the fixes are from different commits.
+> This is prone to race conditions if we have more than one TX queue.
 
-When you break it up into multiple patches, the fixes-tag will get
-simpler.
+Yes, indeed.
 
-> Are there any generic submission steps for klockwork fixes?
+> The original driver code only supported one TX queue and the counters
+> were never modified properly to support multiple queues.  We should
+> convert them to per queue counters by moving tx_dropped and rx_dropped
+> to the tg3_napi struct.
 
-Take a look at
+I'm not super familiar with the recommended approach for handling locks in
+network drivers, so I spent a bit of tme looking at what tg3 does.
 
-https://docs.kernel.org/process/stable-kernel-rules.html
+It seems that there are a few ways to remove the race condition when
+working with these counters:
 
-In particular, the "It must fix a real bug that bothers people".
+1. Use atomic increments. It is easy but every update is more expensive
+   than it needs to be. We might be able to say that there specific
+   counters are updated rarely, so maybe we don't care too much.
+2. netif_tx_lock is already taken when tx_droped is incremented - wrap
+   rx_dropped increment and reading both counters in netif_tx_lock. This
+   seems legal since tg3_tx() can take netif_tx_lock. I'm not sure how to
+   order netif_tx_lock and tp->lock, since tg3_get_stats64() takes
+   the latter. Should netif_tx_lock be takes inside tp->lock? Should they
+   be not nested?
+3. Using tp->lock to protect rx_dropped (tg3_poll_link() already takes it
+   so it must be legal) and netif_tx_lock to protect tx_dropped.
 
-Some issues found by static code tools don't actually bother
-people. So you might want some patches to net-next, not net.
+There are probably other options. Can you recommend an aproach?
 
-     Andrew
+Also, this seems like a larger change that should be done separately from
+fixing the TX stall. Should we land just "[PATCH v2 2/2]"? Should we land
+the whole patch (since it does not make race condition much worse) and fix
+the race condition separately?
+
+Alex.
 
