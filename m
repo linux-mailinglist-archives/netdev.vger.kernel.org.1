@@ -1,117 +1,119 @@
-Return-Path: <netdev+bounces-45926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46AE87E0715
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:57:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C697E072C
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EC9281DA3
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 16:57:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D54DB2134F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804941C6AE;
-	Fri,  3 Nov 2023 16:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86ACB1DDF4;
+	Fri,  3 Nov 2023 17:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Evq6DIQO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCKKREoz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B850E1D6A1
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:57:31 +0000 (UTC)
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 317211BD
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:57:30 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32fbe003761so291380f8f.2
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 09:57:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A9F1C6AE
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:05:29 +0000 (UTC)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B71A1BF;
+	Fri,  3 Nov 2023 10:05:28 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-5094cb3a036so2456260e87.2;
+        Fri, 03 Nov 2023 10:05:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699030648; x=1699635448; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0lIsbDHPwaa1oft7g9fsOhHYzHACUbAbiF4uUBUfwbY=;
-        b=Evq6DIQOxByYYO7QSeQTHoS2dTq9/w30oya392LbIXOsFK0eq705Jn5vlK1hLfoMs5
-         CLU+mfUe6kT+aex+6nBXfVWVC7XbUFhyJkNleGfEAetrfcBkwnP7TZfyI6lWMrEXUyXA
-         AT4w2uwPdUK/1dHuK0FpQeo6Ux0t3O0KXmfWFXdX1GTrmWcYgP+Yhlbct8e+C/NCkZkp
-         iC6rMbEkPis4KEhwr9+rz8qCVO4OPIfXtXzOGthVDD+O7g02bPrGJbD9h0xDh1qfKSXX
-         7CTTMyTGViepzjAmWe3ulyUxQAOxzq4KF7BPIXhW/XrEeJglH5qpjKAwUPUuLeSxFj9b
-         297Q==
+        d=gmail.com; s=20230601; t=1699031126; x=1699635926; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ra48a/diU9zU4ICxF1SoHC79GMLCW1QW6hYOR1nW/k8=;
+        b=UCKKREozCId+2rb1w4LEl0RuFDQq7/5c0r51wj2TbmAkv0C+uHtYqbF8aJoZreAI+b
+         Mavbh4vwZS0d7dHw1SWDTxkdJE5K9ATQNWxLS/Y3txLQuXNuQ7Rps786hkkl/GbVKwN+
+         KXav4Glv6TFo2j5bGzs4k8oz98/VCmsyjX/Lutl7RmDd1LxX+rv3XhHCnbG1BX/IZeJo
+         zR9QUBf50NWYG0HAFFuSAQ3IPavAFGa3oewBYS+drTXVsHUvg5Uz3j5Hby3nbrle1JZo
+         JTeE4+0C0dBKgYZGoKVieGjTWYwn29xrQvWGarQpAnabApKW4Kl8+itxYMa4nn0JsWIM
+         lmLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699030648; x=1699635448;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0lIsbDHPwaa1oft7g9fsOhHYzHACUbAbiF4uUBUfwbY=;
-        b=p8uCT+JOam551gnVi/oMdO32lee/5MHdccE8OLpqErhZHUq6uJcydi/z+8IO0BviDr
-         Qjb8fW19QvgOxCWLMM2Z64gvoiq2H9At9gOi0SCSo3S6xQKSOTdKadHXnFekeSNq343L
-         o2nT6+AOn3nPor8iAtnoF6hmNOI+xueTbbWo64pGp158fdmfPfIf0NAbL96a5jy9cf+z
-         puKZqTAXgc+tWOCkNstgA91TracXsvMQJGekaZKurCGMY73SjHvGKt75S0hLOd1q/6x9
-         c69OycaY4phmVmWkcWQQX6VXUNhNpPxqIfjlG3JbOh537B2mVrMWYiyaneW7wNVrvLIo
-         bp2w==
-X-Gm-Message-State: AOJu0YwoObounLdbBoMSYu9d1ZyxvLtixNCLENMAIxWTABl4IdjrakUF
-	VE/klV03SbEFmca92o2WViMeZX3u/9nxxAfaoEUB5A==
-X-Google-Smtp-Source: AGHT+IHsyB2RMiwtGQtmp5D41evpEcLf0w+GRDtt6AMs5gXHG7mDc80QXHpPVY9wrU1VMaW7Ifo9PRPl2ELGlTdes+M=
-X-Received: by 2002:a05:6000:12c5:b0:32d:9755:44f1 with SMTP id
- l5-20020a05600012c500b0032d975544f1mr17649157wrx.32.1699030648342; Fri, 03
- Nov 2023 09:57:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1699031126; x=1699635926;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ra48a/diU9zU4ICxF1SoHC79GMLCW1QW6hYOR1nW/k8=;
+        b=jmZXuLCDw/PrwT/YC5/dD4cyi16RsPbd9AJMmk49+KnQUwQ4wWWYJIr8j2x14xj0SP
+         dvRTJ1s8MCArPOz7XtYrcEn3I4Fs1718VRjAX90gGb+DhsaQPRWHh6Md4UvYXNQZGwTQ
+         QnuT677HKMW034LY5330P2lQdIrdT5Xc49j3nO+d4BLIjNwqlvo/IhxsN36y016Ofkgx
+         QTeuJiWOdFYGRZSRWRvUoz5KOK05u049QQMiyxP4lrUB184IIRSN0IbcQY/AoffFKEE5
+         nCg7BngSBUGH8YUf0ci0WeZ50CHaFJ7h8Ic6g3BOjQLIer1lY8maIpqil5fFsLTZJe7O
+         rBbw==
+X-Gm-Message-State: AOJu0YwkOS4sjaaIG6LPJevoioKdwLSSmH7xuUkUJzZcP5qsBKmHHfvD
+	o1EdxxfyOFZP8f8Qa8HOcByuBxhm1cazvdPGCQE=
+X-Google-Smtp-Source: AGHT+IF7SywHLKeV2yNChg8/96UC4L44wmo1ar+oTLz/4SylqZQZ0qPk6t4P3rh05RvrE+cGXMZChl7IB03gIFPQkqk=
+X-Received: by 2002:ac2:4d93:0:b0:507:b074:ecd4 with SMTP id
+ g19-20020ac24d93000000b00507b074ecd4mr16171692lfe.7.1699031125964; Fri, 03
+ Nov 2023 10:05:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
- <ZUStrQCqBjBBB6dc@infradead.org>
-In-Reply-To: <ZUStrQCqBjBBB6dc@infradead.org>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Fri, 3 Nov 2023 09:57:17 -0700
-Message-ID: <CAKwvOd=voKM+kPWa=toFfWDvq2gOw7Q0yyjq7ragxmPS7U5HBQ@mail.gmail.com>
-Subject: Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, edumazet@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, trix@redhat.com, 
-	0x7f454c46@gmail.com, fruggeri@arista.com, noureddine@arista.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, llvm@lists.linux.dev, 
-	patches@lists.linux.dev, Thorsten Leemhuis <regressions@leemhuis.info>
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
+ <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
+ <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
+ <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
+ <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com> <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
+In-Reply-To: <CACRpkdaoBo0S0RgLhacObd3pbjtWAfr6s3oizQAHqdB76gaG5A@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Fri, 3 Nov 2023 14:05:14 -0300
+Message-ID: <CAJq09z58A1ZkRfESHU4-Ouv9JYCfDctJ7L7TS2rGRkpDChLbxA@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 3, 2023 at 1:22=E2=80=AFAM Christoph Hellwig <hch@infradead.org=
-> wrote:
+> > [    3.967086] realtek-smi switch: set MAC: 42:E4:F5:XX:XX:XX
 >
-> On Tue, Oct 31, 2023 at 01:23:35PM -0700, Nathan Chancellor wrote:
-> > Clang warns (or errors with CONFIG_WERROR=3Dy) when CONFIG_TCP_AO is se=
-t:
-> >
-> >   net/ipv4/tcp_output.c:663:2: error: label at end of compound statemen=
-t is a C23 extension [-Werror,-Wc23-extensions]
-> >     663 |         }
-> >         |         ^
-> >   1 error generated.
-> >
-> > On earlier releases (such as clang-11, the current minimum supported
-> > version for building the kernel) that do not support C23, this was a
-> > hard error unconditionally:
-> >
-> >   net/ipv4/tcp_output.c:663:2: error: expected statement
-> >           }
-> >           ^
-> >   1 error generated.
-> >
-> > Add a semicolon after the label to create an empty statement, which
-> > resolves the warning or error for all compilers.
+> Unrelated: I have seen other DSA switches "inherit" the MAC of the
+> conduit interface (BRCM). I wonder if we could do that too instead
+> of this random MAC number. Usually the conduit interface has a
+> properly configured MAC.
 >
-> Can you please just split the A0 handlig into a separate helper, which
-> shuld make the whole thing a lot cleaner?
+> > [    3.976779] realtek-smi switch: missing child interrupt-controller node
+> > [    3.983455] realtek-smi switch: no interrupt support
+> > [    4.158891] realtek-smi switch: no LED for port 5
+>
+> Are the LEDs working? My device has no LEDs so I have never
+> tested it, despite I coded it. (Also these days we can actually
+> support each LED individually configured from device tree using
+> the LED API, but that would be quite a bit of code, so only some
+> fun for the aspiring developer...)
 
-Just a note; mainline is currently red over this for us since
-1e03d32bea8e spent all of ~3 days in linux-next before getting merged
-into mainline.
+No at all. LEDs sometimes change state all together but they normally
+are just kept on.
 
-Whatever the fix is, it would be great to get it into mainline ASAP.
+My device is not funny to play with. It has only 32MB of RAM and it
+frequently OOM. Even flashing a new image requires some sokoban,
+unloading all possible kernel modules. It is not usable anymore in the
+real world but I might take a look at LEDs just for fun. The LEDs in
+the old swconfig driver do work and I can compare the code.
 
---=20
-Thanks,
-~Nick Desaulniers
+> > Maybe the ag71xx driver is doing something differently.
+>
+> I'll look at it!
+>
+> Thanks a lot Luiz,
+
+I'm glad to help.
+
+Regards,
+
+Luiz
 
