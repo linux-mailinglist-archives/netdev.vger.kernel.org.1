@@ -1,130 +1,71 @@
-Return-Path: <netdev+bounces-45972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E05B7E08FC
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 20:08:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A21E7E09A9
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 20:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4CE0B218AC
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 19:08:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0F6A281DC6
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 19:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C152628E;
-	Fri,  3 Nov 2023 19:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7553522F18;
+	Fri,  3 Nov 2023 19:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MBfZ76UI"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D2422F0C
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 19:06:14 +0000 (UTC)
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFF0FD56
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 12:06:13 -0700 (PDT)
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3FL0jf005036
-	for <netdev@vger.kernel.org>; Fri, 3 Nov 2023 12:06:13 -0700
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3u4v5v4hhv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 12:06:13 -0700
-Received: from twshared29647.38.frc1.facebook.com (2620:10d:c0a8:1c::1b) by
- mail.thefacebook.com (2620:10d:c0a8:82::b) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 3 Nov 2023 12:06:08 -0700
-Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
-	id 3E90C3AE384D7; Fri,  3 Nov 2023 12:06:00 -0700 (PDT)
-From: Andrii Nakryiko <andrii@kernel.org>
-To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
-        <brauner@kernel.org>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-        <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
-Subject: [PATCH v9 bpf-next 17/17] bpf,selinux: allocate bpf_security_struct per BPF token
-Date: Fri, 3 Nov 2023 12:05:23 -0700
-Message-ID: <20231103190523.6353-18-andrii@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231103190523.6353-1-andrii@kernel.org>
-References: <20231103190523.6353-1-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C26224F2
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 19:53:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BA332C433C8;
+	Fri,  3 Nov 2023 19:53:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699041191;
+	bh=gtUw4RPRjMt1Nyb0AWKTy04Y5Gx4hhcBEDtVDpIp5K8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=MBfZ76UI0TpVznlRzVsSCaYD0TqdU0cCozfXuPtXvQZr/CJBUVBQwDGTT/bkEfg5U
+	 3JhIrW0PwAGXTv8MJ3qqUnXWq/bE3ve81T3Cz6YQB7lqKqt0veCxLlpyASC2tB6OAp
+	 OfdxEkKwtuKDUjUrGDlZPQMYhhJNO2uFfVC1rDLgq9AwM+KqcGsZryZEBS/VT/EN/3
+	 X+xc+VF7Sj3Tqt5ZGSGqrnPZQ8D69kbyPfVddVvwA85UcESAdMaLYC8osFQsSMGEuM
+	 rHLcejTBOfViWGD2DkIlt2SbkKAZtGKrLHiOxdNBhXHLYY8BukKBuBEfMJlNL/Cmyz
+	 6SfFEvsX72npA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A7119EAB08A;
+	Fri,  3 Nov 2023 19:53:11 +0000 (UTC)
+Subject: Re: [GIT PULL] Landlock updates for v6.7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20231102131354.263678-1-mic@digikod.net>
+References: <20231102131354.263678-1-mic@digikod.net>
+X-PR-Tracked-List-Id: <linux-security-module.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20231102131354.263678-1-mic@digikod.net>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/landlock-6.7-rc1
+X-PR-Tracked-Commit-Id: f12f8f84509a084399444c4422661345a15cc713
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 136cc1e1f5be75f57f1e0404b94ee1c8792cb07d
+Message-Id: <169904119167.17286.18185542030780239189.pr-tracker-bot@kernel.org>
+Date: Fri, 03 Nov 2023 19:53:11 +0000
+To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>, =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>, Paul Moore <paul@paul-moore.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, artem.kuzin@huawei.com, yusongping <yusongping@huawei.com>, linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: nWhtQJ3WRqXNDfnoe7UktCM-o4UayU5s
-X-Proofpoint-ORIG-GUID: nWhtQJ3WRqXNDfnoe7UktCM-o4UayU5s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_18,2023-11-02_03,2023-05-22_02
 
-Utilize newly added bpf_token_create/bpf_token_free LSM hooks to
-allocate struct bpf_security_struct for each BPF token object in
-SELinux. This just follows similar pattern for BPF prog and map.
+The pull request you sent on Thu,  2 Nov 2023 14:13:54 +0100:
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
----
- security/selinux/hooks.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+> git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/landlock-6.7-rc1
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 002351ab67b7..1501e95366a1 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6828,6 +6828,29 @@ static void selinux_bpf_prog_free(struct bpf_prog =
-*prog)
- 	prog->aux->security =3D NULL;
- 	kfree(bpfsec);
- }
-+
-+static int selinux_bpf_token_create(struct bpf_token *token, union bpf_a=
-ttr *attr,
-+				    struct path *path)
-+{
-+	struct bpf_security_struct *bpfsec;
-+
-+	bpfsec =3D kzalloc(sizeof(*bpfsec), GFP_KERNEL);
-+	if (!bpfsec)
-+		return -ENOMEM;
-+
-+	bpfsec->sid =3D current_sid();
-+	token->security =3D bpfsec;
-+
-+	return 0;
-+}
-+
-+static void selinux_bpf_token_free(struct bpf_token *token)
-+{
-+	struct bpf_security_struct *bpfsec =3D token->security;
-+
-+	token->security =3D NULL;
-+	kfree(bpfsec);
-+}
- #endif
-=20
- struct lsm_blob_sizes selinux_blob_sizes __ro_after_init =3D {
-@@ -7183,6 +7206,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- 	LSM_HOOK_INIT(bpf_prog, selinux_bpf_prog),
- 	LSM_HOOK_INIT(bpf_map_free, selinux_bpf_map_free),
- 	LSM_HOOK_INIT(bpf_prog_free, selinux_bpf_prog_free),
-+	LSM_HOOK_INIT(bpf_token_free, selinux_bpf_token_free),
- #endif
-=20
- #ifdef CONFIG_PERF_EVENTS
-@@ -7241,6 +7265,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- #ifdef CONFIG_BPF_SYSCALL
- 	LSM_HOOK_INIT(bpf_map_create, selinux_bpf_map_create),
- 	LSM_HOOK_INIT(bpf_prog_load, selinux_bpf_prog_load),
-+	LSM_HOOK_INIT(bpf_token_create, selinux_bpf_token_create),
- #endif
- #ifdef CONFIG_PERF_EVENTS
- 	LSM_HOOK_INIT(perf_event_alloc, selinux_perf_event_alloc),
---=20
-2.34.1
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/136cc1e1f5be75f57f1e0404b94ee1c8792cb07d
 
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
