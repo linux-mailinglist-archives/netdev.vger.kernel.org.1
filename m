@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-45936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185F87E0740
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:17:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268607E0741
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098771C2108B
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:17:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB6A8B2133E
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31691F95D;
-	Fri,  3 Nov 2023 17:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709571F608;
+	Fri,  3 Nov 2023 17:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENK+mJ1n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cB08SaEW"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827871D6AA
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE71E1D6AA
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:17:31 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C90D4C
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 10:17:04 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87DF913E
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 10:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699031823;
+	s=mimecast20190719; t=1699031849;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JjCcpTQrJmsF+m1LiuhY/lfZrSnOFnb7RQ3HwNEy8v8=;
-	b=ENK+mJ1ndLrunPqVcDm5SAIrDtynqIliDPt/gFL8pYltHCnMvtXi06MJMnLa97lWXS+JZo
-	8hllChZtpqayo3Fjy1FIEWXbaIjaasYohWC9fb19mG3CUEwcNTFmzWi0b1CzHPysqjfATe
-	B0m4zOWOMDDG4hEJptS0NAEuBK18s+U=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-61-Lrm-ZPJtNbC55VC5JqJ0OA-1; Fri,
- 03 Nov 2023 13:17:00 -0400
-X-MC-Unique: Lrm-ZPJtNbC55VC5JqJ0OA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	bh=xuqvr5RWRiWU1vecaSpLFCcLTpJ+4Yg7zkI2ypzhUqw=;
+	b=cB08SaEWhkrRma2eKY9izcfqogqRUfX50J8A7zBrRmkNLUZ45Ql6ABZVsljAXD1+mmtHnS
+	OHLArpBYZWRhr8YSoyhYkfLDwtmqwx0U4NW807pn0oli9bX/MfEET2WOY2iI63NnkQlUrS
+	qyLVecc+NaQPPdA+mEmMp8ZLgjCIGRE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-9U5j9LuUPY-QMBSo0Y4PAQ-1; Fri, 03 Nov 2023 13:17:25 -0400
+X-MC-Unique: 9U5j9LuUPY-QMBSo0Y4PAQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99F131C29AE0;
-	Fri,  3 Nov 2023 17:16:59 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7CE285D536;
+	Fri,  3 Nov 2023 17:17:24 +0000 (UTC)
 Received: from server.redhat.com (unknown [10.72.112.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7919440C6EBF;
-	Fri,  3 Nov 2023 17:16:56 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C264EC1290F;
+	Fri,  3 Nov 2023 17:17:21 +0000 (UTC)
 From: Cindy Lu <lulu@redhat.com>
 To: lulu@redhat.com,
 	jasowang@redhat.com,
@@ -56,9 +56,9 @@ To: lulu@redhat.com,
 	linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org
-Subject: [RFC v1 3/8] vhost: Add 3 new uapi to support iommufd
-Date: Sat,  4 Nov 2023 01:16:36 +0800
-Message-Id: <20231103171641.1703146-4-lulu@redhat.com>
+Subject: [RFC v1 4/8] vdpa: Add new vdpa_config_ops to support iommufd
+Date: Sat,  4 Nov 2023 01:16:37 +0800
+Message-Id: <20231103171641.1703146-5-lulu@redhat.com>
 In-Reply-To: <20231103171641.1703146-1-lulu@redhat.com>
 References: <20231103171641.1703146-1-lulu@redhat.com>
 Precedence: bulk
@@ -68,314 +68,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-VHOST_VDPA_SET_IOMMU_FD: bind the device to iommufd device
-
-VDPA_DEVICE_ATTACH_IOMMUFD_AS: Attach a vdpa device to an iommufd
-address space specified by IOAS id.
-
-VDPA_DEVICE_DETACH_IOMMUFD_AS: Detach a vdpa device
-from the iommufd address space
+Add 4 new vdpa_config_ops function to support iommufd
 
 Signed-off-by: Cindy Lu <lulu@redhat.com>
 ---
- drivers/vhost/vdpa.c       | 171 +++++++++++++++++++++++++++++++++++++
- include/uapi/linux/vhost.h |  66 ++++++++++++++
- 2 files changed, 237 insertions(+)
+ include/linux/vdpa.h | 38 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 78379ffd2336..dfaddd833364 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -18,6 +18,7 @@
- #include <linux/mm.h>
- #include <linux/slab.h>
- #include <linux/iommu.h>
+diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+index 0e652026b776..233d80f9d910 100644
+--- a/include/linux/vdpa.h
++++ b/include/linux/vdpa.h
+@@ -5,6 +5,7 @@
+ #include <linux/kernel.h>
+ #include <linux/device.h>
+ #include <linux/interrupt.h>
 +#include <linux/iommufd.h>
- #include <linux/uuid.h>
- #include <linux/vdpa.h>
- #include <linux/nospec.h>
-@@ -25,6 +26,8 @@
+ #include <linux/vhost_iotlb.h>
+ #include <linux/virtio_net.h>
+ #include <linux/if_ether.h>
+@@ -97,6 +98,12 @@ struct vdpa_device {
+ 	struct vdpa_mgmt_dev *mdev;
+ 	unsigned int ngroups;
+ 	unsigned int nas;
++	struct iommufd_access *iommufd_access;
++	struct iommufd_device *iommufd_device;
++	struct iommufd_ctx *iommufd_ictx;
++	unsigned long *vq_bitmap;
++	atomic_t iommufd_users;
++	bool iommufd_attached;
+ };
  
- #include "vhost.h"
- 
-+MODULE_IMPORT_NS(IOMMUFD);
-+
- enum {
- 	VHOST_VDPA_BACKEND_FEATURES =
- 	(1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2) |
-@@ -69,6 +72,15 @@ static void vhost_vdpa_iotlb_unmap(struct vhost_vdpa *v,
- 				   struct vhost_iotlb *iotlb, u64 start,
- 				   u64 last, u32 asid);
- 
-+void vhost_vdpa_lockdep_assert_held(struct vdpa_device *vdpa)
-+{
-+	struct vhost_vdpa *v = vdpa_get_drvdata(vdpa);
-+
-+	if (WARN_ON(!v))
-+		return;
-+	lockdep_assert_held(&v->vdev.mutex);
-+}
-+
- static inline u32 iotlb_to_asid(struct vhost_iotlb *iotlb)
- {
- 	struct vhost_vdpa_as *as = container_of(iotlb, struct
-@@ -551,6 +563,149 @@ static long vhost_vdpa_suspend(struct vhost_vdpa *v)
- 
- 	return ops->suspend(vdpa);
- }
-+static long vhost_vdpa_iommufd_set_device(struct vhost_vdpa *v,
-+					  void __user *argp)
-+{
-+	struct device *dma_dev = vdpa_get_dma_dev(v->vdpa);
-+	struct vhost_vdpa_set_iommufd set_iommufd;
-+	struct vdpa_device *vdpa = v->vdpa;
-+	struct iommufd_ctx *ictx;
-+	unsigned long minsz;
-+	u32 ioas_id, dev_id;
-+	struct fd f;
-+	long r = 0;
-+
-+	minsz = offsetofend(struct vhost_vdpa_set_iommufd, iommufd_ioasid);
-+	if (copy_from_user(&set_iommufd, argp, minsz))
-+		return -EFAULT;
-+
-+	/* Unset IOMMUFD */
-+	if (set_iommufd.iommufd < 0) {
-+		if (!vdpa->iommufd_ictx || !vdpa->iommufd_device)
-+			return -EINVAL;
-+		if (atomic_read(&vdpa->iommufd_users)) {
-+			atomic_dec(&vdpa->iommufd_users);
-+			return 0;
-+		}
-+		vdpa_iommufd_unbind(v->vdpa);
-+		vdpa->iommufd_device = NULL;
-+		vdpa->iommufd_ictx = NULL;
-+		return iommu_attach_device(v->domain, dma_dev);
-+	}
-+
-+	/* For same device but different groups, ++refcount only */
-+	if (vdpa->iommufd_device)
-+		goto out_inc;
-+
-+	r = -EBADF;
-+	f = fdget(set_iommufd.iommufd);
-+	if (!f.file)
-+		goto out;
-+
-+	r = -EINVAL;
-+	ictx = iommufd_ctx_from_file(f.file);
-+	if (IS_ERR(ictx))
-+		goto out_fdput;
-+
-+	if (v->domain) {
-+		iommu_device_unuse_default_domain(dma_dev);
-+		iommu_detach_device(v->domain, dma_dev);
-+	}
-+
-+	ioas_id = set_iommufd.iommufd_ioasid;
-+	r = vdpa_iommufd_bind(vdpa, ictx, &ioas_id, &dev_id);
-+	if (r)
-+		goto out_reattach;
-+
-+	set_iommufd.out_dev_id = dev_id;
-+	r = copy_to_user(argp + minsz, &set_iommufd.out_dev_id,
-+			 sizeof(set_iommufd.out_dev_id)) ?
-+		    -EFAULT :
-+		    0;
-+	if (r)
-+		goto out_device_unbind;
-+
-+	vdpa->iommufd_ictx = ictx;
-+
-+out_inc:
-+	atomic_inc(&vdpa->iommufd_users);
-+
-+	goto out_fdput;
-+
-+out_device_unbind:
-+
-+	vdpa_iommufd_unbind(vdpa);
-+out_reattach:
-+	iommu_device_use_default_domain(dma_dev);
-+	iommu_attach_device(v->domain, dma_dev);
-+	iommufd_ctx_put(ictx);
-+out_fdput:
-+	fdput(f);
-+out:
-+	return r;
-+}
-+int vhost_vdpa_iommufd_ioas_attach(struct vhost_vdpa *v, void __user *arg)
-+{
-+	struct vdpa_device_attach_iommufd_as attach;
-+	unsigned long minsz;
-+	int ret;
-+
-+	minsz = offsetofend(struct vdpa_device_attach_iommufd_as, ioas_id);
-+
-+	if (copy_from_user(&attach, (void __user *)arg, minsz))
-+		return -EFAULT;
-+
-+	if (attach.argsz < minsz || attach.flags)
-+		return -EINVAL;
-+
-+	if (!v->vdpa->config->bind_iommufd)
-+		return -ENODEV;
-+
-+	if (!v->vdpa->iommufd_ictx) {
-+		ret = -EINVAL;
-+		return ret;
-+	}
-+
-+	ret = v->vdpa->config->attach_ioas(v->vdpa, &attach.ioas_id);
-+
-+	if (ret)
-+		return ret;
-+
-+	ret = copy_to_user(
-+		      (void __user *)arg +
-+			      offsetofend(struct vdpa_device_attach_iommufd_as,
-+					  flags),
-+		      &attach.ioas_id, sizeof(attach.ioas_id)) ?
-+		      -EFAULT :
-+		      0;
-+
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+int vhost_vdpa_iommufd_ioas_detach(struct vhost_vdpa *v, void __user *arg)
-+{
-+	struct vdpa_device_detach_iommufd_as detach;
-+	unsigned long minsz;
-+
-+	minsz = offsetofend(struct vdpa_device_detach_iommufd_as, flags);
-+
-+	if (copy_from_user(&detach, (void __user *)arg, minsz))
-+		return -EFAULT;
-+
-+	if (detach.argsz < minsz || detach.flags)
-+		return -EINVAL;
-+
-+	if (!v->vdpa->config->bind_iommufd)
-+		return -ENODEV;
-+
-+	if (v->vdpa->iommufd_ictx) {
-+		return -EINVAL;
-+	}
-+	return v->vdpa->config->detach_ioas(v->vdpa);
-+}
- 
- /* After a successful return of this ioctl the device resumes processing
-  * virtqueue descriptors. The device becomes fully operational the same way it
-@@ -744,6 +899,18 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
- 	case VHOST_SET_LOG_FD:
- 		r = -ENOIOCTLCMD;
- 		break;
-+	case VHOST_VDPA_SET_IOMMU_FD:
-+
-+		r = vhost_vdpa_iommufd_set_device(v, argp);
-+		break;
-+	case VDPA_DEVICE_ATTACH_IOMMUFD_AS:
-+		r = vhost_vdpa_iommufd_ioas_attach(v, (void __user *)arg);
-+		break;
-+
-+	case VDPA_DEVICE_DETACH_IOMMUFD_AS:
-+		r = vhost_vdpa_iommufd_ioas_detach(v, (void __user *)arg);
-+		break;
-+
- 	case VHOST_VDPA_SET_CONFIG_CALL:
- 		r = vhost_vdpa_set_config_call(v, argp);
- 		break;
-@@ -896,6 +1063,10 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
- 	} else if (ops->set_map) {
- 		if (!v->in_batch)
- 			r = ops->set_map(vdpa, asid, iotlb);
-+	} else if (!vdpa->iommufd_ictx) {
-+		/* Legacy iommu domain pathway without IOMMUFD */
-+		r = iommu_map(v->domain, iova, pa, size,
-+			      perm_to_iommu_flags(perm), GFP_KERNEL);
- 	} else {
- 		r = iommu_map(v->domain, iova, pa, size,
- 			      perm_to_iommu_flags(perm), GFP_KERNEL);
-diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-index f5c48b61ab62..07e1b2c443ca 100644
---- a/include/uapi/linux/vhost.h
-+++ b/include/uapi/linux/vhost.h
-@@ -219,4 +219,70 @@
+ /**
+@@ -332,6 +339,17 @@ struct vdpa_map_file {
+  *				@vdev: vdpa device
+  * @free:			Free resources that belongs to vDPA (optional)
+  *				@vdev: vdpa device
++ * @bind_iommufd:              use vdpa_iommufd_physical_bind for an IOMMU
++ *                             backed device.
++ *                             otherwise use vdpa_iommufd_emulated_bind
++ * @unbind_iommufd:            use vdpa_iommufd_physical_unbind for an IOMMU
++ *                             backed device.
++ *                             otherwise, use vdpa_iommufd_emulated_unbind
++ * @attach_ioas:               use vdpa_iommufd_physical_attach_ioas for an
++ *                             IOMMU backed device.
++ * @detach_ioas:               Opposite of attach_ioas
++ * @free:			Free resources that belongs to vDPA (optional)
++ *				@vdev: vdpa device
   */
- #define VHOST_VDPA_RESUME		_IO(VHOST_VIRTIO, 0x7E)
+ struct vdpa_config_ops {
+ 	/* Virtqueue ops */
+@@ -402,6 +420,13 @@ struct vdpa_config_ops {
  
-+/* vhost_vdpa_set_iommufd
-+ * Input parameters:
-+ * @iommufd: file descriptor from /dev/iommu; pass -1 to unset
-+ * @iommufd_ioasid: IOAS identifier returned from ioctl(IOMMU_IOAS_ALLOC)
-+ * Output parameters:
-+ * @out_dev_id: device identifier
-+ */
-+struct vhost_vdpa_set_iommufd {
-+	__s32 iommufd;
-+	__u32 iommufd_ioasid;
-+	__u32 out_dev_id;
-+};
+ 	/* Free device resources */
+ 	void (*free)(struct vdpa_device *vdev);
++	/* IOMMUFD ops */
++	int (*bind_iommufd)(struct vdpa_device *vdev, struct iommufd_ctx *ictx,
++			    u32 *out_device_id);
++	void (*unbind_iommufd)(struct vdpa_device *vdev);
++	int (*attach_ioas)(struct vdpa_device *vdev, u32 *pt_id);
++	int (*detach_ioas)(struct vdpa_device *vdev);
 +
-+#define VHOST_VDPA_SET_IOMMU_FD \
-+	_IOW(VHOST_VIRTIO, 0x7F, struct vhost_vdpa_set_iommufd)
+ };
+ 
+ struct vdpa_device *__vdpa_alloc_device(struct device *parent,
+@@ -570,4 +595,15 @@ struct vdpa_mgmt_dev {
+ int vdpa_mgmtdev_register(struct vdpa_mgmt_dev *mdev);
+ void vdpa_mgmtdev_unregister(struct vdpa_mgmt_dev *mdev);
+ 
+-#endif /* _LINUX_VDPA_H */
++int vdpa_iommufd_physical_bind(struct vdpa_device *vdpa,
++			       struct iommufd_ctx *ictx, u32 *out_device_id);
++void vdpa_iommufd_physical_unbind(struct vdpa_device *vdpa);
++int vdpa_iommufd_physical_attach_ioas(struct vdpa_device *vdpa, u32 *pt_id);
++int vdpa_iommufd_physical_detach_ioas(struct vdpa_device *vdpa);
++int vdpa_iommufd_emulated_bind(struct vdpa_device *vdpa,
++			       struct iommufd_ctx *ictx, u32 *out_device_id);
++void vdpa_iommufd_emulated_unbind(struct vdpa_device *vdpa);
++int vdpa_iommufd_emulated_attach_ioas(struct vdpa_device *vdpa, u32 *pt_id);
++int vdpa_iommufd_emulated_detach_ioas(struct vdpa_device *vdpa);
 +
-+/*
-+ * VDPA_DEVICE_ATTACH_IOMMUFD_AS -
-+ * _IOW(VHOST_VIRTIO, 0x7f, struct vdpa_device_attach_iommufd_as)
-+ *
-+ * Attach a vdpa device to an iommufd address space specified by IOAS
-+ * id.
-+ *
-+ * Available only after a device has been bound to iommufd via
-+ * VHOST_VDPA_SET_IOMMU_FD
-+ *
-+ * Undo by VDPA_DEVICE_DETACH_IOMMUFD_AS or device fd close.
-+ *
-+ * @argsz:	user filled size of this data.
-+ * @flags:	must be 0.
-+ * @ioas_id:	Input the target id which can represent an ioas
-+ *		allocated via iommufd subsystem.
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vdpa_device_attach_iommufd_as {
-+	__u32 argsz;
-+	__u32 flags;
-+	__u32 ioas_id;
-+};
-+
-+#define VDPA_DEVICE_ATTACH_IOMMUFD_AS \
-+	_IOW(VHOST_VIRTIO, 0x82, struct vdpa_device_attach_iommufd_as)
-+
-+/*
-+ * VDPA_DEVICE_DETACH_IOMMUFD_AS
-+ *
-+ * Detach a vdpa device from the iommufd address space it has been
-+ * attached to. After it, device should be in a blocking DMA state.
-+ *
-+ * Available only after a device has been bound to iommufd via
-+ * VHOST_VDPA_SET_IOMMU_FD
-+ *
-+ * @argsz:	user filled size of this data.
-+ * @flags:	must be 0.
-+ *
-+ * Return: 0 on success, -errno on failure.
-+ */
-+struct vdpa_device_detach_iommufd_as {
-+	__u32 argsz;
-+	__u32 flags;
-+};
-+
-+#define VDPA_DEVICE_DETACH_IOMMUFD_AS \
-+	_IOW(VHOST_VIRTIO, 0x83, struct vdpa_device_detach_iommufd_as)
-+
- #endif
++#endif
 -- 
 2.34.3
 
