@@ -1,174 +1,204 @@
-Return-Path: <netdev+bounces-45988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1445F7E0B3B
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 23:44:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F6F7E0BBD
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 00:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423391C2114F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 22:44:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4031281F4F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 23:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC5F24A05;
-	Fri,  3 Nov 2023 22:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3252250E2;
+	Fri,  3 Nov 2023 23:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="i7jyLPbP"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ca9/CG2X"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4428C24A04;
-	Fri,  3 Nov 2023 22:44:14 +0000 (UTC)
-Received: from BN6PR00CU002.outbound.protection.outlook.com (mail-eastus2azon11021006.outbound.protection.outlook.com [52.101.56.6])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E766D70;
-	Fri,  3 Nov 2023 15:44:12 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oOfoyObKiQ1mSjpVmF1M3fhq3/N11lUuj7qtwA44WYmsXSJF24TSXocqlrL9AwzGZkmFvR4ZMaXJDlMtdkKV6sIDEvP4DKAJ5rligdlxgQeC7dQCU4YkXbmEWkcDbxTGbLRm6cEt9uU2IFVwumY7vdf8gTIiOjmuNcc8cXIZ3M/HAy8Q2Yec6AkvB7pmB5jZYNCMuR/suMsjcBuzWzI8vGxihEGFHlEhu/qwZ4OQ4a25WntI0A/GzH9Drv3uJbxeUxsHJRMAsvYGayuoq/dvsfATC1kzlUWwHdeDfSP9pxEjz0o8+TVP4X6eEJCbM7OpmL4Y7Wb2XrzPouOQXzNQTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Do1Inb4Bg6HrjIawh4HzgXg/Lz/WMuJnWCLyN7kHpXE=;
- b=lziLRzE4gTo1H3Gk/duRQG3qqFJSTg53C8QnbXKaG3Y9q9CQQNWqjWGo7pTe928CRt0oRYO16j20nMoaC2NRzce8LXByHaI2j72Tlzs53rYe/YpNFTRBZ8VW5MsfLgyAhP2GcOsoSuPaTFrfoLNaWIgXDD1EmarabkiRlzy9GUC/L2HnuYQ0NZqYM2VZ/tArsK8GbF7o9sSy5QLTCDWnmZHCsCtsHfbLHs42DhDzjj0NHt2D0hW/BsBDiohisvBv85rLxl4AAV/n+vzOvV14v08we+YgzPku7beNavaNYaYQ4Y7Kn7MMCqnt1xbuGnLZxZOuFCZfxKRdDQagWo1cAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Do1Inb4Bg6HrjIawh4HzgXg/Lz/WMuJnWCLyN7kHpXE=;
- b=i7jyLPbPiYP5476WDkDCmHu5FFpHZKmCkEcGGd0JSwYleIBXEfK08rOd59mBS9Wy1Fgdndt4DY86apbpLoIIiCpBhU9WrUBtkgxzeO0aixapYfzO5H0BvE9GWtVcTTW8hwmf6N+lVRPXVDw61vJDRQtYrEv7jucRLny056hOL2I=
-Received: from PH7PR21MB3116.namprd21.prod.outlook.com (2603:10b6:510:1d0::10)
- by CY5PR21MB3444.namprd21.prod.outlook.com (2603:10b6:930:f::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.12; Fri, 3 Nov
- 2023 22:44:09 +0000
-Received: from PH7PR21MB3116.namprd21.prod.outlook.com
- ([fe80::b0b2:906f:67fe:322a]) by PH7PR21MB3116.namprd21.prod.outlook.com
- ([fe80::b0b2:906f:67fe:322a%5]) with mapi id 15.20.6977.012; Fri, 3 Nov 2023
- 22:44:09 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
-	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
-	<decui@microsoft.com>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-Subject: RE: [PATCH net,v2] hv_netvsc: fix race of netvsc and VF
- register_netdevice
-Thread-Topic: [PATCH net,v2] hv_netvsc: fix race of netvsc and VF
- register_netdevice
-Thread-Index: AQHaCFKpKET2UnWjhkeRl4AacA94KLBmhFAAgAK2PJA=
-Date: Fri, 3 Nov 2023 22:44:08 +0000
-Message-ID:
- <PH7PR21MB31169E4E03163358946BF95DCAA5A@PH7PR21MB3116.namprd21.prod.outlook.com>
-References: <1698355354-12869-1-git-send-email-haiyangz@microsoft.com>
- <20231101220730.2b7cc7d1@kernel.org>
-In-Reply-To: <20231101220730.2b7cc7d1@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=c223206b-d339-4527-8658-b770b1fdaf94;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-11-03T22:32:15Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR21MB3116:EE_|CY5PR21MB3444:EE_
-x-ms-office365-filtering-correlation-id: 79e540b1-2ec0-465e-f8a1-08dbdcbe646f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- is2tu15sa+OqzXChbJrl6nuXGXlZaX+fIGTOsPEkSRzIfYsxmna7IDYl+4FdYOlXhbbz2vNVj4Wi9C19lNqlM7VIWTxtEzgRh6cXfxysSKZf6lWsHoAvZdrOqx5jK1U1rWEGZeZOiIAoHBVTXmU3vStqL7YEoZvRTlFF78lic7Z6bece5vbVRqIw6bgH6xTflu7pLLo3u0/puHZFeTnuNaAaBJP5AtWg8Vyv1f91o9VvfkFLQvtvSCn6yyZ9oEAAMW+DPSd9vx8SFwsG6C8N8yILjxVRX1Toe9NfUKuFSFcLYKUhN5uhG3mbxXRTJUnyeY3YW5+tbxgIajdKYTqgRQrEQQ7TZdjBPz3ffXmW8teioBiq1xCuSG8OXmk46MuUI5UeUML6UlzC/r1G9t89PCIlgZwiuCykb8+h8jFAKaN4at8dTKC98HWXa3DeN1lSW+1tS6My+XPrdUpWwtF9ZL5erDX9lWTPM0yw4udvnVQKBaR6Zh2Bceviaa8ZIRaV/yCx0pxYxnr1L4HH563j5etptQqP47y0cJQmIkyEUa9xfLDrnhtrKPa1FzJuijXZ3UdgGNC/ibNWlt8ivyzyBZcaFphbOSXaOQeTse2yPt1N+6ztIaRwul7TBM15GNANsp3s2uVB0PueLFZIMzfYy8npm61Z4HyDt0HQc1U+XNM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3116.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(346002)(39860400002)(366004)(396003)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(54906003)(82950400001)(66476007)(64756008)(66446008)(66556008)(82960400001)(66946007)(122000001)(316002)(38070700009)(6916009)(76116006)(26005)(10290500003)(6506007)(7696005)(71200400001)(478600001)(53546011)(9686003)(38100700002)(86362001)(2906002)(5660300002)(8990500004)(52536014)(41300700001)(33656002)(8936002)(8676002)(4326008)(83380400001)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?7hf7yvdDH9fg8kC/+EMP9aZscZYkCHAGVA9uRIz/52umhQlA06zpC0YINi4K?=
- =?us-ascii?Q?Nu9anYXXbXgF3kWxxxjIIyB8SAZfqW3i4FDLCNbY0kajm5HPtFOIoncT0lKt?=
- =?us-ascii?Q?ofhl/4IZmcWXDW5rdrsKn6YnZUpaulqT4O0lsM9PuCuNC6cT4z3yH3lHAIKZ?=
- =?us-ascii?Q?2uIKedeusyJzZxdYWMn0vDrsddsd0zpuJDsYaXd8fg07QpD42aiK9d4VXAjG?=
- =?us-ascii?Q?9gxYUjdonU37OcycJh20tJExXuya8RDpB2JQq4YZ4hj3AoZplwM7Hlkkgdzv?=
- =?us-ascii?Q?FlGF+g5EUywP4ROWDi3jzOFFi5mOXfWlrH0QzwENGB1+7sB0x9fK+Dt/fy7X?=
- =?us-ascii?Q?WtwDXg52pKue4WOb47otx8tCo3caBGjNgyLbXazqWc3k+B/JMDcK9zeTwYY/?=
- =?us-ascii?Q?XQvrRfzwyWy08b660HZr9gEt8miizPd0Z2VdQTRclQsgiAn+ox6cufJJGifO?=
- =?us-ascii?Q?aL+oy/a+9GxvVCXumEKtv4AVTRackaoQLHSyNAHh+UFElkAlaZsHju5hOrxm?=
- =?us-ascii?Q?0+ALC8K4PisA9LQzAWesBIcPeSTXL4ct+F5sSEY2vd/r71NRtE0MkY8kWy16?=
- =?us-ascii?Q?eIHQBVOLdmZ2EDp+4dadaCiczTaUfsdebagzUOdnOeXCPdGcQqsOQ+Rh0wAd?=
- =?us-ascii?Q?75wflIPX2imA0Yyo4o0o9NMgzg4cs44inuqgNL2hQBM7CSwSXdRaRgF5EimK?=
- =?us-ascii?Q?Tpr65Z8jGk4DUxgVtr36uDUlDYpy1XotKaFfck3qKd86fTua/4jvwjPqObwP?=
- =?us-ascii?Q?P112FdJnpkyyeSIYKVLAZg0EIF9waYGcoXixi+avfB1HnTrc7MgFjaRlxfb8?=
- =?us-ascii?Q?0WZqLuOmIP5ihYIZ2ktTq954GGwSKx45/pRgEyZ7RnupIdw2xCIO9u+PTWc6?=
- =?us-ascii?Q?hEGK4N2GsTVnadHG8cyWJRORZWEVWFvYDzSjPw6ODcEleD432hdBSlmvHZ7y?=
- =?us-ascii?Q?8snXYAzfHGYbDYuQTC2rHSmmQX3O1ixXGnV79mUKukjDsoy8/p7yk9//XYBF?=
- =?us-ascii?Q?Q0uUooSQeov5Ly8zdwGS446+VVyTEOpD7HYmf2wYZT2scJmTBs1shErFx/QO?=
- =?us-ascii?Q?ExPkoqe2LYIjrV5LGzXw5b5n0yhMMMGo3+qPPWeY1mydnz7pbO+E9t/2A4DV?=
- =?us-ascii?Q?bFN231MQPnZHIYtRrYlK4aMl+BONwPcAMW5w2rWzVo1/DAl3BC9qvAmiO/el?=
- =?us-ascii?Q?u6WFsEVNtjcdfZTmw/4ZEfHxuPNbB5VqqgM+jHusLOwUr/mJiqjt7k5aJBO9?=
- =?us-ascii?Q?1ZkbOhNgg4/BYnl5BroxSznblgZIAHHoPvlps/aG5Spp/F1YM4ONrjHcGyYa?=
- =?us-ascii?Q?GZd4oOkw8vTBXmb1Ojv9zeue1vfb79HBZlgU4gag+eIxplF+/SRpsBIcy34t?=
- =?us-ascii?Q?8oHRb7gCXUMSJTE+akVFZN56J/u2bEfSwOnLhRAD2pJkriAqFqblStJP7p11?=
- =?us-ascii?Q?UepG0yqEG7O++J5Jg6FGgTPLyMOrCTM95jwZDrr4dCVcoTNtKN4rTUZUSooW?=
- =?us-ascii?Q?OSDYqjA/gTsS3fmQcslOn0Rv/mHXUxGFK7TMH71X5ZX154kjmQ1WVjhe/HdZ?=
- =?us-ascii?Q?OiEctZ3p0FLIl2Q4k9OSMhXwi++2b0xM8w2TkH5z?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA4C2374F
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 23:03:04 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C19D61
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:03:02 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5435336ab0bso4305807a12.1
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 16:03:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1699052581; x=1699657381; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jb/RCnbHQEqLI2m14Uypn4J41pZATvb3gAI0kusrGiM=;
+        b=Ca9/CG2XCJp0OakbkGIL552KETLHtWKzELjMvauJaXvBJCRQmd8ikFkg4kh7XoRaiA
+         sKTnlEhTN8VXDSeG9FiWx8yJ7P7j2RcI2CqF3PAkzmi03JMfiFhz6RcnGVtrmJGxqq3V
+         PZPcNCyRSJ90ZVKcisQJRnVyHcDsS6Ums6YcM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699052581; x=1699657381;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jb/RCnbHQEqLI2m14Uypn4J41pZATvb3gAI0kusrGiM=;
+        b=Ex/inglVzazUjRprZKEjVn5bVBR6tDCVG12zrMxEfNn0BvJtZEyLqVFK7oxSX8BKGH
+         QtskqKo+qzGZ/Tmujy2BqSJB0wrhVXTH3DPbGad4MX+HXHueEBSV0nFJHlGER10Ls5wE
+         gHJWRfL261P22zvVsl1MbY7ePCxnxf9eyuEut2Wa/ng/cThzHDzU+QCMYVSRKzufc7HT
+         pm5Ryc7v6qb3ii46UU8cowoq9OwcbwdSZmo+d6Vj0WcBo4bu3ugbEMd23i3gRjgk7AE2
+         jLZOlY92skyfhDvyRuxu+MUQKnK61laHpJ+EjwGEJF8jcFklyN7WSEwNeJyMsLhrLG22
+         ZQiQ==
+X-Gm-Message-State: AOJu0Yww2isdmVMgxf8fCgFToKucSNEvAhZxtcybBNFXPzdUPIyMA7yC
+	veNo8kWK3qve6vjh1ad4kSSyORZ8pvrwY25ccKe8Yg==
+X-Google-Smtp-Source: AGHT+IG+gHNS6mRTI5uNDyOUDcWAqhsbZusA0xrfnF6OpESfdGP1U4TzGrLjg5gsK/e3rD4uEqNnSX60C4DnUrtJcCg=
+X-Received: by 2002:a50:9f24:0:b0:543:e42e:128e with SMTP id
+ b33-20020a509f24000000b00543e42e128emr5721744edf.37.1699052580992; Fri, 03
+ Nov 2023 16:03:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3116.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79e540b1-2ec0-465e-f8a1-08dbdcbe646f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Nov 2023 22:44:08.9736
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3qX3ixAhQT1dYm6kr3zF5SdQPwtkrGPM26GILihen/FLlAa5xLHyqzuJ3pUufABQJqKSFsNkbaJ/3NiR25FY7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3444
+References: <CACKFLik-Ey1eptrCkhSEp0Oi66kBKnVWa+yDk7-_uzxqSTHb6A@mail.gmail.com>
+ <20231103170711.4006756-1-alexey.pakhunov@spacex.com>
+In-Reply-To: <20231103170711.4006756-1-alexey.pakhunov@spacex.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Fri, 3 Nov 2023 16:02:49 -0700
+Message-ID: <CACKFLi=ZLAb1Y92LwvqjOGPCuinka7qbHwDP2pkG4-_a7DMorQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] tg3: Increment tx_dropped in tg3_tso_bug()
+To: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Cc: linux-kernel@vger.kernel.org, mchan@broadcom.com, netdev@vger.kernel.org, 
+	prashant@broadcom.com, siva.kallam@broadcom.com, vincent.wong2@spacex.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000931d1206094781ea"
 
+--000000000000931d1206094781ea
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 3, 2023 at 10:07=E2=80=AFAM Alex Pakhunov
+<alexey.pakhunov@spacex.com> wrote:
+> I'm not super familiar with the recommended approach for handling locks i=
+n
+> network drivers, so I spent a bit of tme looking at what tg3 does.
+>
+> It seems that there are a few ways to remove the race condition when
+> working with these counters:
+>
+> 1. Use atomic increments. It is easy but every update is more expensive
+>    than it needs to be. We might be able to say that there specific
+>    counters are updated rarely, so maybe we don't care too much.
+> 2. netif_tx_lock is already taken when tx_droped is incremented - wrap
+>    rx_dropped increment and reading both counters in netif_tx_lock. This
+>    seems legal since tg3_tx() can take netif_tx_lock. I'm not sure how to
+>    order netif_tx_lock and tp->lock, since tg3_get_stats64() takes
+>    the latter. Should netif_tx_lock be takes inside tp->lock? Should they
+>    be not nested?
+> 3. Using tp->lock to protect rx_dropped (tg3_poll_link() already takes it
+>    so it must be legal) and netif_tx_lock to protect tx_dropped.
+>
+> There are probably other options. Can you recommend an aproach?
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Thursday, November 2, 2023 1:08 AM
-> To: Haiyang Zhang <haiyangz@microsoft.com>
-> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
-> <kys@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <decui@microsoft.com>; edumazet@google.com; pabeni@redhat.com;
-> davem@davemloft.net; linux-kernel@vger.kernel.org; stable@vger.kernel.org
-> Subject: Re: [PATCH net,v2] hv_netvsc: fix race of netvsc and VF
-> register_netdevice
->=20
-> On Thu, 26 Oct 2023 14:22:34 -0700 Haiyang Zhang wrote:
-> > And, move register_netdevice_notifier() earlier, so the call back
-> > function is set before probing.
->=20
-> Are you sure you need this? I thought the netdev notifier "replays"
-> registration events (i.e. sends "fake" events for already present
-> netdevs).
->=20
-> If I'm wrong this should still be a separate patch from the rtnl
-> reorder.
+I recommend using per queue counters as briefly mentioned in my
+earlier reply.  Move the tx_dropped and rx_dropped counters to the per
+queue tg3_napi struct.  Incrementing tnapi->tx_dropped in
+tg3_start_xmit() is serialized by the netif_tx_lock held by the stack.
 
-I tested, NETDEV_REGISTER is indeed replayed, but NETDEV_POST_INIT=20
-is not.  And we will use NETDEV_POST_INIT soon.
+Similarly, incrementing tnapi->rx_dropped in the tg3_rx() is serialized by =
+NAPI.
 
-Also, we want to get notified by NETDEV_POST_INIT immediately from=20
-VF, before VF NIC shows up to upper layers. So, even if we make=20
-NETDEV_POST_INIT to be replayed, that may be too late.
+tg3_get_stats64() can just loop and sum all the tx_dropped and
+rx_dropped counters in each tg3_napi struct.  We don't worry about
+locks here since we are just reading.
 
-I will put the register_netdevice_notifier() change to a separate patch.
+>
+> Also, this seems like a larger change that should be done separately from
+> fixing the TX stall. Should we land just "[PATCH v2 2/2]"? Should we land
+> the whole patch (since it does not make race condition much worse) and fi=
+x
+> the race condition separately?
+>
 
-Thanks,
-- Haiyang
+Yes, we can merge patch #2 first which fixes the stall.  Please repost
+just patch #2 standalone if you want to do that.  Thanks.
 
+--000000000000931d1206094781ea
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHpaGUr1Gfniq7uxB5AdShrXeGPOIK/5
+upCox3Ttj3V1MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+MzIzMDMwMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQArXs19U79oeBS8UwnkwKCgIOa6Lxp54SRllR0SmIz7pUz/4hVi
+2vHcWVFRbf9Km7/gR9QnM7es8Zk9SITZwF/ZJDoW/TxagpgfbM9px+biVJJnOl9VIxzyCs5KnaP1
+r+YCcyOP3D81hsAM6O8R/tn2UOOt8zLJ43QFVkZ/w8kUH0n9jRu29hnxJOUbLOEMZ5pRBm8LyrLr
+50uZ0ulAKat5LI0z0bWB5xug5rD5zmdggbseBVG3Ufivo3FX0wgZDDfpJqggScvZkF+XslOXv0Uk
+W4Oghub39f2nEyRW6n+LJ83ERXRlPFBWuXrVTF41eWiP5ds9jj5Otc9YkebJ2pNG
+--000000000000931d1206094781ea--
 
