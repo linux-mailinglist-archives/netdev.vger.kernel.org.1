@@ -1,137 +1,463 @@
-Return-Path: <netdev+bounces-45868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEBD67DFFA4
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:14:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF88A7DFFAB
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BA07B2112B
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 08:13:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D4C2B21240
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 08:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1BB79D0;
-	Fri,  3 Nov 2023 08:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E3E79F7;
+	Fri,  3 Nov 2023 08:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="iszAVqIc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0vlmdsyn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0A423DF
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 08:13:52 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73F1D131;
-	Fri,  3 Nov 2023 01:13:51 -0700 (PDT)
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A37sfe0014915;
-	Fri, 3 Nov 2023 08:13:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=zMP5Blu3Ei7JyRR3CHb7v8/yp0ZTd6P7rHplart82eg=;
- b=iszAVqIcUgVWLLcg83jES5zs43kk3pTLO2aPWxVFyxfDl885gQzKYTWHStTgS708ZVrN
- rxxzph1EmI2jFEuaO2025hWqSvQp7AvIyq/y3aSc6lY7Ms77YpRbvp/uANWDZjgMyQ0V
- KE4/MAWbdQy/x9nKnmv/6q4tbMYOMPbkudCy1I5f48USKXBN9kEvkhHtIm05rqwLMkxb
- 5MR/vqEVBMPSJ8loj7DuFhPxPL1csNmWaOkSLn/RvvUF0p1Xf/j2/WZNxSIS6CQFWhvR
- itbBmwgxzkaz/FQrAzpbm06x39hWFqX7cbpAurGOwfJyQz11vJ0SYZYT8yymy9iJwC8j Jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4vvt8dct-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 08:13:46 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A38BCXM002545;
-	Fri, 3 Nov 2023 08:13:46 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u4vvt8dcf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 08:13:46 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A3815s7031388;
-	Fri, 3 Nov 2023 08:13:45 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u1fb2m2n3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 03 Nov 2023 08:13:45 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A38Disg26673708
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 3 Nov 2023 08:13:44 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 091815805C;
-	Fri,  3 Nov 2023 08:13:44 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 48A4358054;
-	Fri,  3 Nov 2023 08:13:42 +0000 (GMT)
-Received: from [9.171.80.36] (unknown [9.171.80.36])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  3 Nov 2023 08:13:42 +0000 (GMT)
-Message-ID: <d4bf228b-3f58-4c1a-97fb-ae6ceb25f544@linux.ibm.com>
-Date: Fri, 3 Nov 2023 09:13:41 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3568779D1
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 08:17:50 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEDE3112
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 01:17:43 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-54366bb1c02so5703a12.1
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 01:17:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1698999462; x=1699604262; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uZ2vonYqLXWoChIhs/SILWPblBf4zAlg0q/QTxk0xTE=;
+        b=0vlmdsyn1BiDb8Bknr/EGolpCIq3nAnupw0osa+3js2vfAQ5RP1XOjL41emkqdrE+L
+         paV9THenk5tTNivmrXVhk3nKQ1z8bKamBIi+zwshlnL2215oposqrW3QqOjXnqzyOzQx
+         Q4NhnrnXW0QkfflB6YnZNy1N9YI4PKyfSbf84/b424oTPItscsKXN+LWEYMzLsLGI4UT
+         vHFhmcqTEESXjj53ezwoubrkAYsm/dieJcRhDwAWTKI/BmbCQIJPe6L6V0vTt8XluH0Q
+         91mooY7VAmLDv0rYxUyr1BVhm3+Y5aHqu6bxYiUhQCrS+rhFvPHlh+y77Cpujcd4Lf9D
+         xnwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1698999462; x=1699604262;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uZ2vonYqLXWoChIhs/SILWPblBf4zAlg0q/QTxk0xTE=;
+        b=wLxBRpcrRfloJxEHrplL7VrMe61y/x4enH6Q/hE0l0LEJZ6pFBYxjuSRRcBDRcke0V
+         aK4NCT8KUTG3as/H52qTzhsjex2qkfX3738fmazBPdA9Yemi8/S+t04ZhEazR4La/QWL
+         lft6QlOGCD1kfH1mft7hGduef1j8S+6kfltlxh5AJgVlfByDtmWv/8NJhqSF+smDDx/s
+         5/mHqMqW9gd/KsHWPbeWo5yD9XnNsWrbrpoJfg7e9K1UJgsUsftvwOJDGDpSuQTZaYTy
+         cw2oFHmoLx6c+FyMnNe7AF1H12lzWa/JpFVbN0y48hK/nDrQMObt4VIboCB4L6mc8jJ6
+         +aAg==
+X-Gm-Message-State: AOJu0YxcmmE01nqw19bDQ+CRab56EDv9yPnsiWwF4Y1Ah6rNbD8COMA5
+	d3zM2C+dJ/h0nID0ehpmVIt35N7xYh9o9G8iWRcy6oMAQSfzNKBU45oFQQ==
+X-Google-Smtp-Source: AGHT+IFCBvCYo9esyBIEErUjDll/9Oup/vxiRlndq+6TGhkS0JjOM3uk8+zBGrp0+D7C1Ad8miDkLFhkv1LPJRQ56FI=
+X-Received: by 2002:a05:6402:501c:b0:543:fa43:a361 with SMTP id
+ p28-20020a056402501c00b00543fa43a361mr183002eda.1.1698999461890; Fri, 03 Nov
+ 2023 01:17:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/3] bugfixs for smc
-Content-Language: en-GB
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1698991660-82957-1-git-send-email-alibuda@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1698991660-82957-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ZzL5E2iQc1qFo8EX5qy2w19ae3ZhD_pr
-X-Proofpoint-GUID: OCuD6J1ndabIgZe3Er32Q0S3wzBTViCt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_07,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- malwarescore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
- phishscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311030066
+References: <20230717152917.751987-1-edumazet@google.com> <738bb6a1-4e99-4113-9345-48eea11e2108@kernel.org>
+ <c798f412-ac14-4997-9431-c98d1b8e16d8@kernel.org> <875400ba-58d8-44a0-8fe9-334e322bd1db@kernel.org>
+In-Reply-To: <875400ba-58d8-44a0-8fe9-334e322bd1db@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 3 Nov 2023 09:17:27 +0100
+Message-ID: <CANn89iJOwQUwAVcofW+X_8srFcPnaWKyqOoM005L6Zgh8=OvpA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: get rid of sysctl_tcp_adv_win_scale
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Yuchung Cheng <ycheng@google.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 3, 2023 at 8:07=E2=80=AFAM Jiri Slaby <jirislaby@kernel.org> wr=
+ote:
+>
+> On 03. 11. 23, 7:56, Jiri Slaby wrote:
+> > On 03. 11. 23, 7:10, Jiri Slaby wrote:
+> >> On 17. 07. 23, 17:29, Eric Dumazet wrote:
+> >>> With modern NIC drivers shifting to full page allocations per
+> >>> received frame, we face the following issue:
+> >>>
+> >>> TCP has one per-netns sysctl used to tweak how to translate
+> >>> a memory use into an expected payload (RWIN), in RX path.
+> >>>
+> >>> tcp_win_from_space() implementation is limited to few cases.
+> >>>
+> >>> For hosts dealing with various MSS, we either under estimate
+> >>> or over estimate the RWIN we send to the remote peers.
+> >>>
+> >>> For instance with the default sysctl_tcp_adv_win_scale value,
+> >>> we expect to store 50% of payload per allocated chunk of memory.
+> >>>
+> >>> For the typical use of MTU=3D1500 traffic, and order-0 pages allocati=
+ons
+> >>> by NIC drivers, we are sending too big RWIN, leading to potential
+> >>> tcp collapse operations, which are extremely expensive and source
+> >>> of latency spikes.
+> >>>
+> >>> This patch makes sysctl_tcp_adv_win_scale obsolete, and instead
+> >>> uses a per socket scaling factor, so that we can precisely
+> >>> adjust the RWIN based on effective skb->len/skb->truesize ratio.
+> >>>
+> >>> This patch alone can double TCP receive performance when receivers
+> >>> are too slow to drain their receive queue, or by allowing
+> >>> a bigger RWIN when MSS is close to PAGE_SIZE.
+> >>
+> >> Hi,
+> >>
+> >> I bisected a python-eventlet test failure:
+> >>  > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D FAILURES
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>  > _______________________ TestGreenSocket.test_full_duplex
+> >> _______________________
+> >>  >
+> >>  > self =3D <tests.greenio_test.TestGreenSocket
+> >> testMethod=3Dtest_full_duplex>
+> >>  >
+> >>  >     def test_full_duplex(self):
+> >>  > ...
+> >>  > >       large_evt.wait()
+> >>  >
+> >>  > tests/greenio_test.py:424:
+> >>  > _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+> >> _ _ _ _ _ _
+> >>  > eventlet/greenthread.py:181: in wait
+> >>  >     return self._exit_event.wait()
+> >>  > eventlet/event.py:125: in wait
+> >>  >     result =3D hub.switch()
+> >> ...
+> >>  > E       tests.TestIsTakingTooLong: 1
+> >>  >
+> >>  > eventlet/hubs/hub.py:313: TestIsTakingTooLong
+> >>
+> >> to this commit. With the commit, the test takes > 1.5 s. Without the
+> >> commit it takes only < 300 ms. And they set timeout to 1 s.
+> >>
+> >> The reduced self-stadning test case:
+> >> #!/usr/bin/python3
+> >> import eventlet
+> >> from eventlet.green import select, socket, time, ssl
+> >>
+> >> def bufsized(sock, size=3D1):
+> >>      """ Resize both send and receive buffers on a socket.
+> >>      Useful for testing trampoline.  Returns the socket.
+> >>
+> >>      >>> import socket
+> >>      >>> sock =3D bufsized(socket.socket(socket.AF_INET,
+> >> socket.SOCK_STREAM))
+> >>      """
+> >>      sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, size)
+> >>      sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, size)
+> >>      return sock
+> >>
+> >> def min_buf_size():
+> >>      """Return the minimum buffer size that the platform supports."""
+> >>      test_sock =3D socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+> >>      test_sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 1)
+> >>      return test_sock.getsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF)
+> >>
+> >> def test_full_duplex():
+> >>      large_data =3D b'*' * 10 * min_buf_size()
+> >>      listener =3D socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+> >>      listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+> >>      listener.bind(('127.0.0.1', 0))
+> >>      listener.listen(50)
+> >>      bufsized(listener)
+> >>
+> >>      def send_large(sock):
+> >>          sock.sendall(large_data)
+> >>
+> >>      def read_large(sock):
+> >>          result =3D sock.recv(len(large_data))
+> >>          while len(result) < len(large_data):
+> >>              result +=3D sock.recv(len(large_data))
+> >>          assert result =3D=3D large_data
+> >>
+> >>      def server():
+> >>          (sock, addr) =3D listener.accept()
+> >>          sock =3D bufsized(sock)
+> >>          send_large_coro =3D eventlet.spawn(send_large, sock)
+> >>          eventlet.sleep(0)
+> >>          result =3D sock.recv(10)
+> >>          expected =3D b'hello world'
+> >>          while len(result) < len(expected):
+> >>              result +=3D sock.recv(10)
+> >>          assert result =3D=3D expected
+> >>          send_large_coro.wait()
+> >>
+> >>      server_evt =3D eventlet.spawn(server)
+> >>      client =3D socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+> >>      client.connect(('127.0.0.1', listener.getsockname()[1]))
+> >>      bufsized(client)
+> >>      large_evt =3D eventlet.spawn(read_large, client)
+> >>      eventlet.sleep(0)
+> >>      client.sendall(b'hello world')
+> >>      server_evt.wait()
+> >>      large_evt.wait()
+> >>      client.close()
+> >>
+> >> test_full_duplex()
+> >>
+> >> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>
+> >> I speak neither python nor networking, so any ideas :)? Is the test
+> >> simply wrong?
+> >
+> > strace -rT -e trace=3Dnetwork:
+> >
+> > GOOD:
+> >  > 0.000000 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
+> > <0.000063>
+> >  > 0.000406 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00004=
+2>
+> >  > 0.000097 getsockopt(3, SOL_SOCKET, SO_SNDBUF, [4608], [4]) =3D 0
+> > <0.000012>
+> >  > 0.000101 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
+> > <0.000015>
+> >  > 0.000058 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0 <0.00=
+0009>
+> >  > 0.000035 bind(3, {sa_family=3DAF_INET, sin_port=3Dhtons(0),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D 0 <0.000027>
+> >  > 0.000058 listen(3, 50)       =3D 0 <0.000014>
+> >  > 0.000029 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00000=
+9>
+> >  > 0.000023 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00000=
+8>
+> >  > 0.000052 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 5
+> > <0.000014>
+> >  > 0.000050 getsockname(3, {sa_family=3DAF_INET, sin_port=3Dhtons(44313=
+),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [16]) =3D 0 <0.000011>
+> >  > 0.000037 connect(5, {sa_family=3DAF_INET, sin_port=3Dhtons(44313),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D -1 EINPROGRESS (Operation n=
+ow in
+> > progress) <0.000070>
+> >  > 0.000210 accept4(3, {sa_family=3DAF_INET, sin_port=3Dhtons(56062),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [16], SOCK_CLOEXEC) =3D 6 <0.000012=
+>
+> >  > 0.000040 getsockname(6, {sa_family=3DAF_INET, sin_port=3Dhtons(44313=
+),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [128 =3D> 16]) =3D 0 <0.000007>
+> >  > 0.000062 setsockopt(6, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00000=
+7>
+> >  > 0.000020 setsockopt(6, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00000=
+7>
+> >  > 0.000082 getsockopt(5, SOL_SOCKET, SO_ERROR, [0], [4]) =3D 0 <0.0000=
+07>
+> >  > 0.000023 connect(5, {sa_family=3DAF_INET, sin_port=3Dhtons(44313),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D 0 <0.000008>
+> >  > 0.000022 setsockopt(5, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00002=
+0>
+> >  > 0.000036 setsockopt(5, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00000=
+7>
+> >  > 0.000061 sendto(6, "********************************"..., 46080, 0,
+> > NULL, 0) =3D 32768 <0.000049>
+> >  > 0.000135 sendto(6, "********************************"..., 13312, 0,
+> > NULL, 0) =3D 13312 <0.000017>
+> >  > 0.000087 recvfrom(6, 0x7f78e58af890, 10, 0, NULL, NULL) =3D -1 EAGAI=
+N
+> > (Resource temporarily unavailable) <0.000010>
+> >  > 0.000125 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 32768 <0.000032>
+> >  > 0.000066 recvfrom(5, 0x55fdb41bb880, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000011>
+> >  > 0.000075 sendto(5, "hello world", 11, 0, NULL, 0) =3D 11 <0.000023>
+> >  > 0.000117 recvfrom(6, "hello worl", 10, 0, NULL, NULL) =3D 10 <0.0000=
+15>
+> >  > 0.000050 recvfrom(6, "d", 10, 0, NULL, NULL) =3D 1 <0.000011>
+> >  > 0.000212 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 13312 <0.000019>
+> >  > 0.050676 +++ exited with 0 +++
+> >
+> >
+> > BAD:
+> >  > 0.000000 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
+> > <0.000045>
+> >  > 0.000244 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00001=
+5>
+> >  > 0.000057 getsockopt(3, SOL_SOCKET, SO_SNDBUF, [4608], [4]) =3D 0
+> > <0.000013>
+> >  > 0.000104 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
+> > <0.000016>
+> >  > 0.000065 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0 <0.00=
+0010>
+> >  > 0.000038 bind(3, {sa_family=3DAF_INET, sin_port=3Dhtons(0),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D 0 <0.000031>
+> >  > 0.000068 listen(3, 50)       =3D 0 <0.000014>
+> >  > 0.000032 setsockopt(3, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00001=
+0>
+> >  > 0.000030 setsockopt(3, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00001=
+8>
+> >  > 0.000060 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 5
+> > <0.000023>
+> >  > 0.000071 getsockname(3, {sa_family=3DAF_INET, sin_port=3Dhtons(45901=
+),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [16]) =3D 0 <0.000019>
+> >  > 0.000068 connect(5, {sa_family=3DAF_INET, sin_port=3Dhtons(45901),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D -1 EINPROGRESS (Operation n=
+ow in
+> > progress) <0.000074>
+> >  > 0.000259 accept4(3, {sa_family=3DAF_INET, sin_port=3Dhtons(35002),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [16], SOCK_CLOEXEC) =3D 6 <0.000014=
+>
+> >  > 0.000051 getsockname(6, {sa_family=3DAF_INET, sin_port=3Dhtons(45901=
+),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, [128 =3D> 16]) =3D 0 <0.000010>
+> >  > 0.000082 setsockopt(6, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00000=
+9>
+> >  > 0.000040 setsockopt(6, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00000=
+9>
+> >  > 0.000104 getsockopt(5, SOL_SOCKET, SO_ERROR, [0], [4]) =3D 0 <0.0000=
+09>
+> >  > 0.000028 connect(5, {sa_family=3DAF_INET, sin_port=3Dhtons(45901),
+> > sin_addr=3Dinet_addr("127.0.0.1")}, 16) =3D 0 <0.000009>
+> >  > 0.000026 setsockopt(5, SOL_SOCKET, SO_SNDBUF, [1], 4) =3D 0 <0.00000=
+9>
+> >  > 0.000024 setsockopt(5, SOL_SOCKET, SO_RCVBUF, [1], 4) =3D 0 <0.00000=
+8>
+> >  > 0.000071 sendto(6, "********************************"..., 46080, 0,
+> > NULL, 0) =3D 16640 <0.000026>
+> >  > 0.000117 sendto(6, "********************************"..., 29440, 0,
+> > NULL, 0) =3D 16640 <0.000017>
+> >  > 0.000041 sendto(6, "********************************"..., 12800, 0,
+> > NULL, 0) =3D -1 EAGAIN (Resource temporarily unavailable) <0.000009>
+> >  > 0.000075 recvfrom(6, 0x7f4db88a38c0, 10, 0, NULL, NULL) =3D -1 EAGAI=
+N
+> > (Resource temporarily unavailable) <0.000010>
+> >  > 0.000086 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 16640 <0.000018>
+> >  > 0.000044 recvfrom(5, 0x55a64d59b2a0, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000009>
+> >  > 0.000059 sendto(5, "hello world", 11, 0, NULL, 0) =3D 11 <0.000018>
+> >  > 0.000093 recvfrom(6, "hello worl", 10, 0, NULL, NULL) =3D 10 <0.0000=
+09>
+> >  > 0.000029 recvfrom(6, "d", 10, 0, NULL, NULL) =3D 1 <0.000009>
+> >  > 0.206685 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 16640 <0.000116>
+> >  > 0.000306 recvfrom(5, 0x55a64d5a7600, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000013>
+> >  > 0.000208 sendto(6, "********************************"..., 12800, 0,
+> > NULL, 0) =3D 12800 <0.000025>
+> >  > 0.206317 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 2304 <0.000171>
+> >  > 0.000304 recvfrom(5, 0x55a64d597170, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000029>
+> >  > 0.206161 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 2304 <0.000082>
+> >  > 0.000212 recvfrom(5, 0x55a64d5a0ed0, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000034>
+> >  > 0.206572 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 2304 <0.000146>
+> >  > 0.000274 recvfrom(5, 0x55a64d597170, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000029>
+> >  > 0.206604 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 2304 <0.000162>
+> >  > 0.000270 recvfrom(5, 0x55a64d5a20d0, 46080, 0, NULL, NULL) =3D -1
+> > EAGAIN (Resource temporarily unavailable) <0.000016>
+> >  > 0.206164 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 2304 <0.000116>
+> >  > 0.000291 recvfrom(5, "********************************"..., 46080, 0=
+,
+> > NULL, NULL) =3D 1280 <0.000038>
+> >  > 0.052224 +++ exited with 0 +++
+> >
+> > I.e. recvfrom() returns -EAGAIN and takes 200 ms.
+>
+> Ah, no, those 200 ms are not spent in recvfrom() but in poll:
+>  > 0.000029 recvfrom(6, "d", 10, 0, NULL, NULL) =3D 1 <0.000009>
+>  > 0.000040 epoll_wait(4, [{events=3DEPOLLIN, data=3D{u32=3D5,
+> u64=3D139942919405573}}], 1023, 60000) =3D 1 <0.204038>
+>  > 0.204258 epoll_ctl(4, EPOLL_CTL_DEL, 5, 0x7ffd49b4049c) =3D 0 <0.00004=
+5>
+>  > 0.000104 recvfrom(5, "********************************"..., 46080, 0,
+> NULL, NULL) =3D 16640 <0.000078>
+>  > 0.000264 recvfrom(5, 0x5603425f3550, 46080, 0, NULL, NULL) =3D -1
+> EAGAIN (Resource temporarily unavailable) <0.000025>
+>  > 0.000127 epoll_ctl(4, EPOLL_CTL_ADD, 5,
+> {events=3DEPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP, data=3D{u32=3D5,
+> u64=3D94570884890629}}) =3D 0 <0.000031>
+>  > 0.000112 epoll_wait(4, [{events=3DEPOLLOUT, data=3D{u32=3D6,
+> u64=3D139942919405574}}], 1023, 60000) =3D 1 <0.000026>
+>  > 0.000083 epoll_ctl(4, EPOLL_CTL_DEL, 6, 0x7ffd49b404fc) =3D 0 <0.00002=
+5>
+>  > 0.000063 sendto(6, "********************************"..., 12800, 0,
+> NULL, 0) =3D 12800 <0.000028>
+>  > 0.000226 epoll_wait(4, [], 1023, 0) =3D 0 <0.000007>
+>  > 0.000029 epoll_wait(4, [{events=3DEPOLLIN, data=3D{u32=3D5,
+> u64=3D94570884890629}}], 1023, 60000) =3D 1 <0.205476>
+>  > 0.205728 epoll_ctl(4, EPOLL_CTL_DEL, 5, 0x7ffd49b404fc) =3D 0 <0.00007=
+7>
+>  > 0.000157 recvfrom(5, "********************************"..., 46080, 0,
+> NULL, NULL) =3D 2304 <0.000066>
+>  > 0.000180 recvfrom(5, 0x5603425e30c0, 46080, 0, NULL, NULL) =3D -1
+> EAGAIN (Resource temporarily unavailable) <0.000026>
+>  > 0.000139 epoll_ctl(4, EPOLL_CTL_ADD, 5,
+> {events=3DEPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP, data=3D{u32=3D5, u64=3D5}})=
+ =3D 0
+> <0.000030>
+>  > 0.000104 epoll_wait(4, [{events=3DEPOLLIN, data=3D{u32=3D5, u64=3D5}}]=
+, 1023,
+> 60000) =3D 1 <0.205881>
+>  > 0.206222 epoll_ctl(4, EPOLL_CTL_DEL, 5, 0x7ffd49b404fc) =3D 0 <0.00008=
+6>
+>  > 0.000189 recvfrom(5, "********************************"..., 46080, 0,
+> NULL, NULL) =3D 2304 <0.000027>
+>  > 0.000153 recvfrom(5, 0x5603425ece20, 46080, 0, NULL, NULL) =3D -1
+> EAGAIN (Resource temporarily unavailable) <0.000017>
+>  > 0.000074 epoll_ctl(4, EPOLL_CTL_ADD, 5,
+> {events=3DEPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP, data=3D{u32=3D5, u64=3D5}})=
+ =3D 0
+> <0.000018>
+>  > 0.000067 epoll_wait(4, [{events=3DEPOLLIN, data=3D{u32=3D5, u64=3D5}}]=
+, 1023,
+> 60000) =3D 1 <0.205749>
+>  > 0.206088 epoll_ctl(4, EPOLL_CTL_DEL, 5, 0x7ffd49b404fc) =3D 0 <0.00019=
+7>
+>  > 0.000391 recvfrom(5, "********************************"..., 46080, 0,
+> NULL, NULL) =3D 2304 <0.000080>
+>  > 0.000210 recvfrom(5, 0x5603425e30c0, 46080, 0, NULL, NULL) =3D -1
+> EAGAIN (Resource temporarily unavailable) <0.000027>
+>  > 0.000174 epoll_ctl(4, EPOLL_CTL_ADD, 5,
+> {events=3DEPOLLIN|EPOLLPRI|EPOLLERR|EPOLLHUP, data=3D{u32=3D5, u64=3D5}})=
+ =3D 0
+> <0.000031>
+>  > 0.000127 epoll_wait(4, [{events=3DEPOLLIN, data=3D{u32=3D5, u64=3D5}}]=
+, 1023,
+> 60000) =3D 1 <0.205471>
+>  > 0.205783 epoll_ctl(4, EPOLL_CTL_DEL, 5, 0x7ffd49b404fc) =3D 0 <0.00020=
+5>
+>
 
+It seems the test had some expectations.
 
-On 03.11.23 07:07, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> This patches includes bugfix following:
-> 
-> 1. hung state
-> 2. sock leak
-> 3. potential panic
-> 
-> We have been testing these patches for some time, but
-> if you have any questions, please let us know.
-> 
-> --
-> v1:
-> Fix spelling errors and incorrect function names in descriptions
-> 
-> v2->v1:
-> Add fix tags for bugfix patch
-> 
-> D. Wythe (3):
->    net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
->    net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
->    net/smc: put sk reference if close work was canceled
-> 
->   net/smc/af_smc.c    |  4 ++--
->   net/smc/smc.h       |  5 +++++
->   net/smc/smc_cdc.c   | 11 +++++------
->   net/smc/smc_close.c |  5 +++--
->   4 files changed, 15 insertions(+), 10 deletions(-)
-> 
+Setting a small (1 byte) RCVBUF/SNDBUF, and yet expecting to send
+46080 bytes fast enough was not reasonable.
+It might have relied on the fact that tcp sendmsg() can cook large GSO
+packets, even if sk->sk_sndbuf is small.
 
-Thank you for the fixes, LGTM! For all of the 3 pathces:
+With tight memory settings, it is possible TCP has to resort on RTO
+timers (200ms by default) to recover from dropped packets.
 
-Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+What happens if you double /proc/sys/net/ipv4/tcp_wmem  and/or
+/proc/sys/net/ipv4/tcp_rmem first value ?
+(4096 -> 8192)
 
