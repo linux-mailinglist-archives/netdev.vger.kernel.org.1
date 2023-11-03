@@ -1,631 +1,192 @@
-Return-Path: <netdev+bounces-45908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C7897E0417
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:56:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC737E045A
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 15:05:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F5041C20FA3
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:56:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC7E1C20F74
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:05:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E603518632;
-	Fri,  3 Nov 2023 13:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CEE1865C;
+	Fri,  3 Nov 2023 14:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b9s70OR/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99ACD18623;
-	Fri,  3 Nov 2023 13:56:43 +0000 (UTC)
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9718B7;
-	Fri,  3 Nov 2023 06:56:38 -0700 (PDT)
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-9be3b66f254so307656066b.3;
-        Fri, 03 Nov 2023 06:56:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699019797; x=1699624597;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jHTCE7ROeImvpUXZ1SAvqpDykbwHTyy61xMy2AytBh0=;
-        b=SZssVkdX9mupRt5f5hrd1uZtIL8EnEeI1++K3ccaR4rh/zIh2XOF7W8c6VItHrZydo
-         hJgpKiNvm25pGC/uTkPuehNr56bCiL59mxykvYoHXQaUiBNO2uSY5tCurtG8DVRGuvzV
-         cT/gt/zekLrGZfe0eMAqo/abtHZG5IjCyBxOGfvIsyGHdvwmlpnnPx8gn7sU+9HyzAsN
-         6Pe5sNHwrdIP+YgsACBfLCSJxH8RQNP61Dvojorg2zI5nMPujmdK7FgtMxmZBDXF1X+C
-         Ndn7PcWA7BZqECs/EHbL6En4nfguTOEpCIlpFiJJ0mrXBcW1n+pdZ0MEH6Js7eyzBVA7
-         K4rw==
-X-Gm-Message-State: AOJu0YzaLQoErBrHM5cRldr+GMpKj8ppfgF/9cKwfUaWPjfAL6/iJbTr
-	1pIjA791MvcflJzpfPASlDM=
-X-Google-Smtp-Source: AGHT+IH6+LcAVLmJe/Buh8eFeUfYVrBhpsRdik4jYowZPgkjC8OQtwKEHSQQy29cxuFaIdcB6c3jGA==
-X-Received: by 2002:a17:907:940a:b0:9bf:4e0b:fb06 with SMTP id dk10-20020a170907940a00b009bf4e0bfb06mr7384104ejc.14.1699019796950;
-        Fri, 03 Nov 2023 06:56:36 -0700 (PDT)
-Received: from localhost (fwdproxy-cln-005.fbsv.net. [2a03:2880:31ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id v26-20020a17090606da00b009ae57888718sm919405ejb.207.2023.11.03.06.56.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 06:56:36 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: corbet@lwn.net
-Cc: linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH] Documentation: Document the Netlink spec
-Date: Fri,  3 Nov 2023 06:56:22 -0700
-Message-Id: <20231103135622.250314-1-leitao@debian.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A77118643;
+	Fri,  3 Nov 2023 14:05:29 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D770D7D;
+	Fri,  3 Nov 2023 07:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699020311; x=1730556311;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=IF4pObGq99rq8S2g96r3MxvBwfaE/rzPV10xIwz+Riw=;
+  b=b9s70OR/niLrBhYHCgXtMx64iUXKuGpfzJWF1vqf2DTL388hBazBo7bD
+   bdqLJajalYkzvKuJLGQZ5+y5H0/3XhfEsFGtQw9hdAKtWZkSArEWbfRUf
+   UEJU7daL0eHSQ9dMmjk0uEhgvny+NfmJqCeCbqziEvxKTxuY83kA7t2kN
+   d4zNzMM7vTQpOJFdSkxPvHT4EeStA2nB2+SsrwMO2l0SgWc3Fyv8+YAtb
+   ZTOxxUIrCQdbrbtUOrMor0lHTZZCppfDBqVJaEjgrTR99OY/6vebhkm9b
+   nlyVBE3KnHDgPuU/3XJcdfWK2cRq8nNUZtEs0U2JBY8f2EZB9un1SjUQx
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="391817647"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="391817647"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 07:05:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="832031575"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="832031575"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Nov 2023 07:05:09 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 3 Nov 2023 07:05:09 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 3 Nov 2023 07:05:09 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 3 Nov 2023 07:05:09 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 3 Nov 2023 07:05:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hW1fAdBiShFor5pQLspJKfRy0EYm+Oa8iHpb2vBj/NE3JWUss8mDX5ejGfd0UJj18O44FpkZfZLR1qpmQJDsX3DcsXM7dr8k/yX/8Tzl/+17Ah4B4I56seExijlwIsZv7LEy4yGdPlB0nIJjefahvPTQSlwUzLku00G9wrVYAByVTLgf0BvrqP3fyf6gzQJLpQvD5YUGNh5f07QYe9W6QFPWFX45RSVQz0iEPWByJScgU+j9mK3mLM498EZf1chWzEWJYChgCZUVyifk6yfJ86B1gbFwXHVMxMNQmI0eXAlpNb4l7OYLHQW0AKpcvrkvKeJrc+vU8hKjqRHJvwt4Bw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cDzwY19rGYXR6aKoIfYHhCEEjvA3RlU/iWlGGgw87b8=;
+ b=SFFGoclWZuhAYFbM3w8/EKzme/qhpARrua4cOOJx+QAErC8Tuahwqko9GanA5gW0Xu+yq+S0FxjztiGt0hj8UfgOeJuzELM94LfoQXs0gnrOjGo7ypNOwmrhvSRhVlpuQAPZTjIR+vqCd0JrxHj4WbYUGuBzmjgGaxHuWGm9d+bzmGT22/nhBmoZw8dsfTFcyIDc0YnTwllZPYSWN3oH4OrzKtg4I2uLAszNZ1LF1VHSxptA1JL3CP+JnArKRXaeJFf3buIR1vJ1nHn7EuDVeuHz2kKWoMBGlTeILOWzx2Jk+lMGokslcJ1p+1qH1ZgPRZTGiOSw8BC8pGKzDu/etg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by PH7PR11MB8250.namprd11.prod.outlook.com (2603:10b6:510:1a8::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.21; Fri, 3 Nov
+ 2023 14:05:06 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.6954.021; Fri, 3 Nov 2023
+ 14:05:05 +0000
+Message-ID: <b6da9739-a6e6-4528-a4cd-f87e8e025740@intel.com>
+Date: Fri, 3 Nov 2023 15:03:14 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2] net, xdp: allow metadata > 32
+Content-Language: en-US
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, "Jesper Dangaard
+ Brouer" <hawk@kernel.org>, Eric Dumazet <edumazet@google.com>, "Magnus
+ Karlsson" <magnus.karlsson@gmail.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, John Fastabend
+	<john.fastabend@gmail.com>
+References: <20231031175742.21455-1-larysa.zaremba@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231031175742.21455-1-larysa.zaremba@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0365.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f8::8) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|PH7PR11MB8250:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9f94bc01-0ff5-4814-0b59-08dbdc75e153
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0kVFofVftNEb86oav7SfI3xYOnOX4BOP4WXBMvltI7YL45HRvKSf+hRuYWzLRNS8aeC4GtOWReMPDzdQ6p//JcCEefvTWo3K7OXDi+06eKWD7Q0m3gn/EUIr5c8Jp5Fqg7KCWHn25pEPrQDqC2w5JqEDTkrf7LZy8f7Czu0HOvJoLpjWSsNzwD/bOUSqq0d5XayFX9bQkAygG+QdIXpiWmlPgfQY70w8mYc9uriqRYNltDRkyJ7VFC+8pV8hxAqnNOSz5/Z4cwxTOTwusEH3u+fFnIra0572vhVykqB0vfnSm6OH0msIepp0zY9DwRcU8jsNmTlMoL91n7zbLT2O/ndOaaR0hf/A0Frjy0/yTqJ8/UavIc0i4lzfFnnMNHRcxph3BkYHvnhhDQPaV96WkFYbzFzQp8Z+6oTPUy3itfOYjjDZY7AuWoA6raqWLSHx5P4rrVMQIMbpGxBB7fKA3brRSlCxPHhr5cdtZke8FvvPL71xyX8DMnoaoL7OPDavWi8qsuyOmNSKo7GCEIgy/YbRvGD1ddLlmmru5OncvkNLP4u+VsPll86reCXRhGrbECJ/bKaxw8r/G9k71dvW1Gsb+bz/M2bm/JcDMFw1YWyc50zCqnr+4CxG1kOkJ+Qb4uzGHrxR9NXOGSEOvv60lA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(346002)(39860400002)(396003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(38100700002)(82960400001)(5660300002)(8676002)(6862004)(26005)(4326008)(8936002)(4744005)(83380400001)(7416002)(2906002)(6512007)(478600001)(6486002)(31696002)(6506007)(6666004)(2616005)(31686004)(86362001)(54906003)(66476007)(66556008)(66946007)(316002)(6636002)(37006003)(36756003)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?elNzMW1QQkNpUXorSFVSN3liVE13bzZFZ09mNzBqRktEU3dYNHh0WWJUWTNQ?=
+ =?utf-8?B?MVAycVpueUNRTGlXMEZOUVhIcVpvRG03Zmh6N213UFQzUUtaMW9POS9HcmhL?=
+ =?utf-8?B?WkM5a1U0cEgwQUdTTnV0dmhMdjNxazNsS2prUEFYK0trTTNxQ1hXOU8zQVRh?=
+ =?utf-8?B?aVRPcm4zMy9CcVp1Yk04RFdyS1J6Vi9XWmpzMlFGUXc4MDkrM1E5ZEk5TXZZ?=
+ =?utf-8?B?QlcwT1VkZGs5VVp4M2ZMN1BuVnl0OERnR2xudXpoMmc0Y1RkNk1LeVdmSmxp?=
+ =?utf-8?B?V2F1UkRCWnhpaTVVSHFTSW5BaVZjTlVWSzR3cDdoS1RyMU13cWp6SFVmOW56?=
+ =?utf-8?B?YkNsclB1RkRESnlrOGN4bTQxNnYwdUs4RTBhM1BpcjhkSEdNZWoza01oMncw?=
+ =?utf-8?B?NFVTY3htMk11YWppOSthRnBLejZPQTR5RmQ1NXp1QW9pQ1VzZXM4eEFqbHhC?=
+ =?utf-8?B?VzRiRUxNeFFOMHcvdDRkcEduc2x6YlB5Z1Q5eG1SNDRyMzM1ck52OG9GNTJJ?=
+ =?utf-8?B?N2ppL25FMVpicCtPL2tLNXR5aG4zbC9rbzN4WG44dWRlbTUyemh4eWlKUXJK?=
+ =?utf-8?B?MVpWRXBoWDRieEJGWjVZYkdWaEF1bXFmcnFnTjBGSTVWdkdESTUyL1YzU1pT?=
+ =?utf-8?B?ekRKQWlad2ZrbGx1UVo4YU1sNDREaEk0VStjUmxrUUszUUZvY2lKdUtwR01v?=
+ =?utf-8?B?aDFvRDlSVSs1NSt3WEtQWGw5OXpKS1c4SEVSaDJDZ3YvbFZCRS9ZRnZydmI1?=
+ =?utf-8?B?blB5WlAwRyt3VnNtSWZRaVMzRGNya1VQaFppVEJhQlRtSWdjdTBNaEVNU1p3?=
+ =?utf-8?B?eGRvcnZtNmJUdUFnM0FXTmFleWVjQngvb2txN0hnWDdyUzBhUktkUGk4SjM5?=
+ =?utf-8?B?K1dTTkhXZ1J6QXhZMWlSU3hTOUg0azkzdDA3UVhRanY1Y0pCNE1wNXFWV2xK?=
+ =?utf-8?B?R0pqQnkrUnBxcGMzSnR3b1FlZWY2ZkFYaVpIOWNGdHppWm5RZXlHK1o5S09Y?=
+ =?utf-8?B?Sm1qMkxHRmJoaGNVb0NsSkpCL2ZidzNSM0VISEdIZWdZK3k3VGdwMm0rUTNm?=
+ =?utf-8?B?M1lHcXhFVTJyVDNXSEFVVmpZS2pleHNLbnlsVjJHNzMycTBlTkVnRDJMeDNJ?=
+ =?utf-8?B?TXgzNHlURGIyRW51c0MrU3drQ1hJOGkwYy9QR1ZMdlNSYjZJY2V1UVQyU2kw?=
+ =?utf-8?B?RzNXQXpnTFB5NVJKNi84c0RaOTlXdVVwOW9Ycm0yZFlTWnVzTUozcE82Tk82?=
+ =?utf-8?B?ejlFcVJBSVljVnlmSXpaTFVUakJWVGI5U0lXaC9qWmJBLzYrYkE0a1Q3Mmhy?=
+ =?utf-8?B?OHlqZ2oySVhLUVlpOXpHdTdINE9BZHd6MG5JOU1raU9GTGswMW8yQUlac002?=
+ =?utf-8?B?UUxnQ1ZFNW9pV05IQ0d3VUQ5S2RzcDFCSjBkSStMaWZDMS8wdy9uQzVaL0pP?=
+ =?utf-8?B?L3F3d252RzJjcDd0MHp1c083a0F2Tzh6STlSSERraUMwZXA4dmlWbFM3bUtF?=
+ =?utf-8?B?amNyTTJxeGRpNVgrS2xnNFJ2KzBocnpLRDhTcVVLZEVURDNMV1hEZTNOMXox?=
+ =?utf-8?B?SlE2M0F0NitkRUZXNTBNNmhlSUVwNXJEbGQ3QVFnRlcvZzBFRGIxWGUwNUhI?=
+ =?utf-8?B?QkNYSUR1ZHg1T2FIQVpiNnBTMGgySkUvR1Bha3FZMW9kbkFDSllvR3dwcmxD?=
+ =?utf-8?B?N0VHdWtiSlVMaWFxQWRXSlVWcVl4UUpSY1dMMWFsWXJQT2JHWXdQVlZyaVRF?=
+ =?utf-8?B?SEZYVG56MmRneEpTUm16Zmsvb1Q3a1BrVlRNUFBhaitueXEzZ3NpNVUxcHVS?=
+ =?utf-8?B?NS9XVW9kWHZTamF5dHFuemp4bFJkZ2Q2bjhGdUt4OEdQQ2plV0NrNmIyZzZB?=
+ =?utf-8?B?bjVXeU5CaTNDYWMyRXBaV3pGR3h4MHlhallHK05oL2gzdkJhWVNZaXY1dmRR?=
+ =?utf-8?B?K1h2WGFwMTJ3RG41TTZ1V05rb3VMRFE3ZkZ2NG1sMDBkcjhFNWxKK1RYckdU?=
+ =?utf-8?B?eTVnSE1Ed1ZJUGJ5TlVHamcwTyszdzNPbkhzaENyT0lTdms3MjdXMk52Q3U5?=
+ =?utf-8?B?NzJaTFA1MTBzZEE3ZVR6WG83Uk5ONlg3Zm9JdnEwOFVXTGFjeVBmRmpPbFZy?=
+ =?utf-8?B?L1ZDMzMzZmh0OTVOdURWajhLZ2Jpb2tPQVdOQTlaVlNReW5NaCttYmVVVW5h?=
+ =?utf-8?B?U1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f94bc01-0ff5-4814-0b59-08dbdc75e153
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 14:05:05.6300
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eKGK5rLPo1a6jyHTBJ40WSWidrYAZpIDQjf7G9OsYKNVdv/sece8hf52Xh1+7D3TIsoDZ1ucOBcOtGezpJcJaq9HjzvAO9rIUwHsw38EVdA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8250
+X-OriginatorOrg: intel.com
 
-This is a Sphinx extension that parses the Netlink YAML spec files
-(Documentation/netlink/specs/), and generates a rst file to be
-displayed into Documentation pages.
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+Date: Tue, 31 Oct 2023 18:57:37 +0100
 
-Create a new Documentation/networking/netlink_spec page, and a sub-page
-for each Netlink spec that needs to be documented, such as ethtool,
-devlink, netdev, etc.
+It doesn't have "From: Alexa..." here, so that you'll be the author once
+this is applied. Is this intended? ^.^
 
-Create a Sphinx directive extension that reads the YAML spec
-(located under Documentation/netlink/specs), parses it and returns a RST
-string that is inserted where the Sphinx directive was called.
+> 32 bytes may be not enough for some custom metadata. Relax the restriction,
+> allow metadata larger than 32 bytes and make __skb_metadata_differs() work
+> with bigger lengths.
+> 
+> Now size of metadata is only limited by the fact it is stored as u8
+> in skb_shared_info, so the upper limit is now is 255. Other important
+> conditions, such as having enough space for xdp_frame building, are already
+> checked in bpf_xdp_adjust_meta().
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- Documentation/conf.py                         |   2 +-
- Documentation/networking/index.rst            |   1 +
- .../networking/netlink_spec/devlink.rst       |   9 +
- .../networking/netlink_spec/ethtool.rst       |   9 +
- Documentation/networking/netlink_spec/fou.rst |   9 +
- .../networking/netlink_spec/handshake.rst     |   9 +
- .../networking/netlink_spec/index.rst         |  21 ++
- .../networking/netlink_spec/netdev.rst        |   9 +
- .../networking/netlink_spec/ovs_datapath.rst  |   9 +
- .../networking/netlink_spec/ovs_flow.rst      |   9 +
- .../networking/netlink_spec/ovs_vport.rst     |   9 +
- .../networking/netlink_spec/rt_addr.rst       |   9 +
- .../networking/netlink_spec/rt_link.rst       |   9 +
- .../networking/netlink_spec/rt_route.rst      |   9 +
- Documentation/sphinx/netlink_spec.py          | 283 ++++++++++++++++++
- Documentation/sphinx/requirements.txt         |   1 +
- 16 files changed, 406 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/networking/netlink_spec/devlink.rst
- create mode 100644 Documentation/networking/netlink_spec/ethtool.rst
- create mode 100644 Documentation/networking/netlink_spec/fou.rst
- create mode 100644 Documentation/networking/netlink_spec/handshake.rst
- create mode 100644 Documentation/networking/netlink_spec/index.rst
- create mode 100644 Documentation/networking/netlink_spec/netdev.rst
- create mode 100644 Documentation/networking/netlink_spec/ovs_datapath.rst
- create mode 100644 Documentation/networking/netlink_spec/ovs_flow.rst
- create mode 100644 Documentation/networking/netlink_spec/ovs_vport.rst
- create mode 100644 Documentation/networking/netlink_spec/rt_addr.rst
- create mode 100644 Documentation/networking/netlink_spec/rt_link.rst
- create mode 100644 Documentation/networking/netlink_spec/rt_route.rst
- create mode 100755 Documentation/sphinx/netlink_spec.py
+[...]
 
-diff --git a/Documentation/conf.py b/Documentation/conf.py
-index d4fdf6a3875a..10ce47d1a7df 100644
---- a/Documentation/conf.py
-+++ b/Documentation/conf.py
-@@ -55,7 +55,7 @@ needs_sphinx = '1.7'
- extensions = ['kerneldoc', 'rstFlatTable', 'kernel_include',
-               'kfigure', 'sphinx.ext.ifconfig', 'automarkup',
-               'maintainers_include', 'sphinx.ext.autosectionlabel',
--              'kernel_abi', 'kernel_feat']
-+              'kernel_abi', 'kernel_feat', 'netlink_spec']
- 
- if major >= 3:
-     if (major > 3) or (minor > 0 or patch >= 2):
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index 5b75c3f7a137..ee3a2085af71 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -55,6 +55,7 @@ Contents:
-    filter
-    generic-hdlc
-    generic_netlink
-+   netlink_spec/index
-    gen_stats
-    gtp
-    ila
-diff --git a/Documentation/networking/netlink_spec/devlink.rst b/Documentation/networking/netlink_spec/devlink.rst
-new file mode 100644
-index 000000000000..ca4b98e29690
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/devlink.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================
-+Family ``devlink`` netlink specification
-+========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: devlink.yaml
-diff --git a/Documentation/networking/netlink_spec/ethtool.rst b/Documentation/networking/netlink_spec/ethtool.rst
-new file mode 100644
-index 000000000000..017d5dff427b
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/ethtool.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================
-+Family ``ethtool`` netlink specification
-+========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: ethtool.yaml
-diff --git a/Documentation/networking/netlink_spec/fou.rst b/Documentation/networking/netlink_spec/fou.rst
-new file mode 100644
-index 000000000000..4db939091f67
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/fou.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=======================================
-+Family ``fou`` netlink specification
-+=======================================
-+
-+.. contents::
-+
-+.. netlink-spec:: fou.yaml
-diff --git a/Documentation/networking/netlink_spec/handshake.rst b/Documentation/networking/netlink_spec/handshake.rst
-new file mode 100644
-index 000000000000..ed3d79843602
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/handshake.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==========================================
-+Family ``handshake`` netlink specification
-+==========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: handshake.yaml
-diff --git a/Documentation/networking/netlink_spec/index.rst b/Documentation/networking/netlink_spec/index.rst
-new file mode 100644
-index 000000000000..b330bda0ea21
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/index.rst
-@@ -0,0 +1,21 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+======================
-+Netlink Specifications
-+======================
-+
-+.. toctree::
-+   :maxdepth: 2
-+
-+   devlink
-+   ethtool
-+   fou
-+   handshake
-+   netdev
-+   ovs_datapath
-+   ovs_flow
-+   ovs_vport
-+   rt_addr
-+   rt_link
-+   rt_route
-+
-diff --git a/Documentation/networking/netlink_spec/netdev.rst b/Documentation/networking/netlink_spec/netdev.rst
-new file mode 100644
-index 000000000000..4f43c31805dd
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/netdev.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=======================================
-+Family ``netdev`` netlink specification
-+=======================================
-+
-+.. contents::
-+
-+.. netlink-spec:: netdev.yaml
-diff --git a/Documentation/networking/netlink_spec/ovs_datapath.rst b/Documentation/networking/netlink_spec/ovs_datapath.rst
-new file mode 100644
-index 000000000000..8045a5c93001
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/ovs_datapath.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=============================================
-+Family ``ovs_datapath`` netlink specification
-+=============================================
-+
-+.. contents::
-+
-+.. netlink-spec:: ovs_datapath.yaml
-diff --git a/Documentation/networking/netlink_spec/ovs_flow.rst b/Documentation/networking/netlink_spec/ovs_flow.rst
-new file mode 100644
-index 000000000000..3a60d75b79b4
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/ovs_flow.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=========================================
-+Family ``ovs_flow`` netlink specification
-+=========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: ovs_flow.yaml
-diff --git a/Documentation/networking/netlink_spec/ovs_vport.rst b/Documentation/networking/netlink_spec/ovs_vport.rst
-new file mode 100644
-index 000000000000..2be013c0b524
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/ovs_vport.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+==========================================
-+Family ``ovs_vport`` netlink specification
-+==========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: ovs_vport.yaml
-diff --git a/Documentation/networking/netlink_spec/rt_addr.rst b/Documentation/networking/netlink_spec/rt_addr.rst
-new file mode 100644
-index 000000000000..ca002646fa5c
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/rt_addr.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================
-+Family ``rt_addr`` netlink specification
-+========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: rt_addr.yaml
-diff --git a/Documentation/networking/netlink_spec/rt_link.rst b/Documentation/networking/netlink_spec/rt_link.rst
-new file mode 100644
-index 000000000000..e07481a34880
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/rt_link.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+========================================
-+Family ``rt_link`` netlink specification
-+========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: rt_link.yaml
-diff --git a/Documentation/networking/netlink_spec/rt_route.rst b/Documentation/networking/netlink_spec/rt_route.rst
-new file mode 100644
-index 000000000000..7fe674dc098e
---- /dev/null
-+++ b/Documentation/networking/netlink_spec/rt_route.rst
-@@ -0,0 +1,9 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+=========================================
-+Family ``rt_route`` netlink specification
-+=========================================
-+
-+.. contents::
-+
-+.. netlink-spec:: rt_route.yaml
-diff --git a/Documentation/sphinx/netlink_spec.py b/Documentation/sphinx/netlink_spec.py
-new file mode 100755
-index 000000000000..80756e72ed4f
---- /dev/null
-+++ b/Documentation/sphinx/netlink_spec.py
-@@ -0,0 +1,283 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+# -*- coding: utf-8; mode: python -*-
-+
-+"""
-+    netlink-spec
-+    ~~~~~~~~~~~~~~~~~~~
-+
-+    Implementation of the ``netlink-spec`` ReST-directive.
-+
-+    :copyright:  Copyright (C) 2023  Breno Leitao <leitao@debian.org>
-+    :license:    GPL Version 2, June 1991 see linux/COPYING for details.
-+
-+    The ``netlink-spec`` reST-directive performs extensive parsing
-+    specific to the Linux kernel's standard netlink specs, in an
-+    effort to avoid needing to heavily mark up the original YAML file.
-+
-+    This code is split in three big parts:
-+        1) RST formatters: Use to convert a string to a RST output
-+        2) Parser helpers: Helper functions to parse the YAML data
-+        3) NetlinkSpec Directive: The actual directive class
-+"""
-+
-+from typing import Any, Dict, List
-+import os.path
-+from docutils.parsers.rst import Directive
-+from docutils import statemachine
-+import yaml
-+
-+__version__ = "1.0"
-+SPACE_PER_LEVEL = 4
-+
-+# RST Formatters
-+def rst_definition(key: str, value: Any, level: int = 0) -> str:
-+    """Format a single rst definition"""
-+    return headroom(level) + key + "\n" + headroom(level + 1) + str(value)
-+
-+
-+def rst_paragraph(paragraph: str, level: int = 0) -> str:
-+    """Return a formatted paragraph"""
-+    return headroom(level) + paragraph
-+
-+
-+def headroom(level: int) -> str:
-+    """Return space to format"""
-+    return " " * (level * SPACE_PER_LEVEL)
-+
-+
-+def rst_bullet(item: str, level: int = 0) -> str:
-+    """Return a formatted a bullet"""
-+    return headroom(level) + f" - {item}"
-+
-+def rst_subsubtitle(title: str) -> str:
-+    """Add a sub-sub-title to the document"""
-+    return f"{title}\n" + "~" * len(title)
-+
-+
-+def rst_fields(key: str, value: str, level: int = 0) -> str:
-+    """Return a RST formatted field"""
-+    return headroom(level) + f":{key}: {value}"
-+
-+
-+def rst_subtitle(title: str, level: int = 0) -> str:
-+    """Add a subtitle to the document"""
-+    return headroom(level) + f"\n{title}\n" + "-" * len(title)
-+
-+
-+def rst_list_inline(list_: List[str], level: int = 0) -> str:
-+    """Format a list using inlines"""
-+    return headroom(level) + "[" + ", ".join(inline(i) for i in list_) + "]"
-+
-+
-+def bold(text: str) -> str:
-+    """Format bold text"""
-+    return f"**{text}**"
-+
-+
-+def inline(text: str) -> str:
-+    """Format inline text"""
-+    return f"``{text}``"
-+
-+
-+def sanitize(text: str) -> str:
-+    """Remove newlines and multiple spaces"""
-+    # This is useful for some fields that are spread in multiple lines
-+    return str(text).replace("\n", "").strip()
-+
-+
-+# Parser helpers
-+# ==============
-+def parse_mcast_group(mcast_group: List[Dict[str, Any]]) -> str:
-+    """Parse 'multicast' group list and return a formatted string"""
-+    lines = []
-+    for group in mcast_group:
-+        lines.append(rst_paragraph(group["name"], 1))
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_do(do_dict: Dict[str, Any], level: int = 0) -> str:
-+    """Parse 'do' section and return a formatted string"""
-+    lines = []
-+    for key in do_dict.keys():
-+        lines.append(rst_bullet(bold(key), level + 1))
-+        lines.append(parse_do_attributes(do_dict[key], level + 1) + "\n")
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_do_attributes(attrs: Dict[str, Any], level: int = 0) -> str:
-+    """Parse 'attributes' section"""
-+    if "attributes" not in attrs:
-+        return ""
-+    lines = [rst_fields("attributes", rst_list_inline(attrs["attributes"]), level + 1)]
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_operations(operations: List[Dict[str, Any]]) -> str:
-+    """Parse operations block"""
-+    preprocessed = ["name", "doc", "title", "do", "dump"]
-+    lines = []
-+
-+    for operation in operations:
-+        lines.append(rst_subsubtitle(operation["name"]))
-+        lines.append(rst_paragraph(operation["doc"]) + "\n")
-+        if "do" in operation:
-+            lines.append(rst_paragraph(bold("do"), 1))
-+            lines.append(parse_do(operation["do"], 1))
-+        if "dump" in operation:
-+            lines.append(rst_paragraph(bold("dump"), 1))
-+            lines.append(parse_do(operation["dump"], 1))
-+
-+        for key in operation.keys():
-+            if key in preprocessed:
-+                # Skip the special fields
-+                continue
-+            lines.append(rst_fields(key, operation[key], 1))
-+
-+        # New line after fields
-+        lines.append("\n")
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_entries(entries: List[Dict[str, Any]], level: int) -> str:
-+    """Parse a list of entries"""
-+    lines = []
-+    for entry in entries:
-+        if isinstance(entry, dict):
-+            # entries could be a list or a dictionary
-+            lines.append(
-+                rst_fields(entry.get("name"), sanitize(entry.get("doc")), level)
-+            )
-+        elif isinstance(entry, list):
-+            lines.append(rst_list_inline(entry, level))
-+        else:
-+            lines.append(rst_bullet(inline(sanitize(entry)), level))
-+
-+    lines.append("\n")
-+    return "\n".join(lines)
-+
-+
-+def parse_definitions(defs: Dict[str, Any]) -> str:
-+    """Parse definitions section"""
-+    preprocessed = ["name", "entries", "members"]
-+    ignored = ["render-max"] # This is not printed
-+    lines = []
-+
-+    for definition in defs:
-+        lines.append(rst_subsubtitle(definition["name"]))
-+        for k in definition.keys():
-+            if k in preprocessed + ignored:
-+                continue
-+            lines.append(rst_fields(k, sanitize(definition[k]), 1))
-+
-+        # Field list needs to finish with a new line
-+        lines.append("\n")
-+        if "entries" in definition:
-+            lines.append(rst_paragraph(bold("Entries"), 1))
-+            lines.append(parse_entries(definition["entries"], 2))
-+        if "members" in definition:
-+            lines.append(rst_paragraph(bold("members"), 1))
-+            lines.append(parse_entries(definition["members"], 2))
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_attributes_set(entries: List[Dict[str, Any]]) -> str:
-+    """Parse attribute from attribute-set"""
-+    preprocessed = ["name", "type"]
-+    ignored = ["checks"]
-+    lines = []
-+
-+    for entry in entries:
-+        lines.append(rst_bullet(bold(entry["name"])))
-+        for attr in entry["attributes"]:
-+            type_ = attr.get("type")
-+            attr_line = bold(attr["name"])
-+            if type_:
-+                # Add the attribute type in the same line
-+                attr_line += f" ({inline(type_)})"
-+
-+            lines.append(rst_bullet(attr_line, 2))
-+
-+            for k in attr.keys():
-+                if k in preprocessed + ignored:
-+                    continue
-+                lines.append(rst_fields(k, sanitize(attr[k]), 3))
-+            lines.append("\n")
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_yaml(obj: Dict[str, Any]) -> str:
-+    """Format the whole yaml into a RST string"""
-+    lines = []
-+
-+    # This is coming from the RST
-+    lines.append(rst_subtitle("Summary"))
-+    lines.append(rst_paragraph(obj["doc"], 1))
-+
-+    # Operations
-+    lines.append(rst_subtitle("Operations"))
-+    lines.append(parse_operations(obj["operations"]["list"]))
-+
-+    # Multicast groups
-+    if "mcast-groups" in obj:
-+        lines.append(rst_subtitle("Multicast groups"))
-+        lines.append(parse_mcast_group(obj["mcast-groups"]["list"]))
-+
-+    # Definitions
-+    lines.append(rst_subtitle("Definitions"))
-+    lines.append(parse_definitions(obj["definitions"]))
-+
-+    # Attributes set
-+    lines.append(rst_subtitle("Attribute sets"))
-+    lines.append(parse_attributes_set(obj["attribute-sets"]))
-+
-+    return "\n".join(lines)
-+
-+
-+def parse_yaml_file(filename: str, debug: bool = False) -> str:
-+    """Transform the yaml specified by filename into a rst-formmated string"""
-+    with open(filename, "r") as file:
-+        yaml_data = yaml.safe_load(file)
-+        content = parse_yaml(yaml_data)
-+
-+    if debug:
-+        # Save the rst for inspection
-+        print(content, file=open(f"/tmp/{filename.split('/')[-1]}.rst", "w"))
-+
-+    return content
-+
-+
-+# Main Sphinx Extension class
-+def setup(app):
-+    """Sphinx-build register function for 'netlink-spec' directive"""
-+    app.add_directive("netlink-spec", NetlinkSpec)
-+    return dict(version=__version__, parallel_read_safe=True, parallel_write_safe=True)
-+
-+
-+class NetlinkSpec(Directive):
-+    """NetlinkSpec (``netlink-spec``) directive class"""
-+    has_content = True
-+    # Argument is the filename to process
-+    required_arguments = 1
-+
-+    def run(self):
-+        srctree = os.path.abspath(os.environ["srctree"])
-+        yaml_file = os.path.join(
-+            srctree, "Documentation/netlink/specs", self.arguments[0]
-+        )
-+        self.state.document.settings.record_dependencies.add(yaml_file)
-+
-+        try:
-+            content = parse_yaml_file(yaml_file)
-+        except FileNotFoundError as exception:
-+            raise self.severe(str(exception))
-+
-+        self.state_machine.insert_input(statemachine.string2lines(content), yaml_file)
-+
-+        return []
-diff --git a/Documentation/sphinx/requirements.txt b/Documentation/sphinx/requirements.txt
-index 335b53df35e2..a8a1aff6445e 100644
---- a/Documentation/sphinx/requirements.txt
-+++ b/Documentation/sphinx/requirements.txt
-@@ -1,3 +1,4 @@
- # jinja2>=3.1 is not compatible with Sphinx<4.0
- jinja2<3.1
- Sphinx==2.4.4
-+pyyaml
--- 
-2.34.1
-
+Thanks,
+Olek
 
