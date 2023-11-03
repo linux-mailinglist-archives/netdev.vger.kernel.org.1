@@ -1,163 +1,183 @@
-Return-Path: <netdev+bounces-45895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B2C17E02CE
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:28:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD82F7E02FE
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:35:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40CA3B2128A
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:28:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0081C209E7
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5767F1642F;
-	Fri,  3 Nov 2023 12:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5CF13AD3;
+	Fri,  3 Nov 2023 12:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="cVe+fRNb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U81v6V1w"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E591641F
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 12:28:21 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2065.outbound.protection.outlook.com [40.92.89.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F131A8;
-	Fri,  3 Nov 2023 05:28:19 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bbTwa+AfGqcIW7yYxTMX2js5S5AbaDwPYYzFu+mIyXbVqUpbJJMa2Mb6E/0i30A+ev8iIxS4jI7jIhwA7Ec5jYMDQ+Brv7fvU7gUaWeBhKYFBJZ53jsRJaUwrPX0JXeyIdpGeVRuunrABh7l94GtyX5Je79d/7uCmeIlo7Z1kcYSwvtfXADKJH+LXaVv3aFnxmHy+jyVmz5P6KDRFWsMug3/4/7ecsyWH2thVg2e3mBN3eE0pvTJnxq9zTQaV2+B7AZEZryfCMRGJ7MFGOE+Yizg2uLuvaymK8psRHp9sY4NAx2wnkaOB9iZ/7gjfsK3XUAO03ntT3d+5YX5MJTlcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h0y5qiJxKQlTXRK1p0RZpjs5R/99wSgAnj3d5FFrS70=;
- b=SBfWBxdzdOnsN6RlbWdE8bxJ/qBPRez51GVQcUczGvZaORZXvwXbX3MZ0RODlhpfTYFU/8Zx66RErvhf3RoAB7ln5NkjAjKNIhYWm3+it0zkYIcycihyNaBHqxGlkY95zKq/zRmW8As+GUid7PtpLkah9zyBVDaf7s05jvu2XarFe1bLqZNBeFPgNu2IgKZdd3mVlcxt2LMbx5bh/rfySrjeJTDy59EmvclfwrqRMEDOZKON7F+Pu/+vIQqvOk4kHBMaJcRbueN1ROcAMWkYthUdv3oQLjPwF/3Iqq6V0/51X1I2+nP2RdGcQidAABYnS2hGXOndViBYfuMucL/TLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h0y5qiJxKQlTXRK1p0RZpjs5R/99wSgAnj3d5FFrS70=;
- b=cVe+fRNbmyLFnk1C6HAYspd4AQ+33guS9qKfZrOyITw+Q/Ltkq1LE6nG7SFmxnDJjocgjE9U+/CD/WD3GLTo7WZRO2tW4tWpDxC+S15PJuUcUZet5pt0wgRiA6bmfx3/THgK2CUvSMH6LF9ejcn1hGl5EP8d46i8JgW+NyZKBTYYZ5O6oiY0qnM4sC+RJ+0WNZRFzyP4Gu2vET7sAwlpWf5hBaqFzTSMm0uwR9R1fSg0CAANUqHiC6Wr/biYs19OZjMOOGP0FwSDNqXTvsF+8GIe4MsEXFDQsuT+3IUTGT/HRbELlro8YyWVGc3ebpWexoAoH1g++01ktUSS2qIOOA==
-Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
- by PR3PR10MB4112.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:af::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.21; Fri, 3 Nov
- 2023 12:28:17 +0000
-Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::e2b0:8d7e:e293:bd97]) by DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::e2b0:8d7e:e293:bd97%7]) with mapi id 15.20.6954.021; Fri, 3 Nov 2023
- 12:28:17 +0000
-From: Yuran Pereira <yuran.pereira@hotmail.com>
-To: davem@davemloft.net,
-	netdev@vger.kernel.org
-Cc: Yuran Pereira <yuran.pereira@hotmail.com>,
-	justin.chen@broadcom.com,
-	florian.fainelli@broadcom.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH] Prevent out-of-bounds read/write in bcmasp_netfilt_rd and bcmasp_netfilt_wr
-Date: Fri,  3 Nov 2023 17:57:48 +0530
-Message-ID:
- <DB3PR10MB6835E073F668AD24F57AE64AE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [QQIafjqrQ44oIrSesDFq8zjzpV1pHjFv]
-X-ClientProxiedBy: JN2P275CA0001.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:3::13)
- To DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
-X-Microsoft-Original-Message-ID:
- <20231103122748.1615386-1-yuran.pereira@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4502F2F;
+	Fri,  3 Nov 2023 12:35:42 +0000 (UTC)
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F19184;
+	Fri,  3 Nov 2023 05:35:40 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c50cf61f6dso28738091fa.2;
+        Fri, 03 Nov 2023 05:35:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699014938; x=1699619738; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOIjNHwDhIrchH75GqKOcAkPO2xPGvmXahK1witYqLQ=;
+        b=U81v6V1we5SdAULZOaY/D46Gl5cc1Ci3NwvkWMrg3rpPxsfQTeVLx6PjrKQkyLBfYM
+         V949jb3INmYDKvpJhvzRfdHzG+vTqBJN0fvGhSbvcSE5evXMAXcmqDfPdQ/fDqlipiMK
+         CLLPsvQ0G85dpKI0EdTV7RrwG1LbDHqt6I0VuCmkJMfEC5tf/SHEOF0ukJzU1FhfjIfs
+         bSeLRYadzOdp1ru7nXsKEpOH7VrTr1P0FN7TBrKUlTs6uqMuErALjRA8VxvwUMiGCm3o
+         jGeWQcOxdOqcUudkpd6s21zVfhEQgqRcU4BHxifVJZqk7j4X0LGU9b6/aECKcnJS5giM
+         tbvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699014938; x=1699619738;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOIjNHwDhIrchH75GqKOcAkPO2xPGvmXahK1witYqLQ=;
+        b=CcavNxbnoJtc1vFGg6srN9wjCASCgPmWQkAx89rEcTTJFWuzu5Yl23+U5Ltr8lbDjr
+         J1EhINN98IIVxX43Mw27vuX6fYntekPJg7oBKskZSqJOrxk/+4a2mWDdQj07Tdlnj0HP
+         Q4O8Fjy2roxR5u+Pm6GUIFayWI3Gktnr3CzDCdttDlvb/L/XJ6R31IPPuTp1u29osM2S
+         QcC4bsVclWr+v7g4DibtrzRdu93Lj/eC/7snqkrYddMXo9RN5VuiR8Q37ylTBlX8smtB
+         5zOJbnGUaaIcJdXFjDfyNXkCO4F0MVFEO2Gkm3bHRJjG69kl0b6rcRbaq/O+KzE9/qHx
+         fRVQ==
+X-Gm-Message-State: AOJu0YzggPuTjTo7wXy/34FeJaPPrPpdCDeqZGNExon1IWDL0KjyBGLm
+	TktxeaECSbR0Qh68VP9QvYA=
+X-Google-Smtp-Source: AGHT+IFk5WiiMlt6WGzF/0f1ZkmkQo56aWCN5RHiPFzNlLjffmsD/L8x3215C5tzFNC/7zm7U+g+7w==
+X-Received: by 2002:a2e:be8b:0:b0:2c5:b3c4:7b17 with SMTP id a11-20020a2ebe8b000000b002c5b3c47b17mr22055378ljr.38.1699014937967;
+        Fri, 03 Nov 2023 05:35:37 -0700 (PDT)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id gy14-20020a05600c880e00b00403b63e87f2sm2277014wmb.32.2023.11.03.05.35.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Nov 2023 05:35:37 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH v4 1/4] net: phy: aquantia: move to separate directory
+Date: Fri,  3 Nov 2023 13:35:29 +0100
+Message-Id: <20231103123532.687-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB3PR10MB6835:EE_|PR3PR10MB4112:EE_
-X-MS-Office365-Filtering-Correlation-Id: a7768b91-ee06-4bf3-e0f1-08dbdc685b6b
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Xm6eHKEQYhq4LdgDlTZtFUqy1/x42LYVmQviDkJj1Dt6ktHPcaFbHY+G4cfMqKI2dhOIg5lZiyWbGGR4b5dgIzey+odQ+krC99sSkpo0Rd6QbE3oV13AfT6jNwlB5oFQuXYyoNS9iJlCh9JWemt8P2sr4onEWcUz0AeriCw1OINRLlnKeBol0MCeYbHOpVbh26OzPMTDWBH1YaLJ/zf9emROduQ82dU67QVTpCi59ywgNL9TaRJ6Vq0XJatL6XAZRkI+hvVn/eD1+qDh62+QszamjTei3ZiOdcR6M13wN1piDzsKNgjs4rTSVDznfwvpyEgAylfmiGQKpElHEJhBryNNqftxw3JeqmgbB2t+eK1KDuI9hsnIjzzCWFt5WIy9u00p6ejhXrgQMX7qjadBIaaBubgbwPN5GABiT0Ir9jLZODSrx91WcN7JZz8gO1FNFZP52Wx7AaauHkyQgkOPECSTzt1E0mzSbsh2Ny1Xq0PQuzM3IFeUMAXUchI9iN2hNte+JEB5CUw1ryB8hoKcfDcT8O9nKLF6CCTUGZ1cVF5XfdYHU/AKoc54GTNqLyEuhdNyzEpNyKhzIBRzXA1EzAEu1tzl/JcWR6vL8f6797eLRaQlJKFjCUnJ2F8v4KM5
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?JEiMmH8DJ0Kk2rcFMk8vmyTHUVv6z4OrBBCRO00IvLTZn16uwiGEtVb5cR9b?=
- =?us-ascii?Q?yFDOEqjw/IM58Ngahn4ptaKnPJkjPPADCkKZdZmGZ+zAdfvBROVS41Ra7ZH3?=
- =?us-ascii?Q?HhItjLNCFdJm1VlcvEV+aC1g/dJ3hosDTDYJqNLUMyou7PmGT+MaeDbqlF1b?=
- =?us-ascii?Q?YXwmQQ3/6CqFPyt/z3aY5UEUKPiEIjvBglgf+d5nry4fl2NtBA7PEwMnI/56?=
- =?us-ascii?Q?bLK7bSdN2k08x6WBXXR7ujf1P7lOzOME1VqGOqWJ3oDJ1fsA93ZCaJh1ALKg?=
- =?us-ascii?Q?k5LMIFBcLUh7qEGU7t7ZgN6+H2LAFYMjWgz7IY/jhuhVxEqnPzClW8V6v1Zl?=
- =?us-ascii?Q?NVU3QwYrFNLDl6XJu1yBhxhCzOTg/31lyYg6sUCVRk9+f4sZcGxDkmsblXNB?=
- =?us-ascii?Q?GIiNm9UnKZJof3wOHVvmhjr5Hl7YIK7sjFdTEDJD9rM6Uvoz4gRa/mYDLjaJ?=
- =?us-ascii?Q?HuWfCLbs/hTnQXmRuCwQ999a29EeXfjNwXCZihaWqVB8tDRLt4uSKdPkQMwQ?=
- =?us-ascii?Q?34L10l38W/HzvQFX2hmTAZQmOBCCis0m3QS/KHg2mo4j3ttPNWU0uoQzxm67?=
- =?us-ascii?Q?OaojphxqbqcG39DYp2ZlvNsMU0fegQlTXXfVBnJ5neBr1hlVWyMeBtqv1OtG?=
- =?us-ascii?Q?WPACIAYtgdxS76MOobvvopLxowfHxmNOTAanF6RXUwborToL4x4s5Fgzz6x9?=
- =?us-ascii?Q?WnX2k/WOtxfZMD+zQEaTecThC8ALUlKl4Uk/k2b3f2mC19eRMVwt+NaVwyMz?=
- =?us-ascii?Q?/uCChL1MbtjbEFv2o39grhEJL8CXL2wpiJq6AG/W3pA4uoyFB6wAe25AV6+w?=
- =?us-ascii?Q?gYNkEjhsX7vFcidaiW2C+usNe0gY98zlPOh5E5ffJUw6J8tK+3f6ADwcbMvO?=
- =?us-ascii?Q?qaY1grVrVfRVZRkA+uhp3WpqYUBwAatCzW/eSk6aP4mZRH0di3GaIoTG5chC?=
- =?us-ascii?Q?MnMk0bd+ppDdgJ+nyS6kvDxdXJbMkdurKTbSrHDPNfRTTDDW9fm/0+jwuOAH?=
- =?us-ascii?Q?67VX5LNqVmO/IaAUGB4pBK6fIsJR8rIhdExO6FlqmjcOb6t0H+y06oGoMOhk?=
- =?us-ascii?Q?ODhSPO4XGZAkTc5n3aF0PanEBd9TzKflm1PmSrwPnoKcuD54Fq7ckoN+kthK?=
- =?us-ascii?Q?paIXToPoCzKuBoJBlkBXqRszIDQ9DrF0jQZhU4GcOehISewtZybapnDmQ3qZ?=
- =?us-ascii?Q?HY8x4RnsmMzPfKuO+XCRVPZuJJwmTn1Iw7PD6PdsMSoFnTnHvy1H3qAIY9A?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7768b91-ee06-4bf3-e0f1-08dbdc685b6b
-X-MS-Exchange-CrossTenant-AuthSource: DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 12:28:17.7015
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR10MB4112
+Content-Transfer-Encoding: 8bit
 
-The functions `bcmasp_netfilt_rd` and `bcmasp_netfilt_wr` both call
-`bcmasp_netfilt_get_reg_offset` which, when it fails, returns `-EINVAL`.
-This could lead to an out-of-bounds read or write when `rx_filter_core_rl`
-or `rx_filter_core_wl` is called.
+Move aquantia PHY driver to separate driectory in preparation for
+firmware loading support to keep things tidy.
 
-This patch adds a check in both functions to return immediately if
-`bcmasp_netfilt_get_reg_offset` fails. This prevents potential out-of-bounds read
-or writes, and ensures that no undefined or buggy behavior would originate from
-the failure of `bcmasp_netfilt_get_reg_offset`.
-
-Addresses-Coverity-IDs: 1544536 ("Out-of-bounds access")
-Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Changes v4:
+- Keep order for kconfig config
+Changes v3:
+- Add this patch
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 29b04a274d07..8b90b761bdec 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -227,6 +227,8 @@ static void bcmasp_netfilt_wr(struct bcmasp_priv *priv,
+ drivers/net/phy/Kconfig                         | 5 +----
+ drivers/net/phy/Makefile                        | 6 +-----
+ drivers/net/phy/aquantia/Kconfig                | 5 +++++
+ drivers/net/phy/aquantia/Makefile               | 6 ++++++
+ drivers/net/phy/{ => aquantia}/aquantia.h       | 0
+ drivers/net/phy/{ => aquantia}/aquantia_hwmon.c | 0
+ drivers/net/phy/{ => aquantia}/aquantia_main.c  | 0
+ 7 files changed, 13 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/net/phy/aquantia/Kconfig
+ create mode 100644 drivers/net/phy/aquantia/Makefile
+ rename drivers/net/phy/{ => aquantia}/aquantia.h (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_hwmon.c (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_main.c (100%)
+
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 421d2b62918f..25cfc5ded1da 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -96,10 +96,7 @@ config ADIN1100_PHY
+ 	  Currently supports the:
+ 	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
  
- 	reg_offset = bcmasp_netfilt_get_reg_offset(priv, nfilt, reg_type,
- 						   offset);
-+	if (reg_offset < 0)
-+		return;
+-config AQUANTIA_PHY
+-	tristate "Aquantia PHYs"
+-	help
+-	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
++source "drivers/net/phy/aquantia/Kconfig"
  
- 	rx_filter_core_wl(priv, val, reg_offset);
- }
-@@ -244,6 +246,8 @@ static u32 bcmasp_netfilt_rd(struct bcmasp_priv *priv,
- 
- 	reg_offset = bcmasp_netfilt_get_reg_offset(priv, nfilt, reg_type,
- 						   offset);
-+	if (reg_offset < 0)
-+		return 0;
- 
- 	return rx_filter_core_rl(priv, reg_offset);
- }
+ config AX88796B_PHY
+ 	tristate "Asix PHYs"
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index c945ed9bd14b..f65e85c91fc1 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -35,11 +35,7 @@ obj-y				+= $(sfp-obj-y) $(sfp-obj-m)
+ obj-$(CONFIG_ADIN_PHY)		+= adin.o
+ obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
+ obj-$(CONFIG_AMD_PHY)		+= amd.o
+-aquantia-objs			+= aquantia_main.o
+-ifdef CONFIG_HWMON
+-aquantia-objs			+= aquantia_hwmon.o
+-endif
+-obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
+ obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+ obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+ obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
+diff --git a/drivers/net/phy/aquantia/Kconfig b/drivers/net/phy/aquantia/Kconfig
+new file mode 100644
+index 000000000000..226146417a6a
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config AQUANTIA_PHY
++	tristate "Aquantia PHYs"
++	help
++	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+diff --git a/drivers/net/phy/aquantia/Makefile b/drivers/net/phy/aquantia/Makefile
+new file mode 100644
+index 000000000000..346f350bc084
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++aquantia-objs			+= aquantia_main.o
++ifdef CONFIG_HWMON
++aquantia-objs			+= aquantia_hwmon.o
++endif
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
+diff --git a/drivers/net/phy/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
+similarity index 100%
+rename from drivers/net/phy/aquantia.h
+rename to drivers/net/phy/aquantia/aquantia.h
+diff --git a/drivers/net/phy/aquantia_hwmon.c b/drivers/net/phy/aquantia/aquantia_hwmon.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_hwmon.c
+rename to drivers/net/phy/aquantia/aquantia_hwmon.c
+diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_main.c
+rename to drivers/net/phy/aquantia/aquantia_main.c
 -- 
-2.25.1
+2.40.1
 
 
