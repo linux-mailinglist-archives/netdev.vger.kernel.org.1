@@ -1,68 +1,84 @@
-Return-Path: <netdev+bounces-45872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4855A7DFFF2
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:18:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728FC7DFFF7
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78C3B1C20A8D
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:18:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0512BB212FF
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86CE08C05;
-	Fri,  3 Nov 2023 09:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30467CA51;
+	Fri,  3 Nov 2023 09:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qwxr5Ynq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2370B79D1;
-	Fri,  3 Nov 2023 09:18:23 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58170DE;
-	Fri,  3 Nov 2023 02:18:21 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qyqJV-0004lH-Ne; Fri, 03 Nov 2023 10:18:01 +0100
-Date: Fri, 3 Nov 2023 10:18:01 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Florian Westphal <fw@strlen.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nf_tables: fix pointer math issue in
- nft_byteorder_eval()
-Message-ID: <20231103091801.GA8035@breakpoint.cc>
-References: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE258C03
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 938D7C433C9;
+	Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699003223;
+	bh=/E8aN2eqf8+9+fQQLHb6DQ5BDwl4MybdpCu0nul9xiE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Qwxr5Ynqu4Y1dPkA8/LQUHD1izqztkB/TEnEYhAf3cXEyW2dtVTph0sBvSlVWbftO
+	 +NgiIEQXB160wlNcoqDK59ErEkaiOEJ7KQTJjMB5ea15QN/vKx103GJ1QS/9AGRpZV
+	 2fEU2jpmVWPDzpzkmf1fKxsczzGUHDvHkc9CIHgkhczwEdzsrGSLauQvD1F5NJgea0
+	 VE/0RrCAVmgl0cqZGTu3JksVoQi1kE82wjhauGMPymhj7ml7iDFuALiCi4URApmnm1
+	 T9g3EmUi1K2hAy9nA3OmL3mdnZa4uu5urEOGjkDlJo3y0A6LGXNP7PbQlaCIbQIfQm
+	 vQmLH20WokGsQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7733FE00085;
+	Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Fix termination state for idr_for_each_entry_ul()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169900322348.11636.17439163150143289110.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Nov 2023 09:20:23 +0000
+References: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
+In-Reply-To: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
+To: NeilBrown <neilb@suse.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
+ willy@infradead.org, chrism@mellanox.com, xiyou.wangcong@gmail.com
 
-Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> The problem is in nft_byteorder_eval() where we are iterating through a
-> loop and writing to dst[0], dst[1], dst[2] and so on...  On each
-> iteration we are writing 8 bytes.  But dst[] is an array of u32 so each
-> element only has space for 4 bytes.  That means that every iteration
-> overwrites part of the previous element.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 24 Oct 2023 09:53:33 +1100 you wrote:
+> The comment for idr_for_each_entry_ul() states
 > 
-> I spotted this bug while reviewing commit caf3ef7468f7 ("netfilter:
-> nf_tables: prevent OOB access in nft_byteorder_eval") which is a related
-> issue.  I think that the reason we have not detected this bug in testing
-> is that most of time we only write one element.
+>   after normal termination @entry is left with the value NULL
+> 
+> This is not correct in the case where UINT_MAX has an entry in the idr.
+> In that case @entry will be non-NULL after termination.
+> No current code depends on the documentation being correct, but to
+> save future code we should fix it.
+> 
+> [...]
 
-LGTM, thanks Dan.  We will route this via nf.git.
+Here is the summary with links:
+  - Fix termination state for idr_for_each_entry_ul()
+    https://git.kernel.org/netdev/net/c/e8ae8ad479e2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
