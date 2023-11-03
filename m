@@ -1,134 +1,139 @@
-Return-Path: <netdev+bounces-45842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3663B7DFE9D
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 06:03:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 723A47DFEBA
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 06:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D3C281D0B
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 05:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F761C20A61
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 05:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1FF2D626;
-	Fri,  3 Nov 2023 05:03:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D7D17CA;
+	Fri,  3 Nov 2023 05:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cVL8B6Tq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D70517C5
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 05:03:31 +0000 (UTC)
-X-Greylist: delayed 429 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 02 Nov 2023 22:03:29 PDT
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEBE01A4
-	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 22:03:29 -0700 (PDT)
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH 1/2][net-next] skbuff: move
- netlink_large_alloc_large_skb() to skbuff.c
-Thread-Topic: [PATCH 1/2][net-next] skbuff: move
- netlink_large_alloc_large_skb() to skbuff.c
-Thread-Index: AQHaDXv+Yii923TczkyZ24SK2r7UN7Bm7qQggACB9gCAAJlr8A==
-Date: Fri, 3 Nov 2023 05:03:22 +0000
-Message-ID: <2e42d009c393463b9ffd4230eae06977@baidu.com>
-References: <20231102062836.19074-1-lirongqing@baidu.com>
- <50622ac2-0939-af35-5d62-c56249e7bd26@huawei.com>
- <d8fe126e98d1494baddc715c39deef3d@baidu.com>
- <9df5ed1d-ef55-9272-22fd-f2324dc3b5ba@huawei.com>
-In-Reply-To: <9df5ed1d-ef55-9272-22fd-f2324dc3b5ba@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.206.15]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3436617C5;
+	Fri,  3 Nov 2023 05:33:28 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B35E018B;
+	Thu,  2 Nov 2023 22:33:24 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2L8vPV025634;
+	Thu, 2 Nov 2023 22:33:12 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=++u2QPmCV6gWswyCJVglrBgtKR9wwnznpwMNf3rdKew=;
+ b=cVL8B6Tq2H2EuAR6RKBUzeNXM7l2XNwksELNjSG+OZ7GPbYIDpI5HR50aRe3oazcFIJS
+ ZXPsfuT+kL0G5/7WDpCJZr6Szz7w3LY1v5atQ9SilI8NfS3Di+zUe3WZhfQ7HPBVr+2o
+ pynLmrbSnqAw09veleHkmNrHzh/h/QHH8ZNMyOq9roZEhIKybilxsstTuERGXLp7xQRj
+ T3LoZ6tSjtIrFJdmosZ5jPvRyy5JdHosKZip4uCcDyJcat3LbJt/EN5fit5y/MFnRrBx
+ NMA5R/JihkCQCRtVhO1I2Mdif/SPEUpnKWImLvEBhv9lqXIpnuAI0ypBnsg/cglH6WsI 4Q== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3u3y235dxr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 02 Nov 2023 22:33:12 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 2 Nov
+ 2023 22:33:10 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 2 Nov 2023 22:33:10 -0700
+Received: from localhost.localdomain (unknown [10.28.36.175])
+	by maili.marvell.com (Postfix) with ESMTP id 86F2C3F7070;
+	Thu,  2 Nov 2023 22:33:07 -0700 (PDT)
+From: Srujana Challa <schalla@marvell.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <bbrezillon@kernel.org>,
+        <arno@natisbad.org>, <kuba@kernel.org>, <ndabilpuram@marvell.com>,
+        <sgoutham@marvell.com>, <schalla@marvell.com>
+Subject: [PATCH v1 00/10] Add Marvell CN10KB/CN10KA B0 support
+Date: Fri, 3 Nov 2023 11:02:56 +0530
+Message-ID: <20231103053306.2259753-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 172.31.51.53
-X-FE-Last-Public-Client-IP: 100.100.100.38
-X-FE-Policy-ID: 15:10:21:SYSTEM
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: rk-1i1-YhAlpep0PIGw0aEJl15nvYkxf
+X-Proofpoint-GUID: rk-1i1-YhAlpep0PIGw0aEJl15nvYkxf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-03_05,2023-11-02_03,2023-05-22_02
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogWXVuc2hlbmcgTGluIDxs
-aW55dW5zaGVuZ0BodWF3ZWkuY29tPg0KPiBTZW50OiBGcmlkYXksIE5vdmVtYmVyIDMsIDIwMjMg
-MTE6NTAgQU0NCj4gVG86IExpLFJvbmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IG5ldGRl
-dkB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSCAxLzJdW25ldC1uZXh0XSBz
-a2J1ZmY6IG1vdmUgbmV0bGlua19sYXJnZV9hbGxvY19sYXJnZV9za2IoKQ0KPiB0byBza2J1ZmYu
-Yw0KPiANCj4gT24gMjAyMy8xMS8yIDIwOjA5LCBMaSxSb25ncWluZyB3cm90ZToNCj4gPj4gLS0t
-LS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogWXVuc2hlbmcgTGluIDxsaW55dW5z
-aGVuZ0BodWF3ZWkuY29tPg0KPiA+PiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMiwgMjAyMyA3
-OjAyIFBNDQo+ID4+IFRvOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+OyBuZXRk
-ZXZAdmdlci5rZXJuZWwub3JnDQo+ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8yXVtuZXQtbmV4
-dF0gc2tidWZmOiBtb3ZlDQo+ID4+IG5ldGxpbmtfbGFyZ2VfYWxsb2NfbGFyZ2Vfc2tiKCkgdG8g
-c2tidWZmLmMNCj4gPj4NCj4gPj4gT24gMjAyMy8xMS8yIDE0OjI4LCBMaSBSb25nUWluZyB3cm90
-ZToNCj4gPj4+IG1vdmUgbmV0bGlua19hbGxvY19sYXJnZV9za2IgYW5kIG5ldGxpbmtfc2tiX2Rl
-c3RydWN0b3IgdG8gc2tidWZmLmMNCj4gPj4+IGFuZCByZW5hbWUgdGhlbSBtb3JlIGdlbmVyaWMs
-IHNvIHRoZXkgY2FuIGJlIHVzZWQgZWxzZXdoZXJlIGxhcmdlDQo+ID4+PiBub24tY29udGlndW91
-cyBwaHlzaWNhbCBtZW1vcnkgaXMgbmVlZGVkDQo+ID4+Pg0KPiA+Pj4gU2lnbmVkLW9mZi1ieTog
-TGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdAYmFpZHUuY29tPg0KPiA+Pj4gLS0tDQo+ID4+PiAgaW5j
-bHVkZS9saW51eC9za2J1ZmYuaCAgIHwgIDMgKysrDQo+ID4+PiAgbmV0L2NvcmUvc2tidWZmLmMg
-ICAgICAgIHwgNDANCj4gPj4gKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Kw0KPiA+Pj4gIG5ldC9uZXRsaW5rL2FmX25ldGxpbmsuYyB8IDQxDQo+ID4+PiArKy0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiA+Pj4gIDMgZmlsZXMgY2hhbmdlZCwg
-NDUgaW5zZXJ0aW9ucygrKSwgMzkgZGVsZXRpb25zKC0pDQo+ID4+Pg0KPiA+Pj4gZGlmZiAtLWdp
-dCBhL2luY2x1ZGUvbGludXgvc2tidWZmLmggYi9pbmNsdWRlL2xpbnV4L3NrYnVmZi5oIGluZGV4
-DQo+ID4+PiA0MTc0YzRiLi43NzRhNDAxIDEwMDY0NA0KPiA+Pj4gLS0tIGEvaW5jbHVkZS9saW51
-eC9za2J1ZmYuaA0KPiA+Pj4gKysrIGIvaW5jbHVkZS9saW51eC9za2J1ZmYuaA0KPiA+Pj4gQEAg
-LTUwNjMsNSArNTA2Myw4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBza2JfbWFya19mb3JfcmVjeWNs
-ZShzdHJ1Y3QNCj4gPj4+IHNrX2J1ZmYgKnNrYikgIHNzaXplX3Qgc2tiX3NwbGljZV9mcm9tX2l0
-ZXIoc3RydWN0IHNrX2J1ZmYgKnNrYiwNCj4gPj4+IHN0cnVjdCBpb3ZfaXRlcg0KPiA+PiAqaXRl
-ciwNCj4gPj4+ICAJCQkgICAgIHNzaXplX3QgbWF4c2l6ZSwgZ2ZwX3QgZ2ZwKTsNCj4gPj4+DQo+
-ID4+PiArDQo+ID4+PiArdm9pZCBsYXJnZV9za2JfZGVzdHJ1Y3RvcihzdHJ1Y3Qgc2tfYnVmZiAq
-c2tiKTsgc3RydWN0IHNrX2J1ZmYNCj4gPj4+ICsqYWxsb2NfbGFyZ2Vfc2tiKHVuc2lnbmVkIGlu
-dCBzaXplLCBpbnQgYnJvYWRjYXN0KTsNCj4gPj4+ICAjZW5kaWYJLyogX19LRVJORUxfXyAqLw0K
-PiA+Pj4gICNlbmRpZgkvKiBfTElOVVhfU0tCVUZGX0ggKi8NCj4gPj4+IGRpZmYgLS1naXQgYS9u
-ZXQvY29yZS9za2J1ZmYuYyBiL25ldC9jb3JlL3NrYnVmZi5jIGluZGV4DQo+ID4+PiA0NTcwNzA1
-Li4yMGZmY2Q1IDEwMDY0NA0KPiA+Pj4gLS0tIGEvbmV0L2NvcmUvc2tidWZmLmMNCj4gPj4+ICsr
-KyBiL25ldC9jb3JlL3NrYnVmZi5jDQo+ID4+PiBAQCAtNjkxNywzICs2OTE3LDQzIEBAIHNzaXpl
-X3Qgc2tiX3NwbGljZV9mcm9tX2l0ZXIoc3RydWN0IHNrX2J1ZmYNCj4gPj4+ICpza2IsDQo+ID4+
-IHN0cnVjdCBpb3ZfaXRlciAqaXRlciwNCj4gPj4+ICAJcmV0dXJuIHNwbGljZWQgPzogcmV0Ow0K
-PiA+Pj4gIH0NCj4gPj4+ICBFWFBPUlRfU1lNQk9MKHNrYl9zcGxpY2VfZnJvbV9pdGVyKTsNCj4g
-Pj4+ICsNCj4gPj4+ICt2b2lkIGxhcmdlX3NrYl9kZXN0cnVjdG9yKHN0cnVjdCBza19idWZmICpz
-a2IpIHsNCj4gPj4+ICsJaWYgKGlzX3ZtYWxsb2NfYWRkcihza2ItPmhlYWQpKSB7DQo+ID4+PiAr
-CQlpZiAoIXNrYi0+Y2xvbmVkIHx8DQo+ID4+PiArCQkgICAgIWF0b21pY19kZWNfcmV0dXJuKCYo
-c2tiX3NoaW5mbyhza2IpLT5kYXRhcmVmKSkpDQo+ID4+PiArCQkJdmZyZWUoc2tiLT5oZWFkKTsN
-Cj4gPj4+ICsNCj4gPj4+ICsJCXNrYi0+aGVhZCA9IE5VTEw7DQo+ID4+DQo+ID4+IFRoZXJlIHNl
-ZW1zIHRvIGJlIGFuIGFzc3VtcHRpb24gdGhhdCBza2IgcmV0dXJuZWQgZnJvbQ0KPiA+PiBuZXRs
-aW5rX2FsbG9jX2xhcmdlX3NrYigpIGlzIG5vdCBleHBlY3RpbmcgdGhlIGZyYWcgcGFnZSBmb3IN
-Cj4gPj4gc2hpbmZvLT5mcmFncyosIGFzIHRoZSBhYm92ZSBOVUxMIHNldHRpbmcgd2lsbCBieXBh
-c3MgbW9zdCBvZiB0aGUNCj4gPj4gaGFuZGxpbmcgaW4gc2tiX3JlbGVhc2VfZGF0YSgpLHRoZW4g
-aG93IGNhbiB3ZSBlbnN1cmUgdGhhdCB0aGUgdXNlcg0KPiA+PiBpcyBub3QgYnJlYWtpbmcgdGhl
-IGFzc3VtcHRpb24gaWYgd2UgbWFrZSBpdCBtb3JlIGdlbmVyaWM/DQo+ID4+DQo+ID4NCj4gPiBI
-b3cgYWJvdXQgdG8gYWRkIFdBUk5fT04oc2tiX3NoaW5mbyhza2IpLT4gbnJfZnJhZ3MpIHRvIGZp
-bmQgdGhpcw0KPiA+IGNvbmRpdGlvbg0KPiA+DQo+IA0KPiBUaGVyZSBpcyBzb21lIG90aGVyIGhh
-bmRsaW5nIG90aGVyIHRoYW4gc2tiX3NoaW5mbyhza2IpLT4gbnJfZnJhZ3MsIHN1Y2ggYXMNCj4g
-emNvcHksIGZyYWdsaXN0IGFuZCBwcF9yZWN5Y2xlIGhhbmRsaW5nLCBJIGFtIG5vdCBzdXJlIGlm
-IGFkZGluZyB0aG9zZSBjaGVjayBpbiB0aGUNCj4gbm9ybWFsIGRhdGFwYXRjaCBpcyB3b3J0aCBp
-dCBpZiBuZXRsaW5rX2FsbG9jX2xhcmdlX3NrYigpIGlzIG9ubHkgdXNlZCBpbiB0aGUgbmxtc2cN
-Cj4gb3BlcmF0aW9ucywgd2hpY2ggaXMgbGVzcyBwZXJmb3JtYW5jZSBzZW5zdGl2ZS4NCj4gDQoN
-CkFkZCBXQVJOX09OKHNrYl9zaGluZm8oc2tiKS0+IG5yX2ZyYWdzKSBvbmx5IGluIGxhcmdlX3Nr
-Yl9kZXN0cnVjdG9yLCBzaG91bGQgbm90IGVmZmVjdCBwZXJmb3JtYW5jZS4NCg0KZGlmZiAtLWdp
-dCBhL25ldC9jb3JlL3NrYnVmZi5jIGIvbmV0L2NvcmUvc2tidWZmLmMNCmluZGV4IGY5YzFmNmEu
-LjI0ZTE2YWEgMTAwNjQ0DQotLS0gYS9uZXQvY29yZS9za2J1ZmYuYw0KKysrIGIvbmV0L2NvcmUv
-c2tidWZmLmMNCkBAIC02OTk3LDYgKzY5OTcsNyBAQCB2b2lkIGxhcmdlX3NrYl9kZXN0cnVjdG9y
-KHN0cnVjdCBza19idWZmICpza2IpDQogICAgICAgICAgICAgICAgICAgICAgICB2ZnJlZShza2It
-PmhlYWQpOw0KDQogICAgICAgICAgICAgICAgc2tiLT5oZWFkID0gTlVMTDsNCisgICAgICAgICAg
-ICAgICBXQVJOX09OKHNrYl9zaGluZm8oc2tiKS0+IG5yX2ZyYWdzKTsNCiAgICAgICAgfQ0KICAg
-ICAgICBpZiAoc2tiLT5zaykNCiAgICAgICAgICAgICAgICBzb2NrX3JmcmVlKHNrYik7DQoNCg0K
-PiBJZiB0aGVyZSBhcmUgb3RoZXIgbmxtc2cgb3BlcmF0aW9ucyB0aGF0IG5lZWRzIGl0IHRvbz8g
-aWYgbm90LCBtYXliZSB3ZSBsaW1pdA0KPiBuZXRsaW5rX2FsbG9jX2xhcmdlX3NrYigpIGluIG5s
-bXNnIGlmIHdlIGNhbiBhc3N1bWUgYWxsIG5sbXNnIEFQSXMgZG9zZW4ndCBicmVhaw0KPiB0aGUg
-YWJvdmUgYXNzdW1wdGlvbm0sIGludHJvZHVjaW5nIHNvbWV0aGluZyBsaWtlIHZubG1zZ19uZXco
-KSBvciBvbmx5DQo+IGNoYW5nZSBubG1zZ19uZXcoKSB0byB1c2UgbmV0bGlua19hbGxvY19sYXJn
-ZV9za2IoKSwgc28gdGhhdCBhbGwgbmxtc2cgdXNlcnMgY2FuDQo+IG1ha2UgdXNlIG9mIGl0Lg0K
-PiANCg0KUmVhc29uYWJsZQ0KDQpUaGFua3MNCg0KLUxpDQoNCj4gSWYgdGhlcmUgaXMgbW9yZSB1
-c2VyIG1ha2luZyB1c2Ugb2YgbmV0bGlua19hbGxvY19sYXJnZV9za2IoKSBpbiB0aGUgZnV0dXJl
-LCB3ZQ0KPiBjYW4gbWFrZSBpdCB1c2FibGUgb3V0c2lkZSBvZiBubG1zZy4NCj4gDQo+ID4NCj4g
-PiAtTGkgUm9uZ1FpbmcNCj4gPj4NCj4gPg0K
+Marvell OcteonTX2's next gen platform CN10KB/CN10KA B0
+introduced changes in CPT SG input format(SGv2) to make
+it compatibile with NIX SG input format, to support inline
+IPsec in SG mode.
+
+This patchset modifies the octeontx2 CPT driver code to
+support SGv2 format for CN10KB/CN10KA B0. And also adds
+code to configure newly introduced HW registers.
+This patchset also implements SW workaround for couple of
+HW erratas.
+
+---
+v1:
+- Documented devlink parameters supported by octeontx2 CPT
+  driver.
+---
+
+Nithin Dabilpuram (2):
+  crypto/octeontx2: register error interrupts for inline cptlf
+  crypto: octeontx2: support setting ctx ilen for inline CPT LF
+
+Srujana Challa (8):
+  crypto: octeontx2: remove CPT block reset
+  crypto: octeontx2: add SGv2 support for CN10KB or CN10KA B0
+  crypto: octeontx2: add devlink option to set max_rxc_icb_cnt
+  crypto: octeontx2: add devlink option to set t106 mode
+  crypto: octeontx2: remove errata workaround for CN10KB or CN10KA B0
+    chip.
+  crypto: octeontx2: add LF reset on queue disable
+  octeontx2-af: update CPT inbound inline IPsec mailbox
+  crypto: octeontx2: add ctx_val workaround
+
+ Documentation/crypto/device_drivers/index.rst |   9 +
+ .../crypto/device_drivers/octeontx2.rst       |  29 ++
+ Documentation/crypto/index.rst                |   1 +
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.c  |  87 +++++-
+ drivers/crypto/marvell/octeontx2/cn10k_cpt.h  |  25 ++
+ .../marvell/octeontx2/otx2_cpt_common.h       |  68 +++-
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |  88 +++++-
+ .../marvell/octeontx2/otx2_cpt_hw_types.h     |   9 +-
+ .../marvell/octeontx2/otx2_cpt_mbox_common.c  |  26 ++
+ .../marvell/octeontx2/otx2_cpt_reqmgr.h       | 293 ++++++++++++++++++
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 131 +++++---
+ drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 102 ++++--
+ drivers/crypto/marvell/octeontx2/otx2_cptpf.h |   4 +
+ .../marvell/octeontx2/otx2_cptpf_main.c       |  76 ++---
+ .../marvell/octeontx2/otx2_cptpf_mbox.c       |  81 ++++-
+ .../marvell/octeontx2/otx2_cptpf_ucode.c      |  49 +--
+ .../marvell/octeontx2/otx2_cptpf_ucode.h      |   3 +-
+ drivers/crypto/marvell/octeontx2/otx2_cptvf.h |   2 +
+ .../marvell/octeontx2/otx2_cptvf_algs.c       |  31 ++
+ .../marvell/octeontx2/otx2_cptvf_algs.h       |   5 +
+ .../marvell/octeontx2/otx2_cptvf_main.c       |  25 +-
+ .../marvell/octeontx2/otx2_cptvf_mbox.c       |  27 ++
+ .../marvell/octeontx2/otx2_cptvf_reqmgr.c     | 162 +---------
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  20 ++
+ .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  14 +
+ .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   1 +
+ 26 files changed, 1063 insertions(+), 305 deletions(-)
+ create mode 100644 Documentation/crypto/device_drivers/index.rst
+ create mode 100644 Documentation/crypto/device_drivers/octeontx2.rst
+
+-- 
+2.25.1
+
 
