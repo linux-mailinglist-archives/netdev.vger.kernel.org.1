@@ -1,169 +1,152 @@
-Return-Path: <netdev+bounces-45887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39A0D7E01B6
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:06:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 787E97E01B8
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:07:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1F53281D12
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:06:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B52281D01
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA8FE14F86;
-	Fri,  3 Nov 2023 11:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fLq0ZmpS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EA514F86;
+	Fri,  3 Nov 2023 11:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E412214276
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 11:05:56 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143FF182
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 04:05:55 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-54357417e81so10995a12.0
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 04:05:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699009553; x=1699614353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FkyzgOcAguIECOGaQE8cnAm9vlwFOFHgvwGD2Qs61bA=;
-        b=fLq0ZmpSd7VGfbRyknimK+ekL4boLdn8MJ7v7jZ9daBdvfXbS+VObL5+xiV43j8Dob
-         GPSeXBWnNt2dt4Pu63XqfEn22c/qn4pJStys9aIhhiRaCvbn6zqtOm0nIfqXYYHHFnW1
-         FRODCLIE54BkopxhbMsG50V7EC2VH3lp9RaIaTsrb4n0lPJs2hHnydRnMM45YGTJE3PG
-         Nbu36dKZYJqzy8zUC7EBCQUvSdXarWbAgMauLpA2ju00RkMS/9VrArzqou7/4aFo/g4L
-         9qMqJ/sn+Rbr4CXd5zX+ZLGjzZCaarHFEfJTpuJM3bmYeGtcToFYDQaBPMF9KLEduETv
-         8qAQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F5A66ABD
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 11:07:26 +0000 (UTC)
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18E2182
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 04:07:24 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-99357737980so286308466b.2
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 04:07:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699009553; x=1699614353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FkyzgOcAguIECOGaQE8cnAm9vlwFOFHgvwGD2Qs61bA=;
-        b=O6+Ogs/vWSrcQsueriprpI8w1fT7S8iXWXRmdWtLF/jE5R1rGGejtuy4OHEnWncyXa
-         ZPGCqa6BauikoVCOovqRsouib9d+bopAdlkSftjAtZrIGHveYg8Vw5opETCSZ3OiFLGy
-         soRzAoL5Atwfeu0HRcuKirw/hSsqx3cwo1717EWfG7C6vQih3uZV86pz5A7mib9CZKmC
-         fGVxvy6k75DmkrGZmnQzt/c4jdhAY4RrmUC6NKiZFW0qbRk/Y8rgW2ntJyHCezSgAwEq
-         mWrsQ5cCpqntNeFZtvnxIi80tAREh5/YAHgOqy656MwDGpVSiNc0pUCX0EhbeYALpQk3
-         TOcg==
-X-Gm-Message-State: AOJu0YxWgmFDceHroPBJULKTcDiGt20vJHskpni3iQG1Ba0zjI7kMlNw
-	l7PDLt4abikUs6nE/YY5xHGxf5vLrAgmivYIwvCJeQ==
-X-Google-Smtp-Source: AGHT+IEQrMkxU7qPq2Ier5clSh80A+2XUbExlsyt2kT+4YvxowiAHNZh37dP53rUuvlq/ZBJ9De0inVctTQzIZWGyOY=
-X-Received: by 2002:a05:6402:350a:b0:543:faac:e136 with SMTP id
- b10-20020a056402350a00b00543faace136mr196207edd.1.1699009553117; Fri, 03 Nov
- 2023 04:05:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1699009643; x=1699614443;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0Qt+f8RdEQDdaPFCxP792u2d9VejGFb9BZNva4CLt3I=;
+        b=eR+ofhrW8KBx8onTa2XMJ0J8aVyXV8MYx58UKKPqVyVKnlfZESkXBYHsnDhp+yAoYb
+         U6Xlw8Gnx9XmmppW+06efV8n/fPWgf9GSw00uD0rK3nC84TVYJA5yhWULZdjkxYHZz6r
+         0tB7Mgo+Y8iIRVT4BzISq79HOjsZhYVaojhymCqT0XwBeqdUJbE9bro8TNHC8KQ800zD
+         +fpPBWpXsfATdxRJOnO7FMaSaXs818bTp91ELejeK7mLcLJl20UscLd5bq5evwfp/uyB
+         gUiGsCxrh57shIyq/Q73NIqYnxegrUEwXXFxEKiWWWplaSdFT+iFqgfL0M+5mxc0bEW2
+         iWkg==
+X-Gm-Message-State: AOJu0YzzNfkFpCkQXjavHk6PSz+cm3/Et7GMKLovEdheIxyRyUNOapxR
+	udPk7HdOKYKylxGMx3lu4G4=
+X-Google-Smtp-Source: AGHT+IE85aIuKrIJMD14LgV/jgY6Uu495WIisaKm2WhBqbzI14VDSbTmBFu4mEmsY4iMiNGUw9eQSA==
+X-Received: by 2002:a17:906:af72:b0:9b2:babd:cd44 with SMTP id os18-20020a170906af7200b009b2babdcd44mr5563400ejb.44.1699009642922;
+        Fri, 03 Nov 2023 04:07:22 -0700 (PDT)
+Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:59? ([2a0b:e7c0:0:107::aaaa:59])
+        by smtp.gmail.com with ESMTPSA id m10-20020a1709066d0a00b009c74c56d71dsm794495ejr.13.2023.11.03.04.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Nov 2023 04:07:22 -0700 (PDT)
+Message-ID: <79ad8d95-1fbf-4d86-b391-d7af727dfce7@kernel.org>
+Date: Fri, 3 Nov 2023 12:07:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231031015756.1843599-1-sunytt@google.com> <ZUNxcxMq8EW0cVUT@shredder>
- <CAF+qgb4gW8vBb8c2xDHfsXsm1-O2KCwXMCTUcT2mYqED51fHoQ@mail.gmail.com> <fc356b9d-d7fc-4db8-b26c-8c786758d3e5@6wind.com>
-In-Reply-To: <fc356b9d-d7fc-4db8-b26c-8c786758d3e5@6wind.com>
-From: Yang Sun <sunytt@google.com>
-Date: Fri, 3 Nov 2023 19:05:34 +0800
-Message-ID: <CAF+qgb6uUF-Z8EkZoqzfboaCZv4PP6yG_r=-2ojaG9T61Kg3jA@mail.gmail.com>
-Subject: Re: [PATCH] net: ipmr_base: Check iif when returning a (*, G) MFC
-To: nicolas.dichtel@6wind.com
-Cc: Ido Schimmel <idosch@idosch.org>, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tcp: get rid of sysctl_tcp_adv_win_scale
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Soheil Hassas Yeganeh <soheil@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>,
+ eric.dumazet@gmail.com
+References: <20230717152917.751987-1-edumazet@google.com>
+ <738bb6a1-4e99-4113-9345-48eea11e2108@kernel.org>
+ <c798f412-ac14-4997-9431-c98d1b8e16d8@kernel.org>
+ <875400ba-58d8-44a0-8fe9-334e322bd1db@kernel.org>
+ <CANn89iJOwQUwAVcofW+X_8srFcPnaWKyqOoM005L6Zgh8=OvpA@mail.gmail.com>
+ <28e2bd4a-3233-471c-a1ae-57a445173401@kernel.org>
+ <CANn89i+7FWCX6+-puMj7L9f+=Ji6mV-Oca63k-c7OsEikmFPHQ@mail.gmail.com>
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <CANn89i+7FWCX6+-puMj7L9f+=Ji6mV-Oca63k-c7OsEikmFPHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 2, 2023 at 10:19=E2=80=AFPM Nicolas Dichtel
-<nicolas.dichtel@6wind.com> wrote:
->
-> Le 02/11/2023 =C3=A0 12:48, Yang Sun a =C3=A9crit :
-> >> Is this a regression (doesn't seem that way)? If not, the change shoul=
-d
-> >> be targeted at net-next which is closed right now:
-> >
-> >> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> >
-> > I see.
-> >
-> >>> - if (c->mfc_un.res.ttls[vifi] < 255)
-> >>> + if (c->mfc_parent =3D=3D vifi && c->mfc_un.res.ttls[vifi] < 255)
-> >
-> >> What happens if the route doesn't have an iif (-1)? It won't match
-> >> anymore?
-> >
-> > Looks like the mfc_parent can't be -1? There is the check:
-> >     if (mfc->mf6cc_parent >=3D MAXMIFS)
-> >         return -ENFILE;
-> > before setting the parent:
-> >     c->_c.mfc_parent =3D mfc->mf6cc_parent;
-> >
-> > I wrote this patch thinking (*, G) MFCs could be per iif, similar to th=
-e
-> > (S, G) MFCs, like we can add the following MFCs to forward packets from
-> > any address with group destination ff05::aa from if1 to if2, and forwar=
-d
-> > packets from any address with group destination ff05::aa from if2 to
-> > both if1 and if3.
-> >
-> > (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
-> > (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
-> >
-> > But reading Nicolas's initial commit message again, it seems to me that
-> > (*, G) has to be used together with (*, *) and there should be only one
-> > (*, G) entry per group address and include all relevant interfaces in
-> > the oifs? Like the following:
-> >
-> > (::, ::)         Iif: if1 Oifs: if1 if2 if3   State: resolved
-> > (::, ff05::aa)   Iif: if1 Oifs: if1 if2 if3   State: resolved
-> >
-> > Is this how the (*, *|G) MFCs are intended to be used? which means pack=
-ets
-> > to ff05::aa are forwarded from any one of the interfaces to all the oth=
-er
-> > interfaces? If this is the intended way it works then my patch would br=
-eak
-> > things and should be rejected.
-> Yes, this was the intend. Only one (*, G) entry was expected (per G).
->
-> >
-> > Is there a way to achieve the use case I described above? Like having
-> > different oifs for different iif?
-> Instead of being too strict, maybe you could try to return the 'best' ent=
-ry.
->
-> #1 (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
-> #2 (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
->
-> If a packet comes from if2, returns #2, but if a packet comes from if3, r=
-eturns
-> the first matching entry, ie #1 here.
->
+On 03. 11. 23, 11:27, Eric Dumazet wrote:
+> On Fri, Nov 3, 2023 at 11:14 AM Jiri Slaby <jirislaby@kernel.org> wrote:
+>>
+>> On 03. 11. 23, 9:17, Eric Dumazet wrote:
+>>> What happens if you double /proc/sys/net/ipv4/tcp_wmem  and/or
+>>> /proc/sys/net/ipv4/tcp_rmem first value ?
+>>> (4096 -> 8192)
+>>
+>> No change:
+>> # cat /proc/sys/net/ipv4/tcp_wmem
+>> 8192    16384   4194304
+>>
+>>
+>> But this:
+>> # cat /proc/sys/net/ipv4/tcp_rmem
+>> 8192    16384   4194304
+>>
+>> results in test to run 4.7 s, so even 3 more times slower!
+> 
+> 
+> You might try setting tcp_shrink_window sysctl to one, with some side
+> effects for normal TCP flows.
 
-Thanks for your reply Nicolas!
-Here if it returns the first matching then it depends on which entry
-is returned first
-by the hash table lookup, the forwarding behavior may be indeterminate
-in that case
-it seems.
+That results in 3 seconds.
 
-If a packet has no matching (*, G) entry, then it will use the (*, *)
-entry to be forwarded
-to the upstream interface in (*, *). And with the (*, *) it means we
-won't get any nocache upcall
-for interfaces included in the static tree, right? So the (S, G) MFC
-and the static proxy MFCs
-are not meant to be used together?
+In anyway, it looks like they need to fix the test, right? Created:
+https://github.com/eventlet/eventlet/issues/821
 
-I wonder how a real use case with (*, G|*) would look like, what
-interface could be an
-upstream interface. Is there an example?
+thanks,
+-- 
+js
+suse labs
 
-Thanks,
-Yang
-
->
-> Regards,
-> Nicolas
 
