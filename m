@@ -1,84 +1,115 @@
-Return-Path: <netdev+bounces-45930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B797E0732
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:09:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A5ED7E0736
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EED8281E95
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:09:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C0E51C20A43
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F48E1EA78;
-	Fri,  3 Nov 2023 17:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688BC1F607;
+	Fri,  3 Nov 2023 17:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tkhmF8t+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A3+nkL/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CC11A5B3
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:09:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4560C433C8;
-	Fri,  3 Nov 2023 17:09:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699031373;
-	bh=sq3L5gUrO9wxalfWm5HOiwIfw0lC8DkpESy25Odx+hE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tkhmF8t+hdszhtvZFdcxIUCkZguAyqoHMDR2jOPEL+5Ked3zu9OKkuNyiwqVLy/zr
-	 fdB95qyMygnaWOzw5t9vbfRhjzYrKSYi0JNsxd4zmLq+FPUmFeRWegt7XPiFDEx7GV
-	 nPHRTjDtBEdyok9/nLUpZjzEpOVgRY7Tw1o/izNpDfFzPrsq23Y+FKgxPNH/UktSUJ
-	 /CtAipVpNhDWss8cxTM8wD9nSarGpkH8RRjHX+MX5ID9pKEz0AtOrbGxFD5OcFW72x
-	 QoCRp1XTBISxXF0s+oDYMZF6LmxK1aygn1ecLzoFztXYt4+2ERqi6gg3p4tv4H1DhN
-	 ZWAFlbJpccrZw==
-Date: Fri, 3 Nov 2023 17:09:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [PATCH iwl-next] iavf: Remove queue tracking fields from
- iavf_adminq_ring
-Message-ID: <20231103170928.GD714036@kernel.org>
-References: <20231026083932.2623631-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032651A5B3
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:13:42 +0000 (UTC)
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528B813E;
+	Fri,  3 Nov 2023 10:13:41 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5079f6efd64so2845562e87.2;
+        Fri, 03 Nov 2023 10:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699031619; x=1699636419; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=h+nD4Pgw2evypVGggTd49EnVE5xcgPJPs+ysRzIDo+E=;
+        b=A3+nkL/l8fmcGrlVHMMt4xSOLgv0+wFu6p0LB6mBvgpuomNJ613+zzQ/aFMQlzQS/U
+         LwXWlkWUKHY54RQgVFMsoawqw93M8R5FWLu20TxOQrkERnMCTPowa/gIZOaG3blrZoCO
+         4svu/C42RHuqLxRCbjzJUkU38uP0QvkIpfqfUJXePIIHO4kqBeDlcn0e+4fv8Eehc6p9
+         fxhVz1KfXAAz4eG8Zo+H3iJPkjq1dO7DAfeLIM8JQqZbZGNq7AaAZTWaVF+mfh4Vmmg/
+         RSqoeOTOuxoDqabNDmU911GrhX+UbIBG0qf5jdEqkEisfezhLvzLMSeoPc76KS3v8OE4
+         NZug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699031619; x=1699636419;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h+nD4Pgw2evypVGggTd49EnVE5xcgPJPs+ysRzIDo+E=;
+        b=tKHC/1ZjTwzIPCOMb+Cit+jL3wPQSv2NhJ93uXECB5BHfWOJGRTAd34Zzl71T633DP
+         CxUAC3CocPaHmrItKSKKYEaAPRNM2jc0TtitfTdwUe3omABtxP/S9RO7t+LvXIGzVEUp
+         l/pGXSOxUqyEKs2FUhsbfP+oYGMTyUQHz7pq/UJwPZVics1X4dP7a2e0f8TvSwB7HL+l
+         OA3v45rpRXic6LrET6aUProQzywTJ4dR3LB1li1H7k5fiiKpgD5pyWmOgwUPgrQR13OE
+         M9+XdaJkFIxUJY/BIxm9+N2pPFzVYMpZC65eOzHHIYvpJhUW3CunfLLWTSDfPsWs8G5l
+         JBlQ==
+X-Gm-Message-State: AOJu0YzC4gD44jGX95iBubNH0mjEzdchwCdgcs9fi/iCaet7wWyR3Tnq
+	4a7bAZwH+KFxeB/0Jdbk+jkM3UKka5Qxp0+WSLCKmLZTlMoghg==
+X-Google-Smtp-Source: AGHT+IF9gJ7v4h4FQjIKegKXOnNZ0zhbuPS6kSAIVuctubyqGAiD1NmF9nl4mTlf750A9JM6HbCmN7fcsRoMltbGimI=
+X-Received: by 2002:a05:6512:b9c:b0:509:4814:ed7a with SMTP id
+ b28-20020a0565120b9c00b005094814ed7amr5920283lfv.36.1699031619171; Fri, 03
+ Nov 2023 10:13:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231026083932.2623631-1-ivecera@redhat.com>
+References: <20231030-fix-rtl8366rb-v2-1-e66e1ef7dbd2@linaro.org>
+ <20231030141623.ufzhb4ttvxi3ukbj@skbuf> <CACRpkdaN2rTSHXDxwuS4czCzWyUkazY4Fn5vVLYosqF0=qi-Bw@mail.gmail.com>
+ <20231030222035.oqos7v7sdq5u6mti@skbuf> <CACRpkdZ4+QrSA0+JCOrx_OZs4gzt1zx1kPK5bdqxp0AHfEQY3g@mail.gmail.com>
+ <20231030233334.jcd5dnojruo57hfk@skbuf> <CACRpkdbLTNVJusuCw2hrHDzx5odw8vw8hMWvvvvgEPsAFwB8hg@mail.gmail.com>
+ <CAJq09z4+3g7-h5asYPs_3g4e9NbPnxZQK+NxggYXGGxO+oHU1g@mail.gmail.com>
+ <CACRpkdZ-M5mSUeVNhdahQRpm+oA1zfFkq6kZEbpp=3sKjdV9jA@mail.gmail.com>
+ <CAJq09z6QwLNEc5rEGvE3jujZ-vb+vtUQLS-fkOnrdnYqk5KvxA@mail.gmail.com> <20231102103123.hklqlsbb5kbq53mm@skbuf>
+In-Reply-To: <20231102103123.hklqlsbb5kbq53mm@skbuf>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Fri, 3 Nov 2023 14:13:27 -0300
+Message-ID: <CAJq09z4YOgkTb5YYAyObR-dDihcy1oFh_UQXS+i29EHw0jJxXQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: dsa: tag_rtl4_a: Bump min packet size
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 26, 2023 at 10:39:32AM +0200, Ivan Vecera wrote:
-> Fields 'head', 'tail', 'len', 'bah' and 'bal' in iavf_adminq_ring
-> are used to store register offsets. These offsets are initialized
-> and remains constant so there is no need to store them in the
-> iavf_adminq_ring structure.
-> 
-> Remove these fields from iavf_adminq_ring and use register offset
-> constants instead. Remove iavf_adminq_init_regs() that originally
-> stores these constants into these fields.
-> 
-> Finally improve iavf_check_asq_alive() that assumes that
-> non-zero value of hw->aq.asq.len indicates fully initialized
-> AdminQ send queue. Replace it by check for non-zero value
-> of field hw->aq.asq.count that is non-zero when the sending
-> queue is initialized and is zeroed during shutdown of
-> the queue.
-> 
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>
+> Hi Luiz,
+>
+> On Wed, Nov 01, 2023 at 09:35:30AM -0300, Luiz Angelo Daros de Luca wrote:
+> > Hi Linus,
+> >
+> > Sorry but I noticed no issues:
+> >
+> > From the router:
+> >
+> > No. Time Source Destination Protocol Length Info
+> > 1 0.000000000 192.168.1.1 192.168.1.2 ICMP 1514 Echo (ping) request id=0x0789, seq=23/5888, ttl=64 (reply in 2)
+> > 2 0.000040094 192.168.1.2 192.168.1.1 ICMP 1514 Echo (ping) reply id=0x0789, seq=23/5888, ttl=64 (request in 1)
+> >
+> > From the host:
+> >
+> > No. Time Source Destination Protocol Length Info
+> > 1 0.000000000 192.168.1.2 192.168.1.1 ICMP 1514 Echo (ping) request id=0x0002, seq=8/2048, ttl=64 (reply in 2)
+> > 2 0.000391800 192.168.1.1 192.168.1.2 ICMP 1514 Echo (ping) reply id=0x0002, seq=8/2048, ttl=64 (request in 1)
+> >
+> > If I go over that limit, it fragments the packet as expected.
+>
+> Could you run the shell command that sweeps over the entire range, fromhere?
+> https://lore.kernel.org/netdev/20231030222035.oqos7v7sdq5u6mti@skbuf/
 
-Thanks, this is a nice cleanup.
+Sure. I might be able to run it on Monday. I'm away from the device
+and it might have OOM. It has too little RAM to survive too much time
+by itself. However, I doubt it might fail at a specific packet range
+as it would hang an interactive SSH session quite easily.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Regards,
 
-...
+Luiz
 
