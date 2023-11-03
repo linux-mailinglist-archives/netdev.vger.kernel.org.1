@@ -1,177 +1,185 @@
-Return-Path: <netdev+bounces-45919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE0297E067E
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:26:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A5C7E068F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:30:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C14281EBC
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 16:26:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C15611C20D5F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 16:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0061CA86;
-	Fri,  3 Nov 2023 16:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A369B1CA86;
+	Fri,  3 Nov 2023 16:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UbsJInSO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YjO/8t0j"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061A11C6A8;
-	Fri,  3 Nov 2023 16:26:46 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46E0D6A;
-	Fri,  3 Nov 2023 09:26:25 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9c53e8b7cf4so335509666b.1;
-        Fri, 03 Nov 2023 09:26:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699028784; x=1699633584; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LTnkfaaMf1CLAmf1Rg2wsHS7BcVuqGkZNamaGh2FvQ4=;
-        b=UbsJInSOefG71c85sFN7Bv5MY6GB5OP67Kvnhp9H344IpQHR4/IEjCmK9GODo3hH+Z
-         D9lfwHBaaj6YHRIbgZrhFcMKe8/fIb63XbjAm4cSpm064nq4WuMVWLrxpeTL0KiNNTye
-         i8HxNE/FbFeJgtPn6Lo20COmwlJU1xbvw5TqcQeZvqVUebkylipMPpKXad8XW262u+bF
-         09TumWtKl3EQPRJrZ4SSa9r6Hr/o7KxAipmVAoonPu/5GWZgoxIxEq9ajW1EQBDqPvCe
-         HvD+d57Kyh9BSIJxeHzk4ufy1GWNrt1bcKDQva2JQVb+dgD7DNJoLB2PGEK2C6Ae6IVJ
-         yk1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699028784; x=1699633584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LTnkfaaMf1CLAmf1Rg2wsHS7BcVuqGkZNamaGh2FvQ4=;
-        b=XnRLCTSEJyYTQmJRTvAcHuzbY4rxZXHDVX7qxP4ltN9Q1mIy5/eOJxb5IXYueMwCRK
-         eHOXidJsvjX1eloVfffhOJ5DTjWj4y4z6/sC+4vhRkBWzDqbBjt2q+BQUEt1/OtKIxMm
-         dUQndXrjgqAuunpB3YIY0gvdLl0SNtqdepwQ/W1tmC7KIPPV+Zd6Ce0LGnn80WJPU9fu
-         ciW1rKF1jMv9MzbntKy7mnK0WY2hGarNL6d97d0Dt75eg5f5oJsy06WoAEyzWw4O2W17
-         ye6+kenxAWotvdUImMxPtBsO+J+XHUXfJOxUiHBLXV4s8yJCDFoH917+OrWmRT/izA9P
-         TWHg==
-X-Gm-Message-State: AOJu0Yye/ix8LnEtUe7A2wU2/oFLVBsF7jLCrXFhkZShCK7vCJG2BBbZ
-	dstqzrsA50Hr2tw/cxt23MJa9ujL44p38Q2LQ3jFsq6t
-X-Google-Smtp-Source: AGHT+IGakKETpikSrE5Xosw/DkfZZRBaiBc5vn5u0MXOqWdum9NK7AqxWpxFtFIqEj9IQslRRfFGUnfUvUQePkXGpyQ=
-X-Received: by 2002:a17:907:3685:b0:9bd:a7a5:3a5a with SMTP id
- bi5-20020a170907368500b009bda7a53a5amr7824353ejc.36.1699028784033; Fri, 03
- Nov 2023 09:26:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBC914002
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:29:52 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 322A0DC
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699028988; x=1730564988;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZM7k9U6K2HWp2Z+WbEZLG086m0b66EREtoBdOAA0A/M=;
+  b=YjO/8t0jKlaNhC28f7PKaVdW35hzP3wnIkNIIfJItjtcUXNkGCfZ9aTU
+   jQdCBQJK6sydWp7Fzx7LFrkVov7MTgK4/nAq0ZjYP1GNEtDeUpLIj5o1b
+   ITwIxXLwIEDUAhl593IULOtbEqyhY5AdD2udSrpfalVbPCHaiUSWxvpmW
+   BU5iDqElvfhJsQYU8QY4ezgSzz5Hl+fBzOxqPuGV9gJouLcCLlnPGANWe
+   dhweS5TsYXbtHQEt0z6f2AzqWKdS/Ci8fjI+svq3K7grPf7ffPcAFoda1
+   8q7PbLeng55yvrlmRAx334K0MkabkqWx7+vXrRixaon8i8LWYGgK6BtpM
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="10512057"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="10512057"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 09:29:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="878698178"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="878698178"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by fmsmga002.fm.intel.com with ESMTP; 03 Nov 2023 09:29:45 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: [PATCH iwl-next] ice: periodically kick Tx timestamp interrupt
+Date: Fri,  3 Nov 2023 17:29:43 +0100
+Message-Id: <20231103162943.485467-1-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103112237.1756288-1-anders.roxell@linaro.org>
-In-Reply-To: <20231103112237.1756288-1-anders.roxell@linaro.org>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 3 Nov 2023 09:26:12 -0700
-Message-ID: <CAEf4BzahAuskkD9YqxQpZDaUcu_jTuNAfbkkwP4dzJH=cTaVKA@mail.gmail.com>
-Subject: Re: [PATCH] selftests: bpf: xskxceiver: ksft_print_msg: fix format
- type error
-To: Anders Roxell <anders.roxell@linaro.org>
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 3, 2023 at 4:23=E2=80=AFAM Anders Roxell <anders.roxell@linaro.=
-org> wrote:
->
-> Crossbuilding selftests/bpf for architecture arm64, format specifies
-> type error show up like.
->
-> xskxceiver.c:912:34: error: format specifies type 'int' but the argument
-> has type '__u64' (aka 'unsigned long long') [-Werror,-Wformat]
->  ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%d]\n",
->                                                                 ~~
->                                                                 %llu
->                 __func__, pkt->pkt_nb, meta->count);
->                                        ^~~~~~~~~~~
-> xskxceiver.c:929:55: error: format specifies type 'unsigned long long' bu=
-t
->  the argument has type 'u64' (aka 'unsigned long') [-Werror,-Wformat]
->  ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr, len);
->                                     ~~~~             ^~~~
->
+From: Jacob Keller <jacob.e.keller@intel.com>
 
-With u64s it might be %llx or %lx, depending on architecture, so best
-is to force cast to (long long) or (unsigned long long) and then use
-%llx.
+The E822 hardware for Tx timestamping keeps track of how many
+outstanding timestamps are still in the PHY memory block. It will not
+generate a new interrupt to the MAC until all of the timestamps in the
+region have been read.
 
-> Fixing the issues by using the proposed format specifiers by the
-> compilor.
->
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-> ---
->  tools/testing/selftests/bpf/xskxceiver.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/sel=
-ftests/bpf/xskxceiver.c
-> index 591ca9637b23..dc03692f34d8 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.c
-> +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> @@ -908,7 +908,7 @@ static bool is_metadata_correct(struct pkt *pkt, void=
- *buffer, u64 addr)
->         struct xdp_info *meta =3D data - sizeof(struct xdp_info);
->
->         if (meta->count !=3D pkt->pkt_nb) {
-> -               ksft_print_msg("[%s] expected meta_count [%d], got meta_c=
-ount [%d]\n",
-> +               ksft_print_msg("[%s] expected meta_count [%d], got meta_c=
-ount [%llu]\n",
->                                __func__, pkt->pkt_nb, meta->count);
->                 return false;
->         }
-> @@ -926,11 +926,11 @@ static bool is_frag_valid(struct xsk_umem_info *ume=
-m, u64 addr, u32 len, u32 exp
->
->         if (addr >=3D umem->num_frames * umem->frame_size ||
->             addr + len > umem->num_frames * umem->frame_size) {
-> -               ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr,=
- len);
-> +               ksft_print_msg("Frag invalid addr: %lx len: %u\n", addr, =
-len);
->                 return false;
->         }
->         if (!umem->unaligned_mode && addr % umem->frame_size + len > umem=
-->frame_size) {
-> -               ksft_print_msg("Frag crosses frame boundary addr: %llx le=
-n: %u\n", addr, len);
-> +               ksft_print_msg("Frag crosses frame boundary addr: %lx len=
-: %u\n", addr, len);
->                 return false;
->         }
->
-> @@ -1029,7 +1029,7 @@ static int complete_pkts(struct xsk_socket_info *xs=
-k, int batch_size)
->                         u64 addr =3D *xsk_ring_cons__comp_addr(&xsk->umem=
-->cq, idx + rcvd - 1);
->
->                         ksft_print_msg("[%s] Too many packets completed\n=
-", __func__);
-> -                       ksft_print_msg("Last completion address: %llx\n",=
- addr);
-> +                       ksft_print_msg("Last completion address: %lx\n", =
-addr);
->                         return TEST_FAILURE;
->                 }
->
-> @@ -1513,7 +1513,7 @@ static int validate_tx_invalid_descs(struct ifobjec=
-t *ifobject)
->         }
->
->         if (stats.tx_invalid_descs !=3D ifobject->xsk->pkt_stream->nb_pkt=
-s / 2) {
-> -               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%u]=
- expected [%u]\n",
-> +               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%ll=
-u] expected [%u]\n",
->                                __func__, stats.tx_invalid_descs,
->                                ifobject->xsk->pkt_stream->nb_pkts);
->                 return TEST_FAILURE;
-> --
-> 2.42.0
->
->
+If somehow all the available data is not read, but the driver has exited
+its interrupt routine already, the PHY will not generate a new interrupt
+even if new timestamp data is captured. Because no interrupt is
+generated, the driver never processes the timestamp data. This state
+results in a permanent failure for all future Tx timestamps.
+
+It is not clear how the driver and hardware could enter this state.
+However, if it does, there is currently no recovery mechanism.
+
+Add a recovery mechanism via the periodic PTP work thread which invokes
+ice_ptp_periodic_work(). Introduce a new check,
+ice_ptp_maybe_trigger_tx_interrupt() which checks the PHY timestamp
+ready bitmask. If any bits are set, trigger a software interrupt by
+writing to PFINT_OICR.
+
+Once triggered, the main timestamp processing thread will read through
+the PHY data and clear the outstanding timestamp data. Once cleared, new
+data should trigger interrupts as expected.
+
+This should allow recovery from such a state rather than leaving the
+device in a state where we cannot process Tx timestamps.
+
+It is possible that this function checks for timestamp data
+simultaneously with the interrupt, and it might trigger additional
+unnecessary interrupts. This will cause a small amount of additional
+processing.
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 50 ++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 5fb9dbbdfc16..79c1fa61d1a8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2460,6 +2460,54 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
+ 	}
+ }
+ 
++/**
++ * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
++ * @pf: Board private structure
++ *
++ * The device PHY issues Tx timestamp interrupts to the driver for processing
++ * timestamp data from the PHY. It will not interrupt again until all
++ * current timestamp data is read. In rare circumstances, it is possible that
++ * the driver fails to read all outstanding data.
++ *
++ * To avoid getting permanently stuck, periodically check if the PHY has
++ * outstanding timestamp data. If so, trigger an interrupt from software to
++ * process this data.
++ */
++static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
++{
++	struct device *dev = ice_pf_to_dev(pf);
++	struct ice_hw *hw = &pf->hw;
++	bool trigger_oicr = false;
++	unsigned int i;
++
++	if (ice_is_e810(hw))
++		return;
++
++	if (!ice_pf_src_tmr_owned(pf))
++		return;
++
++	for (i = 0; i < ICE_MAX_QUAD; i++) {
++		u64 tstamp_ready;
++		int err;
++
++		err = ice_get_phy_tx_tstamp_ready(&pf->hw, i, &tstamp_ready);
++		if (!err && tstamp_ready) {
++			trigger_oicr = true;
++			break;
++		}
++	}
++
++	if (trigger_oicr) {
++		/* Trigger a software interrupt, to ensure this data
++		 * gets processed.
++		 */
++		dev_dbg(dev, "PTP periodic task detected waiting timestamps. Triggering Tx timestamp interrupt now.\n");
++
++		wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
++		ice_flush(hw);
++	}
++}
++
+ static void ice_ptp_periodic_work(struct kthread_work *work)
+ {
+ 	struct ice_ptp *ptp = container_of(work, struct ice_ptp, work.work);
+@@ -2471,6 +2519,8 @@ static void ice_ptp_periodic_work(struct kthread_work *work)
+ 
+ 	err = ice_ptp_update_cached_phctime(pf);
+ 
++	ice_ptp_maybe_trigger_tx_interrupt(pf);
++
+ 	/* Run twice a second or reschedule if phc update failed */
+ 	kthread_queue_delayed_work(ptp->kworker, &ptp->work,
+ 				   msecs_to_jiffies(err ? 10 : 500));
+
+base-commit: 75eabdb41c25d36bd15661df81033a4e3086c4c9
+-- 
+2.40.1
+
 
