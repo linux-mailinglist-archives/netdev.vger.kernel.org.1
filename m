@@ -1,258 +1,222 @@
-Return-Path: <netdev+bounces-45953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9400E7E07D8
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:56:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9994F7E0805
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 19:23:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2CDD1C21151
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:56:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D905281C7F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:23:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E5F22EEB;
-	Fri,  3 Nov 2023 17:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E42621A10;
+	Fri,  3 Nov 2023 18:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FjeJPHgS"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WapJoSIz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D6F225A4;
-	Fri,  3 Nov 2023 17:56:02 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC09B1BD;
-	Fri,  3 Nov 2023 10:56:00 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9d224dca585so354913066b.1;
-        Fri, 03 Nov 2023 10:56:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5D821A03
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 18:23:24 +0000 (UTC)
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667C7CF
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 11:23:20 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id 41be03b00d2f7-5bd099e3d3cso1818503a12.1
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 11:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699034159; x=1699638959; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ANnfbv1oGkDpEz/e45pUqxbq4vbbI9kV1Jy9Nq/Lv90=;
-        b=FjeJPHgSk67T50NWxh5D7atfWqnCvkgvtcY+QMr54VoYRV4tu44oDD4kVvzXWV/PCH
-         HcabX/RFYUe1Uiye4O/Ki1hsOoyCIEGUziDt2Y3NW+oAaY1N2i7WeU4so88gZGpmvXgF
-         Uu9/y/XmPLxG5uMLVxC9X4SzxBCQNeOL/Bo6b8JSJ7o3ON8fHnhWuFgWiuP1rYR5kLVm
-         sze6i0vI79Lf4+xNHFUE9Sten0Et/pQoue3bHo6PUhULDY1RKpCbvRpJDwIXhzV4u8rQ
-         IXjkiD2uK8q7rR+fjmImY4OjfwYMCz3ny/E15mnV/kiaXREvUAlkONxj9lqk/AbNIDuq
-         oq9w==
+        d=broadcom.com; s=google; t=1699035800; x=1699640600; darn=vger.kernel.org;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=b1PfxphsDoqrGlLP8YueggFbNHOKJz+rXCScnO915aI=;
+        b=WapJoSIzGtWobdOAyk/n13pDgzL/osZqTFnLRO84fk5GkDzv21b/IWU6vekQpqkmM9
+         CE6ov5Ltboa3wD7xZZ7XD1H+hqkIXmJHD7xLRaQKGA62eLkkX4IKlSQ+tK6eQAAkJmsa
+         3HMfj4ltLbDH5pd+QrKrvxJeWJuAHslLB3sjw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699034159; x=1699638959;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ANnfbv1oGkDpEz/e45pUqxbq4vbbI9kV1Jy9Nq/Lv90=;
-        b=L6bw9ebbSWSX42T3KHT9LgoxrStV0bbJk/e7rCo5YxriySh2NNPSwP6IDQDJJ/H7Ja
-         M/IrJ9OjhOFqvc8LMGAEv1ojD7PcutQXU7MvBOtG8XNhgcU2ZXDcXPrwodghRldszvtB
-         fHXso4kn0/TIM58Z1Xot8sFtSI+snZqxnyikWKAtHhUJBCrWTNXfDSsM3umeygFUaXQF
-         8ZZpzdXzQwZhcWC8/lWOYNPrulgTThxek90MsDlxQZyuncmIlVwrM0eHBeocBQDKjeqj
-         XCombZlvgsP/mmUIZdRZ2fLJRwaNaM7QclplKcg2qhf2riqCgieDgww5Eyx+r9h0PhqB
-         ZV+Q==
-X-Gm-Message-State: AOJu0YwO6CCTYBHfpg3Q3nHmzKN/FqBliwM59qq4FFdeeGZNxek1c75K
-	pzja79DiMmyxp/H7L/1n6LY=
-X-Google-Smtp-Source: AGHT+IG+Ba5CGONVICNPRhtchYsMjNYT5WbIR+O63L72F5/7sEGvOVu44gBRrmbNu6Mhg9TmbQSthA==
-X-Received: by 2002:a17:907:72c2:b0:9ad:c763:bc7a with SMTP id du2-20020a17090772c200b009adc763bc7amr8200301ejc.23.1699034159044;
-        Fri, 03 Nov 2023 10:55:59 -0700 (PDT)
-Received: from fedora.. (host-62-211-113-16.retail.telecomitalia.it. [62.211.113.16])
-        by smtp.gmail.com with ESMTPSA id wj6-20020a170907050600b009ddf1a84379sm80306ejb.51.2023.11.03.10.55.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 10:55:58 -0700 (PDT)
-From: f.storniolo95@gmail.com
-To: luigi.leonardi@outlook.com,
-	kvm@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	mst@redhat.com,
-	imbrenda@linux.vnet.ibm.com,
-	kuba@kernel.org,
-	asias@redhat.com,
-	stefanha@redhat.com,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	Filippo Storniolo <f.storniolo95@gmail.com>
-Subject: [PATCH net 4/4] test/vsock: add dobule bind connect test
-Date: Fri,  3 Nov 2023 18:55:51 +0100
-Message-ID: <20231103175551.41025-5-f.storniolo95@gmail.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231103175551.41025-1-f.storniolo95@gmail.com>
-References: <20231103175551.41025-1-f.storniolo95@gmail.com>
+        d=1e100.net; s=20230601; t=1699035800; x=1699640600;
+        h=in-reply-to:from:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b1PfxphsDoqrGlLP8YueggFbNHOKJz+rXCScnO915aI=;
+        b=EPONUkiel5fnClOvhgdyD6qXHVPn6POu2UWKIydvUymONQ4+HucIVfotxv9YMjb9ML
+         CEcdsisQOojp0s+NzXYZ6tPWz7K9j6i2jUt1+qNawBhxo4UWc0LiOMVw7pqusIt2mYQ9
+         6nKjmFYIkYM5SnF5jHmkNVyYB91pFsaV90msuVVg5nAvXpzp4WR/qrDz6mdZ4UshhC5Z
+         DvSV/ggosPPtvouS7AAKlblhAw6V9OWUTPhYsam5uoqgsqom+Uix+kmB4UM5RlgW7RZ/
+         DnSNcAhYB7PGEd/muFV4T65kvya6IL9Gzrw70fX4mF7cZHU/5ULzwQoMJSQW9YQsAfHX
+         /jVQ==
+X-Gm-Message-State: AOJu0Yy+OPdUx32wqg6p8tXVQ1zB3xqh/i44dRr/YEYF5oSt+deghf1v
+	8hNoFX0oVumNPTYqYOoxRN/wuA==
+X-Google-Smtp-Source: AGHT+IHX9+Dpd8zIzy7faXurfs9zTrh+YHXuik3xDVER/pv6yeuapftj7FkzUH72f77X0oOgF4b+RQ==
+X-Received: by 2002:a17:902:f548:b0:1cc:49e7:ee1b with SMTP id h8-20020a170902f54800b001cc49e7ee1bmr19311352plf.58.1699035799682;
+        Fri, 03 Nov 2023 11:23:19 -0700 (PDT)
+Received: from [10.69.71.77] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id j1-20020a170902c3c100b001cc29b5c324sm1675738plj.203.2023.11.03.11.23.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Nov 2023 11:23:17 -0700 (PDT)
+Message-ID: <e3ac58b2-bb78-4364-94c0-f18c376ac132@broadcom.com>
+Date: Fri, 3 Nov 2023 11:23:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Prevent out-of-bounds read/write in bcmasp_netfilt_rd and
+ bcmasp_netfilt_wr
+To: Greg KH <gregkh@linuxfoundation.org>,
+ Yuran Pereira <yuran.pereira@hotmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ florian.fainelli@broadcom.com, linux-kernel@vger.kernel.org,
+ edumazet@google.com, bcm-kernel-feedback-list@broadcom.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel-mentees@lists.linuxfoundation.org
+References: <DB3PR10MB6835E073F668AD24F57AE64AE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+ <2023110301-purist-reputable-fab7@gregkh>
+From: Justin Chen <justin.chen@broadcom.com>
+In-Reply-To: <2023110301-purist-reputable-fab7@gregkh>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000545bb706094399fd"
 
-From: Filippo Storniolo <f.storniolo95@gmail.com>
+--000000000000545bb706094399fd
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This add bind connect test which creates a listening server socket
-and tries to connect a client with a bound local port to it twice.
 
-Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Filippo Storniolo <f.storniolo95@gmail.com>
----
- tools/testing/vsock/util.c       | 47 ++++++++++++++++++++++++++++++
- tools/testing/vsock/util.h       |  3 ++
- tools/testing/vsock/vsock_test.c | 50 ++++++++++++++++++++++++++++++++
- 3 files changed, 100 insertions(+)
 
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 2fc96f29bdf2..ae2b33c21c45 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -85,6 +85,48 @@ void vsock_wait_remote_close(int fd)
- 	close(epollfd);
- }
- 
-+/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
-+int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
-+{
-+	struct sockaddr_vm sa_client = {
-+		.svm_family = AF_VSOCK,
-+		.svm_cid = VMADDR_CID_ANY,
-+		.svm_port = bind_port,
-+	};
-+	struct sockaddr_vm sa_server = {
-+		.svm_family = AF_VSOCK,
-+		.svm_cid = cid,
-+		.svm_port = port,
-+	};
-+
-+	int client_fd, ret;
-+
-+	client_fd = socket(AF_VSOCK, type, 0);
-+	if (client_fd < 0) {
-+		perror("socket");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (bind(client_fd, (struct sockaddr *)&sa_client, sizeof(sa_client))) {
-+		perror("bind");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	timeout_begin(TIMEOUT);
-+	do {
-+		ret = connect(client_fd, (struct sockaddr *)&sa_server, sizeof(sa_server));
-+		timeout_check("connect");
-+	} while (ret < 0 && errno == EINTR);
-+	timeout_end();
-+
-+	if (ret < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	return client_fd;
-+}
-+
- /* Connect to <cid, port> and return the file descriptor. */
- static int vsock_connect(unsigned int cid, unsigned int port, int type)
- {
-@@ -223,6 +265,11 @@ int vsock_stream_accept(unsigned int cid, unsigned int port,
- 	return vsock_accept(cid, port, clientaddrp, SOCK_STREAM);
- }
- 
-+int vsock_stream_listen(unsigned int cid, unsigned int port)
-+{
-+	return vsock_listen(cid, port, SOCK_STREAM);
-+}
-+
- int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
- 			   struct sockaddr_vm *clientaddrp)
- {
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index a77175d25864..03c88d0cb861 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -36,9 +36,12 @@ struct test_case {
- void init_signals(void);
- unsigned int parse_cid(const char *str);
- int vsock_stream_connect(unsigned int cid, unsigned int port);
-+int vsock_bind_connect(unsigned int cid, unsigned int port,
-+		       unsigned int bind_port, int type);
- int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
- int vsock_stream_accept(unsigned int cid, unsigned int port,
- 			struct sockaddr_vm *clientaddrp);
-+int vsock_stream_listen(unsigned int cid, unsigned int port);
- int vsock_seqpacket_accept(unsigned int cid, unsigned int port,
- 			   struct sockaddr_vm *clientaddrp);
- void vsock_wait_remote_close(int fd);
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index c1f7bc9abd22..5b0e93f9996c 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1180,6 +1180,51 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_double_bind_connect_server(const struct test_opts *opts)
-+{
-+	int listen_fd, client_fd, i;
-+	struct sockaddr_vm sa_client;
-+	socklen_t socklen_client = sizeof(sa_client);
-+
-+	listen_fd = vsock_stream_listen(VMADDR_CID_ANY, 1234);
-+
-+	for (i = 0; i < 2; i++) {
-+		control_writeln("LISTENING");
-+
-+		timeout_begin(TIMEOUT);
-+		do {
-+			client_fd = accept(listen_fd, (struct sockaddr *)&sa_client,
-+					   &socklen_client);
-+			timeout_check("accept");
-+		} while (client_fd < 0 && errno == EINTR);
-+		timeout_end();
-+
-+		if (client_fd < 0) {
-+			perror("accept");
-+			exit(EXIT_FAILURE);
-+		}
-+
-+		/* Waiting for remote peer to close connection */
-+		vsock_wait_remote_close(client_fd);
-+	}
-+
-+	close(listen_fd);
-+}
-+
-+static void test_double_bind_connect_client(const struct test_opts *opts)
-+{
-+	int i, client_fd;
-+
-+	for (i = 0; i < 2; i++) {
-+		/* Wait until server is ready to accept a new connection */
-+		control_expectln("LISTENING");
-+
-+		client_fd = vsock_bind_connect(opts->peer_cid, 1234, 4321, SOCK_STREAM);
-+
-+		close(client_fd);
-+	}
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1285,6 +1330,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_msgzcopy_empty_errq_client,
- 		.run_server = test_stream_msgzcopy_empty_errq_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM double bind connect",
-+		.run_client = test_double_bind_connect_client,
-+		.run_server = test_double_bind_connect_server,
-+	},
- 	{},
- };
- 
--- 
-2.41.0
+On 11/3/23 5:57 AM, Greg KH wrote:
+> On Fri, Nov 03, 2023 at 05:57:48PM +0530, Yuran Pereira wrote:
+>> The functions `bcmasp_netfilt_rd` and `bcmasp_netfilt_wr` both call
+>> `bcmasp_netfilt_get_reg_offset` which, when it fails, returns `-EINVAL`.
+>> This could lead to an out-of-bounds read or write when `rx_filter_core_rl`
+>> or `rx_filter_core_wl` is called.
+>>
+>> This patch adds a check in both functions to return immediately if
+>> `bcmasp_netfilt_get_reg_offset` fails. This prevents potential out-of-bounds read
+>> or writes, and ensures that no undefined or buggy behavior would originate from
+>> the failure of `bcmasp_netfilt_get_reg_offset`.
+>>
+>> Addresses-Coverity-IDs: 1544536 ("Out-of-bounds access")
+>> Signed-off-by: Yuran Pereira <yuran.pereira@hotmail.com>
+>> ---
+>>   drivers/net/ethernet/broadcom/asp2/bcmasp.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> index 29b04a274d07..8b90b761bdec 100644
+>> --- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+>> @@ -227,6 +227,8 @@ static void bcmasp_netfilt_wr(struct bcmasp_priv *priv,
+>>   
+>>   	reg_offset = bcmasp_netfilt_get_reg_offset(priv, nfilt, reg_type,
+>>   						   offset);
+>> +	if (reg_offset < 0)
+>> +		return;
+>>   
+>>   	rx_filter_core_wl(priv, val, reg_offset);
+>>   }
+>> @@ -244,6 +246,8 @@ static u32 bcmasp_netfilt_rd(struct bcmasp_priv *priv,
+>>   
+>>   	reg_offset = bcmasp_netfilt_get_reg_offset(priv, nfilt, reg_type,
+>>   						   offset);
+>> +	if (reg_offset < 0)
+>> +		return 0;
+> 
+> Shouldn't you return an error here?
+> 
+> thanks
+> 
+> greg k-h
 
+As long as offset is less than MAX_WAKE_FILTER_SIZE we don't need to 
+worry about error checking. This is already checked before we call 
+netfilt_get_reg_offset() in both cases. Instead of returning -EINVAL in 
+neffilt_get_reg_offset() lets return 0. This will silence the coverity 
+check. In practice we will never hit this logic.
+
+Thanks,
+Justin
+
+--000000000000545bb706094399fd
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+NhTY3E+cXCB11wty89QStajwXdhGJTYEvUgvsq1h8CwJj9w/38ldAQf5WjhPmApYeJR2ewFrBMCM
+4lHkdRJ6TDc9nXoEkypUfjJkJHe7Eal06tosh6JpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGp1c3Rpbi5jaGVuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUIWGeYuaTsnIada5Xx8TR3cheUbgw
+DQYJKoZIhvcNAQELBQADggEBAHNQlMqQOFYPYFO71A+8t+qWMmtOdd2iGswSOvpSZ/pmGlfw8ZvY
+dRTkl27m37la84AxRkiVMes14JyOZJoMh/g7fbgPlU14eBc6WQWkIA6AmNkduFWTr1pRezkjpeo6
+xVmdBLM4VY1TFDYj7S8H2adPuypd62uHMY/MZi+BIUys4uAFA+N3NuUBNjcVZXYPplYxxKEuIFq6
+sDL+OV16G+F9CkNMN3txsym8Nnx5WAYZb6+rBUIhMGz70V05xsHQfzvo2s7f0J1tJ5BoRlPPhL0h
+VOnWA3h71u9TfSsv+PXVm3P21TfOS2uc1hbzEqyENCP4i5XQ0rv0TmPW42GZ0o4xggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwj8BKLXNpALfemdRAwDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIMZGuw48DO0bVMIJyzMduH6Z7v0JyBdCeCX
+nZKde9nYMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEwMzE4
+MjMyMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQAXF4uddVqmmI41lbguO6mi2+A5AwFu0qBZLiLN1wlSjim7NmgyxD5D
+9I0Z/HHl8ydzmLRMeKJrwT+HsHlUBv7JxJRaLTSRg5MstyeFbd+VVEug1OJwmXeLAQ1rQ9kSNjzw
+P6WIr3ZBYNMP0TUhxpFd/y3PocA8EepZwGG+kp7s+AoHfSwM1TwI3nJuWDh40C7GqqlTPWmGkBvu
+vqJWyK51gT6oAPJ30UIvOKN6x/AOgm6U0wxoyQHfXbE+elljBaOrjUAV2vnQLqJVDdv6dRhsH3UT
+BJYbPjW+2BMknryPIAj8DE8YFLp2jOWK/TV1hSTKaNSSTbacUhJ3u3gbiibw
+--000000000000545bb706094399fd--
 
