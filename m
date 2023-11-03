@@ -1,110 +1,156 @@
-Return-Path: <netdev+bounces-45902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F1347E0345
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:01:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DC97E035B
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4644E280DA4
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:01:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324F71C20DCD
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D3B171B2;
-	Fri,  3 Nov 2023 13:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66181798F;
+	Fri,  3 Nov 2023 13:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="114y9TKm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7u8rZeg"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE28216422
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 13:01:30 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE9F19D;
-	Fri,  3 Nov 2023 06:01:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dGbTfODFaQzTymCMKEV4+gY6lqOjwrcNQtCi7t1dngQ=; b=114y9TKmgmpqZxfr5SUUGUwg3L
-	CUYpXioth0kSgDDzNVy8SBlQ+UQzs/+w1iS6vooSrIrgednlC/U+5VEEOyngQOzvmURjwX6LPuD4r
-	YO7NfhLU+F4rb++V3vo40Bz3688mScCQAaF6m/V2+Ual1GqI0b1/V4aVWhyG6+odvQLQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qytnV-000oat-W6; Fri, 03 Nov 2023 14:01:13 +0100
-Date: Fri, 3 Nov 2023 14:01:13 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: at803x: add QCA8084 ethernet phy support
-Message-ID: <806fb6b6-d9b6-457b-b079-48f8b958cc5a@lunn.ch>
-References: <20231103123538.15735-1-quic_luoj@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F82FC121;
+	Fri,  3 Nov 2023 13:08:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49140C433C7;
+	Fri,  3 Nov 2023 13:08:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699016931;
+	bh=Q7bthhPoFjkWUMlyFUZKED1Byw57+VTorIZ5iPKMrmI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s7u8rZegwQaDQ0DVB0SWfhvzDOx6s4B2KWdYGuJfQFnK7NiWYZ3fK2qriOHdVWgef
+	 FjEnXwODUNWC/2ZADbWtGIBmFE3sNmf5sDT7+5nwnbd12e8ENhEkOHQPYC44qVOcL5
+	 2CdToKfZ1foCN03SGj2Ig5YVkgQLBx/xVsGzsK15NeO6tXEhL69MC2coX8T/nZY2Rc
+	 t5jXHDZkQbiDGZ3W3mJcyVfVBBTbcimbk39f/xBz+G3yk6Ie6kTq1oXCDqZ9X2Bpzg
+	 6Xsdutfcgt+QTVcRI7Liq2sdez+MaQZK9UjPNQKTyfqGU/+Umm7YBp2wG1/sxIPJS2
+	 pLdGAyH/CHJ4g==
+Date: Fri, 3 Nov 2023 13:08:45 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v3 4/4] dt-bindings: Document bindings for
+ Marvell Aquantia PHY
+Message-ID: <20231103-outboard-murkiness-e3256874c9a7@spud>
+References: <20231102150032.10740-1-ansuelsmth@gmail.com>
+ <20231102150032.10740-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="YBRbmXQ7LbrT3SgB"
+Content-Disposition: inline
+In-Reply-To: <20231102150032.10740-4-ansuelsmth@gmail.com>
+
+
+--YBRbmXQ7LbrT3SgB
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231103123538.15735-1-quic_luoj@quicinc.com>
+Content-Transfer-Encoding: quoted-printable
 
->  #define QCA8081_PHY_ID				0x004dd101
-> +#define QCA8081_PHY_MASK			0xffffff00
+Yo,
 
-That is an unusual mask. Please check it is correct. All you should
-need its PHY_ID_MATCH_EXACT, PHY_ID_MATCH_MODEL, PHY_ID_MATCH_VENDOR.
-
-> @@ -1767,6 +1781,20 @@ static int qca808x_config_init(struct phy_device *phydev)
->  {
->  	int ret;
->  
-> +	if (phydev->phy_id == QCA8084_PHY_ID) {
-> +		/* Invert ADC clock edge */
-> +		ret = at803x_debug_reg_mask(phydev, QCA8084_ADC_CLK_SEL,
-> +					    QCA8084_ADC_CLK_SEL_ACLK,
-> +					    FIELD_PREP(QCA8084_ADC_CLK_SEL_ACLK,
-> +						       QCA8084_ADC_CLK_SEL_ACLK_FALL));
-> +		if (ret < 0)
-> +			return ret;
+On Thu, Nov 02, 2023 at 04:00:32PM +0100, Christian Marangi wrote:
+> Document bindings for Marvell Aquantia PHY.
+>=20
+> The Marvell Aquantia PHY require a firmware to work correctly and there
+> at least 3 way to load this firmware.
+>=20
+> Describe all the different way and document the binding "firmware-name"
+> to load the PHY firmware from userspace.
+>=20
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> Changes v3:
+> - Make DT description more OS agnostic
+> - Use custom select to fix dtbs checks
+> Changes v2:
+> - Add DT patch
+>=20
+>  .../bindings/net/marvell,aquantia.yaml        | 126 ++++++++++++++++++
+>  1 file changed, 126 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/marvell,aquanti=
+a.yaml
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml =
+b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> new file mode 100644
+> index 000000000000..d43cf28a4d61
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> @@ -0,0 +1,126 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/marvell,aquantia.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > +
-> +		/* Adjust MSE threshold value to avoid link issue with some link partner */
-> +		return phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
-> +				QCA8084_MSE_THRESHOLD, QCA8084_MSE_THRESHOLD_2P5G_VAL);
-> +	}
+> +title: Marvell Aquantia Ethernet PHY
 > +
-
-Please add a qca8084_config_init() and use that from the phy_driver
-structure.
-
->  	/* Active adc&vga on 802.3az for the link 1000M and 100M */
->  	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, QCA808X_PHY_MMD3_ADDR_CLD_CTRL7,
->  			QCA808X_8023AZ_AFE_CTRL_MASK, QCA808X_8023AZ_AFE_EN);
-> @@ -1958,6 +1986,11 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
->  	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807a, 0xc060);
->  	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807e, 0xb060);
->  
-> +	if (phydev->phy_id == QCA8084_PHY_ID) {
-> +		phy_write_mmd(phydev, MDIO_MMD_PCS, 0x8075, 0xa060);
-> +		phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807f, 0x1eb0);
-> +	}
+> +maintainers:
+> +  - Christian Marangi <ansuelsmth@gmail.com>
 > +
+> +description: |
+> +  Marvell Aquantia Ethernet PHY require a firmware to be loaded to actua=
+lly
+> +  work.
+> +
+> +  This can be done and is implemented by OEM in 3 different way:
+> +    - Attached SPI directly to the PHY with the firmware. The PHY will
 
-Please add a comment what this is doing.
+You a word here? Should that not be "SPI flash"?
 
->  }, {
->  	/* Qualcomm QCA8081 */
-> -	PHY_ID_MATCH_EXACT(QCA8081_PHY_ID),
-> -	.name			= "Qualcomm QCA8081",
-> +	.phy_id			= QCA8081_PHY_ID,
-> +	.phy_id_mask		= QCA8081_PHY_MASK,
-> +	.name			= "Qualcomm QCA808X",
+> +      self load the firmware in the presence of this configuration.
 
-Please add a new entry for the 8084. 
+> +    - Dedicated partition on system NAND with firmware in it. NVMEM
+> +      subsystem will be used and the declared NVMEM cell will load
+> +      the firmware to the PHY using the PHY mailbox interface.
+> +    - Manually provided firmware loaded from a file in the filesystem.
+> +
+> +  If declared, NVMEM will always take priority over filesystem provided
+> +  firmware.
 
-       Andrew
+This section here reads entirely like "software policy". The first
+bullet in your list is fine - as that is what the PHY will do itself.
+The second and third bullets here seem like two different ways that
+someone could integrate their system, and I am not objecting to either
+of those ways of doing things.
+The priority system that you mention however I don't think is suitable
+for a description of the hardware - the PHY itself doesn't require that
+an external-to-it flash device take priority over something in the
+filesystem, right?
+
+
+--YBRbmXQ7LbrT3SgB
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZUTw3QAKCRB4tDGHoIJi
+0qf4AQDU5T+OXQT6MxLXyNCp4aiexeUQQeT+wge60Mjxod2E6AD/Tj2SZ7SnSWNL
+2wwCzdXT8D+xgkafSOHsTzmCVBiQQQ0=
+=TObr
+-----END PGP SIGNATURE-----
+
+--YBRbmXQ7LbrT3SgB--
 
