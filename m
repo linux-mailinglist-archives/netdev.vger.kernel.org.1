@@ -1,153 +1,184 @@
-Return-Path: <netdev+bounces-45911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262557E048F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 15:19:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 506607E0498
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 15:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55FD81C20948
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:19:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8106C1C2098F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB1918E17;
-	Fri,  3 Nov 2023 14:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63FD18E1F;
+	Fri,  3 Nov 2023 14:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="kw4DJP8q"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="H/t/DJRN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F081BDCC
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 14:19:23 +0000 (UTC)
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2029.outbound.protection.outlook.com [40.92.59.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74086D45;
-	Fri,  3 Nov 2023 07:19:21 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AsSL07w4IDLC0fhabW2zz87kspfGWiGxX1lFw1ScYke/+hjktyBC5fDZmPf8Y/4r0Orn6nlbutyKqjMz1rIwJ9rF1yQvBiiRs70ggT29evr9vVTWTF+PodBf8GJylLxQ9gs+g+fOzWzhkNEPdEvfS3JmSeImwOJ8pE7jJFjzt/L7sn6F12G/yENUXJs2M0AwAFlZXBtDdwEs7IRF/8Kuk6mvJHGFN5mlIHZztGmBIx/Khy/eM3uW2R3kUXvWH0ZdFZyyheJyh2ES/1zgKHzqLgdfLv1RKFWLgNRW29LU6cRCyxw5UGWA7Ph4kwXzJf/XId/KYWtZ3fpBILrc0+g/UQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=haBTJKP1wIWpjjT1d+Hh1wPfbOWb+381XDgSGorsAl8=;
- b=He86B8lQ5o7SJxNav+iOp6nc8ZuWjQ74NhL7Jjs3mAU81mJ3qCSennZYWTIjjLroPK+2hs0p9u3isUhp++CwSM9RfroNTJ30gksJE+v0C+jKrXGeC374EPFry4iGXbWuuJNKziLyfLthVynh1o1XIY6e+e5OPnyOGrsra83lbR0BdYw6+AkdnrKVkcDeYZdxEQJG5dIHI7JqOzgfTKBc4X9ee8P9ID8P5L5XAj8EjHhwOijve1P8bhvynXPSmkg+rhqCVdThegyDNDnT8gQ6Lugzy7+WtyKb+STgiSt+VyKG9zQDKe/tqP9aQE97KiwRZ/aEsJ949iR8nGhrcRy/Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=haBTJKP1wIWpjjT1d+Hh1wPfbOWb+381XDgSGorsAl8=;
- b=kw4DJP8qngTYaCfBNqF2nYq5+LJsMdV+vQYi0Taz88ztdWrEAumW7Ow5VSZ6iegwHujRIAdgbvGk7V9xmzOuLfdMsKM5ABUY6zcY1rZlOtGgs0vbkmCm/9D7BGuei9BQvK8Hidxy3HcKAQ//CQJ2uigvwHLOuKpXxs1VGRFmbj5qR6f7GGxChBqYrVd9lBoCHl+KiwJfRXsfiDasheUbw8bRdMn66ARrQkMceZnxmM8PudTGwpl0bRmJBAfy+MjPrKG1yw05E5N6/MN9yH1YAhZjUy0xsMPz5V2ASD7PzorW/cDoer5A6OhGUC3SLXphzLeoeKgk+jZ3GO7bsxCKug==
-Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
- by AM0PR10MB3331.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:18b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.21; Fri, 3 Nov
- 2023 14:19:19 +0000
-Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::e2b0:8d7e:e293:bd97]) by DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::e2b0:8d7e:e293:bd97%7]) with mapi id 15.20.6954.021; Fri, 3 Nov 2023
- 14:19:19 +0000
-From: Yuran Pereira <yuran.pereira@hotmail.com>
-To: gregkh@linuxfoundation.org,
-	yuran.pereira@hotmail.com
-Cc: bcm-kernel-feedback-list@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	florian.fainelli@broadcom.com,
-	justin.chen@broadcom.com,
-	kuba@kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH] Prevent out-of-bounds read/write in bcmasp_netfilt_rd and bcmasp_netfilt_wr
-Date: Fri,  3 Nov 2023 19:49:00 +0530
-Message-ID:
- <DB3PR10MB683569338168B85CB009A5E8E8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <DB3PR10MB68352DF6CB458CCF97C416ECE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
-References: <DB3PR10MB68352DF6CB458CCF97C416ECE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [KrQf17aBUp+IEi7VtwCbhN0E29StOFCL]
-X-ClientProxiedBy: JN2P275CA0038.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::26)
- To DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
-X-Microsoft-Original-Message-ID:
- <20231103141900.1620900-1-yuran.pereira@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8181A58E
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 14:22:03 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2C4D49
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 07:21:58 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-408382da7f0so15628275e9.0
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 07:21:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1699021317; x=1699626117; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5Uk4CPF0BBRF+bVj0s0eL7CcpvLknK4GIdu9RnpX2Es=;
+        b=H/t/DJRNfLVo4Ucx8eyVC4ozwYl+RbiRiz5q5/BraGmD39fXvuB40nxRkCFSARxLRA
+         UDmSVT78+WT7UaHV8xnXjCDomKGTdI4DfU10IV1KYS9Gv/8cnzpzCcBvVVhAXfOrl6Uy
+         LF7YrbGtM/Sf4vZ3xW3FGXVFG4GGBQcpBjbddwpiMC+2tuLLQQYahwS4UYTClkayK2dE
+         dQGbW3SXliUviLtjomCa9AIyE4jBQHPvfTvf6ZO+WWy0nPT6ddXUocs85e0fO8l9ptUL
+         JqZoqyG8ua4Xj2iBOFXDMsEG0Ggpdp3dg9V8Vub4hAdJdanrDWg60kQLntvqGUeoFvWJ
+         Crow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699021317; x=1699626117;
+        h=content-transfer-encoding:in-reply-to:organization:from:references
+         :cc:to:content-language:subject:reply-to:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Uk4CPF0BBRF+bVj0s0eL7CcpvLknK4GIdu9RnpX2Es=;
+        b=JFJD4f4BrOpDnOgZ4kTSjXSQmpVreoUSErU/DWMkMpU0ynyIDgoQLSqWqyPMOwq4RM
+         Kp4grau1OzyPNMLS4mV4jcawNFiNj1O7hP3PUfctKSTDkYy9cjFHGYPz2C5qY5ds5xt3
+         MODLGOUKdUf+W70NwHPyeacqtJPxYHtyBIO86wX+hj/B6fpaH6/ynrWc14xpwcesFxn9
+         1tskoh/1rKOo8IQMGQdNAEhKRJQzY0LXLqH8fsASBLe8c0RBjf4VktK+nXIU4REzMY4T
+         LO9nZvswM8vQTXKz+PyHadGcSNVqf17Brr+eGoP9g0hNu4HRV+ZbuTgM91V3Rga5CU2s
+         3uHQ==
+X-Gm-Message-State: AOJu0Yy20DDHgICh+kr+pdTHW29rb3Bejts0VIW1JuGzUfS4E1m83hEb
+	rBj7audtdnPkW7kylxVmTiaKdg==
+X-Google-Smtp-Source: AGHT+IE4+EnnbWCGrqzcO5dvKllV5bvlEnU72oSI3Z0wbn6Ot+ltDahvbMO1g1tBXq2y2IiyLU5NsQ==
+X-Received: by 2002:a05:600c:458e:b0:408:3fae:d809 with SMTP id r14-20020a05600c458e00b004083faed809mr18376719wmo.17.1699021316858;
+        Fri, 03 Nov 2023 07:21:56 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:7bea:b090:d69:c878? ([2a01:e0a:b41:c160:7bea:b090:d69:c878])
+        by smtp.gmail.com with ESMTPSA id h21-20020a05600c499500b0040586360a36sm2579011wmp.17.2023.11.03.07.21.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Nov 2023 07:21:56 -0700 (PDT)
+Message-ID: <7627f7d5-89d5-487a-938a-5156be9d4fbd@6wind.com>
+Date: Fri, 3 Nov 2023 15:21:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB3PR10MB6835:EE_|AM0PR10MB3331:EE_
-X-MS-Office365-Filtering-Correlation-Id: a77bc5eb-178e-4323-5c20-08dbdc77de16
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	WZ6dRuSPIOjOsceLX/6WORqs5W1BwHEjT/KrvjFoNd+zCCx6/A5G9vRAx6PI0BFLHboAdyygGQZE+XBKSIbhr0I3EFEFFrt33jdICh6gfaeUjpDs5Zw1lJzju9+uQQAipD0mrj6XSdQ9FpVxYx41FFB0hPhGanOmXAZq+JEheNKCUjdcrJoGYJUYW2NWiES9AbxXNdbrJBj373wxk8ppzRUTeWwnWtkkriQHgR04B3cswHRMuLPp13/EZB9TxvFLaf0RyjWPNtwahVd1ROsigTaI5Cf7Rinjh05fq+UxNZS4qLIr1RCgt26CvscbSM1sEcn+EO3ALySGOIWHp4TuG1l0zab/HlqkuGzd/7fB7y4fpSa/4wmvcNIfm4DfQSB+h2+P8UM68W/8owU4rUe0lnf0R2wli26m6N8dx17W9TCTXuxOEjPNMkOS/WSalPuE6Qn02AbnPECEmLyxObqWe97gPMFlccid2gAFnQfcFbzPWnFsQAoidQwlDyzXjTpIrDurXA+cswOhJ3jLNz4GJK5hMoWwHPNofmNampWIrq5TzTrmTu1mGKvisO30x0lQIOzIGGZ0sjie3UygHFRrM8ytYEJ8stUKFRBhadC1b/OYgpMVuSjjwbeXm9n21A4I
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Cse4UXeTk3Cldc4FlpAzcTxFjuoQM5Cr+0UKo6ohVwn6UHjVjbobRyTBHc70?=
- =?us-ascii?Q?lLdtgYcNuI05OO/UzdWMQt0EJ2RSNHegIoxaUtAXYp2v1YYit/GuBrJp9sdJ?=
- =?us-ascii?Q?ccbCXl/p69VXvvG+rvjahCDpHBpoLHUwKPCmYJ6d8zfiR5ca6B8L0+ineM+w?=
- =?us-ascii?Q?grkhxW7SO/yfOwVJJKrHm5KAyMsNdGu42r8vAbcnUtxjkII4G4Fkobp5y/Ho?=
- =?us-ascii?Q?Ph+xOZBjSNYx1t/+2bYEWve7OW+u8K9X5UcRy2JeRexCeU1WlkfhqYm5jD2S?=
- =?us-ascii?Q?XuOxCyxGhUXByo61sW9FZ10PtertbhSyV8c+59HZuqtwsLmu5GZAOSnq8q+2?=
- =?us-ascii?Q?SgaaZGhNjFAylqQnzslOQgKvYI5eoQurYpAyLEESvhuzwp0ha0vy8oI3Dg0E?=
- =?us-ascii?Q?8lvXlkYxX+Vuj8OAraM8hqy2CYBQWAl+sZBtWo4VxrBfNWuEf//s9veTUk1l?=
- =?us-ascii?Q?BQv0mx1wOlYT/6F1uQapSZy50Pic7RXl04rasw6lvotttut4QzR8TuSIbZ+Z?=
- =?us-ascii?Q?U7vhGZb1973JxB1f0Eshp6quIzwfqJRZXOQ+OF0vF3Zaw3YPpmPOgleBzTBY?=
- =?us-ascii?Q?z+rsIagRMjo/ZHtkM10a/cXQOElhmgDBJ6vwcHI/JXH7VCFhgW07/KH2Zkgb?=
- =?us-ascii?Q?MY3SgGxQJ81pdYmfdsB68ZJxU4DHAqsV1U8LoLNj0SaFWm1MvBg0l1m7Rk9R?=
- =?us-ascii?Q?kSEJWabRAHACI6Mg1GRqAk9pTqO478y4Ug0mA0dYePlhw+oDhpHV06fUJYKJ?=
- =?us-ascii?Q?ZKIvAe4SI4qEhHbNI/4CVLlNBUk7an+s0mkU2V5VFjHfmiteCjkCLC2n/oCX?=
- =?us-ascii?Q?rOb2fW7mZtT5lC7Y26RQl4UiQqm467YmH8jqPbzxaqd40MyIVMRdzSBLCHAa?=
- =?us-ascii?Q?aGWp0Gobn8ROiPSGoW9QBfaAY5fxVagdPUBCA+NfFvn5YIHgx9TDINeyNsqQ?=
- =?us-ascii?Q?uaet6Hyl7YtDoJ2haea5AnBJ5vM9Gheg1XD9xOL3qVE2EKXbW7aFhKzMIMIr?=
- =?us-ascii?Q?1zmxSfPGxcRsMqP4ZHGI/3SB9GRtjwZDr6b4kSF5GYsXPdfJbdBNw7x4Bw0J?=
- =?us-ascii?Q?8/TBbgn6Og1O9YyreRF+BHhmUNiXHZgz3+s7z/dDjGddaR11xlRog2q70lu/?=
- =?us-ascii?Q?KA4FySu7ZcB6LftMSAU2ieBx+TiZPbUO87GtTz9kCthN2/hZVpeHzZ4jBVlT?=
- =?us-ascii?Q?Bam3YuIjPFGPJYlnlMMod9lzmaZHAyN9ksimERtsXZBCjW5Wmx86ucn2H3o?=
- =?us-ascii?Q?=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: a77bc5eb-178e-4323-5c20-08dbdc77de16
-X-MS-Exchange-CrossTenant-AuthSource: DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 14:19:19.4579
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR10MB3331
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH] net: ipmr_base: Check iif when returning a (*, G) MFC
+Content-Language: en-US
+To: Yang Sun <sunytt@google.com>
+Cc: Ido Schimmel <idosch@idosch.org>, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20231031015756.1843599-1-sunytt@google.com>
+ <ZUNxcxMq8EW0cVUT@shredder>
+ <CAF+qgb4gW8vBb8c2xDHfsXsm1-O2KCwXMCTUcT2mYqED51fHoQ@mail.gmail.com>
+ <fc356b9d-d7fc-4db8-b26c-8c786758d3e5@6wind.com>
+ <CAF+qgb6uUF-Z8EkZoqzfboaCZv4PP6yG_r=-2ojaG9T61Kg3jA@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Organization: 6WIND
+In-Reply-To: <CAF+qgb6uUF-Z8EkZoqzfboaCZv4PP6yG_r=-2ojaG9T61Kg3jA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Le 03/11/2023 à 12:05, Yang Sun a écrit :
+> On Thu, Nov 2, 2023 at 10:19 PM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
+>>
+>> Le 02/11/2023 à 12:48, Yang Sun a écrit :
+>>>> Is this a regression (doesn't seem that way)? If not, the change should
+>>>> be targeted at net-next which is closed right now:
+>>>
+>>>> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+>>>
+>>> I see.
+>>>
+>>>>> - if (c->mfc_un.res.ttls[vifi] < 255)
+>>>>> + if (c->mfc_parent == vifi && c->mfc_un.res.ttls[vifi] < 255)
+>>>
+>>>> What happens if the route doesn't have an iif (-1)? It won't match
+>>>> anymore?
+>>>
+>>> Looks like the mfc_parent can't be -1? There is the check:
+>>>     if (mfc->mf6cc_parent >= MAXMIFS)
+>>>         return -ENFILE;
+>>> before setting the parent:
+>>>     c->_c.mfc_parent = mfc->mf6cc_parent;
+>>>
+>>> I wrote this patch thinking (*, G) MFCs could be per iif, similar to the
+>>> (S, G) MFCs, like we can add the following MFCs to forward packets from
+>>> any address with group destination ff05::aa from if1 to if2, and forward
+>>> packets from any address with group destination ff05::aa from if2 to
+>>> both if1 and if3.
+>>>
+>>> (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
+>>> (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
+>>>
+>>> But reading Nicolas's initial commit message again, it seems to me that
+>>> (*, G) has to be used together with (*, *) and there should be only one
+>>> (*, G) entry per group address and include all relevant interfaces in
+>>> the oifs? Like the following:
+>>>
+>>> (::, ::)         Iif: if1 Oifs: if1 if2 if3   State: resolved
+>>> (::, ff05::aa)   Iif: if1 Oifs: if1 if2 if3   State: resolved
+>>>
+>>> Is this how the (*, *|G) MFCs are intended to be used? which means packets
+>>> to ff05::aa are forwarded from any one of the interfaces to all the other
+>>> interfaces? If this is the intended way it works then my patch would break
+>>> things and should be rejected.
+>> Yes, this was the intend. Only one (*, G) entry was expected (per G).
+>>
+>>>
+>>> Is there a way to achieve the use case I described above? Like having
+>>> different oifs for different iif?
+>> Instead of being too strict, maybe you could try to return the 'best' entry.
+>>
+>> #1 (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
+>> #2 (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
+>>
+>> If a packet comes from if2, returns #2, but if a packet comes from if3, returns
+>> the first matching entry, ie #1 here.
+>>
+> 
+> Thanks for your reply Nicolas!
+> Here if it returns the first matching then it depends on which entry
+> is returned first
+> by the hash table lookup, the forwarding behavior may be indeterminate
+> in that case
+> it seems.
+As I said, only one (*,G) entry was expected thus the 'first' one is
+indeterminate if there are several entries.
+
+> 
+> If a packet has no matching (*, G) entry, then it will use the (*, *)
+> entry to be forwarded
+> to the upstream interface in (*, *). And with the (*, *) it means we
+> won't get any nocache upcall
+> for interfaces included in the static tree, right? So the (S, G) MFC
+> and the static proxy MFCs
+> are not meant to be used together?
+Not together. With proxy multicast, the multicast tree is static, ie there is no
+multicast daemon. Mcast packets received from one interface are sent to the
+other interfaces that are part of the tree.
 
 
-On a second thought, it might not be a good idea to return
-an error without modifying the caller, since the caller of
-this function currently uses this return value without checking
-if it's an error.
-I guess that explains why the first check returns 0.
+Regards,
+Nicolas
 
-```
-static int bcmasp_netfilt_wr_m_wake(struct bcmasp_priv *priv,
-...
-{
-		...
-        if (first_byte && (!IS_ALIGNED(offset, 4) || size < 3)) {
-            match_val = bcmasp_netfilt_rd(priv, nfilt,
-                              ASP_NETFILT_MATCH,
-                              ALIGN_DOWN(offset, 4));
-            mask_val = bcmasp_netfilt_rd(priv, nfilt,
-                             ASP_NETFILT_MASK,
-                             ALIGN_DOWN(offset, 4));
-        }
-
-        shift = (3 - (offset % 4)) * 8;
-        match_val &= ~GENMASK(shift + 7, shift);
-        mask_val &= ~GENMASK(shift + 7, shift);
-        match_val |= (u32)(*((u8 *)match) << shift);
-        mask_val |= (u32)(*((u8 *)mask) << shift);
-
-```
+> 
+> I wonder how a real use case with (*, G|*) would look like, what
+> interface could be an
+> upstream interface. Is there an example?
+> 
+> Thanks,
+> Yang
+> 
+>>
+>> Regards,
+>> Nicolas
 
