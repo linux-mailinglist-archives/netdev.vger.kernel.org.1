@@ -1,179 +1,207 @@
-Return-Path: <netdev+bounces-45838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CEC7DFE71
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 04:40:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D99547DFE76
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 04:49:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76D191C20F6E
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 03:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08F241C20DD8
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 03:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC9715B5;
-	Fri,  3 Nov 2023 03:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774A515B6;
+	Fri,  3 Nov 2023 03:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PD2JE9+Y"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EbXOK7Wz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F967E
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 03:40:00 +0000 (UTC)
-Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADCBDCE;
-	Thu,  2 Nov 2023 20:39:58 -0700 (PDT)
-Received: by mail-ua1-x935.google.com with SMTP id a1e0cc1a2514c-7ba170ac211so574876241.2;
-        Thu, 02 Nov 2023 20:39:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3967E
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 03:48:58 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A401A196
+	for <netdev@vger.kernel.org>; Thu,  2 Nov 2023 20:48:53 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6ba54c3ed97so1778611b3a.2
+        for <netdev@vger.kernel.org>; Thu, 02 Nov 2023 20:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1698982798; x=1699587598; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s39c0Q3vRJAr69pPcp1Cq/oOjffOhAjmF4C5gTe6n2g=;
-        b=PD2JE9+YooOHpn0uTdMpwB3GqDJSgFERacV8171sp1ju7VsCAKrJh6Qyx5VMCSbce5
-         tbNPESO2MWrx5XyKssExUko8PH3ROG/rnpp2cIqJSQTXwRzqLIZqZaywB8yofxWClgNf
-         d7+h490/4tChddJ+wZPZ9pzpPfJ9hsjze+zYHbmP40o89MOCYpiKN6ZDny9YFdcihsYh
-         85u0ablyRf2QkBA6cuc+EePwR/rY37hhBMeh8Ib0xwMsBZyEACF+Mvl1g6jFr6OaJ+xh
-         oBY2ZtGUGIhsgre+sPd+uw2cEmKt1AIxNGgnJWqpFFckSOjPrF0CDt2PCMuzyPKMk4O8
-         hNpA==
+        d=broadcom.com; s=google; t=1698983333; x=1699588133; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wHapStzyo5bcpl/cD9B7p5ZPQDUX0ELpuSAYDKPQZF4=;
+        b=EbXOK7WzfCpi/2dmsCEsUTA60fEak4GtBt3LmXVBWC+QPqVZFmsE0zDvQ+I8Wc8yA9
+         o1BaEDRtoL9BtRQw+emtRRl8sprCB0bCydFRw9yREWICF6+7nY5PSyTEcc9b2/NxxzjH
+         KHpUl9FpLC3rqsv1d8hPdZWh4HCoOfFBvPk2Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1698982798; x=1699587598;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s39c0Q3vRJAr69pPcp1Cq/oOjffOhAjmF4C5gTe6n2g=;
-        b=BBL4aqQRrQqGUOeMX6+SCFAd/oR+khjkATEyjGe0QUe7JKv47RWqv1A3xCc+QI/qPF
-         FM1+YCq4X+DRdvrhy+7kcBOXzz/DmHYQ9bGc8j3DtfDLkteIwkgy8hlKlu+0epe4FSJb
-         M1khsHM98MWi670c+GLJ/f5WuKWeo1devmt37CHCCflPU6jorTSILovp2zdf1dsFlUOK
-         1FBd95el2tWr3mtYzsaomqPB1dEY0SnEg0/uVLtj2wDhXkyeqMzrr2dAtJ6f91dCGDWJ
-         uBm9tbMDh7OBnMsbrGUPsGp17d0fle2cozeRil45eniQhzxHH+my22ook+FD6cLUZhq1
-         k1Hw==
-X-Gm-Message-State: AOJu0YwvI1UazfuV2fnD1zIFYuwSyNqt3b124oZ2aniI248LEWSR9e0S
-	CsQPtugrz5uXNbCJikOshN9/B+jUz0w=
-X-Google-Smtp-Source: AGHT+IEuKRhsbk3ee0U6AUU7P+u20ZODJN0lghzIwHvZfpJsz+Vf7wtmxDdGnCGB3WevwnexC4ZQAA==
-X-Received: by 2002:a67:c399:0:b0:452:c581:5a07 with SMTP id s25-20020a67c399000000b00452c5815a07mr20410738vsj.11.1698982797741;
-        Thu, 02 Nov 2023 20:39:57 -0700 (PDT)
-Received: from [192.168.1.3] (ip72-194-116-95.oc.oc.cox.net. [72.194.116.95])
-        by smtp.gmail.com with ESMTPSA id m24-20020aa78a18000000b0068fcb70ccafsm437860pfa.129.2023.11.02.20.39.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Nov 2023 20:39:57 -0700 (PDT)
-Message-ID: <999020b2-692b-4582-8ca0-e19c7b45ee92@gmail.com>
-Date: Thu, 2 Nov 2023 20:39:55 -0700
+        d=1e100.net; s=20230601; t=1698983333; x=1699588133;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wHapStzyo5bcpl/cD9B7p5ZPQDUX0ELpuSAYDKPQZF4=;
+        b=oHKgLYbkuoiZi8+knJgeKjVG7SgHP1dI7Hg5TPhyaVvw9FzKpT5dUytVZb0usLceal
+         CF/DQROK9LVvNViMKEvTSJDNz4EsZ64asOEptlGz62/QQo5lmMOcgrW4/ZnPU+6t5v1j
+         tMkfM/2UzKGkB2MjoAVPuif5Jm6v/qGLF5q5hlSV7W2JO+LSuA2IG2/DLzaXzyDZWkjE
+         yeM2GdcutFPa0nXsYlmUoR2M2outX11Jmw+DEZMlXBhbAJunCO5LzFiOEzAUkn3HW5Ya
+         NHxyzEb+ZBOrdHGoq7hoG9PNjdb+heSftw4tJBpcYlTh2IgasQf2DYVuC5ib81LhpDfU
+         6sAg==
+X-Gm-Message-State: AOJu0Yz43V0EexhAJ0NlbqABn1A3rBpknG6h6pWVQOi+XNec2yZ1v/6X
+	QeJZIJNS+mX8gUP29k1sfJYoxE8760sRsqRIECbWPN/CBsQf9klwdjWVLw==
+X-Google-Smtp-Source: AGHT+IGZEU8quetx5FsHiopNj4X98qnvlIQzDCU5CPLQQkuLJPk1zZdK+VvrtIlkz2deSvPQLBMmyGKmHHNDBt9FA18=
+X-Received: by 2002:a05:6a20:7f93:b0:181:5480:d400 with SMTP id
+ d19-20020a056a207f9300b001815480d400mr7937208pzj.12.1698983333029; Thu, 02
+ Nov 2023 20:48:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: broadcom: Wire suspend/resume for BCM54612E
-Content-Language: en-US
-To: Marco von Rosenberg <marcovr@selfnet.de>, Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231030225446.17422-1-marcovr@selfnet.de>
- <5414570.Sb9uPGUboI@5cd116mnfx>
- <fe3ad92f-31d9-4509-b851-017218229e19@lunn.ch>
- <4890615.31r3eYUQgx@5cd116mnfx>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <4890615.31r3eYUQgx@5cd116mnfx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20231101130418.44164-1-george.shuklin@gmail.com>
+ <CALs4sv37sniGKkYADvHwwMjFzp5tBbBnpfOnyK-peM=rnp63Bw@mail.gmail.com>
+ <31a5cfe8-133d-4548-9814-cf3e61d89307@gmail.com> <CALs4sv1-6mgQ2JfF9MYiRADxumJD7m7OGWhCB5aWj1tGP0OPJg@mail.gmail.com>
+ <5c778d51-ec87-4e74-9fd6-63dc4a9ae2a6@gmail.com> <CALs4sv3pGsNFQeZstmioiTxjhMu6HJm9_ES1u4_sbTZKrztrDQ@mail.gmail.com>
+ <CACKFLi=0eRFGfGXBihLKwZaifKJAVWR5tK9HM82pyjDNA2r7pw@mail.gmail.com>
+In-Reply-To: <CACKFLi=0eRFGfGXBihLKwZaifKJAVWR5tK9HM82pyjDNA2r7pw@mail.gmail.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Fri, 3 Nov 2023 09:18:36 +0530
+Message-ID: <CALs4sv3BTPo-FxNfJJwtNYoMti45sai3VonhKC9Cyp9khJegwQ@mail.gmail.com>
+Subject: Re: [PATCH] [PATCH net] tg3: power down device only on SYSTEM_POWER_OFF
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: George Shuklin <george.shuklin@gmail.com>, netdev@vger.kernel.org, 
+	Andrew Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000011837f0609376290"
 
+--00000000000011837f0609376290
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Nov 2, 2023 at 11:19=E2=80=AFPM Michael Chan <michael.chan@broadcom=
+.com> wrote:
+>
+> On Thu, Nov 2, 2023 at 10:11=E2=80=AFAM Pavan Chebbi <pavan.chebbi@broadc=
+om.com> wrote:
+> >
+> > On Thu, Nov 2, 2023 at 7:44=E2=80=AFPM George Shuklin <george.shuklin@g=
+mail.com> wrote:
+> > >
+> > > I'm right now with dell support, and what they asked is to 'try this =
+on
+> > > supported distros', which at newest are 5.15. I'll try to bypass thei=
+r
+> > > L1 with Ubuntu + HWE to get to 6+ versions...
+> > >
+> > > I was able to reproduce hanging at reboot there (without ACPI message=
+s),
+> > > and patching helps there too.
+> > >
+> > OK. I am not too sure what we should do. The change as such looks fine =
+to me.
+> > Of course, the patch needs proper tags (tree.fixes, cc ...)
+> >
+> > @Michael : Do you have any suggestions on this?
+>
+> I think that this logic:
+>
+> if (system_state =3D=3D SYSTEM_POWER_OFF)
+>         tg3_power_down(tp);
+>
+> is correct in the shutdown method.  Many other drivers do the same
+> thing.  tg3_power_down() is just to enable WoL if it should be enabled
+> and to put the device in D3hot state.
+>
+> The original commit to change this (2ca1c94ce0b6 tg3: Disable tg3
+> device on system reboot to avoid triggering AER) claims that calling
+> tg3_power_down() unconditionally is to avoid getting spurious MSI.
+> But the dev_close() call in tg3_shutdown() should have shut everything
+> down including MSI.  So I don't think it is necessary to call
+> tg3_power_down() unconditionally.
 
-On 11/2/2023 6:47 PM, Marco von Rosenberg wrote:
-> On Wednesday, November 1, 2023 11:06:56 PM CET Andrew Lunn wrote:
->> On Wed, Nov 01, 2023 at 10:42:52PM +0100, Marco von Rosenberg wrote:
->>> On Tuesday, October 31, 2023 1:31:11 AM CET Andrew Lunn wrote:
->>>> Are we talking about a device which as been suspended? The PHY has
->>>> been left running because there is no suspend callback? Something then
->>>> triggers a resume. The bootloader then suspends the active PHY? Linux
->>>> then boots, detects its a resume, so does not touch the hardware
->>>> because there is no resume callback? The suspended PHY is then
->>>> useless.
->>>
->>> Hi Andrew,
->>>
->>> thanks for your feedback. I guess a bit of context is missing here. The
->>> issue has nothing to do with an ordinary suspension of the OS. The main
->>> point is that on initial power-up, the bootloader suspends the PHY before
->>> booting Linux. With a resume callback defined, Linux would call it on
->>> boot and make the PHY usable.
->>
->> Ah, so you rely on phy_attach_direct() calling phy_resume(phydev).
->>
->> This seems an odd way to solve the problem. It was not Linux which
->> suspend the PHY, so using resume is asymmetric.
->>
->> I think soft_reset() or config_init() should be taking the PHY out of
->> suspend.
+Agree. So let us have this change in. George, can you pls spin a v2
+with proper tagging/addressing done to the patch.
+Please see https://docs.kernel.org/process/submitting-patches.html for
+help. Thanks.
 
-We have an unconditional call to __phy_resume() in phy_start() and we 
-should always have a call to phy_start() regardless of the path though 
-you have a point Andrew that we should ensure that by the time 
-phy_init_hw() is called we have taken the device out of IDDQ-SR.
+--00000000000011837f0609376290
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> 
-> I agree with all of your points. This is just one way which happens to solve
-> this specific problem. Of course it might be asymmetric to see the patch as
-> a solution to my problem. However is there anything fundamentally wrong with
-> adding suspend/resume callbacks? I see some other drivers having these
-> callbacks defined and some not (it seems a bit inconsistent throughout the
-> drivers in broadcom.c to be honest).
-> 
-> I'm wondering if I should just omit this whole "motivation" paragraph in the
-> commit message and just use the commit message of commit 38b6a9073007 ("net:
-> phy: broadcom: Wire suspend/resume for BCM50610 and BCM50610M") as a template.
-> I mean, regardless of my motivation, I would say it makes sense for this PHY
-> to support suspend and resume.
-
-I would remove the motivation aspect from the paragraph and we could 
-also improve the driver a bit to ensure that IDDQ-SR is disabled upon 
-config_init(). Other than that your patch is just fine with me. Can you 
-re-submit in a few days when net-next opens again?
-
-Thanks!
--- 
-Florian
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOWIVdtxSzqrgz6G3Fim8RrZI7UeEbXj
+2tjLfP+HaeCcMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+MzAzNDg1M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBUYMioRPERS7QQqSryGWOO9l+y5OOS7DyVcsy2pHbJmRdYD8GY
+K2TDi0dXWqu0j7CoJoXT7kSupIWCXvb86LASLKq0NDNbru1asv0FajR3bOs88nxk/M4z6t6S7uk0
+S9zAaovEqQ/W6JGbLDxnWQGHNoYCmTlLKbmTgSn7CPEQtg5Si6Qa60CC5e20cryj/NhoFfYth5O+
+0f+BxA0sOCRhzaK9xi6N3K9ZlnWySR7NKE3rZBKfw5efEoVeoA0G4AjwsUGh90QVqYAWa+5z0//8
+SdolMh3XPH6wuFYMK/3i8ImvXy+32ELz5x1BAQReoXmc9HSzc9oJpwkfi7oVYNTW
+--00000000000011837f0609376290--
 
