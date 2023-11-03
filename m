@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-45874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 728FC7DFFF7
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B9F07DFFF6
 	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0512BB212FF
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:20:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10694B2129C
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30467CA51;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C42C8C6;
 	Fri,  3 Nov 2023 09:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qwxr5Ynq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e2Zrz/9i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE258C03
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0484D79D1
 	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 938D7C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 99C06C433C7;
 	Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1699003223;
-	bh=/E8aN2eqf8+9+fQQLHb6DQ5BDwl4MybdpCu0nul9xiE=;
+	bh=THMrlEH/AgE0HuxCkw5yaitecucnxgYxx5Wpr6R41uM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Qwxr5Ynqu4Y1dPkA8/LQUHD1izqztkB/TEnEYhAf3cXEyW2dtVTph0sBvSlVWbftO
-	 +NgiIEQXB160wlNcoqDK59ErEkaiOEJ7KQTJjMB5ea15QN/vKx103GJ1QS/9AGRpZV
-	 2fEU2jpmVWPDzpzkmf1fKxsczzGUHDvHkc9CIHgkhczwEdzsrGSLauQvD1F5NJgea0
-	 VE/0RrCAVmgl0cqZGTu3JksVoQi1kE82wjhauGMPymhj7ml7iDFuALiCi4URApmnm1
-	 T9g3EmUi1K2hAy9nA3OmL3mdnZa4uu5urEOGjkDlJo3y0A6LGXNP7PbQlaCIbQIfQm
-	 vQmLH20WokGsQ==
+	b=e2Zrz/9iiMCFX8sIkXu53NulliBGiIOMOe93ulJFtJeypWyUKWSIpytL6I4ybVRBS
+	 jNWZSvPFo7zb+ckmbOVjXpFd64UUYpjrR02NEKvTfmTZNsdUgRcg97AotY58eWFTXd
+	 cY0XRtf3rP7T+CeoFIpASIeyPn8Ifn3Vm1mfnoKkCDVxEQqGil5kCYyQKEN2AGDp8+
+	 l0tFusaI4R+mpH+5l+YT/Lbc37JYQ+Sr7TayRua9GyjQaHStlfGxSsIyWmAWRpDfvo
+	 C1HOZJl7PBE3VMS4zzgdoRDVoaXwfdcYJCcZIcPKDmzJLdTapymLwc4aE3jQm/1Lwl
+	 b4+YWKOGf2Spg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7733FE00085;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8269FC04DD9;
 	Fri,  3 Nov 2023 09:20:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,37 +43,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Fix termination state for idr_for_each_entry_ul()
+Subject: Re: [PATCH net] tcp: fix fastopen code vs usec TS
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <169900322348.11636.17439163150143289110.git-patchwork-notify@kernel.org>
+ <169900322353.11636.7052991589260368750.git-patchwork-notify@kernel.org>
 Date: Fri, 03 Nov 2023 09:20:23 +0000
-References: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
-In-Reply-To: <169810161336.20306.1410058490199370047@noble.neil.brown.name>
-To: NeilBrown <neilb@suse.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
- willy@infradead.org, chrism@mellanox.com, xiyou.wangcong@gmail.com
+References: <20231031061945.2801972-1-edumazet@google.com>
+In-Reply-To: <20231031061945.2801972-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, oliver.sang@intel.com,
+ ncardwell@google.com, morleyd@google.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Tue, 24 Oct 2023 09:53:33 +1100 you wrote:
-> The comment for idr_for_each_entry_ul() states
+On Tue, 31 Oct 2023 06:19:45 +0000 you wrote:
+> After blamed commit, TFO client-ack-dropped-then-recovery-ms-timestamps
+> packetdrill test failed.
 > 
->   after normal termination @entry is left with the value NULL
+> David Morley and Neal Cardwell started investigating and Neal pointed
+> that we had :
 > 
-> This is not correct in the case where UINT_MAX has an entry in the idr.
-> In that case @entry will be non-NULL after termination.
-> No current code depends on the documentation being correct, but to
-> save future code we should fix it.
+> tcp_conn_request()
+>   tcp_try_fastopen()
+>    -> tcp_fastopen_create_child
+>      -> child = inet_csk(sk)->icsk_af_ops->syn_recv_sock()
+>        -> tcp_create_openreq_child()
+>           -> copy req_usec_ts from req:
+>           newtp->tcp_usec_ts = treq->req_usec_ts;
+>           // now the new TFO server socket always does usec TS, no matter
+>           // what the route options are...
+>   send_synack()
+>     -> tcp_make_synack()
+>         // disable tcp_rsk(req)->req_usec_ts if route option is not present:
+>         if (tcp_rsk(req)->req_usec_ts < 0)
+>                 tcp_rsk(req)->req_usec_ts = dst_tcp_usec_ts(dst);
 > 
 > [...]
 
 Here is the summary with links:
-  - Fix termination state for idr_for_each_entry_ul()
-    https://git.kernel.org/netdev/net/c/e8ae8ad479e2
+  - [net] tcp: fix fastopen code vs usec TS
+    https://git.kernel.org/netdev/net/c/cdbab6236605
 
 You are awesome, thank you!
 -- 
