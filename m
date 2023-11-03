@@ -1,103 +1,177 @@
-Return-Path: <netdev+bounces-45918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7448D7E0639
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0297E067E
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CD87281EBF
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 16:17:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C14281EBC
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 16:26:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727521C6B3;
-	Fri,  3 Nov 2023 16:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0061CA86;
+	Fri,  3 Nov 2023 16:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="XcEcBB1q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UbsJInSO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B13FBF4
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 16:17:14 +0000 (UTC)
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F6B111
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:17:10 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2c4fdf94666so30627831fa.2
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 09:17:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061A11C6A8;
+	Fri,  3 Nov 2023 16:26:46 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46E0D6A;
+	Fri,  3 Nov 2023 09:26:25 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9c53e8b7cf4so335509666b.1;
+        Fri, 03 Nov 2023 09:26:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1699028228; x=1699633028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vvmhYmC/QbC7oGEFnKNnhecSmVQk2QJI2kNmzL6pHrc=;
-        b=XcEcBB1qMCVLeTU1P/QbGU585BqdFMB10sMyximesPBJR5glcQyPm0tzYbDQ4Y4nZR
-         9ssWFi2xxH6f8LqvS285NOc/JW/aj2rSNzRZ8oxg81rxVjRefjYYQRm+HTfE3HypFjDn
-         heST+cASc/aQlYO/yxvz+vrhN7ICT7iVprGhR8Emg5VPxCaXd8nXUC8+vb/b8k13LlLq
-         kocSro5axgKeJNRbPcuQtVk0U9DvmjOKP76zAhnXo7IrTdiLVXek4S2916bFNSL989eR
-         Ij3Uv6DIh3i2xgWfPvraQIzA1eagWZKrfRKVXh3rVNiLiLLoFecLNug94Ct6Jc/0H71q
-         J0lA==
+        d=gmail.com; s=20230601; t=1699028784; x=1699633584; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LTnkfaaMf1CLAmf1Rg2wsHS7BcVuqGkZNamaGh2FvQ4=;
+        b=UbsJInSOefG71c85sFN7Bv5MY6GB5OP67Kvnhp9H344IpQHR4/IEjCmK9GODo3hH+Z
+         D9lfwHBaaj6YHRIbgZrhFcMKe8/fIb63XbjAm4cSpm064nq4WuMVWLrxpeTL0KiNNTye
+         i8HxNE/FbFeJgtPn6Lo20COmwlJU1xbvw5TqcQeZvqVUebkylipMPpKXad8XW262u+bF
+         09TumWtKl3EQPRJrZ4SSa9r6Hr/o7KxAipmVAoonPu/5GWZgoxIxEq9ajW1EQBDqPvCe
+         HvD+d57Kyh9BSIJxeHzk4ufy1GWNrt1bcKDQva2JQVb+dgD7DNJoLB2PGEK2C6Ae6IVJ
+         yk1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699028228; x=1699633028;
-        h=content-transfer-encoding:mime-version:message-id:references
-         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vvmhYmC/QbC7oGEFnKNnhecSmVQk2QJI2kNmzL6pHrc=;
-        b=xF/alHCZ1bOoZu9ldITcN003B97CfHEmvNmebnWgBgKF4gUwxBxr1UVPmofVMF3LPu
-         hbPElKVrswVaxSSYBSTvQ4LclkIzRcht9rdj8GsuXQNjUtBD0Jt2GydAefa7asKuWnIt
-         oOqBho6/NR78GpeZGYfgVe5fWRpsnano5MfbBp29VRFWvTr1mh5iK08S5tgVmQG8Xj5l
-         6s6yCjMgCRwLPPmX6lM5MkhDAdWyhAXJD7VvBNvkS/MyBmghMOfMp4XZgefg9kmr2lCt
-         KuTCnegfcHl8u5pLPxyiVuUPsVoODhztcTg22WO9+Luv3U9WgNGc1XgOL/REy22A9CJn
-         m4mQ==
-X-Gm-Message-State: AOJu0Yx65DT/y6mGnIAEGxZtSZ5Ca95IZAK/zyJkLM8ng0uKv31Jxzjf
-	Nf6lh/rNNHAyowE0LC6CnWyVlQ==
-X-Google-Smtp-Source: AGHT+IEaPofX1b/aGl3GBnYi8tDM/yoFU7InvWgNuWPGwEzpVfu8963R7oC4qeAXhh5fumtEIIFCdw==
-X-Received: by 2002:a2e:8217:0:b0:2c5:1eb6:bd1e with SMTP id w23-20020a2e8217000000b002c51eb6bd1emr16584966ljg.43.1699028228352;
-        Fri, 03 Nov 2023 09:17:08 -0700 (PDT)
-Received: from ?IPv6:::1? ([2a02:8011:e80c:0:bcb3:c564:df72:fc94])
-        by smtp.gmail.com with ESMTPSA id iv12-20020a05600c548c00b0040641a9d49bsm3022293wmb.17.2023.11.03.09.17.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Nov 2023 09:17:07 -0700 (PDT)
-Date: Fri, 03 Nov 2023 16:17:07 +0000
-From: Quentin Monnet <quentin@isovalent.com>
-To: Yonghong Song <yonghong.song@linux.dev>, Artem Savkov <asavkov@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-CC: Jerry Snitselaar <jsnitsel@redhat.com>
-Subject: Re: [PATCH bpf-next] bpftool: fix prog object type in manpage
-User-Agent: K-9 Mail for Android
-In-Reply-To: <a115f76f-f53c-42c0-918a-b88d34c3f54e@linux.dev>
-References: <20231103081126.170034-1-asavkov@redhat.com> <a115f76f-f53c-42c0-918a-b88d34c3f54e@linux.dev>
-Message-ID: <5E56CB57-0162-4402-93E1-917635E68458@isovalent.com>
+        d=1e100.net; s=20230601; t=1699028784; x=1699633584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LTnkfaaMf1CLAmf1Rg2wsHS7BcVuqGkZNamaGh2FvQ4=;
+        b=XnRLCTSEJyYTQmJRTvAcHuzbY4rxZXHDVX7qxP4ltN9Q1mIy5/eOJxb5IXYueMwCRK
+         eHOXidJsvjX1eloVfffhOJ5DTjWj4y4z6/sC+4vhRkBWzDqbBjt2q+BQUEt1/OtKIxMm
+         dUQndXrjgqAuunpB3YIY0gvdLl0SNtqdepwQ/W1tmC7KIPPV+Zd6Ce0LGnn80WJPU9fu
+         ciW1rKF1jMv9MzbntKy7mnK0WY2hGarNL6d97d0Dt75eg5f5oJsy06WoAEyzWw4O2W17
+         ye6+kenxAWotvdUImMxPtBsO+J+XHUXfJOxUiHBLXV4s8yJCDFoH917+OrWmRT/izA9P
+         TWHg==
+X-Gm-Message-State: AOJu0Yye/ix8LnEtUe7A2wU2/oFLVBsF7jLCrXFhkZShCK7vCJG2BBbZ
+	dstqzrsA50Hr2tw/cxt23MJa9ujL44p38Q2LQ3jFsq6t
+X-Google-Smtp-Source: AGHT+IGakKETpikSrE5Xosw/DkfZZRBaiBc5vn5u0MXOqWdum9NK7AqxWpxFtFIqEj9IQslRRfFGUnfUvUQePkXGpyQ=
+X-Received: by 2002:a17:907:3685:b0:9bd:a7a5:3a5a with SMTP id
+ bi5-20020a170907368500b009bda7a53a5amr7824353ejc.36.1699028784033; Fri, 03
+ Nov 2023 09:26:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20231103112237.1756288-1-anders.roxell@linaro.org>
+In-Reply-To: <20231103112237.1756288-1-anders.roxell@linaro.org>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 3 Nov 2023 09:26:12 -0700
+Message-ID: <CAEf4BzahAuskkD9YqxQpZDaUcu_jTuNAfbkkwP4dzJH=cTaVKA@mail.gmail.com>
+Subject: Re: [PATCH] selftests: bpf: xskxceiver: ksft_print_msg: fix format
+ type error
+To: Anders Roxell <anders.roxell@linaro.org>
+Cc: bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-
-
-On 3 November 2023 15:34:05 GMT, Yonghong Song <yonghong=2Esong@linux=2Ede=
-v> wrote:
+On Fri, Nov 3, 2023 at 4:23=E2=80=AFAM Anders Roxell <anders.roxell@linaro.=
+org> wrote:
 >
->On 11/3/23 1:11 AM, Artem Savkov wrote:
->> bpftool's man page lists "program" as one of possible values for OBJECT=
-,
->> while in fact bpftool accepts "prog" instead=2E
->>=20
->> Reported-by: Jerry Snitselaar <jsnitsel@redhat=2Ecom>
->> Signed-off-by: Artem Savkov <asavkov@redhat=2Ecom>
+> Crossbuilding selftests/bpf for architecture arm64, format specifies
+> type error show up like.
 >
->
->Acked-by: Yonghong Song <yonghong=2Esong@linux=2Edev>
+> xskxceiver.c:912:34: error: format specifies type 'int' but the argument
+> has type '__u64' (aka 'unsigned long long') [-Werror,-Wformat]
+>  ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%d]\n",
+>                                                                 ~~
+>                                                                 %llu
+>                 __func__, pkt->pkt_nb, meta->count);
+>                                        ^~~~~~~~~~~
+> xskxceiver.c:929:55: error: format specifies type 'unsigned long long' bu=
+t
+>  the argument has type 'u64' (aka 'unsigned long') [-Werror,-Wformat]
+>  ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr, len);
+>                                     ~~~~             ^~~~
 >
 
-Acked-by: Quentin Monnet <quentin@isovalent=2Ecom>
+With u64s it might be %llx or %lx, depending on architecture, so best
+is to force cast to (long long) or (unsigned long long) and then use
+%llx.
 
-Thanks!
+> Fixing the issues by using the proposed format specifiers by the
+> compilor.
+>
+> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+> ---
+>  tools/testing/selftests/bpf/xskxceiver.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/sel=
+ftests/bpf/xskxceiver.c
+> index 591ca9637b23..dc03692f34d8 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.c
+> +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> @@ -908,7 +908,7 @@ static bool is_metadata_correct(struct pkt *pkt, void=
+ *buffer, u64 addr)
+>         struct xdp_info *meta =3D data - sizeof(struct xdp_info);
+>
+>         if (meta->count !=3D pkt->pkt_nb) {
+> -               ksft_print_msg("[%s] expected meta_count [%d], got meta_c=
+ount [%d]\n",
+> +               ksft_print_msg("[%s] expected meta_count [%d], got meta_c=
+ount [%llu]\n",
+>                                __func__, pkt->pkt_nb, meta->count);
+>                 return false;
+>         }
+> @@ -926,11 +926,11 @@ static bool is_frag_valid(struct xsk_umem_info *ume=
+m, u64 addr, u32 len, u32 exp
+>
+>         if (addr >=3D umem->num_frames * umem->frame_size ||
+>             addr + len > umem->num_frames * umem->frame_size) {
+> -               ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr,=
+ len);
+> +               ksft_print_msg("Frag invalid addr: %lx len: %u\n", addr, =
+len);
+>                 return false;
+>         }
+>         if (!umem->unaligned_mode && addr % umem->frame_size + len > umem=
+->frame_size) {
+> -               ksft_print_msg("Frag crosses frame boundary addr: %llx le=
+n: %u\n", addr, len);
+> +               ksft_print_msg("Frag crosses frame boundary addr: %lx len=
+: %u\n", addr, len);
+>                 return false;
+>         }
+>
+> @@ -1029,7 +1029,7 @@ static int complete_pkts(struct xsk_socket_info *xs=
+k, int batch_size)
+>                         u64 addr =3D *xsk_ring_cons__comp_addr(&xsk->umem=
+->cq, idx + rcvd - 1);
+>
+>                         ksft_print_msg("[%s] Too many packets completed\n=
+", __func__);
+> -                       ksft_print_msg("Last completion address: %llx\n",=
+ addr);
+> +                       ksft_print_msg("Last completion address: %lx\n", =
+addr);
+>                         return TEST_FAILURE;
+>                 }
+>
+> @@ -1513,7 +1513,7 @@ static int validate_tx_invalid_descs(struct ifobjec=
+t *ifobject)
+>         }
+>
+>         if (stats.tx_invalid_descs !=3D ifobject->xsk->pkt_stream->nb_pkt=
+s / 2) {
+> -               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%u]=
+ expected [%u]\n",
+> +               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%ll=
+u] expected [%u]\n",
+>                                __func__, stats.tx_invalid_descs,
+>                                ifobject->xsk->pkt_stream->nb_pkts);
+>                 return TEST_FAILURE;
+> --
+> 2.42.0
+>
+>
 
