@@ -1,85 +1,172 @@
-Return-Path: <netdev+bounces-45870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A3A7DFFB2
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:22:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA31F7DFFED
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:13:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EF941C20FEE
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 08:22:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A80041C20A48
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5DF8460;
-	Fri,  3 Nov 2023 08:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02CE8BF2;
+	Fri,  3 Nov 2023 09:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nNNyOoFx"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="EUEIohOX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDC98824
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 08:22:17 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12B4123;
-	Fri,  3 Nov 2023 01:22:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=EPKbN/fAcNBie4nAiJk8hvrFfMadPTWNEWxizjzYh/k=; b=nNNyOoFxo0uwwVvNH/wBj6zyxi
-	AAmkgPQPchCj3Moaubf3St2OGjUZ57ikTinRRjirtZGFU4gjc2/lXJ/sMLpSWhyq6Xd9vFgj370K7
-	nWATYHpJlFWLlX4oYvz6APkQi38bApywqw116dvcerAEuqtGxAX4vMIlEjH9TUc9oclP+jENuvh8H
-	rxbsnDBlCBtYqw9s4g8nNkJRsLhrFwzmllYGoYaFEHfsMWs5Ckn1fL7gaMyU084ZZgoWfoKO6Ue2X
-	FfugdaZCdHPS5/wlzaIeM4cjoKzc46QMKLvKz8f6A3VqNBDq1iVgTvkoMnq5eUEdAv7gUi6xDFCKD
-	ScKIZBag==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qypRN-00AyPo-38;
-	Fri, 03 Nov 2023 08:22:05 +0000
-Date: Fri, 3 Nov 2023 01:22:05 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
-	kuba@kernel.org, pabeni@redhat.com, ndesaulniers@google.com,
-	trix@redhat.com, 0x7f454c46@gmail.com, fruggeri@arista.com,
-	noureddine@arista.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev
-Subject: Re: [PATCH net] tcp: Fix -Wc23-extensions in tcp_options_write()
-Message-ID: <ZUStrQCqBjBBB6dc@infradead.org>
-References: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE262D604
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 09:13:42 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2064.outbound.protection.outlook.com [40.107.21.64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187B4D4B;
+	Fri,  3 Nov 2023 02:13:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UTMliLc/JPJoL3/CvsZBlPEZGN1rSO9zy9IWtwXCYs3L/KUETEO/sJrac6l0M8VIZY8mUigwB359FzX/cUcCy2ctXgjk0MqXVd+sXDW+55PnTr882tezJngkg6C+KPc/IDpilYpgFmQk7oQqPYOR8PrP22/qOUwpkvL2rYahHJ3m5P4CpPxPOV18p3CXIoHZaM8f4M67F1PzbyA+RUUjZ4TAtxW+FLdLJN1UWqr2NWjEvk3g25ykOQCs504uUucEZqKPK4iQOArGMZ6VLsC3QU0jTROlS9q+/Wgsmd5PiyVVKwyXHwNtry39s+KzI8MFWziqkeQ5P3CaurUq8z0NKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CzHGoHdzG6OhdLHcyl9PZ34QCwkdgcvjB88vQ2frIl4=;
+ b=nSk78APNSe4+71sJNcQxVpU2X/BPlk5rAcmac6Fq4sQ+N2qNHzYfYlYYwSl6xmxIn7Yabx75BEEsBYxrELMAAAQqFjqU8wD5Yq5WTMxB9ph3fZHHBvSCgArvBBMzrADn+nPR+oqk5DPNdyNgDyQJ1baOJgs9qYJ13J3aU4MOYLHVy93fQXN4XX2ka8H/aRZrgdZTMZcl2r2xKHhwa6QBsAlGZ5othfiRf/EuT/VlSCaUmLO+3Lmnt7c8HywC+SBjvzxja9u+8YyDOBH769gQCBEddKsGTMi/3LP9B63ZTD0Bwb5PbASsjwNmDz5tX3SHtU0IbdQXhicg9ZlWPSFuQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CzHGoHdzG6OhdLHcyl9PZ34QCwkdgcvjB88vQ2frIl4=;
+ b=EUEIohOXII9MWovXMbcoF8jLKbhVEruSOQNJqaX20yUgRJVox0oww7YXeFkxTiR/q/2QM7Wyk94U3AC9LaQB/fTppbrgSf7uBPzKIwfwCOb1MBujtyV9Hlo9xffoOYcgyrhqXJlU+3wIoqeun3fvvUjwM0BECOkvkyFRjtijkPNbQGWTkJD658BbrIWIdDHlszvLIpBrB7LMpOyti5haFjBjdZaxY0KZguisUwa5LYR6aQDqUwhPh5K2NBvJC7TXIdpa91MAIDLEBjbQc9ZerzYTMJ1LiAk5mwcYE+YaueUsqmdrtUTEOvrWozs6Bc4461RjAY82yE7Q8ceSV7X+yw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:588::19)
+ by AM8PR10MB4017.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:1ef::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.21; Fri, 3 Nov
+ 2023 09:13:38 +0000
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8496:a3a3:d7a8:b24d]) by AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8496:a3a3:d7a8:b24d%4]) with mapi id 15.20.6954.021; Fri, 3 Nov 2023
+ 09:13:38 +0000
+Message-ID: <eb621845-45f8-4822-b92a-365d485f6870@siemens.com>
+Date: Fri, 3 Nov 2023 10:13:37 +0100
+User-Agent: Mozilla Thunderbird
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: [PATCH] net: ti: icssg-prueth: Fix error cleanup on failing
+ pruss_request_mem_region
+Content-Language: en-US
+To: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Lopes Ivo, Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>,
+ Nishanth Menon <nm@ti.com>,
+ "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0122.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:97::12) To AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:588::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS4PR10MB6181:EE_|AM8PR10MB4017:EE_
+X-MS-Office365-Filtering-Correlation-Id: a81ee0fa-80ff-4029-5436-08dbdc4d2a50
+X-LD-Processed: 38ae3bcd-9579-4fd4-adda-b42e1495d55a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	gmSHsWbZZlBPToA1ZjDsZ+7YqJQnD1wROAV+1rz/ObLu7weFm5jEzRLsJ3i+a7jWefD4bGhkusLvdmzD8eA1f1y3yUSXTvg/0JPN2EWPmRAgJXV7RdOI2gBSB3G6acHbMUHM68zzbrI9N5Qxtaqu7ASYbaHJc68bFZkXxwxxaBjjKpDOzXOKFIykmk9UiDILqy5YhMmzpy+92IJ1KYMBj5ZQb4yIKjFy2yLHImwwBCS5y+kCdReOBcHbuJMBsUAq+v9LJbztaRfRAQ2uNVNVq8p/GtjXDxTwEhCbR6N2Wh3s6p6yH78EvFvUW8RWsAPwomG4ecpfyYX9UUIj9zRhja1CquZ1hJ/RPvGq0XLZrsxIRybzYWTnSB8hqGaYRZ4gih0x0jFt2h5Jo3aVIepc5eTZUvkcmdMW3Eaxg8Zs5rS3ySqwH2IhqaohYMO3oRc2/q5c6yiMjJt/MfJglsUpjwndV4CXhrIPJ40j/rDhF7OvYCCuj/lbudbxcxV5hPAYAN/pYNOrs09jVHKQklj4ZkeYI9AEFGiUVrn1PRCjAeq9XjoipvokL1jVs3peBmmiRuRfKpokfL2YuPPDKMOnPBkIzPAW72CT9FfpwULoD5QJ7xOQW7GbSLyiJfDRBFUS+okmsoLs2bqzi3GxaGse4Q==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39860400002)(346002)(136003)(376002)(230922051799003)(1800799009)(64100799003)(451199024)(186009)(6512007)(2616005)(6486002)(478600001)(6506007)(44832011)(83380400001)(26005)(2906002)(107886003)(66946007)(5660300002)(41300700001)(4744005)(54906003)(66476007)(66556008)(316002)(110136005)(8676002)(4326008)(8936002)(36756003)(86362001)(31696002)(38100700002)(82960400001)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SnZ1c0VJWUk1UEtKbGFSQ3hXdzFyTlBOdy9UQVFka1JFTGMvRXJNTlZva2tK?=
+ =?utf-8?B?WjdhUTZsRmJVUk83SFRJNjhWcDlkQUVHV0o2V3VFTzZpZGVrTExySEpTRXRW?=
+ =?utf-8?B?amdzVUw5OTRlbENKTThvdTVXNHh0QlNEendZMzVjNys3N3A4UDdqNTJOellr?=
+ =?utf-8?B?Vzl4YjM4b3YydjBQZTl0SVkzU3VXcXRYeG1HOHdWVTJWZmVkUnZmY3JMdGZq?=
+ =?utf-8?B?OTNiTXVXK1d3YzBHcU1iSkFuNTY4eXZpdFNJWTlCUE5oaGwrRzFBNzAvODJM?=
+ =?utf-8?B?QSszYkQ3cGFFdFJKMzRwaFdpeE1LNGswSlZUSWtLTUhWcGdhMklzT0JZQzM5?=
+ =?utf-8?B?UGJpNUQwSnA1WWt2dFBRTG1RUUY4TTVEQ05HZlRacDBVSEhKM0hmUGE1R0RN?=
+ =?utf-8?B?SUhHVnk0Z3U5YUNoMzBPR0VHVXo4OEhpbkxxSzFGVmpQTXNJTFJIb0o3Mjlo?=
+ =?utf-8?B?aW8rdzIzV2hVc0dPM0V0V3JJenB3eWdYYW94V0RpaWd3bU9YQ3Vna3Zzb0xU?=
+ =?utf-8?B?eElOVFhwUlJKdDhJamZLV1A3QVN2ZTNxMjROK05pZDRjZ2xCR1g4OHh0TUZU?=
+ =?utf-8?B?enFVY0hCdm1Bd0xDMk1hLzhGRm83b0g3ZTk1eEpKR1R6ek1FMUdObFlsbVdM?=
+ =?utf-8?B?VUEyY05VRzFXM3BzSVNtWjhCY0VSSDQ3ejVVckJQREp0anFRWlpHN3M2ekZv?=
+ =?utf-8?B?N2NRMzAxaGxBYmtSVWhmZmNydHBsUzZRclVqZFpjZ2hwa0IzK2lPMkZwWGRQ?=
+ =?utf-8?B?S1d4WGNNbzArNVRoUDYraGxGK1NxTy9UdnNlZVRybDFyZThtSmhvdWVwNVBl?=
+ =?utf-8?B?bE9aOXNFYnBDT01oTUZraTRiSWliTEt3cHdSandSSXlWL3dPdXRZSHFvTWtC?=
+ =?utf-8?B?NTk5d1FOLzlxUk1UY0pyOGVPZ25Ic3dXUDNlTHZXY3p5N2hPNHZnRVZQTGFi?=
+ =?utf-8?B?STFLZG4wSjRNVkpWbG5COWtYUURaUkY5aC94eWNYNDQyOTB4MHRWTlFiZ2xm?=
+ =?utf-8?B?YVFRdmlGKzB4Q1gvR09kZFRxOG1lV1BhOVIzVTBGYkk3cFY0U0wyaFlyaFFZ?=
+ =?utf-8?B?MGFvYlVCTGFQYVdyRXJDUmx1dVZCV0xJRm15MlExVzFZQVJ6em00Y1VNNm1n?=
+ =?utf-8?B?REIzT0NwU3hta1R3aUhkb2xYZVB0d1VOYXlrWG1kWHZDNENnVVdrTEJhUzRo?=
+ =?utf-8?B?aW1SaHFOeEFaSEFZcGd2L2lxb08zbEc4RzRnamMxMTNpeS8zcWZjRGltbVln?=
+ =?utf-8?B?OGhoQUhwaDdwSkNsMzlJaG5LR3VWNG53M0l4OFhHaWFFdEUzVlRCWnRsdW9k?=
+ =?utf-8?B?ZjJac3MwR0FtRHFOeExXK2UvWkJ6M0ZrWTlmNS83S3VDWjVNbFhuNkp4SHlu?=
+ =?utf-8?B?QnYwT1JSTkROcGtCWWdoME9pbDJ4RXlMMVpCZDlTUlhrQ2NvVDNCZWY1T0pJ?=
+ =?utf-8?B?WkYwZjNydlFFS1pYazFUc3ZXSTEzMzU4UVQ2MHh5ZnZwcmpKVHlKTE5XcGtS?=
+ =?utf-8?B?VHMxeU5GYms5a0hlclJUVEJrVm4vaEwvdERZaUU0MVl4ajcvUWNIWnlMaXk4?=
+ =?utf-8?B?akZ4TWIwUUpITTl1VTl1NHNBaURyUlgwTURGTCtHYTd0aVZQMmtwdTBMUXQ5?=
+ =?utf-8?B?MWh5eHpYcmViUWdHaXNlcHlWbkJWNlV0L3dCWWIrRVk3dy94R3hva2lNQUk2?=
+ =?utf-8?B?TmFNRSsyTG5DdkJTdVVwd0hnSHlGa2JJbG1iMlJkTGZHb0dEeHltRzhnNStD?=
+ =?utf-8?B?aUdJK2V6THBXK3FxVUlUT2QxTUg1cGZUWVp0TEErcGg4N2UwYW5aYjY3Wmlm?=
+ =?utf-8?B?Snpoak85WG55TEZVUUJRb3J4RmZLUTg4SEcwTnpBWkppcWc0T2gwbWxHd1F0?=
+ =?utf-8?B?M3Nad0tTL2VmcWJFSWxMYko4b0hHZ043b2RyWG10M3RhRE0xVUlPSnJaTnlw?=
+ =?utf-8?B?M290dHhDY3FlSG40NXE4Tkh2STVWZkt4SU4yZ3hwSWdXNVFPSmU5dW1NR3c4?=
+ =?utf-8?B?NWtyc0xDZmUxNG9FUnM5YXV0WUh0Lzc5bUIzSTJyNmNDUWJ0a0pkeXhqWDUw?=
+ =?utf-8?B?dFQ5c0NHT0tVVzZsMnRrTDN2dUZrZkxsMzI2eVF4VWxoaWtudVB2U3BlNGkx?=
+ =?utf-8?B?VmN5Zk8zUkN3aDNJTThTcXQzdDRMSWlFU2ZyWm9qOVFQZStBM21MYncxazUz?=
+ =?utf-8?B?ZlE9PQ==?=
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a81ee0fa-80ff-4029-5436-08dbdc4d2a50
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 09:13:38.4743
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RplqojYZR1Qpm6UpkLFAYAwerir/xPGVFR//YTZqzsbz/wGKHxhEqWJ/N6B2EOxvNw2gPbCKwvqjZtdSTahiyQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR10MB4017
 
-On Tue, Oct 31, 2023 at 01:23:35PM -0700, Nathan Chancellor wrote:
-> Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
-> 
->   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
->     663 |         }
->         |         ^
->   1 error generated.
-> 
-> On earlier releases (such as clang-11, the current minimum supported
-> version for building the kernel) that do not support C23, this was a
-> hard error unconditionally:
-> 
->   net/ipv4/tcp_output.c:663:2: error: expected statement
->           }
->           ^
->   1 error generated.
-> 
-> Add a semicolon after the label to create an empty statement, which
-> resolves the warning or error for all compilers.
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Can you please just split the A0 handlig into a separate helper, which
-shuld make the whole thing a lot cleaner?
+We were just continuing in this case, surely not desired.
 
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 0242e123fc05..70c696ef0177 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -2064,7 +2064,7 @@ static int prueth_probe(struct platform_device *pdev)
+ 				       &prueth->shram);
+ 	if (ret) {
+ 		dev_err(dev, "unable to get PRUSS SHRD RAM2: %d\n", ret);
+-		pruss_put(prueth->pruss);
++		goto put_pruss;
+ 	}
+ 
+ 	prueth->sram_pool = of_gen_pool_get(np, "sram", 0);
+@@ -2209,6 +2209,8 @@ static int prueth_probe(struct platform_device *pdev)
+ 
+ put_mem:
+ 	pruss_release_mem_region(prueth->pruss, &prueth->shram);
++
++put_pruss:
+ 	pruss_put(prueth->pruss);
+ 
+ put_cores:
+-- 
+2.35.3
 
