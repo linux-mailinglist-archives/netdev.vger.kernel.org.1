@@ -1,164 +1,99 @@
-Return-Path: <netdev+bounces-45942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC697E0779
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:34:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739AE7E078C
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 18:37:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CA5A1C21096
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:34:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C37FB21320
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 17:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED28208A1;
-	Fri,  3 Nov 2023 17:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFAC320B15;
+	Fri,  3 Nov 2023 17:37:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jp/RzDfP"
+	dkim=pass (2048-bit key) header.d=selfnet.de header.i=@selfnet.de header.b="A34KeUSF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7BE22310
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:34:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E71C433C8;
-	Fri,  3 Nov 2023 17:34:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699032887;
-	bh=CMue2i/Fy6Nwr+UxGDuvfPY8RcDwjFD6UI3d9B5k1Ng=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jp/RzDfPeqIXWPgFzT1E2ZNLHFrzg1echue9Jh7ltYiUh3f29WoRdtHrM6bSP3GXg
-	 3qHFkW08DzTpnRVsgXlR6CKHUCOxF46ZnMS0618CKq4pj6FvxV7/hoBMSaFMHmLeZ+
-	 hhXVIDg7mUMBXDP1SwvF32nXeT8wxwuReR/suSnhQ1P8Ds8AT3FSDhNH4DYbBFB/L4
-	 CKoVXqQ0QEtlA9B9RkzLoIMJPAgpSFcvcltnKUQbaIkTNOqr9mKOGH67CxAeOTWBX4
-	 zFp5JT+Vzu2Xa3JooHNiZvbLawqxrIWab1mCPpQqiJR1+yQ6+ycs3XcI6wBOpLEZ2X
-	 Pog7C1e1W7kLQ==
-Date: Fri, 3 Nov 2023 17:34:42 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH net-next 02/19] netfilter: nft_set_rbtree: prefer sync gc
- to async worker
-Message-ID: <20231103173442.GB768996@kernel.org>
-References: <20231025212555.132775-1-pablo@netfilter.org>
- <20231025212555.132775-3-pablo@netfilter.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D5420B06
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 17:37:13 +0000 (UTC)
+Received: from mail-1.server.selfnet.de (mail-1.server.selfnet.de [141.70.126.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65116D4D;
+	Fri,  3 Nov 2023 10:37:08 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7097742119;
+	Fri,  3 Nov 2023 18:37:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=selfnet.de; s=selfnet;
+	t=1699033023;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DMSZVLxL4ogAD5wj1ttv7z4THeQR0MDtGmLU6KGKDuA=;
+	b=A34KeUSFMP/CwZ0SmwAAgeVyYDX9tSMB41HtasB+kX7eoQ4nkrOaGNjEiqRZACcGZwdX6s
+	HgyvS84YNP6Qqd+g33MqNrkknYC6utbyqtDdrQ5FoafB2RjN4xJF45PiQuoovZRcvbuBtQ
+	THOLXAG5sLNzqPTF0/dgY3zggJNaVp/yPypZUDKx7dIm9xrdyW6VTVTwaLbx2rluiM+EzC
+	cjgpRMCJ1+WMBbM9OjFdIczhmykagOa9SKnolCzhNz4DxE+YjXN1V30p9uSUgfLRc4UyaF
+	zWZFY1O3lkYFpbFkngWfjJLuiz2khWV53WQ0wxw2Z1RQnSZpU/ey/sOh5X2NEw==
+Authentication-Results: mail-1.server.selfnet.de;
+	auth=pass smtp.auth=marcovr smtp.mailfrom=marcovr@selfnet.de
+From: Marco von Rosenberg <marcovr@selfnet.de>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Marco von Rosenberg <marcovr@selfnet.de>
+Subject: Re: [PATCH] net: phy: broadcom: Wire suspend/resume for BCM54612E
+Date: Fri, 03 Nov 2023 18:37:00 +0100
+Message-ID: <2315175.ElGaqSPkdT@5cd116mnfx>
+In-Reply-To: <999020b2-692b-4582-8ca0-e19c7b45ee92@gmail.com>
+References:
+ <20231030225446.17422-1-marcovr@selfnet.de> <4890615.31r3eYUQgx@5cd116mnfx>
+ <999020b2-692b-4582-8ca0-e19c7b45ee92@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231025212555.132775-3-pablo@netfilter.org>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Oct 25, 2023 at 11:25:38PM +0200, Pablo Neira Ayuso wrote:
-> From: Florian Westphal <fw@strlen.de>
+On Friday, November 3, 2023 4:39:55 AM CET Florian Fainelli wrote:
+> We have an unconditional call to __phy_resume() in phy_start() and we
+> should always have a call to phy_start() regardless of the path though
+> you have a point Andrew that we should ensure that by the time
+> phy_init_hw() is called we have taken the device out of IDDQ-SR.
 > 
-> There is no need for asynchronous garbage collection, rbtree inserts
-> can only happen from the netlink control plane.
+> > I agree with all of your points. This is just one way which happens to
+> > solve this specific problem. Of course it might be asymmetric to see the
+> > patch as a solution to my problem. However is there anything
+> > fundamentally wrong with adding suspend/resume callbacks? I see some
+> > other drivers having these callbacks defined and some not (it seems a bit
+> > inconsistent throughout the drivers in broadcom.c to be honest).
+> > 
+> > I'm wondering if I should just omit this whole "motivation" paragraph in
+> > the commit message and just use the commit message of commit 38b6a9073007
+> > ("net: phy: broadcom: Wire suspend/resume for BCM50610 and BCM50610M") as
+> > a template. I mean, regardless of my motivation, I would say it makes
+> > sense for this PHY to support suspend and resume.
 > 
-> We already perform on-demand gc on insertion, in the area of the
-> tree where the insertion takes place, but we don't do a full tree
-> walk there for performance reasons.
-> 
-> Do a full gc walk at the end of the transaction instead and
-> remove the async worker.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> I would remove the motivation aspect from the paragraph and we could
+> also improve the driver a bit to ensure that IDDQ-SR is disabled upon
+> config_init(). Other than that your patch is just fine with me. Can you
+> re-submit in a few days when net-next opens again?
 
-...
+Ok, I'll re-submit the patch when net-next is open again with an updated 
+commit message. And I agree, disabling IDDQ-SR in config_init() would make 
+sense for a future patch since this would fix this potential issue also for 
+other PHYs.
 
-> @@ -515,11 +523,7 @@ static void nft_rbtree_remove(const struct net *net,
->  	struct nft_rbtree *priv = nft_set_priv(set);
->  	struct nft_rbtree_elem *rbe = elem->priv;
->  
-> -	write_lock_bh(&priv->lock);
-> -	write_seqcount_begin(&priv->count);
-> -	rb_erase(&rbe->node, &priv->root);
-> -	write_seqcount_end(&priv->count);
-> -	write_unlock_bh(&priv->lock);
-> +	nft_rbtree_erase(priv, rbe);
->  }
->  
->  static void nft_rbtree_activate(const struct net *net,
-> @@ -613,45 +617,40 @@ static void nft_rbtree_walk(const struct nft_ctx *ctx,
->  	read_unlock_bh(&priv->lock);
->  }
->  
-> -static void nft_rbtree_gc(struct work_struct *work)
-> +static void nft_rbtree_gc_remove(struct net *net, struct nft_set *set,
-> +				 struct nft_rbtree *priv,
-> +				 struct nft_rbtree_elem *rbe)
->  {
-> +	struct nft_set_elem elem = {
-> +		.priv	= rbe,
-> +	};
-> +
-> +	nft_setelem_data_deactivate(net, set, &elem);
-> +	nft_rbtree_erase(priv, rbe);
-> +}
-> +
-> +static void nft_rbtree_gc(struct nft_set *set)
-> +{
-> +	struct nft_rbtree *priv = nft_set_priv(set);
->  	struct nft_rbtree_elem *rbe, *rbe_end = NULL;
->  	struct nftables_pernet *nft_net;
+	Marco
 
-Hi Florian and Pablo,
 
-I understand that this patch has been accepted upstream,
-and that by implication this feedback is rather slow,
-but I noticed that with this patch nft_net is now
-set but otherwise unused in this function.
-
-As flagged by clang-16 and gcc-13 W=1 builds.
-
-> -	struct nft_rbtree *priv;
-> +	struct rb_node *node, *next;
->  	struct nft_trans_gc *gc;
-> -	struct rb_node *node;
-> -	struct nft_set *set;
-> -	unsigned int gc_seq;
->  	struct net *net;
->  
-> -	priv = container_of(work, struct nft_rbtree, gc_work.work);
->  	set  = nft_set_container_of(priv);
->  	net  = read_pnet(&set->net);
->  	nft_net = nft_pernet(net);
-> -	gc_seq  = READ_ONCE(nft_net->gc_seq);
->  
-> -	if (nft_set_gc_is_pending(set))
-> -		goto done;
-> -
-> -	gc = nft_trans_gc_alloc(set, gc_seq, GFP_KERNEL);
-> +	gc = nft_trans_gc_alloc(set, 0, GFP_KERNEL);
->  	if (!gc)
-> -		goto done;
-> -
-> -	read_lock_bh(&priv->lock);
-> -	for (node = rb_first(&priv->root); node != NULL; node = rb_next(node)) {
-> +		return;
->  
-> -		/* Ruleset has been updated, try later. */
-> -		if (READ_ONCE(nft_net->gc_seq) != gc_seq) {
-> -			nft_trans_gc_destroy(gc);
-> -			gc = NULL;
-> -			goto try_later;
-> -		}
-> +	for (node = rb_first(&priv->root); node ; node = next) {
-> +		next = rb_next(node);
->  
->  		rbe = rb_entry(node, struct nft_rbtree_elem, node);
->  
-> -		if (nft_set_elem_is_dead(&rbe->ext))
-> -			goto dead_elem;
-> -
->  		/* elements are reversed in the rbtree for historical reasons,
->  		 * from highest to lowest value, that is why end element is
->  		 * always visited before the start element.
-
-...
 
