@@ -1,74 +1,41 @@
-Return-Path: <netdev+bounces-45889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD7F7E0229
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:22:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1957E024D
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 12:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E83AC281D28
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:22:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26D4D1C209CD
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D2714F9F;
-	Fri,  3 Nov 2023 11:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB0B154AF;
+	Fri,  3 Nov 2023 11:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i1lM8GcK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCtjUrkc"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801CF14F86
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 11:22:50 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B76EA18B
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 04:22:45 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c595f5dc84so31854411fa.0
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 04:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699010564; x=1699615364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uPCpAYyXrmpvTCFWCPrCoA7Y/NUTFBtBJEwkbOnbvfc=;
-        b=i1lM8GcKEXGwpvsZiOvYzJfWQLlBT9KM9zPSHcovcpVfOUEcHgN7soS4vRKA5n9vgc
-         oibbMAybJzuywLWn1ucF7/Fwgc/Xi5gQ5Q0UzXZiWacRbR5saNA7w5rHCge9gIPSkd18
-         DuuTj1n+o/OrYwetV7NaPbuyFpbK47WCv8+5y58RaIoiYLwJi7B0g1+r7B78TojyFXqO
-         dh0fbG/Dulcp+rdFzBDseUH/J6zWx0IWgJJw5fuITipSpMvXQuyn0X1hl1pdDt7lDfZC
-         QnZF4CERetnMm6Pw14pDpHRyqfZ/VBgDolq7OUVvcMm6ZPQE2KgHZolDtsjY/XNQ+bB4
-         0biA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699010564; x=1699615364;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uPCpAYyXrmpvTCFWCPrCoA7Y/NUTFBtBJEwkbOnbvfc=;
-        b=HkqJY+AeItfJHrbjsglTKVeNj2GxYfz7MGrqqM+RkX6qDNcOA0E5IlqrtIyRQv3oN1
-         nXZTmvilodaeIeu0/1i/bvxu+g11/DAn9eVasnM6xHKLPAAwqfefgIRLlRsoWfmG0w7E
-         hGkzDZJXuP97CtkfW+BysG0yUAbtsmFhsDVcyCj0vVlca+V1j7+9k0qDYjFpdoJl//AJ
-         Ojn+L1aP7ff3HUaqIu4F7puZwtr+5ftX2338nn4tVDn2j++++UFgt+PLPy9cKq+0Ocny
-         z0uSKMn6e/DkAbnez7COaFE+BsEvZxtHpVJEYZPTUv/8VAKD271b9i0VktAhYbO6hPYS
-         MvGg==
-X-Gm-Message-State: AOJu0YyII/pODVWIWlRbd+tNXjNIPPUgQWagIL7rRvEt0AUvaFVQX0P6
-	5rHPd9s3/CNf6cLr9BG2etcyJg==
-X-Google-Smtp-Source: AGHT+IFIZFoXGLwHbN1vbOa5GKa0O7Rxzp++onFknzG49QejR0WpxcOerL3lYrLgjbK1nj7lrwnLQA==
-X-Received: by 2002:a19:7119:0:b0:509:dd1:74f8 with SMTP id m25-20020a197119000000b005090dd174f8mr871295lfc.2.1699010563946;
-        Fri, 03 Nov 2023 04:22:43 -0700 (PDT)
-Received: from localhost (c-9b0ee555.07-21-73746f28.bbcust.telenor.se. [85.229.14.155])
-        by smtp.gmail.com with ESMTPSA id u23-20020a2eb817000000b002c50ba4a047sm210102ljo.80.2023.11.03.04.22.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Nov 2023 04:22:43 -0700 (PDT)
-From: Anders Roxell <anders.roxell@linaro.org>
-To: bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com
-Cc: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Anders Roxell <anders.roxell@linaro.org>
-Subject: [PATCH] selftests: bpf: xskxceiver: ksft_print_msg: fix format type error
-Date: Fri,  3 Nov 2023 12:22:37 +0100
-Message-ID: <20231103112237.1756288-1-anders.roxell@linaro.org>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DDD514F9F
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 11:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF32EC433C8;
+	Fri,  3 Nov 2023 11:40:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699011623;
+	bh=sqzwThwQ8TsmxUE5Zzgl2JfsfAgSBHnHcqG9N4ciCIo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=uCtjUrkcSJN0qWpy1qwce6Ygfw89cwNLqIm9Sq8Xu0ODJ3mYEUVKBi6aexoFur8CJ
+	 9rIaGHGBUDnz7VREPh7LPcyGxYlwYmFmLmKxDEbyjeBKtPazYkZ9XguONMkHfm38fa
+	 nuW8vW2cAFzAa/rx93sOM2RS3TXhIv8mQKk+QNFwoFbZliUXKmxt9t5UQugIIq0Qyh
+	 x4OKG5xDByMG1174LHyYz6SOgtGCNFKAHyvtj6PAVUoTuLo+XQWEUecyTcryM6VVno
+	 kJnhMAe57j3I0Egum/Ny3aEQFOVHdSPABQl+SI2BKu7D+BdZdDWdmr9oU3oYTuoc0r
+	 op1GwMdT5gH0Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2E3CEAB08A;
+	Fri,  3 Nov 2023 11:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,76 +43,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] net/tcp: fix possible out-of-bounds reads in
+ tcp_hash_fail()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169901162366.23509.10060779621583802405.git-patchwork-notify@kernel.org>
+Date: Fri, 03 Nov 2023 11:40:23 +0000
+References: <20231101045233.3387072-1-edumazet@google.com>
+In-Reply-To: <20231101045233.3387072-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ dima@arista.com, fruggeri@arista.com, dsahern@kernel.org
 
-Crossbuilding selftests/bpf for architecture arm64, format specifies
-type error show up like.
+Hello:
 
-xskxceiver.c:912:34: error: format specifies type 'int' but the argument
-has type '__u64' (aka 'unsigned long long') [-Werror,-Wformat]
- ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%d]\n",
-                                                                ~~
-                                                                %llu
-                __func__, pkt->pkt_nb, meta->count);
-                                       ^~~~~~~~~~~
-xskxceiver.c:929:55: error: format specifies type 'unsigned long long' but
- the argument has type 'u64' (aka 'unsigned long') [-Werror,-Wformat]
- ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr, len);
-                                    ~~~~             ^~~~
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Fixing the issues by using the proposed format specifiers by the
-compilor.
+On Wed,  1 Nov 2023 04:52:33 +0000 you wrote:
+> syzbot managed to trigger a fault by sending TCP packets
+> with all flags being set.
+> 
+> v2:
+>  - While fixing this bug, add PSH flag handling and represent
+>    flags the way tcpdump does : [S], [S.], [P.]
+>  - Print 4-tuples more consistently between families.
+> 
+> [...]
 
-Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
----
- tools/testing/selftests/bpf/xskxceiver.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Here is the summary with links:
+  - [v2,net] net/tcp: fix possible out-of-bounds reads in tcp_hash_fail()
+    https://git.kernel.org/netdev/net/c/02f0717e9835
 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 591ca9637b23..dc03692f34d8 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -908,7 +908,7 @@ static bool is_metadata_correct(struct pkt *pkt, void *buffer, u64 addr)
- 	struct xdp_info *meta = data - sizeof(struct xdp_info);
- 
- 	if (meta->count != pkt->pkt_nb) {
--		ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%d]\n",
-+		ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%llu]\n",
- 			       __func__, pkt->pkt_nb, meta->count);
- 		return false;
- 	}
-@@ -926,11 +926,11 @@ static bool is_frag_valid(struct xsk_umem_info *umem, u64 addr, u32 len, u32 exp
- 
- 	if (addr >= umem->num_frames * umem->frame_size ||
- 	    addr + len > umem->num_frames * umem->frame_size) {
--		ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr, len);
-+		ksft_print_msg("Frag invalid addr: %lx len: %u\n", addr, len);
- 		return false;
- 	}
- 	if (!umem->unaligned_mode && addr % umem->frame_size + len > umem->frame_size) {
--		ksft_print_msg("Frag crosses frame boundary addr: %llx len: %u\n", addr, len);
-+		ksft_print_msg("Frag crosses frame boundary addr: %lx len: %u\n", addr, len);
- 		return false;
- 	}
- 
-@@ -1029,7 +1029,7 @@ static int complete_pkts(struct xsk_socket_info *xsk, int batch_size)
- 			u64 addr = *xsk_ring_cons__comp_addr(&xsk->umem->cq, idx + rcvd - 1);
- 
- 			ksft_print_msg("[%s] Too many packets completed\n", __func__);
--			ksft_print_msg("Last completion address: %llx\n", addr);
-+			ksft_print_msg("Last completion address: %lx\n", addr);
- 			return TEST_FAILURE;
- 		}
- 
-@@ -1513,7 +1513,7 @@ static int validate_tx_invalid_descs(struct ifobject *ifobject)
- 	}
- 
- 	if (stats.tx_invalid_descs != ifobject->xsk->pkt_stream->nb_pkts / 2) {
--		ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%u] expected [%u]\n",
-+		ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%llu] expected [%u]\n",
- 			       __func__, stats.tx_invalid_descs,
- 			       ifobject->xsk->pkt_stream->nb_pkts);
- 		return TEST_FAILURE;
+You are awesome, thank you!
 -- 
-2.42.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
