@@ -1,251 +1,103 @@
-Return-Path: <netdev+bounces-45853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C70137DFED2
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 06:34:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193947DFEF9
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 06:58:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F4DCB21406
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 05:34:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C272B281D26
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 05:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4075386;
-	Fri,  3 Nov 2023 05:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6324817EA;
+	Fri,  3 Nov 2023 05:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="FFD1nP6H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VYR0NqZR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9CB7469;
-	Fri,  3 Nov 2023 05:34:00 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4550C1BC;
-	Thu,  2 Nov 2023 22:33:56 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A2LI7TU025175;
-	Thu, 2 Nov 2023 22:33:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=RouRC90iUnGmzQEJwDOWvRMGZYb2s/pGqXig6p8hTpM=;
- b=FFD1nP6HpsTEimcdnZuqbZf7nbKuiUI5+8aRtydpq018uCSn5K6aGN56mcCm1ny77Rse
- BiJmOhLR50plORy4SLgZ6++fcNuibh1jDGZUqePVSyV63w5MUSUeshB1MfqARIy+okEN
- 4DpFfsnVyro+9L9rQUqqKZBCJKYpB2YVfUeGvV6djAQYhHYfb7X/Resb7p50GlNDFLmi
- W8n7Rj0FRhYbDgeA8RiysrJO2D8Uga3GFNX+rK+XQgmKOGJ27wMNpTTCVR8VpFQQ3Ggn
- K4AFxbID8gm2i/gG6RBzNjcIPCDGB8y841Q44Qsf5BjGh4MC0wa1Ejcf0LWSEgwNR45Q 0w== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3u3y235e16-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 02 Nov 2023 22:33:50 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 2 Nov
- 2023 22:33:48 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 2 Nov 2023 22:33:48 -0700
-Received: from localhost.localdomain (unknown [10.28.36.175])
-	by maili.marvell.com (Postfix) with ESMTP id 999AB3F705E;
-	Thu,  2 Nov 2023 22:33:45 -0700 (PDT)
-From: Srujana Challa <schalla@marvell.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <bbrezillon@kernel.org>,
-        <arno@natisbad.org>, <kuba@kernel.org>, <ndabilpuram@marvell.com>,
-        <sgoutham@marvell.com>, <schalla@marvell.com>
-Subject: [PATCH v1 10/10] crypto: octeontx2: support setting ctx ilen for inline CPT LF
-Date: Fri, 3 Nov 2023 11:03:06 +0530
-Message-ID: <20231103053306.2259753-11-schalla@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231103053306.2259753-1-schalla@marvell.com>
-References: <20231103053306.2259753-1-schalla@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6919217C5;
+	Fri,  3 Nov 2023 05:58:02 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9DC1AD;
+	Thu,  2 Nov 2023 22:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1698991077; x=1730527077;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3Tb/9TRXfkspZ4Qolx6KFNI5OizP54a6MuN04lpTl5k=;
+  b=VYR0NqZRQjA9LI5aVJPFeYnp7/zQ5kRADYPZla2NTJBqNYx5HDahe51j
+   vzcuiP46k1kutn8gPeIHVwczTNLS+2xXmFukseHgbYb6ZNmJA2byYnnZo
+   u0HkbxU2+itfIuHPvJ8AtaXJUDeRnOHrCptvbaR2l7Ue2K4Ddsbzutq0V
+   IYBiGoJ89pJsBiWxucxwj3TplmHuAuMS2hmpqnw1wJetfz6+4dXcg8ZAC
+   Vwo4OSyuW+cuFSpNDh3VoI6t4xE5LKWLhpFFvGA0XkDCsgY+ls7TK9qkK
+   NzLDPzSXztlfRTRyaHytapd4Lza3LkHVh0sWhhQDQVZc6eW3y2KvmaBsD
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="379285633"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="379285633"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2023 22:57:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10882"; a="765152051"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="765152051"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 02 Nov 2023 22:57:53 -0700
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qynBn-0002H1-2K;
+	Fri, 03 Nov 2023 05:57:51 +0000
+Date: Fri, 3 Nov 2023 13:57:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: thinker.li@gmail.com, bpf@vger.kernel.org, ast@kernel.org,
+	martin.lau@linux.dev, song@kernel.org, kernel-team@meta.com,
+	andrii@kernel.org, drosen@google.com
+Cc: oe-kbuild-all@lists.linux.dev, sinquersw@gmail.com, kuifeng@meta.com,
+	Kui-Feng Lee <thinker.li@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v9 09/12] bpf, net: switch to dynamic
+ registration
+Message-ID: <202311031305.1bFdKyKl-lkp@intel.com>
+References: <20231101204519.677870-10-thinker.li@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: u3SDPRBcqccQn5hRQ4NZjmL0wMRFsmrD
-X-Proofpoint-GUID: u3SDPRBcqccQn5hRQ4NZjmL0wMRFsmrD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-03_05,2023-11-02_03,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231101204519.677870-10-thinker.li@gmail.com>
 
-From: Nithin Dabilpuram <ndabilpuram@marvell.com>
+Hi,
 
-Provide an option in Inline IPsec configure mailbox to configure the
-CPT_AF_LFX_CTL:CTX_ILEN for inline CPT LF attached to CPT RVU PF.
-This is needed to set the ctx ilen to size of inbound SA for
-HW errata IPBUCPT-38756. Not setting this would lead to new context's
-not being fetched.
+kernel test robot noticed the following build errors:
 
-Also set FLR_FLUSH in CPT_LF_CTX_CTL for CPT LF's as workaround
-for same errata.
+[auto build test ERROR on bpf-next/master]
 
-Signed-off-by: Nithin Dabilpuram <ndabilpuram@marvell.com>
----
- .../marvell/octeontx2/otx2_cpt_common.h       |  2 ++
- .../marvell/octeontx2/otx2_cpt_hw_types.h     |  4 ++-
- drivers/crypto/marvell/octeontx2/otx2_cptlf.c | 33 +++++++++++++++++++
- drivers/crypto/marvell/octeontx2/otx2_cptlf.h | 17 ++++++++++
- .../marvell/octeontx2/otx2_cptpf_mbox.c       |  5 +++
- 5 files changed, 60 insertions(+), 1 deletion(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/thinker-li-gmail-com/bpf-refactory-struct_ops-type-initialization-to-a-function/20231102-044820
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20231101204519.677870-10-thinker.li%40gmail.com
+patch subject: [PATCH bpf-next v9 09/12] bpf, net: switch to dynamic registration
+config: xtensa-randconfig-002-20231102 (https://download.01.org/0day-ci/archive/20231103/202311031305.1bFdKyKl-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231103/202311031305.1bFdKyKl-lkp@intel.com/reproduce)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-index 3caa5245df1d..f8abe3ab15cb 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_common.h
-@@ -59,6 +59,8 @@ struct otx2_cpt_rx_inline_lf_cfg {
- 	u32 credit_th;
- 	u16 bpid;
- 	u32 reserved;
-+	u8 ctx_ilen_valid : 1;
-+	u8 ctx_ilen : 7;
- };
- 
- /*
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-index 06bcf49ee379..7e746a4def86 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cpt_hw_types.h
-@@ -102,6 +102,7 @@
- #define OTX2_CPT_LF_Q_INST_PTR          (0x110)
- #define OTX2_CPT_LF_Q_GRP_PTR           (0x120)
- #define OTX2_CPT_LF_NQX(a)              (0x400 | (a) << 3)
-+#define OTX2_CPT_LF_CTX_CTL             (0x500)
- #define OTX2_CPT_LF_CTX_FLUSH           (0x510)
- #define OTX2_CPT_LF_CTX_ERR             (0x520)
- #define OTX2_CPT_RVU_FUNC_BLKADDR_SHIFT 20
-@@ -472,7 +473,8 @@ union otx2_cptx_af_lf_ctrl {
- 		u64 cont_err:1;
- 		u64 reserved_11_15:5;
- 		u64 nixtx_en:1;
--		u64 reserved_17_47:31;
-+		u64 ctx_ilen:3;
-+		u64 reserved_17_47:28;
- 		u64 grp:8;
- 		u64 reserved_56_63:8;
- 	} s;
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-index d7805e672047..571a8ec154e9 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.c
-@@ -106,6 +106,33 @@ static int cptlf_set_grp_and_pri(struct otx2_cptlfs_info *lfs,
- 	return ret;
- }
- 
-+static int cptlf_set_ctx_ilen(struct otx2_cptlfs_info *lfs, int ctx_ilen)
-+{
-+	union otx2_cptx_af_lf_ctrl lf_ctrl;
-+	struct otx2_cptlf_info *lf;
-+	int slot, ret = 0;
-+
-+	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		lf = &lfs->lf[slot];
-+
-+		ret = otx2_cpt_read_af_reg(lfs->mbox, lfs->pdev,
-+					   CPT_AF_LFX_CTL(lf->slot),
-+					   &lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+
-+		lf_ctrl.s.ctx_ilen = ctx_ilen;
-+
-+		ret = otx2_cpt_write_af_reg(lfs->mbox, lfs->pdev,
-+					    CPT_AF_LFX_CTL(lf->slot),
-+					    lf_ctrl.u, lfs->blkaddr);
-+		if (ret)
-+			return ret;
-+
-+	}
-+	return ret;
-+}
-+
- static void cptlf_hw_init(struct otx2_cptlfs_info *lfs)
- {
- 	/* Disable instruction queues */
-@@ -440,6 +467,12 @@ int otx2_cptlf_init(struct otx2_cptlfs_info *lfs, u8 eng_grp_mask, int pri,
- 	if (ret)
- 		goto free_iq;
- 
-+	if (lfs->ctx_ilen_ovrd) {
-+		ret = cptlf_set_ctx_ilen(lfs, lfs->ctx_ilen);
-+		if (ret)
-+			goto free_iq;
-+	}
-+
- 	return 0;
- 
- free_iq:
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-index f6138da945e9..cf4c055c50f4 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptlf.h
-@@ -120,6 +120,8 @@ struct otx2_cptlfs_info {
- 	atomic_t state;         /* LF's state. started/reset */
- 	int blkaddr;            /* CPT blkaddr: BLKADDR_CPT0/BLKADDR_CPT1 */
- 	int global_slot;        /* Global slot across the blocks */
-+	u8 ctx_ilen;
-+	u8 ctx_ilen_ovrd;
- };
- 
- static inline void otx2_cpt_free_instruction_queues(
-@@ -309,6 +311,17 @@ static inline void otx2_cptlf_set_iqueue_exec(struct otx2_cptlf_info *lf,
- 			 OTX2_CPT_LF_INPROG, lf_inprog.u);
- }
- 
-+static inline void otx2_cptlf_set_ctx_flr_flush(struct otx2_cptlf_info *lf)
-+{
-+	u8 blkaddr = lf->lfs->blkaddr;
-+	u64 val;
-+
-+	val = otx2_cpt_read64(lf->lfs->reg_base, blkaddr, lf->slot, OTX2_CPT_LF_CTX_CTL);
-+	val |= BIT_ULL(0);
-+
-+	otx2_cpt_write64(lf->lfs->reg_base, blkaddr, lf->slot, OTX2_CPT_LF_CTX_CTL, val);
-+}
-+
- static inline void otx2_cptlf_enable_iqueue_exec(struct otx2_cptlf_info *lf)
- {
- 	otx2_cptlf_set_iqueue_exec(lf, true);
-@@ -324,6 +337,10 @@ static inline void otx2_cptlf_enable_iqueues(struct otx2_cptlfs_info *lfs)
- 	int slot;
- 
- 	for (slot = 0; slot < lfs->lfs_num; slot++) {
-+		/* Enable flush on FLR for Errata */
-+		if (is_dev_cn10kb(lfs->pdev))
-+			otx2_cptlf_set_ctx_flr_flush(&lfs->lf[slot]);
-+
- 		otx2_cptlf_enable_iqueue_exec(&lfs->lf[slot]);
- 		otx2_cptlf_enable_iqueue_enq(&lfs->lf[slot]);
- 	}
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-index f7cb4ec74153..fd9632d2de03 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_mbox.c
-@@ -267,6 +267,9 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 	otx2_cptlf_set_dev_info(&cptpf->lfs, cptpf->pdev, cptpf->reg_base,
- 				&cptpf->afpf_mbox, BLKADDR_CPT0);
- 	cptpf->lfs.global_slot = 0;
-+	cptpf->lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+	cptpf->lfs.ctx_ilen = cfg_req->ctx_ilen;
-+
- 	ret = otx2_inline_cptlf_setup(cptpf, &cptpf->lfs, egrp, num_lfs);
- 	if (ret) {
- 		dev_err(&cptpf->pdev->dev, "Inline CPT0 LF setup failed.\n");
-@@ -279,6 +282,8 @@ static int handle_msg_rx_inline_ipsec_lf_cfg(struct otx2_cptpf_dev *cptpf,
- 					cptpf->reg_base, &cptpf->afpf_mbox,
- 					BLKADDR_CPT1);
- 		cptpf->cpt1_lfs.global_slot = num_lfs;
-+		cptpf->cpt1_lfs.ctx_ilen_ovrd = cfg_req->ctx_ilen_valid;
-+		cptpf->cpt1_lfs.ctx_ilen = cfg_req->ctx_ilen;
- 		ret = otx2_inline_cptlf_setup(cptpf, &cptpf->cpt1_lfs, egrp, num_lfs);
- 		if (ret) {
- 			dev_err(&cptpf->pdev->dev, "Inline CPT1 LF setup failed.\n");
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311031305.1bFdKyKl-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   xtensa-linux-ld: kernel/bpf/btf.o: in function `btf_int_show':
+   btf.c:(.text+0xb0c4): undefined reference to `bpf_struct_ops_desc_init'
+>> xtensa-linux-ld: btf.c:(.text+0xb330): undefined reference to `bpf_struct_ops_desc_init'
+
 -- 
-2.25.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
