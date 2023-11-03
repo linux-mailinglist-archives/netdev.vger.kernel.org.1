@@ -1,76 +1,62 @@
-Return-Path: <netdev+bounces-45866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AA737DFF60
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 08:23:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2BAF7DFF9D
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 09:11:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AFC0B2125F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 07:23:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E22AB2124B
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 08:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91E26FA4;
-	Fri,  3 Nov 2023 07:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818AD79D1;
+	Fri,  3 Nov 2023 08:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="g1GcMpru"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JMVIWKz9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B523E7E
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 07:23:00 +0000 (UTC)
-Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B97E184
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 00:22:56 -0700 (PDT)
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20231103072252epoutp0448698fa6bc79ffb51d6d5a3ceb66e128~UDARfMghO2846028460epoutp04C
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 07:22:52 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20231103072252epoutp0448698fa6bc79ffb51d6d5a3ceb66e128~UDARfMghO2846028460epoutp04C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1698996172;
-	bh=ZNVUfTg/9BZ7OyZwtTDsZ1BFO44+to3o6/WMTGGwevQ=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=g1GcMpruSt9D3U1ltqyCmnFER0opYxCoHtOhLJJv2XYdogEbiEq0j1N9mwIO5p5T+
-	 h+6kdjVELEYgrjkdmrCrJXA90gyK2EZusReI5nAI43QgCzqyWrJYTBOgxJeIbiGczL
-	 Mn647DCyWo/1+UqFL2SQVAv7NPthObWZJ+nIpyd8=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-	epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-	20231103072251epcas1p4d1add67878735b68f69334c9415b454d~UDAQ6y4tr1445014450epcas1p4h;
-	Fri,  3 Nov 2023 07:22:51 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.38.249]) by
-	epsnrtp4.localdomain (Postfix) with ESMTP id 4SMBzH230Fz4x9Q5; Fri,  3 Nov
-	2023 07:22:51 +0000 (GMT)
-Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
-	epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-	FB.A5.09739.5CF94456; Fri,  3 Nov 2023 16:22:45 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
-	20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77~UDAKxBb-21725817258epcas1p4L;
-	Fri,  3 Nov 2023 07:22:45 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20231103072245epsmtrp111b49ab8961f54b37161752f43882b77~UDAKwSGOv2665926659epsmtrp1M;
-	Fri,  3 Nov 2023 07:22:45 +0000 (GMT)
-X-AuditID: b6c32a37-e67fa7000000260b-0f-65449fc5ee71
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	E5.03.08755.4CF94456; Fri,  3 Nov 2023 16:22:44 +0900 (KST)
-Received: from U20PB1-0469.tn.corp.samsungelectronics.net (unknown
-	[10.253.238.38]) by epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20231103072244epsmtip2395650ac5fd52ffd76f820f0942decb0~UDAKg1lEu2477024770epsmtip2N;
-	Fri,  3 Nov 2023 07:22:44 +0000 (GMT)
-From: Jong eon Park <jongeon.park@samsung.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jong eon Park
-	<jongeon.park@samsung.com>, Dong ha Kang <dongha7.kang@samsung.com>
-Subject: [PATCH] netlink: introduce netlink poll to resolve fast return
- issue
-Date: Fri,  3 Nov 2023 16:22:09 +0900
-Message-Id: <20231103072209.1005409-1-jongeon.park@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F7479D0
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 08:11:39 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9AC4D44
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 01:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1698999094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JBH8NI3gflS6BfDv3RcBeVDFbPLiB4RONxRHKrnGmXk=;
+	b=JMVIWKz92yMaHRx1C8gDPGuiAXIQDbdEFiK4xci1f33Ee6g434Z64Wkr6v2jI4k+nNByh1
+	mjCeVuCrhY2f3/DVIVbVDsRELoph7EfPY0QEDlj1oupTp2xSBuwvKunIfGLzAu8letUBVE
+	Lw9OWV1tzf5FDyaUZsF8gb0relw0wg0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-411-CGiopjSmP-OscmcE6w5ZwA-1; Fri, 03 Nov 2023 04:11:30 -0400
+X-MC-Unique: CGiopjSmP-OscmcE6w5ZwA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36D7183B8E4;
+	Fri,  3 Nov 2023 08:11:30 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.45.225.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0DEC1290F;
+	Fri,  3 Nov 2023 08:11:28 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Artem Savkov <asavkov@redhat.com>,
+	Jerry Snitselaar <jsnitsel@redhat.com>
+Subject: [PATCH bpf-next] bpftool: fix prog object type in manpage
+Date: Fri,  3 Nov 2023 09:11:26 +0100
+Message-ID: <20231103081126.170034-1-asavkov@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,110 +64,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjk+LIzCtJLcpLzFFi42LZdlhTT/fofJdUg7Yz4hZzzrewWEy/OZXZ
-	4umxR+wWD6fHWlzY1sdqcXnXHDaLYwvELL6dfsPowOGxZeVNJo8Fm0o9Nq3qZPN4v+8qm0ff
-	llWMHp83yQWwRWXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE
-	6Lpl5gBdo6RQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkpMCvQK07MLS7NS9fLSy2x
-	MjQwMDIFKkzIzrgy5QdzwUzhip5PHWwNjM/4uxg5OSQETCSedfaxdjFycQgJ7GCUuHttIzuE
-	84lR4tztFiYI5xujxP83B1hgWq7dmwJVtZdR4mTrSjYIp4NJ4sDKzYwgVWwCehIXnx0HqxIR
-	mMYocWTWKkYQh1mgl1Gid8c/sCphAX+JPxOagKo4OFgEVCXmTREHCfMK2EtceHaRDWKdvMTM
-	S9/ZIeKCEidnPgE7gxko3rx1NjPITAmBa+wSrX9fMEM0uEjMOz0RqllY4tXxLewQtpTEy/42
-	KDtb4sWxY6wgeyUECiSuHlGCMO0l3l+yADGZBTQl1u/ShyhWlNj5ey4jxFY+iXdfe6AaeSU6
-	2oQgStQkHp58ywphy0isXnEXar+HxMqJj5hAbCGBWImlp7awTWCUn4Xkl1lIfpmFsHgBI/Mq
-	RrHUguLc9NRiwwJjeKQm5+duYgQnSC3zHYzT3n7QO8TIxMF4iFGCg1lJhNfR2yVViDclsbIq
-	tSg/vqg0J7X4EKMpMHAnMkuJJucDU3ReSbyhiaWBiZmRiYWxpbGZkjjvrWe9KUIC6Yklqdmp
-	qQWpRTB9TBycUg1Mup2mLs1uWb8YU+p+/bV5/nHtTQMWSc/0rfX2Cvvrpkn/zyvdHWEi8/Pv
-	0jNlfsU1DwL16uMrpYSUJz91ixfNzd9b3eP6s3JH2UbmNy0vBPnlGzndvdIVTW78DW4V731w
-	SUjBgs/J44P6lukuJqXXrohMlvCOu911/2HeMa0NTMEtJxXja/v2ll2eWr7lc0FMWdLx/lX9
-	cYuT93Udf39Bg8Xy+iHFhZrXuh4u7k2X6Di23V14wu2Gjgen+RK/NW69PyWyg/31ofn7DK/8
-	ln7qumf/tsn3b76ceVPS6MpejeJ157Lz484+fiv43MXPz1iW6/ojGYaXX8TXTnd3697+9t5Z
-	pwub1HhiCjRnvf+hxFKckWioxVxUnAgAQnSA/BkEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMLMWRmVeSWpSXmKPExsWy7bCSvO7R+S6pBtf8LOacb2GxmH5zKrPF
-	02OP2C0eTo+1uLCtj9Xi8q45bBbHFohZfDv9htGBw2PLyptMHgs2lXpsWtXJ5vF+31U2j74t
-	qxg9Pm+SC2CL4rJJSc3JLEst0rdL4Mq4MuUHc8FM4YqeTx1sDYzP+LsYOTkkBEwkrt2bwt7F
-	yMUhJLCbUeLZ0v1sEAkZiesL9rF0MXIA2cIShw8XQ9S0MUn0P+9nBqlhE9CTuPjsODuILSIw
-	g1Gi8ZAoiM0sMJFRYtP1PBBbWMBX4tKtD+wgc1gEVCXmTREHCfMK2EtceHYRapW8xMxL39kh
-	4oISJ2c+YYEYIy/RvHU28wRGvllIUrOQpBYwMq1ilEwtKM5Nzy02LDDMSy3XK07MLS7NS9dL
-	zs/dxAgOVy3NHYzbV33QO8TIxMF4iFGCg1lJhNfR2yVViDclsbIqtSg/vqg0J7X4EKM0B4uS
-	OK/4i94UIYH0xJLU7NTUgtQimCwTB6dUA9NxZTP2eSoZz4Ueiku11J5d+MTPT3inz+7/apyf
-	P348mv1z35XykO8ufi9v8s5oWNe/aUFMnZecxSoxcfcLCa7Oe+R7o9I0w3r7Nc4u2ezwd9UE
-	9glRq5O/scx24nSeqNgkdjipZ4VYsHrulqiyrxE8KWHnjcI/3Hwc7aUTe7LzSu/lu7M58md6
-	mRxLb//OnVbItT86zjnzpPQBraPr267GVH065nj7vPDGMvfFqw6les6+wrZg1p6rWWY8jkv6
-	9HZyXqnSn+wck5W355jVn1Tlj/U6RxuPlxWUsrLMnnqsyfS4y76pTP3u3+e/+Xolt5Bxbgnn
-	3qN34i4fOXMtu7WKh1OH5f5FLhVrj2ufIpRYijMSDbWYi4oTAfkO2rvGAgAA
-X-CMS-MailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
-References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-In very rare cases, there was an issue where a user's poll function
-waiting for a uevent would continuously return very quickly, causing
-excessive CPU usage due to the following scenario.
+bpftool's man page lists "program" as one of possible values for OBJECT,
+while in fact bpftool accepts "prog" instead.
 
-Once sk_rcvbuf becomes full netlink_broadcast_deliver returns an error and
-netlink_overrun is called. However, if netlink_overrun was called in a
-context just before a another context returns from the poll and recv is
-invoked, emptying the rcvbuf, sk->sk_err = ENOBUF is written to the
-netlink socket belatedly and it enters the NETLINK_S_CONGESTED state.
-If the user does not check for POLLERR, they cannot consume and clean
-sk_err and repeatedly enter the situation where they call poll again but
-return immediately.
-
-To address this issue, I would like to introduce the following netlink
-poll.
-
-After calling the datagram_poll, netlink poll checks the
-NETLINK_S_CONGESTED status and rcv queue, and this make the user to be
-readable once more even if the user has already emptied rcv queue. This
-allows the user to be able to consume sk->sk_err value through
-netlink_recvmsg, thus the situation described above can be avoided
-
-Co-developed-by: Dong ha Kang <dongha7.kang@samsung.com>
-Signed-off-by: Jong eon Park <jongeon.park@samsung.com>
+Reported-by: Jerry Snitselaar <jsnitsel@redhat.com>
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
 ---
- net/netlink/af_netlink.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ tools/bpf/bpftool/Documentation/bpftool.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index eb086b06d60d..f08c10220041 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2002,6 +2002,20 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	return err ? : copied;
- }
+diff --git a/tools/bpf/bpftool/Documentation/bpftool.rst b/tools/bpf/bpftool/Documentation/bpftool.rst
+index 6965c94dfdafe..09e4f2ff5658b 100644
+--- a/tools/bpf/bpftool/Documentation/bpftool.rst
++++ b/tools/bpf/bpftool/Documentation/bpftool.rst
+@@ -20,7 +20,7 @@ SYNOPSIS
  
-+static __poll_t netlink_poll(struct file *file, struct socket *sock,
-+			     poll_table *wait)
-+{
-+	__poll_t mask = datagram_poll(file, sock, wait);
-+	struct sock *sk = sock->sk;
-+	struct netlink_sock *nlk = nlk_sk(sk);
-+
-+	if (test_bit(NETLINK_S_CONGESTED, &nlk->state) &&
-+	    skb_queue_empty_lockless(&sk->sk_receive_queue))
-+		mask |= EPOLLIN | EPOLLRDNORM;
-+
-+	return mask;
-+}
-+
- static void netlink_data_ready(struct sock *sk)
- {
- 	BUG();
-@@ -2803,7 +2817,7 @@ static const struct proto_ops netlink_ops = {
- 	.socketpair =	sock_no_socketpair,
- 	.accept =	sock_no_accept,
- 	.getname =	netlink_getname,
--	.poll =		datagram_poll,
-+	.poll =		netlink_poll,
- 	.ioctl =	netlink_ioctl,
- 	.listen =	sock_no_listen,
- 	.shutdown =	sock_no_shutdown,
+ 	**bpftool** **version**
+ 
+-	*OBJECT* := { **map** | **program** | **link** | **cgroup** | **perf** | **net** | **feature** |
++	*OBJECT* := { **map** | **prog** | **link** | **cgroup** | **perf** | **net** | **feature** |
+ 	**btf** | **gen** | **struct_ops** | **iter** }
+ 
+ 	*OPTIONS* := { { **-V** | **--version** } | |COMMON_OPTIONS| }
 -- 
-2.25.1
+2.41.0
 
 
