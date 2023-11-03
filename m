@@ -1,184 +1,265 @@
-Return-Path: <netdev+bounces-45912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506607E0498
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 15:22:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22A997E04D5
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 15:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8106C1C2098F
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:22:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4DD281E50
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63FD18E1F;
-	Fri,  3 Nov 2023 14:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6DF156CC;
+	Fri,  3 Nov 2023 14:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="H/t/DJRN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k06SnY+q"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8181A58E
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 14:22:03 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C2C4D49
-	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 07:21:58 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-408382da7f0so15628275e9.0
-        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 07:21:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1699021317; x=1699626117; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5Uk4CPF0BBRF+bVj0s0eL7CcpvLknK4GIdu9RnpX2Es=;
-        b=H/t/DJRNfLVo4Ucx8eyVC4ozwYl+RbiRiz5q5/BraGmD39fXvuB40nxRkCFSARxLRA
-         UDmSVT78+WT7UaHV8xnXjCDomKGTdI4DfU10IV1KYS9Gv/8cnzpzCcBvVVhAXfOrl6Uy
-         LF7YrbGtM/Sf4vZ3xW3FGXVFG4GGBQcpBjbddwpiMC+2tuLLQQYahwS4UYTClkayK2dE
-         dQGbW3SXliUviLtjomCa9AIyE4jBQHPvfTvf6ZO+WWy0nPT6ddXUocs85e0fO8l9ptUL
-         JqZoqyG8ua4Xj2iBOFXDMsEG0Ggpdp3dg9V8Vub4hAdJdanrDWg60kQLntvqGUeoFvWJ
-         Crow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699021317; x=1699626117;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:reply-to:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Uk4CPF0BBRF+bVj0s0eL7CcpvLknK4GIdu9RnpX2Es=;
-        b=JFJD4f4BrOpDnOgZ4kTSjXSQmpVreoUSErU/DWMkMpU0ynyIDgoQLSqWqyPMOwq4RM
-         Kp4grau1OzyPNMLS4mV4jcawNFiNj1O7hP3PUfctKSTDkYy9cjFHGYPz2C5qY5ds5xt3
-         MODLGOUKdUf+W70NwHPyeacqtJPxYHtyBIO86wX+hj/B6fpaH6/ynrWc14xpwcesFxn9
-         1tskoh/1rKOo8IQMGQdNAEhKRJQzY0LXLqH8fsASBLe8c0RBjf4VktK+nXIU4REzMY4T
-         LO9nZvswM8vQTXKz+PyHadGcSNVqf17Brr+eGoP9g0hNu4HRV+ZbuTgM91V3Rga5CU2s
-         3uHQ==
-X-Gm-Message-State: AOJu0Yy20DDHgICh+kr+pdTHW29rb3Bejts0VIW1JuGzUfS4E1m83hEb
-	rBj7audtdnPkW7kylxVmTiaKdg==
-X-Google-Smtp-Source: AGHT+IE4+EnnbWCGrqzcO5dvKllV5bvlEnU72oSI3Z0wbn6Ot+ltDahvbMO1g1tBXq2y2IiyLU5NsQ==
-X-Received: by 2002:a05:600c:458e:b0:408:3fae:d809 with SMTP id r14-20020a05600c458e00b004083faed809mr18376719wmo.17.1699021316858;
-        Fri, 03 Nov 2023 07:21:56 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:7bea:b090:d69:c878? ([2a01:e0a:b41:c160:7bea:b090:d69:c878])
-        by smtp.gmail.com with ESMTPSA id h21-20020a05600c499500b0040586360a36sm2579011wmp.17.2023.11.03.07.21.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Nov 2023 07:21:56 -0700 (PDT)
-Message-ID: <7627f7d5-89d5-487a-938a-5156be9d4fbd@6wind.com>
-Date: Fri, 3 Nov 2023 15:21:55 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4552D631;
+	Fri,  3 Nov 2023 14:40:58 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C834D43;
+	Fri,  3 Nov 2023 07:40:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699022451; x=1730558451;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8g+IGmgCPVE9/brhXdzg9N8m1guEQPZ6SOB7XfnmM5A=;
+  b=k06SnY+qaEBiz4pw9s2UprxzaeoSJag2q7Vo+HwkBnEC8L1h97/PK9qQ
+   OZc+W9FlrE1kXp0k4NP9PCFZqgfUR63lJNao5kCyfXgnCnpVPyxNWssa0
+   LaQvvoSgit+8rzzL2fNElLiCG2kHZ3GeblPCyOLdCJFe+hFA+M+E8eHaY
+   SVE8Ab/AX1wLhtoJ7+7vpkZyjDSbuIQZcWVvvLaWVkJcav6rv6CrXn0GX
+   S4pmdk913Mwh9jcUVsqfto6bNZcBzQXmRdRW2jOzQazvJapJxnrkzWkfV
+   4bEMdT0mPEXnW0sl5vdRf8P+qxj5R1269Kw2fHm42LPgoqsLvyaHz/rld
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="420069245"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="420069245"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 07:40:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10883"; a="738094469"
+X-IronPort-AV: E=Sophos;i="6.03,273,1694761200"; 
+   d="scan'208";a="738094469"
+Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2023 07:40:39 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Subject: [PATCH bpf-next] selftests/xsk: fix for SEND_RECEIVE_UNALIGNED test.
+Date: Fri,  3 Nov 2023 14:29:36 +0000
+Message-Id: <20231103142936.393654-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH] net: ipmr_base: Check iif when returning a (*, G) MFC
-Content-Language: en-US
-To: Yang Sun <sunytt@google.com>
-Cc: Ido Schimmel <idosch@idosch.org>, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20231031015756.1843599-1-sunytt@google.com>
- <ZUNxcxMq8EW0cVUT@shredder>
- <CAF+qgb4gW8vBb8c2xDHfsXsm1-O2KCwXMCTUcT2mYqED51fHoQ@mail.gmail.com>
- <fc356b9d-d7fc-4db8-b26c-8c786758d3e5@6wind.com>
- <CAF+qgb6uUF-Z8EkZoqzfboaCZv4PP6yG_r=-2ojaG9T61Kg3jA@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Organization: 6WIND
-In-Reply-To: <CAF+qgb6uUF-Z8EkZoqzfboaCZv4PP6yG_r=-2ojaG9T61Kg3jA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Le 03/11/2023 à 12:05, Yang Sun a écrit :
-> On Thu, Nov 2, 2023 at 10:19 PM Nicolas Dichtel
-> <nicolas.dichtel@6wind.com> wrote:
->>
->> Le 02/11/2023 à 12:48, Yang Sun a écrit :
->>>> Is this a regression (doesn't seem that way)? If not, the change should
->>>> be targeted at net-next which is closed right now:
->>>
->>>> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
->>>
->>> I see.
->>>
->>>>> - if (c->mfc_un.res.ttls[vifi] < 255)
->>>>> + if (c->mfc_parent == vifi && c->mfc_un.res.ttls[vifi] < 255)
->>>
->>>> What happens if the route doesn't have an iif (-1)? It won't match
->>>> anymore?
->>>
->>> Looks like the mfc_parent can't be -1? There is the check:
->>>     if (mfc->mf6cc_parent >= MAXMIFS)
->>>         return -ENFILE;
->>> before setting the parent:
->>>     c->_c.mfc_parent = mfc->mf6cc_parent;
->>>
->>> I wrote this patch thinking (*, G) MFCs could be per iif, similar to the
->>> (S, G) MFCs, like we can add the following MFCs to forward packets from
->>> any address with group destination ff05::aa from if1 to if2, and forward
->>> packets from any address with group destination ff05::aa from if2 to
->>> both if1 and if3.
->>>
->>> (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
->>> (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
->>>
->>> But reading Nicolas's initial commit message again, it seems to me that
->>> (*, G) has to be used together with (*, *) and there should be only one
->>> (*, G) entry per group address and include all relevant interfaces in
->>> the oifs? Like the following:
->>>
->>> (::, ::)         Iif: if1 Oifs: if1 if2 if3   State: resolved
->>> (::, ff05::aa)   Iif: if1 Oifs: if1 if2 if3   State: resolved
->>>
->>> Is this how the (*, *|G) MFCs are intended to be used? which means packets
->>> to ff05::aa are forwarded from any one of the interfaces to all the other
->>> interfaces? If this is the intended way it works then my patch would break
->>> things and should be rejected.
->> Yes, this was the intend. Only one (*, G) entry was expected (per G).
->>
->>>
->>> Is there a way to achieve the use case I described above? Like having
->>> different oifs for different iif?
->> Instead of being too strict, maybe you could try to return the 'best' entry.
->>
->> #1 (::, ff05::aa)      Iif: if1 Oifs: if1 if2  State: resolved
->> #2 (::, ff05::aa)      Iif: if2 Oifs: if1 if2 if3  State: resolved
->>
->> If a packet comes from if2, returns #2, but if a packet comes from if3, returns
->> the first matching entry, ie #1 here.
->>
-> 
-> Thanks for your reply Nicolas!
-> Here if it returns the first matching then it depends on which entry
-> is returned first
-> by the hash table lookup, the forwarding behavior may be indeterminate
-> in that case
-> it seems.
-As I said, only one (*,G) entry was expected thus the 'first' one is
-indeterminate if there are several entries.
+Fix test broken by shared umem test and framework enhancement commit.
 
-> 
-> If a packet has no matching (*, G) entry, then it will use the (*, *)
-> entry to be forwarded
-> to the upstream interface in (*, *). And with the (*, *) it means we
-> won't get any nocache upcall
-> for interfaces included in the static tree, right? So the (S, G) MFC
-> and the static proxy MFCs
-> are not meant to be used together?
-Not together. With proxy multicast, the multicast tree is static, ie there is no
-multicast daemon. Mcast packets received from one interface are sent to the
-other interfaces that are part of the tree.
+Correct the current implementation of pkt_stream_replace_half() by
+ensuring that nb_valid_entries are not set to half, as this is not true
+for all the tests.
 
+Create a new function called pkt_modify() that allows for packet
+modification to meet specific requirements while ensuring the accurate
+maintenance of the valid packet count to prevent inconsistencies in packet
+tracking.
 
-Regards,
-Nicolas
+Fixes: 6d198a89c004 ("selftests/xsk: Add a test for shared umem feature")
+Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+---
+ tools/testing/selftests/bpf/xskxceiver.c | 71 ++++++++++++++++--------
+ 1 file changed, 47 insertions(+), 24 deletions(-)
 
-> 
-> I wonder how a real use case with (*, G|*) would look like, what
-> interface could be an
-> upstream interface. Is there an example?
-> 
-> Thanks,
-> Yang
-> 
->>
->> Regards,
->> Nicolas
+diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+index 591ca9637b23..f7d3a4a9013f 100644
+--- a/tools/testing/selftests/bpf/xskxceiver.c
++++ b/tools/testing/selftests/bpf/xskxceiver.c
+@@ -634,16 +634,35 @@ static u32 pkt_nb_frags(u32 frame_size, struct pkt_stream *pkt_stream, struct pk
+ 	return nb_frags;
+ }
+ 
+-static void pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, int offset, u32 len)
++static bool pkt_valid(bool unaligned_mode, int offset, u32 len)
++{
++	if (len > MAX_ETH_JUMBO_SIZE || (!unaligned_mode && offset < 0))
++		return false;
++
++	return true;
++}
++
++static void pkt_set(struct pkt_stream *pkt_stream, struct xsk_umem_info *umem, struct pkt *pkt,
++		    int offset, u32 len)
+ {
+ 	pkt->offset = offset;
+ 	pkt->len = len;
+-	if (len > MAX_ETH_JUMBO_SIZE) {
+-		pkt->valid = false;
+-	} else {
+-		pkt->valid = true;
++
++	pkt->valid = pkt_valid(umem->unaligned_mode, offset, len);
++	if (pkt->valid)
+ 		pkt_stream->nb_valid_entries++;
+-	}
++}
++
++static void pkt_modify(struct pkt_stream *pkt_stream, struct xsk_umem_info *umem, struct pkt *pkt,
++		       int offset, u32 len)
++{
++	bool mod_valid;
++
++	pkt->offset = offset;
++	pkt->len = len;
++	mod_valid  = pkt_valid(umem->unaligned_mode, offset, len);
++	pkt_stream->nb_valid_entries += mod_valid - pkt->valid;
++	pkt->valid = mod_valid;
+ }
+ 
+ static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
+@@ -651,7 +670,8 @@ static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
+ 	return ceil_u32(len, umem->frame_size) * umem->frame_size;
+ }
+ 
+-static struct pkt_stream *__pkt_stream_generate(u32 nb_pkts, u32 pkt_len, u32 nb_start, u32 nb_off)
++static struct pkt_stream *__pkt_stream_generate(struct xsk_umem_info *umem, u32 nb_pkts,
++						u32 pkt_len, u32 nb_start, u32 nb_off)
+ {
+ 	struct pkt_stream *pkt_stream;
+ 	u32 i;
+@@ -665,30 +685,31 @@ static struct pkt_stream *__pkt_stream_generate(u32 nb_pkts, u32 pkt_len, u32 nb
+ 	for (i = 0; i < nb_pkts; i++) {
+ 		struct pkt *pkt = &pkt_stream->pkts[i];
+ 
+-		pkt_set(pkt_stream, pkt, 0, pkt_len);
++		pkt_set(pkt_stream, umem, pkt, 0, pkt_len);
+ 		pkt->pkt_nb = nb_start + i * nb_off;
+ 	}
+ 
+ 	return pkt_stream;
+ }
+ 
+-static struct pkt_stream *pkt_stream_generate(u32 nb_pkts, u32 pkt_len)
++static struct pkt_stream *pkt_stream_generate(struct xsk_umem_info *umem, u32 nb_pkts, u32 pkt_len)
+ {
+-	return __pkt_stream_generate(nb_pkts, pkt_len, 0, 1);
++	return __pkt_stream_generate(umem, nb_pkts, pkt_len, 0, 1);
+ }
+ 
+-static struct pkt_stream *pkt_stream_clone(struct pkt_stream *pkt_stream)
++static struct pkt_stream *pkt_stream_clone(struct pkt_stream *pkt_stream,
++					   struct xsk_umem_info *umem)
+ {
+-	return pkt_stream_generate(pkt_stream->nb_pkts, pkt_stream->pkts[0].len);
++	return pkt_stream_generate(umem, pkt_stream->nb_pkts, pkt_stream->pkts[0].len);
+ }
+ 
+ static void pkt_stream_replace(struct test_spec *test, u32 nb_pkts, u32 pkt_len)
+ {
+ 	struct pkt_stream *pkt_stream;
+ 
+-	pkt_stream = pkt_stream_generate(nb_pkts, pkt_len);
++	pkt_stream = pkt_stream_generate(test->ifobj_rx->umem, nb_pkts, pkt_len);
+ 	test->ifobj_tx->xsk->pkt_stream = pkt_stream;
+-	pkt_stream = pkt_stream_generate(nb_pkts, pkt_len);
++	pkt_stream = pkt_stream_generate(test->ifobj_tx->umem, nb_pkts, pkt_len);
+ 	test->ifobj_rx->xsk->pkt_stream = pkt_stream;
+ }
+ 
+@@ -698,12 +719,11 @@ static void __pkt_stream_replace_half(struct ifobject *ifobj, u32 pkt_len,
+ 	struct pkt_stream *pkt_stream;
+ 	u32 i;
+ 
+-	pkt_stream = pkt_stream_clone(ifobj->xsk->pkt_stream);
++	pkt_stream = pkt_stream_clone(ifobj->xsk->pkt_stream, ifobj->umem);
+ 	for (i = 1; i < ifobj->xsk->pkt_stream->nb_pkts; i += 2)
+-		pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len);
++		pkt_modify(pkt_stream, ifobj->umem, &pkt_stream->pkts[i], offset, pkt_len);
+ 
+ 	ifobj->xsk->pkt_stream = pkt_stream;
+-	pkt_stream->nb_valid_entries /= 2;
+ }
+ 
+ static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_len, int offset)
+@@ -715,9 +735,10 @@ static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_len, int off
+ static void pkt_stream_receive_half(struct test_spec *test)
+ {
+ 	struct pkt_stream *pkt_stream = test->ifobj_tx->xsk->pkt_stream;
++	struct xsk_umem_info *umem = test->ifobj_rx->umem;
+ 	u32 i;
+ 
+-	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(pkt_stream->nb_pkts,
++	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(umem, pkt_stream->nb_pkts,
+ 							      pkt_stream->pkts[0].len);
+ 	pkt_stream = test->ifobj_rx->xsk->pkt_stream;
+ 	for (i = 1; i < pkt_stream->nb_pkts; i += 2)
+@@ -733,12 +754,12 @@ static void pkt_stream_even_odd_sequence(struct test_spec *test)
+ 
+ 	for (i = 0; i < test->nb_sockets; i++) {
+ 		pkt_stream = test->ifobj_tx->xsk_arr[i].pkt_stream;
+-		pkt_stream = __pkt_stream_generate(pkt_stream->nb_pkts / 2,
++		pkt_stream = __pkt_stream_generate(test->ifobj_tx->umem, pkt_stream->nb_pkts / 2,
+ 						   pkt_stream->pkts[0].len, i, 2);
+ 		test->ifobj_tx->xsk_arr[i].pkt_stream = pkt_stream;
+ 
+ 		pkt_stream = test->ifobj_rx->xsk_arr[i].pkt_stream;
+-		pkt_stream = __pkt_stream_generate(pkt_stream->nb_pkts / 2,
++		pkt_stream = __pkt_stream_generate(test->ifobj_rx->umem, pkt_stream->nb_pkts / 2,
+ 						   pkt_stream->pkts[0].len, i, 2);
+ 		test->ifobj_rx->xsk_arr[i].pkt_stream = pkt_stream;
+ 	}
+@@ -1961,7 +1982,8 @@ static int testapp_stats_tx_invalid_descs(struct test_spec *test)
+ static int testapp_stats_rx_full(struct test_spec *test)
+ {
+ 	pkt_stream_replace(test, DEFAULT_UMEM_BUFFERS + DEFAULT_UMEM_BUFFERS / 2, MIN_PKT_SIZE);
+-	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
++	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(test->ifobj_rx->umem,
++							      DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+ 
+ 	test->ifobj_rx->xsk->rxqsize = DEFAULT_UMEM_BUFFERS;
+ 	test->ifobj_rx->release_rx = false;
+@@ -1972,7 +1994,8 @@ static int testapp_stats_rx_full(struct test_spec *test)
+ static int testapp_stats_fill_empty(struct test_spec *test)
+ {
+ 	pkt_stream_replace(test, DEFAULT_UMEM_BUFFERS + DEFAULT_UMEM_BUFFERS / 2, MIN_PKT_SIZE);
+-	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
++	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(test->ifobj_rx->umem,
++							      DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+ 
+ 	test->ifobj_rx->use_fill_ring = false;
+ 	test->ifobj_rx->validation_func = validate_fill_empty;
+@@ -2526,8 +2549,8 @@ int main(int argc, char **argv)
+ 	init_iface(ifobj_tx, worker_testapp_validate_tx);
+ 
+ 	test_spec_init(&test, ifobj_tx, ifobj_rx, 0, &tests[0]);
+-	tx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+-	rx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
++	tx_pkt_stream_default = pkt_stream_generate(ifobj_tx->umem, DEFAULT_PKT_CNT, MIN_PKT_SIZE);
++	rx_pkt_stream_default = pkt_stream_generate(ifobj_rx->umem, DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+ 	if (!tx_pkt_stream_default || !rx_pkt_stream_default)
+ 		exit_with_error(ENOMEM);
+ 	test.tx_pkt_stream_default = tx_pkt_stream_default;
+-- 
+2.34.1
+
 
