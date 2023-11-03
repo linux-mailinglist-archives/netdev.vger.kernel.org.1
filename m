@@ -1,80 +1,102 @@
-Return-Path: <netdev+bounces-45882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9B47E0034
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:26:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647107E0039
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 11:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 267B8281E24
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:26:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 954091C20A48
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 10:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4070E14299;
-	Fri,  3 Nov 2023 10:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088B214299;
+	Fri,  3 Nov 2023 10:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bWBrQ7AA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CAB714293;
-	Fri,  3 Nov 2023 10:25:57 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9523D4E;
-	Fri,  3 Nov 2023 03:25:54 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qyrN4-00055B-3O; Fri, 03 Nov 2023 11:25:46 +0100
-Date: Fri, 3 Nov 2023 11:25:46 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nf_tables: fix pointer math issue in
- nft_byteorder_eval()
-Message-ID: <20231103102546.GB8035@breakpoint.cc>
-References: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
- <20231103091801.GA8035@breakpoint.cc>
- <ZUTBNcA7ApLu5DMA@calendula>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72A414293
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 10:28:14 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25B00D51
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 03:28:02 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so7304a12.1
+        for <netdev@vger.kernel.org>; Fri, 03 Nov 2023 03:28:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699007280; x=1699612080; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rY9ezNRbe4wkzwuD5NMN5rWnuziwTCNcV0CHKcJFCbk=;
+        b=bWBrQ7AABRSQQ2xbLHc6622KDWIbW2ktuRhzurWBqXvj4+geCB8wS+j4TCdr11E6QM
+         qzKgGIgPAoJqw6ehDRCe6GjmqPDJWcJm5WCrcK0chmg8t7iz2dr6qinJ/Zbn6/pqLliB
+         uIZHsxwqUKa+h2jbgjyX5b2y+Z8/GtGyKYT2deOUY8an730dxa+N5IVsbmdOfGhzMIFB
+         rdVYId9Ps9/CJlxCp3o8/KGZLlLlBUj0C/XGfxasGi/c+xwMytd3EpHXQ3+1oLLlGY9Y
+         0Efl+W6WoBMselS8AoHMVfpKmN9Ek5+xzUe49X3ELE18ALHERdHJ5lskWrnn8PwxWU4k
+         xTfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699007280; x=1699612080;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rY9ezNRbe4wkzwuD5NMN5rWnuziwTCNcV0CHKcJFCbk=;
+        b=p6kb2pvCRb/07y1zi1+oDBH3u8SxqboHKxtuMwsQXnky79Iviy/nncF7ruwLOe8/oa
+         4htchUAcIVNlQsbkSGPiqsTdwWSpjQEEpmuiU82kEmMYjJg8GOSqErrTKX2sfWKF0gmK
+         qLSRH4rqnays43yISEzTJ61I0dXxNwAmnw+CJuyupprCAlVmKqXo+WcSPnuwoNoFWXs1
+         wqecGeMeowiKf1p9lXSqfYjau8EDq6DBIQb2UIwKDUp+S+RPzjh5tV5ntcx/B/Tg71Ga
+         oz9n9Foy8en+ekfPVq2T++xnATfk67Y0BpgJZv92e5adPhFXTUKvyDcZS1fHKPnZ/AYz
+         EEFw==
+X-Gm-Message-State: AOJu0Yyc0XU97FOQmeFku1G9TzxVtux0qfj1n5MIsbphofYv9TWoVfMU
+	ufhGmZwy76vk5TznVN9D8G+drlA5E20zrPVtQ9o0PQ==
+X-Google-Smtp-Source: AGHT+IGyd5/INhnDJmxO2VKxxBkT1b90VPPlsG+jzqJsD8y/lUM6DQMfh//zGTQaC6ShjvMOlA/wzS+VDXbFfdQVdqE=
+X-Received: by 2002:a05:6402:26c6:b0:543:fb17:1a8 with SMTP id
+ x6-20020a05640226c600b00543fb1701a8mr184035edd.3.1699007280370; Fri, 03 Nov
+ 2023 03:28:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZUTBNcA7ApLu5DMA@calendula>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20230717152917.751987-1-edumazet@google.com> <738bb6a1-4e99-4113-9345-48eea11e2108@kernel.org>
+ <c798f412-ac14-4997-9431-c98d1b8e16d8@kernel.org> <875400ba-58d8-44a0-8fe9-334e322bd1db@kernel.org>
+ <CANn89iJOwQUwAVcofW+X_8srFcPnaWKyqOoM005L6Zgh8=OvpA@mail.gmail.com> <28e2bd4a-3233-471c-a1ae-57a445173401@kernel.org>
+In-Reply-To: <28e2bd4a-3233-471c-a1ae-57a445173401@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 3 Nov 2023 11:27:46 +0100
+Message-ID: <CANn89i+7FWCX6+-puMj7L9f+=Ji6mV-Oca63k-c7OsEikmFPHQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: get rid of sysctl_tcp_adv_win_scale
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Soheil Hassas Yeganeh <soheil@google.com>, Neal Cardwell <ncardwell@google.com>, 
+	Yuchung Cheng <ycheng@google.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> On Fri, Nov 03, 2023 at 10:18:01AM +0100, Florian Westphal wrote:
-> > Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> > > The problem is in nft_byteorder_eval() where we are iterating through a
-> > > loop and writing to dst[0], dst[1], dst[2] and so on...  On each
-> > > iteration we are writing 8 bytes.  But dst[] is an array of u32 so each
-> > > element only has space for 4 bytes.  That means that every iteration
-> > > overwrites part of the previous element.
-> > > 
-> > > I spotted this bug while reviewing commit caf3ef7468f7 ("netfilter:
-> > > nf_tables: prevent OOB access in nft_byteorder_eval") which is a related
-> > > issue.  I think that the reason we have not detected this bug in testing
-> > > is that most of time we only write one element.
-> > 
-> > LGTM, thanks Dan.  We will route this via nf.git.
-> 
-> Thanks for your patch.
-> 
-> One question, is this update really required?
+On Fri, Nov 3, 2023 at 11:14=E2=80=AFAM Jiri Slaby <jirislaby@kernel.org> w=
+rote:
+>
+> On 03. 11. 23, 9:17, Eric Dumazet wrote:
+> > What happens if you double /proc/sys/net/ipv4/tcp_wmem  and/or
+> > /proc/sys/net/ipv4/tcp_rmem first value ?
+> > (4096 -> 8192)
+>
+> No change:
+> # cat /proc/sys/net/ipv4/tcp_wmem
+> 8192    16384   4194304
+>
+>
+> But this:
+> # cat /proc/sys/net/ipv4/tcp_rmem
+> 8192    16384   4194304
+>
+> results in test to run 4.7 s, so even 3 more times slower!
 
-I think so, yes.  Part of this bug here is that this helper-niceness
-masks whats really happening in the caller (advancing in strides of
-'u32', rather than 'u64').
+
+You might try setting tcp_shrink_window sysctl to one, with some side
+effects for normal TCP flows.
 
