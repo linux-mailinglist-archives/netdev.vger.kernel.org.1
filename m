@@ -1,257 +1,148 @@
-Return-Path: <netdev+bounces-45905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-45906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32DEC7E03AA
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:15:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3107E03DD
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 14:43:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6321D1C20986
-	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:15:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECDEB1F2255F
+	for <lists+netdev@lfdr.de>; Fri,  3 Nov 2023 13:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAC718047;
-	Fri,  3 Nov 2023 13:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1F6182DD;
+	Fri,  3 Nov 2023 13:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loZ3AabE"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="Idr7FRmY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545AC182DD;
-	Fri,  3 Nov 2023 13:15:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A5DC433C8;
-	Fri,  3 Nov 2023 13:15:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699017342;
-	bh=L+y3pCKIDHVDD+QAE6LGVWOwqVYmCViPL4AD52mv6b8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=loZ3AabEaf5V5IE23nMneEE9MrEnPsqnoa/FbrFykY2QlaPhnGk9JW/eIuRV0BPcj
-	 6F2UizdxzUyBdorja5OX5dfXUaYkbHPZ7TyxO30vDTTy0nSACNydTVHinYMgNSTfia
-	 gukQMPzsBZgmkcLIhRgcDrYSJ9abtaPBvynVIUkAaUIfXU4AA1Y8WMzuuYwPAO/sXR
-	 80gYO6IRcXLBD77l/g7B1DwOfKk9LvSv2bFW4tu8SENp94rvW0KLlB8O3kLwiZM/iA
-	 PNVJozJbfFGDUnSlY59x7EhxAI/cCdd2v4boVUfFep14QbuqU0HZge8kX1yygUSgg3
-	 dca9dXSeIrs1Q==
-Date: Fri, 3 Nov 2023 13:15:37 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert Marko <robimarko@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next RFC PATCH v4 4/4] dt-bindings: Document bindings for
- Marvell Aquantia PHY
-Message-ID: <20231103-pretense-caviar-eacbb7f2fe09@spud>
-References: <20231103123532.687-1-ansuelsmth@gmail.com>
- <20231103123532.687-4-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F06E18621
+	for <netdev@vger.kernel.org>; Fri,  3 Nov 2023 13:43:14 +0000 (UTC)
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03olkn2064.outbound.protection.outlook.com [40.92.58.64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16AF31A8;
+	Fri,  3 Nov 2023 06:43:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GtkGPikIBz9e4jaBpEjx5FxhTRE64cbtont9BM9AVkXSICpOWhOKj0kLKcPJSZ/x70yxORDFEJh6o2hEYj/o9QyRaZ5T2K38EcKK/0V+q7/a0doU7MRvIA+O+X2amJiahyuKdCbO3YVuiWEqMg5YNoKyA2kTfjh5sYw3C96sNRWFmU8HQTH1JSpZ34VvDT4RvFSlxYa4njS+4YBOgLXL5Pt//0gfiAx3HjNO7N9o7VG+3NNlVIl2xkvQWsqBnoPCiIrB2Aw8hhKan/maVBBC3kQuVQFTZVgPWu5FanyF1+V1xrB4yxL9AxprvAb92zMaBfrgcPgYDrBS/ofDXQy5dQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jPsVOIHID35hRcUojOO6766waM0yw6oxof43PYpSfcI=;
+ b=AV72krs1kaBvPogI1LM8WFTWBt6sN6X2/UVjMJz6wHxwxlwQaPpViWL2SPyiHWjmXwP2lPqbqiKpMQWWoWwXJKICfkBi7RLJmgLmhK7y8aNipxM1cyQq2HOGE38bEesUBwnHCEWIbduErpweYUP6lLpVDhPZL2nT/asP01E89HjPjp5+cJ4GlfRcyIkX1exH40ILEQQnpd/qEaxplrFa7Avq/SK+wTNbt8SroJz9Maq7MNGXo3qZRNifHMr5jws8ZRVWpa2A5M0MGMhOU+AkEYwwn4nfmMSkjDEfFPBQ1aDpBXXDck7Mtj0nAPdoM+KqLO6Mqa6rsQYhzA4d6DktnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jPsVOIHID35hRcUojOO6766waM0yw6oxof43PYpSfcI=;
+ b=Idr7FRmYj2UJofZDW0ZtSUPSHdafUToi7Saz2q9BcFS+3Vt+2nifb1MrMbvY+WctDFAFQ9xvlLoS+jXEpgS8Y4hJ8m8AvuT8w5mq9Eg/uWaxzIr/Ncidvi4POIrTmufkaj4tOfNLLZUsqDRx1+e8YKtHftpaSFYZ6XMzcp60spL//H2Rt2yp6iDu1G1OGsCwrmdqJEO0uLz0pRFpSPdSA6syzmh38ooxnTZW2LajFI7DKxtKCOqLCCPlIM6ngIEMA4IHkKudL1sW/wdG+cJHTLtOf4l+xyaqhxGna1T6NT41kUMawVkLAzlwA8rVHHS3vgfpMIFFYepv3S3XdYBY5Q==
+Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
+ by AM7PR10MB3876.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:175::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.21; Fri, 3 Nov
+ 2023 13:43:11 +0000
+Received: from DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::e2b0:8d7e:e293:bd97]) by DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::e2b0:8d7e:e293:bd97%7]) with mapi id 15.20.6954.021; Fri, 3 Nov 2023
+ 13:43:10 +0000
+Date: Fri, 3 Nov 2023 19:12:57 +0530
+From: Yuran Pereira <yuran.pereira@hotmail.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	florian.fainelli@broadcom.com, linux-kernel@vger.kernel.org,
+	justin.chen@broadcom.com, edumazet@google.com,
+	bcm-kernel-feedback-list@broadcom.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel-mentees@lists.linuxfoundation.org
+Subject: Re: [PATCH] Prevent out-of-bounds read/write in bcmasp_netfilt_rd
+ and bcmasp_netfilt_wr
+Message-ID:
+ <DB3PR10MB68352DF6CB458CCF97C416ECE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+References: <DB3PR10MB6835E073F668AD24F57AE64AE8A5A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+ <2023110301-purist-reputable-fab7@gregkh>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2023110301-purist-reputable-fab7@gregkh>
+X-TMN: [eSc+gEx1CmvjjVMBKhf6Xwx/G31TUnDs]
+X-ClientProxiedBy: JN3P275CA0012.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:70::13)
+ To DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:42a::7)
+X-Microsoft-Original-Message-ID: <20231103134257.GA1618360@nmj-network>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+7u5ZFTmWOdAn48p"
-Content-Disposition: inline
-In-Reply-To: <20231103123532.687-4-ansuelsmth@gmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB3PR10MB6835:EE_|AM7PR10MB3876:EE_
+X-MS-Office365-Filtering-Correlation-Id: 071a78ca-998e-4736-94bf-08dbdc72d1ae
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	taaZlKXULBVnl0N5LRqaRG7/SnQHM+I0lW78LodA84iQJmD+v6t98+jqaViAM93QOVx7PnTdgbs3up2okkOM9aCj6jC6hm7DulIW2lCWLERpfMSJKLmTk8QJrRSuIfr8Kaqc4htMy+veAO786X22oYxhl4nsz0JCRjGz+bTYNyTbM8q+P6l2jahz1e21HhB/wNqV0UO2Elnnkv0jO8J8bSlK04QZ75yMwV7rroQyRfGAO1b/BVZMcwIrnwUnddAQhr/8xv8K+vjnOGWuE1Fwl9KWSyAmuKzsveS3NqlFRhZQV7MoV7es92kbkXZHcnSDGshLXT6hQwdgg8rUAd9PBqOsdXJMEx9D04VprjDX7B1cnTnHl0zahY58G646eX29BGHwu01gtSSjBD3NUt3gQ/hz5m5gI/oNI403a8M7X7XjZ+0KuI0uqRf1sAprWgrONqpbgOPR7MNTetMATwGRLpuQsAffqN46tqYw+MB/1Bvsbpt0voN2vfk7Iacul4NPbtlqg21RhVlB7hVubeADgHzzYWia/fXbWMpj6jgXAadtfpH7wdwQCpOhG8x3AfIP
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?8YaI9JifLYhhVft+b+g6EIQXkRZoXdopaNN79tYWQ09oW4WD4KrO2oP3sm1B?=
+ =?us-ascii?Q?BKDkAdKZXzIxNq493Nmj8pzMXDsPUMPGeWRcjOPwI13VmlTVytByTCFz7Oh+?=
+ =?us-ascii?Q?+18iX59khvgM0B1tfNDx+6Q35HnNiJAG8QGnmV//zC2UIdl0Cra9CiAfL+d0?=
+ =?us-ascii?Q?whmYuV+/xrUZC2on690xGF2cZef0tvfFuqdA6/SE5t42mfuKKYoEiSkXzYpF?=
+ =?us-ascii?Q?qla3io2h192XwysCtDMcIi0FPZ1ja2L328tCKDX04vp2r4XzCHD2r/XYZk6q?=
+ =?us-ascii?Q?O/SjFQDjWFb1n+AKjDqM6Lsxjc+MiK6l72i3ACXiaF+QerGgaHI8vK6MbHoz?=
+ =?us-ascii?Q?1C3uW4SAcr0BF0hoT/qeyGzRqgdow3RjG+SfwR8tsNwhFqh+3S3W7lIuAOVn?=
+ =?us-ascii?Q?ss21XJ+sOGuWq86wNSe1M2jSqazwoIZsUz3Otvit7iU7ZWO5dBa0EcA7xLf0?=
+ =?us-ascii?Q?sWZia4ay8WR33asz2e2RuzjyMypEliUSJiDd2UVy21ij37CoSYl5qCI5J71p?=
+ =?us-ascii?Q?Nw0VgTTBnjKOhM96VydB15W+3LHHFwnDjx7wiDhqCXEPgs0knWaDjrPQnnS0?=
+ =?us-ascii?Q?OnG8MqGt8vWp3gLlS9WeSoc38pg7QlLGgwLrJuQfzXyDbbUBTJ70NW5twL70?=
+ =?us-ascii?Q?AQwKF/EpNL+hEFGsxH7l5lW//Hywooc1jHZnROmnBwTMGQi0jo4dZ7jpKCKN?=
+ =?us-ascii?Q?Kt3H8L3bOvqxP+JkVgBZKD/UCaKLnb2lyKDQZURuUwD7nrRP1kXSxBhbJYpD?=
+ =?us-ascii?Q?MZBX9iYd04TdRlYjeBk60DNr7s8nYGoPPyvnuVCs9c/BzXpwv4BRays7+4EF?=
+ =?us-ascii?Q?UNk3pVn2/DehplZVP/L7ErhV0SANyJxdtRwbXsCtthXtS8+LhqUGprDDdz/v?=
+ =?us-ascii?Q?ufIY4SksodD2SrPN9UxwDV40qtbBVx0kiSrLYRrzoCf8Zb+TnA3PquyVAhzn?=
+ =?us-ascii?Q?6QWHkwiKF3xBEO7BsSgtd04zqRIP80u0ZH/XVSmUpKQYlRt4tmmNkD2EpdEw?=
+ =?us-ascii?Q?6ZfETBScY4mlzkEQy6HOk2eZx2pav8sJcQsU1vSQf09nkL0GkO0DPQBOURzy?=
+ =?us-ascii?Q?fxGF7JDsg/xfFfd2fJSlzcAXCbd0tjg6fOgig7oUMCOpxqsy/nNDkRqsHBSR?=
+ =?us-ascii?Q?+WyWDvoA4dXm6Sd4nBo+t3Gwy9G6mpykCfNuNiy2I8q98zUKjBk62/ucslVR?=
+ =?us-ascii?Q?AyEALU0+u8kA2LNweYZnGwVc+p+0mOx1YRYsG+BCGQCaYhUjtpTPvBPVrLI?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-6b909.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 071a78ca-998e-4736-94bf-08dbdc72d1ae
+X-MS-Exchange-CrossTenant-AuthSource: DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2023 13:43:10.9058
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR10MB3876
 
+Hello Greg,
+On Fri, Nov 03, 2023 at 01:57:13PM +0100, Greg KH wrote:
+> >  	reg_offset = bcmasp_netfilt_get_reg_offset(priv, nfilt, reg_type,
+> >  						   offset);
+> > +	if (reg_offset < 0)
+> > +		return 0;
+> 
+> Shouldn't you return an error here?
 
---+7u5ZFTmWOdAn48p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, I think that makes sense. I might just return `reg_offset`
+since it is bound to be -EINVAL when bcmasp_netfilt_get_reg_offset
+fails.
 
-Hey,
+But that now makes me wonder whether the previous check in that
+function which currently returns 0, shouldn't be returning `-EINVAL`
+instead.
 
-On Fri, Nov 03, 2023 at 01:35:32PM +0100, Christian Marangi wrote:
-> Document bindings for Marvell Aquantia PHY.
->=20
-> The Marvell Aquantia PHY require a firmware to work correctly and there
-> at least 3 way to load this firmware.
->=20
-> Describe all the different way and document the binding "firmware-name"
-> to load the PHY firmware from userspace.
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v3:
-> - Make DT description more OS agnostic
-> - Use custom select to fix dtbs checks
-> Changes v2:
-> - Add DT patch
+```
+static u32 bcmasp_netfilt_rd(struct bcmasp_priv *priv,
+...
+{
+	if (!IS_ALIGNED(offset, 4) || offset > MAX_WAKE_FILTER_SIZE)
+		return 0;   <----- Should this one be -EINVAL?
+}
+```
 
+Thank you for the feedback.
 
-Please, it's the merge window, there's even less reason than usual to
-spit out versions less than 24h apart. This is the third version in 48
-hours. As there are no changes to the binding in the v4 patch, please
-take a look at
-<https://lore.kernel.org/all/20231103-outboard-murkiness-e3256874c9a7@spud/>
-I left a review there a few moments ago.
-
-Thanks,
-Conor.
-
->  .../bindings/net/marvell,aquantia.yaml        | 126 ++++++++++++++++++
->  1 file changed, 126 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/marvell,aquanti=
-a.yaml
->=20
-> diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml =
-b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-> new file mode 100644
-> index 000000000000..d43cf28a4d61
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
-> @@ -0,0 +1,126 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/marvell,aquantia.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Marvell Aquantia Ethernet PHY
-> +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
-> +
-> +description: |
-> +  Marvell Aquantia Ethernet PHY require a firmware to be loaded to actua=
-lly
-> +  work.
-> +
-> +  This can be done and is implemented by OEM in 3 different way:
-> +    - Attached SPI directly to the PHY with the firmware. The PHY will
-> +      self load the firmware in the presence of this configuration.
-> +    - Dedicated partition on system NAND with firmware in it. NVMEM
-> +      subsystem will be used and the declared NVMEM cell will load
-> +      the firmware to the PHY using the PHY mailbox interface.
-> +    - Manually provided firmware loaded from a file in the filesystem.
-> +
-> +  If declared, NVMEM will always take priority over filesystem provided
-> +  firmware.
-> +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - ethernet-phy-id03a1.b445
-> +          - ethernet-phy-id03a1.b460
-> +          - ethernet-phy-id03a1.b4a2
-> +          - ethernet-phy-id03a1.b4d0
-> +          - ethernet-phy-id03a1.b4e0
-> +          - ethernet-phy-id03a1.b5c2
-> +          - ethernet-phy-id03a1.b4b0
-> +          - ethernet-phy-id03a1.b662
-> +          - ethernet-phy-id03a1.b712
-> +          - ethernet-phy-id31c3.1c12
-> +  required:
-> +    - compatible
-> +
-> +properties:
-> +  reg:
-> +    maxItems: 1
-> +
-> +  firmware-name:
-> +    description: specify the name of PHY firmware to load
-> +
-> +  nvmem-cells:
-> +    description: phandle to the firmware nvmem cell
-> +    maxItems: 1
-> +
-> +  nvmem-cell-names:
-> +    const: firmware
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    mdio {
-> +        #address-cells =3D <1>;
-> +        #size-cells =3D <0>;
-> +
-> +        ethernet-phy@0 {
-> +            /*  Only needed to make DT lint tools work. Do not copy/paste
-> +             *  into real DTS files.
-> +             */
-> +            compatible =3D "ethernet-phy-id31c3.1c12",
-> +                         "ethernet-phy-ieee802.3-c45";
-> +
-> +            reg =3D <0>;
-> +            firmware-name =3D "AQR-G4_v5.4.C-AQR_CIG_WF-1945_0x8_ID44776=
-_VER1630.cld";
-> +        };
-> +
-> +        ethernet-phy@1 {
-> +            /*  Only needed to make DT lint tools work. Do not copy/paste
-> +             *  into real DTS files.
-> +             */
-> +            compatible =3D "ethernet-phy-id31c3.1c12",
-> +                         "ethernet-phy-ieee802.3-c45";
-> +
-> +            reg =3D <0>;
-> +            nvmem-cells =3D <&aqr_fw>;
-> +            nvmem-cell-names =3D "firmware";
-> +        };
-> +    };
-> +
-> +    flash {
-> +        compatible =3D "jedec,spi-nor";
-> +        #address-cells =3D <1>;
-> +        #size-cells =3D <1>;
-> +
-> +        partitions {
-> +            compatible =3D "fixed-partitions";
-> +            #address-cells =3D <1>;
-> +            #size-cells =3D <1>;
-> +
-> +            /* ... */
-> +
-> +            partition@650000 {
-> +                compatible =3D "nvmem-cells";
-> +                label =3D "0:ethphyfw";
-> +                reg =3D <0x650000 0x80000>;
-> +                read-only;
-> +                #address-cells =3D <1>;
-> +                #size-cells =3D <1>;
-> +
-> +                aqr_fw: aqr_fw@0 {
-> +                    reg =3D <0x0 0x5f42a>;
-> +                };
-> +            };
-> +
-> +            /* ... */
-> +
-> +        };
-> +    };
-> --=20
-> 2.40.1
->=20
-
---+7u5ZFTmWOdAn48p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZUTyeQAKCRB4tDGHoIJi
-0gsKAP9d60hhn+nxIiDAkI0uSgvpGki4jTVDOSGmlKyqVCLa2gD9HRrea+1xVvT6
-R/DZL98It5zqyAZts8tmhjcTtlYFTg8=
-=b+LX
------END PGP SIGNATURE-----
-
---+7u5ZFTmWOdAn48p--
+Yuran
 
