@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-46049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 698817E101A
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 16:33:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A10C7E101C
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 16:36:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5DD7B210DD
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 15:33:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD2872819F9
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 15:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BE11C6A3;
-	Sat,  4 Nov 2023 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F291C1CAAB;
+	Sat,  4 Nov 2023 15:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SGUWWvSC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOIwzmZM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A99188BE1
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 15:33:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBCF9C433C7;
-	Sat,  4 Nov 2023 15:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D612A882F
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 15:36:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEE9C433C8;
+	Sat,  4 Nov 2023 15:36:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699112026;
-	bh=CneH2QCNOFwdP3vrdBROQilhh3jKjpF9b3jeDVy9MwM=;
+	s=k20201202; t=1699112197;
+	bh=vafSQTQ5kXKyz/SHRy5gVLc2MmSNeUAQAiolRcAYYaI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SGUWWvSCp6S+YsbOpxdxMXZS7IG5+uckjzR6vI86t8b1AimcNoEhQ1wPFN577zfZW
-	 9ht3nhJFpqZlqORI5uTTqfSahmBazKbq1VEO5B8ERzj2D/kfZv2wJapWPXPLtWitIm
-	 CX3E5XXgGuBFUcjYelg6j7Qy+PGd4OnsE4QEzECVq13S6dw5NDC2/dAnBqmIGz73f1
-	 kYwz7N4rAXTIxn2LoP1H25I1UasXFMVIeLi7LEO/dino0YkJpifEUr4kj96r5zUEa0
-	 zZQv6rM/AGG01x3M4m7llmeLkLN4dno1sW26ESLibYUtCP9l+W1Fgnf4GVDmsiFv+5
-	 Rx/TsI2zzkZdg==
-Date: Sat, 4 Nov 2023 11:33:31 -0400
+	b=hOIwzmZMSGkTaLl4Ih31a2Q3XsXTeyKtQqcxLwKL4lNDs+oRYQRkuwYp0Nc9MYrOq
+	 gi2iiKNn3yhlrZN+IMKdk2V3OtTWXIa0iwN81TNNlAu2+tsVZ60sORX0EbyUjtn+3P
+	 COycA5cNkMAKB3scLRBbiZZ7mdT4FrxRxmeN+N75rK/SykBE6DVBKurNNh0dOHPo28
+	 jFQ9SqE2qs2VZMTFU6KZkmiUmZuRtsTm5NUkVBxuHEBt1kkuiX90P9yl0VbRv/Ys5Z
+	 SM75E2yxn7JMDQu9vsCPLXqTvi1DhvA5zfqVy1ORwulBzjJTPQz/fZ7vlVddt54SOB
+	 I9++h5DTc5hCw==
+Date: Sat, 4 Nov 2023 11:36:17 -0400
 From: Simon Horman <horms@kernel.org>
-To: Pawel Chmielewski <pawel.chmielewski@intel.com>
+To: Karol Kolacinski <karol.kolacinski@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	pmenzel@molgen.mpg.de, lukasz.czapnik@intel.com,
-	Liang-Min Wang <liang-min.wang@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [PATCH iwl-next v2] ice: Reset VF on Tx MDD event
-Message-ID: <20231104153331.GJ891380@kernel.org>
-References: <20231102155149.2574209-1-pawel.chmielewski@intel.com>
+	anthony.l.nguyen@intel.com, jesse.brandeburg@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrii Staikov <andrii.staikov@intel.com>
+Subject: Re: [PATCH iwl-next] ice: periodically kick Tx timestamp interrupt
+Message-ID: <20231104153617.GK891380@kernel.org>
+References: <20231103162943.485467-1-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,23 +50,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231102155149.2574209-1-pawel.chmielewski@intel.com>
+In-Reply-To: <20231103162943.485467-1-karol.kolacinski@intel.com>
 
-On Thu, Nov 02, 2023 at 04:51:49PM +0100, Pawel Chmielewski wrote:
-> From: Liang-Min Wang <liang-min.wang@intel.com>
+On Fri, Nov 03, 2023 at 05:29:43PM +0100, Karol Kolacinski wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
 > 
-> In cases when VF sends malformed packets that are classified as malicious,
-> sometimes it causes Tx queue to freeze. This frozen queue can be stuck
-> for several minutes being unusable. This behavior can be reproduced with
-> DPDK application, testpmd.
+> The E822 hardware for Tx timestamping keeps track of how many
+> outstanding timestamps are still in the PHY memory block. It will not
+> generate a new interrupt to the MAC until all of the timestamps in the
+> region have been read.
 > 
-> When Malicious Driver Detection event occurs, perform graceful VF reset
-> to quickly bring VF back to operational state. Add a log message to
-> notify about the cause of the reset.
+> If somehow all the available data is not read, but the driver has exited
+> its interrupt routine already, the PHY will not generate a new interrupt
+> even if new timestamp data is captured. Because no interrupt is
+> generated, the driver never processes the timestamp data. This state
+> results in a permanent failure for all future Tx timestamps.
 > 
-> Signed-off-by: Liang-Min Wang <liang-min.wang@intel.com>
-> Signed-off-by: Pawel Chmielewski <pawel.chmielewski@intel.com>
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> It is not clear how the driver and hardware could enter this state.
+> However, if it does, there is currently no recovery mechanism.
+> 
+> Add a recovery mechanism via the periodic PTP work thread which invokes
+> ice_ptp_periodic_work(). Introduce a new check,
+> ice_ptp_maybe_trigger_tx_interrupt() which checks the PHY timestamp
+> ready bitmask. If any bits are set, trigger a software interrupt by
+> writing to PFINT_OICR.
+> 
+> Once triggered, the main timestamp processing thread will read through
+> the PHY data and clear the outstanding timestamp data. Once cleared, new
+> data should trigger interrupts as expected.
+> 
+> This should allow recovery from such a state rather than leaving the
+> device in a state where we cannot process Tx timestamps.
+> 
+> It is possible that this function checks for timestamp data
+> simultaneously with the interrupt, and it might trigger additional
+> unnecessary interrupts. This will cause a small amount of additional
+> processing.
+> 
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
