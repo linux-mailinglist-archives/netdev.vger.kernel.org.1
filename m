@@ -1,196 +1,119 @@
-Return-Path: <netdev+bounces-46069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6C17E1104
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 21:58:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2D07E110C
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 22:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B04DB281429
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 20:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E151C208BA
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 21:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E64D24A04;
-	Sat,  4 Nov 2023 20:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D271250EF;
+	Sat,  4 Nov 2023 21:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dtYXgzXh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J0eVTXul"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C502420E
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 20:57:54 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D37DD57;
-	Sat,  4 Nov 2023 13:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699131473; x=1730667473;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xD3w1bNL+ur9+6VloZbIWGyoZwPVfu1r5oIWJE+fszs=;
-  b=dtYXgzXhcdAefqbJxyIqINK8OWAwtVztssehzC9Zls5ddH1zJ26j+aAn
-   sEXTnvb607SFILfvqUzyhHv8jlDL3em+/32gNy9IV21pReNczz2XF+Au5
-   FnShhTpiw+bidc0VnO3ZZnZSUPduo+6xyj42mR0IoewrS+QLq0ivnvbCu
-   csB9Z8GzJsEVE5kZ5qvLxfNfiOsXRlOvO+jJWpJxZj74D9kOCgwpT4QUq
-   FYbYEoNyvi4xaU4PAxMKkGEfkFtp9AQu5fGkwGV1uzUEXAAMLDLhQVDEQ
-   /A+y11rTYo+glutiX93532jpwJhxTSJqt6PIXCh9i9ShJu++KuIFWJ8ys
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10884"; a="386285112"
-X-IronPort-AV: E=Sophos;i="6.03,278,1694761200"; 
-   d="scan'208";a="386285112"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2023 13:57:53 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10884"; a="905677787"
-X-IronPort-AV: E=Sophos;i="6.03,278,1694761200"; 
-   d="scan'208";a="905677787"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 04 Nov 2023 13:57:50 -0700
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qzNiG-0004gS-1P;
-	Sat, 04 Nov 2023 20:57:48 +0000
-Date: Sun, 5 Nov 2023 04:56:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, linux-nfs@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, lorenzo.bianconi@redhat.com,
-	neilb@suse.de, chuck.lever@oracle.com, netdev@vger.kernel.org,
-	jlayton@kernel.org, kuba@kernel.org
-Subject: Re: [PATCH v4 3/3] NFSD: convert write_ports to netlink command
-Message-ID: <202311050409.dPLvgiwN-lkp@intel.com>
-References: <153b94db12b5c8fff270706673afffad5d84938c.1699095665.git.lorenzo@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39C424A15
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 21:01:02 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFE2FC4
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 14:00:58 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7bbe0a453so39205047b3.0
+        for <netdev@vger.kernel.org>; Sat, 04 Nov 2023 14:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699131658; x=1699736458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7DmhC1X9OAQjJSlRCqONzFt0aXmHxKRvFg2VPovcxo4=;
+        b=J0eVTXulSu4Xa0vAzbhW7/KriqeZBP75Vo2ypGXMPQUBihQZ+F2mUI3OCFBOQscfjC
+         G9HFrbthec8965RvaQ22q5Ovgupa599DDr47Nh9y+5BMCxGMUWMIN+l1Hw/Jt5nCuX4F
+         Zca7eA5lu0/8nPPQBoldV163WpYjwxujFEMqqyuPYbJPpZmFVhGCJ5Vf9aZo3WdcuV9k
+         0HHdCgfBBItibESVF8h4RXO7+QSYrIbzRO1Y7rg3AgImQCN7YlX67G/HEnRzButAoma4
+         ZA1JTx1zbavDP5x6JWKousol/deq+HJb+yK55qgvE2BgTtrhMi/yfCnLdBYxpLcqJJ9T
+         yaCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699131658; x=1699736458;
+        h=content-transfer-encoding:cc:to:from:subject:mime-version
+         :message-id:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7DmhC1X9OAQjJSlRCqONzFt0aXmHxKRvFg2VPovcxo4=;
+        b=pNhbsqs9zmBAv8/EEmN6PVlXU7zFi1sSjpZ5BgSRW1cC5i8HTVo0dqTkYntbeYnWjW
+         gPnQbcfMeo1Kqjlvh38Wu1zfzTTRNWZTfloI2sJRBMftMIQ5qwj96AUN+a24AoErkQ9b
+         Jm7vLJFmj4ozjp4mXUY2OxqFsp4J3MlWAyf4tH51QNtHaLrwAVE1hKqGkterES0sU/52
+         ZD8NVKSXHIcjgTWOLgLGXsjO65hdGqYuNsIxmLyZQCDNinJLaMB2Wc78ZPeNsmkysm+X
+         q4DHXoAkWR6huTHj6aeVpFhKu2ak2YjkZ8Oll7bqbrGrvNz8WJYncpLY00caNf+ygn8G
+         1JUg==
+X-Gm-Message-State: AOJu0YwodEn7jUVuT72e6YrY2jAQ4HIijGi+sSSWL8LcO8t+ijqMxtTi
+	gvmBZeppgFIaEKyM7zVWzq1xAoCN
+X-Google-Smtp-Source: AGHT+IGIDtqtmA/oVN0QNcBMr7oWGUtMmz2Vav0nvFAmRnKyjHoSrAdF6TfPHq/oNfosQzv6u6SZ/Jym
+X-Received: from athina.mtv.corp.google.com ([2620:15c:211:200:f00a:d6b3:feb2:6f0c])
+ (user=maze job=sendgmr) by 2002:a0d:dbcc:0:b0:5a1:d4a5:7dff with SMTP id
+ d195-20020a0ddbcc000000b005a1d4a57dffmr128329ywe.6.1699131657967; Sat, 04 Nov
+ 2023 14:00:57 -0700 (PDT)
+Date: Sat,  4 Nov 2023 14:00:53 -0700
+Message-Id: <20231104210053.343149-1-maze@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <153b94db12b5c8fff270706673afffad5d84938c.1699095665.git.lorenzo@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Subject: [PATCH net] net: xt_recent: fix (increase) ipv6 literal buffer length
+From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
+To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Florian Westphal <fw@strlen.de>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, 
+	Netfilter Development Mailing List <netfilter-devel@vger.kernel.org>, Jan Engelhardt <jengelh@medozas.de>, 
+	Patrick McHardy <kaber@trash.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Lorenzo,
+From: Maciej =C5=BBenczykowski <zenczykowski@gmail.com>
 
-kernel test robot noticed the following build warnings:
+IPv4 in IPv6 is supported by in6_pton
+(this is useful with DNS64/NAT64 networks for example):
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on next-20231103]
-[cannot apply to trondmy-nfs/linux-next v6.6]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+  # echo +aaaa:bbbb:cccc:dddd:eeee:ffff:1.2.3.4 > /proc/self/net/xt_recent/=
+DEFAULT
+  # cat /proc/self/net/xt_recent/DEFAULT
+  src=3Daaaa:bbbb:cccc:dddd:eeee:ffff:0102:0304 ttl: 0 last_seen: 973384882=
+9 oldest_pkt: 1 9733848829
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Lorenzo-Bianconi/NFSD-convert-write_threads-to-netlink-command/20231104-202515
-base:   linus/master
-patch link:    https://lore.kernel.org/r/153b94db12b5c8fff270706673afffad5d84938c.1699095665.git.lorenzo%40kernel.org
-patch subject: [PATCH v4 3/3] NFSD: convert write_ports to netlink command
-config: alpha-defconfig (https://download.01.org/0day-ci/archive/20231105/202311050409.dPLvgiwN-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231105/202311050409.dPLvgiwN-lkp@intel.com/reproduce)
+but the provided buffer is too short:
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311050409.dPLvgiwN-lkp@intel.com/
+  # echo +aaaa:bbbb:cccc:dddd:eeee:ffff:255.255.255.255 > /proc/self/net/xt=
+_recent/DEFAULT
+  -bash: echo: write error: Invalid argument
 
-All warnings (new ones prefixed by >>):
+Cc: Jan Engelhardt <jengelh@medozas.de>
+Cc: Patrick McHardy <kaber@trash.net>
+Fixes: 079aa88fe717 ("netfilter: xt_recent: IPv6 support")
+Signed-off-by: Maciej =C5=BBenczykowski <zenczykowski@gmail.com>
+---
+ net/netfilter/xt_recent.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-   fs/nfsd/nfsctl.c: In function 'nfsd_nl_listener_start_doit':
->> fs/nfsd/nfsctl.c:1877:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
-    1877 |         int ret;
-         |             ^~~
---
-   fs/nfsd/nfsctl.c:1819: warning: expecting prototype for nfsd_nl_version_get_doit(). Prototype was for nfsd_nl_version_get_dumpit() instead
->> fs/nfsd/nfsctl.c:1901: warning: expecting prototype for nfsd_nl_version_get_dumpit(). Prototype was for nfsd_nl_listener_get_dumpit() instead
+diff --git a/net/netfilter/xt_recent.c b/net/netfilter/xt_recent.c
+index 7ddb9a78e3fc..ef93e0d3bee0 100644
+--- a/net/netfilter/xt_recent.c
++++ b/net/netfilter/xt_recent.c
+@@ -561,7 +561,7 @@ recent_mt_proc_write(struct file *file, const char __us=
+er *input,
+ {
+ 	struct recent_table *t =3D pde_data(file_inode(file));
+ 	struct recent_entry *e;
+-	char buf[sizeof("+b335:1d35:1e55:dead:c0de:1715:5afe:c0de")];
++	char buf[sizeof("+b335:1d35:1e55:dead:c0de:1715:255.255.255.255")];
+ 	const char *c =3D buf;
+ 	union nf_inet_addr addr =3D {};
+ 	u_int16_t family;
+--=20
+2.42.0.869.gea05f2083d-goog
 
-
-vim +/ret +1877 fs/nfsd/nfsctl.c
-
-  1867	
-  1868	/**
-  1869	 * nfsd_nl_listener_start_doit - start the provided nfs server listener
-  1870	 * @skb: reply buffer
-  1871	 * @info: netlink metadata and command arguments
-  1872	 *
-  1873	 * Return 0 on success or a negative errno.
-  1874	 */
-  1875	int nfsd_nl_listener_start_doit(struct sk_buff *skb, struct genl_info *info)
-  1876	{
-> 1877		int ret;
-  1878	
-  1879		if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_LISTENER_TRANSPORT_NAME) ||
-  1880		    GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_LISTENER_PORT))
-  1881			return -EINVAL;
-  1882	
-  1883		mutex_lock(&nfsd_mutex);
-  1884		ret = ___write_ports_addxprt(genl_info_net(info), get_current_cred(),
-  1885				nla_data(info->attrs[NFSD_A_SERVER_LISTENER_TRANSPORT_NAME]),
-  1886				nla_get_u32(info->attrs[NFSD_A_SERVER_LISTENER_PORT]));
-  1887		mutex_unlock(&nfsd_mutex);
-  1888	
-  1889		return 0;
-  1890	}
-  1891	
-  1892	/**
-  1893	 * nfsd_nl_version_get_dumpit - Handle listener_get dumpit
-  1894	 * @skb: reply buffer
-  1895	 * @cb: netlink metadata and command arguments
-  1896	 *
-  1897	 * Returns the size of the reply or a negative errno.
-  1898	 */
-  1899	int nfsd_nl_listener_get_dumpit(struct sk_buff *skb,
-  1900					struct netlink_callback *cb)
-> 1901	{
-  1902		struct nfsd_net *nn = net_generic(sock_net(skb->sk), nfsd_net_id);
-  1903		int i = 0, ret = -ENOMEM;
-  1904		struct svc_xprt *xprt;
-  1905		struct svc_serv *serv;
-  1906	
-  1907		mutex_lock(&nfsd_mutex);
-  1908	
-  1909		serv = nn->nfsd_serv;
-  1910		if (!serv) {
-  1911			mutex_unlock(&nfsd_mutex);
-  1912			return 0;
-  1913		}
-  1914	
-  1915		spin_lock_bh(&serv->sv_lock);
-  1916		list_for_each_entry(xprt, &serv->sv_permsocks, xpt_list) {
-  1917			void *hdr;
-  1918	
-  1919			if (i < cb->args[0]) /* already consumed */
-  1920				continue;
-  1921	
-  1922			hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
-  1923					  cb->nlh->nlmsg_seq, &nfsd_nl_family,
-  1924					  0, NFSD_CMD_LISTENER_GET);
-  1925			if (!hdr)
-  1926				goto out;
-  1927	
-  1928			if (nla_put_string(skb, NFSD_A_SERVER_LISTENER_TRANSPORT_NAME,
-  1929					   xprt->xpt_class->xcl_name))
-  1930				goto out;
-  1931	
-  1932			if (nla_put_u32(skb, NFSD_A_SERVER_LISTENER_PORT,
-  1933					svc_xprt_local_port(xprt)))
-  1934				goto out;
-  1935	
-  1936			genlmsg_end(skb, hdr);
-  1937			i++;
-  1938		}
-  1939		cb->args[0] = i;
-  1940		ret = skb->len;
-  1941	out:
-  1942		spin_unlock_bh(&serv->sv_lock);
-  1943	
-  1944		mutex_unlock(&nfsd_mutex);
-  1945	
-  1946		return ret;
-  1947	}
-  1948	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
