@@ -1,158 +1,177 @@
-Return-Path: <netdev+bounces-46017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21337E0E11
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 07:25:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937187E0E2D
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 08:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6375281F7F
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 06:25:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC1561C209DD
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 07:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADA1882E;
-	Sat,  4 Nov 2023 06:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE438F4D;
+	Sat,  4 Nov 2023 07:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SHycbO/q"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="LXveU469"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01629848E
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 06:25:51 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14DD4D4E;
-	Fri,  3 Nov 2023 23:25:49 -0700 (PDT)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A46Mj2s003718;
-	Sat, 4 Nov 2023 06:25:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=FF+AubAxdBtQyqoK1rXHKIxkMnLgY9CQlvcYzJVd4tI=;
- b=SHycbO/qK4paUUQn4nC+afmkMkO/OyRo+SpdGRCZccsYrrgAso/Xuy/FtXfF6EV4fCtr
- 4uXCMO2ZE9KKyklkmCESMpzRLkbew/I559xMfcNIf2Eb+JcCRz1HFWTg+0vvB0p3XvHM
- A7HMzTJuMWKZ5I4EXWFmkaTlvBlpZexvptML5eCpTJwXqFZgkpAXc07JLQ1QBz4Ug2qh
- IQgj1b9MD1aEj55aoqH1VCuVkv31HYhnAv9u2uKA+BclJZOhnh7c3Iklx0hqPEPjsfCu
- wFOt2Obnv5iPHJGQGdiwJ1aYtU7qJ4tPsyhw+GoQLX6IuRAKdPTErmokhZ2Ieb9qK4h+ cw== 
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u5eekg6rd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 04 Nov 2023 06:25:30 +0000
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A46PUGP002481
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 4 Nov 2023 06:25:30 GMT
-Received: from [10.253.39.47] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 3 Nov
- 2023 23:25:27 -0700
-Message-ID: <7f0df23b-f00e-fef8-fa03-314fcfe136eb@quicinc.com>
-Date: Sat, 4 Nov 2023 14:25:25 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13BA847E
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 07:07:33 +0000 (UTC)
+X-Greylist: delayed 13311 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 04 Nov 2023 00:07:30 PDT
+Received: from out162-62-57-64.mail.qq.com (out162-62-57-64.mail.qq.com [162.62.57.64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DDE1BC;
+	Sat,  4 Nov 2023 00:07:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1699081646; bh=Bqd95PbuGQElN4Of7bJRLKQNmHTzaiUlOszYrhbj318=;
+	h=From:To:Cc:Subject:Date;
+	b=LXveU469VZO5nj3lD1iqOBNeMhKQKLmsipm1iQZMEHSfvRYAGt+bFH6xyvIZGg+L9
+	 5HM67XjtlNkEk3lZNdPLOLMuqD3euceOcQ2VVkLWuhWO5NEkVH1YFqiI27668tEtIT
+	 GFLyQAPSCtbwAtvZZx3e7cz7/QfSPxOb0bonuLIk=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrszc2-1.qq.com (NewEsmtp) with SMTP
+	id 1D831A41; Sat, 04 Nov 2023 15:07:24 +0800
+X-QQ-mid: xmsmtpt1699081644tmoguzs89
+Message-ID: <tencent_33056C0C97FCEA56EF7ECD4C7B266DCC2D0A@qq.com>
+X-QQ-XMAILINFO: NKvGkmu+zWvN61OR1ANItrOJhlFpdarAYqB85MhAunGx+RKe4eltiBw0XB0BmU
+	 WhqRViPDufwSgThNJe52JZlTRoajReQv1zl2xhEUCCQWzj0jajLA+J/HekkIvfipBa8NP1pbqHS5
+	 iztU8Qo7uodWRMzyZq5hrLovjrWsg8ISH/XlfxUY0O1Vajph6a3f6kwveJKeevHoWy+cIs5Q5Ka/
+	 4733jhhyx/8n50kd2Mit/aHMc4x80vKT/1nvudjXho4JB/GBL45UWLYpYytqCdoifkS7I4JHMZY4
+	 dgdL2xERqe/9um+VNhTFJqugEYF0rm70EHR8cAOB+YDN9RFXZ6bkGk05JtbMlIUnM4m+GHqL+yXj
+	 vQSpWNUL2J+BJgh8jTzw614G7gQkGzi45HU2lApkW89sjy+nOH3TGiWfmZamDHkMC9Eerm2MoY+7
+	 vcwVFcnscaj3ey32He6HuMgdhzmSnXoK6BFqBsYGOn2dSU/BlLjCOHoRyFD147UEdn9lcc4PYru2
+	 RlJoA8WuA0dhh4OsMDTZEpNM06g1MA/wKTOBFI1c2en3HkuQ1YYB7aDmN/J41NZYL5eQF/N5i4/7
+	 eVyOnyakjNvU5KMsTlbuESj4gHQFTJnhAgryO9/V3EsePd13WWP1BrPYheZ/iC6PQ1kkLpr01DDw
+	 KfzFFBTUngUf+08zHlGckTY5ZePp/P3WC1LTmpbEAV75W1DlYk+QhEMugNgtBLV7VBr18bYym6Dn
+	 b6MpEp3/EWaWEPoY2wccNVXHz8KdYnNZgdyqBjvzV2BjlV7a4Artl5omuKnkSSB6CCTW2hdkSHCU
+	 kmkh6lNQpxcKXNFlVjtU/fEpLVFbiSbcO4dk/RWF+/+GfiotvoaoDcsyWnKU2AKZjuLO0uHpPplm
+	 Y5G4X2fYSAvGBREGR6p42zv3L8FOQZHilQ/huCmh4x2kLKz/LP/xR082xtq5eEow==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: richardcochran@gmail.com
+Cc: davem@davemloft.net,
+	habetsm.xilinx@gmail.com,
+	jeremy@jcline.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	reibax@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Subject: [PATCH net-next V5] ptp: fix corrupted list in ptp_open
+Date: Sat,  4 Nov 2023 15:07:24 +0800
+X-OQ-MSGID: <20231104070723.1637923-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] net: phy: at803x: add QCA8084 ethernet phy support
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20231103123538.15735-1-quic_luoj@quicinc.com>
- <806fb6b6-d9b6-457b-b079-48f8b958cc5a@lunn.ch>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <806fb6b6-d9b6-457b-b079-48f8b958cc5a@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: b80QBcTX3QKOAy7HFz7Xuppm_qjj_JcN
-X-Proofpoint-GUID: b80QBcTX3QKOAy7HFz7Xuppm_qjj_JcN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-04_04,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- lowpriorityscore=0 clxscore=1015 priorityscore=1501 malwarescore=0
- adultscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=815
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2310240000 definitions=main-2311040052
+Content-Transfer-Encoding: 8bit
 
+There is no lock protection when writing ptp->tsevqs in ptp_open(),
+ptp_release(), which can cause data corruption, use mutex lock to avoid this
+issue.
 
+Moreover, ptp_release() should not be used to release the queue in ptp_read(),
+and it should be deleted together.
 
-On 11/3/2023 9:01 PM, Andrew Lunn wrote:
->>   #define QCA8081_PHY_ID				0x004dd101
->> +#define QCA8081_PHY_MASK			0xffffff00
-> 
-> That is an unusual mask. Please check it is correct. All you should
-> need its PHY_ID_MATCH_EXACT, PHY_ID_MATCH_MODEL, PHY_ID_MATCH_VENDOR.
+Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/ptp/ptp_chardev.c | 14 +++++++++-----
+ drivers/ptp/ptp_clock.c   |  3 +++
+ drivers/ptp/ptp_private.h |  1 +
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
-Thanks Andrew for the review.
-The PHY ID of qca8084 is correct, i will update to use 
-PHY_ID_MATCH_EXACT in the new added entry for qca8084.
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 282cd7d24077..0f4628138af6 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -119,8 +119,13 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 	}
+ 	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
++	if (mutex_lock_interruptible(&ptp->tsevq_mux)) {
++		kfree(queue);
++		return -ERESTARTSYS;
++	}
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
+ 	pccontext->private_clkdata = queue;
++	mutex_unlock(&ptp->tsevq_mux);
+ 
+ 	/* Debugfs contents */
+ 	sprintf(debugfsname, "0x%p", queue);
+@@ -138,14 +143,15 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ int ptp_release(struct posix_clock_context *pccontext)
+ {
+ 	struct timestamp_event_queue *queue = pccontext->private_clkdata;
+-	unsigned long flags;
++	struct ptp_clock *ptp =
++		container_of(pccontext->clk, struct ptp_clock, clock);
+ 
+ 	if (queue) {
++		mutex_lock(&ptp->tsevq_mux);
+ 		debugfs_remove(queue->debugfs_instance);
+ 		pccontext->private_clkdata = NULL;
+-		spin_lock_irqsave(&queue->lock, flags);
+ 		list_del(&queue->qlist);
+-		spin_unlock_irqrestore(&queue->lock, flags);
++		mutex_unlock(&ptp->tsevq_mux);
+ 		bitmap_free(queue->mask);
+ 		kfree(queue);
+ 	}
+@@ -585,7 +591,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+ free_event:
+ 	kfree(event);
+ exit:
+-	if (result < 0)
+-		ptp_release(pccontext);
+ 	return result;
+ }
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3d1b0a97301c..7930db6ec18d 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -176,6 +176,7 @@ static void ptp_clock_release(struct device *dev)
+ 
+ 	ptp_cleanup_pin_groups(ptp);
+ 	kfree(ptp->vclock_index);
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	/* Delete first entry */
+@@ -247,6 +248,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (!queue)
+ 		goto no_memory_queue;
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	mutex_init(&ptp->tsevq_mux);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+ 	if (!queue->mask)
+ 		goto no_memory_bitmap;
+@@ -356,6 +358,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (ptp->kworker)
+ 		kthread_destroy_worker(ptp->kworker);
+ kworker_err:
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	bitmap_free(queue->mask);
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 52f87e394aa6..7d82960fd946 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -44,6 +44,7 @@ struct ptp_clock {
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+ 	struct list_head tsevqs; /* timestamp fifo list */
++	struct mutex tsevq_mux; /* one process at a time writing the timestamp fifo list */
+ 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
+ 	wait_queue_head_t tsev_wq;
+ 	int defunct; /* tells readers to go away when clock is being removed */
+-- 
+2.25.1
 
-> 
->> @@ -1767,6 +1781,20 @@ static int qca808x_config_init(struct phy_device *phydev)
->>   {
->>   	int ret;
->>   
->> +	if (phydev->phy_id == QCA8084_PHY_ID) {
->> +		/* Invert ADC clock edge */
->> +		ret = at803x_debug_reg_mask(phydev, QCA8084_ADC_CLK_SEL,
->> +					    QCA8084_ADC_CLK_SEL_ACLK,
->> +					    FIELD_PREP(QCA8084_ADC_CLK_SEL_ACLK,
->> +						       QCA8084_ADC_CLK_SEL_ACLK_FALL));
->> +		if (ret < 0)
->> +			return ret;
->> +
->> +		/* Adjust MSE threshold value to avoid link issue with some link partner */
->> +		return phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
->> +				QCA8084_MSE_THRESHOLD, QCA8084_MSE_THRESHOLD_2P5G_VAL);
->> +	}
->> +
-> 
-> Please add a qca8084_config_init() and use that from the phy_driver
-> structure.
-
-OK.
-
-> 
->>   	/* Active adc&vga on 802.3az for the link 1000M and 100M */
->>   	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, QCA808X_PHY_MMD3_ADDR_CLD_CTRL7,
->>   			QCA808X_8023AZ_AFE_CTRL_MASK, QCA808X_8023AZ_AFE_EN);
->> @@ -1958,6 +1986,11 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
->>   	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807a, 0xc060);
->>   	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807e, 0xb060);
->>   
->> +	if (phydev->phy_id == QCA8084_PHY_ID) {
->> +		phy_write_mmd(phydev, MDIO_MMD_PCS, 0x8075, 0xa060);
->> +		phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807f, 0x1eb0);
->> +	}
->> +
-> 
-> Please add a comment what this is doing.
-
-Ok, will add comments in the next patch.
-
-> 
->>   }, {
->>   	/* Qualcomm QCA8081 */
->> -	PHY_ID_MATCH_EXACT(QCA8081_PHY_ID),
->> -	.name			= "Qualcomm QCA8081",
->> +	.phy_id			= QCA8081_PHY_ID,
->> +	.phy_id_mask		= QCA8081_PHY_MASK,
->> +	.name			= "Qualcomm QCA808X",
-> 
-> Please add a new entry for the 8084.
-> 
->         Andrew
-
-Will add it in the next patch, thanks.
 
