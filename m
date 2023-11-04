@@ -1,313 +1,162 @@
-Return-Path: <netdev+bounces-46064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF7F7E10A5
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 19:55:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF85C7E10BD
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 20:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 023B0B20E42
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 18:55:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7612815A3
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 19:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B156920B1A;
-	Sat,  4 Nov 2023 18:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7B522F14;
+	Sat,  4 Nov 2023 19:35:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="EbkEtAUc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PEvrlBBR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZqJsEIfh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704E01F613;
-	Sat,  4 Nov 2023 18:55:18 +0000 (UTC)
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68CB184;
-	Sat,  4 Nov 2023 11:55:15 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.west.internal (Postfix) with ESMTP id 054CC320099B;
-	Sat,  4 Nov 2023 14:55:11 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Sat, 04 Nov 2023 14:55:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm2; t=
-	1699124111; x=1699210511; bh=jQMa5C9h8+tKW0OeCht46Y9yGFvxlDgodWw
-	XBkYxEyU=; b=EbkEtAUc0TbMCK1imVKb/RJBQ78mDYJGXAEVcLFrggg8F1XO4HG
-	2glYOFElsxkOKJ1YpwuLj31xSqoLZPKZd1xOeeF58s6ZdOmJ61Vc6PyVz0mqakFS
-	kcgOf5FeccaBlgsmrDKSdC3aXzyH/NWNaAeQrVoPOD3kuR8W7d5dYXADG3gGTb7r
-	mmn2XWdhvg0cI3gb1kAfJX3aW3WQZnBdrl1x//HPW+KQFYshVW6SfJAP038p1usN
-	x0nXSGVdARVz46AGGdYTZxznFhmPz1AX3gtouzktHpTjaB8L4sGHGuS05TiXnuSk
-	mz705B3wZmZIOmNmJoqU9uQUzjs9FJMeHnA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1699124111; x=1699210511; bh=jQMa5C9h8+tKW0OeCht46Y9yGFvxlDgodWw
-	XBkYxEyU=; b=PEvrlBBRk8zMQSk6SvNqatmuT7Fsnl2ZxV6wswm6lo1l+BuSMDi
-	I6cKCVUZaXRplgHtTkEl4sUs29OY7S3TEUmMVPsOsAuHdxLNfAuQPj/r6z4SQtzg
-	gyacOPlAOXKmYC4vfOBdi/NJP9E3FZG1GsLtHJFjC32770wV2J0X3yif66y98cPr
-	tRFhoLJ1CptBVxaLaqO+sMoRXwJ0cVjbiRekWuhB/s1U//u7qtzleeOUAwVSGxbL
-	/NEbFGyDJrNEdNLmpSh93x326vT0s5/2ICHMPBMvweqDqHaWctVDVn+9b+VjUTAy
-	cadOLrJS0S0bwpJYFOJ9i4IXrW8/srFNm+w==
-X-ME-Sender: <xms:jZNGZWAG7h8J7Rq-ojKOkbapJPXXIxmuFTYMXdCNuke0b_TIwJyPYw>
-    <xme:jZNGZQgTidpU2GZIfth-PYVUuv22eRserBlU0J-TabsjRPgnSFehgbhSJV4vD9__r
-    3k9XtgMvBI7d6cmZQ>
-X-ME-Received: <xmr:jZNGZZmiNqa6rfV7sN2QGCioIHlpwKkWc8ObENzV5xpqLxUGqXKTqHMwzFzXO2vaoPoN1b18nIUy6j25BxJHy46cuxMtiVP9Eg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedruddutddguddujecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enfghrlhcuvffnffculddvfedmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefs
-    tddttdejnecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihii
-    eqnecuggftrfgrthhtvghrnhepueeludeiteejueehudehhfekfeefgeelveduuefgteel
-    veetvddvkeeiveefffdunecuffhomhgrihhnpehsthhrohhnghhsfigrnhdrohhrghdpih
-    gvthhfrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepugiguhesugiguhhuuhdrgiihii
-X-ME-Proxy: <xmx:jZNGZUwdSLMl5QUgxgk9g9WAou8pRwMx82v-zYbmHtE1kYnJnJZxTg>
-    <xmx:jZNGZbSFWkYLCBSst0_9WcZo-hpfmhOm6NdqOX_dz02WWVoYiR3JTA>
-    <xmx:jZNGZfZBgSMkAu3amprEwYsfFuKsdnyoDyE-8ddaYG56UqRAX0fkzQ>
-    <xmx:j5NGZXoeW3d0scAavEDLeqLdDOwMvJfEKGlrpr3bITK6A4B_8WQmPQ>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 4 Nov 2023 14:55:08 -0400 (EDT)
-Date: Sat, 4 Nov 2023 12:55:07 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Alexei Starovoitov <ast@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, antony.antony@secunet.com, LKML <linux-kernel@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, devel@linux-ipsec.org
-Subject: Re: [RFCv2 bpf-next 1/7] bpf: xfrm: Add bpf_xdp_get_xfrm_state()
- kfunc
-Message-ID: <uwdlimjr7hgpuj3kxbudlnuh33pgwq53dgvphb7ip54tpkiqac@xidd3rv3b2se>
-References: <cover.1698875025.git.dxu@dxuuu.xyz>
- <0a5dc090a098b911bdd19ed0e63c7e466f7054f6.1698875025.git.dxu@dxuuu.xyz>
- <CAADnVQJu27HZGaTH5046Smwjpn-ttVCRR7f_0B12es_juZiN5w@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35157747B
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 19:35:46 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0B7194;
+	Sat,  4 Nov 2023 12:35:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=YDdZpyV4rBTcY/SQHR710W7PYNxHIXtIFLliRXNGxTk=; b=ZqJsEIfhRjAeEcU6uK4McjbleV
+	GrzIJ2KeztdvLxMqay3XLapZUbW9H2HbDQPHpgxbUs2GzK8VPBNccMQn3p6AwSoNbaf58Xlyz5jq/
+	5pr4Vu2xBemAbEAPRee1atdaGJrdWRR/WjC7nZRj6tap7mHgOSWmM0uhbkAdtDWl/ayNwqGIngZwg
+	bwWjt/YJwr8kCWyxUrtv3KtJp4DP4x7jdzjGP4YLqcKsPCMk2wsc6j9wtjIgjZdKdn/83ZK8Zzeke
+	a8G2HMmGKRQgG/Oy0b/ZYvluLJWz0nPQSr7gSyyycWFLHIK9nAuWdvBa3dKv9ETXnrTqlHin9eRCA
+	2EAjgquw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42578)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qzMQf-0006ZZ-1C;
+	Sat, 04 Nov 2023 19:35:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qzMQf-00048X-5m; Sat, 04 Nov 2023 19:35:33 +0000
+Date: Sat, 4 Nov 2023 19:35:32 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: at803x: add QCA8084 ethernet phy support
+Message-ID: <ZUadBJQLFA4f/gQY@shell.armlinux.org.uk>
+References: <20231103123538.15735-1-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQJu27HZGaTH5046Smwjpn-ttVCRR7f_0B12es_juZiN5w@mail.gmail.com>
+In-Reply-To: <20231103123538.15735-1-quic_luoj@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Nov 01, 2023 at 06:27:03PM -0700, Alexei Starovoitov wrote:
-> On Wed, Nov 1, 2023 at 2:58 PM Daniel Xu <dxu@dxuuu.xyz> wrote:
-> >
-> > This commit adds an unstable kfunc helper to access internal xfrm_state
-> > associated with an SA. This is intended to be used for the upcoming
-> > IPsec pcpu work to assign special pcpu SAs to a particular CPU. In other
-> > words: for custom software RSS.
-> >
-> > That being said, the function that this kfunc wraps is fairly generic
-> > and used for a lot of xfrm tasks. I'm sure people will find uses
-> > elsewhere over time.
-> >
-> > Co-developed-by: Antony Antony <antony.antony@secunet.com>
-> > Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> > Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> > ---
-> >  include/net/xfrm.h        |   9 ++++
-> >  net/xfrm/Makefile         |   1 +
-> >  net/xfrm/xfrm_policy.c    |   2 +
-> >  net/xfrm/xfrm_state_bpf.c | 105 ++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 117 insertions(+)
-> >  create mode 100644 net/xfrm/xfrm_state_bpf.c
-> >
-> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> > index c9bb0f892f55..1d107241b901 100644
-> > --- a/include/net/xfrm.h
-> > +++ b/include/net/xfrm.h
-> > @@ -2190,4 +2190,13 @@ static inline int register_xfrm_interface_bpf(void)
-> >
-> >  #endif
-> >
-> > +#if IS_ENABLED(CONFIG_DEBUG_INFO_BTF)
-> > +int register_xfrm_state_bpf(void);
-> > +#else
-> > +static inline int register_xfrm_state_bpf(void)
-> > +{
-> > +       return 0;
-> > +}
-> > +#endif
-> > +
-> >  #endif /* _NET_XFRM_H */
-> > diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
-> > index cd47f88921f5..547cec77ba03 100644
-> > --- a/net/xfrm/Makefile
-> > +++ b/net/xfrm/Makefile
-> > @@ -21,3 +21,4 @@ obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
-> >  obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
-> >  obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
-> >  obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
-> > +obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
-> > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-> > index c13dc3ef7910..1b7e75159727 100644
-> > --- a/net/xfrm/xfrm_policy.c
-> > +++ b/net/xfrm/xfrm_policy.c
-> > @@ -4218,6 +4218,8 @@ void __init xfrm_init(void)
-> >  #ifdef CONFIG_XFRM_ESPINTCP
-> >         espintcp_init();
-> >  #endif
-> > +
-> > +       register_xfrm_state_bpf();
-> >  }
-> >
-> >  #ifdef CONFIG_AUDITSYSCALL
-> > diff --git a/net/xfrm/xfrm_state_bpf.c b/net/xfrm/xfrm_state_bpf.c
-> > new file mode 100644
-> > index 000000000000..4aaac134b97a
-> > --- /dev/null
-> > +++ b/net/xfrm/xfrm_state_bpf.c
+On Fri, Nov 03, 2023 at 08:35:37PM +0800, Luo Jie wrote:
+> Add qca8084 PHY support, which is four-port PHY with maximum
+> link capability 2.5G, the features of each port is almost same
+> as QCA8081 and slave seed config is not needed.
 > 
-> since net/xfrm/xfrm_interface_bpf.c is already there and
-> was meant to be use as a file for interface between xfrm and bpf
-> may be add new kfuncs there instead of new file?
-
-IIUC xfrm_interface_bpf.c is for "xfrm interfaces" [0]. See
-bpf_xfrm_info:if_id.
-
-I could be wrong. But if you or Steffen want it all in one file I don't
-really mind either way.
-
-[0]: https://docs.strongswan.org/docs/5.9/features/routeBasedVpn.html#_xfrm_interfaces_on_linux
-
+> There are some initialization configurations needed.
+> 1. Configuring qca8084 related initializations including
+> MSE detect threshold and ADC clock edge invert.
+> 2. Add the additional configurations for the CDT feature.
 > 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  drivers/net/phy/at803x.c | 40 +++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 37 insertions(+), 3 deletions(-)
 > 
-> > @@ -0,0 +1,105 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/* Unstable XFRM state BPF helpers.
-> > + *
-> > + * Note that it is allowed to break compatibility for these functions since the
-> > + * interface they are exposed through to BPF programs is explicitly unstable.
-> > + */
-> > +
-> > +#include <linux/bpf.h>
-> > +#include <linux/btf_ids.h>
-> > +#include <net/xdp.h>
-> > +#include <net/xfrm.h>
-> > +
-> > +/* bpf_xfrm_state_opts - Options for XFRM state lookup helpers
-> > + *
-> > + * Members:
-> > + * @error      - Out parameter, set for any errors encountered
-> > + *              Values:
-> > + *                -EINVAL - netns_id is less than -1
-> > + *                -EINVAL - Passed NULL for opts
-> > + *                -EINVAL - opts__sz isn't BPF_XFRM_STATE_OPTS_SZ
-> > + *                -ENONET - No network namespace found for netns_id
-> > + * @netns_id   - Specify the network namespace for lookup
-> > + *              Values:
-> > + *                BPF_F_CURRENT_NETNS (-1)
-> > + *                  Use namespace associated with ctx
-> > + *                [0, S32_MAX]
-> > + *                  Network Namespace ID
-> > + * @mark       - XFRM mark to match on
-> > + * @daddr      - Destination address to match on
-> > + * @spi                - Security parameter index to match on
-> > + * @proto      - L3 protocol to match on
-> > + * @family     - L3 protocol family to match on
-> > + */
-> > +struct bpf_xfrm_state_opts {
-> > +       s32 error;
-> > +       s32 netns_id;
-> > +       u32 mark;
-> > +       xfrm_address_t daddr;
-> > +       __be32 spi;
-> > +       u8 proto;
-> > +       u16 family;
-> > +};
-> > +
-> > +enum {
-> > +       BPF_XFRM_STATE_OPTS_SZ = sizeof(struct bpf_xfrm_state_opts),
-> > +};
-> > +
-> > +__diag_push();
-> > +__diag_ignore_all("-Wmissing-prototypes",
-> > +                 "Global functions as their definitions will be in xfrm_state BTF");
-> > +
-> > +/* bpf_xdp_get_xfrm_state - Get XFRM state
-> > + *
-> > + * Parameters:
-> > + * @ctx        - Pointer to ctx (xdp_md) in XDP program
-> > + *                 Cannot be NULL
-> > + * @opts       - Options for lookup (documented above)
-> > + *                 Cannot be NULL
-> > + * @opts__sz   - Length of the bpf_xfrm_state_opts structure
-> > + *                 Must be BPF_XFRM_STATE_OPTS_SZ
-> > + */
-> > +__bpf_kfunc struct xfrm_state *
-> > +bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts, u32 opts__sz)
-> > +{
-> > +       struct xdp_buff *xdp = (struct xdp_buff *)ctx;
-> > +       struct net *net = dev_net(xdp->rxq->dev);
-> > +
-> > +       if (!opts || opts__sz != BPF_XFRM_STATE_OPTS_SZ) {
-> > +               opts->error = -EINVAL;
-> > +               return NULL;
-> > +       }
-> > +
-> > +       if (unlikely(opts->netns_id < BPF_F_CURRENT_NETNS)) {
-> > +               opts->error = -EINVAL;
-> > +               return NULL;
-> > +       }
-> > +
-> > +       if (opts->netns_id >= 0) {
-> > +               net = get_net_ns_by_id(net, opts->netns_id);
-> 
-> netns is leaking :(
+> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
+> index 37fb033e1c29..4124eb76d835 100644
+> --- a/drivers/net/phy/at803x.c
+> +++ b/drivers/net/phy/at803x.c
+> @@ -176,6 +176,8 @@
+>  #define AT8030_PHY_ID_MASK			0xffffffef
+>  
+>  #define QCA8081_PHY_ID				0x004dd101
+> +#define QCA8081_PHY_MASK			0xffffff00
+> +#define QCA8084_PHY_ID				0x004dd180
+...
+> @@ -2207,8 +2240,9 @@ static struct phy_driver at803x_driver[] = {
+>  	.resume			= qca83xx_resume,
+>  }, {
+>  	/* Qualcomm QCA8081 */
+> -	PHY_ID_MATCH_EXACT(QCA8081_PHY_ID),
+> -	.name			= "Qualcomm QCA8081",
+> +	.phy_id			= QCA8081_PHY_ID,
+> +	.phy_id_mask		= QCA8081_PHY_MASK,
+> +	.name			= "Qualcomm QCA808X",
+...
+> @@ -2241,7 +2275,7 @@ static struct mdio_device_id __maybe_unused atheros_tbl[] = {
+>  	{ PHY_ID_MATCH_EXACT(QCA8327_A_PHY_ID) },
+>  	{ PHY_ID_MATCH_EXACT(QCA8327_B_PHY_ID) },
+>  	{ PHY_ID_MATCH_EXACT(QCA9561_PHY_ID) },
+> -	{ PHY_ID_MATCH_EXACT(QCA8081_PHY_ID) },
+> +	{ QCA8081_PHY_ID, QCA8081_PHY_MASK},
 
-Argh, will fix.
+So, in summary from the above, what you're doing is using the pair of
+QCA8081_PHY_ID, QCA8081_PHY_MASK to match not only QCA8081 but also
+QCA8084. This is confusing.
 
-> 
-> > +               if (unlikely(!net)) {
-> > +                       opts->error = -ENONET;
-> > +                       return NULL;
-> > +               }
-> > +       }
-> > +
-> > +       return xfrm_state_lookup(net, opts->mark, &opts->daddr, opts->spi,
-> > +                                opts->proto, opts->family);
-> 
-> After looking into xfrm internals realized that
-> refcnt inc/dec and KF_ACQUIRE maybe unnecessary overhead.
-> XDP progs run under rcu_read_lock.
-> I think you can make a version of __xfrm_state_lookup()
-> without xfrm_state_hold_rcu() and avoid two atomics per packet,
-> but such xfrm_state may have refcnt==0.
-> Since bpf prog will only read from there and won't pass it anywhere
-> else it might be ok.
-> 
-> But considering the rest of ipsec overhead this might be
-> a premature optimization and it's better to stay with clean
-> acquire/release semantics.
+Are there any other parts that QCA808X would correspond with which
+would not be compatible with the above? E.g. QCA8082, QCA8083, QCA8088
+etc.
 
-Yeah I think acquire/release will be fine for now. I've been doing a lot
-of profiling on tput tests and xdp barely shows up. There are some lower
-hanging fruit atm.
+If there are, then the correct approach would be to list them
+separately in atheros_tbl, and also have separate driver entries in
+at803x_driver so it's unambiguous.
 
-> As far as IETF:
-> https://datatracker.ietf.org/doc/html/draft-ietf-ipsecme-multi-sa-performance-02
-> it's not clear to me why one Child SA (without new pcpu field)
-> has to be handled by one cpu.
-> 
-> Sounds like it's possible to implement differently. At least in SW.
-> In HW, I can see how duplicating multiple crypto state and the rest
-> in a single queue is difficult.
+If we keep this approach, then I would suggest:
 
-The child SA without pcpu flag (aka fallback SA) is not pinned to a cpu.
-It's shared between all of the cpus. I think Steffen can probably
-explain this better if that's not clear.
+#define QCA808X_PHY_ID		0x004dd100
+#define QCA808X_PHY_MASK	GENMASK(31, 8)
 
-Thanks,
-Daniel
+to make it explicit that this phy ID/mask pair is matching several
+devices, rather than re-using the QCA8081_PHY_ID definition.
+
+
+The next point - what about the revision field which occupies bits 3:0
+in these:
+
+>  static bool qca808x_has_fast_retrain_or_slave_seed(struct phy_device *phydev)
+>  {
+> +	if (phydev->phy_id == QCA8084_PHY_ID)
+> +		return false;
+> +
+...
+> @@ -1767,6 +1781,20 @@ static int qca808x_config_init(struct phy_device *phydev)
+>  {
+>  	int ret;
+>  
+> +	if (phydev->phy_id == QCA8084_PHY_ID) {
+> +		/* Invert ADC clock edge */
+...
+> @@ -1958,6 +1986,11 @@ static int qca808x_cable_test_start(struct phy_device *phydev)
+>  	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807a, 0xc060);
+>  	phy_write_mmd(phydev, MDIO_MMD_PCS, 0x807e, 0xb060);
+>  
+> +	if (phydev->phy_id == QCA8084_PHY_ID) {
+
+Do these need to be exact matches, or should the revision field be
+ignored? If so, consider using phy_id_compare(), or if you end up with
+separate driver entries, consider using phydev_id_compare().
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
