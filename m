@@ -1,247 +1,176 @@
-Return-Path: <netdev+bounces-46011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62C17E0D73
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 04:20:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59697E0D79
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 04:27:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3AC21C210FE
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 03:20:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B356B21431
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 03:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416BD1FB6;
-	Sat,  4 Nov 2023 03:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96B021FA2;
+	Sat,  4 Nov 2023 03:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JrSDZA9D"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="w4GtO0E+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5262E1C3D;
-	Sat,  4 Nov 2023 03:20:17 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13592D42;
-	Fri,  3 Nov 2023 20:20:15 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9c53e8b7cf4so396897066b.1;
-        Fri, 03 Nov 2023 20:20:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699068013; x=1699672813; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SOW5NXugmBea90l4dKOafO6jV5KmHbw2vGXiSLGBI9E=;
-        b=JrSDZA9DCfPytgU0t9Ztg/QkJTsd5zv5FHuyOXdAPV6jfUXLBB5Mutkb9Dpy49tEcq
-         xi5+nKLQOBU4ravY3fNU4dYKrHLGA2thf23lfqcoOx+3zt0YQVomXZ2DrtlmS/Q/PncP
-         UlN2ArUQxiyhBVhAWTVJFzRoqcRcY9N3KwTkJsXmzLJz/YHcGu7zKo7/stMNqXQvL2tc
-         6bZoJpKviL3r+NhdhmhBVccc4M7npjzlbhfcT2gR/t34MZzExS8Y/RAj7wmBA4gk5vqi
-         vXUTfWOs//4ZYlTOCStAZNXvB4szrsJbl+Q9XsIE+J09PzzlCbXsJCtvSG8PT1CjBB3Y
-         msZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699068013; x=1699672813;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SOW5NXugmBea90l4dKOafO6jV5KmHbw2vGXiSLGBI9E=;
-        b=wpTLBBj9vTbVFAztrhBfzDZ+DsqMj7zdM+2GiiSQbTNuSWqZTQr2bWhBNLp4p4UXp7
-         3ZL5RdEh4nieC95Y3c5bSVBFOi0qRhcEi13ynosVRr6JxpdOQQ0hcJyvNJouDj8WG+sF
-         91M88rnNpVDomTIOykuRMN+5k9cF/p2HW98Dx8CzzJc0QwOLjtfU0T7Vau6Z555RcMMd
-         zDQm56GJgJ128pPe3n/rsxz+Ozf8HyF52uyp3sXT/7shoYU5w8ZHAokicLWfxrDfNMUK
-         fYXS5ONstKe1A6MooYyeLwvpAryCbqltA90pRbBAu5rh1SUMflcvnZ3R6cQaTPGZ6A+t
-         vLog==
-X-Gm-Message-State: AOJu0Ywgqb32yhwsCVrsBg1B+4uJPmLuKxCqYcbUG+onOoMtB0gqYegf
-	cTuFuVtORNZTQZC2WTzhmqqgDelPqA5w30zFTcYGXPHDjzc=
-X-Google-Smtp-Source: AGHT+IH8xLd1pq+w86VCm/cKNI64XRbSamj+/kboZu69o9awtVYVZLgfXtThmlzUdhhsNjVZgvHogC1tJieS0oaaRIE=
-X-Received: by 2002:a17:907:9617:b0:9d3:f436:6826 with SMTP id
- gb23-20020a170907961700b009d3f4366826mr7837195ejc.38.1699068013082; Fri, 03
- Nov 2023 20:20:13 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C3017CB
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 03:26:59 +0000 (UTC)
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F068D52;
+	Fri,  3 Nov 2023 20:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1699068412; bh=uScNyXL7NZlRj5Up/uhHzzuVVWj82T1cweLIeGgSe2Y=;
+	h=From:To:Cc:Subject:Date;
+	b=w4GtO0E+D6zasKx5vZR30g1Imt7ePGbsE5O10uhNK6Yfzj85djm94INtt27YxW47u
+	 QZLndtjiR6X4o4gIAfEyAoIxQfNp5GYxq4iuNo9gWIL9s8tyTCpJoph8foiletZg5H
+	 akqNF3bWmLizWu8TSPbzGei5xbytQ29/aK7lV9DQ=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrszb6-0.qq.com (NewEsmtp) with SMTP
+	id 66105EBB; Sat, 04 Nov 2023 11:25:33 +0800
+X-QQ-mid: xmsmtpt1699068333tpvkcnde1
+Message-ID: <tencent_8A38BBB333189E6E1B4A4B821BF82569BA08@qq.com>
+X-QQ-XMAILINFO: NnA3IMNPwBd+ZlvzrTYMYBA0coqLpnNMXZh9itbweZXkF3uKsXFisdfXTsfP3Q
+	 50I/CS2qW3uXrxTnpKFxmID2Sjk14G2hX24fWa86EzJqrJ0OULCeKUHtfjfW3TFLLljoX+VsVQGG
+	 aAKcgBKYNI3DMVtE1n4PILoqrmg6QKoE1qy+ol4Bj0y2TsuOyhNyoX0nTgxqFDo4EEinnK3xjiSO
+	 /FXBWG5hvZzsEhcQ+kvIvkGb/thAmnzdguZsNyCJf9sjSjpVogICNpc20D9vkyMo9sGbiD4PgUmY
+	 0FLjw1/zKSYSmOuLQKWvGmAZwCCkTQrn0cHK8r6ywskR4P5dLxXh4RbcbH1Vddrw1B4QBSnlZNri
+	 QD2LAUVUEGA7z6h9aa0N0Po2bwfLs7khZ7XrAa6zWEIzz8p0Jgayz7srx9bdP0TCYGPU59bT/UZb
+	 rhYsgspFeVg/yH5KFplvEg+YOUD7/fQjtbp7ru3EJ6wD86yvl3zKmJ7sR0ZeX9zag3RLIKae8Ym5
+	 t+QlX4Tm30ApiIzLye9T9jsQVksmTsUTWeE8abCEQBjyd5Zy5LXqATK6QzKfbR+tyH6c8MUWu14g
+	 nwOn1VXboEzBvEun0rzYNgddUl3B4k29QqhbN4b1kWX1HP1PePrmVFBSCmH8rotjhjDB40mGTzoS
+	 vGXaPVXJWKL3vZw3iTLpErWfA/C3p0A5SFgV1rmdy5laTGfcB6nY7gmQ2GoHXuRFinCfj1PcAHo+
+	 M3t6yDBI9TyZTAjUvUswz2boa5aRMXWv4gfcnMyh6gGr+4lt79eyh/nUs9k2Cq95vPoO5/5fNdgG
+	 voqq9MRqVKnsBXPZ8sg9QJN0ZqZS7p7/lEShrj3o3O7lNuOFSIdyGZjFF4QxzH/2s7CBa3Ox0aN/
+	 joqhfU/39ss9MAXFEcyLIB8VUhqKE830SU0aasT0T1PSZkmrEjOJGP/RsD81wZ/Q==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: richardcochran@gmail.com
+Cc: davem@davemloft.net,
+	habetsm.xilinx@gmail.com,
+	jeremy@jcline.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	reibax@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Subject: [PATCH net-next V4] ptp: fix corrupted list in ptp_open
+Date: Sat,  4 Nov 2023 11:25:33 +0800
+X-OQ-MSGID: <20231104032533.1354507-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103190523.6353-12-andrii@kernel.org> <202311040829.XrnpSV8z-lkp@intel.com>
-In-Reply-To: <202311040829.XrnpSV8z-lkp@intel.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 3 Nov 2023 20:20:01 -0700
-Message-ID: <CAEf4Bza8V6nGgR6Nb5sEvWUMdAhKi63qCoiP4RJV85sLO7ia6Q@mail.gmail.com>
-Subject: Re: [PATCH v9 bpf-next 11/17] bpf,lsm: add BPF token LSM hooks
-To: kernel test robot <lkp@intel.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	paul@paul-moore.com, brauner@kernel.org, oe-kbuild-all@lists.linux.dev, 
-	linux-fsdevel@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	keescook@chromium.org, kernel-team@meta.com, sargun@sargun.me
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 3, 2023 at 5:38=E2=80=AFPM kernel test robot <lkp@intel.com> wr=
-ote:
->
-> Hi Andrii,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on bpf-next/master]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Andrii-Nakryiko/bp=
-f-align-CAP_NET_ADMIN-checks-with-bpf_capable-approach/20231104-031714
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git =
-master
-> patch link:    https://lore.kernel.org/r/20231103190523.6353-12-andrii%40=
-kernel.org
-> patch subject: [PATCH v9 bpf-next 11/17] bpf,lsm: add BPF token LSM hooks
-> config: m68k-defconfig (https://download.01.org/0day-ci/archive/20231104/=
-202311040829.XrnpSV8z-lkp@intel.com/config)
-> compiler: m68k-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20231104/202311040829.XrnpSV8z-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202311040829.XrnpSV8z-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>):
->
->    In file included from include/net/scm.h:8,
->                     from include/linux/netlink.h:9,
->                     from include/uapi/linux/neighbour.h:6,
->                     from include/linux/netdevice.h:45,
->                     from include/net/sock.h:46,
->                     from include/linux/tcp.h:19,
->                     from include/linux/ipv6.h:95,
->                     from include/net/ipv6.h:12,
->                     from include/linux/sunrpc/addr.h:14,
->                     from fs/nfsd/nfsd.h:22,
->                     from fs/nfsd/state.h:42,
->                     from fs/nfsd/xdr4.h:40,
->                     from fs/nfsd/trace.h:17,
->                     from fs/nfsd/trace.c:4:
-> >> include/linux/security.h:2084:92: error: parameter 2 ('cmd') has incom=
-plete type
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                                                               =
-                ~~~~~~~~~~~~~^~~
-> >> include/linux/security.h:2084:19: error: function declaration isn't a =
-prototype [-Werror=3Dstrict-prototypes]
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    cc1: some warnings being treated as errors
+There is no lock protection when writing ptp->tsevqs in ptp_open(),
+ptp_release(), which can cause data corruption, use mutex lock to avoid this
+issue.
 
-Ok, so apparently enum forward declaration doesn't work with static
-inline functions.
+Moreover, ptp_release() should not be used to release the queue in ptp_read(),
+and it should be deleted together.
 
-Would it be ok to just #include <linux/bpf.h> in this file?
+Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/ptp/ptp_chardev.c | 13 +++++++++----
+ drivers/ptp/ptp_clock.c   |  3 +++
+ drivers/ptp/ptp_private.h |  1 +
+ 3 files changed, 13 insertions(+), 4 deletions(-)
 
-$ git diff
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 1d6edbf45d1c..cfe6176824c2 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -32,6 +32,7 @@
- #include <linux/string.h>
- #include <linux/mm.h>
- #include <linux/sockptr.h>
-+#include <linux/bpf.h>
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 282cd7d24077..ba035d6c81ae 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -119,8 +119,13 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 	}
+ 	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
++	if (mutex_lock_interruptible(&ptp->tsevq_mux)) {
++		kfree(queue);
++		return -ERESTARTSYS;
++	}
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
+ 	pccontext->private_clkdata = queue;
++	mutex_unlock(&ptp->tsevq_mux);
+ 
+ 	/* Debugfs contents */
+ 	sprintf(debugfsname, "0x%p", queue);
+@@ -138,14 +143,16 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ int ptp_release(struct posix_clock_context *pccontext)
+ {
+ 	struct timestamp_event_queue *queue = pccontext->private_clkdata;
++	struct ptp_clock *ptp =
++		container_of(pccontext->clk, struct ptp_clock, clock);
+ 	unsigned long flags;
+ 
+ 	if (queue) {
++		mutex_lock(&ptp->tsevq_mux);
+ 		debugfs_remove(queue->debugfs_instance);
+ 		pccontext->private_clkdata = NULL;
+-		spin_lock_irqsave(&queue->lock, flags);
+ 		list_del(&queue->qlist);
+-		spin_unlock_irqrestore(&queue->lock, flags);
++		mutex_unlock(&ptp->tsevq_mux);
+ 		bitmap_free(queue->mask);
+ 		kfree(queue);
+ 	}
+@@ -585,7 +592,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+ free_event:
+ 	kfree(event);
+ exit:
+-	if (result < 0)
+-		ptp_release(pccontext);
+ 	return result;
+ }
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3d1b0a97301c..7930db6ec18d 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -176,6 +176,7 @@ static void ptp_clock_release(struct device *dev)
+ 
+ 	ptp_cleanup_pin_groups(ptp);
+ 	kfree(ptp->vclock_index);
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	/* Delete first entry */
+@@ -247,6 +248,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (!queue)
+ 		goto no_memory_queue;
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	mutex_init(&ptp->tsevq_mux);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+ 	if (!queue->mask)
+ 		goto no_memory_bitmap;
+@@ -356,6 +358,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (ptp->kworker)
+ 		kthread_destroy_worker(ptp->kworker);
+ kworker_err:
++	mutex_destroy(&ptp->tsevq_mux);
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	bitmap_free(queue->mask);
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 52f87e394aa6..7d82960fd946 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -44,6 +44,7 @@ struct ptp_clock {
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+ 	struct list_head tsevqs; /* timestamp fifo list */
++	struct mutex tsevq_mux; /* one process at a time writing the timestamp fifo list */
+ 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
+ 	wait_queue_head_t tsev_wq;
+ 	int defunct; /* tells readers to go away when clock is being removed */
+-- 
+2.25.1
 
- struct linux_binprm;
- struct cred;
-@@ -60,7 +61,6 @@ struct fs_parameter;
- enum fs_value_type;
- struct watch;
- struct watch_notification;
--enum bpf_cmd;
-
- /* Default (no) options for the capable function */
- #define CAP_OPT_NONE 0x0
-
-
-If not, then I guess another alternative would be to pass `int cmd`
-instead of `enum bpf_cmd cmd`, but that doesn't seems like the best
-solution, tbh.
-
-Paul, any preferences?
-
-> --
->    In file included from include/net/scm.h:8,
->                     from include/linux/netlink.h:9,
->                     from include/uapi/linux/neighbour.h:6,
->                     from include/linux/netdevice.h:45,
->                     from include/net/sock.h:46,
->                     from include/linux/tcp.h:19,
->                     from include/linux/ipv6.h:95,
->                     from include/net/ipv6.h:12,
->                     from include/linux/sunrpc/addr.h:14,
->                     from fs/nfsd/nfsd.h:22,
->                     from fs/nfsd/export.c:21:
-> >> include/linux/security.h:2084:92: error: parameter 2 ('cmd') has incom=
-plete type
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                                                               =
-                ~~~~~~~~~~~~~^~~
-> >> include/linux/security.h:2084:19: error: function declaration isn't a =
-prototype [-Werror=3Dstrict-prototypes]
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    fs/nfsd/export.c: In function 'exp_rootfh':
->    fs/nfsd/export.c:1017:34: warning: variable 'inode' set but not used [=
--Wunused-but-set-variable]
->     1017 |         struct inode            *inode;
->          |                                  ^~~~~
->    cc1: some warnings being treated as errors
-> --
->    In file included from include/net/scm.h:8,
->                     from include/linux/netlink.h:9,
->                     from include/uapi/linux/neighbour.h:6,
->                     from include/linux/netdevice.h:45,
->                     from include/net/sock.h:46,
->                     from include/linux/tcp.h:19,
->                     from include/linux/ipv6.h:95,
->                     from include/net/ipv6.h:12,
->                     from include/linux/sunrpc/addr.h:14,
->                     from fs/nfsd/nfsd.h:22,
->                     from fs/nfsd/state.h:42,
->                     from fs/nfsd/xdr4.h:40,
->                     from fs/nfsd/trace.h:17,
->                     from fs/nfsd/trace.c:4:
-> >> include/linux/security.h:2084:92: error: parameter 2 ('cmd') has incom=
-plete type
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                                                               =
-                ~~~~~~~~~~~~~^~~
-> >> include/linux/security.h:2084:19: error: function declaration isn't a =
-prototype [-Werror=3Dstrict-prototypes]
->     2084 | static inline int security_bpf_token_allow_cmd(const struct bp=
-f_token *token, enum bpf_cmd cmd)
->          |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    In file included from fs/nfsd/trace.h:1958:
->    include/trace/define_trace.h:95:42: fatal error: ./trace.h: No such fi=
-le or directory
->       95 | #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)
->          |                                          ^
->    cc1: some warnings being treated as errors
->    compilation terminated.
->
->
-> vim +2084 include/linux/security.h
->
->   2083
-> > 2084  static inline int security_bpf_token_allow_cmd(const struct bpf_t=
-oken *token, enum bpf_cmd cmd)
->   2085  {
->   2086          return 0;
->   2087  }
->   2088
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
 
