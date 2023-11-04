@@ -1,160 +1,151 @@
-Return-Path: <netdev+bounces-46031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E7EF7E0F72
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 13:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 331AD7E0F8F
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 14:11:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1BC1C210A4
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 12:44:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C1EF1C2096F
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 13:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87BB9171DF;
-	Sat,  4 Nov 2023 12:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1627D18645;
+	Sat,  4 Nov 2023 13:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d2xvWO4S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Bz2rcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC3A1A5A2
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 12:43:58 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415C7D4E
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 05:43:56 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c509d5ab43so42064061fa.0
-        for <netdev@vger.kernel.org>; Sat, 04 Nov 2023 05:43:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699101834; x=1699706634; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lGuoNoybmpAHVbeBRQ0Y/xZn4w65B05owlyMy7HgTuo=;
-        b=d2xvWO4ScSw5iDGGrf5T4DdSaie2rYXL4P08TnmhPuTytCXNw16vb9TzYTpT0snlbg
-         HJZUnMNOKFLVcUh0YZ4Qex3UDoIE5jpiUVrowLCwkJTzzJRUWhmVPq/ujbmhAAbQxogg
-         Ppu08ekkM5OrENbvJX+0Ir5z4yeoU3evZN+YibULApcl4gAICZFaRtEr/sTBljFM2cXi
-         BWpfe+kNA9MPS/abpXvdHQLNtkCML2QQe2gQxeHmTAzo241bRMcu8KbBwyrB/Wx4zQgO
-         fLQWp0J96w779pogg1S8ZBPaGMY6CiY52ES1x9tThamt7ygywOrvuUUfTSJcx0JOqTJu
-         qtfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699101834; x=1699706634;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lGuoNoybmpAHVbeBRQ0Y/xZn4w65B05owlyMy7HgTuo=;
-        b=fxAxPsdHVIzTWDkg1x9GbuawUj54W08BC7TCl9snuYCmLSyl4Zq4f5xkYOG84uxCY9
-         c1Zn0HX/MoQ2Wv7kHZMpATilw1QpJ+KGuEVsFUPi4Ia+lGBocUPJJKndAN7Rh55DDKBE
-         Ame3I0jyGgcJ8L2DtSs67aKanQ6KY6oIkyCAqt1Cc04Uj3Rtj45TKSRabZvmmOMFAk2p
-         YNibNS7ePdJO4XMZqC1ymdFhQrs3PRL5ePnmQAZFb/Q4Dnz/gJjsZDIHQ+15L67xQWOR
-         WgJ1yB9KoQP0iIZEM1km9nNv/JZzRj12B58dTzrohxzBJ5gk4Xx2TMPIJH2rLA8ggE7V
-         5Y6Q==
-X-Gm-Message-State: AOJu0Yw06yYaDRplvLKDfoOi4DqJuxiKd1VUh/GUey/XamartujOYrW/
-	mW4XFZThFiLqeOUKM4a4g84RhA==
-X-Google-Smtp-Source: AGHT+IFM8LyKtYP3lb6rmldO2Y/K2K0eNH2873kfaHunY7CPSwdiCXkmjcn14UjlqR8YVVm6mXvm5w==
-X-Received: by 2002:a05:6512:3f29:b0:509:62de:71c7 with SMTP id y41-20020a0565123f2900b0050962de71c7mr825163lfa.2.1699101834505;
-        Sat, 04 Nov 2023 05:43:54 -0700 (PDT)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id u22-20020ac24c36000000b005093312f66fsm496100lfq.124.2023.11.04.05.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Nov 2023 05:43:53 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sat, 04 Nov 2023 13:43:51 +0100
-Subject: [PATCH net 4/4] net: ethernet: cortina: Handle large frames
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECB314A93
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 13:11:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F48C433C8;
+	Sat,  4 Nov 2023 13:11:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699103473;
+	bh=nFjHI5pg1W/bo53kX1geZfMpDlHyQy7cMF+JIqt10Ys=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b9Bz2rcEdQqQauaPwOn3pLFoTo6EOYj6fQZrCFlYnbmLUCZ+kAOfCApZ7g9BErnO5
+	 0+cDQmIgJjfHzXjsgXfwaX6dslKfqgnyI6zeHpMFDE12mMXcnvymPtVcuU1Z3atvHD
+	 nj4JLxARjc9cgQipdSmht50XH9Fwit2GSPHrSuhuLfnqqTGpAqvTj9neOyOiwqg0vX
+	 38eXcA13UPpC8CcALB/3Ilt605SIzV8lcOA8wiHPIwWZCrETuZCLCZ9DHGdGOdRkJT
+	 k/9Y4yspsdMkbMWKcIoF6UWwX/jEYkeqMJ4duhnxKzymtIuhGBmw1Ava3VK0BNM5bG
+	 HPUjDjzVJ0IUA==
+Date: Sat, 4 Nov 2023 13:10:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com,
+	daniel@iogearbox.net, idosch@idosch.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net, sched: Fix SKB_NOT_DROPPED_YET splat under
+ debug config
+Message-ID: <20231104131054.GB891380@kernel.org>
+References: <20231028171610.28596-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231104-gemini-largeframe-fix-v1-4-9c5513f22f33@linaro.org>
-References: <20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org>
-In-Reply-To: <20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org>
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>, 
- Vladimir Oltean <olteanv@gmail.com>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231028171610.28596-1-jhs@mojatatu.com>
 
-The Gemini ethernet controller provides hardware checksumming
-for frames up to 1514 bytes including ethernet headers but not
-FCS.
+On Sat, Oct 28, 2023 at 01:16:10PM -0400, Jamal Hadi Salim wrote:
+> Getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+> reproducer [2]. Problem seems to be that classifiers clear 'struct
+> tcf_result::drop_reason', thereby triggering the warning in
+> __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0).
+> 
+> Fixed by disambiguating a legit error from a verdict with a bogus drop_reason
+> 
+> [1]
+> WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+> Modules linked in:
+> CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+> RIP: 0010:kfree_skb_reason+0x38/0x130
+> [...]
+> Call Trace:
+>  <IRQ>
+>  __netif_receive_skb_core.constprop.0+0x837/0xdb0
+>  __netif_receive_skb_one_core+0x3c/0x70
+>  process_backlog+0x95/0x130
+>  __napi_poll+0x25/0x1b0
+>  net_rx_action+0x29b/0x310
+>  __do_softirq+0xc0/0x29b
+>  do_softirq+0x43/0x60
+>  </IRQ>
+> 
+> [2]
+> 
+> ip link add name veth0 type veth peer name veth1
+> ip link set dev veth0 up
+> ip link set dev veth1 up
+> tc qdisc add dev veth1 clsact
+> tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+> mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+> 
+> Ido reported:
+> 
+>   [...] getting the following splat [1] with CONFIG_DEBUG_NET=y and this
+>   reproducer [2]. Problem seems to be that classifiers clear 'struct
+>   tcf_result::drop_reason', thereby triggering the warning in
+>   __kfree_skb_reason() due to reason being 'SKB_NOT_DROPPED_YET' (0). [...]
+> 
+>   [1]
+>   WARNING: CPU: 0 PID: 181 at net/core/skbuff.c:1082 kfree_skb_reason+0x38/0x130
+>   Modules linked in:
+>   CPU: 0 PID: 181 Comm: mausezahn Not tainted 6.6.0-rc6-custom-ge43e6d9582e0 #682
+>   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+>   RIP: 0010:kfree_skb_reason+0x38/0x130
+>   [...]
+>   Call Trace:
+>    <IRQ>
+>    __netif_receive_skb_core.constprop.0+0x837/0xdb0
+>    __netif_receive_skb_one_core+0x3c/0x70
+>    process_backlog+0x95/0x130
+>    __napi_poll+0x25/0x1b0
+>    net_rx_action+0x29b/0x310
+>    __do_softirq+0xc0/0x29b
+>    do_softirq+0x43/0x60
+>    </IRQ>
+> 
+>   [2]
+>   #!/bin/bash
+> 
+>   ip link add name veth0 type veth peer name veth1
+>   ip link set dev veth0 up
+>   ip link set dev veth1 up
+>   tc qdisc add dev veth1 clsact
+>   tc filter add dev veth1 ingress pref 1 proto all flower dst_mac 00:11:22:33:44:55 action drop
+>   mausezahn veth0 -a own -b 00:11:22:33:44:55 -q -c 1
+> 
+> What happens is that inside most classifiers the tcf_result is copied over
+> from a filter template e.g. *res = f->res which then implicitly overrides
+> the prior SKB_DROP_REASON_TC_{INGRESS,EGRESS} default drop code which was
+> set via sch_handle_{ingress,egress}() for kfree_skb_reason().
+> 
+> Commit text above copied verbatim from Daniel. The general idea of the patch
+> is not very different from what Ido originally posted but instead done at the
+> cls_api codepath.
+> 
+> Fixes: 54a59aed395c ("net, sched: Make tc-related drop reason more flexible")
+> Reported-by: Ido Schimmel <idosch@idosch.org>
+> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Link: https://lore.kernel.org/netdev/ZTjY959R+AFXf3Xy@shredder
 
-If we start sending bigger frames (after first bumping up the MTU
-on both interfaces sending and receiveing the frames), truncated
-packets start to appear on the target such as in this tcpdump
-resulting from ping -s 1474:
+Hi Jamal,
 
-23:34:17.241983 14:d6:4d:a8:3c:4f (oui Unknown) > bc:ae:c5:6b:a8:3d (oui Unknown),
-ethertype IPv4 (0x0800), length 1514: truncated-ip - 2 bytes missing!
-(tos 0x0, ttl 64, id 32653, offset 0, flags [DF], proto ICMP (1), length 1502)
-OpenWrt.lan > Fecusia: ICMP echo request, id 1672, seq 50, length 1482
+FWIIW, I think it would be nicer to fix this the classifiers so they don't
+do this, which by my reading is what Daniel's patch did.
 
-If we bypass the hardware checksumming and provide a software
-fallback, everything starts working fine up to the max TX MTU
-of 2047 bytes, for example ping -s2000 192.168.1.2:
+But, I don't feel strongly about this and I do tend to think the
+approach taken in this patch is a nice clean fix for net.
 
-00:44:29.587598 bc:ae:c5:6b:a8:3d (oui Unknown) > 14:d6:4d:a8:3c:4f (oui Unknown),
-ethertype IPv4 (0x0800), length 2042:
-(tos 0x0, ttl 64, id 51828, offset 0, flags [none], proto ICMP (1), length 2028)
-Fecusia > OpenWrt.lan: ICMP echo reply, id 1683, seq 4, length 2008
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-The bit enabling to bypass hardware checksum (or any of the
-"TSS" bits) are undocumented in the hardware reference manual.
-The entire hardware checksum unit appears undocumented. The
-conclusion that we need to use the "bypass" bit was found by
-trial-and-error.
-
-On the D-Link DIR-685 router this fixes a bug on the conduit
-interface to the RTL8366RB DSA switch: as the switch needs to add
-space for its tag it increases the MTU on the conduit interface
-to 1504 and that means that when the router sends packages
-of 1500 bytes these get an extra 4 bytes of DSA tag and the
-transfer fails because of the erroneous hardware checksumming,
-affecting such basic functionality as the LuCI web inteface.
-
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
- drivers/net/ethernet/cortina/gemini.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 23723c9c0f93..063e58639379 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1145,6 +1145,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 	dma_addr_t mapping;
- 	unsigned short mtu;
- 	void *buffer;
-+	int ret;
- 
- 	mtu  = ETH_HLEN;
- 	mtu += netdev->mtu;
-@@ -1170,7 +1171,14 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 		word3 |= mtu;
- 	}
- 
--	if (skb->ip_summed != CHECKSUM_NONE) {
-+	if (skb->len >= ETH_FRAME_LEN) {
-+		/* Hardware offloaded checksumming isn't working on frames
-+		 * bigger than 1514 bytes. Perhaps the buffer is only 1518
-+		 * bytes fitting mach a normal frame and a checksum?
-+		 * Just bypass on bigger frames.
-+		 */
-+		word1 |= TSS_BYPASS_BIT;
-+	} else if (skb->ip_summed != CHECKSUM_NONE) {
- 		int tcp = 0;
- 
- 		if (skb->protocol == htons(ETH_P_IP)) {
-
--- 
-2.34.1
-
+BTW, this patch is marked as Not Applicable in patchwork.
+I am unsure why.
 
