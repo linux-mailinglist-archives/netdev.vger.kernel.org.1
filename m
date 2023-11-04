@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-46076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30C9D7E1150
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 23:18:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62DD77E1153
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 23:18:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29BC28101A
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 22:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D36AB20F5E
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 22:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C6526283;
-	Sat,  4 Nov 2023 22:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9265326298;
+	Sat,  4 Nov 2023 22:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="teoOEoJw";
-	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="HU1gKuTM"
+	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="Uo/2zhce";
+	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="BM3qBOKM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE1B241F5
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 22:18:14 +0000 (UTC)
-Received: from domac.alu.hr (unknown [IPv6:2001:b68:2:2800::3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B903A10DE;
-	Sat,  4 Nov 2023 15:17:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29A326280
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 22:18:15 +0000 (UTC)
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 000621718;
+	Sat,  4 Nov 2023 15:17:55 -0700 (PDT)
 Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 681D26016E;
-	Sat,  4 Nov 2023 23:17:45 +0100 (CET)
+	by domac.alu.hr (Postfix) with ESMTP id 4E3B960177;
+	Sat,  4 Nov 2023 23:17:53 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1699136265; bh=afuU7Prqj4wOBRLyInMGwaCWEP50viSnxn1+X6zq8OM=;
+	t=1699136273; bh=Q0Y5ACC0TCRNesSVVs/luWSfBi2RlRcN1YXtTxiIoHc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=teoOEoJwaIFLTMbt+esAYqsyDhjbMbppoq7N18uZTdd36itghdKot/TJ3wtQWvrPu
-	 tScbMa0hCXnxaXMo7DNKCpQVIpKYs6jv6dPQQxPJp7PGm6jDMhLDzNwaSO0P2VNac0
-	 Xl2xBD2nMWvJkKT9cq8M0LEMWpfPKymKGVtOSkwepbldMUGVCRTD0AOiFVpfS5Qo23
-	 jfNhjENc4h16z4dos5rDVzs+r9NaNRB9YzCOEQMyBd4sGIqRROCGDyz0oOvlGLzuRM
-	 9H3ROOKtRnr4bouEIFXFOsVVCtoza6lBRMCjBoEs/fbM8tzwGDAwO1NOB/WHWxMq2K
-	 N3pbuOiL8F2Fw==
+	b=Uo/2zhce99IOQiAQB8o3zEYcldvA2ncIPBA+/ikrRYGwjNPN94UWrwDuP8YwKZkpJ
+	 Dl5ZxFG1sTvdnjWbDZKL9VZ6ktGHTfGY/dNWP4b80U/wqAMg3gD5XIp/kqEZzdwl5M
+	 guAHGqdHhJn90yNzH6Cc8QrjjGs1M5hQ2PH4mFNAHZQ9h1/4JMYkZLdCq2uPuitfdt
+	 SmYMMT6BUChAGo125vpgnZ5Eh0bbSh6PVbu9I1a0d4eF/dhQea3Rr2IS0C78HWZTtP
+	 kj7cJ0xD9XsQSiwjOIN/mRdmKAO1OWtNN+GuYMSUkuvA6cYvkDA1Dsr/yQnPrmHmKR
+	 MnLvMH3e7ndXw==
 X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
 Received: from domac.alu.hr ([127.0.0.1])
 	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id JHWuG4qTpnak; Sat,  4 Nov 2023 23:17:43 +0100 (CET)
+	with ESMTP id ncAeqU03ugrV; Sat,  4 Nov 2023 23:17:50 +0100 (CET)
 Received: from defiant.home (78-2-200-71.adsl.net.t-com.hr [78.2.200.71])
-	by domac.alu.hr (Postfix) with ESMTPSA id 83BD460177;
-	Sat,  4 Nov 2023 23:17:42 +0100 (CET)
+	by domac.alu.hr (Postfix) with ESMTPSA id DF90D60171;
+	Sat,  4 Nov 2023 23:17:50 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1699136262; bh=afuU7Prqj4wOBRLyInMGwaCWEP50viSnxn1+X6zq8OM=;
+	t=1699136270; bh=Q0Y5ACC0TCRNesSVVs/luWSfBi2RlRcN1YXtTxiIoHc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HU1gKuTMJn7yZh/M4rdgA30WcfIqWkfeW8sP2RZm6t21k4B/+Q6Km7HPKRWT7f1H0
-	 5422PWSFYZzmPtlijSU4Bx2lKpCQOvIxiPMviKhwgLYM/8ej6HvOZmKeRqdwXK77eh
-	 zuZfFJJ/8jsSa59SbLY9qkYOshFhN2DQkQETDv26w39QVJoo7iI5LmImfaMYOjAiJm
-	 azxvID2kr7+mRJFiGGRXGpYn6OxCGXk7TOwUOnbWX52F2fG8CUQzFE95Bwcxz/dLJ/
-	 SxDNKSss5mxGbKcxHpiWfoVtvj5Vfol299uMFh3EeAOGZbajfpwfZ+QchPolieK5jy
-	 36RA+mO13mivw==
+	b=BM3qBOKMoe5VTuI8UYLIBq7JC6IuBKQGoRhSdmMNh7Pwa2liVpTLUq+0LKsBH1Kqz
+	 6LlxO73Px4O9KumghXdf3z2eg8ek6geNewlK4SpvY7/RO5lC9ScrfX8ibzOXnc0co3
+	 q+A1oD1yORi9PP0jq9Wz9Qw/zl5l+VsZ6ols/jy/PVLPPcdwFnv3+VRtX0YM14wb4z
+	 h97bU3nVyzS1ySN4B8IhB9JLTAff0g5x4rDYqxKP2EyGAIqB7I8i07iLhnNTcJi015
+	 AG6c+UpglqsvcHhhv202+kwon+0vUZ8s9XKkbndXVaqoiRkRd/BuqwV9ZcNT9tZ8g+
+	 P/w0y+vCA3fyw==
 From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 To: linux-kernel@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -64,9 +64,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Marco Elver <elver@google.com>,
 	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next v6 4/5] r8169: Coalesce mac ocp commands for 8125 and 8125B start to reduce spinlock contention
-Date: Sat,  4 Nov 2023 23:15:19 +0100
-Message-Id: <20231104221514.45821-5-mirsad.todorovac@alu.unizg.hr>
+Subject: [PATCH net-next v6 5/5] r8169: Coalesce mac ocp commands for rtl_hw_init_8125 to reduce spinlocks
+Date: Sat,  4 Nov 2023 23:15:21 +0100
+Message-Id: <20231104221514.45821-6-mirsad.todorovac@alu.unizg.hr>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231104221514.45821-1-mirsad.todorovac@alu.unizg.hr>
 References: <20231104221514.45821-1-mirsad.todorovac@alu.unizg.hr>
@@ -79,7 +79,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
 Repeated calls to r8168_mac_ocp_write() and r8168_mac_ocp_modify() in
-the startup of 8125 and 8125B involve implicit spin_lock_irqsave() and
+the init sequence of the 8125 involve implicit spin_lock_irqsave() and
 spin_unlock_irqrestore() on each invocation.
 
 Coalesced with the corresponding helpers r8168_mac_ocp_write_seq() and
@@ -87,7 +87,6 @@ r8168_mac_ocp_modify_seq() into sequential write or modidy with a sinqle lock/un
 these calls reduce overall lock contention.
 
 Fixes: f1bce4ad2f1ce ("r8169: add support for RTL8125")
-Fixes: 0439297be9511 ("r8169: add support for RTL8125B")
 Cc: Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Marco Elver <elver@google.com>
 Cc: nic_swsd@realtek.com
@@ -102,72 +101,37 @@ Link: https://lore.kernel.org/lkml/20231028110459.2644926-1-mirsad.todorovac@alu
 Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 38 ++++++++++++++---------
- 1 file changed, 23 insertions(+), 15 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 0fb34d217205..056fe5b3930b 100644
+index 056fe5b3930b..42f0a7486151 100644
 --- a/drivers/net/ethernet/realtek/r8169_main.c
 +++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -3539,6 +3539,27 @@ DECLARE_RTL_COND(rtl_mac_ocp_e00e_cond)
+@@ -5074,6 +5074,12 @@ static void rtl_hw_init_8168g(struct rtl8169_private *tp)
  
- static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ static void rtl_hw_init_8125(struct rtl8169_private *tp)
  {
-+
-+	static const struct e_info_regmaskset e_info_8125_common_1[] = {
-+		{ 0xd3e2, 0x0fff, 0x03a9 },
-+		{ 0xd3e4, 0x00ff, 0x0000 },
-+		{ 0xe860, 0x0000, 0x0080 },
++	static const struct e_info_regdata hw_init_8125_1[] = {
++		{ 0xc0aa, 0x07d0 },
++		{ 0xc0a6, 0x0150 },
++		{ 0xc01e, 0x5555 },
 +	};
 +
-+	static const struct e_info_regmaskset e_info_8125_common_2[] = {
-+		{ 0xc0b4, 0x0000, 0x000c },
-+		{ 0xeb6a, 0x00ff, 0x0033 },
-+		{ 0xeb50, 0x03e0, 0x0040 },
-+		{ 0xe056, 0x00f0, 0x0030 },
-+		{ 0xe040, 0x1000, 0x0000 },
-+		{ 0xea1c, 0x0003, 0x0001 },
-+		{ 0xe0c0, 0x4f0f, 0x4403 },
-+		{ 0xe052, 0x0080, 0x0068 },
-+		{ 0xd430, 0x0fff, 0x047f },
-+		{ 0xea1c, 0x0004, 0x0000 },
-+		{ 0xeb54, 0x0000, 0x0001 },
-+	};
-+
- 	rtl_pcie_state_l2l3_disable(tp);
+ 	rtl_enable_rxdvgate(tp);
  
- 	RTL_W16(tp, 0x382, 0x221b);
-@@ -3553,9 +3574,7 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 	r8168_mac_ocp_write(tp, 0xc140, 0xffff);
- 	r8168_mac_ocp_write(tp, 0xc142, 0xffff);
+ 	RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) & ~(CmdTxEnb | CmdRxEnb));
+@@ -5083,9 +5089,7 @@ static void rtl_hw_init_8125(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_modify(tp, 0xe8de, BIT(14), 0);
+ 	r8168g_wait_ll_share_fifo_ready(tp);
  
--	r8168_mac_ocp_modify(tp, 0xd3e2, 0x0fff, 0x03a9);
--	r8168_mac_ocp_modify(tp, 0xd3e4, 0x00ff, 0x0000);
--	r8168_mac_ocp_modify(tp, 0xe860, 0x0000, 0x0080);
-+	r8168_mac_ocp_modify_seq(tp, e_info_8125_common_1);
+-	r8168_mac_ocp_write(tp, 0xc0aa, 0x07d0);
+-	r8168_mac_ocp_write(tp, 0xc0a6, 0x0150);
+-	r8168_mac_ocp_write(tp, 0xc01e, 0x5555);
++	r8168_mac_ocp_write_seq(tp, hw_init_8125_1);
+ 	r8168g_wait_ll_share_fifo_ready(tp);
+ }
  
- 	/* disable new tx descriptor format */
- 	r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
-@@ -3570,18 +3589,7 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
- 	else
- 		r8168_mac_ocp_modify(tp, 0xe63e, 0x0c30, 0x0020);
- 
--	r8168_mac_ocp_modify(tp, 0xc0b4, 0x0000, 0x000c);
--	r8168_mac_ocp_modify(tp, 0xeb6a, 0x00ff, 0x0033);
--	r8168_mac_ocp_modify(tp, 0xeb50, 0x03e0, 0x0040);
--	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
--	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
--	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
--	r8168_mac_ocp_modify(tp, 0xe0c0, 0x4f0f, 0x4403);
--	r8168_mac_ocp_modify(tp, 0xe052, 0x0080, 0x0068);
--	r8168_mac_ocp_modify(tp, 0xd430, 0x0fff, 0x047f);
--
--	r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
--	r8168_mac_ocp_modify(tp, 0xeb54, 0x0000, 0x0001);
-+	r8168_mac_ocp_modify_seq(tp, e_info_8125_common_2);
- 	udelay(1);
- 	r8168_mac_ocp_modify(tp, 0xeb54, 0x0001, 0x0000);
- 	RTL_W16(tp, 0x1880, RTL_R16(tp, 0x1880) & ~0x0030);
 -- 
 2.34.1
 
