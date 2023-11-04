@@ -1,77 +1,109 @@
-Return-Path: <netdev+bounces-46055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F507E105D
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 17:34:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC917E105E
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 17:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73713B20EE7
-	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 16:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9757E281799
+	for <lists+netdev@lfdr.de>; Sat,  4 Nov 2023 16:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282851863B;
-	Sat,  4 Nov 2023 16:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D923C1A5A1;
+	Sat,  4 Nov 2023 16:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InxKZ5rS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nSZ8eQsl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB0A3C34
-	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 16:33:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EBC3C433C7;
-	Sat,  4 Nov 2023 16:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699115635;
-	bh=e4QQlFAxSGhj3jwYBmB3+pfSiYHMJrLFy6FKplzgwW4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=InxKZ5rShROXQtrsH7Y9oylUaQBgmsjiCspRz/qGI3aMWFhvWSd7pnn75eIOQSMZP
-	 c/LtCMGgp+26G8S1hzQywotKV8ZN4gTaT6q8YVvjbBthxaHkFD0mRz95VrZQdRY/md
-	 umrBYKp0a927rK9UD3CgNIE4v3ZgCI4lvOwqYtr9A7CXR/VlXnkAhQp82DFlQ1KcQ/
-	 RpQbp0+dE+npW9+oZMBVBa9MZxfd4ED+gZH+7iLriorqoAimK7JCa58eRYYwlaVAJj
-	 fGRyAVrJglpHTUasqfIsZ5rtwqBSs6VD34bugv69pRP7Qw1nlOM11IOHeGKtPOb0Qv
-	 lsbEX34Di2khw==
-Date: Sat, 4 Nov 2023 12:33:38 -0400
-From: Simon Horman <horms@kernel.org>
-To: Yang Li <yang.lee@linux.alibaba.com>
-Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	pabeni@redhat.com, fw@strlen.de, kadlec@netfilter.org,
-	pablo@netfilter.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
-Subject: Re: [PATCH net-next] netfilter: nf_tables: Remove unused variable
- nft_net
-Message-ID: <20231104163338.GN891380@kernel.org>
-References: <20231101013351.55902-1-yang.lee@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248EA3C34
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 16:42:02 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C408E0
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 09:42:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wvYckrz1hj8zuphQTnd4lFXjP6gT/hB2v0eu5Pe45oQ=; b=nSZ8eQsl6NxA2kXOR4211HMdLB
+	geJr2Eb2sysquvOCvVcGIQOlDGFCoAXcQbtyxTykTrqpQ15cExzWdPYf22DkEB4tgerhNs59Xb4yR
+	GvyIe1fwmEG2x0AEi+AbnrjVKCg1yigqa+BylQuzIIuT9lcA+EX89HgbY32944nxVKog=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qzJic-000syE-50; Sat, 04 Nov 2023 17:41:54 +0100
+Date: Sat, 4 Nov 2023 17:41:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev <netdev@vger.kernel.org>,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH] leds: triggers: netdev: add a check, whether device is up
+Message-ID: <196db01b-40ff-44ed-8e45-1b855940417f@lunn.ch>
+References: <20231104125840.27914-1-klaus.kudielka@gmail.com>
+ <0e3fb790-74f2-4bb3-b41e-65baa3b00093@lunn.ch>
+ <95ff53a1d1b9102c81a05076f40d47242579fc37.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231101013351.55902-1-yang.lee@linux.alibaba.com>
+In-Reply-To: <95ff53a1d1b9102c81a05076f40d47242579fc37.camel@gmail.com>
 
-On Wed, Nov 01, 2023 at 09:33:51AM +0800, Yang Li wrote:
-> The code that uses nft_net has been removed, and the nft_pernet function
-> is merely obtaining a reference to shared data through the net pointer.
-> The content of the net pointer is not modified or changed, so both of
-> them should be removed.
+[Changes the Cc: list. Dropping LED people, adding a few netdev
+people]
+
+On Sat, Nov 04, 2023 at 04:27:45PM +0100, Klaus Kudielka wrote:
+> On Sat, 2023-11-04 at 15:29 +0100, Andrew Lunn wrote:
+> > On Sat, Nov 04, 2023 at 01:58:40PM +0100, Klaus Kudielka wrote:
+> > > Some net devices do not report NO-CARRIER, if they haven't been brought
+> > > up.
+> > 
+> > Hi Klaus
+> > 
+> > We should probably fix the driver. What device is it?
+> > 
+> > > In that case, the netdev trigger results in a wrong link state being
+> > > displayed. Fix this, by adding a check, whether the device is up.
+> > 
+> > Is it wrong? Maybe the carrier really is up, even if the interface is
+> > admin down. Broadcast packets are being received by the
+> > hardware. Maybe there is a BMC sharing the link and it is active?
 > 
-> silence the warning:
-> net/netfilter/nft_set_rbtree.c:627:26: warning: variable ‘nft_net’ set but not used
+> My particular example is Turris Omnia, eth2 (WAN), connected to SFP.
+> SFP module is inserted, but no fiber connected, so definitely no carrier. 
 > 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7103
-> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> *Without* the patch:
+> 
+> After booting, the device is down, but netdev trigger reports "link" active.
+> This looks wrong to me.
+> 
+> I can then "ip link set eth2 up", and the "link" goes away - as I
+> would have expected it to be from the beginning.
 
-I think this is for nf-next, rather than net-next (which is closed).
+Thanks for the details.
 
-But as for the change itself, I also noticed this, and am glad
-to see it being addressed.
+A brain dump...
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+You do see a lot of MAC drivers doing a netif_carrier_off() in there
+probe function. That suggests the carrier is on by default. I doubt we
+can change that, we would break all the drivers which assume the
+carrier is on by default, probably virtual devices and some real
+devices.
+
+Often the MAC and PHY are connected in the open() callback, when using
+phylib. So that is too late.  phylink_create() is however mostly used
+in the probe function. So it could set the carrier to off by default.
+Russell, what do you think?
+
+Turris Omnia uses mvneta. That does not turn the carrier off in its
+probe function. So a quick fix would be to add it. However, that then
+becomes pointless if we make phylink_create() disable the carrier.
+
+	Andrew
 
