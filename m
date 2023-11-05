@@ -1,112 +1,125 @@
-Return-Path: <netdev+bounces-46109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A20D37E16A7
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 21:56:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D797E16AD
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 21:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D325B20C93
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 20:56:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C805B20D1D
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 20:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D7F179A4;
-	Sun,  5 Nov 2023 20:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADA2182C0;
+	Sun,  5 Nov 2023 20:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CDJJexQ7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T71nTGc3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4027E11723
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 20:56:38 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD3EDE
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 12:56:36 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5a7dd65052aso45819957b3.0
-        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 12:56:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7F81FD5
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 20:57:30 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310CEE0
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 12:57:29 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-50931355d48so5093951e87.3
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 12:57:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699217796; x=1699822596; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/6QEyl2SUHinJLODwuehCU3YQb03M8xY6TOhu/4Xq68=;
-        b=CDJJexQ7h/6F+C6pkgO0vRYt3HKgKk9/8ZbVT/xo0Lxp1uC40IP7On1djHawUiEJzO
-         c9uDlO5ATBKKhUchIQAle270lZrKmyqg9+FG+yZxzj5ADbWeCfgzQ2rbgsn1qC1FxEi6
-         B47k0NY7RZbuwrLvaFo/cytLtwvsfpHDW+r0CThA0DtErzveKf5fSGhZwA73pJ/JNqkI
-         nWzYpP7eUW9QB1BWT7YjAUNQsWYQumPQzIIFegFBR35RXCccy4vKLgzFZsaVs2GBk5Fj
-         vfAp5YnrdaRnHRn61Wg0qDzNihObHKmD9WUhrotRx+0Pz2i5dfWR6vB5L643rzu+18qL
-         OeEA==
+        d=linaro.org; s=google; t=1699217847; x=1699822647; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WFkRCO5Gr31wYYObvH3M58yivJORulviaRB/LYrXXJQ=;
+        b=T71nTGc3Okg3dJ2uwL1PBI2yihVsH1WUU6wVIvBV6MsY1JdiYlECtNF4NDGUuM90C/
+         JaXDu8k4/NHYkMWT3+aa+ejrB1nwZ7pWusxsNO73UpxUc16lEoNfNoOdzeKLJ7q0Sci/
+         KYFIc/DlCNcNumSnbqPCPW9LuO4xLBXzPQ68uKDkAQ4/f3cUoGK25k+4kuvjlo9roDUj
+         83/LItQaChogLOazxOFYrTWGpQmhR5tGbfQl0apg2DABFlkMMQoT1lsHvm1xNoZp1R4W
+         0+Whe8mumr2gdnYVFUmBYp6JhsBlnqoe0NC78Ci6Zu1dbqYuTvmbrVAyLGLMZkLTUS6a
+         fZ5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699217796; x=1699822596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/6QEyl2SUHinJLODwuehCU3YQb03M8xY6TOhu/4Xq68=;
-        b=ZcY3rh87RkxAMqmfO1HKD+uUc3Sb96+kawXdGNwFPrQJ3tZzFoW/XlL15um1E3HCpV
-         6WSitnng0cVu+54HZQTxLs1LvD7oJdEe1tpFF0nQuXKTCNUinsfas5VYNornjJjVdEVH
-         huBJ5lvaII5F3Nei8QPJxiXcIp4bFQxI2/Ev6sG+pBhQoaazcM3M8UacdNR9Aaef2iVS
-         hQcX0X9W/NE6gbO6DrdPMYpexITW+aeULkxDnLl2hBeW9gcWfg2qOHT+PD/0N/f5pm1K
-         oFVLJfgYwlRe6jQggJaAIKMq/uO1CUC6ypbXX7fA5e/TYouyg+P6pkyrB4IHfT1nRlUV
-         k0GQ==
-X-Gm-Message-State: AOJu0YzWuMSXs88JKiKkPx7iwUPmqSXz5sgomH0s6g/TYnA3cKs4wpxU
-	WKntZ+l7aNWBcOlpX+HH553U7YV/fLoZKK3i/rG/aA==
-X-Google-Smtp-Source: AGHT+IGrBlLDBzl5QYMUEq8ZYbSLDgWpthp2RHHdVa+K8PvdjwCEDI/B3NFocFtHXGZ/fdZx5BrNzzTlf4Vzkt9zu6k=
-X-Received: by 2002:a05:690c:a:b0:59e:9a44:9db9 with SMTP id
- bc10-20020a05690c000a00b0059e9a449db9mr8923885ywb.26.1699217795923; Sun, 05
- Nov 2023 12:56:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699217847; x=1699822647;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WFkRCO5Gr31wYYObvH3M58yivJORulviaRB/LYrXXJQ=;
+        b=h/lPndQ6eJ0w1PZlU6Yx7SV5CZk3UOKO5qaMC9vS2IVLuoSKqES/q4cBkcgjIYvcsM
+         BkpORydSJXz4IFqtZm3yCKuK80L55gpuIMYC0oOcNT3gEGh52esHc5QcdQm9TNoFa/Zo
+         OlxhjyHgsRoPejYaAP3ORD7pllwKKncZEKirOcJqXfgQgba/zxq0sx7YLc2V8REsJ4IN
+         Z5A4Z0KVG2bB9q7P19W0vcE33rhzAIFXUZFXvxstjl0BqwjnT1C3WF2d1+0T4ZQGWGtZ
+         rR/Owxu44KFgIxepBbhA3+CDYUFjhrAEdA1qFk3jJ4PW8nbrOVAvtUNR2aw3D5TFM5de
+         r7nw==
+X-Gm-Message-State: AOJu0YzXYxq5sv+ckRDmDB3ebUr3EEhHoeM0NxRRVcRcjIzA4K31Q7Eb
+	wzd/d0n6Hv9m1WMIPj1ELiJVPQ==
+X-Google-Smtp-Source: AGHT+IGGCnq8W4xy+A703Avtfw1jtmjghCdQJdWIjjPpOpvf4AdSuEWf3pw2aCu+fr2p82NwWqsyhg==
+X-Received: by 2002:a05:6512:969:b0:509:377a:26d9 with SMTP id v9-20020a056512096900b00509377a26d9mr10364957lft.8.1699217846755;
+        Sun, 05 Nov 2023 12:57:26 -0800 (PST)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id d12-20020ac24c8c000000b00507c72697d0sm931873lfl.303.2023.11.05.12.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Nov 2023 12:57:26 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net v2 0/4] Fix large frames in the Gemini ethernet driver
+Date: Sun, 05 Nov 2023 21:57:22 +0100
+Message-Id: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org>
- <20231104-gemini-largeframe-fix-v1-4-9c5513f22f33@linaro.org> <036b481e-ac5b-4e77-b93a-4badaf19e185@lunn.ch>
-In-Reply-To: <036b481e-ac5b-4e77-b93a-4badaf19e185@lunn.ch>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 5 Nov 2023 21:56:23 +0100
-Message-ID: <CACRpkdYp1kiGY0K7kNF+qadPyq1hu3G=2oc1gXnCt3DjtiJxag@mail.gmail.com>
-Subject: Re: [PATCH net 4/4] net: ethernet: cortina: Handle large frames
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>, 
-	Vladimir Oltean <olteanv@gmail.com>, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALIBSGUC/4WNTQqDMBCFryKzboqTKP1Z9R7FRRoncUCTMhFpk
+ dy9wQt0+b7H+94OmYQpw73ZQWjjzCnWoE8NuMnGQIrHmkG32iC2nQq0cGQ1WwnkxS6kPH+Uw86
+ M2l2u+Oqhbt9CFR/eJ0RaYahw4rwm+R5fGx7VH+2GqlU31/dovNbemMfM0Uo6JwkwlFJ+9/O3g
+ sAAAAA=
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>, 
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.4
 
-On Sat, Nov 4, 2023 at 3:57=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+This is the result of a bug hunt for a problem with the
+RTL8366RB DSA switch leading me wrong all over the place.
 
-> > +              * Just bypass on bigger frames.
-> > +              */
-> > +             word1 |=3D TSS_BYPASS_BIT;
-> > +     } else if (skb->ip_summed !=3D CHECKSUM_NONE) {
->
-> I've never looked at how the network stack does checksums. But looking
-> at this patch, it made me wounder, how do you tell the stack it needs
-> to do a software checksum because the hardware cannot?
+I am indebted to Vladimir Oltean who as usual pointed
+out where the real problem was, many thanks!
 
-I read up on it: the documentation is in
-Documentation/networking/checksum-offloads.rst
-and in the header for skbuff, include/linux/skbuff.h
+Tryig to actually use big ("jumbo") frames on this
+hardware uncovered the real bugs. Then I tested it on
+the DSA switch and it indeed fixes the issue.
 
-Actually we should check for =3D=3D CHECKSUM_PARTIAL which means
-we need to do the checksum (!=3D CHECKSUM_NONE is not inclusive)
-then I call a software fallback directly from the driver if I need to.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+Changes in v2:
+- Don't check for oversized MTU request: the framework makes sure it doesn't
+  happen.
+- Drop unrelated BIT() macro cleanups (I might send these later for net-next)
+- Use a special error code if the skbuff is too big and fail gracefully
+  is this happens.
+- Do proper checksum of the frame using a software fallback when the frame
+  is too long for hardware checksumming.
+- Link to v1: https://lore.kernel.org/r/20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org
 
-> Or for this
-> driver, is it always calculating a checksum, which is then ignored?
-> Maybe you can improve performance a little but disabling software
-> checksum when it is not needed?
+---
+Linus Walleij (4):
+      net: ethernet: cortina: Fix MTU max setting
+      net: ethernet: cortina: Fix max RX frame define
+      net: ethernet: cortina: Protect against oversized frames
+      net: ethernet: cortina: Handle large frames
 
-The ping was somehow working without proper checksum
-before, but I think I'm doing the right thing now, also tested with
-HTTP traffic, check out v2.
+ drivers/net/ethernet/cortina/gemini.c | 39 ++++++++++++++++++++++++++++-------
+ drivers/net/ethernet/cortina/gemini.h |  4 ++--
+ 2 files changed, 34 insertions(+), 9 deletions(-)
+---
+base-commit: e85fd73c7d9630d392f451fcf69a457c8e3f21dd
+change-id: 20231104-gemini-largeframe-fix-c143d2c781b5
 
-Thanks for pointing it out, the patch looks way better now.
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
-Yours,
-Linus Walleij
 
