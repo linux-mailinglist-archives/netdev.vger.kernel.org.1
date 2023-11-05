@@ -1,139 +1,88 @@
-Return-Path: <netdev+bounces-46098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E992B7E153C
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 17:46:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA247E1582
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 18:34:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7A31F215C7
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:46:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C482B20D00
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 17:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794EB154B4;
-	Sun,  5 Nov 2023 16:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaPLWjxo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1515915AF8;
+	Sun,  5 Nov 2023 17:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B6B1FD5
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 16:46:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80B8FA
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 08:46:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699202769;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=eC7KMeIBQqNk/V3RXfwXIU+MwIED52IGZpLe2RUKxaU=;
-	b=CaPLWjxok/M9oEaTwhA7+jU7BawpdUY0UOFlXZQ7yhoCPtyRYnAG93iUi8icvZM/0+Z67b
-	N+2FM5yfNST/JNWb8E4C1RALIiuuJUS0sSRbWMVL18qt+R/6exylcBq/8wt8+sJ5tTSPux
-	o3mZKDdjzDEAgcCg/qOyisWU6qbOGKs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-cwp2luAZMS6wp8sRjoORrA-1; Sun, 05 Nov 2023 11:46:07 -0500
-X-MC-Unique: cwp2luAZMS6wp8sRjoORrA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8578D185A780;
-	Sun,  5 Nov 2023 16:46:06 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.224.31])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6C71340C6EB9;
-	Sun,  5 Nov 2023 16:46:03 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-kernel@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net v2] i40e: Fix adding unsupported cloud filters
-Date: Sun,  5 Nov 2023 17:46:02 +0100
-Message-ID: <20231105164602.1107498-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B905A956
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 17:34:07 +0000 (UTC)
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C486BCA
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 09:34:05 -0800 (PST)
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b3f4ab1238so4565414b6e.3
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 09:34:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699205645; x=1699810445;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H4FvxRKbvCfMpMcLXPYkRNT3NM+7m0oeXuj/bJJZmv8=;
+        b=aKi4uciLKN4jqhjrGZEW5axDoqOzhITyllNCqs0TW27RcA1jxu/LCe8lkLHr0FmVFY
+         2R2XYzZ+1MgxZ9mdly2c6EB3O1T3E/XmIoioQehns3CbE9+bDt+ZGw34K+4sEOQiVbE1
+         +bsaElgROcVntZXM6jAPTx7AwXcVOd3bxS1BOz7ZANOrInmOwUfctmZz1vb55/sbkXPa
+         ytSVWxilNC40ecoN8lsQJj8PV056WuMa6wx50HTirCR6h3LnflF982qkii7WydJas/un
+         AkWrFqMTrVp44JHCT/mXVJiUPRGnX/8qtnwOkr/8Pih/s4qjQ0vvl99xrSII+fzUqbU5
+         7BSg==
+X-Gm-Message-State: AOJu0YyYe2sFUxC7Vc2Gzn9sz0C6flRxu+IBJZBsj2nlmxzIdKjskGlP
+	GxHyrHX23EFLGNSGDmYoXAKs4JPFb43r2v+7RZVrH+bwjlWJ
+X-Google-Smtp-Source: AGHT+IHQGKy6Mfra4sf1/Fnaf3EC/D55G0NP35y8t1SN8GFVyNI7t9d57uCYzqPBwHjaKdaF7v3yTC+yAH7PGthgD35bnMd/I7bL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Received: by 2002:a05:6808:3083:b0:3ad:aeed:7eeb with SMTP id
+ bl3-20020a056808308300b003adaeed7eebmr10612059oib.6.1699205645177; Sun, 05
+ Nov 2023 09:34:05 -0800 (PST)
+Date: Sun, 05 Nov 2023 09:34:05 -0800
+In-Reply-To: <0000000000006f759505ee84d8d7@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e197ef06096b2454@google.com>
+Subject: Re: [syzbot] [nfc?] [net?] BUG: corrupted list in nfc_llcp_unregister_device
+From: syzbot <syzbot+81232c4a81a886e2b580@syzkaller.appspotmail.com>
+To: 309386628@qq.com, davem@davemloft.net, dominic.coppola@gatoradeadvert.com, 
+	dvyukov@google.com, edumazet@google.com, hdanton@sina.com, 
+	johan.hedberg@gmail.com, krzysztof.kozlowski@linaro.org, kuba@kernel.org, 
+	linma@zju.edu.cn, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, zahiabdelmalak0@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Level: **
 
-If a VF tries to add unsupported cloud filter through virchnl
-then i40e_add_del_cloud_filter(_big_buf) returns -ENOTSUPP but
-this error code is stored in 'ret' instead of 'aq_ret' that
-is used as error code sent back to VF. In this scenario where
-one of the mentioned functions fails the value of 'aq_ret'
-is zero so the VF will incorrectly receive a 'success'.
+syzbot suspects this issue was fixed by commit:
 
-Use 'aq_ret' to store return value and remove 'ret' local
-variable. Additionally fix the issue when filter allocation
-fails, in this case no notification is sent back to the VF.
+commit b938790e70540bf4f2e653dcd74b232494d06c8f
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Fri Sep 15 20:24:47 2023 +0000
 
-Fixes: e284fc280473be ("i40e: Add and delete cloud filter")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- .../net/ethernet/intel/i40e/i40e_virtchnl_pf.c   | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+    Bluetooth: hci_codec: Fix leaking content of local_codecs
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 08d7edccfb8ddb..3f99eb19824527 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -3844,7 +3844,7 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 	struct i40e_pf *pf = vf->pf;
- 	struct i40e_vsi *vsi = NULL;
- 	int aq_ret = 0;
--	int i, ret;
-+	int i;
- 
- 	if (!i40e_sync_vf_state(vf, I40E_VF_STATE_ACTIVE)) {
- 		aq_ret = -EINVAL;
-@@ -3868,8 +3868,10 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 	}
- 
- 	cfilter = kzalloc(sizeof(*cfilter), GFP_KERNEL);
--	if (!cfilter)
--		return -ENOMEM;
-+	if (!cfilter) {
-+		aq_ret = -ENOMEM;
-+		goto err_out;
-+	}
- 
- 	/* parse destination mac address */
- 	for (i = 0; i < ETH_ALEN; i++)
-@@ -3917,13 +3919,13 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 
- 	/* Adding cloud filter programmed as TC filter */
- 	if (tcf.dst_port)
--		ret = i40e_add_del_cloud_filter_big_buf(vsi, cfilter, true);
-+		aq_ret = i40e_add_del_cloud_filter_big_buf(vsi, cfilter, true);
- 	else
--		ret = i40e_add_del_cloud_filter(vsi, cfilter, true);
--	if (ret) {
-+		aq_ret = i40e_add_del_cloud_filter(vsi, cfilter, true);
-+	if (aq_ret) {
- 		dev_err(&pf->pdev->dev,
- 			"VF %d: Failed to add cloud filter, err %pe aq_err %s\n",
--			vf->vf_id, ERR_PTR(ret),
-+			vf->vf_id, ERR_PTR(aq_ret),
- 			i40e_aq_str(&pf->hw, pf->hw.aq.asq_last_status));
- 		goto err_free;
- 	}
--- 
-2.41.0
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15cb8f17680000
+start commit:   e1c04510f521 Merge tag 'pm-6.2-rc9' of git://git.kernel.or..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fe56f7d193926860
+dashboard link: https://syzkaller.appspot.com/bug?extid=81232c4a81a886e2b580
+userspace arch: i386
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14e90568c80000
 
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: Bluetooth: hci_codec: Fix leaking content of local_codecs
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
