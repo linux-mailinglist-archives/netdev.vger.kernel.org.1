@@ -1,78 +1,199 @@
-Return-Path: <netdev+bounces-46095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4CC37E141A
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:33:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D72C47E142C
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 746512812BB
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 15:33:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B8C1C2098A
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 15:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E05FBE9;
-	Sun,  5 Nov 2023 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CB311711;
+	Sun,  5 Nov 2023 15:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gt9R+XQh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRoVaLL4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754D4101CB
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 15:33:44 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1449A7;
-	Sun,  5 Nov 2023 07:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eqfTkuz+klDPkuPgYNloOteJWBEwKWLuB1ZigC0ZFsI=; b=gt9R+XQhR7uywY8dT2NEYMPSXt
-	X2m51KK66ty4Srb+fouQpQWOarfSL+oZyZ3/3wqNN+OEHQCAi83xulUQc4OhM6YzaY6C6tHacJGmr
-	o3UUq1EuMVC6ND2T7YAiFw5+lU5cYMpr8d/yeDALgArbVn/GBAGzRSzwHv8wegnl3+3s=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qzf7x-000wCa-Rc; Sun, 05 Nov 2023 16:33:29 +0100
-Date: Sun, 5 Nov 2023 16:33:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, nic_swsd@realtek.com
-Subject: Re: [PATCH net-next v6 0/5] Coalesce mac ocp write/modify calls to
- reduce spinlock contention
-Message-ID: <344fc5c2-4447-4481-843f-9d7720e55a77@lunn.ch>
-References: <20231104221514.45821-1-mirsad.todorovac@alu.unizg.hr>
- <da4409f3-d509-413b-8433-f222acbbb1be@gmail.com>
- <edee64f4-442d-4670-a91b-e5b83117dd40@alu.unizg.hr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24897E54D
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 15:58:23 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016E6E0
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 07:58:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699199900;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gm8P+4qqkq3fie/1BXBTuSMj+CMA8LATFFDY5rV8ORw=;
+	b=iRoVaLL4ZpxQqZpqg35eHA56K0DlXNQ1WcOq5EiX38bxtfsd18tT7muxeKrxHKoEBj/9bs
+	37bjm4CbvzFaDpbD8pelcb81k3dMts7Lqmi6Kk421QYSRnp6a63fx+SPVaEqrr5D00FtwG
+	8t6GH8aAPmAWv+OeYOZkvaRDglovqw8=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-3-ANSlyLhENASuDzFp94FBiw-1; Sun, 05 Nov 2023 10:58:18 -0500
+X-MC-Unique: ANSlyLhENASuDzFp94FBiw-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-543f1c6dcaeso2763762a12.1
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 07:58:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699199897; x=1699804697;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gm8P+4qqkq3fie/1BXBTuSMj+CMA8LATFFDY5rV8ORw=;
+        b=YZtb+227KxxevK+uCmbJGZj0wYf+oH31ILlCPkPt+BGQ7W4wVQiSJZ/fCeDav6Ordq
+         1ZTrxMlC2cBH1J3OANVJ3dFyvYFMiH3Q4FYBCVpZPGRcYifx/362yjJY0s+9rtxzGBeu
+         OShIb/pNA67zC7NTRy4ZngcR4bKq2s8rrL40CaNtlnfa0aGMwWmS/WGkpUNlRjF3lGDk
+         /tlJGJjms9LfOIdCDt4eBTsCWjjPndUgICht+M7OI0l5uFuyUCYGq89fJIcqZ+jmmoKX
+         BNo6JNZSNkkzoUYayJS6zCqtJQzp8/oWD/b6Itvytuz0HHYSyuL2rwAV/IOUr/aybmmS
+         S5Mw==
+X-Gm-Message-State: AOJu0YzwgdkAtJxdM/M/H6Mbu9DCqCF8Ne/6fAHA/eZH3IDOqJ5QrvCs
+	L+17anR+zkypwXbJmZ1HsfWMjdTpXgWxrdRX+m9cybOoI0nILziyvI5m5eWH8Xd6ZYZVf3NPOI0
+	TJ52w+8Yb/gXcApOV
+X-Received: by 2002:a17:906:db08:b0:9dd:f5ba:856d with SMTP id xj8-20020a170906db0800b009ddf5ba856dmr3819998ejb.62.1699199897434;
+        Sun, 05 Nov 2023 07:58:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEybgJfekAZesQ+akyhDcdHp9NNqn1nBxIeCP8wqicCb5vXKmYeJbRaNub+H3s331kYxYmE9A==
+X-Received: by 2002:a17:906:db08:b0:9dd:f5ba:856d with SMTP id xj8-20020a170906db0800b009ddf5ba856dmr3819966ejb.62.1699199896993;
+        Sun, 05 Nov 2023 07:58:16 -0800 (PST)
+Received: from redhat.com ([2.55.35.234])
+        by smtp.gmail.com with ESMTPSA id qw23-20020a1709066a1700b009dd949b75c7sm2460591ejc.151.2023.11.05.07.58.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Nov 2023 07:58:16 -0800 (PST)
+Date: Sun, 5 Nov 2023 10:58:06 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dtatulea@nvidia.com, eperezma@redhat.com, geert+renesas@glider.be,
+	gregkh@linuxfoundation.org, jasowang@redhat.com, leiyang@redhat.com,
+	leon@kernel.org, mst@redhat.com, pizhenwei@bytedance.com,
+	sgarzare@redhat.com, shannon.nelson@amd.com,
+	shawn.shao@jaguarmicro.com, simon.horman@corigine.com,
+	si-wei.liu@oracle.com, xieyongji@bytedance.com,
+	xuanzhuo@linux.alibaba.com, xueshi.hu@smartx.com
+Subject: [GIT PULL] vhost,virtio,vdpa: features, fixes, cleanups
+Message-ID: <20231105105806-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <edee64f4-442d-4670-a91b-e5b83117dd40@alu.unizg.hr>
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
 
-> > > With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
-> > > a lock storm that will stall all of the cores and CPUs on the same memory controller
-> > > for certain time I/O takes to finish.
+The following changes since commit ffc253263a1375a65fa6c9f62a893e9767fbebfa:
 
-Please provide benchmark data to show this is a real issue, and the
-patch fixes it.
+  Linux 6.6 (2023-10-29 16:31:08 -1000)
 
-> Additionally, I would like to "inline" many functions, as I think that call/return
-> sequences with stack frame generation /destruction are more expensive than inlining the
-> small one liners.
+are available in the Git repository at:
 
-Please provide benchmarks to show the compiler is getting this wrong,
-and inline really is needed.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-Until there are benchmarks: NACK.
+for you to fetch changes up to 86f6c224c97911b4392cb7b402e6a4ed323a449e:
 
-    Andrew
+  vdpa_sim: implement .reset_map support (2023-11-01 09:20:00 -0400)
+
+----------------------------------------------------------------
+vhost,virtio,vdpa: features, fixes, cleanups
+
+vdpa/mlx5:
+	VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+	new maintainer
+vdpa:
+	support for vq descriptor mappings
+	decouple reset of iotlb mapping from device reset
+
+fixes, cleanups all over the place
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Dragos Tatulea (14):
+      vdpa/mlx5: Expose descriptor group mkey hw capability
+      vdpa/mlx5: Create helper function for dma mappings
+      vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
+      vdpa/mlx5: Take cvq iotlb lock during refresh
+      vdpa/mlx5: Collapse "dvq" mr add/delete functions
+      vdpa/mlx5: Rename mr destroy functions
+      vdpa/mlx5: Allow creation/deletion of any given mr struct
+      vdpa/mlx5: Move mr mutex out of mr struct
+      vdpa/mlx5: Improve mr update flow
+      vdpa/mlx5: Introduce mr for vq descriptor
+      vdpa/mlx5: Enable hw support for vq descriptor mapping
+      vdpa/mlx5: Make iotlb helper functions more generic
+      vdpa/mlx5: Update cvq iotlb mapping on ASID change
+      MAINTAINERS: Add myself as mlx5_vdpa driver
+
+Eugenio Pérez (1):
+      mlx5_vdpa: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
+
+Geert Uytterhoeven (1):
+      vhost-scsi: Spelling s/preceeding/preceding/g
+
+Greg Kroah-Hartman (1):
+      vduse: make vduse_class constant
+
+Michael S. Tsirkin (1):
+      Merge branch 'mlx5-vhost' of https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git
+
+Shannon Nelson (1):
+      virtio: kdoc for struct virtio_pci_modern_device
+
+Shawn.Shao (1):
+      vdpa: Update sysfs ABI documentation
+
+Si-Wei Liu (10):
+      vdpa: introduce dedicated descriptor group for virtqueue
+      vhost-vdpa: introduce descriptor group backend feature
+      vhost-vdpa: uAPI to get dedicated descriptor group id
+      vdpa: introduce .reset_map operation callback
+      vhost-vdpa: reset vendor specific mapping to initial state in .release
+      vhost-vdpa: introduce IOTLB_PERSIST backend feature bit
+      vdpa: introduce .compat_reset operation callback
+      vhost-vdpa: clean iotlb map during reset for older userspace
+      vdpa/mlx5: implement .reset_map driver op
+      vdpa_sim: implement .reset_map support
+
+Xuan Zhuo (3):
+      virtio: add definition of VIRTIO_F_NOTIF_CONFIG_DATA feature bit
+      virtio_pci: add build offset check for the new common cfg items
+      virtio_pci: add check for common cfg size
+
+Xueshi Hu (1):
+      virtio-balloon: correct the comment of virtballoon_migratepage()
+
+zhenwei pi (1):
+      virtio-blk: fix implicit overflow on virtio_max_dma_size
+
+ Documentation/ABI/testing/sysfs-bus-vdpa |   4 +-
+ MAINTAINERS                              |   6 +
+ drivers/block/virtio_blk.c               |   4 +-
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h       |  32 +++--
+ drivers/vdpa/mlx5/core/mr.c              | 213 +++++++++++++++++++------------
+ drivers/vdpa/mlx5/core/resources.c       |   6 +-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c        | 137 +++++++++++++++-----
+ drivers/vdpa/vdpa_sim/vdpa_sim.c         |  52 ++++++--
+ drivers/vdpa/vdpa_user/vduse_dev.c       |  40 +++---
+ drivers/vhost/scsi.c                     |   2 +-
+ drivers/vhost/vdpa.c                     |  79 +++++++++++-
+ drivers/virtio/virtio_balloon.c          |   2 +-
+ drivers/virtio/virtio_pci_modern.c       |  36 ++++++
+ drivers/virtio/virtio_pci_modern_dev.c   |   6 +-
+ drivers/virtio/virtio_vdpa.c             |   2 +-
+ include/linux/mlx5/mlx5_ifc.h            |   8 +-
+ include/linux/mlx5/mlx5_ifc_vdpa.h       |   7 +-
+ include/linux/vdpa.h                     |  41 +++++-
+ include/linux/virtio_pci_modern.h        |  35 +++--
+ include/uapi/linux/vhost.h               |   8 ++
+ include/uapi/linux/vhost_types.h         |   7 +
+ include/uapi/linux/virtio_config.h       |   5 +
+ 22 files changed, 546 insertions(+), 186 deletions(-)
+
 
