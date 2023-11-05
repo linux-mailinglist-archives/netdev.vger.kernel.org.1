@@ -1,251 +1,107 @@
-Return-Path: <netdev+bounces-46081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE4A7E11F8
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 03:18:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 453697E120E
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 03:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31D0B28149D
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 02:18:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DFBD1C208DF
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 02:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9D7EC3;
-	Sun,  5 Nov 2023 02:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78196ECC;
+	Sun,  5 Nov 2023 02:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="lc3SxlZQ";
-	dkim=temperror (0-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="cGdW/9Lc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="sWkyyBE/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8034B63E
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 02:18:45 +0000 (UTC)
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DC7D9;
-	Sat,  4 Nov 2023 19:18:39 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 0E44E60171;
-	Sun,  5 Nov 2023 03:18:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1699150717; bh=fYaMEKBQxJ0g6H5yjgzGnUoFYpoWiOWtlqqdR6WqekU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lc3SxlZQBQgiBsc37quMzDH5CEKIAA3iBIWm70pZYl7dMyHNEbliMdB+cggmqTgEh
-	 DEB8NNMzumM13NSk2g+POKAudb3IPp6Nvso/l51AvjYNz3QOG8n/wmzl3Iqrggw51g
-	 HneJPmfBY+GRMplb6kIg3pcHYVDbqYUBQorSVhfuIE1txsCAHnOFOZ03Hf+koWsiA4
-	 suA6wx9uRZSQMi76073SoCXmJdLoe07buhWvwkCIrGqpHlE6fSikVkLe719DClwMnD
-	 XYjFUDhx7R3NsINVX2Bq3JP5cw765YbsT6YIvGV51bWoFiYTDj9gVAf7c0nVOdodzB
-	 7dbkmWlTv2GxA==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id m7dYu-niWWke; Sun,  5 Nov 2023 03:18:34 +0100 (CET)
-Received: from [192.168.1.6] (78-2-200-71.adsl.net.t-com.hr [78.2.200.71])
-	by domac.alu.hr (Postfix) with ESMTPSA id 22FE66016E;
-	Sun,  5 Nov 2023 03:18:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1699150714; bh=fYaMEKBQxJ0g6H5yjgzGnUoFYpoWiOWtlqqdR6WqekU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cGdW/9LcotJcSSC4jzDb96UCipjLSmnF8baXykkwR4yDLl//I03PlyGDWOz1QMUeV
-	 JwaOUZ4ThybwMA7My7TzQJ8ntpVBjJfLQrd0d1PnBnJwiXotYz7ebI7rD4Ezgx3Mn2
-	 7u+JxEphDBaCfpqdA5dQ7n8ECaFVDhG2X3nyVYu34q4ufAviKRyOv/d/rlsLAHaCMI
-	 hzZxAWbh+NV+TlstT44PmmDNUmjLc9d6xV0rHsFJZYBWKF/IFk6iZkQTkeObT9T/WE
-	 2EJGw8qYLfdr+TG+GGV8iEK7OFkicuapF24Gvimci7djWPGAtNa7yuEJvCpeaaQYo8
-	 bHaAR7GFhpbRA==
-Message-ID: <ac19c886-9d71-4b4f-b5d4-42111dddb8ee@alu.unizg.hr>
-Date: Sun, 5 Nov 2023 03:18:32 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31280EBE
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 02:48:11 +0000 (UTC)
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BAC9C
+	for <netdev@vger.kernel.org>; Sat,  4 Nov 2023 19:48:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Zae8Bgl4FNskvERkFBZCnhwW1xEBIYJ6jwBTUCWsVFY=; t=1699152489; x=1700016489; 
+	b=sWkyyBE/goZOqG5WvxJfBs81BPZ/b+DK+zS1kLd/4SZP5hwHeWQ7zTu+D6VZOvu4RvIlQ1+PA/x
+	uMErfhaV50z4eGqfFKNXGXuVp3vyZtxD+6ZgFOYueZF8K/B9aerhCwmyjHly5uL+YpQ/0f/r6GSBf
+	Cd9urmykvD8OrlEquQkOC/1b9c7b0JlpgYbmDgftgGxPtO+PVOECFUVcwt+rZKTaKknRe7aGoGzGX
+	WzsqdX2/Ly5iABEaQDrYcJ/Z1Np3pYg2Q/opiTeBSosyF5Tk/gA0qVN2w2tztL+4r7D2uNeunSJdI
+	pd+9mPomRplVM/WWDH7Ry89SG8+lLZclI4pg==;
+Received: from mail-oa1-f45.google.com ([209.85.160.45]:57650)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1qzTBI-0004QU-8P
+	for netdev@vger.kernel.org; Sat, 04 Nov 2023 19:48:08 -0700
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-1eb7a8e9dd0so2108505fac.3
+        for <netdev@vger.kernel.org>; Sat, 04 Nov 2023 19:48:08 -0700 (PDT)
+X-Gm-Message-State: AOJu0Ywww4dRlDiT6QkUUbBjHDibWaGnUZ7XJ6NPmRENs+8ALND4jI78
+	8HwK4misPeYRzBPec1jGUvvsB0j2YkkOwfDY95k=
+X-Google-Smtp-Source: AGHT+IF83QTldxmOrQhHrI3pYn6hWGBeq+emJwGh1M+oAxDNTnuxdvg4vdYzQ1kl6fNSeR/9+f+uI2Ljw3rEhiBhkJM=
+X-Received: by 2002:a05:6870:6c05:b0:1ef:c082:ecbe with SMTP id
+ na5-20020a0568706c0500b001efc082ecbemr27178445oab.55.1699152487823; Sat, 04
+ Nov 2023 19:48:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 0/5] Coalesce mac ocp write/modify calls to
- reduce spinlock contention
-Content-Language: en-US
-To: Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, nic_swsd@realtek.com
-References: <20231104221514.45821-1-mirsad.todorovac@alu.unizg.hr>
- <da4409f3-d509-413b-8433-f222acbbb1be@gmail.com>
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <da4409f3-d509-413b-8433-f222acbbb1be@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CAGXJAmy-0_GV7pR5_3NNArWZumunRijHeSJnY=VEf8RjmegZZw@mail.gmail.com>
+ <29217dab-e00e-4e4c-8d6a-4088d8e79c8e@lunn.ch>
+In-Reply-To: <29217dab-e00e-4e4c-8d6a-4088d8e79c8e@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Sat, 4 Nov 2023 19:47:30 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmzn0vFtkVT=JQLQuZm6ae+Ms_nOcvebKPC6ARWfM9DwOw@mail.gmail.com>
+Message-ID: <CAGXJAmzn0vFtkVT=JQLQuZm6ae+Ms_nOcvebKPC6ARWfM9DwOw@mail.gmail.com>
+Subject: Re: Bypass qdiscs?
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: bd70d0bdda1312c8b25f7b39d1e2fb7f
 
+I haven't tried creating a "pass through" qdisc, but that seems like a
+reasonable approach if (as it seems) there isn't something already
+built-in that provides equivalent functionality.
 
+-John-
 
-On 11/4/23 23:37, Heiner Kallweit wrote:
-> On 04.11.2023 23:15, Mirsad Goran Todorovac wrote:
->> The motivation for these helpers was the locking overhead of 130 consecutive
->> r8168_mac_ocp_write() calls in the RTL8411b reset after the NIC gets confused
->> if the PHY is powered-down.
->>
->> To quote Heiner:
->>
->>      On RTL8411b the RX unit gets confused if the PHY is powered-down.
->>      This was reported in [0] and confirmed by Realtek. Realtek provided
->>      a sequence to fix the RX unit after PHY wakeup.
->>
->> A series of about 130 r8168_mac_ocp_write() calls is performed to program the
->> RTL registers for recovery, each doing an expensive spin_lock_irqsave() and
->> spin_unlock_irqrestore().
->>
->> Each mac ocp write is made of:
->>
->>      static void __r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
->>                        u32 data)
->>      {
->>          if (rtl_ocp_reg_failure(reg))
->>              return;
->>
->>          RTL_W32(tp, OCPDR, OCPAR_FLAG | (reg << 15) | data);
->>      }
->>
->>      static void r8168_mac_ocp_write(struct rtl8169_private *tp, u32 reg,
->>                      u32 data)
->>      {
->>          unsigned long flags;
->>
->>          raw_spin_lock_irqsave(&tp->mac_ocp_lock, flags);
->>          __r8168_mac_ocp_write(tp, reg, data);
->>          raw_spin_unlock_irqrestore(&tp->mac_ocp_lock, flags);
->>      }
->>
->> Register programming is done through RTL_W32() macro which expands into
->>
->>      #define RTL_W32(tp, reg, val32) writel((val32), tp->mmio_addr + (reg))
->>
->> which is further (on Alpha):
->>
->>      extern inline void writel(u32 b, volatile void __iomem *addr)
->>      {
->>          mb();
->>          __raw_writel(b, addr);
->>      }
->>
->> or on i386/x86_64:
->>
->>      #define build_mmio_write(name, size, type, reg, barrier) \
->>      static inline void name(type val, volatile void __iomem *addr) \
->>      { asm volatile("mov" size " %0,%1": :reg (val), \
->>      "m" (*(volatile type __force *)addr) barrier); }
->>
->>      build_mmio_write(writel, "l", unsigned int, "r", :"memory")
->>
->> This obviously involves iat least a compiler barrier.
->>
->> mb() expands into something like this i.e. on x86_64:
->>
->>      #define mb()    asm volatile("lock; addl $0,0(%%esp)" ::: "memory")
->>
->> This means a whole lot of memory bus stalls: for spin_lock_irqsave(),
->> memory barrier, writel(), and spin_unlock_irqrestore().
->>
->> With about 130 of these sequential calls to r8168_mac_ocp_write() this looks like
->> a lock storm that will stall all of the cores and CPUs on the same memory controller
->> for certain time I/O takes to finish.
->>
->> In a sequential case of RTL register programming, the writes to RTL registers
->> can be coalesced under a same raw spinlock. This can dramatically decrease the
->> number of bus stalls in a multicore or multi-CPU system.
->>
->> Macro helpers r8168_mac_ocp_write_seq() and r8168_mac_ocp_modify_seq() are
->> provided to reduce lock contention:
->>
->>      static void rtl_hw_start_8411_2(struct rtl8169_private *tp)
->>      {
->>
->>          ...
->>
->>          /* The following Realtek-provided magic fixes an issue with the RX unit
->>           * getting confused after the PHY having been powered-down.
->>           */
->>
->>          static const struct recover_8411b_info init_zero_seq[] = {
->>              { 0xFC28, 0x0000 }, { 0xFC2A, 0x0000 }, { 0xFC2C, 0x0000 },
->>              ...
->>          };
->>
->>          ...
->>
->>          r8168_mac_ocp_write_seq(tp, init_zero_seq);
->>
->>          ...
->>
->>      }
->>
->> The hex data is preserved intact through s/r8168_mac_ocp_write[(]tp,/{ / and s/[)];/ },/
->> functions that only changed the function names and the ending of the line, so the actual
->> hex data is unchanged.
->>
->> To repeat, the reason for the introduction of the original commit
->> was to enable recovery of the RX unit on the RTL8411b which was confused by the
->> powered-down PHY. This sequence of r8168_mac_ocp_write() calls amplifies the problem
->> into a series of about 500+ memory bus locks, most waiting for the main memory read,
->> modify and write under a LOCK. The memory barrier in RTL_W32 should suffice for
->> the programming sequence to reach RTL NIC registers.
->>
->> [0] https://bugzilla.redhat.com/show_bug.cgi?id=1692075
->>
->> v6:
->>   proceeded according to Jacob Keller's suggestions by creating a cover page and reducing
->>   the text within the commits. Applying to the net-next tree as Heiner Kallweit requested.
->>
->> v5:
->>   attempted some new optimisations, which were rejected, but not all and not completely.
->>
->> v4:
->>   fixed complaints as advised by Heiner and checkpatch.pl.
->>   split the patch into five sections to be more easily manipulated and reviewed
->>   introduced r8168_mac_ocp_write_seq()
->>   applied coalescing of mac ocp writes/modifies for 8168H, 8125 and 8125B
->>
->> v3:
->>   removed register/mask pair array sentinels, so using ARRAY_SIZE().
->>   avoided duplication of RTL_W32() call code as advised by Heiner.
->>
->> Mirsad Goran Todorovac (5):
->>    r8169: Coalesce r8169_mac_ocp_write/modify calls to reduce spinlock
->>      stalls
->>    r8169: Coalesce RTL8411b PHY power-down recovery calls to reduce
->>      spinlock stalls
->>    r8169: Coalesce mac ocp write and modify for 8168H start to reduce
->>      spinlocks
->>    r8169: Coalesce mac ocp commands for 8125 and 8125B start to reduce
->>      spinlock contention
->>    r8169: Coalesce mac ocp commands for rtl_hw_init_8125 to reduce
->>      spinlocks
->>
->>   drivers/net/ethernet/realtek/r8169_main.c | 304 +++++++++++-----------
->>   1 file changed, 150 insertions(+), 154 deletions(-)
->>
-> 
-> You still write:
-> "a lock storm that will stall all of the cores and CPUs on the same memory controller"
-> even though you were informed that that's not the case.
-> There's no actual problem, therefore your Fixes tags are incorrect.
-> Also net-next is closed at the moment.
-> In patches 3-5 I see no benefit. And I have doubts whether the small benefit in
-> patch 2 is worth adding all the helpers in patch 1.
+P.S. If hardware starts supporting Homa, I hope that it will be
+possible to move the entire transport to the NIC, so that applications
+can bypass the kernel entirely, as with RDMA.
 
-After some thought, I would like to have a consensus on these patches, rather than someone
-feels defeated or outvoted.
-
-So I will try to reach some common ground, if you think the cause is worth it.
-
-Why is adding six lines of a helper a problem worse than removing 130 lines of callers?
-
-I would hate to think that the Linux kernel developer community became the place where
-Authority has higher weight than Reason and Logic.
-
-I have no personal gain from improving these drivers other than the Galactic credits.
-
-One thing I wouldn't like and do not like is the Windows drivers being better because
-their programmers are more innovative.
-
-Best regards,
-Mirsad Todorovac
+On Sat, Nov 4, 2023 at 8:08=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Fri, Nov 03, 2023 at 04:55:35PM -0700, John Ousterhout wrote:
+> > Is there a way to mark an skb (or its socket) before invoking
+> > ip_queue_xmit/ip6_xmit so that the packet will bypass the qdiscs and
+> > be transmitted immediately? Is doing such a thing considered bad
+> > practice?
+> >
+> > (Homa has its own packet scheduling mechanism so the qdiscs are just
+> > getting in the way and adding delays)
+>
+> Hi John
+>
+> One thing to think about is what happens when hardware starts
+> supporting Homa. Can the packet scheduling be moved into the hardware?
+> Ideally you want to make use of the existing mechanisms to offload
+> scheduling to the hardware, rather than add a Homa specific one.
+>
+> Did you try adding a Homa specific qdisc implementing the scheduling
+> algorithm? Did it kill performance? We prefer to try to fix problems,
+> rather than bypass them.
+>
+>        Andrew
 
