@@ -1,173 +1,153 @@
-Return-Path: <netdev+bounces-46114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D457E16B5
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 21:57:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65AAB7E1767
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 23:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67B21B20F0D
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 20:57:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1BE4B20D3B
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 22:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB68918B18;
-	Sun,  5 Nov 2023 20:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA67115A6;
+	Sun,  5 Nov 2023 22:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NVrow5zP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltY6Wpdt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC8E18C3C
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 20:57:34 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241F2E0
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 12:57:33 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-50931355d48so5093999e87.3
-        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 12:57:33 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE8D3C04
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 22:43:43 +0000 (UTC)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB21ECF
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 14:43:39 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32f78dcf036so2913814f8f.0
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 14:43:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699217851; x=1699822651; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SkmUkmLoK96BNboao7deauYFXBoeWm6vYd1S1QHVdg4=;
-        b=NVrow5zPhOARUcJ620qmCGf0cuZ2picFuADI/ObES/Oco0TYqjoz1pQJyywbgPD1C5
-         hWPzKNDAjAQoBAnTXQB9f3b2XIjSWOFdHemaGM8KUdgl/gsYa9p6tP8ZUoXDaNuTN7Pm
-         vNYT3QpLD32izsPve5f6HGIcG3ku8VcUpYMy2QtAKBTuTqqcmBBA1K/84x2xZXlfJLG8
-         g5kZO/yf7dCep1JDglfPTx3qW90oaIkGqxb5whXumg/QOHu3/63p9mYGIpkqquy3niW5
-         yXPknZ60LFWXrqcHMlLoFovxG9N0fV+Ru1UAyx4eIlZQh4jxPyjPdqBX/F5Y3SBwlw4h
-         Z+pQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699217851; x=1699822651;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1699224218; x=1699829018; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SkmUkmLoK96BNboao7deauYFXBoeWm6vYd1S1QHVdg4=;
-        b=XQomSIR67WsHKJW+zHRVbxFDZN4tvHLNGR2Jbd3tBzIUN9K4xkLBuTWiCkXziBFilx
-         J6kyCQFeR+qxQTHu7QjZ0+0/HmBONrBF8vc9ZfVit0Bz/ZMMVk0bRrNr5b6OpHDWePiH
-         XZehWN99R9wtMkDgCwpX4JoFm6cGanqScVRsZayDxSdlbLMR/Ff0rGlkmttXkPK03yAU
-         s7y3bx6G8p+tLjuReNBeH5IObWPkeLJ3N+7i31FthMNeCsvxkupiCj8LJ7VvFU8wY9xJ
-         zVaKa46jCX/P/8AXFRzMmMdt13fokHrANmfortZJdC0YLb2Lo/zDRhqmxKjdSwH9hyUe
-         DliA==
-X-Gm-Message-State: AOJu0YzU6GhuUZoY1fMIB2Zi07h1lRFWuETQA7PzCodVPxaTueUC04iN
-	Nc8zdU0f28r/ze/1ug2jhKFi0w==
-X-Google-Smtp-Source: AGHT+IEZ5yfK1828ZFfg1z0JEcil3ZmjTYmj62YIDKrrJea9QiYH64N281WrNe7UIF3CYVdtagRcqg==
-X-Received: by 2002:ac2:522c:0:b0:507:9dfd:f846 with SMTP id i12-20020ac2522c000000b005079dfdf846mr19156590lfl.69.1699217851479;
-        Sun, 05 Nov 2023 12:57:31 -0800 (PST)
-Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id d12-20020ac24c8c000000b00507c72697d0sm931873lfl.303.2023.11.05.12.57.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Nov 2023 12:57:31 -0800 (PST)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 05 Nov 2023 21:57:26 +0100
-Subject: [PATCH net v2 4/4] net: ethernet: cortina: Handle large frames
+        bh=ny9yvg/mrQdDqMoC0RdsDcPbjRH/ZEUilUZhqCDAiHA=;
+        b=ltY6WpdtjxyYDbTbczw01XcgrCQ3tulrA+hMFrU2tG2R5XM95ZNSVhwzwV9riouDzX
+         uTPIxabEydjyg1PJU86FLDJT/Zt9yGeaWdvmZkkCNPj4dwghJZN7svYcI0vJBYV5Tp+y
+         RJUj/LsiE2c8xTb0XGKut69ItXy3X5wH24K8nGPxbpiAg7cHKnBUse0/U5F5kmtQo3+u
+         6f8ZD4W72l5gJodWy9qjiSbPSJ2f4OhT0kGPXvakzIXjGsJM1JL6tC6J9sH20Ae6ZrNM
+         MlYwkEdjAEabZ0Qzq688/XTzNO0ImMkH8aME1SmwuQ/jupD732kqif5ihkDeV8RDh0dl
+         HHcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699224218; x=1699829018;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ny9yvg/mrQdDqMoC0RdsDcPbjRH/ZEUilUZhqCDAiHA=;
+        b=baKOoHS8F3r0/t8quZNzHwA7aEZqxvrH1UKfYU1nS+rvpPIYjcx2y05vDwPNMeOkOy
+         yE1pA9vbChmNgiAGKEuWkjJwXm9qnxvxwfwYGcnbl+9VWg9m8sCXZGulRPYCyvn+Kooa
+         vv2DW25QMizvMLWO22u5M5Jmq2YVF4pp/87spnj4S3jyacGByoQW6klyM94X81oKWaQS
+         mQQCk36Z+u6TA0y5dVcjTfOqMeAoOROfR7AHBNihuPUdNBy/NC4cnLNpJGRktrQ6PRV3
+         bgcOBx72i+zt5SXr6yi7oQbrj6bT4gDu8QXv03uniYxneIOqqk1savqchN4ix8AjCOPr
+         GGIQ==
+X-Gm-Message-State: AOJu0Yygd+wyDixHRf6PNy8EBMuyebYqnRmi1nQCQF1ZJ3flxdgEvMNS
+	lGiNXKZ20bjWlRsMjgC51Eo=
+X-Google-Smtp-Source: AGHT+IE3/E+jfTtxY/U8+3gPiPD73gg4OSEdTUQLVe4ks5NJhbRHQYhFfdXBIU6u8WKUHK4dNcIhZw==
+X-Received: by 2002:a05:6000:1a8b:b0:32f:92ca:9e5a with SMTP id f11-20020a0560001a8b00b0032f92ca9e5amr7894448wry.15.1699224217854;
+        Sun, 05 Nov 2023 14:43:37 -0800 (PST)
+Received: from ?IPV6:2a01:c22:73fa:b000:50db:a276:4b83:53fd? (dynamic-2a01-0c22-73fa-b000-50db-a276-4b83-53fd.c22.pool.telefonica.de. [2a01:c22:73fa:b000:50db:a276:4b83:53fd])
+        by smtp.googlemail.com with ESMTPSA id w10-20020adff9ca000000b0032ddc3b88e9sm7794553wrr.0.2023.11.05.14.43.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 05 Nov 2023 14:43:37 -0800 (PST)
+Message-ID: <4a57ba02-d52d-4369-9f14-3565e6c1f7dc@gmail.com>
+Date: Sun, 5 Nov 2023 23:43:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Realtek linux nic maintainers <nic_swsd@realtek.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] r8169: respect userspace disabling IFF_MULTICAST
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
-References: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
-In-Reply-To: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
-To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>, 
- Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.12.4
 
-The Gemini ethernet controller provides hardware checksumming
-for frames up to 1514 bytes including ethernet headers but not
-FCS.
+So far we ignore the setting of IFF_MULTICAST. Fix this and clear bit
+AcceptMulticast if IFF_MULTICAST isn't set.
 
-If we start sending bigger frames (after first bumping up the MTU
-on both interfaces sending and receiveing the frames), truncated
-packets start to appear on the target such as in this tcpdump
-resulting from ping -s 1474:
+Note: Based on the implementations I've seen it doesn't seem to be 100% clear
+what a driver is supposed to do if IFF_ALLMULTI is set but IFF_MULTICAST
+is not. This patch is based on the understanding that IFF_MULTICAST has
+precedence.
 
-23:34:17.241983 14:d6:4d:a8:3c:4f (oui Unknown) > bc:ae:c5:6b:a8:3d (oui Unknown),
-ethertype IPv4 (0x0800), length 1514: truncated-ip - 2 bytes missing!
-(tos 0x0, ttl 64, id 32653, offset 0, flags [DF], proto ICMP (1), length 1502)
-OpenWrt.lan > Fecusia: ICMP echo request, id 1672, seq 50, length 1482
-
-If we bypass the hardware checksumming and provide a software
-fallback, everything starts working fine up to the max TX MTU
-of 2047 bytes, for example ping -s2000 192.168.1.2:
-
-00:44:29.587598 bc:ae:c5:6b:a8:3d (oui Unknown) > 14:d6:4d:a8:3c:4f (oui Unknown),
-ethertype IPv4 (0x0800), length 2042:
-(tos 0x0, ttl 64, id 51828, offset 0, flags [none], proto ICMP (1), length 2028)
-Fecusia > OpenWrt.lan: ICMP echo reply, id 1683, seq 4, length 2008
-
-The bit enabling to bypass hardware checksum (or any of the
-"TSS" bits) are undocumented in the hardware reference manual.
-The entire hardware checksum unit appears undocumented. The
-conclusion that we need to use the "bypass" bit was found by
-trial-and-error.
-
-Since no hardware checksum will happen, we slot in a software
-checksum fallback.
-
-Check for the condition where we need to compute checksum on the
-skb with either hardware or software using == CHECKSUM_PARTIAL instead
-of != CHECKSUM_NONE which is an incomplete check according to
-<linux/skbuff.h>.
-
-On the D-Link DIR-685 router this fixes a bug on the conduit
-interface to the RTL8366RB DSA switch: as the switch needs to add
-space for its tag it increases the MTU on the conduit interface
-to 1504 and that means that when the router sends packages
-of 1500 bytes these get an extra 4 bytes of DSA tag and the
-transfer fails because of the erroneous hardware checksumming,
-affecting such basic functionality as the LuCI web interface.
-
-Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/cortina/gemini.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 576174a862a9..84295c1b87e6 100644
---- a/drivers/net/ethernet/cortina/gemini.c
-+++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1145,6 +1145,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 	dma_addr_t mapping;
- 	unsigned short mtu;
- 	void *buffer;
-+	int ret;
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 4b8251cdb..0c76c162b 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -2582,6 +2582,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
  
- 	mtu  = ETH_HLEN;
- 	mtu += netdev->mtu;
-@@ -1165,7 +1166,19 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 		word3 |= mtu;
- 	}
- 
--	if (skb->ip_summed != CHECKSUM_NONE) {
-+	if (skb->len >= ETH_FRAME_LEN) {
-+		/* Hardware offloaded checksumming isn't working on frames
-+		 * bigger than 1514 bytes. Perhaps the buffer is only 1518
-+		 * bytes fitting a normal frame and a checksum?
-+		 * Just use software checksumming and bypass on bigger frames.
-+		 */
-+		if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+			ret = skb_checksum_help(skb);
-+			if (ret)
-+				return ret;
-+		}
-+		word1 |= TSS_BYPASS_BIT;
-+	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
- 		int tcp = 0;
- 
- 		if (skb->protocol == htons(ETH_P_IP)) {
-
+ 	if (dev->flags & IFF_PROMISC) {
+ 		rx_mode |= AcceptAllPhys;
++	} else if (!(dev->flags & IFF_MULTICAST)) {
++		rx_mode &= ~AcceptMulticast;
+ 	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
+ 		   dev->flags & IFF_ALLMULTI ||
+ 		   tp->mac_version == RTL_GIGA_MAC_VER_35 ||
 -- 
-2.34.1
+2.42.1
 
 
