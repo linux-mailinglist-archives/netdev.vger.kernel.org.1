@@ -1,135 +1,139 @@
-Return-Path: <netdev+bounces-46097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A823B7E1517
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 17:38:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E992B7E153C
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 17:46:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1645FB21677
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:38:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7A31F215C7
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFEC15ACE;
-	Sun,  5 Nov 2023 16:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794EB154B4;
+	Sun,  5 Nov 2023 16:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="iFxkHu/L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CaPLWjxo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC57C23762;
-	Sun,  5 Nov 2023 16:34:30 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6BE2171E;
-	Sun,  5 Nov 2023 08:34:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1699202030; x=1699806830; i=markus.elfring@web.de;
-	bh=AJzJ0pD7PIrmE6AzU/uMIyD8mCJuDdnySvLzrjiZPgM=;
-	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
-	b=iFxkHu/LmKUzE7S3sWGb0x4Z0Si2kJw3v9Ae09arSrdgVRc6Fi105NuBq2Z1Ylv9
-	 8yR7W77jIKyW5gUFVPDOvZqM0bc+TKfy172l5np+GBShr0twy4uFqgC/GF0SRiPDY
-	 DM2Bo3Q8znVpICuMWFI8gorlGul6C0s53EOtngGwvWyF+dWb1RYDuWn0aWLnjK4CH
-	 RMOFV5pCyV8mGVbQ77VkzGq+cO3+3IGe1u/FXk/mXKSDGinMX/qEaD72lC626Lsk7
-	 edjURE0XZulkQSZ4vK1hc28kJd3FT9oBJiIBoIk+L20uBakjrODYsu1QCWUPAX1qW
-	 lUZ0ooU0xBstE0Sd8w==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.80.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N6Jxd-1rWFi30wKv-016iJC; Sun, 05
- Nov 2023 17:33:50 +0100
-Message-ID: <0b2972cb-03b2-40c7-a728-6ebe2512637f@web.de>
-Date: Sun, 5 Nov 2023 17:33:46 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B6B1FD5
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 16:46:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A80B8FA
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 08:46:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699202769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eC7KMeIBQqNk/V3RXfwXIU+MwIED52IGZpLe2RUKxaU=;
+	b=CaPLWjxok/M9oEaTwhA7+jU7BawpdUY0UOFlXZQ7yhoCPtyRYnAG93iUi8icvZM/0+Z67b
+	N+2FM5yfNST/JNWb8E4C1RALIiuuJUS0sSRbWMVL18qt+R/6exylcBq/8wt8+sJ5tTSPux
+	o3mZKDdjzDEAgcCg/qOyisWU6qbOGKs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-cwp2luAZMS6wp8sRjoORrA-1; Sun, 05 Nov 2023 11:46:07 -0500
+X-MC-Unique: cwp2luAZMS6wp8sRjoORrA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8578D185A780;
+	Sun,  5 Nov 2023 16:46:06 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.224.31])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6C71340C6EB9;
+	Sun,  5 Nov 2023 16:46:03 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2] i40e: Fix adding unsupported cloud filters
+Date: Sun,  5 Nov 2023 17:46:02 +0100
+Message-ID: <20231105164602.1107498-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Julia Lawall <Julia.Lawall@inria.fr>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Jakub Kicinski <kuba@kernel.org>, Justin Chen <justin.chen@broadcom.com>,
- Paolo Abeni <pabeni@redhat.com>, bcm-kernel-feedback-list@broadcom.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] net: bcmasp: Use common error handling code in bcmasp_probe()
-Cc: cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6++zPlahvKLDI/Fdz1N+9LgnJ3iTWU2g1ZWw7sjCgkR189sh42S
- vxLUehhG8l5lgi5q8GrndZwdbXiCmh5iaUD9WkLR/AmFoJmOZDW3DPvmMq5VULEJv/R4aBi
- WKc0kXfXRjmsW5SAIzOgHGKR64T0WbQ0zPoLNIYH0UzM4Gs3ulpp8NbNBwuppkdKOVWtH5V
- SdtkFxUusIPUfqzHtoKMw==
-UI-OutboundReport: notjunk:1;M01:P0:Io53oQfVKEs=;rXX/5a1ZB50YgxR0EkBnJzYrQvN
- L+FvVojPLFM3b7oWBkU7AlOl3gUM3ekqmaZuYC7RcNONUzUWJ8noMYWpUEpo85NJJxgSfhE3j
- u4auKRdiSKOaBJEJyitSALkBPHw6lVGfr054SugCmeoWqVkIxoM3l94uPDtqPMLp+CCLpfgM/
- wIogfEzvjN8lC3X/kvls+yA7JO77MDmbM736OzPCa+nlPgJRkLCTucpxgbe4K9B1T7VtGaR7q
- 5WzIIC8v7KHu4Ae2tpKwDgnuKFeOC18N8U57AladnM93hO/odtIcDgse7rlKfV2vLOeto9Qtp
- YEsRLpV0D4AdrL/yYSBTIPxvmtoszHEmCdWE4B9325Hc7QVdgL/uVutUvLi1zB9QZxn/Ywy1I
- udLtABZsQpChihcn+QK8DMusaG5KFLtvBuol/tG4es8kQ+hcbvTZo7Pi1za2TV+e7Uxtu3lk1
- UmO6yc51LCQSDLU4k1DNVRA8o5u/jco8JzkMAyBbAg41YOJWBeYp2vtfTuXnJs3feBwO9VsLq
- k/ZrwPsZwyJhBu8S+0GC23ORJt8HoVf+0SJiKApGIAlyjHAHTJVqrgsrlnhRWzEURfiGV0/Aj
- ubI5irwxYo3DZMuJxV9YfABQjw2ztt/dlUmSm5urq1kecriv+TpMkMaETaykfd6hlAGZ+ERsb
- Bk1vmoiF4FyTxllfSZ5XUkdiBS9DeYrdKtT5JV2dYCaY+sbdph5cVXFUVdUClLvHUoYVMN+Nt
- UzsEaCNz1+9a/06SpiC/T6HlGKXvM1JhpbdaNlmBcridp9rHUTPYckUV8hX4tAgxcv+IzGjF8
- n1vxiZMjDCwFfLyYf+D+Cxe47I9H0advvup3Mhc/olt/F5DHdTKX+2v4xsqTNOMnBOCknBIaA
- zgrbN+4aUOxe6QIiyBI8S3Sib1jLVe8uFrbKGkxfs3SyO+ejATdPSDM8+mboYRF/g+65HZKme
- +0rE+w==
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sun, 5 Nov 2023 17:24:01 +0100
+If a VF tries to add unsupported cloud filter through virchnl
+then i40e_add_del_cloud_filter(_big_buf) returns -ENOTSUPP but
+this error code is stored in 'ret' instead of 'aq_ret' that
+is used as error code sent back to VF. In this scenario where
+one of the mentioned functions fails the value of 'aq_ret'
+is zero so the VF will incorrectly receive a 'success'.
 
-Add a jump target so that a bit of exception handling can be better
-reused at the end of this function.
+Use 'aq_ret' to store return value and remove 'ret' local
+variable. Additionally fix the issue when filter allocation
+fails, in this case no notification is sent back to the VF.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Fixes: e284fc280473be ("i40e: Add and delete cloud filter")
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ .../net/ethernet/intel/i40e/i40e_virtchnl_pf.c   | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/eth=
-ernet/broadcom/asp2/bcmasp.c
-index 29b04a274d07..675437e44b94 100644
-=2D-- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1304,9 +1304,8 @@ static int bcmasp_probe(struct platform_device *pdev=
-)
- 		intf =3D bcmasp_interface_create(priv, intf_node, i);
- 		if (!intf) {
- 			dev_err(dev, "Cannot create eth interface %d\n", i);
--			bcmasp_remove_intfs(priv);
- 			of_node_put(intf_node);
--			goto of_put_exit;
-+			goto remove_intfs;
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
- 		i++;
-@@ -1331,8 +1330,7 @@ static int bcmasp_probe(struct platform_device *pdev=
-)
- 			netdev_err(intf->ndev,
- 				   "failed to register net_device: %d\n", ret);
- 			priv->destroy_wol(priv);
--			bcmasp_remove_intfs(priv);
--			goto of_put_exit;
-+			goto remove_intfs;
- 		}
- 		count++;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 08d7edccfb8ddb..3f99eb19824527 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -3844,7 +3844,7 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
+ 	struct i40e_pf *pf = vf->pf;
+ 	struct i40e_vsi *vsi = NULL;
+ 	int aq_ret = 0;
+-	int i, ret;
++	int i;
+ 
+ 	if (!i40e_sync_vf_state(vf, I40E_VF_STATE_ACTIVE)) {
+ 		aq_ret = -EINVAL;
+@@ -3868,8 +3868,10 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
  	}
-@@ -1342,6 +1340,10 @@ static int bcmasp_probe(struct platform_device *pde=
-v)
- of_put_exit:
- 	of_node_put(ports_node);
- 	return ret;
-+
-+remove_intfs:
-+	bcmasp_remove_intfs(priv);
-+	goto of_put_exit;
- }
-
- static void bcmasp_remove(struct platform_device *pdev)
-=2D-
-2.42.0
+ 
+ 	cfilter = kzalloc(sizeof(*cfilter), GFP_KERNEL);
+-	if (!cfilter)
+-		return -ENOMEM;
++	if (!cfilter) {
++		aq_ret = -ENOMEM;
++		goto err_out;
++	}
+ 
+ 	/* parse destination mac address */
+ 	for (i = 0; i < ETH_ALEN; i++)
+@@ -3917,13 +3919,13 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
+ 
+ 	/* Adding cloud filter programmed as TC filter */
+ 	if (tcf.dst_port)
+-		ret = i40e_add_del_cloud_filter_big_buf(vsi, cfilter, true);
++		aq_ret = i40e_add_del_cloud_filter_big_buf(vsi, cfilter, true);
+ 	else
+-		ret = i40e_add_del_cloud_filter(vsi, cfilter, true);
+-	if (ret) {
++		aq_ret = i40e_add_del_cloud_filter(vsi, cfilter, true);
++	if (aq_ret) {
+ 		dev_err(&pf->pdev->dev,
+ 			"VF %d: Failed to add cloud filter, err %pe aq_err %s\n",
+-			vf->vf_id, ERR_PTR(ret),
++			vf->vf_id, ERR_PTR(aq_ret),
+ 			i40e_aq_str(&pf->hw, pf->hw.aq.asq_last_status));
+ 		goto err_free;
+ 	}
+-- 
+2.41.0
 
 
