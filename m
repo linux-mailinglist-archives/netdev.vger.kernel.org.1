@@ -1,199 +1,135 @@
-Return-Path: <netdev+bounces-46096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D72C47E142C
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:58:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A823B7E1517
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 17:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3B8C1C2098A
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 15:58:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1645FB21677
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 16:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CB311711;
-	Sun,  5 Nov 2023 15:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFEC15ACE;
+	Sun,  5 Nov 2023 16:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRoVaLL4"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="iFxkHu/L"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24897E54D
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 15:58:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016E6E0
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 07:58:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699199900;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gm8P+4qqkq3fie/1BXBTuSMj+CMA8LATFFDY5rV8ORw=;
-	b=iRoVaLL4ZpxQqZpqg35eHA56K0DlXNQ1WcOq5EiX38bxtfsd18tT7muxeKrxHKoEBj/9bs
-	37bjm4CbvzFaDpbD8pelcb81k3dMts7Lqmi6Kk421QYSRnp6a63fx+SPVaEqrr5D00FtwG
-	8t6GH8aAPmAWv+OeYOZkvaRDglovqw8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-3-ANSlyLhENASuDzFp94FBiw-1; Sun, 05 Nov 2023 10:58:18 -0500
-X-MC-Unique: ANSlyLhENASuDzFp94FBiw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-543f1c6dcaeso2763762a12.1
-        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 07:58:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699199897; x=1699804697;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gm8P+4qqkq3fie/1BXBTuSMj+CMA8LATFFDY5rV8ORw=;
-        b=YZtb+227KxxevK+uCmbJGZj0wYf+oH31ILlCPkPt+BGQ7W4wVQiSJZ/fCeDav6Ordq
-         1ZTrxMlC2cBH1J3OANVJ3dFyvYFMiH3Q4FYBCVpZPGRcYifx/362yjJY0s+9rtxzGBeu
-         OShIb/pNA67zC7NTRy4ZngcR4bKq2s8rrL40CaNtlnfa0aGMwWmS/WGkpUNlRjF3lGDk
-         /tlJGJjms9LfOIdCDt4eBTsCWjjPndUgICht+M7OI0l5uFuyUCYGq89fJIcqZ+jmmoKX
-         BNo6JNZSNkkzoUYayJS6zCqtJQzp8/oWD/b6Itvytuz0HHYSyuL2rwAV/IOUr/aybmmS
-         S5Mw==
-X-Gm-Message-State: AOJu0YzwgdkAtJxdM/M/H6Mbu9DCqCF8Ne/6fAHA/eZH3IDOqJ5QrvCs
-	L+17anR+zkypwXbJmZ1HsfWMjdTpXgWxrdRX+m9cybOoI0nILziyvI5m5eWH8Xd6ZYZVf3NPOI0
-	TJ52w+8Yb/gXcApOV
-X-Received: by 2002:a17:906:db08:b0:9dd:f5ba:856d with SMTP id xj8-20020a170906db0800b009ddf5ba856dmr3819998ejb.62.1699199897434;
-        Sun, 05 Nov 2023 07:58:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEybgJfekAZesQ+akyhDcdHp9NNqn1nBxIeCP8wqicCb5vXKmYeJbRaNub+H3s331kYxYmE9A==
-X-Received: by 2002:a17:906:db08:b0:9dd:f5ba:856d with SMTP id xj8-20020a170906db0800b009ddf5ba856dmr3819966ejb.62.1699199896993;
-        Sun, 05 Nov 2023 07:58:16 -0800 (PST)
-Received: from redhat.com ([2.55.35.234])
-        by smtp.gmail.com with ESMTPSA id qw23-20020a1709066a1700b009dd949b75c7sm2460591ejc.151.2023.11.05.07.58.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Nov 2023 07:58:16 -0800 (PST)
-Date: Sun, 5 Nov 2023 10:58:06 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dtatulea@nvidia.com, eperezma@redhat.com, geert+renesas@glider.be,
-	gregkh@linuxfoundation.org, jasowang@redhat.com, leiyang@redhat.com,
-	leon@kernel.org, mst@redhat.com, pizhenwei@bytedance.com,
-	sgarzare@redhat.com, shannon.nelson@amd.com,
-	shawn.shao@jaguarmicro.com, simon.horman@corigine.com,
-	si-wei.liu@oracle.com, xieyongji@bytedance.com,
-	xuanzhuo@linux.alibaba.com, xueshi.hu@smartx.com
-Subject: [GIT PULL] vhost,virtio,vdpa: features, fixes, cleanups
-Message-ID: <20231105105806-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC57C23762;
+	Sun,  5 Nov 2023 16:34:30 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6BE2171E;
+	Sun,  5 Nov 2023 08:34:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1699202030; x=1699806830; i=markus.elfring@web.de;
+	bh=AJzJ0pD7PIrmE6AzU/uMIyD8mCJuDdnySvLzrjiZPgM=;
+	h=X-UI-Sender-Class:Date:To:From:Subject:Cc;
+	b=iFxkHu/LmKUzE7S3sWGb0x4Z0Si2kJw3v9Ae09arSrdgVRc6Fi105NuBq2Z1Ylv9
+	 8yR7W77jIKyW5gUFVPDOvZqM0bc+TKfy172l5np+GBShr0twy4uFqgC/GF0SRiPDY
+	 DM2Bo3Q8znVpICuMWFI8gorlGul6C0s53EOtngGwvWyF+dWb1RYDuWn0aWLnjK4CH
+	 RMOFV5pCyV8mGVbQ77VkzGq+cO3+3IGe1u/FXk/mXKSDGinMX/qEaD72lC626Lsk7
+	 edjURE0XZulkQSZ4vK1hc28kJd3FT9oBJiIBoIk+L20uBakjrODYsu1QCWUPAX1qW
+	 lUZ0ooU0xBstE0Sd8w==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.80.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N6Jxd-1rWFi30wKv-016iJC; Sun, 05
+ Nov 2023 17:33:50 +0100
+Message-ID: <0b2972cb-03b2-40c7-a728-6ebe2512637f@web.de>
+Date: Sun, 5 Nov 2023 17:33:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
+User-Agent: Mozilla Thunderbird
+To: Julia Lawall <Julia.Lawall@inria.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Jakub Kicinski <kuba@kernel.org>, Justin Chen <justin.chen@broadcom.com>,
+ Paolo Abeni <pabeni@redhat.com>, bcm-kernel-feedback-list@broadcom.com,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] net: bcmasp: Use common error handling code in bcmasp_probe()
+Cc: cocci@inria.fr, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:6++zPlahvKLDI/Fdz1N+9LgnJ3iTWU2g1ZWw7sjCgkR189sh42S
+ vxLUehhG8l5lgi5q8GrndZwdbXiCmh5iaUD9WkLR/AmFoJmOZDW3DPvmMq5VULEJv/R4aBi
+ WKc0kXfXRjmsW5SAIzOgHGKR64T0WbQ0zPoLNIYH0UzM4Gs3ulpp8NbNBwuppkdKOVWtH5V
+ SdtkFxUusIPUfqzHtoKMw==
+UI-OutboundReport: notjunk:1;M01:P0:Io53oQfVKEs=;rXX/5a1ZB50YgxR0EkBnJzYrQvN
+ L+FvVojPLFM3b7oWBkU7AlOl3gUM3ekqmaZuYC7RcNONUzUWJ8noMYWpUEpo85NJJxgSfhE3j
+ u4auKRdiSKOaBJEJyitSALkBPHw6lVGfr054SugCmeoWqVkIxoM3l94uPDtqPMLp+CCLpfgM/
+ wIogfEzvjN8lC3X/kvls+yA7JO77MDmbM736OzPCa+nlPgJRkLCTucpxgbe4K9B1T7VtGaR7q
+ 5WzIIC8v7KHu4Ae2tpKwDgnuKFeOC18N8U57AladnM93hO/odtIcDgse7rlKfV2vLOeto9Qtp
+ YEsRLpV0D4AdrL/yYSBTIPxvmtoszHEmCdWE4B9325Hc7QVdgL/uVutUvLi1zB9QZxn/Ywy1I
+ udLtABZsQpChihcn+QK8DMusaG5KFLtvBuol/tG4es8kQ+hcbvTZo7Pi1za2TV+e7Uxtu3lk1
+ UmO6yc51LCQSDLU4k1DNVRA8o5u/jco8JzkMAyBbAg41YOJWBeYp2vtfTuXnJs3feBwO9VsLq
+ k/ZrwPsZwyJhBu8S+0GC23ORJt8HoVf+0SJiKApGIAlyjHAHTJVqrgsrlnhRWzEURfiGV0/Aj
+ ubI5irwxYo3DZMuJxV9YfABQjw2ztt/dlUmSm5urq1kecriv+TpMkMaETaykfd6hlAGZ+ERsb
+ Bk1vmoiF4FyTxllfSZ5XUkdiBS9DeYrdKtT5JV2dYCaY+sbdph5cVXFUVdUClLvHUoYVMN+Nt
+ UzsEaCNz1+9a/06SpiC/T6HlGKXvM1JhpbdaNlmBcridp9rHUTPYckUV8hX4tAgxcv+IzGjF8
+ n1vxiZMjDCwFfLyYf+D+Cxe47I9H0advvup3Mhc/olt/F5DHdTKX+2v4xsqTNOMnBOCknBIaA
+ zgrbN+4aUOxe6QIiyBI8S3Sib1jLVe8uFrbKGkxfs3SyO+ejATdPSDM8+mboYRF/g+65HZKme
+ +0rE+w==
 
-The following changes since commit ffc253263a1375a65fa6c9f62a893e9767fbebfa:
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sun, 5 Nov 2023 17:24:01 +0100
 
-  Linux 6.6 (2023-10-29 16:31:08 -1000)
+Add a jump target so that a bit of exception handling can be better
+reused at the end of this function.
 
-are available in the Git repository at:
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/eth=
+ernet/broadcom/asp2/bcmasp.c
+index 29b04a274d07..675437e44b94 100644
+=2D-- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
++++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
+@@ -1304,9 +1304,8 @@ static int bcmasp_probe(struct platform_device *pdev=
+)
+ 		intf =3D bcmasp_interface_create(priv, intf_node, i);
+ 		if (!intf) {
+ 			dev_err(dev, "Cannot create eth interface %d\n", i);
+-			bcmasp_remove_intfs(priv);
+ 			of_node_put(intf_node);
+-			goto of_put_exit;
++			goto remove_intfs;
+ 		}
+ 		list_add_tail(&intf->list, &priv->intfs);
+ 		i++;
+@@ -1331,8 +1330,7 @@ static int bcmasp_probe(struct platform_device *pdev=
+)
+ 			netdev_err(intf->ndev,
+ 				   "failed to register net_device: %d\n", ret);
+ 			priv->destroy_wol(priv);
+-			bcmasp_remove_intfs(priv);
+-			goto of_put_exit;
++			goto remove_intfs;
+ 		}
+ 		count++;
+ 	}
+@@ -1342,6 +1340,10 @@ static int bcmasp_probe(struct platform_device *pde=
+v)
+ of_put_exit:
+ 	of_node_put(ports_node);
+ 	return ret;
++
++remove_intfs:
++	bcmasp_remove_intfs(priv);
++	goto of_put_exit;
+ }
 
-for you to fetch changes up to 86f6c224c97911b4392cb7b402e6a4ed323a449e:
-
-  vdpa_sim: implement .reset_map support (2023-11-01 09:20:00 -0400)
-
-----------------------------------------------------------------
-vhost,virtio,vdpa: features, fixes, cleanups
-
-vdpa/mlx5:
-	VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-	new maintainer
-vdpa:
-	support for vq descriptor mappings
-	decouple reset of iotlb mapping from device reset
-
-fixes, cleanups all over the place
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Dragos Tatulea (14):
-      vdpa/mlx5: Expose descriptor group mkey hw capability
-      vdpa/mlx5: Create helper function for dma mappings
-      vdpa/mlx5: Decouple cvq iotlb handling from hw mapping code
-      vdpa/mlx5: Take cvq iotlb lock during refresh
-      vdpa/mlx5: Collapse "dvq" mr add/delete functions
-      vdpa/mlx5: Rename mr destroy functions
-      vdpa/mlx5: Allow creation/deletion of any given mr struct
-      vdpa/mlx5: Move mr mutex out of mr struct
-      vdpa/mlx5: Improve mr update flow
-      vdpa/mlx5: Introduce mr for vq descriptor
-      vdpa/mlx5: Enable hw support for vq descriptor mapping
-      vdpa/mlx5: Make iotlb helper functions more generic
-      vdpa/mlx5: Update cvq iotlb mapping on ASID change
-      MAINTAINERS: Add myself as mlx5_vdpa driver
-
-Eugenio Pérez (1):
-      mlx5_vdpa: offer VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK
-
-Geert Uytterhoeven (1):
-      vhost-scsi: Spelling s/preceeding/preceding/g
-
-Greg Kroah-Hartman (1):
-      vduse: make vduse_class constant
-
-Michael S. Tsirkin (1):
-      Merge branch 'mlx5-vhost' of https://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux.git
-
-Shannon Nelson (1):
-      virtio: kdoc for struct virtio_pci_modern_device
-
-Shawn.Shao (1):
-      vdpa: Update sysfs ABI documentation
-
-Si-Wei Liu (10):
-      vdpa: introduce dedicated descriptor group for virtqueue
-      vhost-vdpa: introduce descriptor group backend feature
-      vhost-vdpa: uAPI to get dedicated descriptor group id
-      vdpa: introduce .reset_map operation callback
-      vhost-vdpa: reset vendor specific mapping to initial state in .release
-      vhost-vdpa: introduce IOTLB_PERSIST backend feature bit
-      vdpa: introduce .compat_reset operation callback
-      vhost-vdpa: clean iotlb map during reset for older userspace
-      vdpa/mlx5: implement .reset_map driver op
-      vdpa_sim: implement .reset_map support
-
-Xuan Zhuo (3):
-      virtio: add definition of VIRTIO_F_NOTIF_CONFIG_DATA feature bit
-      virtio_pci: add build offset check for the new common cfg items
-      virtio_pci: add check for common cfg size
-
-Xueshi Hu (1):
-      virtio-balloon: correct the comment of virtballoon_migratepage()
-
-zhenwei pi (1):
-      virtio-blk: fix implicit overflow on virtio_max_dma_size
-
- Documentation/ABI/testing/sysfs-bus-vdpa |   4 +-
- MAINTAINERS                              |   6 +
- drivers/block/virtio_blk.c               |   4 +-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h       |  32 +++--
- drivers/vdpa/mlx5/core/mr.c              | 213 +++++++++++++++++++------------
- drivers/vdpa/mlx5/core/resources.c       |   6 +-
- drivers/vdpa/mlx5/net/mlx5_vnet.c        | 137 +++++++++++++++-----
- drivers/vdpa/vdpa_sim/vdpa_sim.c         |  52 ++++++--
- drivers/vdpa/vdpa_user/vduse_dev.c       |  40 +++---
- drivers/vhost/scsi.c                     |   2 +-
- drivers/vhost/vdpa.c                     |  79 +++++++++++-
- drivers/virtio/virtio_balloon.c          |   2 +-
- drivers/virtio/virtio_pci_modern.c       |  36 ++++++
- drivers/virtio/virtio_pci_modern_dev.c   |   6 +-
- drivers/virtio/virtio_vdpa.c             |   2 +-
- include/linux/mlx5/mlx5_ifc.h            |   8 +-
- include/linux/mlx5/mlx5_ifc_vdpa.h       |   7 +-
- include/linux/vdpa.h                     |  41 +++++-
- include/linux/virtio_pci_modern.h        |  35 +++--
- include/uapi/linux/vhost.h               |   8 ++
- include/uapi/linux/vhost_types.h         |   7 +
- include/uapi/linux/virtio_config.h       |   5 +
- 22 files changed, 546 insertions(+), 186 deletions(-)
+ static void bcmasp_remove(struct platform_device *pdev)
+=2D-
+2.42.0
 
 
