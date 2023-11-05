@@ -1,153 +1,112 @@
-Return-Path: <netdev+bounces-46115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65AAB7E1767
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 23:43:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2361F7E177D
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 23:59:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1BE4B20D3B
-	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 22:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A81B1C20933
+	for <lists+netdev@lfdr.de>; Sun,  5 Nov 2023 22:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA67115A6;
-	Sun,  5 Nov 2023 22:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD1E171DC;
+	Sun,  5 Nov 2023 22:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltY6Wpdt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KZfj525q"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE8D3C04
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 22:43:43 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB21ECF
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 14:43:39 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32f78dcf036so2913814f8f.0
-        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 14:43:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699224218; x=1699829018; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ny9yvg/mrQdDqMoC0RdsDcPbjRH/ZEUilUZhqCDAiHA=;
-        b=ltY6WpdtjxyYDbTbczw01XcgrCQ3tulrA+hMFrU2tG2R5XM95ZNSVhwzwV9riouDzX
-         uTPIxabEydjyg1PJU86FLDJT/Zt9yGeaWdvmZkkCNPj4dwghJZN7svYcI0vJBYV5Tp+y
-         RJUj/LsiE2c8xTb0XGKut69ItXy3X5wH24K8nGPxbpiAg7cHKnBUse0/U5F5kmtQo3+u
-         6f8ZD4W72l5gJodWy9qjiSbPSJ2f4OhT0kGPXvakzIXjGsJM1JL6tC6J9sH20Ae6ZrNM
-         MlYwkEdjAEabZ0Qzq688/XTzNO0ImMkH8aME1SmwuQ/jupD732kqif5ihkDeV8RDh0dl
-         HHcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699224218; x=1699829018;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ny9yvg/mrQdDqMoC0RdsDcPbjRH/ZEUilUZhqCDAiHA=;
-        b=baKOoHS8F3r0/t8quZNzHwA7aEZqxvrH1UKfYU1nS+rvpPIYjcx2y05vDwPNMeOkOy
-         yE1pA9vbChmNgiAGKEuWkjJwXm9qnxvxwfwYGcnbl+9VWg9m8sCXZGulRPYCyvn+Kooa
-         vv2DW25QMizvMLWO22u5M5Jmq2YVF4pp/87spnj4S3jyacGByoQW6klyM94X81oKWaQS
-         mQQCk36Z+u6TA0y5dVcjTfOqMeAoOROfR7AHBNihuPUdNBy/NC4cnLNpJGRktrQ6PRV3
-         bgcOBx72i+zt5SXr6yi7oQbrj6bT4gDu8QXv03uniYxneIOqqk1savqchN4ix8AjCOPr
-         GGIQ==
-X-Gm-Message-State: AOJu0Yygd+wyDixHRf6PNy8EBMuyebYqnRmi1nQCQF1ZJ3flxdgEvMNS
-	lGiNXKZ20bjWlRsMjgC51Eo=
-X-Google-Smtp-Source: AGHT+IE3/E+jfTtxY/U8+3gPiPD73gg4OSEdTUQLVe4ks5NJhbRHQYhFfdXBIU6u8WKUHK4dNcIhZw==
-X-Received: by 2002:a05:6000:1a8b:b0:32f:92ca:9e5a with SMTP id f11-20020a0560001a8b00b0032f92ca9e5amr7894448wry.15.1699224217854;
-        Sun, 05 Nov 2023 14:43:37 -0800 (PST)
-Received: from ?IPV6:2a01:c22:73fa:b000:50db:a276:4b83:53fd? (dynamic-2a01-0c22-73fa-b000-50db-a276-4b83-53fd.c22.pool.telefonica.de. [2a01:c22:73fa:b000:50db:a276:4b83:53fd])
-        by smtp.googlemail.com with ESMTPSA id w10-20020adff9ca000000b0032ddc3b88e9sm7794553wrr.0.2023.11.05.14.43.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Nov 2023 14:43:37 -0800 (PST)
-Message-ID: <4a57ba02-d52d-4369-9f14-3565e6c1f7dc@gmail.com>
-Date: Sun, 5 Nov 2023 23:43:36 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870352569
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 22:58:52 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894B6CF;
+	Sun,  5 Nov 2023 14:58:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699225129; x=1730761129;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IBnqEtOpVF3qUs7zi14zprYn6a0bv6FOzZ6a7h1nLOc=;
+  b=KZfj525qBtCB9v+15cfAINtt6PgDNPOWv4d2R4lwnvJB23FpVeU1HUAc
+   CwWlvtY1CVHZy1YcJEC7ue6cbjbUqIEqxrTkXZlIGOL7OFq1qD0Y3CZ34
+   Ng/mTu0M1htGDpVQibQ+ZoZ61Q9F6h4UEdY4h7EZn46YAjDIUgtedUEX7
+   xHsDZzt49ItKyEQOm+pRFjqIDfmaVHZsaRrWn6Uklva0yOty4DcBLiidC
+   VJEDGifiIR1Mg0HnnSJVSMZSh+Ja73lfyMArs+FiElWASafcyhMlc6dW3
+   d+ltC8CeEHyNVT5+U/9voX2avShLcZEdOI/gakVf8zr7jYcm3HD1bYIw0
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="388064926"
+X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
+   d="scan'208";a="388064926"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2023 14:58:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="1093600479"
+X-IronPort-AV: E=Sophos;i="6.03,279,1694761200"; 
+   d="scan'208";a="1093600479"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 05 Nov 2023 14:58:48 -0800
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qzm4s-0005rY-10;
+	Sun, 05 Nov 2023 22:58:46 +0000
+Date: Mon, 6 Nov 2023 06:57:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	andrew@lunn.ch, pkshih@realtek.com, larry.chiu@realtek.com,
+	Justin Lai <justinlai0215@realtek.com>
+Subject: Re: [PATCH net-next v10 12/13] net:ethernet:realtek: Update the
+ Makefile and Kconfig in the realtek folder
+Message-ID: <202311060633.814zKJdK-lkp@intel.com>
+References: <20231102154505.940783-13-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net] r8169: respect userspace disabling IFF_MULTICAST
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231102154505.940783-13-justinlai0215@realtek.com>
 
-So far we ignore the setting of IFF_MULTICAST. Fix this and clear bit
-AcceptMulticast if IFF_MULTICAST isn't set.
+Hi Justin,
 
-Note: Based on the implementations I've seen it doesn't seem to be 100% clear
-what a driver is supposed to do if IFF_ALLMULTI is set but IFF_MULTICAST
-is not. This patch is based on the understanding that IFF_MULTICAST has
-precedence.
+kernel test robot noticed the following build errors:
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+[auto build test ERROR on net-next/main]
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 4b8251cdb..0c76c162b 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -2582,6 +2582,8 @@ static void rtl_set_rx_mode(struct net_device *dev)
- 
- 	if (dev->flags & IFF_PROMISC) {
- 		rx_mode |= AcceptAllPhys;
-+	} else if (!(dev->flags & IFF_MULTICAST)) {
-+		rx_mode &= ~AcceptMulticast;
- 	} else if (netdev_mc_count(dev) > MC_FILTER_LIMIT ||
- 		   dev->flags & IFF_ALLMULTI ||
- 		   tp->mac_version == RTL_GIGA_MAC_VER_35 ||
+url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20231103-032946
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231102154505.940783-13-justinlai0215%40realtek.com
+patch subject: [PATCH net-next v10 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
+config: powerpc64-allyesconfig (https://download.01.org/0day-ci/archive/20231106/202311060633.814zKJdK-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231106/202311060633.814zKJdK-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311060633.814zKJdK-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:68:10: fatal error: 'net/page_pool.h' file not found
+      68 | #include <net/page_pool.h>
+         |          ^~~~~~~~~~~~~~~~~
+   1 error generated.
+
+
+vim +68 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+db2657d0fa3a98 Justin Lai 2023-11-02 @68  #include <net/page_pool.h>
+db2657d0fa3a98 Justin Lai 2023-11-02  69  #include <net/pkt_cls.h>
+db2657d0fa3a98 Justin Lai 2023-11-02  70  
+
 -- 
-2.42.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
