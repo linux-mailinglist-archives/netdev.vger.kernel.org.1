@@ -1,284 +1,219 @@
-Return-Path: <netdev+bounces-46182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440EE7E1F81
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:08:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B727E1FE7
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:25:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED692280E3B
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:08:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A471C2085A
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC961182DF;
-	Mon,  6 Nov 2023 11:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A0018AEF;
+	Mon,  6 Nov 2023 11:25:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meinberg.de header.i=@meinberg.de header.b="lJtuPqfd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/f408Sv"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E45182BB
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 11:08:15 +0000 (UTC)
-X-Greylist: delayed 372 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 06 Nov 2023 03:08:13 PST
-Received: from server1a.meinberg.de (server1a.meinberg.de [176.9.44.212])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D14798
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 03:08:13 -0800 (PST)
-Received: from seppmail.py.meinberg.de (unknown [193.158.22.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by server1a.meinberg.de (Postfix) with ESMTPSA id CE7D471C1121
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:01:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meinberg.de; s=d2021;
-	t=1699268519;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type;
-	bh=KhAL86gJ2Y5JuuRQbL3IYafOXsa2bi2EyTB3nxIQG7M=;
-	b=lJtuPqfd37i7o3n2Cd2zTFK2IOettlvOQVHD2p8eKPnZzmf1mPJS5Xy/3FmcLcOdAZ2BO8
-	/vzEIh4QcWwrLg+9fkfQ9SH+MYOwfppHixcFRzvTHTmJeq1h3XvzTRefJjxdtJXVL0+QyN
-	/lFXGX/zGYAluRfeY8wGn4tHBhpgAKKciF3fomy1iuPcIxJL116sZlJf/VR7EpX900ENd1
-	9lDy8x3PiqORDUA2efNyG5x1EnWdD2IGfF3Y8PNYYgTtT7PElwWnV1AkPHZ+DnyHVqIQf/
-	aNA3p689F/3DggTF/WedGsBKmLIUCJMfTQZ6s+cGYEfsV715yQDtFg0ZguvQyA==
-Received: from seppmail (localhost [127.0.0.1])
-	by seppmail.py.meinberg.de (Postfix) with SMTP id 4SP7hl2YWQz36ps
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:01:59 +0100 (CET)
-Received: from srv-kerioconnect.py.meinberg.de (srv-kerioconnect.py.meinberg.de [172.16.3.65])
-	(using TLSv1.3 with cipher AEAD-AES256-GCM-SHA384 (256/256 bits)
-	 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by seppmail.py.meinberg.de (Postfix) with ESMTPS
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:01:58 +0100 (CET)
-X-Footer: bWVpbmJlcmcuZGU=
-User-Agent: Microsoft-MacOutlook/16.78.23100802
-Date: Mon, 6 Nov 2023 12:01:57 +0100
-Subject: PRP with VLAN support - or how to contribute to a Linux network
- driver
-Message-ID: <75E355CF-3621-40D7-A31C-BA829804DFA2@meinberg.de>
-Thread-Topic: PRP with VLAN support - or how to contribute to a Linux network
-	driver
-Importance: Normal
-X-Priority: 3
-Thread-Index: AZ2x3tU+NGVjMGQzZTRiMzdiMzk0Mw==
-From: Heiko Gerstung <heiko.gerstung@meinberg.de>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-X-SM-outgoing: yes
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0666E18043
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 11:25:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA519C433C8;
+	Mon,  6 Nov 2023 11:25:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699269901;
+	bh=vjFyA96ISKuv32u0146EL9PZKlDB08ufc7HvCrGs70E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=F/f408SvPPV9zr9YBiuN9ETZhLs18QTJKK5QM2LDx+IAPd0euqC5Mcn6SODQh5ulF
+	 JUIy34pFN8AsjQ4LaqTyARBmOQTBIycC63H23OIsjEvfJIDuTnCfmVdYYS3YIdax6B
+	 NKHVvsvAfSjGfc01GuJLMfc95Ph+kuY6RttrvMDoZjkUljubltdBKwtnux2BnbzIxW
+	 Zksdi9zPY5+k+cxLlqcwM8/AsHkPQZCuQhP04HMGMdbce3LjRJpK2H0P/4iWh12jkt
+	 MaJ4SFdk1ZTo+8iX1VdmitaBqfzk7JMiGp3Q2idA+vaGySBJ6UGnM+O1kaXVE9EOd1
+	 YUamhx5dwAIzw==
+Message-ID: <8205a0ba-aeef-4ab6-80cc-87848903f541@kernel.org>
+Date: Mon, 6 Nov 2023 12:24:57 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg="sha-256"; boundary="----DFA0D99999F5ED3825C1CFC186937DDB"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC Draft net-next] docs: netdev: add section on using lei to
+ manage netdev mail volume
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+References: <20231105185014.2523447-1-dw@davidwei.uk>
+Content-Language: en-GB, fr-BE
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+In-Reply-To: <20231105185014.2523447-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-This is an S/MIME signed message
+Hi David,
 
-------DFA0D99999F5ED3825C1CFC186937DDB
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-MIME-version: 1.0
+On 05/11/2023 19:50, David Wei wrote:
+> As a beginner to netdev I found the volume of mail to be overwhelming. I only
+> want to focus on core netdev changes and ignore most driver changes. I found a
+> way to do this using lei, filtering the mailing list using lore's query
+> language and writing the results into an IMAP server.
 
-Hi All,
+I agree that the volume of mail is too high with a variety of subjects.
+That's why it is very important to CC the right people (as mentioned by
+Patchwork [1] ;) )
 
-we are looking for a way to use the hsr/prp driver in our products and foun=
-d out that it does not support VLANs at the moment. As I can see, the hsr d=
-river is marked as =E2=80=9Corphan=E2=80=9D, i.e. there is no active mainta=
-iner for it.=20
+[1]
+https://patchwork.kernel.org/project/netdevbpf/patch/20231105185014.2523447-1-dw@davidwei.uk/
 
-I would like to discuss if it makes sense to remove the PRP functionality f=
-rom the HSR driver (which is based on the bridge kernel module AFAICS) and =
-instead implement PRP as a separate module (based on the Bonding driver, wh=
-ich would make more sense for PRP). We have a working implementation for su=
-ch a module for 4.14 and would only need help in porting it to newer kernel=
-s. We would volunteer to maintain that kernel module (or sponsor someone wh=
-o could). =20
+> This patch is an RFC draft of updating the maintainer-netdev documentation with
+> this information in the hope of helping out others in the future.
 
-Hoping for advise what the next steps could be. Happy to discuss this off-l=
-ist as it may not be of interest for most people.=20
+Note that I'm also using lei to filter emails, e.g. to be notified when
+someone sends a patch modifying this maintainer-netdev.rst file! [2]
 
-Thank you
-  Heiko
+But I don't think this issue of "busy mailing list" is specific to
+netdev. It seems that "lei" is already mentioned in another part of the
+doc [3]. Maybe this part can be improved? Or the netdev doc could add a
+reference to the existing part?
 
+(Maybe such info should be present elsewhere, e.g. on vger [4] or lore)
 
-=
+[2]
+https://lore.kernel.org/netdev/?q=%28dfn%3ADocumentation%2Fnetworking%2Fnetdev-FAQ.rst+OR+dfn%3ADocumentation%2Fprocess%2Fmaintainer-netdev.rst%29+AND+rt%3A1.month.ago..
+[3]
+https://docs.kernel.org/maintainer/feature-and-driver-maintainers.html#mailing-list-participation
+[4] http://vger.kernel.org/vger-lists.html
 
-------DFA0D99999F5ED3825C1CFC186937DDB
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
+(Note: regarding the commit message here, each line should be limited to
+max 72 chars ideally)
 
-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
-oSqrfruFfGVmcKfpItvuuzL6q7GGP6tIgbir8yrdN8cuC/ar31WtVCAUOreJRG3n
-6D+uiCEYjkdWlQDJ7GVuVkcUTa0uJtLUi2zK8zMt+fCbjreGJoHnC56LDHwFpzx6
-+fCFkJyJZzl1EbFjsNQjLH3cHyt27QStuhHJB0kN4ygPLhEU0ray/3i4/lpTgCSs
-C0i6TjIxUeyq/rtELAvX+X2rjdpsqwjd80E9j/VBQVzGzFHKDkQft2qAdlVpUeZM
-/ReA+7NU7rBKHTOTBnm5YRGs5A5bs93gsSVct9TTzfR7ngFUK4KQoeHKQ43wQaQc
-B8DWMxajRUaPhExp/ZNXndPlb8skDDEtA5jCADlEeSKBbeTq/AtkJm78yp4aA0Tt
-f01N6RGydr2GfXu7VD9RkEfHi/j/TizyCDCMGcEsRzWevatTpCKunwwhGSm9npvP
-hNyO0TVLIhCBG2LtwEvTK5AiSR8tIa6Rxd/x1kFUcg7eyjQQ9cmandVcFuTNJbHH
-qHFGrPhThReJqyQaOBgyJHPpVa74gGMDb4Sw36CUtalT8Itq9VR55f9bnKJvIuH/
-QCllbG+OSGkxPoEbO4tY+lsvO2t9ayTwvPKN5ZrmrHjL2IIrABcdeWoJLtZuds8w
-+9tZAgMBAAGjggFnMIIBYzAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQJDL8q
-oh0EJAyy+UAKQcLPWnKqgDAfBgNVHSMEGDAWgBRbJXuWpGVRfrg588B4Zl7oOufw
-7jAOBgNVHQ8BAf8EBAMCAQYwgf8GA1UdHwSB9zCB9DBHoEWgQ4ZBaHR0cDovL2Ny
-bC5zd2lzc3NpZ24ubmV0LzVCMjU3Qjk2QTQ2NTUxN0VCODM5RjNDMDc4NjY1RUU4
-M0FFN0YwRUUwgaiggaWggaKGgZ9sZGFwOi8vZGlyZWN0b3J5LnN3aXNzc2lnbi5u
-ZXQvQ049NUIyNTdCOTZBNDY1NTE3RUI4MzlGM0MwNzg2NjVFRTgzQUU3RjBFRSUy
-Q089U3dpc3NTaWduJTJDQz1DSD9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jh
-c2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0aW9uUG9pbnQwDQYJKoZIhvcNAQEL
-BQADggIBAAL46l3QisysCAM2VGb/CimG4VSDLDPox2yuEKlUgX8qLYgmraaoNCgP
-GQapneIClQQyZEwLyvnjfcMTW+iXQI534+OCgYetAWAHw8XhIP23MJc+uhxxdItf
-Taex/k58CXh6h1/xrKElEZfHLBGckOpyFj0CNam75SPYH1JAt9COXdojvDPpMv24
-dZ9Dvj1XS4dh3u2WyHB8frcT4QlAuxkCBw9r3R/SzA5aEhjkwbGcvr4rER7lmsXg
-oTWx5OGyYq7A6Gx8lof6YN4tiRwUQUA5onfvsBVbAT8ezuYUqZy+gp+xYhffIkO1
-Mm+3BfwYytp6Q11ltSb+WkGhaXSX8UNRjdx/2VeEpx1R8oJtqw5806Pl4MmVBG3y
-x5134qX4yMW5ZwZvbf3Gf26+xWrbBDbbMG9dvciZ/sRylsy5y3SLJKkTC3i1Bsr1
-iyYWc5gdcZWd8/BS6WxVfgUiF9CJPGXtV4B3/NisvbNTjwd7WBN6sefJsPjjyaGR
-4nTOymgbshvElmCUkNvlCLc+zIh9Z8BV/Chz3hw72s8PHLYI0jM++TySSKBacIge
-EBeYenbdYEg+ckU+cGuM60h8WbVWBRIUCkZNAjYJ0WxzIVIn2GvE0nKnTH7bNs7T
-Pctc4u4b3fk6/U0T/w7OUrYWcTOgl8Vf9oIYF7U6m5u2eKsb6/1aMIIHcjCCBVqg
-AwIBAgIPRXOLMhlC+HUxekgG6wqVMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNVBAYT
-AkNIMRUwEwYDVQQKEwxTd2lzc1NpZ24gQUcxLTArBgNVBAMTJFN3aXNzU2lnbiBS
-U0EgU01JTUUgUm9vdCBDQSAyMDIxIC0gMTAeFw0yMTA4MDMxOTE2MjhaFw0zNjA3
-MzAxOTE2MjhaMFwxCzAJBgNVBAYTAkNIMRUwEwYDVQQKEwxTd2lzc1NpZ24gQUcx
-NjA0BgNVBAMTLVN3aXNzU2lnbiBSU0EgU01JTUUgTkNQIGV4dGVuZGVkIElDQSAy
-MDIxIC0gMTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK1mlxAxJhlg
-BGAMtBG6/Pgsc+zJkd8OTSALhaNK2f0/+ieNt0TnI7gkyJ0phAg6V8l3E+j0Faku
-40/nj/lejhgsHyF8gvhhgV+P9JZu75PSlvUT4mPSIe8RlQzMrjun92kx7IXbhySl
-gsQOM/SD/lbxKLnElbMEyeQfn09VHrRP4GwSuwzRIWxZleo/hb7Kd+cPIf8FNNPX
-qXfd5MX4lT90WJ3UdTQFYdK01JBW3tVP4Ath9jtRldmqutgz5+4/7/u/usb3DcM7
-BBxxM295hRybgfVACJKsYjLkJk0JAqMf0A5FBdIt/0k3rU+AxfQDATjFCqYDAzn0
-2LzAGcJbcox9Odl0+aOwQhFPHp8Ry6I85nXQWHjX8ii0jTesFXTkTb5eRQuoTkpI
-0BYE76Sct1O2GH1HkAIdg4soI4bjap7M3nyJRNmDit46hV71NbECqO14j33/DkUv
-s/r6u9EF6qJh1DYcWW+Xyom+Yd4HPIqaKjztIltqHCEc7FvGmlkQqUvpzn2iYuCy
-dPLbHatMqIu3F/MPEVljeIlz47zkwy0DCc+CIUdtrDajQDH8HoQAdewJmWKWUQgT
-QGRKZRkc0eh3MKaoMvk/hTkcvjHd1sMnaM+aa3Gp7YoY6IFcItC3ORUqy8YGHe7H
-eRS4+uIjmy+iU6T26YivkV24j8GiROMhAgMBAAGjggI4MIICNDAOBgNVHQ8BAf8E
-BAMCAQYwNQYDVR0lBC4wLAYIKwYBBQUHAwIGCCsGAQUFBwMEBgorBgEEAYI3CgME
-BgorBgEEAYI3FAICMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFCtmGmME
-GQOnGfw158O40TaPTppBMB8GA1UdIwQYMBaAFAkMvyqiHQQkDLL5QApBws9acqqA
-MIH/BgNVHR8EgfcwgfQwR6BFoEOGQWh0dHA6Ly9jcmwuc3dpc3NzaWduLm5ldC8w
-OTBDQkYyQUEyMUQwNDI0MENCMkY5NDAwQTQxQzJDRjVBNzJBQTgwMIGooIGloIGi
-hoGfbGRhcDovL2RpcmVjdG9yeS5zd2lzc3NpZ24ubmV0L0NOPTA5MENCRjJBQTIx
-RDA0MjQwQ0IyRjk0MDBBNDFDMkNGNUE3MkFBODAlMkNPPVN3aXNzU2lnbiUyQ0M9
-Q0g/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNS
-TERpc3RyaWJ1dGlvblBvaW50MB8GA1UdIAQYMBYwCgYIYIV0AVkCAQ0wCAYGBACP
-egEBMHQGCCsGAQUFBwEBBGgwZjBkBggrBgEFBQcwAoZYaHR0cDovL3N3aXNzc2ln
-bi5uZXQvY2dpLWJpbi9hdXRob3JpdHkvZG93bmxvYWQvMDkwQ0JGMkFBMjFEMDQy
-NDBDQjJGOTQwMEE0MUMyQ0Y1QTcyQUE4MDANBgkqhkiG9w0BAQsFAAOCAgEAvFxg
-4AvqZothV0hW7gudd8Vcu7lstjDrIKinahkT30x0mL1n00ASbhR7wbFVvpCZy9oj
-Aj3VKdf9Nu++c4dYVrgspkWANg8lj8rZAUtxdl628dISURAXc1xKrvnKqSWvdmfT
-IiAkWKi5I8RF14ktxHuHZk8+I8ndFU27iqKRvvehqiXpb1uIaZ/gY+laTfRJ48KO
-/0iV+E2AJAd6UudNVXLOCMhHXhbZm3mDkxjzKX3qHTU68/TSt8TTCZSl+Ql/jXF9
-T/4dZMm15ev20a4Xliki4J9PbxTZvpiVdPzcl5YYm+5lz6l/TevFjFAiUflYSRk8
-zqhrVvRyTQDNj3x3SYbN2YAD1r5I7X3hu+Fxf+O9lCjABECS3ZI1b29vzWYm83vk
-LY9xyqjMvIEtANwk+keHTW2qP76bShVz2eu7CJeHymMm0xnfZSIp46vXpmJuumth
-/XKebCCxru+Unc2dn6tsPZ8/+WmC8DkGE9snIO30PVMKIAyPKFMOldt1NC2zTN1e
-n39aMqzjc7ehKNsxc1raZku4audhwNbUnUL5CSDIsvZk0RGaLuYuji0nzVD8jXlx
-bDOBBdi75pB8Sw9LNia88W2wX3SNQSZ6xE1WvNAhJ6eLpozm5zh1rPFw4hONonwm
-kHTW/3EV53wUltrlizW88HtH2LzbGp+UpyHNcp8wgghcMIIGRKADAgECAhQVL+XE
-YjWLu5PiKBQAQdinUZu7kTANBgkqhkiG9w0BAQsFADBcMQswCQYDVQQGEwJDSDEV
-MBMGA1UEChMMU3dpc3NTaWduIEFHMTYwNAYDVQQDEy1Td2lzc1NpZ24gUlNBIFNN
-SU1FIE5DUCBleHRlbmRlZCBJQ0EgMjAyMSAtIDEwHhcNMjIxMTI4MTAwMjIyWhcN
-MjMxMTI4MTAwMjIyWjCBiTELMAkGA1UEBhMCREUxCzAJBgNVBAgTAk5JMSkwJwYD
-VQQKDCBNZWluYmVyZyBGdW5rdWhyZW4gR21iSCAmIENvLktHLjEpMCcGCSqGSIb3
-DQEJARYaaGVpa28uZ2Vyc3R1bmdAbWVpbmJlcmcuZGUxFzAVBgNVBAMTDkhlaWtv
-IEdlcnN0dW5nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0Mt9WUkJ
-5VzhEJ9WvZOQNGtultgIbRbOPyPbdaiw+4zmtkWhBVWZDqqCwd4QuFhTXvrCgqse
-pohLtPqW5RnrgmSs6vqEoFVBM/vaxnYrYuCOuj12JqgK+lH7NXtpw8CbS69XPXEx
-oMe2V/0gAehUW3ngevkrJWY/iZ0ck/PAF7liYrww2DJvg7tYRvDtXlkdIonw5QZQ
-bFrn+uLOmhBsTZg6u9Dbvcg/UYuuEAhfgpQQ6bDLDvFY+rGo071LDkEDoApqQO9l
-w0ljRy6oafo7HTYTm5ahtydi2Qt7V1TulsxaBC5E80hfLn1Nw3RyhfLLYdWag9LI
-rGbmnqKLEgzY9leOGfH7i/W92FkQd8WavxhNBqABa2NBpzz81gypP3f7uxIlqsHL
-yqZud8SIKZdCjquFV7vbNnHHvKRPkXSccG/EaNvud7hCFVi3YM1q2WwZnSXPdBBS
-t3aUgd6T9tOLUR1LEgkIr7Q2gMhpRtG/j7ki2005Lf6Tpt1W97EBJEL7adkxoMc2
-febuc2zAQh6v+gQlw1Ie/q86eHjN9++qHPWxwvzjHok1OxOmFnyeM3uVmvIrNiLv
-WuwCFZ14sr8G2ZIsAOCW857oTqH23uqtRhVgxl6u6i/Vqbt+YqEivnPNEEbUVtT3
-YpiZpxNPMBYldRL8EjaCA57EZu79H+PXoaMCAwEAAaOCAuYwggLiMCUGA1UdEQQe
-MByBGmhlaWtvLmdlcnN0dW5nQG1laW5iZXJnLmRlMA4GA1UdDwEB/wQEAwID+DA1
-BgNVHSUELjAsBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQBgjcKAwQGCisGAQQB
-gjcUAgIwHQYDVR0OBBYEFBYFwRRVUSm02JRgOFnxcbriy1QKMB8GA1UdIwQYMBaA
-FCtmGmMEGQOnGfw158O40TaPTppBMIH/BgNVHR8EgfcwgfQwR6BFoEOGQWh0dHA6
-Ly9jcmwuc3dpc3NzaWduLm5ldC8yQjY2MUE2MzA0MTkwM0E3MTlGQzM1RTdDM0I4
-RDEzNjhGNEU5QTQxMIGooIGloIGihoGfbGRhcDovL2RpcmVjdG9yeS5zd2lzc3Np
-Z24ubmV0L0NOPTJCNjYxQTYzMDQxOTAzQTcxOUZDMzVFN0MzQjhEMTM2OEY0RTlB
-NDElMkNPPVN3aXNzU2lnbiUyQ0M9Q0g/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlz
-dD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50MGcGA1UdIARg
-MF4wUgYIYIV0AVkCAQ0wRjBEBggrBgEFBQcCARY4aHR0cHM6Ly9yZXBvc2l0b3J5
-LnN3aXNzc2lnbi5jb20vU3dpc3NTaWduX0NQU19TTUlNRS5wZGYwCAYGBACPegEB
-MIHGBggrBgEFBQcBAQSBuTCBtjBkBggrBgEFBQcwAoZYaHR0cDovL3N3aXNzc2ln
-bi5uZXQvY2dpLWJpbi9hdXRob3JpdHkvZG93bmxvYWQvMkI2NjFBNjMwNDE5MDNB
-NzE5RkMzNUU3QzNCOEQxMzY4RjRFOUE0MTBOBggrBgEFBQcwAYZCaHR0cDovL29j
-c3Auc3dpc3NzaWduLm5ldC8yQjY2MUE2MzA0MTkwM0E3MTlGQzM1RTdDM0I4RDEz
-NjhGNEU5QTQxMA0GCSqGSIb3DQEBCwUAA4ICAQBk4hY2HMpe0jUw9zE6V/OH3EiZ
-6qVRSAamOA13nPdWhjI0S85fDEtH9T9Gzr54cBtZFsmwmPpa7jB51h6SXKdeLgdJ
-6OHDe2MiMW5p2u6XgU53qSkB5LicLFCfKaBv+nHziPJk0EE8uA8Ia0GhHGy+Xl8W
-M1oWr7P6gLi/zaqajGEnDbmYRXj/u0yzoa1r6XnFKmyD7ZfK8aBvT1EXAuD5T6Nm
-Yqknzk4oguExuAmP+2xljBVC0VSB6ClOB+KW+TBlhqRE9mUUS2RwTrVmXF7cWl4G
-vUCEpfbDP9PT8yI5WW0ngKXlOGR10kMaoxHNEondN79s3VT/pdh1FgX4RqoUluju
-CEOUCnE8bz2242RfbgLP0/TnP8V/AIsyust5SL0JjVtk3/tQAFh+WM40KK1MJjqT
-NjkpXSElZNBigmZr3xu4r5Q6J4M3rTIbx8MBKy3t8H+SfJngeeVd8qgFhg3al1EH
-e/JfywzV7beUkuwo1bnR+jbKyXSpj9ywva92r52J/ExmaLoJE/+ufzkdDz5D/4ZY
-yhpkfksy5VdnHirtVfs5WucoWVBzxSf2pNEhdQXVWD7oLVKiX5CyrZDmnaueXjQX
-ciEGc8WNG6M0hwwENPOGZ2ZMjWR4j/J+qCuN9Kf129/2KHYd/6e58HxrqTwWWOio
-c8K3oAvc9LKnRI1wBDGCA4QwggOAAgEBMHQwXDELMAkGA1UEBhMCQ0gxFTATBgNV
-BAoTDFN3aXNzU2lnbiBBRzE2MDQGA1UEAxMtU3dpc3NTaWduIFJTQSBTTUlNRSBO
-Q1AgZXh0ZW5kZWQgSUNBIDIwMjEgLSAxAhQVL+XEYjWLu5PiKBQAQdinUZu7kTAL
-BglghkgBZQMEAgGggeQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG
-9w0BCQUxDxcNMjMxMTA2MTEwMTU5WjAvBgkqhkiG9w0BCQQxIgQgxiyLJAJiq682
-PJlxWdXosOPZubBYF8L1JcQE8bgKvXAweQYJKoZIhvcNAQkPMWwwajALBglghkgB
-ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggq
-hkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwIC
-ASgwDQYJKoZIhvcNAQEBBQAEggIAQ/Gdem8P+0DP+EdStEo4R+ZrDED+XlRSfiqp
-tXQHgipDWkRNNknxu3VFen3aLo6sxhMC+QKboG2StakbgzmCsbNcKwUKCE06e5mv
-mSHc8fW05dl0Mb1Q6eBXsWyOTmsXoCCec1JP/GalNMS1pjgBomUIiwVAItKMdkSY
-xx6zNYat3Bcocv7cJFCnoSCQpdqWa3m48hn3WVGW+ahegv7HbQ294BB2Wu6l+jHI
-KMZz/1FSE8xGOKM/KjDC3WDOVJbnFO9+/TfjVfnSXv6bAxO4i+8rR7Klk2jDqtxb
-8n6UJrGzOniiYrWo+uBKm7XkGdb6Y5apf+mbYq+BS3ER/Ue43mNn10AQA5lxBLpj
-UbrSSkz8UjnJuYG2onxDP7Ev0L1UyT640lpzBow/qiCV/PT3QxomHdiOH5+QO1Jr
-KUpIdTpY2uuWRI/fJA1vPvizF5IAF9mmOqTnDCOUM5PNqJgyprTlTLKx6NmUUw9A
-Lsg+luON8R3ZDUrvh2OwdS9mmnRAoL6/gCCFT8M0F9sXBlDvVYTunFGXfFt2TWjB
-FUp2rcscGM8VDr1p0s58zWHWu+eD+dydbJgsKIlSHKm9LBUJRwMNBS1afQc0Ryt6
-nLvIw5I9kIM4N+33tFxkXxfA29DF6Fi0+D/laCBgv0dvwzXKMjXKXs8wTpUK6OSn
-YeSxZ58=
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  Documentation/process/maintainer-netdev.rst | 39 +++++++++++++++++++++
+>  1 file changed, 39 insertions(+)
+> 
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+> index 7feacc20835e..93851783de6f 100644
+> --- a/Documentation/process/maintainer-netdev.rst
+> +++ b/Documentation/process/maintainer-netdev.rst
+> @@ -33,6 +33,45 @@ Aside from subsystems like those mentioned above, all network-related
+>  Linux development (i.e. RFC, review, comments, etc.) takes place on
+>  netdev.
+>  
+> +Managing emails
+> +~~~~~~~~~~~~~~~
+> +
+> +netdev is a busy mailing list with on average over 200 emails received per day,
+> +which can be overwhelming to beginners. Rather than subscribing to the entire
+> +list, considering using ``lei`` to only subscribe to topics that you are
+> +interested in. Konstantin Ryabitsev wrote excellent tutorials on using ``lei``:
+> +
+> + - https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started
+> + - https://people.kernel.org/monsieuricon/lore-lei-part-2-now-with-imap
+> +
+> +As a netdev beginner, you may want to filter out driver changes and only focus
+> +on core netdev changes. Try using the following query with ``lei q``::
+> +
+> +  lei q -o ~/Mail/netdev \
+> +    -I https://lore.kernel.org/all \
+> +    -t '(b:b/net/* AND tc:netdev@vger.kernel.org AND rt:2.week.ago..'
 
-------DFA0D99999F5ED3825C1CFC186937DDB--
+Small optimisations:
 
+- you can remove tc:netdev@vger.kernel.org and modify the '-I' to
+restrict to netdev instead of querying 'all': -I
+https://lore.kernel.org/netdev/
+
+- In theory, 'dfn:' should help you to match a filename being modified.
+But in your case, 'net' is too generic, and I don't think we can specify
+"starting with 'net'". You can still omit some results after [5] but the
+syntax doesn't look better :)
+
+  dfn:net AND NOT dfn:drivers/net AND NOT dfn:selftests/net AND NOT
+dfn:tools/net AND rt:2.week.ago..
+
+[5]
+https://lore.kernel.org/netdev/?q=dfn%3Anet+AND+NOT+dfn%3Adrivers%2Fnet+AND+NOT+dfn%3Aselftests%2Fnet+AND+NOT+dfn%3Atools%2Fnet+AND+rt%3A2.week.ago..
+
+> +This query will only match threads containing messages with patches that modify
+> +files in ``net/*``. For more information on the query language, see:
+> +
+> +  https://lore.kernel.org/linux-btrfs/_/text/help/
+
+(if this is specific to 'netdev', best to use '/netdev/', not
+'/linux-btrfs/')
+
+> +By default ``lei`` will output to a Maildir, but it also supports Mbox and IMAP
+> +by adding a prefix to the output directory ``-o``. For a list of supported
+> +formats and prefix strings, see:
+> +
+> +  https://www.mankier.com/1/lei-q
+
+Maybe safer to point to the official doc?
+
+https://public-inbox.org/lei-q.html
+
+(or 'man lei-q')
+
+> +If you would like to use IMAP, Konstantin’s blog is slightly outdated and you
+> +no longer need to use here strings i.e. ``<<<`` or ``<<EOF``.
+
+I think we can still use them. In the part 1, they are not used. Maybe
+best to contact Konstantin to update his blog post instead of mentioning
+in the doc that the blog post is outdated?
+
+> You can simply
+> +point lei at an IMAP server e.g. ``imaps://imap.gmail.com``::
+
+In Konstantin's blog post, he mentioned different servers with different
+specificities. Maybe easier to just point to that instead of taking one
+example without more explanations?
+
+Cheers,
+Matt
 
