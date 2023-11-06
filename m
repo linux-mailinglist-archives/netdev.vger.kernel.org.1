@@ -1,93 +1,256 @@
-Return-Path: <netdev+bounces-46236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E587E2AE0
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:23:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7D267E2AFD
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06F8F1C20C0E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:23:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28B42815E7
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C45B929CFB;
-	Mon,  6 Nov 2023 17:22:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F0F29D03;
+	Mon,  6 Nov 2023 17:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VwIwIdXi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F98Wpxiw"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DC328E33
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:22:54 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D88883
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 09:22:53 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a839b31a0dso96168837b3.0
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 09:22:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699291372; x=1699896172; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WjVO4sAOUldvg+TEp1bCwrL1tOOGvg0o40qn6OCIZC8=;
-        b=VwIwIdXiX+TLbRGw0UvGHUurRaoakukQMkmKW74P0yPY+xlXzMEXWWiOEO9lIGg7hw
-         grnI/qVl46gvJd/TOut+dB8kdOwu0fjYs24gQdoYWddP/fXLvS6w7fz8ea9N8Q/3avpi
-         1lsqd+3akYpQ4VPgENRbzYLe44b4oupSWrNcvX388tszuJMfeepWAYkP07cenkoS72ui
-         vt2y285MhnSyIEYejGXhD6/vZ61OO0ueVpS5YgQ7davB3gMo1VybB56EGtz8iadrl1bB
-         FRTtV4sVheNFuqf1wi0cEVW+BgANYhxyz56dUR81/FIfbuLMjRtyTceZcfz00SKpqr6z
-         IDcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699291372; x=1699896172;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WjVO4sAOUldvg+TEp1bCwrL1tOOGvg0o40qn6OCIZC8=;
-        b=nTcFkgH62Qn9zRvcsApNTnSGf0nwxUhncEmPX7fxjMGR1s2GKjt0S1V2JOKFhARHt7
-         xMKXPZG0Slz0SI3NHXvwvRnJW2fzbzg+TqbUX7CaOr/+T1skJq79fLLQUFQhCAWmMJo7
-         vfoPZedLhoMWbjt3WmcvTwrZKgE/3D0zMhRgEHF2b4a9ZxFzksJQKU7FGTMflaO27Wtb
-         DOCYZBFlyS9FCD5CXd7NytkPKE1eXJrjPzOIJZuA/9tOVAWAOo5ws61ZAbAXzNEmU1uf
-         WJUkizDy47UU/AOaBwembrg3anTtIKfko9Zvea9m/9mNOp4/Q6xwb2fayXV5KD+dRuMq
-         8UDA==
-X-Gm-Message-State: AOJu0Yw8hOqJZ5u/MSvuvke6aNmEh3v2QsQwDxFVM8ucqsBL85Z7chRp
-	dPeqon9n3YtyjTQo7GibMmO1oFI=
-X-Google-Smtp-Source: AGHT+IEVyhpt7fUPpfetx4DKqxAPIdrCZ9TLvPSLhdEldLH64LuoQvzQ4YdpQ+DKn+WedQWV80lSuck=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:4f12:0:b0:59b:ebe0:9fcd with SMTP id
- d18-20020a814f12000000b0059bebe09fcdmr202804ywb.7.1699291372467; Mon, 06 Nov
- 2023 09:22:52 -0800 (PST)
-Date: Mon, 6 Nov 2023 09:22:50 -0800
-In-Reply-To: <20231103222748.12551-1-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3E229420;
+	Mon,  6 Nov 2023 17:33:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8389C433C7;
+	Mon,  6 Nov 2023 17:33:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699292022;
+	bh=oOcDWz4H6EBWQZ8XRRFn7yilwzV+aCmfOKBCXufKkEY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F98WpxiwlABjLnTlC53iqz0UZ/avBbM4z0K08bsO8UinsyRhiHLr4d/VdaGgXHjFs
+	 hbp/KzU+RkYgF4qtjf944AAgi1q0MpdnGUwvEcAZ2p4zHPqTXXfMbbeAFrEbrMt27y
+	 HyrQBYLc8VuRI8aHJerD3OWeliIJKf+QYKvyRvqZTl0A4R1yav+mqMJhf9W4JRXGdZ
+	 lco0JJ2ZhSA74E0bLiwKcOdV2J5eMkn2pbJMIEs4Doe0QqOBSohaSohew6u8WHbOYR
+	 ZZhEXLUdmEQCOmoygJb7kNh2IorPhmBhHZqqlnmxPxhJCckiG4vn43K3SGJXf5CzUr
+	 8E1Bz0PS1GPUw==
+Date: Mon, 6 Nov 2023 17:33:36 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v5 4/4] dt-bindings: Document bindings for
+ Marvell Aquantia PHY
+Message-ID: <20231106-plentiful-kilt-9f228cbbe6e0@spud>
+References: <20231106165433.2746-1-ansuelsmth@gmail.com>
+ <20231106165433.2746-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231103222748.12551-1-daniel@iogearbox.net>
-Message-ID: <ZUkg6rkp0bGz7Fkt@google.com>
-Subject: Re: [PATCH bpf 0/6] bpf_redirect_peer fixes
-From: Stanislav Fomichev <sdf@google.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: martin.lau@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="L/mZ8GihQdWIG/0t"
+Content-Disposition: inline
+In-Reply-To: <20231106165433.2746-4-ansuelsmth@gmail.com>
 
-On 11/03, Daniel Borkmann wrote:
-> This fixes bpf_redirect_peer stats accounting for veth and netkit,
-> and adds tstats in the first place for the latter. Utilise indirect
-> call wrapper for bpf_redirect_peer, and improve test coverage of the
-> latter also for netkit devices. Details in the patches, thanks!
-> 
-> Daniel Borkmann (4):
->   netkit: Add tstats per-CPU traffic counters
->   bpf, netkit: Add indirect call wrapper for fetching peer dev
->   selftests/bpf: De-veth-ize the tc_redirect test case
->   selftests/bpf: Add netkit to tc_redirect selftest
-> 
-> Peilin Ye (2):
->   veth: Use tstats per-CPU traffic counters
->   bpf: Fix dev's rx stats for bpf_redirect_peer traffic
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+--L/mZ8GihQdWIG/0t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-With one optional nit about indirect call.
+On Mon, Nov 06, 2023 at 05:54:33PM +0100, Christian Marangi wrote:
+> Document bindings for Marvell Aquantia PHY.
+>=20
+> The Marvell Aquantia PHY require a firmware to work correctly and there
+> at least 3 way to load this firmware.
+>=20
+> Describe all the different way and document the binding "firmware-name"
+> to load the PHY firmware from userspace.
+>=20
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> Changes v5:
+> - Drop extra entry not related to HW description
+> Changes v3:
+> - Make DT description more OS agnostic
+> - Use custom select to fix dtbs checks
+> Changes v2:
+> - Add DT patch
+>=20
+>  .../bindings/net/marvell,aquantia.yaml        | 123 ++++++++++++++++++
+>  1 file changed, 123 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/marvell,aquanti=
+a.yaml
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml =
+b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> new file mode 100644
+> index 000000000000..7106c5bdf73c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> @@ -0,0 +1,123 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/marvell,aquantia.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Marvell Aquantia Ethernet PHY
+> +
+> +maintainers:
+> +  - Christian Marangi <ansuelsmth@gmail.com>
+> +
+> +description: |
+> +  Marvell Aquantia Ethernet PHY require a firmware to be loaded to actua=
+lly
+> +  work.
+> +
+> +  This can be done and is implemented by OEM in 3 different way:
+> +    - Attached SPI flash directly to the PHY with the firmware. The PHY
+> +      will self load the firmware in the presence of this configuration.
+
+> +    - Dedicated partition on system NAND with firmware in it. NVMEM
+> +      subsystem will be used and the declared NVMEM cell will load
+> +      the firmware to the PHY using the PHY mailbox interface.
+
+I'd probably phrase this one as something more like "Read from a
+dedicated partition on system NAND declared in an NVMEM cell, and loaded
+to the PHY using its mailbox interface." or something like that - mostly
+to get rid of the linux specific "NVMEM subsystem" from the description.
+
+Otherwise,
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+Cheers,
+Conor.
+
+> +    - Manually provided firmware loaded from a file in the filesystem.
+> +
+> +allOf:
+> +  - $ref: ethernet-phy.yaml#
+> +
+> +select:
+> +  properties:
+> +    compatible:
+> +      contains:
+> +        enum:
+> +          - ethernet-phy-id03a1.b445
+> +          - ethernet-phy-id03a1.b460
+> +          - ethernet-phy-id03a1.b4a2
+> +          - ethernet-phy-id03a1.b4d0
+> +          - ethernet-phy-id03a1.b4e0
+> +          - ethernet-phy-id03a1.b5c2
+> +          - ethernet-phy-id03a1.b4b0
+> +          - ethernet-phy-id03a1.b662
+> +          - ethernet-phy-id03a1.b712
+> +          - ethernet-phy-id31c3.1c12
+> +  required:
+> +    - compatible
+> +
+> +properties:
+> +  reg:
+> +    maxItems: 1
+> +
+> +  firmware-name:
+> +    description: specify the name of PHY firmware to load
+> +
+> +  nvmem-cells:
+> +    description: phandle to the firmware nvmem cell
+> +    maxItems: 1
+> +
+> +  nvmem-cell-names:
+> +    const: firmware
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    mdio {
+> +        #address-cells =3D <1>;
+> +        #size-cells =3D <0>;
+> +
+> +        ethernet-phy@0 {
+> +            /*  Only needed to make DT lint tools work. Do not copy/paste
+> +             *  into real DTS files.
+> +             */
+> +            compatible =3D "ethernet-phy-id31c3.1c12",
+> +                         "ethernet-phy-ieee802.3-c45";
+> +
+> +            reg =3D <0>;
+> +            firmware-name =3D "AQR-G4_v5.4.C-AQR_CIG_WF-1945_0x8_ID44776=
+_VER1630.cld";
+> +        };
+> +
+> +        ethernet-phy@1 {
+> +            /*  Only needed to make DT lint tools work. Do not copy/paste
+> +             *  into real DTS files.
+> +             */
+> +            compatible =3D "ethernet-phy-id31c3.1c12",
+> +                         "ethernet-phy-ieee802.3-c45";
+> +
+> +            reg =3D <0>;
+> +            nvmem-cells =3D <&aqr_fw>;
+> +            nvmem-cell-names =3D "firmware";
+> +        };
+> +    };
+> +
+> +    flash {
+> +        compatible =3D "jedec,spi-nor";
+> +        #address-cells =3D <1>;
+> +        #size-cells =3D <1>;
+> +
+> +        partitions {
+> +            compatible =3D "fixed-partitions";
+> +            #address-cells =3D <1>;
+> +            #size-cells =3D <1>;
+> +
+> +            /* ... */
+> +
+> +            partition@650000 {
+> +                compatible =3D "nvmem-cells";
+> +                label =3D "0:ethphyfw";
+> +                reg =3D <0x650000 0x80000>;
+> +                read-only;
+> +                #address-cells =3D <1>;
+> +                #size-cells =3D <1>;
+> +
+> +                aqr_fw: aqr_fw@0 {
+> +                    reg =3D <0x0 0x5f42a>;
+> +                };
+> +            };
+> +
+> +            /* ... */
+> +
+> +        };
+> +    };
+> --=20
+> 2.40.1
+>=20
+
+--L/mZ8GihQdWIG/0t
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZUkjcAAKCRB4tDGHoIJi
+0nWmAQD/6caNNaXg4llLe5jQkRunI0dM64BFefhMSwUhRP5KugD/TbX4eaFaejKE
+darP3qusg8I9T17zUTxt8PN8F35mbAc=
+=Kg0u
+-----END PGP SIGNATURE-----
+
+--L/mZ8GihQdWIG/0t--
 
