@@ -1,252 +1,165 @@
-Return-Path: <netdev+bounces-46231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A4B7E2A7E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:57:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D63F7E2A92
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:03:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B52751C20C22
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:57:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F23F1C20C04
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B722941E;
-	Mon,  6 Nov 2023 16:57:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887492942D;
+	Mon,  6 Nov 2023 17:03:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="okLAZE14"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="KZKo9BNA"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B7729CE1
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 16:57:20 +0000 (UTC)
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D41A4C0
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 08:57:18 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1cc0e78ec92so30134915ad.3
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 08:57:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E43115AF2
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:03:29 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A289B125
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 09:03:28 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2809fb0027cso3437996a91.2
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 09:03:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699289838; x=1699894638; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IAtu3+SFzwI9m4YrirdXu7GL4DTW+zbFpK/FdXlvvTM=;
-        b=okLAZE14Q17zvqYCXVvx1dSJC6m0z7c37uMiiQw5rHgjqfEfbOx708/hJnHzQIBwC8
-         fuD9eyj3kOwBcpDeN42DYyQWfZRuy/dmBeyMM2P4SlNPlpzEuxNfYypLmDlLuEZLs02A
-         0SPErTGLVU2Pwvqqt0QHBAB2jDFmbWaWTl8ZuAa3VNNn780n+HHEBYioV2l4TLBlIAPP
-         64DNmQCIFDJ3WL9jTCVSIMEpqdTer24pc6gPaL+h9ePD2Vzr8qX6Zp68IQDCDPhmGacn
-         RDAKRoomzIn6Rj17aXrqPmBP4eicLZn/UTwZ155kg2txCcPGKT0JbO9+JLUJrns6lmry
-         o5iQ==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1699290208; x=1699895008; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ben4iCbN53nMVOf/bR/i9r0kIFtgFbYHJJnd3HQamaI=;
+        b=KZKo9BNAj1gnB+t6GP4PI7Jf/HjulCIBKIDEEuyCEEpZOunjvMEQVgR8IVhrUy5rAT
+         tDXkZJuTXc7F9vesJ3yOeV54Dv+p34uln86hZ7hni9kwWYZFej5hiqKsTusA7wXUsXM6
+         a6D1RCSP6VRRbnA6RHiD06W2MeK7Sg9VMaMJ04ycAmN9KZ2XiglCotLpBvmksCcoCf+q
+         GAp/9JP0V/ZhJ3nK66xKKfo+zJHkQy+52tyqqy0KBapG9KUYIkz1o/Q9123XqGoeyEuA
+         oxh56otNIf+4AOU+zMLQKjt7SijXzsRY82cDGAk6EA1BK8inNHr2BWPA0OHbIEaIMJcy
+         0Mdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699289838; x=1699894638;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAtu3+SFzwI9m4YrirdXu7GL4DTW+zbFpK/FdXlvvTM=;
-        b=SMRoGNWaBgwNT63CaF8P+x8OZBaUA1wKkQWP1KomhI71Wlj3wwzL31yWBFOxK1zdZQ
-         ua9oJD6UJ1Hbq7zIwlgrecLw64LJOGFdw0L5ojQ+LD2J+dJl7GECzm+InRKGuUea5AsO
-         lfQqxfefITjqV66quKJU6j422YKlhkU5p6o2XAmGMTOyQi4/gkC/Ajqgj9A47LvdZpIO
-         KHA8BoSuL+TZZq/OfaJf6JLIrnSQXbYFLvyVrkNNPaXrjMBNLDLbByGCVS+AUXchJKkZ
-         Pb6Qr0UCF3Q5jKprSoHJkqtyO2TtOHovYIBUFhJtHOnpN1m2Z8evX7MuaBEnwkM3BZLj
-         Z5+A==
-X-Gm-Message-State: AOJu0YzL3qW3/5MpOmbKL4IwoCFX43/T9nKRyRMv3TePlPnNS6Spw3Vx
-	VKtt9L151ZFdI3G0nF6M+QCWMA==
-X-Google-Smtp-Source: AGHT+IHtAosg/LkVtTBD2+bok4iEa94l++tqcHBvY/TX+5grNORG+M8J7zu3HhDUry5UXuPwJwM/mA==
-X-Received: by 2002:a17:902:cf46:b0:1cc:6cc3:d9ba with SMTP id e6-20020a170902cf4600b001cc6cc3d9bamr13895878plg.4.1699289838227;
-        Mon, 06 Nov 2023 08:57:18 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::7:3f3c])
-        by smtp.gmail.com with ESMTPSA id a6-20020a170902ee8600b001c0a4146961sm6139074pld.19.2023.11.06.08.57.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 08:57:17 -0800 (PST)
-Message-ID: <9ee972b4-b3ff-4201-b22e-c76080cb8f6e@davidwei.uk>
-Date: Mon, 6 Nov 2023 08:57:15 -0800
+        d=1e100.net; s=20230601; t=1699290208; x=1699895008;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ben4iCbN53nMVOf/bR/i9r0kIFtgFbYHJJnd3HQamaI=;
+        b=fZObhwSFsuZkcjVK2d4eZvV/jg6KgTaEDmvEhHjRFG4Kdd1KIzFB0uaXSEO1W31H/M
+         6Cyj3UnZEYnnjjUUH7XlJ7f4dZj2/8m6lhHD7GZaweVu35FKXjOiks2lroA8w+OSYUhc
+         /GcaMnBw7/5/cqlivMpISHFwis1pGLFWxyTCw+QFxFDFm086qVD36iA9mhIHOOtjiu74
+         E+a/UhtEBL+9r29h31NUh/J3mOtrsY1FfyTyVEZHaRqoeC2frUAKotP1wv1G18FMxlui
+         /KMytvJzziOI7WTfph/jQa0Ebqz8AN0HRgELeAMbrQAhx1ASxYsjq5H9bktp0xeNWuXu
+         H6Vw==
+X-Gm-Message-State: AOJu0Yz0PJVWqPBAlLQu1QPNgHzDeXlLHjkfmilkZbGrMfTMv7EXzI/h
+	hFvplMmSM322yAihjxHhEDQejR/KrglexNOZtWw=
+X-Google-Smtp-Source: AGHT+IEoBVbWUrL6c1QOluncxudI83jsWTm3jKeZTE/RXGHmikCwU1Lk4vxO/HHuVoAWbULdcWR/0Q==
+X-Received: by 2002:a17:90b:4a50:b0:26d:17da:5e9f with SMTP id lb16-20020a17090b4a5000b0026d17da5e9fmr10267650pjb.1.1699290207788;
+        Mon, 06 Nov 2023 09:03:27 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id 18-20020a17090a199200b002810810cc80sm1743382pji.37.2023.11.06.09.03.27
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 09:03:27 -0800 (PST)
+Date: Mon, 6 Nov 2023 09:03:25 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: [ANNOUNCE] iproute2 6.6 release
+Message-ID: <20231106090325.07092c87@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC Draft net-next] docs: netdev: add section on using lei to
- manage netdev mail volume
-Content-Language: en-GB
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- workflows@vger.kernel.org, linux-doc@vger.kernel.org, pabeni@redhat.com,
- davem@davemloft.net, corbet@lwn.net, edumazet@google.com
-References: <20231105185014.2523447-1-dw@davidwei.uk>
- <8205a0ba-aeef-4ab6-80cc-87848903f541@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <8205a0ba-aeef-4ab6-80cc-87848903f541@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
 
-On 2023-11-06 03:24, Matthieu Baerts wrote:
-> Hi David,
-> 
-> On 05/11/2023 19:50, David Wei wrote:
->> As a beginner to netdev I found the volume of mail to be overwhelming. I only
->> want to focus on core netdev changes and ignore most driver changes. I found a
->> way to do this using lei, filtering the mailing list using lore's query
->> language and writing the results into an IMAP server.
-> 
-> I agree that the volume of mail is too high with a variety of subjects.
-> That's why it is very important to CC the right people (as mentioned by
-> Patchwork [1] ;) )
-> 
-> [1]
-> https://patchwork.kernel.org/project/netdevbpf/patch/20231105185014.2523447-1-dw@davidwei.uk/
+Update release of iproute2 corresponding to the 6.6 kernel.  Release
+is smaller than usual. One notable thing is that support for kernel
+components removed in 6.3 kernel was removed from iproute2 (dsmark,
+cbq, rsvp).
 
-Sorry and noted, I've now CC'd maintainers mentioned by Patchwork.
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.6.0.tar.=
+gz
 
-> 
->> This patch is an RFC draft of updating the maintainer-netdev documentation with
->> this information in the hope of helping out others in the future.
-> 
-> Note that I'm also using lei to filter emails, e.g. to be notified when
-> someone sends a patch modifying this maintainer-netdev.rst file! [2]
-> 
-> But I don't think this issue of "busy mailing list" is specific to
-> netdev. It seems that "lei" is already mentioned in another part of the
-> doc [3]. Maybe this part can be improved? Or the netdev doc could add a
-> reference to the existing part?
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
 
-I think "busy mailing list" is especially bad for netdev. There are many
-tutorials for setting up lei, but my ideal goal is a copy + paste
-command specifically for netdev that outputs into an IMAP server for
-beginners to use. As opposed to writing something more generic.
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
 
-> 
-> (Maybe such info should be present elsewhere, e.g. on vger [4] or lore)
-> 
-> [2]
-> https://lore.kernel.org/netdev/?q=%28dfn%3ADocumentation%2Fnetworking%2Fnetdev-FAQ.rst+OR+dfn%3ADocumentation%2Fprocess%2Fmaintainer-netdev.rst%29+AND+rt%3A1.month.ago..
-> [3]
-> https://docs.kernel.org/maintainer/feature-and-driver-maintainers.html#mailing-list-participation
+Contributions:
 
-This document is aimed at kernel maintainers. My concern is that
-beginners would not find or read this document.
+Allen Hubbe (1):
+      vdpa: consume device_features parameter
 
-> [4] http://vger.kernel.org/vger-lists.html
+Amit Cohen (1):
+      bridge: fdb: add an error print for unknown command
 
-It would be nice to add a link in the netdev list "Info" section. Do you
-know how to update it?
+Andrea Claudi (5):
+      ss: make is_selinux_enabled stub work like in SELinux
+      ss: make SELinux stub functions conformant to API definitions
+      lib: add SELinux include and stub functions
+      ip vrf: make ipvrf_exec SELinux-aware
+      Makefile: ensure CONF_USR_DIR honours the libdir config
 
-How about keeping a netdev specific sample lei query in
-maintainer-netdev and refer to it from [4]?
+David Ahern (2):
+      Update kernel headers
+      Update kernel headers
 
-> 
-> (Note: regarding the commit message here, each line should be limited to
-> max 72 chars ideally)
+Eric Dumazet (1):
+      ss: add support for rcv_wnd and rehash
 
-Apologies, I may not have line wrap set up properly in my editor.
+Fran=C3=A7ois Michel (4):
+      tc: support the netem seed parameter for loss and corruption events
+      man: tc-netem: add section for specifying the netem seed
+      tc: fix typo in netem's usage string
+      tc: fix several typos in netem's usage string
 
-> 
->> Signed-off-by: David Wei <dw@davidwei.uk>
->> ---
->>  Documentation/process/maintainer-netdev.rst | 39 +++++++++++++++++++++
->>  1 file changed, 39 insertions(+)
->>
->> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
->> index 7feacc20835e..93851783de6f 100644
->> --- a/Documentation/process/maintainer-netdev.rst
->> +++ b/Documentation/process/maintainer-netdev.rst
->> @@ -33,6 +33,45 @@ Aside from subsystems like those mentioned above, all network-related
->>  Linux development (i.e. RFC, review, comments, etc.) takes place on
->>  netdev.
->>  
->> +Managing emails
->> +~~~~~~~~~~~~~~~
->> +
->> +netdev is a busy mailing list with on average over 200 emails received per day,
->> +which can be overwhelming to beginners. Rather than subscribing to the entire
->> +list, considering using ``lei`` to only subscribe to topics that you are
->> +interested in. Konstantin Ryabitsev wrote excellent tutorials on using ``lei``:
->> +
->> + - https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started
->> + - https://people.kernel.org/monsieuricon/lore-lei-part-2-now-with-imap
->> +
->> +As a netdev beginner, you may want to filter out driver changes and only focus
->> +on core netdev changes. Try using the following query with ``lei q``::
->> +
->> +  lei q -o ~/Mail/netdev \
->> +    -I https://lore.kernel.org/all \
->> +    -t '(b:b/net/* AND tc:netdev@vger.kernel.org AND rt:2.week.ago..'
-> 
-> Small optimisations:
-> 
-> - you can remove tc:netdev@vger.kernel.org and modify the '-I' to
-> restrict to netdev instead of querying 'all': -I
-> https://lore.kernel.org/netdev/
+Ido Schimmel (1):
+      bridge: Add backup nexthop ID support
 
-Thank you, this is great.
+Jiri Pirko (7):
+      devlink: accept "name" command line option instead of "trap"/"group"
+      devlink: move DL_OPT_SB into required options
+      devlink: make parsing of handle non-destructive to argv
+      devlink: implement command line args dry parsing
+      devlink: return -ENOENT if argument is missing
+      mnl_utils: introduce a helper to check if dump policy exists for comm=
+and
+      devlink: implement dump selector for devlink objects show commands
 
-> 
-> - In theory, 'dfn:' should help you to match a filename being modified.
-> But in your case, 'net' is too generic, and I don't think we can specify
-> "starting with 'net'". You can still omit some results after [5] but the
-> syntax doesn't look better :)
-> 
->   dfn:net AND NOT dfn:drivers/net AND NOT dfn:selftests/net AND NOT
-> dfn:tools/net AND rt:2.week.ago..
+Mathieu Schroeter (4):
+      Add get_long utility and adapt get_integer accordingly
+      Add utility to convert an unsigned int to string
+      ss: change aafilter port from int to long (inode support)
+      ss: print unix socket "ports" as unsigned int (inode)
 
-I initially went with this as well, but found it tedious to add many AND
-NOT statements. My metric was number of emails filtered and matching
-using b:b/net/* produced the least number of emails :)
+Maxim Petrov (2):
+      ip: fix memory leak in 'ip maddr show'
+      ss: fix directory leak when -T option is used
 
-It would be ideal if we could express dfn:^net/*. I contacted the public
-inbox folks and they said it is not supported :(
+Pedro Tammela (1):
+      utils: fix get_integer() logic
 
-> 
-> [5]
-> https://lore.kernel.org/netdev/?q=dfn%3Anet+AND+NOT+dfn%3Adrivers%2Fnet+AND+NOT+dfn%3Aselftests%2Fnet+AND+NOT+dfn%3Atools%2Fnet+AND+rt%3A2.week.ago..
-> 
->> +This query will only match threads containing messages with patches that modify
->> +files in ``net/*``. For more information on the query language, see:
->> +
->> +  https://lore.kernel.org/linux-btrfs/_/text/help/
-> 
-> (if this is specific to 'netdev', best to use '/netdev/', not
-> '/linux-btrfs/')
+Ratheesh Kannoth (1):
+      tc: Classifier support for SPI field
 
-Thank you, will fix this.
+Stephen Hemminger (16):
+      tc: add missing space before else
+      uapi: headers update from 6.6-rc2
+      fix set-not-used warnings
+      bridge: fix potential snprintf overflow
+      ila: fix potential snprintf buffer overflow
+      Add security policy
+      uapi: update headers from 6.6-rc4
+      ila: fix array overflow warning
+      uapi: update from 6.6-rc5
+      tc: remove support for CBQ
+      tc: remove support for RSVP classifier
+      tc: remove tcindex classifier
+      tc: remove dsmark qdisc
+      tc: drop support for ATM qdisc
+      ssfilter: fix clang warning about conversion
+      v6.6.0
 
-> 
->> +By default ``lei`` will output to a Maildir, but it also supports Mbox and IMAP
->> +by adding a prefix to the output directory ``-o``. For a list of supported
->> +formats and prefix strings, see:
->> +
->> +  https://www.mankier.com/1/lei-q
-> 
-> Maybe safer to point to the official doc?
-> 
-> https://public-inbox.org/lei-q.html
-> 
-> (or 'man lei-q')
-
-Thanks, official manpages are best.
-
-> 
->> +If you would like to use IMAP, Konstantin’s blog is slightly outdated and you
->> +no longer need to use here strings i.e. ``<<<`` or ``<<EOF``.
-> 
-> I think we can still use them. In the part 1, they are not used. Maybe
-> best to contact Konstantin to update his blog post instead of mentioning
-> in the doc that the blog post is outdated?
-
-You're right, I've emailed Konstantin.
-
-> 
->> You can simply
->> +point lei at an IMAP server e.g. ``imaps://imap.gmail.com``::
-> 
-> In Konstantin's blog post, he mentioned different servers with different
-> specificities. Maybe easier to just point to that instead of taking one
-> example without more explanations?
-
-Will do!
-
-> 
-> Cheers,
-> Matt
 
