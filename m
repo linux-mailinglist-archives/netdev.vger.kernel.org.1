@@ -1,155 +1,236 @@
-Return-Path: <netdev+bounces-46191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 734EF7E2294
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:59:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 576217E24B1
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 14:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45837B20D82
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:59:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD829B20E1A
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95ED11EB5C;
-	Mon,  6 Nov 2023 12:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5D8E219E7;
+	Mon,  6 Nov 2023 13:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="kdh7SkR2"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eyLVk07p"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018A733D5
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:59:14 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2084.outbound.protection.outlook.com [40.107.8.84])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 944D6A9;
-	Mon,  6 Nov 2023 04:59:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IOqZXYVMzAbQSIb1CkJhCjPLLOqiyVDEpBuW1AJb+8C0PCnrzeF+xJwG75vDCFYTXn7iezpTR2XLl9htwzaJWUzd700fGcJvuzkI+k7RF/YH4DfMn8K9I+bmaDTB7G1f87NMOv635NDFjXz46S4uAri4wbNJoWR7ZTqUfmRSCX3mN/Rsykl4YOQDKYhWvYTncegIKCvO7zNxLcinB5ygsr8IbWwvlfIob9zBm020eBCBe/LIUsEtJyDQtpFSiK+eT9gDyM2mm8C9kGGTjAP2+Fy7KuUxfMqePwhMfJUD6x7haK5JfXVc6jTeYXZhxPonONUL8qyeSW0Z8dJYl84UZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7+h5j8HFh3uNxiySGZ5pBdYly6P9hBm3G+RgevQqKns=;
- b=HryeZp16gwlLUpf0IUBEHZfNAXU/cCW/geIOrRMRk7HWrk7MscKMemAoljZvG1mh+grBGqGkEDaQTWCxTW1QbRWbqTbeKpCWKQrO6B0ggfqqOSVpeqhVfiWTdXL3QTVubFAfihJxQg6hDOYEkyGLeqB8Y0q500FqmbL9e+1deyYgSCBpBtuZ8BoA+JuMAbXyWDaefgciR+IJNMI5z4mOGiKHCtqeigTvTNuWR682hhYEsxOzADoEvptYuqpFA+0QFhnAt/Wf5AQ5FwIiGVtzR3kdcl2Q6dEHS19O10HohZHmDJ7K4A0R2O1H/Lj0DzND9YQ7vTfu+LZyaekKwdBjcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7+h5j8HFh3uNxiySGZ5pBdYly6P9hBm3G+RgevQqKns=;
- b=kdh7SkR2bqfLiJOLY+BF9onN2ZrIBQKij0k84PpxkkEgQsk0JBwYUW2woBIC9tZ9JPtLZkdBdtMLS6dlkFlJs++9lyAdsS+Qs/KvxSAJpIlwU8Yv1LaVSl+lA5mr4Na5mazpKP968u8jO+P0/zJ5EdGAuhLOWJnCiopZXAosVZAotHx351cn5ApkjvFjIM4lh4koBxrcA1JuXjb2nEgGQgUVZGlb3DJt6n1hYcgpQ3BdInTncRBHYwMNJP09ZxUd5igb1tUeLtHYPkMqJP/rAm/CM6qZhRUk/nATR/Zm53hTMXO70jzAkHT68btfhGZ8LPoqWtYcLgviGPOss5jyUw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from AM0PR04MB6467.eurprd04.prod.outlook.com (2603:10a6:208:16c::20)
- by AS8PR04MB9190.eurprd04.prod.outlook.com (2603:10a6:20b:44d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.10; Mon, 6 Nov
- 2023 12:59:10 +0000
-Received: from AM0PR04MB6467.eurprd04.prod.outlook.com
- ([fe80::5c46:ada1:fcf3:68e6]) by AM0PR04MB6467.eurprd04.prod.outlook.com
- ([fe80::5c46:ada1:fcf3:68e6%6]) with mapi id 15.20.6977.013; Mon, 6 Nov 2023
- 12:59:10 +0000
-Message-ID: <b377a7c1-bf41-4fd2-81b9-ace2b6134c4e@suse.com>
-Date: Mon, 6 Nov 2023 13:59:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: usbnet: Fix potential NULL pointer dereference
-Content-Language: en-US
-To: Ren Mingshuai <renmingshuai@huawei.com>, kuba@kernel.org,
- =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-Cc: caowangbao@huawei.com, davem@davemloft.net, khlebnikov@openvz.org,
- liaichun@huawei.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- oneukum@suse.com, yanan@huawei.com
-References: <20231101213832.77bd657b@kernel.org>
- <20231102090630.938759-1-renmingshuai@huawei.com>
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20231102090630.938759-1-renmingshuai@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0328.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:eb::7) To AM0PR04MB6467.eurprd04.prod.outlook.com
- (2603:10a6:208:16c::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AD623747;
+	Mon,  6 Nov 2023 13:24:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 433C1C433C7;
+	Mon,  6 Nov 2023 13:24:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1699277051;
+	bh=x2CDny8wkXfR35lNNXfOPjdxX4nWsDNXArOM2czrYIY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eyLVk07pMFAEkDgJTJ8PjZmvmkVrtMV7WRQszIJw2Ts2pWkW6s5N08A+o0BZV5LX3
+	 UQODQCi3OZpHYrONJrepmjPCjSTSFrg7nbleuVk6ENcdyV9XONF0p4TzOFCL2xbM5t
+	 5QF+PtI1qoqCqjajn7tYg0PfGip1PyBoOjpy4rz8=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Marco Elver <elver@google.com>,
+	netdev@vger.kernel.org,
+	Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.15 021/128] r8169: fix the KCSAN reported data-race in rtl_tx() while reading tp->cur_tx
+Date: Mon,  6 Nov 2023 14:03:01 +0100
+Message-ID: <20231106130310.083249489@linuxfoundation.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231106130309.112650042@linuxfoundation.org>
+References: <20231106130309.112650042@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6467:EE_|AS8PR04MB9190:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0397ad27-0b9c-49a5-9461-08dbdec82b21
-X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Xn6BdmvmFe7sZYDy5N/4DJXdnvhk4CpcftiDnu6yYOjSsHkjS696yI8mx8Cz74M9ueHjReQRzZFUlQH9A6VihalgEfQbj1iXMYNjeAHpBQRVIcVertEP15dwjTcX6MzHiYDFdtcuWK4uFE02aMEG/boFwsJiBBiqnKAv0LAfZOHvRFnT+9ADPudXH+Qz/G2MmWp2WyONfTO/PUVTUJrrOEAhjTq3Bz1+yyPBnqWxnWc4sT4jXPlxyvQX/Ko8y9xGTWzdyNi5fZJym6o6/f/muGkQzktHX1OBYJQXO6sFT2+nho8JwVXvKiTguXDIztIkbLMt8i8CUd20ArzG7lJ2uGgyRWyxoq4JKryaIbgpfUXprHVMTmhIOMCQqbrkbv4G0JC/a4+whZXKQREX1jGtWK1hLXwO7Bs6s6oBaOqvZjdFwFYXEBvI6pzVAAHvqmfQLV0LG8J1sAxybXLoUStORIxBUxn3BqJA9zNiPURGw3csqgmCcXuhnWySm3wmt2p+IT98EXhqxlQVF94ewPooUIWTtO9gngevDEgNg2H04z8K6iapyYy80UNl5VEHWvkdpj2jjvtjgQUmS3Vx9503FDSRRQKCOUo5HIuDa3AEldH1I7/cA8MoAdJauTOkEeSmbiUZNVcK910TnDscy42iKQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6467.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(396003)(136003)(366004)(39860400002)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(5660300002)(7416002)(66946007)(38100700002)(110136005)(66476007)(66556008)(8676002)(8936002)(41300700001)(4744005)(316002)(53546011)(478600001)(6486002)(2906002)(2616005)(6506007)(4326008)(6512007)(36756003)(86362001)(31686004)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Zk5zUDJ3c2F6bFZjazRMcUx2RFJacnlOQ29wSFBoSW5kbzJ2bzBqbHE4ZzEy?=
- =?utf-8?B?ZWhjZ3hhL2M3R0ZwM3I4U2tyWkZubDFhRWFVRVIzbDBJRnRJRzNOVDI2ZTJN?=
- =?utf-8?B?YU5zWjNUTVlnQUR5Yk9XRFpaUWVXalBXUVNKNncydG5UMENZUC9RLzgySDRk?=
- =?utf-8?B?M3pqeExwbHloY1hDVGdYTm1ZRzJ1bHhpMWFJbi9NZ05nY095S0hING9UMlJE?=
- =?utf-8?B?blRKQzZOMjY4R2ZqTVpxdUdkSnVNSFJyeWwzRGc5NkhUZk92L2FrUEcrNFJt?=
- =?utf-8?B?NVd0VUtGYitNN0dIMFloanl0cXZjRDBFeVErc2J6WkZMZ3RJcmc1QmFZS2xP?=
- =?utf-8?B?VFJCdWFocm14N3dOaGRWZlJTWGFsVkRGOWl6ZVZTSHpwY25mdUg3cnkxOXdi?=
- =?utf-8?B?RS9oOFdTZHJFM0dUVVhHK2JhRnBwSEhGaUJCeDhUSW42akdFUzdHM2EvQncv?=
- =?utf-8?B?Ritic3FRR0FvV2ZNbVhaNm80bkVHbmNFWk1WWTd3UVR4NTlPYS9WbzZ0dDVB?=
- =?utf-8?B?Unk0MThKZ3FlbWx4UjR1V1NFcW1uQnNoMFY3NWlTV2FsZmx4SERHM0h6ckRv?=
- =?utf-8?B?a2EycDNNR25GT1U5ZGRNNUhoa25XdXVuZ1Z0c2xIOEg2ZC9rcWdiSHVleitS?=
- =?utf-8?B?SHBKeERWM2taYUd2TEszR1pKWDQwWklhM0V1WDRqaml0R0ZmK0ZiaGdNbXor?=
- =?utf-8?B?cTBVMzVUYmNGMlNaUW9xTzd3ZHlVSmJ2YkNrY2QvQWZkVGsyempodjdZWlRo?=
- =?utf-8?B?OC9nQmFQcGh3VmtSU0VFQ1RDRjhMWU9LWUtKQVdSWDZQcXhFdE9DWjgyTVZ4?=
- =?utf-8?B?ajV1UkNFQ2JqV0ZxV2N5M3lHVXV2eThaNkczcjVJb05DVjVuWmw3ektHdkVy?=
- =?utf-8?B?emZueXZ5cjhUZmN5bVcwVjlWaTJ5VUhrMnNMRnAxelF3RGxqZW45NVEwQzhw?=
- =?utf-8?B?Y0EvMmMxRVBCVTBkcDFDY3RBemdVM3pXZHFIaFRYVEFEMndlR1VMbDdZeVlK?=
- =?utf-8?B?MHZLcWhBeDRqbFUyMDNwKzFteFFNS1pabG9pZ01zdFVWaThnbU5FTVdYbU9S?=
- =?utf-8?B?SFU2ZXQxSnFJMWtXb29xOEVNc2xhTVU3Y2VoSzg0L0ZGNFJHSWRvUlVGNE5q?=
- =?utf-8?B?R3hVTkR0S0x6L3FKMGJwY3gzTXVxUVZjNXVtdFdia0ZqTnpWM0NlU2l2TkFa?=
- =?utf-8?B?RkQrNTFITUF3MmJRQkNHdW0wbEtYbkNSSi9ZR2tMTEdsUlYwN1VVK2xCUTJB?=
- =?utf-8?B?YzdGRmUxRXdXUGFGZ281Sk9YbXV1emRieks3QW1sdEFZVkcrQzg1WUNwZk4v?=
- =?utf-8?B?cUV4U2liNUNvOGpwVVlCK1llZ2ZLZDJYYWwrd2k2eHJMNWl3TzRqVis3SjNE?=
- =?utf-8?B?OVpRbkNBQ25HbXg4OXBrdjkwSExMQmsxNmJsVFM0WVFRMWNja243WGdnOFFI?=
- =?utf-8?B?QUZycW5kTkQ5TXBMbTBGTVgrR1JlUVlHTVpjVUNOOTg5aG5CWlZ1MmVDQ1JT?=
- =?utf-8?B?SWI0YzhEVWVsREt2Z2hTT0JjWmtYd3RiN2xXSkNrNXNYalZLb0t5UXNMRW94?=
- =?utf-8?B?UlRXQVkrdVNkcXRkZmNJVkVaQk1HQ00vRXBZRFplRlA5bnZEM0lRdVBPL2RX?=
- =?utf-8?B?RU8wcHY4cFhSbUhUeVNuZG5FcVp4WEIvYWVyZWwwUCtMZDA2eS9GZmRtOGlC?=
- =?utf-8?B?Z2YzTm5keStiOGJhaFV2YTNkZzlDcFdWblJpYVNGZVpLOEJNa1dncGNUa0FX?=
- =?utf-8?B?NENiU20rOE9kdFRXTVAvK24wR3FPaHptS2hJeUNFc2lQWUR3ZHFiVExHOUc2?=
- =?utf-8?B?YWlhRDI0V1BQdDNRK3B3aXBaVlJHNmUvbERsYXB2MEw5LzJ3aVU0TzdHeHFO?=
- =?utf-8?B?aW5aeUxRQUpXVjhua29SVENpYXpjUzlQZkR2K05uT3JOUU5IQnB6cFhUN2Fa?=
- =?utf-8?B?azhFS0lEc1MweDZFbDd1Q1YrTkw4VmZ3YkZJWXA5QmluYS9KdXdNRndESDVu?=
- =?utf-8?B?eEtCbjZJZzhBdGVHcUJtaWo0ZTJqaDkrSDBjaWFlRjlYMU13KzlvU3pOMVBx?=
- =?utf-8?B?VWhLbkt1d0V2QTFpcG15L01JTXYwMUZQQ2NRRVE5M2RrbXdHWmw2SmY3bDNG?=
- =?utf-8?B?WjdrQ2ptdHBCWGhvdmViQWg3U0VtcG5KdmhTcXhiNkM5emdpZVlJa2VLSW1n?=
- =?utf-8?Q?857UEHUHLDw9f+ZoNzfjt6RMt7t4mHcSmG5TaH8vt3CP?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0397ad27-0b9c-49a5-9461-08dbdec82b21
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6467.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 12:59:10.2566
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: G9X42B0zUI8agHMsLB5K14LnYmHKO+S/qY+NTdB1Y6vaaFZR4fTGLTE+4kdmM9c/J8T2TOsI24kddNV/me6aHQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB9190
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 02.11.23 10:06, Ren Mingshuai wrote:
+5.15-stable review patch.  If anyone has any objections, please let me know.
 
->> What do you mean? Grepping the function name shows call sites with NULL getting passed as skb.
+------------------
 
-You may see that we do check skb != NULL before we timestamp it.
-But later in the process we depend skb == NULL implying that tx_fixup != NULL
+From: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
 
-That is the combination that must not happen. If it happens, though
-simply bailing out seems to the wrong answer.
-  
-> Yes And I just learned that during the cdc_ncm_driver.probe, it is possible to pass a NULL SKB to usbnet_start_xmit().
+[ Upstream commit c1c0ce31b2420d5c173228a2132a492ede03d81f ]
 
-How can that happen? And if it happens is tx_fixup set?
+KCSAN reported the following data-race:
 
-	Regards
-		Oliver
+==================================================================
+BUG: KCSAN: data-race in rtl8169_poll [r8169] / rtl8169_start_xmit [r8169]
+
+write (marked) to 0xffff888102474b74 of 4 bytes by task 5358 on cpu 29:
+rtl8169_start_xmit (drivers/net/ethernet/realtek/r8169_main.c:4254) r8169
+dev_hard_start_xmit (./include/linux/netdevice.h:4889 ./include/linux/netdevice.h:4903 net/core/dev.c:3544 net/core/dev.c:3560)
+sch_direct_xmit (net/sched/sch_generic.c:342)
+__dev_queue_xmit (net/core/dev.c:3817 net/core/dev.c:4306)
+ip_finish_output2 (./include/linux/netdevice.h:3082 ./include/net/neighbour.h:526 ./include/net/neighbour.h:540 net/ipv4/ip_output.c:233)
+__ip_finish_output (net/ipv4/ip_output.c:311 net/ipv4/ip_output.c:293)
+ip_finish_output (net/ipv4/ip_output.c:328)
+ip_output (net/ipv4/ip_output.c:435)
+ip_send_skb (./include/net/dst.h:458 net/ipv4/ip_output.c:127 net/ipv4/ip_output.c:1486)
+udp_send_skb (net/ipv4/udp.c:963)
+udp_sendmsg (net/ipv4/udp.c:1246)
+inet_sendmsg (net/ipv4/af_inet.c:840 (discriminator 4))
+sock_sendmsg (net/socket.c:730 net/socket.c:753)
+__sys_sendto (net/socket.c:2177)
+__x64_sys_sendto (net/socket.c:2185)
+do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
+entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
+
+read to 0xffff888102474b74 of 4 bytes by interrupt on cpu 21:
+rtl8169_poll (drivers/net/ethernet/realtek/r8169_main.c:4397 drivers/net/ethernet/realtek/r8169_main.c:4581) r8169
+__napi_poll (net/core/dev.c:6527)
+net_rx_action (net/core/dev.c:6596 net/core/dev.c:6727)
+__do_softirq (kernel/softirq.c:553)
+__irq_exit_rcu (kernel/softirq.c:427 kernel/softirq.c:632)
+irq_exit_rcu (kernel/softirq.c:647)
+common_interrupt (arch/x86/kernel/irq.c:247 (discriminator 14))
+asm_common_interrupt (./arch/x86/include/asm/idtentry.h:636)
+cpuidle_enter_state (drivers/cpuidle/cpuidle.c:291)
+cpuidle_enter (drivers/cpuidle/cpuidle.c:390)
+call_cpuidle (kernel/sched/idle.c:135)
+do_idle (kernel/sched/idle.c:219 kernel/sched/idle.c:282)
+cpu_startup_entry (kernel/sched/idle.c:378 (discriminator 1))
+start_secondary (arch/x86/kernel/smpboot.c:210 arch/x86/kernel/smpboot.c:294)
+secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:433)
+
+value changed: 0x002f4815 -> 0x002f4816
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 21 PID: 0 Comm: swapper/21 Tainted: G             L     6.6.0-rc2-kcsan-00143-gb5cbe7c00aa0 #41
+Hardware name: ASRock X670E PG Lightning/X670E PG Lightning, BIOS 1.21 04/26/2023
+==================================================================
+
+The write side of drivers/net/ethernet/realtek/r8169_main.c is:
+==================
+   4251         /* rtl_tx needs to see descriptor changes before updated tp->cur_tx */
+   4252         smp_wmb();
+   4253
+ → 4254         WRITE_ONCE(tp->cur_tx, tp->cur_tx + frags + 1);
+   4255
+   4256         stop_queue = !netif_subqueue_maybe_stop(dev, 0, rtl_tx_slots_avail(tp),
+   4257                                                 R8169_TX_STOP_THRS,
+   4258                                                 R8169_TX_START_THRS);
+
+The read side is the function rtl_tx():
+
+   4355 static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+   4356                    int budget)
+   4357 {
+   4358         unsigned int dirty_tx, bytes_compl = 0, pkts_compl = 0;
+   4359         struct sk_buff *skb;
+   4360
+   4361         dirty_tx = tp->dirty_tx;
+   4362
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+   4364                 unsigned int entry = dirty_tx % NUM_TX_DESC;
+   4365                 u32 status;
+   4366
+   4367                 status = le32_to_cpu(tp->TxDescArray[entry].opts1);
+   4368                 if (status & DescOwn)
+   4369                         break;
+   4370
+   4371                 skb = tp->tx_skb[entry].skb;
+   4372                 rtl8169_unmap_tx_skb(tp, entry);
+   4373
+   4374                 if (skb) {
+   4375                         pkts_compl++;
+   4376                         bytes_compl += skb->len;
+   4377                         napi_consume_skb(skb, budget);
+   4378                 }
+   4379                 dirty_tx++;
+   4380         }
+   4381
+   4382         if (tp->dirty_tx != dirty_tx) {
+   4383                 dev_sw_netstats_tx_add(dev, pkts_compl, bytes_compl);
+   4384                 WRITE_ONCE(tp->dirty_tx, dirty_tx);
+   4385
+   4386                 netif_subqueue_completed_wake(dev, 0, pkts_compl, bytes_compl,
+   4387                                               rtl_tx_slots_avail(tp),
+   4388                                               R8169_TX_START_THRS);
+   4389                 /*
+   4390                  * 8168 hack: TxPoll requests are lost when the Tx packets are
+   4391                  * too close. Let's kick an extra TxPoll request when a burst
+   4392                  * of start_xmit activity is detected (if it is not detected,
+   4393                  * it is slow enough). -- FR
+   4394                  * If skb is NULL then we come here again once a tx irq is
+   4395                  * triggered after the last fragment is marked transmitted.
+   4396                  */
+ → 4397                 if (tp->cur_tx != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+   4399         }
+   4400 }
+
+Obviously from the code, an earlier detected data-race for tp->cur_tx was fixed in the
+line 4363:
+
+   4363         while (READ_ONCE(tp->cur_tx) != dirty_tx) {
+
+but the same solution is required for protecting the other access to tp->cur_tx:
+
+ → 4397                 if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+   4398                         rtl8169_doorbell(tp);
+
+The write in the line 4254 is protected with WRITE_ONCE(), but the read in the line 4397
+might have suffered read tearing under some compiler optimisations.
+
+The fix eliminated the KCSAN data-race report for this bug.
+
+It is yet to be evaluated what happens if tp->cur_tx changes between the test in line 4363
+and line 4397. This test should certainly not be cached by the compiler in some register
+for such a long time, while asynchronous writes to tp->cur_tx might have occurred in line
+4254 in the meantime.
+
+Fixes: 94d8a98e6235c ("r8169: reduce number of workaround doorbell rings")
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Marco Elver <elver@google.com>
+Cc: netdev@vger.kernel.org
+Link: https://lore.kernel.org/lkml/dc7fc8fa-4ea4-e9a9-30a6-7c83e6b53188@alu.unizg.hr/
+Signed-off-by: Mirsad Goran Todorovac <mirsad.todorovac@alu.unizg.hr>
+Acked-by: Marco Elver <elver@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 264bb3ec44a59..2ecfff54339ac 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -4480,7 +4480,7 @@ static void rtl_tx(struct net_device *dev, struct rtl8169_private *tp,
+ 		 * If skb is NULL then we come here again once a tx irq is
+ 		 * triggered after the last fragment is marked transmitted.
+ 		 */
+-		if (tp->cur_tx != dirty_tx && skb)
++		if (READ_ONCE(tp->cur_tx) != dirty_tx && skb)
+ 			rtl8169_doorbell(tp);
+ 	}
+ }
+-- 
+2.42.0
+
+
 
 
