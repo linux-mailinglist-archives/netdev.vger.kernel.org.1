@@ -1,235 +1,278 @@
-Return-Path: <netdev+bounces-46275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B56C7E301E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:44:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC5E7E3025
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DD691C20850
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:44:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A04B51C209BF
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80A0241FC;
-	Mon,  6 Nov 2023 22:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF09E2E648;
+	Mon,  6 Nov 2023 22:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V2TAxHD4"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="K8JQoSb7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6589D1D528
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:44:53 +0000 (UTC)
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B167810D2
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:44:51 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5b383b4184fso60555207b3.1
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 14:44:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D9129428
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:46:59 +0000 (UTC)
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59A5AD71
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:46:57 -0800 (PST)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-5a8ee23f043so58918427b3.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 14:46:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699310691; x=1699915491; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1699310816; x=1699915616; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Jh4ueUUtnHe+xpZ555uV9QkBq8rONsDDGRxRxIz5vUk=;
-        b=V2TAxHD48QaOdmpfyG5eD8yq/njaTlwLVCQhpMd7KzdrRDhvua3C3Kms1pvND9NjN0
-         1tM0lgZ8AhW8WiAQrEJPbQNrNTUW8TC0OBddroDUveaV0EiNvhkiIyyCmA4PfVodlth2
-         9kNqF3wEACpON3+2PNIXOoausAotBZlyOPzN3xtfezBvfGmTLr0Oz8AiEE5qbu0u5/ZM
-         TcKNDuqLYDRZr8dJKf0ISkfIbgQi+sGWjd3iuwd8YEggYpTZmhT48AENeVasb+3zk1Vi
-         A5QKERiavNQZu2Kr2xbts/NT1FtEeJP3mdaV3nzlxB6Bvz+PdtzGjnenzDVs1cS3JFfu
-         ycOQ==
+        bh=m+CxpgcL4aexq1pxQBuG46UP8l7bbeWIcVPQNBNf8iQ=;
+        b=K8JQoSb7el9HTL9KRhQwzID5BJfxMEh/9nax4gEB6w7NPNEUYMyYB/g5L9qgZaDn7h
+         7TZkBg5w6YKMDW67kybRRR9kTpRtf9LgBNLx6hPbdYKiR3LJ+LC+3v2//hhs2cGHDFgx
+         bfLfPcybjI8GvoOypMOxUJ1Tvnzt971EBpiefS6dJyI1SE9/N80EiKeCplENtAsuTdEx
+         s0PFvxsUv5UK4OzRfWKmGAKM7aPPA290XxufpylJCIUb1wvEwKbFNcSukSJtF97GewSV
+         TrEovf/8cY15HXZ8+TYBAqCj4Il1L41gfLotRIyJf+l2Jss66pPuZ7bu9J+qd96V+E/o
+         xy7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699310691; x=1699915491;
+        d=1e100.net; s=20230601; t=1699310816; x=1699915616;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Jh4ueUUtnHe+xpZ555uV9QkBq8rONsDDGRxRxIz5vUk=;
-        b=v++WnD9J9mulqM3UrKuk7xT1uUpE9llEoq0+TpwvwXpWd1KUz86nwAOJ66vtSCcb/7
-         Gu6kf1XisHsrWbIvW0XIMQicuiOy4ioiyvlGee6D+wL/mILMO0dCV6G8rrKT3Fxd2ZkT
-         1k9c670jQ4U9pUBIkaDxzJ4k+QpTvVxj4Iyj6fw6Ukzlju6a8Ij53iOC9nHElcU2QstN
-         hs1US0KzEr6BDnb1PgdHDXXHiXunjyZmLV2rCSHAkMkuTx9dMRyARHXCJdtk0IlPZkw9
-         mFUNpga9WQ436r+Uh/rk9x6RSkng9jswdAEo5U4QK/ZoR4Y0itbhTitrWDSAHHbezEbr
-         qVYw==
-X-Gm-Message-State: AOJu0YyQAvghH0lHcygekImI/rBTved8Hupw2siX6naJnD8NEnMn+zzg
-	JaQdtzMUGl7vb6ovAKAFUWJNp7FIdg9Mfua80ONRYg==
-X-Google-Smtp-Source: AGHT+IFW46W/qi2R11wocWXMwQfH71KxUBDhedZj2DPWapnZTpkSztTFIYEo5cIEnwGFOFiUNQD9a/CWiF7cl9YjzYQ=
-X-Received: by 2002:a05:690c:681:b0:577:a46:26e5 with SMTP id
- bp1-20020a05690c068100b005770a4626e5mr15037079ywb.31.1699310690873; Mon, 06
- Nov 2023 14:44:50 -0800 (PST)
+        bh=m+CxpgcL4aexq1pxQBuG46UP8l7bbeWIcVPQNBNf8iQ=;
+        b=k3uou6ESilRtETVXMUPGLP7gx65XGjFBpzBQYdiulSxw4irdOlioBYu4TTGTT68jkJ
+         TIXpdzil6Ovf7ntiv7ghsViYUoNAM5VkrSiRM9vEnRPuCrYIO3edxd4L+xu7yiVtaQ8c
+         bgIYaWAFL688Q0AY7B7e2coniNcrr2gwzv7t01hx4RQ9R1ixHuXENsKyIG1z9PM9D5i7
+         r9RlGPy6P8VmD2GiLGMgmUbTgTrSLo5cKUJoM/DbpwVCCx2SdhmOOHwIaqgjDJdqsI7B
+         U9KJ8nK1zpTgKiLrnp6XPnZiIKw0zKOyDxQ277at1bHoK51PkTrQjUnkqE0VbdbXS8yK
+         KaXA==
+X-Gm-Message-State: AOJu0YxxpeJpj+ptvTpP4uQd5RQ7rO5lAluL/R5ZKHlB58DUEA8+x9Os
+	Ax/JdcSmYvZJL6YxJPHA0GIyWOafkuXue4fF5EBQ
+X-Google-Smtp-Source: AGHT+IGXWhDoSXxeBh7Czg+txU8kbw2mYBGyDM2qVw79VBO13uUkESRzx7ovAgOHJjgxfDNHWL6IeHZWWm76GepPGGc=
+X-Received: by 2002:a25:ad14:0:b0:d9a:e397:3b4 with SMTP id
+ y20-20020a25ad14000000b00d9ae39703b4mr30117731ybi.46.1699310816479; Mon, 06
+ Nov 2023 14:46:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
- <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org> <20231106132626.orn5r57cc7n5ditj@skbuf>
-In-Reply-To: <20231106132626.orn5r57cc7n5ditj@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 6 Nov 2023 23:44:37 +0100
-Message-ID: <CACRpkdb-iAQdw3S_1iBX=SFt6LCPvdW8+K0nvuXxD01q1K9A1A@mail.gmail.com>
-Subject: Re: [PATCH net v2 4/4] net: ethernet: cortina: Handle large frames
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>, 
-	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231103190523.6353-12-andrii@kernel.org> <9d2b920cb7e59dfd56f763bdd4e53abd.paul@paul-moore.com>
+ <CAEf4BzbGjLQV0CsTwawiqHaGf4eObMQBJT-bpDpWOoQ8hNNcVQ@mail.gmail.com>
+In-Reply-To: <CAEf4BzbGjLQV0CsTwawiqHaGf4eObMQBJT-bpDpWOoQ8hNNcVQ@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 6 Nov 2023 17:46:45 -0500
+Message-ID: <CAHC9VhSkt8SgmJuBzd7cRf-MpZT2rwkp2ndPukCmYftNb62zmg@mail.gmail.com>
+Subject: Re: [PATCH v9 11/17] bpf,lsm: add BPF token LSM hooks
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 6, 2023 at 2:26=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
-wrote:
-> On Sun, Nov 05, 2023 at 09:57:26PM +0100, Linus Walleij wrote:
-
-> > If we start sending bigger frames (after first bumping up the MTU
-> > on both interfaces sending and receiveing the frames), truncated
-> > packets start to appear on the target such as in this tcpdump
-> > resulting from ping -s 1474:
->
-> A bit related: what is gmac_fix_features() supposed to do? I see it
-> unsets GMAC_OFFLOAD_FEATURES when the MTU goes over a certain limit,
-> and that also includes NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM. Is that
-> limit correct, or is it supposed to kick in sooner, to allow
-> validate_xmit_skb() -> skb_csum_hwoffload_help() do the software
-> checksuum for you? I'm not sure whether that was the intention.
-
-That indeed seems like the intention. But it's a bit suboptimal, because it
-disables hardware checksum just because the MTU goes over a
-certain level, and stops using the hardware checksum also for all
-packets smaller than the MTU :(
-
-I'll delete this and make the driver slot in the SW fallback per-packet
-instead, I think it is fair to assume that most packets will be < MTU
-and it is really just a question of where the fallback gets called.
-
-> > Suggested-by: Vladimir Oltean <olteanv@gmail.com>
->
-> To be clear, I didn't suggest any of this. I just pointed towards the gem=
-ini.c
-> driver as being the problem. Please remove my Suggested-by tag.
-
-OK sorry, it was just my way of trying to provide credit where
-credit is due, because you helped so much with this bug.
-
-> > -     if (skb->ip_summed !=3D CHECKSUM_NONE) {
-> > +     if (skb->len >=3D ETH_FRAME_LEN) {
-> > +             /* Hardware offloaded checksumming isn't working on frame=
-s
-> > +              * bigger than 1514 bytes. Perhaps the buffer is only 151=
-8
-> > +              * bytes fitting a normal frame and a checksum?
-> > +              * Just use software checksumming and bypass on bigger fr=
-ames.
-> > +              */
-> > +             if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> > +                     ret =3D skb_checksum_help(skb);
-> > +                     if (ret)
-> > +                             return ret;
-> > +             }
-> > +             word1 |=3D TSS_BYPASS_BIT;
-> > +     } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) {
-> >               int tcp =3D 0;
+On Mon, Nov 6, 2023 at 2:17=E2=80=AFPM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+> On Sun, Nov 5, 2023 at 9:01=E2=80=AFPM Paul Moore <paul@paul-moore.com> w=
+rote:
+> > On Nov  3, 2023 Andrii Nakryiko <andrii@kernel.org> wrote:
+> > >
+> > > Wire up bpf_token_create and bpf_token_free LSM hooks, which allow to
+> > > allocate LSM security blob (we add `void *security` field to struct
+> > > bpf_token for that), but also control who can instantiate BPF token.
+> > > This follows existing pattern for BPF map and BPF prog.
+> > >
+> > > Also add security_bpf_token_allow_cmd() and security_bpf_token_capabl=
+e()
+> > > LSM hooks that allow LSM implementation to control and negate (if
+> > > necessary) BPF token's delegation of a specific bpf_cmd and capabilit=
+y,
+> > > respectively.
+> > >
+> > > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > ---
+> > >  include/linux/bpf.h           |  3 ++
+> > >  include/linux/lsm_hook_defs.h |  5 +++
+> > >  include/linux/security.h      | 25 +++++++++++++++
+> > >  kernel/bpf/bpf_lsm.c          |  4 +++
+> > >  kernel/bpf/token.c            | 13 ++++++--
+> > >  security/security.c           | 60 +++++++++++++++++++++++++++++++++=
+++
+> > >  6 files changed, 107 insertions(+), 3 deletions(-)
 > >
-> >               if (skb->protocol =3D=3D htons(ETH_P_IP)) {
+> > ...
+> >
+> > > diff --git a/include/linux/security.h b/include/linux/security.h
+> > > index 08fd777cbe94..1d6edbf45d1c 100644
+> > > --- a/include/linux/security.h
+> > > +++ b/include/linux/security.h
+> > > @@ -60,6 +60,7 @@ struct fs_parameter;
+> > >  enum fs_value_type;
+> > >  struct watch;
+> > >  struct watch_notification;
+> > > +enum bpf_cmd;
+> >
+> > Yes, I think it's fine to include bpf.h in security.h instead of the
+> > forward declaration.
+> >
+> > >  /* Default (no) options for the capable function */
+> > >  #define CAP_OPT_NONE 0x0
+> > > @@ -2031,6 +2032,11 @@ extern void security_bpf_map_free(struct bpf_m=
+ap *map);
+> > >  extern int security_bpf_prog_load(struct bpf_prog *prog, union bpf_a=
+ttr *attr,
+> > >                                 struct bpf_token *token);
+> > >  extern void security_bpf_prog_free(struct bpf_prog *prog);
+> > > +extern int security_bpf_token_create(struct bpf_token *token, union =
+bpf_attr *attr,
+> > > +                                  struct path *path);
+> > > +extern void security_bpf_token_free(struct bpf_token *token);
+> > > +extern int security_bpf_token_allow_cmd(const struct bpf_token *toke=
+n, enum bpf_cmd cmd);
+> > > +extern int security_bpf_token_capable(const struct bpf_token *token,=
+ int cap);
+> > >  #else
+> > >  static inline int security_bpf(int cmd, union bpf_attr *attr,
+> > >                                            unsigned int size)
+> > > @@ -2065,6 +2071,25 @@ static inline int security_bpf_prog_load(struc=
+t bpf_prog *prog, union bpf_attr *
+> > >
+> > >  static inline void security_bpf_prog_free(struct bpf_prog *prog)
+> > >  { }
+> > > +
+> > > +static inline int security_bpf_token_create(struct bpf_token *token,=
+ union bpf_attr *attr,
+> > > +                                  struct path *path)
+> > > +{
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static inline void security_bpf_token_free(struct bpf_token *token)
+> > > +{ }
+> > > +
+> > > +static inline int security_bpf_token_allow_cmd(const struct bpf_toke=
+n *token, enum bpf_cmd cmd)
+> > > +{
+> > > +     return 0;
+> > > +}
+> > > +
+> > > +static inline int security_bpf_token_capable(const struct bpf_token =
+*token, int cap)
+> > > +{
+> > > +     return 0;
+> > > +}
+> >
+> > Another nitpick, but I would prefer to shorten
+> > security_bpf_token_allow_cmd() renamed to security_bpf_token_cmd() both
+> > to shorten the name and to better fit convention.  I realize the caller
+> > is named bpf_token_allow_cmd() but I'd still rather see the LSM hook
+> > with the shorter name.
 >
-> [ context: tag_rtl4_a.c is a "category 2", aka "Ethertype", tagger ]
+> Makes sense, renamed to security_bpf_token_cmd() and updated hook name as=
+ well
+
+Thanks.
+
+> > > diff --git a/kernel/bpf/token.c b/kernel/bpf/token.c
+> > > index 35e6f55c2a41..5d04da54faea 100644
+> > > --- a/kernel/bpf/token.c
+> > > +++ b/kernel/bpf/token.c
+> > > @@ -7,11 +7,12 @@
+> > >  #include <linux/idr.h>
+> > >  #include <linux/namei.h>
+> > >  #include <linux/user_namespace.h>
+> > > +#include <linux/security.h>
+> > >
+> > >  bool bpf_token_capable(const struct bpf_token *token, int cap)
+> > >  {
+> > >       /* BPF token allows ns_capable() level of capabilities */
+> > > -     if (token) {
+> > > +     if (token && security_bpf_token_capable(token, cap) =3D=3D 0) {
+> > >               if (ns_capable(token->userns, cap))
+> > >                       return true;
+> > >               if (cap !=3D CAP_SYS_ADMIN && ns_capable(token->userns,=
+ CAP_SYS_ADMIN))
+> >
+> > We typically perform the capability based access controls prior to the
+> > LSM controls, meaning if we want to the token controls to work in a
+> > similar way we should do something like this:
+> >
+> >   bool bpf_token_capable(...)
+> >   {
+> >     if (token) {
+> >       if (ns_capable(token, cap) ||
+> >           (cap !=3D ADMIN && ns_capable(token, ADMIN)))
+> >         return security_bpf_token_capable(token, cap);
+> >     }
+> >     return capable(cap) || (cap !=3D ADMIN && capable(...))
+> >   }
 >
-> We say this in Documentation/networking/dsa/dsa.rst:
+> yep, makes sense, I changed it as you suggested above
+
+Thanks again.
+
+> > > @@ -28,6 +29,7 @@ void bpf_token_inc(struct bpf_token *token)
+> > >
+> > >  static void bpf_token_free(struct bpf_token *token)
+> > >  {
+> > > +     security_bpf_token_free(token);
+> > >       put_user_ns(token->userns);
+> > >       kvfree(token);
+> > >  }
+> > > @@ -172,6 +174,10 @@ int bpf_token_create(union bpf_attr *attr)
+> > >       token->allowed_progs =3D mnt_opts->delegate_progs;
+> > >       token->allowed_attachs =3D mnt_opts->delegate_attachs;
+> > >
+> > > +     err =3D security_bpf_token_create(token, attr, &path);
+> > > +     if (err)
+> > > +             goto out_token;
+> > > +
+> > >       fd =3D get_unused_fd_flags(O_CLOEXEC);
+> > >       if (fd < 0) {
+> > >               err =3D fd;
+> > > @@ -216,8 +222,9 @@ bool bpf_token_allow_cmd(const struct bpf_token *=
+token, enum bpf_cmd cmd)
+> > >  {
+> > >       if (!token)
+> > >               return false;
+> > > -
+> > > -     return token->allowed_cmds & (1ULL << cmd);
+> > > +     if (!(token->allowed_cmds & (1ULL << cmd)))
+> > > +             return false;
+> > > +     return security_bpf_token_allow_cmd(token, cmd) =3D=3D 0;
+> >
+> > I'm not sure how much it really matters, but someone might prefer
+> > the '!!' approach/style over '=3D=3D 0'.
 >
-> Checksum offload should work with category 1 and 2 taggers when the DSA c=
-onduit
-> driver declares NETIF_F_HW_CSUM in vlan_features
-> and looks at csum_start and csum_offset.
-> For those cases, DSA will shift the checksum start and offset by
-> the tag size. If the DSA conduit driver still uses the legacy NETIF_F_IP_=
-CSUM
-> or NETIF_F_IPV6_CSUM in vlan_features, the offload might only work if the
-> offload hardware already expects that specific tag (perhaps due to matchi=
-ng
-> vendors).
+> it would have to be !security_bpf_token_cmd(), right?
 
-Since things work smoothly I can only assume that the Gemini
-checksum engine actually knows about the Realtek ethertype (0x8899)
-and the protocol (0xa) and takes action on that, since the switch works.
+Yeah :P
 
-OR: it has some heuristic on for how to handle it. (Such as looking for
-a valid TCP or UDP header to figure out where to put the checksum.)
+In most, although definitely not all, kernel functions when something
+returns 0 we consider that the positive/success case, with non-zero
+values being some sort of failure.  I must have defaulted to that
+logic here, but you are correct that just a single negation would be
+needed here.
 
-But I have no idea how it does it. It doesn't have a firmware AFAIK.
+> And that single
+> negation is just very confusing when dealing with int-returning
+> function. I find it much easier to make sure the logic is correct when
+> we have explicit `=3D=3D 0`.
 
-Examples listed were ICMP so just IP checksums but I tried for example
-SSH, and HTTP and packets look like this:
+That's fine, it's something I've seen mentioned over the years and
+thought I might offer it as a comment.  I can read either approach
+just fine :)
 
-22:51:35.457191 9a:ec:30:5a:46:96 (oui Unknown) > bc:ae:c5:6b:a8:3d
-(oui Unknown),
-ethertype IPv4 (0x0800), length 434: (tos 0x48, ttl 64, id 8221,
-offset 0, flags [DF], proto TCP (6), length 420)
-    _gateway.48102 > fedora.ssh: Flags [P.], cksum 0xcf1b (correct),
-seq 811:1179, ack 2310,
-   win 2054, options [nop,nop,TS val 74858741 ecr 1981407207], length 368
+Anyway, with the other changes mentioned above, e.g. naming and
+permission ordering, feel free to add my ACK.
 
-Checksum correct. So...
+Acked-by: Paul Moore <paul@paul-moore.com>
 
-> DSA user ports inherit those flags from the conduit, and it is up to
-> the driver to correctly fall back to software checksum when the IP header=
- is not
-> where the hardware expects. If that check is ineffective, the packets mig=
-ht go
-> to the network without a proper checksum (the checksum field will have th=
-e
-> pseudo IP header sum).
-
-It definately does not contain the pseudo IP header sum because
-it would be the same all the time but tcpdump is happy:
-cksum 0xcf1b (correct)
-cksum 0x0655 (correct)
-cksum 0xd247 (correct)
-cksum 0x06b1 (correct)
-
-> Shouldn't "word1 |=3D TSS_BYPASS_BIT;" be done depending on skb->protocol=
-,
-> rather than depending on skb->len?!
->
->                 if (skb->protocol =3D=3D htons(ETH_P_IP)) {
->                         word1 |=3D TSS_IP_CHKSUM_BIT;
->                         tcp =3D ip_hdr(skb)->protocol =3D=3D IPPROTO_TCP;
->                 } else { /* IPv6 */
->                         word1 |=3D TSS_IPV6_ENABLE_BIT;
->                         tcp =3D ipv6_hdr(skb)->nexthdr =3D=3D IPPROTO_TCP=
-;
->                 } // here
->                         word1 |=3D TSS_BYPASS_BIT;
-
-Oddly it assumes everything is either TCP or UDP on
-IPv4 or IPv6. And yet things such as ICMP work just fine.
-
-I think the checksum engine can contain some various
-heuristics, such as if it cannot recognize what is coming
-in as the selected TCP or UDP, it will pass right through.
-
-> Gemini should never attempt to provide checksums for DSA-tagged packets
-> unless it is able to take skb->csum_start into consideration, otherwise
-> it will get it wrong.
->
-> This is somewhat independent of the other problem you've found, which
-> seems to be that large non-DSA packets get truncated anyway. But not
-> bypassing TX checksum offload truncates a packet? Hmm, strange.
-
-I have a theory about that in the comment, which is that when they
-engineered the hardware they only put in a hardware buffer for
-1518 bytes in the checksum engine. If you try to put in any more
-it gets truncated. It's a reasonable guess.
-
-If you do not set the checkumming engine to "bypass" it will try
-to fit the incoming paket into the checksumming buffer, and then
-it will look to see if it can find the right TCP or UDP headers.
-If it can't it will pass the packet out from the buffer without doing
-any changes. But the buffer is just 1518 bytes, which means that
-no matter what kind of package it is, it will get truncated if it
-does not fit into the checksumming buffer.
-
-This would give exactly the behaviour we're seeing.
-
-Yours,
-Linus Walleij
+--=20
+paul-moore.com
 
