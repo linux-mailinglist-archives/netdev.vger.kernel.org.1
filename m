@@ -1,233 +1,228 @@
-Return-Path: <netdev+bounces-46262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089347E2EEB
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:27:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243C57E2EED
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:28:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B654C280D85
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:27:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EA34B20A60
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B702E64E;
-	Mon,  6 Nov 2023 21:27:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5502E64F;
+	Mon,  6 Nov 2023 21:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="WbquFnkk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gxbDyqsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAC92E645
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 21:27:00 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4F4AD76
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:26:57 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32f70391608so2541383f8f.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 13:26:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1699306016; x=1699910816; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qHe8D736RO4AAE+BmknvCqjTIPolggejI3ZO5PCW5Gg=;
-        b=WbquFnkksKPPuTNKsS7UUvamWCuvOGHwB5RNZ4k5dlHLMcIgM8nXNcgR76UPTUyKB/
-         3DoCg552QVZKZ0UIYyUzjj9oolPEyjhStwKuFs6ICc37XNaEK+NQlqhFmEKMRVHjl+Z7
-         x0F0Y7fhLbUsr+WTc6gJEZIp4LeJvQT+RXIMHBs1WyrrXqi4a9l3L9WEmodhu6a+USWl
-         u+YwE1Zmw//V4N5BOxw0pLTNt3tOOTG/RTTsKmqTzbuo2ffycaKEiAA1JL6c5+LBNFvu
-         mrqhh07NTeMB1P/HjZdoYMZnxGkqAn9Eb5t5FAme9Guzhku8vr+1agAub2x809i+7WRc
-         7nWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699306016; x=1699910816;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHe8D736RO4AAE+BmknvCqjTIPolggejI3ZO5PCW5Gg=;
-        b=DYi4ZBhDZTwfnFMue1rykGBHXz6NeKgUuPGMWg2ciMFkT2Sf9NJ4a96dZEin7qs8Od
-         lJo++j33G671Qiv0kdqFmBpG3/2xS96sW7F7LVjAYzPLUzs8JGRWAU1D7RBplO48AEgW
-         EBpmra1vufoLTB7gdXiuKRK+cLjjdoM2a3CG7FLV/Yf2vOiGyKj9EDRdpwSSqq1sdYV1
-         WzeWCMZaoBCEoPtkwB7JbRSW4/q/Phf8LrO5kJEOYwAQyp8qBd6EPBZoipbeexEQg4gM
-         CehYcO6rmJlOFiBAa5BG5+AqbtNwkY71ZZNEVZKbC7Gm7E+4y1WEhlvaKoGXOh1uxoib
-         xOvw==
-X-Gm-Message-State: AOJu0Yy1zoffKg9E33LTVUQsCmPtLQkv3DQYgr8DCnG6dpwvP7nrKvln
-	NBYCXlOD/6vABHQEnl/VCZ4Gzw==
-X-Google-Smtp-Source: AGHT+IHmQ+42Zq81k+WB7jgYWUFzJoI8vvHA2Nnhf+xl+7sVywooW0AAnWHAqTZ9U5Cl/2fsZBCFIA==
-X-Received: by 2002:a05:6000:84:b0:32d:b55c:41fa with SMTP id m4-20020a056000008400b0032db55c41famr18624182wrx.28.1699306016270;
-        Mon, 06 Nov 2023 13:26:56 -0800 (PST)
-Received: from [10.83.37.178] ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id l2-20020a5d4bc2000000b0032da319a27asm583547wrt.9.2023.11.06.13.26.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 13:26:55 -0800 (PST)
-Message-ID: <a8cc305d-0ab8-4ff7-b11a-94f51f33ec92@arista.com>
-Date: Mon, 6 Nov 2023 21:26:48 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68562C859;
+	Mon,  6 Nov 2023 21:28:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6BE7C433C7;
+	Mon,  6 Nov 2023 21:28:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699306127;
+	bh=HeCGytM/CxpByzJMdq2pZz7dPN27FdYys9/RqjZeljY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gxbDyqsHT+3gfotbEtP8TuQyCIBs2qA9CzCeGe3TkT9us+umZgjr+8oaiYC4vzESV
+	 UH3QDglZoPdkR8KqY5lXbfKUEFntG7eWPYVgRKv1UUbT/H0nX8ua6Hfq+Ehm39FBF1
+	 gUe4XQMyRrziEFdIiEyRwNi2GTbPAt7Nu/uLyvfoakmQAqseFgZIEeYImnS5hYIeXr
+	 6C2vyjnBkfUS6xNbY29ipYfzYUf5ZweFxSAAuoY0yT4MyLuV9zenkU6IVcqmPC4tRf
+	 K8zI/a8/BIyMIek1h5qOHrPcs5kaTbfvf7EnbOo/RsSpebtTCcKnXLSda/W1/IXieD
+	 KUIvjAFfHHrtg==
+Date: Mon, 6 Nov 2023 13:28:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Nikolay Aleksandrov <razor@blackwall.org>
+Subject: Re: [PATCH bpf 1/6] netkit: Add tstats per-CPU traffic counters
+Message-ID: <20231106132845.6356bc72@kernel.org>
+In-Reply-To: <20231103222748.12551-2-daniel@iogearbox.net>
+References: <20231103222748.12551-1-daniel@iogearbox.net>
+	<20231103222748.12551-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] tcp: Fix -Wc23-extensions in tcp_options_write()
-Content-Language: en-US
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: ndesaulniers@google.com, trix@redhat.com, noureddine@arista.com,
- hch@infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, patches@lists.linux.dev, edumazet@google.com,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com
-References: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org>
-From: Dmitry Safonov <dima@arista.com>
-In-Reply-To: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 11/6/23 21:14, Nathan Chancellor wrote:
-> Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
+On Fri,  3 Nov 2023 23:27:43 +0100 Daniel Borkmann wrote:
+> Add dev->tstats traffic accounting to netkit. The latter contains per-CPU
+> RX and TX counters.
 > 
->   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
->     663 |         }
->         |         ^
->   1 error generated.
+> The dev's TX counters are bumped upon pass/unspec as well as redirect
+> verdicts, in other words, on everything except for drops.
 > 
-> On earlier releases (such as clang-11, the current minimum supported
-> version for building the kernel) that do not support C23, this was a
-> hard error unconditionally:
+> The dev's RX counters are bumped upon successful __netif_rx(), as well
+> as from skb_do_redirect() (not part of this commit here).
 > 
->   net/ipv4/tcp_output.c:663:2: error: expected statement
->           }
->           ^
->   1 error generated.
-> 
-> While adding a semicolon after the label would resolve this, it is more
-> in line with the kernel as a whole to refactor this block into a
-> standalone function, which means the goto a label construct can just be
-> replaced with a return statement. Do so to resolve the warning.
-> 
-> Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
-> Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> Using dev->lstats with having just a single packets/bytes counter and
+> inferring one another's RX counters from the peer dev's lstats is not
+> possible given skb_do_redirect() can also bump the device's stats.
 
-Seems like exactly the fix that my git testing tree had, with an
-exception to naming the helper tcp_ao_options_write().
-But then I found* your patch-v1 and decided not to send an alternative
-patch.
+sorry for the delay in replying, I'll comment here instead of on:
 
-Thanks for fixing this,
-Reviewed-by: Dmitry Safonov <dima@arista.com>
+https://lore.kernel.org/all/6d5cb0ef-fabc-7ca3-94b2-5b1925a6805f@iogearbox.net/
 
-*had to fix my Gmail lkml filter to label not only emails with cc/to my
-name, but also the raw email address (usually, I got them to/cc "Dmitry
-Safonov", but this one didn't have the name and got lost in the lkml pile).
+What I had in mind was to have the driver just set the type of stats.
+That way it doesn't have to bother with error handling either
+(allocation failure checking, making sure free happens in the right
+spot etc. all happen in the core). Here's a completely untested diff:
 
-> ---
-> Changes in v3:
-> - Don't use a pointer to a pointer for ptr parameter to avoid the extra
->   indirection in process_tcp_ao_options(), just return the modified ptr
->   value back to the caller (Eric)
-> - Link to v2: https://lore.kernel.org/r/20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org
-> 
-> Changes in v2:
-> - Break out problematic block into its own function so that goto can be
->   replaced with a simple return, instead of the simple semicolon
->   approach of v1 (Christoph)
-> - Link to v1: https://lore.kernel.org/r/20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org
-> ---
->  net/ipv4/tcp_output.c | 70 ++++++++++++++++++++++++++++-----------------------
->  1 file changed, 39 insertions(+), 31 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 0d8dd5b7e2e5..eb13a55d660c 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -601,6 +601,44 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
->  }
->  #endif
->  
-> +static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
-> +				      const struct tcp_request_sock *tcprsk,
-> +				      struct tcp_out_options *opts,
-> +				      struct tcp_key *key, __be32 *ptr)
-> +{
-> +#ifdef CONFIG_TCP_AO
-> +	u8 maclen = tcp_ao_maclen(key->ao_key);
-> +
-> +	if (tcprsk) {
-> +		u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
-> +
-> +		*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
-> +			       (tcprsk->ao_keyid << 8) |
-> +			       (tcprsk->ao_rcv_next));
-> +	} else {
-> +		struct tcp_ao_key *rnext_key;
-> +		struct tcp_ao_info *ao_info;
-> +
-> +		ao_info = rcu_dereference_check(tp->ao_info,
-> +			lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> +		rnext_key = READ_ONCE(ao_info->rnext_key);
-> +		if (WARN_ON_ONCE(!rnext_key))
-> +			return ptr;
-> +		*ptr++ = htonl((TCPOPT_AO << 24) |
-> +			       (tcp_ao_len(key->ao_key) << 16) |
-> +			       (key->ao_key->sndid << 8) |
-> +			       (rnext_key->rcvid));
-> +	}
-> +	opts->hash_location = (__u8 *)ptr;
-> +	ptr += maclen / sizeof(*ptr);
-> +	if (unlikely(maclen % sizeof(*ptr))) {
-> +		memset(ptr, TCPOPT_NOP, sizeof(*ptr));
-> +		ptr++;
-> +	}
-> +#endif
-> +	return ptr;
-> +}
-> +
->  /* Write previously computed TCP options to the packet.
->   *
->   * Beware: Something in the Internet is very sensitive to the ordering of
-> @@ -629,37 +667,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
->  		opts->hash_location = (__u8 *)ptr;
->  		ptr += 4;
->  	} else if (tcp_key_is_ao(key)) {
-> -#ifdef CONFIG_TCP_AO
-> -		u8 maclen = tcp_ao_maclen(key->ao_key);
-> -
-> -		if (tcprsk) {
-> -			u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
-> -
-> -			*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
-> -				       (tcprsk->ao_keyid << 8) |
-> -				       (tcprsk->ao_rcv_next));
-> -		} else {
-> -			struct tcp_ao_key *rnext_key;
-> -			struct tcp_ao_info *ao_info;
-> -
-> -			ao_info = rcu_dereference_check(tp->ao_info,
-> -				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> -			rnext_key = READ_ONCE(ao_info->rnext_key);
-> -			if (WARN_ON_ONCE(!rnext_key))
-> -				goto out_ao;
-> -			*ptr++ = htonl((TCPOPT_AO << 24) |
-> -				       (tcp_ao_len(key->ao_key) << 16) |
-> -				       (key->ao_key->sndid << 8) |
-> -				       (rnext_key->rcvid));
-> -		}
-> -		opts->hash_location = (__u8 *)ptr;
-> -		ptr += maclen / sizeof(*ptr);
-> -		if (unlikely(maclen % sizeof(*ptr))) {
-> -			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
-> -			ptr++;
-> -		}
-> -out_ao:
-> -#endif
-> +		ptr = process_tcp_ao_options(tp, tcprsk, opts, key, ptr);
->  	}
->  	if (unlikely(opts->mss)) {
->  		*ptr++ = htonl((TCPOPT_MSS << 24) |
-> 
-> ---
-> base-commit: c1ed833e0b3b7b9edc82b97b73b2a8a10ceab241
-> change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
 
-Thanks,
-             Dmitry
 
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 9980517ed8b0..c23cb7dc0122 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1506,25 +1506,12 @@ static void veth_free_queues(struct net_device *dev)
+ 
+ static int veth_dev_init(struct net_device *dev)
+ {
+-	int err;
+-
+-	dev->lstats = netdev_alloc_pcpu_stats(struct pcpu_lstats);
+-	if (!dev->lstats)
+-		return -ENOMEM;
+-
+-	err = veth_alloc_queues(dev);
+-	if (err) {
+-		free_percpu(dev->lstats);
+-		return err;
+-	}
+-
+-	return 0;
++	return veth_alloc_queues(dev);
+ }
+ 
+ static void veth_dev_free(struct net_device *dev)
+ {
+ 	veth_free_queues(dev);
+-	free_percpu(dev->lstats);
+ }
+ 
+ #ifdef CONFIG_NET_POLL_CONTROLLER
+@@ -1802,6 +1789,8 @@ static void veth_setup(struct net_device *dev)
+ 	dev->hw_enc_features = VETH_FEATURES;
+ 	dev->mpls_features = NETIF_F_HW_CSUM | NETIF_F_GSO_SOFTWARE;
+ 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
++
++	dev->pcpu_stat_type = NETDEV_PCPU_STAT_LSTAT;
+ }
+ 
+ /*
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 208c63f177f4..25e71480ca58 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1797,6 +1797,13 @@ enum netdev_ml_priv_type {
+ 	ML_PRIV_CAN,
+ };
+ 
++enum netdev_stat_type {
++	NETDEV_PCPU_STAT_NONE,
++	NETDEV_PCPU_STAT_LSTAT, /* struct pcpu_lstats */
++	NETDEV_PCPU_STAT_TSTAT, /* struct pcpu_sw_netstats */
++	NETDEV_PCPU_STAT_DSTAT, /* struct pcpu_dstats */
++};
++
+ /**
+  *	struct net_device - The DEVICE structure.
+  *
+@@ -2354,6 +2361,8 @@ struct net_device {
+ 	void				*ml_priv;
+ 	enum netdev_ml_priv_type	ml_priv_type;
+ 
++	/** @pcpu_stat_type: type of per-CPU stats in use */
++	enum netdev_stat_type pcpu_stat_type:8;
+ 	union {
+ 		struct pcpu_lstats __percpu		*lstats;
+ 		struct pcpu_sw_netstats __percpu	*tstats;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0d548431f3fa..15fec94c7d24 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -10049,6 +10049,45 @@ void netif_tx_stop_all_queues(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(netif_tx_stop_all_queues);
+ 
++static int netdev_do_alloc_pcpu_stats(struct net_device *dev)
++{
++	void __percpu *v;
++
++	switch (dev->pcpu_stat_type) {
++	case NETDEV_PCPU_STAT_NONE:
++		return 0;
++	case NETDEV_PCPU_STAT_LSTAT:
++		v = dev->lstats = netdev_alloc_pcpu_stats(struct pcpu_lstats);
++		break;
++	case NETDEV_PCPU_STAT_TSTAT:
++		v = dev->tstats =
++			netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
++		break;
++	case NETDEV_PCPU_STAT_DSTAT:
++		v = dev->dstats = netdev_alloc_pcpu_stats(struct pcpu_dstats);
++		break;
++	}
++
++	return v ? 0 : -ENOMEM;
++}
++
++static void netdev_do_free_pcpu_stats(struct net_device *dev)
++{
++	switch (dev->pcpu_stat_type) {
++	case NETDEV_PCPU_STAT_NONE:
++		return;
++	case NETDEV_PCPU_STAT_LSTAT:
++		free_percpu(dev->lstats);
++		break;
++	case NETDEV_PCPU_STAT_TSTAT:
++		free_percpu(dev->tstats);
++		break;
++	case NETDEV_PCPU_STAT_DSTAT:
++		free_percpu(dev->dstats);
++		break;
++	}
++}
++
+ /**
+  * register_netdevice() - register a network device
+  * @dev: device to register
+@@ -10109,9 +10148,13 @@ int register_netdevice(struct net_device *dev)
+ 		goto err_uninit;
+ 	}
+ 
++	ret = netdev_do_alloc_pcpu_stats(dev);
++	if (ret)
++		goto err_uninit;
++
+ 	ret = dev_index_reserve(net, dev->ifindex);
+ 	if (ret < 0)
+-		goto err_uninit;
++		goto err_free_pcpu;
+ 	dev->ifindex = ret;
+ 
+ 	/* Transfer changeable features to wanted_features and enable
+@@ -10217,6 +10260,8 @@ int register_netdevice(struct net_device *dev)
+ 	call_netdevice_notifiers(NETDEV_PRE_UNINIT, dev);
+ err_ifindex_release:
+ 	dev_index_release(net, dev->ifindex);
++err_free_pcpu:
++	netdev_do_free_pcpu_stats(dev);
+ err_uninit:
+ 	if (dev->netdev_ops->ndo_uninit)
+ 		dev->netdev_ops->ndo_uninit(dev);
+@@ -10469,6 +10514,7 @@ void netdev_run_todo(void)
+ 		WARN_ON(rcu_access_pointer(dev->ip_ptr));
+ 		WARN_ON(rcu_access_pointer(dev->ip6_ptr));
+ 
++		netdev_do_free_pcpu_stats(dev);
+ 		if (dev->priv_destructor)
+ 			dev->priv_destructor(dev);
+ 		if (dev->needs_free_netdev)
 
