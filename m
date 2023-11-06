@@ -1,254 +1,213 @@
-Return-Path: <netdev+bounces-46181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4C67E1F60
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:06:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F20417E1E17
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C0A7B218C2
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:06:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 161A91C203BE
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 10:16:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0E91805F;
-	Mon,  6 Nov 2023 11:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4700D17748;
+	Mon,  6 Nov 2023 10:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bqvfUgCt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mcBIJTUP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F2E1EB2C
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 11:06:37 +0000 (UTC)
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 238B698
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 03:06:34 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53e751aeb3cso7065127a12.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 03:06:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1699268792; x=1699873592; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=YsCfIzoWq/DxNOmh9DbcaajzQhp4aRngc923rsmMCv8=;
-        b=bqvfUgCtCRDAJXa5LuHYMiLhd8RtGLYyriubGzzPVIq2HbNNd90QvAqYmJ5G6BavtI
-         B/SWAZqcNb8+Gr1gxVKENuR3P9cP4Qkq6N0SpRyU/i7jz17HbU7ajh2/33PD/YJ4Ex+t
-         45hNuSeaPDZ6+GJLbyL1FlJyf80q/87N0gSsTkifC4bfm/u/Y1TUAdrdVK51f6A1fprl
-         tBCRZxhw3Olkz3ZfmI4Aw44qelQ+WyyZmGp6b1yIa9FUGBmyy9UMcf7WMchMXK8ITePR
-         ydJlxGKcYy5BizucNqKaDeXJ0cVuXj9E1UYjslw/aGoRbq9nnCjD/uPvBvUwzKk92bE1
-         Y7Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699268792; x=1699873592;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YsCfIzoWq/DxNOmh9DbcaajzQhp4aRngc923rsmMCv8=;
-        b=rkG5wRUARYtpquTlgtfxEplDjmmlMOpu43Xl2ITqbiXt3mGyhjJjkiq9yJ8g6jnc2Y
-         MhWWHG/40iFdJVjSvxEcs5VmiV8zo+Gx/3e6vRsTuGUdHbGQ3SQRRWTA0NEmKqxYUZJn
-         Q740YN+i44w/6fCdOTwI/S6rdhJEC55kz0n7xLqGeW2Nxwm6tmpCYOpy6v8w/vrCSd2b
-         5mV6rodGtQxMCkIoYK4DLqAiFuJxrOxpEw65+IN7AwG8VYy8nYpzWXILhMgrbm0NgzCs
-         WBue6tXbQCG0n9dTNlGJ0xn0w+Pptx73YEcReHGVPDurNL0B9/2xBvmtOmwbyesxso1c
-         kGXg==
-X-Gm-Message-State: AOJu0Yy163CKlXHI3bvBgVYjUjtmvc5aqfp38iszmO0PNzQcT5wYAXYX
-	FAwilb3Its9OV7H0lLp7s4KrSQ==
-X-Google-Smtp-Source: AGHT+IFmzejF8EeJpiWfAzNEb/ZoYcAaES3e9lV+rsP7bNqs+8npIe6IFO13AjfCninjPtv1NEkM2g==
-X-Received: by 2002:a50:9356:0:b0:543:56c8:f84b with SMTP id n22-20020a509356000000b0054356c8f84bmr14221590eda.19.1699268792483;
-        Mon, 06 Nov 2023 03:06:32 -0800 (PST)
-Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
-        by smtp.gmail.com with ESMTPSA id v19-20020a50d093000000b005434095b179sm4269555edd.92.2023.11.06.03.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 03:06:31 -0800 (PST)
-References: <87o7gk18ja.fsf@cloudflare.com>
- <20231027173815.61906-1-kuniyu@amazon.com> <87jzr71967.fsf@cloudflare.com>
- <6545bc9f7e443_3358c208ae@john.notmuch>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org,
- martin.lau@kernel.org, netdev@vger.kernel.org, yangyingliang@huawei.com
-Subject: Re: [PATCH bpf 1/2] bpf: sockmap, af_unix sockets need to hold ref
- for pair sock
-Date: Mon, 06 Nov 2023 11:15:41 +0100
-In-reply-to: <6545bc9f7e443_3358c208ae@john.notmuch>
-Message-ID: <87h6lzjg3r.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C034A17730
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 10:15:59 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B9C93;
+	Mon,  6 Nov 2023 02:15:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699265759; x=1730801759;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=XkU6mZe3hFmG5QBkrZ1bM4ms1hYf7JSgEBV+sx2D4S0=;
+  b=mcBIJTUPeVZ+VEUFBOvQSAMBFmueSGglUmLpoJlESziucWnTzPiiE0ff
+   xHVnujZ1zv8lBGHGROeDFc7JL3hzWWLw3fds10HqTswTrTyw5hMgKSSy5
+   g0KRJ6Nd1fI+VXB0b4DL1qmnmiBJSIz5lwWSHsyxaDRzLHmoyMU9D7YcO
+   X2BPzKhbBggini60tpj87NxJfswvrF33WFSdJ0wTRV+K/WYZjRTq9gfoo
+   DwoNweSnp7KH2F4XHSMYx51o+Pw5XraEewR5IYKRVlq7AfMiSl5ko7kjv
+   bziGoyDvciAVHxWgYflbZY8pEk0DQdF50zdM7EpVXXIKtceVOpmFYNnvE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="7879091"
+X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
+   d="scan'208";a="7879091"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 02:15:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
+   d="scan'208";a="10412943"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2023 02:15:57 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 6 Nov 2023 02:15:56 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 6 Nov 2023 02:15:55 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 6 Nov 2023 02:15:55 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 6 Nov 2023 02:15:53 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bnRY07Frzizh8Bb8Wm0gamBIj2fInSgmgl9GyT+xHubisLh8hiB775zoLX/STmFJkwS1y4vQiEd5Fk3JA9fdHKoTB7YSh3ErHWDljA7bZ1LfZygoBnjJhyWRMEGtQQe9dvRVyLVAOevjRZfu8kLAFhGUYfFLfq21fVB25FzhmJ6iZ5VHP+2OTaZZM8jhc448TEX2xEkfv46wvtKQMAeOACtovyNiI7lpaqx81klxjvQ32Lhpwt5UiDHrbwBzvE5f2McyckGmgmJ8wz2f8xqfga30DGXI5NNL2TOMsnHgnPdWe/1BmWhq38QsSMlaT34+94PVyO/0rQn01biyDGy1Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NY/adPMHhSzt8PZMYaJbz6Pswp5vKF0R63OJYFpGcX8=;
+ b=I782HLEpM8qwjZPkkbNnq+cpcceMPheNK/tJ8v/b1fAXlM0/PZhF3NEB9awAbDA2mVCZg89jOJ4fIMRnmav0/3ArXo2MGVgTLjIdqPFEFsXXrUJ6koPyyVQTDutdm69UOmwNcLvQLSVB1qIW6gZbM9UpMCWqT0alYkV2vGcBQ3LzU7d/F+Cb934UT7Xj2yrvg6Hzjye1G/1cpk2t0d9zrztDEQKVoMdy7DVlnN4dIiq18L8MBoa7KUFzYKBwbn5GvqaM1ZBRJvJ8faGnIazRCdvJipP+9Sj4xMLB3X6NhDJiFxy/fGma+BRTUyXqiD9HWS/UXOahAXKlUx11sdxWLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by PH8PR11MB6659.namprd11.prod.outlook.com (2603:10b6:510:1c2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.27; Mon, 6 Nov
+ 2023 10:15:52 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::1b1e:8472:f24b:6693]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::1b1e:8472:f24b:6693%3]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
+ 10:15:52 +0000
+Message-ID: <d7806b70-12f2-405f-a875-61137a9c6490@intel.com>
+Date: Mon, 6 Nov 2023 11:15:46 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Add missing icss_iep_put to
+ error path
+Content-Language: en-US
+To: Jan Kiszka <jan.kiszka@siemens.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar
+	<danishanwar@ti.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Lopes Ivo,
+ Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>, Nishanth Menon
+	<nm@ti.com>, "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>
+References: <c8081537-f26a-4147-83f3-0c890e824192@siemens.com>
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <c8081537-f26a-4147-83f3-0c890e824192@siemens.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR3P281CA0087.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:1f::9) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|PH8PR11MB6659:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77fdd307-2379-480d-e29e-08dbdeb15ace
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6Ghrvv1I8q4dvgPGZjPy3WBrhnx+Pn+y6b70VFJm99zEFkkV5s31hH3h/0gzsb8N2h+v8DHMJMLuW/18Py43jL7iaafi1UQrLg0rix/Tf8eSqVI0xg8IndZAijUf5YV67PtA+FzoplFg2xaBmq/wVAKIB77UNlwCePcjN52JEIjxoeEkyMKjVmzuysqJyCrNpfqJXD62GZZnlg8m7x7SozuVJo+G2Y6GavdiIeYu+Fw1ExCsc9I3t22ku3DXfxtIAJXvTIXdar9ZuzaxPIGB0uHDULJ1zIV1g4q0jj8JG9U/YL932ccJEskueSgTKJRlxDjk3Ff/emrQmeMVwOaJ4CJe+lBMmO6tZmTOREPqEnuF2RU73x+6MhHe8TxEV4CKmecqFLH/9QHULqWVyIqkTn9HW9FfxvNrj74PzoFvpSVtfJ4yw01h71GZGd10+tCDzGPe7KvMaEezu55lyyQM1OgHm1/50ji72a/E7RcUF+4KAPpw3v1P/WVwOBwuhvHwD2lAfoAIoB0uoUZN5IAsJaTIFVVOMhBhHMi+Cl4Fbdj8ZgqlYtYJYP6DmlHsXStYZ7KAAWsUWcJgM2nAuHR7YSd2zsVmjPVXXkVij0HXLb4ObRrF57PnZvunlwwYGlrQK2wMcgGDj7Q9m4Fw4JbcYg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(396003)(366004)(346002)(376002)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(2906002)(38100700002)(86362001)(36756003)(31696002)(82960400001)(26005)(6506007)(53546011)(110136005)(8936002)(8676002)(4326008)(6666004)(41300700001)(6512007)(6486002)(478600001)(66556008)(54906003)(66946007)(316002)(44832011)(66476007)(31686004)(7416002)(5660300002)(2616005)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?enNuVXJZTFU1L3pXbzBSbUcvUWZTQWtuMTc5UEZSTm92aXl4NUZRN3NxRWFP?=
+ =?utf-8?B?L3hzdjZ0Uzh4T2k3ci84MVFubzVrWk53aTJTbnJhVzVqQmdQZzZYREhCdFNT?=
+ =?utf-8?B?QVFvYnRLeXBSci9qU1JwdVQramdrK2R1Y2RUUDBYQWhOT0xxcHhJUVpZeVBG?=
+ =?utf-8?B?ZVJibFo5UXZMZmVwbXB2TndGYXNKZHJtaDBkSTVuYnVpWHpuRU1RWGJUZkFO?=
+ =?utf-8?B?TDFvWFpUUTVnRGpicTNvNDFFZkFEamh3MExSYnpaZEE4cmNYb0kzM2RHSTJJ?=
+ =?utf-8?B?R1U5WGVUZzdCdkF3VEtaRFNVZGV0ZXh2Q0VuZ0lQUEpiQTV1WkcrWGRxbk1C?=
+ =?utf-8?B?MnZROUZOZGdYazRhdVN2QWJLMW9BS1B1bEExRUJXZWRrZDU5ZEFRR0lxbmtD?=
+ =?utf-8?B?cVE4eCtlcElteHFjYnFobldsSk5lQVdNSThlcUFqWDlxSGR4bDVXTXN1M0xW?=
+ =?utf-8?B?NGI1WndTNjBKenVESktLSWlHTzBrQzd5bWYvVGNTa0NQVW92UzN6MEJpYmRQ?=
+ =?utf-8?B?eVJqNWN1NlhpSzdrOWU1c2I4UjlNREJkazluQ0hFNUJNMVg4d2ZCUWR1RjdR?=
+ =?utf-8?B?SlpuVUltK0JRTEVIVW9ramVybGpFVVhaWkZmZVVhUHFMUDUvTUI4eSt0TkM2?=
+ =?utf-8?B?OVZxUklyNGV6WXJtY2VIVms1aTlVd09PQUl5cFV6dHRGLzk2czJDMk80NEY1?=
+ =?utf-8?B?R1A2NTVwRUU0MVBvWnJyQTlVaFhUSUtOK1MrZTF1WGU5Y2lGK0RTR1A2SzJY?=
+ =?utf-8?B?WjNLQ0Y1ajRkUXVUK0UveGRmRjFxWFZSaHdhaEVEU1pOTUsxWVk4emNaL0J0?=
+ =?utf-8?B?S1dqRk9OWGVIejRYWmhENEU1d1J3MG5RMXdCTHFlVnUwdDhRS1VsNWx2d1Rw?=
+ =?utf-8?B?dkxnOGk5Y2U0MGpkWUQvOHdTaERZcmRLazF3RGI2TkpVWVRyVVVVUkR2S3hG?=
+ =?utf-8?B?Sk1ZdnB1dUV0WDd1VW1FNlVyTG9SNW13clhpQWlXajZOZDY4aThBSFNGM0dh?=
+ =?utf-8?B?QjQ5dCtnckNzVUVlU0l3RkljUVBVRjlLSHJKTTdyZjlWYTV1U1B1bVBwSGxI?=
+ =?utf-8?B?MUV4cTJRaFRZbmQ0NlJDZzd2VkpITWhaNDFIQTBGeGZnSERod1F2UXd1aU0x?=
+ =?utf-8?B?S09najBKcjVoVi8zdVVia2xaWHZYTWUvaFN4UUxYa0p3aU5iRFI5NHRGM1pJ?=
+ =?utf-8?B?SWUwcnRUVExVZXdjeFh5V1ZpR0MzNXltN3g0OElKaHNhU1lOSW9rbmdMb3Q3?=
+ =?utf-8?B?cElUOWxCK3hSemw2OW5aaFplY2tOZXgwcVZEcjdBcWwzYk9XREkydXFtU0ZX?=
+ =?utf-8?B?VHRoenRuT2ozRGVOeFpPbkg0SEh0aXJhbHJsZzhtYjhHR0xmaFA3d2h1NDRR?=
+ =?utf-8?B?elRwNGpRZzdyVUVvbWhtWDJYUGVOeGtaVE56RU5HMnRvZ3kyVjJJTE1PZE9n?=
+ =?utf-8?B?RGU3WFBHVElTeE55Zng4SkVwM3hKRUlRRllEaS9mZ21RUWorb2s2Um8yejM0?=
+ =?utf-8?B?SkdHaEJLWXdYdzc3Um9yOXZzdHlzdEJselExTTRiNzZzSmE4Q21PbWFZZytN?=
+ =?utf-8?B?L0JidGRFYm9tMGRFUXUxZGVXaTJHajFnRUNub2ZlQUI1bVpUYmxQZy9aZkxX?=
+ =?utf-8?B?NDdaMUtxb01FVjBYdGN5Z2tTWThVZ2wzVjRuZnFocFVIeXhlYkhDZzRrWVBJ?=
+ =?utf-8?B?a1dGbnVaeTVvdytZdUZvdmxsRWJpUTRVUjFPNThCeC9QQTJzM3RkYW50a3hW?=
+ =?utf-8?B?d2RkMllRMzZjMEJVWi9YdnFrWEJpMU5GLzNGUXNJSXRGNFVsdXRpWGIwMm9C?=
+ =?utf-8?B?cGNLejQxUm5wR0l6YWhNdDhZTVp0cGM2WjFOSGFoNVhIWXNFcVFpb3lCYXM1?=
+ =?utf-8?B?dkhmNlUxdVYyV1NsNG5sY1RkVzZxTGFwR3B4dWpDeVAwZFZFTmpVVk00TEpT?=
+ =?utf-8?B?cWU5VXhKNTVIYUg5K1FiV3hMaDBla0FwSFJuYkpUd0dzZ0h6YVRpMlZVdHJE?=
+ =?utf-8?B?UFlpNHdZbk1OWG9ZcFFkQ3N6NWQ0a3hBdDU4bUNsK0o4R211dXE3R041aHVP?=
+ =?utf-8?B?RUc3OFEwZVhDSE4yOGhkekQ1YlpjVlBvcHJkYjVFczcwMklQVERaOFFnTVhZ?=
+ =?utf-8?B?MjhsbkxvZ1pQMCtHSnQrdWhNajRTUXNYU0tsYkNHb1IxdDBkUE9kaWlJdUNS?=
+ =?utf-8?B?aUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77fdd307-2379-480d-e29e-08dbdeb15ace
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 10:15:51.9989
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EKQMBmCNhf5WcuHsHaNiPwb375nl4IChu/pXJNNJnUXtIgbxq6RgN3pr+Bu5CP05VDxPRiVeB+0YnQHrmh2n9GZ7vq4zyFgxFvzUzrEg3sY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6659
+X-OriginatorOrg: intel.com
 
-On Fri, Nov 03, 2023 at 08:38 PM -07, John Fastabend wrote:
-> Jakub Sitnicki wrote:
->> On Fri, Oct 27, 2023 at 10:38 AM -07, Kuniyuki Iwashima wrote:
->> > From: Jakub Sitnicki <jakub@cloudflare.com>
->> > Date: Fri, 27 Oct 2023 15:32:15 +0200
->> >> On Tue, Oct 24, 2023 at 02:39 PM -07, John Fastabend wrote:
->> >> > Jakub Sitnicki wrote:
->> >> >> On Mon, Oct 16, 2023 at 12:08 PM -07, John Fastabend wrote:
->> >> >> > AF_UNIX sockets are a paired socket. So sending on one of the pairs
->> >> >> > will lookup the paired socket as part of the send operation. It is
->> >> >> > possible however to put just one of the pairs in a BPF map. This
->> >> >> > currently increments the refcnt on the sock in the sockmap to
->> >> >> > ensure it is not free'd by the stack before sockmap cleans up its
->> >> >> > state and stops any skbs being sent/recv'd to that socket.
->> >> >> >
->> >> >> > But we missed a case. If the peer socket is closed it will be
->> >> >> > free'd by the stack. However, the paired socket can still be
->> >> >> > referenced from BPF sockmap side because we hold a reference
->> >> >> > there. Then if we are sending traffic through BPF sockmap to
->> >> >> > that socket it will try to dereference the free'd pair in its
->> >> >> > send logic creating a use after free.  And following splat,
->> >> >> >
->> >> >> >    [59.900375] BUG: KASAN: slab-use-after-free in sk_wake_async+0x31/0x1b0
->> >> >> >    [59.901211] Read of size 8 at addr ffff88811acbf060 by task kworker/1:2/954
->> >> >> >    [...]
->> >> >> >    [59.905468] Call Trace:
->> >> >> >    [59.905787]  <TASK>
->> >> >> >    [59.906066]  dump_stack_lvl+0x130/0x1d0
->> >> >> >    [59.908877]  print_report+0x16f/0x740
->> >> >> >    [59.910629]  kasan_report+0x118/0x160
->> >> >> >    [59.912576]  sk_wake_async+0x31/0x1b0
->> >> >> >    [59.913554]  sock_def_readable+0x156/0x2a0
->> >> >> >    [59.914060]  unix_stream_sendmsg+0x3f9/0x12a0
->> >> >> >    [59.916398]  sock_sendmsg+0x20e/0x250
->> >> >> >    [59.916854]  skb_send_sock+0x236/0xac0
->> >> >> >    [59.920527]  sk_psock_backlog+0x287/0xaa0
->> >> >> 
->> >> >> Isn't the problem here that unix_stream_sendmsg doesn't grab a ref to
->> >> >> peer sock? Unlike unix_dgram_sendmsg which uses the unix_peer_get
->> >> >> helper.
->> >> >
->> >> > It does by my read. In unix_stream_connect we have,
->> >> >
->> >> > 	sock_hold(sk);
->> >> > 	unix_peer(newsk)	= sk;
->> >> > 	newsk->sk_state		= TCP_ESTABLISHED;
->> >> >
->> >> > where it assigns the peer sock. unix_dgram_connect() also calls
->> >> > sock_hold() but through the path that does the socket lookup, such as
->> >> > unix_find_other().
->> >> >
->> >> > The problem I see is before the socket does the kfree on the
->> >> > sock we need to be sure the backlog is canceled and the skb list
->> >> > ingress_skb is purged. If we don't ensure this then the redirect
->> >> > will 
->> >> >
->> >> > My model is this,
->> >> >
->> >> >          s1            c1
->> >> > refcnt    1             1
->> >> > connect   2             2
->> >> > psock     3             3
->> >> > send(s1) ...
->> >> > close(s1) 2             1 <- close drops psock count also
->> >> > close(c1) 0             0
->> >> >
->> >> > The important bit here is the psock has a refcnt on the
->> >> > underlying sock (psock->sk) and wont dec that until after
->> >> > cancel_delayed_work_sync() completes. This ensures the
->> >> > backlog wont try to sendmsg() on that sock after we free
->> >> > it. We also check for SOCK_DEAD and abort to avoid sending
->> >> > over a socket that has been marked DEAD.
->> >> >
->> >> > So... After close(s1) the only thing keeping that sock
->> >> > around is c1. Then we close(c1) that call path is
->> >> >
->> >> >  unix_release
->> >> >    close() 
->> >> >    unix_release_sock()
->> >> >      skpair = unix_peer(sk);
->> >> >      ...
->> >> >      sock_put(skpair);  <- trouble here
->> >> >
->> >> > The release will call sock_put() on the pair socket and
->> >> > dec it to 0 where it gets free'd through sk_free(). But
->> >> > now the trouble is we haven't waited for cancel_delayed_work_sync()
->> >> > on the c1 socket yet so backlog can still run. When it does
->> >> > run it may try to send a pkg over socket s1. OK right up until
->> >> > the sendmsg(s1, ...) does a peer lookup and derefs the peer
->> >> > socket. The peer socket was free'd earlier so use after free. 
->> >> >
->> >> > The question I had originally was this is odd, we are allowing
->> >> > a sendmsg(s1) over a socket while its in unix_release(). We
->> >> > used to take the sock lock from the backlog that was dropped
->> >> > in the name of performance, but it creates these races.
->> >> >
->> >> > Other fixes I considered. First adding sock lock back to
->> >> > backlog. But that punishes the UDP and TCP cases that don't
->> >> > have this problem. Set the SOCK_DEAD flag earlier or check
->> >> > later but this just makes the race smaller doesn't really
->> >> > eliminate it.
->> >> >
->> >> > So this patch is what I came up with. 
->> >> 
->> >> What I was getting at is that we could make it safe to call sendmsg on a
->> >> unix stream sock while its peer is being release. And not just for
->> >> sockmap. I expect io_uring might have the same problem. But I didn't
->> >> actually check yet.
->> >> 
->> >> For that we could keep a ref to peer for the duration of sendmsg call,
->> >> like unix dgram does. Then 'other' doesn't become a stale pointer before
->> >> we're done with it.
->> >> 
->> >> Bumping ref count on each sendmsg is not free, but maybe its
->> >> acceptable. Unix dgram sockets live with it.
->> >
->> > The reason why only dgram sk needs sock_hold() for each sendmsg() is
->> > that dgram sk can send data without connect().  unix_peer_get() in
->> > unix_dgram_sendmsg() is to reuse the same code when peer is not set.
->> >
->> > unix_stream_sendmsg() already holds a necessary refcnt and need not
->> > use sock_hold() there.
->> >
->> > The user who touches a peer without lookup must hold refcnt beforehand.
->
-> Hi, we probably do need to get a fix for this. syzkaller hit it again
-> and anyways it likely will crash some real systems if folks try to use
-> it with enough systems.
->
->> 
->> Right. And this ownership scheme works well for unix stream because, as
->> John nicely explained, we serialize close() and sendmsg() ops with sock
->> lock.
->> 
->> Here, however, we have a case of deferred work which holds a ref to sock
->> but does not grab the sock lock. While it is doing its thing, the sk
->> gets closed/released and we drop the skpair ref. And bam, UAF.
->> 
->> If it wasn't for the reference cycle between sk and skpair, we could
->> defer the skpari ref drop until sk_destruct callback. But we can't.
->> 
->> If grabbing a ref on skpair on each sendmsg turns out to be not a viable
->> option, I didn't run any benchmarks so can't say what's the penatly
->> like, the next best thing is RCU.
->
-> I think it really would be best to stay out of the presumably hotpath
-> here if we can.
->
-> I had considered marking the socket SOCK_RCU_FREE which should then
-> wait an rcu grace period. But then it wasn't clear to me that would
-> completely solve the race. The psock still needs to do the 
-> cancel_delayed_work_sync() and this is also done from the rcu call
-> back on the psock. Withtout the extra reference iirc the concern
-> was we would basically have two rcu callbacks running that have
-> an ordering requirement which I don't think is ensured.
->
 
-I've checked io_uring and it keeps a ref to the related file for the
-lifetime the I/O request. So I think we are good there and it's only
-sockmap that is "bleeding".
 
-I agree it would be best not to hamper unix_stream sendmsg performance.
+On 05.11.2023 10:51, Jan Kiszka wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
+> 
+> Analogously to prueth_remove.
+> 
+> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+> Fixes: 443a2367ba3c ("net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support")
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+> 
+> Changes in v2:
+>  - add proper tags
+> 
+> This was lost from the TI SDK version while ripping out SR1.0 support - 
+> which we are currently restoring for upstream.
+> 
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 6c4b64227ac8..d119b2bb8158 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -2206,6 +2206,9 @@ static int prueth_probe(struct platform_device *pdev)
+>  	if (prueth->pdata.quirk_10m_link_issue)
+>  		icss_iep_exit_fw(prueth->iep1);
+>  
+> +	icss_iep_put(prueth->iep1);
+> +	icss_iep_put(prueth->iep0);
 
-At the same time, I think we can easily make the extra ref grab in
-unix_stream_sendmsg optional, keeping the fast path fast (modulo 2x a
-branch op).
+We could improve it even more IMO.
+If we fail to get prueth->iep0 we go to the free_pool (already done)
+If we fail to get prueth->iep1 we should go to something like "put_iep0" which calls icss_iep_put(prueth->iep0);
+And in case of exit_iep we can call icss_iep_put(prueth->iep1);
 
-I realize RCU would be a bigger, riskier overhaul. Perhaps not worth it,
-if there are no benefits for "the regular" unix_stream users.
-
-If we can avoid managing more state in psock, that would be my
-preference. But I don't want to block any fixes that users are waiting
-for.
+> +
+>  free_pool:
+>  	gen_pool_free(prueth->sram_pool,
+>  		      (unsigned long)prueth->msmcram.va, msmc_ram_size);
 
