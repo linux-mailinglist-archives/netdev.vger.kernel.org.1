@@ -1,151 +1,227 @@
-Return-Path: <netdev+bounces-46243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 870E67E2C44
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:48:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83CB67E2C96
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 20:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BA6B281103
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:48:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CA6C28166B
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2188827701;
-	Mon,  6 Nov 2023 18:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8580229422;
+	Mon,  6 Nov 2023 19:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a0aFkRbt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ViBPj2pG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772BA2906
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:48:02 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D834FEA
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 10:47:58 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da03c5ae220so4589609276.1
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 10:47:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AED28E17;
+	Mon,  6 Nov 2023 19:03:20 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0223BB;
+	Mon,  6 Nov 2023 11:03:18 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9d0b4dfd60dso715669466b.1;
+        Mon, 06 Nov 2023 11:03:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699296478; x=1699901278; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfYGvt6skLkznGwiqZd9de4cpoKtWczhZA3SDzBtHOk=;
-        b=a0aFkRbtVsZ+9weBVWl18mtKRU+MNbVC2hH62bBUxUtHDLF8FSq+8VWpUzh50tN0wk
-         zcP+5Fnk57gItAbOzC7pmbc/7I+oYIwJDh6EbbaY/Flu7JqdQh5fX/JNk3FQx07wO8lT
-         QFf99PlNgx2AZo1ntdedlSJEmUkQ9d96Ud3/ZBp61Nj+goZpZwhSoXnEwFfSrkX91KJz
-         2UJoMFX5kq5o3wxxtNLJjRhL7Z9zociCvwvVkn92v+Gg7J+wlPsVaAFFYOUF+PHMshFR
-         nTB5456B/mD2lLHdWZI9/xylUVcpkmJcm78im/pgB3NL/PbkmUKNuWdljfQJI97Eq06U
-         2qBA==
+        d=gmail.com; s=20230601; t=1699297397; x=1699902197; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Po8rIN0UE2EVDqSENb5hU9jONiWYxIx8ngSOAiRM/mM=;
+        b=ViBPj2pGMgtXLPfCgAYi0yDHHxrLs5SfbbuIeBSF2w0vkmWFFIYkFCBQXS1zspXWo7
+         CL0YiNlhGfS41sfaDfO/VM9QECNp1O3psBfbY5WQZwkrBvTLVM32wgJOJVpZ8HPi/tCk
+         jv35nIbMfTDt4Gb9azTSc3PyTPZBPKobOs5/DJUUvPAFhyLJ3epLiYveo34iLYcigG83
+         qEIldEFiPbfCN7pwV0ycE3dEqK1w7rth55YyKZ7E84K+EhzWGgVBqmKG30OV4s/RNVsb
+         vKnlXdEU19nLRWErx4VQJoM0AD4Eb8loqHEAGYlOdi0yr+CTEU/sxJAJFEdqd85wuKs1
+         XErA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699296478; x=1699901278;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xfYGvt6skLkznGwiqZd9de4cpoKtWczhZA3SDzBtHOk=;
-        b=rlpNemeaPtBAyshMUJiVeqzIVGBrSeJS97LnUf6YMZKNDZhbB45uWPRYsqrqgfR5CR
-         uj+PVRAHxgSV4DlOWZt2fDlWCOMYUNUjqTJ25+KjiOkqj9/jj6mpjrr9ZpwEMHPkEyBU
-         SUKcSA4b/qotsZKNe15/FWGN4wUevHVf0qG8vmOzoOPwPA86B3/T2y3vCXL24wzdPg4a
-         7uPrS39ZPMgjTowg+o8arBnv3y1G3toXBeSZv0riirZrXvJTkghhxrDuSb9FMnRGU9Z7
-         HDqcJHo9NkwRBUWvToXHGxoogVzbnYA4hwP/Ck6+2xi7Mrhf4xIpzxzBkEFQHBPiIph0
-         H4Nw==
-X-Gm-Message-State: AOJu0YyLIdsE6naxnEVpGn4yEf7ldBzQVZamvU4Gpl21LHjA/e8sY3Ge
-	JVsTU/psJJDI7FcVLKAAQg6GJM4=
-X-Google-Smtp-Source: AGHT+IGUJ2l90Skjb6Eo4Ej5QS91AxRpSBX/C4tSPBp5d8CEeFQv1G9sZ0kIa3LYlCMauqPUFev8brw=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:d308:0:b0:da0:c924:4fdc with SMTP id
- e8-20020a25d308000000b00da0c9244fdcmr7631ybf.6.1699296478090; Mon, 06 Nov
- 2023 10:47:58 -0800 (PST)
-Date: Mon, 6 Nov 2023 10:47:56 -0800
-In-Reply-To: <20231106024413.2801438-10-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1699297397; x=1699902197;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Po8rIN0UE2EVDqSENb5hU9jONiWYxIx8ngSOAiRM/mM=;
+        b=h0BCbFCBtRBEDxqH6ySoYTJPKSYI0CWfSh28cZHHhRrK0kXBHX0HRIDUhU4dIe2+zA
+         dqE/SLFmUVHJFTJD5GaVpg8zEH2ReouhbCSPjnNrrTqi/0JHtezBAsOgU2zpOrDi3Ogk
+         ZIjO3m7oOzxT4RrsignSC8vlWwM5Zf8X9PUBH2bLDrn4Ie0KqxK66mUMNyxXLNgiGZJG
+         EJk72x1TZKDQ2aFG+8fEKOiqcRHSxUw29Nxb5nd1CmjeV41FHXJrp6qMd6hFIuzsDWUG
+         3gN+Svoodn/AaDx/UNYPC1pKnHMdp/ZRKQO39BIK3h+RAuKWalhs3Q7mS1zHI5Jze6Sj
+         M28Q==
+X-Gm-Message-State: AOJu0YzOTwgcnJwMAJ92fIJpbuMyJEfxnjQOKr9D1QtzYm+avYdrpKnv
+	+7cPWrtznbVsXTrBH+qaE1Z22Kv/loChW1kJP7U=
+X-Google-Smtp-Source: AGHT+IGBgeJg/bNsD5dwJoZXLqPVs31CF6CY8+BoPeEjCL4gXQFiXcF/I4SXJow0aqntHGmOxou7y6/uTzGpe7ivH3w=
+X-Received: by 2002:a17:907:368a:b0:9c5:1100:9b8c with SMTP id
+ bi10-20020a170907368a00b009c511009b8cmr13952016ejc.56.1699297396812; Mon, 06
+ Nov 2023 11:03:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com> <20231106024413.2801438-10-almasrymina@google.com>
-Message-ID: <ZUk03DhWxV-bOFJL@google.com>
-Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
-From: Stanislav Fomichev <sdf@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20231103190523.6353-10-andrii@kernel.org> <7ff273d368f3f7dd383444928ca478ef.paul@paul-moore.com>
+In-Reply-To: <7ff273d368f3f7dd383444928ca478ef.paul@paul-moore.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 6 Nov 2023 11:03:05 -0800
+Message-ID: <CAEf4Bzaxv4uHK=+_vwZuvgBgq8L6d4JwxTSGxZgU44LwWYhDug@mail.gmail.com>
+Subject: Re: [PATCH v9 9/17] bpf,lsm: refactor bpf_prog_alloc/bpf_prog_free
+ LSM hooks
+To: Paul Moore <paul@paul-moore.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	brauner@kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/05, Mina Almasry wrote:
-> For device memory TCP, we expect the skb headers to be available in host
-> memory for access, and we expect the skb frags to be in device memory
-> and unaccessible to the host. We expect there to be no mixing and
-> matching of device memory frags (unaccessible) with host memory frags
-> (accessible) in the same skb.
-> 
-> Add a skb->devmem flag which indicates whether the frags in this skb
-> are device memory frags or not.
-> 
-> __skb_fill_page_desc() now checks frags added to skbs for page_pool_iovs,
-> and marks the skb as skb->devmem accordingly.
-> 
-> Add checks through the network stack to avoid accessing the frags of
-> devmem skbs and avoid coalescing devmem skbs with non devmem skbs.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
->  include/linux/skbuff.h | 14 +++++++-
->  include/net/tcp.h      |  5 +--
->  net/core/datagram.c    |  6 ++++
->  net/core/gro.c         |  5 ++-
->  net/core/skbuff.c      | 77 ++++++++++++++++++++++++++++++++++++------
->  net/ipv4/tcp.c         |  6 ++++
->  net/ipv4/tcp_input.c   | 13 +++++--
->  net/ipv4/tcp_output.c  |  5 ++-
->  net/packet/af_packet.c |  4 +--
->  9 files changed, 115 insertions(+), 20 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 1fae276c1353..8fb468ff8115 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -805,6 +805,8 @@ typedef unsigned char *sk_buff_data_t;
->   *	@csum_level: indicates the number of consecutive checksums found in
->   *		the packet minus one that have been verified as
->   *		CHECKSUM_UNNECESSARY (max 3)
-> + *	@devmem: indicates that all the fragments in this skb are backed by
-> + *		device memory.
->   *	@dst_pending_confirm: need to confirm neighbour
->   *	@decrypted: Decrypted SKB
->   *	@slow_gro: state present at GRO time, slower prepare step required
-> @@ -991,7 +993,7 @@ struct sk_buff {
->  #if IS_ENABLED(CONFIG_IP_SCTP)
->  	__u8			csum_not_inet:1;
->  #endif
-> -
-> +	__u8			devmem:1;
->  #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
->  	__u16			tc_index;	/* traffic control index */
->  #endif
-> @@ -1766,6 +1768,12 @@ static inline void skb_zcopy_downgrade_managed(struct sk_buff *skb)
->  		__skb_zcopy_downgrade_managed(skb);
->  }
->  
-> +/* Return true if frags in this skb are not readable by the host. */
-> +static inline bool skb_frags_not_readable(const struct sk_buff *skb)
-> +{
-> +	return skb->devmem;
+On Sun, Nov 5, 2023 at 9:01=E2=80=AFPM Paul Moore <paul@paul-moore.com> wro=
+te:
+>
+> On Nov  3, 2023 Andrii Nakryiko <andrii@kernel.org> wrote:
+> >
+> > Based on upstream discussion ([0]), rework existing
+> > bpf_prog_alloc_security LSM hook. Rename it to bpf_prog_load and instea=
+d
+> > of passing bpf_prog_aux, pass proper bpf_prog pointer for a full BPF
+> > program struct. Also, we pass bpf_attr union with all the user-provided
+> > arguments for BPF_PROG_LOAD command.  This will give LSMs as much
+> > information as we can basically provide.
+> >
+> > The hook is also BPF token-aware now, and optional bpf_token struct is
+> > passed as a third argument. bpf_prog_load LSM hook is called after
+> > a bunch of sanity checks were performed, bpf_prog and bpf_prog_aux were
+> > allocated and filled out, but right before performing full-fledged BPF
+> > verification step.
+> >
+> > bpf_prog_free LSM hook is now accepting struct bpf_prog argument, for
+> > consistency. SELinux code is adjusted to all new names, types, and
+> > signatures.
+> >
+> > Note, given that bpf_prog_load (previously bpf_prog_alloc) hook can be
+> > used by some LSMs to allocate extra security blob, but also by other
+> > LSMs to reject BPF program loading, we need to make sure that
+> > bpf_prog_free LSM hook is called after bpf_prog_load/bpf_prog_alloc one
+> > *even* if the hook itself returned error. If we don't do that, we run
+> > the risk of leaking memory. This seems to be possible today when
+> > combining SELinux and BPF LSM, as one example, depending on their
+> > relative ordering.
+> >
+> > Also, for BPF LSM setup, add bpf_prog_load and bpf_prog_free to
+> > sleepable LSM hooks list, as they are both executed in sleepable
+> > context. Also drop bpf_prog_load hook from untrusted, as there is no
+> > issue with refcount or anything else anymore, that originally forced us
+> > to add it to untrusted list in c0c852dd1876 ("bpf: Do not mark certain =
+LSM
+> > hook arguments as trusted"). We now trigger this hook much later and it
+> > should not be an issue anymore.
+>
+> See my comment below, but it isn't clear to me if this means it is okay
+> to have `BTF_ID(func, bpf_lsm_bpf_prog_free)` called twice.  It probably
+> would be a good idea to get KP, BPF LSM maintainer, to review this change
+> as well to make sure this looks good to him.
+>
+> >   [0] https://lore.kernel.org/bpf/9fe88aef7deabbe87d3fc38c4aea3c69.paul=
+@paul-moore.com/
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+> >  include/linux/lsm_hook_defs.h |  5 +++--
+> >  include/linux/security.h      | 12 +++++++-----
+> >  kernel/bpf/bpf_lsm.c          |  5 +++--
+> >  kernel/bpf/syscall.c          | 25 +++++++++++++------------
+> >  security/security.c           | 25 +++++++++++++++----------
+> >  security/selinux/hooks.c      | 15 ++++++++-------
+> >  6 files changed, 49 insertions(+), 38 deletions(-)
+>
+> ...
+>
+> > diff --git a/kernel/bpf/bpf_lsm.c b/kernel/bpf/bpf_lsm.c
+> > index e14c822f8911..3e956f6302f3 100644
+> > --- a/kernel/bpf/bpf_lsm.c
+> > +++ b/kernel/bpf/bpf_lsm.c
+> > @@ -263,6 +263,8 @@ BTF_ID(func, bpf_lsm_bpf_map)
+> >  BTF_ID(func, bpf_lsm_bpf_map_alloc_security)
+> >  BTF_ID(func, bpf_lsm_bpf_map_free_security)
+> >  BTF_ID(func, bpf_lsm_bpf_prog)
+> > +BTF_ID(func, bpf_lsm_bpf_prog_load)
+> > +BTF_ID(func, bpf_lsm_bpf_prog_free)
+> >  BTF_ID(func, bpf_lsm_bprm_check_security)
+> >  BTF_ID(func, bpf_lsm_bprm_committed_creds)
+> >  BTF_ID(func, bpf_lsm_bprm_committing_creds)
+> > @@ -346,8 +348,7 @@ BTF_SET_END(sleepable_lsm_hooks)
+> >
+> >  BTF_SET_START(untrusted_lsm_hooks)
+> >  BTF_ID(func, bpf_lsm_bpf_map_free_security)
+> > -BTF_ID(func, bpf_lsm_bpf_prog_alloc_security)
+> > -BTF_ID(func, bpf_lsm_bpf_prog_free_security)
+> > +BTF_ID(func, bpf_lsm_bpf_prog_free)
+> >  BTF_ID(func, bpf_lsm_file_alloc_security)
+> >  BTF_ID(func, bpf_lsm_file_free_security)
+> >  #ifdef CONFIG_SECURITY_NETWORK
+>
+> It looks like you're calling the BTF_ID() macro on bpf_lsm_bpf_prog_free
+> twice?  I would have expected a only one macro call for each bpf_prog_loa=
+d
+> and bpf_prog_free, is that a bad assuption?
+>
 
-bikeshedding: should we also rename 'devmem' sk_buff flag to 'not_readable'?
-It better communicates the fact that the stack shouldn't dereference the
-frags (because it has 'devmem' fragments or for some other potential
-future reason).
+Yeah, there is no problem having multiple BTF_ID() invocations for the
+same function. BTF_ID() macro (conceptually) emits a relocation that
+will instruct resolve_btfids tool to put an actual BTF ID for the
+specified function in a designated 4-byte slot.
+
+In this case, we have two separate lists: sleepable_lsm_hooks and
+untrusted_lsm_hooks, so we need two separate BTF_ID() entries for the
+same function. It's expected to be duplicated.
+
+> > diff --git a/security/security.c b/security/security.c
+> > index dcb3e7014f9b..5773d446210e 100644
+> > --- a/security/security.c
+> > +++ b/security/security.c
+> > @@ -5180,16 +5180,21 @@ int security_bpf_map_alloc(struct bpf_map *map)
+> >  }
+> >
+> >  /**
+> > - * security_bpf_prog_alloc() - Allocate a bpf program LSM blob
+> > - * @aux: bpf program aux info struct
+> > + * security_bpf_prog_load() - Check if loading of BPF program is allow=
+ed
+> > + * @prog: BPF program object
+> > + * @attr: BPF syscall attributes used to create BPF program
+> > + * @token: BPF token used to grant user access to BPF subsystem
+> >   *
+> > - * Initialize the security field inside bpf program.
+> > + * Do a check when the kernel allocates BPF program object and is abou=
+t to
+> > + * pass it to BPF verifier for additional correctness checks. This is =
+also the
+> > + * point where LSM blob is allocated for LSMs that need them.
+>
+> This is pretty nitpicky, but I'm guessing you may need to make another
+> revision to this patchset, if you do please drop the BPF verifier remark
+> from the comment above.
+>
+> Example: "Perform an access control check when the kernel loads a BPF
+> program and allocates the associated BPF program object.  This hook is
+> also responsibile for allocating any required LSM state for the BPF
+> program."
+
+Done, no problem.
+
+>
+> >   * Return: Returns 0 on success, error on failure.
+> >   */
+> > -int security_bpf_prog_alloc(struct bpf_prog_aux *aux)
+> > +int security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr=
+,
+> > +                        struct bpf_token *token)
+> >  {
+> > -     return call_int_hook(bpf_prog_alloc_security, 0, aux);
+> > +     return call_int_hook(bpf_prog_load, 0, prog, attr, token);
+> >  }
+>
+> --
+> paul-moore.com
 
