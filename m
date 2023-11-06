@@ -1,87 +1,80 @@
-Return-Path: <netdev+bounces-46211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17727E2757
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:43:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3167E284C
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:11:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B07231C20B9F
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 14:43:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7F21C20B85
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB6028DAD;
-	Mon,  6 Nov 2023 14:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="FKLzxAib"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A743328DD5;
+	Mon,  6 Nov 2023 15:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9296324214
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:43:51 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE1B8112
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 06:43:49 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9d2e7726d5bso671127766b.0
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 06:43:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1699281828; x=1699886628; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=NDSySmtz3iv59MVKPeBfK4m30gXKygHdiLZCdVGtoL4=;
-        b=FKLzxAibfYMZJyga3kFlWQsSvBE4CYd97NzJ3/nAxRLofQ9to6QZntIx1tUoAobUog
-         2S4mWs0n2RWN7YG1AvGILrxZVb1T48JWDMJ8EOo3l/anDs0B4UvqfFR8U5j6TCRL3cJD
-         J17ivQp9h9a/GJx6+ktRLC2WUchHSYEOuaDvr47kIG9lJP4wftHlQWf8jhfJk4fOPbhF
-         Mtwsd8yEuXLRMsbMqNd8PoqPcFmUsfPKm/C1Kx4DkLIEJkhxzyQcZR600TXhOW2CIkw0
-         hExnbjNPqYrJ1AbBqHjbAiBl/C2jenxVx2EWoUy+wZawXSWg3j/j4Y0QFdZzUsnbzoAw
-         Tnyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699281828; x=1699886628;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NDSySmtz3iv59MVKPeBfK4m30gXKygHdiLZCdVGtoL4=;
-        b=MnKpGBm8xHX/WxN/03aTIGJSu7fd/8oSSwqRHBUlEm3m36NcddZLKWBfKagNY47CtN
-         gBDrRl0a4e7qpsGgrgHd2RcSC5i2eZW08xILDY8hY4dDUhRZaI8Y3xW753FasqohIBIk
-         MvHKtsqhpi0Hkn0GYWo7+J5OoUI5gcTaFMsxFzgw0XaZCR+H7YenHhgGNoUh7yqiODrC
-         rQeGvON5VJHNts+X4V+PpIj/qQzgaeQdLUgzVTyu6rE4fSwnVWflTsCGPjq3uDXCe5fr
-         q17vVt34b7wF9puVQHVnavLOHNvKqQQ3A1qcgo8FImTCXfrKaFSO8M6VRzRc0LDScRRC
-         YRew==
-X-Gm-Message-State: AOJu0YzUAaRRNn9cvHROJuGwldJpOpk80b37WP3tDhU3BnXd+P1wSsCp
-	sH6XOQvQ+VKVT8Lh2sVf+0I7JsYMx2ccMbo4V2U=
-X-Google-Smtp-Source: AGHT+IHBOBsU4XTxsmO0ZGIusix3dN8s9ToLcljRr6B+3pF2tycujXUw9E7lDLAQVi6XwymnDm46Jg==
-X-Received: by 2002:a17:906:7307:b0:9bd:d405:4e7e with SMTP id di7-20020a170906730700b009bdd4054e7emr15452858ejc.6.1699281828187;
-        Mon, 06 Nov 2023 06:43:48 -0800 (PST)
-Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
-        by smtp.gmail.com with ESMTPSA id g17-20020a1709067c5100b0099bc8bd9066sm4268993ejp.150.2023.11.06.06.43.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 06:43:47 -0800 (PST)
-References: <20231016190819.81307-1-john.fastabend@gmail.com>
- <20231016190819.81307-3-john.fastabend@gmail.com>
- <878r7bjb1a.fsf@cloudflare.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangyingliang@huawei.com,
- martin.lau@kernel.org
-Subject: Re: [PATCH bpf 2/2] bpf: sockmap, add af_unix test with both
- sockets in map
-Date: Mon, 06 Nov 2023 15:42:17 +0100
-In-reply-to: <878r7bjb1a.fsf@cloudflare.com>
-Message-ID: <874jhzj61o.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD70F28DC9
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 15:11:40 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6A19D7E
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 07:11:37 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3A6FBX3z83568821, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3A6FBX3z83568821
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 6 Nov 2023 23:11:33 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.32; Mon, 6 Nov 2023 23:11:33 +0800
+Received: from Test06-PC.realtek.com.tw (172.22.228.55) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Mon, 6 Nov 2023 23:11:31 +0800
+From: ChunHao Lin <hau@realtek.com>
+To: <hkallweit1@gmail.com>
+CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
+        ChunHao Lin
+	<hau@realtek.com>
+Subject: [PATCH net 0/2] r8169: fix DASH deviceis network lost issue
+Date: Mon, 6 Nov 2023 23:11:22 +0800
+Message-ID: <20231106151124.9175-1-hau@realtek.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-Originating-IP: [172.22.228.55]
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Mon, Nov 06, 2023 at 01:44 PM +01, Jakub Sitnicki wrote:
-> But I'm able to reproduce the bug by running the VSOCK redir test:
+This series are used to fix network lost issue on systems that support
+DASH.
 
-I should clarify - the bug reproduces only without the patch #1 applied.
+ChunHao Lin (2):
+  r8169: add handling DASH when DASH is disabled
+  r8169: fix network lost after resume on DASH systems
 
-The fix is good. It just has some unneeded bits (unix_dgram), IMO.
+ drivers/net/ethernet/realtek/r8169_main.c | 43 +++++++++++++++++------
+ 1 file changed, 33 insertions(+), 10 deletions(-)
+
+-- 
+2.39.2
+
 
