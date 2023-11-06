@@ -1,319 +1,165 @@
-Return-Path: <netdev+bounces-46190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2203E7E227E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:56:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0EEA7E225C
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C81FB20F2C
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:56:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2951F21948
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086701F958;
-	Mon,  6 Nov 2023 12:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8351D55E;
+	Mon,  6 Nov 2023 12:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RPEXEnW5"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eSK8RTzo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500231EB58
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:56:05 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD3FB8
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 04:56:03 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5441ba3e53cso4927643a12.1
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 04:56:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1699275361; x=1699880161; darn=vger.kernel.org;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
-        bh=L0QDp7lDNm2awtfWGTyxjy2wjiWlEOGoI1KRYuRJul0=;
-        b=RPEXEnW50SlVksqKeddT9r/I7jVWDxrUL77L8U8GSZQJaECAoFy7aUDFzV88rGCyla
-         6lXHGmgKc5Udli3O+7vkV0TKCk9agrCQ56u86vCvQQtCTd3vHI9fI/GELNmppBcbxf29
-         gtShGYONk86EO7feHj98PzvdzIA/pbwlBg7XYBsOio/G5MzprExrWoGPXJQ+4VuDLqov
-         1vfkXx3jhoKE0/wEyRF7EllK6HuOdWAPQI4zFpxGUaZ4rVXDRgCT8XD6r1gMjt7KTgMl
-         SSlubwRr8cGoq0jAl9cVrwUnj7Ll5LP489heJg6B3f7KS/mj4WAdmW0i2k+0yEQNWByA
-         V6mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699275361; x=1699880161;
-        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
-         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=L0QDp7lDNm2awtfWGTyxjy2wjiWlEOGoI1KRYuRJul0=;
-        b=sG51U4Nm9NelB7wZ0qYuq9kPhW+c6Y/PurPB25iZ32EWHBd1AoqBSaT2bI5eReoN8X
-         0KCRvp9G6YUumM/4TsJzmP2vsyEfsvikUY7t6ESK97T5e5KGN7zwIA+5bQpQ6RyuAnPz
-         G3Tk4YK1NUzPQQ3eLLmEXepBbgLpL4hnviNjxD0luVzSyQWP6CPRl6daM7agQZM5kAxU
-         5dfyfPhrC31CmdWnVLTsvvZXZR/Zh/gXeMOHpeQBJx8d3MXtFMb/7q0R+g0e1v7JAYWg
-         PZ++qKzMX2yCJVvPV1BlazA2nVXrVj66a8sk3Z7oYf4mzSvRZePkx/qwCXcMQTkN6QpJ
-         JiRg==
-X-Gm-Message-State: AOJu0Yzt7Q5S+lt+TBcih+xLJPSPfq6RuTZ12xuodRryznKgfLWevUg3
-	8fGA1oe/S6kiJeEftBNRG9QTDw==
-X-Google-Smtp-Source: AGHT+IEK9xAG0OO54pTq/PDlgp34o5FMpHAKig7XDWe/DsyWYd0GoOEyjbu4pXAmh7udm7nMwiB9gA==
-X-Received: by 2002:aa7:d8d2:0:b0:543:5789:4d6c with SMTP id k18-20020aa7d8d2000000b0054357894d6cmr14841243eds.2.1699275361576;
-        Mon, 06 Nov 2023 04:56:01 -0800 (PST)
-Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
-        by smtp.gmail.com with ESMTPSA id m22-20020a509316000000b0053e88c4d004sm4385852eda.66.2023.11.06.04.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 04:56:00 -0800 (PST)
-References: <20231016190819.81307-1-john.fastabend@gmail.com>
- <20231016190819.81307-3-john.fastabend@gmail.com>
-User-agent: mu4e 1.6.10; emacs 28.3
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangyingliang@huawei.com,
- martin.lau@kernel.org
-Subject: Re: [PATCH bpf 2/2] bpf: sockmap, add af_unix test with both
- sockets in map
-Date: Mon, 06 Nov 2023 13:44:02 +0100
-In-reply-to: <20231016190819.81307-3-john.fastabend@gmail.com>
-Message-ID: <878r7bjb1a.fsf@cloudflare.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A117819BA3
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:53:26 +0000 (UTC)
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2045.outbound.protection.outlook.com [40.107.249.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F6D10B;
+	Mon,  6 Nov 2023 04:53:24 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GCmsjDlxs82Ky9Jwt7/4irdp//yiK4rIT9tjiyYcpNXM2sJPvTANl/31iIFtJRGgr4VmBVmJ+VyMi7I+F42rj5kkqiBN/8pFY2Ld3nmDu3XWTmTHI1RCMBPRDD+SAKE/CJdvYYAqVwFprUPveLw5yyMv7SOE89eVHU9X70kmHk8mElnZYkmS3mrwvl1bFwU691zQxKxZj4XFRKAkKh3dz3mUmNKVc+P8odE7tzOnWB0oTCaaXo7a0GrJsroMyJ0dRZZ2JnbCjGR24VKl/IFi4Nob9SBwF+tZbc5wKXQNH8iy1orLgDZaS1yxsN+isFByx2nZ/vdOM0Gw8713ffWaFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jMnCcG/3sTCmX0yDbFp7Njhqqf0wIZt8rOj4eVcSlXo=;
+ b=NQmrVeElvWua8RPk+X818uH7rIage2omWomnn78q3pMkNRvgQBhR/EIaMnlE7rbFiPRo71Qa1KRcopiaN6P+9kYP2izSX0WtcQGhbXp++AY1s8MPtIhmssG8fWXUUmAtKoxHjgzxahzeyH0AmLLM3s7Akl4DKZYQ41elkDWetBzvSfMLQQODsuYgW1TZite4ZOcyHyAjAPvqtDs6E5IGVBlpvdAauZbgccdpRlSAqZqT1npuM/UT2u6KhXfs08Td//wJu13qynFU/PvsW9mQnIEkHEI88cCkQyv2cXuBgCwwTd2Dsr5kmldU15omvqOAbLhJnRRvHxAYVbE/E9xm4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jMnCcG/3sTCmX0yDbFp7Njhqqf0wIZt8rOj4eVcSlXo=;
+ b=eSK8RTzoCa3Q7MNYMkJp0DqdYbIQ2SAxix4ezAU7bOjEbffgNeBEx6X0UbhBCLHY1V5KjOaYnkNJgEQ44azrSPoqhSc0bQtxlgML3+Th64UnJXj7x/amQae00yYuK3zAT8d5TFYzuauHpgLuFAuUVN8u92VfZwR5LuaiBwqmMXfH6RZ/TA58UfFQCFmnI9ZSajJ5gGn0X5oj3a65G+6qip/tMf8bNB4kfziUHKtLOjWD46efGLxPwyq1SysFS5Dp6x91FKBCoLItA5aJNKpZ1VXLwe3q/5jp2wyRqAghA1bWJjp91lVl77kydfDe7DaAzbOr/Wcr4kHzz04W5d28Ig==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from AM0PR04MB6467.eurprd04.prod.outlook.com (2603:10a6:208:16c::20)
+ by DU2PR04MB8823.eurprd04.prod.outlook.com (2603:10a6:10:2e2::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.16; Mon, 6 Nov
+ 2023 12:53:21 +0000
+Received: from AM0PR04MB6467.eurprd04.prod.outlook.com
+ ([fe80::5c46:ada1:fcf3:68e6]) by AM0PR04MB6467.eurprd04.prod.outlook.com
+ ([fe80::5c46:ada1:fcf3:68e6%6]) with mapi id 15.20.6977.013; Mon, 6 Nov 2023
+ 12:53:19 +0000
+Message-ID: <0ed0f964-f8c8-4776-a2ae-ca25071bd0cd@suse.com>
+Date: Mon, 6 Nov 2023 13:53:12 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: usbnet: Fix potential NULL pointer dereference
+Content-Language: en-US
+To: =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
+ Oliver Neukum <oneukum@suse.com>
+Cc: Ren Mingshuai <renmingshuai@huawei.com>, kuba@kernel.org,
+ caowangbao@huawei.com, davem@davemloft.net, khlebnikov@openvz.org,
+ liaichun@huawei.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ yanan@huawei.com
+References: <20231101213832.77bd657b@kernel.org>
+ <20231102090630.938759-1-renmingshuai@huawei.com>
+ <80af8b7a-c543-4386-bb0c-a356189581a0@suse.com>
+ <871qd3up56.fsf@miraculix.mork.no>
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <871qd3up56.fsf@miraculix.mork.no>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR0P281CA0226.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b2::19) To AM0PR04MB6467.eurprd04.prod.outlook.com
+ (2603:10a6:208:16c::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6467:EE_|DU2PR04MB8823:EE_
+X-MS-Office365-Filtering-Correlation-Id: e02559ed-b4d4-4f8c-51ff-08dbdec7574a
+X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	g9T0JHYKYn2jRAvcqns8JSMtGxjgUHevxhrFh8/WYbYuJEe4RWd8m1T+lJJvFtBW6Xo2dLCfeQzk3nFuFZLvNopvvMrhjvzVa692iQ/SB+EhCExttzATNccjEyQ47b3t7t7S5Z0BKApyOFDEd5m67o0Re5nwXAzI1UT2BR1u3WZeKhhAomyDqkkNCpMG2AWBSpDGLqwvvNMYsfgQdIpHF5ui5rQWPDYbde43LWYz0sipxlkbgR3BRg6+rYYY5Nr3wvrlQmzlk2FELrikhrtmYPVo3ryvX1fh2vFtp0hAyIiQrtd+P7f1M/zM2naIx85sQX0yenUnTNbuhoieF+tV75XonK3xXLzxg8kG1h5NH3H/Q6dxbA2KTqOEvJLeJIpSA9vw9Dqru1WTlgtDQcqeWOOZYkpx2cWAR6xVVDDdHHnSD9pMSZ9W22yVJYhd9M5k/myShwT/aSrkSScI1wbNkO/AUownCEKjqIDrpgm5HUcR+Rbrr8E56KBLl5JU798Rm1n1sq6NYpqCZGKx2xnDdHGtulJ3UF7aFnffM/nUNLe7ppJL8ClM3lwlv7beh4Tr0E3tnfADQ4H5IZ/mUzCACTIBTe1FnR6dAAZ5wgXpXsczUBO4OS0L4Rif4a46hkcsOwaZ7aT2bm+6JIBbRGdC0w==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6467.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(346002)(366004)(136003)(39850400004)(230922051799003)(451199024)(64100799003)(186009)(1800799009)(8936002)(4744005)(5660300002)(8676002)(4326008)(6486002)(478600001)(2906002)(31686004)(41300700001)(7416002)(110136005)(66476007)(66556008)(66946007)(86362001)(316002)(6506007)(6512007)(6666004)(36756003)(2616005)(53546011)(31696002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TmYrc1U0QVd1alIrWnBEc2E5YUg0ZVlLZ3JWd29yUFJQM3NNOEN5ODdDWmNX?=
+ =?utf-8?B?VXg4b2QxQjI5MDUydWR3SjVNYjd0SFpOQ0tjK0RXYjdDaWd6WU4zRzVKcFlS?=
+ =?utf-8?B?TlVUWjE1S3dXcEdST0hLdGNGcTdKd3h0aWVxMm1oNGdBVFFkbHFUSUMxWjl3?=
+ =?utf-8?B?TzNKV2VJZlNrRC9WcnN4Z2kwSTNMNExPSzdROEZrSFl3d3RieisrM2tBWEtQ?=
+ =?utf-8?B?N3ZDeW1pQjl3UU1sUE56ZWthQmJjZktUMkx5Q0l6djFiKzhVdDhpN0cwVjhj?=
+ =?utf-8?B?TktldnRGN0wrODhaSzVwWEtKV3JnTW8vY3ZqdHI2N3RSRUdUeHRmMjh2dVVr?=
+ =?utf-8?B?a0VlQzZ0d0VZSFFuZStWckdOZk1pTkk0T3h2Zkw3ZDM3eE5VZG55SFVqQUds?=
+ =?utf-8?B?eTBKdzFyRGhaWUlJdGJTNGtSMjl4MjMyVjVFOUxCZC9HbnlWVjU5UytHNGh1?=
+ =?utf-8?B?NGRoSU5HQW9MbUphZ25CZHFjUC8rNTlRZld2amxTS0VTYUdSTEhCU0Nja3JN?=
+ =?utf-8?B?OW9sMjVBbk96bHc0TmVYZ1dxaGQyZVNvSVBORjArR08rRmRsaUoxQmF6eDVV?=
+ =?utf-8?B?ZzB0aUJHekIwZnhjMW8xM0RJanUyWGdYNmRYNXNlNUdOdVBHR0JLRWxiYng5?=
+ =?utf-8?B?Y3JTcm1WTXBTM3dDcDZWV2dHNWdZOWlXa093S2FSYjdwR2U1c3dTbkFXUUVE?=
+ =?utf-8?B?NnlIT21QQ1ZDTGFQVm9uQzg0M3JjUHZwL0FGcEt0Q1RHamhiSXNENldzczBo?=
+ =?utf-8?B?ZEJCN1FVV29yTlVybVBySzBWeWpzaDJ1SGtBeGVOdDlQSzVUa013SDA0OUFh?=
+ =?utf-8?B?T1FRWVNiUFhHcy83Yjc1QmpMdXFXZ002N2FweFlkdlJTS2I4bXp3eUx1R1BN?=
+ =?utf-8?B?VnVrVUtyYndyeU45akVaVVFVSHV5VHp5V2ZLMGVoYXdoMnZXR2VMb1FmRk5r?=
+ =?utf-8?B?UzZOTEU5eWZES2FnZDd0UDBta1kvNU5PaEFUSitkZlRRbDZzdVhSQ2tDcTRD?=
+ =?utf-8?B?MG02bmFWWHFGZUZpM1BINXoveTMrZTQxeUZUR3ZGUmcxMWsvVXBiZjROZkh0?=
+ =?utf-8?B?U2ZBOHZtY3JEeXI1eFI0SVlHcmplaG0xM2FvajMzSzk5TTNLU0JJN1oyNXFs?=
+ =?utf-8?B?N2lkMHhIQzVLN1l3Y2ZBUHRFbUZGaWpRZHRwQTN5a1p5YW5ZSFo2R2lFYmFQ?=
+ =?utf-8?B?WXRDbFE1YVI1WmxHYzBVbEtqL2lUNEs3YW1CVUdNb1BDSFYwMlBpU1ZCdkMv?=
+ =?utf-8?B?Ni9iVFZvNGxaTU1hUlNDaFNYTm1GRGQ4OUhEVHgrMWtjQmtKenNRSDVmVGcz?=
+ =?utf-8?B?Unp4RW9RbFgwdGt3V1pYYytabzRFbTVWblJaOGdxbnNuS3E4UFJrT0hhd29H?=
+ =?utf-8?B?VlBPRDdLbzBLUDVGdm9SR3l5RHJseFErTHFsRFlOVjFnM25iYzB1OUJ2cmNz?=
+ =?utf-8?B?ckFJMjJVdEhzc2pFM1U3YlJaYlVIVkphY1Z1Z1RFYTJuRWVJbnV5ak5VUDQ3?=
+ =?utf-8?B?WHF2SnRNNmhpSXZWRC9SWTZWZi9qWDk2TjZZUzRLbFNFNHQ5VWdnVXRadmtX?=
+ =?utf-8?B?cElPTFRlSmswb05pWFZ2RWhaMEtEOWRXUzJNWjdaNmtnMmI4bWFES295YzJi?=
+ =?utf-8?B?cGNOL1VDMDFWcUxyb0FEMTJiTGNodmFiSEF4L2VuTVNnb3RJYzdEQUhycm5n?=
+ =?utf-8?B?bUtOUVFCb1d0ZTB4WW0vNFdQbkY3Q3JGRnNLdHFrV1RtMWg0U21UZVlSOCs1?=
+ =?utf-8?B?MkZHMkxxOTBONHJzYXdyOFJJRTd0d1NWalJ6cXQxUElPYVBOd0N1eE1LbG9h?=
+ =?utf-8?B?UGJUS1NGb2ppYStUOTl0b3Z5WHZiQ1o5cXJVbk9vN2p5UlQvQ2J4NFppWVgx?=
+ =?utf-8?B?c0RkajROU3drTjM2SFNEczJCeEUzT3pEaHJuYlZ6UER6VnBYeEZHOGF6NXJo?=
+ =?utf-8?B?VmhYZ1FIUXF5bjdoNjZtOHdXV2dmaS91eW05c0J3SU1RckQyemJFbkl3Ynlj?=
+ =?utf-8?B?WmhQOGxhWS9pOEpqQ0hqcHdlV3VjSDFJQlNzOFBUbW1yemNXZmJZeWJGMWFY?=
+ =?utf-8?B?aTRQNXJJYUl0MHVncW1XRm51VXJIeWFQWC92NTM4QUpCY0ZTSEFNUUNsUll2?=
+ =?utf-8?B?YlZzclNzcS9VZEhQSkdhaXJSL2FpZDJ5QWZNaTdBQVZuL0ROVS9UU2U3Q2c5?=
+ =?utf-8?Q?XyQxDNuP7FscdXDrBBo+9Q1nv1nyAj9En3Pzm5yTyqqg?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e02559ed-b4d4-4f8c-51ff-08dbdec7574a
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6467.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 12:53:19.5789
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yCnCYdVsW53Us9LvFyIkaYgw5T182uNso7p4BpWVOjopIMpk41HahGhJ6rYG2hY34O7tdk3Xq9SjDxtmG2nmAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8823
 
-On Mon, Oct 16, 2023 at 12:08 PM -07, John Fastabend wrote:
-> This adds a test where both pairs of a af_unix paired socket are put into
-> a BPF map. This ensures that when we tear down the af_unix pair we don't
-> have any issues on sockmap side with ordering and reference counting.
->
-> Signed-off-by: John Fastabend <john.fastabend@gmail.com>
-> ---
->  .../selftests/bpf/prog_tests/sockmap_listen.c | 39 ++++++++++++++++---
->  .../selftests/bpf/progs/test_sockmap_listen.c |  7 ++++
->  2 files changed, 40 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> index 8df8cbb447f1..90e97907c1c1 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/sockmap_listen.c
-> @@ -1824,8 +1824,10 @@ static void inet_unix_skb_redir_to_connected(struct test_sockmap_listen *skel,
->  	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
->  }
->  
-> -static void unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
-> -					int verd_mapfd, enum redir_mode mode)
-> +static void unix_inet_redir_to_connected(int family, int type,
-> +					int sock_mapfd, int nop_mapfd,
-> +					int verd_mapfd,
-> +					enum redir_mode mode)
->  {
->  	const char *log_prefix = redir_mode_str(mode);
->  	int c0, c1, p0, p1;
-> @@ -1849,6 +1851,12 @@ static void unix_inet_redir_to_connected(int family, int type, int sock_mapfd,
->  	if (err)
->  		goto close;
->  
-> +	if (nop_mapfd >= 0) {
-> +		err = add_to_sockmap(nop_mapfd, c0, c1);
-> +		if (err)
-> +			goto close;
-> +	}
-> +
->  	n = write(c1, "a", 1);
->  	if (n < 0)
->  		FAIL_ERRNO("%s: write", log_prefix);
-> @@ -1883,6 +1891,7 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
->  					    struct bpf_map *inner_map, int family)
->  {
->  	int verdict = bpf_program__fd(skel->progs.prog_skb_verdict);
-> +	int nop_map = bpf_map__fd(skel->maps.nop_map);
->  	int verdict_map = bpf_map__fd(skel->maps.verdict_map);
->  	int sock_map = bpf_map__fd(inner_map);
->  	int err;
-> @@ -1892,14 +1901,32 @@ static void unix_inet_skb_redir_to_connected(struct test_sockmap_listen *skel,
->  		return;
->  
->  	skel->bss->test_ingress = false;
-> -	unix_inet_redir_to_connected(family, SOCK_DGRAM, sock_map, verdict_map,
-> +	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-> +				     sock_map, -1, verdict_map,
-> +				     REDIR_EGRESS);
-> +	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-> +				     sock_map, -1, verdict_map,
->  				     REDIR_EGRESS);
-> -	unix_inet_redir_to_connected(family, SOCK_STREAM, sock_map, verdict_map,
-> +
-> +	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-> +				     sock_map, nop_map, verdict_map,
-> +				     REDIR_EGRESS);
-> +	unix_inet_redir_to_connected(family, SOCK_STREAM,
-> +				     sock_map, nop_map, verdict_map,
->  				     REDIR_EGRESS);
->  	skel->bss->test_ingress = true;
-> -	unix_inet_redir_to_connected(family, SOCK_DGRAM, sock_map, verdict_map,
-> +	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-> +				     sock_map, -1, verdict_map,
-> +				     REDIR_INGRESS);
-> +	unix_inet_redir_to_connected(family, SOCK_STREAM,
-> +				     sock_map, -1, verdict_map,
-> +				     REDIR_INGRESS);
-> +
-> +	unix_inet_redir_to_connected(family, SOCK_DGRAM,
-> +				     sock_map, nop_map, verdict_map,
->  				     REDIR_INGRESS);
-> -	unix_inet_redir_to_connected(family, SOCK_STREAM, sock_map, verdict_map,
-> +	unix_inet_redir_to_connected(family, SOCK_STREAM,
-> +				     sock_map, nop_map, verdict_map,
->  				     REDIR_INGRESS);
->  
->  	xbpf_prog_detach2(verdict, sock_map, BPF_SK_SKB_VERDICT);
-> diff --git a/tools/testing/selftests/bpf/progs/test_sockmap_listen.c b/tools/testing/selftests/bpf/progs/test_sockmap_listen.c
-> index 464d35bd57c7..b7250eb9c30c 100644
-> --- a/tools/testing/selftests/bpf/progs/test_sockmap_listen.c
-> +++ b/tools/testing/selftests/bpf/progs/test_sockmap_listen.c
-> @@ -14,6 +14,13 @@ struct {
->  	__type(value, __u64);
->  } sock_map SEC(".maps");
->  
-> +struct {
-> +	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-> +	__uint(max_entries, 2);
-> +	__type(key, __u32);
-> +	__type(value, __u64);
-> +} nop_map SEC(".maps");
-> +
->  struct {
->  	__uint(type, BPF_MAP_TYPE_SOCKHASH);
->  	__uint(max_entries, 2);
+On 06.11.23 11:55, Bjørn Mork wrote:
 
-So... we have a bug in unix_inet_redir_to_connected() - it happily
-ignores the passed socket type, which is currently hardcoded to
-SOCK_DGRAM :-)
+> I believe that code is based on the (safe?) assumption that the struct
+> usbnet driver_info->tx_fixup points to cdc_ncm_tx_fixup().  And
 
-Which means these tests don't exercise unix_stream paths where the added
-psock->skpair is actually needed.
+That seems to be a correct assumption, but one that is far from obvious.
+Could you add a big, fat comment?
 
-But I'm able to reproduce the bug by running the VSOCK redir test:
+> cdc_ncm_tx_fixup does lots of weird stuff, including special handling of
+> NULL skb. It might return a valid skb for further processing by
+> usbnet_start_xmit().  If it doesn't, then we jump straight to
+> "not_drop", like we do when cdc_ncm_tx_fixup decides to eat the passed
+> skb.
+> 
+> But "funky" is i precise description of all this...  If someone feels
+> like it, then all that open coded skb queing inside cdc_ncm should be
+> completely rewritten.
 
-bash-5.2# ./test_progs -n 212/79
-[   23.232282] ==================================================================
-[   23.232634] BUG: KASAN: slab-use-after-free in sock_def_readable+0xe3/0x400
-[   23.232942] Read of size 8 at addr ffff8881013f9860 by task kworker/1:2/220
-[   23.233253]
-[   23.233326] CPU: 1 PID: 220 Comm: kworker/1:2 Tainted: G           OE      6.6.0 #30
-[   23.233697] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-[   23.234074] Workqueue: events sk_psock_backlog
-[   23.234271] Call Trace:
-[   23.234381]  <TASK>
-[   23.234477]  dump_stack_lvl+0x4a/0x90
-[   23.234640]  print_address_description.constprop.0+0x33/0x400
-[   23.234888]  ? preempt_count_sub+0x13/0xc0
-[   23.235071]  print_report+0xb6/0x260
-[   23.235228]  ? kasan_complete_mode_report_info+0x7c/0x1f0
-[   23.235462]  kasan_report+0xd0/0x110
-[   23.235619]  ? sock_def_readable+0xe3/0x400
-[   23.235801]  ? sock_def_readable+0xe3/0x400
-[   23.235989]  kasan_check_range+0xf7/0x1b0
-[   23.236164]  __kasan_check_read+0x11/0x20
-[   23.236340]  sock_def_readable+0xe3/0x400
-[   23.236514]  unix_stream_sendmsg+0x3c5/0x7d0
-[   23.236704]  ? queue_oob+0x300/0x300
-[   23.236865]  sock_sendmsg+0x229/0x250
-[   23.237030]  ? sock_write_iter+0x320/0x320
-[   23.237211]  ? __this_cpu_preempt_check+0x13/0x20
-[   23.237416]  ? lock_acquire+0x191/0x410
-[   23.237607]  ? lock_sync+0x110/0x110
-[   23.237766]  ? lock_is_held_type+0xd0/0x130
-[   23.237948]  ? __asan_storeN+0x12/0x20
-[   23.238115]  __skb_send_sock+0x4fa/0x670
-[   23.238288]  ? preempt_count_sub+0x13/0xc0
-[   23.238494]  ? sendmsg_locked+0x90/0x90
-[   23.238721]  ? sendmsg_unlocked+0x40/0x40
-[   23.238975]  ? __lock_acquire+0x765/0xf00
-[   23.239252]  ? __this_cpu_preempt_check+0x13/0x20
-[   23.239570]  ? lock_acquire+0x191/0x410
-[   23.239831]  skb_send_sock+0x10/0x20
-[   23.240079]  sk_psock_backlog+0x141/0x5e0
-[   23.240340]  ? __this_cpu_preempt_check+0x13/0x20
-[   23.240638]  process_one_work+0x49d/0x970
-[   23.240900]  ? drain_workqueue+0x1c0/0x1c0
-[   23.241173]  ? assign_work+0xe1/0x120
-[   23.241404]  worker_thread+0x380/0x680
-[   23.241660]  ? trace_hardirqs_on+0x22/0x100
-[   23.241933]  ? preempt_count_sub+0x13/0xc0
-[   23.242213]  ? process_one_work+0x970/0x970
-[   23.242491]  kthread+0x1ba/0x200
-[   23.242687]  ? kthread+0xfe/0x200
-[   23.242890]  ? kthread_complete_and_exit+0x20/0x20
-[   23.243193]  ret_from_fork+0x35/0x60
-[   23.243418]  ? kthread_complete_and_exit+0x20/0x20
-[   23.243718]  ret_from_fork_asm+0x11/0x20
-[   23.243995]  </TASK>
-[   23.244145]
-[   23.244227] Allocated by task 227:
-[   23.244446]  kasan_save_stack+0x26/0x50
-[   23.244709]  kasan_set_track+0x25/0x40
-[   23.244951]  kasan_save_alloc_info+0x1e/0x30
-[   23.245220]  __kasan_slab_alloc+0x72/0x80
-[   23.245491]  kmem_cache_alloc+0x182/0x360
-[   23.245758]  sk_prot_alloc+0x43/0x160
-[   23.246007]  sk_alloc+0x2c/0x3a0
-[   23.246216]  unix_create1+0x86/0x440
-[   23.246462]  unix_create+0x7d/0x100
-[   23.246701]  __sock_create+0x1bc/0x420
-[   23.246960]  __sys_socketpair+0x1ac/0x3a0
-[   23.247237]  __x64_sys_socketpair+0x4f/0x60
-[   23.247521]  do_syscall_64+0x38/0x90
-[   23.247769]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[   23.248113]
-[   23.248225] Freed by task 227:
-[   23.248444]  kasan_save_stack+0x26/0x50
-[   23.248707]  kasan_set_track+0x25/0x40
-[   23.248963]  kasan_save_free_info+0x2b/0x50
-[   23.249249]  ____kasan_slab_free+0x154/0x1c0
-[   23.249541]  __kasan_slab_free+0x12/0x20
-[   23.249810]  kmem_cache_free+0x1e7/0x480
-[   23.250084]  __sk_destruct+0x270/0x3f0
-[   23.250342]  sk_destruct+0x78/0x90
-[   23.250577]  __sk_free+0x51/0x160
-[   23.250807]  sk_free+0x45/0x70
-[   23.251025]  unix_release_sock+0x5cc/0x700
-[   23.251301]  unix_release+0x50/0x70
-[   23.251536]  __sock_release+0x5f/0x120
-[   23.251754]  sock_close+0x13/0x20
-[   23.252109]  __fput+0x1f3/0x470
-[   23.252451]  __fput_sync+0x2f/0x40
-[   23.252811]  __x64_sys_close+0x51/0x90
-[   23.253169]  do_syscall_64+0x38/0x90
-[   23.253480]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[   23.253940]
-[   23.254097] The buggy address belongs to the object at ffff8881013f9800
-[   23.254097]  which belongs to the cache UNIX-STREAM of size 1920
-[   23.254936] The buggy address is located 96 bytes inside of
-[   23.254936]  freed 1920-byte region [ffff8881013f9800, ffff8881013f9f80)
-[   23.255731]
-[   23.255844] The buggy address belongs to the physical page:
-[   23.256225] page:00000000c005ecb3 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff8881013f8000 pfn:0x1013f8
-[   23.256905] head:00000000c005ecb3 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-[   23.257382] flags: 0x2fffe000000840(slab|head|node=0|zone=2|lastcpupid=0x7fff)
-[   23.257791] page_type: 0xffffffff()
-[   23.257988] raw: 002fffe000000840 ffff888100961a40 dead000000000122 0000000000000000
-[   23.258418] raw: ffff8881013f8000 000000008010000e 00000001ffffffff 0000000000000000
-[   23.258817] page dumped because: kasan: bad access detected
-[   23.259131]
-[   23.259205] Memory state around the buggy address:
-[   23.259469]  ffff8881013f9700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   23.259871]  ffff8881013f9780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-[   23.260290] >ffff8881013f9800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   23.260704]                                                        ^
-[   23.261056]  ffff8881013f9880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   23.261469]  ffff8881013f9900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[   23.261854] ==================================================================
-[   23.262453] Disabling lock debugging due to kernel taint
-#212/79  sockmap_listen/sockmap VSOCK test_vsock_redir:OK
-#212     sockmap_listen:OK
-Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
-bash-5.2#
+I understand what you mean, but I need a generic answer. Can you call
+ndo_start_xmit() with skb == NULL?
 
-If I modify the test to use (AF_UNIX, SOCK_DGRAM) instead of
-SOCK_STREAM, the bug no longer reproduces.
+	Regards
+		Oliver
 
-Which confirms my thinking that unix_dgram_sendmsg is safe to use from
-sockmap because it grabs a ref to skpair.
 
