@@ -1,204 +1,130 @@
-Return-Path: <netdev+bounces-46257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F737E2EBC
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:14:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D20637E2EC2
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:15:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B46761C20756
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:14:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 326BB1F20F5E
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9A12E640;
-	Mon,  6 Nov 2023 21:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92E442E642;
+	Mon,  6 Nov 2023 21:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F74yB8bJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/waIwl8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63A02E639;
-	Mon,  6 Nov 2023 21:14:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6639CC433C8;
-	Mon,  6 Nov 2023 21:14:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699305269;
-	bh=yOk149MnqQ38qeZeV/4etw3iKo3CYD5n8FeZGzh/eFc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=F74yB8bJbDjRxQPrWVBp0rcIBA/1CoKPsUPx+XDnqKASkuUkdBYoh37c6UvH0cKhX
-	 wIxHDWgXtlPaGXOi2W+s/3s/ethyy+T8dEhuh+3qTBw41Ih6QVQRtAjnj2XKSjEY3v
-	 28EGdOEvc/f2W/zne9ZsmlPve6sIp/pDj7j79xv0CgxoQMQekl7+fUewO2yBJ0EmnJ
-	 qmShe+edLqsf1VPBmi7+UaDKjkj8NT+By+yBgfSQYVbL/ksvsb97pYZRYyDbtZWlyz
-	 DtLWQV/7wgITaX6YSQPJVjbAOFvL1oYPinGSTkqfFCxqBKYm3mkcWEKo42hx2iKgGv
-	 BS/6AeS9E4u9Q==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 06 Nov 2023 14:14:16 -0700
-Subject: [PATCH net v3] tcp: Fix -Wc23-extensions in tcp_options_write()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17EF62E639
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 21:15:04 +0000 (UTC)
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CC5AB3;
+	Mon,  6 Nov 2023 13:15:03 -0800 (PST)
+Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-4ac459d7962so1005468e0c.1;
+        Mon, 06 Nov 2023 13:15:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699305302; x=1699910102; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pDNcwAtyE05sKduQb5rMgv/slyyDqYM9dQystHpAe00=;
+        b=d/waIwl8ZhA+3fMGbwtKR/1HQ2FRL8sJJsPoARNUrIj8zRK8eO7BDXtgdodqgjiHLU
+         unS+H7Eo+A7ubP2doo1X9VDwtqXBTb3ZE2Z826gxkVF4W0np3D84TjK0bwBUS4W6KEoL
+         qBFnETI4bh8yk/HI3sm5F++bZk1MkQeh7O3+c3lcqALf1dcJTnQMH+BBcjMAcREoAYN1
+         AbMnGj1EzdZssMWjcM16p5fGRn00qXcOBLFkZxFhNtlcigbicTYrEPh7n57SXkrT2+Cj
+         jhacDSfXLrzR+cF+pM2dASy3gyLaxagYqaM/x+jFxgRDfvXU/TyTl5RSnksMGtFehfvY
+         wK8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699305302; x=1699910102;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pDNcwAtyE05sKduQb5rMgv/slyyDqYM9dQystHpAe00=;
+        b=aX5cbGP1wCwveuRfm4tKEgwNVCIrlD5DrRm910xvVAVp5pmL5H/X5MiGc/fVpUbZl3
+         ykvtYO8cH5Ez3/ejMX7SWUcIn5YKC0k/ieHa54C+lsJQfmUiDnbg1OWaJtdgFtx616KE
+         PV2OTpkPfHvPA9Fm4Ht3tgTK9Qq8h55Lw/WgOvsLWh+RqXxMaBUYjYRNFhDiKQKrf7mZ
+         4ZXR8CfbbQk6yNpRcFjtoLgPPPt0v23yPN9f3Az7xeObo4vsx2KwaM5fR/Oudog45rV5
+         73qi2paemTaAT40Q1m4AEtCvgjvf2goD4N6vaY4GiUItT2Du18y9A+ckgy5jN3nnmk/n
+         7YyA==
+X-Gm-Message-State: AOJu0YySOXuUrwY9uvsMK5z2lq1ujaCi0/VA0l+EtzQP6aA1saFuim5x
+	ZqR5sZlDUW213kinphNnAxKUpM/4VKuN/IWN8wQ=
+X-Google-Smtp-Source: AGHT+IFSfXgdSlZ+tas3UVj7xs8CWVob5ysFpk92liyDA5WPCjjGPD1amiOzYCm06+9kKyONPbaGF06Qrr1pItVwWII=
+X-Received: by 2002:a05:6122:4694:b0:49d:20fb:c899 with SMTP id
+ di20-20020a056122469400b0049d20fbc899mr441320vkb.4.1699305302147; Mon, 06 Nov
+ 2023 13:15:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org>
-X-B4-Tracking: v=1; b=H4sIACdXSWUC/52OQQ6CMBBFr2K6dgwDCNSV9zAuShmgEaakragh3
- N2GjXGpyz8/895fhCdnyIvTbhGOZuON5Riy/U7oXnFHYJqYRZqkGSYZQtATKAutecKgahrAMGg
- 7TvbODfigAo3EAR7KseEOqG4KLWVZ5bISETo5iq+b8CKYgrjGY298sO61jZhxq/71zQgIWpYZN
- ojHFsvzjRzTcLCu21xz+uFjUvzMTyNfIrVtQVjklf7ir+v6BkvB94tSAQAA
-To: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
- kuba@kernel.org, pabeni@redhat.com
-Cc: ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com, 
- noureddine@arista.com, hch@infradead.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.13-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4778; i=nathan@kernel.org;
- h=from:subject:message-id; bh=yOk149MnqQ38qeZeV/4etw3iKo3CYD5n8FeZGzh/eFc=;
- b=owGbwMvMwCEmm602sfCA1DTG02pJDKme4SaXfJoX3r0VsrR01445f1buSnbn39V4u66r97CQ1
- Z/WybukOkpZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEXhoyMrRMdQr09N8oPO8f
- j/P1DmaWLyskL7e/VMz67PNJdY7P/LsM/2wEWY5F8B9kWFs2qVvhvo/T68KqtuoNuzdnub/7lHO
- sgxUA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-11-almasrymina@google.com> <ZUk0FGuJ28s1d9OX@google.com>
+ <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
+In-Reply-To: <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 6 Nov 2023 13:14:25 -0800
+Message-ID: <CAF=yD-+MFpO5Hdqn+Q9X54SBpgcBeJvKTRD53X2oM4s8uVqnAQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <sdf@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
+> > IMHO, we need a better UAPI to receive the tokens and give them back to
+> > the kernel. CMSG + setsockopt(SO_DEVMEM_DONTNEED) get the job done,
+> > but look dated and hacky :-(
+> >
+> > We should either do some kind of user/kernel shared memory queue to
+> > receive/return the tokens (similar to what Jonathan was doing in his
+> > proposal?)
+>
+> I'll take a look at Jonathan's proposal, sorry, I'm not immediately
+> familiar but I wanted to respond :-) But is the suggestion here to
+> build a new kernel-user communication channel primitive for the
+> purpose of passing the information in the devmem cmsg? IMHO that seems
+> like an overkill. Why add 100-200 lines of code to the kernel to add
+> something that can already be done with existing primitives? I don't
+> see anything concretely wrong with cmsg & setsockopt approach, and if
+> we switch to something I'd prefer to switch to an existing primitive
+> for simplicity?
+>
+> The only other existing primitive to pass data outside of the linear
+> buffer is the MSG_ERRQUEUE that is used for zerocopy. Is that
+> preferred? Any other suggestions or existing primitives I'm not aware
+> of?
+>
+> > or bite the bullet and switch to io_uring.
+> >
+>
+> IMO io_uring & socket support are orthogonal, and one doesn't preclude
+> the other. As you know we like to use sockets and I believe there are
+> issues with io_uring adoption at Google that I'm not familiar with
+> (and could be wrong). I'm interested in exploring io_uring support as
+> a follow up but I think David Wei will be interested in io_uring
+> support as well anyway.
 
-  net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
-    663 |         }
-        |         ^
-  1 error generated.
+I also disagree that we need to replace a standard socket interface
+with something "faster", in quotes.
 
-On earlier releases (such as clang-11, the current minimum supported
-version for building the kernel) that do not support C23, this was a
-hard error unconditionally:
+This interface is not the bottleneck to the target workload.
 
-  net/ipv4/tcp_output.c:663:2: error: expected statement
-          }
-          ^
-  1 error generated.
+Replacing the synchronous sockets interface with something more
+performant for workloads where it is, is an orthogonal challenge.
+However we do that, I think that traditional sockets should continue
+to be supported.
 
-While adding a semicolon after the label would resolve this, it is more
-in line with the kernel as a whole to refactor this block into a
-standalone function, which means the goto a label construct can just be
-replaced with a return statement. Do so to resolve the warning.
-
-Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
-Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-Changes in v3:
-- Don't use a pointer to a pointer for ptr parameter to avoid the extra
-  indirection in process_tcp_ao_options(), just return the modified ptr
-  value back to the caller (Eric)
-- Link to v2: https://lore.kernel.org/r/20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org
-
-Changes in v2:
-- Break out problematic block into its own function so that goto can be
-  replaced with a simple return, instead of the simple semicolon
-  approach of v1 (Christoph)
-- Link to v1: https://lore.kernel.org/r/20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org
----
- net/ipv4/tcp_output.c | 70 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 39 insertions(+), 31 deletions(-)
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 0d8dd5b7e2e5..eb13a55d660c 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -601,6 +601,44 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
- }
- #endif
- 
-+static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
-+				      const struct tcp_request_sock *tcprsk,
-+				      struct tcp_out_options *opts,
-+				      struct tcp_key *key, __be32 *ptr)
-+{
-+#ifdef CONFIG_TCP_AO
-+	u8 maclen = tcp_ao_maclen(key->ao_key);
-+
-+	if (tcprsk) {
-+		u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
-+
-+		*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
-+			       (tcprsk->ao_keyid << 8) |
-+			       (tcprsk->ao_rcv_next));
-+	} else {
-+		struct tcp_ao_key *rnext_key;
-+		struct tcp_ao_info *ao_info;
-+
-+		ao_info = rcu_dereference_check(tp->ao_info,
-+			lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-+		rnext_key = READ_ONCE(ao_info->rnext_key);
-+		if (WARN_ON_ONCE(!rnext_key))
-+			return ptr;
-+		*ptr++ = htonl((TCPOPT_AO << 24) |
-+			       (tcp_ao_len(key->ao_key) << 16) |
-+			       (key->ao_key->sndid << 8) |
-+			       (rnext_key->rcvid));
-+	}
-+	opts->hash_location = (__u8 *)ptr;
-+	ptr += maclen / sizeof(*ptr);
-+	if (unlikely(maclen % sizeof(*ptr))) {
-+		memset(ptr, TCPOPT_NOP, sizeof(*ptr));
-+		ptr++;
-+	}
-+#endif
-+	return ptr;
-+}
-+
- /* Write previously computed TCP options to the packet.
-  *
-  * Beware: Something in the Internet is very sensitive to the ordering of
-@@ -629,37 +667,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
- 		opts->hash_location = (__u8 *)ptr;
- 		ptr += 4;
- 	} else if (tcp_key_is_ao(key)) {
--#ifdef CONFIG_TCP_AO
--		u8 maclen = tcp_ao_maclen(key->ao_key);
--
--		if (tcprsk) {
--			u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
--
--			*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
--				       (tcprsk->ao_keyid << 8) |
--				       (tcprsk->ao_rcv_next));
--		} else {
--			struct tcp_ao_key *rnext_key;
--			struct tcp_ao_info *ao_info;
--
--			ao_info = rcu_dereference_check(tp->ao_info,
--				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
--			rnext_key = READ_ONCE(ao_info->rnext_key);
--			if (WARN_ON_ONCE(!rnext_key))
--				goto out_ao;
--			*ptr++ = htonl((TCPOPT_AO << 24) |
--				       (tcp_ao_len(key->ao_key) << 16) |
--				       (key->ao_key->sndid << 8) |
--				       (rnext_key->rcvid));
--		}
--		opts->hash_location = (__u8 *)ptr;
--		ptr += maclen / sizeof(*ptr);
--		if (unlikely(maclen % sizeof(*ptr))) {
--			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
--			ptr++;
--		}
--out_ao:
--#endif
-+		ptr = process_tcp_ao_options(tp, tcprsk, opts, key, ptr);
- 	}
- 	if (unlikely(opts->mss)) {
- 		*ptr++ = htonl((TCPOPT_MSS << 24) |
-
----
-base-commit: c1ed833e0b3b7b9edc82b97b73b2a8a10ceab241
-change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
-
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
-
+The feature may already even work with io_uring, as both recvmsg with
+cmsg and setsockopt have io_uring support now.
 
