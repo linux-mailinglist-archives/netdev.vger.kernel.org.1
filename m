@@ -1,144 +1,164 @@
-Return-Path: <netdev+bounces-46120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C657E184A
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 02:19:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA477E1884
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 03:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9AEBB20D33
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 01:19:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05AA2B20CF0
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 02:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B41D3396;
-	Mon,  6 Nov 2023 01:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F10C644;
+	Mon,  6 Nov 2023 02:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="FpfHOKwL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Pw+7npYR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB9D2395
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 01:19:44 +0000 (UTC)
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D27DD;
-	Sun,  5 Nov 2023 17:19:43 -0800 (PST)
-Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.17.1.22/8.17.1.22) with ESMTP id 3A61BWrp004583;
-	Mon, 6 Nov 2023 01:19:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
-	 h=from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	PPS06212021; bh=K4pnxYoJ+KUr7qtKNvXwCC+8/biQl4yzw7nV3oJbvW0=; b=
-	FpfHOKwLuvDXvWFwHlkHGwOnbtGENolcziAQ0gw8Ke62R4fNXCToWY2dlxzLLPoH
-	8BCWaCtkKT+NekSFbzkqInd/XjI/k54LtLHCzK9Vr9K2lK7I0u00aMkTH0vsQEy+
-	yAVZ9a3N9yNimq4dEJhhFxBWnlTGbQ9emRNZIkZRjuNFuIl7OnaZIqGJJKah04JU
-	3uOkS7eHsbUrsNH+Izg8qVK7/ZWPo6sqWe9+1Xq8UA6cRMasI2lPy35NpYOT+Fj9
-	8j5j3T0g63IYugKhQxkxwhjR7mxIVw+S8tFiQRVBK2dZB5sPwGCjnAoOVaXujjnE
-	rP6jbkHnBmjS4vKEnKs7gA==
-Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 3u5b5x18xw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 06 Nov 2023 01:19:30 +0000 (GMT)
-Received: from ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Sun, 5 Nov 2023 17:19:31 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server id
- 15.1.2507.34 via Frontend Transport; Sun, 5 Nov 2023 17:19:29 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+8a78ecea7ac1a2ea26e5@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <reibax@gmail.com>,
-        <richardcochran@gmail.com>, <rrameshbabu@nvidia.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH] ptp: fix null ptr deref in ptp_ioctrl
-Date: Mon, 6 Nov 2023 09:19:26 +0800
-Message-ID: <20231106011926.2928881-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <000000000000e7b62806096c7d67@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D8E630
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 02:12:28 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2061.outbound.protection.outlook.com [40.107.100.61])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD9DE1;
+	Sun,  5 Nov 2023 18:12:26 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UORXS9lnyA6DLx5caCH5a/1A+CoZYmE8HVa2ew+wFbQejp7VYUbwRYu3wyuDTxfiqRI4H9xzc7nEMTsKPSyRdhNNVMb8Xv6ihj+pe/keVlcAlrOb41y+BNcRErRHQwMu6W956gC7IqXMvrHbDT8wgmPuW5G83yVgRjQQAEoOVnaatDTPc+M9vNGtUqsRjGVXtRf6jqjsKJ/BrA8sHYcscIy2kHa/D44uEUHR9adVlO8WsgYdm4OoOV2/cACaq+MSWIQGErXUZ5jfXsGb6A6vbwD0bvibUKB2eUIrY1YtCusPKsPp4UxyiTZmJpE7E06RpYgeb0IWLl0MZzqX124yAw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=O2YTKqvgykwhxtjydSseB0g6WKD2OmVVlfGwTWMt8Y4=;
+ b=mvEbCVwJNUcEWsbqBJYmz7lB0Y/VtKsMRMR1UZk2chiri9d+DKI966c/I9wi9ZQmm1jBlL7syDNwb5WZ2TIcu7gQdbo8XAy+glBpVi06gdWrTJr7Wo3F1H5OvwyGHW9kVR8bFVkdMoTFhF+y6vnatA5Z2cBej0MPV7c1Wz/V1O5h11VhMes/gCrdGVRlujm/K/3lXrttODcI8HvrHQ1RF5y7Ylu+KsCe+oJ7ryEEl1ErevIIBJfeTfiGNBshTgnBGDmqF9UJZysLXuTIKKaUM4p1+ebQkfl6Wjiglp8ePOTZbmZdeFQ5Gl4oXX8X/5n2PUxAsSpnd+fwb1gwjRrXxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O2YTKqvgykwhxtjydSseB0g6WKD2OmVVlfGwTWMt8Y4=;
+ b=Pw+7npYRcdyqOqFaJKL49tfPbFtwe89RX9q2n/+EOVzS5IPlRh2bUuWAKfVet7ZJ1g+ualvRrn1YEBJZ21Gg7Qv2N5BFSSpB5G6vt5SAKMvO1+1DG0C/ro9/Vw5wWDfj0wBu9D4QXtuwqv3VRrk16W+MHdTmZm5zZ096U/gNZSOtzG7eq7mvd6Gt+beGwHocbLxcvpp3pLKoTWIH8TmytYHomYVxmwPjlBjAgFcVGSwy44mjLkTKtr1yubRn4Jfpf2H4fx+u01UoqIw+0JXh62mdbTOqkSmCwterYY0/NcmCepZ0JtdmB3dwRIupegJX4ZV/d2qw6+7x7JnIT9y84w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by IA1PR12MB6433.namprd12.prod.outlook.com (2603:10b6:208:3af::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6933.29; Mon, 6 Nov
+ 2023 02:12:24 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::a24:3ff6:51d6:62dc]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::a24:3ff6:51d6:62dc%4]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
+ 02:12:24 +0000
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Lizhi Xu <lizhi.xu@windriver.com>
+Cc: <syzbot+8a78ecea7ac1a2ea26e5@syzkaller.appspotmail.com>,
+  <davem@davemloft.net>,  <linux-kernel@vger.kernel.org>,
+  <netdev@vger.kernel.org>,  <reibax@gmail.com>,
+  <richardcochran@gmail.com>,  <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH] ptp: fix null ptr deref in ptp_ioctrl
 References: <000000000000e7b62806096c7d67@google.com>
+	<20231106011926.2928881-1-lizhi.xu@windriver.com>
+Date: Sun, 05 Nov 2023 18:12:14 -0800
+In-Reply-To: <20231106011926.2928881-1-lizhi.xu@windriver.com> (Lizhi Xu's
+	message of "Mon, 6 Nov 2023 09:19:26 +0800")
+Message-ID: <877cmvhbpd.fsf@nvidia.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0046.namprd03.prod.outlook.com
+ (2603:10b6:a03:33e::21) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: LbJdJ5OTJzXKelAKrb_qclTiGzYOGAH5
-X-Proofpoint-ORIG-GUID: LbJdJ5OTJzXKelAKrb_qclTiGzYOGAH5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-05_21,2023-11-02_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 mlxscore=0 priorityscore=1501 spamscore=0 adultscore=0
- suspectscore=0 bulkscore=0 malwarescore=0 mlxlogscore=499 clxscore=1011
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2310240000 definitions=main-2311060008
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|IA1PR12MB6433:EE_
+X-MS-Office365-Filtering-Correlation-Id: d0900799-c8e6-41c2-ea53-08dbde6dd0cd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	kX2ntwoSIzn/simzmB0Ov9vbTZHfujXH2dFCLRTyKS7+PjScGRbJVy1BPH6yjIBXAEgXteXVni6FtCBbNOkuQpXH46CJras+rgpAxwA2Jr1aC/cu0ZOnlAk9ffIOLEJA6Ws4Z/xS1ryTn6DlDZZ9BCvKQT5kO657pv5YmpW6kTBifAxDtw2c1qAJdrNFdnJ8/vxy8L7aJMyq8DfEYbX2RKGmPke77vDNWsiuQSuORKxexsg/XSebHd2p3WKXLNa4yhFa4k2VcryG+/ey4C1xoXcmy9KyJjMEMlLcvlbj5YZesRfV5aHHDpv1kL6i8fSTexdLuW2bCFBdkmFg4JnkbXcn3xdz5WdshleavAozYqgIliOIbCOhs8TDR02pNyAqZBUmvUquWGVP/GNtYYPFSKYEYaw+DUFmUs9heRSwS7C2winrq4QR/M3evabQliMAHB0jCgxNTPYaqF7XoQTe5KgpDIKOWRef9X5FYPKUWCTeBi0NCAl2Lh6BBxlVDXWCfjyUCVLF8BOVjKBqamPhQlHQEZyvBHc+VKV8h1nRtPZyJZjy4m4KdgL+hxCk09f+uQZeef1ZnN0+umreWDCl6wntRpN/DduWqMdPKCkT/tk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39860400002)(396003)(366004)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(26005)(6506007)(6512007)(2616005)(38100700002)(86362001)(36756003)(83380400001)(5660300002)(6916009)(2906002)(8676002)(66556008)(316002)(66946007)(66476007)(54906003)(8936002)(4326008)(6666004)(41300700001)(6486002)(966005)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?f1+vanvGcMIaeKHmHBOmeh4X61mMUmLb+kZzYU9e1RrHEBrpTUI81eAnIw8+?=
+ =?us-ascii?Q?JwQ/29ufmYZS9U+RadAURzhcGlfK+rUMyPegJnh3wkgBXEq6uuGurqnVBBml?=
+ =?us-ascii?Q?+mwMV2J9kjvPszVNS4fbjTnfH2t052XiekeUV3ZGShfNJrjAbIDIiMdZ0eSL?=
+ =?us-ascii?Q?UiA7ekQWiKSt4a7N5G2dJ02Tq1IX896HWl+qWi1RCgtQwRwGYUCc7fjOR6YU?=
+ =?us-ascii?Q?XunBVUwx5C2FFZCOmiLpC/4vUMePApws7v5CLQzpPClBPYwwpFQpXKIvDJ0q?=
+ =?us-ascii?Q?dHSMgpl3gg0JXaxdwMnaP241aqrTgs6F7kcktYEofP5N8mRSoRxx5+26nQjR?=
+ =?us-ascii?Q?NdXpw12gLlNj1DulnFI+NNSnMLwLBR0whOKtxfa4yLxz+wdeWdnatXh6oqBS?=
+ =?us-ascii?Q?gX4Myi7+TaMp/uxXB01e9AKnZE0Sm/QJ58erjyyDlJ1p/kwHFFV4HD7cHNYk?=
+ =?us-ascii?Q?KZmP0v3VhdfcgtcMae88e5LbSW6EypxJr2o3u2DqcXiRKA474Fyuyz1GukXx?=
+ =?us-ascii?Q?SXzy2xWB9qUfiFWgVry/UYFAtAJ73M8naG52nxlgmRcQNp6pTiUpmKNcF5PU?=
+ =?us-ascii?Q?qlP9hNFLHmVHEULtq1ZPOgKHy4Dy3rzYrECbLJpwRKO7ancMcdBsso7+n7KJ?=
+ =?us-ascii?Q?6CvFudy0GH/1Afbjr9Ae7ZCBARw3nEQzBKB6mK6w/aMB6Y4rPUxBOQHjWmvY?=
+ =?us-ascii?Q?Fe9vhH5ajJkCnVZmUBUMY0fQnjyd7qq8gpzy4Sk3rfbfn05AgrI1jDyqYFF6?=
+ =?us-ascii?Q?EKZYFVk3kfmC+TBqN2KP+1jDSavOZx4nnQOYXyd0hD0GUApnj1+871lezGac?=
+ =?us-ascii?Q?wqP1RpijixA6YQ04XrM2tTOJLVLdzGbpRgqwi+58oxH8D6NggGGkANuQ7WFm?=
+ =?us-ascii?Q?NNvYU6vJr06ocSMHHRyH2GB/DYqxQflnRItt3QdXCiZ3lR/rb6khHzZ4XlmP?=
+ =?us-ascii?Q?pad4m0LPJGk0K7wlr5enhkDFPHRPPRmxYVDAkc7JKBuPx9Mm2WoSrBYja+Wb?=
+ =?us-ascii?Q?ZYI72lhwvDNCQyh/5oOiIfrBJUSB1fJfHWa8OH3qHDAgv/We1cbUCNury2x1?=
+ =?us-ascii?Q?tyQDYNy9PlwyWEgMzxqthbosQO3qR+VG+8R45z/ha6QWZ18bAhxCzk0SMM7h?=
+ =?us-ascii?Q?JY1VvHQE9W/bVr21sRUlm/3MwpHFEIr4UopI9r6579oFxh7khutohEpPe8ZK?=
+ =?us-ascii?Q?omzskv/hFHATYcOaAUkXPc8vw58vnbJ9map19hvn5Fd/vRpchtuHNcgjRki8?=
+ =?us-ascii?Q?tviBc9Z2JmobZlA4dnYu5f4+sbEOOSJs3HXi9Ddcqpc8cxhZm8VqLdcf3Sy+?=
+ =?us-ascii?Q?Vb0emnqr0BVXjUttP/fSg76IJIpMUs9aWaOvRpxC/FWsjTEp/cFwAxdKZToE?=
+ =?us-ascii?Q?Kpp9I9MNtp/9j3DwagLIDSqSi/OmG9k6rnQHs4xkhk0p14qP8ukuFMuUvNDh?=
+ =?us-ascii?Q?Iv0PKJZsO8oOKfRZ4YRM9/X9xQj3/uSb/eqm4VsBAXw8lPJNZFY2+TgP2aRA?=
+ =?us-ascii?Q?kY8xexNelcNY5vBO4Akc49DVe7V3au0cwS541nRnU6KGiLkFik9LCTnEX5UJ?=
+ =?us-ascii?Q?V7v/yMcTsKQTKLjjvvAQnFrUTYulC2z0u1ZoDG8r?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0900799-c8e6-41c2-ea53-08dbde6dd0cd
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 02:12:24.0705
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 25T3iwknh/bXD3HKt7cJpDQnu75tdZysk7Mmq5nf1KZLPHvpQfR4iFh1YpG9c84+b6Xorgob4CLd/+NLZG32gQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6433
 
-In the logs recorded in the strace log,
-https://syzkaller.appspot.com/text?tag=CrashLog&x=11aa125f680000
-...
-openat(AT_FDCWD, "/dev/ptp0", O_RDONLY) = 3
-read(3, 0x20000080, 90)                 = -1 EINVAL (Invalid argument)
-general protection fault, probably for non-canonical address 0xdffffc000000020b: 0000 [#1] PREEMPT SMP KASAN
-KASAN: probably user-memory-access in range [0x0000000000001058-0x000000000000105f]
-CPU: 0 PID: 5053 Comm: syz-executor353 Not tainted 6.6.0-syzkaller-10396-g4652b8e4f3ff #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
-RIP: 0010:ptp_ioctl+0xcb7/0x1d10
-Code: 81 fe 13 3d 00 00 0f 85 9c 02 00 00 e8 c2 83 23 fa 49 8d bc 24 58 10 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 dc 0e 00 00 49 8b bc 24 58 10 00 00 ba 00 01 00
-RSP: 0018:ffffc90003a37ba0 EFLAGS: 00010212
-RAX: dffffc0000000000 RBX: ffff88814a78a000 RCX: ffffffff8764f81f
-RDX: 000000000000020b RSI: ffffffff8765028e RDI: 0000000000001058
-RBP: ffffc90003a37ec0 R08: 0000000000000005 R09: ffffc90003a37c40
-R10: 0000000000003d13 R11: 0000000000000000 R12: 0000000000000000
-R13: ffffc90003a37c80 R14: 0000000000003d13 R15: ffffffff92ac78e8
-FS:  00005555569a9380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000040 CR3: 0000000076e09000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- ? show_regs+0x8f/0xa0
- ? die_addr+0x4f/0xd0
- ? exc_general_protection+0x154/0x230
- ? asm_exc_general_protection+0x26/0x30
- ? ptp_ioctl+0x22f/0x1d10
- ? ptp_ioctl+0xc9e/0x1d10
- ? ptp_ioctl+0xcb7/0x1d10
- ? ptp_release+0x2b0/0x2b0
- ? lockdep_hardirqs_on_prepare+0x410/0x410
- ? lock_sync+0x190/0x190
- ? find_held_lock+0x2d/0x110
- ? ptp_release+0x2b0/0x2b0
- posix_clock_ioctl+0xf8/0x160
-...
+On Mon, 06 Nov, 2023 09:19:26 +0800 Lizhi Xu <lizhi.xu@windriver.com> wrote:
 
-It can be confirmed that after the execution of "read (3, 0x20000080, 90)",
-ptp_release() will be called to release the queue and set
-pccontext->private_clkdata = NULL at the same time, this is unreasonable and
-incorrect. The queue is not the memory requested in ptp_read() and should not
-be released in ptp_read().
+<snip>
 
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
- drivers/ptp/ptp_chardev.c | 2 --
- 1 file changed, 2 deletions(-)
+>
+> It can be confirmed that after the execution of "read (3, 0x20000080, 90)",
+> ptp_release() will be called to release the queue and set
+> pccontext->private_clkdata = NULL at the same time, this is unreasonable and
+> incorrect. The queue is not the memory requested in ptp_read() and should not
+> be released in ptp_read().
+>
+> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> ---
+>  drivers/ptp/ptp_chardev.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+> index 282cd7d24077..27c1ef493617 100644
+> --- a/drivers/ptp/ptp_chardev.c
+> +++ b/drivers/ptp/ptp_chardev.c
+> @@ -585,7 +585,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+>  free_event:
+>  	kfree(event);
+>  exit:
+> -	if (result < 0)
+> -		ptp_release(pccontext);
+>  	return result;
+>  }
 
-diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
-index 282cd7d24077..27c1ef493617 100644
---- a/drivers/ptp/ptp_chardev.c
-+++ b/drivers/ptp/ptp_chardev.c
-@@ -585,7 +585,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
- free_event:
- 	kfree(event);
- exit:
--	if (result < 0)
--		ptp_release(pccontext);
- 	return result;
- }
--- 
-2.25.1
+There is already an ongoing review for a patch submission that covers this.
 
+  https://lore.kernel.org/netdev/tencent_856E1C97CCE9E2ED66CC087B526CD42ED50A@qq.com/
+
+--
+Thanks,
+
+Rahul Rameshbabu
 
