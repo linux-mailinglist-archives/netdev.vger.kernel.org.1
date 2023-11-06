@@ -1,68 +1,191 @@
-Return-Path: <netdev+bounces-46284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 478127E3170
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 00:31:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1FC7E3178
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 00:32:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 014B6280DBF
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:31:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5EE11C20976
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82A12FE0D;
-	Mon,  6 Nov 2023 23:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B722FE0D;
+	Mon,  6 Nov 2023 23:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNdBel3d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0fFLegmb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C572FE06;
-	Mon,  6 Nov 2023 23:31:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF5E9C433C8;
-	Mon,  6 Nov 2023 23:31:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699313480;
-	bh=JF45N7SvDGNe1/DnJ6JDzkSciGkbttJ81sShj/TaZxU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rNdBel3d9S4mNMTr7FjimvVKJIgCIBjiPdJW7EjojE5/PU22ldre5RwEqjnUjgOBy
-	 8K4sI9HEgk2ASe67yaqIBu7m6SXFs8+V5CH9ZaScv2dMUZEDRFy4LTzxecOozPstdb
-	 ZBFsp49OJWnf5u/ReoqKiPpgIpt2jmCCk2/UqDJ8kbeOoY+qhuwuXTFoqjb06nwQHW
-	 R/l6Zbn/falsH49pEIh+Cd7Ar6Pq1Y3yZyc7eRoTid7BgHhk//DAyfX0yhZ0k3N5PB
-	 J/xrTWjsKCsv+bqexoDybDDft7XZpUz8IL90wDCcYzZ3onQHX7M49bXZcxMLL4p2U5
-	 cJObovkMEs4bA==
-Date: Mon, 6 Nov 2023 15:31:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org,
- magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com,
- hawk@kernel.org, yoong.siang.song@intel.com, netdev@vger.kernel.org,
- xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v5 00/13] xsk: TX metadata
-Message-ID: <20231106153118.4efb5b93@kernel.org>
-In-Reply-To: <20231102225837.1141915-1-sdf@google.com>
-References: <20231102225837.1141915-1-sdf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B0A2EB0B
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:32:40 +0000 (UTC)
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED703D75
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 15:32:37 -0800 (PST)
+Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-4a18f724d47so1654795e0c.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 15:32:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699313557; x=1699918357; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=whIvC0sNba4bFzFOhrMovdRgssWrwgttcPpuIWiql/s=;
+        b=0fFLegmbL+Iaw2NnAVRviDlP/OLm9i/CKzG4iU/X2gMdRfz6aMmu5/Lmv0lhbcz6a9
+         0cOVzosG3ZULPed5qqIEAS8I0H9UjqEkxU7AS8S6swCnYUA50PMNgBoGjZUVmzJFiVmS
+         2LEQAWHf7LI9fv90CLTZVsLzuw4xc84SYwlH3J7mDfWyvLLFVDRB4wG3cTq0PnEt1p3X
+         4FoN/GRHBTqkmResJghw2NgA4vvC8Px3oxjqNlNODNHrbB51SdSp/svRZFM4VC7vjTL0
+         YLH+BLj6Jh7pGQH83RnksObHNPNrOKBBdERwO3OVaNEZ4Faxb4/lMJo4akEP34zP5SNf
+         4x2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699313557; x=1699918357;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=whIvC0sNba4bFzFOhrMovdRgssWrwgttcPpuIWiql/s=;
+        b=aTZJuDKZaQP777aM4Vm51YEXVyOXEK+KrKYCygC8z66DTJVbQecAAjlsrFpZT2VxIA
+         AZmnowI2/uvaXBKRTW8KitIbE9VmyGSTw+bv3DXVsfcjy2ezrYX6jY2LPuBtGZstgon0
+         roXwBpEmqSWbubIA22PlrUTYdmOgCLzR9Jwz/ESeHWulXvfPiES1eQJ7nAY2l1D54MxO
+         vIjzeojBGluIpT2A0+XZhgKUYS6mm6AKQg/+v7h8Js+rKLNCpkbolwX8ol4ek3La1/RP
+         WIINHMD/YDOwQgD7k/zlzH/Zvkatj6ny3chvIa37a6M/RD/mwGfokJcdW20/PzdxgcTB
+         KeMg==
+X-Gm-Message-State: AOJu0Yyd8HHYc30AiDybTLiszjnBxkiiXHHn0jJUwh+HrNp4FKgYtMJ1
+	LQ6r3txqpmR1vuACUs7u/CpnI4LuWcAqeL4VdH3Y4w==
+X-Google-Smtp-Source: AGHT+IGmUk3aoWvy+y4mxwNHeg1dbWxOSmuBU86aI53ERZ2BByHAM1yuczTbLq3vsaQkYp3X4vYpf4DlMVyUBfadW3s=
+X-Received: by 2002:a1f:9d04:0:b0:4ac:6a9d:c49b with SMTP id
+ g4-20020a1f9d04000000b004ac6a9dc49bmr2214430vke.14.1699313556771; Mon, 06 Nov
+ 2023 15:32:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-11-almasrymina@google.com> <ZUk0FGuJ28s1d9OX@google.com>
+ <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
+ <CAF=yD-+MFpO5Hdqn+Q9X54SBpgcBeJvKTRD53X2oM4s8uVqnAQ@mail.gmail.com>
+ <ZUlp8XutSAScKs_0@google.com> <CAF=yD-JZ88j+44MYgX-=oYJngz4Z0zw6Y0V3nHXisZJtNu7q6A@mail.gmail.com>
+In-Reply-To: <CAF=yD-JZ88j+44MYgX-=oYJngz4Z0zw6Y0V3nHXisZJtNu7q6A@mail.gmail.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Mon, 6 Nov 2023 15:32:22 -0800
+Message-ID: <CAKH8qBueYgpxQTvTwngOs6RNjy9yvLF92s1p5nFrobw_UprNMQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu,  2 Nov 2023 15:58:24 -0700 Stanislav Fomichev wrote:
-> This series implements initial TX metadata (offloads) for AF_XDP.
-> See patch #2 for the main implementation and mlx5/stmmac ones for the
-> example on how to consume the metadata on the device side.
-> 
-> Starting with two types of offloads:
-> - request TX timestamp (and write it back into the metadata area)
-> - request TX checksum offload
+On Mon, Nov 6, 2023 at 2:56=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> On Mon, Nov 6, 2023 at 2:34=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
+> wrote:
+> >
+> > On 11/06, Willem de Bruijn wrote:
+> > > > > IMHO, we need a better UAPI to receive the tokens and give them b=
+ack to
+> > > > > the kernel. CMSG + setsockopt(SO_DEVMEM_DONTNEED) get the job don=
+e,
+> > > > > but look dated and hacky :-(
+> > > > >
+> > > > > We should either do some kind of user/kernel shared memory queue =
+to
+> > > > > receive/return the tokens (similar to what Jonathan was doing in =
+his
+> > > > > proposal?)
+> > > >
+> > > > I'll take a look at Jonathan's proposal, sorry, I'm not immediately
+> > > > familiar but I wanted to respond :-) But is the suggestion here to
+> > > > build a new kernel-user communication channel primitive for the
+> > > > purpose of passing the information in the devmem cmsg? IMHO that se=
+ems
+> > > > like an overkill. Why add 100-200 lines of code to the kernel to ad=
+d
+> > > > something that can already be done with existing primitives? I don'=
+t
+> > > > see anything concretely wrong with cmsg & setsockopt approach, and =
+if
+> > > > we switch to something I'd prefer to switch to an existing primitiv=
+e
+> > > > for simplicity?
+> > > >
+> > > > The only other existing primitive to pass data outside of the linea=
+r
+> > > > buffer is the MSG_ERRQUEUE that is used for zerocopy. Is that
+> > > > preferred? Any other suggestions or existing primitives I'm not awa=
+re
+> > > > of?
+> > > >
+> > > > > or bite the bullet and switch to io_uring.
+> > > > >
+> > > >
+> > > > IMO io_uring & socket support are orthogonal, and one doesn't precl=
+ude
+> > > > the other. As you know we like to use sockets and I believe there a=
+re
+> > > > issues with io_uring adoption at Google that I'm not familiar with
+> > > > (and could be wrong). I'm interested in exploring io_uring support =
+as
+> > > > a follow up but I think David Wei will be interested in io_uring
+> > > > support as well anyway.
+> > >
+> > > I also disagree that we need to replace a standard socket interface
+> > > with something "faster", in quotes.
+> > >
+> > > This interface is not the bottleneck to the target workload.
+> > >
+> > > Replacing the synchronous sockets interface with something more
+> > > performant for workloads where it is, is an orthogonal challenge.
+> > > However we do that, I think that traditional sockets should continue
+> > > to be supported.
+> > >
+> > > The feature may already even work with io_uring, as both recvmsg with
+> > > cmsg and setsockopt have io_uring support now.
+> >
+> > I'm not really concerned with faster. I would prefer something cleaner =
+:-)
+> >
+> > Or maybe we should just have it documented. With some kind of path
+> > towards beautiful world where we can create dynamic queues..
+>
+> I suppose we just disagree on the elegance of the API.
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+Yeah, I might be overly sensitive to the apis that use get/setsockopt
+for something more involved than setting a flag.
+Probably because I know that bpf will (unnecessarily) trigger on these :-D
+I had to implement that bpf "bypass" (or fastpath) for
+TCP_ZEROCOPY_RECEIVE and it looks like this token recycle might also
+benefit from something similar.
+
+> The concise notification API returns tokens as a range for
+> compression, encoding as two 32-bit unsigned integers start + length.
+> It allows for even further batching by returning multiple such ranges
+> in a single call.
+
+Tangential: should tokens be u64? Otherwise we can't have more than
+4gb unacknowledged. Or that's a reasonable constraint?
+
+
+> This is analogous to the MSG_ZEROCOPY notification mechanism from
+> kernel to user.
+>
+> The synchronous socket syscall interface can be replaced by something
+> asynchronous like io_uring. This already works today? Whatever
+> asynchronous ring-based API would be selected, io_uring or otherwise,
+> I think the concise notification encoding would remain as is.
+>
+> Since this is an operation on a socket, I find a setsockopt the
+> fitting interface.
 
