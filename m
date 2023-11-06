@@ -1,242 +1,201 @@
-Return-Path: <netdev+bounces-46216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0DD97E289F
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:26:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A65D7E28D5
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CEB2812FE
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:26:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64BF81C20B63
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:36:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2C428E12;
-	Mon,  6 Nov 2023 15:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD9C28E1D;
+	Mon,  6 Nov 2023 15:36:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P1AY/QkL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1kwXDyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E69528E07
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 15:26:19 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2571FD61
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 07:26:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699284377; x=1730820377;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=C5xAmnqBSRvl7cD+EhLOcdeNwbvjBkRZfdt4wnE0Pxw=;
-  b=P1AY/QkLFrwrHeHodIE7SovbWijUqcmgV6Gdg9t64A6vix8DHHVGE9MU
-   NPol/Io6lx9fxODNs/d0tn7Slt8LXdLhLqA4BqMQJvqjC4tQ81KF4qfRX
-   FbedZg3IdiivW3n2U/YfKzRIa0r39wec3SSQor2uY55D3p1b/5Or/GLWT
-   LO+ALghyOztO7WeFK2Snf/OzJGSXAKHbHbQkUtz4Qj/48us61oKfiLH2m
-   EfPj+HRJKnYEJB/z4q/wtP77xbj+ZCv/5BigrklZCX3NrkX4WuCDObJWK
-   bnUZgAyWcZhUgfYL30ZlBt1IYF/wY0bW9aLRNIoFy3q165NoS37qAOFSE
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="389105791"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="389105791"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 07:26:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="791492585"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="791492585"
-Received: from unknown (HELO fedora.jf.intel.com) ([10.166.244.154])
-  by orsmga008.jf.intel.com with ESMTP; 06 Nov 2023 07:26:15 -0800
-From: Paul Greenwalt <paul.greenwalt@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	horms@kernel.org,
-	tony.brelinski@intel.com,
-	Dan Nowlin <dan.nowlin@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH iwl-net v2] ice: fix DDP package download for packages without signature segment
-Date: Mon,  6 Nov 2023 10:18:08 -0500
-Message-ID: <20231106151808.421280-2-paul.greenwalt@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231106151808.421280-1-paul.greenwalt@intel.com>
-References: <20231106151808.421280-1-paul.greenwalt@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47094F9F2;
+	Mon,  6 Nov 2023 15:36:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC4DC433C7;
+	Mon,  6 Nov 2023 15:36:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699285000;
+	bh=41GPekPzS1l/B/L0Wph3EEtN8ju8TJlotN/m7ed36wA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=E1kwXDyWj51NgF8PJXSRF0dnJ5JaSdAp9uTDanVEigIU4T2oA23267Ec4zlRCMLe8
+	 eHRocL7tUq3+McgZc58rLwo1hMd4zPaOxC76mnY0IhZbO8gSoU5tzGbxCjwJXjmiEj
+	 0UCGsyqB/gdUGl8/zYpXgE/mfvBG4cj6XXHeomGHa5pEc0wykoS/XwKm0ljNSS8rSa
+	 wjD47Y7bBonf6iDrknDGFEGROupXL/u3ZvDZOvPltQXXGuRxvAwnz/I1Icy1S2jc7M
+	 1e6uBGcsgVWgAAHgFx/D8pfs9QKIG2JXtiu79YmH1YAfeVNrlzl2KjDCHx9OKDtjKY
+	 m+eIjjGmxTjuA==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Mon, 06 Nov 2023 08:36:07 -0700
+Subject: [PATCH net v2] tcp: Fix -Wc23-extensions in tcp_options_write()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAOYHSWUC/52OwQ6CMBBEf8Xs2TUsqIAn/8NwKO0CjbAlbUUN4
+ d9t+ASPM5OZNysE9pYD3A4reF5ssE6SyI8H0IOSntGapCHP8oKygjDqGZXDzn5wVC2PaAW1m2b
+ 3EoMhqsgTS8S38mKlR27NVdd1WZ3rCtLo7DlVd+ADhCM0yRxsiM5/9xML7dG/vIWQUNdlQYbo0
+ lF5f7IXHk/O99Bs2/YD74jdb/IAAAA=
+To: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
+ kuba@kernel.org, pabeni@redhat.com
+Cc: ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com, 
+ noureddine@arista.com, hch@infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4584; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=41GPekPzS1l/B/L0Wph3EEtN8ju8TJlotN/m7ed36wA=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDKmeHOxGBjpBT+fOFl5w9VNg+osVZc9j1C+zuq3/9UlE3
+ Jf93WK/jlIWBjEOBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjAR/mxGhqa9jhlfH3rd6Yt8
+ eO8Co4/ky47vPEoGn85ypUbO2cq/k5nhf9rMufvveIieZj6oXHW24rGI3aElB37NsNA7lql4e2m
+ SOzMA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-From: Dan Nowlin <dan.nowlin@intel.com>
+Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
 
-Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
-incorrectly removed support for package download for packages without a
-signature segment. These packages include the signature buffer inline
-in the configurations buffers, and not in a signature segment.
+  net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+    663 |         }
+        |         ^
+  1 error generated.
 
-Fix package download by providing download support for both packages
-with (ice_download_pkg_with_sig_seg()) and without signature segment
-(ice_download_pkg_without_sig_seg()).
+On earlier releases (such as clang-11, the current minimum supported
+version for building the kernel) that do not support C23, this was a
+hard error unconditionally:
 
-Fixes: 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
-Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+  net/ipv4/tcp_output.c:663:2: error: expected statement
+          }
+          ^
+  1 error generated.
+
+While adding a semicolon after the label would resolve this, it is more
+in line with the kernel as a whole to refactor this block into a
+standalone function, which means the goto a label construct can just be
+replaced with a simple return. Do so to resolve the warning.
+
+Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
+Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 ---
-Changelog
-v2->v3:
-- correct Reported-by email address.
-___
+Please let me know if this function should have a different name. I
+think I got all the changes of the function shuffle correct but some
+testing would be appreciated.
 
- drivers/net/ethernet/intel/ice/ice_ddp.c | 106 ++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 3 deletions(-)
+Changes in v2:
+- Break out problematic block into its own function so that goto can be
+  replaced with a simple return, instead of the simple semicolon
+  approach of v1 (Christoph)
+- Link to v1: https://lore.kernel.org/r/20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org
+---
+ net/ipv4/tcp_output.c | 69 ++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 38 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index cfb1580f5850..3f1a11d0252c 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -1479,14 +1479,14 @@ ice_post_dwnld_pkg_actions(struct ice_hw *hw)
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 0d8dd5b7e2e5..3f8dc74fbf40 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -601,6 +601,43 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
  }
+ #endif
  
- /**
-- * ice_download_pkg
-+ * ice_download_pkg_with_sig_seg
-  * @hw: pointer to the hardware structure
-  * @pkg_hdr: pointer to package header
-  *
-  * Handles the download of a complete package.
-  */
- static enum ice_ddp_state
--ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
-+ice_download_pkg_with_sig_seg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- {
- 	enum ice_aq_err aq_err = hw->adminq.sq_last_status;
- 	enum ice_ddp_state state = ICE_DDP_PKG_ERR;
-@@ -1519,6 +1519,106 @@ ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- 		state = ice_post_dwnld_pkg_actions(hw);
- 
- 	ice_release_global_cfg_lock(hw);
-+
-+	return state;
-+}
-+
-+/**
-+ * ice_dwnld_cfg_bufs
-+ * @hw: pointer to the hardware structure
-+ * @bufs: pointer to an array of buffers
-+ * @count: the number of buffers in the array
-+ *
-+ * Obtains global config lock and downloads the package configuration buffers
-+ * to the firmware.
-+ */
-+static enum ice_ddp_state
-+ice_dwnld_cfg_bufs(struct ice_hw *hw, struct ice_buf *bufs, u32 count)
++static void process_tcp_ao_options(struct tcp_sock *tp,
++				   const struct tcp_request_sock *tcprsk,
++				   struct tcp_out_options *opts,
++				   struct tcp_key *key, __be32 **ptr)
 +{
-+	enum ice_ddp_state state = ICE_DDP_PKG_SUCCESS;
-+	struct ice_buf_hdr *bh;
-+	int status;
++#ifdef CONFIG_TCP_AO
++	u8 maclen = tcp_ao_maclen(key->ao_key);
 +
-+	if (!bufs || !count)
-+		return ICE_DDP_PKG_ERR;
++	if (tcprsk) {
++		u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
 +
-+	/* If the first buffer's first section has its metadata bit set
-+	 * then there are no buffers to be downloaded, and the operation is
-+	 * considered a success.
-+	 */
-+	bh = (struct ice_buf_hdr *)bufs;
-+	if (le32_to_cpu(bh->section_entry[0].type) & ICE_METADATA_BUF)
-+		return ICE_DDP_PKG_SUCCESS;
++		*(*ptr)++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
++				  (tcprsk->ao_keyid << 8) |
++				  (tcprsk->ao_rcv_next));
++	} else {
++		struct tcp_ao_key *rnext_key;
++		struct tcp_ao_info *ao_info;
 +
-+	status = ice_acquire_global_cfg_lock(hw, ICE_RES_WRITE);
-+	if (status) {
-+		if (status == -EALREADY)
-+			return ICE_DDP_PKG_ALREADY_LOADED;
-+		return ice_map_aq_err_to_ddp_state(hw->adminq.sq_last_status);
++		ao_info = rcu_dereference_check(tp->ao_info,
++			lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
++		rnext_key = READ_ONCE(ao_info->rnext_key);
++		if (WARN_ON_ONCE(!rnext_key))
++			return;
++		*(*ptr)++ = htonl((TCPOPT_AO << 24) |
++				  (tcp_ao_len(key->ao_key) << 16) |
++				  (key->ao_key->sndid << 8) |
++				  (rnext_key->rcvid));
 +	}
-+
-+	state = ice_dwnld_cfg_bufs_no_lock(hw, bufs, 0, count, true);
-+	if (!state)
-+		state = ice_post_dwnld_pkg_actions(hw);
-+
-+	ice_release_global_cfg_lock(hw);
-+
-+	return state;
++	opts->hash_location = (__u8 *)(*ptr);
++	*ptr += maclen / sizeof(**ptr);
++	if (unlikely(maclen % sizeof(**ptr))) {
++		memset(*ptr, TCPOPT_NOP, sizeof(**ptr));
++		(*ptr)++;
++	}
++#endif
 +}
 +
-+/**
-+ * ice_download_pkg_without_sig_seg
-+ * @hw: pointer to the hardware structure
-+ * @ice_seg: pointer to the segment of the package to be downloaded
-+ *
-+ * Handles the download of a complete package without signature segment.
-+ */
-+static enum ice_ddp_state
-+ice_download_pkg_without_sig_seg(struct ice_hw *hw, struct ice_seg *ice_seg)
-+{
-+	struct ice_buf_table *ice_buf_tbl;
-+	enum ice_ddp_state state;
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Segment format version: %d.%d.%d.%d\n",
-+		  ice_seg->hdr.seg_format_ver.major,
-+		  ice_seg->hdr.seg_format_ver.minor,
-+		  ice_seg->hdr.seg_format_ver.update,
-+		  ice_seg->hdr.seg_format_ver.draft);
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Seg: type 0x%X, size %d, name %s\n",
-+		  le32_to_cpu(ice_seg->hdr.seg_type),
-+		  le32_to_cpu(ice_seg->hdr.seg_size), ice_seg->hdr.seg_id);
-+
-+	ice_buf_tbl = ice_find_buf_table(ice_seg);
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Seg buf count: %d\n",
-+		  le32_to_cpu(ice_buf_tbl->buf_count));
-+
-+	state = ice_dwnld_cfg_bufs(hw, ice_buf_tbl->buf_array,
-+				   le32_to_cpu(ice_buf_tbl->buf_count));
-+
-+	return state;
-+}
-+
-+/**
-+ * ice_download_pkg
-+ * @hw: pointer to the hardware structure
-+ * @pkg_hdr: pointer to package header
-+ * @ice_seg: pointer to the segment of the package to be downloaded
-+ *
-+ * Handles the download of a complete package.
-+ */
-+static enum ice_ddp_state
-+ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr,
-+		 struct ice_seg *ice_seg)
-+{
-+	enum ice_ddp_state state;
-+
-+	if (hw->pkg_has_signing_seg)
-+		state = ice_download_pkg_with_sig_seg(hw, pkg_hdr);
-+	else
-+		state = ice_download_pkg_without_sig_seg(hw, ice_seg);
-+
- 	ice_post_pkg_dwnld_vlan_mode_cfg(hw);
- 
- 	return state;
-@@ -2083,7 +2183,7 @@ enum ice_ddp_state ice_init_pkg(struct ice_hw *hw, u8 *buf, u32 len)
- 
- 	/* initialize package hints and then download package */
- 	ice_init_pkg_hints(hw, seg);
--	state = ice_download_pkg(hw, pkg);
-+	state = ice_download_pkg(hw, pkg, seg);
- 	if (state == ICE_DDP_PKG_ALREADY_LOADED) {
- 		ice_debug(hw, ICE_DBG_INIT,
- 			  "package previously loaded - no work.\n");
+ /* Write previously computed TCP options to the packet.
+  *
+  * Beware: Something in the Internet is very sensitive to the ordering of
+@@ -629,37 +666,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+ 		opts->hash_location = (__u8 *)ptr;
+ 		ptr += 4;
+ 	} else if (tcp_key_is_ao(key)) {
+-#ifdef CONFIG_TCP_AO
+-		u8 maclen = tcp_ao_maclen(key->ao_key);
+-
+-		if (tcprsk) {
+-			u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
+-
+-			*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
+-				       (tcprsk->ao_keyid << 8) |
+-				       (tcprsk->ao_rcv_next));
+-		} else {
+-			struct tcp_ao_key *rnext_key;
+-			struct tcp_ao_info *ao_info;
+-
+-			ao_info = rcu_dereference_check(tp->ao_info,
+-				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
+-			rnext_key = READ_ONCE(ao_info->rnext_key);
+-			if (WARN_ON_ONCE(!rnext_key))
+-				goto out_ao;
+-			*ptr++ = htonl((TCPOPT_AO << 24) |
+-				       (tcp_ao_len(key->ao_key) << 16) |
+-				       (key->ao_key->sndid << 8) |
+-				       (rnext_key->rcvid));
+-		}
+-		opts->hash_location = (__u8 *)ptr;
+-		ptr += maclen / sizeof(*ptr);
+-		if (unlikely(maclen % sizeof(*ptr))) {
+-			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
+-			ptr++;
+-		}
+-out_ao:
+-#endif
++		process_tcp_ao_options(tp, tcprsk, opts, key, &ptr);
+ 	}
+ 	if (unlikely(opts->mss)) {
+ 		*ptr++ = htonl((TCPOPT_MSS << 24) |
 
-base-commit: 016b9332a3346e97a6cacffea0f9dc10e1235a75
+---
+base-commit: c1ed833e0b3b7b9edc82b97b73b2a8a10ceab241
+change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
+
+Best regards,
 -- 
-2.41.0
+Nathan Chancellor <nathan@kernel.org>
 
 
