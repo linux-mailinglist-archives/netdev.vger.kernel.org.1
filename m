@@ -1,111 +1,375 @@
-Return-Path: <netdev+bounces-46122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E89B7E1898
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 03:27:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 128887E18B8
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 03:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE289281259
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 02:27:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 323F8B20D98
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 02:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25DA64F;
-	Mon,  6 Nov 2023 02:27:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E435A31;
+	Mon,  6 Nov 2023 02:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ix4w//19"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TRBQh02o"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8648D64C
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 02:27:33 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 982E4D6;
-	Sun,  5 Nov 2023 18:27:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699237652; x=1730773652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2GJpYqysQuTF5tqL/b1VeNnpS+0M2mXiG2Sc6wszklQ=;
-  b=ix4w//199YS1AIjn0/AYfqwrANvPFHlbDbIaOgJRuA0iXVsruSmXYGD2
-   j8TWwUvx40fdU8WOufGtUpZVfEpzbkQuR4aPgCAQFLHM3tdWtZRk+s5WS
-   338NSboLI6QdsBgGpEqaXg9r8pA8EyXIPEu6hqOXD7mavPkfLmTc5RpC+
-   SSZhonOLv0NRDwJXy1KyeVea3lFHAB8Mki0XJt813RSi0Dexw+n4Qv9V4
-   GGh4/HybLHJ/rnhbo0nkfiVv2VxnvyZChY0pQGvMku0Xp+Zr8kEynKCs7
-   FYsSRm2ZPRTwl3BKwOOx+ExDzydjBneR6uCjXtcfe54mi1hRTRSCRR4lA
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="420310411"
-X-IronPort-AV: E=Sophos;i="6.03,280,1694761200"; 
-   d="scan'208";a="420310411"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2023 18:27:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="885760713"
-X-IronPort-AV: E=Sophos;i="6.03,280,1694761200"; 
-   d="scan'208";a="885760713"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 05 Nov 2023 18:27:28 -0800
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qzpKn-00060u-2U;
-	Mon, 06 Nov 2023 02:27:25 +0000
-Date: Mon, 6 Nov 2023 10:26:47 +0800
-From: kernel test robot <lkp@intel.com>
-To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
-	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
-Subject: Re: [PATCH net-next v10 12/13] net:ethernet:realtek: Update the
- Makefile and Kconfig in the realtek folder
-Message-ID: <202311060957.C85OYvxq-lkp@intel.com>
-References: <20231102154505.940783-13-justinlai0215@realtek.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47FB199
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 02:44:22 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94099100
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 18:44:19 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5afbcffe454so81303277b3.3
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 18:44:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699238658; x=1699843458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sp+hYAUZTc06RYPWJdBOgGluYhcxVNOvLIAb9uVqzaA=;
+        b=TRBQh02oXE1zB24Mf2sA3q2XC8tR0in0w8Iv36Mjv6FlWuaR4cgJBx6p4wOGGWPLu8
+         EdOQM/UF6lT9ruyabrICfvRi4rBvUGoDYTKqgJPvpu0am8ToFgQRaOminD854hAg8VKg
+         TvoTaqBnela0F/qruU65AvSS+7WjH+wCdk/sjJoc5m0xHuAr8vFmv5fwq8J1w9wcOHfl
+         uJsroPMCJDhDUWiwKvSRJoOpRLHni8lDxyb8BQJmdhubPXUlLPgV9wkB+VXUTdSERE1y
+         RmU4Jd5bGq8TyzcyXnjeSlnvTn5XWowl3evZo6jzFjOebgfTbwaTTEj8bSYdvNomT1WX
+         aPaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699238658; x=1699843458;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Sp+hYAUZTc06RYPWJdBOgGluYhcxVNOvLIAb9uVqzaA=;
+        b=COYiMAozZXd+w+Xu6vxHJIsG5AoH/defd3gc3LykC3ck8lVbs4gxoCBQg0Hcoz4P95
+         VCzdaWSVJhfpOcBNYUeykh1bPJ2uJoAtKxJm91rnU5lGh6HEOdHKGKOweLKm3okMMsDX
+         W6l51ANGfvfbeL6f4efaP7yubxfehM/cHaPtatnrkwaoMFkYj8F9V/v38DpydBDXte+A
+         PuwFkRBNjJc+GqYwgeWoAk2kf4f780cU7N7M0cZLyKoqG8i7PtQK2pLzRT18VHwNsCXQ
+         lsA9uFbJfu7Lg5yRDj5X7C6zkDUhsVgt4SbBv++XzAhvbZ57eNWJLPJMxgQSw9leJZgB
+         Tvwg==
+X-Gm-Message-State: AOJu0YwvjnKpQ+8tmwyI7IpbiXzNgbXjjLEKB8iu2SPEtueqeY/v+fW+
+	z1DlhuDsiFHfNC2ht/O5DatxTYqaucID7AJ7bzkZvemC/38gjB87wfAp3YvY9R+OlXnHOAfacxt
+	5U9G6mFBjTU5O6Ztj4mvt6VoU8XWZ/GIRa4vNLFidbqal5XLMBrZa+n3fkvfYu0OSi2fKtlhsnG
+	w=
+X-Google-Smtp-Source: AGHT+IGnuAfdlVJP41lHA/nTbtKFLzUzs3m0rNvZ6H4sTLSVpHSiqAfuURFhbOGHi4LN2t4rE5zsPo/O2PYcQ+2WDQ==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:35de:fff:97b7:db3e])
+ (user=almasrymina job=sendgmr) by 2002:a25:6907:0:b0:d9a:cbf9:1c8d with SMTP
+ id e7-20020a256907000000b00d9acbf91c8dmr510046ybc.12.1699238658163; Sun, 05
+ Nov 2023 18:44:18 -0800 (PST)
+Date: Sun,  5 Nov 2023 18:43:59 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231102154505.940783-13-justinlai0215@realtek.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231106024413.2801438-1-almasrymina@google.com>
+Subject: [RFC PATCH v3 00/12] Device Memory TCP
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org
+Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, 
+	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Justin,
+Changes in RFC v3:
+------------------
 
-kernel test robot noticed the following build errors:
+1. Pulled in the memory-provider dependency from Jakub's RFC[1] to make the
+   series reviewable and mergable.
 
-[auto build test ERROR on net-next/main]
+2. Implemented multi-rx-queue binding which was a todo in v2.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20231103-032946
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231102154505.940783-13-justinlai0215%40realtek.com
-patch subject: [PATCH net-next v10 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20231106/202311060957.C85OYvxq-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231106/202311060957.C85OYvxq-lkp@intel.com/reproduce)
+3. Fix to cmsg handling.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311060957.C85OYvxq-lkp@intel.com/
+The sticking point in RFC v2[2] was the device reset required to refill
+the device rx-queues after the dmabuf bind/unbind. The solution
+suggested as I understand is a subset of the per-queue management ops
+Jakub suggested or similar:
 
-All errors (new ones prefixed by >>):
+https://lore.kernel.org/netdev/20230815171638.4c057dcd@kernel.org/
 
->> drivers/net/ethernet/realtek/rtase/rtase_main.c:68:10: fatal error: net/page_pool.h: No such file or directory
-      68 | #include <net/page_pool.h>
-         |          ^~~~~~~~~~~~~~~~~
-   compilation terminated.
+This is not addressed in this revision, because:
 
+1. This point was discussed at netconf & netdev and there is openness to
+   using the current approach of requiring a device reset.
 
-vim +68 drivers/net/ethernet/realtek/rtase/rtase_main.c
+2. Implementing individual queue resetting seems to be difficult for my
+   test bed with GVE. My prototype to test this ran into issues with the
+   rx-queues not coming back up properly if reset individually. At the
+   moment I'm unsure if it's a mistake in the POC or a genuine issue in
+   the virtualization stack behind GVE, which currently doesn't test
+   individual rx-queue restart.
 
-db2657d0fa3a98 Justin Lai 2023-11-02 @68  #include <net/page_pool.h>
-db2657d0fa3a98 Justin Lai 2023-11-02  69  #include <net/pkt_cls.h>
-db2657d0fa3a98 Justin Lai 2023-11-02  70  
+3. Our usecases are not bothered by requiring a device reset to refill
+   the buffer queues, and we'd like to support NICs that run into this
+   limitation with resetting individual queues.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+My thought is that drivers that have trouble with per-queue configs can
+use the support in this series, while drivers that support new netdev
+ops to reset individual queues can automatically reset the queue as
+part of the dma-buf bind/unbind.
+
+The same approach with device resets is presented again for consideration
+with other sticking points addressed.
+
+This proposal includes the rx devmem path only proposed for merge. For a
+snapshot of my entire tree which includes the GVE POC page pool support &
+device memory support:
+
+https://github.com/torvalds/linux/compare/master...mina:linux:tcpdevmem-v3
+
+[1] https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@red=
+hat.com/T/
+[2] https://lore.kernel.org/netdev/CAHS8izOVJGJH5WF68OsRWFKJid1_huzzUK+hpKb=
+LcL4pSOD1Jw@mail.gmail.com/T/
+
+Cc: Shakeel Butt <shakeelb@google.com>
+Cc: Jeroen de Borst <jeroendb@google.com>
+Cc: Praveen Kaligineedi <pkaligineedi@google.com>
+
+Changes in RFC v2:
+------------------
+
+The sticking point in RFC v1[1] was the dma-buf pages approach we used to
+deliver the device memory to the TCP stack. RFC v2 is a proof-of-concept
+that attempts to resolve this by implementing scatterlist support in the
+networking stack, such that we can import the dma-buf scatterlist
+directly. This is the approach proposed at a high level here[2].
+
+Detailed changes:
+1. Replaced dma-buf pages approach with importing scatterlist into the
+   page pool.
+2. Replace the dma-buf pages centric API with a netlink API.
+3. Removed the TX path implementation - there is no issue with
+   implementing the TX path with scatterlist approach, but leaving
+   out the TX path makes it easier to review.
+4. Functionality is tested with this proposal, but I have not conducted
+   perf testing yet. I'm not sure there are regressions, but I removed
+   perf claims from the cover letter until they can be re-confirmed.
+5. Added Signed-off-by: contributors to the implementation.
+6. Fixed some bugs with the RX path since RFC v1.
+
+Any feedback welcome, but specifically the biggest pending questions
+needing feedback IMO are:
+
+1. Feedback on the scatterlist-based approach in general.
+2. Netlink API (Patch 1 & 2).
+3. Approach to handle all the drivers that expect to receive pages from
+   the page pool (Patch 6).
+
+[1] https://lore.kernel.org/netdev/dfe4bae7-13a0-3c5d-d671-f61b375cb0b4@gma=
+il.com/T/
+[2] https://lore.kernel.org/netdev/CAHS8izPm6XRS54LdCDZVd0C75tA1zHSu6jLVO8n=
+zTLXCc=3DH7Nw@mail.gmail.com/
+
+----------------------
+
+* TL;DR:
+
+Device memory TCP (devmem TCP) is a proposal for transferring data to and/o=
+r
+from device memory efficiently, without bouncing the data to a host memory
+buffer.
+
+* Problem:
+
+A large amount of data transfers have device memory as the source and/or
+destination. Accelerators drastically increased the volume of such transfer=
+s.
+Some examples include:
+- ML accelerators transferring large amounts of training data from storage =
+into
+  GPU/TPU memory. In some cases ML training setup time can be as long as 50=
+% of
+  TPU compute time, improving data transfer throughput & efficiency can hel=
+p
+  improving GPU/TPU utilization.
+
+- Distributed training, where ML accelerators, such as GPUs on different ho=
+sts,
+  exchange data among them.
+
+- Distributed raw block storage applications transfer large amounts of data=
+ with
+  remote SSDs, much of this data does not require host processing.
+
+Today, the majority of the Device-to-Device data transfers the network are
+implemented as the following low level operations: Device-to-Host copy,
+Host-to-Host network transfer, and Host-to-Device copy.
+
+The implementation is suboptimal, especially for bulk data transfers, and c=
+an
+put significant strains on system resources, such as host memory bandwidth,
+PCIe bandwidth, etc. One important reason behind the current state is the
+kernel=E2=80=99s lack of semantics to express device to network transfers.
+
+* Proposal:
+
+In this patch series we attempt to optimize this use case by implementing
+socket APIs that enable the user to:
+
+1. send device memory across the network directly, and
+2. receive incoming network packets directly into device memory.
+
+Packet _payloads_ go directly from the NIC to device memory for receive and=
+ from
+device memory to NIC for transmit.
+Packet _headers_ go to/from host memory and are processed by the TCP/IP sta=
+ck
+normally. The NIC _must_ support header split to achieve this.
+
+Advantages:
+
+- Alleviate host memory bandwidth pressure, compared to existing
+ network-transfer + device-copy semantics.
+
+- Alleviate PCIe BW pressure, by limiting data transfer to the lowest level
+  of the PCIe tree, compared to traditional path which sends data through t=
+he
+  root complex.
+
+* Patch overview:
+
+** Part 1: netlink API
+
+Gives user ability to bind dma-buf to an RX queue.
+
+** Part 2: scatterlist support
+
+Currently the standard for device memory sharing is DMABUF, which doesn't
+generate struct pages. On the other hand, networking stack (skbs, drivers, =
+and
+page pool) operate on pages. We have 2 options:
+
+1. Generate struct pages for dmabuf device memory, or,
+2. Modify the networking stack to process scatterlist.
+
+Approach #1 was attempted in RFC v1. RFC v2 implements approach #2.
+
+** part 3: page pool support
+
+We piggy back on page pool memory providers proposal:
+https://github.com/kuba-moo/linux/tree/pp-providers
+
+It allows the page pool to define a memory provider that provides the
+page allocation and freeing. It helps abstract most of the device memory
+TCP changes from the driver.
+
+** part 4: support for unreadable skb frags
+
+Page pool iovs are not accessible by the host; we implement changes
+throughput the networking stack to correctly handle skbs with unreadable
+frags.
+
+** Part 5: recvmsg() APIs
+
+We define user APIs for the user to send and receive device memory.
+
+Not included with this RFC is the GVE devmem TCP support, just to
+simplify the review. Code available here if desired:
+https://github.com/mina/linux/tree/tcpdevmem
+
+This RFC is built on top of net-next with Jakub's pp-providers changes
+cherry-picked.
+
+* NIC dependencies:
+
+1. (strict) Devmem TCP require the NIC to support header split, i.e. the
+   capability to split incoming packets into a header + payload and to put
+   each into a separate buffer. Devmem TCP works by using device memory
+   for the packet payload, and host memory for the packet headers.
+
+2. (optional) Devmem TCP works better with flow steering support & RSS supp=
+ort,
+   i.e. the NIC's ability to steer flows into certain rx queues. This allow=
+s the
+   sysadmin to enable devmem TCP on a subset of the rx queues, and steer
+   devmem TCP traffic onto these queues and non devmem TCP elsewhere.
+
+The NIC I have access to with these properties is the GVE with DQO support
+running in Google Cloud, but any NIC that supports these features would suf=
+fice.
+I may be able to help reviewers bring up devmem TCP on their NICs.
+
+* Testing:
+
+The series includes a udmabuf kselftest that show a simple use case of
+devmem TCP and validates the entire data path end to end without
+a dependency on a specific dmabuf provider.
+
+** Test Setup
+
+Kernel: net-next with this RFC and memory provider API cherry-picked
+locally.
+
+Hardware: Google Cloud A3 VMs.
+
+NIC: GVE with header split & RSS & flow steering support.
+
+Jakub Kicinski (2):
+  net: page_pool: factor out releasing DMA from releasing the page
+  net: page_pool: create hooks for custom page providers
+
+Mina Almasry (10):
+  net: netdev netlink api to bind dma-buf to a net device
+  netdev: support binding dma-buf to netdevice
+  netdev: netdevice devmem allocator
+  memory-provider: dmabuf devmem memory provider
+  page-pool: device memory support
+  net: support non paged skb frags
+  net: add support for skbs with unreadable frags
+  tcp: RX path for devmem TCP
+  net: add SO_DEVMEM_DONTNEED setsockopt to release RX pages
+  selftests: add ncdevmem, netcat for devmem TCP
+
+ Documentation/netlink/specs/netdev.yaml |  28 ++
+ include/linux/netdevice.h               |  93 ++++
+ include/linux/skbuff.h                  |  56 ++-
+ include/linux/socket.h                  |   1 +
+ include/net/netdev_rx_queue.h           |   1 +
+ include/net/page_pool/helpers.h         | 151 ++++++-
+ include/net/page_pool/types.h           |  55 +++
+ include/net/sock.h                      |   2 +
+ include/net/tcp.h                       |   5 +-
+ include/uapi/asm-generic/socket.h       |   6 +
+ include/uapi/linux/netdev.h             |  10 +
+ include/uapi/linux/uio.h                |  10 +
+ net/core/datagram.c                     |   6 +
+ net/core/dev.c                          | 240 +++++++++++
+ net/core/gro.c                          |   7 +-
+ net/core/netdev-genl-gen.c              |  14 +
+ net/core/netdev-genl-gen.h              |   1 +
+ net/core/netdev-genl.c                  | 118 +++++
+ net/core/page_pool.c                    | 209 +++++++--
+ net/core/skbuff.c                       |  80 +++-
+ net/core/sock.c                         |  36 ++
+ net/ipv4/tcp.c                          | 205 ++++++++-
+ net/ipv4/tcp_input.c                    |  13 +-
+ net/ipv4/tcp_ipv4.c                     |   7 +
+ net/ipv4/tcp_output.c                   |   5 +-
+ net/packet/af_packet.c                  |   4 +-
+ tools/include/uapi/linux/netdev.h       |  10 +
+ tools/net/ynl/generated/netdev-user.c   |  42 ++
+ tools/net/ynl/generated/netdev-user.h   |  47 ++
+ tools/testing/selftests/net/.gitignore  |   1 +
+ tools/testing/selftests/net/Makefile    |   5 +
+ tools/testing/selftests/net/ncdevmem.c  | 546 ++++++++++++++++++++++++
+ 32 files changed, 1950 insertions(+), 64 deletions(-)
+ create mode 100644 tools/testing/selftests/net/ncdevmem.c
+
+--=20
+2.42.0.869.gea05f2083d-goog
+
 
