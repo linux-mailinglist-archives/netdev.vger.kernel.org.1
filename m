@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-46255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26DE47E2E7A
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:56:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B6357E2E8C
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16982809B3
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 20:56:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F17A1C20750
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF1F2D781;
-	Mon,  6 Nov 2023 20:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD052E417;
+	Mon,  6 Nov 2023 21:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ziHh/aIF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vv8kFQiu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E3829CF7
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 20:56:43 +0000 (UTC)
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79D8D78
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:56:41 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cc281f1214so39693925ad.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 12:56:41 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695D32D035
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 21:02:42 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D09D51
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:02:41 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc1ddb34ccso32169285ad.1
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 13:02:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699304201; x=1699909001; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699304560; x=1699909360; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=arPwDeCFdRaC5606yGK22eodQyXfqpKFdElw4+wOp+Y=;
-        b=ziHh/aIFvo6N6MyxzgNXH375xkB1tWcG5/44kFckWODsyRclFzTa0ua5XlrUwZw+9E
-         N0P299UgahHVOJk8//C/BKlpneMw6foUl+DV+KKPnMUrxUKffVwHYW2XJwEwdqsTSn6o
-         hRd+NvDO1nV2wrVay+S+M6U0mpVX5uCrbx0aFCvZuVIY6l78swB9jMdh4s94o+R2514k
-         zzEJdNlaQyk4rUsJLidfY0Y2uMiynwmnyYOjAiXbDYlBb9aPchZSLAcH7TUf+j9LSwYK
-         quNVP0iNH/YHDUJTW2+mN3UPEbUXIc0tBJi+dQ5tKuzFag7JaN6xpsosAxfV/s2w84Bx
-         s6GQ==
+        bh=3YVT/6GQJuQ7TjvhzDWajYThozSBRZLd2V3VGmhBHao=;
+        b=Vv8kFQiunIrTYiM6C/oHgHrTapbPb7JHDyQy8sV+NGrJVj1vpNrYPabj6l1M/3k/pe
+         0KSaaQUhg/ZcT1F6kyHn9rRU9tsCGw6mAcPy1W2Muj+zT0GcbkKhL4D8SwhyL48Uj4UZ
+         rFF1SSEqPu+xI1Kekzu58oyXrQ4wUJNx/0fMnKc1m487QZyiAIBOoj05pUveCBtBrMxk
+         eFetU/y0BG/3cbcuiXHfrCIGHvvDBx7MW7aUUulBj/sRFKx8ycriSAw+tMYWERMHyG1E
+         N4TWBgSpWVRrFhtU7AKB35RgNVw2OAXLY9vuE+BX0uGx/b73D3X4to8/XWfcxOmD2Pvf
+         dqeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699304201; x=1699909001;
+        d=1e100.net; s=20230601; t=1699304560; x=1699909360;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=arPwDeCFdRaC5606yGK22eodQyXfqpKFdElw4+wOp+Y=;
-        b=vQU+ecPQfN7ejHJ+aeUP7FkTJxHbVtnoilWHmIQpx3xWi3qyxKyQ6XtLkdjUiHdsy9
-         89/qyAxa0HOnZGSnHgqTRLewvh6CjcKwR9BYarhEgdkXyIoRyC8zjwFkEL1OwAeaCgw4
-         QG0OvdDzfSQZrFCUKVmPoSoIfztHHAgolgMZvQw/o+m+upG8XTSQV3e9I7Czcbdjm0ww
-         hJ6vkX0k2FmSGxMQww+QslJT1E4l9qDTEgTQlGguWkPJdt06BZbo2HZFW5wBhjQa2hFh
-         uqXPvosLIL0clV0+LpbRy3aMDrPmcOnSK5dqM48H5nJ2eSpEP+PF0m4otB82dnQpNd9c
-         cMfg==
-X-Gm-Message-State: AOJu0Yy7ef7q6za1OZ6gdT3GjbBLvnL3UYon8d/vHVR42WkGkGn3f5w2
-	d19xgXkynUJXVljWcvsTKiBXyQI=
-X-Google-Smtp-Source: AGHT+IH5YcYILA3SRp5xgCugD4rJNBs/UUciPiEsDuN9TZoTiWvh1fdpijNAL37ojAOMtIu1NnLdA0s=
+        bh=3YVT/6GQJuQ7TjvhzDWajYThozSBRZLd2V3VGmhBHao=;
+        b=QXk5BkEsi1rHfk+fFmI5uTCAv76LXC1h+XTIvd1YNlIBY5I+t6OMXkbScFz1mSIxpb
+         Nec7ZA7gzBBH/NLu+cz9aTGxTfzKuMrYjj9OxFPdipgJTlZLePkJL32Q8klpqfJplTOB
+         UB7mCIb+SyD5vkiy/9pGatn/udwyj5j5Zu7JnUGVuc/C+NEvhOf5QnlcHLqwlbreG8e3
+         25gLJBMvU6C9499FhMC/FZ+v1LLPL6NyFvnnk+XB5U2RNeF42jKRTqjo/NpEfmjmyxQq
+         NXhM0qivSYWdT1NUM5K4xTgT04Kukn1MDO1AwZ9CuTsS+x76R5RE+nwXoaRRy0Dm3ArB
+         SQcw==
+X-Gm-Message-State: AOJu0YzHoNvG4TrDnLiIiBCciDVSigDtZGyvbaJBblAh6UmghrnNnOAi
+	95Rmpgf+x3lS9vIhw1r/M11m9oA=
+X-Google-Smtp-Source: AGHT+IFMk9K2QPc1yRl8QNToni4u3wTj7lMIW1WMnLhrEu9KTQ1j0Kkg7CJFxK+wf+6qBsS5/cJoFOo=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:ed42:b0:1cc:446c:7701 with SMTP id
- y2-20020a170902ed4200b001cc446c7701mr419825plb.12.1699304201375; Mon, 06 Nov
- 2023 12:56:41 -0800 (PST)
-Date: Mon, 6 Nov 2023 12:56:39 -0800
-In-Reply-To: <20231106024413.2801438-10-almasrymina@google.com>
+ (user=sdf job=sendgmr) by 2002:a17:902:ee14:b0:1ca:b952:f5fa with SMTP id
+ z20-20020a170902ee1400b001cab952f5famr509511plb.5.1699304560650; Mon, 06 Nov
+ 2023 13:02:40 -0800 (PST)
+Date: Mon, 6 Nov 2023 13:02:39 -0800
+In-Reply-To: <20231106024413.2801438-7-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com> <20231106024413.2801438-10-almasrymina@google.com>
-Message-ID: <ZUlTB5diiytEK-Mh@google.com>
-Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
+References: <20231106024413.2801438-1-almasrymina@google.com> <20231106024413.2801438-7-almasrymina@google.com>
+Message-ID: <ZUlUb93BFbPBRJFm@google.com>
+Subject: Re: [RFC PATCH v3 06/12] memory-provider: dmabuf devmem memory provider
 From: Stanislav Fomichev <sdf@google.com>
 To: Mina Almasry <almasrymina@google.com>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -82,44 +82,77 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 Content-Type: text/plain; charset="utf-8"
 
 On 11/05, Mina Almasry wrote:
-> For device memory TCP, we expect the skb headers to be available in host
-> memory for access, and we expect the skb frags to be in device memory
-> and unaccessible to the host. We expect there to be no mixing and
-> matching of device memory frags (unaccessible) with host memory frags
-> (accessible) in the same skb.
+> Implement a memory provider that allocates dmabuf devmem page_pool_iovs.
 > 
-> Add a skb->devmem flag which indicates whether the frags in this skb
-> are device memory frags or not.
+> Support of PP_FLAG_DMA_MAP and PP_FLAG_DMA_SYNC_DEV is omitted for
+> simplicity.
 > 
-> __skb_fill_page_desc() now checks frags added to skbs for page_pool_iovs,
-> and marks the skb as skb->devmem accordingly.
+> The provider receives a reference to the struct netdev_dmabuf_binding
+> via the pool->mp_priv pointer. The driver needs to set this pointer for
+> the provider in the page_pool_params.
 > 
-> Add checks through the network stack to avoid accessing the frags of
-> devmem skbs and avoid coalescing devmem skbs with non devmem skbs.
+> The provider obtains a reference on the netdev_dmabuf_binding which
+> guarantees the binding and the underlying mapping remains alive until
+> the provider is destroyed.
 > 
 > Signed-off-by: Willem de Bruijn <willemb@google.com>
 > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
 > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
+> ---
+>  include/net/page_pool/helpers.h | 40 +++++++++++++++++
+>  include/net/page_pool/types.h   | 10 +++++
+>  net/core/page_pool.c            | 76 +++++++++++++++++++++++++++++++++
+>  3 files changed, 126 insertions(+)
+> 
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index 78cbb040af94..b93243c2a640 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -53,6 +53,7 @@
+>  #define _NET_PAGE_POOL_HELPERS_H
+>  
+>  #include <net/page_pool/types.h>
+> +#include <net/net_debug.h>
+>  
+>  #ifdef CONFIG_PAGE_POOL_STATS
+>  int page_pool_ethtool_stats_get_count(void);
+> @@ -111,6 +112,45 @@ page_pool_iov_binding(const struct page_pool_iov *ppiov)
+>  	return page_pool_iov_owner(ppiov)->binding;
+>  }
+>  
+> +static inline int page_pool_iov_refcount(const struct page_pool_iov *ppiov)
+> +{
+> +	return refcount_read(&ppiov->refcount);
+> +}
+> +
+> +static inline void page_pool_iov_get_many(struct page_pool_iov *ppiov,
+> +					  unsigned int count)
+> +{
+> +	refcount_add(count, &ppiov->refcount);
+> +}
+> +
+> +void __page_pool_iov_free(struct page_pool_iov *ppiov);
+> +
+> +static inline void page_pool_iov_put_many(struct page_pool_iov *ppiov,
+> +					  unsigned int count)
+> +{
+> +	if (!refcount_sub_and_test(count, &ppiov->refcount))
+> +		return;
+> +
+> +	__page_pool_iov_free(ppiov);
+> +}
+> +
+> +/* page pool mm helpers */
+> +
+> +static inline bool page_is_page_pool_iov(const struct page *page)
+> +{
+> +	return (unsigned long)page & PP_DEVMEM;
+> +}
 
-[..]
- 
-> -	snaplen = skb->len;
-> +	snaplen = skb_frags_not_readable(skb) ? skb_headlen(skb) : skb->len;
->  
->  	res = run_filter(skb, sk, snaplen);
->  	if (!res)
-> @@ -2279,7 +2279,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  		}
->  	}
->  
-> -	snaplen = skb->len;
-> +	snaplen = skb_frags_not_readable(skb) ? skb_headlen(skb) : skb->len;
->  
->  	res = run_filter(skb, sk, snaplen);
->  	if (!res)
-
-Not sure it covers 100% of bpf. We might need to double-check bpf_xdp_copy_buf
-which is having its own, non-skb shinfo and frags. And in general, xdp
-can reference those shinfo frags early... (xdp part happens
-before we create an skb with all devmem association)
+Speaking of bpf: one thing that might be problematic with this PP_DEVMEM
+bit is that it will make debugging with bpftrace a bit (more)
+complicated. If somebody were trying to get to that page_pool_iov from
+the frags, they will have to do the equivalent of page_is_page_pool_iov,
+but probably not a big deal? (thinking out loud)
 
