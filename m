@@ -1,62 +1,85 @@
-Return-Path: <netdev+bounces-46264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645B97E2EF7
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:32:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0F157E2EFC
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:34:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CE5DB20A15
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:32:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3D31C2040B
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8087B2E656;
-	Mon,  6 Nov 2023 21:32:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507A02E656;
+	Mon,  6 Nov 2023 21:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gcd+DYdJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tra7q/wC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BBA2C859;
-	Mon,  6 Nov 2023 21:32:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B0F1C433C8;
-	Mon,  6 Nov 2023 21:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283742C859;
+	Mon,  6 Nov 2023 21:34:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D684CC433C7;
+	Mon,  6 Nov 2023 21:34:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699306371;
-	bh=tmBKKGig8qdVRnoOGeW867wxNHPECJMhCPnD8lHBNsk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gcd+DYdJRYTb719UTHhAdf+Wa7ixVNguYDB1bQFvjEFoPjT72pPqEy9NKdU3Qb5Q3
-	 7Gfr+ig+cVAONP0KOvjQqrQmdsRS2xltUc65i0eOuX9OawWzqNv3N2TNLeO+kjPuCz
-	 EvsimOv4e51QmI9gN2RdD32xs2taw1Gz2ARYDnRhHxSdi5q7IMHlPdrWvSuoKHLQNQ
-	 2y8uuLElMIcbfgi6AG68+9enJ2xYcPd+xuMoqUHb1/kQ5Q8JLJgAQq0Bqm0ohxl5Ly
-	 DJvoJ4ST6kiq0LZmLRB4YhnTlL+beOr0MFouUEnOfzW5VhkW8Vsi00FcEPiurE9/WR
-	 Opbp9YDgNdsLA==
-Date: Mon, 6 Nov 2023 13:32:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: martin.lau@kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCH bpf 4/6] bpf, netkit: Add indirect call wrapper for
- fetching peer dev
-Message-ID: <20231106133250.0d49a487@kernel.org>
-In-Reply-To: <20231103222748.12551-5-daniel@iogearbox.net>
-References: <20231103222748.12551-1-daniel@iogearbox.net>
-	<20231103222748.12551-5-daniel@iogearbox.net>
+	s=k20201202; t=1699306450;
+	bh=lg8M4ZU0WKeEUMti2afp6mI1H9am+64JDctsVPEWQ3M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Tra7q/wC7sAJllKQsTDPF/BYwJ6aPrtzVwacWSwuJzOpq/qmotoFcWxnOMpEWg4RW
+	 cqK72ElIXTi2lc2nWkoCKVHCS/0uTzrlnrkdxJFhOJFs9sSgRvC2gpgD8aLxc3sUuR
+	 TtQ810xKB7lOSdTyS/8aTRmXCyEXVdLV0+Wf0G/zoMpCZaUiGC6Ix4OIIkCxYcvQLv
+	 i2mq050hio1bLfRN12aKVHObKH1KRUUIwnFHAwgq1fNEVem9+IPO2+acSP8N5XR+uO
+	 i0TZIqnYHGIvhkXgwIAfi7jyHzJzSIvX+Ot7i1Nj1PMmNSXBSp1ju6EpP/7U+HzkyS
+	 ihY3sjoc7LjKA==
+Date: Mon, 6 Nov 2023 14:34:08 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Dmitry Safonov <dima@arista.com>
+Cc: ndesaulniers@google.com, trix@redhat.com, noureddine@arista.com,
+	hch@infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+	patches@lists.linux.dev, edumazet@google.com, davem@davemloft.net,
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net v3] tcp: Fix -Wc23-extensions in tcp_options_write()
+Message-ID: <20231106213408.GA1841794@dev-arch.thelio-3990X>
+References: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org>
+ <a8cc305d-0ab8-4ff7-b11a-94f51f33ec92@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8cc305d-0ab8-4ff7-b11a-94f51f33ec92@arista.com>
 
-On Fri,  3 Nov 2023 23:27:46 +0100 Daniel Borkmann wrote:
-> ndo_get_peer_dev is used in tcx BPF fast path, therefore make use of
-> indirect call wrapper and therefore optimize the bpf_redirect_peer()
-> internal handling a bit. Add a small skb_get_peer_dev() wrapper which
-> utilizes the INDIRECT_CALL_1() macro instead of open coding.
+On Mon, Nov 06, 2023 at 09:26:48PM +0000, Dmitry Safonov wrote:
+> Seems like exactly the fix that my git testing tree had, with an
+> exception to naming the helper tcp_ao_options_write().
 
-Why don't we kill the ndo and put the pointer in struct net_device?
+Heh, not sure why I never considered that as an option... I am guessing
+it does not matter enough for a v4 at this point but I could send a
+net-next change later to update it if you so desire!
+
+> But then I found* your patch-v1 and decided not to send an alternative
+> patch.
+> 
+> Thanks for fixing this,
+
+Thanks for taking a look!
+
+> Reviewed-by: Dmitry Safonov <dima@arista.com>
+> 
+> *had to fix my Gmail lkml filter to label not only emails with cc/to my
+> name, but also the raw email address (usually, I got them to/cc "Dmitry
+> Safonov", but this one didn't have the name and got lost in the lkml pile).
+
+Sorry about that, b4 used to have some interesting behavior around names
+at one point (don't remember the details at the moment) and just using
+emails avoided those issues. Maybe I should go back to names and emails
+to see if I notice any problems again.
+
+Cheers,
+Nathan
 
