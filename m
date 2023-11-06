@@ -1,222 +1,163 @@
-Return-Path: <netdev+bounces-46220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD447E2933
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:58:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 566B17E2957
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:03:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEA8E28151E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 106A3281549
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591E828E13;
-	Mon,  6 Nov 2023 15:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1025B28E36;
+	Mon,  6 Nov 2023 16:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jVpno2AD"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="GBumYzC3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F8CC28E12;
-	Mon,  6 Nov 2023 15:58:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6326C433C8;
-	Mon,  6 Nov 2023 15:58:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699286288;
-	bh=mdCc81ZkKWiCWgh0DtK923uhvIGiH7XK/k1z5kL2ckc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jVpno2ADWZzo2xf5ZUTtn0YL9/ygi4EpKLhqUMgJow50tSO1nxdvrrC2av4reY9CE
-	 aCNR/Ks5ICeomvaqfiOel5d9nG5SS9mZHe3jlroaKuN+vrWWCs97gwzYTEcD2IDcKM
-	 v8sX8al7SpfPBoSwW+vjtSqXZ85J0aeAWiCTImGWQSY4dB+X+TamwBbPXVTbLhdWkE
-	 Dm39mJ8u8jYxZN7J4eLXDH4ko7fmrUklGnmooQ6uRk9ithUWd0zRY/Zr5mMh7p0LOi
-	 OoRSIOBPovrjb53n4nalOPH5FQwzjorT8cBOP+inXtCB1V8U6OmNxBIV19xHpFXvf+
-	 ITxTKa9mM8iIg==
-Date: Mon, 6 Nov 2023 08:58:06 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, ndesaulniers@google.com, trix@redhat.com,
-	0x7f454c46@gmail.com, noureddine@arista.com, hch@infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH net v2] tcp: Fix -Wc23-extensions in tcp_options_write()
-Message-ID: <20231106155806.GA1181828@dev-arch.thelio-3990X>
-References: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org>
- <CANn89i+GF=4QuVMevE7Ur2Zi0nDjBujMHWJayURR9fbcr+McnA@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7261C250FE
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 16:03:31 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2068.outbound.protection.outlook.com [40.107.105.68])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED0C134;
+	Mon,  6 Nov 2023 08:03:28 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EXB7EOVUjm1lAzOGiJAKeTZnzw7i+q+BOJv1dOlnrHKcJfBZA5zccWNYg9OwjvKvbSEqrwlT9ugAeoowhgUr0ylSml+TTUcJFfPz2tZl4ToeBta0xONfyIpE8CuoWDrfIkjswLJh9/10o3Zvt3TmdK30vI2m/VbA/WwWp32A5HZGvq5L8+o73fyTjvtktsbBIsmkY3crkRXyShIdSKSTdot0L3zRjGynFtkVQmanBPzXYKO+tVKzFFZaVIuidj25qeayuDC0q8I3LOygno857idQQhgmnR9NXDUV6SrlLWv8JFyVWNcGwjQKla+ilQhtVBRggtUXT5d9QtOWvDBp6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cDgwUeBqwwKhmZdjN+bEofx5j1gxSJezZ4jPaMrzevM=;
+ b=J5hxtnSS5+GZN7LvOyapOI6nwbG5vM/2bJdB5KlEfErNFOu8TbRfNflf+qjhcoqYc3EnxQazG9R1CQhV+eL1gPqFJXbZy1rO3aKvimMy/dbj8RivwBqcc9JnirwNWp1BvcuL5RHjptYOySK6bGzS2MHThRaxRqWXtTbnQ5ronx9CHbravqeomQjGslcSbVSUPXPUjEr+niBfcqAMXg3bgGxtpg6ecd9yxuhuxzoDcC/bPYCM2LbZQE5wOB8j4uQZs6HR/y/PoNKcJg8MD9U0SodZqxtAaw7brfHTu0TXh3VheeqYRqHvKjlYHDoM5iabpGNf7YHRdrWhwzddfZ+itg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cDgwUeBqwwKhmZdjN+bEofx5j1gxSJezZ4jPaMrzevM=;
+ b=GBumYzC3B5dfxaBF582Wul/RimkX8psWpgH6gW/cibmcUOE8bwNiswelrdaB5UKnNiwPMPX5eY3deuOW8S8X02weQnZ9VcZ+oQUNIHPVgoAW47HAa3WjNlCwTCy8cx9hsdDoD7gXYdUWmLzNpsljXRurFSfP8hhwE1ogfN3GY4I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by VI1PR04MB9762.eurprd04.prod.outlook.com (2603:10a6:800:1d3::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.13; Mon, 6 Nov
+ 2023 16:03:25 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.013; Mon, 6 Nov 2023
+ 16:03:25 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net] net: enetc: shorten enetc_setup_xdp_prog() error message to fit NETLINK_MAX_FMTMSG_LEN
+Date: Mon,  6 Nov 2023 18:03:11 +0200
+Message-Id: <20231106160311.616118-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR01CA0107.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::48) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+GF=4QuVMevE7Ur2Zi0nDjBujMHWJayURR9fbcr+McnA@mail.gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB9762:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1acec5ef-60c0-43d3-8928-08dbdee1e855
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+qGsMGmmyBlR41ChUSRUggqPlNH6D/Z/p+iBBW4Y18lsCeWeDWMI+F/nj1UAGrRK3St7tCEKOIL5GDOsBSwUDn+zx49ZUtkiwLSQC57VZbO2uXXEISyegFtQ11PaZyGs1rdda64wjIkgA+yVJwzS/kfbE975gkV14V/259tzmG0GtAi5OK7avjinmqI4cANfLy1kiMGRN/emKYSmCDTO/Ni09eqxnMMJeuVPO+wSabNM9WqtUQ/sVNTpifIoHyKgmKqIGKe8mbGDTlNFYQ7k6WPjgZ/cZnzYFV1ntmrg57RT+FeUV55TX6ZbbwNaNkD4D5iBfCa1v6Bkrl5/d07NSIKni3mYhqx2JHuhMpQPwM9Hp70g/Xu/xjCm0cWEgBl5/7/Nk7XqpRPweUnOOa4HjWB1Eh5VqEpDeBrVoYwCIoINmwxGgKmUw9Odq71HLMAKC97Kpw0Oy53rBzre6rbazrEmk4HoiuyMyddQkXQyQTvfiwnQecaLSPcKk5uI4uWKomM6e26kHzcocqCT0nuAUJj8VITaXgaV+IBjN/oeeytvaaX3lrMdTXGUyJr7sfIuaNdcCMxxT4NrAsSYuRQSL8f12GxuYIMVO9cMRGhrsaU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(396003)(39860400002)(136003)(230922051799003)(451199024)(1800799009)(186009)(64100799003)(26005)(1076003)(6506007)(52116002)(2616005)(6666004)(8676002)(6512007)(83380400001)(8936002)(966005)(4326008)(5660300002)(6486002)(41300700001)(2906002)(44832011)(478600001)(316002)(6916009)(66946007)(66476007)(54906003)(66556008)(36756003)(86362001)(38100700002)(38350700005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?OqEx/Ed4N3WEcJ0eRuAZ8n6biEQJ9ygNtRJ+2GwK1ONiiRIIze1fpQWOdH1L?=
+ =?us-ascii?Q?HQLJj8yZsOAGK9xrPxtAg6Sk9SG8G0X8d/zz65EVf5E3S0FRqGZi9Ca5MU7/?=
+ =?us-ascii?Q?sPeJl+XKii8ioyv+vRuNkRwkGOUBdNGidxbjN+bXFIBqN7Zv8ejOU8oGRfhK?=
+ =?us-ascii?Q?8vgdysrfMXqr8ciuX/tEfeSSTwGJl0RMiwwWdGbKcnEo9/yteD0QeBDPFEO0?=
+ =?us-ascii?Q?Icrj6oBj+HkzlNw9cYjqMAcjl2aKjfK2GpQb5EPFa2sBl6fehk7rr8TuZSnn?=
+ =?us-ascii?Q?t5sVlu/9Nvo6Y1DvMfvqXTACxQzIP3mIsl5GdoB33oaZZ8u99xULUB4B3+BK?=
+ =?us-ascii?Q?Oogh9EipfXndtusm+dia36MZkFuugPxHa3udXDnEoldU9NTYCM7rKLExO8DN?=
+ =?us-ascii?Q?LgmzPmMSgtsxA2BpW844wRrhNtf0YpYMnj6D8ATeTEgYXoWgh2X+78d9rzJD?=
+ =?us-ascii?Q?Zm3KUbKFR64LjqgSC3WnS1bSwgmKm2XX2bhh/PqSurR7mTYeL50zZqf3HF/K?=
+ =?us-ascii?Q?i7DbiBmEafKn1U5urQ7knDB9eRpx88XhO1VZY2bKXb+Kfny7cLZxGe/cv1ZB?=
+ =?us-ascii?Q?/CztIU6L7yhQq/ehTTEOmAKvYdK7W7OtjOhnk1D8CGLzit0uT3yU/kD8ZA02?=
+ =?us-ascii?Q?RlQ4SyHm0ml+HICp6hPSCDibw3SqLiEOb+5hJqnmD36P+pmdXP/NJ4R+PzXF?=
+ =?us-ascii?Q?2fuu4n7jszjj3sy2SHgrR/P1blYEn4Z5u5HL+RawXYGCUspMa1ZLoKtiOnJD?=
+ =?us-ascii?Q?CHtAMjvGXHi57V1dTFphu095lngsztfSE6VDJUv03xZ5dT/rtoEtvn3pM01b?=
+ =?us-ascii?Q?oNQilkL+LW9eiSFXWvnqfvYoKEr0t1HXSMsRKp+IF5+vC8+xvFKJylIFv1DZ?=
+ =?us-ascii?Q?sU3nbEvjjVT56yIAH1aI9arpDYSHJ5qC5IyjuAuvkIIkr5yBUC1XxGExqjoH?=
+ =?us-ascii?Q?u7wIhZp288VioK2PkuzciDnQdCFYUNlQimIdQW8u+HL3xCQms5QMTKTBUpvT?=
+ =?us-ascii?Q?ABFlX7z9jT5aPb7WwgqxAPc4Jfkn/yWDraegfBTWSG4QlgXVJTbTOTBKZU+N?=
+ =?us-ascii?Q?JvsLPHq1Mp9BKAn9uyUhFJHwSBhA5y+beskkaWGTcJ5/qQ80CJWXe19i48tn?=
+ =?us-ascii?Q?S1ydHwX55gPQbYkRuRWmahhiQ65yOE8ihVHXgwc02dtDeKizpp/WXjtxmsLE?=
+ =?us-ascii?Q?mOdqv4YDmIaxhhSsrt6vA7Ucs9pK85es2IIIeIJE8tqIHoi6+AAz2/+GHw5+?=
+ =?us-ascii?Q?TgydnQ84x4mGcJnq8RKqhZF6NV5NxVvzgzvsxYR4pgjTjHB6zXtAZ4IMAHfv?=
+ =?us-ascii?Q?F6am25+aWAUgVgeAar8nrpRVBJlPZrFyGP9wpfO/bqgYTGfoZAItHMBywo41?=
+ =?us-ascii?Q?+MP2dNqBuIfUwwAhQjLA73VD1PDYmPB8DggOVfv4xjc9T95L5M4qlnhKwYWf?=
+ =?us-ascii?Q?GRlWaYx0smMlesS/1IiwQdmyoWp599lhhhlb2g799TeXIwbfCK6qLltyKIDJ?=
+ =?us-ascii?Q?2010R+XeCzMkegKQ22eXznhPxXX0+zPCiJhUx4b8kpeJYtUXLXvMOk7dva6o?=
+ =?us-ascii?Q?QovYDrNEq40E2TTgiGvDz7MKuRiAgoAMx9pRRAFCvOIl5EWTRoK7OGcC6z7Y?=
+ =?us-ascii?Q?Nw=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1acec5ef-60c0-43d3-8928-08dbdee1e855
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 16:03:25.1727
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 37xWTL9nRVyK+VzFCn5ui8bG9H4nnhT4HVV0AeJsSjqcW18Bd4ei+6FRyoi3xQqWwfR45zRHeDKx1cBo784C5Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB9762
 
-On Mon, Nov 06, 2023 at 04:52:52PM +0100, Eric Dumazet wrote:
-> On Mon, Nov 6, 2023 at 4:36 PM Nathan Chancellor <nathan@kernel.org> wrote:
-> >
-> > Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
-> >
-> >   net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
-> >     663 |         }
-> >         |         ^
-> >   1 error generated.
-> >
-> > On earlier releases (such as clang-11, the current minimum supported
-> > version for building the kernel) that do not support C23, this was a
-> > hard error unconditionally:
-> >
-> >   net/ipv4/tcp_output.c:663:2: error: expected statement
-> >           }
-> >           ^
-> >   1 error generated.
-> >
-> > While adding a semicolon after the label would resolve this, it is more
-> > in line with the kernel as a whole to refactor this block into a
-> > standalone function, which means the goto a label construct can just be
-> > replaced with a simple return. Do so to resolve the warning.
-> >
-> > Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
-> > Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
-> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > ---
-> > Please let me know if this function should have a different name. I
-> > think I got all the changes of the function shuffle correct but some
-> > testing would be appreciated.
-> >
-> > Changes in v2:
-> > - Break out problematic block into its own function so that goto can be
-> >   replaced with a simple return, instead of the simple semicolon
-> >   approach of v1 (Christoph)
-> > - Link to v1: https://lore.kernel.org/r/20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org
-> > ---
-> >  net/ipv4/tcp_output.c | 69 ++++++++++++++++++++++++++++-----------------------
-> >  1 file changed, 38 insertions(+), 31 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> > index 0d8dd5b7e2e5..3f8dc74fbf40 100644
-> > --- a/net/ipv4/tcp_output.c
-> > +++ b/net/ipv4/tcp_output.c
-> > @@ -601,6 +601,43 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
-> >  }
-> >  #endif
-> >
-> > +static void process_tcp_ao_options(struct tcp_sock *tp,
-> > +                                  const struct tcp_request_sock *tcprsk,
-> > +                                  struct tcp_out_options *opts,
-> > +                                  struct tcp_out_options *opts,
-> 
-> ptr has a different type than in the caller, this is a bit confusing
-> 
-> I would use
-> 
-> static __be32 * process_tcp_ao_options(struct tcp_sock *tp, const
-> struct tcp_request_sock *tcprsk,
->                   struct tcp_out_options *opts,struct tcp_key *key, __be32 *ptr)
+NETLINK_MAX_FMTMSG_LEN is currently hardcoded to 80, and we provide an
+error printf-formatted string having 96 characters including the
+terminating \0. Assuming each %d (representing a queue) gets replaced by
+a number having at most 2 digits (a reasonable assumption), the final
+string is also 96 characters wide, which is too much.
 
-Ah, this suggestion is much better, thanks. I'll make this adjustment
-and send a v3 later today in case others have any suggested changes (I
-know netdev prefers waiting 24 hours for another revision but I'd like
-to get this warning cleared up by -rc1 so it does not proliferate into
-other trees and I sent v1 almost a week ago).
+Reduce the verbiage a bit by removing some (partially) redundant words,
+which makes the new printf-formatted string be 73 characters wide with
+the trailing newline.
 
-> > +{
-> > +#ifdef CONFIG_TCP_AO
-> > +       u8 maclen = tcp_ao_maclen(key->ao_key);
-> > +
-> > +       if (tcprsk) {
-> > +               u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
-> > +
-> > +               *(*ptr)++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
-> > +                                 (tcprsk->ao_keyid << 8) |
-> > +                                 (tcprsk->ao_rcv_next));
-> 
-> 
->                  *ptr++ = ...
-> 
-> (and in all other *ptr uses in this helper)
-> 
-> > +       } else {
-> > +               struct tcp_ao_key *rnext_key;
-> > +               struct tcp_ao_info *ao_info;
-> > +
-> > +               ao_info = rcu_dereference_check(tp->ao_info,
-> > +                       lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> > +               rnext_key = READ_ONCE(ao_info->rnext_key);
-> > +               if (WARN_ON_ONCE(!rnext_key))
-> > +                       return;
-> > +               *(*ptr)++ = htonl((TCPOPT_AO << 24) |
-> > +                                 (tcp_ao_len(key->ao_key) << 16) |
-> > +                                 (key->ao_key->sndid << 8) |
-> > +                                 (rnext_key->rcvid));
-> > +       }
-> > +       opts->hash_location = (__u8 *)(*ptr);
-> > +       *ptr += maclen / sizeof(**ptr);
-> > +       if (unlikely(maclen % sizeof(**ptr))) {
-> > +               memset(*ptr, TCPOPT_NOP, sizeof(**ptr));
-> > +               (*ptr)++;
-> > +       }
-> > +#endif
-> 
->     return ptr;
-> +}
-> > +
-> >  /* Write previously computed TCP options to the packet.
-> >   *
-> >   * Beware: Something in the Internet is very sensitive to the ordering of
-> > @@ -629,37 +666,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
-> >                 opts->hash_location = (__u8 *)ptr;
-> >                 ptr += 4;
-> >         } else if (tcp_key_is_ao(key)) {
-> > -#ifdef CONFIG_TCP_AO
-> > -               u8 maclen = tcp_ao_maclen(key->ao_key);
-> > -
-> > -               if (tcprsk) {
-> > -                       u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
-> > -
-> > -                       *ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
-> > -                                      (tcprsk->ao_keyid << 8) |
-> > -                                      (tcprsk->ao_rcv_next));
-> > -               } else {
-> > -                       struct tcp_ao_key *rnext_key;
-> > -                       struct tcp_ao_info *ao_info;
-> > -
-> > -                       ao_info = rcu_dereference_check(tp->ao_info,
-> > -                               lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
-> > -                       rnext_key = READ_ONCE(ao_info->rnext_key);
-> > -                       if (WARN_ON_ONCE(!rnext_key))
-> > -                               goto out_ao;
-> > -                       *ptr++ = htonl((TCPOPT_AO << 24) |
-> > -                                      (tcp_ao_len(key->ao_key) << 16) |
-> > -                                      (key->ao_key->sndid << 8) |
-> > -                                      (rnext_key->rcvid));
-> > -               }
-> > -               opts->hash_location = (__u8 *)ptr;
-> > -               ptr += maclen / sizeof(*ptr);
-> > -               if (unlikely(maclen % sizeof(*ptr))) {
-> > -                       memset(ptr, TCPOPT_NOP, sizeof(*ptr));
-> > -                       ptr++;
-> > -               }
-> > -out_ao:
-> > -#endif
-> > +               process_tcp_ao_options(tp, tcprsk, opts, key, &ptr);
-> 
-> ptr = process_tcp_ao_options(tp, tcprsk, opts, key, ptr);
-> 
-> 
-> >         }
-> >         if (unlikely(opts->mss)) {
-> >                 *ptr++ = htonl((TCPOPT_MSS << 24) |
-> >
-> > ---
-> > base-commit: c1ed833e0b3b7b9edc82b97b73b2a8a10ceab241
-> > change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
-> >
-> > Best regards,
-> > --
-> > Nathan Chancellor <nathan@kernel.org>
-> >
+Fixes: 800db2d125c2 ("net: enetc: ensure we always have a minimum number of TXQs for stack")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/lkml/202311061336.4dsWMT1h-lkp@intel.com/
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/ethernet/freescale/enetc/enetc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
+index 30bec47bc665..cffbf27c4656 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+@@ -2769,7 +2769,7 @@ static int enetc_setup_xdp_prog(struct net_device *ndev, struct bpf_prog *prog,
+ 	if (priv->min_num_stack_tx_queues + num_xdp_tx_queues >
+ 	    priv->num_tx_rings) {
+ 		NL_SET_ERR_MSG_FMT_MOD(extack,
+-				       "Reserving %d XDP TXQs does not leave a minimum of %d TXQs for network stack (total %d available)",
++				       "Reserving %d XDP TXQs does not leave a minimum of %d for stack (total %d)",
+ 				       num_xdp_tx_queues,
+ 				       priv->min_num_stack_tx_queues,
+ 				       priv->num_tx_rings);
+-- 
+2.34.1
+
 
