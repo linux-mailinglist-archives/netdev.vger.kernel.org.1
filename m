@@ -1,158 +1,204 @@
-Return-Path: <netdev+bounces-46256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6357E2E8C
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:02:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F737E2EBC
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F17A1C20750
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:02:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B46761C20756
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBD052E417;
-	Mon,  6 Nov 2023 21:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9A12E640;
+	Mon,  6 Nov 2023 21:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vv8kFQiu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F74yB8bJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695D32D035
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 21:02:42 +0000 (UTC)
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D09D51
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:02:41 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc1ddb34ccso32169285ad.1
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 13:02:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699304560; x=1699909360; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YVT/6GQJuQ7TjvhzDWajYThozSBRZLd2V3VGmhBHao=;
-        b=Vv8kFQiunIrTYiM6C/oHgHrTapbPb7JHDyQy8sV+NGrJVj1vpNrYPabj6l1M/3k/pe
-         0KSaaQUhg/ZcT1F6kyHn9rRU9tsCGw6mAcPy1W2Muj+zT0GcbkKhL4D8SwhyL48Uj4UZ
-         rFF1SSEqPu+xI1Kekzu58oyXrQ4wUJNx/0fMnKc1m487QZyiAIBOoj05pUveCBtBrMxk
-         eFetU/y0BG/3cbcuiXHfrCIGHvvDBx7MW7aUUulBj/sRFKx8ycriSAw+tMYWERMHyG1E
-         N4TWBgSpWVRrFhtU7AKB35RgNVw2OAXLY9vuE+BX0uGx/b73D3X4to8/XWfcxOmD2Pvf
-         dqeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699304560; x=1699909360;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3YVT/6GQJuQ7TjvhzDWajYThozSBRZLd2V3VGmhBHao=;
-        b=QXk5BkEsi1rHfk+fFmI5uTCAv76LXC1h+XTIvd1YNlIBY5I+t6OMXkbScFz1mSIxpb
-         Nec7ZA7gzBBH/NLu+cz9aTGxTfzKuMrYjj9OxFPdipgJTlZLePkJL32Q8klpqfJplTOB
-         UB7mCIb+SyD5vkiy/9pGatn/udwyj5j5Zu7JnUGVuc/C+NEvhOf5QnlcHLqwlbreG8e3
-         25gLJBMvU6C9499FhMC/FZ+v1LLPL6NyFvnnk+XB5U2RNeF42jKRTqjo/NpEfmjmyxQq
-         NXhM0qivSYWdT1NUM5K4xTgT04Kukn1MDO1AwZ9CuTsS+x76R5RE+nwXoaRRy0Dm3ArB
-         SQcw==
-X-Gm-Message-State: AOJu0YzHoNvG4TrDnLiIiBCciDVSigDtZGyvbaJBblAh6UmghrnNnOAi
-	95Rmpgf+x3lS9vIhw1r/M11m9oA=
-X-Google-Smtp-Source: AGHT+IFMk9K2QPc1yRl8QNToni4u3wTj7lMIW1WMnLhrEu9KTQ1j0Kkg7CJFxK+wf+6qBsS5/cJoFOo=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:ee14:b0:1ca:b952:f5fa with SMTP id
- z20-20020a170902ee1400b001cab952f5famr509511plb.5.1699304560650; Mon, 06 Nov
- 2023 13:02:40 -0800 (PST)
-Date: Mon, 6 Nov 2023 13:02:39 -0800
-In-Reply-To: <20231106024413.2801438-7-almasrymina@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63A02E639;
+	Mon,  6 Nov 2023 21:14:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6639CC433C8;
+	Mon,  6 Nov 2023 21:14:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699305269;
+	bh=yOk149MnqQ38qeZeV/4etw3iKo3CYD5n8FeZGzh/eFc=;
+	h=From:Date:Subject:To:Cc:From;
+	b=F74yB8bJbDjRxQPrWVBp0rcIBA/1CoKPsUPx+XDnqKASkuUkdBYoh37c6UvH0cKhX
+	 wIxHDWgXtlPaGXOi2W+s/3s/ethyy+T8dEhuh+3qTBw41Ih6QVQRtAjnj2XKSjEY3v
+	 28EGdOEvc/f2W/zne9ZsmlPve6sIp/pDj7j79xv0CgxoQMQekl7+fUewO2yBJ0EmnJ
+	 qmShe+edLqsf1VPBmi7+UaDKjkj8NT+By+yBgfSQYVbL/ksvsb97pYZRYyDbtZWlyz
+	 DtLWQV/7wgITaX6YSQPJVjbAOFvL1oYPinGSTkqfFCxqBKYm3mkcWEKo42hx2iKgGv
+	 BS/6AeS9E4u9Q==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Mon, 06 Nov 2023 14:14:16 -0700
+Subject: [PATCH net v3] tcp: Fix -Wc23-extensions in tcp_options_write()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com> <20231106024413.2801438-7-almasrymina@google.com>
-Message-ID: <ZUlUb93BFbPBRJFm@google.com>
-Subject: Re: [RFC PATCH v3 06/12] memory-provider: dmabuf devmem memory provider
-From: Stanislav Fomichev <sdf@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org>
+X-B4-Tracking: v=1; b=H4sIACdXSWUC/52OQQ6CMBBFr2K6dgwDCNSV9zAuShmgEaakragh3
+ N2GjXGpyz8/895fhCdnyIvTbhGOZuON5Riy/U7oXnFHYJqYRZqkGSYZQtATKAutecKgahrAMGg
+ 7TvbODfigAo3EAR7KseEOqG4KLWVZ5bISETo5iq+b8CKYgrjGY298sO61jZhxq/71zQgIWpYZN
+ ojHFsvzjRzTcLCu21xz+uFjUvzMTyNfIrVtQVjklf7ir+v6BkvB94tSAQAA
+To: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
+ kuba@kernel.org, pabeni@redhat.com
+Cc: ndesaulniers@google.com, trix@redhat.com, 0x7f454c46@gmail.com, 
+ noureddine@arista.com, hch@infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.13-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4778; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=yOk149MnqQ38qeZeV/4etw3iKo3CYD5n8FeZGzh/eFc=;
+ b=owGbwMvMwCEmm602sfCA1DTG02pJDKme4SaXfJoX3r0VsrR01445f1buSnbn39V4u66r97CQ1
+ Z/WybukOkpZGMQ4GGTFFFmqH6seNzScc5bxxqlJMHNYmUCGMHBxCsBEXhoyMrRMdQr09N8oPO8f
+ j/P1DmaWLyskL7e/VMz67PNJdY7P/LsM/2wEWY5F8B9kWFs2qVvhvo/T68KqtuoNuzdnub/7lHO
+ sgxUA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On 11/05, Mina Almasry wrote:
-> Implement a memory provider that allocates dmabuf devmem page_pool_iovs.
-> 
-> Support of PP_FLAG_DMA_MAP and PP_FLAG_DMA_SYNC_DEV is omitted for
-> simplicity.
-> 
-> The provider receives a reference to the struct netdev_dmabuf_binding
-> via the pool->mp_priv pointer. The driver needs to set this pointer for
-> the provider in the page_pool_params.
-> 
-> The provider obtains a reference on the netdev_dmabuf_binding which
-> guarantees the binding and the underlying mapping remains alive until
-> the provider is destroyed.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
->  include/net/page_pool/helpers.h | 40 +++++++++++++++++
->  include/net/page_pool/types.h   | 10 +++++
->  net/core/page_pool.c            | 76 +++++++++++++++++++++++++++++++++
->  3 files changed, 126 insertions(+)
-> 
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index 78cbb040af94..b93243c2a640 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -53,6 +53,7 @@
->  #define _NET_PAGE_POOL_HELPERS_H
->  
->  #include <net/page_pool/types.h>
-> +#include <net/net_debug.h>
->  
->  #ifdef CONFIG_PAGE_POOL_STATS
->  int page_pool_ethtool_stats_get_count(void);
-> @@ -111,6 +112,45 @@ page_pool_iov_binding(const struct page_pool_iov *ppiov)
->  	return page_pool_iov_owner(ppiov)->binding;
->  }
->  
-> +static inline int page_pool_iov_refcount(const struct page_pool_iov *ppiov)
-> +{
-> +	return refcount_read(&ppiov->refcount);
-> +}
-> +
-> +static inline void page_pool_iov_get_many(struct page_pool_iov *ppiov,
-> +					  unsigned int count)
-> +{
-> +	refcount_add(count, &ppiov->refcount);
-> +}
-> +
-> +void __page_pool_iov_free(struct page_pool_iov *ppiov);
-> +
-> +static inline void page_pool_iov_put_many(struct page_pool_iov *ppiov,
-> +					  unsigned int count)
-> +{
-> +	if (!refcount_sub_and_test(count, &ppiov->refcount))
-> +		return;
-> +
-> +	__page_pool_iov_free(ppiov);
-> +}
-> +
-> +/* page pool mm helpers */
-> +
-> +static inline bool page_is_page_pool_iov(const struct page *page)
-> +{
-> +	return (unsigned long)page & PP_DEVMEM;
-> +}
+Clang warns (or errors with CONFIG_WERROR=y) when CONFIG_TCP_AO is set:
 
-Speaking of bpf: one thing that might be problematic with this PP_DEVMEM
-bit is that it will make debugging with bpftrace a bit (more)
-complicated. If somebody were trying to get to that page_pool_iov from
-the frags, they will have to do the equivalent of page_is_page_pool_iov,
-but probably not a big deal? (thinking out loud)
+  net/ipv4/tcp_output.c:663:2: error: label at end of compound statement is a C23 extension [-Werror,-Wc23-extensions]
+    663 |         }
+        |         ^
+  1 error generated.
+
+On earlier releases (such as clang-11, the current minimum supported
+version for building the kernel) that do not support C23, this was a
+hard error unconditionally:
+
+  net/ipv4/tcp_output.c:663:2: error: expected statement
+          }
+          ^
+  1 error generated.
+
+While adding a semicolon after the label would resolve this, it is more
+in line with the kernel as a whole to refactor this block into a
+standalone function, which means the goto a label construct can just be
+replaced with a return statement. Do so to resolve the warning.
+
+Closes: https://github.com/ClangBuiltLinux/linux/issues/1953
+Fixes: 1e03d32bea8e ("net/tcp: Add TCP-AO sign to outgoing packets")
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+Changes in v3:
+- Don't use a pointer to a pointer for ptr parameter to avoid the extra
+  indirection in process_tcp_ao_options(), just return the modified ptr
+  value back to the caller (Eric)
+- Link to v2: https://lore.kernel.org/r/20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org
+
+Changes in v2:
+- Break out problematic block into its own function so that goto can be
+  replaced with a simple return, instead of the simple semicolon
+  approach of v1 (Christoph)
+- Link to v1: https://lore.kernel.org/r/20231031-tcp-ao-fix-label-in-compound-statement-warning-v1-1-c9731d115f17@kernel.org
+---
+ net/ipv4/tcp_output.c | 70 ++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 39 insertions(+), 31 deletions(-)
+
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 0d8dd5b7e2e5..eb13a55d660c 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -601,6 +601,44 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
+ }
+ #endif
+ 
++static __be32 *process_tcp_ao_options(struct tcp_sock *tp,
++				      const struct tcp_request_sock *tcprsk,
++				      struct tcp_out_options *opts,
++				      struct tcp_key *key, __be32 *ptr)
++{
++#ifdef CONFIG_TCP_AO
++	u8 maclen = tcp_ao_maclen(key->ao_key);
++
++	if (tcprsk) {
++		u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
++
++		*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
++			       (tcprsk->ao_keyid << 8) |
++			       (tcprsk->ao_rcv_next));
++	} else {
++		struct tcp_ao_key *rnext_key;
++		struct tcp_ao_info *ao_info;
++
++		ao_info = rcu_dereference_check(tp->ao_info,
++			lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
++		rnext_key = READ_ONCE(ao_info->rnext_key);
++		if (WARN_ON_ONCE(!rnext_key))
++			return ptr;
++		*ptr++ = htonl((TCPOPT_AO << 24) |
++			       (tcp_ao_len(key->ao_key) << 16) |
++			       (key->ao_key->sndid << 8) |
++			       (rnext_key->rcvid));
++	}
++	opts->hash_location = (__u8 *)ptr;
++	ptr += maclen / sizeof(*ptr);
++	if (unlikely(maclen % sizeof(*ptr))) {
++		memset(ptr, TCPOPT_NOP, sizeof(*ptr));
++		ptr++;
++	}
++#endif
++	return ptr;
++}
++
+ /* Write previously computed TCP options to the packet.
+  *
+  * Beware: Something in the Internet is very sensitive to the ordering of
+@@ -629,37 +667,7 @@ static void tcp_options_write(struct tcphdr *th, struct tcp_sock *tp,
+ 		opts->hash_location = (__u8 *)ptr;
+ 		ptr += 4;
+ 	} else if (tcp_key_is_ao(key)) {
+-#ifdef CONFIG_TCP_AO
+-		u8 maclen = tcp_ao_maclen(key->ao_key);
+-
+-		if (tcprsk) {
+-			u8 aolen = maclen + sizeof(struct tcp_ao_hdr);
+-
+-			*ptr++ = htonl((TCPOPT_AO << 24) | (aolen << 16) |
+-				       (tcprsk->ao_keyid << 8) |
+-				       (tcprsk->ao_rcv_next));
+-		} else {
+-			struct tcp_ao_key *rnext_key;
+-			struct tcp_ao_info *ao_info;
+-
+-			ao_info = rcu_dereference_check(tp->ao_info,
+-				lockdep_sock_is_held(&tp->inet_conn.icsk_inet.sk));
+-			rnext_key = READ_ONCE(ao_info->rnext_key);
+-			if (WARN_ON_ONCE(!rnext_key))
+-				goto out_ao;
+-			*ptr++ = htonl((TCPOPT_AO << 24) |
+-				       (tcp_ao_len(key->ao_key) << 16) |
+-				       (key->ao_key->sndid << 8) |
+-				       (rnext_key->rcvid));
+-		}
+-		opts->hash_location = (__u8 *)ptr;
+-		ptr += maclen / sizeof(*ptr);
+-		if (unlikely(maclen % sizeof(*ptr))) {
+-			memset(ptr, TCPOPT_NOP, sizeof(*ptr));
+-			ptr++;
+-		}
+-out_ao:
+-#endif
++		ptr = process_tcp_ao_options(tp, tcprsk, opts, key, ptr);
+ 	}
+ 	if (unlikely(opts->mss)) {
+ 		*ptr++ = htonl((TCPOPT_MSS << 24) |
+
+---
+base-commit: c1ed833e0b3b7b9edc82b97b73b2a8a10ceab241
+change-id: 20231031-tcp-ao-fix-label-in-compound-statement-warning-ebd6c9978498
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
 
