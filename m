@@ -1,219 +1,192 @@
-Return-Path: <netdev+bounces-46184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B727E1FE7
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:25:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8757E2053
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:47:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A471C2085A
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:25:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D3E81C20A53
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A0018AEF;
-	Mon,  6 Nov 2023 11:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7460C1A58A;
+	Mon,  6 Nov 2023 11:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/f408Sv"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="GyWZcncz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0666E18043
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 11:25:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA519C433C8;
-	Mon,  6 Nov 2023 11:25:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699269901;
-	bh=vjFyA96ISKuv32u0146EL9PZKlDB08ufc7HvCrGs70E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=F/f408SvPPV9zr9YBiuN9ETZhLs18QTJKK5QM2LDx+IAPd0euqC5Mcn6SODQh5ulF
-	 JUIy34pFN8AsjQ4LaqTyARBmOQTBIycC63H23OIsjEvfJIDuTnCfmVdYYS3YIdax6B
-	 NKHVvsvAfSjGfc01GuJLMfc95Ph+kuY6RttrvMDoZjkUljubltdBKwtnux2BnbzIxW
-	 Zksdi9zPY5+k+cxLlqcwM8/AsHkPQZCuQhP04HMGMdbce3LjRJpK2H0P/4iWh12jkt
-	 MaJ4SFdk1ZTo+8iX1VdmitaBqfzk7JMiGp3Q2idA+vaGySBJ6UGnM+O1kaXVE9EOd1
-	 YUamhx5dwAIzw==
-Message-ID: <8205a0ba-aeef-4ab6-80cc-87848903f541@kernel.org>
-Date: Mon, 6 Nov 2023 12:24:57 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD1E199B7
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 11:47:48 +0000 (UTC)
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2044.outbound.protection.outlook.com [40.107.20.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E095890;
+	Mon,  6 Nov 2023 03:47:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gd6Dz5r+9Lr7wSDYYs/FPbLVXj8EuFd3bnxPuDGsDGqJOzP2e2ZYQamwSpOmiz5J5UwpkC4zvPjpxQgS4Hi31vqWuPEurUcuupYoXwM4oj1etGnTuo2zQ7C9gYiyY6c8RZVSiQ9uU2EsOr11Dfk+F6cWqNjbeLW2hFTADvihPp4FqCqr7ufg8rPS7j5uUc8R3CN9yDEaEBZhVdPdzH9rNbHAQ9mBX4sZoJkms+Fi5Kz+tkaAwy88045WnrW6CdiAdFaXQCnhpKu23fx0z6xv/Q6f3ZUbc2JuLapvW2VlzXjXpvqktbYqkxFsdBXLidNZ0wbBCbm5jjdzKtDkvUyL9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SjHgu1gdsPjhOn8fV/3G0MCZGpSFSmjRG78+I0Cftws=;
+ b=ZKUDkjrLvrhIZAY4v+PkYLl9/mwpzH9dBmKlZr3Xhgz2SqQC10tjEiUf9qvfBGau/Y/bNwoZH3tSEX9nQtZD4stYwt/TPcSgU/HqnQfg7Hzxu0AV1VL66jxPpbarQn+EY7foCdrKIf9Uj2e4nTbNiZeVOKoxLd6yOio4esP/UEI0oXowvouMgr4Euoeb9ss/thtTe+JUef+tggJmHpXcJyVhZhbZsd38IBfOsF2i1W7HSfwFCtVEonyQSpLE+AMiKpmbwE09AT4bSWMVOpm+60hOmXCm2nIK5pi7ByZFSUGdpFGmRwD2YXBdS/4WdgO+NN2AxAESF/STV9zv62AVBw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SjHgu1gdsPjhOn8fV/3G0MCZGpSFSmjRG78+I0Cftws=;
+ b=GyWZcnczCKbO1x6ZbN9HA5zvE4YtyH6OY3+DhmhL96YXZT6GVhkxI9fFPC/LuyWMXxFuX3KE3XGJqqnGUh+oyduc3psRZn+ZeLX98xxKD/x4lBabGkDZhcmUtzBFqAOLXK7VkAsZD0j4NKKf5ueTuNo8hQTbaHtUfanuW/xNYVHPpdhcB1OzdOK2L2gu6bgZ2KsAZYQdonNML/CUPDMJPRWRLM9lDpQL5Uqbj3IyE4MW4qrHDGf+eJk1EYiqNFxJ+SBQB1G35o+8EgeFOZVsd+JuAeu/oEuGgMwotaEqGoQ7e9OSOxa4EfRsIeQ46OqO+K5T3x87VXsLYIzWqaywxA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:588::19)
+ by AS4PR10MB5370.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:4ba::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.27; Mon, 6 Nov
+ 2023 11:47:44 +0000
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8496:a3a3:d7a8:b24d]) by AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::8496:a3a3:d7a8:b24d%4]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
+ 11:47:44 +0000
+Message-ID: <b2857e2c-cacf-4077-8e15-308dce8ccb0b@siemens.com>
+Date: Mon, 6 Nov 2023 12:47:42 +0100
+User-Agent: Mozilla Thunderbird
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: [PATCH net v3] net: ti: icssg-prueth: Add missing icss_iep_put to
+ error path
+Content-Language: en-US
+To: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar <danishanwar@ti.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ "Lopes Ivo, Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>,
+ Nishanth Menon <nm@ti.com>,
+ "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0077.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9a::14) To AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:588::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC Draft net-next] docs: netdev: add section on using lei to
- manage netdev mail volume
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-References: <20231105185014.2523447-1-dw@davidwei.uk>
-Content-Language: en-GB, fr-BE
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-In-Reply-To: <20231105185014.2523447-1-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS4PR10MB6181:EE_|AS4PR10MB5370:EE_
+X-MS-Office365-Filtering-Correlation-Id: 416ee883-df29-47cf-00bc-08dbdebe30ab
+X-LD-Processed: 38ae3bcd-9579-4fd4-adda-b42e1495d55a,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	27ZSPTV2flgKiQEer0eOsIz3jaAgySZ5gnHDhmmIn6FuvMjxeycF94DWosFoexBtxta0ZhewOf7k+kGtsSBrUf2ncWsLL2WVvv4rDAtLiGRkvtSJ/ooh1vri7c5J9PfVTg5odUBCi77LqutDZibd5vyCrlizA2uQXDg6LGY0iE3iYBUocuV4NKplj/6DxFTJzLGIyuQk3M3x4yHcy8WXKD7WdhNmrxIAanBP7UIpAJ59hivG8fl3Md8Y18AodxcsyXmLuUOz5jXG+HDE1p4UmtWMmXZesrZtksGpT4giSxtWx1xgQSWMmtchjMlzjXens1zkcGHYSwloGOtDrjg22v8ICdWdBI6heyEY3xX1ugxqp5ICwuz1lgPQcT81r4U/CSXvr2KI9IfRMgVLqsMFT3dsgpkBTfqtOt+Ge7Ne1L8TkkGGiNM3N9MhuxmNvxxxGHXJwNnKZ5Ox5bErpnT9dLi/KI4101HyDp11rHg6vuyVxBG3gkPDBfqPm34T9eTUkBMxx+Be7fdj/A49Q5JA0MgaROYdDgKmhUxB566A9MO2zJ4Vsg6/hkzZ5zgbbAdja5rGJTDbvp96k84BMk6g3GH/H7PxER0Drb5yHRoRPIYbqC8o64dpw8x6FI/+0S4EzBNQfiDqb8QkASrEOGuv6w==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(346002)(396003)(376002)(136003)(39860400002)(366004)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(31686004)(6512007)(6486002)(478600001)(6506007)(2616005)(2906002)(41300700001)(38100700002)(36756003)(82960400001)(86362001)(31696002)(66946007)(54906003)(5660300002)(66556008)(83380400001)(26005)(66476007)(44832011)(8936002)(110136005)(316002)(4326008)(8676002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?S0tIanFOQU9oRytxR2JNYkkxRjNhMC9Ccldsa09CTFFoZTdDNkRnWHRhYytu?=
+ =?utf-8?B?SUgxSTlkcmEwVjhzZGpndms5alpHWk1Bd1VKRGlqdWVZWWJJVkdDMFRaVUVS?=
+ =?utf-8?B?SEVoYVBydnpibHorM09HZXcrR3llUDE5cHFrL0dPSGVHZXZNUkNxZmNQbTRw?=
+ =?utf-8?B?OUw1TUZRS21KNTFyRWhDTkg1QWFNQSs2VG13Zi80czM0bDhmdDFoUXV5VUxu?=
+ =?utf-8?B?UzhEeDBXdWZKOWl1Wms2alRCTkcwRTRYbnA5c2dKd2pqaTQ5R2IxdmNMZTU0?=
+ =?utf-8?B?SUVwWDFuRUpEUFp0Wk9QV1FmT2wrR2ZUR2hxbHpkUzNZZE44TEVGaW9OMjFD?=
+ =?utf-8?B?cDhrNlo2TFhBbk9raFJPNGhJeUhLNVhtN1ZpbjJHaFhWY0V6Y3NZSmlseFZP?=
+ =?utf-8?B?aVFEN1U0TDRQS0NUUEtJNXB4MzI3TXVyQzVnSEp4Y3F5bHlGMlVQemg1ejRh?=
+ =?utf-8?B?WTZiY2tBY0tod2srazRmMy9Rem5wdG5vZnprVHphZm9OTzRFdEFVZ2lVcytZ?=
+ =?utf-8?B?cmlzbGFtai8rRVRXT1U4bkpTa245ZUhnSjU4NS9DN0p1TjVqMkx3SGxUMFhk?=
+ =?utf-8?B?dlVJRW1JVDVocVJqUFhFbERQaGJQNkZzclFKS2pTSWdYUHZMdUhnUHFLa3NL?=
+ =?utf-8?B?bW1hTU1zc3krUndzOTArMUFNKy8vSGJsWmluQkRaMXFCZjMwQUxKSjkzUlJU?=
+ =?utf-8?B?VG9uL1FxdHJUb1NsdHR4NTNCdzBEQ0d4dncvSFdJaUxFTlV0UFlhczdmRytv?=
+ =?utf-8?B?cXFyaEVtbGZ1eFJQc3IzWUVNQm55THNXYXQzOEhOR0NsVTlYT0crWFNyUjV0?=
+ =?utf-8?B?SXBnR3JmZEtPYlhFMFM2dHRrZGk4NWUzdm9qTmdZUm9jbkRBZkUxcVZzZWxZ?=
+ =?utf-8?B?VEY0cmdLS2pxeC9PdE9OdWc4UTlTUUcycmIvSWxHWldTcnYwNFZTK1o2dGFu?=
+ =?utf-8?B?cGJ3TXE3eXdJVmFJUEdPc1RzNlhuMkxpdVpCVGJrMkw2Zi9qdFhvbkpTYXFJ?=
+ =?utf-8?B?cUpYQThvN21FdDFxbjl6N241elU3RnB5amduQzh5MXYzV3pRU1dFVllCTmV1?=
+ =?utf-8?B?RlV4TzV1SXlqdEdQNXV4T3F2MVAwSXA5Q2NPQm1CS3MxaUorMS9oMFVrMWJy?=
+ =?utf-8?B?NHlSRFJaWU04a0dPU21DY2IxYkFyZEJFVi9RZ2VyandsWDQ2K0ZTWEtHbG01?=
+ =?utf-8?B?amRyL3kxd29UWEN1dzFrWXNReHdFUTIzb280K2F5VUV3RU82bXQ5dzRkVlNV?=
+ =?utf-8?B?THMyZzhJU09GdjdhNlFqazBKSkY4SDNMaTJsaHJycXkvU0VCK2o1dEc3bjRh?=
+ =?utf-8?B?czZ5MUMwMTErQm91cktGOEUxbTY3RTNGY1NwTDVkS0p5VHlwWFc4ZjVhNm9E?=
+ =?utf-8?B?RFlIWmpDS28vYUlkK3pyd2FvOFFweXRVaFEwM3BhYVdTZC81RXN6Sy85Kzlo?=
+ =?utf-8?B?emN2aUNzVyt6cUsyUGk1ZHJkUkpYWWZCelgyQWdwZXVhRE43WjdyL1JIeDE0?=
+ =?utf-8?B?V2lQQ3VCYnhEdGozaURKSTQrZUoxbkhkOWpwNnhnL2VxdldHdGhQaEhHeHI5?=
+ =?utf-8?B?RWxjTDBvdHVFakc2ZWZ4YURabHF6cG90WkxxYmtadWx1VlJ5NEk1NHBEdENw?=
+ =?utf-8?B?QXJXZ2VRYncrdXhmZWFOWThERG9ISlBJdkMrQ01zUEtPdWk5SmJoVklSWndT?=
+ =?utf-8?B?dG83L3o1Q0YxZVh3RkovMXg1Sm43K2I2b2l5RXBnTHkrSklRUmhaQ0FhUXJh?=
+ =?utf-8?B?NXBBa2tLa2lzS1VnaEY3bTN3bDNOMXZScVRUSGZzOUlVeG9CMXV0Y1BBc1NT?=
+ =?utf-8?B?ZStkamZ2YnFFMjN0S3FKcURqZTJ3WlAwSmtYa003WkNyWlZFNmpJWVFLWENq?=
+ =?utf-8?B?KzJyamx2SUxHNEwyY1NYektuKytRcng5NjJQaHQza1JZbDRPMzd4dExzbWx1?=
+ =?utf-8?B?eFZMWHlaMytrTWpxbVh2RUh3Q1hTVVR2YURjQnVZVmY4YU5lR0NlM3U2ODh2?=
+ =?utf-8?B?UG9DOVR4bnFPNXEwalpaUVZDL3k3cjV4ZDltWUFoWXFQcW9JbC93ZDdRb05K?=
+ =?utf-8?B?aFhpSnIwYVA1UVV6eEE5bTFWeGlYT3MxbjhBQU8rc2taTWUxVUtTZkNGaTRJ?=
+ =?utf-8?Q?BnaSEiLcKdCRR85/tz2IPna2T?=
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 416ee883-df29-47cf-00bc-08dbdebe30ab
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 11:47:44.5926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NtAUmg4Ny/h0J5KBETjfqAO9hCdc51gPjX9Cee2bhWqXPRR2VaOZ6+Pbr2gH8nd7cliYa6REIgB4TL5qq+5z4g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR10MB5370
 
-Hi David,
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-On 05/11/2023 19:50, David Wei wrote:
-> As a beginner to netdev I found the volume of mail to be overwhelming. I only
-> want to focus on core netdev changes and ignore most driver changes. I found a
-> way to do this using lei, filtering the mailing list using lore's query
-> language and writing the results into an IMAP server.
+Analogously to prueth_remove, just also taking care for NULL'ing the
+iep pointers.
 
-I agree that the volume of mail is too high with a variety of subjects.
-That's why it is very important to CC the right people (as mentioned by
-Patchwork [1] ;) )
+Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+Fixes: 443a2367ba3c ("net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support")
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
 
-[1]
-https://patchwork.kernel.org/project/netdevbpf/patch/20231105185014.2523447-1-dw@davidwei.uk/
+Changes in v3:
+ - consolidate cleanup logic further [Wojciech]
+ - make sure to NULL iep pointers
 
-> This patch is an RFC draft of updating the maintainer-netdev documentation with
-> this information in the hope of helping out others in the future.
+Changes in v2:
+ - add proper tags
 
-Note that I'm also using lei to filter emails, e.g. to be notified when
-someone sends a patch modifying this maintainer-netdev.rst file! [2]
+This was lost from the TI SDK version while ripping out SR1.0 support - which we are currently restoring for upstream.
 
-But I don't think this issue of "busy mailing list" is specific to
-netdev. It seems that "lei" is already mentioned in another part of the
-doc [3]. Maybe this part can be improved? Or the netdev doc could add a
-reference to the existing part?
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-(Maybe such info should be present elsewhere, e.g. on vger [4] or lore)
-
-[2]
-https://lore.kernel.org/netdev/?q=%28dfn%3ADocumentation%2Fnetworking%2Fnetdev-FAQ.rst+OR+dfn%3ADocumentation%2Fprocess%2Fmaintainer-netdev.rst%29+AND+rt%3A1.month.ago..
-[3]
-https://docs.kernel.org/maintainer/feature-and-driver-maintainers.html#mailing-list-participation
-[4] http://vger.kernel.org/vger-lists.html
-
-(Note: regarding the commit message here, each line should be limited to
-max 72 chars ideally)
-
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  Documentation/process/maintainer-netdev.rst | 39 +++++++++++++++++++++
->  1 file changed, 39 insertions(+)
-> 
-> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-> index 7feacc20835e..93851783de6f 100644
-> --- a/Documentation/process/maintainer-netdev.rst
-> +++ b/Documentation/process/maintainer-netdev.rst
-> @@ -33,6 +33,45 @@ Aside from subsystems like those mentioned above, all network-related
->  Linux development (i.e. RFC, review, comments, etc.) takes place on
->  netdev.
->  
-> +Managing emails
-> +~~~~~~~~~~~~~~~
-> +
-> +netdev is a busy mailing list with on average over 200 emails received per day,
-> +which can be overwhelming to beginners. Rather than subscribing to the entire
-> +list, considering using ``lei`` to only subscribe to topics that you are
-> +interested in. Konstantin Ryabitsev wrote excellent tutorials on using ``lei``:
-> +
-> + - https://people.kernel.org/monsieuricon/lore-lei-part-1-getting-started
-> + - https://people.kernel.org/monsieuricon/lore-lei-part-2-now-with-imap
-> +
-> +As a netdev beginner, you may want to filter out driver changes and only focus
-> +on core netdev changes. Try using the following query with ``lei q``::
-> +
-> +  lei q -o ~/Mail/netdev \
-> +    -I https://lore.kernel.org/all \
-> +    -t '(b:b/net/* AND tc:netdev@vger.kernel.org AND rt:2.week.ago..'
-
-Small optimisations:
-
-- you can remove tc:netdev@vger.kernel.org and modify the '-I' to
-restrict to netdev instead of querying 'all': -I
-https://lore.kernel.org/netdev/
-
-- In theory, 'dfn:' should help you to match a filename being modified.
-But in your case, 'net' is too generic, and I don't think we can specify
-"starting with 'net'". You can still omit some results after [5] but the
-syntax doesn't look better :)
-
-  dfn:net AND NOT dfn:drivers/net AND NOT dfn:selftests/net AND NOT
-dfn:tools/net AND rt:2.week.ago..
-
-[5]
-https://lore.kernel.org/netdev/?q=dfn%3Anet+AND+NOT+dfn%3Adrivers%2Fnet+AND+NOT+dfn%3Aselftests%2Fnet+AND+NOT+dfn%3Atools%2Fnet+AND+rt%3A2.week.ago..
-
-> +This query will only match threads containing messages with patches that modify
-> +files in ``net/*``. For more information on the query language, see:
-> +
-> +  https://lore.kernel.org/linux-btrfs/_/text/help/
-
-(if this is specific to 'netdev', best to use '/netdev/', not
-'/linux-btrfs/')
-
-> +By default ``lei`` will output to a Maildir, but it also supports Mbox and IMAP
-> +by adding a prefix to the output directory ``-o``. For a list of supported
-> +formats and prefix strings, see:
-> +
-> +  https://www.mankier.com/1/lei-q
-
-Maybe safer to point to the official doc?
-
-https://public-inbox.org/lei-q.html
-
-(or 'man lei-q')
-
-> +If you would like to use IMAP, Konstantin’s blog is slightly outdated and you
-> +no longer need to use here strings i.e. ``<<<`` or ``<<EOF``.
-
-I think we can still use them. In the part 1, they are not used. Maybe
-best to contact Konstantin to update his blog post instead of mentioning
-in the doc that the blog post is outdated?
-
-> You can simply
-> +point lei at an IMAP server e.g. ``imaps://imap.gmail.com``::
-
-In Konstantin's blog post, he mentioned different servers with different
-specificities. Maybe easier to just point to that instead of taking one
-example without more explanations?
-
-Cheers,
-Matt
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 6c4b64227ac8..3abbeba26f1b 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -2105,10 +2105,7 @@ static int prueth_probe(struct platform_device *pdev)
+ 	prueth->iep1 = icss_iep_get_idx(np, 1);
+ 	if (IS_ERR(prueth->iep1)) {
+ 		ret = dev_err_probe(dev, PTR_ERR(prueth->iep1), "iep1 get failed\n");
+-		icss_iep_put(prueth->iep0);
+-		prueth->iep0 = NULL;
+-		prueth->iep1 = NULL;
+-		goto free_pool;
++		goto put_iep0;
+ 	}
+ 
+ 	if (prueth->pdata.quirk_10m_link_issue) {
+@@ -2205,6 +2202,12 @@ static int prueth_probe(struct platform_device *pdev)
+ exit_iep:
+ 	if (prueth->pdata.quirk_10m_link_issue)
+ 		icss_iep_exit_fw(prueth->iep1);
++	icss_iep_put(prueth->iep1);
++
++put_iep0:
++	icss_iep_put(prueth->iep0);
++	prueth->iep0 = NULL;
++	prueth->iep1 = NULL;
+ 
+ free_pool:
+ 	gen_pool_free(prueth->sram_pool,
+-- 
+2.35.3
 
