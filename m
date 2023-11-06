@@ -1,167 +1,129 @@
-Return-Path: <netdev+bounces-46156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5667E1BCB
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 09:18:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 166217E1BCE
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 09:19:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22B91C209E4
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 08:18:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 454851C20918
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 08:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73240EAD8;
-	Mon,  6 Nov 2023 08:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C53FC03;
+	Mon,  6 Nov 2023 08:19:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQwVIBHC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BBCFBFA
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 08:18:39 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0BA8B0
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 00:18:37 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VvkMuOG_1699258712;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VvkMuOG_1699258712)
-          by smtp.aliyun-inc.com;
-          Mon, 06 Nov 2023 16:18:33 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux-foundation.org
-Subject: [PATCH net] virtio_net: fix missing dma unmap for resize
-Date: Mon,  6 Nov 2023 16:18:32 +0800
-Message-Id: <20231106081832.668-1-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B2CFBFC
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 08:19:10 +0000 (UTC)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9E2B0
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 00:19:09 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so12145a12.0
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 00:19:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699258748; x=1699863548; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v/i/NbnNcOp2PQfn3YFUM6ZJmzO+qOkgPk5i2DQ8FBI=;
+        b=SQwVIBHCQZyeOg2iF02Blgu0XupDB7mSuhDZf2lLDCch1uB4jkRx6w3RLUpELmVx6o
+         Yb2tK1yc8DjhdayeASdGHdP5BHd+3CKALCIy66kOpMgxIiEvdEV9GbiKaj5fWhlx9YRo
+         +jQ2mpRfZEuQZC79VlGHbtUC6hTOY0LYcyBYvlgzBYFIdDjpSnuE4L3XAZ8Y/mwQTjjt
+         kgPJPjy4V39kQueaCkZgb1gxyhp/LEfUyQnxlZMiOkRVwKGIAezoXjz0yA7lK2hR2s3n
+         ZlX9L89/QdqBpRwOrFYMSrLWM6O60mrTOz4wMTsEomXQlMGbpJXI8LyDzCSG7/x09nwB
+         dQtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699258748; x=1699863548;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v/i/NbnNcOp2PQfn3YFUM6ZJmzO+qOkgPk5i2DQ8FBI=;
+        b=b8OnZ8ga8lVAsc3CGsZqiFOjLOmEUdH4L3pdlLAfa9119hDZHTs4517k80We2CYWcE
+         J2eu4Tz/z/SytfFY1hxf+vNkGBKkwrsv4VAxzLXbeRbVpFArg7LjYJ18iY1HU0ly0cNI
+         maLh7d0io/+vXM+k9qPTLPME1/lI4P7AApEyTuBaWfK1BJ4vVhh2vmU7xCIqyQD0Mw45
+         BIrQ2hRbjUxpXU7G0PnjAQC0+gdzMNWb1Ll+1x7ICmFus9759oiJlVdg664MJPpDNfBZ
+         McNiS2J7RwJTYhwynlGhMBe4VDL8YZERpRzhjF2UITLfpeZa9LyyrPv+R6vFh8I9kOyZ
+         Rp6Q==
+X-Gm-Message-State: AOJu0YyP6btAOGPuwrweDAotcser82jymWLVOTnhsKATljlAk0R0OjiJ
+	ESV66ZMXjCz4Ep+cVgG6E65WAUeodqyzU1lN2j2zZg==
+X-Google-Smtp-Source: AGHT+IGkyW04CpK4IDAOlc5Y0p8Zck32aKz9RbNbK1LqNDmTh5FITG274bDLPYFvC7Q84CRzdKp3MwnQ02D4rzCnsGU=
+X-Received: by 2002:a05:6402:388e:b0:544:4636:db0b with SMTP id
+ fd14-20020a056402388e00b005444636db0bmr101681edb.1.1699258747532; Mon, 06 Nov
+ 2023 00:19:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: af4189b303fe
-Content-Transfer-Encoding: 8bit
+References: <20231023-send-net-next-20231023-2-v1-0-9dc60939d371@kernel.org>
+ <20231023-send-net-next-20231023-2-v1-9-9dc60939d371@kernel.org>
+ <CANn89iLZUA6S2a=K8GObnS62KK6Jt4B7PsAs7meMFooM8xaTgw@mail.gmail.com> <1831224a48dfbf54fb45fa56fce826d1d312700f.camel@redhat.com>
+In-Reply-To: <1831224a48dfbf54fb45fa56fce826d1d312700f.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 6 Nov 2023 09:18:54 +0100
+Message-ID: <CANn89iJ=38aXWA9K18bsMDO22SLi+XyjARTPSdvOMzycOLGPeQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 9/9] mptcp: refactor sndbuf auto-tuning
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Mat Martineau <martineau@kernel.org>, Matthieu Baerts <matttbe@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	mptcp@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-For rq, we have three cases getting buffers from virtio core:
+On Mon, Nov 6, 2023 at 8:22=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> Hi,
+>
+> On Thu, 2023-11-02 at 18:19 +0100, Eric Dumazet wrote:
+> > On Mon, Oct 23, 2023 at 10:45=E2=80=AFPM Mat Martineau <martineau@kerne=
+l.org> wrote:
+> > >
+> > > From: Paolo Abeni <pabeni@redhat.com>
+> > >
+> > > The MPTCP protocol account for the data enqueued on all the subflows
+> > > to the main socket send buffer, while the send buffer auto-tuning
+> > > algorithm set the main socket send buffer size as the max size among
+> > > the subflows.
+> > >
+> > > That causes bad performances when at least one subflow is sndbuf
+> > > limited, e.g. due to very high latency, as the MPTCP scheduler can't
+> > > even fill such buffer.
+> > >
+> > > Change the send-buffer auto-tuning algorithm to compute the main sock=
+et
+> > > send buffer size as the sum of all the subflows buffer size.
+> > >
+> > > Reviewed-by: Mat Martineau <martineau@kernel.org>
+> > > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > > Signed-off-by: Mat Martineau <martineau@kernel.org
+> >
+> > ...
+> >
+> > > diff --git a/net/mptcp/subflow.c b/net/mptcp/subflow.c
+> > > index df208666fd19..2b43577f952e 100644
+> > > --- a/net/mptcp/subflow.c
+> > > +++ b/net/mptcp/subflow.c
+> > > @@ -421,6 +421,7 @@ static bool subflow_use_different_dport(struct mp=
+tcp_sock *msk, const struct soc
+> > >
+> > >  void __mptcp_set_connected(struct sock *sk)
+> > >  {
+> > > +       __mptcp_propagate_sndbuf(sk, mptcp_sk(sk)->first);
+> >
+> > ->first can be NULL here, according to syzbot.
+>
+> I'm sorry for the latency on my side, I had a different kind of crash
+> to handle here.
+>
+> Do you have a syzkaller report available? Or the call trace landing
+> here?
 
-1. virtqueue_get_buf{,_ctx}
-2. virtqueue_detach_unused_buf
-3. callback for virtqueue_resize
-
-But in commit 295525e29a5b("virtio_net: merge dma operations when
-filling mergeable buffers"), I missed the dma unmap for the #3 case.
-
-That will leak some memory, because I did not release the pages referred
-by the unused buffers.
-
-If we do such script, we will make the system OOM.
-
-    while true
-    do
-            ethtool -G ens4 rx 128
-            ethtool -G ens4 rx 256
-            free -m
-    done
-
-Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 43 ++++++++++++++++++++--------------------
- 1 file changed, 22 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d16f592c2061..6423a3a007ce 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -408,6 +408,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
- 	return p;
- }
- 
-+static void virtnet_rq_free_buf(struct virtnet_info *vi,
-+				struct receive_queue *rq, void *buf)
-+{
-+	if (vi->mergeable_rx_bufs)
-+		put_page(virt_to_head_page(buf));
-+	else if (vi->big_packets)
-+		give_pages(rq, buf);
-+	else
-+		put_page(virt_to_head_page(buf));
-+}
-+
- static void enable_delayed_refill(struct virtnet_info *vi)
- {
- 	spin_lock_bh(&vi->refill_lock);
-@@ -634,17 +645,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
- 	return buf;
- }
- 
--static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
--{
--	void *buf;
--
--	buf = virtqueue_detach_unused_buf(rq->vq);
--	if (buf && rq->do_dma)
--		virtnet_rq_unmap(rq, buf, 0);
--
--	return buf;
--}
--
- static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
- {
- 	struct virtnet_rq_dma *dma;
-@@ -1764,7 +1764,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
- 	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
- 		pr_debug("%s: short packet %i\n", dev->name, len);
- 		DEV_STATS_INC(dev, rx_length_errors);
--		virtnet_rq_free_unused_buf(rq->vq, buf);
-+		virtnet_rq_free_buf(vi, rq, buf);
- 		return;
- 	}
- 
-@@ -4034,14 +4034,15 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
- static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
- {
- 	struct virtnet_info *vi = vq->vdev->priv;
-+	struct receive_queue *rq;
- 	int i = vq2rxq(vq);
- 
--	if (vi->mergeable_rx_bufs)
--		put_page(virt_to_head_page(buf));
--	else if (vi->big_packets)
--		give_pages(&vi->rq[i], buf);
--	else
--		put_page(virt_to_head_page(buf));
-+	rq = &vi->rq[i];
-+
-+	if (rq->do_dma)
-+		virtnet_rq_unmap(rq, buf, 0);
-+
-+	virtnet_rq_free_buf(vi, rq, buf);
- }
- 
- static void free_unused_bufs(struct virtnet_info *vi)
-@@ -4057,10 +4058,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
- 	}
- 
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
--		struct receive_queue *rq = &vi->rq[i];
-+		struct virtqueue *vq = vi->rq[i].vq;
- 
--		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
--			virtnet_rq_free_unused_buf(rq->vq, buf);
-+		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-+			virtnet_rq_free_unused_buf(vq, buf);
- 		cond_resched();
- 	}
- }
--- 
-2.32.0.3.g01195cf9f
-
+Sure, let me release the report.
 
