@@ -1,221 +1,262 @@
-Return-Path: <netdev+bounces-46268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8CF7E2FA6
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:15:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 753CA7E2FB8
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BE05B20A45
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:15:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E8731C209AF
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:19:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CB62EAFB;
-	Mon,  6 Nov 2023 22:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3A32F507;
+	Mon,  6 Nov 2023 22:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="CDm45iu9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rztknBbU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668B32EB07
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:15:24 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A039E1BC
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:15:22 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jVaDIT2z3ovVoBG0rt6/R6GFI58PJkm5zzu5f/fZYnA9uRj2dMdXLYlaVJgaPxxIWclKKwL+rpm3K+1kz2Zxlsvf1UNkzK51AJjPDWprVXndGLW990QFATQudFvyD2nbYlZP4IfYQEY88XGAr6Jceffr5bwA1NdYtJyqzy9Swo7vGou/++OlBSPzLAslRfhqlGxU6NXPQGT3tWQasMriI2QoaJTrTnPDyCxkFWPIXFMl06x80RIqR/pyM1mXtrMacCDD6QYSdL3g5cPcGS/HbuigaMYhKkNamDe/NH2h/wNWsF6yRDAkh9eo39zTCJISqxsGpr2KoRF0+aDDAoN6pA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w+Q8xuBWZKjANnBFF9gAMMtC1XQ1GTnK2vHjkOa8jKI=;
- b=D/Y55IIrZjLPDW/3hpr7WH8EfMAi9WDnyEZ1qwY+nuP4mP1ii9LtujbUS+BGOkxu83Nj/4odCnndFG4xk76bOXNrcNWbv25nOA8yCqlGw7GPo9qPavFJ+eqYpKj+aZDTgxElRS7ru699cWHEXw2noRc0osI/OsZWt6YL+mcfj4IzvRTIpNYcHkmp2Yzws725RVk/Xg+Zh65bCvCOLzQU8XVaeJuprruBhQsL3byf6DWBC7UhWhvHD47SYP2eK6FiG6E4i9k0JGdtgQ4KgJ9HFnTqoOYVOJnFdH4RAKGwLcj+2J+JsXVfy1Al7Yh4uhwUiUtaO6cSzOyfcnO9bAJDuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w+Q8xuBWZKjANnBFF9gAMMtC1XQ1GTnK2vHjkOa8jKI=;
- b=CDm45iu9pmQQS5eQIendzzUliHwwSIA0z23TBTKxbsl3msre9/qbXGnIBZn9mUTb6Yuah0eWJ98+xlLNt5fWiDYdT0yA6MPUTy/XPFbuoO3xJcBMSrGyYzL8wdTxY57Kx3llJmdRG6GElmT5pfIpGVhL8zezBbUGm1twk012j0uyFajx9Gxg8zCXcxkXPmq3T1AMRPmUL7Exe0/7wtumyUAkjcqmyR5flboC+llqe8lz0Jmvu+XlINqX3VBb4l5iLss9W1vPz2ChuH3FUufxYbyw877D85qNJOyPASKFcJ0dKoM78fu1aziUhJYolp7USUY+dJc52VA5LQKT3WYgKA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CH0PR12MB8463.namprd12.prod.outlook.com (2603:10b6:610:187::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Mon, 6 Nov
- 2023 22:15:18 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::a24:3ff6:51d6:62dc]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::a24:3ff6:51d6:62dc%4]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
- 22:15:18 +0000
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Eric Dumazet <edumazet@google.com>,  "David S.
- Miller" <davem@davemloft.net>,  Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [PATCH net] macsec: Abort MACSec Rx offload datapath when skb
- is not marked with MACSec metadata
-References: <20231101200217.121789-1-rrameshbabu@nvidia.com>
-	<ZULRxX9eIbFiVi7v@hog>
-Date: Mon, 06 Nov 2023 14:15:11 -0800
-In-Reply-To: <ZULRxX9eIbFiVi7v@hog> (Sabrina Dubroca's message of "Wed, 1 Nov
-	2023 23:31:33 +0100")
-Message-ID: <87r0l25y1c.fsf@nvidia.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0218.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::13) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659E52EB18
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:19:03 +0000 (UTC)
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24C16D7C
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:19:01 -0800 (PST)
+Received: by mail-ua1-x935.google.com with SMTP id a1e0cc1a2514c-7ba9bd62fdfso1523420241.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 14:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699309140; x=1699913940; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sVe8tsFd38G8mudEItn1e9pUK3iBPROvgvogaV1TSrE=;
+        b=rztknBbUbXSOyDwZ6C7H1lXwLoG4e3GVPgRFPgTl6Ou15INJsyIlBBc3a00EyA1L+P
+         LrjDrpsgxZVRqpaak7nuW2+O3Nv3SGn5s5pucCQSG3IPQpvy4agM/OcPu1dhCa1C3WVZ
+         9G6XlJqgGhtSZIh9+Gh4uBWbTGybODxnEp5PkaCo6czotlkifiDt/+ieHfyCl1wxid3r
+         GFWX9Axhpedd3q4kLWWNqWj8PTxWzP9ORQgTWSm7hcprprUcKJBzkGIKcDZ6zQCnj9Ya
+         5ruhPo5cN0SaKi/83oj7NOBIy1qYVpwGkBi6emigcnb0VO3bYzS6i7dJ3N64aBXngTLJ
+         yu5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699309140; x=1699913940;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sVe8tsFd38G8mudEItn1e9pUK3iBPROvgvogaV1TSrE=;
+        b=dJfIpoLaxfNdmrZCSsdeWCSF7rEz9GWkrS7aTbYsH9bg1g+BnbMZIElfAWeFY4fWfY
+         yu4noj8XnOp3tdq4T0tLx/Zbrc9KA3L8Yh5+6WMs67td8o9u1E3+Klw7Kru2cRAHCA/7
+         VxcbzIBZqNuKb92Wt3w0+afoNPOwZQhpDB4jt5YjfvpDYXIyaiGvZOEcExkjYuzPAj1L
+         jUodYlPuxi6oeOydHkDY2/snDYXQqbzZswdSVhmCQ69fzmQ0twE1HFSVhMKRXhlfNgBY
+         FSAfFZK+uiKnzux8gpMeWOfuIMFSzBlnl7tPlIlZYKuGxslCdxbV0V5lwmZJlzX+nHtT
+         uk+A==
+X-Gm-Message-State: AOJu0YxA1r3BnFEBnzJwiNn6i1DrA5EySt+6PNozkF8RmmM57SYZyF0H
+	f1yfmfrA7onxN34q7Hm/36jhAxPQK4jcciYp5e1jZw==
+X-Google-Smtp-Source: AGHT+IETz+GjKs7UxN4zP1XHdksBZh5d6q/RDjmzyDBzuwUW4rr3rEfHXLef56zICeXwbmmbul0YyFrTOhim5/h2TIY=
+X-Received: by 2002:a67:e11c:0:b0:452:d9d4:a056 with SMTP id
+ d28-20020a67e11c000000b00452d9d4a056mr24216370vsl.26.1699309139903; Mon, 06
+ Nov 2023 14:18:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CH0PR12MB8463:EE_
-X-MS-Office365-Filtering-Correlation-Id: defb954a-4d1a-4185-3256-08dbdf15dc1c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Ze6kEKqZv7CcgI5XYA51Vd6ijLZGoALDgWZZMzPiZwsUxeomKQ1glA810zI31Omd8ZxStkZFZMC4h7DKRpSPzIFLpiL06A4pM0YFCqWbtT/dYIsjK+sgi2/+n13CiPP2IqDXFOlLVpF6Y/G1kmZ1ldGfzOMzsj7/0NBos40cJdQwdsgbC4m2w4QsQSlUB5mTQTMSh0yzWkVEw8mteStPobxPcjB+kOBB/MvZG/GJqxi4kNN4uT73rVnZIIR/qQFURWUM8cV2mHqV7/pWdLmM7W91kwqWXjFq5+XKkkLmHB3vv5SHh/42Ftmdmq3kUlViQTvQT8uwe9DNT++XgO5ko6cK8kxtcdUluVraQQBwg6RbdjLNImDqmBMozWJLxa9Rnf/l89L0QzjJ/iy92qrZKoIlwtrRNTvM/pnTZzPT/y49iJI2KzE02KlnsH8SYFMaqi6STuNFDqxHDSqNFCpDA/njD6NzcB7Rp6/6TLE1ZTGcA7ZAKHdHzPjAfAASMQgsiz66q130IjLm5/JgxD9xTC4nS3YIr/s7yRYjCd6HT1khElbK1ElXrpdA6JK5v0ms
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(346002)(396003)(39860400002)(366004)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(478600001)(2616005)(6512007)(6666004)(6486002)(6506007)(36756003)(38100700002)(83380400001)(86362001)(66946007)(41300700001)(66556008)(316002)(66476007)(2906002)(26005)(5660300002)(54906003)(8676002)(4326008)(6916009)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xPtUJl6nCP21e4BBNEnRqXwh6i8twLje3Me3TOYCGBjRlakLUNPSAV2qu5YJ?=
- =?us-ascii?Q?6rfDaao5USFYZFwsx8lbmmjHoDAykpkn1h+gCA4Hbnu0EO7P5j39BckxVNbD?=
- =?us-ascii?Q?peoN4dJIrrJy3j8EQTguj1rdYn6zZn6gHWDJwlfIEhnSxEEUmjtArln8MSRH?=
- =?us-ascii?Q?sQmvqz/1YCEs8TGLwmNpM5pRnmajrtjwalMaQDjOCGEfKEMEciWQJWgl/uZ7?=
- =?us-ascii?Q?IFZy4SR0r///E/WddTXGye+qyLOtPqTxb+sjk0AZ/Ux2/OWxCpzN4LsGZQGO?=
- =?us-ascii?Q?70ujhQRACmr3NXqZ8ef2fHU08bpQX/XF466YfJNQpRaqx/kOhSH2vT7SWFIA?=
- =?us-ascii?Q?5Za+Bl8AcGfb4hh9isfp/JI10MhYt4iwlz7XkSYZl+zMhBWkngOzlyP3nPlG?=
- =?us-ascii?Q?fXbJRYF2IBSrXsCICGXaQhygp4aQpQW5qpe5P8qMJoZOnsPHsTUbIVWip8Qb?=
- =?us-ascii?Q?5w0e9f1Mjt8kA76URLZhBi7DTKbOIcPt+u9G8bu9LGCVcLa/iYqSx7I1ey1b?=
- =?us-ascii?Q?r0RSmyCGpWnR/AQ/fawdaLptAlCc4lJIHP5glZi7IUZYRl1xBi+Fk9K1RsYu?=
- =?us-ascii?Q?H1mS9wILuTEBn2q2JejRtSYe0vxgOB6DOOgSa/MdV9mMpu2W8PfXya/deDFa?=
- =?us-ascii?Q?h8fEKwR9YwIyvlfIUPEiJ8NEvllIkPOY1m2zAy2W4S1ug23vtQ1OTLSL0cqT?=
- =?us-ascii?Q?pu4CjpQrLPfE2wEidcvqs8W/y5ghBFWkkgeCzqpo9zsLG1jEzT41o8mGRWaj?=
- =?us-ascii?Q?U0GbxhDzQvxzkQhkSjgBxUhT0+06vO+dt3bYDKroTsmFLbIxTW0c1E0t9Rbl?=
- =?us-ascii?Q?8mA3n0jbCeELVJTJFiTdYlmugqh/4FWT9LLfTAkgnScAup48ZeHK7Z5N/ISu?=
- =?us-ascii?Q?PGROAoZuxnm3WaqyRE1xqtim6y09hMwbDVW+jFFh/6V6pHHJ2MH52taxdfXd?=
- =?us-ascii?Q?LgCoY+KG01WPiXR4mXQg2pFp1Chv4kVhG7hIKolhHChUFe3yIWk4HusdsGKI?=
- =?us-ascii?Q?vSq6Clc0I6NXg0g0iSNxQfxdpGqtf9uVGrBZIhprQjXac4/EWcKO8JRVRvf3?=
- =?us-ascii?Q?UBMHSTmahzdDY4I7IVy95r+NoV7UlRXbYKdLGPKmAqSI5RL2Tbie2TOAWOkO?=
- =?us-ascii?Q?Gcr5WQ0ZnysNMQwiYmM6PuKoH4idJwEerKNHUz5Fr4i25zDLSVaaLtN2dORq?=
- =?us-ascii?Q?BnX7MRqUrJEwfq/VxVEvx+9nBQc6L7rAAGwE/v9Je54KZEB9WpP3f3gKex7D?=
- =?us-ascii?Q?c3AcV5E1GZOnxhXnrxYKbCZBuLrt90UuSSWFx0EgnhDl/R35VP5WXZBkJiyO?=
- =?us-ascii?Q?E2qwhIpzkXwijnLVzK7vX8C4019UvsFTJVrwuJfO4rISwv7gNz2HnNwlwvxv?=
- =?us-ascii?Q?SfgGAvunbC7I+iB8kz6qvc33Y5gcbK/5yQVPH1H69bqiocPLQBelrcvxVU4l?=
- =?us-ascii?Q?ptxxorvdqxSzSzAK0VGLYAradeeFKU+Ksz3gE+GV3BXMgJK3/BlIInDpxgF+?=
- =?us-ascii?Q?5FosZQViGFDu9jVcIeaGBn6mc3grPFS13Rc1CVBneWB9anUaxgNw6tjoE8qH?=
- =?us-ascii?Q?27zJll5W8Dpzl/Swu/JTiIvpEDqqGzPMz9rpDakogeuS1OGEmSxHLGu81GqW?=
- =?us-ascii?Q?8g=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: defb954a-4d1a-4185-3256-08dbdf15dc1c
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 22:15:18.4718
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +uUc6Jf2WNR0tVj6Qn5PDx5wGIJGN4I2S9XiUALwYbi3DdKlC70XbdDiXdlWAnwG48G3LWY/4h6BQFtkWOxDyQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8463
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-10-almasrymina@google.com> <ZUk03DhWxV-bOFJL@google.com>
+ <19129763-6f74-4b04-8a5f-441255b76d34@kernel.org> <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
+ <ZUlhu4hlTaqR3CTh@google.com>
+In-Reply-To: <ZUlhu4hlTaqR3CTh@google.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 6 Nov 2023 14:18:46 -0800
+Message-ID: <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
+To: Stanislav Fomichev <sdf@google.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 01 Nov, 2023 23:31:33 +0100 Sabrina Dubroca <sd@queasysnail.net> wrote:
-> 2023-11-01, 13:02:17 -0700, Rahul Rameshbabu wrote:
->> When MACSec is configured on an outer netdev, traffic received directly
->> through the underlying netdev should not be processed by the MACSec Rx
->> datapath. When using MACSec offload on an outer netdev, traffic with no
->> metadata indicator in the skb is mistakenly considered as MACSec traffic
->> and incorrectly handled in the handle_not_macsec function. Treat skbs with
->> no metadata type as non-MACSec packets rather than assuming they are MACSec
->> packets.
+On Mon, Nov 6, 2023 at 1:59=E2=80=AFPM Stanislav Fomichev <sdf@google.com> =
+wrote:
 >
-> What about the other drivers? mlx5 is the only driver that sets md_dst
-> on its macsec skbs, so their offloaded packets just get dropped now?
+> On 11/06, Mina Almasry wrote:
+> > On Mon, Nov 6, 2023 at 11:34=E2=80=AFAM David Ahern <dsahern@kernel.org=
+> wrote:
+> > >
+> > > On 11/6/23 11:47 AM, Stanislav Fomichev wrote:
+> > > > On 11/05, Mina Almasry wrote:
+> > > >> For device memory TCP, we expect the skb headers to be available i=
+n host
+> > > >> memory for access, and we expect the skb frags to be in device mem=
+ory
+> > > >> and unaccessible to the host. We expect there to be no mixing and
+> > > >> matching of device memory frags (unaccessible) with host memory fr=
+ags
+> > > >> (accessible) in the same skb.
+> > > >>
+> > > >> Add a skb->devmem flag which indicates whether the frags in this s=
+kb
+> > > >> are device memory frags or not.
+> > > >>
+> > > >> __skb_fill_page_desc() now checks frags added to skbs for page_poo=
+l_iovs,
+> > > >> and marks the skb as skb->devmem accordingly.
+> > > >>
+> > > >> Add checks through the network stack to avoid accessing the frags =
+of
+> > > >> devmem skbs and avoid coalescing devmem skbs with non devmem skbs.
+> > > >>
+> > > >> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > >> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> > > >> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > > >>
+> > > >> ---
+> > > >>  include/linux/skbuff.h | 14 +++++++-
+> > > >>  include/net/tcp.h      |  5 +--
+> > > >>  net/core/datagram.c    |  6 ++++
+> > > >>  net/core/gro.c         |  5 ++-
+> > > >>  net/core/skbuff.c      | 77 ++++++++++++++++++++++++++++++++++++-=
+-----
+> > > >>  net/ipv4/tcp.c         |  6 ++++
+> > > >>  net/ipv4/tcp_input.c   | 13 +++++--
+> > > >>  net/ipv4/tcp_output.c  |  5 ++-
+> > > >>  net/packet/af_packet.c |  4 +--
+> > > >>  9 files changed, 115 insertions(+), 20 deletions(-)
+> > > >>
+> > > >> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > > >> index 1fae276c1353..8fb468ff8115 100644
+> > > >> --- a/include/linux/skbuff.h
+> > > >> +++ b/include/linux/skbuff.h
+> > > >> @@ -805,6 +805,8 @@ typedef unsigned char *sk_buff_data_t;
+> > > >>   *  @csum_level: indicates the number of consecutive checksums fo=
+und in
+> > > >>   *          the packet minus one that have been verified as
+> > > >>   *          CHECKSUM_UNNECESSARY (max 3)
+> > > >> + *  @devmem: indicates that all the fragments in this skb are bac=
+ked by
+> > > >> + *          device memory.
+> > > >>   *  @dst_pending_confirm: need to confirm neighbour
+> > > >>   *  @decrypted: Decrypted SKB
+> > > >>   *  @slow_gro: state present at GRO time, slower prepare step req=
+uired
+> > > >> @@ -991,7 +993,7 @@ struct sk_buff {
+> > > >>  #if IS_ENABLED(CONFIG_IP_SCTP)
+> > > >>      __u8                    csum_not_inet:1;
+> > > >>  #endif
+> > > >> -
+> > > >> +    __u8                    devmem:1;
+> > > >>  #if defined(CONFIG_NET_SCHED) || defined(CONFIG_NET_XGRESS)
+> > > >>      __u16                   tc_index;       /* traffic control in=
+dex */
+> > > >>  #endif
+> > > >> @@ -1766,6 +1768,12 @@ static inline void skb_zcopy_downgrade_mana=
+ged(struct sk_buff *skb)
+> > > >>              __skb_zcopy_downgrade_managed(skb);
+> > > >>  }
+> > > >>
+> > > >> +/* Return true if frags in this skb are not readable by the host.=
+ */
+> > > >> +static inline bool skb_frags_not_readable(const struct sk_buff *s=
+kb)
+> > > >> +{
+> > > >> +    return skb->devmem;
+> > > >
+> > > > bikeshedding: should we also rename 'devmem' sk_buff flag to 'not_r=
+eadable'?
+> > > > It better communicates the fact that the stack shouldn't dereferenc=
+e the
+> > > > frags (because it has 'devmem' fragments or for some other potentia=
+l
+> > > > future reason).
+> > >
+> > > +1.
+> > >
+> > > Also, the flag on the skb is an optimization - a high level signal th=
+at
+> > > one or more frags is in unreadable memory. There is no requirement th=
+at
+> > > all of the frags are in the same memory type.
+>
+> David: maybe there should be such a requirement (that they all are
+> unreadable)? Might be easier to support initially; we can relax later
+> on.
+>
 
-After taking a deeper look throughout the tree, I realize there are
-macsec offloading drivers that do not set md_dst. In this event, we fail
-to correctly handle the skb and deliver to the port as you mentioned
-previously. Sorry about this miss on my end.
+Currently devmem =3D=3D not_readable, and the restriction is that all the
+frags in the same skb must be either all readable or all unreadable
+(all devmem or all non-devmem).
 
-However, I believe that all macsec offload supporting devices run into
-the following problem today (including mlx5 devices).
+> > The flag indicates that the skb contains all devmem dma-buf memory
+> > specifically, not generic 'not_readable' frags as the comment says:
+> >
+> > + *     @devmem: indicates that all the fragments in this skb are backe=
+d by
+> > + *             device memory.
+> >
+> > The reason it's not a generic 'not_readable' flag is because handing
+> > off a generic not_readable skb to the userspace is semantically not
+> > what we're doing. recvmsg() is augmented in this patch series to
+> > return a devmem skb to the user via a cmsg_devmem struct which refers
+> > specifically to the memory in the dma-buf. recvmsg() in this patch
+> > series is not augmented to give any 'not_readable' skb to the
+> > userspace.
+> >
+> > IMHO skb->devmem + an skb_frags_not_readable() as implemented is
+> > correct. If a new type of unreadable skbs are introduced to the stack,
+> > I imagine the stack would implement:
+> >
+> > 1. new header flag: skb->newmem
+> > 2.
+> >
+> > static inline bool skb_frags_not_readable(const struct skb_buff *skb)
+> > {
+> >     return skb->devmem || skb->newmem;
+> > }
+> >
+> > 3. tcp_recvmsg_devmem() would handle skb->devmem skbs is in this patch
+> > series, but tcp_recvmsg_newmem() would handle skb->newmem skbs.
+>
+> You copy it to the userspace in a special way because your frags
+> are page_is_page_pool_iov(). I agree with David, the skb bit is
+> just and optimization.
+>
+> For most of the core stack, it doesn't matter why your skb is not
+> readable. For a few places where it matters (recvmsg?), you can
+> double-check your frags (all or some) with page_is_page_pool_iov.
+>
 
-When I configure macsec offload on a device and then vlan on top of the
-macsec interface, I become unable to send traffic through the underlying
-device.
+I see, we can do that then. I.e. make the header flag 'not_readable'
+and check the frags to decide to delegate to tcp_recvmsg_devmem() or
+something else. We can even assume not_readable =3D=3D devmem because
+currently devmem is the only type of unreadable frag currently.
 
-(can replace mlx5_1 with any ifname of a device that supports macsec offload)
+> Unrelated: we probably need socket to dmabuf association as well (via
+> netlink or something).
 
-Side 1
+Not sure this is possible. The dma-buf is bound to the rx-queue, and
+any packets that land on that rx-queue are bound to that dma-buf,
+regardless of which socket that packet belongs to. So the association
+IMO must be rx-queue to dma-buf, not socket to dma-buf.
 
-  ip link del macsec0
-  ip address flush mlx5_1
-  ip address add 1.1.1.1/24 dev mlx5_1
-  ip link set dev mlx5_1 up
-  ip link add link mlx5_1 macsec0 type macsec sci 1 encrypt on
-  ip link set dev macsec0 address 00:11:22:33:44:66
-  ip macsec offload macsec0 mac
-  ip macsec add macsec0 tx sa 0 pn 1 on key 00 dffafc8d7b9a43d5b9a3dfbbf6a30c16
-  ip macsec add macsec0 rx sci 2 on
-  ip macsec add macsec0 rx sci 2 sa 0 pn 1 on key 00 ead3664f508eb06c40ac7104cdae4ce5
-  ip address flush macsec0
-  ip address add 2.2.2.1/24 dev macsec0
-  ip link set dev macsec0 up
-  ip link add link macsec0 name macsec_vlan type vlan id 1
-  ip link set dev macsec_vlan address 00:11:22:33:44:88
-  ip address flush macsec_vlan
-  ip address add 3.3.3.1/24 dev macsec_vlan
-  ip link set dev macsec_vlan up
+> We are fundamentally receiving into and sending from a dmabuf (devmem =3D=
+=3D
+> dmabuf).
+> And once you have this association, recvmsg shouldn't need any new
+> special flags.
 
-Side 2
 
-  ip link del macsec0
-  ip address flush mlx5_1
-  ip address add 1.1.1.2/24 dev mlx5_1
-  ip link set dev mlx5_1 up
-  ip link add link mlx5_1 macsec0 type macsec sci 2 encrypt on
-  ip link set dev macsec0 address 00:11:22:33:44:77
-  ip macsec offload macsec0 mac
-  ip macsec add macsec0 tx sa 0 pn 1 on key 00 ead3664f508eb06c40ac7104cdae4ce5
-  ip macsec add macsec0 rx sci 1 on
-  ip macsec add macsec0 rx sci 1 sa 0 pn 1 on key 00 dffafc8d7b9a43d5b9a3dfbbf6a30c16
-  ip address flush macsec0
-  ip address add 2.2.2.2/24 dev macsec0
-  ip link set dev macsec0 up
-  ip link add link macsec0 name macsec_vlan type vlan id 1
-  ip link set dev macsec_vlan address 00:11:22:33:44:99
-  ip address flush macsec_vlan
-  ip address add 3.3.3.2/24 dev macsec_vlan
-  ip link set dev macsec_vlan up
-
-Side 1
-
-  ping -I mlx5_1 1.1.1.2
-  PING 1.1.1.2 (1.1.1.2) from 1.1.1.1 mlx5_1: 56(84) bytes of data.
-  From 1.1.1.1 icmp_seq=1 Destination Host Unreachable
-  ping: sendmsg: No route to host
-  From 1.1.1.1 icmp_seq=2 Destination Host Unreachable
-  From 1.1.1.1 icmp_seq=3 Destination Host Unreachable
-
-I am thinking the solution is a combination of annotating which macsec
-devices support md_dst and this patch. However, I am not sure this fix
-would be helpful for devices that support macsec offload without
-utilizing md_dst information (would still be problematic).
-
-Would be glad to hear any suggestions you may have before sending out a
-v2.
-
-Sorry for the late reply. Was away from a trip and wanted to validate
-some things before posting back.
-
---
+--=20
 Thanks,
-
-Rahul Rameshbabu
+Mina
 
