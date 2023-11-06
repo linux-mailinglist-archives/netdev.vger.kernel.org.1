@@ -1,231 +1,199 @@
-Return-Path: <netdev+bounces-46186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FFA7E209F
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:02:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D287E21FE
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:44:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E91D281188
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:02:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D7A1B20EE1
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 12:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E261A707;
-	Mon,  6 Nov 2023 12:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF9518646;
+	Mon,  6 Nov 2023 12:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M7x5GATz"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YTjYm5Yi"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08ED61A705
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:02:09 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F5D194;
-	Mon,  6 Nov 2023 04:02:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699272127; x=1730808127;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=tWd+p1H+UpMpwiYMtHYFe64odqrnVHJJABgzRZuTNmU=;
-  b=M7x5GATzQkIxoy3zyd19dYtsnVNKXKU9Q4SYhHh+eJsLvO+vEdwwVwrm
-   vIwkhXMPaVfBBBugL+gm+Mkxi7Ha9MBR3763Z2iL/bgPtk7KXbpCjLl+N
-   Mk/8KFIl1ooQIpC9GfDh6OnC+E3dWdkeqphS45M3UAhV7yr/mR9aXffv4
-   0G0aNfdDcj4iy4GmBNe9BDEvtvsnEyV7khvmxTJ/DrBEDT2hF8zBEypoe
-   OJBoFBHZEbIzOV/PqHY8zGn15pqQopCc2rnnBDUWRltroNvxmejrGvh10
-   6ryBHUfY+r1z6bFy05qeUuOWzdKzYzJcFvfiolHc0zpStJJLUI7BL14lr
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="2169631"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="2169631"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 04:02:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="797284741"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="797284741"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2023 04:02:05 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 6 Nov 2023 04:02:04 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 6 Nov 2023 04:02:03 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 6 Nov 2023 04:02:03 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 6 Nov 2023 04:02:03 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YKXoCWIZx2VH7f+7RuAxp9ogPwt+PNJ9hQPQPfmlMVeDxE8M+aZx6sR9EeCObsT4Hf2vEZXyL/iJMk2GLvs/IuGq5CyqFfKJc7Fu7no87AJ+s/H+QId+vSS7tbOTn/37VBvEjeBs6CXmuzAY6eTOdPIpozoj9T7yHHdKkwlijBBtPpPnIcWEe/o5IqplSsHkIWHYRkJtn4dap1oO1PpFciApIFRDFIb/VuGQjgXlWKHRfRYT4HPgwBudFOzuBwxyHA0+SexYLaSPZhHEFcif5bGcPx4KBfd4XT+BjqaA3H6sP6qQ/YvKLAYc6CGAjSErsfsI4yQiZwR1fXoWlnUg5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BZudkllo3MjmuVUfNiNq0HSW2o3V0CIXVlwztQFo17Y=;
- b=Gp471Y8I0Xx4taEFH1tt2CUGQxQg9Hhp7D6/B8wKfkrhndbO4IiyX1LMqx6llgeSFgpikipOPyQboUp4iO+e/4TsiPS7S1KpXHQDWBtHkXCS3BqvBgNyJ1iucq/RghzyzbiD7Xh/MdbIU15kBH32Tgutzb82xhFfss2hGIZLjJ0RTz1QprMWge1kXi4MPQRtjt0Ne9uhW0J0iRJoc4iPEFYqmu4sumDhSIrfPHmwyVAteL+/7OLUL+o7dEAXcaPAhPOHAFkw8tSZHMjbsiUG7OF7RV3yMbEUS74jkhUeEhnrJbdTD+TKMonClCPXwHb9ywW3xYenSqKhFSC5pnWjxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by DM6PR11MB4625.namprd11.prod.outlook.com (2603:10b6:5:2a8::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Mon, 6 Nov
- 2023 12:02:00 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::1b1e:8472:f24b:6693]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::1b1e:8472:f24b:6693%3]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
- 12:02:00 +0000
-Message-ID: <2a5434e8-ece3-422b-99bf-d3f56750d408@intel.com>
-Date: Mon, 6 Nov 2023 13:01:53 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Add missing icss_iep_put to
- error path
-Content-Language: en-US
-To: Jan Kiszka <jan.kiszka@siemens.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar
-	<danishanwar@ti.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Lopes Ivo,
- Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>, Nishanth Menon
-	<nm@ti.com>, "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>
-References: <b2857e2c-cacf-4077-8e15-308dce8ccb0b@siemens.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <b2857e2c-cacf-4077-8e15-308dce8ccb0b@siemens.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR5P281CA0003.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f2::14) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A051946A
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 12:43:59 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 793B9BB
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 04:43:56 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53db360294fso7509049a12.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 04:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1699274635; x=1699879435; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=+CljpizNaKMJtlhWDMYHbIGy2sGb70nOe+eKxsqv8bw=;
+        b=YTjYm5YiGHtrp2mLQlGmKxNgxMBjEeiJ8B9uK2DoLA1hqSZHA6NY5X58/tcOvGtMX+
+         gZCoui0cY8Dl4oHL1e0h75PCKGqzGEE17qC2rxOj9GJn9W9z7Ews2VeLb6kU35YNAf3f
+         1ZDPjGzECxLpWXvbT+4lvQg0qY70Z/4RgDAf9E42TIDUw1HzVP2iYMU2aBEmsO3+BD6+
+         /mr8hPLsyxYDHbQx9Y530YShg0edTad95wfNxJLHrfkJUhFJZrDyxgJksyGH0jFw7PpM
+         PaOOfggrFG5qQvYTWRRV3xWQfS24kWzvctArLKGhQDyUY1dGBzVMAnBaKvKu+4RA0pW0
+         lzDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699274635; x=1699879435;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+CljpizNaKMJtlhWDMYHbIGy2sGb70nOe+eKxsqv8bw=;
+        b=pxqop6jW3564a//Moq0OgczQPPLgyEZzgkSBYpeasHNtPof+34F5xcXUQLwb9wkmHY
+         Tj6SuYCHX8kuTfDwlECay1cT+F4xC6DiiS61SGSGoeHVLQ6WEovtUJOiQapsxHgKIQK8
+         bSmytod7NfvUwu043fyJuI7kbIs+K2/9yjnidGPrr/fd4GECXtBVhRe8zrqXHebQu3Su
+         nnEllxLLsHaj+OZs5YgXqGXGbbIEOlThAK2A+Wl9d2rFExVYdVOogtq5sKaT129NgPit
+         euOHn/HA4h0gM5juawrs1oXPBPh2rLV+A330maQOIyViuKECrmKl11MPj6Sat3eqs/mt
+         z51w==
+X-Gm-Message-State: AOJu0YxRordx7hviYsCgF0l7FMNG8+j176GSRdOUSwUBlkKO8W0N6d+U
+	6yf2ErSPUMhx51uk421tgYohims6V7r3WxZbk2c=
+X-Google-Smtp-Source: AGHT+IFz9uyurQv4q7IAXh5dqdf/GR0tCJGpcjx7xqFCbfmiFREIls/hhLNjm5d1J/Rbh3UTmfYzJA==
+X-Received: by 2002:a05:6402:d6b:b0:541:29c8:959b with SMTP id ec43-20020a0564020d6b00b0054129c8959bmr19496699edb.39.1699274634876;
+        Mon, 06 Nov 2023 04:43:54 -0800 (PST)
+Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
+        by smtp.gmail.com with ESMTPSA id u14-20020a50c04e000000b005412c0ba2f9sm4398147edd.13.2023.11.06.04.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 04:43:54 -0800 (PST)
+References: <20231016190819.81307-1-john.fastabend@gmail.com>
+ <20231016190819.81307-2-john.fastabend@gmail.com>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, yangyingliang@huawei.com,
+ martin.lau@kernel.org
+Subject: Re: [PATCH bpf 1/2] bpf: sockmap, af_unix sockets need to hold ref
+ for pair sock
+Date: Mon, 06 Nov 2023 13:35:55 +0100
+In-reply-to: <20231016190819.81307-2-john.fastabend@gmail.com>
+Message-ID: <87cywnjblh.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DM6PR11MB4625:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6e8644b0-b9f9-48cb-514c-08dbdec02e9d
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: LuMJurfx74W27jFBcDaGdCU73eajgynoFollIJygL2Ra+kNQ9NxgOBQBhWtt9+nApJgYCQWm5t/2nejKVw91JY5s9kaIOI38uIhyqc8u+6ug2aWaWLqByix4r4nzq2QJbX9DYT0q2xdwDmC/NkKSp1BsqxBnQSJRNXu8uLCzlKhwQit1ZsNy4RYNFYDjENx+Gq/RIkXwbXa7BTBy9baO9je/xggB2DnIm7mKgiexCV872hWizrnna2IlfslWn1TwelaNqq8InvZf4e3X1YbXs0vnnyOeDLFDPKerAZZxWfOka4L94vwukr+mtpoCRpG0AoWR4rkHCAzoanM11NyD5akCrCJi9L2cnvxFq3kchAoynJiTNKqMi0YL7L0e/4DehpF4tZVSN0BxWA5yhP5cdnKEWLP+ubGqr8Grn9H1gvN98/LO2PuOLQNQv7D6nghwjr2qM8YmtgYwln1mHwZU9OLmPEwa4RT+ThzMrB4wffRFQe6I4WsY+ewz85rvPAkZ0rTYwZMrjaDw43++w0sMMQhp5q7Hhczteol9dDaqdtBZrA8nkVAdTOqSph+8aSZ6u1IL9yV5K4RictXJib3+CQBRbEmQ5Ot43J6eLRT/OnzgAlsP+sU/fVKqxSOfRJ1ysDZCpvLS0Nz8s+1Lk9EVIA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(366004)(136003)(346002)(376002)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(478600001)(41300700001)(6512007)(44832011)(7416002)(6506007)(53546011)(2616005)(6486002)(6666004)(83380400001)(8676002)(8936002)(2906002)(5660300002)(66946007)(26005)(316002)(66476007)(110136005)(54906003)(66556008)(38100700002)(82960400001)(4326008)(31686004)(31696002)(86362001)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cFZLNEF2UHZGRHNDM3k1NmxoNGtMQzl5U0ROSG16MFBSbGRaN0NBVHVtNWYy?=
- =?utf-8?B?ZS9KQ1hBa0VLQnk3cnMydVltdVJHZDdvNyszcUJIKzgvejQvSDdGcGxyQkRJ?=
- =?utf-8?B?K2ptM2t2dWpGaGp1a3pMUmh4NkxWQWpvTEgyN01MdFF2bWcrUTVNenN0VTE0?=
- =?utf-8?B?RXZEM1B5VUNNWGFkTUlCL2gwekswWUJkMFVNOE5GK3lkOE1EN0ZLWVI3bmFM?=
- =?utf-8?B?M01jMHgzZTZaak4zdHVyUTQ0RmJNTXZ6aHllOTM3V3AzaGRUOHA0S1ZPNEU1?=
- =?utf-8?B?MmRXRUR0aE5qemdDS1hrMGVFNkFkOXBtZ29JQStaZSt2MStpVXozamdhaVNQ?=
- =?utf-8?B?M1hIRlhpdXZqRW5XWURCUnh3L1dRV0FtWko0b3JOMFRuK1FLeXFSTG80S0cw?=
- =?utf-8?B?eHQ0NEViQXphN210OFl6S0R3UzdUNGRUMUxFaVl1U2pjZ1VyUlFTT01WaVN6?=
- =?utf-8?B?WVYyVDhSOTFJTzczMkpYN3h4RnJ2aVZtL1ozRm1Eb3gwY2cvVS9mMFdlYXZX?=
- =?utf-8?B?dit0WFY5MHl6d3RoV01RUVloR1N5SHFtN29mTVdkRnVPaWRkSkNhUDBGV1hF?=
- =?utf-8?B?MXFvcnVOalpqdFhoN2UydURGeTNmUTlxOUZIMGtyOHFxdGY0TU5zK2VRamJG?=
- =?utf-8?B?N2RFRm9nT2VNbzBMdXp4Mmw0c0Y5cFI0V3djWE1vWkZxdENjMWVzQ09hY09M?=
- =?utf-8?B?NitYK0lYY0Z5bmFRYnZvZjlscXB4RkN4OGp1Z1ZhRm5IbU53cmZ3SWpwYkFR?=
- =?utf-8?B?Zm9sc2h0S2J3TVYwSStoM1hzZmIyQmlGejI0Z3VOYTlXOExKL3QrNER4S01k?=
- =?utf-8?B?K3VFK2VjKzloWHRHMzFFR1RjSUdQM1FpNW5XZlF5bTN6eVhMMEtqTXNwZEwr?=
- =?utf-8?B?RlFUUEF1T1dLUUxDMStQTWhCS1FkSVVDUVR6WTBSUnFLdkF0UGl0eEFSTzd3?=
- =?utf-8?B?QVIvdVoxeFNCU3lqM2VuSHJKdUtwcU5qODVtZTdMeXBxdGVuK1ZxVHhob0Zs?=
- =?utf-8?B?TU1uOTRmWDdjM2VaTkVqOWVTWUQyRWwvd0NhTWZnTVZuVUVtd25tWEQxL0Rl?=
- =?utf-8?B?RHFpMUdha2tKUEJVUGFsZFlIWXBvN1o4NlN4TzFkT0lDTDNNTVlrWW90K3RF?=
- =?utf-8?B?ME5WNDlmLytQRjlHNDh1bTdYdjFnbUU4ZS9STmx1Yno0TWpGalRoMnVLL1pX?=
- =?utf-8?B?TjhDbkVwblZlMWszUDFNYy9xNVllWVlzQm1WYm5RSG93eUNNM1hnNmQ0Q2pT?=
- =?utf-8?B?UkRabGdXTDY2UzVRWVdYVytRcUlUclZ2U0JwTU96NGdxVWl4NjBHY1FQTDlz?=
- =?utf-8?B?K1dIeDV0WmQwdDZUcndpZG9VYWNhajhwaE5rWjMvQ2FOakxWUllhNEczVXFN?=
- =?utf-8?B?WlRSaldpL29IS0h5NDF0a01CQ1UzSW9lZkVlWTJNMTNnVDFFTEhpNWc1dVJW?=
- =?utf-8?B?K2tkclUvZ2JDWXJLKzQ4MHV1SndOdmx5UFJLYkRrSUVvYUZHa0YvZ0U5YXAx?=
- =?utf-8?B?V1BIM3d2ajVjZCtzZWJNckRGLy9hZjVwNWpUTkN5QkxtenB5TEV5V0t1dmt1?=
- =?utf-8?B?YVBubnBMdjNwU3prSGIxT2hKc2pOdkJ0Nmo0akVGWEk5OFJKakhuYmM4c2sy?=
- =?utf-8?B?dERiVUJsSFRRV21hbFVxK1d0S0tsWEU2bUdjbTdNMHBiNHpaTzZCenVwbTJ1?=
- =?utf-8?B?MnRQbnliaXVFVlJtSTdUU2tCanJxeFRrODhUWUFYRTh0ekdTT0RjOGd6b2pU?=
- =?utf-8?B?QnVpRnljR1dlbmhHUDdhKzVhWUY4Z0Nlb0djcEVzUXlnZVN3aWt6UjVwN29o?=
- =?utf-8?B?RjVpYUYrRDFOcWVyTkE1MXRIem05TGJOK2RLaTdTbGpPQ0M5cHpYZ3BXRG11?=
- =?utf-8?B?cGk0aklJZXFDTEJidkJIS2tQZ3EwbnhtMnRoeTRERk4yTElkZWV2ckhqS05F?=
- =?utf-8?B?amFIRnFKQVcra3JWZ3hYMmtVU3djd0tLNkNOQ250OG9qMHdvTy8rWjcxODZX?=
- =?utf-8?B?TWp6YjZlMFJhRWhNWmN4UU1hR2g1ZFgxTStPMmF3NWIzWTUwSWwrR29SaElP?=
- =?utf-8?B?QlAwOGc1KzdqY0kySjk5TTdaY2pldW16YW9WUHl1RUcvVDF6emVMSVVFOTJk?=
- =?utf-8?B?MkJJellLOWRnaWJ3SkltVXcwRkJXV3BLUHJKN2J1MGxqWUlWVStZdnRDT0tq?=
- =?utf-8?B?blE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e8644b0-b9f9-48cb-514c-08dbdec02e9d
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 12:02:00.4452
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9DuYQ0+/77SGZaYHMLDezlR7dzDxgg8tUyJ8/TBL68tWmXfLW3XQ6HvLmF89Kwa82EwGcB6QpOi7WXG5X5UW8WTnprR7Mk2O8B/AWS3dpTs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4625
-X-OriginatorOrg: intel.com
+Content-Type: text/plain
 
-
-
-On 06.11.2023 12:47, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
-> 
-> Analogously to prueth_remove, just also taking care for NULL'ing the
-> iep pointers.
-> 
-> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
-> Fixes: 443a2367ba3c ("net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support")
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+On Mon, Oct 16, 2023 at 12:08 PM -07, John Fastabend wrote:
+> AF_UNIX sockets are a paired socket. So sending on one of the pairs
+> will lookup the paired socket as part of the send operation. It is
+> possible however to put just one of the pairs in a BPF map. This
+> currently increments the refcnt on the sock in the sockmap to
+> ensure it is not free'd by the stack before sockmap cleans up its
+> state and stops any skbs being sent/recv'd to that socket.
+>
+> But we missed a case. If the peer socket is closed it will be
+> free'd by the stack. However, the paired socket can still be
+> referenced from BPF sockmap side because we hold a reference
+> there. Then if we are sending traffic through BPF sockmap to
+> that socket it will try to dereference the free'd pair in its
+> send logic creating a use after free.  And following splat,
+>
+>    [59.900375] BUG: KASAN: slab-use-after-free in sk_wake_async+0x31/0x1b0
+>    [59.901211] Read of size 8 at addr ffff88811acbf060 by task kworker/1:2/954
+>    [...]
+>    [59.905468] Call Trace:
+>    [59.905787]  <TASK>
+>    [59.906066]  dump_stack_lvl+0x130/0x1d0
+>    [59.908877]  print_report+0x16f/0x740
+>    [59.910629]  kasan_report+0x118/0x160
+>    [59.912576]  sk_wake_async+0x31/0x1b0
+>    [59.913554]  sock_def_readable+0x156/0x2a0
+>    [59.914060]  unix_stream_sendmsg+0x3f9/0x12a0
+>    [59.916398]  sock_sendmsg+0x20e/0x250
+>    [59.916854]  skb_send_sock+0x236/0xac0
+>    [59.920527]  sk_psock_backlog+0x287/0xaa0
+>
+> To fix let BPF sockmap hold a refcnt on both the socket in the
+> sockmap and its paired socket.  It wasn't obvious how to contain
+> the fix to bpf_unix logic. The primarily problem with keeping this
+> logic in bpf_unix was: In the sock close() we could handle the
+> deref by having a close handler. But, when we are destroying the
+> psock through a map delete operation we wouldn't have gotten any
+> signal thorugh the proto struct other than it being replaced.
+> If we do the deref from the proto replace its too early because
+> we need to deref the skpair after the backlog worker has been
+> stopped.
+>
+> Given all this it seems best to just cache it at the end of the
+> psock and eat 8B for the af_unix and vsock users.
+>
+> Fixes: 94531cfcbe79 ("af_unix: Add unix_stream_proto for sockmap")
+> Signed-off-by: John Fastabend <john.fastabend@gmail.com>
 > ---
+>  include/linux/skmsg.h |  1 +
+>  include/net/af_unix.h |  1 +
+>  net/core/skmsg.c      |  2 ++
+>  net/unix/af_unix.c    |  2 --
+>  net/unix/unix_bpf.c   | 10 ++++++++++
+>  5 files changed, 14 insertions(+), 2 deletions(-)
+>
 
-Thanks!
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+[...]
 
-> 
-> Changes in v3:
->  - consolidate cleanup logic further [Wojciech]
->  - make sure to NULL iep pointers
-> 
-> Changes in v2:
->  - add proper tags
-> 
-> This was lost from the TI SDK version while ripping out SR1.0 support - which we are currently restoring for upstream.
-> 
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 6c4b64227ac8..3abbeba26f1b 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -2105,10 +2105,7 @@ static int prueth_probe(struct platform_device *pdev)
->  	prueth->iep1 = icss_iep_get_idx(np, 1);
->  	if (IS_ERR(prueth->iep1)) {
->  		ret = dev_err_probe(dev, PTR_ERR(prueth->iep1), "iep1 get failed\n");
-> -		icss_iep_put(prueth->iep0);
-> -		prueth->iep0 = NULL;
-> -		prueth->iep1 = NULL;
-> -		goto free_pool;
-> +		goto put_iep0;
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 3e8a04a13668..87dd723aacf9 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -212,8 +212,6 @@ static inline bool unix_secdata_eq(struct scm_cookie *scm, struct sk_buff *skb)
+>  }
+>  #endif /* CONFIG_SECURITY_NETWORK */
+>  
+> -#define unix_peer(sk) (unix_sk(sk)->peer)
+> -
+>  static inline int unix_our_peer(struct sock *sk, struct sock *osk)
+>  {
+>  	return unix_peer(osk) == sk;
+> diff --git a/net/unix/unix_bpf.c b/net/unix/unix_bpf.c
+> index 2f9d8271c6ec..705eeed10be3 100644
+> --- a/net/unix/unix_bpf.c
+> +++ b/net/unix/unix_bpf.c
+> @@ -143,6 +143,8 @@ static void unix_stream_bpf_check_needs_rebuild(struct proto *ops)
+>  
+>  int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  {
+> +	struct sock *skpair;
+> +
+>  	if (sk->sk_type != SOCK_DGRAM)
+>  		return -EOPNOTSUPP;
+>  
+> @@ -152,6 +154,9 @@ int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool re
+>  		return 0;
 >  	}
 >  
->  	if (prueth->pdata.quirk_10m_link_issue) {
-> @@ -2205,6 +2202,12 @@ static int prueth_probe(struct platform_device *pdev)
->  exit_iep:
->  	if (prueth->pdata.quirk_10m_link_issue)
->  		icss_iep_exit_fw(prueth->iep1);
-> +	icss_iep_put(prueth->iep1);
-> +
-> +put_iep0:
-> +	icss_iep_put(prueth->iep0);
-> +	prueth->iep0 = NULL;
-> +	prueth->iep1 = NULL;
+> +	skpair = unix_peer(sk);
+> +	sock_hold(skpair);
+> +	psock->skpair = skpair;
+>  	unix_dgram_bpf_check_needs_rebuild(psock->sk_proto);
+>  	sock_replace_proto(sk, &unix_dgram_bpf_prot);
+>  	return 0;
+
+unix_dgram should not need this, since it grabs a ref on each sendmsg.
+
+I'm not able to reproduce this bug for unix_dgram.
+
+Have you seen any KASAN reports for unix_dgram from syzcaller?
+
+> @@ -159,12 +164,17 @@ int unix_dgram_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool re
 >  
->  free_pool:
->  	gen_pool_free(prueth->sram_pool,
+>  int unix_stream_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  {
+> +	struct sock *skpair = unix_peer(sk);
+> +
+>  	if (restore) {
+>  		sk->sk_write_space = psock->saved_write_space;
+>  		sock_replace_proto(sk, psock->sk_proto);
+>  		return 0;
+>  	}
+>  
+> +	skpair = unix_peer(sk);
+> +	sock_hold(skpair);
+> +	psock->skpair = skpair;
+>  	unix_stream_bpf_check_needs_rebuild(psock->sk_proto);
+>  	sock_replace_proto(sk, &unix_stream_bpf_prot);
+>  	return 0;
+
 
