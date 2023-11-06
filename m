@@ -1,165 +1,116 @@
-Return-Path: <netdev+bounces-46232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D63F7E2A92
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:03:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117447E2AB8
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F23F1C20C04
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:03:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 428721C20BDC
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887492942D;
-	Mon,  6 Nov 2023 17:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F2329CEE;
+	Mon,  6 Nov 2023 17:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="KZKo9BNA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aic7iPul"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E43115AF2
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:03:29 +0000 (UTC)
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A289B125
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 09:03:28 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-2809fb0027cso3437996a91.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 09:03:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40AD2F38
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:11:32 +0000 (UTC)
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90D8183
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 09:11:31 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-7a6774da682so203771739f.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 09:11:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1699290208; x=1699895008; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ben4iCbN53nMVOf/bR/i9r0kIFtgFbYHJJnd3HQamaI=;
-        b=KZKo9BNAj1gnB+t6GP4PI7Jf/HjulCIBKIDEEuyCEEpZOunjvMEQVgR8IVhrUy5rAT
-         tDXkZJuTXc7F9vesJ3yOeV54Dv+p34uln86hZ7hni9kwWYZFej5hiqKsTusA7wXUsXM6
-         a6D1RCSP6VRRbnA6RHiD06W2MeK7Sg9VMaMJ04ycAmN9KZ2XiglCotLpBvmksCcoCf+q
-         GAp/9JP0V/ZhJ3nK66xKKfo+zJHkQy+52tyqqy0KBapG9KUYIkz1o/Q9123XqGoeyEuA
-         oxh56otNIf+4AOU+zMLQKjt7SijXzsRY82cDGAk6EA1BK8inNHr2BWPA0OHbIEaIMJcy
-         0Mdg==
+        d=gmail.com; s=20230601; t=1699290691; x=1699895491; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=U0LYl7TPKQ+bVs/FZFQ7VJND4FNh7+P2HHWokpmCYfU=;
+        b=Aic7iPul1lnxiFRlNd2/fWj7xQdxhxKqM3NMTE6G3nOLvq+9wQm2wwOI6wugqKvtO+
+         FFh1eYVfZzwZEGn4P4DEsMIPLE98CyoKoW0BvScxAdyFg/i5YHRx3BCmD55nRJzs9FXJ
+         EcS23pFrEiaHdAv9oohvMD2mz/JkPX7NfeUW1xD4JXE/4PXJbo+cVCGV+NMQy4YmsegA
+         UFukGdbTECljjP44osAU7+x1CDK/H7HcQuMkuGGiSUhwAGNEi2WCCPqtg8xeLGA/FK7n
+         WGlBstQjV8uXZuoB5ta7QL1GyqUP8LyCE1MLC7qWNpVp+AxFHzi4zV/QVhTejaOxTQRU
+         YLKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699290208; x=1699895008;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ben4iCbN53nMVOf/bR/i9r0kIFtgFbYHJJnd3HQamaI=;
-        b=fZObhwSFsuZkcjVK2d4eZvV/jg6KgTaEDmvEhHjRFG4Kdd1KIzFB0uaXSEO1W31H/M
-         6Cyj3UnZEYnnjjUUH7XlJ7f4dZj2/8m6lhHD7GZaweVu35FKXjOiks2lroA8w+OSYUhc
-         /GcaMnBw7/5/cqlivMpISHFwis1pGLFWxyTCw+QFxFDFm086qVD36iA9mhIHOOtjiu74
-         E+a/UhtEBL+9r29h31NUh/J3mOtrsY1FfyTyVEZHaRqoeC2frUAKotP1wv1G18FMxlui
-         /KMytvJzziOI7WTfph/jQa0Ebqz8AN0HRgELeAMbrQAhx1ASxYsjq5H9bktp0xeNWuXu
-         H6Vw==
-X-Gm-Message-State: AOJu0Yz0PJVWqPBAlLQu1QPNgHzDeXlLHjkfmilkZbGrMfTMv7EXzI/h
-	hFvplMmSM322yAihjxHhEDQejR/KrglexNOZtWw=
-X-Google-Smtp-Source: AGHT+IEoBVbWUrL6c1QOluncxudI83jsWTm3jKeZTE/RXGHmikCwU1Lk4vxO/HHuVoAWbULdcWR/0Q==
-X-Received: by 2002:a17:90b:4a50:b0:26d:17da:5e9f with SMTP id lb16-20020a17090b4a5000b0026d17da5e9fmr10267650pjb.1.1699290207788;
-        Mon, 06 Nov 2023 09:03:27 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 18-20020a17090a199200b002810810cc80sm1743382pji.37.2023.11.06.09.03.27
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 09:03:27 -0800 (PST)
-Date: Mon, 6 Nov 2023 09:03:25 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.6 release
-Message-ID: <20231106090325.07092c87@hermes.local>
+        d=1e100.net; s=20230601; t=1699290691; x=1699895491;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U0LYl7TPKQ+bVs/FZFQ7VJND4FNh7+P2HHWokpmCYfU=;
+        b=WAwfUqt9842VPAnEH81D4XeCnG91DdgHoCzkJNvOLKU1sgHZRQAJffIe7jv0tU7TCd
+         lsGlUOH83EY2/8wLcZ1xhRsvnW555okoOVFhqkZM3gqrDSuWqGpSoybi6ke/hNLpmtbD
+         pwsBnrR0gFXh5RfCP0Cgtuxt74kNczwjvytVS5SEj0igBmQbpWLG83Rmb8FBEH+YXhTr
+         JrVWi2eq5CroEk0PBbAeGO9v5gd+QLnG4TbbNjBeDQY0bqu+W4dU3C1wNGm9/k34j41b
+         upywFDTkV0461IC2PCGTHt44Y5lZzTv0x/KgltwqnOzEOZnCNMz79/5Kf+w2w7290GQI
+         1qTg==
+X-Gm-Message-State: AOJu0Yw0AellezNhNIsROrBuGST9OaGhh8nJ6A0a8y722YL5dHPEjdTQ
+	ysa10jE3I/OQLqhg4sGfUz4=
+X-Google-Smtp-Source: AGHT+IHmiMQdg6j8pSnJuwmRX490jlfeaLlggiun3WXbRn0byiNYyKnV2DDzfQrZBHfKxlM4uOS1ZA==
+X-Received: by 2002:a05:6e02:12e6:b0:359:3d9a:2837 with SMTP id l6-20020a056e0212e600b003593d9a2837mr279738iln.2.1699290690857;
+        Mon, 06 Nov 2023 09:11:30 -0800 (PST)
+Received: from ?IPV6:2601:282:1e82:2350:f8c4:a6a1:fdaf:9432? ([2601:282:1e82:2350:f8c4:a6a1:fdaf:9432])
+        by smtp.googlemail.com with ESMTPSA id u7-20020a02aa87000000b0040908cbbc5asm2259181jai.68.2023.11.06.09.11.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Nov 2023 09:11:30 -0800 (PST)
+Message-ID: <6a13b47a-c040-417b-a4e2-8796b72faf85@gmail.com>
+Date: Mon, 6 Nov 2023 10:11:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch net-next v4 1/7] ip/ipnetns: move internals of
+ get_netnsid_from_name() into namespace.c
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: stephen@networkplumber.org, daniel.machon@microchip.com
+References: <20231027101403.958745-1-jiri@resnulli.us>
+ <20231027101403.958745-2-jiri@resnulli.us>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20231027101403.958745-2-jiri@resnulli.us>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Update release of iproute2 corresponding to the 6.6 kernel.  Release
-is smaller than usual. One notable thing is that support for kernel
-components removed in 6.3 kernel was removed from iproute2 (dsmark,
-cbq, rsvp).
+On 10/27/23 4:13 AM, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> In order to be able to reuse get_netnsid_from_name() function outside of
+> ip code, move the internals to lib/namespace.c to a new function called
+> netns_id_from_name().
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+> v3->v4:
+> - removed namespace.h include
+> v2->v3:
+> - s/netns_netnsid_from_name/netns_id_from_name/
+> v1->v2:
+> - new patch
+> ---
+>  include/namespace.h |  2 ++
+>  ip/ipnetns.c        | 45 +----------------------------------------
+>  lib/namespace.c     | 49 +++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 52 insertions(+), 44 deletions(-)
+> 
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.6.0.tar.=
-gz
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+dcb
+    CC       dcb.o
+In file included from dcb.c:11:
+../include/namespace.h:61:31: warning: ‘struct rtnl_handle’ declared
+inside parameter list will not be visible outside of this definition or
+declaration
+   61 | int netns_id_from_name(struct rtnl_handle *rtnl, const char *name);
+      |                               ^~~~~~~~~~~
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
-
-Contributions:
-
-Allen Hubbe (1):
-      vdpa: consume device_features parameter
-
-Amit Cohen (1):
-      bridge: fdb: add an error print for unknown command
-
-Andrea Claudi (5):
-      ss: make is_selinux_enabled stub work like in SELinux
-      ss: make SELinux stub functions conformant to API definitions
-      lib: add SELinux include and stub functions
-      ip vrf: make ipvrf_exec SELinux-aware
-      Makefile: ensure CONF_USR_DIR honours the libdir config
-
-David Ahern (2):
-      Update kernel headers
-      Update kernel headers
-
-Eric Dumazet (1):
-      ss: add support for rcv_wnd and rehash
-
-Fran=C3=A7ois Michel (4):
-      tc: support the netem seed parameter for loss and corruption events
-      man: tc-netem: add section for specifying the netem seed
-      tc: fix typo in netem's usage string
-      tc: fix several typos in netem's usage string
-
-Ido Schimmel (1):
-      bridge: Add backup nexthop ID support
-
-Jiri Pirko (7):
-      devlink: accept "name" command line option instead of "trap"/"group"
-      devlink: move DL_OPT_SB into required options
-      devlink: make parsing of handle non-destructive to argv
-      devlink: implement command line args dry parsing
-      devlink: return -ENOENT if argument is missing
-      mnl_utils: introduce a helper to check if dump policy exists for comm=
-and
-      devlink: implement dump selector for devlink objects show commands
-
-Mathieu Schroeter (4):
-      Add get_long utility and adapt get_integer accordingly
-      Add utility to convert an unsigned int to string
-      ss: change aafilter port from int to long (inode support)
-      ss: print unix socket "ports" as unsigned int (inode)
-
-Maxim Petrov (2):
-      ip: fix memory leak in 'ip maddr show'
-      ss: fix directory leak when -T option is used
-
-Pedro Tammela (1):
-      utils: fix get_integer() logic
-
-Ratheesh Kannoth (1):
-      tc: Classifier support for SPI field
-
-Stephen Hemminger (16):
-      tc: add missing space before else
-      uapi: headers update from 6.6-rc2
-      fix set-not-used warnings
-      bridge: fix potential snprintf overflow
-      ila: fix potential snprintf buffer overflow
-      Add security policy
-      uapi: update headers from 6.6-rc4
-      ila: fix array overflow warning
-      uapi: update from 6.6-rc5
-      tc: remove support for CBQ
-      tc: remove support for RSVP classifier
-      tc: remove tcindex classifier
-      tc: remove dsmark qdisc
-      tc: drop support for ATM qdisc
-      ssfilter: fix clang warning about conversion
-      v6.6.0
-
+--
+pw-bot: cr
 
