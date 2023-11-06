@@ -1,76 +1,220 @@
-Return-Path: <netdev+bounces-46259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B74B67E2EC9
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:16:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24D567E2ED3
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:18:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F55FB20A45
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:16:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04701C2074C
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 21:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68A52E644;
-	Mon,  6 Nov 2023 21:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A962E645;
+	Mon,  6 Nov 2023 21:18:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rXYeTCNV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="guQnzDNr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A612C859;
-	Mon,  6 Nov 2023 21:16:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4821EC433C9;
-	Mon,  6 Nov 2023 21:16:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699305411;
-	bh=k2iHsevdylVfNnzq7vpSFHrz7HmQmltAVDcN12lB57M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rXYeTCNVWqISuAwfrqkINqGZUcV4qtcxPGdhwjgQXWbySb/hqmbVlZ3jbClBYSZcU
-	 Z31DK2I3f59Tkv9EeDg1BGoAw8jf8EOPv+IPNxHcD7X5DSpCwql8fODXsgvOIHSXug
-	 uBF0ZvmhqKP8nlLwdZ1Iw1PZdcChZ9Yz+TqjrmnAHfZ6K9W2LFLlF+rz1gxZa7Gz+o
-	 erGJBRBZ89WPxVdDsrVDn/c5v9y80iLmnVMz7wDhMkvv+ngMA1R6LfnRJHEeB7Qu87
-	 Bd1KkuoRe1uPJaS7ncTHNi2LxqjkKfOFkp1e9AJLyLz67rvCKdFP5rhfI+WQI/5VV5
-	 P+5LCDGNU27Rg==
-Date: Mon, 6 Nov 2023 14:16:48 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net,
-	dsahern@kernel.org, pabeni@redhat.com, ndesaulniers@google.com,
-	trix@redhat.com, 0x7f454c46@gmail.com, noureddine@arista.com,
-	hch@infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev
-Subject: Re: [PATCH net v2] tcp: Fix -Wc23-extensions in tcp_options_write()
-Message-ID: <20231106211648.GA682811@dev-arch.thelio-3990X>
-References: <20231106-tcp-ao-fix-label-in-compound-statement-warning-v2-1-91eff6e1648c@kernel.org>
- <CANn89i+GF=4QuVMevE7Ur2Zi0nDjBujMHWJayURR9fbcr+McnA@mail.gmail.com>
- <20231106155806.GA1181828@dev-arch.thelio-3990X>
- <20231106125257.43f52b1f@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1443F2C859
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 21:18:03 +0000 (UTC)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E9910C3
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:18:01 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cc3130ba31so34004165ad.0
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 13:18:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699305480; x=1699910280; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q+e/wl/IpkV0o6PDo9Tkqa7B1djQqq2R6AetcJyqBsw=;
+        b=guQnzDNrQ0IEnDzO5hmG0IkO9uQpBsE3dQM3ouRmgcIUj8ovtjwTeObif9ZB0Nh1IL
+         Ogw6bASCzlrDbxFB1Ig73mKR0hWGudoulglTPgsFRJei6ZPUavDy4CLE+hiAQ2wiPiVN
+         JnVSSX6b0kXkG45BERqEsZABipd1zMRyVExPL5PbHvNDYjMHAKcAGZMk0PXvKxLwHz6D
+         o2WL1O+bGCtEfRVE6g71WCK1G9uV763h8zt62FZGAOOnSjhBTeAFTbXE8POz71PKERm6
+         IWsFEuPkzt4SAFAUIRJ2XlWdw05sk/Sqf7JtUTQINTH/G/eTA8goRYsvdbBmmRirOhKz
+         7CLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699305480; x=1699910280;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Q+e/wl/IpkV0o6PDo9Tkqa7B1djQqq2R6AetcJyqBsw=;
+        b=kyaljfjzjiYWUpK1nFO8x6bw7ooPIA0SFmTxrqohDoUUvPwMumcsRO9pyLSUIRHefK
+         RrvDuout8a5gJLaiGlrJ5hMTFhkHioDKCvdu+J40GcGMYgPaQmV4JXGRJMyHg2f+LUDF
+         kOlizGUiWG447RkCVGLO4BzXkpdB7kHqCV2+qX2kuDxqzp2/pfUnz06exXy4AKxPjH0f
+         hb6oalxWpiRyrcYCMTZklVKg6bZsJXxQpghfMy0pFXfIlM5JFA8eC4/j2UCbetZv/E+8
+         vAWWaI06Qu3pYXyWUg4op27TFQ47IlrTfKOeBhUbQGY8dHhKwHEoT1ghvx39jR4FybEU
+         fMHQ==
+X-Gm-Message-State: AOJu0Yw91lD/fwDhYCGa2UpZNezJpVmWtukVRVNdPnWQULgRUIl8Qrbj
+	1x/weKeTp6Quo4+oRRgf4N4o5Ac=
+X-Google-Smtp-Source: AGHT+IFyUJONzj4do13pt+qQjhpP+paqIv/cmkYUyDep9IE9Z/JO/7Oa2cHBSiwtEe3VWLUwCJQwRDY=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:902:f809:b0:1cc:2a6f:ab91 with SMTP id
+ ix9-20020a170902f80900b001cc2a6fab91mr467862plb.0.1699305480560; Mon, 06 Nov
+ 2023 13:18:00 -0800 (PST)
+Date: Mon, 6 Nov 2023 13:17:59 -0800
+In-Reply-To: <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231106125257.43f52b1f@kernel.org>
+Mime-Version: 1.0
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-11-almasrymina@google.com> <ZUk0FGuJ28s1d9OX@google.com>
+ <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
+Message-ID: <ZUlYB99GK1Q8is-I@google.com>
+Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
+From: Stanislav Fomichev <sdf@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, 
+	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 06, 2023 at 12:52:57PM -0800, Jakub Kicinski wrote:
-> On Mon, 6 Nov 2023 08:58:06 -0700 Nathan Chancellor wrote:
-> > Ah, this suggestion is much better, thanks. I'll make this adjustment
-> > and send a v3 later today in case others have any suggested changes (I
-> > know netdev prefers waiting 24 hours for another revision but I'd like
-> > to get this warning cleared up by -rc1 so it does not proliferate into
-> > other trees and I sent v1 almost a week ago).
-> 
-> Definitely, sorry about the delay, feel free to post v3 ASAP.
+On 11/06, Mina Almasry wrote:
+> On Mon, Nov 6, 2023 at 10:44=E2=80=AFAM Stanislav Fomichev <sdf@google.co=
+m> wrote:
+> >
+> > On 11/05, Mina Almasry wrote:
+> > > In tcp_recvmsg_locked(), detect if the skb being received by the user
+> > > is a devmem skb. In this case - if the user provided the MSG_SOCK_DEV=
+MEM
+> > > flag - pass it to tcp_recvmsg_devmem() for custom handling.
+> > >
+> > > tcp_recvmsg_devmem() copies any data in the skb header to the linear
+> > > buffer, and returns a cmsg to the user indicating the number of bytes
+> > > returned in the linear buffer.
+> > >
+> > > tcp_recvmsg_devmem() then loops over the unaccessible devmem skb frag=
+s,
+> > > and returns to the user a cmsg_devmem indicating the location of the
+> > > data in the dmabuf device memory. cmsg_devmem contains this informati=
+on:
+> > >
+> > > 1. the offset into the dmabuf where the payload starts. 'frag_offset'=
+.
+> > > 2. the size of the frag. 'frag_size'.
+> > > 3. an opaque token 'frag_token' to return to the kernel when the buff=
+er
+> > > is to be released.
+> > >
+> > > The pages awaiting freeing are stored in the newly added
+> > > sk->sk_user_pages, and each page passed to userspace is get_page()'d.
+> > > This reference is dropped once the userspace indicates that it is
+> > > done reading this page.  All pages are released when the socket is
+> > > destroyed.
+> > >
+> > > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > >
+> > > ---
+> > >
+> > > RFC v3:
+> > > - Fixed issue with put_cmsg() failing silently.
+> > >
+> > > ---
+> > >  include/linux/socket.h            |   1 +
+> > >  include/net/page_pool/helpers.h   |   9 ++
+> > >  include/net/sock.h                |   2 +
+> > >  include/uapi/asm-generic/socket.h |   5 +
+> > >  include/uapi/linux/uio.h          |   6 +
+> > >  net/ipv4/tcp.c                    | 189 ++++++++++++++++++++++++++++=
++-
+> > >  net/ipv4/tcp_ipv4.c               |   7 ++
+> > >  7 files changed, 214 insertions(+), 5 deletions(-)
+> > >
+> > > diff --git a/include/linux/socket.h b/include/linux/socket.h
+> > > index cfcb7e2c3813..fe2b9e2081bb 100644
+> > > --- a/include/linux/socket.h
+> > > +++ b/include/linux/socket.h
+> > > @@ -326,6 +326,7 @@ struct ucred {
+> > >                                         * plain text and require encr=
+yption
+> > >                                         */
+> > >
+> > > +#define MSG_SOCK_DEVMEM 0x2000000    /* Receive devmem skbs as cmsg =
+*/
+> >
+> > Sharing the feedback that I've been providing internally on the public =
+list:
+> >
+>=20
+> There may have been a miscommunication. I don't recall hearing this
+> specific feedback from you, at least in the last few months. Sorry if
+> it seemed like I'm ignoring feedback :)
 
-Done, thanks Jakub!
+No worries, there was a thread long time ago about this whole token
+interface and whether it should support out-of-order refills, etc.
 
-https://lore.kernel.org/20231106-tcp-ao-fix-label-in-compound-statement-warning-v3-1-b54a64602a85@kernel.org/
+> > IMHO, we need a better UAPI to receive the tokens and give them back to
+> > the kernel. CMSG + setsockopt(SO_DEVMEM_DONTNEED) get the job done,
+> > but look dated and hacky :-(
+> >
+> > We should either do some kind of user/kernel shared memory queue to
+> > receive/return the tokens (similar to what Jonathan was doing in his
+> > proposal?)
+>=20
+> I'll take a look at Jonathan's proposal, sorry, I'm not immediately
+> familiar but I wanted to respond :-) But is the suggestion here to
+> build a new kernel-user communication channel primitive for the
+> purpose of passing the information in the devmem cmsg? IMHO that seems
+> like an overkill. Why add 100-200 lines of code to the kernel to add
+> something that can already be done with existing primitives? I don't
+> see anything concretely wrong with cmsg & setsockopt approach, and if
+> we switch to something I'd prefer to switch to an existing primitive
+> for simplicity?
+>=20
+> The only other existing primitive to pass data outside of the linear
+> buffer is the MSG_ERRQUEUE that is used for zerocopy. Is that
+> preferred? Any other suggestions or existing primitives I'm not aware
+> of?
 
-Cheers,
-Nathan
+I guess I'm just wondering whether other people have any suggestions
+here. Not sure Jonathan's way was better, but we fundamentally
+have two queues between the kernel and the userspace:
+- userspace receiving tokens (recvmsg + magical flag)
+- userspace refilling tokens (setsockopt + magical flag)
+
+So having some kind of shared memory producer-consumer queue feels natural.
+And using 'classic' socket api here feels like a stretch, idk.
+
+But maybe I'm overthinking and overcomplicating :-)
+
+> > or bite the bullet and switch to io_uring.
+> >
+>=20
+> IMO io_uring & socket support are orthogonal, and one doesn't preclude
+> the other. As you know we like to use sockets and I believe there are
+> issues with io_uring adoption at Google that I'm not familiar with
+> (and could be wrong). I'm interested in exploring io_uring support as
+> a follow up but I think David Wei will be interested in io_uring
+> support as well anyway.
+
+Ack, might be one more reason on our side to adopt iouring :-p
+
+> > I was also suggesting to do it via netlink initially, but it's probably
+> > a bit slow for these purpose, idk.
+>=20
+> Yeah, I hear netlink is reserved for control paths and is
+> inappropriate for data path, but I'll let folks correct me if wrong.
+>=20
+> --=20
+> Thanks,
+> Mina
 
