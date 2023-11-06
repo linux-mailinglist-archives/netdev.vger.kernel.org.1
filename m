@@ -1,106 +1,119 @@
-Return-Path: <netdev+bounces-46238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 458047E2B91
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:02:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2E27E2B9B
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:06:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F14BD281408
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:02:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56DC928174B
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9292C85B;
-	Mon,  6 Nov 2023 18:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D442C85D;
+	Mon,  6 Nov 2023 18:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mobile-devices.fr header.i=@mobile-devices.fr header.b="n3XlSfI+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1OkgSfk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF43018035
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:02:09 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE18D47
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 10:02:00 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-407c3adef8eso41522605e9.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 10:02:00 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C96618035
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:06:03 +0000 (UTC)
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6724D47;
+	Mon,  6 Nov 2023 10:06:01 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507bd644a96so6849374e87.3;
+        Mon, 06 Nov 2023 10:06:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mobile-devices.fr; s=google; t=1699293719; x=1699898519; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:to:content-language:user-agent
-         :mime-version:date:message-id:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PDm506CW1CfmWdc8ZEPy9UyaSh27+NblN2O42wc6Ric=;
-        b=n3XlSfI+EJkXgZ8IZLr47V57EQeA2XyjilPCsf8ZdWHCdAtHZ/kz0qhIfq/mdd4cfh
-         Z48kIXXUzlhf62FnfQ0aFuLaULB9+mksAfEJ2L2zqjQZh/+IC1uB7TVXS56UVHqFKERz
-         2FDKXZjwADB4PnbvRL75+s5XZGx8Mqj5f3LSw=
+        d=gmail.com; s=20230601; t=1699293960; x=1699898760; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jFJrO7z2AOZpVZxEtLlcen43+JRmpqTB2YOgHcrEaEs=;
+        b=L1OkgSfkURZB1XucDnUvlS4QxpqzcFUk5rapX1YbHU0RmvX6OeKunAt3e9tpZdhaLN
+         gAqFm8oAwVnwD161jxvSg+Ng+P3KS+UWHGvwVLwh8bmteVFU0+1aN/33S8RePzvvxURk
+         lecBFX19eQ9LtCh6v6jVMUSRn0V6VkWdg9FGGSxFsSs6zMZFYB8L6DGt7lSUu+iD8/iW
+         kN4688jdEQ/H3h31kNetvuA0Y3YnctOy1XCQ1XpdgRe3BfGC0UDkPwOPKdCgOp8HRgCm
+         CpAU/wY0XaiGZc69a2NoY4uNZsa6/NwfRBofv1td+hTF5CDI2VNr0DfzX9vIKGzQnKEJ
+         tZ3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699293719; x=1699898519;
-        h=content-transfer-encoding:cc:subject:to:content-language:user-agent
-         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PDm506CW1CfmWdc8ZEPy9UyaSh27+NblN2O42wc6Ric=;
-        b=T6qDV/Xt57oWS9WwjXFKjKBDRkSngbacPep3MTfPjxgUKZmKehTWT88+pZlt1HfKe1
-         vdvFQTUi2vVkEtq+2gJYuuOnlKWVZSGg/VXY/gu78OZK/AEfU2sMMW8P7NnjHoFnuX4R
-         61ZcvNZIJNzAOJtiENS8nwh+ipWkdC2UYrRwKRWmcE0zLMFSEZtWxAj9EqSWxSv7V4Z7
-         F7YnUBpBebTD+b8Uy8X/cjj+Vwq8yg7a2xf29DN0WVG34mcz4iwdl+1XW4MY/ouybISz
-         RdRrZC9pmT/gOBnE/ocq2cs/S5RRVKwRz3MGNWt1xaGfbewo/6qN6489xmwsY9bivwRw
-         xUsQ==
-X-Gm-Message-State: AOJu0Yyaqecccw+aT+upOg6ykoOUfwen+BbfHkPq6lBYkvgIg7p2erOH
-	MEUSB3XvVJtmVBucDwBMfSzKAA==
-X-Google-Smtp-Source: AGHT+IEN04Uu8Xyw8RUlVXXHKf0i80rZNPf69h/WP9HYr9XT0vrLjOEwh1KX8/yJvOWvKUwZqfwCyw==
-X-Received: by 2002:a05:600c:4fd4:b0:405:3b92:2fed with SMTP id o20-20020a05600c4fd400b004053b922fedmr372167wmq.26.1699293719033;
-        Mon, 06 Nov 2023 10:01:59 -0800 (PST)
-Received: from [10.42.42.90] (static-css-cqn-143221.business.bouyguestelecom.com. [176.149.143.221])
-        by smtp.gmail.com with ESMTPSA id f14-20020a05600c154e00b004097881d7a8sm10027857wmg.0.2023.11.06.10.01.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 10:01:58 -0800 (PST)
-From: Maxime Jayat <maxime.jayat@mobile-devices.fr>
-X-Google-Original-From: Maxime Jayat <maxime.jayat@munic.io>
-Message-ID: <40579c18-63c0-43a4-8d4c-f3a6c1c0b417@munic.io>
-Date: Mon, 6 Nov 2023 19:01:58 +0100
+        d=1e100.net; s=20230601; t=1699293960; x=1699898760;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jFJrO7z2AOZpVZxEtLlcen43+JRmpqTB2YOgHcrEaEs=;
+        b=m3W0VcBwhaLgEUcUR4Cfbt0jlBpxR9lkN2PzbMdlYwXgdwLJrYXdiGRMrMEXR1RydR
+         ISkGyvUaTjjFBa0e3+TcArRNJ9uicOOc4VLzqKiquxin8vQm10OESRX3fnKo+cVv175R
+         QWaWxUQUH2nyLvzYggMt5Kntys2vzasWf40nDVs9Xww/6k+3SV6HceU5+zYpMuN3YjHH
+         z9OqzegDf1v9O3P195kA575lpBoJtlRaX8SMon2hZGMrMFv7WKqG1R1qSrQ8o+Jdo4Nv
+         lz4AE6KV3MYuns/LRM7r9Yl95tQEHD8XPqxUwwCSA2UtIrtTLj/wxqeyQMn+fRlx8C7n
+         NCwg==
+X-Gm-Message-State: AOJu0YxUm+8aFC5K5OXiP42Ie3XTH1hE9Z6WiRnf1sjAN3VE5t+96mIs
+	xLHrfjH95eYDJugx4QUnduU=
+X-Google-Smtp-Source: AGHT+IHkisUClwP06UenqkN/5I/6BzE/Tui8qauyREkxPjsuQGIt8lJc1uGELlGNoyCJCk4H9xdVeQ==
+X-Received: by 2002:ac2:4d07:0:b0:502:ff3b:766f with SMTP id r7-20020ac24d07000000b00502ff3b766fmr19920812lfi.6.1699293959736;
+        Mon, 06 Nov 2023 10:05:59 -0800 (PST)
+Received: from mars.. ([2a02:168:6806:0:be30:bf77:9975:b433])
+        by smtp.gmail.com with ESMTPSA id f9-20020a0560001b0900b0032db430fb9bsm217577wrz.68.2023.11.06.10.05.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 10:05:58 -0800 (PST)
+From: Klaus Kudielka <klaus.kudielka@gmail.com>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Klaus Kudielka <klaus.kudielka@gmail.com>
+Subject: [PATCH net] net: phylink: initialize carrier state at creation
+Date: Mon,  6 Nov 2023 19:05:06 +0100
+Message-ID: <20231106180506.2665-1-klaus.kudielka@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Wolfgang Grandegger <wg@grandegger.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: [PATCH] can: netlink: Fix TDCO calculation using the old data
- bittiming
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-The TDCO calculation was done using the currently applied data bittiming,
-instead of the newly computed data bittiming, which means that the TDCO
-had an invalid value unless setting the same data bittiming twice.
+Background: Turris Omnia (Armada 385); eth2 (mvneta) connected to SFP bus;
+SFP module is present, but no fiber connected, so definitely no carrier.
 
-Fixes: d99755f71a80 ("can: netlink: add interface for CAN-FD Transmitter Delay Compensation (TDC)")
-Signed-off-by: Maxime Jayat <maxime.jayat@mobile-devices.fr>
+After booting, eth2 is down, but netdev LED trigger surprisingly reports
+link active. Then, after "ip link set eth2 up", the link indicator goes
+away - as I would have expected it from the beginning.
+
+It turns out, that the default carrier state after netdev creation is
+"carrier ok". Some ethernet drivers explicitly call netif_carrier_off
+during probing, others (like mvneta) don't - which explains the current
+behaviour: only when the device is brought up, phylink_start calls
+netif_carrier_off.
+
+Fix this for all drivers, by calling netif_carrier_off in phylink_create.
+
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Klaus Kudielka <klaus.kudielka@gmail.com>
 ---
- drivers/net/can/dev/netlink.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/phy/phylink.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index 036d85ef07f5..dfdc039d92a6 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -346,7 +346,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 			/* Neither of TDC parameters nor TDC flags are
- 			 * provided: do calculation
- 			 */
--			can_calc_tdco(&priv->tdc, priv->tdc_const, &priv->data_bittiming,
-+			can_calc_tdco(&priv->tdc, priv->tdc_const, &dbt,
- 				      &priv->ctrlmode, priv->ctrlmode_supported);
- 		} /* else: both CAN_CTRLMODE_TDC_{AUTO,MANUAL} are explicitly
- 		   * turned off. TDC is disabled: do nothing
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 6712883498..a28da80bde 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1616,6 +1616,7 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 	pl->config = config;
+ 	if (config->type == PHYLINK_NETDEV) {
+ 		pl->netdev = to_net_dev(config->dev);
++		netif_carrier_off(pl->netdev);
+ 	} else if (config->type == PHYLINK_DEV) {
+ 		pl->dev = config->dev;
+ 	} else {
 -- 
-2.34.1
+2.42.0
 
 
