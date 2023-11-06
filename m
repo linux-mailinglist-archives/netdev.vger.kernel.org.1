@@ -1,119 +1,90 @@
-Return-Path: <netdev+bounces-46239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E2E27E2B9B
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:06:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA707E2BD3
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:22:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56DC928174B
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:06:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70330281731
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7D442C85D;
-	Mon,  6 Nov 2023 18:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7A2C877;
+	Mon,  6 Nov 2023 18:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1OkgSfk"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ef9sDlkz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C96618035
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:06:03 +0000 (UTC)
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6724D47;
-	Mon,  6 Nov 2023 10:06:01 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507bd644a96so6849374e87.3;
-        Mon, 06 Nov 2023 10:06:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699293960; x=1699898760; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jFJrO7z2AOZpVZxEtLlcen43+JRmpqTB2YOgHcrEaEs=;
-        b=L1OkgSfkURZB1XucDnUvlS4QxpqzcFUk5rapX1YbHU0RmvX6OeKunAt3e9tpZdhaLN
-         gAqFm8oAwVnwD161jxvSg+Ng+P3KS+UWHGvwVLwh8bmteVFU0+1aN/33S8RePzvvxURk
-         lecBFX19eQ9LtCh6v6jVMUSRn0V6VkWdg9FGGSxFsSs6zMZFYB8L6DGt7lSUu+iD8/iW
-         kN4688jdEQ/H3h31kNetvuA0Y3YnctOy1XCQ1XpdgRe3BfGC0UDkPwOPKdCgOp8HRgCm
-         CpAU/wY0XaiGZc69a2NoY4uNZsa6/NwfRBofv1td+hTF5CDI2VNr0DfzX9vIKGzQnKEJ
-         tZ3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699293960; x=1699898760;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jFJrO7z2AOZpVZxEtLlcen43+JRmpqTB2YOgHcrEaEs=;
-        b=m3W0VcBwhaLgEUcUR4Cfbt0jlBpxR9lkN2PzbMdlYwXgdwLJrYXdiGRMrMEXR1RydR
-         ISkGyvUaTjjFBa0e3+TcArRNJ9uicOOc4VLzqKiquxin8vQm10OESRX3fnKo+cVv175R
-         QWaWxUQUH2nyLvzYggMt5Kntys2vzasWf40nDVs9Xww/6k+3SV6HceU5+zYpMuN3YjHH
-         z9OqzegDf1v9O3P195kA575lpBoJtlRaX8SMon2hZGMrMFv7WKqG1R1qSrQ8o+Jdo4Nv
-         lz4AE6KV3MYuns/LRM7r9Yl95tQEHD8XPqxUwwCSA2UtIrtTLj/wxqeyQMn+fRlx8C7n
-         NCwg==
-X-Gm-Message-State: AOJu0YxUm+8aFC5K5OXiP42Ie3XTH1hE9Z6WiRnf1sjAN3VE5t+96mIs
-	xLHrfjH95eYDJugx4QUnduU=
-X-Google-Smtp-Source: AGHT+IHkisUClwP06UenqkN/5I/6BzE/Tui8qauyREkxPjsuQGIt8lJc1uGELlGNoyCJCk4H9xdVeQ==
-X-Received: by 2002:ac2:4d07:0:b0:502:ff3b:766f with SMTP id r7-20020ac24d07000000b00502ff3b766fmr19920812lfi.6.1699293959736;
-        Mon, 06 Nov 2023 10:05:59 -0800 (PST)
-Received: from mars.. ([2a02:168:6806:0:be30:bf77:9975:b433])
-        by smtp.gmail.com with ESMTPSA id f9-20020a0560001b0900b0032db430fb9bsm217577wrz.68.2023.11.06.10.05.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 10:05:58 -0800 (PST)
-From: Klaus Kudielka <klaus.kudielka@gmail.com>
-To: Russell King <linux@armlinux.org.uk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Klaus Kudielka <klaus.kudielka@gmail.com>
-Subject: [PATCH net] net: phylink: initialize carrier state at creation
-Date: Mon,  6 Nov 2023 19:05:06 +0100
-Message-ID: <20231106180506.2665-1-klaus.kudielka@gmail.com>
-X-Mailer: git-send-email 2.42.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81612C86F;
+	Mon,  6 Nov 2023 18:22:06 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D2FD47;
+	Mon,  6 Nov 2023 10:22:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=sOSdsNqbyXmCuMzsqcDUCbUAESIaABwBAG5c+7hOL5U=; b=ef9sDlkzUa4rKcnKoM4Q/qAj+/
+	It7D8kCrw7ieTwEoqluxKJjpnuB5GCIL1lu3Da0Yyhv/M0gl533WbQiWgH8TLdTWJyliMoqwFZ225
+	3nhebqfvRrcMJJnR8VDbNepc/yP5aQb9XnWPIc9gbux+kQaMI13wpW/bPdHvLexOwXuAEUrJJKNIK
+	TVQa2xn90LFhzQHc40bkYIcZhVtYma3J2fo9mmWdBrxhDg+Y5ocLJU4dpMOKQHTdVj5958oGTQdqH
+	mbxEleMbOyN4lh2yubgbNJODbbtnmGlmarq84OlSKPqWRDD/VohjsQPBiluDTnkUXRAWnNmWYe+W+
+	YgR+188w==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r04Eb-000Oka-60; Mon, 06 Nov 2023 19:22:01 +0100
+Received: from [194.230.147.75] (helo=localhost.localdomain)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r04Ea-0003I6-Jz; Mon, 06 Nov 2023 19:22:00 +0100
+Subject: Re: [PATCH bpf 4/6] bpf, netkit: Add indirect call wrapper for
+ fetching peer dev
+To: Stanislav Fomichev <sdf@google.com>
+Cc: martin.lau@kernel.org, kuba@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>
+References: <20231103222748.12551-1-daniel@iogearbox.net>
+ <20231103222748.12551-5-daniel@iogearbox.net> <ZUkgtxlK9MRGHx8v@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <0397a813-7e55-7a67-c876-b2274782805f@iogearbox.net>
+Date: Mon, 6 Nov 2023 19:21:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZUkgtxlK9MRGHx8v@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27084/Mon Nov  6 09:39:04 2023)
 
-Background: Turris Omnia (Armada 385); eth2 (mvneta) connected to SFP bus;
-SFP module is present, but no fiber connected, so definitely no carrier.
+On 11/6/23 6:21 PM, Stanislav Fomichev wrote:
+[...]
+>> +static struct net_device *skb_get_peer_dev(struct net_device *dev)
+>> +{
+>> +	const struct net_device_ops *ops = dev->netdev_ops;
+>> +
+>> +	if (likely(ops->ndo_get_peer_dev))
+>> +		return INDIRECT_CALL_1(ops->ndo_get_peer_dev,
+>> +				       netkit_peer_dev, dev);
+> 
+> nit: why not put both netkit and veth here under INDIRECT_CALL_2 ?
+> Presumably should help with the veth deployments as well?
 
-After booting, eth2 is down, but netdev LED trigger surprisingly reports
-link active. Then, after "ip link set eth2 up", the link indicator goes
-away - as I would have expected it from the beginning.
+Yes, I'm also planning to add it there as well, it's a slightly larger
+change since also a new header needs to be added, but I'll follow-up on it.
 
-It turns out, that the default carrier state after netdev creation is
-"carrier ok". Some ethernet drivers explicitly call netif_carrier_off
-during probing, others (like mvneta) don't - which explains the current
-behaviour: only when the device is brought up, phylink_start calls
-netif_carrier_off.
-
-Fix this for all drivers, by calling netif_carrier_off in phylink_create.
-
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Klaus Kudielka <klaus.kudielka@gmail.com>
----
- drivers/net/phy/phylink.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 6712883498..a28da80bde 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1616,6 +1616,7 @@ struct phylink *phylink_create(struct phylink_config *config,
- 	pl->config = config;
- 	if (config->type == PHYLINK_NETDEV) {
- 		pl->netdev = to_net_dev(config->dev);
-+		netif_carrier_off(pl->netdev);
- 	} else if (config->type == PHYLINK_DEV) {
- 		pl->dev = config->dev;
- 	} else {
--- 
-2.42.0
-
+Thanks for review,
+Daniel
 
