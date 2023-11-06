@@ -1,129 +1,328 @@
-Return-Path: <netdev+bounces-46147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1754D7E1A87
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 07:54:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45A47E1AD5
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 08:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8E462812A3
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 06:54:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B192B20CEE
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 07:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189FD4422;
-	Mon,  6 Nov 2023 06:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E83BA49;
+	Mon,  6 Nov 2023 07:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="j26w1Ye4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S3Ep2BRQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C529A9460;
-	Mon,  6 Nov 2023 06:54:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADB6CC433C7;
-	Mon,  6 Nov 2023 06:54:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1699253665;
-	bh=EntPlRifOGbbk3ujSL4xtP86KIkN/FnEjRD6b7R3YTY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j26w1Ye4CDavLpD27dhAnMUk+A6+ndEv2dZYrG0Nabf1DRbw4XUOOFZm4kiuRkvor
-	 /Szn0pfh+ax9Om0u7x5WysEPZTqCWB+GkjlH4zc2hHqq9ctdeGocZhOUfLtkfeYcbr
-	 UCeqefaiBaRvD94JT2AfBaLK0WjUaNfK1Sz3V8Is=
-Date: Mon, 6 Nov 2023 07:54:22 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: Kira <nyakov13@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Sven Joachim <svenjoac@gmx.de>,
-	Ian Kent <raven@themaw.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev
-Subject: Re: [PATCH] staging: Revert "staging: qlge: Retire the driver"
-Message-ID: <2023110655-swarm-parka-177d@gregkh>
-References: <20231030150400.74178-1-benjamin.poirier@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D701BBE48
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 07:13:14 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D758BC6
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 23:13:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699254792; x=1730790792;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=9L3WaNpZgRfx2YEX1OrhfjxHbLYjb3jSl7c8N9U1tUE=;
+  b=S3Ep2BRQYBnFkNtUha1apus4vMDsR0yRh+y41VPlRpLZsUZFjqBOaUId
+   hfIZdGV8bsnzp0nnxImv8RRQGX+mhhUMIr4MJtqRfE4sUnCspaSYif+l4
+   obE9czOgP6fSz7+DVAkXL9+sS+XSydbBiZdAAvLbZHcNHecVPKXZbsK4r
+   El9qPfP5jpwe4RPZVn53Lxk5k+L0177i2aek4ureiqaRj/2DcilBIYIun
+   qkcC7l1oqFNeFdQpdyqVI7r9FRwrUCuJHUKBjVYrr7yG56Ok7ue7YchIl
+   MdF3RL6lUoZKCcfQtGmNO0utVpjGWnNMhCXAP74u6lzpQRy2AkaiETlfZ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="392089013"
+X-IronPort-AV: E=Sophos;i="6.03,280,1694761200"; 
+   d="scan'208";a="392089013"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2023 23:13:12 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="885818188"
+X-IronPort-AV: E=Sophos;i="6.03,280,1694761200"; 
+   d="scan'208";a="885818188"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Nov 2023 23:13:12 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Sun, 5 Nov 2023 23:13:11 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Sun, 5 Nov 2023 23:13:10 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Sun, 5 Nov 2023 23:13:10 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Sun, 5 Nov 2023 23:13:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JXzCPtuijFU+1ETfn0va8IB41lwfCx4vfdfIs9u6Hc7YMNQ4uXCaj3VEhdBLw3enWpbsYPYJ3AKtHqfYs3QRpeqYTQqGCQsQ7bAz2G+ZgODXXwQQ0RfbN5vDL0SY9mMpfmWvOi1jtDhH5cjX2trhZdlJyhTO9VnP6w3synGeD/4OSf/tb5iQhdvZ57BfG/3mowxFWIp/92nnYoKLqwQkXKtPhcW6+2EiG/1A1/9DSR51LHw8ZrMxOwZCYHIom0+RGCAchJcs9eaETN7r1sR0AXj0aN17gAaYzMD4OSKKovIngrx2DSBE6L7oWGxPoNzol0F03axHCHjUXQMwp7IA8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SGw6O9XWtr0HCdL2MEYNyhXPkmwj5zr8HX+xwI0RZQA=;
+ b=lv0BFuwep6wOyLlGgLlhDo7unxS3V/CfvyxerJqq/gQlM4XfkB1qb4AtevOEpBMGs5F4U/BFobuALotB7kOECGpW6+sHQHT0Tj9WFOLAgy/UwvrUGk4Cfp815mf78zddEjQLLzXElFBBSIo+0eBB3yvXda2Z0sAMgx1reGRa8ViLI8grLhzAWe1SLzoABBSXS1g5FchinKo46GPKaiX/WhXbM2GN67jKJ7pM5KpJVm6d/D8eNOdAdAvd1o61z5LM9QvsWJLQRW7zNtIh03BVoBM3c29ihVj+VCMHBmO95AgTc4nrJzd2J8tbPa8CoHDs3mTR3E0JRm09PvmceWBsbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CH3PR11MB8436.namprd11.prod.outlook.com (2603:10b6:610:173::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6954.28; Mon, 6 Nov 2023 07:13:08 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53%6]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
+ 07:13:07 +0000
+Date: Mon, 6 Nov 2023 08:13:02 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Paul Greenwalt <paul.greenwalt@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<jesse.brandeburg@intel.com>, <anthony.l.nguyen@intel.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <horms@kernel.org>,
+	<tony.brelinski@intel.com>, Dan Nowlin <dan.nowlin@intel.com>
+Subject: Re: [PATCH iwl-net] ice: fix DDP package download for packages
+ without signature segment
+Message-ID: <ZUiRucN+jbq92wJ4@boxer>
+References: <20231104182908.15389-1-paul.greenwalt@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231104182908.15389-1-paul.greenwalt@intel.com>
+X-ClientProxiedBy: DB9PR05CA0001.eurprd05.prod.outlook.com
+ (2603:10a6:10:1da::6) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030150400.74178-1-benjamin.poirier@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CH3PR11MB8436:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9ce8c86-85fa-44c5-c601-08dbde97d3ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: msFHhsY/C+VeIFqOaKjBW0w1ldNUyv2imcyw03Qponp46W5KVsnPxUUe9lzWKnvfeL2B83iso+Dw3IxRzPE8Hz9Cgs66vMvymidILWUNXtzYZsPR1k+9pTSCeDAusnEHhwoow5knUhno0JAUbd61lWUbI6HZlBB6yqG0ZU8qTmv/wQQMA/zQi7DGa0FkkCI3hMjehIReN0ijRudjCkfo+ch0Zt8uTb7Qrs5nr3du1tm5A9BKIBkEw4P2GXCB5VsA0h5EqXB4dsx0FuUWrKsur4iPjF6qLvL+OOpy0x/J7SPKWUq5Zpz8MVZ1EgjPpDLAp3irPutQ7iS8PX4ShZkFj+ae21nA90e9cENIqgIYW21xEX8RsF0N3X+W7nha8RdWoOMI22vKkZur1Z+Xwrq7UcRWSSN40frjMfz66XHdr89NIwXPDOMfSeJEgdstF+smtvYGOotSdaF17OO2uhRvusAnVBDnfnNaboHqnhf9lbyZq05YXbMP6apZJtdTBHi0T6JhxTkd5VpO7oDTbQRVvhDAWMmTdRY7BGtTO3gpUDmF6u6und60yHubgqvdq3hxENdh0DagCmrg+4+G5zKV4RmzmXYnadeyBf6CnzgEXv8=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(136003)(366004)(346002)(376002)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(83380400001)(6666004)(6506007)(9686003)(6512007)(82960400001)(107886003)(26005)(6486002)(478600001)(38100700002)(6862004)(8676002)(66476007)(6636002)(8936002)(316002)(66946007)(66556008)(44832011)(4326008)(5660300002)(86362001)(2906002)(41300700001)(33716001)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5hyc9OV3Ezq70rom8eJjpFORIO78GqXCcBuVC/jVDPu//J2aVTRUQbwf5pmb?=
+ =?us-ascii?Q?NZCDF6deIYdRmtxFefpCA0CoULMEYt++B/7DBpmSgEgWq8kxYEkcCzs6CC14?=
+ =?us-ascii?Q?9NfgMAN8bn5QdWLxEBR+O17H2sflUpMH+59eRjRQOedd7hrfo1iG0Ic9zPJm?=
+ =?us-ascii?Q?feSRS/XzxXP5ducU/Dt+YWJq1Jnqr7Ear8uwFD46olIBKfG5abrVefOPlNWz?=
+ =?us-ascii?Q?CXpRm5wcQH5EJzOzZckdPDPlQDpsIWpIRgkXu2C6Fut22UGPNvOPNqjDSybC?=
+ =?us-ascii?Q?W+V8+fd+7zSlTG1fKW6wBs2Gll7oFEWxLVm3WjnwUFmMf2IR8BLkLocG9CFf?=
+ =?us-ascii?Q?RkViAnWAPsCH0ALRLHqmIbSU8Je/84vxPdvhiMjyvYmrD4Ki3XXLCm8Qx+q3?=
+ =?us-ascii?Q?a73ytIee73v78ZaxykhstGCLGytbZNg0nfPlgmuW/O+MJy0lg8g9zRfvCo57?=
+ =?us-ascii?Q?9ZcaMIIOEZSvLrCc6oNI/QkQ0Ha9swldHiHQJliwSfoHDMYDotiyW18Xsitc?=
+ =?us-ascii?Q?sVeHScf/3EYZyhPoXCOQvJy7KIgvlESNTt2nPs+tNNmtWHyQdNTvw7BsLGLt?=
+ =?us-ascii?Q?cLQ5Fcg7SZjfznK7AI8N4OciHkd/vgxHFQqutaEEnsY39bsOCXj3gPc/49kS?=
+ =?us-ascii?Q?LgUVtupE5uq0wK/morJra5GxOILt/oSTF4MOFH4s3bKtd7HKshFmxaKiTgY3?=
+ =?us-ascii?Q?jfzvofN805WeAfSkwqqYRlVsZeayQnXnsql7ZwmE3v9bFKvXsHYbHMedNZzV?=
+ =?us-ascii?Q?Yat9DAS2e4GG01K9bsrXRRV0MINAYEJ3CIXqqj8EAQd9H6UDr+XW4zBWix/m?=
+ =?us-ascii?Q?f1KpL9Oy6S9bJGr4uwG2E4zqjOsKCaUv9xwbNhkoC6CfRXhg5YIHgU7O8vO6?=
+ =?us-ascii?Q?hiTNRHS6sJ6UZpyuh3npYi6V3da9WzFXd/mbEledCny41JASAkD2+Dc+MjYC?=
+ =?us-ascii?Q?022A8Holwp3vfqLX2Rrc4eTy3/ArmNuU2IjAwO2YTaQMrt7uDAmVtJxdY7jt?=
+ =?us-ascii?Q?sczVm9Pbahlbn2bXQf93ZhjzEcP2lUmwil4ErRhpEGnSGvQfS7N5Y8sT+JsM?=
+ =?us-ascii?Q?9v6uAC+3SV7gEEvAvnVAMQcuk9l2+CJDGSHW9p202AgyYaxbVqH784pTgGC7?=
+ =?us-ascii?Q?NYj/dnfDZLHzJN53woYTYuZslNHYKr6o/Wno+mbeePotD/v0EjxcWnRRlsCp?=
+ =?us-ascii?Q?UuRrj9YBVUBeikNd3sZ+RNcPIhVKF6Om5wubatV1hG7flQ20zSFyTqSYXynq?=
+ =?us-ascii?Q?THradB9rqXoh4fy7a2AefrSITRfQJfojoFjWvCdv/dm5UUWFV1GuoAn5snwW?=
+ =?us-ascii?Q?pK5jOo98sNDEvp0q7/OMdphWPvvVgOqQckWAPM+U//KVtPwLK+sMSjrRzSgw?=
+ =?us-ascii?Q?EeKHnpr9eIgrhsOcHBNfFKXFBRzQR8JUSNPND61fItkpTWBnwe9C34DSNzFi?=
+ =?us-ascii?Q?deRi39fheAten9QUgy917/UweLbyBzVa8H2LSCZ1nOYvXyYYQ2d+M2xGQrN2?=
+ =?us-ascii?Q?fvDlliiClorQyBXGPS0F7wrgyk19NrD8yJ3fLrVe3dOQJvoQ68bvf9FFQyLi?=
+ =?us-ascii?Q?linUbkRZcC+dpL2OX8wDY7dgo47e55Bb+52417A2mxI79rBMUckOEE2oGGgt?=
+ =?us-ascii?Q?EQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9ce8c86-85fa-44c5-c601-08dbde97d3ad
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 07:13:07.6928
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z44747dLnczrS1AzEUigs+EYHVP0QNKa2g6uWzhFhhDGJjDMHdQYcqS/B6QnCKGfQkwfnrIJTQnIWkADVGiF16xu9649Eq3JB9KeccrihGU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8436
+X-OriginatorOrg: intel.com
 
-On Tue, Oct 31, 2023 at 02:04:00AM +1100, Benjamin Poirier wrote:
-> This reverts commit 875be090928d19ff4ae7cbaadb54707abb3befdf.
+On Sat, Nov 04, 2023 at 02:29:08PM -0400, Paul Greenwalt wrote:
+> From: Dan Nowlin <dan.nowlin@intel.com>
 > 
-> On All Hallows' Eve, fear and cower for it is the return of the undead
-> driver.
+> Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
+> incorrectly removed support for package download for packages without a
+> signature segment. These packages include the signature buffer inline
+> in the configurations buffers, and do not in a signature segment.
 > 
-> There was a report [1] from a user of a QLE8142 device. They would like for
-> the driver to remain in the kernel. Therefore, revert the removal of the
-> qlge driver.
+> Fix package download by providing download support for both packages
+> with (ice_download_pkg_with_sig_seg()) and without signature segment
+> (ice_download_pkg_without_sig_seg()).
 > 
-> [1] https://lore.kernel.org/netdev/566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com/
+> Fixes: 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
+> Reported-by: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>
 
-<snip>
+s/Fijalkowski, Maciej/Maciej Fijalkowski
 
-> --- /dev/null
-> +++ b/drivers/staging/qlge/TODO
-> @@ -0,0 +1,28 @@
-> +* commit 7c734359d350 ("qlge: Size RX buffers based on MTU.", v2.6.33-rc1)
-> +  introduced dead code in the receive routines, which should be rewritten
-> +  anyways by the admission of the author himself, see the comment above
-> +  qlge_build_rx_skb(). That function is now used exclusively to handle packets
-> +  that underwent header splitting but it still contains code to handle non
-> +  split cases.
-> +* truesize accounting is incorrect (ex: a 9000B frame has skb->truesize 10280
-> +  while containing two frags of order-1 allocations, ie. >16K)
-> +* while in that area, using two 8k buffers to store one 9k frame is a poor
-> +  choice of buffer size.
-> +* in the "chain of large buffers" case, the driver uses an skb allocated with
-> +  head room but only puts data in the frags.
-> +* rename "rx" queues to "completion" queues. Calling tx completion queues "rx
-> +  queues" is confusing.
-> +* struct rx_ring is used for rx and tx completions, with some members relevant
-> +  to one case only
-> +* the flow control implementation in firmware is buggy (sends a flood of pause
-> +  frames, resets the link, device and driver buffer queues become
-> +  desynchronized), disable it by default
-> +* the driver has a habit of using runtime checks where compile time checks are
-> +  possible (ex. qlge_free_rx_buffers())
-> +* reorder struct members to avoid holes if it doesn't impact performance
-> +* use better-suited apis (ex. use pci_iomap() instead of ioremap())
-> +* remove duplicate and useless comments
-> +* fix weird line wrapping (all over, ex. the qlge_set_routing_reg() calls in
-> +  qlge_set_multicast_list()).
-> +* remove useless casts (ex. memset((void *)mac_iocb_ptr, ...))
-> +* fix checkpatch issues
+> Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 
-In looking at this again, are you sure you all want this in the tree?
-I'm glad to take the revert but ONLY if you are willing to then take a
-"move this to drivers/net/" patch for the code as well, WITH an actual
-maintainer and developer who is willing to do the work for this code.
+Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-In all the years that this has been in the staging tree, the listed
-maintainers have not been active at all from what I can remember, and
-obviously the above list of "things to fix" have not really been worked
-on at all.
+Thanks a lot for the quick fix!
 
-So why should it be added back?  I understand there is at least one
-reported user, but for drivers in the staging tree, that's not a good
-reason to keep them around if there is not an actual maintainer that is
-willing to do the work.
-
-Which reminds me, we should probably sweep the drivers/staging/ tree
-again to see what we can remove given a lack of real development.
-Normally we do that every other year or so, and this driver would fall
-into the "no one is doing anything with it" category and should be
-dropped.
-
-thanks,
-
-greg k-h
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ddp.c | 106 ++++++++++++++++++++++-
+>  1 file changed, 103 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> index cfb1580f5850..3f1a11d0252c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ddp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
+> @@ -1479,14 +1479,14 @@ ice_post_dwnld_pkg_actions(struct ice_hw *hw)
+>  }
+>  
+>  /**
+> - * ice_download_pkg
+> + * ice_download_pkg_with_sig_seg
+>   * @hw: pointer to the hardware structure
+>   * @pkg_hdr: pointer to package header
+>   *
+>   * Handles the download of a complete package.
+>   */
+>  static enum ice_ddp_state
+> -ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
+> +ice_download_pkg_with_sig_seg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
+>  {
+>  	enum ice_aq_err aq_err = hw->adminq.sq_last_status;
+>  	enum ice_ddp_state state = ICE_DDP_PKG_ERR;
+> @@ -1519,6 +1519,106 @@ ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
+>  		state = ice_post_dwnld_pkg_actions(hw);
+>  
+>  	ice_release_global_cfg_lock(hw);
+> +
+> +	return state;
+> +}
+> +
+> +/**
+> + * ice_dwnld_cfg_bufs
+> + * @hw: pointer to the hardware structure
+> + * @bufs: pointer to an array of buffers
+> + * @count: the number of buffers in the array
+> + *
+> + * Obtains global config lock and downloads the package configuration buffers
+> + * to the firmware.
+> + */
+> +static enum ice_ddp_state
+> +ice_dwnld_cfg_bufs(struct ice_hw *hw, struct ice_buf *bufs, u32 count)
+> +{
+> +	enum ice_ddp_state state = ICE_DDP_PKG_SUCCESS;
+> +	struct ice_buf_hdr *bh;
+> +	int status;
+> +
+> +	if (!bufs || !count)
+> +		return ICE_DDP_PKG_ERR;
+> +
+> +	/* If the first buffer's first section has its metadata bit set
+> +	 * then there are no buffers to be downloaded, and the operation is
+> +	 * considered a success.
+> +	 */
+> +	bh = (struct ice_buf_hdr *)bufs;
+> +	if (le32_to_cpu(bh->section_entry[0].type) & ICE_METADATA_BUF)
+> +		return ICE_DDP_PKG_SUCCESS;
+> +
+> +	status = ice_acquire_global_cfg_lock(hw, ICE_RES_WRITE);
+> +	if (status) {
+> +		if (status == -EALREADY)
+> +			return ICE_DDP_PKG_ALREADY_LOADED;
+> +		return ice_map_aq_err_to_ddp_state(hw->adminq.sq_last_status);
+> +	}
+> +
+> +	state = ice_dwnld_cfg_bufs_no_lock(hw, bufs, 0, count, true);
+> +	if (!state)
+> +		state = ice_post_dwnld_pkg_actions(hw);
+> +
+> +	ice_release_global_cfg_lock(hw);
+> +
+> +	return state;
+> +}
+> +
+> +/**
+> + * ice_download_pkg_without_sig_seg
+> + * @hw: pointer to the hardware structure
+> + * @ice_seg: pointer to the segment of the package to be downloaded
+> + *
+> + * Handles the download of a complete package without signature segment.
+> + */
+> +static enum ice_ddp_state
+> +ice_download_pkg_without_sig_seg(struct ice_hw *hw, struct ice_seg *ice_seg)
+> +{
+> +	struct ice_buf_table *ice_buf_tbl;
+> +	enum ice_ddp_state state;
+> +
+> +	ice_debug(hw, ICE_DBG_PKG, "Segment format version: %d.%d.%d.%d\n",
+> +		  ice_seg->hdr.seg_format_ver.major,
+> +		  ice_seg->hdr.seg_format_ver.minor,
+> +		  ice_seg->hdr.seg_format_ver.update,
+> +		  ice_seg->hdr.seg_format_ver.draft);
+> +
+> +	ice_debug(hw, ICE_DBG_PKG, "Seg: type 0x%X, size %d, name %s\n",
+> +		  le32_to_cpu(ice_seg->hdr.seg_type),
+> +		  le32_to_cpu(ice_seg->hdr.seg_size), ice_seg->hdr.seg_id);
+> +
+> +	ice_buf_tbl = ice_find_buf_table(ice_seg);
+> +
+> +	ice_debug(hw, ICE_DBG_PKG, "Seg buf count: %d\n",
+> +		  le32_to_cpu(ice_buf_tbl->buf_count));
+> +
+> +	state = ice_dwnld_cfg_bufs(hw, ice_buf_tbl->buf_array,
+> +				   le32_to_cpu(ice_buf_tbl->buf_count));
+> +
+> +	return state;
+> +}
+> +
+> +/**
+> + * ice_download_pkg
+> + * @hw: pointer to the hardware structure
+> + * @pkg_hdr: pointer to package header
+> + * @ice_seg: pointer to the segment of the package to be downloaded
+> + *
+> + * Handles the download of a complete package.
+> + */
+> +static enum ice_ddp_state
+> +ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr,
+> +		 struct ice_seg *ice_seg)
+> +{
+> +	enum ice_ddp_state state;
+> +
+> +	if (hw->pkg_has_signing_seg)
+> +		state = ice_download_pkg_with_sig_seg(hw, pkg_hdr);
+> +	else
+> +		state = ice_download_pkg_without_sig_seg(hw, ice_seg);
+> +
+>  	ice_post_pkg_dwnld_vlan_mode_cfg(hw);
+>  
+>  	return state;
+> @@ -2083,7 +2183,7 @@ enum ice_ddp_state ice_init_pkg(struct ice_hw *hw, u8 *buf, u32 len)
+>  
+>  	/* initialize package hints and then download package */
+>  	ice_init_pkg_hints(hw, seg);
+> -	state = ice_download_pkg(hw, pkg);
+> +	state = ice_download_pkg(hw, pkg, seg);
+>  	if (state == ICE_DDP_PKG_ALREADY_LOADED) {
+>  		ice_debug(hw, ICE_DBG_INIT,
+>  			  "package previously loaded - no work.\n");
+> 
+> base-commit: 016b9332a3346e97a6cacffea0f9dc10e1235a75
+> -- 
+> 2.41.0
+> 
 
