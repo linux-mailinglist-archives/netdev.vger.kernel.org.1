@@ -1,141 +1,107 @@
-Return-Path: <netdev+bounces-46137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA9517E1942
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 04:50:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 275567E194D
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 04:59:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9314628129B
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 03:50:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3DBF28128B
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 03:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B595139D;
-	Mon,  6 Nov 2023 03:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC42B17FD;
+	Mon,  6 Nov 2023 03:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="L2inK74V"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IxG9ae/6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF59441C
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 03:50:18 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5AB2FB
-	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 19:50:15 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-507cee17b00so5107733e87.2
-        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 19:50:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6044E139D
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 03:59:24 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03509BF
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 19:59:23 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507a62d4788so5329027e87.0
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 19:59:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1699242614; x=1699847414; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1699243161; x=1699847961; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NPRoed9/z+EmTEGNdvgePBCLPyOkBm1UgwR3yBhWuXw=;
-        b=L2inK74VOyONj03f7N5S+JD8FkFGoNm2EaYArSld5bCw/SM7dtIiUCy0Qez3y24QZw
-         qsWxQ0j1mko5hA7zmLTzELIJpf0NvHhrdUvK8QJ0gdJ/HPGlMw3b1XfahhtJvQpldv9S
-         NAhddGddOoELIXvIs3bQh/MSa0ddkLEZqUkBg=
+        bh=MdbqNirPY+pqeWozeKes5BLEhtysIX5DqqlYpXjfejU=;
+        b=IxG9ae/637jFriSZlQMOA/XmxEzjJ02jKwG+Zx9AQnPLIklX38i7C2924vwhu3dD+p
+         dkpujvWm88Wrb3BV6KPhbGNppiMXfkX86WaZ1AvznyW2ZQWnShh2pfQnRM5jJ/cCRk4+
+         x1lOoUtsnEk+wBx5h88eVQ/nyfdS1oTxxuK4o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699242614; x=1699847414;
+        d=1e100.net; s=20230601; t=1699243161; x=1699847961;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NPRoed9/z+EmTEGNdvgePBCLPyOkBm1UgwR3yBhWuXw=;
-        b=CdvXQc7ivxxHV0nt8sPe7z6BkDjtzJ5L+Crv7SUS+lzRYkAVcsR3vZgfndk5drEhUT
-         FnkiZSWyaYNjQbcKz5ieCZ4tzOrsAZHq0W6FcSCIEXl2MJ9/sZvCbXa1JjeSbpKGFsmh
-         +RLgAurj1wao/u1Z1keWekPURp9+Ya330K7ZLxg01rvJurSu/TUoq4TdXg4K8hieT1+A
-         EUdPO/AorDEDJvwW0pweyetqealD9kQpDCIi1kUfIpqYBf8vGY+0P/vPTV5PLbsQ++P9
-         g2YZwjm3T72osu3uAa1kZFcPhIMwcUHIJZLz/Z5WYAgxboptuQ3RrxuRNiKYKsdiF79T
-         geQQ==
-X-Gm-Message-State: AOJu0YwJ+0aiaVcJBLVTLXvoSrrIVm3WohTizC2TPX6GUSkYmdKfze76
-	myabAhHjibGV45WaM91Oxms+6+lFvPwcC1VHKRJ5kw==
-X-Google-Smtp-Source: AGHT+IEeHFiFkJ02s24JiKTQ50Sv6sCN2Sh6A/yN+4UfB80ZixwWngyP9tyzhUD9jdB2ZudmqFuK26hrl200nNua7sM=
-X-Received: by 2002:a05:6512:3c98:b0:509:493a:7d64 with SMTP id
- h24-20020a0565123c9800b00509493a7d64mr10530401lfv.41.1699242613482; Sun, 05
- Nov 2023 19:50:13 -0800 (PST)
+        bh=MdbqNirPY+pqeWozeKes5BLEhtysIX5DqqlYpXjfejU=;
+        b=GIhktbJqQ2nNg0/89xM4uFtZNOK2KUecpw8/SdjyaHhb/PtzuDkmYLYGjQnhjUiJg3
+         pyRsWf6YmD2Eif/dMMUu9rWTTogyUdtiiEFldRCR536d6twmlV7Fg6zjJGmfbm5VY2Q3
+         AJI0RsYBgiCSryflFKZH9wSjG8a+slqof955TpSwN+qmarYJXitdGHRiW4Bkuin3vz+0
+         yNtv9pkueWfO+iUArRFGa5Ey7lh0nvd++hGAXGMf3DPoP4V1XcQuFeIZSxBK/gIbfZju
+         LnE9kcslm4A2OjiM9b/a49RmlrdO4rOoK12z4/eN+x/1TccwDfNNQ8s4JbskdzqvdIq5
+         APtQ==
+X-Gm-Message-State: AOJu0YzsY8rvD/2OjICO2pVEQoJeTbQC9uuxFB9+gMItP+Dt/4qZt/h0
+	vmYBaGvF3fuXUd+1PZjU+gXXeuc+9ybWHJyk88DhCQ==
+X-Google-Smtp-Source: AGHT+IHiFO5gAKe9WtpGZLL+VyiroKbuZES0jenNNjw6nCh9eSnNoj3qes8WSbXI1tIo/zgSMM7kB9f+ycJC9diBD+o=
+X-Received: by 2002:ac2:555b:0:b0:503:eae:4896 with SMTP id
+ l27-20020ac2555b000000b005030eae4896mr19148755lfk.39.1699243161146; Sun, 05
+ Nov 2023 19:59:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231105185828.287004-1-alexey.pakhunov@spacex.com>
-In-Reply-To: <20231105185828.287004-1-alexey.pakhunov@spacex.com>
+References: <CACKFLi=ZLAb1Y92LwvqjOGPCuinka7qbHwDP2pkG4-_a7DMorQ@mail.gmail.com>
+ <20231105192643.318753-1-alexey.pakhunov@spacex.com>
+In-Reply-To: <20231105192643.318753-1-alexey.pakhunov@spacex.com>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Sun, 5 Nov 2023 19:50:01 -0800
-Message-ID: <CACKFLikZgXQLnSN95vQgzZqmFisrxUvKiqF78RYcMAA2BE+6Zg@mail.gmail.com>
-Subject: Re: [PATCH v3] tg3: Fix the TX ring stall
-To: alexey.pakhunov@spacex.com
-Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com
+Date: Sun, 5 Nov 2023 19:59:10 -0800
+Message-ID: <CACKFLinFG5AZkOFUHkFLbnTOdnrXgS1fbCVStjP_96zsE7XN-Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] tg3: Increment tx_dropped in tg3_tso_bug()
+To: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Cc: linux-kernel@vger.kernel.org, mchan@broadcom.com, netdev@vger.kernel.org, 
+	prashant@broadcom.com, siva.kallam@broadcom.com, vincent.wong2@spacex.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000065ea96060973c0d9"
+	boundary="000000000000084966060973e103"
 
---00000000000065ea96060973c0d9
+--000000000000084966060973e103
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 5, 2023 at 10:58=E2=80=AFAM <alexey.pakhunov@spacex.com> wrote:
+On Sun, Nov 5, 2023 at 11:26=E2=80=AFAM Alex Pakhunov
+<alexey.pakhunov@spacex.com> wrote:
 >
-> From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+> > I recommend using per queue counters as briefly mentioned in my
+> > earlier reply...
+> > tg3_get_stats64() can just loop and sum all the tx_dropped and
+> > rx_dropped counters in each tg3_napi struct.  We don't worry about
+> > locks here since we are just reading.
 >
-> The TX ring maintained by the tg3 driver can end up in the state, when it
-> has packets queued for sending but the NIC hardware is not informed, so n=
-o
-> progress is made. This leads to a multi-second interruption in network
-> traffic followed by dev_watchdog() firing and resetting the queue.
->
-> The specific sequence of steps is:
->
-> 1. tg3_start_xmit() is called at least once and queues packet(s) without
->    updating tnapi->prodmbox (netdev_xmit_more() returns true)
-> 2. tg3_start_xmit() is called with an SKB which causes tg3_tso_bug() to b=
-e
->    called.
-> 3. tg3_tso_bug() determines that the SKB is too large, ...
->
->         if (unlikely(tg3_tx_avail(tnapi) <=3D frag_cnt_est)) {
->
->    ... stops the queue, and returns NETDEV_TX_BUSY:
->
->         netif_tx_stop_queue(txq);
->         ...
->         if (tg3_tx_avail(tnapi) <=3D frag_cnt_est)
->                 return NETDEV_TX_BUSY;
->
-> 4. Since all tg3_tso_bug() call sites directly return, the code updating
->    tnapi->prodmbox is skipped.
->
-> 5. The queue is stuck now. tg3_start_xmit() is not called while the queue
->    is stopped. The NIC is not processing new packets because
->    tnapi->prodmbox wasn't updated. tg3_tx() is not called by
->    tg3_poll_work() because the all TX descriptions that could be freed ha=
-s
->    been freed:
->
->         /* run TX completion thread */
->         if (tnapi->hw_status->idx[0].tx_consumer !=3D tnapi->tx_cons) {
->                 tg3_tx(tnapi);
->
-> 6. Eventually, dev_watchdog() fires triggering a reset of the queue.
->
-> This fix makes sure that the tnapi->prodmbox update happens regardless of
-> the reason tg3_start_xmit() returned.
->
-> Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
-> Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
-> ---
-> v3: Split "Fix the TX ring stall" into a standalone patch. No code change=
-s from v2.
-> v2: https://lore.kernel.org/netdev/CACKFLi=3DZLAb1Y92LwvqjOGPCuinka7qbHwD=
-P2pkG4-_a7DMorQ@mail.gmail.com/T/#t
->     - Sort the local variables in tg3_start_xmit() in the RCS order
-> v1: https://lore.kernel.org/netdev/20231101191858.2611154-1-alexey.pakhun=
-ov@spacex.com/T/#t
-> ---
+> Got it. So the core idea is to make sure there is a single writer for eac=
+h
+> counter which will make updating the counter race-free. It does not keep
+> reading the counters from multiple queues completely race free, but, I
+> guess, the assumption is that computing the aggregate counter to be
+> slightly wrong is acceptable - it will be recomputed correctly next time.
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Correct.
 
---00000000000065ea96060973c0d9
+>
+> There is still some gotchas on 32 bit machines though. 64 bit reads are n=
+ot
+> atomic there, so we have to make the counters 32bit to compensate:
+
+These counters are currently defined as unsigned long which is 32-bit
+on 32-bit CPUs and 64-bit on 64-bit CPUs.  We can just keep them
+unchanged.  Thanks.
+
+--000000000000084966060973e103
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -206,14 +172,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIeR4IkblsdCXwkOaMnP5mADZRG0IHuq
-TO/MtJHixfnkMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
-NjAzNTAxNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBEeXsRWF/H3lOk3ENECYbNg9c2Y0pxi
+dT9Gt6DLKvloMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+NjAzNTkyMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBdN5ihyNk58Vmzdw+aHkcfOutGtV7iNCT1oj9l8L+PYRKPgW+n
-wOtAhmrdaeY3vOGYzpKISDdtEsxIkcnVz8C+DvsbFWPC9ImDe5FlRlfimyT0xmQKk0VxGHz4oZ3D
-rV3UV1FuLPPdTD2ylNtF8oCTKQTfQ3K5jL7KYqL2lnmmSn1oWZ51Qn9ht54sC+9YlKfAGTtZC8iv
-fFduJ37oW2urJG4UwDY8+94v0vK0h+pHU4SpqIUn5t4lyrjOFmIIH6vX78NY2mYqLGGTz/nJeVOW
-7QdEx0SLjOlsubVepxNUdtr8UBp06YkgxuxxGgEGoPFbYhk5jZdqD59XTAPYoBH8
---00000000000065ea96060973c0d9--
+ATANBgkqhkiG9w0BAQEFAASCAQBbQHavlzARqHWu71DdrBT3KymXMGUZTZa9hXgvmh7p4y7yaBO9
+Px82fIJq+/3Vx6Xe7/XWjvS/KobCg4O3EfAQvyzeeSwxlEBAX2RMyFhpaWGVtS5dozd0xYhgnK1c
+WRwcwF46s79P5aSfpxwUkoO6UTEflCZTAN0/jStlxOqnKEU8dmAowtWD1RRREZMhhO38J23/3caj
+GJUoX4QHODRvJWe8NqOCwXToJ7YSA6Ioaeo48ZpQuF/pjwOqseLNUE+eV9zY+cMyD7lsWtvqzu34
+74sbAP4ASksSjBTFVCghDpUoGjyWsajjLSVonPoI+aXuk+JLg2x7DmvnK37qJORi
+--000000000000084966060973e103--
 
