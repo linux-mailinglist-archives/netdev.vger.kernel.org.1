@@ -1,108 +1,160 @@
-Return-Path: <netdev+bounces-46234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31527E2AD9
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:20:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2FEB7E2ADC
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E657B20EFB
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:20:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FF111C20BA2
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 17:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ABD829CF0;
-	Mon,  6 Nov 2023 17:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E3429CF2;
+	Mon,  6 Nov 2023 17:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ect+N6Nh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QroTw1TC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6912941E
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B4BD0C433CA;
-	Mon,  6 Nov 2023 17:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699291225;
-	bh=0Y41t+A8YImz/2ZSKmKP3b9XBDxUmJyRiQu7FUKAwpo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ect+N6NhwDV3K/SR60icyLlHJq3BPD2no1mcsG4SqE97jUiGInHzd1oRN7tdtP6MR
-	 IOAxRVymbtR43OPqB2Q6LXfggjQwUbGjIIjQtZtRNriyoI4R5ZTWRiVDCa4A9WxvK7
-	 M7FId9pDb3jETBkNSqSMFsM2skyFFD28sVS93WhvytHzSv7WiRCCl2fQtJH5CeXiE4
-	 K8PC4lUG1+6B1rxNqPwqMW4k2GGQevvv1Z7sXg0X1UoX6SeSp7mKfVbCIygeP1mPCf
-	 f+dT+RvJ9/aeckaGv8mkhC35bC4BZtIeDHRlZ/KMT+h+FvaChoYzXhPDQriEnIEifs
-	 hou8mNXA4SqZQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9B9DDC00446;
-	Mon,  6 Nov 2023 17:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B9E29CF0
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:22:02 +0000 (UTC)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6257983
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 09:22:01 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cc281f1214so38162525ad.2
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 09:22:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699291321; x=1699896121; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UsGIrvGQPvl+jlrIkAaumx9ydFi19GX+URg2DQaDyt0=;
+        b=QroTw1TCYpKaU2zf2BoUoOGl3QGEocIa0dQcRbSBEzPv3kZEyA5S2q/AONx8+nAEwS
+         9cQ+HRrpkQKb7qz7Vm7PbVHzYb+vx7zOkh0Su1QwlMBF7tEyuqVj9pM/rmmC1tyO5IZa
+         A2vTe2D15J8wXwxc+Pxcgo/snbx8PqoIboIQNt4FX1nALmWZmU/0pHePgjC3W9LReWWd
+         U3L+QEnI8e9lwWr2bJra2AkiZxxaHEuJ8U/TxWDAx2JjobhFIg2vsLt/GFh3b7gc6kMc
+         sKWCWFjHEC+nBRsWzo6Ixtzq5Ocnud/GSEHgI5GBp1wWrBZP7kz6S4TPlvbMimpgWn6L
+         LqgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699291321; x=1699896121;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UsGIrvGQPvl+jlrIkAaumx9ydFi19GX+URg2DQaDyt0=;
+        b=ryxEmwkVnOrX5TtlB1D0ROjUD8dl4T+9ZPqbcgyjsleQNm7gd/6gu3QFeILm1DZaL3
+         5tm2YR7sc/Yx3k7+ijQlwz8lEwEOBRhN67uFaAyxEd4Asm8iTbs14nYS00K0qL7bhq+i
+         j+uLKjbElwtIevdIpFKpeqaSqX/uP2dbzibUvJ8RfchtrYWv9K3ThhBQTFL8IQ2/sKBh
+         Z/Aj17y4LP1p357fth8P4pOe9CKE4sju9ybkUGU7Z/LBh6i74+OOLPxRu4jlDr20fi6Y
+         r53tSf1EBe/ayzDgMe2LeHm0B6aACKzQFCNB3Vsijt4aFQW1KETPGqo0SrzSzlgjPDQ4
+         CDoQ==
+X-Gm-Message-State: AOJu0YyJRot6jgfyIf8wNKKS48eMsSuNJNBj+/UP3kDL36nTmQ4vMg+F
+	UOsjesvisda83/N1Pt9g/EPQ9r0=
+X-Google-Smtp-Source: AGHT+IGJ5W4iTr1qlF8r5K7jfABNdTMHeWikykBWHeDpfCRGrHjKKtt9ryQ2DAdtxVSnmN4+LQs7mlc=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:902:f7c3:b0:1cc:29fb:f398 with SMTP id
+ h3-20020a170902f7c300b001cc29fbf398mr554881plw.10.1699291320856; Mon, 06 Nov
+ 2023 09:22:00 -0800 (PST)
+Date: Mon, 6 Nov 2023 09:21:59 -0800
+In-Reply-To: <20231103222748.12551-5-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v2] bridge: mdb: Add get support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169929122563.9490.9075171205269038926.git-patchwork-notify@kernel.org>
-Date: Mon, 06 Nov 2023 17:20:25 +0000
-References: <20231101074510.1471018-1-idosch@nvidia.com>
-In-Reply-To: <20231101074510.1471018-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
- razor@blackwall.org, mlxsw@nvidia.com
+Mime-Version: 1.0
+References: <20231103222748.12551-1-daniel@iogearbox.net> <20231103222748.12551-5-daniel@iogearbox.net>
+Message-ID: <ZUkgtxlK9MRGHx8v@google.com>
+Subject: Re: [PATCH bpf 4/6] bpf, netkit: Add indirect call wrapper for
+ fetching peer dev
+From: Stanislav Fomichev <sdf@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: martin.lau@kernel.org, kuba@kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>
+Content-Type: text/plain; charset="utf-8"
 
-Hello:
-
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
-
-On Wed, 1 Nov 2023 09:45:10 +0200 you wrote:
-> Implement MDB get functionality, allowing user space to query a single
-> MDB entry from the kernel instead of dumping all the entries. Example
-> usage:
+On 11/03, Daniel Borkmann wrote:
+> ndo_get_peer_dev is used in tcx BPF fast path, therefore make use of
+> indirect call wrapper and therefore optimize the bpf_redirect_peer()
+> internal handling a bit. Add a small skb_get_peer_dev() wrapper which
+> utilizes the INDIRECT_CALL_1() macro instead of open coding.
 > 
->  # bridge mdb add dev br0 port swp1 grp 239.1.1.1 vid 10
->  # bridge mdb add dev br0 port swp2 grp 239.1.1.1 vid 10
->  # bridge mdb add dev br0 port swp2 grp 239.1.1.5 vid 10
->  # bridge mdb get dev br0 grp 239.1.1.1 vid 10
->  dev br0 port swp1 grp 239.1.1.1 temp vid 10
->  dev br0 port swp2 grp 239.1.1.1 temp vid 10
->  # bridge -j -p mdb get dev br0 grp 239.1.1.1 vid 10
->  [ {
->          "index": 10,
->          "dev": "br0",
->          "port": "swp1",
->          "grp": "239.1.1.1",
->          "state": "temp",
->          "flags": [ ],
->          "vid": 10
->      },{
->          "index": 10,
->          "dev": "br0",
->          "port": "swp2",
->          "grp": "239.1.1.1",
->          "state": "temp",
->          "flags": [ ],
->          "vid": 10
->      } ]
->  # bridge mdb get dev br0 grp 239.1.1.1 vid 20
->  Error: bridge: MDB entry not found.
->  # bridge mdb get dev br0 grp 239.1.1.2 vid 10
->  Error: bridge: MDB entry not found.
+> Co-developed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  drivers/net/netkit.c |  3 ++-
+>  include/net/netkit.h |  6 ++++++
+>  net/core/filter.c    | 18 +++++++++++++-----
+>  3 files changed, 21 insertions(+), 6 deletions(-)
 > 
-> [...]
+> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+> index dc51c23b40f0..934c71a73b5c 100644
+> --- a/drivers/net/netkit.c
+> +++ b/drivers/net/netkit.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/filter.h>
+>  #include <linux/netfilter_netdev.h>
+>  #include <linux/bpf_mprog.h>
+> +#include <linux/indirect_call_wrapper.h>
+>  
+>  #include <net/netkit.h>
+>  #include <net/dst.h>
+> @@ -177,7 +178,7 @@ static void netkit_set_headroom(struct net_device *dev, int headroom)
+>  	rcu_read_unlock();
+>  }
+>  
+> -static struct net_device *netkit_peer_dev(struct net_device *dev)
+> +INDIRECT_CALLABLE_SCOPE struct net_device *netkit_peer_dev(struct net_device *dev)
+>  {
+>  	return rcu_dereference(netkit_priv(dev)->peer);
+>  }
+> diff --git a/include/net/netkit.h b/include/net/netkit.h
+> index 0ba2e6b847ca..9ec0163739f4 100644
+> --- a/include/net/netkit.h
+> +++ b/include/net/netkit.h
+> @@ -10,6 +10,7 @@ int netkit_prog_attach(const union bpf_attr *attr, struct bpf_prog *prog);
+>  int netkit_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
+>  int netkit_prog_detach(const union bpf_attr *attr, struct bpf_prog *prog);
+>  int netkit_prog_query(const union bpf_attr *attr, union bpf_attr __user *uattr);
+> +INDIRECT_CALLABLE_DECLARE(struct net_device *netkit_peer_dev(struct net_device *dev));
+>  #else
+>  static inline int netkit_prog_attach(const union bpf_attr *attr,
+>  				     struct bpf_prog *prog)
+> @@ -34,5 +35,10 @@ static inline int netkit_prog_query(const union bpf_attr *attr,
+>  {
+>  	return -EINVAL;
+>  }
+> +
+> +static inline struct net_device *netkit_peer_dev(struct net_device *dev)
+> +{
+> +	return NULL;
+> +}
+>  #endif /* CONFIG_NETKIT */
+>  #endif /* __NET_NETKIT_H */
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 7aca28b7d0fd..dbf92b272022 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -81,6 +81,7 @@
+>  #include <net/xdp.h>
+>  #include <net/mptcp.h>
+>  #include <net/netfilter/nf_conntrack_bpf.h>
+> +#include <net/netkit.h>
+>  #include <linux/un.h>
+>  
+>  #include "dev.h"
+> @@ -2468,6 +2469,16 @@ static const struct bpf_func_proto bpf_clone_redirect_proto = {
+>  DEFINE_PER_CPU(struct bpf_redirect_info, bpf_redirect_info);
+>  EXPORT_PER_CPU_SYMBOL_GPL(bpf_redirect_info);
+>  
+> +static struct net_device *skb_get_peer_dev(struct net_device *dev)
+> +{
+> +	const struct net_device_ops *ops = dev->netdev_ops;
+> +
+> +	if (likely(ops->ndo_get_peer_dev))
+> +		return INDIRECT_CALL_1(ops->ndo_get_peer_dev,
+> +				       netkit_peer_dev, dev);
 
-Here is the summary with links:
-  - [iproute2-next,v2] bridge: mdb: Add get support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=77138a2f9477
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+nit: why not put both netkit and veth here under INDIRECT_CALL_2 ?
+Presumably should help with the veth deployments as well?
 
