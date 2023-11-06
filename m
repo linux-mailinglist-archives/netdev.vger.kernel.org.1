@@ -1,161 +1,166 @@
-Return-Path: <netdev+bounces-46278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EB6C7E302C
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:52:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D1337E3036
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 23:56:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 539D5280D47
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:52:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CAE71C2074F
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 22:56:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A542D057;
-	Mon,  6 Nov 2023 22:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3392EAFA;
+	Mon,  6 Nov 2023 22:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y9OqlAdV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B201CF95
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:52:31 +0000 (UTC)
-Received: from mail-oa1-f80.google.com (mail-oa1-f80.google.com [209.85.160.80])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C769D75
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 14:52:29 -0800 (PST)
-Received: by mail-oa1-f80.google.com with SMTP id 586e51a60fabf-1e98eca4206so6224273fac.0
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 14:52:29 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FDC2D7B1
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:56:06 +0000 (UTC)
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E526510D;
+	Mon,  6 Nov 2023 14:56:02 -0800 (PST)
+Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-7bae0c07007so805773241.1;
+        Mon, 06 Nov 2023 14:56:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699311362; x=1699916162; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/wEW+J+MMgAFeh8Mzz47HGE59Py4EtdOuMSKU4I6zWM=;
+        b=Y9OqlAdVdfCWM1s4oJdvDwokwM/6M6NpqsO7qIVwY6hn09+wKqlqBlj3lxsB8g8lGD
+         GiERG4iah8VsJwiBQm15HLrHqn/Tby73UreqQeYN8fRGwXG0/Vzhcfq/iA2qXEu4w3CF
+         1VqmDoVZubSrUHtaBx9o05L/g/v2z85yvRT9jmtepvMvEov2em1J8b/39pEAXX3SZKu6
+         ZMsl4SfULVO4IZY6FiaXuELWr0+nI0F3T3lq6Lh/dZwMAhzKCHzG+1Vy/N4JKU4ryqXU
+         7ZoQaz1M7WVKj0iGdJHpx2UW6KY3vr3dLFoMRhGRpmUQ65Hu1gdFzY/RtPgJof/xagwo
+         yNSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699311148; x=1699915948;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gVjrZIYw052So8S0TQsLIpyybr5BKhUBF66hcLzozOo=;
-        b=wKjabqpYK/FFRewkG6kL2eBBOExe+IaE2T5VR5vwadp0twfoZ53eNB8oThLz1Dkaku
-         /GCfwlZ4Mcqc+YC8Bag/wJlgesmahwiU2A7FTj2GvdrmAyuN3y444HKiRbeQb930ot+2
-         JmWHcNfimFPuD2MxUsXkQZ1fDEsD6bTus1QHpea9ih3SsF4yFA82htwW34NV15gV4tzl
-         3BEfnsZwmpv9IF4pznm20eGWbswnNGe9zJzpvOSUx0pzpXLDST5GRpPS4b1+k3m5SLQj
-         Z1g+9X5bnhyEU+xKV6I2lGDcn6krqf5MbPDhYBzJmJQsMS8zZduL1JwBYy0BMLEiWivB
-         6ryw==
-X-Gm-Message-State: AOJu0YwEC6rVj1W+j7sWF/YpOd4/8IgYLB3ZAzaSzTQU7ep5iMp8AI/X
-	S3+BHZKoDRKsnH8g/0UDkFkynrp4O6AefNJTDH+TwUpPtfkw
-X-Google-Smtp-Source: AGHT+IFB7j58wbrZ2aBYzqpaJqnn8TcbxJBmQW57UZjeYHqs+Co2g/njg3yP6/NN5ZjiNKR3Rt7IBifrhZbtUHazgg/BLO34ilyq
+        d=1e100.net; s=20230601; t=1699311362; x=1699916162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/wEW+J+MMgAFeh8Mzz47HGE59Py4EtdOuMSKU4I6zWM=;
+        b=dxA4mDKTXXYMfvOsPeGbPIlC5+ZU5/fAK9I/U8lmxfSd57TRkszd1GYT4mG9GeDMxC
+         N9s+5+XA27JgD+411arAoCdSt/c0iwUK16ryT85n7kT/suFxWOlDToXXKu4JEusFuJqE
+         etYb9qFUiv21DyWVAYezZK50OPlJyLzhCaP03ex6K6UrA9qmmUlntJj5rk3n2Xwf5zme
+         JJRE8q05tvbEv6u5cOHkJkwE8hw8nm4tpVbdrST1JPk6W5qYsg0gt5r7uZZ0fYitmo+w
+         6CIx+6wq5UgvMJiHIsjemG494tnuzwLaGbEzTeaX2bB2DgpzI7VktAPeSw75je4xHXqF
+         IzSw==
+X-Gm-Message-State: AOJu0YwLS+1qhQcgzcyhyxd6+1JTR4j+Oa/rKfrpQytARemjGJuWa7OU
+	0hye8q0/OwrAZ5JF83qgOzX7FqJIZgBvrykHtTM=
+X-Google-Smtp-Source: AGHT+IGJLbY16cPvyvbTXphGTN+7ucINqF5flr9mxxCiuhAJxLJ/TQnck4EFEyL23m987XVAKWsGDAUf4sPH+q33ho4=
+X-Received: by 2002:a67:b042:0:b0:452:94a4:9c59 with SMTP id
+ q2-20020a67b042000000b0045294a49c59mr19989020vsh.10.1699311361745; Mon, 06
+ Nov 2023 14:56:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:2199:b0:1e9:668b:7ba0 with SMTP id
- l25-20020a056870219900b001e9668b7ba0mr374170oae.4.1699311148403; Mon, 06 Nov
- 2023 14:52:28 -0800 (PST)
-Date: Mon, 06 Nov 2023 14:52:28 -0800
-In-Reply-To: <0000000000009e122006088a2b8d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005d11b8060983b5b7@google.com>
-Subject: Re: [syzbot] [dccp?] general protection fault in dccp_write_xmit (2)
-From: syzbot <syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com>
-To: bragathemanick0908@gmail.com, davem@davemloft.net, dccp@vger.kernel.org, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-11-almasrymina@google.com> <ZUk0FGuJ28s1d9OX@google.com>
+ <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
+ <CAF=yD-+MFpO5Hdqn+Q9X54SBpgcBeJvKTRD53X2oM4s8uVqnAQ@mail.gmail.com> <ZUlp8XutSAScKs_0@google.com>
+In-Reply-To: <ZUlp8XutSAScKs_0@google.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 6 Nov 2023 14:55:24 -0800
+Message-ID: <CAF=yD-JZ88j+44MYgX-=oYJngz4Z0zw6Y0V3nHXisZJtNu7q6A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+On Mon, Nov 6, 2023 at 2:34=E2=80=AFPM Stanislav Fomichev <sdf@google.com> =
+wrote:
+>
+> On 11/06, Willem de Bruijn wrote:
+> > > > IMHO, we need a better UAPI to receive the tokens and give them bac=
+k to
+> > > > the kernel. CMSG + setsockopt(SO_DEVMEM_DONTNEED) get the job done,
+> > > > but look dated and hacky :-(
+> > > >
+> > > > We should either do some kind of user/kernel shared memory queue to
+> > > > receive/return the tokens (similar to what Jonathan was doing in hi=
+s
+> > > > proposal?)
+> > >
+> > > I'll take a look at Jonathan's proposal, sorry, I'm not immediately
+> > > familiar but I wanted to respond :-) But is the suggestion here to
+> > > build a new kernel-user communication channel primitive for the
+> > > purpose of passing the information in the devmem cmsg? IMHO that seem=
+s
+> > > like an overkill. Why add 100-200 lines of code to the kernel to add
+> > > something that can already be done with existing primitives? I don't
+> > > see anything concretely wrong with cmsg & setsockopt approach, and if
+> > > we switch to something I'd prefer to switch to an existing primitive
+> > > for simplicity?
+> > >
+> > > The only other existing primitive to pass data outside of the linear
+> > > buffer is the MSG_ERRQUEUE that is used for zerocopy. Is that
+> > > preferred? Any other suggestions or existing primitives I'm not aware
+> > > of?
+> > >
+> > > > or bite the bullet and switch to io_uring.
+> > > >
+> > >
+> > > IMO io_uring & socket support are orthogonal, and one doesn't preclud=
+e
+> > > the other. As you know we like to use sockets and I believe there are
+> > > issues with io_uring adoption at Google that I'm not familiar with
+> > > (and could be wrong). I'm interested in exploring io_uring support as
+> > > a follow up but I think David Wei will be interested in io_uring
+> > > support as well anyway.
+> >
+> > I also disagree that we need to replace a standard socket interface
+> > with something "faster", in quotes.
+> >
+> > This interface is not the bottleneck to the target workload.
+> >
+> > Replacing the synchronous sockets interface with something more
+> > performant for workloads where it is, is an orthogonal challenge.
+> > However we do that, I think that traditional sockets should continue
+> > to be supported.
+> >
+> > The feature may already even work with io_uring, as both recvmsg with
+> > cmsg and setsockopt have io_uring support now.
+>
+> I'm not really concerned with faster. I would prefer something cleaner :-=
+)
+>
+> Or maybe we should just have it documented. With some kind of path
+> towards beautiful world where we can create dynamic queues..
 
-HEAD commit:    d2f51b3516da Merge tag 'rtc-6.7' of git://git.kernel.org/p..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16675f40e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cd456c5e6582895e
-dashboard link: https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=167ac787680000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1799f190e80000
+I suppose we just disagree on the elegance of the API.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-d2f51b35.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d678011e498e/vmlinux-d2f51b35.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4f6ed772923d/bzImage-d2f51b35.xz
+The concise notification API returns tokens as a range for
+compression, encoding as two 32-bit unsigned integers start + length.
+It allows for even further batching by returning multiple such ranges
+in a single call.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
+This is analogous to the MSG_ZEROCOPY notification mechanism from
+kernel to user.
 
-general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-CPU: 3 PID: 5345 Comm: syz-executor785 Not tainted 6.6.0-syzkaller-14651-gd2f51b3516da #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
-RIP: 0010:dccp_write_xmit+0x66/0x1d0 net/dccp/output.c:356
-Code: 00 48 85 c0 49 89 c4 0f 84 03 01 00 00 e8 82 5f cd f7 41 80 3e 00 0f 85 45 01 00 00 48 8b 9d f8 08 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0f 85 1f 01 00 00 48 8b 1b 48 8d bb b0 00 00 00 48
-RSP: 0018:ffffc90003797870 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88802a2bd000 RSI: ffffffff89ba330e RDI: ffff88802d7d9540
-RBP: ffff88802d7d9540 R08: 0000000000000001 R09: fffffbfff23e11e9
-R10: ffffffff91f08f4f R11: ffffffff915e5030 R12: ffff8880186c9cc0
-R13: dffffc0000000000 R14: ffffed1005afb3c7 R15: ffff88802d7d9e38
-FS:  00007f263ceef6c0(0000) GS:ffff88806b900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020002980 CR3: 000000001b2ab000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- dccp_sendmsg+0x968/0xcc0 net/dccp/proto.c:801
- inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:847
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x2ac/0x940 net/socket.c:2588
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2642
- __sys_sendmmsg+0x1a1/0x450 net/socket.c:2728
- __do_sys_sendmmsg net/socket.c:2757 [inline]
- __se_sys_sendmmsg net/socket.c:2754 [inline]
- __x64_sys_sendmmsg+0x9c/0x100 net/socket.c:2754
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f263cf53559
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 61 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f263ceef218 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f263cfdd438 RCX: 00007f263cf53559
-RDX: 0400000000000239 RSI: 0000000020002980 RDI: 0000000000000006
-RBP: 00007f263cfdd430 R08: 00007fff5b335167 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f263cfdd43c
-R13: 00007f263cfaa504 R14: 0400000000000239 R15: 00007fff5b335168
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:ccid_hc_tx_send_packet net/dccp/ccid.h:166 [inline]
-RIP: 0010:dccp_write_xmit+0x66/0x1d0 net/dccp/output.c:356
-Code: 00 48 85 c0 49 89 c4 0f 84 03 01 00 00 e8 82 5f cd f7 41 80 3e 00 0f 85 45 01 00 00 48 8b 9d f8 08 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 28 00 0f 85 1f 01 00 00 48 8b 1b 48 8d bb b0 00 00 00 48
-RSP: 0018:ffffc90003797870 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff88802a2bd000 RSI: ffffffff89ba330e RDI: ffff88802d7d9540
-RBP: ffff88802d7d9540 R08: 0000000000000001 R09: fffffbfff23e11e9
-R10: ffffffff91f08f4f R11: ffffffff915e5030 R12: ffff8880186c9cc0
-R13: dffffc0000000000 R14: ffffed1005afb3c7 R15: ffff88802d7d9e38
-FS:  00007f263ceef6c0(0000) GS:ffff88806b900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020002980 CR3: 000000001b2ab000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 48 85             	add    %cl,-0x7b(%rax)
-   3:	c0 49 89 c4          	rorb   $0xc4,-0x77(%rcx)
-   7:	0f 84 03 01 00 00    	je     0x110
-   d:	e8 82 5f cd f7       	call   0xf7cd5f94
-  12:	41 80 3e 00          	cmpb   $0x0,(%r14)
-  16:	0f 85 45 01 00 00    	jne    0x161
-  1c:	48 8b 9d f8 08 00 00 	mov    0x8f8(%rbp),%rbx
-  23:	48 89 d8             	mov    %rbx,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 28 00       	cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
-  2f:	0f 85 1f 01 00 00    	jne    0x154
-  35:	48 8b 1b             	mov    (%rbx),%rbx
-  38:	48 8d bb b0 00 00 00 	lea    0xb0(%rbx),%rdi
-  3f:	48                   	rex.W
+The synchronous socket syscall interface can be replaced by something
+asynchronous like io_uring. This already works today? Whatever
+asynchronous ring-based API would be selected, io_uring or otherwise,
+I think the concise notification encoding would remain as is.
 
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Since this is an operation on a socket, I find a setsockopt the
+fitting interface.
 
