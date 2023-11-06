@@ -1,90 +1,95 @@
-Return-Path: <netdev+bounces-46240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA707E2BD3
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:22:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1867E2C21
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 19:36:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70330281731
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:22:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 981652816CA
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 18:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A7A2C877;
-	Mon,  6 Nov 2023 18:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175522D025;
+	Mon,  6 Nov 2023 18:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="ef9sDlkz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Q9yjp0Wz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81612C86F;
-	Mon,  6 Nov 2023 18:22:06 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D2FD47;
-	Mon,  6 Nov 2023 10:22:04 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68312D035
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:36:19 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DB958F;
+	Mon,  6 Nov 2023 10:36:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=sOSdsNqbyXmCuMzsqcDUCbUAESIaABwBAG5c+7hOL5U=; b=ef9sDlkzUa4rKcnKoM4Q/qAj+/
-	It7D8kCrw7ieTwEoqluxKJjpnuB5GCIL1lu3Da0Yyhv/M0gl533WbQiWgH8TLdTWJyliMoqwFZ225
-	3nhebqfvRrcMJJnR8VDbNepc/yP5aQb9XnWPIc9gbux+kQaMI13wpW/bPdHvLexOwXuAEUrJJKNIK
-	TVQa2xn90LFhzQHc40bkYIcZhVtYma3J2fo9mmWdBrxhDg+Y5ocLJU4dpMOKQHTdVj5958oGTQdqH
-	mbxEleMbOyN4lh2yubgbNJODbbtnmGlmarq84OlSKPqWRDD/VohjsQPBiluDTnkUXRAWnNmWYe+W+
-	YgR+188w==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r04Eb-000Oka-60; Mon, 06 Nov 2023 19:22:01 +0100
-Received: from [194.230.147.75] (helo=localhost.localdomain)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r04Ea-0003I6-Jz; Mon, 06 Nov 2023 19:22:00 +0100
-Subject: Re: [PATCH bpf 4/6] bpf, netkit: Add indirect call wrapper for
- fetching peer dev
-To: Stanislav Fomichev <sdf@google.com>
-Cc: martin.lau@kernel.org, kuba@kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, Nikolay Aleksandrov <razor@blackwall.org>
-References: <20231103222748.12551-1-daniel@iogearbox.net>
- <20231103222748.12551-5-daniel@iogearbox.net> <ZUkgtxlK9MRGHx8v@google.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <0397a813-7e55-7a67-c876-b2274782805f@iogearbox.net>
-Date: Mon, 6 Nov 2023 19:21:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=FttnvgXCtGPUD1P8YePW+jEBhOPTjxej3y77da5fSZk=; b=Q9yjp0Wz8LIDsMMXs3OI5BOIdX
+	gp0+DKIJXLl+vvFRlZlEu0f1Y5FS+fFaGgKMKnZzJXt1TM7Arbx87dFqsP2zplX7p9xmaQU+AEHeS
+	4MJDdkYfUvXUszus7Z+IE30MBzW372IIUheq80FH648M24Gmm/KRBuHw6TcqDvIUkFfHhb5jw7n4U
+	VtuJPbZfN77SS56fxjqyWqd7QfCTZXAfNn3FKMglt3ydnSQWd7JufqL8aCaXvD4VkySgnC2M239Fa
+	VwXCKMqsgFHngaAWrit8S6y+0mOfKXdbzpeW9pvwmh7sY5tgMFmlwfi4ynct/FGu37EAOn/TRaYyo
+	d8bxTJ3w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53024)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r04SD-00088t-1K;
+	Mon, 06 Nov 2023 18:36:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r04SD-00068S-N2; Mon, 06 Nov 2023 18:36:05 +0000
+Date: Mon, 6 Nov 2023 18:36:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phylink: initialize carrier state at creation
+Message-ID: <ZUkyFaFHdRIoj9YK@shell.armlinux.org.uk>
+References: <20231106180506.2665-1-klaus.kudielka@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZUkgtxlK9MRGHx8v@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27084/Mon Nov  6 09:39:04 2023)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231106180506.2665-1-klaus.kudielka@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 11/6/23 6:21 PM, Stanislav Fomichev wrote:
-[...]
->> +static struct net_device *skb_get_peer_dev(struct net_device *dev)
->> +{
->> +	const struct net_device_ops *ops = dev->netdev_ops;
->> +
->> +	if (likely(ops->ndo_get_peer_dev))
->> +		return INDIRECT_CALL_1(ops->ndo_get_peer_dev,
->> +				       netkit_peer_dev, dev);
+On Mon, Nov 06, 2023 at 07:05:06PM +0100, Klaus Kudielka wrote:
+> Background: Turris Omnia (Armada 385); eth2 (mvneta) connected to SFP bus;
+> SFP module is present, but no fiber connected, so definitely no carrier.
 > 
-> nit: why not put both netkit and veth here under INDIRECT_CALL_2 ?
-> Presumably should help with the veth deployments as well?
+> After booting, eth2 is down, but netdev LED trigger surprisingly reports
+> link active. Then, after "ip link set eth2 up", the link indicator goes
+> away - as I would have expected it from the beginning.
+> 
+> It turns out, that the default carrier state after netdev creation is
+> "carrier ok". Some ethernet drivers explicitly call netif_carrier_off
+> during probing, others (like mvneta) don't - which explains the current
+> behaviour: only when the device is brought up, phylink_start calls
+> netif_carrier_off.
+> 
+> Fix this for all drivers, by calling netif_carrier_off in phylink_create.
+> 
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Klaus Kudielka <klaus.kudielka@gmail.com>
 
-Yes, I'm also planning to add it there as well, it's a slightly larger
-change since also a new header needs to be added, but I'll follow-up on it.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Thanks for review,
-Daniel
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
