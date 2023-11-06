@@ -1,225 +1,200 @@
-Return-Path: <netdev+bounces-46200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4239A7E24EC
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 14:26:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1E97E2600
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 14:48:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB0F72812F5
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:26:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 304CCB20DF3
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 13:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9030F219E9;
-	Mon,  6 Nov 2023 13:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC09249FD;
+	Mon,  6 Nov 2023 13:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nMYn4epo"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="nJ2F/Id7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66F822EED
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:26:33 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869EAEA;
-	Mon,  6 Nov 2023 05:26:31 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-5431614d90eso7337006a12.1;
-        Mon, 06 Nov 2023 05:26:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699277190; x=1699881990; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cetcitf2manmw5zV6XnE3T5HX2WGgbUdmj2U+XjQQ7Q=;
-        b=nMYn4eponyAyR+A3//GUsg4+9gBIW1Zgi+WOqE5/VhtR/GN3Ms99Fg3UwnVM1IQMDO
-         QsprsNI6oEFtidsJqtYiHvuny+AGqQgegXk8icuIr2qXp0CZ2ZSjwP0C/f0yirDLMZF+
-         T54hYO+gYLas+idj4JJ/uTJB4GXDLtt00oWSUklnupwfjxZ2al+ar0mPCSumN3+FAGLq
-         1SHf7tlDMp0qzyQwl7nJMOj1NP9hW5Kop8061SBIwYOinYvD2f1JFePhbgsrUUrbQF3Y
-         pdAdyQ/w9/zqdJGC8Br6inJULMaNzwAzMPBvt3IgRY3S7lNGbTU1Rp8kRiLon851ATTV
-         pbbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699277190; x=1699881990;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cetcitf2manmw5zV6XnE3T5HX2WGgbUdmj2U+XjQQ7Q=;
-        b=Pft1NevHkrzixH6nWuZfn2UiZmXdpQqK1Exy3IvpkJ0XP1MNEO+AT4DppvLKfDvmXT
-         ZE/e0LHoUgrBTVTSHdcgfIoWspxthPTmtPKVU+3/yeMqH7wYHg4dCMbGgg4uSbkyoHLA
-         7NZZH5zWDluqnMD0Bf0Fun2OkJnVoloVFrO/Sj8P73xIagAlvW+IcW1Ja2CLYToUD9d+
-         vHRXVC9PaYviFel+M0o4G96apMcnqjVKsWqngLcY6obwHi+SU/wAdnjylBSe8K/Fkjqm
-         kz1lcJ5NXdLf3FqaEKqKxFeAJIHr0OAP0ToJ9mUolrQpj9dNK+0OKqvYmuxwZJJ1NPNI
-         5eNg==
-X-Gm-Message-State: AOJu0YwtFAyeAGJpICpJOF9H/m7f//4FFwfsxwNvRaRH3YrIY1eLVVYI
-	HqFMQ2dD5CzPjl3LV5W+lT0=
-X-Google-Smtp-Source: AGHT+IGQOb8Ums1LVAfGjAKSFuuLvn9r9e+cCapg5lm5Os7Cwf4Delp3YG51x8EOBbspzt06SHIX/w==
-X-Received: by 2002:a05:6402:8ce:b0:53e:72be:2b31 with SMTP id d14-20020a05640208ce00b0053e72be2b31mr18427680edz.42.1699277189414;
-        Mon, 06 Nov 2023 05:26:29 -0800 (PST)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id w27-20020a50d79b000000b005432f45bee9sm4428436edi.19.2023.11.06.05.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 05:26:29 -0800 (PST)
-Date: Mon, 6 Nov 2023 15:26:26 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 4/4] net: ethernet: cortina: Handle large frames
-Message-ID: <20231106132626.orn5r57cc7n5ditj@skbuf>
-References: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
- <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
- <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
- <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A81200DA
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 13:48:00 +0000 (UTC)
+Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6213D8;
+	Mon,  6 Nov 2023 05:47:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1699278476; bh=EJudLZETgEABMWZNAnUgwz6zsPd5cK0BfnFDCy8ZOBA=;
+	h=From:To:Cc:Subject:Date;
+	b=nJ2F/Id7FjKaVXsr9NuykgpHh2TgAkEt60OAv2q19MUKRsmwx9G+mq1RHjuxpRdLm
+	 FR+g2OPZsC4Ur6w8pZZ0nKJJb3kpYYF2SuUYD47N3FPC6mwVU1SXSwcvxpGYKNe171
+	 h4V1RPhN0Ptfh8gCuqPrLLnun7W9k8VzV3nUUufI=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrsza7-0.qq.com (NewEsmtp) with SMTP
+	id A6233279; Mon, 06 Nov 2023 21:41:34 +0800
+X-QQ-mid: xmsmtpt1699278094tcg2y2bpq
+Message-ID: <tencent_2BEC6ECCDC7AB66DF02D496E4C9738EB960A@qq.com>
+X-QQ-XMAILINFO: NkBK3x0tNc759LLae0hf8RvQgAoD+w5EXsEaQyodv1bzxabCSDNzSZxgmup67l
+	 5sO4iVqgggyoQJlCQkPrXfXCUvW18GK4qH4RmWVKxE4AnHS59+nMs5TosgTqugIqWuqVkVT9LOOk
+	 ESjFX55FLEnQB7b1PbfUgtAqczTPy5m1abO7WF2hyI9Psnj4ahUD+aSsEElTiFZDJ8Pqexg5D3rw
+	 tgk87roZT0OBhQjchldYhx2o+iu5GezUDnD2V1/dor3cq2zv30jOqob5zTGAkNjb91iDMJa23gDf
+	 xzhgzjTB/K9MhnMFIs8DEmYyFpdFg5iCFdlb6Hcc7Abu0ZzZBZlJLvHzw0Z88cV+ATJLn6ElTglC
+	 VCu/QeWC9H89v0N7doTbfQlEHxC6PUmsbv9+twNEHvjpQhSQlFJ8vm5KMXllflCcfn5XBOJve2kw
+	 CLJu0fiONl8FC9AeRCVdy9sHDY1dT6yH7O4go6TUwgbHQEGQy6JYATb0Zy/68bDofTA0Qr1Hj4D7
+	 ShFa27ES6WdYyq6EP406W0z0HICDY00XH7yTm5ost4hDtIQ6tb/6R+P3N+ykqwR6Li/uU2U64kWa
+	 SoCd3PalOJrmslAMNsaAmeDHNxD8xwBIMZaZpHICs2N+FFEUNxAorzfhj0fUALWxU4F+y3eSjCXF
+	 my10yUrpije5qxHXLKXJ0Ys5/vWBimQVSgOUxrvt4WnTxmxNvJoGmA41vRh6CD0yAhL+UT2gwry7
+	 HIarH3EqZD2oYDvu07CPQv/DQiQBmOJCEYLTrhMn8Ttc6VFZdjOxgSKv23mfdsS6HurhiomuUCr6
+	 bCjznRGLfFD9Bks1royBY7NFTU/vOp9TrJhcSuZ9eqHT/cOHeDfXgpDazaPJ8PX/S0rOWkD+3sgC
+	 veEmqE5MJ5dKkIp48vttcZ0hjiUdnS05pXPpjLMC4VUak5aQS84hgMQwu3ziW1bkLrX4oeXkzk4G
+	 T9lCbgTcQsviUZLr/hhA==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: richardcochran@gmail.com
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	habetsm.xilinx@gmail.com,
+	jeremy@jcline.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	reibax@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Subject: [PATCH net-next V7 1/2] ptp: fix corrupted list in ptp_open
+Date: Mon,  6 Nov 2023 21:41:34 +0800
+X-OQ-MSGID: <20231106134133.3882778-3-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
- <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 05, 2023 at 09:57:26PM +0100, Linus Walleij wrote:
-> The Gemini ethernet controller provides hardware checksumming
-> for frames up to 1514 bytes including ethernet headers but not
-> FCS.
-> 
-> If we start sending bigger frames (after first bumping up the MTU
-> on both interfaces sending and receiveing the frames), truncated
-> packets start to appear on the target such as in this tcpdump
-> resulting from ping -s 1474:
+There is no lock protection when writing ptp->tsevqs in ptp_open() and
+ptp_release(), which can cause data corruption, use spin lock to avoid this
+issue.
 
-A bit related: what is gmac_fix_features() supposed to do? I see it
-unsets GMAC_OFFLOAD_FEATURES when the MTU goes over a certain limit,
-and that also includes NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM. Is that
-limit correct, or is it supposed to kick in sooner, to allow
-validate_xmit_skb() -> skb_csum_hwoffload_help() do the software
-checksuum for you? I'm not sure whether that was the intention.
+Moreover, ptp_release() should not be used to release the queue in ptp_read(),
+and it should be deleted altogether.
 
-> 
-> 23:34:17.241983 14:d6:4d:a8:3c:4f (oui Unknown) > bc:ae:c5:6b:a8:3d (oui Unknown),
-> ethertype IPv4 (0x0800), length 1514: truncated-ip - 2 bytes missing!
-> (tos 0x0, ttl 64, id 32653, offset 0, flags [DF], proto ICMP (1), length 1502)
-> OpenWrt.lan > Fecusia: ICMP echo request, id 1672, seq 50, length 1482
-> 
-> If we bypass the hardware checksumming and provide a software
-> fallback, everything starts working fine up to the max TX MTU
-> of 2047 bytes, for example ping -s2000 192.168.1.2:
-> 
-> 00:44:29.587598 bc:ae:c5:6b:a8:3d (oui Unknown) > 14:d6:4d:a8:3c:4f (oui Unknown),
-> ethertype IPv4 (0x0800), length 2042:
-> (tos 0x0, ttl 64, id 51828, offset 0, flags [none], proto ICMP (1), length 2028)
-> Fecusia > OpenWrt.lan: ICMP echo reply, id 1683, seq 4, length 2008
-> 
-> The bit enabling to bypass hardware checksum (or any of the
-> "TSS" bits) are undocumented in the hardware reference manual.
-> The entire hardware checksum unit appears undocumented. The
-> conclusion that we need to use the "bypass" bit was found by
-> trial-and-error.
-> 
-> Since no hardware checksum will happen, we slot in a software
-> checksum fallback.
-> 
-> Check for the condition where we need to compute checksum on the
-> skb with either hardware or software using == CHECKSUM_PARTIAL instead
-> of != CHECKSUM_NONE which is an incomplete check according to
-> <linux/skbuff.h>.
-> 
-> On the D-Link DIR-685 router this fixes a bug on the conduit
-> interface to the RTL8366RB DSA switch: as the switch needs to add
-> space for its tag it increases the MTU on the conduit interface
-> to 1504 and that means that when the router sends packages
-> of 1500 bytes these get an extra 4 bytes of DSA tag and the
-> transfer fails because of the erroneous hardware checksumming,
-> affecting such basic functionality as the LuCI web interface.
-> 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/ptp/ptp_chardev.c | 21 ++++++++++++---------
+ drivers/ptp/ptp_clock.c   |  8 ++++++--
+ drivers/ptp/ptp_private.h |  1 +
+ 3 files changed, 19 insertions(+), 11 deletions(-)
 
-To be clear, I didn't suggest any of this. I just pointed towards the gemini.c
-driver as being the problem. Please remove my Suggested-by tag.
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 282cd7d24077..473b6d992507 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -108,6 +108,7 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 		container_of(pccontext->clk, struct ptp_clock, clock);
+ 	struct timestamp_event_queue *queue;
+ 	char debugfsname[32];
++	unsigned long flags;
+ 
+ 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+ 	if (!queue)
+@@ -119,7 +120,9 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+ 	}
+ 	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
++	spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
+ 	pccontext->private_clkdata = queue;
+ 
+ 	/* Debugfs contents */
+@@ -139,16 +142,16 @@ int ptp_release(struct posix_clock_context *pccontext)
+ {
+ 	struct timestamp_event_queue *queue = pccontext->private_clkdata;
+ 	unsigned long flags;
++	struct ptp_clock *ptp =
++		container_of(pccontext->clk, struct ptp_clock, clock);
+ 
+-	if (queue) {
+-		debugfs_remove(queue->debugfs_instance);
+-		pccontext->private_clkdata = NULL;
+-		spin_lock_irqsave(&queue->lock, flags);
+-		list_del(&queue->qlist);
+-		spin_unlock_irqrestore(&queue->lock, flags);
+-		bitmap_free(queue->mask);
+-		kfree(queue);
+-	}
++	debugfs_remove(queue->debugfs_instance);
++	pccontext->private_clkdata = NULL;
++	spin_lock_irqsave(&ptp->tsevqs_lock, flags);
++	list_del(&queue->qlist);
++	spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
++	bitmap_free(queue->mask);
++	kfree(queue);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3d1b0a97301c..b901f2910963 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -179,11 +179,11 @@ static void ptp_clock_release(struct device *dev)
+ 	mutex_destroy(&ptp->pincfg_mux);
+ 	mutex_destroy(&ptp->n_vclocks_mux);
+ 	/* Delete first entry */
++	spin_lock_irqsave(&tsevq->lock, flags);
+ 	tsevq = list_first_entry(&ptp->tsevqs, struct timestamp_event_queue,
+ 				 qlist);
+-	spin_lock_irqsave(&tsevq->lock, flags);
+ 	list_del(&tsevq->qlist);
+-	spin_unlock_irqrestore(&tsevq->lock, flags);
++	spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
+ 	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	debugfs_remove(ptp->debugfs_root);
+@@ -247,6 +247,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (!queue)
+ 		goto no_memory_queue;
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
++	spin_lock_init(&ptp->tsevqs_lock);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+ 	if (!queue->mask)
+ 		goto no_memory_bitmap;
+@@ -407,6 +408,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ {
+ 	struct timestamp_event_queue *tsevq;
+ 	struct pps_event_time evt;
++	unsigned long flags;
+ 
+ 	switch (event->type) {
+ 
+@@ -415,10 +417,12 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 
+ 	case PTP_CLOCK_EXTTS:
+ 		/* Enqueue timestamp on selected queues */
++		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+ 			if (test_bit((unsigned int)event->index, tsevq->mask))
+ 				enqueue_external_timestamp(tsevq, event);
+ 		}
++		spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
+ 		wake_up_interruptible(&ptp->tsev_wq);
+ 		break;
+ 
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 52f87e394aa6..35fde0a05746 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -44,6 +44,7 @@ struct ptp_clock {
+ 	struct pps_device *pps_source;
+ 	long dialed_frequency; /* remembers the frequency adjustment */
+ 	struct list_head tsevqs; /* timestamp fifo list */
++	spinlock_t tsevqs_lock; /* protects tsevqs from concurrent access */
+ 	struct mutex pincfg_mux; /* protect concurrent info->pin_config access */
+ 	wait_queue_head_t tsev_wq;
+ 	int defunct; /* tells readers to go away when clock is being removed */
+-- 
+2.25.1
 
-> Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
->  drivers/net/ethernet/cortina/gemini.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-> index 576174a862a9..84295c1b87e6 100644
-> --- a/drivers/net/ethernet/cortina/gemini.c
-> +++ b/drivers/net/ethernet/cortina/gemini.c
-> @@ -1145,6 +1145,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
->  	dma_addr_t mapping;
->  	unsigned short mtu;
->  	void *buffer;
-> +	int ret;
->  
->  	mtu  = ETH_HLEN;
->  	mtu += netdev->mtu;
-> @@ -1165,7 +1166,19 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
->  		word3 |= mtu;
->  	}
->  
-> -	if (skb->ip_summed != CHECKSUM_NONE) {
-> +	if (skb->len >= ETH_FRAME_LEN) {
-> +		/* Hardware offloaded checksumming isn't working on frames
-> +		 * bigger than 1514 bytes. Perhaps the buffer is only 1518
-> +		 * bytes fitting a normal frame and a checksum?
-> +		 * Just use software checksumming and bypass on bigger frames.
-> +		 */
-> +		if (skb->ip_summed == CHECKSUM_PARTIAL) {
-> +			ret = skb_checksum_help(skb);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +		word1 |= TSS_BYPASS_BIT;
-> +	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
->  		int tcp = 0;
->  
->  		if (skb->protocol == htons(ETH_P_IP)) {
-> 
-> -- 
-> 2.34.1
-> 
-
-[ context: tag_rtl4_a.c is a "category 2", aka "Ethertype", tagger ]
-
-We say this in Documentation/networking/dsa/dsa.rst:
-
-Checksum offload should work with category 1 and 2 taggers when the DSA conduit
-driver declares NETIF_F_HW_CSUM in vlan_features and looks at csum_start and
-csum_offset. For those cases, DSA will shift the checksum start and offset by
-the tag size. If the DSA conduit driver still uses the legacy NETIF_F_IP_CSUM
-or NETIF_F_IPV6_CSUM in vlan_features, the offload might only work if the
-offload hardware already expects that specific tag (perhaps due to matching
-vendors). DSA user ports inherit those flags from the conduit, and it is up to
-the driver to correctly fall back to software checksum when the IP header is not
-where the hardware expects. If that check is ineffective, the packets might go
-to the network without a proper checksum (the checksum field will have the
-pseudo IP header sum).
-
-Shouldn't "word1 |= TSS_BYPASS_BIT;" be done depending on skb->protocol,
-rather than depending on skb->len?!
-
-		if (skb->protocol == htons(ETH_P_IP)) {
-			word1 |= TSS_IP_CHKSUM_BIT;
-			tcp = ip_hdr(skb)->protocol == IPPROTO_TCP;
-		} else { /* IPv6 */
-			word1 |= TSS_IPV6_ENABLE_BIT;
-			tcp = ipv6_hdr(skb)->nexthdr == IPPROTO_TCP;
-		} // here
-			word1 |= TSS_BYPASS_BIT;
-
-Gemini should never attempt to provide checksums for DSA-tagged packets
-unless it is able to take skb->csum_start into consideration, otherwise
-it will get it wrong.
-
-This is somewhat independent of the other problem you've found, which
-seems to be that large non-DSA packets get truncated anyway. But not
-bypassing TX checksum offload truncates a packet? Hmm, strange.
 
