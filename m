@@ -1,211 +1,89 @@
-Return-Path: <netdev+bounces-46171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8B857E1DE2
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:08:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B364D7E1DF5
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 11:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9AEB1C209AC
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 10:08:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6723428113A
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 10:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E522F1772A;
-	Mon,  6 Nov 2023 10:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3DB17743;
+	Mon,  6 Nov 2023 10:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lb80MGkX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GjaM8jKf"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA28171D9
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 10:08:09 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754E8B8;
-	Mon,  6 Nov 2023 02:08:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699265288; x=1730801288;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZJs8GrRIjJ2lR6XxxhjLDamV3936D6VpT9p81XEeuRQ=;
-  b=Lb80MGkXi+3jrBrCNC8P0lhZPK1FyZ4MgK2cztQz8odqHeI1I2/ARN5P
-   VV0sIsryF2Hw9An7Yge6d2koqCCrMhjONC+dnV2nrLAKdn3oTnXSAaOy5
-   XGlH8bdTR4N2EUwGumQJepP4RIRGZVfJa96ddi7K1EjkR7/yz3QYYv4Vt
-   0UVojMq7mK7ckToF6tSI6Aw5RgJTMhdc10jwkWZWyE3LWVi23hbKsrqMi
-   zuYL6O0ExU2B8vQUDD/dUVZ6GIXOumi4qq4Z+sy/xD3MORMLstOgsYrXn
-   d6LljImH8KkFJBPEtHK3M4nlyGVndDOo7LcYskv74y6EjO8A+iFW/oLiq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="379636201"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="379636201"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 02:08:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10885"; a="879383165"
-X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="879383165"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2023 02:08:07 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 6 Nov 2023 02:08:06 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 6 Nov 2023 02:08:06 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 6 Nov 2023 02:08:06 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TRUFPiJ3IaUTBbv198ufMBTaAz05hnKGvpZiSDflqErNdMaq2DUNWRXiO3Yql5SldlIz3KWzA+i5n7PVIxmzwKLJfWTD6DvqcxKWFj30lhF8U0bIkYte05NyjPn1X1h+DPxr7lugTi9tzX8yYVMEQYLnaHS14hhcn9IFRMQsVgzfpr0viaNhr8tEZInxxyTP+5t/p3mBbGbGS+vuWzNJGO65PaKdeIC36wTmQ3MQgwwlWoCfHuWLIAIl4C0O2UbTdZO3bJVF5Xws28//1ndEKxcWVoK9TPFW4NzBYT49+VrLOVU+UNHUQQOQGb8yrrgVUsOJSiN6FievDC+1hYUoCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pQzCHnrC0W+1820/oNzeNPYXtEcXBGuBWkeON90wB+4=;
- b=OHW2b/9EHx/6/Vi5gy4+y0hRdPw6o3qFznI0HtTGzQH4v37SHpMLXIqFFWh+HXQpMTtuYh3Tl73geIAwsWkaIQx3BpJeOadi81sJyIRnQGWciUef7e7GmLVZ9GpDaEdAsqJviZs9yVFSwEEnMF/50ySyLsgNQ3HqT2ZLqwnxO1eJKEfFiSEVJGaNgiEMqNgQHDB+RAmGGlDfgRTujg4v0z4KmlRTpReIliHu0hPb4yHM8Q24sM14/1xjKmSBIVPaeIGNar7w4mDULJ6FtAXWiWj2gWHa1p3YMn5P5zi07nJcICwT9WUC/Zakqn/qReg18sXSUuYedr/AxfcQuJ4S9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by DS0PR11MB7309.namprd11.prod.outlook.com (2603:10b6:8:13e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Mon, 6 Nov
- 2023 10:07:58 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::1b1e:8472:f24b:6693]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::1b1e:8472:f24b:6693%3]) with mapi id 15.20.6954.027; Mon, 6 Nov 2023
- 10:07:58 +0000
-Message-ID: <f8d6c53d-f241-4ba6-9e27-4d6bc5fbed05@intel.com>
-Date: Mon, 6 Nov 2023 11:07:52 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix error cleanup on
- failing pruss_request_mem_region
-Content-Language: en-US
-To: Jan Kiszka <jan.kiszka@siemens.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar
-	<danishanwar@ti.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Lopes Ivo,
- Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>, Nishanth Menon
-	<nm@ti.com>, "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>
-References: <06ed13ca-9f52-4b49-9178-aae245bfd958@siemens.com>
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <06ed13ca-9f52-4b49-9178-aae245bfd958@siemens.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA1P291CA0008.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:19::19) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8BC4422
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 10:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 93043C433C9;
+	Mon,  6 Nov 2023 10:10:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699265424;
+	bh=cH8O/faWsYqOjwz1jzYWNwsmm1sfvjLFRWVbB4lrV9w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GjaM8jKfoGPFOvVXmKcccvbul8CZRlPa7rBhIBIKM2sTjbO8GNtCMrTJn8TApooj1
+	 qB6w42SQ6HrWSXe8Au6aZnrBkUBmUgdB5gkzkVFqyud+FUrAgVyu4WpuqsLSEQTge9
+	 cFfVqlVhFh3uneNaWrJz8aBhcUl7KvVHaubg2wXsMnh7xBtCPf+ekrX+d3lyNDLM9R
+	 wz/bRmmFVvcVL2LHsvMz5LmQMorXRmbb80tGQR620esYVmcDVVDal9eLAaAFZiB+Ui
+	 NaoWDXPMNkfuY9euamnRUau5nAQNniWNahnBhMYrU3hTWXMqXv36Yy+CTwAlLgO1Iu
+	 ziD6qQ4VLyP/g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78864C04DD9;
+	Mon,  6 Nov 2023 10:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|DS0PR11MB7309:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1fcb43b-8ae0-410f-3f34-08dbdeb04085
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6GL8FcyC/Kl5BGUqRSNeOrjJKv43g4W1wQWJ67zVgkwFmxh/wAxpOunYBrTZaKvWeOP4TA//CVk0AlEiS/z1r+LCbnXDqNUr/phIPkLUtExlc0HDzwYTrI7dysSY2soTqxfMOIEYQjdWJhm9a8Mqg2tfdmKW8BX0DX2VNV9w5cKM5VjA6S675GScF3hB27kTVJpP9gecZzs7k9IMOs0wGHidNTu9nN55fba66xD4mVxQBtJWJehnujUZpDD5s+ZYAnRA+PCIbPlfga4Rlbkg6vt47FsfpGQIh8mikSdSA9h2Ld0eTRlU+y8+fkhiTQ/4aQsP6hbW4pA+AsEXpyPL9tEWU30jfzYDr13Cs/KP54nHS1IRawCGy3RZf5q/g4OzlaRaL0iDBMBq2Ld8sbRLZv4bbm7KRibfwty/Z4QVcxVwUlnbNc+d325azUCgqm8elGneINzYVU2zzPR6Ca+Rzqbz0wNNJI5SCKlvytjeKjpC56VsKK06EDBWYrFI3J+BzIQ6mklRqCEJu0hEv76LjHJdle+6ybeLWdrvhzs3/NUSzgneX06oVX4c47+sYD+infd2LV1CtjMh4B+G8mc0NBx8hGD4lHg7gebdMAHUdyQiSo4wkwYiOe5tocF7jZnpzHxkx7gUZEIciFNHW+xshA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(376002)(396003)(366004)(39860400002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(2616005)(44832011)(6512007)(31696002)(82960400001)(6486002)(26005)(478600001)(36756003)(54906003)(66476007)(66556008)(66946007)(316002)(110136005)(6666004)(53546011)(6506007)(8936002)(8676002)(4326008)(2906002)(31686004)(38100700002)(83380400001)(5660300002)(41300700001)(7416002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXlBKzgxVzNDRmI5VklybmFXbm92WlBvbm9jQlFJVkNnYjVvclBCMlo0elRZ?=
- =?utf-8?B?T2djSkUyUjd3V1kwc1RYMG1rNXNsQmRudHRoUUYrTU5kZlRGTWJKOWxpVE9B?=
- =?utf-8?B?SGNEeThoV1RGQUR0MXhpNlJvWllXY0tMY0x1WW80RW5ydGdNZWdTU2huaHpP?=
- =?utf-8?B?Q1hqcUt3aDF5eE5RNytEY2NMbWVmUy9wbGRLTzZ1bDVUODBMTVVDUS9KUXVr?=
- =?utf-8?B?ME5vR1U2OG9uS0hpZTZhWmZvSG9td0QxQ3BvTmN4RjRkQkloMUlQT3hUVVpl?=
- =?utf-8?B?RXExRFprMS9OQWJwR0xlOHc1WkRxOFJHckhGdmtZTFdoTURuQWV3Z0FIVmVr?=
- =?utf-8?B?eFdXTHFaWXlkT0xnaElpQUdVam9tZFN4TFFmL2pJcnJQMFdWZXNnQXJlTk1a?=
- =?utf-8?B?NmdsVHdETFFMdUROcE9sbGlaUlJGQUZYWi9zVVhRc1ZVUTAxMEVTakI1QklF?=
- =?utf-8?B?UGkvUmdWcUhDUmV1UjdxOUhvbnBGbFNTT0daU2VqdlBZWm9iR3VnNkRHeE5i?=
- =?utf-8?B?dnlaWXp3dEZBcExqdHgrajR1VlNhanlPQ2dmaVBCTWdUTUdWS0FMdFloWHFD?=
- =?utf-8?B?Umx2TVBYWXM3b2pVYzlUajNzclJRdi8wZ2orSUJLZUNOTVgzRTZFYWxuSU5F?=
- =?utf-8?B?RFNZYS9nbmhIZW91M0l0d1c4aUNMZUxSZlZZeE43b0ljbEdUUVpXUDNCWTlk?=
- =?utf-8?B?TGk0cS9qSU1Mdk9tbjBnd1hvaWE0YmVNQmFRSzFxSE1MQytUQW15bnhJak9W?=
- =?utf-8?B?T0ZrNDJwQ2MrSi9TbHJ3d3I3QnpwVktkcWpiVGdEMFFzek1yMS8rZHJNWWNK?=
- =?utf-8?B?bmNFSGhXZ1pYZFArNC9VSlhUUk8vK2RaVjlaOHRBeUt1ek5nNytWcTJjMGxP?=
- =?utf-8?B?MzhJMUZqM0YzRGcrM0xNVVI3T252QjJLQ214VmNZdXJSbGJ5dmMzYURuQlEx?=
- =?utf-8?B?cU9SYW81SmdoakJxMUQveHlRcEsyZWRxa0xBK0k5K2l3RGZZSkN5eFcxNlRX?=
- =?utf-8?B?NmJ3Y0ZPWXN6TXNJSUNiOTFrZVlyWldNM0VOSVByR2U1c2REZWVYYlcvTFpV?=
- =?utf-8?B?SGFybDVDam4rSzBGeXJUYXhHNHYvbVFVbXhyeEZRQlpYZjhmY3NZcEszMVFi?=
- =?utf-8?B?SnNYS2RUQnFoM2NReExZRlV6ME9zSXF6UmJjU21VcEwxTmpqNGpVUlUybWJt?=
- =?utf-8?B?MzVOQk5LN2xWeklhdlBxVExjbUJJWkY2TzRXOCszSHlOam85ei9hYlhmTDlQ?=
- =?utf-8?B?QWxzQ3FnSStlWlhZWkF4MnppVVMweWVoSk1pa1cycEwwTVRkMUY2cXhIZWNW?=
- =?utf-8?B?N3JEUTVlTFFrWEFqT0ZIcHhVRVUyR0RDc2l2VjZZckFkd0x0RVp6eHBTVEVn?=
- =?utf-8?B?MEJadnJnbVJOLzA0R1FOdmsvVnV2RFBjM05LOFlsbDcyK2hRL1laZGRLMWFs?=
- =?utf-8?B?dldHZVV4M1ZPV2oyYk8zZGNTckdqVExMTGU4KzgvZXZBNmM4SUhNV0xkclJh?=
- =?utf-8?B?MmszbHd5QW01R1IyV045aXI1T1ZhTFNrVmhkWVl2VnJMZTM2WTJzaDhqTUpO?=
- =?utf-8?B?dWg3dmxrcTZPV1ZCeTlqL2hNWFdTWUZkZ0UzYVFpS29wZlk4cHNTK1lxV2k1?=
- =?utf-8?B?OVdaSklUYUF6OXNPNjQ2cHlrM2kvWHRzVXl0RXREOXJ4TFRuY01HekQ0aE9M?=
- =?utf-8?B?WXZlc1JsNFp3VnMxT0xJbG9LdVNsRGx2eHdzMlJJYzhvOXM4VC80QklxaVFS?=
- =?utf-8?B?Qmg1Uk9sMFVGZ3cybmZZYmtBeG1HNUR3YVh6WHNxQnV1MkluUVlrMjVyTitx?=
- =?utf-8?B?bDNQWWNkN2s1Rk9JZXlmejRjZ2F6M1VNT2dpYk9NanVDV05xa1djTE9RTkpo?=
- =?utf-8?B?eHlWRVdsdlFlbElLdlpDQmNzYnBxdlJQQTVVdHVvOFdCTFcvaGNhazJwRCtu?=
- =?utf-8?B?Uy9zVjZPOUR1ZVZmYmJMakN5dWh0emp4TjNzZDMrMVhmdStlQWg4cXBEYWtT?=
- =?utf-8?B?Tnp6c0t3bkphOS9ZM1lNQ3hQMjZ6YjFTNWlKOFAvaXV1WVdOU2hWbHU5WG1m?=
- =?utf-8?B?dVVCODdKWi8wWDNPSzJycVFKL2phNE1mQ0J6REZjSUVkeW92c1RWRzREMmtY?=
- =?utf-8?B?Y0xhL3psWHRLZ0tXTnJLZVBFcUJuR1I4WGhSSTh3Rmw1OWVlN1pOWERocHc4?=
- =?utf-8?B?UkE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1fcb43b-8ae0-410f-3f34-08dbdeb04085
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2023 10:07:58.3835
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hPdIOX/5tovWuIwPukKMbzJlXkbWLW8ZEkHX+olHooWdNcdr1UIksW8HFzTwu3SfQJYXuWWvnfybenAMsLYmXiXt8nP0xzS2zSm8yJtFgEU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7309
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/3] bugfixs for smc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169926542449.26451.2583545485943327625.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Nov 2023 10:10:24 +0000
+References: <1698991660-82957-1-git-send-email-alibuda@linux.alibaba.com>
+In-Reply-To: <1698991660-82957-1-git-send-email-alibuda@linux.alibaba.com>
+To: D. Wythe <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ wintera@linux.ibm.com, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org
+
+Hello:
+
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri,  3 Nov 2023 14:07:37 +0800 you wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This patches includes bugfix following:
+> 
+> 1. hung state
+> 2. sock leak
+> 3. potential panic
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/3] net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
+    https://git.kernel.org/netdev/net/c/5211c9729484
+  - [net,v2,2/3] net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
+    https://git.kernel.org/netdev/net/c/c5bf605ba4f9
+  - [net,v2,3/3] net/smc: put sk reference if close work was canceled
+    https://git.kernel.org/netdev/net/c/aa96fbd6d78d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-On 05.11.2023 10:51, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
-> 
-> We were just continuing in this case, surely not desired.
-> 
-> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-
-> 
-> Changes in v2:
->  - add proper tags
-> 
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index d119b2bb8158..845e8a782d3a 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -2063,7 +2063,7 @@ static int prueth_probe(struct platform_device *pdev)
->  				       &prueth->shram);
->  	if (ret) {
->  		dev_err(dev, "unable to get PRUSS SHRD RAM2: %d\n", ret);
-> -		pruss_put(prueth->pruss);
-> +		goto put_pruss;
->  	}
->  
->  	prueth->sram_pool = of_gen_pool_get(np, "sram", 0);
-> @@ -2215,6 +2215,8 @@ static int prueth_probe(struct platform_device *pdev)
->  
->  put_mem:
->  	pruss_release_mem_region(prueth->pruss, &prueth->shram);
-> +
-> +put_pruss:
->  	pruss_put(prueth->pruss);
->  
->  put_cores:
 
