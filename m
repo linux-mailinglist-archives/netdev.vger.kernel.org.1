@@ -1,78 +1,197 @@
-Return-Path: <netdev+bounces-46140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA537E195E
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 05:27:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0701D7E1983
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 06:01:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF9B228126F
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 04:27:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65F20B20F5E
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 05:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD9D63A1;
-	Mon,  6 Nov 2023 04:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8078F6F;
+	Mon,  6 Nov 2023 05:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnBmfMRn"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZI/2Wj/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DA75676
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 04:27:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4D29C433C7;
-	Mon,  6 Nov 2023 04:27:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699244856;
-	bh=6Cm7pOUvjIR9TuKwhmin81I/UFkeSHRm3E5CHJ0OW74=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cnBmfMRnnGlmnJT/r8YSbZNjx/duUP+ucFnqh9A6R4oBYfuAnquhFfaa3r+oD1G5z
-	 4xj+fHSJ00VITGmYbFMhvzLpPaw9JuzwqcALwtFTIfk+jR1TRM2pp4leLHv+yR9oHZ
-	 KATUntXwNJYBt4+Tce/aXD8R2jhEP2GdQi6PbdA1/pyFyBUz1lcKBZklG/ijBw8Dbq
-	 LCynZrI1rPDkOlBcp2OLve5vwy6D8N3cGP4BEKknkKyFB/0U5heyA/FS31cKLhD6Hx
-	 cZ1C55RAd9h0VYb/BIyfdfe3McDC17e5jLoyfMIoNkK9T8HXx/8UrNvss0WzOIBtIM
-	 Tzi2j0SpabtlQ==
-Message-ID: <b80374c7-3f5a-4f47-8955-c16d14e7549a@kernel.org>
-Date: Sun, 5 Nov 2023 21:27:35 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A381923A0
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 05:01:25 +0000 (UTC)
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4DEF2
+	for <netdev@vger.kernel.org>; Sun,  5 Nov 2023 21:01:21 -0800 (PST)
+Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-66cfd35f595so22659496d6.2
+        for <netdev@vger.kernel.org>; Sun, 05 Nov 2023 21:01:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1699246881; x=1699851681; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=je4RrCBnaPDZma+LQbI7lYeKbBZd/hlyMFpI14/dzZw=;
+        b=ZI/2Wj/BbtzrlWZAtg6sTSnd4qlCae67Aa0dwgT4D+vAy+gIKRHjkYAlUiVrmG+Bmd
+         ZYmvAxEXf0XFr5MHzA4XQdw8+bMdqAte/NlMxJND/XXJ5rm7ozA3rIQGWX/LErxxkLjs
+         EZs6pqryZupzQQLdhPIxJfD4ooLhkRNKhCCENWUbhGyE0XbYw1XH7+LMrSliSnA5tZg5
+         vtdVhM5Az7h3tEFII+Pz5JErapHHz5+9Uz44wzqg4LqbxpONn0tPEis0LbYwqLlMEPiq
+         IMbnEeAPKFQUXLQLnYwLS/Yni++1/bqQGlfEDnc9LHVSmiN6Vg9rpLlA+OYv6P+hCBGy
+         +yfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699246881; x=1699851681;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=je4RrCBnaPDZma+LQbI7lYeKbBZd/hlyMFpI14/dzZw=;
+        b=QmTKrcBhFPsiNbe5AkWniC4DdXdQIdh1vBuCJq/r6xEyKXZaofnQfxQugFoJ9M4HMu
+         WEV+LbnHRuY8bwXJMVt1mbvSdjeAbuHeZB2mfDMXxxbFUDvdswqgwyyQj/+X3IgOC2Vn
+         qkLrO5qivW+ncG9fBG3FR+GuTDg4AIt7nCK5EoLVyXB9nqfeGAmMgGz96+KdwU318KAd
+         o+pF9wcmThcnkJD/9vyhh6mWZzTb8efr2qTQ9MS7l7Xrxswi6vQoUCX0Kvb0xaxnoHn2
+         9JyBEEmRKDEhdMjF6RX/HH/3zcrv6jOsd4cvCCvLgOTp9VsDrD13lGWuRPGC59j6JkNy
+         QCNg==
+X-Gm-Message-State: AOJu0YywslNGaKqDZqB9yPh8Z9m85du0ZFzA82pM44BiH/cYL0SFSNcE
+	G/NDypgTVZxHyIQyoy8EXEML
+X-Google-Smtp-Source: AGHT+IEb3ptzoQZtoCEsn5a3d9x4YOVwl6lJKdcIkRv0zs7pCgsbuNwO3+dvv5v/cl+r6OhlXjIqSA==
+X-Received: by 2002:ad4:5961:0:b0:66d:19b5:9a9 with SMTP id eq1-20020ad45961000000b0066d19b509a9mr28419071qvb.65.1699246880776;
+        Sun, 05 Nov 2023 21:01:20 -0800 (PST)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id f2-20020a0ccc82000000b0066d04196c3dsm3121705qvl.49.2023.11.05.21.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Nov 2023 21:01:20 -0800 (PST)
+Date: Mon, 06 Nov 2023 00:01:19 -0500
+Message-ID: <7ff273d368f3f7dd383444928ca478ef.paul@paul-moore.com>
+From: Paul Moore <paul@paul-moore.com>
+To: Andrii Nakryiko <andrii@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <brauner@kernel.org>
+Cc: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>, <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
+Subject: Re: [PATCH v9 9/17] bpf,lsm: refactor bpf_prog_alloc/bpf_prog_free LSM  hooks
+References: <20231103190523.6353-10-andrii@kernel.org>
+In-Reply-To: <20231103190523.6353-10-andrii@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bypass qdiscs?
-To: Stephen Hemminger <stephen@networkplumber.org>,
- John Ousterhout <ouster@cs.stanford.edu>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-References: <CAGXJAmy-0_GV7pR5_3NNArWZumunRijHeSJnY=VEf8RjmegZZw@mail.gmail.com>
- <29217dab-e00e-4e4c-8d6a-4088d8e79c8e@lunn.ch>
- <CAGXJAmzn0vFtkVT=JQLQuZm6ae+Ms_nOcvebKPC6ARWfM9DwOw@mail.gmail.com>
- <20231105192309.20416ff8@hermes.local>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20231105192309.20416ff8@hermes.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 11/5/23 8:23 PM, Stephen Hemminger wrote:
-> On Sat, 4 Nov 2023 19:47:30 -0700
-> John Ousterhout <ouster@cs.stanford.edu> wrote:
+On Nov  3, 2023 Andrii Nakryiko <andrii@kernel.org> wrote:
 > 
->> I haven't tried creating a "pass through" qdisc, but that seems like a
->> reasonable approach if (as it seems) there isn't something already
->> built-in that provides equivalent functionality.
->>
->> -John-
->>
->> P.S. If hardware starts supporting Homa, I hope that it will be
->> possible to move the entire transport to the NIC, so that applications
->> can bypass the kernel entirely, as with RDMA.
+> Based on upstream discussion ([0]), rework existing
+> bpf_prog_alloc_security LSM hook. Rename it to bpf_prog_load and instead
+> of passing bpf_prog_aux, pass proper bpf_prog pointer for a full BPF
+> program struct. Also, we pass bpf_attr union with all the user-provided
+> arguments for BPF_PROG_LOAD command.  This will give LSMs as much
+> information as we can basically provide.
 > 
-> One old trick was setting netdev queue length to 0 to avoid qdisc.
+> The hook is also BPF token-aware now, and optional bpf_token struct is
+> passed as a third argument. bpf_prog_load LSM hook is called after
+> a bunch of sanity checks were performed, bpf_prog and bpf_prog_aux were
+> allocated and filled out, but right before performing full-fledged BPF
+> verification step.
 > 
+> bpf_prog_free LSM hook is now accepting struct bpf_prog argument, for
+> consistency. SELinux code is adjusted to all new names, types, and
+> signatures.
+> 
+> Note, given that bpf_prog_load (previously bpf_prog_alloc) hook can be
+> used by some LSMs to allocate extra security blob, but also by other
+> LSMs to reject BPF program loading, we need to make sure that
+> bpf_prog_free LSM hook is called after bpf_prog_load/bpf_prog_alloc one
+> *even* if the hook itself returned error. If we don't do that, we run
+> the risk of leaking memory. This seems to be possible today when
+> combining SELinux and BPF LSM, as one example, depending on their
+> relative ordering.
+> 
+> Also, for BPF LSM setup, add bpf_prog_load and bpf_prog_free to
+> sleepable LSM hooks list, as they are both executed in sleepable
+> context. Also drop bpf_prog_load hook from untrusted, as there is no
+> issue with refcount or anything else anymore, that originally forced us
+> to add it to untrusted list in c0c852dd1876 ("bpf: Do not mark certain LSM
+> hook arguments as trusted"). We now trigger this hook much later and it
+> should not be an issue anymore.
 
-tc qdisc replace dev <name> root noqueue
+See my comment below, but it isn't clear to me if this means it is okay
+to have `BTF_ID(func, bpf_lsm_bpf_prog_free)` called twice.  It probably
+would be a good idea to get KP, BPF LSM maintainer, to review this change
+as well to make sure this looks good to him.
 
-should work
+>   [0] https://lore.kernel.org/bpf/9fe88aef7deabbe87d3fc38c4aea3c69.paul@paul-moore.com/
+> 
+> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> ---
+>  include/linux/lsm_hook_defs.h |  5 +++--
+>  include/linux/security.h      | 12 +++++++-----
+>  kernel/bpf/bpf_lsm.c          |  5 +++--
+>  kernel/bpf/syscall.c          | 25 +++++++++++++------------
+>  security/security.c           | 25 +++++++++++++++----------
+>  security/selinux/hooks.c      | 15 ++++++++-------
+>  6 files changed, 49 insertions(+), 38 deletions(-)
+
+...
+
+> diff --git a/kernel/bpf/bpf_lsm.c b/kernel/bpf/bpf_lsm.c
+> index e14c822f8911..3e956f6302f3 100644
+> --- a/kernel/bpf/bpf_lsm.c
+> +++ b/kernel/bpf/bpf_lsm.c
+> @@ -263,6 +263,8 @@ BTF_ID(func, bpf_lsm_bpf_map)
+>  BTF_ID(func, bpf_lsm_bpf_map_alloc_security)
+>  BTF_ID(func, bpf_lsm_bpf_map_free_security)
+>  BTF_ID(func, bpf_lsm_bpf_prog)
+> +BTF_ID(func, bpf_lsm_bpf_prog_load)
+> +BTF_ID(func, bpf_lsm_bpf_prog_free)
+>  BTF_ID(func, bpf_lsm_bprm_check_security)
+>  BTF_ID(func, bpf_lsm_bprm_committed_creds)
+>  BTF_ID(func, bpf_lsm_bprm_committing_creds)
+> @@ -346,8 +348,7 @@ BTF_SET_END(sleepable_lsm_hooks)
+>  
+>  BTF_SET_START(untrusted_lsm_hooks)
+>  BTF_ID(func, bpf_lsm_bpf_map_free_security)
+> -BTF_ID(func, bpf_lsm_bpf_prog_alloc_security)
+> -BTF_ID(func, bpf_lsm_bpf_prog_free_security)
+> +BTF_ID(func, bpf_lsm_bpf_prog_free)
+>  BTF_ID(func, bpf_lsm_file_alloc_security)
+>  BTF_ID(func, bpf_lsm_file_free_security)
+>  #ifdef CONFIG_SECURITY_NETWORK
+
+It looks like you're calling the BTF_ID() macro on bpf_lsm_bpf_prog_free
+twice?  I would have expected a only one macro call for each bpf_prog_load
+and bpf_prog_free, is that a bad assuption?
+
+> diff --git a/security/security.c b/security/security.c
+> index dcb3e7014f9b..5773d446210e 100644
+> --- a/security/security.c
+> +++ b/security/security.c
+> @@ -5180,16 +5180,21 @@ int security_bpf_map_alloc(struct bpf_map *map)
+>  }
+>  
+>  /**
+> - * security_bpf_prog_alloc() - Allocate a bpf program LSM blob
+> - * @aux: bpf program aux info struct
+> + * security_bpf_prog_load() - Check if loading of BPF program is allowed
+> + * @prog: BPF program object
+> + * @attr: BPF syscall attributes used to create BPF program
+> + * @token: BPF token used to grant user access to BPF subsystem
+>   *
+> - * Initialize the security field inside bpf program.
+> + * Do a check when the kernel allocates BPF program object and is about to
+> + * pass it to BPF verifier for additional correctness checks. This is also the
+> + * point where LSM blob is allocated for LSMs that need them.
+
+This is pretty nitpicky, but I'm guessing you may need to make another
+revision to this patchset, if you do please drop the BPF verifier remark
+from the comment above.
+
+Example: "Perform an access control check when the kernel loads a BPF
+program and allocates the associated BPF program object.  This hook is
+also responsibile for allocating any required LSM state for the BPF
+program."
+
+>   * Return: Returns 0 on success, error on failure.
+>   */
+> -int security_bpf_prog_alloc(struct bpf_prog_aux *aux)
+> +int security_bpf_prog_load(struct bpf_prog *prog, union bpf_attr *attr,
+> +			   struct bpf_token *token)
+>  {
+> -	return call_int_hook(bpf_prog_alloc_security, 0, aux);
+> +	return call_int_hook(bpf_prog_load, 0, prog, attr, token);
+>  }
+
+--
+paul-moore.com
 
