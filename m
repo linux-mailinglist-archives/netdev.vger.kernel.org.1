@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-46215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 971A57E289D
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:26:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DD97E289F
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 16:26:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F630B20BE4
-	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:26:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63CEB2812FE
+	for <lists+netdev@lfdr.de>; Mon,  6 Nov 2023 15:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB4F28E04;
-	Mon,  6 Nov 2023 15:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2C428E12;
+	Mon,  6 Nov 2023 15:26:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nC41Dq2L"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P1AY/QkL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C11D1773B
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 15:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E69528E07
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 15:26:19 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2F07125
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 07:26:15 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2571FD61
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 07:26:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699284375; x=1730820375;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Z4hObpuNefplRECRvFfNiSxNjDgba8y3jRhdyvxG5+c=;
-  b=nC41Dq2LXC30PxNnR3EqpQFz97eaflq/aOtNeAtmwHpK49qkrn9DymCp
-   L2f3NBtU8Wqzq9l7y6cxa6DoBUKOnTHBZaGmjmPWoPBeUalxRooEYFyso
-   5rfGetpfCKy/ONJXUWuLPIR8YpBTJ2aK9ciUZ7ztAQDnZw3yWoFdfvwWU
-   BuHEXylDqaqoNW/dGZVo1gA006u20QP5bR1vha80KcPeVs32GvzQlPKPo
-   uEgw/wIvZ1grdjkjCyi1mdm7Edly6Y2sTrPYoaTUiBtMHp2/EAacF4efN
-   5OAtORi2xYGzqEIWOfT1I/jdE8ME9aSAPK9urLm8NgfZbHYCYXm9ym1MQ
+  t=1699284377; x=1730820377;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=C5xAmnqBSRvl7cD+EhLOcdeNwbvjBkRZfdt4wnE0Pxw=;
+  b=P1AY/QkLFrwrHeHodIE7SovbWijUqcmgV6Gdg9t64A6vix8DHHVGE9MU
+   NPol/Io6lx9fxODNs/d0tn7Slt8LXdLhLqA4BqMQJvqjC4tQ81KF4qfRX
+   FbedZg3IdiivW3n2U/YfKzRIa0r39wec3SSQor2uY55D3p1b/5Or/GLWT
+   LO+ALghyOztO7WeFK2Snf/OzJGSXAKHbHbQkUtz4Qj/48us61oKfiLH2m
+   EfPj+HRJKnYEJB/z4q/wtP77xbj+ZCv/5BigrklZCX3NrkX4WuCDObJWK
+   bnUZgAyWcZhUgfYL30ZlBt1IYF/wY0bW9aLRNIoFy3q165NoS37qAOFSE
    g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="389105786"
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="389105791"
 X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="389105786"
+   d="scan'208";a="389105791"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 07:26:15 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 07:26:16 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="791492575"
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="791492585"
 X-IronPort-AV: E=Sophos;i="6.03,281,1694761200"; 
-   d="scan'208";a="791492575"
+   d="scan'208";a="791492585"
 Received: from unknown (HELO fedora.jf.intel.com) ([10.166.244.154])
-  by orsmga008.jf.intel.com with ESMTP; 06 Nov 2023 07:26:14 -0800
+  by orsmga008.jf.intel.com with ESMTP; 06 Nov 2023 07:26:15 -0800
 From: Paul Greenwalt <paul.greenwalt@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -59,10 +59,12 @@ Cc: netdev@vger.kernel.org,
 	Dan Nowlin <dan.nowlin@intel.com>,
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
 	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH iwl-net] ice: fix DDP package download for packages without signature segment
-Date: Mon,  6 Nov 2023 10:18:07 -0500
-Message-ID: <20231106151808.421280-1-paul.greenwalt@intel.com>
+Subject: [PATCH iwl-net v2] ice: fix DDP package download for packages without signature segment
+Date: Mon,  6 Nov 2023 10:18:08 -0500
+Message-ID: <20231106151808.421280-2-paul.greenwalt@intel.com>
 X-Mailer: git-send-email 2.41.0
+In-Reply-To: <20231106151808.421280-1-paul.greenwalt@intel.com>
+References: <20231106151808.421280-1-paul.greenwalt@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +78,7 @@ From: Dan Nowlin <dan.nowlin@intel.com>
 Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
 incorrectly removed support for package download for packages without a
 signature segment. These packages include the signature buffer inline
-in the configurations buffers, and do not in a signature segment.
+in the configurations buffers, and not in a signature segment.
 
 Fix package download by providing download support for both packages
 with (ice_download_pkg_with_sig_seg()) and without signature segment
@@ -88,9 +90,9 @@ Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
 Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
 ---
 Changelog
-v1->v2:
-Fix Reported-by email.
----
+v2->v3:
+- correct Reported-by email address.
+___
 
  drivers/net/ethernet/intel/ice/ice_ddp.c | 106 ++++++++++++++++++++++-
  1 file changed, 103 insertions(+), 3 deletions(-)
