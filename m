@@ -1,73 +1,60 @@
-Return-Path: <netdev+bounces-46395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026397E3B0A
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:22:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933D17E3B22
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B102D281011
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 11:22:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4345F280F1E
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 11:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550AC2D7AF;
-	Tue,  7 Nov 2023 11:22:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2206B2D795;
+	Tue,  7 Nov 2023 11:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f5ptr/sy"
+	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="jeevOxww"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C152D797
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 11:22:23 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 166A4102;
-	Tue,  7 Nov 2023 03:22:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699356137; x=1730892137;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pMF+9nUTYtcxwogA5ZhYPefFB2v1RKbC8j7RIB/pdhg=;
-  b=f5ptr/sy11mrBMmNnw8f9I3to9POOIt7PHhGzAOWYrmHGAxW70duPcze
-   1T/kWLj2mDw9TgavTnyZQogmKl05XREejgDoDx+V0wn56GyVopcHCmSNB
-   KJsa76hU+w1MDPvkL0l0CSMYiXh2D+8JqSA3erEWsxc3CU1LU1JdkGDWF
-   KwCrdugGnfeRpcoEbZFlYxWxOyMP/c2Hwi+Up517dT4HD4yO9FaAJJlM7
-   eSiiR0x9PC5PBcOMkZikeYrdjP1jQGRejS3bWuKrWU7D17pKn6MhKxpjh
-   pw7b+iwNKwmgRIGUuhlG2tS28ItfBrHZrBGdpwV0D1Jrnj0plMOcyXu38
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="475727186"
-X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
-   d="scan'208";a="475727186"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 03:22:15 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="828579865"
-X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
-   d="scan'208";a="828579865"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmsmga008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 03:22:15 -0800
-Received: from mohdfai2-iLBPG12-1.png.intel.com (mohdfai2-iLBPG12-1.png.intel.com [10.88.227.73])
-	by linux.intel.com (Postfix) with ESMTP id BE5BC580D42;
-	Tue,  7 Nov 2023 03:22:12 -0800 (PST)
-From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net 7/7] net/sched: taprio: enable cycle time adjustment for current entry
-Date: Tue,  7 Nov 2023 06:20:23 -0500
-Message-Id: <20231107112023.676016-8-faizal.abdul.rahim@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D652D05E
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 11:30:44 +0000 (UTC)
+X-Greylist: delayed 369 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Nov 2023 03:30:42 PST
+Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEECDED
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 03:30:41 -0800 (PST)
+Received: from mail.nppct.ru (localhost [127.0.0.1])
+	by mail.nppct.ru (Postfix) with ESMTP id C19EA1C0E4B
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:24:29 +0300 (MSK)
+Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
+	reason="pass (just generated, assumed good)" header.d=nppct.ru
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:to:from:from; s=dkim; t=1699356269; x=
+	1700220270; bh=x6jysyZ5oZimszC/+KWYqfqt9dmO+sPqmSEiLu28WpI=; b=j
+	eevOxwwE+o124s2+4JWdvCdCGwW1zD5b4AUpIuf/A5S3BF+fCeFPdsbUJYEkbqR/
+	9sVdVVTCDdCHlEPbGk3x+1h5lELxBy1b7YorfDabMDgMBZ6mzKRjU3FuN4aARsWJ
+	64tr3HTurdGnEqwNSr3Arf8LUhw6y3upkk62+7jl5Q=
+X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
+Received: from mail.nppct.ru ([127.0.0.1])
+	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id SdSNP73M8cae for <netdev@vger.kernel.org>;
+	Tue,  7 Nov 2023 14:24:29 +0300 (MSK)
+Received: from localhost.localdomain (mail.dev-ai-melanoma.ru [185.130.227.204])
+	by mail.nppct.ru (Postfix) with ESMTPSA id C3F401C0859;
+	Tue,  7 Nov 2023 14:24:27 +0300 (MSK)
+From: Andrey Shumilin <shum.sdl@nppct.ru>
+To: 3chas3@gmail.com
+Cc: Andrey Shumilin <shum.sdl@nppct.ru>,
+	linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: [PATCH] iphase: Adding a null pointer check
+Date: Tue,  7 Nov 2023 14:24:19 +0300
+Message-Id: <20231107112419.14404-1-shum.sdl@nppct.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,131 +63,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handles cycle time adjustments for the current active entry
-when new admin base time occurs quickly, either within the
-current entry or the next one.
+The pointer <dev->desc_tbl[i].iavcc> is dereferenced on line 195.
+Further in the code, it is checked for null on line 204.
+It is proposed to add a check before dereferencing the pointer.
 
-Changes covers:
-1. Negative cycle correction or truncation
-Occurs when the new admin base time falls before the expiry of the
-current running entry.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-2. Positive cycle correction or extension
-Occurs when the new admin base time falls within the next entry,
-and the current entry is the cycle's last entry. In this case, the
-changes in taprio_start_sched() extends the schedule, preventing
-old oper schedule from resuming and getting truncated in the next
-advance_sched() call.
-
-3. A new API, update_gate_close_time(), has been created to update
-the gate_close_time of the current entry in the event of cycle
-correction.
-
-Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Signed-off-by: Andrey Shumilin <shum.sdl@nppct.ru>
 ---
- net/sched/sch_taprio.c | 72 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 53 insertions(+), 19 deletions(-)
+ drivers/atm/iphase.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index c60e9e7ac193..56743754d42e 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1379,41 +1379,75 @@ static void setup_first_end_time(struct taprio_sched *q,
- 		rcu_assign_pointer(q->current_entry, NULL);
- }
- 
-+static void update_gate_close_time(struct sched_entry *current_entry,
-+				   ktime_t new_end_time,
-+				   int num_tc)
-+{
-+	int tc;
-+
-+	for (tc = 0; tc < num_tc; tc++) {
-+		if (current_entry->gate_mask & BIT(tc))
-+			current_entry->gate_close_time[tc] = new_end_time;
+diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
+index 324148686953..596422fbfacc 100644
+--- a/drivers/atm/iphase.c
++++ b/drivers/atm/iphase.c
+@@ -192,6 +192,11 @@ static u16 get_desc (IADEV *dev, struct ia_vcc *iavcc) {
+            i++;
+            continue;
+         }
++       if (!(iavcc_r = dev->desc_tbl[i].iavcc)) {
++	   printk("Fatal err, desc table vcc or skb is NULL\n");
++	   i++;
++	   continue;
 +	}
-+}
-+
- static void taprio_start_sched(struct Qdisc *sch,
- 			       ktime_t new_base_time,
--			       struct sched_gate_list *new)
-+			       struct sched_gate_list *admin)
- {
- 	struct taprio_sched *q = qdisc_priv(sch);
-+	ktime_t expires = hrtimer_get_expires(&q->advance_timer);
-+	struct net_device *dev = qdisc_dev(q->root);
-+	struct sched_entry *curr_entry = NULL;
- 	struct sched_gate_list *oper = NULL;
--	ktime_t expires, start;
- 
- 	if (FULL_OFFLOAD_IS_ENABLED(q->flags))
- 		return;
- 
- 	oper = rcu_dereference_protected(q->oper_sched,
- 					 lockdep_is_held(&q->current_entry_lock));
-+	curr_entry = rcu_dereference_protected(q->current_entry,
-+					       lockdep_is_held(&q->current_entry_lock));
- 
--	expires = hrtimer_get_expires(&q->advance_timer);
--	if (expires == 0)
--		expires = KTIME_MAX;
-+	if (hrtimer_active(&q->advance_timer)) {
-+		oper->cycle_time_correction =
-+			get_cycle_time_correction(oper, new_base_time,
-+						  curr_entry->end_time,
-+						  curr_entry);
- 
--	/* If the new schedule starts before the next expiration, we
--	 * reprogram it to the earliest one, so we change the admin
--	 * schedule to the operational one at the right time.
--	 */
--	start = min_t(ktime_t, new_base_time, expires);
--
--	if (expires != KTIME_MAX &&
--	    ktime_compare(start, new_base_time) == 0) {
--		/* Since timer was changed to align to the new admin schedule,
--		 * setting the variable below to a non-initialized value will
--		 * indicate to advance_sched() to call switch_schedules() after
--		 * this timer expires.
-+		if (cycle_corr_active(oper->cycle_time_correction)) {
-+			/* This is the last entry we are running from oper,
-+			 * subsequent entry will take from the new admin.
-+			 */
-+			ktime_t	now = taprio_get_time(q);
-+			u64 gate_duration_left = ktime_sub(new_base_time, now);
-+			struct qdisc_size_table *stab =
-+				rtnl_dereference(q->root->stab);
-+			int num_tc = netdev_get_num_tc(dev);
-+
-+			oper->cycle_end_time = new_base_time;
-+			curr_entry->end_time = new_base_time;
-+			curr_entry->correction_active = true;
-+
-+			update_open_gate_duration(curr_entry, oper, num_tc,
-+						  gate_duration_left);
-+			update_gate_close_time(curr_entry, new_base_time, num_tc);
-+			taprio_update_queue_max_sdu(q, oper, stab);
-+			taprio_set_budgets(q, oper, curr_entry);
-+		}
-+	}
-+
-+	if (!hrtimer_active(&q->advance_timer) ||
-+	    cycle_corr_active(oper->cycle_time_correction)) {
-+		/* Use new admin base time if :
-+		 * 1. there's no active oper
-+		 * 2. there's active oper and we will change to the new admin
-+		 * schedule after the current entry from oper ends
- 		 */
--		oper->cycle_time_correction = 0;
-+		expires = new_base_time;
- 	}
- 
--	hrtimer_start(&q->advance_timer, start, HRTIMER_MODE_ABS);
-+	hrtimer_start(&q->advance_timer, expires, HRTIMER_MODE_ABS);
- }
- 
- static void taprio_set_picos_per_byte(struct net_device *dev,
+         ltimeout = dev->desc_tbl[i].iavcc->ltimeout; 
+         delta = jiffies - dev->desc_tbl[i].timestamp;
+         if (delta >= ltimeout) {
 -- 
-2.25.1
+2.30.2
 
 
