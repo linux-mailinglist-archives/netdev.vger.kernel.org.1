@@ -1,167 +1,142 @@
-Return-Path: <netdev+bounces-46318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C1CA7E32D7
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:15:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EEA97E32E3
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFAAA280E1C
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:15:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DAC6B20B0E
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256E1873;
-	Tue,  7 Nov 2023 02:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93361FA6;
+	Tue,  7 Nov 2023 02:24:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dix+WuV7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZeUXNkUk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA4B20F2;
-	Tue,  7 Nov 2023 02:15:25 +0000 (UTC)
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F0610F;
-	Mon,  6 Nov 2023 18:15:24 -0800 (PST)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-7788fb06997so361732685a.0;
-        Mon, 06 Nov 2023 18:15:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562181873;
+	Tue,  7 Nov 2023 02:24:07 +0000 (UTC)
+Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168A810A;
+	Mon,  6 Nov 2023 18:24:06 -0800 (PST)
+Received: by mail-ua1-x92b.google.com with SMTP id a1e0cc1a2514c-7bae8dd095cso1090513241.3;
+        Mon, 06 Nov 2023 18:24:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699323323; x=1699928123; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fk4C8pGkEaO0aYtx+9DFxGow47hYHSHoEQjYuyisEbA=;
-        b=dix+WuV7WEQduGPYlPNqifTplPY8MSlOy5NxoThRP5XJ1gZ8Joho1r3lrNqEd2C4Qe
-         l+jQN5cLHIibrxMSWl9JsJ9HKJVUjpgQd3a8Kts+mcCsidWyXn7JPcJQLqzlvLNWB+Tr
-         JW7wpvVR+N2yRLXDd37kP94dH760u6PnvKi/QUv965voohrJchnFr83X39gxlPCZ7Z5T
-         5VefmRV3C3T4HxpCGG4EzhcCIcmDvUDalJubIGUaBFaErJyPiiMkQZAmoc7tZEDiOrqJ
-         +Dc/KpkwROrIWMD8qhwCtRRIRoiM4aFwO/NnoOHwVyoNRMHEwqHquyBKKJDC5GggpiFv
-         yVzA==
+        d=gmail.com; s=20230601; t=1699323845; x=1699928645; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8/hIJ+hXi3TTC8/M5hN/3Tp+g8W2vvsh36FqMl8LBI=;
+        b=ZeUXNkUkEAD86r01uHPG6TgNxX6+5wueRdXmJsrqE9RANKgKnva9FnungImtWF4auG
+         OejF+mbKp1zpxbdXEZZz9GXorHl1Ib41JaoeT9R1pMDf+f3Ze9eFkL9zX75+TzW/0GIm
+         uoIzO4zGmS/bzdFJwYzf3+CyzDrfmSRj2FFt2X5Re8ddL0t50Y4DF98aA8THpgozwCyo
+         uZTgvowxp5PADFubpAOQ2LcSv8Ojpyo1XYzJmuGTEmSh2eomPW8cwtIQ4GOGXguDV/aO
+         Y1kEH7U3wjPT6gpMV/8hlwCcd1U/CnMeWJ36GS1lmIQpgb8IVHIHcTEiSDOwQ+kjh6ET
+         vWZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699323323; x=1699928123;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fk4C8pGkEaO0aYtx+9DFxGow47hYHSHoEQjYuyisEbA=;
-        b=h53jP+XZTRnd815XfUGDsyBnHGsv6mYSAEzNkTN0qQI1ooGTkD9Ghj3LDSCfiSEtgY
-         pshvuHBCzSgicqnVJeWmaL38kQyfbYGsyZ5i/bPQnG+M8IfR28I90zOyYjzXUtdsSWf9
-         wokeqY8vlUqQ+Zfeiip4R05n0rLt+/efHA3cj5FxiVfYanUFWj0ePPuxXjPqYt7kamry
-         YTCDfSFyaLa6mldeVYZUooOk+YnXndC03fZD0UisseD+SmcBSezMZZ7cjanV1HaZluVu
-         +TpkxVaiuf/mdMR4rusAP+yPK7whIycnqvB283zak56WlxIXbtQLDpcV8wgCb+dc99I6
-         srlw==
-X-Gm-Message-State: AOJu0YxDZyOhyvpt2MIdQMMyMgtZ9xeDgv3DZG28L1kuZWy4l6fTmmYc
-	AX3JYZnfS3nLhJKhoUCY3M0=
-X-Google-Smtp-Source: AGHT+IEsbtgEtm1ThrU0RGNHI2w6rhkc5V3NUgJtzFwqjIS7wWzE7nSayyO4ZlyBcgrFPy4Qz6FqbA==
-X-Received: by 2002:a05:620a:40ca:b0:779:f0a1:3128 with SMTP id g10-20020a05620a40ca00b00779f0a13128mr37320412qko.63.1699323323340;
-        Mon, 06 Nov 2023 18:15:23 -0800 (PST)
-Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
-        by smtp.gmail.com with ESMTPSA id bs10-20020a05620a470a00b00777611164c6sm3829790qkb.15.2023.11.06.18.15.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Nov 2023 18:15:23 -0800 (PST)
-Date: Mon, 6 Nov 2023 21:15:21 -0500
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Kira <nyakov13@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Coiby Xu <coiby.xu@gmail.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Sven Joachim <svenjoac@gmx.de>,
-	Ian Kent <raven@themaw.net>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev
-Subject: Re: [PATCH] staging: Revert "staging: qlge: Retire the driver"
-Message-ID: <ZUmduQ_xKMHF6IY9@d3>
-References: <20231030150400.74178-1-benjamin.poirier@gmail.com>
- <2023110655-swarm-parka-177d@gregkh>
+        d=1e100.net; s=20230601; t=1699323845; x=1699928645;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q8/hIJ+hXi3TTC8/M5hN/3Tp+g8W2vvsh36FqMl8LBI=;
+        b=HgeICBFKKUMeM9f0/biMIYhUIgtEM7lkUKYkawgeJADtGxEB7MOPgAWOifisn8XoN6
+         TUPCymDgzbzaOTEw1Alj/K51TAcU5U3RImAZ7/MQgvAq9OqqZB402t+c+n0nXf33Dhyt
+         0x7oeCb+YeE7aJxG12BmEb7jVGOsBz9cl3enbSyx60OJOzZ+40NV6PpufKBkczPlN7Po
+         csLF+niFpdrbO0eaXsigJy5e6sisS/zWPNLsv0FfldSetYTNkkzBz8koB6bIIAh2QSUu
+         sgS/PgF22JngvvVVz6ZsUij+fqcVz/CSnnkxZu6jeqU/ixMHVNnpNdDPSarz3iODTVrC
+         CD3Q==
+X-Gm-Message-State: AOJu0YyT8z6i13WYIRc4m9AEC0/FOmKfEspSZHE/GfNCThP0aNbMe3GF
+	xackt9R8ZcBsYFRpQzVEjPa96ygTz4nTh9vXvI/tQl3lWsM=
+X-Google-Smtp-Source: AGHT+IFMLt/VUG6TU/4hOSl6RqKh7SB0dwBaFHv9+9I37C28wvAczM3wwtVldLZdBo8d+kzaH5f944U0PquGa1Yz4yU=
+X-Received: by 2002:a67:e10a:0:b0:45e:9611:7b71 with SMTP id
+ d10-20020a67e10a000000b0045e96117b71mr6126361vsl.27.1699323845025; Mon, 06
+ Nov 2023 18:24:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2023110655-swarm-parka-177d@gregkh>
+References: <ZUk03DhWxV-bOFJL@google.com> <19129763-6f74-4b04-8a5f-441255b76d34@kernel.org>
+ <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
+ <ZUlhu4hlTaqR3CTh@google.com> <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
+ <ZUlvzm24SA3YjirV@google.com> <CAHS8izMQ5Um_ScY0VgAjaEaT-hRh4tFoTgc6Xr9Tj5rEj0fijA@mail.gmail.com>
+ <CAKH8qBsbh8qYxNHZ6111RQFFpNWbWZtg0LDXkn15xcsbAq4R6w@mail.gmail.com>
+ <CAF=yD-+BuKXoVL8UF+No1s0TsHSzBTz7UrB1Djt_BrM74uLLcg@mail.gmail.com>
+ <ZUmBf7E8ZoTQwThL@google.com> <ZUmMBZpLPQkRS9bg@google.com>
+In-Reply-To: <ZUmMBZpLPQkRS9bg@google.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 6 Nov 2023 20:23:28 -0600
+Message-ID: <CAF=yD-+tZ7xaU0rKWBuVbfdVWptj88Z=Xf4Mqx+zaC-gZ1U1mw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Mina Almasry <almasrymina@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2023-11-06 07:54 +0100, Greg Kroah-Hartman wrote:
-> On Tue, Oct 31, 2023 at 02:04:00AM +1100, Benjamin Poirier wrote:
-> > This reverts commit 875be090928d19ff4ae7cbaadb54707abb3befdf.
-> > 
-> > On All Hallows' Eve, fear and cower for it is the return of the undead
-> > driver.
-> > 
-> > There was a report [1] from a user of a QLE8142 device. They would like for
-> > the driver to remain in the kernel. Therefore, revert the removal of the
-> > qlge driver.
-> > 
-> > [1] https://lore.kernel.org/netdev/566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com/
-> 
-> <snip>
-> 
-> > --- /dev/null
-> > +++ b/drivers/staging/qlge/TODO
-> > @@ -0,0 +1,28 @@
-> > +* commit 7c734359d350 ("qlge: Size RX buffers based on MTU.", v2.6.33-rc1)
-> > +  introduced dead code in the receive routines, which should be rewritten
-> > +  anyways by the admission of the author himself, see the comment above
-> > +  qlge_build_rx_skb(). That function is now used exclusively to handle packets
-> > +  that underwent header splitting but it still contains code to handle non
-> > +  split cases.
-> > +* truesize accounting is incorrect (ex: a 9000B frame has skb->truesize 10280
-> > +  while containing two frags of order-1 allocations, ie. >16K)
-> > +* while in that area, using two 8k buffers to store one 9k frame is a poor
-> > +  choice of buffer size.
-> > +* in the "chain of large buffers" case, the driver uses an skb allocated with
-> > +  head room but only puts data in the frags.
-> > +* rename "rx" queues to "completion" queues. Calling tx completion queues "rx
-> > +  queues" is confusing.
-> > +* struct rx_ring is used for rx and tx completions, with some members relevant
-> > +  to one case only
-> > +* the flow control implementation in firmware is buggy (sends a flood of pause
-> > +  frames, resets the link, device and driver buffer queues become
-> > +  desynchronized), disable it by default
-> > +* the driver has a habit of using runtime checks where compile time checks are
-> > +  possible (ex. qlge_free_rx_buffers())
-> > +* reorder struct members to avoid holes if it doesn't impact performance
-> > +* use better-suited apis (ex. use pci_iomap() instead of ioremap())
-> > +* remove duplicate and useless comments
-> > +* fix weird line wrapping (all over, ex. the qlge_set_routing_reg() calls in
-> > +  qlge_set_multicast_list()).
-> > +* remove useless casts (ex. memset((void *)mac_iocb_ptr, ...))
-> > +* fix checkpatch issues
-> 
-> In looking at this again, are you sure you all want this in the tree?
-> I'm glad to take the revert but ONLY if you are willing to then take a
-> "move this to drivers/net/" patch for the code as well, WITH an actual
-> maintainer and developer who is willing to do the work for this code.
-> 
-> In all the years that this has been in the staging tree, the listed
-> maintainers have not been active at all from what I can remember, and
-> obviously the above list of "things to fix" have not really been worked
-> on at all.
-> 
-> So why should it be added back?  I understand there is at least one
-> reported user, but for drivers in the staging tree, that's not a good
-> reason to keep them around if there is not an actual maintainer that is
-> willing to do the work.
-> 
-> Which reminds me, we should probably sweep the drivers/staging/ tree
-> again to see what we can remove given a lack of real development.
-> Normally we do that every other year or so, and this driver would fall
-> into the "no one is doing anything with it" category and should be
-> dropped.
+> > > > I think my other issue with MSG_SOCK_DEVMEM being on recvmsg is that
+> > > > it somehow implies that I have an option of passing or not passing it
+> > > > for an individual system call.
+> > > > If we know that we're going to use dmabuf with the socket, maybe we
+> > > > should move this flag to the socket() syscall?
+> > > >
+> > > > fd = socket(AF_INET6, SOCK_STREAM, SOCK_DEVMEM);
+> > > >
+> > > > ?
+> > >
+> > > I think it should then be a setsockopt called before any data is
+> > > exchanged, with no change of modifying mode later. We generally use
+> > > setsockopts for the mode of a socket. This use of the protocol field
+> > > in socket() for setting a mode would be novel. Also, it might miss
+> > > passively opened connections, or be overly restrictive: one approach
+> > > for all accepted child sockets.
+> >
+> > I was thinking this is similar to SOCK_CLOEXEC or SOCK_NONBLOCK? There
+> > are plenty of bits we can grab. But setsockopt works as well!
+>
+> To follow up: if we have this flag on a socket, not on a per-message
+> basis, can we also use recvmsg for the recycling part maybe?
+>
+> while (true) {
+>         memset(msg, 0, ...);
+>
+>         /* receive the tokens */
+>         ret = recvmsg(fd, &msg, 0);
+>
+>         /* recycle the tokens from the above recvmsg() */
+>         ret = recvmsg(fd, &msg, MSG_RECYCLE);
+> }
+>
+> recvmsg + MSG_RECYCLE can parse the same format that regular recvmsg
+> exports (SO_DEVMEM_OFFSET) and we can also add extra cmsg option
+> to recycle a range.
+>
+> Will this be more straightforward than a setsockopt(SO_DEVMEM_DONTNEED)?
+> Or is it more confusing?
 
-Thank you for revisiting this topic. I agree with you that it's better
-not to add orphaned code back into the kernel. I didn't want users to be
-left out in the cold by the removal of the driver, so I just created a
-dkms package as a fallback:
-https://github.com/gobenji/qlge-dkms
+It would have to be sendmsg, as recvmsg is a copy_to_user operation.
 
-People who want to use qlge with the latest kernel can use that package.
-Since the driver code is not mainline quality and there isn't much
-willingness to invest in its improvement, I think it's fitting that the
-code lives out of tree. Of course, if somebody takes ownership of the
-code and substantially improves it, they can submit it back to netdev.
+I am not aware of any precedent in multiplexing the data stream and a
+control operation stream in this manner. It would also require adding
+a branch in the sendmsg hot path.
+
+The memory is associated with the socket, freed when the socket is
+closed as well as on SO_DEVMEM_DONTNEED. Fundamentally it is a socket
+state operation, for which setsockopt is the socket interface.
+
+Is your request purely a dislike, or is there some technical concern
+with BPF and setsockopt?
 
