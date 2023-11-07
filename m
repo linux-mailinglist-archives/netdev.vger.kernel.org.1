@@ -1,70 +1,78 @@
-Return-Path: <netdev+bounces-46478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9EC37E4738
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 18:40:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EA9B7E475A
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 18:44:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 600292811F7
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 17:40:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 166FBB203C8
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 17:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B79E347D6;
-	Tue,  7 Nov 2023 17:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F0D34CDB;
+	Tue,  7 Nov 2023 17:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MBDXhzUk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDnOxzN8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA8C347D2
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 17:40:42 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BBB9C0
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 09:40:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699378841; x=1730914841;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=J0TcrzXGQz0pEEW2aauhG6IXnihUc5Hx1HooNK4d4lw=;
-  b=MBDXhzUk7tw+HE8kzydRFIl1zEVbjAteD9psoPbrsJ46/9FKE4dLMJ6P
-   1Nxurh8hknrppYmpf64POVLxlXLKlZmFEpn7pS1PpsBcYL2LAzvhIdMv1
-   Lkllxrxm5BqUdcVTF/rUMc6gqOcIXCLdbnXGsC+BRT/eERAq/Lep1wjHp
-   fNCku14MzbZZ29uCVtSTZFIQgeWIcKLNAqONZtwMICuhQReltPU+RZCH+
-   k0yzvEtPohhnKzQ0M5HARRLXvtNqFn8OYqH05QZomQrh6tuZjq7OwWWBT
-   U7eyr+x++moUy8zllJJdA4OMiDvgtFz6pYjwf8REtG8vzTbaxkJx5CyO2
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="379966752"
-X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="379966752"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 09:40:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10887"; a="879894166"
-X-IronPort-AV: E=Sophos;i="6.03,284,1694761200"; 
-   d="scan'208";a="879894166"
-Received: from unknown (HELO fedora.jf.intel.com) ([10.166.244.154])
-  by fmsmga002.fm.intel.com with ESMTP; 07 Nov 2023 09:40:39 -0800
-From: Paul Greenwalt <paul.greenwalt@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	horms@kernel.org,
-	tony.brelinski@intel.com,
-	Dan Nowlin <dan.nowlin@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>
-Subject: [PATCH iwl-net v3] ice: fix DDP package download for packages without signature segment
-Date: Tue,  7 Nov 2023 12:32:27 -0500
-Message-ID: <20231107173227.862417-1-paul.greenwalt@intel.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F6E30FAC
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 17:44:48 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC0212B;
+	Tue,  7 Nov 2023 09:44:47 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c59a4dd14cso79964541fa.2;
+        Tue, 07 Nov 2023 09:44:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699379086; x=1699983886; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vBopQGClenfXGmuKg6C+Z7OAKKWkOzVf06T/O52p9BM=;
+        b=IDnOxzN8be9/3C0yRG6b3cVbDW6izav8Ou1cZXUZ6TZZY7PNskf8qsY/b+M4EggUjj
+         hmdguXa7GYvkMM6yOMYteKvO6NwZcYsWq2BQUz7Aku/wnP6M24ipqRjBh12+qZamas4X
+         eQ/3N0wQfr2UCnDA6faOVvsKysD5r7e0NPLoIFt5kvtkAeyJXIrW18X02ffE2t2ShZUn
+         cG8vkL5S1sNHjKemmZF0EYTCbSzDA0/7ASEokDfxgMVtG5NYSP9z2Nw33+NdG/7+OXOW
+         3F70Ej/cAd/Lxiu3cqPTBAX/pwKi2Sczi7PBPG2X1SURJxrinILO5YPDeRjr1Mb/nR5N
+         jk6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699379086; x=1699983886;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vBopQGClenfXGmuKg6C+Z7OAKKWkOzVf06T/O52p9BM=;
+        b=PAh3agm7IKoAnUUSPU9WhhsGRX0pi68JAjAttHDmfvLSbM6cMZUsmalRXa5D4tiLGy
+         MsSbCY6oY5B8YtP0eDBD2tz4hOm+jztwYtEX2CWssJ/z9TtcVsso8Yvba+BV299cJ7Ns
+         dxHhhnF0bd/QSIjOiQpWj3/R5rbPniLlJGNg0H5AmDYSK45aVpoOkSOa6r+07pDUtreL
+         Ym11DmTGMhPFxnwFfZgeD+9kD7GPC2bY+yvuwkoprzcUwR8tX3ik2J1CWY/xycppsMOM
+         5G5FczZAz8BVM2BoORHINugGUUtT9W1kOHe7GD/bOM9e+Wqee1UNUkQoD64hc8h4Kx5t
+         3a2g==
+X-Gm-Message-State: AOJu0YyxhQCqjjXfGDM9sqhsveRdy2o4bAlcdvwOSG4916hOku+Ivrmo
+	YAKRn046AKtnpqVAmJYc4Zc=
+X-Google-Smtp-Source: AGHT+IES7S2vBMwfwLLo9czOMjftZI+gMSNLau9BawVxeuoCFGFSKElKL3PI8QD0OoVy9aSJy/6QEQ==
+X-Received: by 2002:a2e:a417:0:b0:2bd:102c:4161 with SMTP id p23-20020a2ea417000000b002bd102c4161mr28844292ljn.43.1699379085812;
+        Tue, 07 Nov 2023 09:44:45 -0800 (PST)
+Received: from mars.. ([2a02:168:6806:0:ed9a:eb86:e191:6603])
+        by smtp.gmail.com with ESMTPSA id bh7-20020a05600c3d0700b00401b242e2e6sm16608744wmb.47.2023.11.07.09.44.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 09:44:45 -0800 (PST)
+From: Klaus Kudielka <klaus.kudielka@gmail.com>
+To: Russell King <rmk+kernel@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Klaus Kudielka <klaus.kudielka@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] net: phylink: initialize carrier state at creation
+Date: Tue,  7 Nov 2023 18:44:02 +0100
+Message-ID: <20231107174402.3590-1-klaus.kudielka@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,174 +81,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Dan Nowlin <dan.nowlin@intel.com>
+Background: Turris Omnia (Armada 385); eth2 (mvneta) connected to SFP bus;
+SFP module is present, but no fiber connected, so definitely no carrier.
 
-Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
-incorrectly removed support for package download for packages without a
-signature segment. These packages include the signature buffer inline
-in the configurations buffers, and not in a signature segment.
+After booting, eth2 is down, but netdev LED trigger surprisingly reports
+link active. Then, after "ip link set eth2 up", the link indicator goes
+away - as I would have expected it from the beginning.
 
-Fix package download by providing download support for both packages
-with (ice_download_pkg_with_sig_seg()) and without signature segment
-(ice_download_pkg_without_sig_seg()).
+It turns out, that the default carrier state after netdev creation is
+"carrier ok". Some ethernet drivers explicitly call netif_carrier_off
+during probing, others (like mvneta) don't - which explains the current
+behaviour: only when the device is brought up, phylink_start calls
+netif_carrier_off.
 
-Fixes: 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
-Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Closes: https://lore.kernel.org/netdev/ZUT50a94kk2pMGKb@boxer/
-Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+Fix this for all drivers using phylink, by calling netif_carrier_off in
+phylink_create.
+
+Fixes: 089381b27abe ("leds: initial support for Turris Omnia LEDs")
+Cc: stable@vger.kernel.org
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Klaus Kudielka <klaus.kudielka@gmail.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
-Changelog
-v2->v3:
-- correct Changelog version tag, add Closes, Tested-by and Reviewed-by.
-  Remove unnecessary local variable initialization in ice_dwnld_cfg_bufs(),
-  and unnecessary local variable in ice_download_pkg_without_sig_seg(),
-v1->v2:
-- correct Reported-by email address.
----
- drivers/net/ethernet/intel/ice/ice_ddp.c | 103 ++++++++++++++++++++++-
- 1 file changed, 100 insertions(+), 3 deletions(-)
+v2: clarified fixed drivers; added fixes tag & cc stable
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index cfb1580f5850..8b7504a9df31 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -1479,14 +1479,14 @@ ice_post_dwnld_pkg_actions(struct ice_hw *hw)
- }
- 
- /**
-- * ice_download_pkg
-+ * ice_download_pkg_with_sig_seg
-  * @hw: pointer to the hardware structure
-  * @pkg_hdr: pointer to package header
-  *
-  * Handles the download of a complete package.
-  */
- static enum ice_ddp_state
--ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
-+ice_download_pkg_with_sig_seg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- {
- 	enum ice_aq_err aq_err = hw->adminq.sq_last_status;
- 	enum ice_ddp_state state = ICE_DDP_PKG_ERR;
-@@ -1519,6 +1519,103 @@ ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr)
- 		state = ice_post_dwnld_pkg_actions(hw);
- 
- 	ice_release_global_cfg_lock(hw);
-+
-+	return state;
-+}
-+
-+/**
-+ * ice_dwnld_cfg_bufs
-+ * @hw: pointer to the hardware structure
-+ * @bufs: pointer to an array of buffers
-+ * @count: the number of buffers in the array
-+ *
-+ * Obtains global config lock and downloads the package configuration buffers
-+ * to the firmware.
-+ */
-+static enum ice_ddp_state
-+ice_dwnld_cfg_bufs(struct ice_hw *hw, struct ice_buf *bufs, u32 count)
-+{
-+	enum ice_ddp_state state;
-+	struct ice_buf_hdr *bh;
-+	int status;
-+
-+	if (!bufs || !count)
-+		return ICE_DDP_PKG_ERR;
-+
-+	/* If the first buffer's first section has its metadata bit set
-+	 * then there are no buffers to be downloaded, and the operation is
-+	 * considered a success.
-+	 */
-+	bh = (struct ice_buf_hdr *)bufs;
-+	if (le32_to_cpu(bh->section_entry[0].type) & ICE_METADATA_BUF)
-+		return ICE_DDP_PKG_SUCCESS;
-+
-+	status = ice_acquire_global_cfg_lock(hw, ICE_RES_WRITE);
-+	if (status) {
-+		if (status == -EALREADY)
-+			return ICE_DDP_PKG_ALREADY_LOADED;
-+		return ice_map_aq_err_to_ddp_state(hw->adminq.sq_last_status);
-+	}
-+
-+	state = ice_dwnld_cfg_bufs_no_lock(hw, bufs, 0, count, true);
-+	if (!state)
-+		state = ice_post_dwnld_pkg_actions(hw);
-+
-+	ice_release_global_cfg_lock(hw);
-+
-+	return state;
-+}
-+
-+/**
-+ * ice_download_pkg_without_sig_seg
-+ * @hw: pointer to the hardware structure
-+ * @ice_seg: pointer to the segment of the package to be downloaded
-+ *
-+ * Handles the download of a complete package without signature segment.
-+ */
-+static enum ice_ddp_state
-+ice_download_pkg_without_sig_seg(struct ice_hw *hw, struct ice_seg *ice_seg)
-+{
-+	struct ice_buf_table *ice_buf_tbl;
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Segment format version: %d.%d.%d.%d\n",
-+		  ice_seg->hdr.seg_format_ver.major,
-+		  ice_seg->hdr.seg_format_ver.minor,
-+		  ice_seg->hdr.seg_format_ver.update,
-+		  ice_seg->hdr.seg_format_ver.draft);
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Seg: type 0x%X, size %d, name %s\n",
-+		  le32_to_cpu(ice_seg->hdr.seg_type),
-+		  le32_to_cpu(ice_seg->hdr.seg_size), ice_seg->hdr.seg_id);
-+
-+	ice_buf_tbl = ice_find_buf_table(ice_seg);
-+
-+	ice_debug(hw, ICE_DBG_PKG, "Seg buf count: %d\n",
-+		  le32_to_cpu(ice_buf_tbl->buf_count));
-+
-+	return ice_dwnld_cfg_bufs(hw, ice_buf_tbl->buf_array,
-+				  le32_to_cpu(ice_buf_tbl->buf_count));
-+}
-+
-+/**
-+ * ice_download_pkg
-+ * @hw: pointer to the hardware structure
-+ * @pkg_hdr: pointer to package header
-+ * @ice_seg: pointer to the segment of the package to be downloaded
-+ *
-+ * Handles the download of a complete package.
-+ */
-+static enum ice_ddp_state
-+ice_download_pkg(struct ice_hw *hw, struct ice_pkg_hdr *pkg_hdr,
-+		 struct ice_seg *ice_seg)
-+{
-+	enum ice_ddp_state state;
-+
-+	if (hw->pkg_has_signing_seg)
-+		state = ice_download_pkg_with_sig_seg(hw, pkg_hdr);
-+	else
-+		state = ice_download_pkg_without_sig_seg(hw, ice_seg);
-+
- 	ice_post_pkg_dwnld_vlan_mode_cfg(hw);
- 
- 	return state;
-@@ -2083,7 +2180,7 @@ enum ice_ddp_state ice_init_pkg(struct ice_hw *hw, u8 *buf, u32 len)
- 
- 	/* initialize package hints and then download package */
- 	ice_init_pkg_hints(hw, seg);
--	state = ice_download_pkg(hw, pkg);
-+	state = ice_download_pkg(hw, pkg, seg);
- 	if (state == ICE_DDP_PKG_ALREADY_LOADED) {
- 		ice_debug(hw, ICE_DBG_INIT,
- 			  "package previously loaded - no work.\n");
+ drivers/net/phy/phylink.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-base-commit: 016b9332a3346e97a6cacffea0f9dc10e1235a75
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 6712883498..a28da80bde 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1616,6 +1616,7 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 	pl->config = config;
+ 	if (config->type == PHYLINK_NETDEV) {
+ 		pl->netdev = to_net_dev(config->dev);
++		netif_carrier_off(pl->netdev);
+ 	} else if (config->type == PHYLINK_DEV) {
+ 		pl->dev = config->dev;
+ 	} else {
 -- 
-2.41.0
+2.42.0
 
 
