@@ -1,104 +1,101 @@
-Return-Path: <netdev+bounces-46367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2E27E362F
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:01:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B497D7E3627
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:00:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AAB1B20BB7
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:01:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 984FA1C2093D
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBF89D298;
-	Tue,  7 Nov 2023 08:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69CF3CA75;
+	Tue,  7 Nov 2023 08:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QgJ6PrhS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94441C8E4;
-	Tue,  7 Nov 2023 08:01:46 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 256F2E8;
-	Tue,  7 Nov 2023 00:01:45 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SPgf74yFYzvQS6;
-	Tue,  7 Nov 2023 16:01:35 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 7 Nov
- 2023 16:00:33 +0800
-Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
-To: Mina Almasry <almasrymina@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
- Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-8-almasrymina@google.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <4a0e9d53-324d-e19b-2a30-ba86f9e5569e@huawei.com>
-Date: Tue, 7 Nov 2023 16:00:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B77CA6E
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 08:00:47 +0000 (UTC)
+Received: from out203-205-221-190.mail.qq.com (out203-205-221-190.mail.qq.com [203.205.221.190])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C895E122;
+	Tue,  7 Nov 2023 00:00:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1699344042; bh=Y13edSMPHSTeEjO4Q2T9XMLjGfxpFO+4U5U506LRl6w=;
+	h=From:To:Cc:Subject:Date;
+	b=QgJ6PrhSIkxp2QSK9llo4k4rBfFqW5XsjbZlNQbyFAM/UyZ/MZoq0vJvYc2i/7kHz
+	 siCdnYr0xXbd3qCpSP0/H0O3bG0IyWtQEq+AMe08/Q31FMyzTUH15aVtHL43cTTOZZ
+	 0Yv7rlug7iNtvDP3Gs3nhabykPL3IGYB1hTQJgiM=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.56])
+	by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+	id 278C277; Tue, 07 Nov 2023 16:00:39 +0800
+X-QQ-mid: xmsmtpt1699344039tpv5sb9xv
+Message-ID: <tencent_18747D76F1675A3C633772960237544AAA09@qq.com>
+X-QQ-XMAILINFO: NkHKfw09D6j8tFugrFYQ+3Wix8FlP2Gsy0h2yucQcoYwN2n0NKVSDpBhqJXEWD
+	 V/Y2cmflXS2EzCnHedqj4pMynetU3KC5j0gkJ2h5z9iQ2MU0gA36QLYJrdik28SoQg92tfPBFqK7
+	 YoNYWJ5uRiSYDy9bcnyDsjivDJK54mhukxQ723NjLgZdCoS6czS6hIE1AB1mU0NJn2cXuZ3Jm6qQ
+	 adsAJqDI6zoLzKxM1zpuec3PqbNgwa2lHd7MXrWyj7vsQ6vhngGibMCJsp2l71bBPAZ6gjQyPxLW
+	 zhtthg6+QEghKoNBGAz+l/n9OTV1oUo/8iGkcRW4QS7RZrNIdmxuoT5OsHudbMaC6OYVjX+qId/R
+	 wEM+h3ZX3nPZEOwWaOBt1ek4gssKLjDhWQySXU9hIUfUEndJXvPqK6FxEm3isrmL/ClkHILG5Rm3
+	 ZUW0/LqDpxvJ5MVvhG/FmpQDqENgTgzKJCGxaJ0a1GYhTgr+DEFT4KojlpriUFWyG7fOxNjgaPGk
+	 JgxiX8pO83/0It6wm2dfase5mFUvwK2MMLTJP4G9hLJv34NN0PHKpCBoOO3dlJqT1UkDH3JWEjNO
+	 8LWj1F0L+UEAHse1B+m2T1iMhelaJUcccbjQ47s/46JE0Po7Q1bOSrZbiXEP0LwoWtcjGkTzrQRO
+	 Tqn2MkPfkF7oca3TkfgFpyrULHyqYWgbUd5mg0B8JLpK4xMAvHBf5d2KBS19q+EVKz8rJNpM0nHk
+	 QR1j/5j3WsQgXokxGyPW8LpgnpWA+xjXmgih2yhqVcGv1AWJlzANBcRKxpW1ifTMZdD43GHr7nXp
+	 4kWyR7zCyw49Z5QxbdG5WGq5Icsxa9OJAJGoESQDDSJowboX0S6y2Y5nqMFtdHDm5uVjpAAKiiRN
+	 3eupL3B2Qx2xO/fstgkQfIzhn7o+xz4pnC/FA6UIkOviz/EV8t776zQ3GgTt+xqJQVRxgkr8qRxG
+	 COMVNkS2I=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: Edward Adam Davis <eadavis@qq.com>
+To: richardcochran@gmail.com
+Cc: davem@davemloft.net,
+	eadavis@qq.com,
+	habetsm.xilinx@gmail.com,
+	jeremy@jcline.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	reibax@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Subject: [PATCH net V9 1/2] ptp: ptp_read should not release queue
+Date: Tue,  7 Nov 2023 16:00:40 +0800
+X-OQ-MSGID: <20231107080039.436253-3-eadavis@qq.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231106024413.2801438-8-almasrymina@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-On 2023/11/6 10:44, Mina Almasry wrote:
-> Overload the LSB of struct page* to indicate that it's a page_pool_iov.
-> 
-> Refactor mm calls on struct page* into helpers, and add page_pool_iov
-> handling on those helpers. Modify callers of these mm APIs with calls to
-> these helpers instead.
-> 
-> In areas where struct page* is dereferenced, add a check for special
-> handling of page_pool_iov.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
-> ---
->  include/net/page_pool/helpers.h | 74 ++++++++++++++++++++++++++++++++-
->  net/core/page_pool.c            | 63 ++++++++++++++++++++--------
->  2 files changed, 118 insertions(+), 19 deletions(-)
-> 
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-> index b93243c2a640..08f1a2cc70d2 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -151,6 +151,64 @@ static inline struct page_pool_iov *page_to_page_pool_iov(struct page *page)
->  	return NULL;
->  }
->  
-> +static inline int page_pool_page_ref_count(struct page *page)
-> +{
-> +	if (page_is_page_pool_iov(page))
-> +		return page_pool_iov_refcount(page_to_page_pool_iov(page));
+Firstly, queue is not the memory allocated in ptp_read;
+Secondly, other processes may block at ptp_read and wait for conditions to be
+met to perform read operations.
 
-We have added a lot of 'if' for the devmem case, it would be better to
-make it more generic so that we can have more unified metadata handling
-for normal page and devmem. If we add another memory type here, do we
-need another 'if' here?
-That is part of the reason I suggested using a more unified metadata for
-all the types of memory chunks used by page_pool.
+Acked-by: Richard Cochran <richardcochran@gmail.com>
+Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ drivers/ptp/ptp_chardev.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 473b6d992507..3f7a74788802 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -588,7 +588,5 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+ free_event:
+ 	kfree(event);
+ exit:
+-	if (result < 0)
+-		ptp_release(pccontext);
+ 	return result;
+ }
+-- 
+2.25.1
+
 
