@@ -1,145 +1,92 @@
-Return-Path: <netdev+bounces-46350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD4F7E3514
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:11:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCBB57E3517
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD971C20A72
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 06:10:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878D8280EE6
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 06:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7D56AA0;
-	Tue,  7 Nov 2023 06:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A3E8F7A;
+	Tue,  7 Nov 2023 06:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCL0BBPV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EX/9QLC4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69457B66B
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 06:10:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C205D135
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:10:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699337452;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jy3AoTaEFtBC3Hdf9DK2P1sqM0oihORJcg/Y85jsjiM=;
-	b=ZCL0BBPVCjBx5kRQ/v13uPAH0IBAj3NooUqYEfFuhtj3Bw7kKpD3UeBsU0xZIfWzNwVmdH
-	QjW8FjjKAHPmSQH3Ls4eNDeEeOGAgll04CE35/SrWSXG0HKrx50wpejld0E8SwbCAVNPOl
-	O/U56whWBcXZ4jvjt0xJ+NzxXmgD3AM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-75-heGb091WOUmOLolVsPSbqw-1; Tue, 07 Nov 2023 01:10:51 -0500
-X-MC-Unique: heGb091WOUmOLolVsPSbqw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c7f0a33afbso380590666b.3
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 22:10:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9730C6AA0
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 06:13:06 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FD6410F;
+	Mon,  6 Nov 2023 22:13:05 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6bd20c30831so974946b3a.1;
+        Mon, 06 Nov 2023 22:13:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699337585; x=1699942385; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eYDdK5bxPox1XDZTxjW6zzD5nW+jVYa/FuFqSU8icUM=;
+        b=EX/9QLC4rkeRsgc+c2OqF6gYkQH43wBqJWbx46oKQtTaRsdiNY99+0/In00/AtLbI8
+         CoGcFeEc65+ZGD4YL42CFa4G0VH0ZJ3/u/43yePBGhn9/TbCGO3fbcqnpAXxsKp8a2/2
+         h1Gs7iqDxg/OZAs6Q2OTGjKeu2gslBsa6IL437LX/aA8asuCqmyuILCqUVQ+B/5XQY6L
+         OGPRABhHgc8rTh4/FFfTgDGLbrisSRM8MhZ/LW0ZIbnnVDL9E4o8NsU/cq8hYVLCZ3au
+         uCECtUXznuhEp7VyTphJR0cuBZ5zAED8KT7lOHPEHfDMUF1ZYGdMu4FI8I9kKDqCsqRP
+         oyIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699337450; x=1699942250;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Jy3AoTaEFtBC3Hdf9DK2P1sqM0oihORJcg/Y85jsjiM=;
-        b=f3FHOvz2wOAvL0lbkRtMDBTSrcdnsFzHHRae9mouccEPLgscBWf9dOHy1XBmz3WCa9
-         A5TkleDWyrIn7fVe1BZm38h+zG6t18XjXK1Zd2xx8IgigBstMFoXS+yzj+e59vjZ4jdK
-         rmU7S1iVnML76Nfx0wKqYhzF8gLpQtpDYUUuNy+MuXAGGc5rE4H1HXB6k+EfwzoLXC+w
-         m980Q1Bs3WTEf1z33d5SJvNDCJWXDl5rf+EdELoY2utwMev8e0cg0C/tO6bb8kZkx9H6
-         sqnUy2m38vwz4E7nVVAJS9bg3i0haHhrLwLIi48Onsf5okGyQLllBlg3XL661GHErFtq
-         ToEw==
-X-Gm-Message-State: AOJu0YwtmJY3+PoLOwYwV/fpgBMdrpMUz5qeK8JimOtLzfnpOaQ/3CYt
-	UrDPwChMCGQgU66/WurSS57Z8+mV/318QMjd9EoMhUo0hPMe00B5i1xqlBnnlrg6KJ3zVz1MLu3
-	xuew5/LvyKwmxfSpsBBxuzwbLrFkw8qMp
-X-Received: by 2002:a17:906:c114:b0:9dd:6d39:42b9 with SMTP id do20-20020a170906c11400b009dd6d3942b9mr9767019ejc.55.1699337450453;
-        Mon, 06 Nov 2023 22:10:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHZ146Ql2Vvi0xcjK7Z9omMZRxdZMLHLDq1ESNq6PfFahRy+ug99qPlbg3aZ0HTfKjKT8OIC8DWy3+ihFO68A8=
-X-Received: by 2002:a17:906:c114:b0:9dd:6d39:42b9 with SMTP id
- do20-20020a170906c11400b009dd6d3942b9mr9767002ejc.55.1699337450164; Mon, 06
- Nov 2023 22:10:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699337585; x=1699942385;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eYDdK5bxPox1XDZTxjW6zzD5nW+jVYa/FuFqSU8icUM=;
+        b=VMoWNMPnjKvE0BkB1z11pqBUf/jBPhk28ZPoJfjUO8Y19fudCOj7fZif2+8fsbTDDu
+         jdAIWgCzdH5IIztAIefAir7hp12+yGT28E+8Pw5JVCgxRuHylebsAUIT+Y8GnB9ZQZIl
+         jGgAjq/EZIFZndJ4oBFBHmjcV6zdaJVbSSrSf3zDUHHEH2UZ5N1zOcLJWwvScp8DajGo
+         4EJT+WfOocUeuSoCPIvM8odmmtZllctr4SSx97aAQ1mpt9lm7arEC4wEIhuK0mqaTDAu
+         PhX1W60WG2h5sM0TURQukqjXUPsYgo8F5hJahllp8Gj/KtoHBw3BaabIL/8wl8JePXm+
+         ozoQ==
+X-Gm-Message-State: AOJu0YzmfpSgbjAZtOo2EQ0wqFFKRmoNt4LN9gr/ttwmQ/CuPrStM8xw
+	cD0YBhS8KUukopiJsu0J1c0=
+X-Google-Smtp-Source: AGHT+IGHq3RsTsOApBXXHfRMGdLm3/XmlgmQt2GrdztgBlzcj6/WtoF+2EeTCPS5SL3OYPSU3f///g==
+X-Received: by 2002:a05:6a00:309b:b0:6b9:7d5c:bb58 with SMTP id bh27-20020a056a00309b00b006b97d5cbb58mr29937251pfb.0.1699337584912;
+        Mon, 06 Nov 2023 22:13:04 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id bd32-20020a056a0027a000b006870ed427b2sm6626300pfb.94.2023.11.06.22.13.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 22:13:04 -0800 (PST)
+Date: Mon, 6 Nov 2023 22:13:02 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: davem@davemloft.net, habetsm.xilinx@gmail.com, jeremy@jcline.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	reibax@gmail.com,
+	syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next V8 1/2] ptp: ptp_read should not release queue
+Message-ID: <ZUnVbk-1Y-Yxq5ik@hoboy.vegasvil.org>
+References: <tencent_AD33049E711B744BDD1B3225A1BA3DBB9A08@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-9-lulu@redhat.com>
- <CACGkMEtRJ6-KRQ1qrrwC3FVBosMfYvV6Q47enoE9cE9C8MYYOg@mail.gmail.com>
-In-Reply-To: <CACGkMEtRJ6-KRQ1qrrwC3FVBosMfYvV6Q47enoE9cE9C8MYYOg@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 7 Nov 2023 14:10:11 +0800
-Message-ID: <CACLfguUPZVY2HDBoir67u0CeR3A9wHjCGvuc3cGLe0L43f8jkg@mail.gmail.com>
-Subject: Re: [RFC v1 8/8] iommu: expose the function iommu_device_use_default_domain
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_AD33049E711B744BDD1B3225A1BA3DBB9A08@qq.com>
 
-On Mon, Nov 6, 2023 at 3:26=E2=80=AFPM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Sat, Nov 4, 2023 at 1:18=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
-> >
-> > Expose the function iommu_device_use_default_domain() and
-> > iommu_device_unuse_default_domain()=EF=BC=8C
-> > While vdpa bind the iommufd device and detach the iommu device,
-> > vdpa need to call the function
-> > iommu_device_unuse_default_domain() to release the owner
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
->
-> This is the end of the series, who is the user then?
->
-> Thanks
->
-hi Jason
-These 2 functions was called in vhost_vdpa_iommufd_set_device(), Vdpa need =
-to
-release the dma owner, otherwise, the function will fail when
-iommufd called iommu_device_claim_dma_owner() in iommufd_device_bind()
-I will change this sequence, Or maybe will find some other way to fix
-this problem
-thanks
-cindy
+On Mon, Nov 06, 2023 at 10:31:27PM +0800, Edward Adam Davis wrote:
+> Firstly, queue is not the memory allocated in ptp_read;
+> Secondly, other processes may block at ptp_read and wait for conditions to be
+> met to perform read operations.
+> 
+> Reported-and-tested-by: syzbot+df3f3ef31f60781fa911@syzkaller.appspotmail.com
+> Fixes: 8f5de6fb2453 ("ptp: support multiple timestamp event readers")
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 
+(This should go to net and not net-next.)
 
-> > ---
-> >  drivers/iommu/iommu.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> > index 3bfc56df4f78..987cbf8c9a87 100644
-> > --- a/drivers/iommu/iommu.c
-> > +++ b/drivers/iommu/iommu.c
-> > @@ -3164,6 +3164,7 @@ int iommu_device_use_default_domain(struct device=
- *dev)
-> >
-> >         return ret;
-> >  }
-> > +EXPORT_SYMBOL_GPL(iommu_device_use_default_domain);
-> >
-> >  /**
-> >   * iommu_device_unuse_default_domain() - Device driver stops handling =
-device
-> > @@ -3187,6 +3188,7 @@ void iommu_device_unuse_default_domain(struct dev=
-ice *dev)
-> >         mutex_unlock(&group->mutex);
-> >         iommu_group_put(group);
-> >  }
-> > +EXPORT_SYMBOL_GPL(iommu_device_unuse_default_domain);
-> >
-> >  static int __iommu_group_alloc_blocking_domain(struct iommu_group *gro=
-up)
-> >  {
-> > --
-> > 2.34.3
-> >
->
-
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
