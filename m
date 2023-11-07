@@ -1,63 +1,43 @@
-Return-Path: <netdev+bounces-46438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 753EF7E3E4D
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:36:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD51D7E3E81
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 303BD28106E
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:36:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0D81C20B5A
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C759C1EB46;
-	Tue,  7 Nov 2023 12:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="JiV0qAZe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0167D28C;
+	Tue,  7 Nov 2023 12:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 736082FE31
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:36:25 +0000 (UTC)
-Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8346313AF2
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 04:36:19 -0800 (PST)
-Received: from mail.nppct.ru (localhost [127.0.0.1])
-	by mail.nppct.ru (Postfix) with ESMTP id D36861C0E04
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:36:16 +0300 (MSK)
-Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
-	reason="pass (just generated, assumed good)" header.d=nppct.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
-	content-transfer-encoding:mime-version:x-mailer:message-id:date
-	:date:subject:subject:to:from:from; s=dkim; t=1699360573; x=
-	1700224574; bh=x6jysyZ5oZimszC/+KWYqfqt9dmO+sPqmSEiLu28WpI=; b=J
-	iV0qAZeIgdJp13a2vKcTuf+PBzKnYdQyrtDViKNZqjzNxHq0yguncKnwVxhEBczY
-	mzGFKXzuesk4tuUnvg6Xb89omDVJTgKVv6BpySWtatPFs80N7Iq3AtK5uVSRHWGo
-	JNUfRhCxMwkPv+1HVx9IEskkQK+P1TRq1B18qsnDHY=
-X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
-Received: from mail.nppct.ru ([127.0.0.1])
-	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id Yk5pPn4LjwxF for <netdev@vger.kernel.org>;
-	Tue,  7 Nov 2023 15:36:13 +0300 (MSK)
-Received: from localhost.localdomain (mail.dev-ai-melanoma.ru [185.130.227.204])
-	by mail.nppct.ru (Postfix) with ESMTPSA id 236B81C0CB3;
-	Tue,  7 Nov 2023 15:36:12 +0300 (MSK)
-From: Andrey Shumilin <shum.sdl@nppct.ru>
-To: 3chas3@gmail.com
-Cc: Andrey Shumilin <shum.sdl@nppct.ru>,
-	linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	khoroshilov@ispras.ru,
-	ykarpov@ispras.ru,
-	vmerzlyakov@ispras.ru,
-	vefanov@ispras.ru
-Subject: [PATCH] iphase: Adding a null pointer check
-Date: Tue,  7 Nov 2023 15:36:00 +0300
-Message-Id: <20231107123600.14529-1-shum.sdl@nppct.ru>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F4630CEE
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:39:22 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36E5A6581;
+	Tue,  7 Nov 2023 04:39:06 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SPnp76GyXzfZyR;
+	Tue,  7 Nov 2023 20:38:55 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 7 Nov 2023 20:38:09 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>
+Subject: [PATCH net v2] page_pool: Add myself as page pool reviewer in MAINTAINERS
+Date: Tue, 7 Nov 2023 20:38:24 +0800
+Message-ID: <20231107123825.61051-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,35 +45,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-The pointer <dev->desc_tbl[i].iavcc> is dereferenced on line 195.
-Further in the code, it is checked for null on line 204.
-It is proposed to add a check before dereferencing the pointer.
+I have added frag support for page pool, made some improvement
+for it recently, and reviewed some related patches too.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+So add myself as reviewer so that future patch will be cc'ed
+to my email.
 
-Signed-off-by: Andrey Shumilin <shum.sdl@nppct.ru>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+CC: Jesper Dangaard Brouer <hawk@kernel.org>
+CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: David S. Miller <davem@davemloft.net>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Netdev <netdev@vger.kernel.org>
 ---
- drivers/atm/iphase.c | 5 +++++
- 1 file changed, 5 insertions(+)
+V2: add missing ":" as pointed out by Jesper
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
-index 324148686953..596422fbfacc 100644
---- a/drivers/atm/iphase.c
-+++ b/drivers/atm/iphase.c
-@@ -192,6 +192,11 @@ static u16 get_desc (IADEV *dev, struct ia_vcc *iavcc) {
-            i++;
-            continue;
-         }
-+       if (!(iavcc_r = dev->desc_tbl[i].iavcc)) {
-+	   printk("Fatal err, desc table vcc or skb is NULL\n");
-+	   i++;
-+	   continue;
-+	}
-         ltimeout = dev->desc_tbl[i].iavcc->ltimeout; 
-         delta = jiffies - dev->desc_tbl[i].timestamp;
-         if (delta >= ltimeout) {
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 14e1194faa4b..67817d80c9cc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16242,6 +16242,7 @@ F:	mm/truncate.c
+ PAGE POOL
+ M:	Jesper Dangaard Brouer <hawk@kernel.org>
+ M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
++R:	Yunsheng Lin <linyunsheng@huawei.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+ F:	Documentation/networking/page_pool.rst
 -- 
-2.30.2
+2.33.0
 
 
