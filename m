@@ -1,54 +1,49 @@
-Return-Path: <netdev+bounces-46426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6EDF7E3C1F
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06FEF7E3C21
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E03AB20C06
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C4D9B20E89
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA51F2E412;
-	Tue,  7 Nov 2023 12:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DCD2E634;
+	Tue,  7 Nov 2023 12:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZ9ET1w1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iAY4RitU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBA02E3FB
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DFE4C43395;
-	Tue,  7 Nov 2023 12:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99C72E3FE
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBC8BC433A9;
+	Tue,  7 Nov 2023 12:12:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699359155;
-	bh=cYmZsL8f0x/yljOBP/ipObqQSXEDxf1vk1TY8G4z8PU=;
+	s=k20201202; t=1699359161;
+	bh=rLQ5JtPfqbfWN75jKoa4h4vYeHE8yV6K8LVdWWy5zqE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KZ9ET1w1FG3szWTOS6kkvkAMYVguI5GW50SsNyZN4msWZxsLmUeiC+V1++kZwBDwC
-	 S2Kzm22pLOrU2oee80jUzeMpGMMoN40rIjH5fck/XTSH75y1GDActSSxKUFQIRwPxa
-	 bIeNW9gye96ZDoJ3zO6nP+7a1ZOd5g2M8b4igqBiUUnc/O2xvyEbEBNuXCp+CMuXrA
-	 Ych/nA5LK8pkRaj0zkeyKzhIip7PSD9ZuPCVmbJW3D8K9mfqPSYxaDLH3e2I3taxpc
-	 Z4+uG0A+/b/ZDCn8p1myVh93CIS5Fu5pL8CY2BAk7OEaos9l8zA1Z47RHVu2IeCcK/
-	 dnV9IgXiUaZxA==
+	b=iAY4RitUONqWiCj5nkVMlyjqil5mw/kQWXYxblEC2YXvq4LLa1BE9FN1fqLQffXRZ
+	 NG9Ke6BqvaWO7TOyLpms8/oKwBsmDq3krs9FVugurHlW3h4QW3o1fIQxXUw02enjyT
+	 wsYXHC/9sebNXkU3DkJySVs2c3HaIaaW8Vj3fuHJhM9LfywTOzQLrskwi6EwrXs1dR
+	 pkgs2oKao7Iy5BnohRw1yL2FbGnu8VTF0QGK07isrCi3nSDuCsDdLgXa4GLs9etKW7
+	 m6oJN0gJjD/EXSyL514LmNhqr3PHdbKxKqroQ6P+VRGR1Rh+Ls+0CtPXOnLabEJoBO
+	 OZroFQFyjVCSg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ping-Ke Shih <pkshih@realtek.com>,
-	Zong-Zhe Yang <kevin_yang@realtek.com>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 02/11] wifi: mac80211: don't return unset power in ieee80211_get_tx_power()
-Date: Tue,  7 Nov 2023 07:12:17 -0500
-Message-ID: <20231107121230.3758617-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 06/11] net: annotate data-races around sk->sk_tx_queue_mapping
+Date: Tue,  7 Nov 2023 07:12:21 -0500
+Message-ID: <20231107121230.3758617-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231107121230.3758617-1-sashal@kernel.org>
 References: <20231107121230.3758617-1-sashal@kernel.org>
@@ -63,54 +58,61 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.199
 Content-Transfer-Encoding: 8bit
 
-From: Ping-Ke Shih <pkshih@realtek.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit e160ab85166e77347d0cbe5149045cb25e83937f ]
+[ Upstream commit 0bb4d124d34044179b42a769a0c76f389ae973b6 ]
 
-We can get a UBSAN warning if ieee80211_get_tx_power() returns the
-INT_MIN value mac80211 internally uses for "unset power level".
+This field can be read or written without socket lock being held.
 
- UBSAN: signed-integer-overflow in net/wireless/nl80211.c:3816:5
- -2147483648 * 100 cannot be represented in type 'int'
- CPU: 0 PID: 20433 Comm: insmod Tainted: G        WC OE
- Call Trace:
-  dump_stack+0x74/0x92
-  ubsan_epilogue+0x9/0x50
-  handle_overflow+0x8d/0xd0
-  __ubsan_handle_mul_overflow+0xe/0x10
-  nl80211_send_iface+0x688/0x6b0 [cfg80211]
-  [...]
-  cfg80211_register_wdev+0x78/0xb0 [cfg80211]
-  cfg80211_netdev_notifier_call+0x200/0x620 [cfg80211]
-  [...]
-  ieee80211_if_add+0x60e/0x8f0 [mac80211]
-  ieee80211_register_hw+0xda5/0x1170 [mac80211]
+Add annotations to avoid load-store tearing.
 
-In this case, simply return an error instead, to indicate
-that no data is available.
-
-Cc: Zong-Zhe Yang <kevin_yang@realtek.com>
-Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
-Link: https://lore.kernel.org/r/20230203023636.4418-1-pkshih@realtek.com
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/cfg.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/net/sock.h | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
-index c6a7f1c99abc5..45bb6f2755987 100644
---- a/net/mac80211/cfg.c
-+++ b/net/mac80211/cfg.c
-@@ -2726,6 +2726,10 @@ static int ieee80211_get_tx_power(struct wiphy *wiphy,
- 	else
- 		*dbm = sdata->vif.bss_conf.txpower;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 234196d904238..9d5e603a10f5a 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1853,21 +1853,33 @@ static inline void sk_tx_queue_set(struct sock *sk, int tx_queue)
+ 	/* sk_tx_queue_mapping accept only upto a 16-bit value */
+ 	if (WARN_ON_ONCE((unsigned short)tx_queue >= USHRT_MAX))
+ 		return;
+-	sk->sk_tx_queue_mapping = tx_queue;
++	/* Paired with READ_ONCE() in sk_tx_queue_get() and
++	 * other WRITE_ONCE() because socket lock might be not held.
++	 */
++	WRITE_ONCE(sk->sk_tx_queue_mapping, tx_queue);
+ }
  
-+	/* INT_MIN indicates no power level was set yet */
-+	if (*dbm == INT_MIN)
-+		return -EINVAL;
-+
- 	return 0;
+ #define NO_QUEUE_MAPPING	USHRT_MAX
+ 
+ static inline void sk_tx_queue_clear(struct sock *sk)
+ {
+-	sk->sk_tx_queue_mapping = NO_QUEUE_MAPPING;
++	/* Paired with READ_ONCE() in sk_tx_queue_get() and
++	 * other WRITE_ONCE() because socket lock might be not held.
++	 */
++	WRITE_ONCE(sk->sk_tx_queue_mapping, NO_QUEUE_MAPPING);
+ }
+ 
+ static inline int sk_tx_queue_get(const struct sock *sk)
+ {
+-	if (sk && sk->sk_tx_queue_mapping != NO_QUEUE_MAPPING)
+-		return sk->sk_tx_queue_mapping;
++	if (sk) {
++		/* Paired with WRITE_ONCE() in sk_tx_queue_clear()
++		 * and sk_tx_queue_set().
++		 */
++		int val = READ_ONCE(sk->sk_tx_queue_mapping);
+ 
++		if (val != NO_QUEUE_MAPPING)
++			return val;
++	}
+ 	return -1;
  }
  
 -- 
