@@ -1,253 +1,192 @@
-Return-Path: <netdev+bounces-46316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C687E32BE
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:00:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446E37E32C4
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BD8C280DED
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:00:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6640A1C208CA
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A441870;
-	Tue,  7 Nov 2023 02:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202C61873;
+	Tue,  7 Nov 2023 02:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="exYHTHSk"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XbTxIL8N"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272D720EB
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:00:37 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AAA115;
-	Mon,  6 Nov 2023 18:00:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699322435; x=1730858435;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=DNcWFlgWFVNRGva6aSrz0MmPCTB+PaUMaMiPwbUwwyg=;
-  b=exYHTHSkNLnOoBAhOV71CZBuiTn59+C5Iu9Zm2AJ5v5FaYIB4E+k6kWK
-   Pw6+0VRugBJtdfusz62G1YYJkNHR0jFkHSyiECTQce6J2t1MlK5XOFQN7
-   kXE3wg6IQcCxytIud/QSnRygFF04PmqBUuupDJunW23CCA+RR9NUcUiin
-   os0T03sN2npcFWbGf62oY0ahQs28yi7bq3LDW/K8N0WUdRv0fsWYISQOk
-   je1U3HsArUAZXct3yaoq19uVwLMm6OiP79pTYzu2B49nT5JmXLebk2XY8
-   BAZN4PUmmcXKc3qKXbWDIkMNTPtBXuzZBd7Ndn8TTWou4rMkYIVLLIwXa
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="393300955"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="393300955"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2023 18:00:35 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="738959725"
-X-IronPort-AV: E=Sophos;i="6.03,282,1694761200"; 
-   d="scan'208";a="738959725"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2023 18:00:35 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Mon, 6 Nov 2023 18:00:34 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Mon, 6 Nov 2023 18:00:34 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Mon, 6 Nov 2023 18:00:34 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J8CY88JHak0fSoErQsiDNvxzPP2ZdhsZAFPr+216yWMbb82mEx0j2+Lb8LQs2s5qqgjPoylyljaqWm/iKy7UWOeMZNjuSXwFO9zQQFMneGGYD+vyOmv50d7OJYKYB8d/Og0vhueSftGnRaH62pAeDso+XRaigN+FOVq0VcohvNN8u+hzija3JUEJqcOqsIwgYnpzAIaRawo3jvFShXS9ja3YWez4X0Dmv5WEG5ez5in4SY6Kc2MOk/dAP8ax7aFkN8cqOQSpOP4+GcfPCcNvvHU/5X2cHk+ChZg/NWlbouTXkzV50Cwo6zSgjBB8wVe2Be076dS5dXUDSvgKO796pQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P3bq91FDhwzU+hIWI/9b0n0Xc1vTKtRHKqLUndSeOD8=;
- b=oBk2icVlwqtEWmD1+NX5+BkFylIbgs+WFZnCl81ZgyV8JaKfC0IdGVrl/IoSt+YSZTo/Lj07R751EsX4u5kyMI5uD0anjzPA2X0zZVC7nj9TGfDC5ByCJGuDtomaESL5jHKuXpBant2wS6RYwwWiQLid8CikY6uI3y6uCl2E3rCKpzLOLiuiDWXLG4H3roktiqy3Hr6ZLos381NTZidw5z9WC+BFfjL4tINf/64vibnHZ0zF9pmBpL5AwIu2Yl+p70owAg0FHMkE1ENek2YDfPGzm2yzPzI+rd7XVkbTkSOXhXGpiVsnlhU+mAWp4EsZlZ5SFjiq4U3P6Wts5+gkvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6779.namprd11.prod.outlook.com (2603:10b6:510:1ca::17)
- by DS0PR11MB7902.namprd11.prod.outlook.com (2603:10b6:8:f6::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6954.28; Tue, 7 Nov 2023 02:00:32 +0000
-Received: from PH8PR11MB6779.namprd11.prod.outlook.com
- ([fe80::b8:30e8:1502:b2a7]) by PH8PR11MB6779.namprd11.prod.outlook.com
- ([fe80::b8:30e8:1502:b2a7%4]) with mapi id 15.20.6954.028; Tue, 7 Nov 2023
- 02:00:32 +0000
-Date: Tue, 7 Nov 2023 10:00:25 +0800
-From: kernel test robot <oliver.sang@intel.com>
-To: Daniel Mendes <dmendes@redhat.com>
-CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>,
-	<oliver.sang@intel.com>
-Subject: [linus:master] [kselftest]  9c2a19f715:
- kernel-selftests.net.rtnetlink.sh.gretap.fail
-Message-ID: <202311061651.88994df5-oliver.sang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-ClientProxiedBy: SI1PR02CA0036.apcprd02.prod.outlook.com
- (2603:1096:4:1f6::20) To PH8PR11MB6779.namprd11.prod.outlook.com
- (2603:10b6:510:1ca::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E2D17F4
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:05:19 +0000 (UTC)
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4462811F
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:05:17 -0800 (PST)
+Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20231107020511epoutp01126040bbf1ff4d7fab57f3783830d260~VNQDBQdhL0215902159epoutp01i
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:05:11 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20231107020511epoutp01126040bbf1ff4d7fab57f3783830d260~VNQDBQdhL0215902159epoutp01i
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1699322711;
+	bh=TBL8+EFA/ZaaK31h63r/ZXqTOOqEdXbFSJSw9cNVIVg=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=XbTxIL8NU9n6yj2/wPZ2f6Q+EmSmvA3fKocxJWRiYemY8chJD5oBMa1Jqcp7dU50H
+	 WIRzauz5Tq5W4ratroBNkBTbvngy8xrh+ybcVS2Lex22/oOXIovWNk5nF7W4cItexH
+	 Lt+2uaiv8dB1MH9CN5PHEeyFkTrxbsO7F7dnLIHw=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20231107020511epcas1p129b5e8910b71d15b254780b51500a537~VNQCY-N_L2181021810epcas1p1w;
+	Tue,  7 Nov 2023 02:05:11 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.38.248]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4SPWkt4jHkz4x9QK; Tue,  7 Nov
+	2023 02:05:10 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+	epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+	4C.42.10025.45B99456; Tue,  7 Nov 2023 11:05:08 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+	20231107020508epcas1p3e3f47fab18e52248f64bfdde05b1e53b~VNP-96Y7T0586405864epcas1p36;
+	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20231107020508epsmtrp2b7d91d55d9b40193aa0ad8ad85310877~VNP-9Tzs62332523325epsmtrp2L;
+	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
+X-AuditID: b6c32a39-c2bf870000002729-40-65499b54bb3c
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	D1.53.18939.45B99456; Tue,  7 Nov 2023 11:05:08 +0900 (KST)
+Received: from jongeonpark03 (unknown [10.253.101.166]) by
+	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20231107020508epsmtip12401683f6021257597dc66f70e2f7ff1~VNP-zFqrW0626206262epsmtip1G;
+	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
+From: "Jong eon Park" <jongeon.park@samsung.com>
+To: "'Jakub Kicinski'" <kuba@kernel.org>, "'Paolo Abeni'"
+	<pabeni@redhat.com>
+Cc: "'David S. Miller'" <davem@davemloft.net>, "'Eric Dumazet'"
+	<edumazet@google.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, "'Dong ha Kang'" <dongha7.kang@samsung.com>
+In-Reply-To: <20231106154812.14c470c2@kernel.org>
+Subject: RE: [PATCH] netlink: introduce netlink poll to resolve fast return
+ issue
+Date: Tue, 7 Nov 2023 11:05:08 +0900
+Message-ID: <25c501da111e$d527b010$7f771030$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6779:EE_|DS0PR11MB7902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 840b275a-81ea-40e8-53fc-08dbdf3552f2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: yneEYO6FIyy9E06+I8KjZqFSJpebuDkn8ibf1kTAKLrdbYHf2L+guUHmSXFCl7bw5jxx062AMzOtm6eu6ZdrX60HLb3BekjHI1kt2iPZdMj4XJiFbMud52gRJixLelKyt+sviyJ9/hL1beG9ghwpTbtCqYTVdvL45OkwEpel8VeuY220mjcxDpd41DNPIyK9zEtoGUR4nWX1Ip2jAirE8ETTUj1ufSgiNYDDDLV4AL17R+Rcs8QI/TT7bLllpFrt52wHYlF7465KfIdToQxVv8vas11XBTEdPgYngB3TWl6enagvbXajBJrpZqS2CaDHnP1ApdzXbowvqPlWMPLR8IsON1DTkWWkQsz6YLPSLF6TSYAjoL2dXctXujDXf+0JjRCoa2tJM1Pre6lmWHkfkpcAHFbPunL6OWWvguVwnvEJOyTNFX3uDnL5g40m/H2M7BuHOO5uQGtuJ0zEahhIgXzZh0Qe7b3H6TpR2AUhek3IIpHPBKXvsOHgnMnA91WzjuZlxYtF+zEm+H6RuvwKAPUxFRvhuH6wJR1ocL0ND3IjNqWpijljnqA0t/2V8R2JoJkfchkLLyIvZ+gi9BCC4L5ihNvYfoo0z5gG7LuzEcWdTnrZtaQKr2lOI17u2JwiMQ2vXRDMGD7Indx/r26Sqg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6779.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(346002)(39860400002)(376002)(366004)(396003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(6666004)(6506007)(6512007)(2616005)(966005)(6486002)(478600001)(26005)(107886003)(1076003)(2906002)(41300700001)(5660300002)(66946007)(66556008)(66476007)(6916009)(316002)(4326008)(8676002)(8936002)(83380400001)(38100700002)(36756003)(86362001)(82960400001)(568244002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8mW3zIR+k4nWEby8LeeH6PoUfqKATta0XXQs7xP2GykFqR/zLTaXmVxLiz1R?=
- =?us-ascii?Q?/ZO3zsmULJj+nUGBS9n7ed7Ifu/PWEUrVF9VXcIhsrwZiOqCQEmXHVn4z9+q?=
- =?us-ascii?Q?hyEcAc8cie5lLPyy9p1ZWP9zlsdSn2Fe+AVxEqUTAMlPxFozQ6iaZlwdyWuv?=
- =?us-ascii?Q?GvnkdmSab4jV6D0e1soir2+J5b962pOyjum0l0vzqGWErCn4wIe75GPs0Ppc?=
- =?us-ascii?Q?a8FknC4rck1j1vnTEWnwUOrPu5yR6yR2Ypm6Ni+rEYm/MPODrTsGJZMUpE5x?=
- =?us-ascii?Q?v5OCnxxNAROGcThTxzJ90bsLBL6ZZBPHP2vU8mIgwhGJ5JoY5O2NGn8nGL2l?=
- =?us-ascii?Q?h28nvnG5uq8jevqYi31rRjb0ESpGXft1psjklT1mr05gVu5Maeu3GjUrRfyC?=
- =?us-ascii?Q?QiOerIZD5meJ2cHkofjF1qQzqnv4Oi4WSO2W8DLFVaKpnT66yyByhUri3K8x?=
- =?us-ascii?Q?aq1vz9hOs+BXbitMdZEsXeMzCV7Bo5LFpKJhz/wZ6+9LAl/p85DBqkQU0OLx?=
- =?us-ascii?Q?uib6yG0KvAtc09KOUF5aq58As+AiBOKYO9MApySZ+RG7H6+BE6ez8E+93bVD?=
- =?us-ascii?Q?j1OxqPJs5vLV6ZzwuQOPmbmgMiaku7rWfmLR85qXQAlxhcXiIY+NLTnuV8gt?=
- =?us-ascii?Q?cr8sNtvKLV7l0uWsCFU30mVeKwDZXshtwl//t889dVjAE7jsn4xquN2mqMSX?=
- =?us-ascii?Q?eX6JflYAbJEJkoIbBK5HgJ8VTVMQbQ9/+/G/C00j2/y/vt1yUyN3HozRjLhK?=
- =?us-ascii?Q?XXCJlcYKIU/lx4sNv+HZigf8OwWbSpsr1fX4Z/xH9NdjHS9WTYcGvthGKCaT?=
- =?us-ascii?Q?3buh+Jsz8SWG/A2XtRfjJ3qWG0QLq1zDn0wO3AKOvDyHXHZpkdmzZpILJdzK?=
- =?us-ascii?Q?GwCfZAymnGE+ncSxvKKq8icI1DWHdYTvZiGbHS472La0mU1l9GODA24Bx3Si?=
- =?us-ascii?Q?Eg8YOmNhhaoGcEAhGCxysRmd2y7TPSZTEjJaGmI3hffS9ZtNguyjlCWDuym5?=
- =?us-ascii?Q?vxEtH97klZ0CmMe+UtPDAv5A6bzXIo4R/rSqknrHZTVk3o8IziRneqYZw7so?=
- =?us-ascii?Q?hbD5j3qocUSWX3PYEeVoQ1DbUYf8oc/KK2rNtmfE+dJqrqVSRje2BiFKX28L?=
- =?us-ascii?Q?paUivYXU3f0VIuuFDP5aEjXLWkVuhDTCAuLqfdXU6GbFRfTJxgrIZ4p0CuY4?=
- =?us-ascii?Q?+N/9dLppLdSQEtfAYdt0jB0dcWds00zXAcmz+Q3ZzS55ctQTAzcGi0kltBoW?=
- =?us-ascii?Q?mF3xYEhLXEDbtjsNHm49a4YL0U2R7ArBjaA7kavnIZB8geeMJOhKTH5MQcvJ?=
- =?us-ascii?Q?nQLPW//lvRebvucPOrADvhDEzIEATBEqUxQp/q+zrwGyLk5/CyX2FyofAcih?=
- =?us-ascii?Q?wy0vdCfqj0LXY4bCAgEna6tFcIgmdVEImAcUdhsEQHIOaxrJTAs1wvWvTGYl?=
- =?us-ascii?Q?uyPaqBmpx04vCrWE0dconM/h+QJJguQPEZ61DdAgz9lkvk/ZLNqq5s+81bnd?=
- =?us-ascii?Q?uWaVmzOgdMncDvzkO4zXzslU3OhvmuCkteswCeBIcIvYyKbicB00abbRLZqQ?=
- =?us-ascii?Q?bhmDONFxK5qWRthfAC2++Jwpu4gg7MwCQ4Pa0r1j?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 840b275a-81ea-40e8-53fc-08dbdf3552f2
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6779.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 02:00:32.3695
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: edFT9qJdIczhE2Eld8l5vLoHiDqni1cRTG/UihG/T7DuSstiaQWkv/2lTiGBwXbemgkqjfRR/NTce9leqPwfxg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7902
-X-OriginatorOrg: intel.com
-
-
-hi, Daniel Mendes,
-
-we reported
-"[linux-next:master] [kselftest]  9c2a19f715: kernel-selftests.net.rtnetlink.sh.gretap.fail"
-in
-https://lore.kernel.org/all/202310112125.c5889283-oliver.sang@intel.com/
-when this commit is in linux-next/master
-
-now we noticed the commit was merged into mainline. and we still saw the same
-issue in our tests. just FYI.
-
-
-Hello,
-
-kernel test robot noticed "kernel-selftests.net.rtnetlink.sh.gretap.fail" on:
-
-commit: 9c2a19f71515553a874e2bf31655ac2264a66e37 ("kselftest: rtnetlink.sh: add verbose flag")
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-
-[test failed on linus/master 2c40c1c6adab90ee4660caf03722b3a3ec67767b]
-[test failed on linux-next/master e27090b1413ff236ca1aec26d6b022149115de2c]
-
-in testcase: kernel-selftests
-version: kernel-selftests-x86_64-60acb023-1_20230329
-with following parameters:
-
-	group: net
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJoS8HO+cSy/HZb7h5ntB8MEORIdAHf29cGAkyoXsSvMDrooA==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKJsWRmVeSWpSXmKPExsWy7bCmgW7IbM9Ug961NhZzzrewWEy/OZXZ
+	4umxR+wWF7b1sVpc3jWHzeLYAjGLb6ffMDqwe2xZeZPJY8GmUo9NqzrZPN7vu8rm0bdlFaPH
+	501yAWxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5
+	QJcoKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgrMCvSKE3OLS/PS9fJSS6wMDQyM
+	TIEKE7IzbizMLlgsXtG1bi9jA+MLoS5GDg4JAROJeVs8uxg5OYQEdjBK7FvL1cXIBWR/YpSY
+	eu0AG5xzbdlUVpAqkIbmxztYIBI7GSUWtqxjgWh/wyjxZLs+iM0mYCBx7MdPRpANIgL+Erfv
+	eYPUMwscYJRY8OYtWD2ngKHE23dzmEBsYYFgie0/FoLFWQRUJKY/+sMMYvMKWEp8n/WbFcIW
+	lDg58wlYDbOAvMT2t3OYIQ5SkPj5dBlYjYiAk8TkBT/ZIWpEJGZ3tjGDLJYQmMoh8fHuQXaI
+	BheJ2X+PQdnCEq+Ob4GypSQ+v9vLBmFnS7w4dowVEkQFElePKEGY9hLvL1mAmMwCmhLrd+lD
+	FCtK7Pw9lxFiK5/Eu689UI28Eh1tQhAlahIPT76FhqCMxOoVd9kmMCrNQvLXLCR/zUJy/yyE
+	ZQsYWVYxiqUWFOempxYbFpjC4zk5P3cTIzh9alnuYJz+9oPeIUYmDsZDjBIczEoivH/tPVKF
+	eFMSK6tSi/Lji0pzUosPMZoCQ3ois5Rocj4wgeeVxBuaWBqYmBmZWBhbGpspifOee9ubIiSQ
+	nliSmp2aWpBaBNPHxMEp1cBktWZylvJz/qMnBXf2me+tdj9u9aBv2/uNfbtclvXpZDMyCD2d
+	MvlCZd4jRhNGuacfNLi8HJacUM4zsiicHLVM3u5L6ORKXm+GdWkV50oW6ctX9PNuN5CWvnD+
+	5IEtRtEnEoP9fohP32tUKPuEwfjbEZaCzh/HtvxUaMvwiitsf/5I9leO2NYZv6wZNH4bvv97
+	7NfHFZrJJ3LezPL4t/HOm2XiC5MZ2k7yl4mf+/VQvsv72rHEP1bL3u3uM16bVcx0MnNLwkbL
+	AjG1nusfW8QO/HG0jjv9Z06mbmWkbRqTx/k0S41aRttZjuI/9wkw5ayueCt6WJbZ6P9LSZ6C
+	4MoDbDv8n3FozGK69KLZ6J8SS3FGoqEWc1FxIgBWo/7NKAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LZdlhJTjdktmeqwe/FEhZzzrewWEy/OZXZ
+	4umxR+wWF7b1sVpc3jWHzeLYAjGLb6ffMDqwe2xZeZPJY8GmUo9NqzrZPN7vu8rm0bdlFaPH
+	501yAWxRXDYpqTmZZalF+nYJXBk3FmYXLBav6Fq3l7GB8YVQFyMnh4SAiUTz4x0sXYxcHEIC
+	2xklHk9YzgiRkJG4vmAfUIIDyBaWOHy4GKLmFaPEwzXXWUBq2AQMJI79+AlWLyLgL9E04yMb
+	SBGzwBFGicmLnzNDdGxjlJg/ZzcbSBWngKHE23dzmEBsYYFAifcbv4LFWQRUJKY/+sMMYvMK
+	WEp8n/WbFcIWlDg58wnYNmYBPYn16+cwQtjyEtvfzmGGuFRB4ufTZawQVzhJTF7wkx2iRkRi
+	dmcb8wRG4VlIRs1CMmoWklGzkLQsYGRZxSiaWlCcm56bXGCoV5yYW1yal66XnJ+7iREcTVpB
+	OxiXrf+rd4iRiYPxEKMEB7OSCO9fe49UId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rzKOZ0pQgLp
+	iSWp2ampBalFMFkmDk6pBibZ5+nGrUumOMq4SaYdSMub92DtJ2W+8obbfOtv/TJd0zhr1vzP
+	M89MYDYtUWCNDvsk/EelYhGDv378md2fSxJPP+DrFHIN7d18jFOvnynXMMMlvccm6E+gtOeG
+	rx3tIomrisMaa+y+V+azPDjyR/X9Krm5ccx/t6gXHE76ouRy4pPAoinSM66xWvKLa4p7PNv6
+	YXfBEZYdl/comeiVZJ16sT3xe1yuRLJmyYEooboPigk2sY2rTn17+9JMleHbDLOQ4jwG9b+5
+	tTWWqW81WOvf7Cm88t6iP/Xqq5J9Bj+tmZdM3XPG0i572oEbK9bd6L8yg4FPY+OlCKaj+dt/
+	Kl2Va94iq5AW/y9hkdI3LSWW4oxEQy3mouJEADGTrwAVAwAA
+X-CMS-MailID: 20231107020508epcas1p3e3f47fab18e52248f64bfdde05b1e53b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
+References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
+	<20231103072209.1005409-1-jongeon.park@samsung.com>
+	<20231106154812.14c470c2@kernel.org>
 
 
 
-compiler: gcc-12
-test machine: 36 threads 1 sockets Intel(R) Core(TM) i9-10980XE CPU @ 3.00GHz (Cascade Lake) with 32G memory
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, November 7, 2023 8:48 AM
+> To: Jong eon Park <jongeon.park@samsung.com>; Paolo Abeni
+> <pabeni@redhat.com>
+> Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Dong ha Kang <dongha7.kang@samsung.com>
+> Subject: Re: [PATCH] netlink: introduce netlink poll to resolve fast
+> return issue
+> 
+> On Fri,  3 Nov 2023 16:22:09 +0900 Jong eon Park wrote:
+> > In very rare cases, there was an issue where a user's poll function
+> > waiting for a uevent would continuously return very quickly, causing
+> > excessive CPU usage due to the following scenario.
+> >
+> > Once sk_rcvbuf becomes full netlink_broadcast_deliver returns an error
+> > and netlink_overrun is called. However, if netlink_overrun was called
+> > in a context just before a another context returns from the poll and
+> > recv is invoked, emptying the rcvbuf, sk->sk_err = ENOBUF is written
+> > to the netlink socket belatedly and it enters the NETLINK_S_CONGESTED
+> state.
+> > If the user does not check for POLLERR, they cannot consume and clean
+> > sk_err and repeatedly enter the situation where they call poll again
+> > but return immediately.
+> >
+> > To address this issue, I would like to introduce the following netlink
+> > poll.
+> >
+> > After calling the datagram_poll, netlink poll checks the
+> > NETLINK_S_CONGESTED status and rcv queue, and this make the user to be
+> > readable once more even if the user has already emptied rcv queue.
+> > This allows the user to be able to consume sk->sk_err value through
+> > netlink_recvmsg, thus the situation described above can be avoided
+> 
+> The explanation makes sense, but I'm not able to make the jump in
+> understanding how this is a netlink problem. datagram_poll() returns
+> EPOLLERR because sk_err is set, what makes netlink special?
+> The fact that we can have an sk_err with nothing in the recv queue?
+> 
+> Paolo understands this better, maybe he can weigh in tomorrow...
 
-(please refer to attached dmesg/kmsg for entire log/backtrace)
+Perhaps my explanation was not comprehensive enough.
 
+The issue at hand is that once it occurs, users cannot escape from this 
+"busy running" situation, and the inadequate handling of EPOLLERR by users 
+imposes a heavy burden on the entire system, which seems quite harsh.
 
+The reason for a separate netlink poll is related to the netlink state. 
+When it enters the NETLINK_S_CONGESTED state, sk can no longer receive or 
+deliver skb, and the receive_queue must be completely emptied to clear the 
+state. However, it was found that the NETLINK_S_CONGESTED state was still 
+maintained even when the receive_queue was empty, which was incorrect, and 
+that's why I implemented the handling in poll.
 
+I don't consider this approach to be the best way, so if you have any 
+recommendations for a better solution, I would appreciate it.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <oliver.sang@intel.com>
-| Closes: https://lore.kernel.org/oe-lkp/202311061651.88994df5-oliver.sang@intel.com
+Regards.
+JE Park.
 
-
-
-....
-
-# timeout set to 1500
-# selftests: net: rtnetlink.sh
-# PASS: policy routing
-# PASS: route get
-# PASS: preferred_lft addresses have expired
-# PASS: promote_secondaries complete
-# PASS: tc htb hierarchy
-# PASS: gre tunnel endpoint
-# FAIL: gretap
-# PASS: ip6gretap
-# PASS: erspan
-# PASS: ip6erspan
-# PASS: bridge setup
-# PASS: ipv6 addrlabel
-# PASS: set ifalias f007c594-8cc4-4bfa-bf82-fef2dfb81ad2 for test-dummy0
-# PASS: vrf
-# PASS: macsec
-# PASS: macsec_offload
-# PASS: ipsec
-# PASS: ipsec_offload
-# PASS: bridge fdb get
-# PASS: neigh get
-# PASS: bridge_parent_id
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: ipv4: Address not found.
-# Error: ipv4: Address not found.
-# FAIL: address proto IPv4
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "local" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: either "dev" is duplicate, or "proto" is a garbage.
-# Error: ipv6: address not found.
-# Error: ipv6: address not found.
-# FAIL: address proto IPv6
-not ok 15 selftests: net: rtnetlink.sh # exit=1
-
-....
-
-
-
-The kernel config and materials to reproduce are available at:
-https://download.01.org/0day-ci/archive/20231106/202311061651.88994df5-oliver.sang@intel.com
-
-
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
 
