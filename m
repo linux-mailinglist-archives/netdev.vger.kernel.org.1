@@ -1,195 +1,268 @@
-Return-Path: <netdev+bounces-46356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF5F7E3566
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:57:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3607D7E3594
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:12:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 58C25B20B13
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 06:57:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2924280E92
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:12:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30B3BA3B;
-	Tue,  7 Nov 2023 06:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10898C14C;
+	Tue,  7 Nov 2023 07:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+q7cvvn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhQud6YE"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166C28F49
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 06:57:46 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1CA1FC
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:57:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699340264;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2UKkJWw0ipJp0+eK2cyF9Tytq76jRoBcGjC8u2Fp/zg=;
-	b=i+q7cvvngAmqLB8vOLnkavCrJXKpZZ6PGAsXKmBgxYqXOXlTP3eXf543YTZyyoehXlK4W0
-	C/UG6eXybzMoTS+/iKQFT6tXjGLAuYrSXYpI9LYRKXaST4DglG3U9b8y8m0KA5ao/dVwv+
-	M74shnb/24BDno/2k8jeregsbC0flvA=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-457-RMh0r3FQMo2JlXC1z9Wu4g-1; Tue, 07 Nov 2023 01:57:43 -0500
-X-MC-Unique: RMh0r3FQMo2JlXC1z9Wu4g-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9e293cd8269so11128266b.0
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 22:57:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6207A17C3
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 07:12:37 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9EF9A4
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:12:35 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9c2a0725825so785141466b.2
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 23:12:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699341154; x=1699945954; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LeUUPNZL0gBLyKwT6WbASs0i2WFPUjH7V2DAz3vySnQ=;
+        b=FhQud6YEfL+66/PWKnaRbb2KHZF2Mqzm5TjYTtgRyY/EyTg/HTnr8hbiRJSYL6ygJZ
+         GinFTbbydnqGIZLY3Ajz0SlBn+Na1IAfLCGCZt5kQWAukB+pijvxUeE68FTN5jAEWFja
+         UqaNNeioD2lcKJ0F1Mf5qYadkSJeaQm04JPxZa2FlQ0gqwauPUn/IFPxtdY854knWubC
+         fKpdABmMoL073rwszRXHTuwxUBIyZoOl0lJA1fsDhbCjSyHQVu9X85kAzLYI6Ob4uwaa
+         kR11RkFwA5stZkIrohsFxZ4hCUysRjCXsTif8daWr1pXWTdFHR7Sjx0KvYuwmM1+/iFD
+         XcOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699340262; x=1699945062;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2UKkJWw0ipJp0+eK2cyF9Tytq76jRoBcGjC8u2Fp/zg=;
-        b=Kbju/jftMAaIO/Q3u2pkJw42VNECvP1IMhhfFpFNoVZYTcZxA2jXxb/2bghrGMmtd5
-         OMCuv03a1J8jBtRBriIIAJDSlC9t+T6Xjg4rzC26i3PHgyER1TlLZX77rR/NQe3bIi1T
-         nv8e+kpUiBplKX/2FByTM8scf9Aukemve+uI7jYsAta2w4hkpq0lJy5IE+zK68AHKQZP
-         RWjc0HFd2v4azLfnAlHdYBKA6L4Ws15x0RpTfrCgJbo7NsM9oMVfzvNv46amRvqAQXXD
-         fKUUlgDEJ4BHktYgousKe3ic9iy+O/w6puF/cY9qSHEd3s3vstn9IVydhyQahDMbvFyG
-         kE3g==
-X-Gm-Message-State: AOJu0Ywna002XtIfNLLlEKN9bEWzA5ufWnV/rzSyEV/c0VM2mdoQvn2c
-	MiMsXqNr78B1QsKKfLMOPXJ1hVbbp4N+atoOeVNYbt55L8wicq+8tTNdtQbTt4DqWSuaRrPnsUQ
-	qsmaJLW45IO21kt3fQEmcfetTJi3jOwZ+
-X-Received: by 2002:a17:907:2da7:b0:9dd:f00d:c4e5 with SMTP id gt39-20020a1709072da700b009ddf00dc4e5mr7921445ejc.53.1699340262195;
-        Mon, 06 Nov 2023 22:57:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFpoDaO1jLLW4JPf6quOD7RvrGAVMZGCINfmMiWH9FieITjURg9fW1hcoakgE4F7vstqKhiYiv0ExnE/IcXagg=
-X-Received: by 2002:a17:907:2da7:b0:9dd:f00d:c4e5 with SMTP id
- gt39-20020a1709072da700b009ddf00dc4e5mr7921431ejc.53.1699340261949; Mon, 06
- Nov 2023 22:57:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699341154; x=1699945954;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LeUUPNZL0gBLyKwT6WbASs0i2WFPUjH7V2DAz3vySnQ=;
+        b=oIFRvQrXlRROTZVptZDk3FiPlYilJ2Y35dqlNmEGVDtZF29OGBfI+vl11sNogF//kS
+         0VmvoNwyxpPYrfiwrT6FRKmMiiawrWQCCY/iRvcbuRP8cdWTwfzvaB9YyfT8/RtTK0Y3
+         ZUU59aoR7bijHB1/ABNz91VcZezSwxQA6GBc7qRw1mkr8gflLtahz+gJ4aglkxJdqkGY
+         UzKA5CrZzQkRgKlFygQYawjvca2dqhCs84i4XW6+zZjgaJDkhBTvlmTNhsvdACu7dUxF
+         fgv8zXXjpwjcpBTjS5y2rtlXiZY+5CXvJ/mbRjolrKO3o/sZD040G3MsfwOT+Tk7+0L0
+         zhhQ==
+X-Gm-Message-State: AOJu0Ywvt6yF5Fbermi/vccmkdW3T6c1nE1eBarANmmaBoCjNCBIKAM3
+	EOuzeA8yXcYDN7LxM+WRLeSa9b5axbs=
+X-Google-Smtp-Source: AGHT+IFge4/RCdsg4nwjtyUqWSN4pqE9ILk0snXBE7WlCRFNXnz+s2h1+KsBdAJWLC3u0mBrRMNnMQ==
+X-Received: by 2002:a17:907:9814:b0:9d5:9065:90aa with SMTP id ji20-20020a170907981400b009d5906590aamr15457402ejc.76.1699341154073;
+        Mon, 06 Nov 2023 23:12:34 -0800 (PST)
+Received: from ?IPV6:2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720? (dynamic-2a01-0c22-6f6b-1c00-45f5-1cd8-f090-5720.c22.pool.telefonica.de. [2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720])
+        by smtp.googlemail.com with ESMTPSA id d8-20020a05600c34c800b0040770ec2c19sm14979282wmq.10.2023.11.06.23.12.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 06 Nov 2023 23:12:33 -0800 (PST)
+Message-ID: <8d90ab93-cc15-4e14-a972-ebdd2eb89f00@gmail.com>
+Date: Tue, 7 Nov 2023 08:12:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-4-lulu@redhat.com>
- <CACGkMEtVfHL2WPwxkYEfTKBE10uWfB2a75QQOO8rzn3=Y9FiBg@mail.gmail.com>
-In-Reply-To: <CACGkMEtVfHL2WPwxkYEfTKBE10uWfB2a75QQOO8rzn3=Y9FiBg@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 7 Nov 2023 14:57:04 +0800
-Message-ID: <CACLfguX9-wEQPUyZkJZoRMmgPDRFNyZCmt0nvHROhyP1yooiYA@mail.gmail.com>
-Subject: Re: [RFC v1 3/8] vhost: Add 3 new uapi to support iommufd
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] r8169: add handling DASH when DASH is disabled
+Content-Language: en-US
+To: ChunHao Lin <hau@realtek.com>
+Cc: netdev@vger.kernel.org, nic_swsd@realtek.com
+References: <20231106151124.9175-1-hau@realtek.com>
+ <20231106151124.9175-2-hau@realtek.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20231106151124.9175-2-hau@realtek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 6, 2023 at 3:30=E2=80=AFPM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Sat, Nov 4, 2023 at 1:17=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
-> >
-> > VHOST_VDPA_SET_IOMMU_FD: bind the device to iommufd device
-> >
-> > VDPA_DEVICE_ATTACH_IOMMUFD_AS: Attach a vdpa device to an iommufd
-> > address space specified by IOAS id.
-> >
-> > VDPA_DEVICE_DETACH_IOMMUFD_AS: Detach a vdpa device
-> > from the iommufd address space
-> >
-> > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > ---
->
-> [...]
->
-> > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > index f5c48b61ab62..07e1b2c443ca 100644
-> > --- a/include/uapi/linux/vhost.h
-> > +++ b/include/uapi/linux/vhost.h
-> > @@ -219,4 +219,70 @@
-> >   */
-> >  #define VHOST_VDPA_RESUME              _IO(VHOST_VIRTIO, 0x7E)
-> >
-> > +/* vhost_vdpa_set_iommufd
-> > + * Input parameters:
-> > + * @iommufd: file descriptor from /dev/iommu; pass -1 to unset
-> > + * @iommufd_ioasid: IOAS identifier returned from ioctl(IOMMU_IOAS_ALL=
-OC)
-> > + * Output parameters:
-> > + * @out_dev_id: device identifier
-> > + */
-> > +struct vhost_vdpa_set_iommufd {
-> > +       __s32 iommufd;
-> > +       __u32 iommufd_ioasid;
-> > +       __u32 out_dev_id;
-> > +};
-> > +
-> > +#define VHOST_VDPA_SET_IOMMU_FD \
-> > +       _IOW(VHOST_VIRTIO, 0x7F, struct vhost_vdpa_set_iommufd)
-> > +
-> > +/*
-> > + * VDPA_DEVICE_ATTACH_IOMMUFD_AS -
-> > + * _IOW(VHOST_VIRTIO, 0x7f, struct vdpa_device_attach_iommufd_as)
-> > + *
-> > + * Attach a vdpa device to an iommufd address space specified by IOAS
-> > + * id.
-> > + *
-> > + * Available only after a device has been bound to iommufd via
-> > + * VHOST_VDPA_SET_IOMMU_FD
-> > + *
-> > + * Undo by VDPA_DEVICE_DETACH_IOMMUFD_AS or device fd close.
-> > + *
-> > + * @argsz:     user filled size of this data.
-> > + * @flags:     must be 0.
-> > + * @ioas_id:   Input the target id which can represent an ioas
-> > + *             allocated via iommufd subsystem.
-> > + *
-> > + * Return: 0 on success, -errno on failure.
-> > + */
-> > +struct vdpa_device_attach_iommufd_as {
-> > +       __u32 argsz;
-> > +       __u32 flags;
-> > +       __u32 ioas_id;
-> > +};
->
-> I think we need to map ioas to vDPA AS, so there should be an ASID
-> from the view of vDPA?
->
-> Thanks
->
-The qemu will have a structure save and  maintain this information,So
-I didn't add this
- in kernel=EF=BC=8Cwe can add this but maybe only for check?
-this in
-Thanks
-Cindy
-> > +
-> > +#define VDPA_DEVICE_ATTACH_IOMMUFD_AS \
-> > +       _IOW(VHOST_VIRTIO, 0x82, struct vdpa_device_attach_iommufd_as)
-> > +
-> > +/*
-> > + * VDPA_DEVICE_DETACH_IOMMUFD_AS
-> > + *
-> > + * Detach a vdpa device from the iommufd address space it has been
-> > + * attached to. After it, device should be in a blocking DMA state.
-> > + *
-> > + * Available only after a device has been bound to iommufd via
-> > + * VHOST_VDPA_SET_IOMMU_FD
-> > + *
-> > + * @argsz:     user filled size of this data.
-> > + * @flags:     must be 0.
-> > + *
-> > + * Return: 0 on success, -errno on failure.
-> > + */
-> > +struct vdpa_device_detach_iommufd_as {
-> > +       __u32 argsz;
-> > +       __u32 flags;
-> > +};
-> > +
-> > +#define VDPA_DEVICE_DETACH_IOMMUFD_AS \
-> > +       _IOW(VHOST_VIRTIO, 0x83, struct vdpa_device_detach_iommufd_as)
-> > +
-> >  #endif
-> > --
-> > 2.34.3
-> >
->
+On 06.11.2023 16:11, ChunHao Lin wrote:
+> For devices that support DASH, even DASH is disabled, there may still
+> exist a default firmware that will influence device behavior.
+> So driver needs to handle DASH for devices that support DASH, no matter
+> the DASH status is.
+> 
+AFAICS there's no functional change in patch 1 (except the dash disabled
+message). It just prepares patch 2. That's worth mentioning.
+
+> Fixes: ee7a1beb9759 ("r8169:call "rtl8168_driver_start" "rtl8168_driver_stop" only when hardware dash function is enabled")
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+
+stable should be cc'ed
+
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 37 +++++++++++++++++------
+>  1 file changed, 27 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 4b8251cdb436..8cbd7c96d9e1 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -624,6 +624,7 @@ struct rtl8169_private {
+>  
+>  	unsigned supports_gmii:1;
+>  	unsigned aspm_manageable:1;
+> +	unsigned dash_enable:1;
+
+better: dash_enabled
+
+>  	dma_addr_t counters_phys_addr;
+>  	struct rtl8169_counters *counters;
+>  	struct rtl8169_tc_offsets tc_offset;
+> @@ -1253,14 +1254,26 @@ static bool r8168ep_check_dash(struct rtl8169_private *tp)
+>  	return r8168ep_ocp_read(tp, 0x128) & BIT(0);
+>  }
+>  
+> -static enum rtl_dash_type rtl_check_dash(struct rtl8169_private *tp)
+> +static bool rtl_check_dash(struct rtl8169_private *tp)
+
+maybe better: rtl_dash_is_enabled()
+
+> +{
+> +	switch (tp->dash_type) {
+> +	case RTL_DASH_DP:
+> +		return r8168dp_check_dash(tp);
+> +	case RTL_DASH_EP:
+> +		return r8168ep_check_dash(tp);
+> +	default:
+> +		return 0;
+
+false instead of 0
+
+> +	}
+> +}
+> +
+> +static enum rtl_dash_type rtl_check_dash_type(struct rtl8169_private *tp)
+>  {
+
+maybe better: rtl_get_dash_type()
+
+>  	switch (tp->mac_version) {
+>  	case RTL_GIGA_MAC_VER_28:
+>  	case RTL_GIGA_MAC_VER_31:
+> -		return r8168dp_check_dash(tp) ? RTL_DASH_DP : RTL_DASH_NONE;
+> +		return RTL_DASH_DP;
+>  	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
+> -		return r8168ep_check_dash(tp) ? RTL_DASH_EP : RTL_DASH_NONE;
+> +		return RTL_DASH_EP;
+>  	default:
+>  		return RTL_DASH_NONE;
+>  	}
+> @@ -1453,7 +1466,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
+>  
+>  	device_set_wakeup_enable(tp_to_dev(tp), wolopts);
+>  
+> -	if (tp->dash_type == RTL_DASH_NONE) {
+> +	if (!tp->dash_enable) {
+>  		rtl_set_d3_pll_down(tp, !wolopts);
+>  		tp->dev->wol_enabled = wolopts ? 1 : 0;
+>  	}
+> @@ -2512,7 +2525,7 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
+>  
+>  static void rtl_prepare_power_down(struct rtl8169_private *tp)
+>  {
+> -	if (tp->dash_type != RTL_DASH_NONE)
+> +	if (tp->dash_enable)
+>  		return;
+>  
+>  	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
+> @@ -4867,7 +4880,7 @@ static int rtl8169_runtime_idle(struct device *device)
+>  {
+>  	struct rtl8169_private *tp = dev_get_drvdata(device);
+>  
+> -	if (tp->dash_type != RTL_DASH_NONE)
+> +	if (tp->dash_enable)
+>  		return -EBUSY;
+>  
+>  	if (!netif_running(tp->dev) || !netif_carrier_ok(tp->dev))
+> @@ -4894,7 +4907,7 @@ static void rtl_shutdown(struct pci_dev *pdev)
+>  	rtl_rar_set(tp, tp->dev->perm_addr);
+>  
+>  	if (system_state == SYSTEM_POWER_OFF &&
+> -	    tp->dash_type == RTL_DASH_NONE) {
+> +		!tp->dash_enable) {
+>  		pci_wake_from_d3(pdev, tp->saved_wolopts);
+>  		pci_set_power_state(pdev, PCI_D3hot);
+>  	}
+> @@ -5252,7 +5265,8 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  		rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1);
+>  	tp->aspm_manageable = !rc;
+>  
+> -	tp->dash_type = rtl_check_dash(tp);
+> +	tp->dash_type = rtl_check_dash_type(tp);
+> +	tp->dash_enable = rtl_check_dash(tp);
+>  
+>  	tp->cp_cmd = RTL_R16(tp, CPlusCmd) & CPCMD_MASK;
+>  
+> @@ -5323,7 +5337,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	/* configure chip for default features */
+>  	rtl8169_set_features(dev, dev->features);
+>  
+> -	if (tp->dash_type == RTL_DASH_NONE) {
+> +	if (!tp->dash_enable) {
+>  		rtl_set_d3_pll_down(tp, true);
+>  	} else {
+>  		rtl_set_d3_pll_down(tp, false);
+> @@ -5363,7 +5377,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  			    "ok" : "ko");
+>  
+>  	if (tp->dash_type != RTL_DASH_NONE) {
+> -		netdev_info(dev, "DASH enabled\n");
+> +		if (tp->dash_enable)
+> +			netdev_info(dev, "DASH enabled\n");
+> +		else
+> +			netdev_info(dev, "DASH disabled\n");
+
+alternative:
+netdev_info(dev, "DASH %s\n", tp->dash_enabled ? "enabled" : "disabled")
+
+>  		rtl8168_driver_start(tp);
+>  	}
+>  
 
 
