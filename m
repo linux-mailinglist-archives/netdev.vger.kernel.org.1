@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-46357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3607D7E3594
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:12:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB0E7E3599
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:14:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2924280E92
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCDB4280EE2
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10898C14C;
-	Tue,  7 Nov 2023 07:12:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085F1C15B;
+	Tue,  7 Nov 2023 07:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhQud6YE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lX1maKFb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6207A17C3
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 07:12:37 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9EF9A4
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:12:35 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-9c2a0725825so785141466b.2
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 23:12:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8A9C2C0
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 07:14:50 +0000 (UTC)
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F56120
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:14:49 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-509109104e2so6977072e87.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 23:14:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699341154; x=1699945954; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699341287; x=1699946087; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=LeUUPNZL0gBLyKwT6WbASs0i2WFPUjH7V2DAz3vySnQ=;
-        b=FhQud6YEfL+66/PWKnaRbb2KHZF2Mqzm5TjYTtgRyY/EyTg/HTnr8hbiRJSYL6ygJZ
-         GinFTbbydnqGIZLY3Ajz0SlBn+Na1IAfLCGCZt5kQWAukB+pijvxUeE68FTN5jAEWFja
-         UqaNNeioD2lcKJ0F1Mf5qYadkSJeaQm04JPxZa2FlQ0gqwauPUn/IFPxtdY854knWubC
-         fKpdABmMoL073rwszRXHTuwxUBIyZoOl0lJA1fsDhbCjSyHQVu9X85kAzLYI6Ob4uwaa
-         kR11RkFwA5stZkIrohsFxZ4hCUysRjCXsTif8daWr1pXWTdFHR7Sjx0KvYuwmM1+/iFD
-         XcOQ==
+        bh=X8sfscZNgvFdNuYLj9pz7pxUEhl0FJn2711ooDKEXvA=;
+        b=lX1maKFbxrDpUne0rsUYkkB3wW0iTYcKCQiSS7Go8O0W9IBweQxMUlLyclGezZdfVO
+         I14zfEIFxRbDdkq2AaVU9J8DMwNm+vzoWcdgwNm1d1mFw6IoKCxg0Hu18zuGr8A17t2j
+         hDjvUZzr47dTgfP1iwJeFTm6TWgivRZf+e59Ajb6d4xEVa2kJMLdnErDySO6DzimI/8R
+         YM8nPf3liCFze6qarKCmHmQr9LTR8ZxBfh2LjeBityXpIXuCI77J27zY0xGmRcYNbaf/
+         zRKOHEhUg/pZwtse/3hKIWrBCroTEuEQ9bBFSeMhJIpaHdDaowWKxLw0jPJjTX2AKbnE
+         SbkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699341154; x=1699945954;
+        d=1e100.net; s=20230601; t=1699341287; x=1699946087;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LeUUPNZL0gBLyKwT6WbASs0i2WFPUjH7V2DAz3vySnQ=;
-        b=oIFRvQrXlRROTZVptZDk3FiPlYilJ2Y35dqlNmEGVDtZF29OGBfI+vl11sNogF//kS
-         0VmvoNwyxpPYrfiwrT6FRKmMiiawrWQCCY/iRvcbuRP8cdWTwfzvaB9YyfT8/RtTK0Y3
-         ZUU59aoR7bijHB1/ABNz91VcZezSwxQA6GBc7qRw1mkr8gflLtahz+gJ4aglkxJdqkGY
-         UzKA5CrZzQkRgKlFygQYawjvca2dqhCs84i4XW6+zZjgaJDkhBTvlmTNhsvdACu7dUxF
-         fgv8zXXjpwjcpBTjS5y2rtlXiZY+5CXvJ/mbRjolrKO3o/sZD040G3MsfwOT+Tk7+0L0
-         zhhQ==
-X-Gm-Message-State: AOJu0Ywvt6yF5Fbermi/vccmkdW3T6c1nE1eBarANmmaBoCjNCBIKAM3
-	EOuzeA8yXcYDN7LxM+WRLeSa9b5axbs=
-X-Google-Smtp-Source: AGHT+IFge4/RCdsg4nwjtyUqWSN4pqE9ILk0snXBE7WlCRFNXnz+s2h1+KsBdAJWLC3u0mBrRMNnMQ==
-X-Received: by 2002:a17:907:9814:b0:9d5:9065:90aa with SMTP id ji20-20020a170907981400b009d5906590aamr15457402ejc.76.1699341154073;
-        Mon, 06 Nov 2023 23:12:34 -0800 (PST)
+        bh=X8sfscZNgvFdNuYLj9pz7pxUEhl0FJn2711ooDKEXvA=;
+        b=eGjkHH+qWqAszvufFiJhD6yT1ql0pk+QU4Qi3+wpfsYxqOsn/JGsxb43MgUaKfYJJU
+         9RJmfUwQldiT+zELis1BgXNoDblOXNpAZpQlUQAYQcvczYymlWrw5RsWdLhlUI4rd+L3
+         kio/IDA6laI1zaMZmumuKUudXTKQGyRxln/J1rl3LFBIUrfCvPstpGRr8eFV4GO7gOxh
+         tpSRiHQy4Xp7c2bGHJT2saEh8bPt6DQxffqdzZ2+M60qTY0g742W5GUbNhgLJ6ZUCnRa
+         raetdOINlrLObh1UD+KLnb90grtf3uoiz3xyjdzoED7M3VwXFveEEgDumQ4qdLr+YUAu
+         2JGQ==
+X-Gm-Message-State: AOJu0YxXAuLNW8PFdjGnp7Yd2hnUGe5LULLu2efzaJZt7gnIMdIoTBUz
+	uuaNLPKsAExLZb9xgW/Vlhg=
+X-Google-Smtp-Source: AGHT+IFOK+EQMAYxdvAw8YBbFUllXwIq2zymtqE+4FDosJiJOIcomruo/QcddP2rDDRzDG920AnTXA==
+X-Received: by 2002:a19:434d:0:b0:503:655:12e7 with SMTP id m13-20020a19434d000000b00503065512e7mr21492182lfj.62.1699341286711;
+        Mon, 06 Nov 2023 23:14:46 -0800 (PST)
 Received: from ?IPV6:2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720? (dynamic-2a01-0c22-6f6b-1c00-45f5-1cd8-f090-5720.c22.pool.telefonica.de. [2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720])
-        by smtp.googlemail.com with ESMTPSA id d8-20020a05600c34c800b0040770ec2c19sm14979282wmq.10.2023.11.06.23.12.33
+        by smtp.googlemail.com with ESMTPSA id b18-20020a5d6352000000b0032f933556b8sm1496783wrw.7.2023.11.06.23.14.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 23:12:33 -0800 (PST)
-Message-ID: <8d90ab93-cc15-4e14-a972-ebdd2eb89f00@gmail.com>
-Date: Tue, 7 Nov 2023 08:12:36 +0100
+        Mon, 06 Nov 2023 23:14:46 -0800 (PST)
+Message-ID: <942b9e65-205c-46f1-8c37-1fb627d28775@gmail.com>
+Date: Tue, 7 Nov 2023 08:14:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,12 +67,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] r8169: add handling DASH when DASH is disabled
+Subject: Re: [PATCH net 0/2] r8169: fix DASH deviceis network lost issue
 Content-Language: en-US
 To: ChunHao Lin <hau@realtek.com>
 Cc: netdev@vger.kernel.org, nic_swsd@realtek.com
 References: <20231106151124.9175-1-hau@realtek.com>
- <20231106151124.9175-2-hau@realtek.com>
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -117,152 +116,22 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20231106151124.9175-2-hau@realtek.com>
+In-Reply-To: <20231106151124.9175-1-hau@realtek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 06.11.2023 16:11, ChunHao Lin wrote:
-> For devices that support DASH, even DASH is disabled, there may still
-> exist a default firmware that will influence device behavior.
-> So driver needs to handle DASH for devices that support DASH, no matter
-> the DASH status is.
+> This series are used to fix network lost issue on systems that support
+> DASH.
 > 
-AFAICS there's no functional change in patch 1 (except the dash disabled
-message). It just prepares patch 2. That's worth mentioning.
+As I have no he to test this: Can you add on which hw you tested this patch?
 
-> Fixes: ee7a1beb9759 ("r8169:call "rtl8168_driver_start" "rtl8168_driver_stop" only when hardware dash function is enabled")
-> Signed-off-by: ChunHao Lin <hau@realtek.com>
-
-stable should be cc'ed
-
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 37 +++++++++++++++++------
->  1 file changed, 27 insertions(+), 10 deletions(-)
+> ChunHao Lin (2):
+>   r8169: add handling DASH when DASH is disabled
+>   r8169: fix network lost after resume on DASH systems
 > 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 4b8251cdb436..8cbd7c96d9e1 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -624,6 +624,7 @@ struct rtl8169_private {
->  
->  	unsigned supports_gmii:1;
->  	unsigned aspm_manageable:1;
-> +	unsigned dash_enable:1;
-
-better: dash_enabled
-
->  	dma_addr_t counters_phys_addr;
->  	struct rtl8169_counters *counters;
->  	struct rtl8169_tc_offsets tc_offset;
-> @@ -1253,14 +1254,26 @@ static bool r8168ep_check_dash(struct rtl8169_private *tp)
->  	return r8168ep_ocp_read(tp, 0x128) & BIT(0);
->  }
->  
-> -static enum rtl_dash_type rtl_check_dash(struct rtl8169_private *tp)
-> +static bool rtl_check_dash(struct rtl8169_private *tp)
-
-maybe better: rtl_dash_is_enabled()
-
-> +{
-> +	switch (tp->dash_type) {
-> +	case RTL_DASH_DP:
-> +		return r8168dp_check_dash(tp);
-> +	case RTL_DASH_EP:
-> +		return r8168ep_check_dash(tp);
-> +	default:
-> +		return 0;
-
-false instead of 0
-
-> +	}
-> +}
-> +
-> +static enum rtl_dash_type rtl_check_dash_type(struct rtl8169_private *tp)
->  {
-
-maybe better: rtl_get_dash_type()
-
->  	switch (tp->mac_version) {
->  	case RTL_GIGA_MAC_VER_28:
->  	case RTL_GIGA_MAC_VER_31:
-> -		return r8168dp_check_dash(tp) ? RTL_DASH_DP : RTL_DASH_NONE;
-> +		return RTL_DASH_DP;
->  	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
-> -		return r8168ep_check_dash(tp) ? RTL_DASH_EP : RTL_DASH_NONE;
-> +		return RTL_DASH_EP;
->  	default:
->  		return RTL_DASH_NONE;
->  	}
-> @@ -1453,7 +1466,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
->  
->  	device_set_wakeup_enable(tp_to_dev(tp), wolopts);
->  
-> -	if (tp->dash_type == RTL_DASH_NONE) {
-> +	if (!tp->dash_enable) {
->  		rtl_set_d3_pll_down(tp, !wolopts);
->  		tp->dev->wol_enabled = wolopts ? 1 : 0;
->  	}
-> @@ -2512,7 +2525,7 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
->  
->  static void rtl_prepare_power_down(struct rtl8169_private *tp)
->  {
-> -	if (tp->dash_type != RTL_DASH_NONE)
-> +	if (tp->dash_enable)
->  		return;
->  
->  	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
-> @@ -4867,7 +4880,7 @@ static int rtl8169_runtime_idle(struct device *device)
->  {
->  	struct rtl8169_private *tp = dev_get_drvdata(device);
->  
-> -	if (tp->dash_type != RTL_DASH_NONE)
-> +	if (tp->dash_enable)
->  		return -EBUSY;
->  
->  	if (!netif_running(tp->dev) || !netif_carrier_ok(tp->dev))
-> @@ -4894,7 +4907,7 @@ static void rtl_shutdown(struct pci_dev *pdev)
->  	rtl_rar_set(tp, tp->dev->perm_addr);
->  
->  	if (system_state == SYSTEM_POWER_OFF &&
-> -	    tp->dash_type == RTL_DASH_NONE) {
-> +		!tp->dash_enable) {
->  		pci_wake_from_d3(pdev, tp->saved_wolopts);
->  		pci_set_power_state(pdev, PCI_D3hot);
->  	}
-> @@ -5252,7 +5265,8 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  		rc = pci_disable_link_state(pdev, PCIE_LINK_STATE_L1);
->  	tp->aspm_manageable = !rc;
->  
-> -	tp->dash_type = rtl_check_dash(tp);
-> +	tp->dash_type = rtl_check_dash_type(tp);
-> +	tp->dash_enable = rtl_check_dash(tp);
->  
->  	tp->cp_cmd = RTL_R16(tp, CPlusCmd) & CPCMD_MASK;
->  
-> @@ -5323,7 +5337,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	/* configure chip for default features */
->  	rtl8169_set_features(dev, dev->features);
->  
-> -	if (tp->dash_type == RTL_DASH_NONE) {
-> +	if (!tp->dash_enable) {
->  		rtl_set_d3_pll_down(tp, true);
->  	} else {
->  		rtl_set_d3_pll_down(tp, false);
-> @@ -5363,7 +5377,10 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  			    "ok" : "ko");
->  
->  	if (tp->dash_type != RTL_DASH_NONE) {
-> -		netdev_info(dev, "DASH enabled\n");
-> +		if (tp->dash_enable)
-> +			netdev_info(dev, "DASH enabled\n");
-> +		else
-> +			netdev_info(dev, "DASH disabled\n");
-
-alternative:
-netdev_info(dev, "DASH %s\n", tp->dash_enabled ? "enabled" : "disabled")
-
->  		rtl8168_driver_start(tp);
->  	}
->  
+>  drivers/net/ethernet/realtek/r8169_main.c | 43 +++++++++++++++++------
+>  1 file changed, 33 insertions(+), 10 deletions(-)
+> 
 
 
