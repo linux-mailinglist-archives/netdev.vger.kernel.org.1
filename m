@@ -1,147 +1,82 @@
-Return-Path: <netdev+bounces-46525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F4EC7E4B85
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:11:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 056E37E4B99
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A39281138
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:11:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366C91C20AA0
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9172A1A4;
-	Tue,  7 Nov 2023 22:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD592A1BB;
+	Tue,  7 Nov 2023 22:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H2HecGuA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tSykE0H1"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9BD2F870
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 22:11:08 +0000 (UTC)
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF62410FB
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:11:07 -0800 (PST)
-Received: by mail-ua1-x929.google.com with SMTP id a1e0cc1a2514c-7bac330d396so2293502241.1
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 14:11:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699395067; x=1699999867; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GbbSAsuabIr4BwrZEqK8c8XYZufkR++Mr7B/MiPJA0o=;
-        b=H2HecGuAWdWApGZBswfYfMpGXm37AHw0nDvVqm0SK9guPY+f0qGNJ0wkKZx8aLgTpo
-         vBs3T24Ecqc0Wla336n8sIuuCmk1YdXARx9cbiod0i2TpLLJ7Nbkw8GApOJL16QliGH7
-         FP9GGvHGIkMpUO15nRlrhFUyyLfiGzX2HpBos7EL/qmRRvxkLvHv8T0yGEOAh9PvqHs9
-         Iq1B9Px5nVuxQ6JJp+2tone3XdgSZcvI3yM/DkdANDnWnk1FL3lVtXRgGTcT/UDbllZo
-         91D44aUcO0xSc8+WM/cA0n0cNcar08uF69AgMMR9mRSw3ylGOJgpku2pqp9f3GQVGmT9
-         N0pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699395067; x=1699999867;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GbbSAsuabIr4BwrZEqK8c8XYZufkR++Mr7B/MiPJA0o=;
-        b=eAGpHdI00J2VOdi3nbQWUcKlUE1mw4ZOyQZtKZpssGA62vvgmEFuT6GblQFDdQNIMC
-         A9gYKaonolnIc/s9QmonFFX/+CPSB0XlrsV0FP9MEuMEKy06o/9e2JBqmU8kJrV9WLaV
-         yZRnvoxrizlRc5RwRVpUVQwjNa0e1eyarA5Cy7FRg1nC2vygkbVwEUZXU3gZKklmNtqd
-         xaD3qv62LW4Q8tnUqNJufuJmUH4Z8NNTUzfuw2jleiKCetpBilZ88pvKIyWuKYx3Y3S+
-         2jTzCC+4A1+H9szKJOXLjCXnYmlXgcWZgFRj7aScVS338lSnRF7JGnc4++J1XTFlgMN1
-         Q9fg==
-X-Gm-Message-State: AOJu0YyLPTsSAw3u5NOB+zvydQz4MBSrbEYUPuKzlSZra1jm8RXcwaEJ
-	hMhl7lVyOVg2Du2M3T5JTT4qmpOkQjdGDJY/cEdU4g==
-X-Google-Smtp-Source: AGHT+IGk2R54zWB6aRa4RbSeBT9Z8J5T4TXiyB4Vle9bwzR5GqISmJH2OZCPqY1SUXwwMEpn8Stt8en869yrOvH8V6Y=
-X-Received: by 2002:a05:6102:474b:b0:45f:4e55:9c4b with SMTP id
- ej11-20020a056102474b00b0045f4e559c4bmr5313415vsb.31.1699395066619; Tue, 07
- Nov 2023 14:11:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0562A1A4
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 22:20:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D131C433C8;
+	Tue,  7 Nov 2023 22:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699395625;
+	bh=u5ZRGxzcwj01x84zTuvGZgszUEpJS89vsjD7KAezq/0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tSykE0H1u85coMDP5Xdy7J+bUXexqNZl9lXvjN4C3ejZPCKZyufiIkyYyBUp6Yba9
+	 7cnAkDmNNS0shN5P/W9v9Y58NxjNlUqwZFJ9iwmpcLSyaooyVv6uYrnxBON+TK+H2r
+	 8WI63hGGbFe5J1hMZWqOUNh7F01rzu85LLu1sg3T2t/g/o144LVx5bBSia4TVKNkSa
+	 YpBMF6FTZIi0Jb2MjAxFe0TefPkjxefF3KB4XVinSLrEKJVnUBFsx2pkkspVlH5Uo3
+	 0vCOUcn1TXUAy+hTPEpsvNiWM2Edga3lhwc7ySqsPUjhQRidKLP/4Yzv48EQONhvS3
+	 TFYR29OVTa5pA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E71C0E00083;
+	Tue,  7 Nov 2023 22:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-6-almasrymina@google.com> <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
-In-Reply-To: <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 Nov 2023 14:10:52 -0800
-Message-ID: <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
-To: David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] tg3: Fix the TX ring stall
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169939562494.24931.8185977865842706438.git-patchwork-notify@kernel.org>
+Date: Tue, 07 Nov 2023 22:20:24 +0000
+References: <20231105185828.287004-1-alexey.pakhunov@spacex.com>
+In-Reply-To: <20231105185828.287004-1-alexey.pakhunov@spacex.com>
+To: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com
 
-On Mon, Nov 6, 2023 at 3:44=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 11/5/23 7:44 PM, Mina Almasry wrote:
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index eeeda849115c..1c351c138a5b 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
-> >  };
-> >
-> >  #ifdef CONFIG_DMA_SHARED_BUFFER
-> > +struct page_pool_iov *
-> > +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
-> > +void netdev_free_devmem(struct page_pool_iov *ppiov);
->
-> netdev_{alloc,free}_dmabuf?
->
+Hello:
 
-Can do.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> I say that because a dmabuf can be host memory, at least I am not aware
-> of a restriction that a dmabuf is device memory.
->
+On Sun, 5 Nov 2023 10:58:28 -0800 you wrote:
+> From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+> 
+> The TX ring maintained by the tg3 driver can end up in the state, when it
+> has packets queued for sending but the NIC hardware is not informed, so no
+> progress is made. This leads to a multi-second interruption in network
+> traffic followed by dev_watchdog() firing and resetting the queue.
+> 
+> [...]
 
-In my limited experience dma-buf is generally device memory, and
-that's really its use case. CONFIG_UDMABUF is a driver that mocks
-dma-buf with a memfd which I think is used for testing. But I can do
-the rename, it's more clear anyway, I think.
+Here is the summary with links:
+  - [v3] tg3: Fix the TX ring stall
+    https://git.kernel.org/netdev/net/c/c542b39b607d
 
-On Mon, Nov 6, 2023 at 11:45=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2023/11/6 10:44, Mina Almasry wrote:
-> > +
-> > +void netdev_free_devmem(struct page_pool_iov *ppiov)
-> > +{
-> > +     struct netdev_dmabuf_binding *binding =3D page_pool_iov_binding(p=
-piov);
-> > +
-> > +     refcount_set(&ppiov->refcount, 1);
-> > +
-> > +     if (gen_pool_has_addr(binding->chunk_pool,
-> > +                           page_pool_iov_dma_addr(ppiov), PAGE_SIZE))
->
-> When gen_pool_has_addr() returns false, does it mean something has gone
-> really wrong here?
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Yes, good eye. gen_pool_has_addr() should never return false, but then
-again, gen_pool_free()  BUG_ON()s if it doesn't find the address,
-which is an extremely severe reaction to what can be a minor bug in
-the accounting. I prefer to leak rather than crash the machine. It's a
-bit of defensive programming that is normally frowned upon, but I feel
-like in this case it's maybe warranted due to the very severe reaction
-(BUG_ON).
 
---=20
-Thanks,
-Mina
 
