@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-46446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 541387E4147
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:55:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5957E41A2
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 15:12:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5380D1C209F3
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:55:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 406B11C20B0A
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF6C30D0C;
-	Tue,  7 Nov 2023 13:55:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7930F9F;
+	Tue,  7 Nov 2023 14:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAXNPXkL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J9fogmrC"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8999182C8
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:55:13 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B55710FD
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 05:55:12 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-5079f6efd64so7033095e87.2
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 05:55:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699365310; x=1699970110; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=W/3ePFEPzKQWOM3nOSX/yJ6R3zGL0DsR9CwluQIWSUA=;
-        b=JAXNPXkLy+DjDu3V+ygMQ07tIqiRV6FuoXH+ZBIcYOcpd4Bbbrqqyp40vmu3z20Tat
-         0NyU9VIuAw4zrE+E4VNHukyoRzbfMlsz5TDJxM4WYrgxpXnfsHnrR33zGBn4XxlODbns
-         OgHv8PFeoFuujxanX+AIKkZOl+hciTpJalscq5wJEhJycX7eboVFnOS8IIE3cohLlAIi
-         iNUduoVbZbuyajgcip+iFrJTPmjGRILv0k3YvqBoHG0qiO/WcOCRLh2Spse7WMaGTE6s
-         9/mknsN1+bvWrjKEk5xFLup6xmhOnAuttFdSbjSURuj18QIWhelN/Mhygb6YOZShzh6m
-         yGTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699365310; x=1699970110;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=W/3ePFEPzKQWOM3nOSX/yJ6R3zGL0DsR9CwluQIWSUA=;
-        b=q+b/o8Xl7Kulzp1iXSAk8p2c1VDdnjKwyhPeHC6vDCG8M1Ok+XuSjLnE3wibgHL6KN
-         H6X9ppYMOMUzDqwQYm3dbsP1tqr/rckcBJhyky7rH+wEAEc2aubS59BFL4TOQopjB8O4
-         pTibmjapHxr2MiDoJdEo9LohQZyK26DwxaU0opWNrMHLQdUEKMB8cHAdZdHQ6tDas2BW
-         xPWOMkWOGhDWrslYT/IpEvbLDNqZM8YiL4fzacFGBpd447nVhArIO/Otb5O41h1eFa8t
-         FkkKeRixGcZWXNj/5vEZ5hwApGdLUa4GzxIJjd9rHzbhPeaDLlTR6YpQ+V1RZG2H+7WK
-         +ejQ==
-X-Gm-Message-State: AOJu0YxTeZ7JI886uJ47joFVq6T77UNuLztMCQbaKWnc+XuspGGgONyq
-	LL40/yIDGdz4AVBLdTWioJ6qayvO4LR1GwdtBYs=
-X-Google-Smtp-Source: AGHT+IE0lDOGqWnY5/Dp21jIBsj7GHx6gwQkrqcwfVNx3qqxklbu+FAoTfobUWwn/frNUhKJQiCEJK1morasBTY4GqA=
-X-Received: by 2002:a05:6512:3582:b0:505:9872:7a16 with SMTP id
- m2-20020a056512358200b0050598727a16mr22137256lfr.49.1699365310221; Tue, 07
- Nov 2023 05:55:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587D730F8F
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:12:42 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2085.outbound.protection.outlook.com [40.107.95.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C798AC2;
+	Tue,  7 Nov 2023 06:12:40 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=O3jMmC3tpIZ8prSa4EohGwxrE4VkRQBK25xJ40qZWexs5cW9YFPgxZrUhBhKyd3kelMAl/dBw7KqJf3boWahYc5mC72NfZTQhGr60yZnNHxFWsr/NvUSdjBGdPfgUhdDe9/zoRxrNb+iEFXarAMbrvk990g6ziNaF6QW8Fz+oZ0Kqyz81MF8ewHjsCbKaEgVJKrB/K6yxQmbKaHltBWaeGrLQrv4ZLOqadTneseBY1F5driNyi+MfRsqHJIn+0MCCGfbBzExOsxmpYUOQoGmoAu3+LCblkNglpXyoFhft8SA7H9NiuXBnRxhzMTRaymf3XTtupFLso48dykQQnNDYQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZT3DD69R9xNQi1GcHmXwiLYetj6hO7ORkSUzN5xGp8s=;
+ b=MqLb4ei6q4Za9PvdhKQN1jzwDCBEfw6nAg0couFjtIPmF0hxoRJC2s2RMGJ0h3nh6V7CPrv0CCXq67aWBAaSo1tWWz/1Z4WC6cuyRutdvFE30byt1OG60pqM25sHz80pCPW7RmYkcTzU/5x7FZ/kMxQPu++eJbQKw2ccyKxhmtw31s/fmZnfqD73Ey98FTsZtJ8QEN4UJa+QABNdB61XOQGTR3AbgVnYin0GRT4hRmg3MxxxIAkxnL/voj7cgwdelJewG3lk+4L+IF8sQshuOlt+cOv5bjoMOlvwAyXiT7WVQmWrEmHwsksWxXyVXVpK8BZE8KRtlBY7rd2C28vG0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZT3DD69R9xNQi1GcHmXwiLYetj6hO7ORkSUzN5xGp8s=;
+ b=J9fogmrCBPX4MdL2amRNSGqoE0KAvNEl6ZemuIH8C/gxPa4Muxp93JaBlUmMA87YWPIDHyDLYZiGRtAH35Ph7t7JQibzhhsJm/+LoynIjmlLpPRwjdk0GCh4Txl+4BY92eMMgvJPufmJb9WtOestOfY0ah04w2eH7mRp7gKPInDiwAYXo77mf28W6epNejh2joBPfr31XgT067tly0z6G3EdXR6i/AKvMKlc8S4hUHW3SJMCKwgkAXdqkjUPH5SueJx6b1Z+RutHvJF9VHz1lTxYZ910G+swfFFNt6rE9+y1c90sKQMYOzMV7LK2jitAUo0af10djz3rTKvAiT4uwA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by LV8PR12MB9272.namprd12.prod.outlook.com (2603:10b6:408:201::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Tue, 7 Nov
+ 2023 14:12:38 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::b53a:1092:9be2:cfb9]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::b53a:1092:9be2:cfb9%5]) with mapi id 15.20.6954.027; Tue, 7 Nov 2023
+ 14:12:38 +0000
+Date: Tue, 7 Nov 2023 10:12:37 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, yi.l.liu@intel.com,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Subject: Re: [RFC v1 0/8] vhost-vdpa: add support for iommufd
+Message-ID: <20231107141237.GO4488@nvidia.com>
+References: <20231103171641.1703146-1-lulu@redhat.com>
+ <20231107022847-mutt-send-email-mst@kernel.org>
+ <20231107124902.GJ4488@nvidia.com>
+ <20231107082343-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107082343-mutt-send-email-mst@kernel.org>
+X-ClientProxiedBy: BL1PR13CA0180.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::35) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231027190910.27044-1-luizluca@gmail.com> <20231027190910.27044-4-luizluca@gmail.com>
- <20231030205025.b4dryzqzuunrjils@skbuf> <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
- <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
- <CACRpkdairxqm_YVshEuk_KbnZw9oH2sKiHapY_sTrgc85_+AmQ@mail.gmail.com>
- <20231102155521.2yo5qpugdhkjy22x@skbuf> <CAJq09z5muf01d1gDAP9kcsxC9-V3sbmyqTok=FPOqLXfZB9gNw@mail.gmail.com>
- <CACRpkdaBC7GeeGYoZ+CYjSVV657yFm=B2L6U2mNyh+AVsLbnsA@mail.gmail.com>
-In-Reply-To: <CACRpkdaBC7GeeGYoZ+CYjSVV657yFm=B2L6U2mNyh+AVsLbnsA@mail.gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 7 Nov 2023 10:54:58 -0300
-Message-ID: <CAJq09z6_nVvXsvL0KD9fYNELNkdFg+_dM95Umb4hJgrUP3H-5A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset controller
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, alsi@bang-olufsen.dk, 
-	andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
-	krzk+dt@kernel.org, arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9272:EE_
+X-MS-Office365-Filtering-Correlation-Id: b97d8f91-b230-4548-4d03-08dbdf9b9912
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	McdDCa6yW1xw9wx3Qq1AYV2sTw4rhnNdYNeXvcgMYWvL8BwLeMXCrDQrAMZmF7WmE0xnNZOzYxEDC6rj1W/DLb5zt/1LYMI0h5Xx1bd1dBA77OcTLASfCZgo85cbnouSjPVRAn7Lf+Jdwr73othuFedAEbzSnlzl0XjjQ93z7CRYusW7fF1evS8zOTySEwqYOlNWfzCzso6C1ELIAJ/Y/eq8Pn5YlOQlo/N/PqgYspf3ArT8NZMNCrLKUYlACBRB6T4jpjg36/P+V2qGHstyGb4TJ8UCa9/NoUyzUVHFnjp3d4/i3GyxG6220aKHgLq7ow6d3OREVCSiBtDHCL09Q1sD17PkWkRoL9infRvuh8bJDmL5L02HRIHo7ef8yRq1yERGXzaj5OfwZ5uPPK354l0humk4xK3iJdYR2gV7oRtr4jJ8k0g6Tgg337BF0HQ1MFC/1qi8q2Uyujdws7tQyVAEJbIBEG4amua56Dt69mQSdWSEwJB4baaEiCN+R5qTIscmkleRGQ8XywoPnW9WgAdiqebZJRCwQpcBB/ZGa8gJdnPJjgOFilH/2l5u9ifV
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(366004)(376002)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(6916009)(8936002)(8676002)(4326008)(41300700001)(36756003)(2906002)(38100700002)(5660300002)(6486002)(66556008)(6512007)(66476007)(33656002)(316002)(86362001)(66946007)(26005)(83380400001)(2616005)(1076003)(478600001)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?oFD5t+/c5UeOtQv4gD1L6SaROgkBNKRRkrfH4RX8wus1oY0YIn413qw0FsJw?=
+ =?us-ascii?Q?nBun3kr0Ewsb/wyP3/UwWXXJH/68Wa3EB0+F/3SHeDUPVAaeZWlI5Og6Mljo?=
+ =?us-ascii?Q?3CaQ0Iv8gcscq1cglOz34wYpf0jUtF+FSY7eJnABBu45wCDLpRUcpFMTd0vS?=
+ =?us-ascii?Q?1QR7CAthGpbpBygFOpFAtT9/RXftDzNQDUEc8jW5LFXL5kXfc8voiSLwwjUd?=
+ =?us-ascii?Q?sjAFhqiO/z3tF9xE2WxsvF2G/y1YY25kym4Jj/BOlwsTN88Q+4uLWi6YueOw?=
+ =?us-ascii?Q?+2vLuKC6WdTOnk6sC5WEbqibhGp2EF/G9ZZ3iBS4JmUChNzujWbBxUGFmtT/?=
+ =?us-ascii?Q?VQ1K2qkPNijrOgYAGpqs/05vAEL5sTkiufAryajGLXp6xNHEIXIBv0uxL6pz?=
+ =?us-ascii?Q?Vs6zhRowpKV30XHGpu2QcMCj9BwjTw5QdEEjY6sQmabxC6s8OR/W+XT+WWQq?=
+ =?us-ascii?Q?D8lyHLTUa9OWqWX4lpk47bxiZ1glYEbcl35ivXUsCjz1wZHM04EW4YXKBSn5?=
+ =?us-ascii?Q?LfkXwjJ9xljyvC3QdQsl3N3iprkOpJqbmr5/gjq56OtsTIAiRmlslA/wsAc+?=
+ =?us-ascii?Q?1jSNkH/lEgKBjQFqD6G3a7mKapZ8aabkRuEwoVwFgPgE+A53xAwFGTnzaumg?=
+ =?us-ascii?Q?aeNL91jvVJJqJDcK3oeFtOualwmPJOZQtwqVfF430bjzfDNm4/oZlM3BxgfB?=
+ =?us-ascii?Q?UDtwvsA9RJXyja8ogZ5qilxjw+vSEen58UvGPDelHyV1MEySJVKFusvTlpkA?=
+ =?us-ascii?Q?CHpHFX6J7Sw7SR8JVhkxP/C7geX7KihYvu4f0vUhd/5ha4W6DBYRXLHcShDA?=
+ =?us-ascii?Q?2Tk8Wuu1ZSTN76cT3I6RGvgVKyCUoiH3TfMNhrpBhBIZqqCf6y86MXIQXiJm?=
+ =?us-ascii?Q?+Hh7SgWlxIh5YdWUUbLA0uKq/3cURFNMARFFwDG+TEbPVBHXuGsxbKzx96+6?=
+ =?us-ascii?Q?f8Ridh6p2w40NTSxqJCk/5bZ9PYlhB8cHIUqWZgtsGd9E7D2FpJL78S/48g8?=
+ =?us-ascii?Q?tUUtYpMCeY/keOJCb/wYIteTI7Acyj9mSjatA/Dc4C59Fe3OaYUWyhOnsSIV?=
+ =?us-ascii?Q?cMOppHxkedB+YlERWs9u95tl1ZKfOOZxqTqQk1i9oCobVArPnk3G/AUVJROq?=
+ =?us-ascii?Q?sUIBcNG0NrKKUy9Af8+8gXTVbrZ0cmFxhCEROGSrZPCnGVVR1aevNtuRdCN/?=
+ =?us-ascii?Q?7dIDxKDf02bqBljJP7qAaOpWxCwc3qSJEoJeaSDLmSpye/bpbfc71sXMNO0v?=
+ =?us-ascii?Q?R/06JzBhjLxMSApfpaimZq70iMRifn+YGpxmV5jO+8m5V2u6N6KXu0NVZU7F?=
+ =?us-ascii?Q?Z0fYOy5Ww3kZLEq5odmgH8Ug3xuCOwYxooBFRg7ozKaW9n1zKXwjVrnSSLJu?=
+ =?us-ascii?Q?+YdEq7iDJopYGmn/fRsaCTABE7vYp1AksP52oJ6Pqn4Q82craosXc6qS8m60?=
+ =?us-ascii?Q?kGCp6TKRR/2Ok7Q6j+Rx9fMQ30VErdNJ5qGgFl1dOp5ld7iFfZ22Q8ARQhiZ?=
+ =?us-ascii?Q?K1ZwYptA0Un8Wm+OvnE1sXHULaEVs3LCYTrOu//tQEX5xapOtAt7pjsoHfsU?=
+ =?us-ascii?Q?mPrpy4vxG3MiaxFYqZ4p0NX6rgQY4CJY35M6AIt3?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b97d8f91-b230-4548-4d03-08dbdf9b9912
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 14:12:38.5372
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6dGy5IJRwqylA4G8oSOD4k9ie3Z6iKs21f6KZ3exrCMQvfR4hihnG8K3Gy2AMv2l
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9272
 
-> > Your proposed Kconfig does not attempt to avoid a realtek-interface
-> > without both interfaces or without support for both switch families.
-> > Is it possible in Kconfig to force it to, at least, select one of the
-> > interfaces and one of the switches? Is it okay to leave it
-> > unconstrained?
->
-> Can't you just remove the help text under
-> NET_DSA_REALTEK_INTERFACE so it becomes a hidden
-> option? The other options just select it anyway.
+On Tue, Nov 07, 2023 at 08:28:32AM -0500, Michael S. Tsirkin wrote:
+> On Tue, Nov 07, 2023 at 08:49:02AM -0400, Jason Gunthorpe wrote:
+> > On Tue, Nov 07, 2023 at 02:30:34AM -0500, Michael S. Tsirkin wrote:
+> > > On Sat, Nov 04, 2023 at 01:16:33AM +0800, Cindy Lu wrote:
+> > > > 
+> > > > Hi All
+> > > > This code provides the iommufd support for vdpa device
+> > > > This code fixes the bugs from the last version and also add the asid support. rebase on kernel
+> > > > v6,6-rc3
+> > > > Test passed in the physical device (vp_vdpa), but  there are still some problems in the emulated device (vdpa_sim_net), 
+> > > 
+> > > What kind of problems? Understanding that will make it easier
+> > > to figure out whether this is worth reviewing.
+> > 
+> > IMHO, this patch series needs to spend more time internally to Red Hat
+> > before it is presented to the community. It is too far away from
+> > something worth reviewing at this point.
+> > 
+> > Jason
+> 
+> I am always trying to convince people to post RFCs early
+> instead of working for months behind closed doors only
+> to be told to rewrite everything in Rust.
 
-Without a text after the tristate, it will already be hidden. However,
-we can still ask to build a module with no SMI and MDIO.
+The community has a limited review bandwidth, things should meet a
+minimum standard before there is an expectation that other people
+should review it on the list.
 
-> > If merging the modules is the accepted solution, it makes me wonder if
-> > rtl8365mb.ko and rtl8366.ko should get merged as well into a single
-> > realtek-switch.ko. They are a hard dependency for realtek-interface.ko
-> > (previously on each interface module). If the kernel is custom-built,
-> > it would still be possible to exclude one switch family at build time.
->
-> That's not a good idea, because we want to be able to load
-> a single module into the kernel to support a single switch
-> family at runtime. If you have a kernel that boots on several
-> systems and some of them have one of the switches and
-> some of them have another switch, I think you see the problem
-> with this approach.
+> Why does it have to be internal to a specific company?
+> I see Yi Liu from Intel is helping Cindy get it into shape
+> and that's classic open source ethos.
 
-We already have this situation. As the interface module uses
-rtl8366rb_variant and rtl8365mb_variant, we cannot select one or the
-other at runtime.
+Big company's should take the responsibility to train and provide
+skill development for their own staff.
 
-rtl8365mb              14802  1 realtek_smi
-rtl8366                20870  1 realtek_smi
-tag_rtl4_a              1522  1
+> I know some subsystems ignore the RFC tag but I didn't realize
+> iommu is one of these. Is that really true?
 
-If we build it with support for both switches, both modules need to be
-loaded together.
+At least I've looked at this twice now and been disappointed. Neither
+have been a well thought out RFC, this is a brain dump of unfinished
+work.
 
-Somehow initializing the switch selectively autoloads the tag module.
-Is it possible to have something like this for subdrivers?
-
-> > I'll use these modules in OpenWrt, which builds a single kernel for a
-> > bunch of devices. Is there a way to weakly depend on a module,
-> > allowing the system to load only a single subdriver? Is it worth it?
->
-> Last time I looked actually having DSA:s as loadable modules
-> didn't work so well, so they are all compiled in. In OpenWrt
-> I didn't find any DSA modules packaged as modules. But maybe
-> I didn't try hard enough. IIRC the problem is that it needs to
-> also have a tag module (for NET_DSA_TAG_*) and that didn't
-> modularize so well.
-
-It does work, even the tag module. As I mentioned, the tag modules are
-even loaded on demand. You just need to load it in the correct
-sequence.
-
->
-> Yours,
-> Linus Walleij
+Jason
 
