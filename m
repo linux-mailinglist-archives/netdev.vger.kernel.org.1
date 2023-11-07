@@ -1,91 +1,145 @@
-Return-Path: <netdev+bounces-46349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C8F7E34B5
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 05:52:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD4F7E3514
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DABF1C20A79
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 04:52:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD971C20A72
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 06:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F9639C;
-	Tue,  7 Nov 2023 04:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7D56AA0;
+	Tue,  7 Nov 2023 06:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCL0BBPV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD574A20
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 04:52:23 +0000 (UTC)
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com [209.85.167.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0A8E113
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 20:52:21 -0800 (PST)
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3b3f893e38aso8099459b6e.0
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 20:52:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69457B66B
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 06:10:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C205D135
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 22:10:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699337452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Jy3AoTaEFtBC3Hdf9DK2P1sqM0oihORJcg/Y85jsjiM=;
+	b=ZCL0BBPVCjBx5kRQ/v13uPAH0IBAj3NooUqYEfFuhtj3Bw7kKpD3UeBsU0xZIfWzNwVmdH
+	QjW8FjjKAHPmSQH3Ls4eNDeEeOGAgll04CE35/SrWSXG0HKrx50wpejld0E8SwbCAVNPOl
+	O/U56whWBcXZ4jvjt0xJ+NzxXmgD3AM=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-75-heGb091WOUmOLolVsPSbqw-1; Tue, 07 Nov 2023 01:10:51 -0500
+X-MC-Unique: heGb091WOUmOLolVsPSbqw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c7f0a33afbso380590666b.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 22:10:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699332741; x=1699937541;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nAp6NrkzveDLTFcK/QBlyXampAT5bnoWcodW9DteIEY=;
-        b=Wh6S22aAU8X+J9lVbrszF946sOFEWDizmGv4aPtiGj44SbEhjZUPGL/cOMGdNwV47W
-         hreuVwaESPAqEkBrPmHah2lIcxbu7zkdRuCmcaCrZ8iymSL60hJJWiAbPHqvh25g2Pch
-         CIYRLLDDSW1TT0QuaMAYUtj/rHdHxBnByoS9MUTKyMBYJRgYl8+Y41k4odKIg+X1Odns
-         LuR3uhZR0y3t578NUbm+sFQbQAY57d/ST7IaxO8nwXZs37KYJyS0nmbaHwmd+WSg4rfp
-         hCKnkNEOKXuKcqdmTVIq+U/3OwfHb71xFmmrQ4sMFRqYPHeYjs4QhDi9IakNfVYX8oqI
-         UDKw==
-X-Gm-Message-State: AOJu0Yz4DV9VKUwLotMfsAqg/kb0Evq3BprtJT47g4WXLFO4A0St3vuX
-	optVingVxXrq+WPg6en2DvXuAMOyq7EZd1f6B9q8HA9IP7hg
-X-Google-Smtp-Source: AGHT+IFF27op/Kwmmbi3biZNw7HPBJKNkjRdM+sIHsqhwmEFp3rYvx1gTgztLCdObmJvkS/O2IcmmDN+HGs/YgX5sOuJQS0Rr5qt
+        d=1e100.net; s=20230601; t=1699337450; x=1699942250;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jy3AoTaEFtBC3Hdf9DK2P1sqM0oihORJcg/Y85jsjiM=;
+        b=f3FHOvz2wOAvL0lbkRtMDBTSrcdnsFzHHRae9mouccEPLgscBWf9dOHy1XBmz3WCa9
+         A5TkleDWyrIn7fVe1BZm38h+zG6t18XjXK1Zd2xx8IgigBstMFoXS+yzj+e59vjZ4jdK
+         rmU7S1iVnML76Nfx0wKqYhzF8gLpQtpDYUUuNy+MuXAGGc5rE4H1HXB6k+EfwzoLXC+w
+         m980Q1Bs3WTEf1z33d5SJvNDCJWXDl5rf+EdELoY2utwMev8e0cg0C/tO6bb8kZkx9H6
+         sqnUy2m38vwz4E7nVVAJS9bg3i0haHhrLwLIi48Onsf5okGyQLllBlg3XL661GHErFtq
+         ToEw==
+X-Gm-Message-State: AOJu0YwtmJY3+PoLOwYwV/fpgBMdrpMUz5qeK8JimOtLzfnpOaQ/3CYt
+	UrDPwChMCGQgU66/WurSS57Z8+mV/318QMjd9EoMhUo0hPMe00B5i1xqlBnnlrg6KJ3zVz1MLu3
+	xuew5/LvyKwmxfSpsBBxuzwbLrFkw8qMp
+X-Received: by 2002:a17:906:c114:b0:9dd:6d39:42b9 with SMTP id do20-20020a170906c11400b009dd6d3942b9mr9767019ejc.55.1699337450453;
+        Mon, 06 Nov 2023 22:10:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHZ146Ql2Vvi0xcjK7Z9omMZRxdZMLHLDq1ESNq6PfFahRy+ug99qPlbg3aZ0HTfKjKT8OIC8DWy3+ihFO68A8=
+X-Received: by 2002:a17:906:c114:b0:9dd:6d39:42b9 with SMTP id
+ do20-20020a170906c11400b009dd6d3942b9mr9767002ejc.55.1699337450164; Mon, 06
+ Nov 2023 22:10:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:128a:b0:3ae:5aab:a6f3 with SMTP id
- a10-20020a056808128a00b003ae5aaba6f3mr11617841oiw.5.1699332741146; Mon, 06
- Nov 2023 20:52:21 -0800 (PST)
-Date: Mon, 06 Nov 2023 20:52:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000642e40060988bc45@google.com>
-Subject: [syzbot] Monthly dccp report (Nov 2023)
-From: syzbot <syzbot+listc2ee659ad54baf9fc752@syzkaller.appspotmail.com>
-To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-9-lulu@redhat.com>
+ <CACGkMEtRJ6-KRQ1qrrwC3FVBosMfYvV6Q47enoE9cE9C8MYYOg@mail.gmail.com>
+In-Reply-To: <CACGkMEtRJ6-KRQ1qrrwC3FVBosMfYvV6Q47enoE9cE9C8MYYOg@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 7 Nov 2023 14:10:11 +0800
+Message-ID: <CACLfguUPZVY2HDBoir67u0CeR3A9wHjCGvuc3cGLe0L43f8jkg@mail.gmail.com>
+Subject: Re: [RFC v1 8/8] iommu: expose the function iommu_device_use_default_domain
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello dccp maintainers/developers,
+On Mon, Nov 6, 2023 at 3:26=E2=80=AFPM Jason Wang <jasowang@redhat.com> wro=
+te:
+>
+> On Sat, Nov 4, 2023 at 1:18=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
+> >
+> > Expose the function iommu_device_use_default_domain() and
+> > iommu_device_unuse_default_domain()=EF=BC=8C
+> > While vdpa bind the iommufd device and detach the iommu device,
+> > vdpa need to call the function
+> > iommu_device_unuse_default_domain() to release the owner
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+>
+> This is the end of the series, who is the user then?
+>
+> Thanks
+>
+hi Jason
+These 2 functions was called in vhost_vdpa_iommufd_set_device(), Vdpa need =
+to
+release the dma owner, otherwise, the function will fail when
+iommufd called iommu_device_claim_dma_owner() in iommufd_device_bind()
+I will change this sequence, Or maybe will find some other way to fix
+this problem
+thanks
+cindy
 
-This is a 31-day syzbot report for the dccp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/dccp
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 6 have been fixed so far.
+> > ---
+> >  drivers/iommu/iommu.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+> > index 3bfc56df4f78..987cbf8c9a87 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -3164,6 +3164,7 @@ int iommu_device_use_default_domain(struct device=
+ *dev)
+> >
+> >         return ret;
+> >  }
+> > +EXPORT_SYMBOL_GPL(iommu_device_use_default_domain);
+> >
+> >  /**
+> >   * iommu_device_unuse_default_domain() - Device driver stops handling =
+device
+> > @@ -3187,6 +3188,7 @@ void iommu_device_unuse_default_domain(struct dev=
+ice *dev)
+> >         mutex_unlock(&group->mutex);
+> >         iommu_group_put(group);
+> >  }
+> > +EXPORT_SYMBOL_GPL(iommu_device_unuse_default_domain);
+> >
+> >  static int __iommu_group_alloc_blocking_domain(struct iommu_group *gro=
+up)
+> >  {
+> > --
+> > 2.34.3
+> >
+>
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 102     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
-                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
-<2> 50      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
-                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
-<3> 13      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
-                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
