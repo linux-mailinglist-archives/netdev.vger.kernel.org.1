@@ -1,81 +1,120 @@
-Return-Path: <netdev+bounces-46532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021157E4C00
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:46:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BDEC7E4C10
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 328451C2040E
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F055BB20EAA
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FFA30645;
-	Tue,  7 Nov 2023 22:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F1A210B;
+	Tue,  7 Nov 2023 22:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwzKn3ML"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D5C30643
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 22:45:58 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B230913A
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:45:57 -0800 (PST)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-PW-tGBIhPv288BDvM0_Hag-1; Tue, 07 Nov 2023 17:45:50 -0500
-X-MC-Unique: PW-tGBIhPv288BDvM0_Hag-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AF39285A59D;
-	Tue,  7 Nov 2023 22:45:49 +0000 (UTC)
-Received: from hog (unknown [10.39.192.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 163AF2166B26;
-	Tue,  7 Nov 2023 22:45:47 +0000 (UTC)
-Date: Tue, 7 Nov 2023 23:45:46 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Dae R. Jeong" <threeearcat@gmail.com>, borisp@nvidia.com,
-	john.fastabend@gmail.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
-Subject: Re: Missing a write memory barrier in tls_init()
-Message-ID: <ZUq-GrWMvbfhX74a@hog>
-References: <ZUNLocdNkny6QPn8@dragonet>
- <20231106143659.12e0d126@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7B430643;
+	Tue,  7 Nov 2023 22:55:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75129C433C7;
+	Tue,  7 Nov 2023 22:55:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699397724;
+	bh=iB5WIQwRWCJ62sSwm7rVVjSX4KNeifY96+WD+ljQo7A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CwzKn3MLIlLci2fLlpr0m0pOk173vFyYAGolRpAoKUQY79y3Gsz/ZTWTY9UNQp0aT
+	 j3/uplXmQpqgMLpDUu+RzQD5rtH7NsPAK+YwQhsxHqxCoHd5KNx7iYjk3XekAeOLqW
+	 dmA44Lv3QYzFJDV6a7/X/M0Sk6Ch3fPiTogIrlEAa85Bytb2V42KPPN6Cu81fvUdHw
+	 NNBLdE0C7ah0RV48znH8Y18XD6UzmkAh0ggCZjl9ZrKnrdnYH7YVhCnv6wk7IYHWDT
+	 zTGv+xK1Anj9erQ5elOkREzeOde6rdEcp7w2E0bvGgmeVKep1IfXdMijuOwOs9FgO9
+	 VYN0GSclxC51A==
+Message-ID: <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
+Date: Tue, 7 Nov 2023 15:55:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231106143659.12e0d126@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
+Content-Language: en-US
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-6-almasrymina@google.com>
+ <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
+ <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-2023-11-06, 14:36:59 -0800, Jakub Kicinski wrote:
-> On Thu, 2 Nov 2023 16:11:29 +0900 Dae R. Jeong wrote:
-> > In addition, I believe the {tls_setsockopt, tls_getsockopt}
-> > implementation is fine because of the address dependency. I think
-> > load-load reordering is prohibited in this case so we don't need a
-> > read barrier.
+On 11/7/23 3:10 PM, Mina Almasry wrote:
+> On Mon, Nov 6, 2023 at 3:44 PM David Ahern <dsahern@kernel.org> wrote:
+>>
+>> On 11/5/23 7:44 PM, Mina Almasry wrote:
+>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>>> index eeeda849115c..1c351c138a5b 100644
+>>> --- a/include/linux/netdevice.h
+>>> +++ b/include/linux/netdevice.h
+>>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
+>>>  };
+>>>
+>>>  #ifdef CONFIG_DMA_SHARED_BUFFER
+>>> +struct page_pool_iov *
+>>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
+>>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
+>>
+>> netdev_{alloc,free}_dmabuf?
+>>
 > 
-> Sounds plausible, could you send a patch?
->
-> The smb_wmb() would be better placed in tls_init(), IMHO.
+> Can do.
+> 
+>> I say that because a dmabuf can be host memory, at least I am not aware
+>> of a restriction that a dmabuf is device memory.
+>>
+> 
+> In my limited experience dma-buf is generally device memory, and
+> that's really its use case. CONFIG_UDMABUF is a driver that mocks
+> dma-buf with a memfd which I think is used for testing. But I can do
+> the rename, it's more clear anyway, I think.
 
-Wouldn't it be enough to just move the rcu_assign_pointer after ctx is
-fully initialized, ie just before update_sk_prot? also clearer wrt
-RCU.
-(and maybe get rid of tls_ctx_create and move all that into tls_init,
-it's not much and we don't even set ctx->{tx,rx}_conf in there)
+config UDMABUF
+        bool "userspace dmabuf misc driver"
+        default n
+        depends on DMA_SHARED_BUFFER
+        depends on MEMFD_CREATE || COMPILE_TEST
+        help
+          A driver to let userspace turn memfd regions into dma-bufs.
+          Qemu can use this to create host dmabufs for guest framebuffers.
 
--- 
-Sabrina
+
+Qemu is just a userspace process; it is no way a special one.
+
+Treating host memory as a dmabuf should radically simplify the io_uring
+extension of this set. That the io_uring set needs to dive into
+page_pools is just wrong - complicating the design and code and pushing
+io_uring into a realm it does not need to be involved in.
+
+Most (all?) of this patch set can work with any memory; only device
+memory is unreadable.
+
 
 
