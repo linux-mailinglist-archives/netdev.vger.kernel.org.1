@@ -1,127 +1,116 @@
-Return-Path: <netdev+bounces-46387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0097E3A31
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 11:45:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE6C7E3AFC
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:22:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC181C20BF5
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 10:45:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 881AAB20B48
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 11:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D2A2C852;
-	Tue,  7 Nov 2023 10:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBDB82D05C;
+	Tue,  7 Nov 2023 11:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfHMKmIU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D42oczmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DAAFBE5;
-	Tue,  7 Nov 2023 10:44:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AF0EC433C7;
-	Tue,  7 Nov 2023 10:44:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699353896;
-	bh=6KvSSAyHzV1t/xzun1oJg0AqCmYPNZNoG1yjrk+2N5g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EfHMKmIUi7LClGqSTR82uTGSALdsGhooGkAQNBOKzdAx9XrKCS32CwP6rRNlINeJp
-	 fTBcOh2CbrNgz5T9wN8X4IfDIz30xCLXq2htrhQAdC3JQhS9flLyk/+pf5MtKIc1uc
-	 JGySGdYEdfIvLpVTQJXhgpJr9YrJTitMM+csMdn+xILBQI2oGOVjB/sYO87FSSlzde
-	 FSNahA1CtFFCQyIxON1Z1I4OewRIeg1rULpA/yqisw7axPef9I0RY6dTvW/rbObEf0
-	 ODLYbBKyXYy654yF6yL9+/nSFia7MKf5WBhUfT/JXvT2gH/1if2QXy5oq+hmLNVTje
-	 IOMZOtUYIwdeQ==
-Date: Tue, 7 Nov 2023 10:44:47 +0000
-From: Will Deacon <will@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v3 04/13] mm/execmem, arch: convert remaining overrides
- of module_alloc to execmem
-Message-ID: <20231107104446.GA19133@willie-the-truck>
-References: <20230918072955.2507221-1-rppt@kernel.org>
- <20230918072955.2507221-5-rppt@kernel.org>
- <20231023171420.GA4041@willie-the-truck>
- <20231026085800.GK2824@kernel.org>
- <20231026102438.GA6924@willie-the-truck>
- <20231030070053.GL2824@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A79328E38
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 11:21:57 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A89491;
+	Tue,  7 Nov 2023 03:21:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699356116; x=1730892116;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=M4Tpz5L6PCxNOS3E/Mpmben/vumZjjJ+Uyr4CUFs7VU=;
+  b=D42oczmo5P6ehk84XyX3PDRwcKWAUXm1yek00Cp6XNqJYIeXto5z6YEZ
+   vXG6yF71EGKO4RAe5It+fR2CuUthZa7s/Rs/UW+PjHVKgWvmti4nZ2dta
+   nsL2ZY8+eaEYJv5fzrSeQKRqu79EgIZM2y8UW7T4ZTLRoXcbeLBR45RH0
+   2Ps8UYsJGcAXC3GFZrP5tCzFYmdIIF+xNf8kibPj7IWQyx9Z5q9e2ohgt
+   afppx+TUWURRanR+2bG/luKhbXe0uQjx4wlWAxXGS3NUVVCdW3YoBG3On
+   RI52vkF5A6Qv8uCdiH88hJoFHHD6ObnJuqYXzn62fYVRccirNtLCswQzw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="475727076"
+X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
+   d="scan'208";a="475727076"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 03:21:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="828579774"
+X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
+   d="scan'208";a="828579774"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 03:21:54 -0800
+Received: from mohdfai2-iLBPG12-1.png.intel.com (mohdfai2-iLBPG12-1.png.intel.com [10.88.227.73])
+	by linux.intel.com (Postfix) with ESMTP id C4038580D61;
+	Tue,  7 Nov 2023 03:21:51 -0800 (PST)
+From: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net 0/7] qbv cycle time extension/truncation
+Date: Tue,  7 Nov 2023 06:20:16 -0500
+Message-Id: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231030070053.GL2824@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 30, 2023 at 09:00:53AM +0200, Mike Rapoport wrote:
-> On Thu, Oct 26, 2023 at 11:24:39AM +0100, Will Deacon wrote:
-> > On Thu, Oct 26, 2023 at 11:58:00AM +0300, Mike Rapoport wrote:
-> > > On Mon, Oct 23, 2023 at 06:14:20PM +0100, Will Deacon wrote:
-> > > > On Mon, Sep 18, 2023 at 10:29:46AM +0300, Mike Rapoport wrote:
-> > > > > diff --git a/arch/arm64/kernel/module.c b/arch/arm64/kernel/module.c
-> > > > > index dd851297596e..cd6320de1c54 100644
-> > > > > --- a/arch/arm64/kernel/module.c
-> > > > > +++ b/arch/arm64/kernel/module.c
-> 
-> ...
-> 
-> > > > > -	if (module_direct_base) {
-> > > > > -		p = __vmalloc_node_range(size, MODULE_ALIGN,
-> > > > > -					 module_direct_base,
-> > > > > -					 module_direct_base + SZ_128M,
-> > > > > -					 GFP_KERNEL | __GFP_NOWARN,
-> > > > > -					 PAGE_KERNEL, 0, NUMA_NO_NODE,
-> > > > > -					 __builtin_return_address(0));
-> > > > > -	}
-> > > > > +	module_init_limits();
-> > > > 
-> > > > Hmm, this used to be run from subsys_initcall(), but now you're running
-> > > > it _really_ early, before random_init(), so randomization of the module
-> > > > space is no longer going to be very random if we don't have early entropy
-> > > > from the firmware or the CPU, which is likely to be the case on most SoCs.
-> > > 
-> > > Well, it will be as random as KASLR. Won't that be enough?
-> > 
-> > I don't think that's true -- we have the 'kaslr-seed' property for KASLR,
-> > but I'm not seeing anything like that for the module randomisation and I
-> > also don't see why we need to set these limits so early.
-> 
-> x86 needs execmem initialized before ftrace_init() so I thought it would be
-> best to setup execmem along with most of MM in mm_core_init().
-> 
-> I'll move execmem initialization for !x86 to a later point, say
-> core_initcall.
+According to IEEE Std. 802.1Q-2018 section Q.5 CycleTimeExtension,
+the Cycle Time Extension variable allows this extension of the last old
+cycle to be done in a defined way. If the last complete old cycle would
+normally end less than OperCycleTimeExtension nanoseconds before the new
+base time, then the last complete cycle before AdminBaseTime is reached
+is extended so that it ends at AdminBaseTime.
 
-Thanks, Mike.
+Changes in v2:
 
-Will
+- Added 's64 cycle_time_correction' in 'sched_gate_list struct'.
+- Removed sched_changed created in v1 since the new cycle_time_correction
+  field can also serve to indicate the need for a schedule change.
+- Added 'bool correction_active' in 'struct sched_entry' to represent
+  the correction state from the entry's perspective and return corrected
+  interval value when active.
+- Fix cycle time correction logics for the next entry in advance_sched()
+- Fix and implement proper cycle time correction logics for current
+  entry in taprio_start_sched()
+
+v1 at:
+https://lore.kernel.org/lkml/20230530082541.495-1-muhammad.husaini.zulkifli@intel.com/
+
+Faizal Rahim (7):
+  net/sched: taprio: fix too early schedules switching
+  net/sched: taprio: fix cycle time adjustment for next entry
+  net/sched: taprio: update impacted fields during cycle time adjustment
+  net/sched: taprio: get corrected value of cycle_time and interval
+  net/sched: taprio: fix delayed switching to new schedule after timer
+    expiry
+  net/sched: taprio: fix q->current_entry is NULL before its expiry
+  net/sched: taprio: enable cycle time adjustment for current entry
+
+ net/sched/sch_taprio.c | 263 ++++++++++++++++++++++++++++++++---------
+ 1 file changed, 209 insertions(+), 54 deletions(-)
+
+-- 
+2.25.1
+
 
