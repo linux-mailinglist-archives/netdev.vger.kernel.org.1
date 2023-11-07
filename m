@@ -1,186 +1,172 @@
-Return-Path: <netdev+bounces-46535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2927E4C62
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 00:00:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 177CF7E4C6C
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 00:04:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 335A8B20DCA
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3CF628108A
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:04:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E6530652;
-	Tue,  7 Nov 2023 23:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1D93065D;
+	Tue,  7 Nov 2023 23:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wo4P00xr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RTyao1M5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7970C210B
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 23:00:09 +0000 (UTC)
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB92D78
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:00:08 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32f7c80ab33so3699020f8f.0
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 15:00:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7655B210B
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 23:04:08 +0000 (UTC)
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E132D10E2
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:04:07 -0800 (PST)
+Received: by mail-ua1-x92d.google.com with SMTP id a1e0cc1a2514c-7b9dc92881eso2557000241.2
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 15:04:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1699398007; x=1700002807; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699398247; x=1700003047; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0tH8FoKh7cHQDHvyLNhPgTHfTTeil2f3JK8l4/BlvzE=;
-        b=wo4P00xrUAcPZJeagGcptfBUYBfgsf6xf7hSPzp8TvtJZmRkBsoiN170LudiQ1LK5E
-         7hZmFd3MeMKNl8yG3UEQ+NNfLgsP2WKBPMgqwI5om3CbWkf6zRXYVkz5IIqkyYdJ8qQy
-         uREGOv75bLSDEe3cqN7BLtYFLlvS5HoZYeLEc8eD5HbmEZX+EIPMeEmOSq9plgT2foLP
-         6rtxkkxriEQ5TzA1D4nD3DI20QoW2Rg56asrVmD4JqhyX3e2V4QmL6d8RnLdrSkY+SN6
-         TXAWmKsUD2s1NRGYq5Ilba/RoegbnTkzBNL2NJo+/5Ow9Q5fL7VIsaWk2dOE8PNEK8LJ
-         Veng==
+        bh=LwSWVxQJlefO2RXGLXTB5EQnzK3f7Ti0RFRCIocUVAs=;
+        b=RTyao1M5gnN7cTlDG7d8LPAKzFJX0V4Trw6manexGrhKIxZDKzaDzD15ayTI7EefhD
+         8ySq2N4mYEadI5EXDaY97Y8kfbO1RYF1rXnTOWrGCboGiAHtiKIk9DMBgklfURF3ILpM
+         OXtHaii+Woesd5DF3er0h7i2sEe9SuKBuo0bQWBso8HD3QSK1IlXAMm5HtNyMszSPhHm
+         222h64CvspTt7hz5sPbehPaYkyPJEE8SNUaMAgCM6FwZRzqpiTz3Bm14ho/nleKoSGxh
+         LDhEV9QZMQBB1QNx+mmnQ+aO4PtmMFv4fXL5f4BfzrnfZBucrb6PbVg/nMhjhatNuzmq
+         EWeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699398007; x=1700002807;
+        d=1e100.net; s=20230601; t=1699398247; x=1700003047;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0tH8FoKh7cHQDHvyLNhPgTHfTTeil2f3JK8l4/BlvzE=;
-        b=sa4FKhqZNWz5YAuljzBrAaTDPGpJi6vBw2XyY5O3+1lF1aFx/mpXh3Cvf0fpt8RQ2m
-         AyBc+1Btaid8U3iUMa77lk+ON1/mSSvzyVZtjPT0Nz4Zf6idCnJMqNZ1hiNSZOZSsQ6g
-         GFlOgIr8jPbITZHL1U9zJpKOVqivU6WjUa1FHvTdWhdvSre9x6C3BxUDR5RQ119dlo1x
-         JdQeFzn7uGjONNUaJu0snvP5E9IjOVys7JyfxQqFuRkcllQdQWZSpElcdYm527wuKmO1
-         P5z3OeXXLfY5Roji2E7AP2CYZ7uWJW7PpmZfvaLa7dFXseKcTlVgfeYcAxRtXH/9C52R
-         PBaQ==
-X-Gm-Message-State: AOJu0YxDrsCfCAbIfqSaL87ppMJwAum8CYlNLVjDreVPwGKPWR4gtzq6
-	o172apF9WDFPJxjihLgl8x/JexZaYfArHikvVuEsvw==
-X-Google-Smtp-Source: AGHT+IGuggcU1bh9QWzOFqzQIUImXNmuJSXG+ioTXW26kiI/yqa+p0mi5qbuCLQInXWLlRHZWlpXSiZNQmCrZJuBBUw=
-X-Received: by 2002:a05:6000:719:b0:32d:570b:c0a4 with SMTP id
- bs25-20020a056000071900b0032d570bc0a4mr164770wrb.27.1699398006989; Tue, 07
- Nov 2023 15:00:06 -0800 (PST)
+        bh=LwSWVxQJlefO2RXGLXTB5EQnzK3f7Ti0RFRCIocUVAs=;
+        b=ppj/sR4tH2+SlWdnRj1KDt4x4euH3Fb7hUku+ssLxSFPOqx0+zCqEh2ft9WhzYSqpv
+         fSyGYJx/ju/aV2MXuVFh5u4MT8W8P5ZzWMkuWLbWhD8a40BWx1o4S0kNvaqxh62hoSdF
+         X9zCkCSyZmHPR/SZxqviWnGpko/XzRqOFrq7CBav097pEE4uFd81MHaLSb+pTQ+sTG8f
+         e2j4GEeH4/+HwFqnpicWb/Dub3WI+qgpi5bwUhy78JS6lQgLY8nFyEw1LVLOgVtEfe71
+         vgc69a0LOeVJQJJUOfiVwyv/VGd6vvUMH+2pGU9j0Z/SfpZZ6N+Uz6YGAfa88S1vXthL
+         hJeg==
+X-Gm-Message-State: AOJu0YwirKRADCZjSBDTUdvSwDhlab78fP3q6ucayuPCv6aD94RyofSn
+	KC5R46nO8fcgclJpxTnIb1rYKXV31wNQ1OvHIsPnPQ==
+X-Google-Smtp-Source: AGHT+IGkIzXyZBaE32+WMwF+duu/QcIsXXrFXzLPRCigy40o3oogjiTft3g4ezREIoF7S18+m0g5FcLRymLotkSR3mA=
+X-Received: by 2002:a67:e09b:0:b0:45f:8b65:28f0 with SMTP id
+ f27-20020a67e09b000000b0045f8b6528f0mr105754vsl.12.1699398246594; Tue, 07 Nov
+ 2023 15:04:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231107160440.1992526-1-edumazet@google.com>
-In-Reply-To: <20231107160440.1992526-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 7 Nov 2023 17:59:54 -0500
-Message-ID: <CAM0EoMmJ_tDjCXbA3bKT1Y4xkYGtTAPnnU8nw=XgUonF8pgyWA@mail.gmail.com>
-Subject: Re: [PATCH net] net_sched: sch_fq: better validate TCA_FQ_WEIGHTS and TCA_FQ_PRIOMAP
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-6-almasrymina@google.com> <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
+ <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com> <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
+In-Reply-To: <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 7 Nov 2023 15:03:53 -0800
+Message-ID: <CAHS8izMKDOw5_y2MLRfuJHs=ai+sZ6GF7Rg1NuR_JqONg-5u5Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
+To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 7, 2023 at 11:04=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Tue, Nov 7, 2023 at 2:55=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
 >
-> syzbot was able to trigger the following report while providing
-> too small TCA_FQ_WEIGHTS attribute [1]
+> On 11/7/23 3:10 PM, Mina Almasry wrote:
+> > On Mon, Nov 6, 2023 at 3:44=E2=80=AFPM David Ahern <dsahern@kernel.org>=
+ wrote:
+> >>
+> >> On 11/5/23 7:44 PM, Mina Almasry wrote:
+> >>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> >>> index eeeda849115c..1c351c138a5b 100644
+> >>> --- a/include/linux/netdevice.h
+> >>> +++ b/include/linux/netdevice.h
+> >>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
+> >>>  };
+> >>>
+> >>>  #ifdef CONFIG_DMA_SHARED_BUFFER
+> >>> +struct page_pool_iov *
+> >>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
+> >>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
+> >>
+> >> netdev_{alloc,free}_dmabuf?
+> >>
+> >
+> > Can do.
+> >
+> >> I say that because a dmabuf can be host memory, at least I am not awar=
+e
+> >> of a restriction that a dmabuf is device memory.
+> >>
+> >
+> > In my limited experience dma-buf is generally device memory, and
+> > that's really its use case. CONFIG_UDMABUF is a driver that mocks
+> > dma-buf with a memfd which I think is used for testing. But I can do
+> > the rename, it's more clear anyway, I think.
 >
-> Fix is to use NLA_POLICY_EXACT_LEN() to ensure user space
-> provided correct sizes.
+> config UDMABUF
+>         bool "userspace dmabuf misc driver"
+>         default n
+>         depends on DMA_SHARED_BUFFER
+>         depends on MEMFD_CREATE || COMPILE_TEST
+>         help
+>           A driver to let userspace turn memfd regions into dma-bufs.
+>           Qemu can use this to create host dmabufs for guest framebuffers=
+.
 >
-> Apply the same fix to TCA_FQ_PRIOMAP.
 >
-> [1]
-> BUG: KMSAN: uninit-value in fq_load_weights net/sched/sch_fq.c:960 [inlin=
-e]
-> BUG: KMSAN: uninit-value in fq_change+0x1348/0x2fe0 net/sched/sch_fq.c:10=
-71
-> fq_load_weights net/sched/sch_fq.c:960 [inline]
-> fq_change+0x1348/0x2fe0 net/sched/sch_fq.c:1071
-> fq_init+0x68e/0x780 net/sched/sch_fq.c:1159
-> qdisc_create+0x12f3/0x1be0 net/sched/sch_api.c:1326
-> tc_modify_qdisc+0x11ef/0x2c20
-> rtnetlink_rcv_msg+0x16a6/0x1840 net/core/rtnetlink.c:6558
-> netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
-> rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6576
-> netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
-> netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
-> netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2588
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2642
-> __sys_sendmsg net/socket.c:2671 [inline]
-> __do_sys_sendmsg net/socket.c:2680 [inline]
-> __se_sys_sendmsg net/socket.c:2678 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2678
-> do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> Qemu is just a userspace process; it is no way a special one.
 >
-> Uninit was created at:
-> slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
-> slab_alloc_node mm/slub.c:3478 [inline]
-> kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
-> kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
-> __alloc_skb+0x318/0x740 net/core/skbuff.c:651
-> alloc_skb include/linux/skbuff.h:1286 [inline]
-> netlink_alloc_large_skb net/netlink/af_netlink.c:1214 [inline]
-> netlink_sendmsg+0xb34/0x13d0 net/netlink/af_netlink.c:1885
-> sock_sendmsg_nosec net/socket.c:730 [inline]
-> __sock_sendmsg net/socket.c:745 [inline]
-> ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2588
-> ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2642
-> __sys_sendmsg net/socket.c:2671 [inline]
-> __do_sys_sendmsg net/socket.c:2680 [inline]
-> __se_sys_sendmsg net/socket.c:2678 [inline]
-> __x64_sys_sendmsg+0x307/0x490 net/socket.c:2678
-> do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-> do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
-> entry_SYSCALL_64_after_hwframe+0x63/0x6b
->
-> CPU: 1 PID: 5001 Comm: syz-executor300 Not tainted 6.6.0-syzkaller-12401-=
-g8f6f76a6a29f #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 10/09/2023
->
-> Fixes: 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR scheduling")
-> Fixes: 49e7265fd098 ("net_sched: sch_fq: add TCA_FQ_WEIGHTS attribute")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  net/sched/sch_fq.c | 10 ++--------
->  1 file changed, 2 insertions(+), 8 deletions(-)
->
-> diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> index 0fd18c344ab5ae6d53e12fc764c0506a2979b4c8..3a31c47fea9bd97d815f2624d=
-926bf7be62387cd 100644
-> --- a/net/sched/sch_fq.c
-> +++ b/net/sched/sch_fq.c
-> @@ -919,14 +919,8 @@ static const struct nla_policy fq_policy[TCA_FQ_MAX =
-+ 1] =3D {
->         [TCA_FQ_TIMER_SLACK]            =3D { .type =3D NLA_U32 },
->         [TCA_FQ_HORIZON]                =3D { .type =3D NLA_U32 },
->         [TCA_FQ_HORIZON_DROP]           =3D { .type =3D NLA_U8 },
-> -       [TCA_FQ_PRIOMAP]                =3D {
-> -                       .type =3D NLA_BINARY,
-> -                       .len =3D sizeof(struct tc_prio_qopt),
-> -               },
-> -       [TCA_FQ_WEIGHTS]                =3D {
-> -                       .type =3D NLA_BINARY,
-> -                       .len =3D FQ_BANDS * sizeof(s32),
-> -               },
-> +       [TCA_FQ_PRIOMAP]                =3D NLA_POLICY_EXACT_LEN(sizeof(s=
-truct tc_prio_qopt)),
-> +       [TCA_FQ_WEIGHTS]                =3D NLA_POLICY_EXACT_LEN(FQ_BANDS=
- * sizeof(s32)),
->  };
->
->  /* compress a u8 array with all elems <=3D 3 to an array of 2-bit fields=
- */
+> Treating host memory as a dmabuf should radically simplify the io_uring
+> extension of this set.
 
-Acked-by: Jamal Hadi Salim<jhs@mojatatu.com>
+I agree actually, and I was about to make that comment to David Wei's
+series once I have the time.
 
-cheers,
-jamal
-> --
-> 2.42.0.869.gea05f2083d-goog
+David, your io_uring RX zerocopy proposal actually works with devmem
+TCP, if you're inclined to do that instead, what you'd do roughly is
+(I think):
+
+- Allocate a memfd,
+- Use CONFIG_UDMABUF to create a dma-buf out of that memfd.
+- Bind the dma-buf to the NIC using the netlink API in this RFC.
+- Your io_uring extensions and io_uring uapi should work as-is almost
+on top of this series, I think.
+
+If you do this the incoming packets should land into your memfd, which
+may or may not work for you. In the future if you feel inclined to use
+device memory, this approach that I'm describing here would be more
+extensible to device memory, because you'd already be using dma-bufs
+for your user memory; you'd just replace one kind of dma-buf (UDMABUF)
+with another.
+
+> That the io_uring set needs to dive into
+> page_pools is just wrong - complicating the design and code and pushing
+> io_uring into a realm it does not need to be involved in.
 >
+> Most (all?) of this patch set can work with any memory; only device
+> memory is unreadable.
+>
+>
+
+
+--=20
+Thanks,
+Mina
 
