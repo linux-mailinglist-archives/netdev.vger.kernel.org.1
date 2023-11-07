@@ -1,132 +1,139 @@
-Return-Path: <netdev+bounces-46445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D467E4132
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:52:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 541387E4147
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FDFA1C20A48
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5380D1C209F3
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51F5B30CF5;
-	Tue,  7 Nov 2023 13:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF6C30D0C;
+	Tue,  7 Nov 2023 13:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X40FUekz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAXNPXkL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6D7182C8
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:52:45 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61021199D
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 05:52:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699365165; x=1730901165;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=O7mugTy0WMD+sPBXu0JncizMt0uI+MNJ0XrfSzj4VFg=;
-  b=X40FUekzGaO1l/N2VOJaMIURG/1vRg1oAH/hKg0YXCk/w6fM1r3CG/Tj
-   dTEiz5zJ6Z3lMl88XQ0cE72FZ83Kk0aBaD/4w3f7wQY52Bi31PnYOfzrX
-   KU5PxLrJEeqSDYtZv5chzDIHCwZg+XgVA9p6pb0b2J5lEsTqAW0XvJL4s
-   eWJEYMAZXzpSQNYe2Q+PQDr51kdTl2qyUooV5j5F+BW7AMDSIOQ4DYKm8
-   +uKlugIYzmzw4KUQJWvixkq3Mb+ue2CmbqauJZKth5vtejpBNGK8X1tez
-   /b425yEvCteCC89lGL/+D0D4jQb+X5rMBBczgBklg23o0DX4t262UBi2Q
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="8160085"
-X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
-   d="scan'208";a="8160085"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2023 05:52:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10886"; a="712570090"
-X-IronPort-AV: E=Sophos;i="6.03,283,1694761200"; 
-   d="scan'208";a="712570090"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orsmga003.jf.intel.com with ESMTP; 07 Nov 2023 05:52:42 -0800
-Received: from giewont.igk.intel.com (giewont.igk.intel.com [10.211.8.15])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 385921258E;
-	Tue,  7 Nov 2023 13:52:39 +0000 (GMT)
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [PATCH iwl-net] ice: Restore fix disabling RX VLAN filtering
-Date: Tue,  7 Nov 2023 14:51:38 +0100
-Message-Id: <20231107135138.10692-1-marcin.szycik@linux.intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8999182C8
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:55:13 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B55710FD
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 05:55:12 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-5079f6efd64so7033095e87.2
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 05:55:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699365310; x=1699970110; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=W/3ePFEPzKQWOM3nOSX/yJ6R3zGL0DsR9CwluQIWSUA=;
+        b=JAXNPXkLy+DjDu3V+ygMQ07tIqiRV6FuoXH+ZBIcYOcpd4Bbbrqqyp40vmu3z20Tat
+         0NyU9VIuAw4zrE+E4VNHukyoRzbfMlsz5TDJxM4WYrgxpXnfsHnrR33zGBn4XxlODbns
+         OgHv8PFeoFuujxanX+AIKkZOl+hciTpJalscq5wJEhJycX7eboVFnOS8IIE3cohLlAIi
+         iNUduoVbZbuyajgcip+iFrJTPmjGRILv0k3YvqBoHG0qiO/WcOCRLh2Spse7WMaGTE6s
+         9/mknsN1+bvWrjKEk5xFLup6xmhOnAuttFdSbjSURuj18QIWhelN/Mhygb6YOZShzh6m
+         yGTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699365310; x=1699970110;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W/3ePFEPzKQWOM3nOSX/yJ6R3zGL0DsR9CwluQIWSUA=;
+        b=q+b/o8Xl7Kulzp1iXSAk8p2c1VDdnjKwyhPeHC6vDCG8M1Ok+XuSjLnE3wibgHL6KN
+         H6X9ppYMOMUzDqwQYm3dbsP1tqr/rckcBJhyky7rH+wEAEc2aubS59BFL4TOQopjB8O4
+         pTibmjapHxr2MiDoJdEo9LohQZyK26DwxaU0opWNrMHLQdUEKMB8cHAdZdHQ6tDas2BW
+         xPWOMkWOGhDWrslYT/IpEvbLDNqZM8YiL4fzacFGBpd447nVhArIO/Otb5O41h1eFa8t
+         FkkKeRixGcZWXNj/5vEZ5hwApGdLUa4GzxIJjd9rHzbhPeaDLlTR6YpQ+V1RZG2H+7WK
+         +ejQ==
+X-Gm-Message-State: AOJu0YxTeZ7JI886uJ47joFVq6T77UNuLztMCQbaKWnc+XuspGGgONyq
+	LL40/yIDGdz4AVBLdTWioJ6qayvO4LR1GwdtBYs=
+X-Google-Smtp-Source: AGHT+IE0lDOGqWnY5/Dp21jIBsj7GHx6gwQkrqcwfVNx3qqxklbu+FAoTfobUWwn/frNUhKJQiCEJK1morasBTY4GqA=
+X-Received: by 2002:a05:6512:3582:b0:505:9872:7a16 with SMTP id
+ m2-20020a056512358200b0050598727a16mr22137256lfr.49.1699365310221; Tue, 07
+ Nov 2023 05:55:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231027190910.27044-1-luizluca@gmail.com> <20231027190910.27044-4-luizluca@gmail.com>
+ <20231030205025.b4dryzqzuunrjils@skbuf> <CAJq09z6KV-Oz_8tt4QHKxMx1fjb_81C+XpvFRjLu5vXJHNWKOQ@mail.gmail.com>
+ <CAJq09z6f3AA4t7t+FvdRg9wS9DftNbibu6pssUAPA3u4qih0rg@mail.gmail.com>
+ <CACRpkdairxqm_YVshEuk_KbnZw9oH2sKiHapY_sTrgc85_+AmQ@mail.gmail.com>
+ <20231102155521.2yo5qpugdhkjy22x@skbuf> <CAJq09z5muf01d1gDAP9kcsxC9-V3sbmyqTok=FPOqLXfZB9gNw@mail.gmail.com>
+ <CACRpkdaBC7GeeGYoZ+CYjSVV657yFm=B2L6U2mNyh+AVsLbnsA@mail.gmail.com>
+In-Reply-To: <CACRpkdaBC7GeeGYoZ+CYjSVV657yFm=B2L6U2mNyh+AVsLbnsA@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 7 Nov 2023 10:54:58 -0300
+Message-ID: <CAJq09z6_nVvXsvL0KD9fYNELNkdFg+_dM95Umb4hJgrUP3H-5A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] net: dsa: realtek: support reset controller
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, alsi@bang-olufsen.dk, 
+	andrew@lunn.ch, vivien.didelot@gmail.com, f.fainelli@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org, 
+	krzk+dt@kernel.org, arinc.unal@arinc9.com
+Content-Type: text/plain; charset="UTF-8"
 
-Fix setting dis_rx_filtering depending on whether port vlan is being
-turned on or off. This was originally fixed in commit c793f8ea15e3 ("ice:
-Fix disabling Rx VLAN filtering with port VLAN enabled"), but while
-refactoring ice_vf_vsi_init_vlan_ops(), the fix has been lost. Restore the
-fix along with the original comment from that change.
+> > Your proposed Kconfig does not attempt to avoid a realtek-interface
+> > without both interfaces or without support for both switch families.
+> > Is it possible in Kconfig to force it to, at least, select one of the
+> > interfaces and one of the switches? Is it okay to leave it
+> > unconstrained?
+>
+> Can't you just remove the help text under
+> NET_DSA_REALTEK_INTERFACE so it becomes a hidden
+> option? The other options just select it anyway.
 
-Also delete duplicate lines in ice_port_vlan_on().
+Without a text after the tristate, it will already be hidden. However,
+we can still ask to build a module with no SMI and MDIO.
 
-Fixes: 2946204b3fa8 ("ice: implement bridge port vlan")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+> > If merging the modules is the accepted solution, it makes me wonder if
+> > rtl8365mb.ko and rtl8366.ko should get merged as well into a single
+> > realtek-switch.ko. They are a hard dependency for realtek-interface.ko
+> > (previously on each interface module). If the kernel is custom-built,
+> > it would still be possible to exclude one switch family at build time.
+>
+> That's not a good idea, because we want to be able to load
+> a single module into the kernel to support a single switch
+> family at runtime. If you have a kernel that boots on several
+> systems and some of them have one of the switches and
+> some of them have another switch, I think you see the problem
+> with this approach.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-index d7b10dc67f03..80dc4bcdd3a4 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
-@@ -32,7 +32,6 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
- 		/* setup outer VLAN ops */
- 		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
- 		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
--		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
- 
- 		/* setup inner VLAN ops */
- 		vlan_ops = &vsi->inner_vlan_ops;
-@@ -47,8 +46,13 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
- 
- 		vlan_ops->set_port_vlan = ice_vsi_set_inner_port_vlan;
- 		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
--		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
- 	}
-+
-+	/* all Rx traffic should be in the domain of the assigned port VLAN,
-+	 * so prevent disabling Rx VLAN filtering
-+	 */
-+	vlan_ops->dis_rx_filtering = noop_vlan;
-+
- 	vlan_ops->ena_rx_filtering = ice_vsi_ena_rx_vlan_filtering;
- }
- 
-@@ -77,6 +81,8 @@ static void ice_port_vlan_off(struct ice_vsi *vsi)
- 		vlan_ops->del_vlan = ice_vsi_del_vlan;
- 	}
- 
-+	vlan_ops->dis_rx_filtering = ice_vsi_dis_rx_vlan_filtering;
-+
- 	if (!test_bit(ICE_FLAG_VF_VLAN_PRUNING, pf->flags))
- 		vlan_ops->ena_rx_filtering = noop_vlan;
- 	else
-@@ -141,7 +147,6 @@ void ice_vf_vsi_init_vlan_ops(struct ice_vsi *vsi)
- 		&vsi->outer_vlan_ops : &vsi->inner_vlan_ops;
- 
- 	vlan_ops->add_vlan = ice_vsi_add_vlan;
--	vlan_ops->dis_rx_filtering = ice_vsi_dis_rx_vlan_filtering;
- 	vlan_ops->ena_tx_filtering = ice_vsi_ena_tx_vlan_filtering;
- 	vlan_ops->dis_tx_filtering = ice_vsi_dis_tx_vlan_filtering;
- }
--- 
-2.31.1
+We already have this situation. As the interface module uses
+rtl8366rb_variant and rtl8365mb_variant, we cannot select one or the
+other at runtime.
 
+rtl8365mb              14802  1 realtek_smi
+rtl8366                20870  1 realtek_smi
+tag_rtl4_a              1522  1
+
+If we build it with support for both switches, both modules need to be
+loaded together.
+
+Somehow initializing the switch selectively autoloads the tag module.
+Is it possible to have something like this for subdrivers?
+
+> > I'll use these modules in OpenWrt, which builds a single kernel for a
+> > bunch of devices. Is there a way to weakly depend on a module,
+> > allowing the system to load only a single subdriver? Is it worth it?
+>
+> Last time I looked actually having DSA:s as loadable modules
+> didn't work so well, so they are all compiled in. In OpenWrt
+> I didn't find any DSA modules packaged as modules. But maybe
+> I didn't try hard enough. IIRC the problem is that it needs to
+> also have a tag module (for NET_DSA_TAG_*) and that didn't
+> modularize so well.
+
+It does work, even the tag module. As I mentioned, the tag modules are
+even loaded on demand. You just need to load it in the correct
+sequence.
+
+>
+> Yours,
+> Linus Walleij
 
