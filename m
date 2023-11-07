@@ -1,224 +1,214 @@
-Return-Path: <netdev+bounces-46501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B8ED7E4A77
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:19:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39047E4AD9
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F51B281346
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:19:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8119C2813E0
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F393A2A1C7;
-	Tue,  7 Nov 2023 21:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17571450F0;
+	Tue,  7 Nov 2023 21:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0qCpusB5"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="cNDzU9qO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737402A1A4
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:19:48 +0000 (UTC)
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB053D78
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:19:47 -0800 (PST)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-45d72e4eb31so1598680137.1
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 13:19:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C611D68C
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:40:57 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9F3810D0
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:40:56 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc329ce84cso55985585ad.2
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 13:40:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699391987; x=1699996787; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H6vtB6oGNeNraeO1yfc6WDVHQCGu06A7XkYHqu97D2c=;
-        b=0qCpusB5cgJsovyh+pflw6eb7M0+rxhkXqUUV57dWxTspNfOyvZJzzSCqvkW+N1FrS
-         KiR8RmuRy7bxGqZE4qdy3tCGanjdKdDgC7beNnOEoYptIBik1gKxC/6ON4ZOg/Z2hNyj
-         DAKipbvHGVeOHp7RyWj2RS9aE30t0vT836lR/ctBajfm2ZrzTmX7Lakc7QhXGOqyElwC
-         c/WVUv+dUkQ7kX/oL9GKWoos1K2b9SkmmQiKLGchPwdr8JV1bGaQz8B+g5PVoxIHPTze
-         4X8Gy+wOTF2R+6DUDjmTO+pHw/79tXdvy3SFPimRaaJC0d/M9p2BbWGdKUeRDi2ltsZx
-         ebMg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699393256; x=1699998056; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVJZqVcyma3ct6BfK13ilT3hI6yMCDJSgtxoPkUL7Us=;
+        b=cNDzU9qOn7UWFCp+xGJqPzi4U1ruEp8023y/neUzTcRYCYL9tU6J0CR5vh8fhJY+ti
+         8d5Ierb2suE6aqhxidEcrOMmg2wyN6jI2AqzxXnofBm/eQZK+EqVrvavG9/t3OumB7E3
+         hgBgbOSXey1LNsoXKkjK6fil8UHPOKRvCncHBQjjediVbYtPkRN4RfoEVJ55kYsMYdcO
+         SMv2k2N2XchplNx7WFUzSoKkl6bHi6lF8n1ehnRC+GILPA44tHNHeC8Q94RdU4nYZktl
+         R0pmfMWKHdP0MmbnbTXdYn6w9GmCIxkPCq4PJ8jSgGDJVvljCgfUbzFsNQtAiOfxQVi1
+         kP9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699391987; x=1699996787;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H6vtB6oGNeNraeO1yfc6WDVHQCGu06A7XkYHqu97D2c=;
-        b=G2bOiaT9Z6Dz09Gt5gGwm/bKOy2z5HfQGZu3l5NPAG648SIiGu+K/4e1aWh9SlEjxW
-         Tn/iRnA8qpG4pVPmDuGvhyrGrMXFNJhKETpSFAx5+6REhgV8jNbH0jNC/ku5z6lFDBXF
-         iF1ah3EOwA2zcvjzxqVADpThWZ9OQYBXiWc2nRsloNRRwL1ILMKaMThhgUyeBXSfDzU3
-         x/5ZBQWe5TPy1SEOVJL7gn4rTtbmvz/Kq5bmo4PDUEgkO8I5JgdocPmvvWa/+rJ76oQH
-         ZiR+mnj/2EB8Jt3l5DIBC2Z9HRFD2jo6zGRrDHW/iroyGdNiUgBDUUvifUENQqqv4EnJ
-         rQiA==
-X-Gm-Message-State: AOJu0YzWyqs5dHGYiYkdFkgtuLCOeGnpT+Z9Oi/BNcackh4hUGnFtOfX
-	mYRFsoCIunSbEdDSFuFkg63uIeswOlvygkyAVhDSDQ==
-X-Google-Smtp-Source: AGHT+IGP/CXPxw/3EMz20UnoxCfjtef8X0h1zK6Yh6FlZoE34oBHf9lsr5FmmVHSCxlfjvy68G8o2l++xlKxI0QUgP0=
-X-Received: by 2002:a05:6102:4712:b0:45d:91b3:74b7 with SMTP id
- ei18-20020a056102471200b0045d91b374b7mr12087084vsb.27.1699391986590; Tue, 07
- Nov 2023 13:19:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699393256; x=1699998056;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AVJZqVcyma3ct6BfK13ilT3hI6yMCDJSgtxoPkUL7Us=;
+        b=VRHAe4etXFOiM3Tdpbr3/W90KkXoo8EMh5Y/Z6OFcxiwvrDGQ+0AUhRHWxqUdUEe+4
+         IqE8C9rSIWPrauYIPn8eaCInsUTxjtW5sGpVPjR6AuYI/wahdMgNO5bhGBQcLQqoyxn+
+         V0oq/bogrNYk7PL7z+P0lddIgBqFxLL/yX+ep6otDeLMYKTRtxKSuHxKsp7wY0F/s0+/
+         WRUKVX8exVRUMbIC5lvIp4L+jvOoHU3Fu6pZBq0UTOueM7DIaq33OG1MNAEhE8zCaynL
+         lCVn87rj57xZ28Id4c/bAeOUZn8SVh1rugCzonvpUmj684lirHmn3ZWbgmSTyiktZYin
+         GZrA==
+X-Gm-Message-State: AOJu0YykasCCr1DcCUEQ6uMDxXg5HOVlbztAm08uuTbOkGeKKpMX7mz5
+	hr68E2e5PRmQD4JfypzFZysTOw==
+X-Google-Smtp-Source: AGHT+IEsv6fK+LHzXXi/oHWB63hwNVvn+nqPWFiS64BbMdemDnSHvz9isUHkY1sOCc9meRMUmkMMyg==
+X-Received: by 2002:a17:902:ce91:b0:1cc:5425:bb4 with SMTP id f17-20020a170902ce9100b001cc54250bb4mr238392plg.52.1699393256425;
+        Tue, 07 Nov 2023 13:40:56 -0800 (PST)
+Received: from localhost (fwdproxy-prn-017.fbsv.net. [2a03:2880:ff:11::face:b00c])
+        by smtp.gmail.com with ESMTPSA id ji3-20020a170903324300b001c5fc11c085sm265202plb.264.2023.11.07.13.40.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 13:40:56 -0800 (PST)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [RFC PATCH v2 00/20] Zero copy Rx using io_uring
+Date: Tue,  7 Nov 2023 13:40:25 -0800
+Message-Id: <20231107214045.2172393-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-9-almasrymina@google.com> <7e851882-9a85-3672-c3d5-73b47599873c@huawei.com>
-In-Reply-To: <7e851882-9a85-3672-c3d5-73b47599873c@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 Nov 2023 13:19:32 -0800
-Message-ID: <CAHS8izPGa99LyEc=AeqNaK8X68b7dovxCHOLbR=hnbaybN_zgQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 08/12] net: support non paged skb frags
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 7, 2023 at 1:00=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2023/11/6 10:44, Mina Almasry wrote:
-> > Make skb_frag_page() fail in the case where the frag is not backed
-> > by a page, and fix its relevent callers to handle this case.
-> >
-> > Correctly handle skb_frag refcounting in the page_pool_iovs case.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
->
-> ...
->
-> >  /**
-> >   * skb_frag_page - retrieve the page referred to by a paged fragment
-> >   * @frag: the paged fragment
-> >   *
-> > - * Returns the &struct page associated with @frag.
-> > + * Returns the &struct page associated with @frag. Returns NULL if thi=
-s frag
-> > + * has no associated page.
-> >   */
-> >  static inline struct page *skb_frag_page(const skb_frag_t *frag)
-> >  {
-> > -     return frag->bv_page;
-> > +     if (!page_is_page_pool_iov(frag->bv_page))
-> > +             return frag->bv_page;
-> > +
-> > +     return NULL;
->
-> It seems most of callers don't expect NULL returning for skb_frag_page(),
-> and this patch only changes a few relevant callers to handle the NULL cas=
-e.
->
+Changes in RFC v2:
+------------------
 
-Yes, I did not change code that I guessed was not likely to be
-affected or enable the devmem TCP case. Here is my breakdown:
+* Added copy fallback support if userspace memory allocated for ZC Rx
+  runs out, or if header splitting or flow steering fails.
+* Added veth support for ZC Rx, for testing and demonstration. We will
+  need to figure out what driver would be best for such testing
+  functionality in the future. Perhaps netdevsim?
+* Added socket registration API to io_uring to associate specific
+  sockets with ifqs/Rx queues for ZC.
+* Added multi-socket support, such that multiple connections can be
+  steered into the same hardware Rx queue.
+* Added Netbench server/client support.
 
-=E2=9E=9C  cos-kernel git:(tcpdevmem) =E2=9C=97 ack -i "skb_frag_page\("
---ignore-dir=3Ddrivers -t cc -l
-net/core/dev.c
-net/core/datagram.c
-net/core/xdp.c
-net/core/skbuff.c
-net/core/filter.c
-net/core/gro.c
-net/appletalk/ddp.c
-net/wireless/util.c
-net/tls/tls_device.c
-net/tls/tls_device_fallback.c
-net/ipv4/tcp.c
-net/ipv4/tcp_output.c
-net/bpf/test_run.c
-include/linux/skbuff.h
+Known deficiencies that we will address in a future patchset:
 
-I'm ignoring ank skb_frag_page() calls in drivers because drivers need
-to add support for devmem TCP, and handle these calls at time of
-adding support, I think that's reasonable.
+* Rebase on top of Kuba's page pool memory provider RFC.
+* Proper test driver + selftests, maybe netdevsim.
+* Further optimisation work.
+* ...and more.
 
-net/core/dev.c:
-I think I missed ilegal_highdma()
+We are looking for feedback on our approach. Here are some example
+points we would like to specifically discuss:
 
-net/core/datagram.c:
-__skb_datagram_iter() protected by not_readable(skb) check.
+* Use of bpf_netdev_command to set up a hardware Rx queue for ZC?
+* Tagging page private fields with a magic cookie to distinguish special
+  userspace pages used for ZC Rx. This is used when reading skbs from a
+  socket in io_uring to decide what to do.
 
-net/core/skbuff.c:
-protected by not_readable(skb) check.
+This patchset is a proposal that adds zero copy network Rx to io_uring.
+With it, userspace can register a region of host memory for receiving
+data directly from a NIC using DMA, without needing a kernel to user
+copy.
 
-net/core/filter.c:
-bpf_xdp_frags_shrink_tail seems like xdp specific, not sure it's relevant h=
-ere.
+Full kernel tree including some out of tree BNXT changes:
 
-net/core/gro.c:
-skb_gro_reset_offset: protected by NULL check
+https://github.com/spikeh/linux/tree/zcrx_sil
 
-net/ipv4/tcp.c:
-tcp_zerocopy_receive protected by NULL check.
+On the userspace side, support is added to both liburing and Netbench:
 
-net/ipv4/tcp_output.c:
-tcp_clone_payload: handles NULL return fine.
+https://github.com/spikeh/liburing/tree/zcrx2
+https://github.com/spikeh/netbench/tree/zcrx
 
-net/bpf/test_run.c:
-seems xdp specific and not sure if it can run into devmem issues.
+If you would like to try out this patchset, build and run the kernel
+tree then build Netbench using liburing, all from forks above.
 
-include/linux/skbuff.h:
-I think the multiple calls here are being handled correctly, but let
-me know if not.
+Run setup.sh first:
 
-All the calls in these files, I think, are code paths not possible to
-hit devmem TCP with the current support, I think:
-net/core/xdp.c
-net/appletalk/ddp.c
-net/wireless/util.c
-net/tls/tls_device.c
-net/tls/tls_device_fallback.c
+https://gist.github.com/isilence/e6a28ce41a545a261566672104afa461
 
-All in all I think maybe all in all I missed illegal_highdma(). I'll
-fix it in the next iteration.
+Then run the following commands:
 
-> It may make more sense to add a new helper to do the above checking, and
-> add a warning in skb_frag_page() to catch any missing NULL checking for
-> skb_frag_page() caller, something like below?
->
->  static inline struct page *skb_frag_page(const skb_frag_t *frag)
->  {
-> -       return frag->bv_page;
-> +       struct page *page =3D frag->bv_page;
-> +
-> +       BUG_ON(page_is_page_pool_iov(page));
-> +
-> +       return page;
-> +}
-> +
-> +static inline struct page *skb_frag_readable_page(const skb_frag_t *frag=
-)
-> +{
-> +       struct page *page =3D frag->bv_page;
-> +
-> +       if (!page_is_page_pool_iov(page))
-> +               return page;
-> +
-> +       return NULL;
->  }
->
->
+sudo ip netns exec nsserv ./netbench --server_only 1 --v6 false \
+    --rx "io_uring --provide_buffers 0 --use_zc 1 \
+    --zc_pool_pages 16384 --zc_ifname ptp-serv" --use_port 9999
 
-My personal immediate reaction is that this may just introduce code
-churn without significant benefit. If an unsuspecting caller call
-skb_frag_page() on devmem frag and doesn't correctly handle NULL
-return, it will crash or error out anyway, and likely in some obvious
-way, so maybe the BUG_ON() isn't so useful that it's worth changing
-all the call sites. But if there is consensus on adding a change like
-you propose, I have no problem adding it.
+sudo ip netns exec nscl ./netbench --client_only 1 --v6 false \
+    --tx "epoll --threads 1 --per_thread 1 --size 2800" \
+    --host 10.10.10.20 --use_port 9999
 
---=20
-Thanks,
-Mina
+Hardware support is added to the Broadcom BNXT driver. This patchset +
+userspace code was tested on an Intel Xeon Platinum 8321HC CPU and
+Broadcom BCM57504 NIC.
+
+Early benchmarks using this prototype, with iperf3 as a load generator,
+showed a ~50% reduction in overall system memory bandwidth as measured
+using perf counters. Note that DDIO must be disabled on Intel systems.
+Build Netbench using the modified liburing above.
+
+This patchset is based on the work by Jonathan Lemon
+<jonathan.lemon@gmail.com>:
+https://lore.kernel.org/io-uring/20221108050521.3198458-1-jonathan.lemon@gmail.com/
+
+David Wei (13):
+  io_uring: add interface queue
+  io_uring: add mmap support for shared ifq ringbuffers
+  netdev: add XDP_SETUP_ZC_RX command
+  io_uring: setup ZC for an Rx queue when registering an ifq
+  io_uring: add ZC buf and pool
+  io_uring: add ZC pool API
+  skbuff: add SKBFL_FIXED_FRAG and skb_fixed()
+  io_uring: allocate a uarg for freeing zero copy skbs
+  io_uring: delay ZC pool destruction
+  net: add data pool
+  io_uring: add io_recvzc request
+  bnxt: use data pool
+  io_uring/zcrx: add multi socket support per Rx queue
+
+Pavel Begunkov (7):
+  io_uring/zcrx: implement socket registration
+  io_uring/zcrx: propagate ifq down the stack
+  io_uring/zcrx: introduce io_zc_get_rbuf_cqe
+  io_uring/zcrx: add copy fallback
+  net: execute custom callback from napi
+  io_uring/zcrx: copy fallback to ring buffers
+  veth: add support for io_uring zc rx
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  61 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |   3 +
+ drivers/net/veth.c                            | 179 +++-
+ include/linux/io_uring.h                      |  33 +
+ include/linux/io_uring_types.h                |   6 +
+ include/linux/net.h                           |   2 +
+ include/linux/netdevice.h                     |   7 +
+ include/linux/skbuff.h                        |  10 +-
+ include/net/busy_poll.h                       |   2 +
+ include/net/data_pool.h                       |  74 ++
+ include/net/netdev_rx_queue.h                 |   2 +
+ include/uapi/linux/io_uring.h                 |  61 ++
+ io_uring/Makefile                             |   3 +-
+ io_uring/io_uring.c                           |  19 +
+ io_uring/kbuf.c                               |  27 +
+ io_uring/kbuf.h                               |   5 +
+ io_uring/net.c                                | 136 ++-
+ io_uring/opdef.c                              |  16 +
+ io_uring/zc_rx.c                              | 967 ++++++++++++++++++
+ io_uring/zc_rx.h                              |  69 ++
+ net/core/dev.c                                |  51 +
+ net/socket.c                                  |   1 +
+ 23 files changed, 1721 insertions(+), 18 deletions(-)
+ create mode 100644 include/net/data_pool.h
+ create mode 100644 io_uring/zc_rx.c
+ create mode 100644 io_uring/zc_rx.h
+
+-- 
+2.39.3
+
 
