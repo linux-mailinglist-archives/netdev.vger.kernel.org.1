@@ -1,55 +1,49 @@
-Return-Path: <netdev+bounces-46423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBA27E3C10
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3ADA7E3C11
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CCF028109E
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99F30281100
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902AF2E40C;
-	Tue,  7 Nov 2023 12:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3092E410;
+	Tue,  7 Nov 2023 12:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UPFhrcpg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qNoWaw46"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AE52E3FE
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 832BDC433C7;
-	Tue,  7 Nov 2023 12:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B12F2E407
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213EEC43395;
+	Tue,  7 Nov 2023 12:12:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699359130;
-	bh=g+8IPi16N1GgX38KnQ3IcliT0JgNLjiBdQ59z/y057s=;
+	s=k20201202; t=1699359136;
+	bh=TtWCg/eP5F31DlPLAlF2GSU1qVOUUjLiPvLmgJtHgMI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UPFhrcpgkkP72IwGhLUr6UJnWenyzQHDtWU9yTplo07irGo3z41qBU142AamWFFzy
-	 Qlv0Cya7r08JtTsberVEFOjPYKOrZXF0caQ8Q5yuRsqak3PjiSNp9HOM5TxYIEpwbi
-	 v4FTZtwQ32T5VH8UXBDj3ywUAr6XkCc3LJuvc5c8ikS0Y1mtDiitj0zZYUNVqo627s
-	 oLdlBBV5ru58GHPAIfYPY2QYA5nDrHHMXnkAwyWP+iiNBhrrxtG6EXr+NQvCfg5EDa
-	 XOgsE+0oZIODTPOi7LcauFIBA7a7TDg3poVPRYo/zEPqKXFDTFnhdfK6xL8z///MEX
-	 iZ06Jr4jIu/BA==
+	b=qNoWaw46Dv2XYPy5XO4E0DKWUL6GXx5S+tB/4srBU2edunhTsMS6/NIQFVOKGWC3t
+	 GoZHvbkZ9u0AdJSkyQjDsV1woq9eA/zEQrnj3+otcXCWhgQ0UotS1ilGDkjWAqP+BP
+	 aFvlq8b+cT7TQCv3de9N32+paHxfq0m72R3jt/H06j9gw4lBTxyZZFxjpbd68Zcbou
+	 C0Ey94MmoD6bIF2aNVUi0LLSUWQlvCg3A1vzESIIpeJaUWQsSYStjoxq5ThuhHoJuF
+	 GQ0nJPZC4OlsnuVsd4tF9ka6d+N+IPUyPXH8zaFOEpcvuI0Uxj0qO6fRsBV+vNjClD
+	 2m0+kfyedRRxg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Sieng-Piaw Liew <liew.s.piaw@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	chris.snook@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
 	kuba@kernel.org,
-	horms@kernel.org,
-	pavan.chebbi@broadcom.com,
-	ruc_gongyuanjun@163.com,
-	trix@redhat.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 03/12] atl1c: Work around the DMA RX overflow issue
-Date: Tue,  7 Nov 2023 07:11:40 -0500
-Message-ID: <20231107121158.3758348-3-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 07/12] net: annotate data-races around sk->sk_tx_queue_mapping
+Date: Tue,  7 Nov 2023 07:11:44 -0500
+Message-ID: <20231107121158.3758348-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231107121158.3758348-1-sashal@kernel.org>
 References: <20231107121158.3758348-1-sashal@kernel.org>
@@ -64,171 +58,63 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.137
 Content-Transfer-Encoding: 8bit
 
-From: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
 
-[ Upstream commit 86565682e9053e5deb128193ea9e88531bbae9cf ]
+[ Upstream commit 0bb4d124d34044179b42a769a0c76f389ae973b6 ]
 
-This is based on alx driver commit 881d0327db37 ("net: alx: Work around
-the DMA RX overflow issue").
+This field can be read or written without socket lock being held.
 
-The alx and atl1c drivers had RX overflow error which was why a custom
-allocator was created to avoid certain addresses. The simpler workaround
-then created for alx driver, but not for atl1c due to lack of tester.
+Add annotations to avoid load-store tearing.
 
-Instead of using a custom allocator, check the allocated skb address and
-use skb_reserve() to move away from problematic 0x...fc0 address.
-
-Tested on AR8131 on Acer 4540.
-
-Signed-off-by: Sieng-Piaw Liew <liew.s.piaw@gmail.com>
-Link: https://lore.kernel.org/r/20230912010711.12036-1-liew.s.piaw@gmail.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/atheros/atl1c/atl1c.h    |  3 -
- .../net/ethernet/atheros/atl1c/atl1c_main.c   | 67 +++++--------------
- 2 files changed, 16 insertions(+), 54 deletions(-)
+ include/net/sock.h | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c.h b/drivers/net/ethernet/atheros/atl1c/atl1c.h
-index 43d821fe7a542..63ba64dbb7310 100644
---- a/drivers/net/ethernet/atheros/atl1c/atl1c.h
-+++ b/drivers/net/ethernet/atheros/atl1c/atl1c.h
-@@ -504,15 +504,12 @@ struct atl1c_rrd_ring {
- 	u16 next_to_use;
- 	u16 next_to_clean;
- 	struct napi_struct napi;
--	struct page *rx_page;
--	unsigned int rx_page_offset;
- };
- 
- /* board specific private data structure */
- struct atl1c_adapter {
- 	struct net_device   *netdev;
- 	struct pci_dev      *pdev;
--	unsigned int	    rx_frag_size;
- 	struct atl1c_hw        hw;
- 	struct atl1c_hw_stats  hw_stats;
- 	struct mii_if_info  mii;    /* MII interface info */
-diff --git a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-index dad21b4fbc0bc..c6f621c0ca836 100644
---- a/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-+++ b/drivers/net/ethernet/atheros/atl1c/atl1c_main.c
-@@ -493,15 +493,10 @@ static int atl1c_set_mac_addr(struct net_device *netdev, void *p)
- static void atl1c_set_rxbufsize(struct atl1c_adapter *adapter,
- 				struct net_device *dev)
- {
--	unsigned int head_size;
- 	int mtu = dev->mtu;
- 
- 	adapter->rx_buffer_len = mtu > AT_RX_BUF_SIZE ?
- 		roundup(mtu + ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN, 8) : AT_RX_BUF_SIZE;
--
--	head_size = SKB_DATA_ALIGN(adapter->rx_buffer_len + NET_SKB_PAD + NET_IP_ALIGN) +
--		    SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
--	adapter->rx_frag_size = roundup_pow_of_two(head_size);
+diff --git a/include/net/sock.h b/include/net/sock.h
+index 640bd7a367779..d148dc95c9e9c 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1923,21 +1923,33 @@ static inline void sk_tx_queue_set(struct sock *sk, int tx_queue)
+ 	/* sk_tx_queue_mapping accept only upto a 16-bit value */
+ 	if (WARN_ON_ONCE((unsigned short)tx_queue >= USHRT_MAX))
+ 		return;
+-	sk->sk_tx_queue_mapping = tx_queue;
++	/* Paired with READ_ONCE() in sk_tx_queue_get() and
++	 * other WRITE_ONCE() because socket lock might be not held.
++	 */
++	WRITE_ONCE(sk->sk_tx_queue_mapping, tx_queue);
  }
  
- static netdev_features_t atl1c_fix_features(struct net_device *netdev,
-@@ -974,7 +969,6 @@ static void atl1c_init_ring_ptrs(struct atl1c_adapter *adapter)
- static void atl1c_free_ring_resources(struct atl1c_adapter *adapter)
- {
- 	struct pci_dev *pdev = adapter->pdev;
--	int i;
+ #define NO_QUEUE_MAPPING	USHRT_MAX
  
- 	dma_free_coherent(&pdev->dev, adapter->ring_header.size,
- 			  adapter->ring_header.desc, adapter->ring_header.dma);
-@@ -987,12 +981,6 @@ static void atl1c_free_ring_resources(struct atl1c_adapter *adapter)
- 		kfree(adapter->tpd_ring[0].buffer_info);
- 		adapter->tpd_ring[0].buffer_info = NULL;
- 	}
--	for (i = 0; i < adapter->rx_queue_count; ++i) {
--		if (adapter->rrd_ring[i].rx_page) {
--			put_page(adapter->rrd_ring[i].rx_page);
--			adapter->rrd_ring[i].rx_page = NULL;
--		}
--	}
+ static inline void sk_tx_queue_clear(struct sock *sk)
+ {
+-	sk->sk_tx_queue_mapping = NO_QUEUE_MAPPING;
++	/* Paired with READ_ONCE() in sk_tx_queue_get() and
++	 * other WRITE_ONCE() because socket lock might be not held.
++	 */
++	WRITE_ONCE(sk->sk_tx_queue_mapping, NO_QUEUE_MAPPING);
  }
  
- /**
-@@ -1764,48 +1752,11 @@ static inline void atl1c_rx_checksum(struct atl1c_adapter *adapter,
- 	skb_checksum_none_assert(skb);
- }
- 
--static struct sk_buff *atl1c_alloc_skb(struct atl1c_adapter *adapter,
--				       u32 queue, bool napi_mode)
--{
--	struct atl1c_rrd_ring *rrd_ring = &adapter->rrd_ring[queue];
--	struct sk_buff *skb;
--	struct page *page;
--
--	if (adapter->rx_frag_size > PAGE_SIZE) {
--		if (likely(napi_mode))
--			return napi_alloc_skb(&rrd_ring->napi,
--					      adapter->rx_buffer_len);
--		else
--			return netdev_alloc_skb_ip_align(adapter->netdev,
--							 adapter->rx_buffer_len);
--	}
--
--	page = rrd_ring->rx_page;
--	if (!page) {
--		page = alloc_page(GFP_ATOMIC);
--		if (unlikely(!page))
--			return NULL;
--		rrd_ring->rx_page = page;
--		rrd_ring->rx_page_offset = 0;
--	}
--
--	skb = build_skb(page_address(page) + rrd_ring->rx_page_offset,
--			adapter->rx_frag_size);
--	if (likely(skb)) {
--		skb_reserve(skb, NET_SKB_PAD + NET_IP_ALIGN);
--		rrd_ring->rx_page_offset += adapter->rx_frag_size;
--		if (rrd_ring->rx_page_offset >= PAGE_SIZE)
--			rrd_ring->rx_page = NULL;
--		else
--			get_page(page);
--	}
--	return skb;
--}
--
- static int atl1c_alloc_rx_buffer(struct atl1c_adapter *adapter, u32 queue,
- 				 bool napi_mode)
+ static inline int sk_tx_queue_get(const struct sock *sk)
  {
- 	struct atl1c_rfd_ring *rfd_ring = &adapter->rfd_ring[queue];
-+	struct atl1c_rrd_ring *rrd_ring = &adapter->rrd_ring[queue];
- 	struct pci_dev *pdev = adapter->pdev;
- 	struct atl1c_buffer *buffer_info, *next_info;
- 	struct sk_buff *skb;
-@@ -1824,13 +1775,27 @@ static int atl1c_alloc_rx_buffer(struct atl1c_adapter *adapter, u32 queue,
- 	while (next_info->flags & ATL1C_BUFFER_FREE) {
- 		rfd_desc = ATL1C_RFD_DESC(rfd_ring, rfd_next_to_use);
- 
--		skb = atl1c_alloc_skb(adapter, queue, napi_mode);
-+		/* When DMA RX address is set to something like
-+		 * 0x....fc0, it will be very likely to cause DMA
-+		 * RFD overflow issue.
-+		 *
-+		 * To work around it, we apply rx skb with 64 bytes
-+		 * longer space, and offset the address whenever
-+		 * 0x....fc0 is detected.
+-	if (sk && sk->sk_tx_queue_mapping != NO_QUEUE_MAPPING)
+-		return sk->sk_tx_queue_mapping;
++	if (sk) {
++		/* Paired with WRITE_ONCE() in sk_tx_queue_clear()
++		 * and sk_tx_queue_set().
 +		 */
-+		if (likely(napi_mode))
-+			skb = napi_alloc_skb(&rrd_ring->napi, adapter->rx_buffer_len + 64);
-+		else
-+			skb = netdev_alloc_skb(adapter->netdev, adapter->rx_buffer_len + 64);
- 		if (unlikely(!skb)) {
- 			if (netif_msg_rx_err(adapter))
- 				dev_warn(&pdev->dev, "alloc rx buffer failed\n");
- 			break;
- 		}
++		int val = READ_ONCE(sk->sk_tx_queue_mapping);
  
-+		if (((unsigned long)skb->data & 0xfff) == 0xfc0)
-+			skb_reserve(skb, 64);
-+
- 		/*
- 		 * Make buffer alignment 2 beyond a 16 byte boundary
- 		 * this will result in a 16 byte aligned IP header after
++		if (val != NO_QUEUE_MAPPING)
++			return val;
++	}
+ 	return -1;
+ }
+ 
 -- 
 2.42.0
 
