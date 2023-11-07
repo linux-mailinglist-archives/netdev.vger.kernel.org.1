@@ -1,84 +1,123 @@
-Return-Path: <netdev+bounces-46379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE62A7E3691
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:25:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F6E7E3717
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 10:00:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6111C20944
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:25:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FFD0B20B97
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFA8101CF;
-	Tue,  7 Nov 2023 08:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12409D260;
+	Tue,  7 Nov 2023 09:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4BA510A03
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 08:25:08 +0000 (UTC)
-Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A36BD
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 00:25:06 -0800 (PST)
-Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-1e9adea7a4cso6772030fac.3
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 00:25:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699345506; x=1699950306;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/VeWHnX3FKLObEtyX6GlSBLB+HcaO16fQrZJABNKmrA=;
-        b=aZm7URqjxWX7XH9qntDikyE7l06ukR7a/GQqmnbcd6P2yPuV+g7jvHjmwwraT1BS0l
-         RSCMT6tUa9sSoZyO4pMy6fVxx2criMfB+dIOqZVqky2ZCYQDvIZsJWJO/ROOCySDmewP
-         fxoBFh/UgqozB411HjN4AvhmvYqgEDY022FCy5w8AsqfRpOCTyEESQUlvjqtc1Z0DaR5
-         lAmO+u3zpkWARQiDKe5Xss0ylHgDlcK1TaNjm7S55S7+m4tmkX5gpOPOCzj46/t6hpp2
-         tRbUyOl6tuZrdD0APZCoDEnR6O1B7J73LWTiHG78NBu3BAt97btUnQsTyrogPNQUleAz
-         XePA==
-X-Gm-Message-State: AOJu0Yx+GWnaJYeIV3uhoHthi5UIPapPt8wahT5s2wigEBYMaAUhJS9p
-	VAsSeVMBzokTkItjvQMJ+bpYzA8sSfiPl9nwwnKZJ+/3QX6T
-X-Google-Smtp-Source: AGHT+IGJEd5Nq1Mz1pOFbxEaR60SDM8zts1GWxm0RyeCCsYGeWxT13dinNOJtnz8GWzdFwASj7cOe1upjxWEL6VJP2SWJnCZs7e9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D54CA46;
+	Tue,  7 Nov 2023 09:00:43 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928DD101;
+	Tue,  7 Nov 2023 01:00:41 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SPhtd20XRzrTwF;
+	Tue,  7 Nov 2023 16:57:29 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 7 Nov
+ 2023 17:00:07 +0800
+Subject: Re: [RFC PATCH v3 08/12] net: support non paged skb frags
+To: Mina Almasry <almasrymina@google.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-9-almasrymina@google.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <7e851882-9a85-3672-c3d5-73b47599873c@huawei.com>
+Date: Tue, 7 Nov 2023 17:00:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6870:241a:b0:1dd:7381:e05 with SMTP id
- n26-20020a056870241a00b001dd73810e05mr950466oap.3.1699345506174; Tue, 07 Nov
- 2023 00:25:06 -0800 (PST)
-Date: Tue, 07 Nov 2023 00:25:06 -0800
-In-Reply-To: <000000000000bcd80b06046a98ac@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003f0e4406098bb529@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_link_release_channel
-From: syzbot <syzbot+9817a610349542589c42@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jiri@nvidia.com, 
-	johannes@sipsolutions.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20231106024413.2801438-9-almasrymina@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-syzbot has bisected this issue to:
+On 2023/11/6 10:44, Mina Almasry wrote:
+> Make skb_frag_page() fail in the case where the frag is not backed
+> by a page, and fix its relevent callers to handle this case.
+> 
+> Correctly handle skb_frag refcounting in the page_pool_iovs case.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
 
-commit c2368b19807affd7621f7c4638cd2e17fec13021
-Author: Jiri Pirko <jiri@nvidia.com>
-Date:   Fri Jul 29 07:10:35 2022 +0000
+...
 
-    net: devlink: introduce "unregistering" mark and use it during devlinks iteration
+>  /**
+>   * skb_frag_page - retrieve the page referred to by a paged fragment
+>   * @frag: the paged fragment
+>   *
+> - * Returns the &struct page associated with @frag.
+> + * Returns the &struct page associated with @frag. Returns NULL if this frag
+> + * has no associated page.
+>   */
+>  static inline struct page *skb_frag_page(const skb_frag_t *frag)
+>  {
+> -	return frag->bv_page;
+> +	if (!page_is_page_pool_iov(frag->bv_page))
+> +		return frag->bv_page;
+> +
+> +	return NULL;
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1734cd60e80000
-start commit:   d68b4b6f307d Merge tag 'mm-nonmm-stable-2023-08-28-22-48' ..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14b4cd60e80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10b4cd60e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c45ae22e154d76fa
-dashboard link: https://syzkaller.appspot.com/bug?extid=9817a610349542589c42
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128eab18680000
+It seems most of callers don't expect NULL returning for skb_frag_page(),
+and this patch only changes a few relevant callers to handle the NULL case.
 
-Reported-by: syzbot+9817a610349542589c42@syzkaller.appspotmail.com
-Fixes: c2368b19807a ("net: devlink: introduce "unregistering" mark and use it during devlinks iteration")
+It may make more sense to add a new helper to do the above checking, and
+add a warning in skb_frag_page() to catch any missing NULL checking for
+skb_frag_page() caller, something like below?
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+ static inline struct page *skb_frag_page(const skb_frag_t *frag)
+ {
+-       return frag->bv_page;
++       struct page *page = frag->bv_page;
++
++       BUG_ON(page_is_page_pool_iov(page));
++
++       return page;
++}
++
++static inline struct page *skb_frag_readable_page(const skb_frag_t *frag)
++{
++       struct page *page = frag->bv_page;
++
++       if (!page_is_page_pool_iov(page))
++               return page;
++
++       return NULL;
+ }
+
+
 
