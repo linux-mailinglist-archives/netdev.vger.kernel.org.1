@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-46358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB0E7E3599
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:14:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB6B7E359F
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCDB4280EE2
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:14:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15B5DB20B02
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 07:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085F1C15B;
-	Tue,  7 Nov 2023 07:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2B8C15E;
+	Tue,  7 Nov 2023 07:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lX1maKFb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XWQAU+LU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E8A9C2C0
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 07:14:50 +0000 (UTC)
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F56120
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:14:49 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id 2adb3069b0e04-509109104e2so6977072e87.3
-        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 23:14:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E84717C3
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 07:15:52 +0000 (UTC)
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 984C4120
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 23:15:50 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id ffacd0b85a97d-32daeed7771so2703017f8f.3
+        for <netdev@vger.kernel.org>; Mon, 06 Nov 2023 23:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699341287; x=1699946087; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699341349; x=1699946149; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=X8sfscZNgvFdNuYLj9pz7pxUEhl0FJn2711ooDKEXvA=;
-        b=lX1maKFbxrDpUne0rsUYkkB3wW0iTYcKCQiSS7Go8O0W9IBweQxMUlLyclGezZdfVO
-         I14zfEIFxRbDdkq2AaVU9J8DMwNm+vzoWcdgwNm1d1mFw6IoKCxg0Hu18zuGr8A17t2j
-         hDjvUZzr47dTgfP1iwJeFTm6TWgivRZf+e59Ajb6d4xEVa2kJMLdnErDySO6DzimI/8R
-         YM8nPf3liCFze6qarKCmHmQr9LTR8ZxBfh2LjeBityXpIXuCI77J27zY0xGmRcYNbaf/
-         zRKOHEhUg/pZwtse/3hKIWrBCroTEuEQ9bBFSeMhJIpaHdDaowWKxLw0jPJjTX2AKbnE
-         SbkA==
+        bh=rRzm56T7EUgRkqNvrdAiWVMpijVnh8MmrmIatfAwqkk=;
+        b=XWQAU+LUQjc0kt1/oAAVPOQBqsUzmfdYqTRYBskXLkatyZ/jfkyGyGaAWbpsAhbvge
+         n38d3uduJVNnQWBJ1SG78bfcfrgA7CunaLGbMU2QjNM0b54kdV01qXOQT0U/sWDZvlL8
+         VU9gI8CeQGkJEVPdAdDoD9U/daSaD4bdnwxe5vk437YUrSfi9UYYFRwamUjBat1Fk5Ry
+         VyPVYnmkHd+lS6nANfmQNI5ZJtpPtlZr+eUKJaZCdcYL20kNV6fRBg4xPw/sdS9V/twY
+         KueEaQFUXImTKtOzhun5gO0x/gpcGyh/A/fmJRr4XKxLAEQNWMf756N4LPA3NJIL3Lg2
+         FvsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699341287; x=1699946087;
+        d=1e100.net; s=20230601; t=1699341349; x=1699946149;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X8sfscZNgvFdNuYLj9pz7pxUEhl0FJn2711ooDKEXvA=;
-        b=eGjkHH+qWqAszvufFiJhD6yT1ql0pk+QU4Qi3+wpfsYxqOsn/JGsxb43MgUaKfYJJU
-         9RJmfUwQldiT+zELis1BgXNoDblOXNpAZpQlUQAYQcvczYymlWrw5RsWdLhlUI4rd+L3
-         kio/IDA6laI1zaMZmumuKUudXTKQGyRxln/J1rl3LFBIUrfCvPstpGRr8eFV4GO7gOxh
-         tpSRiHQy4Xp7c2bGHJT2saEh8bPt6DQxffqdzZ2+M60qTY0g742W5GUbNhgLJ6ZUCnRa
-         raetdOINlrLObh1UD+KLnb90grtf3uoiz3xyjdzoED7M3VwXFveEEgDumQ4qdLr+YUAu
-         2JGQ==
-X-Gm-Message-State: AOJu0YxXAuLNW8PFdjGnp7Yd2hnUGe5LULLu2efzaJZt7gnIMdIoTBUz
-	uuaNLPKsAExLZb9xgW/Vlhg=
-X-Google-Smtp-Source: AGHT+IFOK+EQMAYxdvAw8YBbFUllXwIq2zymtqE+4FDosJiJOIcomruo/QcddP2rDDRzDG920AnTXA==
-X-Received: by 2002:a19:434d:0:b0:503:655:12e7 with SMTP id m13-20020a19434d000000b00503065512e7mr21492182lfj.62.1699341286711;
-        Mon, 06 Nov 2023 23:14:46 -0800 (PST)
+        bh=rRzm56T7EUgRkqNvrdAiWVMpijVnh8MmrmIatfAwqkk=;
+        b=Eb8QepT/u789JQ5fP0v8ftkCFWMBkUUaZwRsDQWRzhZ371u2UNkqVs48zIKdjn0bs2
+         KBbMjXvnhy24946kJkPocODnEXoXbcgAysU1xtm0v865o9bqb/lGGU7xSef0MVNgB++S
+         ZUOe78bXu7byQHksUPVhTmajpNIJru+PiqrlHLhQFf1amYHvLfD0yYywwRINqUAzNBzb
+         gnjgTR4N/cIKS2YLpAUr9YdHl6TIPqgf5BvPvBxKuj7UxzEJqmHlx8Q/QiS/390iiNMO
+         D5VZ7VEhCQ5Y6Rm1XQHzK3Zsvc9/A1BCvMwbxA0zESBZzK5lnbN4cWXAgX0kVLes3V7X
+         JiFQ==
+X-Gm-Message-State: AOJu0Yz6hmFeL+rRD1qsYcHCiDbOEZBwMocn1jhvvcUfO0MzmncH1cch
+	MCxekMaO0hZWwdSz9quOIHQwlamE8b8=
+X-Google-Smtp-Source: AGHT+IH0l+/C0x2rBbGh7zU/Zli8cAqaLFKLL0xV2Z8WTczWUbF6oewwL7IGuT1jLrgTHXMQKupDDA==
+X-Received: by 2002:a05:6000:4020:b0:32f:acb1:ba9b with SMTP id cp32-20020a056000402000b0032facb1ba9bmr12115578wrb.22.1699341348719;
+        Mon, 06 Nov 2023 23:15:48 -0800 (PST)
 Received: from ?IPV6:2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720? (dynamic-2a01-0c22-6f6b-1c00-45f5-1cd8-f090-5720.c22.pool.telefonica.de. [2a01:c22:6f6b:1c00:45f5:1cd8:f090:5720])
-        by smtp.googlemail.com with ESMTPSA id b18-20020a5d6352000000b0032f933556b8sm1496783wrw.7.2023.11.06.23.14.46
+        by smtp.googlemail.com with ESMTPSA id b18-20020a5d6352000000b0032f933556b8sm1496783wrw.7.2023.11.06.23.15.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Nov 2023 23:14:46 -0800 (PST)
-Message-ID: <942b9e65-205c-46f1-8c37-1fb627d28775@gmail.com>
-Date: Tue, 7 Nov 2023 08:14:49 +0100
+        Mon, 06 Nov 2023 23:15:48 -0800 (PST)
+Message-ID: <5ff51bab-52ea-4f9a-a1ba-31b26d21a8a4@gmail.com>
+Date: Tue, 7 Nov 2023 08:15:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,11 +67,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/2] r8169: fix DASH deviceis network lost issue
+Subject: Re: [PATCH net 2/2] r8169: fix network lost after resume on DASH
+ systems
 Content-Language: en-US
 To: ChunHao Lin <hau@realtek.com>
 Cc: netdev@vger.kernel.org, nic_swsd@realtek.com
 References: <20231106151124.9175-1-hau@realtek.com>
+ <20231106151124.9175-3-hau@realtek.com>
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -116,22 +118,24 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20231106151124.9175-1-hau@realtek.com>
+In-Reply-To: <20231106151124.9175-3-hau@realtek.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 06.11.2023 16:11, ChunHao Lin wrote:
-> This series are used to fix network lost issue on systems that support
-> DASH.
+> Device that support DASH may be reseted or powered off during suspend.
+> So driver needs to handle DASH during system suspend and resume. Or
+> DASH firmware will influence device behavior and causes network lost.
 > 
-As I have no he to test this: Can you add on which hw you tested this patch?
+> Fixes: b646d90053f8 ("r8169: magic.")
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
 
-> ChunHao Lin (2):
->   r8169: add handling DASH when DASH is disabled
->   r8169: fix network lost after resume on DASH systems
-> 
->  drivers/net/ethernet/realtek/r8169_main.c | 43 +++++++++++++++++------
->  1 file changed, 33 insertions(+), 10 deletions(-)
-> 
+Also here: cc stable
+With this:
+
+Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+
+
+
 
 
