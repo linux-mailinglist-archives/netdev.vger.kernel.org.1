@@ -1,224 +1,250 @@
-Return-Path: <netdev+bounces-46486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D91B27E4802
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 19:14:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1D87E4870
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 19:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6361F21620
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 18:14:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FE752811E3
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 18:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AAF3589F;
-	Tue,  7 Nov 2023 18:14:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0403334CCA;
+	Tue,  7 Nov 2023 18:41:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aPll66bW"
+	dkim=pass (1024-bit key) header.d=esdhannover.onmicrosoft.com header.i=@esdhannover.onmicrosoft.com header.b="PdxEmwLb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C30D42FE32
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 18:14:28 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E97CB0
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 10:14:28 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-d9ab79816a9so7157798276.3
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 10:14:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C806D30FBF;
+	Tue,  7 Nov 2023 18:41:09 +0000 (UTC)
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2127.outbound.protection.outlook.com [40.107.104.127])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BD2116;
+	Tue,  7 Nov 2023 10:41:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Nh9sS1j5VLgtSeGm1RAm79fXm/5zaFuu6xeo0+yHrQWrd+3uKteJW5Z7YJGvyIFvxku4OefnyvSabxxcJi2j2XTbRIsuDKx9PytePkpGLoDLt/rI2engzE6Lfqvhcbvd9THVMFTuKMFeTD27aU9s/vZMeGsbC+XCPIm8JIWI/qo4uN1K5X6/CVIrE6vllfzK0m8LfS9+C1Z6ke9dp1jSLW8AhUzAfpZlLMN833z+b5FNzc3LvTP7wP6cr/TiPvJZCBeUNPD93AiaG0csAtf2sboh2HgNS4IZ1PYx/98sF2LCcJO2UnuyPxrnkyhwHs89lJHER8hA8byDHFEFpJg5Wg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SI6dtr7mDyzUnl9YQNWjQC8BHqVulDEKIYKi/lFBcj4=;
+ b=bfL/NwqOYpHXpulwdC6JUXMq/Xog/PWhRlZCl3go+ydit0EK62wA4W09NbC/9c1xQHiQl+jVo4TbeovTORxuVwk1jZRG9pgCPj9lg4fgh4amZLXUxjyKCq+tgTSfXU4RhC7/0gMhyObgJPryw1/1HxwsAKl03K6iusIM5iqs1bpqQNo84q7rFWAiyAAtuJqGCzyC52LKNBAiXOzQTn9Fr6ufdBX7QdMvqslyOkgjAMMqRhawKcjTYI/4SU6pQL8PnW/obGHBso8hP0VnbHBeMk/Ve0LSIOPi8QKmr6iKZAy2hWukeg1TRjBrnE+xs77eaT+K7QW90CaZOECqJa4JAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=softfail (sender ip
+ is 80.151.164.27) smtp.rcpttodomain=davemloft.net smtp.mailfrom=esd.eu;
+ dmarc=none action=none header.from=esd.eu; dkim=none (message not signed);
+ arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699380867; x=1699985667; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8HeHeN/xiCMz8DEWBM6X0ByYPySZA5Zqi9Xr6EDBkSs=;
-        b=aPll66bWlARwkRPRwtl9t0tL+XQORS/aSFcO3RAkPU4vzASryDOwL81gKljBMo9dBg
-         IY1SV4CtO1hVUfPV8ZbWr06dweCWaAmg6OSQx8E3/Zp/bPOCjEXGZKZUpsA+agmOEtgs
-         BdJT2C7NT2byWGnugH/vyfvagYoL1uV/vkbTSJd1l9vUVBYEyzMt9Epiukd6GOSvvTYT
-         TaNhydc7MUXdh8IInp71NWrEdcE4HSLuwTKa7WZQg01uL8NWJWzl73VNrlAogM+Kvx4w
-         yY5haY2tdluVkBeMCl4iYQbLWfK6mxe2wuh4N1Mi02wvNDXShxl6qlH+fAfGks3Encrc
-         Vi9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699380867; x=1699985667;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8HeHeN/xiCMz8DEWBM6X0ByYPySZA5Zqi9Xr6EDBkSs=;
-        b=wO49gyKWdz4lGnvjWGE1Kv8bokZtQx6rzx5HlFB8PFHagWSJJsk3dNpQ8XTy87u7ws
-         +OltXH9bh3ZnEE6k1RqSTcsr7rtoGzl+XvT3+1NGzdu+sD17jwTDy5jtX85UlYu2dmZL
-         JGZEtjrZ/VtIBYaJYjl8UX4AKblsJOnesZKw6Kwzt9mENO1yI+9qgfbUTSN6gj7E79wf
-         s0xn2WDSgiIGv7Jz4LqSYMnnG4o8sIENOdud8AinmRrly5gt2eGoHp9eUmmSNB3dJrbg
-         DThp0dLwK8jCckFeQbRvets5eU040xH7i+0GS0j7z0Avx/nQeYFqcCmZgAANE5AXwkOa
-         U1UQ==
-X-Gm-Message-State: AOJu0YxL9O9l1jGA0BIsn1cFHujOPFLRyyvUyxvu7wBPHg+v9vmGPmPi
-	98GtqVxlBnNPrpP27/wfd5pdEFQ=
-X-Google-Smtp-Source: AGHT+IEFH3S1Xddt5/l1kHplzp6Kf3Zu4Jc1nx0T2cx1iq2FT0uS/xoaqN5IyidpJIJBKzD/qi9XQZ0=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:494:0:b0:d13:856b:c10a with SMTP id
- 142-20020a250494000000b00d13856bc10amr597853ybe.3.1699380867206; Tue, 07 Nov
- 2023 10:14:27 -0800 (PST)
-Date: Tue, 7 Nov 2023 10:14:25 -0800
-In-Reply-To: <CAF=yD-Ltd0REhOS78q_t8bSEpefQsZuJV_Aq7zxXmFDh+BmJhg@mail.gmail.com>
+ d=esdhannover.onmicrosoft.com; s=selector1-esdhannover-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SI6dtr7mDyzUnl9YQNWjQC8BHqVulDEKIYKi/lFBcj4=;
+ b=PdxEmwLbIMugvDYDaDPQzdPUwvoj7xwg4RPLqput1u3Sj8+EPbh4EF3KnXV3GRHYklxUwHnzn97gHu2ih+6DepKQ00PijxJC83XM6W6r3cB+BZHUeqf4dBUq3B6fi5pm4/K2k55y6yzkmOZplcsnI44v1LbAkGMP+jpjsyfEoXw=
+Received: from AM6PR05CA0001.eurprd05.prod.outlook.com (2603:10a6:20b:2e::14)
+ by GV1PR03MB8544.eurprd03.prod.outlook.com (2603:10a6:150:9c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.27; Tue, 7 Nov
+ 2023 18:41:04 +0000
+Received: from AM4PEPF00025F98.EURPRD83.prod.outlook.com
+ (2603:10a6:20b:2e:cafe::74) by AM6PR05CA0001.outlook.office365.com
+ (2603:10a6:20b:2e::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18 via Frontend
+ Transport; Tue, 7 Nov 2023 18:41:04 +0000
+X-MS-Exchange-Authentication-Results: spf=softfail (sender IP is
+ 80.151.164.27) smtp.mailfrom=esd.eu; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=esd.eu;
+Received-SPF: SoftFail (protection.outlook.com: domain of transitioning esd.eu
+ discourages use of 80.151.164.27 as permitted sender)
+Received: from esd-s7.esd (80.151.164.27) by
+ AM4PEPF00025F98.mail.protection.outlook.com (10.167.16.7) with Microsoft SMTP
+ Server id 15.20.7002.1 via Frontend Transport; Tue, 7 Nov 2023 18:41:03 +0000
+Received: from esd-s20.esd.local (debby [10.0.0.190])
+	by esd-s7.esd (Postfix) with ESMTPS id 7575D7C16C5;
+	Tue,  7 Nov 2023 19:41:03 +0100 (CET)
+Received: by esd-s20.esd.local (Postfix, from userid 2044)
+	id 62A6A2E446A; Tue,  7 Nov 2023 19:41:03 +0100 (CET)
+From: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>
+To: Marc Kleine-Budde <mkl@pengutronix.de>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Wolfgang Grandegger <wg@grandegger.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v9 0/2] can: esd: add support for esd GmbH PCIe/402 CAN interface
+Date: Tue,  7 Nov 2023 19:41:01 +0100
+Message-Id: <20231107184103.2802678-1-stefan.maetje@esd.eu>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
- <ZUlvzm24SA3YjirV@google.com> <CAHS8izMQ5Um_ScY0VgAjaEaT-hRh4tFoTgc6Xr9Tj5rEj0fijA@mail.gmail.com>
- <CAKH8qBsbh8qYxNHZ6111RQFFpNWbWZtg0LDXkn15xcsbAq4R6w@mail.gmail.com>
- <CAF=yD-+BuKXoVL8UF+No1s0TsHSzBTz7UrB1Djt_BrM74uLLcg@mail.gmail.com>
- <ZUmBf7E8ZoTQwThL@google.com> <ZUmMBZpLPQkRS9bg@google.com>
- <CAF=yD-+tZ7xaU0rKWBuVbfdVWptj88Z=Xf4Mqx+zaC-gZ1U1mw@mail.gmail.com>
- <ZUp3j2TLNKhPYwch@google.com> <CAF=yD-Ltd0REhOS78q_t8bSEpefQsZuJV_Aq7zxXmFDh+BmJhg@mail.gmail.com>
-Message-ID: <ZUp-gYT7OMb9wun3@google.com>
-Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
-From: Stanislav Fomichev <sdf@google.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM4PEPF00025F98:EE_|GV1PR03MB8544:EE_
+X-MS-Office365-Filtering-Correlation-Id: 23bbd583-d6e0-40e2-dc77-08dbdfc1189f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	d9Q1x6FSbvliAkt6u/L4lQZWyE6p+yw1Lhh2SWzBfx6Eu5m+DxkdJ1knW+Ed9N4QHdbvBN8f6N97zEOPElMze0aQ9bHiy9gb6RXy4kjey+RnpEtm/wZ/pmM5igdRwTESBI26Z8E1cEmwxk5f3u/NFbS+7qdeLhqoEHsuils5gbLNW1CCtTfJvkC8KlFBd35UrxeUbQWHhgncNdj9FA41tLgFrm/QRwwmntZudeVVsLKgkI5x3iAZcfCZ8tc/FXxZjJ6xGP8BijXm0YrA7+HHlPAeeYZVu/LNf4JFGhsdjziR4pLL7Gd67quy2ATiQolQVgj1hAsIYFqrZAo31YMamoexwhB5ClNabEY8gfPl0mrc0xIEhnyhJXjXgLYqEyExM6Q0prXcuQzLbLDrADmeADhKa3NjKuLed8hU4Mcw9BbmVBpanWSqCai5B/DnKzCAdPu6LOxp3aHWTguc/nC+BhdApjJfgzciex25dijOU6rdtpU8OmPNdaM7fu6vqIMgtveQ1ipOc/aaB1zY+uhbNq3GknTkT5k3a4aGXJpOgqGIzmipF0PJDECseYebv5RCxAxLOPhlsxelxP8YKJqf7aKwZhVrmjdLL2vVtaAFogsc5ZzZSUDuLYHWSkKALoQv5xdZaI6+DeuCweguXHxp/+VcSQUg8IrUv5DIlu6XnqJcSvpWgv8elPaNKt9Tbd65EuVaHM2pbLe7ENlDB4qiwNcbK4Vd9YEyaIr7CB6xKLMx+2Gyzzn0Ey6ik81i+rQ/
+X-Forefront-Antispam-Report:
+	CIP:80.151.164.27;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:esd-s7.esd;PTR:p5097a41b.dip0.t-ipconnect.de;CAT:NONE;SFS:(13230031)(4636009)(396003)(136003)(346002)(376002)(39840400004)(230173577357003)(230273577357003)(230922051799003)(82310400011)(1800799009)(451199024)(64100799003)(186009)(36840700001)(46966006)(2616005)(356005)(40480700001)(81166007)(86362001)(478600001)(966005)(36756003)(8676002)(4326008)(336012)(26005)(8936002)(47076005)(41300700001)(54906003)(66574015)(42186006)(70586007)(83380400001)(70206006)(316002)(1076003)(36860700001)(2906002)(6266002)(5660300002);DIR:OUT;SFP:1102;
+X-OriginatorOrg: esd.eu
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 18:41:03.7087
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23bbd583-d6e0-40e2-dc77-08dbdfc1189f
+X-MS-Exchange-CrossTenant-Id: 5a9c3a1d-52db-4235-b74c-9fd851db2e6b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5a9c3a1d-52db-4235-b74c-9fd851db2e6b;Ip=[80.151.164.27];Helo=[esd-s7.esd]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM4PEPF00025F98.EURPRD83.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR03MB8544
 
-On 11/07, Willem de Bruijn wrote:
-> On Tue, Nov 7, 2023 at 12:44=E2=80=AFPM Stanislav Fomichev <sdf@google.co=
-m> wrote:
-> >
-> > On 11/06, Willem de Bruijn wrote:
-> > > > > > > I think my other issue with MSG_SOCK_DEVMEM being on recvmsg =
-is that
-> > > > > > > it somehow implies that I have an option of passing or not pa=
-ssing it
-> > > > > > > for an individual system call.
-> > > > > > > If we know that we're going to use dmabuf with the socket, ma=
-ybe we
-> > > > > > > should move this flag to the socket() syscall?
-> > > > > > >
-> > > > > > > fd =3D socket(AF_INET6, SOCK_STREAM, SOCK_DEVMEM);
-> > > > > > >
-> > > > > > > ?
-> > > > > >
-> > > > > > I think it should then be a setsockopt called before any data i=
-s
-> > > > > > exchanged, with no change of modifying mode later. We generally=
- use
-> > > > > > setsockopts for the mode of a socket. This use of the protocol =
-field
-> > > > > > in socket() for setting a mode would be novel. Also, it might m=
-iss
-> > > > > > passively opened connections, or be overly restrictive: one app=
-roach
-> > > > > > for all accepted child sockets.
-> > > > >
-> > > > > I was thinking this is similar to SOCK_CLOEXEC or SOCK_NONBLOCK? =
-There
-> > > > > are plenty of bits we can grab. But setsockopt works as well!
-> > > >
-> > > > To follow up: if we have this flag on a socket, not on a per-messag=
-e
-> > > > basis, can we also use recvmsg for the recycling part maybe?
-> > > >
-> > > > while (true) {
-> > > >         memset(msg, 0, ...);
-> > > >
-> > > >         /* receive the tokens */
-> > > >         ret =3D recvmsg(fd, &msg, 0);
-> > > >
-> > > >         /* recycle the tokens from the above recvmsg() */
-> > > >         ret =3D recvmsg(fd, &msg, MSG_RECYCLE);
-> > > > }
-> > > >
-> > > > recvmsg + MSG_RECYCLE can parse the same format that regular recvms=
-g
-> > > > exports (SO_DEVMEM_OFFSET) and we can also add extra cmsg option
-> > > > to recycle a range.
-> > > >
-> > > > Will this be more straightforward than a setsockopt(SO_DEVMEM_DONTN=
-EED)?
-> > > > Or is it more confusing?
-> > >
-> > > It would have to be sendmsg, as recvmsg is a copy_to_user operation.
-> > >
-> > >
-> > > I am not aware of any precedent in multiplexing the data stream and a
-> > > control operation stream in this manner. It would also require adding
-> > > a branch in the sendmsg hot path.
-> >
-> > Is it too much plumbing to copy_from_user msg_control deep in recvmsg
-> > stack where we need it? Mixing in sendmsg is indeed ugly :-(
->=20
-> I tried exactly the inverse of that when originally adding
-> MSG_ZEROCOPY: to allow piggy-backing zerocopy completion notifications
-> on sendmsg calls by writing to sendmsg msg_control on return to user.
-> It required significant code churn, which the performance gains did
-> not warrant. Doing so also breaks the simple rule that recv is for
-> reading and send is for writing.
+This patch picks up the work from last year. Any comments on needed or
+recommended changes are appreciated.
 
-We're breaking so many rules here, so not sure we should be super
-constrained :-D
+The purpose of this patch is to introduce a new CAN driver to support
+the esd GmbH 402 family of CAN interface boards. The hardware design
+is based on a CAN controller implemented in a FPGA attached to a
+PCIe link.
 
-> > Regarding hot patch: aren't we already doing copy_to_user for the token=
-s in
-> > this hot path, so having one extra condition shouldn't hurt too much?
->=20
-> We're doing that in the optional cmsg handling of recvmsg, which is
-> already a slow path (compared to the data read() itself).
->=20
-> > > The memory is associated with the socket, freed when the socket is
-> > > closed as well as on SO_DEVMEM_DONTNEED. Fundamentally it is a socket
-> > > state operation, for which setsockopt is the socket interface.
-> > >
-> > > Is your request purely a dislike, or is there some technical concern
-> > > with BPF and setsockopt?
-> >
-> > It's mostly because I've been bitten too much by custom socket options =
-that
-> > are not really on/off/update-value operations:
-> >
-> > 29ebbba7d461 - bpf: Don't EFAULT for {g,s}setsockopt with wrong optlen
-> > 00e74ae08638 - bpf: Don't EFAULT for getsockopt with optval=3DNULL
-> > 9cacf81f8161 - bpf: Remove extra lock_sock for TCP_ZEROCOPY_RECEIVE
-> > d8fe449a9c51 - bpf: Don't return EINVAL from {get,set}sockopt when optl=
-en > PAGE_SIZE
-> >
-> > I do agree that this particular case of SO_DEVMEM_DONTNEED seems ok, bu=
-t
-> > things tend to evolve and change.
->=20
-> I see. I'm a bit concerned if we start limiting what we can do in
-> sockets because of dependencies that BPF processing places on them.
-> The use case for BPF [gs]etsockopt is limited to specific control mode
-> calls. Would it make sense to just exclude calls like
-> SO_DEVMEM_DONTNEED from this interpositioning?
+More information on these boards can be found following the links
+included in the commit message.
 
-Yup, that's why I'm asking. We already have ->bpf_bypass_getsockopt()
-to special-case tcp zerocopy. We might add another bpf_bypass_setsockopt
-to special case SO_DEVMEM_DONTNEED. That's why I'm trying to see if
-there is a better alternative.
+This patch supports all boards but will operate the CAN-FD capable
+boards only in Classic-CAN mode. The CAN-FD support will be added
+when the initial patch has stabilized.
 
-> At a high level what we really want is a high rate metadata path from
-> user to kernel. And there are no perfect solutions. From kernel to
-> user we use the socket error queue for this. That was never intended
-> for high event rate itself, dealing with ICMP errors and the like
-> before timestamps and zerocopy notifications were added.
->
-> If I squint hard enough I can see some prior art in mixing data and
-> high rate state changes within the same channel in NIC descriptor
-> queues, where some devices do this, e.g.,  { "insert encryption key",
-> "send packet" }. But fundamentally I think we should keep the socket
-> queues for data only.
+The patch is reuses the previous work of my former colleague:
+Link: https://lore.kernel.org/linux-can/1426592308-23817-1-git-send-email-thomas.koerper@esd.eu/
 
-+1, we keep taking an easy route with using sockopt for this :-(
 
-Anyway, let's see if any better suggestions pop up. Worst case - we stick
-with a socket option and will add a bypass on the bpf side.
+The patch is based on the linux-can-next main branch.
+
+Changes in v9:
+  - Fix returning success error code in case of allocation failure in
+    pci402_probe().
+
+Changes in v8:
+  - Rebased to 6.6-rc2 on linux-can-next branch main
+
+Changes in v7:
+  - Numerous changes. Find the quoted with inline comments about changes
+    below after the changes list. Stuff that I don't understand and
+    where I have questions is marked with ????.
+    Unfortunately I will be AFK till 28th of November.
+
+Changes in v6:
+  - Fixed the statistic handling of RX overrun errors and increase 
+    net_device_stats::rx_errors instead of net_device_stats::rx_dropped.
+  - Added a patch to not increase rx statistics when generating a CAN
+    rx error message frame as suggested on the linux-can list.
+  - Added a patch to not not increase rx_bytes statistics for RTR frames
+    as suggested on the linux-can list.
+
+    The last two patches change the statistics handling from the previous
+    style used in other drivers to the newly suggested one.
+
+Changes in v5:
+  - Added the initialization for netdev::dev_port as it is implemented
+    for another CAN driver. See
+    https://lore.kernel.org/linux-can/20211026180553.1953189-1-mailhol.vincent@wanadoo.fr/
+
+Changes in v4:
+  - Fixed the build failure on ARCH=arm64 that was found by the Intel
+    kernel test robot. See
+    https://lore.kernel.org/linux-can/202109120608.7ZbQXkRh-lkp@intel.com/
+
+    Removed error monitoring code that used GCC's built-in compiler
+    functions for atomic access (__sync_* functions). GCC versions
+    after 9 (tested with "gcc-10 (Ubuntu 10.3.0-1ubuntu1~20.04)")
+    don't implement the intrinsic atomic as in-line code but call
+    "__aarch64_ldadd4_acq_rel" on arm64. This GCC support function
+    is not exported by the kernel and therefore the module build
+    post-processing fails.
+
+    Removed that code because the error monitoring never showed a
+    problem during the development this year.
+
+
+Changes in v3:
+  - Rework the bus-off restart logic in acc_set_mode() and
+    handle_core_msg_errstatechange() to call netif_wake_queue() from the
+    error active event.
+  - Changed pci402_init_card() to allocate a variable sized array of
+    struct acc_core using devm_kcalloc() instead of using a fixed size
+    array in struct pci402_card.
+  - Changed handle_core_msg_txabort() to release aborted TX frames in
+    TX FIFO order.
+  - Fixed the acc_close() function to abort all pending TX request in
+    esdACC controller.
+  - Fixed counting of transmit aborts in handle_core_msg_txabort().
+    It is now done like in can_flush_echo_skb().
+  - Fixed handle_core_msg_buserr() to create error frames including the
+    CAN RX and TX error counters that were missing.
+  - Fixed acc_set_bittiming() neither to touch LOM mode setting of
+    esdACC controller nor to enter or leave RESET mode.
+    The esdACC controller is going active on the CAN bus in acc_open()
+    and is going inactive (RESET mode) again in acc_close().
+  - Rely on the automatic release of memory fetched by devm_kzalloc().
+    But still use devm_irq_free() explicitely to make sure that the
+    interrupt handler is disconnected at that point.
+    This avoids a possible crash in non-MSI mode due to the IRQ
+    triggered by another device on the same PCI IRQ line.
+  - Changed to use DMA map API instead of pci_*_consistent compatibility
+    wrappers.
+  - Fixed stale email references and updated copyright information.
+  - Removed any traces of future CAN-FD support.
+
+
+Changes in v2:
+  - Avoid warning triggered by -Wshift-count-overflow on architectures
+    with 32-bit dma_addr_t.
+  - Fixed Makefile not to build the kernel module always. Doing this
+    renamed esd402_pci.c to esd_402_pci-core.c as recommended by Marc.
+
+previous versions:
+v1 - https://lore.kernel.org/linux-can/20210728203647.15240-1-Stefan.Maetje@esd.eu/
+v2 - https://lore.kernel.org/linux-can/20210730173805.3926-1-Stefan.Maetje@esd.eu/
+v3 - https://lore.kernel.org/linux-can/20210908164640.23243-1-stefan.maetje@esd.eu/
+v4 - https://lore.kernel.org/linux-can/20210916172152.5127-1-stefan.maetje@esd.eu/
+v5 - https://lore.kernel.org/linux-can/20211109155326.2608822-1-stefan.maetje@esd.eu/
+v6 - https://lore.kernel.org/linux-can/20211201220328.3079270-1-stefan.maetje@esd.eu/
+v7 - https://lore.kernel.org/linux-can/20221106224156.3619334-1-stefan.maetje@esd.eu/
+v8 - https://lore.kernel.org/linux-can/20231025141635.1459606-1-stefan.maetje@esd.eu/
+
+
+
+Stefan Mätje (2):
+  MAINTAINERS: add Stefan Mätje as maintainer for the esd electronics
+    GmbH PCIe/402 CAN drivers
+  can: esd: add support for esd GmbH PCIe/402 CAN interface family
+
+ MAINTAINERS                            |   7 +
+ drivers/net/can/Kconfig                |   1 +
+ drivers/net/can/Makefile               |   1 +
+ drivers/net/can/esd/Kconfig            |  12 +
+ drivers/net/can/esd/Makefile           |   7 +
+ drivers/net/can/esd/esd_402_pci-core.c | 512 ++++++++++++++++
+ drivers/net/can/esd/esdacc.c           | 771 +++++++++++++++++++++++++
+ drivers/net/can/esd/esdacc.h           | 393 +++++++++++++
+ 8 files changed, 1704 insertions(+)
+ create mode 100644 drivers/net/can/esd/Kconfig
+ create mode 100644 drivers/net/can/esd/Makefile
+ create mode 100644 drivers/net/can/esd/esd_402_pci-core.c
+ create mode 100644 drivers/net/can/esd/esdacc.c
+ create mode 100644 drivers/net/can/esd/esdacc.h
+
+
+base-commit: 93e7eca853ca0087b129433630ddd89288d2b8b4
+-- 
+2.34.1
+
 
