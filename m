@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-46520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282727E4B02
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:42:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9FFA7E4B05
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:42:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 940551F21F26
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:42:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA4D11C20D6A
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E968C2CCD5;
-	Tue,  7 Nov 2023 21:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD1C2A8D2;
+	Tue,  7 Nov 2023 21:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="NPBxlArz"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="DZYmBary"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC952CCA3
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:41:14 +0000 (UTC)
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6D310EF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B450A2CCB6
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:41:15 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF8AE10E6
 	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:41:14 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-28041176e77so4662478a91.0
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cc53d0030fso1101055ad.0
         for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 13:41:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699393273; x=1699998073; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699393274; x=1699998074; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=24NMvuwsm8opdmLI6RaThqDP9FkcBYT5SzyW1mwOoUk=;
-        b=NPBxlArzKZXH2jXMbgP8j7xomkQmrggyA5JD8zYQbubi6gRLdQ06VDarLDMotMR980
-         Jv6WGZ7RV1HipXeC0sizxTj7mSms9lU7aj+0SemMjgTqrnky5F8k7EYNv07hr2rfFKLN
-         R2LAkGCTIn1WMg44TFo3f0rfD8oUzmnYFT1XR+X3FnTP9liWRn0HHIkhUerFV2Y+8TPv
-         D1EPd2HxzooNlo8uSSKmn9aUa9DUPP6DqqL6/5mP65bYFpSKsP9oGBOWcYdwGv/pCMqj
-         mBu4vtEfxbtzqnZlBa1fZMYvOsFOz3Oq9Jdbo20yTn8tIfy1jz5099IQydBEI4YSMO+L
-         07pA==
+        bh=aN4oMaI4R9lQb3D1p9Iwygb5XnCuCVbIIXzTcWlvdpg=;
+        b=DZYmBaryiWUy/oPARqPJEF50u3v87tKbQ+qlTDjEt+UZkUiQhUxbAEu/Qd/p+Ogq27
+         d7N9vlSeIqGRlql1kNg/G05KyA57/ORqXhTfg4D/CezVvVmGH2U4xNw6yxvAJ6INI0y3
+         CO/AWhUrrjSKleYEJXusYjx4C5UsiPzraOsgabEtG3cPh5dtDGWiIHdRdSBzA9Fv5o5o
+         5dAtXybbO3nrDOEAPSY6FEy5fDxIA4UCk7Pth5XS6pHI4M2KFKZ6qviCoB9FWPHsKWcE
+         OkVOSpIj97lVJt0OQ9SCt+ZeHjAMF6ogNVwI3r1o7WMppaVR4VnG2h0ya1aH8dP4mqec
+         Ijng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699393273; x=1699998073;
+        d=1e100.net; s=20230601; t=1699393274; x=1699998074;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=24NMvuwsm8opdmLI6RaThqDP9FkcBYT5SzyW1mwOoUk=;
-        b=VhuXZ8VoJkLs0vlfZ84Cr1sM4NHfZbf4M9dcA35D0oIfHCWg8U4pPubpjrJMJAK4xE
-         gyOadA3HNFAQcqX2ua1Zf6FjinerSwFYW7MxJzsIEKXg9dJvtXnwuiUrxwWLpMrQ9XD2
-         n4rszajpXag6GR8aeD+FFm6etVVgFUViRbid/is0ayIC0qgZ+Yu3uNWnbBzbdStrAY5t
-         bqqB/URLGf+V5pJK0sFx3HN20ByxPwbkUe+WyZhlEkyhzYZ4diZxNAV4d0v2K6nDgv3N
-         wX/pAoD/gvmeNEUukovgokxU0UTqOKraoxcvqR7JKnjOabL18p5H0NPD58bN7C3TuIOO
-         Gwnw==
-X-Gm-Message-State: AOJu0YxLTkMzeO1wJw0J7VRl9MctYiMGBrochf9yidTuAZK96Khm3TPh
-	XHISL1Gft8J1vLlFWZhsc/7iLg==
-X-Google-Smtp-Source: AGHT+IEsCCxIQ4zudTGP6Cjux/XiAMHHW5H4f2S8Qmp0qUYHU0tHtdYyhYBfoPuRWZjiqf1BB8wdAw==
-X-Received: by 2002:a17:90a:7e8d:b0:280:ff37:8981 with SMTP id j13-20020a17090a7e8d00b00280ff378981mr5558242pjl.44.1699393273530;
-        Tue, 07 Nov 2023 13:41:13 -0800 (PST)
-Received: from localhost (fwdproxy-prn-013.fbsv.net. [2a03:2880:ff:d::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ml10-20020a17090b360a00b0027d0af2e9c3sm255218pjb.40.2023.11.07.13.41.13
+        bh=aN4oMaI4R9lQb3D1p9Iwygb5XnCuCVbIIXzTcWlvdpg=;
+        b=dZKbr15diq6OTNQPMuWUChtvju5d2yqPRWp9Lnot0EMDoH63fRGD3P2EobH9WyTXUR
+         haOqHSP6rA8AnT9uUBTBkcjbwwBnSTS7eX4rQPi7YnwiY50moSzClwleGtqNzkfHDzXc
+         /2oX/2qEhZpCAsOAE21t1UMEDASvMH7Cni9TJpTigEnUNg5QzxdXCAITQ908jO+2gAWO
+         CdTpVsN916/yW7vNHvq+E2sYUzBktBWhf0yHi8PU0n399pbZ80UQ95PCpdbvueRrRy65
+         StfcMc1/agrxyqcdOpmlvSgaU8oYBsWY/5fCh2bBNmLjQgwj0hkMNd3uc+bdI/Ybio6h
+         yTww==
+X-Gm-Message-State: AOJu0YzhPnomuh7+SHUq6ggWndQfYFBxg0wbZcKVeakqsC1DeyKISbf4
+	O1qPr7+8MKaTBk2hi8csogMKNw==
+X-Google-Smtp-Source: AGHT+IEC28F2Hi8Z2PLSGIkXJCyYnwk65ti/b8HkC4XdItbMFIjTiR7+o2qyYlTD6mIX1MINY5plzA==
+X-Received: by 2002:a17:903:2281:b0:1cc:332f:9e4b with SMTP id b1-20020a170903228100b001cc332f9e4bmr12727plh.1.1699393274402;
+        Tue, 07 Nov 2023 13:41:14 -0800 (PST)
+Received: from localhost (fwdproxy-prn-011.fbsv.net. [2a03:2880:ff:b::face:b00c])
+        by smtp.gmail.com with ESMTPSA id h10-20020a170902748a00b001cc0d1af177sm264672pll.229.2023.11.07.13.41.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 13:41:13 -0800 (PST)
+        Tue, 07 Nov 2023 13:41:14 -0800 (PST)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -72,9 +72,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Mina Almasry <almasrymina@google.com>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [PATCH 19/20] bnxt: use data pool
-Date: Tue,  7 Nov 2023 13:40:44 -0800
-Message-Id: <20231107214045.2172393-20-dw@davidwei.uk>
+Subject: [PATCH 20/20] io_uring/zcrx: add multi socket support per Rx queue
+Date: Tue,  7 Nov 2023 13:40:45 -0800
+Message-Id: <20231107214045.2172393-21-dw@davidwei.uk>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20231107214045.2172393-1-dw@davidwei.uk>
 References: <20231107214045.2172393-1-dw@davidwei.uk>
@@ -86,229 +86,158 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The BNXT driver is modified to use data pool in order to support ZC Rx.
-A setup function bnxt_zc_rx is added that is called on XDP_SETUP_ZC_RX
-XDP command which initialises a data_pool in a netdev_rx_queue.
+Extract the io_uring internal sock_idx from a sock and set it in each
+rbuf cqe. This allows userspace to distinguish which cqe belongs to
+which socket (and by association, which flow).
+
+This complicates the uapi as userspace now needs to keep a table of
+sock_idx to bufs per loop iteration. Each io_recvzc request on a socket
+will return its own completion event, but all rbuf cqes from all sockets
+already exist in the rbuf cq ring.
 
 Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 61 ++++++++++++++++---
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 ++
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  3 +
- include/net/netdev_rx_queue.h                 |  2 +
- 4 files changed, 61 insertions(+), 10 deletions(-)
+ include/uapi/linux/io_uring.h |  3 ++-
+ io_uring/net.c                |  1 +
+ io_uring/zc_rx.c              | 29 ++++++++++++++++++++++-------
+ 3 files changed, 25 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ca1088f7107e..2787c1b474db 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -55,6 +55,8 @@
- #include <net/page_pool/helpers.h>
- #include <linux/align.h>
- #include <net/netdev_queues.h>
-+#include <net/netdev_rx_queue.h>
-+#include <net/data_pool.h>
- 
- #include "bnxt_hsi.h"
- #include "bnxt.h"
-@@ -798,13 +800,7 @@ static struct page *__bnxt_alloc_rx_64k_page(struct bnxt *bp, dma_addr_t *mappin
- 	if (!page)
- 		return NULL;
- 
--	*mapping = dma_map_page_attrs(&bp->pdev->dev, page, offset,
--				      BNXT_RX_PAGE_SIZE, DMA_FROM_DEVICE,
--				      DMA_ATTR_WEAK_ORDERING);
--	if (dma_mapping_error(&bp->pdev->dev, *mapping)) {
--		page_pool_recycle_direct(rxr->page_pool, page);
--		return NULL;
--	}
-+	*mapping = page_pool_get_dma_addr(page);
- 
- 	if (page_offset)
- 		*page_offset = offset;
-@@ -824,13 +820,13 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
- 		page = page_pool_dev_alloc_frag(rxr->page_pool, offset,
- 						BNXT_RX_PAGE_SIZE);
- 	} else {
--		page = page_pool_dev_alloc_pages(rxr->page_pool);
-+		page = data_pool_alloc_page(&rxr->rx_dp);
- 		*offset = 0;
- 	}
- 	if (!page)
- 		return NULL;
- 
--	*mapping = page_pool_get_dma_addr(page) + *offset;
-+	*mapping = data_pool_get_dma_addr(&rxr->rx_dp, page) + *offset;
- 	return page;
- }
- 
-@@ -1816,6 +1812,8 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		return;
- 	}
- 	skb_record_rx_queue(skb, bnapi->index);
-+	if (bnapi->rx_ring->rx_dp.zc_uarg)
-+		skb_zcopy_init(skb, bnapi->rx_ring->rx_dp.zc_uarg);
- 	skb_mark_for_recycle(skb);
- 	napi_gro_receive(&bnapi->napi, skb);
- }
-@@ -3100,7 +3098,7 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
- 		rx_agg_buf->page = NULL;
- 		__clear_bit(i, rxr->rx_agg_bmap);
- 
--		page_pool_recycle_direct(rxr->page_pool, page);
-+		data_pool_put_page(&rxr->rx_dp, page);
- 	}
- 
- skip_rx_agg_free:
-@@ -3305,6 +3303,8 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
- 
- 		page_pool_destroy(rxr->page_pool);
- 		rxr->page_pool = NULL;
-+		rxr->rx_dp.page_pool = NULL;
-+		rxr->rx_dp.zc_ifq = NULL;
- 
- 		kfree(rxr->rx_agg_bmap);
- 		rxr->rx_agg_bmap = NULL;
-@@ -3333,6 +3333,8 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 	pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
- 	if (PAGE_SIZE > BNXT_RX_PAGE_SIZE)
- 		pp.flags |= PP_FLAG_PAGE_FRAG;
-+	pp.flags |= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-+	pp.max_len = PAGE_SIZE;
- 
- 	rxr->page_pool = page_pool_create(&pp);
- 	if (IS_ERR(rxr->page_pool)) {
-@@ -3341,6 +3343,7 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 		rxr->page_pool = NULL;
- 		return err;
- 	}
-+	rxr->rx_dp.page_pool = rxr->page_pool;
- 	return 0;
- }
- 
-@@ -3803,6 +3806,7 @@ static int bnxt_init_one_rx_ring(struct bnxt *bp, int ring_nr)
- {
- 	struct bnxt_rx_ring_info *rxr;
- 	struct bnxt_ring_struct *ring;
-+	struct netdev_rx_queue *rxq;
- 	u32 type;
- 
- 	type = (bp->rx_buf_use_size << RX_BD_LEN_SHIFT) |
-@@ -3831,6 +3835,12 @@ static int bnxt_init_one_rx_ring(struct bnxt *bp, int ring_nr)
- 		bnxt_init_rxbd_pages(ring, type);
- 	}
- 
-+	rxq = __netif_get_rx_queue(bp->dev, ring_nr);
-+	if (rxq->data_pool.zc_ifq) {
-+		rxr->rx_dp.zc_ifq = rxq->data_pool.zc_ifq;
-+		rxr->rx_dp.zc_uarg = rxq->data_pool.zc_uarg;
-+	}
-+
- 	return bnxt_alloc_one_rx_ring(bp, ring_nr);
- }
- 
-@@ -13974,6 +13984,37 @@ void bnxt_print_device_info(struct bnxt *bp)
- 	pcie_print_link_status(bp->pdev);
- }
- 
-+int bnxt_zc_rx(struct bnxt *bp, struct netdev_bpf *xdp)
-+{
-+	unsigned ifq_idx = xdp->zc_rx.queue_id;
-+
-+	if (ifq_idx >= bp->rx_nr_rings)
-+		return -EINVAL;
-+
-+	bnxt_rtnl_lock_sp(bp);
-+	if (netif_running(bp->dev)) {
-+		struct netdev_rx_queue *rxq;
-+		int rc, napi_id;
-+
-+		bnxt_ulp_stop(bp);
-+		bnxt_close_nic(bp, true, false);
-+
-+		rxq = __netif_get_rx_queue(bp->dev, ifq_idx);
-+		rxq->data_pool.zc_ifq = xdp->zc_rx.ifq;
-+		rxq->data_pool.zc_uarg = xdp->zc_rx.uarg;
-+
-+		rc = bnxt_open_nic(bp, true, false);
-+		bnxt_ulp_start(bp, rc);
-+
-+		if (xdp->zc_rx.ifq) {
-+			napi_id = bp->bnapi[ifq_idx]->napi.napi_id;
-+			io_zc_rx_set_napi(xdp->zc_rx.ifq, napi_id);
-+		}
-+	}
-+	bnxt_rtnl_unlock_sp(bp);
-+	return 0;
-+}
-+
- static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	struct net_device *dev;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index d95d0ca91f3f..7f3b03fa5960 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -33,6 +33,7 @@
- #ifdef CONFIG_TEE_BNXT_FW
- #include <linux/firmware/broadcom/tee_bnxt_fw.h>
- #endif
-+#include <net/data_pool.h>
- 
- extern struct list_head bnxt_block_cb_list;
- 
-@@ -946,6 +947,7 @@ struct bnxt_rx_ring_info {
- 	struct bnxt_ring_struct	rx_agg_ring_struct;
- 	struct xdp_rxq_info	xdp_rxq;
- 	struct page_pool	*page_pool;
-+	struct data_pool	rx_dp;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 603d07d0a791..588fd7eda797 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -754,8 +754,9 @@ struct io_uring_rbuf_cqe {
+ 	__u32	off;
+ 	__u32	len;
+ 	__u16	region;
++	__u8	sock;
+ 	__u8	flags;
+-	__u8	__pad[3];
++	__u8	__pad[2];
  };
  
- struct bnxt_rx_sw_stats {
-@@ -2485,4 +2487,7 @@ int bnxt_get_port_parent_id(struct net_device *dev,
- void bnxt_dim_work(struct work_struct *work);
- int bnxt_hwrm_set_ring_coal(struct bnxt *bp, struct bnxt_napi *bnapi);
- void bnxt_print_device_info(struct bnxt *bp);
-+
-+int bnxt_zc_rx(struct bnxt *bp, struct netdev_bpf *xdp);
-+
- #endif
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 96f5ca778c67..b7ef2e551334 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -465,6 +465,9 @@ int bnxt_xdp(struct net_device *dev, struct netdev_bpf *xdp)
- 	case XDP_SETUP_PROG:
- 		rc = bnxt_xdp_set(bp, xdp->prog);
- 		break;
-+	case XDP_SETUP_ZC_RX:
-+		return bnxt_zc_rx(bp, xdp);
-+		break;
- 	default:
- 		rc = -EINVAL;
- 		break;
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index cdcafb30d437..1b2944e61e19 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -6,6 +6,7 @@
- #include <linux/netdevice.h>
- #include <linux/sysfs.h>
- #include <net/xdp.h>
-+#include <net/data_pool.h>
+ struct io_rbuf_rqring_offsets {
+diff --git a/io_uring/net.c b/io_uring/net.c
+index e7b41c5826d5..4f8d19e88dcb 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -1031,6 +1031,7 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
+ 	int ret, min_ret = 0;
+ 	bool force_nonblock = issue_flags & IO_URING_F_NONBLOCK;
+ 	struct io_zc_rx_ifq *ifq;
++	unsigned sock_idx;
  
- /* This structure contains an instance of an RX queue. */
- struct netdev_rx_queue {
-@@ -18,6 +19,7 @@ struct netdev_rx_queue {
- 	struct net_device		*dev;
- 	netdevice_tracker		dev_tracker;
+ 	if (issue_flags & IO_URING_F_UNLOCKED)
+ 		return -EAGAIN;
+diff --git a/io_uring/zc_rx.c b/io_uring/zc_rx.c
+index 611a068c3402..fdeaed4b4883 100644
+--- a/io_uring/zc_rx.c
++++ b/io_uring/zc_rx.c
+@@ -47,6 +47,11 @@ struct io_zc_refill_data {
+ 	unsigned count;
+ };
  
-+	struct data_pool		data_pool;
- #ifdef CONFIG_XDP_SOCKETS
- 	struct xsk_buff_pool            *pool;
- #endif
++struct io_zc_rx_recv_args {
++	struct io_zc_rx_ifq	*ifq;
++	struct socket		*sock;
++};
++
+ static inline u32 io_zc_rx_cqring_entries(struct io_zc_rx_ifq *ifq)
+ {
+ 	struct io_rbuf_ring *ring = ifq->ring;
+@@ -667,7 +672,7 @@ static inline struct io_uring_rbuf_cqe *io_zc_get_rbuf_cqe(struct io_zc_rx_ifq *
+ }
+ 
+ static ssize_t zc_rx_copy_chunk(struct io_zc_rx_ifq *ifq, void *data,
+-				unsigned int offset, size_t len)
++				unsigned int offset, size_t len, unsigned sock_idx)
+ {
+ 	size_t copy_size, copied = 0;
+ 	struct io_uring_rbuf_cqe *cqe;
+@@ -702,6 +707,7 @@ static ssize_t zc_rx_copy_chunk(struct io_zc_rx_ifq *ifq, void *data,
+ 		cqe->off = pgid * PAGE_SIZE + off;
+ 		cqe->len = copy_size;
+ 		cqe->flags = 0;
++		cqe->sock = sock_idx;
+ 
+ 		offset += copy_size;
+ 		len -= copy_size;
+@@ -712,7 +718,7 @@ static ssize_t zc_rx_copy_chunk(struct io_zc_rx_ifq *ifq, void *data,
+ }
+ 
+ static int zc_rx_recv_frag(struct io_zc_rx_ifq *ifq, const skb_frag_t *frag,
+-			   int off, int len, bool zc_skb)
++			   int off, int len, unsigned sock_idx, bool zc_skb)
+ {
+ 	struct io_uring_rbuf_cqe *cqe;
+ 	struct page *page;
+@@ -732,6 +738,7 @@ static int zc_rx_recv_frag(struct io_zc_rx_ifq *ifq, const skb_frag_t *frag,
+ 		cqe->region = 0;
+ 		cqe->off = pgid * PAGE_SIZE + off;
+ 		cqe->len = len;
++		cqe->sock = sock_idx;
+ 		cqe->flags = 0;
+ 	} else {
+ 		u32 p_off, p_len, t, copied = 0;
+@@ -741,7 +748,7 @@ static int zc_rx_recv_frag(struct io_zc_rx_ifq *ifq, const skb_frag_t *frag,
+ 		skb_frag_foreach_page(frag, off, len,
+ 				      page, p_off, p_len, t) {
+ 			vaddr = kmap_local_page(page);
+-			ret = zc_rx_copy_chunk(ifq, vaddr, p_off, p_len);
++			ret = zc_rx_copy_chunk(ifq, vaddr, p_off, p_len, sock_idx);
+ 			kunmap_local(vaddr);
+ 
+ 			if (ret < 0)
+@@ -758,9 +765,12 @@ static int
+ zc_rx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+ 	       unsigned int offset, size_t len)
+ {
+-	struct io_zc_rx_ifq *ifq = desc->arg.data;
++	struct io_zc_rx_recv_args *args = desc->arg.data;
++	struct io_zc_rx_ifq *ifq = args->ifq;
++	struct socket *sock = args->sock;
+ 	struct io_zc_rx_ifq *skb_ifq;
+ 	struct sk_buff *frag_iter;
++	unsigned sock_idx = sock->zc_rx_idx & IO_ZC_IFQ_IDX_MASK;
+ 	unsigned start, start_off = offset;
+ 	int i, copy, end, off;
+ 	bool zc_skb = true;
+@@ -778,7 +788,7 @@ zc_rx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+ 		size_t to_copy;
+ 
+ 		to_copy = min_t(size_t, skb_headlen(skb) - offset, len);
+-		copied = zc_rx_copy_chunk(ifq, skb->data, offset, to_copy);
++		copied = zc_rx_copy_chunk(ifq, skb->data, offset, to_copy, sock_idx);
+ 		if (copied < 0) {
+ 			ret = copied;
+ 			goto out;
+@@ -807,7 +817,7 @@ zc_rx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+ 				copy = len;
+ 
+ 			off = offset - start;
+-			ret = zc_rx_recv_frag(ifq, frag, off, copy, zc_skb);
++			ret = zc_rx_recv_frag(ifq, frag, off, copy, sock_idx, zc_skb);
+ 			if (ret < 0)
+ 				goto out;
+ 
+@@ -850,9 +860,14 @@ zc_rx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
+ 
+ static int io_zc_rx_tcp_read(struct io_zc_rx_ifq *ifq, struct sock *sk)
+ {
++	struct io_zc_rx_recv_args args = {
++		.ifq = ifq,
++		.sock = sk->sk_socket,
++	};
++
+ 	read_descriptor_t rd_desc = {
+ 		.count = 1,
+-		.arg.data = ifq,
++		.arg.data = &args,
+ 	};
+ 
+ 	return tcp_read_sock(sk, &rd_desc, zc_rx_recv_skb);
 -- 
 2.39.3
 
