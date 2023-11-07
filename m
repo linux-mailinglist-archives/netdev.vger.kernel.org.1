@@ -1,142 +1,99 @@
-Return-Path: <netdev+bounces-46319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EEA97E32E3
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:24:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68E367E32E9
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DAC6B20B0E
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:24:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DBA0FB20AFC
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93361FA6;
-	Tue,  7 Nov 2023 02:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZeUXNkUk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8655A1FA6;
+	Tue,  7 Nov 2023 02:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562181873;
-	Tue,  7 Nov 2023 02:24:07 +0000 (UTC)
-Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 168A810A;
-	Mon,  6 Nov 2023 18:24:06 -0800 (PST)
-Received: by mail-ua1-x92b.google.com with SMTP id a1e0cc1a2514c-7bae8dd095cso1090513241.3;
-        Mon, 06 Nov 2023 18:24:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699323845; x=1699928645; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q8/hIJ+hXi3TTC8/M5hN/3Tp+g8W2vvsh36FqMl8LBI=;
-        b=ZeUXNkUkEAD86r01uHPG6TgNxX6+5wueRdXmJsrqE9RANKgKnva9FnungImtWF4auG
-         OejF+mbKp1zpxbdXEZZz9GXorHl1Ib41JaoeT9R1pMDf+f3Ze9eFkL9zX75+TzW/0GIm
-         uoIzO4zGmS/bzdFJwYzf3+CyzDrfmSRj2FFt2X5Re8ddL0t50Y4DF98aA8THpgozwCyo
-         uZTgvowxp5PADFubpAOQ2LcSv8Ojpyo1XYzJmuGTEmSh2eomPW8cwtIQ4GOGXguDV/aO
-         Y1kEH7U3wjPT6gpMV/8hlwCcd1U/CnMeWJ36GS1lmIQpgb8IVHIHcTEiSDOwQ+kjh6ET
-         vWZA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E36720EB;
+	Tue,  7 Nov 2023 02:26:55 +0000 (UTC)
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09B5610F;
+	Mon,  6 Nov 2023 18:26:54 -0800 (PST)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-577fff1cae6so3811038a12.1;
+        Mon, 06 Nov 2023 18:26:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699323845; x=1699928645;
+        d=1e100.net; s=20230601; t=1699324013; x=1699928813;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Q8/hIJ+hXi3TTC8/M5hN/3Tp+g8W2vvsh36FqMl8LBI=;
-        b=HgeICBFKKUMeM9f0/biMIYhUIgtEM7lkUKYkawgeJADtGxEB7MOPgAWOifisn8XoN6
-         TUPCymDgzbzaOTEw1Alj/K51TAcU5U3RImAZ7/MQgvAq9OqqZB402t+c+n0nXf33Dhyt
-         0x7oeCb+YeE7aJxG12BmEb7jVGOsBz9cl3enbSyx60OJOzZ+40NV6PpufKBkczPlN7Po
-         csLF+niFpdrbO0eaXsigJy5e6sisS/zWPNLsv0FfldSetYTNkkzBz8koB6bIIAh2QSUu
-         sgS/PgF22JngvvVVz6ZsUij+fqcVz/CSnnkxZu6jeqU/ixMHVNnpNdDPSarz3iODTVrC
-         CD3Q==
-X-Gm-Message-State: AOJu0YyT8z6i13WYIRc4m9AEC0/FOmKfEspSZHE/GfNCThP0aNbMe3GF
-	xackt9R8ZcBsYFRpQzVEjPa96ygTz4nTh9vXvI/tQl3lWsM=
-X-Google-Smtp-Source: AGHT+IFMLt/VUG6TU/4hOSl6RqKh7SB0dwBaFHv9+9I37C28wvAczM3wwtVldLZdBo8d+kzaH5f944U0PquGa1Yz4yU=
-X-Received: by 2002:a67:e10a:0:b0:45e:9611:7b71 with SMTP id
- d10-20020a67e10a000000b0045e96117b71mr6126361vsl.27.1699323845025; Mon, 06
- Nov 2023 18:24:05 -0800 (PST)
+        bh=fdOKnPqOiNGc/GoNlDxuW2SGXoTVefUhBh4JImabdU4=;
+        b=g1F615k6Lo4tx1iCio8iXMsY3wN3o0sjPEFQkJMzCgCwv4l5Q5tuVykzsPktPTz5Iu
+         WoHP7g9qMjgqTB7puffw8V8LArlwXDdgaHnl3HkGwTpB2NfsPFo2Gh7JYITE6LMbpMO/
+         n8zmD0buvdfPuXvujSypr/4LtJxTi+pr3zSyhiSblu5snwa1GDuC9W3B588NzOxx9vTc
+         g7dfBOv1E3YPpZqhBiGpLKQ6XobEk3AViFSCyuGPasORYDdfEm5CW1iFa6YcEXqN49FF
+         YHWgw1rVzV1nTkffWMwC+PxIHHjfuW+XWvj0BVuTGpfHBYym1T2+LPoqkoi7/mj8ZFoo
+         0VCg==
+X-Gm-Message-State: AOJu0YxuR6cV8A+wlERlp9jFSSpqWIZ2pmp2LVUS0IxaUtpqRmN2zqAM
+	vkGEhnXLsvVAyV0IRqyi4TBeCjTYdICda4os5nGzZlFPx9Y=
+X-Google-Smtp-Source: AGHT+IF5bnnFsdOCMB+6HZVG0lDLcf+5vAOnE7orT/gq97jehdbGwVu59ZUNe4p9idUDn6OY+A2e6DXHWwdUMPfg6eY=
+X-Received: by 2002:a17:90b:390b:b0:27d:d9a:be8b with SMTP id
+ ob11-20020a17090b390b00b0027d0d9abe8bmr1854993pjb.6.1699324013367; Mon, 06
+ Nov 2023 18:26:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZUk03DhWxV-bOFJL@google.com> <19129763-6f74-4b04-8a5f-441255b76d34@kernel.org>
- <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
- <ZUlhu4hlTaqR3CTh@google.com> <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
- <ZUlvzm24SA3YjirV@google.com> <CAHS8izMQ5Um_ScY0VgAjaEaT-hRh4tFoTgc6Xr9Tj5rEj0fijA@mail.gmail.com>
- <CAKH8qBsbh8qYxNHZ6111RQFFpNWbWZtg0LDXkn15xcsbAq4R6w@mail.gmail.com>
- <CAF=yD-+BuKXoVL8UF+No1s0TsHSzBTz7UrB1Djt_BrM74uLLcg@mail.gmail.com>
- <ZUmBf7E8ZoTQwThL@google.com> <ZUmMBZpLPQkRS9bg@google.com>
-In-Reply-To: <ZUmMBZpLPQkRS9bg@google.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Mon, 6 Nov 2023 20:23:28 -0600
-Message-ID: <CAF=yD-+tZ7xaU0rKWBuVbfdVWptj88Z=Xf4Mqx+zaC-gZ1U1mw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Mina Almasry <almasrymina@google.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
+References: <40579c18-63c0-43a4-8d4c-f3a6c1c0b417@munic.io>
+In-Reply-To: <40579c18-63c0-43a4-8d4c-f3a6c1c0b417@munic.io>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Tue, 7 Nov 2023 11:26:42 +0900
+Message-ID: <CAMZ6Rq+10m=yQ9Cc9gZQegwD=6iCU=s1r78+ogJ4PV0f5_s+tQ@mail.gmail.com>
+Subject: Re: [PATCH] can: netlink: Fix TDCO calculation using the old data bittiming
+To: Maxime Jayat <maxime.jayat@mobile-devices.fr>
+Cc: Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-> > > > I think my other issue with MSG_SOCK_DEVMEM being on recvmsg is that
-> > > > it somehow implies that I have an option of passing or not passing it
-> > > > for an individual system call.
-> > > > If we know that we're going to use dmabuf with the socket, maybe we
-> > > > should move this flag to the socket() syscall?
-> > > >
-> > > > fd = socket(AF_INET6, SOCK_STREAM, SOCK_DEVMEM);
-> > > >
-> > > > ?
-> > >
-> > > I think it should then be a setsockopt called before any data is
-> > > exchanged, with no change of modifying mode later. We generally use
-> > > setsockopts for the mode of a socket. This use of the protocol field
-> > > in socket() for setting a mode would be novel. Also, it might miss
-> > > passively opened connections, or be overly restrictive: one approach
-> > > for all accepted child sockets.
-> >
-> > I was thinking this is similar to SOCK_CLOEXEC or SOCK_NONBLOCK? There
-> > are plenty of bits we can grab. But setsockopt works as well!
->
-> To follow up: if we have this flag on a socket, not on a per-message
-> basis, can we also use recvmsg for the recycling part maybe?
->
-> while (true) {
->         memset(msg, 0, ...);
->
->         /* receive the tokens */
->         ret = recvmsg(fd, &msg, 0);
->
->         /* recycle the tokens from the above recvmsg() */
->         ret = recvmsg(fd, &msg, MSG_RECYCLE);
-> }
->
-> recvmsg + MSG_RECYCLE can parse the same format that regular recvmsg
-> exports (SO_DEVMEM_OFFSET) and we can also add extra cmsg option
-> to recycle a range.
->
-> Will this be more straightforward than a setsockopt(SO_DEVMEM_DONTNEED)?
-> Or is it more confusing?
+On Tue. 7 Nov. 2023 at 03:02, Maxime Jayat
+<maxime.jayat@mobile-devices.fr> wrote:
+> The TDCO calculation was done using the currently applied data bittiming,
+> instead of the newly computed data bittiming, which means that the TDCO
+> had an invalid value unless setting the same data bittiming twice.
 
-It would have to be sendmsg, as recvmsg is a copy_to_user operation.
+Nice catch!
 
-I am not aware of any precedent in multiplexing the data stream and a
-control operation stream in this manner. It would also require adding
-a branch in the sendmsg hot path.
+Moving the can_calc_tdco() before the memcpy(&priv->data_bittiming,
+&dbt, sizeof(dbt)) was one of the last changes I made. And the last
+batch of tests did not catch that. Thanks for the patch!
 
-The memory is associated with the socket, freed when the socket is
-closed as well as on SO_DEVMEM_DONTNEED. Fundamentally it is a socket
-state operation, for which setsockopt is the socket interface.
+> Fixes: d99755f71a80 ("can: netlink: add interface for CAN-FD Transmitter Delay Compensation (TDC)")
+> Signed-off-by: Maxime Jayat <maxime.jayat@mobile-devices.fr>
 
-Is your request purely a dislike, or is there some technical concern
-with BPF and setsockopt?
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+
+> ---
+>  drivers/net/can/dev/netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
+> index 036d85ef07f5..dfdc039d92a6 100644
+> --- a/drivers/net/can/dev/netlink.c
+> +++ b/drivers/net/can/dev/netlink.c
+> @@ -346,7 +346,7 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
+>                         /* Neither of TDC parameters nor TDC flags are
+>                          * provided: do calculation
+>                          */
+> -                       can_calc_tdco(&priv->tdc, priv->tdc_const, &priv->data_bittiming,
+> +                       can_calc_tdco(&priv->tdc, priv->tdc_const, &dbt,
+>                                       &priv->ctrlmode, priv->ctrlmode_supported);
+>                 } /* else: both CAN_CTRLMODE_TDC_{AUTO,MANUAL} are explicitly
+>                    * turned off. TDC is disabled: do nothing
+> --
+> 2.34.1
+>
 
