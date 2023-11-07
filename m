@@ -1,172 +1,156 @@
-Return-Path: <netdev+bounces-46536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 177CF7E4C6C
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 00:04:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1FED7E4CC3
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 00:23:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3CF628108A
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:04:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E901B21078
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 23:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1D93065D;
-	Tue,  7 Nov 2023 23:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0A33067F;
+	Tue,  7 Nov 2023 23:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RTyao1M5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T2xvom7q"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7655B210B
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 23:04:08 +0000 (UTC)
-Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E132D10E2
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:04:07 -0800 (PST)
-Received: by mail-ua1-x92d.google.com with SMTP id a1e0cc1a2514c-7b9dc92881eso2557000241.2
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 15:04:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699398247; x=1700003047; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LwSWVxQJlefO2RXGLXTB5EQnzK3f7Ti0RFRCIocUVAs=;
-        b=RTyao1M5gnN7cTlDG7d8LPAKzFJX0V4Trw6manexGrhKIxZDKzaDzD15ayTI7EefhD
-         8ySq2N4mYEadI5EXDaY97Y8kfbO1RYF1rXnTOWrGCboGiAHtiKIk9DMBgklfURF3ILpM
-         OXtHaii+Woesd5DF3er0h7i2sEe9SuKBuo0bQWBso8HD3QSK1IlXAMm5HtNyMszSPhHm
-         222h64CvspTt7hz5sPbehPaYkyPJEE8SNUaMAgCM6FwZRzqpiTz3Bm14ho/nleKoSGxh
-         LDhEV9QZMQBB1QNx+mmnQ+aO4PtmMFv4fXL5f4BfzrnfZBucrb6PbVg/nMhjhatNuzmq
-         EWeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699398247; x=1700003047;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LwSWVxQJlefO2RXGLXTB5EQnzK3f7Ti0RFRCIocUVAs=;
-        b=ppj/sR4tH2+SlWdnRj1KDt4x4euH3Fb7hUku+ssLxSFPOqx0+zCqEh2ft9WhzYSqpv
-         fSyGYJx/ju/aV2MXuVFh5u4MT8W8P5ZzWMkuWLbWhD8a40BWx1o4S0kNvaqxh62hoSdF
-         X9zCkCSyZmHPR/SZxqviWnGpko/XzRqOFrq7CBav097pEE4uFd81MHaLSb+pTQ+sTG8f
-         e2j4GEeH4/+HwFqnpicWb/Dub3WI+qgpi5bwUhy78JS6lQgLY8nFyEw1LVLOgVtEfe71
-         vgc69a0LOeVJQJJUOfiVwyv/VGd6vvUMH+2pGU9j0Z/SfpZZ6N+Uz6YGAfa88S1vXthL
-         hJeg==
-X-Gm-Message-State: AOJu0YwirKRADCZjSBDTUdvSwDhlab78fP3q6ucayuPCv6aD94RyofSn
-	KC5R46nO8fcgclJpxTnIb1rYKXV31wNQ1OvHIsPnPQ==
-X-Google-Smtp-Source: AGHT+IGkIzXyZBaE32+WMwF+duu/QcIsXXrFXzLPRCigy40o3oogjiTft3g4ezREIoF7S18+m0g5FcLRymLotkSR3mA=
-X-Received: by 2002:a67:e09b:0:b0:45f:8b65:28f0 with SMTP id
- f27-20020a67e09b000000b0045f8b6528f0mr105754vsl.12.1699398246594; Tue, 07 Nov
- 2023 15:04:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF0503066C;
+	Tue,  7 Nov 2023 23:23:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDBE4C433CA;
+	Tue,  7 Nov 2023 23:23:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699399390;
+	bh=8LLAVN37ZkxOoKP/PIwFB1R3Dw5Nr9o1s4ATZRbvKPQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=T2xvom7qH98BvE0JLE0AoGDwkwFmyY64x5hdFgSBE+k6V5qRVPX97ZWt+Y6H+qsST
+	 L0/uEB9FAb+ZJzC4b2lt2Vbxsy9h0y/i9ZT7Tyxvs+MZ/slDJjmr/BN4R5o6zCCxSx
+	 AlfTuPzrorPeNV+H3JWzgTUXgtcdIiI7FJibUW8veSbTsvQzKLWlwpNFX31tjDkQiP
+	 ljd7pILYxZWaUflsGfJupXG3DUd9mBszpXsufYKPP8UlZnx9hfN7qm5+/yDqHsaTf2
+	 p1kSJk42G0eBhvq8BBlwNPxvNM3qoR2COjb4VucxlcuGj04lSHoCjDuUQdFLOt1SzE
+	 yXhTlRa+rNa5A==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Marco Elver <elver@google.com>,
+	syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Sasha Levin <sashal@kernel.org>,
+	ericvh@kernel.org,
+	lucho@ionkov.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	v9fs@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 17/18] 9p/trans_fd: Annotate data-racy writes to file::f_flags
+Date: Tue,  7 Nov 2023 18:22:11 -0500
+Message-ID: <20231107232231.3775605-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231107232231.3775605-1-sashal@kernel.org>
+References: <20231107232231.3775605-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-6-almasrymina@google.com> <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
- <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com> <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
-In-Reply-To: <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 7 Nov 2023 15:03:53 -0800
-Message-ID: <CAHS8izMKDOw5_y2MLRfuJHs=ai+sZ6GF7Rg1NuR_JqONg-5u5Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
-To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 7, 2023 at 2:55=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 11/7/23 3:10 PM, Mina Almasry wrote:
-> > On Mon, Nov 6, 2023 at 3:44=E2=80=AFPM David Ahern <dsahern@kernel.org>=
- wrote:
-> >>
-> >> On 11/5/23 7:44 PM, Mina Almasry wrote:
-> >>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> >>> index eeeda849115c..1c351c138a5b 100644
-> >>> --- a/include/linux/netdevice.h
-> >>> +++ b/include/linux/netdevice.h
-> >>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
-> >>>  };
-> >>>
-> >>>  #ifdef CONFIG_DMA_SHARED_BUFFER
-> >>> +struct page_pool_iov *
-> >>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
-> >>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
-> >>
-> >> netdev_{alloc,free}_dmabuf?
-> >>
-> >
-> > Can do.
-> >
-> >> I say that because a dmabuf can be host memory, at least I am not awar=
-e
-> >> of a restriction that a dmabuf is device memory.
-> >>
-> >
-> > In my limited experience dma-buf is generally device memory, and
-> > that's really its use case. CONFIG_UDMABUF is a driver that mocks
-> > dma-buf with a memfd which I think is used for testing. But I can do
-> > the rename, it's more clear anyway, I think.
->
-> config UDMABUF
->         bool "userspace dmabuf misc driver"
->         default n
->         depends on DMA_SHARED_BUFFER
->         depends on MEMFD_CREATE || COMPILE_TEST
->         help
->           A driver to let userspace turn memfd regions into dma-bufs.
->           Qemu can use this to create host dmabufs for guest framebuffers=
-.
->
->
-> Qemu is just a userspace process; it is no way a special one.
->
-> Treating host memory as a dmabuf should radically simplify the io_uring
-> extension of this set.
+From: Marco Elver <elver@google.com>
 
-I agree actually, and I was about to make that comment to David Wei's
-series once I have the time.
+[ Upstream commit 355f074609dbf3042900ea9d30fcd2b0c323a365 ]
 
-David, your io_uring RX zerocopy proposal actually works with devmem
-TCP, if you're inclined to do that instead, what you'd do roughly is
-(I think):
+syzbot reported:
 
-- Allocate a memfd,
-- Use CONFIG_UDMABUF to create a dma-buf out of that memfd.
-- Bind the dma-buf to the NIC using the netlink API in this RFC.
-- Your io_uring extensions and io_uring uapi should work as-is almost
-on top of this series, I think.
+ | BUG: KCSAN: data-race in p9_fd_create / p9_fd_create
+ |
+ | read-write to 0xffff888130fb3d48 of 4 bytes by task 15599 on cpu 0:
+ |  p9_fd_open net/9p/trans_fd.c:842 [inline]
+ |  p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
+ |  p9_client_create+0x595/0xa70 net/9p/client.c:1010
+ |  v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
+ |  v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
+ |  legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
+ |  vfs_get_tree+0x51/0x190 fs/super.c:1519
+ |  do_new_mount+0x203/0x660 fs/namespace.c:3335
+ |  path_mount+0x496/0xb30 fs/namespace.c:3662
+ |  do_mount fs/namespace.c:3675 [inline]
+ |  __do_sys_mount fs/namespace.c:3884 [inline]
+ |  [...]
+ |
+ | read-write to 0xffff888130fb3d48 of 4 bytes by task 15563 on cpu 1:
+ |  p9_fd_open net/9p/trans_fd.c:842 [inline]
+ |  p9_fd_create+0x210/0x250 net/9p/trans_fd.c:1092
+ |  p9_client_create+0x595/0xa70 net/9p/client.c:1010
+ |  v9fs_session_init+0xf9/0xd90 fs/9p/v9fs.c:410
+ |  v9fs_mount+0x69/0x630 fs/9p/vfs_super.c:123
+ |  legacy_get_tree+0x74/0xd0 fs/fs_context.c:611
+ |  vfs_get_tree+0x51/0x190 fs/super.c:1519
+ |  do_new_mount+0x203/0x660 fs/namespace.c:3335
+ |  path_mount+0x496/0xb30 fs/namespace.c:3662
+ |  do_mount fs/namespace.c:3675 [inline]
+ |  __do_sys_mount fs/namespace.c:3884 [inline]
+ |  [...]
+ |
+ | value changed: 0x00008002 -> 0x00008802
 
-If you do this the incoming packets should land into your memfd, which
-may or may not work for you. In the future if you feel inclined to use
-device memory, this approach that I'm describing here would be more
-extensible to device memory, because you'd already be using dma-bufs
-for your user memory; you'd just replace one kind of dma-buf (UDMABUF)
-with another.
+Within p9_fd_open(), O_NONBLOCK is added to f_flags of the read and
+write files. This may happen concurrently if e.g. mounting process
+modifies the fd in another thread.
 
-> That the io_uring set needs to dive into
-> page_pools is just wrong - complicating the design and code and pushing
-> io_uring into a realm it does not need to be involved in.
->
-> Most (all?) of this patch set can work with any memory; only device
-> memory is unreadable.
->
->
+Mark the plain read-modify-writes as intentional data-races, with the
+assumption that the result of executing the accesses concurrently will
+always result in the same result despite the accesses themselves not
+being atomic.
 
+Reported-by: syzbot+e441aeeb422763cc5511@syzkaller.appspotmail.com
+Signed-off-by: Marco Elver <elver@google.com>
+Link: https://lore.kernel.org/r/ZO38mqkS0TYUlpFp@elver.google.com
+Signed-off-by: Dominique Martinet <asmadeus@codewreck.org>
+Message-ID: <20231025103445.1248103-1-asmadeus@codewreck.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/9p/trans_fd.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
---=20
-Thanks,
-Mina
+diff --git a/net/9p/trans_fd.c b/net/9p/trans_fd.c
+index c4015f30f9fa7..d0eb03ada704d 100644
+--- a/net/9p/trans_fd.c
++++ b/net/9p/trans_fd.c
+@@ -832,14 +832,21 @@ static int p9_fd_open(struct p9_client *client, int rfd, int wfd)
+ 		goto out_free_ts;
+ 	if (!(ts->rd->f_mode & FMODE_READ))
+ 		goto out_put_rd;
+-	/* prevent workers from hanging on IO when fd is a pipe */
+-	ts->rd->f_flags |= O_NONBLOCK;
++	/* Prevent workers from hanging on IO when fd is a pipe.
++	 * It's technically possible for userspace or concurrent mounts to
++	 * modify this flag concurrently, which will likely result in a
++	 * broken filesystem. However, just having bad flags here should
++	 * not crash the kernel or cause any other sort of bug, so mark this
++	 * particular data race as intentional so that tooling (like KCSAN)
++	 * can allow it and detect further problems.
++	 */
++	data_race(ts->rd->f_flags |= O_NONBLOCK);
+ 	ts->wr = fget(wfd);
+ 	if (!ts->wr)
+ 		goto out_put_rd;
+ 	if (!(ts->wr->f_mode & FMODE_WRITE))
+ 		goto out_put_wr;
+-	ts->wr->f_flags |= O_NONBLOCK;
++	data_race(ts->wr->f_flags |= O_NONBLOCK);
+ 
+ 	client->trans = ts;
+ 	client->status = Connected;
+-- 
+2.42.0
+
 
