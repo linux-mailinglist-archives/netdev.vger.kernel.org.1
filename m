@@ -1,102 +1,61 @@
-Return-Path: <netdev+bounces-46469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A117E449D
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 16:55:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E0A7E44BA
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 16:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6A6D28107F
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 15:55:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92C041C20BAE
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 15:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C472331A77;
-	Tue,  7 Nov 2023 15:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D23931A6F;
+	Tue,  7 Nov 2023 15:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fo/HzkIr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsuqIDYP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BDF315B8
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:55:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60F41C433CA;
-	Tue,  7 Nov 2023 15:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3338D315BE
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 15:56:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84891C433C9;
+	Tue,  7 Nov 2023 15:56:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699372534;
-	bh=5nn9rQ9rkS9+XG5bPxfRyTGYrqtetJox/GOm5Mv7JFE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Fo/HzkIryFoD2pNW+MsZl52fEXOy8dfO5icBKfbqiixCJ5PxnAMI2QtzuAhixjK+e
-	 rWr51XUcPzPB8MQuy3IqjujXTAr1BOmIdG4mLYEOckPN0aaHqxq2nMvaMDyLDMZlly
-	 M9MwyXKZ50Y8gfNZhqY0YgS0wTjbndAyRPgaaDJcRZBg4KVjHSGIzbLTPjEVnGJfQG
-	 nl97f+2Ks3QbinkBDzSY5QcaYZoDTMKBjmB6umrpOOSP1uUpOWQ06BanFbLYrfF/1Z
-	 i8r8y6en5jxZUvHNqnB0Kht2kaRVyYGts2zzL4OHVcYjyRys+ZLYoTN/y8MAKva3vG
-	 C7cktmH8q/SIA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Wenchao Hao <haowenchao2@huawei.com>,
-	Simon Horman <horms@kernel.org>,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Sasha Levin <sashal@kernel.org>,
-	hare@suse.de,
-	jejb@linux.ibm.com,
-	richardcochran@gmail.com,
-	linux-scsi@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 9/9] scsi: libfc: Fix potential NULL pointer dereference in fc_lport_ptp_setup()
-Date: Tue,  7 Nov 2023 10:54:59 -0500
-Message-ID: <20231107155509.3769038-9-sashal@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231107155509.3769038-1-sashal@kernel.org>
-References: <20231107155509.3769038-1-sashal@kernel.org>
+	s=k20201202; t=1699372587;
+	bh=UM90gK6k7dsz3gd2Yxb/FgNapJOxoWm0ijOk60YhGPg=;
+	h=Date:From:To:Subject:In-Reply-To:References:From;
+	b=YsuqIDYP7xwxC2BvGW6ymp0N0TJzwBnpVOQYZ8Mw+6tsi7Vz8SWISjhPqQoHIHltt
+	 sslo4FGTd7fvmhd7vZ4fPpHuPn6QJ3TYJ74poWJpjwFUrSwl9WxESZCWS2CDm37HWS
+	 HAUgj8ILVy07AIVutDYWnAKSFicd/douQJLuEIHUG/XuowpuYn4vD9E79zqZgmoog2
+	 zh0MS/V0vSKO/wrCoIgq+9HrXV6J31JSpYymrb8jshhq6mqU5uYwWf8TfKUQOzkBNd
+	 ZplDlSF/aPNQG1ktq0YW3cojn3arUcX9r3NSLvRPRajFY+gNEK9V1x9lD2vCLmbHh2
+	 hXpt4TTzUll3Q==
+Date: Tue, 7 Nov 2023 07:56:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: Re: [netdev call] Nov 7th
+Message-ID: <20231107075626.19fce518@kernel.org>
+In-Reply-To: <20231106162339.371852dc@kernel.org>
+References: <20231106162339.371852dc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.14.328
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Wenchao Hao <haowenchao2@huawei.com>
+On Mon, 6 Nov 2023 16:23:39 -0800 Jakub Kicinski wrote:
+> The bi-weekly netdev call at https://bbb.lwn.net/b/jak-wkr-seg-hjn
+> is scheduled tomorrow at 8:30 am (PT) / 5:30 pm (~EU).
+> 
+> Nothing on the agenda at this point, please send topics.
+> 
+> We could discuss any follow up / comments relating to
+> just-concluded netdev.conf, or upcoming LPC?
 
-[ Upstream commit 4df105f0ce9f6f30cda4e99f577150d23f0c9c5f ]
-
-fc_lport_ptp_setup() did not check the return value of fc_rport_create()
-which can return NULL and would cause a NULL pointer dereference. Address
-this issue by checking return value of fc_rport_create() and log error
-message on fc_rport_create() failed.
-
-Signed-off-by: Wenchao Hao <haowenchao2@huawei.com>
-Link: https://lore.kernel.org/r/20231011130350.819571-1-haowenchao2@huawei.com
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/scsi/libfc/fc_lport.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/scsi/libfc/fc_lport.c b/drivers/scsi/libfc/fc_lport.c
-index 5c0aa2c5fd558..cb22c7afa3cdc 100644
---- a/drivers/scsi/libfc/fc_lport.c
-+++ b/drivers/scsi/libfc/fc_lport.c
-@@ -251,6 +251,12 @@ static void fc_lport_ptp_setup(struct fc_lport *lport,
- 	}
- 	mutex_lock(&lport->disc.disc_mutex);
- 	lport->ptp_rdata = fc_rport_create(lport, remote_fid);
-+	if (!lport->ptp_rdata) {
-+		printk(KERN_WARNING "libfc: Failed to setup lport 0x%x\n",
-+			lport->port_id);
-+		mutex_unlock(&lport->disc.disc_mutex);
-+		return;
-+	}
- 	kref_get(&lport->ptp_rdata->kref);
- 	lport->ptp_rdata->ids.port_name = remote_wwpn;
- 	lport->ptp_rdata->ids.node_name = remote_wwnn;
--- 
-2.42.0
-
+No topics, let's cancel today's call.
 
