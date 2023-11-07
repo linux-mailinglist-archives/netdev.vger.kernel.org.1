@@ -1,192 +1,167 @@
-Return-Path: <netdev+bounces-46317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 446E37E32C4
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:05:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1CA7E32D7
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 03:15:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6640A1C208CA
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:05:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFAAA280E1C
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202C61873;
-	Tue,  7 Nov 2023 02:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A256E1873;
+	Tue,  7 Nov 2023 02:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XbTxIL8N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dix+WuV7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E2D17F4
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:05:19 +0000 (UTC)
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4462811F
-	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 18:05:17 -0800 (PST)
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20231107020511epoutp01126040bbf1ff4d7fab57f3783830d260~VNQDBQdhL0215902159epoutp01i
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:05:11 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20231107020511epoutp01126040bbf1ff4d7fab57f3783830d260~VNQDBQdhL0215902159epoutp01i
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1699322711;
-	bh=TBL8+EFA/ZaaK31h63r/ZXqTOOqEdXbFSJSw9cNVIVg=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-	b=XbTxIL8NU9n6yj2/wPZ2f6Q+EmSmvA3fKocxJWRiYemY8chJD5oBMa1Jqcp7dU50H
-	 WIRzauz5Tq5W4ratroBNkBTbvngy8xrh+ybcVS2Lex22/oOXIovWNk5nF7W4cItexH
-	 Lt+2uaiv8dB1MH9CN5PHEeyFkTrxbsO7F7dnLIHw=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20231107020511epcas1p129b5e8910b71d15b254780b51500a537~VNQCY-N_L2181021810epcas1p1w;
-	Tue,  7 Nov 2023 02:05:11 +0000 (GMT)
-Received: from epsmges1p5.samsung.com (unknown [182.195.38.248]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4SPWkt4jHkz4x9QK; Tue,  7 Nov
-	2023 02:05:10 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-	epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
-	4C.42.10025.45B99456; Tue,  7 Nov 2023 11:05:08 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-	epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-	20231107020508epcas1p3e3f47fab18e52248f64bfdde05b1e53b~VNP-96Y7T0586405864epcas1p36;
-	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20231107020508epsmtrp2b7d91d55d9b40193aa0ad8ad85310877~VNP-9Tzs62332523325epsmtrp2L;
-	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
-X-AuditID: b6c32a39-c2bf870000002729-40-65499b54bb3c
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	D1.53.18939.45B99456; Tue,  7 Nov 2023 11:05:08 +0900 (KST)
-Received: from jongeonpark03 (unknown [10.253.101.166]) by
-	epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20231107020508epsmtip12401683f6021257597dc66f70e2f7ff1~VNP-zFqrW0626206262epsmtip1G;
-	Tue,  7 Nov 2023 02:05:08 +0000 (GMT)
-From: "Jong eon Park" <jongeon.park@samsung.com>
-To: "'Jakub Kicinski'" <kuba@kernel.org>, "'Paolo Abeni'"
-	<pabeni@redhat.com>
-Cc: "'David S. Miller'" <davem@davemloft.net>, "'Eric Dumazet'"
-	<edumazet@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, "'Dong ha Kang'" <dongha7.kang@samsung.com>
-In-Reply-To: <20231106154812.14c470c2@kernel.org>
-Subject: RE: [PATCH] netlink: introduce netlink poll to resolve fast return
- issue
-Date: Tue, 7 Nov 2023 11:05:08 +0900
-Message-ID: <25c501da111e$d527b010$7f771030$@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA4B20F2;
+	Tue,  7 Nov 2023 02:15:25 +0000 (UTC)
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F0610F;
+	Mon,  6 Nov 2023 18:15:24 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-7788fb06997so361732685a.0;
+        Mon, 06 Nov 2023 18:15:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699323323; x=1699928123; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fk4C8pGkEaO0aYtx+9DFxGow47hYHSHoEQjYuyisEbA=;
+        b=dix+WuV7WEQduGPYlPNqifTplPY8MSlOy5NxoThRP5XJ1gZ8Joho1r3lrNqEd2C4Qe
+         l+jQN5cLHIibrxMSWl9JsJ9HKJVUjpgQd3a8Kts+mcCsidWyXn7JPcJQLqzlvLNWB+Tr
+         JW7wpvVR+N2yRLXDd37kP94dH760u6PnvKi/QUv965voohrJchnFr83X39gxlPCZ7Z5T
+         5VefmRV3C3T4HxpCGG4EzhcCIcmDvUDalJubIGUaBFaErJyPiiMkQZAmoc7tZEDiOrqJ
+         +Dc/KpkwROrIWMD8qhwCtRRIRoiM4aFwO/NnoOHwVyoNRMHEwqHquyBKKJDC5GggpiFv
+         yVzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699323323; x=1699928123;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fk4C8pGkEaO0aYtx+9DFxGow47hYHSHoEQjYuyisEbA=;
+        b=h53jP+XZTRnd815XfUGDsyBnHGsv6mYSAEzNkTN0qQI1ooGTkD9Ghj3LDSCfiSEtgY
+         pshvuHBCzSgicqnVJeWmaL38kQyfbYGsyZ5i/bPQnG+M8IfR28I90zOyYjzXUtdsSWf9
+         wokeqY8vlUqQ+Zfeiip4R05n0rLt+/efHA3cj5FxiVfYanUFWj0ePPuxXjPqYt7kamry
+         YTCDfSFyaLa6mldeVYZUooOk+YnXndC03fZD0UisseD+SmcBSezMZZ7cjanV1HaZluVu
+         +TpkxVaiuf/mdMR4rusAP+yPK7whIycnqvB283zak56WlxIXbtQLDpcV8wgCb+dc99I6
+         srlw==
+X-Gm-Message-State: AOJu0YxDZyOhyvpt2MIdQMMyMgtZ9xeDgv3DZG28L1kuZWy4l6fTmmYc
+	AX3JYZnfS3nLhJKhoUCY3M0=
+X-Google-Smtp-Source: AGHT+IEsbtgEtm1ThrU0RGNHI2w6rhkc5V3NUgJtzFwqjIS7wWzE7nSayyO4ZlyBcgrFPy4Qz6FqbA==
+X-Received: by 2002:a05:620a:40ca:b0:779:f0a1:3128 with SMTP id g10-20020a05620a40ca00b00779f0a13128mr37320412qko.63.1699323323340;
+        Mon, 06 Nov 2023 18:15:23 -0800 (PST)
+Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
+        by smtp.gmail.com with ESMTPSA id bs10-20020a05620a470a00b00777611164c6sm3829790qkb.15.2023.11.06.18.15.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Nov 2023 18:15:23 -0800 (PST)
+Date: Mon, 6 Nov 2023 21:15:21 -0500
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Kira <nyakov13@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Manish Chopra <manishc@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+	Coiby Xu <coiby.xu@gmail.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Sven Joachim <svenjoac@gmx.de>,
+	Ian Kent <raven@themaw.net>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-staging@lists.linux.dev
+Subject: Re: [PATCH] staging: Revert "staging: qlge: Retire the driver"
+Message-ID: <ZUmduQ_xKMHF6IY9@d3>
+References: <20231030150400.74178-1-benjamin.poirier@gmail.com>
+ <2023110655-swarm-parka-177d@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJoS8HO+cSy/HZb7h5ntB8MEORIdAHf29cGAkyoXsSvMDrooA==
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKJsWRmVeSWpSXmKPExsWy7bCmgW7IbM9Ug961NhZzzrewWEy/OZXZ
-	4umxR+wWF7b1sVpc3jWHzeLYAjGLb6ffMDqwe2xZeZPJY8GmUo9NqzrZPN7vu8rm0bdlFaPH
-	501yAWxR2TYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5
-	QJcoKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgrMCvSKE3OLS/PS9fJSS6wMDQyM
-	TIEKE7IzbizMLlgsXtG1bi9jA+MLoS5GDg4JAROJeVs8uxg5OYQEdjBK7FvL1cXIBWR/YpSY
-	eu0AG5xzbdlUVpAqkIbmxztYIBI7GSUWtqxjgWh/wyjxZLs+iM0mYCBx7MdPRpANIgL+Erfv
-	eYPUMwscYJRY8OYtWD2ngKHE23dzmEBsYYFgie0/FoLFWQRUJKY/+sMMYvMKWEp8n/WbFcIW
-	lDg58wlYDbOAvMT2t3OYIQ5SkPj5dBlYjYiAk8TkBT/ZIWpEJGZ3tjGDLJYQmMoh8fHuQXaI
-	BheJ2X+PQdnCEq+Ob4GypSQ+v9vLBmFnS7w4dowVEkQFElePKEGY9hLvL1mAmMwCmhLrd+lD
-	FCtK7Pw9lxFiK5/Eu689UI28Eh1tQhAlahIPT76FhqCMxOoVd9kmMCrNQvLXLCR/zUJy/yyE
-	ZQsYWVYxiqUWFOempxYbFpjC4zk5P3cTIzh9alnuYJz+9oPeIUYmDsZDjBIczEoivH/tPVKF
-	eFMSK6tSi/Lji0pzUosPMZoCQ3ois5Rocj4wgeeVxBuaWBqYmBmZWBhbGpspifOee9ubIiSQ
-	nliSmp2aWpBaBNPHxMEp1cBktWZylvJz/qMnBXf2me+tdj9u9aBv2/uNfbtclvXpZDMyCD2d
-	MvlCZd4jRhNGuacfNLi8HJacUM4zsiicHLVM3u5L6ORKXm+GdWkV50oW6ctX9PNuN5CWvnD+
-	5IEtRtEnEoP9fohP32tUKPuEwfjbEZaCzh/HtvxUaMvwiitsf/5I9leO2NYZv6wZNH4bvv97
-	7NfHFZrJJ3LezPL4t/HOm2XiC5MZ2k7yl4mf+/VQvsv72rHEP1bL3u3uM16bVcx0MnNLwkbL
-	AjG1nusfW8QO/HG0jjv9Z06mbmWkbRqTx/k0S41aRttZjuI/9wkw5ayueCt6WJbZ6P9LSZ6C
-	4MoDbDv8n3FozGK69KLZ6J8SS3FGoqEWc1FxIgBWo/7NKAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpikeLIzCtJLcpLzFFi42LZdlhJTjdktmeqwe/FEhZzzrewWEy/OZXZ
-	4umxR+wWF7b1sVpc3jWHzeLYAjGLb6ffMDqwe2xZeZPJY8GmUo9NqzrZPN7vu8rm0bdlFaPH
-	501yAWxRXDYpqTmZZalF+nYJXBk3FmYXLBav6Fq3l7GB8YVQFyMnh4SAiUTz4x0sXYxcHEIC
-	2xklHk9YzgiRkJG4vmAfUIIDyBaWOHy4GKLmFaPEwzXXWUBq2AQMJI79+AlWLyLgL9E04yMb
-	SBGzwBFGicmLnzNDdGxjlJg/ZzcbSBWngKHE23dzmEBsYYFAifcbv4LFWQRUJKY/+sMMYvMK
-	WEp8n/WbFcIWlDg58wnYNmYBPYn16+cwQtjyEtvfzmGGuFRB4ufTZawQVzhJTF7wkx2iRkRi
-	dmcb8wRG4VlIRs1CMmoWklGzkLQsYGRZxSiaWlCcm56bXGCoV5yYW1yal66XnJ+7iREcTVpB
-	OxiXrf+rd4iRiYPxEKMEB7OSCO9fe49UId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rzKOZ0pQgLp
-	iSWp2ampBalFMFkmDk6pBibZ5+nGrUumOMq4SaYdSMub92DtJ2W+8obbfOtv/TJd0zhr1vzP
-	M89MYDYtUWCNDvsk/EelYhGDv378md2fSxJPP+DrFHIN7d18jFOvnynXMMMlvccm6E+gtOeG
-	rx3tIomrisMaa+y+V+azPDjyR/X9Krm5ccx/t6gXHE76ouRy4pPAoinSM66xWvKLa4p7PNv6
-	YXfBEZYdl/comeiVZJ16sT3xe1yuRLJmyYEooboPigk2sY2rTn17+9JMleHbDLOQ4jwG9b+5
-	tTWWqW81WOvf7Cm88t6iP/Xqq5J9Bj+tmZdM3XPG0i572oEbK9bd6L8yg4FPY+OlCKaj+dt/
-	Kl2Va94iq5AW/y9hkdI3LSWW4oxEQy3mouJEADGTrwAVAwAA
-X-CMS-MailID: 20231107020508epcas1p3e3f47fab18e52248f64bfdde05b1e53b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
-References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
-	<20231103072209.1005409-1-jongeon.park@samsung.com>
-	<20231106154812.14c470c2@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2023110655-swarm-parka-177d@gregkh>
 
-
-
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Tuesday, November 7, 2023 8:48 AM
-> To: Jong eon Park <jongeon.park@samsung.com>; Paolo Abeni
-> <pabeni@redhat.com>
-> Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet
-> <edumazet@google.com>; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org; Dong ha Kang <dongha7.kang@samsung.com>
-> Subject: Re: [PATCH] netlink: introduce netlink poll to resolve fast
-> return issue
+On 2023-11-06 07:54 +0100, Greg Kroah-Hartman wrote:
+> On Tue, Oct 31, 2023 at 02:04:00AM +1100, Benjamin Poirier wrote:
+> > This reverts commit 875be090928d19ff4ae7cbaadb54707abb3befdf.
+> > 
+> > On All Hallows' Eve, fear and cower for it is the return of the undead
+> > driver.
+> > 
+> > There was a report [1] from a user of a QLE8142 device. They would like for
+> > the driver to remain in the kernel. Therefore, revert the removal of the
+> > qlge driver.
+> > 
+> > [1] https://lore.kernel.org/netdev/566c0155-4f80-43ec-be2c-2d1ad631bf25@gmail.com/
 > 
-> On Fri,  3 Nov 2023 16:22:09 +0900 Jong eon Park wrote:
-> > In very rare cases, there was an issue where a user's poll function
-> > waiting for a uevent would continuously return very quickly, causing
-> > excessive CPU usage due to the following scenario.
-> >
-> > Once sk_rcvbuf becomes full netlink_broadcast_deliver returns an error
-> > and netlink_overrun is called. However, if netlink_overrun was called
-> > in a context just before a another context returns from the poll and
-> > recv is invoked, emptying the rcvbuf, sk->sk_err = ENOBUF is written
-> > to the netlink socket belatedly and it enters the NETLINK_S_CONGESTED
-> state.
-> > If the user does not check for POLLERR, they cannot consume and clean
-> > sk_err and repeatedly enter the situation where they call poll again
-> > but return immediately.
-> >
-> > To address this issue, I would like to introduce the following netlink
-> > poll.
-> >
-> > After calling the datagram_poll, netlink poll checks the
-> > NETLINK_S_CONGESTED status and rcv queue, and this make the user to be
-> > readable once more even if the user has already emptied rcv queue.
-> > This allows the user to be able to consume sk->sk_err value through
-> > netlink_recvmsg, thus the situation described above can be avoided
+> <snip>
 > 
-> The explanation makes sense, but I'm not able to make the jump in
-> understanding how this is a netlink problem. datagram_poll() returns
-> EPOLLERR because sk_err is set, what makes netlink special?
-> The fact that we can have an sk_err with nothing in the recv queue?
+> > --- /dev/null
+> > +++ b/drivers/staging/qlge/TODO
+> > @@ -0,0 +1,28 @@
+> > +* commit 7c734359d350 ("qlge: Size RX buffers based on MTU.", v2.6.33-rc1)
+> > +  introduced dead code in the receive routines, which should be rewritten
+> > +  anyways by the admission of the author himself, see the comment above
+> > +  qlge_build_rx_skb(). That function is now used exclusively to handle packets
+> > +  that underwent header splitting but it still contains code to handle non
+> > +  split cases.
+> > +* truesize accounting is incorrect (ex: a 9000B frame has skb->truesize 10280
+> > +  while containing two frags of order-1 allocations, ie. >16K)
+> > +* while in that area, using two 8k buffers to store one 9k frame is a poor
+> > +  choice of buffer size.
+> > +* in the "chain of large buffers" case, the driver uses an skb allocated with
+> > +  head room but only puts data in the frags.
+> > +* rename "rx" queues to "completion" queues. Calling tx completion queues "rx
+> > +  queues" is confusing.
+> > +* struct rx_ring is used for rx and tx completions, with some members relevant
+> > +  to one case only
+> > +* the flow control implementation in firmware is buggy (sends a flood of pause
+> > +  frames, resets the link, device and driver buffer queues become
+> > +  desynchronized), disable it by default
+> > +* the driver has a habit of using runtime checks where compile time checks are
+> > +  possible (ex. qlge_free_rx_buffers())
+> > +* reorder struct members to avoid holes if it doesn't impact performance
+> > +* use better-suited apis (ex. use pci_iomap() instead of ioremap())
+> > +* remove duplicate and useless comments
+> > +* fix weird line wrapping (all over, ex. the qlge_set_routing_reg() calls in
+> > +  qlge_set_multicast_list()).
+> > +* remove useless casts (ex. memset((void *)mac_iocb_ptr, ...))
+> > +* fix checkpatch issues
 > 
-> Paolo understands this better, maybe he can weigh in tomorrow...
+> In looking at this again, are you sure you all want this in the tree?
+> I'm glad to take the revert but ONLY if you are willing to then take a
+> "move this to drivers/net/" patch for the code as well, WITH an actual
+> maintainer and developer who is willing to do the work for this code.
+> 
+> In all the years that this has been in the staging tree, the listed
+> maintainers have not been active at all from what I can remember, and
+> obviously the above list of "things to fix" have not really been worked
+> on at all.
+> 
+> So why should it be added back?  I understand there is at least one
+> reported user, but for drivers in the staging tree, that's not a good
+> reason to keep them around if there is not an actual maintainer that is
+> willing to do the work.
+> 
+> Which reminds me, we should probably sweep the drivers/staging/ tree
+> again to see what we can remove given a lack of real development.
+> Normally we do that every other year or so, and this driver would fall
+> into the "no one is doing anything with it" category and should be
+> dropped.
 
-Perhaps my explanation was not comprehensive enough.
+Thank you for revisiting this topic. I agree with you that it's better
+not to add orphaned code back into the kernel. I didn't want users to be
+left out in the cold by the removal of the driver, so I just created a
+dkms package as a fallback:
+https://github.com/gobenji/qlge-dkms
 
-The issue at hand is that once it occurs, users cannot escape from this 
-"busy running" situation, and the inadequate handling of EPOLLERR by users 
-imposes a heavy burden on the entire system, which seems quite harsh.
-
-The reason for a separate netlink poll is related to the netlink state. 
-When it enters the NETLINK_S_CONGESTED state, sk can no longer receive or 
-deliver skb, and the receive_queue must be completely emptied to clear the 
-state. However, it was found that the NETLINK_S_CONGESTED state was still 
-maintained even when the receive_queue was empty, which was incorrect, and 
-that's why I implemented the handling in poll.
-
-I don't consider this approach to be the best way, so if you have any 
-recommendations for a better solution, I would appreciate it.
-
-Regards.
-JE Park.
-
-
+People who want to use qlge with the latest kernel can use that package.
+Since the driver code is not mainline quality and there isn't much
+willingness to invest in its improvement, I think it's fitting that the
+code lives out of tree. Of course, if somebody takes ownership of the
+code and substantially improves it, they can submit it back to netdev.
 
