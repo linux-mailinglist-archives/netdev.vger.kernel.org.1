@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-46425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303217E3C17
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6EDF7E3C1F
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:12:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B35D6B20BE1
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E03AB20C06
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1353F2E410;
-	Tue,  7 Nov 2023 12:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA51F2E412;
+	Tue,  7 Nov 2023 12:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fozeG1ZW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZ9ET1w1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C522E3FE
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42575C433C8;
-	Tue,  7 Nov 2023 12:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBA02E3FB
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:12:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DFE4C43395;
+	Tue,  7 Nov 2023 12:12:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699359139;
-	bh=nTG27SvLwHvCzPCy51qW36Qp59QfVKOdXUygo/rfWI0=;
+	s=k20201202; t=1699359155;
+	bh=cYmZsL8f0x/yljOBP/ipObqQSXEDxf1vk1TY8G4z8PU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fozeG1ZWTm2n6Mhduw1HILhocPLiAENnJbZkUq3ipD9LpDdWdcY11H5JbpkYEucCx
-	 1P+H8PuBFPRdSIDt2iDpKqTN+mb6uHAsrAPOiOI48gVtQ4/VDYbjafoxS/mX9qroHr
-	 ugeuUZcO8AF5N//TGsXnHEYMLMILTZJSAp2Q2kOZvag9eTCHMNfOHGh1IKpa6ARnCg
-	 3EFYklr8liB8VhWJwJkR1S9znbSUDT7KE5Ct2R+jIVIjO7ZbPJ5alNq8XTgwI1xozt
-	 Go/OGU+3Z1Uv/XuDgYuJtimEF60KIN6KNKr+IZ5xwml/hr+YEyae1dTeTyPcLKnws9
-	 5xYPFmqDuhbhQ==
+	b=KZ9ET1w1FG3szWTOS6kkvkAMYVguI5GW50SsNyZN4msWZxsLmUeiC+V1++kZwBDwC
+	 S2Kzm22pLOrU2oee80jUzeMpGMMoN40rIjH5fck/XTSH75y1GDActSSxKUFQIRwPxa
+	 bIeNW9gye96ZDoJ3zO6nP+7a1ZOd5g2M8b4igqBiUUnc/O2xvyEbEBNuXCp+CMuXrA
+	 Ych/nA5LK8pkRaj0zkeyKzhIip7PSD9ZuPCVmbJW3D8K9mfqPSYxaDLH3e2I3taxpc
+	 Z4+uG0A+/b/ZDCn8p1myVh93CIS5Fu5pL8CY2BAk7OEaos9l8zA1Z47RHVu2IeCcK/
+	 dnV9IgXiUaZxA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Ping-Ke Shih <pkshih@realtek.com>,
+	Zong-Zhe Yang <kevin_yang@realtek.com>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuniyu@amazon.com,
-	wuyun.abel@bytedance.com,
-	leitao@debian.org,
-	alexander@mihalicyn.com,
-	dhowells@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 08/12] net: annotate data-races around sk->sk_dst_pending_confirm
-Date: Tue,  7 Nov 2023 07:11:45 -0500
-Message-ID: <20231107121158.3758348-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 02/11] wifi: mac80211: don't return unset power in ieee80211_get_tx_power()
+Date: Tue,  7 Nov 2023 07:12:17 -0500
+Message-ID: <20231107121230.3758617-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231107121158.3758348-1-sashal@kernel.org>
-References: <20231107121158.3758348-1-sashal@kernel.org>
+In-Reply-To: <20231107121230.3758617-1-sashal@kernel.org>
+References: <20231107121230.3758617-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,83 +60,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.137
+X-stable-base: Linux 5.10.199
 Content-Transfer-Encoding: 8bit
 
-From: Eric Dumazet <edumazet@google.com>
+From: Ping-Ke Shih <pkshih@realtek.com>
 
-[ Upstream commit eb44ad4e635132754bfbcb18103f1dcb7058aedd ]
+[ Upstream commit e160ab85166e77347d0cbe5149045cb25e83937f ]
 
-This field can be read or written without socket lock being held.
+We can get a UBSAN warning if ieee80211_get_tx_power() returns the
+INT_MIN value mac80211 internally uses for "unset power level".
 
-Add annotations to avoid load-store tearing.
+ UBSAN: signed-integer-overflow in net/wireless/nl80211.c:3816:5
+ -2147483648 * 100 cannot be represented in type 'int'
+ CPU: 0 PID: 20433 Comm: insmod Tainted: G        WC OE
+ Call Trace:
+  dump_stack+0x74/0x92
+  ubsan_epilogue+0x9/0x50
+  handle_overflow+0x8d/0xd0
+  __ubsan_handle_mul_overflow+0xe/0x10
+  nl80211_send_iface+0x688/0x6b0 [cfg80211]
+  [...]
+  cfg80211_register_wdev+0x78/0xb0 [cfg80211]
+  cfg80211_netdev_notifier_call+0x200/0x620 [cfg80211]
+  [...]
+  ieee80211_if_add+0x60e/0x8f0 [mac80211]
+  ieee80211_register_hw+0xda5/0x1170 [mac80211]
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+In this case, simply return an error instead, to indicate
+that no data is available.
+
+Cc: Zong-Zhe Yang <kevin_yang@realtek.com>
+Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
+Link: https://lore.kernel.org/r/20230203023636.4418-1-pkshih@realtek.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/sock.h    | 6 +++---
- net/core/sock.c       | 2 +-
- net/ipv4/tcp_output.c | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ net/mac80211/cfg.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index d148dc95c9e9c..e19eebaf59f73 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2083,7 +2083,7 @@ static inline void __dst_negative_advice(struct sock *sk)
- 		if (ndst != dst) {
- 			rcu_assign_pointer(sk->sk_dst_cache, ndst);
- 			sk_tx_queue_clear(sk);
--			sk->sk_dst_pending_confirm = 0;
-+			WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
- 		}
- 	}
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index c6a7f1c99abc5..45bb6f2755987 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -2726,6 +2726,10 @@ static int ieee80211_get_tx_power(struct wiphy *wiphy,
+ 	else
+ 		*dbm = sdata->vif.bss_conf.txpower;
+ 
++	/* INT_MIN indicates no power level was set yet */
++	if (*dbm == INT_MIN)
++		return -EINVAL;
++
+ 	return 0;
  }
-@@ -2100,7 +2100,7 @@ __sk_dst_set(struct sock *sk, struct dst_entry *dst)
- 	struct dst_entry *old_dst;
  
- 	sk_tx_queue_clear(sk);
--	sk->sk_dst_pending_confirm = 0;
-+	WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
- 	old_dst = rcu_dereference_protected(sk->sk_dst_cache,
- 					    lockdep_sock_is_held(sk));
- 	rcu_assign_pointer(sk->sk_dst_cache, dst);
-@@ -2113,7 +2113,7 @@ sk_dst_set(struct sock *sk, struct dst_entry *dst)
- 	struct dst_entry *old_dst;
- 
- 	sk_tx_queue_clear(sk);
--	sk->sk_dst_pending_confirm = 0;
-+	WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
- 	old_dst = xchg((__force struct dst_entry **)&sk->sk_dst_cache, dst);
- 	dst_release(old_dst);
- }
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 8faa0f9cc0839..662cd6d54ac70 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -557,7 +557,7 @@ struct dst_entry *__sk_dst_check(struct sock *sk, u32 cookie)
- 	    INDIRECT_CALL_INET(dst->ops->check, ip6_dst_check, ipv4_dst_check,
- 			       dst, cookie) == NULL) {
- 		sk_tx_queue_clear(sk);
--		sk->sk_dst_pending_confirm = 0;
-+		WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
- 		RCU_INIT_POINTER(sk->sk_dst_cache, NULL);
- 		dst_release(dst);
- 		return NULL;
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 9d5e652c9bba1..8032ccb69463e 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -1318,7 +1318,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
- 	skb->destructor = skb_is_tcp_pure_ack(skb) ? __sock_wfree : tcp_wfree;
- 	refcount_add(skb->truesize, &sk->sk_wmem_alloc);
- 
--	skb_set_dst_pending_confirm(skb, sk->sk_dst_pending_confirm);
-+	skb_set_dst_pending_confirm(skb, READ_ONCE(sk->sk_dst_pending_confirm));
- 
- 	/* Build TCP header and checksum it. */
- 	th = (struct tcphdr *)skb->data;
 -- 
 2.42.0
 
