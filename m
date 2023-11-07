@@ -1,69 +1,66 @@
-Return-Path: <netdev+bounces-46496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C5B7E4A48
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:06:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADAD7E4A70
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 22:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F85AB20DB6
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:06:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA9901C2093C
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 21:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C433C6AC;
-	Tue,  7 Nov 2023 21:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64442A1C0;
+	Tue,  7 Nov 2023 21:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CLrc7Vs/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FVocwmGS"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7A236B19
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:05:58 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B3D10DF
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:05:57 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a909b4e079so83178537b3.2
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 13:05:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649C12A1B6
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 21:17:58 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD1D10C1
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 13:17:57 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-51e24210395so3988a12.0
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 13:17:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699391157; x=1699995957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JeYrzwOr78xPwcpsKE4mhPZUV4HYgKXqTY0m7zX5WN8=;
-        b=CLrc7Vs/1PCELHyGusVoDCPf/52uCjYwq6cI2ser3URI83cqD1/t2QsbqpK5DNa3zx
-         PRu9K0gZTWpt8b27n97Bi4vWIxaaMlxJnIhqAgxQxXUmTDNgROTHOTDvz6vsRnQBW8kd
-         iMAG2TYBabVgWWCXYY43noeUEA3P4v5OcByvPUgHM5PacDJw0bwsJYCON+w6GUXHLsEZ
-         Iu0IMsJKN4msjEdymno0rhKDwXebRmdyr/NVJLVdVR+Kz6nzuSWAVqEwtFh02xC8hKxm
-         zCPGqkCz2ENS2Y+/X0D92XvNPCJICf5Hkn0E/djFFMUgumX3IIoV8rU1okD1hg95vWtE
-         zLNw==
+        d=google.com; s=20230601; t=1699391876; x=1699996676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T2QCCZhbNaMLPXpYCBN6556bTQl/R/gNcXFBlSEHr6s=;
+        b=FVocwmGSdxHkbrQ7tWTS2XmP+6qZLpKinaIFJ4qZjAwcbkLFjNkDTYVRevnaSQcI+D
+         KEXXF+0M7DFvG7E37VvjOb7veyL6IGMckc0T4YI1LOz6PB4DK7q1iZM62wpu5M15C5eF
+         lHoCQKjfFO0ovCSbncChNkAu2/mWN0zrFeRJbEVGralItJLVcEEjacT+sk7n2ZiADLHe
+         b/DbkrmextfY25yafPa/LV9X6Z6+qdwbztJsZSa3WBMPdEY1eJiM71gF/397W8hJ3h/9
+         UctHYR1aMoZkG99fSELZjAiO5TOkOWWHmPyCYH8Oz1eznDe0dm2GI2udZggxipVwamKh
+         LwnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699391157; x=1699995957;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JeYrzwOr78xPwcpsKE4mhPZUV4HYgKXqTY0m7zX5WN8=;
-        b=v55nPZe3eIeqGg/eiBpBUxW5vME9SXEPHgwmPy4CI5rqHIC/gba7vtRXmy/vEr30TK
-         uMJwJDMGt8rsNZR2wozsolF7zKd6aOSDez7Nh+Bx+JgJouLwLc2XR7AteXJzcJ6zjNln
-         9wTNiL/+qAmiCDsh3oHfZkYUTX1o/sDcSMgaX1K/rxwydMRsAbdILeesWg0QEjFYOx+R
-         aety9UcTG5mhQSJ5qu53MG6Jb3rcKudgJPYJfyBSBWo0eTCQS+4IDAZ9vq2HYJjMIoVc
-         o6FHViYeK7Jqs6ZCrOu1QBvEkoFDVUCClyuobqHQRMtq9913x2WCtcqspLwB6MxFKvup
-         cKrA==
-X-Gm-Message-State: AOJu0YzfGv2BDNhYOjDDn+WFw5O9MpIKsaJE0ZNMXnu9HnlGVG8/yOwF
-	ZpAjYZX68t3wWn7ynj5WC2pp+7w=
-X-Google-Smtp-Source: AGHT+IE4UIBdCOBSahaHbXIaAM3E3QwhCi94Cvn3aJLHOo+p0gLkdCty9bKUvZY7uZa3X7IxK0NG/CQ=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:830d:0:b0:5a8:6162:b69 with SMTP id
- t13-20020a81830d000000b005a861620b69mr287016ywf.3.1699391156928; Tue, 07 Nov
- 2023 13:05:56 -0800 (PST)
-Date: Tue, 7 Nov 2023 13:05:55 -0800
-In-Reply-To: <CAHS8izNTDsHTahkd17zQVQnjzniZAk-dKNs-Mq0E4shdrXOJbg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1699391876; x=1699996676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=T2QCCZhbNaMLPXpYCBN6556bTQl/R/gNcXFBlSEHr6s=;
+        b=CFF+01GnMyTnGE+tfbzOIW0HH/SfuyQZbYjRLWv1ahEOn1e4Wc5IvU79F0bAelESh1
+         t4XrQOcfcxKVvS01KQ2JO6QwV+CYrpH/Amlr9FHht1B5YP0xGCAcXzvRo0ak1pl/liow
+         7nVXYDbPopLqavkUtfJrsBao467QdE9HRvyY78Ty2X7PpvuT9A7IISKt9LcOuGXnrTfF
+         RwO1wc9UvqVwHpRuOwZIAiKZ/k0B9TitkelKE8YCsOmbaDddJRBcqiRKdLQ7sx8okLal
+         3wqkwbTk9iVumzoTI1d8qnjgsKKdNB8Izwi/OtVnUS6Gn/zOnWHFJucuADC+0MzG+8rM
+         5tdA==
+X-Gm-Message-State: AOJu0YyqjT7ikVhV3X/1vMdePIHtHy/vEuOhhBZvXm2oHUPE9+B33YJA
+	LOWyJAwC4qhFP3e+Dqox36H03SObK+S0VB0jPw5RdA==
+X-Google-Smtp-Source: AGHT+IE2BJYg2o+RWiBo7zUK8rUJLrxbtosbDGcrLcTm47eDVBdJN7KV0TjFmGvpMtQ446xGBJBrXEpJoAJUwEcp3Q0=
+X-Received: by 2002:a05:6402:e84:b0:544:e249:be8f with SMTP id
+ h4-20020a0564020e8400b00544e249be8fmr179390eda.1.1699391875922; Tue, 07 Nov
+ 2023 13:17:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
  <ZUlhu4hlTaqR3CTh@google.com> <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
  <ZUlvzm24SA3YjirV@google.com> <CAHS8izMQ5Um_ScY0VgAjaEaT-hRh4tFoTgc6Xr9Tj5rEj0fijA@mail.gmail.com>
@@ -71,77 +68,48 @@ References: <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
  <CAF=yD-+BuKXoVL8UF+No1s0TsHSzBTz7UrB1Djt_BrM74uLLcg@mail.gmail.com>
  <CAHS8izNxKHhW5uCqmfau6n3c18=hE3RXzA+ng5LEGiKj12nGcg@mail.gmail.com>
  <ZUmNk98LyO_Ntcy7@google.com> <CAHS8izNTDsHTahkd17zQVQnjzniZAk-dKNs-Mq0E4shdrXOJbg@mail.gmail.com>
-Message-ID: <ZUqms8QzQpfPQWyy@google.com>
+ <ZUqms8QzQpfPQWyy@google.com>
+In-Reply-To: <ZUqms8QzQpfPQWyy@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 7 Nov 2023 22:17:42 +0100
+Message-ID: <CANn89iJNR8bYYBO92=f5_2hFoTK8+giH11o-7NHURoahwvV11w@mail.gmail.com>
 Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable frags
-From: Stanislav Fomichev <sdf@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Mina Almasry <almasrymina@google.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
 	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
 	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
 	Arnd Bergmann <arnd@arndb.de>, Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
-	"Christian =?utf-8?B?S8O2bmln?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="utf-8"
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 11/07, Mina Almasry wrote:
-> On Mon, Nov 6, 2023 at 5:06=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
-> wrote:
-> [..]
-> > > > > And the socket has to know this association; otherwise those toke=
-ns
-> > > > > are useless since they don't carry anything to identify the dmabu=
-f.
-> > > > >
-> > > > > I think my other issue with MSG_SOCK_DEVMEM being on recvmsg is t=
-hat
-> > > > > it somehow implies that I have an option of passing or not passin=
-g it
-> > > > > for an individual system call.
-> > >
-> > > You do have the option of passing it or not passing it per system
-> > > call. The MSG_SOCK_DEVMEM says the application is willing to receive
-> > > devmem cmsgs - that's all. The application doesn't get to decide
-> > > whether it's actually going to receive a devmem cmsg or not, because
-> > > that's dictated by the type of skb that is present in the receive
-> > > queue, and not up to the application. I should explain this in the
-> > > commit message...
-> >
-> > What would be the case of passing it or not passing it? Some fallback t=
-o
-> > the host memory after flow steering update? Yeah, would be useful to
-> > document those constrains. I'd lean on starting stricter and relaxing
-> > those conditions if we find the use-cases.
-> >
->=20
-> MSG_SOCK_DEVMEM (or its replacement SOCK_DEVMEM or SO_SOCK_DEVMEM),
-> just says that the application is able to receive devmem cmsgs and
-> will parse them. The use case for not setting that flag is existing
-> applications that are not aware of devmem cmsgs. I don't want those
-> applications to think they're receiving data in the linear buffer only
-> to find out that the data is in devmem and they ignored the devmem
-> cmsg.
->=20
-> So, what happens:
->=20
-> - MSG_SOCK_DEVMEM provided and next skb in the queue is devmem:
-> application receives cmsgs.
-> - MSG_SOCK_DEVMEM provided and next skb in the queue is non-devmem:
-> application receives in the linear buffer.
-> - MSG_SOCK_DEVMEM not provided and net skb is devmem: application
-> receives EFAULT.
-> - MSG_SOCK_DEVMEM not provided and next skb is non-devmem: application
-> receives in the linear buffer.
->=20
-> My bad on not including some docs about this. The next version should
-> have the commit message beefed up to explain all this, or a docs
-> patch.
+On Tue, Nov 7, 2023 at 10:05=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
+ wrote:
 
-I don't understand. We require an elaborate setup to receive devmem cmsgs,
-why would some random application receive those?
+>
+> I don't understand. We require an elaborate setup to receive devmem cmsgs=
+,
+> why would some random application receive those?
+
+
+A TCP socket can receive 'valid TCP packets' from many different sources,
+especially with BPF hooks...
+
+Think of a bonding setup, packets being mirrored by some switches or
+even from tc.
+
+Better double check than be sorry.
+
+We have not added a 5th component in the 4-tuple lookups, being "is
+this socket a devmem one".
+
+A mix of regular/devmem skb is supported.
 
