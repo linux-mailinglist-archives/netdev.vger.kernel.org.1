@@ -1,170 +1,103 @@
-Return-Path: <netdev+bounces-46447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5957E41A2
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 15:12:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530197E41DA
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 15:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 406B11C20B0A
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:12:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A031C20B82
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 14:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE7930F9F;
-	Tue,  7 Nov 2023 14:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEEEC2E3E8;
+	Tue,  7 Nov 2023 14:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="J9fogmrC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Of4PASZj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587D730F8F
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:12:42 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2085.outbound.protection.outlook.com [40.107.95.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C798AC2;
-	Tue,  7 Nov 2023 06:12:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O3jMmC3tpIZ8prSa4EohGwxrE4VkRQBK25xJ40qZWexs5cW9YFPgxZrUhBhKyd3kelMAl/dBw7KqJf3boWahYc5mC72NfZTQhGr60yZnNHxFWsr/NvUSdjBGdPfgUhdDe9/zoRxrNb+iEFXarAMbrvk990g6ziNaF6QW8Fz+oZ0Kqyz81MF8ewHjsCbKaEgVJKrB/K6yxQmbKaHltBWaeGrLQrv4ZLOqadTneseBY1F5driNyi+MfRsqHJIn+0MCCGfbBzExOsxmpYUOQoGmoAu3+LCblkNglpXyoFhft8SA7H9NiuXBnRxhzMTRaymf3XTtupFLso48dykQQnNDYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZT3DD69R9xNQi1GcHmXwiLYetj6hO7ORkSUzN5xGp8s=;
- b=MqLb4ei6q4Za9PvdhKQN1jzwDCBEfw6nAg0couFjtIPmF0hxoRJC2s2RMGJ0h3nh6V7CPrv0CCXq67aWBAaSo1tWWz/1Z4WC6cuyRutdvFE30byt1OG60pqM25sHz80pCPW7RmYkcTzU/5x7FZ/kMxQPu++eJbQKw2ccyKxhmtw31s/fmZnfqD73Ey98FTsZtJ8QEN4UJa+QABNdB61XOQGTR3AbgVnYin0GRT4hRmg3MxxxIAkxnL/voj7cgwdelJewG3lk+4L+IF8sQshuOlt+cOv5bjoMOlvwAyXiT7WVQmWrEmHwsksWxXyVXVpK8BZE8KRtlBY7rd2C28vG0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZT3DD69R9xNQi1GcHmXwiLYetj6hO7ORkSUzN5xGp8s=;
- b=J9fogmrCBPX4MdL2amRNSGqoE0KAvNEl6ZemuIH8C/gxPa4Muxp93JaBlUmMA87YWPIDHyDLYZiGRtAH35Ph7t7JQibzhhsJm/+LoynIjmlLpPRwjdk0GCh4Txl+4BY92eMMgvJPufmJb9WtOestOfY0ah04w2eH7mRp7gKPInDiwAYXo77mf28W6epNejh2joBPfr31XgT067tly0z6G3EdXR6i/AKvMKlc8S4hUHW3SJMCKwgkAXdqkjUPH5SueJx6b1Z+RutHvJF9VHz1lTxYZ910G+swfFFNt6rE9+y1c90sKQMYOzMV7LK2jitAUo0af10djz3rTKvAiT4uwA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by LV8PR12MB9272.namprd12.prod.outlook.com (2603:10b6:408:201::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Tue, 7 Nov
- 2023 14:12:38 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::b53a:1092:9be2:cfb9]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::b53a:1092:9be2:cfb9%5]) with mapi id 15.20.6954.027; Tue, 7 Nov 2023
- 14:12:38 +0000
-Date: Tue, 7 Nov 2023 10:12:37 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397DE2E63D
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 14:30:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27CE598
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 06:30:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699367431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0BEK4Nq2797qPXi5hUhUOD+w7Yxl1Y5y6keCDboqBnw=;
+	b=Of4PASZjPYtpcx7NaEMxBZk8sa21j4tPyCox960KCw1SRFDq6fyBYirTpQwXvG56TRQ5ZO
+	Rdphcb1uqHZisgU16dif/C64RhKLCAnMjCYPSnFnplKf0zuzF+G9lRODXNg3XqML5bAMWc
+	4UaX0SLfU+fezPOAkyOpD9LxwxnXvVs=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-426-kk1KB_C2OYyTwQqYDYt9ww-1; Tue, 07 Nov 2023 09:30:27 -0500
+X-MC-Unique: kk1KB_C2OYyTwQqYDYt9ww-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-507b8ac8007so6212987e87.0
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 06:30:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699367426; x=1699972226;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0BEK4Nq2797qPXi5hUhUOD+w7Yxl1Y5y6keCDboqBnw=;
+        b=awKfHB9G6Asd34HZCvCz2m+hSUaYKVDBlvqpPSh+BiVyM3wkirxeqygqA+8EWpwcgv
+         MdhHiGw73JcZfgjo9PnjjPi72s2dz+AHp6rMf2IkLuoQK1HuJemQQhuf6Fmv6vjPJaL6
+         hJlrNCujqm4dyEnMMUJwtlMQcK6/T7Uu787dDBWFfh3dwNx5mmOZSQSqVmRrk6G3R0df
+         vnLy+RHg4oBXemunB2gA33sZ+HN08MUzxQBLCzpta7M936gbNknrRnY1rBUhBPHndRw5
+         z+iql8kxkY1DQcNyn6dxN/DfS5rHhGf0aEGpBxoAEdG96PhSfDQFEwR4CaAtSbrRXpup
+         nZJQ==
+X-Gm-Message-State: AOJu0Yy2rLl929B7WnaUkGkHVGvY4ckAHhhTcTeSJ+qG+5IRLkgQgSbG
+	ELWOS/pD3OgVTzZ7dTT0Kt6QrcQMPHUtpPTdkWsYhjMhRFLyRYHVvhXU1XN6DMJs24wiOeQBS6i
+	nS8h0w9LFz3J8EAjb
+X-Received: by 2002:ac2:488e:0:b0:500:7cab:efc3 with SMTP id x14-20020ac2488e000000b005007cabefc3mr23998199lfc.11.1699367426350;
+        Tue, 07 Nov 2023 06:30:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJy8gOlznCOc9sukgGEsAedAcGzp6nnH6baVR5lODsEIZgCRdZq2T6s/WT4PvnZAwy92AFJA==
+X-Received: by 2002:ac2:488e:0:b0:500:7cab:efc3 with SMTP id x14-20020ac2488e000000b005007cabefc3mr23998175lfc.11.1699367425918;
+        Tue, 07 Nov 2023 06:30:25 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f1:373a:140:63a8:a31c:ab2a])
+        by smtp.gmail.com with ESMTPSA id a6-20020a056000100600b0031984b370f2sm2499881wrx.47.2023.11.07.06.30.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 06:30:25 -0800 (PST)
+Date: Tue, 7 Nov 2023 09:30:21 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
 Cc: Cindy Lu <lulu@redhat.com>, jasowang@redhat.com, yi.l.liu@intel.com,
 	linux-kernel@vger.kernel.org,
 	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 Subject: Re: [RFC v1 0/8] vhost-vdpa: add support for iommufd
-Message-ID: <20231107141237.GO4488@nvidia.com>
+Message-ID: <20231107092551-mutt-send-email-mst@kernel.org>
 References: <20231103171641.1703146-1-lulu@redhat.com>
  <20231107022847-mutt-send-email-mst@kernel.org>
  <20231107124902.GJ4488@nvidia.com>
  <20231107082343-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107082343-mutt-send-email-mst@kernel.org>
-X-ClientProxiedBy: BL1PR13CA0180.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::35) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+ <20231107141237.GO4488@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|LV8PR12MB9272:EE_
-X-MS-Office365-Filtering-Correlation-Id: b97d8f91-b230-4548-4d03-08dbdf9b9912
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	McdDCa6yW1xw9wx3Qq1AYV2sTw4rhnNdYNeXvcgMYWvL8BwLeMXCrDQrAMZmF7WmE0xnNZOzYxEDC6rj1W/DLb5zt/1LYMI0h5Xx1bd1dBA77OcTLASfCZgo85cbnouSjPVRAn7Lf+Jdwr73othuFedAEbzSnlzl0XjjQ93z7CRYusW7fF1evS8zOTySEwqYOlNWfzCzso6C1ELIAJ/Y/eq8Pn5YlOQlo/N/PqgYspf3ArT8NZMNCrLKUYlACBRB6T4jpjg36/P+V2qGHstyGb4TJ8UCa9/NoUyzUVHFnjp3d4/i3GyxG6220aKHgLq7ow6d3OREVCSiBtDHCL09Q1sD17PkWkRoL9infRvuh8bJDmL5L02HRIHo7ef8yRq1yERGXzaj5OfwZ5uPPK354l0humk4xK3iJdYR2gV7oRtr4jJ8k0g6Tgg337BF0HQ1MFC/1qi8q2Uyujdws7tQyVAEJbIBEG4amua56Dt69mQSdWSEwJB4baaEiCN+R5qTIscmkleRGQ8XywoPnW9WgAdiqebZJRCwQpcBB/ZGa8gJdnPJjgOFilH/2l5u9ifV
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(366004)(376002)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(6916009)(8936002)(8676002)(4326008)(41300700001)(36756003)(2906002)(38100700002)(5660300002)(6486002)(66556008)(6512007)(66476007)(33656002)(316002)(86362001)(66946007)(26005)(83380400001)(2616005)(1076003)(478600001)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oFD5t+/c5UeOtQv4gD1L6SaROgkBNKRRkrfH4RX8wus1oY0YIn413qw0FsJw?=
- =?us-ascii?Q?nBun3kr0Ewsb/wyP3/UwWXXJH/68Wa3EB0+F/3SHeDUPVAaeZWlI5Og6Mljo?=
- =?us-ascii?Q?3CaQ0Iv8gcscq1cglOz34wYpf0jUtF+FSY7eJnABBu45wCDLpRUcpFMTd0vS?=
- =?us-ascii?Q?1QR7CAthGpbpBygFOpFAtT9/RXftDzNQDUEc8jW5LFXL5kXfc8voiSLwwjUd?=
- =?us-ascii?Q?sjAFhqiO/z3tF9xE2WxsvF2G/y1YY25kym4Jj/BOlwsTN88Q+4uLWi6YueOw?=
- =?us-ascii?Q?+2vLuKC6WdTOnk6sC5WEbqibhGp2EF/G9ZZ3iBS4JmUChNzujWbBxUGFmtT/?=
- =?us-ascii?Q?VQ1K2qkPNijrOgYAGpqs/05vAEL5sTkiufAryajGLXp6xNHEIXIBv0uxL6pz?=
- =?us-ascii?Q?Vs6zhRowpKV30XHGpu2QcMCj9BwjTw5QdEEjY6sQmabxC6s8OR/W+XT+WWQq?=
- =?us-ascii?Q?D8lyHLTUa9OWqWX4lpk47bxiZ1glYEbcl35ivXUsCjz1wZHM04EW4YXKBSn5?=
- =?us-ascii?Q?LfkXwjJ9xljyvC3QdQsl3N3iprkOpJqbmr5/gjq56OtsTIAiRmlslA/wsAc+?=
- =?us-ascii?Q?1jSNkH/lEgKBjQFqD6G3a7mKapZ8aabkRuEwoVwFgPgE+A53xAwFGTnzaumg?=
- =?us-ascii?Q?aeNL91jvVJJqJDcK3oeFtOualwmPJOZQtwqVfF430bjzfDNm4/oZlM3BxgfB?=
- =?us-ascii?Q?UDtwvsA9RJXyja8ogZ5qilxjw+vSEen58UvGPDelHyV1MEySJVKFusvTlpkA?=
- =?us-ascii?Q?CHpHFX6J7Sw7SR8JVhkxP/C7geX7KihYvu4f0vUhd/5ha4W6DBYRXLHcShDA?=
- =?us-ascii?Q?2Tk8Wuu1ZSTN76cT3I6RGvgVKyCUoiH3TfMNhrpBhBIZqqCf6y86MXIQXiJm?=
- =?us-ascii?Q?+Hh7SgWlxIh5YdWUUbLA0uKq/3cURFNMARFFwDG+TEbPVBHXuGsxbKzx96+6?=
- =?us-ascii?Q?f8Ridh6p2w40NTSxqJCk/5bZ9PYlhB8cHIUqWZgtsGd9E7D2FpJL78S/48g8?=
- =?us-ascii?Q?tUUtYpMCeY/keOJCb/wYIteTI7Acyj9mSjatA/Dc4C59Fe3OaYUWyhOnsSIV?=
- =?us-ascii?Q?cMOppHxkedB+YlERWs9u95tl1ZKfOOZxqTqQk1i9oCobVArPnk3G/AUVJROq?=
- =?us-ascii?Q?sUIBcNG0NrKKUy9Af8+8gXTVbrZ0cmFxhCEROGSrZPCnGVVR1aevNtuRdCN/?=
- =?us-ascii?Q?7dIDxKDf02bqBljJP7qAaOpWxCwc3qSJEoJeaSDLmSpye/bpbfc71sXMNO0v?=
- =?us-ascii?Q?R/06JzBhjLxMSApfpaimZq70iMRifn+YGpxmV5jO+8m5V2u6N6KXu0NVZU7F?=
- =?us-ascii?Q?Z0fYOy5Ww3kZLEq5odmgH8Ug3xuCOwYxooBFRg7ozKaW9n1zKXwjVrnSSLJu?=
- =?us-ascii?Q?+YdEq7iDJopYGmn/fRsaCTABE7vYp1AksP52oJ6Pqn4Q82craosXc6qS8m60?=
- =?us-ascii?Q?kGCp6TKRR/2Ok7Q6j+Rx9fMQ30VErdNJ5qGgFl1dOp5ld7iFfZ22Q8ARQhiZ?=
- =?us-ascii?Q?K1ZwYptA0Un8Wm+OvnE1sXHULaEVs3LCYTrOu//tQEX5xapOtAt7pjsoHfsU?=
- =?us-ascii?Q?mPrpy4vxG3MiaxFYqZ4p0NX6rgQY4CJY35M6AIt3?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b97d8f91-b230-4548-4d03-08dbdf9b9912
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2023 14:12:38.5372
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6dGy5IJRwqylA4G8oSOD4k9ie3Z6iKs21f6KZ3exrCMQvfR4hihnG8K3Gy2AMv2l
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9272
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107141237.GO4488@nvidia.com>
 
-On Tue, Nov 07, 2023 at 08:28:32AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Nov 07, 2023 at 08:49:02AM -0400, Jason Gunthorpe wrote:
-> > On Tue, Nov 07, 2023 at 02:30:34AM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Nov 04, 2023 at 01:16:33AM +0800, Cindy Lu wrote:
-> > > > 
-> > > > Hi All
-> > > > This code provides the iommufd support for vdpa device
-> > > > This code fixes the bugs from the last version and also add the asid support. rebase on kernel
-> > > > v6,6-rc3
-> > > > Test passed in the physical device (vp_vdpa), but  there are still some problems in the emulated device (vdpa_sim_net), 
-> > > 
-> > > What kind of problems? Understanding that will make it easier
-> > > to figure out whether this is worth reviewing.
-> > 
-> > IMHO, this patch series needs to spend more time internally to Red Hat
-> > before it is presented to the community. It is too far away from
-> > something worth reviewing at this point.
-> > 
-> > Jason
-> 
-> I am always trying to convince people to post RFCs early
-> instead of working for months behind closed doors only
-> to be told to rewrite everything in Rust.
+On Tue, Nov 07, 2023 at 10:12:37AM -0400, Jason Gunthorpe wrote:
+> Big company's should take the responsibility to train and provide
+> skill development for their own staff.
 
-The community has a limited review bandwidth, things should meet a
-minimum standard before there is an expectation that other people
-should review it on the list.
+That would result in a beautiful cathedral of a patch. I know this is
+how some companies work. We are doing more of a bazaar thing here,
+though. In a bunch of subsystems it seems that you don't get the
+necessary skills until you have been publically shouted at by
+maintainers - better to start early ;). Not a nice environment for
+novices, for sure.
 
-> Why does it have to be internal to a specific company?
-> I see Yi Liu from Intel is helping Cindy get it into shape
-> and that's classic open source ethos.
+-- 
+MST
 
-Big company's should take the responsibility to train and provide
-skill development for their own staff.
-
-> I know some subsystems ignore the RFC tag but I didn't realize
-> iommu is one of these. Is that really true?
-
-At least I've looked at this twice now and been disappointed. Neither
-have been a well thought out RFC, this is a brain dump of unfinished
-work.
-
-Jason
 
