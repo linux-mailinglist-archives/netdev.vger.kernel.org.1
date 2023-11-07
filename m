@@ -1,90 +1,119 @@
-Return-Path: <netdev+bounces-46398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E0BD7E3B60
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:58:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB897E3B7C
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 13:07:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C8A1F21756
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 11:58:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A489280FC1
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 12:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88DD2D7B2;
-	Tue,  7 Nov 2023 11:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC9D2DF7E;
+	Tue,  7 Nov 2023 12:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="euHsOw7p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRvB50t4"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63CC1FA6
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 11:58:29 +0000 (UTC)
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C736A129
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 03:58:27 -0800 (PST)
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20231107115824f32b912308a34441c4
-        for <netdev@vger.kernel.org>;
-        Tue, 07 Nov 2023 12:58:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=T0U1ehnEjbJ/WZ+hydu7gZvoFo6UcN15DJYXnc+ncjw=;
- b=euHsOw7puSIQYsJs0NVY2XcgVozNDK0WpYmQQJXOZAiBUnhhlZhWgqej1UJiqccC5SOrP0
- izc6aTU955IGCGurhmAhJxP0klERjVPxcCTkk7/s5Oh2sIH6Oo2tfD9hBFp9I3e3/PXinvjA
- 2YEiZcXVpTNP9OsQZ3ILcO6KPyuQI=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-To: davem@davemloft.net,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83191651
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 12:07:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE87DC433CB;
+	Tue,  7 Nov 2023 12:07:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699358832;
+	bh=VNHtG2A9R7C2Ms4q7fPyK2xBmajwKw/8UfqODj1Pmi8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=hRvB50t4Ji2k/97AOreVU+KEJ4BWO34cYjcoNrU1ToGzIQkY7w84Vi8P7MQh8a2A3
+	 Itk5GBoqjBWICkpZVi8qeyDGCNBJehFaylDyg27ZulSXJUvGkC8UUIxpFuZlagKg3k
+	 Bffj/FKYFEXCjgFNdPzufJq19YnWrTocZ/XyFQpoIrjijQxvdtEu88cAA+mhUGVnqN
+	 t0oN7jtLgMqzcIeDoWXFmsT95aJ8oJdC0Lpng7cUZr/PHYPQZxrDJlFYZlK6ta0Afs
+	 uUYAonA9uZftkxUdDb9HQ81De/6FRgSBihL8AspZ+kRgMCuBIHDyujuE9BffI08lol
+	 t/FSGGj2M+pKQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Ping-Ke Shih <pkshih@realtek.com>,
+	Zong-Zhe Yang <kevin_yang@realtek.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	horms@kernel.org,
-	danishanwar@ti.com,
-	vigneshr@ti.com,
-	rogerq@ti.com,
-	grygorii.strashko@ti.com,
-	m-karicheri2@ti.com
-Cc: Diogo Ivo <diogo.ivo@siemens.com>,
-	jan.kiszka@siemens.com,
-	netdev@vger.kernel.org,
-	baocheng.su@siemens.com
-Subject: [PATCH net] net: ti: icss-iep: fix setting counter value
-Date: Tue,  7 Nov 2023 12:00:36 +0000
-Message-ID: <20231107120037.1513546-1-diogo.ivo@siemens.com>
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 04/31] wifi: mac80211: don't return unset power in ieee80211_get_tx_power()
+Date: Tue,  7 Nov 2023 07:05:51 -0500
+Message-ID: <20231107120704.3756327-4-sashal@kernel.org>
+X-Mailer: git-send-email 2.42.0
+In-Reply-To: <20231107120704.3756327-1-sashal@kernel.org>
+References: <20231107120704.3756327-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6
 Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-Currently icss_iep_set_counter() writes the upper 32-bits of the
-counter value to both the lower and upper counter registers, so
-fix this by writing the appropriate value to the lower register.
+From: Ping-Ke Shih <pkshih@realtek.com>
 
-Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+[ Upstream commit e160ab85166e77347d0cbe5149045cb25e83937f ]
+
+We can get a UBSAN warning if ieee80211_get_tx_power() returns the
+INT_MIN value mac80211 internally uses for "unset power level".
+
+ UBSAN: signed-integer-overflow in net/wireless/nl80211.c:3816:5
+ -2147483648 * 100 cannot be represented in type 'int'
+ CPU: 0 PID: 20433 Comm: insmod Tainted: G        WC OE
+ Call Trace:
+  dump_stack+0x74/0x92
+  ubsan_epilogue+0x9/0x50
+  handle_overflow+0x8d/0xd0
+  __ubsan_handle_mul_overflow+0xe/0x10
+  nl80211_send_iface+0x688/0x6b0 [cfg80211]
+  [...]
+  cfg80211_register_wdev+0x78/0xb0 [cfg80211]
+  cfg80211_netdev_notifier_call+0x200/0x620 [cfg80211]
+  [...]
+  ieee80211_if_add+0x60e/0x8f0 [mac80211]
+  ieee80211_register_hw+0xda5/0x1170 [mac80211]
+
+In this case, simply return an error instead, to indicate
+that no data is available.
+
+Cc: Zong-Zhe Yang <kevin_yang@realtek.com>
+Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
+Link: https://lore.kernel.org/r/20230203023636.4418-1-pkshih@realtek.com
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/ti/icssg/icss_iep.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/mac80211/cfg.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 4cf2a52e4378..3025e9c18970 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -177,7 +177,7 @@ static void icss_iep_set_counter(struct icss_iep *iep, u64 ns)
- 	if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
- 		writel(upper_32_bits(ns), iep->base +
- 		       iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG1]);
--	writel(upper_32_bits(ns), iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
-+	writel(lower_32_bits(ns), iep->base + iep->plat_data->reg_offs[ICSS_IEP_COUNT_REG0]);
+diff --git a/net/mac80211/cfg.c b/net/mac80211/cfg.c
+index 0e3a1753a51c6..715da615f0359 100644
+--- a/net/mac80211/cfg.c
++++ b/net/mac80211/cfg.c
+@@ -3121,6 +3121,10 @@ static int ieee80211_get_tx_power(struct wiphy *wiphy,
+ 	else
+ 		*dbm = sdata->vif.bss_conf.txpower;
+ 
++	/* INT_MIN indicates no power level was set yet */
++	if (*dbm == INT_MIN)
++		return -EINVAL;
++
+ 	return 0;
  }
  
- static void icss_iep_update_to_next_boundary(struct icss_iep *iep, u64 start_ns);
 -- 
-2.42.1
+2.42.0
 
 
