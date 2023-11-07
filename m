@@ -1,158 +1,104 @@
-Return-Path: <netdev+bounces-46376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528FA7E3652
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:06:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7537E365D
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 09:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24670B20F23
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:06:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4228B20B7C
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 08:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2FADDD7;
-	Tue,  7 Nov 2023 08:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6862D512;
+	Tue,  7 Nov 2023 08:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BES/P7q4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOq+TIFd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADAE13AE9
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 08:06:22 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE606129
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 00:06:19 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-53df747cfe5so9181550a12.2
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 00:06:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6442563D8
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 08:08:13 +0000 (UTC)
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702C2129;
+	Tue,  7 Nov 2023 00:08:08 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6b497c8575aso5693566b3a.1;
+        Tue, 07 Nov 2023 00:08:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699344378; x=1699949178; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
-        b=BES/P7q4r3D6JI66C4Rnx2yUj0hakfQ+8ffgu6A7zpEaky91TmXN/9n3JqQNnFd3/a
-         iY+PEF68Fa9WMkYzYte2/ZEIAz/446DspOFEg8el04HvXE4McVf8j/j7OATVXLANnzfS
-         NMRoX0P1Xdul8IOB+gcNqB+o55cIgyyqWejDHgFacbywnzRz7mSQUwgfCQN4/QtGCOG0
-         E9eFY/dJTypwf386lncqkTdNmiY6sTQG626SguM7JYClm1QSm72+2I5DNQNi1tcLUvhf
-         CZVKAop4+ezy1/c9G50oDbsdiJJnDwzfzP/6j8uD7z39web2fdXPBxTX04Bx/dCOUBPX
-         j5nA==
+        d=gmail.com; s=20230601; t=1699344488; x=1699949288; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ttXqTP+4Vn5umWykt6+NuZt9O79QAnsU1LGP6YXU9Zk=;
+        b=nOq+TIFdoZ9YDPP6S06U/qln8h+8+p6GvQ9CIwjanfZOItZ59CZ5730n/8+j6wMtSn
+         65AFjC0Dcx1BejqRVFEBt+zXcBdSJ9w0L3FOetiD6uv1MesuUHognXnb24/zA8QUOC5I
+         1j3106UoIN2lLkaZ5Lb86MVs7VerS9YwczgdUo7SMSz39N00kSKwQuMHpk1OPHJj+PJE
+         zCfRo4HGjhJ3rp9mP/OlVscGeLcWZuXB3o8KU4Uf1vxeYZfQ+Ex0q9MtRQ6jwoi5CxuX
+         OXZvkAp2zmWGhrJZhkKqccknNsdfmYDTHJqIp34d/3/KD9qxLjJnvnqH9N10qCsWHCxi
+         VPhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699344378; x=1699949178;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WVEm7APPSSSk+YJQkBaPKu7CTimG895Qex6fY+sz04k=;
-        b=d4Y+uO2QDVnwbopwJxKanq+gSrYxpT5YrCu1T3vVM/fQEAqbnrf8cyp6UMhcio7XHG
-         w7DbTD3QcEXyRmpWPAtOhMU8Dt+q7jtbs5WqVvI7NtGEdCv6FzCNkGUkHsA6LTBeYxZs
-         2nLmXj21HTNHgNidtJny3gLcOEB5wleJ1dO8vw3j4nJdyEEJG1IqiWQ5xPgOO/X+ITjz
-         HyyLbi8cxs5/oYG4PvSA4hIaQLQnb5bcslREP97QD2AeD1GMsicNN5dHXj7V+ndWe6Eo
-         OqveCdWmCIIPocGFvJfhsIQ+Db7DQb8N7EpuP2ehrNqI2LGsjJgrCvco3SR58mGX69t9
-         5D9g==
-X-Gm-Message-State: AOJu0YwgwqCndUf3Ix5t6WfLXhrln4bw8vu9FVO87NGlhUn7umQnNn2S
-	a1hXeY5TrEoFseO/M4IOezQIZPrY8ezO+eXbWZQ=
-X-Google-Smtp-Source: AGHT+IGt+2lUSniG9n1WfTC+6eWFO1Jr7yjUgnEmgfGsp46sdzNP5/ZxAId7fCY8cRHUv0lkCdqkig==
-X-Received: by 2002:a17:906:fe41:b0:9b6:aac1:6fa5 with SMTP id wz1-20020a170906fe4100b009b6aac16fa5mr16218048ejb.55.1699344378446;
-        Tue, 07 Nov 2023 00:06:18 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id s18-20020a170906bc5200b009c503bf61c9sm734050ejv.165.2023.11.07.00.06.17
+        d=1e100.net; s=20230601; t=1699344488; x=1699949288;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ttXqTP+4Vn5umWykt6+NuZt9O79QAnsU1LGP6YXU9Zk=;
+        b=uyAPvyOJXKtM6CLlOHeG16KWN/3myp95PAMCK+X59RoHXdpH5vG8MWxwjtZB/MoOTZ
+         rAAJNtE3ROPcwB4qMp2DNtn1jpZPA6SwYzlOm+4UA1ErbtarUWm14JV7ypqi8bXJKqe4
+         3ujcNYtSzVYINsOWxgs1Cx6DSrEO7/r5/b7eg3jUTUPWlSvkhmuqPskxbOVklVDOeav+
+         c8PtqFxeVHGRPhWtngjTIp4rAz80HKlv4TyFNzqPfEtScUV4T99En2zK9miMBz2Mm4hZ
+         QaZtHcY54oLpCykP3VFf19bcsmQijsb1bOxpx5oKjVKQ2vGTUgW6ZEDOhgljlUWZfXQT
+         cmkA==
+X-Gm-Message-State: AOJu0YyXMa+JccRA+g3xN2QIgOSX7/GQQzbuJXXqTevU7boPE3XdpNLV
+	ZxzWQvNj8ri2yHONtVQWqIyjG+z5cPeJ0A==
+X-Google-Smtp-Source: AGHT+IGC5IkahBSjMohONTov0dfX7L8VtsuNs4X0P2KeXZfzd3gzSmHwdNM2Jbr2u4FrddXTkIPd/Q==
+X-Received: by 2002:a05:6a00:2d09:b0:6bc:f819:fcf0 with SMTP id fa9-20020a056a002d0900b006bcf819fcf0mr37849993pfb.1.1699344487663;
+        Tue, 07 Nov 2023 00:08:07 -0800 (PST)
+Received: from dragonet (dragonet.kaist.ac.kr. [143.248.133.220])
+        by smtp.gmail.com with ESMTPSA id w2-20020a056a0014c200b0069ee4242f89sm6941581pfu.13.2023.11.07.00.08.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Nov 2023 00:06:17 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: stephen@networkplumber.org,
-	dsahern@gmail.com,
-	daniel.machon@microchip.com
-Subject: [patch iproute2-next v5 7/7] devlink: print nested devlink handle for devlink dev
-Date: Tue,  7 Nov 2023 09:06:07 +0100
-Message-ID: <20231107080607.190414-8-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231107080607.190414-1-jiri@resnulli.us>
-References: <20231107080607.190414-1-jiri@resnulli.us>
+        Tue, 07 Nov 2023 00:08:07 -0800 (PST)
+Date: Tue, 7 Nov 2023 17:07:03 +0900
+From: "Dae R. Jeong" <threeearcat@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: borisp@nvidia.com, john.fastabend@gmail.com, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
+Subject: Re: Missing a write memory barrier in tls_init()
+Message-ID: <ZUnwJwuqZMFNYE3x@dragonet>
+References: <ZUNLocdNkny6QPn8@dragonet>
+ <20231106143659.12e0d126@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231106143659.12e0d126@kernel.org>
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi, Jakub,
 
-Devlink dev may contain one or more nested devlink instances.
-Print them using previously introduced pr_out_nested_handle_obj()
-helper.
+Thank you for your reply.
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v2->v3:
-- rebased on top of new patch "devlink: extend pr_out_nested_handle() to
-  print object" and previous patch to use pr_out_nested_handle_obj()
----
- devlink/devlink.c | 30 ++++++++++++++++++++++++++----
- 1 file changed, 26 insertions(+), 4 deletions(-)
+On Mon, Nov 06, 2023 at 02:36:59PM -0800, Jakub Kicinski wrote:
+> On Thu, 2 Nov 2023 16:11:29 +0900 Dae R. Jeong wrote:
+> > In addition, I believe the {tls_setsockopt, tls_getsockopt}
+> > implementation is fine because of the address dependency. I think
+> > load-load reordering is prohibited in this case so we don't need a
+> > read barrier.
+> 
+> Sounds plausible, could you send a patch?
 
-diff --git a/devlink/devlink.c b/devlink/devlink.c
-index ae31e7cf34e3..f999e5940c63 100644
---- a/devlink/devlink.c
-+++ b/devlink/devlink.c
-@@ -3860,13 +3860,35 @@ static void pr_out_reload_data(struct dl *dl, struct nlattr **tb)
- 	pr_out_object_end(dl);
- }
- 
-+static void pr_out_dev_nested(struct dl *dl, const struct nlmsghdr *nlh)
-+{
-+	int i = 0, count = 0;
-+	struct nlattr *attr;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		if (mnl_attr_get_type(attr) == DEVLINK_ATTR_NESTED_DEVLINK)
-+			count++;
-+	}
-+	if (!count)
-+		return;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		if (mnl_attr_get_type(attr) != DEVLINK_ATTR_NESTED_DEVLINK)
-+			continue;
-+		pr_out_nested_handle_obj(dl, attr, i == 0, i == count - 1);
-+		i++;
-+	}
-+}
- 
--static void pr_out_dev(struct dl *dl, struct nlattr **tb)
-+static void pr_out_dev(struct dl *dl, const struct nlmsghdr *nlh,
-+		       struct nlattr **tb)
- {
- 	if ((tb[DEVLINK_ATTR_RELOAD_FAILED] && mnl_attr_get_u8(tb[DEVLINK_ATTR_RELOAD_FAILED])) ||
--	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats)) {
-+	    (tb[DEVLINK_ATTR_DEV_STATS] && dl->stats) ||
-+	     tb[DEVLINK_ATTR_NESTED_DEVLINK]) {
- 		__pr_out_handle_start(dl, tb, true, false);
- 		pr_out_reload_data(dl, tb);
-+		pr_out_dev_nested(dl, nlh);
- 		pr_out_handle_end(dl);
- 	} else {
- 		pr_out_handle(dl, tb);
-@@ -3883,7 +3905,7 @@ static int cmd_dev_show_cb(const struct nlmsghdr *nlh, void *data)
- 	if (!tb[DEVLINK_ATTR_BUS_NAME] || !tb[DEVLINK_ATTR_DEV_NAME])
- 		return MNL_CB_ERROR;
- 
--	pr_out_dev(dl, tb);
-+	pr_out_dev(dl, nlh, tb);
- 	return MNL_CB_OK;
- }
- 
-@@ -6810,7 +6832,7 @@ static int cmd_mon_show_cb(const struct nlmsghdr *nlh, void *data)
- 			return MNL_CB_ERROR;
- 		pr_out_mon_header(genl->cmd);
- 		dl->stats = true;
--		pr_out_dev(dl, tb);
-+		pr_out_dev(dl, nlh, tb);
- 		pr_out_mon_footer();
- 		break;
- 	case DEVLINK_CMD_PORT_GET: /* fall through */
--- 
-2.41.0
+Sure. I am doing something else today, so I will send a patch tomorrow
+or the day after tomorrow.
 
+
+> The smb_wmb() would be better placed in tls_init(), IMHO.
+
+It sounds better. I will write a patch in that way.
+
+
+Best regards,
+Dae R. Jeong
 
