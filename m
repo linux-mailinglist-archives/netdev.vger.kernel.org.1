@@ -1,88 +1,96 @@
-Return-Path: <netdev+bounces-46312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463E77E3281
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:09:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9362C7E3291
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 02:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E87E280E07
-	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 01:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32673280DE9
+	for <lists+netdev@lfdr.de>; Tue,  7 Nov 2023 01:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C166417C3;
-	Tue,  7 Nov 2023 01:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE6217C8;
+	Tue,  7 Nov 2023 01:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4YbRkhj"
+	dkim=pass (2048-bit key) header.d=posteo.de header.i=@posteo.de header.b="SPZJxXyu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5E415A4;
-	Tue,  7 Nov 2023 01:09:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 147D2C433C8;
-	Tue,  7 Nov 2023 01:09:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699319347;
-	bh=71l20GkBOFUWOSbSR+FiTHlfmSsCI73pQkIYJSjwA1o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=U4YbRkhjKovNT9nbOQUSJL0HgDh16yoV1zgSGNMyDkFbe/4JG87BU2EEup/QMpgwc
-	 kbRXf6SG9j3O3TNdKSYqN5dxD5+C+9ZXdxrUXd3X6cIg47/LbwJBtzrWnHEhJqhsXU
-	 PjGxXa40525TjLBDK9dUhHpj3nFHe+7u2ldDn6wikhJZ3G8WoygqNBBAQGvQr7b4ik
-	 /P0990SE8EkzyRrGHxTSlJPvIh60Lduh5XfLBwWNeDIqYHIJa6h7F7kVNeX005uRAK
-	 u7K7FyCdA2UQVa7D98G+Tj2nKc9lZw8Pom2TlxYgWcaNE61PZV60iOgukpBP82xD2Q
-	 ENZ1ONDIE1q4g==
-Message-ID: <c9a08db6-7418-4684-a5bf-6e9ac0655795@kernel.org>
-Date: Mon, 6 Nov 2023 18:09:05 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B8017C7
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 01:22:34 +0000 (UTC)
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1850103
+	for <netdev@vger.kernel.org>; Mon,  6 Nov 2023 17:22:32 -0800 (PST)
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id 757BA240027
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 02:22:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
+	t=1699320151; bh=CZQ06YgnfpGiCUCYkYEdsye/GTLnq2HQ7pypTmh8jGs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:From;
+	b=SPZJxXyu5L4i2VxrX4XikeFUfFFNuOxXTWUgR8XpNbNwR17cS7W7e3itTLNOW7ZPt
+	 AnM0/CYZFjUYYWQFfeEJM3xj68u0uzSC/PkProAzWRBoZ1kofd8yTFffP5fF5E3zVQ
+	 bCk/xvmfoRtQpLxXdxaLNY4/S83Sxvy5wgSg44OLJjhl2lYtDd7Snlx8VlO07KSRH2
+	 ddrZ1eO7JehvGTKodIdtSSr1Txw9aDk+IP3Gjbz4v1rVcZrHL8fm1Ly07T+/72ZaRJ
+	 Z3oWWB8Rc0NzQu5gSfn+f3EyKBa4g7GYktYN9INUNVaRQUtzMGfUZ+2QtK8iXsGOBP
+	 ZFzG8QecOYi2A==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4SPVnf1D8Xz9rxG;
+	Tue,  7 Nov 2023 02:22:30 +0100 (CET)
+From: Max Kunzelmann <maxdev@posteo.de>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	dsahern@gmail.com,
+	Max Kunzelmann <maxdev@posteo.de>,
+	Benny Baumann <BenBE@geshi.org>,
+	Robert Geislinger <github@crpykng.de>
+Subject: [PATCH iproute2] libnetlink: validate nlmsg header length first
+Date: Tue,  7 Nov 2023 01:20:55 +0000
+Message-ID: <20231107012147.668074-1-maxdev@posteo.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 09/12] net: add support for skbs with unreadable
- frags
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Stanislav Fomichev <sdf@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-10-almasrymina@google.com>
- <ZUk03DhWxV-bOFJL@google.com>
- <19129763-6f74-4b04-8a5f-441255b76d34@kernel.org>
- <CAHS8izMrnVUfbbS=OcJ6JT9SZRRfZ2MC7UnggthpZT=zf2BGLA@mail.gmail.com>
- <ZUlhu4hlTaqR3CTh@google.com>
- <CAHS8izMaAhoae5ChnzO4gny1cYYnqV1cB8MC2cAF3eoyt+Sf4A@mail.gmail.com>
- <ZUlvzm24SA3YjirV@google.com>
- <CAHS8izMQ5Um_ScY0VgAjaEaT-hRh4tFoTgc6Xr9Tj5rEj0fijA@mail.gmail.com>
- <CAKH8qBsbh8qYxNHZ6111RQFFpNWbWZtg0LDXkn15xcsbAq4R6w@mail.gmail.com>
- <CAF=yD-+BuKXoVL8UF+No1s0TsHSzBTz7UrB1Djt_BrM74uLLcg@mail.gmail.com>
- <CAHS8izNxKHhW5uCqmfau6n3c18=hE3RXzA+ng5LEGiKj12nGcg@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAHS8izNxKHhW5uCqmfau6n3c18=hE3RXzA+ng5LEGiKj12nGcg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/6/23 5:20 PM, Mina Almasry wrote:
-> The user is free to modify or delete flow steering rules outside of the
-> lifetime of the socket. Technically it's possible for the user to
-> reconfigure flow steering while the socket is simultaneously receiving,
-> and the result will be packets switching from devmem to non-devmem.
+Validate the nlmsg header length before accessing the nlmsg payload
+length.
 
-generically, from one page pool to another (ie., devmem piece of that
-statement is not relevant).
+Fixes: 892a25e286fb ("libnetlink: break up dump function")
+
+Signed-off-by: Max Kunzelmann <maxdev@posteo.de>
+Reviewed-by: Benny Baumann <BenBE@geshi.org>
+Reviewed-by: Robert Geislinger <github@crpykng.de>
+---
+ lib/libnetlink.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/libnetlink.c b/lib/libnetlink.c
+index 7edcd285..01648229 100644
+--- a/lib/libnetlink.c
++++ b/lib/libnetlink.c
+@@ -727,13 +727,15 @@ int rtnl_dump_request_n(struct rtnl_handle *rth, struct nlmsghdr *n)
+ static int rtnl_dump_done(struct nlmsghdr *h,
+ 			  const struct rtnl_dump_filter_arg *a)
+ {
+-	int len = *(int *)NLMSG_DATA(h);
++	int len;
+ 
+ 	if (h->nlmsg_len < NLMSG_LENGTH(sizeof(int))) {
+ 		fprintf(stderr, "DONE truncated\n");
+ 		return -1;
+ 	}
+ 
++	len = *(int *)NLMSG_DATA(h);
++
+ 	if (len < 0) {
+ 		errno = -len;
+ 
+-- 
+2.42.0
+
 
