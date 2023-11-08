@@ -1,1077 +1,241 @@
-Return-Path: <netdev+bounces-46687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A557E5D33
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 19:28:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40D17E5D3D
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 19:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45A3A1C208BC
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 18:28:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E4CB281552
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 18:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A3A358B4;
-	Wed,  8 Nov 2023 18:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB482171C9;
+	Wed,  8 Nov 2023 18:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="mcKXSRWU"
+	dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b="OoTaKz6S"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F29F36AED
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 18:28:51 +0000 (UTC)
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2080.outbound.protection.outlook.com [40.92.40.80])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1AB32101;
-	Wed,  8 Nov 2023 10:28:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7206936AFC;
+	Wed,  8 Nov 2023 18:31:21 +0000 (UTC)
+Received: from FRA01-MR2-obe.outbound.protection.outlook.com (mail-mr2fra01on2041.outbound.protection.outlook.com [40.107.9.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13632102;
+	Wed,  8 Nov 2023 10:31:20 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KoNe+aytjM0LlgfxHzbo2KtjAcLSH/lFASIHKmkjGApssDkVezQnx+LCllYReLT1oxdhD28+l/Edd8DcR9QaBhipzgnJuUcNabVevxecUuQrfLoXzXtW0ksYZF3H7ysaJUC1CKMG4JUxWIeSrN38L6GnK5VRZvYfkzNyddNAjj9XZoMtsP63CT85LImh8eZENtbTkffBqN4Frgp4gm2/sZS5Lm4eaCS1QjTD04HBOPDQ9xwLRL65KKG2C51KA/fadqNXceoJLTCCty1AZSLN8qz4Ff/CD00adJo9yNMOGUmMCPlviR6V9bMqjXH3PClfYfvMU8tB/Tw/pBUF4QBsyA==
+ b=UcHyTGDMo0wE8d44Clkr14OjZQMTHG1A9+8WqarCR6kXtJ8CnVgnRg4m2Kd1X2IFR8DsXHXPGtaEulu44hqkHkbmYYmBSXw5bzHg/7DA3Jgc3e9CodFo/idh6ws3Eym+AGb0osj408S6gRrrqUeHHML1TNvInXCX+MOd0b7YohmZN4Zl3xxpL2RpJWOdwXfE9lCaFOyFVmnpara1JFzyiNuZ0OGSOb17sxcenEIHYvWX9g9N/7084iSmXNWEUBBKwOiM/Hk+31xEUGBBuMjCmoJxhfVfs95q/E9F8UK0NuvjauzAu23t22FPnDivKOlplUlJ9koB3d+E5raJyLtyfw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=enEOm8e3R3oAdRCqstM8aY5GBAzsXbxRqdZKF+MINho=;
- b=K0Otye2dB5WoEioKFVyvInbXgx2Zzyh+DzZ4fXvWJO2fnzrFnSrhjRiDDNvSmE0pot55mWJEztr93jWS3Sb0NNecFmbPL37zfYc2GB+w0rtBNnJ1JzguilemMgt4WuYg811GzW05GOEePDc9uWuIeq8eHAvoecCCg8hk6ubcY8OrLT6n6hpgrAmNp5XsO//ey5rsuBg4g/01Y4i93Zl0N4RLZoOjcsahCkYonE4aOEQNHFvTpc6pe1vR9LpcXdH5y2/guYMwUbTyWW780KEwR3PksYPFQRVmLl+mT8GMbOGDMu44+zpaoGn3Nf7xjEj8NEvE8atqG4vuquDXLJ6vSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
+ bh=jEFd6rZP1yOqyMBQ2nhaCEUwOF4TlNx+anXdfKUppz0=;
+ b=oJapebSQk52eyFXh0NuvvE5H+cMkXRRUdF96XqygtiD0P3z4viQWzBiTkmCv7bbKM1ZGJvdANV5Q7d1CULuipmrQ/pRlshWBKLkRr+kOXtiZ0DkSlGQfRqsXQtDfAsq5bvBAygHXQYVCtC4h3tIXPyx55P+9unwavUiGE6Hxc2onCdb8Y4OTVrD72S/aIx+IsVJ1REifA4CFQCR0ljlWwvhgKk2cPy/h4AjaIyjZ2F3Ry2u4ntkCUjPFdeHc85tN/ATG+NiNFSPtS6/f0ahBJKScrpsEeOE6yScSfniiVrW7XdVoLrUW4FgVs6S3r/hXYdO3tawo1SQgTO3ASFRtFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
+ dkim=pass header.d=csgroup.eu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=enEOm8e3R3oAdRCqstM8aY5GBAzsXbxRqdZKF+MINho=;
- b=mcKXSRWUrU+NBAblXcdKGvp1zPKDFFGIQ4WMJn+6d9vYTakx1/5oNOZbBhIwoIsGnIyJZirdNRxJ8NqNHQC1QeucrBbPZYxNcL731yhazzM7/8WSUNr0O+z2MXX/4Jh81IqWd3BMyMmS2PLpTjqsZvk3utI+K9hhmYIE6Blk6jpRLh8trUPve+Zj8hrl2QprH8zjT3SFhcMB+uPh8w2BNzZL0hwS0R72Xbj4bBv/RUPmfMqnS7UwYGMxBC1fzTNUqH5WOKqdtmTQboR185ojDhmpxnqWL3w1iNyyADLq4CaSzLYUNng9sv/MKWmCUEKFFwfSL5olyU3mlWe5g8I30g==
-Received: from MW5PR03MB6932.namprd03.prod.outlook.com (2603:10b6:303:1cd::22)
- by MW4PR03MB6442.namprd03.prod.outlook.com (2603:10b6:303:121::17) with
+ bh=jEFd6rZP1yOqyMBQ2nhaCEUwOF4TlNx+anXdfKUppz0=;
+ b=OoTaKz6SPvutw7/Wd1pDpyyunpFZAAwBZ+76Q9dEJE/V4yfXdd2YqneHgOHwPhNnTeXQX7+oLHc6ZFf+pZUt3wceTlQ1r2ir6S6zV9CqWgWTlhLPhJQqJfl/Mars4RaSoVU7+e2p2+69vOmwS0Zn5pAFbQGrDyBrgyPzTiMV6kMf7ANPGfrrV9blUu+I9X2JjtL4ugDmF/AoK7X3hnZ7fVzMXz7xax1ZkV17OOQxzQrj/xTNgTBrvFKpAJ97uNZIImVMu4td+3O6SnoJHHxJZhAV/cSnxWjvFVG8912jCfag37lCoV45h9WDt70d2qQ4jwQSVkSebuWoMtS1LA/Wmw==
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
+ by MR1P264MB2388.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:35::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.15; Wed, 8 Nov
- 2023 18:28:46 +0000
-Received: from MW5PR03MB6932.namprd03.prod.outlook.com
- ([fe80::e204:782d:2249:36d8]) by MW5PR03MB6932.namprd03.prod.outlook.com
- ([fe80::e204:782d:2249:36d8%6]) with mapi id 15.20.6954.020; Wed, 8 Nov 2023
- 18:28:46 +0000
-From: Min Li <lnimi@hotmail.com>
-To: richardcochran@gmail.com,
-	lee@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
-Subject: [PATCH net-next 1/1] ptp: clockmatrix: support 32-bit address space
-Date: Wed,  8 Nov 2023 13:28:30 -0500
-Message-ID:
- <MW5PR03MB6932FF68AEEF51E83EDDB89CA0A8A@MW5PR03MB6932.namprd03.prod.outlook.com>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [WFNVL88gufnY96Te+uAzoKj5N/n+BCCP]
-X-ClientProxiedBy: BN9P222CA0025.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:408:10c::30) To MW5PR03MB6932.namprd03.prod.outlook.com
- (2603:10b6:303:1cd::22)
-X-Microsoft-Original-Message-ID: <20231108182830.27063-1-lnimi@hotmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.6; Wed, 8 Nov
+ 2023 18:31:17 +0000
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::5bfe:e2f2:6d89:8d97]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::5bfe:e2f2:6d89:8d97%3]) with mapi id 15.20.6977.018; Wed, 8 Nov 2023
+ 18:31:17 +0000
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Arnd Bergmann <arnd@kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
+	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+CC: Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>, Vineet
+ Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, Catalin
+ Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mark
+ Rutland <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>, Peter Zijlstra
+	<peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
+	<chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, Michal Simek
+	<monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Dinh
+ Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>, Geoff Levand <geoff@infradead.org>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>, John Paul
+ Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S. Miller"
+	<davem@davemloft.net>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "x86@kernel.org"
+	<x86@kernel.org>, Helge Deller <deller@gmx.de>, Sudip Mukherjee
+	<sudipm.mukherjee@gmail.com>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, Kent Overstreet
+	<kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, "Naveen
+ N. Rao" <naveen.n.rao@linux.ibm.com>, Anil S Keshavamurthy
+	<anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, Vincenzo
+ Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor
+	<nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Nicolas
+ Schier <nicolas@fjasle.eu>, Al Viro <viro@zeniv.linux.org.uk>,
+	=?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= <u.kleine-koenig@pengutronix.de>,
+	"linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>,
+	"linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-trace-kernel@vger.kernel.org"
+	<linux-trace-kernel@vger.kernel.org>, "linux-csky@vger.kernel.org"
+	<linux-csky@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "linux-m68k@lists.linux-m68k.org"
+	<linux-m68k@lists.linux-m68k.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "linux-sh@vger.kernel.org"
+	<linux-sh@vger.kernel.org>, "sparclinux@vger.kernel.org"
+	<sparclinux@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-parisc@vger.kernel.org"
+	<linux-parisc@vger.kernel.org>, "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>, "linux-fbdev@vger.kernel.org"
+	<linux-fbdev@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linux-bcachefs@vger.kernel.org"
+	<linux-bcachefs@vger.kernel.org>, "linux-mtd@lists.infradead.org"
+	<linux-mtd@lists.infradead.org>
+Subject: Re: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Thread-Topic: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Thread-Index: AQHaEkPkiwEWo83izEmVhjzNZW4UOLBwvvwA
+Date: Wed, 8 Nov 2023 18:31:17 +0000
+Message-ID: <ecedb0f1-9543-35c6-18bd-723e6bf21173@csgroup.eu>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-16-arnd@kernel.org>
+In-Reply-To: <20231108125843.3806765-16-arnd@kernel.org>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=csgroup.eu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2988:EE_|MR1P264MB2388:EE_
+x-ms-office365-filtering-correlation-id: 5d1f5e49-f364-404e-467e-08dbe088e583
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Fp1JRTmkWLncYFH910KAH3NWhUE3YgpRFeNA1BtkV6xRFNfgS3yir0I80UfoE+W7H2/wmeTqYR/zwgIh2VFOzp8cArrDMHEA129Ni8cLIbK0aHMD3hi0x3ieW1aTDzzS14/jPaobhRGgeMRAu/bD0M96+5i1GOBJL5Zvf1cRMfmAuZ2H/kOq8JMqHXR4LmZFELc7gjRL8u0jKNZxlHhVUpesX5UYL0LHVxTDonQJhAImDPFR/2qMQ4iEQbNsYSkC3BmQIkGw2c38g4VJk+00FLI9jtUZbVsAkhqEPU7VwelGibW6+LxZSH4pmOs6LTI7ASFh7dakyCSJBbDTxwvuW+jRXTFuVypxeeuYHkzT9qo4qI+RqIfHXWlYldPsU2uX8d4GltxLhYZdBSlOpO5/9Grm2A/k289CyFOk+4+C5mC8zpcOBTrCTw0a0GixSZX3BtbhQQD788u7pvj+1YxQul5EGuSa4T/Tdf2HbFJhSMJ8li8fP/GFIesVfIiqxEYOdUupSQdarucpnKcFU4TqcxkgqiTgNdOwumS8AYlDwlNcdD3rElUYgEpPwpnNBK1qi+0WUMsNElZucOJ8c7rbeG8nXQ2FV1/4pihNwcYu4jq5Ku29vfH5tiCeTRU2wWnKDBamSbNQ2NFy3Azj11UoWvO0GPR/sCcxwcS9XxFnkl21NSvcAT/ipXlUg6pjUP+JcO+2BAT39CGE9bZSBD0T/KyGkS7QBwENFC+sapP2Ljo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(366004)(396003)(136003)(376002)(230922051799003)(230273577357003)(230173577357003)(451199024)(1800799009)(64100799003)(186009)(36756003)(38070700009)(4326008)(478600001)(44832011)(5660300002)(8936002)(8676002)(83380400001)(7366002)(6506007)(7406005)(7416002)(6512007)(2906002)(31686004)(2616005)(6486002)(66476007)(66556008)(66946007)(76116006)(54906003)(64756008)(26005)(91956017)(110136005)(316002)(66446008)(71200400001)(86362001)(31696002)(122000001)(41300700001)(38100700002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bDAzNlo0eFdWdW1wbVIwYnh4a2ZzMWhQTlRKRE8zQzZ4cHo2a2xiVlVCblZl?=
+ =?utf-8?B?d3VoVFpaN2hoNWJVT1luVlNjcGwyWjE5L3krRE02bENHdk9wVENLNW9nSzhq?=
+ =?utf-8?B?SHlaZGNscXVuL1o2UzlYV3hRKy9LT0h6WDgxTVBIbmluS0w5Q3pNRXNUalM5?=
+ =?utf-8?B?bk02SER6enE2eWZ1c3Jtaks2cjd3Qm1lbnhQVHg2TmlYUWZhN3YrVU9BM0lw?=
+ =?utf-8?B?TWc3bkVoR0hRek90T0pjdDkvVzdUN1NhelRSbXVnVldSOFptZENhMTNDMGdE?=
+ =?utf-8?B?Vk1VcVFjellQTm1RaTltNFN5dCtyU2gwaWFaOXhtaEFEYWZ5MHdMWERvNXph?=
+ =?utf-8?B?dXgrM3lZZWw1bjFJeWdBSmcvS255NWVLSGtKa2N3Z3I3Y3hBZjM3UHV3TGp6?=
+ =?utf-8?B?cnhhM0JkK3hOUGxBbExzY2VkQzM1Y2wyaktaZWxBc0ZiK2xHUEU0UnowckRh?=
+ =?utf-8?B?WkppdFlIQ2NlVU51TUNucklyc0NySVVHcUhHRHJKRmU3WU5pNU54dmF4UU8x?=
+ =?utf-8?B?czd4UVdQMWdoR1NBSnNTUVMyNXViTnZtdmcycnZxN0RKLzN3bm9POHJ1ZGY5?=
+ =?utf-8?B?L1M5RGN0QUR6S2ZVdXFDejBRZDZ6NUdIYVN4Qk1lakwxRnpOcVNTY0RGY0E1?=
+ =?utf-8?B?aFlMS1ZVSTdnT1E4UnlKMzRETlMxeDVFUThaamlDY3JuNUwxbWs0MU9DWHBo?=
+ =?utf-8?B?d1hVN2tyYzBUaGg3ZjlyWDU5anY0UUkzZ2d3SmVOVXhzQ0ZIVzB6L3RGQU5L?=
+ =?utf-8?B?TStuc0Z3TUdDdTNqN2JySlFPQ1ZqR2xYQlJYcmtNSndHNmYyek9yUzFyUmp4?=
+ =?utf-8?B?MW1sc1hscTg4enNDamZ6Umc3ZFE5NGk2SHdSVXZWYkxWM3JDUnhtQWZzUEJu?=
+ =?utf-8?B?RW1UVktCU2NZeVdYZlJUaVlvWHFSSTBZWFp4U212YWtXU1dXSmJ4cVVkZi9r?=
+ =?utf-8?B?aFZCM1R1Tyt5V0ZQQU84VU5Kc3plTDZEcHZhYnR2T2RvTlVITElDVTJvQmhj?=
+ =?utf-8?B?S0VSdkFLc2lzRjBaYzlmcmtSNXlXNVNBOVNBQnZvTm4yYjF3OERoaFRlNURM?=
+ =?utf-8?B?K2lXaGliVGdTUmdtT1dSTHhDMXVrWFZ4SmxwSURRSnR2c3l6S052TjVYMmln?=
+ =?utf-8?B?UDJXWEtCZTlPb3JvdEN2aTZMeHFpa2hTSHFUU01SdE9TckZCUG9WNWRTUlda?=
+ =?utf-8?B?TXlkdGtFdHQ3SGd3NHdjMlkzTGtCQzRjSjc4UEJYdWgvR0tpNjNiZm1FQURX?=
+ =?utf-8?B?VVRjUUxPSVZsdkIxa3l5bUsvSGs0cnc0V0QvOFNhaGlNekRzYkVDNnJOempk?=
+ =?utf-8?B?TTQ5blpQaUlaaXMzbU5ERlZaMzJQMVdmbnhqQ2Z1b2VwTlJMZ3V5WGM3b3Bk?=
+ =?utf-8?B?UEtkendFeVNTa1NOaE9CWEx1Q1g3YUdZQ1R0cGhKZHFIRWh3QW1HZzNFWnNZ?=
+ =?utf-8?B?eWE5QTBscjUvK2NxOVU3QURlTVBjWks1RElCNUgzVENuZnJKY2hBUU44czds?=
+ =?utf-8?B?QjMyNy82RlVxWWZVclRRNnRNckFQb0hKSHJXKzFuRndIbFJBRmt4Ym82czc0?=
+ =?utf-8?B?Uy9Kc0ZzUUtTbSt2UnZ0dTh5akMwUlBYdjZHUHFkVXJTSmNBa2FmYS90elJG?=
+ =?utf-8?B?Si9vTGswSnR6MXpkbWlZZDg2WlEvSUtwUEtnTXpZbkI0VCtmclRiWWs2ZDFy?=
+ =?utf-8?B?cXE1dEtCZDNyWXR1WFFyeFEwYzRoOWFxVWExbUpWdDd5ZXg4NUJONFY5cEtS?=
+ =?utf-8?B?UUJyVlh6NEpZK0wwVVRjT0JoYlBUK2FlaW1TN25obHp6VnhpRzZBV1gyUzhQ?=
+ =?utf-8?B?V2FrSDliSkEwWXZzOHBQRWNQeUtQZG94OTVMejRVQW1uaTUvMG5XOWtYZWwv?=
+ =?utf-8?B?bk9peFpqanhqNWExWUMybjRpZllWY2p4T1RITnZMSEE5eXpqMFBzNVNCSzFF?=
+ =?utf-8?B?aXNyUXZvMlFuYVFGV3dLUkordXYyWWNlME56SjZIVktLQkE1WkFMTHFVZExr?=
+ =?utf-8?B?YzM1MGwwajZTTjBiWm9qbnVYZnVnU3lJMS9oTCtRdFFMM0VITENDVmZOTW5T?=
+ =?utf-8?B?ZVNNRWRpQzZiSHU3QXBYOWV5KzdDRlQ3RWJNd3paUEhzMUtmbTVoZHZickJn?=
+ =?utf-8?B?RGZjRzhVbmpGVllSTE1FaU9xaDJhSFlmWnBDTWVOTzE3emZ0V2FqWVRGbEFn?=
+ =?utf-8?B?Ymc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C233738C4F54F846AA4C39154FBFB7E2@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW5PR03MB6932:EE_|MW4PR03MB6442:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5436a22-7bb0-496f-ebe3-08dbe0888b32
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VzjNaqFsSis8UaIK9Uq/Y5tPv6ma5K1dNIpS5r7qxr52p4KtPa2nHPQLfr4jye43O9zYZkY9Hhc26OBcvYP05XNglx5CkUcY27pC0k1lkSN/gN5DF/22pAj0QZ8pOXDfa5wgE4ZR6h5cE6oY5xCMJpbXIF2Pev9mhYKmsLwSTfzAFz67IosV60KwkVbNzPQXOkZbYct18pZEJfhKFNjgxqJRDnuWLpC0uj4CsN05fabToGenJaJ5bNqY+TAmikER9WiQDhFGLmjPqM+BF9jY0qg0OfuHkX4a6QRQqnKcQDvwkHSXzCH7nKR05gEcaZLx2OJqfj6UwnXyU1Ay3eUJaczTRXiENbycJuPeMJyn1kHPJds5NpZ8Ri6K4LI7FY07yISMw0Lo2TCb0GiAFx2dYW23POmvcbe/QOJTGqPhpAzPT7hbCjVffhWpiJdISv9GZZRCJvRDF42c1iW173JZwIIJSrIWFxhrQxj5k0knS3+FF57S8BdZctse869RwrxrROg6ZPorEqyo1djaaG/MZAl1OqmEJ3bBzqKT389GbnAFq8QvJu9rGFVQr6cABJSU
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sohQGiW2Bl/vwiLKv4TnjRw5qMfT7R2wj80m0KwblOxK0+d8P94jJjAhWoCX?=
- =?us-ascii?Q?ijTOky0NXMWB17NZ3bE+UXZL0BSO5OwZy5rafL4/MqsSGcRefWBdZkUfBi30?=
- =?us-ascii?Q?xoMSVJrj5Xc8hyNCavpHBb9RdIf/+GxVU1haQYyvJrb3VKrunq/a9nxwbdn9?=
- =?us-ascii?Q?BZ737AP4Ar11fImzXIPBMPuRkONn+pBuqeaBq4iBnksopFHpg/tzhcn+PPce?=
- =?us-ascii?Q?HDEZ19pDQin/VcZFvMsojqorTBGER8twZJhckfedxrOVCXIsNVK24JYyDKRL?=
- =?us-ascii?Q?ErH/j0cakzuwIX1KmL+xh7j/Nq+qz2EBS9uPCvTwZO8097y+ATdWcf2c1mCN?=
- =?us-ascii?Q?7b6tWeGcmBdK53Z+mQNqzSo3skDeAVkdNtMvffQmNbPzFNJhfhP7TEe8fjT3?=
- =?us-ascii?Q?bFaVt9oh/SUowSIEYfZ41xXqxJZzc4kEtxe/clBu5BOO7fcoO8cJwytKbnHA?=
- =?us-ascii?Q?fI3fQ+EaUDbdO53QDU9GoggD55lQKKVrdj+iG64rsV1fSFrQTyGM7PwNtMII?=
- =?us-ascii?Q?C+9dMxwVUV0FSnHunSmY1BBY/XXModqwtg9B45HB20ckfb5kkHAnRGwTARHE?=
- =?us-ascii?Q?JVlF9u2xCa7Etbt/Vu5ARda8Qg/TtJmz6Wz4OnQ7v+WuZ0yYjA7NwlMi6GWw?=
- =?us-ascii?Q?1xRHbRg44Vr4gNVD2DRu/jrzeQchhOvphz8/4G5/qVmyK9ifDou+4fWPeIlN?=
- =?us-ascii?Q?/iXBFHzItomiQ6dZVgET/fPnuUsJGIAA7T3Rt70R0mLcm2pN0g8KUXbMaIKU?=
- =?us-ascii?Q?FAc/kubHwsaOdPcI/JUYXUuA9opBkn0IAIeAtSFR1di1cCuMqpvY9j52hbvr?=
- =?us-ascii?Q?Mm5k4EsYDTAk6gmjab4l9nbasUNysYn346QxYZO1DVJ4aZ3ADXvsNHgI3EJw?=
- =?us-ascii?Q?qAbWHkAOdFpWYVCOvYF2hHuyQRTmgSiG27K5Lq2aTD6TfaAKcwSn2+zcs+j4?=
- =?us-ascii?Q?6o2mzgGhMrQf6BvIR/Bs2g0aqFY24/vBExOu9RBsrx8vi/Twysuz5nVkUZK1?=
- =?us-ascii?Q?m6h3dhiACvGBFyf1/cY0/5ZYAqInV+rZt+h3FPli4WUVXZ06pxsbWrLjoNNU?=
- =?us-ascii?Q?4CplttYuSwPGRwZ8byRhWZyI2/x3Ewp2Rxiko03k5duXw32Qudu+xhrw0Iku?=
- =?us-ascii?Q?w8QC2XRNbAw4J31KnBjAWzDMthXFARZrvczdhaK176pJocPPyMwmWI/ANuja?=
- =?us-ascii?Q?F0bwJoELlOiRRg7xFv47bA0LPr3YcCt4hnDo+w=3D=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-839f4.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5436a22-7bb0-496f-ebe3-08dbe0888b32
-X-MS-Exchange-CrossTenant-AuthSource: MW5PR03MB6932.namprd03.prod.outlook.com
+X-OriginatorOrg: csgroup.eu
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 18:28:46.6691
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d1f5e49-f364-404e-467e-08dbe088e583
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2023 18:31:17.3456
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR03MB6442
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RgRxhNLlCVkPc0LSEKxDmYk13Epm1drAQ51K7ghR1BlnMAtU6BHXhvJz0vDxNQ55QC8jwmFb9Gk8lEsCeGEDiat92/7DJzDVfHtwYXaeMXs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MR1P264MB2388
 
-From: Min Li <min.li.xe@renesas.com>
-
-We used to assume 0x2010xxxx address. Now that
-we need to access 0x2011xxxx address, we need
-to support read/write the whole 32-bit address space.
-
-Signed-off-by: Min Li <min.li.xe@renesas.com>
----
- drivers/ptp/ptp_clockmatrix.c    |  72 ++--
- drivers/ptp/ptp_clockmatrix.h    |  33 +-
- include/linux/mfd/idt8a340_reg.h | 542 ++++++++++++++++---------------
- 3 files changed, 340 insertions(+), 307 deletions(-)
-
-diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
-index f6f9d4adce04..875841892842 100644
---- a/drivers/ptp/ptp_clockmatrix.c
-+++ b/drivers/ptp/ptp_clockmatrix.c
-@@ -41,7 +41,7 @@ module_param(firmware, charp, 0);
- static int _idtcm_adjfine(struct idtcm_channel *channel, long scaled_ppm);
- 
- static inline int idtcm_read(struct idtcm *idtcm,
--			     u16 module,
-+			     u32 module,
- 			     u16 regaddr,
- 			     u8 *buf,
- 			     u16 count)
-@@ -50,7 +50,7 @@ static inline int idtcm_read(struct idtcm *idtcm,
- }
- 
- static inline int idtcm_write(struct idtcm *idtcm,
--			      u16 module,
-+			      u32 module,
- 			      u16 regaddr,
- 			      u8 *buf,
- 			      u16 count)
-@@ -62,7 +62,8 @@ static int contains_full_configuration(struct idtcm *idtcm,
- 				       const struct firmware *fw)
- {
- 	struct idtcm_fwrc *rec = (struct idtcm_fwrc *)fw->data;
--	u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
-+	u16 scratch = SCSR_ADDR(IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH));
-+	u16 gpio_control = SCSR_ADDR(GPIO_USER_CONTROL);
- 	s32 full_count;
- 	s32 count = 0;
- 	u16 regaddr;
-@@ -70,8 +71,8 @@ static int contains_full_configuration(struct idtcm *idtcm,
- 	s32 len;
- 
- 	/* 4 bytes skipped every 0x80 */
--	full_count = (scratch - GPIO_USER_CONTROL) -
--		     ((scratch >> 7) - (GPIO_USER_CONTROL >> 7)) * 4;
-+	full_count = (scratch - gpio_control) -
-+		     ((scratch >> 7) - (gpio_control >> 7)) * 4;
- 
- 	/* If the firmware contains 'full configuration' SM_RESET can be used
- 	 * to ensure proper configuration.
-@@ -88,7 +89,7 @@ static int contains_full_configuration(struct idtcm *idtcm,
- 		rec++;
- 
- 		/* Top (status registers) and bottom are read-only */
--		if (regaddr < GPIO_USER_CONTROL || regaddr >= scratch)
-+		if (regaddr < gpio_control || regaddr >= scratch)
- 			continue;
- 
- 		/* Page size 128, last 4 bytes of page skipped */
-@@ -506,8 +507,8 @@ static int _sync_pll_output(struct idtcm *idtcm,
- {
- 	int err;
- 	u8 val;
--	u16 sync_ctrl0;
--	u16 sync_ctrl1;
-+	u32 sync_ctrl0;
-+	u32 sync_ctrl1;
- 	u8 temp;
- 
- 	if (qn == 0 && qn_plus_1 == 0)
-@@ -576,21 +577,21 @@ static int _sync_pll_output(struct idtcm *idtcm,
- 
- 	/* PLL5 can have OUT8 as second additional output. */
- 	if (pll == 5 && qn_plus_1 != 0) {
--		err = idtcm_read(idtcm, 0, HW_Q8_CTRL_SPARE,
-+		err = idtcm_read(idtcm, HW_Q8_CTRL_SPARE, 0,
- 				 &temp, sizeof(temp));
- 		if (err)
- 			return err;
- 
- 		temp &= ~(Q9_TO_Q8_SYNC_TRIG);
- 
--		err = idtcm_write(idtcm, 0, HW_Q8_CTRL_SPARE,
-+		err = idtcm_write(idtcm, HW_Q8_CTRL_SPARE, 0,
- 				  &temp, sizeof(temp));
- 		if (err)
- 			return err;
- 
- 		temp |= Q9_TO_Q8_SYNC_TRIG;
- 
--		err = idtcm_write(idtcm, 0, HW_Q8_CTRL_SPARE,
-+		err = idtcm_write(idtcm, HW_Q8_CTRL_SPARE, 0,
- 				  &temp, sizeof(temp));
- 		if (err)
- 			return err;
-@@ -598,21 +599,21 @@ static int _sync_pll_output(struct idtcm *idtcm,
- 
- 	/* PLL6 can have OUT11 as second additional output. */
- 	if (pll == 6 && qn_plus_1 != 0) {
--		err = idtcm_read(idtcm, 0, HW_Q11_CTRL_SPARE,
-+		err = idtcm_read(idtcm, HW_Q11_CTRL_SPARE, 0,
- 				 &temp, sizeof(temp));
- 		if (err)
- 			return err;
- 
- 		temp &= ~(Q10_TO_Q11_SYNC_TRIG);
- 
--		err = idtcm_write(idtcm, 0, HW_Q11_CTRL_SPARE,
-+		err = idtcm_write(idtcm, HW_Q11_CTRL_SPARE, 0,
- 				  &temp, sizeof(temp));
- 		if (err)
- 			return err;
- 
- 		temp |= Q10_TO_Q11_SYNC_TRIG;
- 
--		err = idtcm_write(idtcm, 0, HW_Q11_CTRL_SPARE,
-+		err = idtcm_write(idtcm, HW_Q11_CTRL_SPARE, 0,
- 				  &temp, sizeof(temp));
- 		if (err)
- 			return err;
-@@ -637,7 +638,7 @@ static int idtcm_sync_pps_output(struct idtcm_channel *channel)
- 	u8 temp;
- 	u16 output_mask = channel->output_mask;
- 
--	err = idtcm_read(idtcm, 0, HW_Q8_CTRL_SPARE,
-+	err = idtcm_read(idtcm, HW_Q8_CTRL_SPARE, 0,
- 			 &temp, sizeof(temp));
- 	if (err)
- 		return err;
-@@ -646,7 +647,7 @@ static int idtcm_sync_pps_output(struct idtcm_channel *channel)
- 	    Q9_TO_Q8_FANOUT_AND_CLOCK_SYNC_ENABLE_MASK)
- 		out8_mux = 1;
- 
--	err = idtcm_read(idtcm, 0, HW_Q11_CTRL_SPARE,
-+	err = idtcm_read(idtcm, HW_Q11_CTRL_SPARE, 0,
- 			 &temp, sizeof(temp));
- 	if (err)
- 		return err;
-@@ -1303,14 +1304,14 @@ static int idtcm_load_firmware(struct idtcm *idtcm,
- 			err = 0;
- 
- 			/* Top (status registers) and bottom are read-only */
--			if (regaddr < GPIO_USER_CONTROL || regaddr >= scratch)
-+			if (regaddr < SCSR_ADDR(GPIO_USER_CONTROL) || regaddr >= scratch)
- 				continue;
- 
- 			/* Page size 128, last 4 bytes of page skipped */
- 			if ((loaddr > 0x7b && loaddr <= 0x7f) || loaddr > 0xfb)
- 				continue;
- 
--			err = idtcm_write(idtcm, regaddr, 0, &val, sizeof(val));
-+			err = idtcm_write(idtcm, SCSR_BASE, regaddr, &val, sizeof(val));
- 		}
- 
- 		if (err)
-@@ -1395,6 +1396,20 @@ static int idtcm_set_pll_mode(struct idtcm_channel *channel,
- 	struct idtcm *idtcm = channel->idtcm;
- 	int err;
- 	u8 dpll_mode;
-+	u8 timeout = 0;
-+
-+	/* Setup WF/WP timer for phase pull-in to work correctly */
-+	err = idtcm_write(idtcm, channel->dpll_n, DPLL_WF_TIMER,
-+			  &timeout, sizeof(timeout));
-+	if (err)
-+		return err;
-+
-+	if (mode == PLL_MODE_WRITE_PHASE)
-+		timeout = 160;
-+	err = idtcm_write(idtcm, channel->dpll_n, DPLL_WP_TIMER,
-+			  &timeout, sizeof(timeout));
-+	if (err)
-+		return err;
- 
- 	err = idtcm_read(idtcm, channel->dpll_n,
- 			 IDTCM_FW_REG(idtcm->fw_ver, V520, DPLL_MODE),
-@@ -1705,10 +1720,14 @@ static s32 idtcm_getmaxphase(struct ptp_clock_info *ptp __always_unused)
- }
- 
- /*
-- * Internal function for implementing support for write phase offset
-+ * Maximum absolute value for write phase offset in picoseconds
-  *
-  * @channel:  channel
-  * @delta_ns: delta in nanoseconds
-+ *
-+ * Destination signed register is 32-bit register in resolution of 50ps
-+ *
-+ * 0x7fffffff * 50 =  2147483647 * 50 = 107374182350
-  */
- static int _idtcm_adjphase(struct idtcm_channel *channel, s32 delta_ns)
- {
-@@ -1717,6 +1736,7 @@ static int _idtcm_adjphase(struct idtcm_channel *channel, s32 delta_ns)
- 	u8 i;
- 	u8 buf[4] = {0};
- 	s32 phase_50ps;
-+	s64 offset_ps;
- 
- 	if (channel->mode != PTP_PLL_MODE_WRITE_PHASE) {
- 		err = channel->configure_write_phase(channel);
-@@ -1724,7 +1744,19 @@ static int _idtcm_adjphase(struct idtcm_channel *channel, s32 delta_ns)
- 			return err;
- 	}
- 
--	phase_50ps = div_s64((s64)delta_ns * 1000, 50);
-+	offset_ps = (s64)delta_ns * 1000;
-+
-+	/*
-+	 * Check for 32-bit signed max * 50:
-+	 *
-+	 * 0x7fffffff * 50 =  2147483647 * 50 = 107374182350
-+	 */
-+	if (offset_ps > MAX_ABS_WRITE_PHASE_PICOSECONDS)
-+		offset_ps = MAX_ABS_WRITE_PHASE_PICOSECONDS;
-+	else if (offset_ps < -MAX_ABS_WRITE_PHASE_PICOSECONDS)
-+		offset_ps = -MAX_ABS_WRITE_PHASE_PICOSECONDS;
-+
-+	phase_50ps = div_s64(offset_ps, 50);
- 
- 	for (i = 0; i < 4; i++) {
- 		buf[i] = phase_50ps & 0xff;
-diff --git a/drivers/ptp/ptp_clockmatrix.h b/drivers/ptp/ptp_clockmatrix.h
-index 7c17c4f7f573..a0aa88c8a4ab 100644
---- a/drivers/ptp/ptp_clockmatrix.h
-+++ b/drivers/ptp/ptp_clockmatrix.h
-@@ -19,6 +19,7 @@
- #define MAX_REF_CLK	(16)
- 
- #define MAX_ABS_WRITE_PHASE_NANOSECONDS (107374182L)
-+#define MAX_ABS_WRITE_PHASE_PICOSECONDS (107374182350LL)
- 
- #define TOD_MASK_ADDR		(0xFFA5)
- #define DEFAULT_TOD_MASK	(0x04)
-@@ -54,21 +55,9 @@
- #define LOCK_TIMEOUT_MS			(2000)
- #define LOCK_POLL_INTERVAL_MS		(10)
- 
--#define IDTCM_MAX_WRITE_COUNT		(512)
--
- #define PHASE_PULL_IN_MAX_PPB		(144000)
- #define PHASE_PULL_IN_MIN_THRESHOLD_NS	(2)
- 
--/*
-- * Return register address based on passed in firmware version
-- */
--#define IDTCM_FW_REG(FW, VER, REG)	(((FW) < (VER)) ? (REG) : (REG##_##VER))
--enum fw_version {
--	V_DEFAULT = 0,
--	V487 = 1,
--	V520 = 2,
--};
--
- /* PTP PLL Mode */
- enum ptp_pll_mode {
- 	PTP_PLL_MODE_MIN = 0,
-@@ -84,16 +73,16 @@ struct idtcm_channel {
- 	struct ptp_clock_info	caps;
- 	struct ptp_clock	*ptp_clock;
- 	struct idtcm		*idtcm;
--	u16			dpll_phase;
--	u16			dpll_freq;
--	u16			dpll_n;
--	u16			dpll_ctrl_n;
--	u16			dpll_phase_pull_in;
--	u16			tod_read_primary;
--	u16			tod_read_secondary;
--	u16			tod_write;
--	u16			tod_n;
--	u16			hw_dpll_n;
-+	u32			dpll_phase;
-+	u32			dpll_freq;
-+	u32			dpll_n;
-+	u32			dpll_ctrl_n;
-+	u32			dpll_phase_pull_in;
-+	u32			tod_read_primary;
-+	u32			tod_read_secondary;
-+	u32			tod_write;
-+	u32			tod_n;
-+	u32			hw_dpll_n;
- 	u8			sync_src;
- 	enum ptp_pll_mode	mode;
- 	int			(*configure_write_frequency)(struct idtcm_channel *channel);
-diff --git a/include/linux/mfd/idt8a340_reg.h b/include/linux/mfd/idt8a340_reg.h
-index 0c706085c205..b680a0eb5f68 100644
---- a/include/linux/mfd/idt8a340_reg.h
-+++ b/include/linux/mfd/idt8a340_reg.h
-@@ -7,20 +7,20 @@
- #ifndef HAVE_IDT8A340_REG
- #define HAVE_IDT8A340_REG
- 
--#define PAGE_ADDR_BASE                    0x0000
--#define PAGE_ADDR                         0x00fc
-+#define SCSR_BASE			  0x20100000
-+#define SCSR_ADDR(x)			  ((x) & 0xffff)
- 
--#define HW_REVISION                       0x8180
-+#define HW_REVISION                       0x20108180
- #define REV_ID                            0x007a
- 
--#define HW_DPLL_0                         (0x8a00)
--#define HW_DPLL_1                         (0x8b00)
--#define HW_DPLL_2                         (0x8c00)
--#define HW_DPLL_3                         (0x8d00)
--#define HW_DPLL_4                         (0x8e00)
--#define HW_DPLL_5                         (0x8f00)
--#define HW_DPLL_6                         (0x9000)
--#define HW_DPLL_7                         (0x9100)
-+#define HW_DPLL_0                         (0x20108a00)
-+#define HW_DPLL_1                         (0x20108b00)
-+#define HW_DPLL_2                         (0x20108c00)
-+#define HW_DPLL_3                         (0x20108d00)
-+#define HW_DPLL_4                         (0x20108e00)
-+#define HW_DPLL_5                         (0x20108f00)
-+#define HW_DPLL_6                         (0x20109000)
-+#define HW_DPLL_7                         (0x20109100)
- 
- #define HW_DPLL_TOD_SW_TRIG_ADDR__0       (0x080)
- #define HW_DPLL_TOD_CTRL_1                (0x089)
-@@ -28,22 +28,22 @@
- #define HW_DPLL_TOD_OVR__0                (0x098)
- #define HW_DPLL_TOD_OUT_0__0              (0x0B0)
- 
--#define HW_Q0_Q1_CH_SYNC_CTRL_0           (0xa740)
--#define HW_Q0_Q1_CH_SYNC_CTRL_1           (0xa741)
--#define HW_Q2_Q3_CH_SYNC_CTRL_0           (0xa742)
--#define HW_Q2_Q3_CH_SYNC_CTRL_1           (0xa743)
--#define HW_Q4_Q5_CH_SYNC_CTRL_0           (0xa744)
--#define HW_Q4_Q5_CH_SYNC_CTRL_1           (0xa745)
--#define HW_Q6_Q7_CH_SYNC_CTRL_0           (0xa746)
--#define HW_Q6_Q7_CH_SYNC_CTRL_1           (0xa747)
--#define HW_Q8_CH_SYNC_CTRL_0              (0xa748)
--#define HW_Q8_CH_SYNC_CTRL_1              (0xa749)
--#define HW_Q9_CH_SYNC_CTRL_0              (0xa74a)
--#define HW_Q9_CH_SYNC_CTRL_1              (0xa74b)
--#define HW_Q10_CH_SYNC_CTRL_0             (0xa74c)
--#define HW_Q10_CH_SYNC_CTRL_1             (0xa74d)
--#define HW_Q11_CH_SYNC_CTRL_0             (0xa74e)
--#define HW_Q11_CH_SYNC_CTRL_1             (0xa74f)
-+#define HW_Q0_Q1_CH_SYNC_CTRL_0           (0x2010a740)
-+#define HW_Q0_Q1_CH_SYNC_CTRL_1           (0x2010a741)
-+#define HW_Q2_Q3_CH_SYNC_CTRL_0           (0x2010a742)
-+#define HW_Q2_Q3_CH_SYNC_CTRL_1           (0x2010a743)
-+#define HW_Q4_Q5_CH_SYNC_CTRL_0           (0x2010a744)
-+#define HW_Q4_Q5_CH_SYNC_CTRL_1           (0x2010a745)
-+#define HW_Q6_Q7_CH_SYNC_CTRL_0           (0x2010a746)
-+#define HW_Q6_Q7_CH_SYNC_CTRL_1           (0x2010a747)
-+#define HW_Q8_CH_SYNC_CTRL_0              (0x2010a748)
-+#define HW_Q8_CH_SYNC_CTRL_1              (0x2010a749)
-+#define HW_Q9_CH_SYNC_CTRL_0              (0x2010a74a)
-+#define HW_Q9_CH_SYNC_CTRL_1              (0x2010a74b)
-+#define HW_Q10_CH_SYNC_CTRL_0             (0x2010a74c)
-+#define HW_Q10_CH_SYNC_CTRL_1             (0x2010a74d)
-+#define HW_Q11_CH_SYNC_CTRL_0             (0x2010a74e)
-+#define HW_Q11_CH_SYNC_CTRL_1             (0x2010a74f)
- 
- #define SYNC_SOURCE_DPLL0_TOD_PPS	0x14
- #define SYNC_SOURCE_DPLL1_TOD_PPS	0x15
-@@ -58,8 +58,8 @@
- #define SYNCTRL1_Q1_DIV_SYNC_TRIG	BIT(1)
- #define SYNCTRL1_Q0_DIV_SYNC_TRIG	BIT(0)
- 
--#define HW_Q8_CTRL_SPARE  (0xa7d4)
--#define HW_Q11_CTRL_SPARE (0xa7ec)
-+#define HW_Q8_CTRL_SPARE  (0x2010a7d4)
-+#define HW_Q11_CTRL_SPARE (0x2010a7ec)
- 
- /**
-  * Select FOD5 as sync_trigger for Q8 divider.
-@@ -95,12 +95,12 @@
-  */
- #define Q10_TO_Q11_FANOUT_AND_CLOCK_SYNC_ENABLE_MASK  (BIT(0) | BIT(2))
- 
--#define RESET_CTRL                        0xc000
-+#define RESET_CTRL                        0x2010c000
- #define SM_RESET                          0x0012
- #define SM_RESET_V520                     0x0013
- #define SM_RESET_CMD                      0x5A
- 
--#define GENERAL_STATUS                    0xc014
-+#define GENERAL_STATUS                    0x2010c014
- #define BOOT_STATUS                       0x0000
- #define HW_REV_ID                         0x000A
- #define BOND_ID                           0x000B
-@@ -115,7 +115,7 @@
- #define PRODUCT_ID                        0x001e
- #define OTP_SCSR_CONFIG_SELECT            0x0022
- 
--#define STATUS                            0xc03c
-+#define STATUS                            0x2010c03c
- #define DPLL0_STATUS			  0x0018
- #define DPLL1_STATUS			  0x0019
- #define DPLL2_STATUS			  0x001a
-@@ -138,60 +138,62 @@
- #define USER_GPIO0_TO_7_STATUS            0x008a
- #define USER_GPIO8_TO_15_STATUS           0x008b
- 
--#define GPIO_USER_CONTROL                 0xc160
-+#define GPIO_USER_CONTROL                 0x2010c160
- #define GPIO0_TO_7_OUT                    0x0000
- #define GPIO8_TO_15_OUT                   0x0001
- #define GPIO0_TO_7_OUT_V520               0x0002
- #define GPIO8_TO_15_OUT_V520              0x0003
- 
--#define STICKY_STATUS_CLEAR               0xc164
--
--#define GPIO_TOD_NOTIFICATION_CLEAR       0xc16c
--
--#define ALERT_CFG                         0xc188
--
--#define SYS_DPLL_XO                       0xc194
--
--#define SYS_APLL                          0xc19c
--
--#define INPUT_0                           0xc1b0
--#define INPUT_1                           0xc1c0
--#define INPUT_2                           0xc1d0
--#define INPUT_3                           0xc200
--#define INPUT_4                           0xc210
--#define INPUT_5                           0xc220
--#define INPUT_6                           0xc230
--#define INPUT_7                           0xc240
--#define INPUT_8                           0xc250
--#define INPUT_9                           0xc260
--#define INPUT_10                          0xc280
--#define INPUT_11                          0xc290
--#define INPUT_12                          0xc2a0
--#define INPUT_13                          0xc2b0
--#define INPUT_14                          0xc2c0
--#define INPUT_15                          0xc2d0
--
--#define REF_MON_0                         0xc2e0
--#define REF_MON_1                         0xc2ec
--#define REF_MON_2                         0xc300
--#define REF_MON_3                         0xc30c
--#define REF_MON_4                         0xc318
--#define REF_MON_5                         0xc324
--#define REF_MON_6                         0xc330
--#define REF_MON_7                         0xc33c
--#define REF_MON_8                         0xc348
--#define REF_MON_9                         0xc354
--#define REF_MON_10                        0xc360
--#define REF_MON_11                        0xc36c
--#define REF_MON_12                        0xc380
--#define REF_MON_13                        0xc38c
--#define REF_MON_14                        0xc398
--#define REF_MON_15                        0xc3a4
--
--#define DPLL_0                            0xc3b0
-+#define STICKY_STATUS_CLEAR               0x2010c164
-+
-+#define GPIO_TOD_NOTIFICATION_CLEAR       0x2010c16c
-+
-+#define ALERT_CFG                         0x2010c188
-+
-+#define SYS_DPLL_XO                       0x2010c194
-+
-+#define SYS_APLL                          0x2010c19c
-+
-+#define INPUT_0                           0x2010c1b0
-+#define INPUT_1                           0x2010c1c0
-+#define INPUT_2                           0x2010c1d0
-+#define INPUT_3                           0x2010c200
-+#define INPUT_4                           0x2010c210
-+#define INPUT_5                           0x2010c220
-+#define INPUT_6                           0x2010c230
-+#define INPUT_7                           0x2010c240
-+#define INPUT_8                           0x2010c250
-+#define INPUT_9                           0x2010c260
-+#define INPUT_10                          0x2010c280
-+#define INPUT_11                          0x2010c290
-+#define INPUT_12                          0x2010c2a0
-+#define INPUT_13                          0x2010c2b0
-+#define INPUT_14                          0x2010c2c0
-+#define INPUT_15                          0x2010c2d0
-+
-+#define REF_MON_0                         0x2010c2e0
-+#define REF_MON_1                         0x2010c2ec
-+#define REF_MON_2                         0x2010c300
-+#define REF_MON_3                         0x2010c30c
-+#define REF_MON_4                         0x2010c318
-+#define REF_MON_5                         0x2010c324
-+#define REF_MON_6                         0x2010c330
-+#define REF_MON_7                         0x2010c33c
-+#define REF_MON_8                         0x2010c348
-+#define REF_MON_9                         0x2010c354
-+#define REF_MON_10                        0x2010c360
-+#define REF_MON_11                        0x2010c36c
-+#define REF_MON_12                        0x2010c380
-+#define REF_MON_13                        0x2010c38c
-+#define REF_MON_14                        0x2010c398
-+#define REF_MON_15                        0x2010c3a4
-+
-+#define DPLL_0                            0x2010c3b0
- #define DPLL_CTRL_REG_0                   0x0002
- #define DPLL_CTRL_REG_1                   0x0003
- #define DPLL_CTRL_REG_2                   0x0004
-+#define DPLL_WF_TIMER                     0x002c
-+#define DPLL_WP_TIMER                     0x002e
- #define DPLL_TOD_SYNC_CFG                 0x0031
- #define DPLL_COMBO_SLAVE_CFG_0            0x0032
- #define DPLL_COMBO_SLAVE_CFG_1            0x0033
-@@ -200,69 +202,69 @@
- #define DPLL_PHASE_MEASUREMENT_CFG        0x0036
- #define DPLL_MODE                         0x0037
- #define DPLL_MODE_V520                    0x003B
--#define DPLL_1                            0xc400
--#define DPLL_2                            0xc438
--#define DPLL_2_V520                       0xc43c
--#define DPLL_3                            0xc480
--#define DPLL_4                            0xc4b8
--#define DPLL_4_V520                       0xc4bc
--#define DPLL_5                            0xc500
--#define DPLL_6                            0xc538
--#define DPLL_6_V520                       0xc53c
--#define DPLL_7                            0xc580
--#define SYS_DPLL                          0xc5b8
--#define SYS_DPLL_V520                     0xc5bc
--
--#define DPLL_CTRL_0                       0xc600
-+#define DPLL_1                            0x2010c400
-+#define DPLL_2                            0x2010c438
-+#define DPLL_2_V520                       0x2010c43c
-+#define DPLL_3                            0x2010c480
-+#define DPLL_4                            0x2010c4b8
-+#define DPLL_4_V520                       0x2010c4bc
-+#define DPLL_5                            0x2010c500
-+#define DPLL_6                            0x2010c538
-+#define DPLL_6_V520                       0x2010c53c
-+#define DPLL_7                            0x2010c580
-+#define SYS_DPLL                          0x2010c5b8
-+#define SYS_DPLL_V520                     0x2010c5bc
-+
-+#define DPLL_CTRL_0                       0x2010c600
- #define DPLL_CTRL_DPLL_MANU_REF_CFG       0x0001
- #define DPLL_CTRL_DPLL_FOD_FREQ           0x001c
- #define DPLL_CTRL_COMBO_MASTER_CFG        0x003a
--#define DPLL_CTRL_1                       0xc63c
--#define DPLL_CTRL_2                       0xc680
--#define DPLL_CTRL_3                       0xc6bc
--#define DPLL_CTRL_4                       0xc700
--#define DPLL_CTRL_5                       0xc73c
--#define DPLL_CTRL_6                       0xc780
--#define DPLL_CTRL_7                       0xc7bc
--#define SYS_DPLL_CTRL                     0xc800
--
--#define DPLL_PHASE_0                      0xc818
-+#define DPLL_CTRL_1                       0x2010c63c
-+#define DPLL_CTRL_2                       0x2010c680
-+#define DPLL_CTRL_3                       0x2010c6bc
-+#define DPLL_CTRL_4                       0x2010c700
-+#define DPLL_CTRL_5                       0x2010c73c
-+#define DPLL_CTRL_6                       0x2010c780
-+#define DPLL_CTRL_7                       0x2010c7bc
-+#define SYS_DPLL_CTRL                     0x2010c800
-+
-+#define DPLL_PHASE_0                      0x2010c818
- /* Signed 42-bit FFO in units of 2^(-53) */
- #define DPLL_WR_PHASE                     0x0000
--#define DPLL_PHASE_1                      0xc81c
--#define DPLL_PHASE_2                      0xc820
--#define DPLL_PHASE_3                      0xc824
--#define DPLL_PHASE_4                      0xc828
--#define DPLL_PHASE_5                      0xc82c
--#define DPLL_PHASE_6                      0xc830
--#define DPLL_PHASE_7                      0xc834
--
--#define DPLL_FREQ_0                       0xc838
-+#define DPLL_PHASE_1                      0x2010c81c
-+#define DPLL_PHASE_2                      0x2010c820
-+#define DPLL_PHASE_3                      0x2010c824
-+#define DPLL_PHASE_4                      0x2010c828
-+#define DPLL_PHASE_5                      0x2010c82c
-+#define DPLL_PHASE_6                      0x2010c830
-+#define DPLL_PHASE_7                      0x2010c834
-+
-+#define DPLL_FREQ_0                       0x2010c838
- /* Signed 42-bit FFO in units of 2^(-53) */
- #define DPLL_WR_FREQ                      0x0000
--#define DPLL_FREQ_1                       0xc840
--#define DPLL_FREQ_2                       0xc848
--#define DPLL_FREQ_3                       0xc850
--#define DPLL_FREQ_4                       0xc858
--#define DPLL_FREQ_5                       0xc860
--#define DPLL_FREQ_6                       0xc868
--#define DPLL_FREQ_7                       0xc870
--
--#define DPLL_PHASE_PULL_IN_0              0xc880
-+#define DPLL_FREQ_1                       0x2010c840
-+#define DPLL_FREQ_2                       0x2010c848
-+#define DPLL_FREQ_3                       0x2010c850
-+#define DPLL_FREQ_4                       0x2010c858
-+#define DPLL_FREQ_5                       0x2010c860
-+#define DPLL_FREQ_6                       0x2010c868
-+#define DPLL_FREQ_7                       0x2010c870
-+
-+#define DPLL_PHASE_PULL_IN_0              0x2010c880
- #define PULL_IN_OFFSET                    0x0000 /* Signed 32 bit */
- #define PULL_IN_SLOPE_LIMIT               0x0004 /* Unsigned 24 bit */
- #define PULL_IN_CTRL                      0x0007
--#define DPLL_PHASE_PULL_IN_1              0xc888
--#define DPLL_PHASE_PULL_IN_2              0xc890
--#define DPLL_PHASE_PULL_IN_3              0xc898
--#define DPLL_PHASE_PULL_IN_4              0xc8a0
--#define DPLL_PHASE_PULL_IN_5              0xc8a8
--#define DPLL_PHASE_PULL_IN_6              0xc8b0
--#define DPLL_PHASE_PULL_IN_7              0xc8b8
--
--#define GPIO_CFG                          0xc8c0
-+#define DPLL_PHASE_PULL_IN_1              0x2010c888
-+#define DPLL_PHASE_PULL_IN_2              0x2010c890
-+#define DPLL_PHASE_PULL_IN_3              0x2010c898
-+#define DPLL_PHASE_PULL_IN_4              0x2010c8a0
-+#define DPLL_PHASE_PULL_IN_5              0x2010c8a8
-+#define DPLL_PHASE_PULL_IN_6              0x2010c8b0
-+#define DPLL_PHASE_PULL_IN_7              0x2010c8b8
-+
-+#define GPIO_CFG                          0x2010c8c0
- #define GPIO_CFG_GBL                      0x0000
--#define GPIO_0                            0xc8c2
-+#define GPIO_0                            0x2010c8c2
- #define GPIO_DCO_INC_DEC                  0x0000
- #define GPIO_OUT_CTRL_0                   0x0001
- #define GPIO_OUT_CTRL_1                   0x0002
-@@ -281,25 +283,25 @@
- #define GPIO_TOD_NOTIFICATION_CFG         0x000f
- #define GPIO_CTRL                         0x0010
- #define GPIO_CTRL_V520                    0x0011
--#define GPIO_1                            0xc8d4
--#define GPIO_2                            0xc8e6
--#define GPIO_3                            0xc900
--#define GPIO_4                            0xc912
--#define GPIO_5                            0xc924
--#define GPIO_6                            0xc936
--#define GPIO_7                            0xc948
--#define GPIO_8                            0xc95a
--#define GPIO_9                            0xc980
--#define GPIO_10                           0xc992
--#define GPIO_11                           0xc9a4
--#define GPIO_12                           0xc9b6
--#define GPIO_13                           0xc9c8
--#define GPIO_14                           0xc9da
--#define GPIO_15                           0xca00
--
--#define OUT_DIV_MUX                       0xca12
--#define OUTPUT_0                          0xca14
--#define OUTPUT_0_V520                     0xca20
-+#define GPIO_1                            0x2010c8d4
-+#define GPIO_2                            0x2010c8e6
-+#define GPIO_3                            0x2010c900
-+#define GPIO_4                            0x2010c912
-+#define GPIO_5                            0x2010c924
-+#define GPIO_6                            0x2010c936
-+#define GPIO_7                            0x2010c948
-+#define GPIO_8                            0x2010c95a
-+#define GPIO_9                            0x2010c980
-+#define GPIO_10                           0x2010c992
-+#define GPIO_11                           0x2010c9a4
-+#define GPIO_12                           0x2010c9b6
-+#define GPIO_13                           0x2010c9c8
-+#define GPIO_14                           0x2010c9da
-+#define GPIO_15                           0x2010ca00
-+
-+#define OUT_DIV_MUX                       0x2010ca12
-+#define OUTPUT_0                          0x2010ca14
-+#define OUTPUT_0_V520                     0x2010ca20
- /* FOD frequency output divider value */
- #define OUT_DIV                           0x0000
- #define OUT_DUTY_CYCLE_HIGH               0x0004
-@@ -307,88 +309,88 @@
- #define OUT_CTRL_1                        0x0009
- /* Phase adjustment in FOD cycles */
- #define OUT_PHASE_ADJ                     0x000c
--#define OUTPUT_1                          0xca24
--#define OUTPUT_1_V520                     0xca30
--#define OUTPUT_2                          0xca34
--#define OUTPUT_2_V520                     0xca40
--#define OUTPUT_3                          0xca44
--#define OUTPUT_3_V520                     0xca50
--#define OUTPUT_4                          0xca54
--#define OUTPUT_4_V520                     0xca60
--#define OUTPUT_5                          0xca64
--#define OUTPUT_5_V520                     0xca80
--#define OUTPUT_6                          0xca80
--#define OUTPUT_6_V520                     0xca90
--#define OUTPUT_7                          0xca90
--#define OUTPUT_7_V520                     0xcaa0
--#define OUTPUT_8                          0xcaa0
--#define OUTPUT_8_V520                     0xcab0
--#define OUTPUT_9                          0xcab0
--#define OUTPUT_9_V520                     0xcac0
--#define OUTPUT_10                         0xcac0
--#define OUTPUT_10_V520                     0xcad0
--#define OUTPUT_11                         0xcad0
--#define OUTPUT_11_V520                    0xcae0
--
--#define SERIAL                            0xcae0
--#define SERIAL_V520                       0xcaf0
--
--#define PWM_ENCODER_0                     0xcb00
--#define PWM_ENCODER_1                     0xcb08
--#define PWM_ENCODER_2                     0xcb10
--#define PWM_ENCODER_3                     0xcb18
--#define PWM_ENCODER_4                     0xcb20
--#define PWM_ENCODER_5                     0xcb28
--#define PWM_ENCODER_6                     0xcb30
--#define PWM_ENCODER_7                     0xcb38
--#define PWM_DECODER_0                     0xcb40
--#define PWM_DECODER_1                     0xcb48
--#define PWM_DECODER_1_V520                0xcb4a
--#define PWM_DECODER_2                     0xcb50
--#define PWM_DECODER_2_V520                0xcb54
--#define PWM_DECODER_3                     0xcb58
--#define PWM_DECODER_3_V520                0xcb5e
--#define PWM_DECODER_4                     0xcb60
--#define PWM_DECODER_4_V520                0xcb68
--#define PWM_DECODER_5                     0xcb68
--#define PWM_DECODER_5_V520                0xcb80
--#define PWM_DECODER_6                     0xcb70
--#define PWM_DECODER_6_V520                0xcb8a
--#define PWM_DECODER_7                     0xcb80
--#define PWM_DECODER_7_V520                0xcb94
--#define PWM_DECODER_8                     0xcb88
--#define PWM_DECODER_8_V520                0xcb9e
--#define PWM_DECODER_9                     0xcb90
--#define PWM_DECODER_9_V520                0xcba8
--#define PWM_DECODER_10                    0xcb98
--#define PWM_DECODER_10_V520               0xcbb2
--#define PWM_DECODER_11                    0xcba0
--#define PWM_DECODER_11_V520               0xcbbc
--#define PWM_DECODER_12                    0xcba8
--#define PWM_DECODER_12_V520               0xcbc6
--#define PWM_DECODER_13                    0xcbb0
--#define PWM_DECODER_13_V520               0xcbd0
--#define PWM_DECODER_14                    0xcbb8
--#define PWM_DECODER_14_V520               0xcbda
--#define PWM_DECODER_15                    0xcbc0
--#define PWM_DECODER_15_V520               0xcbe4
--#define PWM_USER_DATA                     0xcbc8
--#define PWM_USER_DATA_V520                0xcbf0
--
--#define TOD_0                             0xcbcc
--#define TOD_0_V520                        0xcc00
-+#define OUTPUT_1                          0x2010ca24
-+#define OUTPUT_1_V520                     0x2010ca30
-+#define OUTPUT_2                          0x2010ca34
-+#define OUTPUT_2_V520                     0x2010ca40
-+#define OUTPUT_3                          0x2010ca44
-+#define OUTPUT_3_V520                     0x2010ca50
-+#define OUTPUT_4                          0x2010ca54
-+#define OUTPUT_4_V520                     0x2010ca60
-+#define OUTPUT_5                          0x2010ca64
-+#define OUTPUT_5_V520                     0x2010ca80
-+#define OUTPUT_6                          0x2010ca80
-+#define OUTPUT_6_V520                     0x2010ca90
-+#define OUTPUT_7                          0x2010ca90
-+#define OUTPUT_7_V520                     0x2010caa0
-+#define OUTPUT_8                          0x2010caa0
-+#define OUTPUT_8_V520                     0x2010cab0
-+#define OUTPUT_9                          0x2010cab0
-+#define OUTPUT_9_V520                     0x2010cac0
-+#define OUTPUT_10                         0x2010cac0
-+#define OUTPUT_10_V520                    0x2010cad0
-+#define OUTPUT_11                         0x2010cad0
-+#define OUTPUT_11_V520                    0x2010cae0
-+
-+#define SERIAL                            0x2010cae0
-+#define SERIAL_V520                       0x2010caf0
-+
-+#define PWM_ENCODER_0                     0x2010cb00
-+#define PWM_ENCODER_1                     0x2010cb08
-+#define PWM_ENCODER_2                     0x2010cb10
-+#define PWM_ENCODER_3                     0x2010cb18
-+#define PWM_ENCODER_4                     0x2010cb20
-+#define PWM_ENCODER_5                     0x2010cb28
-+#define PWM_ENCODER_6                     0x2010cb30
-+#define PWM_ENCODER_7                     0x2010cb38
-+#define PWM_DECODER_0                     0x2010cb40
-+#define PWM_DECODER_1                     0x2010cb48
-+#define PWM_DECODER_1_V520                0x2010cb4a
-+#define PWM_DECODER_2                     0x2010cb50
-+#define PWM_DECODER_2_V520                0x2010cb54
-+#define PWM_DECODER_3                     0x2010cb58
-+#define PWM_DECODER_3_V520                0x2010cb5e
-+#define PWM_DECODER_4                     0x2010cb60
-+#define PWM_DECODER_4_V520                0x2010cb68
-+#define PWM_DECODER_5                     0x2010cb68
-+#define PWM_DECODER_5_V520                0x2010cb80
-+#define PWM_DECODER_6                     0x2010cb70
-+#define PWM_DECODER_6_V520                0x2010cb8a
-+#define PWM_DECODER_7                     0x2010cb80
-+#define PWM_DECODER_7_V520                0x2010cb94
-+#define PWM_DECODER_8                     0x2010cb88
-+#define PWM_DECODER_8_V520                0x2010cb9e
-+#define PWM_DECODER_9                     0x2010cb90
-+#define PWM_DECODER_9_V520                0x2010cba8
-+#define PWM_DECODER_10                    0x2010cb98
-+#define PWM_DECODER_10_V520               0x2010cbb2
-+#define PWM_DECODER_11                    0x2010cba0
-+#define PWM_DECODER_11_V520               0x2010cbbc
-+#define PWM_DECODER_12                    0x2010cba8
-+#define PWM_DECODER_12_V520               0x2010cbc6
-+#define PWM_DECODER_13                    0x2010cbb0
-+#define PWM_DECODER_13_V520               0x2010cbd0
-+#define PWM_DECODER_14                    0x2010cbb8
-+#define PWM_DECODER_14_V520               0x2010cbda
-+#define PWM_DECODER_15                    0x2010cbc0
-+#define PWM_DECODER_15_V520               0x2010cbe4
-+#define PWM_USER_DATA                     0x2010cbc8
-+#define PWM_USER_DATA_V520                0x2010cbf0
-+
-+#define TOD_0                             0x2010cbcc
-+#define TOD_0_V520                        0x2010cc00
- /* Enable TOD counter, output channel sync and even-PPS mode */
- #define TOD_CFG                           0x0000
- #define TOD_CFG_V520                      0x0001
--#define TOD_1                             0xcbce
--#define TOD_1_V520                        0xcc02
--#define TOD_2                             0xcbd0
--#define TOD_2_V520                        0xcc04
--#define TOD_3                             0xcbd2
--#define TOD_3_V520                        0xcc06
--
--#define TOD_WRITE_0                       0xcc00
--#define TOD_WRITE_0_V520                  0xcc10
-+#define TOD_1                             0x2010cbce
-+#define TOD_1_V520                        0x2010cc02
-+#define TOD_2                             0x2010cbd0
-+#define TOD_2_V520                        0x2010cc04
-+#define TOD_3                             0x2010cbd2
-+#define TOD_3_V520                        0x2010cc06
-+
-+#define TOD_WRITE_0                       0x2010cc00
-+#define TOD_WRITE_0_V520                  0x2010cc10
- /* 8-bit subns, 32-bit ns, 48-bit seconds */
- #define TOD_WRITE                         0x0000
- /* Counter increments after TOD write is completed */
-@@ -397,15 +399,15 @@
- #define TOD_WRITE_SELECT_CFG_0            0x000d
- /* TOD write trigger selection */
- #define TOD_WRITE_CMD                     0x000f
--#define TOD_WRITE_1                       0xcc10
--#define TOD_WRITE_1_V520                  0xcc20
--#define TOD_WRITE_2                       0xcc20
--#define TOD_WRITE_2_V520                  0xcc30
--#define TOD_WRITE_3                       0xcc30
--#define TOD_WRITE_3_V520                  0xcc40
--
--#define TOD_READ_PRIMARY_0                0xcc40
--#define TOD_READ_PRIMARY_0_V520           0xcc50
-+#define TOD_WRITE_1                       0x2010cc10
-+#define TOD_WRITE_1_V520                  0x2010cc20
-+#define TOD_WRITE_2                       0x2010cc20
-+#define TOD_WRITE_2_V520                  0x2010cc30
-+#define TOD_WRITE_3                       0x2010cc30
-+#define TOD_WRITE_3_V520                  0x2010cc40
-+
-+#define TOD_READ_PRIMARY_0                0x2010cc40
-+#define TOD_READ_PRIMARY_0_V520           0x2010cc50
- /* 8-bit subns, 32-bit ns, 48-bit seconds */
- #define TOD_READ_PRIMARY_BASE             0x0000
- /* Counter increments after TOD write is completed */
-@@ -415,15 +417,15 @@
- /* Read trigger selection */
- #define TOD_READ_PRIMARY_CMD              0x000e
- #define TOD_READ_PRIMARY_CMD_V520         0x000f
--#define TOD_READ_PRIMARY_1                0xcc50
--#define TOD_READ_PRIMARY_1_V520           0xcc60
--#define TOD_READ_PRIMARY_2                0xcc60
--#define TOD_READ_PRIMARY_2_V520           0xcc80
--#define TOD_READ_PRIMARY_3                0xcc80
--#define TOD_READ_PRIMARY_3_V520           0xcc90
--
--#define TOD_READ_SECONDARY_0              0xcc90
--#define TOD_READ_SECONDARY_0_V520         0xcca0
-+#define TOD_READ_PRIMARY_1                0x2010cc50
-+#define TOD_READ_PRIMARY_1_V520           0x2010cc60
-+#define TOD_READ_PRIMARY_2                0x2010cc60
-+#define TOD_READ_PRIMARY_2_V520           0x2010cc80
-+#define TOD_READ_PRIMARY_3                0x2010cc80
-+#define TOD_READ_PRIMARY_3_V520           0x2010cc90
-+
-+#define TOD_READ_SECONDARY_0              0x2010cc90
-+#define TOD_READ_SECONDARY_0_V520         0x2010cca0
- /* 8-bit subns, 32-bit ns, 48-bit seconds */
- #define TOD_READ_SECONDARY_BASE           0x0000
- /* Counter increments after TOD write is completed */
-@@ -434,30 +436,30 @@
- #define TOD_READ_SECONDARY_CMD            0x000e
- #define TOD_READ_SECONDARY_CMD_V520       0x000f
- 
--#define TOD_READ_SECONDARY_1              0xcca0
--#define TOD_READ_SECONDARY_1_V520         0xccb0
--#define TOD_READ_SECONDARY_2              0xccb0
--#define TOD_READ_SECONDARY_2_V520         0xccc0
--#define TOD_READ_SECONDARY_3              0xccc0
--#define TOD_READ_SECONDARY_3_V520         0xccd0
-+#define TOD_READ_SECONDARY_1              0x2010cca0
-+#define TOD_READ_SECONDARY_1_V520         0x2010ccb0
-+#define TOD_READ_SECONDARY_2              0x2010ccb0
-+#define TOD_READ_SECONDARY_2_V520         0x2010ccc0
-+#define TOD_READ_SECONDARY_3              0x2010ccc0
-+#define TOD_READ_SECONDARY_3_V520         0x2010ccd0
- 
--#define OUTPUT_TDC_CFG                    0xccd0
--#define OUTPUT_TDC_CFG_V520               0xcce0
--#define OUTPUT_TDC_0                      0xcd00
--#define OUTPUT_TDC_1                      0xcd08
--#define OUTPUT_TDC_2                      0xcd10
--#define OUTPUT_TDC_3                      0xcd18
--#define INPUT_TDC                         0xcd20
-+#define OUTPUT_TDC_CFG                    0x2010ccd0
-+#define OUTPUT_TDC_CFG_V520               0x2010cce0
-+#define OUTPUT_TDC_0                      0x2010cd00
-+#define OUTPUT_TDC_1                      0x2010cd08
-+#define OUTPUT_TDC_2                      0x2010cd10
-+#define OUTPUT_TDC_3                      0x2010cd18
-+#define INPUT_TDC                         0x2010cd20
- 
--#define SCRATCH                           0xcf50
--#define SCRATCH_V520                      0xcf4c
-+#define SCRATCH                           0x2010cf50
-+#define SCRATCH_V520                      0x2010cf4c
- 
--#define EEPROM                            0xcf68
--#define EEPROM_V520                       0xcf64
-+#define EEPROM                            0x2010cf68
-+#define EEPROM_V520                       0x2010cf64
- 
--#define OTP                               0xcf70
-+#define OTP                               0x2010cf70
- 
--#define BYTE                              0xcf80
-+#define BYTE                              0x2010cf80
- 
- /* Bit definitions for the MAJ_REL register */
- #define MAJOR_SHIFT                       (1)
-@@ -665,6 +667,16 @@
- #define DPLL_STATE_MASK                   (0xf)
- #define DPLL_STATE_SHIFT                  (0x0)
- 
-+/*
-+ * Return register address based on passed in firmware version
-+ */
-+#define IDTCM_FW_REG(FW, VER, REG)	(((FW) < (VER)) ? (REG) : (REG##_##VER))
-+enum fw_version {
-+	V_DEFAULT = 0,
-+	V487 = 1,
-+	V520 = 2,
-+};
-+
- /* Values of DPLL_N.DPLL_MODE.PLL_MODE */
- enum pll_mode {
- 	PLL_MODE_MIN = 0,
--- 
-2.39.2
-
+SGkgQXJuZCwNCg0KTGUgMDgvMTEvMjAyMyDDoCAxMzo1OCwgQXJuZCBCZXJnbWFubiBhIMOpY3Jp
+dMKgOg0KPiBGcm9tOiBBcm5kIEJlcmdtYW5uIDxhcm5kQGFybmRiLmRlPg0KPiANCj4gVGhlIFZE
+U08gZnVuY3Rpb25zIGFyZSBkZWZpbmVkIGFzIGdsb2JhbHMgaW4gdGhlIGtlcm5lbCBzb3VyY2Vz
+IGJ1dCBpbnRlbmRlZA0KPiB0byBiZSBjYWxsZWQgZnJvbSB1c2Vyc3BhY2UsIHNvIHRoZXJlIGlz
+IG5vIG5lZWQgdG8gZGVjbGFyZSB0aGVtIGluIGEga2VybmVsDQo+IHNpZGUgaGVhZGVyLg0KPiAN
+Cj4gV2l0aG91dCBhIHByb3RvdHlwZSwgdGhpcyBub3cgY2F1c2VzIHdhcm5pbmdzIHN1Y2ggYXMN
+Cj4gDQo+IGFyY2gvbWlwcy92ZHNvL3ZnZXR0aW1lb2ZkYXkuYzoxNDo1OiBlcnJvcjogbm8gcHJl
+dmlvdXMgcHJvdG90eXBlIGZvciAnX192ZHNvX2Nsb2NrX2dldHRpbWUnIFstV2Vycm9yPW1pc3Np
+bmctcHJvdG90eXBlc10NCj4gYXJjaC9taXBzL3Zkc28vdmdldHRpbWVvZmRheS5jOjI4OjU6IGVy
+cm9yOiBubyBwcmV2aW91cyBwcm90b3R5cGUgZm9yICdfX3Zkc29fZ2V0dGltZW9mZGF5JyBbLVdl
+cnJvcj1taXNzaW5nLXByb3RvdHlwZXNdDQo+IGFyY2gvbWlwcy92ZHNvL3ZnZXR0aW1lb2ZkYXku
+YzozNjo1OiBlcnJvcjogbm8gcHJldmlvdXMgcHJvdG90eXBlIGZvciAnX192ZHNvX2Nsb2NrX2dl
+dHJlcycgWy1XZXJyb3I9bWlzc2luZy1wcm90b3R5cGVzXQ0KPiBhcmNoL21pcHMvdmRzby92Z2V0
+dGltZW9mZGF5LmM6NDI6NTogZXJyb3I6IG5vIHByZXZpb3VzIHByb3RvdHlwZSBmb3IgJ19fdmRz
+b19jbG9ja19nZXR0aW1lNjQnIFstV2Vycm9yPW1pc3NpbmctcHJvdG90eXBlc10NCj4gYXJjaC9z
+cGFyYy92ZHNvL3ZjbG9ja19nZXR0aW1lLmM6MjU0OjE6IGVycm9yOiBubyBwcmV2aW91cyBwcm90
+b3R5cGUgZm9yICdfX3Zkc29fY2xvY2tfZ2V0dGltZScgWy1XZXJyb3I9bWlzc2luZy1wcm90b3R5
+cGVzXQ0KPiBhcmNoL3NwYXJjL3Zkc28vdmNsb2NrX2dldHRpbWUuYzoyODI6MTogZXJyb3I6IG5v
+IHByZXZpb3VzIHByb3RvdHlwZSBmb3IgJ19fdmRzb19jbG9ja19nZXR0aW1lX3N0aWNrJyBbLVdl
+cnJvcj1taXNzaW5nLXByb3RvdHlwZXNdDQo+IGFyY2gvc3BhcmMvdmRzby92Y2xvY2tfZ2V0dGlt
+ZS5jOjMwNzoxOiBlcnJvcjogbm8gcHJldmlvdXMgcHJvdG90eXBlIGZvciAnX192ZHNvX2dldHRp
+bWVvZmRheScgWy1XZXJyb3I9bWlzc2luZy1wcm90b3R5cGVzXQ0KPiBhcmNoL3NwYXJjL3Zkc28v
+dmNsb2NrX2dldHRpbWUuYzozNDM6MTogZXJyb3I6IG5vIHByZXZpb3VzIHByb3RvdHlwZSBmb3Ig
+J19fdmRzb19nZXR0aW1lb2ZkYXlfc3RpY2snIFstV2Vycm9yPW1pc3NpbmctcHJvdG90eXBlc10N
+Cj4gDQo+IE1vc3QgYXJjaGl0ZWN0dXJlcyBoYXZlIGFscmVhZHkgYWRkZWQgd29ya2Fyb3VuZHMg
+Zm9yIHRoZXNlIGJ5IGFkZGluZw0KPiBkZWNsYXJhdGlvbnMgc29tZXdoZXJlLCBidXQgc2luY2Ug
+dGhlc2UgYXJlIGFsbCBjb21wYXRpYmxlLCB3ZSBzaG91bGQNCj4gcmVhbGx5IGp1c3QgaGF2ZSBv
+bmUgY29weSwgd2l0aCBhbiAjaWZkZWYgY2hlY2sgZm9yIHRoZSAzMi1iaXQgdnMNCj4gNjQtYml0
+IHZhcmlhbnQgYW5kIHVzZSB0aGF0IGV2ZXJ5d2hlcmUuDQo+IA0KPiBVbmZvcnR1bmF0ZWx5LCB0
+aGUgc3BhcmMgdmVyc2lvbiBpcyBjdXJyZW50bHkgaW5jb21wYXRpYmxlIHNpbmNlDQo+IHRoYXQg
+bmV2ZXIgYWRkZWQgc3VwcG9ydCBmb3IgX192ZHNvX2Nsb2NrX2dldHRpbWU2NCgpIGluIDMyLWJp
+dA0KPiB1c2VybGFuZC4gRm9yIHRoZSBtb21lbnQsIEknbSBsZWF2aW5nIHRoaXMgb25lIG91dCwg
+YXMgSSBjYW4ndA0KPiBlYXNpbHkgdGVzdCBpdCBhbmQgaXQgcmVxdWlyZXMgYSBsYXJnZXIgcmV3
+b3JrLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQXJuZCBCZXJnbWFubiA8YXJuZEBhcm5kYi5kZT4N
+Cj4gLS0tDQo+ICAgYXJjaC9hcm0vaW5jbHVkZS9hc20vdmRzby5oICAgICAgICAgICAgICB8ICA1
+IC0tLS0tDQo+ICAgYXJjaC9hcm0vdmRzby92Z2V0dGltZW9mZGF5LmMgICAgICAgICAgICB8ICAx
+ICsNCj4gICBhcmNoL2FybTY0L2tlcm5lbC92ZHNvMzIvdmdldHRpbWVvZmRheS5jIHwgIDEgKw0K
+PiAgIGFyY2gvY3NreS9rZXJuZWwvdmRzby92Z2V0dGltZW9mZGF5LmMgICAgfCAxMSArLS0tLS0t
+LS0tLQ0KPiAgIGFyY2gvbG9vbmdhcmNoL3Zkc28vdmdldHRpbWVvZmRheS5jICAgICAgfCAgNyAr
+LS0tLS0tDQo+ICAgYXJjaC9taXBzL3Zkc28vdmdldHRpbWVvZmRheS5jICAgICAgICAgICB8ICAx
+ICsNCj4gICBhcmNoL3Jpc2N2L2tlcm5lbC92ZHNvL3ZnZXR0aW1lb2ZkYXkuYyAgIHwgIDcgKy0t
+LS0tLQ0KPiAgIGFyY2gveDg2L2VudHJ5L3Zkc28vdmNsb2NrX2dldHRpbWUuYyAgICAgfCAxMCAr
+LS0tLS0tLS0tDQo+ICAgYXJjaC94ODYvaW5jbHVkZS9hc20vdmRzby9nZXR0aW1lb2ZkYXkuaCB8
+ICAyIC0tDQo+ICAgYXJjaC94ODYvdW0vdmRzby91bV92ZHNvLmMgICAgICAgICAgICAgICB8ICAx
+ICsNCj4gICBpbmNsdWRlL3Zkc28vZ2V0dGltZS5oICAgICAgICAgICAgICAgICAgIHwgMjMgKysr
+KysrKysrKysrKysrKysrKysrKysNCj4gICAxMSBmaWxlcyBjaGFuZ2VkLCAzMSBpbnNlcnRpb25z
+KCspLCAzOCBkZWxldGlvbnMoLSkNCj4gICBjcmVhdGUgbW9kZSAxMDA2NDQgaW5jbHVkZS92ZHNv
+L2dldHRpbWUuaA0KDQpwb3dlcnBjIGhhcyBmdW5jdGlvbnMgZG9pbmcgbW9yZSBvciBsZXNzIHRo
+ZSBzYW1lLCB0aGV5IGFyZSBjYWxsZWQgDQpfX2Nfa2VybmVsX2Nsb2NrX2dldHRpbWUoKSBhbmQg
+YWxpa2Ugd2l0aCB0aGVpciBwcm90b3R5cGVzIHNpdGluZyBpbiANCmFyY2gvcG93ZXJwYy9pbmNs
+dWRlL2FzbS92ZHNvL2dldHRpbWVvZmRheS5oDQoNClNob3VsZCB0aG9zZSBwcm90b3R5cGVzIGJl
+IG1vdmVkIHRvIGluY2x1ZGUvdmRzby9nZXR0aW1lLmggdG9vIGFuZCANCmV2ZW50dWFsbHkgcmVu
+YW1lZCwgb3IgYXJlIHRoZXkgY29uc2lkZXJlZCB0b28gcG93ZXJwYyBzcGVjaWZpYyA/DQoNCkNo
+cmlzdG9waGUNCg==
 
