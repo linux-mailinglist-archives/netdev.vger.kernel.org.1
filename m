@@ -1,135 +1,101 @@
-Return-Path: <netdev+bounces-46653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46E47E59BC
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:10:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554877E59C0
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41084281107
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:10:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EADD1C20DDC
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2D030323;
-	Wed,  8 Nov 2023 15:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4381E30335;
+	Wed,  8 Nov 2023 15:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYaCeiA+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4wNroml"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B924E2592
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:10:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E427F1BFA
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:10:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699456231;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=PDc6Ow/bSblo3GhUEPhnVNdc0LfbXdgWx7MoQyklJ7Q=;
-	b=dYaCeiA+IlCpCTV+P+p+PIrQ+rxsj134TdgFHCs9+o63Ii5igBs96yD2qKhLQ2rqrh9TM/
-	v39ZP2/pHDzNwPCBkYYOMevCTEa/UGRD/Thpuj1++z4VKMcSmkE0cSU1xDmRp0gCOqEkOH
-	698P0abG2TaE637VBETJEdz+Xzfz6xg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-549-ClR-7Y0IOCeBTJnzrMdaPg-1; Wed, 08 Nov 2023 10:10:26 -0500
-X-MC-Unique: ClR-7Y0IOCeBTJnzrMdaPg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AC718892281;
-	Wed,  8 Nov 2023 15:10:21 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C48DDC12911;
-	Wed,  8 Nov 2023 15:10:19 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Todd Fujinaka <todd.fujinaka@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] i40e: Fix max frame size check
-Date: Wed,  8 Nov 2023 16:10:18 +0100
-Message-ID: <20231108151018.72670-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10372592;
+	Wed,  8 Nov 2023 15:10:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E8E3C433CC;
+	Wed,  8 Nov 2023 15:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699456248;
+	bh=ubRWv4gCHYtZyc/7EUxKBrb1M8Jq2gNnH2Iv89hahkg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V4wNromlDBNArj+XlVHbk1Tpho83VHKj4KF3u+g8D/gDHOgmbzk9TF5F0k0bfjyJ5
+	 QAa+SJ1H1vdt9z6QLXRKqy3OD3OdIvi0IIM6oR9t+f/Qou1n/kmZp3N4Ld5+Em6SUX
+	 C152TcjhS6BX54Dd5mExY/uqbFmfwaVKqqV5higpeeV5QYXEeI2g8nKEM8QO7JpfaW
+	 oYvzN3/QTGIj+pp0Nd5j3aFNPnFwrr1RCnhA/mv97Odgb/1aJ2xdCVJdaJgtaQHSY0
+	 fqhoFzKt0Xnl3SB0XmmHuBK+2Zwe0i1mRrDK0QRCpnefsPz2sjmCZbZODNGq5w3ycl
+	 CDBBZ1wKet15w==
+Date: Wed, 8 Nov 2023 07:10:44 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Geoff Levand <geoff@infradead.org>
+Cc: Arnd Bergmann <arnd@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Masahiro Yamada
+ <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, Arnd Bergmann
+ <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>, Vineet Gupta
+ <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
+ <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, Michal Simek
+ <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Dinh
+ Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Palmer Dabbelt <palmer@dabbelt.com>, Heiko
+ Carstens <hca@linux.ibm.com>, John Paul Adrian Glaubitz
+ <glaubitz@physik.fu-berlin.de>, "David S. Miller" <davem@davemloft.net>,
+ Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, x86@kernel.org, Helge Deller
+ <deller@gmx.de>, Sudip Mukherjee <sudipm.mukherjee@gmail.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>,
+ Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse
+ <dwmw2@infradead.org>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Anil S
+ Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook
+ <keescook@chromium.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>,
+ Al Viro <viro@zeniv.linux.org.uk>, Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?=
+ <u.kleine-koenig@pengutronix.de>, linux-alpha@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-trace-kernel@vger.kernel.org, linux-csky@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
+ linux-mtd@lists.infradead.org
+Subject: Re: [PATCH 17/22] powerpc: ps3: move udbg_shutdown_ps3gelic
+ prototype
+Message-ID: <20231108071044.6abdf09e@kernel.org>
+In-Reply-To: <1b3ccc4a-41f7-46ad-9c5c-5ef44a96426e@infradead.org>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+	<20231108125843.3806765-18-arnd@kernel.org>
+	<1b3ccc4a-41f7-46ad-9c5c-5ef44a96426e@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set") added
-a check for port's MFS (max frame size) value. The value is stored
-in PRTGL_SAH register for each physical port. According datasheet this
-register is defined as:
+On Wed, 8 Nov 2023 14:18:09 +0000 Geoff Levand wrote:
+> Seems good to me.  I'll test it next chance I get.
+> 
+> Signed-off-by: Geoff Levand <geoff@infradead.org>
 
-PRTGL_SAH[PRT]: (0x001E2140 + 0x4*PRT, PRT=0...3)
+Seems like this is best routed via powerpc:
 
-where PRT is physical port number.
-
-The existing check does not take port number into account and reads
-actually MFS value always for port 0 that is correct for PF 0 but
-not for other PFs.
-
-Update PRTGL_SAH register definition so it takes a port number as
-an argument and fix the check by passing the port number.
-Also fix the warning message that use for a port number a local
-variable 'i' that really does not contain such information.
-
-Fixes: 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set")
-Cc: Todd Fujinaka <todd.fujinaka@intel.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c     | 4 ++--
- drivers/net/ethernet/intel/i40e/i40e_register.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 4f445f6835de..6a2907674583 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -16219,11 +16219,11 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	/* make sure the MFS hasn't been set lower than the default */
- #define MAX_FRAME_SIZE_DEFAULT 0x2600
--	val = (rd32(&pf->hw, I40E_PRTGL_SAH) &
-+	val = (rd32(&pf->hw, I40E_PRTGL_SAH(pf->hw.port)) &
- 	       I40E_PRTGL_SAH_MFS_MASK) >> I40E_PRTGL_SAH_MFS_SHIFT;
- 	if (val < MAX_FRAME_SIZE_DEFAULT)
- 		dev_warn(&pdev->dev, "MFS for port %x has been set below the default: %x\n",
--			 i, val);
-+			 pf->hw.port, val);
- 
- 	/* Add a filter to drop all Flow control frames from any VSI from being
- 	 * transmitted. By doing so we stop a malicious VF from sending out
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
-index f408fcf23ce8..75edfe3d43f7 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-@@ -498,7 +498,7 @@
- #define I40E_VSILAN_QBASE_VSIQTABLE_ENA_SHIFT 11
- #define I40E_VSILAN_QBASE_VSIQTABLE_ENA_MASK I40E_MASK(0x1, I40E_VSILAN_QBASE_VSIQTABLE_ENA_SHIFT)
- #define I40E_VSILAN_QTABLE(_i, _VSI) (0x00200000 + ((_i) * 2048 + (_VSI) * 4)) /* _i=0...7, _VSI=0...383 */ /* Reset: PFR */
--#define I40E_PRTGL_SAH 0x001E2140 /* Reset: GLOBR */
-+#define I40E_PRTGL_SAH(_PRT) (0x001E2140 + ((_PRT) * 4)) /* _PRT=0...3 */ /* Reset: GLOBR */
- #define I40E_PRTGL_SAH_FC_SAH_SHIFT 0
- #define I40E_PRTGL_SAH_FC_SAH_MASK I40E_MASK(0xFFFF, I40E_PRTGL_SAH_FC_SAH_SHIFT)
- #define I40E_PRTGL_SAH_MFS_SHIFT 16
--- 
-2.41.0
-
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
