@@ -1,211 +1,103 @@
-Return-Path: <netdev+bounces-46674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528B27E5ADC
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 17:12:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FB7B7E5B49
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 17:33:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 767161C20AD4
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:12:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CEF7B20E49
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A5A30CEF;
-	Wed,  8 Nov 2023 16:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE43317999;
+	Wed,  8 Nov 2023 16:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="fMZnLo4H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BmoS/Jdq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FFC3067D
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 16:12:00 +0000 (UTC)
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C3A1FDD
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 08:12:00 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1cc53d0030fso7721855ad.0
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 08:12:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699459919; x=1700064719; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=polvhyFKi41sYRbfyXcWfNg92E/y83EB4K6tLgO22GE=;
-        b=fMZnLo4HPvXvwWMfWCCcRaMigK5xh+kX8wf4RZP2ma321/Z1JYQo67/VszzQKNfw3v
-         3goPttKl/odneFolWfAMNBV+uKusYqOJTz+2d+qbsrUl40GYO0Vyu5Xb1bqF0PQQxo6N
-         2sXqMep1TEfCP1PvZWdk8tOgt8tDsdl1rpkNEojQ7Wct8EIXPhAQhcNA1p9dgSJqAwrl
-         HqOxIDKgtzECFs4A1TVvFzQHzaGmO8FoEWWHomv9jpMcYN2EvVdhVuFTIOR+wtprT9ZU
-         71u4PYuR6PLGo+o7ahJ6ZdcmIiDkmNK/Cp449N3FRHsAgoHieJXJTqhbHyVwci1HCcQG
-         UYPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699459919; x=1700064719;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=polvhyFKi41sYRbfyXcWfNg92E/y83EB4K6tLgO22GE=;
-        b=I2jR4OpahYMND9G6kOPhg3Ass/6y22lt/pRqkrZOYGq5uMiprTOC0kFqlzoULQ9YNX
-         +LbQSmpSXrHkXNpQAmZyk7UTs89tTTHUQy5Mn0ss7imLdHelsxXXO/9tntgM4Ac9tlBz
-         MOJBSnm3iXOrnc5jq80bKSRjUE4zwb/iOMJ+Ai7kk0F7JycHjuyz4atKiWJRg1i/pIuX
-         VHxZRBYx0AZwbgFw+qSTIDsfw4efiPBa8TW/01juAi5M9NMJe1hHEpI4APL6aCpf/0b4
-         D1uLapnMfDcRxqAvAN/15zY1vSwRBX8Qf3DlysMMCGFlJ74jG2WmUwsbWPCkv+xZ8R6S
-         Y4Kw==
-X-Gm-Message-State: AOJu0Yx/fnBdUlM58rPyjD9XoKccqbxE/sct73DRKSjIgFjEhWriLBrD
-	PZ4rXWNgyoHL0VwPcoyfDfjVdQ==
-X-Google-Smtp-Source: AGHT+IGIHNEVwzF/gyLgbWBbkclZC1Cl+aAPHlcgnsXyRaq8hkIiNwI80BUKnJwETkn1zLVFUQ+98w==
-X-Received: by 2002:a17:902:d389:b0:1cc:4810:6f2c with SMTP id e9-20020a170902d38900b001cc48106f2cmr2906326pld.33.1699459919231;
-        Wed, 08 Nov 2023 08:11:59 -0800 (PST)
-Received: from ?IPV6:2620:10d:c085:21e8::1118? ([2620:10d:c090:400::4:86d6])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170902cec200b001c3be750900sm1938192plg.163.2023.11.08.08.11.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Nov 2023 08:11:58 -0800 (PST)
-Message-ID: <1d1f7518-6ff9-4402-a874-5c0138bedefd@davidwei.uk>
-Date: Wed, 8 Nov 2023 08:11:56 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D234832C6D
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 16:33:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 100ACC433C8;
+	Wed,  8 Nov 2023 16:33:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699461188;
+	bh=DNs+hxUozPcAk22MpXBVQKW/WowOe37ObtLphMi+7jU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BmoS/JdqgqBfq73EQSOLmDSQ3mnV3nP8vFMj5D863u9PFdwWBlx4DTSQcQ6zhPItY
+	 9iMFP8A8QLSEjvtHsUMr/w511BXwLP1O4EIIKBg3CMqOfUPmMq8lwiyqIoQIYQySFf
+	 yJoNr5KhhSJfuhcSOoFF6ABwXLqle9E5uFgNwQ0hjvUrumKKLgTuIp61rSHI0sorbj
+	 4CcCaEALdz9cITn1MKcyQrd11P9lTmMBcY5/S3akbq4lA1xDgCnmt9QaIRBzebfhI7
+	 Il9jviH7nbUVvNdsxYVtTb7pWcvza6D3okPfGw9nqAXZIWBX6WwTc93vVT3gmB63Nd
+	 ZyUKjzDXJ9fyQ==
+Date: Wed, 8 Nov 2023 08:33:07 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org,
+ Stanislav Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, Toke
+ =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
+Subject: Re: [ANN] netdev development stats for 6.7
+Message-ID: <20231108083307.364cfe91@kernel.org>
+In-Reply-To: <ff7104c9-6db9-449f-bcb4-6c857798698f@lunn.ch>
+References: <20231101162906.59631ffa@kernel.org>
+	<ZUt9n0gwZR0kaKdF@Laptop-X1>
+	<ff7104c9-6db9-449f-bcb4-6c857798698f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] WARNING in inet_csk_get_port (2)
-Content-Language: en-GB
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
-Cc: avagin@gmail.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-References: <0000000000004ba00e0605ce2fcf@google.com>
- <20230920185952.94518-1-kuniyu@amazon.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20230920185952.94518-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 2023-09-20 11:59, Kuniyuki Iwashima wrote:
-> From: syzbot <syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
-> Date: Wed, 20 Sep 2023 11:02:55 -0700
->> Hello,
->>
->> syzbot found the following issue on:
->>
->> HEAD commit:    2cf0f7156238 Merge tag 'nfs-for-6.6-2' of git://git.linux-..
->> git tree:       upstream
->> console+strace: https://syzkaller.appspot.com/x/log.txt?x=17405ab0680000
->> kernel config:  https://syzkaller.appspot.com/x/.config?x=d594086f139d167
->> dashboard link: https://syzkaller.appspot.com/bug?extid=71e724675ba3958edb31
->> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
->> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b2e118680000
->> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b55c4680000
->>
->> Downloadable assets:
->> disk image: https://storage.googleapis.com/syzbot-assets/456b02029fa8/disk-2cf0f715.raw.xz
->> vmlinux: https://storage.googleapis.com/syzbot-assets/9f9ff0c00454/vmlinux-2cf0f715.xz
->> kernel image: https://storage.googleapis.com/syzbot-assets/0ede19fba30f/bzImage-2cf0f715.xz
->>
->> The issue was bisected to:
->>
->> commit c48ef9c4aed3632566b57ba66cec6ec78624d4cb
->> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
->> Date:   Mon Sep 11 18:36:57 2023 +0000
->>
->>     tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
->>
-> 
-> We need this condition to put v4 sk and v4-mapped-v6 sk into
-> the same bucket.
-> 
-> ---8<---
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index dfb1c61c0c2b..6487357d1ddd 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -822,7 +823,8 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
->  			return ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
->  				tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
->  
-> -		return false;
-> +		return ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr) &&
-> +			sk->sk_v6_rcv_saddr.s6_addr32[3] == tb->rcv_saddr;
->  	}
->  
->  	if (sk->sk_family == AF_INET6)
-> ---8<---
-> 
-> Scenario is like
-> 
->   1) bind(v4) creates a tb2 bucket
->   2) bind(v4-mapped-v6) creates another tb2 bucket
->   3) listen(v4) finds the second tb2 and trigger warning
-> 
-> ---8<---
-> from socket import *
-> 
-> s = socket()
-> s.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-> s.bind(('255.255.255.255', 0))
-> 
-> s2 = socket(AF_INET6, SOCK_STREAM)
-> s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-> s2.bind(('::ffff:255.255.255.255', s.getsockname()[1]))
-> s.listen()
-> ---8<---
-> 
-> Will post a formal patch after doing more tests with SO_REUSEPORT.
-> 
-> Thanks!
+On Wed, 8 Nov 2023 14:19:31 +0100 Andrew Lunn wrote:
+> > I just noticed this stats report from Simon. Thanks for your work and
+> > sharing. I want to know if there is a way to bind my personal email
+> > with my company so my review could increase my company's score :)  
 
-Hi Kuniyuki, did you get around to fixing and posting this patch? I
-couldn't find anything on the mailing list.
+Thanks for asking, the company association is my least favorite part 
+of this work, and you gave me an excuse to rant about it :)
 
-Would you like help fixing this?
+> Jonathan Corbet <corbet@lwn.net> maintains a list of email addresses
+> to organisations mapping. Let him know who you work for and the next
+> cycle you should count to your company.
 
-> 
-> 
->> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15567dc4680000
->> final oops:     https://syzkaller.appspot.com/x/report.txt?x=17567dc4680000
->> console output: https://syzkaller.appspot.com/x/log.txt?x=13567dc4680000
->>
->> IMPORTANT: if you fix the issue, please add the following tag to the commit:
->> Reported-by: syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
->> Fixes: c48ef9c4aed3 ("tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.")
->>
->> ------------[ cut here ]------------
->> WARNING: CPU: 0 PID: 5049 at net/ipv4/inet_connection_sock.c:587 inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
->> Modules linked in:
->> CPU: 0 PID: 5049 Comm: syz-executor288 Not tainted 6.6.0-rc2-syzkaller-00018-g2cf0f7156238 #0
->> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
->> RIP: 0010:inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
->> Code: 7c 24 08 e8 4c b6 8a 01 31 d2 be 88 01 00 00 48 c7 c7 e0 94 ae 8b e8 59 2e a3 f8 2e 2e 2e 31 c0 e9 04 fe ff ff e8 ca 88 d0 f8 <0f> 0b e9 0f f9 ff ff e8 be 88 d0 f8 49 8d 7e 48 e8 65 ca 5a 00 31
->> RSP: 0018:ffffc90003abfbf0 EFLAGS: 00010293
->> RAX: 0000000000000000 RBX: ffff888026429100 RCX: 0000000000000000
->> RDX: ffff88807edcbb80 RSI: ffffffff88b73d66 RDI: ffff888026c49f38
->> RBP: ffff888026c49f30 R08: 0000000000000005 R09: 0000000000000000
->> R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff9260f200
->> R13: ffff888026c49880 R14: 0000000000000000 R15: ffff888026429100
->> FS:  00005555557d5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 000000000045ad50 CR3: 0000000025754000 CR4: 00000000003506f0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <TASK>
->>  inet_csk_listen_start+0x155/0x360 net/ipv4/inet_connection_sock.c:1256
->>  __inet_listen_sk+0x1b8/0x5c0 net/ipv4/af_inet.c:217
->>  inet_listen+0x93/0xd0 net/ipv4/af_inet.c:239
->>  __sys_listen+0x194/0x270 net/socket.c:1866
->>  __do_sys_listen net/socket.c:1875 [inline]
->>  __se_sys_listen net/socket.c:1873 [inline]
->>  __x64_sys_listen+0x53/0x80 net/socket.c:1873
->>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->>  do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f3a5bce3af9
->> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->> RSP: 002b:00007ffc1a1c79e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
->> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3a5bce3af9
->> RDX: 00007f3a5bce3af9 RSI: 0000000000000000 RDI: 0000000000000003
->> RBP: 00007f3a5bd565f0 R08: 0000000000000006 R09: 0000000000000006
->> R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
->> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->>  </TASK>
+Yes, unfortunately I do not have access to that list. The LWN list was
+compiled with some assurances of the list not being shared. Jon / Greg
+understandably did not want to send me the list and break that promise.
+
+So telling Jon won't help me.
+
+Now, CNCF has a similar setup: https://github.com/cncf/gitdm
+and they do share their database. So I use that, plus my local hacky
+mapping. Unfortunately the CNCF DB is not very up to date for kernel
+folks.
+
+Hangbin, according to CNCF you're at Red Hat, which seems sane, and
+that's how I count you :)
+
+Now the rant.
+
+Unfortunately I can't handle creating a company/developer DB myself,
+because of GDPR etc. I work for a company which takes personal
+information very, very seriously.
+
+I brought creating a public DB up at Linux Foundation TAB meetings,
+but after some poking there's no movement.
+
+To add insult to injury, if you watch past the end of the recent
+(excellent) talk from Jon - https://lwn.net/Articles/949647/ you will
+see Jim Zemlin pop up on the stage after Jon finishes, and you will
+hear him tout the great "analytics tools" that Linux Foundation
+has been working. I think he's talking about this:
+https://insights.lfx.linuxfoundation.org/projects/korg/dashboard
+
+It would be great if Linux Foundation helped the community with the
+developer/company DB, which is ACTUALLY USEFUL BEFORE WASTING TIME ON
+SOME WEB STUFF THAT DOESN'T WORK FOR THE KERNEL.
+
+This makes me so angry.
 
