@@ -1,197 +1,80 @@
-Return-Path: <netdev+bounces-46634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F1C57E57AB
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:04:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFA6C7E57E3
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39E1B1C20D46
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 13:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B98031C208EE
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 13:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98A018C24;
-	Wed,  8 Nov 2023 13:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E864419441;
+	Wed,  8 Nov 2023 13:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TlNJ9OUo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="B+LVhMV8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF98D19440
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 13:04:12 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5375D1FD7;
-	Wed,  8 Nov 2023 05:04:11 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8Cf27k012360;
-	Wed, 8 Nov 2023 13:04:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=5Nn8m0Am600Bnx9YKqymeN1ILa5QqX61g+i3Sxs3PbY=;
- b=TlNJ9OUorHAnP+uE2ZimFj1rpcPwCg4ZSLLMi4Yy0BjVUyG0/ATHOQYK8+wrZCTgEtRS
- szwKVaFBjbETJnQsyabuhnLjbTyX6h6N/tgETMBXVZGECL2tuKSI7KkTerwp7gYyhDzH
- 5OhPrDCLjJ1sJuA/LqmdF61GfQkkJ54hrDnH8hgnFRlQ4cMr64/joMws7pkCYfc1gnjx
- akgWmvzWaUlEmJP4pvmqY65UobAT1IFSa24dJJTwKzNBs43pqs1ZPHJwrsT2kJ1gxqaR
- 4naoU86uBRlLwNLTObmdnrXhfEgHJ37hKh0HAthR2BDyylDmWrBU1jFyUFYlcyy7r62a 9A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8abph46f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 13:04:07 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3A8CfpaT015654;
-	Wed, 8 Nov 2023 13:01:06 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3u8abph41e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 13:01:06 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3A8BeKYn003435;
-	Wed, 8 Nov 2023 13:01:02 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3u7w21vsq3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Nov 2023 13:01:02 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3A8D102Z41877762
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Nov 2023 13:01:01 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD54558043;
-	Wed,  8 Nov 2023 13:01:00 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DF6758053;
-	Wed,  8 Nov 2023 13:00:59 +0000 (GMT)
-Received: from [9.155.210.178] (unknown [9.155.210.178])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Nov 2023 13:00:59 +0000 (GMT)
-Message-ID: <05c29431-c941-45d1-8e14-0527accc3993@linux.ibm.com>
-Date: Wed, 8 Nov 2023 14:00:58 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B682CA8
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 13:19:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379EB1BE3;
+	Wed,  8 Nov 2023 05:19:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2bEwq9z9zdLgqr1oNBum/ilykSY2OlKgUE6VnESOsXo=; b=B+LVhMV85AOcG2XkksDQfsH6rI
+	A377+bP5A1Sa38CzA4eDua1bB4lO3qyZ1Rxm1/Sm9lwQcZ+kXsy4jcx+2/Zp6XowJUzW8111s+7sK
+	3bLTfmwakrIK2rKNWgrHPh9dLRa0Aa30fd+8ABXnQdFW2JCfC5KxK3oUHZVT7B0SVSYU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r0iSx-0017v4-Kv; Wed, 08 Nov 2023 14:19:31 +0100
+Date: Wed, 8 Nov 2023 14:19:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	netdev-driver-reviewers@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Subject: Re: [ANN] netdev development stats for 6.7
+Message-ID: <ff7104c9-6db9-449f-bcb4-6c857798698f@lunn.ch>
+References: <20231101162906.59631ffa@kernel.org>
+ <ZUt9n0gwZR0kaKdF@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net/smc: avoid data corruption caused by decline
-Content-Language: en-GB
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: IX57UdHS1tUn_gPYZ3-gU-vI3BQ-VaBu
-X-Proofpoint-GUID: A9BPy8xGtgNW8-vhtwnwMx9Cf7Xa7WtR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-08_01,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 mlxscore=0 mlxlogscore=999 spamscore=0 phishscore=0
- bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311080109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZUt9n0gwZR0kaKdF@Laptop-X1>
 
+On Wed, Nov 08, 2023 at 08:22:55PM +0800, Hangbin Liu wrote:
+> Hi Jakub,
+> On Wed, Nov 01, 2023 at 04:29:06PM -0700, Jakub Kicinski wrote:
+> > Top reviewers (thr):                 Top reviewers (msg):                
+> >    1 ( +2) [42] RedHat                  1 ( +2) [71] RedHat              
+> >    2 (   ) [27] Meta                    2 ( -1) [52] Meta                
+> >    3 ( +2) [23] Intel                   3 ( +2) [46] Intel               
+> >    4 ( +2) [15] Google                  4 ( +2) [33] Andrew Lunn         
+> >    5 ( -1) [12] nVidia                  5 ( +2) [29] Google              
+> >    6 ( +1) [12] Andrew Lunn             6 ( -2) [23] nVidia              
+> >    7 ( +3) [ 7] Enfabrica               7 ( +4) [14] Broadcom            
+> 
+> I just noticed this stats report from Simon. Thanks for your work and
+> sharing. I want to know if there is a way to bind my personal email
+> with my company so my review could increase my company's score :)
 
+Jonathan Corbet <corbet@lwn.net> maintains a list of email addresses
+to organisations mapping. Let him know who you work for and the next
+cycle you should count to your company.
 
-On 08.11.23 10:48, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> We found a data corruption issue during testing of SMC-R on Redis
-> applications.
-> 
-> The benchmark has a low probability of reporting a strange error as
-> shown below.
-> 
-> "Error: Protocol error, got "\xe2" as reply type byte"
-> 
-> Finally, we found that the retrieved error data was as follows:
-> 
-> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
-> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
-> 
-> It is quite obvious that this is a SMC DECLINE message, which means that
-> the applications received SMC protocol message.
-> We found that this was caused by the following situations:
-> 
-> client			server
-> 	   proposal
-> 	------------->
-> 	   accept
-> 	<-------------
-> 	   confirm
-> 	------------->
-> wait confirm
-> 
-> 	 failed llc confirm
-> 	    x------
-> (after 2s)timeout
-> 			wait rsp
-> 
-> wait decline
-> 
-> (after 1s) timeout
-> 			(after 2s) timeout
-> 	    decline
-> 	-------------->
-> 	    decline
-> 	<--------------
-> 
-> As a result, a decline message was sent in the implementation, and this
-> message was read from TCP by the already-fallback connection.
-> 
-> This patch double the client timeout as 2x of the server value,
-> With this simple change, the Decline messages should never cross or
-> collide (during Confirm link timeout).
-> 
-> This issue requires an immediate solution, since the protocol updates
-> involve a more long-term solution.
-> 
-> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> ---
->   net/smc/af_smc.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index abd2667..5b91f55 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
->   	int rc;
->   
->   	/* receive CONFIRM LINK request from server over RoCE fabric */
-> -	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
-> +	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
->   			      SMC_LLC_CONFIRM_LINK);
->   	if (!qentry) {
->   		struct smc_clc_msg_decline dclc;
-I'm wondering if the double time (if sufficient) of timeout could be for 
-waiting for CLC_DECLINE on the client's side. i.e.
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 35ddebae8894..9b1feef1013d 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -605,7 +605,7 @@ static int smcr_clnt_conf_first_link(struct smc_sock 
-*smc)
-                 struct smc_clc_msg_decline dclc;
-
-                 rc = smc_clc_wait_msg(smc, &dclc, sizeof(dclc),
--                                     SMC_CLC_DECLINE, CLC_WAIT_TIME_SHORT);
-+                                     SMC_CLC_DECLINE, 2 * 
-CLC_WAIT_TIME_SHORT);
-                 return rc == -EAGAIN ? SMC_CLC_DECL_TIMEOUT_CL : rc;
-         }
-         smc_llc_save_peer_uid(qentry);
-
-Because the purpose is to let the server have the control to deline.
-
+      Andrew
 
