@@ -1,124 +1,92 @@
-Return-Path: <netdev+bounces-46586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D38F7E52D5
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:48:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA9B7E52DB
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E7E72812CB
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 905AF1C20A81
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08600101D2;
-	Wed,  8 Nov 2023 09:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC51101F2;
+	Wed,  8 Nov 2023 09:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rmaJLzq9"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49C2101C7
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 09:48:40 +0000 (UTC)
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 328FB199;
-	Wed,  8 Nov 2023 01:48:38 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vvxn8v0_1699436910;
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Vvxn8v0_1699436910)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Nov 2023 17:48:36 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net v1] net/smc: avoid data corruption caused by decline
-Date: Wed,  8 Nov 2023 17:48:29 +0800
-Message-Id: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE94B101C2
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 09:50:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5618DC433C9;
+	Wed,  8 Nov 2023 09:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699437025;
+	bh=d2gSTy+vkT+31H7XELYbOwZiriPnni4XDCQCXWXVTrQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rmaJLzq9K6LWU0TbEY9k20In79eVvajZ22oEEq8TGY4P8tnVxWKySpBAm/W5C7x9t
+	 PzbMuqPOiFFZhKr9lDQAcdlCA28tlCo22V1JEjFn/OnhqlqfK9skepSUO5JsYOP8BT
+	 wI8xH74EUD39nUm/9TbEadQqP/Huf6JrYwDpkyT/L5K9DIHfUESpeP3ofn7ioJfQUF
+	 GSUVxHEukp005F8DHWfwcffv3CGdLhkn7i0HYTnllanWV6aWSDSClJBtulljiQQGku
+	 K3yxHk7MKRRfZVRYmtagBRs6PWlErPd//eBNuUQrqtahssNTbhImQcRs3Bk0f7vwN9
+	 SDX1GraA1AHkw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B6CEE00084;
+	Wed,  8 Nov 2023 09:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] drivers/net/ppp: use standard array-copy-function
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169943702523.25861.15308203568486315499.git-patchwork-notify@kernel.org>
+Date: Wed, 08 Nov 2023 09:50:25 +0000
+References: <20231106091559.14419-2-pstanner@redhat.com>
+In-Reply-To: <20231106091559.14419-2-pstanner@redhat.com>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, sdf@google.com, gregkh@linuxfoundation.org,
+ benjamin.tissoires@redhat.com, viro@zeniv.linux.org.uk,
+ linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, airlied@redhat.com
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
+Hello:
 
-We found a data corruption issue during testing of SMC-R on Redis
-applications.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-The benchmark has a low probability of reporting a strange error as
-shown below.
+On Mon,  6 Nov 2023 10:16:00 +0100 you wrote:
+> In ppp_generic.c, memdup_user() is utilized to copy a userspace array.
+> This is done without an overflow-check, which is, however, not critical
+> because the multiplicands are an unsigned short and struct sock_filter,
+> which is currently of size 8.
+> 
+> Regardless, string.h now provides memdup_array_user(), a wrapper for
+> copying userspace arrays in a standardized manner, which has the
+> advantage of making it more obvious to the reader that an array is being
+> copied.
+> The wrapper additionally performs an obligatory overflow check, saving
+> the reader the effort of analyzing the potential for overflow, and
+> making the code a bit more robust in case of future changes to the
+> multiplicands len * size.
+> 
+> [...]
 
-"Error: Protocol error, got "\xe2" as reply type byte"
+Here is the summary with links:
+  - [v2] drivers/net/ppp: use standard array-copy-function
+    https://git.kernel.org/netdev/net/c/caf3100810f4
 
-Finally, we found that the retrieved error data was as follows:
-
-0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
-0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
-
-It is quite obvious that this is a SMC DECLINE message, which means that
-the applications received SMC protocol message.
-We found that this was caused by the following situations:
-
-client			server
-	   proposal
-	------------->
-	   accept
-	<-------------
-	   confirm
-	------------->
-wait confirm
-
-	 failed llc confirm
-	    x------
-(after 2s)timeout
-			wait rsp
-
-wait decline
-
-(after 1s) timeout
-			(after 2s) timeout
-	    decline
-	-------------->
-	    decline
-	<--------------
-
-As a result, a decline message was sent in the implementation, and this
-message was read from TCP by the already-fallback connection.
-
-This patch double the client timeout as 2x of the server value,
-With this simple change, the Decline messages should never cross or
-collide (during Confirm link timeout).
-
-This issue requires an immediate solution, since the protocol updates
-involve a more long-term solution.
-
-Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
- net/smc/af_smc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index abd2667..5b91f55 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
- 	int rc;
- 
- 	/* receive CONFIRM LINK request from server over RoCE fabric */
--	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
-+	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
- 			      SMC_LLC_CONFIRM_LINK);
- 	if (!qentry) {
- 		struct smc_clc_msg_decline dclc;
+You are awesome, thank you!
 -- 
-1.8.3.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
