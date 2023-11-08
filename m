@@ -1,189 +1,177 @@
-Return-Path: <netdev+bounces-46600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD98D7E5519
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 12:21:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB15D7E5565
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 12:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFB191C20DF1
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 11:21:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB9DD1C2098A
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 11:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E94215EBD;
-	Wed,  8 Nov 2023 11:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H+LDNwoM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5599215E9A;
+	Wed,  8 Nov 2023 11:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C451715EB0
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 11:21:50 +0000 (UTC)
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1364B1BF0
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 03:21:50 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-66fa16092c0so46147806d6.0
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 03:21:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699442509; x=1700047309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+WbK1qQZMhL0UyUEskip3O7w49fLhRM2vZKP3ZSvFYk=;
-        b=H+LDNwoMcxULQSifPL1N9H+HbdxJKCnvtZ9KvOaHOuU4WMisVx0wWTiYuih//dVrI4
-         KXHHgQ2KNlZv2eEdVkTeDEF3Ykdq+QJsz/Exnn9QNPL0yiwRKQftxxqYBgv8XDwUZl+l
-         eXCIYbH9hNP31ayNOl08cPlusiDzgMLuX7NUVgI52IJ7O+bv8g3PpkFP4rpZll9PvBO3
-         2pILoXmhu7DzX2WQOEiMZ+0yFhahFgDtNyRMbAWXltRM72m0oLuYVrzvSyHj5mWDJ4PR
-         B6n7BFFCg1gE779lW9BGNztKZavSGn6vP4auZsQs10iJd54vlcxlTG5SjE1Qv4APwdmc
-         OBag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699442509; x=1700047309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+WbK1qQZMhL0UyUEskip3O7w49fLhRM2vZKP3ZSvFYk=;
-        b=it3jcU2P3Dl/Io+QhdmrvP8YMQzztL9enkvJN7Gwj0MvThsI94HCCN2tZ439yfVoOH
-         gtJatJY5uvw+YoGosirnlkmrPq18sSQ9GaqcZksoTc7Lu4yWmySFbeL7m1IWgPsi/Wjh
-         Jeg9/uEFT+lOJ1Qp/sgeBXqNsJHhegQZAsR0hxxy2SWeVFDlOT1mKIaNFJU7uEeFKYL3
-         jh4JOLfHKZqvKGZ38t/2LRrUJOBgiL7QDQkwXtKjcAnuqnF6mZ8FqZOSgtYOkFFhFYON
-         9N3HVFIl2V86ajqEZzLl2U7BwpoG2RV2lfS/18qu56bOj+44NlKr3EBKHuOeJVJrAQfF
-         Dp9w==
-X-Gm-Message-State: AOJu0YzsuYIgqrUsOfjfmWn4ab7H+1Vrq20DBZRKzr6ibdCSdpEXdytr
-	hK9gJOovfrVurZFey3GFDGo+BlgBBESWrAKp9pblnw==
-X-Google-Smtp-Source: AGHT+IHkM7Zz9YGVd5cg0w5zMDhUonnSmd8ty3Bmuen4IPcSzWl3Y7Bi/ii33xTS0GXdtkoqowbiW20l1cdep/WcKvs=
-X-Received: by 2002:ad4:5967:0:b0:66d:949d:717e with SMTP id
- eq7-20020ad45967000000b0066d949d717emr1544322qvb.42.1699442509189; Wed, 08
- Nov 2023 03:21:49 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFB8538A
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 11:25:15 +0000 (UTC)
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 214781BE9;
+	Wed,  8 Nov 2023 03:25:13 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0Vvy6hR._1699442703;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Vvy6hR._1699442703)
+          by smtp.aliyun-inc.com;
+          Wed, 08 Nov 2023 19:25:09 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [RFC PATCH net-next] net/smc: Introduce IPPROTO_SMC for smc
+Date: Wed,  8 Nov 2023 19:25:03 +0800
+Message-Id: <1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103112237.1756288-1-anders.roxell@linaro.org> <CAEf4BzahAuskkD9YqxQpZDaUcu_jTuNAfbkkwP4dzJH=cTaVKA@mail.gmail.com>
-In-Reply-To: <CAEf4BzahAuskkD9YqxQpZDaUcu_jTuNAfbkkwP4dzJH=cTaVKA@mail.gmail.com>
-From: Anders Roxell <anders.roxell@linaro.org>
-Date: Wed, 8 Nov 2023 12:21:38 +0100
-Message-ID: <CADYN=9+koLV3eg85hVBkRtiAuygyngWxWChpnh=iUPVH4JeTjg@mail.gmail.com>
-Subject: Re: [PATCH] selftests: bpf: xskxceiver: ksft_print_msg: fix format
- type error
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 3 Nov 2023 at 17:26, Andrii Nakryiko <andrii.nakryiko@gmail.com> wr=
-ote:
->
-> On Fri, Nov 3, 2023 at 4:23=E2=80=AFAM Anders Roxell <anders.roxell@linar=
-o.org> wrote:
-> >
-> > Crossbuilding selftests/bpf for architecture arm64, format specifies
-> > type error show up like.
-> >
-> > xskxceiver.c:912:34: error: format specifies type 'int' but the argumen=
-t
-> > has type '__u64' (aka 'unsigned long long') [-Werror,-Wformat]
-> >  ksft_print_msg("[%s] expected meta_count [%d], got meta_count [%d]\n",
-> >                                                                 ~~
-> >                                                                 %llu
-> >                 __func__, pkt->pkt_nb, meta->count);
-> >                                        ^~~~~~~~~~~
-> > xskxceiver.c:929:55: error: format specifies type 'unsigned long long' =
-but
-> >  the argument has type 'u64' (aka 'unsigned long') [-Werror,-Wformat]
-> >  ksft_print_msg("Frag invalid addr: %llx len: %u\n", addr, len);
-> >                                     ~~~~             ^~~~
-> >
->
-> With u64s it might be %llx or %lx, depending on architecture, so best
-> is to force cast to (long long) or (unsigned long long) and then use
-> %llx.
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Thank you Andrii,
-v2 posted https://lore.kernel.org/bpf/20231108110048.1988128-1-anders.roxel=
-l@linaro.org/T/#u
+This patch attempts to initiate a discussion on creating smc socket
+via AF_INET, similar to the following code snippet:
 
-Cheers,
-Anders
+/* create v4 smc sock */
+v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
 
->
-> > Fixing the issues by using the proposed format specifiers by the
-> > compilor.
-> >
-> > Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
-> > ---
-> >  tools/testing/selftests/bpf/xskxceiver.c | 10 +++++-----
-> >  1 file changed, 5 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/s=
-elftests/bpf/xskxceiver.c
-> > index 591ca9637b23..dc03692f34d8 100644
-> > --- a/tools/testing/selftests/bpf/xskxceiver.c
-> > +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> > @@ -908,7 +908,7 @@ static bool is_metadata_correct(struct pkt *pkt, vo=
-id *buffer, u64 addr)
-> >         struct xdp_info *meta =3D data - sizeof(struct xdp_info);
-> >
-> >         if (meta->count !=3D pkt->pkt_nb) {
-> > -               ksft_print_msg("[%s] expected meta_count [%d], got meta=
-_count [%d]\n",
-> > +               ksft_print_msg("[%s] expected meta_count [%d], got meta=
-_count [%llu]\n",
-> >                                __func__, pkt->pkt_nb, meta->count);
-> >                 return false;
-> >         }
-> > @@ -926,11 +926,11 @@ static bool is_frag_valid(struct xsk_umem_info *u=
-mem, u64 addr, u32 len, u32 exp
-> >
-> >         if (addr >=3D umem->num_frames * umem->frame_size ||
-> >             addr + len > umem->num_frames * umem->frame_size) {
-> > -               ksft_print_msg("Frag invalid addr: %llx len: %u\n", add=
-r, len);
-> > +               ksft_print_msg("Frag invalid addr: %lx len: %u\n", addr=
-, len);
-> >                 return false;
-> >         }
-> >         if (!umem->unaligned_mode && addr % umem->frame_size + len > um=
-em->frame_size) {
-> > -               ksft_print_msg("Frag crosses frame boundary addr: %llx =
-len: %u\n", addr, len);
-> > +               ksft_print_msg("Frag crosses frame boundary addr: %lx l=
-en: %u\n", addr, len);
-> >                 return false;
-> >         }
-> >
-> > @@ -1029,7 +1029,7 @@ static int complete_pkts(struct xsk_socket_info *=
-xsk, int batch_size)
-> >                         u64 addr =3D *xsk_ring_cons__comp_addr(&xsk->um=
-em->cq, idx + rcvd - 1);
-> >
-> >                         ksft_print_msg("[%s] Too many packets completed=
-\n", __func__);
-> > -                       ksft_print_msg("Last completion address: %llx\n=
-", addr);
-> > +                       ksft_print_msg("Last completion address: %lx\n"=
-, addr);
-> >                         return TEST_FAILURE;
-> >                 }
-> >
-> > @@ -1513,7 +1513,7 @@ static int validate_tx_invalid_descs(struct ifobj=
-ect *ifobject)
-> >         }
-> >
-> >         if (stats.tx_invalid_descs !=3D ifobject->xsk->pkt_stream->nb_p=
-kts / 2) {
-> > -               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%=
-u] expected [%u]\n",
-> > +               ksft_print_msg("[%s] tx_invalid_descs incorrect. Got [%=
-llu] expected [%u]\n",
-> >                                __func__, stats.tx_invalid_descs,
-> >                                ifobject->xsk->pkt_stream->nb_pkts);
-> >                 return TEST_FAILURE;
-> > --
-> > 2.42.0
-> >
-> >
+/* create v6 smc sock */
+v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+
+As we all know, the way we currently create an SMC socket as
+follows.
+
+/* create v4 smc sock */
+v4 = socket(AF_SMC, SOCK_STREAM, SMCPROTO_SMC);
+
+/* create v6 smc sock */
+v6 = socket(AF_SMC, SOCK_STREAM, SMCPROTO_SMC6);
+
+Note: This is not to suggest removing the SMC path, but rather to propose
+adding a new path (inet path).
+
+There are several reasons why we believe it is much better than AF_SMC:
+
+Semantics:
+
+SMC extends the TCP protocol and switches it's data path to RDMA path if
+RDMA link is ready. Otherwise, SMC should always try its best to degrade to
+TCP. From this perspective, SMC is a protocol derived from TCP and can also
+fallback to TCP, It should be considered as part of the same protocol
+family as TCP (AF_INET and AF_INET6).
+
+Compatibility & Scalability:
+
+Due to the presence of fallback, we needs to handle it very carefully to
+keep the consistent with the TCP sockets. SMC has done a lot of work to
+ensure that, but still, there are quite a few issues left, such as:
+
+1. The "ss" command cannot display the process name and ID associated with
+the fallback socket.
+
+2. The linger option is ineffective when user try’s to close the fallback
+socket.
+
+3. Some eBPF attach points related to INET_SOCK are ineffective under
+fallback socket, such as BPF_CGROUP_INET_SOCK_RELEASE.
+
+4. SO_PEEK_OFF is a un-supported sock option for fallback sockets, while
+it’s of course supported for tcp sockets.
+
+Of course, we can fix each issue one by one, but it is not a fundamental
+solution. Any changes on the inet path may require re-synchronization,
+including bug fixes, security fixes, tracing, new features and more. For
+example, there is a commit which we think is very valueable:
+
+commit 0dd061a6a115 ("bpf: Add update_socket_protocol hook")
+
+This commit allows users to modify dynamically the protocol before socket
+created through eBPF programs, which provides a more flexible approach
+than smc_run (LP_PRELOAD). It does not require the process restart
+and allows for controlling replacement at the connection level, whereas
+smc_run operates at the process level.
+
+However, to benefit from it under the SMC path requires additional
+code submission while nothing changes requires to do under inet path.
+
+I'm not saying that these issues cannot be fixed under smc path, however,
+the solution for these issues often involves duplicating work that already
+done on inet path. Thats to say, if we can be under the inet path, we can
+easily reuse the existing infrastructure.
+
+Performance:
+
+In order to ensure consistency between fallback sockets and TCP sockets,
+SMC creates an additional TCP socket. This introduces additional overhead
+of approximately 15%-20% for the establishment and destruction of fallback
+sockets. In fact, for the users we have contacted who have shown interest
+in SMC, ensuring consistency in performance between fallback and TCP has
+always been their top priority. Since no one can guarantee the
+availability of RDMA links, support for SMC on both sides, or if the
+user's environment is 100% suitable for SMC. Fallback is the only way to
+address those issues, but the additional performance overhead is
+unacceptable, as fallback cannot provide the benefits of RDMA and only
+brings burden right now.
+
+In inet path, we can embed TCP sock into SMC sock, when fallback occurs,
+the socket behaves exactly like a TCP socket. In our POC, the performance
+of fallback socket under inet path is almost indistinguishable from of
+tcp socket, with less than 1% loss. Additionally, and more importantly,
+it has full feature compatibility with TCP socket.
+
+Of course, it is also possible under smc path, but in that way, it
+would require a significant amount of work to ensure compatibility with
+tcp sockets, which most of them has already been done in inet path.
+And still, any changes in inet path may require re-synchronization.
+
+I also noticed that there have been some discussions on this issue before.
+
+Link: https://lore.kernel.org/stable/4a873ea1-ba83-1506-9172-e955d5f9ae16@redhat.com/
+
+And I saw some supportive opinions here, maybe it is time to continue
+discussing this matter now.
+
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+---
+ include/uapi/linux/in.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index e682ab6..0c6322b 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -83,6 +83,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
++  IPPROTO_SMC = 263,		/* Shared Memory Communications		*/
++#define IPPROTO_SMC		IPPROTO_SMC
+   IPPROTO_MAX
+ };
+ #endif
+-- 
+1.8.3.1
+
 
