@@ -1,157 +1,161 @@
-Return-Path: <netdev+bounces-46664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03E1C7E5A52
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:44:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6A97E5A69
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D8A281445
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:44:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C48BB20D46
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E29230352;
-	Wed,  8 Nov 2023 15:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F93230357;
+	Wed,  8 Nov 2023 15:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jREken/x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jDCcHs7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06935199A5
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:44:29 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 889A61FDC
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:44:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699458268;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9pfTamduDuXvj1ycdmEqtqmHUJQLMXtDuZ7PUu6n6YA=;
-	b=jREken/xfshM5fckfCQh7onDDbyjPRPAdvl1S909c91VnU4tZ5Y66O8+1LuN5p51ipLVzO
-	Ubm4Jga0iIBfZko18dX5cLrfMWp0d7/SEwTOy+rpqZJJ/Z/negrBpXpDNA+rQnpxmYPKaw
-	Ft/y1pSFE9gd4MZSEaKN/Vkhcfw9YkY=
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
- [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-503-iNDdq9Q2OSOFp1lk1Nmg8Q-1; Wed, 08 Nov 2023 10:44:27 -0500
-X-MC-Unique: iNDdq9Q2OSOFp1lk1Nmg8Q-1
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6b1f7baa5ceso4960316b3a.2
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 07:44:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699458266; x=1700063066;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9pfTamduDuXvj1ycdmEqtqmHUJQLMXtDuZ7PUu6n6YA=;
-        b=eNhK3NK58rQeR707PUxx4PeFZ80Xq4CD6Ay848m5Ms5fVjJwgvko0+Z05RCK6DQvaT
-         uDeihLHcmikWRM+TFMiZJzMGLGO17IRreCeqnnztyL/X+E2JW6K4rI9rU3LFXvmR5lyB
-         ao/sD7pjiZRWyFvfT5g+XVwoWv6qXwjDT+vuOJCFxcJaXjk+3IFKT9KuMuZs8Rtr9qNF
-         clIWX5OJyb0s1aPjdxm73+x3u3lAS9vy0YnPBYAP4BhiL5P5Ab+gGZ3Gk8vKucGV0wbD
-         XuKBz3/Q90VUq2Hzf8tPTT/U5VKC9t9moF3+BMq2WjuRe6M9/a9B4DHfuHC039aQZedt
-         4VSA==
-X-Gm-Message-State: AOJu0YwWESGBKJME3CzF6lrK4nD7ZSV3JuCkdl9gNUs86yoVjlJFREgv
-	JHbMUsOr+DGNzfNC7gUIKC53GZOUmpLEuDTRmNEO52zFzjmHwYYIb3cuPqGHjKkR8Pu3ZCQtdZC
-	lFAXIEEJOiJZJznWE
-X-Received: by 2002:a05:6a20:7349:b0:181:7aa7:de46 with SMTP id v9-20020a056a20734900b001817aa7de46mr1945362pzc.8.1699458265953;
-        Wed, 08 Nov 2023 07:44:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEyrfKU4MqxbyH9BApHxfTp6hLteN1T9QI82b/UtxOmPvpYED3KgY/5w5B3MEUMr1rMniNAeg==
-X-Received: by 2002:a05:6a20:7349:b0:181:7aa7:de46 with SMTP id v9-20020a056a20734900b001817aa7de46mr1945350pzc.8.1699458265661;
-        Wed, 08 Nov 2023 07:44:25 -0800 (PST)
-Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
-        by smtp.gmail.com with ESMTPSA id ei4-20020a056a0080c400b006c31b4d5e57sm9161068pfb.184.2023.11.08.07.44.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 07:44:25 -0800 (PST)
-From: Shigeru Yoshida <syoshida@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shigeru Yoshida <syoshida@redhat.com>
-Subject: [PATCH net] tty: Fix uninit-value access in ppp_sync_receive()
-Date: Thu,  9 Nov 2023 00:44:20 +0900
-Message-ID: <20231108154420.1474853-1-syoshida@redhat.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E95C30352;
+	Wed,  8 Nov 2023 15:46:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 015E7C433CA;
+	Wed,  8 Nov 2023 15:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699458391;
+	bh=rZ9HX1+atEHu++YlPY3PMKy6I5q8b1mlWO6r/QezZaA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=jDCcHs7aTuKTdXtMnwKR1FSV5LQgdeNTnKhBiCVOws9M5UHHw/qxldHFn9PfjkyZy
+	 MlNvWXhckG6BZ+Zhn5ZtE7xOIkZY/6E1lbbxTeomfP5ee2K0V2ttAjuB41c/rkxtYi
+	 z90Y4lPN0H/bckmkVv9axrxwvkb17742Hcl0eXmvW940ea4mh6u/SVyj+pMfF8PrAn
+	 iDsxFN8S9furNaT+ZH7Tw5Sj3850NOeks67CPwQW2CPSuvTr6PamPqEgkGorRJVEm7
+	 /fOGJLAseiLyE510zD5fgSXMkYpOKpY/N/+Uf8QHR+oyDElQLPYkZyBXYm7XyRPL2/
+	 bbRqf9iPsBBvA==
+Date: Wed, 8 Nov 2023 15:46:26 +0000
+From: Lee Jones <lee@kernel.org>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: x86@kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [REPORT] BPF: Reproducible triggering of BUG() from userspace PoC
+Message-ID: <20231108154626.GB8909@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
-KMSAN reported the following uninit-value access issue:
+Good afternoon,
 
-=====================================================
-BUG: KMSAN: uninit-value in ppp_sync_input drivers/net/ppp/ppp_synctty.c:690 [inline]
-BUG: KMSAN: uninit-value in ppp_sync_receive+0xdc9/0xe70 drivers/net/ppp/ppp_synctty.c:334
- ppp_sync_input drivers/net/ppp/ppp_synctty.c:690 [inline]
- ppp_sync_receive+0xdc9/0xe70 drivers/net/ppp/ppp_synctty.c:334
- tiocsti+0x328/0x450 drivers/tty/tty_io.c:2295
- tty_ioctl+0x808/0x1920 drivers/tty/tty_io.c:2694
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl+0x211/0x400 fs/ioctl.c:857
- __x64_sys_ioctl+0x97/0xe0 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+After coming across a recent Syzkaller report [0] I thought I'd take
+some time to firstly reproduce the issue, then see if there was a
+trivial way to mitigate it.  The report suggests that a BUG() in
+prog_array_map_poke_run() [1] can be trivially and reliably triggered
+from userspace using the PoC provided [2].
 
-Uninit was created at:
- __alloc_pages+0x75d/0xe80 mm/page_alloc.c:4591
- __alloc_pages_node include/linux/gfp.h:238 [inline]
- alloc_pages_node include/linux/gfp.h:261 [inline]
- __page_frag_cache_refill+0x9a/0x2c0 mm/page_alloc.c:4691
- page_frag_alloc_align+0x91/0x5d0 mm/page_alloc.c:4722
- page_frag_alloc include/linux/gfp.h:322 [inline]
- __netdev_alloc_skb+0x215/0x6d0 net/core/skbuff.c:728
- netdev_alloc_skb include/linux/skbuff.h:3225 [inline]
- dev_alloc_skb include/linux/skbuff.h:3238 [inline]
- ppp_sync_input drivers/net/ppp/ppp_synctty.c:669 [inline]
- ppp_sync_receive+0x237/0xe70 drivers/net/ppp/ppp_synctty.c:334
- tiocsti+0x328/0x450 drivers/tty/tty_io.c:2295
- tty_ioctl+0x808/0x1920 drivers/tty/tty_io.c:2694
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:871 [inline]
- __se_sys_ioctl+0x211/0x400 fs/ioctl.c:857
- __x64_sys_ioctl+0x97/0xe0 fs/ioctl.c:857
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+        ret = bpf_arch_text_poke(poke->tailcall_bypass,
+                                 BPF_MOD_JUMP,
+                                 old_bypass_addr,
+                                 poke->bypass_addr);
+        BUG_ON(ret < 0 && ret != -EINVAL);
 
-CPU: 0 PID: 12950 Comm: syz-executor.1 Not tainted 6.6.0-14500-g1c41041124bd #10
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-=====================================================
+Indeed the PoC does seem to be able to consistently trigger the BUG(),
+not only on the reported kernel (v6.1), but also on linux-next.  I went
+to the trouble of checking LORE, but failed to find any patches which
+may be attempting to fix this.
 
-ppp_sync_input() checks the first 2 bytes of the data are PPP_ALLSTATIONS
-and PPP_UI. However, if the data length is 1 and the first byte is
-PPP_ALLSTATIONS, an access to an uninitialized value occurs when checking
-PPP_UI. This patch resolves this issue by checking the data length.
+    kernel BUG at kernel/bpf/arraymap.c:1094!
+    invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+    CPU: 5 PID: 45 Comm: kworker/5:0 Not tainted 6.6.0-rc3-next-20230929-dirty #74
+    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+    Workqueue: events prog_array_map_clear_deferred
+    RIP: 0010:prog_array_map_poke_run+0x6b4/0x6d0
+    Code: ff 0f 0b e8 1e 27 e1 ff 48 c7 c7 60 80 93 85 48 c7 c6 00 7f 93 85 48 c7 c2 bb c2 39 86 b9 45 04 00 00 45 89 f8 e8 9c 890
+    RSP: 0018:ffffc9000036fb50 EFLAGS: 00010246
+    RAX: 0000000000000044 RBX: ffff88811f337490 RCX: 63af48a1314f9900
+    RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+    RBP: ffffc9000036fbe8 R08: ffffffff815c23c5 R09: 1ffff11084c14eba
+    R10: dfffe91084c14ebc R11: ffffed1084c14ebb R12: ffff888116517800
+    R13: dffffc0000000000 R14: ffff888125a1a400 R15: 00000000fffffff0
+    FS:  0000000000000000(0000) GS:ffff888426080000(0000) knlGS:0000000000000000
+    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    CR2: 00000000004ab678 CR3: 0000000122ac4000 CR4: 0000000000350eb0
+    DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    Call Trace:
+     <TASK>
+     ? __die_body+0x92/0xf0
+     ? die+0xa2/0xe0
+     ? do_trap+0x12f/0x370
+     ? handle_invalid_op+0xa6/0x140
+     ? handle_invalid_op+0xdf/0x140
+     ? prog_array_map_poke_run+0x6b4/0x6d0
+     ? prog_array_map_poke_run+0x6b4/0x6d0
+     ? exc_invalid_op+0x32/0x50
+     ? asm_exc_invalid_op+0x1b/0x20
+     ? __wake_up_klogd+0xd5/0x110
+     ? prog_array_map_poke_run+0x6b4/0x6d0
+     ? bpf_prog_6781ebc2dae4bad9+0xb/0x53
+     fd_array_map_delete_elem+0x152/0x250
+     prog_array_map_clear_deferred+0xf6/0x210
+     ? __bpf_array_map_seq_show+0xa40/0xa40
+     ? kick_pool+0x164/0x350
+     ? process_one_work+0x57a/0xd00
+     process_one_work+0x5e4/0xd00
+     worker_thread+0x9cf/0xea0
+     kthread+0x2b4/0x350
+     ? pr_cont_work+0x580/0x580
+     ? kthread_blkcg+0xd0/0xd0
+     ret_from_fork+0x4a/0x80
+     ? kthread_blkcg+0xd0/0xd0
+     ret_from_fork_asm+0x11/0x20
+     </TASK>
+    Modules linked in:
+    ---[ end trace 0000000000000000 ]---
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
----
- drivers/net/ppp/ppp_synctty.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+However, with my very limited BPF subsystem knowledge I was unable to
+trivially fix the issue.  Hopefully some knowledgable person would be
+kind enough to provide me with some pointers.
 
-diff --git a/drivers/net/ppp/ppp_synctty.c b/drivers/net/ppp/ppp_synctty.c
-index ebcdffdf4f0e..ea261a628786 100644
---- a/drivers/net/ppp/ppp_synctty.c
-+++ b/drivers/net/ppp/ppp_synctty.c
-@@ -687,7 +687,7 @@ ppp_sync_input(struct syncppp *ap, const u8 *buf, const u8 *flags, int count)
- 
- 	/* strip address/control field if present */
- 	p = skb->data;
--	if (p[0] == PPP_ALLSTATIONS && p[1] == PPP_UI) {
-+	if (skb->len >= 2 && p[0] == PPP_ALLSTATIONS && p[1] == PPP_UI) {
- 		/* chop off address/control */
- 		if (skb->len < 3)
- 			goto err;
+bpf_arch_text_poke() seems to be returning -EBUSY due to a negative
+memcmp() result from [3].
+
+        ret = -EBUSY;
+        mutex_lock(&text_mutex);
+        if (memcmp(ip, old_insn, X86_PATCH_SIZE)) {
+                goto out;
+        [...]
+
+When spitting out the memory at those locations, this is the result:
+
+    ip:        e9 06 00 00 00
+    old_insn:  0f 1f 44 00 00
+    nop_insn:  0f 1f 44 00 00
+
+As you can see, the information stored in 'ip' does not match that of
+the data stored in 'old_insn', causing bpf_arch_text_poke() to return
+early with the error -EBUSY, suggesting that the data pointed to by
+'old_insn', and by extension 'prog' should have been changed when
+emit_call()ing, to the value of 'ip', but wasn't.
+
+It's possible for me to see what is happening, but I'm afraid finding
+possible causes of corruption became too time consuming on this
+occasion.  Would anyone be able to chime in to provide their take on
+possible causes please?
+
+Any help would be gratefully received.
+
+[0] https://syzkaller.appspot.com/bug?extid=97a4fe20470e9bc30810
+[1] https://elixir.bootlin.com/linux/latest/source/kernel/bpf/arraymap.c#L1092
+[2] https://syzkaller.appspot.com/text?tag=ReproC&x=1397180f680000
+[3] https://elixir.bootlin.com/linux/latest/source/arch/x86/net/bpf_jit_comp.c#L387
+
 -- 
-2.41.0
-
+Lee Jones [李琼斯]
 
