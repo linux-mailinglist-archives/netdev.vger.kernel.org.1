@@ -1,125 +1,171 @@
-Return-Path: <netdev+bounces-46642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11937E587F
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:18:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B838A7E5887
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:19:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E922814B0
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:18:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 575CA1F21B5F
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63DE199D6;
-	Wed,  8 Nov 2023 14:18:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A372D199DE;
+	Wed,  8 Nov 2023 14:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ce8QxVd4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uxs05mpG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7611640F;
-	Wed,  8 Nov 2023 14:18:33 +0000 (UTC)
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCD71716;
-	Wed,  8 Nov 2023 06:18:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=oPbIgwC0BijVgGIquFkJt/4vZ7saVONMlD6xtHIWlpI=; b=Ce8QxVd4WKG0h9ztVM/Vn/nozc
-	8DRtZ9C1JiuIIVlzxZxS+Ui3PxxM3jqb/akrMqXYO3WvQUBJmaQyrGweyeK/v/2+8fZJtis97EdQ/
-	Z2OUj+WkOgKAiPwjdTmxLpAN/0e+qc+yEGVcCGOKaE6IPc3x5sP1qOZYrVD/iYkmeJ7ckobeBHTNA
-	IarXDpeU/s6fQAOkNZdunXkH+NJj5F0m3DXdHv+wbdxzqwV/TXUawSYG3lJPeRoYipVWG2Yq80nQd
-	BOosblKbS23sgiPA/jNunjiRIP4lrtzpk4Tekhmsx6ugm9zT+y/qPe6q2ru9aKlrV+bDPpPIT9NHA
-	JfjaNGoA==;
-Received: from [2001:8a0:6c72:c100:c7fb:dbc0:2c8e:ab9a]
-	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1r0jNp-001S65-JA; Wed, 08 Nov 2023 14:18:18 +0000
-Message-ID: <1b3ccc4a-41f7-46ad-9c5c-5ef44a96426e@infradead.org>
-Date: Wed, 8 Nov 2023 14:18:09 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA93199D3
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:19:19 +0000 (UTC)
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B2F0171B
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:19:18 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54366bb1c02so11770a12.1
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 06:19:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699453157; x=1700057957; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+sYNnjAcMQ8gCIe4cIzjWRlbHFIhha8H1RklK74YtPo=;
+        b=uxs05mpGSIdXlmdYd/s2YDwWA2313+WgW+YVF2x3jFcLiSbh6GAP9v1L0bfCsy+J5S
+         0GTLJuL+sbU/+PWUGe6F25lUGhJ9zKWGFAP184hcBPXnWMR78l4VJB/hKmshxA4udv8S
+         WRheh9wDpF13m9bYXsK28HddB1yAJdZwlaewrpic3g46K9wC+pKQkpKsqgxlBF9ddozT
+         AYFuDPJqr0TC18MD1Kh+EKXGvanviQ5wozSt1x0HfxptbOf4hi+AGYKwX+r4lbveeCT0
+         JnNboUpp9cU6sBhd+m9/6NS0xmoNmwwYGG1o2UfNXvi5RNFbO20OakOc+35ODgYuJ63a
+         Z5qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699453157; x=1700057957;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+sYNnjAcMQ8gCIe4cIzjWRlbHFIhha8H1RklK74YtPo=;
+        b=lrdCkAAkjVQgbrLWGTVTxcE+oPQlvCSoUDEsWcJyOTFyF+rR3yVOHj9MJLhC2Rp+32
+         Bk2tAvBpwXaujH08jajogF3yHJ1FbfMrKH62SXTafksa7xdtf+GDMXvFdyYR8ssVxIUk
+         XUyBTsP8qd94munqwKEBkb6lnUntzopG/9ZX4D10wt+ySLhdqm5YprmYHUYtxiCa6nG2
+         lBvwZf4H+8VVcGGpXuoFWWshgjePPZkrjFDKfJ4hl2H0HtF5Rz2mqjztQUjBYbelcrbZ
+         rWtjF5+QnFuqmVr/kThpojjMGgR991B6nEGZrGxFI5fOO6KLzFpEspzvWTqKnZAAsKGI
+         UOLA==
+X-Gm-Message-State: AOJu0YwJihq+/6lcJCUb26MkjYj597cxnhn6lou/AIu8qfyQ2aEhpS+L
+	FXe3I17s3OTv4YPl/1MZg3jbDRU8KU/JncB0Wif14A==
+X-Google-Smtp-Source: AGHT+IHj4bJ+yiU4h9OblJOTjRI0jqw1FY6a7GwD4yc2B+lCC4iQ346itd6XVNguMuvx1MB2vtj6nSqzVvv5/MzQg4s=
+X-Received: by 2002:a05:6402:528e:b0:544:e37e:d597 with SMTP id
+ en14-20020a056402528e00b00544e37ed597mr284537edb.7.1699453156652; Wed, 08 Nov
+ 2023 06:19:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/22] powerpc: ps3: move udbg_shutdown_ps3gelic prototype
-To: Arnd Bergmann <arnd@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
- Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>,
- Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Guo Ren <guoren@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Ard Biesheuvel <ardb@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
- Greg Ungerer <gerg@linux-m68k.org>, Michal Simek <monstr@monstr.eu>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Palmer Dabbelt <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>,
- John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
- "David S. Miller" <davem@davemloft.net>, Andy Lutomirski <luto@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- x86@kernel.org, Helge Deller <deller@gmx.de>,
- Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Timur Tabi <timur@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>,
- David Woodhouse <dwmw2@infradead.org>,
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
- Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
- Kees Cook <keescook@chromium.org>,
- Vincenzo Frascino <vincenzo.frascino@arm.com>,
- Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>,
- Nicolas Schier <nicolas@fjasle.eu>, Al Viro <viro@zeniv.linux.org.uk>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
- linux-csky@vger.kernel.org, loongarch@lists.linux.dev,
- linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
- sparclinux@vger.kernel.org, netdev@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linux-bcachefs@vger.kernel.org, linux-mtd@lists.infradead.org
-References: <20231108125843.3806765-1-arnd@kernel.org>
- <20231108125843.3806765-18-arnd@kernel.org>
-Content-Language: en-US
-From: Geoff Levand <geoff@infradead.org>
-In-Reply-To: <20231108125843.3806765-18-arnd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231108064641.65209-1-haifeng.xu@shopee.com>
+In-Reply-To: <20231108064641.65209-1-haifeng.xu@shopee.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 8 Nov 2023 15:19:03 +0100
+Message-ID: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
+Subject: Re: [PATCH] boning: use a read-write lock in bonding_show_bonds()
+To: Haifeng Xu <haifeng.xu@shopee.com>
+Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Arnd,
+On Wed, Nov 8, 2023 at 7:47=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.com> w=
+rote:
+>
+> call stack:
 
-On 11/8/23 12:58, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Allmodconfig kernels produce a missing-prototypes warning:
-> 
-> arch/powerpc/platforms/ps3/gelic_udbg.c:239:6: error: no previous prototype for 'udbg_shutdown_ps3gelic' [-Werror=missing-prototypes]
-> 
-> Move the declaration from a local header to asm/ps3.h where it can be
-> seen from both the caller and the definition.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  arch/powerpc/include/asm/ps3.h               | 6 ++++++
->  arch/powerpc/platforms/ps3/gelic_udbg.c      | 1 +
->  drivers/net/ethernet/toshiba/ps3_gelic_net.h | 6 ------
->  3 files changed, 7 insertions(+), 6 deletions(-)
+These stacks should either be removed from the changelog, or moved
+_after_ the description
+of the problem. These are normal looking call stacks, you are not
+fixing a crash or deadlock.
 
-Seems good to me.  I'll test it next chance I get.
+> ......
+> PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
+> [ffffa7a8e96bbac0] __schedule at ffffffffb0719898
+> [ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
+> [ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
+> [ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
+> [ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
+> [ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
+> [ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
+> [ffffa7a8e96bbc80] device_del at ffffffffb0209af8
+> [ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
+> [ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
+> [ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
+> [ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
+> [ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
+> [ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
+> [ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
+> [ffffa7a8e96bbf10] kthread at ffffffffafae132a
+> [ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
+>
+> 290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-expor=
+ter"
+> [ffffa7a8d14dbb80] __schedule at ffffffffb0719898
+> [ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
+> [ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
+> [ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
+> [ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
+> [ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
+> [ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
+> [ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
+> [ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
+> [ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
+> [ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
+> [ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
+> [ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
+> [ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
+> [ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
+> [ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
+> [ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
+> [ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
+> [ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
+> ......
+>
+> Problem description:
+>
+> Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
+> but there are many readers which hold the kernfs_rwsem, so it has to slee=
+p
+> for a long time to wait the readers release the lock. Thread 278176 and a=
+ny
+> other threads which call bonding_show_bonds() also need to wait because
+> they try to accuire the rtnl_mutex.
 
-Signed-off-by: Geoff Levand <geoff@infradead.org>
+acquire
 
+>
+> bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
+> However, the addition and deletion of bond_list are only performed in
+> bond_init()/bond_uninit(), so we can intoduce a separate read-write lock
 
+introduce
+
+> to synchronize bond list mutation.
+>
+> What's the benefits of this change?
+>
+> 1) All threads which call bonding_show_bonds() only wait when the
+> registration or unregistration of bond device happens.
+>
+> 2) There are many other users of rtnl_mutex, so bonding_show_bonds()
+> won't compete with them.
+>
+> In a word, this change reduces the lock contention of rtnl_mutex.
+>
+
+This looks good to me, but please note:
+
+1) This is net-next material, please resend next week, because
+net-next is currently closed during the merge window.
+
+2) Using a spell checker would point few typos (including in the title
+"boning" -> "bonding")
+
+Thanks.
 
