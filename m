@@ -1,161 +1,155 @@
-Return-Path: <netdev+bounces-46665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6A97E5A69
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:46:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1C27E5A74
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C48BB20D46
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:46:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655682813EA
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F93230357;
-	Wed,  8 Nov 2023 15:46:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9593035A;
+	Wed,  8 Nov 2023 15:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jDCcHs7a"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="UiC0P1BO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E95C30352;
-	Wed,  8 Nov 2023 15:46:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 015E7C433CA;
-	Wed,  8 Nov 2023 15:46:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699458391;
-	bh=rZ9HX1+atEHu++YlPY3PMKy6I5q8b1mlWO6r/QezZaA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=jDCcHs7aTuKTdXtMnwKR1FSV5LQgdeNTnKhBiCVOws9M5UHHw/qxldHFn9PfjkyZy
-	 MlNvWXhckG6BZ+Zhn5ZtE7xOIkZY/6E1lbbxTeomfP5ee2K0V2ttAjuB41c/rkxtYi
-	 z90Y4lPN0H/bckmkVv9axrxwvkb17742Hcl0eXmvW940ea4mh6u/SVyj+pMfF8PrAn
-	 iDsxFN8S9furNaT+ZH7Tw5Sj3850NOeks67CPwQW2CPSuvTr6PamPqEgkGorRJVEm7
-	 /fOGJLAseiLyE510zD5fgSXMkYpOKpY/N/+Uf8QHR+oyDElQLPYkZyBXYm7XyRPL2/
-	 bbRqf9iPsBBvA==
-Date: Wed, 8 Nov 2023 15:46:26 +0000
-From: Lee Jones <lee@kernel.org>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: x86@kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [REPORT] BPF: Reproducible triggering of BUG() from userspace PoC
-Message-ID: <20231108154626.GB8909@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D16EECC
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:51:52 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2048.outbound.protection.outlook.com [40.107.7.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D07E61BC3;
+	Wed,  8 Nov 2023 07:51:51 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gSKD3g/a3ia5q1orqeK6UBNS/cYfcL7c/RmIfsvQipCYy+/jRAKNRKDZktl6N9tWpZ8qltaSNVG3/jB2/dU7BdrqwLPD6wlt3BnlMXozd+BQ01neQNsZXLZ639AG8gjoJmeukO+95DptXz02TcPAc1LMGmIqHxyTEMqANuoQLjd5qdEnG40Wm1l/h1A1w4VUqyieD5kL11VpxJZGlmUAXDOH6LP6/yNfYmP8On3riKrf1+bQ5qdjRlN6BDSB03VUX+2Yiy8C32AgFIHQ2WipJWlpY2rH1UyNAFig75eW8j8Ug4sy8x+aTgrZIvFVQkULna2/TOEDe9Um6ebIFZMLEg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/7bgvZaibOPzNTUAcql2w3jrXnvVVRRMmtgwexf4yD4=;
+ b=CVTDEi+kkiFWlesjlt395wjoVdAXD4v9VN3mPS6Xv0+nVuIi+McBFFyhvCnXoIJ64wgvAHE/Rt1t9IY8VODVOxReuCziVUJGQarPLAEbo2MaPfKajXwYjVFSXQyr7mcllDk0bLQjKYeunErtYhmHBCntV+Yn/C2uPsvja7GAQIxYVa8RBA4Wwj1CRI5fgarKhTjLUhkcYbAIWe7kmKji8NI6dYo7pRENRWqpGlptuaHPvbFCnnNJQlT+VunY91dWUwR8z9mOnvA2CRjyLZ9WKW+f2TGVeEZkPJtLqc82sEZtCocgRBhSc1BCo7A/5y1bu470G7y6LsFRBN5M2NIqGw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/7bgvZaibOPzNTUAcql2w3jrXnvVVRRMmtgwexf4yD4=;
+ b=UiC0P1BOLo6gq/+w7bBoIkeX/J4DbdlYjr/fTeoxrSyHxJVAVeaVvKeQBFJTa4UEt9EZF7FlDa7V1xVIeEsR54xysoKACtT3a+z6bFpQ5lLkGzN2mp4IkG4tLFi1kGLK3Q3627VJPv4Ak0coI2i3jH+iFLHyoFZ2PdLZGht0lko=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DB9PR04MB8394.eurprd04.prod.outlook.com (2603:10a6:10:244::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Wed, 8 Nov
+ 2023 15:51:48 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Wed, 8 Nov 2023
+ 15:51:48 +0000
+Date: Wed, 8 Nov 2023 17:51:44 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 0/7] qbv cycle time extension/truncation
+Message-ID: <20231108155144.xadpltcdw2rhdpkv@skbuf>
+References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+X-ClientProxiedBy: AM0PR10CA0027.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::37) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DB9PR04MB8394:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1290d4ce-3166-4ce6-acf6-08dbe0729dfd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1BOBlXtYd9vIQtw9ubG6v8iV76K69S0fcpVl06Te8zwHIQoGcgSevdjj0MErudIu7qBkMNyiiq/f/99ZxunTFd1r5ahGLKSKUlfME6sEtoKZtGWOucaugxcVw0SwBErNMzgD0+Xvn35Z6ljKsHVloVOf3SWuy0inlIZ9rH2wkORwYouobmAIZO30/QYBo24k1rSSO4r6aiNVsUCJHt/nIxPqOkFJELUYgecICWK6HSCjngNOEKTqmsvuIqihrZtePAebQHH8MwBdTLFzaQgRv0UzHZsPxLVjU6uq6H4lSfmIR8ZVkXQhr78ljIlLrLXbaiBU88VNb9iNPcWIN/1fMks9DFaiHu3MGIZ2tfb+MNmcUBjRLG38m9rq/4BCT76kig35ATDBAvSFJz2nes/lFFiSVID3TpffdQAKQAfDTGtDxen2hH8wS5mluVXOSLivbKeEPC4zyvGaGw2UhuV5V1fF/8455/10ak6WyLYjDSiZ7vW2EKUtdDeHTLnf51YZR+t4MpdBhAXRSj7+fcDd0qyNuItxqh9uVoLqprkuJBQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(366004)(396003)(376002)(136003)(346002)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(33716001)(2906002)(8676002)(8936002)(83380400001)(4326008)(26005)(66946007)(54906003)(66476007)(66556008)(6916009)(316002)(7416002)(5660300002)(44832011)(478600001)(9686003)(966005)(6486002)(6512007)(6506007)(6666004)(1076003)(86362001)(38100700002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?eLjIzBVRNFgpDFbIdPWn7V890bM/V1lqD09CDA3PzogGenV6tqcMKz7m4ncq?=
+ =?us-ascii?Q?FZG9UTYnyQu7urSK7/hiKrWLQW2lkh4OwCJMVRzVpyUkbBNFUpT/09IHozzM?=
+ =?us-ascii?Q?gRdEMGFBUMSOqXeqozO/hZPZDyvHWOP5cbXZeTBEnMibs/sCCVp8Q3vd3/7u?=
+ =?us-ascii?Q?S3yfzRx2sep4bMSxZjx2KMWbiQMlGuAJeiQBJBrWiSfeSa3HX2d1UPWEcWWc?=
+ =?us-ascii?Q?kQ38Kvd0PjSsmtyfS05bYEsjZL86fqwHQbZS1x+Dl56zf7wKcJn63TpB7KHJ?=
+ =?us-ascii?Q?b5NCVsXQJO7gC/TlZStLuEf3/sgOrWdvmeWyNbg5SsKjcXzzxb30LVE0PN0W?=
+ =?us-ascii?Q?YPdnvR/5OK5HBGObGKwOSjMzqPYWDz+vD8WyPwtGppBmkEifvla+T6a8o31q?=
+ =?us-ascii?Q?nj5SqmuCZg1ysfNiTUfNipDbtFQ0uc9hy6iVeXvo4xsIHEf9WG/L/e6Oyna5?=
+ =?us-ascii?Q?fxvFOVZy9jnLzTxRUZtv4jDVZPQTRst1jR9005MU40pywekPOAEPhQpODnxT?=
+ =?us-ascii?Q?usFihH9DJL8IzyZO+6hQCStbxjo4F3/Nbb0rcNnmDV7RsjzAaa/nP697MKeB?=
+ =?us-ascii?Q?O1mNAsuMSEU64Phj74JOr66qf0jbFi12wWjDuhsKoHJXyVTSGnY84xeze5fd?=
+ =?us-ascii?Q?D7+HD35TL5EwfGNme8pXvX92U/OdrbufYjv6l+rXh14gF0aWfwRGteP0UduT?=
+ =?us-ascii?Q?TY7vIOytk6lQSzivx0YNphL9P2ib4CRGrq52nsZ3N0qJO6wB0t5pSSd9tsid?=
+ =?us-ascii?Q?0BaKwu6LvdXDmBTWMKTk2Yksf7LRQddp0TzEJHugld1EzjEhgxMLb+PUbQ9c?=
+ =?us-ascii?Q?4tMO+uzBacXMd6JdgIp9NNHRgwUMKaf7LjpeGMC00LNLCXkSHUz98gM1CAS5?=
+ =?us-ascii?Q?4PLMhE0npzre10VgL78rOshxB9l4Uhz0jnILl8m5EE7jUu4iDob1yvWeu0V+?=
+ =?us-ascii?Q?I7jfxDKn3tzDKYW6cHy268bYJlw5BUfl7owCIhsc5g8Ew2FY5hRHDKZkYMaA?=
+ =?us-ascii?Q?Xo2nc5GxGYG4rnS6nShk3Yze1yHWa1LGF3YRHUXKmWc/gMTTQVNWl96OQYhH?=
+ =?us-ascii?Q?crxzTAbjIRCIPOlEgRo2A/jL+Mia02GHHqlIQcKvGD1R9ALcC3jslF8VKnQL?=
+ =?us-ascii?Q?zXRMC8oYsZt6CX5kZwhKzkSNI1TfH69IGc5QEsGAxGTn/lCv5bPSj4MdeYb6?=
+ =?us-ascii?Q?jBQC1jiSU9bhSiTAto5bEjhwk4E/BlYmpCE5Q2+jYmvo6DbYPQiT/QtyWjQa?=
+ =?us-ascii?Q?KGzTHvoGluduhLEaeQgx+0ySWpo2SKB8ClbXfcrKbNAgEiosJOJsYnNdyAWx?=
+ =?us-ascii?Q?20rON4czEDTY8qcc7wDCAPIGfaWHwDRxDldMh3I2fVQ5cL6J7aIYBVgpz8sc?=
+ =?us-ascii?Q?kkZuClbf7wTL/E8NlPY1sVkFR7vSyOEHvoxoWYTqEt/hs1M3EhWZiI8n9ieL?=
+ =?us-ascii?Q?UmK34KuyaRh3SpJOAx7AvBbuojxidZeJHTdIgegbk/+UmfcbHYW01SpRe6Ub?=
+ =?us-ascii?Q?EsA59K341NqJnwwE2zkhhtT1nY0/RSqizjuYhmdr/JkGzjcnUJ4gf1N6PCAT?=
+ =?us-ascii?Q?rqCpSLKPfpGDga8WjwcZtFtX4zrfm9gS5DuIdI2B85AZ3y0Ki1mCf63TvmV3?=
+ =?us-ascii?Q?9g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1290d4ce-3166-4ce6-acf6-08dbe0729dfd
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 15:51:48.6111
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DDA1KETtm0kjprYztZ+Be9D/xSAc+KhqrCRuGsl25kyzdqaAb/WiwYuFgDlLQNceRrha7eckW+vbS3ZBpZg2BQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8394
 
-Good afternoon,
+Hi Faizal,
 
-After coming across a recent Syzkaller report [0] I thought I'd take
-some time to firstly reproduce the issue, then see if there was a
-trivial way to mitigate it.  The report suggests that a BUG() in
-prog_array_map_poke_run() [1] can be trivially and reliably triggered
-from userspace using the PoC provided [2].
+On Tue, Nov 07, 2023 at 06:20:16AM -0500, Faizal Rahim wrote:
+> According to IEEE Std. 802.1Q-2018 section Q.5 CycleTimeExtension,
+> the Cycle Time Extension variable allows this extension of the last old
+> cycle to be done in a defined way. If the last complete old cycle would
+> normally end less than OperCycleTimeExtension nanoseconds before the new
+> base time, then the last complete cycle before AdminBaseTime is reached
+> is extended so that it ends at AdminBaseTime.
+> 
+> Changes in v2:
+> 
+> - Added 's64 cycle_time_correction' in 'sched_gate_list struct'.
+> - Removed sched_changed created in v1 since the new cycle_time_correction
+>   field can also serve to indicate the need for a schedule change.
+> - Added 'bool correction_active' in 'struct sched_entry' to represent
+>   the correction state from the entry's perspective and return corrected
+>   interval value when active.
+> - Fix cycle time correction logics for the next entry in advance_sched()
+> - Fix and implement proper cycle time correction logics for current
+>   entry in taprio_start_sched()
+> 
+> v1 at:
+> https://lore.kernel.org/lkml/20230530082541.495-1-muhammad.husaini.zulkifli@intel.com/
 
-        ret = bpf_arch_text_poke(poke->tailcall_bypass,
-                                 BPF_MOD_JUMP,
-                                 old_bypass_addr,
-                                 poke->bypass_addr);
-        BUG_ON(ret < 0 && ret != -EINVAL);
-
-Indeed the PoC does seem to be able to consistently trigger the BUG(),
-not only on the reported kernel (v6.1), but also on linux-next.  I went
-to the trouble of checking LORE, but failed to find any patches which
-may be attempting to fix this.
-
-    kernel BUG at kernel/bpf/arraymap.c:1094!
-    invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-    CPU: 5 PID: 45 Comm: kworker/5:0 Not tainted 6.6.0-rc3-next-20230929-dirty #74
-    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-    Workqueue: events prog_array_map_clear_deferred
-    RIP: 0010:prog_array_map_poke_run+0x6b4/0x6d0
-    Code: ff 0f 0b e8 1e 27 e1 ff 48 c7 c7 60 80 93 85 48 c7 c6 00 7f 93 85 48 c7 c2 bb c2 39 86 b9 45 04 00 00 45 89 f8 e8 9c 890
-    RSP: 0018:ffffc9000036fb50 EFLAGS: 00010246
-    RAX: 0000000000000044 RBX: ffff88811f337490 RCX: 63af48a1314f9900
-    RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-    RBP: ffffc9000036fbe8 R08: ffffffff815c23c5 R09: 1ffff11084c14eba
-    R10: dfffe91084c14ebc R11: ffffed1084c14ebb R12: ffff888116517800
-    R13: dffffc0000000000 R14: ffff888125a1a400 R15: 00000000fffffff0
-    FS:  0000000000000000(0000) GS:ffff888426080000(0000) knlGS:0000000000000000
-    CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-    CR2: 00000000004ab678 CR3: 0000000122ac4000 CR4: 0000000000350eb0
-    DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-    DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-    Call Trace:
-     <TASK>
-     ? __die_body+0x92/0xf0
-     ? die+0xa2/0xe0
-     ? do_trap+0x12f/0x370
-     ? handle_invalid_op+0xa6/0x140
-     ? handle_invalid_op+0xdf/0x140
-     ? prog_array_map_poke_run+0x6b4/0x6d0
-     ? prog_array_map_poke_run+0x6b4/0x6d0
-     ? exc_invalid_op+0x32/0x50
-     ? asm_exc_invalid_op+0x1b/0x20
-     ? __wake_up_klogd+0xd5/0x110
-     ? prog_array_map_poke_run+0x6b4/0x6d0
-     ? bpf_prog_6781ebc2dae4bad9+0xb/0x53
-     fd_array_map_delete_elem+0x152/0x250
-     prog_array_map_clear_deferred+0xf6/0x210
-     ? __bpf_array_map_seq_show+0xa40/0xa40
-     ? kick_pool+0x164/0x350
-     ? process_one_work+0x57a/0xd00
-     process_one_work+0x5e4/0xd00
-     worker_thread+0x9cf/0xea0
-     kthread+0x2b4/0x350
-     ? pr_cont_work+0x580/0x580
-     ? kthread_blkcg+0xd0/0xd0
-     ret_from_fork+0x4a/0x80
-     ? kthread_blkcg+0xd0/0xd0
-     ret_from_fork_asm+0x11/0x20
-     </TASK>
-    Modules linked in:
-    ---[ end trace 0000000000000000 ]---
-
-However, with my very limited BPF subsystem knowledge I was unable to
-trivially fix the issue.  Hopefully some knowledgable person would be
-kind enough to provide me with some pointers.
-
-bpf_arch_text_poke() seems to be returning -EBUSY due to a negative
-memcmp() result from [3].
-
-        ret = -EBUSY;
-        mutex_lock(&text_mutex);
-        if (memcmp(ip, old_insn, X86_PATCH_SIZE)) {
-                goto out;
-        [...]
-
-When spitting out the memory at those locations, this is the result:
-
-    ip:        e9 06 00 00 00
-    old_insn:  0f 1f 44 00 00
-    nop_insn:  0f 1f 44 00 00
-
-As you can see, the information stored in 'ip' does not match that of
-the data stored in 'old_insn', causing bpf_arch_text_poke() to return
-early with the error -EBUSY, suggesting that the data pointed to by
-'old_insn', and by extension 'prog' should have been changed when
-emit_call()ing, to the value of 'ip', but wasn't.
-
-It's possible for me to see what is happening, but I'm afraid finding
-possible causes of corruption became too time consuming on this
-occasion.  Would anyone be able to chime in to provide their take on
-possible causes please?
-
-Any help would be gratefully received.
-
-[0] https://syzkaller.appspot.com/bug?extid=97a4fe20470e9bc30810
-[1] https://elixir.bootlin.com/linux/latest/source/kernel/bpf/arraymap.c#L1092
-[2] https://syzkaller.appspot.com/text?tag=ReproC&x=1397180f680000
-[3] https://elixir.bootlin.com/linux/latest/source/arch/x86/net/bpf_jit_comp.c#L387
-
--- 
-Lee Jones [李琼斯]
+I like what came of this patch series. Thanks for following up and
+taking over. I have some comments on individual patches.
 
