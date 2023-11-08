@@ -1,213 +1,285 @@
-Return-Path: <netdev+bounces-46709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C09F7E5FDF
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:17:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA767E5FA9
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E99B20E34
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:17:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E47222815FD
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EF1374CE;
-	Wed,  8 Nov 2023 21:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81637374CE;
+	Wed,  8 Nov 2023 21:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="32beSgpe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kjlV4oVb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6ty0Vk/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83AA37160;
-	Wed,  8 Nov 2023 21:17:25 +0000 (UTC)
-X-Greylist: delayed 585 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Nov 2023 13:17:25 PST
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2443E213F;
-	Wed,  8 Nov 2023 13:17:25 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 15DEC5808D9;
-	Wed,  8 Nov 2023 16:07:40 -0500 (EST)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Wed, 08 Nov 2023 16:07:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
-	1699477660; x=1699484860; bh=D9PBCL8QJKdjrKS2aPJfuUQXeRbWRMeFHOK
-	ckMk8fx4=; b=32beSgpe4JW/41MI9lwE9Ijo4clBZDCZcdz5W29GlXfmeBdloGs
-	Pj6zClFpI3rBEASL5bt2BJ0z9kSHXoRmNM9S3ZUV9IpU6H2SlzHeojjwyK38ubdm
-	rc5I6AbHQO428z+GTudTpXj84wN1iHyD5B4xrh7Xg9+/lOsXO8mWGmiOw0oEtT95
-	59tIeWQXJ0PMlmbTe9oPGJNjvuF2Q00g7Aup3KvWuYCehPghEdVuK62ANt1RCDNX
-	P59SJAJQv8a5rR+mmaJ00cjQiQKIVXVSq/NkJ5Ceh2lpGohzfDFoxucwi0IF29D/
-	556O8j5asu9BGmdizp+cE+MTUaFBWLNaDZw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1699477660; x=1699484860; bh=D9PBCL8QJKdjrKS2aPJfuUQXeRbWRMeFHOK
-	ckMk8fx4=; b=kjlV4oVb2NP4EXVJD0KYm4LTALqMkDnrU92/a5IM2DxqbQWjsi+
-	IwdXxoSa3WEs4VZrlHH4JbCKkIL0G8Pwij1126xSe7hG/IMqOBcu3RQxvqgsEHsb
-	pcFM0Ua1NE3OwtwEsNMc4jlmhSYjBeK+x0Ed/W7Rlf03UIZVqr2B+d0ryicP7Tub
-	QSkOlA0efMsPA3XcbslixipIgl/+8P6M15YEgB0c0t6f8ouEUKSI2KL0MYB9RUr3
-	hoiEAHdJCFrsG/Y/a3llxHIutnrnDvRz3cIbj7RF5co+2MINYEdgACq/D/uqzlpo
-	r0L8iW3NWB7AxkztwyKFHjpLOPBdYiLEhJA==
-X-ME-Sender: <xms:m_hLZQw4_GjcfbThT_vbWtFC1jg247Lu0E-xxAcura-dvGHI0kyRtw>
-    <xme:m_hLZUTBxKjGHnkabv1F9oTzwRz5Y87A_Eif-kfMyvanmifw9H6wOpvDuy8X5HtkK
-    Zp2U-M3JmHcVR-PhU4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudduledgudegfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedf
-    tehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrf
-    grthhtvghrnhepgeefjeehvdelvdffieejieejiedvvdfhleeivdelveehjeelteegudek
-    tdfgjeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    eprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:m_hLZSW6ebv1Nls-lv6APr_ihVG7HATMnEZKUQ2lPJN14ImeSnqatA>
-    <xmx:m_hLZejrECVMz1a28xI-eZZXTwB4qMex3E04bXgkhXhjxa6Uy3_eWg>
-    <xmx:m_hLZSCmSuJkW1zFZoPx2zdR5BRKPmHS1VpT2dl_7ti0xOUBuc0gGw>
-    <xmx:nPhLZa5R9gGZF0aG1bP9Mvi7bGv6CIQdVEBpyyHzpDHDqjyICYNx-Q>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 48539B60089; Wed,  8 Nov 2023 16:07:39 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-1108-g3a29173c6d-fm-20231031.005-g3a29173c
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8980374C7;
+	Wed,  8 Nov 2023 21:09:42 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D00332580;
+	Wed,  8 Nov 2023 13:09:41 -0800 (PST)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9d216597f64so30028266b.3;
+        Wed, 08 Nov 2023 13:09:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699477780; x=1700082580; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b3VLfq7sx7EQNPSuIP7+UwIreDQvznY4bi5G4L5TGSE=;
+        b=I6ty0Vk/3DUT/sA+UM1OEpTxgbCI3Kdra+UAKezUmnE9ryYuhCahN2P66Qp0vZDzo7
+         fSASFzbvMHnnmGxbjrMjEMyUc7S5vb27DQW1VJrhY+1zcohLf6Sv0rRap0AZIbRO5cef
+         Nc5w9Alczv3BpKNgrNHfkdacMHSLpGi6fFl/pnl3fCCuWpolBl6HBUdIlqRrFbc1H2hE
+         6KrcY+vlg/9Bc+SrFy4zjtjoyu+IMxkjHv7rJhfdA2jenhJlqDGi0nL58lQQMf941SEy
+         RzUqZnBu1tmV/VkR6GTWKyKYzMwKb6Z3bIu7wo+II9AXnMVRzlZunFIDZUaLOGEn73/S
+         QQnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699477780; x=1700082580;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b3VLfq7sx7EQNPSuIP7+UwIreDQvznY4bi5G4L5TGSE=;
+        b=JrgMvxBlOdc6CX0tVFihqZ7ZJz1TlJTseSgWzG4wS814HYpT72PrjDkHbUF9JZZA+R
+         ZnoksZ8jerw8HZ0VZTuoIjYPKVhJnghPYf7kxFMAZ0hlVp3zSzKdauXAj6jQyNdmXxB+
+         WtJu9R2GwWWBP1rB7rl++mNlStEf3toqvW4TPHNnR41Cp8VppP1+/m1KWcBUA1BwZp9L
+         yVIaRZUOnyPVGQHQrxaDhqMUmk+b7UwzuEUz65fI3Z4oJmfV9DIQlD+f+k9FSc1cTjUe
+         SerJ9r9UV+DLPSJ/1V6fXV7gLilYE5kOYtiQiiDPxznF/XMhVb6JL2whEwG7Rgt2bXon
+         HnIw==
+X-Gm-Message-State: AOJu0Yyl7FWZ7sZGJBtesQ7ZLm5L90jOdnS4en50t2OZmc2iaLMfsYgM
+	0jBi3ZRXyN3NqkXKA/fo9LlHw0KFdKjyfJPFS5RUJyuahPM=
+X-Google-Smtp-Source: AGHT+IHhn+yfXlFZr0ffESTNZIm1zxhEz3ywwkAAJ1sXW+xaO+oJbbc827jTcn8YH4qA7DzHTqxRst22gAd5l3vviTk=
+X-Received: by 2002:a17:907:a03:b0:9d1:92bb:ce74 with SMTP id
+ bb3-20020a1709070a0300b009d192bbce74mr2281906ejc.38.1699477779886; Wed, 08
+ Nov 2023 13:09:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
-In-Reply-To: 
- <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
-References: <20231108125843.3806765-1-arnd@kernel.org>
- <20231108125843.3806765-11-arnd@kernel.org>
- <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
-Date: Wed, 08 Nov 2023 22:07:18 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Andrew Morton" <akpm@linux-foundation.org>,
- linux-kernel@vger.kernel.org, "Masahiro Yamada" <masahiroy@kernel.org>,
- linux-kbuild@vger.kernel.org, "Matt Turner" <mattst88@gmail.com>,
- "Vineet Gupta" <vgupta@kernel.org>,
- "Russell King" <linux@armlinux.org.uk>,
- "Catalin Marinas" <catalin.marinas@arm.com>,
- "Will Deacon" <will@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>,
- "Masami Hiramatsu" <mhiramat@kernel.org>,
- "Mark Rutland" <mark.rutland@arm.com>, guoren <guoren@kernel.org>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Ard Biesheuvel" <ardb@kernel.org>,
- "Huacai Chen" <chenhuacai@kernel.org>,
- "Greg Ungerer" <gerg@linux-m68k.org>, "Michal Simek" <monstr@monstr.eu>,
- "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
- "Dinh Nguyen" <dinguyen@kernel.org>,
- "Michael Ellerman" <mpe@ellerman.id.au>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Christophe Leroy" <christophe.leroy@csgroup.eu>,
- "Geoff Levand" <geoff@infradead.org>,
- "Palmer Dabbelt" <palmer@dabbelt.com>,
- "Heiko Carstens" <hca@linux.ibm.com>,
- "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
- "David S . Miller" <davem@davemloft.net>,
- "Andy Lutomirski" <luto@kernel.org>,
- "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
- x86@kernel.org, "Helge Deller" <deller@gmx.de>,
- "Sudip Mukherjee" <sudipm.mukherjee@gmail.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Timur Tabi" <timur@kernel.org>,
- "Kent Overstreet" <kent.overstreet@linux.dev>,
- "David Woodhouse" <dwmw2@infradead.org>,
- "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
- "Anil S Keshavamurthy" <anil.s.keshavamurthy@intel.com>,
- "Kees Cook" <keescook@chromium.org>,
- "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
- "Juri Lelli" <juri.lelli@redhat.com>,
- "Vincent Guittot" <vincent.guittot@linaro.org>,
- "Nathan Chancellor" <nathan@kernel.org>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Nicolas Schier" <nicolas@fjasle.eu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
- "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
- loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
- Netdev <netdev@vger.kernel.org>, linux-parisc@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org,
- "linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>,
- linux-mtd@lists.infradead.org
-Subject: Re: [PATCH 10/22] microblaze: include linux/cpu.h for trap_init() prototype
-Content-Type: text/plain;charset=utf-8
+References: <20231103190523.6353-1-andrii@kernel.org> <20231103190523.6353-3-andrii@kernel.org>
+ <20231108-ungeeignet-uhren-698f16b4b36b@brauner>
+In-Reply-To: <20231108-ungeeignet-uhren-698f16b4b36b@brauner>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 8 Nov 2023 13:09:27 -0800
+Message-ID: <CAEf4BzbanZO_QPhzyFgBEuB0i+uZZO4rZn7mO1qNp3aoPx+32g@mail.gmail.com>
+Subject: Re: [PATCH v9 bpf-next 02/17] bpf: add BPF token delegation mount
+ options to BPF FS
+To: Christian Brauner <brauner@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, keescook@chromium.org, 
+	kernel-team@meta.com, sargun@sargun.me
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 8, 2023, at 21:42, Geert Uytterhoeven wrote:
+On Wed, Nov 8, 2023 at 5:51=E2=80=AFAM Christian Brauner <brauner@kernel.or=
+g> wrote:
 >
-> On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org>=
- wrote:
->> From: Arnd Bergmann <arnd@arndb.de>
->>
->> Microblaze runs into a single -Wmissing-prototypes warning when that =
-is
->> enabled:
->>
->> arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype f=
-or 'trap_init' [-Wmissing-prototypes]
->>
->> Include the right header to avoid this.
->>
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> On Fri, Nov 03, 2023 at 12:05:08PM -0700, Andrii Nakryiko wrote:
+> > Add few new mount options to BPF FS that allow to specify that a given
+> > BPF FS instance allows creation of BPF token (added in the next patch),
+> > and what sort of operations are allowed under BPF token. As such, we ge=
+t
+> > 4 new mount options, each is a bit mask
+> >   - `delegate_cmds` allow to specify which bpf() syscall commands are
+> >     allowed with BPF token derived from this BPF FS instance;
+> >   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
+> >     a set of allowable BPF map types that could be created with BPF tok=
+en;
+> >   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
+> >     a set of allowable BPF program types that could be loaded with BPF =
+token;
+> >   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
+> >     a set of allowable BPF program attach types that could be loaded wi=
+th
+> >     BPF token; delegate_progs and delegate_attachs are meant to be used
+> >     together, as full BPF program type is, in general, determined
+> >     through both program type and program attach type.
+> >
+> > Currently, these mount options accept the following forms of values:
+> >   - a special value "any", that enables all possible values of a given
+> >   bit set;
+> >   - numeric value (decimal or hexadecimal, determined by kernel
+> >   automatically) that specifies a bit mask value directly;
+> >   - all the values for a given mount option are combined, if specified
+> >   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
+> >   delegate_maps=3D0x1 -o delegate_maps=3D0x2` will result in a combined=
+ 0x3
+> >   mask.
+> >
+> > Ideally, more convenient (for humans) symbolic form derived from
+> > corresponding UAPI enums would be accepted (e.g., `-o
+> > delegate_progs=3Dkprobe|tracepoint`) and I intend to implement this, bu=
+t
+> > it requires a bunch of UAPI header churn, so I postponed it until this
+> > feature lands upstream or at least there is a definite consensus that
+> > this feature is acceptable and is going to make it, just to minimize
+> > amount of wasted effort and not increase amount of non-essential code t=
+o
+> > be reviewed.
+> >
+> > Attentive reader will notice that BPF FS is now marked as
+> > FS_USERNS_MOUNT, which theoretically makes it mountable inside non-init
+> > user namespace as long as the process has sufficient *namespaced*
+> > capabilities within that user namespace. But in reality we still
+> > restrict BPF FS to be mountable only by processes with CAP_SYS_ADMIN *i=
+n
+> > init userns* (extra check in bpf_fill_super()). FS_USERNS_MOUNT is adde=
+d
+> > to allow creating BPF FS context object (i.e., fsopen("bpf")) from
+> > inside unprivileged process inside non-init userns, to capture that
+> > userns as the owning userns. It will still be required to pass this
+> > context object back to privileged process to instantiate and mount it.
+> >
+> > This manipulation is important, because capturing non-init userns as th=
+e
+> > owning userns of BPF FS instance (super block) allows to use that usern=
+s
+> > to constraint BPF token to that userns later on (see next patch). So
+> > creating BPF FS with delegation inside unprivileged userns will restric=
+t
+> > derived BPF token objects to only "work" inside that intended userns,
+> > making it scoped to a intended "container".
+> >
+> > There is a set of selftests at the end of the patch set that simulates
+> > this sequence of steps and validates that everything works as intended.
+> > But careful review is requested to make sure there are no missed gaps i=
+n
+> > the implementation and testing.
+> >
+> > All this is based on suggestions and discussions with Christian Brauner
+> > ([0]), to the best of my ability to follow all the implications.
 >
-> Thanks for your patch!
+> "who will not be held responsible for any CVE future or present as he's
+>  not sure whether bpf token is a good idea in general"
 >
->>  arch/alpha/kernel/traps.c      | 1 +
->>  arch/csky/include/asm/traps.h  | 2 --
->>  arch/csky/kernel/traps.c       | 1 +
->>  arch/m68k/coldfire/vectors.c   | 3 +--
->>  arch/m68k/coldfire/vectors.h   | 3 ---
+> I'm not opposing it because it's really not my subsystem. But it'd be
+> nice if you also added a disclaimer that I'm not endorsing this. :)
 >
-> Ah, so this is where the m68k changes listed in the cover letter are
-> hiding ;-)
->
->>  arch/microblaze/kernel/traps.c | 1 +
->>  arch/sparc/kernel/traps_32.c   | 1 +
->>  arch/sparc/kernel/traps_64.c   | 1 +
->>  arch/x86/include/asm/traps.h   | 1 -
->>  arch/x86/kernel/traps.c        | 1 +
->>  10 files changed, 7 insertions(+), 8 deletions(-)
->>  delete mode 100644 arch/m68k/coldfire/vectors.h
->
-> Obviously the non-microblaze changes should be spun off in separate
-> patches.
 
-I messed up one of my rebases here and accidentally sent
-the wrong changelog text. My intention was to have the
-combined patch but with this text:
+Sure, I'll clarify. I still appreciate your reviewing everything and
+pointing out all the gotchas (like the reconfiguration and other
+stuff), thanks!
 
-    arch: include linux/cpu.h for trap_init() prototype
-   =20
-    some architectures run into a -Wmissing-prototypes warning
-    for trap_init()
-   =20
-    arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype =
-for 'trap_init' [-Wmissing-prototypes]
-   =20
-    Include the right header to avoid this consistently, removing
-    the extra declarations on m68k and x86 that were added as local
-    workarounds already.
-   =20
-    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> A comment below.
+>
+> >
+> >   [0] https://lore.kernel.org/bpf/20230704-hochverdient-lehne-eeb9eeef7=
+85e@brauner/
+> >
+> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > ---
+> >  include/linux/bpf.h | 10 ++++++
+> >  kernel/bpf/inode.c  | 88 +++++++++++++++++++++++++++++++++++++++------
+> >  2 files changed, 88 insertions(+), 10 deletions(-)
+> >
 
+[...]
 
-I made the same mistake with the "arch: add do_page_fault prototypes"
-patch that was missing an explanation.
+> >       opt =3D fs_parse(fc, bpf_fs_parameters, param, &result);
+> >       if (opt < 0) {
+> > @@ -665,6 +692,25 @@ static int bpf_parse_param(struct fs_context *fc, =
+struct fs_parameter *param)
+> >       case OPT_MODE:
+> >               opts->mode =3D result.uint_32 & S_IALLUGO;
+> >               break;
+> > +     case OPT_DELEGATE_CMDS:
+> > +     case OPT_DELEGATE_MAPS:
+> > +     case OPT_DELEGATE_PROGS:
+> > +     case OPT_DELEGATE_ATTACHS:
+> > +             if (strcmp(param->string, "any") =3D=3D 0) {
+> > +                     msk =3D ~0ULL;
+> > +             } else {
+> > +                     err =3D kstrtou64(param->string, 0, &msk);
+> > +                     if (err)
+> > +                             return err;
+> > +             }
+> > +             switch (opt) {
+> > +             case OPT_DELEGATE_CMDS: opts->delegate_cmds |=3D msk; bre=
+ak;
+> > +             case OPT_DELEGATE_MAPS: opts->delegate_maps |=3D msk; bre=
+ak;
+> > +             case OPT_DELEGATE_PROGS: opts->delegate_progs |=3D msk; b=
+reak;
+> > +             case OPT_DELEGATE_ATTACHS: opts->delegate_attachs |=3D ms=
+k; break;
+> > +             default: return -EINVAL;
+> > +             }
+> > +             break;
+> >       }
+>
+> So just to repeat that this will allow a container to set it's own
+> delegation options:
+>
+>         # unprivileged container
+>
+>         fd_fs =3D fsopen();
+>         fsconfig(fd_fs, FSCONFIG_BLA_BLA, "give-me-all-the-delegation");
+>
+>         # Now hand of that fd_fs to a privileged process
+>
+>         fsconfig(fd_fs, FSCONFIG_CREATE_CMD, ...)
+>
+> This means the container manager can't be part of your threat model
+> because you need to trust it to set delegation options.
+>
+> But if the container manager is part of your threat model then you can
+> never trust an fd_fs handed to you because the container manager might
+> have enabled arbitrary delegation privileges.
+>
+> There's ways around this:
+>
+> (1) kernel: Account for this in the kernel and require privileges when
+>     setting delegation options.
 
-      Arnd
+What sort of privilege would that be? We are in an unprivileged user
+namespace, so that would have to be some ns_capable() checks or
+something? I can add ns_capable(CAP_BPF), but what else did you have
+in mind?
+
+I think even if we say that privileged parent does FSCONFIG_SET_STRING
+and unprivileged child just does sys_fsopen("bpf", 0) and nothing
+more, we still can't be sure that child won't race with parent and set
+FSCONFIG_SET_STRING at the same time. Because they both have access to
+the same fs_fd.
+
+> (2) userspace: A trusted helper that allocates an fs_context fd in
+>     the target user namespace, then sets delegation options and creates
+>     superblock.
+>
+> (1) Is more restrictive but also more secure. (2) is less restrictive
+> but requires more care from userspace.
+>
+> Either way I would probably consider writing a document detailing
+> various delegation scenarios and possible pitfalls and implications
+> before advertising it.
+>
+> If you choose (2) then you also need to be aware that the security of
+> this also hinges on bpffs not allowing to reconfigure parameters once it
+> has been mounted. Otherwise an unprivileged container can change
+> delegation options.
+>
+> I would recommend that you either add a dummy bpf_reconfigure() method
+> with a comment in it or you add a comment on top of bpf_context_ops.
+> Something like:
+>
+> /*
+>  * Unprivileged mounts of bpffs are owned by the user namespace they are
+>  * mounted in. That means unprivileged users can change vfs mount
+>  * options (ro<->rw, nosuid, etc.).
+>  *
+>  * They currently cannot change bpffs specific mount options such as
+>  * delegation settings. If that is ever implemented it is necessary to
+>  * require rivileges in the initial namespace. Otherwise unprivileged
+>  * users can change delegation options to whatever they want.
+>  */
+
+Yep, I will add a custom callback. I think we can allow reconfiguring
+towards less permissive delegation subset, but I'll need to look at
+the specifics to see if we can support that easily.
 
