@@ -1,171 +1,95 @@
-Return-Path: <netdev+bounces-46643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B838A7E5887
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:19:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB2A7E58BF
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:26:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 575CA1F21B5F
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:19:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8734128118B
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A372D199DE;
-	Wed,  8 Nov 2023 14:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C5D1A5B0;
+	Wed,  8 Nov 2023 14:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uxs05mpG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJoPBWH6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA93199D3
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:19:19 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B2F0171B
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:19:18 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54366bb1c02so11770a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 06:19:18 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6E21A589
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:26:46 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BAEE1FDF;
+	Wed,  8 Nov 2023 06:26:45 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9d10972e63eso1043321866b.2;
+        Wed, 08 Nov 2023 06:26:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699453157; x=1700057957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+sYNnjAcMQ8gCIe4cIzjWRlbHFIhha8H1RklK74YtPo=;
-        b=uxs05mpGSIdXlmdYd/s2YDwWA2313+WgW+YVF2x3jFcLiSbh6GAP9v1L0bfCsy+J5S
-         0GTLJuL+sbU/+PWUGe6F25lUGhJ9zKWGFAP184hcBPXnWMR78l4VJB/hKmshxA4udv8S
-         WRheh9wDpF13m9bYXsK28HddB1yAJdZwlaewrpic3g46K9wC+pKQkpKsqgxlBF9ddozT
-         AYFuDPJqr0TC18MD1Kh+EKXGvanviQ5wozSt1x0HfxptbOf4hi+AGYKwX+r4lbveeCT0
-         JnNboUpp9cU6sBhd+m9/6NS0xmoNmwwYGG1o2UfNXvi5RNFbO20OakOc+35ODgYuJ63a
-         Z5qA==
+        d=gmail.com; s=20230601; t=1699453604; x=1700058404; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVBE77VBxR9IpyvzgJwRw9S64V6IXgaNTy2Pl9D2aH4=;
+        b=UJoPBWH6+W2CAHH5y8m1Icgpb6XSkEa4ul0VKgPScbxUyjhNm6ppRHZwR1v8/XmSo4
+         1K474XafrnJZ1J3/WFx3Ol29uUP23hJyGXPDpkdZrLNaCfTEiAx1YW/AWsr8TjENJ8Ru
+         Lnosn4RZstdI1N/1KZhNxfyakIVpgfgSONSXYVwdi7heu0oMRQP7niPxPsc7VbXEfIbD
+         Eb8C3MlkE1I1xkvYyLKfCtJX6ugSbY4Yza4m7QQil68m+hJnxHkjmV4tsJuNMwEr1lf2
+         sZhuEnOUIOOndcKS/lUjrLJ9liVKoXMDh87okgbqzEklZ/G+jCoBa0YoGs3xAOOZgbOV
+         y4Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699453157; x=1700057957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+sYNnjAcMQ8gCIe4cIzjWRlbHFIhha8H1RklK74YtPo=;
-        b=lrdCkAAkjVQgbrLWGTVTxcE+oPQlvCSoUDEsWcJyOTFyF+rR3yVOHj9MJLhC2Rp+32
-         Bk2tAvBpwXaujH08jajogF3yHJ1FbfMrKH62SXTafksa7xdtf+GDMXvFdyYR8ssVxIUk
-         XUyBTsP8qd94munqwKEBkb6lnUntzopG/9ZX4D10wt+ySLhdqm5YprmYHUYtxiCa6nG2
-         lBvwZf4H+8VVcGGpXuoFWWshgjePPZkrjFDKfJ4hl2H0HtF5Rz2mqjztQUjBYbelcrbZ
-         rWtjF5+QnFuqmVr/kThpojjMGgR991B6nEGZrGxFI5fOO6KLzFpEspzvWTqKnZAAsKGI
-         UOLA==
-X-Gm-Message-State: AOJu0YwJihq+/6lcJCUb26MkjYj597cxnhn6lou/AIu8qfyQ2aEhpS+L
-	FXe3I17s3OTv4YPl/1MZg3jbDRU8KU/JncB0Wif14A==
-X-Google-Smtp-Source: AGHT+IHj4bJ+yiU4h9OblJOTjRI0jqw1FY6a7GwD4yc2B+lCC4iQ346itd6XVNguMuvx1MB2vtj6nSqzVvv5/MzQg4s=
-X-Received: by 2002:a05:6402:528e:b0:544:e37e:d597 with SMTP id
- en14-20020a056402528e00b00544e37ed597mr284537edb.7.1699453156652; Wed, 08 Nov
- 2023 06:19:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699453604; x=1700058404;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iVBE77VBxR9IpyvzgJwRw9S64V6IXgaNTy2Pl9D2aH4=;
+        b=lCA/CkcbMtX8bY0YWRaUzngtaDTLTQrSHURqImNvprQprT0ukJIRLV3EpFukhAiJok
+         axIobgKnA+3qgSgwhrmedOgqjS3khQXB7k/OUYr86xBoUKn9qbxlKzsV/yo57sEh8Oyl
+         SCidC5R17vUsbHQ7lgtUchb1Iuq1e8++pnasyuVHonXbpjuCQk9eB8P1YJo9Kp/a69CT
+         PdtYEPlnu1aZQnRtyVI0goZTK7gbpBoY+Y4tpxZVR3a489zgbJRxCiSL5Vd8cQ9uTIjB
+         i5YUT5fzSyaSHr9LK8bR4JsA8yD4gcE6ub50xybFSDk9I/6N7MrDTWaaShP1G/fvoYZI
+         UmBQ==
+X-Gm-Message-State: AOJu0Yz/kHZNbqmW4naRg0CpHCnwtwzxL4+WI3L9egtdEeo+vULaawh7
+	aCQMQl2TmWKNXsclDsWOS0Q=
+X-Google-Smtp-Source: AGHT+IGeu2yOuVGSxMaBwyf6wUUUWNLB7feoE7z9tAd1EQvhOpC3cE3veLdFXFYH4H49MAE6ulIGJA==
+X-Received: by 2002:a17:907:6d13:b0:9bf:65b0:1122 with SMTP id sa19-20020a1709076d1300b009bf65b01122mr1702011ejc.69.1699453603434;
+        Wed, 08 Nov 2023 06:26:43 -0800 (PST)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id q24-20020a1709066b1800b009b2ca104988sm1136317ejr.98.2023.11.08.06.26.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 06:26:43 -0800 (PST)
+Date: Wed, 8 Nov 2023 16:26:40 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 1/4] net: ethernet: cortina: Fix MTU max setting
+Message-ID: <20231108142640.tmly4ifgsoeo7m3e@skbuf>
+References: <20231107-gemini-largeframe-fix-v3-0-e3803c080b75@linaro.org>
+ <20231107-gemini-largeframe-fix-v3-1-e3803c080b75@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231108064641.65209-1-haifeng.xu@shopee.com>
-In-Reply-To: <20231108064641.65209-1-haifeng.xu@shopee.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 8 Nov 2023 15:19:03 +0100
-Message-ID: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
-Subject: Re: [PATCH] boning: use a read-write lock in bonding_show_bonds()
-To: Haifeng Xu <haifeng.xu@shopee.com>
-Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107-gemini-largeframe-fix-v3-1-e3803c080b75@linaro.org>
 
-On Wed, Nov 8, 2023 at 7:47=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.com> w=
-rote:
->
-> call stack:
+On Tue, Nov 07, 2023 at 10:54:26AM +0100, Linus Walleij wrote:
+> The RX max frame size is over 10000 for the Gemini ethernet,
+> but the TX max frame size is actually just 2047 (0x7ff after
+> checking the datasheet). Reflect this in what we offer to Linux,
+> cap the MTU at the TX max frame minus ethernet headers.
+> 
+> Use the BIT() macro for related bit flags so these TX settings
+> are consistent.
 
-These stacks should either be removed from the changelog, or moved
-_after_ the description
-of the problem. These are normal looking call stacks, you are not
-fixing a crash or deadlock.
-
-> ......
-> PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
-> [ffffa7a8e96bbac0] __schedule at ffffffffb0719898
-> [ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
-> [ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
-> [ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
-> [ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
-> [ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
-> [ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
-> [ffffa7a8e96bbc80] device_del at ffffffffb0209af8
-> [ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
-> [ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
-> [ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
-> [ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
-> [ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
-> [ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
-> [ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
-> [ffffa7a8e96bbf10] kthread at ffffffffafae132a
-> [ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
->
-> 290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-expor=
-ter"
-> [ffffa7a8d14dbb80] __schedule at ffffffffb0719898
-> [ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
-> [ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
-> [ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
-> [ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
-> [ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
-> [ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
-> [ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
-> [ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
-> [ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
-> [ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
-> [ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
-> [ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
-> [ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
-> [ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
-> [ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
-> [ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
-> [ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
-> [ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
-> ......
->
-> Problem description:
->
-> Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
-> but there are many readers which hold the kernfs_rwsem, so it has to slee=
-p
-> for a long time to wait the readers release the lock. Thread 278176 and a=
-ny
-> other threads which call bonding_show_bonds() also need to wait because
-> they try to accuire the rtnl_mutex.
-
-acquire
-
->
-> bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
-> However, the addition and deletion of bond_list are only performed in
-> bond_init()/bond_uninit(), so we can intoduce a separate read-write lock
-
-introduce
-
-> to synchronize bond list mutation.
->
-> What's the benefits of this change?
->
-> 1) All threads which call bonding_show_bonds() only wait when the
-> registration or unregistration of bond device happens.
->
-> 2) There are many other users of rtnl_mutex, so bonding_show_bonds()
-> won't compete with them.
->
-> In a word, this change reduces the lock contention of rtnl_mutex.
->
-
-This looks good to me, but please note:
-
-1) This is net-next material, please resend next week, because
-net-next is currently closed during the merge window.
-
-2) Using a spell checker would point few typos (including in the title
-"boning" -> "bonding")
-
-Thanks.
+What does this second paragraph intend to say? The patch doesn't use the
+BIT() macro.
 
