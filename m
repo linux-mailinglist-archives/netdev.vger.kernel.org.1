@@ -1,90 +1,125 @@
-Return-Path: <netdev+bounces-46641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFFC7E585B
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:08:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11937E587F
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:18:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 263B41C208C3
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:08:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5E922814B0
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFAD199B9;
-	Wed,  8 Nov 2023 14:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63DE199D6;
+	Wed,  8 Nov 2023 14:18:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5GEGOY5"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ce8QxVd4"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824EC199AE;
-	Wed,  8 Nov 2023 14:08:49 +0000 (UTC)
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0581FC1;
-	Wed,  8 Nov 2023 06:08:49 -0800 (PST)
-Received: by mail-qk1-x72e.google.com with SMTP id af79cd13be357-77bb668d941so14619285a.3;
-        Wed, 08 Nov 2023 06:08:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699452528; x=1700057328; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kX7CM/+HFOuoWO0RSAPK5Wud7OOKi/SdZQGaJwTivkY=;
-        b=O5GEGOY5RtmTjVbIHWJkBLUmvS16Tr5+Wqd8c+KSLvlmMYjaHssDM3nSxH6HwZIFbl
-         OtTTtNmaiuKUYVlhZNxdfaPtvdyvNRul+My7wczh9NRQyNGqWr80zhQytulWVePdmGTL
-         z9aVwQQOqWxBH0FfArUKdF8QtrvUe5QWlKBSBKbJQ8KUFv5SDs9OX3nSn2NudeniC+ew
-         wO3QcZ7/u91vmecn5suNEh5t4vbty6e7m+TqE4ryc+tlqAkfezpqP21UjKBDiKHz23VF
-         Yl+flBKAWsjua6yDV9cSWWRHOOHdY7FP3b53JxuOydxKTgeaV2vwnCxUya27cZdH71KJ
-         CbJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699452528; x=1700057328;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kX7CM/+HFOuoWO0RSAPK5Wud7OOKi/SdZQGaJwTivkY=;
-        b=tZw/rwOO461W24QK9fGvfnRXg6zeAxoZBnr2w+PodfzJ226zTTDR8VoBBa/3p7XHHc
-         SFqhim3w155XjUCXgFGWdcdPudnQMkq3p/UjU5fwf+0jn1nljN2SQpxGYX48goFl4yGP
-         WjgENPPVYMFytkOC9OkHa6p5fsCDy/DP3JufKotKsUIeCOSZCjyWXLSawiEE1qFppoP9
-         +q6621VFYd0t0Aa9s017RFTboh68bCqWmTa8eoLWHvSYF/hLCMI1Gi2CqT+O0+oSuNSy
-         bXsW5NwcfQpkfOThFYCixjsJiyUM7Sx9JIStwCimuA9bQV5Bce1roCmjNAz7FX79pqbD
-         dP5Q==
-X-Gm-Message-State: AOJu0YwJ5LlciLufeqaUeovPhBwCrfnWFbtO4FEfG6s87TQBbgsEQggi
-	uVq1GqSA6JIhh3sMFg5J7Bw=
-X-Google-Smtp-Source: AGHT+IHagkHKV+raaU34iTpMYbk7LfATLSymRnVvtHbHkjUYDy0VP9t2kHDEzXzWsAmbc5ZJ20SQvg==
-X-Received: by 2002:a05:620a:2801:b0:77a:565e:3ff0 with SMTP id f1-20020a05620a280100b0077a565e3ff0mr1678930qkp.31.1699452527943;
-        Wed, 08 Nov 2023 06:08:47 -0800 (PST)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id d26-20020a05620a141a00b007788bb0ab8esm1075318qkj.19.2023.11.08.06.08.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 06:08:47 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: corbet@lwn.net,  linux-doc@vger.kernel.org,  netdev@vger.kernel.org,
-  kuba@kernel.org,  pabeni@redhat.com,  edumazet@google.com
-Subject: Re: [PATCH] Documentation: Document the Netlink spec
-In-Reply-To: <m2y1f8mjex.fsf@gmail.com> (Donald Hunter's message of "Wed, 08
-	Nov 2023 14:03:34 +0000")
-Date: Wed, 08 Nov 2023 14:08:24 +0000
-Message-ID: <m2pm0kmj6v.fsf@gmail.com>
-References: <20231103135622.250314-1-leitao@debian.org>
-	<m2y1f8mjex.fsf@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7611640F;
+	Wed,  8 Nov 2023 14:18:33 +0000 (UTC)
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCD71716;
+	Wed,  8 Nov 2023 06:18:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=oPbIgwC0BijVgGIquFkJt/4vZ7saVONMlD6xtHIWlpI=; b=Ce8QxVd4WKG0h9ztVM/Vn/nozc
+	8DRtZ9C1JiuIIVlzxZxS+Ui3PxxM3jqb/akrMqXYO3WvQUBJmaQyrGweyeK/v/2+8fZJtis97EdQ/
+	Z2OUj+WkOgKAiPwjdTmxLpAN/0e+qc+yEGVcCGOKaE6IPc3x5sP1qOZYrVD/iYkmeJ7ckobeBHTNA
+	IarXDpeU/s6fQAOkNZdunXkH+NJj5F0m3DXdHv+wbdxzqwV/TXUawSYG3lJPeRoYipVWG2Yq80nQd
+	BOosblKbS23sgiPA/jNunjiRIP4lrtzpk4Tekhmsx6ugm9zT+y/qPe6q2ru9aKlrV+bDPpPIT9NHA
+	JfjaNGoA==;
+Received: from [2001:8a0:6c72:c100:c7fb:dbc0:2c8e:ab9a]
+	by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+	id 1r0jNp-001S65-JA; Wed, 08 Nov 2023 14:18:18 +0000
+Message-ID: <1b3ccc4a-41f7-46ad-9c5c-5ef44a96426e@infradead.org>
+Date: Wed, 8 Nov 2023 14:18:09 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 17/22] powerpc: ps3: move udbg_shutdown_ps3gelic prototype
+To: Arnd Bergmann <arnd@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>,
+ Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Guo Ren <guoren@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+ Greg Ungerer <gerg@linux-m68k.org>, Michal Simek <monstr@monstr.eu>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>,
+ John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+ "David S. Miller" <davem@davemloft.net>, Andy Lutomirski <luto@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ x86@kernel.org, Helge Deller <deller@gmx.de>,
+ Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Timur Tabi <timur@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>,
+ David Woodhouse <dwmw2@infradead.org>,
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+ Kees Cook <keescook@chromium.org>,
+ Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ Nicolas Schier <nicolas@fjasle.eu>, Al Viro <viro@zeniv.linux.org.uk>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+ linux-csky@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-sh@vger.kernel.org,
+ sparclinux@vger.kernel.org, netdev@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-bcachefs@vger.kernel.org, linux-mtd@lists.infradead.org
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-18-arnd@kernel.org>
+Content-Language: en-US
+From: Geoff Levand <geoff@infradead.org>
+In-Reply-To: <20231108125843.3806765-18-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Donald Hunter <donald.hunter@gmail.com> writes:
->
-> I quickly hacked the diff below to see if it would improve the HTML
-> rendering. I think the HTML has fewer odd constructs and the indentation
-> seems better to my eye. My main aim was to ensure that for a given
-> section, each indentation level uses the same construct, whether it be a
-> definition list or a bullet list.
+Hi Arnd,
 
-Or what Jakub said, use more (sub)+titles and fewer bullet lists.
+On 11/8/23 12:58, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Allmodconfig kernels produce a missing-prototypes warning:
+> 
+> arch/powerpc/platforms/ps3/gelic_udbg.c:239:6: error: no previous prototype for 'udbg_shutdown_ps3gelic' [-Werror=missing-prototypes]
+> 
+> Move the declaration from a local header to asm/ps3.h where it can be
+> seen from both the caller and the definition.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/powerpc/include/asm/ps3.h               | 6 ++++++
+>  arch/powerpc/platforms/ps3/gelic_udbg.c      | 1 +
+>  drivers/net/ethernet/toshiba/ps3_gelic_net.h | 6 ------
+>  3 files changed, 7 insertions(+), 6 deletions(-)
+
+Seems good to me.  I'll test it next chance I get.
+
+Signed-off-by: Geoff Levand <geoff@infradead.org>
+
 
 
