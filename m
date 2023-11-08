@@ -1,256 +1,363 @@
-Return-Path: <netdev+bounces-46646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E117E58F1
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:30:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83007E58FC
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD343B20D05
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:30:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E94C28163A
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3A41BDDA;
-	Wed,  8 Nov 2023 14:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB241798A;
+	Wed,  8 Nov 2023 14:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mYYmkMSR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NV6Zj27B"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092772A1A7
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:30:07 +0000 (UTC)
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56508213A
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:30:06 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-9d10f94f70bso1059613466b.3
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 06:30:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699453805; x=1700058605; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aqFYSyfDnsfrkZxmEenita9GfDckTQaGoW2e4dYhJ8k=;
-        b=mYYmkMSRh3f5O5x/qmA4LAxOxg5II9xqeqQQfGFQmwRre3Vtjb4fHWDb0i0JU7jyE+
-         l+VM2QzM0YahVHQYlwcy3pmhgZ08/sHJ+3PoIDHWJ7MW6PPJo6mIMsSCvPW0hbUVQnJ2
-         QdASrJThhMdtlx/tGXnjcuvzqjfJJpr0jcwA+ADefotKerVdVohnh9ceBy/pHbZbPqWa
-         91y573oq+JVtHXHvr6PEZgJ5SpXFvYvt+pTaJPibwBM2wpf1fszvoAnZTjPn35qSQAaZ
-         sZz0rnQXcZJKxKG8yCCbP2i/SG5INKrWSWQnYGcUpTPbnJr2NWYm0kpk6VyF2pWfdGOy
-         ALog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699453805; x=1700058605;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aqFYSyfDnsfrkZxmEenita9GfDckTQaGoW2e4dYhJ8k=;
-        b=sqETvdayeZrusBAV4VxHSJHxXU5cJ+TchiyetDDKAG3+gDA3HIyLIOAJAScTNxFdrb
-         sfr7ji3NwS/0PYqtzuVRscqzV/Ijl33zjq2j9Pv5qxRQcBExh6s0XbAE2wSf65++pw0u
-         cT7ad13/Z50em5jc3OfKXnC2AQz7ouj+ncH0AgreZBxRKz1UYE9h+LNDiOgJKRAk2MaB
-         q2HmZ8B64aj4mwcF7avwkNkvzHAG0nYgoXEidzVQwjz95U5KBNWdiRgxwWESpvSLzns+
-         kBq9uGl+CYDmCKr4R9Ii9Ndb2MkTpPF/awP6T1wB7qks9UqWeee2pEcysfhdyl7Z9HUy
-         /mCA==
-X-Gm-Message-State: AOJu0YyE6AzVaK8xPALHbuLuu+kb9eiYa5vqy8ivIjWm4Ib7RF7m5irq
-	5AYxTeEEYp2h60aK/04Ve566uw==
-X-Google-Smtp-Source: AGHT+IFY+DLVbduO84g93eYfANGJP/kR2DtWD0fYbMs2KW8rMAPhSsiglIJIv3lFAY2eaflaV+gstA==
-X-Received: by 2002:a17:906:ee81:b0:9dc:21c7:9ae5 with SMTP id wt1-20020a170906ee8100b009dc21c79ae5mr1560362ejb.26.1699453804546;
-        Wed, 08 Nov 2023 06:30:04 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id w12-20020a170906130c00b0099bd86f9248sm1126776ejb.63.2023.11.08.06.30.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 06:30:03 -0800 (PST)
-Date: Wed, 8 Nov 2023 15:30:02 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	michal.michalik@intel.com, milena.olech@intel.com,
-	pabeni@redhat.com, kuba@kernel.org
-Subject: Re: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
-Message-ID: <ZUubagu6B+vbfBqm@nanopsycho>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2C02A1A1;
+	Wed,  8 Nov 2023 14:30:59 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 369D61FD0;
+	Wed,  8 Nov 2023 06:30:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699453859; x=1730989859;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=MPEB4LdjBfyCPBNA6Uf6ywj9LolqiBOdlB9OW1SRGPw=;
+  b=NV6Zj27BCcDJSip5enyXRyUX+In5kJIuiPXHCOUGeh0fwnClnHXg/bde
+   GP3E3odGop7+Rd9FM6y0PBOYASn5iesvAOAfi1VG84rhcy6bOkg66vIwx
+   izps0AHXhSKcs/Qh4o4Mj6SW+JvP91ArX7HIb+nqwyUCjLhtb6EUb9sTI
+   pXEWYpQucGfLD2aKMm9QOIEcrjzXMGV8K6v9BmGH3AuRtH3DlpvsUGhY8
+   cBzwtnts9TKKxbNj2FQwDjg2CC72AjQ2UQaaxRXMrZb3erpZsmgEbWteB
+   bstjJVnY4uImq8Kvs41iByHzfgbDeeUT8OtU59ZquzdTinbZnuKXLdEpS
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="380170061"
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="380170061"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 06:30:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="798015164"
+X-IronPort-AV: E=Sophos;i="6.03,286,1694761200"; 
+   d="scan'208";a="798015164"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Nov 2023 06:30:58 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 8 Nov 2023 06:30:58 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 8 Nov 2023 06:30:57 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 8 Nov 2023 06:30:57 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Wed, 8 Nov 2023 06:30:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CCH53unvQQa5epesU0Dq3fRcYSl27rbh4kRVBXGtn8iTECJtCplKngMilCn2crShm2Yr9bBZBvuw7Ml2fievbqmH+AKNalKool/fBwoO1RAgrq+1f5MZkSsZcVXqBSfn/MWZywPrAbkRxSzJPZyQVJFgNrGI4N7w9A7w0IqEU8PWPJrEiDchVZ80nn1ozYxgGKj9YM1xiqG/jgV+D8mshScwXPV5N6k3Ry2DgvClEcZgobuoI3zp9GXsaOD9i+xNDCH1Yd0t40cvLOwMnTHl6KlmE9KL5/gpve51IJNuHD3zAY0BzR9UBu0xfsZKRqgOiIOyzTXO18iJhToN2RQagw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BR6oxOSRnYlSjyaTj4YcDHVTwK3WQ59Q9LIAgd5p1hI=;
+ b=MWG8Z8cAf+JP0dmNerWN62UlzvftC83gPpDON50PemqbGzLld9f2zAwnQGLTax8FS3phis6yJ5yssnkJNpnxt2llpUPL8f5iOvOtOq6RooEkKylViN4DueYcBz29xQojUMf3l6jhl7gj9a4l0bCrn+Bpe7G2lSVT8i5O+QGLgEuGkXfsS3eUHEiiRe41ueIUj8Hx2YOZvqLlLe04l6ywwamayE3R1y822jGuKsfSUP+2+BSyvGJUU3Dnf5Tx7bTsVnhOEYKNrMLZlTrhMCenFVwqHq+HxOopx2wzH3v9KDIxg+gJwYZPZKb15WcD4tdlE8zaVOVrjMACvNePAtI35Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ CYYPR11MB8408.namprd11.prod.outlook.com (2603:10b6:930:b9::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6954.28; Wed, 8 Nov 2023 14:30:55 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53%6]) with mapi id 15.20.6954.029; Wed, 8 Nov 2023
+ 14:30:54 +0000
+Date: Wed, 8 Nov 2023 15:30:43 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <bjorn@kernel.org>,
+	<magnus.karlsson@intel.com>, <jonathan.lemon@gmail.com>,
+	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<ast@kernel.org>, <daniel@iogearbox.net>, <tirthendu.sarkar@intel.com>
+Subject: Re: [PATCH bpf-next] selftests/xsk: fix for SEND_RECEIVE_UNALIGNED
+ test.
+Message-ID: <ZUubk1lZ6WDDV2k+@boxer>
+References: <20231103142936.393654-1-tushar.vyavahare@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231103142936.393654-1-tushar.vyavahare@intel.com>
+X-ClientProxiedBy: FR4P281CA0033.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c7::16) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CYYPR11MB8408:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cbfa565-9e69-484a-9e1f-08dbe06750df
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /LxwFo5WquhTipva/gtIuohJDVZfAYTThBTaCSHjM8F+kEq2lj8z9n2mZYVVRhJoDrlYseu6gelLJHMLk5Iim7P6UOs+cRs7x1G4DEh32tltD+/o8BZDRevceM3Z0CsBwDM3SLly4HDksDeRT4zWIX4wBUIkJZkUA34uq2CcjXM0gk+Pg7uFQ5P1G/t43lEOSCP5jSMcl68W+keJ8hCjFPEwPpcYnyAWm9TVwtDH1bKmemC0vAZAK1DEpOQC5alC9e28lHOGcViGg7EiZA7gZzEDbCVVISOTVYm430uIfaDna67foLzNHG2WC9qxn+y18gfd3OHkXSAJPwcXVLGdUXN/B99ovCAb+o1SmVwpm5at7u6x/WWCT/oTNGVUXsb3vJ/w7+nyf3h3QCs8NenJHIf4erLVKEUVU8rcg+/2A5LRz9vcieNvc8lyh+oLI/DHw/VsRyOZ61zNU8qze2NAgg84ZehamtqZSSpzFXQsUw9WZ7sk3W8AkWM37+XHDeiv0FrWVkPOuBwFpTExzkAtyARG87J6Y6rVXknt5vdE9gjALf7dDcoKBHrz5TK7MCi3
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(376002)(136003)(39860400002)(396003)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(44832011)(6512007)(9686003)(6636002)(316002)(66946007)(41300700001)(66556008)(6486002)(66476007)(6666004)(6862004)(8676002)(478600001)(8936002)(6506007)(4326008)(5660300002)(107886003)(2906002)(83380400001)(82960400001)(26005)(86362001)(33716001)(38100700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?u2u2WFEpy1z4BJ//n+P5CUCzsbNhfdhk73/MUBTHXmi77NH0HXRWuNV9mIoc?=
+ =?us-ascii?Q?utUnnYojMYPIZ6oxGxiBWp9vgtrmtN8iSar9IeyXK5vqsUjVf2ZTo/RJz3R7?=
+ =?us-ascii?Q?nt7wBdLKtzzJKGJsKHieyZD/gThZF529TEP+nEBQLvh2642liEQ2ecEk5c2C?=
+ =?us-ascii?Q?tDX++Q6L8maHo5P5RPIFQ2RWUgB3Iad/4/3bxcyXqJy5d2sNxMgKvTiNKCmg?=
+ =?us-ascii?Q?7hBRtCLO/T0EVlugT52CyDjMQ7RMzhwVlRgRqet18H/aF6woHTcxJKVrn1Rp?=
+ =?us-ascii?Q?ji9Qezdn35Q8uR/6omSTGUdShl3fBu67x+nf5hRKmeOWIKgDMyooDDDe/m/G?=
+ =?us-ascii?Q?WbYzqygeCcn/RFMDgpqrIeAQVkEhogmLefLqkv4P8jaFeZpzT9i0oV7WV/ma?=
+ =?us-ascii?Q?Jpi4qX/Nq+vGjhwYCMdJDcJ9Pexq5k0USkyo/ioI9iL+Ir9PlBwnlY8XeZa6?=
+ =?us-ascii?Q?76Xq5+hLmZxDnRHgQJykFrUSHO+Lz6M1kNxENj9kxTaMnf1pv6AOevMYHmuj?=
+ =?us-ascii?Q?HaKAh1/4/2i8K+ET28vv/6al7y5a3bRwD9le7xta7BczNBS7djI8bB+4obuy?=
+ =?us-ascii?Q?Sx3/us7jZYJvAcoyO+YgC4Krbhe7+s2faS8SdH3mDwMdMmmyZlGamdtdc8nU?=
+ =?us-ascii?Q?czK9YJ6niaEhD7vlIqJY5ZYc/XSRhhkdsuZADoffFBHVmZuH+xtmwleA7X4D?=
+ =?us-ascii?Q?Cvduv7BfslucxGQOlMqgu/zIAEFHqyF/4UigrnNa2Ca4a/Kw0ANs2VV1ciGh?=
+ =?us-ascii?Q?CcsMkpYBPnHJ4GCfRk5J/KqWcIdcyeLkRJBxtlsJElKfagZie6MwJFgKRRZs?=
+ =?us-ascii?Q?VP/g9WhOFS77xr+0vHPzcTSMSIuNKy9BFuSxEN3kviKBV2Q8u+gGqlqgUzj/?=
+ =?us-ascii?Q?qjda/0hdYpHTF7A3YjZQyhzYfae89WAWjICdpssc11jW1G673MqSato/txdY?=
+ =?us-ascii?Q?ZwD/Hj6LgCIF6nyIIrSGIjouIC/Fqh6wnsRP4x5i825LEpZh5NVQ23oZ4c7Q?=
+ =?us-ascii?Q?ok8BaUI5lh1sc+1FgYjBwhubuBG/oK4JJDd8DLUluUubD5/4yp5wly3ZW/B+?=
+ =?us-ascii?Q?pSFEH7nDSBT/frgf5cSZS6ZF69JAE/D6Ty2SUTccwN1dArnjiPG2vwJUacdH?=
+ =?us-ascii?Q?52t9p8fXYvifZErQIu5dLn9qibtC1upAZcHP6iljp5O61hc7WE+eiFFb8eUD?=
+ =?us-ascii?Q?RYHCGUG3QjlqlP4pU9oD+OStTq4ZHQIgDrfbK9mtsmB/AG3SYRobPt85cueD?=
+ =?us-ascii?Q?GnVDjJiwNtryVBx6wZmDF48RnAyVUR3n96b+tStK8TE/0Px6V74h4HaarpDS?=
+ =?us-ascii?Q?RsGz+B0NTbdiU5ugJqlta9TM9AZ4MLVYp0Pjkrv3HHuKd+hJSy8Vsyi7O/KQ?=
+ =?us-ascii?Q?ccBiqS/zD5N8LBiuo9qZIgFr5z9cwc6cVxF9VHoq9X/i7H79xLAc2wXNOmYN?=
+ =?us-ascii?Q?W8mLIXp1BMETI+V098Y7ASOjzMsjEJiylAGrGXaNgl2a/7BApk0XGTPwIBq+?=
+ =?us-ascii?Q?9oTFNTUitzD/U2HF/mN9YZuo1LabkdTx3+IuVnnyWnSfcbCvATYSXzmG58Mx?=
+ =?us-ascii?Q?OBF/ez73SJ/QBBvjG7D+jEhMJfPvq50HUFe2eM+4vecuqSb/2Hnv+M/ZnXhI?=
+ =?us-ascii?Q?gg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cbfa565-9e69-484a-9e1f-08dbe06750df
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 14:30:54.8504
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XXPM+rxwx4UDhPolQ9r5PomkP7r7vqockW3ndafe5nh+jztCzfjGvlpDfAqnRfBJh8ZlNMxU9XaElVMGoa6m/EmfZyH7XJGoGgWPt0pbnNY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8408
+X-OriginatorOrg: intel.com
 
-Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com wrote:
->When a kernel module is unbound but the pin resources were not entirely
->freed (other kernel module instance have had kept the reference to that
->pin), and kernel module is again bound, the pin properties would not be
->updated (the properties are only assigned when memory for the pin is
->allocated), prop pointer still points to the kernel module memory of
->the kernel module which was deallocated on the unbind.
->
->If the pin dump is invoked in this state, the result is a kernel crash.
->Prevent the crash by storing persistent pin properties in dpll subsystem,
->copy the content from the kernel module when pin is allocated, instead of
->using memory of the kernel module.
->
->Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
->Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->---
-> drivers/dpll/dpll_core.c    |  4 ++--
-> drivers/dpll/dpll_core.h    |  4 ++--
-> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
-> 3 files changed, 18 insertions(+), 18 deletions(-)
->
->diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->index 3568149b9562..4077b562ba3b 100644
->--- a/drivers/dpll/dpll_core.c
->+++ b/drivers/dpll/dpll_core.c
->@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
-> 		ret = -EINVAL;
-> 		goto err;
-> 	}
->-	pin->prop = prop;
->+	memcpy(&pin->prop, prop, sizeof(pin->prop));
+On Fri, Nov 03, 2023 at 02:29:36PM +0000, Tushar Vyavahare wrote:
+> Fix test broken by shared umem test and framework enhancement commit.
+> 
+> Correct the current implementation of pkt_stream_replace_half() by
+> ensuring that nb_valid_entries are not set to half, as this is not true
+> for all the tests.
 
-Odd, you don't care about the pointer within this structure?
+Please be more specific - so what is the expected value for
+nb_valid_entries for unaligned mode test then, if not the half?
 
+> 
+> Create a new function called pkt_modify() that allows for packet
+> modification to meet specific requirements while ensuring the accurate
+> maintenance of the valid packet count to prevent inconsistencies in packet
+> tracking.
+> 
+> Fixes: 6d198a89c004 ("selftests/xsk: Add a test for shared umem feature")
+> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+> ---
+>  tools/testing/selftests/bpf/xskxceiver.c | 71 ++++++++++++++++--------
+>  1 file changed, 47 insertions(+), 24 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+> index 591ca9637b23..f7d3a4a9013f 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.c
+> +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> @@ -634,16 +634,35 @@ static u32 pkt_nb_frags(u32 frame_size, struct pkt_stream *pkt_stream, struct pk
+>  	return nb_frags;
+>  }
+>  
+> -static void pkt_set(struct pkt_stream *pkt_stream, struct pkt *pkt, int offset, u32 len)
+> +static bool pkt_valid(bool unaligned_mode, int offset, u32 len)
 
-> 	refcount_set(&pin->refcount, 1);
-> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
-> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
->@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent, struct dpll_pin *pin,
-> 	unsigned long i, stop;
-> 	int ret;
+kinda confusing to have is_pkt_valid() and pkt_valid() functions...
+maybe name this as set_pkt_valid() ? doesn't help much but anyways.
+
+> +{
+> +	if (len > MAX_ETH_JUMBO_SIZE || (!unaligned_mode && offset < 0))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static void pkt_set(struct pkt_stream *pkt_stream, struct xsk_umem_info *umem, struct pkt *pkt,
+> +		    int offset, u32 len)
+
+How about adding a bool unaligned to pkt_stream instead of passing whole
+xsk_umem_info to pkt_set - wouldn't this make the diff smaller?
+
+>  {
+>  	pkt->offset = offset;
+>  	pkt->len = len;
+> -	if (len > MAX_ETH_JUMBO_SIZE) {
+> -		pkt->valid = false;
+> -	} else {
+> -		pkt->valid = true;
+> +
+> +	pkt->valid = pkt_valid(umem->unaligned_mode, offset, len);
+> +	if (pkt->valid)
+>  		pkt_stream->nb_valid_entries++;
+> -	}
+> +}
+> +
+> +static void pkt_modify(struct pkt_stream *pkt_stream, struct xsk_umem_info *umem, struct pkt *pkt,
+> +		       int offset, u32 len)
+> +{
+> +	bool mod_valid;
+> +
+> +	pkt->offset = offset;
+> +	pkt->len = len;
+> +	mod_valid  = pkt_valid(umem->unaligned_mode, offset, len);
+
+double space
+
+> +	pkt_stream->nb_valid_entries += mod_valid - pkt->valid;
+> +	pkt->valid = mod_valid;
+>  }
+>  
+>  static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
+> @@ -651,7 +670,8 @@ static u32 pkt_get_buffer_len(struct xsk_umem_info *umem, u32 len)
+>  	return ceil_u32(len, umem->frame_size) * umem->frame_size;
+>  }
+>  
+> -static struct pkt_stream *__pkt_stream_generate(u32 nb_pkts, u32 pkt_len, u32 nb_start, u32 nb_off)
+> +static struct pkt_stream *__pkt_stream_generate(struct xsk_umem_info *umem, u32 nb_pkts,
+> +						u32 pkt_len, u32 nb_start, u32 nb_off)
+>  {
+>  	struct pkt_stream *pkt_stream;
+>  	u32 i;
+> @@ -665,30 +685,31 @@ static struct pkt_stream *__pkt_stream_generate(u32 nb_pkts, u32 pkt_len, u32 nb
+>  	for (i = 0; i < nb_pkts; i++) {
+>  		struct pkt *pkt = &pkt_stream->pkts[i];
+>  
+> -		pkt_set(pkt_stream, pkt, 0, pkt_len);
+> +		pkt_set(pkt_stream, umem, pkt, 0, pkt_len);
+>  		pkt->pkt_nb = nb_start + i * nb_off;
+>  	}
+>  
+>  	return pkt_stream;
+>  }
+>  
+> -static struct pkt_stream *pkt_stream_generate(u32 nb_pkts, u32 pkt_len)
+> +static struct pkt_stream *pkt_stream_generate(struct xsk_umem_info *umem, u32 nb_pkts, u32 pkt_len)
+>  {
+> -	return __pkt_stream_generate(nb_pkts, pkt_len, 0, 1);
+> +	return __pkt_stream_generate(umem, nb_pkts, pkt_len, 0, 1);
+>  }
+>  
+> -static struct pkt_stream *pkt_stream_clone(struct pkt_stream *pkt_stream)
+> +static struct pkt_stream *pkt_stream_clone(struct pkt_stream *pkt_stream,
+> +					   struct xsk_umem_info *umem)
+>  {
+> -	return pkt_stream_generate(pkt_stream->nb_pkts, pkt_stream->pkts[0].len);
+> +	return pkt_stream_generate(umem, pkt_stream->nb_pkts, pkt_stream->pkts[0].len);
+>  }
+>  
+>  static void pkt_stream_replace(struct test_spec *test, u32 nb_pkts, u32 pkt_len)
+>  {
+>  	struct pkt_stream *pkt_stream;
+>  
+> -	pkt_stream = pkt_stream_generate(nb_pkts, pkt_len);
+> +	pkt_stream = pkt_stream_generate(test->ifobj_rx->umem, nb_pkts, pkt_len);
+>  	test->ifobj_tx->xsk->pkt_stream = pkt_stream;
+> -	pkt_stream = pkt_stream_generate(nb_pkts, pkt_len);
+> +	pkt_stream = pkt_stream_generate(test->ifobj_tx->umem, nb_pkts, pkt_len);
+>  	test->ifobj_rx->xsk->pkt_stream = pkt_stream;
+>  }
+>  
+> @@ -698,12 +719,11 @@ static void __pkt_stream_replace_half(struct ifobject *ifobj, u32 pkt_len,
+>  	struct pkt_stream *pkt_stream;
+>  	u32 i;
+>  
+> -	pkt_stream = pkt_stream_clone(ifobj->xsk->pkt_stream);
+> +	pkt_stream = pkt_stream_clone(ifobj->xsk->pkt_stream, ifobj->umem);
+>  	for (i = 1; i < ifobj->xsk->pkt_stream->nb_pkts; i += 2)
+> -		pkt_set(pkt_stream, &pkt_stream->pkts[i], offset, pkt_len);
+> +		pkt_modify(pkt_stream, ifobj->umem, &pkt_stream->pkts[i], offset, pkt_len);
+>  
+>  	ifobj->xsk->pkt_stream = pkt_stream;
+> -	pkt_stream->nb_valid_entries /= 2;
+>  }
+>  
+>  static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_len, int offset)
+> @@ -715,9 +735,10 @@ static void pkt_stream_replace_half(struct test_spec *test, u32 pkt_len, int off
+>  static void pkt_stream_receive_half(struct test_spec *test)
+>  {
+>  	struct pkt_stream *pkt_stream = test->ifobj_tx->xsk->pkt_stream;
+> +	struct xsk_umem_info *umem = test->ifobj_rx->umem;
+>  	u32 i;
+>  
+> -	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(pkt_stream->nb_pkts,
+> +	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(umem, pkt_stream->nb_pkts,
+>  							      pkt_stream->pkts[0].len);
+>  	pkt_stream = test->ifobj_rx->xsk->pkt_stream;
+>  	for (i = 1; i < pkt_stream->nb_pkts; i += 2)
+> @@ -733,12 +754,12 @@ static void pkt_stream_even_odd_sequence(struct test_spec *test)
+>  
+>  	for (i = 0; i < test->nb_sockets; i++) {
+>  		pkt_stream = test->ifobj_tx->xsk_arr[i].pkt_stream;
+> -		pkt_stream = __pkt_stream_generate(pkt_stream->nb_pkts / 2,
+> +		pkt_stream = __pkt_stream_generate(test->ifobj_tx->umem, pkt_stream->nb_pkts / 2,
+>  						   pkt_stream->pkts[0].len, i, 2);
+>  		test->ifobj_tx->xsk_arr[i].pkt_stream = pkt_stream;
+>  
+>  		pkt_stream = test->ifobj_rx->xsk_arr[i].pkt_stream;
+> -		pkt_stream = __pkt_stream_generate(pkt_stream->nb_pkts / 2,
+> +		pkt_stream = __pkt_stream_generate(test->ifobj_rx->umem, pkt_stream->nb_pkts / 2,
+>  						   pkt_stream->pkts[0].len, i, 2);
+>  		test->ifobj_rx->xsk_arr[i].pkt_stream = pkt_stream;
+>  	}
+> @@ -1961,7 +1982,8 @@ static int testapp_stats_tx_invalid_descs(struct test_spec *test)
+>  static int testapp_stats_rx_full(struct test_spec *test)
+>  {
+>  	pkt_stream_replace(test, DEFAULT_UMEM_BUFFERS + DEFAULT_UMEM_BUFFERS / 2, MIN_PKT_SIZE);
+> -	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+> +	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(test->ifobj_rx->umem,
+> +							      DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+>  
+>  	test->ifobj_rx->xsk->rxqsize = DEFAULT_UMEM_BUFFERS;
+>  	test->ifobj_rx->release_rx = false;
+> @@ -1972,7 +1994,8 @@ static int testapp_stats_rx_full(struct test_spec *test)
+>  static int testapp_stats_fill_empty(struct test_spec *test)
+>  {
+>  	pkt_stream_replace(test, DEFAULT_UMEM_BUFFERS + DEFAULT_UMEM_BUFFERS / 2, MIN_PKT_SIZE);
+> -	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+> +	test->ifobj_rx->xsk->pkt_stream = pkt_stream_generate(test->ifobj_rx->umem,
+> +							      DEFAULT_UMEM_BUFFERS, MIN_PKT_SIZE);
+>  
+>  	test->ifobj_rx->use_fill_ring = false;
+>  	test->ifobj_rx->validation_func = validate_fill_empty;
+> @@ -2526,8 +2549,8 @@ int main(int argc, char **argv)
+>  	init_iface(ifobj_tx, worker_testapp_validate_tx);
+>  
+>  	test_spec_init(&test, ifobj_tx, ifobj_rx, 0, &tests[0]);
+> -	tx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+> -	rx_pkt_stream_default = pkt_stream_generate(DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+> +	tx_pkt_stream_default = pkt_stream_generate(ifobj_tx->umem, DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+> +	rx_pkt_stream_default = pkt_stream_generate(ifobj_rx->umem, DEFAULT_PKT_CNT, MIN_PKT_SIZE);
+>  	if (!tx_pkt_stream_default || !rx_pkt_stream_default)
+>  		exit_with_error(ENOMEM);
+>  	test.tx_pkt_stream_default = tx_pkt_stream_default;
+> -- 
+> 2.34.1
 > 
->-	if (WARN_ON(parent->prop->type != DPLL_PIN_TYPE_MUX))
->+	if (WARN_ON(parent->prop.type != DPLL_PIN_TYPE_MUX))
-> 		return -EINVAL;
-> 
-> 	if (WARN_ON(!ops) ||
->diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
->index 5585873c5c1b..717f715015c7 100644
->--- a/drivers/dpll/dpll_core.h
->+++ b/drivers/dpll/dpll_core.h
->@@ -44,7 +44,7 @@ struct dpll_device {
->  * @module:		module of creator
->  * @dpll_refs:		hold referencees to dplls pin was registered with
->  * @parent_refs:	hold references to parent pins pin was registered with
->- * @prop:		pointer to pin properties given by registerer
->+ * @prop:		pin properties copied from the registerer
->  * @rclk_dev_name:	holds name of device when pin can recover clock from it
->  * @refcount:		refcount
->  **/
->@@ -55,7 +55,7 @@ struct dpll_pin {
-> 	struct module *module;
-> 	struct xarray dpll_refs;
-> 	struct xarray parent_refs;
->-	const struct dpll_pin_properties *prop;
->+	struct dpll_pin_properties prop;
-> 	refcount_t refcount;
-> };
-> 
->diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->index 93fc6c4b8a78..963bbbbe6660 100644
->--- a/drivers/dpll/dpll_netlink.c
->+++ b/drivers/dpll/dpll_netlink.c
->@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
-> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq), &freq,
-> 			  DPLL_A_PIN_PAD))
-> 		return -EMSGSIZE;
->-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++) {
->+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++) {
-> 		nest = nla_nest_start(msg, DPLL_A_PIN_FREQUENCY_SUPPORTED);
-> 		if (!nest)
-> 			return -EMSGSIZE;
->-		freq = pin->prop->freq_supported[fs].min;
->+		freq = pin->prop.freq_supported[fs].min;
-> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN, sizeof(freq),
-> 				  &freq, DPLL_A_PIN_PAD)) {
-> 			nla_nest_cancel(msg, nest);
-> 			return -EMSGSIZE;
-> 		}
->-		freq = pin->prop->freq_supported[fs].max;
->+		freq = pin->prop.freq_supported[fs].max;
-> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX, sizeof(freq),
-> 				  &freq, DPLL_A_PIN_PAD)) {
-> 			nla_nest_cancel(msg, nest);
->@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct dpll_pin *pin, u32 freq)
-> {
-> 	int fs;
-> 
->-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++)
->-		if (freq >= pin->prop->freq_supported[fs].min &&
->-		    freq <= pin->prop->freq_supported[fs].max)
->+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++)
->+		if (freq >= pin->prop.freq_supported[fs].min &&
->+		    freq <= pin->prop.freq_supported[fs].max)
-> 			return true;
-> 	return false;
-> }
->@@ -403,7 +403,7 @@ static int
-> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
-> 		     struct netlink_ext_ack *extack)
-> {
->-	const struct dpll_pin_properties *prop = pin->prop;
->+	const struct dpll_pin_properties *prop = &pin->prop;
-> 	struct dpll_pin_ref *ref;
-> 	int ret;
-> 
->@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32 parent_idx,
-> 	int ret;
-> 
-> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->-	      pin->prop->capabilities)) {
->+	      pin->prop.capabilities)) {
-> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
-> 		return -EOPNOTSUPP;
-> 	}
->@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll, struct dpll_pin *pin,
-> 	int ret;
-> 
-> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->-	      pin->prop->capabilities)) {
->+	      pin->prop.capabilities)) {
-> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
-> 		return -EOPNOTSUPP;
-> 	}
->@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll, struct dpll_pin *pin,
-> 	int ret;
-> 
-> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
->-	      pin->prop->capabilities)) {
->+	      pin->prop.capabilities)) {
-> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
-> 		return -EOPNOTSUPP;
-> 	}
->@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin, struct dpll_device *dpll,
-> 	int ret;
-> 
-> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
->-	      pin->prop->capabilities)) {
->+	      pin->prop.capabilities)) {
-> 		NL_SET_ERR_MSG(extack, "direction changing is not allowed");
-> 		return -EOPNOTSUPP;
-> 	}
->@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct nlattr *phase_adj_attr,
-> 	int ret;
-> 
-> 	phase_adj = nla_get_s32(phase_adj_attr);
->-	if (phase_adj > pin->prop->phase_range.max ||
->-	    phase_adj < pin->prop->phase_range.min) {
->+	if (phase_adj > pin->prop.phase_range.max ||
->+	    phase_adj < pin->prop.phase_range.min) {
-> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
-> 				    "phase adjust value not supported");
-> 		return -EINVAL;
->@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr *mod_name_attr,
-> 	unsigned long i;
-> 
-> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
->-		prop = pin->prop;
->+		prop = &pin->prop;
-> 		cid_match = clock_id ? pin->clock_id == clock_id : true;
-> 		mod_match = mod_name_attr && module_name(pin->module) ?
-> 			!nla_strcmp(mod_name_attr,
->-- 
->2.38.1
->
 
