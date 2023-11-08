@@ -1,102 +1,211 @@
-Return-Path: <netdev+bounces-46673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 687A87E5AC0
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 17:01:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528B27E5ADC
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 17:12:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D83F281396
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:01:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 767161C20AD4
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478CE3065E;
-	Wed,  8 Nov 2023 16:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A5A30CEF;
+	Wed,  8 Nov 2023 16:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V6v8JFgy"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="fMZnLo4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D3030656
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 16:01:13 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1C0172E
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 08:01:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699459272;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=rQ51b9eM0IFRwZBnxfiG5qJhLYeuJ0C09QIPA+aM9L8=;
-	b=V6v8JFgyd2A9aSBoKB20USk6q8fS3KpxFsQZzRcnLyvE+GV0Sya9ekmjEy2DHOBfoBn7Q/
-	jmUmJdxp7A7pqu3PCE1pDou733tj49ny/QgAjiw+6p4s11J3aEXkcTRuL2yi3Nyv7WLANF
-	Gz9XZZogDas0t0ebVAeTnUD2H4k5VuE=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-104-3s9y6T4AMICaPuwOeGB2SA-1; Wed,
- 08 Nov 2023 11:01:08 -0500
-X-MC-Unique: 3s9y6T4AMICaPuwOeGB2SA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A634A3810D35;
-	Wed,  8 Nov 2023 16:01:06 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.110])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C75042166B27;
-	Wed,  8 Nov 2023 16:01:04 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	Neerav Parikh <neerav.parikh@intel.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH iwl-net] i40e: Fix waiting for queues of all VSIs to be disabled
-Date: Wed,  8 Nov 2023 17:01:03 +0100
-Message-ID: <20231108160104.86140-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FFC3067D
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 16:12:00 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C3A1FDD
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 08:12:00 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1cc53d0030fso7721855ad.0
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 08:12:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699459919; x=1700064719; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=polvhyFKi41sYRbfyXcWfNg92E/y83EB4K6tLgO22GE=;
+        b=fMZnLo4HPvXvwWMfWCCcRaMigK5xh+kX8wf4RZP2ma321/Z1JYQo67/VszzQKNfw3v
+         3goPttKl/odneFolWfAMNBV+uKusYqOJTz+2d+qbsrUl40GYO0Vyu5Xb1bqF0PQQxo6N
+         2sXqMep1TEfCP1PvZWdk8tOgt8tDsdl1rpkNEojQ7Wct8EIXPhAQhcNA1p9dgSJqAwrl
+         HqOxIDKgtzECFs4A1TVvFzQHzaGmO8FoEWWHomv9jpMcYN2EvVdhVuFTIOR+wtprT9ZU
+         71u4PYuR6PLGo+o7ahJ6ZdcmIiDkmNK/Cp449N3FRHsAgoHieJXJTqhbHyVwci1HCcQG
+         UYPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699459919; x=1700064719;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=polvhyFKi41sYRbfyXcWfNg92E/y83EB4K6tLgO22GE=;
+        b=I2jR4OpahYMND9G6kOPhg3Ass/6y22lt/pRqkrZOYGq5uMiprTOC0kFqlzoULQ9YNX
+         +LbQSmpSXrHkXNpQAmZyk7UTs89tTTHUQy5Mn0ss7imLdHelsxXXO/9tntgM4Ac9tlBz
+         MOJBSnm3iXOrnc5jq80bKSRjUE4zwb/iOMJ+Ai7kk0F7JycHjuyz4atKiWJRg1i/pIuX
+         VHxZRBYx0AZwbgFw+qSTIDsfw4efiPBa8TW/01juAi5M9NMJe1hHEpI4APL6aCpf/0b4
+         D1uLapnMfDcRxqAvAN/15zY1vSwRBX8Qf3DlysMMCGFlJ74jG2WmUwsbWPCkv+xZ8R6S
+         Y4Kw==
+X-Gm-Message-State: AOJu0Yx/fnBdUlM58rPyjD9XoKccqbxE/sct73DRKSjIgFjEhWriLBrD
+	PZ4rXWNgyoHL0VwPcoyfDfjVdQ==
+X-Google-Smtp-Source: AGHT+IGIHNEVwzF/gyLgbWBbkclZC1Cl+aAPHlcgnsXyRaq8hkIiNwI80BUKnJwETkn1zLVFUQ+98w==
+X-Received: by 2002:a17:902:d389:b0:1cc:4810:6f2c with SMTP id e9-20020a170902d38900b001cc48106f2cmr2906326pld.33.1699459919231;
+        Wed, 08 Nov 2023 08:11:59 -0800 (PST)
+Received: from ?IPV6:2620:10d:c085:21e8::1118? ([2620:10d:c090:400::4:86d6])
+        by smtp.gmail.com with ESMTPSA id d2-20020a170902cec200b001c3be750900sm1938192plg.163.2023.11.08.08.11.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 08:11:58 -0800 (PST)
+Message-ID: <1d1f7518-6ff9-4402-a874-5c0138bedefd@davidwei.uk>
+Date: Wed, 8 Nov 2023 08:11:56 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [net?] WARNING in inet_csk_get_port (2)
+Content-Language: en-GB
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
+Cc: avagin@gmail.com, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <0000000000004ba00e0605ce2fcf@google.com>
+ <20230920185952.94518-1-kuniyu@amazon.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20230920185952.94518-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The function i40e_pf_wait_queues_disabled() iterates all PF's VSIs
-up to 'pf->hw.func_caps.num_vsis' but this is incorrect because
-the real number of VSIs can be up to 'pf->num_alloc_vsi' that
-can be higher. Fix this loop.
+On 2023-09-20 11:59, Kuniyuki Iwashima wrote:
+> From: syzbot <syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com>
+> Date: Wed, 20 Sep 2023 11:02:55 -0700
+>> Hello,
+>>
+>> syzbot found the following issue on:
+>>
+>> HEAD commit:    2cf0f7156238 Merge tag 'nfs-for-6.6-2' of git://git.linux-..
+>> git tree:       upstream
+>> console+strace: https://syzkaller.appspot.com/x/log.txt?x=17405ab0680000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=d594086f139d167
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=71e724675ba3958edb31
+>> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b2e118680000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b55c4680000
+>>
+>> Downloadable assets:
+>> disk image: https://storage.googleapis.com/syzbot-assets/456b02029fa8/disk-2cf0f715.raw.xz
+>> vmlinux: https://storage.googleapis.com/syzbot-assets/9f9ff0c00454/vmlinux-2cf0f715.xz
+>> kernel image: https://storage.googleapis.com/syzbot-assets/0ede19fba30f/bzImage-2cf0f715.xz
+>>
+>> The issue was bisected to:
+>>
+>> commit c48ef9c4aed3632566b57ba66cec6ec78624d4cb
+>> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+>> Date:   Mon Sep 11 18:36:57 2023 +0000
+>>
+>>     tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.
+>>
+> 
+> We need this condition to put v4 sk and v4-mapped-v6 sk into
+> the same bucket.
+> 
+> ---8<---
+> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+> index dfb1c61c0c2b..6487357d1ddd 100644
+> --- a/net/ipv4/inet_hashtables.c
+> +++ b/net/ipv4/inet_hashtables.c
+> @@ -822,7 +823,8 @@ static bool inet_bind2_bucket_match(const struct inet_bind2_bucket *tb,
+>  			return ipv6_addr_v4mapped(&tb->v6_rcv_saddr) &&
+>  				tb->v6_rcv_saddr.s6_addr32[3] == sk->sk_rcv_saddr;
+>  
+> -		return false;
+> +		return ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr) &&
+> +			sk->sk_v6_rcv_saddr.s6_addr32[3] == tb->rcv_saddr;
+>  	}
+>  
+>  	if (sk->sk_family == AF_INET6)
+> ---8<---
+> 
+> Scenario is like
+> 
+>   1) bind(v4) creates a tb2 bucket
+>   2) bind(v4-mapped-v6) creates another tb2 bucket
+>   3) listen(v4) finds the second tb2 and trigger warning
+> 
+> ---8<---
+> from socket import *
+> 
+> s = socket()
+> s.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+> s.bind(('255.255.255.255', 0))
+> 
+> s2 = socket(AF_INET6, SOCK_STREAM)
+> s2.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+> s2.bind(('::ffff:255.255.255.255', s.getsockname()[1]))
+> s.listen()
+> ---8<---
+> 
+> Will post a formal patch after doing more tests with SO_REUSEPORT.
+> 
+> Thanks!
 
-Fixes: 69129dc39fac ("i40e: Modify Tx disable wait flow in case of DCB reconfiguration")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Kuniyuki, did you get around to fixing and posting this patch? I
+couldn't find anything on the mailing list.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 6a2907674583..de19d753ba83 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -5340,7 +5340,7 @@ static int i40e_pf_wait_queues_disabled(struct i40e_pf *pf)
- {
- 	int v, ret = 0;
- 
--	for (v = 0; v < pf->hw.func_caps.num_vsis; v++) {
-+	for (v = 0; v < pf->num_alloc_vsi; v++) {
- 		if (pf->vsi[v]) {
- 			ret = i40e_vsi_wait_queues_disabled(pf->vsi[v]);
- 			if (ret)
--- 
-2.41.0
+Would you like help fixing this?
 
+> 
+> 
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15567dc4680000
+>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=17567dc4680000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=13567dc4680000
+>>
+>> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+>> Reported-by: syzbot+71e724675ba3958edb31@syzkaller.appspotmail.com
+>> Fixes: c48ef9c4aed3 ("tcp: Fix bind() regression for v4-mapped-v6 non-wildcard address.")
+>>
+>> ------------[ cut here ]------------
+>> WARNING: CPU: 0 PID: 5049 at net/ipv4/inet_connection_sock.c:587 inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
+>> Modules linked in:
+>> CPU: 0 PID: 5049 Comm: syz-executor288 Not tainted 6.6.0-rc2-syzkaller-00018-g2cf0f7156238 #0
+>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/04/2023
+>> RIP: 0010:inet_csk_get_port+0xf96/0x2350 net/ipv4/inet_connection_sock.c:587
+>> Code: 7c 24 08 e8 4c b6 8a 01 31 d2 be 88 01 00 00 48 c7 c7 e0 94 ae 8b e8 59 2e a3 f8 2e 2e 2e 31 c0 e9 04 fe ff ff e8 ca 88 d0 f8 <0f> 0b e9 0f f9 ff ff e8 be 88 d0 f8 49 8d 7e 48 e8 65 ca 5a 00 31
+>> RSP: 0018:ffffc90003abfbf0 EFLAGS: 00010293
+>> RAX: 0000000000000000 RBX: ffff888026429100 RCX: 0000000000000000
+>> RDX: ffff88807edcbb80 RSI: ffffffff88b73d66 RDI: ffff888026c49f38
+>> RBP: ffff888026c49f30 R08: 0000000000000005 R09: 0000000000000000
+>> R10: 0000000000000001 R11: 0000000000000000 R12: ffffffff9260f200
+>> R13: ffff888026c49880 R14: 0000000000000000 R15: ffff888026429100
+>> FS:  00005555557d5380(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 000000000045ad50 CR3: 0000000025754000 CR4: 00000000003506f0
+>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>> Call Trace:
+>>  <TASK>
+>>  inet_csk_listen_start+0x155/0x360 net/ipv4/inet_connection_sock.c:1256
+>>  __inet_listen_sk+0x1b8/0x5c0 net/ipv4/af_inet.c:217
+>>  inet_listen+0x93/0xd0 net/ipv4/af_inet.c:239
+>>  __sys_listen+0x194/0x270 net/socket.c:1866
+>>  __do_sys_listen net/socket.c:1875 [inline]
+>>  __se_sys_listen net/socket.c:1873 [inline]
+>>  __x64_sys_listen+0x53/0x80 net/socket.c:1873
+>>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>>  do_syscall_64+0x38/0xb0 arch/x86/entry/common.c:80
+>>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>> RIP: 0033:0x7f3a5bce3af9
+>> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+>> RSP: 002b:00007ffc1a1c79e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000032
+>> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f3a5bce3af9
+>> RDX: 00007f3a5bce3af9 RSI: 0000000000000000 RDI: 0000000000000003
+>> RBP: 00007f3a5bd565f0 R08: 0000000000000006 R09: 0000000000000006
+>> R10: 0000000000000006 R11: 0000000000000246 R12: 0000000000000001
+>> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+>>  </TASK>
 
