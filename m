@@ -1,255 +1,123 @@
-Return-Path: <netdev+bounces-46579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C2D97E50F1
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 08:28:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAFCE7E5145
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 08:41:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0266B20E9A
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:28:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A45C22813CE
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F488D30D;
-	Wed,  8 Nov 2023 07:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83FDD2EF;
+	Wed,  8 Nov 2023 07:41:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="HqYz1f+q"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Rro5imfK";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AzsxTUEV"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE2ED273;
-	Wed,  8 Nov 2023 07:27:49 +0000 (UTC)
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 073E8170D;
-	Tue,  7 Nov 2023 23:27:48 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 0698C100024;
-	Wed,  8 Nov 2023 10:27:47 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 0698C100024
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1699428467;
-	bh=RpkC5lfXlkMFYUw1ymgu4ywMbNeocePvX94SLreWShw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=HqYz1f+qOByC8+Xdh71Jlne1jsd+gBV7aEZxjFrh2eHufZy8I7eDhlyBjD1hz0mTA
-	 r6KmRxK+VbNEzG+XL7Ip1Bw0fFqY352dq+0kKdro9chfjs2aXAEbkbKM4zNu/wyT0g
-	 mAigMZgyRx9HuJBhjUUv0QS5DQ2E+vJI09fhvmFJnNgV3PKjy4cJ22gnvNkztTjeqJ
-	 7JdWKO2+fsOl7dr3zhWJdknPvW+Mh7wJYybC4pjOq92HhHLT33flHMfA+3RNYsT1s6
-	 cvk0SS54bsehDigFqR9l5UbKly+BaGO6asi6xzRwgsqnEhhshG+ooNsRQ5+ewdfb/d
-	 fylXNVMS7vZkg==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed,  8 Nov 2023 10:27:46 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.37; Wed, 8 Nov 2023 10:27:46 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [RFC PATCH v1 2/2] vsock/test: SO_RCVLOWAT + deferred credit update test
-Date: Wed, 8 Nov 2023 10:20:04 +0300
-Message-ID: <20231108072004.1045669-3-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
-References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAA7D2E9
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:41:38 +0000 (UTC)
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54B5F1706
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 23:41:38 -0800 (PST)
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1699429295;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JvV0BBV98ILtpySlH9Oy5VCvWdR00btlLeloaBlnNPk=;
+	b=Rro5imfKbpyGNO2QI7p1EbzRmMa1jAcE/6ktJe3prM5zfB8FbtlXRmrZwEdKCnlnEgGtMb
+	955LX4+LLPr48YVy7tV7guSEDx3JvD/9bw0LHBmWoIpYKxYw6nQSsfWVG7ilvJ2iHGFU5x
+	72zL16thJCeCY93depqNLSLBBa1wp4tX3pgaDIRlKUfjL48Ry3+TN+KaM72DnCqVkTDiNo
+	DsvxwR16+RDJYfD+nt0dSQHe2DE9ji9/+sv3URuSbtS1chE2dz0tOGSq+mvQLxFKvm+zRc
+	SXMa1Dskfs9J7M475Ts7XjGnoq9Br+sZHw1YpqJ+yvuyrlPGUNrOaCpagrPrGw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1699429295;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JvV0BBV98ILtpySlH9Oy5VCvWdR00btlLeloaBlnNPk=;
+	b=AzsxTUEVui+m87B8FzDkQqF6IEZUg7h7BzaNt2WZGkNGD+bquyueuCwsHIWncpA9s+A/Pk
+	/E4vQ4yd87pHYYAQ==
+To: Florian Bezdeka <florian.bezdeka@siemens.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, jan.kiszka@siemens.com, vivek.behera@siemens.com
+Subject: Re: [PATCH net-next] net/core: Enable socket busy polling on -RT
+In-Reply-To: <fc7fb885df3a52d076bb71191afa786d19d79cd5.camel@siemens.com>
+References: <20230523111518.21512-1-kurt@linutronix.de>
+ <d085757ed5607e82b1cd09d10d4c9f73bbdf3154.camel@siemens.com>
+ <87zg033vox.fsf@kurt>
+ <fc7fb885df3a52d076bb71191afa786d19d79cd5.camel@siemens.com>
+Date: Wed, 08 Nov 2023 08:41:34 +0100
+Message-ID: <87bkc44rpt.fsf@kurt>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
 Content-Type: text/plain
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181188 [Nov 08 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_from_domain_doesnt_match_to}, p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/08 04:00:00 #22424297
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-This adds test which checks, that updating SO_RCVLOWAT value also sends
-credit update message. Otherwise mutual hungup may happen when receiver
-didn't send credit update and then calls 'poll()' with non default
-SO_RCVLOWAT value (e.g. waiting enough bytes to read), while sender
-waits for free space at receiver's side.
+Hi Florian,
 
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- tools/testing/vsock/vsock_test.c | 131 +++++++++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+On Mon Oct 30 2023, Florian Bezdeka wrote:
+>> > > Allow RX_BUSY_POLL on PREEMPT_RT if NETPOLL is disabled. Don't disable
+>> > > preemption on PREEMPT_RT within the busy poll loop.
+>
+> Sorry, I need one more information here: We try to re-use the kernel
+> and its configuration from Debian whenever possible. NETPOLL/NETCONSOLE
+> is build as module there.
+>
+> Will this limitation be addressed in the future? Is someone already
+> working on that? Is that maybe on the radar for the ongoing printk()
+> work? (Assuming printk() with NETCONSOLE enabled is the underlying
+> problem)
+>
+> We don't use NETPOLL/NETCONSOLE during runtime but it is enabled at
+> build time. Sadly we can not use busy polling mode in combination with
+> XDP now. (Ignoring the fact that we could adjust the kernel
+> configuration, build on our own, ...)
+>
+> Would love to hear your thoughts about that. Thanks a lot!
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index c1f7bc9abd22..c71b3875fd16 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1180,6 +1180,132 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+#define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-+#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE	(1024 * 64)
-+
-+static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opts)
-+{
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, 1234);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Send 1 byte more than peer's buffer size. */
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE + 1;
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	/* Wait until peer sets needed buffer size. */
-+	control_expectln("SRVREADY");
-+
-+	if (send(fd, buf, buf_size, 0) != buf_size) {
-+		perror("send failed");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
-+static void test_stream_rcvlowat_def_cred_upd_server(const struct test_opts *opts)
-+{
-+	size_t recv_buf_size;
-+	struct pollfd fds;
-+	size_t buf_size;
-+	void *buf;
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
-+
-+	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
-+		       &buf_size, sizeof(buf_size))) {
-+		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	buf = malloc(buf_size);
-+	if (!buf) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	control_writeln("SRVREADY");
-+
-+	/* Wait until there will be 128KB of data in rx queue. */
-+	while (1) {
-+		ssize_t res;
-+
-+		res = recv(fd, buf, buf_size, MSG_PEEK);
-+		if (res == buf_size)
-+			break;
-+
-+		if (res <= 0) {
-+			fprintf(stderr, "unexpected 'recv()' return: %zi\n", res);
-+			exit(EXIT_FAILURE);
-+		}
-+	}
-+
-+	/* There is 128KB of data in the socket's rx queue,
-+	 * dequeue first 64KB, credit update is not sent.
-+	 */
-+	recv_buf_size = VIRTIO_VSOCK_MAX_PKT_BUF_SIZE;
-+	recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	recv_buf_size++;
-+
-+	/* Updating SO_RCVLOWAT will send credit update. */
-+	if (setsockopt(fd, SOL_SOCKET, SO_RCVLOWAT,
-+		       &recv_buf_size, sizeof(recv_buf_size))) {
-+		perror("setsockopt(SO_RCVLOWAT)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	memset(&fds, 0, sizeof(fds));
-+	fds.fd = fd;
-+	fds.events = POLLIN | POLLRDNORM | POLLERR |
-+		     POLLRDHUP | POLLHUP;
-+
-+	/* This 'poll()' will return once we receive last byte
-+	 * sent by client.
-+	 */
-+	if (poll(&fds, 1, -1) < 0) {
-+		perror("poll");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & POLLERR) {
-+		fprintf(stderr, "'poll()' error\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (fds.revents & (POLLIN | POLLRDNORM)) {
-+		recv_buf(fd, buf, recv_buf_size, 0, recv_buf_size);
-+	} else {
-+		/* These flags must be set, as there is at
-+		 * least 64KB of data ready to read.
-+		 */
-+		fprintf(stderr, "POLLIN | POLLRDNORM expected\n");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	free(buf);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1285,6 +1411,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_msgzcopy_empty_errq_client,
- 		.run_server = test_stream_msgzcopy_empty_errq_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM virtio SO_RCVLOWAT + deferred cred update",
-+		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-+		.run_server = test_stream_rcvlowat_def_cred_upd_server,
-+	},
- 	{},
- };
- 
--- 
-2.25.1
+Yes, the busy polling conflicts with netpoll due to the locking. At the
+moment you have to disable it in the kernel configuration and
+re-compile. I don't think anyone is working on solving this limitation
+yet.
 
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmVLO64THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgpe9EACsA1Ztrm3UbfQhG+IvHsd0kuvKTQ1y
+rKlGmGl4XYhtDCISkvEqbVSYfhlpZgTDKXgbUccGZXWsQ81CJHVchEk5YAtkM1Qx
+xGWOWqqBbIYJWedznJ2kl7Zj3xsr4djI+K20vYt9nuDPOvjk1/HbZgsSwhZEiLoC
+9s3bCkdPnMD0kpdYv0wqsi7d4zhhigDT7U7zWbNPLSet2WdPyiT1sThHp9h44YCH
+OFhTXapzo0tHO8o7TF7ZJluJ1qUZe2ZW+M/WRKy5Q8QYjZiuWZiH6BF5vU2Fs5zr
+ameT+FJW1tc+kTHqBGayE4NNDXFK6Dq+xwYVsSaPZw3SyWqelzaJfccQsEdUNIng
+T1MadFGpRJik9imaMfzJIIONPpo5cGb0ywl18r9yL4t7D9j/anWXtlWoYXYL+W/Z
+q2jnpfmSM9WYo8c0EpXlFq0ZvAEOaNuXjU+EJbYe1qfEnsu1iBzFMCZ71C3hg+1a
+4KvzmhooUeCJWLbX1K9ufB/CFx7XoEF5TsoqSLkb8xx2DpJHrXyWTIaRyy8tL3H1
+SkpP+Hy5tppow/tF56X/yMSaweh9CkT8IpWpYDnwzxLHY4pzuoRlo622cP7VNvTl
+nM/ElLCzBLDUSHi6OMZYLg3IqcWhJelT7nnkH7SKlGiDwldgzHmnQn61KQF/BVnM
+EQINhP4razNCqQ==
+=Xj6p
+-----END PGP SIGNATURE-----
+--=-=-=--
 
