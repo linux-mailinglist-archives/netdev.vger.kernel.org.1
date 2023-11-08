@@ -1,233 +1,227 @@
-Return-Path: <netdev+bounces-46571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C8E57E5064
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:39:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E59927E5070
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:47:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D480B20D50
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 06:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 277601C2097F
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 06:47:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33847FD;
-	Wed,  8 Nov 2023 06:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F4D812;
+	Wed,  8 Nov 2023 06:47:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jWk6yjbO"
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="ELpwII6+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F085A4C
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:39:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6BF610C0
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 22:39:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699425561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k2BiMbY1gQc7nI1jkxql4bnHmw6v5I6CxsOnPkltxnE=;
-	b=jWk6yjbOWhiRZwjoYTRvTmimiKHhuNmYQIB0ISlJ0kQ88vW6nwMRN2pSaF1PH0XGobtdKC
-	iAVb9lt5cWoBJBwmP0MeKFIFURaHMUbtnXMIQDeiULaplWgik0xvbQgGDfrgtFgJYuJOcY
-	zUNFV/yvBBupniSB4HEbkyU7wgO8uY8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-YwO-5di7NcyjOSzEs3Hnfg-1; Wed, 08 Nov 2023 01:39:20 -0500
-X-MC-Unique: YwO-5di7NcyjOSzEs3Hnfg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9d28dd67464so479981266b.0
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 22:39:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FC37FD
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:47:15 +0000 (UTC)
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51BE31A4
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 22:47:15 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6c396ef9a3dso3551316b3a.1
+        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 22:47:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shopee.com; s=shopee.com; t=1699426035; x=1700030835; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6aKtTjNDRBAbkTJx1/gQ1fqt7H+SbuhGHosyUpxruvU=;
+        b=ELpwII6+EuVgV4C8ZGvbNIAQxLAV8cKYzpeckJqQjFDv69SM7a52ypjl87s10A0E+b
+         wU5bZezmhgOOaicLvoEoMZwmM6f5JIYwxXUxg0UPyXbfMBCireh0nvrVzRcKVf/LeR6Y
+         EKlO9w8sk1sbZ3tp0yqAc1FVysWXoKZnw6PWoaYE4wRlgD2k/Uy8EKE+mRTmG3K0kaP7
+         vZT7VmKA/DYhRDmAL2CPBlJF2R6Fk6Wj3GKQ3RmG6Bvq1MxoW0yeVeFc7wdvtKAk2tDb
+         Ie583YvQFntDvuGJfp7Lfqdbj8C9WdkGJavZoIn130wnv8JOXcY0lPAH1YIA2U7SbPZC
+         Qb/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699425559; x=1700030359;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k2BiMbY1gQc7nI1jkxql4bnHmw6v5I6CxsOnPkltxnE=;
-        b=YuasCaZY2u4FZ+7jDrLDLV3o+mN1niViejVPqyT2L/MAPNu0xu5skpbP5Ko/XyHEu0
-         lMfdAHXlAVulOAon1gSz43gFSh0QGl26OzX2EJPsq6YzM/TB9cGl9YiTMYzkOR65KAOJ
-         yQ5Xu+ySgu770nNzOA4gtdnYUzSZhpVivzJ4NsTfBJ34hlBGJfS6X/Cm1afAWv2hexg0
-         4dkiZWZdpF/ACqBGwL9bZO6d70hrgIe9cSzAvkpQ1+d0ljcxpeyuUoQaMaMDaifmADZP
-         bOxIFHe5Q3bTSaBC9FyTNu6Z2Yh9iNi/BenvRksTg2Yq32ttlHmiOUKYH1MYojyVoXSv
-         8uoA==
-X-Gm-Message-State: AOJu0YwX/mZ0zo/l7FoIAPgtQTLBZ1ukO3KtPGhAl+9/2IjsKodPRdtJ
-	Ol/Uz4qIABXv0xMF1Bnz2IubYbpqtGnPj0+pSTln9NoKwd4qaHu+lkCsMIYJvzcmASIOrz+CVfq
-	fiGXw8kApH/d18yqA7KP13H0i02tH4/Zb
-X-Received: by 2002:a17:907:1c0a:b0:9bf:b5bc:6c4b with SMTP id nc10-20020a1709071c0a00b009bfb5bc6c4bmr655945ejc.62.1699425558975;
-        Tue, 07 Nov 2023 22:39:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG5epofarFvRVM8cfq6bWdS/ETWfx+tpEnjAOoX/h4uMoyQAvRTok8J+YOehY2gIUyCmGh47tZqftyW2YYoQUI=
-X-Received: by 2002:a17:907:1c0a:b0:9bf:b5bc:6c4b with SMTP id
- nc10-20020a1709071c0a00b009bfb5bc6c4bmr655930ejc.62.1699425558569; Tue, 07
- Nov 2023 22:39:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699426035; x=1700030835;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6aKtTjNDRBAbkTJx1/gQ1fqt7H+SbuhGHosyUpxruvU=;
+        b=rsc3dGePPkjE231evM/ou5ViI5RLp8jpcCIc/C/tQSJ4OHVVYi0hJ10PpwBC8iL2Sy
+         10kfoW5FBWwswSymG0BF36ucMqN4fXlXghno2OpwKrwPCjUpG/RHtxT7L2aiYwivu/lb
+         SqDyqZpSmYkBthcxOSun2dk5vpZAe3CrL9ViaAquF4QYzfooTF/24PPzDOuxfhY4X6nq
+         gqPPmfJ1NPOcWFEQxPYsP2LrJ59qBPM+XCZq5IvZ65DPqbE0rq+fO6yce+d1VO9ViN1z
+         4CrpAuJ4KofNqENt5J2HSaWY0rftoZOSWQKfv0uGsfdHjrZIvHjcsl1ee5X6sKtDVa07
+         HK3Q==
+X-Gm-Message-State: AOJu0Yx3jdtSGQVwG3t1j4WOw6qh+arVtVgaeyHgd1v2ObwFPZCoJ99q
+	sXKPITrQ4iwRzL+ql7KGSKFPjg==
+X-Google-Smtp-Source: AGHT+IEum2aQzFSBiV8R3XcvFFH6JKn1SMYjG8T6E2d8kkkcMerbJPymQYVkZWtiPiRWELwIJg7+pA==
+X-Received: by 2002:a05:6a21:71c7:b0:181:39a7:4fd4 with SMTP id ay7-20020a056a2171c700b0018139a74fd4mr1141079pzc.30.1699426034700;
+        Tue, 07 Nov 2023 22:47:14 -0800 (PST)
+Received: from ubuntu-hf2.default.svc.cluster.local ([101.127.248.173])
+        by smtp.gmail.com with ESMTPSA id ij27-20020a170902ab5b00b001c3a8b135ebsm933831plb.282.2023.11.07.22.47.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Nov 2023 22:47:14 -0800 (PST)
+From: Haifeng Xu <haifeng.xu@shopee.com>
+To: j.vosburgh@gmail.com
+Cc: andy@greyhouse.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haifeng Xu <haifeng.xu@shopee.com>
+Subject: [PATCH] boning: use a read-write lock in bonding_show_bonds()
+Date: Wed,  8 Nov 2023 06:46:41 +0000
+Message-Id: <20231108064641.65209-1-haifeng.xu@shopee.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-4-lulu@redhat.com>
- <CACGkMEtVfHL2WPwxkYEfTKBE10uWfB2a75QQOO8rzn3=Y9FiBg@mail.gmail.com>
- <CACLfguX9-wEQPUyZkJZoRMmgPDRFNyZCmt0nvHROhyP1yooiYA@mail.gmail.com> <CACGkMEsp_rg+_01hwxCtZNOk2itB1L89mdOc1W1DG3umfEt5bw@mail.gmail.com>
-In-Reply-To: <CACGkMEsp_rg+_01hwxCtZNOk2itB1L89mdOc1W1DG3umfEt5bw@mail.gmail.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 8 Nov 2023 14:38:37 +0800
-Message-ID: <CACLfguW3NZawOL0ET2K7bmtGZuzQwUfJ2HSgnirswzZK1ayPnA@mail.gmail.com>
-Subject: Re: [RFC v1 3/8] vhost: Add 3 new uapi to support iommufd
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 8, 2023 at 11:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Tue, Nov 7, 2023 at 2:57=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
-> >
-> > On Mon, Nov 6, 2023 at 3:30=E2=80=AFPM Jason Wang <jasowang@redhat.com>=
- wrote:
-> > >
-> > > On Sat, Nov 4, 2023 at 1:17=E2=80=AFAM Cindy Lu <lulu@redhat.com> wro=
-te:
-> > > >
-> > > > VHOST_VDPA_SET_IOMMU_FD: bind the device to iommufd device
-> > > >
-> > > > VDPA_DEVICE_ATTACH_IOMMUFD_AS: Attach a vdpa device to an iommufd
-> > > > address space specified by IOAS id.
-> > > >
-> > > > VDPA_DEVICE_DETACH_IOMMUFD_AS: Detach a vdpa device
-> > > > from the iommufd address space
-> > > >
-> > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > > ---
-> > >
-> > > [...]
-> > >
-> > > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.=
-h
-> > > > index f5c48b61ab62..07e1b2c443ca 100644
-> > > > --- a/include/uapi/linux/vhost.h
-> > > > +++ b/include/uapi/linux/vhost.h
-> > > > @@ -219,4 +219,70 @@
-> > > >   */
-> > > >  #define VHOST_VDPA_RESUME              _IO(VHOST_VIRTIO, 0x7E)
-> > > >
-> > > > +/* vhost_vdpa_set_iommufd
-> > > > + * Input parameters:
-> > > > + * @iommufd: file descriptor from /dev/iommu; pass -1 to unset
-> > > > + * @iommufd_ioasid: IOAS identifier returned from ioctl(IOMMU_IOAS=
-_ALLOC)
-> > > > + * Output parameters:
-> > > > + * @out_dev_id: device identifier
-> > > > + */
-> > > > +struct vhost_vdpa_set_iommufd {
-> > > > +       __s32 iommufd;
-> > > > +       __u32 iommufd_ioasid;
-> > > > +       __u32 out_dev_id;
-> > > > +};
-> > > > +
-> > > > +#define VHOST_VDPA_SET_IOMMU_FD \
-> > > > +       _IOW(VHOST_VIRTIO, 0x7F, struct vhost_vdpa_set_iommufd)
-> > > > +
-> > > > +/*
-> > > > + * VDPA_DEVICE_ATTACH_IOMMUFD_AS -
-> > > > + * _IOW(VHOST_VIRTIO, 0x7f, struct vdpa_device_attach_iommufd_as)
-> > > > + *
-> > > > + * Attach a vdpa device to an iommufd address space specified by I=
-OAS
-> > > > + * id.
-> > > > + *
-> > > > + * Available only after a device has been bound to iommufd via
-> > > > + * VHOST_VDPA_SET_IOMMU_FD
-> > > > + *
-> > > > + * Undo by VDPA_DEVICE_DETACH_IOMMUFD_AS or device fd close.
-> > > > + *
-> > > > + * @argsz:     user filled size of this data.
-> > > > + * @flags:     must be 0.
-> > > > + * @ioas_id:   Input the target id which can represent an ioas
-> > > > + *             allocated via iommufd subsystem.
-> > > > + *
-> > > > + * Return: 0 on success, -errno on failure.
-> > > > + */
-> > > > +struct vdpa_device_attach_iommufd_as {
-> > > > +       __u32 argsz;
-> > > > +       __u32 flags;
-> > > > +       __u32 ioas_id;
-> > > > +};
-> > >
-> > > I think we need to map ioas to vDPA AS, so there should be an ASID
-> > > from the view of vDPA?
-> > >
-> > > Thanks
-> > >
-> > The qemu will have a structure save and  maintain this information,So
-> > I didn't add this
-> >  in kernel=EF=BC=8Cwe can add this but maybe only for check?
->
-> I meant for example, a simulator has two AS. How can we attach an ioas
-> to a specific AS with the above uAPI?
->
-> Thank>
-this   __u32 ioas_id here is alloc from the iommufd system. maybe I
-need to change to new name iommuds_asid to
-make this more clear
-the process in qemu is
+call stack:
+......
+PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
+[ffffa7a8e96bbac0] __schedule at ffffffffb0719898
+[ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
+[ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
+[ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
+[ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
+[ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
+[ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
+[ffffa7a8e96bbc80] device_del at ffffffffb0209af8
+[ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
+[ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
+[ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
+[ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
+[ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
+[ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
+[ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
+[ffffa7a8e96bbf10] kthread at ffffffffafae132a
+[ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
 
-1) qemu want to use AS 0 (for example)
-2) checking the existing asid. the asid 0 not used before
-3 )alloc new asid from iommufd system, get new ioas_id (maybe 3 for example=
-)
-qemu will save this relation 3<-->0 in the driver.
-4) setting the ioctl VDPA_DEVICE_ATTACH_IOMMUFD_AS to attach new ASID
-to the kernel
-5=EF=BC=89 while map the memory=EF=BC=8C qemu will use ASID 3 to map /umap
-and use ASID 0 for legacy mode map/umap
+290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-exporter"
+[ffffa7a8d14dbb80] __schedule at ffffffffb0719898
+[ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
+[ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
+[ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
+[ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
+[ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
+[ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
+[ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
+[ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
+[ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
+[ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
+[ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
+[ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
+[ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
+[ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
+[ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
+[ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
+[ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
+[ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
+......
 
-So kernel here will not maintain the ioas_id from iommufd=EF=BC=8C
-and this also make the code strange since there will 2 different asid
-for the same AS, maybe we can save these information in the kernel
-Thanks
-cindy
-> > Thanks
-> > Cindy
-> > > > +
-> > > > +#define VDPA_DEVICE_ATTACH_IOMMUFD_AS \
-> > > > +       _IOW(VHOST_VIRTIO, 0x82, struct vdpa_device_attach_iommufd_=
-as)
-> > > > +
-> > > > +/*
-> > > > + * VDPA_DEVICE_DETACH_IOMMUFD_AS
-> > > > + *
-> > > > + * Detach a vdpa device from the iommufd address space it has been
-> > > > + * attached to. After it, device should be in a blocking DMA state=
-.
-> > > > + *
-> > > > + * Available only after a device has been bound to iommufd via
-> > > > + * VHOST_VDPA_SET_IOMMU_FD
-> > > > + *
-> > > > + * @argsz:     user filled size of this data.
-> > > > + * @flags:     must be 0.
-> > > > + *
-> > > > + * Return: 0 on success, -errno on failure.
-> > > > + */
-> > > > +struct vdpa_device_detach_iommufd_as {
-> > > > +       __u32 argsz;
-> > > > +       __u32 flags;
-> > > > +};
-> > > > +
-> > > > +#define VDPA_DEVICE_DETACH_IOMMUFD_AS \
-> > > > +       _IOW(VHOST_VIRTIO, 0x83, struct vdpa_device_detach_iommufd_=
-as)
-> > > > +
-> > > >  #endif
-> > > > --
-> > > > 2.34.3
-> > > >
-> > >
-> >
->
+Problem description:
+
+Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
+but there are many readers which hold the kernfs_rwsem, so it has to sleep
+for a long time to wait the readers release the lock. Thread 278176 and any
+other threads which call bonding_show_bonds() also need to wait because
+they try to accuire the rtnl_mutex.
+
+bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
+However, the addition and deletion of bond_list are only performed in
+bond_init()/bond_uninit(), so we can intoduce a separate read-write lock
+to synchronize bond list mutation.
+
+What's the benefits of this change?
+
+1) All threads which call bonding_show_bonds() only wait when the
+registration or unregistration of bond device happens.
+
+2) There are many other users of rtnl_mutex, so bonding_show_bonds()
+won't compete with them.
+
+In a word, this change reduces the lock contention of rtnl_mutex.
+
+Signed-off-by: Haifeng Xu <haifeng.xu@shopee.com>
+---
+ drivers/net/bonding/bond_main.c  | 4 ++++
+ drivers/net/bonding/bond_sysfs.c | 6 ++++--
+ include/net/bonding.h            | 3 +++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 51d47eda1c87..ac4773d19beb 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -5951,7 +5951,9 @@ static void bond_uninit(struct net_device *bond_dev)
+ 
+ 	bond_set_slave_arr(bond, NULL, NULL);
+ 
++	write_lock(&bonding_dev_lock);
+ 	list_del(&bond->bond_list);
++	write_unlock(&bonding_dev_lock);
+ 
+ 	bond_debug_unregister(bond);
+ }
+@@ -6364,7 +6366,9 @@ static int bond_init(struct net_device *bond_dev)
+ 	spin_lock_init(&bond->stats_lock);
+ 	netdev_lockdep_set_classes(bond_dev);
+ 
++	write_lock(&bonding_dev_lock);
+ 	list_add_tail(&bond->bond_list, &bn->dev_list);
++	write_unlock(&bonding_dev_lock);
+ 
+ 	bond_prepare_sysfs_group(bond);
+ 
+diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
+index 2805135a7205..e107c1d7a6bf 100644
+--- a/drivers/net/bonding/bond_sysfs.c
++++ b/drivers/net/bonding/bond_sysfs.c
+@@ -28,6 +28,8 @@
+ 
+ #define to_bond(cd)	((struct bonding *)(netdev_priv(to_net_dev(cd))))
+ 
++DEFINE_RWLOCK(bonding_dev_lock);
++
+ /* "show" function for the bond_masters attribute.
+  * The class parameter is ignored.
+  */
+@@ -40,7 +42,7 @@ static ssize_t bonding_show_bonds(const struct class *cls,
+ 	int res = 0;
+ 	struct bonding *bond;
+ 
+-	rtnl_lock();
++	read_lock(&bonding_dev_lock);
+ 
+ 	list_for_each_entry(bond, &bn->dev_list, bond_list) {
+ 		if (res > (PAGE_SIZE - IFNAMSIZ)) {
+@@ -55,7 +57,7 @@ static ssize_t bonding_show_bonds(const struct class *cls,
+ 	if (res)
+ 		buf[res-1] = '\n'; /* eat the leftover space */
+ 
+-	rtnl_unlock();
++	read_unlock(&bonding_dev_lock);
+ 	return res;
+ }
+ 
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 5b8b1b644a2d..584ba4b5b8df 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -777,6 +777,9 @@ extern struct rtnl_link_ops bond_link_ops;
+ /* exported from bond_sysfs_slave.c */
+ extern const struct sysfs_ops slave_sysfs_ops;
+ 
++/* exported from bond_sysfs.c */
++extern rwlock_t bonding_dev_lock;
++
+ /* exported from bond_3ad.c */
+ extern const u8 lacpdu_mcast_addr[];
+ 
+-- 
+2.25.1
 
 
