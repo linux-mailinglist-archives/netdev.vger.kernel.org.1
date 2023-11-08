@@ -1,124 +1,216 @@
-Return-Path: <netdev+bounces-46582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB787E5264
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:08:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05637E526C
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 674BD28130B
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:08:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E17721C20AB3
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C83DDDD2;
-	Wed,  8 Nov 2023 09:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3EFDDD9;
+	Wed,  8 Nov 2023 09:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LJmImJ+z"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621CEDDC2
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 09:08:21 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9AD6171D
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 01:08:20 -0800 (PST)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375--2j0IgigP7ym7xCqA1Yr_g-1; Wed, 08 Nov 2023 04:08:03 -0500
-X-MC-Unique: -2j0IgigP7ym7xCqA1Yr_g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9EFF382DFB0;
-	Wed,  8 Nov 2023 09:08:01 +0000 (UTC)
-Received: from hog (unknown [10.39.192.51])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A9D240C6EB9;
-	Wed,  8 Nov 2023 09:07:59 +0000 (UTC)
-Date: Wed, 8 Nov 2023 10:07:58 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Dae R. Jeong" <threeearcat@gmail.com>, borisp@nvidia.com,
-	john.fastabend@gmail.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
-Subject: Re: Missing a write memory barrier in tls_init()
-Message-ID: <ZUtP7lMqFnNK8lw_@hog>
-References: <ZUNLocdNkny6QPn8@dragonet>
- <20231106143659.12e0d126@kernel.org>
- <ZUq-GrWMvbfhX74a@hog>
- <20231107185324.22eecf10@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793F3DDD2
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 09:11:48 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2E561723
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 01:11:47 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53de0d1dc46so11345486a12.3
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 01:11:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1699434706; x=1700039506; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=1pKf10d7hTfD1NyBYVfybCn2aZoHnxWTiDcVdV6Xd30=;
+        b=LJmImJ+zxSojgEO97lX+LD3NgL51FwGJobhDxpXx+jH7OckI3cDlNWmYyot1bN0Ot8
+         Th5Te+Cn0kKuQNs6nMtGWYp+kKk8OlupZ0P/UOVD+Q34WoysZ16ehfvyumi2uxnBjif6
+         iWVsWgbekdgLSXf9feXWdPrzJJO7bBOriUG2A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699434706; x=1700039506;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1pKf10d7hTfD1NyBYVfybCn2aZoHnxWTiDcVdV6Xd30=;
+        b=MuuR/zjZ5YO7jRHdexq3jHBblOyoThot7xYn5UbgAyr+Bx8wg1erdZRIrFigxbbhWW
+         EgIm369xMX/e+nRQqfS3ep6u3/TR2HfSnyofiTEdEWKDTJPwYQpy6Fsdc/biHaPMGJF+
+         HqTGs8oG2uawqhp+mTlvaFhf84zTXJ316JWKfDKQgvTOrTLPVnOw+OLpkLiqYZTmqORa
+         sE/BpVkaCTZaYYSFM5ABpwiCTqJ50nk7+1EjTcFf+yI1XbjHIoFv7Bjhiw6e3ow3lWiY
+         xVk9u8j0tGB5YU8ag67tod5toVqO5hgowGxZbYdw3qeeJb14gAO2auauw1bJrggndh/L
+         bD7w==
+X-Gm-Message-State: AOJu0Yy+erbF7hOJu4LktMLdPYwkISB3j1RLAbrBuaH5qI5gfCHKZvFB
+	avUfYj6UbtDRf3L/VW0G0awNXbYvKrt995D0mCYl4w==
+X-Google-Smtp-Source: AGHT+IFT2SFJTGzzr8nvrwYJuArjzQOPkb9wjA7bseEogcFh7rn13hpWlbHZ69aMtM4D4lyhZXsSZFXzukFpYmmB53I=
+X-Received: by 2002:a50:9303:0:b0:543:566f:2e89 with SMTP id
+ m3-20020a509303000000b00543566f2e89mr891741eda.37.1699434705567; Wed, 08 Nov
+ 2023 01:11:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231107185324.22eecf10@kernel.org>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+References: <20231108010129.2009947-1-alexey.pakhunov@spacex.com>
+In-Reply-To: <20231108010129.2009947-1-alexey.pakhunov@spacex.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 8 Nov 2023 01:11:33 -0800
+Message-ID: <CACKFLi=VL8kHH-Q4UQF60tGaK2dk7NgH_9-yJpP7hgn_NE9e7Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tg3: Move the [rt]x_dropped counters to tg3_napi
+To: alexey.pakhunov@spacex.com
+Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000fa954a0609a07997"
 
-2023-11-07, 18:53:24 -0800, Jakub Kicinski wrote:
-> On Tue, 7 Nov 2023 23:45:46 +0100 Sabrina Dubroca wrote:
-> > Wouldn't it be enough to just move the rcu_assign_pointer after ctx is
-> > fully initialized, ie just before update_sk_prot? also clearer wrt
-> > RCU.
-> 
-> I'm not sure, IIUC rcu_assign_pointer() is equivalent to
-> WRITE_ONCE() on any sane architecture, it depends on address
-> dependencies to provide ordering.
+--000000000000fa954a0609a07997
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Not what the doc says:
+On Tue, Nov 7, 2023 at 5:01=E2=80=AFPM <alexey.pakhunov@spacex.com> wrote:
+>
+> From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+>
+> This change moves [rt]x_dropped counters to tg3_napi so that they can be
+> updated by a single writer, race-free.
+>
+> Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
+> Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
+> ---
+...
+> @@ -11895,6 +11898,9 @@ static void tg3_get_nstats(struct tg3 *tp, struct=
+ rtnl_link_stats64 *stats)
+>  {
+>         struct rtnl_link_stats64 *old_stats =3D &tp->net_stats_prev;
+>         struct tg3_hw_stats *hw_stats =3D tp->hw_stats;
+> +       unsigned long rx_dropped =3D 0;
+> +       unsigned long tx_dropped =3D 0;
+> +       int i;
+>
+>         stats->rx_packets =3D old_stats->rx_packets +
+>                 get_stat64(&hw_stats->rx_ucast_packets) +
+> @@ -11941,8 +11947,23 @@ static void tg3_get_nstats(struct tg3 *tp, struc=
+t rtnl_link_stats64 *stats)
+>         stats->rx_missed_errors =3D old_stats->rx_missed_errors +
+>                 get_stat64(&hw_stats->rx_discards);
+>
+> -       stats->rx_dropped =3D tp->rx_dropped;
+> -       stats->tx_dropped =3D tp->tx_dropped;
+> +       /* Aggregate per-queue counters. The per-queue counters are updat=
+ed
+> +        * by a single writer, race-free. The result computed by this loo=
+p
+> +        * might not be 100% accurate (counters can be updated in the mid=
+dle of
+> +        * the loop) but the next tg3_get_nstats() will recompute the cur=
+rent
+> +        * value so it is acceptable.
+> +        */
+> +       for (i =3D 0; i < tp->irq_cnt; i++) {
+> +               struct tg3_napi *tnapi =3D &tp->napi[i];
+> +
+> +               rx_dropped +=3D tnapi->rx_dropped;
+> +               tx_dropped +=3D tnapi->tx_dropped;
+> +       }
+> +
+> +       /* The counters wrap around at 4G on 32bit machines. */
+> +       stats->rx_dropped =3D rx_dropped;
+> +       stats->tx_dropped =3D tx_dropped;
 
-    /**
-     * rcu_assign_pointer() - assign to RCU-protected pointer
-     [...]
-     * Inserts memory barriers on architectures that require them
-     * (which is most of them), and also prevents the compiler from
-     * reordering the code that initializes the structure after the pointer
-     * assignment.
-     [...]
-     */
+I think here we need to keep these counters accumulate across a reset:
 
-And it uses smp_store_release (unless writing NULL).
+stats->rx_dropped =3D old_stats->rx_dropped + rx_dropped;
+stats->tx_dropped =3D old_stats->tx_dropped + tx_dropped;
 
+> +
+>  }
+>
 
-rcu_dereference is the one that usually doesn't contain a barrier:
+--000000000000fa954a0609a07997
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-    /**
-     * rcu_dereference_check() - rcu_dereference with debug checking
-     [...]
-     * Inserts memory barriers on architectures that require them
-     * (currently only the Alpha), prevents the compiler from refetching
-     * (and from merging fetches), and, more importantly, documents exactly
-     * which pointers are protected by RCU and checks that the pointer is
-     * annotated as __rcu.
-     */
-
-
-> Since here we care about
-> ctx->sk_prot being updated, when changes to sk->sk_prot
-> are visible there is no super-obvious address dependency.
-> 
-> There may be one. But to me at least it isn't an obvious
-> "RCU used right will handle this" case.
-
-Ok, I think you're right. Looking at smp_store_release used by rcu_assign_pointer:
-
-    #define __smp_store_release(p, v)					\
-    do {									\
-    	compiletime_assert_atomic_type(*p);				\
-    	barrier();							\
-    	WRITE_ONCE(*p, v);						\
-    } while (0)
-
-it's only going to make sure ctx->sk_proto is set when ctx is visible,
-and not guarantee that ctx is visible whenever sk->sk_prot has been
-switched over.
-
--- 
-Sabrina
-
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOvqVP23Dn9/POnZoYnqqairy+j9908o
+2trpN46/BSVrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEw
+ODA5MTE0NlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAHq6xFPbRSQMfFGvqC8YRbKbFdAV10uWuyD54WSADMYArn9Ia2
++o2GSCP6i7qQJjYY+qg/9Rv7Ce7HgUYwhQbEo0mR304qjOYnryPd+nCN4GEQghnOuWHBfcDuDxuY
+L2Fn3PBqWrouHCFG18zqjJQGrM7Oyfwk6BSfy+FVLz8WeP7/HtaOBrk3uLOPDL4LHH+p37IPGqzb
+hj3G2b+23uTYDgIrJrLz1KpQ9V+HNep3M/CUCn/qfUolraNq0T4K9w67sKeFOUN1FSKcnCmmI6BG
+MBhHaUJbTGXmad6iWiEnuhug2dhepnh3GnYWU7Kc071Pwc/cuoODfuEJle0cefwx
+--000000000000fa954a0609a07997--
 
