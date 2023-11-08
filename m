@@ -1,253 +1,185 @@
-Return-Path: <netdev+bounces-46706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EDF7E5FAD
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:09:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10C7A7E5FBA
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FA68280C57
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:09:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436B0B20D75
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 519B6374E9;
-	Wed,  8 Nov 2023 21:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ji+sddoG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6A0374D8;
+	Wed,  8 Nov 2023 21:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6228B374C8;
-	Wed,  8 Nov 2023 21:09:49 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2BA12581;
-	Wed,  8 Nov 2023 13:09:48 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-99bdeae1d0aso30942266b.1;
-        Wed, 08 Nov 2023 13:09:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699477787; x=1700082587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KazIzduS9BidB+bNmstAcrQgF6siENXwi+iuOkkoB0A=;
-        b=ji+sddoGPucfnsMYY5Ui15x9+OiqhSiP9hmgCMWPq+9HfVGseChXyXm3XJG+UAqVwI
-         xpJu3E2MaKcv06nmgZ3TJ4yQ/Xixy5r5e9iQL4GGB+n/9ydyn5yNH6JS/LCyxcbHesnb
-         V/lTd8PYKx4bjr1F9sWc5fvb4yUC45lufh4Y1NnrfLXdNUSQMtGV1CK5ITWmhhOIkQ9Y
-         Bg582GU3NiRZVO2L9BaeomU0G4O5Dsr6ptWZgVW8QxgxljacI+a5VD9M5qBYvqEi9rDI
-         JwpDKggQekKmf3A3WmhA8+gGHRGwVSllkUoa9o7o8NvHLtzBTJ70SX/X3heEzQb8EkYS
-         VztA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271593715A;
+	Wed,  8 Nov 2023 21:10:20 +0000 (UTC)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8524D2580;
+	Wed,  8 Nov 2023 13:10:19 -0800 (PST)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5b499b18b28so2133447b3.0;
+        Wed, 08 Nov 2023 13:10:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699477787; x=1700082587;
+        d=1e100.net; s=20230601; t=1699477818; x=1700082618;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KazIzduS9BidB+bNmstAcrQgF6siENXwi+iuOkkoB0A=;
-        b=snj7vR9N5F3InbuBNpxRQ8vZccP4U9k0yM1bn+cOVr5AhdxXmqbmfJNIVa4DsRzAik
-         gS4/a5F6gjWW1cGxcyRtf2vWSzZjmtIsXR9hJsszssQbeL+RiSXeQU3Ztp7PWjoDyOwu
-         qTnzVM4oyYN8egXUmldhYgYZaphzkiyrz9QpaBkItjdKDDMDdFO8n7xGdROmSK5m8InE
-         Quws21YMov3p99N+d9ZVQXwuZupgjtRhIuljxpYj25xB6Y3ItidZoveaa38oJdFfyfrp
-         ZfTcswRaPrbMzElz9y8z02OtMBY/T8VgDGxo7eRz0mWf1o0bDcIVkMuR277zsPfZ87vu
-         0CRA==
-X-Gm-Message-State: AOJu0YzOOwxxCyP4x6F2gwDAnEoF4XfR41hm7qbJlKFwxPoEIvzaslZd
-	IYGVmttTBzT6AQb9q2mTwKQuIeEEh3AP71UA4js=
-X-Google-Smtp-Source: AGHT+IGW85Rh+rAMkRglZRCOSxXfOd+5RIr+08ebXPpTcAJNErxjXHV3uER6A0yMTCKj2M+ow15o2uJ/GAScSrKP5MU=
-X-Received: by 2002:a17:907:a03:b0:9bd:a738:2bfe with SMTP id
- bb3-20020a1709070a0300b009bda7382bfemr2337139ejc.38.1699477786877; Wed, 08
- Nov 2023 13:09:46 -0800 (PST)
+        bh=bav5/FGayyEQonBNC4kdS6ICDtnFE4p01QngumR4dg4=;
+        b=ipwWhpKRdtmh+Uh6VvmrxWywQK9Q9c1fyFkHq6ayzI/hoFkgARWPYRg7X4Xr3FzFLR
+         c4G6aiTPD+wkruVmz3pRfMeLBmbpqO1HbwzQp4tUQVnIizUPo3zNjom/4AuV0V7+Lg1Q
+         1q2cR3Bc7acbJnBJAdgxckR6G4u8qQqFdLJQUhvqW9CnjOyzfYL5qlagBwnqD3iSFzxX
+         hLlVOnE+vbEnX/JObB4UNFIFfF1D3iTiEXAcT7nrWqwHy5qDkup5xZtILGCe101g17cK
+         ZlFVoDUFUg/44K/H2HkkdNaJ+cf8Lf6IaDGVg6jg8le3yrun8Gaw6WQCOZvtSmRDk7oS
+         KPQg==
+X-Gm-Message-State: AOJu0Ywm+iqe0tYvEdAkpz+r3ecFqCmZWws2QYyTyarGcn3EjMhys9Br
+	ncbDEwLWhmrkVazpI4Yn0jrK87BUX3QC0w==
+X-Google-Smtp-Source: AGHT+IF0f+EnWpL39uPcb0Isgr8GcwJ2K7wJjaLgpat0Vo/euboSWtRuvVqOY1mQa+U4sJvOqCYELw==
+X-Received: by 2002:a0d:c042:0:b0:5a7:ba51:9c1b with SMTP id b63-20020a0dc042000000b005a7ba519c1bmr2761143ywd.37.1699477818216;
+        Wed, 08 Nov 2023 13:10:18 -0800 (PST)
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
+        by smtp.gmail.com with ESMTPSA id o14-20020a81de4e000000b005956b451fb8sm7201882ywl.100.2023.11.08.13.10.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 13:10:16 -0800 (PST)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5b31c5143a0so1848457b3.3;
+        Wed, 08 Nov 2023 13:10:16 -0800 (PST)
+X-Received: by 2002:a0d:f3c2:0:b0:59b:54b5:7d66 with SMTP id
+ c185-20020a0df3c2000000b0059b54b57d66mr2960037ywf.34.1699477816210; Wed, 08
+ Nov 2023 13:10:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103190523.6353-1-andrii@kernel.org> <20231103190523.6353-4-andrii@kernel.org>
- <20231108-verbuchen-unteilbar-9005061e2b48@brauner>
-In-Reply-To: <20231108-verbuchen-unteilbar-9005061e2b48@brauner>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 8 Nov 2023 13:09:35 -0800
-Message-ID: <CAEf4BzZVNj=hR_TBOU5YsBM3iurqi9igSO=JZXkgXZReXfdACQ@mail.gmail.com>
-Subject: Re: [PATCH v9 bpf-next 03/17] bpf: introduce BPF token object
-To: Christian Brauner <brauner@kernel.org>
-Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	paul@paul-moore.com, linux-fsdevel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, keescook@chromium.org, 
-	kernel-team@meta.com, sargun@sargun.me
+References: <20231108125843.3806765-1-arnd@kernel.org> <20231108125843.3806765-11-arnd@kernel.org>
+ <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com> <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
+In-Reply-To: <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 8 Nov 2023 22:10:03 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdV7VfiSA9+wSJYYQkBN2=4E9HsFJRV6j8ffioe0=MFd8A@mail.gmail.com>
+Message-ID: <CAMuHMdV7VfiSA9+wSJYYQkBN2=4E9HsFJRV6j8ffioe0=MFd8A@mail.gmail.com>
+Subject: Re: [PATCH 10/22] microblaze: include linux/cpu.h for trap_init() prototype
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Arnd Bergmann <arnd@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, 
+	linux-kbuild@vger.kernel.org, Matt Turner <mattst88@gmail.com>, 
+	Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, guoren <guoren@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, 
+	Huacai Chen <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, 
+	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Geoff Levand <geoff@infradead.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, 
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S . Miller" <davem@davemloft.net>, 
+	Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	x86@kernel.org, Helge Deller <deller@gmx.de>, 
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, 
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
+	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, 
+	Vincenzo Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
+	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>, loongarch@lists.linux.dev, 
+	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
+	sparclinux@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
+	linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	"linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>, linux-mtd@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 8, 2023 at 6:28=E2=80=AFAM Christian Brauner <brauner@kernel.or=
-g> wrote:
->
-> On Fri, Nov 03, 2023 at 12:05:09PM -0700, Andrii Nakryiko wrote:
-> > Add new kind of BPF kernel object, BPF token. BPF token is meant to
-> > allow delegating privileged BPF functionality, like loading a BPF
-> > program or creating a BPF map, from privileged process to a *trusted*
-> > unprivileged process, all while have a good amount of control over whic=
-h
-> > privileged operations could be performed using provided BPF token.
+Hi Arnd,
+
+On Wed, Nov 8, 2023 at 10:07=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
+> On Wed, Nov 8, 2023, at 21:42, Geert Uytterhoeven wrote:
+> > On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> =
+wrote:
+> >> From: Arnd Bergmann <arnd@arndb.de>
+> >>
+> >> Microblaze runs into a single -Wmissing-prototypes warning when that i=
+s
+> >> enabled:
+> >>
+> >> arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype fo=
+r 'trap_init' [-Wmissing-prototypes]
+> >>
+> >> Include the right header to avoid this.
+> >>
+> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > >
-> > This is achieved through mounting BPF FS instance with extra delegation
-> > mount options, which determine what operations are delegatable, and als=
-o
-> > constraining it to the owning user namespace (as mentioned in the
-> > previous patch).
+> > Thanks for your patch!
 > >
-> > BPF token itself is just a derivative from BPF FS and can be created
-> > through a new bpf() syscall command, BPF_TOKEN_CREATE, which accepts
-> > a path specification (using the usual fd + string path combo) to a BPF
-> > FS mount. Currently, BPF token "inherits" delegated command, map types,
-> > prog type, and attach type bit sets from BPF FS as is. In the future,
-> > having an BPF token as a separate object with its own FD, we can allow
-> > to further restrict BPF token's allowable set of things either at the c=
-reation
-> > time or after the fact, allowing the process to guard itself further
-> > from, e.g., unintentionally trying to load undesired kind of BPF
-> > programs. But for now we keep things simple and just copy bit sets as i=
-s.
+> >>  arch/alpha/kernel/traps.c      | 1 +
+> >>  arch/csky/include/asm/traps.h  | 2 --
+> >>  arch/csky/kernel/traps.c       | 1 +
+> >>  arch/m68k/coldfire/vectors.c   | 3 +--
+> >>  arch/m68k/coldfire/vectors.h   | 3 ---
 > >
-> > When BPF token is created from BPF FS mount, we take reference to the
-> > BPF super block's owning user namespace, and then use that namespace fo=
-r
-> > checking all the {CAP_BPF, CAP_PERFMON, CAP_NET_ADMIN, CAP_SYS_ADMIN}
-> > capabilities that are normally only checked against init userns (using
-> > capable()), but now we check them using ns_capable() instead (if BPF
-> > token is provided). See bpf_token_capable() for details.
+> > Ah, so this is where the m68k changes listed in the cover letter are
+> > hiding ;-)
 > >
-> > Such setup means that BPF token in itself is not sufficient to grant BP=
-F
-> > functionality. User namespaced process has to *also* have necessary
-> > combination of capabilities inside that user namespace. So while
-> > previously CAP_BPF was useless when granted within user namespace, now
-> > it gains a meaning and allows container managers and sys admins to have
-> > a flexible control over which processes can and need to use BPF
-> > functionality within the user namespace (i.e., container in practice).
-> > And BPF FS delegation mount options and derived BPF tokens serve as
-> > a per-container "flag" to grant overall ability to use bpf() (plus furt=
-her
-> > restrict on which parts of bpf() syscalls are treated as namespaced).
+> >>  arch/microblaze/kernel/traps.c | 1 +
+> >>  arch/sparc/kernel/traps_32.c   | 1 +
+> >>  arch/sparc/kernel/traps_64.c   | 1 +
+> >>  arch/x86/include/asm/traps.h   | 1 -
+> >>  arch/x86/kernel/traps.c        | 1 +
+> >>  10 files changed, 7 insertions(+), 8 deletions(-)
+> >>  delete mode 100644 arch/m68k/coldfire/vectors.h
 > >
-> > Note also, BPF_TOKEN_CREATE command itself requires ns_capable(CAP_BPF)
-> > within the BPF FS owning user namespace, rounding up the ns_capable()
-> > story of BPF token.
-> >
-> > The alternative to creating BPF token object was:
-> >   a) not having any extra object and just pasing BPF FS path to each
-> >      relevant bpf() command. This seems suboptimal as it's racy (mount
-> >      under the same path might change in between checking it and using =
-it
-> >      for bpf() command). And also less flexible if we'd like to further
+> > Obviously the non-microblaze changes should be spun off in separate
+> > patches.
 >
-> I don't understand "mount under the same path might change in between
-> checking it and using it for bpf() command".
+> I messed up one of my rebases here and accidentally sent
+> the wrong changelog text. My intention was to have the
+> combined patch but with this text:
 >
-> Just require userspace to open() the bpffs instance and pass that fd to
-> bpf() just as you're doing right now. If that is racy then the current
-> implementation is even more so because it is passing:
+>     arch: include linux/cpu.h for trap_init() prototype
 >
-> bpffs_path_fd
-> bpffs_pathname
+>     some architectures run into a -Wmissing-prototypes warning
+>     for trap_init()
 >
-> and then performs a lookup. More on that below.
+>     arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype f=
+or 'trap_init' [-Wmissing-prototypes]
+>
+>     Include the right header to avoid this consistently, removing
+>     the extra declarations on m68k and x86 that were added as local
+>     workarounds already.
+>
+>     Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Yes, this is a result of my initial confusion with how O_PATH-based
-open() works. You are right that it's not racy, I'll update the
-message.
+That makes sense, although it's hard to combine this with "my preference
+would be for the patches to make it through the respective subsystem
+maintainer trees"...
 
->
-> I want to point out that most of this code here is unnecessary if you
-> use the bpffs fd itself as a token. But that's your decision. I'm just
-> saying that I'm not sure the critique that it's racy is valid.
+Gr{oetje,eeting}s,
 
-Ack.
+                        Geert
 
->
-> >      restrict ourselves compared to all the delegated functionality
-> >      allowed on BPF FS.
-> >   b) use non-bpf() interface, e.g., ioctl(), but otherwise also create
-> >      a dedicated FD that would represent a token-like functionality. Th=
-is
-> >      doesn't seem superior to having a proper bpf() command, so
-> >      BPF_TOKEN_CREATE was chosen.
-> >
-> > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > ---
-> >  include/linux/bpf.h            |  41 +++++++
-> >  include/uapi/linux/bpf.h       |  39 +++++++
-> >  kernel/bpf/Makefile            |   2 +-
-> >  kernel/bpf/inode.c             |  17 ++-
-> >  kernel/bpf/syscall.c           |  17 +++
-> >  kernel/bpf/token.c             | 197 +++++++++++++++++++++++++++++++++
-> >  tools/include/uapi/linux/bpf.h |  39 +++++++
-> >  7 files changed, 342 insertions(+), 10 deletions(-)
-> >  create mode 100644 kernel/bpf/token.c
-> >
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-[...]
-
-> > +
-> > +#define BPF_TOKEN_INODE_NAME "bpf-token"
-> > +
-> > +static const struct inode_operations bpf_token_iops =3D { };
-> > +
-> > +static const struct file_operations bpf_token_fops =3D {
-> > +     .release        =3D bpf_token_release,
-> > +     .show_fdinfo    =3D bpf_token_show_fdinfo,
-> > +};
-> > +
-> > +int bpf_token_create(union bpf_attr *attr)
-> > +{
-> > +     struct bpf_mount_opts *mnt_opts;
-> > +     struct bpf_token *token =3D NULL;
-> > +     struct user_namespace *userns;
-> > +     struct inode *inode;
-> > +     struct file *file;
-> > +     struct path path;
-> > +     umode_t mode;
-> > +     int err, fd;
-> > +
-> > +     err =3D user_path_at(attr->token_create.bpffs_path_fd,
-> > +                        u64_to_user_ptr(attr->token_create.bpffs_pathn=
-ame),
-> > +                        LOOKUP_FOLLOW | LOOKUP_EMPTY, &path);
->
-> Do you really need bpffs_path_fd and bpffs_pathname?
-> This seems unnecessar as you're forcing a lookup that's best done in
-> userspace through regular open() apis. So I would just make this:
->
-> struct { /* struct used by BPF_TOKEN_CREATE command */
->         __u32           flags;
->         __u32           bpffs_path_fd;
-> } token_create;
->
-> In bpf_token_create() you can then just do:
->
->         struct fd f;
->         struct path path;
->
->         f =3D fdget(attr->token_create.bpffs_path_fd);
->         if (!f.file)
->                 return -EBADF;
->
->         *path =3D f.file->f_path;
->         path_get(path);
->         fdput(f);
->
-
-Yes, you are right. I'll simplify this part, thanks.
-
-
-> > +     if (err)
-> > +             return err;
-> > +
-> > +     if (path.mnt->mnt_root !=3D path.dentry) {
-> > +             err =3D -EINVAL;
-> > +             goto out_path;
-> > +     }
-> > +     if (path.mnt->mnt_sb->s_op !=3D &bpf_super_ops) {
-> > +             err =3D -EINVAL;
-> > +             goto out_path;
-> > +     }
-
-[...]
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
