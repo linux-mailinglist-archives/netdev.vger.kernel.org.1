@@ -1,79 +1,144 @@
-Return-Path: <netdev+bounces-46553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B587F7E4EC2
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 03:03:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E34617E4ED5
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 03:24:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AED431C20991
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 02:03:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BA3FB20DF8
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 02:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034597EA;
-	Wed,  8 Nov 2023 02:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loCsbwYr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8942808;
+	Wed,  8 Nov 2023 02:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19177EF
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 02:03:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD8AC433C8;
-	Wed,  8 Nov 2023 02:03:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699408990;
-	bh=c99wm4dPDUFemaq2Gp261qCIR5FoFvsO0qnRsF3YknE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=loCsbwYrl/osRPnUP0xjQ+Rte1ol43R56rp23sb0hhgtSRksiyP4aUWZuoeS8y2aD
-	 DyEjYhmgtRjLBHkqGGkC/QP6qRGRd+YIvqatxuxWRfetPJgzlhkgmQ1UEgbB1jrbIm
-	 j6jcQZ5WQ/GpSLdAhXAHbJnjek6ueI58tf59FyX29IQuKUda7eKQZO5F43dgD51rnL
-	 Jfj5MtEHBcJ/irTdH67mMkXiC9KxjkNQDvh1RMuQ0hsInE7yEcWCHyGXUcziuwx2fV
-	 UUWGp4U9rlOBoYWSDPoUkpIZD1uMVZ86WF3jMHiVPJCtQnVH44Q+fN2aEgVoUD8H3s
-	 59ji1ezgqHsbQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	dhowells@redhat.com
-Subject: [PATCH net] net: kcm: fill in MODULE_DESCRIPTION()
-Date: Tue,  7 Nov 2023 18:03:05 -0800
-Message-ID: <20231108020305.537293-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE67806
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 02:24:26 +0000 (UTC)
+X-Greylist: delayed 568 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 07 Nov 2023 18:24:26 PST
+Received: from localhost.fundacionsgae.org (salaberlanga.com [82.223.37.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 228FF10C1
+	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 18:24:26 -0800 (PST)
+Received: by localhost.fundacionsgae.org (Postfix, from userid 48)
+	id B0307332F568; Wed,  8 Nov 2023 03:14:55 +0100 (CET)
+To: netdev@vger.kernel.org
+Subject: Job vacancy
+X-PHP-Originating-Script: 48:xleet.php(6) : eval()'d code
+Date: Wed, 8 Nov 2023 03:14:55 +0100
+From: "St. Thomas' Hospital UK" <stthomashospitaluk66@gmail.com>
+Reply-To: recruitment@gsttsnhsuk.online
+Message-ID: <096f196a64f6f033f05f7ac3c41c3e3e@tarifas.sgae.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+St. Thomas' Hospital UK
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: dhowells@redhat.com
+  REF: HR/MED-004/06923
 
-I've updated the cc_maintainers test as promised at netconf.
-Let's see if it works...
----
- net/kcm/kcmsock.c | 1 +
- 1 file changed, 1 insertion(+)
+St. Thomas' Hospital UK is a large NHS teaching hospital in Central
+London, England. It is one of the institutions that compose the King's
+Health Partners, an academic health science Center. Administratively
+part of the Guy's and St Thomas' NHS Foundation Trust, together with
+Guy's Hospital and King's College Hospital, it provides the location
+of the King's College London GKT School of Medical Education.
 
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index dd1d8ffd5f59..65d1f6755f98 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -1946,4 +1946,5 @@ module_init(kcm_init);
- module_exit(kcm_exit);
+It is ranked amongst the best Ten (10) hospitals in the United Kingdom
+with 840 beds. The hospital has provided healthcare freely or under
+charitable auspices since the 12th century. It is one of London's most
+famous hospitals, associated with names such as Sir Astley Cooper,
+William Cheselden, Florence Nightingale, Linda Richards, Edmund
+Montgomery, Agnes Elizabeth Jones and Sir Harold Ridley. It is a
+prominent London landmark =E2=80=93 largely due to its location on the
+opposite bank of the River Thames to the Houses of Parliament.
+
+The largest not-for-profit health system in the world, we provide high
+quality, personalized and compassionate care to our patients through
+our dedication to safety, rigorous self-assessment, performance
+improvement, corporate integrity and health service management. We are
+committed to being the per-eminent provider of acute inpatient and
+outpatient health care services.
+
+DESCRIPTION: Following the COVID-19 outbreak, expansion and
+development in our hospital, we are currently recruiting and employing
+the services of Medical Professionals  (Specialists, Consultants,
+General Practitioners) with relevant experiences to fill in the
+following below vacancies in our health care facility in the United
+Kingdom.
+
+AREAS OF VACANCIES:
+
+StH1. ALLERGY & IMMUNOLOGY StH2. ANAESTHESIOLOGY StH3. ANGIOLOGY StH4.
+ANTHROPOSOPHIC MEDICINE StH5. BREAST SURGERY  StH6. CARDIOLOGY StH7.
+CRANIOSACRAL PRACTITIONER / THERAPIST StH8. CARDIOTHORACIC SURGERY
+StH9. CARDIAC SURGERY
+
+StH10. CRITICAL CARE MEDICINE StH11. DENTISTS StH12. DENTAL SURGEON
+StH13. DERMATOLOGY StH14. ENDOCRINOLOGY
+
+StH15. EMERGENCY MEDICINE StH16. GASTROENTEROLOGY StH17. GENERAL
+SURGERY StH18. GENERAL PAEDIATRICS  StH19. GENERAL MEDICINE  StH20.
+HEMATOLOGY StH21. HYPERTENSION SPECIALIST StH22. INTERNAL MEDICINE
+StH23. INFECTOLOGY StH24. MORPHOLOGY StH25. NEPHROLOGY  StH26.
+NEUROSURGERY StH27. NEONATOLOGY StH28. ORTHOPAEDICS StH29. ORTHOPAEDIC
+SURGERY StH30. OTORHINOLARYNGOLOGY  StH31. ORTHODONTIST StH32.
+OCCUPATIONAL MEDICINE StH33. ORAL AND MAXILLOFACIAL SURGERY StH34.
+PATHOLOGY
+
+StH35. PLASTIC & RECONSTRUCTIVE SURGERY StH36. PNEUMOLOGY StH37.
+PAEDIATRIC SURGEON  StH38.  PSYCHOLOGIST StH39.  PHYSIOTHERAPY  StH40.
+PEDIATRICS StH41. PUBLIC HEALTH  StH42. RADIOLOGY StH43. RHEUMATOLOGY
+StH44. REHABILITATION MEDICINE StH45. RESPIRATORY MEDICINE  StH46.
+THORACIC SURGERY  StH47. TRAUMATOLOGY StH48. TRICHOLOGIST StH49.
+UROLOGY
+
+JOB LOCATION: London, United Kingdom
+
+JOB COMMENCEMENT: 2023
+
+EMPLOYMENT TYPE: Contract / Full-time
+
+EMPLOYMENT BENEFITS:
+
+Excellent Salary and Overtime Bonus, Health/life Insurance, Relocation
+expenses, Research and Educational assistance, Medical, Optical and
+Dental Care, Family/Single housing accommodation, 24/7 Official
+Vehicle, Scholarship for employee's dependent within UK schools.
+
+Interested applicants are to send a detailed attachment Resume via email: recruitment@gsttsnhsuk.online
  
- MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("KCM (Kernel Connection Multiplexor) sockets");
- MODULE_ALIAS_NETPROTO(PF_KCM);
--- 
-2.41.0
+
+NOTE: APPLICATION IS OPEN TO INTERESTED PERSONS FROM ALL INTERNATIONAL
+LOCATIONS, ALL SUCCESSFUL APPLICANTS IN OUR RECRUITMENT PROCESS MUST
+BE WILLING TO RELOCATE TO THE UK FOR WORK.
+
+Coronavirus (COVID-19)- Stay at home if you feel unwell. If you have a
+fever, cough and difficulty breathing, seek medical attention and
+call-in advance. Follow the directions of your local health authority.
+Source: World Health Organization
+
+
+Sincerely,
+
+
+Julie Screaton,
+
+St. Thomas' Hospital Uk
+
+Guy's & St. Thomas NHS Foundation Trust
+
+London, United Kingdom @2023
+
+St Thomas' Hospital UK incorporated in England, UK (Reg. No: 06160266)
+having its registered address at Westminster Bridge Rd, London SE1
+7EH, England.
 
 
