@@ -1,255 +1,157 @@
-Return-Path: <netdev+bounces-46576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41AF7E50CC
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 08:09:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 637B57E50EF
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 08:28:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 078A6B20D5D
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:09:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E73181F216E4
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 07:28:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25A4C8C4;
-	Wed,  8 Nov 2023 07:09:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3112ED2FA;
+	Wed,  8 Nov 2023 07:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TvbOGM/8"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="R9IREQxx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20119CA6C
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:09:25 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D54710F9
-	for <netdev@vger.kernel.org>; Tue,  7 Nov 2023 23:09:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699427363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FG5MOGLDTAMR4tm1WZM1MYzGY/BA/UTHJJrzFko+l1M=;
-	b=TvbOGM/8BypqutJiHVJF57joz2aKnEY2od8MAJgfvrAuHFd9bak6x+kWbTMOFywvitWstB
-	uk/88pTzcghZqW5rweZ/wixyJoXeoz3HQshvx6d799YNp/BaHndc/utdL5II6ffz9cELS5
-	XVZWpXmBK9nZFv1pt2qPZX/Q8nwlf8s=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-6KFugozZMTKasM5bVjPh-w-1; Wed, 08 Nov 2023 02:09:22 -0500
-X-MC-Unique: 6KFugozZMTKasM5bVjPh-w-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-50798a259c7so6291806e87.1
-        for <netdev@vger.kernel.org>; Tue, 07 Nov 2023 23:09:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699427361; x=1700032161;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FG5MOGLDTAMR4tm1WZM1MYzGY/BA/UTHJJrzFko+l1M=;
-        b=seSGnCKKBdbXzpSOYZUZ/mRJbKipP0kVnZdaiObDt2WO/4+/DPHI5tS7PDMYqsg8U3
-         hvAIe1qLOWo9AeXMJZB4BkB27loRLdtX04mkrGBZzOdb49/AjqqK6Fj+4KBjFJ/N1JY5
-         //COTTJRDtMQod0JCrZ3rig5lDBO8pekSefKE+x8GLKTJyaqqHCDcM4rMubbOcTVUxzD
-         AbihHwkwitKIyC26wKU9Y4V+fQ5Gjorj6z+e/5z3FwviEPisP++z+btq36wcH7JbcFI5
-         QgDJv53U4Fl7vpO4SIbBa7x1bbcvvlRknq8QmxvW8PTcYAb5SQtYLFf1rnm2qNJwcxC3
-         SEkg==
-X-Gm-Message-State: AOJu0YxiBQUnl9OqwrnEGZUhlLzaXQ16Z1bFtESG5YPdE++tnZSdbI1R
-	4zxEB8sDWE/YmtG5qKSkdthgHsCkNXMnKQmTN3ZxOJAlB5/skz0Stv3o7m8p16+my6eO+P+Zy9z
-	//quD/RwOWudJ3pB6PndKAtk9F853Lnnz
-X-Received: by 2002:ac2:5104:0:b0:507:a58f:79ad with SMTP id q4-20020ac25104000000b00507a58f79admr525478lfb.61.1699427360915;
-        Tue, 07 Nov 2023 23:09:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGQlJqwh5A5QLG0zNOIdXOFw8oqq1dAcThcH8anfd70ScbRYfFhNkorJyUFptDNZWspLJ+aEXO/44/4ki8IWxk=
-X-Received: by 2002:ac2:5104:0:b0:507:a58f:79ad with SMTP id
- q4-20020ac25104000000b00507a58f79admr525465lfb.61.1699427360483; Tue, 07 Nov
- 2023 23:09:20 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE1ED266;
+	Wed,  8 Nov 2023 07:27:49 +0000 (UTC)
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E21198;
+	Tue,  7 Nov 2023 23:27:48 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 180C9100023;
+	Wed,  8 Nov 2023 10:27:45 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 180C9100023
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1699428465;
+	bh=GboU7QxQo+Iiecc7y5wDkeix0frYFM0ixS3MLnG4nCs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=R9IREQxxLHd4Y72wNfKVkCCE5pKZPTBYiQK0xYhqp6UjoEUFzoWw2sT9hDS9p5iTG
+	 29HL+TBcNTyXCQ31S+QqgP/wRjnQZ1bvIka/6L1GA/E0w9E/gkW4cUYXcuHR0X8K6T
+	 r5bjCLAviw4hgjUcUXfWhr6mqtCe6fyZMNPxTJp/aDX0xkqnfgxSfyyJgEwXT8q/dq
+	 aUh2FiwsxufHyUo8fxsO8RmWhrqLdWTQKL0QcWtywZNMsF5ZgFJJq2jbMQRiTTbiQn
+	 E+q++1tXcOVO6rh4GqFbuAOEVGJCsfs7EYUkMk0BIv4IxF8xQChyhA2yMoLRq4wV04
+	 uHgchs8maZMrQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Wed,  8 Nov 2023 10:27:44 +0300 (MSK)
+Received: from localhost.localdomain (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.37; Wed, 8 Nov 2023 10:27:44 +0300
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
+CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
+Subject: [RFC PATCH v1 0/2] send credit update during setting SO_RCVLOWAT
+Date: Wed, 8 Nov 2023 10:20:02 +0300
+Message-ID: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
+X-Mailer: git-send-email 2.35.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-4-lulu@redhat.com>
- <CACGkMEtVfHL2WPwxkYEfTKBE10uWfB2a75QQOO8rzn3=Y9FiBg@mail.gmail.com>
- <CACLfguX9-wEQPUyZkJZoRMmgPDRFNyZCmt0nvHROhyP1yooiYA@mail.gmail.com>
- <CACGkMEsp_rg+_01hwxCtZNOk2itB1L89mdOc1W1DG3umfEt5bw@mail.gmail.com> <CACLfguW3NZawOL0ET2K7bmtGZuzQwUfJ2HSgnirswzZK1ayPnA@mail.gmail.com>
-In-Reply-To: <CACLfguW3NZawOL0ET2K7bmtGZuzQwUfJ2HSgnirswzZK1ayPnA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 8 Nov 2023 15:09:09 +0800
-Message-ID: <CACGkMEvnNXC8PhBNQn_F0ROGRX3CvwmXM6wP2A69aydSuzThYw@mail.gmail.com>
-Subject: Re: [RFC v1 3/8] vhost: Add 3 new uapi to support iommufd
-To: Cindy Lu <lulu@redhat.com>
-Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181188 [Nov 08 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;salutedevices.com:7.1.1;127.0.0.199:7.1.2;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;git.kernel.org:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2023/11/08 06:11:00
+X-KSMG-LinksScanning: Clean, bases: 2023/11/08 06:10:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/08 04:00:00 #22424297
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Wed, Nov 8, 2023 at 2:39=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> On Wed, Nov 8, 2023 at 11:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Tue, Nov 7, 2023 at 2:57=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote=
-:
-> > >
-> > > On Mon, Nov 6, 2023 at 3:30=E2=80=AFPM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> > > >
-> > > > On Sat, Nov 4, 2023 at 1:17=E2=80=AFAM Cindy Lu <lulu@redhat.com> w=
-rote:
-> > > > >
-> > > > > VHOST_VDPA_SET_IOMMU_FD: bind the device to iommufd device
-> > > > >
-> > > > > VDPA_DEVICE_ATTACH_IOMMUFD_AS: Attach a vdpa device to an iommufd
-> > > > > address space specified by IOAS id.
-> > > > >
-> > > > > VDPA_DEVICE_DETACH_IOMMUFD_AS: Detach a vdpa device
-> > > > > from the iommufd address space
-> > > > >
-> > > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> > > > > ---
-> > > >
-> > > > [...]
-> > > >
-> > > > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhos=
-t.h
-> > > > > index f5c48b61ab62..07e1b2c443ca 100644
-> > > > > --- a/include/uapi/linux/vhost.h
-> > > > > +++ b/include/uapi/linux/vhost.h
-> > > > > @@ -219,4 +219,70 @@
-> > > > >   */
-> > > > >  #define VHOST_VDPA_RESUME              _IO(VHOST_VIRTIO, 0x7E)
-> > > > >
-> > > > > +/* vhost_vdpa_set_iommufd
-> > > > > + * Input parameters:
-> > > > > + * @iommufd: file descriptor from /dev/iommu; pass -1 to unset
-> > > > > + * @iommufd_ioasid: IOAS identifier returned from ioctl(IOMMU_IO=
-AS_ALLOC)
-> > > > > + * Output parameters:
-> > > > > + * @out_dev_id: device identifier
-> > > > > + */
-> > > > > +struct vhost_vdpa_set_iommufd {
-> > > > > +       __s32 iommufd;
-> > > > > +       __u32 iommufd_ioasid;
-> > > > > +       __u32 out_dev_id;
-> > > > > +};
-> > > > > +
-> > > > > +#define VHOST_VDPA_SET_IOMMU_FD \
-> > > > > +       _IOW(VHOST_VIRTIO, 0x7F, struct vhost_vdpa_set_iommufd)
-> > > > > +
-> > > > > +/*
-> > > > > + * VDPA_DEVICE_ATTACH_IOMMUFD_AS -
-> > > > > + * _IOW(VHOST_VIRTIO, 0x7f, struct vdpa_device_attach_iommufd_as=
-)
-> > > > > + *
-> > > > > + * Attach a vdpa device to an iommufd address space specified by=
- IOAS
-> > > > > + * id.
-> > > > > + *
-> > > > > + * Available only after a device has been bound to iommufd via
-> > > > > + * VHOST_VDPA_SET_IOMMU_FD
-> > > > > + *
-> > > > > + * Undo by VDPA_DEVICE_DETACH_IOMMUFD_AS or device fd close.
-> > > > > + *
-> > > > > + * @argsz:     user filled size of this data.
-> > > > > + * @flags:     must be 0.
-> > > > > + * @ioas_id:   Input the target id which can represent an ioas
-> > > > > + *             allocated via iommufd subsystem.
-> > > > > + *
-> > > > > + * Return: 0 on success, -errno on failure.
-> > > > > + */
-> > > > > +struct vdpa_device_attach_iommufd_as {
-> > > > > +       __u32 argsz;
-> > > > > +       __u32 flags;
-> > > > > +       __u32 ioas_id;
-> > > > > +};
-> > > >
-> > > > I think we need to map ioas to vDPA AS, so there should be an ASID
-> > > > from the view of vDPA?
-> > > >
-> > > > Thanks
-> > > >
-> > > The qemu will have a structure save and  maintain this information,So
-> > > I didn't add this
-> > >  in kernel=EF=BC=8Cwe can add this but maybe only for check?
-> >
-> > I meant for example, a simulator has two AS. How can we attach an ioas
-> > to a specific AS with the above uAPI?
-> >
-> > Thank>
-> this   __u32 ioas_id here is alloc from the iommufd system. maybe I
-> need to change to new name iommuds_asid to
-> make this more clear
-> the process in qemu is
->
-> 1) qemu want to use AS 0 (for example)
-> 2) checking the existing asid. the asid 0 not used before
-> 3 )alloc new asid from iommufd system, get new ioas_id (maybe 3 for examp=
-le)
-> qemu will save this relation 3<-->0 in the driver.
-> 4) setting the ioctl VDPA_DEVICE_ATTACH_IOMMUFD_AS to attach new ASID
-> to the kernel
+Hello,
 
-So if we want to map IOMMUFD AS 3 to VDPA AS 0, how can it be done?
+                               DESCRIPTION
 
-For example I didn't see a vDPA AS parameter in the above uAPI.
+This patchset fixes old problem with hungup of both rx/tx sides and adds
+test for it. This happens due to non-default SO_RCVLOWAT value and
+deferred credit update in virtio/vsock. Link to previous old patchset:
+https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
 
-vhost_vdpa_set_iommufd has iommufd_ioasid which is obviously not the vDPA A=
-S.
+Here is what happens step by step:
 
-And ioas_id of vdpa_device_attach_iommufd_as (as you explained above)
-is not vDPA AS.
+                                  TEST
 
-Thanks
+                            INITIAL CONDITIONS
+
+1) Vsock buffer size is 128KB.
+2) Maximum packet size is also 64KB as defined in header (yes it is
+   hardcoded, just to remind about that value).
+3) SO_RCVLOWAT is default, e.g. 1 byte.
 
 
-> 5=EF=BC=89 while map the memory=EF=BC=8C qemu will use ASID 3 to map /uma=
-p
-> and use ASID 0 for legacy mode map/umap
->
-> So kernel here will not maintain the ioas_id from iommufd=EF=BC=8C
-> and this also make the code strange since there will 2 different asid
-> for the same AS, maybe we can save these information in the kernel
-> Thanks
-> cindy
-> > > Thanks
-> > > Cindy
-> > > > > +
-> > > > > +#define VDPA_DEVICE_ATTACH_IOMMUFD_AS \
-> > > > > +       _IOW(VHOST_VIRTIO, 0x82, struct vdpa_device_attach_iommuf=
-d_as)
-> > > > > +
-> > > > > +/*
-> > > > > + * VDPA_DEVICE_DETACH_IOMMUFD_AS
-> > > > > + *
-> > > > > + * Detach a vdpa device from the iommufd address space it has be=
-en
-> > > > > + * attached to. After it, device should be in a blocking DMA sta=
-te.
-> > > > > + *
-> > > > > + * Available only after a device has been bound to iommufd via
-> > > > > + * VHOST_VDPA_SET_IOMMU_FD
-> > > > > + *
-> > > > > + * @argsz:     user filled size of this data.
-> > > > > + * @flags:     must be 0.
-> > > > > + *
-> > > > > + * Return: 0 on success, -errno on failure.
-> > > > > + */
-> > > > > +struct vdpa_device_detach_iommufd_as {
-> > > > > +       __u32 argsz;
-> > > > > +       __u32 flags;
-> > > > > +};
-> > > > > +
-> > > > > +#define VDPA_DEVICE_DETACH_IOMMUFD_AS \
-> > > > > +       _IOW(VHOST_VIRTIO, 0x83, struct vdpa_device_detach_iommuf=
-d_as)
-> > > > > +
-> > > > >  #endif
-> > > > > --
-> > > > > 2.34.3
-> > > > >
-> > > >
-> > >
-> >
->
+                                 STEPS
+
+            SENDER                              RECEIVER
+1) sends 128KB + 1 byte in a
+   single buffer. 128KB will
+   be sent, but for 1 byte
+   sender will wait for free
+   space at peer. Sender goes
+   to sleep.
+
+
+2)                                     reads 64KB, credit update not sent
+3)                                     sets SO_RCVLOWAT to 64KB + 1
+4)                                     poll() -> wait forever, there is
+                                       only 64KB available to read.
+
+So in step 4) receiver also goes to sleep, waiting for enough data or
+connection shutdown message from the sender. Idea to fix it is that rx
+kicks tx side to continue transmission (and may be close connection)
+when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
+this value is bigger than number of available bytes to read.
+
+I've added small test for this, but not sure as it uses hardcoded value
+for maximum packet length, this value is defined in kernel header and
+used to control deferred credit update. And as this is not available to
+userspace, I can't control test parameters correctly (if one day this
+define will be changed - test may become useless). 
+
+Head for this patchset is:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=ff269e2cd5adce4ae14f883fc9c8803bc43ee1e9
+
+Arseniy Krasnov (2):
+  virtio/vsock: send credit update during setting SO_RCVLOWAT
+  vsock/test: SO_RCVLOWAT + deferred credit update test
+
+ drivers/vhost/vsock.c                   |   2 +
+ include/linux/virtio_vsock.h            |   1 +
+ net/vmw_vsock/virtio_transport.c        |   2 +
+ net/vmw_vsock/virtio_transport_common.c |  31 ++++++
+ net/vmw_vsock/vsock_loopback.c          |   2 +
+ tools/testing/vsock/vsock_test.c        | 131 ++++++++++++++++++++++++
+ 6 files changed, 169 insertions(+)
+
+-- 
+2.25.1
 
 
