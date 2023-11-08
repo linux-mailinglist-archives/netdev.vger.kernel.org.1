@@ -1,142 +1,319 @@
-Return-Path: <netdev+bounces-46611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2065D7E566D
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 13:38:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B20D7E56A9
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 13:59:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 819DFB20DD8
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 12:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B1601C209BB
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 12:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E975D505;
-	Wed,  8 Nov 2023 12:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B8614F6F;
+	Wed,  8 Nov 2023 12:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hdJmX6Tf"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B6663C1
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 12:38:27 +0000 (UTC)
-Received: from mail-oi1-f207.google.com (mail-oi1-f207.google.com [209.85.167.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E04DF1BF0
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 04:38:26 -0800 (PST)
-Received: by mail-oi1-f207.google.com with SMTP id 5614622812f47-3b3f5a58408so9187461b6e.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 04:38:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699447106; x=1700051906;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=f9rx/NIwDuIO7RH8l1m10PzkYB91FmtIKSHTeanxTHM=;
-        b=Pk54R2uqG+/AuXaLkS+KZCDzE0+0LEsF8G7m07BcQ0rEcGPyQhpb+BNrQeJcfWKkvh
-         id3RZe3YeowHbq64zrKQSHNP00Ups60Ujr8u2aRE5Vn77UF4bMA16/dYZegIbPZ1ejPR
-         n3NQiq662jgHeM1hxmFnlaPSZ3HClinwYFQgrpQLdjkuRKMEWpm4iXIxXdA+YW4azjEt
-         /v+e/vdIVEWjevu9EwURokf8q/74Nw2CVwcMTFFqV6nYqVSd8lgGjS+ctY1P0F6hA+AY
-         oBIx3zW5HQgaHUAbSlpAagxVVAJJIbgSOq068hswYhwC4VqTS3LovP+3Ov5As45FbU7F
-         3lRA==
-X-Gm-Message-State: AOJu0YwtZHdOziWAT9fZkjJ6aJ4PwmOFVmpw0fLCQ5a9e3ivuzyJAHh5
-	iSfkoKtQnBH8v29gdrHIIfUY3O3XL1LjVNR1rza0Hkglha44
-X-Google-Smtp-Source: AGHT+IG71zcFpz6v7BgDMgGsmf8ro6g3f2BtFnk+5GxCdSxmGM4jtJyBkjuFqm2Buq1Xn8XzDIk65nSM9m/S/cMH3sSE+eWS5nQl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4241B1370;
+	Wed,  8 Nov 2023 12:59:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 397CEC433C7;
+	Wed,  8 Nov 2023 12:58:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699448345;
+	bh=mCKY7B1NUlBI0NuotW3ba1ch9AEY8/W0fCgPLr2mO8c=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hdJmX6TfcykocaTr5OrRW3LbdILEh0itmqr9P21mwGlg6MNeeNmqG3lC80LfvXy6g
+	 VtUPAhXRHS6nGjOfsUwjv4hGM05Gke0gSh30zzdYv1zPY1K/pw/ewTT8Yp/pFtHxgA
+	 CqlBBLPXwAyP7VR93PLJDWmmif9jbReJ7JLAXEI1K/cSXYfGNGTUY0jhDW7DQKkLkv
+	 3fLnVWbGfEdWbODApTbzfegitWoXOm7yzXOFjF2nGEbrSRbNtAzwlzPk6EFXSXbWOk
+	 /dWaNDETcJ9PdXN+Cgh02YBuiyQScJCQc1vmxaWB0AVd7HB7HFVPq6/I5aemCJlBbV
+	 L+fUTsc/kSZfw==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	linux-kbuild@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Matt Turner <mattst88@gmail.com>,
+	Vineet Gupta <vgupta@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Guo Ren <guoren@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Greg Ungerer <gerg@linux-m68k.org>,
+	Michal Simek <monstr@monstr.eu>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Geoff Levand <geoff@infradead.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andy Lutomirski <luto@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	x86@kernel.org,
+	Helge Deller <deller@gmx.de>,
+	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Timur Tabi <timur@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	David Woodhouse <dwmw2@infradead.org>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-alpha@vger.kernel.org,
+	linux-snps-arc@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-csky@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-m68k@lists.linux-m68k.org,
+	linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-bcachefs@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: [PATCH 00/22] -Wmissing-prototype warning fixes
+Date: Wed,  8 Nov 2023 13:58:21 +0100
+Message-Id: <20231108125843.3806765-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:198f:b0:3ae:2024:837d with SMTP id
- bj15-20020a056808198f00b003ae2024837dmr769620oib.8.1699447106316; Wed, 08 Nov
- 2023 04:38:26 -0800 (PST)
-Date: Wed, 08 Nov 2023 04:38:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001633ea0609a35d4d@google.com>
-Subject: [syzbot] [wireless?] [net?] WARNING in ieee80211_rfkill_poll
-From: syzbot <syzbot+7e59a5bfc7a897247e18@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+From: Arnd Bergmann <arnd@arndb.de>
 
-syzbot found the following issue on:
+I slightly dropped the ball on this since last sending the series in
+August, but a number of warning fixes have made it into the kernel in
+the meantime, both from my earlier submission and from architecture
+maintainers.
 
-HEAD commit:    90b0c2b2edd1 Merge tag 'pinctrl-v6.7-1' of git://git.kerne..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=1437f47b680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b0220f5f3436eb1a
-dashboard link: https://syzkaller.appspot.com/bug?extid=7e59a5bfc7a897247e18
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13c670c0e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1310d47b680000
+I have none patches that remain from the previous submission, with
+two of them reworked according to comments. The additional patches
+are from more testing across architectures and configurations that
+I had previously missed.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/38f32e2d2d96/disk-90b0c2b2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ec454d0d1d26/vmlinux-90b0c2b2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/110137c447a9/bzImage-90b0c2b2.xz
+At least one patch is for a newly added warning in recent kernels.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7e59a5bfc7a897247e18@syzkaller.appspotmail.com
+Regarding the regressions in terms of added warnings, there are
+now only five architectures left that add warnings (alpha, mips,
+nios2, sh and sparc) rather than 15, so I think we can apply
+the Kbuild change directly and have the architecture maintainers
+take care of the warnings just like the others did already.
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 732 at net/mac80211/driver-ops.h:688 drv_rfkill_poll net/mac80211/driver-ops.h:688 [inline]
-WARNING: CPU: 1 PID: 732 at net/mac80211/driver-ops.h:688 ieee80211_rfkill_poll+0x134/0x170 net/mac80211/cfg.c:3100
-Modules linked in:
-CPU: 1 PID: 732 Comm: kworker/1:2 Not tainted 6.6.0-syzkaller-14142-g90b0c2b2edd1 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
-Workqueue: events_power_efficient rfkill_poll
-RIP: 0010:drv_rfkill_poll net/mac80211/driver-ops.h:688 [inline]
-RIP: 0010:ieee80211_rfkill_poll+0x134/0x170 net/mac80211/cfg.c:3100
-Code: 60 07 00 00 be ff ff ff ff 48 8d 78 68 e8 44 f4 38 00 31 ff 89 c5 89 c6 e8 89 59 39 fb 85 ed 0f 85 44 ff ff ff e8 0c 5e 39 fb <0f> 0b e9 38 ff ff ff e8 00 5e 39 fb 0f 0b 48 c7 c7 f8 16 34 89 e8
-RSP: 0018:ffffc90001cafc90 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888100ff0700 RCX: ffffffff8614b267
-RDX: ffff888107368000 RSI: ffffffff8614b274 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 1ffffffff15c0565 R12: ffff888100ff0700
-R13: 0000000000000001 R14: ffffc90001cafd80 R15: ffff8881f673ad40
-FS:  0000000000000000(0000) GS:ffff8881f6700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6477ad0e40 CR3: 00000001122fe000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rdev_rfkill_poll net/wireless/rdev-ops.h:636 [inline]
- cfg80211_rfkill_poll+0xc9/0x240 net/wireless/core.c:224
- rfkill_poll+0x8d/0x110 net/rfkill/core.c:1037
- process_one_work+0x884/0x15c0 kernel/workqueue.c:2630
- process_scheduled_works kernel/workqueue.c:2703 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2784
- kthread+0x33c/0x440 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
- </TASK>
+As before, my preference would be for the patches to make it
+through the respective subsystem maintainer trees, though I
+can apply the architecture specific ones to the asm-generic
+tree as well.
 
+Sorry for posting these during the merge window, I wanted to
+get them out before LPC so we can have them in linux-next
+as early as possible.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+    Arnd
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Link: https://lore.kernel.org/lkml/20230810141947.1236730-1-arnd@kernel.org/
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Arnd Bergmann (22):
+  [RESEND^2] ida: make 'ida_dump' static
+  [RESEND^2] jffs2: mark __jffs2_dbg_superblock_counts() static
+  [RESEND] kprobes: unify kprobes_exceptions_nofify() prototypes
+  [RESEND] time: make sysfs_get_uname() function visible in header
+  [RESEND] parport: gsc: mark init function static
+  [RESEND] stackleak: add declarations for global functions
+  [RESEND] sched: fair: move unused stub functions to header
+  [v2] arch: consolidate arch_irq_work_raise prototypes
+  [v2] arch: fix asm-offsets.c building with -Wmissing-prototypes
+  microblaze: include linux/cpu.h for trap_init() prototype
+  x86: sta2x11: include header for sta2x11_get_instance() prototype
+  csky: fix arch_jump_label_transform_static override
+  arch: add do_page_fault prototypes
+  arch: add missing prepare_ftrace_return() prototypes
+  arch: vdso: consolidate gettime prototypes
+  bcachefs: mark bch2_target_to_text_sb() static
+  powerpc: ps3: move udbg_shutdown_ps3gelic prototype
+  powerpc: pasemi: mark pas_shutdown() static
+  powerpc: powermac: mark smp_psurge_{give,take}_timebase static
+  usb: fsl-mph-dr-of: mark fsl_usb2_mpc5121_init() static
+  fbdev/fsl-diu-fb: mark wr_reg_wa() static
+  Makefile.extrawarn: turn on missing-prototypes globally
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+ arch/alpha/include/asm/mmu_context.h         |  2 ++
+ arch/alpha/kernel/asm-offsets.c              |  2 +-
+ arch/alpha/kernel/traps.c                    |  1 +
+ arch/arc/include/asm/kprobes.h               |  3 ---
+ arch/arm/include/asm/irq_work.h              |  2 --
+ arch/arm/include/asm/kprobes.h               |  2 --
+ arch/arm/include/asm/vdso.h                  |  5 ----
+ arch/arm/vdso/vgettimeofday.c                |  1 +
+ arch/arm64/include/asm/irq_work.h            |  2 --
+ arch/arm64/include/asm/kprobes.h             |  2 --
+ arch/arm64/kernel/vdso32/vgettimeofday.c     |  1 +
+ arch/csky/include/asm/ftrace.h               |  4 +++
+ arch/csky/include/asm/irq_work.h             |  2 +-
+ arch/csky/include/asm/jump_label.h           |  5 ++++
+ arch/csky/include/asm/traps.h                |  2 +-
+ arch/csky/kernel/traps.c                     |  1 +
+ arch/csky/kernel/vdso/vgettimeofday.c        | 11 +--------
+ arch/loongarch/kernel/asm-offsets.c          | 26 ++++++++++----------
+ arch/loongarch/vdso/vgettimeofday.c          |  7 +-----
+ arch/m68k/coldfire/vectors.c                 |  3 +--
+ arch/m68k/coldfire/vectors.h                 |  3 ---
+ arch/microblaze/include/asm/ftrace.h         |  1 +
+ arch/microblaze/kernel/traps.c               |  1 +
+ arch/mips/include/asm/ftrace.h               |  4 +++
+ arch/mips/include/asm/kprobes.h              |  2 --
+ arch/mips/include/asm/traps.h                |  3 +++
+ arch/mips/vdso/vgettimeofday.c               |  1 +
+ arch/nios2/include/asm/traps.h               |  2 ++
+ arch/powerpc/include/asm/irq_work.h          |  1 -
+ arch/powerpc/include/asm/kprobes.h           |  2 --
+ arch/powerpc/include/asm/ps3.h               |  6 +++++
+ arch/powerpc/platforms/pasemi/setup.c        |  2 +-
+ arch/powerpc/platforms/powermac/smp.c        |  4 +--
+ arch/powerpc/platforms/ps3/gelic_udbg.c      |  1 +
+ arch/riscv/include/asm/irq_work.h            |  2 +-
+ arch/riscv/kernel/vdso/vgettimeofday.c       |  7 +-----
+ arch/s390/include/asm/irq_work.h             |  2 --
+ arch/s390/include/asm/kprobes.h              |  2 --
+ arch/sh/include/asm/kprobes.h                |  2 --
+ arch/sh/include/asm/traps_32.h               |  3 +++
+ arch/sparc/include/asm/kprobes.h             |  2 --
+ arch/sparc/kernel/asm-offsets.c              |  6 ++---
+ arch/sparc/kernel/traps_32.c                 |  1 +
+ arch/sparc/kernel/traps_64.c                 |  1 +
+ arch/x86/entry/vdso/vclock_gettime.c         | 10 +-------
+ arch/x86/include/asm/irq_work.h              |  1 -
+ arch/x86/include/asm/kprobes.h               |  2 --
+ arch/x86/include/asm/traps.h                 |  1 -
+ arch/x86/include/asm/vdso/gettimeofday.h     |  2 --
+ arch/x86/kernel/traps.c                      |  1 +
+ arch/x86/pci/sta2x11-fixup.c                 |  1 +
+ arch/x86/um/vdso/um_vdso.c                   |  1 +
+ drivers/net/ethernet/toshiba/ps3_gelic_net.h |  6 -----
+ drivers/parport/parport_gsc.c                |  2 +-
+ drivers/usb/host/fsl-mph-dr-of.c             |  2 +-
+ drivers/video/fbdev/fsl-diu-fb.c             |  2 +-
+ fs/bcachefs/disk_groups.c                    |  2 +-
+ fs/jffs2/debug.c                             |  2 +-
+ include/linux/irq_work.h                     |  3 +++
+ include/linux/kprobes.h                      |  4 +++
+ include/linux/stackleak.h                    |  6 +++++
+ include/vdso/gettime.h                       | 23 +++++++++++++++++
+ kernel/sched/fair.c                          | 13 ----------
+ kernel/sched/sched.h                         | 11 +++++++++
+ kernel/time/tick-internal.h                  |  3 ++-
+ lib/test_ida.c                               |  2 +-
+ scripts/Makefile.extrawarn                   |  4 +--
+ 67 files changed, 127 insertions(+), 122 deletions(-)
+ delete mode 100644 arch/m68k/coldfire/vectors.h
+ create mode 100644 include/vdso/gettime.h
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+-- 
+2.39.2
+Cc: Matt Turner <mattst88@gmail.com>
+Cc: Vineet Gupta <vgupta@kernel.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Guo Ren <guoren@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Greg Ungerer <gerg@linux-m68k.org>
+Cc: Michal Simek <monstr@monstr.eu>
+Cc: Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc: Dinh Nguyen <dinguyen@kernel.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Geoff Levand <geoff@infradead.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: x86@kernel.org
+Cc: Helge Deller <deller@gmx.de>
+Cc: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Timur Tabi <timur@kernel.org>
+Cc: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: David Woodhouse <dwmw2@infradead.org>
+Cc: "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>
+Cc: Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>
+Cc: Kees Cook <keescook@chromium.org>
+Cc: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Cc: Juri Lelli <juri.lelli@redhat.com>
+Cc: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Nathan Chancellor <nathan@kernel.org>
+Cc: Nick Desaulniers <ndesaulniers@google.com>
+Cc: Nicolas Schier <nicolas@fjasle.eu>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: "Uwe Kleine-König" <u.kleine-koenig@pengutronix.de>
+Cc: linux-alpha@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-snps-arc@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-trace-kernel@vger.kernel.org
+Cc: linux-csky@vger.kernel.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-mips@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-riscv@lists.infradead.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-sh@vger.kernel.org
+Cc: sparclinux@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-parisc@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Cc: linux-fbdev@vger.kernel.org
+Cc: dri-devel@lists.freedesktop.org
+Cc: linux-bcachefs@vger.kernel.org
+Cc: linux-mtd@lists.infradead.org
+Cc: linux-kbuild@vger.kernel.org
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
