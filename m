@@ -1,184 +1,213 @@
-Return-Path: <netdev+bounces-46704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1417E5F95
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:02:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C09F7E5FDF
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:17:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E14DB1C20BD4
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:02:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80E99B20E34
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E24374CB;
-	Wed,  8 Nov 2023 21:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EF1374CE;
+	Wed,  8 Nov 2023 21:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iEvman0/"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="32beSgpe";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kjlV4oVb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8547C37175
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 21:01:58 +0000 (UTC)
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05046EA
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 13:01:58 -0800 (PST)
-Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-49e15724283so65158e0c.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 13:01:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699477317; x=1700082117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PiM3LuIXvGAfyi5F2iKLHCbu8z2UXm9Y3n0WdD8YYls=;
-        b=iEvman0/+xNNaWzcTrEIPGESxg8S1nvfJ8yeCpLC6nbcYDeTm9njjy0MqzHh4tHK6z
-         Zj35srWFG+ySwmPPigPB/7FFlnhT0/8a+ttuVtxI0IySLmNEkT3UnsAjdTvH1pIWnfhu
-         KgLlML+wLdtwn3ZKzcM67psjuSrtvd6+aKKvmdSVuE1B1d4CipkhaCCV/nN14a2pGFgM
-         qT9m5sIuahfl3IHfaWmNQGVf/e6cs7djQ78hxbN37V9cAbzr/zRl4kI5SeuNsMzZNZgb
-         0/S6gcO/SIuAR5CpyLpsfSHYppwpXAZqh2bdtKXMMtqTaxcVczF7xNByFhVeyksLw8ga
-         CMVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699477317; x=1700082117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PiM3LuIXvGAfyi5F2iKLHCbu8z2UXm9Y3n0WdD8YYls=;
-        b=UxBHtWW3l6KUuFRvGW2HwZ2wD5AB6LB29S7+cCeYkhYVWk4rBn8kHLbniojy9KnmSZ
-         8UUGtbYKgKFVivFzHP+us4BbT5Zq1vPTq8Qt+K1/xrfzSb7dAwBAQ3hlBZJ8V9wG+TGu
-         PYVpw4IKcaca55JCms17FgdIrR7rAgJJSU1bZL1K9q1kvs9GJbNOhhtj6RgJJLeAQqTe
-         ew5I4H6BQJ3V+WCL9zTnFgwwZDfc6O8HUZY2M80xSn7A6ZaHXfwmsEahv+M8aped6b9q
-         AU2nDmDb+qq+91lneaLdt9PX9eKcOWsuWhV2M/ySlGLgnPz/A0137lQC9veKu50YWsRd
-         yp1w==
-X-Gm-Message-State: AOJu0Yz3moEa5GozQVECPLtHGelJ18v8KXoSuhkYbIZetta7tAHLK2kk
-	Zdjx67piIAeyjfAazNzyRUZMK7m5mnmkb90FDRbXNA==
-X-Google-Smtp-Source: AGHT+IFHfzUhQpGjZnmcMNbQNIB2J8SGGa2wGFeJ44qee8aLxODhFc/oVAoMTNdAcDtYar9T2m54xyl1lLZ16eD87rg=
-X-Received: by 2002:a1f:9cc7:0:b0:49a:88a9:cac6 with SMTP id
- f190-20020a1f9cc7000000b0049a88a9cac6mr2980720vke.11.1699477316866; Wed, 08
- Nov 2023 13:01:56 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83AA37160;
+	Wed,  8 Nov 2023 21:17:25 +0000 (UTC)
+X-Greylist: delayed 585 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Nov 2023 13:17:25 PST
+Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2443E213F;
+	Wed,  8 Nov 2023 13:17:25 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailnew.nyi.internal (Postfix) with ESMTP id 15DEC5808D9;
+	Wed,  8 Nov 2023 16:07:40 -0500 (EST)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Wed, 08 Nov 2023 16:07:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm3; t=
+	1699477660; x=1699484860; bh=D9PBCL8QJKdjrKS2aPJfuUQXeRbWRMeFHOK
+	ckMk8fx4=; b=32beSgpe4JW/41MI9lwE9Ijo4clBZDCZcdz5W29GlXfmeBdloGs
+	Pj6zClFpI3rBEASL5bt2BJ0z9kSHXoRmNM9S3ZUV9IpU6H2SlzHeojjwyK38ubdm
+	rc5I6AbHQO428z+GTudTpXj84wN1iHyD5B4xrh7Xg9+/lOsXO8mWGmiOw0oEtT95
+	59tIeWQXJ0PMlmbTe9oPGJNjvuF2Q00g7Aup3KvWuYCehPghEdVuK62ANt1RCDNX
+	P59SJAJQv8a5rR+mmaJ00cjQiQKIVXVSq/NkJ5Ceh2lpGohzfDFoxucwi0IF29D/
+	556O8j5asu9BGmdizp+cE+MTUaFBWLNaDZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1699477660; x=1699484860; bh=D9PBCL8QJKdjrKS2aPJfuUQXeRbWRMeFHOK
+	ckMk8fx4=; b=kjlV4oVb2NP4EXVJD0KYm4LTALqMkDnrU92/a5IM2DxqbQWjsi+
+	IwdXxoSa3WEs4VZrlHH4JbCKkIL0G8Pwij1126xSe7hG/IMqOBcu3RQxvqgsEHsb
+	pcFM0Ua1NE3OwtwEsNMc4jlmhSYjBeK+x0Ed/W7Rlf03UIZVqr2B+d0ryicP7Tub
+	QSkOlA0efMsPA3XcbslixipIgl/+8P6M15YEgB0c0t6f8ouEUKSI2KL0MYB9RUr3
+	hoiEAHdJCFrsG/Y/a3llxHIutnrnDvRz3cIbj7RF5co+2MINYEdgACq/D/uqzlpo
+	r0L8iW3NWB7AxkztwyKFHjpLOPBdYiLEhJA==
+X-ME-Sender: <xms:m_hLZQw4_GjcfbThT_vbWtFC1jg247Lu0E-xxAcura-dvGHI0kyRtw>
+    <xme:m_hLZUTBxKjGHnkabv1F9oTzwRz5Y87A_Eif-kfMyvanmifw9H6wOpvDuy8X5HtkK
+    Zp2U-M3JmHcVR-PhU4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudduledgudegfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedf
+    tehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrf
+    grthhtvghrnhepgeefjeehvdelvdffieejieejiedvvdfhleeivdelveehjeelteegudek
+    tdfgjeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    eprghrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:m_hLZSW6ebv1Nls-lv6APr_ihVG7HATMnEZKUQ2lPJN14ImeSnqatA>
+    <xmx:m_hLZejrECVMz1a28xI-eZZXTwB4qMex3E04bXgkhXhjxa6Uy3_eWg>
+    <xmx:m_hLZSCmSuJkW1zFZoPx2zdR5BRKPmHS1VpT2dl_7ti0xOUBuc0gGw>
+    <xmx:nPhLZa5R9gGZF0aG1bP9Mvi7bGv6CIQdVEBpyyHzpDHDqjyICYNx-Q>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 48539B60089; Wed,  8 Nov 2023 16:07:39 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-1108-g3a29173c6d-fm-20231031.005-g3a29173c
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231108202819.1932920-1-sdf@google.com> <CANn89iJnX6sm1UHbU6TKzoWJJyNLGjpN_amb8bkmgnLk8Qj_gQ@mail.gmail.com>
-In-Reply-To: <CANn89iJnX6sm1UHbU6TKzoWJJyNLGjpN_amb8bkmgnLk8Qj_gQ@mail.gmail.com>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Wed, 8 Nov 2023 13:01:44 -0800
-Message-ID: <CAKH8qBvFTHQ9FOX8_ta7M2aq8ExZnoefLp+nOygE3m1z+433Ew@mail.gmail.com>
-Subject: Re: [PATCH net] net: set SOCK_RCU_FREE before inserting socket into hashtable
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
+In-Reply-To: 
+ <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-11-arnd@kernel.org>
+ <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
+Date: Wed, 08 Nov 2023 22:07:18 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Arnd Bergmann" <arnd@kernel.org>
+Cc: "Andrew Morton" <akpm@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, "Masahiro Yamada" <masahiroy@kernel.org>,
+ linux-kbuild@vger.kernel.org, "Matt Turner" <mattst88@gmail.com>,
+ "Vineet Gupta" <vgupta@kernel.org>,
+ "Russell King" <linux@armlinux.org.uk>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Will Deacon" <will@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>, guoren <guoren@kernel.org>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Ard Biesheuvel" <ardb@kernel.org>,
+ "Huacai Chen" <chenhuacai@kernel.org>,
+ "Greg Ungerer" <gerg@linux-m68k.org>, "Michal Simek" <monstr@monstr.eu>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Dinh Nguyen" <dinguyen@kernel.org>,
+ "Michael Ellerman" <mpe@ellerman.id.au>,
+ "Nicholas Piggin" <npiggin@gmail.com>,
+ "Christophe Leroy" <christophe.leroy@csgroup.eu>,
+ "Geoff Levand" <geoff@infradead.org>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>,
+ "John Paul Adrian Glaubitz" <glaubitz@physik.fu-berlin.de>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Andy Lutomirski" <luto@kernel.org>,
+ "Thomas Gleixner" <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>,
+ x86@kernel.org, "Helge Deller" <deller@gmx.de>,
+ "Sudip Mukherjee" <sudipm.mukherjee@gmail.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Timur Tabi" <timur@kernel.org>,
+ "Kent Overstreet" <kent.overstreet@linux.dev>,
+ "David Woodhouse" <dwmw2@infradead.org>,
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ "Anil S Keshavamurthy" <anil.s.keshavamurthy@intel.com>,
+ "Kees Cook" <keescook@chromium.org>,
+ "Vincenzo Frascino" <vincenzo.frascino@arm.com>,
+ "Juri Lelli" <juri.lelli@redhat.com>,
+ "Vincent Guittot" <vincent.guittot@linaro.org>,
+ "Nathan Chancellor" <nathan@kernel.org>,
+ "Nick Desaulniers" <ndesaulniers@google.com>,
+ "Nicolas Schier" <nicolas@fjasle.eu>,
+ "Alexander Viro" <viro@zeniv.linux.org.uk>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+ "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ Netdev <netdev@vger.kernel.org>, linux-parisc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org,
+ "linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>,
+ linux-mtd@lists.infradead.org
+Subject: Re: [PATCH 10/22] microblaze: include linux/cpu.h for trap_init() prototype
+Content-Type: text/plain;charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 8, 2023 at 12:58=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Wed, Nov 8, 2023, at 21:42, Geert Uytterhoeven wrote:
 >
-> On Wed, Nov 8, 2023 at 9:28=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
-> wrote:
-> >
-> > We've started to see the following kernel traces:
-> >
-> >  WARNING: CPU: 83 PID: 0 at net/core/filter.c:6641 sk_lookup+0x1bd/0x1d=
-0
-> >
-> >  Call Trace:
-> >   <IRQ>
-> >   __bpf_skc_lookup+0x10d/0x120
-> >   bpf_sk_lookup+0x48/0xd0
-> >   bpf_sk_lookup_tcp+0x19/0x20
-> >   bpf_prog_<redacted>+0x37c/0x16a3
-> >   cls_bpf_classify+0x205/0x2e0
-> >   tcf_classify+0x92/0x160
-> >   __netif_receive_skb_core+0xe52/0xf10
-> >   __netif_receive_skb_list_core+0x96/0x2b0
-> >   napi_complete_done+0x7b5/0xb70
-> >   <redacted>_poll+0x94/0xb0
-> >   net_rx_action+0x163/0x1d70
-> >   __do_softirq+0xdc/0x32e
-> >   asm_call_irq_on_stack+0x12/0x20
-> >   </IRQ>
-> >   do_softirq_own_stack+0x36/0x50
-> >   do_softirq+0x44/0x70
-> >
-> > I'm not 100% what is causing them. It might be some kernel change or
-> > new code path in the bpf program. But looking at the code,
-> > I'm assuming the issue has been there for a while.
-> >
-> > __inet_hash can race with lockless (rcu) readers on the other cpus:
-> >
-> >   __inet_hash
-> >     __sk_nulls_add_node_rcu
-> >     <- (bpf triggers here)
-> >     sock_set_flag(SOCK_RCU_FREE)
-> >
-> > Let's move the SOCK_RCU_FREE part up a bit, before we are inserting
-> > the socket into hashtables. Note, that the race is really harmless;
-> > the bpf callers are handling this situation (where listener socket
-> > doesn't have SOCK_RCU_FREE set) correctly, so the only
-> > annoyance is a WARN_ONCE (so not 100% sure whether it should
-> > wait until net-next instead).
-> >
-> > For the fixes tag, I'm using the original commit which added the flag.
+> On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org>=
+ wrote:
+>> From: Arnd Bergmann <arnd@arndb.de>
+>>
+>> Microblaze runs into a single -Wmissing-prototypes warning when that =
+is
+>> enabled:
+>>
+>> arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype f=
+or 'trap_init' [-Wmissing-prototypes]
+>>
+>> Include the right header to avoid this.
+>>
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 >
-> When this commit added the flag, precise location of the
-> sock_set_flag(sk, SOCK_RCU_FREE)
-> did not matter, because the thread calling __inet_hash() owns a reference=
- on sk.
+> Thanks for your patch!
 >
-> SOCK_RCU_FREE was tested only at dismantle time.
+>>  arch/alpha/kernel/traps.c      | 1 +
+>>  arch/csky/include/asm/traps.h  | 2 --
+>>  arch/csky/kernel/traps.c       | 1 +
+>>  arch/m68k/coldfire/vectors.c   | 3 +--
+>>  arch/m68k/coldfire/vectors.h   | 3 ---
 >
-> Back then BPF was not able yet to perform lookups, and double check if
-> SOCK_RCU_FREE
-> was set or not.
+> Ah, so this is where the m68k changes listed in the cover letter are
+> hiding ;-)
 >
-> Checking SOCK_RCU_FREE _after_ the lookup to infer if a refcount has
-> been taken came
-> with commit 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
+>>  arch/microblaze/kernel/traps.c | 1 +
+>>  arch/sparc/kernel/traps_32.c   | 1 +
+>>  arch/sparc/kernel/traps_64.c   | 1 +
+>>  arch/x86/include/asm/traps.h   | 1 -
+>>  arch/x86/kernel/traps.c        | 1 +
+>>  10 files changed, 7 insertions(+), 8 deletions(-)
+>>  delete mode 100644 arch/m68k/coldfire/vectors.h
 >
-> I think we can be more precise and help future debugging, in case more pr=
-oblems
-> need investigations.
->
-> Can you augment the changelog and use a different Fixes: tag ?
->
-> With that,
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Obviously the non-microblaze changes should be spun off in separate
+> patches.
 
-Sure, thank you for the timeline! Will resend shortly with the updated
-changelog.
+I messed up one of my rebases here and accidentally sent
+the wrong changelog text. My intention was to have the
+combined patch but with this text:
 
-> >
-> > Fixes: 3b24d854cb35 ("tcp/dccp: do not touch listener sk_refcnt under s=
-ynflood")
-> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> > ---
-> >  net/ipv4/inet_hashtables.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> > index 598c1b114d2c..a532f749e477 100644
-> > --- a/net/ipv4/inet_hashtables.c
-> > +++ b/net/ipv4/inet_hashtables.c
-> > @@ -751,12 +751,12 @@ int __inet_hash(struct sock *sk, struct sock *osk=
-)
-> >                 if (err)
-> >                         goto unlock;
-> >         }
-> > +       sock_set_flag(sk, SOCK_RCU_FREE);
-> >         if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
-> >                 sk->sk_family =3D=3D AF_INET6)
-> >                 __sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
-> >         else
-> >                 __sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
-> > -       sock_set_flag(sk, SOCK_RCU_FREE);
-> >         sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
-> >  unlock:
-> >         spin_unlock(&ilb2->lock);
-> > --
-> > 2.42.0.869.gea05f2083d-goog
-> >
+    arch: include linux/cpu.h for trap_init() prototype
+   =20
+    some architectures run into a -Wmissing-prototypes warning
+    for trap_init()
+   =20
+    arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype =
+for 'trap_init' [-Wmissing-prototypes]
+   =20
+    Include the right header to avoid this consistently, removing
+    the extra declarations on m68k and x86 that were added as local
+    workarounds already.
+   =20
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+
+I made the same mistake with the "arch: add do_page_fault prototypes"
+patch that was missing an explanation.
+
+      Arnd
 
