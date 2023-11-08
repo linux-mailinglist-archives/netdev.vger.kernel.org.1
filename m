@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-46700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471DE7E5F2F
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:31:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F05E97E5F22
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 027AC2814F6
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 20:30:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA51228140B
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 20:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1037B37177;
-	Wed,  8 Nov 2023 20:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100913716F;
+	Wed,  8 Nov 2023 20:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NN4jl9Db"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="PFmhlbFm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6E0374D1;
-	Wed,  8 Nov 2023 20:30:53 +0000 (UTC)
-X-Greylist: delayed 666 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Nov 2023 12:30:51 PST
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [IPv6:2001:41d0:203:375::af])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73938213F;
-	Wed,  8 Nov 2023 12:30:51 -0800 (PST)
-Date: Wed, 8 Nov 2023 15:19:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1699474780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PbwFpWU3b/64FA3DGg16AJLy9+l+edq6SWw+OgQ7JB8=;
-	b=NN4jl9DbG6ge2X5Z4LvMRvUIzvrx3zb+78lKBdvMU7o+Xx21MYgYzpA0z9n8XArsqMD5mN
-	cqbLms/2qCjnwyMGpCOUnGEEUiLwSIpWA52OH4XJopqInWjZJuja9sTV850XElLhrQ1PvD
-	UpjFRjTS9+IYREluvfHwywBTDvFGkRc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-	Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Greg Ungerer <gerg@linux-m68k.org>, Michal Simek <monstr@monstr.eu>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Geoff Levand <geoff@infradead.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
-	Helge Deller <deller@gmx.de>,
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Timur Tabi <timur@kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-	Kees Cook <keescook@chromium.org>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Nicolas Schier <nicolas@fjasle.eu>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-trace-kernel@vger.kernel.org, linux-csky@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-	netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
-	linux-mtd@lists.infradead.org
-Subject: Re: [PATCH 16/22] bcachefs: mark bch2_target_to_text_sb() static
-Message-ID: <20231108201932.572kz2zsyzyprn3g@moria.home.lan>
-References: <20231108125843.3806765-1-arnd@kernel.org>
- <20231108125843.3806765-17-arnd@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCCC30FAF;
+	Wed,  8 Nov 2023 20:27:30 +0000 (UTC)
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA4FB2126;
+	Wed,  8 Nov 2023 12:27:29 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 30E3377D;
+	Wed,  8 Nov 2023 20:27:29 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 30E3377D
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1699475249; bh=lcpu4lqmDmvaxi98wOh6OW+as9ZncysjkXCYXHMXnNI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=PFmhlbFmAJfzKQZ548sHjF5Hm1esnwtzv3TtqDzvBVoF59MY5fgzvrXPke6BXtnJp
+	 mZE8INxabP9CzQ7aFFqFWIf7t7wN8Upq8gNaXpMJGTIkQlouhxvUdH2jEdunk+CIn8
+	 JHWZez339Snxrs9OS5ocGX/HUjgzAy5VNiqx9c5VU/lu//SJeMAVguaPX4sdao82nW
+	 BcDfU3v/I+ZJ8x+N5EL3GTw1hbH0FYZhG8sP2vTu3j1LDrFDLk5yO2eU2v9F+X+0kd
+	 z7Kg6bTHy+xbZ+H4QDin+MSLfVHwB9ASAC6kQDO6Az0JMvB1mCNDkA0WwFAKvcQ9oE
+	 uCbvFv9x+pYbA==
+From: Jonathan Corbet <corbet@lwn.net>
+To: Breno Leitao <leitao@debian.org>
+Cc: linux-doc@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH] Documentation: Document the Netlink spec
+In-Reply-To: <20231103135622.250314-1-leitao@debian.org>
+References: <20231103135622.250314-1-leitao@debian.org>
+Date: Wed, 08 Nov 2023 13:27:28 -0700
+Message-ID: <875y2cxa6n.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231108125843.3806765-17-arnd@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-On Wed, Nov 08, 2023 at 01:58:37PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> bch2_target_to_text_sb() is only called in the file it is defined in,
-> and it has no extern prototype:
-> 
-> fs/bcachefs/disk_groups.c:583:6: error: no previous prototype for 'bch2_target_to_text_sb' [-Werror=missing-prototypes]
-> 
-> Mark it static to avoid the warning and have the code better optimized.
-> 
-> Fixes: bf0d9e89de2e ("bcachefs: Split apart bch2_target_to_text(), bch2_target_to_text_sb()")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Breno Leitao <leitao@debian.org> writes:
 
-This is already fixed in my tree.
+> This is a Sphinx extension that parses the Netlink YAML spec files
+> (Documentation/netlink/specs/), and generates a rst file to be
+> displayed into Documentation pages.
+>
+> Create a new Documentation/networking/netlink_spec page, and a sub-page
+> for each Netlink spec that needs to be documented, such as ethtool,
+> devlink, netdev, etc.
+>
+> Create a Sphinx directive extension that reads the YAML spec
+> (located under Documentation/netlink/specs), parses it and returns a RST
+> string that is inserted where the Sphinx directive was called.
+
+So I finally had a chance to look a bit at this; I have a few
+impressions.
+
+First of all, if you put something silly into one of the YAML files, it
+kills the whole docs build, which is ... not desirable:
+
+> Exception occurred:
+>   File "/usr/lib64/python3.11/site-packages/yaml/scanner.py", line 577, in fetch_value
+>     raise ScannerError(None, None,
+> yaml.scanner.ScannerError: mapping values are not allowed here
+>   in "/stuff/k/git/kernel/Documentation/netlink/specs/ovs_datapath.yaml", line 14, column 9
+> 
+
+That error needs to be caught and handled in some more graceful way.
+
+I do have to wonder, though, whether a sphinx extension is the right way
+to solve this problem.  You're essentially implementing a filter that
+turns one YAML file into one RST file; might it be better to keep that
+outside of sphinx as a standalone script, invoked by the Makefile?
+
+Note that I'm asking because I wonder, I'm not saying I would block an
+extension-based implementation.
+
+Thanks,
+
+jon
 
