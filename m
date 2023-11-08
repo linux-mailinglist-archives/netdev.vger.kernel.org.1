@@ -1,120 +1,150 @@
-Return-Path: <netdev+bounces-46652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DAA87E59B4
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:08:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10CA7E59BE
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:10:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8871FB20C75
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:08:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EACC280FF1
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBC030322;
-	Wed,  8 Nov 2023 15:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA4830328;
+	Wed,  8 Nov 2023 15:10:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aKfYXL+f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dm/3sO8n"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933ED4C7F
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:08:46 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B551BE5
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:08:45 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-9a6190af24aso1088218666b.0
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 07:08:45 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044A12592
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:10:40 +0000 (UTC)
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF8C1FE4
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:10:40 -0800 (PST)
+Received: by mail-vk1-xa32.google.com with SMTP id 71dfb90a1353d-4ac0719457bso584909e0c.0
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 07:10:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699456124; x=1700060924; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=20noXmNraMuNIbsacYWC++j7zo4NVQhLYKhuMZttxuQ=;
-        b=aKfYXL+fI0FAdF3YnM+A5CrQT7q7Gc+UPwWtDMsmi8gTFHphVSVxeX9KbnLudQy/FU
-         teSIGagVO3Y/VNEIxzhipB02YY1pEmVgXoGbJMfVJVdDhFCKXVLoF+HPt1i0ZJexWQuH
-         xyW3DGPYbOKWswDhaR376Zp0rmGRxM0lvwAdlWN1fm9RoQuBr/cQIQNVJbQtrcZYxBbn
-         W5baI6ikH/whWcOpid0Vu8S+E8TncXJ17rGvcs1/6Qzw6tlXmYznZKhe8lnjM32UFV9j
-         jVLCIVNAHH/GDQE5joolrtnluiW+lz/c/JmxReop1SJ3SDQxWyqJm+Bg3kMqPQe1IQ2D
-         x+gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699456124; x=1700060924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1699456239; x=1700061039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=20noXmNraMuNIbsacYWC++j7zo4NVQhLYKhuMZttxuQ=;
-        b=WEhtJZZMsdbxYIrsyhNRaoBhd9JkZ5C9zvE7O/hk1sHUHB3FHFn4WPujPjQy4VDeoE
-         L5OiwX2bMuCLXE87wqBAULet0jmLKYHuvkoQ35EZJTgjEVheTSDD0a2uJXGnFpY2xqHf
-         mj/lhSNhjKDh3ZrePLDpk8LJLwIIOseJrTSFIeN4EmNd+t/n8s7+i3IeQ7GJpY4sokqw
-         PB6WJijUoTP5n2TSzu6POeE+lmggLh1v+WUNWy15ErD8xw2INWMV+4ivMgDAqDtjtccz
-         oHWQF9tmpbupP6Sz4JaxAle9LHxr9BoyWFgXF574Ch5P82+YErFfzd4sKCcquLdVYeHq
-         KuXQ==
-X-Gm-Message-State: AOJu0Ywp1+tGe4Q75Wv/g9JjG2UtqEmQtavn9xEUSnvhUbg1kH8p0C4B
-	4gJ3YIZxKxmDVS53KM8TntQvxw==
-X-Google-Smtp-Source: AGHT+IGQC4jNTGjKgNptF6KTUMjR7qIHUFbsjdJJO4g8I7yNk34TOtMQLvsfqU/MHY8NVg1lEAFOVw==
-X-Received: by 2002:a17:907:78c:b0:9e0:4910:166b with SMTP id xd12-20020a170907078c00b009e04910166bmr1776366ejb.52.1699456124302;
-        Wed, 08 Nov 2023 07:08:44 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id u19-20020a170906069300b009a168ab6ee2sm1159395ejb.164.2023.11.08.07.08.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 07:08:43 -0800 (PST)
-Date: Wed, 8 Nov 2023 16:08:42 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	michal.michalik@intel.com, milena.olech@intel.com,
-	pabeni@redhat.com, kuba@kernel.org
-Subject: Re: [PATCH net 1/3] dpll: fix pin dump crash after module unbind
-Message-ID: <ZUukeokxH2NVvmpe@nanopsycho>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-2-arkadiusz.kubalewski@intel.com>
+        bh=GfvmRBytKaz69wOAtnLg0uwO+ymX7F4EJbN3f30an0U=;
+        b=dm/3sO8nwVHuRlicCn4LtBH/QQezPafXCEk0A7YO9G1MmGiAOglPokpiNk2S7feMo7
+         N7GeKQZNUPAQ1CUnrRArej5Plfzxa8L266bYJSMmZ0Q/H/gnFrLsG+88EXHEakuYNcYg
+         2MpR28u+UjPNj6b59jJccFxuq/RQ/vHavWtqZnfake7NDtNrtOpvhuRhe9iX7hy3tiaw
+         W0feibYllT12tQ1JaC4eIgHw/JZnahZ4R9O7uVcKo6mH44w5riubDAm7bAsGDcs5mRyS
+         jgPe4ZhmzZraTA5gTkz0a43Bn8QZuyUSuysTzOSakVbxAM+TPYVtTGaV4hVUsmnfdqsy
+         xl8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699456239; x=1700061039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GfvmRBytKaz69wOAtnLg0uwO+ymX7F4EJbN3f30an0U=;
+        b=cI4NBp6XvBjg7hVHg1eJ/MZ2j/7GO4z27vmrCif4W5Eg+FT3lYfWUIdOBLxDRwMR3s
+         mZFGj2h7UsLnyxDrF2ywZkxFZNhxoevoOiT2iNfO06I8Jlcvz+puPh7rBHFe/bN+Jnrt
+         X7XVZ2+hqbQDtEAW9g8fEAWVheGdIK2v+QVp67lJV9BnGEQkE2KkqK7eqDoAbRpBY9zo
+         8Mp2OSMozrqh9b7SePDYFiN/X4qkYn2p94LNZS+donJwdd/H+/v53GS73DYDuhTf/GEj
+         SH2SE2pOpR6YfZgxr9esT5QfFRw9bF/nlLxT28W5daEKq4wXMtNvHPFJkisXviTsFYtb
+         INAw==
+X-Gm-Message-State: AOJu0YwO+e0VUo5c+clTS++3/61osN3HZs8/MWnrBIpPX7Rdtn4j9IJt
+	5LGWO/xVCPKJlWcB+vvr+7vdFO4ZaLhfNnG/RtY=
+X-Google-Smtp-Source: AGHT+IHRHE39FBTqgGB5t0NjRMZ3A2UlMfdLJWppJgrl9G2Fo5S8UVAoOZjy4ptSXYP8PSCDKVysg/g95dEXTNiVne0=
+X-Received: by 2002:a1f:2bd2:0:b0:4ab:da7a:c573 with SMTP id
+ r201-20020a1f2bd2000000b004abda7ac573mr940228vkr.8.1699456239119; Wed, 08 Nov
+ 2023 07:10:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231108103226.1168500-2-arkadiusz.kubalewski@intel.com>
+References: <87jzqsld6q.fsf@cloudflare.com>
+In-Reply-To: <87jzqsld6q.fsf@cloudflare.com>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 8 Nov 2023 10:10:02 -0500
+Message-ID: <CAF=yD-+GNV_1HLyBKGeZuVkRGPEMmyQ4+MX9cLvyC1mC9a+dvg@mail.gmail.com>
+Subject: Re: EIO on send with UDP_SEGMENT
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, kernel-team@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Wed, Nov 08, 2023 at 11:32:24AM CET, arkadiusz.kubalewski@intel.com wrote:
->Disallow dump of unregistered parent pins, it is possible when parent
->pin and dpll device registerer kernel module instance unbinds, and
->other kernel module instances of the same dpll device have pins
->registered with the parent pin. The user can invoke a pin-dump but as
->the parent was unregistered, thus shall not be accessed by the
->userspace, prevent that by checking if parent pin is still registered.
+On Wed, Nov 8, 2023 at 6:03=E2=80=AFAM Jakub Sitnicki <jakub@cloudflare.com=
+> wrote:
 >
->Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
->Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->---
-> drivers/dpll/dpll_netlink.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
+> Hi Willem et al,
 >
->diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->index a6dc3997bf5c..93fc6c4b8a78 100644
->--- a/drivers/dpll/dpll_netlink.c
->+++ b/drivers/dpll/dpll_netlink.c
->@@ -328,6 +328,13 @@ dpll_msg_add_pin_parents(struct sk_buff *msg, struct dpll_pin *pin,
-> 		void *parent_priv;
-> 
-> 		ppin = ref->pin;
->+		/*
->+		 * dump parent only if it is registered, thus prevent crash on
->+		 * pin dump called when driver which registered the pin unbinds
->+		 * and different instance registered pin on that parent pin
+> We have hit the EIO error path in udp_send_skb introduced in commit bec1f=
+6f69736
+> ("udp: generate gso with UDP_SEGMENT") [0]:
+>
+>         if (skb->ip_summed !=3D CHECKSUM_PARTIAL || ...) {
+>                 kfree_skb(skb);
+>                 return -EIO;
+>         }
+>
+> ... when attempting to send a GSO packet, using UDP_SEGMENT option, from
+> a TUN device which didn't have any offloads enabled (the default case).
+>
+> A trivial reproducer for that would be:
+>
+>   ip tuntap add dev tun0 mode tun
+>   ip addr add dev tun0 192.0.2.1/24
+>   ip link set dev tun0 up
+>
+>   strace -e %net python -c '
+>   from socket import *
+>   s =3D socket(AF_INET, SOCK_DGRAM)
+>   s.setsockopt(SOL_UDP, 103, 1200)
+>   s.sendto(b"x" * 3000, ("192.0.2.2", 9))
+>   '
+>
+> which yields:
+>
+>   socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC, IPPROTO_IP) =3D 3
+>   setsockopt(3, SOL_UDP, UDP_SEGMENT, [1200], 4) =3D 0
+>   sendto(3, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"..., 3000, 0, {sa_family=3D=
+AF_INET, sin_port=3Dhtons(9), sin_addr=3Dinet_addr("192.0.2.2")}, 16) =3D -=
+1 EIO (Input/output error)
+>
+> This has been a surprise and caused us some pain. I think it comes down
+> to that anyone using UDP_SEGMENT has to implement a segmentation
+> fallback in user-space. Just to be on the safe side.  We can't really
+> assume that any TUN/TAP interface, which happens to be our egress
+> device, has at least checksum offload enabled and implemented.
+>
+> Which is not ideal.
+> So it made us wonder if anything can be done about it?
+>
+> As it turns out, skb_segment() in GSO path implements a software
+> fallback not only for segmentation but also for checksumming [1].
+>
+> What is more, when we removed the skb->ip_summed =3D=3D CHECKSUM_PARTIAL
+> restriction in udp_send, as an experiment, we were able to observe fully
+> checksummed segments in packet capture.
+>
+> Which brings me to my question -
+>
+> Do you think the restriction in udp_send_skb can be lifted or tweaked?
 
-Read this sentence like 10 times, still don't get what you mean.
-Shouldn't comments be easy to understand?
+The argument against has been that segmentation offload offers no
+performance benefit if the stack has to fall back onto software
+checksumming.
 
+If this limitation makes userspace code more complex, by having to
+branch between segmentation offload and not depending on device
+features, that would be an argument to drop it. As you point out, it
+is not needed for correctness.
 
->+		 */
->+		if (!xa_get_mark(&dpll_pin_xa, ppin->id, DPLL_REGISTERED))
->+			continue;
-> 		parent_priv = dpll_pin_on_dpll_priv(dpll_ref->dpll, ppin);
-> 		ret = ops->state_on_pin_get(pin,
-> 					    dpll_pin_on_pin_priv(ppin, pin),
->-- 
->2.38.1
+>
+> Thanks,
+> Jakub
+>
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3Dbec1f6f697362c5bc635dacd7ac8499d0a10a4e7
+> [1] https://elixir.bootlin.com/linux/v6.6/source/net/core/skbuff.c#L4626
 >
 
