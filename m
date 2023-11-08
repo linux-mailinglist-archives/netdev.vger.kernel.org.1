@@ -1,119 +1,233 @@
-Return-Path: <netdev+bounces-46660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3307E59EF
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:23:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAF587E59FC
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:27:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9F3528149E
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:23:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6284AB20C98
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22BF3033D;
-	Wed,  8 Nov 2023 15:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4B42FE3A;
+	Wed,  8 Nov 2023 15:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7Z5lHbG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XInJUJVx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA4D3033A;
-	Wed,  8 Nov 2023 15:23:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CECEFC433C9;
-	Wed,  8 Nov 2023 15:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699456994;
-	bh=GYkmk8qCTCeJLO8tC4gkRcDTmGCJ6Fq6YovqQyNeMc4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s7Z5lHbGCP/2ulRL1hIUMwtIwLwQLo426JNTActtX+dc2/GhkZkUMYZfVli+LRf/i
-	 4O3RAcTPZtKBHHPXaH4CqHeuufwE9kAmmGkGRRuy7GHZfZ1icIjYEwVkqnTvGJ0GbT
-	 B/zoymBCtjuKGcu5TeTLuEEtpr8jj2UvHSoqEmxBPKYZvzl2zeqouvs6q8rxAd+WnH
-	 BPgFcecgSeez7WNBNfcUEn1wlZhuoYZFwGKntv120VOI8y8CVgRGoFEUY9i0Lo7BJl
-	 XGWKjB0K/iPP0liiDJSoyu7UXaxP9IZRj7p2qsXAc9c8sGWvLiSn1Zg59K4A5mpO+L
-	 4aQ2SNI9gV4zw==
-Date: Wed, 8 Nov 2023 10:23:11 -0500
-From: Simon Horman <horms@kernel.org>
-To: Stefan =?utf-8?B?TcOkdGpl?= <Stefan.Maetje@esd.eu>
-Cc: "wg@grandegger.com" <wg@grandegger.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"mkl@pengutronix.de" <mkl@pengutronix.de>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH v8 2/2] can: esd: add support for esd GmbH PCIe/402 CAN
- interface family
-Message-ID: <20231108152311.GD173253@kernel.org>
-References: <20231025141635.1459606-1-stefan.maetje@esd.eu>
- <20231025141635.1459606-3-stefan.maetje@esd.eu>
- <20231103164839.GA714036@kernel.org>
- <1a1d0f4257cd980c58b6e2f83e2456dde5fe9441.camel@esd.eu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DFA33033C
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:27:41 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B20A01AE;
+	Wed,  8 Nov 2023 07:27:40 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-5441ba3e53cso9389870a12.1;
+        Wed, 08 Nov 2023 07:27:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699457259; x=1700062059; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GbKer+D8Q+KHc3RawBywAbRhnUO2N5YC2mknZI5eaAk=;
+        b=XInJUJVxtm5gUXHctN72xlpyc8Lf1b9AUBbWkacvhhpFYkc273CUm5gMflzYr+XrBr
+         DzzHrTXRBSEyxNfMitsIi9WmthZ0etHzMHnwHvfP2dN64dIgXa9D5ZMHWpIvyQlHcFlq
+         4lO0d2VJABrI7SclK3eiHR6wJy9wrWGyb41LN9e7LzdM9HVsZihSKHNE+YzO/5OENNVa
+         jF/ft30ALuNjdBf7R7cqhJCVd7Y+VyHQcx6Rsfx2/OFEPsMwz8nnjlL9PhumaUZSsPJd
+         LnSRqbNU2ExcrJItMIxJKbnSQ6af1rm9L7+jiYKwjedlBsQS6HSFml8GMgprJpXH3CyS
+         Qhqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699457259; x=1700062059;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GbKer+D8Q+KHc3RawBywAbRhnUO2N5YC2mknZI5eaAk=;
+        b=RAbhn06xwvsdu9w5dhLZ0M9AlX77kIe2WYY/VVECZmCZqvlGv3+Nbgb+zVKK1JJu7b
+         PbO1raMsn8y0DrSo5+IX09Sj46ZY3fpDZy5p9WDeAM/70R6K2h5To8dx/rdcXqD23u5u
+         R/rigyJWH3LFg7SMAoYmotW9+0BZ6XsfnNA8DYJoG5Zm+bwDQ7QApmTKGHK4WEUIYlGo
+         71fzx6kmkOB9n6uNAkwZdzyhpkNXwHSOlf9/akAMRbFz+El3XQ+uQANDclRvWnQsIg5T
+         LrAZjaYw3XSmstdpCOBQQE1TWvduWfL1XQhZ/twAH3wRVLq0ZMDGYU2h/e894JYxRChh
+         /myg==
+X-Gm-Message-State: AOJu0YyC7Ks3f7Kmd0M+AQLCf4r1Ls+Y/fob6+us/jik8cbdWJG4+28a
+	77xXhfIa10JpS5cR+pxvDZY=
+X-Google-Smtp-Source: AGHT+IGEH7nKLCeA0lDhAwUUQXgn2UhS9sWmWknjymraKE1HIbs3PeGN8y0LRZvFF007+cX+OctJsw==
+X-Received: by 2002:a17:907:6d20:b0:9be:aebc:d479 with SMTP id sa32-20020a1709076d2000b009beaebcd479mr1813981ejc.19.1699457258882;
+        Wed, 08 Nov 2023 07:27:38 -0800 (PST)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id z17-20020a170906669100b009920e9a3a73sm1203843ejo.115.2023.11.08.07.27.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 07:27:38 -0800 (PST)
+Date: Wed, 8 Nov 2023 17:27:36 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 3/4] net: ethernet: cortina: Handle large frames
+Message-ID: <20231108152736.euqbedurxvq2wben@skbuf>
+References: <20231107-gemini-largeframe-fix-v3-0-e3803c080b75@linaro.org>
+ <20231107-gemini-largeframe-fix-v3-3-e3803c080b75@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1a1d0f4257cd980c58b6e2f83e2456dde5fe9441.camel@esd.eu>
+In-Reply-To: <20231107-gemini-largeframe-fix-v3-3-e3803c080b75@linaro.org>
 
-On Tue, Nov 07, 2023 at 01:27:34PM +0000, Stefan Mätje wrote:
-> Am Freitag, dem 03.11.2023 um 16:48 +0000 schrieb Simon Horman:
-> > On Wed, Oct 25, 2023 at 04:16:35PM +0200, Stefan Mätje wrote:
-> > > This patch adds support for the PCI based PCIe/402 CAN interface family
-> > > from esd GmbH that is available with various form factors
-> > > (https://esd.eu/en/products/402-series-can-interfaces).
-> > > 
-> > > All boards utilize a FPGA based CAN controller solution developed
-> > > by esd (esdACC). For more information on the esdACC see
-> > > https://esd.eu/en/products/esdacc.
-> > > 
-> > > This driver detects all available CAN interface board variants of
-> > > the family but atm. operates the CAN-FD capable devices in
-> > > Classic-CAN mode only! A later patch will introduce the CAN-FD
-> > > functionality in this driver.
-> > > 
-> > > Co-developed-by: Thomas Körper <thomas.koerper@esd.eu>
-> > > Signed-off-by: Thomas Körper <thomas.koerper@esd.eu>
-> > > Signed-off-by: Stefan Mätje <stefan.maetje@esd.eu>
-> > 
-> > ...
-> > 
-> > > +static int pci402_probe(struct pci_dev *pdev, const struct pci_device_id
-> > > *ent)
-> > > +{
-> > > +       struct pci402_card *card = NULL;
-> > > +       int err;
-> > > +
-> > > +       err = pci_enable_device(pdev);
-> > > +       if (err)
-> > > +               return err;
-> > > +
-> > > +       card = devm_kzalloc(&pdev->dev, sizeof(*card), GFP_KERNEL);
-> > > +       if (!card)
-> > 
-> > Hi Thomas and Stefan,
-> > 
-> > If this condition is met then the function will return err,
-> > but err is set to 0. Perhaps it should be set to an error value here?
-> > 
-> > Flagged by Smatch.
+On Tue, Nov 07, 2023 at 10:54:28AM +0100, Linus Walleij wrote:
+> The Gemini ethernet controller provides hardware checksumming
+> for frames up to 1514 bytes including ethernet headers but not
+> FCS.
 > 
-> Hi Simon,
-> 
-> thank you for reviewing this. Looking at the code it is apparently wrong.
-> 
-> I was not aware of smatch. I got a copy and could reproduce the error report.
-> This will add another tool of static code analysis to my release routine.
-> 
-> An upgraded patch with a fix will follow.
+> If we start sending bigger frames (after first bumping up the MTU
+> on both interfaces sending and receiveing the frames), truncated
 
-Thanks Stefan, that sounds good to me on both counts.
+s/receiveing/receiving/
 
-...
+> packets start to appear on the target such as in this tcpdump
+> resulting from ping -s 1474:
+> 
+> 23:34:17.241983 14:d6:4d:a8:3c:4f (oui Unknown) > bc:ae:c5:6b:a8:3d (oui Unknown),
+> ethertype IPv4 (0x0800), length 1514: truncated-ip - 2 bytes missing!
+> (tos 0x0, ttl 64, id 32653, offset 0, flags [DF], proto ICMP (1), length 1502)
+> OpenWrt.lan > Fecusia: ICMP echo request, id 1672, seq 50, length 1482
+> 
+> If we bypass the hardware checksumming and provide a software
+> fallback, everything starts working fine up to the max TX MTU
+> of 2047 bytes, for example ping -s2000 192.168.1.2:
+> 
+> 00:44:29.587598 bc:ae:c5:6b:a8:3d (oui Unknown) > 14:d6:4d:a8:3c:4f (oui Unknown),
+> ethertype IPv4 (0x0800), length 2042:
+> (tos 0x0, ttl 64, id 51828, offset 0, flags [none], proto ICMP (1), length 2028)
+> Fecusia > OpenWrt.lan: ICMP echo reply, id 1683, seq 4, length 2008
+> 
+> The bit enabling to bypass hardware checksum (or any of the
+> "TSS" bits) are undocumented in the hardware reference manual.
+> The entire hardware checksum unit appears undocumented. The
+> conclusion that we need to use the "bypass" bit was found by
+> trial-and-error.
+> 
+> Since no hardware checksum will happen, we slot in a software
+> checksum fallback.
+> 
+> Check for the condition where we need to compute checksum on the
+> skb with either hardware or software using == CHECKSUM_PARTIAL instead
+> of != CHECKSUM_NONE which is an incomplete check according to
+> <linux/skbuff.h>.
+> 
+> We delete the code disabling the hardware checksum for large
+> MTU:s: this is suboptimal because it will disable hardware
+
+"MTUs" maybe?
+
+> checksumming also on small packets which the checksumming
+> engine can handle just fine, which is a waste of resources.
+> 
+> On the D-Link DIR-685 router this fixes a bug on the conduit
+> interface to the RTL8366RB DSA switch: as the switch needs to add
+> space for its tag it increases the MTU on the conduit interface
+> to 1504 and that means that when the router sends packages
+> of 1500 bytes these get an extra 4 bytes of DSA tag and the
+> transfer fails because of the erroneous hardware checksumming,
+> affecting such basic functionality as the LuCI web interface.
+> 
+> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
+> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> ---
+>  drivers/net/ethernet/cortina/gemini.c | 34 +++++++++++++++++++++++-----------
+>  1 file changed, 23 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+> index b21a94b4ab5c..78287cfcbf63 100644
+> --- a/drivers/net/ethernet/cortina/gemini.c
+> +++ b/drivers/net/ethernet/cortina/gemini.c
+> @@ -1145,6 +1145,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+>  	dma_addr_t mapping;
+>  	unsigned short mtu;
+>  	void *buffer;
+> +	int ret;
+>  
+>  	mtu  = ETH_HLEN;
+>  	mtu += netdev->mtu;
+> @@ -1159,9 +1160,30 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
+>  		word3 |= mtu;
+>  	}
+>  
+> -	if (skb->ip_summed != CHECKSUM_NONE) {
+> +	if (skb->len >= ETH_FRAME_LEN) {
+> +		/* Hardware offloaded checksumming isn't working on frames
+> +		 * bigger than 1514 bytes. A hypothesis about this is that the
+> +		 * checksum buffer is only 1518 bytes, so when the frames get
+> +		 * bigger they get truncated, or the last few bytes get
+> +		 * overwritten by the FCS.
+> +		 *
+> +		 * Just use software checksumming and bypass on bigger frames.
+> +		 */
+> +		if (skb->ip_summed == CHECKSUM_PARTIAL) {
+> +			ret = skb_checksum_help(skb);
+> +			if (ret)
+> +				return ret;
+> +		}
+> +		word1 |= TSS_BYPASS_BIT;
+> +	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
+>  		int tcp = 0;
+>  
+> +		/* We do not switch off the checksumming on non TCP/UDP
+> +		 * frames: as is shown from tests, the checksumming engine
+> +		 * is smart enough to see that a frame is not actually TCP
+> +		 * or UDP and then just pass it through without any changes
+> +		 * to the frame.
+> +		 */
+>  		if (skb->protocol == htons(ETH_P_IP)) {
+>  			word1 |= TSS_IP_CHKSUM_BIT;
+>  			tcp = ip_hdr(skb)->protocol == IPPROTO_TCP;
+> @@ -1978,15 +2000,6 @@ static int gmac_change_mtu(struct net_device *netdev, int new_mtu)
+>  	return 0;
+>  }
+>  
+> -static netdev_features_t gmac_fix_features(struct net_device *netdev,
+> -					   netdev_features_t features)
+> -{
+> -	if (netdev->mtu + ETH_HLEN + VLAN_HLEN > MTU_SIZE_BIT_MASK)
+> -		features &= ~GMAC_OFFLOAD_FEATURES;
+> -
+> -	return features;
+> -}
+> -
+
+I think this entire ndo_fix_features() can be indeed removed, but your
+justification was not immediately convincing. I'd point out that after
+your patch 1/4 "net: ethernet: cortina: Fix MTU max setting", you
+actually made this dead code, because netdev->mtu can't be larger than
+netdev->max_mtu.
+
+If you reverse the patch order a bit, such that "net: ethernet: cortina:
+Handle large frames" comes first, I think it would be much more logical
+for the removal of gmac_fix_features() to be part of the commit
+"net: ethernet: cortina: Fix MTU max setting", with the simple
+justification: the new MTU makes the code stop having any role.
+
+>  static int gmac_set_features(struct net_device *netdev,
+>  			     netdev_features_t features)
+>  {
+> @@ -2212,7 +2225,6 @@ static const struct net_device_ops gmac_351x_ops = {
+>  	.ndo_set_mac_address	= gmac_set_mac_address,
+>  	.ndo_get_stats64	= gmac_get_stats64,
+>  	.ndo_change_mtu		= gmac_change_mtu,
+> -	.ndo_fix_features	= gmac_fix_features,
+>  	.ndo_set_features	= gmac_set_features,
+>  };
+>  
+> 
+> -- 
+> 2.34.1
+> 
 
