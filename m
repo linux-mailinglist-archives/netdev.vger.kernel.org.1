@@ -1,322 +1,677 @@
-Return-Path: <netdev+bounces-46720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30BFA7E6123
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 00:41:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5C2C7E6130
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 00:48:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BA9AB20DC9
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 23:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA6531C208E8
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 23:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E5232C71;
-	Wed,  8 Nov 2023 23:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46191374E3;
+	Wed,  8 Nov 2023 23:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SwT7IcVo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="Ax7ppKC8"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC1738DEE
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 23:41:21 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2074.outbound.protection.outlook.com [40.107.8.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C90425B6;
-	Wed,  8 Nov 2023 15:41:21 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aG+k8iiBqUdVH0uidk/77rRJLwBL2cm9xi3Q7QFELdWTN8EfdYKgaX4X6YdY6KM5OFi7Av4U1VcnLNrNTXzs4DHSdCvVZ6f8lIgNauX3FOpJqS2N1YWxw8Xb1gUbxk0IQgLfQ5yXf9Z7Sgyu/FjpIvwu48XuYtcfwImcFiFVlc9AIR4eyCkbswy4WYlLe3jpINrQneDiM/NN6EtRoQIZQZQzxSgtaEorYS1AsiKSA2Wrei7gl/oY1DPzVyQLRQN7M/TWCTbFgzyp/s76NVV3VbX3xVlkYdbjVzX4ub19cp0ixg11KDXzYjvTV9yT8jaxhfHnbICF72pk37YDQj3IWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Lws8oEamIWsOK0MmMwSiSWQ6YR73K4uMWlAvbx0oqAY=;
- b=XhvQSb7oUnBqy11xzwltUbVsNIvaynu24IjCpmkVQvJXVv6TW5XbYSSGo9B5i/GFUVDf7OUNr4UgePcO3Ff1uGkEUkpHv2+CONOrRjleTS6uKQJGyWBwcIkel1RFFZswFkffMeTtMKroogayF4yb9mjo6LJqLdcALZVlnkvxxiEYm6zj6FsyDYCV908edHBaVtbKCiUyplqo/WlJlyJHT2yZC0X+ntBkg+8neWehPIwGcTz4rIRRW7TRY95F7IHYRxLFzCfsOVi/izMdqaZEd9CzW7IirZrG0yw+0Z5OE8cZVHibPaM98Pm6jeCLa3pKqWhQlgVETar8nVN3yV9BGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Lws8oEamIWsOK0MmMwSiSWQ6YR73K4uMWlAvbx0oqAY=;
- b=SwT7IcVosRFWlByEOYpHFMq+onl0GnbNOF+t/NgO81yrY5SbWS1Hc5mAjX3hzQjCJfwVw3VgZ/r4axr6PJaLR3mN1JRhSGShMn2sdck6TVU56vrAEQMm196E2cbY5ek8ze3bKe2EfMsMSFgW34qMBsU7/0TV7x79oCYFik+8q2g=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by VI1PR04MB7101.eurprd04.prod.outlook.com (2603:10a6:800:12e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Wed, 8 Nov
- 2023 23:41:16 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Wed, 8 Nov 2023
- 23:41:16 +0000
-Date: Thu, 9 Nov 2023 01:41:12 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 3/7] net/sched: taprio: update impacted fields
- during cycle time adjustment
-Message-ID: <20231108234112.umxjgvqajnxjr6lj@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-4-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-4-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107112023.676016-4-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-4-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: AM9P250CA0021.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:21c::26) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DA7374EB
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 23:47:53 +0000 (UTC)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C12B25A3
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:47:53 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc5b7057d5so1916275ad.2
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 15:47:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699487273; x=1700092073; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+IvnU9qdnd1cU9uLDy6TRQLEoRFzd3xp2aOytPCevCQ=;
+        b=Ax7ppKC8RcOco1VbSEbRmbMheLjzNspbZKohieW6Q7wNjo08iwm0HjZ8jLn2td2nD9
+         1vk3GACHmyQcE23Aa+R5wBuNJTeskXvn/fxktaaH6WYCKaTb/iEvMjjVOdMfZqsPScuw
+         WFNuYTVsshsStx4po1prLLZ3SwmFjQfcv7f8rIgPCP0IDTZR0lD1Tv/pxWsOkFcy2SJU
+         hdVgCn1gLxqHMfK60mmfg7gdKHhjRqGRFcl9gyskHBGEw67wAekBce24xVVYeRM8mo5/
+         DS/PIbyvpcEjHOz5JSREnsEj/Rg9KBe7nY3pvbTfthSZvStxrnGaKUpwfPHIr17cybG4
+         IsRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699487273; x=1700092073;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+IvnU9qdnd1cU9uLDy6TRQLEoRFzd3xp2aOytPCevCQ=;
+        b=ScN1hf2pU0kejiY9zGr5kGHB2+uutMHjSFsvw8D9XBSg/PXU7EJZSWFp5JWcbV51aL
+         +KmWPzHMgF2zNjAwwsWiFodn1spRm537INM/Lt6E2aniImAJDhVD7UN28rDnFL1c8riF
+         i17qy8urrTsmM1BlwdhQFG+sUjIcgJ+C7ffzN6KdxcJC5sGvA+qrBNYQzutw4hrSL9Dg
+         T1CdgqamG1m4NEQUjcsqDt63W6rhJw/xQnysgGK8IKaYRN9/Aen8L8CrMu/HgTkZvJrH
+         yH09bFdInQjV9180lHXyQN7CMUk24WpRyBc+lzrgXh4Zx+9SH4bAV06Fs0FtX0xlNnDZ
+         Ojyw==
+X-Gm-Message-State: AOJu0YzMXDHOD0dEps8dwCJFCEq2n5BDyrhkbMINd2FVqHNJYAcKgVe4
+	tAdd51lVygi4lgva7afI+aSc0g==
+X-Google-Smtp-Source: AGHT+IGTt11vcMFqMOQfTuSVCx5TwuNb8uSZ7RQdxA3Rg7MI28/KHHKH1KO4GcEzuJ8mpvCgVJ9ojQ==
+X-Received: by 2002:a17:902:ed53:b0:1ca:b26a:9729 with SMTP id y19-20020a170902ed5300b001cab26a9729mr3651815plb.38.1699487272742;
+        Wed, 08 Nov 2023 15:47:52 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:887f])
+        by smtp.gmail.com with ESMTPSA id u13-20020a17090341cd00b001bdb85291casm2223663ple.208.2023.11.08.15.47.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 15:47:52 -0800 (PST)
+Message-ID: <7769b74d-dd23-41de-8e11-434a0acabf72@davidwei.uk>
+Date: Wed, 8 Nov 2023 15:47:48 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB7101:EE_
-X-MS-Office365-Filtering-Correlation-Id: bd46b111-9d94-47fa-ba2a-08dbe0b4334c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	D1uBQO6q0j9AaNaSDnbjfrND/S/uhudciUNAwfGSE9FifpKQLvO5EgCNXRQkTzPq5NjYP+82ySp7c3gla7MXP4KfZo7WB0/AegEW8xicKGwk0XaUNTjjn3zY73OJ3foNOhZcnAamNZml8vCY6JXUiGtvVoLT3YBXfC9chULWxfFd1cErDM1DBY+vl1TbCGzX2YAQDvOEOGjuGtAynlh88VlPCkDq/s1S63A1QrgTCnXVc0BO8oHQTbzEjkuPiNTvLblfys8M6i8SxDfnvrxjZQnY1fxloxIgIDVg4nEJ8c5tiGHwdyydI/IBTbGYxBXg0k09c+wGS6qxDMwrI7UZvChqwst9fTiV8HuGC4Pj9kAEDqyDGzifAQcMkEj+cmnuu9esactI98+1lSu4muy5YtY2z/pLK5avCjA1vZIBkUM4/lKX6DkSzxL+YByfZpwZqlWf9aLaP6+0FatOwtojSV1x7G6gX6ut0sn31NaHpMDfJKJ5igHTTF2gir8W/D7Nw9hgtNM2Q/ZwJY5F6znKYXpyOIhqhFEKiSbIg+7vpsyEX6mKawifex75A7RY9TnYvPKBj9rOAn41ooFqNHUbvjJG4jbmGOSvdvVmNRLsuqP+U2MQYebUVjqbP8tX/fYV
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(396003)(346002)(136003)(366004)(376002)(230173577357003)(230922051799003)(230273577357003)(64100799003)(451199024)(1800799009)(186009)(6666004)(33716001)(1076003)(83380400001)(66556008)(54906003)(66946007)(66476007)(26005)(6506007)(478600001)(9686003)(6512007)(6486002)(15650500001)(38100700002)(2906002)(8936002)(8676002)(4326008)(86362001)(7416002)(5660300002)(44832011)(6916009)(316002)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?tRTCkjHAYKDLciWpRHzqblXa003HcxHDdq8W38HKe5lYWcVL3/lLF7UjoABC?=
- =?us-ascii?Q?GGg505rv3h56qsM5RViu6f1PjaVe4uaIbQ6B6F1aReKV4RFox1UPFxi0zAWB?=
- =?us-ascii?Q?eNHcC6/s7esMHetGjmhV90yOd+bhRqIKDjwqOK7ZksaJKuYUJfFfdG8hWSdi?=
- =?us-ascii?Q?0po2ll/YQKGhlJlQ7IWjWglh7zn1BdAt27nexX0SPLVn61cvIhpX15eyGYMA?=
- =?us-ascii?Q?sSONt++oGuAmfTDQja2MdTDWS2fbi0d5Sk/dH4bM+Ih7m6Fa607pXNXzk+HF?=
- =?us-ascii?Q?u0wVIB7DPIwGZks+0AoSe3jEWFabsJPl5GgBJhKNBUm/6AeiGfBrRCUsPunv?=
- =?us-ascii?Q?knePaMf3IN5gLtY9GTv3FFKavZ4uNQk8sw2LwjvLxNE4WhMd2qH3Aw3gW3QS?=
- =?us-ascii?Q?ml1Lu9ASJSc29gst6JMP7MAa5FAHkvJCRQhtkxJKDXx64Ai1K9EgjwuGrXQ1?=
- =?us-ascii?Q?gt7CrR13ZGOamr3ZD4FBYIwzFOE6QpOknaqKvt2vWYgkY/PVdhZOb1hf3K0n?=
- =?us-ascii?Q?wvhLejdj8xr//DIDNPpyXlzw2mt5cTZuM+Ff5Jy3yxiifQnTIjCJCZHcKB1W?=
- =?us-ascii?Q?T4PRhzsraaFmbW0lEkTBEnuHYnuLn45YAqA4wNDsDmF/16YtoFjPDQMrycOa?=
- =?us-ascii?Q?Kf+78QWP4uxzvKDD2s3f47ZLuOUFgbrVJ5qhmOKy60SfeVhkjvZo5EZeMSB+?=
- =?us-ascii?Q?95ytoOYul/+GQOD4nN5HWRfwZ5piJZyN0SxA0TJH1DHbalmhrSA4kkYjZhLb?=
- =?us-ascii?Q?4Li9AppDSIAIAkz82PQhT26fBF4eu4iR8GpwEcPqRh83w8BceTLvxT8aqDwP?=
- =?us-ascii?Q?HeLYNqfMLpkN+hoVYLF1J7QSfHJ6uMZG6w42Q8lGxdZG21lSvJslwFjCp6Ue?=
- =?us-ascii?Q?lrubg61qLnFJ/plN2AHcc0vHu66RjxaW7Dn5lakZ7R7VBuWDhmEw/7c1LFce?=
- =?us-ascii?Q?80GOQ2OUIvx7QqT9O92RrQgm5mvtGsXbi2jL6WkVttFspDOFCDvno2XkisUY?=
- =?us-ascii?Q?vycbJabBC2lncypBYBBAIyRlSba5K3muuN/v/hfcrrAduwJ3fVBjxULZA0Pk?=
- =?us-ascii?Q?FoWu/HTzveIKchg6iPWZkZ8uyIZZNS8/QzKyH8R/2diWT6QX5wzf2V5OUpLR?=
- =?us-ascii?Q?Q+EPC62j8eXDORLt8ynQhr8iYIarbPk2pAmkyXKHDsy/GdUIpM19wxVNTjFH?=
- =?us-ascii?Q?yVf+90kr6gW9cRc38QtTHT8dsZr4BtpwmpDQFP5+p5WIsmHxej/n/TRdyU8h?=
- =?us-ascii?Q?rBDVjEMrFs6P+GGClB6UHmBEWInQroLx7iWo172n86nphbkWB9mdJjH74nF3?=
- =?us-ascii?Q?wDIz9BZ+cQIIQcpAnEkyzXe63t9l7ZM8FeZaEQmOaAMoGSkrfrOo4qypnSsO?=
- =?us-ascii?Q?e3mUx+D+GcXdjCc/lvORuhryu+29q4pn79dVfsY7NJy1LzsVlhQnb0GwK0te?=
- =?us-ascii?Q?rvywAwpUiJYClUncrgbm9J7jHv21Z/YuJktlAhWknErQI9OjbaWbAiV0QGEx?=
- =?us-ascii?Q?Qb4uwzSNqzx6YbmAYiysWyXyQXngtaKYGBy/J8yhidVwkVedLU87qM1ZsHRB?=
- =?us-ascii?Q?glUtx9T5DJR4pvUktXYMsws4y8qwkAOq6eCrrI1bFzGmOCtHehwxP1Dqm9bm?=
- =?us-ascii?Q?wA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bd46b111-9d94-47fa-ba2a-08dbe0b4334c
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2023 23:41:16.7408
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6+qtjqtV0KNrm1rOHMXDHGCIQPyd3Chc5RhHXjueNDESCuTrxAZSLDWIpzh1zrqmZJPSDTIHZ3mBDiWK8W6ehw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7101
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 04/12] netdev: support binding dma-buf to netdevice
+Content-Language: en-GB
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
+ Pavel Begunkov <asml.silence@gmail.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-5-almasrymina@google.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20231106024413.2801438-5-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 07, 2023 at 06:20:19AM -0500, Faizal Rahim wrote:
-> Update impacted fields in advance_sched() if cycle_corr_active()
-> is true, which indicates that the next entry is the last entry
-> from oper that it will run.
+On 2023-11-05 18:44, Mina Almasry wrote:
+> Add a netdev_dmabuf_binding struct which represents the
+> dma-buf-to-netdevice binding. The netlink API will bind the dma-buf to
+> rx queues on the netdevice. On the binding, the dma_buf_attach
+> & dma_buf_map_attachment will occur. The entries in the sg_table from
+> mapping will be inserted into a genpool to make it ready
+> for allocation.
 > 
-> Update impacted fields:
+> The chunks in the genpool are owned by a dmabuf_chunk_owner struct which
+> holds the dma-buf offset of the base of the chunk and the dma_addr of
+> the chunk. Both are needed to use allocations that come from this chunk.
 > 
-> 1. gate_duration[tc], max_open_gate_duration[tc]
-> Created a new API update_open_gate_duration().The API sets the
-> duration based on the last remaining entry, the original value
-> was based on consideration of multiple entries.
+> We create a new type that represents an allocation from the genpool:
+> page_pool_iov. We setup the page_pool_iov allocation size in the
+> genpool to PAGE_SIZE for simplicity: to match the PAGE_SIZE normally
+> allocated by the page pool and given to the drivers.
 > 
-> 2. gate_close_time[tc]
-> Update next entry gate close time according to the new admin
-> base time
+> The user can unbind the dmabuf from the netdevice by closing the netlink
+> socket that established the binding. We do this so that the binding is
+> automatically unbound even if the userspace process crashes.
 > 
-> 3. max_sdu[tc], budget[tc]
-> Restrict from setting to max value because there's only a single
-> entry left to run from oper before changing to the new admin
-> schedule, so we shouldn't set to max.
+> The binding and unbinding leaves an indicator in struct netdev_rx_queue
+> that the given queue is bound, but the binding doesn't take effect until
+> the driver actually reconfigures its queues, and re-initializes its page
+> pool.
 > 
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-
-The commit message shouldn't be a text-to-speech output of the commit body.
-Say very shortly how the system should behave, what's wrong such that it
-doesn't behave as expected, what's the user-visible impact of the bug,
-and try to identify why the bug happened.
-
-In this case, what happened is that commit a306a90c8ffe ("net/sched:
-taprio: calculate tc gate durations"), which introduced the impacted
-fields you are changing, never took dynamic schedule changes into
-consideration. So this commit should also appear in the Fixes: tag.
-
+> The netdev_dmabuf_binding struct is refcounted, and releases its
+> resources only when all the refs are released.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Kaiyuan Zhang <kaiyuanz@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> 
 > ---
->  net/sched/sch_taprio.c | 49 +++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 46 insertions(+), 3 deletions(-)
 > 
-> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> index ed32654b46f5..119dec3bbe88 100644
-> --- a/net/sched/sch_taprio.c
-> +++ b/net/sched/sch_taprio.c
-> @@ -288,7 +288,8 @@ static void taprio_update_queue_max_sdu(struct taprio_sched *q,
->  		/* TC gate never closes => keep the queueMaxSDU
->  		 * selected by the user
->  		 */
-> -		if (sched->max_open_gate_duration[tc] == sched->cycle_time) {
-> +		if (sched->max_open_gate_duration[tc] == sched->cycle_time &&
-> +		    !cycle_corr_active(sched->cycle_time_correction)) {
->  			max_sdu_dynamic = U32_MAX;
->  		} else {
->  			u32 max_frm_len;
-> @@ -684,7 +685,8 @@ static void taprio_set_budgets(struct taprio_sched *q,
+> RFC v3:
+> - Support multi rx-queue binding
+> 
+> ---
+>  include/linux/netdevice.h     |  80 ++++++++++++++
+>  include/net/netdev_rx_queue.h |   1 +
+>  include/net/page_pool/types.h |  27 +++++
+>  net/core/dev.c                | 203 ++++++++++++++++++++++++++++++++++
+>  net/core/netdev-genl.c        | 116 ++++++++++++++++++-
+>  5 files changed, 425 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index b8bf669212cc..eeeda849115c 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -52,6 +52,8 @@
+>  #include <net/net_trackers.h>
+>  #include <net/net_debug.h>
+>  #include <net/dropreason-core.h>
+> +#include <linux/xarray.h>
+> +#include <linux/refcount.h>
 >  
->  	for (tc = 0; tc < num_tc; tc++) {
->  		/* Traffic classes which never close have infinite budget */
-> -		if (entry->gate_duration[tc] == sched->cycle_time)
-> +		if (entry->gate_duration[tc] == sched->cycle_time &&
-> +		    !cycle_corr_active(sched->cycle_time_correction))
->  			budget = INT_MAX;
->  		else
->  			budget = div64_u64((u64)entry->gate_duration[tc] * PSEC_PER_NSEC,
-> @@ -896,6 +898,32 @@ static bool should_restart_cycle(const struct sched_gate_list *oper,
->  	return false;
->  }
+>  struct netpoll_info;
+>  struct device;
+> @@ -808,6 +810,84 @@ bool rps_may_expire_flow(struct net_device *dev, u16 rxq_index, u32 flow_id,
+>  #endif
+>  #endif /* CONFIG_RPS */
 >  
-> +/* Open gate duration were calculated at the beginning with consideration of
-> + * multiple entries. If cycle time correction is active, there's only a single
-> + * remaining entry left from oper to run.
-> + * Update open gate duration based on this last entry.
-> + */
-> +static void update_open_gate_duration(struct sched_entry *entry,
-> +				      struct sched_gate_list *oper,
-> +				      int num_tc,
-> +				      u64 open_gate_duration)
+> +struct netdev_dmabuf_binding {
+> +	struct dma_buf *dmabuf;
+> +	struct dma_buf_attachment *attachment;
+> +	struct sg_table *sgt;
+> +	struct net_device *dev;
+> +	struct gen_pool *chunk_pool;
+> +
+> +	/* The user holds a ref (via the netlink API) for as long as they want
+> +	 * the binding to remain alive. Each page pool using this binding holds
+> +	 * a ref to keep the binding alive. Each allocated page_pool_iov holds a
+> +	 * ref.
+> +	 *
+> +	 * The binding undos itself and unmaps the underlying dmabuf once all
+> +	 * those refs are dropped and the binding is no longer desired or in
+> +	 * use.
+> +	 */
+> +	refcount_t ref;
+> +
+> +	/* The portid of the user that owns this binding. Used for netlink to
+> +	 * notify us of the user dropping the bind.
+> +	 */
+> +	u32 owner_nlportid;
+> +
+> +	/* The list of bindings currently active. Used for netlink to notify us
+> +	 * of the user dropping the bind.
+> +	 */
+> +	struct list_head list;
+> +
+> +	/* rxq's this binding is active on. */
+> +	struct xarray bound_rxq_list;
+> +};
+> +
+> +#ifdef CONFIG_DMA_SHARED_BUFFER
+> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding);
+> +int netdev_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+> +		       struct netdev_dmabuf_binding **out);
+> +void netdev_unbind_dmabuf(struct netdev_dmabuf_binding *binding);
+> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> +				struct netdev_dmabuf_binding *binding);
+> +#else
+> +static inline void
+> +__netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding)
 > +{
-> +	int tc;
-> +
-> +	if (!entry || !oper)
-> +		return;
-> +
-> +	for (tc = 0; tc < num_tc; tc++) {
-> +		if (entry->gate_mask & BIT(tc)) {
-> +			entry->gate_duration[tc] = open_gate_duration;
-> +			oper->max_open_gate_duration[tc] = open_gate_duration;
-> +		} else {
-> +			entry->gate_duration[tc] = 0;
-> +			oper->max_open_gate_duration[tc] = 0;
-> +		}
-> +	}
 > +}
 > +
->  static bool should_change_sched(struct sched_gate_list *oper)
->  {
->  	bool change_to_admin_sched = false;
-> @@ -1010,13 +1038,28 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
->  			/* The next entry is the last entry we will run from
->  			 * oper, subsequent ones will take from the new admin
->  			 */
-> +			u64 new_gate_duration =
-> +				next->interval + oper->cycle_time_correction;
-> +			struct qdisc_size_table *stab =
-> +				rtnl_dereference(q->root->stab);
+> +static inline int netdev_bind_dmabuf(struct net_device *dev,
+> +				     unsigned int dmabuf_fd,
+> +				     struct netdev_dmabuf_binding **out)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +static inline void netdev_unbind_dmabuf(struct netdev_dmabuf_binding *binding)
+> +{
+> +}
 > +
-
-The lockdep annotation for this RCU accessor is bogus.
-rtnl_dereference() is the same as rcu_dereference_protected(..., lockdep_rtnl_is_held()),
-which cannot be true in a hrtimer callback, as the rtnetlink lock is a
-sleepable mutex and hrtimers run in atomic context.
-
-Running with lockdep enabled will tell you as much:
-
-$ ./test_taprio_cycle_extension.sh 
-Testing config change with a delay of 5250000000 ns between schedules
-[  100.734925] 
-[  100.736703] =============================
-[  100.740780] WARNING: suspicious RCU usage
-[  100.744857] 6.6.0-10114-gca572939947f #1495 Not tainted
-[  100.750162] -----------------------------
-[  100.754236] net/sched/sch_taprio.c:1064 suspicious rcu_dereference_protected() usage!
-[  100.762155] 
-[  100.762155] other info that might help us debug this:
-[  100.762155] 
-[  100.770242] 
-[  100.770242] rcu_scheduler_active = 2, debug_locks = 1
-[  100.776851] 1 lock held by swapper/0/0:
-[  100.780756]  #0: ffff3d9784b83b00 (&q->current_entry_lock){-...}-{3:3}, at: advance_sched+0x44/0x59c
-[  100.790099] 
-[  100.790099] stack backtrace:
-[  100.794477] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.6.0-10114-gca572939947f #1495
-[  100.802346] Hardware name: LS1028A RDB Board (DT)
-[  100.807072] Call trace:
-[  100.809531]  dump_backtrace+0xf4/0x140
-[  100.813305]  show_stack+0x18/0x2c
-[  100.816638]  dump_stack_lvl+0x60/0x80
-[  100.820321]  dump_stack+0x18/0x24
-[  100.823654]  lockdep_rcu_suspicious+0x170/0x210
-[  100.828210]  advance_sched+0x384/0x59c
-[  100.831978]  __hrtimer_run_queues+0x200/0x430
-[  100.836360]  hrtimer_interrupt+0xdc/0x39c
-[  100.840392]  arch_timer_handler_phys+0x3c/0x4c
-[  100.844862]  handle_percpu_devid_irq+0xb8/0x28c
-[  100.849417]  generic_handle_domain_irq+0x2c/0x44
-[  100.854060]  gic_handle_irq+0x4c/0x110
-[  100.857830]  call_on_irq_stack+0x24/0x4c
-[  100.861775]  el1_interrupt+0x74/0xc0
-[  100.865370]  el1h_64_irq_handler+0x18/0x24
-[  100.869489]  el1h_64_irq+0x64/0x68
-[  100.872909]  arch_local_irq_enable+0x8/0xc
-[  100.877032]  cpuidle_enter+0x38/0x50
-[  100.880629]  do_idle+0x1ec/0x280
-[  100.883877]  cpu_startup_entry+0x34/0x38
-[  100.887822]  kernel_init+0x0/0x1a0
-[  100.891245]  start_kernel+0x0/0x3b0
-[  100.894756]  start_kernel+0x2f8/0x3b0
-[  100.898439]  __primary_switched+0xbc/0xc4
-
-What I would do is:
-
-			struct qdisc_size_table *stab;
-
-			rcu_read_lock();
-			stab = rcu_dereference(q->root->stab);
-			taprio_update_queue_max_sdu(q, oper, stab);
-			rcu_read_unlock();
-
->  			oper->cycle_end_time = new_base_time;
->  			end_time = new_base_time;
+> +static inline int
+> +netdev_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> +			    struct netdev_dmabuf_binding *binding)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +#endif
 > +
-> +			update_open_gate_duration(next, oper, num_tc,
-> +						  new_gate_duration);
-> +			taprio_update_queue_max_sdu(q, oper, stab);
->  		}
->  	}
+> +static inline void
+> +netdev_devmem_binding_get(struct netdev_dmabuf_binding *binding)
+> +{
+> +	refcount_inc(&binding->ref);
+> +}
+> +
+> +static inline void
+> +netdev_devmem_binding_put(struct netdev_dmabuf_binding *binding)
+> +{
+> +	if (!refcount_dec_and_test(&binding->ref))
+> +		return;
+> +
+> +	__netdev_devmem_binding_free(binding);
+> +}
+> +
+>  /* XPS map type and offset of the xps map within net_device->xps_maps[]. */
+>  enum xps_map_type {
+>  	XPS_CPUS = 0,
+> diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+> index cdcafb30d437..1bfcf60a145d 100644
+> --- a/include/net/netdev_rx_queue.h
+> +++ b/include/net/netdev_rx_queue.h
+> @@ -21,6 +21,7 @@ struct netdev_rx_queue {
+>  #ifdef CONFIG_XDP_SOCKETS
+>  	struct xsk_buff_pool            *pool;
+>  #endif
+> +	struct netdev_dmabuf_binding *binding;
+
+@Pavel - They are using struct netdev_rx_queue to hold the binding,
+which is an object that holds the state and is mapped 1:1 to an rxq.
+This object is similar to our "interface queue". I wonder if we should
+re-visit using this generic struct, instead of driver specific structs
+e.g. bnxt_rx_ring_info?
+
+>  } ____cacheline_aligned_in_smp;
 >  
->  	for (tc = 0; tc < num_tc; tc++) {
-> -		if (next->gate_duration[tc] == oper->cycle_time)
-> +		if (cycle_corr_active(oper->cycle_time_correction) &&
-> +		    (next->gate_mask & BIT(tc)))
-> +			/* Set to the new base time, ensuring a smooth transition
-> +			 * to the new schedule when the next entry finishes.
+>  /*
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index d4bea053bb7e..64386325d965 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -133,6 +133,33 @@ struct pp_memory_provider_ops {
+>  	bool (*release_page)(struct page_pool *pool, struct page *page);
+>  };
+>  
+> +/* page_pool_iov support */
+> +
+> +/* Owner of the dma-buf chunks inserted into the gen pool. Each scatterlist
+> + * entry from the dmabuf is inserted into the genpool as a chunk, and needs
+> + * this owner struct to keep track of some metadata necessary to create
+> + * allocations from this chunk.
+> + */
+> +struct dmabuf_genpool_chunk_owner {
+> +	/* Offset into the dma-buf where this chunk starts.  */
+> +	unsigned long base_virtual;
+> +
+> +	/* dma_addr of the start of the chunk.  */
+> +	dma_addr_t base_dma_addr;
+> +
+> +	/* Array of page_pool_iovs for this chunk. */
+> +	struct page_pool_iov *ppiovs;
+> +	size_t num_ppiovs;
+> +
+> +	struct netdev_dmabuf_binding *binding;
+> +};
+> +
+> +struct page_pool_iov {
+> +	struct dmabuf_genpool_chunk_owner *owner;
+> +
+> +	refcount_t refcount;
+> +};
+> +
+>  struct page_pool {
+>  	struct page_pool_params p;
+>  
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index a37a932a3e14..c8c3709d42c8 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -153,6 +153,9 @@
+>  #include <linux/prandom.h>
+>  #include <linux/once_lite.h>
+>  #include <net/netdev_rx_queue.h>
+> +#include <linux/genalloc.h>
+> +#include <linux/dma-buf.h>
+> +#include <net/page_pool/types.h>
+>  
+>  #include "dev.h"
+>  #include "net-sysfs.h"
+> @@ -2040,6 +2043,206 @@ static int call_netdevice_notifiers_mtu(unsigned long val,
+>  	return call_netdevice_notifiers_info(val, &info.info);
+>  }
+>  
+> +/* Device memory support */
+> +
+> +#ifdef CONFIG_DMA_SHARED_BUFFER
+> +static void netdev_devmem_free_chunk_owner(struct gen_pool *genpool,
+> +					   struct gen_pool_chunk *chunk,
+> +					   void *not_used)
+> +{
+> +	struct dmabuf_genpool_chunk_owner *owner = chunk->owner;
+> +
+> +	kvfree(owner->ppiovs);
+> +	kfree(owner);
+> +}
+> +
+> +void __netdev_devmem_binding_free(struct netdev_dmabuf_binding *binding)
+> +{
+> +	size_t size, avail;
+> +
+> +	gen_pool_for_each_chunk(binding->chunk_pool,
+> +				netdev_devmem_free_chunk_owner, NULL);
+> +
+> +	size = gen_pool_size(binding->chunk_pool);
+> +	avail = gen_pool_avail(binding->chunk_pool);
+> +
+> +	if (!WARN(size != avail, "can't destroy genpool. size=%lu, avail=%lu",
+> +		  size, avail))
+> +		gen_pool_destroy(binding->chunk_pool);
+> +
+> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
+> +				 DMA_BIDIRECTIONAL);
+> +	dma_buf_detach(binding->dmabuf, binding->attachment);
+> +	dma_buf_put(binding->dmabuf);
+> +	kfree(binding);
+> +}
+> +
+> +void netdev_unbind_dmabuf(struct netdev_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	unsigned long xa_idx;
+> +
+> +	if (!binding)
+> +		return;
+> +
+> +	list_del_rcu(&binding->list);
+> +
+> +	xa_for_each(&binding->bound_rxq_list, xa_idx, rxq)
+> +		if (rxq->binding == binding)
+> +			/* We hold the rtnl_lock while binding/unbinding
+> +			 * dma-buf, so we can't race with another thread that
+> +			 * is also modifying this value. However, the driver
+> +			 * may read this config while it's creating its
+> +			 * rx-queues. WRITE_ONCE() here to match the
+> +			 * READ_ONCE() in the driver.
 > +			 */
-> +			next->gate_close_time[tc] = end_time;
-> +		else if (next->gate_duration[tc] == oper->cycle_time)
->  			next->gate_close_time[tc] = KTIME_MAX;
->  		else
->  			next->gate_close_time[tc] = ktime_add_ns(entry->end_time,
-> -- 
-> 2.25.1
->
+> +			WRITE_ONCE(rxq->binding, NULL);
+> +
+> +	netdev_devmem_binding_put(binding);
+> +}
+> +
+> +int netdev_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+> +				struct netdev_dmabuf_binding *binding)
+> +{
+> +	struct netdev_rx_queue *rxq;
+> +	u32 xa_idx;
+> +	int err;
+> +
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> +
+> +	if (rxq->binding)
+> +		return -EEXIST;
+> +
+> +	err = xa_alloc(&binding->bound_rxq_list, &xa_idx, rxq, xa_limit_32b,
+> +		       GFP_KERNEL);
+> +	if (err)
+> +		return err;
+> +
+> +	/*We hold the rtnl_lock while binding/unbinding dma-buf, so we can't
+> +	 * race with another thread that is also modifying this value. However,
+> +	 * the driver may read this config while it's creating its * rx-queues.
+> +	 * WRITE_ONCE() here to match the READ_ONCE() in the driver.
+> +	 */
+> +	WRITE_ONCE(rxq->binding, binding);
+> +
+> +	return 0;
+> +}
+> +
+> +int netdev_bind_dmabuf(struct net_device *dev, unsigned int dmabuf_fd,
+> +		       struct netdev_dmabuf_binding **out)
+
+I'm not entirely familiar with the Netlink API. Mina, do you know if we
+can call into netdev_bind_dmabuf or netdev_nl_bind_rx_doit directly,
+without needing to call send/recv on a Netlink socket? We likely want
+io_uring to do the registration of a dmabuf fd and keep ownership over
+it.
+
+> +{
+> +	struct netdev_dmabuf_binding *binding;
+> +	struct scatterlist *sg;
+> +	struct dma_buf *dmabuf;
+> +	unsigned int sg_idx, i;
+> +	unsigned long virtual;
+> +	int err;
+> +
+> +	if (!capable(CAP_NET_ADMIN))
+> +		return -EPERM;
+> +
+> +	dmabuf = dma_buf_get(dmabuf_fd);
+> +	if (IS_ERR_OR_NULL(dmabuf))
+> +		return -EBADFD;
+> +
+> +	binding = kzalloc_node(sizeof(*binding), GFP_KERNEL,
+> +			       dev_to_node(&dev->dev));
+> +	if (!binding) {
+> +		err = -ENOMEM;
+> +		goto err_put_dmabuf;
+> +	}
+> +
+> +	xa_init_flags(&binding->bound_rxq_list, XA_FLAGS_ALLOC);
+> +
+> +	refcount_set(&binding->ref, 1);
+> +
+> +	binding->dmabuf = dmabuf;
+> +
+> +	binding->attachment = dma_buf_attach(binding->dmabuf, dev->dev.parent);
+> +	if (IS_ERR(binding->attachment)) {
+> +		err = PTR_ERR(binding->attachment);
+> +		goto err_free_binding;
+> +	}
+> +
+> +	binding->sgt = dma_buf_map_attachment(binding->attachment,
+> +					      DMA_BIDIRECTIONAL);
+> +	if (IS_ERR(binding->sgt)) {
+> +		err = PTR_ERR(binding->sgt);
+> +		goto err_detach;
+> +	}
+> +
+> +	/* For simplicity we expect to make PAGE_SIZE allocations, but the
+> +	 * binding can be much more flexible than that. We may be able to
+> +	 * allocate MTU sized chunks here. Leave that for future work...
+> +	 */
+> +	binding->chunk_pool = gen_pool_create(PAGE_SHIFT,
+> +					      dev_to_node(&dev->dev));
+> +	if (!binding->chunk_pool) {
+> +		err = -ENOMEM;
+> +		goto err_unmap;
+> +	}
+> +
+> +	virtual = 0;
+> +	for_each_sgtable_dma_sg(binding->sgt, sg, sg_idx) {
+> +		dma_addr_t dma_addr = sg_dma_address(sg);
+> +		struct dmabuf_genpool_chunk_owner *owner;
+> +		size_t len = sg_dma_len(sg);
+> +		struct page_pool_iov *ppiov;
+> +
+> +		owner = kzalloc_node(sizeof(*owner), GFP_KERNEL,
+> +				     dev_to_node(&dev->dev));
+> +		owner->base_virtual = virtual;
+> +		owner->base_dma_addr = dma_addr;
+> +		owner->num_ppiovs = len / PAGE_SIZE;
+> +		owner->binding = binding;
+> +
+> +		err = gen_pool_add_owner(binding->chunk_pool, dma_addr,
+> +					 dma_addr, len, dev_to_node(&dev->dev),
+> +					 owner);
+> +		if (err) {
+> +			err = -EINVAL;
+> +			goto err_free_chunks;
+> +		}
+> +
+> +		owner->ppiovs = kvmalloc_array(owner->num_ppiovs,
+> +					       sizeof(*owner->ppiovs),
+> +					       GFP_KERNEL);
+> +		if (!owner->ppiovs) {
+> +			err = -ENOMEM;
+> +			goto err_free_chunks;
+> +		}
+> +
+> +		for (i = 0; i < owner->num_ppiovs; i++) {
+> +			ppiov = &owner->ppiovs[i];
+> +			ppiov->owner = owner;
+> +			refcount_set(&ppiov->refcount, 1);
+> +		}
+> +
+> +		dma_addr += len;
+> +		virtual += len;
+> +	}
+> +
+> +	*out = binding;
+> +
+> +	return 0;
+> +
+> +err_free_chunks:
+> +	gen_pool_for_each_chunk(binding->chunk_pool,
+> +				netdev_devmem_free_chunk_owner, NULL);
+> +	gen_pool_destroy(binding->chunk_pool);
+> +err_unmap:
+> +	dma_buf_unmap_attachment(binding->attachment, binding->sgt,
+> +				 DMA_BIDIRECTIONAL);
+> +err_detach:
+> +	dma_buf_detach(dmabuf, binding->attachment);
+> +err_free_binding:
+> +	kfree(binding);
+> +err_put_dmabuf:
+> +	dma_buf_put(dmabuf);
+> +	return err;
+> +}
+> +#endif
+> +
+>  #ifdef CONFIG_NET_INGRESS
+>  static DEFINE_STATIC_KEY_FALSE(ingress_needed_key);
+>  
+> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> index 59d3d512d9cc..2c2a62593217 100644
+> --- a/net/core/netdev-genl.c
+> +++ b/net/core/netdev-genl.c
+> @@ -129,10 +129,89 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>  	return skb->len;
+>  }
+>  
+> -/* Stub */
+> +static LIST_HEAD(netdev_rbinding_list);
+> +
+>  int netdev_nl_bind_rx_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+> -	return 0;
+> +	struct netdev_dmabuf_binding *out_binding;
+> +	u32 ifindex, dmabuf_fd, rxq_idx;
+> +	struct net_device *netdev;
+> +	struct sk_buff *rsp;
+> +	int rem, err = 0;
+> +	void *hdr;
+> +	struct nlattr *attr;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_DEV_IFINDEX) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_BIND_DMABUF_DMABUF_FD) ||
+> +	    GENL_REQ_ATTR_CHECK(info, NETDEV_A_BIND_DMABUF_QUEUES))
+> +		return -EINVAL;
+> +
+> +	ifindex = nla_get_u32(info->attrs[NETDEV_A_DEV_IFINDEX]);
+> +	dmabuf_fd = nla_get_u32(info->attrs[NETDEV_A_BIND_DMABUF_DMABUF_FD]);
+> +
+> +	rtnl_lock();
+> +
+> +	netdev = __dev_get_by_index(genl_info_net(info), ifindex);
+> +	if (!netdev) {
+> +		err = -ENODEV;
+> +		goto err_unlock;
+> +	}
+> +
+> +	err = netdev_bind_dmabuf(netdev, dmabuf_fd, &out_binding);
+> +	if (err)
+> +		goto err_unlock;
+> +
+> +	nla_for_each_attr(attr, genlmsg_data(info->genlhdr),
+> +			  genlmsg_len(info->genlhdr), rem) {
+> +		switch (nla_type(attr)) {
+> +		case NETDEV_A_BIND_DMABUF_QUEUES:
+> +			rxq_idx = nla_get_u32(attr);
+> +
+> +			if (rxq_idx >= netdev->num_rx_queues) {
+> +				err = -ERANGE;
+> +				goto err_unbind;
+> +			}
+> +
+> +			err = netdev_bind_dmabuf_to_queue(netdev, rxq_idx,
+> +							  out_binding);
+> +			if (err)
+> +				goto err_unbind;
+> +
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +	}
+> +
+> +	out_binding->owner_nlportid = info->snd_portid;
+> +	list_add_rcu(&out_binding->list, &netdev_rbinding_list);
+> +
+> +	rsp = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!rsp) {
+> +		err = -ENOMEM;
+> +		goto err_unbind;
+> +	}
+> +
+> +	hdr = genlmsg_put(rsp, info->snd_portid, info->snd_seq,
+> +			  &netdev_nl_family, 0, info->genlhdr->cmd);
+> +	if (!hdr) {
+> +		err = -EMSGSIZE;
+> +		goto err_genlmsg_free;
+> +	}
+> +
+> +	genlmsg_end(rsp, hdr);
+> +
+> +	rtnl_unlock();
+> +
+> +	return genlmsg_reply(rsp, info);
+> +
+> +err_genlmsg_free:
+> +	nlmsg_free(rsp);
+> +err_unbind:
+> +	netdev_unbind_dmabuf(out_binding);
+> +err_unlock:
+> +	rtnl_unlock();
+> +	return err;
+>  }
+>  
+>  static int netdev_genl_netdevice_event(struct notifier_block *nb,
+> @@ -155,10 +234,37 @@ static int netdev_genl_netdevice_event(struct notifier_block *nb,
+>  	return NOTIFY_OK;
+>  }
+>  
+> +static int netdev_netlink_notify(struct notifier_block *nb, unsigned long state,
+> +				 void *_notify)
+> +{
+> +	struct netlink_notify *notify = _notify;
+> +	struct netdev_dmabuf_binding *rbinding;
+> +
+> +	if (state != NETLINK_URELEASE || notify->protocol != NETLINK_GENERIC)
+> +		return NOTIFY_DONE;
+> +
+> +	rcu_read_lock();
+> +
+> +	list_for_each_entry_rcu(rbinding, &netdev_rbinding_list, list) {
+> +		if (rbinding->owner_nlportid == notify->portid) {
+> +			netdev_unbind_dmabuf(rbinding);
+> +			break;
+> +		}
+> +	}
+> +
+> +	rcu_read_unlock();
+> +
+> +	return NOTIFY_OK;
+> +}
+> +
+>  static struct notifier_block netdev_genl_nb = {
+>  	.notifier_call	= netdev_genl_netdevice_event,
+>  };
+>  
+> +static struct notifier_block netdev_netlink_notifier = {
+> +	.notifier_call = netdev_netlink_notify,
+> +};
+
+Is this mechamism what cleans up TCP devmem in case userspace crashes
+and the associated Netlink socket is closed?
+
+> +
+>  static int __init netdev_genl_init(void)
+>  {
+>  	int err;
+> @@ -171,8 +277,14 @@ static int __init netdev_genl_init(void)
+>  	if (err)
+>  		goto err_unreg_ntf;
+>  
+> +	err = netlink_register_notifier(&netdev_netlink_notifier);
+> +	if (err)
+> +		goto err_unreg_family;
+> +
+>  	return 0;
+>  
+> +err_unreg_family:
+> +	genl_unregister_family(&netdev_nl_family);
+>  err_unreg_ntf:
+>  	unregister_netdevice_notifier(&netdev_genl_nb);
+>  	return err;
 
