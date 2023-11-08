@@ -1,185 +1,150 @@
-Return-Path: <netdev+bounces-46707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10C7A7E5FBA
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:10:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4665B7E5FC9
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 22:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 436B0B20D75
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:10:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A27AF280F29
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6A0374D8;
-	Wed,  8 Nov 2023 21:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F89032C80;
+	Wed,  8 Nov 2023 21:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gcQWbgqn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271593715A;
-	Wed,  8 Nov 2023 21:10:20 +0000 (UTC)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8524D2580;
-	Wed,  8 Nov 2023 13:10:19 -0800 (PST)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5b499b18b28so2133447b3.0;
-        Wed, 08 Nov 2023 13:10:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8676374C8
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 21:13:28 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B5C22102
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 13:13:28 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da2b87dd614so187843276.2
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 13:13:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699478007; x=1700082807; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=p3r/YXmjVkMwD+ikAEvppZ37LMLhvs43OdVVk7KFtJc=;
+        b=gcQWbgqnzmOkR6txPcAEfCUIq7a3ZEH2tuJEQzJLG0Hyc+7k8fGJbQmNlXOWUm7BJe
+         7h/mEwXgudq/kRTspPUhddQ+TR75KsrHVd5VWBQS4ytXpGOVXNE2NEK2oiPhEAbAvKhS
+         /kjvaOPPRYNh6gkTJmHTAl8h+90RXidO2akrNxEsM/ZYkahaLCrdJDDErtw2UJdjsk8P
+         DFPfJ9ZaDx9GtwiBg8ss92fpT2YaIQo5UczoUZhk6u5mEYgoCR4ZbD3augvvIduiJLwk
+         N7bbyOLvEalwQNUnE1/HOIKgQwK4MJeCa9NdUTq4e4Z9/z3+lxn1ETIVp3LMyrKpC0AI
+         4Peg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699477818; x=1700082618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bav5/FGayyEQonBNC4kdS6ICDtnFE4p01QngumR4dg4=;
-        b=ipwWhpKRdtmh+Uh6VvmrxWywQK9Q9c1fyFkHq6ayzI/hoFkgARWPYRg7X4Xr3FzFLR
-         c4G6aiTPD+wkruVmz3pRfMeLBmbpqO1HbwzQp4tUQVnIizUPo3zNjom/4AuV0V7+Lg1Q
-         1q2cR3Bc7acbJnBJAdgxckR6G4u8qQqFdLJQUhvqW9CnjOyzfYL5qlagBwnqD3iSFzxX
-         hLlVOnE+vbEnX/JObB4UNFIFfF1D3iTiEXAcT7nrWqwHy5qDkup5xZtILGCe101g17cK
-         ZlFVoDUFUg/44K/H2HkkdNaJ+cf8Lf6IaDGVg6jg8le3yrun8Gaw6WQCOZvtSmRDk7oS
-         KPQg==
-X-Gm-Message-State: AOJu0Ywm+iqe0tYvEdAkpz+r3ecFqCmZWws2QYyTyarGcn3EjMhys9Br
-	ncbDEwLWhmrkVazpI4Yn0jrK87BUX3QC0w==
-X-Google-Smtp-Source: AGHT+IF0f+EnWpL39uPcb0Isgr8GcwJ2K7wJjaLgpat0Vo/euboSWtRuvVqOY1mQa+U4sJvOqCYELw==
-X-Received: by 2002:a0d:c042:0:b0:5a7:ba51:9c1b with SMTP id b63-20020a0dc042000000b005a7ba519c1bmr2761143ywd.37.1699477818216;
-        Wed, 08 Nov 2023 13:10:18 -0800 (PST)
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com. [209.85.128.171])
-        by smtp.gmail.com with ESMTPSA id o14-20020a81de4e000000b005956b451fb8sm7201882ywl.100.2023.11.08.13.10.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Nov 2023 13:10:16 -0800 (PST)
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5b31c5143a0so1848457b3.3;
-        Wed, 08 Nov 2023 13:10:16 -0800 (PST)
-X-Received: by 2002:a0d:f3c2:0:b0:59b:54b5:7d66 with SMTP id
- c185-20020a0df3c2000000b0059b54b57d66mr2960037ywf.34.1699477816210; Wed, 08
- Nov 2023 13:10:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699478007; x=1700082807;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p3r/YXmjVkMwD+ikAEvppZ37LMLhvs43OdVVk7KFtJc=;
+        b=n9Fud+bipBs1LT1iybyP3Ikvf0zo5s6gWulfropY7hoUnwCDNYR+iHMBP7cLDrbKnU
+         fRRll19SPCubAkARSjO67j45VqfRBnA6ZFDNjTBoyegODgEQwTmhrypg/6cxhnJetE+w
+         4/Tx1z/hGlBCjSQTu4Hv6RHLHLfKXru3MVZ4GcJCl8jYMBCOF401/7QcNUoNgenMZGO+
+         KvKZhyWwdnjDhe8JnTVfM2+KLvsF+R8483S9/o4nPbecwQNehS6T+xHrkyOXzGgMfln+
+         Q+TmOWrArnIsVX8b2/3wkGZ9tTWELmoD11GBwHqyrSPbPC6+hpKi3EGfmPX09fjyyWih
+         fWXQ==
+X-Gm-Message-State: AOJu0Yw6odbeJB2L0zyCQXL6zA7z5qXUlT82Cqb2Qiexs58+gUftUdFE
+	mtQNo0ld6PoonsPf0a+Xbd/LYbohmlmb1kWYMATeoa0MeoGatqSfJnumBKdwakuzqv5yzR2WtPr
+	ym/BBqM/Q7uO+iKEATi2fh3XSokdcmIOoUumtqzgiEyd67puqteYMrg==
+X-Google-Smtp-Source: AGHT+IGqLBAB3R8V9OoSsZ0jXRVZolsHr9fwSwaUvmAJbpZJirwPgaa/MVrwNcdqXbALS7RP5qY/Nmk=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:6902:285:b0:d9a:f3dc:7d18 with SMTP id
+ v5-20020a056902028500b00d9af3dc7d18mr73658ybh.13.1699478007382; Wed, 08 Nov
+ 2023 13:13:27 -0800 (PST)
+Date: Wed,  8 Nov 2023 13:13:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231108125843.3806765-1-arnd@kernel.org> <20231108125843.3806765-11-arnd@kernel.org>
- <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com> <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
-In-Reply-To: <e7753f82-c3de-48fc-955d-59773222aaa9@app.fastmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 8 Nov 2023 22:10:03 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV7VfiSA9+wSJYYQkBN2=4E9HsFJRV6j8ffioe0=MFd8A@mail.gmail.com>
-Message-ID: <CAMuHMdV7VfiSA9+wSJYYQkBN2=4E9HsFJRV6j8ffioe0=MFd8A@mail.gmail.com>
-Subject: Re: [PATCH 10/22] microblaze: include linux/cpu.h for trap_init() prototype
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Arnd Bergmann <arnd@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, Masahiro Yamada <masahiroy@kernel.org>, 
-	linux-kbuild@vger.kernel.org, Matt Turner <mattst88@gmail.com>, 
-	Vineet Gupta <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, guoren <guoren@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Huacai Chen <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, 
-	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Geoff Levand <geoff@infradead.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S . Miller" <davem@davemloft.net>, 
-	Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	x86@kernel.org, Helge Deller <deller@gmx.de>, 
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, 
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
-	"linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>, loongarch@lists.linux.dev, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-	sparclinux@vger.kernel.org, Netdev <netdev@vger.kernel.org>, 
-	linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	"linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>, linux-mtd@lists.infradead.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231108211325.18938-1-sdf@google.com>
+Subject: [PATCH net v2] net: set SOCK_RCU_FREE before inserting socket into hashtable
+From: Stanislav Fomichev <sdf@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, Stanislav Fomichev <sdf@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Arnd,
+We've started to see the following kernel traces:
 
-On Wed, Nov 8, 2023 at 10:07=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
-:
-> On Wed, Nov 8, 2023, at 21:42, Geert Uytterhoeven wrote:
-> > On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> =
-wrote:
-> >> From: Arnd Bergmann <arnd@arndb.de>
-> >>
-> >> Microblaze runs into a single -Wmissing-prototypes warning when that i=
-s
-> >> enabled:
-> >>
-> >> arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype fo=
-r 'trap_init' [-Wmissing-prototypes]
-> >>
-> >> Include the right header to avoid this.
-> >>
-> >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > Thanks for your patch!
-> >
-> >>  arch/alpha/kernel/traps.c      | 1 +
-> >>  arch/csky/include/asm/traps.h  | 2 --
-> >>  arch/csky/kernel/traps.c       | 1 +
-> >>  arch/m68k/coldfire/vectors.c   | 3 +--
-> >>  arch/m68k/coldfire/vectors.h   | 3 ---
-> >
-> > Ah, so this is where the m68k changes listed in the cover letter are
-> > hiding ;-)
-> >
-> >>  arch/microblaze/kernel/traps.c | 1 +
-> >>  arch/sparc/kernel/traps_32.c   | 1 +
-> >>  arch/sparc/kernel/traps_64.c   | 1 +
-> >>  arch/x86/include/asm/traps.h   | 1 -
-> >>  arch/x86/kernel/traps.c        | 1 +
-> >>  10 files changed, 7 insertions(+), 8 deletions(-)
-> >>  delete mode 100644 arch/m68k/coldfire/vectors.h
-> >
-> > Obviously the non-microblaze changes should be spun off in separate
-> > patches.
->
-> I messed up one of my rebases here and accidentally sent
-> the wrong changelog text. My intention was to have the
-> combined patch but with this text:
->
->     arch: include linux/cpu.h for trap_init() prototype
->
->     some architectures run into a -Wmissing-prototypes warning
->     for trap_init()
->
->     arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype f=
-or 'trap_init' [-Wmissing-prototypes]
->
->     Include the right header to avoid this consistently, removing
->     the extra declarations on m68k and x86 that were added as local
->     workarounds already.
->
->     Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+ WARNING: CPU: 83 PID: 0 at net/core/filter.c:6641 sk_lookup+0x1bd/0x1d0
 
-That makes sense, although it's hard to combine this with "my preference
-would be for the patches to make it through the respective subsystem
-maintainer trees"...
+ Call Trace:
+  <IRQ>
+  __bpf_skc_lookup+0x10d/0x120
+  bpf_sk_lookup+0x48/0xd0
+  bpf_sk_lookup_tcp+0x19/0x20
+  bpf_prog_<redacted>+0x37c/0x16a3
+  cls_bpf_classify+0x205/0x2e0
+  tcf_classify+0x92/0x160
+  __netif_receive_skb_core+0xe52/0xf10
+  __netif_receive_skb_list_core+0x96/0x2b0
+  napi_complete_done+0x7b5/0xb70
+  <redacted>_poll+0x94/0xb0
+  net_rx_action+0x163/0x1d70
+  __do_softirq+0xdc/0x32e
+  asm_call_irq_on_stack+0x12/0x20
+  </IRQ>
+  do_softirq_own_stack+0x36/0x50
+  do_softirq+0x44/0x70
 
-Gr{oetje,eeting}s,
+__inet_hash can race with lockless (rcu) readers on the other cpus:
 
-                        Geert
+  __inet_hash
+    __sk_nulls_add_node_rcu
+    <- (bpf triggers here)
+    sock_set_flag(SOCK_RCU_FREE)
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+Let's move the SOCK_RCU_FREE part up a bit, before we are inserting
+the socket into hashtables. Note, that the race is really harmless;
+the bpf callers are handling this situation (where listener socket
+doesn't have SOCK_RCU_FREE set) correctly, so the only
+annoyance is a WARN_ONCE.
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+More details from Eric regarding SOCK_RCU_FREE timeline:
+
+Commit 3b24d854cb35 ("tcp/dccp: do not touch listener sk_refcnt under
+synflood") added SOCK_RCU_FREE. At that time, the precise location of
+sock_set_flag(sk, SOCK_RCU_FREE) did not matter, because the thread calling
+__inet_hash() owns a reference on sk. SOCK_RCU_FREE was only tested
+at dismantle time.
+
+Commit 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
+started checking SOCK_RCU_FREE _after_ the lookup to infer whether
+the refcount has been taken care of.
+
+Fixes: 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Stanislav Fomichev <sdf@google.com>
+---
+ net/ipv4/inet_hashtables.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 598c1b114d2c..a532f749e477 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -751,12 +751,12 @@ int __inet_hash(struct sock *sk, struct sock *osk)
+ 		if (err)
+ 			goto unlock;
+ 	}
++	sock_set_flag(sk, SOCK_RCU_FREE);
+ 	if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
+ 		sk->sk_family == AF_INET6)
+ 		__sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
+ 	else
+ 		__sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
+-	sock_set_flag(sk, SOCK_RCU_FREE);
+ 	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+ unlock:
+ 	spin_unlock(&ilb2->lock);
+-- 
+2.42.0.869.gea05f2083d-goog
+
 
