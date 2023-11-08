@@ -1,157 +1,176 @@
-Return-Path: <netdev+bounces-46702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 189887E5F72
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:47:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C7F7E5F8A
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 21:58:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 477961C20B95
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 20:47:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA75EB20CE9
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 20:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B9E32C6E;
-	Wed,  8 Nov 2023 20:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0258636B0F;
+	Wed,  8 Nov 2023 20:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gPWDyA6I"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13AA919460;
-	Wed,  8 Nov 2023 20:47:44 +0000 (UTC)
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 711AD1FFA;
-	Wed,  8 Nov 2023 12:47:44 -0800 (PST)
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6d3260385b5so91416a34.0;
-        Wed, 08 Nov 2023 12:47:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667AB32C80
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 20:58:23 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEE42113
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 12:58:22 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-54366bb1c02so340a12.1
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 12:58:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699477101; x=1700081901; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PY7xmBs42iykszqt8y/IvRxSzSu34bDZ+s2XJ6E9Ges=;
+        b=gPWDyA6ISTiIlRMZvhIzjiHCRopHfxrIBDiBLa7ZyzNOpF8MXUZ67TWKMVT+au0aVr
+         fGy/B+dCusqIJN3UhgKMUA6PsawIl+WJ8bKI/IL3J2SJgsrCCFEwwoIYaZdNHC+BF3wg
+         VBYL2AxOjavKikGIgHOVC91RaahkHkvKrllsowA17P4zgkLApAqdWix/pMWDDSN0Zxb2
+         iLYrBbxcFy7NLKiEyOsMypGPxQIBZ9qFz9dPMaBj1xGauMMwW+ARN89QOrtppQkdlEGW
+         0yrez8oT3BhK6+Qw3O3TX7zfu+J40ReICbL8xivlDnX9g7GhhbwLZig5o7vBj7OqgLbA
+         LAEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699476463; x=1700081263;
+        d=1e100.net; s=20230601; t=1699477101; x=1700081901;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dYbfzdavLbBO2X96qC9Jj/xBig9KkpEQ+EQytSx8qtw=;
-        b=jxZXyhycDBZofRN6lFaNZdM9e9glMdkC32bKh7sv3faWX7iyY989dO6JNJP24JWv+O
-         5lt5etOEdYJIBwRdhdvP/3Va6j49GD3WJHPUVSYCWvz/F0dEWSWrwCX62+Q/yLSb7gWp
-         a2f4z4Fxy02FB1XmIfAx+Cu0QhpjnNPe3h6bBRGw/P8zyhKAdYy7P+nTJFAsB1QH+QMo
-         mL8B9Zdko5+OeqOC9GkY8suOs7717ncjpHT3Pp0K4G1pYZi/HXiWbpWAnwRRK4TTNhb1
-         2L21AB9QBJexk8wpcts1NM6f9H9hlkTmujDKzGOuXFCLWj/W5WWUK/ozP6f6ll7x4UV5
-         xJhg==
-X-Gm-Message-State: AOJu0YyK8jHyBMQQYVTneCNBeXJUgqdcUyGumIlb2fqRugzIG6pPECvV
-	F2Yn6om3zSdd27SSbZ6tpstKIijcFa/sdA==
-X-Google-Smtp-Source: AGHT+IHIZ3vqBGEL4YIXgb9YVKDU6Z0f2fdmz4hDjS3gRZ4no7WRaRn4WReex2R9i4sGarkpZsf7Fg==
-X-Received: by 2002:a05:6830:2691:b0:6c4:6af2:ea72 with SMTP id l17-20020a056830269100b006c46af2ea72mr1947153otu.3.1699476463583;
-        Wed, 08 Nov 2023 12:47:43 -0800 (PST)
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com. [209.85.167.176])
-        by smtp.gmail.com with ESMTPSA id v2-20020a056830090200b006b9cc67386fsm1975626ott.66.2023.11.08.12.47.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Nov 2023 12:47:43 -0800 (PST)
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3b587bd1a63so622308b6e.1;
-        Wed, 08 Nov 2023 12:47:43 -0800 (PST)
-X-Received: by 2002:a81:4756:0:b0:59f:699b:c3b3 with SMTP id
- u83-20020a814756000000b0059f699bc3b3mr5987326ywa.0.1699476150732; Wed, 08 Nov
- 2023 12:42:30 -0800 (PST)
+        bh=PY7xmBs42iykszqt8y/IvRxSzSu34bDZ+s2XJ6E9Ges=;
+        b=A+9vIQ2qJAWQGoIUSu61rzcSrxAuaSIDL66uyOFXzPjJuT1XBtmShg8SNIsMBsh9bm
+         GtWYnKCgKtcVyyQD9FAagHl25Gah6yLqbjMMr8vE/BtA3OAmiL+a+rnTLdm0uUcGl7SF
+         AedRWfwSjLVmasOJQQVGGsS8W2kTnjDitJmdfDuEYCQtiqTYlmiL7LF/fpP2Inyxr1mh
+         nzk2ayu/uuM6gR8qFhc5zMUiUQBqaYDYo7S9ShB41J35lOeQmCBQsWGHW4YyRkEl9IkD
+         Ef617t4TU8y9Yk3mDVztn8aNwnQNlTAToWULsFmbUXfBiSQyU/fZ/C4wsytoRcTz/wRX
+         ACRw==
+X-Gm-Message-State: AOJu0YwSd/yRdpZgxG195LREKvmzbzSBCx3JF9ZFbJLe1dnzUfSKSb19
+	grL9zvbdgjLdG/aC0LOmBK6QBm4OBVLmznq/MveDpwtMijxpl/x7QG264A==
+X-Google-Smtp-Source: AGHT+IHkS5WFlz6y7JL+EHyIWhsqK0l51juTDHNB8vV5XNeeGNNiVbcX7iBd4GFut0AaYU9Yi2C/Ovb8j6oHn27rG4o=
+X-Received: by 2002:a05:6402:1518:b0:544:f741:62f4 with SMTP id
+ f24-20020a056402151800b00544f74162f4mr35059edw.0.1699477100893; Wed, 08 Nov
+ 2023 12:58:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231108125843.3806765-1-arnd@kernel.org> <20231108125843.3806765-11-arnd@kernel.org>
-In-Reply-To: <20231108125843.3806765-11-arnd@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 8 Nov 2023 21:42:17 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
-Message-ID: <CAMuHMdXgdn_cMq0YeqPu3sUeM5cEYbCoodxu8XwCGiRJ-vFsyw@mail.gmail.com>
-Subject: Re: [PATCH 10/22] microblaze: include linux/cpu.h for trap_init() prototype
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, 
-	Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, 
-	Arnd Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Huacai Chen <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, 
-	Michal Simek <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Dinh Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Geoff Levand <geoff@infradead.org>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, 
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S. Miller" <davem@davemloft.net>, 
-	Andy Lutomirski <luto@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	x86@kernel.org, Helge Deller <deller@gmx.de>, 
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, 
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, 
-	Vincenzo Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Al Viro <viro@zeniv.linux.org.uk>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
-	linux-csky@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, 
-	sparclinux@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linux-bcachefs@vger.kernel.org, linux-mtd@lists.infradead.org
+References: <20231108202819.1932920-1-sdf@google.com>
+In-Reply-To: <20231108202819.1932920-1-sdf@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 8 Nov 2023 21:58:07 +0100
+Message-ID: <CANn89iJnX6sm1UHbU6TKzoWJJyNLGjpN_amb8bkmgnLk8Qj_gQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: set SOCK_RCU_FREE before inserting socket into hashtable
+To: Stanislav Fomichev <sdf@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Arnd,
-
-On Wed, Nov 8, 2023 at 2:01=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wrot=
-e:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Nov 8, 2023 at 9:28=E2=80=AFPM Stanislav Fomichev <sdf@google.com> =
+wrote:
 >
-> Microblaze runs into a single -Wmissing-prototypes warning when that is
-> enabled:
+> We've started to see the following kernel traces:
 >
-> arch/microblaze/kernel/traps.c:21:6: warning: no previous prototype for '=
-trap_init' [-Wmissing-prototypes]
+>  WARNING: CPU: 83 PID: 0 at net/core/filter.c:6641 sk_lookup+0x1bd/0x1d0
 >
-> Include the right header to avoid this.
+>  Call Trace:
+>   <IRQ>
+>   __bpf_skc_lookup+0x10d/0x120
+>   bpf_sk_lookup+0x48/0xd0
+>   bpf_sk_lookup_tcp+0x19/0x20
+>   bpf_prog_<redacted>+0x37c/0x16a3
+>   cls_bpf_classify+0x205/0x2e0
+>   tcf_classify+0x92/0x160
+>   __netif_receive_skb_core+0xe52/0xf10
+>   __netif_receive_skb_list_core+0x96/0x2b0
+>   napi_complete_done+0x7b5/0xb70
+>   <redacted>_poll+0x94/0xb0
+>   net_rx_action+0x163/0x1d70
+>   __do_softirq+0xdc/0x32e
+>   asm_call_irq_on_stack+0x12/0x20
+>   </IRQ>
+>   do_softirq_own_stack+0x36/0x50
+>   do_softirq+0x44/0x70
 >
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> I'm not 100% what is causing them. It might be some kernel change or
+> new code path in the bpf program. But looking at the code,
+> I'm assuming the issue has been there for a while.
+>
+> __inet_hash can race with lockless (rcu) readers on the other cpus:
+>
+>   __inet_hash
+>     __sk_nulls_add_node_rcu
+>     <- (bpf triggers here)
+>     sock_set_flag(SOCK_RCU_FREE)
+>
+> Let's move the SOCK_RCU_FREE part up a bit, before we are inserting
+> the socket into hashtables. Note, that the race is really harmless;
+> the bpf callers are handling this situation (where listener socket
+> doesn't have SOCK_RCU_FREE set) correctly, so the only
+> annoyance is a WARN_ONCE (so not 100% sure whether it should
+> wait until net-next instead).
+>
+> For the fixes tag, I'm using the original commit which added the flag.
 
-Thanks for your patch!
+When this commit added the flag, precise location of the
+sock_set_flag(sk, SOCK_RCU_FREE)
+did not matter, because the thread calling __inet_hash() owns a reference o=
+n sk.
 
->  arch/alpha/kernel/traps.c      | 1 +
->  arch/csky/include/asm/traps.h  | 2 --
->  arch/csky/kernel/traps.c       | 1 +
->  arch/m68k/coldfire/vectors.c   | 3 +--
->  arch/m68k/coldfire/vectors.h   | 3 ---
+SOCK_RCU_FREE was tested only at dismantle time.
 
-Ah, so this is where the m68k changes listed in the cover letter are
-hiding ;-)
+Back then BPF was not able yet to perform lookups, and double check if
+SOCK_RCU_FREE
+was set or not.
 
->  arch/microblaze/kernel/traps.c | 1 +
->  arch/sparc/kernel/traps_32.c   | 1 +
->  arch/sparc/kernel/traps_64.c   | 1 +
->  arch/x86/include/asm/traps.h   | 1 -
->  arch/x86/kernel/traps.c        | 1 +
->  10 files changed, 7 insertions(+), 8 deletions(-)
->  delete mode 100644 arch/m68k/coldfire/vectors.h
+Checking SOCK_RCU_FREE _after_ the lookup to infer if a refcount has
+been taken came
+with commit 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
 
-Obviously the non-microblaze changes should be spun off in separate
-patches.
+I think we can be more precise and help future debugging, in case more prob=
+lems
+need investigations.
 
-Gr{oetje,eeting}s,
+Can you augment the changelog and use a different Fixes: tag ?
 
-                        Geert
+With that,
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+>
+> Fixes: 3b24d854cb35 ("tcp/dccp: do not touch listener sk_refcnt under syn=
+flood")
+> Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> ---
+>  net/ipv4/inet_hashtables.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+> index 598c1b114d2c..a532f749e477 100644
+> --- a/net/ipv4/inet_hashtables.c
+> +++ b/net/ipv4/inet_hashtables.c
+> @@ -751,12 +751,12 @@ int __inet_hash(struct sock *sk, struct sock *osk)
+>                 if (err)
+>                         goto unlock;
+>         }
+> +       sock_set_flag(sk, SOCK_RCU_FREE);
+>         if (IS_ENABLED(CONFIG_IPV6) && sk->sk_reuseport &&
+>                 sk->sk_family =3D=3D AF_INET6)
+>                 __sk_nulls_add_node_tail_rcu(sk, &ilb2->nulls_head);
+>         else
+>                 __sk_nulls_add_node_rcu(sk, &ilb2->nulls_head);
+> -       sock_set_flag(sk, SOCK_RCU_FREE);
+>         sock_prot_inuse_add(sock_net(sk), sk->sk_prot, 1);
+>  unlock:
+>         spin_unlock(&ilb2->lock);
+> --
+> 2.42.0.869.gea05f2083d-goog
+>
 
