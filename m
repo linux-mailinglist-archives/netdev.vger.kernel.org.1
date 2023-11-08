@@ -1,206 +1,131 @@
-Return-Path: <netdev+bounces-46596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AF37E5491
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 11:56:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 201AA7E54AC
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 12:03:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92D831C20A0D
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:56:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5534E1C20952
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 11:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970AF1428E;
-	Wed,  8 Nov 2023 10:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E369314261;
+	Wed,  8 Nov 2023 11:03:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SnUPnd7n"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209BA14261;
-	Wed,  8 Nov 2023 10:56:17 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5A019A5;
-	Wed,  8 Nov 2023 02:56:16 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SQMSz45TJzfb2h;
-	Wed,  8 Nov 2023 18:56:03 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 8 Nov
- 2023 18:56:12 +0800
-Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
-To: Mina Almasry <almasrymina@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<linaro-mm-sig@lists.linaro.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	David Ahern <dsahern@kernel.org>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
- Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-8-almasrymina@google.com>
- <4a0e9d53-324d-e19b-2a30-ba86f9e5569e@huawei.com>
- <CAHS8izNbw7vAGo2euQGA+TF9CgQ8zwrDqTVGsOSxh22_uo0R1w@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <d4309392-711a-75b0-7bf0-9e7de8fd527e@huawei.com>
-Date: Wed, 8 Nov 2023 18:56:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 454AB15487
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 11:03:26 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89929199
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 03:03:25 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9c53e8b7cf4so1024606866b.1
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 03:03:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1699441404; x=1700046204; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:user-agent:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M8tgvgRdl8qekMWLyBR4jj7OgNLFjHC8OJ7GB2+5eqM=;
+        b=SnUPnd7nfS3ZYifdcyg9mMpelmSpSWiFjSmpT8vRm0085vOCBWXS0e83wB6t2apzG3
+         6uQr5FirTHD2eR1e1msbiaZvEPbcwYrlkvnOd0fCcJwQevDDRHptO62DUKsn9eceISSz
+         05KLKnTgZN3BtRazd5viT9ktS+agt/FFxJSCxm0TM3fEz/mtQkYJBL/Urj5zo3COMeeL
+         dc4Y21WJ5Uuu+CZotSGjWxu93cqwLfm6vsx7rGLwJcoIwBR2dlb76fHB2NCdTqJdF07M
+         zFfLxVcdl8HIjH1MsbDi1Dd81w8i4ctMiKnNTMUiFw1lWueIMVkKzYIwv/s/Asier9Qv
+         y8FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699441404; x=1700046204;
+        h=mime-version:message-id:date:subject:cc:to:from:user-agent
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M8tgvgRdl8qekMWLyBR4jj7OgNLFjHC8OJ7GB2+5eqM=;
+        b=AyZMCQEpb9dVvmM5bu87EPclcnVDpqmL3DwkKORW64UKN1E2YrYiYPAuHz3cC1eqer
+         STyOl9Tf/MGskU3Q4ZRLss919/IGOqr6NXtEmJH0bBL9e4pB/IC4AY+AtDVYWgK0pRE8
+         /V7hD5y2xoXkCDgoHfBq6owEx1abCER65GpbUgu1A3965L9LrSlhUFEsGpzl64JqNmH/
+         SJYKwFZn0bBszN+hgkaYsUB8Y7R3hdry0e0oYemPn32q7Ei6EaGou3uIclh57/xYyADZ
+         FvoeEJvzONx7qdnQY7lLfIANOgH5GyVrqCjGco3cX8tyRrAVv2NIYZF1etsT6nzAiqrW
+         0sHw==
+X-Gm-Message-State: AOJu0YyTM5BrEYwYfUX9+rQXQPHk8B+SWBjqvfDr5AmMD9sSwrO98Tjl
+	q+ghducix5cozdMhMCYED65WQQ==
+X-Google-Smtp-Source: AGHT+IGR4KTQVI4YXTJvEv0qF/FaNh1xjl8ZaMjSeSiEYDpyBpEdkL6+Ix4TVSEkvUvRwFwSpW+lmQ==
+X-Received: by 2002:a17:907:1c05:b0:9b2:ecbd:8412 with SMTP id nc5-20020a1709071c0500b009b2ecbd8412mr1101318ejc.47.1699441403969;
+        Wed, 08 Nov 2023 03:03:23 -0800 (PST)
+Received: from cloudflare.com (79.184.209.104.ipv4.supernova.orange.pl. [79.184.209.104])
+        by smtp.gmail.com with ESMTPSA id d21-20020a170906641500b009dd606ce80fsm863932ejm.31.2023.11.08.03.03.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 03:03:23 -0800 (PST)
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, kernel-team@cloudflare.com
+Subject: EIO on send with UDP_SEGMENT
+Date: Wed, 08 Nov 2023 11:58:57 +0100
+Message-ID: <87jzqsld6q.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izNbw7vAGo2euQGA+TF9CgQ8zwrDqTVGsOSxh22_uo0R1w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 
-On 2023/11/8 5:56, Mina Almasry wrote:
-> On Tue, Nov 7, 2023 at 12:00 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2023/11/6 10:44, Mina Almasry wrote:
->>> Overload the LSB of struct page* to indicate that it's a page_pool_iov.
->>>
->>> Refactor mm calls on struct page* into helpers, and add page_pool_iov
->>> handling on those helpers. Modify callers of these mm APIs with calls to
->>> these helpers instead.
->>>
->>> In areas where struct page* is dereferenced, add a check for special
->>> handling of page_pool_iov.
->>>
->>> Signed-off-by: Mina Almasry <almasrymina@google.com>
->>>
->>> ---
->>>  include/net/page_pool/helpers.h | 74 ++++++++++++++++++++++++++++++++-
->>>  net/core/page_pool.c            | 63 ++++++++++++++++++++--------
->>>  2 files changed, 118 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
->>> index b93243c2a640..08f1a2cc70d2 100644
->>> --- a/include/net/page_pool/helpers.h
->>> +++ b/include/net/page_pool/helpers.h
->>> @@ -151,6 +151,64 @@ static inline struct page_pool_iov *page_to_page_pool_iov(struct page *page)
->>>       return NULL;
->>>  }
->>>
->>> +static inline int page_pool_page_ref_count(struct page *page)
->>> +{
->>> +     if (page_is_page_pool_iov(page))
->>> +             return page_pool_iov_refcount(page_to_page_pool_iov(page));
->>
->> We have added a lot of 'if' for the devmem case, it would be better to
->> make it more generic so that we can have more unified metadata handling
->> for normal page and devmem. If we add another memory type here, do we
->> need another 'if' here?
-> 
-> Maybe, not sure. I'm guessing new memory types will either be pages or
-> iovs, so maybe no new if statements needed.
-> 
->> That is part of the reason I suggested using a more unified metadata for
->> all the types of memory chunks used by page_pool.
-> 
-> I think your suggestion was to use struct pages for devmem. That was
-> thoroughly considered and intensely argued about in the initial
-> conversations regarding devmem and the initial RFC, and from the
-> conclusions there it's extremely clear to me that devmem struct pages
-> are categorically a no-go.
+Hi Willem et al,
 
-Not exactly, I was wondering if adding a more abstract structure specificly
-for page pool makes any sense, and each mem type can add its own specific
-fields, net stack only see and handle the common fields so that it does not
-care about specific mem type, and each provider only see the and handle the
-specific fields belonging to it most of the time.
+We have hit the EIO error path in udp_send_skb introduced in commit bec1f6f69736
+("udp: generate gso with UDP_SEGMENT") [0]:
 
-Ideally something like beleow:
+	if (skb->ip_summed != CHECKSUM_PARTIAL || ...) {
+		kfree_skb(skb);
+		return -EIO;
+	}
 
-struct netmem {
-	/* common fields */
-	refcount_t refcount;
-	struct page_pool *pp;
-	......
+... when attempting to send a GSO packet, using UDP_SEGMENT option, from
+a TUN device which didn't have any offloads enabled (the default case).
 
-	union {
-		struct devmem{
-			struct dmabuf_genpool_chunk_owner *owner;
-		};
+A trivial reproducer for that would be:
 
-		struct other_mem{
-			...
-			...
-		};
-	};
-};
+  ip tuntap add dev tun0 mode tun
+  ip addr add dev tun0 192.0.2.1/24
+  ip link set dev tun0 up
+  
+  strace -e %net python -c '
+  from socket import *
+  s = socket(AF_INET, SOCK_DGRAM)
+  s.setsockopt(SOL_UDP, 103, 1200)
+  s.sendto(b"x" * 3000, ("192.0.2.2", 9))
+  '
 
-But untill we completely decouple the 'struct page' from the net stack,
-the above seems undoable in the near term.
-But we might be able to do something as folio is doing now, mm subsystem
-is still seeing 'struct folio/page', but other subsystem like slab is using
-'struct slab', and there is still some common fields shared between
-'struct folio' and 'struct slab'.
+which yields:
 
-As the netmem patchset, is devmem able to reuse the below 'struct netmem'
-and rename it to 'struct page_pool_iov'? So that 'struct page' for normal
-memory and 'struct page_pool_iov' for devmem share the common fields used
-by page pool and net stack? And we might be able to reuse the 'flags',
-'_pp_mapping_pad' and '_mapcount' for specific mem provider, which is enough
-for the devmem only requiring a single pointer to point to it's
-owner?
+  socket(AF_INET, SOCK_DGRAM|SOCK_CLOEXEC, IPPROTO_IP) = 3
+  setsockopt(3, SOL_UDP, UDP_SEGMENT, [1200], 4) = 0
+  sendto(3, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"..., 3000, 0, {sa_family=AF_INET, sin_port=htons(9), sin_addr=inet_addr("192.0.2.2")}, 16) = -1 EIO (Input/output error)
 
-https://lkml.kernel.org/netdev/20230105214631.3939268-2-willy@infradead.org/
+This has been a surprise and caused us some pain. I think it comes down
+to that anyone using UDP_SEGMENT has to implement a segmentation
+fallback in user-space. Just to be on the safe side.  We can't really
+assume that any TUN/TAP interface, which happens to be our egress
+device, has at least checksum offload enabled and implemented.
 
-+/**
-+ * struct netmem - A memory allocation from a &struct page_pool.
-+ * @flags: The same as the page flags.  Do not use directly.
-+ * @pp_magic: Magic value to avoid recycling non page_pool allocated pages.
-+ * @pp: The page pool this netmem was allocated from.
-+ * @dma_addr: Call netmem_get_dma_addr() to read this value.
-+ * @dma_addr_upper: Might need to be 64-bit on 32-bit architectures.
-+ * @pp_frag_count: For frag page support, not supported in 32-bit
-+ *   architectures with 64-bit DMA.
-+ * @_mapcount: Do not access this member directly.
-+ * @_refcount: Do not access this member directly.  Read it using
-+ *   netmem_ref_count() and manipulate it with netmem_get() and netmem_put().
-+ *
-+ * This struct overlays struct page for now.  Do not modify without a
-+ * good understanding of the issues.
-+ */
-+struct netmem {
-+	unsigned long flags;
-+	unsigned long pp_magic;
-+	struct page_pool *pp;
-+	/* private: no need to document this padding */
-+	unsigned long _pp_mapping_pad;	/* aliases with folio->mapping */
-+	/* public: */
-+	unsigned long dma_addr;
-+	union {
-+		unsigned long dma_addr_upper;
-+		atomic_long_t pp_frag_count;
-+	};
-+	atomic_t _mapcount;
-+	atomic_t _refcount;
-+};
+Which is not ideal.
+So it made us wonder if anything can be done about it?
 
-If we do that, it seems we might be able to allow net stack and page pool to see
-the metadata for devmem chunk as 'struct page', and may be able to aovid most of
-the 'if' checking in net stack and page pool?
+As it turns out, skb_segment() in GSO path implements a software
+fallback not only for segmentation but also for checksumming [1].
 
-> 
-> --
-> Thanks,
-> Mina
-> 
-> .
-> 
+What is more, when we removed the skb->ip_summed == CHECKSUM_PARTIAL
+restriction in udp_send, as an experiment, we were able to observe fully
+checksummed segments in packet capture.
+
+Which brings me to my question -
+
+Do you think the restriction in udp_send_skb can be lifted or tweaked?
+
+Thanks,
+Jakub
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=bec1f6f697362c5bc635dacd7ac8499d0a10a4e7
+[1] https://elixir.bootlin.com/linux/v6.6/source/net/core/skbuff.c#L4626
 
