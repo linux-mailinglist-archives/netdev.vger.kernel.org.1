@@ -1,103 +1,115 @@
-Return-Path: <netdev+bounces-46648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C1C7E5933
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:37:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3BF47E5962
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:43:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D462B1C20B15
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:37:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 975842810FE
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:43:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D7F1366;
-	Wed,  8 Nov 2023 14:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ORh2+4K9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 025D1815;
+	Wed,  8 Nov 2023 14:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73621CF9E
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:37:41 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E2CE1BDA
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:37:41 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5a7c011e113so85382757b3.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 06:37:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699454260; x=1700059060; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5pLSEcA2VjED8h8cG+iJ0qpM0EKkiOxsur6HDc4UGXc=;
-        b=ORh2+4K988j+MAmJWIUWRmvI6fBRKSTeI851p/58f5nqTcfM1y67km1wUMJW3iWiL7
-         s46pV2O4/mNCdiO1iMop0taAEbkTVKA2RIaMv0Abh70MqDdKqFV3XbbwpFk6xeEdKANx
-         9fINI+jZwldgd045rTGFBC6GpDep3PJJ9JUWl5N49UQaz6Z0CL0DJrKjwA91oJmrCSyr
-         aYhjM7y2O0v1P7rOpYDWYRSn6PtzxNOEw72cNofQ0iqnFsM9TSS2qLmZv8Mh4MRvxyKq
-         5c9eMh/6C5EtG6wLPeV3taimaWo3rXmJUHHxvtxZt0KUbi1bWyQuAncM/Li7FIcjDwle
-         mtpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699454260; x=1700059060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5pLSEcA2VjED8h8cG+iJ0qpM0EKkiOxsur6HDc4UGXc=;
-        b=FuH/08EfpRFaRWF8+2/ZwOvevnRtkxyWCUuBxhTTDe9+XcAuO44OGBPzI4IIMVUNRp
-         1tYpJOzLSUhUkjPvwXDbiy79SIA1Q4Z4CMl9UO9gTzjoDAv3uptwODVITpSnQxETo8L5
-         r/NtulsqHrSUNTJIddoISqU2ZODHBFmocRRKpfCIOjWHY2tzJ2qGuTZCz1SVOTOXF7u8
-         bw5L4LFOnoqef53Era2DNVMTEyf+fagvTyCIDUW+H+u9RBlMppxGR0sksp5rHyaTR26T
-         Wj1yLBFrl+Teef19NK7A/nR5yp9LFEUb9ZiJRnDwDWHfI8B/MfV7PHbJX/sFv6azAmZF
-         Qv8w==
-X-Gm-Message-State: AOJu0YxQOPDYEPIzCmEe90N83FhfiSHkp90LjCRTLt841OdEp2PgQCP2
-	MjAKeJmA51hAzvyyRrlX/6v/+/atDGc545xYrMzD+A==
-X-Google-Smtp-Source: AGHT+IF55MrY2C8gUy5UEgkOtPKa6Oi8mTKtSV1L4rKV0gjIZlPg1ZoEvJYa2FVQjNUppNOqvXM7P0/6857Jez9ndOc=
-X-Received: by 2002:a81:48ca:0:b0:5a7:a81d:e410 with SMTP id
- v193-20020a8148ca000000b005a7a81de410mr1971187ywa.18.1699454260465; Wed, 08
- Nov 2023 06:37:40 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5178E12E77
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 14:43:31 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7277B1BDD
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 06:43:30 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mtapsc-8-f2DJacRmPsWNj5mB7xeKRQ-1; Wed, 08 Nov 2023 14:43:27 +0000
+X-MC-Unique: f2DJacRmPsWNj5mB7xeKRQ-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 8 Nov
+ 2023 14:43:23 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Wed, 8 Nov 2023 14:43:23 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mina Almasry' <almasrymina@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org"
+	<linux-arch@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linaro-mm-sig@lists.linaro.org"
+	<linaro-mm-sig@lists.linaro.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, "Sumit
+ Semwal" <sumit.semwal@linaro.org>, =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?=
+	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, "Jeroen de
+ Borst" <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Subject: RE: [RFC PATCH v3 09/12] net: add support for skbs with unreadable
+ frags
+Thread-Topic: [RFC PATCH v3 09/12] net: add support for skbs with unreadable
+ frags
+Thread-Index: AQHaEFtCwSYr9EEKH0iEeRZOyEz/y7BwghiQ
+Date: Wed, 8 Nov 2023 14:43:23 +0000
+Message-ID: <1478ddd0902941fba8316e8883de2758@AcuMS.aculab.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-10-almasrymina@google.com>
+In-Reply-To: <20231106024413.2801438-10-almasrymina@google.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231107-gemini-largeframe-fix-v3-0-e3803c080b75@linaro.org>
- <20231107-gemini-largeframe-fix-v3-1-e3803c080b75@linaro.org> <20231108142640.tmly4ifgsoeo7m3e@skbuf>
-In-Reply-To: <20231108142640.tmly4ifgsoeo7m3e@skbuf>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 8 Nov 2023 15:37:28 +0100
-Message-ID: <CACRpkdZ0zH6i8xuZGXq2VEd7brp-dmY89KXmKfxMTk=9eX1EQw@mail.gmail.com>
-Subject: Re: [PATCH net v3 1/4] net: ethernet: cortina: Fix MTU max setting
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>, 
-	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Wed, Nov 8, 2023 at 3:26=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com> =
-wrote:
-> On Tue, Nov 07, 2023 at 10:54:26AM +0100, Linus Walleij wrote:
+RnJvbTogTWluYSBBbG1hc3J5DQo+IFNlbnQ6IDA2IE5vdmVtYmVyIDIwMjMgMDI6NDQNCj4gDQo+
+IEZvciBkZXZpY2UgbWVtb3J5IFRDUCwgd2UgZXhwZWN0IHRoZSBza2IgaGVhZGVycyB0byBiZSBh
+dmFpbGFibGUgaW4gaG9zdA0KPiBtZW1vcnkgZm9yIGFjY2VzcywgYW5kIHdlIGV4cGVjdCB0aGUg
+c2tiIGZyYWdzIHRvIGJlIGluIGRldmljZSBtZW1vcnkNCj4gYW5kIHVuYWNjZXNzaWJsZSB0byB0
+aGUgaG9zdC4gV2UgZXhwZWN0IHRoZXJlIHRvIGJlIG5vIG1peGluZyBhbmQNCj4gbWF0Y2hpbmcg
+b2YgZGV2aWNlIG1lbW9yeSBmcmFncyAodW5hY2Nlc3NpYmxlKSB3aXRoIGhvc3QgbWVtb3J5IGZy
+YWdzDQo+IChhY2Nlc3NpYmxlKSBpbiB0aGUgc2FtZSBza2IuDQo+IA0KPiBBZGQgYSBza2ItPmRl
+dm1lbSBmbGFnIHdoaWNoIGluZGljYXRlcyB3aGV0aGVyIHRoZSBmcmFncyBpbiB0aGlzIHNrYg0K
+PiBhcmUgZGV2aWNlIG1lbW9yeSBmcmFncyBvciBub3QuDQo+IA0KLi4uDQo+IGRpZmYgLS1naXQg
+YS9pbmNsdWRlL2xpbnV4L3NrYnVmZi5oIGIvaW5jbHVkZS9saW51eC9za2J1ZmYuaA0KPiBpbmRl
+eCAxZmFlMjc2YzEzNTMuLjhmYjQ2OGZmODExNSAxMDA2NDQNCj4gLS0tIGEvaW5jbHVkZS9saW51
+eC9za2J1ZmYuaA0KPiArKysgYi9pbmNsdWRlL2xpbnV4L3NrYnVmZi5oDQo+IEBAIC04MDUsNiAr
+ODA1LDggQEAgdHlwZWRlZiB1bnNpZ25lZCBjaGFyICpza19idWZmX2RhdGFfdDsNCj4gICAqCUBj
+c3VtX2xldmVsOiBpbmRpY2F0ZXMgdGhlIG51bWJlciBvZiBjb25zZWN1dGl2ZSBjaGVja3N1bXMg
+Zm91bmQgaW4NCj4gICAqCQl0aGUgcGFja2V0IG1pbnVzIG9uZSB0aGF0IGhhdmUgYmVlbiB2ZXJp
+ZmllZCBhcw0KPiAgICoJCUNIRUNLU1VNX1VOTkVDRVNTQVJZIChtYXggMykNCj4gKyAqCUBkZXZt
+ZW06IGluZGljYXRlcyB0aGF0IGFsbCB0aGUgZnJhZ21lbnRzIGluIHRoaXMgc2tiIGFyZSBiYWNr
+ZWQgYnkNCj4gKyAqCQlkZXZpY2UgbWVtb3J5Lg0KPiAgICoJQGRzdF9wZW5kaW5nX2NvbmZpcm06
+IG5lZWQgdG8gY29uZmlybSBuZWlnaGJvdXINCj4gICAqCUBkZWNyeXB0ZWQ6IERlY3J5cHRlZCBT
+S0INCj4gICAqCUBzbG93X2dybzogc3RhdGUgcHJlc2VudCBhdCBHUk8gdGltZSwgc2xvd2VyIHBy
+ZXBhcmUgc3RlcCByZXF1aXJlZA0KPiBAQCAtOTkxLDcgKzk5Myw3IEBAIHN0cnVjdCBza19idWZm
+IHsNCj4gICNpZiBJU19FTkFCTEVEKENPTkZJR19JUF9TQ1RQKQ0KPiAgCV9fdTgJCQljc3VtX25v
+dF9pbmV0OjE7DQo+ICAjZW5kaWYNCj4gLQ0KPiArCV9fdTgJCQlkZXZtZW06MTsNCj4gICNpZiBk
+ZWZpbmVkKENPTkZJR19ORVRfU0NIRUQpIHx8IGRlZmluZWQoQ09ORklHX05FVF9YR1JFU1MpDQo+
+ICAJX191MTYJCQl0Y19pbmRleDsJLyogdHJhZmZpYyBjb250cm9sIGluZGV4ICovDQo+ICAjZW5k
+aWYNCj4gQEAgLTE3NjYsNiArMTc2OCwxMiBAQCBzdGF0aWMgaW5saW5lIHZvaWQgc2tiX3pjb3B5
+X2Rvd25ncmFkZV9tYW5hZ2VkKHN0cnVjdCBza19idWZmICpza2IpDQo+ICAJCV9fc2tiX3pjb3B5
+X2Rvd25ncmFkZV9tYW5hZ2VkKHNrYik7DQo+ICB9DQoNCkRvZXNuJ3QgdGhhdCBibG9hdCBzdHJ1
+Y3Qgc2tfYnVmZj8NCkknbSBub3Qgc3VyZSB0aGVyZSBhcmUgYW55IHNwYXJlIGJpdHMgYXZhaWxh
+YmxlLg0KQWx0aG91Z2ggQ09ORklHX05FVF9TV0lUQ0hERVYgYW5kIENPTkZJR19ORVRfU0NIRUQg
+c2VlbSB0bw0KYWxyZWFkeSBhZGQgcGFkZGluZy4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQg
+QWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVz
+LCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
-> > The RX max frame size is over 10000 for the Gemini ethernet,
-> > but the TX max frame size is actually just 2047 (0x7ff after
-> > checking the datasheet). Reflect this in what we offer to Linux,
-> > cap the MTU at the TX max frame minus ethernet headers.
-> >
-> > Use the BIT() macro for related bit flags so these TX settings
-> > are consistent.
->
-> What does this second paragraph intend to say? The patch doesn't use the
-> BIT() macro.
-
-Ah it's a leftover from v1 where I did some unrelated cleanup using
-BIT() but Andrew remarked on it so I dropped it.
-
-Maybe this twoliner in the commit message can be deleted when
-applying?
-
-Yours,
-Linus Walleij
 
