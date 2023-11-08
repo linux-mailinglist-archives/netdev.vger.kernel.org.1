@@ -1,47 +1,78 @@
-Return-Path: <netdev+bounces-46656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D1067E59DE
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:17:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03B057E59E4
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 16:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D89B1C2088D
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7692813AB
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:18:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76CE30333;
-	Wed,  8 Nov 2023 15:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639F43033A;
+	Wed,  8 Nov 2023 15:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ADFjITpM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uj2nmKRg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF0530322
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:17:26 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1EF0199
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 07:17:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0tOA4xl7tjgD0t44VxCU9/KD7nYM3/Cw/0M7IYajhuA=; b=ADFjITpMwY9PI1lEgQCt2DfXJw
-	0plQC4SkwiApsyP0rD/O4IBAGUEkDNUC3UiKeOZJT4O+BwRSf/KrQmLijojSkO38n2naFlOBzAa+Z
-	tu53iQ2+sOrP/UiL35aKxQDhMbeeR3OH41B8aaX7uCJYxYrcGb6lIJtmXojLekzJMFEA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r0kJ1-0018Gt-Jw; Wed, 08 Nov 2023 16:17:23 +0100
-Date: Wed, 8 Nov 2023 16:17:23 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiko Gerstung <heiko.gerstung@meinberg.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: PRP with VLAN support - or how to contribute to a Linux network
- driver
-Message-ID: <6ab3289a-2ede-41a3-8c57-b01df37bab7f@lunn.ch>
-References: <75E355CF-3621-40D7-A31C-BA829804DFA2@meinberg.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA42C30333
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:18:28 +0000 (UTC)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2923C1991;
+	Wed,  8 Nov 2023 07:18:28 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53e751aeb3cso11640272a12.2;
+        Wed, 08 Nov 2023 07:18:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699456706; x=1700061506; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=20YB/7o0duQE57AM+W651r/Hi5TulQyuDTg1baZxPYU=;
+        b=Uj2nmKRgd4NghuwWkq39H2Ul5R79xosg9KjHk48T0vl8DUBgyIRpzok/hXbF1tEtMW
+         Fi9NSAd8QfSguqZ63xxCVNN8wEgvlMTmRCYVBw+6vOTGPCzMBcDnfq7alvJg6eS4Xpu8
+         hCXIfsYExlyxSfzkorPOmf25c3J6NlObBYkFa0hBLwTXZtXPWXuqLr/o9ckvve8G4p63
+         3eWDu3ctdXSn5zI79dCxhrNFTkS3I5owAA+y/Xyo2ElTBmA7ecMQGWN+eEEAs1JsvXOJ
+         1g5zKnH6xDSczUtFh3cvefc+tZCxBGferHPh/1k1DRMOS/jTdlyeiEaXLGjPS4EpWIsT
+         bVhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699456706; x=1700061506;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=20YB/7o0duQE57AM+W651r/Hi5TulQyuDTg1baZxPYU=;
+        b=n8gS8eXGj6pk+MF8LdwHDWolCVwtYblJYzbMFBHu0T8lRBE5bOgc6r35b5jMj5NEiw
+         SEOENHc6weNEI+7r5Ydz9/FrhT+5+rAwEdZNLSqOTkMU7OddHoe76vLYQmefVg2sMC11
+         jmIWX3jNlSQuzSaUk4FYWnIBwLiNGD9eKgMuOk99elYyh6NvuYUCxLvufT7xTjKN5qb8
+         bGuS94rCSRqyVm852zZS0JckTRlaTqSNJBufsG4TZz7cFv4tA1oD5+Tj6uoEsrzSjeZs
+         hnkLK8asAw/9gWEP2LOIilLAeJsiqZhYX44Tmwi83HthY0el7PuNz6SAGZSViGAGxiSe
+         q+Ow==
+X-Gm-Message-State: AOJu0YyunjYQxmj5RM22nd9bVsMOI4BG0Zjnmq4pT13UG0d+0XkB54JK
+	b0IlYXfWj8GYp4WPiXJhztusUafX0ujBXQ==
+X-Google-Smtp-Source: AGHT+IGBKj+9SqJ/qYTCOUb8xjtAEEzYl3Lo963j4zWXTvU73ZFy5/fQ1JEo+izBsJLsT+TWXG+JTQ==
+X-Received: by 2002:a50:d7c2:0:b0:53d:e0cf:cb95 with SMTP id m2-20020a50d7c2000000b0053de0cfcb95mr2077578edj.21.1699456706277;
+        Wed, 08 Nov 2023 07:18:26 -0800 (PST)
+Received: from skbuf ([188.26.57.160])
+        by smtp.gmail.com with ESMTPSA id cf27-20020a0564020b9b00b005435faef9cfsm6793016edb.52.2023.11.08.07.18.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 07:18:26 -0800 (PST)
+Date: Wed, 8 Nov 2023 17:18:23 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 4/4] net: ethernet: cortina: Handle large frames
+Message-ID: <20231108151823.dlvzmgjizmhttmao@skbuf>
+References: <20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org>
+ <20231105-gemini-largeframe-fix-v2-4-cd3a5aa6c496@linaro.org>
+ <20231106132626.orn5r57cc7n5ditj@skbuf>
+ <CACRpkdb-iAQdw3S_1iBX=SFt6LCPvdW8+K0nvuXxD01q1K9A1A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,30 +81,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <75E355CF-3621-40D7-A31C-BA829804DFA2@meinberg.de>
+In-Reply-To: <CACRpkdb-iAQdw3S_1iBX=SFt6LCPvdW8+K0nvuXxD01q1K9A1A@mail.gmail.com>
 
-> I would like to discuss if it makes sense to remove the PRP
-> functionality from the HSR driver (which is based on the bridge
-> kernel module AFAICS) and instead implement PRP as a separate module
-> (based on the Bonding driver, which would make more sense for PRP).
+On Mon, Nov 06, 2023 at 11:44:37PM +0100, Linus Walleij wrote:
+> That indeed seems like the intention. But it's a bit suboptimal, because it
+> disables hardware checksum just because the MTU goes over a
+> certain level, and stops using the hardware checksum also for all
+> packets smaller than the MTU :(
+> 
+> I'll delete this and make the driver slot in the SW fallback per-packet
+> instead, I think it is fair to assume that most packets will be < MTU
+> and it is really just a question of where the fallback gets called.
 
-Seems like nobody replied. I don't know PRP or HSR, so i can only make
-general remarks.
+Performing the software checksum per packet instead of doing it for all
+packets seems more sensible. I haven't looked at the other offload bits
+from GMAC_OFFLOAD_FEATURES to determine if changing those is going to be
+problematic.
 
-The general policy is that we don't rip something out and replace it
-with new code. We try to improve what already exists to meet the
-demands. This is partially because of backwards compatibility. There
-could be users using the code as is. You cannot break that. Can you
-step by step modify the current code to make use of bonding, and in
-the process show you don't break the current use cases? You also need
-to consider offloading to hardware. The bridge code has infrastructure
-to offload. Does the bond driver? I've no idea about that.
+> > > Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+> >
+> > To be clear, I didn't suggest any of this. I just pointed towards the gemini.c
+> > driver as being the problem. Please remove my Suggested-by tag.
+> 
+> OK sorry, it was just my way of trying to provide credit where
+> credit is due, because you helped so much with this bug.
 
-> Hoping for advise what the next steps could be. Happy to discuss
-> this off-list as it may not be of interest for most people.
+Ok, but asserting the validity of the DSA code and vaguely pointing
+towards an unrelated driver and not even specifying what might be wrong
+with its xmit procedure still does not count as worth a Suggested-by tag
+to me. So still, please remove it.
 
-You probably want to get together with others who are interested in
-PRP and HSR. linutronix, ti, microchip, etc.
+> > We say this in Documentation/networking/dsa/dsa.rst:
+> >
+> > Checksum offload should work with category 1 and 2 taggers when the DSA conduit
+> > driver declares NETIF_F_HW_CSUM in vlan_features
+> > and looks at csum_start and csum_offset.
+> > For those cases, DSA will shift the checksum start and offset by
+> > the tag size. If the DSA conduit driver still uses the legacy NETIF_F_IP_CSUM
+> > or NETIF_F_IPV6_CSUM in vlan_features, the offload might only work if the
+> > offload hardware already expects that specific tag (perhaps due to matching
+> > vendors).
+> 
+> Since things work smoothly I can only assume that the Gemini
+> checksum engine actually knows about the Realtek ethertype (0x8899)
+> and the protocol (0xa) and takes action on that, since the switch works.
+> 
+> OR: it has some heuristic on for how to handle it. (Such as looking for
+> a valid TCP or UDP header to figure out where to put the checksum.)
 
-	Andrew
+The second option seems more plausible to me. It seems unlikely that a
+non-Realtek controller would have information about a Realtek
+proprietary protocol, that even Linux people have trouble finding a lot
+of information about, when explicitly trying to do so.
+
+> But I have no idea how it does it. It doesn't have a firmware AFAIK.
+> 
+> Examples listed were ICMP so just IP checksums but I tried for example
+> SSH, and HTTP and packets look like this:
+> 
+> 22:51:35.457191 9a:ec:30:5a:46:96 (oui Unknown) > bc:ae:c5:6b:a8:3d
+> (oui Unknown),
+> ethertype IPv4 (0x0800), length 434: (tos 0x48, ttl 64, id 8221,
+> offset 0, flags [DF], proto TCP (6), length 420)
+>     _gateway.48102 > fedora.ssh: Flags [P.], cksum 0xcf1b (correct),
+> seq 811:1179, ack 2310,
+>    win 2054, options [nop,nop,TS val 74858741 ecr 1981407207], length 368
+> 
+> Checksum correct. So...
+
+Well, the checksum is correct because it's done in software by the
+network stack, prior to dsa_user_xmit() being even called, and thus
+prior to the DSA tag being added. "ethtool -k lan0 | grep sum" will tell
+you as much (compare it to "ethtool -k eth0" which will list some
+offload bits set).
+
+> > Shouldn't "word1 |= TSS_BYPASS_BIT;" be done depending on skb->protocol,
+> > rather than depending on skb->len?!
+> >
+> >                 if (skb->protocol == htons(ETH_P_IP)) {
+> >                         word1 |= TSS_IP_CHKSUM_BIT;
+> >                         tcp = ip_hdr(skb)->protocol == IPPROTO_TCP;
+> >                 } else { /* IPv6 */
+> >                         word1 |= TSS_IPV6_ENABLE_BIT;
+> >                         tcp = ipv6_hdr(skb)->nexthdr == IPPROTO_TCP;
+> >                 } // here
+> >                         word1 |= TSS_BYPASS_BIT;
+> 
+> Oddly it assumes everything is either TCP or UDP on
+> IPv4 or IPv6. And yet things such as ICMP work just fine.
+> 
+> I think the checksum engine can contain some various
+> heuristics, such as if it cannot recognize what is coming
+> in as the selected TCP or UDP, it will pass right through.
+> 
+> > Gemini should never attempt to provide checksums for DSA-tagged packets
+> > unless it is able to take skb->csum_start into consideration, otherwise
+> > it will get it wrong.
+> >
+> > This is somewhat independent of the other problem you've found, which
+> > seems to be that large non-DSA packets get truncated anyway. But not
+> > bypassing TX checksum offload truncates a packet? Hmm, strange.
+> 
+> I have a theory about that in the comment, which is that when they
+> engineered the hardware they only put in a hardware buffer for
+> 1518 bytes in the checksum engine. If you try to put in any more
+> it gets truncated. It's a reasonable guess.
+> 
+> If you do not set the checkumming engine to "bypass" it will try
+> to fit the incoming paket into the checksumming buffer, and then
+> it will look to see if it can find the right TCP or UDP headers.
+> If it can't it will pass the packet out from the buffer without doing
+> any changes. But the buffer is just 1518 bytes, which means that
+> no matter what kind of package it is, it will get truncated if it
+> does not fit into the checksumming buffer.
+> 
+> This would give exactly the behaviour we're seeing.
+
+The evidence you've presented seems to support your position and not
+mine. The controller does not attempt to provide checksums for
+DSA-tagged packets, that is not a problem because those have checksums
+already, but the packet size is the actual problem, irrespective of
+whether the packets are DSA-tagged or not.
+
+But in that case I have some comments on your latest version of the
+patch set.
 
