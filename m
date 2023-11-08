@@ -1,103 +1,186 @@
-Return-Path: <netdev+bounces-46549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 738E67E4DBE
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 01:10:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A59C7E4E57
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 02:01:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1405AB20E3A
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 00:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B829281565
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 01:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFE619B;
-	Wed,  8 Nov 2023 00:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7740C655;
+	Wed,  8 Nov 2023 01:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ICoTurgj"
+	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="rINmnpWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BAA18A;
-	Wed,  8 Nov 2023 00:10:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CBF6C433C7;
-	Wed,  8 Nov 2023 00:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699402210;
-	bh=49/18eui175XW6NzFUiZghmKR051RlPOSAcbSznIRN0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ICoTurgjXoU7vBaB5nU3XnpCuGXUGM/Lg+7nx9Zg5c9Vx2xHyr8NmLns0KLqXONdI
-	 R8LCfCS/mHRDjwxTSoVe+sj1cDEttA8Y0JuKSpm6lLw1n/qSIvaHCleQRX+/QjqfLB
-	 9Bnfw+85Cc/QjVXk/VLdQ1jhn6eKkRkQigB0ZLL0MOdSoiV/erOA1zHYVxiYbjmu34
-	 FBxFuBnpvV+HFTIqWMpFB8XBpikQNZwbiRDQ+p87uOEkTycDU3xckJomKwbrGlJPDI
-	 Tua1FNCNa4KtRmoEEFxhCTAEpwuhMRfvnw4geJfz4mItNfTxdevbQPqdoQT+SaaD4C
-	 6UXbF+jG51x8A==
-Message-ID: <674f6ae2-d88e-4203-83f9-e9a9322393d9@kernel.org>
-Date: Tue, 7 Nov 2023 17:10:09 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9352C645
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 01:01:45 +0000 (UTC)
+Received: from mx3.spacex.com (mx3.spacex.com [192.31.242.183])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2603A193;
+	Tue,  7 Nov 2023 17:01:44 -0800 (PST)
+Received: from pps.filterd (mx3.spacex.com [127.0.0.1])
+	by mx3.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3A7NjQoB029456;
+	Tue, 7 Nov 2023 17:01:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=dkim; bh=OJOltpCw6oEDZHdLgwEv7lAgASuWqnZDUGl4CiEkjRg=;
+ b=rINmnpWBKHp4qCC3WgPVCy3td4sEDpZtaR3vlVVU8lRdpiIDnAkOnfo8WrOJQnvLqOjd
+ DXZtbN/DOzjRcc1BihEP0gUDCvhe6flKbH4JelcWHpVKIy66ob4UqeMWzWq2t8aCrbiC
+ 4+bgWVNZ4xx0GmAmbRfWw8ZsLXnl9n1Abexzh919cXWiwNQDIFERxVDLjBVjj8o/mT0J
+ b9s0C9v0B8eVOb4NOtGZ0PhproPInzI6yYliCP3r/n0f7JUSIwfVjMmxzWYn+DMN9/OW
+ S3YgklP0bVK/TYBFuqGEGx2vQsLKVOcNHc4J7N3q+aKHhdSVDUAKOK8e8N5kB0yv3lI4 sQ== 
+Received: from smtp.spacex.corp ([10.34.3.234])
+	by mx3.spacex.com (PPS) with ESMTPS id 3u7w328a1a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 07 Nov 2023 17:01:42 -0800
+Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Tue, 7 Nov 2023 17:01:42 -0800
+From: <alexey.pakhunov@spacex.com>
+To: <mchan@broadcom.com>
+CC: <vincent.wong2@spacex.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <siva.kallam@broadcom.com>,
+        <prashant@broadcom.com>, Alex Pakhunov <alexey.pakhunov@spacex.com>
+Subject: [PATCH 1/2] tg3: Move the [rt]x_dropped counters to tg3_napi
+Date: Tue, 7 Nov 2023 17:01:28 -0800
+Message-ID: <20231108010129.2009947-1-alexey.pakhunov@spacex.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 06/12] memory-provider: dmabuf devmem memory
- provider
-Content-Language: en-US
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-7-almasrymina@google.com>
- <583db67b-96c6-4e17-bea0-b5a14799db4a@kernel.org>
- <CAHS8izME7NixQrrh+qKnMR4+FyTzKW=B2pYyNffJ+igiehe-7g@mail.gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAHS8izME7NixQrrh+qKnMR4+FyTzKW=B2pYyNffJ+igiehe-7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ht-dc-ex-d3-n2.spacex.corp (10.34.3.237) To
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
+X-Proofpoint-ORIG-GUID: PkMZjvHVa2L8WY4LJamS6wXHoV8WtbVu
+X-Proofpoint-GUID: PkMZjvHVa2L8WY4LJamS6wXHoV8WtbVu
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ mlxscore=0 malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 impostorscore=0 suspectscore=0 clxscore=1015
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311080006
 
-On 11/7/23 5:02 PM, Mina Almasry wrote:
-> On Mon, Nov 6, 2023 at 1:02 PM Stanislav Fomichev <sdf@google.com> wrote:
->>
->> On 11/05, Mina Almasry wrote:
->>> +static inline bool page_is_page_pool_iov(const struct page *page)
->>> +{
->>> +     return (unsigned long)page & PP_DEVMEM;
->>> +}
->>
->> Speaking of bpf: one thing that might be problematic with this PP_DEVMEM
->> bit is that it will make debugging with bpftrace a bit (more)
->> complicated. If somebody were trying to get to that page_pool_iov from
->> the frags, they will have to do the equivalent of page_is_page_pool_iov,
->> but probably not a big deal? (thinking out loud)
-> 
-> Good point, but that doesn't only apply to bpf I think. I'm guessing
-> even debugger drgn access to the bv_page in the frag will have trouble
-> if it's actually accessing an iov with LSB set.
-> 
-> But this is not specific to this use for LSB pointer trick. I think
-> all code that currently uses LSB pointer trick will have similar
-> troubles. In this context my humble vote is that we get such big
-> upside from reducing code churn that it's reasonable to tolerate such
-> side effects.
+From: Alex Pakhunov <alexey.pakhunov@spacex.com>
 
-+1
+This change moves [rt]x_dropped counters to tg3_napi so that they can be
+updated by a single writer, race-free.
 
-> 
-> I could alleviate some of the issues by teaching drgn to do the right
-> thing for devmem/iovs... time permitting.
-> 
-Tools like drgn and crash have to know when the LSB trick is used  -
-e.g., dst_entry - and handle it when dereferencing pointers.
+Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
+Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 29 +++++++++++++++++++++++++----
+ drivers/net/ethernet/broadcom/tg3.h |  4 ++--
+ 2 files changed, 27 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 14b311196b8f..09acc2504965 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -6845,7 +6845,7 @@ static int tg3_rx(struct tg3_napi *tnapi, int budget)
+ 				       desc_idx, *post_ptr);
+ 		drop_it_no_recycle:
+ 			/* Other statistics kept track of by card. */
+-			tp->rx_dropped++;
++			tnapi->rx_dropped++;
+ 			goto next_pkt;
+ 		}
+ 
+@@ -8146,7 +8146,7 @@ static netdev_tx_t tg3_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ drop:
+ 	dev_kfree_skb_any(skb);
+ drop_nofree:
+-	tp->tx_dropped++;
++	tnapi->tx_dropped++;
+ 	return NETDEV_TX_OK;
+ }
+ 
+@@ -8587,6 +8587,9 @@ static int tg3_init_rings(struct tg3 *tp)
+ 			tg3_free_rings(tp);
+ 			return -ENOMEM;
+ 		}
++
++		tnapi->rx_dropped = 0;
++		tnapi->tx_dropped = 0;
+ 	}
+ 
+ 	return 0;
+@@ -11895,6 +11898,9 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+ {
+ 	struct rtnl_link_stats64 *old_stats = &tp->net_stats_prev;
+ 	struct tg3_hw_stats *hw_stats = tp->hw_stats;
++	unsigned long rx_dropped = 0;
++	unsigned long tx_dropped = 0;
++	int i;
+ 
+ 	stats->rx_packets = old_stats->rx_packets +
+ 		get_stat64(&hw_stats->rx_ucast_packets) +
+@@ -11941,8 +11947,23 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+ 	stats->rx_missed_errors = old_stats->rx_missed_errors +
+ 		get_stat64(&hw_stats->rx_discards);
+ 
+-	stats->rx_dropped = tp->rx_dropped;
+-	stats->tx_dropped = tp->tx_dropped;
++	/* Aggregate per-queue counters. The per-queue counters are updated
++	 * by a single writer, race-free. The result computed by this loop
++	 * might not be 100% accurate (counters can be updated in the middle of
++	 * the loop) but the next tg3_get_nstats() will recompute the current
++	 * value so it is acceptable.
++	 */
++	for (i = 0; i < tp->irq_cnt; i++) {
++		struct tg3_napi *tnapi = &tp->napi[i];
++
++		rx_dropped += tnapi->rx_dropped;
++		tx_dropped += tnapi->tx_dropped;
++	}
++
++	/* The counters wrap around at 4G on 32bit machines. */
++	stats->rx_dropped = rx_dropped;
++	stats->tx_dropped = tx_dropped;
++
+ }
+ 
+ static int tg3_get_regs_len(struct net_device *dev)
+diff --git a/drivers/net/ethernet/broadcom/tg3.h b/drivers/net/ethernet/broadcom/tg3.h
+index 1000c894064f..8d753f8c5b06 100644
+--- a/drivers/net/ethernet/broadcom/tg3.h
++++ b/drivers/net/ethernet/broadcom/tg3.h
+@@ -3018,6 +3018,7 @@ struct tg3_napi {
+ 	u16				*rx_rcb_prod_idx;
+ 	struct tg3_rx_prodring_set	prodring;
+ 	struct tg3_rx_buffer_desc	*rx_rcb;
++	unsigned long			rx_dropped;
+ 
+ 	u32				tx_prod	____cacheline_aligned;
+ 	u32				tx_cons;
+@@ -3026,6 +3027,7 @@ struct tg3_napi {
+ 	u32				prodmbox;
+ 	struct tg3_tx_buffer_desc	*tx_ring;
+ 	struct tg3_tx_ring_info		*tx_buffers;
++	unsigned long			tx_dropped;
+ 
+ 	dma_addr_t			status_mapping;
+ 	dma_addr_t			rx_rcb_mapping;
+@@ -3219,8 +3221,6 @@ struct tg3 {
+ 
+ 
+ 	/* begin "everything else" cacheline(s) section */
+-	unsigned long			rx_dropped;
+-	unsigned long			tx_dropped;
+ 	struct rtnl_link_stats64	net_stats_prev;
+ 	struct tg3_ethtool_stats	estats_prev;
+ 
+
+base-commit: ffc253263a1375a65fa6c9f62a893e9767fbebfa
+-- 
+2.39.3
+
 
