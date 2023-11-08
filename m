@@ -1,184 +1,265 @@
-Return-Path: <netdev+bounces-46716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE087E60DA
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 00:11:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2947E60F9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 00:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17AE82815BA
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 23:11:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 742B1281400
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 23:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B26737158;
-	Wed,  8 Nov 2023 23:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23FB6374E7;
+	Wed,  8 Nov 2023 23:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BQ9bLrAA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BzFtaBog"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98192FE3A
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 23:11:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE37259B
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 15:11:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699485065;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7zBhCsl+J9XuFKJwNU+AckeR5uKVYWw4Qceb+g+hq/k=;
-	b=BQ9bLrAAB5nwUNe06oq2Xt5qjWiyIOhRDgGEK+Rha/MmfuGzcQy3ag4656TxT35sfyWs3l
-	KAr2M8BV2IAuefrTb6SfNaS4TNWVZmsPx2RHijdv4Mq70/9Tme8JJfZueeqTFC2VqUq1sN
-	p4jE8I1DhJvJiNPx6TzhIa8lLK/xUa0=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-B1SA-0YUML2q-3RJ1yX15g-1; Wed, 08 Nov 2023 18:11:03 -0500
-X-MC-Unique: B1SA-0YUML2q-3RJ1yX15g-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-543d2bc7d9dso110134a12.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 15:11:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699485060; x=1700089860;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=7zBhCsl+J9XuFKJwNU+AckeR5uKVYWw4Qceb+g+hq/k=;
-        b=wczQ6l0xS1uElhioz1gUCTOSo+TMxI5U+ebsb/YUPRnkZ33SXRYfA+AEnn3zx3Xd2u
-         +UmBAFAR4Syq1iGwQghmwQZnUB/64KfMPsFCsxQTS7Ro3uC8d+AoK4FaKL5s8EHNVjm7
-         7nxvR41aNgwYYwN/s9mYcqirabvFJ7xbTyiZieh7Vc0UYY4hkv3Y9MV2lfH8y7r4j25n
-         rmhFtfD3+hrBOqnkNOGun2tzjUUFs2cm/7hwLbjF9EIGnOBqJYtlfSBNJoqBI+vQ3Bs9
-         eVte/4LxJpyHUS8Q+BKOPIp/bZWjOTq12V+XGMIUDV6Ug/IqhbG6RsRhL34hGrt07700
-         wm+g==
-X-Gm-Message-State: AOJu0YxVksZTcKkt7HMdkMeWZuRccrs1wfqAvpIxn8dO76UxtQp4fqoR
-	DyV6tCRcbUSFh6eCGdNjAV6KSopios1sXQJymoFgkkr4Izn7uTBzHRMFjfxsZc70po7j388hNEB
-	2fugZAl168Ow6QppJ
-X-Received: by 2002:a17:907:3f17:b0:9b3:308:d045 with SMTP id hq23-20020a1709073f1700b009b30308d045mr3130121ejc.46.1699485060542;
-        Wed, 08 Nov 2023 15:11:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGgT5SEAwLzC5r/BVkOQGnVjCHOESssbnCbCYt42mXA7+rcpol8Z1ymofhy8h2p7zzk10z75A==
-X-Received: by 2002:a17:907:3f17:b0:9b3:308:d045 with SMTP id hq23-20020a1709073f1700b009b30308d045mr3130105ejc.46.1699485060207;
-        Wed, 08 Nov 2023 15:11:00 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id e22-20020a1709067e1600b009ddaa2183d4sm1681156ejr.42.2023.11.08.15.10.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 15:10:59 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8E1EBEE6EBE; Thu,  9 Nov 2023 00:10:59 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, Daniel
- Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-Subject: Re: BPF/XDP: kernel panic when removing an interface that is an
- xdp_redirect target
-In-Reply-To: <fa95d5d0-35c0-497e-aea8-a35f9f6304f4@amd.com>
-References: <e3085c47-7452-4302-8401-1bda052a3714@amd.com>
- <87h6lxy3zq.fsf@toke.dk> <fa95d5d0-35c0-497e-aea8-a35f9f6304f4@amd.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 09 Nov 2023 00:10:59 +0100
-Message-ID: <871qczx2m4.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D334430355;
+	Wed,  8 Nov 2023 23:20:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB6AC433C8;
+	Wed,  8 Nov 2023 23:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699485626;
+	bh=PYJW4QGKn9tJvNiaagWV7uxmfj3dj1vHSKjkB8gGQNU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BzFtaBogfySwWTla2NJeVqR4PuaYoyopTLM2Vi9KPqLDdx3zZhWzGVJP/DnI0doAr
+	 DCysq9OUVMln4AwlnrEJVkGy7f+Qm12tVyciJjWeul+4uzovgGCKk2sMAtDMAjSHQk
+	 VewIlU9Taz4GP2QauTMdLCa7SvSTilwhfOh7tff1Ga+FrRKGb/HdT6qnkIpQd6cOAM
+	 O/27XvUeKFXk5bmEslLGwZ3jtw7QVPeQvIoDsIh/p8JjCWRipxoFk8lN/qC5a7ewR/
+	 H/tawx3cjSx2H40w4euTMdD4AcO2ZafY4Qwdj7yo9jdfRTzsx4bJpJ6lI9DE3yX0ny
+	 IuIsDgsRCUzJQ==
+Date: Thu, 9 Nov 2023 08:20:09 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org,
+ Masahiro Yamada <masahiroy@kernel.org>, linux-kbuild@vger.kernel.org, Arnd
+ Bergmann <arnd@arndb.de>, Matt Turner <mattst88@gmail.com>, Vineet Gupta
+ <vgupta@kernel.org>, Russell King <linux@armlinux.org.uk>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland
+ <mark.rutland@arm.com>, Guo Ren <guoren@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
+ <chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, Michal Simek
+ <monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Dinh
+ Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Geoff Levand <geoff@infradead.org>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>, John Paul
+ Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S. Miller"
+ <davem@davemloft.net>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, Helge
+ Deller <deller@gmx.de>, Sudip Mukherjee <sudipm.mukherjee@gmail.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>,
+ Kent Overstreet <kent.overstreet@linux.dev>, David Woodhouse
+ <dwmw2@infradead.org>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, Anil S
+ Keshavamurthy <anil.s.keshavamurthy@intel.com>, Kees Cook
+ <keescook@chromium.org>, Vincenzo Frascino <vincenzo.frascino@arm.com>,
+ Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <ndesaulniers@google.com>, Nicolas Schier <nicolas@fjasle.eu>,
+ Al Viro <viro@zeniv.linux.org.uk>, Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?=
+ <u.kleine-koenig@pengutronix.de>, linux-alpha@vger.kernel.org,
+ linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-trace-kernel@vger.kernel.org, linux-csky@vger.kernel.org,
+ loongarch@lists.linux.dev, linux-m68k@lists.linux-m68k.org,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+ linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+ netdev@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linux-bcachefs@vger.kernel.org,
+ linux-mtd@lists.infradead.org
+Subject: Re: [PATCH 03/22] [RESEND] kprobes: unify
+ kprobes_exceptions_nofify() prototypes
+Message-Id: <20231109082009.a34621399a98181ee6cde60b@kernel.org>
+In-Reply-To: <20231108125843.3806765-4-arnd@kernel.org>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+	<20231108125843.3806765-4-arnd@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-"Nelson, Shannon" <shannon.nelson@amd.com> writes:
+On Wed,  8 Nov 2023 13:58:24 +0100
+Arnd Bergmann <arnd@kernel.org> wrote:
 
-> On 11/7/2023 7:31 AM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>=20
->> "Nelson, Shannon" <shannon.nelson@amd.com> writes:
->>=20
->>> While testing new code to support XDP in the ionic driver we found that
->>> we could panic the kernel by running a bind/unbind loop on the target
->>> interface of an xdp_redirect action.  Obviously this is a stress test
->>> that is abusing the system, but it does point to a window of opportunity
->>> in bq_enqueue() and bq_xmit_all().  I believe that while the validity of
->>> the target interface has been checked in __xdp_enqueue(), the interface
->>> can be unbound by the time either bq_enqueue() or bq_xmit_all() tries to
->>> use the interface.  There is no locking or reference taken on the
->>> interface to hold it in place before the target=E2=80=99s ndo_xdp_xmit(=
-) is called.
->>>
->>> Below is a stack trace that our tester captured while running our test
->>> code on a RHEL 9.2 kernel =E2=80=93 yes, I know, unpublished driver cod=
-e on a
->>> non-upstream kernel.  But if you look at the current upstream code in
->>> kernel/bpf/devmap.c I think you can see what we ran into.
->>>
->>> Other than telling users to not abuse the system with a bind/unbind
->>> loop, is there something we can do to limit the potential pain here?
->>> Without knowing what interfaces might be targeted by the users=E2=80=99=
- XDP
->>> programs, is there a step the originating driver can do to take
->>> precautions?  Did we simply miss a step in the driver, or is this an
->>> actual problem in the devmap code?
->>=20
->> Sounds like a driver bug :)
->
-> Entirely possible, wouldn't be our first ... :-)
->
->>=20
->> The XDP redirect flow guarantees that all outstanding packets are
->> flushed within a single NAPI cycle, as documented here:
->> https://docs.kernel.org/bpf/redirect.html
->>=20
->> So basically, the driver should be doing a two-step teardown: remove
->> global visibility of the resource in question, wait for all concurrent
->> users to finish, and *then* free the data structure. This corresponds to
->> the usual RCU protection: resources should be kept alive until all
->> concurrent RCU critical sections have exited on all CPUs. So if your
->> driver is removing an interface's data structure without waiting for
->> concurrent NAPI cycles to finish, that's a bug in the driver.
->>=20
->> This kind of thing is what the synchronize_net() function is for; for a
->> usage example, see veth_napi_del_range(). My guess would be that you're
->> missing this as part of your driver teardown flow?
->
-> Essentially, the first thing we do in the remove function is to call=20
-> unregister_netdev(), which has synchronize_net() in the path, so I don't=
-=20
-> think this is missing from our scenario, but thanks for the hint, I'll=20
-> keep this in mind.  I do see there are a couple of net drivers that are=20
-> more aggressive about calling it directly in some other parts of the=20
-> logic - I don't think that has a bearing on this issue, but I'll keep it=
-=20
-> in mind.
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Most architectures that support kprobes declare this function in their
+> own asm/kprobes.h header and provide an override, but some are missing
+> the prototype, which causes a warning for the __weak stub implementation:
+> 
+> kernel/kprobes.c:1865:12: error: no previous prototype for 'kprobe_exceptions_notify' [-Werror=missing-prototypes]
+>  1865 | int __weak kprobe_exceptions_notify(struct notifier_block *self,
+> 
+> Move the prototype into linux/kprobes.h so it is visible to all
+> the definitions.
 
-Hmm, right, in fact unregister_netdev() has two such synchronize_net()
-calls. The XDP queue is only guaranteed to be flushed after the second
-one of those, though, and there's an 'ndo_uninit()' callback in-between
-them. So I don't suppose your driver implements that ndo and does
-something there that could cause the crash you're seeing?
+Thanks, let me pick this to linux-trace tree.
 
-Otherwise, the one thing I can think of is that maybe it can be related
-to the fact that synchronize_net() turns into a
-synchronize_rcu_expedited() if the rtnl lock is held (which it is in
-this case if you're calling the parameter-less unregister_netdev()). I'm
-not quite sure I grok the expedited wait thing, but it should be pretty
-easy to check if this is the cause by making a change like the one below
-and seeing if the issue goes away.
+> 
+> Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  arch/arc/include/asm/kprobes.h     | 3 ---
+>  arch/arm/include/asm/kprobes.h     | 2 --
+>  arch/arm64/include/asm/kprobes.h   | 2 --
+>  arch/mips/include/asm/kprobes.h    | 2 --
+>  arch/powerpc/include/asm/kprobes.h | 2 --
+>  arch/s390/include/asm/kprobes.h    | 2 --
+>  arch/sh/include/asm/kprobes.h      | 2 --
+>  arch/sparc/include/asm/kprobes.h   | 2 --
+>  arch/x86/include/asm/kprobes.h     | 2 --
+>  include/linux/kprobes.h            | 4 ++++
+>  10 files changed, 4 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/arc/include/asm/kprobes.h b/arch/arc/include/asm/kprobes.h
+> index de1566e32cb8..68e8301c0df2 100644
+> --- a/arch/arc/include/asm/kprobes.h
+> +++ b/arch/arc/include/asm/kprobes.h
+> @@ -32,9 +32,6 @@ struct kprobe;
+>  
+>  void arch_remove_kprobe(struct kprobe *p);
+>  
+> -int kprobe_exceptions_notify(struct notifier_block *self,
+> -			     unsigned long val, void *data);
+> -
+>  struct prev_kprobe {
+>  	struct kprobe *kp;
+>  	unsigned long status;
+> diff --git a/arch/arm/include/asm/kprobes.h b/arch/arm/include/asm/kprobes.h
+> index e26a278d301a..5b8dbf1b0be4 100644
+> --- a/arch/arm/include/asm/kprobes.h
+> +++ b/arch/arm/include/asm/kprobes.h
+> @@ -40,8 +40,6 @@ struct kprobe_ctlblk {
+>  
+>  void arch_remove_kprobe(struct kprobe *);
+>  int kprobe_fault_handler(struct pt_regs *regs, unsigned int fsr);
+> -int kprobe_exceptions_notify(struct notifier_block *self,
+> -			     unsigned long val, void *data);
+>  
+>  /* optinsn template addresses */
+>  extern __visible kprobe_opcode_t optprobe_template_entry[];
+> diff --git a/arch/arm64/include/asm/kprobes.h b/arch/arm64/include/asm/kprobes.h
+> index 05cd82eeca13..be7a3680dadf 100644
+> --- a/arch/arm64/include/asm/kprobes.h
+> +++ b/arch/arm64/include/asm/kprobes.h
+> @@ -37,8 +37,6 @@ struct kprobe_ctlblk {
+>  
+>  void arch_remove_kprobe(struct kprobe *);
+>  int kprobe_fault_handler(struct pt_regs *regs, unsigned int fsr);
+> -int kprobe_exceptions_notify(struct notifier_block *self,
+> -			     unsigned long val, void *data);
+>  void __kretprobe_trampoline(void);
+>  void __kprobes *trampoline_probe_handler(struct pt_regs *regs);
+>  
+> diff --git a/arch/mips/include/asm/kprobes.h b/arch/mips/include/asm/kprobes.h
+> index 68b1e5d458cf..bc27d99c9436 100644
+> --- a/arch/mips/include/asm/kprobes.h
+> +++ b/arch/mips/include/asm/kprobes.h
+> @@ -71,8 +71,6 @@ struct kprobe_ctlblk {
+>  	struct prev_kprobe prev_kprobe;
+>  };
+>  
+> -extern int kprobe_exceptions_notify(struct notifier_block *self,
+> -				    unsigned long val, void *data);
+>  
+>  #endif /* CONFIG_KPROBES */
+>  #endif /* _ASM_KPROBES_H */
+> diff --git a/arch/powerpc/include/asm/kprobes.h b/arch/powerpc/include/asm/kprobes.h
+> index c8e4b4fd4e33..4525a9c68260 100644
+> --- a/arch/powerpc/include/asm/kprobes.h
+> +++ b/arch/powerpc/include/asm/kprobes.h
+> @@ -84,8 +84,6 @@ struct arch_optimized_insn {
+>  	kprobe_opcode_t *insn;
+>  };
+>  
+> -extern int kprobe_exceptions_notify(struct notifier_block *self,
+> -					unsigned long val, void *data);
+>  extern int kprobe_fault_handler(struct pt_regs *regs, int trapnr);
+>  extern int kprobe_handler(struct pt_regs *regs);
+>  extern int kprobe_post_handler(struct pt_regs *regs);
+> diff --git a/arch/s390/include/asm/kprobes.h b/arch/s390/include/asm/kprobes.h
+> index 21b9e5290c04..01f1682a73b7 100644
+> --- a/arch/s390/include/asm/kprobes.h
+> +++ b/arch/s390/include/asm/kprobes.h
+> @@ -73,8 +73,6 @@ struct kprobe_ctlblk {
+>  void arch_remove_kprobe(struct kprobe *p);
+>  
+>  int kprobe_fault_handler(struct pt_regs *regs, int trapnr);
+> -int kprobe_exceptions_notify(struct notifier_block *self,
+> -	unsigned long val, void *data);
+>  
+>  #define flush_insn_slot(p)	do { } while (0)
+>  
+> diff --git a/arch/sh/include/asm/kprobes.h b/arch/sh/include/asm/kprobes.h
+> index eeba83e0a7d2..65d4c3316a5b 100644
+> --- a/arch/sh/include/asm/kprobes.h
+> +++ b/arch/sh/include/asm/kprobes.h
+> @@ -46,8 +46,6 @@ struct kprobe_ctlblk {
+>  };
+>  
+>  extern int kprobe_fault_handler(struct pt_regs *regs, int trapnr);
+> -extern int kprobe_exceptions_notify(struct notifier_block *self,
+> -				    unsigned long val, void *data);
+>  extern int kprobe_handle_illslot(unsigned long pc);
+>  #else
+>  
+> diff --git a/arch/sparc/include/asm/kprobes.h b/arch/sparc/include/asm/kprobes.h
+> index 06c2bc767ef7..aec742cd898f 100644
+> --- a/arch/sparc/include/asm/kprobes.h
+> +++ b/arch/sparc/include/asm/kprobes.h
+> @@ -47,8 +47,6 @@ struct kprobe_ctlblk {
+>  	struct prev_kprobe prev_kprobe;
+>  };
+>  
+> -int kprobe_exceptions_notify(struct notifier_block *self,
+> -			     unsigned long val, void *data);
+>  int kprobe_fault_handler(struct pt_regs *regs, int trapnr);
+>  asmlinkage void __kprobes kprobe_trap(unsigned long trap_level,
+>  				      struct pt_regs *regs);
+> diff --git a/arch/x86/include/asm/kprobes.h b/arch/x86/include/asm/kprobes.h
+> index a2e9317aad49..5939694dfb28 100644
+> --- a/arch/x86/include/asm/kprobes.h
+> +++ b/arch/x86/include/asm/kprobes.h
+> @@ -113,8 +113,6 @@ struct kprobe_ctlblk {
+>  };
+>  
+>  extern int kprobe_fault_handler(struct pt_regs *regs, int trapnr);
+> -extern int kprobe_exceptions_notify(struct notifier_block *self,
+> -				    unsigned long val, void *data);
+>  extern int kprobe_int3_handler(struct pt_regs *regs);
+>  
+>  #else
+> diff --git a/include/linux/kprobes.h b/include/linux/kprobes.h
+> index 365eb092e9c4..ab1da3142b06 100644
+> --- a/include/linux/kprobes.h
+> +++ b/include/linux/kprobes.h
+> @@ -445,6 +445,10 @@ int kprobe_get_kallsym(unsigned int symnum, unsigned long *value, char *type,
+>  
+>  int arch_kprobe_get_kallsym(unsigned int *symnum, unsigned long *value,
+>  			    char *type, char *sym);
+> +
+> +int kprobe_exceptions_notify(struct notifier_block *self,
+> +			     unsigned long val, void *data);
+> +
+>  #else /* !CONFIG_KPROBES: */
+>  
+>  static inline int kprobe_fault_handler(struct pt_regs *regs, int trapnr)
+> -- 
+> 2.39.2
+> 
 
--Toke
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e28a18e7069b..1a035a5f0b0e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10932,7 +10932,7 @@ void synchronize_net(void)
- {
-        might_sleep();
-        if (rtnl_is_locked())
--               synchronize_rcu_expedited();
-+               synchronize_rcu();
-        else
-                synchronize_rcu();
- }
-
+-- 
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
