@@ -1,84 +1,124 @@
-Return-Path: <netdev+bounces-46581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C517E5194
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:03:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAB787E5264
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 10:08:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F782813AC
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 08:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 674BD28130B
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 09:08:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC27D51E;
-	Wed,  8 Nov 2023 08:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C83DDDD2;
+	Wed,  8 Nov 2023 09:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB93D51B
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 08:03:05 +0000 (UTC)
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com [209.85.167.198])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 545AE199
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 00:03:05 -0800 (PST)
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3b2e4f3defaso9032634b6e.2
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 00:03:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699430584; x=1700035384;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wLxkoJ0J2bDcVFhjdD1ByIlE66SDaLG2rCYjwFdMcfw=;
-        b=miK/p+Ysv9n7ItaaAL/TOUo43BgGTCHK9L0sD5apIlHrD5zuZxpIZzcByWiq2/9Sdp
-         Vrfa7kv8nry3D05/9ChPHyeRH42W0vs4DoQqIjwS36ms/djiE1tSvDhz92Fz0PUgj0eP
-         PL4ZeGWCjoVKRA+nk22/jBgJ/Dh+gwIIadlvqnFPHjO1E+wrQvM+U0FbI31zWdqHpncU
-         p3plKmlJkcYRDEiE29ljvziNY7hf6KGIZ6jv7OgwxSTcwjz1J7/6bWf9drGC4Zob2fu7
-         qVoJ5M2Z+S4gGLf208h6UPheyjSkpAbBiQVQ1K6vmwncA1eH8dMr2vO0gGOUOoA4zBD3
-         CpOQ==
-X-Gm-Message-State: AOJu0YwYE0xo20PFehkUl6SgwfvvxS/LjUSTmBfdoqwkV8A19HuEJedb
-	wBkmPc7vt8m2qysKHrc+97SurNRaLcvqE44MknSyWC3ZQs+G
-X-Google-Smtp-Source: AGHT+IFaX5LC4+c28UiyOy/nAi3zs6InloFZr1OolB/cB0NXkbGGJtuSl1zjrihF1453Xy0W+gcaNotbRS9cwtvEwE4TbRPga8XM
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621CEDDC2
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 09:08:21 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9AD6171D
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 01:08:20 -0800 (PST)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-375--2j0IgigP7ym7xCqA1Yr_g-1; Wed, 08 Nov 2023 04:08:03 -0500
+X-MC-Unique: -2j0IgigP7ym7xCqA1Yr_g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9EFF382DFB0;
+	Wed,  8 Nov 2023 09:08:01 +0000 (UTC)
+Received: from hog (unknown [10.39.192.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A9D240C6EB9;
+	Wed,  8 Nov 2023 09:07:59 +0000 (UTC)
+Date: Wed, 8 Nov 2023 10:07:58 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Dae R. Jeong" <threeearcat@gmail.com>, borisp@nvidia.com,
+	john.fastabend@gmail.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
+Subject: Re: Missing a write memory barrier in tls_init()
+Message-ID: <ZUtP7lMqFnNK8lw_@hog>
+References: <ZUNLocdNkny6QPn8@dragonet>
+ <20231106143659.12e0d126@kernel.org>
+ <ZUq-GrWMvbfhX74a@hog>
+ <20231107185324.22eecf10@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6808:201d:b0:3ae:61f:335e with SMTP id
- q29-20020a056808201d00b003ae061f335emr581414oiw.5.1699430584749; Wed, 08 Nov
- 2023 00:03:04 -0800 (PST)
-Date: Wed, 08 Nov 2023 00:03:04 -0800
-In-Reply-To: <0000000000009e122006088a2b8d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000053135d06099f84a3@google.com>
-Subject: Re: [syzbot] [dccp?] general protection fault in dccp_write_xmit (2)
-From: syzbot <syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com>
-To: bragathemanick0908@gmail.com, davem@davemloft.net, dccp@vger.kernel.org, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20231107185324.22eecf10@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-syzbot has bisected this issue to:
+2023-11-07, 18:53:24 -0800, Jakub Kicinski wrote:
+> On Tue, 7 Nov 2023 23:45:46 +0100 Sabrina Dubroca wrote:
+> > Wouldn't it be enough to just move the rcu_assign_pointer after ctx is
+> > fully initialized, ie just before update_sk_prot? also clearer wrt
+> > RCU.
+> 
+> I'm not sure, IIUC rcu_assign_pointer() is equivalent to
+> WRITE_ONCE() on any sane architecture, it depends on address
+> dependencies to provide ordering.
 
-commit 419ce133ab928ab5efd7b50b2ef36ddfd4eadbd2
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Wed Oct 11 07:20:55 2023 +0000
+Not what the doc says:
 
-    tcp: allow again tcp_disconnect() when threads are waiting
+    /**
+     * rcu_assign_pointer() - assign to RCU-protected pointer
+     [...]
+     * Inserts memory barriers on architectures that require them
+     * (which is most of them), and also prevents the compiler from
+     * reordering the code that initializes the structure after the pointer
+     * assignment.
+     [...]
+     */
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=142a647b680000
-start commit:   ff269e2cd5ad Merge tag 'net-next-6.7-followup' of git://gi..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=162a647b680000
-console output: https://syzkaller.appspot.com/x/log.txt?x=122a647b680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=53cdcbf124ea14aa
-dashboard link: https://syzkaller.appspot.com/bug?extid=c71bc336c5061153b502
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=142bff40e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1559f190e80000
+And it uses smp_store_release (unless writing NULL).
 
-Reported-by: syzbot+c71bc336c5061153b502@syzkaller.appspotmail.com
-Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+rcu_dereference is the one that usually doesn't contain a barrier:
+
+    /**
+     * rcu_dereference_check() - rcu_dereference with debug checking
+     [...]
+     * Inserts memory barriers on architectures that require them
+     * (currently only the Alpha), prevents the compiler from refetching
+     * (and from merging fetches), and, more importantly, documents exactly
+     * which pointers are protected by RCU and checks that the pointer is
+     * annotated as __rcu.
+     */
+
+
+> Since here we care about
+> ctx->sk_prot being updated, when changes to sk->sk_prot
+> are visible there is no super-obvious address dependency.
+> 
+> There may be one. But to me at least it isn't an obvious
+> "RCU used right will handle this" case.
+
+Ok, I think you're right. Looking at smp_store_release used by rcu_assign_pointer:
+
+    #define __smp_store_release(p, v)					\
+    do {									\
+    	compiletime_assert_atomic_type(*p);				\
+    	barrier();							\
+    	WRITE_ONCE(*p, v);						\
+    } while (0)
+
+it's only going to make sure ctx->sk_proto is set when ctx is visible,
+and not guarantee that ctx is visible whenever sk->sk_prot has been
+switched over.
+
+-- 
+Sabrina
+
 
