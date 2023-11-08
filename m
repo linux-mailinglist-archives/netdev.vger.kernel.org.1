@@ -1,313 +1,230 @@
-Return-Path: <netdev+bounces-46639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B6317E5825
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:51:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 842F37E5844
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 15:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01EAF1C208F7
-	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 13:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A66C21C20952
+	for <lists+netdev@lfdr.de>; Wed,  8 Nov 2023 14:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804E81947E;
-	Wed,  8 Nov 2023 13:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0321199AE;
+	Wed,  8 Nov 2023 14:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r+gxhwql"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCFXkccT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CA519468;
-	Wed,  8 Nov 2023 13:51:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B39C433C8;
-	Wed,  8 Nov 2023 13:51:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699451507;
-	bh=ZMSscZxw4l4aURw1F5+SZTr6ghqL/5J9z/+heAnmCLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r+gxhwql72aOlgDfZs+oY4rjQBHw4cFcOWZMLxX5KrRnMKpY9NHNxCFrxAEynV74c
-	 xZtLyeTlh3Oz0VvEPH7K8m4UUgXrvXWjlVCqPfvOICippPr4j+pBWduPCNPzpP5uSq
-	 m1z9nOU6eyc1IZd5/CoA+8X/068Br7DREy0ThNpOAp2YkOiNUD0XZlcBQdDJ2OmYJD
-	 aLQZ18NHUJqYIiRcg7LVF3mkp2qb9kJeviutPeBPas/Dhh5ojn/4YAhW45EM0FV5Zx
-	 tXib9xEnrgg4Ha5MzE9fEJJpolNo5Xnc+o8gEpg2SZZIiCuOonXX1V3mvusZ+lb/HZ
-	 Ff2I+PZ9y+NrQ==
-Date: Wed, 8 Nov 2023 14:51:43 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, paul@paul-moore.com,
-	linux-fsdevel@vger.kernel.org,
-	linux-security-module@vger.kernel.org, keescook@chromium.org,
-	kernel-team@meta.com, sargun@sargun.me
-Subject: Re: [PATCH v9 bpf-next 02/17] bpf: add BPF token delegation mount
- options to BPF FS
-Message-ID: <20231108-ungeeignet-uhren-698f16b4b36b@brauner>
-References: <20231103190523.6353-1-andrii@kernel.org>
- <20231103190523.6353-3-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15389199AC;
+	Wed,  8 Nov 2023 14:04:04 +0000 (UTC)
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 738E71BEF;
+	Wed,  8 Nov 2023 06:04:04 -0800 (PST)
+Received: by mail-qv1-xf34.google.com with SMTP id 6a1803df08f44-670e7ae4a2eso7087246d6.1;
+        Wed, 08 Nov 2023 06:04:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699452243; x=1700057043; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8bTSKgbOdcy5X+MX1qBjBKNf1zsmqIk3O75quBISCig=;
+        b=fCFXkccT89WYTvJDpsjXzOBJR/RQ7cnTYHkPc7sVV8uTUyeaUPpIM5tHD0V1MC1Lw/
+         fsZpST0SZw34V8cL0I1quZRNfBh8lSZSaKoQNFh1u6M3XAxHWoFG3v7FnKTy7Sm5HvcN
+         rPA4hjoXOnt1wdjUAb7RIjNq9vNP/qI27bhaM1z9dOaDp8MBRSqWovV4U6SIoOzpbKH1
+         VUnQk25/QaJtBZ3snLodIHK3+3yn5JZXmhvE/TXWDAR7s7B1Vv9A0MLU+LaE3Yoiz3WQ
+         Rel34ceyqoicupF/lzAvd0LaxmA7Tdn8hBbMu8rZp0Bk9UiFoMhtdu3i0X4395wGKKtI
+         qUfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699452243; x=1700057043;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8bTSKgbOdcy5X+MX1qBjBKNf1zsmqIk3O75quBISCig=;
+        b=mkPKAnqT3Wm0XAuZC3lIrqrpvfFj/yJmt2OMHWTzYf19kURCG2Tef8R5DEAqb/IcwT
+         Wx6FI2J4npwtqxYXqZbdLTWir+PkPwrJHjiy1d2VXTQcvhkELIsguKbZIeZukwl5bmkD
+         2Tg4BF8nTeE07//daq1hPzuxh0FUOK3mE6I55i4QNEoOqtNyPFj7A6l2SkHLuMqBmSMP
+         hkIx/3efoAxWMgrBO43yo9NuIXSfHFfiGSf1gSv7KhSilyUrqGXuGg4UZvKcrod8QrBX
+         UQ64+DxJdZC5G+iBWC3lv3XxQOerZ6hTtdawG6YQDCwZa3HpjG04XSaYb/BY471Zfv2S
+         SKtQ==
+X-Gm-Message-State: AOJu0Yy2DfUBJMJWI8CcnADCF1xblJaf5QgwfUeGaZluNolwruCMsp6h
+	6mFxpMOQhundixwrGeshfRl/c7Bxk8nJOpXW
+X-Google-Smtp-Source: AGHT+IGapD8WBUv+8bhRoBfqfirLNajqwl253g5PMx4/w0HQ+14WYEJ3KMz+G+KeHuLkDQKJcpVfbA==
+X-Received: by 2002:a0c:d84c:0:b0:66c:fa89:a894 with SMTP id i12-20020a0cd84c000000b0066cfa89a894mr7899917qvj.10.1699452242986;
+        Wed, 08 Nov 2023 06:04:02 -0800 (PST)
+Received: from imac ([88.97.103.74])
+        by smtp.gmail.com with ESMTPSA id o11-20020a056214108b00b0067095b0c473sm1100973qvr.11.2023.11.08.06.04.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 06:04:01 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: corbet@lwn.net,  linux-doc@vger.kernel.org,  netdev@vger.kernel.org,
+  kuba@kernel.org,  pabeni@redhat.com,  edumazet@google.com
+Subject: Re: [PATCH] Documentation: Document the Netlink spec
+In-Reply-To: <20231103135622.250314-1-leitao@debian.org> (Breno Leitao's
+	message of "Fri, 3 Nov 2023 06:56:22 -0700")
+Date: Wed, 08 Nov 2023 14:03:34 +0000
+Message-ID: <m2y1f8mjex.fsf@gmail.com>
+References: <20231103135622.250314-1-leitao@debian.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20231103190523.6353-3-andrii@kernel.org>
+Content-Type: text/plain
 
-On Fri, Nov 03, 2023 at 12:05:08PM -0700, Andrii Nakryiko wrote:
-> Add few new mount options to BPF FS that allow to specify that a given
-> BPF FS instance allows creation of BPF token (added in the next patch),
-> and what sort of operations are allowed under BPF token. As such, we get
-> 4 new mount options, each is a bit mask
->   - `delegate_cmds` allow to specify which bpf() syscall commands are
->     allowed with BPF token derived from this BPF FS instance;
->   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
->     a set of allowable BPF map types that could be created with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
->     a set of allowable BPF program types that could be loaded with BPF token;
->   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
->     a set of allowable BPF program attach types that could be loaded with
->     BPF token; delegate_progs and delegate_attachs are meant to be used
->     together, as full BPF program type is, in general, determined
->     through both program type and program attach type.
-> 
-> Currently, these mount options accept the following forms of values:
->   - a special value "any", that enables all possible values of a given
->   bit set;
->   - numeric value (decimal or hexadecimal, determined by kernel
->   automatically) that specifies a bit mask value directly;
->   - all the values for a given mount option are combined, if specified
->   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
->   delegate_maps=0x1 -o delegate_maps=0x2` will result in a combined 0x3
->   mask.
-> 
-> Ideally, more convenient (for humans) symbolic form derived from
-> corresponding UAPI enums would be accepted (e.g., `-o
-> delegate_progs=kprobe|tracepoint`) and I intend to implement this, but
-> it requires a bunch of UAPI header churn, so I postponed it until this
-> feature lands upstream or at least there is a definite consensus that
-> this feature is acceptable and is going to make it, just to minimize
-> amount of wasted effort and not increase amount of non-essential code to
-> be reviewed.
-> 
-> Attentive reader will notice that BPF FS is now marked as
-> FS_USERNS_MOUNT, which theoretically makes it mountable inside non-init
-> user namespace as long as the process has sufficient *namespaced*
-> capabilities within that user namespace. But in reality we still
-> restrict BPF FS to be mountable only by processes with CAP_SYS_ADMIN *in
-> init userns* (extra check in bpf_fill_super()). FS_USERNS_MOUNT is added
-> to allow creating BPF FS context object (i.e., fsopen("bpf")) from
-> inside unprivileged process inside non-init userns, to capture that
-> userns as the owning userns. It will still be required to pass this
-> context object back to privileged process to instantiate and mount it.
-> 
-> This manipulation is important, because capturing non-init userns as the
-> owning userns of BPF FS instance (super block) allows to use that userns
-> to constraint BPF token to that userns later on (see next patch). So
-> creating BPF FS with delegation inside unprivileged userns will restrict
-> derived BPF token objects to only "work" inside that intended userns,
-> making it scoped to a intended "container".
-> 
-> There is a set of selftests at the end of the patch set that simulates
-> this sequence of steps and validates that everything works as intended.
-> But careful review is requested to make sure there are no missed gaps in
-> the implementation and testing.
-> 
-> All this is based on suggestions and discussions with Christian Brauner
-> ([0]), to the best of my ability to follow all the implications.
+Breno Leitao <leitao@debian.org> writes:
 
-"who will not be held responsible for any CVE future or present as he's
- not sure whether bpf token is a good idea in general"
+> This is a Sphinx extension that parses the Netlink YAML spec files
+> (Documentation/netlink/specs/), and generates a rst file to be
+> displayed into Documentation pages.
+>
+> Create a new Documentation/networking/netlink_spec page, and a sub-page
+> for each Netlink spec that needs to be documented, such as ethtool,
+> devlink, netdev, etc.
+>
+> Create a Sphinx directive extension that reads the YAML spec
+> (located under Documentation/netlink/specs), parses it and returns a RST
+> string that is inserted where the Sphinx directive was called.
 
-I'm not opposing it because it's really not my subsystem. But it'd be
-nice if you also added a disclaimer that I'm not endorsing this. :)
+This is great! Looks like I need to fill in some missing docs in the
+specs I have contributed.
 
-A comment below.
+I wonder if the generated .rst content can be adjusted to improve the
+resulting HTML.
 
-> 
->   [0] https://lore.kernel.org/bpf/20230704-hochverdient-lehne-eeb9eeef785e@brauner/
-> 
-> Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> ---
->  include/linux/bpf.h | 10 ++++++
->  kernel/bpf/inode.c  | 88 +++++++++++++++++++++++++++++++++++++++------
->  2 files changed, 88 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index b4825d3cdb29..df50a7bf1a77 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -1562,6 +1562,16 @@ struct bpf_link_primer {
->  	u32 id;
->  };
->  
-> +struct bpf_mount_opts {
-> +	umode_t mode;
-> +
-> +	/* BPF token-related delegation options */
-> +	u64 delegate_cmds;
-> +	u64 delegate_maps;
-> +	u64 delegate_progs;
-> +	u64 delegate_attachs;
-> +};
-> +
->  struct bpf_struct_ops_value;
->  struct btf_member;
->  
-> diff --git a/kernel/bpf/inode.c b/kernel/bpf/inode.c
-> index 1aafb2ff2e95..e49e93bc65e3 100644
-> --- a/kernel/bpf/inode.c
-> +++ b/kernel/bpf/inode.c
-> @@ -20,6 +20,7 @@
->  #include <linux/filter.h>
->  #include <linux/bpf.h>
->  #include <linux/bpf_trace.h>
-> +#include <linux/kstrtox.h>
->  #include "preload/bpf_preload.h"
->  
->  enum bpf_type {
-> @@ -599,10 +600,31 @@ EXPORT_SYMBOL(bpf_prog_get_type_path);
->   */
->  static int bpf_show_options(struct seq_file *m, struct dentry *root)
->  {
-> +	struct bpf_mount_opts *opts = root->d_sb->s_fs_info;
->  	umode_t mode = d_inode(root)->i_mode & S_IALLUGO & ~S_ISVTX;
->  
->  	if (mode != S_IRWXUGO)
->  		seq_printf(m, ",mode=%o", mode);
-> +
-> +	if (opts->delegate_cmds == ~0ULL)
-> +		seq_printf(m, ",delegate_cmds=any");
-> +	else if (opts->delegate_cmds)
-> +		seq_printf(m, ",delegate_cmds=0x%llx", opts->delegate_cmds);
-> +
-> +	if (opts->delegate_maps == ~0ULL)
-> +		seq_printf(m, ",delegate_maps=any");
-> +	else if (opts->delegate_maps)
-> +		seq_printf(m, ",delegate_maps=0x%llx", opts->delegate_maps);
-> +
-> +	if (opts->delegate_progs == ~0ULL)
-> +		seq_printf(m, ",delegate_progs=any");
-> +	else if (opts->delegate_progs)
-> +		seq_printf(m, ",delegate_progs=0x%llx", opts->delegate_progs);
-> +
-> +	if (opts->delegate_attachs == ~0ULL)
-> +		seq_printf(m, ",delegate_attachs=any");
-> +	else if (opts->delegate_attachs)
-> +		seq_printf(m, ",delegate_attachs=0x%llx", opts->delegate_attachs);
->  	return 0;
->  }
->  
-> @@ -626,22 +648,27 @@ static const struct super_operations bpf_super_ops = {
->  
->  enum {
->  	OPT_MODE,
-> +	OPT_DELEGATE_CMDS,
-> +	OPT_DELEGATE_MAPS,
-> +	OPT_DELEGATE_PROGS,
-> +	OPT_DELEGATE_ATTACHS,
->  };
->  
->  static const struct fs_parameter_spec bpf_fs_parameters[] = {
->  	fsparam_u32oct	("mode",			OPT_MODE),
-> +	fsparam_string	("delegate_cmds",		OPT_DELEGATE_CMDS),
-> +	fsparam_string	("delegate_maps",		OPT_DELEGATE_MAPS),
-> +	fsparam_string	("delegate_progs",		OPT_DELEGATE_PROGS),
-> +	fsparam_string	("delegate_attachs",		OPT_DELEGATE_ATTACHS),
->  	{}
->  };
->  
-> -struct bpf_mount_opts {
-> -	umode_t mode;
-> -};
-> -
->  static int bpf_parse_param(struct fs_context *fc, struct fs_parameter *param)
->  {
-> -	struct bpf_mount_opts *opts = fc->fs_private;
-> +	struct bpf_mount_opts *opts = fc->s_fs_info;
->  	struct fs_parse_result result;
-> -	int opt;
-> +	int opt, err;
-> +	u64 msk;
->  
->  	opt = fs_parse(fc, bpf_fs_parameters, param, &result);
->  	if (opt < 0) {
-> @@ -665,6 +692,25 @@ static int bpf_parse_param(struct fs_context *fc, struct fs_parameter *param)
->  	case OPT_MODE:
->  		opts->mode = result.uint_32 & S_IALLUGO;
->  		break;
-> +	case OPT_DELEGATE_CMDS:
-> +	case OPT_DELEGATE_MAPS:
-> +	case OPT_DELEGATE_PROGS:
-> +	case OPT_DELEGATE_ATTACHS:
-> +		if (strcmp(param->string, "any") == 0) {
-> +			msk = ~0ULL;
-> +		} else {
-> +			err = kstrtou64(param->string, 0, &msk);
-> +			if (err)
-> +				return err;
-> +		}
-> +		switch (opt) {
-> +		case OPT_DELEGATE_CMDS: opts->delegate_cmds |= msk; break;
-> +		case OPT_DELEGATE_MAPS: opts->delegate_maps |= msk; break;
-> +		case OPT_DELEGATE_PROGS: opts->delegate_progs |= msk; break;
-> +		case OPT_DELEGATE_ATTACHS: opts->delegate_attachs |= msk; break;
-> +		default: return -EINVAL;
-> +		}
-> +		break;
->  	}
+There are a couple of places where paragraph text is indented and I
+don't think it needs to be, e.g. the 'Summary' doc.
 
-So just to repeat that this will allow a container to set it's own
-delegation options:
+A lot of the .rst content seems to be over-indented which causes
+blockquote tags to be generated in the HTML. That combined with a
+mixture of bullets and definition lists at the same indentation level
+seems to produce HTML with inconsistent indentation.
 
-        # unprivileged container
+I quickly hacked the diff below to see if it would improve the HTML
+rendering. I think the HTML has fewer odd constructs and the indentation
+seems better to my eye. My main aim was to ensure that for a given
+section, each indentation level uses the same construct, whether it be a
+definition list or a bullet list.
 
-        fd_fs = fsopen();
-        fsconfig(fd_fs, FSCONFIG_BLA_BLA, "give-me-all-the-delegation");
+It would be great to generate links from e.g. an attribute-set to its
+definition.
 
-        # Now hand of that fd_fs to a privileged process
+Did you intentionally leave out the protocol values?
 
-        fsconfig(fd_fs, FSCONFIG_CREATE_CMD, ...)
+It looks like parse_entries will need to be extended to include the type
+information for struct members, similar to how attribute sets are shown.
+I'd be happy to look at this as a follow up patch, unless you get there
+first. 
 
-This means the container manager can't be part of your threat model
-because you need to trust it to set delegation options.
+Thanks,
+Donald.
 
-But if the container manager is part of your threat model then you can
-never trust an fd_fs handed to you because the container manager might
-have enabled arbitrary delegation privileges.
+diff --git a/Documentation/sphinx/netlink_spec.py b/Documentation/sphinx/netlink_spec.py
+index 80756e72ed4f..66ba9106b4ea 100755
+--- a/Documentation/sphinx/netlink_spec.py
++++ b/Documentation/sphinx/netlink_spec.py
+@@ -92,7 +92,7 @@ def parse_mcast_group(mcast_group: List[Dict[str, Any]]) -> str:
+     """Parse 'multicast' group list and return a formatted string"""
+     lines = []
+     for group in mcast_group:
+-        lines.append(rst_paragraph(group["name"], 1))
++        lines.append(rst_bullet(group["name"]))
+ 
+     return "\n".join(lines)
+ 
+@@ -101,7 +101,7 @@ def parse_do(do_dict: Dict[str, Any], level: int = 0) -> str:
+     """Parse 'do' section and return a formatted string"""
+     lines = []
+     for key in do_dict.keys():
+-        lines.append(rst_bullet(bold(key), level + 1))
++        lines.append("     " + bold(key))
+         lines.append(parse_do_attributes(do_dict[key], level + 1) + "\n")
+ 
+     return "\n".join(lines)
+@@ -124,18 +124,19 @@ def parse_operations(operations: List[Dict[str, Any]]) -> str:
+     for operation in operations:
+         lines.append(rst_subsubtitle(operation["name"]))
+         lines.append(rst_paragraph(operation["doc"]) + "\n")
+-        if "do" in operation:
+-            lines.append(rst_paragraph(bold("do"), 1))
+-            lines.append(parse_do(operation["do"], 1))
+-        if "dump" in operation:
+-            lines.append(rst_paragraph(bold("dump"), 1))
+-            lines.append(parse_do(operation["dump"], 1))
+ 
+         for key in operation.keys():
+             if key in preprocessed:
+                 # Skip the special fields
+                 continue
+-            lines.append(rst_fields(key, operation[key], 1))
++            lines.append(rst_fields(key, operation[key], 0))
++
++        if "do" in operation:
++            lines.append(rst_paragraph(":do:", 0))
++            lines.append(parse_do(operation["do"], 0))
++        if "dump" in operation:
++            lines.append(rst_paragraph(":dump:", 0))
++            lines.append(parse_do(operation["dump"], 0))
+ 
+         # New line after fields
+         lines.append("\n")
+@@ -150,7 +151,7 @@ def parse_entries(entries: List[Dict[str, Any]], level: int) -> str:
+         if isinstance(entry, dict):
+             # entries could be a list or a dictionary
+             lines.append(
+-                rst_fields(entry.get("name"), sanitize(entry.get("doc")), level)
++                rst_fields(entry.get("name"), sanitize(entry.get("doc") or ""), level)
+             )
+         elif isinstance(entry, list):
+             lines.append(rst_list_inline(entry, level))
+@@ -172,16 +173,16 @@ def parse_definitions(defs: Dict[str, Any]) -> str:
+         for k in definition.keys():
+             if k in preprocessed + ignored:
+                 continue
+-            lines.append(rst_fields(k, sanitize(definition[k]), 1))
++            lines.append(rst_fields(k, sanitize(definition[k]), 0))
+ 
+         # Field list needs to finish with a new line
+         lines.append("\n")
+         if "entries" in definition:
+-            lines.append(rst_paragraph(bold("Entries"), 1))
+-            lines.append(parse_entries(definition["entries"], 2))
++            lines.append(rst_paragraph(":entries:", 0))
++            lines.append(parse_entries(definition["entries"], 1))
+         if "members" in definition:
+-            lines.append(rst_paragraph(bold("members"), 1))
+-            lines.append(parse_entries(definition["members"], 2))
++            lines.append(rst_paragraph(":members:", 0))
++            lines.append(parse_entries(definition["members"], 1))
+ 
+     return "\n".join(lines)
+ 
+@@ -201,12 +202,12 @@ def parse_attributes_set(entries: List[Dict[str, Any]]) -> str:
+                 # Add the attribute type in the same line
+                 attr_line += f" ({inline(type_)})"
+ 
+-            lines.append(rst_bullet(attr_line, 2))
++            lines.append(rst_bullet(attr_line, 1))
 
-There's ways around this:
-
-(1) kernel: Account for this in the kernel and require privileges when
-    setting delegation options.
-(2) userspace: A trusted helper that allocates an fs_context fd in
-    the target user namespace, then sets delegation options and creates
-    superblock.
-
-(1) Is more restrictive but also more secure. (2) is less restrictive
-but requires more care from userspace.
-
-Either way I would probably consider writing a document detailing
-various delegation scenarios and possible pitfalls and implications
-before advertising it.
-
-If you choose (2) then you also need to be aware that the security of
-this also hinges on bpffs not allowing to reconfigure parameters once it
-has been mounted. Otherwise an unprivileged container can change
-delegation options.
-
-I would recommend that you either add a dummy bpf_reconfigure() method
-with a comment in it or you add a comment on top of bpf_context_ops.
-Something like:
-
-/*
- * Unprivileged mounts of bpffs are owned by the user namespace they are
- * mounted in. That means unprivileged users can change vfs mount
- * options (ro<->rw, nosuid, etc.).
- *
- * They currently cannot change bpffs specific mount options such as
- * delegation settings. If that is ever implemented it is necessary to
- * require rivileges in the initial namespace. Otherwise unprivileged
- * users can change delegation options to whatever they want.
- */
+             for k in attr.keys():
+                 if k in preprocessed + ignored:
+                     continue
+-                lines.append(rst_fields(k, sanitize(attr[k]), 3))
++                lines.append(rst_fields(k, sanitize(attr[k]), 2))
+             lines.append("\n")
+ 
+     return "\n".join(lines)
+@@ -218,7 +219,7 @@ def parse_yaml(obj: Dict[str, Any]) -> str:
+ 
+     # This is coming from the RST
+     lines.append(rst_subtitle("Summary"))
+-    lines.append(rst_paragraph(obj["doc"], 1))
++    lines.append(rst_paragraph(obj["doc"], 0))
+ 
+     # Operations
+     lines.append(rst_subtitle("Operations"))
 
