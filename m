@@ -1,190 +1,509 @@
-Return-Path: <netdev+bounces-46930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34C87E7317
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:51:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5572D7E7323
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 22:00:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B8C1C209E7
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 20:51:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D9F4B20BDB
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F10E2FE2E;
-	Thu,  9 Nov 2023 20:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A50358B4;
+	Thu,  9 Nov 2023 21:00:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q2dCuSyd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fD1hWpg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9A7358B2
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 20:51:43 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20F9344A6;
-	Thu,  9 Nov 2023 12:51:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699563103; x=1731099103;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=qQL6ukIuR94B3PPT5+OT+gY4jBfxzMu1TIUCX0/43oI=;
-  b=Q2dCuSyd9K/1INZ3Irluil/KtTieQ3xkHHxlXPlaWURYKENlKpHb2L4T
-   7ei/0pis8VZlul+w5W1BlXNpyVDrCQmXilJkYg+QzG7iT3sqmljO7jhbW
-   gX/zH6GPdeZgSeARm5lhtCY1+9bo2kQ+hn9PHvHRO9HYb3dCnG7omLNH7
-   0Y13vJsl6k7qfzhVsB77vN9UTHZwt9wo4sGaUbgr0OK9ZaBE/hVp9vL9I
-   i46dWhEZgJL9eWwWlgwSpkoa46DG+Vj/H5B14E0+OMNRWL9Zwpy0Fanyh
-   Znza0bOTJ+QGGIFMZaoTQBhtSylv7sHykv5U6NYXxugAC7y1C9bgBxune
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="389877498"
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="389877498"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 12:51:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="4662111"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 12:51:41 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 12:51:42 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 12:51:42 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 9 Nov 2023 12:51:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kzig49iCWzuf5MJTu+xu1h46X6vbKe+NvlD9G5AIFkL/gpoWfkaYAfm9vqvz8DYHDeRdxj2p6wgMMLmrjM6aD4NndG1JGgKWkdwNzYHzHkQPxJIMwUCD9/V/kYxDePpPB7UPc1mvK3NU/nbFLpz7OjOzGHmI8k603L9idvZvFhwiwdlYFvo26MoOcuEDgfWzVbispWcLYsonfkoXcchlolsZUU5+5cyeynRqsn73UPQR4GIwCWNcq+17Piy+bFMGDwtbNZEzSHD8aUOwLxL1nSDDl4tV2dth7OILNRZQa26uEJKt8XdET3zDQEu0NqbMlf75ifEwhnCVw+SazffnSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EEpBpRmrsEZLyKzp6aQVCwG/m2zbL/7R30a8qO8TssA=;
- b=nWlEnpNfQr+Um1ZYcABTR/2KWIKm5hsf86WsCuGIilvk3S0OIELki5cAD63qtRNlc7riae2CiO7fIwdt01sUgQMy+54mXl/xrsGvSsCwJBBNbi976AVbCXC2miCy5WaVcGYDrcthX+DP0b0vauvHeWrNZPpU3K9A7/tgXAevrMDkHHwlVtdvdESkh7L2eE8cKZSLtc3YdKFgN7Ev7MUllgvxqdBoyd/efdjXpHgQgbX4R8WrqHhMoPZKqXhoIWCWYds91kKsPBmd9GOKjYYBLcY3jEYYyUDcY1NkFGMEGmDQki/7ZtDP8ugF9/JRdebkCKNWfBaQdHiSJo1OZ2QvOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by MN0PR11MB6206.namprd11.prod.outlook.com (2603:10b6:208:3c6::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 9 Nov
- 2023 20:51:40 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6%6]) with mapi id 15.20.6954.021; Thu, 9 Nov 2023
- 20:51:40 +0000
-From: Johnathan Mantey <johnathanx.mantey@intel.com>
-To: <netdev@vger.kernel.org>
-CC: <sam@mendozajonas.com>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <johnathanx.mantey@intel.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net v2] ncsi: Revert NCSI link loss/gain commit
-Date: Thu, 9 Nov 2023 12:51:37 -0800
-Message-ID: <20231109205137.819392-1-johnathanx.mantey@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9140347DF
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 21:00:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED92CC433C8;
+	Thu,  9 Nov 2023 21:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699563614;
+	bh=oIh278dcWNjBT0LI/g+XCy7IbgEEDqp4JdWUWTmbWyM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fD1hWpg9Jf42SkxaJPNzhHeq4FGL9+qkMsKrdtqJZPeEUUtBAtOvweKDNpHah4RrF
+	 3eWqAzUGMr3EFjeixz0j6/nMEeShOKFBh6u7MXw3o1kL3LQVZOn6gRgQurMQfi6poF
+	 Qz3kswyUzecij9Imt691R+vLP/+qu3DSx1G0tePeGcWK2PHXQGism7MfsTa38MGKOR
+	 luMpvwVV/y+TvnUV+ebI00RkvQIMeofwAa3fiz2BOnnpHtdY70edcrYJUONzHkHOhJ
+	 rjV04c9hefQbZEHRtzxVD7FiplrAdWUuOxRG2T8N7MBJrBahzbiQw3i0EJYYsTfmSt
+	 pvI7/XIvj6CjQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.7-rc1
+Date: Thu,  9 Nov 2023 13:00:13 -0800
+Message-ID: <20231109210013.1276858-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0230.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::25) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|MN0PR11MB6206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f0cda59-a0ca-467c-5ecf-08dbe165ac6a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ag5YqGwB8DzqjJxgVRGR6wIwMUrR7PpGwpMoVsCFaa1ynrudskx0cuvTrA2Winjp1MrkaKY9hoPRq23+xkKxp4k0eQ0IGUfPxwh31rtaxG4HkmKo1jUu1w7gH7w/Lzju835BVQhH4IEnr7EVHyNcYdnYcEuuBzcs0x1n3xIQV7DPn98BKDLQy2MvW2ywbtytuEIYvCt7MhjbWn4PEuiICHMM1+T1/RrFiYKKIeYq0VYFJjadSOD9AMcGN+P8Q8HkXzrHvmtrTJkhdYJ3JgLZAjSeEWPh8lE4oeEo6vKZvZWufI8lMUhnG0GeBCvO+9fISvR4iOE4M8H2scjHp+hZoevp/oG7tJZVaFG2x8H2LHIhS4gacmMqAGsH7eiTeGxPXm5s9WivIpc9dA3cDsdsJxeOHcBOblsFFLsDa1QWsj+UaJsrdBH/Zt/n+RhhWR5einQMQC8XlK7xSfl46aNZaVo7sZMbDCJ4Y1jhmfhAlOVN1OJ9T5q4rA11rggMS2IA9OEeTGlIoUU3t/Gm0Orug2JFAK58T5afjYcUkULVt+j+4QpgoamvMh8Oi+gdnC6b
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(376002)(366004)(346002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6916009)(26005)(1076003)(316002)(8936002)(8676002)(36756003)(6512007)(86362001)(6666004)(4326008)(2616005)(66946007)(6486002)(38100700002)(66556008)(66476007)(82960400001)(83380400001)(6506007)(5660300002)(478600001)(41300700001)(2906002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IlJNDy20XQ9EKhUg3MgaTvyGTebBDhnQP1D2mC1kEAnZDPMqt91MbAESzxi3?=
- =?us-ascii?Q?CKbrA7ObLmg5royRrupXJLp/qPHw4t7Y/Jt/sBlokrHmwE3SP1W8oX9pUp91?=
- =?us-ascii?Q?MKktn6h6AS6HnRN2QhyFEq06Vl0730zcLXCz1EBcjxc8Uo6PnUisSg1iCpDy?=
- =?us-ascii?Q?NqHCcJiTPeC8q9j1ghum+BqC3q9T6l1+Y3Bk129XM+mf3CFH02tURjEFEtrz?=
- =?us-ascii?Q?DsY14zSfhWy0Ta3O8xJ3RRWqwtRaLcQlipbCzAfODkTJ49QwIkZVHaeDbIRG?=
- =?us-ascii?Q?8cpz2f+HqmLC55J31nZ78+jYJVb78GyRzYwkXWx1ZHpt76+myd7U/3HKrdl2?=
- =?us-ascii?Q?uMkXL2/9LWCHJ6ZEGdfNlk3H1l8XvsVoJ4z6h1dzQZHRlRj/iIXNkkBCV12q?=
- =?us-ascii?Q?LAIufVcyNea/7Te/5Km0kyKJu5eObQnBPBiU/Ph00C7L8tM6seOPks4+zyTX?=
- =?us-ascii?Q?G4i+QStu6y+cDiJBzwRqBwl/NJxG/vChBJUedt9QJN1tm/yTsxzyKatHfHsA?=
- =?us-ascii?Q?RoD+yrar3R+KzaHypuaIuHgdcBJsNrIfe4gf3V9a1KdDzas4U9mQodoYZzRL?=
- =?us-ascii?Q?M+miNvTcQLSA2uEkigtN1O69MZxAC8BAEjn25tm5ofqWm4U5ah7+visKvBYJ?=
- =?us-ascii?Q?XF48TvIq8I5EG+05G9y2siya5o16Fpyw/0akUxxbMkn10sQ49wv1S4yahEgS?=
- =?us-ascii?Q?DVHRiWYWTrsNJ2SFQKUA54W1eGRK3mhcIpRzsEIWxtLyfAIUesvSp61LdjNy?=
- =?us-ascii?Q?Dulf3ORZKLf0fbuPIQdq2Kw9t7LcdzL+qSVHOznsSo9FCHjp7MOdiACt7Mqn?=
- =?us-ascii?Q?22RadryGs/1wCvCn4eWZOW//UUw0GzkzYOI4sEXJOpR/RxcODxkr/rXoF069?=
- =?us-ascii?Q?SbIc0bgtXftKI2gIdETLrMSH7hvMzthxn83DKpZIVvTs18SvYCdGpZY/KJMM?=
- =?us-ascii?Q?z7/rz5oiHEnG+Aaj9XYveqJww/RZGUnPbWLvw8Z1KbfFNnrRhXBMdYP0dqk0?=
- =?us-ascii?Q?wX1+d/r7tZXnN29+M1GAC9XDL0GS/7YoKp4iMBm1qdIF2EWE/30SnobSMwEJ?=
- =?us-ascii?Q?BR7ekfQrk7KbvIaCO9ymcOrhpwAX3Dpa+HHiifjwcm0pDSJvmqZFDSzGidHC?=
- =?us-ascii?Q?eqUVCsPE4f14OqcSUPk2kUwGU3uYg9TlrWN8NGRDLDZJyGHCkyYJZDkgYESg?=
- =?us-ascii?Q?v5FZLXY8qgc5pGwoR+MTRBKtkkFAAvwA9VjTCdxRGnmaBzWJQEcG7I7DxkiL?=
- =?us-ascii?Q?Ws3YHb1/LZGU8BI2OGSk8+TGh+EPOY7l36AnnCWZp3rPB+f1gR5RwEGZ6dAA?=
- =?us-ascii?Q?gQMp7P8cx993dIcJ8M+LDOCyvtQxlMEr/+gnggTyKrDa2YDgxZ2fJtwYb/lG?=
- =?us-ascii?Q?odORe+4EtzQPg8KKtlUtiGMt6WEmivYXKU57jC3phM3e+cgcJuPUtVsS+/XR?=
- =?us-ascii?Q?BK3Dk7GP4kVojKB2oH6zFE6x7uLQv6WH8gs5ciH9jDimU7I/3gh+RX0F4dtj?=
- =?us-ascii?Q?ew4ayL85bu32nerZku/J96rVG5OMpRiX20MyYF46gsxNISlthJJyj0U2Be8o?=
- =?us-ascii?Q?5fPCu7XOQAmW3NBMITDa1vAMyKnj1B6ijai21wrpAK3WYhw+f1EurVukhDcW?=
- =?us-ascii?Q?uw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f0cda59-a0ca-467c-5ecf-08dbe165ac6a
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 20:51:40.5905
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /DcClPHys8w+aMY/uCTrSM75k9dXmDov4/5AdalJVn0X23a6KHtCJPv6xO5x2rE1fWHl0tIHI4ui6Qj0Rac+PRRNsFd+lUF0QMjy7IwkE3Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6206
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The NCSI commit
-ncsi: Propagate carrier gain/loss events to the NCSI controller
-introduced unwanted behavior.
+Hi Linus!
 
-The intent for the commit was to be able to detect carrier loss/gain
-for just the NIC connected to the BMC. The unwanted effect is a
-carrier loss for auxiliary paths also causes the BMC to lose
-carrier. The BMC never regains carrier despite the secondary NIC
-regaining a link.
+The following changes since commit ff269e2cd5adce4ae14f883fc9c8803bc43ee1e9:
 
-This change, when merged, needs to be backported to stable kernels.
-5.4-stable, 5.10-stable, 5.15-stable, 6.1-stable, 6.5-stable
+  Merge tag 'net-next-6.7-followup' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-11-01 16:33:20 -1000)
 
-Fixes: 3780bb29311e ncsi: Propagate carrier gain/loss events to the
-CC: stable@vger.kernel.org
-Signed-off-by: Johnathan Mantey <johnathanx.mantey@intel.com>
----
- net/ncsi/ncsi-aen.c | 5 -----
- 1 file changed, 5 deletions(-)
+are available in the Git repository at:
 
-diff --git a/net/ncsi/ncsi-aen.c b/net/ncsi/ncsi-aen.c
-index f8854bff286c..62fb1031763d 100644
---- a/net/ncsi/ncsi-aen.c
-+++ b/net/ncsi/ncsi-aen.c
-@@ -89,11 +89,6 @@ static int ncsi_aen_handler_lsc(struct ncsi_dev_priv *ndp,
- 	if ((had_link == has_link) || chained)
- 		return 0;
- 
--	if (had_link)
--		netif_carrier_off(ndp->ndev.dev);
--	else
--		netif_carrier_on(ndp->ndev.dev);
--
- 	if (!ndp->multi_package && !nc->package->multi_channel) {
- 		if (had_link) {
- 			ndp->flags |= NCSI_DEV_RESHUFFLE;
--- 
-2.41.0
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc1
 
+for you to fetch changes up to 83b9dda8afa4e968d9cce253f390b01c0612a2a5:
+
+  net: ti: icss-iep: fix setting counter value (2023-11-09 13:15:40 +0100)
+
+----------------------------------------------------------------
+Including fixes from netfilter and bpf.
+
+Current release - regressions:
+
+ - sched: fix SKB_NOT_DROPPED_YET splat under debug config
+
+Current release - new code bugs:
+
+ - tcp: fix usec timestamps with TCP fastopen
+
+ - tcp_sigpool: fix some off by one bugs
+
+ - tcp: fix possible out-of-bounds reads in tcp_hash_fail()
+
+ - tcp: fix SYN option room calculation for TCP-AO
+
+ - bpf: fix compilation error without CGROUPS
+
+ - ptp:
+   - ptp_read() should not release queue
+   - fix tsevqs corruption
+
+Previous releases - regressions:
+
+ - llc: verify mac len before reading mac header
+
+Previous releases - always broken:
+
+ - bpf:
+   - fix check_stack_write_fixed_off() to correctly spill imm
+   - fix precision tracking for BPF_ALU | BPF_TO_BE | BPF_END
+   - check map->usercnt after timer->timer is assigned
+
+ - dsa: lan9303: consequently nested-lock physical MDIO
+
+ - dccp/tcp: call security_inet_conn_request() after setting IP addr
+
+ - tg3: fix the TX ring stall due to incorrect full ring handling
+
+ - phylink: initialize carrier state at creation
+
+ - ice: fix direction of VF rules in switchdev mode
+
+Misc:
+
+ - fill in a bunch of missing MODULE_DESCRIPTION()s, more to come
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Alex Pakhunov (1):
+      tg3: Fix the TX ring stall
+
+Alexander Sverdlin (1):
+      net: dsa: lan9303: consequently nested-lock physical MDIO
+
+Alexei Starovoitov (3):
+      Merge branch 'bpf-fix-incorrect-immediate-spill'
+      Merge branch 'relax-allowlist-for-open-coded-css_task-iter'
+      Merge branch 'bpf-fix-precision-tracking-for-bpf_alu-bpf_to_be-bpf_end'
+
+Andrew Lunn (3):
+      net: phy: fill in missing MODULE_DESCRIPTION()s
+      net: mdio: fill in missing MODULE_DESCRIPTION()s
+      net: ethtool: Fix documentation of ethtool_sprintf()
+
+Andrii Nakryiko (1):
+      selftests/bpf: fix test_maps' use of bpf_map_create_opts
+
+Aniruddha Paul (1):
+      ice: Fix VF-VF filter rules in switchdev mode
+
+Björn Töpel (1):
+      selftests/bpf: Fix broken build where char is unsigned
+
+Chuyi Zhou (5):
+      bpf: Relax allowlist for css_task iter
+      selftests/bpf: Add tests for css_task iter combining with cgroup iter
+      selftests/bpf: Add test for using css_task iter in sleepable progs
+      bpf: Let verifier consider {task,cgroup} is trusted in bpf_iter_reg
+      selftests/bpf: get trusted cgrp from bpf_iter__cgroup directly
+
+D. Wythe (3):
+      net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
+      net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
+      net/smc: put sk reference if close work was canceled
+
+Dan Carpenter (2):
+      hsr: Prevent use after free in prp_create_tagged_frame()
+      net/tcp_sigpool: Fix some off by one bugs
+
+Dave Ertman (1):
+      ice: Fix SRIOV LAG disable on non-compliant aggregate
+
+Dave Marchevsky (2):
+      bpf: Add __bpf_kfunc_{start,end}_defs macros
+      bpf: Add __bpf_hook_{start,end} macros
+
+David Howells (1):
+      rxrpc: Fix two connection reaping bugs
+
+David S. Miller (2):
+      Merge branch 'smc-fixes'
+      Merge branch 'vsock-fixes'
+
+Diogo Ivo (1):
+      net: ti: icss-iep: fix setting counter value
+
+Edward Adam Davis (2):
+      ptp: ptp_read should not release queue
+      ptp: fix corrupted list in ptp_open
+
+Eric Dumazet (5):
+      inet: shrink struct flowi_common
+      tcp: fix fastopen code vs usec TS
+      net/tcp: fix possible out-of-bounds reads in tcp_hash_fail()
+      idpf: fix potential use-after-free in idpf_tso()
+      net_sched: sch_fq: better validate TCA_FQ_WEIGHTS and TCA_FQ_PRIOMAP
+
+Filippo Storniolo (4):
+      vsock/virtio: remove socket from connected/bound list on shutdown
+      test/vsock fix: add missing check on socket creation
+      test/vsock: refactor vsock_accept
+      test/vsock: add dobule bind connect test
+
+Florian Westphal (3):
+      netfilter: add missing module descriptions
+      ipvs: add missing module descriptions
+      netfilter: nat: fix ipv6 nat redirect with mapped and scoped addresses
+
+Furong Xu (1):
+      net: stmmac: xgmac: Enable support for multiple Flexible PPS outputs
+
+Geetha sowjanya (1):
+      octeontx2-pf: Free pending and dropped SQEs
+
+George Shuklin (1):
+      tg3: power down device only on SYSTEM_POWER_OFF
+
+Gerd Bayer (1):
+      net/smc: fix documentation of buffer sizes
+
+Hangbin Liu (1):
+      selftests: pmtu.sh: fix result checking
+
+Hao Sun (2):
+      bpf: Fix check_stack_write_fixed_off() to correctly spill imm
+      selftests/bpf: Add test for immediate spilled to stack
+
+Heiner Kallweit (1):
+      r8169: respect userspace disabling IFF_MULTICAST
+
+Hou Tao (1):
+      bpf: Check map->usercnt after timer->timer is assigned
+
+Ivan Vecera (2):
+      i40e: Do not call devlink_port_type_clear()
+      i40e: Fix devlink port unregistering
+
+Jakub Kicinski (10):
+      Merge branch 'net-sched-fill-in-missing-module_descriptions-for-net-sched'
+      Merge branch 'add-missing-module_descriptions'
+      tools: ynl-gen: don't touch the output file if content is the same
+      netlink: fill in missing MODULE_DESCRIPTION()
+      nfsd: regenerate user space parsers after ynl-gen changes
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge tag 'nf-23-11-08' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+      net: kcm: fill in MODULE_DESCRIPTION()
+      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+
+Jamal Hadi Salim (1):
+      net, sched: Fix SKB_NOT_DROPPED_YET splat under debug config
+
+Jian Shen (1):
+      net: page_pool: add missing free_percpu when page_pool_init fail
+
+Jiri Pirko (1):
+      netlink: specs: devlink: add forgotten port function caps enum values
+
+Klaus Kudielka (1):
+      net: phylink: initialize carrier state at creation
+
+Kuan-Wei Chiu (1):
+      s390/qeth: Fix typo 'weed' in comment
+
+Kuniyuki Iwashima (3):
+      dccp: Call security_inet_conn_request() after setting IPv4 addresses.
+      dccp/tcp: Call security_inet_conn_request() after setting IPv6 addresses.
+      tcp: Fix SYN option room calculation for TCP-AO.
+
+Linus Walleij (1):
+      net: xscale: Drop unused PHY number
+
+Maciej Żenczykowski (1):
+      netfilter: xt_recent: fix (increase) ipv6 literal buffer length
+
+Manu Bretelle (1):
+      selftests/bpf: fix test_bpffs
+
+Marcin Szycik (1):
+      ice: Fix VF-VF direction matching in drop rule in switchdev
+
+Martin KaFai Lau (1):
+      Merge branch 'Let BPF verifier consider {task,cgroup} is trusted in bpf_iter_reg'
+
+Matthieu Baerts (1):
+      bpf: fix compilation error without CGROUPS
+
+Michal Schmidt (1):
+      ice: lag: in RCU, use atomic allocation
+
+Nathan Chancellor (1):
+      tcp: Fix -Wc23-extensions in tcp_options_write()
+
+NeilBrown (1):
+      Fix termination state for idr_for_each_entry_ul()
+
+Pablo Neira Ayuso (1):
+      netfilter: nf_tables: remove catchall element in GC sync path
+
+Paolo Abeni (1):
+      Merge branch 'dccp-tcp-relocate-security_inet_conn_request'
+
+Patrick Thompson (1):
+      net: r8169: Disable multicast filter for RTL8168H and RTL8107E
+
+Philipp Stanner (1):
+      drivers/net/ppp: use standard array-copy-function
+
+Ratheesh Kannoth (2):
+      octeontx2-pf: Fix error codes
+      octeontx2-pf: Fix holes in error code
+
+Ronald Wahl (1):
+      net: ethernet: ti: am65-cpsw: rx_pause/tx_pause controls wrong direction
+
+Shigeru Yoshida (2):
+      tipc: Change nla_policy for bearer-related names to NLA_NUL_STRING
+      virtio/vsock: Fix uninit-value in virtio_transport_recv_pkt()
+
+Shung-Hsi Yu (2):
+      bpf: Fix precision tracking for BPF_ALU | BPF_TO_BE | BPF_END
+      selftests/bpf: precision tracking test for BPF_NEG and BPF_END
+
+Victor Nogueira (3):
+      net: sched: Fill in MODULE_DESCRIPTION for act_gate
+      net: sched: Fill in missing MODULE_DESCRIPTION for classifiers
+      net: sched: Fill in missing MODULE_DESCRIPTION for qdiscs
+
+Vlad Buslov (1):
+      net/sched: act_ct: Always fill offloading tuple iifidx
+
+Vladimir Oltean (1):
+      net: enetc: shorten enetc_setup_xdp_prog() error message to fit NETLINK_MAX_FMTMSG_LEN
+
+Willem de Bruijn (1):
+      llc: verify mac len before reading mac header
+
+ Documentation/bpf/kfuncs.rst                       |   6 +-
+ Documentation/netlink/specs/devlink.yaml           |   4 +
+ Documentation/networking/smc-sysctl.rst            |   6 +-
+ drivers/net/dsa/lan9303_mdio.c                     |   4 +-
+ drivers/net/ethernet/broadcom/tg3.c                |  56 +++++++---
+ drivers/net/ethernet/freescale/enetc/enetc.c       |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_devlink.c     |   1 -
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |  10 +-
+ drivers/net/ethernet/intel/ice/ice_lag.c           |  18 ++--
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c        | 114 +++++++++++++++-----
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        |   6 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   |  15 +--
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h   |   1 +
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  81 ++++++++------
+ .../ethernet/marvell/octeontx2/nic/otx2_struct.h   |  34 +++---
+ .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  42 ++++++++
+ drivers/net/ethernet/realtek/r8169_main.c          |   6 +-
+ drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h     |   2 +-
+ .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  14 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c           |   4 +-
+ drivers/net/ethernet/ti/icssg/icss_iep.c           |   2 +-
+ drivers/net/ethernet/xscale/ixp4xx_eth.c           |   3 +-
+ drivers/net/mdio/acpi_mdio.c                       |   1 +
+ drivers/net/mdio/fwnode_mdio.c                     |   1 +
+ drivers/net/mdio/mdio-aspeed.c                     |   1 +
+ drivers/net/mdio/mdio-bitbang.c                    |   1 +
+ drivers/net/mdio/of_mdio.c                         |   1 +
+ drivers/net/phy/bcm-phy-ptp.c                      |   1 +
+ drivers/net/phy/bcm87xx.c                          |   1 +
+ drivers/net/phy/phylink.c                          |   2 +
+ drivers/net/phy/sfp.c                              |   1 +
+ drivers/net/ppp/ppp_generic.c                      |   4 +-
+ drivers/ptp/ptp_chardev.c                          |  23 ++--
+ drivers/ptp/ptp_clock.c                            |   8 +-
+ drivers/ptp/ptp_private.h                          |   1 +
+ drivers/s390/net/qeth_core_main.c                  |   2 +-
+ include/linux/btf.h                                |  11 ++
+ include/linux/ethtool.h                            |   4 +-
+ include/linux/idr.h                                |   6 +-
+ include/linux/tcp.h                                |   2 +-
+ include/net/flow.h                                 |   2 +-
+ include/net/netfilter/nf_conntrack_act_ct.h        |  34 +++---
+ include/net/tcp_ao.h                               |  13 +--
+ include/uapi/linux/nfsd_netlink.h                  |   6 +-
+ kernel/bpf/bpf_iter.c                              |   6 +-
+ kernel/bpf/cgroup_iter.c                           |   8 +-
+ kernel/bpf/cpumask.c                               |   6 +-
+ kernel/bpf/helpers.c                               |  39 ++++---
+ kernel/bpf/map_iter.c                              |   6 +-
+ kernel/bpf/task_iter.c                             |  24 ++---
+ kernel/bpf/verifier.c                              |  33 ++++--
+ kernel/cgroup/rstat.c                              |   9 +-
+ kernel/trace/bpf_trace.c                           |   6 +-
+ net/bpf/test_run.c                                 |   7 +-
+ net/bridge/netfilter/ebtable_broute.c              |   1 +
+ net/bridge/netfilter/ebtable_filter.c              |   1 +
+ net/bridge/netfilter/ebtable_nat.c                 |   1 +
+ net/bridge/netfilter/ebtables.c                    |   1 +
+ net/bridge/netfilter/nf_conntrack_bridge.c         |   1 +
+ net/core/filter.c                                  |  13 +--
+ net/core/page_pool.c                               |   6 +-
+ net/core/xdp.c                                     |   6 +-
+ net/dccp/ipv4.c                                    |   6 +-
+ net/dccp/ipv6.c                                    |   6 +-
+ net/devlink/netlink_gen.c                          |   2 +-
+ net/hsr/hsr_forward.c                              |   4 +-
+ net/ipv4/fou_bpf.c                                 |   6 +-
+ net/ipv4/netfilter/iptable_nat.c                   |   1 +
+ net/ipv4/netfilter/iptable_raw.c                   |   1 +
+ net/ipv4/netfilter/nf_defrag_ipv4.c                |   1 +
+ net/ipv4/netfilter/nf_reject_ipv4.c                |   1 +
+ net/ipv4/syncookies.c                              |   2 +-
+ net/ipv4/tcp_ao.c                                  |   5 +-
+ net/ipv4/tcp_input.c                               |   7 +-
+ net/ipv4/tcp_output.c                              |  72 +++++++------
+ net/ipv4/tcp_sigpool.c                             |   8 +-
+ net/ipv6/netfilter/ip6table_nat.c                  |   1 +
+ net/ipv6/netfilter/ip6table_raw.c                  |   1 +
+ net/ipv6/netfilter/nf_defrag_ipv6_hooks.c          |   1 +
+ net/ipv6/netfilter/nf_reject_ipv6.c                |   1 +
+ net/ipv6/syncookies.c                              |   7 +-
+ net/kcm/kcmsock.c                                  |   1 +
+ net/llc/llc_input.c                                |  10 +-
+ net/llc/llc_s_ac.c                                 |   3 +
+ net/llc/llc_station.c                              |   3 +
+ net/netfilter/ipvs/ip_vs_core.c                    |   1 +
+ net/netfilter/ipvs/ip_vs_dh.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_fo.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_ftp.c                     |   1 +
+ net/netfilter/ipvs/ip_vs_lblc.c                    |   1 +
+ net/netfilter/ipvs/ip_vs_lblcr.c                   |   1 +
+ net/netfilter/ipvs/ip_vs_lc.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_nq.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_ovf.c                     |   1 +
+ net/netfilter/ipvs/ip_vs_pe_sip.c                  |   1 +
+ net/netfilter/ipvs/ip_vs_rr.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_sed.c                     |   1 +
+ net/netfilter/ipvs/ip_vs_sh.c                      |   1 +
+ net/netfilter/ipvs/ip_vs_twos.c                    |   1 +
+ net/netfilter/ipvs/ip_vs_wlc.c                     |   1 +
+ net/netfilter/ipvs/ip_vs_wrr.c                     |   1 +
+ net/netfilter/nf_conntrack_bpf.c                   |   6 +-
+ net/netfilter/nf_conntrack_broadcast.c             |   1 +
+ net/netfilter/nf_conntrack_netlink.c               |   1 +
+ net/netfilter/nf_conntrack_proto.c                 |   1 +
+ net/netfilter/nf_nat_bpf.c                         |   6 +-
+ net/netfilter/nf_nat_core.c                        |   1 +
+ net/netfilter/nf_nat_redirect.c                    |  27 ++++-
+ net/netfilter/nf_tables_api.c                      |  23 +++-
+ net/netfilter/nfnetlink_osf.c                      |   1 +
+ net/netfilter/nft_chain_nat.c                      |   1 +
+ net/netfilter/nft_fib.c                            |   1 +
+ net/netfilter/nft_fwd_netdev.c                     |   1 +
+ net/netfilter/xt_recent.c                          |   2 +-
+ net/netlink/diag.c                                 |   1 +
+ net/openvswitch/conntrack.c                        |   2 +-
+ net/rxrpc/conn_object.c                            |   2 +-
+ net/rxrpc/local_object.c                           |   2 +-
+ net/sched/act_api.c                                |   2 +-
+ net/sched/act_ct.c                                 |  15 ++-
+ net/sched/act_gate.c                               |   1 +
+ net/sched/cls_api.c                                |   9 +-
+ net/sched/cls_basic.c                              |   1 +
+ net/sched/cls_cgroup.c                             |   1 +
+ net/sched/cls_fw.c                                 |   1 +
+ net/sched/cls_route.c                              |   1 +
+ net/sched/cls_u32.c                                |   1 +
+ net/sched/sch_cbs.c                                |   1 +
+ net/sched/sch_choke.c                              |   1 +
+ net/sched/sch_drr.c                                |   1 +
+ net/sched/sch_etf.c                                |   1 +
+ net/sched/sch_ets.c                                |   1 +
+ net/sched/sch_fifo.c                               |   1 +
+ net/sched/sch_fq.c                                 |  10 +-
+ net/sched/sch_gred.c                               |   1 +
+ net/sched/sch_hfsc.c                               |   1 +
+ net/sched/sch_htb.c                                |   1 +
+ net/sched/sch_ingress.c                            |   1 +
+ net/sched/sch_mqprio.c                             |   1 +
+ net/sched/sch_mqprio_lib.c                         |   1 +
+ net/sched/sch_multiq.c                             |   1 +
+ net/sched/sch_netem.c                              |   1 +
+ net/sched/sch_plug.c                               |   1 +
+ net/sched/sch_prio.c                               |   1 +
+ net/sched/sch_qfq.c                                |   1 +
+ net/sched/sch_red.c                                |   1 +
+ net/sched/sch_sfq.c                                |   1 +
+ net/sched/sch_skbprio.c                            |   1 +
+ net/sched/sch_taprio.c                             |   1 +
+ net/sched/sch_tbf.c                                |   1 +
+ net/sched/sch_teql.c                               |   1 +
+ net/smc/af_smc.c                                   |   4 +-
+ net/smc/smc.h                                      |   5 +
+ net/smc/smc_cdc.c                                  |  11 +-
+ net/smc/smc_close.c                                |   5 +-
+ net/socket.c                                       |   8 +-
+ net/tipc/netlink.c                                 |   4 +-
+ net/vmw_vsock/virtio_transport_common.c            |  18 +++-
+ net/xfrm/xfrm_interface_bpf.c                      |   6 +-
+ tools/net/ynl/generated/devlink-user.c             |   2 +
+ tools/net/ynl/generated/nfsd-user.c                | 120 +++++++++++++++++++--
+ tools/net/ynl/generated/nfsd-user.h                |  44 +++++++-
+ tools/net/ynl/ynl-gen-c.py                         |   7 +-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c        |   6 +-
+ .../selftests/bpf/map_tests/map_percpu_stats.c     |  20 +---
+ .../testing/selftests/bpf/prog_tests/cgroup_iter.c |  33 ++++++
+ tools/testing/selftests/bpf/prog_tests/iters.c     |   1 +
+ .../testing/selftests/bpf/prog_tests/test_bpffs.c  |  11 +-
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
+ tools/testing/selftests/bpf/progs/iters_css_task.c |  55 ++++++++++
+ .../selftests/bpf/progs/iters_task_failure.c       |   4 +-
+ .../selftests/bpf/progs/verifier_precision.c       |  93 ++++++++++++++++
+ tools/testing/selftests/bpf/verifier/bpf_st_mem.c  |  32 ++++++
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |   2 +-
+ tools/testing/selftests/net/pmtu.sh                |   2 +-
+ tools/testing/vsock/util.c                         |  87 ++++++++++++---
+ tools/testing/vsock/util.h                         |   3 +
+ tools/testing/vsock/vsock_test.c                   |  50 +++++++++
+ 178 files changed, 1242 insertions(+), 434 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_precision.c
 
