@@ -1,175 +1,141 @@
-Return-Path: <netdev+bounces-46773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FB347E655C
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:33:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 551C97E655E
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:34:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F096C281595
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:33:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10C891F214F0
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F59EC0;
-	Thu,  9 Nov 2023 08:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IGAKGGLr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ECB1EC0;
+	Thu,  9 Nov 2023 08:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0367010A19
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:33:01 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A524210A;
-	Thu,  9 Nov 2023 00:33:01 -0800 (PST)
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A98BCFh007178;
-	Thu, 9 Nov 2023 08:32:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=J6ZXmXXTgg+b2E438QEG2x0HVhaMiR1kvgY0atBWADs=;
- b=IGAKGGLrU3HdhW5LESkobIIuXrWyW7F+/p+v0AqMXHDlgioCfVEHoId0JayRjNTGXSPF
- BitqffYliwVNydHeqa3Vhs8GWD1BfSSX7ROIksCrUbCrrKp6Uxha6QslW01RoR/bSmIL
- usY4rMZ87c58GVtNPTPm1p3WB4AVPrKVtIBmIelPJM2OG0m4OFv9n+tUxhu6PWUYtdgo
- NV2Y9ri1KD+fLghOxnR5OgKN+wLo13e+j8JY9K7HxKHJbsq3xFW1mggwDjKPHMAwmGES
- QvKS29eHsylQsfyzOEtW10YPiT1Q8GcORaSTZtNIdlfVID+moHhaD0P2JT8B6ELHmHoV 4g== 
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u8upj01pg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Nov 2023 08:32:42 +0000
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3A98Wg3t023168
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 9 Nov 2023 08:32:42 GMT
-Received: from [10.253.38.48] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 9 Nov
- 2023 00:32:39 -0800
-Message-ID: <423a3ee3-bed5-02f9-f872-7b5dba64f994@quicinc.com>
-Date: Thu, 9 Nov 2023 16:32:36 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A8F10A07
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:34:20 +0000 (UTC)
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1396D273E
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:34:18 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw01fIT_1699518853;
+Received: from 30.221.148.83(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vw01fIT_1699518853)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Nov 2023 16:34:14 +0800
+Message-ID: <4ed04b2e-b4be-4841-8484-7e7087cc90f4@linux.alibaba.com>
+Date: Thu, 9 Nov 2023 16:34:11 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy support
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20231108113445.24825-1-quic_luoj@quicinc.com>
- <20231108113445.24825-2-quic_luoj@quicinc.com>
- <20231108131250.66d1c236@fedora>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231108131250.66d1c236@fedora>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: SUFP3CfsgJq4mSAR1vWU3KIJhD8RH9TB
-X-Proofpoint-ORIG-GUID: SUFP3CfsgJq4mSAR1vWU3KIJhD8RH9TB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-09_07,2023-11-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
- bulkscore=0 malwarescore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0
- impostorscore=0 adultscore=0 priorityscore=1501 mlxlogscore=936
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311090068
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/5] virtio-net: return -EOPNOTSUPP for
+ adaptive-tx
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Simon Horman <horms@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, "Liu, Yujie" <yujie.liu@intel.com>
+References: <cover.1698929590.git.hengqi@linux.alibaba.com>
+ <4d57c072ca7d12034a1be4d9284e2be5988e1330.1698929590.git.hengqi@linux.alibaba.com>
+ <CACGkMEt23Xm=dpwJMwX9dnwVjmQZqBp0SBxnpY19fgc=xMpcjA@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEt23Xm=dpwJMwX9dnwVjmQZqBp0SBxnpY19fgc=xMpcjA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-On 11/8/2023 8:12 PM, Maxime Chevallier wrote:
-> Hello,
-> 
-> On Wed, 8 Nov 2023 19:34:43 +0800
-> Luo Jie <quic_luoj@quicinc.com> wrote:
-> 
->> Add qca8084 PHY support, which is four-port PHY with maximum
->> link capability 2.5G, the features of each port is almost same
->> as QCA8081 and slave seed config is not needed.
+在 2023/11/9 下午12:45, Jason Wang 写道:
+> On Thu, Nov 2, 2023 at 9:10 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>> We do not currently support tx dim, so respond to -EOPNOTSUPP.
 >>
->> Three kind of interface modes supported by qca8084.
->> PHY_INTERFACE_MODE_QUSGMII, PHY_INTERFACE_MODE_2500BASEX and
->> PHY_INTERFACE_MODE_SGMII.
->>
->> The PCS(serdes) and clock are also needed to be configured to
->> bringup qca8084 PHY, which will be added in the pcs driver.
->>
->> The additional CDT configurations used for qca8084.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 >> ---
->>   drivers/net/phy/at803x.c | 48 ++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 48 insertions(+)
-> 
-> [...]
-> 
->> @@ -1824,6 +1828,21 @@ static int qca808x_read_status(struct phy_device *phydev)
->>   		return ret;
->>   
->>   	if (phydev->link) {
->> +		/* There are two PCSs available for QCA8084, which support the following
->> +		 * interface modes.
->> +		 *
->> +		 * 1. PHY_INTERFACE_MODE_QUSGMII utilizes PCS1 for all available 4 ports,
->> +		 * which is for all link speeds.
->> +		 *
->> +		 * 2. PHY_INTERFACE_MODE_2500BASEX utilizes PCS0 for the fourth port,
->> +		 * which is only for the link speed 2500M same as QCA8081.
->> +		 *
->> +		 * 3. PHY_INTERFACE_MODE_SGMII utilizes PCS0 for the fourth port,
->> +		 * which is for the link speed 10M, 100M and 1000M same as QCA8081.
->> +		 */
->> +		if (phydev->interface == PHY_INTERFACE_MODE_QUSGMII)
->> +			return 0;
+>> v1->v2:
+>> - Use -EOPNOTSUPP instead of specific implementation.
+>>
+>>   drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++---
+>>   1 file changed, 26 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 5473aa1ee5cd..03edeadd0725 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -3364,9 +3364,15 @@ static int virtnet_get_link_ksettings(struct net_device *dev,
+>>   static int virtnet_send_tx_notf_coal_cmds(struct virtnet_info *vi,
+>>                                            struct ethtool_coalesce *ec)
+>>   {
+>> +       bool tx_ctrl_dim_on = !!ec->use_adaptive_tx_coalesce;
+>>          struct scatterlist sgs_tx;
+>>          int i;
+>>
+>> +       if (tx_ctrl_dim_on) {
+>> +               pr_debug("Failed to enable adaptive-tx, which is not supported\n");
+>> +               return -EOPNOTSUPP;
+>> +       }
+> When can we hit this?
+
+When user tries to enable tx dim using following cmd:
+'ethtool -C eth0 adaptive-tx on'
+
+Thanks!
+
+>
+> Thanks
+>
 >> +
-> 
-> What I understand from this is that this PHY can be used either as a
-> switch, in which case port 4 would be connected to the host interface
-> at up to 2.5G, or as a quad-phy, but since it uses QUSGMII the link
-> speed would be limited to 1G per-port, is that correct ?
+>>          vi->ctrl->coal_tx.tx_usecs = cpu_to_le32(ec->tx_coalesce_usecs);
+>>          vi->ctrl->coal_tx.tx_max_packets = cpu_to_le32(ec->tx_max_coalesced_frames);
+>>          sg_init_one(&sgs_tx, &vi->ctrl->coal_tx, sizeof(vi->ctrl->coal_tx));
+>> @@ -3497,6 +3503,25 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
+>>          return 0;
+>>   }
+>>
+>> +static int virtnet_send_tx_notf_coal_vq_cmds(struct virtnet_info *vi,
+>> +                                            struct ethtool_coalesce *ec,
+>> +                                            u16 queue)
+>> +{
+>> +       bool tx_ctrl_dim_on = !!ec->use_adaptive_tx_coalesce;
+>> +       int err;
+>> +
+>> +       if (tx_ctrl_dim_on) {
+>> +               pr_debug("Enabling adaptive-tx for txq%d is not supported\n", queue);
+>> +               return -EOPNOTSUPP;
+>> +       }
+>> +
+>> +       err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, queue,
+>> +                                              ec->tx_coalesce_usecs,
+>> +                                              ec->tx_max_coalesced_frames);
+>> +
+>> +       return err;
+>> +}
+>> +
+>>   static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+>>                                            struct ethtool_coalesce *ec,
+>>                                            u16 queue)
+>> @@ -3507,9 +3532,7 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
+>>          if (err)
+>>                  return err;
+>>
+>> -       err = virtnet_send_tx_ctrl_coal_vq_cmd(vi, queue,
+>> -                                              ec->tx_coalesce_usecs,
+>> -                                              ec->tx_max_coalesced_frames);
+>> +       err = virtnet_send_tx_notf_coal_vq_cmds(vi, ec, queue);
+>>          if (err)
+>>                  return err;
+>>
+>> --
+>> 2.19.1.6.gb485710b
+>>
 
-When the PHY works on the interface mode QUSGMII for quad-phy, all 4
-PHYs can support to the max link speed 2.5G, actually the PHY can
-support to max link speed 2.5G for all supported interface modes
-including qusgmii and sgmii.
-
-> 
-> However the get_features function seems to build the supported modes
-> set by reading some capabilities registers :
-> 
-> static int qca808x_get_features(struct phy_device *phydev)
-> {
-> [...]
-> 	ret = phy_read_mmd(phydev, MDIO_MMD_AN, QCA808X_PHY_MMD7_CHIP_TYPE);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	if (QCA808X_PHY_CHIP_TYPE_1G & ret)
-> 		linkmode_clear_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
-> [...]
-> }
-> 
-> Wouldn't port 4 report 2.5G capabilities then ? Maybe you need to
-> mask-out the 2.5G bit if the interface is qusgmii.
-> 
-> Best regards,
-> 
-> Maxime
-
-All ports including port4 support 2.5G capability for the supported
-interface mode.
-
-Thanks Maxime for the review.
 
