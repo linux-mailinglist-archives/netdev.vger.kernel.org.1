@@ -1,157 +1,210 @@
-Return-Path: <netdev+bounces-46841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 916C17E6A37
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:01:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E1787E6A53
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DB901C20DF8
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:01:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A314B20BA1
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5801CF83;
-	Thu,  9 Nov 2023 12:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CCF1865E;
+	Thu,  9 Nov 2023 12:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="kf7qqfBm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCj/3aw3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB582134DB
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:01:34 +0000 (UTC)
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2048.outbound.protection.outlook.com [40.107.15.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D9612102;
-	Thu,  9 Nov 2023 04:01:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ABznZXwPPOTKssBzQ9YewdKbeOaQzPnkKuGdhyQJdFhF0u5cISTcE7yPB0T0eecOdXL81iAddnIJDpNl6dTNhdPkQsahb30Glfi9SoiAb+UqY6XUeDEmfz9+Gy6j0d2zhxFnXRYhdLD0Op7jY5HEQG9LwYZLX8+/Ucuk1Q95jOb5eE1Qexfc9wmPKG+GneBfzV/lDG9r3bagE0UfCFpvVSnuGwtwFWez5fnzOUlF0RsBkxzkMVGantN9dbnpjbNm6CNhB96Pyn56G47Kl8gIGI6KraJn8ZhN3nPPxbz9S3mqaDBm4ZYPQdxTx1JIpbEkdNZDdcNqFN+PiYLNjqUh1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zoIsXpCOhjyy1Pq1jKs4CyOChMqg84s9YLkpMkC6dCM=;
- b=kK8HDK6FkuMckP/fJj2m9QhyDnttNxheuKL1buBkU3Ha1T65wik5y9cr0ZBxk/USx3hQX/2RbN+tR1tqlWyOivI55fMTB0i8ObMXLY1ZxFu3UVF20GOrltzRT2SH1FNQ2MhSIUR4hJVVsXNNjHAmWiAKG9SNL+8isak42judqYE4ovqqh0F7C+KlTy5tCZUhyeWPxNzNJ9O6/q0r2M8yHe3w1gKD/Mp8ZU+XLCQR+qwpQNDMSfIfHaESumhrTwaPcNy46u68HBOIHJOYO9KwMV78hgw6+bWc+x0iay/r/x+rOb+HyOq0uHBX0eT1IToseB4A1nEYPxb2zIE7a1DGgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zoIsXpCOhjyy1Pq1jKs4CyOChMqg84s9YLkpMkC6dCM=;
- b=kf7qqfBmZQi5MUsQHLNWd5UVwky9aV8aYiEh5BPbutoWg1A3dopRFfHb4pIoggqZgWGfo5Ak6Q83RPfbS9EYwSRZot1mSU2pMynLQy0oGbwH1EAceNFLbgnSQR4oLc3Nf+U7xhJ7A6EDW6P+0c6N4i3U0dCZErI5wS7/olG5w3s=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBBPR04MB7721.eurprd04.prod.outlook.com (2603:10a6:10:1f6::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Thu, 9 Nov
- 2023 12:01:30 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
- 12:01:30 +0000
-Date: Thu, 9 Nov 2023 14:01:26 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF3E1CF93
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:06:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84892102
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 04:06:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699531583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HczSlh6k8idx0RX4fYohX/UOTD9Fux3MDTZW+Rddgqc=;
+	b=bCj/3aw3VmEPr0MhxE/BxjR1tErAoNWabW7vv6a6x1mEOHPWYQURR273XyLnLSCjsYasl5
+	BPdABoOH3JITMjLL7b9z11rJ+1TKRyaqcqnjwMGqn9chnk7MgfVCTG1hS3Y5PQpzbotFW8
+	Qe0JMfzVQUzA6+lyS/1vKwwnEK3k+ss=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492-Z3rgfxWVOcuqG2y-tuN9kg-1; Thu, 09 Nov 2023 07:06:21 -0500
+X-MC-Unique: Z3rgfxWVOcuqG2y-tuN9kg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9d30a6a67abso60940666b.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 04:06:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699531580; x=1700136380;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HczSlh6k8idx0RX4fYohX/UOTD9Fux3MDTZW+Rddgqc=;
+        b=luQKQ1gBUGul+6Fkn94vejjLyJYaAGNoEuoEu8w4C0IWaUn2kfQvr24Yb1I8BEMIes
+         8QlpWZiJU/vPJB7i/KKvWRy8RvUQ34BkEmpHGYTZYsdRFmIs+kH5gp0cPQYQ/h6lM8qP
+         /Pg/pbuvM538mQOZdo65IX9a27wsqVRT8eld/lH0zk/ORP5we7AJ/5b0X3d3lfiaurgz
+         tajYzp5j/tEHcI0ebrDiKT0Yd090Lzamzs25puk9knS8zLj+3O8xNV5JTSMorfgVioLG
+         GDlYLYPauyysWO0ZPDqZF/VdfZZC6dWRAFvss1cHXS9q8NWw/Uh6GC7gO4DCJTHe1C3X
+         Na2g==
+X-Gm-Message-State: AOJu0YyeP4bHGuz+2CNhNWgsaL5nXWn6Hq/cj5ygRkYm/+gmFELMyy9T
+	CKUgrqAGy0pIIxui3bHxVe4Wotwcu+XqyzxnnmOamVsibcQ2FslHdoSlpBEzzUtCXhqJCwqSIYS
+	tgV2OpQv4yxoJZhqp
+X-Received: by 2002:a17:907:944d:b0:9df:e39d:e0ed with SMTP id dl13-20020a170907944d00b009dfe39de0edmr3980257ejc.24.1699531580644;
+        Thu, 09 Nov 2023 04:06:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG3c9N8uienSCMFMaSNgRUsN1RMqRrgawzGF8dpQ3zGGTRC3h7IvBxqjNXqZRtJc9Uth6kwTw==
+X-Received: by 2002:a17:907:944d:b0:9df:e39d:e0ed with SMTP id dl13-20020a170907944d00b009dfe39de0edmr3980236ejc.24.1699531580310;
+        Thu, 09 Nov 2023 04:06:20 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f4:2044:be5a:328c:4b98:1420])
+        by smtp.gmail.com with ESMTPSA id x25-20020a1709065ad900b009ae587ce128sm2447121ejs.216.2023.11.09.04.06.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 04:06:19 -0800 (PST)
+Date: Thu, 9 Nov 2023 07:06:16 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 4/7] net/sched: taprio: get corrected value of
- cycle_time and interval
-Message-ID: <20231109120126.75vxgrcdjusfr54y@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: VI1PR0502CA0021.eurprd05.prod.outlook.com
- (2603:10a6:803:1::34) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH net] virtio_net: fix missing dma unmap for resize
+Message-ID: <20231109070359-mutt-send-email-mst@kernel.org>
+References: <20231106081832.668-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7721:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21b1f746-d527-4b33-ae38-08dbe11b9bf5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	wOlgdfz7fVzMNsqBJRCuxOrsn8AZchnK90HjgOXtU2i/ez4aYslo8dc4yNIR25SbX849rjyMRumFzc2OHZCQr/V/BJXKaJOKXY0YlHBoEfJQgpkPce37nIYtyb9ptEwJNVcR3K3syrkpkPQCiddusFJwOTLXPWmmWz195O6CqwVx3gnCwRSnK02nKyIeByS8xDQjakUm5ViLM3yLa0CTW06+W82EHOpgpT7EWbL66KKRDvIuAdpmxXiuqlRnrHxeoCoJzHED82x/KMTWibQ7icYUmBhzIrahOQamzwxbIAL5pZvYHywvruU/FgmujOw8IgHgzKm5pcpSHEpMYcagRqTkBKg1IFyJQeVXyLI67gebBeteckuaUaKwIZQI350f6a2lrCCkqB7J1PnO0teHzaAwmwqk7Jvu8DMu0sIYij0nHbWaOsXI/a6QuY3DA6Zme4NJiS6TKlYhhQ+Tujzo7GI+WGHFZjBnoG0p+WTDH548RulrxmDdUwWqIkyByHqvw7cYa/gHeKnX4GHaW3GyxM05i1FJOdJdi1/ekoAWHS6hFTI1xb8SNq1OInXC8jrm
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(366004)(346002)(396003)(136003)(39860400002)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(6666004)(6506007)(83380400001)(38100700002)(6512007)(9686003)(1076003)(41300700001)(86362001)(8676002)(2906002)(8936002)(4744005)(4326008)(5660300002)(44832011)(478600001)(54906003)(6916009)(66556008)(66476007)(7416002)(66946007)(316002)(26005)(6486002)(33716001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KxWiwEKLfsZ7PLfPnJ98plp7tRSeydenTOkI754CGxsmTs7OZXSIaAvlowuQ?=
- =?us-ascii?Q?aG5mxbkDn6g3pUeBjAKBinMF0jwXoVC4tdbwr3aQiRNpwSc0crIFQshtV1rI?=
- =?us-ascii?Q?DNiCzp6LzdWVWKh2/At1VDoPmxgVncEaU1AQtxgAOKZB7QodwzFORJ1w6KSG?=
- =?us-ascii?Q?Xn6UE5QcdQ3+nl9HjDZ4hWNywU5uVDNLDrpaQTUc/G7xYYNiM5rldk6T3Of0?=
- =?us-ascii?Q?kr3kFOpMVX58dY4KGjZ40g5U3w1SccwC0GhPtpEImgYMpBz0OV3IYeNj7YDu?=
- =?us-ascii?Q?ZYj0ZDVCyXRNxz1mpyDdYc6pHG7spFbWiq/S0XTx9kkIPlcZ3BEVOIVgPx36?=
- =?us-ascii?Q?gvuf6L3EQIcquw4sRiw8FSMV6kbBlzzifKZc6biUf3Dy6Sr8C12bqc1Qhkrs?=
- =?us-ascii?Q?lPFXWsKH5gOeKPZcJxMemIDBNO/raV+dmPE5I0TzE1vhlaOEx81rs8iplQ7J?=
- =?us-ascii?Q?feooFkomVTMgPMvUqdF0YAIx8ypu8376GyGoZ38PwEDfNQoNdkxKos0jDUNY?=
- =?us-ascii?Q?b64ivNodC7A7rpGi3KhuVFwNaXTNxnJc3jDMoxBKS7GX+5SG9w/jFijIqfY1?=
- =?us-ascii?Q?I5qeAX/h1TDwVKrTLcvzZtOk9Mcv3AYtUsh+9TG3uMgKtocC5XAMIXSG+VCY?=
- =?us-ascii?Q?HPY6DrJv3sCbrI1JmhCCHIuwGlh+0rLg1K6aWLXYoy/yMoVs+x/hQUWiUEFD?=
- =?us-ascii?Q?bEjSx8ZowiSszQ6+g69rU/KpVPci/zCw1coXQ967BUMoLFLH916gMfwBGGXs?=
- =?us-ascii?Q?OxSj4vAr8IhUkqOFCbkzhVRYlHHlb4aZE2Toa347mBCz2IsFbLa+7Gxv1oiZ?=
- =?us-ascii?Q?64qCJWaV/1fcoaPEY1hrNQWpvboLzZDy8AxAfoIKFXiQ5nV4dqjSWWboiji1?=
- =?us-ascii?Q?Con9IbUbc6vqtcUYy6j5Om1wQTPbQQXswgZo8OFI/F7XdL622VD6WwD8VkQA?=
- =?us-ascii?Q?5HSIy/m3hi4uuOAJw6cJl/qrYsFKbnMkGioDI8nIH02hR1wtOEp+V4iKgE06?=
- =?us-ascii?Q?EHQ+Gspfvdci0m/5em2RDE3iq76U6oayvwNg6RrDZTTltel+d6JRTqgEzKxR?=
- =?us-ascii?Q?faaqkeD0LH+A+AEVPOXQLZsbiDZ/+Lmcra/pxNv26jMlcNGFXtVw5PpGujzS?=
- =?us-ascii?Q?/cLT6aLhW6ahsOyNQHtaciGfovHl82JG62Knvn9ZtJW4b0MFBB8aoJ85ZfZ/?=
- =?us-ascii?Q?/vBUn44ijFndhCS+2cF4v2mP4q4kuvmYEFejizlEiXboQTtoaWwrm019gEjf?=
- =?us-ascii?Q?24L8WBlHR/uU/+oUu+JIImcoE1CJnmtDuhvMTb3U31YWP5rkIOtQ5ey2kwHr?=
- =?us-ascii?Q?4CsPj3NLynzdrtXAo6GpxYMu5OXTzLjL+wqD14YGn5bFO9iSJ4GQdy2NjNeV?=
- =?us-ascii?Q?21NQKjc2Ug8aDThWK9pdt1CiEo7Y78QbMEbsJ/8dOnMleKUwEulKtpkcoVUm?=
- =?us-ascii?Q?QwseLCpM6cbVR6aDFPdWTcepVZCMQdmf95SmSYE5x1ECiysEVQzdUeHG3hm9?=
- =?us-ascii?Q?B0DGqJvUR9HNn0Df9BHkKbZ/NwM0RMaUFU7xYOJXo4s5U2BjB6vvLgHEH9Pl?=
- =?us-ascii?Q?vEB52RlBx7RCVvQ+91knQFF/CDPlXinOtmR/6idN3t8HvXDJqOUTT7O1Gd2u?=
- =?us-ascii?Q?OA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21b1f746-d527-4b33-ae38-08dbe11b9bf5
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 12:01:30.1140
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: euEIf0+MOFf+liiIqF0unmqLt1pkvV3DsBq2mbB4ateCfwJ+TOx+sRrSd7L6cJlDt3IhERmZgW9IbJ7colHaZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7721
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231106081832.668-1-xuanzhuo@linux.alibaba.com>
 
-On Tue, Nov 07, 2023 at 06:20:20AM -0500, Faizal Rahim wrote:
-> @@ -215,6 +216,31 @@ static void switch_schedules(struct taprio_sched *q,
->  	*admin = NULL;
+On Mon, Nov 06, 2023 at 04:18:32PM +0800, Xuan Zhuo wrote:
+> For rq, we have three cases getting buffers from virtio core:
+> 
+> 1. virtqueue_get_buf{,_ctx}
+> 2. virtqueue_detach_unused_buf
+> 3. callback for virtqueue_resize
+> 
+> But in commit 295525e29a5b("virtio_net: merge dma operations when
+> filling mergeable buffers"), I missed the dma unmap for the #3 case.
+> 
+> That will leak some memory, because I did not release the pages referred
+> by the unused buffers.
+> 
+> If we do such script, we will make the system OOM.
+> 
+>     while true
+>     do
+>             ethtool -G ens4 rx 128
+>             ethtool -G ens4 rx 256
+>             free -m
+>     done
+> 
+> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 43 ++++++++++++++++++++--------------------
+>  1 file changed, 22 insertions(+), 21 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index d16f592c2061..6423a3a007ce 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -408,6 +408,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
+>  	return p;
 >  }
 >  
-> +static bool cycle_corr_active(s64 cycle_time_correction)
+> +static void virtnet_rq_free_buf(struct virtnet_info *vi,
+> +				struct receive_queue *rq, void *buf)
 > +{
-> +	if (cycle_time_correction == INIT_CYCLE_TIME_CORRECTION)
-> +		return false;
+> +	if (vi->mergeable_rx_bufs)
+> +		put_page(virt_to_head_page(buf));
+> +	else if (vi->big_packets)
+> +		give_pages(rq, buf);
 > +	else
-> +		return true;
+> +		put_page(virt_to_head_page(buf));
 > +}
-> @@ -259,14 +286,6 @@ static int duration_to_length(struct taprio_sched *q, u64 duration)
->  	return div_u64(duration * PSEC_PER_NSEC, atomic64_read(&q->picos_per_byte));
+> +
+
+>  static void enable_delayed_refill(struct virtnet_info *vi)
+>  {
+>  	spin_lock_bh(&vi->refill_lock);
+> @@ -634,17 +645,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
+>  	return buf;
 >  }
 >  
-> -static bool cycle_corr_active(s64 cycle_time_correction)
+> -static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
 > -{
-> -	if (cycle_time_correction == INIT_CYCLE_TIME_CORRECTION)
-> -		return false;
-> -	else
-> -		return true;
+> -	void *buf;
+> -
+> -	buf = virtqueue_detach_unused_buf(rq->vq);
+> -	if (buf && rq->do_dma)
+> -		virtnet_rq_unmap(rq, buf, 0);
+> -
+> -	return buf;
 > -}
 > -
+>  static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
+>  {
+>  	struct virtnet_rq_dma *dma;
+> @@ -1764,7 +1764,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>  	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+>  		pr_debug("%s: short packet %i\n", dev->name, len);
+>  		DEV_STATS_INC(dev, rx_length_errors);
+> -		virtnet_rq_free_unused_buf(rq->vq, buf);
+> +		virtnet_rq_free_buf(vi, rq, buf);
+>  		return;
+>  	}
+>  
+> @@ -4034,14 +4034,15 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
+>  static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
+>  {
+>  	struct virtnet_info *vi = vq->vdev->priv;
+> +	struct receive_queue *rq;
+>  	int i = vq2rxq(vq);
+>  
+> -	if (vi->mergeable_rx_bufs)
+> -		put_page(virt_to_head_page(buf));
+> -	else if (vi->big_packets)
+> -		give_pages(&vi->rq[i], buf);
+> -	else
+> -		put_page(virt_to_head_page(buf));
+> +	rq = &vi->rq[i];
+> +
+> +	if (rq->do_dma)
+> +		virtnet_rq_unmap(rq, buf, 0);
+> +
+> +	virtnet_rq_free_buf(vi, rq, buf);
+>  }
+>  
 
-Don't move code around that you've introduced in earlier changes. Just
-place it where it needs to be from the beginning.
+So we have virtnet_rq_free_buf which sounds like it should free any
+buf, and we have virtnet_rq_free_unused_buf which is only for unused.
+Or so it would seem from names but this is not true.
+Better function names?
+
+>  static void free_unused_bufs(struct virtnet_info *vi)
+> @@ -4057,10 +4058,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
+>  	}
+>  
+>  	for (i = 0; i < vi->max_queue_pairs; i++) {
+> -		struct receive_queue *rq = &vi->rq[i];
+> +		struct virtqueue *vq = vi->rq[i].vq;
+>  
+> -		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
+> -			virtnet_rq_free_unused_buf(rq->vq, buf);
+> +		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
+> +			virtnet_rq_free_unused_buf(vq, buf);
+>  		cond_resched();
+>  	}
+>  }
+> -- 
+> 2.32.0.3.g01195cf9f
+
 
