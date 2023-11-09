@@ -1,209 +1,213 @@
-Return-Path: <netdev+bounces-46835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D3327E69E9
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:49:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4B97E69EE
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2657A1C20940
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E33A28119A
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC0F1C286;
-	Thu,  9 Nov 2023 11:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EED81C684;
+	Thu,  9 Nov 2023 11:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OeVtJ24B"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Noo+A1Qj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D511B29B
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:49:47 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC141719
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:49:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699530586;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rRWgktC5dBfBH0y4IlPCeWKy9YBplXDcHKZ7n5koZ7o=;
-	b=OeVtJ24B4HYZMNRIlvDH8dGLJddDJv0Ylw7PduLfT4p+7CpDaNUrKKYeYN0wtOV4z4VC7A
-	1E9aMu0wggtMgK+wNOAWY2N9njCpRxYpAIu+zHN6lNFpVHXwzK9BFB1jWZKoAySvdSEyqS
-	x3E4X5JPn2cnlVN0L8Jukr5dRsq+Opw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-636-dTwAgvH-O1SGAaW21x9n_g-1; Thu, 09 Nov 2023 06:49:45 -0500
-X-MC-Unique: dTwAgvH-O1SGAaW21x9n_g-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-778b5c628f4so14748185a.0
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:49:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699530585; x=1700135385;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rRWgktC5dBfBH0y4IlPCeWKy9YBplXDcHKZ7n5koZ7o=;
-        b=DJr2/q8MjsY72MsP8R1pbDGHYeoJamebx9/VYZl+lUPErgHEmeGxr3qJ5F4jf9mTV+
-         uQUaDPI1/2uTPTadZIW6zFEo23/V3FgbSJ2FCZ/THzxZCGqHyUw6wFynQtHwHf4GL440
-         rOyxcoXDdoiVx+S4CeLF02zbk31XPywrZguqUwcpQ7KxxPYHna5Tzkjf6oFkAuUWniJ5
-         c7MBMCLl6x+SL1USPXnwL7IzG7/j8cvHuKbnIlSm8RkY0vYabBloWJGspv0iR+fJHihm
-         4oQeZ7CfwisKTpdnl8XSLQrerWPotNgotk9hWBSFmhB0XYna2r8263YdOOAeSbk0h5el
-         J5zg==
-X-Gm-Message-State: AOJu0YwoPoOuYpLV0b/ZcaRV0XVuI4h2Yn/hhfS9dTR//VDBlFBlR5ou
-	1PLGiO82816P4skqlcujW3eIelCstw7nWEoaPL70etVXPNFMqzw9qPZHr2ok8SJF78N3YuJe3NH
-	JZ9yr/8vimAHI1W6f
-X-Received: by 2002:a05:622a:5186:b0:41e:4be2:d3eb with SMTP id ex6-20020a05622a518600b0041e4be2d3ebmr5519122qtb.1.1699530584773;
-        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEGUS4SbJ9ssl4USsnfkA9xKEduU/vOY24B+xDTRXOVdGNcq+w7LhBc+XgFeookbhcTcoTQKA==
-X-Received: by 2002:a05:622a:5186:b0:41e:4be2:d3eb with SMTP id ex6-20020a05622a518600b0041e4be2d3ebmr5519110qtb.1.1699530584454;
-        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id kf20-20020a05622a2a9400b0041b83654af9sm1859307qtb.30.2023.11.09.03.49.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
-Message-ID: <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
-Subject: Re: [PATCH net v2 1/2] r8169: add handling DASH when DASH is
- disabled
-From: Paolo Abeni <pabeni@redhat.com>
-To: ChunHao Lin <hau@realtek.com>, hkallweit1@gmail.com
-Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Date: Thu, 09 Nov 2023 12:49:41 +0100
-In-Reply-To: <20231108184849.2925-2-hau@realtek.com>
-References: <20231108184849.2925-1-hau@realtek.com>
-	 <20231108184849.2925-2-hau@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B645618C3B
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:50:58 +0000 (UTC)
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2065.outbound.protection.outlook.com [40.107.104.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3415619E;
+	Thu,  9 Nov 2023 03:50:58 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ehl3ms3JgWE1Q6a8RIHzQTtQGwCHmoFnrLHvQQo4qlG4yF249fR5okvS6eMv9mCBWr4YqROtFZfGwgJoMuma9raFaIQMWPyQC2cmLACboA/S6jdRu7cQOOnZaBR3IMsOoA7ziitT64ykVYZpI9OgB3PwqWn+ezmfWHFANdGahxnl2cxNGJvlkzF5+Aw4VcSDMYPe2CWmZ97A8pLCA4M1ecOaxjPkWl/vLPSKkc3rD2W4+ZelUFnAdmckLvL4wnmRuOG2sI/jWVdhGsg+Chno83zP2b6RmdK4/IqNVKCihNxaPImShh+v5shifgX7A/ajhxocjLRqWQiXMjPbepTAlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XBh9QvkhAm/bhRyPxBExc/o94SRksH9s79ZLrmDjTWs=;
+ b=iaK2I5cABBWI70TAQehLeVsJkE6T+FaWnXAhXJplmmsM9sJ6d7+AeoXuBpM1lkDqImN75GgapZRiZNeFcckHwXlh859ZvokTlt2J2w6dP1wxB+qAGR4eDQjOG8CGnkLPwpZVulVuKnMymB3DRfA7Vh4IjnWZMjvnGQ1BeS2akUtXThk8GtupUN/24Li29YJaGR+eaiIgxWSeu3HT1h/qx20wb9p9Y+HIdb5BS1aD1gfYNhqBm9qhJgKGdvxKtEDhjk6eJtnbqEPc4lETiZ5az3mOfSk2+bEnTb6H0Aqom1KojtKuI7k7I1WmZrGJwyFICcKCcmuXqQ4pkZV/1R/KEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XBh9QvkhAm/bhRyPxBExc/o94SRksH9s79ZLrmDjTWs=;
+ b=Noo+A1QjpqGW8zzu3D7nfcIFw9NCt0ufv3bGF2SlPLawZ/cX0GTbD+MZb+VPhEj+S3pGGUTQyHt6MZLAAe1EhjibNx7B/2TeNAq5J9HHg7taLpj8SqmdmfLliCyNQjXYwCL2218cL28kvAqksYz0LYqjCoQ5sxuMmWYaNeLhfvM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DB9PR04MB9556.eurprd04.prod.outlook.com (2603:10a6:10:304::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.13; Thu, 9 Nov
+ 2023 11:50:55 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
+ 11:50:55 +0000
+Date: Thu, 9 Nov 2023 13:50:52 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 5/7] net/sched: taprio: fix delayed switching to
+ new schedule after timer expiry
+Message-ID: <20231109115052.xz2vhaknno6nycbo@skbuf>
+References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-6-faizal.abdul.rahim@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107112023.676016-6-faizal.abdul.rahim@linux.intel.com>
+X-ClientProxiedBy: FR2P281CA0007.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::17) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DB9PR04MB9556:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0297e40e-eb26-4b50-9df4-08dbe11a2189
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	QCqr0czUL6b4eJeVsNjjxgx6bM6NW767FxApIxT7K46i3SALjkga/CAW/WrwghEfx+bmtYSxujUhXBPZSYQkLeV6o+EHvusFjN5UpdZ2etK2Cm914abZkqQN8JUKQ+6OcHuY5e94B96dVuvKjMLUn3oGIlnRsvt7UPM4sqPPGCSa7dAwcrtPWm1J2nQtA2RR+PVSuMxLRCdD63W3Id4MaKXwGzzpNM3v7YSmpTsp38Joh7AV4Mu+1K7WqKjLesTXecc4TtO2B5bh5S26XKt+msLtkzxM3zfg9IH2uGvUdqF00SgdOwJz7U/5zeVNZAO9zcjTY8/EhSNjLcs409nr3KfJOAY/GNm5rYK2sIiRcspxqGCQfm0N66V80fVuS878hrD46QMsCAEzGJksdUgLw4xUFLJk6gBOwI0Rg4UEYttBMJg+SDEEQXqXoKK2D5Mc/qzxQx3yxU8LZQbZEBXsl7f3PjbulauidmF4vYgZKpqYYDzbFsrorKvV6Sq/Hp+32lH0pBNPIOs5ndb/GkD+KWHLNRAA/TbYgwJMcabVxYt+3mkOcWb/Df8PtseZIpoV
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(39860400002)(396003)(376002)(136003)(346002)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(8676002)(8936002)(66899024)(41300700001)(2906002)(5660300002)(7416002)(44832011)(316002)(83380400001)(4326008)(33716001)(86362001)(6916009)(66476007)(66946007)(54906003)(38100700002)(66556008)(26005)(6506007)(6666004)(6486002)(6512007)(478600001)(9686003)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?0x6d7kDL5qAbVxFF4eqnp64iCWlGdBSdfYGAmcrULCdiIVNdRob6GZyll+Kg?=
+ =?us-ascii?Q?lljrdqXGiYSYogqPt3DwhU6Un3ohn8aY1INoOKJfdQWmeHTWa73t1KKfCPN8?=
+ =?us-ascii?Q?c54maZIlvdLwST+Xa8fSmyyMvPA84EyiJtH7kqT7bRJ6RklcpngvRavggHfp?=
+ =?us-ascii?Q?GXDzhoWsRwrMKfJh18ashko+qotuW7YtLzJNubFJQ7rfv9JtxZI4tvNh5Kcm?=
+ =?us-ascii?Q?hehmVep2O50insW0CIJ/A00z05ubsWDQwbSyaEwKJeUwvGq1JGn7R3cYpSSP?=
+ =?us-ascii?Q?1HLDziKgs2GQZhtGzt6cXH5srnh63R6Yhkm7zL9VgkrOvuVqHFtu7Iv8ji8T?=
+ =?us-ascii?Q?Wlc90ESGzGgMHCwFKiT95XXe+nKctsXyjtyTAt8f41VuysRRG0HjYk0SBlMA?=
+ =?us-ascii?Q?zeWtPjvQ3X2x5COxC2+TInfdtSdqCalVtX3FrsfJ0YxZPA32gtTA1mo5hJlM?=
+ =?us-ascii?Q?XLt8ikJUNZ6a0ooDN7BRtF3N8c5Bl8je9tNm8icnbu66tH/t/CfkTbyBbjv1?=
+ =?us-ascii?Q?kpw8IAvFV1IH78NUlP6vJ91HOKNwqt2QywUFx5yjFVHxS6ZnQlsXYQ2zxe9E?=
+ =?us-ascii?Q?sxhL0rW1hg9hRIdEMTQMxj4LVHHmAO18pXkzZ4dXZDAqtdbCtUZjtXEm7NNY?=
+ =?us-ascii?Q?USlNBwslyyvRwUccDvRZ7WHMcjOeEbhGYruJsp4DXU8ojl8Bnh2A+mJ+g2wc?=
+ =?us-ascii?Q?XAC//9RZzG3455/j0ZButj2dOx++1lUobPzb+3HtN4m17f1lhn+XSaf3XH4R?=
+ =?us-ascii?Q?O2gq1zYgxJevfdFmXQl3qg5t8NOqYH3pPwH/fNJ9qZJ77ddP7eFqjn0Kn0wD?=
+ =?us-ascii?Q?pJi1q/S3DMApFf/6FEEr35Q7HQfaMhSkHNrcar+8sRhY6107niKdTV8uSZru?=
+ =?us-ascii?Q?Dz2BfRcMypdRQAfiIknlIfcYv+iDqGgTVWFLyEDCgPVdDlOgCItUjv62Wbqx?=
+ =?us-ascii?Q?6rSvt4a0Rpuc1fg/0WWkoqQTOOCkXIKPopgwE/Jg5Nz77bnudcNbV64RKHy/?=
+ =?us-ascii?Q?4/OB9tz2TKF21JvpxdDikG3gFNJq+SPMO0lhpziGDJs6yCICOFrMoXsCZ4Mp?=
+ =?us-ascii?Q?TCsbHfca+N9LcZTh2iOWO3d1BakBbaouUdNq7JvDXty2xDuq24QAPnqppysx?=
+ =?us-ascii?Q?0mXk6qrFQp6MLuUEYVtMyJctJ17T6tE8X/VP8VITvm7zRZOUUQbxUZs2Hqk0?=
+ =?us-ascii?Q?ck13/Hz9J2FGgO5i4pta1VXIznRjx7YqMmNm7HN9zLLPhhgFXlFLSpjOaFB3?=
+ =?us-ascii?Q?mQiKyf56JfjY1fz3b9KQDmUKLyFFNQgiLSvq/5/EqQCylsDcshFHl+peJZSB?=
+ =?us-ascii?Q?7/xvMHHr/pTbFZUI6XayWlCnTqiXr4twkiEQbcabi3AT553CHVx7r5uktd8s?=
+ =?us-ascii?Q?GOuxfJekCq4nURkOCD1BRTnEqaOvcY1J/iWDqt3tRTKGIDybQqgbGOSn+uCa?=
+ =?us-ascii?Q?umK0rXr4BBI59xvpnOSclBKsPu9v4mg+AWp24p6cJ4RCFwu3hjY2uhVOEbwK?=
+ =?us-ascii?Q?hT16vjhEDQVYZ9ixnO4lGXXTEoCALrQrMqAb6GdbB+8PGhdBujuuvxGQZ+Zr?=
+ =?us-ascii?Q?WzhKOlP2+lHt78ndlMPzEldipskCvELyF9wlpqQT6APvBzgWE0jV97wLdAK5?=
+ =?us-ascii?Q?eA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0297e40e-eb26-4b50-9df4-08dbe11a2189
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 11:50:55.2356
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BzJtKzwwoR/Z/GuYHG6p6yZpMiEtxtkB10OMlnuTQ5u0JECMCpTPlFxgXxnwTdK0OdJK0kSYbt+mhzq5aZ0aXw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9556
 
-On Thu, 2023-11-09 at 02:48 +0800, ChunHao Lin wrote:
-> For devices that support DASH, even DASH is disabled, there may still
-> exist a default firmware that will influence device behavior.
-> So driver needs to handle DASH for devices that support DASH, no
-> matter the DASH status is.
->=20
-> This patch also prepare for "fix DASH deviceis network lost issue".
->=20
-> Signed-off-by: ChunHao Lin <hau@realtek.com>
+On Tue, Nov 07, 2023 at 06:20:21AM -0500, Faizal Rahim wrote:
+> If a new GCL is triggered and the new admin base time falls before the
+> expiry of advance_timer (current running entry from oper),
+> taprio_start_sched() resets the current advance_timer expiry to the
+> new admin base time. However, upon expiry, advance_sched() doesn't
+> immediately switch to the admin schedule. It continues running entries
+> from the old oper schedule, and only switches to the new admin schedule
+> much later. Ideally, if the advance_timer is shorten to align with the
+> new admin base time, when the timer expires, advance_sched() should
+> trigger switch_schedules() at the beginning.
+> 
+> To resolve this issue, set the cycle_time_correction to a non-initialized
+> value in taprio_start_sched(). advance_sched() will use it to initiate
+> switch_schedules() at the beginning.
+> 
+> Fixes: a3d43c0d56f1 ("taprio: Add support adding an admin schedule")
 
-You should include the fixes tag you already added in v1 and your Sob
-should come as the last tag
+Did the commit you blame really introduce this issue, or was it your
+rework to trigger switch_schedules() based on the correction?
 
-The same applies to the next patch=20
-
-> Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
-
-It's not clear where/when Heiner provided the above tag for this patch.
-I hope that was off-list.
-
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
 > ---
->  drivers/net/ethernet/realtek/r8169_main.c | 35 ++++++++++++++++-------
->  1 file changed, 25 insertions(+), 10 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
-rnet/realtek/r8169_main.c
-> index 0c76c162b8a9..108dc75050ba 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -624,6 +624,7 @@ struct rtl8169_private {
-> =20
->  	unsigned supports_gmii:1;
->  	unsigned aspm_manageable:1;
-> +	unsigned dash_enabled:1;
->  	dma_addr_t counters_phys_addr;
->  	struct rtl8169_counters *counters;
->  	struct rtl8169_tc_offsets tc_offset;
-> @@ -1253,14 +1254,26 @@ static bool r8168ep_check_dash(struct rtl8169_pri=
-vate *tp)
->  	return r8168ep_ocp_read(tp, 0x128) & BIT(0);
+>  net/sched/sch_taprio.c | 21 ++++++++++++++++++---
+>  1 file changed, 18 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+> index f18a5fe12f0c..01b114edec30 100644
+> --- a/net/sched/sch_taprio.c
+> +++ b/net/sched/sch_taprio.c
+> @@ -1379,14 +1379,19 @@ static void setup_first_end_time(struct taprio_sched *q,
 >  }
-> =20
-> -static enum rtl_dash_type rtl_check_dash(struct rtl8169_private *tp)
-> +static bool rtl_dash_is_enabled(struct rtl8169_private *tp)
-> +{
-> +	switch (tp->dash_type) {
-> +	case RTL_DASH_DP:
-> +		return r8168dp_check_dash(tp);
-> +	case RTL_DASH_EP:
-> +		return r8168ep_check_dash(tp);
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+>  
+>  static void taprio_start_sched(struct Qdisc *sch,
+> -			       ktime_t start, struct sched_gate_list *new)
+> +			       ktime_t new_base_time,
+> +			       struct sched_gate_list *new)
 >  {
->  	switch (tp->mac_version) {
->  	case RTL_GIGA_MAC_VER_28:
->  	case RTL_GIGA_MAC_VER_31:
-> -		return r8168dp_check_dash(tp) ? RTL_DASH_DP : RTL_DASH_NONE;
-> +		return RTL_DASH_DP;
->  	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
-> -		return r8168ep_check_dash(tp) ? RTL_DASH_EP : RTL_DASH_NONE;
-> +		return RTL_DASH_EP;
->  	default:
->  		return RTL_DASH_NONE;
->  	}
-> @@ -1453,7 +1466,7 @@ static void __rtl8169_set_wol(struct rtl8169_privat=
-e *tp, u32 wolopts)
-> =20
->  	device_set_wakeup_enable(tp_to_dev(tp), wolopts);
-> =20
-> -	if (tp->dash_type =3D=3D RTL_DASH_NONE) {
-> +	if (!tp->dash_enabled) {
->  		rtl_set_d3_pll_down(tp, !wolopts);
->  		tp->dev->wol_enabled =3D wolopts ? 1 : 0;
->  	}
-> @@ -2512,7 +2525,7 @@ static void rtl_wol_enable_rx(struct rtl8169_privat=
-e *tp)
-> =20
->  static void rtl_prepare_power_down(struct rtl8169_private *tp)
->  {
-> -	if (tp->dash_type !=3D RTL_DASH_NONE)
-> +	if (tp->dash_enabled)
+>  	struct taprio_sched *q = qdisc_priv(sch);
+> -	ktime_t expires;
+> +	struct sched_gate_list *oper = NULL;
+> +	ktime_t expires, start;
+>  
+>  	if (FULL_OFFLOAD_IS_ENABLED(q->flags))
 >  		return;
-> =20
->  	if (tp->mac_version =3D=3D RTL_GIGA_MAC_VER_32 ||
-> @@ -4869,7 +4882,7 @@ static int rtl8169_runtime_idle(struct device *devi=
-ce)
->  {
->  	struct rtl8169_private *tp =3D dev_get_drvdata(device);
-> =20
-> -	if (tp->dash_type !=3D RTL_DASH_NONE)
-> +	if (tp->dash_enabled)
->  		return -EBUSY;
-> =20
->  	if (!netif_running(tp->dev) || !netif_carrier_ok(tp->dev))
-> @@ -4896,7 +4909,7 @@ static void rtl_shutdown(struct pci_dev *pdev)
->  	rtl_rar_set(tp, tp->dev->perm_addr);
-> =20
->  	if (system_state =3D=3D SYSTEM_POWER_OFF &&
-> -	    tp->dash_type =3D=3D RTL_DASH_NONE) {
-> +		!tp->dash_enabled) {
+>  
+> +	oper = rcu_dereference_protected(q->oper_sched,
+> +					 lockdep_is_held(&q->current_entry_lock));
+> +
+>  	expires = hrtimer_get_expires(&q->advance_timer);
+>  	if (expires == 0)
+>  		expires = KTIME_MAX;
+> @@ -1395,7 +1400,17 @@ static void taprio_start_sched(struct Qdisc *sch,
+>  	 * reprogram it to the earliest one, so we change the admin
+>  	 * schedule to the operational one at the right time.
+>  	 */
+> -	start = min_t(ktime_t, start, expires);
+> +	start = min_t(ktime_t, new_base_time, expires);
+> +
+> +	if (expires != KTIME_MAX &&
+> +	    ktime_compare(start, new_base_time) == 0) {
+> +		/* Since timer was changed to align to the new admin schedule,
+> +		 * setting the variable below to a non-initialized value will
 
-Since you have to repost, please maintain the correct indentation
-above:
+I find the wording "setting the variable below to a non-initialized value"
+confusing. 0 is non-initialized? You're talking about a value different
+than INIT_CYCLE_TIME_CORRECTION. What about "setting a specific cycle
+correction will indicate ..."?
 
-	if (system_state =3D=3D SYSTEM_POWER_OFF &&
-	    !tp->dash_enabled) {
+> +		 * indicate to advance_sched() to call switch_schedules() after
+> +		 * this timer expires.
+> +		 */
+> +		oper->cycle_time_correction = 0;
 
-        ^^^^
-spaces here.
+Why 0 and not ktime_sub(new_base_time, oper->cycle_end_time)? Doesn't
+the precise correction value make a difference?
 
-
-Cheers,
-
-Paolo
-
+> +	}
+>  
+>  	hrtimer_start(&q->advance_timer, start, HRTIMER_MODE_ABS);
+>  }
+> -- 
+> 2.25.1
+>
 
