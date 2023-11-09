@@ -1,94 +1,126 @@
-Return-Path: <netdev+bounces-46926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E16B7E718D
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:31:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 593567E71A7
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:42:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77B6C1C209FA
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:31:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7FF8B20CBE
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF45B199AE;
-	Thu,  9 Nov 2023 18:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E170B4C94;
+	Thu,  9 Nov 2023 18:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="inDStH7e"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UBbIrZ2+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD7E36B05
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:31:50 +0000 (UTC)
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17BA2D44
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:31:49 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so15246a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:31:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699554708; x=1700159508; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h//kCb37dZb7PolHGuErzbRJ0mNVKVZt1yNtcCz9sIM=;
-        b=inDStH7e4FupRr5VRXtOdx7RPKjFckLE+/mOfIn/R9lJQ34c9juVgBomGCNIOeJhZ2
-         rX/u/zqySXiIcFEvFC+jaUhp8zElB3WEpGeHgctupEV6MhjFKD/jwrmXmKhxk5V4m2dO
-         fKX3sZqS2HPnsr3ShoSi/rBmlMN7zf+z43HjcL+0O7+JC6EYo/47oRG2YJD3QQMTdhmj
-         1oCaqgM0IAqYrkVgG6WLWed9Td9NIDl0YA7G7xnZj5sohlYZKoN/DmtaseZ4lWhxrLiB
-         fMrj6j505e1U4iKvXtGVLsgS/dMeQjqrBwzRL90L09Env40SuE9O2EroEtHYi2cLxo38
-         r1LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699554708; x=1700159508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h//kCb37dZb7PolHGuErzbRJ0mNVKVZt1yNtcCz9sIM=;
-        b=FZDJ9hOZxYSiijuKN6bzavin5HbfNdCEeR6X+2yYiXnh6MbYFqidZLDaEM2UXfPp6H
-         bgSoFuXTxFIc5ORTDllb0ZGU2EI3n1rUuFp2MKP6wPDxwa66m4aWi5H5df6tReVYD85+
-         2jBWoC1mH9+RtVV5CBYUuRjrf00Mz5MV/w/cp5CEIdOtLCaB24/YT0ntgvct6a2WVeea
-         pp7lzniAvpiPSAtAX/uO8Yw0Xnio8GD1Lvys1iTGGQXcoVhgx8NCOZvWces4glP6kbjD
-         fMoKOv15w/FWiRfMQqM+8gear8ru1UqA2L+RTnD673ocD27tDaCvA4DLwXKMDA2y40RA
-         bCJw==
-X-Gm-Message-State: AOJu0YysXaqy4N8afC0hYgAhFWaM7R5cwGE/APFj0KGI9eV/kkMfO8Q1
-	NOv34HSAJc9dalBm+4F7rnO5KCrqUmFWdu8bRRKXCw==
-X-Google-Smtp-Source: AGHT+IErijKEY0QTQ1RNBECbgPtoO9xB9V4UDMkR2kxarDR3k5UZ1CRhoMIlvEb1AkLzJnVBF4scPmd5psk5wcMBVJA=
-X-Received: by 2002:a05:6402:5017:b0:545:279:d075 with SMTP id
- p23-20020a056402501700b005450279d075mr258669eda.1.1699554708116; Thu, 09 Nov
- 2023 10:31:48 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B660374DD
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:41:54 +0000 (UTC)
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8543C0E
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:41:54 -0800 (PST)
+Message-ID: <9ac86e10-e8b7-4eee-a8c4-c58397c1606a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1699555311;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dFMuoyltFtVxWVJxaFtiCDqbh02J2DqjKLDbbrCUOx4=;
+	b=UBbIrZ2+2/udeRkulku++eQwdC/IT1SBZX6N44sHyXJMUdl7nlx0uX3us3v7B6hmKNsQJz
+	lsfKksKyrZr38BjI/fEf/+mdms1o84VAipZHk6kwFal3ndX2swNhvHidAQsUsd1RxawB7w
+	3amgXwyTtg78WkcMuTH8IG6CqXuVGjw=
+Date: Thu, 9 Nov 2023 10:41:43 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231109152241.3754521-1-edumazet@google.com> <CAF=yD-KjqkVJ7G_=EpKNRcdvbTujf6E4p1S_mTVQNBt9enOs2w@mail.gmail.com>
-In-Reply-To: <CAF=yD-KjqkVJ7G_=EpKNRcdvbTujf6E4p1S_mTVQNBt9enOs2w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Nov 2023 19:31:33 +0100
-Message-ID: <CANn89i+BhRbK-HfmYzzr37N+E_-6kCeoZU0W8n7V35ERZR4A_A@mail.gmail.com>
-Subject: Re: [PATCH net] ipvlan: add ipvlan_route_v6_outbound() helper
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Mahesh Bandewar <maheshb@google.com>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [GIT PULL v2] Networking for 6.7
+Content-Language: en-GB
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, Hou Tao
+ <houtao1@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Network Development <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20231028011741.2400327-1-kuba@kernel.org>
+ <20231031210948.2651866-1-kuba@kernel.org>
+ <20231109154934.4saimljtqx625l3v@box.shutemov.name>
+ <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
+ <20231109161406.lol2mjhr47dhd42q@box.shutemov.name>
+ <11e2e744-4bc7-45b1-aaca-298b5e4ee281@linux.dev>
+ <CAADnVQJtc6JJZMXuZ0M5_0A3=N-TJuYO2vMofJmK6KLhWrBAPg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <CAADnVQJtc6JJZMXuZ0M5_0A3=N-TJuYO2vMofJmK6KLhWrBAPg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 9, 2023 at 7:29=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
 
-> Do you think that it is an oversight that this function mixes a return
-> of NET_XMIT_DROP/NET_XMIT_SUCCESS with returning the error code
-> received from deep in the routing stack?
->
-> Either way, this patch preserves that existing behavior, so
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-I saw this indeed, and chose to leave this as is to ease code review.
-
-We might send a stand alone patch to return NET_XMIT_DROP instead.
-
-Thanks for the review !
+On 11/9/23 10:18 AM, Alexei Starovoitov wrote:
+> On Thu, Nov 9, 2023 at 10:09 AM Yonghong Song <yonghong.song@linux.dev> wrote:
+>>
+>> On 11/9/23 8:14 AM, Kirill A. Shutemov wrote:
+>>> On Thu, Nov 09, 2023 at 08:01:39AM -0800, Alexei Starovoitov wrote:
+>>>> On Thu, Nov 9, 2023 at 7:49 AM Kirill A. Shutemov <kirill@shutemov.name> wrote:
+>>>>> On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
+>>>>>>         bpf: Add support for non-fix-size percpu mem allocation
+>>>>> Recent changes in BPF increased per-CPU memory consumption a lot.
+>>>>>
+>>>>> On virtual machine with 288 CPUs, per-CPU consumtion increased from 111 MB
+>>>>> to 969 MB, or 8.7x.
+>>>>>
+>>>>> I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
+>>>>> non-fix-size percpu mem allocation"), which part of the pull request.
+>>>> Hmm. This is unexpected. Thank you for reporting.
+>>>>
+>>>> How did you measure this 111 MB vs 969 MB ?
+>>>> Pls share the steps to reproduce.
+>>> Boot VMM with 288 (qemu-system-x86_64 -smp 288) and check Percpu: field of
+>>> /proc/meminfo.
+>> I did some experiments with my VM. My VM currently supports up to 255 cpus,
+>> so I tried 4/32/252 number of cpus. For a particular number of cpus, two
+>> experiments are done:
+>>     (1). bpf-percpu-mem-prefill
+>>     (2). no-bpf-percpu-mem-prefill
+>>
+>> For 4 cpu:
+>>      bpf-percpu-mem-prefill:
+>>        Percpu:             2000 kB
+>>      no-bpf-percpu-mem-prefill:
+>>        Percpu:             1808 kB
+>>
+>>      bpf-percpu-mem-prefill percpu cost: (2000 - 1808)/4 KB = 48KB
+>>
+>> For 32 cpus:
+>>      bpf-percpu-mem-prefill:
+>>        Percpu:            25344 kB
+>>      no-bpf-percpu-mem-prefill:
+>>        Percpu:            14464 kB
+>>
+>>      bpf-percpu-mem-prefill percpu cost: (25344 - 14464)/4 KB = 340KB
+>>
+>> For 252 cpus:
+>>      bpf-percpu-mem-prefill:
+>>        Percpu:           230912 kB
+>>      no-bpf-percpu-mem-prefill:
+>>        Percpu:            57856 kB
+>>
+>>      bpf-percpu-mem-prefill percpu cost: (230912 - 57856)/4 KB = 686KB
+>>
+>> I am not able to reproduce the dramatic number from 111 MB to 969 MB.
+>> My number with 252 cpus is from ~58MB to ~231MB.
+> Even 231MB is way too much. We shouldn't be allocating that much.
+> Let's switch to on-demand allocation. Only when bpf progs that
+> user per-cpu are loaded.
+Sounds good. Will craft a patch for this.
 
