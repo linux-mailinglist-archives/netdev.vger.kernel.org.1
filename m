@@ -1,322 +1,158 @@
-Return-Path: <netdev+bounces-46844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0715C7E6A6E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:20:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC62E7E6A70
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B65CE281329
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCCC31C208EA
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:20:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84F11DA2E;
-	Thu,  9 Nov 2023 12:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771D91DA2F;
+	Thu,  9 Nov 2023 12:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CGuM6wOV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iq1hqnZb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A9628F2
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:20:26 +0000 (UTC)
-Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED3532715
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 04:20:25 -0800 (PST)
-Received: by mail-vs1-xe32.google.com with SMTP id ada2fe7eead31-45d955fcabdso329884137.0
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 04:20:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B0728F2
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:20:38 +0000 (UTC)
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 043E7270C
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 04:20:38 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id 6a1803df08f44-66fbcaf03c6so5062586d6.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 04:20:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699532425; x=1700137225; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BPcS64LNsr6Re9WYBQ3Sfo6KPTli043xINsR6eR0oWU=;
-        b=CGuM6wOVAZlujMOXHQNeku1AE6QvAmM2iij+iJLrYAQC+V2esDVnIAL/n2CqDR+dqw
-         LZLkwCzUOcD6ZOE98OaiHbINwIwhVP+/r20yI5s5s9Y4dHeksn6jU+kH9OwcOmCdzqn4
-         a9TS+wGPZLS+49mbMhxQ8FLGxePOcPtOAVjnR1W+87oWfDtTzBGDHzvMKwQkcHzR2Eul
-         SlduiTaCIla+dHwQ2FFGc6rByWzCsKo75/cfx63kjxyJC4w5gFD4bI1m82CmKxzo+xQM
-         CHHfiiqGZ6EGC6jUCM9FjKX6z7wzgAi9KojyMSWa4c7tEoIDOObdG3DCBNcrb2+uzDx3
-         v3dg==
+        d=gmail.com; s=20230601; t=1699532437; x=1700137237; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=HYCupUsz0OFmITZmI4iB771dn7Xgq+QS5truD0Mrxx8=;
+        b=iq1hqnZbh4rkqipbMJ4rFxT/9nBU9TAxT++ESM3Rqp4BQMH2zdjFi150zgZLFtNhhI
+         m6JQx8hG1KcpGoUSj6d4/cXfQ+kYx7SaXlhbmbmhdo7uhBjIBj639BYEmDUcUKzcM1fR
+         FyPWA3A7bLOrOQsZe9MAEe6kALKXxbv2QUDMLR7IpTfwNwQWrwbcUv0efCzGN7kdbtgc
+         1zavg9in7THb57nD0HPfzehLip1u8vp6THBUy+JJpNKe6V1+gUEzXvT5Y2N0eP9ita96
+         BvaWXVrJumt8PY+a7jIR1dm9XC+jLKgiuFELTRDZId8VKdLuGsdPiN18xlO9NSgZT2ha
+         hj3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699532425; x=1700137225;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BPcS64LNsr6Re9WYBQ3Sfo6KPTli043xINsR6eR0oWU=;
-        b=sVHysnJJ85UAQoGVsI3pC6Dk75HDW5vUp0G9v/mlvDXPCZVBN//lfukb5WzAIgSu4d
-         asrZGC4ad45wFq24QTGEwqaTDuxLqnqUM4oJf5hjwgR5HTtvg4y4J+Tj+lNsC+u47Aqn
-         6hDT7Yw/kadES06z27DpycgEBw32m5AhP+/pJ87fmNIlOYWd7B6EypuR2yRTyL2BH0Al
-         xZZgfJAibRpZxlV5+mSHXrRMd7gHUbbYa8PBEO4kXnXWJFc51EDuGT5JForyym7EAdAW
-         pWsisJ4ncVpuobEn6Nwa9jA8xgOLvCAHHFR5s2byV4hv/cCK0HWRGxWrnCTmpNX0pWVe
-         c1xw==
-X-Gm-Message-State: AOJu0YzFEdsS9oaxWM6uJP/i6YpD7DIrBlrvNAY0mg+lUtUwnLYa84ao
-	nhAfXvK3leyd9dP6RHXy+BBTP65w2YQEOgJRcYpQtg==
-X-Google-Smtp-Source: AGHT+IFfFl922mscmOxZBJu/cgw+xUG99huJKamj4SvfI8CIyJ6yJO0CbXCAJJce1KiW6D25ou0quO0lgo5uh+PiKfc=
-X-Received: by 2002:a67:ef5e:0:b0:45d:b022:9835 with SMTP id
- k30-20020a67ef5e000000b0045db0229835mr4061147vsr.22.1699532424738; Thu, 09
- Nov 2023 04:20:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699532437; x=1700137237;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HYCupUsz0OFmITZmI4iB771dn7Xgq+QS5truD0Mrxx8=;
+        b=cUxw1p9kGtLpbTUobanLe57PEsenbDwHP2iE6RUxKxrcvOoHV1mh/lAdMUBErzfPN9
+         9g64Hl3OBG+JJ7PIGnJQt1fKFlSAP+QZ4iqtn8KvfoysQIAVqfa35FqfEakNxFxz8SZq
+         cVzWm3jJI0i0yimLlo7bCutL2nntxlOfAOfQDsLm+pkS3r8LMFK8OzMwhzqhvoi72/iJ
+         lOMaR+Ho5caqReQIPA/jdli3Mdlktu4REBFQHVONCeEOe1GkpD9ug6tfvIeVa7Pakg0d
+         KBtkmev/88RPdUXAxbyOAIgftwyJ0UpWijIScxTUtEAl59v09dlZ8Six2c/z8YfsQ6qN
+         kNhg==
+X-Gm-Message-State: AOJu0Yx0qVl/UcXstq1HyPwuNpIKqQtyXsgFcc1QLLBExHqSicAHMLKC
+	qWZE9UstbARheBaJKCIb+/85cMfdsI1fzcGy5DLL/XOmj2s=
+X-Google-Smtp-Source: AGHT+IGJuSwgtYfel8FcgZHF9EV8UBBK6Q+5nORMFmh8xhrJW0YyjBaNxZZcHy5oQlLnuR0Mub/+cICRbxHFKnsssMQ=
+X-Received: by 2002:a05:6214:124b:b0:66d:35b8:e661 with SMTP id
+ r11-20020a056214124b00b0066d35b8e661mr5111834qvv.45.1699532437060; Thu, 09
+ Nov 2023 04:20:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-8-almasrymina@google.com> <4a0e9d53-324d-e19b-2a30-ba86f9e5569e@huawei.com>
- <CAHS8izNbw7vAGo2euQGA+TF9CgQ8zwrDqTVGsOSxh22_uo0R1w@mail.gmail.com>
- <d4309392-711a-75b0-7bf0-9e7de8fd527e@huawei.com> <CAHS8izM1P6d8jgyWE9wFJUJah2YFsjHP2uikDwA0vR=3QA+BXQ@mail.gmail.com>
- <a8ae22dc-5b85-9efe-16c7-d95d455828fa@huawei.com>
-In-Reply-To: <a8ae22dc-5b85-9efe-16c7-d95d455828fa@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 9 Nov 2023 04:20:11 -0800
-Message-ID: <CAHS8izOh8yC7q9yJN+RAKGs=AgsEf13MnFDmG46=EU05ynnLKw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
+References: <75E355CF-3621-40D7-A31C-BA829804DFA2@meinberg.de>
+ <6ab3289a-2ede-41a3-8c57-b01df37bab7f@lunn.ch> <DB0904D7-4F30-4A61-A4CB-48C7BFF4390F@meinberg.de>
+In-Reply-To: <DB0904D7-4F30-4A61-A4CB-48C7BFF4390F@meinberg.de>
+From: Kristian Myrland Overskeid <koverskeid@gmail.com>
+Date: Thu, 9 Nov 2023 13:20:26 +0100
+Message-ID: <CAGL4nSN0ZLHjARRRvS8Df8gLQLUb0ddiSJ5UfjNte0oX83VTOg@mail.gmail.com>
+Subject: Re: PRP with VLAN support - or how to contribute to a Linux network driver
+To: Heiko Gerstung <heiko.gerstung@meinberg.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 9, 2023 at 1:30=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
+If you simply remove the line "dev->features |=
+NETIF_F_VLAN_CHALLENGED;" in hsr_device.c, the hsr-module is handling
+vlan frames without any further modifications. Unless you need to send
+vlan tagged supervision frames, I'm pretty sure the current
+implementation works just as fine with vlan as without.
+
+However, in my opinion, the discard-algorithm
+(hsr_register_frame_out() in hsr_framereg.c) is not made for switched
+networks. The problem with the current implementation is that it does
+not account for frames arriving in a different order than it was sent
+from a host. It simply checks if the sequence number of an arriving
+frame is higher than the previous one. If the network has some sort of
+priority, it must be expected that frames will arrive out of order
+when the network load is big enough for the switches to start
+prioritizing.
+
+My solution was to add a linked list to the node struct, one for each
+registered vlan id. It contains the vlan id, last sequence number and
+time. On reception of a vlan frame to the HSR_PT_MASTER, it retrieves
+the "node_seq_out" and "node_time_out" based on the vlan.
+
+This works fine for me because all the prp nodes are connected to
+trunk ports and the switches are prioritizing frames based on the vlan
+tag.
+
+If a prp node is connected to an access port, but the network is using
+vlan priority, all sequence numbers and timestamps with the
+corresponding vlan id must be kept in a hashed list. The list must be
+regularly checked to remove elements before new frames with a wrapped
+around sequence number can arrive.
+
+ZHAW School of Engineering has made a prp program for both linux user
+and kernel space with such a discard algorithm. The program does not
+compile without some modifications, but the discard algorithm works
+fine. The program is open source and can be found at
+https://github.com/ZHAW-InES-Team/sw_stack_prp1.
+
+
+tor. 9. nov. 2023 kl. 09:08 skrev Heiko Gerstung <heiko.gerstung@meinberg.de>:
 >
-> On 2023/11/9 11:20, Mina Almasry wrote:
-> > On Wed, Nov 8, 2023 at 2:56=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
-.com> wrote:
+> Am 08.11.23, 16:17 schrieb "Andrew Lunn" <andrew@lunn.ch <mailto:andrew@lunn.ch>>:
 >
-> >
-> > Agreed everything above is undoable.
-> >
-> >> But we might be able to do something as folio is doing now, mm subsyst=
-em
-> >> is still seeing 'struct folio/page', but other subsystem like slab is =
-using
-> >> 'struct slab', and there is still some common fields shared between
-> >> 'struct folio' and 'struct slab'.
-> >>
-> >
-> > In my eyes this is almost exactly what I suggested in RFC v1 and got
-> > immediately nacked with no room to negotiate. What we did for v1 is to
-> > allocate struct pages for dma-buf to make dma-bufs look like struct
-> > page to mm subsystem. Almost exactly what you're describing above.
 >
-> Maybe the above is where we have disagreement:
-> Do we still need make dma-bufs look like struct page to mm subsystem?
-> IMHO, the answer is no. We might only need to make dma-bufs look like
-> struct page to net stack and page pool subsystem. I think that is already
-> what this pacthset is trying to do, what I am suggesting is just make
-> it more like 'struct page' to net stack and page pool subsystem, in order
-> to try to avoid most of the 'if' checking in net stack and page pool
-> subsystem.
+> >> I would like to discuss if it makes sense to remove the PRP
+> >> functionality from the HSR driver (which is based on the bridge
+> >> kernel module AFAICS) and instead implement PRP as a separate module
+> >> (based on the Bonding driver, which would make more sense for PRP).
 >
-
-First, most of the checking in the net stack is
-skb_frag_not_readable(). dma-buf are fundamentally not kmap()able and
-not readable. So we can't remove those, no matter what we do I think.
-Can we agree on that? If so, lets discuss removing most of the ifs in
-the page pool, only.
-
-> > It's a no-go. I don't think renaming struct page to netmem is going to
-> > move the needle (it also re-introduces code-churn). What I feel like I
-> > learnt is that dma-bufs are not struct pages and can't be made to look
-> > like one, I think.
-> >
-> >> As the netmem patchset, is devmem able to reuse the below 'struct netm=
-em'
-> >> and rename it to 'struct page_pool_iov'?
-> >
-> > I don't think so. For the reasons above, but also practically it
-> > immediately falls apart. Consider this field in netmem:
-> >
-> > + * @flags: The same as the page flags.  Do not use directly.
-> >
-> > dma-buf don't have or support page-flags, and making dma-buf looks
-> > like they support page flags or any page-like features (other than
-> > dma_addr) seems extremely unacceptable to mm folks.
 >
-> As far as I tell, as we limit the devmem usage in netstack, the below
-> is the related mm function call for 'struct page' for devmem:
-> page_ref_*(): page->_refcount does not need changing
-
-Sorry, I don't understand. Are you suggesting we call page_ref_add() &
-page_ref_sub() on page_pool_iov? That is basically making
-page_pool_iov look like struct page to the mm stack, since page_ref_*
-are mm calls, which you say above we don't need to do. We will still
-need to special case this, no?
-
-> page_is_pfmemalloc(): which is corresponding to page->pp_magic, and
->                       devmem provider can set/unset it in it's 'alloc_pag=
-es'
->                       ops.
-
-page_is_pfmemalloc() has nothing to do with page->pp_magic. It checks
-page->lru.next to figure out if this is a pfmemalloc. page_pool_iov
-has no page->lru.next. Still need to special case this?
-
-> page_to_nid(): we may need to handle it differently somewhat like this
->                patch does as page_to_nid() may has different implementati=
-on
->                based on different configuration.
-
-So you're saying we need to handle page_to_nid() differently for
-devmem? So we're not going to be able to avoid the if statement.
-
-> page_pool_iov_put_many(): as mentioned in other thread, if net stack is n=
-ot
->                           calling page_pool_page_put_many() directly, we
->                           can reuse napi_pp_put_page() for devmem too, an=
-d
->                           handle the special case for devmem in 'release_=
-page'
->                           ops.
+> > Seems like nobody replied. I don't know PRP or HSR, so i can only make
+> > general remarks.
 >
-
-page_pool_iov_put_many()/page_pool_iov_get_many() are called to do
-refcounting before the page is released back to the provider. I'm not
-seeing how we can handle the special case inside of 'release_page' -
-that's too late, as far as I can tell.
-
-The only way to remove the if statements in the page pool is to
-implement what you said was not feasible in an earlier email. We would
-define this struct:
-
-struct netmem {
-        /* common fields */
-        refcount_t refcount;
-        bool is_pfmemalloc;
-        int nid;
-        ......
-        union {
-                struct devmem{
-                        struct dmabuf_genpool_chunk_owner *owner;
-                };
-
-                struct page * page;
-        };
-};
-
-Then, we would require all memory providers to allocate struct netmem
-for the memory and set the common fields, including ones that have
-struct pages. For devmem, netmem->page will be NULL, because netmem
-has no page.
-
-If we do that, the page pool can ignore whether the underlying memory
-is page or devmem, because it can use the common fields, example:
-
-/* page_ref_count replacement */
-netmem_ref_count(struct netmem* netmem) {
-    return netmem->refcount;
-}
-
-/* page_ref_add replacement */
-netmem_ref_add(struct netmem* netmem) {
-   atomic_inc(netmem->refcount);
-}
-
-/* page_to_nid replacement */
-netmem_nid(struct netmem* netmem) {
-    return netmem->nid;
-}
-
-/* page_is_pfmemalloc() replacement */
-netmem_is_pfmemalloc(struct netmem* netmem) {
-    return netmem->is_pfmemalloc;
-}
-
-/* page_ref_sub replacement */
-netmem_ref_sub(struct netmem* netmem) {
-    atomic_sub(netmet->refcount);
-    if (netmem->refcount =3D=3D 0) {
-                  /* release page to the memory provider.
-                   * struct page memory provider will do put_page(),
-                   * devmem will do something else */
-           }
-     }
-}
-
-
-I think this MAY BE technically feasible, but I'm not sure it's better:
-
-1. It is a huge refactor to the page pool, lots of code churn. While
-the page pool currently uses page*, it needs to be completely
-refactored to use netmem*.
-2. It causes extra memory usage. struct netmem needs to be allocated
-for every struct page.
-3. It has minimal perf upside. The page_is_page_pool_iov() checks
-currently have minimal perf impact, and I demonstrated that to Jesper
-in RFC v2.
-4. It also may not be technically feasible. I'm not sure how netmem
-interacts with skb_frag_t. I guess we replace struct page* bv_page
-with struct netmem* bv_page, and add changes there.
-5. Drivers need to be refactored to use netmem* instead of page*,
-unless we cast netmem* to page* before returning to the driver.
-
-Possibly other downsides, these are what I could immediately think of.
-
-If I'm still misunderstanding your suggestion, it may be time to send
-me a concrete code snippet of what you have in mind. I'm a bit
-confused at the moment because the only avenue I see to remove the if
-statements in the page pool is to define the struct that we agreed is
-not feasible in earlier emails.
-
-> >
-> >> So that 'struct page' for normal
-> >> memory and 'struct page_pool_iov' for devmem share the common fields u=
-sed
-> >> by page pool and net stack?
-> >
-> > Are you suggesting that we'd cast a netmem* to a page* and call core
-> > mm APIs on it? It's basically what was happening with RFC v1, where
-> > things that are not struct pages were made to look like struct pages.
-> >
-> > Also, there isn't much upside for what you're suggesting, I think. For
-> > example I can align the refcount variable in struct page_pool_iov with
-> > the refcount in struct page so that this works:
-> >
-> > put_page((struct page*)ppiov);
-> >
-> > but it's a disaster. Because put_page() will call __put_page() if the
-> > page is freed, and __put_page() will try to return the page to the
-> > buddy allocator!
+> Thank you for responding!
 >
-> As what I suggested above, Can we handle this in devmem provider's
-> 'release_page' ops instead of calling put_page() directly as for devmem.
+> > The general policy is that we don't rip something out and replace it
+> > with new code. We try to improve what already exists to meet the
+> > demands. This is partially because of backwards compatibility. There
+> > could be users using the code as is. You cannot break that. Can you
+> > step by step modify the current code to make use of bonding, and in
+> > the process show you don't break the current use cases?
 >
-> >
-> >>  And we might be able to reuse the 'flags',
-> >> '_pp_mapping_pad' and '_mapcount' for specific mem provider, which is =
-enough
-> >> for the devmem only requiring a single pointer to point to it's
-> >> owner?
-> >>
-> >
-> > All the above seems quite similar to RFC v1 again, using netmem
-> > instead of struct page. In RFC v1 we re-used zone_device_data() for
-> > the dma-buf owner equivalent.
+> Understood. I am not sure if we can change the hsr driver to gradually use a more bonding-like approach for prp and I believe this might not be required, as long as we can get VLAN support into it.
 >
-> As we have added a few checkings to limit 'struct page' for devmem to
-> be only used in net stack, we can decouple 'struct page' for devmem
-> from mm subsystem, zone_device_data() is not really needed, right?
+> > You also need to consider offloading to hardware. The bridge code has infrastructure
+> > to offload. Does the bond driver? I've no idea about that.
 >
-> If we can decouple 'struct page' for normal memory from mm subsystem
-> through the folio work in the future, then we may define a more abstract
-> structure for page pool and net stack instead of reusing 'struct page'
-> from mm.
+> I do not know this either but would expect that the nature of bonding would not require offloading support (I do not see a potential for efficiency/performance improvements here, unlike HSR or PRP).
 >
-> >
-
-
-
---
-Thanks,
-Mina
+> >> Hoping for advise what the next steps could be. Happy to discuss
+> >> this off-list as it may not be of interest for most people.
+>
+> > You probably want to get together with others who are interested in
+> > PRP and HSR. linutronix, ti, microchip, etc.
+>
+> Yes, would love to do that and my hope was that I would find them here. I am not familiar with the "orphaned" status for a kernel module, but I would have expected that one of the mentioned parties interested in PRP/HSR would have adopted the module.
+>
+> > Andrew
+>
+> Again, thanks a lot for your comments and remarks, very useful.
+>
+> Heiko
+>
+>
+>
 
