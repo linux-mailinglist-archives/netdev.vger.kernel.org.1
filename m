@@ -1,144 +1,118 @@
-Return-Path: <netdev+bounces-46922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F0C17E714A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:19:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B76A87E7165
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 291A0281102
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:19:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34C5CB20CA2
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C232C30322;
-	Thu,  9 Nov 2023 18:18:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWVZfaJn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613861DDCB;
+	Thu,  9 Nov 2023 18:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E82F358AF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:18:58 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9DC3C01;
-	Thu,  9 Nov 2023 10:18:57 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-407c3adef8eso8749275e9.2;
-        Thu, 09 Nov 2023 10:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699553936; x=1700158736; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4OWgafj54kevub5QuwjRLgVnCD0p1Q643A6n3V1pcLs=;
-        b=fWVZfaJnUzoUZr4Ss3pGHTGTM0fhPKQ9uTl1nE+Rwxx0LqM4Ekk6yt0w2K13CUmtxd
-         OhZeYhjufqh20cz/m7ksBrj9Ws2RBsOhrRM3CKNtKXIK3LLS+9nyx/V6eD18Ur7tMUfx
-         dSIfVz2QHSIXPygNxlhNFixWAvYLpPTSjP5OjvNwLoLh9CvxVIfaiMYZiwzjpgfnbT5h
-         zIGQh0Iht0U6l7UyAqW3j4WCsuH51fBzipkNsvX/Mg6vMfR0o/ZG3U8Y6dcSOP9qH5RP
-         Vm9f579zqYVbn4/boQDNnf/f+PRI1FowJfDjw/5YpigwYhDq2Oe0saawwpq2xxCLGxnD
-         5+gw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA79347C9;
+	Thu,  9 Nov 2023 18:28:08 +0000 (UTC)
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 269363C03;
+	Thu,  9 Nov 2023 10:28:08 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-9d0b4dfd60dso191457466b.1;
+        Thu, 09 Nov 2023 10:28:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699553936; x=1700158736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4OWgafj54kevub5QuwjRLgVnCD0p1Q643A6n3V1pcLs=;
-        b=KYi6wRv0iy8KNOPvUAWSfLb+xxFbdGL9YapKajBlCXLs1RtCR9dsJLpenBGSt1jurn
-         VifGsUcx4ZcmAF+XfQ0NR2Exj2cV9RACppIq1lt2rNaqBLFtWpZu+MX97v71OTJxo6fp
-         Ir+y0oFmuOHRkQyyZfspizeifgdpUVu46yUQmUKdUsN6UP+G1eSUBPfp9uGQtojDTcTB
-         48U7mCSUM2Qj0ao28Uc/u6PjOZZGRBaIjzNAO9IwxR/fsiHR0JrzEpCeGXIJqY5+DUm6
-         Oz6Yx5xaLq49P6PGUNVn8dHcWokmvRk3e6maKe8HyjmHNQ8+SCFSxcGJQU/3Ztq0Nqtn
-         9jOA==
-X-Gm-Message-State: AOJu0YxHU05G16Beseq3LckHLxz1Cho/sofCFBbA4V2tXzMIWmqj64vt
-	3289FUosUb+BS957RQWEwhhM9tScCVPAnxCJSH4MHsRS
-X-Google-Smtp-Source: AGHT+IGNrM2VrtZCZ1iHG5iS61vpmfGmwZVJvAETUSs+vsptLcUC8HAIxyHy15HIsMm1QPDzOJ/pe/I6pdKEQtA93jo=
-X-Received: by 2002:a05:600c:524c:b0:402:cc5c:c98 with SMTP id
- fc12-20020a05600c524c00b00402cc5c0c98mr5012274wmb.13.1699553935748; Thu, 09
- Nov 2023 10:18:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699554486; x=1700159286;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=drCAL7MfPLvti2xnDPj/kIqoT3VUikkThA9jieXOVFI=;
+        b=X4tkMelhdO9L7g86xOIF+sgL7/Pv6T7ulC98SuHACbMBrrfS0j/Jrw9yQIH9BAN4fK
+         iFdqiavHronGAFN8mdlW1FPD5zGcgUa+l2E7tnut8gvEyB5uA2Cuz7Y++/3vXeuf6R62
+         sAIpkrESdPpqxaQFkssAPlKW5zB2REjlFgb1gycPRgdf5cP2BD5Q0DDqSEJ9rYYBfVbK
+         JINhsJHzujqCr3SAx/MOignEeujx0WkLaQ2oqfJoSQAXoyi6hISFyyhdwEmoRbEGPGvA
+         9rE5VFgqABaczcKwE2qErP3mlk8hADf3NahcUuUwwf2vzpJQ7ouXKdtw+fimrOvW8f8F
+         E6cA==
+X-Gm-Message-State: AOJu0Yz+xEQXlEDmOw0wFWlr6c4S4KTHWi8uh0s/zZnFkfBuLNgWVpJC
+	QNzW5O827vmJktTN3ENuxWpTixZxbM7IYQ==
+X-Google-Smtp-Source: AGHT+IEP/9Msgj4tIj0/AA6iEsWNtNIXetDgQl3YXOjIS1u00dcEqWMjTNrPThLP2GXcb3djtFgD6w==
+X-Received: by 2002:a17:907:7f04:b0:9c5:64b5:45cc with SMTP id qf4-20020a1709077f0400b009c564b545ccmr5237040ejc.14.1699554486346;
+        Thu, 09 Nov 2023 10:28:06 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-015.fbsv.net. [2a03:2880:31ff:f::face:b00c])
+        by smtp.gmail.com with ESMTPSA id s3-20020a1709067b8300b009adc77fe164sm2875248ejo.66.2023.11.09.10.28.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 10:28:05 -0800 (PST)
+Date: Thu, 9 Nov 2023 10:28:04 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: corbet@lwn.net, linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH] Documentation: Document the Netlink spec
+Message-ID: <ZU0ktGJNbqTwjS3Q@gmail.com>
+References: <20231103135622.250314-1-leitao@debian.org>
+ <m2y1f8mjex.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231028011741.2400327-1-kuba@kernel.org> <20231031210948.2651866-1-kuba@kernel.org>
- <20231109154934.4saimljtqx625l3v@box.shutemov.name> <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
- <20231109161406.lol2mjhr47dhd42q@box.shutemov.name> <11e2e744-4bc7-45b1-aaca-298b5e4ee281@linux.dev>
-In-Reply-To: <11e2e744-4bc7-45b1-aaca-298b5e4ee281@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 9 Nov 2023 10:18:44 -0800
-Message-ID: <CAADnVQJtc6JJZMXuZ0M5_0A3=N-TJuYO2vMofJmK6KLhWrBAPg@mail.gmail.com>
-Subject: Re: [GIT PULL v2] Networking for 6.7
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, Hou Tao <houtao1@huawei.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m2y1f8mjex.fsf@gmail.com>
 
-On Thu, Nov 9, 2023 at 10:09=E2=80=AFAM Yonghong Song <yonghong.song@linux.=
-dev> wrote:
->
->
-> On 11/9/23 8:14 AM, Kirill A. Shutemov wrote:
-> > On Thu, Nov 09, 2023 at 08:01:39AM -0800, Alexei Starovoitov wrote:
-> >> On Thu, Nov 9, 2023 at 7:49=E2=80=AFAM Kirill A. Shutemov <kirill@shut=
-emov.name> wrote:
-> >>> On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
-> >>>>        bpf: Add support for non-fix-size percpu mem allocation
-> >>> Recent changes in BPF increased per-CPU memory consumption a lot.
-> >>>
-> >>> On virtual machine with 288 CPUs, per-CPU consumtion increased from 1=
-11 MB
-> >>> to 969 MB, or 8.7x.
-> >>>
-> >>> I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
-> >>> non-fix-size percpu mem allocation"), which part of the pull request.
-> >> Hmm. This is unexpected. Thank you for reporting.
-> >>
-> >> How did you measure this 111 MB vs 969 MB ?
-> >> Pls share the steps to reproduce.
-> > Boot VMM with 288 (qemu-system-x86_64 -smp 288) and check Percpu: field=
- of
-> > /proc/meminfo.
->
-> I did some experiments with my VM. My VM currently supports up to 255 cpu=
-s,
-> so I tried 4/32/252 number of cpus. For a particular number of cpus, two
-> experiments are done:
->    (1). bpf-percpu-mem-prefill
->    (2). no-bpf-percpu-mem-prefill
->
-> For 4 cpu:
->     bpf-percpu-mem-prefill:
->       Percpu:             2000 kB
->     no-bpf-percpu-mem-prefill:
->       Percpu:             1808 kB
->
->     bpf-percpu-mem-prefill percpu cost: (2000 - 1808)/4 KB =3D 48KB
->
-> For 32 cpus:
->     bpf-percpu-mem-prefill:
->       Percpu:            25344 kB
->     no-bpf-percpu-mem-prefill:
->       Percpu:            14464 kB
->
->     bpf-percpu-mem-prefill percpu cost: (25344 - 14464)/4 KB =3D 340KB
->
-> For 252 cpus:
->     bpf-percpu-mem-prefill:
->       Percpu:           230912 kB
->     no-bpf-percpu-mem-prefill:
->       Percpu:            57856 kB
->
->     bpf-percpu-mem-prefill percpu cost: (230912 - 57856)/4 KB =3D 686KB
->
-> I am not able to reproduce the dramatic number from 111 MB to 969 MB.
-> My number with 252 cpus is from ~58MB to ~231MB.
+On Wed, Nov 08, 2023 at 02:03:34PM +0000, Donald Hunter wrote:
+> Breno Leitao <leitao@debian.org> writes:
+> 
+> > This is a Sphinx extension that parses the Netlink YAML spec files
+> > (Documentation/netlink/specs/), and generates a rst file to be
+> > displayed into Documentation pages.
+> >
+> > Create a new Documentation/networking/netlink_spec page, and a sub-page
+> > for each Netlink spec that needs to be documented, such as ethtool,
+> > devlink, netdev, etc.
+> >
+> > Create a Sphinx directive extension that reads the YAML spec
+> > (located under Documentation/netlink/specs), parses it and returns a RST
+> > string that is inserted where the Sphinx directive was called.
+> 
+> This is great! Looks like I need to fill in some missing docs in the
+> specs I have contributed.
+> 
+> I wonder if the generated .rst content can be adjusted to improve the
+> resulting HTML.
+> 
+> There are a couple of places where paragraph text is indented and I
+> don't think it needs to be, e.g. the 'Summary' doc.
+> 
+> A lot of the .rst content seems to be over-indented which causes
+> blockquote tags to be generated in the HTML. That combined with a
+> mixture of bullets and definition lists at the same indentation level
+> seems to produce HTML with inconsistent indentation.
+> 
+> I quickly hacked the diff below to see if it would improve the HTML
+> rendering. I think the HTML has fewer odd constructs and the indentation
+> seems better to my eye. My main aim was to ensure that for a given
+> section, each indentation level uses the same construct, whether it be a
+> definition list or a bullet list.
 
-Even 231MB is way too much. We shouldn't be allocating that much.
-Let's switch to on-demand allocation. Only when bpf progs that
-user per-cpu are loaded.
+Thanks for the diff. That makes total sense and I will integrate it  in
+the updated version.
+
+> It would be great to generate links from e.g. an attribute-set to its
+> definition.
+> 
+> Did you intentionally leave out the protocol values?
+
+Yes. This could be done in a follow up patch if necessary.
+> 
+> It looks like parse_entries will need to be extended to include the type
+> information for struct members, similar to how attribute sets are shown.
+> I'd be happy to look at this as a follow up patch, unless you get there
+> first. 
+
+Awesome. That would be appreciate.
 
