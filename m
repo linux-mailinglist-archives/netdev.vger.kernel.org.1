@@ -1,115 +1,159 @@
-Return-Path: <netdev+bounces-46722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769737E6146
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:09:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868867E61A5
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2ECE1C208A7
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 00:09:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40008281268
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5064F363;
-	Thu,  9 Nov 2023 00:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6B4376;
+	Thu,  9 Nov 2023 01:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Quu+joIj"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="twBcydj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339D5362
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:09:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 362FBC433C7;
-	Thu,  9 Nov 2023 00:09:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699488549;
-	bh=krYc3gc4p+L6r0RoI311O2EKgq/PD9o4KG4eS/ctDt8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Quu+joIjXBYP3MZqXQT4QO6j66vYzPxpCOW985bRj1dKthB+FSarrNdOJM0sS1/LK
-	 yeqj+cWJ03XwGdw5t2jWDWPCny0Bb9xrkH+KLPpOhLk3u9aY7+5UZYg/DvofuqrrLg
-	 kDAK4oIZTWV+492zCKHAqVzSgfyMhgID69RgM2eZllx2B5VSRytHmtShJZqU8+YVc6
-	 Kws3KfLPFNUWNtFZGX2SoNk5y6e30N66FJZpnJEZg/sznaIsDhNwmChDuAekNuRAM/
-	 baNroLE67imrtuCAWfmjRxhFuNOprHSPt1A7NgcRm9ms7I5/SXRv4Y2oIYqijbfPTn
-	 R8exwIrS065cQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Subject: [RFC net-next] net: don't dump stack on queue timeout
-Date: Wed,  8 Nov 2023 16:09:01 -0800
-Message-ID: <20231109000901.949152-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692F67F4
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:00:44 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B31258A
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 17:00:44 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cc3bc5df96so2306825ad.2
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 17:00:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699491643; x=1700096443; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=g+m1/eec3BAI+VxQgeWP5nozlTdhs+GvhhRREFgPtnw=;
+        b=twBcydj177gEe6trQmjXVoEAVUA814gQxanP2tNi0bC3WYu6GFBi1NTJRuGFMc7qcb
+         N1KFTTsThKZvuYzaT5/e43BdLn98gA4KcYLDiodnOM9uamizS8mZ9pXr73tQHJjWEjHi
+         g9H1P6xpegWWj9yuDLHtWitsfInUyguJwyoGEy8ZNIbkP0BgIllWYEhtXdtsjPAqaAV7
+         5jjzjuj9NNgm7m2bXKd8/ghLRdWG1Lf80THlMHFiVTNR9MpuDFRZUIrpZDMmqvafM0jH
+         rzsw88LY2cGiakpGyVwhgep1rMZP8RoXur38b63NkiS9x71ETQvVDbUGwbahhix27iXP
+         W6Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699491643; x=1700096443;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g+m1/eec3BAI+VxQgeWP5nozlTdhs+GvhhRREFgPtnw=;
+        b=KJWHm7JH1YEU7BekNi6BDcHiZQNcJ8g9yNUkcrSg+yeuImKKf+7BuTqbJK/LAJdWac
+         u/sToNnYL7TIbaA8+Koxe2c/bnKuXl3BSbXZqVyMctpgScQyKMWh36s+exhxXVcgJ5LY
+         iWILhBQAREddpD7wplmYaRCTGCPivywPCC8Lb98o11hvS9JJ6sl1K4QbgNzMkSlATjtR
+         vDTEe4C7W68E9bO/2LB2+tcrIwIXaL+w9fjRe7M0qNaC5iiclI3RvSv2YlwZjeAZ9gWj
+         A77GUn4yFN2np0xPSsPHxFCnjKYlilryCKVfJaepKjshy/jTIcehzuCruKqXCz1RUKvk
+         QvcQ==
+X-Gm-Message-State: AOJu0YzHYyA28tO5Afc19nh8R4yYNwM6juZ2PX5Lzj0jYZohJx/D7vpp
+	mUv61G94COUHOOnulpyJDI8b6A==
+X-Google-Smtp-Source: AGHT+IGqOk5pLGreahWyU5Tyhch5OGepp+ms2LPYRQxo1oPkx1W4LYvgzN77Bieh5CFVk1MoPdYbhQ==
+X-Received: by 2002:a17:902:d2cf:b0:1cc:6acc:8fa4 with SMTP id n15-20020a170902d2cf00b001cc6acc8fa4mr4025647plc.32.1699491643400;
+        Wed, 08 Nov 2023 17:00:43 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:887f])
+        by smtp.gmail.com with ESMTPSA id g10-20020a170902934a00b001b0358848b0sm2287468plp.161.2023.11.08.17.00.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Nov 2023 17:00:43 -0800 (PST)
+Message-ID: <b1476f8e-1b4b-497a-9e80-aff679ca8b4b@davidwei.uk>
+Date: Wed, 8 Nov 2023 17:00:39 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
+Content-Language: en-GB
+To: David Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
+ <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
+ Pavel Begunkov <asml.silence@gmail.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-6-almasrymina@google.com>
+ <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
+ <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
+ <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The top syzbot report for networking (#14 for the entire kernel)
-is the queue timeout splat. We kept it around for a long time,
-because in real life it provides pretty strong signal that
-something is wrong with the driver or the device.
+On 2023-11-07 14:55, David Ahern wrote:
+> On 11/7/23 3:10 PM, Mina Almasry wrote:
+>> On Mon, Nov 6, 2023 at 3:44 PM David Ahern <dsahern@kernel.org> wrote:
+>>>
+>>> On 11/5/23 7:44 PM, Mina Almasry wrote:
+>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>>>> index eeeda849115c..1c351c138a5b 100644
+>>>> --- a/include/linux/netdevice.h
+>>>> +++ b/include/linux/netdevice.h
+>>>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
+>>>>  };
+>>>>
+>>>>  #ifdef CONFIG_DMA_SHARED_BUFFER
+>>>> +struct page_pool_iov *
+>>>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
+>>>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
+>>>
+>>> netdev_{alloc,free}_dmabuf?
+>>>
+>>
+>> Can do.
+>>
+>>> I say that because a dmabuf can be host memory, at least I am not aware
+>>> of a restriction that a dmabuf is device memory.
+>>>
+>>
+>> In my limited experience dma-buf is generally device memory, and
+>> that's really its use case. CONFIG_UDMABUF is a driver that mocks
+>> dma-buf with a memfd which I think is used for testing. But I can do
+>> the rename, it's more clear anyway, I think.
+> 
+> config UDMABUF
+>         bool "userspace dmabuf misc driver"
+>         default n
+>         depends on DMA_SHARED_BUFFER
+>         depends on MEMFD_CREATE || COMPILE_TEST
+>         help
+>           A driver to let userspace turn memfd regions into dma-bufs.
+>           Qemu can use this to create host dmabufs for guest framebuffers.
+> 
+> 
+> Qemu is just a userspace process; it is no way a special one.
+> 
+> Treating host memory as a dmabuf should radically simplify the io_uring
+> extension of this set. That the io_uring set needs to dive into
+> page_pools is just wrong - complicating the design and code and pushing
+> io_uring into a realm it does not need to be involved in.
 
-Removing it is also likely to break monitoring for those who
-track it as a kernel warning.
+I think our io_uring proposal will already be vastly simplified once we
+rebase onto Kuba's page pool memory provider API. Using udmabuf means
+depending on a driver designed for testing, vs io_uring's registered
+buffers API that's been tried and tested.
 
-Nevertheless, WARN()ings are best suited for catching kernel
-programming bugs. If a Tx queue gets starved due to a pause
-storm, priority configuration, or other weirdness - that's
-obviously a problem, but not a problem we can fix at
-the kernel level.
+I don't have an intuitive understanding of the trade offs yet, and would
+need to try out udmabuf and compare vs say using our own page pool
+memory provider.
 
-Bite the bullet and convert the WARN() to a print.
-
-Before:
-
-  NETDEV WATCHDOG: eni1np1 (netdevsim): transmit queue 0 timed out 1975 ms
-  WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:525 dev_watchdog+0x39e/0x3b0
-  [... completely pointless stack trace of a timer follows ...]
-
-Now:
-
-  netdevsim netdevsim1 eni1np1: NETDEV WATCHDOG: CPU: 0: transmit queue 0 timed out 1769 ms
-
-Alternatively we could mark the drivers which syzbot has
-learned to abuse as "print-instead-of-WARN" selectively.
-
-Reported-by: syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: jhs@mojatatu.com
-CC: xiyou.wangcong@gmail.com
-CC: jiri@resnulli.us
----
- net/sched/sch_generic.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index 4195a4bc26ca..8dd0e5925342 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -522,8 +522,9 @@ static void dev_watchdog(struct timer_list *t)
- 
- 			if (unlikely(timedout_ms)) {
- 				trace_net_dev_xmit_timeout(dev, i);
--				WARN_ONCE(1, "NETDEV WATCHDOG: %s (%s): transmit queue %u timed out %u ms\n",
--					  dev->name, netdev_drivername(dev), i, timedout_ms);
-+				netdev_crit(dev, "NETDEV WATCHDOG: CPU: %d: transmit queue %u timed out %u ms\n",
-+					    raw_smp_processor_id(),
-+					    i, timedout_ms);
- 				netif_freeze_queues(dev);
- 				dev->netdev_ops->ndo_tx_timeout(dev, i);
- 				netif_unfreeze_queues(dev);
--- 
-2.41.0
-
+> 
+> Most (all?) of this patch set can work with any memory; only device
+> memory is unreadable.
+> 
+> 
 
