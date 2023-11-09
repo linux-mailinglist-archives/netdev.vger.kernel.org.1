@@ -1,132 +1,127 @@
-Return-Path: <netdev+bounces-46920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D02C7E7134
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:07:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6757E714B
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A942810C7
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:07:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2298A1C209E2
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC63C32C94;
-	Thu,  9 Nov 2023 18:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA28341AC;
+	Thu,  9 Nov 2023 18:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lr8IWXYH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DBQjH57e"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749F232C82
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:07:29 +0000 (UTC)
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDEBC3AAE
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:07:28 -0800 (PST)
-Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-4a13374a1e8so502570e0c.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:07:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699553248; x=1700158048; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q5jof2dMXbvUyv/2d3eh8cYmtslz7u0wbU9sqNUptZw=;
-        b=lr8IWXYHFzQZXnUU/VHDOE8lzRLYhBk24xaDUt6mknLxoRwm7q0viGidfxl7KDrlCR
-         QnA0pqSymEsMbFUasogVdy9OGiRjtQLhMV20dscCeAI4CHg2SS9Rlztk47AhFcON74MC
-         MTdcm+5DEFN+A+0xAAvu8FPGfHavRjZ0i5j3u2w33sVqv1en/vz7c/vted6S0e24f5BG
-         p0PN3NaxisoraETVnk26pNzhs6/10RPrfhiL3VgmWD4FsSo2fF24t0quXHsofq/9q2Uk
-         fh8nmn/ghtNzMtDnSPmpYb3GNxVd6P8+G435DDTCLmjKewsP1sTGjZGScTDzvC7J6R+e
-         Nhzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699553248; x=1700158048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q5jof2dMXbvUyv/2d3eh8cYmtslz7u0wbU9sqNUptZw=;
-        b=aGy7D751nUBvYCvj60jAzCzlvvppdTmNu/oU12emm9G8HyAyY8LczVA2txtFN4PhjB
-         fkvGo+leS74865l3QO+5kyUImYk4nnqji+QbgFg7tPUb+4XixvSJyehB3whKBvVXDToR
-         0v2bZcQKkLHoM37h/0LuBJShbPdGNO97Ni9/lgJGfPsSI1xS8ogPDSRR2LPOYL1wPwUL
-         NF+3Zfkn7axguz1Ln7cXAtnhsqygnPsX1PlAdkoC+9B3opftjivfwt7JRhZyjxffx8+t
-         TVYk4A7P0j9mASRraRI62OiKqV/BLUVTdlwzgSVPnwfFEpYFkaS7uqOwF2VdPT+ianV0
-         5WkA==
-X-Gm-Message-State: AOJu0YyqZsMwELktMvAlskLERc6iYndbqIXp99azVcFIKDNepeWtr2pQ
-	TldPfTaOgp9/eTFYXe7n1Cd8+DRG2RGvQFrLCKhODg==
-X-Google-Smtp-Source: AGHT+IEnm0GQvFTNs/hpK2AqwHKtIdbux6hL2chbJDT/1nnPxaXSEMiQmybsy0eZF4F5OgkJ1E0jEiVEkvhvNTuTRrY=
-X-Received: by 2002:a05:6122:1799:b0:49c:79f3:27a4 with SMTP id
- o25-20020a056122179900b0049c79f327a4mr2654001vkf.3.1699553247892; Thu, 09 Nov
- 2023 10:07:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1829330322
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:19:32 +0000 (UTC)
+X-Greylist: delayed 576 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 09 Nov 2023 10:19:32 PST
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BBD21FF6
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:19:31 -0800 (PST)
+Message-ID: <11e2e744-4bc7-45b1-aaca-298b5e4ee281@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1699553393;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+i1XoVLmgrvkP2MiYW953YAIB1lEyaf4e1N1W5RcvHU=;
+	b=DBQjH57enkpPK0kzCojOpPQc9yMRxEWWxKb7Z7VJ2Fg1KVuZBL+keheo5yShwEdhi7Pp06
+	4/N9gGeAm7646xxn0/jhh/p9FjBecI5G7aSWYErCGrSYLRSFBwyYFrEQoN1kozqy0osGNU
+	W40kqlOe6WZre6QGg58biFDenAMNieU=
+Date: Thu, 9 Nov 2023 10:09:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231102225837.1141915-1-sdf@google.com> <CAADnVQLTkhYMXxDsJ4jB5d7SnQ_Z51j9YT65TcdiXNg5DOO_Fg@mail.gmail.com>
-In-Reply-To: <CAADnVQLTkhYMXxDsJ4jB5d7SnQ_Z51j9YT65TcdiXNg5DOO_Fg@mail.gmail.com>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Thu, 9 Nov 2023 10:07:14 -0800
-Message-ID: <CAKH8qBskineuye_0cUP6_aPb+FO2=PigFgC=n5upC1rt2ritQg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 00/13] xsk: TX metadata
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	"Song, Yoong Siang" <yoong.siang.song@intel.com>, Network Development <netdev@vger.kernel.org>, 
-	xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [GIT PULL v2] Networking for 6.7
+Content-Language: en-GB
+To: "Kirill A. Shutemov" <kirill@shutemov.name>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Hou Tao <houtao1@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Network Development <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ yonghong.song@linux.dev
+References: <20231028011741.2400327-1-kuba@kernel.org>
+ <20231031210948.2651866-1-kuba@kernel.org>
+ <20231109154934.4saimljtqx625l3v@box.shutemov.name>
+ <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
+ <20231109161406.lol2mjhr47dhd42q@box.shutemov.name>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20231109161406.lol2mjhr47dhd42q@box.shutemov.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 9, 2023 at 10:03=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Nov 2, 2023 at 3:58=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
-> wrote:
-> >
-> > This series implements initial TX metadata (offloads) for AF_XDP.
-> > See patch #2 for the main implementation and mlx5/stmmac ones for the
-> > example on how to consume the metadata on the device side.
-> >
-> > Starting with two types of offloads:
-> > - request TX timestamp (and write it back into the metadata area)
-> > - request TX checksum offload
-> >
-> > Changes since v4:
-> > - remove 'render-max: true' from spec (Jakub)
-> > - move xsk_tx_metadata_ops into include/net/xdp_sock.h (Jakub)
-> > - christmas tree in netdev_nl_dev_fill (Jakub)
-> > - fix > vs >=3D when dumping masks in samples (Jakub)
-> > - switch to 8-byte alignment for tx metadata length (Jakub)
-> > - spelling fixes in the doc (Magnus)
-> > - deny metadata length >=3D 256 (Magnus)
-> > - validate metadata flags and deny unknown ones (Jakub)
-> > - move XDP_TX_METADATA_CHECKSUM_SW into umem config flag (Jakub)
-> > - don't print timestamps twice in xdp_hw_metadata (Song)
-> > - rename anonymous xsk_tx_metadata member into request (Alexei)
-> > - add comment to xsk_tx_metadata (Alexei)
-> >
-> > I've separated new bits that need a closer review into separate patches=
-:
-> > - xsk_tx_metadata flags validation:
-> >   - xsk: Validate xsk_tx_metadata flags
-> > - new umem flag for sw tx csum calculation (instead of per-packet flag)
-> >   - xsk: Add option to calculate TX checksum in SW
->
-> Stan,
->
-> new xdp_metadata is failing on s390. See BPF CI:
->
-> verify_xsk_metadata:FAIL:csum unexpected csum: actual 29212 !=3D expected=
- 7282
->
-> Other than this I think the patchset is good to go.
-> Pls fix and respin.
 
-Oh, thanks for catching this, probably some endianness issues? Will take a =
-look!
+On 11/9/23 8:14 AM, Kirill A. Shutemov wrote:
+> On Thu, Nov 09, 2023 at 08:01:39AM -0800, Alexei Starovoitov wrote:
+>> On Thu, Nov 9, 2023 at 7:49 AM Kirill A. Shutemov <kirill@shutemov.name> wrote:
+>>> On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
+>>>>        bpf: Add support for non-fix-size percpu mem allocation
+>>> Recent changes in BPF increased per-CPU memory consumption a lot.
+>>>
+>>> On virtual machine with 288 CPUs, per-CPU consumtion increased from 111 MB
+>>> to 969 MB, or 8.7x.
+>>>
+>>> I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
+>>> non-fix-size percpu mem allocation"), which part of the pull request.
+>> Hmm. This is unexpected. Thank you for reporting.
+>>
+>> How did you measure this 111 MB vs 969 MB ?
+>> Pls share the steps to reproduce.
+> Boot VMM with 288 (qemu-system-x86_64 -smp 288) and check Percpu: field of
+> /proc/meminfo.
+
+I did some experiments with my VM. My VM currently supports up to 255 cpus,
+so I tried 4/32/252 number of cpus. For a particular number of cpus, two
+experiments are done:
+   (1). bpf-percpu-mem-prefill
+   (2). no-bpf-percpu-mem-prefill
+
+For 4 cpu:
+    bpf-percpu-mem-prefill:
+      Percpu:             2000 kB
+    no-bpf-percpu-mem-prefill:
+      Percpu:             1808 kB
+
+    bpf-percpu-mem-prefill percpu cost: (2000 - 1808)/4 KB = 48KB
+
+For 32 cpus:
+    bpf-percpu-mem-prefill:
+      Percpu:            25344 kB
+    no-bpf-percpu-mem-prefill:
+      Percpu:            14464 kB
+
+    bpf-percpu-mem-prefill percpu cost: (25344 - 14464)/4 KB = 340KB
+
+For 252 cpus:
+    bpf-percpu-mem-prefill:
+      Percpu:           230912 kB
+    no-bpf-percpu-mem-prefill:
+      Percpu:            57856 kB
+  
+    bpf-percpu-mem-prefill percpu cost: (230912 - 57856)/4 KB = 686KB
+
+I am not able to reproduce the dramatic number from 111 MB to 969 MB.
+My number with 252 cpus is from ~58MB to ~231MB.
+
+I appears that percpu allocation cost goes up when the number of cpus
+is increased.
+
+I will continue to debug this. Thanks!
+
+>
 
