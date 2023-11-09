@@ -1,293 +1,160 @@
-Return-Path: <netdev+bounces-46779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD6187E660F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:02:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061137E6621
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0CD2281167
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:01:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3609E1C20BE4
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359DF10976;
-	Thu,  9 Nov 2023 09:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4FA10A28;
+	Thu,  9 Nov 2023 09:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbCXh15k"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LX/2ft4F"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9206410A11
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:01:53 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C555B35A3
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:01:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699520512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3GdRtcKnHBIooBz8CRQ9n177xrjS4UMT2Wxo71oaBJg=;
-	b=NbCXh15kexYMLJTf1dBdRGLj/xvNikxf8GmFNGyCJ8LDy/PUdU//dqc0qo2sQjE/sO8zXZ
-	2LKaEB4BMc1MsGv6HULBRFLrLt+F9upQcDzjuJWbkC8TVz4JbLhqfoMinSAkrv4V/PMvXr
-	zU7bb4x5mREr3o+BS23SLpO1P2h+s80=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-618-NNwdhggHM2SJnk-2i0lJ-Q-1; Thu, 09 Nov 2023 04:01:50 -0500
-X-MC-Unique: NNwdhggHM2SJnk-2i0lJ-Q-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-540f4715d09so63396a12.0
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:01:50 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A7F10A21
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:03:16 +0000 (UTC)
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A1ED55
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:03:15 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c503da4fd6so6898571fa.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:03:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1699520594; x=1700125394; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X23W+DtxdHmqBzJUyijkKW7gcM1l2veMuv/ye91bjTA=;
+        b=LX/2ft4FvsXvpYzdvUh45S8NiVjyZP831Pz8sy8qA6UYxcloRt3EiTHgyxwDBarlRv
+         1JX8RvBEEK+3Sue2zz2fYZo2zufQBVUlPR+1+udBIZIwLK6L27gWR3i/wtsa+Kwgqpm5
+         JHZMor6zzOd3YCfUcQ2NKhw1YEv1fT67iLpKBW4yVA73xz1cvjt2w2g+BYObqNPWqQkn
+         eAQvSW/G75S/cbV1fIuR3em7g9Bi8xJD2I8DNmU+QO4KoSgxsCn5Zb/FaQlTEPwIWroE
+         yXntW145ItIpEXAKj66sT2VOsk5wPRrXsfux6t6BoKlnT8hZ17Mrx/fS24zDXORvnsqn
+         T2lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699520509; x=1700125309;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3GdRtcKnHBIooBz8CRQ9n177xrjS4UMT2Wxo71oaBJg=;
-        b=av0vG0mf70OqyoTFeS5L/dFVTpX2hJ6etg13L8QyTg4aK1f0RvuAzB3M8JzZRxFx3R
-         C/XRvzE9v9Y1aqD6PnRlR5MT0UAKFN0byrfcNy7NhE4eE1u7pvLBpvXR41s1Q4cpgC1l
-         gSSXN7GrxQPtvxnrQizR8QqANvQUUhR3XN6UZExjbXKIQdgBhKA3nbtb1TjjsfzxLnuI
-         /jmK9bRHMfcv38tOZKr3poBtTy+eI/J4StQV2+YQQ3BshDYH7glGQXc5q0Y0WdsAGsat
-         wQD5s3vcC1QkvTzxX3GB29tZUVfGLyUkVTayUuoZxPaBzJ4nu38cVyEcPusxlJ0mzMHo
-         r6FA==
-X-Gm-Message-State: AOJu0YwBmq8bveJMHw6pUDBcORi/d40Xu7ztt6IGKByQx0acQd4JVcYt
-	M0TW/qL2TYkuYOlhXXD8xe19uXzkATUrC9X12W8pAreaGqGzHsJyvq7wNBf5xsS8VfRNsJxVx+i
-	QpMq0OUVm0QtNMAwv
-X-Received: by 2002:a05:6402:f17:b0:540:a181:f40b with SMTP id i23-20020a0564020f1700b00540a181f40bmr4095038eda.4.1699520509698;
-        Thu, 09 Nov 2023 01:01:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFs4kFQwDr2GcSp3GTsPB4RRvWzreFUbMHSJElDo2cAX0GNGwqbEAhl7Xc8OlUx2EJqQdsHHw==
-X-Received: by 2002:a05:6402:f17:b0:540:a181:f40b with SMTP id i23-20020a0564020f1700b00540a181f40bmr4094979eda.4.1699520508954;
-        Thu, 09 Nov 2023 01:01:48 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id y93-20020a50bb66000000b0053e6e40cc1asm8068217ede.86.2023.11.09.01.01.46
+        d=1e100.net; s=20230601; t=1699520594; x=1700125394;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X23W+DtxdHmqBzJUyijkKW7gcM1l2veMuv/ye91bjTA=;
+        b=T0XyThOsYPPsVouF0ukz8nfmxcQvqAz39BoMtiir+L85ee9w0xMNXQJdQNOTMOiIly
+         o0hH3/F07YInGIk0Vsbt1S3pn9/xsYrvaFMRxHJOglcCndckDdXL4QVV4fYWLF3D4b+D
+         lwB9s+axyi9kiHwhqdLq16Gn4Pj0ykU1rzRdaHtuvjNfv2NnaUYL5Z6bgiyKXMb7SUIc
+         UTCLJylQyrQcPmuMsPIrxSu7rwEW3ZqfuaiK9lmeYqGrwXVUTuEBOtziwY3F8XHn8YpG
+         TTjzWDLx4BWhQF627bS95EdSV8FxZNz/0C17hUtQ3CMsEzaqDt44kv+/+YNmqFn/E89O
+         bMCQ==
+X-Gm-Message-State: AOJu0YyBlJTg2Y1a7LMa10TpcWidliiCrTcKA/YDAgvHxV3hCoAGwXhr
+	0UCg7niHp9igYhtQVAcrVxZX8Q==
+X-Google-Smtp-Source: AGHT+IFwKlWTvRrQ1ZFMN7SHZYCNDqEQVjVoIvuY549D7L8oHnqQqDA8MivwJ7zAVezbFWntv0hILw==
+X-Received: by 2002:a05:651c:2047:b0:2c6:edfd:658a with SMTP id t7-20020a05651c204700b002c6edfd658amr3500404ljo.31.1699520593928;
+        Thu, 09 Nov 2023 01:03:13 -0800 (PST)
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id h19-20020a05651c159300b002bbacc6c523sm2212383ljq.49.2023.11.09.01.03.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 01:01:47 -0800 (PST)
-Message-ID: <429f6303c9c61d50ba6c5fdddec30c22dc0b2c09.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
- <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Thu, 09 Nov 2023 10:01:45 +0100
-In-Reply-To: <20231106024413.2801438-8-almasrymina@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
-	 <20231106024413.2801438-8-almasrymina@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Thu, 09 Nov 2023 01:03:13 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH net v4 0/3] Fix large frames in the Gemini ethernet driver
+Date: Thu, 09 Nov 2023 10:03:11 +0100
+Message-Id: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE+gTGUC/4XNQQqDMBAF0KtI1k1JMonarnqP0kWMEx3QWKJIi
+ 3j3BleWIl3+P/w3CxsxEo7smi0s4kwjDSEFfcqYa21okFOdMlNCgZRC8wZ7CsQ7Gxv00fbIPb2
+ 4kxpq5YpSVoal7TNiqjf3zgJO7JHKlsZpiO/t1yy30x92llzwizNGglfKA9w6CjYO5yE2GzmrP
+ WOOGJUYV4M11uZOX/IfBvZMccRAYhBKAU6UoirMF7Ou6wf1EM5ATgEAAA==
+To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ =?utf-8?q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>, 
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.4
 
-On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
-> Overload the LSB of struct page* to indicate that it's a page_pool_iov.
->=20
-> Refactor mm calls on struct page* into helpers, and add page_pool_iov
-> handling on those helpers. Modify callers of these mm APIs with calls to
-> these helpers instead.
->=20
-> In areas where struct page* is dereferenced, add a check for special
-> handling of page_pool_iov.
->=20
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
->=20
-> ---
->  include/net/page_pool/helpers.h | 74 ++++++++++++++++++++++++++++++++-
->  net/core/page_pool.c            | 63 ++++++++++++++++++++--------
->  2 files changed, 118 insertions(+), 19 deletions(-)
->=20
-> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
-ers.h
-> index b93243c2a640..08f1a2cc70d2 100644
-> --- a/include/net/page_pool/helpers.h
-> +++ b/include/net/page_pool/helpers.h
-> @@ -151,6 +151,64 @@ static inline struct page_pool_iov *page_to_page_poo=
-l_iov(struct page *page)
->  	return NULL;
->  }
-> =20
-> +static inline int page_pool_page_ref_count(struct page *page)
-> +{
-> +	if (page_is_page_pool_iov(page))
-> +		return page_pool_iov_refcount(page_to_page_pool_iov(page));
-> +
-> +	return page_ref_count(page);
-> +}
-> +
-> +static inline void page_pool_page_get_many(struct page *page,
-> +					   unsigned int count)
-> +{
-> +	if (page_is_page_pool_iov(page))
-> +		return page_pool_iov_get_many(page_to_page_pool_iov(page),
-> +					      count);
-> +
-> +	return page_ref_add(page, count);
-> +}
-> +
-> +static inline void page_pool_page_put_many(struct page *page,
-> +					   unsigned int count)
-> +{
-> +	if (page_is_page_pool_iov(page))
-> +		return page_pool_iov_put_many(page_to_page_pool_iov(page),
-> +					      count);
-> +
-> +	if (count > 1)
-> +		page_ref_sub(page, count - 1);
-> +
-> +	put_page(page);
-> +}
-> +
-> +static inline bool page_pool_page_is_pfmemalloc(struct page *page)
-> +{
-> +	if (page_is_page_pool_iov(page))
-> +		return false;
-> +
-> +	return page_is_pfmemalloc(page);
-> +}
-> +
-> +static inline bool page_pool_page_is_pref_nid(struct page *page, int pre=
-f_nid)
-> +{
-> +	/* Assume page_pool_iov are on the preferred node without actually
-> +	 * checking...
-> +	 *
-> +	 * This check is only used to check for recycling memory in the page
-> +	 * pool's fast paths. Currently the only implementation of page_pool_io=
-v
-> +	 * is dmabuf device memory. It's a deliberate decision by the user to
-> +	 * bind a certain dmabuf to a certain netdev, and the netdev rx queue
-> +	 * would not be able to reallocate memory from another dmabuf that
-> +	 * exists on the preferred node, so, this check doesn't make much sense
-> +	 * in this case. Assume all page_pool_iovs can be recycled for now.
-> +	 */
-> +	if (page_is_page_pool_iov(page))
-> +		return true;
-> +
-> +	return page_to_nid(page) =3D=3D pref_nid;
-> +}
-> +
->  /**
->   * page_pool_dev_alloc_pages() - allocate a page.
->   * @pool:	pool from which to allocate
-> @@ -301,6 +359,9 @@ static inline long page_pool_defrag_page(struct page =
-*page, long nr)
->  {
->  	long ret;
-> =20
-> +	if (page_is_page_pool_iov(page))
-> +		return -EINVAL;
-> +
->  	/* If nr =3D=3D pp_frag_count then we have cleared all remaining
->  	 * references to the page:
->  	 * 1. 'n =3D=3D 1': no need to actually overwrite it.
-> @@ -431,7 +492,12 @@ static inline void page_pool_free_va(struct page_poo=
-l *pool, void *va,
->   */
->  static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
->  {
-> -	dma_addr_t ret =3D page->dma_addr;
-> +	dma_addr_t ret;
-> +
-> +	if (page_is_page_pool_iov(page))
-> +		return page_pool_iov_dma_addr(page_to_page_pool_iov(page));
+This is the result of a bug hunt for a problem with the
+RTL8366RB DSA switch leading me wrong all over the place.
 
-Should the above conditional be guarded by the page_pool_mem_providers
-static key? this looks like fast-path. Same question for the refcount
-helper above.
+I am indebted to Vladimir Oltean who as usual pointed
+out where the real problem was, many thanks!
 
-Minor nit: possibly cache 'page_is_page_pool_iov(page)' to make the
-code more readable.
+Tryig to actually use big ("jumbo") frames on this
+hardware uncovered the real bugs. Then I tested it on
+the DSA switch and it indeed fixes the issue.
 
-> +
-> +	ret =3D page->dma_addr;
-> =20
->  	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
->  		ret <<=3D PAGE_SHIFT;
-> @@ -441,6 +507,12 @@ static inline dma_addr_t page_pool_get_dma_addr(stru=
-ct page *page)
-> =20
->  static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t =
-addr)
->  {
-> +	/* page_pool_iovs are mapped and their dma-addr can't be modified. */
-> +	if (page_is_page_pool_iov(page)) {
-> +		DEBUG_NET_WARN_ON_ONCE(true);
-> +		return false;
-> +	}
+To make sure it also works fine with big frames on
+non-DSA devices I also copied a large video file over
+scp to a device with maximum frame size, the data
+was transported in large TCP packets ending up in
+0x7ff sized frames using software checksumming at
+~2.0 MB/s.
 
-Quickly skimming over the page_pool_code it looks like
-page_pool_set_dma_addr() usage is guarded by the PP_FLAG_DMA_MAP page
-pool flag. Could the device mem provider enforce such flag being
-cleared on the page pool?
+If I set down the MTU to the standard 1500 bytes so
+that hardware checksumming is used, the scp transfer
+of the same file was slightly lower, ~1.8-1.9 MB/s.
 
-> +
->  	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
->  		page->dma_addr =3D addr >> PAGE_SHIFT;
-> =20
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 138ddea0b28f..d211996d423b 100644
-> --- a/net/core/page_pool.cnn
-> +++ b/net/core/page_pool.c
-> @@ -317,7 +317,7 @@ static struct page *page_pool_refill_alloc_cache(stru=
-ct page_pool *pool)
->  		if (unlikely(!page))
->  			break;
-> =20
-> -		if (likely(page_to_nid(page) =3D=3D pref_nid)) {
-> +		if (likely(page_pool_page_is_pref_nid(page, pref_nid))) {
->  			pool->alloc.cache[pool->alloc.count++] =3D page;
->  		} else {
->  			/* NUMA mismatch;
-> @@ -362,7 +362,15 @@ static void page_pool_dma_sync_for_device(struct pag=
-e_pool *pool,
->  					  struct page *page,
->  					  unsigned int dma_sync_size)
->  {
-> -	dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
-> +	dma_addr_t dma_addr;
-> +
-> +	/* page_pool_iov memory provider do not support PP_FLAG_DMA_SYNC_DEV */
-> +	if (page_is_page_pool_iov(page)) {
-> +		DEBUG_NET_WARN_ON_ONCE(true);
-> +		return;
-> +	}
+Despite this not being the best test it shows that
+we can now stress the hardware with large frames
+and that software checksum works fine.
 
-Similar to the above point, mutatis mutandis.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+Changes in v4:
+- Strip stray v1-related comment from the commit message on patch 1
+- Move the hunks deleting gmac_fix_features() from patch
+  "net: ethernet: cortina: Handle large frames" to
+  "net: ethernet: cortina: Fix MTU max setting" as it is
+  perfectly motivated by the MTU change, then move this patch
+  later in the series.
+- Drop the last patch only activating the checksum engine for
+  TCP and UDP explicitly. It's not fixing a regression,
+  so let's reconsider it for net-next rather than net.
+- Link to v3: https://lore.kernel.org/r/20231107-gemini-largeframe-fix-v3-0-e3803c080b75@linaro.org
 
-> +
-> +	dma_addr =3D page_pool_get_dma_addr(page);
-> =20
->  	dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
->  	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
-> @@ -374,6 +382,12 @@ static bool page_pool_dma_map(struct page_pool *pool=
-, struct page *page)
->  {
->  	dma_addr_t dma;
-> =20
-> +	if (page_is_page_pool_iov(page)) {
-> +		/* page_pool_iovs are already mapped */
-> +		DEBUG_NET_WARN_ON_ONCE(true);
-> +		return true;
-> +	}
+Changes in v3:
+- Do not reimplement the existing oversize check (sigh what is
+  wrong with me). Drop that patch.
+- Drop the gmac_fix_features() since we are better off falling
+  back to software checksums dynamically per-frame.
+- Add a new patch to bypass the checksumming engine if we are not
+  handling TCP or UDP.
+- Link to v2: https://lore.kernel.org/r/20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org
 
-Ditto.
+Changes in v2:
+- Don't check for oversized MTU request: the framework makes sure it doesn't
+  happen.
+- Drop unrelated BIT() macro cleanups (I might send these later for net-next)
+- Use a special error code if the skbuff is too big and fail gracefully
+  is this happens.
+- Do proper checksum of the frame using a software fallback when the frame
+  is too long for hardware checksumming.
+- Link to v1: https://lore.kernel.org/r/20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org
 
-Cheers,
+---
+Linus Walleij (3):
+      net: ethernet: cortina: Fix max RX frame define
+      net: ethernet: cortina: Handle large frames
+      net: ethernet: cortina: Fix MTU max setting
 
-Paolo
+ drivers/net/ethernet/cortina/gemini.c | 45 ++++++++++++++++++++++-------------
+ drivers/net/ethernet/cortina/gemini.h |  4 ++--
+ 2 files changed, 31 insertions(+), 18 deletions(-)
+---
+base-commit: ffc253263a1375a65fa6c9f62a893e9767fbebfa
+change-id: 20231104-gemini-largeframe-fix-c143d2c781b5
+
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
 
