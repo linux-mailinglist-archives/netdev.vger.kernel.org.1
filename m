@@ -1,188 +1,109 @@
-Return-Path: <netdev+bounces-46725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 512F57E61C1
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:15:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC96E7E61C5
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FBD7B20CA5
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:15:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7E1B20C26
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551F77FC;
-	Thu,  9 Nov 2023 01:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45B67FC;
+	Thu,  9 Nov 2023 01:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="oU+zW1Jd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyLy8Pzz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B81CA5F
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:15:40 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F14412590
-	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 17:15:39 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cc3388621cso10847865ad.1
-        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 17:15:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8070DA5F
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:17:48 +0000 (UTC)
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B9125B6;
+	Wed,  8 Nov 2023 17:17:47 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28019b66ad5so249765a91.3;
+        Wed, 08 Nov 2023 17:17:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1699492539; x=1700097339; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jJB2HzPFVnzl6OnBO06iUXlf1dFeMFQcQCJyWfsLLCM=;
-        b=oU+zW1JdlEDddCtLn2Vwe03LgnZG04PA20yor1yaYAokCZTbKT1vInggEJz6JAEUnZ
-         L02aVFp1o9bISNJJb72JekUAEvK5o+pfsrq47kqm0tBzlv3k2g5DdT4q3qhkpHnFu6/E
-         AlR9eBSyJ4cdrGi4+Nuw8VTSP0LY89X1e4JwL2SMYCvqisD+T1Mhw03J7FrPr7O2yVMa
-         hYZp4PFEX3I9Mqh6JpY1icCt4KBOjvjB8a5P4FgJQBZ5S8BNfkvI8afBg2nRmf4+SX3w
-         C2tD45LgTM7YX6zqix0odVOIls6rxx7DZUbIyYaZpKU3TGO7ER2/zsnhAarefMFAkiU2
-         rcRA==
+        d=gmail.com; s=20230601; t=1699492648; x=1700097448; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lBNYzqasXDmHMz+y+gn6jPytXIm3L/47ou0r+HRqqJc=;
+        b=NyLy8PzzSvJp9c9giMQEEXbRSb3HGrc2N5/nb8BAhV+adWYiMdv7FcNfMT28PxuvFi
+         5UdKg50w35s+ypxlOlfYDTRuXhMOliRIAkDqKHwfErI42uFPFLNjHqAtRVa7bFtie06r
+         oI9+kSBCDKLsoA3Ct7DddpSe8putnJkAdWRXhOL0Cllv63Abu17H91ROqnKv85HR3mml
+         +LQDWOZ5lT+62sWhEpWxXX6FKmkDKXDlUfkEnFyhjSD9o9VAkbtPevEaTMQCYJyrsAwU
+         i+jXOBwOzDKiIcoXdsQSZ3t2myO2cg7APfpB3VlsJSwlvHKymMDana2cOiXcOk3gKmII
+         C0xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699492539; x=1700097339;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJB2HzPFVnzl6OnBO06iUXlf1dFeMFQcQCJyWfsLLCM=;
-        b=Ok06LR9tKfoRpePoWZ3ghvKqlVfHg5RBMuXeQiLkVWlD4TOEJsTvg4LUt2XFi00arb
-         nbH03cDo2WxklyM7LSTSR2asB9qZMeJcHcpttTAIPM09rwu53zAOdY4DMhRY/jLAR5m4
-         fPwvGE+GnJ6U5Ir81rpb39bp9arhYUqliDBF8dkPLNl6UKV8hOHB5audF8voFpMGziF7
-         9zL8b1XxD+iDNT+QLyKi5Pd6OvaRIEn09H79O+eBz1deIt40dp00DJRbE4s3OCNlWchd
-         sopDMlPfEhNOKz6cwviGvkSzzhLrw0GtEf4MkGk0Ucfl2CwJCgfBkZtVTYCJJzYu/YWU
-         dPhw==
-X-Gm-Message-State: AOJu0Yyb/zZIsMAKwa5MBagCw1HKrdzZNY+Nng9fC9MyzphgehzreSSW
-	WM62ETUc1bfGYuspBI5XUrMF+g==
-X-Google-Smtp-Source: AGHT+IEppdvik8GMA+ADUF0nvc93yMlmYp9AyXurMTUDu1ruiRbNSJ04wmW0jrxiNpH9ub52AlowNw==
-X-Received: by 2002:a17:902:d487:b0:1cc:4d4e:bfb4 with SMTP id c7-20020a170902d48700b001cc4d4ebfb4mr10863357plg.12.1699492539395;
-        Wed, 08 Nov 2023 17:15:39 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1256:2:c51:2090:e106:83fa? ([2620:10d:c090:500::5:887f])
-        by smtp.gmail.com with ESMTPSA id c10-20020a170902d48a00b001ae0152d280sm2268962plg.193.2023.11.08.17.15.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Nov 2023 17:15:39 -0800 (PST)
-Message-ID: <cdf21548-8c95-448e-88a4-701727ad7538@davidwei.uk>
-Date: Wed, 8 Nov 2023 17:15:35 -0800
+        d=1e100.net; s=20230601; t=1699492648; x=1700097448;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lBNYzqasXDmHMz+y+gn6jPytXIm3L/47ou0r+HRqqJc=;
+        b=SiR9QjyM7kr03KVxriCTHsbiFN24sWf0otHqWW+DdUxnGhGKq5HE/rLtkyFnu0cHgj
+         h+61MNDGwPco8epXEKwPEZq7DO+QpnkF0glBwWdQJh/ENhG7XPt/3mjakT4AUr2dvbq+
+         x0wXk74mZxw3p6iEt7AgykwpYQhShhpPm6iubJqveUQKy7/BR0ZXoBdy5qdmCwNScom2
+         BvnFHKlrTRXD062FTISdOdh0NOCDaxVcLNKErEkNFzMrtgHfCuKjII05FHyQtSddw/pi
+         0ChLV2Pd7uIyOhd8vk9GTXI0Xz1Y/YdGXRPOa3LrdGPZbx/pg4igpAydXkmXFOspp2fa
+         iJiw==
+X-Gm-Message-State: AOJu0Yw/CCJqyoWCKEw3NMqKEZ+ZADBPGUS3DPYsZK/790EM7+FnUYJh
+	+2loRh60ESZ5+j4fr3iPtwQ=
+X-Google-Smtp-Source: AGHT+IFtqOgYbckOxuYGwXLv/tmibGyLbwZS6E+0CzesNWUuL+fiyRstimVdz8h++jB5d+pnkp93Dg==
+X-Received: by 2002:a17:90b:4d07:b0:280:c4be:3c85 with SMTP id mw7-20020a17090b4d0700b00280c4be3c85mr308973pjb.23.1699492647732;
+        Wed, 08 Nov 2023 17:17:27 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 11-20020a17090a034b00b0027ced921e80sm153671pjf.38.2023.11.08.17.17.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Nov 2023 17:17:27 -0800 (PST)
+Date: Thu, 9 Nov 2023 09:17:23 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	netdev-driver-reviewers@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Simon Horman <horms@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Subject: Re: [ANN] netdev development stats for 6.7
+Message-ID: <ZUwzI29bQB7G9yUP@Laptop-X1>
+References: <20231101162906.59631ffa@kernel.org>
+ <ZUt9n0gwZR0kaKdF@Laptop-X1>
+ <ff7104c9-6db9-449f-bcb4-6c857798698f@lunn.ch>
+ <20231108083307.364cfe91@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>, David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>,
- Pavel Begunkov <asml.silence@gmail.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-6-almasrymina@google.com>
- <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
- <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
- <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
- <CAHS8izMKDOw5_y2MLRfuJHs=ai+sZ6GF7Rg1NuR_JqONg-5u5Q@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAHS8izMKDOw5_y2MLRfuJHs=ai+sZ6GF7Rg1NuR_JqONg-5u5Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231108083307.364cfe91@kernel.org>
 
-On 2023-11-07 15:03, Mina Almasry wrote:
-> On Tue, Nov 7, 2023 at 2:55 PM David Ahern <dsahern@kernel.org> wrote:
->>
->> On 11/7/23 3:10 PM, Mina Almasry wrote:
->>> On Mon, Nov 6, 2023 at 3:44 PM David Ahern <dsahern@kernel.org> wrote:
->>>>
->>>> On 11/5/23 7:44 PM, Mina Almasry wrote:
->>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>>>> index eeeda849115c..1c351c138a5b 100644
->>>>> --- a/include/linux/netdevice.h
->>>>> +++ b/include/linux/netdevice.h
->>>>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
->>>>>  };
->>>>>
->>>>>  #ifdef CONFIG_DMA_SHARED_BUFFER
->>>>> +struct page_pool_iov *
->>>>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
->>>>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
->>>>
->>>> netdev_{alloc,free}_dmabuf?
->>>>
->>>
->>> Can do.
->>>
->>>> I say that because a dmabuf can be host memory, at least I am not aware
->>>> of a restriction that a dmabuf is device memory.
->>>>
->>>
->>> In my limited experience dma-buf is generally device memory, and
->>> that's really its use case. CONFIG_UDMABUF is a driver that mocks
->>> dma-buf with a memfd which I think is used for testing. But I can do
->>> the rename, it's more clear anyway, I think.
->>
->> config UDMABUF
->>         bool "userspace dmabuf misc driver"
->>         default n
->>         depends on DMA_SHARED_BUFFER
->>         depends on MEMFD_CREATE || COMPILE_TEST
->>         help
->>           A driver to let userspace turn memfd regions into dma-bufs.
->>           Qemu can use this to create host dmabufs for guest framebuffers.
->>
->>
->> Qemu is just a userspace process; it is no way a special one.
->>
->> Treating host memory as a dmabuf should radically simplify the io_uring
->> extension of this set.
+Hi Jakub,
+On Wed, Nov 08, 2023 at 08:33:07AM -0800, Jakub Kicinski wrote:
+> Now, CNCF has a similar setup: https://github.com/cncf/gitdm
+> and they do share their database. So I use that, plus my local hacky
+> mapping. Unfortunately the CNCF DB is not very up to date for kernel
+> folks.
 > 
-> I agree actually, and I was about to make that comment to David Wei's
-> series once I have the time.
-> 
-> David, your io_uring RX zerocopy proposal actually works with devmem
-> TCP, if you're inclined to do that instead, what you'd do roughly is
-> (I think):
-> 
-> - Allocate a memfd,
-> - Use CONFIG_UDMABUF to create a dma-buf out of that memfd.
-> - Bind the dma-buf to the NIC using the netlink API in this RFC.
-> - Your io_uring extensions and io_uring uapi should work as-is almost
-> on top of this series, I think.
-> 
-> If you do this the incoming packets should land into your memfd, which
-> may or may not work for you. In the future if you feel inclined to use
-> device memory, this approach that I'm describing here would be more
-> extensible to device memory, because you'd already be using dma-bufs
-> for your user memory; you'd just replace one kind of dma-buf (UDMABUF)
-> with another.
-> 
+> Hangbin, according to CNCF you're at Red Hat, which seems sane, and
+> that's how I count you :)
 
-How would TCP devmem change if we no longer assume that dmabuf is device
-memory? Pavel will know more on the perf side, but I wouldn't want to
-put any if/else on the hot path if we can avoid it. I could be wrong,
-but right now in my mind using different memory providers solves this
-neatly and the driver/networking stack doesn't need to care.
+Thanks for this info. Glad to know my email and company are mapping correctly.
 
-Mina, I believe you said at NetDev conf that you already had an udmabuf
-implementation for testing. I would like to see this (you can send
-privately) to see how TCP devmem would handle both user memory and
-device memory.
+> I brought creating a public DB up at Linux Foundation TAB meetings,
+> but after some poking there's no movement.
+> 
+> It would be great if Linux Foundation helped the community with the
+> developer/company DB, which is ACTUALLY USEFUL BEFORE WASTING TIME ON
+> SOME WEB STUFF THAT DOESN'T WORK FOR THE KERNEL.
 
->> That the io_uring set needs to dive into
->> page_pools is just wrong - complicating the design and code and pushing
->> io_uring into a realm it does not need to be involved in.
->>
->> Most (all?) of this patch set can work with any memory; only device
->> memory is unreadable.
->>
->>
-> 
-> 
+I personally agree Linux Foundation should maintain a developer/company DB.
+The developer could submit their information on a voluntary basis, instead of
+letting some tools search the website and collect data.
+
+Thanks
+Hangbin
 
