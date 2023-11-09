@@ -1,93 +1,95 @@
-Return-Path: <netdev+bounces-46880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D4AC7E6E5C
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:14:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9307E6E75
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:17:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF2F28109F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:14:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B9ACB20DBE
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BE221A12;
-	Thu,  9 Nov 2023 16:14:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07821210F1;
+	Thu,  9 Nov 2023 16:17:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fTrsclx/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pgYZcUNj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A082136B
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:14:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C80CC433C9;
-	Thu,  9 Nov 2023 16:14:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699546453;
-	bh=Y0GW2muLw5+bWPBPEsnZmKIlY04MGh7SV8hoCZTderM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fTrsclx/4HZaDw1xtV2KqbL0Ap8/hODW23Ngi9nIJjRECN4V1vk8a7NI1/q83DcE1
-	 NRAEvQkGlhzc1RRQtw+PS1WrvG/zbk+1Kks4ZNaEf3H/raTauzW9WJMie9nGWtMhCX
-	 3KQmWmHOo71IsvatuLjTEyr8GVQmUZ6Uo5Bu0gfBDdIdj1DYvpYak137OmO64CxgnF
-	 FJqjJ50NlJvmGP/h/8QiYNTE297uvXtmFWJIkPrkcfsLdcQsts3vTCM7ZN/ntZAS6b
-	 j/AqcUOxIVuPEIs2b8PMXu77il6ID99WN0hPnr/T9mI/6YczXBF8S+/TC20NNtlnga
-	 nxy5WY6AOPcdg==
-Date: Thu, 9 Nov 2023 08:14:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org
-Subject: Re: [PATCH net-next 00/15] net: page_pool: add netlink-based
- introspection
-Message-ID: <20231109081412.161ce68f@kernel.org>
-In-Reply-To: <CAC_iWjKi0V6wUmutmpjYyjZGkwXef4bxQwcx6o5rytT+-Pj5Eg@mail.gmail.com>
-References: <20231024160220.3973311-1-kuba@kernel.org>
-	<CAC_iWjKi0V6wUmutmpjYyjZGkwXef4bxQwcx6o5rytT+-Pj5Eg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4931A22320
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:17:41 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C90A173E;
+	Thu,  9 Nov 2023 08:17:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Fupq4hlBImNT9/E31GMXTqKPrNZBcdihgav2GAlB7G8=; b=pgYZcUNj/ZO5UbgTJtXr7RxPoO
+	BMmVH8QE5aDmVxhnV1ZHCpAhjNOhRHwZ8DNEXXWgLo8MK1ua74OAIc8zUp5ZB39GJxJ+BmVwoDycc
+	K4UMhtqo59MrESwBIxEBXwH3Ukk/d4nwZPyOVodGtMhFSQ4ZV+8FDDiB2q5WzemblC9M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r17iU-001DWW-A6; Thu, 09 Nov 2023 17:17:14 +0100
+Date: Thu, 9 Nov 2023 17:17:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gan Yi Fang <yi.fang.gan@intel.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Johannes Zink <j.zink@pengutronix.de>,
+	Jochen Henneberg <jh@henneberg-systemdesign.com>,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>
+Subject: Re: [PATCH net-next 1/1] net: stmmac: Add support for HW-accelerated
+ VLAN stripping
+Message-ID: <b7bd1b0c-5203-4071-95c6-ada047010687@lunn.ch>
+References: <20231109053831.2572699-1-yi.fang.gan@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231109053831.2572699-1-yi.fang.gan@intel.com>
 
-On Thu, 9 Nov 2023 10:11:47 +0200 Ilias Apalodimas wrote:
-> > We immediately run into page pool leaks both real and false positive
-> > warnings. As Eric pointed out/predicted there's no guarantee that
-> > applications will read / close their sockets so a page pool page
-> > may be stuck in a socket (but not leaked) forever. This happens
-> > a lot in our fleet. Most of these are obviously due to application
-> > bugs but we should not be printing kernel warnings due to minor
-> > application resource leaks.  
-> 
-> Fair enough, I guess you mean 'continuous warnings'?
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
+> @@ -198,6 +198,17 @@ static int dwmac4_get_tx_ls(struct dma_desc *p)
+>  		>> TDES3_LAST_DESCRIPTOR_SHIFT;
+>  }
+>  
+> +static inline int dwmac4_wrback_get_rx_vlan_tci(struct dma_desc *p)
+> +{
+> +	return (le32_to_cpu(p->des0) & RDES0_VLAN_TAG_MASK);
+> +}
+> +
+> +static inline bool dwmac4_wrback_get_rx_vlan_valid(struct dma_desc *p)
+> +{
+> +	return ((le32_to_cpu(p->des3) & RDES3_LAST_DESCRIPTOR) &&
+> +		(le32_to_cpu(p->des3) & RDES3_RDES0_VALID));
+> +}
 
-Yes, in this case but I'm making a general statement.
-Or do you mean that there's a typo / grammar issue?
+No inline functions in C files please. Let the compiler decide.
 
-> > Conversely the page pool memory may get leaked at runtime, and
-> > we have no way to detect / track that, unless someone reconfigures
-> > the NIC and destroys the page pools which leaked the pages.
-> >
-> > The solution presented here is to expose the memory use of page
-> > pools via netlink. This allows for continuous monitoring of memory
-> > used by page pools, regardless if they were destroyed or not.
-> > Sample in patch 15 can print the memory use and recycling
-> > efficiency:
-> >
-> > $ ./page-pool
-> >     eth0[2]     page pools: 10 (zombies: 0)
-> >                 refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
-> >                 recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
-> 
-> That's reasonable, and the recycling rate is pretty impressive. 
+You are submitting a number of patches for this driver. Do they all
+cleanly apply independent of each other? Or are there dependencies?
 
-This is just from a test machine, fresh boot, maybe a short iperf run,
-I don't remember now :) In any case not real workload.
-
-> Any idea how that translated to enhancements overall? mem/cpu pressure etc
-
-I haven't collected much prod data at this stage, I'm hoping to add
-this to the internal kernel and then do a more thorough investigation.
+	Andrew
 
