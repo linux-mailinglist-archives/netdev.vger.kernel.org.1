@@ -1,103 +1,100 @@
-Return-Path: <netdev+bounces-46949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACE9B7E7511
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 00:21:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C910D7E752A
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 00:32:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F3CBB20B5A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 23:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E03951C20B6E
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 23:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78C238DE9;
-	Thu,  9 Nov 2023 23:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9B338DCA;
+	Thu,  9 Nov 2023 23:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aH35LMvB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QmE9TqHl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94733374E2
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 23:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E312838FA2
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 23:32:27 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C654231
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:21:19 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 774164482
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:32:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699572079; x=1731108079;
+  t=1699572747; x=1731108747;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=P3Vx1W3c0k7GiYCUbck0dW8PLOZdAgxTk5ipErBOz0w=;
-  b=aH35LMvB0rgdvhZ3lLN8CTUhBLMpBs4KU4dKG70A3xYL3zE7P7RVscTb
-   2sJl2a9VCFY8ECecgW8hG3yd4Mqz5MKuCw8/EzSyeeKLNnyNbvFII1eWY
-   eVP1sFIE5X6oJ7c5yzwVfkaZCHKUMg44HWijziHs2Y5FnElm3glm+CMNJ
-   GzoQgbEWFj7S3uwmQDcCLvo9hzUr89sqhmN1zh3f+FmAuQWNzghwFpFY3
-   7ySZQOM6rLRTa1Raxz2nXjKRCFFj8JYx2pRZjbsFqL38+pHHnazWSLFva
-   vtfaOed3BfFiuo6+Y9resep1oMBPg/P6h1YLHBQ0FhL2WJJAdTuNEDvqE
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="456587349"
+  bh=XSvgok3LVVLk++phOLVEwH0yTYVp2lJ7YBcPcFFU0OU=;
+  b=QmE9TqHl+3gN1XYnMm7RjPvla40Ph8+SMEF5hTw3tV1wGmaaNWLuy/Mf
+   H9KtUE6b5DKJhdDvZSxGiQtMSZDFWZHLGKlW61bYwPo5C/1B9dQ7EMdOL
+   YET2oApUeHtZis0RjSd1WdJXJCmu9ybKHOsiqEglT6kbvhdf2kZ1ZmIIi
+   gfDp12fuaCix8ujnklRZKnYecV+dqRu1lmYYVMpXMgQqrJzZI9x/3SAbD
+   g+WgtjKOL4JNabR2LvQn9XIcv4AJinpY5JSQCigYa2ciRhuNbiT1mIX/y
+   sSP1lx8xI+o+OJ2PlISSMrJevcGDwH5lxxvKS2KrSZJ4Lymlj0+bw+B10
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="456589251"
 X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="456587349"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 15:21:19 -0800
+   d="scan'208";a="456589251"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 15:32:25 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="767157704"
 X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
-   d="scan'208";a="767157704"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 15:21:19 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="4870773"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 15:32:25 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 15:21:18 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ 15.1.2507.34; Thu, 9 Nov 2023 15:32:24 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 15:21:18 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 15:32:24 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 9 Nov 2023 15:21:18 -0800
+ 15.1.2507.34; Thu, 9 Nov 2023 15:32:23 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O2i6lLEd5OlKkG+oHwuF5mMY4YBWuA5xwPerIbQSCQG9T/PQuPhzLOW4BkqLDsBE6ME8QnUgjLpg+PafCHkbPB1LKVRdnuH0yST2yIcYhPTACXjWh9uxmu+VqlQDYHzXfcKZkFAlVbymGPoOHoFCCPaW9K6KxyeTheI6uQhSMR2CGF+b1sJGabUCoXQMx0SkKFrTiXKwnm33F/qel4zLJp7TIEAC46sEX0FV9B4CIn1LE0B7oikR2q+k8gsSY1Bprsi0GYFWZ2/ku6t9UtT5TUq+Hxm3XO5MQiNWGnTRgG43thxvPO0ezFkNVwC+i+J8yMgXxGVheoZYBcoju/DioQ==
+ b=FVeKr979OgfeNY2CTAcTfllmjojsfO/elKDsFJ6B2n0ThMit58WVCR29LfsjSWPl/E0w36Wr/DsWjZixhc9JX8UsnFRB3EoUo43dqlNUg36obUdD2Hxb6xxRdJIjB6kKzsJLO9Y3OgWqnaO/pcbs7ReDQqajJycd+2RIp6syGmZrUuqZQvhEMWS4ARZ528tH+EVedygumfJQUzKC9eZ3q/3C6I8qrQvB8lB5/I/0dgoehlboRoHJ2dT3chlwe5H/9BWGYGt/5VLbzjz7E8idvsARJLC//jzjFsNRFSD8OFrUxk7yGMvKLwYk5dkS5gGR47IcyPsSAwMmxEFxUdKA4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Fzs/1m5nn3ZUu6ke01FXE8kDR8jfZu1uX9LHn5+/Pa0=;
- b=Ku6Bc/NwIE17etyw8Dc4zDHGWozu9LmNiIUnu1OynbrpNnjtWcf5d8cq0d/ZlJY1+il3qdBoMXBxyRZ9pIl5L5CJU6BZO+EtiKlud0DCT7fvdAquMUXoEMHfPXF3qmdnEcdRLokzi3ZsGOvZL7lVkOKOmq4j08Igz19926GlopNHdwt4XUNEYx55EprL5Xr5Y2wGCBzcPcf0CnbFLIL1YiODk6thETG5DCxe0Xa4pebRhBbWBeAEyG4IJujyQCMRkR/ONis3s+vdthrVvVtPccsQHs8FeqDvYDstxhqWv5w0zNjANHwKCSlNjtE1U40wFKZlDn6jifkABN3+2vwjYQ==
+ bh=c+ppfb2sG82fdXmgLACGjeRL6Vq204pE8aWepScrD9M=;
+ b=jxAo8cfunv1mgnTcwsFUY+Tgnx86ceVP3sgM5OILEXOdJcFg7ZBGQYT2dM1CH8XzdIbZu25R+lxG2oo2HKcaK9oQDjhCM/QDCceDHiMSnp335olUK6AhGpP1/1vQ5R0ub83YnLYr5TL1Ln8It8Jjc9HM1opNVDi05tggwqQyNjz7u8V9NrmEg+Tv/6HHySUvJQeQJREu6mXAi5jEv3mNUD6tPgXrQkv3s/RRHTWOx4VQs6vH039ar85TSt5qUDXCnvgL2Bn9uCzKGAD94HJB0Q7TpLoAFZcXzXR+DC0SnATiIOlQHAof7hvdmlHid3hklSQ6BycUBc/t9VKYLBDf1w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- CO1PR11MB5188.namprd11.prod.outlook.com (2603:10b6:303:95::16) with Microsoft
+ PH8PR11MB7045.namprd11.prod.outlook.com (2603:10b6:510:217::6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6977.19; Thu, 9 Nov 2023 23:21:11 +0000
+ 15.20.6954.28; Thu, 9 Nov 2023 23:32:21 +0000
 Received: from DM6PR11MB4657.namprd11.prod.outlook.com
  ([fe80::fe1c:922f:987:85ab]) by DM6PR11MB4657.namprd11.prod.outlook.com
  ([fe80::fe1c:922f:987:85ab%4]) with mapi id 15.20.6954.029; Thu, 9 Nov 2023
- 23:21:11 +0000
+ 23:32:21 +0000
 From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
 To: Jiri Pirko <jiri@resnulli.us>
-CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Michalik, Michal" <michal.michalik@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
-Subject: RE: [PATCH net 3/3] dpll: fix register pin with unregistered parent
- pin
-Thread-Topic: [PATCH net 3/3] dpll: fix register pin with unregistered parent
- pin
-Thread-Index: AQHaEi9R20w3ZLh/s0yEUYAIdOH3G7BwhkSAgAE6GCCAABIKAIAAOifwgAA9V4CAAFdrsA==
-Date: Thu, 9 Nov 2023 23:21:11 +0000
-Message-ID: <DM6PR11MB465763E8D261CEC6B215358C9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Michalik, Michal"
+	<michal.michalik@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
+Subject: RE: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
+Thread-Topic: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
+Thread-Index: AQHaEi9PNvCIepF1tEu7KRNf+M25RbBwe78AgAFGpmCAADfgAIAAMUJwgAAe7ICAAFgbsA==
+Date: Thu, 9 Nov 2023 23:32:21 +0000
+Message-ID: <DM6PR11MB4657DAC525E05B5DB72145119BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
 References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-4-arkadiusz.kubalewski@intel.com>
- <ZUukPbTCww26jltC@nanopsycho>
- <DM6PR11MB46572BD8C43DACA0FF15C2CF9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <8b6e3211-3f03-4c17-b0cb-26175bf42213@linux.dev>
- <DM6PR11MB4657C6C1B094DD7B429A22469BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU0fFz+GTdqjA7RD@nanopsycho>
-In-Reply-To: <ZU0fFz+GTdqjA7RD@nanopsycho>
+ <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
+ <ZUubagu6B+vbfBqm@nanopsycho>
+ <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZUzcTBmSPxIs5iH3@nanopsycho>
+ <DM6PR11MB46571D4C776B0B1888F943569BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU0fj5y9mAvVzXuf@nanopsycho>
+In-Reply-To: <ZU0fj5y9mAvVzXuf@nanopsycho>
 Accept-Language: pl-PL, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -105,42 +102,42 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|CO1PR11MB5188:EE_
-x-ms-office365-filtering-correlation-id: 217c9845-0faa-4e6a-fbd6-08dbe17a8f9c
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|PH8PR11MB7045:EE_
+x-ms-office365-filtering-correlation-id: 57fd83ee-f5af-49de-92c7-08dbe17c1f09
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OmyNObhEoPcOlnP+F2TYUDmJP5z/7VZUL8DZjtae8hxHOw6Rg5oiD2iY/UBSkN4uIWw6xBLmwDahO2RyPK2f2UVMtc0aEeUEHAZ9o2xzcqZZesyfi9JaRMSc/73qGYiJXJ9o8vsInQcxnIQ5Aci64m0Le77eGBoNhyPsFC8SBnagdBNuy+/Mbap0cWl2Jl89bcG8yZU6BgxNan0icoonWOVQ7bvZljZej0kbW9jyYwORBUhhigD4sG4ipmXm4JDE03xBjKVaxg1fFnIV3J6v1OtE/OKD48u/W2GmmLQ1LSiKuYoes0sduxczRZXlcg6Xplr1ENDiXFXWD2zFlpvBsArBFmW0GU4CMcswrBals/xcthF4x+32lRqgVHR6bXO1B7iCL98dsIshUL67uDhM88D3+OmGQPXb4M7iCBj6aVhZCmupM+myL15hcoG3LimYmIYatE//EL4JI97o5ILADv8LWg4liBaVWlMO+QTRNRunhMGZmgkPOkMTZZmaMgo89TbJcG95ro2n5jwFePncSRLd8FYLfCeX/9PuHbCaLFRwgl0pd24IdkEsqhkDHFloS4L3VlHBQDRLgyYKYA707cCPEQxxy8TZDlERq6Ffp3Z/pzJor+tMLJUAja9fgPgT
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(39860400002)(136003)(346002)(366004)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(6506007)(7696005)(83380400001)(8936002)(8676002)(4326008)(9686003)(6916009)(55016003)(64756008)(316002)(52536014)(54906003)(76116006)(26005)(66446008)(478600001)(66476007)(66946007)(66556008)(71200400001)(5660300002)(38100700002)(41300700001)(122000001)(82960400001)(2906002)(33656002)(38070700009)(86362001);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: GFkxXaRyp8lfPZIB5vZcSkRRQyAZrIFFKDjWkM2T3BJjNgzHki6TlQcVxsq7v/E9IJHKCobwc/PDRj/Sq9JtsnRUUmnQnCsVKuFPI0FU2notJUH340+NVDoFtxsdyYKzIyxhFoOI8avhjkQtI8HQ31bFHSVfl1VoqcRErQjT1zlXDJ8vKbS27Sn0oculJA7huSgp5WP17BI5yXDA/6OtB0T7MtfNdnvXwIWbOe9+y9Q+of/jQ0mb8x2H5pOfbP0ovvptkm0L15a+n+U4Bsu2s8gPCTtEvu5wyCNCcr9j6EB9HSbjHLtmPwW/mPKKob+Ty1Ff2UvZ7WFSZrIfvEa41vw9e1XHoOhlM2bU4W02yMHRFZ7pJXg0oH+myjVR+QUdH14Swi2mkfqT+qmHpgFIvCBI6hKzrmpm93nwHnN+g649YdezBmnKbUcL9+T/IhjB2bAt8GKm1UyOnCiz6ygEExUIDezmJZG/HJBoNVZjOFiQM9U4R+WHFE6h8dNoQ2nUoGSk23HESjuXSrdEzyillv0Rqn7AGxbIwPokUimwpnwSMV/dWgGo/dHDWmp1Mj8nrvD9w8H5JHc9VXLyX33z0zMcLTLTvdy51dtPDXRnFPDdIsQy56KfjnZYNnErfq6Y
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(396003)(136003)(366004)(39860400002)(346002)(230922051799003)(451199024)(186009)(64100799003)(1800799009)(71200400001)(41300700001)(52536014)(33656002)(6916009)(55016003)(4326008)(66446008)(38100700002)(64756008)(54906003)(8936002)(316002)(8676002)(5660300002)(2906002)(86362001)(83380400001)(66476007)(76116006)(66556008)(26005)(82960400001)(66946007)(122000001)(38070700009)(66899024)(9686003)(7696005)(6506007)(478600001);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?C0TsoaEtGb9Vrsj4Z63C7ln/9twjHIaOGjS9t18d8wwKiHA7jnBPv6jTaLr2?=
- =?us-ascii?Q?cuyg+nRWGpes79Is/h7TeA2sChaFoj6yxEG8rIwHaXySIApHvFar4nrmuNmm?=
- =?us-ascii?Q?Oc5sJvpzmvEMFBp22MWjNTx3Bp49EQ20MXw3wU5KvLW9ktjdUTwdoBGuGEH9?=
- =?us-ascii?Q?pUwpsoSWEaSQqV/F9oiYujEfx+79l85Guev1ZC+5/deAUG4M+7of8wSCMSLi?=
- =?us-ascii?Q?eKq7v7tqCTOESC/NyZe1Ld0I+lIq+Lwr6l2udtSAbaOrAwY+CckK/whBmWq+?=
- =?us-ascii?Q?m/xq85iyaLiearq5MYOGA/ObMExH7vTAowu9SljyQ3p80MlqJV9K8oSAQ5EA?=
- =?us-ascii?Q?B5em3rZP3fz36Nko+NLri/7EMwgvUnv2x8I9Z8nGMgxgSYnnrRoFFQNNpDsI?=
- =?us-ascii?Q?Mdv9iddasZOQguQ28Y4PhGoqmarDBmIi4El3M1Hsv103cGXhCWFhZxQKSVId?=
- =?us-ascii?Q?BvDt0+chPCtcKTS8aQ3nGCmdWuxTblR3KzWJIqYEtN0yEC96NsW4yQv2tzy7?=
- =?us-ascii?Q?W12EwFG+Mr2MgRT7vbYbhB69R0W0vupvttq4P7YKEuqUbHTvCxVNn+R90z9I?=
- =?us-ascii?Q?jEcsTyEQbB7FqeHUX9WTeL+BSi3DG2cxquecV4hbKEAIdLaXhO7t+DtIFvcS?=
- =?us-ascii?Q?bB6jJNbnd9bBfrjrPVZIo5vOhrYwTcUSgUKJNMEh3sUNKXwdF25pi1VJ+hi1?=
- =?us-ascii?Q?LgBa4HP/We7WRGLKW7cfDb73baIRlIUb3BJOkQyps5PDq55W2BjNKcWaCjkm?=
- =?us-ascii?Q?qBp9fgTOY/8SECoxd+fAvDp/jMciIVwHzsd4lT17kh412L/MJb7oXVEgzbql?=
- =?us-ascii?Q?ZCEp/x1i9bvpilavs8jgEImPXCBm4Vw3tNLqfXBajS/YQmuDpEjZKcwXbwfT?=
- =?us-ascii?Q?7qAAQmYAEHORIQlpN/Q9mk3hPkMGTF5rszPqWFIQWgJuibR1AevcCbvHORra?=
- =?us-ascii?Q?XO0+7TEg6FX6nFmZrQ2G9/5xeqcEJBiSLCF09kFSvMIRpBDmMXluFabX/Pd+?=
- =?us-ascii?Q?WogZFAH8xjgGxcH/CdP6E++kO1NSL5L55LW7FIKWNiIKT2QokVrny5l756PA?=
- =?us-ascii?Q?fBe0fnCY6oRJ2vC9lufhEuGSjy5WjCslgIDgkDNExqZpYN93MF9xyT1XIoVI?=
- =?us-ascii?Q?BzLgfShnwK93ca0sPSP4pCCFGf4eXDyVXsm3nrQaU5ynYL10s4wTHsK2cSg8?=
- =?us-ascii?Q?6aIMP+POHNnDQ78zCEqfONGjRsKJTv1LHL+B+VCXLOyphqEa2xOFv+SHVmJV?=
- =?us-ascii?Q?OTaYQhnoIM7QRyba7wRrHUfnlm5It0666bgyG7+qvG3kxfEi49ROfY0w4wNs?=
- =?us-ascii?Q?xLZMRIkREz8LeA96GCweND0F1nK/tPZeWvGhYphAX0w0z3UV3txFvU+5xaeg?=
- =?us-ascii?Q?2VKfYpKskstU6l1YyxbDYuzJxLsGADx7+NS/nXHjQn19naUtpNkoicbbY4/9?=
- =?us-ascii?Q?JxP8s1h61sHFb6lNYSvWAwj6ri3eI24vZO9xPflB5oCOqfyZsxRTlMDelnd1?=
- =?us-ascii?Q?+friFN05kLSjRI/GWlHPnaRSO9BCZMITlVRrJllKvV39MK51EM2X6MHCRzAW?=
- =?us-ascii?Q?5jS5J2CL695FTrA+uywRMoyd5tGKdrPm0Uc3Jjikd/WpQqqWewuYO0sGFI3v?=
- =?us-ascii?Q?Nw=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?QrKOCrVhIIf365M/Xo8p5+tWXp8ZlXcXWet4ndO6dnUwZheTAV2gy1phE861?=
+ =?us-ascii?Q?zWJ+Z32iOjngBdVg7L0RYiDuWnMybKY8EvTBb+SWwhOzIhL+KxPH9ufI7OZ+?=
+ =?us-ascii?Q?Z5lAMT4JHYdggeGmKGIiGNBdpZQy+pe21b3FWSeOQhCQHqZuS68CLg3IbvHn?=
+ =?us-ascii?Q?W3+p9b3As1H4/tvL1wT0OAbkKoJ8mvv+e3oKqqSY5XQLkMG3STHdjZrfhyZ4?=
+ =?us-ascii?Q?6tyJCc9PGFPybTerdEfd7CMM1nTLbFPdMC8Sd30aJ5a8gTYTgwBmjLRq9xn9?=
+ =?us-ascii?Q?maO35GG0BQyOx4fZ0wtIMeEj03Ln71Zj0QZxkh0IDObJxwtnemPnD/BRQuHs?=
+ =?us-ascii?Q?gRnzbTD9Jiz3yms0ihnkaiUU2K0PZNSCEtIwQ8jqELqMyplBiyV5OC9Xg9nm?=
+ =?us-ascii?Q?9GKR93ZvHGkaj2PQT8UIXX2qS7BMrIofc4HxIe+b6dhJ6fC1TLF3iVoqAmhG?=
+ =?us-ascii?Q?SJ9vGndwHs9lK/HiIsKCNBsSXnWETvEgPwLxqaz+I0ZPdqgonEtYu7LefZ5z?=
+ =?us-ascii?Q?YW+Zcy5ygTGAs1YXyP1qX7aVI6e6dVK6PzSaNn9kAIxge9mhKzJXfCyMv+jV?=
+ =?us-ascii?Q?eskBhNPm6OIB3S0Cz0oN15G7dezruGPWASAoACcCqMXhnrCQatEopIF1uxiw?=
+ =?us-ascii?Q?jRZSKwS+ivE8xDEzV9V5B+e2CZiuc6wBAPDAGH09r0WQovMjYmVM0aIbJfxr?=
+ =?us-ascii?Q?LiZPiF72RS9D8NDxRYPnZq8Swce4YWXnme2MwJrBP4160NmK6Cn9HDnrKtNM?=
+ =?us-ascii?Q?F0XFZZPoamx+h87GHc4obuF1Ip760mFHKUQUfVQS6hQZ2DjnmUJ4ZOTj4k4v?=
+ =?us-ascii?Q?6K9TOzi4VuRWDeYRY5df4N+62DA/VRVQAwTPhuorxj5BBer2gX9HWyHx+9xl?=
+ =?us-ascii?Q?O9pSghOfqmnL++/w0/BwgwFxdrgtjSwmB3ouMtG1neS9F32EHbxZ98+dxH0J?=
+ =?us-ascii?Q?4TS0DTrVXHX7BK6YDFJR/u09nQZgdl2sGSVqGaSH7/r6jPsqR+QphNlmjJE8?=
+ =?us-ascii?Q?pAxbI/NgqwIlHOTM8vsv4SpeMq56fc0fEQaNKVEJxiiSuZ/D2DeDHg5Dk93I?=
+ =?us-ascii?Q?GC4sNy+VAMJIIrh+Pt1fpTOomiUNYW3tnzPjWiO/gSIiMnV46FwnHpJkzxNf?=
+ =?us-ascii?Q?T/f8I0dTFbiqzuJ7tl5Ae7Vb9OZyaXRJQp0isojiMuaXDCiXBDM114HhpeI6?=
+ =?us-ascii?Q?maMBylSZLqEQWXBBtGMgX+5LX+OsKjpx4Hlth+rio98IzXQaTF/lGsuUJ6G+?=
+ =?us-ascii?Q?5f7+oKd3eEt2SRJ9MyCj2HB/sTJTEt5zMmhK4MO84+SAdG3Cpzepd/bMicLT?=
+ =?us-ascii?Q?wu+rmpSubKNz1ANowPMach7+qDLgQCGZEPQer/pt1pKDHmxPosIJ7NiU5dq2?=
+ =?us-ascii?Q?sIll7hrkyL2+DtmcaizSVTuOiGr8TUKHyu+N5SmJENIHfjIw6Zwm9iEmUOzc?=
+ =?us-ascii?Q?0XMgW1CEKeqC6DBMEZf3voCOIyquNdK0JG86XHPmMdcLfwAQCJSmIPyLjzDH?=
+ =?us-ascii?Q?VREtnayVetIj1lfl4RIKfXI/lQt5lB8+iI2n3YCiBB+B+OfBKC1kNZKIKTsL?=
+ =?us-ascii?Q?xveL66bDD52/fwT9sbZSVy86ELwarWPS64lOothF7gjpqHwUohSkPvQY781O?=
+ =?us-ascii?Q?Zg=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -151,204 +148,293 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 217c9845-0faa-4e6a-fbd6-08dbe17a8f9c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 23:21:11.4648
+X-MS-Exchange-CrossTenant-Network-Message-Id: 57fd83ee-f5af-49de-92c7-08dbe17c1f09
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 23:32:21.5810
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 989quDHTVGTNtJ9TYWyk+8DXbML5NwJ+KWwCayaDYjK9Q6Gog8rsChAhhMefsPODzcdetM6gOr/9LWoPLzY3dFNQaS0F7XLuWjgUcyVPSRE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5188
+X-MS-Exchange-CrossTenant-userprincipalname: vzc3TNasn/7pBVHfrbG9Vxzv+BsIgedmiANZsgoUx5CIMryDZXtewWk2wqzhSGnVYun6k2a8FcTf1tFhXqi0N1DcThxPLLB+sVI2evsdMyk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7045
 X-OriginatorOrg: intel.com
 
 >From: Jiri Pirko <jiri@resnulli.us>
->Sent: Thursday, November 9, 2023 7:04 PM
+>Sent: Thursday, November 9, 2023 7:06 PM
 >
->Thu, Nov 09, 2023 at 05:02:48PM CET, arkadiusz.kubalewski@intel.com wrote:
->>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>Sent: Thursday, November 9, 2023 11:56 AM
->>>To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>; Jiri Pirko
+>Thu, Nov 09, 2023 at 05:30:20PM CET, arkadiusz.kubalewski@intel.com wrote:
+>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>Sent: Thursday, November 9, 2023 2:19 PM
 >>>
->>>On 09/11/2023 09:59, Kubalewski, Arkadiusz wrote:
->>>>> From: Jiri Pirko <jiri@resnulli.us>
->>>>> Sent: Wednesday, November 8, 2023 4:08 PM
+>>>Thu, Nov 09, 2023 at 01:20:48PM CET, arkadiusz.kubalewski@intel.com
+>>>wrote:
+>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>Sent: Wednesday, November 8, 2023 3:30 PM
 >>>>>
->>>>> Wed, Nov 08, 2023 at 11:32:26AM CET, arkadiusz.kubalewski@intel.com
->>>>> wrote:
->>>>>> In case of multiple kernel module instances using the same dpll
->>>>>>device:
->>>>>> if only one registers dpll device, then only that one can register
+>>>>>Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com
+>>>>>wrote:
+>>>>>>When a kernel module is unbound but the pin resources were not
+>>>>>>entirely
+>>>>>>freed (other kernel module instance have had kept the reference to
+>>>>>>that
+>>>>>>pin), and kernel module is again bound, the pin properties would not
+>>>>>>be
+>>>>>>updated (the properties are only assigned when memory for the pin is
+>>>>>>allocated), prop pointer still points to the kernel module memory of
+>>>>>>the kernel module which was deallocated on the unbind.
+>>>>>>
+>>>>>>If the pin dump is invoked in this state, the result is a kernel
+>>>>>>crash.
+>>>>>>Prevent the crash by storing persistent pin properties in dpll
+>>>>>>subsystem,
+>>>>>>copy the content from the kernel module when pin is allocated, instea=
+d
+>>>>>>of
+>>>>>>using memory of the kernel module.
+>>>>>>
+>>>>>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
+>>>>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
+>>>>>>functions")
+>>>>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>>>>---
+>>>>>> drivers/dpll/dpll_core.c    |  4 ++--
+>>>>>> drivers/dpll/dpll_core.h    |  4 ++--
+>>>>>> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
+>>>>>> 3 files changed, 18 insertions(+), 18 deletions(-)
+>>>>>>
+>>>>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>>>>>>index 3568149b9562..4077b562ba3b 100644
+>>>>>>--- a/drivers/dpll/dpll_core.c
+>>>>>>+++ b/drivers/dpll/dpll_core.c
+>>>>>>@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct
+>>>>>>module *module,
+>>>>>> 		ret =3D -EINVAL;
+>>>>>> 		goto err;
+>>>>>> 	}
+>>>>>>-	pin->prop =3D prop;
+>>>>>>+	memcpy(&pin->prop, prop, sizeof(pin->prop));
 >>>>>
->>>>> They why you don't register in multiple instances? See mlx5 for a
->>>>> reference.
+>>>>>Odd, you don't care about the pointer within this structure?
 >>>>>
 >>>>
->>>> Every registration requires ops, but for our case only PF0 is able to
->>>> control dpll pins and device, thus only this can provide ops.
->>>> Basically without PF0, dpll is not able to be controlled, as well
->>>> as directly connected pins.
->>>>
->>>But why do you need other pins then, if FP0 doesn't exist?
+>>>>Well, true. Need a fix.
+>>>>Wondering if copying idea is better than just assigning prop pointer on
+>>>>each call to dpll_pin_get(..) function (when pin already exists)?
+>>>
+>>>Not sure what do you mean. Examples please.
 >>>
 >>
->>In general we don't need them at that point, but this is a corner case,
->>where users for some reason decided to unbind PF 0, and I treat this stat=
-e
->>as temporary, where dpll/pins controllability is temporarily broken.
+>>Sure,
+>>
+>>Basically this change:
+>>
+>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>>index ae884b92d68c..06b72d5877c3 100644
+>>--- a/drivers/dpll/dpll_core.c
+>>+++ b/drivers/dpll/dpll_core.c
+>>@@ -483,6 +483,7 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct module
+>>*module,
+>>                    pos->pin_idx =3D=3D pin_idx &&
+>>                    pos->module =3D=3D module) {
+>>                        ret =3D pos;
+>>+                       pos->prop =3D prop;
+>>                        refcount_inc(&ret->refcount);
+>>                        break;
+>>                }
+>>
+>>would replace whole of this patch changes, although seems a bit hacky.
 >
->So resolve this broken situation internally in the driver, registering
->things only in case PF0 is present. Some simple notification infra would
->do. Don't drag this into the subsystem internals.
+>Or event better, as I suggested in the other patch reply, resolve this
+>internally in the driver registering things only when they are valid.
+>Much better then to hack anything in dpll core.
 >
 
-Thanks for your feedback, but this is already wrong advice.
-
-Our HW/FW is designed in different way than yours, it doesn't mean it is wr=
-ong.
-As you might recall from our sync meetings, the dpll subsystem is to unify
-approaches and reduce the code in the drivers, where your advice is exactly
-opposite, suggested fix would require to implement extra synchronization of=
- the
-dpll and pin registration state between driver instances, most probably wit=
-h
-use of additional modules like aux-bus or something similar, which was from=
- the
-very beginning something we tried to avoid.
-Only ice uses the infrastructure of muxed pins, and this is broken as it
-doesn't allow unbind the driver which have registered dpll and pins without
-crashing the kernel, so a fix is required in dpll subsystem, not in the dri=
-ver.
+This approach seemed to me hacky, that is why started with coping the
+data.
+It is not about registering, rather about unregistering on driver
+unbind, which brakes things, and currently cannot be recovered in
+described case.
 
 Thank you!
 Arkadiusz
 
 >
 >>
->>The dpll at that point is not registered, all the direct pins are also
->>not registered, thus not available to the users.
->>
->>When I do dump at that point there are still 3 pins present, one for each
->>PF, although they are all zombies - no parents as their parent pins are
->>not
->>registered (as the other patch [1/3] prevents dump of pin parent if the
->>parent is not registered). Maybe we can remove the REGISTERED mark for al=
-l
->>the muxed pins, if all their parents have been unregistered, so they won'=
-t
->>be visible to the user at all. Will try to POC that.
->>
->>>>>
->>>>>> directly connected pins with a dpll device. If unregistered parent
->>>>>> determines if the muxed pin can be register with it or not, it force=
-s
->>>>>> serialized driver load order - first the driver instance which
->>>>>> registers the direct pins needs to be loaded, then the other
->>>>>> instances
->>>>>> could register muxed type pins.
->>>>>>
->>>>>> Allow registration of a pin with a parent even if the parent was not
->>>>>> yet registered, thus allow ability for unserialized driver instance
->>>>>
->>>>> Weird.
->>>>>
->>>>
->>>> Yeah, this is issue only for MUX/parent pin part, couldn't find better
->>>> way, but it doesn't seem to break things around..
->>>>
->>>
->>>I just wonder how do you see the registration procedure? How can parent
->>>pin exist if it's not registered? I believe you cannot get it through
->>>DPLL API, then the only possible way is to create it within the same
->>>driver code, which can be simply re-arranged. Am I wrong here?
->>>
->>
->>By "parent exist" I mean the parent pin exist in the dpll subsystem
->>(allocated on pins xa), but it doesn't mean it is available to the users,
->>as it might not be registered with a dpll device.
->>
->>We have this 2 step init approach:
->>1. dpll_pin_get(..) -> allocate new pin or increase reference if exist
->>2.1. dpll_pin_register(..) -> register with a dpll device
->>2.2. dpll_pin_on_pin_register -> register with a parent pin
->>
->>Basically:
->>- PF 0 does 1 & 2.1 for all the direct inputs, and steps: 1 & 2.2 for its
->>  recovery clock pin,
->>- other PF's only do step 1 for the direct input pins (as they must get
->>  reference to those in order to register recovery clock pin with them),
->>  and steps: 1 & 2.2 for their recovery clock pin.
->>
->>
 >>Thank you!
 >>Arkadiusz
 >>
->>>> Thank you!
->>>> Arkadiusz
+>>>
+>>>>
+>>>>Thank you!
+>>>>Arkadiusz
 >>>>
 >>>>>
->>>>>> load order.
->>>>>> Do not WARN_ON notification for unregistered pin, which can be
->>>>>> invoked
->>>>>> for described case, instead just return error.
+>>>>>> 	refcount_set(&pin->refcount, 1);
+>>>>>> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
+>>>>>> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+>>>>>>@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin
+>>>>>>*parent,
+>>>>>>struct dpll_pin *pin,
+>>>>>> 	unsigned long i, stop;
+>>>>>> 	int ret;
 >>>>>>
->>>>>> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions"=
-)
->>>>>> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
->>>>>> functions")
->>>>>> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>>>> ---
->>>>>> drivers/dpll/dpll_core.c    | 4 ----
->>>>>> drivers/dpll/dpll_netlink.c | 2 +-
->>>>>> 2 files changed, 1 insertion(+), 5 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>>>>> index
->>>>>> 4077b562ba3b..ae884b92d68c 100644
->>>>>> --- a/drivers/dpll/dpll_core.c
->>>>>> +++ b/drivers/dpll/dpll_core.c
->>>>>> @@ -28,8 +28,6 @@ static u32 dpll_xa_id;
->>>>>> 	WARN_ON_ONCE(!xa_get_mark(&dpll_device_xa, (d)->id,
->>>>>> DPLL_REGISTERED))
->>>>>> #define ASSERT_DPLL_NOT_REGISTERED(d)	\
->>>>>> 	WARN_ON_ONCE(xa_get_mark(&dpll_device_xa, (d)->id,
->>>>>> DPLL_REGISTERED))
->>>>>> -#define ASSERT_PIN_REGISTERED(p)	\
->>>>>> -	WARN_ON_ONCE(!xa_get_mark(&dpll_pin_xa, (p)->id,
->>>>>> DPLL_REGISTERED))
->>>>>>
->>>>>> struct dpll_device_registration {
->>>>>> 	struct list_head list;
->>>>>> @@ -641,8 +639,6 @@ int dpll_pin_on_pin_register(struct dpll_pin
->>>>>> *parent,
->>>>>> struct dpll_pin *pin,
->>>>>> 	    WARN_ON(!ops->state_on_pin_get) ||
->>>>>> 	    WARN_ON(!ops->direction_get))
+>>>>>>-	if (WARN_ON(parent->prop->type !=3D DPLL_PIN_TYPE_MUX))
+>>>>>>+	if (WARN_ON(parent->prop.type !=3D DPLL_PIN_TYPE_MUX))
 >>>>>> 		return -EINVAL;
->>>>>> -	if (ASSERT_PIN_REGISTERED(parent))
->>>>>> -		return -EINVAL;
 >>>>>>
->>>>>> 	mutex_lock(&dpll_lock);
->>>>>> 	ret =3D dpll_xa_ref_pin_add(&pin->parent_refs, parent, ops,
->>>>>> priv); diff
->>>>>> --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->>>>>> index
->>>>>> 963bbbbe6660..ff430f43304f 100644
->>>>>> --- a/drivers/dpll/dpll_netlink.c
->>>>>> +++ b/drivers/dpll/dpll_netlink.c
->>>>>> @@ -558,7 +558,7 @@ dpll_pin_event_send(enum dpll_cmd event, struct
->>>>>> dpll_pin *pin)
->>>>>> 	int ret =3D -ENOMEM;
->>>>>> 	void *hdr;
+>>>>>> 	if (WARN_ON(!ops) ||
+>>>>>>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+>>>>>>index 5585873c5c1b..717f715015c7 100644
+>>>>>>--- a/drivers/dpll/dpll_core.h
+>>>>>>+++ b/drivers/dpll/dpll_core.h
+>>>>>>@@ -44,7 +44,7 @@ struct dpll_device {
+>>>>>>  * @module:		module of creator
+>>>>>>  * @dpll_refs:		hold referencees to dplls pin was registered
+>>>>>>with
+>>>>>>  * @parent_refs:	hold references to parent pins pin was registered
+>>>>>>with
+>>>>>>- * @prop:		pointer to pin properties given by registerer
+>>>>>>+ * @prop:		pin properties copied from the registerer
+>>>>>>  * @rclk_dev_name:	holds name of device when pin can recover
+>>>>>>clock
+>>>>>>from it
+>>>>>>  * @refcount:		refcount
+>>>>>>  **/
+>>>>>>@@ -55,7 +55,7 @@ struct dpll_pin {
+>>>>>> 	struct module *module;
+>>>>>> 	struct xarray dpll_refs;
+>>>>>> 	struct xarray parent_refs;
+>>>>>>-	const struct dpll_pin_properties *prop;
+>>>>>>+	struct dpll_pin_properties prop;
+>>>>>> 	refcount_t refcount;
+>>>>>> };
 >>>>>>
->>>>>> -	if (WARN_ON(!xa_get_mark(&dpll_pin_xa, pin->id,
->>>>>> DPLL_REGISTERED)))
->>>>>> +	if (!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED))
->>>>>> 		return -ENODEV;
+>>>>>>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.=
+c
+>>>>>>index 93fc6c4b8a78..963bbbbe6660 100644
+>>>>>>--- a/drivers/dpll/dpll_netlink.c
+>>>>>>+++ b/drivers/dpll/dpll_netlink.c
+>>>>>>@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg,
+>>>>>>struct
+>>>>>>dpll_pin *pin,
+>>>>>> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq),
+>>>>>>&freq,
+>>>>>> 			  DPLL_A_PIN_PAD))
+>>>>>> 		return -EMSGSIZE;
+>>>>>>-	for (fs =3D 0; fs < pin->prop->freq_supported_num; fs++) {
+>>>>>>+	for (fs =3D 0; fs < pin->prop.freq_supported_num; fs++) {
+>>>>>> 		nest =3D nla_nest_start(msg,
+>>>>>>DPLL_A_PIN_FREQUENCY_SUPPORTED);
+>>>>>> 		if (!nest)
+>>>>>> 			return -EMSGSIZE;
+>>>>>>-		freq =3D pin->prop->freq_supported[fs].min;
+>>>>>>+		freq =3D pin->prop.freq_supported[fs].min;
+>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN,
+>>>>>>sizeof(freq),
+>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>>>>> 			nla_nest_cancel(msg, nest);
+>>>>>> 			return -EMSGSIZE;
+>>>>>> 		}
+>>>>>>-		freq =3D pin->prop->freq_supported[fs].max;
+>>>>>>+		freq =3D pin->prop.freq_supported[fs].max;
+>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX,
+>>>>>>sizeof(freq),
+>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>>>>> 			nla_nest_cancel(msg, nest);
+>>>>>>@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct
+>>>>>>dpll_pin
+>>>>>>*pin, u32 freq)
+>>>>>> {
+>>>>>> 	int fs;
 >>>>>>
->>>>>> 	msg =3D genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
->>>>>> --
->>>>>> 2.38.1
+>>>>>>-	for (fs =3D 0; fs < pin->prop->freq_supported_num; fs++)
+>>>>>>-		if (freq >=3D pin->prop->freq_supported[fs].min &&
+>>>>>>-		    freq <=3D pin->prop->freq_supported[fs].max)
+>>>>>>+	for (fs =3D 0; fs < pin->prop.freq_supported_num; fs++)
+>>>>>>+		if (freq >=3D pin->prop.freq_supported[fs].min &&
+>>>>>>+		    freq <=3D pin->prop.freq_supported[fs].max)
+>>>>>> 			return true;
+>>>>>> 	return false;
+>>>>>> }
+>>>>>>@@ -403,7 +403,7 @@ static int
+>>>>>> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+>>>>>> 		     struct netlink_ext_ack *extack)
+>>>>>> {
+>>>>>>-	const struct dpll_pin_properties *prop =3D pin->prop;
+>>>>>>+	const struct dpll_pin_properties *prop =3D &pin->prop;
+>>>>>> 	struct dpll_pin_ref *ref;
+>>>>>> 	int ret;
 >>>>>>
->>>
->>
+>>>>>>@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin,
+>>>>>>u32
+>>>>>>parent_idx,
+>>>>>> 	int ret;
+>>>>>>
+>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>+	      pin->prop.capabilities)) {
+>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>>>>> 		return -EOPNOTSUPP;
+>>>>>> 	}
+>>>>>>@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll,
+>>>>>>struct
+>>>>>>dpll_pin *pin,
+>>>>>> 	int ret;
+>>>>>>
+>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>+	      pin->prop.capabilities)) {
+>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>>>>> 		return -EOPNOTSUPP;
+>>>>>> 	}
+>>>>>>@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll, struc=
+t
+>>>>>>dpll_pin *pin,
+>>>>>> 	int ret;
+>>>>>>
+>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
+>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>+	      pin->prop.capabilities)) {
+>>>>>> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
+>>>>>> 		return -EOPNOTSUPP;
+>>>>>> 	}
+>>>>>>@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin,
+>>>>>>struct
+>>>>>>dpll_device *dpll,
+>>>>>> 	int ret;
+>>>>>>
+>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
+>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>+	      pin->prop.capabilities)) {
+>>>>>> 		NL_SET_ERR_MSG(extack, "direction changing is not
+>>>>>>allowed");
+>>>>>> 		return -EOPNOTSUPP;
+>>>>>> 	}
+>>>>>>@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin,
+>>>>>>struct
+>>>>>>nlattr *phase_adj_attr,
+>>>>>> 	int ret;
+>>>>>>
+>>>>>> 	phase_adj =3D nla_get_s32(phase_adj_attr);
+>>>>>>-	if (phase_adj > pin->prop->phase_range.max ||
+>>>>>>-	    phase_adj < pin->prop->phase_range.min) {
+>>>>>>+	if (phase_adj > pin->prop.phase_range.max ||
+>>>>>>+	    phase_adj < pin->prop.phase_range.min) {
+>>>>>> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
+>>>>>> 				    "phase adjust value not supported");
+>>>>>> 		return -EINVAL;
+>>>>>>@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr
+>>>>>>*mod_name_attr,
+>>>>>> 	unsigned long i;
+>>>>>>
+>>>>>> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
+>>>>>>-		prop =3D pin->prop;
+>>>>>>+		prop =3D &pin->prop;
+>>>>>> 		cid_match =3D clock_id ? pin->clock_id =3D=3D clock_id : true;
+>>>>>> 		mod_match =3D mod_name_attr && module_name(pin->module) ?
+>>>>>> 			!nla_strcmp(mod_name_attr,
+>>>>>>--
+>>>>>>2.38.1
+>>>>>>
+>>>>
+
 
