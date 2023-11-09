@@ -1,79 +1,76 @@
-Return-Path: <netdev+bounces-46918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE95C7E712A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:06:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B085D7E712D
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:07:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED5011C20C80
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:06:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 606972810DF
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1874B32C96;
-	Thu,  9 Nov 2023 18:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5860232C90;
+	Thu,  9 Nov 2023 18:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="U5vit+5H"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="W2bPJzrU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B547208B8
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:06:11 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E6A3A92
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:06:10 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54366784377so1816198a12.3
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:06:10 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95032C82
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:07:15 +0000 (UTC)
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEEC1727
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:07:14 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5441ba3e53cso1819776a12.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:07:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699553169; x=1700157969; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699553233; x=1700158033; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4641hBkPi2JuQQ74e4aafC1XmsvS/PhqpU5RWoR2Q4g=;
-        b=U5vit+5Hyj5Hk+qZhaO+xlt9g4wLRvxnkEpsdeMB8CEv6je9tab1RfZHPAQDI8qnj3
-         0xQ5poqcliXDX4nqSymEx5DivaXbMP3pvwnUOYozvy9c2o2Ws1za6H+XRVdbTQ4hR3vr
-         ZmkFgjq3R/Jzn90ECmliSakK8ijKkK4g6cDp5SVDzuU7VE0pZIoGiM3ztZCUC8UMLMRx
-         mKS0aHqVQoUUka3Jp8ya/ImkuWmDAHOVP9nZ59XlhlRcGVRD/QhhKk7h7L7wzFdDZCmY
-         l5Rsd2IAZnvVyTz6k5SUzbiM4/YRA7Nqm1dGqG094LQgcPknopTwRsTMduGToNOyu06b
-         Ts2w==
+        bh=oGtopPGDGiHp99PDIuHYLua3YoCROal58OYHkjV7DBI=;
+        b=W2bPJzrU/xY6COVkFTQgSmqkfEC/VeopQ1i8TXfcIOMgGKtnzOxgrdfC9smN2jXRs1
+         jSsghNRgseRUs5XJfgYsOPN8zE245ubTYk+8F54anCMqY4GTPWr5gjGLQma7yfWGVzvB
+         mUq08qdRsFAH3ZPiNovgYOsay2yhNXBDCIXUKkKUotwcWfhzU7dmA7ni+MoXSdYyBoSJ
+         a+YEHScpu+FQNW9FfyO4/Q5sMUxjDDrJVusNFk2LFc6coyy7uq6gA7gBz/75FBV6F7Ws
+         N3PDKKiTKKwguzda2+F8kbocuF30k77GDSW0/I3FNZuaDJDLa+Ox0QGs2w08j+JEo5Lz
+         tdPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699553169; x=1700157969;
+        d=1e100.net; s=20230601; t=1699553233; x=1700158033;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4641hBkPi2JuQQ74e4aafC1XmsvS/PhqpU5RWoR2Q4g=;
-        b=l50FzWQaUomMBsHKw06SfQOS7fVlmat09vjKQEUHvUUWKxJmwNsN4lKaIpNfyAegJh
-         wH17ppg1vGaJmG4qYrB1M/DoO/E27hmuCdpKF/Wi9K1EXVAZwsEpX3DvUHbQlQ9MTVOC
-         knBdrAvMJHDQE0EP7h+0HqdwK+bFdnTxz9dlVHK0vw+cp7Ee75CH6oBOHNGnLgFPz9H7
-         +1ZQ/aV2UGrSbuKiWBIMt6YZgdLHVPDPpWRAGmSRpcDgq2tmGqaIZQ9G2UPRj4RDA0ha
-         bOdOD5X9WnrMrU+dpjazv7InUBaVF0O28H0ci4I4GquQwBr/Ilimccq7GrCTgisYyN8l
-         AWnA==
-X-Gm-Message-State: AOJu0YzFiAglxvKwaSYMccqhLioMcqReeohRZwomFdercWuxxiFvUJKh
-	DdIIdEtYJWa7YO7MIemHFUZCqQ==
-X-Google-Smtp-Source: AGHT+IE5ffpPpvq1j8Pf6ajPUJ+jkHJZYPWvuC8XhHKD01DOFCA4IxWi5PsLrmlJOE24w+K/Pj6aCg==
-X-Received: by 2002:a50:f697:0:b0:53e:5957:aa4e with SMTP id d23-20020a50f697000000b0053e5957aa4emr5607606edn.20.1699553169321;
-        Thu, 09 Nov 2023 10:06:09 -0800 (PST)
+        bh=oGtopPGDGiHp99PDIuHYLua3YoCROal58OYHkjV7DBI=;
+        b=MrqW60lDOyzUyFMsDHM7zkMsSgmbVoRhxMUgsD+xxYX6ZvH5qxv4L0j6UP9flqcKBP
+         /MC9Ffb6frUz6PobCG6mJaf8PzAdOXRYrLWn8NzkcX6P25qEb4UfNOvME/jX5p0nfyAu
+         v5G1kUOU3CIRggpFmM4O9036WWhRYkz+Xe8o8Tq6GqQkzPaets/p1+XAiqwkc8Ox2GeA
+         7j5wcdH432HgA1yzOR666O+5mSSYO0kRYjEcieWuYI8inQmoTm4pJNc50rzAvmUI6gn0
+         tYuYjrLgxKCA73bXgxHwh6gSYknSK3EW4kA6v+5lMIo8+Io40GD1+37rXBK8eeeTp27M
+         kZ+w==
+X-Gm-Message-State: AOJu0YxZ7caVatDvE2p2V0uPKPyLc5QZGbbgopCKn1VF01a45/kOwWkv
+	pHFNUm3EeshI5PGJ/6CkxalKjA==
+X-Google-Smtp-Source: AGHT+IHeBVdX0ytpk0hc1Pmju8UM1U3MadSrK4b4dCn6Xj/sHbID2k+sDi/fwCCmUVTtFoVFjbQB0Q==
+X-Received: by 2002:a50:c050:0:b0:53e:98c6:5100 with SMTP id u16-20020a50c050000000b0053e98c65100mr4700269edd.30.1699553233208;
+        Thu, 09 Nov 2023 10:07:13 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id 25-20020a508e59000000b00536ad96f867sm108264edx.11.2023.11.09.10.06.08
+        by smtp.gmail.com with ESMTPSA id j26-20020a50d01a000000b0053e408aec8bsm109200edf.6.2023.11.09.10.07.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 10:06:08 -0800 (PST)
-Date: Thu, 9 Nov 2023 19:06:07 +0100
+        Thu, 09 Nov 2023 10:07:12 -0800 (PST)
+Date: Thu, 9 Nov 2023 19:07:11 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
 	"Michalik, Michal" <michal.michalik@intel.com>,
 	"Olech, Milena" <milena.olech@intel.com>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
 	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
-Message-ID: <ZU0fj5y9mAvVzXuf@nanopsycho>
+Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
+Message-ID: <ZU0fzzmmxjnsNW0n@nanopsycho>
 References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
- <ZUubagu6B+vbfBqm@nanopsycho>
- <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZUzcTBmSPxIs5iH3@nanopsycho>
- <DM6PR11MB46571D4C776B0B1888F943569BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
+ <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,250 +79,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46571D4C776B0B1888F943569BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+In-Reply-To: <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
 
-Thu, Nov 09, 2023 at 05:30:20PM CET, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Thursday, November 9, 2023 2:19 PM
+Thu, Nov 09, 2023 at 06:20:14PM CET, arkadiusz.kubalewski@intel.com wrote:
+>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>Sent: Thursday, November 9, 2023 11:51 AM
 >>
->>Thu, Nov 09, 2023 at 01:20:48PM CET, arkadiusz.kubalewski@intel.com wrote:
->>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>Sent: Wednesday, November 8, 2023 3:30 PM
->>>>
->>>>Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com
->>>>wrote:
->>>>>When a kernel module is unbound but the pin resources were not entirely
->>>>>freed (other kernel module instance have had kept the reference to that
->>>>>pin), and kernel module is again bound, the pin properties would not be
->>>>>updated (the properties are only assigned when memory for the pin is
->>>>>allocated), prop pointer still points to the kernel module memory of
->>>>>the kernel module which was deallocated on the unbind.
->>>>>
->>>>>If the pin dump is invoked in this state, the result is a kernel crash.
->>>>>Prevent the crash by storing persistent pin properties in dpll
->>>>>subsystem,
->>>>>copy the content from the kernel module when pin is allocated, instead
->>>>>of
->>>>>using memory of the kernel module.
->>>>>
->>>>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->>>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
->>>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>>>---
->>>>> drivers/dpll/dpll_core.c    |  4 ++--
->>>>> drivers/dpll/dpll_core.h    |  4 ++--
->>>>> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
->>>>> 3 files changed, 18 insertions(+), 18 deletions(-)
->>>>>
->>>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>>>>index 3568149b9562..4077b562ba3b 100644
->>>>>--- a/drivers/dpll/dpll_core.c
->>>>>+++ b/drivers/dpll/dpll_core.c
->>>>>@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct
->>>>>module *module,
->>>>> 		ret = -EINVAL;
->>>>> 		goto err;
->>>>> 	}
->>>>>-	pin->prop = prop;
->>>>>+	memcpy(&pin->prop, prop, sizeof(pin->prop));
->>>>
->>>>Odd, you don't care about the pointer within this structure?
->>>>
+>>On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
+>>> Fix issues when performing unordered unbind/bind of a kernel modules
+>>> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
+>>> Currently only serialized bind/unbind of such use case works, fix
+>>> the issues and allow for unserialized kernel module bind order.
 >>>
->>>Well, true. Need a fix.
->>>Wondering if copying idea is better than just assigning prop pointer on
->>>each call to dpll_pin_get(..) function (when pin already exists)?
+>>> The issues are observed on the ice driver, i.e.,
+>>>
+>>> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
+>>> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
+>>>
+>>> results in:
+>>>
+>>> ice 0000:af:00.0: Removed PTP clock
+>>> BUG: kernel NULL pointer dereference, address: 0000000000000010
+>>> PF: supervisor read access in kernel mode
+>>> PF: error_code(0x0000) - not-present page
+>>> PGD 0 P4D 0
+>>> Oops: 0000 [#1] PREEMPT SMP PTI
+>>> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-
+>>>queue_19th-Oct-2023-01625-g039e5d15e451 #1
+>>> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS
+>>>SE5C620.86B.02.01.0008.031920191559 03/19/2019
+>>> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66
+>>>08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b 10
+>>>41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
+>>> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
+>>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+>>> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
+>>> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
+>>> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
+>>> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
+>>> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000)
+>>knlGS:0000000000000000
+>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
+>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>> PKRU: 55555554
+>>> Call Trace:
+>>>   <TASK>
+>>>   ? __die+0x20/0x70
+>>>   ? page_fault_oops+0x76/0x170
+>>>   ? exc_page_fault+0x65/0x150
+>>>   ? asm_exc_page_fault+0x22/0x30
+>>>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
+>>>   dpll_msg_add_pin_parents+0x142/0x1d0
+>>>   dpll_pin_event_send+0x7d/0x150
+>>>   dpll_pin_on_pin_unregister+0x3f/0x100
+>>>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
+>>>   ice_dpll_deinit+0x29/0xe0 [ice]
+>>>   ice_remove+0xcd/0x200 [ice]
+>>>   pci_device_remove+0x33/0xa0
+>>>   device_release_driver_internal+0x193/0x200
+>>>   unbind_store+0x9d/0xb0
+>>>   kernfs_fop_write_iter+0x128/0x1c0
+>>>   vfs_write+0x2bb/0x3e0
+>>>   ksys_write+0x5f/0xe0
+>>>   do_syscall_64+0x59/0x90
+>>>   ? filp_close+0x1b/0x30
+>>>   ? do_dup2+0x7d/0xd0
+>>>   ? syscall_exit_work+0x103/0x130
+>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>   ? do_syscall_64+0x69/0x90
+>>>   ? syscall_exit_work+0x103/0x130
+>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>   ? do_syscall_64+0x69/0x90
+>>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>> RIP: 0033:0x7fdc7d93eb97
+>>> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e
+>>fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0
+>>ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+>>> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+>>> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
+>>> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
+>>> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
+>>> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
+>>> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
+>>>   </TASK>
+>>> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio
+>>>irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer
+>>>snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c
+>>>rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod target_core_mod
+>>>ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr
+>>>intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common
+>>>isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal
+>>>intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt
+>>>iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr i2c_i801
+>>>ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus
+>>>ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache jbd2
+>>>sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice
+>>>crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci
+>>>ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
+>>> CR2: 0000000000000010
+>>>
+>>> Arkadiusz Kubalewski (3):
+>>>    dpll: fix pin dump crash after module unbind
+>>>    dpll: fix pin dump crash for rebound module
+>>>    dpll: fix register pin with unregistered parent pin
+>>>
+>>>   drivers/dpll/dpll_core.c    |  8 ++------
+>>>   drivers/dpll/dpll_core.h    |  4 ++--
+>>>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++---------------
+>>>   3 files changed, 26 insertions(+), 23 deletions(-)
+>>>
 >>
->>Not sure what do you mean. Examples please.
+>>
+>>I still don't get how can we end up with unregistered pin. And shouldn't
+>>drivers do unregister of dpll/pin during release procedure? I thought it
+>>was kind of agreement we reached while developing the subsystem.
 >>
 >
->Sure,
+>It's definitely not about ending up with unregistered pins.
 >
->Basically this change:
->
->diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->index ae884b92d68c..06b72d5877c3 100644
->--- a/drivers/dpll/dpll_core.c
->+++ b/drivers/dpll/dpll_core.c
->@@ -483,6 +483,7 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct module *module,
->                    pos->pin_idx == pin_idx &&
->                    pos->module == module) {
->                        ret = pos;
->+                       pos->prop = prop;
->                        refcount_inc(&ret->refcount);
->                        break;
->                }
->
->would replace whole of this patch changes, although seems a bit hacky.
+>Usually the driver is loaded for PF0, PF1, PF2, PF3 and unloaded in opposite
+>order: PF3, PF2, PF1, PF0. And this is working without any issues.
 
-Or event better, as I suggested in the other patch reply, resolve this
-internally in the driver registering things only when they are valid.
-Much better then to hack anything in dpll core.
+Please fix this in the driver.
 
 
+>
+>Above crash is caused because of unordered driver unload, where dpll subsystem
+>tries to notify muxed pin was deleted, but at that time the parent is already
+>gone, thus data points to memory which is no longer available, thus crash
+>happens when trying to dump pin parents.
+>
+>This series fixes all issues I could find connected to the situation where
+>muxed-pins are trying to access their parents, when parent registerer was removed
+>in the meantime.
 >
 >Thank you!
 >Arkadiusz
->
->>
->>>
->>>Thank you!
->>>Arkadiusz
->>>
->>>>
->>>>> 	refcount_set(&pin->refcount, 1);
->>>>> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
->>>>> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
->>>>>@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin
->>>>>*parent,
->>>>>struct dpll_pin *pin,
->>>>> 	unsigned long i, stop;
->>>>> 	int ret;
->>>>>
->>>>>-	if (WARN_ON(parent->prop->type != DPLL_PIN_TYPE_MUX))
->>>>>+	if (WARN_ON(parent->prop.type != DPLL_PIN_TYPE_MUX))
->>>>> 		return -EINVAL;
->>>>>
->>>>> 	if (WARN_ON(!ops) ||
->>>>>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
->>>>>index 5585873c5c1b..717f715015c7 100644
->>>>>--- a/drivers/dpll/dpll_core.h
->>>>>+++ b/drivers/dpll/dpll_core.h
->>>>>@@ -44,7 +44,7 @@ struct dpll_device {
->>>>>  * @module:		module of creator
->>>>>  * @dpll_refs:		hold referencees to dplls pin was registered
->>>>>with
->>>>>  * @parent_refs:	hold references to parent pins pin was registered
->>>>>with
->>>>>- * @prop:		pointer to pin properties given by registerer
->>>>>+ * @prop:		pin properties copied from the registerer
->>>>>  * @rclk_dev_name:	holds name of device when pin can recover clock
->>>>>from it
->>>>>  * @refcount:		refcount
->>>>>  **/
->>>>>@@ -55,7 +55,7 @@ struct dpll_pin {
->>>>> 	struct module *module;
->>>>> 	struct xarray dpll_refs;
->>>>> 	struct xarray parent_refs;
->>>>>-	const struct dpll_pin_properties *prop;
->>>>>+	struct dpll_pin_properties prop;
->>>>> 	refcount_t refcount;
->>>>> };
->>>>>
->>>>>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->>>>>index 93fc6c4b8a78..963bbbbe6660 100644
->>>>>--- a/drivers/dpll/dpll_netlink.c
->>>>>+++ b/drivers/dpll/dpll_netlink.c
->>>>>@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg, struct
->>>>>dpll_pin *pin,
->>>>> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq), &freq,
->>>>> 			  DPLL_A_PIN_PAD))
->>>>> 		return -EMSGSIZE;
->>>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++) {
->>>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++) {
->>>>> 		nest = nla_nest_start(msg, DPLL_A_PIN_FREQUENCY_SUPPORTED);
->>>>> 		if (!nest)
->>>>> 			return -EMSGSIZE;
->>>>>-		freq = pin->prop->freq_supported[fs].min;
->>>>>+		freq = pin->prop.freq_supported[fs].min;
->>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN, sizeof(freq),
->>>>> 				  &freq, DPLL_A_PIN_PAD)) {
->>>>> 			nla_nest_cancel(msg, nest);
->>>>> 			return -EMSGSIZE;
->>>>> 		}
->>>>>-		freq = pin->prop->freq_supported[fs].max;
->>>>>+		freq = pin->prop.freq_supported[fs].max;
->>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX, sizeof(freq),
->>>>> 				  &freq, DPLL_A_PIN_PAD)) {
->>>>> 			nla_nest_cancel(msg, nest);
->>>>>@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct
->>>>>dpll_pin
->>>>>*pin, u32 freq)
->>>>> {
->>>>> 	int fs;
->>>>>
->>>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++)
->>>>>-		if (freq >= pin->prop->freq_supported[fs].min &&
->>>>>-		    freq <= pin->prop->freq_supported[fs].max)
->>>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++)
->>>>>+		if (freq >= pin->prop.freq_supported[fs].min &&
->>>>>+		    freq <= pin->prop.freq_supported[fs].max)
->>>>> 			return true;
->>>>> 	return false;
->>>>> }
->>>>>@@ -403,7 +403,7 @@ static int
->>>>> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
->>>>> 		     struct netlink_ext_ack *extack)
->>>>> {
->>>>>-	const struct dpll_pin_properties *prop = pin->prop;
->>>>>+	const struct dpll_pin_properties *prop = &pin->prop;
->>>>> 	struct dpll_pin_ref *ref;
->>>>> 	int ret;
->>>>>
->>>>>@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32
->>>>>parent_idx,
->>>>> 	int ret;
->>>>>
->>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->>>>>-	      pin->prop->capabilities)) {
->>>>>+	      pin->prop.capabilities)) {
->>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
->>>>> 		return -EOPNOTSUPP;
->>>>> 	}
->>>>>@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll, struct
->>>>>dpll_pin *pin,
->>>>> 	int ret;
->>>>>
->>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->>>>>-	      pin->prop->capabilities)) {
->>>>>+	      pin->prop.capabilities)) {
->>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
->>>>> 		return -EOPNOTSUPP;
->>>>> 	}
->>>>>@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll, struct
->>>>>dpll_pin *pin,
->>>>> 	int ret;
->>>>>
->>>>> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
->>>>>-	      pin->prop->capabilities)) {
->>>>>+	      pin->prop.capabilities)) {
->>>>> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
->>>>> 		return -EOPNOTSUPP;
->>>>> 	}
->>>>>@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin, struct
->>>>>dpll_device *dpll,
->>>>> 	int ret;
->>>>>
->>>>> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
->>>>>-	      pin->prop->capabilities)) {
->>>>>+	      pin->prop.capabilities)) {
->>>>> 		NL_SET_ERR_MSG(extack, "direction changing is not allowed");
->>>>> 		return -EOPNOTSUPP;
->>>>> 	}
->>>>>@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct
->>>>>nlattr *phase_adj_attr,
->>>>> 	int ret;
->>>>>
->>>>> 	phase_adj = nla_get_s32(phase_adj_attr);
->>>>>-	if (phase_adj > pin->prop->phase_range.max ||
->>>>>-	    phase_adj < pin->prop->phase_range.min) {
->>>>>+	if (phase_adj > pin->prop.phase_range.max ||
->>>>>+	    phase_adj < pin->prop.phase_range.min) {
->>>>> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
->>>>> 				    "phase adjust value not supported");
->>>>> 		return -EINVAL;
->>>>>@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr
->>>>>*mod_name_attr,
->>>>> 	unsigned long i;
->>>>>
->>>>> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
->>>>>-		prop = pin->prop;
->>>>>+		prop = &pin->prop;
->>>>> 		cid_match = clock_id ? pin->clock_id == clock_id : true;
->>>>> 		mod_match = mod_name_attr && module_name(pin->module) ?
->>>>> 			!nla_strcmp(mod_name_attr,
->>>>>--
->>>>>2.38.1
->>>>>
->>>
 
