@@ -1,117 +1,256 @@
-Return-Path: <netdev+bounces-46776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1467E6586
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:44:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF9A7E658D
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F2111C208D2
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:44:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03508B20D24
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65AEAD297;
-	Thu,  9 Nov 2023 08:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39082D307;
+	Thu,  9 Nov 2023 08:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cKbo6XHb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vC5Z590Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B6A10782
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:44:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E151BDF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:44:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699519463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eTFEp4CMLoFdUcZdEGfmISXt6fDITsZHDJnL/kZD0Z4=;
-	b=cKbo6XHbnavfrKYxdPMwfU9izlpcdyoF8h7ZzedfYYH/SoodiUu/A3yjIKDib7TmpQWEzL
-	SWgw/d9doEpWjyUJmxMaozSFido0MJWl+14keAR+kkFJ43+lmlul/J/PwWw95jyCxOKqGY
-	vU+CMFFikuL6aNGAN9GmmPG6IDpBnrw=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-_DGU9PdoNsmrH7VSrQXhYQ-1; Thu, 09 Nov 2023 03:44:22 -0500
-X-MC-Unique: _DGU9PdoNsmrH7VSrQXhYQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9d358c03077so8396566b.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:44:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699519461; x=1700124261;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eTFEp4CMLoFdUcZdEGfmISXt6fDITsZHDJnL/kZD0Z4=;
-        b=uzHlSHO7It8AEqqrR8OENgAV+Eg6SXh/B78v/SFViUe4vb7nravGC5xZOZ2SzLI1M4
-         E8hQCsZ4eIy6DtmTz9uXIoVfAtdNQvjZ+CdneipAwSv9Gxsxar7Gqt5xJeodWWo4QvnQ
-         3X2JfxyKiF1ya8ZlwXbcT8E2LMXVcSYRZDfDH6fQDEsdrryFAusWV/1Pfl1x5wj9XVao
-         076dSI7/BMp0EFX4WrABsJNmeB3CnYVTxZpvoBEfdYbGZZMb3rRapYmwjO05wq+kMmOC
-         6oYP63viB9ZCAz9Kxt/2vZk/e11/NR4yuf4mWwL80OtDfk79s4ayDmAl4o7GTBNKi5dT
-         uyew==
-X-Gm-Message-State: AOJu0Yyj3vzawQcn6W5DtxrUYhdt5w0AyATkxXI9SGbfuheYTBbj+JmJ
-	SVfEzDEWU8+VUCHaLdqYp1vvkj8zbUHH+J5/fIWFvdGTiFp1Jy9Y2U72GY5EGzFvi0Hgln7Xy7C
-	iWofHVFe1fOPDsb54
-X-Received: by 2002:a17:906:6a0e:b0:9ae:50de:1aaf with SMTP id qw14-20020a1709066a0e00b009ae50de1aafmr3323725ejc.4.1699519461240;
-        Thu, 09 Nov 2023 00:44:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHpt6f4OXVKtH4i3m412g4H1Y1OUcpmAtKJLGhLybamCWeX8G1/7ze6DLbaN+L9dFmPNZ/PZg==
-X-Received: by 2002:a17:906:6a0e:b0:9ae:50de:1aaf with SMTP id qw14-20020a1709066a0e00b009ae50de1aafmr3323714ejc.4.1699519460914;
-        Thu, 09 Nov 2023 00:44:20 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id ha12-20020a170906a88c00b0099d804da2e9sm2235687ejb.225.2023.11.09.00.44.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 00:44:20 -0800 (PST)
-Message-ID: <21e4ef7d4a1b4ad298b0688f2b9ce8f5572e1e69.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
- <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Date: Thu, 09 Nov 2023 09:44:18 +0100
-In-Reply-To: <20231106024413.2801438-6-almasrymina@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
-	 <20231106024413.2801438-6-almasrymina@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B32910782;
+	Thu,  9 Nov 2023 08:48:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E6DAC433C7;
+	Thu,  9 Nov 2023 08:48:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699519685;
+	bh=RYAd4qXFWlCfiZBRCTuNCjZIwDzmv9k1JMTrqRiqfs0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vC5Z590ZM//lkVgtEYshPj8SctB7cjYwutMx6w3jb8mHCgGg58yHLCnxRu51+QWpu
+	 A0rVJvBldGDClD0wHrAzOnrdU5JOyycQlCopJHP81rLz8KRcJm+o5mTcCCmvFdr7y0
+	 ZQMss+ICIyxFPfEA2S2B41SFyJWTuDIlGmrAvl0wejbXCNK9sjwqP0Gct7u9sV9VG0
+	 sAfEH4PqRab0cP4WPN6GttCs+CyRQfmPD1mGUJD+n7qxW6foDGjgoVveq4w/NcA67j
+	 6bfYsksR7R7xN+pyiDWjzmayz6Yt+ZajTs6KVosR9bfdf+kRJFIKdNfG0cqeAnDNUZ
+	 uFlwOy6rCx5Pg==
+Date: Thu, 9 Nov 2023 09:47:59 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, paul@paul-moore.com,
+	linux-fsdevel@vger.kernel.org,
+	linux-security-module@vger.kernel.org, keescook@chromium.org,
+	kernel-team@meta.com, sargun@sargun.me
+Subject: Re: [PATCH v9 bpf-next 02/17] bpf: add BPF token delegation mount
+ options to BPF FS
+Message-ID: <20231109-linden-kursprogramm-15c2cbd860b3@brauner>
+References: <20231103190523.6353-1-andrii@kernel.org>
+ <20231103190523.6353-3-andrii@kernel.org>
+ <20231108-ungeeignet-uhren-698f16b4b36b@brauner>
+ <CAEf4BzbanZO_QPhzyFgBEuB0i+uZZO4rZn7mO1qNp3aoPx+32g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzbanZO_QPhzyFgBEuB0i+uZZO4rZn7mO1qNp3aoPx+32g@mail.gmail.com>
 
-On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
-[...]
-> +void netdev_free_devmem(struct page_pool_iov *ppiov)
-> +{
-> +	struct netdev_dmabuf_binding *binding =3D page_pool_iov_binding(ppiov);
-> +
-> +	refcount_set(&ppiov->refcount, 1);
-> +
-> +	if (gen_pool_has_addr(binding->chunk_pool,
-> +			      page_pool_iov_dma_addr(ppiov), PAGE_SIZE))
-> +		gen_pool_free(binding->chunk_pool,
-> +			      page_pool_iov_dma_addr(ppiov), PAGE_SIZE);
+On Wed, Nov 08, 2023 at 01:09:27PM -0800, Andrii Nakryiko wrote:
+> On Wed, Nov 8, 2023 at 5:51 AM Christian Brauner <brauner@kernel.org> wrote:
+> >
+> > On Fri, Nov 03, 2023 at 12:05:08PM -0700, Andrii Nakryiko wrote:
+> > > Add few new mount options to BPF FS that allow to specify that a given
+> > > BPF FS instance allows creation of BPF token (added in the next patch),
+> > > and what sort of operations are allowed under BPF token. As such, we get
+> > > 4 new mount options, each is a bit mask
+> > >   - `delegate_cmds` allow to specify which bpf() syscall commands are
+> > >     allowed with BPF token derived from this BPF FS instance;
+> > >   - if BPF_MAP_CREATE command is allowed, `delegate_maps` specifies
+> > >     a set of allowable BPF map types that could be created with BPF token;
+> > >   - if BPF_PROG_LOAD command is allowed, `delegate_progs` specifies
+> > >     a set of allowable BPF program types that could be loaded with BPF token;
+> > >   - if BPF_PROG_LOAD command is allowed, `delegate_attachs` specifies
+> > >     a set of allowable BPF program attach types that could be loaded with
+> > >     BPF token; delegate_progs and delegate_attachs are meant to be used
+> > >     together, as full BPF program type is, in general, determined
+> > >     through both program type and program attach type.
+> > >
+> > > Currently, these mount options accept the following forms of values:
+> > >   - a special value "any", that enables all possible values of a given
+> > >   bit set;
+> > >   - numeric value (decimal or hexadecimal, determined by kernel
+> > >   automatically) that specifies a bit mask value directly;
+> > >   - all the values for a given mount option are combined, if specified
+> > >   multiple times. E.g., `mount -t bpf nodev /path/to/mount -o
+> > >   delegate_maps=0x1 -o delegate_maps=0x2` will result in a combined 0x3
+> > >   mask.
+> > >
+> > > Ideally, more convenient (for humans) symbolic form derived from
+> > > corresponding UAPI enums would be accepted (e.g., `-o
+> > > delegate_progs=kprobe|tracepoint`) and I intend to implement this, but
+> > > it requires a bunch of UAPI header churn, so I postponed it until this
+> > > feature lands upstream or at least there is a definite consensus that
+> > > this feature is acceptable and is going to make it, just to minimize
+> > > amount of wasted effort and not increase amount of non-essential code to
+> > > be reviewed.
+> > >
+> > > Attentive reader will notice that BPF FS is now marked as
+> > > FS_USERNS_MOUNT, which theoretically makes it mountable inside non-init
+> > > user namespace as long as the process has sufficient *namespaced*
+> > > capabilities within that user namespace. But in reality we still
+> > > restrict BPF FS to be mountable only by processes with CAP_SYS_ADMIN *in
+> > > init userns* (extra check in bpf_fill_super()). FS_USERNS_MOUNT is added
+> > > to allow creating BPF FS context object (i.e., fsopen("bpf")) from
+> > > inside unprivileged process inside non-init userns, to capture that
+> > > userns as the owning userns. It will still be required to pass this
+> > > context object back to privileged process to instantiate and mount it.
+> > >
+> > > This manipulation is important, because capturing non-init userns as the
+> > > owning userns of BPF FS instance (super block) allows to use that userns
+> > > to constraint BPF token to that userns later on (see next patch). So
+> > > creating BPF FS with delegation inside unprivileged userns will restrict
+> > > derived BPF token objects to only "work" inside that intended userns,
+> > > making it scoped to a intended "container".
+> > >
+> > > There is a set of selftests at the end of the patch set that simulates
+> > > this sequence of steps and validates that everything works as intended.
+> > > But careful review is requested to make sure there are no missed gaps in
+> > > the implementation and testing.
+> > >
+> > > All this is based on suggestions and discussions with Christian Brauner
+> > > ([0]), to the best of my ability to follow all the implications.
+> >
+> > "who will not be held responsible for any CVE future or present as he's
+> >  not sure whether bpf token is a good idea in general"
+> >
+> > I'm not opposing it because it's really not my subsystem. But it'd be
+> > nice if you also added a disclaimer that I'm not endorsing this. :)
+> >
+> 
+> Sure, I'll clarify. I still appreciate your reviewing everything and
+> pointing out all the gotchas (like the reconfiguration and other
+> stuff), thanks!
+> 
+> > A comment below.
+> >
+> > >
+> > >   [0] https://lore.kernel.org/bpf/20230704-hochverdient-lehne-eeb9eeef785e@brauner/
+> > >
+> > > Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > ---
+> > >  include/linux/bpf.h | 10 ++++++
+> > >  kernel/bpf/inode.c  | 88 +++++++++++++++++++++++++++++++++++++++------
+> > >  2 files changed, 88 insertions(+), 10 deletions(-)
+> > >
+> 
+> [...]
+> 
+> > >       opt = fs_parse(fc, bpf_fs_parameters, param, &result);
+> > >       if (opt < 0) {
+> > > @@ -665,6 +692,25 @@ static int bpf_parse_param(struct fs_context *fc, struct fs_parameter *param)
+> > >       case OPT_MODE:
+> > >               opts->mode = result.uint_32 & S_IALLUGO;
+> > >               break;
+> > > +     case OPT_DELEGATE_CMDS:
+> > > +     case OPT_DELEGATE_MAPS:
+> > > +     case OPT_DELEGATE_PROGS:
+> > > +     case OPT_DELEGATE_ATTACHS:
+> > > +             if (strcmp(param->string, "any") == 0) {
+> > > +                     msk = ~0ULL;
+> > > +             } else {
+> > > +                     err = kstrtou64(param->string, 0, &msk);
+> > > +                     if (err)
+> > > +                             return err;
+> > > +             }
+> > > +             switch (opt) {
+> > > +             case OPT_DELEGATE_CMDS: opts->delegate_cmds |= msk; break;
+> > > +             case OPT_DELEGATE_MAPS: opts->delegate_maps |= msk; break;
+> > > +             case OPT_DELEGATE_PROGS: opts->delegate_progs |= msk; break;
+> > > +             case OPT_DELEGATE_ATTACHS: opts->delegate_attachs |= msk; break;
+> > > +             default: return -EINVAL;
+> > > +             }
+> > > +             break;
+> > >       }
+> >
+> > So just to repeat that this will allow a container to set it's own
+> > delegation options:
+> >
+> >         # unprivileged container
+> >
+> >         fd_fs = fsopen();
+> >         fsconfig(fd_fs, FSCONFIG_BLA_BLA, "give-me-all-the-delegation");
+> >
+> >         # Now hand of that fd_fs to a privileged process
+> >
+> >         fsconfig(fd_fs, FSCONFIG_CREATE_CMD, ...)
+> >
+> > This means the container manager can't be part of your threat model
+> > because you need to trust it to set delegation options.
+> >
+> > But if the container manager is part of your threat model then you can
+> > never trust an fd_fs handed to you because the container manager might
+> > have enabled arbitrary delegation privileges.
+> >
+> > There's ways around this:
+> >
+> > (1) kernel: Account for this in the kernel and require privileges when
+> >     setting delegation options.
+> 
+> What sort of privilege would that be? We are in an unprivileged user
+> namespace, so that would have to be some ns_capable() checks or
+> something? I can add ns_capable(CAP_BPF), but what else did you have
+> in mind?
 
-Minor nit: what about caching the dma_addr value to make the above more
-readable?
+You would require privileges in the initial namespace aka capable()
+checks similar to what you require for superblock creation.
 
-Cheers,
+> 
+> I think even if we say that privileged parent does FSCONFIG_SET_STRING
+> and unprivileged child just does sys_fsopen("bpf", 0) and nothing
+> more, we still can't be sure that child won't race with parent and set
+> FSCONFIG_SET_STRING at the same time. Because they both have access to
+> the same fs_fd.
 
-Paolo
+Unless you require privileges as outlined above to set delegation
+options in which case an unprivileged container cannot change delegation
+options at all.
 
+> 
+> > (2) userspace: A trusted helper that allocates an fs_context fd in
+> >     the target user namespace, then sets delegation options and creates
+> >     superblock.
+> >
+> > (1) Is more restrictive but also more secure. (2) is less restrictive
+> > but requires more care from userspace.
+> >
+> > Either way I would probably consider writing a document detailing
+> > various delegation scenarios and possible pitfalls and implications
+> > before advertising it.
+> >
+> > If you choose (2) then you also need to be aware that the security of
+> > this also hinges on bpffs not allowing to reconfigure parameters once it
+> > has been mounted. Otherwise an unprivileged container can change
+> > delegation options.
+> >
+> > I would recommend that you either add a dummy bpf_reconfigure() method
+> > with a comment in it or you add a comment on top of bpf_context_ops.
+> > Something like:
+> >
+> > /*
+> >  * Unprivileged mounts of bpffs are owned by the user namespace they are
+> >  * mounted in. That means unprivileged users can change vfs mount
+> >  * options (ro<->rw, nosuid, etc.).
+> >  *
+> >  * They currently cannot change bpffs specific mount options such as
+> >  * delegation settings. If that is ever implemented it is necessary to
+> >  * require rivileges in the initial namespace. Otherwise unprivileged
+> >  * users can change delegation options to whatever they want.
+> >  */
+> 
+> Yep, I will add a custom callback. I think we can allow reconfiguring
+> towards less permissive delegation subset, but I'll need to look at
+> the specifics to see if we can support that easily.
 
