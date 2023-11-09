@@ -1,71 +1,80 @@
-Return-Path: <netdev+bounces-46823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69AD37E692A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:07:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 747517E692D
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E637F280FE6
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:07:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C75528101B
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF0E19456;
-	Thu,  9 Nov 2023 11:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03FA619473;
+	Thu,  9 Nov 2023 11:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="Pi8dpa1u"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="fpK1kmIK"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F220F19445
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:07:01 +0000 (UTC)
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2131.outbound.protection.outlook.com [40.107.249.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EBCC271F
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:07:01 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF141944C
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:08:26 +0000 (UTC)
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2041.outbound.protection.outlook.com [40.107.8.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F87273F;
+	Thu,  9 Nov 2023 03:08:26 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Itt7fYhqOuyghwUb1SETy4yyDUdjeOn3kM3LL9Idi2l/vCN5rKK5LNt8fcnA9vfWCt859+my6WtaU3cb7nhLIKyn57wwcbSNxjoI+bJDEmgmwd3ItOWI3aFWTFYOHWGcEnOD49lDieeMv9tAfoNvT8wHhGq/OCF6LMCzDq/6Agv54n5MQeye22CVnmtTkQsWinssyOzdpZ4odj1ZyChuN3seah3Y3nWnx5VUQ6AY/PDQiFO3zAnWNnpfzC5qLQrC7X9inZRilcfaVxwN0jaI44No5s1aWyw3lqML9HmucP4nZIIrwrWSfsM6ieZ2RrnxgKsm9qIpPsB0tJZjQSOLPQ==
+ b=MNS1XpxwE4pLFI46Dj88xySfVYl7gt2z74j9XbWJ0LMxCTG9QSXRRHiXI6bVuiYrGO9imhd8wJ9s1kQBMPpBGLWGBeo1tm8m7az3lYQVOXiT+tam6ASl2O4tat9OWFMHdbKvVkPmTNIDC45nS3lSoORY424tbWaGEMXJXa+iHQbrqB19cVYLa0ovrZcOiZCRu2X6sGlFnTtSAtCuqMzb39YjcGm1lsz5mWASzv2zjp09SAyzF7wx7EGW7IWVz97DF0fQJi64rca0Q8zqh7K0zXF6OLNLF0AZQd7yXkcEI0Vdetgy6C2HF1aIQOnUPedvkW8oZ7suzKxPSaJxBk7bOA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JaoJN6gZBBwTGjILENQ26ngGRIiznMdMj7xvskTuD2g=;
- b=oPi1GowhIJkad0ZntCcvdO0DSZmquR2FLN0Fz21h2u7CFSKoUDGMI3rI5HWgXkhAqX04rKqCvFJkexiLolB7Dcnz1xh0yLx0teTXqRddzq2xmzIYB3/zQcQMUUiNBSHegVTDTDuVaQ2Q/eVVLf7P34JlzVMt5AO1nNDlKb5MGPbnA9IkRdigN1TzC5Htx3pVfqXonHUsiCseSErQmXud6jtrBE+ln6H07UwWWcnqLQ4KU5DZpNBQolGPeC2HnvgA9YJO777hwq++0qcaDyi5LT5l8nuk6TFCpSMXW0vinpyE2XgstFmFVZX6PzCzbjYjAnYjTVYAK/8P7++hAkeYbg==
+ bh=S22PyeNf5ZQzC7NT8yLbH+T50xlzuLZbHRpbC0e0VC0=;
+ b=a/Q17dVnlkupnMinYdU8hzfjphj9iSLRDloU8SnuDlclDlloIVLeCE87TUmPuQc7IcrnaLOhpgMHQdfQCUTmZw5oov7eGm6nGYIJ7HUB1SnZ0oTT/zHAaf76blrQeFXU6QXI7Yl6kzDu/33o7pG64NmlZlWHJ3QJvtVVwB1GDlC4mfmOINBGPIaFOxD6nC0P4BCSpFXjHEfWzc2M+rLD8X5WGODiRFt2hg8MTOkzhW3U4vsNjHKGasUfsxv5zHeHcD6t3Bz7pHKyFGXftYduzSN8OueKw5+EM9kPqIDc37S2CF6R+147sZh+pUHbo98pPHG/CrBIDr1otCFq7TFrNw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
- dkim=pass header.d=voleatech.de; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JaoJN6gZBBwTGjILENQ26ngGRIiznMdMj7xvskTuD2g=;
- b=Pi8dpa1ueqzfTg0Nwfx7wKEDmvAQyv/gVjSJxzierGIOw6ytbkB7i89yd5qywNE/TLT3RuXVDy0PdnMGpLgagP4Pwh18cWG02qwueFTToD/6lWkERckzSNyQfgZ+UNUDFQ9BTss3WaJZsn2pFGHJH62Y11rBFqR+fVhaiVAqRi8=
+ bh=S22PyeNf5ZQzC7NT8yLbH+T50xlzuLZbHRpbC0e0VC0=;
+ b=fpK1kmIK96Xr6daGsMny/mp2ZWvACT0uRtoIw01fxgazHC3hxbGRiF6LdmsSx+bgaN5S4mqRdAQ9gBSu66Le4kdLSBSxSkVVlr37evpn+yl2hERcCYLVAKpmP4U2yNo9h+0aDse7He4dArv1grqAaF/umYKr5X1AXdW/RVuDMgyKScyemyberd+dc7iNnl5ltLt4c+L+NkxXXbpLItJVJDqqbcq+2PAzbW/xHlDutowtxTEUnf+P7jlw+pQF5hdx43jy8clzYonBgCOf4EECN2gVU1LlHWY4TERv6iAc65NU8HgR9ZB8xgNpOAPvi8WqqjGe4Dtg0OwJ7/ZHD4AlOQ==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=voleatech.de;
-Received: from AS8PR05MB10778.eurprd05.prod.outlook.com
- (2603:10a6:20b:632::13) by PA6PR05MB11145.eurprd05.prod.outlook.com
- (2603:10a6:102:3c9::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Thu, 9 Nov
- 2023 11:06:58 +0000
-Received: from AS8PR05MB10778.eurprd05.prod.outlook.com
- ([fe80::c38e:cf18:a498:7925]) by AS8PR05MB10778.eurprd05.prod.outlook.com
- ([fe80::c38e:cf18:a498:7925%6]) with mapi id 15.20.6954.028; Thu, 9 Nov 2023
- 11:06:58 +0000
-Date: Thu, 9 Nov 2023 12:06:51 +0100
-From: Sven Auhagen <sven.auhagen@voleatech.de>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>, "brouer@redhat.com" <brouer@redhat.com>, 
-	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>, "mcroce@microsoft.com" <mcroce@microsoft.com>, 
-	"leon@kernel.org" <leon@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH v4] net: mvneta: fix calls to page_pool_get_stats
-Message-ID: <4fxnidhi7gfpzmeels363loksphtifgsan6w64n5y7dxzi7dyx@jwbe4gp37mwy>
-References: <4wba22pa6sxknqfxve42xevswz4wfu637p5gyyeq546tmzudzu@4z3kphfrpm64>
- <ZUyOsB7p6j21e42c@lore-desk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZUyOsB7p6j21e42c@lore-desk>
-X-ClientProxiedBy: FR3P281CA0100.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a1::18) To AS8PR05MB10778.eurprd05.prod.outlook.com
- (2603:10a6:20b:632::13)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:588::19)
+ by DB4PR10MB6287.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:381::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19; Thu, 9 Nov
+ 2023 11:08:23 +0000
+Received: from AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::96c7:d239:1723:8761]) by AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::96c7:d239:1723:8761%4]) with mapi id 15.20.6977.018; Thu, 9 Nov 2023
+ 11:08:23 +0000
+Message-ID: <502a27b6-e555-42d2-bb0f-964a58f81dbe@siemens.com>
+Date: Thu, 9 Nov 2023 12:08:21 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Add missing icss_iep_put to
+ error path
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ MD Danish Anwar <danishanwar@ti.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ "Lopes Ivo, Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>,
+ Nishanth Menon <nm@ti.com>,
+ "Su, Bao Cheng (RC-CN DF FA R&D)" <baocheng.su@siemens.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>,
+ Roger Quadros <rogerq@kernel.org>,
+ Grygorii Strashko <grygorii.strashko@ti.com>
+References: <b2857e2c-cacf-4077-8e15-308dce8ccb0b@siemens.com>
+ <20231107183256.2d19981b@kernel.org>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+In-Reply-To: <20231107183256.2d19981b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0095.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::17) To AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:588::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,245 +82,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR05MB10778:EE_|PA6PR05MB11145:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5255489a-53ce-4816-4311-08dbe113fda1
-X-MS-Exchange-AtpMessageProperties: SA
+X-MS-TrafficTypeDiagnostic: AS4PR10MB6181:EE_|DB4PR10MB6287:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3e0b9d16-9806-43d0-e932-08dbe1143079
+X-LD-Processed: 38ae3bcd-9579-4fd4-adda-b42e1495d55a,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	OY9z5bX3PfGmmdmHphJpOSVXN7YMEetTan5JujGK06PTJ4PtFoCf1imZzdrE0eqJSRTn2EuQ5JhteXGrJngeMpO50cSYivIBksMy5xHhUT4YFxx2Y/XAoWMjDm7P2xJlix+eAEt9Ie8DgkeNkJlEc2b+qKfMVHsTw3DzNbd0Wy4lzBt6ua65vPymESrT8A4MpK6WuqFMgU05a3f03U2GmruFz55GS7d4yUGO2yyqff2/Hr1uC4yDFpNzgHTAGlUkilm1LYR1YBdSCKY/eIcGMCHiqw7Rm1W4eWz5HO+0jANFwjUeP0dUeRNPBZ+zz6M3TiXTjTRw0Qr7kxLtly+7EsZNYSvthiyk/hCxkee8I57LXsBkVHAGxat+Re1bh6pdK3FRdaKqkUfuM0b3xuhgF28RdggzvdVi//N55kzDzsYzU424W7EKwde4Fg33AukG62hrDP3uYv8ofMEO7ztTJwNhXU8nb8Uor2NsODKGeyoCjMUwaD6ePjLqkAxaWhTQFs02uDugUMnGJCgkTxwVJwLWtwkugdM7mbH2I7i1n1HT/lAhO00OtHKUMNgfRSzO
+	Is1G3R2+v7c2Og7UOc3oRxyM6U+hQwHLPgBHPw9Reabuha5CTeS4hwLj4Jj+0ea5W9Q4luJq6Dl+ZuTGJZfMLc3QTGTIde+IASfFyPgjc+jBcSxM6Aqi7w1e2mtqYnl3iJwF1lV64Bd+/ipJDihW4cWXoas+GaBqSlOfTWA8zJtJVuf7HH82LKjprO6pQCq+H0MUgcgZJCboNIij/pwRbBtGWp6cJdY3HwXevXHCiY1/6McRc0dU75xNrQJooNePe6AxdZBkr64eS2NZkODSodtciBc2pKT+LqADG6qS1bIfAN+h6EncTRng2lYduGu1zEOQ1m9n03NwEbnQX1DcvP4vpTV1q5qYkY+H0aSHQiC46e3lhzV/p58uRQMlxMDNQ75iR7onWorV8S2v0L0JO2DLA3h42qPK5dkZfO0zcA2IxDYc2dh2Zor4Q/yxSBJDXyNVli5wmSdvgs+ssbbMPr70Ocd+g31cSu+NC7pmrJicd7HetFkEfX/uidpYW2f1+qugyGPLCHCoVnidGpjptY9Ggs8WtqfPWWJcjCaf8pJ1DdHIJOP0F8pcb4FrNNi0CQEhFeNnzCpx+ei42i9BVoEqpJrixarYG3gqNvGRsj6QfVwUvvBM2hOPWPPZ/46oVtDncjvLJmIBB8o1tekpKw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR05MB10778.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(396003)(376002)(136003)(39830400003)(346002)(64100799003)(451199024)(186009)(1800799009)(2906002)(38100700002)(4326008)(8676002)(41300700001)(83380400001)(86362001)(316002)(44832011)(6512007)(9686003)(8936002)(5660300002)(66899024)(66946007)(66556008)(66476007)(6916009)(6506007)(54906003)(33716001)(6666004)(478600001)(6486002);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(376002)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(26005)(53546011)(6506007)(2616005)(6512007)(83380400001)(7416002)(44832011)(41300700001)(8676002)(5660300002)(4326008)(8936002)(2906002)(4744005)(6486002)(478600001)(316002)(66946007)(66556008)(66476007)(54906003)(82960400001)(36756003)(86362001)(31696002)(38100700002)(6916009)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?OgLBB8MnVCcUuIzmQwC+d/B8MhG/44JYvtqvf+Kt5CuuUc7+cDqMR5nO14s6?=
- =?us-ascii?Q?KQX0xNKEyqG1C2LZgBaRJ5CreQfD7giOCLXkez7nd7+KIPDo5sY1EgDN3S2k?=
- =?us-ascii?Q?i2ljpk3GBPkz6j7TJt0PRH2kQ3H1koqEhCQ1UzV8KKs0WammRzooXEhZAl+D?=
- =?us-ascii?Q?CoNM+cecFO3bXS0kwkd2p4Ycl5KNDrBjJcAZ08RNpjbhdf6yFtF7UrQjBvup?=
- =?us-ascii?Q?hzNOPz4au4FH4LnHaGmW7oTBNPrp+O8ssnR0Kj94SdkolT2gVKaYdtKxckI5?=
- =?us-ascii?Q?o9YqwUER4O14++NO+eukzp00uByNHEiUUw6+GcGxiVQ1dkEuHrCV6T0owa3z?=
- =?us-ascii?Q?aCvdIZPA+KyD0LnefOpJkxUHmuCif+ZC9MwG9QTvpdDAKKvfcLjVkOEHnDwd?=
- =?us-ascii?Q?kpJF7N8DjjJ6Or6cqYW5PccYOah7yBJwaf5azDH+wl4BYpi/ffIzbXqA+0pZ?=
- =?us-ascii?Q?0TJXme6gIQ6PSca3e9kT/84x6GosBVyGLuZoBJzAlXEPcoMkm9PDw4fyVVYW?=
- =?us-ascii?Q?52y6Y+PayXrhtKv9lgxFpV5brjo/qBuhCMCP5iVJhqK4jKInzFKScpd82UdC?=
- =?us-ascii?Q?+WDgLg3aB2OJaHOMYBQNZwCNLySUPOoAMgeqP+Vl9gYaE60o+7LSts0NpH0c?=
- =?us-ascii?Q?qodYi4x+bZsm//Tb/bHEheTMlOdk8KQZY/eynQYu/vN/z5k79uPUBOYWR9hn?=
- =?us-ascii?Q?WmnetKj1focbf2Kg9qpDVObJ7037tqgy1RzNbAX7VKLogoMKg7RxujlZ6Pes?=
- =?us-ascii?Q?qnLAhY1akeqjDGZs1IeM48LxKZdnYeyudEreqpRYgWQBPP699fWnU/6z21VO?=
- =?us-ascii?Q?oCCfpJohYICXGl4jKIED2bXpgGInugOkXvhBzWxg76AesKuaIqQzdZAj1hnY?=
- =?us-ascii?Q?aFtz6vhsu4Ee2sax+0eRLoikIQ8zk+MDj3bGA2fb2jcrjQsFWwiWM+RHMdiR?=
- =?us-ascii?Q?osf3oG+18enLiRCNJwPvxUJdn7EJQ/5utp6Y75NDa7iLNhjeZPmyBa9lFscG?=
- =?us-ascii?Q?6P742XvCGy4ET9cg8v3DLLl7dNrLF90SRhAkARU7d7d8TV1RTqm19dHIlknA?=
- =?us-ascii?Q?VvUdvI/w3XQKd7NfufgkMXEuT8J5NI6Zyn3gOzVsjz0wexNgH/l5tSRdSUgJ?=
- =?us-ascii?Q?R/34Z9QdyTDOjrflpsqxj8Qo+y794o5ml0CNYuScaKpeOOLH4W44pS3YXw0u?=
- =?us-ascii?Q?aAOzXyF/I84zQW6JEaL3sNS2ypOc1PJo/MIPKe0FJ9skL+cQbdee4/j58LNr?=
- =?us-ascii?Q?rGJCfc4/QdHC+5he7/cQFU//76mXyFSdXS6mSOxnFYgVvsJQu/IDSdOhjfVt?=
- =?us-ascii?Q?F9dsiL7nnDH1K1YMFK+axCPWJrTKNrjpjhrXH99mMkz2ALBsOLzHoYXhCAE8?=
- =?us-ascii?Q?bYG51dhWY8Qb7t5ZMSCxPX9mE8gEXEJYQLsNy8ui1jiRa3wLLvLOtKI0uIcF?=
- =?us-ascii?Q?PQJ/XUTDL5m2O/13T5xEhFykKA82Su8UtcbM8tndF+HQXq1PMHWwVJZtgdQe?=
- =?us-ascii?Q?fmK5Iix7WDOQ7Toz/g4utOeKSrjSYG02BO8g6pYHi2CCrdEO7ietuWxJ6gvH?=
- =?us-ascii?Q?EedTJOSchRH629zvq8MbQK0wbcLYKD9SadfhdkhL/jrFE1H0IlBCP/f4/Gz0?=
- =?us-ascii?Q?LyHsQ8tMr6rrShf//hi4T4ENCSXUH+fFCkW0+LxckD4ovjXln+LKJ+YfTQyH?=
- =?us-ascii?Q?/iZhNg=3D=3D?=
-X-OriginatorOrg: voleatech.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5255489a-53ce-4816-4311-08dbe113fda1
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR05MB10778.eurprd05.prod.outlook.com
+	=?utf-8?B?WWJ4Y2dPOUhwYm81TTRwZGd1cGc0dXV3SEhzQ3FUSGhIYk01enFQVmxTYmZF?=
+ =?utf-8?B?SlVJKzdYbGhnSzVrWlBTWFUwNU5KUXZPYmoxVnIyT0VzUHdVWkZKL2E5d2tC?=
+ =?utf-8?B?eWxjUGgrcTdUTzBVY0JhemMvaVBTZWtJSGpoSzJMQ2JVdG9veUxlVDRxUkdQ?=
+ =?utf-8?B?c0FJQ0dOOE9mbGlNbkdacEQ2VWp2TjlCMVBkZVNPSi9GZm5zdEowM0JIbHZM?=
+ =?utf-8?B?R205NXdpbzRHOGc5YTR0bGI5MWVhNUgyVW56OGhqZ3RDdGFnc2ZydTBhOWEv?=
+ =?utf-8?B?ek1UMHpzQnlDSE4xcVhYOG5kNmtPQ3dVSGVYLyt3cDg5TUsrTlVyellLcDFK?=
+ =?utf-8?B?djdJU20wZFk0Qk1pVWpNUHZoU2prdFRPbStrZDIrRHMyNllRREhPNUlnam9T?=
+ =?utf-8?B?MlBtaForMU1IVGNwZGhURnJkQ2VyVDlTNllGbmxYSk9KNlFiNHdVQmVuWVh2?=
+ =?utf-8?B?WG1nRFpkcjdKTUxkOGxNYmZDYVdOUGRpQzFkM0ZYYnBGSmRMQmVXMktnOHNX?=
+ =?utf-8?B?ejQyV2c5anQ3d25qcGI2T3ZTdE9DUS85V0VxT0FKU0dDcmorN3FNa0lmVW9z?=
+ =?utf-8?B?UU5yRVRNWldOR2E3RWdMOGNuQ05VanE3dDJJY3YrSEZZaUtkUmNBUGtWMVkw?=
+ =?utf-8?B?b2VZM0pKUW8yTFNTOE0yclZSWkdZM2IvL2xTdjg1RHBDRTZKREo5cUtqanhk?=
+ =?utf-8?B?eHBWdnFUZ2NSODBBRHpYRER1VWpmYWVpVE9FWXkzS1lzSDROWGdRSktPZkJ4?=
+ =?utf-8?B?OGt0akZiRHFGT0ZaMDdFY1padmgwUzhwOC8rTURwaUFTM2dlSG96cFM0VHU0?=
+ =?utf-8?B?K2VXenFueGl4M3VHVEdkSEROdTZFQTVkL1VCNzJEdlgvTVJyNlZVekQ1NlZM?=
+ =?utf-8?B?RVp4cnNzTHhNNEhSdnY0ckFUbVJpRDJta3gySlJ2Q1RaSC9TUlVCM01BU3VU?=
+ =?utf-8?B?OFRteWlGOG0wVFBGR3haa08wZVo4ZytKT000K3pTN3hLYytUL3RPbE1USnhZ?=
+ =?utf-8?B?TFEwOTJ3d2FWQ2Y2WGp0ak02MWFBa3RvNm5YQ085VURVWlJIK3pzZ2phNXZi?=
+ =?utf-8?B?WFYzdWk4SVdNZjYxcjNxWXU5a1MvWDl3YU1MM01oTDF3K1ZtY0NvUEN6aU5r?=
+ =?utf-8?B?dGJjaDYxVDk4SVRSdFJhTnp5cDRaZ1V6a1g4SHVLYk54NnZUd0dldUtzRmRZ?=
+ =?utf-8?B?VGh4SzZhZ3M0WC8zL2xBZUVSd0I5cjZOUzkwNXFIYVE3Rmg1aUVneVBMUU1k?=
+ =?utf-8?B?aVUzQlM0aTJhdzVsR2ZXQklPOEZQVlJMc0Zpdjdaa3lZWG1mekVHYU1NK1N3?=
+ =?utf-8?B?aVFNWUVnelNWWEFNT01lTUJBSjl1UWZYbzI2RjE5SVR2V3lSNCtvSVNxOEht?=
+ =?utf-8?B?cEQvMUFUOGRJb05QTmlOaEE0TmpVYVpJemNuY1hDUzM5OEtYb1ZEQlpWM0Qw?=
+ =?utf-8?B?ZFFVL2pxdFh6NkxlbGxvbklmMUo2c3NsTktUNFlNNHB2UC9aU05CRTc5dkti?=
+ =?utf-8?B?QVVQMG1pSXRUMkMweHZDMk42Wk1Ya29GVkJnWFo5UWZmZUNnaEl6ek9aSUNF?=
+ =?utf-8?B?OVZ6NHBLdHMzUm53UkRVdTVTa2NqdStBeUw3bXFTQnhpUGdPRU1ja3hnVWhQ?=
+ =?utf-8?B?QU8zd1I5WUlOOUNkZzRONHNaMjZrMU1tRHg0Z3lLN3JZYUM4aFZ4U0FZTXFw?=
+ =?utf-8?B?S1ZibC8rdzBlL3Q5MkpOdEt3cVIzQVZDaXkxZ2NhUkpaRXd1VDNMekMrbDc1?=
+ =?utf-8?B?bENRdkhDWkxWRktDemJnQjNLanRSNzNIcmliTlovSjcwTWRSek1zaEoyNTNm?=
+ =?utf-8?B?ZTM1SVhhbnZRdU00SDFHMkJlUTlYSTY3VjhxQVRubEdKOHdVeGhZenExRExX?=
+ =?utf-8?B?ZGVaNm5HTUs0eE0wWnpBYTlIeWd0ZGQwbUc2RWorLzMrL0pGMzllUFlIWEg3?=
+ =?utf-8?B?VTFPMjZVbUtBdkZRc0pGeEEwciswdjJ4N1FacUNMMHkxUC9TUUlhYXN4bnZJ?=
+ =?utf-8?B?WExNSjJwTitnZ3dVQUs1djl1WlZ3Z0l5UTlhNjdhMnJDVm9RUCtFT2t0M0wy?=
+ =?utf-8?B?TERhUGF4NUxsQ0JsTkR5US96a3g3UW4zT2MvREZPWFlyQnNLdzFpdzlGTnZt?=
+ =?utf-8?Q?WAwLWk0Rk8i0VBN3mHtkSzea9?=
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e0b9d16-9806-43d0-e932-08dbe1143079
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB6181.EURPRD10.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 11:06:58.1411
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 11:08:23.3019
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-Id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qjxcJtb3tXCESd18sTcvUuoJLAwIPuJuKiGd1eJdbZjq4C53l4fOvZO5MVF54aDeBm6sDjnAv59HXBqz+k7OOGArsBIwSeYlN3Q0m9pOcvo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA6PR05MB11145
+X-MS-Exchange-CrossTenant-UserPrincipalName: fDwCw+kZb4DDtKV5500gX+j7QV4WlIgEQMW5WqXuCk5Gd8I51QpMH+cE2XntOmibyarhfEy2xlpD8WIR+81/Fg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR10MB6287
 
-On Thu, Nov 09, 2023 at 08:48:00AM +0100, Lorenzo Bianconi wrote:
-> > Calling page_pool_get_stats in the mvneta driver without checks
-> > leads to kernel crashes.
-> > First the page pool is only available if the bm is not used.
-> > The page pool is also not allocated when the port is stopped.
-> > It can also be not allocated in case of errors.
-> > 
-> > The current implementation leads to the following crash calling
-> > ethstats on a port that is down or when calling it at the wrong moment:
-> > 
-> > ble to handle kernel NULL pointer dereference at virtual address 00000070
-> > [00000070] *pgd=00000000
-> > Internal error: Oops: 5 [#1] SMP ARM
-> > Hardware name: Marvell Armada 380/385 (Device Tree)
-> > PC is at page_pool_get_stats+0x18/0x1cc
-> > LR is at mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
-> > pc : [<c0b413cc>]    lr : [<bf0a98d8>]    psr: a0000013
-> > sp : f1439d48  ip : f1439dc0  fp : 0000001d
-> > r10: 00000100  r9 : c4816b80  r8 : f0d75150
-> > r7 : bf0b400c  r6 : c238f000  r5 : 00000000  r4 : f1439d68
-> > r3 : c2091040  r2 : ffffffd8  r1 : f1439d68  r0 : 00000000
-> > Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> > Control: 10c5387d  Table: 066b004a  DAC: 00000051
-> > Register r0 information: NULL pointer
-> > Register r1 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
-> > Register r2 information: non-paged memory
-> > Register r3 information: slab kmalloc-2k start c2091000 pointer offset 64 size 2048
-> > Register r4 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
-> > Register r5 information: NULL pointer
-> > Register r6 information: slab kmalloc-cg-4k start c238f000 pointer offset 0 size 4096
-> > Register r7 information: 15-page vmalloc region starting at 0xbf0a8000 allocated at load_module+0xa30/0x219c
-> > Register r8 information: 1-page vmalloc region starting at 0xf0d75000 allocated at ethtool_get_stats+0x138/0x208
-> > Register r9 information: slab task_struct start c4816b80 pointer offset 0
-> > Register r10 information: non-paged memory
-> > Register r11 information: non-paged memory
-> > Register r12 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
-> > Process snmpd (pid: 733, stack limit = 0x38de3a88)
-> > Stack: (0xf1439d48 to 0xf143a000)
-> > 9d40:                   000000c0 00000001 c238f000 bf0b400c f0d75150 c4816b80
-> > 9d60: 00000100 bf0a98d8 00000000 00000000 00000000 00000000 00000000 00000000
-> > 9d80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > 9da0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > 9dc0: 00000dc0 5335509c 00000035 c238f000 bf0b2214 01067f50 f0d75000 c0b9b9c8
-> > 9de0: 0000001d 00000035 c2212094 5335509c c4816b80 c238f000 c5ad6e00 01067f50
-> > 9e00: c1b0be80 c4816b80 00014813 c0b9d7f0 00000000 00000000 0000001d 0000001d
-> > 9e20: 00000000 00001200 00000000 00000000 c216ed90 c73943b8 00000000 00000000
-> > 9e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-> > 9e60: 00000000 c0ad9034 00000000 00000000 00000000 00000000 00000000 00000000
-> > 9e80: 00000000 00000000 00000000 5335509c c1b0be80 f1439ee4 00008946 c1b0be80
-> > 9ea0: 01067f50 f1439ee3 00000000 00000046 b6d77ae0 c0b383f0 00008946 becc83e8
-> > 9ec0: c1b0be80 00000051 0000000b c68ca480 c7172d00 c0ad8ff0 f1439ee3 cf600e40
-> > 9ee0: 01600e40 32687465 00000000 00000000 00000000 01067f50 00000000 00000000
-> > 9f00: 00000000 5335509c 00008946 00008946 00000000 c68ca480 becc83e8 c05e2de0
-> > 9f20: f1439fb0 c03002f0 00000006 5ac3c35a c4816b80 00000006 b6d77ae0 c030caf0
-> > 9f40: c4817350 00000014 f1439e1c 0000000c 00000000 00000051 01000000 00000014
-> > 9f60: 00003fec f1439edc 00000001 c0372abc b6d77ae0 c0372abc cf600e40 5335509c
-> > 9f80: c21e6800 01015c9c 0000000b 00008946 00000036 c03002f0 c4816b80 00000036
-> > 9fa0: b6d77ae0 c03000c0 01015c9c 0000000b 0000000b 00008946 becc83e8 00000000
-> > 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d77ae0
-> > 9fe0: b6dbf738 becc838c b6d186d7 b6baa858 40000030 0000000b 00000000 00000000
-> >  page_pool_get_stats from mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
-> >  mvneta_ethtool_get_stats [mvneta] from ethtool_get_stats+0x154/0x208
-> >  ethtool_get_stats from dev_ethtool+0xf48/0x2480
-> >  dev_ethtool from dev_ioctl+0x538/0x63c
-> >  dev_ioctl from sock_ioctl+0x49c/0x53c
-> >  sock_ioctl from sys_ioctl+0x134/0xbd8
-> >  sys_ioctl from ret_fast_syscall+0x0/0x1c
-> > Exception stack(0xf1439fa8 to 0xf1439ff0)
-> > 9fa0:                   01015c9c 0000000b 0000000b 00008946 becc83e8 00000000
-> > 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d77ae0
-> > 9fe0: b6dbf738 becc838c b6d186d7 b6baa858
-> > Code: e28dd004 e1a05000 e2514000 0a00006a (e5902070)
-> > 
-> > This commit adds the proper checks before calling page_pool_get_stats.
-> > 
-> > Fixes: b3fc79225f05 ("net: mvneta: add support for page_pool_get_stats")
-> > Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
-> > Reported-by: Paulo Da Silva <Paulo.DaSilva@kyberna.com>
-> > ---
+On 08.11.23 03:32, Jakub Kicinski wrote:
+> On Mon, 6 Nov 2023 12:47:42 +0100 Jan Kiszka wrote:
+>> Analogously to prueth_remove, just also taking care for NULL'ing the
+>> iep pointers.
+>>
+>> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+>> Fixes: 443a2367ba3c ("net: ti: icssg-prueth: am65x SR2.0 add 10M full duplex support")
 > 
-> Hi Sven,
-> 
-> first of all thx for fixing it. Just minor comments inline.
-> 
-> Regards,
-> Lorenzo
-> 
-> > 
-> > Change from v3:
-> > 	* Move the page pool check back to mvneta
-> > 
-> > Change from v2:
-> > 	* Fix the fixes tag
-> > 
-> > Change from v1:
-> > 	* Add cover letter
-> > 	* Move the page pool check in mvneta to the ethtool stats
-> > 	  function
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-> > index 8b0f12a0e0f2..bbb5d972657a 100644
-> > --- a/drivers/net/ethernet/marvell/mvneta.c
-> > +++ b/drivers/net/ethernet/marvell/mvneta.c
-> > @@ -4734,13 +4734,16 @@ static void mvneta_ethtool_get_strings(struct net_device *netdev, u32 sset,
-> >  {
-> >  	if (sset == ETH_SS_STATS) {
-> >  		int i;
-> > +		struct mvneta_port *pp = netdev_priv(netdev);
-> 
-> nit: reverse christmas tree here (just if you need to repost)
-> 
-> >  
-> >  		for (i = 0; i < ARRAY_SIZE(mvneta_statistics); i++)
-> >  			memcpy(data + i * ETH_GSTRING_LEN,
-> >  			       mvneta_statistics[i].name, ETH_GSTRING_LEN);
-> >  
-> > -		data += ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> > -		page_pool_ethtool_stats_get_strings(data);
-> > +		if (!pp->bm_priv) {
-> > +			data += ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> > +			page_pool_ethtool_stats_get_strings(data);
-> > +		}
-> >  	}
-> >  }
-> >  
-> > @@ -4858,8 +4861,10 @@ static void mvneta_ethtool_pp_stats(struct mvneta_port *pp, u64 *data)
-> >  	struct page_pool_stats stats = {};
-> >  	int i;
-> >  
-> > -	for (i = 0; i < rxq_number; i++)
-> > -		page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> > +	for (i = 0; i < rxq_number; i++) {
-> > +		if (pp->rxqs[i].page_pool)
-> > +			page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> > +	}
-> >  
-> >  	page_pool_ethtool_stats_get(data, &stats);
-> >  }
-> > @@ -4875,14 +4880,21 @@ static void mvneta_ethtool_get_stats(struct net_device *dev,
-> >  	for (i = 0; i < ARRAY_SIZE(mvneta_statistics); i++)
-> >  		*data++ = pp->ethtool_stats[i];
-> >  
-> > -	mvneta_ethtool_pp_stats(pp, data);
-> > +	if (!pp->bm_priv && !pp->is_stopped)
-> 
-> do we need to check pp->is_stopped here? (we already check if page_pool
-> pointer is NULL in mvneta_ethtool_pp_stats).
-> Moreover in mvneta_ethtool_get_sset_count() and in mvneta_ethtool_get_strings()
-> we just check pp->bm_priv pointer. Are the stats disaligned in this case?
+> Is there a reason you're not CCing authors of these changes?
+> Please make sure you run get_maintainer on the patch, and CC
+> folks appropriately.
 
-Hi Lorenzo,
+I was only interacting (directly) with Danish in the past years on this
+driver, and he also upstreamed it. So I assumed "ownership" moved on.
+Adding both, Roger with updated email (where get_maintainer does not help).
 
-so the buffer manager (bm) does not support the page pool.
-If this mode is used we can skip any page pool references.
+Jan
 
-The question is do we end up with a race condition when we skip the is_stopped check
-as the variable is set to true just before the page pools are
-deallocated on suspend or interface stop calls.
-
-Best
-Sven
-
-> 
-> > +		mvneta_ethtool_pp_stats(pp, data);
-> >  }
-> >  
-> >  static int mvneta_ethtool_get_sset_count(struct net_device *dev, int sset)
-> >  {
-> > -	if (sset == ETH_SS_STATS)
-> > -		return ARRAY_SIZE(mvneta_statistics) +
-> > -		       page_pool_ethtool_stats_get_count();
-> > +	if (sset == ETH_SS_STATS) {
-> > +		int count = ARRAY_SIZE(mvneta_statistics);
-> > +		struct mvneta_port *pp = netdev_priv(dev);
-> > +
-> > +		if (!pp->bm_priv)
-> > +			count += page_pool_ethtool_stats_get_count();
-> > +
-> > +		return count;
-> > +	}
-> >  
-> >  	return -EOPNOTSUPP;
-> >  }
-> > -- 
-> > 2.42.0
-> > 
-
+-- 
+Siemens AG, Technology
+Linux Expert Center
 
 
