@@ -1,129 +1,93 @@
-Return-Path: <netdev+bounces-46879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542247E6E5B
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:14:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D4AC7E6E5C
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84A111C2086F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF2F28109F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C158A210F0;
-	Thu,  9 Nov 2023 16:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BE221A12;
+	Thu,  9 Nov 2023 16:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shutemov.name header.i=@shutemov.name header.b="Dedj1FOM";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="qJaNYVEd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fTrsclx/"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9081CF83
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:14:10 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CA03588;
-	Thu,  9 Nov 2023 08:14:10 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 8AE995C0452;
-	Thu,  9 Nov 2023 11:14:09 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Thu, 09 Nov 2023 11:14:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:sender:subject:subject:to:to;
-	 s=fm2; t=1699546449; x=1699632849; bh=kPd+scBALwPSSF853kD362qUH
-	B1LZ1xYUAJPoV1UhaI=; b=Dedj1FOMixa6lnn5RVYSQ8Kf1xbeURB9ZOzGnvA43
-	H9kl9Z/bAM/f+RnBnG2KCcHorhu5E2wkVusAl2HyHAEJl473RpF050Y1BN4/jxL6
-	RLYgALwjIvrUIw5xg5sh+HPfCk6KYLmc0Kn8tAnCDNglfGow7cl9EqBhiDJCF9Xw
-	L5kmTKHXG6z+k6VpmQL/pd7YsjiXSqOwD13P/slI06csVHUzd3+X71CqRjoUfJM2
-	cw9HBnoTiamAjiIncxc2TB9kZCuv4RQpCQ08mtyVh+SehiC3aamHPj89ECJp5JPT
-	6mDfZtXJO/7iuhZ15Cq/rSmn/Nld3YfVAuh8tG4afkHCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1699546449; x=1699632849; bh=kPd+scBALwPSSF853kD362qUHB1LZ1xYUAJ
-	PoV1UhaI=; b=qJaNYVEdXy2vl+ilHLaqe3R2lluXxBhpOBIUhzvUKYXknKyev++
-	EGIilHrj3nc14rOzRPpOLYV6pBbD+WtdATtCri/dnA7pi6NRqyBlVDyyDht4wPUo
-	HRSkZ6xRYnJos6luoj8jpDfMwZZGNc0520qK8Tr8RWTNLdreCoSkV/M+mtpbXPEz
-	XM0Yg/CBfT3khygQjJbzRLufpiPaGkKtwdnTRlT5qpOPZPIU7uxsZnpVM2uERndK
-	1dUURhyJFhjr9wk/rjEq7tDU7HKWGCqins5edsxPsH692ji9yvIyqxu/qrhMht2j
-	/tY1pMdIQuOWsBqJ6nrlhVFXj2zMEP/akkQ==
-X-ME-Sender: <xms:UQVNZVzZLDWhROJB75YWn374RCyx8kLBZmyKE45Y5fuwJd6uBsoFrA>
-    <xme:UQVNZVRQJ2CGm_WlzNd77ekLRwogrndWfnDYN2g8VmwyIJNfKfcKx23mrP1BZ9CHk
-    uTReNjaW6fDxM6OOiM>
-X-ME-Received: <xmr:UQVNZfUDuR_NQWa-bZhP2ZiHc4dTBXVTrfCNEN_7APaLN31suyayaIA3VxuzwhY1qlQwXg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedruddvuddgkeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkedttddttdejnecuhfhrohhmpedfmfhi
-    rhhilhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrd
-    hnrghmvgeqnecuggftrfgrthhtvghrnhepgfejieekffeffeevudfgtdekvdfhtddtieef
-    vedtheeggfejffellefggffgvdeknecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:UQVNZXg5FByDJcUIxcSgtAp2HMCS_1rcZhnsIF_HFHTiLPwKVA-zTQ>
-    <xmx:UQVNZXAMImd5MVs-dwUDB0-59hTIW27Z1_EQZ2Shzhv-fjPYOgzjQw>
-    <xmx:UQVNZQKI0pg3tgOubirYIwAYZL7OM7WkOgh_927HQuoOsG_RLoI-iQ>
-    <xmx:UQVNZb3TtGLElCFfdcp7oe5lujTeXao2LKw0NRE4apoSndBbGSJ7ZQ>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 9 Nov 2023 11:14:08 -0500 (EST)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-	id B5ECC10A31E; Thu,  9 Nov 2023 19:14:06 +0300 (+03)
-Date: Thu, 9 Nov 2023 19:14:06 +0300
-From: "Kirill A. Shutemov" <kirill@shutemov.name>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Hou Tao <houtao1@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Network Development <netdev@vger.kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [GIT PULL v2] Networking for 6.7
-Message-ID: <20231109161406.lol2mjhr47dhd42q@box.shutemov.name>
-References: <20231028011741.2400327-1-kuba@kernel.org>
- <20231031210948.2651866-1-kuba@kernel.org>
- <20231109154934.4saimljtqx625l3v@box.shutemov.name>
- <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A082136B
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:14:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C80CC433C9;
+	Thu,  9 Nov 2023 16:14:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699546453;
+	bh=Y0GW2muLw5+bWPBPEsnZmKIlY04MGh7SV8hoCZTderM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fTrsclx/4HZaDw1xtV2KqbL0Ap8/hODW23Ngi9nIJjRECN4V1vk8a7NI1/q83DcE1
+	 NRAEvQkGlhzc1RRQtw+PS1WrvG/zbk+1Kks4ZNaEf3H/raTauzW9WJMie9nGWtMhCX
+	 3KQmWmHOo71IsvatuLjTEyr8GVQmUZ6Uo5Bu0gfBDdIdj1DYvpYak137OmO64CxgnF
+	 FJqjJ50NlJvmGP/h/8QiYNTE297uvXtmFWJIkPrkcfsLdcQsts3vTCM7ZN/ntZAS6b
+	 j/AqcUOxIVuPEIs2b8PMXu77il6ID99WN0hPnr/T9mI/6YczXBF8S+/TC20NNtlnga
+	 nxy5WY6AOPcdg==
+Date: Thu, 9 Nov 2023 08:14:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org
+Subject: Re: [PATCH net-next 00/15] net: page_pool: add netlink-based
+ introspection
+Message-ID: <20231109081412.161ce68f@kernel.org>
+In-Reply-To: <CAC_iWjKi0V6wUmutmpjYyjZGkwXef4bxQwcx6o5rytT+-Pj5Eg@mail.gmail.com>
+References: <20231024160220.3973311-1-kuba@kernel.org>
+	<CAC_iWjKi0V6wUmutmpjYyjZGkwXef4bxQwcx6o5rytT+-Pj5Eg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 09, 2023 at 08:01:39AM -0800, Alexei Starovoitov wrote:
-> On Thu, Nov 9, 2023 at 7:49 AM Kirill A. Shutemov <kirill@shutemov.name> wrote:
-> >
-> > On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
-> > >       bpf: Add support for non-fix-size percpu mem allocation
-> >
-> > Recent changes in BPF increased per-CPU memory consumption a lot.
-> >
-> > On virtual machine with 288 CPUs, per-CPU consumtion increased from 111 MB
-> > to 969 MB, or 8.7x.
-> >
-> > I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
-> > non-fix-size percpu mem allocation"), which part of the pull request.
+On Thu, 9 Nov 2023 10:11:47 +0200 Ilias Apalodimas wrote:
+> > We immediately run into page pool leaks both real and false positive
+> > warnings. As Eric pointed out/predicted there's no guarantee that
+> > applications will read / close their sockets so a page pool page
+> > may be stuck in a socket (but not leaked) forever. This happens
+> > a lot in our fleet. Most of these are obviously due to application
+> > bugs but we should not be printing kernel warnings due to minor
+> > application resource leaks.  
 > 
-> Hmm. This is unexpected. Thank you for reporting.
+> Fair enough, I guess you mean 'continuous warnings'?
+
+Yes, in this case but I'm making a general statement.
+Or do you mean that there's a typo / grammar issue?
+
+> > Conversely the page pool memory may get leaked at runtime, and
+> > we have no way to detect / track that, unless someone reconfigures
+> > the NIC and destroys the page pools which leaked the pages.
+> >
+> > The solution presented here is to expose the memory use of page
+> > pools via netlink. This allows for continuous monitoring of memory
+> > used by page pools, regardless if they were destroyed or not.
+> > Sample in patch 15 can print the memory use and recycling
+> > efficiency:
+> >
+> > $ ./page-pool
+> >     eth0[2]     page pools: 10 (zombies: 0)
+> >                 refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
+> >                 recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
 > 
-> How did you measure this 111 MB vs 969 MB ?
-> Pls share the steps to reproduce.
+> That's reasonable, and the recycling rate is pretty impressive. 
 
-Boot VMM with 288 (qemu-system-x86_64 -smp 288) and check Percpu: field of
-/proc/meminfo.
+This is just from a test machine, fresh boot, maybe a short iperf run,
+I don't remember now :) In any case not real workload.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+> Any idea how that translated to enhancements overall? mem/cpu pressure etc
+
+I haven't collected much prod data at this stage, I'm hoping to add
+this to the internal kernel and then do a more thorough investigation.
 
