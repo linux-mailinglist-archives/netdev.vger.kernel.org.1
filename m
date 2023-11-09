@@ -1,133 +1,183 @@
-Return-Path: <netdev+bounces-46849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5947E6A8A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:26:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EC77E6AEC
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:06:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B6D280FCE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:26:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FCC51C2086F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644AB1DA45;
-	Thu,  9 Nov 2023 12:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3931311197;
+	Thu,  9 Nov 2023 13:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HecThWgb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QLeVLtaQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568E91DA37
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:26:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD982D56
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 04:26:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699532782;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1/haom+yH9xLwnE9aURcVj9dx4YOUUdXMdvnVMAeYqM=;
-	b=HecThWgbZ6C6ynnvaiA5u144VgmDj3hSFaWTn+bmjBw2kNcU6zE8tnR1MyIm4vBIuTvt7M
-	I0yxU28PrYVHhwiFDUZOyZirXAGjduhcXuF+q6fHTPWQ1wccLWfWu6IaODU0z3aNdwrpU+
-	qe9SwYxgdW9RN1gu9hnGBz5bDvdix1g=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-111-rexEU2_4NquTNliml9csbg-1; Thu, 09 Nov 2023 07:26:21 -0500
-X-MC-Unique: rexEU2_4NquTNliml9csbg-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5a7af473da1so1532627b3.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 04:26:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52CA18E0A;
+	Thu,  9 Nov 2023 13:06:53 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D454E2D55;
+	Thu,  9 Nov 2023 05:06:52 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-4094301d505so5573175e9.2;
+        Thu, 09 Nov 2023 05:06:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699535211; x=1700140011; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOIjNHwDhIrchH75GqKOcAkPO2xPGvmXahK1witYqLQ=;
+        b=QLeVLtaQuk8DJJnBxRK9IYnH0O/Crti1ZYzgtw6WlttU3Cx1ivh4JnDaL/BZQfm27V
+         T5Ecq5ClBbVRJt67kdm9V4aVwP/beTqH23f3ICyJF8Sx3HgHm7Z+SQj04gmHAYjmIB7V
+         dvN9Ki6NZwyuaLqEHbPu6hDvOjn/jxdLeLBCLg2dnF87kTvMDRVuU/wvWNgoPMGQMYKT
+         fBSU8vsWLqgntvlEMJ7nmbyQHkkCx6wMvg0/xTjoJlqkIBQ+uSj7TB5b+51rJvJSPs6Q
+         MqSZE4l8psm/dvoe4gdNq4CKQ3NB7LOvZ2vJCeUs61XLMTS16ca/N0yx6a7qnAz9HGoV
+         Xebg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699532781; x=1700137581;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1/haom+yH9xLwnE9aURcVj9dx4YOUUdXMdvnVMAeYqM=;
-        b=o1mqzXF72jVNMIiwjUBraEl+9yAfma11S0KJ2wDJt22pItwCOUlR1eOP8FZiD4v2Fs
-         /EM9I3CfTw0dQry3C2nlNU3KVChBO/t3GSPMvXU8WMLkq4kDaP6jPeQ5Mebojxy2tC5S
-         Yo70hS/s3ARrEbtzRp6oY7lmOiUbJ9bcN6biP0Q3+XYVBV9vroj2q2GKTOYy27NSWaou
-         GZK2aZo3WKDpKBYEs3SevDQnwVJlyQx6COTPGL+AWn+ZNT85gkyg+8mWHpH1XmgVL+oz
-         hM1e9HCMxhpXGHkbmPzxKSBsOhgO/rmmQxR4ivIUerk2lM5TQZ332UuI2ktcmjg0N8Cv
-         BwGw==
-X-Gm-Message-State: AOJu0Yzpo16iY+FlOhxJlDk7ex6U103GkbL+/QcqdMqLfK62D/y4+wFg
-	cV8YSepYiAWMafJipi2L1sm5S2kr02S+p1Zfa9NtCmJ3L/9OaHe7KGWWeJUHdeoWScKmX29QIZv
-	j79+XEuuWvr7ErJU+
-X-Received: by 2002:a81:a941:0:b0:5a7:ba54:5127 with SMTP id g62-20020a81a941000000b005a7ba545127mr3971929ywh.3.1699532781105;
-        Thu, 09 Nov 2023 04:26:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFlXxTrprPZijY3/9XY14mMrwVZ8+lm8hhrgq8SG1ZGANmgzirEEjusP4RzmaSaOW2ShlenrA==
-X-Received: by 2002:a81:a941:0:b0:5a7:ba54:5127 with SMTP id g62-20020a81a941000000b005a7ba545127mr3971916ywh.3.1699532780737;
-        Thu, 09 Nov 2023 04:26:20 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id g24-20020ac84dd8000000b00417db2593bdsm1876925qtw.72.2023.11.09.04.26.18
+        d=1e100.net; s=20230601; t=1699535211; x=1700140011;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xOIjNHwDhIrchH75GqKOcAkPO2xPGvmXahK1witYqLQ=;
+        b=EuR2nqK8buSyT1oNH6BwkIophlDj2AGk/61tiBIcZ214/0v7WnpYKJAsZVASn7KI2Q
+         3XlJrkKBKvqnWhg2KzI5YMXJkmc0pOGSyrNs3mHmthwPG1f57zwOah/bUMGbpwn00V84
+         ILsbkUlF3B+ChTdK+UUuWwvVla1Ju9KilVihiMSl6fo+lOu1aeR3+xM6wKdoGHIJDvn1
+         jT0dyWFUxn90O2T2ISQq2wHhes491Ly9cFbe+i89sPJfx8/OVSLtnpMQyH7dVrvgjG8m
+         XCO7Rm4wxO6N+8lL8NDQRHKa/MYTHtTS60MxXTVXWX3nLayqPCXTmJHWUFPVhOZbbahE
+         rLVw==
+X-Gm-Message-State: AOJu0YzXhQHUlXaCfAuBNEtmUnXYh6Fn3+DzSnXdE1YJ51klET41e5I+
+	6KFZ/6d7HtmCwNnhhbPWo94=
+X-Google-Smtp-Source: AGHT+IFbDCbIXiVpY6Mn2uAlQLGSxn3Bb9kx81nXr/A7KXXIfQ9AEnOdXFXwP6clKgGh5QhGOQV7lw==
+X-Received: by 2002:a05:600c:2046:b0:405:75f0:fd31 with SMTP id p6-20020a05600c204600b0040575f0fd31mr4456945wmg.31.1699535210756;
+        Thu, 09 Nov 2023 05:06:50 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id v19-20020a05600c445300b0040813e14b49sm2095267wmn.30.2023.11.09.05.06.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 04:26:20 -0800 (PST)
-Message-ID: <ad66b532d1702c36adecd944e25f84e4497ef8b3.camel@redhat.com>
-Subject: Re: [PATCH net v4 0/3] Fix large frames in the Gemini ethernet
- driver
-From: Paolo Abeni <pabeni@redhat.com>
-To: Vladimir Oltean <olteanv@gmail.com>, Linus Walleij
-	 <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, =?UTF-8?Q?Micha=C5=82_Miros=C5=82aw?=
-	 <mirq-linux@rere.qmqm.pl>, Andrew Lunn <andrew@lunn.ch>, 
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+        Thu, 09 Nov 2023 05:06:50 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Date: Thu, 09 Nov 2023 13:26:17 +0100
-In-Reply-To: <20231109105037.zppxrr3bptd7a7i6@skbuf>
-References: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
-	 <20231109105037.zppxrr3bptd7a7i6@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Subject: [net-next RFC PATCH v6 1/4] net: phy: aquantia: move to separate directory
+Date: Thu,  9 Nov 2023 13:32:50 +0100
+Message-Id: <20231109123253.3933-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2023-11-09 at 12:50 +0200, Vladimir Oltean wrote:
-> On Thu, Nov 09, 2023 at 10:03:11AM +0100, Linus Walleij wrote:
-> > This is the result of a bug hunt for a problem with the
-> > RTL8366RB DSA switch leading me wrong all over the place.
-> >=20
-> > I am indebted to Vladimir Oltean who as usual pointed
-> > out where the real problem was, many thanks!
-> >=20
-> > Tryig to actually use big ("jumbo") frames on this
-> > hardware uncovered the real bugs. Then I tested it on
-> > the DSA switch and it indeed fixes the issue.
-> >=20
-> > To make sure it also works fine with big frames on
-> > non-DSA devices I also copied a large video file over
-> > scp to a device with maximum frame size, the data
-> > was transported in large TCP packets ending up in
-> > 0x7ff sized frames using software checksumming at
-> > ~2.0 MB/s.
-> >=20
-> > If I set down the MTU to the standard 1500 bytes so
-> > that hardware checksumming is used, the scp transfer
-> > of the same file was slightly lower, ~1.8-1.9 MB/s.
-> >=20
-> > Despite this not being the best test it shows that
-> > we can now stress the hardware with large frames
-> > and that software checksum works fine.
-> >=20
-> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> > ---
->=20
-> Thanks for being persistent with this! I hope we didn't miss today's
-> "net" pull request :)
+Move aquantia PHY driver to separate driectory in preparation for
+firmware loading support to keep things tidy.
 
-I fear this is a bit too late for today's PR. I hope it should not be a
-big problem, since we are very early in the release cycle.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v4:
+- Keep order for kconfig config
+Changes v3:
+- Add this patch
 
-Cheers,
+ drivers/net/phy/Kconfig                         | 5 +----
+ drivers/net/phy/Makefile                        | 6 +-----
+ drivers/net/phy/aquantia/Kconfig                | 5 +++++
+ drivers/net/phy/aquantia/Makefile               | 6 ++++++
+ drivers/net/phy/{ => aquantia}/aquantia.h       | 0
+ drivers/net/phy/{ => aquantia}/aquantia_hwmon.c | 0
+ drivers/net/phy/{ => aquantia}/aquantia_main.c  | 0
+ 7 files changed, 13 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/net/phy/aquantia/Kconfig
+ create mode 100644 drivers/net/phy/aquantia/Makefile
+ rename drivers/net/phy/{ => aquantia}/aquantia.h (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_hwmon.c (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_main.c (100%)
 
-Paolo
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 421d2b62918f..25cfc5ded1da 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -96,10 +96,7 @@ config ADIN1100_PHY
+ 	  Currently supports the:
+ 	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
+ 
+-config AQUANTIA_PHY
+-	tristate "Aquantia PHYs"
+-	help
+-	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
++source "drivers/net/phy/aquantia/Kconfig"
+ 
+ config AX88796B_PHY
+ 	tristate "Asix PHYs"
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index c945ed9bd14b..f65e85c91fc1 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -35,11 +35,7 @@ obj-y				+= $(sfp-obj-y) $(sfp-obj-m)
+ obj-$(CONFIG_ADIN_PHY)		+= adin.o
+ obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
+ obj-$(CONFIG_AMD_PHY)		+= amd.o
+-aquantia-objs			+= aquantia_main.o
+-ifdef CONFIG_HWMON
+-aquantia-objs			+= aquantia_hwmon.o
+-endif
+-obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
+ obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+ obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+ obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
+diff --git a/drivers/net/phy/aquantia/Kconfig b/drivers/net/phy/aquantia/Kconfig
+new file mode 100644
+index 000000000000..226146417a6a
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config AQUANTIA_PHY
++	tristate "Aquantia PHYs"
++	help
++	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+diff --git a/drivers/net/phy/aquantia/Makefile b/drivers/net/phy/aquantia/Makefile
+new file mode 100644
+index 000000000000..346f350bc084
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++aquantia-objs			+= aquantia_main.o
++ifdef CONFIG_HWMON
++aquantia-objs			+= aquantia_hwmon.o
++endif
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
+diff --git a/drivers/net/phy/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
+similarity index 100%
+rename from drivers/net/phy/aquantia.h
+rename to drivers/net/phy/aquantia/aquantia.h
+diff --git a/drivers/net/phy/aquantia_hwmon.c b/drivers/net/phy/aquantia/aquantia_hwmon.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_hwmon.c
+rename to drivers/net/phy/aquantia/aquantia_hwmon.c
+diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_main.c
+rename to drivers/net/phy/aquantia/aquantia_main.c
+-- 
+2.40.1
 
 
