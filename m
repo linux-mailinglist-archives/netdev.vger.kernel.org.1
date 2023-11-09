@@ -1,509 +1,267 @@
-Return-Path: <netdev+bounces-46931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5572D7E7323
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 22:00:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E445D7E73C3
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 22:39:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D9F4B20BDB
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:00:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125861C20AF3
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A50358B4;
-	Thu,  9 Nov 2023 21:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4B638DE9;
+	Thu,  9 Nov 2023 21:39:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fD1hWpg9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pd2jM6Qt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9140347DF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 21:00:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED92CC433C8;
-	Thu,  9 Nov 2023 21:00:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699563614;
-	bh=oIh278dcWNjBT0LI/g+XCy7IbgEEDqp4JdWUWTmbWyM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fD1hWpg9Jf42SkxaJPNzhHeq4FGL9+qkMsKrdtqJZPeEUUtBAtOvweKDNpHah4RrF
-	 3eWqAzUGMr3EFjeixz0j6/nMEeShOKFBh6u7MXw3o1kL3LQVZOn6gRgQurMQfi6poF
-	 Qz3kswyUzecij9Imt691R+vLP/+qu3DSx1G0tePeGcWK2PHXQGism7MfsTa38MGKOR
-	 luMpvwVV/y+TvnUV+ebI00RkvQIMeofwAa3fiz2BOnnpHtdY70edcrYJUONzHkHOhJ
-	 rjV04c9hefQbZEHRtzxVD7FiplrAdWUuOxRG2T8N7MBJrBahzbiQw3i0EJYYsTfmSt
-	 pvI7/XIvj6CjQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pabeni@redhat.com
-Subject: [GIT PULL] Networking for v6.7-rc1
-Date: Thu,  9 Nov 2023 13:00:13 -0800
-Message-ID: <20231109210013.1276858-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BE838DDA;
+	Thu,  9 Nov 2023 21:39:25 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187314211;
+	Thu,  9 Nov 2023 13:39:24 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-991c786369cso237902466b.1;
+        Thu, 09 Nov 2023 13:39:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699565962; x=1700170762; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mivFoTsyzu5D3ktYakV/iPJjqNTQ6vxhMqnx19AOq4=;
+        b=Pd2jM6QtX35Iqp+ALpamDOuMRu9JJCF2TeYvGiN9FdwPzQyT7CQmZuSuYvoQ3Ss+z5
+         GZLAdGvX2c/YaFYb5XLzePD2Qmaqgz2xINb8UX8xJwnPYAL6rohSfgiAsT5zCnZBpfXt
+         Rj69pO/AtA45FHEwGwqymEHix+tne3moyHHScGLBU59q43t9NOKkIu0ecqhujDI9cgoK
+         D2P+XSAFRbRiJC9BTJ7kk3eHsKH/HASzpv2S6o2hXe2gPpqqRO3lsQ4ISv1xJSzwDs4H
+         TQ6UT+Dad+mBo7gheLTC24nSroK5Xv1+3UPnmch0tegCWZ7AEKPe4ytI+R3DvdAxfGoP
+         s9dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699565962; x=1700170762;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7mivFoTsyzu5D3ktYakV/iPJjqNTQ6vxhMqnx19AOq4=;
+        b=jgdx+uqRrXGbTHwwNdM6FmLF20j+lbQshQM3ExoICrTxa3vgQBdzQg71j4zQgAniKL
+         UNzuuOdGsXsSUnNkrkfpRwF0KdHRG7JJHO82xfyi8W7xya5+tRM6rR8ArIyAlNGXhy+d
+         Hzn8IP+JMgBHW8wpuYcIzTIHQ39qdVRlhBueErftl5yhvvpPr5fWxr6uuZ3VK72ECqPa
+         tAKrOnZArFnPnErmCcqJeIVuHFztkZxmddflLkyhBgJoA5cUOvSSSj89FWOjPDftOFbX
+         hIp7Ao2pLklEMaVFwlP2tIWNNMvl+b//WBgbX+edZvzOWkjPYgERFK/vuW16N7tCtWrA
+         ymIg==
+X-Gm-Message-State: AOJu0YyUYvTQL2df4FXwLDYaIE1nCcSU9gAO1hkxGJwlLsQPjYPEfW53
+	oPicMan4OEKx4EAeW9e/gWs=
+X-Google-Smtp-Source: AGHT+IGX3N5iX5LSKJ95LCTzhUOw3nwL5273uioZrF9b4UvDKOmdcXT+cZl5S1QF5kdiE4gl0U5Yxw==
+X-Received: by 2002:a17:907:910a:b0:9e4:e405:27b4 with SMTP id p10-20020a170907910a00b009e4e40527b4mr1447235ejq.53.1699565962160;
+        Thu, 09 Nov 2023 13:39:22 -0800 (PST)
+Received: from krava ([83.240.60.131])
+        by smtp.gmail.com with ESMTPSA id gy8-20020a170906f24800b0099c53c44083sm3057499ejb.79.2023.11.09.13.39.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 13:39:21 -0800 (PST)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Thu, 9 Nov 2023 22:39:14 +0100
+To: Lee Jones <lee@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, x86@kernel.org,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [REPORT] BPF: Reproducible triggering of BUG() from userspace PoC
+Message-ID: <ZU1RgvcM0FFXunOA@krava>
+References: <20231108154626.GB8909@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-Hi Linus!
-
-The following changes since commit ff269e2cd5adce4ae14f883fc9c8803bc43ee1e9:
-
-  Merge tag 'net-next-6.7-followup' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2023-11-01 16:33:20 -1000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.7-rc1
-
-for you to fetch changes up to 83b9dda8afa4e968d9cce253f390b01c0612a2a5:
-
-  net: ti: icss-iep: fix setting counter value (2023-11-09 13:15:40 +0100)
-
-----------------------------------------------------------------
-Including fixes from netfilter and bpf.
-
-Current release - regressions:
-
- - sched: fix SKB_NOT_DROPPED_YET splat under debug config
-
-Current release - new code bugs:
-
- - tcp: fix usec timestamps with TCP fastopen
-
- - tcp_sigpool: fix some off by one bugs
-
- - tcp: fix possible out-of-bounds reads in tcp_hash_fail()
-
- - tcp: fix SYN option room calculation for TCP-AO
-
- - bpf: fix compilation error without CGROUPS
-
- - ptp:
-   - ptp_read() should not release queue
-   - fix tsevqs corruption
-
-Previous releases - regressions:
-
- - llc: verify mac len before reading mac header
-
-Previous releases - always broken:
-
- - bpf:
-   - fix check_stack_write_fixed_off() to correctly spill imm
-   - fix precision tracking for BPF_ALU | BPF_TO_BE | BPF_END
-   - check map->usercnt after timer->timer is assigned
-
- - dsa: lan9303: consequently nested-lock physical MDIO
-
- - dccp/tcp: call security_inet_conn_request() after setting IP addr
-
- - tg3: fix the TX ring stall due to incorrect full ring handling
-
- - phylink: initialize carrier state at creation
-
- - ice: fix direction of VF rules in switchdev mode
-
-Misc:
-
- - fill in a bunch of missing MODULE_DESCRIPTION()s, more to come
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-----------------------------------------------------------------
-Alex Pakhunov (1):
-      tg3: Fix the TX ring stall
-
-Alexander Sverdlin (1):
-      net: dsa: lan9303: consequently nested-lock physical MDIO
-
-Alexei Starovoitov (3):
-      Merge branch 'bpf-fix-incorrect-immediate-spill'
-      Merge branch 'relax-allowlist-for-open-coded-css_task-iter'
-      Merge branch 'bpf-fix-precision-tracking-for-bpf_alu-bpf_to_be-bpf_end'
-
-Andrew Lunn (3):
-      net: phy: fill in missing MODULE_DESCRIPTION()s
-      net: mdio: fill in missing MODULE_DESCRIPTION()s
-      net: ethtool: Fix documentation of ethtool_sprintf()
-
-Andrii Nakryiko (1):
-      selftests/bpf: fix test_maps' use of bpf_map_create_opts
-
-Aniruddha Paul (1):
-      ice: Fix VF-VF filter rules in switchdev mode
-
-Björn Töpel (1):
-      selftests/bpf: Fix broken build where char is unsigned
-
-Chuyi Zhou (5):
-      bpf: Relax allowlist for css_task iter
-      selftests/bpf: Add tests for css_task iter combining with cgroup iter
-      selftests/bpf: Add test for using css_task iter in sleepable progs
-      bpf: Let verifier consider {task,cgroup} is trusted in bpf_iter_reg
-      selftests/bpf: get trusted cgrp from bpf_iter__cgroup directly
-
-D. Wythe (3):
-      net/smc: fix dangling sock under state SMC_APPFINCLOSEWAIT
-      net/smc: allow cdc msg send rather than drop it with NULL sndbuf_desc
-      net/smc: put sk reference if close work was canceled
-
-Dan Carpenter (2):
-      hsr: Prevent use after free in prp_create_tagged_frame()
-      net/tcp_sigpool: Fix some off by one bugs
-
-Dave Ertman (1):
-      ice: Fix SRIOV LAG disable on non-compliant aggregate
-
-Dave Marchevsky (2):
-      bpf: Add __bpf_kfunc_{start,end}_defs macros
-      bpf: Add __bpf_hook_{start,end} macros
-
-David Howells (1):
-      rxrpc: Fix two connection reaping bugs
-
-David S. Miller (2):
-      Merge branch 'smc-fixes'
-      Merge branch 'vsock-fixes'
-
-Diogo Ivo (1):
-      net: ti: icss-iep: fix setting counter value
-
-Edward Adam Davis (2):
-      ptp: ptp_read should not release queue
-      ptp: fix corrupted list in ptp_open
-
-Eric Dumazet (5):
-      inet: shrink struct flowi_common
-      tcp: fix fastopen code vs usec TS
-      net/tcp: fix possible out-of-bounds reads in tcp_hash_fail()
-      idpf: fix potential use-after-free in idpf_tso()
-      net_sched: sch_fq: better validate TCA_FQ_WEIGHTS and TCA_FQ_PRIOMAP
-
-Filippo Storniolo (4):
-      vsock/virtio: remove socket from connected/bound list on shutdown
-      test/vsock fix: add missing check on socket creation
-      test/vsock: refactor vsock_accept
-      test/vsock: add dobule bind connect test
-
-Florian Westphal (3):
-      netfilter: add missing module descriptions
-      ipvs: add missing module descriptions
-      netfilter: nat: fix ipv6 nat redirect with mapped and scoped addresses
-
-Furong Xu (1):
-      net: stmmac: xgmac: Enable support for multiple Flexible PPS outputs
-
-Geetha sowjanya (1):
-      octeontx2-pf: Free pending and dropped SQEs
-
-George Shuklin (1):
-      tg3: power down device only on SYSTEM_POWER_OFF
-
-Gerd Bayer (1):
-      net/smc: fix documentation of buffer sizes
-
-Hangbin Liu (1):
-      selftests: pmtu.sh: fix result checking
-
-Hao Sun (2):
-      bpf: Fix check_stack_write_fixed_off() to correctly spill imm
-      selftests/bpf: Add test for immediate spilled to stack
-
-Heiner Kallweit (1):
-      r8169: respect userspace disabling IFF_MULTICAST
-
-Hou Tao (1):
-      bpf: Check map->usercnt after timer->timer is assigned
-
-Ivan Vecera (2):
-      i40e: Do not call devlink_port_type_clear()
-      i40e: Fix devlink port unregistering
-
-Jakub Kicinski (10):
-      Merge branch 'net-sched-fill-in-missing-module_descriptions-for-net-sched'
-      Merge branch 'add-missing-module_descriptions'
-      tools: ynl-gen: don't touch the output file if content is the same
-      netlink: fill in missing MODULE_DESCRIPTION()
-      nfsd: regenerate user space parsers after ynl-gen changes
-      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
-      Merge tag 'nf-23-11-08' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      net: kcm: fill in MODULE_DESCRIPTION()
-      Merge branch '40GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-
-Jamal Hadi Salim (1):
-      net, sched: Fix SKB_NOT_DROPPED_YET splat under debug config
-
-Jian Shen (1):
-      net: page_pool: add missing free_percpu when page_pool_init fail
-
-Jiri Pirko (1):
-      netlink: specs: devlink: add forgotten port function caps enum values
-
-Klaus Kudielka (1):
-      net: phylink: initialize carrier state at creation
-
-Kuan-Wei Chiu (1):
-      s390/qeth: Fix typo 'weed' in comment
-
-Kuniyuki Iwashima (3):
-      dccp: Call security_inet_conn_request() after setting IPv4 addresses.
-      dccp/tcp: Call security_inet_conn_request() after setting IPv6 addresses.
-      tcp: Fix SYN option room calculation for TCP-AO.
-
-Linus Walleij (1):
-      net: xscale: Drop unused PHY number
-
-Maciej Żenczykowski (1):
-      netfilter: xt_recent: fix (increase) ipv6 literal buffer length
-
-Manu Bretelle (1):
-      selftests/bpf: fix test_bpffs
-
-Marcin Szycik (1):
-      ice: Fix VF-VF direction matching in drop rule in switchdev
-
-Martin KaFai Lau (1):
-      Merge branch 'Let BPF verifier consider {task,cgroup} is trusted in bpf_iter_reg'
-
-Matthieu Baerts (1):
-      bpf: fix compilation error without CGROUPS
-
-Michal Schmidt (1):
-      ice: lag: in RCU, use atomic allocation
-
-Nathan Chancellor (1):
-      tcp: Fix -Wc23-extensions in tcp_options_write()
-
-NeilBrown (1):
-      Fix termination state for idr_for_each_entry_ul()
-
-Pablo Neira Ayuso (1):
-      netfilter: nf_tables: remove catchall element in GC sync path
-
-Paolo Abeni (1):
-      Merge branch 'dccp-tcp-relocate-security_inet_conn_request'
-
-Patrick Thompson (1):
-      net: r8169: Disable multicast filter for RTL8168H and RTL8107E
-
-Philipp Stanner (1):
-      drivers/net/ppp: use standard array-copy-function
-
-Ratheesh Kannoth (2):
-      octeontx2-pf: Fix error codes
-      octeontx2-pf: Fix holes in error code
-
-Ronald Wahl (1):
-      net: ethernet: ti: am65-cpsw: rx_pause/tx_pause controls wrong direction
-
-Shigeru Yoshida (2):
-      tipc: Change nla_policy for bearer-related names to NLA_NUL_STRING
-      virtio/vsock: Fix uninit-value in virtio_transport_recv_pkt()
-
-Shung-Hsi Yu (2):
-      bpf: Fix precision tracking for BPF_ALU | BPF_TO_BE | BPF_END
-      selftests/bpf: precision tracking test for BPF_NEG and BPF_END
-
-Victor Nogueira (3):
-      net: sched: Fill in MODULE_DESCRIPTION for act_gate
-      net: sched: Fill in missing MODULE_DESCRIPTION for classifiers
-      net: sched: Fill in missing MODULE_DESCRIPTION for qdiscs
-
-Vlad Buslov (1):
-      net/sched: act_ct: Always fill offloading tuple iifidx
-
-Vladimir Oltean (1):
-      net: enetc: shorten enetc_setup_xdp_prog() error message to fit NETLINK_MAX_FMTMSG_LEN
-
-Willem de Bruijn (1):
-      llc: verify mac len before reading mac header
-
- Documentation/bpf/kfuncs.rst                       |   6 +-
- Documentation/netlink/specs/devlink.yaml           |   4 +
- Documentation/networking/smc-sysctl.rst            |   6 +-
- drivers/net/dsa/lan9303_mdio.c                     |   4 +-
- drivers/net/ethernet/broadcom/tg3.c                |  56 +++++++---
- drivers/net/ethernet/freescale/enetc/enetc.c       |   2 +-
- drivers/net/ethernet/intel/i40e/i40e_devlink.c     |   1 -
- drivers/net/ethernet/intel/i40e/i40e_main.c        |  10 +-
- drivers/net/ethernet/intel/ice/ice_lag.c           |  18 ++--
- drivers/net/ethernet/intel/ice/ice_tc_lib.c        | 114 +++++++++++++++-----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c        |   6 +-
- .../ethernet/marvell/octeontx2/nic/otx2_common.c   |  15 +--
- .../ethernet/marvell/octeontx2/nic/otx2_common.h   |   1 +
- .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  81 ++++++++------
- .../ethernet/marvell/octeontx2/nic/otx2_struct.h   |  34 +++---
- .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  42 ++++++++
- drivers/net/ethernet/realtek/r8169_main.c          |   6 +-
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h     |   2 +-
- .../net/ethernet/stmicro/stmmac/dwxgmac2_core.c    |  14 ++-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c           |   4 +-
- drivers/net/ethernet/ti/icssg/icss_iep.c           |   2 +-
- drivers/net/ethernet/xscale/ixp4xx_eth.c           |   3 +-
- drivers/net/mdio/acpi_mdio.c                       |   1 +
- drivers/net/mdio/fwnode_mdio.c                     |   1 +
- drivers/net/mdio/mdio-aspeed.c                     |   1 +
- drivers/net/mdio/mdio-bitbang.c                    |   1 +
- drivers/net/mdio/of_mdio.c                         |   1 +
- drivers/net/phy/bcm-phy-ptp.c                      |   1 +
- drivers/net/phy/bcm87xx.c                          |   1 +
- drivers/net/phy/phylink.c                          |   2 +
- drivers/net/phy/sfp.c                              |   1 +
- drivers/net/ppp/ppp_generic.c                      |   4 +-
- drivers/ptp/ptp_chardev.c                          |  23 ++--
- drivers/ptp/ptp_clock.c                            |   8 +-
- drivers/ptp/ptp_private.h                          |   1 +
- drivers/s390/net/qeth_core_main.c                  |   2 +-
- include/linux/btf.h                                |  11 ++
- include/linux/ethtool.h                            |   4 +-
- include/linux/idr.h                                |   6 +-
- include/linux/tcp.h                                |   2 +-
- include/net/flow.h                                 |   2 +-
- include/net/netfilter/nf_conntrack_act_ct.h        |  34 +++---
- include/net/tcp_ao.h                               |  13 +--
- include/uapi/linux/nfsd_netlink.h                  |   6 +-
- kernel/bpf/bpf_iter.c                              |   6 +-
- kernel/bpf/cgroup_iter.c                           |   8 +-
- kernel/bpf/cpumask.c                               |   6 +-
- kernel/bpf/helpers.c                               |  39 ++++---
- kernel/bpf/map_iter.c                              |   6 +-
- kernel/bpf/task_iter.c                             |  24 ++---
- kernel/bpf/verifier.c                              |  33 ++++--
- kernel/cgroup/rstat.c                              |   9 +-
- kernel/trace/bpf_trace.c                           |   6 +-
- net/bpf/test_run.c                                 |   7 +-
- net/bridge/netfilter/ebtable_broute.c              |   1 +
- net/bridge/netfilter/ebtable_filter.c              |   1 +
- net/bridge/netfilter/ebtable_nat.c                 |   1 +
- net/bridge/netfilter/ebtables.c                    |   1 +
- net/bridge/netfilter/nf_conntrack_bridge.c         |   1 +
- net/core/filter.c                                  |  13 +--
- net/core/page_pool.c                               |   6 +-
- net/core/xdp.c                                     |   6 +-
- net/dccp/ipv4.c                                    |   6 +-
- net/dccp/ipv6.c                                    |   6 +-
- net/devlink/netlink_gen.c                          |   2 +-
- net/hsr/hsr_forward.c                              |   4 +-
- net/ipv4/fou_bpf.c                                 |   6 +-
- net/ipv4/netfilter/iptable_nat.c                   |   1 +
- net/ipv4/netfilter/iptable_raw.c                   |   1 +
- net/ipv4/netfilter/nf_defrag_ipv4.c                |   1 +
- net/ipv4/netfilter/nf_reject_ipv4.c                |   1 +
- net/ipv4/syncookies.c                              |   2 +-
- net/ipv4/tcp_ao.c                                  |   5 +-
- net/ipv4/tcp_input.c                               |   7 +-
- net/ipv4/tcp_output.c                              |  72 +++++++------
- net/ipv4/tcp_sigpool.c                             |   8 +-
- net/ipv6/netfilter/ip6table_nat.c                  |   1 +
- net/ipv6/netfilter/ip6table_raw.c                  |   1 +
- net/ipv6/netfilter/nf_defrag_ipv6_hooks.c          |   1 +
- net/ipv6/netfilter/nf_reject_ipv6.c                |   1 +
- net/ipv6/syncookies.c                              |   7 +-
- net/kcm/kcmsock.c                                  |   1 +
- net/llc/llc_input.c                                |  10 +-
- net/llc/llc_s_ac.c                                 |   3 +
- net/llc/llc_station.c                              |   3 +
- net/netfilter/ipvs/ip_vs_core.c                    |   1 +
- net/netfilter/ipvs/ip_vs_dh.c                      |   1 +
- net/netfilter/ipvs/ip_vs_fo.c                      |   1 +
- net/netfilter/ipvs/ip_vs_ftp.c                     |   1 +
- net/netfilter/ipvs/ip_vs_lblc.c                    |   1 +
- net/netfilter/ipvs/ip_vs_lblcr.c                   |   1 +
- net/netfilter/ipvs/ip_vs_lc.c                      |   1 +
- net/netfilter/ipvs/ip_vs_nq.c                      |   1 +
- net/netfilter/ipvs/ip_vs_ovf.c                     |   1 +
- net/netfilter/ipvs/ip_vs_pe_sip.c                  |   1 +
- net/netfilter/ipvs/ip_vs_rr.c                      |   1 +
- net/netfilter/ipvs/ip_vs_sed.c                     |   1 +
- net/netfilter/ipvs/ip_vs_sh.c                      |   1 +
- net/netfilter/ipvs/ip_vs_twos.c                    |   1 +
- net/netfilter/ipvs/ip_vs_wlc.c                     |   1 +
- net/netfilter/ipvs/ip_vs_wrr.c                     |   1 +
- net/netfilter/nf_conntrack_bpf.c                   |   6 +-
- net/netfilter/nf_conntrack_broadcast.c             |   1 +
- net/netfilter/nf_conntrack_netlink.c               |   1 +
- net/netfilter/nf_conntrack_proto.c                 |   1 +
- net/netfilter/nf_nat_bpf.c                         |   6 +-
- net/netfilter/nf_nat_core.c                        |   1 +
- net/netfilter/nf_nat_redirect.c                    |  27 ++++-
- net/netfilter/nf_tables_api.c                      |  23 +++-
- net/netfilter/nfnetlink_osf.c                      |   1 +
- net/netfilter/nft_chain_nat.c                      |   1 +
- net/netfilter/nft_fib.c                            |   1 +
- net/netfilter/nft_fwd_netdev.c                     |   1 +
- net/netfilter/xt_recent.c                          |   2 +-
- net/netlink/diag.c                                 |   1 +
- net/openvswitch/conntrack.c                        |   2 +-
- net/rxrpc/conn_object.c                            |   2 +-
- net/rxrpc/local_object.c                           |   2 +-
- net/sched/act_api.c                                |   2 +-
- net/sched/act_ct.c                                 |  15 ++-
- net/sched/act_gate.c                               |   1 +
- net/sched/cls_api.c                                |   9 +-
- net/sched/cls_basic.c                              |   1 +
- net/sched/cls_cgroup.c                             |   1 +
- net/sched/cls_fw.c                                 |   1 +
- net/sched/cls_route.c                              |   1 +
- net/sched/cls_u32.c                                |   1 +
- net/sched/sch_cbs.c                                |   1 +
- net/sched/sch_choke.c                              |   1 +
- net/sched/sch_drr.c                                |   1 +
- net/sched/sch_etf.c                                |   1 +
- net/sched/sch_ets.c                                |   1 +
- net/sched/sch_fifo.c                               |   1 +
- net/sched/sch_fq.c                                 |  10 +-
- net/sched/sch_gred.c                               |   1 +
- net/sched/sch_hfsc.c                               |   1 +
- net/sched/sch_htb.c                                |   1 +
- net/sched/sch_ingress.c                            |   1 +
- net/sched/sch_mqprio.c                             |   1 +
- net/sched/sch_mqprio_lib.c                         |   1 +
- net/sched/sch_multiq.c                             |   1 +
- net/sched/sch_netem.c                              |   1 +
- net/sched/sch_plug.c                               |   1 +
- net/sched/sch_prio.c                               |   1 +
- net/sched/sch_qfq.c                                |   1 +
- net/sched/sch_red.c                                |   1 +
- net/sched/sch_sfq.c                                |   1 +
- net/sched/sch_skbprio.c                            |   1 +
- net/sched/sch_taprio.c                             |   1 +
- net/sched/sch_tbf.c                                |   1 +
- net/sched/sch_teql.c                               |   1 +
- net/smc/af_smc.c                                   |   4 +-
- net/smc/smc.h                                      |   5 +
- net/smc/smc_cdc.c                                  |  11 +-
- net/smc/smc_close.c                                |   5 +-
- net/socket.c                                       |   8 +-
- net/tipc/netlink.c                                 |   4 +-
- net/vmw_vsock/virtio_transport_common.c            |  18 +++-
- net/xfrm/xfrm_interface_bpf.c                      |   6 +-
- tools/net/ynl/generated/devlink-user.c             |   2 +
- tools/net/ynl/generated/nfsd-user.c                | 120 +++++++++++++++++++--
- tools/net/ynl/generated/nfsd-user.h                |  44 +++++++-
- tools/net/ynl/ynl-gen-c.py                         |   7 +-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |   6 +-
- .../selftests/bpf/map_tests/map_percpu_stats.c     |  20 +---
- .../testing/selftests/bpf/prog_tests/cgroup_iter.c |  33 ++++++
- tools/testing/selftests/bpf/prog_tests/iters.c     |   1 +
- .../testing/selftests/bpf/prog_tests/test_bpffs.c  |  11 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- tools/testing/selftests/bpf/progs/iters_css_task.c |  55 ++++++++++
- .../selftests/bpf/progs/iters_task_failure.c       |   4 +-
- .../selftests/bpf/progs/verifier_precision.c       |  93 ++++++++++++++++
- tools/testing/selftests/bpf/verifier/bpf_st_mem.c  |  32 ++++++
- tools/testing/selftests/bpf/xdp_hw_metadata.c      |   2 +-
- tools/testing/selftests/net/pmtu.sh                |   2 +-
- tools/testing/vsock/util.c                         |  87 ++++++++++++---
- tools/testing/vsock/util.h                         |   3 +
- tools/testing/vsock/vsock_test.c                   |  50 +++++++++
- 178 files changed, 1242 insertions(+), 434 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_precision.c
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231108154626.GB8909@google.com>
+
+On Wed, Nov 08, 2023 at 03:46:26PM +0000, Lee Jones wrote:
+> Good afternoon,
+> 
+> After coming across a recent Syzkaller report [0] I thought I'd take
+> some time to firstly reproduce the issue, then see if there was a
+> trivial way to mitigate it.  The report suggests that a BUG() in
+> prog_array_map_poke_run() [1] can be trivially and reliably triggered
+> from userspace using the PoC provided [2].
+> 
+>         ret = bpf_arch_text_poke(poke->tailcall_bypass,
+>                                  BPF_MOD_JUMP,
+>                                  old_bypass_addr,
+>                                  poke->bypass_addr);
+>         BUG_ON(ret < 0 && ret != -EINVAL);
+> 
+> Indeed the PoC does seem to be able to consistently trigger the BUG(),
+> not only on the reported kernel (v6.1), but also on linux-next.  I went
+> to the trouble of checking LORE, but failed to find any patches which
+> may be attempting to fix this.
+> 
+>     kernel BUG at kernel/bpf/arraymap.c:1094!
+>     invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+>     CPU: 5 PID: 45 Comm: kworker/5:0 Not tainted 6.6.0-rc3-next-20230929-dirty #74
+>     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+>     Workqueue: events prog_array_map_clear_deferred
+>     RIP: 0010:prog_array_map_poke_run+0x6b4/0x6d0
+>     Code: ff 0f 0b e8 1e 27 e1 ff 48 c7 c7 60 80 93 85 48 c7 c6 00 7f 93 85 48 c7 c2 bb c2 39 86 b9 45 04 00 00 45 89 f8 e8 9c 890
+>     RSP: 0018:ffffc9000036fb50 EFLAGS: 00010246
+>     RAX: 0000000000000044 RBX: ffff88811f337490 RCX: 63af48a1314f9900
+>     RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+>     RBP: ffffc9000036fbe8 R08: ffffffff815c23c5 R09: 1ffff11084c14eba
+>     R10: dfffe91084c14ebc R11: ffffed1084c14ebb R12: ffff888116517800
+>     R13: dffffc0000000000 R14: ffff888125a1a400 R15: 00000000fffffff0
+>     FS:  0000000000000000(0000) GS:ffff888426080000(0000) knlGS:0000000000000000
+>     CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>     CR2: 00000000004ab678 CR3: 0000000122ac4000 CR4: 0000000000350eb0
+>     DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>     DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>     Call Trace:
+>      <TASK>
+>      ? __die_body+0x92/0xf0
+>      ? die+0xa2/0xe0
+>      ? do_trap+0x12f/0x370
+>      ? handle_invalid_op+0xa6/0x140
+>      ? handle_invalid_op+0xdf/0x140
+>      ? prog_array_map_poke_run+0x6b4/0x6d0
+>      ? prog_array_map_poke_run+0x6b4/0x6d0
+>      ? exc_invalid_op+0x32/0x50
+>      ? asm_exc_invalid_op+0x1b/0x20
+>      ? __wake_up_klogd+0xd5/0x110
+>      ? prog_array_map_poke_run+0x6b4/0x6d0
+>      ? bpf_prog_6781ebc2dae4bad9+0xb/0x53
+>      fd_array_map_delete_elem+0x152/0x250
+>      prog_array_map_clear_deferred+0xf6/0x210
+>      ? __bpf_array_map_seq_show+0xa40/0xa40
+>      ? kick_pool+0x164/0x350
+>      ? process_one_work+0x57a/0xd00
+>      process_one_work+0x5e4/0xd00
+>      worker_thread+0x9cf/0xea0
+>      kthread+0x2b4/0x350
+>      ? pr_cont_work+0x580/0x580
+>      ? kthread_blkcg+0xd0/0xd0
+>      ret_from_fork+0x4a/0x80
+>      ? kthread_blkcg+0xd0/0xd0
+>      ret_from_fork_asm+0x11/0x20
+>      </TASK>
+>     Modules linked in:
+>     ---[ end trace 0000000000000000 ]---
+> 
+> However, with my very limited BPF subsystem knowledge I was unable to
+> trivially fix the issue.  Hopefully some knowledgable person would be
+> kind enough to provide me with some pointers.
+> 
+> bpf_arch_text_poke() seems to be returning -EBUSY due to a negative
+> memcmp() result from [3].
+> 
+>         ret = -EBUSY;
+>         mutex_lock(&text_mutex);
+>         if (memcmp(ip, old_insn, X86_PATCH_SIZE)) {
+>                 goto out;
+>         [...]
+> 
+> When spitting out the memory at those locations, this is the result:
+> 
+>     ip:        e9 06 00 00 00
+>     old_insn:  0f 1f 44 00 00
+>     nop_insn:  0f 1f 44 00 00
+> 
+> As you can see, the information stored in 'ip' does not match that of
+> the data stored in 'old_insn', causing bpf_arch_text_poke() to return
+> early with the error -EBUSY, suggesting that the data pointed to by
+> 'old_insn', and by extension 'prog' should have been changed when
+> emit_call()ing, to the value of 'ip', but wasn't.
+
+hi,
+thanks for the report.. I can reproduce that easily with [2]
+
+AFAICS it looks like previous update fails because we use bpf_arch_text_poke,
+which can't find poke->tailcall_bypass value as bpf program symbol and fails
+with -EINVAL
+
+then the following update fails to find expected jmp/nop because it was never
+updated.. I think we should use __bpf_arch_text_poke like we do in
+bpf_tail_call_direct_fixup and skip the bpf symbol check
+
+with the patch below I can't reproduce the issue anymore, I'll do some more
+checking though
+
+jirka
+
+
+---
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index 8c10d9abc239..35c2988caf29 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -391,8 +391,8 @@ static int emit_jump(u8 **pprog, void *func, void *ip)
+ 	return emit_patch(pprog, func, ip, 0xE9);
+ }
+ 
+-static int __bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
+-				void *old_addr, void *new_addr)
++int __bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
++			 void *old_addr, void *new_addr)
+ {
+ 	const u8 *nop_insn = x86_nops[5];
+ 	u8 old_insn[X86_PATCH_SIZE];
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index eb84caf133df..0d7b8311fada 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -3172,6 +3172,8 @@ enum bpf_text_poke_type {
+ 
+ int bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
+ 		       void *addr1, void *addr2);
++int __bpf_arch_text_poke(void *ip, enum bpf_text_poke_type t,
++			 void *old_addr, void *new_addr);
+ 
+ void *bpf_arch_text_copy(void *dst, void *src, size_t len);
+ int bpf_arch_text_invalidate(void *dst, size_t len);
+diff --git a/kernel/bpf/arraymap.c b/kernel/bpf/arraymap.c
+index 2058e89b5ddd..4ab5864746ce 100644
+--- a/kernel/bpf/arraymap.c
++++ b/kernel/bpf/arraymap.c
+@@ -1073,33 +1073,33 @@ static void prog_array_map_poke_run(struct bpf_map *map, u32 key,
+ 			new_addr = new ? (u8 *)new->bpf_func + poke->adj_off : NULL;
+ 
+ 			if (new) {
+-				ret = bpf_arch_text_poke(poke->tailcall_target,
++				ret = __bpf_arch_text_poke(poke->tailcall_target,
+ 							 BPF_MOD_JUMP,
+ 							 old_addr, new_addr);
+ 				BUG_ON(ret < 0 && ret != -EINVAL);
+ 				if (!old) {
+-					ret = bpf_arch_text_poke(poke->tailcall_bypass,
++					ret = __bpf_arch_text_poke(poke->tailcall_bypass,
+ 								 BPF_MOD_JUMP,
+ 								 poke->bypass_addr,
+ 								 NULL);
+-					BUG_ON(ret < 0 && ret != -EINVAL);
++					BUG_ON(ret < 0);
+ 				}
+ 			} else {
+-				ret = bpf_arch_text_poke(poke->tailcall_bypass,
++				ret = __bpf_arch_text_poke(poke->tailcall_bypass,
+ 							 BPF_MOD_JUMP,
+ 							 old_bypass_addr,
+ 							 poke->bypass_addr);
+-				BUG_ON(ret < 0 && ret != -EINVAL);
++				BUG_ON(ret < 0);
+ 				/* let other CPUs finish the execution of program
+ 				 * so that it will not possible to expose them
+ 				 * to invalid nop, stack unwind, nop state
+ 				 */
+ 				if (!ret)
+ 					synchronize_rcu();
+-				ret = bpf_arch_text_poke(poke->tailcall_target,
++				ret = __bpf_arch_text_poke(poke->tailcall_target,
+ 							 BPF_MOD_JUMP,
+ 							 old_addr, NULL);
+-				BUG_ON(ret < 0 && ret != -EINVAL);
++				BUG_ON(ret < 0);
+ 			}
+ 		}
+ 	}
 
