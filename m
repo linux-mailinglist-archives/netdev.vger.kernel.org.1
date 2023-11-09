@@ -1,283 +1,215 @@
-Return-Path: <netdev+bounces-46760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF64E7E64A4
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:48:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975B27E64B9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:51:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F8F2B20B7B
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 07:48:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9E981C20982
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 07:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBA4DF5D;
-	Thu,  9 Nov 2023 07:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7187101ED;
+	Thu,  9 Nov 2023 07:51:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAWZfrfP"
+	dkim=pass (2048-bit key) header.d=csgroup.eu header.i=@csgroup.eu header.b="B8vIy1yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD41FBE7
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 07:48:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F3BEC433C9;
-	Thu,  9 Nov 2023 07:48:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699516083;
-	bh=YRAy8iTLsEF+5UmCR2/LBnCbDvTxfTKlhX4bNT18h4A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aAWZfrfPDqa5/HwXsBChoxIJuCKDgtURxgn79PM2Q0JL/HSj7t8ShA83sCri98W56
-	 rEsR/H7S0Ir4RWxizWy8tukJHBkpCBSHElBPVm55gYDoMWi/+ilRWE54vUC0qzUT+5
-	 ZmwnLhAB1U+T/Gm7/uwJvJsf4gBfjpuqfKB1pT9eFkbXf0MvF1J+BChouA2p0JoEcr
-	 PlJVUXAqNs2QjtbM1LTdfuXnnmes6I5hBlToi4Ske5RlxNKgJOrK6CCsitbtzqbvOT
-	 mNXzv9BXLm2rDjfLig3nidMa5noDj7Lb5gQ0Y1uaw/HIFJgSjNEoHZLhKYZ81A6ueg
-	 P/v9AYOX+rs5A==
-Date: Thu, 9 Nov 2023 08:48:00 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Sven Auhagen <sven.auhagen@voleatech.de>
-Cc: netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, brouer@redhat.com,
-	ilias.apalodimas@linaro.org, mcroce@microsoft.com, leon@kernel.org,
-	kuba@kernel.org
-Subject: Re: [PATCH v4] net: mvneta: fix calls to page_pool_get_stats
-Message-ID: <ZUyOsB7p6j21e42c@lore-desk>
-References: <4wba22pa6sxknqfxve42xevswz4wfu637p5gyyeq546tmzudzu@4z3kphfrpm64>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54076101C9;
+	Thu,  9 Nov 2023 07:51:04 +0000 (UTC)
+Received: from FRA01-PR2-obe.outbound.protection.outlook.com (mail-pr2fra01on2045.outbound.protection.outlook.com [40.107.12.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575B2268D;
+	Wed,  8 Nov 2023 23:51:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gez0/G1mCD+PhwYzccbK7HnNolg7+ar01RUnR87+ImavIEpjwL7qAvGFTKTj6BGiMBO61bX4usAJcTkj3Z0brhsS8mBYgNyyqNkScyx6+tO3lNp5JvTCbYL/OZPDP7dcsNq01zY9nDLYVKj2bi/quYGdsxo6GipMKe6+Wzp0e2BWaymBjsiwmvvPqUqzN0sZOEbDKgxowCDajCLVgdmBnQsOjxtzzxqNLByw4jY+upjsWc1cmxW8o7z3IEZon7W1087IhEWh2nV6IIIITky52pNxT1RZtw2tPOb/2vbrEF3Oma6skKv6kyvGhGjcMxGSZiaIB3mFzTpT2gOn7BXpKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+2eikrIvlQMysYuM6u0fRDWCLfWqS7aaq5BFW/jxHc8=;
+ b=IYMBQPFEvQZSZn8Ffui4Tr0gK89zqi+6ldBXyiw/1rE151znz9dJ98+SfXMry8xi/3CiKrA3p8I/HqM4yKyFxDuhZ6Dtzl9oUaZAQNA+DnpF4C9vKh5+QOBaXs6r9Vx70U6qhOaXCVV75ma1nw7k5pZzUj7xGQJRFq1nC8MbnwKdVa04gRlkjj9o7cvStrx3I2BXbjtLKa9JGFYhqKcc/bUWy1OYzMI7wMokhqwHE4ooKMmkZWF4JP89GWlQ1W69xyTgPqYmxLoSSzXF5mnOj/gqCbVpo9JxJKHEok/gu4czPGuhgeUEehXD/h4o4E5tcGPnCOV8U48pkrzafmCFCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=csgroup.eu; dmarc=pass action=none header.from=csgroup.eu;
+ dkim=pass header.d=csgroup.eu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=csgroup.eu;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+2eikrIvlQMysYuM6u0fRDWCLfWqS7aaq5BFW/jxHc8=;
+ b=B8vIy1ybcPgZQDxKEwmYuC+a2brKKmIKurGqsGw4CAapwaKS534T8Fg41c2rS0XTCNLbDu/CGG1/ciGUt6xzDHFjrYsQQ5CuUxmqcALLKpNpPBeP3nZCgOmgQI1Gk2AJpUWWulPJ8MBMMpMpaEDxYC1PrpNiml+lqEe8c9tJG1NonL0/WMtYt+5utYraekI2unAmg0JSBwf8mq/lKELAie7IqhalFE6X1Tgg7eGDTKNLlGiq+J/bmPyShv4reBz2YCpZD+kOzIjpecUu/2cCe+oDc/GJrdDa4igHwN/1NJOW9Ep61xYg7dTHzCpVvTDds7bdb0VN1bUjF66S9YXHSA==
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM (2603:10a6:501:31::15)
+ by PR0P264MB2060.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:166::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.7; Thu, 9 Nov
+ 2023 07:50:59 +0000
+Received: from MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::5bfe:e2f2:6d89:8d97]) by MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+ ([fe80::5bfe:e2f2:6d89:8d97%3]) with mapi id 15.20.7002.007; Thu, 9 Nov 2023
+ 07:50:59 +0000
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Arnd Bergmann <arnd@arndb.de>, Arnd Bergmann <arnd@kernel.org>, Andrew
+ Morton <akpm@linux-foundation.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Masahiro Yamada <masahiroy@kernel.org>,
+	"linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+CC: Matt Turner <mattst88@gmail.com>, Vineet Gupta <vgupta@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, Catalin Marinas
+	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Steven Rostedt
+	<rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mark Rutland
+	<mark.rutland@arm.com>, guoren <guoren@kernel.org>, Peter Zijlstra
+	<peterz@infradead.org>, Ard Biesheuvel <ardb@kernel.org>, Huacai Chen
+	<chenhuacai@kernel.org>, Greg Ungerer <gerg@linux-m68k.org>, Michal Simek
+	<monstr@monstr.eu>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Dinh
+ Nguyen <dinguyen@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>, Geoff Levand <geoff@infradead.org>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Heiko Carstens <hca@linux.ibm.com>, John Paul
+ Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, "David S . Miller"
+	<davem@davemloft.net>, Andy Lutomirski <luto@kernel.org>, Thomas Gleixner
+	<tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "x86@kernel.org"
+	<x86@kernel.org>, Helge Deller <deller@gmx.de>, Sudip Mukherjee
+	<sudipm.mukherjee@gmail.com>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>, Timur Tabi <timur@kernel.org>, Kent Overstreet
+	<kent.overstreet@linux.dev>, David Woodhouse <dwmw2@infradead.org>, "Naveen
+ N. Rao" <naveen.n.rao@linux.ibm.com>, Anil S Keshavamurthy
+	<anil.s.keshavamurthy@intel.com>, Kees Cook <keescook@chromium.org>, Vincenzo
+ Frascino <vincenzo.frascino@arm.com>, Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>, Nathan Chancellor
+	<nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, Nicolas
+ Schier <nicolas@fjasle.eu>, Alexander Viro <viro@zeniv.linux.org.uk>,
+	=?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?= <u.kleine-koenig@pengutronix.de>,
+	"linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>,
+	"linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-trace-kernel@vger.kernel.org"
+	<linux-trace-kernel@vger.kernel.org>, "linux-csky@vger.kernel.org"
+	<linux-csky@vger.kernel.org>, "loongarch@lists.linux.dev"
+	<loongarch@lists.linux.dev>, "linux-m68k@lists.linux-m68k.org"
+	<linux-m68k@lists.linux-m68k.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+	<linuxppc-dev@lists.ozlabs.org>, "linux-riscv@lists.infradead.org"
+	<linux-riscv@lists.infradead.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "linux-sh@vger.kernel.org"
+	<linux-sh@vger.kernel.org>, "sparclinux@vger.kernel.org"
+	<sparclinux@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
+	"linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+	"linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"linux-bcachefs@vger.kernel.org" <linux-bcachefs@vger.kernel.org>,
+	"linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>
+Subject: Re: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Thread-Topic: [PATCH 15/22] arch: vdso: consolidate gettime prototypes
+Thread-Index: AQHaEkPkiwEWo83izEmVhjzNZW4UOLBwvvwAgAASbACAAM0CgA==
+Date: Thu, 9 Nov 2023 07:50:58 +0000
+Message-ID: <9cbfbd59-0761-406d-e97e-75e83bc4e6d0@csgroup.eu>
+References: <20231108125843.3806765-1-arnd@kernel.org>
+ <20231108125843.3806765-16-arnd@kernel.org>
+ <ecedb0f1-9543-35c6-18bd-723e6bf21173@csgroup.eu>
+ <d94de5b8-db92-4055-9484-f2666973c02a@app.fastmail.com>
+In-Reply-To: <d94de5b8-db92-4055-9484-f2666973c02a@app.fastmail.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=csgroup.eu;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MRZP264MB2988:EE_|PR0P264MB2060:EE_
+x-ms-office365-filtering-correlation-id: 7fd46605-a5a3-4429-7fe6-08dbe0f89cc6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ CotvFx75DMMuKHwjPh2tXnWiHwsxyYHENTBYC1puuKnRMcbQUY4adXRJxExQ/HzFzIMHzN35wsMH3iE7TOqI6RYzUwuDVyyXlfjxA59YKtgE2uroyFAcnB/oSQjxm5nibe8NhSbRUgU9F42GEn4wSMq1jDTxl0mGQjJ1EHcIBe7kH2Ik0nbjnPLnGC+qyWJMifT8Na5K+e2lwRZoIoYf3mnZw7wg95MUOl6FE1WiMusyeNqxGlK6M8w7Vw5AlX97OdrTwdxRD7pekgqpv17utzAQWfWCSEb+wx7TFt8ZELxwn8yP4l/Qx+OXPr/u5+ANojBDEHq/Io89KJSFmcBcoMP7X45IpOZ4CZbV84LvkYq/7o/C9PeZYw3LJ5+IlditUdyUZxECHCHfrbAX9PS/p+DceKpDJmbdcNoINdxy7mdbw0k7US2W0ankT/9tYApKOoNchr31ZOLyjLbBklY5LpFeow3TVXA5VibHRmwLuzFn/gvRc/SX2/ceZcS7NDjJTsWnkbtadIFLk3G4Ll+02/ZySr/I/cV8Uhb7JqAv2lgFz5MDuhDz+woJDl+FEKiXA8cq8AUFKByafmrA02Eq3RJVWlqivQ5GzrRtScU5bagNQkSYKGvC4c9tlojLdfdruvy1Z6X9cD+op+vUz41G/yRig98scD2krjPBw0pTcGT00UhEhaeOGf1uc/HWe0FG
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(39850400004)(346002)(376002)(136003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(31686004)(6486002)(478600001)(2616005)(71200400001)(6506007)(6512007)(36756003)(38100700002)(122000001)(86362001)(31696002)(66476007)(7366002)(7416002)(5660300002)(7406005)(64756008)(110136005)(76116006)(66556008)(66446008)(54906003)(316002)(66946007)(41300700001)(91956017)(44832011)(83380400001)(2906002)(38070700009)(4326008)(8936002)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UEdnV051TnhxRWI3c05VY1JMN3pQNWpYeTdQK3pWZVZHSk5QdFRoOUhjRHdo?=
+ =?utf-8?B?MWE5RmN5bGlCZitWMUluTldmZE5HM1U5ck1TOWxpQ3pVd25pc3lCSGt3YVBC?=
+ =?utf-8?B?WStCSDRRMWFPZ0o5SHlhNDRBczdQcS9LOHZzTTlrb1IrREhTdXBqTWNkMzNx?=
+ =?utf-8?B?NlFZVmN4M3FBYzVmQzAxd3k4c2gvV25rczQ2Z2xoZk5tejlqRnhyampaOXh4?=
+ =?utf-8?B?bDdKbzhEOVFMSitudmIvWERWT2xrd3pneE8zdUlkdjZXYlk4NElmbSt5V29p?=
+ =?utf-8?B?ZS94SDZRMXladGMxUHRiS0lxeExHU1pBRkRlMHVsRU9TSW5VWjllVUhKM2Fk?=
+ =?utf-8?B?VnlvaXNTRFR5RnFwTDFETm96cDJyQnQxRndrNXkyVzJ1RTFXYlVhaURuUUxr?=
+ =?utf-8?B?STlTbklzL0pTenRBM3dIZVVqRTZZU1dEbVN3eXRMZmNmV1ZlTmpROHZZd3dB?=
+ =?utf-8?B?clI4eTR4azVSWkxFQ2ZnODZJZE1MWlJCRWZVU00vaDRKYzczS1QrVzhQbkpi?=
+ =?utf-8?B?azNsL3NSZlBNbmtKTXk1V0Nqbm1VckNlQWZLODQxVmdrYzY3dHlXemYxdjlN?=
+ =?utf-8?B?NGpENTlDTWhMSWxMRlBUcnQwNGl4MDNKUjl6dlZzSDhCRFRtdnZFcmFicEty?=
+ =?utf-8?B?cjdQOUpwV0pnS0pHZEw5YzNDa1BtWGxnbXQwOUxsTjNuSjY2aHlhYUtQeVJm?=
+ =?utf-8?B?WFdpRmN3MEc0QVJEUWhvLy9CK2E1bGFBUlZNUC9YQ3FuaDRuRUJsTThieTZZ?=
+ =?utf-8?B?Y1M3Y05lSTlsRkNTSnB5WGhWSVk0NFErNGdURC82UGN1d1RrZTJNYkNSWk1u?=
+ =?utf-8?B?YWJ0KzBOUDVUMTFuQmVkNG9xOU5WY0M0MTNkbFpsTDRJZUorWUM0b0k3WlYy?=
+ =?utf-8?B?clN1WGFQMldEd0ZwWlU3TVcxMERSZEo0UzlQRTBoUFo1YUhnTzhrQ081NHJI?=
+ =?utf-8?B?YXhtcUFJNEdvUlR3OU5IN3VxSzdoK0xqTFZiTG1IanFPK3g4VCtEQnVzTDBi?=
+ =?utf-8?B?VUQ0TnV1cjNzMEZhbzZCeUdoUWRFUVVVbmQwWnBMSkp1U2lwMmhLUXJsR0ZU?=
+ =?utf-8?B?ZVNyYnF5U3hUekljYmFvT29VZW5SeTNEUm5McFUzdUtLdzJLbmRFdG9XSDRF?=
+ =?utf-8?B?TDFaQ01vZGUrZThPS2tSS0ZBcDBzcFU0cHliang5YVQ5c0V6UkNCZ2Y5bVpr?=
+ =?utf-8?B?OHRPTkdZcnpsbDNja0VaZlJmNE9xR0xZYTRvQ3YyS253NThuV0srbmdVbnBR?=
+ =?utf-8?B?TUZLRTUzZDNoRDVFSHM3bk9BNU5lRkJJU2ZwaGhldE5qOUhLY1BGaG1yTmE5?=
+ =?utf-8?B?K2RTN1prSFpiZ05IQ0xxWHlnaGFPSjhaeWVzYmdNQWovcGMrYjBFbHJ2MmtV?=
+ =?utf-8?B?eXk2bFpBd0RoaWZHeDFyak9EUTZxbTRYWTliSThaU29VUmZHWTBFd1FQbVdx?=
+ =?utf-8?B?Q3REN05SV2NqWE9XVk5senRKc2FiSHJNcWNObkdSc1dHS3lhWDduL0swUXJF?=
+ =?utf-8?B?S3ZWY2IzTmZjSzkwVXAxWVZKbXRZOGVQNXphYzZtZTB5RllxZFB0dkJ2Ymdq?=
+ =?utf-8?B?SWhYdDFrdkZCdnNqUkp5VFI4c1N4aHQ2MG41OHlISlJrbTJYMWJybkdXV2Zh?=
+ =?utf-8?B?ZXV6NHpJWU5FK243Q1gzZkJMa0J6dFRZeFVVS09PQ2R4RFcwM2VtT0pVWkli?=
+ =?utf-8?B?MWIrZU9RZjJ3MkFVYU9HVEcwRlNIVjA3cmNJcC9ZYVIzb1FyS2xYWVk3MlFh?=
+ =?utf-8?B?bStkZkVQenZYMFRUazlsT04xeFMwb1VjVTg1bmU4b1hXc1RBYWY4bzltL2pP?=
+ =?utf-8?B?M0wzN0thaFl4bTBwWXRVdzAxM0RabmMxNjFQTE5XN2s0K1gxbWFZZ0ZLbUIx?=
+ =?utf-8?B?ckE2UXJaQ0RmQXdyZnNoZ3dPaHJwRmo3TjNJNFozc2JNQlB1OTRpSDY5YVNR?=
+ =?utf-8?B?aXFmT2VKUkNMaGNlOGhhM0tRaEZ1eWRneCtyNU4zVS9FRU9YSDNwYWFYcGVt?=
+ =?utf-8?B?QlJDVE5LdU1uQkZkK09FekdrTHNKZzFQcG50Uk5nZHBOUWpMeFJnWXd2bk1B?=
+ =?utf-8?B?YVREV0NoU1ZUOE5Wc1p6QWtSMHNldXRYUjFucm54NmtQN0FPSVYzTW5EUUc3?=
+ =?utf-8?B?N0tmQ2ttZHF4VjF2cEdUMHZZSzlZSk1xeW5ZVVdFTUxSTUJsdGJ4YS9wUjAv?=
+ =?utf-8?B?eEF2WXRvKzhNSXUvVWMyT1ZYc2Q1QmxISVRsbkpEOXhVcys4bUcrVlordlM3?=
+ =?utf-8?B?MGN3Rm9hTGhaY0VPUW9KSDZoMjFnPT0=?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6ADA312F05CBD14886F7686E9E3B661D@FRAP264.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="m3L85qAxctbLnJio"
-Content-Disposition: inline
-In-Reply-To: <4wba22pa6sxknqfxve42xevswz4wfu637p5gyyeq546tmzudzu@4z3kphfrpm64>
+X-OriginatorOrg: csgroup.eu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MRZP264MB2988.FRAP264.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fd46605-a5a3-4429-7fe6-08dbe0f89cc6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 07:50:58.9770
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 9914def7-b676-4fda-8815-5d49fb3b45c8
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XhXpgb1F2l6xtfeDBb9/frhCt+QuHDXHsK2ocb0duLDJUEQTcU0qq5eUKD6YhHGrBYQ38DA1iI/n+JUTe0W4xwlIAzSyupKvu+IsauF1FpQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR0P264MB2060
 
-
---m3L85qAxctbLnJio
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> Calling page_pool_get_stats in the mvneta driver without checks
-> leads to kernel crashes.
-> First the page pool is only available if the bm is not used.
-> The page pool is also not allocated when the port is stopped.
-> It can also be not allocated in case of errors.
->=20
-> The current implementation leads to the following crash calling
-> ethstats on a port that is down or when calling it at the wrong moment:
->=20
-> ble to handle kernel NULL pointer dereference at virtual address 00000070
-> [00000070] *pgd=3D00000000
-> Internal error: Oops: 5 [#1] SMP ARM
-> Hardware name: Marvell Armada 380/385 (Device Tree)
-> PC is at page_pool_get_stats+0x18/0x1cc
-> LR is at mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
-> pc : [<c0b413cc>]    lr : [<bf0a98d8>]    psr: a0000013
-> sp : f1439d48  ip : f1439dc0  fp : 0000001d
-> r10: 00000100  r9 : c4816b80  r8 : f0d75150
-> r7 : bf0b400c  r6 : c238f000  r5 : 00000000  r4 : f1439d68
-> r3 : c2091040  r2 : ffffffd8  r1 : f1439d68  r0 : 00000000
-> Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> Control: 10c5387d  Table: 066b004a  DAC: 00000051
-> Register r0 information: NULL pointer
-> Register r1 information: 2-page vmalloc region starting at 0xf1438000 all=
-ocated at kernel_clone+0x9c/0x390
-> Register r2 information: non-paged memory
-> Register r3 information: slab kmalloc-2k start c2091000 pointer offset 64=
- size 2048
-> Register r4 information: 2-page vmalloc region starting at 0xf1438000 all=
-ocated at kernel_clone+0x9c/0x390
-> Register r5 information: NULL pointer
-> Register r6 information: slab kmalloc-cg-4k start c238f000 pointer offset=
- 0 size 4096
-> Register r7 information: 15-page vmalloc region starting at 0xbf0a8000 al=
-located at load_module+0xa30/0x219c
-> Register r8 information: 1-page vmalloc region starting at 0xf0d75000 all=
-ocated at ethtool_get_stats+0x138/0x208
-> Register r9 information: slab task_struct start c4816b80 pointer offset 0
-> Register r10 information: non-paged memory
-> Register r11 information: non-paged memory
-> Register r12 information: 2-page vmalloc region starting at 0xf1438000 al=
-located at kernel_clone+0x9c/0x390
-> Process snmpd (pid: 733, stack limit =3D 0x38de3a88)
-> Stack: (0xf1439d48 to 0xf143a000)
-> 9d40:                   000000c0 00000001 c238f000 bf0b400c f0d75150 c481=
-6b80
-> 9d60: 00000100 bf0a98d8 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9d80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9da0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9dc0: 00000dc0 5335509c 00000035 c238f000 bf0b2214 01067f50 f0d75000 c0b9=
-b9c8
-> 9de0: 0000001d 00000035 c2212094 5335509c c4816b80 c238f000 c5ad6e00 0106=
-7f50
-> 9e00: c1b0be80 c4816b80 00014813 c0b9d7f0 00000000 00000000 0000001d 0000=
-001d
-> 9e20: 00000000 00001200 00000000 00000000 c216ed90 c73943b8 00000000 0000=
-0000
-> 9e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9e60: 00000000 c0ad9034 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9e80: 00000000 00000000 00000000 5335509c c1b0be80 f1439ee4 00008946 c1b0=
-be80
-> 9ea0: 01067f50 f1439ee3 00000000 00000046 b6d77ae0 c0b383f0 00008946 becc=
-83e8
-> 9ec0: c1b0be80 00000051 0000000b c68ca480 c7172d00 c0ad8ff0 f1439ee3 cf60=
-0e40
-> 9ee0: 01600e40 32687465 00000000 00000000 00000000 01067f50 00000000 0000=
-0000
-> 9f00: 00000000 5335509c 00008946 00008946 00000000 c68ca480 becc83e8 c05e=
-2de0
-> 9f20: f1439fb0 c03002f0 00000006 5ac3c35a c4816b80 00000006 b6d77ae0 c030=
-caf0
-> 9f40: c4817350 00000014 f1439e1c 0000000c 00000000 00000051 01000000 0000=
-0014
-> 9f60: 00003fec f1439edc 00000001 c0372abc b6d77ae0 c0372abc cf600e40 5335=
-509c
-> 9f80: c21e6800 01015c9c 0000000b 00008946 00000036 c03002f0 c4816b80 0000=
-0036
-> 9fa0: b6d77ae0 c03000c0 01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
-0000
-> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
-7ae0
-> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858 40000030 0000000b 00000000 0000=
-0000
->  page_pool_get_stats from mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
->  mvneta_ethtool_get_stats [mvneta] from ethtool_get_stats+0x154/0x208
->  ethtool_get_stats from dev_ethtool+0xf48/0x2480
->  dev_ethtool from dev_ioctl+0x538/0x63c
->  dev_ioctl from sock_ioctl+0x49c/0x53c
->  sock_ioctl from sys_ioctl+0x134/0xbd8
->  sys_ioctl from ret_fast_syscall+0x0/0x1c
-> Exception stack(0xf1439fa8 to 0xf1439ff0)
-> 9fa0:                   01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
-0000
-> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
-7ae0
-> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858
-> Code: e28dd004 e1a05000 e2514000 0a00006a (e5902070)
->=20
-> This commit adds the proper checks before calling page_pool_get_stats.
->=20
-> Fixes: b3fc79225f05 ("net: mvneta: add support for page_pool_get_stats")
-> Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
-> Reported-by: Paulo Da Silva <Paulo.DaSilva@kyberna.com>
-> ---
-
-Hi Sven,
-
-first of all thx for fixing it. Just minor comments inline.
-
-Regards,
-Lorenzo
-
->=20
-> Change from v3:
-> 	* Move the page pool check back to mvneta
->=20
-> Change from v2:
-> 	* Fix the fixes tag
->=20
-> Change from v1:
-> 	* Add cover letter
-> 	* Move the page pool check in mvneta to the ethtool stats
-> 	  function
->=20
-> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet=
-/marvell/mvneta.c
-> index 8b0f12a0e0f2..bbb5d972657a 100644
-> --- a/drivers/net/ethernet/marvell/mvneta.c
-> +++ b/drivers/net/ethernet/marvell/mvneta.c
-> @@ -4734,13 +4734,16 @@ static void mvneta_ethtool_get_strings(struct net=
-_device *netdev, u32 sset,
->  {
->  	if (sset =3D=3D ETH_SS_STATS) {
->  		int i;
-> +		struct mvneta_port *pp =3D netdev_priv(netdev);
-
-nit: reverse christmas tree here (just if you need to repost)
-
-> =20
->  		for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
->  			memcpy(data + i * ETH_GSTRING_LEN,
->  			       mvneta_statistics[i].name, ETH_GSTRING_LEN);
-> =20
-> -		data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> -		page_pool_ethtool_stats_get_strings(data);
-> +		if (!pp->bm_priv) {
-> +			data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> +			page_pool_ethtool_stats_get_strings(data);
-> +		}
->  	}
->  }
-> =20
-> @@ -4858,8 +4861,10 @@ static void mvneta_ethtool_pp_stats(struct mvneta_=
-port *pp, u64 *data)
->  	struct page_pool_stats stats =3D {};
->  	int i;
-> =20
-> -	for (i =3D 0; i < rxq_number; i++)
-> -		page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> +	for (i =3D 0; i < rxq_number; i++) {
-> +		if (pp->rxqs[i].page_pool)
-> +			page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> +	}
-> =20
->  	page_pool_ethtool_stats_get(data, &stats);
->  }
-> @@ -4875,14 +4880,21 @@ static void mvneta_ethtool_get_stats(struct net_d=
-evice *dev,
->  	for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
->  		*data++ =3D pp->ethtool_stats[i];
-> =20
-> -	mvneta_ethtool_pp_stats(pp, data);
-> +	if (!pp->bm_priv && !pp->is_stopped)
-
-do we need to check pp->is_stopped here? (we already check if page_pool
-pointer is NULL in mvneta_ethtool_pp_stats).
-Moreover in mvneta_ethtool_get_sset_count() and in mvneta_ethtool_get_strin=
-gs()
-we just check pp->bm_priv pointer. Are the stats disaligned in this case?
-
-> +		mvneta_ethtool_pp_stats(pp, data);
->  }
-> =20
->  static int mvneta_ethtool_get_sset_count(struct net_device *dev, int sse=
-t)
->  {
-> -	if (sset =3D=3D ETH_SS_STATS)
-> -		return ARRAY_SIZE(mvneta_statistics) +
-> -		       page_pool_ethtool_stats_get_count();
-> +	if (sset =3D=3D ETH_SS_STATS) {
-> +		int count =3D ARRAY_SIZE(mvneta_statistics);
-> +		struct mvneta_port *pp =3D netdev_priv(dev);
-> +
-> +		if (!pp->bm_priv)
-> +			count +=3D page_pool_ethtool_stats_get_count();
-> +
-> +		return count;
-> +	}
-> =20
->  	return -EOPNOTSUPP;
->  }
-> --=20
-> 2.42.0
->=20
-
---m3L85qAxctbLnJio
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZUyOsAAKCRA6cBh0uS2t
-rM+vAQCFsTmIg/gIC93/LQNRzoPcRkZMCZItEqV+2zoqWRJSxAEA9lDfdB097rAK
-4S5TPQMe6TPInLIpjwYGpyO9l1Nv3gc=
-=1CvT
------END PGP SIGNATURE-----
-
---m3L85qAxctbLnJio--
+DQoNCkxlIDA4LzExLzIwMjMgw6AgMjA6MzcsIEFybmQgQmVyZ21hbm4gYSDDqWNyaXTCoDoNCj4g
+T24gV2VkLCBOb3YgOCwgMjAyMywgYXQgMTk6MzEsIENocmlzdG9waGUgTGVyb3kgd3JvdGU6DQo+
+PiBMZSAwOC8xMS8yMDIzIMOgIDEzOjU4LCBBcm5kIEJlcmdtYW5uIGEgw6ljcml0wqA6DQo+IA0K
+Pj4gcG93ZXJwYyBoYXMgZnVuY3Rpb25zIGRvaW5nIG1vcmUgb3IgbGVzcyB0aGUgc2FtZSwgdGhl
+eSBhcmUgY2FsbGVkDQo+PiBfX2Nfa2VybmVsX2Nsb2NrX2dldHRpbWUoKSBhbmQgYWxpa2Ugd2l0
+aCB0aGVpciBwcm90b3R5cGVzIHNpdGluZyBpbg0KPj4gYXJjaC9wb3dlcnBjL2luY2x1ZGUvYXNt
+L3Zkc28vZ2V0dGltZW9mZGF5LmgNCj4+DQo+PiBTaG91bGQgdGhvc2UgcHJvdG90eXBlcyBiZSBt
+b3ZlZCB0byBpbmNsdWRlL3Zkc28vZ2V0dGltZS5oIHRvbyBhbmQNCj4+IGV2ZW50dWFsbHkgcmVu
+YW1lZCwgb3IgYXJlIHRoZXkgY29uc2lkZXJlZCB0b28gcG93ZXJwYyBzcGVjaWZpYyA/DQo+IA0K
+PiBJIGRvbid0IGFjdHVhbGx5IGtub3csIG15IGluaXRpYWwgaW50ZXJwcmV0YXRpb24gd2FzIHRo
+YXQNCj4gdGhlc2UgZnVuY3Rpb24gbmFtZXMgYXJlIHBhcnQgb2YgdGhlIHVzZXIgQUJJIGZvciB0
+aGUgdmRzbywNCj4gYnV0IEkgbmV2ZXIgbG9va2VkIGNsb3NlbHkgZW5vdWdoIGF0IGhvdyB2ZHNv
+IHdvcmtzIHRvDQo+IGJlIHN1cmUgd2hhdCB0aGUgYWN0dWFsIEFCSSBpcy4NCj4gDQo+IElmIF9f
+Y19rZXJuZWxfY2xvY2tfZ2V0dGltZSgpIGV0YyBhcmUgbm90IHBhcnQgb2YgdGhlIHVzZXItZmFj
+aW5nDQo+IEFCSSwgSSB0aGluayByZW5hbWluZyB0aGVtIGZvciBjb25zaXN0ZW5jeSB3aXRoIHRo
+ZSBvdGhlcg0KPiBhcmNoaXRlY3R1cmVzIHdvdWxkIGJlIGJlc3QuDQo+IA0KDQpVc2VyLWZhY2lu
+ZyBBQkkgZnVuY3Rpb24gaXMgX19rZXJuZWxfY2xvY2tfZ2V0dGltZSgpLCBkZWZpbmVkIGluIA0K
+YXJjaC9wb3dlcnBjL2tlcm5lbC92ZHNvL2dldHRpbWVvZmRheS5TICwgc2VlIG1hbiB2ZHNvLg0K
+VGhlcmUgaXMgbm8gcHJvdG90eXBlIGRlZmluZWQgZm9yIGl0IGFueXdoZXJlLCBvYnZpb3VzbHkg
+dGhhdCdzIA0KdW5kZXRlY3RlZCBiZWNhdXNlIGl0IGlzIGFzc2VtYmx5LiBTaG91bGQgYSBwcm90
+b3R5cGUgYmUgYWRkZWQgc29tZXdoZXJlIA0KYW55d2F5ID8NCg0KX19rZXJuZWxfY2xvY2tfZ2V0
+dGltZSgpIHNldHMgdXAgYSBzdGFjayBmcmFtZSwgcmV0cmlldmVzIHRoZSBhZGRyZXNzIG9mIA0K
+dGhlIGRhdGFwYWdlIHRoZW4gY2FsbHMgX19jX2tlcm5lbF9jbG9ja19nZXR0aW1lKCkgd2hpY2gg
+dGhlbiBjYWxscyANCl9fY3Zkc29fY2xvY2tfZ2V0dGltZV9kYXRhKCkgd2hpY2ggaXMgcGFydCBv
+ZiB0aGUgZ2VuZXJpYyBDVkRTTy4NCg0KTWF5YmUgdGhhdCdzIHRvbyBkaWZmZXJlbnQgZnJvbSB3
+aGF0IG90aGVyIGFyY2hpdGVjdHVyZXMgZG8gPw0KDQpDaHJpc3RvcGhlDQo=
 
