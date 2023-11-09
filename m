@@ -1,181 +1,239 @@
-Return-Path: <netdev+bounces-46766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA687E64F8
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:12:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09CAC7E64F9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 708E21C208ED
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:12:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B706C281051
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6687B10780;
-	Thu,  9 Nov 2023 08:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8384110784;
+	Thu,  9 Nov 2023 08:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gF+F5FIo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K/g2Vb4P"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445D71078C
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:12:26 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597F42D4F
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:12:25 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c509f2c46cso6933361fa.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:12:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699517543; x=1700122343; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fM3Oq3397BLHIwz7mWQIogkat/eFZMzgGCTfhk2qn+A=;
-        b=gF+F5FIoq9O3VxPFZRZ18cGY08DIzxgqY/uG7j+TvcIppfgu5QvHCNH4SwKc/0q2ft
-         P9agJ50a3OWNzJacSb+PXuVEk7I9c0B4hvK14u+9kfFWy8r66VT7LBDgNhheNnFKBsAu
-         7LP+hN17Quw4Qi8tnbAcnSnBbcnOs/Mmk4O6V9SUUqsJ0vg07b/amhFhgsyLXeyLU3aM
-         6qUq0ZpfyrMCFQD5BTq0x8PPJfgl0uokr1DTG87Aotp+Fo5ui/vgbyvgKzuQ9DRPUmM7
-         Eao8+hlStWHICWwzhbSxG9YumNPe5q/yEP0Fgoo8WEwhrMw/DAei+SSJxjoijGo/XdfL
-         pkMg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB6110780
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:12:37 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC5F2737
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:12:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699517555;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3TtQkLzXAXLHc3UJQsu7PPbU+hHtju2TNGzcG1eMX/E=;
+	b=K/g2Vb4PtGzrvolCzAgZPC84ki9DHmmPoFLisxhCbXKcHBqArVBOUSpQUZ8FEdRg1NYf4Q
+	MxNfG8jHNQyyMi/HWYRGEGyI1v/j6fSqhMMCuO73naeyQuab8e+SYe2G6r/TRUhPcyqWcf
+	ATuFn0QiHXbEdagBUZANmQ96zezfGGM=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74-ReYw9nEnMjWP1ndI7iziSg-1; Thu, 09 Nov 2023 03:12:34 -0500
+X-MC-Unique: ReYw9nEnMjWP1ndI7iziSg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9d25d0788b8so46522166b.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:12:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699517543; x=1700122343;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fM3Oq3397BLHIwz7mWQIogkat/eFZMzgGCTfhk2qn+A=;
-        b=Y5zXD48nrdQGtMr4D8ZfnfG0GYRjZ2UpFxPIMXkjR+UJxgDkB4nd4LzP1Urjb387o9
-         UBx6sRIxXRblkwNZWqnjw7dBtzNCkqBk7NxYKcNsGl3RdVlwsFnbAqb2+sBk25jq39lb
-         6nTzRJqw21yuJfn6bgvC00Ph68/kW/F9Ffx28PJhgFhVSIZem627Nxg3DwSeIHtoiF3D
-         75gqdluw+wP6Z6BOGvCq3okgb1d+L2OZ8Q54cKTtwUlMzmm8sE/P0nsJY2EwknB5KeJO
-         3164/snSccPc/GnNXWXLofr8kj2KTqc6XOAU+ntfDvZtaDKaKj9wM+0X/Z8fLWBT4b0a
-         gROQ==
-X-Gm-Message-State: AOJu0YwT2o5SWrLr2OQLsVXMsTkLSEQpBt2QX3XW7TCHHo56hFtNjzwo
-	XayAArRoerBSDlk9SEoVtRIM7qhEi4kobJp9EajGFZJgaZ2XSuGi
-X-Google-Smtp-Source: AGHT+IGzfhdkSTR9vBrfxXosiP8TXTg15B6sFYA4BvQj+rj8MpijhuUKuQOqnEVGqmfbbh6MDti++o7v6jO67T+BfJk=
-X-Received: by 2002:a2e:9e88:0:b0:2c5:582:fd8e with SMTP id
- f8-20020a2e9e88000000b002c50582fd8emr3618843ljk.21.1699517543550; Thu, 09 Nov
- 2023 00:12:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699517553; x=1700122353;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3TtQkLzXAXLHc3UJQsu7PPbU+hHtju2TNGzcG1eMX/E=;
+        b=RAua26Ohjmz0j8cAmRqKB6qqPsmsGYOPNYBoGsh0XTXeU3xkyEyI7WoHsQgbES8xNc
+         QQZZZ8GTl2RarNNZcEtNh4q5icJiw9NtMe3X2ELSCmVNongHfk1vqVCNuHMtlDAYjdIl
+         IGbJwpPC0LCfbd89GI1k1Mi3h5GC9aPrjsOS3XaMJkKmTr9ScWwgbsoP78G4HkwSrOwp
+         LLm4Ivzbi6yNo6lAicbU0yhEX3s+w6y4cqnfWo/pkx63eVDlDoL4UU06nCy8xt+E+jXa
+         pJUS/+d/MILpVxE40Mm7CsqEvmb70cDKSAEBsfMaJGS3B1Vcrwk0LYp0n7MFp3AOKUq7
+         4STg==
+X-Gm-Message-State: AOJu0YwVAZNoP7iBlK4l/c4PBBKkRBkPJUqs0ZZQwI7uv1fAcEkTpsU1
+	dQsmb2uQMU0DNHvpQwXzYADew3+oitvolyuJshJPwaox0LSB8klr4Qllk6NdSskX+cSEXccA1ct
+	i2u1CjkV7W0+xzTKU
+X-Received: by 2002:a17:907:96a0:b0:9dd:8603:ce with SMTP id hd32-20020a17090796a000b009dd860300cemr4051055ejc.9.1699517553105;
+        Thu, 09 Nov 2023 00:12:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHWo6Llt8v+2ywmjkukcaaZqqnfwiyYvDgAr2DUpk6IKjaTUAoQ/imwHduk+oI2LokR5fTx9w==
+X-Received: by 2002:a17:907:96a0:b0:9dd:8603:ce with SMTP id hd32-20020a17090796a000b009dd860300cemr4051023ejc.9.1699517552743;
+        Thu, 09 Nov 2023 00:12:32 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f4:2044:be5a:328c:4b98:1420])
+        by smtp.gmail.com with ESMTPSA id t6-20020a170906064600b00997e00e78e6sm2210800ejb.112.2023.11.09.00.12.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 00:12:32 -0800 (PST)
+Date: Thu, 9 Nov 2023 03:12:27 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 16/21] virtio_net: xsk: rx: introduce
+ add_recvbuf_xsk()
+Message-ID: <20231109031003-mutt-send-email-mst@kernel.org>
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-17-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024160220.3973311-1-kuba@kernel.org>
-In-Reply-To: <20231024160220.3973311-1-kuba@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Thu, 9 Nov 2023 10:11:47 +0200
-Message-ID: <CAC_iWjKi0V6wUmutmpjYyjZGkwXef4bxQwcx6o5rytT+-Pj5Eg@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/15] net: page_pool: add netlink-based introspection
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107031227.100015-17-xuanzhuo@linux.alibaba.com>
 
-Hi Jakub,
+On Tue, Nov 07, 2023 at 11:12:22AM +0800, Xuan Zhuo wrote:
+> Implement the logic of filling rq with XSK buffers.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio/main.c       |  4 ++-
+>  drivers/net/virtio/virtio_net.h |  5 ++++
+>  drivers/net/virtio/xsk.c        | 49 ++++++++++++++++++++++++++++++++-
+>  drivers/net/virtio/xsk.h        |  2 ++
+>  4 files changed, 58 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> index 6210a6e37396..15943a22e17d 100644
+> --- a/drivers/net/virtio/main.c
+> +++ b/drivers/net/virtio/main.c
+> @@ -1798,7 +1798,9 @@ static bool try_fill_recv(struct virtnet_info *vi, struct virtnet_rq *rq,
+>  	bool oom;
+>  
+>  	do {
+> -		if (vi->mergeable_rx_bufs)
+> +		if (rq->xsk.pool)
+> +			err = virtnet_add_recvbuf_xsk(vi, rq, rq->xsk.pool, gfp);
+> +		else if (vi->mergeable_rx_bufs)
+>  			err = add_recvbuf_mergeable(vi, rq, gfp);
+>  		else if (vi->big_packets)
+>  			err = add_recvbuf_big(vi, rq, gfp);
 
-On Tue, 24 Oct 2023 at 19:02, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> This is a new revision of the RFC posted in August:
-> https://lore.kernel.org/all/20230816234303.3786178-1-kuba@kernel.org/
-> There's been a handful of fixes and tweaks but the overall
-> architecture is unchanged.
->
-> As a reminder the RFC was posted as the first step towards
-> an API which could configure the page pools (GET API as a stepping
-> stone for a SET API to come later). I wasn't sure whether we should
-> commit to the GET API before the SET takes shape, hence the large
-> delay between versions.
->
-> Unfortunately, real deployment experience made this series much more
-> urgent. We recently started to deploy newer kernels / drivers
-> at Meta, making significant use of page pools for the first time.
+I'm not sure I understand. How does this handle mergeable flag still being set?
 
-That's nice and scary at the same time!
 
-> We immediately run into page pool leaks both real and false positive
-> warnings. As Eric pointed out/predicted there's no guarantee that
-> applications will read / close their sockets so a page pool page
-> may be stuck in a socket (but not leaked) forever. This happens
-> a lot in our fleet. Most of these are obviously due to application
-> bugs but we should not be printing kernel warnings due to minor
-> application resource leaks.
+> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> index a13d6d301fdb..1242785e311e 100644
+> --- a/drivers/net/virtio/virtio_net.h
+> +++ b/drivers/net/virtio/virtio_net.h
+> @@ -140,6 +140,11 @@ struct virtnet_rq {
+>  
+>  		/* xdp rxq used by xsk */
+>  		struct xdp_rxq_info xdp_rxq;
+> +
+> +		struct xdp_buff **xsk_buffs;
+> +		u32 nxt_idx;
+> +		u32 num;
+> +		u32 size;
+>  	} xsk;
+>  };
+>  
+> diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> index ea5804ddd44e..e737c3353212 100644
+> --- a/drivers/net/virtio/xsk.c
+> +++ b/drivers/net/virtio/xsk.c
+> @@ -38,6 +38,41 @@ static void virtnet_xsk_check_queue(struct virtnet_sq *sq)
+>  		netif_stop_subqueue(dev, qnum);
+>  }
+>  
+> +int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct virtnet_rq *rq,
+> +			    struct xsk_buff_pool *pool, gfp_t gfp)
+> +{
+> +	struct xdp_buff **xsk_buffs;
+> +	dma_addr_t addr;
+> +	u32 len, i;
+> +	int err = 0;
+> +
+> +	xsk_buffs = rq->xsk.xsk_buffs;
+> +
+> +	if (rq->xsk.nxt_idx >= rq->xsk.num) {
+> +		rq->xsk.num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->xsk.size);
+> +		if (!rq->xsk.num)
+> +			return -ENOMEM;
+> +		rq->xsk.nxt_idx = 0;
+> +	}
 
-Fair enough, I guess you mean 'continuous warnings'?
+Another manually rolled linked list implementation.
+Please, don't.
 
->
-> Conversely the page pool memory may get leaked at runtime, and
-> we have no way to detect / track that, unless someone reconfigures
-> the NIC and destroys the page pools which leaked the pages.
->
-> The solution presented here is to expose the memory use of page
-> pools via netlink. This allows for continuous monitoring of memory
-> used by page pools, regardless if they were destroyed or not.
-> Sample in patch 15 can print the memory use and recycling
-> efficiency:
->
-> $ ./page-pool
->     eth0[2]     page pools: 10 (zombies: 0)
->                 refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
->                 recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
->
 
-That's reasonable, and the recycling rate is pretty impressive.  Any
-idea how that translated to enhancements overall? mem/cpu pressure etc
+> +
+> +	i = rq->xsk.nxt_idx;
+> +
+> +	/* use the part of XDP_PACKET_HEADROOM as the virtnet hdr space */
+> +	addr = xsk_buff_xdp_get_dma(xsk_buffs[i]) - vi->hdr_len;
+> +	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
+> +
+> +	sg_init_table(rq->sg, 1);
+> +	sg_fill_dma(rq->sg, addr, len);
+> +
+> +	err = virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buffs[i], gfp);
+> +	if (err)
+> +		return err;
+> +
+> +	rq->xsk.nxt_idx++;
+> +
+> +	return 0;
+> +}
+> +
+>  static int virtnet_xsk_xmit_one(struct virtnet_sq *sq,
+>  				struct xsk_buff_pool *pool,
+>  				struct xdp_desc *desc)
+> @@ -213,7 +248,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
+>  	struct virtnet_sq *sq;
+>  	struct device *dma_dev;
+>  	dma_addr_t hdr_dma;
+> -	int err;
+> +	int err, size;
+>  
+>  	/* In big_packets mode, xdp cannot work, so there is no need to
+>  	 * initialize xsk of rq.
+> @@ -249,6 +284,16 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
+>  	if (!dma_dev)
+>  		return -EPERM;
+>  
+> +	size = virtqueue_get_vring_size(rq->vq);
+> +
+> +	rq->xsk.xsk_buffs = kcalloc(size, sizeof(*rq->xsk.xsk_buffs), GFP_KERNEL);
+> +	if (!rq->xsk.xsk_buffs)
+> +		return -ENOMEM;
+> +
+> +	rq->xsk.size = size;
+> +	rq->xsk.nxt_idx = 0;
+> +	rq->xsk.num = 0;
+> +
+>  	hdr_dma = dma_map_single(dma_dev, &xsk_hdr, vi->hdr_len, DMA_TO_DEVICE);
+>  	if (dma_mapping_error(dma_dev, hdr_dma))
+>  		return -ENOMEM;
+> @@ -307,6 +352,8 @@ static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
+>  
+>  	dma_unmap_single(dma_dev, sq->xsk.hdr_dma_address, vi->hdr_len, DMA_TO_DEVICE);
+>  
+> +	kfree(rq->xsk.xsk_buffs);
+> +
+>  	return err1 | err2;
+>  }
+>  
+> diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> index 7ebc9bda7aee..bef41a3f954e 100644
+> --- a/drivers/net/virtio/xsk.h
+> +++ b/drivers/net/virtio/xsk.h
+> @@ -23,4 +23,6 @@ int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+>  bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+>  		      int budget);
+>  int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag);
+> +int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct virtnet_rq *rq,
+> +			    struct xsk_buff_pool *pool, gfp_t gfp);
+>  #endif
+> -- 
+> 2.32.0.3.g01195cf9f
 
-Thanks
-/Ilias
-
-> The main change compared to the RFC is that the API now exposes
-> outstanding references and byte counts even for "live" page pools.
-> The warning is no longer printed if page pool is accessible via netlink.
->
-> Jakub Kicinski (15):
->   net: page_pool: split the page_pool_params into fast and slow
->   net: page_pool: avoid touching slow on the fastpath
->   net: page_pool: factor out uninit
->   net: page_pool: id the page pools
->   net: page_pool: record pools per netdev
->   net: page_pool: stash the NAPI ID for easier access
->   eth: link netdev to page_pools in drivers
->   net: page_pool: add nlspec for basic access to page pools
->   net: page_pool: implement GET in the netlink API
->   net: page_pool: add netlink notifications for state changes
->   net: page_pool: report amount of memory held by page pools
->   net: page_pool: report when page pool was destroyed
->   net: page_pool: expose page pool stats via netlink
->   net: page_pool: mute the periodic warning for visible page pools
->   tools: ynl: add sample for getting page-pool information
->
->  Documentation/netlink/specs/netdev.yaml       | 161 +++++++
->  Documentation/networking/page_pool.rst        |  10 +-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |   1 +
->  .../net/ethernet/mellanox/mlx5/core/en_main.c |   1 +
->  drivers/net/ethernet/microsoft/mana/mana_en.c |   1 +
->  include/linux/list.h                          |  20 +
->  include/linux/netdevice.h                     |   4 +
->  include/linux/poison.h                        |   2 +
->  include/net/page_pool/helpers.h               |   8 +-
->  include/net/page_pool/types.h                 |  43 +-
->  include/uapi/linux/netdev.h                   |  36 ++
->  net/core/Makefile                             |   2 +-
->  net/core/netdev-genl-gen.c                    |  52 +++
->  net/core/netdev-genl-gen.h                    |  11 +
->  net/core/page_pool.c                          |  78 ++--
->  net/core/page_pool_priv.h                     |  12 +
->  net/core/page_pool_user.c                     | 414 +++++++++++++++++
->  tools/include/uapi/linux/netdev.h             |  36 ++
->  tools/net/ynl/generated/netdev-user.c         | 419 ++++++++++++++++++
->  tools/net/ynl/generated/netdev-user.h         | 171 +++++++
->  tools/net/ynl/lib/ynl.h                       |   2 +-
->  tools/net/ynl/samples/.gitignore              |   1 +
->  tools/net/ynl/samples/Makefile                |   2 +-
->  tools/net/ynl/samples/page-pool.c             | 147 ++++++
->  24 files changed, 1586 insertions(+), 48 deletions(-)
->  create mode 100644 net/core/page_pool_priv.h
->  create mode 100644 net/core/page_pool_user.c
->  create mode 100644 tools/net/ynl/samples/page-pool.c
->
-> --
-> 2.41.0
->
 
