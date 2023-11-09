@@ -1,134 +1,293 @@
-Return-Path: <netdev+bounces-46778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAFD87E660C
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:01:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD6187E660F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44BFAB20C40
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:01:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0CD2281167
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177021096A;
-	Thu,  9 Nov 2023 09:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359DF10976;
+	Thu,  9 Nov 2023 09:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n2Yok3QH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbCXh15k"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EF110953
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:01:23 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80AB630DF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:01:22 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso6673901fa.3
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:01:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699520481; x=1700125281; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2vTPoa0YiuT1ZlZP4+pv+g9I2X4gvWs/AYca8L8v/3E=;
-        b=n2Yok3QHeVNQgSq1Q8os/GYvtBRAk0o4nM81QJFJKwRt++Fu+NT3WrI8SSbDh/yiKr
-         W28eW95zsOzvIC/E5nVm8i8L2EyVvEG5dxlmhtWx2nMeBoAy52EAbIpPyZmKvvunswZN
-         adk7fqlEO2DT0rlhhR+5AnEaqUEdFdUl6pXvSy6lFWm1DQuOq6xO2U/VGoTMVew3J66b
-         npwuwK4R0iSv4b3bUFQWfEZyujtHX6LHYfeo5fbOLZTgRASDFAHIA3ws8jhxerUBY9Ls
-         Xict5vqYgQqgEYZmbh17YYBYWrIfUlM8+or3pjEmRKg8sDY+5Fx34Vw9ezwpsAHOq/Fc
-         HJLg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9206410A11
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:01:53 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C555B35A3
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:01:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699520512;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3GdRtcKnHBIooBz8CRQ9n177xrjS4UMT2Wxo71oaBJg=;
+	b=NbCXh15kexYMLJTf1dBdRGLj/xvNikxf8GmFNGyCJ8LDy/PUdU//dqc0qo2sQjE/sO8zXZ
+	2LKaEB4BMc1MsGv6HULBRFLrLt+F9upQcDzjuJWbkC8TVz4JbLhqfoMinSAkrv4V/PMvXr
+	zU7bb4x5mREr3o+BS23SLpO1P2h+s80=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-NNwdhggHM2SJnk-2i0lJ-Q-1; Thu, 09 Nov 2023 04:01:50 -0500
+X-MC-Unique: NNwdhggHM2SJnk-2i0lJ-Q-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-540f4715d09so63396a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:01:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699520481; x=1700125281;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2vTPoa0YiuT1ZlZP4+pv+g9I2X4gvWs/AYca8L8v/3E=;
-        b=QXvqipUIOyz5hNo0e0/YXbjIKiHguDSzK2iZX3+GByx8RgGU7sgRxUmB3p5zFOVa3p
-         FGtpEnfWZTliikAlOodTjEV3EFBxnDc/vEzHy/F6VpFyW32TON08VIxpQqNoCc7b4d1F
-         GlpTzWUnNixjQtiqF14ijfNvKvVQ5HNzn7L4Az7j5/9TNRMrMJUmeEPoNG1sR9Y8KWV0
-         VCOx9aMJ5t/GlImz/sLvzy59mJpX8WiDA8mOZyLILwxTw+Afo9fyDsDbOUC5MHTkVRpn
-         RwkjACU/Ft4ZPZvMqdbGmNJq7IpuWOKwPhiUgYuBflTR4V0lvrdtp0q+GDSni6UMcTx+
-         hbGQ==
-X-Gm-Message-State: AOJu0YxVWalkIaTmW65NvuV05WmozxagByBE6lS5P0seLzGaiqUb0zW9
-	Su7cBIWRBr1O/twDA1IbRSgFggfDyIqmnls+r22syuCSCK6YoPKdFAw=
-X-Google-Smtp-Source: AGHT+IFQfOpbMKJ9Y7BDuaHioC8DzpumSuY/EGWkymKP2izi9WHFmBiSjbNzxJOHjPjXbUXrZYRXshlgNrP/6IZaMGU=
-X-Received: by 2002:a2e:818c:0:b0:2c5:9b16:199 with SMTP id
- e12-20020a2e818c000000b002c59b160199mr3460975ljg.17.1699520480749; Thu, 09
- Nov 2023 01:01:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699520509; x=1700125309;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3GdRtcKnHBIooBz8CRQ9n177xrjS4UMT2Wxo71oaBJg=;
+        b=av0vG0mf70OqyoTFeS5L/dFVTpX2hJ6etg13L8QyTg4aK1f0RvuAzB3M8JzZRxFx3R
+         C/XRvzE9v9Y1aqD6PnRlR5MT0UAKFN0byrfcNy7NhE4eE1u7pvLBpvXR41s1Q4cpgC1l
+         gSSXN7GrxQPtvxnrQizR8QqANvQUUhR3XN6UZExjbXKIQdgBhKA3nbtb1TjjsfzxLnuI
+         /jmK9bRHMfcv38tOZKr3poBtTy+eI/J4StQV2+YQQ3BshDYH7glGQXc5q0Y0WdsAGsat
+         wQD5s3vcC1QkvTzxX3GB29tZUVfGLyUkVTayUuoZxPaBzJ4nu38cVyEcPusxlJ0mzMHo
+         r6FA==
+X-Gm-Message-State: AOJu0YwBmq8bveJMHw6pUDBcORi/d40Xu7ztt6IGKByQx0acQd4JVcYt
+	M0TW/qL2TYkuYOlhXXD8xe19uXzkATUrC9X12W8pAreaGqGzHsJyvq7wNBf5xsS8VfRNsJxVx+i
+	QpMq0OUVm0QtNMAwv
+X-Received: by 2002:a05:6402:f17:b0:540:a181:f40b with SMTP id i23-20020a0564020f1700b00540a181f40bmr4095038eda.4.1699520509698;
+        Thu, 09 Nov 2023 01:01:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFs4kFQwDr2GcSp3GTsPB4RRvWzreFUbMHSJElDo2cAX0GNGwqbEAhl7Xc8OlUx2EJqQdsHHw==
+X-Received: by 2002:a05:6402:f17:b0:540:a181:f40b with SMTP id i23-20020a0564020f1700b00540a181f40bmr4094979eda.4.1699520508954;
+        Thu, 09 Nov 2023 01:01:48 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
+        by smtp.gmail.com with ESMTPSA id y93-20020a50bb66000000b0053e6e40cc1asm8068217ede.86.2023.11.09.01.01.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 01:01:47 -0800 (PST)
+Message-ID: <429f6303c9c61d50ba6c5fdddec30c22dc0b2c09.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
+From: Paolo Abeni <pabeni@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+Date: Thu, 09 Nov 2023 10:01:45 +0100
+In-Reply-To: <20231106024413.2801438-8-almasrymina@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+	 <20231106024413.2801438-8-almasrymina@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024160220.3973311-1-kuba@kernel.org> <20231024160220.3973311-3-kuba@kernel.org>
-In-Reply-To: <20231024160220.3973311-3-kuba@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Thu, 9 Nov 2023 11:00:44 +0200
-Message-ID: <CAC_iWjKWf5cT-L7O6HwkWxGBeKajhqq2DTe1djxmPj04L3P5wg@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/15] net: page_pool: avoid touching slow on the fastpath
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 24 Oct 2023 at 19:02, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> To fully benefit from previous commit add one byte of state
-> in the first cache line recording if we need to look at
-> the slow part.
->
-> The packing isn't all that impressive right now, we create
-> a 7B hole. I'm expecting Olek's rework will reshuffle this,
-> anyway.
->
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
+> Overload the LSB of struct page* to indicate that it's a page_pool_iov.
+>=20
+> Refactor mm calls on struct page* into helpers, and add page_pool_iov
+> handling on those helpers. Modify callers of these mm APIs with calls to
+> these helpers instead.
+>=20
+> In areas where struct page* is dereferenced, add a check for special
+> handling of page_pool_iov.
+>=20
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+>=20
 > ---
->  include/net/page_pool/types.h | 2 ++
->  net/core/page_pool.c          | 4 +++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index 23950fcc4eca..e1bb92c192de 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -125,6 +125,8 @@ struct page_pool_stats {
->  struct page_pool {
->         struct page_pool_params_fast p;
->
-> +       bool has_init_callback;
-> +
->         long frag_users;
->         struct page *frag_page;
->         unsigned int frag_offset;
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 5cae413de7cc..08af9de8e8eb 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -212,6 +212,8 @@ static int page_pool_init(struct page_pool *pool,
->                  */
->         }
->
-> +       pool->has_init_callback = !!pool->slow.init_callback;
-> +
->  #ifdef CONFIG_PAGE_POOL_STATS
->         pool->recycle_stats = alloc_percpu(struct page_pool_recycle_stats);
->         if (!pool->recycle_stats)
-> @@ -385,7 +387,7 @@ static void page_pool_set_pp_info(struct page_pool *pool,
->          * the overhead is negligible.
->          */
->         page_pool_fragment_page(page, 1);
-> -       if (pool->slow.init_callback)
-> +       if (pool->has_init_callback)
->                 pool->slow.init_callback(page, pool->slow.init_arg);
+>  include/net/page_pool/helpers.h | 74 ++++++++++++++++++++++++++++++++-
+>  net/core/page_pool.c            | 63 ++++++++++++++++++++--------
+>  2 files changed, 118 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/help=
+ers.h
+> index b93243c2a640..08f1a2cc70d2 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -151,6 +151,64 @@ static inline struct page_pool_iov *page_to_page_poo=
+l_iov(struct page *page)
+>  	return NULL;
 >  }
->
-> --
-> 2.41.0
->
+> =20
+> +static inline int page_pool_page_ref_count(struct page *page)
+> +{
+> +	if (page_is_page_pool_iov(page))
+> +		return page_pool_iov_refcount(page_to_page_pool_iov(page));
+> +
+> +	return page_ref_count(page);
+> +}
+> +
+> +static inline void page_pool_page_get_many(struct page *page,
+> +					   unsigned int count)
+> +{
+> +	if (page_is_page_pool_iov(page))
+> +		return page_pool_iov_get_many(page_to_page_pool_iov(page),
+> +					      count);
+> +
+> +	return page_ref_add(page, count);
+> +}
+> +
+> +static inline void page_pool_page_put_many(struct page *page,
+> +					   unsigned int count)
+> +{
+> +	if (page_is_page_pool_iov(page))
+> +		return page_pool_iov_put_many(page_to_page_pool_iov(page),
+> +					      count);
+> +
+> +	if (count > 1)
+> +		page_ref_sub(page, count - 1);
+> +
+> +	put_page(page);
+> +}
+> +
+> +static inline bool page_pool_page_is_pfmemalloc(struct page *page)
+> +{
+> +	if (page_is_page_pool_iov(page))
+> +		return false;
+> +
+> +	return page_is_pfmemalloc(page);
+> +}
+> +
+> +static inline bool page_pool_page_is_pref_nid(struct page *page, int pre=
+f_nid)
+> +{
+> +	/* Assume page_pool_iov are on the preferred node without actually
+> +	 * checking...
+> +	 *
+> +	 * This check is only used to check for recycling memory in the page
+> +	 * pool's fast paths. Currently the only implementation of page_pool_io=
+v
+> +	 * is dmabuf device memory. It's a deliberate decision by the user to
+> +	 * bind a certain dmabuf to a certain netdev, and the netdev rx queue
+> +	 * would not be able to reallocate memory from another dmabuf that
+> +	 * exists on the preferred node, so, this check doesn't make much sense
+> +	 * in this case. Assume all page_pool_iovs can be recycled for now.
+> +	 */
+> +	if (page_is_page_pool_iov(page))
+> +		return true;
+> +
+> +	return page_to_nid(page) =3D=3D pref_nid;
+> +}
+> +
+>  /**
+>   * page_pool_dev_alloc_pages() - allocate a page.
+>   * @pool:	pool from which to allocate
+> @@ -301,6 +359,9 @@ static inline long page_pool_defrag_page(struct page =
+*page, long nr)
+>  {
+>  	long ret;
+> =20
+> +	if (page_is_page_pool_iov(page))
+> +		return -EINVAL;
+> +
+>  	/* If nr =3D=3D pp_frag_count then we have cleared all remaining
+>  	 * references to the page:
+>  	 * 1. 'n =3D=3D 1': no need to actually overwrite it.
+> @@ -431,7 +492,12 @@ static inline void page_pool_free_va(struct page_poo=
+l *pool, void *va,
+>   */
+>  static inline dma_addr_t page_pool_get_dma_addr(struct page *page)
+>  {
+> -	dma_addr_t ret =3D page->dma_addr;
+> +	dma_addr_t ret;
+> +
+> +	if (page_is_page_pool_iov(page))
+> +		return page_pool_iov_dma_addr(page_to_page_pool_iov(page));
 
-Same here, please swap my ack with
-Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Should the above conditional be guarded by the page_pool_mem_providers
+static key? this looks like fast-path. Same question for the refcount
+helper above.
+
+Minor nit: possibly cache 'page_is_page_pool_iov(page)' to make the
+code more readable.
+
+> +
+> +	ret =3D page->dma_addr;
+> =20
+>  	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA)
+>  		ret <<=3D PAGE_SHIFT;
+> @@ -441,6 +507,12 @@ static inline dma_addr_t page_pool_get_dma_addr(stru=
+ct page *page)
+> =20
+>  static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t =
+addr)
+>  {
+> +	/* page_pool_iovs are mapped and their dma-addr can't be modified. */
+> +	if (page_is_page_pool_iov(page)) {
+> +		DEBUG_NET_WARN_ON_ONCE(true);
+> +		return false;
+> +	}
+
+Quickly skimming over the page_pool_code it looks like
+page_pool_set_dma_addr() usage is guarded by the PP_FLAG_DMA_MAP page
+pool flag. Could the device mem provider enforce such flag being
+cleared on the page pool?
+
+> +
+>  	if (PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA) {
+>  		page->dma_addr =3D addr >> PAGE_SHIFT;
+> =20
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 138ddea0b28f..d211996d423b 100644
+> --- a/net/core/page_pool.cnn
+> +++ b/net/core/page_pool.c
+> @@ -317,7 +317,7 @@ static struct page *page_pool_refill_alloc_cache(stru=
+ct page_pool *pool)
+>  		if (unlikely(!page))
+>  			break;
+> =20
+> -		if (likely(page_to_nid(page) =3D=3D pref_nid)) {
+> +		if (likely(page_pool_page_is_pref_nid(page, pref_nid))) {
+>  			pool->alloc.cache[pool->alloc.count++] =3D page;
+>  		} else {
+>  			/* NUMA mismatch;
+> @@ -362,7 +362,15 @@ static void page_pool_dma_sync_for_device(struct pag=
+e_pool *pool,
+>  					  struct page *page,
+>  					  unsigned int dma_sync_size)
+>  {
+> -	dma_addr_t dma_addr =3D page_pool_get_dma_addr(page);
+> +	dma_addr_t dma_addr;
+> +
+> +	/* page_pool_iov memory provider do not support PP_FLAG_DMA_SYNC_DEV */
+> +	if (page_is_page_pool_iov(page)) {
+> +		DEBUG_NET_WARN_ON_ONCE(true);
+> +		return;
+> +	}
+
+Similar to the above point, mutatis mutandis.
+
+> +
+> +	dma_addr =3D page_pool_get_dma_addr(page);
+> =20
+>  	dma_sync_size =3D min(dma_sync_size, pool->p.max_len);
+>  	dma_sync_single_range_for_device(pool->p.dev, dma_addr,
+> @@ -374,6 +382,12 @@ static bool page_pool_dma_map(struct page_pool *pool=
+, struct page *page)
+>  {
+>  	dma_addr_t dma;
+> =20
+> +	if (page_is_page_pool_iov(page)) {
+> +		/* page_pool_iovs are already mapped */
+> +		DEBUG_NET_WARN_ON_ONCE(true);
+> +		return true;
+> +	}
+
+Ditto.
+
+Cheers,
+
+Paolo
+
 
