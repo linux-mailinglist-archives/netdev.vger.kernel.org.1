@@ -1,126 +1,99 @@
-Return-Path: <netdev+bounces-46927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593567E71A7
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:42:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB3E7E7221
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 20:20:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7FF8B20CBE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:41:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46DBB1F200F5
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:20:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E170B4C94;
-	Thu,  9 Nov 2023 18:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A41732C82;
+	Thu,  9 Nov 2023 19:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UBbIrZ2+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OfmnD/x7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B660374DD
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:41:54 +0000 (UTC)
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8543C0E
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:41:54 -0800 (PST)
-Message-ID: <9ac86e10-e8b7-4eee-a8c4-c58397c1606a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1699555311;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dFMuoyltFtVxWVJxaFtiCDqbh02J2DqjKLDbbrCUOx4=;
-	b=UBbIrZ2+2/udeRkulku++eQwdC/IT1SBZX6N44sHyXJMUdl7nlx0uX3us3v7B6hmKNsQJz
-	lsfKksKyrZr38BjI/fEf/+mdms1o84VAipZHk6kwFal3ndX2swNhvHidAQsUsd1RxawB7w
-	3amgXwyTtg78WkcMuTH8IG6CqXuVGjw=
-Date: Thu, 9 Nov 2023 10:41:43 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03452249FF;
+	Thu,  9 Nov 2023 19:20:00 +0000 (UTC)
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31EB73A84;
+	Thu,  9 Nov 2023 11:20:00 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-32da4ffd7e5so797011f8f.0;
+        Thu, 09 Nov 2023 11:20:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699557598; x=1700162398; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EHmtmlWMV03EPvOAE8I3l03aMAmsfssVCPga19RZMhE=;
+        b=OfmnD/x7hwAuRzWPRhOTb3HYL5Q4KWqvJwav8thAAEij73tbuCH6RlTfNzx2wvBxZA
+         A7k8QbrR3ArxfFyVTxLmgz+xre8Xr0kPkSJv9siCJUKt9n9wcq90Q+XyJeIvckVRPy32
+         uHdEKsaVqgLlULTqRkNZuSqfD7SQ33Cm9TFWtnNomyYfkSByBNDEF9sTC9unnoI5zhFO
+         pmcyWA7WMcVf8CtrmxpYBKbq9PHNeOzGiEbLAG4EtceGbYSRVBUcB6WCW5SoIwpe9w2R
+         5dsOp3pR9m15qWENOGpqLptEtL/4EIKWC2nanOKyP6jDlaqjqEXIJ0/bOgY37vIOflBU
+         2B9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699557598; x=1700162398;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EHmtmlWMV03EPvOAE8I3l03aMAmsfssVCPga19RZMhE=;
+        b=j1hfiCrbA1/xKFJN8Af7js2GmDUzuldpaPhQOTdJmU+DL5I1P8MIiSmNXL3v5qojT2
+         keAmISSwMK3R0NpFug8OVzKiwymx07aCgLHSk7NItHK+YY8o84FltsVXIygjdZih9c05
+         ZyFnse/XKeknjTQBbrDLk8ZzaidiSZy5gowrtU6Q3SED3qx0mofyTK4vJIFWrTbYQOwd
+         WXA2tGejrys/JrBGFJptBUH3tkSMremmu3HzVb30neTgRY+ojpx5X9N/ymxJY4deGjr5
+         bPD9Q2Tm4+s29za6yWgRfCi05m131nMh9gu2OYw+heVmRwLzVQjX24BxxjL3y4Y+lWxK
+         qc4A==
+X-Gm-Message-State: AOJu0YyVAFACfLOqygpMKpIr6KGGksxsvuPZ/5JckFfm8Ys07BWFSRBo
+	dGvCa6PCVqKFsKIGjftO7eXv1hc/MsO69ryGBGQ=
+X-Google-Smtp-Source: AGHT+IFTKtJTibqT0yuYffZ0UvZ7lZfRvacgEC8CXUxpdX5dbeeum5dNGE/z37iWWs19/BDiupjshmHtYNmdyxpwrak=
+X-Received: by 2002:a05:6000:188b:b0:32f:76d7:7d6a with SMTP id
+ a11-20020a056000188b00b0032f76d77d6amr134396wri.35.1699557598437; Thu, 09 Nov
+ 2023 11:19:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [GIT PULL v2] Networking for 6.7
-Content-Language: en-GB
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, Hou Tao
- <houtao1@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>,
- Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20231028011741.2400327-1-kuba@kernel.org>
- <20231031210948.2651866-1-kuba@kernel.org>
- <20231109154934.4saimljtqx625l3v@box.shutemov.name>
- <CAADnVQJnMQaFoWxj165GZ+CwJbVtPQBss80o7zYVQwg5MVij3g@mail.gmail.com>
- <20231109161406.lol2mjhr47dhd42q@box.shutemov.name>
- <11e2e744-4bc7-45b1-aaca-298b5e4ee281@linux.dev>
- <CAADnVQJtc6JJZMXuZ0M5_0A3=N-TJuYO2vMofJmK6KLhWrBAPg@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <CAADnVQJtc6JJZMXuZ0M5_0A3=N-TJuYO2vMofJmK6KLhWrBAPg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20231031175742.21455-1-larysa.zaremba@intel.com>
+ <b6da9739-a6e6-4528-a4cd-f87e8e025740@intel.com> <ZUUE8lH+EbuRNI16@lzaremba-mobl.ger.corp.intel.com>
+In-Reply-To: <ZUUE8lH+EbuRNI16@lzaremba-mobl.ger.corp.intel.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 9 Nov 2023 11:19:47 -0800
+Message-ID: <CAADnVQJzQm-R5etK+Dh7dMP9dzXfg58kd3suKV2FSPxKMKh8iA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2] net, xdp: allow metadata > 32
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, John Fastabend <john.fastabend@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 3, 2023 at 7:35=E2=80=AFAM Larysa Zaremba <larysa.zaremba@intel=
+.com> wrote:
+>
+> On Fri, Nov 03, 2023 at 03:03:14PM +0100, Alexander Lobakin wrote:
+> > From: Larysa Zaremba <larysa.zaremba@intel.com>
+> > Date: Tue, 31 Oct 2023 18:57:37 +0100
+> >
+> > It doesn't have "From: Alexa..." here, so that you'll be the author onc=
+e
+> > this is applied. Is this intended? ^.^
+> >
+>
+> No, I should probably resend.
 
-On 11/9/23 10:18 AM, Alexei Starovoitov wrote:
-> On Thu, Nov 9, 2023 at 10:09 AM Yonghong Song <yonghong.song@linux.dev> wrote:
->>
->> On 11/9/23 8:14 AM, Kirill A. Shutemov wrote:
->>> On Thu, Nov 09, 2023 at 08:01:39AM -0800, Alexei Starovoitov wrote:
->>>> On Thu, Nov 9, 2023 at 7:49 AM Kirill A. Shutemov <kirill@shutemov.name> wrote:
->>>>> On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
->>>>>>         bpf: Add support for non-fix-size percpu mem allocation
->>>>> Recent changes in BPF increased per-CPU memory consumption a lot.
->>>>>
->>>>> On virtual machine with 288 CPUs, per-CPU consumtion increased from 111 MB
->>>>> to 969 MB, or 8.7x.
->>>>>
->>>>> I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
->>>>> non-fix-size percpu mem allocation"), which part of the pull request.
->>>> Hmm. This is unexpected. Thank you for reporting.
->>>>
->>>> How did you measure this 111 MB vs 969 MB ?
->>>> Pls share the steps to reproduce.
->>> Boot VMM with 288 (qemu-system-x86_64 -smp 288) and check Percpu: field of
->>> /proc/meminfo.
->> I did some experiments with my VM. My VM currently supports up to 255 cpus,
->> so I tried 4/32/252 number of cpus. For a particular number of cpus, two
->> experiments are done:
->>     (1). bpf-percpu-mem-prefill
->>     (2). no-bpf-percpu-mem-prefill
->>
->> For 4 cpu:
->>      bpf-percpu-mem-prefill:
->>        Percpu:             2000 kB
->>      no-bpf-percpu-mem-prefill:
->>        Percpu:             1808 kB
->>
->>      bpf-percpu-mem-prefill percpu cost: (2000 - 1808)/4 KB = 48KB
->>
->> For 32 cpus:
->>      bpf-percpu-mem-prefill:
->>        Percpu:            25344 kB
->>      no-bpf-percpu-mem-prefill:
->>        Percpu:            14464 kB
->>
->>      bpf-percpu-mem-prefill percpu cost: (25344 - 14464)/4 KB = 340KB
->>
->> For 252 cpus:
->>      bpf-percpu-mem-prefill:
->>        Percpu:           230912 kB
->>      no-bpf-percpu-mem-prefill:
->>        Percpu:            57856 kB
->>
->>      bpf-percpu-mem-prefill percpu cost: (230912 - 57856)/4 KB = 686KB
->>
->> I am not able to reproduce the dramatic number from 111 MB to 969 MB.
->> My number with 252 cpus is from ~58MB to ~231MB.
-> Even 231MB is way too much. We shouldn't be allocating that much.
-> Let's switch to on-demand allocation. Only when bpf progs that
-> user per-cpu are loaded.
-Sounds good. Will craft a patch for this.
+CI is failing as well.
+Make sure to test your patches.
+test_xdp_context_error:FAIL:bpf_prog_test_run unexpected success: 0
 
