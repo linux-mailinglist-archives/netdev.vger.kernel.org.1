@@ -1,109 +1,240 @@
-Return-Path: <netdev+bounces-46726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC96E7E61C5
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:17:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5F77E61D6
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7E1B20C26
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:17:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 284A91C208DD
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 01:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E45B67FC;
-	Thu,  9 Nov 2023 01:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061A710FE;
+	Thu,  9 Nov 2023 01:42:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NyLy8Pzz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pte8zQkM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8070DA5F
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:17:48 +0000 (UTC)
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B9125B6;
-	Wed,  8 Nov 2023 17:17:47 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28019b66ad5so249765a91.3;
-        Wed, 08 Nov 2023 17:17:47 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D9610FC
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:42:11 +0000 (UTC)
+Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44BE7268E
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 17:42:11 -0800 (PST)
+Received: by mail-ua1-x931.google.com with SMTP id a1e0cc1a2514c-7ba7b361b22so127036241.1
+        for <netdev@vger.kernel.org>; Wed, 08 Nov 2023 17:42:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699492648; x=1700097448; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lBNYzqasXDmHMz+y+gn6jPytXIm3L/47ou0r+HRqqJc=;
-        b=NyLy8PzzSvJp9c9giMQEEXbRSb3HGrc2N5/nb8BAhV+adWYiMdv7FcNfMT28PxuvFi
-         5UdKg50w35s+ypxlOlfYDTRuXhMOliRIAkDqKHwfErI42uFPFLNjHqAtRVa7bFtie06r
-         oI9+kSBCDKLsoA3Ct7DddpSe8putnJkAdWRXhOL0Cllv63Abu17H91ROqnKv85HR3mml
-         +LQDWOZ5lT+62sWhEpWxXX6FKmkDKXDlUfkEnFyhjSD9o9VAkbtPevEaTMQCYJyrsAwU
-         i+jXOBwOzDKiIcoXdsQSZ3t2myO2cg7APfpB3VlsJSwlvHKymMDana2cOiXcOk3gKmII
-         C0xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699492648; x=1700097448;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1699494130; x=1700098930; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lBNYzqasXDmHMz+y+gn6jPytXIm3L/47ou0r+HRqqJc=;
-        b=SiR9QjyM7kr03KVxriCTHsbiFN24sWf0otHqWW+DdUxnGhGKq5HE/rLtkyFnu0cHgj
-         h+61MNDGwPco8epXEKwPEZq7DO+QpnkF0glBwWdQJh/ENhG7XPt/3mjakT4AUr2dvbq+
-         x0wXk74mZxw3p6iEt7AgykwpYQhShhpPm6iubJqveUQKy7/BR0ZXoBdy5qdmCwNScom2
-         BvnFHKlrTRXD062FTISdOdh0NOCDaxVcLNKErEkNFzMrtgHfCuKjII05FHyQtSddw/pi
-         0ChLV2Pd7uIyOhd8vk9GTXI0Xz1Y/YdGXRPOa3LrdGPZbx/pg4igpAydXkmXFOspp2fa
-         iJiw==
-X-Gm-Message-State: AOJu0Yw/CCJqyoWCKEw3NMqKEZ+ZADBPGUS3DPYsZK/790EM7+FnUYJh
-	+2loRh60ESZ5+j4fr3iPtwQ=
-X-Google-Smtp-Source: AGHT+IFtqOgYbckOxuYGwXLv/tmibGyLbwZS6E+0CzesNWUuL+fiyRstimVdz8h++jB5d+pnkp93Dg==
-X-Received: by 2002:a17:90b:4d07:b0:280:c4be:3c85 with SMTP id mw7-20020a17090b4d0700b00280c4be3c85mr308973pjb.23.1699492647732;
-        Wed, 08 Nov 2023 17:17:27 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 11-20020a17090a034b00b0027ced921e80sm153671pjf.38.2023.11.08.17.17.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Nov 2023 17:17:27 -0800 (PST)
-Date: Thu, 9 Nov 2023 09:17:23 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	netdev-driver-reviewers@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Simon Horman <horms@kernel.org>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Subject: Re: [ANN] netdev development stats for 6.7
-Message-ID: <ZUwzI29bQB7G9yUP@Laptop-X1>
-References: <20231101162906.59631ffa@kernel.org>
- <ZUt9n0gwZR0kaKdF@Laptop-X1>
- <ff7104c9-6db9-449f-bcb4-6c857798698f@lunn.ch>
- <20231108083307.364cfe91@kernel.org>
+        bh=rtXvJMS7/3Fgi+LpB6nuDO1GbZPELeIfXynT/oP6gbw=;
+        b=pte8zQkMQ+/0wqzuA5lFv1GZ/lyHdSNgr4p7SbREBf9dolQE99OPtDF1uQbqi5A7wz
+         L16PQRM6VdeIbhQ4n+3JN5QN6cwTGf2BlIwwFKWpyFaEpzv33Rags+tgwjtX4pROh/x8
+         ACPiFtN7FvjLkD6uKebnroFsZRoMDYSry8gP7P9/TJFE+Jyb92HyZ5zd0Wi1PHEziu7W
+         +w8ULc2V8vg/WVf0bx2yVfXc/jKsQjk3G2MbXsU6R6tk9Yakq7HjE4tY4G27+N28n+Wy
+         ymH75pQdUwgpLl8598nL5W9x7rk5NHjoc+k/UNLVjsmL8DJD6yaP8SvmxUkNrkCvR28x
+         JVMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699494130; x=1700098930;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rtXvJMS7/3Fgi+LpB6nuDO1GbZPELeIfXynT/oP6gbw=;
+        b=V08yQM8NjTdxGh8j5Gs1bELeVk+NweW245shGetQNSwGEfVWhFDZQc9rF+gI1Tdl6z
+         t53V6fmWOqdsZw9nysQfArU2vYvCRCHB+prM/30D9yuqlY2HVFJ/uNnKQo0c/V90VAdm
+         zYif2hOsIjVs4PPRx/WGzZg160JvGuXCaUvLn1XxB7Mhd03p68JDHEiNyaxYZNMnH2EI
+         NZueLMbRgnzBu3QBMFNth3qexBpXGybJeeFs8bcebO+dGnB/imsNDIGzdCEaCkVDxb3o
+         Cl257QHnBTo/4WJjrE1y+6yZP1gQFCiVY2YSG81Km7dTOm7HIAhE1ykuyfv2x27QmeeS
+         jBDw==
+X-Gm-Message-State: AOJu0YxcZWeY33uaXWGoBWlLW5oYkMp5CNbsMBwK9qhsVT8q3iaEvqL9
+	bRc2DB72i4vEFdCYXkE+xvmRpTPzDQvo0pfbJO3eQA==
+X-Google-Smtp-Source: AGHT+IEgdcG0qqqXy9cIxFiAolh/hrZOW6JAOB3Io/o+JJsEAX7J8FeEEaKDW9kJyXKjNOuzCBypENaeQVzYpVq+vos=
+X-Received: by 2002:a05:6102:2082:b0:45d:8660:b91 with SMTP id
+ h2-20020a056102208200b0045d86600b91mr3660311vsr.9.1699494130078; Wed, 08 Nov
+ 2023 17:42:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231108083307.364cfe91@kernel.org>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-6-almasrymina@google.com> <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
+ <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com> <6c629d6d-6927-3857-edaa-1971a94b6e93@huawei.com>
+In-Reply-To: <6c629d6d-6927-3857-edaa-1971a94b6e93@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 8 Nov 2023 17:41:56 -0800
+Message-ID: <CAHS8izPgioCzFGadNFNFWr_tqi--YBF8qrNqi8ELgixA9ZX0rQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
-On Wed, Nov 08, 2023 at 08:33:07AM -0800, Jakub Kicinski wrote:
-> Now, CNCF has a similar setup: https://github.com/cncf/gitdm
-> and they do share their database. So I use that, plus my local hacky
-> mapping. Unfortunately the CNCF DB is not very up to date for kernel
-> folks.
-> 
-> Hangbin, according to CNCF you're at Red Hat, which seems sane, and
-> that's how I count you :)
+> > On Mon, Nov 6, 2023 at 11:45=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
+i.com> wrote:
+> >>
+> >> On 2023/11/6 10:44, Mina Almasry wrote:
+> >>> +
+> >>> +void netdev_free_devmem(struct page_pool_iov *ppiov)
+> >>> +{
+> >>> +     struct netdev_dmabuf_binding *binding =3D page_pool_iov_binding=
+(ppiov);
+> >>> +
+> >>> +     refcount_set(&ppiov->refcount, 1);
+> >>> +
+> >>> +     if (gen_pool_has_addr(binding->chunk_pool,
+> >>> +                           page_pool_iov_dma_addr(ppiov), PAGE_SIZE)=
+)
+> >>
+> >> When gen_pool_has_addr() returns false, does it mean something has gon=
+e
+> >> really wrong here?
+> >>
+> >
+> > Yes, good eye. gen_pool_has_addr() should never return false, but then
+> > again, gen_pool_free()  BUG_ON()s if it doesn't find the address,
+> > which is an extremely severe reaction to what can be a minor bug in
+> > the accounting. I prefer to leak rather than crash the machine. It's a
+> > bit of defensive programming that is normally frowned upon, but I feel
+> > like in this case it's maybe warranted due to the very severe reaction
+> > (BUG_ON).
+>
+> I would argue that why is the above defensive programming not done in the
+> gen_pool core:)
+>
 
-Thanks for this info. Glad to know my email and company are mapping correctly.
+I think gen_pool is not really not that new, and suggesting removing
+the BUG_ONs must have been proposed before and rejected. I'll try to
+do some research and maybe suggest downgrading the BUG_ON to WARN_ON,
+but my guess is there is some reason the maintainer wants it to be a
+BUG_ON.
 
-> I brought creating a public DB up at Linux Foundation TAB meetings,
-> but after some poking there's no movement.
-> 
-> It would be great if Linux Foundation helped the community with the
-> developer/company DB, which is ACTUALLY USEFUL BEFORE WASTING TIME ON
-> SOME WEB STUFF THAT DOESN'T WORK FOR THE KERNEL.
+On Wed, Nov 8, 2023 at 5:00=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2023-11-07 14:55, David Ahern wrote:
+> > On 11/7/23 3:10 PM, Mina Almasry wrote:
+> >> On Mon, Nov 6, 2023 at 3:44=E2=80=AFPM David Ahern <dsahern@kernel.org=
+> wrote:
+> >>>
+> >>> On 11/5/23 7:44 PM, Mina Almasry wrote:
+> >>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> >>>> index eeeda849115c..1c351c138a5b 100644
+> >>>> --- a/include/linux/netdevice.h
+> >>>> +++ b/include/linux/netdevice.h
+> >>>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
+> >>>>  };
+> >>>>
+> >>>>  #ifdef CONFIG_DMA_SHARED_BUFFER
+> >>>> +struct page_pool_iov *
+> >>>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
+> >>>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
+> >>>
+> >>> netdev_{alloc,free}_dmabuf?
+> >>>
+> >>
+> >> Can do.
+> >>
+> >>> I say that because a dmabuf can be host memory, at least I am not awa=
+re
+> >>> of a restriction that a dmabuf is device memory.
+> >>>
+> >>
+> >> In my limited experience dma-buf is generally device memory, and
+> >> that's really its use case. CONFIG_UDMABUF is a driver that mocks
+> >> dma-buf with a memfd which I think is used for testing. But I can do
+> >> the rename, it's more clear anyway, I think.
+> >
+> > config UDMABUF
+> >         bool "userspace dmabuf misc driver"
+> >         default n
+> >         depends on DMA_SHARED_BUFFER
+> >         depends on MEMFD_CREATE || COMPILE_TEST
+> >         help
+> >           A driver to let userspace turn memfd regions into dma-bufs.
+> >           Qemu can use this to create host dmabufs for guest framebuffe=
+rs.
+> >
+> >
+> > Qemu is just a userspace process; it is no way a special one.
+> >
+> > Treating host memory as a dmabuf should radically simplify the io_uring
+> > extension of this set. That the io_uring set needs to dive into
+> > page_pools is just wrong - complicating the design and code and pushing
+> > io_uring into a realm it does not need to be involved in.
+>
+> I think our io_uring proposal will already be vastly simplified once we
+> rebase onto Kuba's page pool memory provider API. Using udmabuf means
+> depending on a driver designed for testing, vs io_uring's registered
+> buffers API that's been tried and tested.
+>
 
-I personally agree Linux Foundation should maintain a developer/company DB.
-The developer could submit their information on a voluntary basis, instead of
-letting some tools search the website and collect data.
+FWIW I also get an impression that udmabuf is mostly targeting
+testing, but I'm not aware of any deficiency that makes it concretely
+unsuitable for you. You be the judge.
 
-Thanks
-Hangbin
+The only quirk of udmabuf I'm aware of is that it seems to cap the max
+dma-buf size to 16000 pages. Not sure if that's due to a genuine
+technical limitation or just convenience.
+
+> I don't have an intuitive understanding of the trade offs yet, and would
+> need to try out udmabuf and compare vs say using our own page pool
+> memory provider.
+>
+
+
+On Wed, Nov 8, 2023 at 5:15=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+> How would TCP devmem change if we no longer assume that dmabuf is device
+> memory?
+
+It wouldn't. The code already never assumes that dmabuf is device
+memory. Any dma-buf should work, as far as I can tell. I'm also quite
+confident udmabuf works, I use it for testing.
+
+(Jason Gunthrope is much more of an expert and may chime in to say
+'some dma-buf will not work'. My primitive understanding is that we're
+using dma-bufs without any quirks and any dma-buf should work. I of
+course haven't tested all dma-bufs :D)
+
+> Pavel will know more on the perf side, but I wouldn't want to
+> put any if/else on the hot path if we can avoid it. I could be wrong,
+> but right now in my mind using different memory providers solves this
+> neatly and the driver/networking stack doesn't need to care.
+>
+> Mina, I believe you said at NetDev conf that you already had an udmabuf
+> implementation for testing. I would like to see this (you can send
+> privately) to see how TCP devmem would handle both user memory and
+> device memory.
+>
+
+There is nothing to send privately. The patch series you're looking at
+supports udma-buf as-is, and the kselftest included with the series
+demonstrates devmem TCP working with udmabuf.
+
+The only thing missing from this series is the driver support. You can
+see the GVE driver support for devmem TCP here:
+
+https://github.com/torvalds/linux/compare/master...mina:linux:tcpdevmem-v3
+
+You may need to implement devmem TCP for your driver before you can
+reproduce udmabuf working for yourself, though.
+
+--=20
+Thanks,
+Mina
 
