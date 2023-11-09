@@ -1,201 +1,285 @@
-Return-Path: <netdev+bounces-46821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CFC87E691F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:05:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2C097E6932
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:09:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D627DB20BB4
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:05:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865DC2810D6
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2261116408;
-	Thu,  9 Nov 2023 11:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OS361Xut"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83272199A6;
+	Thu,  9 Nov 2023 11:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E438182AF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:05:47 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4F8F2590
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:05:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699527946;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AtRUDPzty4xk6G3YrueIs/2p0T2ePc3PiZweAufe498=;
-	b=OS361Xut6gEBwI75pkHK1P6BpZbEaeTNv1/Ogh97N9vzFF5xKsJZ6nsEjoXEx3MO0YeOGh
-	PWq/xBNT1V+Ph7tmez+pYsmB+cuoGHj9jS3YdbxQzC3tOn+J9rwiO8qShzQHCx3wmYeAV7
-	Rt4O0a/rq/k+iYg+8vfGBGuZdtoN+uQ=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-180-2uoK89PwMSijqGoQYF_WaQ-1; Thu, 09 Nov 2023 06:05:44 -0500
-X-MC-Unique: 2uoK89PwMSijqGoQYF_WaQ-1
-Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-da37e78401aso151701276.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:05:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699527944; x=1700132744;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AtRUDPzty4xk6G3YrueIs/2p0T2ePc3PiZweAufe498=;
-        b=Q+dhxLlQYAHhDvgBFWTn9UvWGEdLHMRZR+7PMcLsUOpAMjWd2m3wjiic25kerk10yW
-         6n/xGVrOCpokXppnJiqXXaJZj5hiALvvq2L0svYyS2F1UtArnHWHH0W9+HQ4HC45FfSQ
-         soEqiTfoyPtupLgsjGarAxPUN6xerKGxlHrR0Bc5KMGtAmKmDMrn+kqjJGx/HrxnnelA
-         w5BCdvPTMmugVxzkTa8kRxasb0ADBHllDUSi6M8j4KCIv9ayY7RKyUjhiDc4oEFt/2zD
-         uk2NgdcGH1Q+af/3CaZDt3KCTgKMnLTg2E582PUvkAhSq0l/NRROpujxKK2K+gn4zhE5
-         oimw==
-X-Gm-Message-State: AOJu0YzAHvCPBSw5TnLFhsKal7eMEodcbBG5UEhwABW02dk2legkIt5Z
-	j2RKFK1R5tXgkvZRx/W3tyGqaAH7VgcswwwXvpblx97+K7Y5mfnCaxzr8wFd8Cq7VGL92SYaysC
-	QaZgb7OLi6p9OTjkO
-X-Received: by 2002:a25:9346:0:b0:dae:e380:3afa with SMTP id g6-20020a259346000000b00daee3803afamr1116255ybo.2.1699527944398;
-        Thu, 09 Nov 2023 03:05:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHOFSam8Y2WZfjs6lyrCBJqDmNWulDFM0w0FKUbNkESWMi4P7ZtSYxs4i3pcukjOXBjSX6POg==
-X-Received: by 2002:a25:9346:0:b0:dae:e380:3afa with SMTP id g6-20020a259346000000b00daee3803afamr1116194ybo.2.1699527942695;
-        Thu, 09 Nov 2023 03:05:42 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id g23-20020ac870d7000000b004181e5a724csm1813782qtp.88.2023.11.09.03.05.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 03:05:42 -0800 (PST)
-Message-ID: <3a1b5412bee202affc6a7cc74cd939e182b9a18e.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
-From: Paolo Abeni <pabeni@redhat.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Stanislav Fomichev
-	 <sdf@google.com>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>, Christian
- =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,  Shakeel Butt
- <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn
- <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Date: Thu, 09 Nov 2023 12:05:37 +0100
-In-Reply-To: <CAF=yD-JZ88j+44MYgX-=oYJngz4Z0zw6Y0V3nHXisZJtNu7q6A@mail.gmail.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
-	 <20231106024413.2801438-11-almasrymina@google.com>
-	 <ZUk0FGuJ28s1d9OX@google.com>
-	 <CAHS8izNFv7r6vqYR_TYqcCuDO61F+nnNMhsSu=DrYWSr3sVgrA@mail.gmail.com>
-	 <CAF=yD-+MFpO5Hdqn+Q9X54SBpgcBeJvKTRD53X2oM4s8uVqnAQ@mail.gmail.com>
-	 <ZUlp8XutSAScKs_0@google.com>
-	 <CAF=yD-JZ88j+44MYgX-=oYJngz4Z0zw6Y0V3nHXisZJtNu7q6A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7074619456;
+	Thu,  9 Nov 2023 11:09:11 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2631B2D49;
+	Thu,  9 Nov 2023 03:09:09 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0b2Pe_1699528145;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0b2Pe_1699528145)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Nov 2023 19:09:06 +0800
+Message-ID: <1699527983.483377-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 12/21] virtio_net: xsk: tx: support tx
+Date: Thu, 9 Nov 2023 19:06:23 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-13-xuanzhuo@linux.alibaba.com>
+ <20231109030424-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231109030424-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-On Mon, 2023-11-06 at 14:55 -0800, Willem de Bruijn wrote:
-> On Mon, Nov 6, 2023 at 2:34=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
-> wrote:
-> >=20
-> > On 11/06, Willem de Bruijn wrote:
-> > > > > IMHO, we need a better UAPI to receive the tokens and give them b=
-ack to
-> > > > > the kernel. CMSG + setsockopt(SO_DEVMEM_DONTNEED) get the job don=
-e,
-> > > > > but look dated and hacky :-(
-> > > > >=20
-> > > > > We should either do some kind of user/kernel shared memory queue =
-to
-> > > > > receive/return the tokens (similar to what Jonathan was doing in =
-his
-> > > > > proposal?)
-> > > >=20
-> > > > I'll take a look at Jonathan's proposal, sorry, I'm not immediately
-> > > > familiar but I wanted to respond :-) But is the suggestion here to
-> > > > build a new kernel-user communication channel primitive for the
-> > > > purpose of passing the information in the devmem cmsg? IMHO that se=
-ems
-> > > > like an overkill. Why add 100-200 lines of code to the kernel to ad=
-d
-> > > > something that can already be done with existing primitives? I don'=
-t
-> > > > see anything concretely wrong with cmsg & setsockopt approach, and =
-if
-> > > > we switch to something I'd prefer to switch to an existing primitiv=
-e
-> > > > for simplicity?
-> > > >=20
-> > > > The only other existing primitive to pass data outside of the linea=
-r
-> > > > buffer is the MSG_ERRQUEUE that is used for zerocopy. Is that
-> > > > preferred? Any other suggestions or existing primitives I'm not awa=
-re
-> > > > of?
-> > > >=20
-> > > > > or bite the bullet and switch to io_uring.
-> > > > >=20
-> > > >=20
-> > > > IMO io_uring & socket support are orthogonal, and one doesn't precl=
-ude
-> > > > the other. As you know we like to use sockets and I believe there a=
-re
-> > > > issues with io_uring adoption at Google that I'm not familiar with
-> > > > (and could be wrong). I'm interested in exploring io_uring support =
-as
-> > > > a follow up but I think David Wei will be interested in io_uring
-> > > > support as well anyway.
-> > >=20
-> > > I also disagree that we need to replace a standard socket interface
-> > > with something "faster", in quotes.
-> > >=20
-> > > This interface is not the bottleneck to the target workload.
-> > >=20
-> > > Replacing the synchronous sockets interface with something more
-> > > performant for workloads where it is, is an orthogonal challenge.
-> > > However we do that, I think that traditional sockets should continue
-> > > to be supported.
-> > >=20
-> > > The feature may already even work with io_uring, as both recvmsg with
-> > > cmsg and setsockopt have io_uring support now.
-> >=20
-> > I'm not really concerned with faster. I would prefer something cleaner =
-:-)
-> >=20
-> > Or maybe we should just have it documented. With some kind of path
-> > towards beautiful world where we can create dynamic queues..
->=20
-> I suppose we just disagree on the elegance of the API.
->=20
-> The concise notification API returns tokens as a range for
-> compression, encoding as two 32-bit unsigned integers start + length.
-> It allows for even further batching by returning multiple such ranges
-> in a single call.
->=20
-> This is analogous to the MSG_ZEROCOPY notification mechanism from
-> kernel to user.
->=20
-> The synchronous socket syscall interface can be replaced by something
-> asynchronous like io_uring. This already works today? Whatever
-> asynchronous ring-based API would be selected, io_uring or otherwise,
-> I think the concise notification encoding would remain as is.
->=20
-> Since this is an operation on a socket, I find a setsockopt the
-> fitting interface.
+On Thu, 9 Nov 2023 03:09:00 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Nov 07, 2023 at 11:12:18AM +0800, Xuan Zhuo wrote:
+> > The driver's tx napi is very important for XSK. It is responsible for
+> > obtaining data from the XSK queue and sending it out.
+> >
+> > At the beginning, we need to trigger tx napi.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio/main.c       |  12 +++-
+> >  drivers/net/virtio/virtio_net.h |   3 +-
+> >  drivers/net/virtio/xsk.c        | 110 ++++++++++++++++++++++++++++++++
+> >  drivers/net/virtio/xsk.h        |  13 ++++
+> >  4 files changed, 136 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> > index 6c608b3ce27d..ff6bc764089d 100644
+> > --- a/drivers/net/virtio/main.c
+> > +++ b/drivers/net/virtio/main.c
+> > @@ -2074,6 +2074,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+> >  	struct virtnet_info *vi = sq->vq->vdev->priv;
+> >  	unsigned int index = vq2txq(sq->vq);
+> >  	struct netdev_queue *txq;
+> > +	int busy = 0;
+> >  	int opaque;
+> >  	bool done;
+> >
+> > @@ -2086,11 +2087,20 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+> >  	txq = netdev_get_tx_queue(vi->dev, index);
+> >  	__netif_tx_lock(txq, raw_smp_processor_id());
+> >  	virtqueue_disable_cb(sq->vq);
+> > -	free_old_xmit(sq, true);
+> > +
+> > +	if (sq->xsk.pool)
+> > +		busy |= virtnet_xsk_xmit(sq, sq->xsk.pool, budget);
+>
+> You use bitwise or on errno values? What's going on here?
 
-FWIW, I think sockopt +cmsg is the right API. It would deserve some
-explicit addition to the documentation, both in the kernel and in the
-man-pages.
+virtnet_xsk_xmit() return that it is busy or not. Not the errno.
+Here just record whether this handler is busy or not.
 
-Cheers,
+>
+>
+> > +	else
+> > +		free_old_xmit(sq, true);
+> >
+> >  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
+> >  		netif_tx_wake_queue(txq);
+> >
+> > +	if (busy) {
+> > +		__netif_tx_unlock(txq);
+> > +		return budget;
+> > +	}
+> > +
+> >  	opaque = virtqueue_enable_cb_prepare(sq->vq);
+> >
+> >  	done = napi_complete_done(napi, 0);
+> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > index 442af4673bf8..1c21af47e13c 100644
+> > --- a/drivers/net/virtio/virtio_net.h
+> > +++ b/drivers/net/virtio/virtio_net.h
+> > @@ -9,7 +9,8 @@
+> >  #include <net/xdp_sock_drv.h>
+> >
+> >  #define VIRTIO_XDP_FLAG	BIT(0)
+> > -#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG)
+> > +#define VIRTIO_XSK_FLAG	BIT(1)
+> > +#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG | VIRTIO_XSK_FLAG)
+> >
+> >  /* RX packet size EWMA. The average packet size is used to determine the packet
+> >   * buffer size when refilling RX rings. As the entire RX ring may be refilled
+> > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > index 8b397787603f..caa448308232 100644
+> > --- a/drivers/net/virtio/xsk.c
+> > +++ b/drivers/net/virtio/xsk.c
+> > @@ -4,9 +4,119 @@
+> >   */
+> >
+> >  #include "virtio_net.h"
+> > +#include "xsk.h"
+> >
+> >  static struct virtio_net_hdr_mrg_rxbuf xsk_hdr;
+> >
+> > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len)
+> > +{
+> > +	sg->dma_address = addr;
+> > +	sg->length = len;
+> > +}
+> > +
+> > +static void virtnet_xsk_check_queue(struct virtnet_sq *sq)
+> > +{
+> > +	struct virtnet_info *vi = sq->vq->vdev->priv;
+> > +	struct net_device *dev = vi->dev;
+> > +	int qnum = sq - vi->sq;
+> > +
+> > +	/* If it is a raw buffer queue, it does not check whether the status
+> > +	 * of the queue is stopped when sending. So there is no need to check
+> > +	 * the situation of the raw buffer queue.
+> > +	 */
+> > +	if (virtnet_is_xdp_raw_buffer_queue(vi, qnum))
+> > +		return;
+> > +
+> > +	/* If this sq is not the exclusive queue of the current cpu,
+> > +	 * then it may be called by start_xmit, so check it running out
+> > +	 * of space.
+> > +	 *
+> > +	 * Stop the queue to avoid getting packets that we are
+> > +	 * then unable to transmit. Then wait the tx interrupt.
+> > +	 */
+> > +	if (sq->vq->num_free < 2 + MAX_SKB_FRAGS)
+>
+> what does MAX_SKB_FRAGS have to do with it? And where's 2 coming from?
 
-Paolo
+check_sq_full_and_disable()
 
+Thanks.
+
+>
+> > +		netif_stop_subqueue(dev, qnum);
+> > +}
+> > +
+> > +static int virtnet_xsk_xmit_one(struct virtnet_sq *sq,
+> > +				struct xsk_buff_pool *pool,
+> > +				struct xdp_desc *desc)
+> > +{
+> > +	struct virtnet_info *vi;
+> > +	dma_addr_t addr;
+> > +
+> > +	vi = sq->vq->vdev->priv;
+> > +
+> > +	addr = xsk_buff_raw_get_dma(pool, desc->addr);
+> > +	xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
+> > +
+> > +	sg_init_table(sq->sg, 2);
+> > +
+> > +	sg_fill_dma(sq->sg, sq->xsk.hdr_dma_address, vi->hdr_len);
+> > +	sg_fill_dma(sq->sg + 1, addr, desc->len);
+> > +
+> > +	return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
+> > +				    virtnet_xsk_to_ptr(desc->len), GFP_ATOMIC);
+> > +}
+> > +
+> > +static int virtnet_xsk_xmit_batch(struct virtnet_sq *sq,
+> > +				  struct xsk_buff_pool *pool,
+> > +				  unsigned int budget,
+> > +				  u64 *kicks)
+> > +{
+> > +	struct xdp_desc *descs = pool->tx_descs;
+> > +	u32 nb_pkts, max_pkts, i;
+> > +	bool kick = false;
+> > +	int err;
+> > +
+> > +	/* Every xsk tx packet needs two desc(virtnet header and packet). So we
+> > +	 * use sq->vq->num_free / 2 as the limitation.
+> > +	 */
+> > +	max_pkts = min_t(u32, budget, sq->vq->num_free / 2);
+> > +
+> > +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, max_pkts);
+> > +	if (!nb_pkts)
+> > +		return 0;
+> > +
+> > +	for (i = 0; i < nb_pkts; i++) {
+> > +		err = virtnet_xsk_xmit_one(sq, pool, &descs[i]);
+> > +		if (unlikely(err))
+> > +			break;
+> > +
+> > +		kick = true;
+> > +	}
+> > +
+> > +	if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq))
+> > +		(*kicks)++;
+> > +
+> > +	return i;
+> > +}
+> > +
+> > +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > +		      int budget)
+> > +{
+> > +	u64 bytes = 0, packets = 0, kicks = 0;
+> > +	int sent;
+> > +
+> > +	virtnet_free_old_xmit(sq, true, &bytes, &packets);
+> > +
+> > +	sent = virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
+> > +
+> > +	virtnet_xsk_check_queue(sq);
+> > +
+> > +	u64_stats_update_begin(&sq->stats.syncp);
+> > +	u64_stats_add(&sq->stats.packets, packets);
+> > +	u64_stats_add(&sq->stats.bytes, bytes);
+> > +	u64_stats_add(&sq->stats.kicks, kicks);
+> > +	u64_stats_add(&sq->stats.xdp_tx,  sent);
+> > +	u64_stats_update_end(&sq->stats.syncp);
+> > +
+> > +	if (xsk_uses_need_wakeup(pool))
+> > +		xsk_set_tx_need_wakeup(pool);
+> > +
+> > +	return sent == budget;
+> > +}
+> > +
+> >  static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *rq,
+> >  				    struct xsk_buff_pool *pool)
+> >  {
+> > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> > index 1918285c310c..73ca8cd5308b 100644
+> > --- a/drivers/net/virtio/xsk.h
+> > +++ b/drivers/net/virtio/xsk.h
+> > @@ -3,5 +3,18 @@
+> >  #ifndef __XSK_H__
+> >  #define __XSK_H__
+> >
+> > +#define VIRTIO_XSK_FLAG_OFFSET	4
+> > +
+> > +static inline void *virtnet_xsk_to_ptr(u32 len)
+> > +{
+> > +	unsigned long p;
+> > +
+> > +	p = len << VIRTIO_XSK_FLAG_OFFSET;
+> > +
+> > +	return (void *)(p | VIRTIO_XSK_FLAG);
+> > +}
+> > +
+> >  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+> > +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > +		      int budget);
+> >  #endif
+> > --
+> > 2.32.0.3.g01195cf9f
+>
 
