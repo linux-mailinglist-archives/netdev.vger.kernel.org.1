@@ -1,873 +1,349 @@
-Return-Path: <netdev+bounces-46942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B5B7E7404
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 22:52:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D57687E740D
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 22:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C288E1C20C4E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:52:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E98C28139F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9131438F8D;
-	Thu,  9 Nov 2023 21:52:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A02C38F8F;
+	Thu,  9 Nov 2023 21:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DfJ9h2Gq"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2371F38F8A;
-	Thu,  9 Nov 2023 21:52:36 +0000 (UTC)
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ED5C4211;
-	Thu,  9 Nov 2023 13:52:36 -0800 (PST)
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1r1Cwq-0003aK-2T;
-	Thu, 09 Nov 2023 21:52:24 +0000
-Date: Thu, 9 Nov 2023 21:52:21 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: [RFC PATCH 8/8] net: ethernet: mtk_eth_soc: add paths and SerDes
- modes for MT7988
-Message-ID: <cad139116f916ae4f63d3df9900835af3f6b5cd2.1699565880.git.daniel@makrotopia.org>
-References: <cover.1699565880.git.daniel@makrotopia.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6C938F8C
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 21:54:32 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDF981FE5
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 13:54:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699566872; x=1731102872;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=o8lRFtCseJTKxdnFvecxWLwJJ0OuNB14Poc/4Q66rpM=;
+  b=DfJ9h2GqEXjyfDrcfw471QU3M0+hp8hVVUKlpCDyekpGcNbZjPMBXrXu
+   0/t2qzqYaZsieQWmMdGTENTbt4ZKmAhZoxgSjQm3WqMiK0jdg4ibzY1pb
+   iAjj0YzaKAX7BV4mOpm+xjyEJhYzf7SBs7l7a0tq4dkZhevqRBNYZk0je
+   TMPCIa6FUZC6egm+SmTPpECQoqbeQma1eo3XlsMUTzwWGqQzjZJaAH38P
+   9msO5AF46FcefXHU/i7o80DKT+cWwjLjOw/O4imof799CUdLWU235AiIn
+   DqrhMExbIuvFTfThbmoW7c6rbXqe8J+nYP14x+3YSjCIWp3pilQRfibeR
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="11630074"
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="11630074"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 13:54:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="829452693"
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="829452693"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 13:54:24 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 9 Nov 2023 13:54:24 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 9 Nov 2023 13:54:24 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 13:54:24 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 9 Nov 2023 13:54:23 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FnuRU0GMgG7musqYChFgjPRxUOMU2s4opCtvS8ji9q3h6hNl9F34aXYj1X85pZzM9M2MPiLo3j7Es8ePQiss5OFov2UhmXUGfi/GvI/IxiN043dKSkAqqK8XUL5GUisoQYgjyaQknn2WNRw9hwCf1s3ch+ezlIRaBX8ZD5afFf3OAU2qgUeeW+igSTRR5U5+FbQQYxh8rQPp3WmSl88ZzThctWF2EoH5VHxr6H0mhTxTDSG82ckZnr7miox80X6aYBibX0jEUq0uU6gFNdjywvCmq9BKDW3YS/fBve+5V80/xbFWfjJVFhKywtNZsoDmq1aGsI7xMRsZhvLd2o2ZUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mr5oiCjWTMP2367dX7QUlxRK15mRiZmjnQhAG3OdQYc=;
+ b=SP0lU4yJEtUC8omTuRDHzbxYlh34Y93QfCjkxqx1Egy5ZF3vX09MaX9f9aAwIYobH+6smjs2QCdRBAj6L27eKnBq/zI0rByMslCUbgaxLDxaOw8iNvnsftCi3WCLaF5+UrAbZGgVnZ5j/32ZP0uLTF9NXqjDiJucwXHDEnPVBntKdd4q5bhZdB56zXgxL+nfVrOp/bQx99YjZ/YKCFTPIBZOpEojjtn70LT1mxZfuV9HCqfp02HyCLFFLBK4adCJeqG89CtI4K0YMmjauqVN62S6p+kS7qKUBS4dUgZHrVleZmBPRpzQJEz30F1gRCw9ZNZyraGeKTTy6ydTKIAKGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5042.namprd11.prod.outlook.com (2603:10b6:303:99::14)
+ by IA1PR11MB6323.namprd11.prod.outlook.com (2603:10b6:208:389::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Thu, 9 Nov
+ 2023 21:54:20 +0000
+Received: from CO1PR11MB5042.namprd11.prod.outlook.com
+ ([fe80::dc90:ba:fcb1:4198]) by CO1PR11MB5042.namprd11.prod.outlook.com
+ ([fe80::dc90:ba:fcb1:4198%6]) with mapi id 15.20.6954.029; Thu, 9 Nov 2023
+ 21:54:20 +0000
+Message-ID: <5d873c14-9d17-4c48-8e11-951b99270b75@intel.com>
+Date: Thu, 9 Nov 2023 13:54:17 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
+To: Maxim Mikityanskiy <maxtram95@gmail.com>, Paolo Abeni <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+	<xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	<xuejun.zhang@intel.com>, <sridhar.samudrala@intel.com>
+References: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
+ <ZTvBoQHfu23ynWf-@mail.gmail.com>
+ <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
+ <ZUEQzsKiIlgtbN-S@mail.gmail.com>
+Content-Language: en-US
+From: "Chittim, Madhu" <madhu.chittim@intel.com>
+In-Reply-To: <ZUEQzsKiIlgtbN-S@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4P222CA0028.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:303:114::33) To CO1PR11MB5042.namprd11.prod.outlook.com
+ (2603:10b6:303:99::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1699565880.git.daniel@makrotopia.org>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5042:EE_|IA1PR11MB6323:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1178ea13-6988-433d-c8f8-08dbe16e6d40
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: baj0fEbZ/bBejxGGiq+LqcGpriii3OidQiNQ670wDfgYapUN/1FL5NL5/ex2kdmJSgwDe2GOVrLz4e3t7IgOWZoXN19s/f/8FLrwtidxXBH+i20g9LX8X/imdtwriBVManTZ8mOj99Gngj06AlPSAoS1sktynPlhJlF9JKncTtnizZA3X0VOMsw4hk9mO0nzAdHjPcAY1UViR7k3PwtJaeuaH5Cr051xFWteg/2hH7CNe/47xlxPSYiGSjzNb0GiisaYCMK7qrc3QY6AeMCAeqm2GJMAftuPgA5zNhBs7iOAg5Cicyr4AlAW8qEahjuSPmhBoKkEDHMuAfLyKuA5dm6XHGJirgiysG6w9PM22fpabiJYsEG7k7+XggjFfEFkaontd+TJVLwUV559MaqQIFsfMip1oM85twGhAf3xnRnK44Qv1UGOJB7l45Dxw8+P9oJLNc+aw7fBTLbi5bD7SSwv/nyV7z+0+POLLZX3gUzLsMA9cDQ3s7He2dAXOWQo2zvEGUxIhxDytHjyYMc/wo4r7JZaanJls/Eq79p07E83sOCl4souh/6WeNzROoHQpWwttw7mfPeasjZHlMpB6LauUmtKjK/aH+rbbufZWl6aLEOzXn/T5eVAnmVLDfAZ9MIXF3lSUe9KWII8ALE0EAVhsgtevDHUHePDY/GPCKTzBRg7UJCxInBBYo72HxFl
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5042.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(346002)(366004)(376002)(136003)(39860400002)(230173577357003)(230922051799003)(230273577357003)(451199024)(186009)(1800799009)(64100799003)(478600001)(6512007)(2616005)(41300700001)(7416002)(6486002)(53546011)(6506007)(966005)(66476007)(8936002)(8676002)(26005)(83380400001)(5660300002)(54906003)(4326008)(6666004)(110136005)(316002)(66556008)(66946007)(4001150100001)(2906002)(82960400001)(31686004)(107886003)(86362001)(31696002)(38100700002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?STFsbW1zZ0ZhZzhuQzcvU2hybzBkc204SzF2VWdEbW1VdkVJeXBhT0p3WXdy?=
+ =?utf-8?B?M2ZsUW5VdGUvbUtTdjJOQmVTT3QreGlyNW5rTDZ0QVp3OGx0WDhDUCs1QkV2?=
+ =?utf-8?B?dExEUUc5QXlLVWJPRDNweUFCVGdRVm55cE5QMmpSOGlhOEFJNUNHdVB3WFNx?=
+ =?utf-8?B?cW1KaVpNZURqaENaQVRCN2MybUJ3bDRQWTlZbjhpaE4wQ1JGajFlM1ZhWlVk?=
+ =?utf-8?B?VG1XTjlUalpQRzZqd0xpVG1EakFTRW5rV3krVUdwSHdHbUdZQ0UyVjdaai92?=
+ =?utf-8?B?Y1Y1M1BGaDEvMklWc2huMG1pVksvMHV1TFVPd3JCUWNNd2pma2Q3UDFiOFNw?=
+ =?utf-8?B?eHhWV0d3UVVFSXdJdlpSbG9hR01KdmFVck1pTXNzd056cEhWRmtxblFSOW9i?=
+ =?utf-8?B?MGMvZ3VjY2JaNmwwZVRUVno2Z1lWdXd6SU93YW1zQzlOdTA3S21SeW05L2Np?=
+ =?utf-8?B?NUp2ZjQ2NDBicDRPb0VwTEIrb05WOW9ieGpFenBheHpKSGpTT1hhcitEZE9k?=
+ =?utf-8?B?ZnBKQVJYQmxqVTNZODE2dCsySVlRWEpUcHpvdUdsbndBWE5CdGdsU1BNa05r?=
+ =?utf-8?B?ZGYvR0NQOFhSY3JEb0JOWk1aYWRVSVRMZ2V3c3lka2UycHhtY2lJcUZucitj?=
+ =?utf-8?B?UmNCZG9BWFp3ZUF1SG9GRFl3a3Vaa24ydXNmcEM4cm8ycUFYVFh1RGg5THc1?=
+ =?utf-8?B?Vlc0YlZpSVZEZUwwVk84OEk2QS9qalFzYVJ1NUkxenhkN3NDZ2Q4U3IyZWFr?=
+ =?utf-8?B?bFdxRlNNZU4vZGJCSG0rQUNMbU1WWGtaQkJNM0RuL2ZTa0FRT2tCcjQ5ZnpK?=
+ =?utf-8?B?RThNeW5XV0hjSjRTTUJZKzduNFJNUFpsb1BkUTdSdndDY3hCMkRvVGFYdXpI?=
+ =?utf-8?B?ZkhSZ1B6SkcrZ045MXdIQ3JDTDhPaXNZdGZkRFFyMUtFRDQxSWtIYmVyTWgx?=
+ =?utf-8?B?WGVveGpCWGdENEp3Z1UzcWlmbDdjZDVZU3NVM3hrRHZNeEpueW1wZEdHay9w?=
+ =?utf-8?B?U3Q1N2pqR0V6RU5ncHVUdTViVWRxc2JPR29qaGtMS3NsUVN1VFEwbjlLWW1B?=
+ =?utf-8?B?cUxzUFVLMVJrZlNyTlpCbXppZy95T3NiMFl2MjdnemhIbGVsUkN2enduMy9C?=
+ =?utf-8?B?WTdQRzhUZWI2eFdmYzFDN1dqajZrQ1pDYkkxMjZVM0NSMEtJYzU0c1Fib0NJ?=
+ =?utf-8?B?SUMyN1h3RUpzUFcrVU4xMkhLcGFNOG9Mb3FzMWNYVHhoM1FyYXA2WW5iWVdF?=
+ =?utf-8?B?TWZma1pQRU1IM0w3Y3lMMnBwS3MzQitHQW0zcGtoRWFxM1UzSnNJQ096a25v?=
+ =?utf-8?B?YjlqN0ZCWWswVHdRY0djVmxaVmlUVWhiOVh1bzhWQW8vaWlVdy9vTjZFL1Zv?=
+ =?utf-8?B?T2l0WFVGTzlyUVc4OUtnS3JnVkxQdjFkRERPS3NYN0RsZmtoZXphWlZtbXJY?=
+ =?utf-8?B?SVQ1MXY5RThmaTBPNEFpeVkybTdWdnRiUEh1UWNkWmJWK3dORWlBMTdiY0Ft?=
+ =?utf-8?B?alliUmNsR0g2YXZUUEJmS0k2Um5HREJ3cFJDSDVueGdTV2NudmNEUFFLdnlO?=
+ =?utf-8?B?b2toUDhuekpYV1NzWW5pTzcvcUNPV05MYng3ZE1kYjBtRnZIYzEwZkc0Y0Jx?=
+ =?utf-8?B?OHdCZVE4RHJrekk4cW5tN2MzZzNHK1hxTnBiWTc0K24zTG52dU1yK2hlMktu?=
+ =?utf-8?B?eFB5endaNWV0N2RQRmFFT3F1SWFUaUdnU09WYjFjOG92SFdGZTBPZTBFZHJI?=
+ =?utf-8?B?ZXREZmtTaVFyYXFXYUxDKzAyRHF1VEMvMUxGR3h2aU5wQnVURWg0OWdTYTNI?=
+ =?utf-8?B?Ty90L3FSTHNOWi80TGFBZjRUbUV4WkFPaVBQOXNIalN0K3FKY3pIUFdFK0Zx?=
+ =?utf-8?B?NkMydG50RXZmbXI2TlNWeG44aVhLUzVCVWNwQnQyeE05N1J1Q0hXUlVXc1Fy?=
+ =?utf-8?B?UlhUUDBoc2tmeVhvWUt2V3BMNmI0cnZFdSswOTFzU3ZacFZIcnBweWR4TVhU?=
+ =?utf-8?B?Ui81dzc1MmxpSzYyU3B6bW8xaWJTalllSjMwM0cvc244Snk0N1ZOM0NpWFZm?=
+ =?utf-8?B?VmdIMWozWExpd1pjZmhhdGZ6aUQ2bGV4K2dJZ3k1eU9HRVFndnYxK1pqTG9W?=
+ =?utf-8?B?N3JEZ0RQMEdMR29wOHlLa2VIT0NaU2tJODRod1pNUDBuQXZ3N0pLMjJBL0RQ?=
+ =?utf-8?B?aWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1178ea13-6988-433d-c8f8-08dbe16e6d40
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5042.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 21:54:20.0060
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aRLvLM3JI0jSujNslepPCnJNUzDViUdt5AXI+Sd6YQ6PEE8sAbR0+Rzm8h/R9LUaxWF+u2+mLlU0qWgm3BnQdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6323
+X-OriginatorOrg: intel.com
 
-MT7988 comes with a built-in 2.5G PHY as well as SerDes lanes to
-connect external PHYs or transceivers in USXGMII, 10GBase-R, 5GBase-R,
-2500Base-X, 1000Base-X and Cisco SGMII interface modes.
 
-Implement support for configuring for the new paths to SerDes interfaces
-and the internal 2.5G PHY.
 
-Add USXGMII PCS driver for 10GBase-R, 5GBase-R and USXGMII mode, and
-setup the new PHYA on MT7988 to access the also still existing old
-LynxI PCS for 1000Base-X, 2500Base-X and Cisco SGMII PCS interface
-modes.
+On 10/31/2023 7:40 AM, Maxim Mikityanskiy wrote:
+> On Tue, 31 Oct 2023 at 10:11:14 +0100, Paolo Abeni wrote:
+>> Hi,
+>>
+>> I'm sorry for the late reply.
+>>
+>> On Fri, 2023-10-27 at 16:57 +0300, Maxim Mikityanskiy wrote:
+>>> I believe this is not the right fix.
+>>>
+>>> On Thu, 26 Oct 2023 at 17:36:48 +0200, Paolo Abeni wrote:
+>>>> The following commands:
+>>>>
+>>>> tc qdisc add dev eth1 handle 2: root htb offload
+>>>> tc class add dev eth1 parent 2: classid 2:1 htb rate 5mbit burst 15k
+>>>>
+>>>> yeld to a WARN in the HTB qdisc:
+>>>
+>>> Something is off here. These are literally the most basic commands one
+>>> could invoke with HTB offload, I'm sure they worked. Is it something
+>>> that broke recently? Tariq/Gal/Saeed, could you check them on a Mellanox
+>>> NIC?
+>>>
+>>>>
+>>>>   WARNING: CPU: 2 PID: 1583 at net/sched/sch_htb.c:1959
+>>>>   CPU: 2 PID: 1583 Comm: tc Kdump: loaded 6.6.0-rc2.mptcp_7895773e5235+ #59
+>>>>   Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-1.fc37 04/01/2014
+>>>>   RIP: 0010:htb_change_class+0x25c4/0x2e30 [sch_htb]
+>>>>   Code: 24 58 48 b8 00 00 00 00 00 fc ff df 48 89 ca 48 c1 ea 03 80 3c 02 00 0f 85 92 01 00 00 49 89 8c 24 b0 01 00 00 e9 77 fc ff ff <0f> 0b e9 15 ec ff ff 80 3d f8 35 00 00 00 0f 85 d4 f9 ff ff ba 32
+>>>>   RSP: 0018:ffffc900015df240 EFLAGS: 00010246
+>>>>   RAX: 0000000000000000 RBX: ffff88811b4ca000 RCX: ffff88811db42800
+>>>>   RDX: 1ffff11023b68502 RSI: ffffffffaf2e6a00 RDI: ffff88811db42810
+>>>>   RBP: ffff88811db45000 R08: 0000000000000001 R09: fffffbfff664bbc9
+>>>>   R10: ffffffffb325de4f R11: ffffffffb2d33748 R12: 0000000000000000
+>>>>   R13: ffff88811db43000 R14: ffff88811b4caaac R15: ffff8881252c0030
+>>>>   FS:  00007f6c1f126740(0000) GS:ffff88815aa00000(0000) knlGS:0000000000000000
+>>>>   CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>   CR2: 000055dca8e5b4a8 CR3: 000000011bc7a006 CR4: 0000000000370ee0
+>>>>   DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>>   DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>>   Call Trace:
+>>>>   <TASK>
+>>>>    tc_ctl_tclass+0x394/0xeb0
+>>>>    rtnetlink_rcv_msg+0x2f5/0xaa0
+>>>>    netlink_rcv_skb+0x12e/0x3a0
+>>>>    netlink_unicast+0x421/0x730
+>>>>    netlink_sendmsg+0x79e/0xc60
+>>>>    ____sys_sendmsg+0x95a/0xc20
+>>>>    ___sys_sendmsg+0xee/0x170
+>>>>    __sys_sendmsg+0xc6/0x170
+>>>>   do_syscall_64+0x58/0x80
+>>>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>>>
+>>>> The first command creates per TX queue pfifo qdiscs in
+>>>> tc_modify_qdisc() -> htb_init() and grafts the pfifo to each dev_queue
+>>>> via tc_modify_qdisc() ->  qdisc_graft() -> htb_attach().
+>>>
+>>> Not exactly; it grafts pfifo to direct queues only. htb_attach_offload
+>>> explicitly grafts noop to all the remaining queues.
+>>
+>> num_direct_qdiscs == real_num_tx_queues:
+>>
+>> https://elixir.bootlin.com/linux/latest/source/net/sched/sch_htb.c#L1101
+>>
+>> pfifo will be configured on all the TX queues available at TC creation
+>> time, right?
+> 
+> Yes, all real TX queues will be used as direct queues (for unclassified
+> traffic). num_tx_queues should be somewhat bigger than
+> real_num_tx_queues - it should reserve a queue per potential leaf class.
+> 
+> pfifo is configured on direct queues, and the reserved queues have noop.
+> Then, when a new leaf class is added (TC_HTB_LEAF_ALLOC_QUEUE), the
+> driver allocates a new queue and increases real_num_tx_queues. HTB
+> assigns a pfifo qdisc to the newly allocated queue.
+> 
+> Changing the hierarchy (deleting a node or converting an inner node to a
+> leaf) may reorder the classful queues (with indexes >= the initial
+> real_num_tx_queues), so that there are no gaps.
+> 
+>> Lacking a mlx card with offload support I hack basic htb support in
+>> netdevsim and I observe the splat on top of such device. I can as well
+>> share the netdevsim patch - it will need some clean-up.
+> 
+> I will be happy to review the netdevsim patch, but I don't promise
+> prompt responsiveness.
+> 
+>>>
+>>>> When the command completes, the qdisc_sleeping for each dev_queue is a
+>>>> pfifo one. The next class creation will trigger the reported splat.
+>>>>
+>>>> Address the issue taking care of old non-builtin qdisc in
+>>>> htb_change_class().
+>>>>
+>>>> Fixes: d03b195b5aa0 ("sch_htb: Hierarchical QoS hardware offload")
+>>>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>>>> ---
+>>>>   net/sched/sch_htb.c | 3 +--
+>>>>   1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
+>>>> index 0d947414e616..dc682bd542b4 100644
+>>>> --- a/net/sched/sch_htb.c
+>>>> +++ b/net/sched/sch_htb.c
+>>>> @@ -1955,8 +1955,7 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
+>>>>   				qdisc_refcount_inc(new_q);
+>>>>   			}
+>>>>   			old_q = htb_graft_helper(dev_queue, new_q);
+>>>> -			/* No qdisc_put needed. */
+>>>> -			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
+>>>> +			qdisc_put(old_q);
+>>>
+>>> We can get here after one of two cases above:
+>>>
+>>> 1. A new queue is allocated with TC_HTB_LEAF_ALLOC_QUEUE. It's supposed
+>>> to have a noop qdisc by default (after htb_attach_offload).
+>>
+>> So most likely the trivial netdevsim implementation I used was not good
+>> enough.
+>>
+>> Which constrains should respect TC_HTB_LEAF_ALLOC_QUEUE WRT the
+>> returned qid value? should it in the (real_num_tx_queues,
+>> num_tx_queues] range?
+> 
+> Let's say N is real_num_tx_queues as it was at the moment of attaching.
+> HTB queues should be allocated from [N, num_tx_queues), and
+> real_num_tx_queues should be increased accordingly. It should not return
+> queues number [0, N).
+> 
+> Deletions should fill the gaps: if queue X is being deleted, N <= X <
+> real_num_tx_queues - 1, then the gap should be filled with queue number
+> real_num_tx_queues - 1 by swapping the queues (real_num_tx_queues will
+> be decreased by 1 accordingly). Some care also needs to be taken when
+> converting inner-to-leaf (TC_HTB_LEAF_DEL_LAST) and leaf-to-inner (it's
+> better to get insights from [1], there are also some comments).
+> 
+>> Can HTB actually configure H/W shaping on
+>> real_num_tx_queues?
+> 
+> It will be on real_num_tx_queues, but after it's increased to add new
+> HTB queues. The original queues [0, N) are used for direct traffic, same
+> as the non-offloaded HTB's direct_queue (it's not shaped).
+> 
+>> I find no clear documentation WRT the above.
+> 
+> I'm sorry for the lack of documentation. All I have is the commit
+> message [2] and a netdev talk [3]. Maybe the slides could be of some
+> use...
+> 
+> I hope the above explanation clarifies something, and feel free to ask
+> further questions, I'll be glad to explain what hasn't been documented
+> properly.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/ethernet/mediatek/Kconfig        |  17 ++
- drivers/net/ethernet/mediatek/mtk_eth_path.c | 122 ++++++++++++-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c  | 178 ++++++++++++++++---
- drivers/net/ethernet/mediatek/mtk_eth_soc.h  | 105 +++++++++--
- 4 files changed, 379 insertions(+), 43 deletions(-)
+We would like to enable Tx rate limiting using htb offload on all the 
+existing queues. We are able to do with the following set of commands 
+with Paolo's patch
 
-diff --git a/drivers/net/ethernet/mediatek/Kconfig b/drivers/net/ethernet/mediatek/Kconfig
-index da0db417ab690..b63723b8d1d2c 100644
---- a/drivers/net/ethernet/mediatek/Kconfig
-+++ b/drivers/net/ethernet/mediatek/Kconfig
-@@ -21,10 +21,27 @@ config NET_MEDIATEK_SOC
- 	select PAGE_POOL_STATS
- 	select PCS_MTK_LYNXI
- 	select REGMAP_MMIO
-+	select PCS_MTK_USXGMII if NET_MEDIATEK_SOC_USXGMII
- 	help
- 	  This driver supports the gigabit ethernet MACs in the
- 	  MediaTek SoC family.
- 
-+config NET_MEDIATEK_SOC_USXGMII
-+	bool "Support USXGMII SerDes on MT7988"
-+	depends on (ARCH_MEDIATEK && ARM64) || COMPILE_TEST
-+	def_bool NET_MEDIATEK_SOC != n
-+	help
-+	  Include support for 10GE SerDes which can be found on MT7988.
-+	  If this kernel should run on SoCs with 10 GBit/s Ethernet you
-+	  will need to select this option to use GMAC2 and GMAC3 with
-+	  external PHYs, SFP(+) cages in 10GBase-R, 5GBase-R or USXGMII
-+	  interface modes.
-+
-+	  Note that as the 2500Base-X/1000Base-X/Cisco SGMII SerDes PCS
-+	  unit (MediaTek LynxI) in MT7988 is connected via the new 10GE
-+	  SerDes, you will also need to select this option in case you
-+	  want to use any of those SerDes modes.
-+
- config NET_MEDIATEK_STAR_EMAC
- 	tristate "MediaTek STAR Ethernet MAC support"
- 	select PHYLIB
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_path.c b/drivers/net/ethernet/mediatek/mtk_eth_path.c
-index 7c27a19c4d8f4..3f4f4cfe6a233 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_path.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_path.c
-@@ -31,10 +31,20 @@ static const char *mtk_eth_path_name(u64 path)
- 		return "gmac2_rgmii";
- 	case MTK_ETH_PATH_GMAC2_SGMII:
- 		return "gmac2_sgmii";
-+	case MTK_ETH_PATH_GMAC2_2P5GPHY:
-+		return "gmac2_2p5gphy";
- 	case MTK_ETH_PATH_GMAC2_GEPHY:
- 		return "gmac2_gephy";
-+	case MTK_ETH_PATH_GMAC3_SGMII:
-+		return "gmac3_sgmii";
- 	case MTK_ETH_PATH_GDM1_ESW:
- 		return "gdm1_esw";
-+	case MTK_ETH_PATH_GMAC1_USXGMII:
-+		return "gmac1_usxgmii";
-+	case MTK_ETH_PATH_GMAC2_USXGMII:
-+		return "gmac2_usxgmii";
-+	case MTK_ETH_PATH_GMAC3_USXGMII:
-+		return "gmac3_usxgmii";
- 	default:
- 		return "unknown path";
- 	}
-@@ -127,6 +137,27 @@ static int set_mux_u3_gmac2_to_qphy(struct mtk_eth *eth, u64 path)
- 	return 0;
- }
- 
-+static int set_mux_gmac2_to_2p5gphy(struct mtk_eth *eth, u64 path)
-+{
-+	int ret;
-+
-+	if (path == MTK_ETH_PATH_GMAC2_2P5GPHY) {
-+		ret = regmap_clear_bits(eth->ethsys, ETHSYS_SYSCFG0, SYSCFG0_SGMII_GMAC2_V2);
-+		if (ret)
-+			return ret;
-+
-+		/* Setup mux to 2p5g PHY */
-+		ret = regmap_clear_bits(eth->infra, TOP_MISC_NETSYS_PCS_MUX, MUX_G2_USXGMII_SEL);
-+		if (ret)
-+			return ret;
-+
-+		dev_dbg(eth->dev, "path %s in %s updated\n",
-+			mtk_eth_path_name(path), __func__);
-+	}
-+
-+	return 0;
-+}
-+
- static int set_mux_gmac1_gmac2_to_sgmii_rgmii(struct mtk_eth *eth, u64 path)
- {
- 	unsigned int val = 0;
-@@ -165,7 +196,48 @@ static int set_mux_gmac1_gmac2_to_sgmii_rgmii(struct mtk_eth *eth, u64 path)
- 	return 0;
- }
- 
--static int set_mux_gmac12_to_gephy_sgmii(struct mtk_eth *eth, u64 path)
-+static int set_mux_gmac123_to_usxgmii(struct mtk_eth *eth, u64 path)
-+{
-+	unsigned int val = 0;
-+	bool updated = true;
-+	int mac_id = 0;
-+
-+	/* Disable SYSCFG1 SGMII */
-+	regmap_read(eth->ethsys, ETHSYS_SYSCFG0, &val);
-+
-+	switch (path) {
-+	case MTK_ETH_PATH_GMAC1_USXGMII:
-+		val &= ~(u32)SYSCFG0_SGMII_GMAC1_V2;
-+		mac_id = MTK_GMAC1_ID;
-+		break;
-+	case MTK_ETH_PATH_GMAC2_USXGMII:
-+		val &= ~(u32)SYSCFG0_SGMII_GMAC2_V2;
-+		mac_id = MTK_GMAC2_ID;
-+		break;
-+	case MTK_ETH_PATH_GMAC3_USXGMII:
-+		val &= ~(u32)SYSCFG0_SGMII_GMAC3_V2;
-+		mac_id = MTK_GMAC3_ID;
-+		break;
-+	default:
-+		updated = false;
-+	};
-+
-+	if (updated) {
-+		regmap_update_bits(eth->ethsys, ETHSYS_SYSCFG0,
-+				   SYSCFG0_SGMII_MASK, val);
-+
-+		if (mac_id == MTK_GMAC2_ID)
-+			regmap_set_bits(eth->infra, TOP_MISC_NETSYS_PCS_MUX,
-+					MUX_G2_USXGMII_SEL);
-+	}
-+
-+	dev_dbg(eth->dev, "path %s in %s updated = %d\n",
-+		mtk_eth_path_name(path), __func__, updated);
-+
-+	return 0;
-+}
-+
-+static int set_mux_gmac123_to_gephy_sgmii(struct mtk_eth *eth, u64 path)
- {
- 	unsigned int val = 0;
- 	bool updated = true;
-@@ -182,6 +254,9 @@ static int set_mux_gmac12_to_gephy_sgmii(struct mtk_eth *eth, u64 path)
- 	case MTK_ETH_PATH_GMAC2_SGMII:
- 		val |= SYSCFG0_SGMII_GMAC2_V2;
- 		break;
-+	case MTK_ETH_PATH_GMAC3_SGMII:
-+		val |= SYSCFG0_SGMII_GMAC3_V2;
-+		break;
- 	default:
- 		updated = false;
- 	}
-@@ -209,6 +284,10 @@ static const struct mtk_eth_muxc mtk_eth_muxc[] = {
- 		.name = "mux_u3_gmac2_to_qphy",
- 		.cap_bit = MTK_ETH_MUX_U3_GMAC2_TO_QPHY,
- 		.set_path = set_mux_u3_gmac2_to_qphy,
-+	}, {
-+		.name = "mux_gmac2_to_2p5gphy",
-+		.cap_bit = MTK_ETH_MUX_GMAC2_TO_2P5GPHY,
-+		.set_path = set_mux_gmac2_to_2p5gphy,
- 	}, {
- 		.name = "mux_gmac1_gmac2_to_sgmii_rgmii",
- 		.cap_bit = MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII,
-@@ -216,7 +295,15 @@ static const struct mtk_eth_muxc mtk_eth_muxc[] = {
- 	}, {
- 		.name = "mux_gmac12_to_gephy_sgmii",
- 		.cap_bit = MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII,
--		.set_path = set_mux_gmac12_to_gephy_sgmii,
-+		.set_path = set_mux_gmac123_to_gephy_sgmii,
-+	}, {
-+		.name = "mux_gmac123_to_gephy_sgmii",
-+		.cap_bit = MTK_ETH_MUX_GMAC123_TO_GEPHY_SGMII,
-+		.set_path = set_mux_gmac123_to_gephy_sgmii,
-+	}, {
-+		.name = "mux_gmac123_to_usxgmii",
-+		.cap_bit = MTK_ETH_MUX_GMAC123_TO_USXGMII,
-+		.set_path = set_mux_gmac123_to_usxgmii,
- 	},
- };
- 
-@@ -249,12 +336,39 @@ static int mtk_eth_mux_setup(struct mtk_eth *eth, u64 path)
- 	return err;
- }
- 
-+int mtk_gmac_usxgmii_path_setup(struct mtk_eth *eth, int mac_id)
-+{
-+	u64 path;
-+
-+	path = (mac_id == MTK_GMAC1_ID) ?  MTK_ETH_PATH_GMAC1_USXGMII :
-+	       (mac_id == MTK_GMAC2_ID) ?  MTK_ETH_PATH_GMAC2_USXGMII :
-+					   MTK_ETH_PATH_GMAC3_USXGMII;
-+
-+	/* Setup proper MUXes along the path */
-+	return mtk_eth_mux_setup(eth, path);
-+}
-+
- int mtk_gmac_sgmii_path_setup(struct mtk_eth *eth, int mac_id)
- {
- 	u64 path;
- 
--	path = (mac_id == 0) ?  MTK_ETH_PATH_GMAC1_SGMII :
--				MTK_ETH_PATH_GMAC2_SGMII;
-+	path = (mac_id == MTK_GMAC1_ID) ? MTK_ETH_PATH_GMAC1_SGMII :
-+	       (mac_id == MTK_GMAC2_ID) ? MTK_ETH_PATH_GMAC2_SGMII :
-+					  MTK_ETH_PATH_GMAC3_SGMII;
-+
-+	/* Setup proper MUXes along the path */
-+	return mtk_eth_mux_setup(eth, path);
-+}
-+
-+int mtk_gmac_2p5gphy_path_setup(struct mtk_eth *eth, int mac_id)
-+{
-+	u64 path = 0;
-+
-+	if (mac_id == MTK_GMAC2_ID)
-+		path = MTK_ETH_PATH_GMAC2_2P5GPHY;
-+
-+	if (!path)
-+		return -EINVAL;
- 
- 	/* Setup proper MUXes along the path */
- 	return mtk_eth_mux_setup(eth, path);
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 3cf6589cfdacf..a550cf7ab0d91 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -22,6 +22,7 @@
- #include <linux/pinctrl/devinfo.h>
- #include <linux/phylink.h>
- #include <linux/pcs/pcs-mtk-lynxi.h>
-+#include <linux/pcs/pcs-mtk-usxgmii.h>
- #include <linux/jhash.h>
- #include <linux/bitfield.h>
- #include <net/dsa.h>
-@@ -260,12 +261,8 @@ static const char * const mtk_clks_source_name[] = {
- 	"ethwarp_wocpu2",
- 	"ethwarp_wocpu1",
- 	"ethwarp_wocpu0",
--	"top_usxgmii0_sel",
--	"top_usxgmii1_sel",
- 	"top_sgm0_sel",
- 	"top_sgm1_sel",
--	"top_xfi_phy0_xtal_sel",
--	"top_xfi_phy1_xtal_sel",
- 	"top_eth_gmii_sel",
- 	"top_eth_refck_50m_sel",
- 	"top_eth_sys_200m_sel",
-@@ -508,6 +505,30 @@ static void mtk_setup_bridge_switch(struct mtk_eth *eth)
- 		MTK_GSW_CFG);
- }
- 
-+static bool mtk_check_gmac23_idle(struct mtk_mac *mac)
-+{
-+	u32 mac_fsm, gdm_fsm;
-+
-+	mac_fsm = mtk_r32(mac->hw, MTK_MAC_FSM(mac->id));
-+
-+	switch (mac->id) {
-+	case MTK_GMAC2_ID:
-+		gdm_fsm = mtk_r32(mac->hw, MTK_FE_GDM2_FSM);
-+		break;
-+	case MTK_GMAC3_ID:
-+		gdm_fsm = mtk_r32(mac->hw, MTK_FE_GDM3_FSM);
-+		break;
-+	default:
-+		return true;
-+	};
-+
-+	if ((mac_fsm & 0xFFFF0000) == 0x01010000 &&
-+	    (gdm_fsm & 0xFFFF0000) == 0x00000000)
-+		return true;
-+
-+	return false;
-+}
-+
- static struct phylink_pcs *mtk_mac_select_pcs(struct phylink_config *config,
- 					      phy_interface_t interface)
- {
-@@ -516,6 +537,14 @@ static struct phylink_pcs *mtk_mac_select_pcs(struct phylink_config *config,
- 	struct mtk_eth *eth = mac->hw;
- 	unsigned int sid;
- 
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
-+#if IS_ENABLED(CONFIG_NET_MEDIATEK_SOC_USXGMII)
-+		return mtk_usxgmii_select_pcs(mac->pcs_of_node, interface);
-+#else
-+		return NULL;
-+#endif
-+	}
-+
- 	if (interface == PHY_INTERFACE_MODE_SGMII ||
- 	    phy_interface_mode_is_8023z(interface)) {
- 		sid = (MTK_HAS_CAPS(eth->soc->caps, MTK_SHARED_SGMII)) ?
-@@ -567,7 +596,22 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
- 					goto init_err;
- 			}
- 			break;
-+		case PHY_INTERFACE_MODE_USXGMII:
-+		case PHY_INTERFACE_MODE_10GBASER:
-+		case PHY_INTERFACE_MODE_5GBASER:
-+			if (MTK_HAS_CAPS(eth->soc->caps, MTK_USXGMII)) {
-+				err = mtk_gmac_usxgmii_path_setup(eth, mac->id);
-+				if (err)
-+					goto init_err;
-+			}
-+			break;
- 		case PHY_INTERFACE_MODE_INTERNAL:
-+			if (mac->id == MTK_GMAC2_ID &&
-+			    MTK_HAS_CAPS(eth->soc->caps, MTK_2P5GPHY)) {
-+				err = mtk_gmac_2p5gphy_path_setup(eth, mac->id);
-+				if (err)
-+					goto init_err;
-+			}
- 			break;
- 		default:
- 			goto err_phy;
-@@ -614,8 +658,6 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
- 		val &= ~SYSCFG0_GE_MODE(SYSCFG0_GE_MASK, mac->id);
- 		val |= SYSCFG0_GE_MODE(ge_mode, mac->id);
- 		regmap_write(eth->ethsys, ETHSYS_SYSCFG0, val);
--
--		mac->interface = state->interface;
- 	}
- 
- 	/* SGMII */
-@@ -632,21 +674,40 @@ static void mtk_mac_config(struct phylink_config *config, unsigned int mode,
- 
- 		/* Save the syscfg0 value for mac_finish */
- 		mac->syscfg0 = val;
--	} else if (phylink_autoneg_inband(mode)) {
-+	} else if (state->interface != PHY_INTERFACE_MODE_USXGMII &&
-+		   state->interface != PHY_INTERFACE_MODE_10GBASER &&
-+		   state->interface != PHY_INTERFACE_MODE_5GBASER &&
-+		   phylink_autoneg_inband(mode)) {
- 		dev_err(eth->dev,
--			"In-band mode not supported in non SGMII mode!\n");
-+			"In-band mode not supported in non-SerDes modes!\n");
- 		return;
- 	}
- 
- 	/* Setup gmac */
--	if (mtk_is_netsys_v3_or_greater(eth) &&
--	    mac->interface == PHY_INTERFACE_MODE_INTERNAL) {
--		mtk_w32(mac->hw, MTK_GDMA_XGDM_SEL, MTK_GDMA_EG_CTRL(mac->id));
--		mtk_w32(mac->hw, MAC_MCR_FORCE_LINK_DOWN, MTK_MAC_MCR(mac->id));
-+	if (mtk_is_netsys_v3_or_greater(eth)) {
-+		if (mtk_interface_mode_is_xgmii(state->interface)) {
-+			mtk_w32(mac->hw, MTK_GDMA_XGDM_SEL, MTK_GDMA_EG_CTRL(mac->id));
-+			mtk_w32(mac->hw, MAC_MCR_FORCE_LINK_DOWN, MTK_MAC_MCR(mac->id));
- 
--		mtk_setup_bridge_switch(eth);
-+			if (mac->id == MTK_GMAC1_ID)
-+				mtk_setup_bridge_switch(eth);
-+		} else {
-+			mtk_w32(eth, 0, MTK_GDMA_EG_CTRL(mac->id));
-+
-+			/* FIXME: In current hardware design, we have to reset FE
-+			 * when swtiching XGDM to GDM. Therefore, here trigger an SER
-+			 * to let GDM go back to the initial state.
-+			 */
-+			if ((mtk_interface_mode_is_xgmii(mac->interface) ||
-+			     mac->interface == PHY_INTERFACE_MODE_NA) &&
-+			    !mtk_check_gmac23_idle(mac) &&
-+			    !test_bit(MTK_RESETTING, &eth->state))
-+				schedule_work(&eth->pending_work);
-+		}
- 	}
- 
-+	mac->interface = state->interface;
-+
- 	return;
- 
- err_phy:
-@@ -692,10 +753,13 @@ static void mtk_mac_link_down(struct phylink_config *config, unsigned int mode,
- {
- 	struct mtk_mac *mac = container_of(config, struct mtk_mac,
- 					   phylink_config);
--	u32 mcr = mtk_r32(mac->hw, MTK_MAC_MCR(mac->id));
- 
--	mcr &= ~(MAC_MCR_TX_EN | MAC_MCR_RX_EN);
--	mtk_w32(mac->hw, mcr, MTK_MAC_MCR(mac->id));
-+	if (!mtk_interface_mode_is_xgmii(interface)) {
-+		mtk_m32(mac->hw, MAC_MCR_TX_EN | MAC_MCR_RX_EN, 0, MTK_MAC_MCR(mac->id));
-+		mtk_m32(mac->hw, MTK_XGMAC_FORCE_LINK(mac->id), 0, MTK_XGMAC_STS(mac->id));
-+	} else if (mac->id != MTK_GMAC1_ID) {
-+		mtk_m32(mac->hw, XMAC_MCR_TRX_DISABLE, XMAC_MCR_TRX_DISABLE, MTK_XMAC_MCR(mac->id));
-+	}
- }
- 
- static void mtk_set_queue_speed(struct mtk_eth *eth, unsigned int idx,
-@@ -767,13 +831,11 @@ static void mtk_set_queue_speed(struct mtk_eth *eth, unsigned int idx,
- 	mtk_w32(eth, val, soc->reg_map->qdma.qtx_sch + ofs);
- }
- 
--static void mtk_mac_link_up(struct phylink_config *config,
--			    struct phy_device *phy,
--			    unsigned int mode, phy_interface_t interface,
--			    int speed, int duplex, bool tx_pause, bool rx_pause)
-+static void mtk_gdm_mac_link_up(struct mtk_mac *mac,
-+				struct phy_device *phy,
-+				unsigned int mode, phy_interface_t interface,
-+				int speed, int duplex, bool tx_pause, bool rx_pause)
- {
--	struct mtk_mac *mac = container_of(config, struct mtk_mac,
--					   phylink_config);
- 	u32 mcr;
- 
- 	mcr = mtk_r32(mac->hw, MTK_MAC_MCR(mac->id));
-@@ -807,6 +869,55 @@ static void mtk_mac_link_up(struct phylink_config *config,
- 	mtk_w32(mac->hw, mcr, MTK_MAC_MCR(mac->id));
- }
- 
-+static void mtk_xgdm_mac_link_up(struct mtk_mac *mac,
-+				 struct phy_device *phy,
-+				 unsigned int mode, phy_interface_t interface,
-+				 int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	u32 mcr, force_link = 0;
-+
-+	if (mac->id == MTK_GMAC1_ID)
-+		return;
-+
-+	/* Eliminate the interference(before link-up) caused by PHY noise */
-+	mtk_m32(mac->hw, XMAC_LOGIC_RST, 0, MTK_XMAC_LOGIC_RST(mac->id));
-+	mdelay(20);
-+	mtk_m32(mac->hw, XMAC_GLB_CNTCLR, XMAC_GLB_CNTCLR, MTK_XMAC_CNT_CTRL(mac->id));
-+
-+	if (mac->interface == PHY_INTERFACE_MODE_INTERNAL || mac->id == MTK_GMAC3_ID)
-+		force_link = MTK_XGMAC_FORCE_LINK(mac->id);
-+
-+	mtk_m32(mac->hw, MTK_XGMAC_FORCE_LINK(mac->id), force_link, MTK_XGMAC_STS(mac->id));
-+
-+	mcr = mtk_r32(mac->hw, MTK_XMAC_MCR(mac->id));
-+	mcr &= ~(XMAC_MCR_FORCE_TX_FC | XMAC_MCR_FORCE_RX_FC | XMAC_MCR_TRX_DISABLE);
-+	/* Configure pause modes -
-+	 * phylink will avoid these for half duplex
-+	 */
-+	if (tx_pause)
-+		mcr |= XMAC_MCR_FORCE_TX_FC;
-+	if (rx_pause)
-+		mcr |= XMAC_MCR_FORCE_RX_FC;
-+
-+	mtk_w32(mac->hw, mcr, MTK_XMAC_MCR(mac->id));
-+}
-+
-+static void mtk_mac_link_up(struct phylink_config *config,
-+			    struct phy_device *phy,
-+			    unsigned int mode, phy_interface_t interface,
-+			    int speed, int duplex, bool tx_pause, bool rx_pause)
-+{
-+	struct mtk_mac *mac = container_of(config, struct mtk_mac,
-+					   phylink_config);
-+
-+	if (mtk_interface_mode_is_xgmii(interface))
-+		mtk_xgdm_mac_link_up(mac, phy, mode, interface, speed, duplex,
-+				     tx_pause, rx_pause);
-+	else
-+		mtk_gdm_mac_link_up(mac, phy, mode, interface, speed, duplex,
-+				    tx_pause, rx_pause);
-+}
-+
- static const struct phylink_mac_ops mtk_phylink_ops = {
- 	.mac_select_pcs = mtk_mac_select_pcs,
- 	.mac_config = mtk_mac_config,
-@@ -4484,6 +4595,7 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
- 	const __be32 *_id = of_get_property(np, "reg", NULL);
- 	phy_interface_t phy_mode;
- 	struct phylink *phylink;
-+	struct phylink_pcs *pcs;
- 	struct mtk_mac *mac;
- 	int id, err;
- 	int txqs = 1;
-@@ -4518,6 +4630,12 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
- 	mac->id = id;
- 	mac->hw = eth;
- 	mac->of_node = np;
-+	mac->pcs_of_node = of_parse_phandle(mac->of_node, "pcs-handle", 0);
-+	if (mac->pcs_of_node) {
-+		pcs = mtk_usxgmii_select_pcs(mac->pcs_of_node, PHY_INTERFACE_MODE_NA);
-+		if (IS_ERR(pcs))
-+			return PTR_ERR(pcs);
-+	}
- 
- 	err = of_get_ethdev_address(mac->of_node, eth->netdev[id]);
- 	if (err == -EPROBE_DEFER)
-@@ -4610,8 +4728,21 @@ static int mtk_add_mac(struct mtk_eth *eth, struct device_node *np)
- 		phy_interface_zero(mac->phylink_config.supported_interfaces);
- 		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
- 			  mac->phylink_config.supported_interfaces);
-+	} else if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_USXGMII)) {
-+		mac->phylink_config.mac_capabilities |= MAC_5000FD | MAC_10000FD;
-+		__set_bit(PHY_INTERFACE_MODE_5GBASER,
-+			  mac->phylink_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_10GBASER,
-+			  mac->phylink_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_USXGMII,
-+			  mac->phylink_config.supported_interfaces);
- 	}
- 
-+	if (MTK_HAS_CAPS(mac->hw->soc->caps, MTK_2P5GPHY) &&
-+	    id == MTK_GMAC2_ID)
-+		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
-+			  mac->phylink_config.supported_interfaces);
-+
- 	phylink = phylink_create(&mac->phylink_config,
- 				 of_fwnode_handle(mac->of_node),
- 				 phy_mode, &mtk_phylink_ops);
-@@ -4805,7 +4936,8 @@ static int mtk_probe(struct platform_device *pdev)
- 			regmap_write(cci, 0, 3);
- 	}
- 
--	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SGMII)) {
-+	if (MTK_HAS_CAPS(eth->soc->caps, MTK_SGMII) &&
-+	    !mtk_is_netsys_v3_or_greater(eth)) {
- 		err = mtk_sgmii_init(eth);
- 
- 		if (err)
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.h b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-index 9ae3b8a71d0e6..ba5998ef7965e 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.h
-@@ -15,6 +15,7 @@
- #include <linux/u64_stats_sync.h>
- #include <linux/refcount.h>
- #include <linux/phylink.h>
-+#include <linux/reset.h>
- #include <linux/rhashtable.h>
- #include <linux/dim.h>
- #include <linux/bitfield.h>
-@@ -503,6 +504,21 @@
- #define INTF_MODE_RGMII_1000    (TRGMII_MODE | TRGMII_CENTRAL_ALIGNED)
- #define INTF_MODE_RGMII_10_100  0
- 
-+/* XFI Mac control registers */
-+#define MTK_XMAC_BASE(x)	(0x12000 + (((x) - 1) * 0x1000))
-+#define MTK_XMAC_MCR(x)		(MTK_XMAC_BASE(x))
-+#define XMAC_MCR_TRX_DISABLE	0xf
-+#define XMAC_MCR_FORCE_TX_FC	BIT(5)
-+#define XMAC_MCR_FORCE_RX_FC	BIT(4)
-+
-+/* XFI Mac logic reset registers */
-+#define MTK_XMAC_LOGIC_RST(x)	(MTK_XMAC_BASE(x) + 0x10)
-+#define XMAC_LOGIC_RST		BIT(0)
-+
-+/* XFI Mac count global control */
-+#define MTK_XMAC_CNT_CTRL(x)	(MTK_XMAC_BASE(x) + 0x100)
-+#define XMAC_GLB_CNTCLR		BIT(0)
-+
- /* GPIO port control registers for GMAC 2*/
- #define GPIO_OD33_CTRL8		0x4c0
- #define GPIO_BIAS_CTRL		0xed0
-@@ -528,6 +544,7 @@
- #define SYSCFG0_SGMII_GMAC2    ((3 << 8) & SYSCFG0_SGMII_MASK)
- #define SYSCFG0_SGMII_GMAC1_V2 BIT(9)
- #define SYSCFG0_SGMII_GMAC2_V2 BIT(8)
-+#define SYSCFG0_SGMII_GMAC3_V2 BIT(7)
- 
- 
- /* ethernet subsystem clock register */
-@@ -566,6 +583,11 @@
- #define GEPHY_MAC_SEL          BIT(1)
- 
- /* Top misc registers */
-+#define TOP_MISC_NETSYS_PCS_MUX	0x84
-+#define NETSYS_PCS_MUX_MASK	GENMASK(1, 0)
-+#define	MUX_G2_USXGMII_SEL	BIT(1)
-+#define MUX_HSGMII1_G1_SEL	BIT(0)
-+
- #define USB_PHY_SWITCH_REG	0x218
- #define QPHY_SEL_MASK		GENMASK(1, 0)
- #define SGMII_QPHY_SEL		0x2
-@@ -590,6 +612,8 @@
- #define MT7628_SDM_RBCNT	(MT7628_SDM_OFFSET + 0x10c)
- #define MT7628_SDM_CS_ERR	(MT7628_SDM_OFFSET + 0x110)
- 
-+/* Debug Purpose Register */
-+#define MTK_PSE_FQFC_CFG	0x100
- #define MTK_FE_CDM1_FSM		0x220
- #define MTK_FE_CDM2_FSM		0x224
- #define MTK_FE_CDM3_FSM		0x238
-@@ -598,6 +622,11 @@
- #define MTK_FE_CDM6_FSM		0x328
- #define MTK_FE_GDM1_FSM		0x228
- #define MTK_FE_GDM2_FSM		0x22C
-+#define MTK_FE_GDM3_FSM		0x23C
-+#define MTK_FE_PSE_FREE		0x240
-+#define MTK_FE_DROP_FQ		0x244
-+#define MTK_FE_DROP_FC		0x248
-+#define MTK_FE_DROP_PPE		0x24C
- 
- #define MTK_MAC_FSM(x)		(0x1010C + ((x) * 0x100))
- 
-@@ -722,12 +751,8 @@ enum mtk_clks_map {
- 	MTK_CLK_ETHWARP_WOCPU2,
- 	MTK_CLK_ETHWARP_WOCPU1,
- 	MTK_CLK_ETHWARP_WOCPU0,
--	MTK_CLK_TOP_USXGMII_SBUS_0_SEL,
--	MTK_CLK_TOP_USXGMII_SBUS_1_SEL,
- 	MTK_CLK_TOP_SGM_0_SEL,
- 	MTK_CLK_TOP_SGM_1_SEL,
--	MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL,
--	MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL,
- 	MTK_CLK_TOP_ETH_GMII_SEL,
- 	MTK_CLK_TOP_ETH_REFCK_50M_SEL,
- 	MTK_CLK_TOP_ETH_SYS_200M_SEL,
-@@ -798,19 +823,9 @@ enum mtk_clks_map {
- 				 BIT_ULL(MTK_CLK_GP3) | BIT_ULL(MTK_CLK_XGP1) | \
- 				 BIT_ULL(MTK_CLK_XGP2) | BIT_ULL(MTK_CLK_XGP3) | \
- 				 BIT_ULL(MTK_CLK_CRYPTO) | \
--				 BIT_ULL(MTK_CLK_SGMII_TX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII_RX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII2_TX_250M) | \
--				 BIT_ULL(MTK_CLK_SGMII2_RX_250M) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU2) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU1) | \
- 				 BIT_ULL(MTK_CLK_ETHWARP_WOCPU0) | \
--				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_0_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_USXGMII_SBUS_1_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_SGM_0_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_SGM_1_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_0_XTAL_SEL) | \
--				 BIT_ULL(MTK_CLK_TOP_XFI_PHY_1_XTAL_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_GMII_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_REFCK_50M_SEL) | \
- 				 BIT_ULL(MTK_CLK_TOP_ETH_SYS_200M_SEL) | \
-@@ -944,6 +959,8 @@ enum mkt_eth_capabilities {
- 	MTK_RGMII_BIT = 0,
- 	MTK_TRGMII_BIT,
- 	MTK_SGMII_BIT,
-+	MTK_USXGMII_BIT,
-+	MTK_2P5GPHY_BIT,
- 	MTK_ESW_BIT,
- 	MTK_GEPHY_BIT,
- 	MTK_MUX_BIT,
-@@ -964,8 +981,11 @@ enum mkt_eth_capabilities {
- 	MTK_ETH_MUX_GDM1_TO_GMAC1_ESW_BIT,
- 	MTK_ETH_MUX_GMAC2_GMAC0_TO_GEPHY_BIT,
- 	MTK_ETH_MUX_U3_GMAC2_TO_QPHY_BIT,
-+	MTK_ETH_MUX_GMAC2_TO_2P5GPHY_BIT,
- 	MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII_BIT,
- 	MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII_BIT,
-+	MTK_ETH_MUX_GMAC123_TO_GEPHY_SGMII_BIT,
-+	MTK_ETH_MUX_GMAC123_TO_USXGMII_BIT,
- 
- 	/* PATH BITS */
- 	MTK_ETH_PATH_GMAC1_RGMII_BIT,
-@@ -973,14 +993,21 @@ enum mkt_eth_capabilities {
- 	MTK_ETH_PATH_GMAC1_SGMII_BIT,
- 	MTK_ETH_PATH_GMAC2_RGMII_BIT,
- 	MTK_ETH_PATH_GMAC2_SGMII_BIT,
-+	MTK_ETH_PATH_GMAC2_2P5GPHY_BIT,
- 	MTK_ETH_PATH_GMAC2_GEPHY_BIT,
-+	MTK_ETH_PATH_GMAC3_SGMII_BIT,
- 	MTK_ETH_PATH_GDM1_ESW_BIT,
-+	MTK_ETH_PATH_GMAC1_USXGMII_BIT,
-+	MTK_ETH_PATH_GMAC2_USXGMII_BIT,
-+	MTK_ETH_PATH_GMAC3_USXGMII_BIT,
- };
- 
- /* Supported hardware group on SoCs */
- #define MTK_RGMII		BIT_ULL(MTK_RGMII_BIT)
- #define MTK_TRGMII		BIT_ULL(MTK_TRGMII_BIT)
- #define MTK_SGMII		BIT_ULL(MTK_SGMII_BIT)
-+#define MTK_USXGMII		BIT_ULL(MTK_USXGMII_BIT)
-+#define MTK_2P5GPHY		BIT_ULL(MTK_2P5GPHY_BIT)
- #define MTK_ESW			BIT_ULL(MTK_ESW_BIT)
- #define MTK_GEPHY		BIT_ULL(MTK_GEPHY_BIT)
- #define MTK_MUX			BIT_ULL(MTK_MUX_BIT)
-@@ -1003,10 +1030,16 @@ enum mkt_eth_capabilities {
- 	BIT_ULL(MTK_ETH_MUX_GMAC2_GMAC0_TO_GEPHY_BIT)
- #define MTK_ETH_MUX_U3_GMAC2_TO_QPHY		\
- 	BIT_ULL(MTK_ETH_MUX_U3_GMAC2_TO_QPHY_BIT)
-+#define MTK_ETH_MUX_GMAC2_TO_2P5GPHY		\
-+	BIT_ULL(MTK_ETH_MUX_GMAC2_TO_2P5GPHY_BIT)
- #define MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII	\
- 	BIT_ULL(MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII_BIT)
- #define MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII	\
- 	BIT_ULL(MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII_BIT)
-+#define MTK_ETH_MUX_GMAC123_TO_GEPHY_SGMII	\
-+	BIT_ULL(MTK_ETH_MUX_GMAC123_TO_GEPHY_SGMII_BIT)
-+#define MTK_ETH_MUX_GMAC123_TO_USXGMII	\
-+	BIT_ULL(MTK_ETH_MUX_GMAC123_TO_USXGMII_BIT)
- 
- /* Supported path present on SoCs */
- #define MTK_ETH_PATH_GMAC1_RGMII	BIT_ULL(MTK_ETH_PATH_GMAC1_RGMII_BIT)
-@@ -1014,8 +1047,13 @@ enum mkt_eth_capabilities {
- #define MTK_ETH_PATH_GMAC1_SGMII	BIT_ULL(MTK_ETH_PATH_GMAC1_SGMII_BIT)
- #define MTK_ETH_PATH_GMAC2_RGMII	BIT_ULL(MTK_ETH_PATH_GMAC2_RGMII_BIT)
- #define MTK_ETH_PATH_GMAC2_SGMII	BIT_ULL(MTK_ETH_PATH_GMAC2_SGMII_BIT)
-+#define MTK_ETH_PATH_GMAC2_2P5GPHY	BIT_ULL(MTK_ETH_PATH_GMAC2_2P5GPHY_BIT)
- #define MTK_ETH_PATH_GMAC2_GEPHY	BIT_ULL(MTK_ETH_PATH_GMAC2_GEPHY_BIT)
-+#define MTK_ETH_PATH_GMAC3_SGMII	BIT_ULL(MTK_ETH_PATH_GMAC3_SGMII_BIT)
- #define MTK_ETH_PATH_GDM1_ESW		BIT_ULL(MTK_ETH_PATH_GDM1_ESW_BIT)
-+#define MTK_ETH_PATH_GMAC1_USXGMII	BIT_ULL(MTK_ETH_PATH_GMAC1_USXGMII_BIT)
-+#define MTK_ETH_PATH_GMAC2_USXGMII	BIT_ULL(MTK_ETH_PATH_GMAC2_USXGMII_BIT)
-+#define MTK_ETH_PATH_GMAC3_USXGMII	BIT_ULL(MTK_ETH_PATH_GMAC3_USXGMII_BIT)
- 
- #define MTK_GMAC1_RGMII		(MTK_ETH_PATH_GMAC1_RGMII | MTK_RGMII)
- #define MTK_GMAC1_TRGMII	(MTK_ETH_PATH_GMAC1_TRGMII | MTK_TRGMII)
-@@ -1023,7 +1061,12 @@ enum mkt_eth_capabilities {
- #define MTK_GMAC2_RGMII		(MTK_ETH_PATH_GMAC2_RGMII | MTK_RGMII)
- #define MTK_GMAC2_SGMII		(MTK_ETH_PATH_GMAC2_SGMII | MTK_SGMII)
- #define MTK_GMAC2_GEPHY		(MTK_ETH_PATH_GMAC2_GEPHY | MTK_GEPHY)
-+#define MTK_GMAC2_2P5GPHY	(MTK_ETH_PATH_GMAC2_2P5GPHY | MTK_2P5GPHY)
-+#define MTK_GMAC3_SGMII		(MTK_ETH_PATH_GMAC3_SGMII | MTK_SGMII)
- #define MTK_GDM1_ESW		(MTK_ETH_PATH_GDM1_ESW | MTK_ESW)
-+#define MTK_GMAC1_USXGMII	(MTK_ETH_PATH_GMAC1_USXGMII | MTK_USXGMII)
-+#define MTK_GMAC2_USXGMII	(MTK_ETH_PATH_GMAC2_USXGMII | MTK_USXGMII)
-+#define MTK_GMAC3_USXGMII	(MTK_ETH_PATH_GMAC3_USXGMII | MTK_USXGMII)
- 
- /* MUXes present on SoCs */
- /* 0: GDM1 -> GMAC1, 1: GDM1 -> ESW */
-@@ -1042,10 +1085,20 @@ enum mkt_eth_capabilities {
- 	(MTK_ETH_MUX_GMAC1_GMAC2_TO_SGMII_RGMII | MTK_MUX | \
- 	MTK_SHARED_SGMII)
- 
-+/* 2: GMAC2 -> XGMII */
-+#define MTK_MUX_GMAC2_TO_2P5GPHY      \
-+	(MTK_ETH_MUX_GMAC2_TO_2P5GPHY | MTK_MUX | MTK_INFRA)
-+
- /* 0: GMACx -> GEPHY, 1: GMACx -> SGMII where x is 1 or 2 */
- #define MTK_MUX_GMAC12_TO_GEPHY_SGMII   \
- 	(MTK_ETH_MUX_GMAC12_TO_GEPHY_SGMII | MTK_MUX)
- 
-+#define MTK_MUX_GMAC123_TO_GEPHY_SGMII   \
-+	(MTK_ETH_MUX_GMAC123_TO_GEPHY_SGMII | MTK_MUX)
-+
-+#define MTK_MUX_GMAC123_TO_USXGMII   \
-+	(MTK_ETH_MUX_GMAC123_TO_USXGMII | MTK_MUX | MTK_INFRA)
-+
- #define MTK_HAS_CAPS(caps, _x)		(((caps) & (_x)) == (_x))
- 
- #define MT7621_CAPS  (MTK_GMAC1_RGMII | MTK_GMAC1_TRGMII | \
-@@ -1077,8 +1130,12 @@ enum mkt_eth_capabilities {
- 		      MTK_MUX_GMAC12_TO_GEPHY_SGMII | MTK_QDMA | \
- 		      MTK_RSTCTRL_PPE1 | MTK_SRAM)
- 
--#define MT7988_CAPS  (MTK_36BIT_DMA | MTK_GDM1_ESW | MTK_QDMA | \
--		      MTK_RSTCTRL_PPE1 | MTK_RSTCTRL_PPE2 | MTK_SRAM)
-+#define MT7988_CAPS  (MTK_36BIT_DMA | MTK_GDM1_ESW | MTK_GMAC1_SGMII | \
-+		      MTK_GMAC2_2P5GPHY | MTK_GMAC2_SGMII | MTK_GMAC2_USXGMII | \
-+		      MTK_GMAC3_SGMII | MTK_GMAC3_USXGMII | \
-+		      MTK_MUX_GMAC123_TO_GEPHY_SGMII | \
-+		      MTK_MUX_GMAC123_TO_USXGMII | MTK_MUX_GMAC2_TO_2P5GPHY | \
-+		      MTK_QDMA | MTK_RSTCTRL_PPE1 | MTK_RSTCTRL_PPE2 | MTK_SRAM)
- 
- struct mtk_tx_dma_desc_info {
- 	dma_addr_t	addr;
-@@ -1313,6 +1370,7 @@ struct mtk_mac {
- 	phy_interface_t			interface;
- 	int				speed;
- 	struct device_node		*of_node;
-+	struct device_node		*pcs_of_node;
- 	struct phylink			*phylink;
- 	struct phylink_config		phylink_config;
- 	struct mtk_eth			*hw;
-@@ -1421,6 +1479,19 @@ static inline u32 mtk_get_ib2_multicast_mask(struct mtk_eth *eth)
- 	return MTK_FOE_IB2_MULTICAST;
- }
- 
-+static inline bool mtk_interface_mode_is_xgmii(phy_interface_t interface)
-+{
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_INTERNAL:
-+	case PHY_INTERFACE_MODE_USXGMII:
-+	case PHY_INTERFACE_MODE_10GBASER:
-+	case PHY_INTERFACE_MODE_5GBASER:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
- /* read the hardware status register */
- void mtk_stats_update_mac(struct mtk_mac *mac);
- 
-@@ -1429,8 +1500,10 @@ u32 mtk_r32(struct mtk_eth *eth, unsigned reg);
- u32 mtk_m32(struct mtk_eth *eth, u32 mask, u32 set, unsigned int reg);
- 
- int mtk_gmac_sgmii_path_setup(struct mtk_eth *eth, int mac_id);
-+int mtk_gmac_2p5gphy_path_setup(struct mtk_eth *eth, int mac_id);
- int mtk_gmac_gephy_path_setup(struct mtk_eth *eth, int mac_id);
- int mtk_gmac_rgmii_path_setup(struct mtk_eth *eth, int mac_id);
-+int mtk_gmac_usxgmii_path_setup(struct mtk_eth *eth, int mac_id);
- 
- int mtk_eth_offload_init(struct mtk_eth *eth);
- int mtk_eth_setup_tc(struct net_device *dev, enum tc_setup_type type,
--- 
-2.42.1
+tc qdisc add dev enp175s0v0 handle 1: root htb offload
+tc class add dev enp175s0v0 parent 1: classid 1:1 htb rate 1000mbit ceil 
+2000mbit burst 100k
+
+where
+   classid 1:1 is tx queue0
+   tx_minrate is rate 1000mbps
+   tx_maxrate is ceil 2000mbps
+
+
+In order to not break your implementation could bring in if condition 
+instead WARN_ON, something like below
+	if (!(old_q->flags & TCQ_F_BUILTIN))
+		qdisc_put(old_q);
+
+Would this work for you, please advise.
 
