@@ -1,75 +1,128 @@
-Return-Path: <netdev+bounces-46871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A0A7E6D6A
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:29:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78DF87E6D8F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DA331C2094B
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:29:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06089B20FF7
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABED120318;
-	Thu,  9 Nov 2023 15:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF47208A0;
+	Thu,  9 Nov 2023 15:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZrg+5XM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RnJCDgKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B800200D2
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:29:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A33FC433C8;
-	Thu,  9 Nov 2023 15:29:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699543769;
-	bh=Dvpc/hn3aIEBQWMzrsNL9Hlmh05ncAoe/xihc89NxGM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kZrg+5XM1Czv03HdNl+1iAgvYyPpK6QWXn9Ao+PHwv2vXYIdZg6bxvyEn0BOZnxv9
-	 kZyJQ54pJhcPKwqtAycmfW66gvQB64BSUu801eRuEe01A/hDGSaXgSCE3yhl/3LeuI
-	 GfK0HoyKUIHR+M7w7hyVY8+I+VIJgV9V2hP/+MsqJFlJOY9q0Jhubht3VzuA2puQbk
-	 KB5BEhmcHnD5/AEPg6EPSz8dmVbk298Fo1bmBXjbvQOEklFYuizIacV5jOOiW1coRe
-	 4k0h4z6CqT7JFmE+488TEoPRpP+xs7rq0GrxI9IPgA6DxsFD2mC+Uh+tMnEuMHCNut
-	 rVHO5m6OGQtRQ==
-Date: Thu, 9 Nov 2023 07:29:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, MD Danish Anwar
- <danishanwar@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- "Lopes Ivo, Diogo Miguel (T CED IFD-PT)" <diogo.ivo@siemens.com>, Nishanth
- Menon <nm@ti.com>, "Su, Bao Cheng (RC-CN DF FA R&D)"
- <baocheng.su@siemens.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
- Roger Quadros <rogerq@kernel.org>, Grygorii Strashko
- <grygorii.strashko@ti.com>
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Add missing icss_iep_put
- to error path
-Message-ID: <20231109072927.6695042a@kernel.org>
-In-Reply-To: <502a27b6-e555-42d2-bb0f-964a58f81dbe@siemens.com>
-References: <b2857e2c-cacf-4077-8e15-308dce8ccb0b@siemens.com>
-	<20231107183256.2d19981b@kernel.org>
-	<502a27b6-e555-42d2-bb0f-964a58f81dbe@siemens.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1650920324
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:40:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA0535A8
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 07:40:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699544416;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LyBoCbElMBWTxv8fACt2i5x96KxhIHRnkO6so+DaPzc=;
+	b=RnJCDgKYna1Uwa9YiSb2iQDJ8VPTTYqSbxEk4RIwP+9wn2FJ7LJGI7137pMlEP0jIbSxZb
+	m6uulEqskClSExbxxjR11wwzYXS7umce4x2h/F/hfzyBz/zuUWEI1Qj0c8pQbMTeXSBzSP
+	uTTn2KUQNw9+PrVIaC17hkyn0wG3/SE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-357-XzmQuWuwO7OKmcbrwpdI4Q-1; Thu, 09 Nov 2023 10:40:14 -0500
+X-MC-Unique: XzmQuWuwO7OKmcbrwpdI4Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B26E8185A782;
+	Thu,  9 Nov 2023 15:40:13 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 605AB492BE7;
+	Thu,  9 Nov 2023 15:40:12 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Marc Dionne <marc.dionne@auristor.com>
+Cc: David Howells <dhowells@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 02/41] rxrpc: Fix two connection reaping bugs
+Date: Thu,  9 Nov 2023 15:39:25 +0000
+Message-ID: <20231109154004.3317227-3-dhowells@redhat.com>
+In-Reply-To: <20231109154004.3317227-1-dhowells@redhat.com>
+References: <20231109154004.3317227-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Thu, 9 Nov 2023 12:08:21 +0100 Jan Kiszka wrote:
-> > Is there a reason you're not CCing authors of these changes?
-> > Please make sure you run get_maintainer on the patch, and CC
-> > folks appropriately.  
-> 
-> I was only interacting (directly) with Danish in the past years on this
-> driver, and he also upstreamed it. So I assumed "ownership" moved on.
-> Adding both, Roger with updated email (where get_maintainer does not help).
+Fix two connection reaping bugs:
 
-You'll need to repost the patch, it's been dropped from patchwork.
+ (1) rxrpc_connection_expiry is in units of seconds, so
+     rxrpc_disconnect_call() needs to multiply it by HZ when adding it to
+     jiffies.
 
-Roger, if your old address doesn't work any more please add an entry
-to .mailmap.
+ (2) rxrpc_client_conn_reap_timeout() should set RXRPC_CLIENT_REAP_TIMER if
+     local->kill_all_client_conns is clear, not if it is set (in which case
+     we don't need the timer).  Without this, old client connections don't
+     get cleaned up until the local endpoint is cleaned up.
+
+Fixes: 5040011d073d ("rxrpc: Make the local endpoint hold a ref on a connected call")
+Fixes: 0d6bf319bc5a ("rxrpc: Move the client conn cache management to the I/O thread")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: netdev@vger.kernel.org
+cc: linux-afs@lists.infradead.org
+---
+ net/rxrpc/conn_object.c  | 2 +-
+ net/rxrpc/local_object.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
+index ac85d4644a3c..df8a271948a1 100644
+--- a/net/rxrpc/conn_object.c
++++ b/net/rxrpc/conn_object.c
+@@ -212,7 +212,7 @@ void rxrpc_disconnect_call(struct rxrpc_call *call)
+ 		conn->idle_timestamp = jiffies;
+ 		if (atomic_dec_and_test(&conn->active))
+ 			rxrpc_set_service_reap_timer(conn->rxnet,
+-						     jiffies + rxrpc_connection_expiry);
++						     jiffies + rxrpc_connection_expiry * HZ);
+ 	}
+ 
+ 	rxrpc_put_call(call, rxrpc_call_put_io_thread);
+diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
+index 7d910aee4f8c..c553a30e9c83 100644
+--- a/net/rxrpc/local_object.c
++++ b/net/rxrpc/local_object.c
+@@ -87,7 +87,7 @@ static void rxrpc_client_conn_reap_timeout(struct timer_list *timer)
+ 	struct rxrpc_local *local =
+ 		container_of(timer, struct rxrpc_local, client_conn_reap_timer);
+ 
+-	if (local->kill_all_client_conns &&
++	if (!local->kill_all_client_conns &&
+ 	    test_and_set_bit(RXRPC_CLIENT_CONN_REAP_TIMER, &local->client_conn_flags))
+ 		rxrpc_wake_up_io_thread(local);
+ }
+
 
