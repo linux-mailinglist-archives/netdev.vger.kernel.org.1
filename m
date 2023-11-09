@@ -1,95 +1,151 @@
-Return-Path: <netdev+bounces-46881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9307E6E75
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:17:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F5DD7E6E83
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B9ACB20DBE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:17:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5727C1C2093E
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07821210F1;
-	Thu,  9 Nov 2023 16:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pgYZcUNj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326DD20B17;
+	Thu,  9 Nov 2023 16:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4931A22320
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:17:41 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C90A173E;
-	Thu,  9 Nov 2023 08:17:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Fupq4hlBImNT9/E31GMXTqKPrNZBcdihgav2GAlB7G8=; b=pgYZcUNj/ZO5UbgTJtXr7RxPoO
-	BMmVH8QE5aDmVxhnV1ZHCpAhjNOhRHwZ8DNEXXWgLo8MK1ua74OAIc8zUp5ZB39GJxJ+BmVwoDycc
-	K4UMhtqo59MrESwBIxEBXwH3Ukk/d4nwZPyOVodGtMhFSQ4ZV+8FDDiB2q5WzemblC9M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r17iU-001DWW-A6; Thu, 09 Nov 2023 17:17:14 +0100
-Date: Thu, 9 Nov 2023 17:17:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gan Yi Fang <yi.fang.gan@intel.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Johannes Zink <j.zink@pengutronix.de>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>
-Subject: Re: [PATCH net-next 1/1] net: stmmac: Add support for HW-accelerated
- VLAN stripping
-Message-ID: <b7bd1b0c-5203-4071-95c6-ada047010687@lunn.ch>
-References: <20231109053831.2572699-1-yi.fang.gan@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E830F20B10
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:20:55 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 868E4173E;
+	Thu,  9 Nov 2023 08:20:54 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3A9GKUKM01668823, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3A9GKUKM01668823
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Nov 2023 00:20:30 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Fri, 10 Nov 2023 00:20:31 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Fri, 10 Nov 2023 00:20:30 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Fri, 10 Nov 2023 00:20:30 +0800
+From: Hau <hau@realtek.com>
+To: Paolo Abeni <pabeni@redhat.com>,
+        "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>
+CC: nic_swsd <nic_swsd@realtek.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH net v2 1/2] r8169: add handling DASH when DASH is disabled
+Thread-Topic: [PATCH net v2 1/2] r8169: add handling DASH when DASH is
+ disabled
+Thread-Index: AQHaEnRkKWk8jO5fZUKdN+LsLx8Ws7BxWqCAgADQJoA=
+Date: Thu, 9 Nov 2023 16:20:29 +0000
+Message-ID: <12b7d629d07949eb9cf5472f860413db@realtek.com>
+References: <20231108184849.2925-1-hau@realtek.com>
+	 <20231108184849.2925-2-hau@realtek.com>
+ <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
+In-Reply-To: <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
+Accept-Language: zh-TW, en-US
+Content-Language: en-US
+x-originating-ip: [172.22.228.56]
+x-kse-serverinfo: RTEXMBS06.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231109053831.2572699-1-yi.fang.gan@intel.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-> @@ -198,6 +198,17 @@ static int dwmac4_get_tx_ls(struct dma_desc *p)
->  		>> TDES3_LAST_DESCRIPTOR_SHIFT;
->  }
->  
-> +static inline int dwmac4_wrback_get_rx_vlan_tci(struct dma_desc *p)
-> +{
-> +	return (le32_to_cpu(p->des0) & RDES0_VLAN_TAG_MASK);
-> +}
-> +
-> +static inline bool dwmac4_wrback_get_rx_vlan_valid(struct dma_desc *p)
-> +{
-> +	return ((le32_to_cpu(p->des3) & RDES3_LAST_DESCRIPTOR) &&
-> +		(le32_to_cpu(p->des3) & RDES3_RDES0_VALID));
-> +}
-
-No inline functions in C files please. Let the compiler decide.
-
-You are submitting a number of patches for this driver. Do they all
-cleanly apply independent of each other? Or are there dependencies?
-
-	Andrew
+PiBZb3Ugc2hvdWxkIGluY2x1ZGUgdGhlIGZpeGVzIHRhZyB5b3UgYWxyZWFkeSBhZGRlZCBpbiB2
+MSBhbmQgeW91ciBTb2Igc2hvdWxkDQo+IGNvbWUgYXMgdGhlIGxhc3QgdGFnDQo+IA0KPiBUaGUg
+c2FtZSBhcHBsaWVzIHRvIHRoZSBuZXh0IHBhdGNoDQo+IA0KSSBmb3JnZXQgdG8gYWRkIEZpeGVz
+IHRhZy4gSSB3aWxsIGFkZCBpdCBiYWNrLg0KDQo+ID4gUmV2aWV3ZWQtYnk6IEhlaW5lciBLYWxs
+d2VpdCA8aGthbGx3ZWl0MUBnbWFpbC5jb20+DQo+IA0KPiBJdCdzIG5vdCBjbGVhciB3aGVyZS93
+aGVuIEhlaW5lciBwcm92aWRlZCB0aGUgYWJvdmUgdGFnIGZvciB0aGlzIHBhdGNoLg0KPiBJIGhv
+cGUgdGhhdCB3YXMgb2ZmLWxpc3QuDQpJIG1heSBtaXN1bmRlcnN0YW5kaW5nIHdoYXQgaGUgbWVh
+bnMuIEkgd2lsbCBub3QgYWRkIHRoaXMgdGFnIGluIG15IG5leHQgcGF0Y2guDQoNCj4gDQo+ID4g
+Q2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcNCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9uZXQvZXRo
+ZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMgfCAzNQ0KPiA+ICsrKysrKysrKysrKysrKystLS0t
+LS0tDQo+ID4gIDEgZmlsZSBjaGFuZ2VkLCAyNSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlvbnMo
+LSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4
+MTY5X21haW4uYw0KPiA+IGIvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWlu
+LmMNCj4gPiBpbmRleCAwYzc2YzE2MmI4YTkuLjEwOGRjNzUwNTBiYSAxMDA2NDQNCj4gPiAtLS0g
+YS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5X21haW4uYw0KPiA+ICsrKyBiL2Ry
+aXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsvcjgxNjlfbWFpbi5jDQo+ID4gQEAgLTYyNCw2ICs2
+MjQsNyBAQCBzdHJ1Y3QgcnRsODE2OV9wcml2YXRlIHsNCj4gPg0KPiA+ICAgICAgIHVuc2lnbmVk
+IHN1cHBvcnRzX2dtaWk6MTsNCj4gPiAgICAgICB1bnNpZ25lZCBhc3BtX21hbmFnZWFibGU6MTsN
+Cj4gPiArICAgICB1bnNpZ25lZCBkYXNoX2VuYWJsZWQ6MTsNCj4gPiAgICAgICBkbWFfYWRkcl90
+IGNvdW50ZXJzX3BoeXNfYWRkcjsNCj4gPiAgICAgICBzdHJ1Y3QgcnRsODE2OV9jb3VudGVycyAq
+Y291bnRlcnM7DQo+ID4gICAgICAgc3RydWN0IHJ0bDgxNjlfdGNfb2Zmc2V0cyB0Y19vZmZzZXQ7
+IEBAIC0xMjUzLDE0ICsxMjU0LDI2IEBADQo+ID4gc3RhdGljIGJvb2wgcjgxNjhlcF9jaGVja19k
+YXNoKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRwKQ0KPiA+ICAgICAgIHJldHVybiByODE2OGVw
+X29jcF9yZWFkKHRwLCAweDEyOCkgJiBCSVQoMCk7ICB9DQo+ID4NCj4gPiAtc3RhdGljIGVudW0g
+cnRsX2Rhc2hfdHlwZSBydGxfY2hlY2tfZGFzaChzdHJ1Y3QgcnRsODE2OV9wcml2YXRlICp0cCkN
+Cj4gPiArc3RhdGljIGJvb2wgcnRsX2Rhc2hfaXNfZW5hYmxlZChzdHJ1Y3QgcnRsODE2OV9wcml2
+YXRlICp0cCkgew0KPiA+ICsgICAgIHN3aXRjaCAodHAtPmRhc2hfdHlwZSkgew0KPiA+ICsgICAg
+IGNhc2UgUlRMX0RBU0hfRFA6DQo+ID4gKyAgICAgICAgICAgICByZXR1cm4gcjgxNjhkcF9jaGVj
+a19kYXNoKHRwKTsNCj4gPiArICAgICBjYXNlIFJUTF9EQVNIX0VQOg0KPiA+ICsgICAgICAgICAg
+ICAgcmV0dXJuIHI4MTY4ZXBfY2hlY2tfZGFzaCh0cCk7DQo+ID4gKyAgICAgZGVmYXVsdDoNCj4g
+PiArICAgICAgICAgICAgIHJldHVybiBmYWxzZTsNCj4gPiArICAgICB9DQo+ID4gK30NCj4gPiAr
+DQo+ID4gK3N0YXRpYyBlbnVtIHJ0bF9kYXNoX3R5cGUgcnRsX2dldF9kYXNoX3R5cGUoc3RydWN0
+IHJ0bDgxNjlfcHJpdmF0ZQ0KPiA+ICsqdHApDQo+ID4gIHsNCj4gPiAgICAgICBzd2l0Y2ggKHRw
+LT5tYWNfdmVyc2lvbikgew0KPiA+ICAgICAgIGNhc2UgUlRMX0dJR0FfTUFDX1ZFUl8yODoNCj4g
+PiAgICAgICBjYXNlIFJUTF9HSUdBX01BQ19WRVJfMzE6DQo+ID4gLSAgICAgICAgICAgICByZXR1
+cm4gcjgxNjhkcF9jaGVja19kYXNoKHRwKSA/IFJUTF9EQVNIX0RQIDogUlRMX0RBU0hfTk9ORTsN
+Cj4gPiArICAgICAgICAgICAgIHJldHVybiBSVExfREFTSF9EUDsNCj4gPiAgICAgICBjYXNlIFJU
+TF9HSUdBX01BQ19WRVJfNTEgLi4uIFJUTF9HSUdBX01BQ19WRVJfNTM6DQo+ID4gLSAgICAgICAg
+ICAgICByZXR1cm4gcjgxNjhlcF9jaGVja19kYXNoKHRwKSA/IFJUTF9EQVNIX0VQIDogUlRMX0RB
+U0hfTk9ORTsNCj4gPiArICAgICAgICAgICAgIHJldHVybiBSVExfREFTSF9FUDsNCj4gPiAgICAg
+ICBkZWZhdWx0Og0KPiA+ICAgICAgICAgICAgICAgcmV0dXJuIFJUTF9EQVNIX05PTkU7DQo+ID4g
+ICAgICAgfQ0KPiA+IEBAIC0xNDUzLDcgKzE0NjYsNyBAQCBzdGF0aWMgdm9pZCBfX3J0bDgxNjlf
+c2V0X3dvbChzdHJ1Y3QNCj4gPiBydGw4MTY5X3ByaXZhdGUgKnRwLCB1MzIgd29sb3B0cykNCj4g
+Pg0KPiA+ICAgICAgIGRldmljZV9zZXRfd2FrZXVwX2VuYWJsZSh0cF90b19kZXYodHApLCB3b2xv
+cHRzKTsNCj4gPg0KPiA+IC0gICAgIGlmICh0cC0+ZGFzaF90eXBlID09IFJUTF9EQVNIX05PTkUp
+IHsNCj4gPiArICAgICBpZiAoIXRwLT5kYXNoX2VuYWJsZWQpIHsNCj4gPiAgICAgICAgICAgICAg
+IHJ0bF9zZXRfZDNfcGxsX2Rvd24odHAsICF3b2xvcHRzKTsNCj4gPiAgICAgICAgICAgICAgIHRw
+LT5kZXYtPndvbF9lbmFibGVkID0gd29sb3B0cyA/IDEgOiAwOw0KPiA+ICAgICAgIH0NCj4gPiBA
+QCAtMjUxMiw3ICsyNTI1LDcgQEAgc3RhdGljIHZvaWQgcnRsX3dvbF9lbmFibGVfcngoc3RydWN0
+DQo+ID4gcnRsODE2OV9wcml2YXRlICp0cCkNCj4gPg0KPiA+ICBzdGF0aWMgdm9pZCBydGxfcHJl
+cGFyZV9wb3dlcl9kb3duKHN0cnVjdCBydGw4MTY5X3ByaXZhdGUgKnRwKSAgew0KPiA+IC0gICAg
+IGlmICh0cC0+ZGFzaF90eXBlICE9IFJUTF9EQVNIX05PTkUpDQo+ID4gKyAgICAgaWYgKHRwLT5k
+YXNoX2VuYWJsZWQpDQo+ID4gICAgICAgICAgICAgICByZXR1cm47DQo+ID4NCj4gPiAgICAgICBp
+ZiAodHAtPm1hY192ZXJzaW9uID09IFJUTF9HSUdBX01BQ19WRVJfMzIgfHwgQEAgLTQ4NjksNyAr
+NDg4Miw3DQo+ID4gQEAgc3RhdGljIGludCBydGw4MTY5X3J1bnRpbWVfaWRsZShzdHJ1Y3QgZGV2
+aWNlICpkZXZpY2UpICB7DQo+ID4gICAgICAgc3RydWN0IHJ0bDgxNjlfcHJpdmF0ZSAqdHAgPSBk
+ZXZfZ2V0X2RydmRhdGEoZGV2aWNlKTsNCj4gPg0KPiA+IC0gICAgIGlmICh0cC0+ZGFzaF90eXBl
+ICE9IFJUTF9EQVNIX05PTkUpDQo+ID4gKyAgICAgaWYgKHRwLT5kYXNoX2VuYWJsZWQpDQo+ID4g
+ICAgICAgICAgICAgICByZXR1cm4gLUVCVVNZOw0KPiA+DQo+ID4gICAgICAgaWYgKCFuZXRpZl9y
+dW5uaW5nKHRwLT5kZXYpIHx8ICFuZXRpZl9jYXJyaWVyX29rKHRwLT5kZXYpKSBAQA0KPiA+IC00
+ODk2LDcgKzQ5MDksNyBAQCBzdGF0aWMgdm9pZCBydGxfc2h1dGRvd24oc3RydWN0IHBjaV9kZXYg
+KnBkZXYpDQo+ID4gICAgICAgcnRsX3Jhcl9zZXQodHAsIHRwLT5kZXYtPnBlcm1fYWRkcik7DQo+
+ID4NCj4gPiAgICAgICBpZiAoc3lzdGVtX3N0YXRlID09IFNZU1RFTV9QT1dFUl9PRkYgJiYNCj4g
+PiAtICAgICAgICAgdHAtPmRhc2hfdHlwZSA9PSBSVExfREFTSF9OT05FKSB7DQo+ID4gKyAgICAg
+ICAgICAgICAhdHAtPmRhc2hfZW5hYmxlZCkgew0KPiANCj4gU2luY2UgeW91IGhhdmUgdG8gcmVw
+b3N0LCBwbGVhc2UgbWFpbnRhaW4gdGhlIGNvcnJlY3QgaW5kZW50YXRpb24NCj4gYWJvdmU6DQo+
+IA0KPiAgICAgICAgIGlmIChzeXN0ZW1fc3RhdGUgPT0gU1lTVEVNX1BPV0VSX09GRiAmJg0KPiAg
+ICAgICAgICAgICAhdHAtPmRhc2hfZW5hYmxlZCkgew0KPiANCj4gICAgICAgICBeXl5eDQo+IHNw
+YWNlcyBoZXJlLg0KSSB3aWxsIGNvcnJlY3QgdGhlIGluZGVudGF0aW9uLiBUaGFua3MuDQo=
 
