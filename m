@@ -1,183 +1,174 @@
-Return-Path: <netdev+bounces-46768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4F37E64FE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:14:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3B07E6503
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:15:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAD1C1C2082C
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:14:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1055B20B45
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D091E10790;
-	Thu,  9 Nov 2023 08:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18BE107A3;
+	Thu,  9 Nov 2023 08:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hUS4/fnO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bwB+GFEH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529BA10780
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:14:01 +0000 (UTC)
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 895492D4D
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:14:00 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id 2adb3069b0e04-507f1c29f25so711167e87.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:14:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699517639; x=1700122439; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=G17FVc9ZIs9MsADgRcHfDSaNMtMlfNOczgj7HTnDgTw=;
-        b=hUS4/fnODHvCt4LC+GZCb0i/pICkzBjhFF09qZdsU/D+b7hAlPxpmxaiWozCRJvg0Z
-         lROtONTbDdHZnsbXXzvqI1wjG7pYhPWtmJjnPcX6/Q8VeUGCDwGMrMTz6LqCtzNc2D7v
-         39mGJFf98xcHuYU/Cvg/Cn7gzDU8k6Vd6bVMVZMbOIeXYXX/YXHl70wqPAAI/KQ2rLLP
-         9h9+guwzUli81KiziKvIOdU4aSDYJ30RYWwuy5GZqnN6B/TSNKmq8ZjAw7TpapC+d/yz
-         31s9QSYRPtOxWmwQSPL/O5h0H6GgwaPFawI9mEzLQycie98wEEl0QW3+OGfTTW799DHb
-         cRCQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3304110780
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:15:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861162D4F
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:15:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699517710;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N1MZTY0O2dPelAjqmuHM1qmWRJLOj+88Y5VWEtfM7Q0=;
+	b=bwB+GFEHJs4Ur0Nmr+mg89BsvUdaCv1/kSeNsQVAael20/9FIfVWAmCcVux7xoERQp3dGz
+	SPigGHUj6usTEA8I7xjRHvFWmshCvTE2HnqrpANTXQopV/vxgm/9UNUdH0JjtU86n3bjtg
+	LpgNvmqoX7XdjamUf15ntUQUwgAW6KM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-iLMK46PdOl2BLkOAF2CIVQ-1; Thu, 09 Nov 2023 03:15:09 -0500
+X-MC-Unique: iLMK46PdOl2BLkOAF2CIVQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-9be601277c2so47011566b.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:15:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699517639; x=1700122439;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G17FVc9ZIs9MsADgRcHfDSaNMtMlfNOczgj7HTnDgTw=;
-        b=dcbAi9YRAMp8BqqO+V+kaMdsbR2c/Z9F36nLYGVhSIa6DdciNKevGtNgSast18nQ6Q
-         yhmkEtYegpyHbTOOiAYX+9uhKEG+bkgD/PjkUz5dRynK8BooSm14vYSJT11SxmUTW7Tf
-         ibb2I53oW9aCz4RxaheMKdVfzzAHt2LZ8Xc+1kLCrrUzjD+cxakGKgscYF1SiwkH1sIm
-         SgAz756AJ4lF8OSEjVRVWq0mHjw7jydb7nQ9BoIqvkBz8AeoVRaX7LSAaGD5imsSH0Lx
-         U1BRMksEcTc/yFUTUfcmQDxfW118JrOk3Yrl/6k6/i1HFSgbNw55wPpEowYbkheu0OGO
-         KX1A==
-X-Gm-Message-State: AOJu0YzR5uTO3NTqK9zxDKuegRyXidkezqty3wyUnNurMuXHeeZegE7d
-	O0+98LjSLV4K74WFxRN6yhHXEBtYSFiUvW0Xp2RU/Q==
-X-Google-Smtp-Source: AGHT+IH2r9WNnRLnV5uGU3d5Llux4hoXQYUMNaE4Hjf1i4MbmVDWuTW9k0oJXF1ZB7Hr/UFPd9TcZFYsRREBNgCBRVE=
-X-Received: by 2002:ac2:5e6c:0:b0:509:1033:c544 with SMTP id
- a12-20020ac25e6c000000b005091033c544mr683089lfr.50.1699517638598; Thu, 09 Nov
- 2023 00:13:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699517708; x=1700122508;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N1MZTY0O2dPelAjqmuHM1qmWRJLOj+88Y5VWEtfM7Q0=;
+        b=ISd/kCOTjpZqcvpFuED41a77kX2fM96/9OwHJ8FtKu8DKOpb9baPCU3Pqd0ec444Bu
+         xjKPhSIvpuxFNsD9t9vOlbO281rw6pmCwPjKpeqUGVYaDfzF0TXNyhFnN/A87pjJr9ze
+         bdLgRYIt5I7Jk3hfBIq41R90I7wfJefWoC899aPO8vFxFi/p0q51rr29A5T5UowAJLsc
+         ufESyrGtGSlFm2EIFAoFDAeNqay+/qD0it6ARHNeMMiqZliiAIKCzBnsUmxH5sa02PDf
+         uKgE4Cv6295+iGh8NoPGhKXBcx0tyQOrtbh+VKwSZ8jIHjDueReUG0LKp9RrQ9hmECtp
+         uQCA==
+X-Gm-Message-State: AOJu0YwhvePPciMA0MmGvJ+amvKrkqCDVIjp4t1GReQuhV0oslmZrrvj
+	YKZ8yUSAx6KZpUec9ato2myEqukQ7BJBd4kItHWWtM0BirTUWRQzRkCz0Kwd4Ace5/IhPca8PuX
+	iqjZKgkhInqAxd3TU
+X-Received: by 2002:a17:907:72d2:b0:9e0:5d5c:aa6d with SMTP id du18-20020a17090772d200b009e05d5caa6dmr3638441ejc.20.1699517708285;
+        Thu, 09 Nov 2023 00:15:08 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGpU3MhXZeWVJ99B6VMP356iL5x2p0xFm35pSCHy/HUi/fikXGBhzSPC6P7WxyGEaa1jJuIJg==
+X-Received: by 2002:a17:907:72d2:b0:9e0:5d5c:aa6d with SMTP id du18-20020a17090772d200b009e05d5caa6dmr3638421ejc.20.1699517707967;
+        Thu, 09 Nov 2023 00:15:07 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f4:2044:be5a:328c:4b98:1420])
+        by smtp.gmail.com with ESMTPSA id lg5-20020a170906f88500b00992b2c55c67sm2216420ejb.156.2023.11.09.00.15.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 00:15:07 -0800 (PST)
+Date: Thu, 9 Nov 2023 03:15:03 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 17/21] virtio_net: xsk: rx: skip dma unmap
+ when rq is bind with AF_XDP
+Message-ID: <20231109031347-mutt-send-email-mst@kernel.org>
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-18-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231024160220.3973311-1-kuba@kernel.org> <20231024160220.3973311-2-kuba@kernel.org>
-In-Reply-To: <20231024160220.3973311-2-kuba@kernel.org>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Thu, 9 Nov 2023 10:13:22 +0200
-Message-ID: <CAC_iWjKk4FPF4Pf-Lz15NrR9yWvrOehgFeSB+Wi6UzYDh8r=wQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/15] net: page_pool: split the page_pool_params
- into fast and slow
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, almasrymina@google.com, hawk@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107031227.100015-18-xuanzhuo@linux.alibaba.com>
 
-On Tue, 24 Oct 2023 at 19:02, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> struct page_pool is rather performance critical and we use
-> 16B of the first cache line to store 2 pointers used only
-> by test code. Future patches will add more informational
-> (non-fast path) attributes.
->
-> It's convenient for the user of the API to not have to worry
-> which fields are fast and which are slow path. Use struct
-> groups to split the params into the two categories internally.
->
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, Nov 07, 2023 at 11:12:23AM +0800, Xuan Zhuo wrote:
+> When rq is bound with AF_XDP, the buffer dma is managed
+> by the AF_XDP APIs. So the buffer got from the virtio core should
+> skip the dma unmap operation.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+
+I don't get it - is this like a bugfix?
+And why do we need our own flag and checks?
+Doesn't virtio core DTRT?
+
 > ---
->  include/net/page_pool/types.h | 31 +++++++++++++++++++------------
->  net/core/page_pool.c          |  7 ++++---
->  2 files changed, 23 insertions(+), 15 deletions(-)
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index 6fc5134095ed..23950fcc4eca 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -54,18 +54,22 @@ struct pp_alloc_cache {
->   * @offset:    DMA sync address offset for PP_FLAG_DMA_SYNC_DEV
->   */
->  struct page_pool_params {
-> -       unsigned int    flags;
-> -       unsigned int    order;
-> -       unsigned int    pool_size;
-> -       int             nid;
-> -       struct device   *dev;
-> -       struct napi_struct *napi;
-> -       enum dma_data_direction dma_dir;
-> -       unsigned int    max_len;
-> -       unsigned int    offset;
-> +       struct_group_tagged(page_pool_params_fast, fast,
-> +               unsigned int    flags;
-> +               unsigned int    order;
-> +               unsigned int    pool_size;
-> +               int             nid;
-> +               struct device   *dev;
-> +               struct napi_struct *napi;
-> +               enum dma_data_direction dma_dir;
-> +               unsigned int    max_len;
-> +               unsigned int    offset;
-> +       );
-> +       struct_group_tagged(page_pool_params_slow, slow,
->  /* private: used by test code only */
-> -       void (*init_callback)(struct page *page, void *arg);
-> -       void *init_arg;
-> +               void (*init_callback)(struct page *page, void *arg);
-> +               void *init_arg;
-> +       );
->  };
->
->  #ifdef CONFIG_PAGE_POOL_STATS
-> @@ -119,7 +123,7 @@ struct page_pool_stats {
->  #endif
->
->  struct page_pool {
-> -       struct page_pool_params p;
-> +       struct page_pool_params_fast p;
->
->         long frag_users;
->         struct page *frag_page;
-> @@ -178,6 +182,9 @@ struct page_pool {
->         refcount_t user_cnt;
->
->         u64 destroy_cnt;
-> +
-> +       /* Slow/Control-path information follows */
-> +       struct page_pool_params_slow slow;
->  };
->
->  struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 5e409b98aba0..5cae413de7cc 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -173,7 +173,8 @@ static int page_pool_init(struct page_pool *pool,
->  {
->         unsigned int ring_qsize = 1024; /* Default */
->
-> -       memcpy(&pool->p, params, sizeof(pool->p));
-> +       memcpy(&pool->p, &params->fast, sizeof(pool->p));
-> +       memcpy(&pool->slow, &params->slow, sizeof(pool->slow));
->
->         /* Validate only known flags were used */
->         if (pool->p.flags & ~(PP_FLAG_ALL))
-> @@ -384,8 +385,8 @@ static void page_pool_set_pp_info(struct page_pool *pool,
->          * the overhead is negligible.
->          */
->         page_pool_fragment_page(page, 1);
-> -       if (pool->p.init_callback)
-> -               pool->p.init_callback(page, pool->p.init_arg);
-> +       if (pool->slow.init_callback)
-> +               pool->slow.init_callback(page, pool->slow.init_arg);
+>  drivers/net/virtio/main.c       | 8 +++++---
+>  drivers/net/virtio/virtio_net.h | 3 +++
+>  drivers/net/virtio/xsk.c        | 1 +
+>  3 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> index 15943a22e17d..a318b2533b94 100644
+> --- a/drivers/net/virtio/main.c
+> +++ b/drivers/net/virtio/main.c
+> @@ -430,7 +430,7 @@ static void *virtnet_rq_get_buf(struct virtnet_rq *rq, u32 *len, void **ctx)
+>  	void *buf;
+>  
+>  	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> -	if (buf && rq->do_dma)
+> +	if (buf && rq->do_dma_unmap)
+>  		virtnet_rq_unmap(rq, buf, *len);
+>  
+>  	return buf;
+> @@ -561,8 +561,10 @@ static void virtnet_set_premapped(struct virtnet_info *vi)
+>  
+>  		/* disable for big mode */
+>  		if (vi->mergeable_rx_bufs || !vi->big_packets) {
+> -			if (!virtqueue_set_dma_premapped(vi->rq[i].vq))
+> +			if (!virtqueue_set_dma_premapped(vi->rq[i].vq)) {
+>  				vi->rq[i].do_dma = true;
+> +				vi->rq[i].do_dma_unmap = true;
+> +			}
+>  		}
+>  	}
 >  }
->
->  static void page_pool_clear_pp_info(struct page *page)
-> --
-> 2.41.0
->
+> @@ -3944,7 +3946,7 @@ void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
+>  
+>  	rq = &vi->rq[i];
+>  
+> -	if (rq->do_dma)
+> +	if (rq->do_dma_unmap)
+>  		virtnet_rq_unmap(rq, buf, 0);
+>  
+>  	virtnet_rq_free_buf(vi, rq, buf);
+> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> index 1242785e311e..2005d0cd22e2 100644
+> --- a/drivers/net/virtio/virtio_net.h
+> +++ b/drivers/net/virtio/virtio_net.h
+> @@ -135,6 +135,9 @@ struct virtnet_rq {
+>  	/* Do dma by self */
+>  	bool do_dma;
+>  
+> +	/* Do dma unmap after getting buf from virtio core. */
+> +	bool do_dma_unmap;
+> +
+>  	struct {
+>  		struct xsk_buff_pool *pool;
+>  
+> diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> index e737c3353212..b09c473c29fb 100644
+> --- a/drivers/net/virtio/xsk.c
+> +++ b/drivers/net/virtio/xsk.c
+> @@ -210,6 +210,7 @@ static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *
+>  		xdp_rxq_info_unreg(&rq->xsk.xdp_rxq);
+>  
+>  	rq->xsk.pool = pool;
+> +	rq->do_dma_unmap = !pool;
+>  
+>  	virtnet_rx_resume(vi, rq);
+>  
+> -- 
+> 2.32.0.3.g01195cf9f
 
-Had time for a close look, feel free to replace my ack with
-Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
