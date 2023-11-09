@@ -1,222 +1,132 @@
-Return-Path: <netdev+bounces-46919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B085D7E712D
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:07:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D02C7E7134
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 19:07:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 606972810DF
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A942810C7
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5860232C90;
-	Thu,  9 Nov 2023 18:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC63C32C94;
+	Thu,  9 Nov 2023 18:07:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="W2bPJzrU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lr8IWXYH"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E95032C82
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:07:15 +0000 (UTC)
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEEC1727
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:07:14 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5441ba3e53cso1819776a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:07:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749F232C82
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 18:07:29 +0000 (UTC)
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDEBC3AAE
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:07:28 -0800 (PST)
+Received: by mail-vk1-xa2a.google.com with SMTP id 71dfb90a1353d-4a13374a1e8so502570e0c.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 10:07:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699553233; x=1700158033; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oGtopPGDGiHp99PDIuHYLua3YoCROal58OYHkjV7DBI=;
-        b=W2bPJzrU/xY6COVkFTQgSmqkfEC/VeopQ1i8TXfcIOMgGKtnzOxgrdfC9smN2jXRs1
-         jSsghNRgseRUs5XJfgYsOPN8zE245ubTYk+8F54anCMqY4GTPWr5gjGLQma7yfWGVzvB
-         mUq08qdRsFAH3ZPiNovgYOsay2yhNXBDCIXUKkKUotwcWfhzU7dmA7ni+MoXSdYyBoSJ
-         a+YEHScpu+FQNW9FfyO4/Q5sMUxjDDrJVusNFk2LFc6coyy7uq6gA7gBz/75FBV6F7Ws
-         N3PDKKiTKKwguzda2+F8kbocuF30k77GDSW0/I3FNZuaDJDLa+Ox0QGs2w08j+JEo5Lz
-         tdPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699553233; x=1700158033;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1699553248; x=1700158048; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oGtopPGDGiHp99PDIuHYLua3YoCROal58OYHkjV7DBI=;
-        b=MrqW60lDOyzUyFMsDHM7zkMsSgmbVoRhxMUgsD+xxYX6ZvH5qxv4L0j6UP9flqcKBP
-         /MC9Ffb6frUz6PobCG6mJaf8PzAdOXRYrLWn8NzkcX6P25qEb4UfNOvME/jX5p0nfyAu
-         v5G1kUOU3CIRggpFmM4O9036WWhRYkz+Xe8o8Tq6GqQkzPaets/p1+XAiqwkc8Ox2GeA
-         7j5wcdH432HgA1yzOR666O+5mSSYO0kRYjEcieWuYI8inQmoTm4pJNc50rzAvmUI6gn0
-         tYuYjrLgxKCA73bXgxHwh6gSYknSK3EW4kA6v+5lMIo8+Io40GD1+37rXBK8eeeTp27M
-         kZ+w==
-X-Gm-Message-State: AOJu0YxZ7caVatDvE2p2V0uPKPyLc5QZGbbgopCKn1VF01a45/kOwWkv
-	pHFNUm3EeshI5PGJ/6CkxalKjA==
-X-Google-Smtp-Source: AGHT+IHeBVdX0ytpk0hc1Pmju8UM1U3MadSrK4b4dCn6Xj/sHbID2k+sDi/fwCCmUVTtFoVFjbQB0Q==
-X-Received: by 2002:a50:c050:0:b0:53e:98c6:5100 with SMTP id u16-20020a50c050000000b0053e98c65100mr4700269edd.30.1699553233208;
-        Thu, 09 Nov 2023 10:07:13 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j26-20020a50d01a000000b0053e408aec8bsm109200edf.6.2023.11.09.10.07.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 10:07:12 -0800 (PST)
-Date: Thu, 9 Nov 2023 19:07:11 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
-Message-ID: <ZU0fzzmmxjnsNW0n@nanopsycho>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
- <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+        bh=Q5jof2dMXbvUyv/2d3eh8cYmtslz7u0wbU9sqNUptZw=;
+        b=lr8IWXYHFzQZXnUU/VHDOE8lzRLYhBk24xaDUt6mknLxoRwm7q0viGidfxl7KDrlCR
+         QnA0pqSymEsMbFUasogVdy9OGiRjtQLhMV20dscCeAI4CHg2SS9Rlztk47AhFcON74MC
+         MTdcm+5DEFN+A+0xAAvu8FPGfHavRjZ0i5j3u2w33sVqv1en/vz7c/vted6S0e24f5BG
+         p0PN3NaxisoraETVnk26pNzhs6/10RPrfhiL3VgmWD4FsSo2fF24t0quXHsofq/9q2Uk
+         fh8nmn/ghtNzMtDnSPmpYb3GNxVd6P8+G435DDTCLmjKewsP1sTGjZGScTDzvC7J6R+e
+         Nhzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699553248; x=1700158048;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q5jof2dMXbvUyv/2d3eh8cYmtslz7u0wbU9sqNUptZw=;
+        b=aGy7D751nUBvYCvj60jAzCzlvvppdTmNu/oU12emm9G8HyAyY8LczVA2txtFN4PhjB
+         fkvGo+leS74865l3QO+5kyUImYk4nnqji+QbgFg7tPUb+4XixvSJyehB3whKBvVXDToR
+         0v2bZcQKkLHoM37h/0LuBJShbPdGNO97Ni9/lgJGfPsSI1xS8ogPDSRR2LPOYL1wPwUL
+         NF+3Zfkn7axguz1Ln7cXAtnhsqygnPsX1PlAdkoC+9B3opftjivfwt7JRhZyjxffx8+t
+         TVYk4A7P0j9mASRraRI62OiKqV/BLUVTdlwzgSVPnwfFEpYFkaS7uqOwF2VdPT+ianV0
+         5WkA==
+X-Gm-Message-State: AOJu0YyqZsMwELktMvAlskLERc6iYndbqIXp99azVcFIKDNepeWtr2pQ
+	TldPfTaOgp9/eTFYXe7n1Cd8+DRG2RGvQFrLCKhODg==
+X-Google-Smtp-Source: AGHT+IEnm0GQvFTNs/hpK2AqwHKtIdbux6hL2chbJDT/1nnPxaXSEMiQmybsy0eZF4F5OgkJ1E0jEiVEkvhvNTuTRrY=
+X-Received: by 2002:a05:6122:1799:b0:49c:79f3:27a4 with SMTP id
+ o25-20020a056122179900b0049c79f327a4mr2654001vkf.3.1699553247892; Thu, 09 Nov
+ 2023 10:07:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20231102225837.1141915-1-sdf@google.com> <CAADnVQLTkhYMXxDsJ4jB5d7SnQ_Z51j9YT65TcdiXNg5DOO_Fg@mail.gmail.com>
+In-Reply-To: <CAADnVQLTkhYMXxDsJ4jB5d7SnQ_Z51j9YT65TcdiXNg5DOO_Fg@mail.gmail.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Thu, 9 Nov 2023 10:07:14 -0800
+Message-ID: <CAKH8qBskineuye_0cUP6_aPb+FO2=PigFgC=n5upC1rt2ritQg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 00/13] xsk: TX metadata
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	"Song, Yoong Siang" <yoong.siang.song@intel.com>, Network Development <netdev@vger.kernel.org>, 
+	xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Nov 09, 2023 at 06:20:14PM CET, arkadiusz.kubalewski@intel.com wrote:
->>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>Sent: Thursday, November 9, 2023 11:51 AM
->>
->>On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
->>> Fix issues when performing unordered unbind/bind of a kernel modules
->>> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
->>> Currently only serialized bind/unbind of such use case works, fix
->>> the issues and allow for unserialized kernel module bind order.
->>>
->>> The issues are observed on the ice driver, i.e.,
->>>
->>> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
->>> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
->>>
->>> results in:
->>>
->>> ice 0000:af:00.0: Removed PTP clock
->>> BUG: kernel NULL pointer dereference, address: 0000000000000010
->>> PF: supervisor read access in kernel mode
->>> PF: error_code(0x0000) - not-present page
->>> PGD 0 P4D 0
->>> Oops: 0000 [#1] PREEMPT SMP PTI
->>> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-
->>>queue_19th-Oct-2023-01625-g039e5d15e451 #1
->>> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS
->>>SE5C620.86B.02.01.0008.031920191559 03/19/2019
->>> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
->>> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66
->>>08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b 10
->>>41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
->>> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
->>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
->>> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
->>> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
->>> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
->>> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
->>> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000)
->>knlGS:0000000000000000
->>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
->>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>> PKRU: 55555554
->>> Call Trace:
->>>   <TASK>
->>>   ? __die+0x20/0x70
->>>   ? page_fault_oops+0x76/0x170
->>>   ? exc_page_fault+0x65/0x150
->>>   ? asm_exc_page_fault+0x22/0x30
->>>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
->>>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
->>>   dpll_msg_add_pin_parents+0x142/0x1d0
->>>   dpll_pin_event_send+0x7d/0x150
->>>   dpll_pin_on_pin_unregister+0x3f/0x100
->>>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
->>>   ice_dpll_deinit+0x29/0xe0 [ice]
->>>   ice_remove+0xcd/0x200 [ice]
->>>   pci_device_remove+0x33/0xa0
->>>   device_release_driver_internal+0x193/0x200
->>>   unbind_store+0x9d/0xb0
->>>   kernfs_fop_write_iter+0x128/0x1c0
->>>   vfs_write+0x2bb/0x3e0
->>>   ksys_write+0x5f/0xe0
->>>   do_syscall_64+0x59/0x90
->>>   ? filp_close+0x1b/0x30
->>>   ? do_dup2+0x7d/0xd0
->>>   ? syscall_exit_work+0x103/0x130
->>>   ? syscall_exit_to_user_mode+0x22/0x40
->>>   ? do_syscall_64+0x69/0x90
->>>   ? syscall_exit_work+0x103/0x130
->>>   ? syscall_exit_to_user_mode+0x22/0x40
->>>   ? do_syscall_64+0x69/0x90
->>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->>> RIP: 0033:0x7fdc7d93eb97
->>> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e
->>fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0
->>ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
->>> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
->>> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
->>> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
->>> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
->>> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
->>> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
->>>   </TASK>
->>> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio
->>>irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer
->>>snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c
->>>rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod target_core_mod
->>>ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr
->>>intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common
->>>isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal
->>>intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt
->>>iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr i2c_i801
->>>ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus
->>>ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache jbd2
->>>sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice
->>>crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci
->>>ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
->>> CR2: 0000000000000010
->>>
->>> Arkadiusz Kubalewski (3):
->>>    dpll: fix pin dump crash after module unbind
->>>    dpll: fix pin dump crash for rebound module
->>>    dpll: fix register pin with unregistered parent pin
->>>
->>>   drivers/dpll/dpll_core.c    |  8 ++------
->>>   drivers/dpll/dpll_core.h    |  4 ++--
->>>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++---------------
->>>   3 files changed, 26 insertions(+), 23 deletions(-)
->>>
->>
->>
->>I still don't get how can we end up with unregistered pin. And shouldn't
->>drivers do unregister of dpll/pin during release procedure? I thought it
->>was kind of agreement we reached while developing the subsystem.
->>
+On Thu, Nov 9, 2023 at 10:03=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
->It's definitely not about ending up with unregistered pins.
+> On Thu, Nov 2, 2023 at 3:58=E2=80=AFPM Stanislav Fomichev <sdf@google.com=
+> wrote:
+> >
+> > This series implements initial TX metadata (offloads) for AF_XDP.
+> > See patch #2 for the main implementation and mlx5/stmmac ones for the
+> > example on how to consume the metadata on the device side.
+> >
+> > Starting with two types of offloads:
+> > - request TX timestamp (and write it back into the metadata area)
+> > - request TX checksum offload
+> >
+> > Changes since v4:
+> > - remove 'render-max: true' from spec (Jakub)
+> > - move xsk_tx_metadata_ops into include/net/xdp_sock.h (Jakub)
+> > - christmas tree in netdev_nl_dev_fill (Jakub)
+> > - fix > vs >=3D when dumping masks in samples (Jakub)
+> > - switch to 8-byte alignment for tx metadata length (Jakub)
+> > - spelling fixes in the doc (Magnus)
+> > - deny metadata length >=3D 256 (Magnus)
+> > - validate metadata flags and deny unknown ones (Jakub)
+> > - move XDP_TX_METADATA_CHECKSUM_SW into umem config flag (Jakub)
+> > - don't print timestamps twice in xdp_hw_metadata (Song)
+> > - rename anonymous xsk_tx_metadata member into request (Alexei)
+> > - add comment to xsk_tx_metadata (Alexei)
+> >
+> > I've separated new bits that need a closer review into separate patches=
+:
+> > - xsk_tx_metadata flags validation:
+> >   - xsk: Validate xsk_tx_metadata flags
+> > - new umem flag for sw tx csum calculation (instead of per-packet flag)
+> >   - xsk: Add option to calculate TX checksum in SW
 >
->Usually the driver is loaded for PF0, PF1, PF2, PF3 and unloaded in opposite
->order: PF3, PF2, PF1, PF0. And this is working without any issues.
+> Stan,
+>
+> new xdp_metadata is failing on s390. See BPF CI:
+>
+> verify_xsk_metadata:FAIL:csum unexpected csum: actual 29212 !=3D expected=
+ 7282
+>
+> Other than this I think the patchset is good to go.
+> Pls fix and respin.
 
-Please fix this in the driver.
-
-
->
->Above crash is caused because of unordered driver unload, where dpll subsystem
->tries to notify muxed pin was deleted, but at that time the parent is already
->gone, thus data points to memory which is no longer available, thus crash
->happens when trying to dump pin parents.
->
->This series fixes all issues I could find connected to the situation where
->muxed-pins are trying to access their parents, when parent registerer was removed
->in the meantime.
->
->Thank you!
->Arkadiusz
+Oh, thanks for catching this, probably some endianness issues? Will take a =
+look!
 
