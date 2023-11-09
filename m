@@ -1,149 +1,214 @@
-Return-Path: <netdev+bounces-46752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411EE7E6307
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 06:04:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B21057E630B
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 06:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B44C7280ED0
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 05:04:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BA74B20B09
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 05:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CA163B8;
-	Thu,  9 Nov 2023 05:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0526AB7;
+	Thu,  9 Nov 2023 05:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eKzsamSc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oD9EIG24"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD6063A9
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:03:59 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05261D58;
-	Wed,  8 Nov 2023 21:03:58 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6140929CA
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:08:33 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D116E2683;
+	Wed,  8 Nov 2023 21:08:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699506239; x=1731042239;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=uxgTlz8DTOjfWlg4jszUqQlmMAps8QNPlUyELVJIm1M=;
-  b=eKzsamScKLOWc88vsxUaLUmovGLUDUBtgB5KXlHuxBybKL1NKchXW9RJ
-   k1j1Q98QTDpWon0Ct2yqzv1YywlhwLwksHiPnx3WPsbyu3kX9K5MIDRlr
-   62D55Kq8kLcsD+wCHlUgLBcP+Tfh9nl+awh6eHPk+h3KrxjLTEvOmOVAh
-   J+eBb4GaiolhwDR+YO29n8Kw6j1eCS5r+1zGlQ7C7gsXEC2IztxZRZNOY
-   49nnVX3rUkgWFwYl7nYHRgr4nwYTrFIog3OFZV4t1Lq/NByTmgv0fHnzg
-   nQw8Mdxp0nnPNxk9RNjUIDFd8zhGI810XS8cz6FFRGUtngu/fG7BsXXio
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="369249823"
+  t=1699506512; x=1731042512;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aYziC9OV0CoYzTtQYnYOxWglKYNSGFP0iZsUI6hjSeg=;
+  b=oD9EIG24hnryjy300HGQZE2DicP+oJM5ixlkMoG5Pb9w+xCl7NeR/9YF
+   uY/f0uUY9KGengKgKSdSyhqSHSfqO1H1VUkC6Iy8xJpI32Ta0F6UJNqpO
+   7zDWGR8i/qGW8zsEBxkETxg8O3Gz/5vHyPucuYJMin/XaPDYbx5d9RE1J
+   fQ01sYjknFWhkfg0etoBZheJ65v8Wf4A9zDSwrW87UuR7tRYZ7ucqVYKM
+   m9R2OFGIxIWcRUEMGGKWWF7x62S9tJW1yRZzdS/2LWhh+6DsCEhVdFe4W
+   EEyyhs5NeVh0yyZpX6CYxPUjPYYBbJ1CWkPkPx6gg+/+GCeqtnsnGX5Ay
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="374957405"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="369249823"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 21:03:58 -0800
+   d="scan'208";a="374957405"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 21:08:32 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="739738491"
 X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="4425719"
-Received: from ssid-ilbpg3-teeminta.png.intel.com ([10.88.227.74])
-  by orviesa002.jf.intel.com with ESMTP; 08 Nov 2023 21:03:55 -0800
-From: Gan Yi Fang <yi.fang.gan@intel.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Joakim Zhang <qiangqing.zhang@nxp.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Gan Yi Fang <yi.fang.gan@intel.com>
-Subject: [PATCH net 1/1] net: stmmac: fix MAC and phylink mismatch issue after resume with STMMAC_FLAG_USE_PHY_WOL enabled
-Date: Thu,  9 Nov 2023 13:00:27 +0800
-Message-Id: <20231109050027.2545000-1-yi.fang.gan@intel.com>
-X-Mailer: git-send-email 2.34.1
+   d="scan'208";a="739738491"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Nov 2023 21:08:32 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Wed, 8 Nov 2023 21:08:31 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Wed, 8 Nov 2023 21:08:31 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Wed, 8 Nov 2023 21:08:31 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=efS0fH/zCFnBotTZvMDnv00bClfc4JjBOPCvaCx1uJGvD8kWoHHtMTIdS4DrbpKT7feM8wDUz318IwHFzRymznMyTmxxO1AG56hgi2oyRt2U4xlkeHQc7BLJCuk1XBQsX8gxjzAy9C5e7K8VIQTI22pb+hTrA0hKMa4BBhy9FF7c3FbWuKW9LyC69QW5lfqxeHJsO6bpRAIlJBvI4vTyGmxU9F0ieNDqOI4sqfPmp5YWQup6gTfC/Ovzw79oXTI9bbUEhEhIIBtRArxvXn86LqE2wRqhdRrUKQpXBeqOOGkQ62/aGI/6VtbQl79VuUxv9mYaWmsHQSKoBinozniyww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RKB9TTTM5RT8VNQcKXIFvyXIvPLIdp4cISJU6qZBlTo=;
+ b=JI6pOUsm9D29J8sdOHxyDF6T2TokWNcWGaDpftx2oJCxS0IaFBrTd3qMQDqDHScymUrVMR4aEMRWYUzrfP3Bbftqb93St8dqp2SZwAl/i2f+ESyihrusOYyloZve//mkOXyaN7iti/A5jMtq902+aYIQ30tdGIrc/Jiv2e88PT16F5S3KBdcQLOoBx1p5FHTYJ2x2JoEGbzgoBsYzLj0/NdP5yaPctrSUmKj9H1uMINx7hM7qcoRl1r1OHpZgbVXwmXHZftJlFFm9OFge814noXUJFWi3Z3pYqyL0m4PU47s3YblGROOvSH6D9kq0XGSaCkKMMRxpdJIUwZG60jy2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB3306.namprd11.prod.outlook.com (2603:10b6:5:5c::18) by
+ SA1PR11MB8522.namprd11.prod.outlook.com (2603:10b6:806:3b1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Thu, 9 Nov
+ 2023 05:08:30 +0000
+Received: from DM6PR11MB3306.namprd11.prod.outlook.com
+ ([fe80::4245:c7d1:e22a:d879]) by DM6PR11MB3306.namprd11.prod.outlook.com
+ ([fe80::4245:c7d1:e22a:d879%4]) with mapi id 15.20.6977.018; Thu, 9 Nov 2023
+ 05:08:29 +0000
+From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+	<joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Looi, Hong Aun" <hong.aun.looi@intel.com>,
+	"Voon, Weifeng" <weifeng.voon@intel.com>, "Song, Yoong Siang"
+	<yoong.siang.song@intel.com>, "Sit, Michael Wei Hong"
+	<michael.wei.hong.sit@intel.com>
+Subject: RE: [PATCH net-next v2 1/1] net: stmmac: check CBS input values
+ before configuration
+Thread-Topic: [PATCH net-next v2 1/1] net: stmmac: check CBS input values
+ before configuration
+Thread-Index: AQHaDIvZ4rD8CSZwXkif+5bCBd+iWbBlZtuAgAwU6fA=
+Date: Thu, 9 Nov 2023 05:08:29 +0000
+Message-ID: <DM6PR11MB3306336C961366FF79799959B9AFA@DM6PR11MB3306.namprd11.prod.outlook.com>
+References: <20231101061920.401582-1-yi.fang.gan@intel.com>
+ <58132260-81d0-4f0c-90b6-0c97c7a6a2f5@lunn.ch>
+In-Reply-To: <58132260-81d0-4f0c-90b6-0c97c7a6a2f5@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB3306:EE_|SA1PR11MB8522:EE_
+x-ms-office365-filtering-correlation-id: c77eb180-78f3-4ec6-86f9-08dbe0e1e9d5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: trFqQbsATDe0bmvLvp3qQATW03UxDNwq0R42YASAn2DoKI54YyCVgEeosjbxAVK5tOVPo8wZd7N8MMF+LuvaH4Y6NBJ/dGj515cbc2rGgA+K+LYT3ek5wsu4VLCEh9IarqsNt55qFTJf9VQ/2QiPQ0m5HJvu+PuCyG9QA0l/H1mRsUKxWhstZr6YI2ZTLPOj98845QLM0YN29iP6hUAF09bFKq6pwCHZKKg8I+AXZqoNzOkLWIGrXCkwfL5W8j+pefMw7pXhVZeiBifJhzooFE9FKjarf+EWT7YJPg6SUhfVjOe+Mji9oY6mjLmo+oaFQ+qMotuwzLjz+TNpURoqCIEmDsKso/3idKmC6uqJ6jAcSZDOWoueHYsU5gC/TJbWQsdir+iGI6YwN+Pk5q82M4npcI0H4/j3qH9ZTbfROzoEAxhMmtvMMl54Xne4n9zd3ut+QVi2gbJ79W/88Xg9/kTvz8w7d3oQopVWP+lTgvatqSrDMAZajmQFQl2t9aR8gY4XVR0Xh87Kkunz/RIcIW9JUPzpjWj90naFmF9137ckVE19Hgdlnz/LS2+ur3uBH2RmfRCSd+JDH2B/1a7DT/j9UpawlHLzH51RH7LEZDYJv4ltqU9aWJw23GS4MdxW
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3306.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(376002)(346002)(39860400002)(136003)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(478600001)(6506007)(7696005)(9686003)(71200400001)(53546011)(83380400001)(26005)(107886003)(2906002)(41300700001)(7416002)(66446008)(64756008)(66556008)(66476007)(66946007)(76116006)(54906003)(52536014)(6916009)(8936002)(4326008)(38070700009)(8676002)(316002)(33656002)(38100700002)(122000001)(82960400001)(86362001)(5660300002)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?r9JC16dVneUCKkZq0zdgFUt5d36a3vdl0Jp9DnCRksjbBvVcOq2GE+IYYnbm?=
+ =?us-ascii?Q?pr5pdOTT+lb9dpcswRGEXTZyNDQC+pN0J8gNz2xoGUQAUZEPn7ZyA5KOOkLI?=
+ =?us-ascii?Q?n+rfX9G11iCVu9RB85+vmsayXPQuw8uGwzh8aKCOOYoPCN4SSdXF67hKZT0k?=
+ =?us-ascii?Q?aGm8qWfkEItsRVWyUz2njX30bPcJl5jfVmeizNm8pAadyISwjgd3o147Lf85?=
+ =?us-ascii?Q?inUoCLmjpQi3x5DqwQxkXPzi8wJG6byN0KChpuUwhbDNMqquN8+z86JvO3FL?=
+ =?us-ascii?Q?/Fs1S/XZlrPdj6IvVLqTPgbIJfZZ9AiXGbjS1oopJ4zYMZY/uyohSZTR7wsH?=
+ =?us-ascii?Q?xwidUwBCUUXPbK7j+dHmirtxuA9WwFwaBldtmOy0+WhXneBltwQPHzARHRNI?=
+ =?us-ascii?Q?oUrmdYUMmzBAlQVChXC+D0ej6DbsPkkwmjHvjpCwdf46r3lbhbt3/acZqog3?=
+ =?us-ascii?Q?ZBCeGuHzLOzwTdBQzNtn9+1FL+qXUeprz68SZQqogGKY9kbO4f5YiUb4HFjG?=
+ =?us-ascii?Q?nWM6WemLX/j/niDYyw4XxBLgA2HwdC4uoRONlyizHDnak/8+3Fh27TXEgmt/?=
+ =?us-ascii?Q?bWTAsDMK8HyabBjS3m39DC/HE9z7/Vtocpab7fin08nOq2Y/xt8ww3s1tvNB?=
+ =?us-ascii?Q?jmBIjklOmM7jfBYVLAIJac4ei5ii7GVxlvAu55MbqrX22CxnD00EY+3aNn6a?=
+ =?us-ascii?Q?YM+TGO4n2Q9htdDZacHfssdXOkAV+oR+/zwwHRvk2VdqOk+r/2cJMIfqdHL2?=
+ =?us-ascii?Q?XdmJVy+skWXw2LgF9c5negTsd26GvS7G4pcYHh5orwfBUe5NPtTOb3I9FdIx?=
+ =?us-ascii?Q?8Au4LVttOV+nXbznMallpzOAOz82CpKRLkv2S5aJBDD7U7McF8rU3w7Y/WST?=
+ =?us-ascii?Q?hynp4WsDwx75iPp+ejL5L3OAm6eRIiA2bNpQyE+8NwzxDRNb4aFiYw7pKGcl?=
+ =?us-ascii?Q?nz27RX3b6ypGVd5Y93vmtzgKdYTUED6fJ2fuAzrbgzuDrDuckDuiQwK31pNg?=
+ =?us-ascii?Q?tu944/4cmmD2LpUlfAIf8h/xdsPsU5LCyLLKSOyPoV4UItLS9YCV8hIgQhLz?=
+ =?us-ascii?Q?6OW4JOvZohCV7wCCQA0k6mbsr2chisVGgxPQZaEq5+tRqwixbiJid91qPlU7?=
+ =?us-ascii?Q?QEQIXSudzeKgWCE8tgl/mD0apBL60eVNXaBhP8itgzzmg/hBTUtAv7aLXyHO?=
+ =?us-ascii?Q?DptpyUhcMd+SdJqHc4S9wh02UgJnRrdB9lXAScD2sVEeg5w6KG+47vcdNTBS?=
+ =?us-ascii?Q?J3n+NcZKVU7tj6qp6/b6lIUgDoWllMGbV9c3/mrMuu72E+gAKaGeFrJvwrlV?=
+ =?us-ascii?Q?u0iO4f4stTAVI+joBofFwAnUYTODOMKBRFm8ccmQD22/qROHxilR6AL4hsW6?=
+ =?us-ascii?Q?y4jxW10CiyAR71n3fDjjewke2e73VHERD2r4FxMEooSpOmAtfDGWJamKRIie?=
+ =?us-ascii?Q?y79gEl+1aBh1YKNvAFXF1Xfyqq0r0sQqS/B3n9vmyawSSeXH9c6Z3ebWTIkG?=
+ =?us-ascii?Q?7a4h2LmfKE9R0rTlJoRoxYUs+vPRyi8AqzE92lMXW5THxvQE2WJejD03ENuV?=
+ =?us-ascii?Q?bNu8Hn0lhdNPWyr2PseKVqDh0mPwptRFQYuF4H17?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3306.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c77eb180-78f3-4ec6-86f9-08dbe0e1e9d5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 05:08:29.8340
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xnam9TFr7/p53ya1JufrCDiYEnW3MijjhgIy6u6c2Ts8IqcTZ8LdKje0NtKIxs45G6ZefWLC6x3TDyxQALsvng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8522
+X-OriginatorOrg: intel.com
 
-From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+Hi Andrew,
 
-The issue happened when flag STMMAC_FLAG_USE_PHY_WOL is enabled.
-It can be reproduced with steps below:
-1. Advertise only one speed on the host
-2. Enable the WoL on the host
-3. Suspend the host
-4. Wake up the host
+The values are not specific to stmmac driver.
+It is more making sense to implement the checking at higher level.
+Let's close the review for this patch.
 
-When the WoL is disabled, both the PHY and MAC will suspend and wake up
-with everything configured well. When WoL is enabled, the PHY needs to be
-stay awake to receive the signal from remote client but MAC will enter
-suspend mode.
 
-When the MAC resumes from suspend, phylink_resume() will call
-phylink_start() to start the phylink instance which will trigger the
-phylink machine to invoke the mac_link_up callback function. The
-stmmac_mac_link_up() will configure the MAC_CTRL_REG based on the current
-link state. Then the stmmac_hw_setup() will be called to configure the MAC.
+Best Regards,
+Fang
 
-This sequence might cause mismatch of the link state between MAC and
-phylink. This patch moves the phylink_resume() after stmamc_hw_setup() to
-ensure the MAC is initialized before phylink is being configured.
-
-As phylink_resume() is called all the time, refactor the code and
-remove the redundant check.
-
-Fixes: 90702dcd19c0 ("net: stmmac: fix MAC not working when system resume back with WoL active")
-Cc: <stable@vger.kernel.org> # 5.15+
-Signed-off-by: Gan, Yi Fang <yi.fang.gan@intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3e50fd53a617..9b009fa5478f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7844,16 +7844,6 @@ int stmmac_resume(struct device *dev)
- 			return ret;
- 	}
- 
--	rtnl_lock();
--	if (device_may_wakeup(priv->device) && priv->plat->pmt) {
--		phylink_resume(priv->phylink);
--	} else {
--		phylink_resume(priv->phylink);
--		if (device_may_wakeup(priv->device))
--			phylink_speed_up(priv->phylink);
--	}
--	rtnl_unlock();
--
- 	rtnl_lock();
- 	mutex_lock(&priv->lock);
- 
-@@ -7868,6 +7858,11 @@ int stmmac_resume(struct device *dev)
- 
- 	stmmac_restore_hw_vlan_rx_fltr(priv, ndev, priv->hw);
- 
-+	phylink_resume(priv->phylink);
-+
-+	if (device_may_wakeup(priv->device) && !(priv->plat->pmt))
-+		phylink_speed_up(priv->phylink);
-+
- 	stmmac_enable_all_queues(priv);
- 	stmmac_enable_all_dma_irq(priv);
- 
--- 
-2.34.1
-
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Wednesday, November 1, 2023 8:36 PM
+> To: Gan, Yi Fang <yi.fang.gan@intel.com>
+> Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu
+> <joabreu@synopsys.com>; David S . Miller <davem@davemloft.net>; Eric
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; Maxime Coquelin
+> <mcoquelin.stm32@gmail.com>; netdev@vger.kernel.org; linux-stm32@st-md-
+> mailman.stormreply.com; linux-arm-kernel@lists.infradead.org; linux-
+> kernel@vger.kernel.org; Looi, Hong Aun <hong.aun.looi@intel.com>; Voon,
+> Weifeng <weifeng.voon@intel.com>; Song, Yoong Siang
+> <yoong.siang.song@intel.com>; Sit, Michael Wei Hong
+> <michael.wei.hong.sit@intel.com>
+> Subject: Re: [PATCH net-next v2 1/1] net: stmmac: check CBS input values
+> before configuration
+>=20
+> On Wed, Nov 01, 2023 at 02:19:20PM +0800, Gan Yi Fang wrote:
+> > From: Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>
+> >
+> > Add check for below conditions before proceeding to configuration.
+> > A message will be prompted if the input value is invalid.
+> >
+> > Idleslope minus sendslope should equal speed_div.
+> > Idleslope is always a positive value including zero.
+> > Sendslope is always a negative value including zero.
+> > Hicredit is always a positive value including zero.
+> > Locredit is always a negative value including zero.
+>=20
+> Which of these conditional are specific to stmmac, and which are generic =
+to
+> CBS? Anything which is generic to CBS i would expect to be checked at a h=
+igher
+> level, rather than in every driver implementing CBS.
+>=20
+> 	Andrew
 
