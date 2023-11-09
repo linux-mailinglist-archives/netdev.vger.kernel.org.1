@@ -1,117 +1,335 @@
-Return-Path: <netdev+bounces-46868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D06C7E6D3E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:21:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A0F7E6D48
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38419280F93
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:21:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C1E2280FCC
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5FA2031B;
-	Thu,  9 Nov 2023 15:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18A1200D2;
+	Thu,  9 Nov 2023 15:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KQvPBQPL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rMuDgF8X"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE84B2030E
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:21:45 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF81530E5
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 07:21:44 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so11678a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 07:21:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8666F18C29
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 15:22:44 +0000 (UTC)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0098E30DC
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 07:22:43 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da03c5ae220so1701031276.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 07:22:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699543303; x=1700148103; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uqhljzTmyyfNCUJQiOX+wvfktS/JxULrH0/ohES2TiE=;
-        b=KQvPBQPLxs4GazDKwsxcF7v/e5PuI5VVWzuFfBB+hvipjXxnx1UlhPrl1c6gWbeTjK
-         pGxQB9+OPzk1CTwvvs47zdhv41vV0iz5/w429A5gIGMDOxggKxF/ODHjmHTiYnL8xDN+
-         b2E0/0EFisoi0uZY7sNIiVWF8paphJ9KXbk/R3lpukoJrSa985MQLu2L524mfZP3YORC
-         346JYxq4N9BXZRRcvFsneErm4iR+OLJTQnHX9JhFM+PNp84WUFaFoBmOukDUnvd/VtDK
-         naHCkKQLkuExg192nlWuBXfEy80DfTTu9cnLbcQHUDkTaRl3mI0g0312TsID2kmcRJ52
-         fU9A==
+        d=google.com; s=20230601; t=1699543363; x=1700148163; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yL9zlK7JDeyabdv3zo5Y81t/7CrJI72cv98ySkoZyb8=;
+        b=rMuDgF8XaBkaEh8lNgG/K8ASvnkbJzawDvVDU2lIN+kzQ36ruu1yfDvFnndyco4rRa
+         KAFzR573uyi/HNRfGrSZJOxEQebsUvC/Fj6tyaAQLcJlnPK51Tb0QmByFLhiVmwmT1Jm
+         lBKra2Sg6FU0HYr3Rwi9nVunPOwtfA+qIv2bSUmV/R51SC6mZF6WVKn8lGCoIO7D2lAS
+         PXPGdwjnZGr1cp2+jrZDVNADN4Sl6fQ6sQ+p6GB2PU+azpXLumhAJH/oR7zGiRuOjYJM
+         3jh2DNun9u5eyYF95i33x7BYqd+20csY7SO0d1xuDJGNDoZTzn2iGPRY5ta9nf14XgL4
+         hceg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699543303; x=1700148103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uqhljzTmyyfNCUJQiOX+wvfktS/JxULrH0/ohES2TiE=;
-        b=Fr3QIFoWevnXZim4xIYFB5Zdy0dzJWNPj47z3QwYy7Ou0Hk7+IJx3L0Bx2v46OPldp
-         PDlWxvoLVtAy9aobhIGxEvicbmrDREfUMDMdDZdraY/TG2kAe+7kicQxVj1OB6mtUFBM
-         v/cyWOJ//pa/+0p7QHeOSeRzaVe1BqxR/OEDKeWXK1rERtKuTnBLMe+0hJ6nQ6s/LoKK
-         6OF8I8LsEYKesE83XMW40pvUkZHty55Jw2Jqm62HwfgBnSWugg+V4aWhCjQCxsN61ayS
-         kNNIVMQyWJMsMIsUCvk9ASH4UOaXiWfZOlUIvjGiXXFFIv5cQCmm7Qvamx8n4hnbziwB
-         13EQ==
-X-Gm-Message-State: AOJu0YzfLDGfRiav6Cm8ko7YOwFbjHISvsjFCen14kkeCo3wHj9bfk1l
-	jo7pXwPXCi3mdalx+/cxPuyhmz4sgCYnLinRyOyWy6PSDd6UjfjDTLo=
-X-Google-Smtp-Source: AGHT+IEc8AjuOXT+o20lLjbTJZpnISpx9kkTgfW68DVXDmZq1ijVnGjE1trXVrNycSQ5EFjpjArhSpE5TeKu4PIVewY=
-X-Received: by 2002:a05:6402:497:b0:545:94d:7b with SMTP id
- k23-20020a056402049700b00545094d007bmr145442edv.4.1699543303146; Thu, 09 Nov
- 2023 07:21:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699543363; x=1700148163;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yL9zlK7JDeyabdv3zo5Y81t/7CrJI72cv98ySkoZyb8=;
+        b=vjtDcn4FD8fk3TgyIXJ4GjKgyJyEbhW4xuwovKaTbFtG5h0LbpWpnxHR46bhNPCixC
+         0lLnb07d8fKFZoIEhpHVH7c5qlRtuCC8jkeCIXHLBcrkLbYKjsm4YYKA0A3ZS0vj4ldR
+         o0sLjTXeSan8IPPph3ZQ8HMvVyM2eKs5NnSZjAKx0Rcba2z1kvySoaJmUoRdZQGwcMQu
+         EZ5fGww4VmXV+dIhUUHGjIHxAaIpIddGjWe3jc+uZVWIZfZWM4El+vF7Iv6YqdOT2xIl
+         yI2L9u4Zi4dvByThCm051yy5+WNNaWAuOdiVBc0Y8n7ZqdWRQ+EECBBixLU/CVPnpFRN
+         XTZQ==
+X-Gm-Message-State: AOJu0YwcrXXiuZojGSxDqyKT1kVqO3wB5Y+xkhROecDoNZQdQjt0mWa7
+	kF4Z0WL3zRNU8OmoOKlgWHFaBgeuBb0mgA==
+X-Google-Smtp-Source: AGHT+IEV48ct79F+IM6DK4XJ2vG/joFLUenqPZx5QKrZ3QQKvRuTNhowswfPDJcGxAdzpg1luxzxDWXlrRfI6Q==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:6007:0:b0:da0:6216:7990 with SMTP id
+ u7-20020a256007000000b00da062167990mr160959ybb.3.1699543363268; Thu, 09 Nov
+ 2023 07:22:43 -0800 (PST)
+Date: Thu,  9 Nov 2023 15:22:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231109000901.949152-1-kuba@kernel.org>
-In-Reply-To: <20231109000901.949152-1-kuba@kernel.org>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231109152241.3754521-1-edumazet@google.com>
+Subject: [PATCH net] ipvlan: add ipvlan_route_v6_outbound() helper
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Nov 2023 16:21:32 +0100
-Message-ID: <CANn89iJLG6pdkoCWQM1fifkK+OASD5DcNMq+uSv4N9cncFan3A@mail.gmail.com>
-Subject: Re: [RFC net-next] net: don't dump stack on queue timeout
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com, jhs@mojatatu.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Mahesh Bandewar <maheshb@google.com>, Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 9, 2023 at 1:09=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> The top syzbot report for networking (#14 for the entire kernel)
-> is the queue timeout splat. We kept it around for a long time,
-> because in real life it provides pretty strong signal that
-> something is wrong with the driver or the device.
->
-> Removing it is also likely to break monitoring for those who
-> track it as a kernel warning.
->
-> Nevertheless, WARN()ings are best suited for catching kernel
-> programming bugs. If a Tx queue gets starved due to a pause
-> storm, priority configuration, or other weirdness - that's
-> obviously a problem, but not a problem we can fix at
-> the kernel level.
->
-> Bite the bullet and convert the WARN() to a print.
->
-> Before:
->
->   NETDEV WATCHDOG: eni1np1 (netdevsim): transmit queue 0 timed out 1975 m=
-s
->   WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:525 dev_watchdog+0x39=
-e/0x3b0
->   [... completely pointless stack trace of a timer follows ...]
->
-> Now:
->
->   netdevsim netdevsim1 eni1np1: NETDEV WATCHDOG: CPU: 0: transmit queue 0=
- timed out 1769 ms
->
-> Alternatively we could mark the drivers which syzbot has
-> learned to abuse as "print-instead-of-WARN" selectively.
->
-> Reported-by: syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Inspired by syzbot reports using a stack of multiple ipvlan devices.
 
-SGTM !
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reduce stack size needed in ipvlan_process_v6_outbound() by moving
+the flowi6 struct used for the route lookup in an non inlined
+helper. ipvlan_route_v6_outbound() needs 120 bytes on the stack,
+immediately reclaimed.
+
+Also make sure ipvlan_process_v4_outbound() is not inlined.
+
+We might also have to lower MAX_NEST_DEV, because only syzbot uses
+setups with more than four stacked devices.
+
+BUG: TASK stack guard page was hit at ffffc9000e803ff8 (stack is ffffc9000e804000..ffffc9000e808000)
+stack guard page: 0000 [#1] SMP KASAN
+CPU: 0 PID: 13442 Comm: syz-executor.4 Not tainted 6.1.52-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
+RIP: 0010:kasan_check_range+0x4/0x2a0 mm/kasan/generic.c:188
+Code: 48 01 c6 48 89 c7 e8 db 4e c1 03 31 c0 5d c3 cc 0f 0b eb 02 0f 0b b8 ea ff ff ff 5d c3 cc 00 00 cc cc 00 00 cc cc 55 48 89 e5 <41> 57 41 56 41 55 41 54 53 b0 01 48 85 f6 0f 84 a4 01 00 00 48 89
+RSP: 0018:ffffc9000e804000 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff817e5bf2
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff887c6568
+RBP: ffffc9000e804000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: dffffc0000000001 R12: 1ffff92001d0080c
+R13: dffffc0000000000 R14: ffffffff87e6b100 R15: 0000000000000000
+FS: 00007fd0c55826c0(0000) GS:ffff8881f6800000(0000) knlGS:0000000000000000
+CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffc9000e803ff8 CR3: 0000000170ef7000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+<#DF>
+</#DF>
+<TASK>
+[<ffffffff81f281d1>] __kasan_check_read+0x11/0x20 mm/kasan/shadow.c:31
+[<ffffffff817e5bf2>] instrument_atomic_read include/linux/instrumented.h:72 [inline]
+[<ffffffff817e5bf2>] _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+[<ffffffff817e5bf2>] cpumask_test_cpu include/linux/cpumask.h:506 [inline]
+[<ffffffff817e5bf2>] cpu_online include/linux/cpumask.h:1092 [inline]
+[<ffffffff817e5bf2>] trace_lock_acquire include/trace/events/lock.h:24 [inline]
+[<ffffffff817e5bf2>] lock_acquire+0xe2/0x590 kernel/locking/lockdep.c:5632
+[<ffffffff8563221e>] rcu_lock_acquire+0x2e/0x40 include/linux/rcupdate.h:306
+[<ffffffff8561464d>] rcu_read_lock include/linux/rcupdate.h:747 [inline]
+[<ffffffff8561464d>] ip6_pol_route+0x15d/0x1440 net/ipv6/route.c:2221
+[<ffffffff85618120>] ip6_pol_route_output+0x50/0x80 net/ipv6/route.c:2606
+[<ffffffff856f65b5>] pol_lookup_func include/net/ip6_fib.h:584 [inline]
+[<ffffffff856f65b5>] fib6_rule_lookup+0x265/0x620 net/ipv6/fib6_rules.c:116
+[<ffffffff85618009>] ip6_route_output_flags_noref+0x2d9/0x3a0 net/ipv6/route.c:2638
+[<ffffffff8561821a>] ip6_route_output_flags+0xca/0x340 net/ipv6/route.c:2651
+[<ffffffff838bd5a3>] ip6_route_output include/net/ip6_route.h:100 [inline]
+[<ffffffff838bd5a3>] ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:473 [inline]
+[<ffffffff838bd5a3>] ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:529 [inline]
+[<ffffffff838bd5a3>] ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+[<ffffffff838bd5a3>] ipvlan_queue_xmit+0xc33/0x1be0 drivers/net/ipvlan/ipvlan_core.c:677
+[<ffffffff838c2909>] ipvlan_start_xmit+0x49/0x100 drivers/net/ipvlan/ipvlan_main.c:229
+[<ffffffff84d03900>] netdev_start_xmit include/linux/netdevice.h:4966 [inline]
+[<ffffffff84d03900>] xmit_one net/core/dev.c:3644 [inline]
+[<ffffffff84d03900>] dev_hard_start_xmit+0x320/0x980 net/core/dev.c:3660
+[<ffffffff84d080e2>] __dev_queue_xmit+0x16b2/0x3370 net/core/dev.c:4324
+[<ffffffff855ce4cd>] dev_queue_xmit include/linux/netdevice.h:3067 [inline]
+[<ffffffff855ce4cd>] neigh_hh_output include/net/neighbour.h:529 [inline]
+[<ffffffff855ce4cd>] neigh_output include/net/neighbour.h:543 [inline]
+[<ffffffff855ce4cd>] ip6_finish_output2+0x160d/0x1ae0 net/ipv6/ip6_output.c:139
+[<ffffffff855b8616>] __ip6_finish_output net/ipv6/ip6_output.c:200 [inline]
+[<ffffffff855b8616>] ip6_finish_output+0x6c6/0xb10 net/ipv6/ip6_output.c:211
+[<ffffffff855b7e3c>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
+[<ffffffff855b7e3c>] ip6_output+0x2bc/0x3d0 net/ipv6/ip6_output.c:232
+[<ffffffff8575d27f>] dst_output include/net/dst.h:444 [inline]
+[<ffffffff8575d27f>] ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
+[<ffffffff838bdae4>] ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:483 [inline]
+[<ffffffff838bdae4>] ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:529 [inline]
+[<ffffffff838bdae4>] ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+[<ffffffff838bdae4>] ipvlan_queue_xmit+0x1174/0x1be0 drivers/net/ipvlan/ipvlan_core.c:677
+[<ffffffff838c2909>] ipvlan_start_xmit+0x49/0x100 drivers/net/ipvlan/ipvlan_main.c:229
+[<ffffffff84d03900>] netdev_start_xmit include/linux/netdevice.h:4966 [inline]
+[<ffffffff84d03900>] xmit_one net/core/dev.c:3644 [inline]
+[<ffffffff84d03900>] dev_hard_start_xmit+0x320/0x980 net/core/dev.c:3660
+[<ffffffff84d080e2>] __dev_queue_xmit+0x16b2/0x3370 net/core/dev.c:4324
+[<ffffffff855ce4cd>] dev_queue_xmit include/linux/netdevice.h:3067 [inline]
+[<ffffffff855ce4cd>] neigh_hh_output include/net/neighbour.h:529 [inline]
+[<ffffffff855ce4cd>] neigh_output include/net/neighbour.h:543 [inline]
+[<ffffffff855ce4cd>] ip6_finish_output2+0x160d/0x1ae0 net/ipv6/ip6_output.c:139
+[<ffffffff855b8616>] __ip6_finish_output net/ipv6/ip6_output.c:200 [inline]
+[<ffffffff855b8616>] ip6_finish_output+0x6c6/0xb10 net/ipv6/ip6_output.c:211
+[<ffffffff855b7e3c>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
+[<ffffffff855b7e3c>] ip6_output+0x2bc/0x3d0 net/ipv6/ip6_output.c:232
+[<ffffffff8575d27f>] dst_output include/net/dst.h:444 [inline]
+[<ffffffff8575d27f>] ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
+[<ffffffff838bdae4>] ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:483 [inline]
+[<ffffffff838bdae4>] ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:529 [inline]
+[<ffffffff838bdae4>] ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+[<ffffffff838bdae4>] ipvlan_queue_xmit+0x1174/0x1be0 drivers/net/ipvlan/ipvlan_core.c:677
+[<ffffffff838c2909>] ipvlan_start_xmit+0x49/0x100 drivers/net/ipvlan/ipvlan_main.c:229
+[<ffffffff84d03900>] netdev_start_xmit include/linux/netdevice.h:4966 [inline]
+[<ffffffff84d03900>] xmit_one net/core/dev.c:3644 [inline]
+[<ffffffff84d03900>] dev_hard_start_xmit+0x320/0x980 net/core/dev.c:3660
+[<ffffffff84d080e2>] __dev_queue_xmit+0x16b2/0x3370 net/core/dev.c:4324
+[<ffffffff855ce4cd>] dev_queue_xmit include/linux/netdevice.h:3067 [inline]
+[<ffffffff855ce4cd>] neigh_hh_output include/net/neighbour.h:529 [inline]
+[<ffffffff855ce4cd>] neigh_output include/net/neighbour.h:543 [inline]
+[<ffffffff855ce4cd>] ip6_finish_output2+0x160d/0x1ae0 net/ipv6/ip6_output.c:139
+[<ffffffff855b8616>] __ip6_finish_output net/ipv6/ip6_output.c:200 [inline]
+[<ffffffff855b8616>] ip6_finish_output+0x6c6/0xb10 net/ipv6/ip6_output.c:211
+[<ffffffff855b7e3c>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
+[<ffffffff855b7e3c>] ip6_output+0x2bc/0x3d0 net/ipv6/ip6_output.c:232
+[<ffffffff8575d27f>] dst_output include/net/dst.h:444 [inline]
+[<ffffffff8575d27f>] ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
+[<ffffffff838bdae4>] ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:483 [inline]
+[<ffffffff838bdae4>] ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:529 [inline]
+[<ffffffff838bdae4>] ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+[<ffffffff838bdae4>] ipvlan_queue_xmit+0x1174/0x1be0 drivers/net/ipvlan/ipvlan_core.c:677
+[<ffffffff838c2909>] ipvlan_start_xmit+0x49/0x100 drivers/net/ipvlan/ipvlan_main.c:229
+[<ffffffff84d03900>] netdev_start_xmit include/linux/netdevice.h:4966 [inline]
+[<ffffffff84d03900>] xmit_one net/core/dev.c:3644 [inline]
+[<ffffffff84d03900>] dev_hard_start_xmit+0x320/0x980 net/core/dev.c:3660
+[<ffffffff84d080e2>] __dev_queue_xmit+0x16b2/0x3370 net/core/dev.c:4324
+[<ffffffff855ce4cd>] dev_queue_xmit include/linux/netdevice.h:3067 [inline]
+[<ffffffff855ce4cd>] neigh_hh_output include/net/neighbour.h:529 [inline]
+[<ffffffff855ce4cd>] neigh_output include/net/neighbour.h:543 [inline]
+[<ffffffff855ce4cd>] ip6_finish_output2+0x160d/0x1ae0 net/ipv6/ip6_output.c:139
+[<ffffffff855b8616>] __ip6_finish_output net/ipv6/ip6_output.c:200 [inline]
+[<ffffffff855b8616>] ip6_finish_output+0x6c6/0xb10 net/ipv6/ip6_output.c:211
+[<ffffffff855b7e3c>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
+[<ffffffff855b7e3c>] ip6_output+0x2bc/0x3d0 net/ipv6/ip6_output.c:232
+[<ffffffff8575d27f>] dst_output include/net/dst.h:444 [inline]
+[<ffffffff8575d27f>] ip6_local_out+0x10f/0x140 net/ipv6/output_core.c:161
+[<ffffffff838bdae4>] ipvlan_process_v6_outbound drivers/net/ipvlan/ipvlan_core.c:483 [inline]
+[<ffffffff838bdae4>] ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:529 [inline]
+[<ffffffff838bdae4>] ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+[<ffffffff838bdae4>] ipvlan_queue_xmit+0x1174/0x1be0 drivers/net/ipvlan/ipvlan_core.c:677
+[<ffffffff838c2909>] ipvlan_start_xmit+0x49/0x100 drivers/net/ipvlan/ipvlan_main.c:229
+[<ffffffff84d03900>] netdev_start_xmit include/linux/netdevice.h:4966 [inline]
+[<ffffffff84d03900>] xmit_one net/core/dev.c:3644 [inline]
+[<ffffffff84d03900>] dev_hard_start_xmit+0x320/0x980 net/core/dev.c:3660
+[<ffffffff84d080e2>] __dev_queue_xmit+0x16b2/0x3370 net/core/dev.c:4324
+[<ffffffff84d4a65e>] dev_queue_xmit include/linux/netdevice.h:3067 [inline]
+[<ffffffff84d4a65e>] neigh_resolve_output+0x64e/0x750 net/core/neighbour.c:1560
+[<ffffffff855ce503>] neigh_output include/net/neighbour.h:545 [inline]
+[<ffffffff855ce503>] ip6_finish_output2+0x1643/0x1ae0 net/ipv6/ip6_output.c:139
+[<ffffffff855b8616>] __ip6_finish_output net/ipv6/ip6_output.c:200 [inline]
+[<ffffffff855b8616>] ip6_finish_output+0x6c6/0xb10 net/ipv6/ip6_output.c:211
+[<ffffffff855b7e3c>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
+[<ffffffff855b7e3c>] ip6_output+0x2bc/0x3d0 net/ipv6/ip6_output.c:232
+[<ffffffff855b9ce4>] dst_output include/net/dst.h:444 [inline]
+[<ffffffff855b9ce4>] NF_HOOK include/linux/netfilter.h:309 [inline]
+[<ffffffff855b9ce4>] ip6_xmit+0x11a4/0x1b20 net/ipv6/ip6_output.c:352
+[<ffffffff8597984e>] sctp_v6_xmit+0x9ae/0x1230 net/sctp/ipv6.c:250
+[<ffffffff8594623e>] sctp_packet_transmit+0x25de/0x2bc0 net/sctp/output.c:653
+[<ffffffff858f5142>] sctp_packet_singleton+0x202/0x310 net/sctp/outqueue.c:783
+[<ffffffff858ea411>] sctp_outq_flush_ctrl net/sctp/outqueue.c:914 [inline]
+[<ffffffff858ea411>] sctp_outq_flush+0x661/0x3d40 net/sctp/outqueue.c:1212
+[<ffffffff858f02f9>] sctp_outq_uncork+0x79/0xb0 net/sctp/outqueue.c:764
+[<ffffffff8589f060>] sctp_side_effects net/sctp/sm_sideeffect.c:1199 [inline]
+[<ffffffff8589f060>] sctp_do_sm+0x55c0/0x5c30 net/sctp/sm_sideeffect.c:1170
+[<ffffffff85941567>] sctp_primitive_ASSOCIATE+0x97/0xc0 net/sctp/primitive.c:73
+[<ffffffff859408b2>] sctp_sendmsg_to_asoc+0xf62/0x17b0 net/sctp/socket.c:1839
+[<ffffffff85910b5e>] sctp_sendmsg+0x212e/0x33b0 net/sctp/socket.c:2029
+[<ffffffff8544d559>] inet_sendmsg+0x149/0x310 net/ipv4/af_inet.c:849
+[<ffffffff84c6c4d2>] sock_sendmsg_nosec net/socket.c:716 [inline]
+[<ffffffff84c6c4d2>] sock_sendmsg net/socket.c:736 [inline]
+[<ffffffff84c6c4d2>] ____sys_sendmsg+0x572/0x8c0 net/socket.c:2504
+[<ffffffff84c6ca91>] ___sys_sendmsg net/socket.c:2558 [inline]
+[<ffffffff84c6ca91>] __sys_sendmsg+0x271/0x360 net/socket.c:2587
+[<ffffffff84c6cbff>] __do_sys_sendmsg net/socket.c:2596 [inline]
+[<ffffffff84c6cbff>] __se_sys_sendmsg net/socket.c:2594 [inline]
+[<ffffffff84c6cbff>] __x64_sys_sendmsg+0x7f/0x90 net/socket.c:2594
+[<ffffffff85b32553>] do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+[<ffffffff85b32553>] do_syscall_64+0x53/0x80 arch/x86/entry/common.c:84
+[<ffffffff85c00087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Mahesh Bandewar <maheshb@google.com>
+Cc: Willem de Bruijn <willemb@google.com>
+---
+ drivers/net/ipvlan/ipvlan_core.c | 41 +++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index 21e9cac7312186380fa60de11f0a9178080b74b0..2d5b021b4ea6053eeb055a76fa4c7d9380cd2a53 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
+@@ -411,7 +411,7 @@ struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
+ 	return addr;
+ }
+ 
+-static int ipvlan_process_v4_outbound(struct sk_buff *skb)
++static noinline_for_stack int ipvlan_process_v4_outbound(struct sk_buff *skb)
+ {
+ 	const struct iphdr *ip4h = ip_hdr(skb);
+ 	struct net_device *dev = skb->dev;
+@@ -453,13 +453,11 @@ static int ipvlan_process_v4_outbound(struct sk_buff *skb)
+ }
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+-static int ipvlan_process_v6_outbound(struct sk_buff *skb)
++
++static noinline_for_stack int
++ipvlan_route_v6_outbound(struct net_device *dev, struct sk_buff *skb)
+ {
+ 	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
+-	struct net_device *dev = skb->dev;
+-	struct net *net = dev_net(dev);
+-	struct dst_entry *dst;
+-	int err, ret = NET_XMIT_DROP;
+ 	struct flowi6 fl6 = {
+ 		.flowi6_oif = dev->ifindex,
+ 		.daddr = ip6h->daddr,
+@@ -469,27 +467,38 @@ static int ipvlan_process_v6_outbound(struct sk_buff *skb)
+ 		.flowi6_mark = skb->mark,
+ 		.flowi6_proto = ip6h->nexthdr,
+ 	};
++	struct dst_entry *dst;
++	int err;
+ 
+-	dst = ip6_route_output(net, NULL, &fl6);
+-	if (dst->error) {
+-		ret = dst->error;
++	dst = ip6_route_output(dev_net(dev), NULL, &fl6);
++	err = dst->error;
++	if (err) {
+ 		dst_release(dst);
+-		goto err;
++		return err;
+ 	}
+ 	skb_dst_set(skb, dst);
++	return 0;
++}
++
++static int ipvlan_process_v6_outbound(struct sk_buff *skb)
++{
++	struct net_device *dev = skb->dev;
++	int err, ret = NET_XMIT_DROP;
++
++	err = ipvlan_route_v6_outbound(dev, skb);
++	if (unlikely(err)) {
++		DEV_STATS_INC(dev, tx_errors);
++		kfree_skb(skb);
++		return err;
++	}
+ 
+ 	memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
+ 
+-	err = ip6_local_out(net, skb->sk, skb);
++	err = ip6_local_out(dev_net(dev), skb->sk, skb);
+ 	if (unlikely(net_xmit_eval(err)))
+ 		DEV_STATS_INC(dev, tx_errors);
+ 	else
+ 		ret = NET_XMIT_SUCCESS;
+-	goto out;
+-err:
+-	DEV_STATS_INC(dev, tx_errors);
+-	kfree_skb(skb);
+-out:
+ 	return ret;
+ }
+ #else
+-- 
+2.42.0.869.gea05f2083d-goog
+
 
