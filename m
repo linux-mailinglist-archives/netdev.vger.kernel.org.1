@@ -1,176 +1,332 @@
-Return-Path: <netdev+bounces-46837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A727E69F5
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:55:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44E167E6A26
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:59:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69D1928119C
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C2E9B20C02
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62DA1C68D;
-	Thu,  9 Nov 2023 11:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882BB1C69D;
+	Thu,  9 Nov 2023 11:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="W0RDP5e4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DFasnnLx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2904F18C3B
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:55:35 +0000 (UTC)
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2076.outbound.protection.outlook.com [40.107.21.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 894A0211D;
-	Thu,  9 Nov 2023 03:55:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H7L8TqdfmIRSxO1kxmfZhsICDFZzTmq86PeWO4zJUwhd103CiRY2WcGwvUj1KJaJYoilqQoRyLxR1yWsAnzF3Qk40A5n42NdUbwpbHiOokLpc4nIdMmk0BM81tPEAgPr7F0Dv3VDcEisga9NakvRHqUa81Rb3mhhSnz2diseVrr9fuddNuXyFpXD+MDsTkiGA5WnHhrlKxw0cZwXWqRIY8gXlfocK0lCg7ifwLOxa8zjK/gvsBSatBavLmrKj9p6cmvIKaqueT/oZM4Xani+exN1JMSh/alN33khcQ56TQo50e/yzevEG2BB2A4nfLjIJ/hNCk45vmtbvcl2BZv4gw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=U3PejJiA6Hfqz2RumLaK5822FeON1+IkANvSsDLFcLg=;
- b=nqgh6Uafyeu81IjNaFvWEB80CDqZJafHS2v5OA6dh6kqUQK6PzSs6A+SmUYLJCaYIZV7pkfEEyRgGpfxjsw34ySZt1AIh9oY4OLZIkyHARDcrJD0fD7K74g+GOJpXETODSqHTjjZFBJOm6TBc5zay+Gx3w0Ka2SBCpn4pvf1daoC/zvkQPWVN3z5qLsPt5i8axbIlihQSwKoUouioU0sNca9uU1bxcBk66XVXr6iDF/54l6+iIi14vYd+q8/BtaNJIU9fSTkM+WAdwV7bpzzmiWPrMI2IRFTS+B0RnwAUOdi2Hi2uvO1LjgjS+wwKouRtpnNsRDK4vYweivKymyC4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=U3PejJiA6Hfqz2RumLaK5822FeON1+IkANvSsDLFcLg=;
- b=W0RDP5e4e98ZXpfkKyvQoTy1LFVm+lL5d/Lv6rbZ79CTlg7wgv0I0N93Rb7JZeQ6a3UbrQi3DQwbcsTorJzybV7X3skhS8zzZ6ASBXfUBqznXgcn4t0S/kVQGJmaMYhSettOyWbI888SrF/JnW/Yn4jpH8nzv2Zwj6wFwyO43l0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PA4PR04MB9248.eurprd04.prod.outlook.com (2603:10a6:102:2a3::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Thu, 9 Nov
- 2023 11:55:30 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
- 11:55:30 +0000
-Date: Thu, 9 Nov 2023 13:55:27 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E214E1DA20
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:58:56 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B5C3270
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:58:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699531135;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TUNOOtGsi1hNHsduk3fSKj7ZCj9VW40bKaKUArdHHXw=;
+	b=DFasnnLx4gAOsQlEpwP8ifLIBvXDfNcIS/aodMyI2VhXqe4pFZ+xhZgIwesl9uAGnQIcJZ
+	AFkb+VA3dyCQn9dvzOsmKFybVjOCVHd76eFs06AZQlny5+RyV+ZCqzP/gmOq20Y4+tFV81
+	FDGJVOIit9XOlvEKx2UhPAIcm9QbeXw=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-xCMQFmiyPUGUZ8Un2P1ERg-1; Thu, 09 Nov 2023 06:58:54 -0500
+X-MC-Unique: xCMQFmiyPUGUZ8Un2P1ERg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-9c75886c044so62794066b.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:58:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699531133; x=1700135933;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TUNOOtGsi1hNHsduk3fSKj7ZCj9VW40bKaKUArdHHXw=;
+        b=qQWoGX3rqWB0DJ1ucHx8v3XX+CjMZ/YU6WM4XeihO85KVJ0EyVVTxiTO4ED13KGrvF
+         Ri5sgbpMr3z6ebloz+EK7rlR9d9LWw43SKrfOgbEEvOXw0vxeO9Yi3ugXJe4MAoZotJY
+         VwK1N+gXBqHBcuOf+4fqVi7kKRg7Pw5OrAXcRYDGxTsjdX/78hFBuU+2s75ufPfFQJ6o
+         wZ4/KWEUFpj1rarfjRdjKRDgbRSDnd18r4OpBdlOgiNp8JTkIBibMC4RiEElSRwzoDwR
+         WaLG1xSEBKvDEUPMfj7HeQ+6v3ytdyd+YMLZRTskRjz4Nw8hhF7NpdFzI8VXxv2+jEMI
+         ADFA==
+X-Gm-Message-State: AOJu0YzPS4UPulnOC9ubv5jCRrmOCG/fO3GPyz2BXp5piRDEVJ5qn4BA
+	73RBCBAoc+pyPtNMii3LdV8CUmhW1HihXd7IMkbQdxrC+VBwISEm8Otv46wz2/aDdjMuvxszk1k
+	UzzIhHXTYYYAFzQ/dfpnBnSin
+X-Received: by 2002:a17:907:9304:b0:9d3:85b9:afdf with SMTP id bu4-20020a170907930400b009d385b9afdfmr4085476ejc.3.1699531132903;
+        Thu, 09 Nov 2023 03:58:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGEkUoPpfy9AypiUZGSY5pYVHolZGAvOtAKDc+fyXhW0Kg5hhknUXFHv8jBxXXY3nMKTrqU0Q==
+X-Received: by 2002:a17:907:9304:b0:9d3:85b9:afdf with SMTP id bu4-20020a170907930400b009d385b9afdfmr4085458ejc.3.1699531132555;
+        Thu, 09 Nov 2023 03:58:52 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f4:2044:be5a:328c:4b98:1420])
+        by smtp.gmail.com with ESMTPSA id e14-20020a1709061e8e00b00977cad140a8sm2456887ejj.218.2023.11.09.03.58.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 03:58:52 -0800 (PST)
+Date: Thu, 9 Nov 2023 06:58:48 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 6/7] net/sched: taprio: fix q->current_entry is
- NULL before its expiry
-Message-ID: <20231109115527.loaz76xp5wxwbqav@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: FR3P281CA0209.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a5::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 12/21] virtio_net: xsk: tx: support tx
+Message-ID: <20231109061507-mutt-send-email-mst@kernel.org>
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-13-xuanzhuo@linux.alibaba.com>
+ <20231109030424-mutt-send-email-mst@kernel.org>
+ <1699527983.483377-3-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PA4PR04MB9248:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3e6b00d3-0e04-456f-875f-08dbe11ac5c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	nNx+tEo97mIrgZVi7gspRB12o/JondaGJuMvRyZDPdNBPzIFjC0iw5HKoqKr48A57cKqhdgjpuGn9CfjqITspq9+hQldTlaYlkzR5UyhNrTiJ9aremvVohNCdGC0T5X5O9iXL3jFtNj8i2+BsF6KRiJjdwEiRFUtfFHaz6fyeqVBjCAm55UILos14wQnY92F435RvcesiBHkduiApY/ANEwM3ANv5XKFmYIBZMgDCDxiYMWwPb+cS/r2/vFjfUhbUsSpn+ruGimhkwAVy9OOYnZ3Guke5AdRfJuYUQ6ckjulA+pRJxl83TBkQ6PDaERfhKudAdcEt0im11LtquEN1uNptJb9o0jQhVgTRs9NYBpoD+oEtdyn8B6B34v5/X8SUiWaxzUyBlvs1HWntfQR10RAsggHdJRyH7/Z6W4RKCKoUpVrxJ4g3hg2WB2C5a5IZMm+N3sY8GL4M1YATzzfRn/sj5b93ED8Kf5Cr0aSgYb3F4Ntsm38chEQ4Z75KTFTEdITVnJF02YDQBSiy1lUSedGJ6DDfU7NsIKpJxQVtBF3qcTg1xCMfy71eTP1m9OD
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(136003)(376002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(6666004)(6486002)(478600001)(86362001)(38100700002)(83380400001)(6512007)(9686003)(41300700001)(66946007)(66556008)(26005)(6506007)(1076003)(5660300002)(2906002)(7416002)(54906003)(44832011)(66476007)(6916009)(4326008)(8676002)(316002)(8936002)(33716001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?k/Y68TN6ITXxIALdvry8fj/CPrdI5ITrCMmK5t08w8Oqs56xeRz1lYgpGg86?=
- =?us-ascii?Q?MdG8SOJ9Ae/P9X7muQS8+qjAq/s0vHHuPl/Tuh8dYEBJ6cZmaF0kH761Oxh6?=
- =?us-ascii?Q?VIv1jE3IVjKL6tGFtHX4B3NDmxshmbkqjkNAEGshbuQ6x9Ue5oGn99WCUN+m?=
- =?us-ascii?Q?QK7SDDe3rwdE9Arm2A8q8VbO9EtCFRqg+I+SEAIfGSYGWG2QRjtl0XEwFWdG?=
- =?us-ascii?Q?62trMFMskopghWsjAz3FVfoNCQgNjl1wWVs8TKRJ+UELCXgoBUHD49jdX9Ni?=
- =?us-ascii?Q?dGCcQf1YEHSBKIr9oVSkitWg3jF0TlsF+5CxD8xL6M5DL0Dc42BteTzavS5F?=
- =?us-ascii?Q?1JhKMKOByjt5VjPMrW0Im8ZSioQQ3i8K1oMfmr6H8cDX+6IrgBOPG//9jUtW?=
- =?us-ascii?Q?5Lxl6FZM2J46ZZpHDE7xPr+KMzPiLD8963Mgj271jLn1qw3jaXHFUt7C9BS0?=
- =?us-ascii?Q?Z9ehIvmbvgP2j/iTU9QvjUxuhWAqMd+G8ZOnsnKMLo0Gs6N+izDQRkIxBJEK?=
- =?us-ascii?Q?EbLX0jawciAjwm0D9J5eHU+W33bX/Gfv73ghUeSWgUGA6T7j0F5gFyRkqu3b?=
- =?us-ascii?Q?1FkzcdWPMPO3XpUu3jbDZKCI2N7cfWBlKCOTf5HAbhMcru1FyBOPUOlsZYQf?=
- =?us-ascii?Q?zT9Ysa1oLmo5FCyaTuW1IsIW/JUA+GGbT7AZe7SJSPT0mwVnJe1jZhZm4Lj/?=
- =?us-ascii?Q?OsSquojyF2B++iaj7+C+xWwLi+jtiqLKBeIvZmI7oei6twEFhVL4o1FaT25Y?=
- =?us-ascii?Q?XYr52Iet0Ag89QH2tcHmk84Np0qv9hLiYHd10ituE/AklsdeFiypYrvvlNIT?=
- =?us-ascii?Q?l3M9Gww5xINZBAhDsDgCwbpMKVuKEBwZRlEDjKNdOFqNO3+1/Bc4riZBx4ZY?=
- =?us-ascii?Q?rKbUKFfn3kYzqEFBW817n6ocjUI6wsqidxh1vtEhu9QAKDyoRmwxqAdzogJD?=
- =?us-ascii?Q?eQkZah78f466aGVBTexJ/ERL3SuAvj4fp82EEAp1F4ZYJS+It1E2roTpczXU?=
- =?us-ascii?Q?+JK66g/OZsVPxNjB/034xT3MpPkU+Q9ziqeqrCwWV1BqfxK5fTuuP1QUlICN?=
- =?us-ascii?Q?sr0I9Wkc/zwmX2sfYsxpIFkN8plHG+syFUs1WXyogsDTZAaRnohP9cjEFej5?=
- =?us-ascii?Q?tQlAfXXQ6eok9aR4Q5jDFqLySaBGDhTMtzfKMCdr+NLA1QAWUUc8u6SKAug4?=
- =?us-ascii?Q?s69vMytRZV4qWhbUcryKri8/lkhAfliGEdWGYEfE3M7sgtBkAaKzJYTNi2Jw?=
- =?us-ascii?Q?2y6XJR9zEixhdPR/60wOnZINGklyuPdpVnAiPNafzCyNC3/rWm3J9e7wJOqc?=
- =?us-ascii?Q?LqflBKjgZfYKPMbbN6GcxFhUINav9+zJamHvBFZJx4tlmgEkJSlMZcolfFbX?=
- =?us-ascii?Q?MD6NQxQLPo+ZKmysHRDk6FnkcjEPSafWTNEAgOC2Zjzyt0PXJNAn7K2jAcRY?=
- =?us-ascii?Q?84eCPGtV57vn+0552ZLgo+tkp8LKJq2CeZHZU7E8sJFIk2JlEH3XgkMWyLdl?=
- =?us-ascii?Q?yYFA+gWdfbJMZ6ybwqBUkKtYGxKC0MMejskEP2IP/Sp/E8w0WxQeSJQUr2Qd?=
- =?us-ascii?Q?QWynF3iNgWvlPMaHfL3xq168AIEtz7UZ2VWDmMP6R5Gs8A3OUMnpQ+5RJWrj?=
- =?us-ascii?Q?Dg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e6b00d3-0e04-456f-875f-08dbe11ac5c7
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 11:55:30.8015
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JbO7Z3xHh+B8H5iRqkfJeCks/kM5DRdiES2/LZCzx4TIp3Pt3Qh/tAF/xMYTcSvtTmpvpnq6e2YC5UB/wYwoig==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB9248
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1699527983.483377-3-xuanzhuo@linux.alibaba.com>
 
-On Tue, Nov 07, 2023 at 06:20:22AM -0500, Faizal Rahim wrote:
-> Fix the issue of prematurely setting q->current_entry to NULL in the
-> setup_first_end_time() function when a new admin schedule arrives
-> while the oper schedule is still running but hasn't transitioned yet.
-> This premature setting causes problems because any reference to
-> q->current_entry, such as in taprio_dequeue(), will result in NULL
-> during this period, which is incorrect. q->current_entry should remain
-> valid until the currently running entry expires.
+On Thu, Nov 09, 2023 at 07:06:23PM +0800, Xuan Zhuo wrote:
+> On Thu, 9 Nov 2023 03:09:00 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Tue, Nov 07, 2023 at 11:12:18AM +0800, Xuan Zhuo wrote:
+> > > The driver's tx napi is very important for XSK. It is responsible for
+> > > obtaining data from the XSK queue and sending it out.
+> > >
+> > > At the beginning, we need to trigger tx napi.
+> > >
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > ---
+> > >  drivers/net/virtio/main.c       |  12 +++-
+> > >  drivers/net/virtio/virtio_net.h |   3 +-
+> > >  drivers/net/virtio/xsk.c        | 110 ++++++++++++++++++++++++++++++++
+> > >  drivers/net/virtio/xsk.h        |  13 ++++
+> > >  4 files changed, 136 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> > > index 6c608b3ce27d..ff6bc764089d 100644
+> > > --- a/drivers/net/virtio/main.c
+> > > +++ b/drivers/net/virtio/main.c
+> > > @@ -2074,6 +2074,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+> > >  	struct virtnet_info *vi = sq->vq->vdev->priv;
+> > >  	unsigned int index = vq2txq(sq->vq);
+> > >  	struct netdev_queue *txq;
+> > > +	int busy = 0;
+> > >  	int opaque;
+> > >  	bool done;
+> > >
+> > > @@ -2086,11 +2087,20 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+> > >  	txq = netdev_get_tx_queue(vi->dev, index);
+> > >  	__netif_tx_lock(txq, raw_smp_processor_id());
+> > >  	virtqueue_disable_cb(sq->vq);
+> > > -	free_old_xmit(sq, true);
+> > > +
+> > > +	if (sq->xsk.pool)
+> > > +		busy |= virtnet_xsk_xmit(sq, sq->xsk.pool, budget);
+> >
+> > You use bitwise or on errno values? What's going on here?
 > 
-> To address this issue, only set q->current_entry to NULL when there is
-> no oper schedule currently running.
+> virtnet_xsk_xmit() return that it is busy or not. Not the errno.
+> Here just record whether this handler is busy or not.
+
+
+Ah I see it's a bool. So make busy a bool too.
+
+
+> >
+> >
+> > > +	else
+> > > +		free_old_xmit(sq, true);
+> > >
+> > >  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
+> > >  		netif_tx_wake_queue(txq);
+> > >
+> > > +	if (busy) {
+> > > +		__netif_tx_unlock(txq);
+> > > +		return budget;
+> > > +	}
+> > > +
+> > >  	opaque = virtqueue_enable_cb_prepare(sq->vq);
+> > >
+> > >  	done = napi_complete_done(napi, 0);
+> > > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > > index 442af4673bf8..1c21af47e13c 100644
+> > > --- a/drivers/net/virtio/virtio_net.h
+> > > +++ b/drivers/net/virtio/virtio_net.h
+> > > @@ -9,7 +9,8 @@
+> > >  #include <net/xdp_sock_drv.h>
+> > >
+> > >  #define VIRTIO_XDP_FLAG	BIT(0)
+> > > -#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG)
+> > > +#define VIRTIO_XSK_FLAG	BIT(1)
+> > > +#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG | VIRTIO_XSK_FLAG)
+> > >
+> > >  /* RX packet size EWMA. The average packet size is used to determine the packet
+> > >   * buffer size when refilling RX rings. As the entire RX ring may be refilled
+> > > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > > index 8b397787603f..caa448308232 100644
+> > > --- a/drivers/net/virtio/xsk.c
+> > > +++ b/drivers/net/virtio/xsk.c
+> > > @@ -4,9 +4,119 @@
+> > >   */
+> > >
+> > >  #include "virtio_net.h"
+> > > +#include "xsk.h"
+> > >
+> > >  static struct virtio_net_hdr_mrg_rxbuf xsk_hdr;
+> > >
+> > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len)
+> > > +{
+> > > +	sg->dma_address = addr;
+> > > +	sg->length = len;
+> > > +}
+> > > +
+> > > +static void virtnet_xsk_check_queue(struct virtnet_sq *sq)
+> > > +{
+> > > +	struct virtnet_info *vi = sq->vq->vdev->priv;
+> > > +	struct net_device *dev = vi->dev;
+> > > +	int qnum = sq - vi->sq;
+> > > +
+> > > +	/* If it is a raw buffer queue, it does not check whether the status
+> > > +	 * of the queue is stopped when sending. So there is no need to check
+> > > +	 * the situation of the raw buffer queue.
+> > > +	 */
+> > > +	if (virtnet_is_xdp_raw_buffer_queue(vi, qnum))
+> > > +		return;
+> > > +
+> > > +	/* If this sq is not the exclusive queue of the current cpu,
+> > > +	 * then it may be called by start_xmit, so check it running out
+> > > +	 * of space.
+> > > +	 *
+> > > +	 * Stop the queue to avoid getting packets that we are
+> > > +	 * then unable to transmit. Then wait the tx interrupt.
+> > > +	 */
+> > > +	if (sq->vq->num_free < 2 + MAX_SKB_FRAGS)
+> >
+> > what does MAX_SKB_FRAGS have to do with it? And where's 2 coming from?
 > 
-> Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
-
-The "Fixes" tag represents the commit where the code started becoming a
-problem, not when the code that you're changing was first introduced.
-
-I find it hard to believe that the problem was in commit 5a781ccbd19e
-("tc: Add support for configuring the taprio scheduler"), because we
-didn't support admin -> oper dynamic schedules back then.
-
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> ---
->  net/sched/sch_taprio.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> check_sq_full_and_disable()
 > 
-> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> index 01b114edec30..c60e9e7ac193 100644
-> --- a/net/sched/sch_taprio.c
-> +++ b/net/sched/sch_taprio.c
-> @@ -1375,7 +1375,8 @@ static void setup_first_end_time(struct taprio_sched *q,
->  			first->gate_close_time[tc] = ktime_add_ns(base, first->gate_duration[tc]);
->  	}
->  
-> -	rcu_assign_pointer(q->current_entry, NULL);
-> +	if (!hrtimer_active(&q->advance_timer))
-> +		rcu_assign_pointer(q->current_entry, NULL);
->  }
->  
->  static void taprio_start_sched(struct Qdisc *sch,
-> -- 
-> 2.25.1
->
+> Thanks.
+
+
+This is one example of duplication I was talking about earlier.
+
+> >
+> > > +		netif_stop_subqueue(dev, qnum);
+> > > +}
+> > > +
+> > > +static int virtnet_xsk_xmit_one(struct virtnet_sq *sq,
+> > > +				struct xsk_buff_pool *pool,
+> > > +				struct xdp_desc *desc)
+> > > +{
+> > > +	struct virtnet_info *vi;
+> > > +	dma_addr_t addr;
+> > > +
+> > > +	vi = sq->vq->vdev->priv;
+> > > +
+> > > +	addr = xsk_buff_raw_get_dma(pool, desc->addr);
+> > > +	xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
+> > > +
+> > > +	sg_init_table(sq->sg, 2);
+> > > +
+> > > +	sg_fill_dma(sq->sg, sq->xsk.hdr_dma_address, vi->hdr_len);
+> > > +	sg_fill_dma(sq->sg + 1, addr, desc->len);
+> > > +
+> > > +	return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
+> > > +				    virtnet_xsk_to_ptr(desc->len), GFP_ATOMIC);
+> > > +}
+> > > +
+> > > +static int virtnet_xsk_xmit_batch(struct virtnet_sq *sq,
+> > > +				  struct xsk_buff_pool *pool,
+> > > +				  unsigned int budget,
+> > > +				  u64 *kicks)
+> > > +{
+> > > +	struct xdp_desc *descs = pool->tx_descs;
+> > > +	u32 nb_pkts, max_pkts, i;
+> > > +	bool kick = false;
+> > > +	int err;
+> > > +
+> > > +	/* Every xsk tx packet needs two desc(virtnet header and packet). So we
+> > > +	 * use sq->vq->num_free / 2 as the limitation.
+> > > +	 */
+> > > +	max_pkts = min_t(u32, budget, sq->vq->num_free / 2);
+> > > +
+> > > +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, max_pkts);
+> > > +	if (!nb_pkts)
+> > > +		return 0;
+> > > +
+> > > +	for (i = 0; i < nb_pkts; i++) {
+> > > +		err = virtnet_xsk_xmit_one(sq, pool, &descs[i]);
+> > > +		if (unlikely(err))
+> > > +			break;
+> > > +
+> > > +		kick = true;
+> > > +	}
+> > > +
+> > > +	if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq))
+> > > +		(*kicks)++;
+> > > +
+> > > +	return i;
+> > > +}
+> > > +
+> > > +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > > +		      int budget)
+> > > +{
+> > > +	u64 bytes = 0, packets = 0, kicks = 0;
+> > > +	int sent;
+> > > +
+> > > +	virtnet_free_old_xmit(sq, true, &bytes, &packets);
+> > > +
+> > > +	sent = virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
+> > > +
+> > > +	virtnet_xsk_check_queue(sq);
+> > > +
+> > > +	u64_stats_update_begin(&sq->stats.syncp);
+> > > +	u64_stats_add(&sq->stats.packets, packets);
+> > > +	u64_stats_add(&sq->stats.bytes, bytes);
+> > > +	u64_stats_add(&sq->stats.kicks, kicks);
+> > > +	u64_stats_add(&sq->stats.xdp_tx,  sent);
+> > > +	u64_stats_update_end(&sq->stats.syncp);
+> > > +
+> > > +	if (xsk_uses_need_wakeup(pool))
+> > > +		xsk_set_tx_need_wakeup(pool);
+> > > +
+> > > +	return sent == budget;
+> > > +}
+> > > +
+> > >  static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *rq,
+> > >  				    struct xsk_buff_pool *pool)
+> > >  {
+> > > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> > > index 1918285c310c..73ca8cd5308b 100644
+> > > --- a/drivers/net/virtio/xsk.h
+> > > +++ b/drivers/net/virtio/xsk.h
+> > > @@ -3,5 +3,18 @@
+> > >  #ifndef __XSK_H__
+> > >  #define __XSK_H__
+> > >
+> > > +#define VIRTIO_XSK_FLAG_OFFSET	4
+> > > +
+> > > +static inline void *virtnet_xsk_to_ptr(u32 len)
+> > > +{
+> > > +	unsigned long p;
+> > > +
+> > > +	p = len << VIRTIO_XSK_FLAG_OFFSET;
+> > > +
+> > > +	return (void *)(p | VIRTIO_XSK_FLAG);
+> > > +}
+> > > +
+> > >  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+> > > +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > > +		      int budget);
+> > >  #endif
+> > > --
+> > > 2.32.0.3.g01195cf9f
+> >
+
 
