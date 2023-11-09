@@ -1,181 +1,303 @@
-Return-Path: <netdev+bounces-46861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8A87E6B27
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:20:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39CA07E6B30
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:24:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44EE7B20AD8
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:20:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86C85B20C93
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065AE1DFED;
-	Thu,  9 Nov 2023 13:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="trfx3AyI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C559346A0;
+	Thu,  9 Nov 2023 13:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29EA1DFEC
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 13:20:31 +0000 (UTC)
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B354A30D7
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:20:16 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507adc3381cso1048424e87.3
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 05:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699536015; x=1700140815; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=903ll40CqDNJzGklBXfrEVrovf33BBg7v0iLnvEmgxY=;
-        b=trfx3AyIFxYcdPKKeeBO+JdPqnym9lZpKP8vc7KlPiZpU5FFV/6J2RLI7/xtkQibn5
-         Z4lTW4OcVJl3joFJ5lOTqTD+F+mv+1DUmGdFRSW3/lnRENh2TubM+h+BONC4eFaS2bgN
-         +d5WJKgPFzyDpHzkTF52IgVXjC0wFA3Cbwq+jvJJuFIrz5wU/AwxH2GSfTJEFyU1kERN
-         +7wsET6icRrhw9XSHGgfzPsLIuVYOdHyCgSxNxTH/fX67KAqMNXkuaGfBvnvwZaMuV8b
-         GLsY8WvGWfrRZNV48I+j4y/FvRKwN6CqtdFSE2JVaJR2X/JXtm5peqgV5/63iKNDxluv
-         pWzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699536015; x=1700140815;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=903ll40CqDNJzGklBXfrEVrovf33BBg7v0iLnvEmgxY=;
-        b=qABpA5lajrheGh9Pdvwbdrv0TOuBgroIX18Lb2iNESK174ow/ye09QWpH8v56YXpFa
-         Gok6VUGN91gHRLgMcy6EdZehqATSfKrS4kp2sWxvj5r5jR4EaAmlELC77MyQxDmWWSmT
-         g2b6NKPlm7/aVe7mGN67JqEpW/Y0KSeHSwAJrJ3u96aKY6K2pZNtJyhbI3sRVMSugO6R
-         FvdszRp7xG86wRZdEhMSwGNZ6DNbfipHhojwcYNt2DfwmA7lRcPlEwKV6fi1cS68j8/Z
-         icbe0VXkeutIge8VBSaPs3pGdePEIhkazWTpSS2+OVvVqk15gFjk7TNimWLKa3X+fbhi
-         o6pA==
-X-Gm-Message-State: AOJu0YwUysKSJ3bPLUbG0Q5jjeSbVUuxAXAHCL4f9c/YpQTrgS0+K3o6
-	yehBfIde2k1YrshUarx7fmDKVQ==
-X-Google-Smtp-Source: AGHT+IEbTo4CeuXwGTTwY2Y5Y1L7hxw9u4xr/ihcCb+ZHhwgIG7yGxNkY1U9Sirzc4QnUHlVLndHog==
-X-Received: by 2002:a05:6512:480b:b0:500:b42f:1830 with SMTP id eo11-20020a056512480b00b00500b42f1830mr1058974lfb.63.1699536014617;
-        Thu, 09 Nov 2023 05:20:14 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id e22-20020a1709067e1600b009ddaa2183d4sm2489056ejr.42.2023.11.09.05.20.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 05:20:14 -0800 (PST)
-Date: Thu, 9 Nov 2023 14:20:13 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net 3/3] dpll: fix register pin with unregistered parent
- pin
-Message-ID: <ZUzcjUqoL6gcxW6f@nanopsycho>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-4-arkadiusz.kubalewski@intel.com>
- <ZUukPbTCww26jltC@nanopsycho>
- <DM6PR11MB46572BD8C43DACA0FF15C2CF9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB08101C7;
+	Thu,  9 Nov 2023 13:24:10 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5637030C1;
+	Thu,  9 Nov 2023 05:24:09 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SR2dd0TsbzmWys;
+	Thu,  9 Nov 2023 21:20:53 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 9 Nov
+ 2023 21:23:31 +0800
+Subject: Re: [RFC PATCH v3 07/12] page-pool: device memory support
+To: Mina Almasry <almasrymina@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
+	<linaro-mm-sig@lists.linaro.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
+ Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-8-almasrymina@google.com>
+ <4a0e9d53-324d-e19b-2a30-ba86f9e5569e@huawei.com>
+ <CAHS8izNbw7vAGo2euQGA+TF9CgQ8zwrDqTVGsOSxh22_uo0R1w@mail.gmail.com>
+ <d4309392-711a-75b0-7bf0-9e7de8fd527e@huawei.com>
+ <CAHS8izM1P6d8jgyWE9wFJUJah2YFsjHP2uikDwA0vR=3QA+BXQ@mail.gmail.com>
+ <a8ae22dc-5b85-9efe-16c7-d95d455828fa@huawei.com>
+ <CAHS8izOh8yC7q9yJN+RAKGs=AgsEf13MnFDmG46=EU05ynnLKw@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <b123e89d-d4d9-1202-d7c3-9e52e38009d7@huawei.com>
+Date: Thu, 9 Nov 2023 21:23:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46572BD8C43DACA0FF15C2CF9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+In-Reply-To: <CAHS8izOh8yC7q9yJN+RAKGs=AgsEf13MnFDmG46=EU05ynnLKw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-Thu, Nov 09, 2023 at 10:59:04AM CET, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Wednesday, November 8, 2023 4:08 PM
+On 2023/11/9 20:20, Mina Almasry wrote:
+> On Thu, Nov 9, 2023 at 1:30 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
->>Wed, Nov 08, 2023 at 11:32:26AM CET, arkadiusz.kubalewski@intel.com wrote:
->>>In case of multiple kernel module instances using the same dpll device:
->>>if only one registers dpll device, then only that one can register
+>> On 2023/11/9 11:20, Mina Almasry wrote:
+>>> On Wed, Nov 8, 2023 at 2:56 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
->>They why you don't register in multiple instances? See mlx5 for a
->>reference.
+>>>
+>>> Agreed everything above is undoable.
+>>>
+>>>> But we might be able to do something as folio is doing now, mm subsystem
+>>>> is still seeing 'struct folio/page', but other subsystem like slab is using
+>>>> 'struct slab', and there is still some common fields shared between
+>>>> 'struct folio' and 'struct slab'.
+>>>>
+>>>
+>>> In my eyes this is almost exactly what I suggested in RFC v1 and got
+>>> immediately nacked with no room to negotiate. What we did for v1 is to
+>>> allocate struct pages for dma-buf to make dma-bufs look like struct
+>>> page to mm subsystem. Almost exactly what you're describing above.
 >>
->
->Every registration requires ops, but for our case only PF0 is able to
+>> Maybe the above is where we have disagreement:
+>> Do we still need make dma-bufs look like struct page to mm subsystem?
+>> IMHO, the answer is no. We might only need to make dma-bufs look like
+>> struct page to net stack and page pool subsystem. I think that is already
+>> what this pacthset is trying to do, what I am suggesting is just make
+>> it more like 'struct page' to net stack and page pool subsystem, in order
+>> to try to avoid most of the 'if' checking in net stack and page pool
+>> subsystem.
+>>
+> 
+> First, most of the checking in the net stack is
+> skb_frag_not_readable(). dma-buf are fundamentally not kmap()able and
+> not readable. So we can't remove those, no matter what we do I think.
+> Can we agree on that? If so, lets discuss removing most of the ifs in
+> the page pool, only.
 
-What makes PF0 so special? Smell like broken FW design... Care to fix
-it?
+Agreed on the 'not kmap()able and not readable' checking part.
+
+> 
+>>> It's a no-go. I don't think renaming struct page to netmem is going to
+>>> move the needle (it also re-introduces code-churn). What I feel like I
+>>> learnt is that dma-bufs are not struct pages and can't be made to look
+>>> like one, I think.
+>>>
+>>>> As the netmem patchset, is devmem able to reuse the below 'struct netmem'
+>>>> and rename it to 'struct page_pool_iov'?
+>>>
+>>> I don't think so. For the reasons above, but also practically it
+>>> immediately falls apart. Consider this field in netmem:
+>>>
+>>> + * @flags: The same as the page flags.  Do not use directly.
+>>>
+>>> dma-buf don't have or support page-flags, and making dma-buf looks
+>>> like they support page flags or any page-like features (other than
+>>> dma_addr) seems extremely unacceptable to mm folks.
+>>
+>> As far as I tell, as we limit the devmem usage in netstack, the below
+>> is the related mm function call for 'struct page' for devmem:
+>> page_ref_*(): page->_refcount does not need changing
+> 
+> Sorry, I don't understand. Are you suggesting we call page_ref_add() &
+> page_ref_sub() on page_pool_iov? That is basically making
+> page_pool_iov look like struct page to the mm stack, since page_ref_*
+> are mm calls, which you say above we don't need to do. We will still
+> need to special case this, no?
+
+As we are reusing 'struct page' for devmem, page->_refcount for
+devmem and page->_refcount for normal memory should be the same, right?
+We may need to ensure 'struct page' for devmem to always look like a head
+page for compound page or base page for net stack, as we use get_page()
+in __skb_frag_ref().
+
+We can choose to not call page_ref_sub() for page from devmem, we can
+call napi_pp_put_page(), and we may be able to special handle the page
+from devmem in devmem provider's 'release_page' ops in napi_pp_put_page().
+
+> 
+>> page_is_pfmemalloc(): which is corresponding to page->pp_magic, and
+>>                       devmem provider can set/unset it in it's 'alloc_pages'
+>>                       ops.
+> 
+> page_is_pfmemalloc() has nothing to do with page->pp_magic. It checks
+> page->lru.next to figure out if this is a pfmemalloc. page_pool_iov
+> has no page->lru.next. Still need to special case this?
+
+See the comment in napi_pp_put_page():
+
+	/* page->pp_magic is OR'ed with PP_SIGNATURE after the allocation
+	 * in order to preserve any existing bits, such as bit 0 for the
+	 * head page of compound page and bit 1 for pfmemalloc page, so
+	 * mask those bits for freeing side when doing below checking,
+	 * and page_is_pfmemalloc() is checked in __page_pool_put_page()
+	 * to avoid recycling the pfmemalloc page.
+	 */
+
+There is some union in struct page, page->lru.next and page->pp_magic is
+actually pointing to the same thing as my understanding.
 
 
->control dpll pins and device, thus only this can provide ops.
->Basically without PF0, dpll is not able to be controlled, as well
->as directly connected pins.
->
+> 
+>> page_to_nid(): we may need to handle it differently somewhat like this
+>>                patch does as page_to_nid() may has different implementation
+>>                based on different configuration.
+> 
+> So you're saying we need to handle page_to_nid() differently for
+> devmem? So we're not going to be able to avoid the if statement.
+
+Yes, it seems to be the only place that might need special handling I
+see so far.
+
+> 
+>> page_pool_iov_put_many(): as mentioned in other thread, if net stack is not
+>>                           calling page_pool_page_put_many() directly, we
+>>                           can reuse napi_pp_put_page() for devmem too, and
+>>                           handle the special case for devmem in 'release_page'
+>>                           ops.
 >>
->>>directly connected pins with a dpll device. If unregistered parent
->>>determines if the muxed pin can be register with it or not, it forces
->>>serialized driver load order - first the driver instance which
->>>registers the direct pins needs to be loaded, then the other instances
->>>could register muxed type pins.
->>>
->>>Allow registration of a pin with a parent even if the parent was not
->>>yet registered, thus allow ability for unserialized driver instance
->>
->>Weird.
->>
->
->Yeah, this is issue only for MUX/parent pin part, couldn't find better
->way, but it doesn't seem to break things around..
->
->Thank you!
->Arkadiusz
->
->>
->>>load order.
->>>Do not WARN_ON notification for unregistered pin, which can be invoked
->>>for described case, instead just return error.
->>>
->>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
->>>functions")
->>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>---
->>> drivers/dpll/dpll_core.c    | 4 ----
->>> drivers/dpll/dpll_netlink.c | 2 +-
->>> 2 files changed, 1 insertion(+), 5 deletions(-)
->>>
->>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c index
->>>4077b562ba3b..ae884b92d68c 100644
->>>--- a/drivers/dpll/dpll_core.c
->>>+++ b/drivers/dpll/dpll_core.c
->>>@@ -28,8 +28,6 @@ static u32 dpll_xa_id;
->>> 	WARN_ON_ONCE(!xa_get_mark(&dpll_device_xa, (d)->id, DPLL_REGISTERED))
->>> #define ASSERT_DPLL_NOT_REGISTERED(d)	\
->>> 	WARN_ON_ONCE(xa_get_mark(&dpll_device_xa, (d)->id, DPLL_REGISTERED))
->>>-#define ASSERT_PIN_REGISTERED(p)	\
->>>-	WARN_ON_ONCE(!xa_get_mark(&dpll_pin_xa, (p)->id, DPLL_REGISTERED))
->>>
->>> struct dpll_device_registration {
->>> 	struct list_head list;
->>>@@ -641,8 +639,6 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent,
->>struct dpll_pin *pin,
->>> 	    WARN_ON(!ops->state_on_pin_get) ||
->>> 	    WARN_ON(!ops->direction_get))
->>> 		return -EINVAL;
->>>-	if (ASSERT_PIN_REGISTERED(parent))
->>>-		return -EINVAL;
->>>
->>> 	mutex_lock(&dpll_lock);
->>> 	ret = dpll_xa_ref_pin_add(&pin->parent_refs, parent, ops, priv); diff
->>>--git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c index
->>>963bbbbe6660..ff430f43304f 100644
->>>--- a/drivers/dpll/dpll_netlink.c
->>>+++ b/drivers/dpll/dpll_netlink.c
->>>@@ -558,7 +558,7 @@ dpll_pin_event_send(enum dpll_cmd event, struct
->>dpll_pin *pin)
->>> 	int ret = -ENOMEM;
->>> 	void *hdr;
->>>
->>>-	if (WARN_ON(!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED)))
->>>+	if (!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED))
->>> 		return -ENODEV;
->>>
->>> 	msg = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
->>>--
->>>2.38.1
->>>
+> 
+> page_pool_iov_put_many()/page_pool_iov_get_many() are called to do
+
+Can we remove the page_pool_iov_put_many()/page_pool_iov_get_many()
+calling?
+
+> refcounting before the page is released back to the provider. I'm not
+> seeing how we can handle the special case inside of 'release_page' -
+> that's too late, as far as I can tell.
+
+And handle the special case in page_pool_return_page() to mainly
+replace put_page() with 'release_page' for devmem page?
+https://elixir.free-electrons.com/linux/v6.6-rc1/source/net/core/page_pool.c#L537
+
+> 
+> The only way to remove the if statements in the page pool is to
+> implement what you said was not feasible in an earlier email. We would
+> define this struct:
+> 
+> struct netmem {
+>         /* common fields */
+>         refcount_t refcount;
+>         bool is_pfmemalloc;
+>         int nid;
+>         ......
+>         union {
+>                 struct devmem{
+>                         struct dmabuf_genpool_chunk_owner *owner;
+>                 };
+> 
+>                 struct page * page;
+>         };
+> };
+> 
+> Then, we would require all memory providers to allocate struct netmem
+> for the memory and set the common fields, including ones that have
+> struct pages. For devmem, netmem->page will be NULL, because netmem
+> has no page.
+
+That is not what I have in mind.
+
+> 
+> If we do that, the page pool can ignore whether the underlying memory
+> is page or devmem, because it can use the common fields, example:
+> 
+> /* page_ref_count replacement */
+> netmem_ref_count(struct netmem* netmem) {
+>     return netmem->refcount;
+> }
+> 
+> /* page_ref_add replacement */
+> netmem_ref_add(struct netmem* netmem) {
+>    atomic_inc(netmem->refcount);
+> }
+> 
+> /* page_to_nid replacement */
+> netmem_nid(struct netmem* netmem) {
+>     return netmem->nid;
+> }
+> 
+> /* page_is_pfmemalloc() replacement */
+> netmem_is_pfmemalloc(struct netmem* netmem) {
+>     return netmem->is_pfmemalloc;
+> }
+> 
+> /* page_ref_sub replacement */
+> netmem_ref_sub(struct netmem* netmem) {
+>     atomic_sub(netmet->refcount);
+>     if (netmem->refcount == 0) {
+>                   /* release page to the memory provider.
+>                    * struct page memory provider will do put_page(),
+>                    * devmem will do something else */
+>            }
+>      }
+> }
+> 
+> 
+> I think this MAY BE technically feasible, but I'm not sure it's better:
+> 
+> 1. It is a huge refactor to the page pool, lots of code churn. While
+> the page pool currently uses page*, it needs to be completely
+> refactored to use netmem*.
+> 2. It causes extra memory usage. struct netmem needs to be allocated
+> for every struct page.
+> 3. It has minimal perf upside. The page_is_page_pool_iov() checks
+> currently have minimal perf impact, and I demonstrated that to Jesper
+> in RFC v2.
+> 4. It also may not be technically feasible. I'm not sure how netmem
+> interacts with skb_frag_t. I guess we replace struct page* bv_page
+> with struct netmem* bv_page, and add changes there.
+> 5. Drivers need to be refactored to use netmem* instead of page*,
+> unless we cast netmem* to page* before returning to the driver.
+> 
+> Possibly other downsides, these are what I could immediately think of.
+> 
+> If I'm still misunderstanding your suggestion, it may be time to send
+> me a concrete code snippet of what you have in mind. I'm a bit
+> confused at the moment because the only avenue I see to remove the if
+> statements in the page pool is to define the struct that we agreed is
+> not feasible in earlier emails.
+> 
+
+I might be able to do it at the weekend if it is still not making any
+sense to you.
+
+> 
+> --
+> Thanks,
+> Mina
+> 
+> .
+> 
 
