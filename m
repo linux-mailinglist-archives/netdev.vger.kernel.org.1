@@ -1,293 +1,290 @@
-Return-Path: <netdev+bounces-46859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF9397E6B1E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:18:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C867E6B1F
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:19:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14EDEB20C76
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:18:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F9D1B20C86
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7F6FC16;
-	Thu,  9 Nov 2023 13:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D932D107AD;
+	Thu,  9 Nov 2023 13:19:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="iotu1cwf"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="plnqCv5s"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 790BC10A33
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 13:18:47 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2074.outbound.protection.outlook.com [40.107.8.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFD02D78;
-	Thu,  9 Nov 2023 05:18:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q7pyjL1ecBAXcH8WnaocEcthhqUFAZGYyOfkPt3aTV4ygBGa1sDe9Pb9jgwDG98bXkwm6WsUY0gQ4i6TAY8N0TzOJm4VxwPulR3rcNbIfzlYCZghZCN9Jyebk70WuJH9Zta7UFaliGx/Kuvq3Y7PWXbPiPB0ZyWPXKr4PLP2ND6mdp3YYzwbltnsA3Z6//dU+4Z/8ie6bBVuYclK1rwEkVSbpCg69LMfhKnAJIsK3AFQPhgcRUGTTJAxbyYKFftu6eHWyLiTzhCdRomWkHXdwfjoh+hjcU7l7JgA0BZ82h8bDkRWzD+BJ8k/kp77SAORLEBNkGjybK+8enqFfSmU6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3N1iieZrCf1uuk0U98315wv82fYWx/WYzNxSZPWPEac=;
- b=E8YvICym1L53jZIF+P5fxFS1NafPo4yOVOv3n/lgxn4lV0BZe3GvS99zEnrPgtJqu0Y7QmdX4K5KNjN8+eXMMsP090ooL9jQ7XtbG2DbGNSMty3GX5WdysFNBxNiQiwlf054b+Tk/IN3JhjOpCbjpKi2B3XHYm2FEQacfR8zhNYZNHBw2Qfg0djdrDK6dn5/jp/Si15ZC2KuHeUp7rjb41V9A3gqcRNJ0Tbkfz13gjAWZbXHyIwJxcdJsweVvg0oGs2SDpjnHs9vHwJ6skJ2T6JaJjkZ/oh08O2aoHrPYX1rrAWctmhDGecJexCNfwB2wuMR8sTZxno8mKzLXuqqNw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3N1iieZrCf1uuk0U98315wv82fYWx/WYzNxSZPWPEac=;
- b=iotu1cwfFvVOIk6VW3prdZ1ZMajv5qQQje2AjCiqdhTP179/miKR7Kppt+jH0vb7vC6ZSXAdlLK4iyfhzAqk2J9daF4H5JiJ2QgB4GtijA1T2XDYnT5zFtyURvaJFx5OVsFiIK512Vlb25Itg8KVoOd8Wmo5yPSPSsIFPEnkpKw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM7PR04MB7110.eurprd04.prod.outlook.com (2603:10a6:20b:119::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Thu, 9 Nov
- 2023 13:18:44 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
- 13:18:44 +0000
-Date: Thu, 9 Nov 2023 15:18:40 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 7/7] net/sched: taprio: enable cycle time
- adjustment for current entry
-Message-ID: <20231109131840.wgfrzuk5kz4wtd2h@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-8-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-8-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107112023.676016-8-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-8-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: VI1PR0102CA0067.eurprd01.prod.exchangelabs.com
- (2603:10a6:803::44) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC4A1DFC8
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 13:19:11 +0000 (UTC)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2383B30CD
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:19:11 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-543923af573so1377666a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 05:19:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699535949; x=1700140749; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=66wh30Ew82ffDebJ18oPJoQua0dXNHmGRb6puz7dPeM=;
+        b=plnqCv5shIwes3+RY3edDRIA9Eelhe/7JVHigwtTqcbCStd6K7ZZq2SQU+kSbH8PV8
+         e8vEnfi7pWTHaKgQLnefnBn9eMg4swMDE8ARGbYqlhipR32aOzCr3oNXSBdYqyVCNBd+
+         4US6LH6p13tEiZKHvKMaqFOvoRPDf/xEkl+ZIuJ3TG9uIPJwd1wKmbgwWEBhqZ/Gd0Qx
+         pbARUXK/exTASjKaguHI9LKL4fVRLt4XZ+CuJUur7Fq9dnrdgyHOQke0eResTew9ZRRO
+         bOgrS9iPqYAtPGP4bCCmlbIHsrZHw5ULe1/oB+Y3dVC4cKAQdIf3bspfirY40n0TRSnW
+         38gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699535949; x=1700140749;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=66wh30Ew82ffDebJ18oPJoQua0dXNHmGRb6puz7dPeM=;
+        b=OFlnm6zoc0i8vewN8mDB/z9ayTP7WeUDDn4cY1jV23zckdDhUHnbB5D3lR2gbtLQXZ
+         bHn5w4P5AGO+NrHdv4ZHTlqsCPw7iUS1OcWfzFDzP6SXtuXkkc3VVYXvQo5KnxlRemdc
+         oLIu+sP9izhJaG2Ye0DAd0heDDSocvYZUxqNC1t236wRJSfQYgwhxIZ2DI3s1fOWzFs7
+         UrOO6lZgw1lFwzg0qgrCxcfCxXa4+l+boDMnkYnZVtrCketqtTLBH0t9jb3Clckn7NIh
+         yrnuYKrfLdsApwmn5vcimMDb1dpG+YapMsPde0mfUZcdvugELGGaJSVocBarpUcKgacP
+         cZDQ==
+X-Gm-Message-State: AOJu0YyK7jfM0rBWL4ivD59vpZMWKV2AecmLnnw+YsOXbuPN5Kqm2pO7
+	ujHj4FEfHGDAXaqYY5ymCsUslw==
+X-Google-Smtp-Source: AGHT+IGW5rkFb5rbkhe30pmfhOx1tnnI7AwNRRoRWtnkaqrtsJ0+gptnPCAStqicmXldeDxXNgpXow==
+X-Received: by 2002:a17:907:7288:b0:9df:2fb1:1a83 with SMTP id dt8-20020a170907728800b009df2fb11a83mr4034677ejc.39.1699535949684;
+        Thu, 09 Nov 2023 05:19:09 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id m20-20020a17090607d400b009ce03057c4dsm2532546ejc.2.2023.11.09.05.19.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 05:19:09 -0800 (PST)
+Date: Thu, 9 Nov 2023 14:19:08 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
+Message-ID: <ZUzcTBmSPxIs5iH3@nanopsycho>
+References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
+ <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
+ <ZUubagu6B+vbfBqm@nanopsycho>
+ <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM7PR04MB7110:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07b9a77e-c099-413b-6af4-08dbe12665d4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	toAHq5ujRfS7EeS7y3HjRfX5dh3e/gnHE+CHTNB+S4zfvQWx2u4+hXtlDpw99KdwCG63cWX5ncCfxPhhtUQdgpAm8yRPKFAtlRPjjJWfThBwlwgdpxDlpDZSTP+YxVq+UxWurulOlUg7zESGKa8zRES6MB9R1LvD7rQrFUqqlWX1IXO0HCx5ObiAQ2lUiEsJ6NZJN4mqEqZG+HpxA0SluOVsKb6FhjlCBSqDIl7EAGt39iNHqOnWRnOMdggg+k1mCKzylfZ9YZul1Cz1dOSz2vOjy64e8DFl2QPF4NAzLDlB1PL7dnQTGaeDqitd7YcOpRGQyDyakBJaWumpbKyw8SXK2BGOqVPomDQq4lQR5aqCqcrW4Hk6yiPXpaskgtR8mpDLYPzbMq1mauaHqY5+D9YLYY+qRKmIGdRw5mlxqVWRDDbIOYt+Uakly9/RYV5dqrBsZmU8XqCncVOvziNEqiY5A4Y7ERsaourKVkzHzzMT8c3fc+GVi9HtM898TnQamwy+UT8PkFKKpf3ge1sNL9Xq46G81hg4B5DzGIyKx2hLZOo1n8qwU/3iOha0iCM4
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(376002)(366004)(39860400002)(346002)(136003)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(7416002)(8676002)(8936002)(5660300002)(44832011)(316002)(6916009)(54906003)(66476007)(66946007)(66556008)(4326008)(6486002)(2906002)(478600001)(6666004)(6512007)(9686003)(83380400001)(33716001)(6506007)(41300700001)(26005)(1076003)(86362001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KRl7D9ZqVpNkKWOV9jIqoVS/dD2nyGWHJcKWM5TvThND3X1bWionAv/XGfML?=
- =?us-ascii?Q?CfH75a1ZIbV49P3vSMZDPNRd8QWpNznq3TQgdOMDkHrigGlZheEAusMYzrZ5?=
- =?us-ascii?Q?Qb1sleRl+mhLxOzRaFNwCE2H6Mm1qkNN/AONWJyUkG6qe4WGALW1fp9BEflT?=
- =?us-ascii?Q?7ftL+23SYm9Yz+UxPjIr1O0WAPwm8/noByMWIw1tS4Ci92gunbv4RXX3Q0QG?=
- =?us-ascii?Q?KjysAuDSZiDNehN2HOuzVpb1ZyRHTOJENbmJa0jg5DYI/tAkmJ4UNUYdxD3J?=
- =?us-ascii?Q?DhMkweqVoyIGwtQEAA1a6hJidX+pK29yhKIiPqDso+n7TAfFQmer7flGLE4l?=
- =?us-ascii?Q?G1MqHjhTGEfz+BrVt1DgLUSrPRn6nxhIb+e1dK6vY2oe/SYoVcE3qxlgM6Yw?=
- =?us-ascii?Q?iVurqVS0N1+F9e/Z9QjTiDEQwki9LgNVL/tlE7G9TPXTvVlFszuL/eN1SAEU?=
- =?us-ascii?Q?/uTleDR5LybWv3EEbQweDfG/F/TUAE5ky/by4rl40WyvPIZORqr+05AWfD8J?=
- =?us-ascii?Q?ryuNbpQEuOyPVc8V8xYjF5SHKLE7lURNNoK30OnQ0zGzn0KRxxws7QZFPAdl?=
- =?us-ascii?Q?aR2HdD2Nzt7/FKQNd07UBuNjdDdjak+hlp7ZFfv8LHJUURJXf4L7Mt3C4aBC?=
- =?us-ascii?Q?FIDwfA6XbP0ypk2OOW+c6j+WOsOhMlRG+rx/eHYUM99TJUe26+5D74emFePU?=
- =?us-ascii?Q?gaunjMCPykmejzBqJjo625REqwbWmH4fibUC68GxUFhMkZcxcC6e3cs3YDLY?=
- =?us-ascii?Q?gdNf0dAcIMmJQ5QLW6H+sG4xQ+rf/GEXabNW8pXQ7+FpXltEZyR/BDvxM0gE?=
- =?us-ascii?Q?moA0jQtWcoSfuWSCKpXfm7xqhoK9i0FDQp79W0WicthkQg57ScyS1waXWxJI?=
- =?us-ascii?Q?HEwONRXvAEV4JXvPC+o6hibQdG51we9F0bHyd7kqGgtIhxQb744Tvpc7RW1b?=
- =?us-ascii?Q?fbChq4znvS6g+VZtml6IbL1vi1YvpyExAofl9RM/X7bFSGpDm0d00bY2jKbs?=
- =?us-ascii?Q?4401+SGJ5lagSM5hdcja9YQUKJzsaKtJ8yoeZgqZOsLRwFhwLkytb17Cojy1?=
- =?us-ascii?Q?yG4KyncHYsC4Ko7PMDE+d7JIE19Sn1BMTrsqQTFLIh4e1BycI7Cd6uz17JlO?=
- =?us-ascii?Q?npoLSbwiI04njTk4yp0mEFqUoFrfEbYUT4OP46IoOEcgpm4imlFSlNe4deJw?=
- =?us-ascii?Q?8erxdnpXgXoTrgLcHkHFSBugcc58yO5tXwMv1SulkeXqmvHQO9dQxpQDtj6g?=
- =?us-ascii?Q?LHcWOYLMj32Zlvt3j1o39Od+h/YHLXyKvzCac+Dxw62ABWGABrddhsRgtyH8?=
- =?us-ascii?Q?tCNxcgL27KxLcLykf/xTVKBqMjOaIQYJnKqcVoHR0HmfEA2K9BB4AsYsMcfr?=
- =?us-ascii?Q?/0JFcxQAwOG9uHUw/EUf5NYzF8jdZ7BA7tqdhHeKu4a4WE+S5MtCU1ftGDxt?=
- =?us-ascii?Q?HG+sfG4c4+X0o0b6ui6iM7dc68ta55SaBlHCLCAFUdv6yTlU5qO2pFyY0NAK?=
- =?us-ascii?Q?3j0Wiidp/G+3yR5QBelZgbVyWVK1EZjIGijosY6lDVNUz/SXk19L5U8AsWoY?=
- =?us-ascii?Q?KyWLcj0GbRTbQRvlx+2iFN4+My+pMn5RbZd3mDcoVBupOlJgyQAIqbu2pP9p?=
- =?us-ascii?Q?AA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07b9a77e-c099-413b-6af4-08dbe12665d4
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 13:18:43.9656
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZVDjeijvp8OG4c4JLTdiuUNObDtJK1kfgmRtdhsbtAW3EQfu7zOZYIaPdtswHDAbrJWBCjvArMq/zxD8XIM9RA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7110
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
 
-On Tue, Nov 07, 2023 at 06:20:23AM -0500, Faizal Rahim wrote:
-> Handles cycle time adjustments for the current active entry
+Thu, Nov 09, 2023 at 01:20:48PM CET, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Wednesday, November 8, 2023 3:30 PM
+>>
+>>Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com wrote:
+>>>When a kernel module is unbound but the pin resources were not entirely
+>>>freed (other kernel module instance have had kept the reference to that
+>>>pin), and kernel module is again bound, the pin properties would not be
+>>>updated (the properties are only assigned when memory for the pin is
+>>>allocated), prop pointer still points to the kernel module memory of
+>>>the kernel module which was deallocated on the unbind.
+>>>
+>>>If the pin dump is invoked in this state, the result is a kernel crash.
+>>>Prevent the crash by storing persistent pin properties in dpll subsystem,
+>>>copy the content from the kernel module when pin is allocated, instead of
+>>>using memory of the kernel module.
+>>>
+>>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
+>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
+>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>---
+>>> drivers/dpll/dpll_core.c    |  4 ++--
+>>> drivers/dpll/dpll_core.h    |  4 ++--
+>>> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
+>>> 3 files changed, 18 insertions(+), 18 deletions(-)
+>>>
+>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>>>index 3568149b9562..4077b562ba3b 100644
+>>>--- a/drivers/dpll/dpll_core.c
+>>>+++ b/drivers/dpll/dpll_core.c
+>>>@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct
+>>>module *module,
+>>> 		ret = -EINVAL;
+>>> 		goto err;
+>>> 	}
+>>>-	pin->prop = prop;
+>>>+	memcpy(&pin->prop, prop, sizeof(pin->prop));
+>>
+>>Odd, you don't care about the pointer within this structure?
+>>
+>
+>Well, true. Need a fix.
+>Wondering if copying idea is better than just assigning prop pointer on
+>each call to dpll_pin_get(..) function (when pin already exists)?
 
-Use the imperative mood for commit messages, i.e. "handle".
+Not sure what do you mean. Examples please.
 
-> when new admin base time occurs quickly, either within the
-> current entry or the next one.
-> 
-> Changes covers:
-> 1. Negative cycle correction or truncation
-> Occurs when the new admin base time falls before the expiry of the
-> current running entry.
-> 
-> 2. Positive cycle correction or extension
-> Occurs when the new admin base time falls within the next entry,
-> and the current entry is the cycle's last entry. In this case, the
-> changes in taprio_start_sched() extends the schedule, preventing
-> old oper schedule from resuming and getting truncated in the next
-> advance_sched() call.
-> 
-> 3. A new API, update_gate_close_time(), has been created to update
-> the gate_close_time of the current entry in the event of cycle
-> correction.
-> 
-> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-> ---
->  net/sched/sch_taprio.c | 72 +++++++++++++++++++++++++++++++-----------
->  1 file changed, 53 insertions(+), 19 deletions(-)
-> 
-> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-> index c60e9e7ac193..56743754d42e 100644
-> --- a/net/sched/sch_taprio.c
-> +++ b/net/sched/sch_taprio.c
-> @@ -1379,41 +1379,75 @@ static void setup_first_end_time(struct taprio_sched *q,
->  		rcu_assign_pointer(q->current_entry, NULL);
->  }
->  
-> +static void update_gate_close_time(struct sched_entry *current_entry,
-> +				   ktime_t new_end_time,
-> +				   int num_tc)
-> +{
-> +	int tc;
-> +
-> +	for (tc = 0; tc < num_tc; tc++) {
-> +		if (current_entry->gate_mask & BIT(tc))
-> +			current_entry->gate_close_time[tc] = new_end_time;
-> +	}
-> +}
-> +
->  static void taprio_start_sched(struct Qdisc *sch,
->  			       ktime_t new_base_time,
-> -			       struct sched_gate_list *new)
-> +			       struct sched_gate_list *admin)
->  {
->  	struct taprio_sched *q = qdisc_priv(sch);
-> +	ktime_t expires = hrtimer_get_expires(&q->advance_timer);
-> +	struct net_device *dev = qdisc_dev(q->root);
-> +	struct sched_entry *curr_entry = NULL;
->  	struct sched_gate_list *oper = NULL;
-> -	ktime_t expires, start;
->  
->  	if (FULL_OFFLOAD_IS_ENABLED(q->flags))
->  		return;
->  
->  	oper = rcu_dereference_protected(q->oper_sched,
->  					 lockdep_is_held(&q->current_entry_lock));
-> +	curr_entry = rcu_dereference_protected(q->current_entry,
-> +					       lockdep_is_held(&q->current_entry_lock));
->  
-> -	expires = hrtimer_get_expires(&q->advance_timer);
-> -	if (expires == 0)
-> -		expires = KTIME_MAX;
-> +	if (hrtimer_active(&q->advance_timer)) {
-> +		oper->cycle_time_correction =
-> +			get_cycle_time_correction(oper, new_base_time,
-> +						  curr_entry->end_time,
-> +						  curr_entry);
->  
-> -	/* If the new schedule starts before the next expiration, we
-> -	 * reprogram it to the earliest one, so we change the admin
-> -	 * schedule to the operational one at the right time.
-> -	 */
-> -	start = min_t(ktime_t, new_base_time, expires);
-> -
-> -	if (expires != KTIME_MAX &&
-> -	    ktime_compare(start, new_base_time) == 0) {
-> -		/* Since timer was changed to align to the new admin schedule,
-> -		 * setting the variable below to a non-initialized value will
-> -		 * indicate to advance_sched() to call switch_schedules() after
-> -		 * this timer expires.
 
-I would appreciate not changing things that you've established in
-earlier changes. Try to keep stuff introduced earlier in a form that is
-as close as possible to the final form.
-
-> +		if (cycle_corr_active(oper->cycle_time_correction)) {
-> +			/* This is the last entry we are running from oper,
-> +			 * subsequent entry will take from the new admin.
-> +			 */
-> +			ktime_t	now = taprio_get_time(q);
-> +			u64 gate_duration_left = ktime_sub(new_base_time, now);
-
-What is special about "now" as a moment in time? Gate durations are
-calculated relative to the moment when the sched_entry begins.
-
-> +			struct qdisc_size_table *stab =
-> +				rtnl_dereference(q->root->stab);
-
-"q->root" is "sch".
-
-> +			int num_tc = netdev_get_num_tc(dev);
-
-It would be nice if you could pay some attention to the preferred
-variable declaration style, i.e. longer lines come first. If you cannot
-easily respect that, you could split the variable declarations from
-their initialization.
-
-> +
-> +			oper->cycle_end_time = new_base_time;
-> +			curr_entry->end_time = new_base_time;
-> +			curr_entry->correction_active = true;
-> +
-> +			update_open_gate_duration(curr_entry, oper, num_tc,
-> +						  gate_duration_left);
-
-Recalculating open gate durations with a cycle time correction seems
-very complicated, at least from this code path. What depends on this?
-The data path only looks at the gate_close_time. Can we get away with
-updating only the gate_close_time?
-
-> +			update_gate_close_time(curr_entry, new_base_time, num_tc);
-> +			taprio_update_queue_max_sdu(q, oper, stab);
-> +			taprio_set_budgets(q, oper, curr_entry);
-
-There's a lot of duplication between the correction management from
-advance_sched() and the one from taprio_start_sched(). I wonder if some
-of it can go into a common function.
-
-> +		}
-> +	}
-> +
-> +	if (!hrtimer_active(&q->advance_timer) ||
-> +	    cycle_corr_active(oper->cycle_time_correction)) {
-> +		/* Use new admin base time if :
-> +		 * 1. there's no active oper
-> +		 * 2. there's active oper and we will change to the new admin
-> +		 * schedule after the current entry from oper ends
->  		 */
-> -		oper->cycle_time_correction = 0;
-> +		expires = new_base_time;
->  	}
->  
-> -	hrtimer_start(&q->advance_timer, start, HRTIMER_MODE_ABS);
-> +	hrtimer_start(&q->advance_timer, expires, HRTIMER_MODE_ABS);
->  }
->  
->  static void taprio_set_picos_per_byte(struct net_device *dev,
-> -- 
-> 2.25.1
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>> 	refcount_set(&pin->refcount, 1);
+>>> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
+>>> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+>>>@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin *parent,
+>>>struct dpll_pin *pin,
+>>> 	unsigned long i, stop;
+>>> 	int ret;
+>>>
+>>>-	if (WARN_ON(parent->prop->type != DPLL_PIN_TYPE_MUX))
+>>>+	if (WARN_ON(parent->prop.type != DPLL_PIN_TYPE_MUX))
+>>> 		return -EINVAL;
+>>>
+>>> 	if (WARN_ON(!ops) ||
+>>>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+>>>index 5585873c5c1b..717f715015c7 100644
+>>>--- a/drivers/dpll/dpll_core.h
+>>>+++ b/drivers/dpll/dpll_core.h
+>>>@@ -44,7 +44,7 @@ struct dpll_device {
+>>>  * @module:		module of creator
+>>>  * @dpll_refs:		hold referencees to dplls pin was registered with
+>>>  * @parent_refs:	hold references to parent pins pin was registered
+>>>with
+>>>- * @prop:		pointer to pin properties given by registerer
+>>>+ * @prop:		pin properties copied from the registerer
+>>>  * @rclk_dev_name:	holds name of device when pin can recover clock
+>>>from it
+>>>  * @refcount:		refcount
+>>>  **/
+>>>@@ -55,7 +55,7 @@ struct dpll_pin {
+>>> 	struct module *module;
+>>> 	struct xarray dpll_refs;
+>>> 	struct xarray parent_refs;
+>>>-	const struct dpll_pin_properties *prop;
+>>>+	struct dpll_pin_properties prop;
+>>> 	refcount_t refcount;
+>>> };
+>>>
+>>>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+>>>index 93fc6c4b8a78..963bbbbe6660 100644
+>>>--- a/drivers/dpll/dpll_netlink.c
+>>>+++ b/drivers/dpll/dpll_netlink.c
+>>>@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg, struct
+>>>dpll_pin *pin,
+>>> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq), &freq,
+>>> 			  DPLL_A_PIN_PAD))
+>>> 		return -EMSGSIZE;
+>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++) {
+>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++) {
+>>> 		nest = nla_nest_start(msg, DPLL_A_PIN_FREQUENCY_SUPPORTED);
+>>> 		if (!nest)
+>>> 			return -EMSGSIZE;
+>>>-		freq = pin->prop->freq_supported[fs].min;
+>>>+		freq = pin->prop.freq_supported[fs].min;
+>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN, sizeof(freq),
+>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>> 			nla_nest_cancel(msg, nest);
+>>> 			return -EMSGSIZE;
+>>> 		}
+>>>-		freq = pin->prop->freq_supported[fs].max;
+>>>+		freq = pin->prop.freq_supported[fs].max;
+>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX, sizeof(freq),
+>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>> 			nla_nest_cancel(msg, nest);
+>>>@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct dpll_pin
+>>>*pin, u32 freq)
+>>> {
+>>> 	int fs;
+>>>
+>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++)
+>>>-		if (freq >= pin->prop->freq_supported[fs].min &&
+>>>-		    freq <= pin->prop->freq_supported[fs].max)
+>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++)
+>>>+		if (freq >= pin->prop.freq_supported[fs].min &&
+>>>+		    freq <= pin->prop.freq_supported[fs].max)
+>>> 			return true;
+>>> 	return false;
+>>> }
+>>>@@ -403,7 +403,7 @@ static int
+>>> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+>>> 		     struct netlink_ext_ack *extack)
+>>> {
+>>>-	const struct dpll_pin_properties *prop = pin->prop;
+>>>+	const struct dpll_pin_properties *prop = &pin->prop;
+>>> 	struct dpll_pin_ref *ref;
+>>> 	int ret;
+>>>
+>>>@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32
+>>>parent_idx,
+>>> 	int ret;
+>>>
+>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>-	      pin->prop->capabilities)) {
+>>>+	      pin->prop.capabilities)) {
+>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>> 		return -EOPNOTSUPP;
+>>> 	}
+>>>@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll, struct
+>>>dpll_pin *pin,
+>>> 	int ret;
+>>>
+>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>-	      pin->prop->capabilities)) {
+>>>+	      pin->prop.capabilities)) {
+>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>> 		return -EOPNOTSUPP;
+>>> 	}
+>>>@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll, struct
+>>>dpll_pin *pin,
+>>> 	int ret;
+>>>
+>>> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
+>>>-	      pin->prop->capabilities)) {
+>>>+	      pin->prop.capabilities)) {
+>>> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
+>>> 		return -EOPNOTSUPP;
+>>> 	}
+>>>@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin, struct
+>>>dpll_device *dpll,
+>>> 	int ret;
+>>>
+>>> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
+>>>-	      pin->prop->capabilities)) {
+>>>+	      pin->prop.capabilities)) {
+>>> 		NL_SET_ERR_MSG(extack, "direction changing is not allowed");
+>>> 		return -EOPNOTSUPP;
+>>> 	}
+>>>@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin, struct
+>>>nlattr *phase_adj_attr,
+>>> 	int ret;
+>>>
+>>> 	phase_adj = nla_get_s32(phase_adj_attr);
+>>>-	if (phase_adj > pin->prop->phase_range.max ||
+>>>-	    phase_adj < pin->prop->phase_range.min) {
+>>>+	if (phase_adj > pin->prop.phase_range.max ||
+>>>+	    phase_adj < pin->prop.phase_range.min) {
+>>> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
+>>> 				    "phase adjust value not supported");
+>>> 		return -EINVAL;
+>>>@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr
+>>>*mod_name_attr,
+>>> 	unsigned long i;
+>>>
+>>> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
+>>>-		prop = pin->prop;
+>>>+		prop = &pin->prop;
+>>> 		cid_match = clock_id ? pin->clock_id == clock_id : true;
+>>> 		mod_match = mod_name_attr && module_name(pin->module) ?
+>>> 			!nla_strcmp(mod_name_attr,
+>>>--
+>>>2.38.1
+>>>
 >
 
