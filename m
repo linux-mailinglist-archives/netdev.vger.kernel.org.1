@@ -1,75 +1,133 @@
-Return-Path: <netdev+bounces-46792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C8A7E66F9
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:44:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6852D7E6709
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA80EB20C9B
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:44:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C9861C20856
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFC912B99;
-	Thu,  9 Nov 2023 09:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFCE12E75;
+	Thu,  9 Nov 2023 09:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BWdti6VB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BA612E48
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:44:02 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C0B272C;
-	Thu,  9 Nov 2023 01:44:02 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SQxqB44W1zfb6H;
-	Thu,  9 Nov 2023 17:43:50 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 9 Nov
- 2023 17:43:34 +0800
-Subject: Re: [PATCH net v2] page_pool: Add myself as page pool reviewer in
- MAINTAINERS
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-References: <20231107123825.61051-1-linyunsheng@huawei.com>
- <20231107094959.556ffe53@kernel.org>
- <0098508e-59ab-5633-3725-86f1febc1480@huawei.com>
- <20231108084739.59adead6@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <bcf61cb5-1203-7de5-4db1-85a96bd84130@huawei.com>
-Date: Thu, 9 Nov 2023 17:43:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E59D134B3
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:46:39 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AC0A2D49;
+	Thu,  9 Nov 2023 01:46:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cToWrjKVkKlNsoeH6fQytqUtrMdfuAVIxZoekhMSeHU=; b=BWdti6VBodHQYvNyN5+fj7ApxK
+	pBBN4JBp6GoSQOmrIrCZt585hkq3fgNoHm14umxjNweakNB0fuBEo454E4n3j0Dv9wNleEfP1cpHu
+	Y2lNsjV01IZVD29zbeJb5X4bN7AzfiywYP/PMR43P0K4NX2laKuksRwSdTZtuvWApcX7VSCv9ksf0
+	S7VuzWrJHFWVPqXqPR92IJ6o7iTORGUFBU3iknfCD28oRjjIowdXCO8tApMtnTHDdG0Xa6p3PQsiB
+	da+LDhPjglZxooSqrfPmr6R/deiZ/gHxOkFNVWe3prUuISHU7Ji2b4p1nwfMWOr+WI6uRmu8wmQMz
+	EMwySoHQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35116)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r11cD-0002DX-0q;
+	Thu, 09 Nov 2023 09:46:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r11cB-0000Rt-RJ; Thu, 09 Nov 2023 09:46:19 +0000
+Date: Thu, 9 Nov 2023 09:46:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gan Yi Fang <yi.fang.gan@intel.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joakim Zhang <qiangqing.zhang@nxp.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Looi Hong Aun <hong.aun.looi@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Song Yoong Siang <yoong.siang.song@intel.com>
+Subject: Re: [PATCH net 1/1] net: stmmac: fix MAC and phylink mismatch issue
+ after resume with STMMAC_FLAG_USE_PHY_WOL enabled
+Message-ID: <ZUyqa5lVfWtDP9/F@shell.armlinux.org.uk>
+References: <20231109050027.2545000-1-yi.fang.gan@intel.com>
+ <ZUyjOEQHHnnbzwrV@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231108084739.59adead6@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZUyjOEQHHnnbzwrV@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2023/11/9 0:47, Jakub Kicinski wrote:
-> On Wed, 8 Nov 2023 11:31:45 +0800 Yunsheng Lin wrote:
->> For 2, yes, maybe I should stick to the rule even if it is a simple
->> patch and obivous format error.
+On Thu, Nov 09, 2023 at 09:15:36AM +0000, Russell King (Oracle) wrote:
+> On Thu, Nov 09, 2023 at 01:00:27PM +0800, Gan Yi Fang wrote:
+> > From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+> > 
+> > The issue happened when flag STMMAC_FLAG_USE_PHY_WOL is enabled.
+> > It can be reproduced with steps below:
+> > 1. Advertise only one speed on the host
+> > 2. Enable the WoL on the host
+> > 3. Suspend the host
+> > 4. Wake up the host
+> > 
+> > When the WoL is disabled, both the PHY and MAC will suspend and wake up
+> > with everything configured well. When WoL is enabled, the PHY needs to be
+> > stay awake to receive the signal from remote client but MAC will enter
+> > suspend mode.
+> > 
+> > When the MAC resumes from suspend, phylink_resume() will call
+> > phylink_start() to start the phylink instance which will trigger the
+> > phylink machine to invoke the mac_link_up callback function. The
+> > stmmac_mac_link_up() will configure the MAC_CTRL_REG based on the current
+> > link state. Then the stmmac_hw_setup() will be called to configure the MAC.
+> > 
+> > This sequence might cause mismatch of the link state between MAC and
+> > phylink. This patch moves the phylink_resume() after stmamc_hw_setup() to
+> > ensure the MAC is initialized before phylink is being configured.
 > 
-> Yes, maybe you should.
-
-Thanks for clarifying.
-Maybe I should be targetting the net-next branch for the repost
-after merge window open, in order not to cause any confusion.
-
-> .
+> Isn't this going to cause problems?
 > 
+> stmamc_hw_setup() calls stmmac_init_dma_engine(), which then calls
+> stmmac_reset() - and stmmac_reset() can fail if the PHY clock isn't
+> running, which is why phylink_resume() gets called before this.
+
+I think these two commits should be reviewed to understand why the code
+is the way it is, and why changing it may cause regressions:
+
+90702dcd19c0 ("net: stmmac: fix MAC not working when system resume back
+with WoL active")
+
+36d18b5664ef ("net: stmmac: start phylink instance before
+stmmac_hw_setup()")
+
+As part of my work on stmmac that got junked, I was looking at a
+solution to the "we need the PHY clock to be running for the MAC to
+work for things like reset" problem - but those patches got thrown
+away when stmmac folk were very nitpicky over %u vs %d in format
+strings to print what was a _signed_ value that stmmac code stupidly
+converts to an unsigned integer... it's still a signed integer no
+matter if code decides to use "unsigned int". I suspect all those
+patches (and there was a considerable number of them) have now been
+expired from git, so are now totally lost, and honestly I have no
+desire to put further work into stmmac stuff.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
