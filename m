@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-46782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C937E6623
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:03:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 099327E664D
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABC4A1C20BE4
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:03:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39FB71C208BE
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6C5211192;
-	Thu,  9 Nov 2023 09:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC0610A30;
+	Thu,  9 Nov 2023 09:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KfIJEmWs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mv4zDv/H"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7D210A35
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:03:19 +0000 (UTC)
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA28A2D59
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:03:17 -0800 (PST)
-Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2c6ef6c1ec2so6694651fa.2
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:03:17 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E6A10A23
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:10:03 +0000 (UTC)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31E7211B
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:10:02 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-407c3adef8eso4245775e9.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:10:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699520596; x=1700125396; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699521001; x=1700125801; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aC8LSFbrPW68Hp+zttgMH6wC0575N6ndnCuu0kvQp3U=;
-        b=KfIJEmWsBKMIMPyg/8glfSplb7JaxQvUVljaU3sZZgAVJ526I66ZJ7jMcm9E0kcFPV
-         aAUIwFNGyaUj8/ztpVsb57Rc72XGkhAhByewcD4X54XIz+COpvpw5oL37YMpRTJxaMLt
-         7K/gJdcf73G9j5+1I48E/6d+qMl9rG/697Y+zKUNkmEVgLNQZf1CbzcquOGLkSboFxFQ
-         CLCGG4MSRyH3HSRTpHvjU+Z1NNzCjJHmRqqLVB8/fj1scyWQSbf77+1bQMNQppEztrsf
-         9ffkyATa8zM/3YyOrz4+vcipFmv2R58HFNSr1Ynx7TD3E6gl0QeN3cv+boo6BKFc9f96
-         L/Ag==
+        bh=3LORq79d2KWiO2zsyhGNgwevjLWkh4YlRcW/4qVJO5g=;
+        b=Mv4zDv/HD/fdYIRJYheiXMABEtbYB1jdUUYVGfmVHoLG6SX1wRXqeHrQ8WHgXwIK9j
+         pu+jpbCJZPJuLS75Vv6t9UeDZK74JFpYnCdD73dTwCdCHvhCOlwoYOSz6M7OKUosFmsK
+         IeowEoYqhDwmwknsKg/kSlSqtU+nnntbsZPeLQOBSgA9ticiOCXlpP8xwHum02pjIhv5
+         FlphuVsrc3tLI5s9nI+6UrR2WoFRusD+3TK90GCvcHTzds7XZ+caJGTw/hZjk9NB2Gx6
+         MwF6/KLKgvpE999FeoPgrRLYCmlhp095s5zouUtVgxcMu5J+9sVKdFj6nFPidfrNdDer
+         jvPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699520596; x=1700125396;
+        d=1e100.net; s=20230601; t=1699521001; x=1700125801;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aC8LSFbrPW68Hp+zttgMH6wC0575N6ndnCuu0kvQp3U=;
-        b=vOMYpUoTFa1FVAJcaoJYF5bNLCpmKeImWqsuohdBwqpuNoPeD7iGe8FhDxqquSEJ4r
-         OdTX2s5U5obEJgGFXck153nd7ToUuPW3zPIaCGtpCyTos0mZlcQJowHa17W6oKyGSChv
-         nYTC0cybVcg70dz+COODFpCzhgC+Y8I2+O7u731pftAdBGCO0WfQbZYk5jAmPAtAcWXt
-         EZov1FwoIcQtKsHxT6bDH0BYFrKjXz+yeTA/WBiAtP3KC8zmMDCUfUWRWgWw06jdQAkT
-         lIC0xZwxfDOE42NhVMVP3H7j5WQGJYgZ4N+MnzPWZB9oudj9mqRUga1RqjVT/lMfZl5N
-         O9Ig==
-X-Gm-Message-State: AOJu0Yxy8UP62Nq0n8uUxLOmRLAlm7Jb+GTKW+mPk4wELICIpQa/xptl
-	ZeWQ1+E5xAXYvYGZknJ9F+dY2g==
-X-Google-Smtp-Source: AGHT+IHoDrqOJeHD3P8tw48u5vyH0Sw1wB8cwi01eZho9VrbWwPklDV2CqEV2k0vWTpPDakTgfwwRg==
-X-Received: by 2002:a05:651c:104c:b0:2b9:f13b:6139 with SMTP id x12-20020a05651c104c00b002b9f13b6139mr4288294ljm.20.1699520595911;
-        Thu, 09 Nov 2023 01:03:15 -0800 (PST)
+        bh=3LORq79d2KWiO2zsyhGNgwevjLWkh4YlRcW/4qVJO5g=;
+        b=bribbzm1EGdnJExH4Zr2/J3ClrfL5SVAXKsxnTWf5TL5jpt2kk+IQzja/cDrSGdkH2
+         w5KNaZam3GiwxiPwfxcFyzpoZOBmL2kHa+JM6UBaJCNCpKEPDGXjzAYfUIplIaP1ohlw
+         /8cCGRc6SmGvMdvaG9r73yrb0Mj1s/GIk3aLwRyRvGSFOPQgjxTula4trzOnUM2o3Umd
+         CJf1oUWS2tnX93URU3tGcjauFYAv2zsCjhl/ZAhRGRB3iN+lQaN5AfKRuRg5gAZETHuz
+         YrSaajPTELoEjpZsiKDrLCIjCv9kvbEfK3KUfsBO96/ykU9/HpQ1jPX/RgxFhTsPeJKl
+         bSXg==
+X-Gm-Message-State: AOJu0YzG6bwCFRhFG+8JcTNgD6J2LmpyLJa0vbM4UfGGZ2NJT41gxr59
+	RL29TtPmHqq3FI03UZGenFt9DzdAel/q8W7kjXQ=
+X-Google-Smtp-Source: AGHT+IF2mb2GZBOKU5NXn4xWX1KfmPMioQ/7KZHFjewuwHxEgnC77hOGACXU+QAP8LrJWhu2BAZcXw==
+X-Received: by 2002:a2e:80d6:0:b0:2c5:a21:8388 with SMTP id r22-20020a2e80d6000000b002c50a218388mr3713516ljg.29.1699520596806;
+        Thu, 09 Nov 2023 01:03:16 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id h19-20020a05651c159300b002bbacc6c523sm2212383ljq.49.2023.11.09.01.03.15
+        by smtp.gmail.com with ESMTPSA id h19-20020a05651c159300b002bbacc6c523sm2212383ljq.49.2023.11.09.01.03.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 01:03:15 -0800 (PST)
+        Thu, 09 Nov 2023 01:03:16 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 09 Nov 2023 10:03:13 +0100
-Subject: [PATCH net v4 2/3] net: ethernet: cortina: Handle large frames
+Date: Thu, 09 Nov 2023 10:03:14 +0100
+Subject: [PATCH net v4 3/3] net: ethernet: cortina: Fix MTU max setting
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231109-gemini-largeframe-fix-v4-2-6e611528db08@linaro.org>
+Message-Id: <20231109-gemini-largeframe-fix-v4-3-6e611528db08@linaro.org>
 References: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
 In-Reply-To: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
 To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
@@ -81,101 +81,81 @@ Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.12.4
 
-The Gemini ethernet controller provides hardware checksumming
-for frames up to 1514 bytes including ethernet headers but not
-FCS.
+The RX max frame size is over 10000 for the Gemini ethernet,
+but the TX max frame size is actually just 2047 (0x7ff after
+checking the datasheet). Reflect this in what we offer to Linux,
+cap the MTU at the TX max frame minus ethernet headers.
 
-If we start sending bigger frames (after first bumping up the MTU
-on both interfaces sending and receiving the frames), truncated
-packets start to appear on the target such as in this tcpdump
-resulting from ping -s 1474:
-
-23:34:17.241983 14:d6:4d:a8:3c:4f (oui Unknown) > bc:ae:c5:6b:a8:3d (oui Unknown),
-ethertype IPv4 (0x0800), length 1514: truncated-ip - 2 bytes missing!
-(tos 0x0, ttl 64, id 32653, offset 0, flags [DF], proto ICMP (1), length 1502)
-OpenWrt.lan > Fecusia: ICMP echo request, id 1672, seq 50, length 1482
-
-If we bypass the hardware checksumming and provide a software
-fallback, everything starts working fine up to the max TX MTU
-of 2047 bytes, for example ping -s2000 192.168.1.2:
-
-00:44:29.587598 bc:ae:c5:6b:a8:3d (oui Unknown) > 14:d6:4d:a8:3c:4f (oui Unknown),
-ethertype IPv4 (0x0800), length 2042:
-(tos 0x0, ttl 64, id 51828, offset 0, flags [none], proto ICMP (1), length 2028)
-Fecusia > OpenWrt.lan: ICMP echo reply, id 1683, seq 4, length 2008
-
-The bit enabling to bypass hardware checksum (or any of the
-"TSS" bits) are undocumented in the hardware reference manual.
-The entire hardware checksum unit appears undocumented. The
-conclusion that we need to use the "bypass" bit was found by
-trial-and-error.
-
-Since no hardware checksum will happen, we slot in a software
-checksum fallback.
-
-Check for the condition where we need to compute checksum on the
-skb with either hardware or software using == CHECKSUM_PARTIAL instead
-of != CHECKSUM_NONE which is an incomplete check according to
-<linux/skbuff.h>.
-
-On the D-Link DIR-685 router this fixes a bug on the conduit
-interface to the RTL8366RB DSA switch: as the switch needs to add
-space for its tag it increases the MTU on the conduit interface
-to 1504 and that means that when the router sends packages
-of 1500 bytes these get an extra 4 bytes of DSA tag and the
-transfer fails because of the erroneous hardware checksumming,
-affecting such basic functionality as the LuCI web interface.
+We delete the code disabling the hardware checksum for large
+MTUs as netdev->mtu can no longer be larger than
+netdev->max_mtu meaning the if()-clause in gmac_fix_features()
+is never true.
 
 Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- drivers/net/ethernet/cortina/gemini.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/cortina/gemini.c | 17 ++++-------------
+ drivers/net/ethernet/cortina/gemini.h |  2 +-
+ 2 files changed, 5 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
-index 5bdd1b252840..dbbccef86516 100644
+index dbbccef86516..636949737d72 100644
 --- a/drivers/net/ethernet/cortina/gemini.c
 +++ b/drivers/net/ethernet/cortina/gemini.c
-@@ -1145,6 +1145,7 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 	dma_addr_t mapping;
- 	unsigned short mtu;
- 	void *buffer;
-+	int ret;
+@@ -2000,15 +2000,6 @@ static int gmac_change_mtu(struct net_device *netdev, int new_mtu)
+ 	return 0;
+ }
  
- 	mtu  = ETH_HLEN;
- 	mtu += netdev->mtu;
-@@ -1159,9 +1160,30 @@ static int gmac_map_tx_bufs(struct net_device *netdev, struct sk_buff *skb,
- 		word3 |= mtu;
- 	}
+-static netdev_features_t gmac_fix_features(struct net_device *netdev,
+-					   netdev_features_t features)
+-{
+-	if (netdev->mtu + ETH_HLEN + VLAN_HLEN > MTU_SIZE_BIT_MASK)
+-		features &= ~GMAC_OFFLOAD_FEATURES;
+-
+-	return features;
+-}
+-
+ static int gmac_set_features(struct net_device *netdev,
+ 			     netdev_features_t features)
+ {
+@@ -2234,7 +2225,6 @@ static const struct net_device_ops gmac_351x_ops = {
+ 	.ndo_set_mac_address	= gmac_set_mac_address,
+ 	.ndo_get_stats64	= gmac_get_stats64,
+ 	.ndo_change_mtu		= gmac_change_mtu,
+-	.ndo_fix_features	= gmac_fix_features,
+ 	.ndo_set_features	= gmac_set_features,
+ };
  
--	if (skb->ip_summed != CHECKSUM_NONE) {
-+	if (skb->len >= ETH_FRAME_LEN) {
-+		/* Hardware offloaded checksumming isn't working on frames
-+		 * bigger than 1514 bytes. A hypothesis about this is that the
-+		 * checksum buffer is only 1518 bytes, so when the frames get
-+		 * bigger they get truncated, or the last few bytes get
-+		 * overwritten by the FCS.
-+		 *
-+		 * Just use software checksumming and bypass on bigger frames.
-+		 */
-+		if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+			ret = skb_checksum_help(skb);
-+			if (ret)
-+				return ret;
-+		}
-+		word1 |= TSS_BYPASS_BIT;
-+	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
- 		int tcp = 0;
+@@ -2486,11 +2476,12 @@ static int gemini_ethernet_port_probe(struct platform_device *pdev)
  
-+		/* We do not switch off the checksumming on non TCP/UDP
-+		 * frames: as is shown from tests, the checksumming engine
-+		 * is smart enough to see that a frame is not actually TCP
-+		 * or UDP and then just pass it through without any changes
-+		 * to the frame.
-+		 */
- 		if (skb->protocol == htons(ETH_P_IP)) {
- 			word1 |= TSS_IP_CHKSUM_BIT;
- 			tcp = ip_hdr(skb)->protocol == IPPROTO_TCP;
+ 	netdev->hw_features = GMAC_OFFLOAD_FEATURES;
+ 	netdev->features |= GMAC_OFFLOAD_FEATURES | NETIF_F_GRO;
+-	/* We can handle jumbo frames up to 10236 bytes so, let's accept
+-	 * payloads of 10236 bytes minus VLAN and ethernet header
++	/* We can receive jumbo frames up to 10236 bytes but only
++	 * transmit 2047 bytes so, let's accept payloads of 2047
++	 * bytes minus VLAN and ethernet header
+ 	 */
+ 	netdev->min_mtu = ETH_MIN_MTU;
+-	netdev->max_mtu = 10236 - VLAN_ETH_HLEN;
++	netdev->max_mtu = MTU_SIZE_BIT_MASK - VLAN_ETH_HLEN;
+ 
+ 	port->freeq_refill = 0;
+ 	netif_napi_add(netdev, &port->napi, gmac_napi_poll);
+diff --git a/drivers/net/ethernet/cortina/gemini.h b/drivers/net/ethernet/cortina/gemini.h
+index 99efb1155743..24bb989981f2 100644
+--- a/drivers/net/ethernet/cortina/gemini.h
++++ b/drivers/net/ethernet/cortina/gemini.h
+@@ -502,7 +502,7 @@ union gmac_txdesc_3 {
+ #define SOF_BIT			0x80000000
+ #define EOF_BIT			0x40000000
+ #define EOFIE_BIT		BIT(29)
+-#define MTU_SIZE_BIT_MASK	0x1fff
++#define MTU_SIZE_BIT_MASK	0x7ff /* Max MTU 2047 bytes */
+ 
+ /* GMAC Tx Descriptor */
+ struct gmac_txdesc {
 
 -- 
 2.34.1
