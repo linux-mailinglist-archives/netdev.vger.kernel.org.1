@@ -1,360 +1,278 @@
-Return-Path: <netdev+bounces-46755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E928A7E634E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 06:42:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D75B7E637A
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 06:59:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B093B20BAD
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 05:42:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B16BB20BDB
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 05:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462D8D279;
-	Thu,  9 Nov 2023 05:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF76BD287;
+	Thu,  9 Nov 2023 05:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JbILdzF9"
+	dkim=pass (1024-bit key) header.d=voleatech.de header.i=@voleatech.de header.b="NSm6iGpa"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90789D26F
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:42:00 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2B02590;
-	Wed,  8 Nov 2023 21:42:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699508521; x=1731044521;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=z51dALqJnDsmc80RwaJAZ6Svb33+i7AdIgXz9Zfhm74=;
-  b=JbILdzF9fkiEib9oXoIXaMExhzn6hSHWO819eKyJYv6v5O/27qRz7kNR
-   mlK+326/3AdCy2NrFo8BR/U054i/Ys69m8rrGASC5pdUczlTu7hvYnrWB
-   +YJ+mE3TkqMnut8IdOVxlVl/s8WW9YrYp73i4Gxo1tgq0sDrJnLwJSN7O
-   AH8tTwKGE1O6UjnngQjYzVTIBRUvG3Als0+m4mS3HoPOC7rFl8Lrh+G06
-   0S9gYk9ZPquTz0GNkL3ZcEZ5icrC6FMW8Ur2Sj+2BdiRO5mW5rsS4CeJ/
-   6WQYn0UPQbtWoAe57e2rH6kf7vVPisflG8y/hO8D3IGXszaSjOlKFffYT
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="369254048"
-X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="369254048"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2023 21:42:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="756788547"
-X-IronPort-AV: E=Sophos;i="6.03,288,1694761200"; 
-   d="scan'208";a="756788547"
-Received: from ssid-ilbpg3-teeminta.png.intel.com ([10.88.227.74])
-  by orsmga007.jf.intel.com with ESMTP; 08 Nov 2023 21:41:53 -0800
-From: Gan Yi Fang <yi.fang.gan@intel.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Johannes Zink <j.zink@pengutronix.de>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Looi Hong Aun <hong.aun.looi@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Gan Yi Fang <yi.fang.gan@intel.com>
-Subject: [PATCH net-next 1/1] net: stmmac: Add support for HW-accelerated VLAN stripping
-Date: Thu,  9 Nov 2023 13:38:31 +0800
-Message-Id: <20231109053831.2572699-1-yi.fang.gan@intel.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28DED27D
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 05:59:40 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2104.outbound.protection.outlook.com [40.107.22.104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F06342584
+	for <netdev@vger.kernel.org>; Wed,  8 Nov 2023 21:59:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yx9w7e8eK7c74bzHevdpoemyeBhvL8gfGkBzc+l/e1UBeWbTE2UhsWDu1QAPtg07BmKzU5MPvP9+rBgmBfvuypdOCPERc1cCt8abbPY9UgfxaPe5AcznWS8z3jnnFII4pZwAR74qmOWlYYHzhb4qbEYGi3ofttiePARyuoGDdlTfZVZ9rJFz7mR2TVDGyk4dnKYAH+m/MuWU8B+9fQeqOPkSxs2n5RdugZc8K7RUO3+gMIfLebqauTlZIptMERW8ecojfYWb2m9QyFnpiWMNygfVTUaP8XA9JcuYQKtWAugWFiibhjAPORA4ZTywkewzj2qQeAsoXIXwV6gl4grMuw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W0VQC91RscsHDjKB13XlOYAsug9a3jNh6iubmwGqsVY=;
+ b=ho3ox4W7sYoamzWRUr6UIZ42FPA43xWhxi3vhi+wceeCO9K2y5xL6uUeSkMjWS8CcNSqu1gpHPOqIhWwsBuIdZj6Etd2xwILjTAttIlxV0dhR6bqNaxlCB/yJw2/sh99bnwygIM61VS1JUcFKVdQxPEUSpGa5SzMg4Dk5pPuYeXlCqHg9QYs82Utr8sHeiFOvPIl0xVHhi4q0Z97/vsVSaMQwAb6gHHh3xAubmBnpTDU1dNaT1efNugts31RPVav6g5YIELxUZfzB8+AwzFB/V8LJ1P1kDF76nQl7JGCA86U+z2ENKnjBg7QEeqxe09zxCYN6+FhPKnxsaaKZlg7kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=voleatech.de; dmarc=pass action=none header.from=voleatech.de;
+ dkim=pass header.d=voleatech.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=voleatech.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W0VQC91RscsHDjKB13XlOYAsug9a3jNh6iubmwGqsVY=;
+ b=NSm6iGpaoVKkxjyb7F1l8e+wZ0emECsSzNQ1Uks1f4AG0Cyl38q91dOt/7wgskgkPdNK76rSwWxmAhbBftu71y1UbXbdUMnU83krTnPUO8idXClvSGtzF2SVe7nt85IqD4/L62Os7RyM55eqWHBh87pHX4pw11kjdUgGkJqX4iQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=voleatech.de;
+Received: from AS8PR05MB10778.eurprd05.prod.outlook.com
+ (2603:10a6:20b:632::13) by VE1PR05MB7552.eurprd05.prod.outlook.com
+ (2603:10a6:800:1ad::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.29; Thu, 9 Nov
+ 2023 05:59:34 +0000
+Received: from AS8PR05MB10778.eurprd05.prod.outlook.com
+ ([fe80::c38e:cf18:a498:7925]) by AS8PR05MB10778.eurprd05.prod.outlook.com
+ ([fe80::c38e:cf18:a498:7925%6]) with mapi id 15.20.6954.028; Thu, 9 Nov 2023
+ 05:59:33 +0000
+Date: Thu, 9 Nov 2023 06:59:26 +0100
+From: Sven Auhagen <sven.auhagen@voleatech.de>
+To: netdev@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com, brouer@redhat.com, lorenzo@kernel.org, 
+	ilias.apalodimas@linaro.org, mcroce@microsoft.com, leon@kernel.org, kuba@kernel.org
+Subject: [PATCH v4] net: mvneta: fix calls to page_pool_get_stats
+Message-ID: <4wba22pa6sxknqfxve42xevswz4wfu637p5gyyeq546tmzudzu@4z3kphfrpm64>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: AM4PR07CA0023.eurprd07.prod.outlook.com
+ (2603:10a6:205:1::36) To AS8PR05MB10778.eurprd05.prod.outlook.com
+ (2603:10a6:20b:632::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR05MB10778:EE_|VE1PR05MB7552:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52dc9ecb-7f65-417a-0dbe-08dbe0e90bdc
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PChcSu3MJ62EtKksY83c2liJjo0C7/51ojzOru3pmQdfU6U7QFTqxnvzK9UX9mdF+kdGqXhfgsOzNywHsfah1cTYzy173yRNUBmZlwTKQzosGXRUTM2U/RK0vrvnMcN8SPgeWqCUa8tRXIeHH5hEOPrjnt1rCMjyvGosAHY7afWwgCVE4lBAFKo+LpH2rrJkFM6nuJQBKrXizzOmU9ap4hoh2O+Bcr4lRu0YUlV0dD4sFkqvRcSB1YNwGu6XIA/xKaXjgG5TWcJpTsRh0d8EfAGAQrsp6Z0WdLEfN+FgfIWSBbRCJQ2alaY7IMNHG+AYzLfYsi7hIhoz8iBCMD8rMzV8C//5q/84fy4ahyu1zP6mM9jJxKodWhU+QKInxKWnepQUv6U/OdnI8BKgJaoWWA8YFUNJDLBF6YssrhSMLqnLcQR++xHWSyaO0Gh1UPh/EG60vY0vm0nNXtjFfE7X2FHqQMCXSQGdcTG7G34ccL0B/Fs0xAYQvfkHsrXYrdLd05cV/F8Do/9n0Fuu2nCbfb6DMR9Oyw/c6e9gCDUxwSV2t1VZXCghYV6WxD479oMO
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR05MB10778.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(396003)(136003)(376002)(39830400003)(64100799003)(451199024)(186009)(1800799009)(41300700001)(6506007)(6486002)(478600001)(86362001)(38100700002)(66476007)(83380400001)(66946007)(6512007)(6666004)(66556008)(26005)(9686003)(5660300002)(44832011)(8936002)(33716001)(4326008)(316002)(6916009)(2906002)(8676002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ALdYfqZ8AmGkUrY6L49GNZGWP3kDdnmiyTy6ITJPA10k/6eOQT82C547xnIS?=
+ =?us-ascii?Q?tmjcK1/ybbel4kMFZ03PuolVI6O4U9OtilkKRGui3vIj93esn3sr4fmar/Vm?=
+ =?us-ascii?Q?ti2Ot9jDnZZY2s6VaQ9UMiidTVEVc51GUl0yYrYD6kWYDkH/+ah9N5bmB419?=
+ =?us-ascii?Q?Amo26qpLGT7GXraidnuLyrA6FkwzgjxBtkxbbSBBS9009/+ZtoaKyO0eh4u7?=
+ =?us-ascii?Q?z4c5qZKV5l7cJBmeLknFMMlpWvcUqiEh/jx3vOKbAAHG9N1DP5aGebvJUcwM?=
+ =?us-ascii?Q?i+Fsr/2pVzMoYZb7REgGI5JvOwRsYB2RsfFAVxcs5D1mf731sJ99qHzs5O7Z?=
+ =?us-ascii?Q?3aUzdmrJbWy4PhZ9mgr3TWOvF5hA0jh97Io4u1lma5M9R+7RxOvzxE1uDTsL?=
+ =?us-ascii?Q?sLGY7VoOmWYiXfH435PmOeCp2dpZmIPpMTSL69vw3FtNKjQu3n3AyevsSC/5?=
+ =?us-ascii?Q?8Oe9F6uS3PZiuMoAb3BzzjI0JLFXf1zLdzcFkIqHuzwnrW1CXBObv6o4MepM?=
+ =?us-ascii?Q?lEcQTW0a1L2tPoZjM+9/OSFZ323x6K0kk8K7Y1G/KHONv15sZckxrfqNloyG?=
+ =?us-ascii?Q?wg9XWfU+/IQQzXFm99LBQWxYETbg1hjoIGtzGXC69IWqVa3Wh0nUHca9VLqs?=
+ =?us-ascii?Q?4ukFpc3TwWoHAlMS5aKo4zyvPQ2nFwfzy4iXjMWRKoStpGCmF3YLv6PQJcBO?=
+ =?us-ascii?Q?rYNdT8/1NhkZRBx3OVwZlHhCTcBC4ZnwXzp+1FlD9ft/irxDMHHdw/d9p0+3?=
+ =?us-ascii?Q?4SxtbMcir/FNZUGkYgVaXXv5ZahU7YEPIRRUWiWjQByW/6nagnf8GSzRxuK3?=
+ =?us-ascii?Q?gXNm+x5oq9qAnx2idit2CXSWNsh4ULzAAq8sU5TNI2mCrfUokqdDvzU7Fiuz?=
+ =?us-ascii?Q?Ed4rwA7rcs+IpvrRPFzxmUpHwvJiQmbnA7u4XAS7xkG/Ipx4adrRXF/TYXG0?=
+ =?us-ascii?Q?lx+LQ4pgZvwoUwRiSJDYcn99wLpKzh4DfsixOpC1M4/Ela3YAZOInTe/Z5on?=
+ =?us-ascii?Q?lD4fQs13j5BAZ866P6Dpa3bIXHdiYwaomyX76W3Yh9LcZZI4Phy/UfKHpbU6?=
+ =?us-ascii?Q?/uRw5n6QY0zzV6Q4efJpm8/OdE3gKb3aQPMGSwZzftSCe2CWaWpWv4xaZJ3G?=
+ =?us-ascii?Q?y3GnTyQOz9CYMR8SUti6KllI3oEilknpotPKiWNwPdxCRKUK861JhIlEZOeS?=
+ =?us-ascii?Q?moAypwaidaQUhXTwXApoTOM+k8zThfjNj8J0q5HPmqnR4Zm0FROpfJg6OkI5?=
+ =?us-ascii?Q?avCxqv3QkCRoQ3rRNgYnFO+XYqUmg+PQ4WS1tlaplTvFxfep4ue4FnVL4NPE?=
+ =?us-ascii?Q?LxJfj+9YbzZEjudGelwxImIk6scT9n1E1UI0r7IDN852fr8Y+vwBjnyofIkF?=
+ =?us-ascii?Q?x3e84q6JKg57WF4EFznq5h2lSULQeXLvu4lhaXqep7oTiflkt4YC1AygYGDL?=
+ =?us-ascii?Q?jGqqptq0lxfcwYwfHs0uiwaICEqYdxw5HK9kSn9r67va3uIHSKUlo9UJdDmi?=
+ =?us-ascii?Q?UTlJfJPRC5rhLTYr+2NEVlKtZfwAvAW80717XLQZjQEE6/IsCvIkzuLdnfNa?=
+ =?us-ascii?Q?RV+SQmcL2uzKm9+4CZjyonLSTBMcqaTzb3AHglSBIaFBh5iLv/HE3AUTQEHi?=
+ =?us-ascii?Q?fg=3D=3D?=
+X-OriginatorOrg: voleatech.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52dc9ecb-7f65-417a-0dbe-08dbe0e90bdc
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR05MB10778.eurprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 05:59:33.6724
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: b82a99f6-7981-4a72-9534-4d35298f847b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vXuc5BZHMgbsNMbxkKtrkz6A85ffKW/cUcVq2sci1gK26p7UTGjpmxVv02QuuNnVztTSVMyvqZnUWs4t5SFwy7Q07pp1J7Nx7seRnORvDcQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR05MB7552
 
-From: "Gan, Yi Fang" <yi.fang.gan@intel.com>
+Calling page_pool_get_stats in the mvneta driver without checks
+leads to kernel crashes.
+First the page pool is only available if the bm is not used.
+The page pool is also not allocated when the port is stopped.
+It can also be not allocated in case of errors.
 
-Current implementation supports driver level VLAN tag stripping only.
-The features is always on if CONFIG_VLAN_8021Q is enabled in kernel
-config and is not user configurable.
+The current implementation leads to the following crash calling
+ethstats on a port that is down or when calling it at the wrong moment:
 
-This patch add support to MAC level VLAN tag stripping and can be
-configured through ethtool. If the rx-vlan-offload is off, the VLAN tag
-will be stripped by driver. If the rx-vlan-offload is on, the VLAN tag
-will be stripped by MAC.
+ble to handle kernel NULL pointer dereference at virtual address 00000070
+[00000070] *pgd=00000000
+Internal error: Oops: 5 [#1] SMP ARM
+Hardware name: Marvell Armada 380/385 (Device Tree)
+PC is at page_pool_get_stats+0x18/0x1cc
+LR is at mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
+pc : [<c0b413cc>]    lr : [<bf0a98d8>]    psr: a0000013
+sp : f1439d48  ip : f1439dc0  fp : 0000001d
+r10: 00000100  r9 : c4816b80  r8 : f0d75150
+r7 : bf0b400c  r6 : c238f000  r5 : 00000000  r4 : f1439d68
+r3 : c2091040  r2 : ffffffd8  r1 : f1439d68  r0 : 00000000
+Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+Control: 10c5387d  Table: 066b004a  DAC: 00000051
+Register r0 information: NULL pointer
+Register r1 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
+Register r2 information: non-paged memory
+Register r3 information: slab kmalloc-2k start c2091000 pointer offset 64 size 2048
+Register r4 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
+Register r5 information: NULL pointer
+Register r6 information: slab kmalloc-cg-4k start c238f000 pointer offset 0 size 4096
+Register r7 information: 15-page vmalloc region starting at 0xbf0a8000 allocated at load_module+0xa30/0x219c
+Register r8 information: 1-page vmalloc region starting at 0xf0d75000 allocated at ethtool_get_stats+0x138/0x208
+Register r9 information: slab task_struct start c4816b80 pointer offset 0
+Register r10 information: non-paged memory
+Register r11 information: non-paged memory
+Register r12 information: 2-page vmalloc region starting at 0xf1438000 allocated at kernel_clone+0x9c/0x390
+Process snmpd (pid: 733, stack limit = 0x38de3a88)
+Stack: (0xf1439d48 to 0xf143a000)
+9d40:                   000000c0 00000001 c238f000 bf0b400c f0d75150 c4816b80
+9d60: 00000100 bf0a98d8 00000000 00000000 00000000 00000000 00000000 00000000
+9d80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+9da0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+9dc0: 00000dc0 5335509c 00000035 c238f000 bf0b2214 01067f50 f0d75000 c0b9b9c8
+9de0: 0000001d 00000035 c2212094 5335509c c4816b80 c238f000 c5ad6e00 01067f50
+9e00: c1b0be80 c4816b80 00014813 c0b9d7f0 00000000 00000000 0000001d 0000001d
+9e20: 00000000 00001200 00000000 00000000 c216ed90 c73943b8 00000000 00000000
+9e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+9e60: 00000000 c0ad9034 00000000 00000000 00000000 00000000 00000000 00000000
+9e80: 00000000 00000000 00000000 5335509c c1b0be80 f1439ee4 00008946 c1b0be80
+9ea0: 01067f50 f1439ee3 00000000 00000046 b6d77ae0 c0b383f0 00008946 becc83e8
+9ec0: c1b0be80 00000051 0000000b c68ca480 c7172d00 c0ad8ff0 f1439ee3 cf600e40
+9ee0: 01600e40 32687465 00000000 00000000 00000000 01067f50 00000000 00000000
+9f00: 00000000 5335509c 00008946 00008946 00000000 c68ca480 becc83e8 c05e2de0
+9f20: f1439fb0 c03002f0 00000006 5ac3c35a c4816b80 00000006 b6d77ae0 c030caf0
+9f40: c4817350 00000014 f1439e1c 0000000c 00000000 00000051 01000000 00000014
+9f60: 00003fec f1439edc 00000001 c0372abc b6d77ae0 c0372abc cf600e40 5335509c
+9f80: c21e6800 01015c9c 0000000b 00008946 00000036 c03002f0 c4816b80 00000036
+9fa0: b6d77ae0 c03000c0 01015c9c 0000000b 0000000b 00008946 becc83e8 00000000
+9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d77ae0
+9fe0: b6dbf738 becc838c b6d186d7 b6baa858 40000030 0000000b 00000000 00000000
+ page_pool_get_stats from mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
+ mvneta_ethtool_get_stats [mvneta] from ethtool_get_stats+0x154/0x208
+ ethtool_get_stats from dev_ethtool+0xf48/0x2480
+ dev_ethtool from dev_ioctl+0x538/0x63c
+ dev_ioctl from sock_ioctl+0x49c/0x53c
+ sock_ioctl from sys_ioctl+0x134/0xbd8
+ sys_ioctl from ret_fast_syscall+0x0/0x1c
+Exception stack(0xf1439fa8 to 0xf1439ff0)
+9fa0:                   01015c9c 0000000b 0000000b 00008946 becc83e8 00000000
+9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d77ae0
+9fe0: b6dbf738 becc838c b6d186d7 b6baa858
+Code: e28dd004 e1a05000 e2514000 0a00006a (e5902070)
 
-Command: ethtool -K enp0s30f4 rx-vlan-offload off | on
+This commit adds the proper checks before calling page_pool_get_stats.
 
-Signed-off-by: Gan, Yi Fang <yi.fang.gan@intel.com>
-Signed-off-by: Lai Peter Jun Ann <jun.ann.lai@intel.com>
+Fixes: b3fc79225f05 ("net: mvneta: add support for page_pool_get_stats")
+Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
+Reported-by: Paulo Da Silva <Paulo.DaSilva@kyberna.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c |  3 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 35 +++++++++++++++++++
- .../ethernet/stmicro/stmmac/dwmac4_descs.c    | 13 +++++++
- drivers/net/ethernet/stmicro/stmmac/hwif.h    | 15 ++++++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 24 ++++++++++++-
- include/linux/stmmac.h                        |  1 +
- 7 files changed, 90 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index e3f650e88f82..6b935922054d 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -580,6 +580,7 @@ struct mac_device_info {
- 	u32 vlan_filter[32];
- 	bool vlan_fail_q_en;
- 	u8 vlan_fail_q;
-+	bool hw_vlan_en;
- };
- 
- struct stmmac_rx_routing {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-index 60283543ffc8..651fee867aac 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
-@@ -457,7 +457,8 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
- 	plat->has_gmac = 0;
- 	plat->has_gmac4 = 1;
- 	plat->force_sf_dma_mode = 0;
--	plat->flags |= (STMMAC_FLAG_TSO_EN | STMMAC_FLAG_SPH_DISABLE);
-+	plat->flags |= (STMMAC_FLAG_TSO_EN | STMMAC_FLAG_SPH_DISABLE |
-+			STMMAC_FLAG_HW_VLAN_EN);
- 
- 	/* Multiplying factor to the clk_eee_i clock time
- 	 * period to make it closer to 100 ns. This value
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-index c6ff1fa0e04d..6a8d7873b456 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-@@ -1134,6 +1134,35 @@ static int dwmac4_config_l4_filter(struct mac_device_info *hw, u32 filter_no,
- 	return 0;
- }
- 
-+static void dwmac4_rx_hw_vlan(struct mac_device_info *hw,
-+			      struct dma_desc *rx_desc, struct sk_buff *skb)
-+{
-+	if (hw->desc->get_rx_vlan_valid(rx_desc)) {
-+		u16 vid = (u16)hw->desc->get_rx_vlan_tci(rx_desc);
-+
-+		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vid);
-+	}
-+}
-+
-+static void dwmac4_set_hw_vlan_mode(struct mac_device_info *hw)
-+{
-+	void __iomem *ioaddr = hw->pcsr;
-+	u32 value = readl(ioaddr + GMAC_VLAN_TAG);
-+
-+	value &= ~GMAC_VLAN_TAG_CTRL_EVLS_MASK;
-+
-+	if (hw->hw_vlan_en)
-+		/* Always strip VLAN on Receive */
-+		value |= GMAC_VLAN_TAG_STRIP_ALL;
-+	else
-+		/* Do not strip VLAN on Receive */
-+		value |= GMAC_VLAN_TAG_STRIP_NONE;
-+
-+	/* Enable outer VLAN Tag in Rx DMA descriptor */
-+	value |= GMAC_VLAN_TAG_CTRL_EVLRXS;
-+	writel(value, ioaddr + GMAC_VLAN_TAG);
-+}
-+
- const struct stmmac_ops dwmac4_ops = {
- 	.core_init = dwmac4_core_init,
- 	.phylink_get_caps = dwmac4_phylink_get_caps,
-@@ -1175,6 +1204,8 @@ const struct stmmac_ops dwmac4_ops = {
- 	.add_hw_vlan_rx_fltr = dwmac4_add_hw_vlan_rx_fltr,
- 	.del_hw_vlan_rx_fltr = dwmac4_del_hw_vlan_rx_fltr,
- 	.restore_hw_vlan_rx_fltr = dwmac4_restore_hw_vlan_rx_fltr,
-+	.rx_hw_vlan = dwmac4_rx_hw_vlan,
-+	.set_hw_vlan_mode = dwmac4_set_hw_vlan_mode,
- };
- 
- const struct stmmac_ops dwmac410_ops = {
-@@ -1224,6 +1255,8 @@ const struct stmmac_ops dwmac410_ops = {
- 	.add_hw_vlan_rx_fltr = dwmac4_add_hw_vlan_rx_fltr,
- 	.del_hw_vlan_rx_fltr = dwmac4_del_hw_vlan_rx_fltr,
- 	.restore_hw_vlan_rx_fltr = dwmac4_restore_hw_vlan_rx_fltr,
-+	.rx_hw_vlan = dwmac4_rx_hw_vlan,
-+	.set_hw_vlan_mode = dwmac4_set_hw_vlan_mode,
- };
- 
- const struct stmmac_ops dwmac510_ops = {
-@@ -1277,6 +1310,8 @@ const struct stmmac_ops dwmac510_ops = {
- 	.add_hw_vlan_rx_fltr = dwmac4_add_hw_vlan_rx_fltr,
- 	.del_hw_vlan_rx_fltr = dwmac4_del_hw_vlan_rx_fltr,
- 	.restore_hw_vlan_rx_fltr = dwmac4_restore_hw_vlan_rx_fltr,
-+	.rx_hw_vlan = dwmac4_rx_hw_vlan,
-+	.set_hw_vlan_mode = dwmac4_set_hw_vlan_mode,
- };
- 
- static u32 dwmac4_get_num_vlan(void __iomem *ioaddr)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-index 89a14084c611..a01d71dfed6c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-@@ -198,6 +198,17 @@ static int dwmac4_get_tx_ls(struct dma_desc *p)
- 		>> TDES3_LAST_DESCRIPTOR_SHIFT;
- }
- 
-+static inline int dwmac4_wrback_get_rx_vlan_tci(struct dma_desc *p)
-+{
-+	return (le32_to_cpu(p->des0) & RDES0_VLAN_TAG_MASK);
-+}
-+
-+static inline bool dwmac4_wrback_get_rx_vlan_valid(struct dma_desc *p)
-+{
-+	return ((le32_to_cpu(p->des3) & RDES3_LAST_DESCRIPTOR) &&
-+		(le32_to_cpu(p->des3) & RDES3_RDES0_VALID));
-+}
-+
- static int dwmac4_wrback_get_rx_frame_len(struct dma_desc *p, int rx_coe)
+Change from v3:
+	* Move the page pool check back to mvneta
+
+Change from v2:
+	* Fix the fixes tag
+
+Change from v1:
+	* Add cover letter
+	* Move the page pool check in mvneta to the ethtool stats
+	  function
+
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 8b0f12a0e0f2..bbb5d972657a 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -4734,13 +4734,16 @@ static void mvneta_ethtool_get_strings(struct net_device *netdev, u32 sset,
  {
- 	return (le32_to_cpu(p->des3) & RDES3_PACKET_SIZE_MASK);
-@@ -551,6 +562,8 @@ const struct stmmac_desc_ops dwmac4_desc_ops = {
- 	.set_tx_owner = dwmac4_set_tx_owner,
- 	.set_rx_owner = dwmac4_set_rx_owner,
- 	.get_tx_ls = dwmac4_get_tx_ls,
-+	.get_rx_vlan_tci = dwmac4_wrback_get_rx_vlan_tci,
-+	.get_rx_vlan_valid = dwmac4_wrback_get_rx_vlan_valid,
- 	.get_rx_frame_len = dwmac4_wrback_get_rx_frame_len,
- 	.enable_tx_timestamp = dwmac4_rd_enable_tx_timestamp,
- 	.get_tx_timestamp_status = dwmac4_wrback_get_tx_timestamp_status,
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-index b95d3e137813..5a079dae1380 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-@@ -56,6 +56,10 @@ struct stmmac_desc_ops {
- 	void (*set_tx_ic)(struct dma_desc *p);
- 	/* Last tx segment reports the transmit status */
- 	int (*get_tx_ls)(struct dma_desc *p);
-+	/* Get the tag of the descriptor */
-+	int (*get_rx_vlan_tci)(struct dma_desc *p);
-+	/* Get the valid status of descriptor */
-+	bool (*get_rx_vlan_valid)(struct dma_desc *p);
- 	/* Return the transmit status looking at the TDES1 */
- 	int (*tx_status)(struct stmmac_extra_stats *x,
- 			 struct dma_desc *p, void __iomem *ioaddr);
-@@ -117,6 +121,10 @@ struct stmmac_desc_ops {
- 	stmmac_do_void_callback(__priv, desc, set_tx_ic, __args)
- #define stmmac_get_tx_ls(__priv, __args...) \
- 	stmmac_do_callback(__priv, desc, get_tx_ls, __args)
-+#define stmmac_get_rx_vlan_tci(__priv, __args...) \
-+	stmmac_do_callback(__priv, desc, get_rx_vlan_tci, __args)
-+#define stmmac_get_rx_vlan_valid(__priv, __args...) \
-+	stmmac_do_callback(__priv, desc, get_rx_vlan_valid, __args)
- #define stmmac_tx_status(__priv, __args...) \
- 	stmmac_do_callback(__priv, desc, tx_status, __args)
- #define stmmac_get_tx_len(__priv, __args...) \
-@@ -388,6 +396,9 @@ struct stmmac_ops {
- 	void (*update_vlan_hash)(struct mac_device_info *hw, u32 hash,
- 				 __le16 perfect_match, bool is_double);
- 	void (*enable_vlan)(struct mac_device_info *hw, u32 type);
-+	void (*rx_hw_vlan)(struct mac_device_info *hw, struct dma_desc *rx_desc,
-+			   struct sk_buff *skb);
-+	void (*set_hw_vlan_mode)(struct mac_device_info *hw);
- 	int (*add_hw_vlan_rx_fltr)(struct net_device *dev,
- 				   struct mac_device_info *hw,
- 				   __be16 proto, u16 vid);
-@@ -497,6 +508,10 @@ struct stmmac_ops {
- 	stmmac_do_void_callback(__priv, mac, update_vlan_hash, __args)
- #define stmmac_enable_vlan(__priv, __args...) \
- 	stmmac_do_void_callback(__priv, mac, enable_vlan, __args)
-+#define stmmac_rx_hw_vlan(__priv, __args...) \
-+	stmmac_do_void_callback(__priv, mac, rx_hw_vlan, __args)
-+#define stmmac_set_hw_vlan_mode(__priv, __args...) \
-+	stmmac_do_void_callback(__priv, mac, set_hw_vlan_mode, __args)
- #define stmmac_add_hw_vlan_rx_fltr(__priv, __args...) \
- 	stmmac_do_callback(__priv, mac, add_hw_vlan_rx_fltr, __args)
- #define stmmac_del_hw_vlan_rx_fltr(__priv, __args...) \
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 3e50fd53a617..62299ec5179f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3469,6 +3469,9 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
- 	/* Start the ball rolling... */
- 	stmmac_start_all_dma(priv);
+ 	if (sset == ETH_SS_STATS) {
+ 		int i;
++		struct mvneta_port *pp = netdev_priv(netdev);
  
-+	if (priv->hw->hw_vlan_en)
-+		stmmac_set_hw_vlan_mode(priv, priv->hw);
-+
- 	if (priv->dma_cap.fpesel) {
- 		stmmac_fpe_start_wq(priv);
+ 		for (i = 0; i < ARRAY_SIZE(mvneta_statistics); i++)
+ 			memcpy(data + i * ETH_GSTRING_LEN,
+ 			       mvneta_statistics[i].name, ETH_GSTRING_LEN);
  
-@@ -5508,7 +5511,14 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 		/* Got entire packet into SKB. Finish it. */
- 
- 		stmmac_get_rx_hwtstamp(priv, p, np, skb);
--		stmmac_rx_vlan(priv->dev, skb);
-+
-+		if (priv->hw->hw_vlan_en)
-+			/* MAC level stripping. */
-+			stmmac_rx_hw_vlan(priv, priv->hw, p, skb);
-+		else
-+			/* Driver level stripping. */
-+			stmmac_rx_vlan(priv->dev, skb);
-+
- 		skb->protocol = eth_type_trans(skb, priv->dev);
- 
- 		if (unlikely(!coe))
-@@ -5817,6 +5827,14 @@ static int stmmac_set_features(struct net_device *netdev,
- 			stmmac_enable_sph(priv, priv->ioaddr, sph_en, chan);
+-		data += ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
+-		page_pool_ethtool_stats_get_strings(data);
++		if (!pp->bm_priv) {
++			data += ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
++			page_pool_ethtool_stats_get_strings(data);
++		}
  	}
- 
-+	if ((features & NETIF_F_HW_VLAN_CTAG_RX) &&
-+	    (priv->plat->flags & STMMAC_FLAG_HW_VLAN_EN))
-+		priv->hw->hw_vlan_en = true;
-+	else
-+		priv->hw->hw_vlan_en = false;
-+
-+	stmmac_set_hw_vlan_mode(priv, priv->hw);
-+
- 	return 0;
  }
  
-@@ -7146,6 +7164,8 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
- 			 "Enable RX Mitigation via HW Watchdog Timer\n");
- 	}
+@@ -4858,8 +4861,10 @@ static void mvneta_ethtool_pp_stats(struct mvneta_port *pp, u64 *data)
+ 	struct page_pool_stats stats = {};
+ 	int i;
  
-+	priv->hw->hw_vlan_en = (priv->plat->flags & STMMAC_FLAG_HW_VLAN_EN);
-+
- 	return 0;
+-	for (i = 0; i < rxq_number; i++)
+-		page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
++	for (i = 0; i < rxq_number; i++) {
++		if (pp->rxqs[i].page_pool)
++			page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
++	}
+ 
+ 	page_pool_ethtool_stats_get(data, &stats);
+ }
+@@ -4875,14 +4880,21 @@ static void mvneta_ethtool_get_stats(struct net_device *dev,
+ 	for (i = 0; i < ARRAY_SIZE(mvneta_statistics); i++)
+ 		*data++ = pp->ethtool_stats[i];
+ 
+-	mvneta_ethtool_pp_stats(pp, data);
++	if (!pp->bm_priv && !pp->is_stopped)
++		mvneta_ethtool_pp_stats(pp, data);
  }
  
-@@ -7515,6 +7535,8 @@ int stmmac_dvr_probe(struct device *device,
- #ifdef STMMAC_VLAN_TAG_USED
- 	/* Both mac100 and gmac support receive VLAN tag detection */
- 	ndev->features |= NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_STAG_RX;
-+	ndev->hw_features |= NETIF_F_HW_VLAN_CTAG_RX;
+ static int mvneta_ethtool_get_sset_count(struct net_device *dev, int sset)
+ {
+-	if (sset == ETH_SS_STATS)
+-		return ARRAY_SIZE(mvneta_statistics) +
+-		       page_pool_ethtool_stats_get_count();
++	if (sset == ETH_SS_STATS) {
++		int count = ARRAY_SIZE(mvneta_statistics);
++		struct mvneta_port *pp = netdev_priv(dev);
 +
- 	if (priv->dma_cap.vlhash) {
- 		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
- 		ndev->features |= NETIF_F_HW_VLAN_STAG_FILTER;
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 0b4658a7eceb..1cf78e6bca5e 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -220,6 +220,7 @@ struct dwmac4_addrs {
- #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
- #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
- #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
-+#define STMMAC_FLAG_HW_VLAN_EN			BIT(13)
++		if (!pp->bm_priv)
++			count += page_pool_ethtool_stats_get_count();
++
++		return count;
++	}
  
- struct plat_stmmacenet_data {
- 	int bus_id;
+ 	return -EOPNOTSUPP;
+ }
 -- 
-2.34.1
+2.42.0
 
 
