@@ -1,235 +1,247 @@
-Return-Path: <netdev+bounces-46888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E360D7E6EE9
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:33:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9987E6EF9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:37:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59451B20BCE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:33:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D5361F212BD
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 16:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B4622308;
-	Thu,  9 Nov 2023 16:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDA7EC0;
+	Thu,  9 Nov 2023 16:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qrmwg5l8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2Yf9Bsy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AC9225CD
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:33:40 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64AB03C28
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:33:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699547620; x=1731083620;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WGrzpoSL+tjZwECiZ1HAee0v6K260Q8LnJ71Ouj4SmE=;
-  b=Qrmwg5l8hKuWwbGbD9rw6OF+iUctI/G86hzsxLefngdwfdi9fjbc0BSg
-   RMq4yxByTBmnbwTUvRyR7pbCCbBSG0AH+OYM5Cd5VRvVPwd8tW5TmXlZo
-   /lR4m6dvjzCdc1OLWcUEum032vrVatCnRk4alraUyV576sZs+QS1Qao7I
-   bexE79OFchiMBuhWNiryOA8o2qSzBuow+5yFJ1NckZbv5nlh39C9spBBB
-   Rw7sqlBbn1xPXR/4FaUdaQUYggvhSm+ca9YDdp5tRAQWR+lNkLkN/bHRu
-   y6Zfdfx1rSaCauL5rYFWSXRRGe/O1jO8o79IP2M4i/KHgVUYPSEYedg7b
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="393929703"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="393929703"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 08:33:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="798360875"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="798360875"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 08:33:39 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 08:33:38 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 08:33:37 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 08:33:37 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 9 Nov 2023 08:33:37 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ny0zQV5JG2bYXCc0H5Df41lhHu+VIY3vlfyVCDMESPPt8JUqFT3AuWScUdJx0Po1t7GfnGR1vj/EvLSQwYvVu6FnqlLnSPRrap5n/MGWyM5HJHCMQw6IxPeKyLzPIuL7iGQ0tv+Qrj6Tl4MjD0hYXluArBQzmjC+31djn0jlY1gCXJVLdb9tHo3X+SQHr6DxWClxJtbv4BF0Fiy1jbq2jNBT1xt8kERTksTho06V1Ae93BnKtnZy4GDgJMMqWebQ01hAK6HjFEt/84l2bTxjGrYPp+hvuF8w8Yb6IggkFmqrUUPabdi1Crp8vTu00CoJg71oFrysFUFcg4vyDapghQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eEHdcmJdIAmmnTYEwd6dekeY4xJO28VN5dB8etzFV28=;
- b=YM+PFEIr2AgeFHfxvFWLfvxovFjJ/xcCNdVmQ6k5PBl587xKmlFYfXT0xw9MUHF1lfEI/DVv6cQyKU8VwInkeYBBIhUFa0+BR6ReDDcYzK2fmqn0Jr5QeMWcAgkA5Uhfo3g17Ugv2SzAf5NEcaqkgPhSgiSh9SdeQgoRhGxcOncE2fI+OcYDMxB7KdYR9KcaFG9PTReKLbtStjH/cByQXDWD2cR8ijppQ6Wb2ZCn9W6EAxjaVrMNF+hQCBzF7KEB0zB9FkjwXEzLJuWxfyGJjIX1pArxWiQdT0h4Ap1W14Z5lC7Ere2XvpsTY6E1z9ZxEE+FUb6I55gr16WncfiYAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- DS0PR11MB6469.namprd11.prod.outlook.com (2603:10b6:8:c3::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6977.18; Thu, 9 Nov 2023 16:33:35 +0000
-Received: from DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::fe1c:922f:987:85ab]) by DM6PR11MB4657.namprd11.prod.outlook.com
- ([fe80::fe1c:922f:987:85ab%4]) with mapi id 15.20.6954.029; Thu, 9 Nov 2023
- 16:33:35 +0000
-From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Michalik, Michal"
-	<michal.michalik@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
-Subject: RE: [PATCH net 1/3] dpll: fix pin dump crash after module unbind
-Thread-Topic: [PATCH net 1/3] dpll: fix pin dump crash after module unbind
-Thread-Index: AQHaEi9O+MhpyYqtOE+7KgFNzKw5JbBwho0AgAE4RKCAADstgIAANcfw
-Date: Thu, 9 Nov 2023 16:33:35 +0000
-Message-ID: <DM6PR11MB46579E6553D7C7DF5B37BD4C9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-2-arkadiusz.kubalewski@intel.com>
- <ZUukeokxH2NVvmpe@nanopsycho>
- <DM6PR11MB46576110B45D806064F437C49BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZUzcEdhmnBVdXsBD@nanopsycho>
-In-Reply-To: <ZUzcEdhmnBVdXsBD@nanopsycho>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|DS0PR11MB6469:EE_
-x-ms-office365-filtering-correlation-id: c3718ab1-7bc9-43c5-922f-08dbe1419ea4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DwXy6vg9Gts3j6qF24w9z4QuQcaunUNsTA3cH4rJToVV2fez0bVU/Qw9My+Y2zPxOM5cRWMHAEAOFiA9a8+iDGx0y5Fqi/GreEcQEohKwUkww9J1R4phijN6shNDKuR31LV7jxsjDh4wcdS6uRmdxOzu2WdqCXEEtINCWiKS20U6TI+gkeRbDvF7L30lC3gW4GCUbs5YTpamnaF1j8e3NUg0LAWtkWIhEZciiM46krJxwOwRJyW7F8o26SzRN0beM0VhKFB/bVQCrHNGzkUjRkELqf6NkY4jYEVwe70Rb6E/oNHkj3TuBL6KtGAqGvPgZybc/KPuFRROLUKyytw/IzXCFmbPOYGA7XE5sqagOnoAHZpoR+nXUK+hZ2qk5nQwVhaKMC8CM7Zk5kV313umSlWlA673uYczdMbF0nUNHd2dOFbQ3y1VvMeW7nvBQ4J//DZzU5G6S48/ELF8qysgkBwfIFNo1rh4mdqSFiC+pfHFTinLxKilYQeZmf9aicb9czsR0BSmyZ/uSS/+PN1hNoczfj3S8W+V83TvPAqWolt/m2PYk+xy+X8rYPlj76I06Qc8VzbZmfIXrWfIsptaAxq1Q1SzSh7YOootA4AUYVpDsvD6/eVlztg/PuMSK4/A
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(346002)(376002)(366004)(136003)(230922051799003)(186009)(1800799009)(64100799003)(451199024)(316002)(76116006)(66476007)(66946007)(66446008)(54906003)(64756008)(9686003)(7696005)(6506007)(26005)(478600001)(71200400001)(82960400001)(83380400001)(33656002)(122000001)(38100700002)(86362001)(66556008)(6916009)(38070700009)(52536014)(41300700001)(2906002)(55016003)(5660300002)(8676002)(8936002)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cjRZajiOOxQ56Lb2ijOuKbnOGPSnju3enDzjCuL/v6Lr/WSoWWlcuKy8eo8G?=
- =?us-ascii?Q?JvKHVYHG6Lj+7NjPs/FaJ428Q7moaOu48RtNI2Yf+t8uOGLUPLErwzkZuh+k?=
- =?us-ascii?Q?P5WtGfLekTrKw92+ujMnayo3CH0bvFxOPpwx6uu9t3bYcG/SjoWo1KjDFYOC?=
- =?us-ascii?Q?IpByYHfmZdyqA8mG4TKn7UDtU3eypX2XCGfU8UqRH2lOE1cuje3cU0UlO06T?=
- =?us-ascii?Q?i3Cn5o1RfBZQuQ+44Wy//hVdp2QMCn6z6ol4Ufmv85M/XvyuyW8/tXMO+O4X?=
- =?us-ascii?Q?qEmLd6RjNhpFO+ZWocbs+vg5bHsCmjJi53AeWwaJ6XvENFmskw0b5ZDt0JCX?=
- =?us-ascii?Q?2qf7GRX1kqZontJqbBDeQHJXIIhPzCFiUoR0ugrRYE3xNnuny7a8qMZVoGNM?=
- =?us-ascii?Q?J6XULG7lo0Vgzz4gYEGihTnDexSkjp4RowLW4IiKW/45BhA2LPnmtodfoqeW?=
- =?us-ascii?Q?C1LK0+NGY/0rk+uQD9AqwvzKaKpcdSQj1gWFB+D+CVk9Hg/32pClEIVgXngr?=
- =?us-ascii?Q?/aRpzpGIpEL/7SE6YqSRjck1FRR2JqZ6OL39kXY40+W6BZKNKejWJ+edzUfG?=
- =?us-ascii?Q?4DI2Ts176EheAYfzo2z3GYPpDXmjh36/s7s/IkwmReU3J5NoXdO6QEsRFNeh?=
- =?us-ascii?Q?l2MmP4JqTYEC7rITIrgKkwX3UfYszgSPIsk4bnSylJvtHRhSiZI/FC8JbGXB?=
- =?us-ascii?Q?9qxB6B1+od/iJbJnEB45N3xyqsvnMXqEb1zoJpo7x22K4STac73zbW4GGgHm?=
- =?us-ascii?Q?QvqL0z8W61N7cv1OFsDUf3tL0ZoT7qKOmepED+mAccvfB/cfFExgGpWeXgGq?=
- =?us-ascii?Q?H5G2BWjBvqkKCi2QRilKwW6B08yLPu3sN6Rkjz+5blZydWwWooLzqxqs5fC9?=
- =?us-ascii?Q?rxWehpM1mMiV/K7NEO2zg5ICH+tdLV5nBrezmNNyteBKIs6VHB/iPmW50qbz?=
- =?us-ascii?Q?zqFekfJreLG2e7xmOa44eflFKcoe2nrUSrLzwQsu+oIUk6BOZ7yzfitoUgGO?=
- =?us-ascii?Q?Pypu4u27P+kzXWeLKPhdc5h2LJcpoXCfvTWIdwuGSlQHqJMLi0NY/c6Z5Fk4?=
- =?us-ascii?Q?IBq7mT6HXEaR+WR0/qi48IqXsTdGak8SU13WvMi/k+N15zmM+KQZ/PK1jrVL?=
- =?us-ascii?Q?JXIVrosnKw1P5Edk5YhmE+yteg8NwlrHanbz2IUdZR6qFTcezmYFv/yG67FU?=
- =?us-ascii?Q?H7Q0sfKh6lLaTCle0niFNZE/KYbVYAsvbaRErhFiuboRyuWKsa6Wx7/jPMpS?=
- =?us-ascii?Q?a0nVRCqH5+tBwh+TXs1UE/6DA2uaAhSZOeuQW+Fjg6tJxZhEaqKww7gml2Rz?=
- =?us-ascii?Q?WlRAe3MMNs7Iw8UXbv2DOZlR4xVrtIE78vpC5LV/MYaXO1AJ0Qlq8lcT6LmQ?=
- =?us-ascii?Q?Q+6InHqC3tU+uhVjkxITgnomYaKv2o8bQqmtw27B7WbloZnY0gGp8K0gxahT?=
- =?us-ascii?Q?FUvNcWT0ySte2TTygXrKqEpOx1Ku2ZBvjHoZC3sD9LTsGuSrLP+tdmCjpMNJ?=
- =?us-ascii?Q?1S+N+w2X9jnfuZzi6X0a50qDaG/70ivAVgFeoDHf5mNrva3+SecKguAd6E8x?=
- =?us-ascii?Q?G6Fnyb4W59yGTmvmP88WJ6d5qfm6LsHhrHlBqSMEjAo5Er1jmdmM0VGNZCyM?=
- =?us-ascii?Q?zQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD362233D
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 16:37:09 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D7830C0;
+	Thu,  9 Nov 2023 08:37:08 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9c2a0725825so184114966b.2;
+        Thu, 09 Nov 2023 08:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699547827; x=1700152627; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ELLAT455rlK2Wp5mHeL2SjOOXY/6fk9G0bSVgD3Qnzw=;
+        b=V2Yf9BsyCakucvL1HxDpF09L0xyqclGFqFUnfKKeHHiCkGXopzYz/j51rfB236PiRa
+         oTSVSPjdZ/53FcW+2GKMsN2FFIv10SEBcs26vWWCz7Yhs0c6BArBrrIsMemZ5zqKBCBJ
+         R7iS14Bi+D2WRsinPfeZjAbx2s8JxX4ysNL0fXGjJd0KlM1qYzOCvpvPILSIOKzzKk2V
+         wHrteAnn/UOE8waDjns55eUpFMQgPkVv4elpvSC6Rvi9rT0ok/tSG35eVY06ZEp+GZAS
+         Zms643Fo5dp7IkFfFHvsoUFpfvPgIgBaG5Yv+YybdXqb4l8yP0nsSfSvHRrj7PDM5rml
+         518A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699547827; x=1700152627;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ELLAT455rlK2Wp5mHeL2SjOOXY/6fk9G0bSVgD3Qnzw=;
+        b=ZnFaTobp6yb7oysGpFP+5/r0vXQmNkqxEtezwzIyKpeFnFHHlZIsXhfwJ4fjz3ggwR
+         TqAHWYKnOvG2eNKHvUMHa57DriBBcB45mFAFd+63266m0BxbQUmLp/wSVE9bgt0z/edZ
+         qPabBSgX80EDaO4ZFZAYTxTgJDKJDAbGFCsRCPiu2QlXR08v+F8FXCavxuJibjzR7sKk
+         4aoLSMLgVgKviKClnsNci4h7nP/YIr9HJgo12tu4Al/JuQQOzOnktDbTz4w4C4A30afL
+         u50d9p8pGBPi6NH46Tnosmn3M/WuxcClHoOEuPP6aPotGaAuBLWT8IUZh9jzgW7gXeJW
+         4pDw==
+X-Gm-Message-State: AOJu0Yy+I2oOqhzTeDXoMQYDzL9xhK++tRgAnRVGXD3TVceuoHwThGkh
+	Ys0DEgYk+Jqle/3qvcbptKo=
+X-Google-Smtp-Source: AGHT+IEotSTzQvzd5+jXTLfTdEibaXwQ0HxGDF+VbzVQMHI4nRfvyL7IOlRMU9KjY3xqJEDWBNsFRA==
+X-Received: by 2002:a17:906:fe02:b0:9ae:5370:81d5 with SMTP id wy2-20020a170906fe0200b009ae537081d5mr4371522ejb.41.1699547826372;
+        Thu, 09 Nov 2023 08:37:06 -0800 (PST)
+Received: from ?IPV6:2a01:c23:bd8b:e400:ed81:899c:b431:d0cc? (dynamic-2a01-0c23-bd8b-e400-ed81-899c-b431-d0cc.c23.pool.telefonica.de. [2a01:c23:bd8b:e400:ed81:899c:b431:d0cc])
+        by smtp.googlemail.com with ESMTPSA id g17-20020a170906395100b009de467a25d5sm2813466eje.13.2023.11.09.08.37.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Nov 2023 08:37:06 -0800 (PST)
+Message-ID: <64c6614b-d585-46e0-867d-2704a15c8f8c@gmail.com>
+Date: Thu, 9 Nov 2023 17:37:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3718ab1-7bc9-43c5-922f-08dbe1419ea4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 16:33:35.3213
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6Hv9UXegFfiIS4XgQi+KwlC8avFieQEQspX8EF6eM7QzqbEym1TYc6xnAqo6yPtIMUEit5V+Ksb4S6DkdAvCETo2uvvYVx5AxBMgBMxUT3M=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB6469
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] r8169: add handling DASH when DASH is disabled
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, ChunHao Lin <hau@realtek.com>
+Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <20231108184849.2925-1-hau@realtek.com>
+ <20231108184849.2925-2-hau@realtek.com>
+ <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->From: Jiri Pirko <jiri@resnulli.us>
->Sent: Thursday, November 9, 2023 2:18 PM
->
->Thu, Nov 09, 2023 at 10:49:49AM CET, arkadiusz.kubalewski@intel.com wrote:
->>>From: Jiri Pirko <jiri@resnulli.us>
->>>Sent: Wednesday, November 8, 2023 4:09 PM
->>>
->>>Wed, Nov 08, 2023 at 11:32:24AM CET, arkadiusz.kubalewski@intel.com
->>>wrote:
->>>>Disallow dump of unregistered parent pins, it is possible when parent
->>>>pin and dpll device registerer kernel module instance unbinds, and
->>>>other kernel module instances of the same dpll device have pins
->>>>registered with the parent pin. The user can invoke a pin-dump but as
->>>>the parent was unregistered, thus shall not be accessed by the
->>>>userspace, prevent that by checking if parent pin is still registered.
->>>>
->>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions"=
-)
->>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>>---
->>>> drivers/dpll/dpll_netlink.c | 7 +++++++
->>>> 1 file changed, 7 insertions(+)
->>>>
->>>>diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->>>>index a6dc3997bf5c..93fc6c4b8a78 100644
->>>>--- a/drivers/dpll/dpll_netlink.c
->>>>+++ b/drivers/dpll/dpll_netlink.c
->>>>@@ -328,6 +328,13 @@ dpll_msg_add_pin_parents(struct sk_buff *msg,
->>>>        struct dpll_pin *pin,
->>>> 		void *parent_priv;
->>>>
->>>> 		ppin =3D ref->pin;
->>>>+		/*
->>>>+		 * dump parent only if it is registered, thus prevent crash on
->>>>+		 * pin dump called when driver which registered the pin unbinds
->>>>+		 * and different instance registered pin on that parent pin
->>>
->>>Read this sentence like 10 times, still don't get what you mean.
->>>Shouldn't comments be easy to understand?
->>>
+On 09.11.2023 12:49, Paolo Abeni wrote:
+> On Thu, 2023-11-09 at 02:48 +0800, ChunHao Lin wrote:
+>> For devices that support DASH, even DASH is disabled, there may still
+>> exist a default firmware that will influence device behavior.
+>> So driver needs to handle DASH for devices that support DASH, no
+>> matter the DASH status is.
 >>
->>Hi,
+>> This patch also prepare for "fix DASH deviceis network lost issue".
 >>
->>Hmm, wondering isn't it better to remove this comment at all?
->>If you think it is needed I will rephrase it somehow..
->
->I don't know if it is needed as I don't understand it :)
->Just remove it.
->
+>> Signed-off-by: ChunHao Lin <hau@realtek.com>
+> 
+> You should include the fixes tag you already added in v1 and your Sob
+> should come as the last tag
+> 
+> The same applies to the next patch 
+> 
+>> Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 
+> It's not clear where/when Heiner provided the above tag for this patch.
+> I hope that was off-list.
+> 
+Right, so far I added my Rb for patch 2 only. Will have a look at patch 1
+again once there's a version with your review comments having been addressed.
 
-Sure, will do.
+>> Cc: stable@vger.kernel.org
+>> ---
+>>  drivers/net/ethernet/realtek/r8169_main.c | 35 ++++++++++++++++-------
+>>  1 file changed, 25 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>> index 0c76c162b8a9..108dc75050ba 100644
+>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>> @@ -624,6 +624,7 @@ struct rtl8169_private {
+>>  
+>>  	unsigned supports_gmii:1;
+>>  	unsigned aspm_manageable:1;
+>> +	unsigned dash_enabled:1;
+>>  	dma_addr_t counters_phys_addr;
+>>  	struct rtl8169_counters *counters;
+>>  	struct rtl8169_tc_offsets tc_offset;
+>> @@ -1253,14 +1254,26 @@ static bool r8168ep_check_dash(struct rtl8169_private *tp)
+>>  	return r8168ep_ocp_read(tp, 0x128) & BIT(0);
+>>  }
+>>  
+>> -static enum rtl_dash_type rtl_check_dash(struct rtl8169_private *tp)
+>> +static bool rtl_dash_is_enabled(struct rtl8169_private *tp)
+>> +{
+>> +	switch (tp->dash_type) {
+>> +	case RTL_DASH_DP:
+>> +		return r8168dp_check_dash(tp);
+>> +	case RTL_DASH_EP:
+>> +		return r8168ep_check_dash(tp);
+>> +	default:
+>> +		return false;
+>> +	}
+>> +}
+>> +
+>> +static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+>>  {
+>>  	switch (tp->mac_version) {
+>>  	case RTL_GIGA_MAC_VER_28:
+>>  	case RTL_GIGA_MAC_VER_31:
+>> -		return r8168dp_check_dash(tp) ? RTL_DASH_DP : RTL_DASH_NONE;
+>> +		return RTL_DASH_DP;
+>>  	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
+>> -		return r8168ep_check_dash(tp) ? RTL_DASH_EP : RTL_DASH_NONE;
+>> +		return RTL_DASH_EP;
+>>  	default:
+>>  		return RTL_DASH_NONE;
+>>  	}
+>> @@ -1453,7 +1466,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
+>>  
+>>  	device_set_wakeup_enable(tp_to_dev(tp), wolopts);
+>>  
+>> -	if (tp->dash_type == RTL_DASH_NONE) {
+>> +	if (!tp->dash_enabled) {
+>>  		rtl_set_d3_pll_down(tp, !wolopts);
+>>  		tp->dev->wol_enabled = wolopts ? 1 : 0;
+>>  	}
+>> @@ -2512,7 +2525,7 @@ static void rtl_wol_enable_rx(struct rtl8169_private *tp)
+>>  
+>>  static void rtl_prepare_power_down(struct rtl8169_private *tp)
+>>  {
+>> -	if (tp->dash_type != RTL_DASH_NONE)
+>> +	if (tp->dash_enabled)
+>>  		return;
+>>  
+>>  	if (tp->mac_version == RTL_GIGA_MAC_VER_32 ||
+>> @@ -4869,7 +4882,7 @@ static int rtl8169_runtime_idle(struct device *device)
+>>  {
+>>  	struct rtl8169_private *tp = dev_get_drvdata(device);
+>>  
+>> -	if (tp->dash_type != RTL_DASH_NONE)
+>> +	if (tp->dash_enabled)
+>>  		return -EBUSY;
+>>  
+>>  	if (!netif_running(tp->dev) || !netif_carrier_ok(tp->dev))
+>> @@ -4896,7 +4909,7 @@ static void rtl_shutdown(struct pci_dev *pdev)
+>>  	rtl_rar_set(tp, tp->dev->perm_addr);
+>>  
+>>  	if (system_state == SYSTEM_POWER_OFF &&
+>> -	    tp->dash_type == RTL_DASH_NONE) {
+>> +		!tp->dash_enabled) {
+> 
+> Since you have to repost, please maintain the correct indentation
+> above:
+> 
+> 	if (system_state == SYSTEM_POWER_OFF &&
+> 	    !tp->dash_enabled) {
+> 
+>         ^^^^
+> spaces here.
+> 
+> 
+> Cheers,
+> 
+> Paolo
+> 
 
-Thank you!
-Arkadiusz
-
->
->>
->>Thank you!
->>Arkadiusz
->>
->>>
->>>>+		 */
->>>>+		if (!xa_get_mark(&dpll_pin_xa, ppin->id, DPLL_REGISTERED))
->>>>+			continue;
->>>> 		parent_priv =3D dpll_pin_on_dpll_priv(dpll_ref->dpll, ppin);
->>>> 		ret =3D ops->state_on_pin_get(pin,
->>>> 					    dpll_pin_on_pin_priv(ppin, pin),
->>>>--
->>>>2.38.1
->>>>
->>
 
