@@ -1,114 +1,168 @@
-Return-Path: <netdev+bounces-46863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5086D7E6C3E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:12:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A65D7E6C86
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 15:39:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 819941C20940
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:12:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE2BCB20A3B
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 14:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6438E1E52E;
-	Thu,  9 Nov 2023 14:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9843C179B1;
+	Thu,  9 Nov 2023 14:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="RCQPyMxB"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="hPN+jFbj"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AE31E530;
-	Thu,  9 Nov 2023 14:12:39 +0000 (UTC)
-Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453562D75;
-	Thu,  9 Nov 2023 06:12:39 -0800 (PST)
-Received: from localhost (unknown [IPv6:2601:281:8300:73::646])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id C48D52C1;
-	Thu,  9 Nov 2023 14:12:38 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net C48D52C1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1699539159; bh=8kev2//0PzKZ/xSG/Y0mE6h/RdMVt+9LuCt1xXu5iDw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=RCQPyMxBH4vnMDMhEznJ7OJVwNrup4SoWpRSOVXYIn+/N/he7cwTy9amIWYC0SH5c
-	 AMUK57YCDp0lrT8+boCVA+pXBwJ+UlIshKxC7U/yhCX32+SdCpVw80ZASqbVRVgeko
-	 2scQrp0JGkBAAskrD6ZMjwACzo6yW9Qw5UvrsBLbEMWy6mQf7lxl8ayZK9SlfpBJQA
-	 R5WgIdHQMbPkm2T8amYTMlyQXW9XLeKyGa5nb2nPpv9eiJJ8JP5l5jpET6w2x9Vg9s
-	 PxJKUtPLeDOtA2h7REZUB+ffU/KPxhJvUWI0NlD86iPvZ+ZqKGCV+5I30KrINsd9Kp
-	 4JUf+9Wm8DVuQ==
-From: Jonathan Corbet <corbet@lwn.net>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com
-Subject: Re: [PATCH] Documentation: Document the Netlink spec
-In-Reply-To: <m2h6lvmasi.fsf@gmail.com>
-References: <20231103135622.250314-1-leitao@debian.org>
- <875y2cxa6n.fsf@meer.lwn.net> <m2h6lvmasi.fsf@gmail.com>
-Date: Thu, 09 Nov 2023 07:12:38 -0700
-Message-ID: <87r0kzuiax.fsf@meer.lwn.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15EFB20E6;
+	Thu,  9 Nov 2023 14:39:10 +0000 (UTC)
+Received: from DM6FTOPR00CU001.outbound.protection.outlook.com (mail-centralusazon11020003.outbound.protection.outlook.com [52.101.61.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988E8184;
+	Thu,  9 Nov 2023 06:39:09 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SO3UNJmYD3OmcJ9GBnimOXy8dLe+ulPI7uFC+mva28qHzf3G1qBWRblqjV89d14aSCbs9G7IwH0Fr1/qEC6ZrzqBN7DzVTTiPz+GX8SyGgcDd8ZP0mAn3Phx9ZQqzZcfdbfm8TWOMG2IpaRflBkFRrst2hM6ynNnN925S0y9wTyH3Hq+l6XQXnswW7Vb+XtfOlyRFMEetWrjgS8wm2jUPM0OIesDqg4Xku+4Oty6R/LNYTRjiKWkPPGdg03oPuWC5YDlMMOu43kqwPUNnesfVqGKWJ4oYCIqpRlYr5+snIU1V/qFzTL/F1dEZYeMHxV+uBCRiA7hZcNFCFycBnnKVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lk1pXClMJvmJ0uk15aNZWD3cbRHB+qLBqqjp/RopdXc=;
+ b=JZlpSeeUY5xDuruNn0eVCqVdFjjDToYMp6LZOjavkZmmy39glFQHG3WjlTtHTkRwG8WT5A265Z2bWrOiYAs3RDapZv6NzEp6EGcAoNBmSxID2WyN2LTuozuw2WtpZPyAl6HONrO2XyuEJaB+rbHQXBBiQgLwSp7p7wh+R87Wl3tmSwgQ6CAXYFK9BW4jnm8gxUe1+c/3GNnmX9pRPG05JqbmBSwiegSO59qHIEqwWYTFXigqId2bdOGC+3fa1Cjus5ptkuCg7VGi+pz09UB8fM5BXsEewI1Zlb8xCPPyQ2+ZAAP8k9Y3Gyx8iIzh1cvXWlTPdZgayjOIuaGJaMOnVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lk1pXClMJvmJ0uk15aNZWD3cbRHB+qLBqqjp/RopdXc=;
+ b=hPN+jFbj1xbSSvWeGLJg9+GC2791dT98WhbjCrw7f6FfbGMPQVhHmXtPTfR9ML7325BaQvEnf16MovXkgxm5UNsb+AUZ54k/KkQwB/4H7X2U430azdYwoPV3Eqm70wdwS732wR9IlH43BI1RExIYR3eqLxRSHMKOiqZJ9W3jW9o=
+Received: from PH7PR21MB3116.namprd21.prod.outlook.com (2603:10b6:510:1d0::10)
+ by CY5PR21MB3543.namprd21.prod.outlook.com (2603:10b6:930:c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.9; Thu, 9 Nov
+ 2023 14:39:06 +0000
+Received: from PH7PR21MB3116.namprd21.prod.outlook.com
+ ([fe80::4cdf:6519:4a36:698b]) by PH7PR21MB3116.namprd21.prod.outlook.com
+ ([fe80::4cdf:6519:4a36:698b%6]) with mapi id 15.20.7002.006; Thu, 9 Nov 2023
+ 14:39:05 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, KY Srinivasan
+	<kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
+	<decui@microsoft.com>, "edumazet@google.com" <edumazet@google.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH net,v3, 2/2] hv_netvsc: Fix race of
+ register_netdevice_notifier and VF register
+Thread-Topic: [PATCH net,v3, 2/2] hv_netvsc: Fix race of
+ register_netdevice_notifier and VF register
+Thread-Index: AQHaEb6Ik37YP3oeSEOL/cl9SKSQv7BxRMAAgADMiKA=
+Date: Thu, 9 Nov 2023 14:39:05 +0000
+Message-ID:
+ <PH7PR21MB3116D65E4546544628C61EF8CAAFA@PH7PR21MB3116.namprd21.prod.outlook.com>
+References: <1699391132-30317-1-git-send-email-haiyangz@microsoft.com>
+	<1699391132-30317-3-git-send-email-haiyangz@microsoft.com>
+ <20231108182618.09ef4dfe@kernel.org>
+In-Reply-To: <20231108182618.09ef4dfe@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=8f88658b-b65a-471b-94fa-ca9f5d4e9d8d;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-11-09T14:38:20Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR21MB3116:EE_|CY5PR21MB3543:EE_
+x-ms-office365-filtering-correlation-id: c98e352a-78a4-413b-c7aa-08dbe1319fd3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 81Cuhk7iDDj7bt9HPOHiC1hoHq5bsfi9CMleTvMqbbHgXUTpVTPDHOCepuqaxjaU21IunXDramW9BffvixD/ovuMEtDv6D0Po4CQ6ouS63DtdAVJhfy500fLgcdPfJkoC3sup/QFxZRooDeBgS6PFV0YloznB9mdc4uR2ebo5ogecBfRfwuHMezggZqiO+FcUHwhENC7X4oVotUmoCbSv+SSplGcnSvkOD/TsZQbuLiXbf3k46Ew+B2AbKxXVyUTb3QVXnAQgLBgvbYO891IYydLvOsy05TC09rg2OKWBPHc9A4nwfsML2rfB0YUNmV5OqacTfC7V90XdqXlS32J6u4napLs0eM2nQ+GVGD+BdCsVFTrEf+4VnuP3ZuHefITX07Tykaf43o42KLmpUY2YEYcbRmEtyVDG6T5xaRbFMn2LX5e9SY1lv/O6Th0JAlnrTewMyFRFz4nRxik/PYggDTrdDv1zVqyNxswpI0gdO4eN7P2BDNedaogyt+8SzXR/7V5VJUqtNFGSgC6byrDVmoqVwNhxMbC4VN6IlETv9Wy2XK/48TnZmMH1uuJ8BRbcF6RWr4NzRkSlozKwypX6yHQHk3sQRK0caIQvPppHdjuV+UpkAeOL8L+0oGA8fhcX9++cfn3BQ8jh1YUJrg+z+IUa5a9ArPnVmG5pyt0NFA=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3116.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(346002)(366004)(136003)(396003)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(8990500004)(83380400001)(38100700002)(122000001)(478600001)(10290500003)(6506007)(7696005)(76116006)(71200400001)(53546011)(26005)(64756008)(54906003)(6916009)(316002)(9686003)(66556008)(66476007)(66946007)(66446008)(2906002)(52536014)(33656002)(82950400001)(82960400001)(8676002)(8936002)(86362001)(4326008)(38070700009)(5660300002)(41300700001)(55016003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?fFM9WLRQotP1WezGzcWxheJGTzZyWaMhfk1SuL8I0kNhFdUqBGwXLGWTluwX?=
+ =?us-ascii?Q?+fvBC3PrQAMfJHpin5utYTlFytqUn0x1LqAJTSNXx0LcE755xPzKXE1vAWe+?=
+ =?us-ascii?Q?yrLvZPUyE7lvI+KuZcn2PjfhwhbLy/nUGNA0Coo5SNxk100AwXVRMQd98+RN?=
+ =?us-ascii?Q?49ejtYTXJYe6exBJPn00blKLJ4pebzuR5HI1+9AbVF2kRxHPyhO+C6pDGoi9?=
+ =?us-ascii?Q?QllIwLpRcZwitQlzozDusjhmpQkPhQWYJGKwRz+OCzEJDEnp7H128IGcqGLp?=
+ =?us-ascii?Q?UNR5DAUfhPg559gY2oXR7vomugaX/gIg9pxSptw/jBxXJ0q4GxxznBjJtWId?=
+ =?us-ascii?Q?MmVCjHNzFQT4PcNWXFRPcErHo90fZ/5tduaXat8s+QAq9s6+oOMAQRcw3fKz?=
+ =?us-ascii?Q?aEAEdOr6LIha1KYLM1VCetcnQc0tgpBNf+Zmn/lcYetk1UBgkef9/G1sXZgv?=
+ =?us-ascii?Q?rzj70Lz/2IQ8bf2cq4ZKQ7mX15OWe0Dp+9e17L4CaEIdSOkd1ydAg5pqpoSJ?=
+ =?us-ascii?Q?8qgN7i8AK9vEETRg3xOUADKra6OJnWPfQCrSCFRfTv71NTmpSq5M0IAk4k9l?=
+ =?us-ascii?Q?wTZyMTtF+/ef9kc0dvDZBm+1CEzUTwdNdHyEoABMQU1UE1tnsfHPpO3bNH3n?=
+ =?us-ascii?Q?yMtBLJWhjydKZemXpPq2hkYZMjsLsFalftX/3mcU9gkMbso47i3/Hkq3kCF7?=
+ =?us-ascii?Q?HqRHjzSCTBWUTidQalcXW/rthyypHjHELO8fn+pheIfAgFdCWBM9HPEKuH3X?=
+ =?us-ascii?Q?cw0SHAwLBcVcRZpucYhba+d84lILabGhPTqrukpUEsSdSKzHHZ1fdwLTeE42?=
+ =?us-ascii?Q?6h7ohz5vbMzArgLOLyC9mJ+xt9yx9jms0uJrfnxMXdLF5/4OekCmJOf70/em?=
+ =?us-ascii?Q?D0jyditbD3fZ2j3amy8+HNcHj8MapxIweCzVXMvyopwl6ooIfVdOF7ZkYtfb?=
+ =?us-ascii?Q?rnBYbdesO2PhjhAJUrUWJH9syGFqJJxDOCQQJZEOVwFDDL0t2Rd9lCsRYkO2?=
+ =?us-ascii?Q?331wvqJGrMm5ezcwLMhvvqOxwtNyTuHkejF+134m45hr1WXkLoxSo7uv7HXx?=
+ =?us-ascii?Q?s/NIM3GJuZz4wppor8jmxOPbLY31Tscr9WfUnR1aGass+E/Gop643SpYPGbL?=
+ =?us-ascii?Q?22dFuMnv6HDvtE/SCntdIGWovzLNGCljK66WaucZuLr6s1TeIOty4tOwtMO8?=
+ =?us-ascii?Q?KlQ3N0QbuQsZ6/juS9SLBT4Mli1B/yW2Xhgq3iPhAcQvjNvofVn72xSlZegq?=
+ =?us-ascii?Q?Jc3eBf90VlTDiI5/u9Y5DdP7dGf6n8L/9u7K6O7a8TOYRCy583i7ZaiojlP/?=
+ =?us-ascii?Q?lCETg2QNdFbZI+UEUC3EMl0UZ5/6urvOB5v7VXlZ/uLecdGb28k3BlL7Jzpq?=
+ =?us-ascii?Q?rFjcqWfUj6Kf/gPwMWTp1zQjZE6BXzgP228RbFSTKXu92CRRX8mc4hrf693Y?=
+ =?us-ascii?Q?WZxOGUE+dFohFTdlcZ03c9jvWpGyXmwVx9+5BDHQK8JqaMeshBmscdUFCVYm?=
+ =?us-ascii?Q?8b/puHAirm6T4W+RcvwkFM0Z+fY+67sO8N1hZje5WIjJmPwX/B6ebgVgjTgs?=
+ =?us-ascii?Q?AuRKtkZ+MBOvUjOZVj7BZ8PK6T9ibyQp0BJpv5u3?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3116.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c98e352a-78a4-413b-c7aa-08dbe1319fd3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 14:39:05.3698
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: apVft613i4JkN4B4gXcP/RQcCNT6K3ja88Vtk2BcchKYbgS9xTlF2Zsl5x8uny8UmUQr6nvH9kpme3m2ERhrkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR21MB3543
 
-Donald Hunter <donald.hunter@gmail.com> writes:
 
-> Jonathan Corbet <corbet@lwn.net> writes:
->> I do have to wonder, though, whether a sphinx extension is the right way
->> to solve this problem.  You're essentially implementing a filter that
->> turns one YAML file into one RST file; might it be better to keep that
->> outside of sphinx as a standalone script, invoked by the Makefile?
->>
->> Note that I'm asking because I wonder, I'm not saying I would block an
->> extension-based implementation.
->
-> +1 to this. The .rst generation can then be easily tested independently
-> of the doc build and the stub files could be avoided.
->
-> Just a note that last year you offered the opposite guidance:
->
-> https://lore.kernel.org/linux-doc/87tu4zsfse.fsf@meer.lwn.net/
 
-Heh ... I totally forgot about that whole discussion ...
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Wednesday, November 8, 2023 9:26 PM
+> To: Haiyang Zhang <haiyangz@microsoft.com>
+> Cc: linux-hyperv@vger.kernel.org; netdev@vger.kernel.org; KY Srinivasan
+> <kys@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
+> <decui@microsoft.com>; edumazet@google.com; pabeni@redhat.com;
+> davem@davemloft.net; linux-kernel@vger.kernel.org; stable@vger.kernel.org
+> Subject: Re: [PATCH net,v3, 2/2] hv_netvsc: Fix race of
+> register_netdevice_notifier and VF register
+>=20
+> On Tue,  7 Nov 2023 13:05:32 -0800 Haiyang Zhang wrote:
+> > If VF NIC is registered earlier, NETDEV_REGISTER event is replayed,
+> > but NETDEV_POST_INIT is not.
+>=20
+> But Long Li sent the patch which starts to use POST_INIT against
+> the net-next tree. If we apply this to net and Long Li's patch to
+> net-next one release will have half of the fixes.
+>=20
+> I think that you should add Long Li's patch to this series. That'd
+> limit the confusion and git preserves authorship of the changes, so
+> neither of you will loose the credit.
 
-> If the preference now is for standalone scripts invoked by the Makefile
-> then this previous patch might be useful:
->
-> https://lore.kernel.org/linux-doc/20220922115257.99815-2-donald.hunter@gmail.com/
->
-> It would be good to document the preferred approach to this kind of doc
-> extension and I'd be happy to contribute an 'Extensions' section for
-> contributing.rst in the doc-guide.
-
-I think it will vary depending on what we're trying to do, and I think
-we're still working it out - part of why I expressed some uncertainty
-this time around.
-
-For something like the kernel-doc or automarkup, where we are modifying
-existing documents, an extension is the only way to go.  In this case,
-where we are creating new RST files from whole cloth, it's not so clear
-to me.  My feeling (this week at least ;) is that doing it as an
-extension makes things more complicated without a lot of benefit.
-
-FWIW, if something like this is done as a makefile change, I'd do it a
-bit differently than your linked patch above.  Rather than replicate the
-command through the file, I'd just add a new target:
-
-  netlink_specs:
-  	.../scripts/gen-netlink-rst
-
-  htmldocs: netlink_specs
-  	existing stuff here
-
-But that's a detail.
+Will do.
 
 Thanks,
-
-jon
+- Haiyang
 
