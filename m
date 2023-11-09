@@ -1,205 +1,224 @@
-Return-Path: <netdev+bounces-46828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA5E7E694F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:12:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E26E47E695A
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:15:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB93B20C3B
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:11:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82DB5B20C47
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:15:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91016199C4;
-	Thu,  9 Nov 2023 11:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="LZnllcTb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDD1199CA;
+	Thu,  9 Nov 2023 11:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FB9199A6
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:11:53 +0000 (UTC)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2040.outbound.protection.outlook.com [40.107.6.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A90822D5F;
-	Thu,  9 Nov 2023 03:11:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SRhCQPPn/yCirm0CTzWE8a9GqDY05vC+4nDrBd9Zjmze6jKkqoDBCh2VMYtI7YxpxJbfqm/cFzryXxI6bdLxVOD5WBdzTV95qalZecjpaDVubRlU6lcQnQmm9+QzInOFhoFsdhixNf/IsUZLVyXsxl++63dVWvfvdDxv2g41JSeaY9SKIK5/XY7ffdauqmlzoRWwkDWAd0l0BQpStT0dHWIXfTWhiu4a8VfW3SCWIaSWPV+3gMu2o8VI5CXSpIbtoc3J+X/HweHop52smcGBRQoqlBxHwPhjVngIZHMGkBq2fHmtHrchshQqevy/38whAdfbOWwXInrXjJRpmYOKiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/kZfdre/69bHLBBoCv+wmgSFNDltsMax6AhjFYYi+40=;
- b=m5m3z644Ky9fxLCfza0N4KNv2MQ6UW1n6BooCPaJDLIgwZ4bCwPl7sqwCBhDOQosdE1rm2hFMM3Mfveo7JlOetDuJSd9tPHvXgmtC8GqkfyoK9rHxi2DXKXWMmvpnS80xwooam819i9QJ67lDXJDD8x+RJHFDB39Eemm03FhOCGAp7SDSCyIEfOUFeLN79FuPKpX/jKnl894kEuAAFAcKo60ZHc9a5CCF8mlxuinALwlqRCBErIB0WprN2txQCTDh6o5XAHs8UYKnm2FHXnjuTYZfO0RfvADACVSn40DwqYKBm8lHrS1tJ7a2J1nFbHkNyfhk7tuPnlw74ZwYKFC3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/kZfdre/69bHLBBoCv+wmgSFNDltsMax6AhjFYYi+40=;
- b=LZnllcTbgJoUiJ4y6D0lbBMJ/UCvGuryXguQ5/RLxa0Cz11TQO/Wa1u71LocNHlNgeXdr6650rLZBx45Tm2RNYoTt5gvR1zFIT8+tyD0YFprKrGdrqA1hDpkmzGJCHSkWuMsN5PFsu9kcss7y/vSRdn2jgeDf8RcTUWuqdTvepQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM8PR04MB7395.eurprd04.prod.outlook.com (2603:10a6:20b:1c4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.7; Thu, 9 Nov
- 2023 11:11:49 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
- 11:11:49 +0000
-Date: Thu, 9 Nov 2023 13:11:46 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 4/7] net/sched: taprio: get corrected value of
- cycle_time and interval
-Message-ID: <20231109111146.qrnekz6ykyzrcpbd@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: VI1PR08CA0246.eurprd08.prod.outlook.com
- (2603:10a6:803:dc::19) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651005663;
+	Thu,  9 Nov 2023 11:15:36 +0000 (UTC)
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09BA82590;
+	Thu,  9 Nov 2023 03:15:34 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0bRyP_1699528530;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0bRyP_1699528530)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Nov 2023 19:15:31 +0800
+Message-ID: <1699528306.7236402-5-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 16/21] virtio_net: xsk: rx: introduce add_recvbuf_xsk()
+Date: Thu, 9 Nov 2023 19:11:46 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-17-xuanzhuo@linux.alibaba.com>
+ <20231109031003-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231109031003-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM8PR04MB7395:EE_
-X-MS-Office365-Filtering-Correlation-Id: bdcdb38a-5bee-488b-9ff5-08dbe114ab85
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	pWvoQxt7okb93K5i1m9p8p0pCRGsugJji58ovVptOM6Q3Zlkb9bhTSiSSytby5HerIKvioBpasEaWES25UCmiERLe/0q0bfnSMh+qj1T2YpvdA/7ZbKyQ5oXijN5pmT063qPl1xtHtZY7owYb0QnWY88obN0EjTPMcJRnh0M5ZdFLZUkW2aBvOgvfU+QpUY1h3h2/9j/3HwCM7pWptnZ3uRs2jNdijeaLI7IbKM9JrDJTCzyoj5FXQ02G6sUUsF6KAageneOws0YR60QJNdJkkeSRWI0hrtmz/VdKMseGWoLqQx8iE/IbSA6sIxKJP0vh3YBLHXMF9CiqBZdBbf8CXBv+6f4pyCh6N0vTF0grcuOxWEGWRxM8MFv+h7iBjlCVOaEVZ34Qc5oW2jo+P4LkSKJIW0siIjLEfaTkK8TqIQy4We0Fns0EFXEf+wj6Id6b5w4SOEvwwHRtdEaoU6R0XpH/Di8QYkfQ69lAbY/rGcvakoNceRnBwLDfi9U36ktV18p1l4pDdYeym3HsePV0fMDBdyjeUt12JYmJto+ONksBha5cHMelLtLOkk3JDTi
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(396003)(346002)(366004)(136003)(376002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(66946007)(66556008)(54906003)(66476007)(44832011)(110136005)(316002)(8676002)(8936002)(5660300002)(4326008)(7416002)(33716001)(6486002)(2906002)(26005)(478600001)(6666004)(41300700001)(6506007)(1076003)(86362001)(6512007)(9686003)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UmxFeFd6Wm85YTJGVzJjUmR2RHpIM0NkWUJZVnFPbUVkb3owWVBYU253MjFl?=
- =?utf-8?B?Z3Zla2RBQXd3d3IrTWpESVJqZkV3TWgrdmlsREEvOVJQVFJaUy9RRjU2d0xI?=
- =?utf-8?B?bzBwVFJ1ZTVIdU1LVEw2UTRVREhGUHI3RnIxeVBSeEpRVlNWQzRXVHAxd0Qv?=
- =?utf-8?B?UDJWUDl0WExNdVhKTmxTK0RhR0o4T0NXRG1CVURMU3cwZk4wR2ZFaUkxanlC?=
- =?utf-8?B?Ykl4aFUweUtzbXBvbzRjdzR4MGVIZUVscDF2RDgyWkFGZVFVY1loS0EzRk80?=
- =?utf-8?B?UVhZSzBVaFQ4SVk3a2NmWldvRjdlL1VITGdnQ0ptaDU1V3k0TlcxWkI0Z1U5?=
- =?utf-8?B?TFI1NFBlVWRyQmJpN1luL1RscVFick90MWJudkJuL3ZFdGcvdGgxZlY2enN0?=
- =?utf-8?B?bkR1L1JocWgrTHlLQ2N4M1ZvM0JXZ3kwWDMyQ0dadEk1cjBKS3ViRVZpNmhZ?=
- =?utf-8?B?T2U0Y29FQkpFeHM1UTdEKzBGaU93ZjhEcXZOcElWeVRPZ1lmYmdPOEVWSWtW?=
- =?utf-8?B?VTJQalhXeUl6REVMelp1cVZPVlFYdjZuWVpocnVxTmxoM0lKMW5oZWhwdFlm?=
- =?utf-8?B?ZzgwSVQzc0VFUmtxZUk2VXZ1VlBJc1JvaU9PSTMwaWdQZ3FVa3pxMDA5NUdj?=
- =?utf-8?B?R0g2R3FwcFJnNHhCOTZjQ3pxdFJUdDhwenZsdm9mODJhKzd0U09WZDFIelV4?=
- =?utf-8?B?TGp2N2laUkJkd2JpdGpJLzFYVnJMazhGaE1SNGYrbVVHWGhZc0svK1dMdkoy?=
- =?utf-8?B?SmEyWmlvenB4Uk5XT1BsKzQrOWRLbFJjVzI5Y0tNRmV1YkhGU0Fmai95R1Yr?=
- =?utf-8?B?cXAvQVJqU0VMVmhNMEhycHdJLzZhdnlmU05Pc1JwMExPNURZem9jQkdpeXpO?=
- =?utf-8?B?TEh2RGRpR3NuOEczM3dIVng0QkNwcXdNWXFOWW4wUC9DaWIyL2czeEtlTy8w?=
- =?utf-8?B?dEo2NjAvbUhiQ0pNMVFNOUNnMnpNVkZuM2hocjBQOW1YZm5jdWIwdmV0S0d4?=
- =?utf-8?B?Y1BsTWZKQWkyL2hkVWFTbzNqdjFHQjhWNU1SMHhnMGk4YUlxSVJIdVU2VEJj?=
- =?utf-8?B?RjFnZVllTUZoRWdxQmxjY2ZFcnord3NPQTIxcjNQaTVvZHBSZWVJaVpDZ0Jq?=
- =?utf-8?B?Q3BJblBSRmVFUGpIOUFEbjB6ZTVLTlh3T2d1SjhrbndDVkN6SWF2YTRSQXBN?=
- =?utf-8?B?RjRKaGlKd1BpQ0FOWFN1eDA2eElBY1hxVXZpaE1KZ3k4Q2JSa1ZUZUx2QkVH?=
- =?utf-8?B?WVI2TVFmay8vMlkvWS9scC9HdjVvcUg4ZUdXR3R0QVNlTHFORXpSdDNQNFI2?=
- =?utf-8?B?VDJjdWtTS2h4Yld6SDZrZFNqNkFKVUJyaUJ1Nk1PUEpOWkFheSszcGJGRmlk?=
- =?utf-8?B?QXVaTEtWNGVkZkVtc2J0QXV0a2NyeXpmUWZaRkNFVFUrM2pUREI0RWdxZFZN?=
- =?utf-8?B?cjhtYmxBL2FGWUorSE9FYU5JeWZYMlE5UE9OenhSMnJNNUdoSXBnSEtSdmhY?=
- =?utf-8?B?Vk9PMHo2V1RERmVRTXRLVERROFA4RmhYUDR0ZkFYSjRZRnlIci8rNktrU0hq?=
- =?utf-8?B?cUZzRTZDcFRBMjVQd01iMEZpbUpSNWw0dFdsb1Q0VmlGcU81a1c4VzlaNzB2?=
- =?utf-8?B?cE5iS2ZQRmFKaGhsTmRucmh6aW44c0tPQktWdUh0QXBiU0lMM2dRaFgrN29r?=
- =?utf-8?B?RjRzVGJqdnRxNGlKR3JtWTNIQ0tMeHgrZzdvTEFTanBxbiswakttUUMxdGhN?=
- =?utf-8?B?ZmlBcmg5elcwaVJ6Vis0SEJwbGt5WWFRRmFXWFlIaXBNcnd2Sm5mNFp2cm9U?=
- =?utf-8?B?ZUQ5Tkg2aGh6L1E3Um9QcEl3MFdjMVNURTYwNDVZYVJ4V0pCekV2dFJ5WllI?=
- =?utf-8?B?bndocXV6NHNTK3VmbUJTN2NsOTFpcy9RcXNpNTFaOE5wenVoNEpISDRYaVcv?=
- =?utf-8?B?ZUNHZ3VaQ2xVdDVYQ2hKbFd2YXROVGdxMW9YUGRkckVFRDM3OXUrOTA1eTBZ?=
- =?utf-8?B?TUk4M0J3K2h4NzRmcTRVQVo3WE5GVlBMajdLenNueHhhaUF3RmdoUFF3ay8v?=
- =?utf-8?B?eTFjUnZMWjNpNTQvOHJncmNxZHZpdnFBbktpbk9QRWl1ZVZwYW1ML0JwMCtP?=
- =?utf-8?B?UmxSdVdwcEhmQmEybElXR2cxY2NuQkhWZW10ejdocXloQmh2aTBnclVWSmVp?=
- =?utf-8?B?bHc9PQ==?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdcdb38a-5bee-488b-9ff5-08dbe114ab85
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 11:11:49.8212
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UQhiizr1e7NImMHLjokgzBXDgkbZLdA4b/W1pop5HqnvCbfgirNL1mCzWlubh/v0KnUQvP0ZFGjk2YvECMWxpA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7395
 
-On Tue, Nov 07, 2023 at 06:20:20AM -0500, Faizal Rahim wrote:
-> Retrieve adjusted cycle_time and interval values through new APIs.
-> Note that in some cases where the original values are required,
-> such as in dump_schedule() and setup_first_end_time(), direct calls
-> to cycle_time and interval are retained without using the new APIs.
-> 
-> Added a new field, correction_active, in the sched_entry struct to
-> determine the entry's correction state. This field is required due
-> to specific flow like find_entry_to_transmit() -> get_interval_end_time()
-> which retrieves the interval for each entry. During positive cycle
-> time correction, it's known that the last entry interval requires
-> correction. However, for negative correction, the affected entry
-> is unknown, which is why this new field is necessary.
+On Thu, 9 Nov 2023 03:12:27 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Nov 07, 2023 at 11:12:22AM +0800, Xuan Zhuo wrote:
+> > Implement the logic of filling rq with XSK buffers.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio/main.c       |  4 ++-
+> >  drivers/net/virtio/virtio_net.h |  5 ++++
+> >  drivers/net/virtio/xsk.c        | 49 ++++++++++++++++++++++++++++++++-
+> >  drivers/net/virtio/xsk.h        |  2 ++
+> >  4 files changed, 58 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> > index 6210a6e37396..15943a22e17d 100644
+> > --- a/drivers/net/virtio/main.c
+> > +++ b/drivers/net/virtio/main.c
+> > @@ -1798,7 +1798,9 @@ static bool try_fill_recv(struct virtnet_info *vi, struct virtnet_rq *rq,
+> >  	bool oom;
+> >
+> >  	do {
+> > -		if (vi->mergeable_rx_bufs)
+> > +		if (rq->xsk.pool)
+> > +			err = virtnet_add_recvbuf_xsk(vi, rq, rq->xsk.pool, gfp);
+> > +		else if (vi->mergeable_rx_bufs)
+> >  			err = add_recvbuf_mergeable(vi, rq, gfp);
+> >  		else if (vi->big_packets)
+> >  			err = add_recvbuf_big(vi, rq, gfp);
+>
+> I'm not sure I understand. How does this handle mergeable flag still being set?
 
-I agree with the motivation, but I'm not sure if the chosen solution is
-correct.
 
-static u32 get_interval(const struct sched_entry *entry,
-			const struct sched_gate_list *oper)
-{
-	if (entry->correction_active)
-		return entry->interval + oper->cycle_time_correction;
+You has the same question as Jason.
 
-	return entry->interval;
-}
+So I think maybe I should put the handle into the
+add_recvbuf_mergeable and add_recvbuf_small.
 
-What if the schedule looks like this:
+Let me think about this.
 
-	sched-entry S 0x01 125000000
-	sched-entry S 0x02 125000000
-	sched-entry S 0x04 125000000
-	sched-entry S 0x08 125000000
-	sched-entry S 0x10 125000000
-	sched-entry S 0x20 125000000
-	sched-entry S 0x40 125000000
-	sched-entry S 0x80 125000000
 
-and the calculated cycle_time_correction is -200000000? That would
-eliminate the entire last sched-entry (0x80), and the previous one
-(0x40) would run for just 75000000 ns. But your calculation would say
-that its interval is −75000000 ns (actually reported as an u32 positive
-integer, so it would be a completely bogus value).
+>
+>
+> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > index a13d6d301fdb..1242785e311e 100644
+> > --- a/drivers/net/virtio/virtio_net.h
+> > +++ b/drivers/net/virtio/virtio_net.h
+> > @@ -140,6 +140,11 @@ struct virtnet_rq {
+> >
+> >  		/* xdp rxq used by xsk */
+> >  		struct xdp_rxq_info xdp_rxq;
+> > +
+> > +		struct xdp_buff **xsk_buffs;
+> > +		u32 nxt_idx;
+> > +		u32 num;
+> > +		u32 size;
+> >  	} xsk;
+> >  };
+> >
+> > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > index ea5804ddd44e..e737c3353212 100644
+> > --- a/drivers/net/virtio/xsk.c
+> > +++ b/drivers/net/virtio/xsk.c
+> > @@ -38,6 +38,41 @@ static void virtnet_xsk_check_queue(struct virtnet_sq *sq)
+> >  		netif_stop_subqueue(dev, qnum);
+> >  }
+> >
+> > +int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct virtnet_rq *rq,
+> > +			    struct xsk_buff_pool *pool, gfp_t gfp)
+> > +{
+> > +	struct xdp_buff **xsk_buffs;
+> > +	dma_addr_t addr;
+> > +	u32 len, i;
+> > +	int err = 0;
+> > +
+> > +	xsk_buffs = rq->xsk.xsk_buffs;
+> > +
+> > +	if (rq->xsk.nxt_idx >= rq->xsk.num) {
+> > +		rq->xsk.num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->xsk.size);
+> > +		if (!rq->xsk.num)
+> > +			return -ENOMEM;
+> > +		rq->xsk.nxt_idx = 0;
+> > +	}
+>
+> Another manually rolled linked list implementation.
+> Please, don't.
 
-So not only is the affected entry unknown, but also the amount of cycle
-time correction that applies to it is unknown.
 
-I'm looking at where we need get_interval(), and it's from:
+The array is for speedup.
 
-taprio_enqueue_one()
--> is_valid_interval()
-   -> find_entry_to_transmit()
-      -> get_interval_end_time()
--> get_packet_txtime()
-   -> find_entry_to_transmit()
+xsk_buff_alloc_batch will return many xsk_buff that will be more efficient than
+the xsk_buff_alloc.
 
-I admit it's a part of taprio which I don't understand too well. Why do
-we perform such complex calculations in get_interval_end_time() when we
-should have struct sched_entry :: end_time precomputed and available for
-this purpose (although it was primarily inteded for advance_sched() and
-not for enqueue())?
+Thanks.
 
-Vinicius, do you know?
+
+>
+>
+> > +
+> > +	i = rq->xsk.nxt_idx;
+> > +
+> > +	/* use the part of XDP_PACKET_HEADROOM as the virtnet hdr space */
+> > +	addr = xsk_buff_xdp_get_dma(xsk_buffs[i]) - vi->hdr_len;
+> > +	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
+> > +
+> > +	sg_init_table(rq->sg, 1);
+> > +	sg_fill_dma(rq->sg, addr, len);
+> > +
+> > +	err = virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buffs[i], gfp);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	rq->xsk.nxt_idx++;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static int virtnet_xsk_xmit_one(struct virtnet_sq *sq,
+> >  				struct xsk_buff_pool *pool,
+> >  				struct xdp_desc *desc)
+> > @@ -213,7 +248,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
+> >  	struct virtnet_sq *sq;
+> >  	struct device *dma_dev;
+> >  	dma_addr_t hdr_dma;
+> > -	int err;
+> > +	int err, size;
+> >
+> >  	/* In big_packets mode, xdp cannot work, so there is no need to
+> >  	 * initialize xsk of rq.
+> > @@ -249,6 +284,16 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
+> >  	if (!dma_dev)
+> >  		return -EPERM;
+> >
+> > +	size = virtqueue_get_vring_size(rq->vq);
+> > +
+> > +	rq->xsk.xsk_buffs = kcalloc(size, sizeof(*rq->xsk.xsk_buffs), GFP_KERNEL);
+> > +	if (!rq->xsk.xsk_buffs)
+> > +		return -ENOMEM;
+> > +
+> > +	rq->xsk.size = size;
+> > +	rq->xsk.nxt_idx = 0;
+> > +	rq->xsk.num = 0;
+> > +
+> >  	hdr_dma = dma_map_single(dma_dev, &xsk_hdr, vi->hdr_len, DMA_TO_DEVICE);
+> >  	if (dma_mapping_error(dma_dev, hdr_dma))
+> >  		return -ENOMEM;
+> > @@ -307,6 +352,8 @@ static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
+> >
+> >  	dma_unmap_single(dma_dev, sq->xsk.hdr_dma_address, vi->hdr_len, DMA_TO_DEVICE);
+> >
+> > +	kfree(rq->xsk.xsk_buffs);
+> > +
+> >  	return err1 | err2;
+> >  }
+> >
+> > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> > index 7ebc9bda7aee..bef41a3f954e 100644
+> > --- a/drivers/net/virtio/xsk.h
+> > +++ b/drivers/net/virtio/xsk.h
+> > @@ -23,4 +23,6 @@ int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+> >  bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> >  		      int budget);
+> >  int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag);
+> > +int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct virtnet_rq *rq,
+> > +			    struct xsk_buff_pool *pool, gfp_t gfp);
+> >  #endif
+> > --
+> > 2.32.0.3.g01195cf9f
+>
+>
 
