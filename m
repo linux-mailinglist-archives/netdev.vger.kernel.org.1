@@ -1,138 +1,209 @@
-Return-Path: <netdev+bounces-46834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A817E69B0
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:31:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D3327E69E9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F77281028
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:31:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2657A1C20940
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B7C19BB1;
-	Thu,  9 Nov 2023 11:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC0F1C286;
+	Thu,  9 Nov 2023 11:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pUZ/rUdo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OeVtJ24B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AAA41CF93
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:31:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677F7C433C7;
-	Thu,  9 Nov 2023 11:31:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699529508;
-	bh=viR/y2fazue9JOkzDugrHK017rAatdnnGSMeOols6VA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pUZ/rUdoMrHbDD3xG1iJatG3Y8uXH+vqyoI/Se0iH7gFz/LBI4P0AzzsQLSIXJT/j
-	 Oat3w+6wo0s9F9eoavX3qWbwu6ePsUTNRtehg9yoHXiYxOyZsdXldPVKRosfDyu21Y
-	 H7JuvmPb1gSBGyCLP9+tS7HoizORo+FnBoM3mtaCGhO8za2PBWMkmLI4BjC84/vNmJ
-	 UYBZrE74a6LFavYBLfwChIzYy6a1Bpq6Z70BDCiqC0HJf3lFbfmKPV0NHMM3OCWlHp
-	 /jpV4Ti5oOjRAAYAxgms6YXFJzjdELiKEIZ++zVFzd8P+0T6QbW76VjGv90nw17oa8
-	 z6IskhluYXa+Q==
-Date: Thu, 9 Nov 2023 12:31:45 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Sven Auhagen <sven.auhagen@voleatech.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-	"brouer@redhat.com" <brouer@redhat.com>,
-	"ilias.apalodimas@linaro.org" <ilias.apalodimas@linaro.org>,
-	"mcroce@microsoft.com" <mcroce@microsoft.com>,
-	"leon@kernel.org" <leon@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH v4] net: mvneta: fix calls to page_pool_get_stats
-Message-ID: <ZUzDIV2SQ4U/rhzI@lore-desk>
-References: <4wba22pa6sxknqfxve42xevswz4wfu637p5gyyeq546tmzudzu@4z3kphfrpm64>
- <ZUyOsB7p6j21e42c@lore-desk>
- <4fxnidhi7gfpzmeels363loksphtifgsan6w64n5y7dxzi7dyx@jwbe4gp37mwy>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D511B29B
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:49:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC141719
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:49:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699530586;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rRWgktC5dBfBH0y4IlPCeWKy9YBplXDcHKZ7n5koZ7o=;
+	b=OeVtJ24B4HYZMNRIlvDH8dGLJddDJv0Ylw7PduLfT4p+7CpDaNUrKKYeYN0wtOV4z4VC7A
+	1E9aMu0wggtMgK+wNOAWY2N9njCpRxYpAIu+zHN6lNFpVHXwzK9BFB1jWZKoAySvdSEyqS
+	x3E4X5JPn2cnlVN0L8Jukr5dRsq+Opw=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-dTwAgvH-O1SGAaW21x9n_g-1; Thu, 09 Nov 2023 06:49:45 -0500
+X-MC-Unique: dTwAgvH-O1SGAaW21x9n_g-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-778b5c628f4so14748185a.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:49:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699530585; x=1700135385;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rRWgktC5dBfBH0y4IlPCeWKy9YBplXDcHKZ7n5koZ7o=;
+        b=DJr2/q8MjsY72MsP8R1pbDGHYeoJamebx9/VYZl+lUPErgHEmeGxr3qJ5F4jf9mTV+
+         uQUaDPI1/2uTPTadZIW6zFEo23/V3FgbSJ2FCZ/THzxZCGqHyUw6wFynQtHwHf4GL440
+         rOyxcoXDdoiVx+S4CeLF02zbk31XPywrZguqUwcpQ7KxxPYHna5Tzkjf6oFkAuUWniJ5
+         c7MBMCLl6x+SL1USPXnwL7IzG7/j8cvHuKbnIlSm8RkY0vYabBloWJGspv0iR+fJHihm
+         4oQeZ7CfwisKTpdnl8XSLQrerWPotNgotk9hWBSFmhB0XYna2r8263YdOOAeSbk0h5el
+         J5zg==
+X-Gm-Message-State: AOJu0YwoPoOuYpLV0b/ZcaRV0XVuI4h2Yn/hhfS9dTR//VDBlFBlR5ou
+	1PLGiO82816P4skqlcujW3eIelCstw7nWEoaPL70etVXPNFMqzw9qPZHr2ok8SJF78N3YuJe3NH
+	JZ9yr/8vimAHI1W6f
+X-Received: by 2002:a05:622a:5186:b0:41e:4be2:d3eb with SMTP id ex6-20020a05622a518600b0041e4be2d3ebmr5519122qtb.1.1699530584773;
+        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEGUS4SbJ9ssl4USsnfkA9xKEduU/vOY24B+xDTRXOVdGNcq+w7LhBc+XgFeookbhcTcoTQKA==
+X-Received: by 2002:a05:622a:5186:b0:41e:4be2:d3eb with SMTP id ex6-20020a05622a518600b0041e4be2d3ebmr5519110qtb.1.1699530584454;
+        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
+        by smtp.gmail.com with ESMTPSA id kf20-20020a05622a2a9400b0041b83654af9sm1859307qtb.30.2023.11.09.03.49.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 03:49:44 -0800 (PST)
+Message-ID: <5783a6f8819a741f0f299602ff615e6a03368246.camel@redhat.com>
+Subject: Re: [PATCH net v2 1/2] r8169: add handling DASH when DASH is
+ disabled
+From: Paolo Abeni <pabeni@redhat.com>
+To: ChunHao Lin <hau@realtek.com>, hkallweit1@gmail.com
+Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Date: Thu, 09 Nov 2023 12:49:41 +0100
+In-Reply-To: <20231108184849.2925-2-hau@realtek.com>
+References: <20231108184849.2925-1-hau@realtek.com>
+	 <20231108184849.2925-2-hau@realtek.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="M57S2kKDOWuCTbe7"
-Content-Disposition: inline
-In-Reply-To: <4fxnidhi7gfpzmeels363loksphtifgsan6w64n5y7dxzi7dyx@jwbe4gp37mwy>
 
-
---M57S2kKDOWuCTbe7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-[...]
-> >=20
-> > do we need to check pp->is_stopped here? (we already check if page_pool
-> > pointer is NULL in mvneta_ethtool_pp_stats).
-> > Moreover in mvneta_ethtool_get_sset_count() and in mvneta_ethtool_get_s=
-trings()
-> > we just check pp->bm_priv pointer. Are the stats disaligned in this cas=
-e?
+On Thu, 2023-11-09 at 02:48 +0800, ChunHao Lin wrote:
+> For devices that support DASH, even DASH is disabled, there may still
+> exist a default firmware that will influence device behavior.
+> So driver needs to handle DASH for devices that support DASH, no
+> matter the DASH status is.
 >=20
-> Hi Lorenzo,
+> This patch also prepare for "fix DASH deviceis network lost issue".
 >=20
-> so the buffer manager (bm) does not support the page pool.
-> If this mode is used we can skip any page pool references.
+> Signed-off-by: ChunHao Lin <hau@realtek.com>
+
+You should include the fixes tag you already added in v1 and your Sob
+should come as the last tag
+
+The same applies to the next patch=20
+
+> Reviewed-by: Heiner Kallweit <hkallweit1@gmail.com>
+
+It's not clear where/when Heiner provided the above tag for this patch.
+I hope that was off-list.
+
+> Cc: stable@vger.kernel.org
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 35 ++++++++++++++++-------
+>  1 file changed, 25 insertions(+), 10 deletions(-)
 >=20
-> The question is do we end up with a race condition when we skip the is_st=
-opped check
-> as the variable is set to true just before the page pools are
-> deallocated on suspend or interface stop calls.
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethe=
+rnet/realtek/r8169_main.c
+> index 0c76c162b8a9..108dc75050ba 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -624,6 +624,7 @@ struct rtl8169_private {
+> =20
+>  	unsigned supports_gmii:1;
+>  	unsigned aspm_manageable:1;
+> +	unsigned dash_enabled:1;
+>  	dma_addr_t counters_phys_addr;
+>  	struct rtl8169_counters *counters;
+>  	struct rtl8169_tc_offsets tc_offset;
+> @@ -1253,14 +1254,26 @@ static bool r8168ep_check_dash(struct rtl8169_pri=
+vate *tp)
+>  	return r8168ep_ocp_read(tp, 0x128) & BIT(0);
+>  }
+> =20
+> -static enum rtl_dash_type rtl_check_dash(struct rtl8169_private *tp)
+> +static bool rtl_dash_is_enabled(struct rtl8169_private *tp)
+> +{
+> +	switch (tp->dash_type) {
+> +	case RTL_DASH_DP:
+> +		return r8168dp_check_dash(tp);
+> +	case RTL_DASH_EP:
+> +		return r8168ep_check_dash(tp);
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +static enum rtl_dash_type rtl_get_dash_type(struct rtl8169_private *tp)
+>  {
+>  	switch (tp->mac_version) {
+>  	case RTL_GIGA_MAC_VER_28:
+>  	case RTL_GIGA_MAC_VER_31:
+> -		return r8168dp_check_dash(tp) ? RTL_DASH_DP : RTL_DASH_NONE;
+> +		return RTL_DASH_DP;
+>  	case RTL_GIGA_MAC_VER_51 ... RTL_GIGA_MAC_VER_53:
+> -		return r8168ep_check_dash(tp) ? RTL_DASH_EP : RTL_DASH_NONE;
+> +		return RTL_DASH_EP;
+>  	default:
+>  		return RTL_DASH_NONE;
+>  	}
+> @@ -1453,7 +1466,7 @@ static void __rtl8169_set_wol(struct rtl8169_privat=
+e *tp, u32 wolopts)
+> =20
+>  	device_set_wakeup_enable(tp_to_dev(tp), wolopts);
+> =20
+> -	if (tp->dash_type =3D=3D RTL_DASH_NONE) {
+> +	if (!tp->dash_enabled) {
+>  		rtl_set_d3_pll_down(tp, !wolopts);
+>  		tp->dev->wol_enabled =3D wolopts ? 1 : 0;
+>  	}
+> @@ -2512,7 +2525,7 @@ static void rtl_wol_enable_rx(struct rtl8169_privat=
+e *tp)
+> =20
+>  static void rtl_prepare_power_down(struct rtl8169_private *tp)
+>  {
+> -	if (tp->dash_type !=3D RTL_DASH_NONE)
+> +	if (tp->dash_enabled)
+>  		return;
+> =20
+>  	if (tp->mac_version =3D=3D RTL_GIGA_MAC_VER_32 ||
+> @@ -4869,7 +4882,7 @@ static int rtl8169_runtime_idle(struct device *devi=
+ce)
+>  {
+>  	struct rtl8169_private *tp =3D dev_get_drvdata(device);
+> =20
+> -	if (tp->dash_type !=3D RTL_DASH_NONE)
+> +	if (tp->dash_enabled)
+>  		return -EBUSY;
+> =20
+>  	if (!netif_running(tp->dev) || !netif_carrier_ok(tp->dev))
+> @@ -4896,7 +4909,7 @@ static void rtl_shutdown(struct pci_dev *pdev)
+>  	rtl_rar_set(tp, tp->dev->perm_addr);
+> =20
+>  	if (system_state =3D=3D SYSTEM_POWER_OFF &&
+> -	    tp->dash_type =3D=3D RTL_DASH_NONE) {
+> +		!tp->dash_enabled) {
 
-Do we really have a race here? e.g. both ndo_stop and ethtool_get_stats() r=
-un under rtnl.
-Moreover it seems is_stopped is not set for armada-3700 devices (e.g. my
-espressobin). Do we have the issue for this kind of devices?
+Since you have to repost, please maintain the correct indentation
+above:
 
-Regards,
-Lorenzo
+	if (system_state =3D=3D SYSTEM_POWER_OFF &&
+	    !tp->dash_enabled) {
 
->=20
-> Best
-> Sven
->=20
-> >=20
-> > > +		mvneta_ethtool_pp_stats(pp, data);
-> > >  }
-> > > =20
-> > >  static int mvneta_ethtool_get_sset_count(struct net_device *dev, int=
- sset)
-> > >  {
-> > > -	if (sset =3D=3D ETH_SS_STATS)
-> > > -		return ARRAY_SIZE(mvneta_statistics) +
-> > > -		       page_pool_ethtool_stats_get_count();
-> > > +	if (sset =3D=3D ETH_SS_STATS) {
-> > > +		int count =3D ARRAY_SIZE(mvneta_statistics);
-> > > +		struct mvneta_port *pp =3D netdev_priv(dev);
-> > > +
-> > > +		if (!pp->bm_priv)
-> > > +			count +=3D page_pool_ethtool_stats_get_count();
-> > > +
-> > > +		return count;
-> > > +	}
-> > > =20
-> > >  	return -EOPNOTSUPP;
-> > >  }
-> > > --=20
-> > > 2.42.0
-> > >=20
->=20
->=20
+        ^^^^
+spaces here.
 
---M57S2kKDOWuCTbe7
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+Cheers,
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZUzDIQAKCRA6cBh0uS2t
-rBGQAQD7M6pLFEeOmFCkiqhM77omhA3lvjc0h0wlIlgFXUpCuQD+P5fOcT3PpPzK
-R+1U5AW9fuPCZ4G3BuATvVdLY9XoKAM=
-=TUIT
------END PGP SIGNATURE-----
+Paolo
 
---M57S2kKDOWuCTbe7--
 
