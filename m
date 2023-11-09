@@ -1,242 +1,190 @@
-Return-Path: <netdev+bounces-46929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82857E72BE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:26:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A34C87E7317
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 21:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A1F9B20BA2
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 20:26:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5B8C1C209E7
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 20:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0629636B14;
-	Thu,  9 Nov 2023 20:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F10E2FE2E;
+	Thu,  9 Nov 2023 20:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="YB6z+9OD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q2dCuSyd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F094C374C9
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 20:26:18 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 489F944B7
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:26:18 -0800 (PST)
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com [209.85.208.199])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id CDA2F3F129
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 20:26:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1699561575;
-	bh=2Kj3mYxA7EDom8iqgmIGjAXq9KRsn15BoZtGKD2WBeA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=YB6z+9ODkfVq6T9ge5bzlUxss431+tLX9zvBtDOVE+aUmNvY/sZJtg6CUUxVI3y6W
-	 riAlUXyVFAUcyxweEoYAIdw6h769GBMnP9ESFj/uTBdC+l0WbKijH2HGet1xNB6jzS
-	 PqUscL3g2oowILq3BpMZIxk1IeYTlgp5NKea4+tU/KVjTobg2/3qe/MFWzfwNtloXT
-	 UBLx+K06lc0VFUVLbuii+NhcQjyVjRJFLXuo7/fFuytDz08tcB4/PmT26GJJT8BlFm
-	 zcLidVjFeOqP7d0syAPeqPZu4naBHjhKnX59mwbiaZx4nKI+TJ7AhlwlFTtRXJDahE
-	 edZeKtbSo+uWA==
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2c59e2c661eso8305411fa.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 12:26:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699561575; x=1700166375;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Kj3mYxA7EDom8iqgmIGjAXq9KRsn15BoZtGKD2WBeA=;
-        b=F/mdvNk6h1oINKMMP+7EM2Nw/LnMZ6ci5WnN/9HuEYdlew3dcfFZcAkBQYeXdM5Zmi
-         uOhmwxPAegjYKPjUEkBzK0bljDNfFG6YqTFyGwzWPju1Wlrzt7+SkJAYiUhiopWFToc6
-         CkzHaphU+mhTcQLv+FPV1Y/16cNbGmPfz4dTnS8YHtSPZDGj8snqnLH/mlXZ73KqWuxx
-         K85JKLks6uujBRRdvXezRbz1rKlbKLde6uBvK/nT4R1aenSa522DrpZCnp8RnBoJDh/3
-         eyBjlTx2spUA5AQrXtzpCJbPjn0MUofpWTAszMAadNDo1ZSdx8N/Y3eU0R1kLevhCAdF
-         RlgQ==
-X-Gm-Message-State: AOJu0Yxc9nTrx6aBv0ataSrjZ89vgkC3utgQu8XxLpAnX1bzpNnBLalY
-	i4s6Je028nizpJIXKn6hne13f2ezpPGC+KAGseIgzB3fpCVnIHFnnBTE89RRZdx10suqoTHEHsp
-	X2FCyF/BVYqOQiaIJS5xJjfUe+WipIiTMmA==
-X-Received: by 2002:a2e:5c47:0:b0:2c5:dc3:5780 with SMTP id q68-20020a2e5c47000000b002c50dc35780mr162410ljb.8.1699561575338;
-        Thu, 09 Nov 2023 12:26:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF6xpWdJS6Rwy/1lIj6FVrWSd91kTgpVWNE8AuOUrVzexn2rPpZNA6iaWiBW0ULNAiZ+dxuDA==
-X-Received: by 2002:a2e:5c47:0:b0:2c5:dc3:5780 with SMTP id q68-20020a2e5c47000000b002c50dc35780mr162399ljb.8.1699561574986;
-        Thu, 09 Nov 2023 12:26:14 -0800 (PST)
-Received: from vermin.localdomain ([159.148.28.2])
-        by smtp.gmail.com with ESMTPSA id s19-20020a2e98d3000000b002bb99bd0865sm56653ljj.38.2023.11.09.12.26.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 12:26:14 -0800 (PST)
-Received: by vermin.localdomain (Postfix, from userid 1000)
-	id D4D8A1C3B33; Thu,  9 Nov 2023 12:26:13 -0800 (PST)
-Received: from vermin (localhost [127.0.0.1])
-	by vermin.localdomain (Postfix) with ESMTP id D42411C3B2E;
-	Thu,  9 Nov 2023 22:26:13 +0200 (EET)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Eric Dumazet <edumazet@google.com>
-cc: "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-    eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] bonding: stop the device in bond_setup_by_slave()
-In-reply-to: <20231109180102.4085183-1-edumazet@google.com>
-References: <20231109180102.4085183-1-edumazet@google.com>
-Comments: In-reply-to Eric Dumazet <edumazet@google.com>
-   message dated "Thu, 09 Nov 2023 18:01:02 +0000."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9A7358B2
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 20:51:43 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20F9344A6;
+	Thu,  9 Nov 2023 12:51:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699563103; x=1731099103;
+  h=from:to:cc:subject:date:message-id:
+   content-transfer-encoding:mime-version;
+  bh=qQL6ukIuR94B3PPT5+OT+gY4jBfxzMu1TIUCX0/43oI=;
+  b=Q2dCuSyd9K/1INZ3Irluil/KtTieQ3xkHHxlXPlaWURYKENlKpHb2L4T
+   7ei/0pis8VZlul+w5W1BlXNpyVDrCQmXilJkYg+QzG7iT3sqmljO7jhbW
+   gX/zH6GPdeZgSeARm5lhtCY1+9bo2kQ+hn9PHvHRO9HYb3dCnG7omLNH7
+   0Y13vJsl6k7qfzhVsB77vN9UTHZwt9wo4sGaUbgr0OK9ZaBE/hVp9vL9I
+   i46dWhEZgJL9eWwWlgwSpkoa46DG+Vj/H5B14E0+OMNRWL9Zwpy0Fanyh
+   Znza0bOTJ+QGGIFMZaoTQBhtSylv7sHykv5U6NYXxugAC7y1C9bgBxune
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="389877498"
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="389877498"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 12:51:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,290,1694761200"; 
+   d="scan'208";a="4662111"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 12:51:41 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 9 Nov 2023 12:51:42 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 12:51:42 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 9 Nov 2023 12:51:42 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kzig49iCWzuf5MJTu+xu1h46X6vbKe+NvlD9G5AIFkL/gpoWfkaYAfm9vqvz8DYHDeRdxj2p6wgMMLmrjM6aD4NndG1JGgKWkdwNzYHzHkQPxJIMwUCD9/V/kYxDePpPB7UPc1mvK3NU/nbFLpz7OjOzGHmI8k603L9idvZvFhwiwdlYFvo26MoOcuEDgfWzVbispWcLYsonfkoXcchlolsZUU5+5cyeynRqsn73UPQR4GIwCWNcq+17Piy+bFMGDwtbNZEzSHD8aUOwLxL1nSDDl4tV2dth7OILNRZQa26uEJKt8XdET3zDQEu0NqbMlf75ifEwhnCVw+SazffnSw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EEpBpRmrsEZLyKzp6aQVCwG/m2zbL/7R30a8qO8TssA=;
+ b=nWlEnpNfQr+Um1ZYcABTR/2KWIKm5hsf86WsCuGIilvk3S0OIELki5cAD63qtRNlc7riae2CiO7fIwdt01sUgQMy+54mXl/xrsGvSsCwJBBNbi976AVbCXC2miCy5WaVcGYDrcthX+DP0b0vauvHeWrNZPpU3K9A7/tgXAevrMDkHHwlVtdvdESkh7L2eE8cKZSLtc3YdKFgN7Ev7MUllgvxqdBoyd/efdjXpHgQgbX4R8WrqHhMoPZKqXhoIWCWYds91kKsPBmd9GOKjYYBLcY3jEYYyUDcY1NkFGMEGmDQki/7ZtDP8ugF9/JRdebkCKNWfBaQdHiSJo1OZ2QvOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MN0PR11MB6206.namprd11.prod.outlook.com (2603:10b6:208:3c6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.19; Thu, 9 Nov
+ 2023 20:51:40 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::5d1:aa22:7c98:f3c6%6]) with mapi id 15.20.6954.021; Thu, 9 Nov 2023
+ 20:51:40 +0000
+From: Johnathan Mantey <johnathanx.mantey@intel.com>
+To: <netdev@vger.kernel.org>
+CC: <sam@mendozajonas.com>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <johnathanx.mantey@intel.com>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net v2] ncsi: Revert NCSI link loss/gain commit
+Date: Thu, 9 Nov 2023 12:51:37 -0800
+Message-ID: <20231109205137.819392-1-johnathanx.mantey@intel.com>
+X-Mailer: git-send-email 2.41.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0230.namprd03.prod.outlook.com
+ (2603:10b6:a03:39f::25) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <77833.1699561573.1@vermin>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 09 Nov 2023 22:26:13 +0200
-Message-ID: <77834.1699561573@vermin>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|MN0PR11MB6206:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5f0cda59-a0ca-467c-5ecf-08dbe165ac6a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ag5YqGwB8DzqjJxgVRGR6wIwMUrR7PpGwpMoVsCFaa1ynrudskx0cuvTrA2Winjp1MrkaKY9hoPRq23+xkKxp4k0eQ0IGUfPxwh31rtaxG4HkmKo1jUu1w7gH7w/Lzju835BVQhH4IEnr7EVHyNcYdnYcEuuBzcs0x1n3xIQV7DPn98BKDLQy2MvW2ywbtytuEIYvCt7MhjbWn4PEuiICHMM1+T1/RrFiYKKIeYq0VYFJjadSOD9AMcGN+P8Q8HkXzrHvmtrTJkhdYJ3JgLZAjSeEWPh8lE4oeEo6vKZvZWufI8lMUhnG0GeBCvO+9fISvR4iOE4M8H2scjHp+hZoevp/oG7tJZVaFG2x8H2LHIhS4gacmMqAGsH7eiTeGxPXm5s9WivIpc9dA3cDsdsJxeOHcBOblsFFLsDa1QWsj+UaJsrdBH/Zt/n+RhhWR5einQMQC8XlK7xSfl46aNZaVo7sZMbDCJ4Y1jhmfhAlOVN1OJ9T5q4rA11rggMS2IA9OEeTGlIoUU3t/Gm0Orug2JFAK58T5afjYcUkULVt+j+4QpgoamvMh8Oi+gdnC6b
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(39860400002)(376002)(366004)(346002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(6916009)(26005)(1076003)(316002)(8936002)(8676002)(36756003)(6512007)(86362001)(6666004)(4326008)(2616005)(66946007)(6486002)(38100700002)(66556008)(66476007)(82960400001)(83380400001)(6506007)(5660300002)(478600001)(41300700001)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?IlJNDy20XQ9EKhUg3MgaTvyGTebBDhnQP1D2mC1kEAnZDPMqt91MbAESzxi3?=
+ =?us-ascii?Q?CKbrA7ObLmg5royRrupXJLp/qPHw4t7Y/Jt/sBlokrHmwE3SP1W8oX9pUp91?=
+ =?us-ascii?Q?MKktn6h6AS6HnRN2QhyFEq06Vl0730zcLXCz1EBcjxc8Uo6PnUisSg1iCpDy?=
+ =?us-ascii?Q?NqHCcJiTPeC8q9j1ghum+BqC3q9T6l1+Y3Bk129XM+mf3CFH02tURjEFEtrz?=
+ =?us-ascii?Q?DsY14zSfhWy0Ta3O8xJ3RRWqwtRaLcQlipbCzAfODkTJ49QwIkZVHaeDbIRG?=
+ =?us-ascii?Q?8cpz2f+HqmLC55J31nZ78+jYJVb78GyRzYwkXWx1ZHpt76+myd7U/3HKrdl2?=
+ =?us-ascii?Q?uMkXL2/9LWCHJ6ZEGdfNlk3H1l8XvsVoJ4z6h1dzQZHRlRj/iIXNkkBCV12q?=
+ =?us-ascii?Q?LAIufVcyNea/7Te/5Km0kyKJu5eObQnBPBiU/Ph00C7L8tM6seOPks4+zyTX?=
+ =?us-ascii?Q?G4i+QStu6y+cDiJBzwRqBwl/NJxG/vChBJUedt9QJN1tm/yTsxzyKatHfHsA?=
+ =?us-ascii?Q?RoD+yrar3R+KzaHypuaIuHgdcBJsNrIfe4gf3V9a1KdDzas4U9mQodoYZzRL?=
+ =?us-ascii?Q?M+miNvTcQLSA2uEkigtN1O69MZxAC8BAEjn25tm5ofqWm4U5ah7+visKvBYJ?=
+ =?us-ascii?Q?XF48TvIq8I5EG+05G9y2siya5o16Fpyw/0akUxxbMkn10sQ49wv1S4yahEgS?=
+ =?us-ascii?Q?DVHRiWYWTrsNJ2SFQKUA54W1eGRK3mhcIpRzsEIWxtLyfAIUesvSp61LdjNy?=
+ =?us-ascii?Q?Dulf3ORZKLf0fbuPIQdq2Kw9t7LcdzL+qSVHOznsSo9FCHjp7MOdiACt7Mqn?=
+ =?us-ascii?Q?22RadryGs/1wCvCn4eWZOW//UUw0GzkzYOI4sEXJOpR/RxcODxkr/rXoF069?=
+ =?us-ascii?Q?SbIc0bgtXftKI2gIdETLrMSH7hvMzthxn83DKpZIVvTs18SvYCdGpZY/KJMM?=
+ =?us-ascii?Q?z7/rz5oiHEnG+Aaj9XYveqJww/RZGUnPbWLvw8Z1KbfFNnrRhXBMdYP0dqk0?=
+ =?us-ascii?Q?wX1+d/r7tZXnN29+M1GAC9XDL0GS/7YoKp4iMBm1qdIF2EWE/30SnobSMwEJ?=
+ =?us-ascii?Q?BR7ekfQrk7KbvIaCO9ymcOrhpwAX3Dpa+HHiifjwcm0pDSJvmqZFDSzGidHC?=
+ =?us-ascii?Q?eqUVCsPE4f14OqcSUPk2kUwGU3uYg9TlrWN8NGRDLDZJyGHCkyYJZDkgYESg?=
+ =?us-ascii?Q?v5FZLXY8qgc5pGwoR+MTRBKtkkFAAvwA9VjTCdxRGnmaBzWJQEcG7I7DxkiL?=
+ =?us-ascii?Q?Ws3YHb1/LZGU8BI2OGSk8+TGh+EPOY7l36AnnCWZp3rPB+f1gR5RwEGZ6dAA?=
+ =?us-ascii?Q?gQMp7P8cx993dIcJ8M+LDOCyvtQxlMEr/+gnggTyKrDa2YDgxZ2fJtwYb/lG?=
+ =?us-ascii?Q?odORe+4EtzQPg8KKtlUtiGMt6WEmivYXKU57jC3phM3e+cgcJuPUtVsS+/XR?=
+ =?us-ascii?Q?BK3Dk7GP4kVojKB2oH6zFE6x7uLQv6WH8gs5ciH9jDimU7I/3gh+RX0F4dtj?=
+ =?us-ascii?Q?ew4ayL85bu32nerZku/J96rVG5OMpRiX20MyYF46gsxNISlthJJyj0U2Be8o?=
+ =?us-ascii?Q?5fPCu7XOQAmW3NBMITDa1vAMyKnj1B6ijai21wrpAK3WYhw+f1EurVukhDcW?=
+ =?us-ascii?Q?uw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f0cda59-a0ca-467c-5ecf-08dbe165ac6a
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 20:51:40.5905
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /DcClPHys8w+aMY/uCTrSM75k9dXmDov4/5AdalJVn0X23a6KHtCJPv6xO5x2rE1fWHl0tIHI4ui6Qj0Rac+PRRNsFd+lUF0QMjy7IwkE3Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6206
+X-OriginatorOrg: intel.com
 
-Eric Dumazet <edumazet@google.com> wrote:
+The NCSI commit
+ncsi: Propagate carrier gain/loss events to the NCSI controller
+introduced unwanted behavior.
 
->Commit 9eed321cde22 ("net: lapbether: only support ethernet devices")
->has been able to keep syzbot away from net/lapb, until today.
->
->In the following splat [1], the issue is that a lapbether device has
->been created on a bonding device without members. Then adding a non
->ARPHRD_ETHER member forced the bonding master to change its type.
->
->The fix is to make sure we call dev_close() in bond_setup_by_slave()
->so that the potential linked lapbether devices (or any other devices
->having assumptions on the physical device) are removed.
->
->A similar bug has been addressed in commit 40baec225765
->("bonding: fix panic on non-ARPHRD_ETHER enslave failure")
->
->[1]
->skbuff: skb_under_panic: text:ffff800089508810 len:44 put:40 head:ffff000=
-0c78e7c00 data:ffff0000c78e7bea tail:0x16 end:0x140 dev:bond0
->kernel BUG at net/core/skbuff.c:192 !
->Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
->Modules linked in:
->CPU: 0 PID: 6007 Comm: syz-executor383 Not tainted 6.6.0-rc3-syzkaller-gb=
-f6547d8715b #0
->Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 08/04/2023
->pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
->pc : skb_panic net/core/skbuff.c:188 [inline]
->pc : skb_under_panic+0x13c/0x140 net/core/skbuff.c:202
->lr : skb_panic net/core/skbuff.c:188 [inline]
->lr : skb_under_panic+0x13c/0x140 net/core/skbuff.c:202
->sp : ffff800096a06aa0
->x29: ffff800096a06ab0 x28: ffff800096a06ba0 x27: dfff800000000000
->x26: ffff0000ce9b9b50 x25: 0000000000000016 x24: ffff0000c78e7bea
->x23: ffff0000c78e7c00 x22: 000000000000002c x21: 0000000000000140
->x20: 0000000000000028 x19: ffff800089508810 x18: ffff800096a06100
->x17: 0000000000000000 x16: ffff80008a629a3c x15: 0000000000000001
->x14: 1fffe00036837a32 x13: 0000000000000000 x12: 0000000000000000
->x11: 0000000000000201 x10: 0000000000000000 x9 : cb50b496c519aa00
->x8 : cb50b496c519aa00 x7 : 0000000000000001 x6 : 0000000000000001
->x5 : ffff800096a063b8 x4 : ffff80008e280f80 x3 : ffff8000805ad11c
->x2 : 0000000000000001 x1 : 0000000100000201 x0 : 0000000000000086
->Call trace:
->skb_panic net/core/skbuff.c:188 [inline]
->skb_under_panic+0x13c/0x140 net/core/skbuff.c:202
->skb_push+0xf0/0x108 net/core/skbuff.c:2446
->ip6gre_header+0xbc/0x738 net/ipv6/ip6_gre.c:1384
->dev_hard_header include/linux/netdevice.h:3136 [inline]
->lapbeth_data_transmit+0x1c4/0x298 drivers/net/wan/lapbether.c:257
->lapb_data_transmit+0x8c/0xb0 net/lapb/lapb_iface.c:447
->lapb_transmit_buffer+0x178/0x204 net/lapb/lapb_out.c:149
->lapb_send_control+0x220/0x320 net/lapb/lapb_subr.c:251
->__lapb_disconnect_request+0x9c/0x17c net/lapb/lapb_iface.c:326
->lapb_device_event+0x288/0x4e0 net/lapb/lapb_iface.c:492
->notifier_call_chain+0x1a4/0x510 kernel/notifier.c:93
->raw_notifier_call_chain+0x3c/0x50 kernel/notifier.c:461
->call_netdevice_notifiers_info net/core/dev.c:1970 [inline]
->call_netdevice_notifiers_extack net/core/dev.c:2008 [inline]
->call_netdevice_notifiers net/core/dev.c:2022 [inline]
->__dev_close_many+0x1b8/0x3c4 net/core/dev.c:1508
->dev_close_many+0x1e0/0x470 net/core/dev.c:1559
->dev_close+0x174/0x250 net/core/dev.c:1585
->lapbeth_device_event+0x2e4/0x958 drivers/net/wan/lapbether.c:466
->notifier_call_chain+0x1a4/0x510 kernel/notifier.c:93
->raw_notifier_call_chain+0x3c/0x50 kernel/notifier.c:461
->call_netdevice_notifiers_info net/core/dev.c:1970 [inline]
->call_netdevice_notifiers_extack net/core/dev.c:2008 [inline]
->call_netdevice_notifiers net/core/dev.c:2022 [inline]
->__dev_close_many+0x1b8/0x3c4 net/core/dev.c:1508
->dev_close_many+0x1e0/0x470 net/core/dev.c:1559
->dev_close+0x174/0x250 net/core/dev.c:1585
->bond_enslave+0x2298/0x30cc drivers/net/bonding/bond_main.c:2332
->bond_do_ioctl+0x268/0xc64 drivers/net/bonding/bond_main.c:4539
->dev_ifsioc+0x754/0x9ac
->dev_ioctl+0x4d8/0xd34 net/core/dev_ioctl.c:786
->sock_do_ioctl+0x1d4/0x2d0 net/socket.c:1217
->sock_ioctl+0x4e8/0x834 net/socket.c:1322
->vfs_ioctl fs/ioctl.c:51 [inline]
->__do_sys_ioctl fs/ioctl.c:871 [inline]
->__se_sys_ioctl fs/ioctl.c:857 [inline]
->__arm64_sys_ioctl+0x14c/0x1c8 fs/ioctl.c:857
->__invoke_syscall arch/arm64/kernel/syscall.c:37 [inline]
->invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:51
->el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:136
->do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:155
->el0_svc+0x58/0x16c arch/arm64/kernel/entry-common.c:678
->el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:696
->el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:591
->Code: aa1803e6 aa1903e7 a90023f5 94785b8b (d4210000)
->
->Fixes: 872254dd6b1f ("net/bonding: Enable bonding to enslave non ARPHRD_E=
-THER")
->Reported-by: syzbot <syzkaller@googlegroups.com>
->Signed-off-by: Eric Dumazet <edumazet@google.com>
+The intent for the commit was to be able to detect carrier loss/gain
+for just the NIC connected to the BMC. The unwanted effect is a
+carrier loss for auxiliary paths also causes the BMC to lose
+carrier. The BMC never regains carrier despite the secondary NIC
+regaining a link.
 
-	I was initially worred that the close / open dance was on the
-regular path, but it's only for the non-ARPHRD_ETHER case.  That's
-really for Infiniband IPoIB, and I'm not sure that there is anything
-that can be stacked atop an IPoIB bond.
+This change, when merged, needs to be backported to stable kernels.
+5.4-stable, 5.10-stable, 5.15-stable, 6.1-stable, 6.5-stable
 
-Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
-
-	-J
-
->---
-> drivers/net/bonding/bond_main.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 51d47eda1c873debda6da094377bcb3367a78f6e..8e6cc0e133b7f19afccd3ecf4=
-4bea5ceacb393b1 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -1500,6 +1500,10 @@ static void bond_compute_features(struct bonding *=
-bond)
-> static void bond_setup_by_slave(struct net_device *bond_dev,
-> 				struct net_device *slave_dev)
-> {
->+	bool was_up =3D !!(bond_dev->flags & IFF_UP);
->+
->+	dev_close(bond_dev);
->+
-> 	bond_dev->header_ops	    =3D slave_dev->header_ops;
-> =
-
-> 	bond_dev->type		    =3D slave_dev->type;
->@@ -1514,6 +1518,8 @@ static void bond_setup_by_slave(struct net_device *=
-bond_dev,
-> 		bond_dev->flags &=3D ~(IFF_BROADCAST | IFF_MULTICAST);
-> 		bond_dev->flags |=3D (IFF_POINTOPOINT | IFF_NOARP);
-> 	}
->+	if (was_up)
->+		dev_open(bond_dev, NULL);
-> }
-> =
-
-> /* On bonding slaves other than the currently active slave, suppress
->-- =
-
->2.42.0.869.gea05f2083d-goog
-
+Fixes: 3780bb29311e ncsi: Propagate carrier gain/loss events to the
+CC: stable@vger.kernel.org
+Signed-off-by: Johnathan Mantey <johnathanx.mantey@intel.com>
 ---
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+ net/ncsi/ncsi-aen.c | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/net/ncsi/ncsi-aen.c b/net/ncsi/ncsi-aen.c
+index f8854bff286c..62fb1031763d 100644
+--- a/net/ncsi/ncsi-aen.c
++++ b/net/ncsi/ncsi-aen.c
+@@ -89,11 +89,6 @@ static int ncsi_aen_handler_lsc(struct ncsi_dev_priv *ndp,
+ 	if ((had_link == has_link) || chained)
+ 		return 0;
+ 
+-	if (had_link)
+-		netif_carrier_off(ndp->ndev.dev);
+-	else
+-		netif_carrier_on(ndp->ndev.dev);
+-
+ 	if (!ndp->multi_package && !nc->package->multi_channel) {
+ 		if (had_link) {
+ 			ndp->flags |= NCSI_DEV_RESHUFFLE;
+-- 
+2.41.0
+
 
