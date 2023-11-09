@@ -1,308 +1,311 @@
-Return-Path: <netdev+bounces-46763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571BB7E64EE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:08:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 792AE7E64F2
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:09:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61FE51C20818
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A95B2810CD
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 08:09:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3919101FC;
-	Thu,  9 Nov 2023 08:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313E710787;
+	Thu,  9 Nov 2023 08:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meinberg.de header.i=@meinberg.de header.b="Kacd8fz3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ao1ckPKd"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAFD101FA
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:08:22 +0000 (UTC)
-Received: from server1a.meinberg.de (server1a.meinberg.de [176.9.44.212])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6232D44
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:08:22 -0800 (PST)
-Received: from seppmail.py.meinberg.de (unknown [193.158.22.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA512)
-	(No client certificate requested)
-	by server1a.meinberg.de (Postfix) with ESMTPSA id 9D5AF71C0D1F;
-	Thu,  9 Nov 2023 09:08:19 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meinberg.de; s=d2021;
-	t=1699517299;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4439010784
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 08:09:11 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A711A2D44
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 00:09:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699517349;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bB0TBhiXv30ofUQqllyffVGIy1Ow8zt5Xd80cvMu4Hs=;
-	b=Kacd8fz39AyYSWglQIHnbWsAgcRKmADaU2WXtua7KdovxZjoFmALDpFqMGLnEiiZRcM11C
-	l1DY0cT7bS7+fRtonhV/t9iiAHX5qUTIJOV6HxvCrr0CUJOJb8/T+svsakNmRPU0Z/iuuz
-	43wfQvcIk9vtAYdyN9urZI0cLlYMKjdP0ekI/dpgamR3m8OIiFLqXNLB/H80yn/H33A4wn
-	EQq0FVye09TMscq3koA1Ik0yuH/a7DJrj6dn+awPp2SdrcrzM60WlsoBSUhtbBWJpf1mFh
-	6EwQxKEBDeqqv7mVUtTmXXuIzER8ASiaQAgDntubNpdWbybrHZwSUYa4AC1MJg==
-Received: from seppmail (localhost [127.0.0.1])
-	by seppmail.py.meinberg.de (Postfix) with SMTP id 4SQvhz1BtRz36ps;
-	Thu,  9 Nov 2023 09:08:19 +0100 (CET)
-Received: from srv-kerioconnect.py.meinberg.de (srv-kerioconnect.py.meinberg.de [172.16.3.65])
-	(using TLSv1.3 with cipher AEAD-AES256-GCM-SHA384 (256/256 bits)
-	 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by seppmail.py.meinberg.de (Postfix) with ESMTPS;
-	Thu,  9 Nov 2023 09:08:18 +0100 (CET)
-X-Footer: bWVpbmJlcmcuZGU=
-User-Agent: Microsoft-MacOutlook/16.78.23100802
-Date: Thu, 9 Nov 2023 09:08:17 +0100
-Subject: Re: PRP with VLAN support - or how to contribute to a Linux network
- driver
-Message-ID: <DB0904D7-4F30-4A61-A4CB-48C7BFF4390F@meinberg.de>
-Thread-Topic: PRP with VLAN support - or how to contribute to a Linux network
-	driver
-References: <75E355CF-3621-40D7-A31C-BA829804DFA2@meinberg.de>
-	<6ab3289a-2ede-41a3-8c57-b01df37bab7f@lunn.ch>
-In-Reply-To: <6ab3289a-2ede-41a3-8c57-b01df37bab7f@lunn.ch>
-Importance: Normal
-X-Priority: 3
-Thread-Index: AZ2x3tU+NGVjMGQzZTRiMzdiMzk0Mw==
-From: Heiko Gerstung <heiko.gerstung@meinberg.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-X-SM-outgoing: yes
+	bh=aUoeYWUJDM0IWxWC+TFHuPPTNx4g+Umu7w6l7MZzjis=;
+	b=Ao1ckPKdwVI0heZ9DoUtjUB9EMSDHUZtBzJzroLYoZ/hJbGU8EpnWOs4DJfB8QSFL9JuWY
+	X2GNjqTASR2igotR6XkqWxrS+ZndDk9WYxYfXIsBOcI68Ji2nlq+/buKmA9clEwTn+9GAj
+	htz4Il8uX6iR+PwUgg18dp//3u7jB7M=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-295-1NlpCBPNOoWVOCxLREsDqw-1; Thu, 09 Nov 2023 03:09:07 -0500
+X-MC-Unique: 1NlpCBPNOoWVOCxLREsDqw-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-54061ad6600so400544a12.3
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 00:09:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699517346; x=1700122146;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUoeYWUJDM0IWxWC+TFHuPPTNx4g+Umu7w6l7MZzjis=;
+        b=qZ+1MLOlyQziAZu0KO4FkhQnJGQSPCrf/8cnM+DD/b3VctBvBYOJ/UYEakoxs8DLjX
+         7fQOdDgkg3nC/AEsk51aG0vzunRqa/Mj/zkQZsCaNQOong+VckfaUrw134gnCgyS+gVr
+         qMYg3XAMTqoi7cx088/01vYaVZOj45WlO23qDjHTNhQ59eNxvRETPP5d99AIwAfXv0+K
+         1cNLiw+IOQpc5YSIgXNOO0Rfiu93d0S9LuW63I8FEqibhaGyK0gf+VHgmRT9QmL2Mqyn
+         JAjRjEatFbhf1aR2Y1iO0+Jf1gykwVEsx+PFir0CMnc870W7eawgWiDd8Lik6j7E/BQc
+         GB+A==
+X-Gm-Message-State: AOJu0YwpX2/NVXAy4GQeTW7K3n0xrams2+LtUZx3XWiVjjCJxJWP/BDx
+	9Da35tVq5D9rITvteLsyg2l0OF32fTB4/Ct71cwccreI1uxZQzprSiYFNmsmKc1M8bErFS0dOqi
+	f7crcm+uwXj4DHf26
+X-Received: by 2002:a17:907:94cf:b0:9be:2991:81fb with SMTP id dn15-20020a17090794cf00b009be299181fbmr4063694ejc.36.1699517345903;
+        Thu, 09 Nov 2023 00:09:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGYpu3wVHFEBLFOCNpjO1ckAkX39m7vNMdfJg1lqaCszlr215VR1rcwV9phhRRqhp7kEHHjtw==
+X-Received: by 2002:a17:907:94cf:b0:9be:2991:81fb with SMTP id dn15-20020a17090794cf00b009be299181fbmr4063673ejc.36.1699517345524;
+        Thu, 09 Nov 2023 00:09:05 -0800 (PST)
+Received: from redhat.com ([2a02:14f:1f4:2044:be5a:328c:4b98:1420])
+        by smtp.gmail.com with ESMTPSA id o20-20020a170906359400b0098f33157e7dsm2189274ejb.82.2023.11.09.00.09.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 00:09:04 -0800 (PST)
+Date: Thu, 9 Nov 2023 03:09:00 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 12/21] virtio_net: xsk: tx: support tx
+Message-ID: <20231109030424-mutt-send-email-mst@kernel.org>
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-13-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg="sha-256"; boundary="----B3AC91E90B5DDD414FD7DB6E0E2D5BFB"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107031227.100015-13-xuanzhuo@linux.alibaba.com>
 
-This is an S/MIME signed message
+On Tue, Nov 07, 2023 at 11:12:18AM +0800, Xuan Zhuo wrote:
+> The driver's tx napi is very important for XSK. It is responsible for
+> obtaining data from the XSK queue and sending it out.
+> 
+> At the beginning, we need to trigger tx napi.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio/main.c       |  12 +++-
+>  drivers/net/virtio/virtio_net.h |   3 +-
+>  drivers/net/virtio/xsk.c        | 110 ++++++++++++++++++++++++++++++++
+>  drivers/net/virtio/xsk.h        |  13 ++++
+>  4 files changed, 136 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> index 6c608b3ce27d..ff6bc764089d 100644
+> --- a/drivers/net/virtio/main.c
+> +++ b/drivers/net/virtio/main.c
+> @@ -2074,6 +2074,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+>  	struct virtnet_info *vi = sq->vq->vdev->priv;
+>  	unsigned int index = vq2txq(sq->vq);
+>  	struct netdev_queue *txq;
+> +	int busy = 0;
+>  	int opaque;
+>  	bool done;
+>  
+> @@ -2086,11 +2087,20 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
+>  	txq = netdev_get_tx_queue(vi->dev, index);
+>  	__netif_tx_lock(txq, raw_smp_processor_id());
+>  	virtqueue_disable_cb(sq->vq);
+> -	free_old_xmit(sq, true);
+> +
+> +	if (sq->xsk.pool)
+> +		busy |= virtnet_xsk_xmit(sq, sq->xsk.pool, budget);
 
-------B3AC91E90B5DDD414FD7DB6E0E2D5BFB
-Content-Type: text/plain; charset="utf-8"
-MIME-version: 1.0
-
-Am 08.11.23, 16:17 schrieb "Andrew Lunn" <andrew@lunn.ch <mailto:andrew@lunn.ch>>:
-
-
->> I would like to discuss if it makes sense to remove the PRP
->> functionality from the HSR driver (which is based on the bridge
->> kernel module AFAICS) and instead implement PRP as a separate module
->> (based on the Bonding driver, which would make more sense for PRP).
-
-
-> Seems like nobody replied. I don't know PRP or HSR, so i can only make
-> general remarks.
-
-Thank you for responding!
-
-> The general policy is that we don't rip something out and replace it
-> with new code. We try to improve what already exists to meet the
-> demands. This is partially because of backwards compatibility. There
-> could be users using the code as is. You cannot break that. Can you
-> step by step modify the current code to make use of bonding, and in
-> the process show you don't break the current use cases? 
-
-Understood. I am not sure if we can change the hsr driver to gradually use a more bonding-like approach for prp and I believe this might not be required, as long as we can get VLAN support into it. 
-
-> You also need to consider offloading to hardware. The bridge code has infrastructure
-> to offload. Does the bond driver? I've no idea about that.
-
-I do not know this either but would expect that the nature of bonding would not require offloading support (I do not see a potential for efficiency/performance improvements here, unlike HSR or PRP). 
-
->> Hoping for advise what the next steps could be. Happy to discuss
->> this off-list as it may not be of interest for most people.
-
-> You probably want to get together with others who are interested in
-> PRP and HSR. linutronix, ti, microchip, etc.
-
-Yes, would love to do that and my hope was that I would find them here. I am not familiar with the "orphaned" status for a kernel module, but I would have expected that one of the mentioned parties interested in PRP/HSR would have adopted the module. 
-
-> Andrew
-
-Again, thanks a lot for your comments and remarks, very useful.
-
-Heiko
+You use bitwise or on errno values? What's going on here?
 
 
+> +	else
+> +		free_old_xmit(sq, true);
+>  
+>  	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
+>  		netif_tx_wake_queue(txq);
+>  
+> +	if (busy) {
+> +		__netif_tx_unlock(txq);
+> +		return budget;
+> +	}
+> +
+>  	opaque = virtqueue_enable_cb_prepare(sq->vq);
+>  
+>  	done = napi_complete_done(napi, 0);
+> diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> index 442af4673bf8..1c21af47e13c 100644
+> --- a/drivers/net/virtio/virtio_net.h
+> +++ b/drivers/net/virtio/virtio_net.h
+> @@ -9,7 +9,8 @@
+>  #include <net/xdp_sock_drv.h>
+>  
+>  #define VIRTIO_XDP_FLAG	BIT(0)
+> -#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG)
+> +#define VIRTIO_XSK_FLAG	BIT(1)
+> +#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG | VIRTIO_XSK_FLAG)
+>  
+>  /* RX packet size EWMA. The average packet size is used to determine the packet
+>   * buffer size when refilling RX rings. As the entire RX ring may be refilled
+> diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> index 8b397787603f..caa448308232 100644
+> --- a/drivers/net/virtio/xsk.c
+> +++ b/drivers/net/virtio/xsk.c
+> @@ -4,9 +4,119 @@
+>   */
+>  
+>  #include "virtio_net.h"
+> +#include "xsk.h"
+>  
+>  static struct virtio_net_hdr_mrg_rxbuf xsk_hdr;
+>  
+> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len)
+> +{
+> +	sg->dma_address = addr;
+> +	sg->length = len;
+> +}
+> +
+> +static void virtnet_xsk_check_queue(struct virtnet_sq *sq)
+> +{
+> +	struct virtnet_info *vi = sq->vq->vdev->priv;
+> +	struct net_device *dev = vi->dev;
+> +	int qnum = sq - vi->sq;
+> +
+> +	/* If it is a raw buffer queue, it does not check whether the status
+> +	 * of the queue is stopped when sending. So there is no need to check
+> +	 * the situation of the raw buffer queue.
+> +	 */
+> +	if (virtnet_is_xdp_raw_buffer_queue(vi, qnum))
+> +		return;
+> +
+> +	/* If this sq is not the exclusive queue of the current cpu,
+> +	 * then it may be called by start_xmit, so check it running out
+> +	 * of space.
+> +	 *
+> +	 * Stop the queue to avoid getting packets that we are
+> +	 * then unable to transmit. Then wait the tx interrupt.
+> +	 */
+> +	if (sq->vq->num_free < 2 + MAX_SKB_FRAGS)
 
+what does MAX_SKB_FRAGS have to do with it? And where's 2 coming from?
 
-------B3AC91E90B5DDD414FD7DB6E0E2D5BFB
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-
-MIIf4QYJKoZIhvcNAQcCoIIf0jCCH84CAQExDTALBglghkgBZQMEAgEwCwYJKoZI
-hvcNAQcBoIIcIzCCBbowggOioAMCAQICCQC7QBxD9V5PsDANBgkqhkiG9w0BAQUF
-ADBFMQswCQYDVQQGEwJDSDEVMBMGA1UEChMMU3dpc3NTaWduIEFHMR8wHQYDVQQD
-ExZTd2lzc1NpZ24gR29sZCBDQSAtIEcyMB4XDTA2MTAyNTA4MzAzNVoXDTM2MTAy
-NTA4MzAzNVowRTELMAkGA1UEBhMCQ0gxFTATBgNVBAoTDFN3aXNzU2lnbiBBRzEf
-MB0GA1UEAxMWU3dpc3NTaWduIEdvbGQgQ0EgLSBHMjCCAiIwDQYJKoZIhvcNAQEB
-BQADggIPADCCAgoCggIBAK/k7n6LJA4SbqlQLRZEO5KSXMq4XYSSQhMqvGVXgkA+
-VyTNUIslKrdv/O+i0MAfAiRKE5aPIxPmKFgAo0fHBqeEIyu7vZYrf1XMi8FXHw5i
-ZQ/dPVaKc9qufm26gRx+QowgNdlDTYT6hNtSLPMOJ3cLa78RL3J4ny7YPuYYN1oq
-cvnaYpCSlcofnOmzPCvL8wETv1rPwbUKYL3dtZlkU7iglrNv4iZ3kYzgYhACnzQP
-pNWSM1Hevo26hHpgPGrbnyvs3t4BP25N5VCGy7Sv7URAxcpajNrSK3yo7r6m5Qqq
-DqXfBVK3VcciXTJql5djE9vJ23k2e4U6SsVSifkk5513qYL/VRylcWkr0QIk8rMm
-1GvaBFXlwQrHbTA3kCrknhQzXhYXVcVbtcs0iZLxnSaPoQfUxrJ4UNsMDAt8C4xB
-17np3YyI96NNsjLM2BfazbfOZp3U/V7/vZc+KXXnfqdiWK8lNKVBxz28DVDKAwMP
-CFoflXN4Yr+vchRpDqXlAw54jiYoQvAHC2IgEGc5RvqpA8wEOHpm7yCDtYxKVo6R
-APyOXILeiKDD4mhufY3vPN1l9F2sUe8kgK6qVpdv+a192mE/mHc8pZG2HIwm2mWi
-CW3B4lTjucpMTICPd3tgmh7ftvJIHg66TlRtmODhohqid1DPxGOS7EcZnevma87B
-AgMBAAGjgawwgakwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wHQYD
-VR0OBBYEFFsle5akZVF+uDnzwHhmXug65/DuMB8GA1UdIwQYMBaAFFsle5akZVF+
-uDnzwHhmXug65/DuMEYGA1UdIAQ/MD0wOwYJYIV0AVkBAgEBMC4wLAYIKwYBBQUH
-AgEWIGh0dHA6Ly9yZXBvc2l0b3J5LnN3aXNzc2lnbi5jb20vMA0GCSqGSIb3DQEB
-BQUAA4ICAQAnuuOUfPGuwN4X5uXY1fVUsIP0u81eBXtPn3VmrzzoVn78cng4A9kr
-YhsAufjpYM3MzlGKx1AxbuFKfhgvaVm2PWSBK+ODhOYih4594O4CmWG4HvS4K4gS
-FoTCMZM4ljGmuTtTP8Mkk1ZbaZLsxcG7OADj7BepuNzHfAGDnzJHulIiNB0yeglW
-p3wlNqk9S9rAgm8KuxLIh0snEfkeLceTP57bXyZrUtkuivEUxkSNFam3v73ephru
-ri37SHcX/rvsrxj1KlHwOYSXlWxuG8MrxHRgeSWwCiff317SOc9FfUJL37MsHsXG
-XcpVOqCcaZqP2u+ysDyfh2wSK2VwFVIxGiTPbzEjUB+MT48jw3RBYxxVqBTdPuBR
-UM/xGzBWDpKwgoXYg8siZLwtuCXVVKK4BuqtkqQkoMGGtUoTakfPLgtWlVTLzprb
-arSmsttBCIYnd/dqoEJsCzjO13VQMpLC3yswIkjQ1UE4JV2k6V2fxpR10EX9MJdD
-j5CrCseGc2BKaS3epXjXBtpqnks+dzogEyIB0L9onmNgazVNC226oT3Ak+B/I7NV
-rXIlTkb50hbvsGTBAZ7pyqBqmA7P2GDyL0m45ELhODUW9MhuT/eBVui6o74jr679
-bwPgAjswdvobbUHPAbHpuMlm9Nsm8zqkdPJJJFvJsNBXwfo+euGXyTCCBoswggRz
-oAMCAQICEADeTFUg9tz0AhsPEVT3jRAwDQYJKoZIhvcNAQELBQAwRTELMAkGA1UE
-BhMCQ0gxFTATBgNVBAoTDFN3aXNzU2lnbiBBRzEfMB0GA1UEAxMWU3dpc3NTaWdu
-IEdvbGQgQ0EgLSBHMjAeFw0yMTA4MDMxMzE0NTVaFw0zNjEwMjMxMzE0NTVaMFMx
-CzAJBgNVBAYTAkNIMRUwEwYDVQQKEwxTd2lzc1NpZ24gQUcxLTArBgNVBAMTJFN3
-aXNzU2lnbiBSU0EgU01JTUUgUm9vdCBDQSAyMDIxIC0gMTCCAiIwDQYJKoZIhvcN
-AQEBBQADggIPADCCAgoCggIBANayuLQ4jya6N8gBI0UWfr5kOIZyZmFYjSSKWbMM
-oSqrfruFfGVmcKfpItvuuzL6q7GGP6tIgbir8yrdN8cuC/ar31WtVCAUOreJRG3n
-6D+uiCEYjkdWlQDJ7GVuVkcUTa0uJtLUi2zK8zMt+fCbjreGJoHnC56LDHwFpzx6
-+fCFkJyJZzl1EbFjsNQjLH3cHyt27QStuhHJB0kN4ygPLhEU0ray/3i4/lpTgCSs
-C0i6TjIxUeyq/rtELAvX+X2rjdpsqwjd80E9j/VBQVzGzFHKDkQft2qAdlVpUeZM
-/ReA+7NU7rBKHTOTBnm5YRGs5A5bs93gsSVct9TTzfR7ngFUK4KQoeHKQ43wQaQc
-B8DWMxajRUaPhExp/ZNXndPlb8skDDEtA5jCADlEeSKBbeTq/AtkJm78yp4aA0Tt
-f01N6RGydr2GfXu7VD9RkEfHi/j/TizyCDCMGcEsRzWevatTpCKunwwhGSm9npvP
-hNyO0TVLIhCBG2LtwEvTK5AiSR8tIa6Rxd/x1kFUcg7eyjQQ9cmandVcFuTNJbHH
-qHFGrPhThReJqyQaOBgyJHPpVa74gGMDb4Sw36CUtalT8Itq9VR55f9bnKJvIuH/
-QCllbG+OSGkxPoEbO4tY+lsvO2t9ayTwvPKN5ZrmrHjL2IIrABcdeWoJLtZuds8w
-+9tZAgMBAAGjggFnMIIBYzAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBQJDL8q
-oh0EJAyy+UAKQcLPWnKqgDAfBgNVHSMEGDAWgBRbJXuWpGVRfrg588B4Zl7oOufw
-7jAOBgNVHQ8BAf8EBAMCAQYwgf8GA1UdHwSB9zCB9DBHoEWgQ4ZBaHR0cDovL2Ny
-bC5zd2lzc3NpZ24ubmV0LzVCMjU3Qjk2QTQ2NTUxN0VCODM5RjNDMDc4NjY1RUU4
-M0FFN0YwRUUwgaiggaWggaKGgZ9sZGFwOi8vZGlyZWN0b3J5LnN3aXNzc2lnbi5u
-ZXQvQ049NUIyNTdCOTZBNDY1NTE3RUI4MzlGM0MwNzg2NjVFRTgzQUU3RjBFRSUy
-Q089U3dpc3NTaWduJTJDQz1DSD9jZXJ0aWZpY2F0ZVJldm9jYXRpb25MaXN0P2Jh
-c2U/b2JqZWN0Q2xhc3M9Y1JMRGlzdHJpYnV0aW9uUG9pbnQwDQYJKoZIhvcNAQEL
-BQADggIBAAL46l3QisysCAM2VGb/CimG4VSDLDPox2yuEKlUgX8qLYgmraaoNCgP
-GQapneIClQQyZEwLyvnjfcMTW+iXQI534+OCgYetAWAHw8XhIP23MJc+uhxxdItf
-Taex/k58CXh6h1/xrKElEZfHLBGckOpyFj0CNam75SPYH1JAt9COXdojvDPpMv24
-dZ9Dvj1XS4dh3u2WyHB8frcT4QlAuxkCBw9r3R/SzA5aEhjkwbGcvr4rER7lmsXg
-oTWx5OGyYq7A6Gx8lof6YN4tiRwUQUA5onfvsBVbAT8ezuYUqZy+gp+xYhffIkO1
-Mm+3BfwYytp6Q11ltSb+WkGhaXSX8UNRjdx/2VeEpx1R8oJtqw5806Pl4MmVBG3y
-x5134qX4yMW5ZwZvbf3Gf26+xWrbBDbbMG9dvciZ/sRylsy5y3SLJKkTC3i1Bsr1
-iyYWc5gdcZWd8/BS6WxVfgUiF9CJPGXtV4B3/NisvbNTjwd7WBN6sefJsPjjyaGR
-4nTOymgbshvElmCUkNvlCLc+zIh9Z8BV/Chz3hw72s8PHLYI0jM++TySSKBacIge
-EBeYenbdYEg+ckU+cGuM60h8WbVWBRIUCkZNAjYJ0WxzIVIn2GvE0nKnTH7bNs7T
-Pctc4u4b3fk6/U0T/w7OUrYWcTOgl8Vf9oIYF7U6m5u2eKsb6/1aMIIHcjCCBVqg
-AwIBAgIPRXOLMhlC+HUxekgG6wqVMA0GCSqGSIb3DQEBCwUAMFMxCzAJBgNVBAYT
-AkNIMRUwEwYDVQQKEwxTd2lzc1NpZ24gQUcxLTArBgNVBAMTJFN3aXNzU2lnbiBS
-U0EgU01JTUUgUm9vdCBDQSAyMDIxIC0gMTAeFw0yMTA4MDMxOTE2MjhaFw0zNjA3
-MzAxOTE2MjhaMFwxCzAJBgNVBAYTAkNIMRUwEwYDVQQKEwxTd2lzc1NpZ24gQUcx
-NjA0BgNVBAMTLVN3aXNzU2lnbiBSU0EgU01JTUUgTkNQIGV4dGVuZGVkIElDQSAy
-MDIxIC0gMTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAK1mlxAxJhlg
-BGAMtBG6/Pgsc+zJkd8OTSALhaNK2f0/+ieNt0TnI7gkyJ0phAg6V8l3E+j0Faku
-40/nj/lejhgsHyF8gvhhgV+P9JZu75PSlvUT4mPSIe8RlQzMrjun92kx7IXbhySl
-gsQOM/SD/lbxKLnElbMEyeQfn09VHrRP4GwSuwzRIWxZleo/hb7Kd+cPIf8FNNPX
-qXfd5MX4lT90WJ3UdTQFYdK01JBW3tVP4Ath9jtRldmqutgz5+4/7/u/usb3DcM7
-BBxxM295hRybgfVACJKsYjLkJk0JAqMf0A5FBdIt/0k3rU+AxfQDATjFCqYDAzn0
-2LzAGcJbcox9Odl0+aOwQhFPHp8Ry6I85nXQWHjX8ii0jTesFXTkTb5eRQuoTkpI
-0BYE76Sct1O2GH1HkAIdg4soI4bjap7M3nyJRNmDit46hV71NbECqO14j33/DkUv
-s/r6u9EF6qJh1DYcWW+Xyom+Yd4HPIqaKjztIltqHCEc7FvGmlkQqUvpzn2iYuCy
-dPLbHatMqIu3F/MPEVljeIlz47zkwy0DCc+CIUdtrDajQDH8HoQAdewJmWKWUQgT
-QGRKZRkc0eh3MKaoMvk/hTkcvjHd1sMnaM+aa3Gp7YoY6IFcItC3ORUqy8YGHe7H
-eRS4+uIjmy+iU6T26YivkV24j8GiROMhAgMBAAGjggI4MIICNDAOBgNVHQ8BAf8E
-BAMCAQYwNQYDVR0lBC4wLAYIKwYBBQUHAwIGCCsGAQUFBwMEBgorBgEEAYI3CgME
-BgorBgEEAYI3FAICMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFCtmGmME
-GQOnGfw158O40TaPTppBMB8GA1UdIwQYMBaAFAkMvyqiHQQkDLL5QApBws9acqqA
-MIH/BgNVHR8EgfcwgfQwR6BFoEOGQWh0dHA6Ly9jcmwuc3dpc3NzaWduLm5ldC8w
-OTBDQkYyQUEyMUQwNDI0MENCMkY5NDAwQTQxQzJDRjVBNzJBQTgwMIGooIGloIGi
-hoGfbGRhcDovL2RpcmVjdG9yeS5zd2lzc3NpZ24ubmV0L0NOPTA5MENCRjJBQTIx
-RDA0MjQwQ0IyRjk0MDBBNDFDMkNGNUE3MkFBODAlMkNPPVN3aXNzU2lnbiUyQ0M9
-Q0g/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVjdENsYXNzPWNS
-TERpc3RyaWJ1dGlvblBvaW50MB8GA1UdIAQYMBYwCgYIYIV0AVkCAQ0wCAYGBACP
-egEBMHQGCCsGAQUFBwEBBGgwZjBkBggrBgEFBQcwAoZYaHR0cDovL3N3aXNzc2ln
-bi5uZXQvY2dpLWJpbi9hdXRob3JpdHkvZG93bmxvYWQvMDkwQ0JGMkFBMjFEMDQy
-NDBDQjJGOTQwMEE0MUMyQ0Y1QTcyQUE4MDANBgkqhkiG9w0BAQsFAAOCAgEAvFxg
-4AvqZothV0hW7gudd8Vcu7lstjDrIKinahkT30x0mL1n00ASbhR7wbFVvpCZy9oj
-Aj3VKdf9Nu++c4dYVrgspkWANg8lj8rZAUtxdl628dISURAXc1xKrvnKqSWvdmfT
-IiAkWKi5I8RF14ktxHuHZk8+I8ndFU27iqKRvvehqiXpb1uIaZ/gY+laTfRJ48KO
-/0iV+E2AJAd6UudNVXLOCMhHXhbZm3mDkxjzKX3qHTU68/TSt8TTCZSl+Ql/jXF9
-T/4dZMm15ev20a4Xliki4J9PbxTZvpiVdPzcl5YYm+5lz6l/TevFjFAiUflYSRk8
-zqhrVvRyTQDNj3x3SYbN2YAD1r5I7X3hu+Fxf+O9lCjABECS3ZI1b29vzWYm83vk
-LY9xyqjMvIEtANwk+keHTW2qP76bShVz2eu7CJeHymMm0xnfZSIp46vXpmJuumth
-/XKebCCxru+Unc2dn6tsPZ8/+WmC8DkGE9snIO30PVMKIAyPKFMOldt1NC2zTN1e
-n39aMqzjc7ehKNsxc1raZku4audhwNbUnUL5CSDIsvZk0RGaLuYuji0nzVD8jXlx
-bDOBBdi75pB8Sw9LNia88W2wX3SNQSZ6xE1WvNAhJ6eLpozm5zh1rPFw4hONonwm
-kHTW/3EV53wUltrlizW88HtH2LzbGp+UpyHNcp8wgghcMIIGRKADAgECAhQVL+XE
-YjWLu5PiKBQAQdinUZu7kTANBgkqhkiG9w0BAQsFADBcMQswCQYDVQQGEwJDSDEV
-MBMGA1UEChMMU3dpc3NTaWduIEFHMTYwNAYDVQQDEy1Td2lzc1NpZ24gUlNBIFNN
-SU1FIE5DUCBleHRlbmRlZCBJQ0EgMjAyMSAtIDEwHhcNMjIxMTI4MTAwMjIyWhcN
-MjMxMTI4MTAwMjIyWjCBiTELMAkGA1UEBhMCREUxCzAJBgNVBAgTAk5JMSkwJwYD
-VQQKDCBNZWluYmVyZyBGdW5rdWhyZW4gR21iSCAmIENvLktHLjEpMCcGCSqGSIb3
-DQEJARYaaGVpa28uZ2Vyc3R1bmdAbWVpbmJlcmcuZGUxFzAVBgNVBAMTDkhlaWtv
-IEdlcnN0dW5nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA0Mt9WUkJ
-5VzhEJ9WvZOQNGtultgIbRbOPyPbdaiw+4zmtkWhBVWZDqqCwd4QuFhTXvrCgqse
-pohLtPqW5RnrgmSs6vqEoFVBM/vaxnYrYuCOuj12JqgK+lH7NXtpw8CbS69XPXEx
-oMe2V/0gAehUW3ngevkrJWY/iZ0ck/PAF7liYrww2DJvg7tYRvDtXlkdIonw5QZQ
-bFrn+uLOmhBsTZg6u9Dbvcg/UYuuEAhfgpQQ6bDLDvFY+rGo071LDkEDoApqQO9l
-w0ljRy6oafo7HTYTm5ahtydi2Qt7V1TulsxaBC5E80hfLn1Nw3RyhfLLYdWag9LI
-rGbmnqKLEgzY9leOGfH7i/W92FkQd8WavxhNBqABa2NBpzz81gypP3f7uxIlqsHL
-yqZud8SIKZdCjquFV7vbNnHHvKRPkXSccG/EaNvud7hCFVi3YM1q2WwZnSXPdBBS
-t3aUgd6T9tOLUR1LEgkIr7Q2gMhpRtG/j7ki2005Lf6Tpt1W97EBJEL7adkxoMc2
-febuc2zAQh6v+gQlw1Ie/q86eHjN9++qHPWxwvzjHok1OxOmFnyeM3uVmvIrNiLv
-WuwCFZ14sr8G2ZIsAOCW857oTqH23uqtRhVgxl6u6i/Vqbt+YqEivnPNEEbUVtT3
-YpiZpxNPMBYldRL8EjaCA57EZu79H+PXoaMCAwEAAaOCAuYwggLiMCUGA1UdEQQe
-MByBGmhlaWtvLmdlcnN0dW5nQG1laW5iZXJnLmRlMA4GA1UdDwEB/wQEAwID+DA1
-BgNVHSUELjAsBggrBgEFBQcDAgYIKwYBBQUHAwQGCisGAQQBgjcKAwQGCisGAQQB
-gjcUAgIwHQYDVR0OBBYEFBYFwRRVUSm02JRgOFnxcbriy1QKMB8GA1UdIwQYMBaA
-FCtmGmMEGQOnGfw158O40TaPTppBMIH/BgNVHR8EgfcwgfQwR6BFoEOGQWh0dHA6
-Ly9jcmwuc3dpc3NzaWduLm5ldC8yQjY2MUE2MzA0MTkwM0E3MTlGQzM1RTdDM0I4
-RDEzNjhGNEU5QTQxMIGooIGloIGihoGfbGRhcDovL2RpcmVjdG9yeS5zd2lzc3Np
-Z24ubmV0L0NOPTJCNjYxQTYzMDQxOTAzQTcxOUZDMzVFN0MzQjhEMTM2OEY0RTlB
-NDElMkNPPVN3aXNzU2lnbiUyQ0M9Q0g/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlz
-dD9iYXNlP29iamVjdENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50MGcGA1UdIARg
-MF4wUgYIYIV0AVkCAQ0wRjBEBggrBgEFBQcCARY4aHR0cHM6Ly9yZXBvc2l0b3J5
-LnN3aXNzc2lnbi5jb20vU3dpc3NTaWduX0NQU19TTUlNRS5wZGYwCAYGBACPegEB
-MIHGBggrBgEFBQcBAQSBuTCBtjBkBggrBgEFBQcwAoZYaHR0cDovL3N3aXNzc2ln
-bi5uZXQvY2dpLWJpbi9hdXRob3JpdHkvZG93bmxvYWQvMkI2NjFBNjMwNDE5MDNB
-NzE5RkMzNUU3QzNCOEQxMzY4RjRFOUE0MTBOBggrBgEFBQcwAYZCaHR0cDovL29j
-c3Auc3dpc3NzaWduLm5ldC8yQjY2MUE2MzA0MTkwM0E3MTlGQzM1RTdDM0I4RDEz
-NjhGNEU5QTQxMA0GCSqGSIb3DQEBCwUAA4ICAQBk4hY2HMpe0jUw9zE6V/OH3EiZ
-6qVRSAamOA13nPdWhjI0S85fDEtH9T9Gzr54cBtZFsmwmPpa7jB51h6SXKdeLgdJ
-6OHDe2MiMW5p2u6XgU53qSkB5LicLFCfKaBv+nHziPJk0EE8uA8Ia0GhHGy+Xl8W
-M1oWr7P6gLi/zaqajGEnDbmYRXj/u0yzoa1r6XnFKmyD7ZfK8aBvT1EXAuD5T6Nm
-Yqknzk4oguExuAmP+2xljBVC0VSB6ClOB+KW+TBlhqRE9mUUS2RwTrVmXF7cWl4G
-vUCEpfbDP9PT8yI5WW0ngKXlOGR10kMaoxHNEondN79s3VT/pdh1FgX4RqoUluju
-CEOUCnE8bz2242RfbgLP0/TnP8V/AIsyust5SL0JjVtk3/tQAFh+WM40KK1MJjqT
-NjkpXSElZNBigmZr3xu4r5Q6J4M3rTIbx8MBKy3t8H+SfJngeeVd8qgFhg3al1EH
-e/JfywzV7beUkuwo1bnR+jbKyXSpj9ywva92r52J/ExmaLoJE/+ufzkdDz5D/4ZY
-yhpkfksy5VdnHirtVfs5WucoWVBzxSf2pNEhdQXVWD7oLVKiX5CyrZDmnaueXjQX
-ciEGc8WNG6M0hwwENPOGZ2ZMjWR4j/J+qCuN9Kf129/2KHYd/6e58HxrqTwWWOio
-c8K3oAvc9LKnRI1wBDGCA4QwggOAAgEBMHQwXDELMAkGA1UEBhMCQ0gxFTATBgNV
-BAoTDFN3aXNzU2lnbiBBRzE2MDQGA1UEAxMtU3dpc3NTaWduIFJTQSBTTUlNRSBO
-Q1AgZXh0ZW5kZWQgSUNBIDIwMjEgLSAxAhQVL+XEYjWLu5PiKBQAQdinUZu7kTAL
-BglghkgBZQMEAgGggeQwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG
-9w0BCQUxDxcNMjMxMTA5MDgwODE5WjAvBgkqhkiG9w0BCQQxIgQgq2xEjrnaNDrX
-j7WX+6UyWwKxI2/Xqj4yj5b9vIq69RsweQYJKoZIhvcNAQkPMWwwajALBglghkgB
-ZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggq
-hkiG9w0DAgICAIAwDQYIKoZIhvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwIC
-ASgwDQYJKoZIhvcNAQEBBQAEggIAanvaQnc3UX1dy1NwQ0OdTLG7bg/5jVVsBdEo
-wd5/bELPNbXKdXCuU3yj9SYAplh03xjcbhTmyYXYS9T/iWXcjpac8uIhpJCy/qZH
-zEHMUnnp1gNUeHuQosOLb5v/sIzOAG0OxDuHQIQfDUpsLgZSusb7Z9KXdiAKPqT5
-gpBNqOVvwL+4YoDipuMQ18nEOuP+yVzf6Uf27Az+nFIIViaCu2U+rkFKv2cXLIhi
-L/n6q/7yQGU0m6G1cJ36BV9OCbGn35OiBEk3ditRpoIuByWBFeswk9gmdm7+mrY+
-41/8Hv76ss2W7Tnh4ybHcLLB4gXaKfgEr5KMcc+D839mv/D823WPeaArZLa1Jcu6
-lsBdlz/aiYiVj1H+1MBT+VlevGrSVB/a33sxxlxH5NQi4/H0DdMR4uVjMUqW0a1v
-hEs0lV5PbpWdtjaSXRRfinf1Ec/avvgay2Pytd5YivD8ukmoMFFxLa39W8y8Bccx
-H9IpyGb61eonip+GbaovXpDF6Q7zAqnW3EMeOsh170hY4Wqz9zJCowB1DLYi/bs4
-giCLR8ee3CuAMUT5bXZQ/fLVLwqBtDRDYBnvAScKvz0xXuLQQ/B4rEe+KXJx05R4
-uQWfCZoscWdyEGxV5vTqGZEXBY07z4R7YvBQlK1dZ+6ynMG4aQxqXVLA7rBQedXB
-ZAPmO1c=
-
-------B3AC91E90B5DDD414FD7DB6E0E2D5BFB--
+> +		netif_stop_subqueue(dev, qnum);
+> +}
+> +
+> +static int virtnet_xsk_xmit_one(struct virtnet_sq *sq,
+> +				struct xsk_buff_pool *pool,
+> +				struct xdp_desc *desc)
+> +{
+> +	struct virtnet_info *vi;
+> +	dma_addr_t addr;
+> +
+> +	vi = sq->vq->vdev->priv;
+> +
+> +	addr = xsk_buff_raw_get_dma(pool, desc->addr);
+> +	xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
+> +
+> +	sg_init_table(sq->sg, 2);
+> +
+> +	sg_fill_dma(sq->sg, sq->xsk.hdr_dma_address, vi->hdr_len);
+> +	sg_fill_dma(sq->sg + 1, addr, desc->len);
+> +
+> +	return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
+> +				    virtnet_xsk_to_ptr(desc->len), GFP_ATOMIC);
+> +}
+> +
+> +static int virtnet_xsk_xmit_batch(struct virtnet_sq *sq,
+> +				  struct xsk_buff_pool *pool,
+> +				  unsigned int budget,
+> +				  u64 *kicks)
+> +{
+> +	struct xdp_desc *descs = pool->tx_descs;
+> +	u32 nb_pkts, max_pkts, i;
+> +	bool kick = false;
+> +	int err;
+> +
+> +	/* Every xsk tx packet needs two desc(virtnet header and packet). So we
+> +	 * use sq->vq->num_free / 2 as the limitation.
+> +	 */
+> +	max_pkts = min_t(u32, budget, sq->vq->num_free / 2);
+> +
+> +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, max_pkts);
+> +	if (!nb_pkts)
+> +		return 0;
+> +
+> +	for (i = 0; i < nb_pkts; i++) {
+> +		err = virtnet_xsk_xmit_one(sq, pool, &descs[i]);
+> +		if (unlikely(err))
+> +			break;
+> +
+> +		kick = true;
+> +	}
+> +
+> +	if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_notify(sq->vq))
+> +		(*kicks)++;
+> +
+> +	return i;
+> +}
+> +
+> +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> +		      int budget)
+> +{
+> +	u64 bytes = 0, packets = 0, kicks = 0;
+> +	int sent;
+> +
+> +	virtnet_free_old_xmit(sq, true, &bytes, &packets);
+> +
+> +	sent = virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
+> +
+> +	virtnet_xsk_check_queue(sq);
+> +
+> +	u64_stats_update_begin(&sq->stats.syncp);
+> +	u64_stats_add(&sq->stats.packets, packets);
+> +	u64_stats_add(&sq->stats.bytes, bytes);
+> +	u64_stats_add(&sq->stats.kicks, kicks);
+> +	u64_stats_add(&sq->stats.xdp_tx,  sent);
+> +	u64_stats_update_end(&sq->stats.syncp);
+> +
+> +	if (xsk_uses_need_wakeup(pool))
+> +		xsk_set_tx_need_wakeup(pool);
+> +
+> +	return sent == budget;
+> +}
+> +
+>  static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *rq,
+>  				    struct xsk_buff_pool *pool)
+>  {
+> diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> index 1918285c310c..73ca8cd5308b 100644
+> --- a/drivers/net/virtio/xsk.h
+> +++ b/drivers/net/virtio/xsk.h
+> @@ -3,5 +3,18 @@
+>  #ifndef __XSK_H__
+>  #define __XSK_H__
+>  
+> +#define VIRTIO_XSK_FLAG_OFFSET	4
+> +
+> +static inline void *virtnet_xsk_to_ptr(u32 len)
+> +{
+> +	unsigned long p;
+> +
+> +	p = len << VIRTIO_XSK_FLAG_OFFSET;
+> +
+> +	return (void *)(p | VIRTIO_XSK_FLAG);
+> +}
+> +
+>  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+> +bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> +		      int budget);
+>  #endif
+> -- 
+> 2.32.0.3.g01195cf9f
 
 
