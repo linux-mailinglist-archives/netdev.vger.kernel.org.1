@@ -1,99 +1,158 @@
-Return-Path: <netdev+bounces-46912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 290EF7E70CE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:51:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C96F7E70F1
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 18:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56CDE1C209E7
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:51:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6624B20BD0
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 17:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB1D3034F;
-	Thu,  9 Nov 2023 17:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F32030FB2;
+	Thu,  9 Nov 2023 17:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qQHnAoeg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC972241EF
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 17:51:07 +0000 (UTC)
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E05463845
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:51:06 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-167-qkI4FkjbOTunzZxys49AaA-1; Thu, 09 Nov 2023 17:51:04 +0000
-X-MC-Unique: qkI4FkjbOTunzZxys49AaA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 9 Nov
- 2023 17:50:56 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Thu, 9 Nov 2023 17:50:56 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'David Ahern' <dsahern@kernel.org>, John Ousterhout
-	<ouster@cs.stanford.edu>
-CC: Stephen Hemminger <stephen@networkplumber.org>, Andrew Lunn
-	<andrew@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: Bypass qdiscs?
-Thread-Topic: Bypass qdiscs?
-Thread-Index: AQHaEmd2okzX54FRkE6OZa244mM/DbByQMKA
-Date: Thu, 9 Nov 2023 17:50:56 +0000
-Message-ID: <a455bf52cd8b4594be360b1758ba88cd@AcuMS.aculab.com>
-References: <CAGXJAmy-0_GV7pR5_3NNArWZumunRijHeSJnY=VEf8RjmegZZw@mail.gmail.com>
- <29217dab-e00e-4e4c-8d6a-4088d8e79c8e@lunn.ch>
- <CAGXJAmzn0vFtkVT=JQLQuZm6ae+Ms_nOcvebKPC6ARWfM9DwOw@mail.gmail.com>
- <20231105192309.20416ff8@hermes.local>
- <b80374c7-3f5a-4f47-8955-c16d14e7549a@kernel.org>
- <CAGXJAmz+j0y00XLc2YCyfK5aVPD12aDcrNzc58N1fExT6ceoVw@mail.gmail.com>
- <89cd5f11-2c54-4905-b900-b1e06304805f@kernel.org>
-In-Reply-To: <89cd5f11-2c54-4905-b900-b1e06304805f@kernel.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FBFE1DFEB
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 17:55:05 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0D76387F
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:55:04 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6b1d1099a84so1210605b3a.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 09:55:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1699552504; x=1700157304; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EsdJnH/UPwCfccnXmCrjr+pN8ss+UFCd2sCSGOFBt1Q=;
+        b=qQHnAoegc4UhbUv7mHPohCeeEhCD7ULqIlkiqZBkiTgH3XjUKM0AMYCsjopHx4m1dY
+         45zcxswg3jZ+lJwt0QvGwW7NQ4CIeRTPaAi4wKY1SJm745J1BC1G3xDgf08CuWBFT51Y
+         gHCqgMqdHbQLYzVsNFvxW6c+8wTpQLj82EQbAxeVHEKX6JTI+vr+Zvp2XYOSPYKp+FO5
+         /kV4i4vQcSYJdlkiym31HfiDfVxisOEV02+admNmlMqji9WdOLwKPrpaGcoF8SIxYUFf
+         CDtNmfF4cbE8ZxMH6Z+E+X1y7sA7qpWeq5XmXNPJk2DA4sT1vnUNggE/Plr1Fuk0CuOl
+         YvXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699552504; x=1700157304;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EsdJnH/UPwCfccnXmCrjr+pN8ss+UFCd2sCSGOFBt1Q=;
+        b=B9C0JlzIw0YNxZfuFIYSL6h3LL+IyN02f692iDy4I0T8gZAW6B6TH4mhCvJj1l+kTJ
+         N1zrKtE7UvrUOs/v81mbNhLbi5mlycCTualwLTHRaxtWxPbKxMW6WYqjpgfhJYiEosU7
+         C52yCZOki+RCNS35G1j4mT4ye7+wIrXT+ms+kzD4w1mvAN/0qxjcDQIe3eEaNREJ6GFV
+         hfNiREHg9wmq8870DRh82pAWSDOvEbmao5LuDRc+InR2dS9ZoZkVzYXyh1QfBjgmLyaG
+         RIh04vpmzYDr3KquCqSKxJWNYLzKx+ZOc4/S6xiGNaxvxOcouYnmwtjh8XFphFZOOBOc
+         OYgg==
+X-Gm-Message-State: AOJu0Yx29j9PxTEQTiy5HS8K3bAXwa+CFDesxZjdVzoG2xcitPX3fvO0
+	bJ20BFv4b3q3n8xvzzLIWeCGow==
+X-Google-Smtp-Source: AGHT+IEAezY0GC9QhZdx89YT2zb/H5H4dcMl2pyI6rDFMS8jlVgJ3/InUzO8ecz+JhORfkFhJv76Pw==
+X-Received: by 2002:a05:6a00:1acd:b0:6c3:7978:f82f with SMTP id f13-20020a056a001acd00b006c37978f82fmr5902105pfv.9.1699552504349;
+        Thu, 09 Nov 2023 09:55:04 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id ff6-20020a056a002f4600b006c3328c9911sm11274857pfb.93.2023.11.09.09.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 09:55:04 -0800 (PST)
+Date: Thu, 9 Nov 2023 09:55:02 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Haifeng Xu <haifeng.xu@shopee.com>
+Cc: j.vosburgh@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] boning: use a read-write lock in bonding_show_bonds()
+Message-ID: <20231109095502.5a03bfd5@hermes.local>
+In-Reply-To: <20231108064641.65209-1-haifeng.xu@shopee.com>
+References: <20231108064641.65209-1-haifeng.xu@shopee.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-RnJvbTogRGF2aWQgQWhlcm4NCj4gU2VudDogMDggTm92ZW1iZXIgMjAyMyAxNzoxNw0KPiANCj4g
-T24gMTEvOC8yMyA5OjUwIEFNLCBKb2huIE91c3RlcmhvdXQgd3JvdGU6DQo+ID4gSGkgRGF2aWQs
-DQo+ID4NCj4gPiBUaGFua3MgZm9yIHRoZSBzdWdnZXN0aW9uLCBidXQgaWYgSSB1bmRlcnN0YW5k
-IHRoaXMgY29ycmVjdGx5LCB0aGlzDQo+ID4gd2lsbCBkaXNhYmxlIHFkaXNjcyBmb3IgVENQIGFz
-IHdlbGwgYXMgSG9tYTsgSSBzdXNwZWN0IEkgc2hvdWxkbid0IGRvDQo+ID4gdGhhdD8NCj4gPg0K
-PiANCj4gQSBtZWFucyB0byBzZXBhcmF0ZSBpc3N1ZXMgLSBpLmUuLCBydW4gSG9tYSB0ZXN0cyB3
-aXRob3V0IHFkaXNjIG92ZXJoZWFkDQo+IG9yIGRlbGF5cy4gWW91IGNhbiB3b3JyeSBhYm91dCBo
-b3cgdG8gaGFuZGxlIGlmL3doZW4geW91IHN0YXJ0DQo+IHVwc3RyZWFtaW5nIHRoZSBjb2RlLg0K
-DQpJc24ndCB0aGUgcWRpc2Mgb3ZlcmhlYWQgcHJldHR5IG1pbmltYWwgbW9zdCBvZiB0aGUgdGlt
-ZSBhbnl3YXk/DQpJZiBJIHNlbmQgYSBSQVdfSVAgKGFuZCBwcm9iYWJseSBVRFApIHBhY2tldCB0
-aGUgZXRoZXJuZXQgTUFDDQpwYWNrZXQgc2V0dXAgKGV0YykgaXMgbm9ybWFsbHkgZG9uZSBieSBk
-aXJlY3QgY2FsbHMgZnJvbSB0aGUNCnByb2Nlc3MgY2FsbGluZyBzZW5kbXNnKCkuDQoNCklmIHR3
-byB0aHJlYWRzIGNhbGwgc2VuZG1zZyAob24gZGlmZmVyZW50IHNvY2tldHMpIGF0IHRoZSBzYW1l
-DQp0aW1lIHNvbWV0aGluZyBoYXMgdG8gZ2l2ZSBzb21ld2hlcmUuDQpUbyBhdm9pZCBzdGFsbGlu
-ZyB0aGUgMm5kIHRocmVhZCwgdGhlIHBhY2tldCBnZXRzIHF1ZXVlZCBhbmQgaXMNCnBpY2tlZCB1
-cCBieSB0aGUgZmlyc3QgdGhyZWFkIGJlZm9yZSBpdCByZXR1cm5zLg0KDQpUbyBieXBhc3MgdGhl
-IHFkaXNjIHdvdWxkbid0IHlvdSBuZWVkIGEgTUFDIGRyaXZlciB0aGF0IGNhbg0KcHJvY2Vzc2Vz
-IG11bHRpcGxlIHRyYW5zbWl0IHNldHVwIHJlcXVlc3RzIGluIHBhcmFsbGVsPw0KSXQgY2FuIGJl
-IGRvbmUgZm9yIGEgc2ltcGxlIG1lbW9yeSByaW5nIGJhc2VkIGludGVyZmFjZSAtIGp1c3QNCnVz
-ZSBhIGxvY2sgdG8gZ3JhYiB0aGUgcmVxdWlyZWQgc2xvdHMgaW4gdGhlIHRyYW5zbWl0IHJpbmcu
-DQpUaGVuIGl0IGRvZXNuJ3QgbWF0dGVyIHdoaWNoIG9yZGVyIHNldHVwcyBjb21wbGV0ZSBpbi4N
-CkJ1dCBJIGRvbid0IHRoaW5rIExpbnV4IG1ha2VzIHRoYXQgZWFzeSB0byB3cml0ZS4NCg0KVHJh
-bnNtaXQgZmxvdyBjb250cm9sIHdpbGwgYWxzbyByZXF1aXJlIHF1ZXVlaW5nIChvciBkaXNjYXJk
-KS4NCklmIEhvbWEgYW5kIFRDUCBhcmUgc2hhcmluZyBhIHBoeXNpY2FsIG5ldHdvcmsgdGhlbiBz
-dXJlbHkgdGhlDQpUQ1AgdHJhZmZpYyBjYW4gY2F1c2UgZmxvdyBjb250cm9sIGlzc3VlIGZvciBi
-b3RoPw0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5
-IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRp
-b24gTm86IDEzOTczODYgKFdhbGVzKQ0K
+On Wed,  8 Nov 2023 06:46:41 +0000
+Haifeng Xu <haifeng.xu@shopee.com> wrote:
 
+> call stack:
+> ......
+> PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
+> [ffffa7a8e96bbac0] __schedule at ffffffffb0719898
+> [ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
+> [ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
+> [ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
+> [ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
+> [ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
+> [ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
+> [ffffa7a8e96bbc80] device_del at ffffffffb0209af8
+> [ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
+> [ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
+> [ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
+> [ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
+> [ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
+> [ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
+> [ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
+> [ffffa7a8e96bbf10] kthread at ffffffffafae132a
+> [ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
+> 
+> 290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-exporter"
+> [ffffa7a8d14dbb80] __schedule at ffffffffb0719898
+> [ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
+> [ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
+> [ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
+> [ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
+> [ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
+> [ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
+> [ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
+> [ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
+> [ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
+> [ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
+> [ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
+> [ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
+> [ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
+> [ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
+> [ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
+> [ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
+> [ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
+> [ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
+> ......
+> 
+> Problem description:
+> 
+> Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
+> but there are many readers which hold the kernfs_rwsem, so it has to sleep
+> for a long time to wait the readers release the lock. Thread 278176 and any
+> other threads which call bonding_show_bonds() also need to wait because
+> they try to accuire the rtnl_mutex.
+> 
+> bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
+> However, the addition and deletion of bond_list are only performed in
+> bond_init()/bond_uninit(), so we can intoduce a separate read-write lock
+> to synchronize bond list mutation.
+> 
+> What's the benefits of this change?
+> 
+> 1) All threads which call bonding_show_bonds() only wait when the
+> registration or unregistration of bond device happens.
+> 
+> 2) There are many other users of rtnl_mutex, so bonding_show_bonds()
+> won't compete with them.
+> 
+> In a word, this change reduces the lock contention of rtnl_mutex.
+> 
+> Signed-off-by: Haifeng Xu <haifeng.xu@shopee.com>
+> ---
+>  drivers/net/bonding/bond_main.c  | 4 ++++
+>  drivers/net/bonding/bond_sysfs.c | 6 ++++--
+>  include/net/bonding.h            | 3 +++
+>  3 files changed, 11 insertions(+), 2 deletions(-)
+
+Reader-writer locks are slower than spin locks and should be discouraged.
+Would it be possible to use RCU here instead?
 
