@@ -1,448 +1,421 @@
-Return-Path: <netdev+bounces-46822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112F27E6921
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:05:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4F1A7E6916
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA72A281052
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:05:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B596F1C20975
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5489019444;
-	Thu,  9 Nov 2023 11:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC8A13AE2;
+	Thu,  9 Nov 2023 11:04:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LSVq+CPU"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A5F199A2;
-	Thu,  9 Nov 2023 11:05:54 +0000 (UTC)
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169582728;
-	Thu,  9 Nov 2023 03:05:52 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0hJB2_1699527949;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0hJB2_1699527949)
-          by smtp.aliyun-inc.com;
-          Thu, 09 Nov 2023 19:05:49 +0800
-Message-ID: <1699527528.5637772-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 08/21] virtio_net: sq support premapped mode
-Date: Thu, 9 Nov 2023 18:58:48 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
- <20231107031227.100015-9-xuanzhuo@linux.alibaba.com>
- <CACGkMEtLee8ELzqFnV_zOu3p5tU6hivouKM=WjtNAq+2wQzAFQ@mail.gmail.com>
-In-Reply-To: <CACGkMEtLee8ELzqFnV_zOu3p5tU6hivouKM=WjtNAq+2wQzAFQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A98D19442
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:04:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 616F8272C
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:04:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699527841;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BTHdoswUAcs5z99P9gQJOP7b9HTzdGGGib7KL3ylz+E=;
+	b=LSVq+CPUUIbuT7zPmZD+2kmH8/xjB+2zBRdrBV86bSadd7v2K88Tw8e/WqyrnpsG7Yg0Td
+	ebhZCDm0cVXDQF9SfRinRV3gJ39WClTRsHqOg4ymlSRyHG8RLHWVsDfhNxDcP2lWNYw1wy
+	PQdLHLJlmSOGZ4BNOV4zzD0fWgE2wNk=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-9-SdW43PhgMi29GQsokrz0hA-1; Thu, 09 Nov 2023 06:04:00 -0500
+X-MC-Unique: SdW43PhgMi29GQsokrz0hA-1
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-4ac2040cedaso149185e0c.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:04:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699527840; x=1700132640;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BTHdoswUAcs5z99P9gQJOP7b9HTzdGGGib7KL3ylz+E=;
+        b=w6kirXtf7xqs56veILdjCzhe4JIYbT5au5n5D5uJt75TGmwL1shQzEZIqS3J7G0IuV
+         9/xsmdlbZFuDjdU1DFriT7pRoNF7A05XmS3wPr6fmdiOLlwrEBzw+zsdoaTo3/f3umiK
+         di8THAhhxNB2csBcxbUXVbfwBvz5X9j5iDvZRnxzwpIC41B/BOaLTpxtnbkdg0/9+cvR
+         X3s25D9DiYIemJ0vAeechoQIDboNkfK2l3XTwEM9KLxRPcA9K1ife9FuQwC8nmjFcId7
+         Fg3wIKWvx3sF+YD8Bckg4pgaQJFvyMfwTo0Vnh3wtcFxpu73aVFVf2KomAs2sGLV7oW4
+         Y7Ng==
+X-Gm-Message-State: AOJu0YwfD4al9NBmLBg4q1XO+qFcW0YrxOb2WwCV/Aoye4GYMB6EUNAI
+	QwYyL2WQObxywe+OAvEgFxBJYw1no9Un/c/nhIkIuYArmAbs1Nrn+2A9m8s9ci8AEQALEyiZssd
+	03Wf5gDMmMz3k3zSJ
+X-Received: by 2002:a67:fe4f:0:b0:45d:b4ae:ddb9 with SMTP id m15-20020a67fe4f000000b0045db4aeddb9mr4081977vsr.2.1699527839667;
+        Thu, 09 Nov 2023 03:03:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH/PKB7u4hZG7vUEjD4FVPQ4r2OiRrvyLgxkTsj6m7W595bd9b7FYDieBBb/+sfLZB5ri4zKA==
+X-Received: by 2002:a67:fe4f:0:b0:45d:b4ae:ddb9 with SMTP id m15-20020a67fe4f000000b0045db4aeddb9mr4081949vsr.2.1699527839319;
+        Thu, 09 Nov 2023 03:03:59 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
+        by smtp.gmail.com with ESMTPSA id e6-20020ad44426000000b0065afcf19e23sm1949798qvt.62.2023.11.09.03.03.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 03:03:58 -0800 (PST)
+Message-ID: <53b5c756ff3387e81796d1859c79276a09328234.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 12/12] selftests: add ncdevmem, netcat for devmem
+ TCP
+From: Paolo Abeni <pabeni@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+  Stanislav Fomichev <sdf@google.com>
+Date: Thu, 09 Nov 2023 12:03:54 +0100
+In-Reply-To: <20231106024413.2801438-13-almasrymina@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+	 <20231106024413.2801438-13-almasrymina@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-On Thu, 9 Nov 2023 14:37:38 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Nov 7, 2023 at 11:12=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > If the xsk is enabling, the xsk tx will share the send queue.
-> > But the xsk requires that the send queue use the premapped mode.
-> > So the send queue must support premapped mode.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio/main.c       | 163 ++++++++++++++++++++++++++++----
-> >  drivers/net/virtio/virtio_net.h |  16 ++++
-> >  2 files changed, 163 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
-> > index 16e75c08639e..f052db459156 100644
-> > --- a/drivers/net/virtio/main.c
-> > +++ b/drivers/net/virtio/main.c
-> > @@ -46,6 +46,7 @@ module_param(napi_tx, bool, 0644);
-> >  #define VIRTIO_XDP_REDIR       BIT(1)
-> >
-> >  #define VIRTIO_XDP_FLAG        BIT(0)
-> > +#define VIRTIO_XMIT_DATA_MASK (VIRTIO_XDP_FLAG)
-> >
-> >  #define VIRTNET_DRIVER_VERSION "1.0.0"
-> >
-> > @@ -167,6 +168,29 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
-> >         return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FL=
-AG);
-> >  }
-> >
-> > +static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
-> > +{
-> > +       struct virtnet_sq_dma *next, *head;
-> > +
-> > +       head =3D (void *)((unsigned long)data & ~VIRTIO_XMIT_DATA_MASK);
-> > +
-> > +       data =3D head->data;
-> > +
-> > +       while (head) {
-> > +               virtqueue_dma_unmap_single_attrs(sq->vq, head->addr, he=
-ad->len,
-> > +                                                DMA_TO_DEVICE, 0);
-> > +
-> > +               next =3D head->next;
-> > +
-> > +               head->next =3D sq->dmainfo.free;
-> > +               sq->dmainfo.free =3D head;
-> > +
-> > +               head =3D next;
-> > +       }
-> > +
-> > +       return data;
-> > +}
-> > +
-> >  static void __free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> >                             u64 *bytes, u64 *packets)
-> >  {
-> > @@ -175,14 +199,24 @@ static void __free_old_xmit(struct virtnet_sq *sq=
-, bool in_napi,
-> >
-> >         while ((ptr =3D virtqueue_get_buf(sq->vq, &len)) !=3D NULL) {
-> >                 if (!is_xdp_frame(ptr)) {
-> > -                       struct sk_buff *skb =3D ptr;
-> > +                       struct sk_buff *skb;
-> > +
-> > +                       if (sq->do_dma)
-> > +                               ptr =3D virtnet_sq_unmap(sq, ptr);
-> > +
-> > +                       skb =3D ptr;
-> >
-> >                         pr_debug("Sent skb %p\n", skb);
-> >
-> >                         *bytes +=3D skb->len;
-> >                         napi_consume_skb(skb, in_napi);
-> >                 } else {
-> > -                       struct xdp_frame *frame =3D ptr_to_xdp(ptr);
-> > +                       struct xdp_frame *frame;
-> > +
-> > +                       if (sq->do_dma)
-> > +                               ptr =3D virtnet_sq_unmap(sq, ptr);
-> > +
-> > +                       frame =3D ptr_to_xdp(ptr);
-> >
-> >                         *bytes +=3D xdp_get_frame_len(frame);
-> >                         xdp_return_frame(frame);
-> > @@ -567,22 +601,104 @@ static void *virtnet_rq_alloc(struct virtnet_rq =
-*rq, u32 size, gfp_t gfp)
-> >         return buf;
-> >  }
-> >
-> > -static void virtnet_rq_set_premapped(struct virtnet_info *vi)
-> > +static int virtnet_sq_set_premapped(struct virtnet_sq *sq)
-> >  {
-> > -       int i;
-> > +       struct virtnet_sq_dma *d;
-> > +       int err, size, i;
-> >
-> > -       /* disable for big mode */
-> > -       if (!vi->mergeable_rx_bufs && vi->big_packets)
-> > -               return;
-> > +       size =3D virtqueue_get_vring_size(sq->vq);
-> > +
-> > +       size +=3D MAX_SKB_FRAGS + 2;
->
-> Btw, the dmainfo seems per sg? If I'm correct, how can vq_size +
-> MAX_SKB_FRAGS + 2 work?
+On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
+> @@ -91,6 +95,7 @@ TEST_PROGS +=3D test_bridge_neigh_suppress.sh
+>  TEST_PROGS +=3D test_vxlan_nolocalbypass.sh
+>  TEST_PROGS +=3D test_bridge_backup_port.sh
+>  TEST_PROGS +=3D fdb_flush.sh
+> +TEST_GEN_FILES +=3D ncdevmem
 
+I guess we want something added to TEST_PROGS, too ;)
 
-We may alloc dmainfo items when the vq is full. So I prepare more dmainfo i=
-tems.
+>  TEST_FILES :=3D settings
+> =20
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
+ests/net/ncdevmem.c
+> new file mode 100644
+> index 000000000000..78bc3ad767ca
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -0,0 +1,546 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#define _GNU_SOURCE
+> +#define __EXPORTED_HEADERS__
+> +
+> +#include <linux/uio.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <unistd.h>
+> +#include <stdbool.h>
+> +#include <string.h>
+> +#include <errno.h>
+> +#define __iovec_defined
+> +#include <fcntl.h>
+> +#include <malloc.h>
+> +
+> +#include <arpa/inet.h>
+> +#include <sys/socket.h>
+> +#include <sys/mman.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/syscall.h>
+> +
+> +#include <linux/memfd.h>
+> +#include <linux/if.h>
+> +#include <linux/dma-buf.h>
+> +#include <linux/udmabuf.h>
+> +#include <libmnl/libmnl.h>
+> +#include <linux/types.h>
+> +#include <linux/netlink.h>
+> +#include <linux/genetlink.h>
+> +#include <linux/netdev.h>
+> +#include <time.h>
+> +
+> +#include "netdev-user.h"
+> +#include <ynl.h>
+> +
+> +#define PAGE_SHIFT 12
+> +#define TEST_PREFIX "ncdevmem"
+> +#define NUM_PAGES 16000
+> +
+> +#ifndef MSG_SOCK_DEVMEM
+> +#define MSG_SOCK_DEVMEM 0x2000000
+> +#endif
+> +
+> +/*
+> + * tcpdevmem netcat. Works similarly to netcat but does device memory TC=
+P
+> + * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
+> + *
+> + * Usage:
+> + *
+> + * * Without validation:
+> + *
+> + *	On server:
+> + *	ncdevmem -s <server IP> -c <client IP> -f eth1 -n 0000:06:00.0 -l \
+> + *		-p 5201
+> + *
+> + *	On client:
+> + *	ncdevmem -s <server IP> -c <client IP> -f eth1 -n 0000:06:00.0 -p 520=
+1
+> + *
+> + * * With Validation:
+> + *	On server:
+> + *	ncdevmem -s <server IP> -c <client IP> -l -f eth1 -n 0000:06:00.0 \
+> + *		-p 5202 -v 1
+> + *
+> + *	On client:
+> + *	ncdevmem -s <server IP> -c <client IP> -f eth1 -n 0000:06:00.0 -p 520=
+2 \
+> + *		-v 100000
+> + *
+> + * Note this is compatible with regular netcat. i.e. the sender or recei=
+ver can
+> + * be replaced with regular netcat to test the RX or TX path in isolatio=
+n.
+> + */
+> +
+> +static char *server_ip =3D "192.168.1.4";
+> +static char *client_ip =3D "192.168.1.2";
+> +static char *port =3D "5201";
+> +static size_t do_validation;
+> +static int queue_num =3D 15;
+> +static char *ifname =3D "eth1";
+> +static char *nic_pci_addr =3D "0000:06:00.0";
+> +static unsigned int iterations;
+> +
+> +void print_bytes(void *ptr, size_t size)
+> +{
+> +	unsigned char *p =3D ptr;
+> +	int i;
+> +
+> +	for (i =3D 0; i < size; i++) {
+> +		printf("%02hhX ", p[i]);
+> +	}
+> +	printf("\n");
+> +}
+> +
+> +void print_nonzero_bytes(void *ptr, size_t size)
+> +{
+> +	unsigned char *p =3D ptr;
+> +	unsigned int i;
+> +
+> +	for (i =3D 0; i < size; i++)
+> +		putchar(p[i]);
+> +	printf("\n");
+> +}
+> +
+> +void validate_buffer(void *line, size_t size)
+> +{
+> +	static unsigned char seed =3D 1;
+> +	unsigned char *ptr =3D line;
+> +	int errors =3D 0;
+> +	size_t i;
+> +
+> +	for (i =3D 0; i < size; i++) {
+> +		if (ptr[i] !=3D seed) {
+> +			fprintf(stderr,
+> +				"Failed validation: expected=3D%u, actual=3D%u, index=3D%lu\n",
+> +				seed, ptr[i], i);
+> +			errors++;
+> +			if (errors > 20)
+> +				exit(1);
+> +		}
+> +		seed++;
+> +		if (seed =3D=3D do_validation)
+> +			seed =3D 0;
+> +	}
+> +
+> +	fprintf(stdout, "Validated buffer\n");
+> +}
+> +
+> +static void reset_flow_steering(void)
+> +{
+> +	char command[256];
+> +
+> +	memset(command, 0, sizeof(command));
+> +	snprintf(command, sizeof(command), "sudo ethtool -K %s ntuple off",
+> +		 "eth1");
+> +	system(command);
+> +
+> +	memset(command, 0, sizeof(command));
+> +	snprintf(command, sizeof(command), "sudo ethtool -K %s ntuple on",
+> +		 "eth1");
+> +	system(command);
+> +}
+> +
+> +static void configure_flow_steering(void)
+> +{
+> +	char command[256];
+> +
+> +	memset(command, 0, sizeof(command));
+> +	snprintf(command, sizeof(command),
+> +		 "sudo ethtool -N %s flow-type tcp4 src-ip %s dst-ip %s src-port %s ds=
+t-port %s queue %d",
+> +		 ifname, client_ip, server_ip, port, port, queue_num);
+> +	system(command);
+> +}
+> +
+> +/* Triggers a driver reset...
+> + *
+> + * The proper way to do this is probably 'ethtool --reset', but I don't =
+have
+> + * that supported on my current test bed. I resort to changing this
+> + * configuration in the driver which also causes a driver reset...
+> + */
+> +static void trigger_device_reset(void)
+> +{
+> +	char command[256];
+> +
+> +	memset(command, 0, sizeof(command));
+> +	snprintf(command, sizeof(command),
+> +		 "sudo ethtool --set-priv-flags %s enable-header-split off",
+> +		 ifname);
+> +	system(command);
+> +
+> +	memset(command, 0, sizeof(command));
+> +	snprintf(command, sizeof(command),
+> +		 "sudo ethtool --set-priv-flags %s enable-header-split on",
+> +		 ifname);
+> +	system(command);
+> +}
+> +
+> +static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+> +			 __u32 *queue_idx, unsigned int n_queue_index,
+> +			 struct ynl_sock **ys)
+> +{
+> +	struct netdev_bind_rx_req *req =3D NULL;
+> +	struct ynl_error yerr;
+> +	int ret =3D 0;
+> +
+> +	*ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
+> +	if (!*ys) {
+> +		fprintf(stderr, "YNL: %s\n", yerr.msg);
+> +		return -1;
+> +	}
+> +
+> +	if (ynl_subscribe(*ys, "mgmt"))
+> +		goto err_close;
+> +
+> +	req =3D netdev_bind_rx_req_alloc();
+> +	netdev_bind_rx_req_set_ifindex(req, ifindex);
+> +	netdev_bind_rx_req_set_dmabuf_fd(req, dmabuf_fd);
+> +	__netdev_bind_rx_req_set_queues(req, queue_idx, n_queue_index);
+> +
+> +	ret =3D netdev_bind_rx(*ys, req);
+> +	if (!ret) {
+> +		perror("netdev_bind_rx");
+> +		goto err_close;
+> +	}
+> +
+> +	netdev_bind_rx_req_free(req);
+> +
+> +	return 0;
+> +
+> +err_close:
+> +	fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
+> +	netdev_bind_rx_req_free(req);
+> +	ynl_sock_destroy(*ys);
+> +	return -1;
+> +}
+> +
+> +static void create_udmabuf(int *devfd, int *memfd, int *buf, size_t dmab=
+uf_size)
+> +{
+> +	struct udmabuf_create create;
+> +	int ret;
+> +
+> +	*devfd =3D open("/dev/udmabuf", O_RDWR);
+> +	if (*devfd < 0) {
+> +		fprintf(stderr,
+> +			"%s: [skip,no-udmabuf: Unable to access DMA "
+> +			"buffer device file]\n",
+> +			TEST_PREFIX);
+> +		exit(70);
+> +	}
+> +
+> +	*memfd =3D memfd_create("udmabuf-test", MFD_ALLOW_SEALING);
+> +	if (*memfd < 0) {
+> +		printf("%s: [skip,no-memfd]\n", TEST_PREFIX);
+> +		exit(72);
+> +	}
+> +
+> +	ret =3D fcntl(*memfd, F_ADD_SEALS, F_SEAL_SHRINK);
+> +	if (ret < 0) {
+> +		printf("%s: [skip,fcntl-add-seals]\n", TEST_PREFIX);
+> +		exit(73);
+> +	}
+> +
+> +	ret =3D ftruncate(*memfd, dmabuf_size);
+> +	if (ret =3D=3D -1) {
+> +		printf("%s: [FAIL,memfd-truncate]\n", TEST_PREFIX);
+> +		exit(74);
+> +	}
+> +
+> +	memset(&create, 0, sizeof(create));
+> +
+> +	create.memfd =3D *memfd;
+> +	create.offset =3D 0;
+> +	create.size =3D dmabuf_size;
+> +	*buf =3D ioctl(*devfd, UDMABUF_CREATE, &create);
+> +	if (*buf < 0) {
+> +		printf("%s: [FAIL, create udmabuf]\n", TEST_PREFIX);
+> +		exit(75);
+> +	}
+> +}
+> +
+> +int do_server(void)
+> +{
+> +	char ctrl_data[sizeof(int) * 20000];
+> +	size_t non_page_aligned_frags =3D 0;
+> +	struct sockaddr_in client_addr;
+> +	struct sockaddr_in server_sin;
+> +	size_t page_aligned_frags =3D 0;
+> +	int devfd, memfd, buf, ret;
+> +	size_t total_received =3D 0;
+> +	bool is_devmem =3D false;
+> +	char *buf_mem =3D NULL;
+> +	struct ynl_sock *ys;
+> +	size_t dmabuf_size;
+> +	char iobuf[819200];
+> +	char buffer[256];
+> +	int socket_fd;
+> +	int client_fd;
+> +	size_t i =3D 0;
+> +	int opt =3D 1;
+> +
+> +	dmabuf_size =3D getpagesize() * NUM_PAGES;
+> +
+> +	create_udmabuf(&devfd, &memfd, &buf, dmabuf_size);
+> +
+> +	__u32 *queue_idx =3D malloc(sizeof(__u32) * 2);
+> +
+> +	queue_idx[0] =3D 14;
+> +	queue_idx[1] =3D 15;
+> +	if (bind_rx_queue(3 /* index for eth1 */, buf, queue_idx, 2, &ys)) {
+                          ^^^^^^^^^^^^^^^^^^^
+I guess we want to explicitly fetch the "ifname" index.
 
+Side note: I'm wondering if we could extend some kind of virtual device
+to allow single host self-tests? e.g. veth, if that would not cause
+excessive bloat in the device driver?
 
->
-> > +
-> > +       sq->dmainfo.head =3D kcalloc(size, sizeof(*sq->dmainfo.head), G=
-FP_KERNEL);
-> > +       if (!sq->dmainfo.head)
-> > +               return -ENOMEM;
-> > +
-> > +       err =3D virtqueue_set_dma_premapped(sq->vq);
-> > +       if (err) {
-> > +               kfree(sq->dmainfo.head);
-> > +               return err;
-> > +       }
->
-> Allocating after set_dma_premapped() seems easier.
+Cheers,
 
-Yes. But, we donot has the way to disable premapped mode.
+Paolo
 
-That is my mistake. :)
-
-
->
-> Btw, is there a benchmark of TX PPS just for this patch to demonstrate
-> the impact of the performance?
-
-We will have that.
-
-
->
-> > +
-> > +       sq->dmainfo.free =3D NULL;
-> > +
-> > +       sq->do_dma =3D true;
-> > +
-> > +       for (i =3D 0; i < size; ++i) {
-> > +               d =3D &sq->dmainfo.head[i];
-> > +
-> > +               d->next =3D sq->dmainfo.free;
-> > +               sq->dmainfo.free =3D d;
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static void virtnet_set_premapped(struct virtnet_info *vi)
-> > +{
-> > +       int i;
-> >
-> >         for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> > -               if (virtqueue_set_dma_premapped(vi->rq[i].vq))
-> > -                       continue;
-> > +               virtnet_sq_set_premapped(&vi->sq[i]);
-> >
-> > -               vi->rq[i].do_dma =3D true;
-> > +               /* disable for big mode */
-> > +               if (vi->mergeable_rx_bufs || !vi->big_packets) {
-> > +                       if (!virtqueue_set_dma_premapped(vi->rq[i].vq))
-> > +                               vi->rq[i].do_dma =3D true;
->
-> How about sticking a virtnet_rq_set_premapped() and calling it here?
->
-> It seems more clean.
-
-OK.
-
-
->
-> Btw, the big mode support for pre mapping is still worthwhile
-> regardless whether or not XDP is supported. It has a page pool so we
-> can avoid redundant DMA map/unmap there.
-
-Yes.
-
-I post other patch set to do this.
-
-
->
-> > +               }
-> >         }
-> >  }
-> >
-> > +static struct virtnet_sq_dma *virtnet_sq_map_sg(struct virtnet_sq *sq,=
- int nents, void *data)
-> > +{
-> > +       struct virtnet_sq_dma *d, *head;
-> > +       struct scatterlist *sg;
-> > +       int i;
-> > +
-> > +       head =3D NULL;
-> > +
-> > +       for_each_sg(sq->sg, sg, nents, i) {
-> > +               sg->dma_address =3D virtqueue_dma_map_single_attrs(sq->=
-vq, sg_virt(sg),
-> > +                                                                sg->le=
-ngth,
-> > +                                                                DMA_TO=
-_DEVICE, 0);
-> > +               if (virtqueue_dma_mapping_error(sq->vq, sg->dma_address=
-))
-> > +                       goto err;
-> > +
-> > +               d =3D sq->dmainfo.free;
-> > +               sq->dmainfo.free =3D d->next;
-> > +
-> > +               d->addr =3D sg->dma_address;
-> > +               d->len =3D sg->length;
-> > +
-> > +               d->next =3D head;
-> > +               head =3D d;
-> > +       }
-> > +
-> > +       head->data =3D data;
-> > +
-> > +       return (void *)((unsigned long)head | ((unsigned long)data & VI=
-RTIO_XMIT_DATA_MASK));
->
-> So head contains a pointer to data, any reason we still need to pack a
-> data pointer here?
-
-Maybe you are right. We can skip this.
-
-
->
->
-> > +err:
-> > +       virtnet_sq_unmap(sq, head);
-> > +       return NULL;
-> > +}
-> > +
-> > +static int virtnet_add_outbuf(struct virtnet_sq *sq, u32 num, void *da=
-ta)
-> > +{
-> > +       int ret;
-> > +
-> > +       if (sq->do_dma) {
-> > +               data =3D virtnet_sq_map_sg(sq, num, data);
-> > +               if (!data)
-> > +                       return -ENOMEM;
-> > +       }
-> > +
-> > +       ret =3D virtqueue_add_outbuf(sq->vq, sq->sg, num, data, GFP_ATO=
-MIC);
-> > +       if (ret && sq->do_dma)
-> > +               virtnet_sq_unmap(sq, data);
-> > +
-> > +       return ret;
-> > +}
-> > +
-> >  static void free_old_xmit(struct virtnet_sq *sq, bool in_napi)
-> >  {
-> >         u64 bytes, packets =3D 0;
-> > @@ -686,8 +802,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_in=
-fo *vi,
-> >                             skb_frag_size(frag), skb_frag_off(frag));
-> >         }
-> >
-> > -       err =3D virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
-> > -                                  xdp_to_ptr(xdpf), GFP_ATOMIC);
-> > +       err =3D virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
-> >         if (unlikely(err))
-> >                 return -ENOSPC; /* Caller handle free/refcnt */
-> >
-> > @@ -2126,7 +2241,8 @@ static int xmit_skb(struct virtnet_sq *sq, struct=
- sk_buff *skb)
-> >                         return num_sg;
-> >                 num_sg++;
-> >         }
-> > -       return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_AT=
-OMIC);
-> > +
-> > +       return virtnet_add_outbuf(sq, num_sg, skb);
-> >  }
-> >
-> >  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *=
-dev)
-> > @@ -3818,6 +3934,8 @@ static void virtnet_free_queues(struct virtnet_in=
-fo *vi)
-> >         for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> >                 __netif_napi_del(&vi->rq[i].napi);
-> >                 __netif_napi_del(&vi->sq[i].napi);
-> > +
-> > +               kfree(vi->sq[i].dmainfo.head);
-> >         }
-> >
-> >         /* We called __netif_napi_del(),
-> > @@ -3866,10 +3984,23 @@ static void free_receive_page_frags(struct virt=
-net_info *vi)
-> >
-> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> >  {
-> > -       if (!is_xdp_frame(buf))
-> > +       struct virtnet_info *vi =3D vq->vdev->priv;
-> > +       struct virtnet_sq *sq;
-> > +       int i =3D vq2rxq(vq);
-> > +
-> > +       sq =3D &vi->sq[i];
-> > +
-> > +       if (!is_xdp_frame(buf)) {
-> > +               if (sq->do_dma)
-> > +                       buf =3D virtnet_sq_unmap(sq, buf);
-> > +
-> >                 dev_kfree_skb(buf);
-> > -       else
-> > +       } else {
-> > +               if (sq->do_dma)
-> > +                       buf =3D virtnet_sq_unmap(sq, buf);
-> > +
-> >                 xdp_return_frame(ptr_to_xdp(buf));
-> > +       }
-> >  }
-> >
-> >  static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > @@ -4075,7 +4206,7 @@ static int init_vqs(struct virtnet_info *vi)
-> >         if (ret)
-> >                 goto err_free;
-> >
-> > -       virtnet_rq_set_premapped(vi);
-> > +       virtnet_set_premapped(vi);
-> >
-> >         cpus_read_lock();
-> >         virtnet_set_affinity(vi);
-> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virti=
-o_net.h
-> > index d814341d9f97..ce806afb6d64 100644
-> > --- a/drivers/net/virtio/virtio_net.h
-> > +++ b/drivers/net/virtio/virtio_net.h
-> > @@ -48,6 +48,18 @@ struct virtnet_rq_dma {
-> >         u16 need_sync;
-> >  };
-> >
-> > +struct virtnet_sq_dma {
-> > +       struct virtnet_sq_dma *next;
-> > +       dma_addr_t addr;
-> > +       u32 len;
-> > +       void *data;
->
-> I think we need to seek a way to reuse what has been stored by virtio
-> core. It should be much more efficient.
-
-
-Yes.
-
-But that is for net-next branch.
-
-Can we do that as a fix after that is merged to 6.8?
-
-Thanks.
-
-
->
-> Thanks
->
-> > +};
-> > +
-> > +struct virtnet_sq_dma_head {
-> > +       struct virtnet_sq_dma *free;
-> > +       struct virtnet_sq_dma *head;
-> > +};
-> > +
-> >  /* Internal representation of a send virtqueue */
-> >  struct virtnet_sq {
-> >         /* Virtqueue associated with this virtnet_sq */
-> > @@ -67,6 +79,10 @@ struct virtnet_sq {
-> >
-> >         /* Record whether sq is in reset state. */
-> >         bool reset;
-> > +
-> > +       bool do_dma;
-> > +
-> > +       struct virtnet_sq_dma_head dmainfo;
-> >  };
-> >
-> >  /* Internal representation of a receive virtqueue */
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
->
 
