@@ -1,218 +1,220 @@
-Return-Path: <netdev+bounces-46819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC7A7E68FD
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:58:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E0E07E6867
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D38A7280FB6
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:58:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304491C20A67
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A674134DB;
-	Thu,  9 Nov 2023 10:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A58F7F2;
+	Thu,  9 Nov 2023 10:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCb+JTQB"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF85134D1;
-	Thu,  9 Nov 2023 10:58:39 +0000 (UTC)
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCC42590;
-	Thu,  9 Nov 2023 02:58:37 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0bMC3_1699527511;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0bMC3_1699527511)
-          by smtp.aliyun-inc.com;
-          Thu, 09 Nov 2023 18:58:32 +0800
-Message-ID: <1699526256.4202905-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 00/21] virtio-net: support AF_XDP zero copy
-Date: Thu, 9 Nov 2023 18:37:36 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
- <20231109031728-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231109031728-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7E5199B9;
+	Thu,  9 Nov 2023 10:38:34 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 079AB2139;
+	Thu,  9 Nov 2023 02:38:34 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-507c5249d55so896772e87.3;
+        Thu, 09 Nov 2023 02:38:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699526312; x=1700131112; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=F6sdlilRzx4KJNCM1uvaoqMCkWPOin5PXK15jSeT8dQ=;
+        b=fCb+JTQB/vRTl2VoGmwlivyJZS6BGPmVqgYXFd43vWN/9ykzobQeG9vIASQ4vhom1R
+         dhnINY5isTV9x1YYHgmD1LTx9H7UyW0/6uMQIeRENmHOkUIAWUKW1cIkvgp7i0XtWfA7
+         sbTCF/IfkgGX0iGu+0Q+DtFPiqK0Ga6N0ZSRK2+xuyXYfE9Ts+L+sDMK9pX0XQaEGDRS
+         vUej/wZlTmm/1Gl6c2zTQD4rV+6QzMakdJGLD5wlTGavW0319j9ACPgIZQDp+9GSpmza
+         oRdsNvFxbVolLPhRtAYZAGurQoDOKnQTPowbVUBXKup7M1+Z/lUaPY8sfjB73VuYxv8p
+         q4NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699526312; x=1700131112;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F6sdlilRzx4KJNCM1uvaoqMCkWPOin5PXK15jSeT8dQ=;
+        b=ldReS1th0tQ/U1YqvpIdC07ySEsO+2es3Q9ApLg85tTiBUz2OPFR6ikrTlmyLogfNJ
+         1jfAJ+F8+6UcaxkTA1RB+Mx3K62Bs95awkDsvZoCsGOnWSKRjXU7K1syCa9aWa8W9zxe
+         mWcdqikUD0xDWkk2oJegXoGUbxyfu60syKUxyVA6ot3YraVlcWYPoDKqaEkF59Q6G+uX
+         5l/nixSHlVdT4PHBv/PNS7/J47Ei33Il8GrvUFtT6msJIbNX/OZWPR2qDg+zNimaAe9I
+         u3UXW7Y5kykY7dAfHDXA9pHQHJO/Uq+AwabPwZhlKnvg+NcwQzPILHGKU44alG4Zu4Gh
+         twsQ==
+X-Gm-Message-State: AOJu0Yx0+Ha0o0X5ITSuIwIKbY99u1HPHVwRtudkomJXCN43yTk/S1Rq
+	6bB6zgZsUbi2UP2t6maijC8=
+X-Google-Smtp-Source: AGHT+IHZhML8KNaOm9Y0mD700s/Nyoltq5ethe4dv3R0UqGXcUT3bmS/+0jzPSHKsy/PW133kpsC8w==
+X-Received: by 2002:ac2:5f57:0:b0:507:b15b:8b92 with SMTP id 23-20020ac25f57000000b00507b15b8b92mr998309lfz.59.1699526311861;
+        Thu, 09 Nov 2023 02:38:31 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id j29-20020a05600c1c1d00b00405391f485fsm1684846wms.41.2023.11.09.02.38.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 02:38:31 -0800 (PST)
+Message-ID: <654cb6a7.050a0220.78255.59d0@mx.google.com>
+X-Google-Original-Message-ID: <ZUy2pLuCj82ynjOh@Ansuel-xps.>
+Date: Thu, 9 Nov 2023 11:38:28 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v5 4/4] dt-bindings: Document bindings for
+ Marvell Aquantia PHY
+References: <20231106165433.2746-1-ansuelsmth@gmail.com>
+ <20231106165433.2746-4-ansuelsmth@gmail.com>
+ <20231107192232.GA3296102-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231107192232.GA3296102-robh@kernel.org>
 
-On Thu, 9 Nov 2023 03:19:04 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Tue, Nov 07, 2023 at 11:12:06AM +0800, Xuan Zhuo wrote:
-> > ## AF_XDP
-> >
-> > XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
-> > copy feature of xsk (XDP socket) needs to be supported by the driver. The
-> > performance of zero copy is very good. mlx5 and intel ixgbe already support
-> > this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
-> > feature.
-> >
-> > At present, we have completed some preparation:
-> >
-> > 1. vq-reset (virtio spec and kernel code)
-> > 2. virtio-core premapped dma
-> > 3. virtio-net xdp refactor
-> >
-> > So it is time for Virtio-Net to complete the support for the XDP Socket
-> > Zerocopy.
-> >
-> > Virtio-net can not increase the queue num at will, so xsk shares the queue with
-> > kernel.
-> >
-> > On the other hand, Virtio-Net does not support generate interrupt from driver
-> > manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
-> > NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
-> > is also the local CPU, then we wake up napi directly.
-> >
-> > This patch set includes some refactor to the virtio-net to let that to support
-> > AF_XDP.
-> >
-> > ## performance
-> >
-> > ENV: Qemu with vhost-user(polling mode).
-> > Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-> >
-> > ### virtio PMD in guest with testpmd
-> >
-> > testpmd> show port stats all
-> >
-> >  ######################## NIC statistics for port 0 ########################
-> >  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
-> >  RX-errors: 0
-> >  RX-nombuf: 0
-> >  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
-> >
-> >
-> >  Throughput (since last show)
-> >  Rx-pps:   8861574     Rx-bps:  3969985208
-> >  Tx-pps:   8861493     Tx-bps:  3969962736
-> >  ############################################################################
-> >
-> > ### AF_XDP PMD in guest with testpmd
-> >
-> > testpmd> show port stats all
-> >
-> >   ######################## NIC statistics for port 0  ########################
-> >   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
-> >   RX-errors: 0
-> >   RX-nombuf:  0
-> >   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
-> >
-> >   Throughput (since last show)
-> >   Rx-pps:      6333196          Rx-bps:   2837272088
-> >   Tx-pps:      6333227          Tx-bps:   2837285936
-> >   ############################################################################
-> >
-> > But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
-> >
-> > ## maintain
-> >
-> > I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
-> > virtio-net.
-> >
-> > Please review.
-> >
-> > Thanks.
-> >
-> > v2
-> >     1. wakeup uses the way of GVE. No send ipi to wakeup napi on remote cpu.
-> >     2. remove rcu. Because we synchronize all operat, so the rcu is not needed.
-> >     3. split the commit "move to virtio_net.h" in last patch set. Just move the
-> >        struct/api to header when we use them.
-> >     4. add comments for some code
-> >
-> > v1:
-> >     1. remove two virtio commits. Push this patchset to net-next
-> >     2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
-> >     3. fix some warnings
-> >
-> >
-> > Xuan Zhuo (21):
-> >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> >   virtio_net: unify the code for recycling the xmit ptr
-> >   virtio_net: independent directory
-> >   virtio_net: move core structures to virtio_net.h
-> >   virtio_net: add prefix virtnet to all struct inside virtio_net.h
-> >   virtio_net: separate virtnet_rx_resize()
-> >   virtio_net: separate virtnet_tx_resize()
-> >   virtio_net: sq support premapped mode
-> >   virtio_net: xsk: bind/unbind xsk
-> >   virtio_net: xsk: prevent disable tx napi
-> >   virtio_net: move some api to header
-> >   virtio_net: xsk: tx: support tx
-> >   virtio_net: xsk: tx: support wakeup
-> >   virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
-> >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() check xsk buffer
-> >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
-> >   virtio_net: xsk: rx: skip dma unmap when rq is bind with AF_XDP
-> >   virtio_net: xsk: rx: introduce receive_xsk() to recv xsk buffer
-> >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() check xsk buffer
-> >   virtio_net: update tx timeout record
-> >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
-> >
-> >  MAINTAINERS                                 |   2 +-
-> >  drivers/net/Kconfig                         |   8 +-
-> >  drivers/net/Makefile                        |   2 +-
-> >  drivers/net/virtio/Kconfig                  |  13 +
-> >  drivers/net/virtio/Makefile                 |   8 +
-> >  drivers/net/{virtio_net.c => virtio/main.c} | 630 +++++++++-----------
-> >  drivers/net/virtio/virtio_net.h             | 346 +++++++++++
-> >  drivers/net/virtio/xsk.c                    | 498 ++++++++++++++++
-> >  drivers/net/virtio/xsk.h                    |  32 +
-> >  9 files changed, 1174 insertions(+), 365 deletions(-)
-> >  create mode 100644 drivers/net/virtio/Kconfig
-> >  create mode 100644 drivers/net/virtio/Makefile
-> >  rename drivers/net/{virtio_net.c => virtio/main.c} (92%)
-> >  create mode 100644 drivers/net/virtio/virtio_net.h
-> >  create mode 100644 drivers/net/virtio/xsk.c
-> >  create mode 100644 drivers/net/virtio/xsk.h
+On Tue, Nov 07, 2023 at 01:22:32PM -0600, Rob Herring wrote:
+> On Mon, Nov 06, 2023 at 05:54:33PM +0100, Christian Marangi wrote:
+> > Document bindings for Marvell Aquantia PHY.
+> 
+> For the subject: dt-bindings: net: Add Marvell Aquantia PHY
+> 
+> ('Document bindings' is redundant)
+> 
+> > 
+> > The Marvell Aquantia PHY require a firmware to work correctly and there
+> > at least 3 way to load this firmware.
+> > 
+> > Describe all the different way and document the binding "firmware-name"
+> > to load the PHY firmware from userspace.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> > Changes v5:
+> > - Drop extra entry not related to HW description
+> > Changes v3:
+> > - Make DT description more OS agnostic
+> > - Use custom select to fix dtbs checks
+> > Changes v2:
+> > - Add DT patch
+> > 
+> >  .../bindings/net/marvell,aquantia.yaml        | 123 ++++++++++++++++++
+> >  1 file changed, 123 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> > new file mode 100644
+> > index 000000000000..7106c5bdf73c
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+> > @@ -0,0 +1,123 @@
+> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/marvell,aquantia.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Marvell Aquantia Ethernet PHY
+> > +
+> > +maintainers:
+> > +  - Christian Marangi <ansuelsmth@gmail.com>
+> > +
+> > +description: |
+> > +  Marvell Aquantia Ethernet PHY require a firmware to be loaded to actually
+> > +  work.
+> > +
+> > +  This can be done and is implemented by OEM in 3 different way:
+> > +    - Attached SPI flash directly to the PHY with the firmware. The PHY
+> > +      will self load the firmware in the presence of this configuration.
+> > +    - Dedicated partition on system NAND with firmware in it. NVMEM
+> > +      subsystem will be used and the declared NVMEM cell will load
+> > +      the firmware to the PHY using the PHY mailbox interface.
+> > +    - Manually provided firmware loaded from a file in the filesystem.
+> > +
+> > +allOf:
+> > +  - $ref: ethernet-phy.yaml#
+> > +
+> > +select:
+> > +  properties:
+> > +    compatible:
+> > +      contains:
+> > +        enum:
+> > +          - ethernet-phy-id03a1.b445
+> > +          - ethernet-phy-id03a1.b460
+> > +          - ethernet-phy-id03a1.b4a2
+> > +          - ethernet-phy-id03a1.b4d0
+> > +          - ethernet-phy-id03a1.b4e0
+> > +          - ethernet-phy-id03a1.b5c2
+> > +          - ethernet-phy-id03a1.b4b0
+> > +          - ethernet-phy-id03a1.b662
+> > +          - ethernet-phy-id03a1.b712
+> > +          - ethernet-phy-id31c3.1c12
+> > +  required:
+> > +    - compatible
+> > +
+> > +properties:
+> > +  reg:
+> > +    maxItems: 1
+> > +
+> > +  firmware-name:
+> > +    description: specify the name of PHY firmware to load
+> > +
+> > +  nvmem-cells:
+> > +    description: phandle to the firmware nvmem cell
+> > +    maxItems: 1
+> > +
+> > +  nvmem-cell-names:
+> > +    const: firmware
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    mdio {
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> > +
+> > +        ethernet-phy@0 {
+> > +            /*  Only needed to make DT lint tools work. Do not copy/paste
+> > +             *  into real DTS files.
+> > +             */
+> 
+> I don't agree with this statement. Pretty sure we've been through this 
+> before...
+> 
+> If we have a node, we need to define what it is. The way that is done is 
+> with compatible. Whether some particular OS implementation (currently) 
+> needs compatible or not is irrelevant. It's not about dtschema needing 
+> it, that just exposes the issue.
+> 
+> These MDIO PHY bindings are all broken because they are never actually 
+> applied to anything.
 >
->
-> Too much code duplications for my taste. Would there maybe be less if
-> everything was in a single file?
 
+I will just drop these comments, the additional compatible is redundant
+as it will be scanned from PHY ID but won't cause any problem.
 
-What duplication?
+Also the scenario with fw in nvmem cells or in fs is in devices where
+the PHY is soldered to the device, so describe them in DT is correct.
 
-Yes. If everything is in a single file, something maybe simpler. But I
-do not like that, that will be more trouble in the future. We want to
-make the virtnet more like the modern network card, then we will
-introduce more features to the virtio-net. I think it's time to
-split the single file to modules. I think letting every module simple is
-beneficial for the maintaining.
-
-About the duplications, I do not understand. No duplication,
-We just refer the functions from each other.
-
-Do you mean the receive_xsk()?
-Let we resolve this problem if you think it's a duplicate. I think this is the
-right way.
-
-Thanks.
-
-
-
-
-
->
->
-> > --
-> > 2.32.0.3.g01195cf9f
->
->
+-- 
+	Ansuel
 
