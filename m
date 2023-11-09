@@ -1,160 +1,139 @@
-Return-Path: <netdev+bounces-46831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEAF7E6960
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:17:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C19BC7E697C
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB7E3B20C1F
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:17:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 613C7B20BEF
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5479C199D0;
-	Thu,  9 Nov 2023 11:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EAD1A5AB;
+	Thu,  9 Nov 2023 11:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hg5vkPuI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977F4199A6;
-	Thu,  9 Nov 2023 11:17:09 +0000 (UTC)
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E142D5E;
-	Thu,  9 Nov 2023 03:17:07 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0hMzX_1699528623;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0hMzX_1699528623)
-          by smtp.aliyun-inc.com;
-          Thu, 09 Nov 2023 19:17:04 +0800
-Message-ID: <1699528568.0674586-6-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 14/21] virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
-Date: Thu, 9 Nov 2023 19:16:08 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux-foundation.org,
- bpf@vger.kernel.org
-References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
- <20231107031227.100015-15-xuanzhuo@linux.alibaba.com>
- <20231109061056-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231109061056-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57342199D5;
+	Thu,  9 Nov 2023 11:25:13 +0000 (UTC)
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2EB62D64;
+	Thu,  9 Nov 2023 03:25:12 -0800 (PST)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5bf5d6eaf60so5529667b3.2;
+        Thu, 09 Nov 2023 03:25:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699529112; x=1700133912; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/0HXfz/RYRjdCn8R6IffJ7Qc4ROY093vNOoEeYEQ5SY=;
+        b=hg5vkPuIoWuP1HQKsde16/KZFBFDCrDUA1wA0fI/Gg61GYn7uPArlxCm7+t6cXQvWA
+         jyodCm/iSR68FT0yJnkBXBIuMG28J9E1eZWvFrTEiuqwPjrig9HYAh2pOhoAOtgJbpm0
+         wZayujbbvHR66lllaBhaLVTSd1iStw2/v8ycgnAwIjjTY86uc8tp1ogU8Ea3pgvzI8tC
+         QX7b/IToXkcDAwo3piWODEaJHXd9o1CzXNZAHLY5Cc1gVdcO50JWVUqgOMmBrmYt2j5o
+         ji0siRf//OhN3WDxsASg6x54V6RolJv68RggZp+JpZp+DELphdWAKUduUjZcsDZE294T
+         xLwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699529112; x=1700133912;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/0HXfz/RYRjdCn8R6IffJ7Qc4ROY093vNOoEeYEQ5SY=;
+        b=WgrJ+Msrdsw133sEGGtma21utJ+LuNFzd3IdlS5z4Jy/9p1wa+OaMpD16Wf+30561v
+         n+Uzf2DjchpPmDRaLqfpXdkK4GE1/1y2tgDykOJk76TXy7kfLB8JsW5/32Pcy2MZiM7I
+         eYDBaGcN4lyCb0GJMdJH5asP4dbUCgXT28AlJHeslhreS4I2pCPN62pvi9CauGIHengm
+         6CMHaU3OTbLUCRfCnbfSkO1Tya0GPuo4wOcVH73VpD7rq4kCfJnD+6ktc/N7KLl5E0EI
+         ymziPVPCqmnEBTptODNxbiwgJtBFDq7elTPWkjj32/4D7kctvpKB8CQ/07O/qmtgTZrz
+         jsWQ==
+X-Gm-Message-State: AOJu0Yzb3lUrQszh3qt5ysq/BY6hfuvl8KeimW5LL+UQX/dg4RSU6yA/
+	mDyAPjGandUD5yVizO5Rn9B5ENqsXhofS2F2
+X-Google-Smtp-Source: AGHT+IFg4fbgIkMn4hbtwKeaycyyfpogNFQgIp2PbG64oNmhXwEi9viSqmyOnpgf+OdU8NxxfFX5jw==
+X-Received: by 2002:a0d:dd0c:0:b0:586:a684:e7ba with SMTP id g12-20020a0ddd0c000000b00586a684e7bamr4865149ywe.39.1699529111754;
+        Thu, 09 Nov 2023 03:25:11 -0800 (PST)
+Received: from imac ([88.97.103.74])
+        by smtp.gmail.com with ESMTPSA id mh21-20020a056214565500b00641899958efsm1982340qvb.130.2023.11.09.03.25.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 03:25:11 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Breno Leitao <leitao@debian.org>,  linux-doc@vger.kernel.org,
+  netdev@vger.kernel.org,  kuba@kernel.org,  pabeni@redhat.com,
+  edumazet@google.com
+Subject: Re: [PATCH] Documentation: Document the Netlink spec
+In-Reply-To: <875y2cxa6n.fsf@meer.lwn.net> (Jonathan Corbet's message of "Wed,
+	08 Nov 2023 13:27:28 -0700")
+Date: Thu, 09 Nov 2023 11:22:05 +0000
+Message-ID: <m2h6lvmasi.fsf@gmail.com>
+References: <20231103135622.250314-1-leitao@debian.org>
+	<875y2cxa6n.fsf@meer.lwn.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Thu, 9 Nov 2023 06:11:49 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Tue, Nov 07, 2023 at 11:12:20AM +0800, Xuan Zhuo wrote:
-> > virtnet_free_old_xmit distinguishes three type ptr(skb, xdp frame, xsk
-> > buffer) by the last bits of the pointer.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio/virtio_net.h | 18 ++++++++++++++++--
-> >  drivers/net/virtio/xsk.h        |  5 +++++
-> >  2 files changed, 21 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
-> > index a431a2c1ee47..a13d6d301fdb 100644
-> > --- a/drivers/net/virtio/virtio_net.h
-> > +++ b/drivers/net/virtio/virtio_net.h
-> > @@ -225,6 +225,11 @@ struct virtnet_info {
-> >  	struct failover *failover;
-> >  };
-> >
-> > +static inline bool virtnet_is_skb_ptr(void *ptr)
-> > +{
-> > +	return !((unsigned long)ptr & VIRTIO_XMIT_DATA_MASK);
-> > +}
-> > +
-> >  static inline bool virtnet_is_xdp_frame(void *ptr)
-> >  {
-> >  	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > @@ -235,6 +240,8 @@ static inline struct xdp_frame *virtnet_ptr_to_xdp(void *ptr)
-> >  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
-> >  }
-> >
-> > +static inline u32 virtnet_ptr_to_xsk(void *ptr);
-> > +
->
-> I don't understand why you need this here.
+Jonathan Corbet <corbet@lwn.net> writes:
 
-The below function virtnet_free_old_xmit needs this.
+> Breno Leitao <leitao@debian.org> writes:
+>
+>> This is a Sphinx extension that parses the Netlink YAML spec files
+>> (Documentation/netlink/specs/), and generates a rst file to be
+>> displayed into Documentation pages.
+>>
+>> Create a new Documentation/networking/netlink_spec page, and a sub-page
+>> for each Netlink spec that needs to be documented, such as ethtool,
+>> devlink, netdev, etc.
+>>
+>> Create a Sphinx directive extension that reads the YAML spec
+>> (located under Documentation/netlink/specs), parses it and returns a RST
+>> string that is inserted where the Sphinx directive was called.
+>
+> So I finally had a chance to look a bit at this; I have a few
+> impressions.
+>
+> First of all, if you put something silly into one of the YAML files, it
+> kills the whole docs build, which is ... not desirable:
+>
+>> Exception occurred:
+>>   File "/usr/lib64/python3.11/site-packages/yaml/scanner.py", line 577, in fetch_value
+>>     raise ScannerError(None, None,
+>> yaml.scanner.ScannerError: mapping values are not allowed here
+>>   in "/stuff/k/git/kernel/Documentation/netlink/specs/ovs_datapath.yaml", line 14, column 9
+>> 
+>
+> That error needs to be caught and handled in some more graceful way.
+>
+> I do have to wonder, though, whether a sphinx extension is the right way
+> to solve this problem.  You're essentially implementing a filter that
+> turns one YAML file into one RST file; might it be better to keep that
+> outside of sphinx as a standalone script, invoked by the Makefile?
+>
+> Note that I'm asking because I wonder, I'm not saying I would block an
+> extension-based implementation.
 
-Thanks.
++1 to this. The .rst generation can then be easily tested independently
+of the doc build and the stub files could be avoided.
 
+Just a note that last year you offered the opposite guidance:
+
+https://lore.kernel.org/linux-doc/87tu4zsfse.fsf@meer.lwn.net/
+
+If the preference now is for standalone scripts invoked by the Makefile
+then this previous patch might be useful:
+
+https://lore.kernel.org/linux-doc/20220922115257.99815-2-donald.hunter@gmail.com/
+
+It would be good to document the preferred approach to this kind of doc
+extension and I'd be happy to contribute an 'Extensions' section for
+contributing.rst in the doc-guide.
+
+> Thanks,
 >
->
-> >  static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
-> >  {
-> >  	struct virtnet_sq_dma *next, *head;
-> > @@ -261,11 +268,12 @@ static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
-> >  static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> >  					 u64 *bytes, u64 *packets)
-> >  {
-> > +	unsigned int xsknum = 0;
-> >  	unsigned int len;
-> >  	void *ptr;
-> >
-> >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> > -		if (!virtnet_is_xdp_frame(ptr)) {
-> > +		if (virtnet_is_skb_ptr(ptr)) {
-> >  			struct sk_buff *skb;
-> >
-> >  			if (sq->do_dma)
-> > @@ -277,7 +285,7 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> >
-> >  			*bytes += skb->len;
-> >  			napi_consume_skb(skb, in_napi);
-> > -		} else {
-> > +		} else if (virtnet_is_xdp_frame(ptr)) {
-> >  			struct xdp_frame *frame;
-> >
-> >  			if (sq->do_dma)
-> > @@ -287,9 +295,15 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> >
-> >  			*bytes += xdp_get_frame_len(frame);
-> >  			xdp_return_frame(frame);
-> > +		} else {
-> > +			*bytes += virtnet_ptr_to_xsk(ptr);
-> > +			++xsknum;
-> >  		}
-> >  		(*packets)++;
-> >  	}
-> > +
-> > +	if (xsknum)
-> > +		xsk_tx_completed(sq->xsk.pool, xsknum);
-> >  }
-> >
-> >  static inline bool virtnet_is_xdp_raw_buffer_queue(struct virtnet_info *vi, int q)
-> > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
-> > index 1bd19dcda649..7ebc9bda7aee 100644
-> > --- a/drivers/net/virtio/xsk.h
-> > +++ b/drivers/net/virtio/xsk.h
-> > @@ -14,6 +14,11 @@ static inline void *virtnet_xsk_to_ptr(u32 len)
-> >  	return (void *)(p | VIRTIO_XSK_FLAG);
-> >  }
-> >
-> > +static inline u32 virtnet_ptr_to_xsk(void *ptr)
-> > +{
-> > +	return ((unsigned long)ptr) >> VIRTIO_XSK_FLAG_OFFSET;
-> > +}
-> > +
-> >  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
-> >  bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
-> >  		      int budget);
-> > --
-> > 2.32.0.3.g01195cf9f
->
->
+> jon
 
