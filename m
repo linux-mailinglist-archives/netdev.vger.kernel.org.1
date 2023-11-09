@@ -1,149 +1,157 @@
-Return-Path: <netdev+bounces-46826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0F47E6936
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:09:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70D27E6947
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:11:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38E77280FF6
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:09:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F4E62812E1
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F653199A2;
-	Thu,  9 Nov 2023 11:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjyTf0bP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A022D199D3;
+	Thu,  9 Nov 2023 11:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2DB19475
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 11:09:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921552D44
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 03:09:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699528183;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ezu0iXe5WM3zfDfpiwhiAtccNmWTLMMx0akG9lcRF/g=;
-	b=CjyTf0bPtHLHNbCf/Zc/P5nwyWCg9EJN7rTfDtuTIsESPnGzL1TLk3Uxe7i4S8C5s8qPqO
-	FY4BqMBJTMAMJmOEFb84kEVlp7H97WGguv/j+gmAOKmvGIoT2K3xGuYGH8iXkU7sanhJnr
-	gu1/QsT1NWIeoqJ5Dww1Zte7JaFY/7c=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-696-NQVDgQOzM0uvCfE8o9joSg-1; Thu, 09 Nov 2023 06:09:42 -0500
-X-MC-Unique: NQVDgQOzM0uvCfE8o9joSg-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-41eb42115e9so2209051cf.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 03:09:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699528182; x=1700132982;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ezu0iXe5WM3zfDfpiwhiAtccNmWTLMMx0akG9lcRF/g=;
-        b=lJxGDCMMqizb7u7EZkadhTOUiTus9Cz86GH8/dA+FH9cz+dDhOfYVXBXlObxnqej1W
-         5cTkRSzrVWhWPQG68UZH1SYpcfe9XPBdBrH5OlJut0fU1CnRol0sJ5Oit22cngXuNSKK
-         ih7XOh/zwjIcSvZPpaDJdA34JGAQIWdNoW2esPIPGK8pHn+h/2ji2w7neAOm0ApJ0WFP
-         WIsj8Gaj5Etkg5Mh6581bdrIdOPGlRFxWuPIZ+9KkJHXYIOlocGM2MkBwO/dD3IHotXg
-         YoDDyq+RajHYaamcbaIi3QZT+N9Cm2UvjY+1Qyra6Epgydpx/jNoKQ4a2ohJpD2orv+T
-         fiug==
-X-Gm-Message-State: AOJu0YxYFuHXm+IOVfWSdnVazSun8IF3tj4G0GzSySKzNxD93uqcz7zY
-	Kh1LPtIGDONJJN5Ahzz8fHadEPS48HSjsT+Ag7cziSwUqu6LZdD6FVRHio09QAuUSBAuIzU8J2d
-	L6B0HIZ0plhNtmltVaVaaIfRx
-X-Received: by 2002:a05:622a:2b46:b0:41c:d433:6c86 with SMTP id hb6-20020a05622a2b4600b0041cd4336c86mr5854599qtb.4.1699528182034;
-        Thu, 09 Nov 2023 03:09:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEczlBkEToxT5HA1bWloT/vSc9WPJn4E7V19w/sRlEABI2nrBuMePu+oCzKYFBd5r1xDIeGg==
-X-Received: by 2002:a05:622a:2b46:b0:41c:d433:6c86 with SMTP id hb6-20020a05622a2b4600b0041cd4336c86mr5854566qtb.4.1699528181732;
-        Thu, 09 Nov 2023 03:09:41 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
-        by smtp.gmail.com with ESMTPSA id n5-20020ac86745000000b0041977932fc6sm1828045qtp.18.2023.11.09.03.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 03:09:41 -0800 (PST)
-Message-ID: <fdf6b2e9c5a734b1a03336f7d5bcfd06bdef47c5.camel@redhat.com>
-Subject: Re: [RFC PATCH v3 02/12] net: page_pool: create hooks for custom
- page providers
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
- <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Thu, 09 Nov 2023 12:09:37 +0100
-In-Reply-To: <20231106024413.2801438-3-almasrymina@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
-	 <20231106024413.2801438-3-almasrymina@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3274199B5;
+	Thu,  9 Nov 2023 11:11:40 +0000 (UTC)
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8304F2D5F;
+	Thu,  9 Nov 2023 03:11:39 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0bQaU_1699528295;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0bQaU_1699528295)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Nov 2023 19:11:36 +0800
+Message-ID: <1699528202.3090942-4-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 17/21] virtio_net: xsk: rx: skip dma unmap when rq is bind with AF_XDP
+Date: Thu, 9 Nov 2023 19:10:02 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-18-xuanzhuo@linux.alibaba.com>
+ <20231109031347-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231109031347-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.=
-h
-> index 6fc5134095ed..d4bea053bb7e 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -60,6 +60,8 @@ struct page_pool_params {
->  	int		nid;
->  	struct device	*dev;
->  	struct napi_struct *napi;
-> +	u8		memory_provider;
-> +	void            *mp_priv;
+On Thu, 9 Nov 2023 03:15:03 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Nov 07, 2023 at 11:12:23AM +0800, Xuan Zhuo wrote:
+> > When rq is bound with AF_XDP, the buffer dma is managed
+> > by the AF_XDP APIs. So the buffer got from the virtio core should
+> > skip the dma unmap operation.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>
+>
+> I don't get it - is this like a bugfix?
 
-Minor nit: swapping the above 2 fields should make the struct smaller.
+I want focus on this. So let it as an independent commit.
 
->  	enum dma_data_direction dma_dir;
->  	unsigned int	max_len;
->  	unsigned int	offset;
-> @@ -118,6 +120,19 @@ struct page_pool_stats {
->  };
->  #endif
-> =20
-> +struct mem_provider;
-> +
-> +enum pp_memory_provider_type {
-> +	__PP_MP_NONE, /* Use system allocator directly */
-> +};
-> +
-> +struct pp_memory_provider_ops {
-> +	int (*init)(struct page_pool *pool);
-> +	void (*destroy)(struct page_pool *pool);
-> +	struct page *(*alloc_pages)(struct page_pool *pool, gfp_t gfp);
-> +	bool (*release_page)(struct page_pool *pool, struct page *page);
-> +};
-> +
->  struct page_pool {
->  	struct page_pool_params p;
-> =20
-> @@ -165,6 +180,9 @@ struct page_pool {
->  	 */
->  	struct ptr_ring ring;
-> =20
-> +	const struct pp_memory_provider_ops *mp_ops;
-> +	void *mp_priv;
+> And why do we need our own flag and checks?
+> Doesn't virtio core DTRT?
 
-Why the mp_ops are not part of page_pool_params? why mp_priv is
-duplicated here?
 
-Cheers,
+struct vring_virtqueue {
+	[....]
 
-Paolo
+	/* Do DMA mapping by driver */
+	bool premapped;
 
+We can not.
+
+So I add own flag.
+
+Thanks.
+
+
+>
+> > ---
+> >  drivers/net/virtio/main.c       | 8 +++++---
+> >  drivers/net/virtio/virtio_net.h | 3 +++
+> >  drivers/net/virtio/xsk.c        | 1 +
+> >  3 files changed, 9 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> > index 15943a22e17d..a318b2533b94 100644
+> > --- a/drivers/net/virtio/main.c
+> > +++ b/drivers/net/virtio/main.c
+> > @@ -430,7 +430,7 @@ static void *virtnet_rq_get_buf(struct virtnet_rq *rq, u32 *len, void **ctx)
+> >  	void *buf;
+> >
+> >  	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> > -	if (buf && rq->do_dma)
+> > +	if (buf && rq->do_dma_unmap)
+> >  		virtnet_rq_unmap(rq, buf, *len);
+> >
+> >  	return buf;
+> > @@ -561,8 +561,10 @@ static void virtnet_set_premapped(struct virtnet_info *vi)
+> >
+> >  		/* disable for big mode */
+> >  		if (vi->mergeable_rx_bufs || !vi->big_packets) {
+> > -			if (!virtqueue_set_dma_premapped(vi->rq[i].vq))
+> > +			if (!virtqueue_set_dma_premapped(vi->rq[i].vq)) {
+> >  				vi->rq[i].do_dma = true;
+> > +				vi->rq[i].do_dma_unmap = true;
+> > +			}
+> >  		}
+> >  	}
+> >  }
+> > @@ -3944,7 +3946,7 @@ void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
+> >
+> >  	rq = &vi->rq[i];
+> >
+> > -	if (rq->do_dma)
+> > +	if (rq->do_dma_unmap)
+> >  		virtnet_rq_unmap(rq, buf, 0);
+> >
+> >  	virtnet_rq_free_buf(vi, rq, buf);
+> > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > index 1242785e311e..2005d0cd22e2 100644
+> > --- a/drivers/net/virtio/virtio_net.h
+> > +++ b/drivers/net/virtio/virtio_net.h
+> > @@ -135,6 +135,9 @@ struct virtnet_rq {
+> >  	/* Do dma by self */
+> >  	bool do_dma;
+> >
+> > +	/* Do dma unmap after getting buf from virtio core. */
+> > +	bool do_dma_unmap;
+> > +
+> >  	struct {
+> >  		struct xsk_buff_pool *pool;
+> >
+> > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > index e737c3353212..b09c473c29fb 100644
+> > --- a/drivers/net/virtio/xsk.c
+> > +++ b/drivers/net/virtio/xsk.c
+> > @@ -210,6 +210,7 @@ static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *
+> >  		xdp_rxq_info_unreg(&rq->xsk.xdp_rxq);
+> >
+> >  	rq->xsk.pool = pool;
+> > +	rq->do_dma_unmap = !pool;
+> >
+> >  	virtnet_rx_resume(vi, rq);
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+>
+>
 
