@@ -1,114 +1,151 @@
-Return-Path: <netdev+bounces-46814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09CFF7E68BE
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:50:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A8547E68C5
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDB77B20BE1
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:50:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7C10B20E6E
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A430ED29A;
-	Thu,  9 Nov 2023 10:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2984F107A6;
+	Thu,  9 Nov 2023 10:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J7bWnqWW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="knH1OepF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD37D63B8
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:50:42 +0000 (UTC)
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 380211B1;
-	Thu,  9 Nov 2023 02:50:42 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32daeed7771so384904f8f.3;
-        Thu, 09 Nov 2023 02:50:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699527040; x=1700131840; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M6XHp8ZxUUWF+Lmmh8ZFzScZepwpVrVtTeNoN9NNTn4=;
-        b=J7bWnqWWodhW18eG9uO7GWQBybW0XWuhR0Td94F2eeq3fpTH/tVgVHiNamInYb2pLT
-         u7Yag/qNva5/yAyvNYw8KS99rtkuDKvZeusZDXoZ+ulHL1eGU4TvoLFLiWIN1mbew8Hw
-         HEUWksAVCW91fGPKMGvIKWIuXtAcHE3DguCjieWYqX7inAEoUl1XX1vQ/k2+HX3qm6+Z
-         q4JZurC7lb860m4HfUt6Hp7RcRoq7FMsOgu5J/2h/26YIANeBI8m39BIfsBVHndXNmAO
-         U1dse3045evg26Pel6ODs8DwjAyrkjhVWs/qA3TyZKur8gdJCYi25dmF9xu+daAkV6Mc
-         uZDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699527040; x=1700131840;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M6XHp8ZxUUWF+Lmmh8ZFzScZepwpVrVtTeNoN9NNTn4=;
-        b=AYDRfXo4XBs5uMnIVT8JxJGK9fLHRMps3RMShG4dp5qMjo/ujztf4Pnkw4m1ou3VaL
-         7M2r4H5j+NIQ+a8yehrBlVVpsBDSSbBC1uBXvbelM3NOk+JVIVANKuIsXU6komLaZOqZ
-         X/43kapdneiZu5QEEdj0naR34cIqDqwbJ0VrfNsuhy1s0Kvx0YE6mi+A77W9LNs0UxVC
-         /KjxzS1yecdA2LeUod1xVTCNbqEWGSzQJtlJu4GVkbzLsbBK9g3HPTw1AvDm5LK1UxJK
-         Kf2YC5d1YrC0n7t2oIZgQqBJs3Yfzv0zBeeV8SIOUtdnHEZsbJVzR/GgpmiVgwIZMCFL
-         zIdA==
-X-Gm-Message-State: AOJu0Yzv+3AxqE4BMJQvxwqup0/Lw+9IO9Ubi9oGwzHO8YbGYA+/1d8e
-	Ua8bwPH87wfTR1FfjDtanp0=
-X-Google-Smtp-Source: AGHT+IHkTzzHCRer28VEszakWXegQq7fkpcKQVYrtPkskdHGdqFchpM3qgS6wDDvnF2Oa4VQcpPgqQ==
-X-Received: by 2002:a05:6000:188b:b0:32f:89e5:ef60 with SMTP id a11-20020a056000188b00b0032f89e5ef60mr3501570wri.11.1699527040321;
-        Thu, 09 Nov 2023 02:50:40 -0800 (PST)
-Received: from skbuf ([188.26.57.160])
-        by smtp.gmail.com with ESMTPSA id n7-20020a5d6607000000b0032db1d741a6sm7079646wru.99.2023.11.09.02.50.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 02:50:40 -0800 (PST)
-Date: Thu, 9 Nov 2023 12:50:37 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-	Andrew Lunn <andrew@lunn.ch>, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 0/3] Fix large frames in the Gemini ethernet driver
-Message-ID: <20231109105037.zppxrr3bptd7a7i6@skbuf>
-References: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F21111BA
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:50:50 +0000 (UTC)
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F522590
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:50:49 -0800 (PST)
+Message-ID: <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1699527047;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LHtbprRvTKOHkNQYRPsiaJtfEdKrjYNzkVx+uV8hTm4=;
+	b=knH1OepFOzD9DfH5RPXBCuFOiPXwf1RBM0aPCzlJuvWe09UPqmGdJHGAF8ZL/jtzcK1PAX
+	v70/UFFU1GhVMF72rEIHst7Nx1psQPG1zDPgNIxELA6+157ZXrauB+O0WhoebuRiptjqVE
+	5VPKYFy+HPYcFD935j0T4lrLWrEaaDE=
+Date: Thu, 9 Nov 2023 10:50:44 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
+Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
+Content-Language: en-US
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ netdev@vger.kernel.org
+Cc: jiri@resnulli.us, michal.michalik@intel.com, milena.olech@intel.com,
+ pabeni@redhat.com, kuba@kernel.org
+References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Nov 09, 2023 at 10:03:11AM +0100, Linus Walleij wrote:
-> This is the result of a bug hunt for a problem with the
-> RTL8366RB DSA switch leading me wrong all over the place.
+On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
+> Fix issues when performing unordered unbind/bind of a kernel modules
+> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
+> Currently only serialized bind/unbind of such use case works, fix
+> the issues and allow for unserialized kernel module bind order.
 > 
-> I am indebted to Vladimir Oltean who as usual pointed
-> out where the real problem was, many thanks!
+> The issues are observed on the ice driver, i.e.,
 > 
-> Tryig to actually use big ("jumbo") frames on this
-> hardware uncovered the real bugs. Then I tested it on
-> the DSA switch and it indeed fixes the issue.
+> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
+> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
 > 
-> To make sure it also works fine with big frames on
-> non-DSA devices I also copied a large video file over
-> scp to a device with maximum frame size, the data
-> was transported in large TCP packets ending up in
-> 0x7ff sized frames using software checksumming at
-> ~2.0 MB/s.
+> results in:
 > 
-> If I set down the MTU to the standard 1500 bytes so
-> that hardware checksumming is used, the scp transfer
-> of the same file was slightly lower, ~1.8-1.9 MB/s.
+> ice 0000:af:00.0: Removed PTP clock
+> BUG: kernel NULL pointer dereference, address: 0000000000000010
+> PF: supervisor read access in kernel mode
+> PF: error_code(0x0000) - not-present page
+> PGD 0 P4D 0
+> Oops: 0000 [#1] PREEMPT SMP PTI
+> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-queue_19th-Oct-2023-01625-g039e5d15e451 #1
+> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS SE5C620.86B.02.01.0008.031920191559 03/19/2019
+> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66 08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b 10 41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
+> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
+> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
+> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
+> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
+> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> PKRU: 55555554
+> Call Trace:
+>   <TASK>
+>   ? __die+0x20/0x70
+>   ? page_fault_oops+0x76/0x170
+>   ? exc_page_fault+0x65/0x150
+>   ? asm_exc_page_fault+0x22/0x30
+>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
+>   dpll_msg_add_pin_parents+0x142/0x1d0
+>   dpll_pin_event_send+0x7d/0x150
+>   dpll_pin_on_pin_unregister+0x3f/0x100
+>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
+>   ice_dpll_deinit+0x29/0xe0 [ice]
+>   ice_remove+0xcd/0x200 [ice]
+>   pci_device_remove+0x33/0xa0
+>   device_release_driver_internal+0x193/0x200
+>   unbind_store+0x9d/0xb0
+>   kernfs_fop_write_iter+0x128/0x1c0
+>   vfs_write+0x2bb/0x3e0
+>   ksys_write+0x5f/0xe0
+>   do_syscall_64+0x59/0x90
+>   ? filp_close+0x1b/0x30
+>   ? do_dup2+0x7d/0xd0
+>   ? syscall_exit_work+0x103/0x130
+>   ? syscall_exit_to_user_mode+0x22/0x40
+>   ? do_syscall_64+0x69/0x90
+>   ? syscall_exit_work+0x103/0x130
+>   ? syscall_exit_to_user_mode+0x22/0x40
+>   ? do_syscall_64+0x69/0x90
+>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> RIP: 0033:0x7fdc7d93eb97
+> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
+> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
+> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
+> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
+> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
+>   </TASK>
+> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod target_core_mod ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr i2c_i801 ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache jbd2 sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
+> CR2: 0000000000000010
 > 
-> Despite this not being the best test it shows that
-> we can now stress the hardware with large frames
-> and that software checksum works fine.
+> Arkadiusz Kubalewski (3):
+>    dpll: fix pin dump crash after module unbind
+>    dpll: fix pin dump crash for rebound module
+>    dpll: fix register pin with unregistered parent pin
 > 
-> Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
-> ---
+>   drivers/dpll/dpll_core.c    |  8 ++------
+>   drivers/dpll/dpll_core.h    |  4 ++--
+>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++---------------
+>   3 files changed, 26 insertions(+), 23 deletions(-)
+> 
 
-Thanks for being persistent with this! I hope we didn't miss today's
-"net" pull request :)
+
+I still don't get how can we end up with unregistered pin. And shouldn't
+drivers do unregister of dpll/pin during release procedure? I thought it
+was kind of agreement we reached while developing the subsystem.
+
 
