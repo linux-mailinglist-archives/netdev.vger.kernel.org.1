@@ -1,150 +1,133 @@
-Return-Path: <netdev+bounces-46848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12F37E6A84
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:24:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A5947E6A8A
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 13:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1C15281358
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:24:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B6D280FCE
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 12:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2B41DA34;
-	Thu,  9 Nov 2023 12:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644AB1DA45;
+	Thu,  9 Nov 2023 12:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Y4YoZNKv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HecThWgb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5549F1DDC1
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:24:48 +0000 (UTC)
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2040.outbound.protection.outlook.com [40.107.8.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69CAB270C;
-	Thu,  9 Nov 2023 04:24:47 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cIdrLtVx4MXknCDHwGWsQMARX8WeJinETGj5QfA4BQmSEkFPo2e3WaPNQ6qTDkYwT88KKEfbVLqvKZTIwXdBmD4errA2y8lBeBWIApHjopn6A6Xi3ZfcLy7/LStI1Xe3d5u/yoBwxa+DeYKi7x5FC7kfEu/x0XAjeGF2QBnc+xxWu+djTLWP+UScqO0m5dXt6V4frjif0TmQyYlKogyiczTgjPGaF05eXDdosVf5AhsyqizA+bxHFj8uCxB6TPmScSjVM3NwtYzJ266VEdmlIUVbaBA6s5uwXmmkR1GWcQeO3HouBei45NiZlYrUEEqkDOejA2Y9Cpdd9PyfrZNW+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+NAB6gKaDL3gmCh+X+BaXzw9RqDf0dShp0ugpawXMFE=;
- b=Sm1e8GBQDbQGQ7ZXK+tAvTJSMUPVVL5dRYi8S2vJ17mICMJo+ZWmvyLxjgYDUhvEtm8GHsp9PtPo325Rgs9X2Zrllbq9Te4L4/v+1sWhwWTD2LGuInpb5xJCfV38D3U3jwHPOSLI72jBAOCvIBJQ005DDWhyaIeuJrdFFKbq5RXO7yOUWp8QnvwbfiHrnMZs8d30mciuibMh5SNrqAvgqGV8my1GhhRxfWIUBnP5IMF9czEXZmr2JztUjdG/fV4nrtbS3yB/mUrW7ruah0Hl+TMB+HfoK3X5uiNy+7QMLlHwutbOXb+kJ0/uG2WkqBe7KPa2L8LaKMVYQLU2LokzyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+NAB6gKaDL3gmCh+X+BaXzw9RqDf0dShp0ugpawXMFE=;
- b=Y4YoZNKv49OBbQaauJxkVouqkC8UUSDB2iI3FA63s6DrrPHFKFxdLMspUqL3RNYE1r1R/iVWzCcXyTod9jEZJAWP6KrOIZL0tCI7ZtBTW9vAzuOXghEEBtKHE8fyJAH9ky1ZdCdEUwLTItQ1wtBXPv+g1iW7G4rwfStwWnc49X8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by PA4PR04MB7869.eurprd04.prod.outlook.com (2603:10a6:102:c4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.7; Thu, 9 Nov
- 2023 12:24:44 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%6]) with mapi id 15.20.6977.017; Thu, 9 Nov 2023
- 12:24:44 +0000
-Date: Thu, 9 Nov 2023 14:24:40 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
-Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net 5/7] net/sched: taprio: fix delayed switching to
- new schedule after timer expiry
-Message-ID: <20231109122440.374wlo5oqk2eua5u@skbuf>
-References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
- <20231107112023.676016-6-faizal.abdul.rahim@linux.intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231107112023.676016-6-faizal.abdul.rahim@linux.intel.com>
-X-ClientProxiedBy: VE1PR03CA0033.eurprd03.prod.outlook.com
- (2603:10a6:803:118::22) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568E91DA37
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 12:26:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD982D56
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 04:26:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699532782;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1/haom+yH9xLwnE9aURcVj9dx4YOUUdXMdvnVMAeYqM=;
+	b=HecThWgbZ6C6ynnvaiA5u144VgmDj3hSFaWTn+bmjBw2kNcU6zE8tnR1MyIm4vBIuTvt7M
+	I0yxU28PrYVHhwiFDUZOyZirXAGjduhcXuF+q6fHTPWQ1wccLWfWu6IaODU0z3aNdwrpU+
+	qe9SwYxgdW9RN1gu9hnGBz5bDvdix1g=
+Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
+ [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-111-rexEU2_4NquTNliml9csbg-1; Thu, 09 Nov 2023 07:26:21 -0500
+X-MC-Unique: rexEU2_4NquTNliml9csbg-1
+Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5a7af473da1so1532627b3.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 04:26:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699532781; x=1700137581;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1/haom+yH9xLwnE9aURcVj9dx4YOUUdXMdvnVMAeYqM=;
+        b=o1mqzXF72jVNMIiwjUBraEl+9yAfma11S0KJ2wDJt22pItwCOUlR1eOP8FZiD4v2Fs
+         /EM9I3CfTw0dQry3C2nlNU3KVChBO/t3GSPMvXU8WMLkq4kDaP6jPeQ5Mebojxy2tC5S
+         Yo70hS/s3ARrEbtzRp6oY7lmOiUbJ9bcN6biP0Q3+XYVBV9vroj2q2GKTOYy27NSWaou
+         GZK2aZo3WKDpKBYEs3SevDQnwVJlyQx6COTPGL+AWn+ZNT85gkyg+8mWHpH1XmgVL+oz
+         hM1e9HCMxhpXGHkbmPzxKSBsOhgO/rmmQxR4ivIUerk2lM5TQZ332UuI2ktcmjg0N8Cv
+         BwGw==
+X-Gm-Message-State: AOJu0Yzpo16iY+FlOhxJlDk7ex6U103GkbL+/QcqdMqLfK62D/y4+wFg
+	cV8YSepYiAWMafJipi2L1sm5S2kr02S+p1Zfa9NtCmJ3L/9OaHe7KGWWeJUHdeoWScKmX29QIZv
+	j79+XEuuWvr7ErJU+
+X-Received: by 2002:a81:a941:0:b0:5a7:ba54:5127 with SMTP id g62-20020a81a941000000b005a7ba545127mr3971929ywh.3.1699532781105;
+        Thu, 09 Nov 2023 04:26:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlXxTrprPZijY3/9XY14mMrwVZ8+lm8hhrgq8SG1ZGANmgzirEEjusP4RzmaSaOW2ShlenrA==
+X-Received: by 2002:a81:a941:0:b0:5a7:ba54:5127 with SMTP id g62-20020a81a941000000b005a7ba545127mr3971916ywh.3.1699532780737;
+        Thu, 09 Nov 2023 04:26:20 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
+        by smtp.gmail.com with ESMTPSA id g24-20020ac84dd8000000b00417db2593bdsm1876925qtw.72.2023.11.09.04.26.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 04:26:20 -0800 (PST)
+Message-ID: <ad66b532d1702c36adecd944e25f84e4497ef8b3.camel@redhat.com>
+Subject: Re: [PATCH net v4 0/3] Fix large frames in the Gemini ethernet
+ driver
+From: Paolo Abeni <pabeni@redhat.com>
+To: Vladimir Oltean <olteanv@gmail.com>, Linus Walleij
+	 <linus.walleij@linaro.org>
+Cc: Hans Ulli Kroll <ulli.kroll@googlemail.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, =?UTF-8?Q?Micha=C5=82_Miros=C5=82aw?=
+	 <mirq-linux@rere.qmqm.pl>, Andrew Lunn <andrew@lunn.ch>, 
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Thu, 09 Nov 2023 13:26:17 +0100
+In-Reply-To: <20231109105037.zppxrr3bptd7a7i6@skbuf>
+References: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
+	 <20231109105037.zppxrr3bptd7a7i6@skbuf>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PA4PR04MB7869:EE_
-X-MS-Office365-Filtering-Correlation-Id: c89b88a3-0cd0-4267-2146-08dbe11edaca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	gc0EEYPUBbiVTCKIa9TAFKgXrkjtNuIya0PL1ptd2M8V+ybWP+JL01N164LBpShtoUXFQHiMV/8i1FqeDieftJAvRzR053jp/uKakH7u7BJXScKVhGmCZ4UJDa47hY270jXnGCfWmtC3Iw0RplKowY89a27dCFGAo47uHlDxRM1j67TiWcB/AWagb/vdopWR7KRaBx/z8JLEZlL3facCi7qzeeqRYdl6k1INW9Lv+WRRyLSFG71wqW3uhOxMQyuR8F5lkGPx5tm7I9nu+ZBZqIa4uYkpEDU+/8Y3qILK7+vPsP4P+WbHA0uzyLREvuo9sLvFrFbtv5C+XnR7EYLrvlNeckbCUNcp3V3mdU8OtIMf5wveUIcw/kHYSOY2gCIxldNeauxoQ8+WUq+4YYvN2tae+8xEb43R2pjenTw3ZOBY0zXvOZtwzVAHIMXOFE0DxfKhtxg086VgKj718h7bM8YEmSg63JaXCUyV8+snzxZa0dNX8yGLUBfggG9PFp0Ku2b6H6AeNX8lKaqBzo2/Fq5CcVAHOqSoqdB3+fUSurEZbaWuqd24rhG84eR07ejl
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(136003)(376002)(396003)(39860400002)(366004)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(9686003)(6512007)(86362001)(6666004)(44832011)(41300700001)(33716001)(6506007)(1076003)(4744005)(2906002)(26005)(83380400001)(7416002)(5660300002)(478600001)(38100700002)(6486002)(66556008)(54906003)(316002)(6916009)(66946007)(4326008)(8936002)(8676002)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?b1HHd9TqojXoOKhiFvCEWze/yoWCe4R/92tmSI+39i3MJoieeRTaoIXFOD7a?=
- =?us-ascii?Q?N3B1TfJwk1wZ3KqATG+tSTka0bE1gzjggUlAGLxw2tJHG4SbUlXw6Kh8fwse?=
- =?us-ascii?Q?jZqXmdcuvN76hH27XsMf2HfnY9KRdowzfpdOsUH4zC98eTzCU4ESKxj7kLRG?=
- =?us-ascii?Q?QHNNkWtAs5TIsiu89xLWKgH+OxC202LOjj9WaRCZp6VTGJFd230mQcRTusfH?=
- =?us-ascii?Q?oyRe9apeqRvdQ7icpobq6n3LtNL39wYG0DWbvqjsYlJPYT1QoeKOFjQkzhIJ?=
- =?us-ascii?Q?npHVOFAj8zxOK3Qslg6y3qSuqU/m3jukSoCcM5HdPAkTVlhSQ3i3mGRPPcbn?=
- =?us-ascii?Q?3wJeCZ8A9xudlXfYWv9wRgh8S2aOOLfU9Pe7nkAEltRllmiKUun5ledoCPjd?=
- =?us-ascii?Q?kT5Z/bLpcFHMwT3PgOORd9yMh/X4Dg4vav1fFt8Rsjrv/1LjKyZcXXy/Ptx/?=
- =?us-ascii?Q?Vq4SdfseLOdEbAWPxMPUkzmp6QvbgzB5hQcd1c6Y3DkLzCB5Vg/4GtUZtD0i?=
- =?us-ascii?Q?YWEqxDBIUSzAMEBKnxg6xFH0N+8WEitjdY3wLadmndEiixr6oqZ5wf+tcEiO?=
- =?us-ascii?Q?jrI284g7Hdpd1vQRWbJGqzuUW9pdpZsVvRLIWKuNuUmsf7Tr92UROIRHU+a8?=
- =?us-ascii?Q?NCEe0Dzb9taTxyonEw712kdo1E8GFIg5Vs6zGR/O0oyM7U7bFqd4hI6g5ioQ?=
- =?us-ascii?Q?5EUl3kjB4xhvZiP5eMD8fsd1H4cSWzWfp3uAgqJjGqcMyz1eMWkoKAeKKjNt?=
- =?us-ascii?Q?OFgNzjAqPNk1qojY7l1f0QIbWwxVTZ4QBPcks9710Ld4324hYZbA069f4C/Z?=
- =?us-ascii?Q?cx6hSeqcMLUL6R+Nl8HPXbwBtU8KMz+dFQNbUHPYqvDKRA0S/jBRbksd3g7W?=
- =?us-ascii?Q?h1QxgoCb5FElD235DXXnpK28Nn8bqpw42xayx53mhIG3vxbze1WG0MXsrT5r?=
- =?us-ascii?Q?dQAYKVpSOb1o2ED7fGebeWJKG354zJSnBQypEhMqK2HSM/HR79CzvCRt3Y4B?=
- =?us-ascii?Q?qZBMFKEXw8iL0lUUWQ/cotslsFXlgjcXsOY0uIYPefyIuh1xicygswkvx6vA?=
- =?us-ascii?Q?d8mUqpuVJVAPuqhI0R578uAoeyjqby19XuCwg/7qA17VZhWQ7ZbvLMgjvhs6?=
- =?us-ascii?Q?lHyeiB5UWWvW3XEi0xT/OVyr3dEtC3VxA+x7S3kzbBwob9wLeoF+x8gC4lm/?=
- =?us-ascii?Q?Fu6t1aTHetl08IzgIFsLvmAM2eXd2LOoIZvpwuBkytOZ0eHf3TnWNrVZrpj0?=
- =?us-ascii?Q?kIn/thZm5wojWl/xVyaVcn7yHVI8EMXjUd9EdiYeUGpheBDZ9GXc/Sl5ufEr?=
- =?us-ascii?Q?J7u2zsi0f2EmA5fLEe/Rp+KSABMpUqhYicCHCZGC2SUkE3fgnnb3nrnNpsdG?=
- =?us-ascii?Q?jafO7OBdX9CjFhxwSXDeO4gS7LMjZr3tQG/NEEZSiTJPEPgipzcl4axJ08jA?=
- =?us-ascii?Q?rUfry6k9nNc2cz3rFUuSEZcNoiDMqk4xWGRqurWgcK/R2/bIk82jeHxNHQJp?=
- =?us-ascii?Q?8O1s4rI0SHpga0Cyfwwf0KRh7483xlQTpS9Bn64f9jhdo4cWGC307QaBhYQF?=
- =?us-ascii?Q?dmR81E7P2LIPO3EBAyuQigARG8e7FZDVEOz9o/8AqVetPBU+3jn895baOUxE?=
- =?us-ascii?Q?TA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c89b88a3-0cd0-4267-2146-08dbe11edaca
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2023 12:24:44.0254
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AulKrcFKzZywXPu0jKi9MEW+lRGXrh3Nliy+dGxYG5fvqL+wg6fsGnySa8fvfh9jB2FwuSsww3im6RHgXL2c0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7869
 
-On Tue, Nov 07, 2023 at 06:20:21AM -0500, Faizal Rahim wrote:
->  static void taprio_start_sched(struct Qdisc *sch,
-> -			       ktime_t start, struct sched_gate_list *new)
-> +			       ktime_t new_base_time,
-> +			       struct sched_gate_list *new)
->  {
->  	struct taprio_sched *q = qdisc_priv(sch);
-> -	ktime_t expires;
-> +	struct sched_gate_list *oper = NULL;
+On Thu, 2023-11-09 at 12:50 +0200, Vladimir Oltean wrote:
+> On Thu, Nov 09, 2023 at 10:03:11AM +0100, Linus Walleij wrote:
+> > This is the result of a bug hunt for a problem with the
+> > RTL8366RB DSA switch leading me wrong all over the place.
+> >=20
+> > I am indebted to Vladimir Oltean who as usual pointed
+> > out where the real problem was, many thanks!
+> >=20
+> > Tryig to actually use big ("jumbo") frames on this
+> > hardware uncovered the real bugs. Then I tested it on
+> > the DSA switch and it indeed fixes the issue.
+> >=20
+> > To make sure it also works fine with big frames on
+> > non-DSA devices I also copied a large video file over
+> > scp to a device with maximum frame size, the data
+> > was transported in large TCP packets ending up in
+> > 0x7ff sized frames using software checksumming at
+> > ~2.0 MB/s.
+> >=20
+> > If I set down the MTU to the standard 1500 bytes so
+> > that hardware checksumming is used, the scp transfer
+> > of the same file was slightly lower, ~1.8-1.9 MB/s.
+> >=20
+> > Despite this not being the best test it shows that
+> > we can now stress the hardware with large frames
+> > and that software checksum works fine.
+> >=20
+> > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+> > ---
+>=20
+> Thanks for being persistent with this! I hope we didn't miss today's
+> "net" pull request :)
 
-No point in initializing with NULL if this will be overwritten later.
+I fear this is a bit too late for today's PR. I hope it should not be a
+big problem, since we are very early in the release cycle.
 
-> +	ktime_t expires, start;
->  
->  	if (FULL_OFFLOAD_IS_ENABLED(q->flags))
->  		return;
->  
-> +	oper = rcu_dereference_protected(q->oper_sched,
-> +					 lockdep_is_held(&q->current_entry_lock));
-> +
+Cheers,
+
+Paolo
+
 
