@@ -1,151 +1,325 @@
-Return-Path: <netdev+bounces-46815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A8547E68C5
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:50:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8245F7E68F9
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:57:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7C10B20E6E
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:50:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09C0C280E2A
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2984F107A6;
-	Thu,  9 Nov 2023 10:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC69111AC;
+	Thu,  9 Nov 2023 10:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="knH1OepF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EwtBdSBI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F21111BA
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:50:50 +0000 (UTC)
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [IPv6:2001:41d0:1004:224b::b1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F522590
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:50:49 -0800 (PST)
-Message-ID: <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1699527047;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100DE111BA
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:57:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64852270B
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:57:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699527431;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LHtbprRvTKOHkNQYRPsiaJtfEdKrjYNzkVx+uV8hTm4=;
-	b=knH1OepFOzD9DfH5RPXBCuFOiPXwf1RBM0aPCzlJuvWe09UPqmGdJHGAF8ZL/jtzcK1PAX
-	v70/UFFU1GhVMF72rEIHst7Nx1psQPG1zDPgNIxELA6+157ZXrauB+O0WhoebuRiptjqVE
-	5VPKYFy+HPYcFD935j0T4lrLWrEaaDE=
-Date: Thu, 9 Nov 2023 10:50:44 +0000
+	bh=/fEMZu04vJmPyEDeZ4tFFxfgW3Qd9nS2eGWSB2Vs73s=;
+	b=EwtBdSBIDPIMH1OWnFZdbE6oMgRXp/fkiiYqtuy7b/E9N4TybuwpGR0QJTooVrCswS9qde
+	BPi9xJnZdGsnBZwOzXDGHKgD+kJlYG5wvJSAQHZ3WUdUyAELYOYAYpPRX+3XG53kwRymRS
+	8wFWzcvO4V3Nx/wxYqMp3xtNemc0YsU=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-ZAg4tnsJMuOfvtoaRoA_BA-1; Thu, 09 Nov 2023 05:57:10 -0500
+X-MC-Unique: ZAg4tnsJMuOfvtoaRoA_BA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-66cfa898cfeso1039196d6.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 02:57:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699527127; x=1700131927;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/fEMZu04vJmPyEDeZ4tFFxfgW3Qd9nS2eGWSB2Vs73s=;
+        b=SDfudP1ewM7hPiKoWp0Mkr9iZ1aUaBso/Tk6H73aiooqK9AUfOMMd/1ZL1JjCXvFyZ
+         Ozl3Izqqnu7sh4mov+I03w7l14vTkGLQskiJkC3GXSwoVjTuYR2Fq+u+A05uqC4G4dPe
+         svKKVvi0jSX2JFhWJjDyYNHPbmPuTfpL+nWyFH9fsq5zMZeKqCFcDNO4FPyxUDaQXYF8
+         h+44iLh3zpMidARkbIUo1REct/FwktQroPVv1pQ8ApKfaTE11ax7wjH08Whr7GKunI8O
+         myCImMTpsjbTpfvRUMPMSknhjdxonqkROwsTY6rHdJpbtYNPZt8FEGP4FV/vN5Zv5Y7y
+         XTSg==
+X-Gm-Message-State: AOJu0Yw8KLKfSP4yuaknhdAFipmn8WDjMNezJn9AHHsUNDD1i0zP1WdA
+	1Tnbfsh+0RKbjpZjsvEW6RSKglMQcNgRZG+tHwyz5Seoxetk36H2yTwkzfsMjKwBapUHujAD6IO
+	WmIW2QK3wZACOeNZD
+X-Received: by 2002:a05:6214:4a:b0:670:d117:1f9e with SMTP id c10-20020a056214004a00b00670d1171f9emr4487362qvr.2.1699527126643;
+        Thu, 09 Nov 2023 02:52:06 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFAk/DQxSd74d4wUNFAZnKsQQezg47K5p4R/fP0LVcZMKk5oMlW4rqzws8VL1bQTjgTMKPmVQ==
+X-Received: by 2002:a05:6214:4a:b0:670:d117:1f9e with SMTP id c10-20020a056214004a00b00670d1171f9emr4487333qvr.2.1699527126264;
+        Thu, 09 Nov 2023 02:52:06 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-228-197.dyn.eolo.it. [146.241.228.197])
+        by smtp.gmail.com with ESMTPSA id l8-20020a056214104800b0065d89f4d537sm1952390qvr.45.2023.11.09.02.52.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 02:52:05 -0800 (PST)
+Message-ID: <e584ca804a2e98bcf6e8e5ea2d4206f9f579e0ce.camel@redhat.com>
+Subject: Re: [RFC PATCH v3 10/12] tcp: RX path for devmem TCP
+From: Paolo Abeni <pabeni@redhat.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>,  Shuah Khan <shuah@kernel.org>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+ Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Date: Thu, 09 Nov 2023 11:52:01 +0100
+In-Reply-To: <20231106024413.2801438-11-almasrymina@google.com>
+References: <20231106024413.2801438-1-almasrymina@google.com>
+	 <20231106024413.2801438-11-almasrymina@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
-Content-Language: en-US
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- netdev@vger.kernel.org
-Cc: jiri@resnulli.us, michal.michalik@intel.com, milena.olech@intel.com,
- pabeni@redhat.com, kuba@kernel.org
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
-> Fix issues when performing unordered unbind/bind of a kernel modules
-> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
-> Currently only serialized bind/unbind of such use case works, fix
-> the issues and allow for unserialized kernel module bind order.
-> 
-> The issues are observed on the ice driver, i.e.,
-> 
-> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
-> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
-> 
-> results in:
-> 
-> ice 0000:af:00.0: Removed PTP clock
-> BUG: kernel NULL pointer dereference, address: 0000000000000010
-> PF: supervisor read access in kernel mode
-> PF: error_code(0x0000) - not-present page
-> PGD 0 P4D 0
-> Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-queue_19th-Oct-2023-01625-g039e5d15e451 #1
-> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS SE5C620.86B.02.01.0008.031920191559 03/19/2019
-> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
-> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66 08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b 10 41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
-> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
-> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
-> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
-> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
-> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->   <TASK>
->   ? __die+0x20/0x70
->   ? page_fault_oops+0x76/0x170
->   ? exc_page_fault+0x65/0x150
->   ? asm_exc_page_fault+0x22/0x30
->   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
->   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
->   dpll_msg_add_pin_parents+0x142/0x1d0
->   dpll_pin_event_send+0x7d/0x150
->   dpll_pin_on_pin_unregister+0x3f/0x100
->   ice_dpll_deinit_pins+0xa1/0x230 [ice]
->   ice_dpll_deinit+0x29/0xe0 [ice]
->   ice_remove+0xcd/0x200 [ice]
->   pci_device_remove+0x33/0xa0
->   device_release_driver_internal+0x193/0x200
->   unbind_store+0x9d/0xb0
->   kernfs_fop_write_iter+0x128/0x1c0
->   vfs_write+0x2bb/0x3e0
->   ksys_write+0x5f/0xe0
->   do_syscall_64+0x59/0x90
->   ? filp_close+0x1b/0x30
->   ? do_dup2+0x7d/0xd0
->   ? syscall_exit_work+0x103/0x130
->   ? syscall_exit_to_user_mode+0x22/0x40
->   ? do_syscall_64+0x69/0x90
->   ? syscall_exit_work+0x103/0x130
->   ? syscall_exit_to_user_mode+0x22/0x40
->   ? do_syscall_64+0x69/0x90
->   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> RIP: 0033:0x7fdc7d93eb97
-> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
-> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
-> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
-> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
-> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
->   </TASK>
-> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod target_core_mod ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr i2c_i801 ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache jbd2 sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
-> CR2: 0000000000000010
-> 
-> Arkadiusz Kubalewski (3):
->    dpll: fix pin dump crash after module unbind
->    dpll: fix pin dump crash for rebound module
->    dpll: fix register pin with unregistered parent pin
-> 
->   drivers/dpll/dpll_core.c    |  8 ++------
->   drivers/dpll/dpll_core.h    |  4 ++--
->   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++---------------
->   3 files changed, 26 insertions(+), 23 deletions(-)
-> 
+On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
+[...]
+> +/* On error, returns the -errno. On success, returns number of bytes sen=
+t to the
+> + * user. May not consume all of @remaining_len.
+> + */
+> +static int tcp_recvmsg_devmem(const struct sock *sk, const struct sk_buf=
+f *skb,
+> +			      unsigned int offset, struct msghdr *msg,
+> +			      int remaining_len)
+> +{
+> +	struct cmsg_devmem cmsg_devmem =3D { 0 };
+> +	unsigned int start;
+> +	int i, copy, n;
+> +	int sent =3D 0;
+> +	int err =3D 0;
+> +
+> +	do {
+> +		start =3D skb_headlen(skb);
+> +
+> +		if (!skb_frags_not_readable(skb)) {
 
+As 'skb_frags_not_readable()' is intended to be a possibly wider scope
+test then skb->devmem, should the above test explicitly skb->devmem?
 
-I still don't get how can we end up with unregistered pin. And shouldn't
-drivers do unregister of dpll/pin during release procedure? I thought it
-was kind of agreement we reached while developing the subsystem.
+> +			err =3D -ENODEV;
+> +			goto out;
+> +		}
+> +
+> +		/* Copy header. */
+> +		copy =3D start - offset;
+> +		if (copy > 0) {
+> +			copy =3D min(copy, remaining_len);
+> +
+> +			n =3D copy_to_iter(skb->data + offset, copy,
+> +					 &msg->msg_iter);
+> +			if (n !=3D copy) {
+> +				err =3D -EFAULT;
+> +				goto out;
+> +			}
+> +
+> +			offset +=3D copy;
+> +			remaining_len -=3D copy;
+> +
+> +			/* First a cmsg_devmem for # bytes copied to user
+> +			 * buffer.
+> +			 */
+> +			memset(&cmsg_devmem, 0, sizeof(cmsg_devmem));
+> +			cmsg_devmem.frag_size =3D copy;
+> +			err =3D put_cmsg(msg, SOL_SOCKET, SO_DEVMEM_HEADER,
+> +				       sizeof(cmsg_devmem), &cmsg_devmem);
+> +			if (err || msg->msg_flags & MSG_CTRUNC) {
+> +				msg->msg_flags &=3D ~MSG_CTRUNC;
+> +				if (!err)
+> +					err =3D -ETOOSMALL;
+> +				goto out;
+> +			}
+> +
+> +			sent +=3D copy;
+> +
+> +			if (remaining_len =3D=3D 0)
+> +				goto out;
+> +		}
+> +
+> +		/* after that, send information of devmem pages through a
+> +		 * sequence of cmsg
+> +		 */
+> +		for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++) {
+> +			const skb_frag_t *frag =3D &skb_shinfo(skb)->frags[i];
+> +			struct page_pool_iov *ppiov;
+> +			u64 frag_offset;
+> +			u32 user_token;
+> +			int end;
+> +
+> +			/* skb_frags_not_readable() should indicate that ALL the
+> +			 * frags in this skb are unreadable page_pool_iovs.
+> +			 * We're checking for that flag above, but also check
+> +			 * individual pages here. If the tcp stack is not
+> +			 * setting skb->devmem correctly, we still don't want to
+> +			 * crash here when accessing pgmap or priv below.
+> +			 */
+> +			if (!skb_frag_page_pool_iov(frag)) {
+> +				net_err_ratelimited("Found non-devmem skb with page_pool_iov");
+> +				err =3D -ENODEV;
+> +				goto out;
+> +			}
+> +
+> +			ppiov =3D skb_frag_page_pool_iov(frag);
+> +			end =3D start + skb_frag_size(frag);
+> +			copy =3D end - offset;
+> +
+> +			if (copy > 0) {
+> +				copy =3D min(copy, remaining_len);
+> +
+> +				frag_offset =3D page_pool_iov_virtual_addr(ppiov) +
+> +					      skb_frag_off(frag) + offset -
+> +					      start;
+> +				cmsg_devmem.frag_offset =3D frag_offset;
+> +				cmsg_devmem.frag_size =3D copy;
+> +				err =3D xa_alloc((struct xarray *)&sk->sk_user_pages,
+> +					       &user_token, frag->bv_page,
+> +					       xa_limit_31b, GFP_KERNEL);
+> +				if (err)
+> +					goto out;
+> +
+> +				cmsg_devmem.frag_token =3D user_token;
+> +
+> +				offset +=3D copy;
+> +				remaining_len -=3D copy;
+> +
+> +				err =3D put_cmsg(msg, SOL_SOCKET,
+> +					       SO_DEVMEM_OFFSET,
+> +					       sizeof(cmsg_devmem),
+> +					       &cmsg_devmem);
+> +				if (err || msg->msg_flags & MSG_CTRUNC) {
+> +					msg->msg_flags &=3D ~MSG_CTRUNC;
+> +					xa_erase((struct xarray *)&sk->sk_user_pages,
+> +						 user_token);
+> +					if (!err)
+> +						err =3D -ETOOSMALL;
+> +					goto out;
+> +				}
+> +
+> +				page_pool_iov_get_many(ppiov, 1);
+> +
+> +				sent +=3D copy;
+> +
+> +				if (remaining_len =3D=3D 0)
+> +					goto out;
+> +			}
+> +			start =3D end;
+> +		}
+> +
+> +		if (!remaining_len)
+> +			goto out;
+> +
+> +		/* if remaining_len is not satisfied yet, we need to go to the
+> +		 * next frag in the frag_list to satisfy remaining_len.
+> +		 */
+> +		skb =3D skb_shinfo(skb)->frag_list ?: skb->next;
+
+I think at this point the 'skb' is still on the sk receive queue. The
+above will possibly walk the queue.
+
+Later on, only the current queue tail could be possibly consumed by
+tcp_recvmsg_locked(). This feel confusing to me?!? Why don't limit the
+loop only the 'current' skb and it's frags?
+
+> +
+> +		offset =3D offset - start;
+> +	} while (skb);
+> +
+> +	if (remaining_len) {
+> +		err =3D -EFAULT;
+> +		goto out;
+> +	}
+> +
+> +out:
+> +	if (!sent)
+> +		sent =3D err;
+> +
+> +	return sent;
+> +}
+> +
+>  /*
+>   *	This routine copies from a sock struct into the user buffer.
+>   *
+> @@ -2314,6 +2463,7 @@ static int tcp_recvmsg_locked(struct sock *sk, stru=
+ct msghdr *msg, size_t len,
+>  			      int *cmsg_flags)
+>  {
+>  	struct tcp_sock *tp =3D tcp_sk(sk);
+> +	int last_copied_devmem =3D -1; /* uninitialized */
+>  	int copied =3D 0;
+>  	u32 peek_seq;
+>  	u32 *seq;
+> @@ -2491,15 +2641,44 @@ static int tcp_recvmsg_locked(struct sock *sk, st=
+ruct msghdr *msg, size_t len,
+>  		}
+> =20
+>  		if (!(flags & MSG_TRUNC)) {
+> -			err =3D skb_copy_datagram_msg(skb, offset, msg, used);
+> -			if (err) {
+> -				/* Exception. Bailout! */
+> -				if (!copied)
+> -					copied =3D -EFAULT;
+> +			if (last_copied_devmem !=3D -1 &&
+> +			    last_copied_devmem !=3D skb->devmem)
+>  				break;
+> +
+> +			if (!skb->devmem) {
+> +				err =3D skb_copy_datagram_msg(skb, offset, msg,
+> +							    used);
+> +				if (err) {
+> +					/* Exception. Bailout! */
+> +					if (!copied)
+> +						copied =3D -EFAULT;
+> +					break;
+> +				}
+> +			} else {
+> +				if (!(flags & MSG_SOCK_DEVMEM)) {
+> +					/* skb->devmem skbs can only be received
+> +					 * with the MSG_SOCK_DEVMEM flag.
+> +					 */
+> +					if (!copied)
+> +						copied =3D -EFAULT;
+> +
+> +					break;
+> +				}
+> +
+> +				err =3D tcp_recvmsg_devmem(sk, skb, offset, msg,
+> +							 used);
+> +				if (err <=3D 0) {
+> +					if (!copied)
+> +						copied =3D -EFAULT;
+> +
+> +					break;
+> +				}
+> +				used =3D err;
+
+Minor nit: I personally would find the above more readable, placing
+this whole chunk in a single helper (e.g. the current
+tcp_recvmsg_devmem(), renamed to something more appropriate).
+
+Cheers,
+
+Paolo
 
 
