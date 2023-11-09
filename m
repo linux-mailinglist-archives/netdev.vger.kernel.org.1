@@ -1,203 +1,218 @@
-Return-Path: <netdev+bounces-46808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D00E57E6831
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:33:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC7A7E68FD
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 11:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F176E1C20A41
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:33:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D38A7280FB6
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458E111198;
-	Thu,  9 Nov 2023 10:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RnX8ICcn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A674134DB;
+	Thu,  9 Nov 2023 10:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC159199C4
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 10:33:01 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5488E1BFD
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:33:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699525981; x=1731061981;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=R0HP2h7LAzDCqdP1/RQgKyl9YR3hLFdhZ+rv1wFN7LU=;
-  b=RnX8ICcnHp6WtCwyCSlMk5UjDVREvCdYVi9Y0sOoX2cJu7wDZmW2ms1r
-   bwdxMz0gkpa7yJc2DWddrcuH0TD3kIOZ2pmCtZ9uYgHSLYNcozGhBXheI
-   R/8MgNJbgGsUrs9Q1fcdLZeLmXr54NYx8MZh4YCJSwmCJ1yafx17S/GBk
-   Nx0RGA9GA+sitvt0KIaGhKHK/lZEhI6iGQIjgp4KLPkuiQQXsM4h5Fq8R
-   VvhFbFEeXYyT1MPHIm+AcE+5DgkXNQA/X+FoxW6u3NC9Vr4Y5+QralGpW
-   O0XxDv8OfuKo1Qpi2B1Q93FKdERNQ5WsUhKKlgZ3FwCmfWX0wwjd/Fzyx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="369292448"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="369292448"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2023 02:32:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10888"; a="739810214"
-X-IronPort-AV: E=Sophos;i="6.03,289,1694761200"; 
-   d="scan'208";a="739810214"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Nov 2023 02:32:45 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 02:32:43 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 02:32:42 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 9 Nov 2023 02:32:42 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 9 Nov 2023 02:32:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K53NLZs5HWLFU8xeSNwKIwZQiw7WJxBscHqUA8TAgHQdA/LGd11oLlQYybl8IHRTVE7J3+6Ezfi3d/HJVdtztF3cVegNZovjBVKf0Gl2IY+KBFG4Vd+BpA9KWQglt6gEPex3goT/gZPbrpdJXEscCMu8WQgg3YFKgnKtJ3ltia9pzDIQS+LFWDt1lZVcAB3fbdegZ2gmf/Yw/JkMd2llFA5tufQgisBq0KEre4QAGGKmjk19dplOq1o3tPfRVPyEX32txwSe4UXn7cxWYRrSB0feM43bPmKfrcWqfm4bPnrVuLsJmWZPq3XeZZPBD3PD6TzLunZ9t0fUPg5yl8kMsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qqKOTQ6n0A447fdnnCZ5kR479pn8+j4f4T/ZsfxFkJs=;
- b=Irb3TH7py9ivn3zRUV8ZCr9R0rRf7qgbgf8w7jW3IEPp14pHYLeOotW0ry/jYLu0ds0Otl0IURXqp4+nd7f9vVkQe2nDLsTGviptqQqq1vg+5gbK7VStjejTnCJ6juBaZoUHIpLvvnWDptwEt7V8k0vlCnfy0HyZvfVozzZLAYSZsZxD6S6r+5J9C8zGMvddz3TlC/rrj2cX/NWVn4xp6sWS4Bz9UgPYWO0vRo5ky+yXL+HdSVe8/q1GMC8bjRdcYYFBbFCN7IG64yod8ptqeDd7H3pCOCWkg9rWsjKOf93t/FnZRCCrzpQus9GFsJ9tRo4hu2Uh4wFNjXbeNht0Pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
- by DS7PR11MB6245.namprd11.prod.outlook.com (2603:10b6:8:9a::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6954.28; Thu, 9 Nov
- 2023 10:32:40 +0000
-Received: from PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::3d98:44fd:690d:c3f3]) by PH0PR11MB5013.namprd11.prod.outlook.com
- ([fe80::3d98:44fd:690d:c3f3%4]) with mapi id 15.20.6977.019; Thu, 9 Nov 2023
- 10:32:40 +0000
-From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "Szycik, Marcin"
-	<marcin.szycik@intel.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"Raczynski, Piotr" <piotr.raczynski@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 15/15] ice: reserve number
- of CP queues
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 15/15] ice: reserve number
- of CP queues
-Thread-Index: AQHaBm5aaLqn1QsT80C3IsNcSsG0h7Bx4y0w
-Date: Thu, 9 Nov 2023 10:32:40 +0000
-Message-ID: <PH0PR11MB50132DC49D9B5AAF419764FD96AFA@PH0PR11MB5013.namprd11.prod.outlook.com>
-References: <20231024110929.19423-1-michal.swiatkowski@linux.intel.com>
- <20231024110929.19423-16-michal.swiatkowski@linux.intel.com>
-In-Reply-To: <20231024110929.19423-16-michal.swiatkowski@linux.intel.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|DS7PR11MB6245:EE_
-x-ms-office365-filtering-correlation-id: 4c30bd4e-d67f-4382-9cef-08dbe10f3384
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: i2P6rC6tOiZgDVyO2zLXCycd/kDr7sVnweFbQRrdHZgt4b5T9VsXYQlWMzhve7DxlwklXmpwMulaMs5cFUZRq9C0lRAzm57JAgrOxcTZ2/Yp8pD6PtL7ZZh4c3z7hFLRpvDWy6p7aGrJuhKOGdu5lwfpdY5rWR34kO8KRBLLo5AcqhA6jK48DFXmhK8/u9pzcF6oo9xcqbJPN5qclgqsriTQtv5bOkN3s7qUWP7FsuaqFBnBaMdwydY4FqMvrukWPCgw0cl9uN4TNuq/NpZvBqJBgLMPTZWkCr/rAMmtZd5G3MFM+vy5Dp0IopyVliygoMdUhMntiXFZJ9xHxfmy4DgX4w4MkL4ipqWciZ1nwMbl569FJ6S1lnDvwHAOsOhgCXo0DS1fZz8Xid/N6Aj8JIqw9FqCcVVUOXrbCvx5MMkOTBdqarUDBRu6aSYR2WjOdkks7aH6f1DaqUnST7T+a1Qp4+MOqwwxMqGZyJLSgi8Ccy/HBLYntSg6heYN0nh4P/rvZizecjrBVdZVAMEUfTddocqINVR46Fn+bCzGJsDCXTo0oh5g7NGmFFbA1ERsjQov8PmRtdm/VLZ24J46+Nv7H10gkkRRnrUZAi3/DFc=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(366004)(346002)(396003)(376002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(66899024)(38070700009)(33656002)(55016003)(83380400001)(316002)(64756008)(54906003)(8676002)(110136005)(52536014)(8936002)(66946007)(66446008)(66556008)(26005)(5660300002)(4326008)(66476007)(2906002)(478600001)(9686003)(41300700001)(71200400001)(6506007)(7696005)(53546011)(76116006)(122000001)(82960400001)(86362001)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CwmxvVamB7HuoZ3D7v7YanJqCzy+txCg0Vtm/u47qkfeGSkttM4SOR1XDK6h?=
- =?us-ascii?Q?90VAtx4W14azPHbxi9wPbpcG6fUIo0a+m/8j96MOY64f6V9oB1cD5LIQkKTO?=
- =?us-ascii?Q?8a61DZqYk/iC+C903TiReVAu1zB+ZQssm2qd3zi6fTbhX7N5D+4mZYKT9Dh1?=
- =?us-ascii?Q?u4zyNxv8eFdt7FKHtpIeNQJlibk0HzWHZgKrXM5FJhA3kxzJh2gEnUqRcFcS?=
- =?us-ascii?Q?fd6iq1CDJ2JzAeQ33LUq9wUwdXy2lAqb9mSqtmFExhMVVAnP/tjf5ig8eR5y?=
- =?us-ascii?Q?B/1P1LE+hPZad0ZdUhu0/nPAIntdAoZON82JkhC2odEdjtE4qSh628+KOrlV?=
- =?us-ascii?Q?2vJzQKHHDM+JujTbXakdQV2t9Qll3aj8pUSXgqxT6OVGOd4bVnD4+G9eFHex?=
- =?us-ascii?Q?U2yMThoW9p5dwl+UtFqJhV6dHUBLvz/qzX3BM+WeCLCsM/koK895ErVDoTWJ?=
- =?us-ascii?Q?4dmbB7JYXNESMfj52islfdD67YePgcbx+z06XZWFGoc4yGVhp2xTavo7Txmx?=
- =?us-ascii?Q?SXp6uZcK4KrmQcOxg9DzNY5bR/l3PMO//ybUPPluL68egWYJabgub3LDqgrB?=
- =?us-ascii?Q?0066sqkXuWMpDg0vm+Fl000aGbOju4xgjJeChfbVxr0h6ATcqDOGZej+yTg+?=
- =?us-ascii?Q?xmmPZ9WP+Mz5sbmQ0sqTdh7gRE+UOEvi4sb1XT8Kh9Ef3TXdS34TF73haVT/?=
- =?us-ascii?Q?ggYu7VNkIDJR12n51PB8N8ja5/Gof0xI5s0nJ+M+a47ObskELRj46K+A7sjU?=
- =?us-ascii?Q?RY6hZuny7zlq/EsnmayyCyWQ/QyKCL+1PIBQi6rnokx9THq7q3XKGsVuNk7r?=
- =?us-ascii?Q?wto0xhaLk7fcBiSJKwhsEDXRujXcjaerB2M1CizbCghEZzIY3F3G1H+jRt8G?=
- =?us-ascii?Q?vI+oBVrTBzzgNTWhKL09ezenPe4Zo+d1ycXxOxE9orneXcIgimc0oAeq/ND1?=
- =?us-ascii?Q?HFptlQu4Qj2iUH3jbA//vA76Tgb9iQtAWe+E/p5rqHjIM3nLBmdboAaJjKxn?=
- =?us-ascii?Q?liWkhUYrzPIdj1cki79gxnVwlBWDEK0WurUI73rq/HhKRjOzLgqtBV0H7n4o?=
- =?us-ascii?Q?Mw0PsQaIBZKmHFdeA0EDTYAw/hW2Ri42yop5dH5BlbXDlQpFl4eBdMewJV5S?=
- =?us-ascii?Q?5/Kjt9mkqvLpHOdPFmX+BBhGuFhgm0GDbvfHDY23gXnHHlE6HvJ9WZERCZZH?=
- =?us-ascii?Q?/9Jj71v36xotkcRlYVBIpIG0eC5wHMYPDL8gzAKH5/KruRoKsH+7FwbQ4Pvi?=
- =?us-ascii?Q?6knitvD7SBBzp1E3ygxr1eJxV5GjI8fCZq3v2ydHrzTfGfVCI59godfM4Hya?=
- =?us-ascii?Q?wUMrNX6X/3uJCUzaIjLqLJVx1UvF7bwYLxirvGJirZUEpKI860vc6S5FZQae?=
- =?us-ascii?Q?qmZBWYdvjPSi1ITmIHrYgBWLN4PDvbxrdQiWJriy1jqoUv6tGF8E8dWYa7lH?=
- =?us-ascii?Q?z2LvHbR62XT8uvQWaTijDlrMXsA3L2e4A5IOrdWkoGYszJ1ucczL/YlcGf55?=
- =?us-ascii?Q?gcU6IZSGtaoZeQqRIGF31+E28hJoFU6yGVa6to5iqvd308BytanXK55e7JQ/?=
- =?us-ascii?Q?xpHpcUHr3OPRvpbluDh33CkjaxRzUggai4naYKUm6WdUN5cUuT4dp53MmPRN?=
- =?us-ascii?Q?9w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF85134D1;
+	Thu,  9 Nov 2023 10:58:39 +0000 (UTC)
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BCC42590;
+	Thu,  9 Nov 2023 02:58:37 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R341e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw0bMC3_1699527511;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw0bMC3_1699527511)
+          by smtp.aliyun-inc.com;
+          Thu, 09 Nov 2023 18:58:32 +0800
+Message-ID: <1699526256.4202905-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 00/21] virtio-net: support AF_XDP zero copy
+Date: Thu, 9 Nov 2023 18:37:36 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231109031728-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231109031728-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c30bd4e-d67f-4382-9cef-08dbe10f3384
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2023 10:32:40.7715
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: V1aBpCBJBJY4Pviux1/xp2BMw1c7YcvcrjYRSm6XY/y7Z9210gSebpUNxYEcTtR/dW0nP684Eg/HNG9C9/geGwUkClzjkd6A7eKHwzrO9fQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6245
-X-OriginatorOrg: intel.com
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Michal Swiatkowski
-> Sent: Tuesday, October 24, 2023 4:39 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Drewek, Wojciech <wojciech.drewek@intel.com>; Szycik, Marcin
-> <marcin.szycik@intel.com>; netdev@vger.kernel.org; Brandeburg, Jesse
-> <jesse.brandeburg@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com=
->;
-> Michal Swiatkowski <michal.swiatkowski@linux.intel.com>; Raczynski, Piotr
-> <piotr.raczynski@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v1 15/15] ice: reserve number =
-of
-> CP queues
->=20
-> Rebuilding CP VSI each time the PR is created drastically increase the ti=
-me of
-> maximum VFs creation. Add function to reserve number of CP queues to deal
-> with this problem.
->=20
-> Use the same function to decrease number of queues in case of removing
-> VFs. Assume that caller of ice_eswitch_reserve_cp_queues() will also call
-> ice_eswitch_attach/detach() correct number of times.
->=20
-> Still one by one PR adding is handy for VF resetting routine.
->=20
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice.h         |  6 +++
->  drivers/net/ethernet/intel/ice/ice_eswitch.c | 52 +++++++++++++++++---
-> drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++
->  drivers/net/ethernet/intel/ice/ice_sriov.c   |  3 ++
->  4 files changed, 58 insertions(+), 7 deletions(-)
->=20
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+On Thu, 9 Nov 2023 03:19:04 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Tue, Nov 07, 2023 at 11:12:06AM +0800, Xuan Zhuo wrote:
+> > ## AF_XDP
+> >
+> > XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+> > copy feature of xsk (XDP socket) needs to be supported by the driver. The
+> > performance of zero copy is very good. mlx5 and intel ixgbe already support
+> > this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+> > feature.
+> >
+> > At present, we have completed some preparation:
+> >
+> > 1. vq-reset (virtio spec and kernel code)
+> > 2. virtio-core premapped dma
+> > 3. virtio-net xdp refactor
+> >
+> > So it is time for Virtio-Net to complete the support for the XDP Socket
+> > Zerocopy.
+> >
+> > Virtio-net can not increase the queue num at will, so xsk shares the queue with
+> > kernel.
+> >
+> > On the other hand, Virtio-Net does not support generate interrupt from driver
+> > manually, so when we wakeup tx xmit, we used some tips. If the CPU run by TX
+> > NAPI last time is other CPUs, use IPI to wake up NAPI on the remote CPU. If it
+> > is also the local CPU, then we wake up napi directly.
+> >
+> > This patch set includes some refactor to the virtio-net to let that to support
+> > AF_XDP.
+> >
+> > ## performance
+> >
+> > ENV: Qemu with vhost-user(polling mode).
+> > Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+> >
+> > ### virtio PMD in guest with testpmd
+> >
+> > testpmd> show port stats all
+> >
+> >  ######################## NIC statistics for port 0 ########################
+> >  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+> >  RX-errors: 0
+> >  RX-nombuf: 0
+> >  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
+> >
+> >
+> >  Throughput (since last show)
+> >  Rx-pps:   8861574     Rx-bps:  3969985208
+> >  Tx-pps:   8861493     Tx-bps:  3969962736
+> >  ############################################################################
+> >
+> > ### AF_XDP PMD in guest with testpmd
+> >
+> > testpmd> show port stats all
+> >
+> >   ######################## NIC statistics for port 0  ########################
+> >   RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+> >   RX-errors: 0
+> >   RX-nombuf:  0
+> >   TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+> >
+> >   Throughput (since last show)
+> >   Rx-pps:      6333196          Rx-bps:   2837272088
+> >   Tx-pps:      6333227          Tx-bps:   2837285936
+> >   ############################################################################
+> >
+> > But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+> >
+> > ## maintain
+> >
+> > I am currently a reviewer for virtio-net. I commit to maintain AF_XDP support in
+> > virtio-net.
+> >
+> > Please review.
+> >
+> > Thanks.
+> >
+> > v2
+> >     1. wakeup uses the way of GVE. No send ipi to wakeup napi on remote cpu.
+> >     2. remove rcu. Because we synchronize all operat, so the rcu is not needed.
+> >     3. split the commit "move to virtio_net.h" in last patch set. Just move the
+> >        struct/api to header when we use them.
+> >     4. add comments for some code
+> >
+> > v1:
+> >     1. remove two virtio commits. Push this patchset to net-next
+> >     2. squash "virtio_net: virtnet_poll_tx support rescheduled" to xsk: support tx
+> >     3. fix some warnings
+> >
+> >
+> > Xuan Zhuo (21):
+> >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
+> >   virtio_net: unify the code for recycling the xmit ptr
+> >   virtio_net: independent directory
+> >   virtio_net: move core structures to virtio_net.h
+> >   virtio_net: add prefix virtnet to all struct inside virtio_net.h
+> >   virtio_net: separate virtnet_rx_resize()
+> >   virtio_net: separate virtnet_tx_resize()
+> >   virtio_net: sq support premapped mode
+> >   virtio_net: xsk: bind/unbind xsk
+> >   virtio_net: xsk: prevent disable tx napi
+> >   virtio_net: move some api to header
+> >   virtio_net: xsk: tx: support tx
+> >   virtio_net: xsk: tx: support wakeup
+> >   virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
+> >   virtio_net: xsk: tx: virtnet_sq_free_unused_buf() check xsk buffer
+> >   virtio_net: xsk: rx: introduce add_recvbuf_xsk()
+> >   virtio_net: xsk: rx: skip dma unmap when rq is bind with AF_XDP
+> >   virtio_net: xsk: rx: introduce receive_xsk() to recv xsk buffer
+> >   virtio_net: xsk: rx: virtnet_rq_free_unused_buf() check xsk buffer
+> >   virtio_net: update tx timeout record
+> >   virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+> >
+> >  MAINTAINERS                                 |   2 +-
+> >  drivers/net/Kconfig                         |   8 +-
+> >  drivers/net/Makefile                        |   2 +-
+> >  drivers/net/virtio/Kconfig                  |  13 +
+> >  drivers/net/virtio/Makefile                 |   8 +
+> >  drivers/net/{virtio_net.c => virtio/main.c} | 630 +++++++++-----------
+> >  drivers/net/virtio/virtio_net.h             | 346 +++++++++++
+> >  drivers/net/virtio/xsk.c                    | 498 ++++++++++++++++
+> >  drivers/net/virtio/xsk.h                    |  32 +
+> >  9 files changed, 1174 insertions(+), 365 deletions(-)
+> >  create mode 100644 drivers/net/virtio/Kconfig
+> >  create mode 100644 drivers/net/virtio/Makefile
+> >  rename drivers/net/{virtio_net.c => virtio/main.c} (92%)
+> >  create mode 100644 drivers/net/virtio/virtio_net.h
+> >  create mode 100644 drivers/net/virtio/xsk.c
+> >  create mode 100644 drivers/net/virtio/xsk.h
+>
+>
+> Too much code duplications for my taste. Would there maybe be less if
+> everything was in a single file?
+
+
+What duplication?
+
+Yes. If everything is in a single file, something maybe simpler. But I
+do not like that, that will be more trouble in the future. We want to
+make the virtnet more like the modern network card, then we will
+introduce more features to the virtio-net. I think it's time to
+split the single file to modules. I think letting every module simple is
+beneficial for the maintaining.
+
+About the duplications, I do not understand. No duplication,
+We just refer the functions from each other.
+
+Do you mean the receive_xsk()?
+Let we resolve this problem if you think it's a duplicate. I think this is the
+right way.
+
+Thanks.
+
+
+
+
+
+>
+>
+> > --
+> > 2.32.0.3.g01195cf9f
+>
+>
 
