@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-46780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061137E6621
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:03:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627717E6624
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 10:03:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3609E1C20BE4
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:03:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25D9BB20C85
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 09:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4FA10A28;
-	Thu,  9 Nov 2023 09:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E38710A3E;
+	Thu,  9 Nov 2023 09:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LX/2ft4F"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mYpbZa3v"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A7F10A21
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:03:16 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00A1ED55
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:03:15 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c503da4fd6so6898571fa.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:03:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B5B10A0A
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 09:03:18 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C862592
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 01:03:17 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c523ac38fbso7102781fa.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 01:03:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699520594; x=1700125394; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X23W+DtxdHmqBzJUyijkKW7gcM1l2veMuv/ye91bjTA=;
-        b=LX/2ft4FvsXvpYzdvUh45S8NiVjyZP831Pz8sy8qA6UYxcloRt3EiTHgyxwDBarlRv
-         1JX8RvBEEK+3Sue2zz2fYZo2zufQBVUlPR+1+udBIZIwLK6L27gWR3i/wtsa+Kwgqpm5
-         JHZMor6zzOd3YCfUcQ2NKhw1YEv1fT67iLpKBW4yVA73xz1cvjt2w2g+BYObqNPWqQkn
-         eAQvSW/G75S/cbV1fIuR3em7g9Bi8xJD2I8DNmU+QO4KoSgxsCn5Zb/FaQlTEPwIWroE
-         yXntW145ItIpEXAKj66sT2VOsk5wPRrXsfux6t6BoKlnT8hZ17Mrx/fS24zDXORvnsqn
-         T2lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699520594; x=1700125394;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=linaro.org; s=google; t=1699520595; x=1700125395; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=X23W+DtxdHmqBzJUyijkKW7gcM1l2veMuv/ye91bjTA=;
-        b=T0XyThOsYPPsVouF0ukz8nfmxcQvqAz39BoMtiir+L85ee9w0xMNXQJdQNOTMOiIly
-         o0hH3/F07YInGIk0Vsbt1S3pn9/xsYrvaFMRxHJOglcCndckDdXL4QVV4fYWLF3D4b+D
-         lwB9s+axyi9kiHwhqdLq16Gn4Pj0ykU1rzRdaHtuvjNfv2NnaUYL5Z6bgiyKXMb7SUIc
-         UTCLJylQyrQcPmuMsPIrxSu7rwEW3ZqfuaiK9lmeYqGrwXVUTuEBOtziwY3F8XHn8YpG
-         TTjzWDLx4BWhQF627bS95EdSV8FxZNz/0C17hUtQ3CMsEzaqDt44kv+/+YNmqFn/E89O
-         bMCQ==
-X-Gm-Message-State: AOJu0YyBlJTg2Y1a7LMa10TpcWidliiCrTcKA/YDAgvHxV3hCoAGwXhr
-	0UCg7niHp9igYhtQVAcrVxZX8Q==
-X-Google-Smtp-Source: AGHT+IFwKlWTvRrQ1ZFMN7SHZYCNDqEQVjVoIvuY549D7L8oHnqQqDA8MivwJ7zAVezbFWntv0hILw==
-X-Received: by 2002:a05:651c:2047:b0:2c6:edfd:658a with SMTP id t7-20020a05651c204700b002c6edfd658amr3500404ljo.31.1699520593928;
-        Thu, 09 Nov 2023 01:03:13 -0800 (PST)
+        bh=vzJIeWNq2FEaPyhEpEI6+O7cf3g+sTgw9uPY1dLEPEs=;
+        b=mYpbZa3vIe9EoNguaotcW/iuSHQ5nJBhgru7WF6umoDpHN8iwGyMUVIzZqeN7eSC3l
+         bUROfxyTyv02qOd4rGh8NC+KC69rP6AUrqfKFV3nAS4z7hQulpEAySIvj2YDKQls4mlI
+         AojGS0iRcvbzcwYkXhI/m40+2CgdjYHgCcJQBpDpurkLQGVCPZCZc5IdPJg0d+t1y9f0
+         RgujTfifKDufDowdBz6SUtKczS1KGL8L7QqF9lfjQH1xFJmd36RoajCR9HwiPFBrc8ue
+         NKBDQnl6UlkdtCu2HTrURXahxmyMNTRihtRx+iwZ2j0MGLkytjexc5aCbi/1wx1Okb92
+         12Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699520595; x=1700125395;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vzJIeWNq2FEaPyhEpEI6+O7cf3g+sTgw9uPY1dLEPEs=;
+        b=ATjKWn7DABuxNjAXLk/42lTWcZHxCd3VJLfvxH+Q4J0OUFqqJlEnjoFOJ8mVqdZZIr
+         D612aShPDqr7o0o7Sq1KKkogSzmsm6Y/TD7eu4gORz78epUNIPQzt+cT3tezeV5OYweH
+         vLRE4s1TTk0VhMvGqoRU51ILJixOk0kUe1001a9kFcuUWh3FO0d3dJQ07GMZHgkCleh9
+         H2TQarh84R8QIH81SsJI3Y0HWeVGl8kUF7tPNn6IPsqu8pwUPQUz2k/OUW54AfgZ+8ce
+         sO0dTrO7GVB66lfacpzXJisXrXdcuYQCUb8raqJ4CT881AOCAZ2ePZ1YZAlLPohqbc/O
+         3lWg==
+X-Gm-Message-State: AOJu0YwpKY0L4kfATIHYYfiEpjrV23x5un4c5Gd4fZZHwiTKux4WaxHk
+	DRbapk2tpQdI8VY5aXW49oE9Vw==
+X-Google-Smtp-Source: AGHT+IH0sjqNLl/veK2UKnVf2/NE7U4+3ND+oxhdQlRbHZbnIHRAFaAKtPKKAo+K3oMuEO5OM9Y+qA==
+X-Received: by 2002:a2e:9e53:0:b0:2c5:cac:e9a3 with SMTP id g19-20020a2e9e53000000b002c50cace9a3mr3404465ljk.52.1699520594884;
+        Thu, 09 Nov 2023 01:03:14 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id h19-20020a05651c159300b002bbacc6c523sm2212383ljq.49.2023.11.09.01.03.13
+        by smtp.gmail.com with ESMTPSA id h19-20020a05651c159300b002bbacc6c523sm2212383ljq.49.2023.11.09.01.03.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 01:03:13 -0800 (PST)
+        Thu, 09 Nov 2023 01:03:14 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Subject: [PATCH net v4 0/3] Fix large frames in the Gemini ethernet driver
-Date: Thu, 09 Nov 2023 10:03:11 +0100
-Message-Id: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
+Date: Thu, 09 Nov 2023 10:03:12 +0100
+Subject: [PATCH net v4 1/3] net: ethernet: cortina: Fix max RX frame define
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,10 +69,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAE+gTGUC/4XNQQqDMBAF0KtI1k1JMonarnqP0kWMEx3QWKJIi
- 3j3BleWIl3+P/w3CxsxEo7smi0s4kwjDSEFfcqYa21okFOdMlNCgZRC8wZ7CsQ7Gxv00fbIPb2
- 4kxpq5YpSVoal7TNiqjf3zgJO7JHKlsZpiO/t1yy30x92llzwizNGglfKA9w6CjYO5yE2GzmrP
- WOOGJUYV4M11uZOX/IfBvZMccRAYhBKAU6UoirMF7Ou6wf1EM5ATgEAAA==
+Message-Id: <20231109-gemini-largeframe-fix-v4-1-6e611528db08@linaro.org>
+References: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
+In-Reply-To: <20231109-gemini-largeframe-fix-v4-0-6e611528db08@linaro.org>
 To: Hans Ulli Kroll <ulli.kroll@googlemail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -82,79 +81,47 @@ Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: b4 0.12.4
 
-This is the result of a bug hunt for a problem with the
-RTL8366RB DSA switch leading me wrong all over the place.
+Enumerator 3 is 1548 bytes according to the datasheet.
+Not 1542.
 
-I am indebted to Vladimir Oltean who as usual pointed
-out where the real problem was, many thanks!
-
-Tryig to actually use big ("jumbo") frames on this
-hardware uncovered the real bugs. Then I tested it on
-the DSA switch and it indeed fixes the issue.
-
-To make sure it also works fine with big frames on
-non-DSA devices I also copied a large video file over
-scp to a device with maximum frame size, the data
-was transported in large TCP packets ending up in
-0x7ff sized frames using software checksumming at
-~2.0 MB/s.
-
-If I set down the MTU to the standard 1500 bytes so
-that hardware checksumming is used, the scp transfer
-of the same file was slightly lower, ~1.8-1.9 MB/s.
-
-Despite this not being the best test it shows that
-we can now stress the hardware with large frames
-and that software checksum works fine.
-
+Fixes: 4d5ae32f5e1e ("net: ethernet: Add a driver for Gemini gigabit ethernet")
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
-Changes in v4:
-- Strip stray v1-related comment from the commit message on patch 1
-- Move the hunks deleting gmac_fix_features() from patch
-  "net: ethernet: cortina: Handle large frames" to
-  "net: ethernet: cortina: Fix MTU max setting" as it is
-  perfectly motivated by the MTU change, then move this patch
-  later in the series.
-- Drop the last patch only activating the checksum engine for
-  TCP and UDP explicitly. It's not fixing a regression,
-  so let's reconsider it for net-next rather than net.
-- Link to v3: https://lore.kernel.org/r/20231107-gemini-largeframe-fix-v3-0-e3803c080b75@linaro.org
+ drivers/net/ethernet/cortina/gemini.c | 4 ++--
+ drivers/net/ethernet/cortina/gemini.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-Changes in v3:
-- Do not reimplement the existing oversize check (sigh what is
-  wrong with me). Drop that patch.
-- Drop the gmac_fix_features() since we are better off falling
-  back to software checksums dynamically per-frame.
-- Add a new patch to bypass the checksumming engine if we are not
-  handling TCP or UDP.
-- Link to v2: https://lore.kernel.org/r/20231105-gemini-largeframe-fix-v2-0-cd3a5aa6c496@linaro.org
+diff --git a/drivers/net/ethernet/cortina/gemini.c b/drivers/net/ethernet/cortina/gemini.c
+index a8b9d1a3e4d5..5bdd1b252840 100644
+--- a/drivers/net/ethernet/cortina/gemini.c
++++ b/drivers/net/ethernet/cortina/gemini.c
+@@ -432,8 +432,8 @@ static const struct gmac_max_framelen gmac_maxlens[] = {
+ 		.val = CONFIG0_MAXLEN_1536,
+ 	},
+ 	{
+-		.max_l3_len = 1542,
+-		.val = CONFIG0_MAXLEN_1542,
++		.max_l3_len = 1548,
++		.val = CONFIG0_MAXLEN_1548,
+ 	},
+ 	{
+ 		.max_l3_len = 9212,
+diff --git a/drivers/net/ethernet/cortina/gemini.h b/drivers/net/ethernet/cortina/gemini.h
+index 9fdf77d5eb37..99efb1155743 100644
+--- a/drivers/net/ethernet/cortina/gemini.h
++++ b/drivers/net/ethernet/cortina/gemini.h
+@@ -787,7 +787,7 @@ union gmac_config0 {
+ #define  CONFIG0_MAXLEN_1536	0
+ #define  CONFIG0_MAXLEN_1518	1
+ #define  CONFIG0_MAXLEN_1522	2
+-#define  CONFIG0_MAXLEN_1542	3
++#define  CONFIG0_MAXLEN_1548	3
+ #define  CONFIG0_MAXLEN_9k	4	/* 9212 */
+ #define  CONFIG0_MAXLEN_10k	5	/* 10236 */
+ #define  CONFIG0_MAXLEN_1518__6	6
 
-Changes in v2:
-- Don't check for oversized MTU request: the framework makes sure it doesn't
-  happen.
-- Drop unrelated BIT() macro cleanups (I might send these later for net-next)
-- Use a special error code if the skbuff is too big and fail gracefully
-  is this happens.
-- Do proper checksum of the frame using a software fallback when the frame
-  is too long for hardware checksumming.
-- Link to v1: https://lore.kernel.org/r/20231104-gemini-largeframe-fix-v1-0-9c5513f22f33@linaro.org
-
----
-Linus Walleij (3):
-      net: ethernet: cortina: Fix max RX frame define
-      net: ethernet: cortina: Handle large frames
-      net: ethernet: cortina: Fix MTU max setting
-
- drivers/net/ethernet/cortina/gemini.c | 45 ++++++++++++++++++++++-------------
- drivers/net/ethernet/cortina/gemini.h |  4 ++--
- 2 files changed, 31 insertions(+), 18 deletions(-)
----
-base-commit: ffc253263a1375a65fa6c9f62a893e9767fbebfa
-change-id: 20231104-gemini-largeframe-fix-c143d2c781b5
-
-Best regards,
 -- 
-Linus Walleij <linus.walleij@linaro.org>
+2.34.1
 
 
