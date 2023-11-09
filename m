@@ -1,86 +1,75 @@
-Return-Path: <netdev+bounces-46730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9596C7E61F6
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 03:00:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE39D7E61FB
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 03:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60547280F41
-	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:00:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 548D4280F98
+	for <lists+netdev@lfdr.de>; Thu,  9 Nov 2023 02:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CA410FE;
-	Thu,  9 Nov 2023 02:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5468B10E1;
+	Thu,  9 Nov 2023 02:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FlaKoe4P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PdhREZbP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5649910E1
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C4942C433C9;
-	Thu,  9 Nov 2023 02:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385364C8D
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 02:06:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77689C433C8;
+	Thu,  9 Nov 2023 02:06:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699495223;
-	bh=I4vzEOuc35l4pm4gfrzl13r/E3m0mxg1sr3yqH5Yxy8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FlaKoe4PxlSJKnMn+iEO7z4JnfKD1vIGyd1tZZ5Hk66y+SGN66f2Q7sLJcUvUjA0Y
-	 3ugv4hdGp+8p8VAksVinRgf/D3Pql/2K+jb2paiCefESyO6cLMj6dccSmZJPOPQq2c
-	 x2wY1rZ8xPfZc33IsU3Lp7b/x33/RAWzecGogQ8UwslADkyDm2blaNwYO6Tq8ZnmAt
-	 mIld26E4Fu1ZtkFOQ3cgT/PzZ8oQn3xArxdEw6MlcoHLU/FLTvE38YwYUmt4bMHk7t
-	 OTquEqwdT0uPPIpjo3EoEzq0dKGDw+pdeBnc75f+cTxGmwX5fkkYhr6s2mYco5zHah
-	 VJ6wSIBkvQLFA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A8493E00086;
-	Thu,  9 Nov 2023 02:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1699495573;
+	bh=mha02uxgjSUNHXZ17TIvV0cebQbUGfZb35U/ymU9+eI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PdhREZbP9T1Uyq0vGVeFoS8iwCAcVqPhEGTfjDSCUsmmx2ccUzp6vkWGZliUsjE3W
+	 +h0w5izhyJP6lA7IrD3jSnC0In0Jy6/9wZmd6vLkvfh7XafoKtgaTuAiu7f2G2sI4d
+	 lifjctretbhItLsBseLsqG95Ak72w6MzDgbljGEwVfR6QY5JIijY3dMMdKLgeqy0SM
+	 HUEq+bhzA8w0qZOWh2jmBSkviWzup946X8StjaERsh+JqXxpfHcPjg4yqEIJFPD8ou
+	 Q7/xZNxhpBFPRW4DXvR5YBGW1MJPyIjmJ7Is/Cg4yHZvEkj4bChl12ZHNPiO98pFmQ
+	 6C9NwUxzDJXyA==
+Date: Wed, 8 Nov 2023 18:06:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Johnathan Mantey <johnathanx.mantey@intel.com>
+Cc: <netdev@vger.kernel.org>
+Subject: Re: [PATCH][ncsi] Revert NCSI link loss/gain commit
+Message-ID: <20231108180602.43c2bfad@kicinski-fedora-PC1C0HJN>
+In-Reply-To: <20231108222943.4098887-1-johnathanx.mantey@intel.com>
+References: <20231108222943.4098887-1-johnathanx.mantey@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/sched: act_ct: Always fill offloading tuple iifidx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169949522368.6460.3054206731226534744.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Nov 2023 02:00:23 +0000
-References: <20231103151410.764271-1-vladbu@nvidia.com>
-In-Reply-To: <20231103151410.764271-1-vladbu@nvidia.com>
-To: Vlad Buslov <vladbu@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, pablo@netfilter.org, paulb@nvidia.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 3 Nov 2023 16:14:10 +0100 you wrote:
-> Referenced commit doesn't always set iifidx when offloading the flow to
-> hardware. Fix the following cases:
+On Wed, 8 Nov 2023 14:29:43 -0800 Johnathan Mantey wrote:
+> The NCSI commit
+> ncsi: Propagate carrier gain/loss events to the NCSI controller
+> introduced unwanted behavior.
 > 
-> - nf_conn_act_ct_ext_fill() is called before extension is created with
-> nf_conn_act_ct_ext_add() in tcf_ct_act(). This can cause rule offload with
-> unspecified iifidx when connection is offloaded after only single
-> original-direction packet has been processed by tc data path. Always fill
-> the new nf_conn_act_ct_ext instance after creating it in
-> nf_conn_act_ct_ext_add().
+> The intent for the commit was to be able to detect carrier loss/gain
+> for just the NIC connected to the BMC. The unwanted effect is a
+> carrier loss for auxiliary paths also causes the BMC to lose
+> carrier. The BMC never regains carrier despite the secondary NIC
+> regaining a link.
 > 
-> [...]
+> This change, when merged, needs to be backported to stable kernels.
 
-Here is the summary with links:
-  - [net] net/sched: act_ct: Always fill offloading tuple iifidx
-    https://git.kernel.org/netdev/net/c/9bc64bd0cd76
+You need to add a Fixes tag (pointing at the reverted change), 
+and a CC: stable tag. Here's an example of a well formatted fix:
 
-You are awesome, thank you!
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=02d5fdbf4f2b8c406f7a4c98fa52aa181a11d733
+
+When you repost make sure you use get_maintainers on the patch file, 
+to catch all reviewers. And put [PATCH net v2] ncsi: Revert...
+as the subject.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
