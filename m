@@ -1,178 +1,84 @@
-Return-Path: <netdev+bounces-47077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2EA07E7B89
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:58:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F717E7B92
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 12:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D9C5B20E04
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:58:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85FCB1F209A7
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66EB10A09;
-	Fri, 10 Nov 2023 10:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE409134C4;
+	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifCvakJ0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OowxffQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EC1D2EB
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:58:36 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381182AD2A;
-	Fri, 10 Nov 2023 02:58:35 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6b5af4662b7so1727581b3a.3;
-        Fri, 10 Nov 2023 02:58:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699613914; x=1700218714; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rgCullXs69eYhISfXuDpHxjryEOlOpmI+uw8NW6NNb4=;
-        b=ifCvakJ0vl9wmUWX2XTa/QoQkBQUWKcs8tm6sTxQfqDiLRdsjUGtndEGAmEna25PcT
-         qs/JYNJO2FfOnyMapQsEed1iclBoJ7AQXz8mHzBZOqonlC5oJDUU61fMXPGBIMDkWt8O
-         snjJ8GDydOqFWK4llU5ZFfPTc9JJPpCWGUsPiQsNotzvYf+jAl/evu2hUVAr0SU17xJ0
-         nyPMlVbpOp06S8V/kwYe3T6vIe97lrijq/wceoako9JFtOdOZpsmbzAFB4BCO+joMYVv
-         H4lkThX2WR8AIORrixqRWh0oAWUbwnsM3qD6pfCUKsKp9JyLbVfMV9+z10wLQDzcPbsQ
-         syoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699613914; x=1700218714;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rgCullXs69eYhISfXuDpHxjryEOlOpmI+uw8NW6NNb4=;
-        b=Bw4UL6DUfqUzqDukUJxmrxHhr/8tmtV9HeawBs2nvdwzmEkmKtJp7W/z/rjDM7B2HP
-         B4irlDs3rrsWZNDsO4jQOT/MuMm3Wq/ZkeS1Zr711cytpwetMM9hV8jvCXelNhajcfaI
-         lsphGbDHlEzatXXCMdQy3PmCgNBfktYYjO53ptTVveTtcFmnX/3u38GNlNt1X81BvHvf
-         JsA690hlUoUxJfZqfWRzRbBsg1mWA1/tw7yQRODOM7uHNQEtHLTfYTfaBwGj9xkwhPt7
-         uk4yowkA1JlFqbwfIpHYjMR+Ai6CMdSm58OHgpc7bMygwek/85pOwNww1IRxaMNOcqse
-         bekw==
-X-Gm-Message-State: AOJu0YxcM6JGwdWqbPRakjRwLVT/1dMfu9neoOrKf8oJT8ed0djdjBtl
-	X3/3CL43zMPRpe+1hqWNGLBPV6rAG+GGnw==
-X-Google-Smtp-Source: AGHT+IEQZj+JOsqGYgZ8zjnhecxauxVdWisXmGc0MRIjquJPWv/siqqO9vhcdG7oRGhlxy9dE/sW8g==
-X-Received: by 2002:a05:6a20:5504:b0:181:261f:f368 with SMTP id ko4-20020a056a20550400b00181261ff368mr6412147pzb.53.1699613914507;
-        Fri, 10 Nov 2023 02:58:34 -0800 (PST)
-Received: from dragonet (dragonet.kaist.ac.kr. [143.248.133.220])
-        by smtp.gmail.com with ESMTPSA id j8-20020a17090276c800b001bb97e51ab4sm5103694plt.98.2023.11.10.02.58.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 02:58:34 -0800 (PST)
-Date: Fri, 10 Nov 2023 19:57:23 +0900
-From: "Dae R. Jeong" <threeearcat@gmail.com>
-To: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: ywchoi@casys.kaist.ac.kr
-Subject: [PATCH] tls: fix missing memory barrier in tls_init
-Message-ID: <ZU4Mk_RfzvRpwkmX@dragonet>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AC612B75
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4EF4CC433C7;
+	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699614024;
+	bh=5al1T1jdDu+2lAGbHeFM/Y4l/1eJyWvVGIt5NoilUG8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OowxffQfbiB/ixXfRru7AMA7och/GvMwqYBHuWWYSmNUdT7f1Z1XlD4zXC8MrEDSl
+	 WRQyi0XDZ/FFMqf667ZCLzIGLyH3GqNLqYiPoZSwAx1PJV3MC6wBPstAAY84Mv6qDh
+	 3EUvVinlUVdJ+qeJhgrLMwmb64IJoGguh/sddQ1AR551axmbRKnBebtj3XpiliLTQ2
+	 /K9ZQxj5kaTeC2MkcYrsS5Zy5HxemwVu38yLqNBux6UlUrRziyeSkHYVtSkWK//bwb
+	 PdydxFO5f++VEwFGJgLn2qRIfMUM14CyqtElmAKIacuYMOwlMjg+bAxswCBkZ6VfKo
+	 lhRynBQAMhIFg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29593C43158;
+	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] MAINTAINERS: net: Update reviewers for TI's Ethernet
+ drivers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169961402416.16509.13586966017660246315.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Nov 2023 11:00:24 +0000
+References: <20231110092749.3618-1-r-gunasekaran@ti.com>
+In-Reply-To: <20231110092749.3618-1-r-gunasekaran@ti.com>
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Cc: netdev@vger.kernel.org, linux-omap@vger.kernel.org,
+ linux-kernel@vger.kernel.org, s-vadapalli@ti.com, nm@ti.com, srk@ti.com,
+ rogerq@kernel.org
 
-In tls_init(), a write memory barrier is missing, and store-store
-reordering may cause NULL dereference in tls_{setsockopt,getsockopt}.
+Hello:
 
-CPU0                               CPU1
------                              -----
-// In tls_init()
-// In tls_ctx_create()
-ctx = kzalloc()
-ctx->sk_proto = READ_ONCE(sk->sk_prot) -(1)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-// In update_sk_prot()
-WRITE_ONCE(sk->sk_prot, tls_prots)     -(2)
+On Fri, 10 Nov 2023 14:57:49 +0530 you wrote:
+> Grygorii is no longer associated with TI and messages addressed to
+> him bounce.
+> 
+> Add Siddharth, Roger and myself as reviewers.
+> 
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> 
+> [...]
 
-                                   // In sock_common_setsockopt()
-                                   READ_ONCE(sk->sk_prot)->setsockopt()
+Here is the summary with links:
+  - [v2] MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
+    https://git.kernel.org/netdev/net/c/cbe9e68e1e0f
 
-                                   // In tls_{setsockopt,getsockopt}()
-                                   ctx->sk_proto->setsockopt()    -(3)
-
-In the above scenario, when (1) and (2) are reordered, (3) can observe
-the NULL value of ctx->sk_proto, causing NULL dereference.
-
-To fix it, we rely on rcu_assign_pointer() which implies the release
-barrier semantic. By moving rcu_assign_pointer() after ctx is fully
-initialized, we can ensure that all fields of ctx are visible when
-changing sk->sk_prot.
-
-Also, as Sabrina suggested, this patch gets rid of tls_ctx_create(),
-and move all that into tls_init().
-
-Signed-off-by: Dae R. Jeong <threeearcat@gmail.com>
----
- net/tls/tls_main.c | 32 +++++++++++++++-----------------
- 1 file changed, 15 insertions(+), 17 deletions(-)
-
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 1c2c6800949d..235fa93dc7ef 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -806,22 +806,6 @@ static int tls_setsockopt(struct sock *sk, int level, int optname,
- 	return do_tls_setsockopt(sk, optname, optval, optlen);
- }
- 
--struct tls_context *tls_ctx_create(struct sock *sk)
--{
--	struct inet_connection_sock *icsk = inet_csk(sk);
--	struct tls_context *ctx;
--
--	ctx = kzalloc(sizeof(*ctx), GFP_ATOMIC);
--	if (!ctx)
--		return NULL;
--
--	mutex_init(&ctx->tx_lock);
--	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
--	ctx->sk_proto = READ_ONCE(sk->sk_prot);
--	ctx->sk = sk;
--	return ctx;
--}
--
- static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 			    const struct proto_ops *base)
- {
-@@ -933,6 +917,7 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 
- static int tls_init(struct sock *sk)
- {
-+	struct inet_connection_sock *icsk = inet_csk(sk);
- 	struct tls_context *ctx;
- 	int rc = 0;
- 
-@@ -954,14 +939,27 @@ static int tls_init(struct sock *sk)
- 
- 	/* allocate tls context */
- 	write_lock_bh(&sk->sk_callback_lock);
--	ctx = tls_ctx_create(sk);
-+	ctx = kzalloc(sizeof(*ctx), GFP_ATOMIC);
- 	if (!ctx) {
- 		rc = -ENOMEM;
- 		goto out;
- 	}
- 
-+	mutex_init(&ctx->tx_lock);
-+	ctx->sk_proto = READ_ONCE(sk->sk_prot);
-+	ctx->sk = sk;
- 	ctx->tx_conf = TLS_BASE;
- 	ctx->rx_conf = TLS_BASE;
-+	/* rcu_assign_pointer() should be called after initialization of
-+	 * all fields of ctx. It ensures that all fields of ctx are
-+	 * visible before changing sk->sk_prot, and prevents reading of
-+	 * uninitialized fields in tls_{getsockopt,setsockopt}. Note that
-+	 * we do not need a read barrier in tls_{getsockopt,setsockopt} as
-+	 * there is an address dependency between
-+	 * sk->sk_proto->{getsockopt,setsockopt} and ctx->sk_proto.
-+	 */
-+	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
-+
- 	update_sk_prot(sk, ctx);
- out:
- 	write_unlock_bh(&sk->sk_callback_lock);
+You are awesome, thank you!
 -- 
-2.42.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
