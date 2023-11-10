@@ -1,33 +1,33 @@
-Return-Path: <netdev+bounces-47035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08C727E7AC2
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:25:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163C67E7AC4
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:26:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B670A28168D
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:25:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 215081C20DB2
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99577125AF;
-	Fri, 10 Nov 2023 09:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C830125AF;
+	Fri, 10 Nov 2023 09:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4E1125A1
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C71A111CA1
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:25:52 +0000 (UTC)
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AE822BE31
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:25:46 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0E3AB2BE30
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:25:49 -0800 (PST)
 Received: from loongson.cn (unknown [112.20.112.120])
-	by gateway (Coremail) with SMTP id _____8AxV_EZ901l4bM4AA--.46759S3;
-	Fri, 10 Nov 2023 17:25:45 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Cx5_Eb901l7rM4AA--.45714S3;
+	Fri, 10 Nov 2023 17:25:47 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.112.120])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfS8X901lPPo9AA--.4768S2;
-	Fri, 10 Nov 2023 17:25:44 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfS8X901lPPo9AA--.4768S3;
+	Fri, 10 Nov 2023 17:25:45 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -44,9 +44,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	netdev@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH v5 2/9] net: stmmac: Allow platforms to set irq_flags
-Date: Fri, 10 Nov 2023 17:25:41 +0800
-Message-Id: <e18edf4ab0a83de235fa3475eee4ba8ac88ee651.1699533745.git.siyanteng@loongson.cn>
+Subject: [PATCH v5 3/9] net: stmmac: Add Loongson DWGMAC definitions
+Date: Fri, 10 Nov 2023 17:25:42 +0800
+Message-Id: <87011adcd39f20250edc09ee5d31bda01ded98b5.1699533745.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1699533745.git.siyanteng@loongson.cn>
 References: <cover.1699533745.git.siyanteng@loongson.cn>
@@ -57,117 +57,451 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxfS8X901lPPo9AA--.4768S2
+X-CM-TRANSID:AQAAf8DxfS8X901lPPo9AA--.4768S3
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxJFW3tF18Kw4fXrWxZw15WrX_yoWrGFy8pa
-	y7Aas5trs7tr12gan8AayDZFy5K34xJayxAa4fJwnxAFWIyr9avr1FqrySyr1fCrZ5ArWa
-	qFWDua18C3WjgrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
-	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
+X-Coremail-Antispam: 1Uk129KBj9fXoW3Zr17Ww1xuryfuF1fKF48GrX_yoW8Ww4rKo
+	Z3Jr9IqrySgw18urn7Kr1vqFy5Xrn8Xw43AFZ7urWkua9ava98uFWFq3yfGF17AF4xCF98
+	Z348X3WqyrW5tF15l-sFpf9Il3svdjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYC7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUZVWUtwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Jw0_WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
+	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7Cj
+	xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UAKsUUUUUU=
 
-Some platforms need extra irq flags when request multi msi, add
-irq_flags variable for them.
+Loongson platforms use a DWGMAC which supports multi-channel.
+
+There are two types of Loongson DWGMAC. The first type shares the same
+register definitions and has similar logic as dwmac1000. The second type
+uses several different register definitions.
 
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 +++++++++-------
- include/linux/stmmac.h                           |  1 +
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 63 ++++++++++++++++---
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 57 ++++++++++++++++-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 39 ++++++------
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +
+ 6 files changed, 133 insertions(+), 32 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index e3f650e88f82..e01584fe9efa 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -34,6 +34,7 @@
+ #define DWMAC_CORE_5_00		0x50
+ #define DWMAC_CORE_5_10		0x51
+ #define DWMAC_CORE_5_20		0x52
++#define DWGMAC_CORE_1_00	0x10
+ #define DWXGMAC_CORE_2_10	0x21
+ #define DWXGMAC_CORE_2_20	0x22
+ #define DWXLGMAC_CORE_2_00	0x20
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+index ce0e6ca6f3a2..234d30c5a836 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+@@ -12,7 +12,8 @@
+   Author: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+ *******************************************************************************/
+ 
+-#include <asm/io.h>
++#include <linux/io.h>
++#include "stmmac.h"
+ #include "dwmac1000.h"
+ #include "dwmac_dma.h"
+ 
+@@ -111,13 +112,58 @@ static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_INTR_ENA);
+ }
+ 
++static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
++				     void __iomem *ioaddr,
++				     struct stmmac_dma_cfg *dma_cfg, u32 chan)
++{
++	u32 value;
++	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
++	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
++
++	if (!(priv->plat->flags & STMMAC_FLAG_MULTI_MSI_EN))
++		return;
++
++	/* common channel control register config */
++	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	/* Set the DMA PBL (Programmable Burst Length) mode.
++	 *
++	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
++	 * post 3.5 mode bit acts as 8*PBL.
++	 */
++	if (dma_cfg->pblx8)
++		value |= DMA_BUS_MODE_MAXPBL;
++	value |= DMA_BUS_MODE_USP;
++	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
++	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
++	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
++
++	/* Set the Fixed burst mode */
++	if (dma_cfg->fixed_burst)
++		value |= DMA_BUS_MODE_FB;
++
++	/* Mixed Burst has no effect when fb is set */
++	if (dma_cfg->mixed_burst)
++		value |= DMA_BUS_MODE_MB;
++
++	value |= DMA_BUS_MODE_ATDS;
++
++	if (dma_cfg->aal)
++		value |= DMA_BUS_MODE_AAL;
++
++	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	/* Mask interrupts by writing to CSR7 */
++	writel(DMA_INTR_DEFAULT_MASK, ioaddr + DMA_CHAN_INTR_ENA(chan));
++}
++
+ static void dwmac1000_dma_init_rx(struct stmmac_priv *priv,
+ 				  void __iomem *ioaddr,
+ 				  struct stmmac_dma_cfg *dma_cfg,
+ 				  dma_addr_t dma_rx_phy, u32 chan)
+ {
+ 	/* RX descriptor base address list must be written into DMA CSR3 */
+-	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_RCV_BASE_ADDR);
++	writel(lower_32_bits(dma_rx_phy), ioaddr + DMA_CHAN_RCV_BASE_ADDR(chan));
+ }
+ 
+ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+@@ -126,7 +172,7 @@ static void dwmac1000_dma_init_tx(struct stmmac_priv *priv,
+ 				  dma_addr_t dma_tx_phy, u32 chan)
+ {
+ 	/* TX descriptor base address list must be written into DMA CSR4 */
+-	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_TX_BASE_ADDR);
++	writel(lower_32_bits(dma_tx_phy), ioaddr + DMA_CHAN_TX_BASE_ADDR(chan));
+ }
+ 
+ static u32 dwmac1000_configure_fc(u32 csr6, int rxfifosz)
+@@ -154,7 +200,7 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+ 					    void __iomem *ioaddr, int mode,
+ 					    u32 channel, int fifosz, u8 qmode)
+ {
+-	u32 csr6 = readl(ioaddr + DMA_CONTROL);
++	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+ 
+ 	if (mode == SF_DMA_MODE) {
+ 		pr_debug("GMAC: enable RX store and forward mode\n");
+@@ -176,14 +222,14 @@ static void dwmac1000_dma_operation_mode_rx(struct stmmac_priv *priv,
+ 	/* Configure flow control based on rx fifo size */
+ 	csr6 = dwmac1000_configure_fc(csr6, fifosz);
+ 
+-	writel(csr6, ioaddr + DMA_CONTROL);
++	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+ }
+ 
+ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+ 					    void __iomem *ioaddr, int mode,
+ 					    u32 channel, int fifosz, u8 qmode)
+ {
+-	u32 csr6 = readl(ioaddr + DMA_CONTROL);
++	u32 csr6 = readl(ioaddr + DMA_CHAN_CONTROL(channel));
+ 
+ 	if (mode == SF_DMA_MODE) {
+ 		pr_debug("GMAC: enable TX store and forward mode\n");
+@@ -210,7 +256,7 @@ static void dwmac1000_dma_operation_mode_tx(struct stmmac_priv *priv,
+ 			csr6 |= DMA_CONTROL_TTC_256;
+ 	}
+ 
+-	writel(csr6, ioaddr + DMA_CONTROL);
++	writel(csr6, ioaddr + DMA_CHAN_CONTROL(channel));
+ }
+ 
+ static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
+@@ -273,12 +319,13 @@ static int dwmac1000_get_hw_feature(struct stmmac_priv *priv,
+ static void dwmac1000_rx_watchdog(struct stmmac_priv *priv,
+ 				  void __iomem *ioaddr, u32 riwt, u32 queue)
+ {
+-	writel(riwt, ioaddr + DMA_RX_WATCHDOG);
++	writel(riwt, ioaddr + DMA_CHAN_RX_WATCHDOG(queue));
+ }
+ 
+ const struct stmmac_dma_ops dwmac1000_dma_ops = {
+ 	.reset = dwmac_dma_reset,
+ 	.init = dwmac1000_dma_init,
++	.init_chan = dwmac1000_dma_init_channel,
+ 	.init_rx_chan = dwmac1000_dma_init_rx,
+ 	.init_tx_chan = dwmac1000_dma_init_tx,
+ 	.axi = dwmac1000_dma_axi,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+index 77141391bd2f..90464e1c9649 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+@@ -76,8 +76,15 @@
+ #define DMA_INTR_ENA_RIE 0x00000040	/* Receive Interrupt */
+ #define DMA_INTR_ENA_ERE 0x00004000	/* Early Receive */
+ 
++#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000	/* Loongson Normal Summary */
++
++#ifdef	CONFIG_DWMAC_LOONGSON
++#define DMA_INTR_NORMAL	(DMA_INTR_ENA_NIE_LOONGSON | DMA_INTR_ENA_NIE | \
++			DMA_INTR_ENA_RIE | DMA_INTR_ENA_TIE)
++#else
+ #define DMA_INTR_NORMAL	(DMA_INTR_ENA_NIE | DMA_INTR_ENA_RIE | \
+ 			DMA_INTR_ENA_TIE)
++#endif
+ 
+ /* DMA Abnormal interrupt */
+ #define DMA_INTR_ENA_AIE 0x00008000	/* Abnormal Summary */
+@@ -91,8 +98,15 @@
+ #define DMA_INTR_ENA_TJE 0x00000008	/* Transmit Jabber */
+ #define DMA_INTR_ENA_TSE 0x00000002	/* Transmit Stopped */
+ 
++#define DMA_INTR_ENA_AIE_LOONGSON 0x00018000	/* Loongson Abnormal Summary */
++
++#ifdef	CONFIG_DWMAC_LOONGSON
++#define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE_LOONGSON | DMA_INTR_ENA_AIE | \
++				DMA_INTR_ENA_FBE | DMA_INTR_ENA_UNE)
++#else
+ #define DMA_INTR_ABNORMAL	(DMA_INTR_ENA_AIE | DMA_INTR_ENA_FBE | \
+ 				DMA_INTR_ENA_UNE)
++#endif
+ 
+ /* DMA default interrupt mask */
+ #define DMA_INTR_DEFAULT_MASK	(DMA_INTR_NORMAL | DMA_INTR_ABNORMAL)
+@@ -128,9 +142,29 @@
+ #define DMA_STATUS_TI	0x00000001	/* Transmit Interrupt */
+ #define DMA_CONTROL_FTF		0x00100000	/* Flush transmit FIFO */
+ 
+-#define DMA_STATUS_MSK_COMMON		(DMA_STATUS_NIS | \
+-					 DMA_STATUS_AIS | \
+-					 DMA_STATUS_FBI)
++#define DMA_STATUS_TX_NIS_LOONGSON		0x00040000	/* Normal Tx Interrupt Summary */
++#define DMA_STATUS_RX_NIS_LOONGSON		0x00020000	/* Normal Rx Interrupt Summary */
++#define DMA_STATUS_TX_AIS_LOONGSON		0x00010000	/* Abnormal Tx Interrupt Summary */
++#define DMA_STATUS_RX_AIS_LOONGSON		0x00008000	/* Abnormal Rx Interrupt Summary */
++#define DMA_STATUS_TX_FBI_LOONGSON		0x00002000	/* Fatal Tx Bus Error Interrupt */
++#define DMA_STATUS_RX_FBI_LOONGSON		0x00001000	/* Fatal Rx Bus Error Interrupt */
++
++#ifdef	CONFIG_DWMAC_LOONGSON
++#define DMA_NOR_INTR_STATUS	    (DMA_STATUS_TX_NIS_LOONGSON | DMA_STATUS_RX_NIS_LOONGSON)
++#define DMA_ABNOR_INTR_STATUS	    (DMA_STATUS_TX_AIS_LOONGSON | DMA_STATUS_RX_AIS_LOONGSON)
++#define DMA_FB_INTR_STATUS	    (DMA_STATUS_TX_FBI_LOONGSON | DMA_STATUS_RX_FBI_LOONGSON)
++#else
++#define DMA_NOR_INTR_STATUS	    DMA_STATUS_NIS
++#define DMA_ABNOR_INTR_STATUS	    DMA_STATUS_AIS
++#define DMA_FB_INTR_STATUS	    DMA_STATUS_FBI
++#endif
++
++#define DMA_INTR_STATUS		    (DMA_STATUS_GPI | \
++					 DMA_STATUS_GMI | \
++					 DMA_STATUS_GLI)
++#define DMA_STATUS_MSK_COMMON		(DMA_NOR_INTR_STATUS | \
++					 DMA_ABNOR_INTR_STATUS | \
++					 DMA_FB_INTR_STATUS)
+ 
+ #define DMA_STATUS_MSK_RX		(DMA_STATUS_ERI | \
+ 					 DMA_STATUS_RWT | \
+@@ -148,6 +182,9 @@
+ 					 DMA_STATUS_TI | \
+ 					 DMA_STATUS_MSK_COMMON)
+ 
++/* Following DMA defines are chanels oriented */
++#define DMA_CHAN_OFFSET			0x100
++
+ #define NUM_DWMAC100_DMA_REGS	9
+ #define NUM_DWMAC1000_DMA_REGS	23
+ #define NUM_DWMAC4_DMA_REGS	27
+@@ -170,4 +207,18 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			struct stmmac_extra_stats *x, u32 chan, u32 dir);
+ int dwmac_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr);
+ 
++static inline u32 dma_chan_base_addr(u32 base, u32 chan)
++{
++	return base + chan * DMA_CHAN_OFFSET;
++}
++
++#define DMA_CHAN_XMT_POLL_DEMAND(chan)	dma_chan_base_addr(DMA_XMT_POLL_DEMAND, chan)
++#define DMA_CHAN_INTR_ENA(chan)		dma_chan_base_addr(DMA_INTR_ENA, chan)
++#define DMA_CHAN_CONTROL(chan)		dma_chan_base_addr(DMA_CONTROL, chan)
++#define DMA_CHAN_STATUS(chan)		dma_chan_base_addr(DMA_STATUS, chan)
++#define DMA_CHAN_BUS_MODE(chan)		dma_chan_base_addr(DMA_BUS_MODE, chan)
++#define DMA_CHAN_RCV_BASE_ADDR(chan)	dma_chan_base_addr(DMA_RCV_BASE_ADDR, chan)
++#define DMA_CHAN_TX_BASE_ADDR(chan)	dma_chan_base_addr(DMA_TX_BASE_ADDR, chan)
++#define DMA_CHAN_RX_WATCHDOG(chan)	dma_chan_base_addr(DMA_RX_WATCHDOG, chan)
++
+ #endif /* __DWMAC_DMA_H__ */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+index 0cb337ffb7ac..c36aec97bbb5 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+@@ -31,63 +31,63 @@ int dwmac_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
+ 				   void __iomem *ioaddr, u32 chan)
+ {
+-	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
++	writel(1, ioaddr + DMA_CHAN_XMT_POLL_DEMAND(chan));
+ }
+ 
+ void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  u32 chan, bool rx, bool tx)
+ {
+-	u32 value = readl(ioaddr + DMA_INTR_ENA);
++	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+ 
+ 	if (rx)
+ 		value |= DMA_INTR_DEFAULT_RX;
+ 	if (tx)
+ 		value |= DMA_INTR_DEFAULT_TX;
+ 
+-	writel(value, ioaddr + DMA_INTR_ENA);
++	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+ }
+ 
+ void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			   u32 chan, bool rx, bool tx)
+ {
+-	u32 value = readl(ioaddr + DMA_INTR_ENA);
++	u32 value = readl(ioaddr + DMA_CHAN_INTR_ENA(chan));
+ 
+ 	if (rx)
+ 		value &= ~DMA_INTR_DEFAULT_RX;
+ 	if (tx)
+ 		value &= ~DMA_INTR_DEFAULT_TX;
+ 
+-	writel(value, ioaddr + DMA_INTR_ENA);
++	writel(value, ioaddr + DMA_CHAN_INTR_ENA(chan));
+ }
+ 
+ void dwmac_dma_start_tx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value |= DMA_CONTROL_ST;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_stop_tx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value &= ~DMA_CONTROL_ST;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_start_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value |= DMA_CONTROL_SR;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
+ {
+-	u32 value = readl(ioaddr + DMA_CONTROL);
++	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
+ 	value &= ~DMA_CONTROL_SR;
+-	writel(value, ioaddr + DMA_CONTROL);
++	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
+ }
+ 
+ #ifdef DWMAC_DMA_DEBUG
+@@ -167,7 +167,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
+ 	int ret = 0;
+ 	/* read the status register (CSR5) */
+-	u32 intr_status = readl(ioaddr + DMA_STATUS);
++	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
+ 
+ #ifdef DWMAC_DMA_DEBUG
+ 	/* Enable it to monitor DMA rx/tx status in case of critical problems */
+@@ -182,7 +182,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 		intr_status &= DMA_STATUS_MSK_TX;
+ 
+ 	/* ABNORMAL interrupts */
+-	if (unlikely(intr_status & DMA_STATUS_AIS)) {
++	if (unlikely(intr_status & DMA_ABNOR_INTR_STATUS)) {
+ 		if (unlikely(intr_status & DMA_STATUS_UNF)) {
+ 			ret = tx_hard_error_bump_tc;
+ 			x->tx_undeflow_irq++;
+@@ -205,13 +205,13 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			x->tx_process_stopped_irq++;
+ 			ret = tx_hard_error;
+ 		}
+-		if (unlikely(intr_status & DMA_STATUS_FBI)) {
++		if (unlikely(intr_status & DMA_FB_INTR_STATUS)) {
+ 			x->fatal_bus_error_irq++;
+ 			ret = tx_hard_error;
+ 		}
+ 	}
+ 	/* TX/RX NORMAL interrupts */
+-	if (likely(intr_status & DMA_STATUS_NIS)) {
++	if (likely(intr_status & DMA_NOR_INTR_STATUS)) {
+ 		if (likely(intr_status & DMA_STATUS_RI)) {
+ 			u32 value = readl(ioaddr + DMA_INTR_ENA);
+ 			/* to schedule NAPI on real RIE event. */
+@@ -232,12 +232,11 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			x->rx_early_irq++;
+ 	}
+ 	/* Optional hardware blocks, interrupts should be disabled */
+-	if (unlikely(intr_status &
+-		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
++	if (unlikely(intr_status & DMA_INTR_STATUS))
+ 		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
+ 
+ 	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+-	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
++	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
+ 
+ 	return ret;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index 93cead5613e3..e5e7ac03459d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -58,7 +58,8 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+ 		dev_info(priv->device, "Enhanced/Alternate descriptors\n");
+ 
+ 		/* GMAC older than 3.50 has no extended descriptors */
+-		if (priv->synopsys_id >= DWMAC_CORE_3_50) {
++		if (priv->synopsys_id >= DWMAC_CORE_3_50 ||
++		    priv->synopsys_id == DWGMAC_CORE_1_00) {
+ 			dev_info(priv->device, "Enabled extended descriptors\n");
+ 			priv->extend_desc = 1;
+ 		} else {
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 132d4f679b95..7371713c116d 100644
+index 7371713c116d..aafc75fa14a0 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -3552,7 +3552,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 	int_name = priv->int_name_mac;
- 	sprintf(int_name, "%s:%s", dev->name, "mac");
- 	ret = request_irq(dev->irq, stmmac_mac_interrupt,
--			  0, int_name, dev);
-+			  priv->plat->irq_flags, int_name, dev);
- 	if (unlikely(ret < 0)) {
- 		netdev_err(priv->dev,
- 			   "%s: alloc mac MSI %d (error: %d)\n",
-@@ -3569,7 +3569,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s", dev->name, "wol");
- 		ret = request_irq(priv->wol_irq,
- 				  stmmac_mac_interrupt,
--				  0, int_name, dev);
-+				  priv->plat->irq_flags, int_name, dev);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc wol MSI %d (error: %d)\n",
-@@ -3587,7 +3587,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s", dev->name, "lpi");
- 		ret = request_irq(priv->lpi_irq,
- 				  stmmac_mac_interrupt,
--				  0, int_name, dev);
-+				  priv->plat->irq_flags, int_name, dev);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc lpi MSI %d (error: %d)\n",
-@@ -3605,7 +3605,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s", dev->name, "safety-ce");
- 		ret = request_irq(priv->sfty_ce_irq,
- 				  stmmac_safety_interrupt,
--				  0, int_name, dev);
-+				  priv->plat->irq_flags, int_name, dev);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc sfty ce MSI %d (error: %d)\n",
-@@ -3623,7 +3623,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s", dev->name, "safety-ue");
- 		ret = request_irq(priv->sfty_ue_irq,
- 				  stmmac_safety_interrupt,
--				  0, int_name, dev);
-+				  priv->plat->irq_flags, int_name, dev);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc sfty ue MSI %d (error: %d)\n",
-@@ -3644,7 +3644,8 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
- 		ret = request_irq(priv->rx_irq[i],
- 				  stmmac_msi_intr_rx,
--				  0, int_name, &priv->dma_conf.rx_queue[i]);
-+				  priv->plat->irq_flags, int_name,
-+				  &priv->dma_conf.rx_queue[i]);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc rx-%d  MSI %d (error: %d)\n",
-@@ -3669,7 +3670,8 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
- 		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
- 		ret = request_irq(priv->tx_irq[i],
- 				  stmmac_msi_intr_tx,
--				  0, int_name, &priv->dma_conf.tx_queue[i]);
-+				  priv->plat->irq_flags, int_name,
-+				  &priv->dma_conf.tx_queue[i]);
- 		if (unlikely(ret < 0)) {
- 			netdev_err(priv->dev,
- 				   "%s: alloc tx-%d  MSI %d (error: %d)\n",
-diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 0b4658a7eceb..664a0e1cefc2 100644
---- a/include/linux/stmmac.h
-+++ b/include/linux/stmmac.h
-@@ -312,5 +312,6 @@ struct plat_stmmacenet_data {
- 	int msi_tx_base_vec;
- 	const struct dwmac4_addrs *dwmac4_addrs;
- 	unsigned int flags;
-+	unsigned int irq_flags;
- };
- #endif
+@@ -7062,6 +7062,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+ 	/* dwmac-sun8i only work in chain mode */
+ 	if (priv->plat->flags & STMMAC_FLAG_HAS_SUN8I)
+ 		chain_mode = 1;
++
+ 	priv->chain_mode = chain_mode;
+ 
+ 	/* Initialize HW Interface */
+@@ -7142,6 +7143,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+ 	 * riwt_off field from the platform.
+ 	 */
+ 	if (((priv->synopsys_id >= DWMAC_CORE_3_50) ||
++		(priv->synopsys_id == DWGMAC_CORE_1_00) ||
+ 	    (priv->plat->has_xgmac)) && (!priv->plat->riwt_off)) {
+ 		priv->use_riwt = 1;
+ 		dev_info(priv->device,
 -- 
 2.31.4
 
