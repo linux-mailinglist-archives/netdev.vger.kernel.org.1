@@ -1,112 +1,103 @@
-Return-Path: <netdev+bounces-47017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2F37E7A36
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:38:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBBD37E7A37
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF21B1C20B6E
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:38:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7CF71C20ABE
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC4F3ED7;
-	Fri, 10 Nov 2023 08:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940316FD8;
+	Fri, 10 Nov 2023 08:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N7dujEP1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a7GDCKJX"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8141C3C
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:38:36 +0000 (UTC)
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E19BCA256
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:38:33 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id 4fb4d7f45d1cf-545557de8e6so21284a12.0
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:38:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699605512; x=1700210312; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9enKIlQx7Ll0We+uQl4xwkZb2Jwnx+iM0ls3QWAyu8=;
-        b=N7dujEP1wOWD8itcEQmgaq+WuFYrXo+xdSLevfOA8blSoS6qfugDXqeAQxueiPE1SY
-         Axr3XWI6DIw8hSo6kFMVVaGi608Br65/HWOhtNRiicOBBQ9X1tTNS/FBVP6CppXC9khp
-         jvK3QF4Kg0qxf9foxJi6xNdeYxbtkG8ASvTzmZ2T+2wAWqqeMI2lfzBHgwpgD/i7DsyU
-         vVQsnINjIDTg/22YJrYPeaCacwC9qwV5Fky3V9PKTPGesdRrAot+cem8UW3J/0z02tn+
-         s+vT6kVA+iIl3vTbXN9uOGpYwhE/cNvUl9BAJj3QTe1u2eQzohR9uMxyOqbetMfoub/D
-         SbYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699605512; x=1700210312;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=s9enKIlQx7Ll0We+uQl4xwkZb2Jwnx+iM0ls3QWAyu8=;
-        b=ZnUlGOjOlk1+9wDBVbwanGXrxEcOH9PreQ2XYSEGdSdPfdDKP1oZ67rnt1PciAYBQ6
-         3WRW8rJomZY4BMZW5n5s9oot7UIiEorS+8uX5PUt0mZLR9v0JyFeAoUFM/F59fdoLq6y
-         sS4JNiiuGR63cCqU7oEhRM8S/Kd+kQEdvoUlj6c3NXcegEV0tJskzhZBo+i6oEd94kRW
-         5LZ8Cu+/yYZQ14XPkDHEU11N7A+4nbFliNhipmAVlQ2OpjM1SE/qDSpuY2nOwwXc3W40
-         nqV3YoAqxs+uYBrgaG0yQd5ZzTNc6XCf3CBGbIalnRzYVQPIUKhlqFLGEI/1iXaHG/mJ
-         zGFQ==
-X-Gm-Message-State: AOJu0YysqBuZ9d05QCR4yvQbSFhQGZxe7ryBBdk708PeopCC/c5iNo5/
-	9POKMT/V3wthhVG1cUy0a4aFeZoY/c8hpP0NOHRlWA==
-X-Google-Smtp-Source: AGHT+IEBFpWM6rT58IrR0RMqmNvgsw5e9jnd06qZHvYrlq5rVZEoxlryCRIKPsRcix1X+pGqo0qCGXhR77kw2edEUQM=
-X-Received: by 2002:a05:6402:5410:b0:545:2e6:cf63 with SMTP id
- ev16-20020a056402541000b0054502e6cf63mr356431edb.6.1699605511709; Fri, 10 Nov
- 2023 00:38:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7854D6AA5
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:40:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F1B02C433C9;
+	Fri, 10 Nov 2023 08:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699605629;
+	bh=saabdHyMdvYng2Dm3AITfV8opude96FOgCmZKQQ9Eew=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=a7GDCKJXsxeZRLI4Kdg05bO/fVQCEWG0xKShB+lG5QpJOLheLL9wPxRJvtSaIFCBz
+	 xx55YTy6+GYLQXEqALeON+ZnzpFKYRLfpCXK7p9dzuBONrM8gT8TgLJKNWwHltfN1S
+	 IQ08kx8R6YYKXktp4anXEQOHrCxp9p9k2NSS9CxA+dkphakXtjGzV1SrDuQZpbfN1a
+	 lci16sUuG8TmkCQ88IFXgMZrbMKDKWTFR6HPadG2fNRdLveksmr86MJcIF5Vsg1VLV
+	 IVGmoHaop+U2L94HNAfvjJaiIK9liCkHiGR0yKGlaDncsrXEIgCWTUcVg4fxg1iKIa
+	 HKoD/N6+2knpw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D3AA8C4166E;
+	Fri, 10 Nov 2023 08:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231109180102.4085183-1-edumazet@google.com> <ZU2nBgeOAZVs4KKJ@Laptop-X1>
-In-Reply-To: <ZU2nBgeOAZVs4KKJ@Laptop-X1>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Nov 2023 09:38:18 +0100
-Message-ID: <CANn89iLXNnHNdApy3JaOpnq-hkrDyR-vTYjDEiTaU5oJ1uAPTg@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: stop the device in bond_setup_by_slave()
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Jay Vosburgh <j.vosburgh@gmail.com>, 
-	Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND] ptp: Fixes a null pointer dereference in ptp_ioctl
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169960562886.22093.15188059654948446469.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Nov 2023 08:40:28 +0000
+References: <DB3PR10MB6835D68E7E632532155AE585E8A9A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+In-Reply-To: <DB3PR10MB6835D68E7E632532155AE585E8A9A@DB3PR10MB6835.EURPRD10.PROD.OUTLOOK.COM>
+To: Yuran Pereira <yuran.pereira@hotmail.com>
+Cc: richardcochran@gmail.com, netdev@vger.kernel.org, eadavis@qq.com,
+ davem@davemloft.net, reibax@gmail.com, linux-kernel@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org,
+ syzbot+8a78ecea7ac1a2ea26e5@syzkaller.appspotmail.com
 
-On Fri, Nov 10, 2023 at 4:44=E2=80=AFAM Hangbin Liu <liuhangbin@gmail.com> =
-wrote:
->
-> On Thu, Nov 09, 2023 at 06:01:02PM +0000, Eric Dumazet wrote:
-> > Commit 9eed321cde22 ("net: lapbether: only support ethernet devices")
-> > has been able to keep syzbot away from net/lapb, until today.
-> >
-> > In the following splat [1], the issue is that a lapbether device has
-> > been created on a bonding device without members. Then adding a non
-> > ARPHRD_ETHER member forced the bonding master to change its type.
-> >
-> > The fix is to make sure we call dev_close() in bond_setup_by_slave()
-> > so that the potential linked lapbether devices (or any other devices
-> > having assumptions on the physical device) are removed.
-> >
-> > A similar bug has been addressed in commit 40baec225765
-> > ("bonding: fix panic on non-ARPHRD_ETHER enslave failure")
-> >
->
-> Do we need also do this if the bond changed to ether device from other de=
-v
-> type? e.g.
->
->     if (slave_dev->type !=3D ARPHRD_ETHER)
->             bond_setup_by_slave(bond_dev, slave_dev);
->     else
->             bond_ether_setup(bond_dev);
+Hello:
 
-Hmmm... possibly, but as far as I know, nothing can be stacked on top of IP=
-oIB
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Note that another way to deal with this in a fine grained way is to
-return NOTIFY_BAD
-from NETDEV_PRE_TYPE_CHANGE event (vlan, macvlan, ipvlan ...)
+On Wed,  8 Nov 2023 02:18:36 +0530 you wrote:
+> Syzkaller found a null pointer dereference in ptp_ioctl
+> originating from the lack of a null check for tsevq.
+> 
+> ```
+> general protection fault, probably for non-canonical
+> 	address 0xdffffc000000020b: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: probably user-memory-access in range
+> 	[0x0000000000001058-0x000000000000105f]
+> CPU: 0 PID: 5053 Comm: syz-executor353 Not tainted
+> 	6.6.0-syzkaller-10396-g4652b8e4f3ff #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine,
+> 	BIOS Google 10/09/2023
+> RIP: 0010:ptp_ioctl+0xcb7/0x1d10 drivers/ptp/ptp_chardev.c:476
+> ...
+> Call Trace:
+>  <TASK>
+>  posix_clock_ioctl+0xf8/0x160 kernel/time/posix-clock.c:86
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:871 [inline]
+>  __se_sys_ioctl fs/ioctl.c:857 [inline]
+>  __x64_sys_ioctl+0x18f/0x210 fs/ioctl.c:857
+>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>  do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> ```
+> 
+> [...]
+
+Here is the summary with links:
+  - [RESEND] ptp: Fixes a null pointer dereference in ptp_ioctl
+    https://git.kernel.org/netdev/net/c/8a4f030dbced
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
