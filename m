@@ -1,103 +1,108 @@
-Return-Path: <netdev+bounces-47042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5CD37E7AD0
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:28:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD06F7E7ADA
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:30:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 700822817DA
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:28:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91FFF1F20EBB
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEE4125A4;
-	Fri, 10 Nov 2023 09:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="wg4lb0nM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CBD125DB;
+	Fri, 10 Nov 2023 09:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E601812E42
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:27:56 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B73512BE39;
-	Fri, 10 Nov 2023 01:27:55 -0800 (PST)
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3AA9RqtS007745;
-	Fri, 10 Nov 2023 03:27:52 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1699608472;
-	bh=BLiCtDU8nsdSlSYXr+3R3b3TK6oRBbRtfnrRbMla3fQ=;
-	h=From:To:CC:Subject:Date;
-	b=wg4lb0nM28xuVFrj7xZbsG+0ulGees5j9LtTlUXzsOLNq/re+764g8EUYZaetn0X1
-	 WjqduiTMzPHqW18sn6CUfnQGZ8DKCwokL+YsV4bKBKgW8S4dMeUHNyJHiKQGK9AFQ0
-	 jJvv6orpPe63CS2BLXhlOm0k9XHEYCK7Mk+CGg4Y=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3AA9Rqfm006658
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 10 Nov 2023 03:27:52 -0600
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
- Nov 2023 03:27:52 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 10 Nov 2023 03:27:52 -0600
-Received: from uda0500640.dal.design.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3AA9RnX8016335;
-	Fri, 10 Nov 2023 03:27:50 -0600
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>, <nm@ti.com>, <srk@ti.com>, <rogerq@kernel.org>,
-        <r-gunasekaran@ti.com>
-Subject: [PATCH v2] MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
-Date: Fri, 10 Nov 2023 14:57:49 +0530
-Message-ID: <20231110092749.3618-1-r-gunasekaran@ti.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A992F125A4
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:30:43 +0000 (UTC)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CFDB024482
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:30:41 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.112.120])
+	by gateway (Coremail) with SMTP id _____8CxtPA_+E1lyrQ4AA--.47052S3;
+	Fri, 10 Nov 2023 17:30:39 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.112.120])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxnd49+E1lUfw9AA--.5972S2;
+	Fri, 10 Nov 2023 17:30:38 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	fancer.lancer@gmail.com,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	dongbiao@loongson.cn,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v5 9/9] net: stmmac: Disable coe for some Loongson GNET
+Date: Fri, 10 Nov 2023 17:30:27 +0800
+Message-Id: <c55b7c78c7a992fa3d41f88c87b67b4550373980.1699533745.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
+In-Reply-To: <cover.1699533745.git.siyanteng@loongson.cn>
+References: <cover.1699533745.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Dxnd49+E1lUfw9AA--.5972S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7XFWUZrW8Gr1kJFW3Ww13WrX_yoWfCFXE9F
+	42vrn3Xa1UtF1ak34vgw15Z34S9w4Duw1rAFsFqayFka92g3s8Jr95ur97JFsxur95ZF9r
+	Gr1xt34xAw1xJosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbhkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26Fy2
+	6r45twAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVW7JVWDJwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAIcVC2z280aVCY
+	1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07j4PfQUUUUU=
 
-Grygorii is no longer associated with TI and messages addressed to
-him bounce.
+Some chips of Loongson GNET does not support coe, so disable them.
 
-Add Siddharth, Roger and myself as reviewers.
-
-Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 ---
-Changes from v1:
---------------
-* Added Roger as reviewer upon on his request
+ drivers/net/ethernet/stmicro/stmmac/hwif.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-v1: https://lore.kernel.org/all/20231110084227.2616-1-r-gunasekaran@ti.com/
-
- MAINTAINERS | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7b151710e8c5..1466699fbaaf 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -21775,7 +21775,9 @@ F:	Documentation/devicetree/bindings/counter/ti-eqep.yaml
- F:	drivers/counter/ti-eqep.c
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index e5e7ac03459d..c1ea68514acc 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -72,6 +72,11 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
+ 		mac->desc = &ndesc_ops;
+ 	}
  
- TI ETHERNET SWITCH DRIVER (CPSW)
--R:	Grygorii Strashko <grygorii.strashko@ti.com>
-+R:	Siddharth Vadapalli <s-vadapalli@ti.com>
-+R:	Ravi Gunasekaran <r-gunasekaran@ti.com>
-+R:	Roger Quadros <rogerq@kernel.org>
- L:	linux-omap@vger.kernel.org
- L:	netdev@vger.kernel.org
- S:	Maintained
++	if (priv->synopsys_id == DWGMAC_CORE_1_00) {
++		priv->plat->tx_coe = 0;
++		priv->plat->rx_coe = STMMAC_RX_COE_NONE;
++	}
++
+ 	stmmac_dwmac_mode_quirk(priv);
+ 	return 0;
+ }
 -- 
-2.17.1
+2.31.4
 
 
