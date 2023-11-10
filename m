@@ -1,215 +1,179 @@
-Return-Path: <netdev+bounces-47044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C2047E7ADD
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:31:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C717E7AE0
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A72442814E8
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:31:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FF531C20CA2
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F1512B68;
-	Fri, 10 Nov 2023 09:31:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20A125DB;
+	Fri, 10 Nov 2023 09:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJyw1hn2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GLlmWqNx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F71E125D3
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:31:01 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A647424488
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:30:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699608659; x=1731144659;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=xO//tMHiCHTu6JKtWLb8iOLpZiGDRktwJKxFo0U0Fms=;
-  b=GJyw1hn2kNhPFTmwrg81DyxE8wabbiOUzaWlGYpQFOVogkhDOnAuZnKZ
-   QD+9WCicPTtwkG+tRnzMTFHwGMCTPVHORquB3t3PUeC0ICu+gNn/oS5+Y
-   yPR47oG70WLDBsdto7cpH3t8SK7JaNZdlIdd2IVgmySgFb6OTNrjTXhtR
-   MFGLgOyMI1ZQLOyUQPjNiMBZhCkFJ1fGt4uIlHVUVe5FEkzHsH0hVeeCz
-   SXHHRfIq74NXTS+PbCWmZyGTUDUYHEtPQM/NvS7XAzilo6eYXtFPQFOS2
-   8iNrwNrCd/RH+zPyxZhLnHpnxHwcXiDVAAv9pvOhFEfsYXdPaJGTDVglk
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="387323983"
-X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="387323983"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 01:30:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="4810029"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Nov 2023 01:30:56 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 10 Nov 2023 01:30:54 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Fri, 10 Nov 2023 01:30:54 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Fri, 10 Nov 2023 01:30:54 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QSOrGeIofoa7X1Cm7IIDo8cSfcLh7PvgA9B1PJpEaHLUFVXYRIiNIRG4D0jrFCfGX04B+HaLV7gjoOOQVMfs8IzUKYEdxEhOgKFzKHUrmWsigmLEqWrRp5xXp87iSpHUyxwwk/4EpNO2yDtFPg/V9+BgFep8zfZrIRA6ca1N8JJDT3kC/Gci/UmHWhrhxRE5CT1lU91cJ+ffJ9tWkxunRP56V5SAI8RoLK+/GDP0bfHMcf8KFDKDwxId4llBcQ5HZ34vJczMI8HuOpBRc/HhHFXa9F6qfl/71QlRCeU3BKvJP4+9GwEe+6vxcbMcaAmfRufIn8BvJUGLMPosbMIFvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EB6jgrTwA6TEAmvnpeun+YwHXNg91uHBf3GT4uCxPgk=;
- b=d0gppj383wnN6wPRC4otiZFDdamDU0+HAoBnJoUrmgm7HVBA+EUxfX+egaGmeDe4CbWmNbniy9VUpA7eTsMuzD1bBYWv5qkBXktkvzme/0xm4NC/wmfiJo+6vLvFGjAGyIB+/IclSBiKtLnirzDf4sl4w1dskhlelRxq3liDeoKQvqci+9cX3cCYTkDfE7U62IP/bBnsb1XxJ6d/X4wfKRIvHmS5oMXxQwHLYE3f5XakzcvizmjbGIqo/jOjmzoEQJodPMZVpsFP8tSs+9MWftGX6pk3DPwAkC44vrns+nTQuIQtip5x4Iu1GNidZhNHZ3uhvPmWnew6kqYo9GC2UQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5354.namprd11.prod.outlook.com (2603:10b6:408:11b::7)
- by PH0PR11MB5952.namprd11.prod.outlook.com (2603:10b6:510:147::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Fri, 10 Nov
- 2023 09:30:49 +0000
-Received: from BN9PR11MB5354.namprd11.prod.outlook.com
- ([fe80::e716:9ed:e589:aa69]) by BN9PR11MB5354.namprd11.prod.outlook.com
- ([fe80::e716:9ed:e589:aa69%4]) with mapi id 15.20.6977.019; Fri, 10 Nov 2023
- 09:30:49 +0000
-From: "Arland, ArpanaX" <arpanax.arland@intel.com>
-To: "Greenwalt, Paul" <paul.greenwalt@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Nowlin, Dan" <dan.nowlin@intel.com>, "Fijalkowski, Maciej"
-	<maciej.fijalkowski@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Greenwalt, Paul" <paul.greenwalt@intel.com>,
-	"horms@kernel.org" <horms@kernel.org>, "Drewek, Wojciech"
-	<wojciech.drewek@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package
- download for packages without signature segment
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package
- download for packages without signature segment
-Thread-Index: AQHaEaGgDo2pwu4lPUytI94AsyT9TbBzLzzA
-Date: Fri, 10 Nov 2023 09:30:48 +0000
-Message-ID: <BN9PR11MB5354BE41B278F3CA1E9FB35B80AEA@BN9PR11MB5354.namprd11.prod.outlook.com>
-References: <20231107173227.862417-1-paul.greenwalt@intel.com>
-In-Reply-To: <20231107173227.862417-1-paul.greenwalt@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5354:EE_|PH0PR11MB5952:EE_
-x-ms-office365-filtering-correlation-id: 0cb1a3a2-3119-401a-c9c8-08dbe1cfb98d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: oQUggzoQ4TXxAsmwfX4DW+StxO56zzWGVSgUBtyroQzowqwKstBhcywzETfYDJmZT5Xf/57y53AqT6O22rx791BaSM1z8cpzYbvd0gWrQCqMyOPC4YdPsx1kH4wFSrVAm7VvMJ2RKnhowiPvo73fWuJYkJB2rBOFzxblvuhVrSTbWJF6lc83STePJgoJ3yRA0pAzOlVfF7HdcAtSbsm2y2HqzZtcJpIhTjhQ4blnvnTccTSNCuiDiwSY6/tZnkw8OmBrtqwmfmoJsg0V3TUo5jmONqteuz5Wd9AqT9XmViSsXReIHbYZd9/hOBd4RKN5g+qoyukhUbkex33RiWNj/CiYn8wgDtK6fQt4HRRQKMMWBZiN+vDuIAOlC91Dlj07uEiGREm/Fz7ozv8WBWY98FUHvxGAFSQaU36qJoiHYEXjkyHg3Mn0BVqmR0BvXwXWsJoFFh/KoEOIeR2YtBglnUANwR/0EqcriWz9X4Wuz0JkhGO8A4SPmB54XMbH0onKn2GC0gVUlYdtnO58aSAJw0N3luuEh22q9PcUlOY9o0jvO7k4QVV0dO+mIJF+Nh2x3w79vrWDSh6+bADg2PCn+8fEuWiEJrNICb9cfH6GTlcWUAjDYcSiZSxLd70ng+uDqYtJEtovrbJmgM/X91nRpg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5354.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(376002)(396003)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(9686003)(33656002)(55236004)(38100700002)(7696005)(53546011)(6506007)(71200400001)(26005)(41300700001)(83380400001)(38070700009)(110136005)(64756008)(66446008)(54906003)(66556008)(66946007)(5660300002)(66476007)(76116006)(55016003)(86362001)(316002)(82960400001)(122000001)(52536014)(8936002)(8676002)(2906002)(966005)(4326008)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VfGVbCISDFsvCWsqxtIaR4f6EZ5cSCtkKfB3qvwXwsU3ZvCYguk0K6uUk4bj?=
- =?us-ascii?Q?pm2AvSp5mtFR39ozEEAvB3JhFLGph8s0voTJgwC62fqqGlSsk6VExh/w9PWw?=
- =?us-ascii?Q?txqwhNPVcTyE0neZCou/VrFRfU5SOSTv82gsS5MnrY1egpi9wfdI5MMOOoi8?=
- =?us-ascii?Q?1wo0CH58xFzhnIL3Jlk9NuZMS0781ubAKtPYrJu/w0EhaJ9v4TYXIY7TotKa?=
- =?us-ascii?Q?Y5lHg5I6nIPeASUa0wJGaRCvrF2jZFb4+DpTu0VqHxomAhtc0Fwi7jeR/s1X?=
- =?us-ascii?Q?L9izNlyENaDEAtfJQc7Z17p9FbqXCdC+S7X36S1EVEmin3Z+j4ho+amhbBkq?=
- =?us-ascii?Q?rxrKSLvSjvmGX/Re2fsPNVEdbj4eXtWYM8aDYkcdVG58zxv6vmcl8z78Tvda?=
- =?us-ascii?Q?K7iyh4umY8K3A08O8emGpmvXhX9eVix6tFnQICR8bZfpDaGRgG+VgqkWdbjw?=
- =?us-ascii?Q?bFQjFmKldUT94+E+2TZrLwvwsxiIpjLMZqmxK7gK5bl+tG7OfsbNtrNhyT4/?=
- =?us-ascii?Q?FgEKNJjihE9W3+1hmht3l2et9Wg38wfsjg2g+MAHbmH6/Fd8YAtos8sfu/iI?=
- =?us-ascii?Q?0Nq61uMs/rRnOAmQk5cZcmF0SQqMq01rPOOZkAZjmZeIIwVtLzLr4iWE5n6Q?=
- =?us-ascii?Q?bmLa5PFFvc5rvJiXK20eIEDgacsw5+7/zzaoFK77ndUSBaC/shGNokvn5xcg?=
- =?us-ascii?Q?BQQ9quQa+4CBNOOzE5+PYvePx2G8BEfmWAd70Dp0VfOkAlKBcn1Dc34awGQv?=
- =?us-ascii?Q?y/GowwvTBIm/UHstyhE4xDk3tMIFwmM0cZe4st314HejImmjAqNQpwxz8bQp?=
- =?us-ascii?Q?XdIYesl0joKJkSoa1eXqJVht91waV1zDv5X3yN1octh52brx+KzGeTgVTtXc?=
- =?us-ascii?Q?yoWOTH5Y5IrqAEnsh3UNkOjSg4gj6cYPyI/+QhnVGm/0iUl+yfD5W48aDxfG?=
- =?us-ascii?Q?gNcQjYOotJA0sXd+WKY3iRSSmSft2oeEkbwMp3JzOs+0jbhiAbi1S1BEqvCR?=
- =?us-ascii?Q?9OpwKMsqrDQVGti06zryS/CPipfMC3E17WBzpAtiqYisdcvyHrCL0BFiwO2I?=
- =?us-ascii?Q?tc6MxIuHMSU7ekzZsqSvZHwRcYNWynEEqd/9dv01Bpb4n5iVB0tQ7nNaSuFZ?=
- =?us-ascii?Q?TNIbCPelZWTneVWlNWRqmIFusas75V+gXxwrUGRvpZQe/PAIrLVA1hek6mR+?=
- =?us-ascii?Q?95PvVI/t+l+3DAJStvQuoxLbTkLwoyjmR9MUJzF7bKl7wKekHZIe+cod4xwm?=
- =?us-ascii?Q?RCpa7cdP31Ru9nv45OUaXtWCAku3AE+Oxj/OBqIS35b7nPdUcb2cV7ZKWkGQ?=
- =?us-ascii?Q?xhnXv9zQT2bwiXnyQVVqJcNUbUfcNe3SDIwVGxV8XvM8C0xK8QsKhhpmQJgj?=
- =?us-ascii?Q?0KfcIuVlmdqbgW7t0vAG4guhq8ImKaFUXv3rWnxOYHjwIH/45b7B/XdwEx/6?=
- =?us-ascii?Q?SJ1JGTiVwdugpsxcVdlTNUeted027Zf39rnYZgc9y3EEz/R94gWPKQ0/rBq4?=
- =?us-ascii?Q?0xa/iu1eyBcfA5BCHv1+KUN2omEuX6xoReftM+em+rwMsmEQYt5B2znrDMLu?=
- =?us-ascii?Q?nD5SktfLODxdCT2FzatmAOeuL3z8pAzq3mpc0ZmF?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494512B68
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:31:10 +0000 (UTC)
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E877124489
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:31:05 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so24096a12.1
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:31:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699608664; x=1700213464; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ksKC5N5S1VwyLBs8puatXQ5O6wSMGiBfXyqCMNWeYS0=;
+        b=GLlmWqNxmYnB2EqluZiCz+8D0g4pXZpw8oYS4Pu0rDkOkG4mLp7P5dywjCL3MKM8pF
+         GNkSz/bI+hDLcu9gkjtcRhFDSezB6SoINxEs5bpMs6i/BuhPG7KiV0iRXWRj//SkXL3R
+         U7zazpVKD3PYbMXUgXKcH+w9SSKZR6BW5+z3mIMOFeDmSjMf6qqGP/llZIDnV6HZLqrJ
+         1lQfsYZdAkOfLs3qG/17zNkep1NQPWneAP150QFMn52QFDW/21AdwIs5ujKRQZaXzqLv
+         1LSG/8uO89HG6EQm09Hnb7UEWCuS9EEkeD7C66JxPy/atUuWNtDUi7cWbNPLa8F/cHL5
+         XErg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699608664; x=1700213464;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ksKC5N5S1VwyLBs8puatXQ5O6wSMGiBfXyqCMNWeYS0=;
+        b=GCp1QCFL5IuNl7eJYjPpU0IYKxpXmRlcmlEYs9yqA4qs+P6c1HARgQKqGxuMe5bJtr
+         djmKi1y09a55wuglUIe7s+la2Z3uH0l+CLwa6noNjEHpXXZQpHSpMcc60KeVsWUU1Pog
+         uvKQZTelmzlmroHTfTuvfiGLDsVGeoOAoPDHuBEKB48/l8d7/kgC9Hl6OthdgunP2DDU
+         uIhGXi/yWN1SSNJqYMuDsnFCSLeEPuiRg/EcEPl0Mev7mM3ip+vNiabY8r6G+aX182Ic
+         GHmfMKUGx8eGx08pLm2vw/18AzIJn0TKL6VMnCwuAbC12NjwPMqk8wj5xZk9m7o7HLBo
+         zs9g==
+X-Gm-Message-State: AOJu0Yy/me9H65NU8BgzVBALndFtj9fPZfUlf6CaGi1McK2VKJk9G6uF
+	Ihd3QBvRwBgdUnSUb2EidQpd/D6q4zTVVWWTBNRsLA==
+X-Google-Smtp-Source: AGHT+IGcsfjTyKWdpxswyD/khdOvVcyNQpeNRxwBtmA6S2pZzXcxgaiSZg7dqCQNUa8KOrtv0uaK5Oi+Gtl9Nk9nbpA=
+X-Received: by 2002:a05:6402:1484:b0:544:466b:3b20 with SMTP id
+ e4-20020a056402148400b00544466b3b20mr299720edv.5.1699608663758; Fri, 10 Nov
+ 2023 01:31:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5354.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb1a3a2-3119-401a-c9c8-08dbe1cfb98d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2023 09:30:49.0106
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xpmLBCKRDFrWbM+BaH/YbvquvdqhilCdn62lOC0VsiFwg+XHlqqkgti5FwovIvrw2WDvnIvvxU22nhzi5aouQ2aaXry6GcF4kg9DaFZiSKg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5952
-X-OriginatorOrg: intel.com
+References: <ZU3EZKQ3dyLE6T8z@debian.debian>
+In-Reply-To: <ZU3EZKQ3dyLE6T8z@debian.debian>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 10 Nov 2023 10:30:49 +0100
+Message-ID: <CANn89iKZYsWGT1weXZ6W7_z28dqJwTZeg+2_Lw+x+6spUHp8Eg@mail.gmail.com>
+Subject: Re: [PATCH net-next] packet: add a generic drop reason for receive
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Weongyo Jeong <weongyo.linux@gmail.com>, 
+	Ivan Babrou <ivan@cloudflare.com>, David Ahern <dsahern@kernel.org>, 
+	Jesper Brouer <jesper@cloudflare.com>, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
-aul Greenwalt
-> Sent: Tuesday, November 7, 2023 11:02 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Nowlin, Dan <dan.nowlin@intel.com>; Fijalkowski, Maciej <maciej.fijal=
-kowski@intel.com>; netdev@vger.kernel.org; Brandeburg, Jesse <jesse.brandeb=
-urg@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>; Nguyen, Anthony=
- L <anthony.l.nguyen@intel.com>; Greenwalt, Paul <paul.greenwalt@intel.com>=
-; horms@kernel.org; Drewek, Wojciech <wojciech.drewek@intel.com>; kuba@kern=
-el.org; davem@davemloft.net
-> Subject: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package downlo=
-ad for packages without signature segment
+On Fri, Nov 10, 2023 at 6:49=E2=80=AFAM Yan Zhai <yan@cloudflare.com> wrote=
+:
 >
-> From: Dan Nowlin <dan.nowlin@intel.com>
+> Commit da37845fdce2 ("packet: uses kfree_skb() for errors.") switches
+> from consume_skb to kfree_skb to improve error handling. However, this
+> could bring a lot of noises when we monitor real packet drops in
+> kfree_skb[1], because in tpacket_rcv or packet_rcv only packet clones
+> can be freed, not actual packets.
 >
-> Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment") inc=
-orrectly removed support for package download for packages without a signat=
-ure segment. These packages include the signature buffer inline in the conf=
-igurations buffers, and not in a signature segment.
+> Adding a generic drop reason to allow distinguish these "clone drops".
 >
-> Fix package download by providing download support for both packages with=
- (ice_download_pkg_with_sig_seg()) and without signature segment (ice_downl=
-oad_pkg_without_sig_seg()).
->
-> Fixes: 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
-> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Closes: https://lore.kernel.org/netdev/ZUT50a94kk2pMGKb@boxer/
-> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
-> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> [1]: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=3DZah28QwZ_5RU-xcxLFU=
+K2Zj08A8MrLk9jzg@mail.gmail.com/
+> Fixes: da37845fdce2 ("packet: uses kfree_skb() for errors.")
+> Signed-off-by: Yan Zhai <yan@cloudflare.com>
 > ---
-> Changelog
-> v2->v3:
-> - correct Changelog version tag, add Closes, Tested-by and Reviewed-by.
->   Remove unnecessary local variable initialization in ice_dwnld_cfg_bufs(=
-),
->   and unnecessary local variable in ice_download_pkg_without_sig_seg(),
-> v1->v2:
-> - correct Reported-by email address.
-> ---
->  drivers/net/ethernet/intel/ice/ice_ddp.c | 103 ++++++++++++++++++++++-
->  1 file changed, 100 insertions(+), 3 deletions(-)
+>  include/net/dropreason-core.h |  6 ++++++
+>  net/packet/af_packet.c        | 16 +++++++++++++---
+>  2 files changed, 19 insertions(+), 3 deletions(-)
 >
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
+h
+> index 845dce805de7..6ff543fe8a8b 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -81,6 +81,7 @@
+>         FN(IPV6_NDISC_NS_OTHERHOST)     \
+>         FN(QUEUE_PURGE)                 \
+>         FN(TC_ERROR)                    \
+> +       FN(PACKET_SOCK_ERROR)           \
+>         FNe(MAX)
+>
+>  /**
+> @@ -348,6 +349,11 @@ enum skb_drop_reason {
+>         SKB_DROP_REASON_QUEUE_PURGE,
+>         /** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
+>         SKB_DROP_REASON_TC_ERROR,
+> +       /**
+> +        * @SKB_DROP_REASON_PACKET_SOCK_ERROR: generic packet socket erro=
+rs
+> +        * after its filter matches an incoming packet.
+> +        */
+> +       SKB_DROP_REASON_PACKET_SOCK_ERROR,
+>         /**
+>          * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+>          * shouldn't be used as a real 'reason' - only for tracing code g=
+en
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index a84e00b5904b..94b8a9d8e038 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -2128,6 +2128,7 @@ static int packet_rcv(struct sk_buff *skb, struct n=
+et_device *dev,
+>         int skb_len =3D skb->len;
+>         unsigned int snaplen, res;
+>         bool is_drop_n_account =3D false;
+> +       enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_NOT_SPECIFIE=
+D;
+>
+>         if (skb->pkt_type =3D=3D PACKET_LOOPBACK)
+>                 goto drop;
+> @@ -2161,6 +2162,10 @@ static int packet_rcv(struct sk_buff *skb, struct =
+net_device *dev,
+>         res =3D run_filter(skb, sk, snaplen);
+>         if (!res)
+>                 goto drop_n_restore;
+> +
+> +       /* skb will only be "consumed" not "dropped" before this */
+> +       drop_reason =3D SKB_DROP_REASON_PACKET_SOCK_ERROR;
+> +
+>         if (snaplen > res)
+>                 snaplen =3D res;
+>
+> @@ -2230,7 +2235,7 @@ static int packet_rcv(struct sk_buff *skb, struct n=
+et_device *dev,
+>         if (!is_drop_n_account)
+>                 consume_skb(skb);
+>         else
+> -               kfree_skb(skb);
+> +               kfree_skb_reason(skb, drop_reason);
+>         return 0;
 
-Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at=
- Intel)
-_______________________________________________
-Intel-wired-lan mailing list
-Intel-wired-lan@osuosl.org
-https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+
+1) Note that net-next is currently closed.
+
+2) Now we have 0e84afe8ebfb ("net: dropreason: add SKB_CONSUMED reason")
+
+it is time we replace the various constructs which do not help readability:
+
+if (something)
+     consume_skb(skb);
+else
+     kfree_skb_reason(skb, drop_reason);
+
+By:
+
+kfree_skb_reason(skb, drop_reason);
+
+(By using drop_reason =3D=3D SKB_CONSUMED when appropriate)
 
