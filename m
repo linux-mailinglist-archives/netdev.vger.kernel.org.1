@@ -1,103 +1,105 @@
-Return-Path: <netdev+bounces-47027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CBC07E7A5D
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:02:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B85D37E7A71
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:07:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 222B12814BA
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:02:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A689CB20DC4
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FCCD307;
-	Fri, 10 Nov 2023 09:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B26BD26B;
+	Fri, 10 Nov 2023 09:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bXiPcsv8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TYe+m+wl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD34D269
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:02:02 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E385AAD01
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:01:59 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673BD1094C
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:07:09 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA33EAFB5
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:07:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699606920; x=1731142920;
+  t=1699607226; x=1731143226;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=gPAEedPNwmkr7XR0gfn8ef7+XjcNS1PdYJ9nNkzcwoA=;
-  b=bXiPcsv8rohwcrlVHSwy+u+tWCSE+BKul6CGDRfUB+o1TIQWpYK+ei8P
-   GKzDkk7yIzhgiFqpi+Dnra7sWMf8OHzfvQvLUxXZDSrypqFks8qgj51oS
-   EnYXXLZHe3j5e2dP8RizurjvirKRXXc2+XJyRPMBxLu8iqHtH4g5RJqR8
-   YlNomjwsAQOTmk5bH1ub04DzgWY5KuhqsDSTPjrV/szKzX6jlowQXJ/pk
-   u8ftGeCDXcTs0CwdjFe3oxgRDlmvJ7DxT+9VBx+fnhaGnCcVow9ktOwv1
-   8yurP0WXwn4ehcZITe2DWiUbAlaviEn81agg5e7z8sdMBaLxgyB1is+9z
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="375198246"
+  bh=uG3oy9+c/r3Qs1MGJ9FB/CjS1ojLtwcB4Z5JTPurAUk=;
+  b=TYe+m+wlT4oJ5brG8/1FT1qoywcDZ3n3ORgdgQfAUxE79WOwASXml2vb
+   WEPTdewQ4eUPPxW5rBlDD+LfFSJlwdOIJ+RK5cPGbk6MZe+CHZAd5yOTS
+   WFBevXY9BccZ5zp/WtT3LZYr9qlyZRGccCwQJabyqmeHFkQnoeGtK+xb/
+   StcXZ8akwd10BjseLAIHEqGAfuVSgvJ94LGVPA7U0klTW8t80vQiVrDIE
+   sLbi355Lf/ubDD027dWEblvOkfATl8P0Yc9pyUrOGqTNS4LvktOWRjZma
+   reD5AWQJsWaI6RcUqRAElR2g6G8dcnpgowThsW/g82A5tFueVc9g2HOYv
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="389016805"
 X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="375198246"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 01:01:58 -0800
+   d="scan'208";a="389016805"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 01:07:06 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="757154622"
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="887310739"
 X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
-   d="scan'208";a="757154622"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Nov 2023 01:01:58 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+   d="scan'208";a="887310739"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Nov 2023 01:07:04 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 10 Nov 2023 01:01:57 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ 15.1.2507.34; Fri, 10 Nov 2023 01:07:04 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Fri, 10 Nov 2023 01:01:57 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2507.34; Fri, 10 Nov 2023 01:07:03 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 10 Nov 2023 01:07:03 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Fri, 10 Nov 2023 01:01:57 -0800
+ 15.1.2507.34; Fri, 10 Nov 2023 01:07:02 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NtIBqb0DsDrgojr4ymQ7jOyJG4sgMMjGjaGmMlQUZluxWFhoIy0h9TenDBB3OjmIk4IuMoN+gNuNI2gHKm/M5wwlefk5sgb70Dfz1PgSKE4UM7YxYfXw1SNkeCUKkvPesC9qA+bK534UibZOlQ0oFf4ECcCoxO4YV51DTJTUmHdjw00uZtyTB80BPGkE4xEeEKwCLDhdvqsMhk+eDyU9kGBMosNeyt2Vd2C3bGFhyFDUMDbtDjmEWkkOYYTsmdTtaNRBp+cdJwE8/6Q86bGSF420BEXoAjNb3rKrMqPtUwAW4XeqqX4Rk17rHbzOY7g3bUQgpnsVO/DynZ0yhQ+Ezw==
+ b=BzCGUblzSIeAZ46W7Mqjwv40ztR9DWizKzeClhPLFHu0tv+HhqxPd8UwFgoL0vTTYrOfWAUuj9VE3U+ZOz4ES+T4GkgcKtEeexHSyqWcnb0jg/C2MyZDMZYxhGWod83jb/m0iuXn5UMl+mQkb1mSiNjpAIpmdFWpCRIPjvg8QBHNI5K0IDTfd7gEkwzm8AYgnumA6Sqs8i+FRaVM6mmpm2rG/nVapEV4r/6s2CXgZI/s0sSP6VeB6Dx9Od4Cqyf6Zrtoh/Gf/T5XP2AqHGxq26SArfOMPabQTG5msoFuyS9vO1YAJjgs/kF67OaFPutyaIDuXuXaccBnG/EzshYH1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=na/gPg11/G+xigJt0JLPOG7YYnUsk0Vw8bf+iColsr8=;
- b=E3TEpTje3p9M/pNU1Ljpc++pQnibxSEEVipxPrF69DdQWbSPPoESgRbvT7YWw7CJxjeats3KTqdejxHQlFl8ONsKG96/7eWuwEU1x4jfgV30iUyYqG2qPm7VAKAvx5y0GwqeLgrEGfQvogwVHDec+R1/EeRwqb4FADcW6DufT5WcBuw3GF4dau27U5hgYHL1ZSVIpZDTl5c/6Ta9llCNHzt/n6Focm3m/wAXqTHtFaKA08gNkDsUaZoGRoF7bBwlRQGXf8Ikyt4jIGyPdJWlsXNbcEMiczppne9VPDx+n8MdJ0pQFxAB9AYGonLFY4n1DIld7syRUMFzg2pLgayP8Q==
+ bh=oZncLk3HFGUXKsCpEihrEwjxUHsrO+UjLnAEpdjxUv0=;
+ b=X4mr+AWn8m9UV1DcUp61bvv0yU1bl08+huPK0fzaNnbMIcFV5C3H09HPHZR5i57sHXdBXSKcxrx2HJOn6v1Xj1jpV4Ksh8W3XLxjZ4UftKggpj/50TdEsLLTPGKzP4VWbW8nb8kbcUdRZFeQTBIR8yMbX5K4X+imo6W39lmR5RHmgrCWrfEjYS0WnXzt0kIegH5T+ezN13/BfgdmatEq9zZp0wJ+9U26ExXCL+lGuN6Sk7xUcgfCe0YrWMNirtIaWUBJICEmawm40nh6b0MkXSHmgpvSb7raBxBvnOqIQjGAcMiJVoxyCuCwX0tSuXPpjAC3Diz6PQ+p3lDkSlW0Jw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
- MW5PR11MB5882.namprd11.prod.outlook.com (2603:10b6:303:19e::6) with Microsoft
+ PH7PR11MB7964.namprd11.prod.outlook.com (2603:10b6:510:247::9) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6954.28; Fri, 10 Nov 2023 09:01:51 +0000
+ 15.20.6907.33; Fri, 10 Nov 2023 09:07:00 +0000
 Received: from DM6PR11MB4657.namprd11.prod.outlook.com
  ([fe80::fe1c:922f:987:85ab]) by DM6PR11MB4657.namprd11.prod.outlook.com
  ([fe80::fe1c:922f:987:85ab%4]) with mapi id 15.20.6954.029; Fri, 10 Nov 2023
- 09:01:50 +0000
+ 09:07:00 +0000
 From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
 To: Jiri Pirko <jiri@resnulli.us>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>, "Michalik, Michal"
-	<michal.michalik@intel.com>, "Olech, Milena" <milena.olech@intel.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
-Subject: RE: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
-Thread-Topic: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
-Thread-Index: AQHaEi9PNvCIepF1tEu7KRNf+M25RbBwe78AgAFGpmCAADfgAIAAMUJwgAAe7ICAAFgbsIAAfB6AgAAjAGA=
-Date: Fri, 10 Nov 2023 09:01:50 +0000
-Message-ID: <DM6PR11MB4657B61E86D5DFFAF83BC1E59BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
+CC: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Michalik, Michal" <michal.michalik@intel.com>,
+	"Olech, Milena" <milena.olech@intel.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>
+Subject: RE: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
+Thread-Topic: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer
+ issues
+Thread-Index: AQHaEi9OB4zvczpCGUaIr1usLpOLxrBx0M4AgABky0CAABUngIAAWuQQgAB53QCAACV4EA==
+Date: Fri, 10 Nov 2023 09:06:59 +0000
+Message-ID: <DM6PR11MB4657DE812ADB8C5079705DC99BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
 References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
- <ZUubagu6B+vbfBqm@nanopsycho>
- <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZUzcTBmSPxIs5iH3@nanopsycho>
- <DM6PR11MB46571D4C776B0B1888F943569BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU0fj5y9mAvVzXuf@nanopsycho>
- <DM6PR11MB4657DAC525E05B5DB72145119BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU3RlSmInnoXufxf@nanopsycho>
-In-Reply-To: <ZU3RlSmInnoXufxf@nanopsycho>
+ <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
+ <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU0fzzmmxjnsNW0n@nanopsycho>
+ <DM6PR11MB4657209FFC300E207E600F3F9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU3SSClU6Ijn3M7B@nanopsycho>
+In-Reply-To: <ZU3SSClU6Ijn3M7B@nanopsycho>
 Accept-Language: pl-PL, en-US
 Content-Language: en-US
 X-MS-Has-Attach:
@@ -105,42 +107,42 @@ X-MS-TNEF-Correlator:
 authentication-results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|MW5PR11MB5882:EE_
-x-ms-office365-filtering-correlation-id: 0d9a896e-cdae-4b19-1dbe-08dbe1cbad81
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|PH7PR11MB7964:EE_
+x-ms-office365-filtering-correlation-id: 6207832f-3d1f-42e4-c6ff-08dbe1cc6592
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2Z/Y6+rF9uYEOpHqlV3FjeBn1ExCyZUXWhF3VGmPayl77ujbcGsfPGinGnHy1rPArehfwCHLQit6SzbkQzMFiY33eWxwXSpgyoo1tZgqg1A/3aPTs0ikQdSxD13+EYBFIPxI7T1TR5xNefdhkGqwGuG6qZ37yX5Krd2I+EbDuMHJ0MPO7JAhrU/tifI7/DRtaXO+Pl8C5wE2Ctu8a8Ap9pQaVYl4SScg3tlxHJik5nC9Bv98+xfQMPzi1UNB3A1uG0SmBEkMsPBZ3GP0vTXvhjpU0LI8Q93+5O6B4qjAvprRHOqT8OftC+k2IHCHfeZLhXY+jEhkzQZdTxNF7Vy88JcFIJrhXP5DnVqVrrjrgdTmtUHt9W0Ic8LMVRcCj/zVDVQvj2DzD7T11UVhbC/BLzWQ/bXR0zRnu0y6h5EaBhZyROHp4udJYn9PGsHahj+haRtGlOWU10zEH+5ZrHkeVn4CnIlzMfHN/6pugdLNO9mgOy9adSNBen62IjXkxBRGBJHHvBwMRTUSvugLUt9qoQelCb+7BZkRk/qjDAofo1CeUtDskAuaPblbzJFbAycVxc7RIcdyAVqcs6U18UGoqJesXSbBDQ6+RLF1XknQt0040HFj8eZBvRc3hsIOB/0f
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(346002)(136003)(396003)(366004)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(82960400001)(316002)(38070700009)(76116006)(66946007)(83380400001)(26005)(122000001)(478600001)(7696005)(6506007)(71200400001)(66556008)(9686003)(8936002)(2906002)(41300700001)(8676002)(6916009)(4326008)(55016003)(5660300002)(38100700002)(66899024)(52536014)(33656002)(64756008)(54906003)(66446008)(30864003)(86362001)(66476007);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: U4Jeske7Dd0PAh3CbCKZvPOyGkkAQAKs4YUSuzDUBZwhV4a6hwxp/8RihRAKMUSMn/38TezkPEAL8smF/dqPdq5EDm76dX3QDZIrqHrGwdiBMEtfeZtpvqQP+dhldLzORULQKbpyImo0nVRW8Cb0l2JdkysnFSOneoLRx0QY6Spwnjml1UQiKDXFo/nV0pwR07e88pdcSV7Z3xGAbCj2Itd2eCmEA8vdNb5nKNuqDQVHiUl+daxBQ38GPjLIMyhgiRRdozdSicNqnxY+3YIDGSUgneeu1JYCYCgPsM23lZPTBarYv0VZwssWg6fn6tahufh8hs4IojpKixzAKWkXsfCTcnzV4jp44WbG+w/wVlHQM2v9eANJZ1XdzrNxM4duA23dYgB7cU7xxDMIrz3mZvgQiloRSFoZQBM+eRQ1t3WvMVY9MYFl6lo/4r61q6tX9FhCfp7qCWREfGl2xsTpee1SwQLxrYnGjsnNbkXGg+OiuxqHBcfvJOQZWuq2s77EE0WQ4H+gkRtt9V4FS+SxQ0Vq+fodfxccqeLJRYPdOZqxYI90fztWqlAIknwA6kbt2TiiZ8SPcOJekjE/dXc4feVcR2LsNaOBNyGtxQCG8qJqg83n4EopLG8rCPhXuXec
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(136003)(346002)(366004)(376002)(39860400002)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(478600001)(2906002)(38070700009)(4326008)(7696005)(6506007)(55016003)(9686003)(52536014)(38100700002)(122000001)(82960400001)(33656002)(45080400002)(54906003)(83380400001)(316002)(66476007)(8936002)(41300700001)(6916009)(64756008)(66446008)(26005)(8676002)(76116006)(66946007)(86362001)(5660300002)(71200400001)(66556008);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?yiA62pAPZLaYBL1ns1MhyZ6fkrr1lf60FW6WuIKhDsB2c9GRQJ8+Twhir1+T?=
- =?us-ascii?Q?QwFHDPp++1/lOhqc3ZnEzu6CuZ2LeXdi8Xs248wPkFCnaXe/altOKDCtqsYH?=
- =?us-ascii?Q?gdlhFZ9L3E23htxtXdvh2QnobO499tokbnn7oILitlDjzTdo4d3rScTdPp0p?=
- =?us-ascii?Q?MZIKbhkoKlR4jrxBlFOXwdm7Q36UNSrAtJBOaerzyWMvRTRQk+y5IqGD/Xvc?=
- =?us-ascii?Q?z5/hKI2UZzq66ZT8eSyKK2tnQ6UE2KeJBtD4yjaAeKmRhzpX20IQRdmm7UlU?=
- =?us-ascii?Q?r04KTBvs226UTaAyhiNGi4UuaARwB0wWQQS1MMeA9wqowfC2duXJ//znePaW?=
- =?us-ascii?Q?T2X2MLegPh+dA3KLejTHlrK40z3DcbI7ptWQtDblRw8TtpoQELWyh6JgSnQ7?=
- =?us-ascii?Q?D3zGj7M4lQ8UhoiznUHHmH37wEFBg5nrH8DJTQ72hifO+fZYJtuYrmk/U+Rs?=
- =?us-ascii?Q?8Lyd2hv/kuOgJsqjkTcBKG3uBkkXq9W8a8+iX2C9zUPuvWxemUO/IBPVp5+8?=
- =?us-ascii?Q?nJNteVwiTjIz2UPWb9TbJvwABhy3VT7WcK5NMhVdr/A1AZZfvW7aAe94bEy4?=
- =?us-ascii?Q?bRmmPVsNDOvdCP7um7pQb38u7GllemLLD1QBQzbJyWqZGjKrutmtvXCij2o5?=
- =?us-ascii?Q?2ZEjLD07BPLj9eueFTa9eyA3LWg3Nx2i3LGtk9QlvUoUpE0Sz59wioZvG7YM?=
- =?us-ascii?Q?FeXApVTAPtFIX7ucpmpS8i+CyaymvAkibvojPGS4U5IwTkrz4yQtl90O4BMu?=
- =?us-ascii?Q?OhLFMKuqjbxNlj0caLJHS91z/vqq1BORZ5k6SXMi44FjH6RrR7Q+CUk5fh7Y?=
- =?us-ascii?Q?Pzx6Y89NLwtxinbBBJPmFYgm8tVm3sRT/8PtTP//jS0Ay7+LKC/otbvXFx0o?=
- =?us-ascii?Q?rraB/g0a2wZAF25FerwuqFjbqVmcYaMVrdbyV9E5/d2FLegmEnNvWt/gL40v?=
- =?us-ascii?Q?CrHsMI2YHKwivjkmcUwXszu5z8172HFF3zVKAlz6O4/R3hjNlYLWFE7ip/8F?=
- =?us-ascii?Q?OMlWPvZF0DDHQpg26iD7oVoXc4Xh67WlVa0TkAt+8p9QwsjUrBQVgLG73J4w?=
- =?us-ascii?Q?wBat1mGWNBffu+Ay2aG5yL47GbwqfK5nPDHPvtWQUqglaLO/I6dU78AJLmwN?=
- =?us-ascii?Q?IqamhtRRO/AEkV8aFt5v8ql+GhbCT1ZXkab4B7f0tBegb0icaGHHXAVeTE1+?=
- =?us-ascii?Q?eXDrJ3bZaboCxrZnTblegCj6uqUudGfNoKzgZzcnJ8izGlpKGzP0oOC+4z0K?=
- =?us-ascii?Q?kPtl71f8MKXXN3GyQ/1JhAZrNgWUYoT77xXC9Ux7WMbPpp6DDZiBvH4UHV5g?=
- =?us-ascii?Q?hUrLi0uMyj9mJJY35Sn0wDzYGNQG9p7bYOf3jR3k0ZYIgezpWwZoNzCe8Bwk?=
- =?us-ascii?Q?BOvucE1A2LM02tLUlVdUBy4HyYRuoGKiuMfrShf2ao5EV+oNP2RYTfY+XkJy?=
- =?us-ascii?Q?07uRWHUVik1c8MaeRWEkgYGDim71P2r1+noi3s1Me/wRRqld+MfVhdpqIld3?=
- =?us-ascii?Q?YO6P8ZCx/04fILIjTmmTBNicsxkJnTxRBzWtwv5VxSqky2ZT0YVpgosQ82lg?=
- =?us-ascii?Q?R/+nRfl9g1V5R2vOL/weSAE0YjzRz1O3QcydQHp5xe7ETJXQnb4mfN/sN39k?=
- =?us-ascii?Q?zw=3D=3D?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YhHHgZMYX56z8tXqnDJKjh8lLocb7D7SaeW/s7mvS2bGG6uIpM/ZT0wFy8X+?=
+ =?us-ascii?Q?8C0Y0fUhUtcRZWpFvEdrDH36XRsSOPBu6YtGrm5jWu64Oy7LfussfnEdXLcl?=
+ =?us-ascii?Q?zvA99B5MVEmWfGmql0nYJ5If29A8YHKm/xaoDxBS8ir3IUH3n6XgPqAd6WwX?=
+ =?us-ascii?Q?szEnLoOI0pkMJ945LE3h4O4kgV3v9q1TM73H0JodgUP75Ks8KY1VXa9lbxBg?=
+ =?us-ascii?Q?xHiQmU5qvRziqoHyBZZaK34BeDsGu9XiC9FOHA5MGM9TB26wA6FizKiWGoTh?=
+ =?us-ascii?Q?PzIJB171Q9p8guiDHsmvTpY9IGt5GGep7VVxPLjfdZ5QMAP4YemyumX4JyIo?=
+ =?us-ascii?Q?otv8nGGs9lcj1zFSOd+LuE4MvAU+XZGgOr0z6ZT0WphoGyPYUO6ikUtl4sPg?=
+ =?us-ascii?Q?7AW9zkZcUZRVS3Sjqbz+I8NoQdMYn8ynvkwcFpkv389/yOd0T5xebM8P2IHX?=
+ =?us-ascii?Q?EOZ8/Jy7A1p/3oz4BU4uC2XG+wW9/oDrvuP/Tba3/ly/5zi5ImC3nIyoDmWU?=
+ =?us-ascii?Q?Wi125M/SsX+UJy+kNDd+970uQKDEyTWKR7pxcpjEmEoO3ff3eyAxO6NWPKGA?=
+ =?us-ascii?Q?df82qzgCQilakRZ+VtWTDDgGLpQ8nUhl6m9wCCX2xQKI83hAwOPImyNRdBCK?=
+ =?us-ascii?Q?w6klx2LGsqSnaVr5JFW7boS7vKaFkumQMUiG0CIRQY6tnxD9VxOnFa7BJLaj?=
+ =?us-ascii?Q?yqx7j1kaYfIFLC+BgkthGljiiY/xO1fvKErJ2UnWRjivSniTCGAGAqdXtwhK?=
+ =?us-ascii?Q?JPX0/Y6s722rMMouRcPjp77TB1tgFRKRyiZtfhhdvxKokGhXjMg8pc+aRyY5?=
+ =?us-ascii?Q?4Ap8uaFjkJyBNdfN+C0jW9GaQqMqyIVBYvhEKzCJ+JRMDWzGcVv8hkZlEabp?=
+ =?us-ascii?Q?X/RPNVgijhX6Y6a3gXHLsqJubH5veDybqAip0mHz4xLfM7Vd+8YAU5LSJhHj?=
+ =?us-ascii?Q?wn+Vykkcc+i+JoK3uDk8TbadUbxhUG3y2uRllYhiPOXoJ0M9GjQIfV6pg4Pf?=
+ =?us-ascii?Q?PrwEPcPHvPqAZhIglJ4cN0Tk1z4QQZbm/DTvnT9klo4LphLDhXLJ3PIVrRHL?=
+ =?us-ascii?Q?CydXtSlbPQDupLOvQYBOYMbFjZdFVa4n4fJkcI6FH06SlR0loEWX4N6h0ieq?=
+ =?us-ascii?Q?9WF8lkwIf+GBUjeUeH5GTA9QV0ueGs+6F+SlbIe0+cj45hfJ9J99acQPJL7L?=
+ =?us-ascii?Q?Ck7EPCVMhCWt8t5MGFHeJAXmZkQ1UIctYGBt745sMh5I72UW9oEUf4pqdNLW?=
+ =?us-ascii?Q?VyRCRBdQElL2Vghf9Ibk4yByfw6feJgIeN0JM8SWhJhJhkKi/Fp1Tx9/ZiUT?=
+ =?us-ascii?Q?kdp2VsMI2ZZlqeuQvDzw6m+sgmS3JflsjJz5rICeOT8t1Sp4tG4c4dN9vCPj?=
+ =?us-ascii?Q?CNG/XHMmcM8O/TFnnV83opX0cdB1Gr4r8g2XTWmT6djmUH3+MFhqd+g1YMI3?=
+ =?us-ascii?Q?XdfE43YjYHkncshThx/Bs6743bWDgmUzH29v0JmvGt+zUI1SM0MstxPfr88v?=
+ =?us-ascii?Q?QIBBhhH5pP03qNrKUzDZQJCx9Y0Bkr/PIvg880k+uZzThcid/U5vAcX2jPhj?=
+ =?us-ascii?Q?v5Lay/e4HigoOAVBboJy4/Jnr4UzXJIoutHiUkK/slq017w00c6DjTLtXyz9?=
+ =?us-ascii?Q?eA=3D=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -151,136 +153,200 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d9a896e-cdae-4b19-1dbe-08dbe1cbad81
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2023 09:01:50.8419
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6207832f-3d1f-42e4-c6ff-08dbe1cc6592
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2023 09:06:59.6300
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nvPbTbz8b0N32MXKx1kd7efjRZnx4u3l53LWqAn3x9HBX3Yh+4VoNtzus7ujIxM8eTItLVqoGdRJJKSaJsY4Hl0im7PTJ+GRk/M1cLYSxDA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5882
+X-MS-Exchange-CrossTenant-userprincipalname: rpPBqphURclkuyokq5t5/qPc8uGhu6WGDpkMkZAKa8Z6/JIgQkTXFw+wgA1HBdnfzbPiDgqPp0zSH/PDWrTYX1QiWOSZnyQbRNlZ1suO0Pg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7964
 X-OriginatorOrg: intel.com
 
 >From: Jiri Pirko <jiri@resnulli.us>
->Sent: Friday, November 10, 2023 7:46 AM
+>Sent: Friday, November 10, 2023 7:49 AM
 >
->Fri, Nov 10, 2023 at 12:32:21AM CET, arkadiusz.kubalewski@intel.com wrote:
+>Fri, Nov 10, 2023 at 12:35:43AM CET, arkadiusz.kubalewski@intel.com wrote:
 >>>From: Jiri Pirko <jiri@resnulli.us>
->>>Sent: Thursday, November 9, 2023 7:06 PM
+>>>Sent: Thursday, November 9, 2023 7:07 PM
 >>>
->>>Thu, Nov 09, 2023 at 05:30:20PM CET, arkadiusz.kubalewski@intel.com
+>>>Thu, Nov 09, 2023 at 06:20:14PM CET, arkadiusz.kubalewski@intel.com
 >>>wrote:
->>>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>>Sent: Thursday, November 9, 2023 2:19 PM
+>>>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>>>Sent: Thursday, November 9, 2023 11:51 AM
 >>>>>
->>>>>Thu, Nov 09, 2023 at 01:20:48PM CET, arkadiusz.kubalewski@intel.com
->>>>>wrote:
->>>>>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>>>>Sent: Wednesday, November 8, 2023 3:30 PM
->>>>>>>
->>>>>>>Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com
->>>>>>>wrote:
->>>>>>>>When a kernel module is unbound but the pin resources were not
->>>>>>>>entirely
->>>>>>>>freed (other kernel module instance have had kept the reference to
->>>>>>>>that
->>>>>>>>pin), and kernel module is again bound, the pin properties would no=
-t
->>>>>>>>be
->>>>>>>>updated (the properties are only assigned when memory for the pin i=
-s
->>>>>>>>allocated), prop pointer still points to the kernel module memory o=
-f
->>>>>>>>the kernel module which was deallocated on the unbind.
->>>>>>>>
->>>>>>>>If the pin dump is invoked in this state, the result is a kernel
->>>>>>>>crash.
->>>>>>>>Prevent the crash by storing persistent pin properties in dpll
->>>>>>>>subsystem,
->>>>>>>>copy the content from the kernel module when pin is allocated,
->>>>>>>>instead
->>>>>>>>of
->>>>>>>>using memory of the kernel module.
->>>>>>>>
->>>>>>>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base
->>>>>>>>functions")
->>>>>>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
->>>>>>>>functions")
->>>>>>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com=
->
->>>>>>>>---
->>>>>>>> drivers/dpll/dpll_core.c    |  4 ++--
->>>>>>>> drivers/dpll/dpll_core.h    |  4 ++--
->>>>>>>> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
->>>>>>>> 3 files changed, 18 insertions(+), 18 deletions(-)
->>>>>>>>
->>>>>>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>>>>>>>index 3568149b9562..4077b562ba3b 100644
->>>>>>>>--- a/drivers/dpll/dpll_core.c
->>>>>>>>+++ b/drivers/dpll/dpll_core.c
->>>>>>>>@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struc=
-t
->>>>>>>>module *module,
->>>>>>>> 		ret =3D -EINVAL;
->>>>>>>> 		goto err;
->>>>>>>> 	}
->>>>>>>>-	pin->prop =3D prop;
->>>>>>>>+	memcpy(&pin->prop, prop, sizeof(pin->prop));
->>>>>>>
->>>>>>>Odd, you don't care about the pointer within this structure?
->>>>>>>
+>>>>>On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
+>>>>>> Fix issues when performing unordered unbind/bind of a kernel modules
+>>>>>> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
+>>>>>> Currently only serialized bind/unbind of such use case works, fix
+>>>>>> the issues and allow for unserialized kernel module bind order.
 >>>>>>
->>>>>>Well, true. Need a fix.
->>>>>>Wondering if copying idea is better than just assigning prop pointer
->>>>>>on
->>>>>>each call to dpll_pin_get(..) function (when pin already exists)?
+>>>>>> The issues are observed on the ice driver, i.e.,
+>>>>>>
+>>>>>> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
+>>>>>> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
+>>>>>>
+>>>>>> results in:
+>>>>>>
+>>>>>> ice 0000:af:00.0: Removed PTP clock
+>>>>>> BUG: kernel NULL pointer dereference, address: 0000000000000010
+>>>>>> PF: supervisor read access in kernel mode
+>>>>>> PF: error_code(0x0000) - not-present page
+>>>>>> PGD 0 P4D 0
+>>>>>> Oops: 0000 [#1] PREEMPT SMP PTI
+>>>>>> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-
+>>>>>>rc5_next-
+>>>>>>queue_19th-Oct-2023-01625-g039e5d15e451 #1
+>>>>>> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS
+>>>>>>SE5C620.86B.02.01.0008.031920191559 03/19/2019
+>>>>>> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>>>>> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b
+>>>>>>66
+>>>>>>08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5=
+b
+>>>>>>10
+>>>>>>41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
+>>>>>> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
+>>>>>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+>>>>>> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
+>>>>>> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
+>>>>>> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
+>>>>>> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
+>>>>>> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000)
+>>>>>>knlGS:0000000000000000
+>>>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>>> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
+>>>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>>>> PKRU: 55555554
+>>>>>> Call Trace:
+>>>>>>   <TASK>
+>>>>>>   ? __die+0x20/0x70
+>>>>>>   ? page_fault_oops+0x76/0x170
+>>>>>>   ? exc_page_fault+0x65/0x150
+>>>>>>   ? asm_exc_page_fault+0x22/0x30
+>>>>>>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>>>>>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
+>>>>>>   dpll_msg_add_pin_parents+0x142/0x1d0
+>>>>>>   dpll_pin_event_send+0x7d/0x150
+>>>>>>   dpll_pin_on_pin_unregister+0x3f/0x100
+>>>>>>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
+>>>>>>   ice_dpll_deinit+0x29/0xe0 [ice]
+>>>>>>   ice_remove+0xcd/0x200 [ice]
+>>>>>>   pci_device_remove+0x33/0xa0
+>>>>>>   device_release_driver_internal+0x193/0x200
+>>>>>>   unbind_store+0x9d/0xb0
+>>>>>>   kernfs_fop_write_iter+0x128/0x1c0
+>>>>>>   vfs_write+0x2bb/0x3e0
+>>>>>>   ksys_write+0x5f/0xe0
+>>>>>>   do_syscall_64+0x59/0x90
+>>>>>>   ? filp_close+0x1b/0x30
+>>>>>>   ? do_dup2+0x7d/0xd0
+>>>>>>   ? syscall_exit_work+0x103/0x130
+>>>>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>>>>   ? do_syscall_64+0x69/0x90
+>>>>>>   ? syscall_exit_work+0x103/0x130
+>>>>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>>>>   ? do_syscall_64+0x69/0x90
+>>>>>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>>>>> RIP: 0033:0x7fdc7d93eb97
+>>>>>> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f
+>>>>>>1e
+>>>>>>fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 0=
+0
+>>>>>>f0
+>>>>>>ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+>>>>>> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX:
+>>>>>>0000000000000001
+>>>>>> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
+>>>>>> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
+>>>>>> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
+>>>>>> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
+>>>>>> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
+>>>>>>   </TASK>
+>>>>>> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1
+>>>>>>vfio
+>>>>>>irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer
+>>>>>>snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs
+>>>>>>libcrc32c
+>>>>>>rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod
+>>>>>>target_core_mod
+>>>>>>ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm
+>>>>>>intel_rapl_msr
+>>>>>>intel_rapl_common intel_uncore_frequency intel_uncore_frequency_commo=
+n
+>>>>>>isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal
+>>>>>>intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt
+>>>>>>iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr
+>>>>>>i2c_i801
+>>>>>>ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus
+>>>>>>ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache
+>>>>>>jbd2
+>>>>>>sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice
+>>>>>>crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahc=
+i
+>>>>>>ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded:
+>>>>>>iavf]
+>>>>>> CR2: 0000000000000010
+>>>>>>
+>>>>>> Arkadiusz Kubalewski (3):
+>>>>>>    dpll: fix pin dump crash after module unbind
+>>>>>>    dpll: fix pin dump crash for rebound module
+>>>>>>    dpll: fix register pin with unregistered parent pin
+>>>>>>
+>>>>>>   drivers/dpll/dpll_core.c    |  8 ++------
+>>>>>>   drivers/dpll/dpll_core.h    |  4 ++--
+>>>>>>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++-----------=
+-
+>>>>>>--
+>>>>>>-
+>>>>>>   3 files changed, 26 insertions(+), 23 deletions(-)
+>>>>>>
 >>>>>
->>>>>Not sure what do you mean. Examples please.
+>>>>>
+>>>>>I still don't get how can we end up with unregistered pin. And
+>>>>>shouldn't
+>>>>>drivers do unregister of dpll/pin during release procedure? I thought
+>>>>>it
+>>>>>was kind of agreement we reached while developing the subsystem.
 >>>>>
 >>>>
->>>>Sure,
+>>>>It's definitely not about ending up with unregistered pins.
 >>>>
->>>>Basically this change:
->>>>
->>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>>>index ae884b92d68c..06b72d5877c3 100644
->>>>--- a/drivers/dpll/dpll_core.c
->>>>+++ b/drivers/dpll/dpll_core.c
->>>>@@ -483,6 +483,7 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct
->>>>module
->>>>*module,
->>>>                    pos->pin_idx =3D=3D pin_idx &&
->>>>                    pos->module =3D=3D module) {
->>>>                        ret =3D pos;
->>>>+                       pos->prop =3D prop;
->>>>                        refcount_inc(&ret->refcount);
->>>>                        break;
->>>>                }
->>>>
->>>>would replace whole of this patch changes, although seems a bit hacky.
+>>>>Usually the driver is loaded for PF0, PF1, PF2, PF3 and unloaded in
+>>>>opposite
+>>>>order: PF3, PF2, PF1, PF0. And this is working without any issues.
 >>>
->>>Or event better, as I suggested in the other patch reply, resolve this
->>>internally in the driver registering things only when they are valid.
->>>Much better then to hack anything in dpll core.
+>>>Please fix this in the driver.
 >>>
 >>
->>This approach seemed to me hacky, that is why started with coping the
->>data.
->>It is not about registering, rather about unregistering on driver
->>unbind, which brakes things, and currently cannot be recovered in
->>described case.
+>>Thanks for your feedback, but this is already wrong advice.
+>>
+>>Our HW/FW is designed in different way than yours, it doesn't mean it is
+>>wrong.
+>>As you might recall from our sync meetings, the dpll subsystem is to unif=
+y
+>>approaches and reduce the code in the drivers, where your advice is
+>>exactly
+>>opposite, suggested fix would require to implement extra synchronization
+>>of the
+>>dpll and pin registration state between driver instances, most probably
+>>with
+>>use of additional modules like aux-bus or something similar, which was
+>>from the
+>>very beginning something we tried to avoid.
+>>Only ice uses the infrastructure of muxed pins, and this is broken as it
+>>doesn't allow unbind the driver which have registered dpll and pins
+>>without
+>>crashing the kernel, so a fix is required in dpll subsystem, not in the
+>>driver.
 >
->Sure it can. PF0 unbind-> internal notification-> PF1 unregisters all
->related object. Very clean and simple.
+>I replied in the other patch thread.
 >
 
-What you are suggesting is:
-- special purpose bus in the driver,
-- dpll-related,
-- not needed,
-- prone for errors.
-
-The dpll subsystem is here to make driver life easier.
+Yes, so did I.
+But what is the reason you have moved the discussion from the other thread
+into this one?
 
 Thank you!
 Arkadiusz
@@ -292,183 +358,21 @@ Arkadiusz
 >>
 >>>
 >>>>
+>>>>Above crash is caused because of unordered driver unload, where dpll
+>>>>subsystem
+>>>>tries to notify muxed pin was deleted, but at that time the parent is
+>>>>already
+>>>>gone, thus data points to memory which is no longer available, thus
+>>>>crash
+>>>>happens when trying to dump pin parents.
+>>>>
+>>>>This series fixes all issues I could find connected to the situation
+>>>>where
+>>>>muxed-pins are trying to access their parents, when parent registerer
+>>>>was
+>>>>removed
+>>>>in the meantime.
+>>>>
 >>>>Thank you!
 >>>>Arkadiusz
->>>>
->>>>>
->>>>>>
->>>>>>Thank you!
->>>>>>Arkadiusz
->>>>>>
->>>>>>>
->>>>>>>> 	refcount_set(&pin->refcount, 1);
->>>>>>>> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
->>>>>>>> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
->>>>>>>>@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin
->>>>>>>>*parent,
->>>>>>>>struct dpll_pin *pin,
->>>>>>>> 	unsigned long i, stop;
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>>-	if (WARN_ON(parent->prop->type !=3D DPLL_PIN_TYPE_MUX))
->>>>>>>>+	if (WARN_ON(parent->prop.type !=3D DPLL_PIN_TYPE_MUX))
->>>>>>>> 		return -EINVAL;
->>>>>>>>
->>>>>>>> 	if (WARN_ON(!ops) ||
->>>>>>>>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
->>>>>>>>index 5585873c5c1b..717f715015c7 100644
->>>>>>>>--- a/drivers/dpll/dpll_core.h
->>>>>>>>+++ b/drivers/dpll/dpll_core.h
->>>>>>>>@@ -44,7 +44,7 @@ struct dpll_device {
->>>>>>>>  * @module:		module of creator
->>>>>>>>  * @dpll_refs:		hold referencees to dplls pin was registered
->>>>>>>>with
->>>>>>>>  * @parent_refs:	hold references to parent pins pin was
->registered
->>>>>>>>with
->>>>>>>>- * @prop:		pointer to pin properties given by registerer
->>>>>>>>+ * @prop:		pin properties copied from the registerer
->>>>>>>>  * @rclk_dev_name:	holds name of device when pin can recover
->>>>>>>>clock
->>>>>>>>from it
->>>>>>>>  * @refcount:		refcount
->>>>>>>>  **/
->>>>>>>>@@ -55,7 +55,7 @@ struct dpll_pin {
->>>>>>>> 	struct module *module;
->>>>>>>> 	struct xarray dpll_refs;
->>>>>>>> 	struct xarray parent_refs;
->>>>>>>>-	const struct dpll_pin_properties *prop;
->>>>>>>>+	struct dpll_pin_properties prop;
->>>>>>>> 	refcount_t refcount;
->>>>>>>> };
->>>>>>>>
->>>>>>>>diff --git a/drivers/dpll/dpll_netlink.c
->b/drivers/dpll/dpll_netlink.c
->>>>>>>>index 93fc6c4b8a78..963bbbbe6660 100644
->>>>>>>>--- a/drivers/dpll/dpll_netlink.c
->>>>>>>>+++ b/drivers/dpll/dpll_netlink.c
->>>>>>>>@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg,
->>>>>>>>struct
->>>>>>>>dpll_pin *pin,
->>>>>>>> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq),
->>>>>>>>&freq,
->>>>>>>> 			  DPLL_A_PIN_PAD))
->>>>>>>> 		return -EMSGSIZE;
->>>>>>>>-	for (fs =3D 0; fs < pin->prop->freq_supported_num; fs++) {
->>>>>>>>+	for (fs =3D 0; fs < pin->prop.freq_supported_num; fs++) {
->>>>>>>> 		nest =3D nla_nest_start(msg,
->>>>>>>>DPLL_A_PIN_FREQUENCY_SUPPORTED);
->>>>>>>> 		if (!nest)
->>>>>>>> 			return -EMSGSIZE;
->>>>>>>>-		freq =3D pin->prop->freq_supported[fs].min;
->>>>>>>>+		freq =3D pin->prop.freq_supported[fs].min;
->>>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN,
->>>>>>>>sizeof(freq),
->>>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
->>>>>>>> 			nla_nest_cancel(msg, nest);
->>>>>>>> 			return -EMSGSIZE;
->>>>>>>> 		}
->>>>>>>>-		freq =3D pin->prop->freq_supported[fs].max;
->>>>>>>>+		freq =3D pin->prop.freq_supported[fs].max;
->>>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX,
->>>>>>>>sizeof(freq),
->>>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
->>>>>>>> 			nla_nest_cancel(msg, nest);
->>>>>>>>@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct
->>>>>>>>dpll_pin
->>>>>>>>*pin, u32 freq)
->>>>>>>> {
->>>>>>>> 	int fs;
->>>>>>>>
->>>>>>>>-	for (fs =3D 0; fs < pin->prop->freq_supported_num; fs++)
->>>>>>>>-		if (freq >=3D pin->prop->freq_supported[fs].min &&
->>>>>>>>-		    freq <=3D pin->prop->freq_supported[fs].max)
->>>>>>>>+	for (fs =3D 0; fs < pin->prop.freq_supported_num; fs++)
->>>>>>>>+		if (freq >=3D pin->prop.freq_supported[fs].min &&
->>>>>>>>+		    freq <=3D pin->prop.freq_supported[fs].max)
->>>>>>>> 			return true;
->>>>>>>> 	return false;
->>>>>>>> }
->>>>>>>>@@ -403,7 +403,7 @@ static int
->>>>>>>> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
->>>>>>>> 		     struct netlink_ext_ack *extack)
->>>>>>>> {
->>>>>>>>-	const struct dpll_pin_properties *prop =3D pin->prop;
->>>>>>>>+	const struct dpll_pin_properties *prop =3D &pin->prop;
->>>>>>>> 	struct dpll_pin_ref *ref;
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>>@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin,
->>>>>>>>u32
->>>>>>>>parent_idx,
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->>>>>>>>-	      pin->prop->capabilities)) {
->>>>>>>>+	      pin->prop.capabilities)) {
->>>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
->>>>>>>> 		return -EOPNOTSUPP;
->>>>>>>> 	}
->>>>>>>>@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll,
->>>>>>>>struct
->>>>>>>>dpll_pin *pin,
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
->>>>>>>>-	      pin->prop->capabilities)) {
->>>>>>>>+	      pin->prop.capabilities)) {
->>>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
->>>>>>>> 		return -EOPNOTSUPP;
->>>>>>>> 	}
->>>>>>>>@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll,
->struct
->>>>>>>>dpll_pin *pin,
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
->>>>>>>>-	      pin->prop->capabilities)) {
->>>>>>>>+	      pin->prop.capabilities)) {
->>>>>>>> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
->>>>>>>> 		return -EOPNOTSUPP;
->>>>>>>> 	}
->>>>>>>>@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin,
->>>>>>>>struct
->>>>>>>>dpll_device *dpll,
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
->>>>>>>>-	      pin->prop->capabilities)) {
->>>>>>>>+	      pin->prop.capabilities)) {
->>>>>>>> 		NL_SET_ERR_MSG(extack, "direction changing is not
->>>>>>>>allowed");
->>>>>>>> 		return -EOPNOTSUPP;
->>>>>>>> 	}
->>>>>>>>@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin,
->>>>>>>>struct
->>>>>>>>nlattr *phase_adj_attr,
->>>>>>>> 	int ret;
->>>>>>>>
->>>>>>>> 	phase_adj =3D nla_get_s32(phase_adj_attr);
->>>>>>>>-	if (phase_adj > pin->prop->phase_range.max ||
->>>>>>>>-	    phase_adj < pin->prop->phase_range.min) {
->>>>>>>>+	if (phase_adj > pin->prop.phase_range.max ||
->>>>>>>>+	    phase_adj < pin->prop.phase_range.min) {
->>>>>>>> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
->>>>>>>> 				    "phase adjust value not supported");
->>>>>>>> 		return -EINVAL;
->>>>>>>>@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr
->>>>>>>>*mod_name_attr,
->>>>>>>> 	unsigned long i;
->>>>>>>>
->>>>>>>> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
->>>>>>>>-		prop =3D pin->prop;
->>>>>>>>+		prop =3D &pin->prop;
->>>>>>>> 		cid_match =3D clock_id ? pin->clock_id =3D=3D clock_id : true;
->>>>>>>> 		mod_match =3D mod_name_attr && module_name(pin->module) ?
->>>>>>>> 			!nla_strcmp(mod_name_attr,
->>>>>>>>--
->>>>>>>>2.38.1
->>>>>>>>
->>>>>>
->>
 
