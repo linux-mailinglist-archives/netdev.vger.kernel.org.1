@@ -1,83 +1,153 @@
-Return-Path: <netdev+bounces-47078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D12F7E7B91
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 12:00:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C5987E7BAD
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 12:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE14E1C20A4D
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:00:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9BB7280D6B
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD518134C0;
-	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB8E14292;
+	Fri, 10 Nov 2023 11:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXuhptmI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GiTRKNP9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A90525C
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43AB1C433C9;
-	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699614024;
-	bh=LcrvrLyGui4XnjP+0yJXYxqfPfvOw2CwHS4zGFcgBAw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kXuhptmICXy8mrx0lZ8QfcqAc0fnpppeAJFeLgcm6VpwRlBc6SVJdzE8Wyb9poNZY
-	 9SYCFev/iTW8vSOXQlWgjF2BJNiBtTEKUOzDCwIIcWaEZCBpWuUMhXRxG/eX6LNDOR
-	 2KqIsE4rs6MsabWuXDRAxiPjclygsu0clUgBrXOUzUswFZ1naNlA1h3ne4ERZqLpda
-	 YBaFrVtNnsBV0EJyhv+23mhrHURG6Vgdo9U8mLtELgjxPJTSbfcsaoE1elsOg1XM2q
-	 G1N8nwS7FAY6y/EQ6nFAB8Qsrxpl5ETam15NACcqFqfy3iKtvGmWe4/MJ8G0Wf1s92
-	 nwLPHjV3g6AHA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2227EE00084;
-	Fri, 10 Nov 2023 11:00:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74EA213FE7
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 11:05:20 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D852B794;
+	Fri, 10 Nov 2023 03:05:17 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6c115026985so1968483b3a.1;
+        Fri, 10 Nov 2023 03:05:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699614316; x=1700219116; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwtDltZqo6DRYNAe427685yCrF5zwVVyWvlJ8J0IIxE=;
+        b=GiTRKNP9dAwIYBs6SNkMWZd/vooYtvgKLg5dTG7wk0o7bSxqxPu3FgUnqtsZphFiXI
+         PWpZ0LQKcx92x8lQ6Gw2n5IqZGfXhaS/QpoSrkOJv0a4eSUM4WenOOGZMduuVjizV07b
+         fex/9BccWs2dCCBrVq5o2kMhPgf4j5fHhjqbsvC+dypUXKyxabbzLxDrthUEXW9Sv9hZ
+         xCY1NHqmkUUs74ozoLIj0KLCi5WqJgQu55gcqiRHEFJH748DHJWM5tRuzuJaRGbnQyv1
+         YoTRQe/6JOlQxDYjEIdRAI6T44l2Fwnzp3/siQ45XG/iEnZGEEaxNhGhjBbpis9k/qn9
+         ibUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699614316; x=1700219116;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kwtDltZqo6DRYNAe427685yCrF5zwVVyWvlJ8J0IIxE=;
+        b=lzwYuQE/tRcHEDPSA+e8U0Ai+yQQ56wGY6BAEWvfbq8YQ5Rrwi5Kk7gKFqF9hCix++
+         X61B164g3EHQzna01wDzCQUJ62MJPerOlpFDffUu2qio0RSEdFL4BW+JcPwGEa3c1fZ6
+         kgfUfyPdoNDmKMq2oktwYcFgt943/FJ60ozrrhM2g1Jr++MmT0SV3H5f65Gw9Zwvf2El
+         9g8oCXDbn5kIMGu+ESFEHDBoYU38VKtjooIXaiLUStJMBm7pH1jEtJ3qfQdTVj7260zW
+         UIRwI8+B2I7IE6N4kfzJBGK2xZjw0C1xHr16Nt2RyydRFiJDmC38FdePtfsSXq0shVUZ
+         SzvQ==
+X-Gm-Message-State: AOJu0Yy2NJzzcTkiUjFwCZmSuKbNiBqxCQEIU3BCO45qvgfFtzjPqRJV
+	nhSPX3rYEYsb5JH2gVnp6DM=
+X-Google-Smtp-Source: AGHT+IFFW5pDixabAM8siIP62wg5JRPJT9/pzTZ5dLjbDzNknwhVd78EnQPMrW0ubr+G7381zAUD/w==
+X-Received: by 2002:a17:90a:1a04:b0:281:61c:1399 with SMTP id 4-20020a17090a1a0400b00281061c1399mr4342992pjk.3.1699614316559;
+        Fri, 10 Nov 2023 03:05:16 -0800 (PST)
+Received: from dragonet (dragonet.kaist.ac.kr. [143.248.133.220])
+        by smtp.gmail.com with ESMTPSA id 6-20020a170902c10600b001c726147a45sm5112612pli.190.2023.11.10.03.05.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Nov 2023 03:05:16 -0800 (PST)
+Date: Fri, 10 Nov 2023 20:04:04 +0900
+From: "Dae R. Jeong" <threeearcat@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, borisp@nvidia.com,
+	john.fastabend@gmail.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
+Subject: Re: Missing a write memory barrier in tls_init()
+Message-ID: <ZU4OJG56g2V9z_H7@dragonet>
+References: <ZUNLocdNkny6QPn8@dragonet>
+ <20231106143659.12e0d126@kernel.org>
+ <ZUq-GrWMvbfhX74a@hog>
+ <20231107185324.22eecf10@kernel.org>
+ <ZUtP7lMqFnNK8lw_@hog>
+ <ZU4Ecx2qbdqGfRVw@dragonet>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipvlan: add ipvlan_route_v6_outbound() helper
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169961402413.16509.14964071732962964958.git-patchwork-notify@kernel.org>
-Date: Fri, 10 Nov 2023 11:00:24 +0000
-References: <20231109152241.3754521-1-edumazet@google.com>
-In-Reply-To: <20231109152241.3754521-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
- maheshb@google.com, willemb@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZU4Ecx2qbdqGfRVw@dragonet>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu,  9 Nov 2023 15:22:41 +0000 you wrote:
-> Inspired by syzbot reports using a stack of multiple ipvlan devices.
+On Fri, Nov 10, 2023 at 07:22:48PM +0900, Dae R. Jeong wrote:
+> On Wed, Nov 08, 2023 at 10:07:58AM +0100, Sabrina Dubroca wrote:
+> > 2023-11-07, 18:53:24 -0800, Jakub Kicinski wrote:
+> > > On Tue, 7 Nov 2023 23:45:46 +0100 Sabrina Dubroca wrote:
+> > > > Wouldn't it be enough to just move the rcu_assign_pointer after ctx is
+> > > > fully initialized, ie just before update_sk_prot? also clearer wrt
+> > > > RCU.
+> > > 
+> > > I'm not sure, IIUC rcu_assign_pointer() is equivalent to
+> > > WRITE_ONCE() on any sane architecture, it depends on address
+> > > dependencies to provide ordering.
+> > 
+> > Not what the doc says:
+> > 
+> >     /**
+> >      * rcu_assign_pointer() - assign to RCU-protected pointer
+> >      [...]
+> >      * Inserts memory barriers on architectures that require them
+> >      * (which is most of them), and also prevents the compiler from
+> >      * reordering the code that initializes the structure after the pointer
+> >      * assignment.
+> >      [...]
+> >      */
+> > 
+> > And it uses smp_store_release (unless writing NULL).
+> > 
 > 
-> Reduce stack size needed in ipvlan_process_v6_outbound() by moving
-> the flowi6 struct used for the route lookup in an non inlined
-> helper. ipvlan_route_v6_outbound() needs 120 bytes on the stack,
-> immediately reclaimed.
+> I think Sabrina is right. We can rely on the release semantic implied
+> in rcu_assign_pointer(). Simply moving rcu_assign_pointer() to the end
+> of tls_ctx_create() should prevent a scenario what I thought (ie.,
+> store-store reordering between ctx->sk_proto and sk->sk_prot).
 > 
-> [...]
+> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+> index 1c2c6800949d..d20b823c68d4 100644
+> --- a/net/tls/tls_main.c
+> +++ b/net/tls/tls_main.c
+> @@ -816,9 +816,9 @@ struct tls_context *tls_ctx_create(struct sock *sk)
+>                 return NULL;
+>  
+>         mutex_init(&ctx->tx_lock);
+> -       rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
+>         ctx->sk_proto = READ_ONCE(sk->sk_prot);
+>         ctx->sk = sk;
+> +       rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
+>         return ctx;
+>  }
+> 
+> But what I also wonder is that, do we need to ensure that
+> ctx->{tx,rx}_conf is visible before updating sk->sk_prot? If so, as
+> Sabrina suggested, we may want to move rcu_assign_pointer() right
+> before update_sk_prot().
+> 
+> 
+> Best regards,
+> Dae R. Jeong
 
-Here is the summary with links:
-  - [net] ipvlan: add ipvlan_route_v6_outbound() helper
-    https://git.kernel.org/netdev/net/c/18f039428c7d
+I sent a patch by taking suggestions from Sabrina. The patches 1)
+moves rcu_assign_pointer() after fully initializing ctx, and 2) gets
+rid of tls_ctx_create().
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I'm not sure whether removing tls_ctx_create() is a good idea or not,
+but it still did not fully initialize ctx (i.e., ctx->{tx,rx}_conf).
+
+Let me know if there is any issue, then I will rewrite a patch.
 
 
+Best regards,
+Dae R. Jeong
 
