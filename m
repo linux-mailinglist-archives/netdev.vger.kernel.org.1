@@ -1,258 +1,285 @@
-Return-Path: <netdev+bounces-47008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 483BF7E7985
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:48:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE55E7E7989
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BE121C20E09
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:48:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 289591C20D98
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:50:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428566127;
-	Fri, 10 Nov 2023 06:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A135693;
+	Fri, 10 Nov 2023 06:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="kDN1vyqU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gjz9+aRY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B691FCB
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:48:46 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2AD27DAA
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:48:43 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-5441ba3e53cso2660404a12.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:48:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699598922; x=1700203722; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ouRV/LCG/Nf/XmGrResNOpfdVt5pWSkdZ6WfLbMzMP0=;
-        b=kDN1vyqUN1lg+N1SRHKC3soYyHPE8LIN54fvjyZ4HICz7P9v97hV5UZ5N5zhuNC/wZ
-         qqssL+2uGiM9T2iTB6F8pTt074jCwKDyrYIV2QIJQ5dh+N/1/7IjRemMGURdc6fdQRU3
-         gyFPGXAaJ43WR6cfu6KwK1JHb18DWG9Agnxm+AzRkxS2EDZPixM1nrCY3zJVCyLX/FEE
-         DyuqwxafqNndDDp9Kfo+ecBt+frRRQ0ee+gYLdNFU5EfpKt1UjXu0j3UO5rD5pWH5VMM
-         U4FO+tNIJRHz+F3FiWHGWpS4UhEARJoy1jzaOXFNkGSXY2wpJz5KHsQMnKOs13U7kAVY
-         jKXQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DE163BE
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:50:23 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E317DB4
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:50:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699599019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0M1EG+vkP/oHQ3C8AC569hjRGE3An7KZi4c6BBHfHyQ=;
+	b=Gjz9+aRY6IHphGSu1Jql0Q+OiRrR3uO4s0GJWz77RdJvwag4VSQ7trKd5uR+6SyaK72AiM
+	jEWDriPHxT8LXxsrc9D2MizifqnK9ZcimH9R/QMYTcrr7kTAWhRgvY+ffLXDm/a/hRcKyN
+	SXVOuWcT1HOxEq668ShgngCYqkgoN34=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-501-2aSkIwO9OIWBHrbrJSihuA-1; Fri, 10 Nov 2023 01:50:18 -0500
+X-MC-Unique: 2aSkIwO9OIWBHrbrJSihuA-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-53fa5cd4480so1330194a12.0
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:50:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699598922; x=1700203722;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ouRV/LCG/Nf/XmGrResNOpfdVt5pWSkdZ6WfLbMzMP0=;
-        b=JNfPAXpKUMeP+H6QaN2Hgy82ys7jpY3LC3vdhQfqvluJ3Fioi2TNZqQLrxZulSH0Dj
-         x8lAMS+dcAK4rgV4fpbRFcpeBoOEZcJAqX6I7uHae8An1IDvThC/ltxzlhu6hx8no9av
-         mYaMVNFF5Qkf6xK5/7y/YtAvS/g9mFy9uDOLpJPvfzkXWyvzpot3nhtwLP0GJA/e0BEr
-         a0RJ7LS2GMV/odlbA4W+MATKmjKs5xoH+AfntDIU3pPsw93A0a/j1R/KOGDmx5uZcZjz
-         q481uc9011k8oP9WdVckDkxuSJbeuO/Qf09NkIEVbX482COkvznvLjbsoaMHxneR6o8X
-         dRxw==
-X-Gm-Message-State: AOJu0YwnMQy9b16QAv4PGHP6PCrMTSl6X6Uv4aJoXKOjMrLuwaZtYf4t
-	5wcG5ELMgEjHH8x153kJkOJQSNAFzYgzmZdrFfTzYA==
-X-Google-Smtp-Source: AGHT+IEJ/6Fj/ZLcs7e0KS0WZ1fapJmLOr3Y6ZAw7WMibcclH6VmHsV8HYDdPcDqNQ9xw6OVTwDNjw==
-X-Received: by 2002:a50:9b0a:0:b0:543:5f7a:a020 with SMTP id o10-20020a509b0a000000b005435f7aa020mr4965964edi.25.1699598922205;
-        Thu, 09 Nov 2023 22:48:42 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id y93-20020a50bb66000000b0053e07fe8d98sm752701ede.79.2023.11.09.22.48.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 22:48:41 -0800 (PST)
-Date: Fri, 10 Nov 2023 07:48:40 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
-Message-ID: <ZU3SSClU6Ijn3M7B@nanopsycho>
-References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
- <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU0fzzmmxjnsNW0n@nanopsycho>
- <DM6PR11MB4657209FFC300E207E600F3F9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1699599017; x=1700203817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0M1EG+vkP/oHQ3C8AC569hjRGE3An7KZi4c6BBHfHyQ=;
+        b=Kv/r0QHnwiKy/snEz6x8wF695YZmE9D9Ym+LgKoyzAHdaHuaaxysax4b7GQpWiWVta
+         6awiwb43DnzH1ixnsvPP2PAexVgGCkz8K4Iw3IoL2lUhUSW9ke2hKOOdrKKN3pkGj8sU
+         S4iEtAhuZXgJFeqq1eQcuuecOHgz/2kyH0h9ee2Gy8WtNN3Ikk81n4v+3N7MdLWEcHiO
+         g4LwTUMWz35+GFHjiXCqMaNNSOfoXLqpNi52i6ac6ELoSXButNvlRkK93EE409iqTy8i
+         f1LkyKNT2ehfbVmEcB5lFl7sJmgiospLxbYo0cxSVlNgDSOOt9z/4gpBPleLwfrHxu3M
+         w7Ww==
+X-Gm-Message-State: AOJu0YwrEVt7hOvaZ9TgTCtJXsp0vVIS0fL0JE6g0M0BR1Bgt/57YEoL
+	8GuSs4ZMQRhOhR9EUq9o9DqQpTTsf3Xv/Na5XuXpsje9FgbcHquOQHExuyUQUtesx0zFkcQOON4
+	HPGN7nW68HxV2GnD0jm+z9iuqQNSNzmd3
+X-Received: by 2002:a50:9b19:0:b0:543:c388:1d69 with SMTP id o25-20020a509b19000000b00543c3881d69mr6199679edi.16.1699599017180;
+        Thu, 09 Nov 2023 22:50:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFJKgFLm8IAWbD4pDRiL75jQXjIaaTe0xwSRHT7UApyxw5o/GJCLUzV1pFMAY6YeZ6y/T9BJxhpOlXosUbTuEo=
+X-Received: by 2002:a50:9b19:0:b0:543:c388:1d69 with SMTP id
+ o25-20020a509b19000000b00543c3881d69mr6199675edi.16.1699599016862; Thu, 09
+ Nov 2023 22:50:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB4657209FFC300E207E600F3F9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20231103171641.1703146-1-lulu@redhat.com> <20231103171641.1703146-4-lulu@redhat.com>
+ <CACGkMEtVfHL2WPwxkYEfTKBE10uWfB2a75QQOO8rzn3=Y9FiBg@mail.gmail.com>
+ <CACLfguX9-wEQPUyZkJZoRMmgPDRFNyZCmt0nvHROhyP1yooiYA@mail.gmail.com>
+ <CACGkMEsp_rg+_01hwxCtZNOk2itB1L89mdOc1W1DG3umfEt5bw@mail.gmail.com>
+ <CACLfguW3NZawOL0ET2K7bmtGZuzQwUfJ2HSgnirswzZK1ayPnA@mail.gmail.com>
+ <CACGkMEvnNXC8PhBNQn_F0ROGRX3CvwmXM6wP2A69aydSuzThYw@mail.gmail.com> <CACGkMEtVqAYP3ec0+uxmdiOdXXevjy5S+7Vuc9s=PcS3ry0nCg@mail.gmail.com>
+In-Reply-To: <CACGkMEtVqAYP3ec0+uxmdiOdXXevjy5S+7Vuc9s=PcS3ry0nCg@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Fri, 10 Nov 2023 14:49:33 +0800
+Message-ID: <CACLfguXNtzD5TW4VC_Yu755Mtkz4vVo6_Vvo=gVs4pHdF3-NCg@mail.gmail.com>
+Subject: Re: [RFC v1 3/8] vhost: Add 3 new uapi to support iommufd
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, yi.l.liu@intel.com, jgg@nvidia.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fri, Nov 10, 2023 at 12:35:43AM CET, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Thursday, November 9, 2023 7:07 PM
->>
->>Thu, Nov 09, 2023 at 06:20:14PM CET, arkadiusz.kubalewski@intel.com wrote:
->>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>>Sent: Thursday, November 9, 2023 11:51 AM
->>>>
->>>>On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
->>>>> Fix issues when performing unordered unbind/bind of a kernel modules
->>>>> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
->>>>> Currently only serialized bind/unbind of such use case works, fix
->>>>> the issues and allow for unserialized kernel module bind order.
->>>>>
->>>>> The issues are observed on the ice driver, i.e.,
->>>>>
->>>>> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
->>>>> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
->>>>>
->>>>> results in:
->>>>>
->>>>> ice 0000:af:00.0: Removed PTP clock
->>>>> BUG: kernel NULL pointer dereference, address: 0000000000000010
->>>>> PF: supervisor read access in kernel mode
->>>>> PF: error_code(0x0000) - not-present page
->>>>> PGD 0 P4D 0
->>>>> Oops: 0000 [#1] PREEMPT SMP PTI
->>>>> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-rc5_next-
->>>>>queue_19th-Oct-2023-01625-g039e5d15e451 #1
->>>>> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS
->>>>>SE5C620.86B.02.01.0008.031920191559 03/19/2019
->>>>> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
->>>>> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b 66
->>>>>08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b
->>>>>10
->>>>>41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
->>>>> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
->>>>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
->>>>> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
->>>>> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
->>>>> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
->>>>> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
->>>>> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000)
->>>>>knlGS:0000000000000000
->>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
->>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>>> PKRU: 55555554
->>>>> Call Trace:
->>>>>   <TASK>
->>>>>   ? __die+0x20/0x70
->>>>>   ? page_fault_oops+0x76/0x170
->>>>>   ? exc_page_fault+0x65/0x150
->>>>>   ? asm_exc_page_fault+0x22/0x30
->>>>>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
->>>>>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
->>>>>   dpll_msg_add_pin_parents+0x142/0x1d0
->>>>>   dpll_pin_event_send+0x7d/0x150
->>>>>   dpll_pin_on_pin_unregister+0x3f/0x100
->>>>>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
->>>>>   ice_dpll_deinit+0x29/0xe0 [ice]
->>>>>   ice_remove+0xcd/0x200 [ice]
->>>>>   pci_device_remove+0x33/0xa0
->>>>>   device_release_driver_internal+0x193/0x200
->>>>>   unbind_store+0x9d/0xb0
->>>>>   kernfs_fop_write_iter+0x128/0x1c0
->>>>>   vfs_write+0x2bb/0x3e0
->>>>>   ksys_write+0x5f/0xe0
->>>>>   do_syscall_64+0x59/0x90
->>>>>   ? filp_close+0x1b/0x30
->>>>>   ? do_dup2+0x7d/0xd0
->>>>>   ? syscall_exit_work+0x103/0x130
->>>>>   ? syscall_exit_to_user_mode+0x22/0x40
->>>>>   ? do_syscall_64+0x69/0x90
->>>>>   ? syscall_exit_work+0x103/0x130
->>>>>   ? syscall_exit_to_user_mode+0x22/0x40
->>>>>   ? do_syscall_64+0x69/0x90
->>>>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
->>>>> RIP: 0033:0x7fdc7d93eb97
->>>>> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e
->>>>>fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0
->>>>>ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
->>>>> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
->>>>> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
->>>>> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
->>>>> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
->>>>> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
->>>>> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
->>>>>   </TASK>
->>>>> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1 vfio
->>>>>irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer
->>>>>snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs libcrc32c
->>>>>rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod
->>>>>target_core_mod
->>>>>ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm intel_rapl_msr
->>>>>intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common
->>>>>isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal
->>>>>intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt
->>>>>iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr
->>>>>i2c_i801
->>>>>ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus
->>>>>ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache
->>>>>jbd2
->>>>>sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice
->>>>>crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci
->>>>>ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded: iavf]
->>>>> CR2: 0000000000000010
->>>>>
->>>>> Arkadiusz Kubalewski (3):
->>>>>    dpll: fix pin dump crash after module unbind
->>>>>    dpll: fix pin dump crash for rebound module
->>>>>    dpll: fix register pin with unregistered parent pin
->>>>>
->>>>>   drivers/dpll/dpll_core.c    |  8 ++------
->>>>>   drivers/dpll/dpll_core.h    |  4 ++--
->>>>>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++--------------
->>>>>-
->>>>>   3 files changed, 26 insertions(+), 23 deletions(-)
->>>>>
->>>>
->>>>
->>>>I still don't get how can we end up with unregistered pin. And shouldn't
->>>>drivers do unregister of dpll/pin during release procedure? I thought it
->>>>was kind of agreement we reached while developing the subsystem.
->>>>
->>>
->>>It's definitely not about ending up with unregistered pins.
->>>
->>>Usually the driver is loaded for PF0, PF1, PF2, PF3 and unloaded in
->>>opposite
->>>order: PF3, PF2, PF1, PF0. And this is working without any issues.
->>
->>Please fix this in the driver.
->>
+Jason Wang <jasowang@redhat.com> =E4=BA=8E2023=E5=B9=B411=E6=9C=8810=E6=97=
+=A5=E5=91=A8=E4=BA=94 10:32=E5=86=99=E9=81=93=EF=BC=9A
 >
->Thanks for your feedback, but this is already wrong advice.
+> On Wed, Nov 8, 2023 at 3:09=E2=80=AFPM Jason Wang <jasowang@redhat.com> w=
+rote:
+> >
+> > On Wed, Nov 8, 2023 at 2:39=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote=
+:
+> > >
+> > > On Wed, Nov 8, 2023 at 11:03=E2=80=AFAM Jason Wang <jasowang@redhat.c=
+om> wrote:
+> > > >
+> > > > On Tue, Nov 7, 2023 at 2:57=E2=80=AFPM Cindy Lu <lulu@redhat.com> w=
+rote:
+> > > > >
+> > > > > On Mon, Nov 6, 2023 at 3:30=E2=80=AFPM Jason Wang <jasowang@redha=
+t.com> wrote:
+> > > > > >
+> > > > > > On Sat, Nov 4, 2023 at 1:17=E2=80=AFAM Cindy Lu <lulu@redhat.co=
+m> wrote:
+> > > > > > >
+> > > > > > > VHOST_VDPA_SET_IOMMU_FD: bind the device to iommufd device
+> > > > > > >
+> > > > > > > VDPA_DEVICE_ATTACH_IOMMUFD_AS: Attach a vdpa device to an iom=
+mufd
+> > > > > > > address space specified by IOAS id.
+> > > > > > >
+> > > > > > > VDPA_DEVICE_DETACH_IOMMUFD_AS: Detach a vdpa device
+> > > > > > > from the iommufd address space
+> > > > > > >
+> > > > > > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > > > > > ---
+> > > > > >
+> > > > > > [...]
+> > > > > >
+> > > > > > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/=
+vhost.h
+> > > > > > > index f5c48b61ab62..07e1b2c443ca 100644
+> > > > > > > --- a/include/uapi/linux/vhost.h
+> > > > > > > +++ b/include/uapi/linux/vhost.h
+> > > > > > > @@ -219,4 +219,70 @@
+> > > > > > >   */
+> > > > > > >  #define VHOST_VDPA_RESUME              _IO(VHOST_VIRTIO, 0x7=
+E)
+> > > > > > >
+> > > > > > > +/* vhost_vdpa_set_iommufd
+> > > > > > > + * Input parameters:
+> > > > > > > + * @iommufd: file descriptor from /dev/iommu; pass -1 to uns=
+et
+> > > > > > > + * @iommufd_ioasid: IOAS identifier returned from ioctl(IOMM=
+U_IOAS_ALLOC)
+> > > > > > > + * Output parameters:
+> > > > > > > + * @out_dev_id: device identifier
+> > > > > > > + */
+> > > > > > > +struct vhost_vdpa_set_iommufd {
+> > > > > > > +       __s32 iommufd;
+> > > > > > > +       __u32 iommufd_ioasid;
+> > > > > > > +       __u32 out_dev_id;
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +#define VHOST_VDPA_SET_IOMMU_FD \
+> > > > > > > +       _IOW(VHOST_VIRTIO, 0x7F, struct vhost_vdpa_set_iommuf=
+d)
+> > > > > > > +
+> > > > > > > +/*
+> > > > > > > + * VDPA_DEVICE_ATTACH_IOMMUFD_AS -
+> > > > > > > + * _IOW(VHOST_VIRTIO, 0x7f, struct vdpa_device_attach_iommuf=
+d_as)
+> > > > > > > + *
+> > > > > > > + * Attach a vdpa device to an iommufd address space specifie=
+d by IOAS
+> > > > > > > + * id.
+> > > > > > > + *
+> > > > > > > + * Available only after a device has been bound to iommufd v=
+ia
+> > > > > > > + * VHOST_VDPA_SET_IOMMU_FD
+> > > > > > > + *
+> > > > > > > + * Undo by VDPA_DEVICE_DETACH_IOMMUFD_AS or device fd close.
+> > > > > > > + *
+> > > > > > > + * @argsz:     user filled size of this data.
+> > > > > > > + * @flags:     must be 0.
+> > > > > > > + * @ioas_id:   Input the target id which can represent an io=
+as
+> > > > > > > + *             allocated via iommufd subsystem.
+> > > > > > > + *
+> > > > > > > + * Return: 0 on success, -errno on failure.
+> > > > > > > + */
+> > > > > > > +struct vdpa_device_attach_iommufd_as {
+> > > > > > > +       __u32 argsz;
+> > > > > > > +       __u32 flags;
+> > > > > > > +       __u32 ioas_id;
+> > > > > > > +};
+> > > > > >
+> > > > > > I think we need to map ioas to vDPA AS, so there should be an A=
+SID
+> > > > > > from the view of vDPA?
+> > > > > >
+> > > > > > Thanks
+> > > > > >
+> > > > > The qemu will have a structure save and  maintain this informatio=
+n,So
+> > > > > I didn't add this
+> > > > >  in kernel=EF=BC=8Cwe can add this but maybe only for check?
+> > > >
+> > > > I meant for example, a simulator has two AS. How can we attach an i=
+oas
+> > > > to a specific AS with the above uAPI?
+> > > >
+> > > > Thank>
+> > > this   __u32 ioas_id here is alloc from the iommufd system. maybe I
+> > > need to change to new name iommuds_asid to
+> > > make this more clear
+> > > the process in qemu is
+> > >
+> > > 1) qemu want to use AS 0 (for example)
+> > > 2) checking the existing asid. the asid 0 not used before
+> > > 3 )alloc new asid from iommufd system, get new ioas_id (maybe 3 for e=
+xample)
+> > > qemu will save this relation 3<-->0 in the driver.
+> > > 4) setting the ioctl VDPA_DEVICE_ATTACH_IOMMUFD_AS to attach new ASID
+> > > to the kernel
+> >
+> > So if we want to map IOMMUFD AS 3 to VDPA AS 0, how can it be done?
+> >
+> > For example I didn't see a vDPA AS parameter in the above uAPI.
+> >
+> > vhost_vdpa_set_iommufd has iommufd_ioasid which is obviously not the vD=
+PA AS.
+> >
+> > And ioas_id of vdpa_device_attach_iommufd_as (as you explained above)
+> > is not vDPA AS.
 >
->Our HW/FW is designed in different way than yours, it doesn't mean it is wrong.
->As you might recall from our sync meetings, the dpll subsystem is to unify
->approaches and reduce the code in the drivers, where your advice is exactly
->opposite, suggested fix would require to implement extra synchronization of the
->dpll and pin registration state between driver instances, most probably with
->use of additional modules like aux-bus or something similar, which was from the
->very beginning something we tried to avoid.
->Only ice uses the infrastructure of muxed pins, and this is broken as it
->doesn't allow unbind the driver which have registered dpll and pins without
->crashing the kernel, so a fix is required in dpll subsystem, not in the driver.
+> For example, the simulator/mlx5e has two ASes. It needs to know the
+> mapping between vDPA AS and iommufd AS. Otherwise the translation will
+> be problematic.
+>
+> Thanks
+>
+Got it, thanks Jason. I will re-write this part
+Thanks
+Cindy
+> >
+> > Thanks
+> >
+> >
+> > > 5=EF=BC=89 while map the memory=EF=BC=8C qemu will use ASID 3 to map =
+/umap
+> > > and use ASID 0 for legacy mode map/umap
+> > >
+> > > So kernel here will not maintain the ioas_id from iommufd=EF=BC=8C
+> > > and this also make the code strange since there will 2 different asid
+> > > for the same AS, maybe we can save these information in the kernel
+> > > Thanks
+> > > cindy
+> > > > > Thanks
+> > > > > Cindy
+> > > > > > > +
+> > > > > > > +#define VDPA_DEVICE_ATTACH_IOMMUFD_AS \
+> > > > > > > +       _IOW(VHOST_VIRTIO, 0x82, struct vdpa_device_attach_io=
+mmufd_as)
+> > > > > > > +
+> > > > > > > +/*
+> > > > > > > + * VDPA_DEVICE_DETACH_IOMMUFD_AS
+> > > > > > > + *
+> > > > > > > + * Detach a vdpa device from the iommufd address space it ha=
+s been
+> > > > > > > + * attached to. After it, device should be in a blocking DMA=
+ state.
+> > > > > > > + *
+> > > > > > > + * Available only after a device has been bound to iommufd v=
+ia
+> > > > > > > + * VHOST_VDPA_SET_IOMMU_FD
+> > > > > > > + *
+> > > > > > > + * @argsz:     user filled size of this data.
+> > > > > > > + * @flags:     must be 0.
+> > > > > > > + *
+> > > > > > > + * Return: 0 on success, -errno on failure.
+> > > > > > > + */
+> > > > > > > +struct vdpa_device_detach_iommufd_as {
+> > > > > > > +       __u32 argsz;
+> > > > > > > +       __u32 flags;
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +#define VDPA_DEVICE_DETACH_IOMMUFD_AS \
+> > > > > > > +       _IOW(VHOST_VIRTIO, 0x83, struct vdpa_device_detach_io=
+mmufd_as)
+> > > > > > > +
+> > > > > > >  #endif
+> > > > > > > --
+> > > > > > > 2.34.3
+> > > > > > >
+> > > > > >
+> > > > >
+> > > >
+> > >
+>
 
-I replied in the other patch thread.
-
-
->
->Thank you!
->Arkadiusz
->
->>
->>>
->>>Above crash is caused because of unordered driver unload, where dpll
->>>subsystem
->>>tries to notify muxed pin was deleted, but at that time the parent is
->>>already
->>>gone, thus data points to memory which is no longer available, thus crash
->>>happens when trying to dump pin parents.
->>>
->>>This series fixes all issues I could find connected to the situation where
->>>muxed-pins are trying to access their parents, when parent registerer was
->>>removed
->>>in the meantime.
->>>
->>>Thank you!
->>>Arkadiusz
 
