@@ -1,76 +1,69 @@
-Return-Path: <netdev+bounces-47076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0E57E7B5F
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:24:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2EA07E7B89
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7341C20A23
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:24:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D9C5B20E04
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2235A14012;
-	Fri, 10 Nov 2023 10:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66EB10A09;
+	Fri, 10 Nov 2023 10:58:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJ+nQjAk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ifCvakJ0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E18F14008
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:23:56 +0000 (UTC)
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8470428B11;
-	Fri, 10 Nov 2023 02:23:55 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cc3542e328so15572815ad.1;
-        Fri, 10 Nov 2023 02:23:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77EC1D2EB
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:58:36 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381182AD2A;
+	Fri, 10 Nov 2023 02:58:35 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6b5af4662b7so1727581b3a.3;
+        Fri, 10 Nov 2023 02:58:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699611835; x=1700216635; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/2cSIxf2LiNikr5+UZH8g91X0Uc2ts17P5QtMNK58mc=;
-        b=aJ+nQjAkK7YVbVINs+X6SEG5H2lWSwRpXrpnsNccu9xUvxlB4MjLw85MRwRKG7MiLP
-         OiuPZY8jQPgvYz8IVRH8R8C51VoeHVmO8jEK8ZqYnDhaFb5NM6k0G8EbLRTDabRKPuXv
-         PWhJH3I34OOD4cN0xvecFbJrO+yivn4mQSttvt+Pvpnr2RHcuKAx0HvlGWMYGg7RcRAo
-         snv7Q6WgTWnJF9k+3neCY0vYJDXnyJepwRIMQDCFGEuGi0dc9OlAIthoTvNcyegj1KMy
-         HbpV0qITFs4m7meqUU422MwXQpBHEnst4v/6J4ci+SqHyiax0wZ87wKrWrFS2Ie0qWuv
-         stYA==
+        d=gmail.com; s=20230601; t=1699613914; x=1700218714; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rgCullXs69eYhISfXuDpHxjryEOlOpmI+uw8NW6NNb4=;
+        b=ifCvakJ0vl9wmUWX2XTa/QoQkBQUWKcs8tm6sTxQfqDiLRdsjUGtndEGAmEna25PcT
+         qs/JYNJO2FfOnyMapQsEed1iclBoJ7AQXz8mHzBZOqonlC5oJDUU61fMXPGBIMDkWt8O
+         snjJ8GDydOqFWK4llU5ZFfPTc9JJPpCWGUsPiQsNotzvYf+jAl/evu2hUVAr0SU17xJ0
+         nyPMlVbpOp06S8V/kwYe3T6vIe97lrijq/wceoako9JFtOdOZpsmbzAFB4BCO+joMYVv
+         H4lkThX2WR8AIORrixqRWh0oAWUbwnsM3qD6pfCUKsKp9JyLbVfMV9+z10wLQDzcPbsQ
+         syoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699611835; x=1700216635;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/2cSIxf2LiNikr5+UZH8g91X0Uc2ts17P5QtMNK58mc=;
-        b=P/0AjSY7VPKwYcRr6E0XTfw1TIcDLCHGvkbANNzTUviLK2v67olTk9VheyaqIssmk0
-         OyVrFnI5nFRvr3QLfaz/3X4cpzcBEbEwTc2NQ4Bwfd+Q+VahJEPafGnETTH+ipBe+64f
-         WnnUsCZ0Kh1+Nst/k2frhTkaTrmTauZzBk48SNcEiColxu1kehohZez4tALWytRqulOl
-         XrLsaUlbG6EA5ARinazp4erxui00UUFWqb4DyERPjRGai+vV0BdTVI+/sy4hfqxgLJRs
-         47ROD8XjxaVGYsalocA7bjEl80+QYAZuRAG1MdgPaygrfYDDYOkEeibZnjZVvcPemTX1
-         uDVA==
-X-Gm-Message-State: AOJu0YzNiO1tcFNPv/9BHerb8NEa/DR/CmJQGT4lA4Xh9ISJ2A0OnIrA
-	/iTUvFTFxyTaB6qBITARC5w=
-X-Google-Smtp-Source: AGHT+IH+Lqu9XPEnKKNzGYWaYuidCTu0HniqN9du1LvZf+5vxSLs//4ZqYeE9JdELHxJyeMLO1iwAw==
-X-Received: by 2002:a17:902:eac6:b0:1cc:6f7b:636a with SMTP id p6-20020a170902eac600b001cc6f7b636amr7274169pld.2.1699611834844;
-        Fri, 10 Nov 2023 02:23:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699613914; x=1700218714;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rgCullXs69eYhISfXuDpHxjryEOlOpmI+uw8NW6NNb4=;
+        b=Bw4UL6DUfqUzqDukUJxmrxHhr/8tmtV9HeawBs2nvdwzmEkmKtJp7W/z/rjDM7B2HP
+         B4irlDs3rrsWZNDsO4jQOT/MuMm3Wq/ZkeS1Zr711cytpwetMM9hV8jvCXelNhajcfaI
+         lsphGbDHlEzatXXCMdQy3PmCgNBfktYYjO53ptTVveTtcFmnX/3u38GNlNt1X81BvHvf
+         JsA690hlUoUxJfZqfWRzRbBsg1mWA1/tw7yQRODOM7uHNQEtHLTfYTfaBwGj9xkwhPt7
+         uk4yowkA1JlFqbwfIpHYjMR+Ai6CMdSm58OHgpc7bMygwek/85pOwNww1IRxaMNOcqse
+         bekw==
+X-Gm-Message-State: AOJu0YxcM6JGwdWqbPRakjRwLVT/1dMfu9neoOrKf8oJT8ed0djdjBtl
+	X3/3CL43zMPRpe+1hqWNGLBPV6rAG+GGnw==
+X-Google-Smtp-Source: AGHT+IEQZj+JOsqGYgZ8zjnhecxauxVdWisXmGc0MRIjquJPWv/siqqO9vhcdG7oRGhlxy9dE/sW8g==
+X-Received: by 2002:a05:6a20:5504:b0:181:261f:f368 with SMTP id ko4-20020a056a20550400b00181261ff368mr6412147pzb.53.1699613914507;
+        Fri, 10 Nov 2023 02:58:34 -0800 (PST)
 Received: from dragonet (dragonet.kaist.ac.kr. [143.248.133.220])
-        by smtp.gmail.com with ESMTPSA id n4-20020a170902e54400b001cc55bcd0c1sm5014551plf.177.2023.11.10.02.23.51
+        by smtp.gmail.com with ESMTPSA id j8-20020a17090276c800b001bb97e51ab4sm5103694plt.98.2023.11.10.02.58.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 02:23:54 -0800 (PST)
-Date: Fri, 10 Nov 2023 19:22:43 +0900
+        Fri, 10 Nov 2023 02:58:34 -0800 (PST)
+Date: Fri, 10 Nov 2023 19:57:23 +0900
 From: "Dae R. Jeong" <threeearcat@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, borisp@nvidia.com,
-	john.fastabend@gmail.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ywchoi@casys.kaist.ac.kr
-Subject: Re: Missing a write memory barrier in tls_init()
-Message-ID: <ZU4Ecx2qbdqGfRVw@dragonet>
-References: <ZUNLocdNkny6QPn8@dragonet>
- <20231106143659.12e0d126@kernel.org>
- <ZUq-GrWMvbfhX74a@hog>
- <20231107185324.22eecf10@kernel.org>
- <ZUtP7lMqFnNK8lw_@hog>
+To: borisp@nvidia.com, john.fastabend@gmail.com, kuba@kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: ywchoi@casys.kaist.ac.kr
+Subject: [PATCH] tls: fix missing memory barrier in tls_init
+Message-ID: <ZU4Mk_RfzvRpwkmX@dragonet>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,60 +72,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZUtP7lMqFnNK8lw_@hog>
 
-On Wed, Nov 08, 2023 at 10:07:58AM +0100, Sabrina Dubroca wrote:
-> 2023-11-07, 18:53:24 -0800, Jakub Kicinski wrote:
-> > On Tue, 7 Nov 2023 23:45:46 +0100 Sabrina Dubroca wrote:
-> > > Wouldn't it be enough to just move the rcu_assign_pointer after ctx is
-> > > fully initialized, ie just before update_sk_prot? also clearer wrt
-> > > RCU.
-> > 
-> > I'm not sure, IIUC rcu_assign_pointer() is equivalent to
-> > WRITE_ONCE() on any sane architecture, it depends on address
-> > dependencies to provide ordering.
-> 
-> Not what the doc says:
-> 
->     /**
->      * rcu_assign_pointer() - assign to RCU-protected pointer
->      [...]
->      * Inserts memory barriers on architectures that require them
->      * (which is most of them), and also prevents the compiler from
->      * reordering the code that initializes the structure after the pointer
->      * assignment.
->      [...]
->      */
-> 
-> And it uses smp_store_release (unless writing NULL).
-> 
+In tls_init(), a write memory barrier is missing, and store-store
+reordering may cause NULL dereference in tls_{setsockopt,getsockopt}.
 
-I think Sabrina is right. We can rely on the release semantic implied
-in rcu_assign_pointer(). Simply moving rcu_assign_pointer() to the end
-of tls_ctx_create() should prevent a scenario what I thought (ie.,
-store-store reordering between ctx->sk_proto and sk->sk_prot).
+CPU0                               CPU1
+-----                              -----
+// In tls_init()
+// In tls_ctx_create()
+ctx = kzalloc()
+ctx->sk_proto = READ_ONCE(sk->sk_prot) -(1)
+
+// In update_sk_prot()
+WRITE_ONCE(sk->sk_prot, tls_prots)     -(2)
+
+                                   // In sock_common_setsockopt()
+                                   READ_ONCE(sk->sk_prot)->setsockopt()
+
+                                   // In tls_{setsockopt,getsockopt}()
+                                   ctx->sk_proto->setsockopt()    -(3)
+
+In the above scenario, when (1) and (2) are reordered, (3) can observe
+the NULL value of ctx->sk_proto, causing NULL dereference.
+
+To fix it, we rely on rcu_assign_pointer() which implies the release
+barrier semantic. By moving rcu_assign_pointer() after ctx is fully
+initialized, we can ensure that all fields of ctx are visible when
+changing sk->sk_prot.
+
+Also, as Sabrina suggested, this patch gets rid of tls_ctx_create(),
+and move all that into tls_init().
+
+Signed-off-by: Dae R. Jeong <threeearcat@gmail.com>
+---
+ net/tls/tls_main.c | 32 +++++++++++++++-----------------
+ 1 file changed, 15 insertions(+), 17 deletions(-)
 
 diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index 1c2c6800949d..d20b823c68d4 100644
+index 1c2c6800949d..235fa93dc7ef 100644
 --- a/net/tls/tls_main.c
 +++ b/net/tls/tls_main.c
-@@ -816,9 +816,9 @@ struct tls_context *tls_ctx_create(struct sock *sk)
-                return NULL;
- 
-        mutex_init(&ctx->tx_lock);
--       rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
-        ctx->sk_proto = READ_ONCE(sk->sk_prot);
-        ctx->sk = sk;
-+       rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
-        return ctx;
+@@ -806,22 +806,6 @@ static int tls_setsockopt(struct sock *sk, int level, int optname,
+ 	return do_tls_setsockopt(sk, optname, optval, optlen);
  }
+ 
+-struct tls_context *tls_ctx_create(struct sock *sk)
+-{
+-	struct inet_connection_sock *icsk = inet_csk(sk);
+-	struct tls_context *ctx;
+-
+-	ctx = kzalloc(sizeof(*ctx), GFP_ATOMIC);
+-	if (!ctx)
+-		return NULL;
+-
+-	mutex_init(&ctx->tx_lock);
+-	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
+-	ctx->sk_proto = READ_ONCE(sk->sk_prot);
+-	ctx->sk = sk;
+-	return ctx;
+-}
+-
+ static void build_proto_ops(struct proto_ops ops[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
+ 			    const struct proto_ops *base)
+ {
+@@ -933,6 +917,7 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
+ 
+ static int tls_init(struct sock *sk)
+ {
++	struct inet_connection_sock *icsk = inet_csk(sk);
+ 	struct tls_context *ctx;
+ 	int rc = 0;
+ 
+@@ -954,14 +939,27 @@ static int tls_init(struct sock *sk)
+ 
+ 	/* allocate tls context */
+ 	write_lock_bh(&sk->sk_callback_lock);
+-	ctx = tls_ctx_create(sk);
++	ctx = kzalloc(sizeof(*ctx), GFP_ATOMIC);
+ 	if (!ctx) {
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+ 
++	mutex_init(&ctx->tx_lock);
++	ctx->sk_proto = READ_ONCE(sk->sk_prot);
++	ctx->sk = sk;
+ 	ctx->tx_conf = TLS_BASE;
+ 	ctx->rx_conf = TLS_BASE;
++	/* rcu_assign_pointer() should be called after initialization of
++	 * all fields of ctx. It ensures that all fields of ctx are
++	 * visible before changing sk->sk_prot, and prevents reading of
++	 * uninitialized fields in tls_{getsockopt,setsockopt}. Note that
++	 * we do not need a read barrier in tls_{getsockopt,setsockopt} as
++	 * there is an address dependency between
++	 * sk->sk_proto->{getsockopt,setsockopt} and ctx->sk_proto.
++	 */
++	rcu_assign_pointer(icsk->icsk_ulp_data, ctx);
++
+ 	update_sk_prot(sk, ctx);
+ out:
+ 	write_unlock_bh(&sk->sk_callback_lock);
+-- 
+2.42.1
 
-But what I also wonder is that, do we need to ensure that
-ctx->{tx,rx}_conf is visible before updating sk->sk_prot? If so, as
-Sabrina suggested, we may want to move rcu_assign_pointer() right
-before update_sk_prot().
-
-
-Best regards,
-Dae R. Jeong
 
