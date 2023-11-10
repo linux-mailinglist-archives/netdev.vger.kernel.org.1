@@ -1,170 +1,203 @@
-Return-Path: <netdev+bounces-47005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 560AD7E797F
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:43:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76D5E7E7923
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F022281149
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:43:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C78E1C20D1C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66416AA5;
-	Fri, 10 Nov 2023 06:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBA053AB;
+	Fri, 10 Nov 2023 06:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J5S3CaSD"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fxmA4oPM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558BA6AB1
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:43:54 +0000 (UTC)
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208B77D89
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:43:53 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-54553e4888bso2506535a12.2
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:43:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1699598631; x=1700203431; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5aAyrsi/OdYTJt7ztD1zdPN9A45VA9yQ9S/fXiOmzBc=;
-        b=J5S3CaSDAdc/e4xSzvGhgW7snrNo6ae70n04Yf855IZS+Ba+ujCMitmKbCz6NiFfPs
-         4oFEVjb31Gxn6YqT00BdZso8DkQ4BsBMyhUFGhT7h8JFE6sMoEHR4hTqrLcsTV9G0F0T
-         s8NfOD43A07c/wSPw3UhKcpTk7QAlDK2tV+NY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699598631; x=1700203431;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5aAyrsi/OdYTJt7ztD1zdPN9A45VA9yQ9S/fXiOmzBc=;
-        b=PN/IzWiU8wMV82FFvQV9VUVlD/fGuYF5eZvcgGoKHN7t4+9cpguSdzAnP5wEvfIEPs
-         mEZFDBhgZd6WxkLYq54DOq1M7zgAiOVYBzZox7mCEhnOFtYnYadJ4SBhdLaLwCEDbrFA
-         KJgEo8IycO8/BFYJL0cOT4/KYe4+2xYW211L3OyMOeRfnK0qqXfdASl5Hmf+NZ/NmZaB
-         hyrALLi/NYxpxm82cnsaZ8X+gIIzNLwbf/vFekTtSDjH3qYuEV7cBy12skUspjpMxcoC
-         cyQ6CFONrhLLpgKedKUKN71fXA6/fe4egOZz40Si9nBY3NUFEHTg+nSZClNj6H3qrmEe
-         8pKA==
-X-Gm-Message-State: AOJu0Yy6NsEolBCPB+WWEBgpD2M/oIMfR4gJu6uVlKM11Z+8nc6UHvfN
-	fbmG+cgIY7eh7okZn46x68U21d6xgIbY2/gW1QucA9PauitAqCzC
-X-Google-Smtp-Source: AGHT+IGNIclidNAlX0bKuPEoO8+P0utqB9UWfIj7BHmAgCgipVSJkQHDhkEHEBzr+YUc1On/0f+M/uFn2Xfgq20iyX0=
-X-Received: by 2002:a50:d65c:0:b0:53d:eca8:8775 with SMTP id
- c28-20020a50d65c000000b0053deca88775mr6077048edj.26.1699592222329; Thu, 09
- Nov 2023 20:57:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97639525C;
+	Fri, 10 Nov 2023 06:20:06 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2059.outbound.protection.outlook.com [40.107.92.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7626595;
+	Thu,  9 Nov 2023 22:20:04 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oYdRE+TvYp9sS/jmG8WyPrt7nnwPKV0NLPZ/bIwVcCzHO7/dx3HlQX6m0jYUGB3c0r5S7u8mXJ9sSc2Wlw6fwDfOYgrZAtCzD7NmJZtBlj6ZY5UAFo5H5IfF9t5xUGGxTaKd9I5FjTgusJcOxZV+XPKYCQMIBsl/f/5a8ap7xxsf5nNn9+v7JrvGVCs+YDqGegsVGwMPsDmSNTQPoOmMxdxEYBvdAWwxyMqpNzWg2+55K5w4EVcSezXKaP9JX9d36zNGEqItC3l4bdkN3vpr8FptqPW9RVz7wf1XNzcUxMC8qTo1Jb6GN+ugMb286p/a6xqB5S6igaa0+yjGeNxJkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W2IjFB2Py0Qm69uOKPb9IPDrnGI6L9Ns2AaebZ3f+NM=;
+ b=dEtik4TqvHLT5w+cfxt6WDG2tmzs0Gmf3O1SHx7s3W8hNog+K8n6XAGBSFCyvytteOywzSwVoSoqiHPWdkvMdU9FAa+LWcy8Kom2a66AwU4yBjF2rBirDn6BDsIbTvUYvjtkbnAtgrX/unlRSJnLVDgcTh34vaasScj7ANxrq+ds/RyzvhG8l0Fy6wwu0dOvbqgVTFr5G2rLjlUGKlOKEs7Ay9SgZwTeICfbYF0n0uzhv6xlQHRiodC7cJC+Bl46P11Kch1MJF7trXvLegX4eBCiHWijLxyXPRkLNYC+LiNr8YzICKJcypeOlCG1JSbnH968VKyOj4PBVahMgb7/6w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W2IjFB2Py0Qm69uOKPb9IPDrnGI6L9Ns2AaebZ3f+NM=;
+ b=fxmA4oPMx5TU6y0ZPxYmPqRYm5Ik5KSygCpz8SBWEb4vc7fwdO/VO/lULbz5JSDKExUG2jO9I3K45QY9iQMnEr3A4eu9DIcuS0vtum4QUW41kXL8S/nOqXcgu3Rr07VtRLd4j4oERm6EUDuxs+PgxUXbWbk0n5/hSCCg3v+Ixu0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6) by
+ MW3PR12MB4363.namprd12.prod.outlook.com (2603:10b6:303:56::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6977.19; Fri, 10 Nov 2023 05:31:23 +0000
+Received: from DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::5287:5f3:34f:4402]) by DM4PR12MB6351.namprd12.prod.outlook.com
+ ([fe80::5287:5f3:34f:4402%7]) with mapi id 15.20.6954.028; Fri, 10 Nov 2023
+ 05:31:23 +0000
+Message-ID: <665cb7da-3d7e-4323-9a07-d4f59102c5f1@amd.com>
+Date: Fri, 10 Nov 2023 13:31:09 +0800
+User-Agent: Mozilla Thunderbird
+Cc: majun@amd.com
+Subject: Re: [Patch v13 0/9] Enable Wifi RFI interference mitigation feature
+ support
+Content-Language: en-US
+To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
+ Lijo.Lazar@amd.com, mario.limonciello@amd.com, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, platform-driver-x86@vger.kernel.org
+References: <20231030071832.2217118-1-Jun.Ma2@amd.com>
+From: "Ma, Jun" <majun@amd.com>
+In-Reply-To: <20231030071832.2217118-1-Jun.Ma2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG3P274CA0005.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::17)
+ To DM4PR12MB6351.namprd12.prod.outlook.com (2603:10b6:8:a2::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231110002340.3612515-1-alexey.pakhunov@spacex.com> <20231110002340.3612515-2-alexey.pakhunov@spacex.com>
-In-Reply-To: <20231110002340.3612515-2-alexey.pakhunov@spacex.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 9 Nov 2023 20:56:51 -0800
-Message-ID: <CACKFLinOyTgH9STGbFc89sr6eqEiFeWWDvD4DurJjq3_-7+y+A@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] tg3: Increment tx_dropped in tg3_tso_bug()
-To: alexey.pakhunov@spacex.com
-Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b3f9930609c6a470"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB6351:EE_|MW3PR12MB4363:EE_
+X-MS-Office365-Filtering-Correlation-Id: b655a1cd-bf58-4fc3-f6fb-08dbe1ae4678
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	OVXqpOTGUjkR0w63DG9B+sgISTHyrwfsPwFqMlPP99QhJvP51w2oXXuox5QJSJAnANz8oxzglkpV3Iy4Fyv44hATu8J0+5n5IkjpdtQV2j8AiH6nmA8zHQLiphCSnTnZbLyB1S6UHFTyhzE4L8eiOOvccHQJ6gfr+9MhByf/bCmzO4Nz2boce7au4TTz2AKZqznZbx81ZyCoOgZ1orUI0PRzDYxn24kTTShsGf10e+AERtMgk1zPEQS3RTYzGQsDF13ga9si9NmNst8GUrJ+Z3ugu1Ri8y0xi3JUG3iu3JNh/17deXrkxkXzff48SPVrRinBad75qKhj+uQb1R3eSWq3o9RM3h5KPUpVXEBT+juU2LW+lidcirrGf+MCvonOCX0+sjjN9fECuwGZkyGa0WPeLfqFaE6Ojie0BLdXLiaLn0FkhbVbI2gLdLv5m3tsav58TzMDZWFOeuGPWSUZZxGeT4/bNwF8D/1OxjfqBgwDauFscQm/TwVyuLAJKalH+kiuewu5ssk0ZfhO1ELGP/fzNQr3GIhRQyf6/8EpLT3N2KOHhoVlIONXlDh1DqYUNEjOKWQeOoZ643x2dSvLUbcOW9eY98DpraBLnXf99V9JZ99FJLyEAd4UU/0MuYR/SVfMk95vJre87u99wcht0RYbeaC8n1sSbFK7A4TTAhk=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6351.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(346002)(366004)(376002)(39860400002)(230922051799003)(64100799003)(1800799009)(451199024)(186009)(26005)(2616005)(6512007)(83380400001)(31686004)(6666004)(36756003)(53546011)(478600001)(6506007)(6486002)(316002)(2906002)(66946007)(66556008)(66476007)(41300700001)(5660300002)(31696002)(7416002)(38100700002)(4326008)(8676002)(8936002)(921008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?dUhzMFlGOXkrSGhsZlJJUk4ybVB2NDNkemdQR29HT2NGVFI2U2k2Y2J3N25R?=
+ =?utf-8?B?ZFgwTE5RRnYzdjNBbXZNeWh3TVFtRDhvRFkzYmc3N241d0U5S250TU1jUFNj?=
+ =?utf-8?B?bDRlNUIzcUZtcHFndWNXQVFUd2l4Nkk4cFdNS1BiUWNkRngxakZZZGVDQjd2?=
+ =?utf-8?B?cnJSVnpwV2swZkRYeXV1L21lZEptZWF3dWVvcldQNjVXNHFmeTRoMXJGQ0o5?=
+ =?utf-8?B?ZU8xSXcrK1dXRXZZU3c3UkpjaEFPbEFZTkVJYzlmNTlRMlliSFFHUHA5TzZq?=
+ =?utf-8?B?Sm1PeCtiNWtVWWZqWHJ2MDhWUEgxK2htMm50WG9ieFdnZGNBMzZLVXhYc3dk?=
+ =?utf-8?B?ZzBJd25nZjMwenhLaGJycUI3SWxjM2VUcHBNVkhMc1BrWFJtam42QUNvdnNv?=
+ =?utf-8?B?Y0dScDl1N21Bb2N6MFc3aTZFZVJZbkN6Y0o1WjhwaWhnVVZtU28veVdrdlFo?=
+ =?utf-8?B?RE1sTENYL2drcElQZ0dMUUpRVUNtMGR4bFlXdzRDbzBTR2IzbW9LVitMV1dF?=
+ =?utf-8?B?ZkhkeHIvNndUTEhINkhqSXYzUzdCTzFnZWRHcVkxdFVndVdTKzk3SjVlaldT?=
+ =?utf-8?B?VUFjQ2kxTENuWTkxOGt0bXNYaXArbTlJSUY0bHc2dDc2Uk9BM1UxWjBKSVA0?=
+ =?utf-8?B?NDVuU0wxMFRpbjBTWElVbWlrejQ1OFJOU1VuZ0p4eFVIY2J4Ny96SCtUQSt6?=
+ =?utf-8?B?dDlia1ROUVhtMnpvNmJpSHphRnRZejV4OVJpazdxKzlvekkwcjFmY01waGNI?=
+ =?utf-8?B?ZStKTENOZVMyZ1BIcXprbk40czk4NWFSeUxvSHlkMmRjZWVQUXZ2VUl1aDFQ?=
+ =?utf-8?B?aGtmUnJKRWM4Ly9aUWNSUlVFMjN2RzJvSTdIcEhsR3ZqWGE1a0JQVWhTL01U?=
+ =?utf-8?B?VkRSTkhHcnNPbzZoT2MyK1VLTEtqYVQ5Uy9PQzJvMXFuSmlkZUVES3JGYjZB?=
+ =?utf-8?B?dmsxME5iRytDUWhGU3gvVFkwUENXUkFUdXJRQURLb1ZhZEVOd3k0eG9HUGQx?=
+ =?utf-8?B?MFI4ek13OGVLZlFMbEpUbjJzMGRuQzFiR1lub0ttNE1rc3RsRmFucXZLNjZn?=
+ =?utf-8?B?VUdaZVNENU9vbklQMDlFTDZDUUtJdVczZ2xoVkJvYkp0RmUrUWJVRHI1ZURC?=
+ =?utf-8?B?UzcxNU9jeDFRakp2WTNlUVVlMXRkbFo0NUw0bTU4V0N5cnJML0s0OXI3bTZk?=
+ =?utf-8?B?Q2xMZzNncjFHK05iQVNzaXEvYXN6VFllcndad3I2OWVVZ2szbm1BbEpvMzdz?=
+ =?utf-8?B?V25yOE51OU9ZVXBCMlM5S2xQb1BGeVRYcGRqUGdHcE5iZk5YL293eVJ3N0xm?=
+ =?utf-8?B?Qlh4TnBYSTJUSDd2ZWt6cjZVeHY0bE1qVVpXME5sY05oV2krKzFuQlV0b2Ft?=
+ =?utf-8?B?TFV3MTlDWUN6WmNtTEpqWTVUNlV1SFJVQ2hjbm9IYVY5WHBkSFZzcjZpYlc0?=
+ =?utf-8?B?V3lkQmF2ZExUUlJaQUFYb3NJMFNraHhlRDgxcnZTd3lnOFczTk5hdjVibU9o?=
+ =?utf-8?B?Q0pqU3pGZTVVVXZHOFcxTXowc0EreWhXaFNLTHNPazc5VHJNdlRHaVdIWUVE?=
+ =?utf-8?B?dlFNYWZTSEFxcU9jcjlBb2N0ay9SSzRUdC9NNmNNY0k5NUFXZnlJbDVZc1lv?=
+ =?utf-8?B?dHJmOUZaZEYzZGVVcHdWL1RqK2k4Nis3N2IyQUxKMUVNVUo5NExRSEs5ZkZ3?=
+ =?utf-8?B?MHhUeVZMYjl5YkhpZzJDZGxETHEzTDZhOExTWlFrcFZ2WEIxOFFtaGJJUlFF?=
+ =?utf-8?B?bGxuU2dNcHVxeDlGU0xSTk1VWEg3TVJoWTVtN2R6dEs4VEtFMWs4TkQ5QVVF?=
+ =?utf-8?B?VGlONFM0MEUzU0FCNlpxOUJ0Nm5rSEUrdWlmUUVGZzJLNUVud3lZUnJaeVFy?=
+ =?utf-8?B?aVRLSUxvMGVabm83Y29TTFJyZkpVY2tmcDZqU09TMUpBdWR2eFdCb01iL00r?=
+ =?utf-8?B?bWd5WlErYVJ0cWF1dXdxT2hSK2lVOWlYa1EwL3RQUVVUVVJoYnJNTGFORlo0?=
+ =?utf-8?B?YkpnMStrcEM1VHc4cHpJek1wMEoyT0FrbkpCeW5GdXJ0SjZOUFFIMnBHM0hC?=
+ =?utf-8?B?V0xlN25FSUZ5L2E4WUN3bUI2VlM0eXk0OHNsR3B3d2xXeklNMjIxYTNqWmNq?=
+ =?utf-8?Q?IOgPjCa6jnEBgKgT7JHoJgihd?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b655a1cd-bf58-4fc3-f6fb-08dbe1ae4678
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6351.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2023 05:31:22.8323
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: veYcbKh+rMsqz6ff5c7FGE6YSKLmyhVKxCOQxpY5xFAuK8khJtkhSt3vL2k58pgv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4363
 
---000000000000b3f9930609c6a470
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ping...
+Any other comments?
 
-On Thu, Nov 9, 2023 at 4:24=E2=80=AFPM <alexey.pakhunov@spacex.com> wrote:
->
-> From: Alex Pakhunov <alexey.pakhunov@spacex.com>
->
-> tg3_tso_bug() drops a packet if it cannot be segmented for any reason.
-> The number of discarded frames should be incremented accordingly.
->
-> Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
-> Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
+Regards,
+Ma Jun
 
-Thanks.
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-
---000000000000b3f9930609c6a470
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOJdBDTGK7zYgvlmeacSHEwRyeU3AO+l
-jLH5zjeGNwPOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
-MDA2NDM1MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB2+Q0u0hb8W8t/rzaEA3ZnAXiD7VVDn4i26R8gNOp+PesSj3mP
-POO5+HSfl4EeBpQwYZxnUySifyi13TgB+Y1TPqHyJ2CEh3Mca+UBdtoqJ5m4tMNHfs129axULY2b
-v7PJG5NjI8mrVfCbdLbP7eA3KCQRYLcCwfnNpdd8/ms08wMkIqlSSIRelstU22aL8aPMR7MEtaXu
-YN0L11n6rkznMo/dlICdBbKEzctFmPT8Q6l0HrMujl89Cu1D+coe3loikEYDeBNHGBsPcrWHovg3
-5b1DgXtHOUC3fahAIDzPxBWT4SIvCIqsyZZh/e5OSW78dWF0HxfE2mFdvXmGlHAQ
---000000000000b3f9930609c6a470--
+On 10/30/2023 3:18 PM, Ma Jun wrote:
+> Due to electrical and mechanical constraints in certain platform designs there
+> may be likely interference of relatively high-powered harmonics of the (G-)DDR
+> memory clocks with local radio module frequency bands used by Wifi 6/6e/7. To
+> mitigate possible RFI interference we introuduced WBRF(Wifi Band RFI mitigation Feature).
+> Producers can advertise the frequencies in use and consumers can use this information
+> to avoid using these frequencies for sensitive features.
+> 
+> The whole patch set is based on Linux 6.6.0-rc6. With some brief introductions
+> as below:
+> Patch1:      Document about WBRF
+> Patch2:      Core functionality setup for WBRF feature support
+> Patch3 - 4:  Bring WBRF support to wifi subsystem.
+> Patch5 - 9:  Bring WBRF support to AMD graphics driver.
+> 
+> Evan Quan (6):
+>   cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
+>   wifi: mac80211: Add support for WBRF features
+>   drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
+>   drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
+>   drm/amd/pm: add flood detection for wbrf events
+>   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
+> 
+> Ma Jun (3):
+>   Documentation/driver-api: Add document about WBRF mechanism
+>   platform/x86/amd: Add support for AMD ACPI based Wifi band RFI
+>     mitigation feature
+>   drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
+> 
+>  Documentation/driver-api/wbrf.rst             |  76 ++++
+>  drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   2 +
+>  drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  17 +
+>  drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 208 +++++++++
+>  drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  42 ++
+>  .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |   3 +-
+>  .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |   3 +-
+>  .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   5 +-
+>  .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
+>  drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
+>  drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   4 +
+>  .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |  48 ++
+>  .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  22 +
+>  .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  13 +
+>  drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
+>  drivers/platform/x86/amd/Kconfig              |  15 +
+>  drivers/platform/x86/amd/Makefile             |   1 +
+>  drivers/platform/x86/amd/wbrf.c               | 413 ++++++++++++++++++
+>  include/linux/acpi_amd_wbrf.h                 |  94 ++++
+>  include/net/cfg80211.h                        |   9 +
+>  net/mac80211/Makefile                         |   2 +
+>  net/mac80211/chan.c                           |   9 +
+>  net/mac80211/ieee80211_i.h                    |   7 +
+>  net/mac80211/main.c                           |   2 +
+>  net/mac80211/wbrf.c                           |  95 ++++
+>  net/wireless/chan.c                           |   3 +-
+>  26 files changed, 1094 insertions(+), 8 deletions(-)
+>  create mode 100644 Documentation/driver-api/wbrf.rst
+>  create mode 100644 drivers/platform/x86/amd/wbrf.c
+>  create mode 100644 include/linux/acpi_amd_wbrf.h
+>  create mode 100644 net/mac80211/wbrf.c
+> 
 
