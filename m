@@ -1,108 +1,215 @@
-Return-Path: <netdev+bounces-47043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD06F7E7ADA
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:30:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2047E7ADD
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:31:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91FFF1F20EBB
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:30:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A72442814E8
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CBD125DB;
-	Fri, 10 Nov 2023 09:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F1512B68;
+	Fri, 10 Nov 2023 09:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GJyw1hn2"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A992F125A4
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:30:43 +0000 (UTC)
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CFDB024482
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:30:41 -0800 (PST)
-Received: from loongson.cn (unknown [112.20.112.120])
-	by gateway (Coremail) with SMTP id _____8CxtPA_+E1lyrQ4AA--.47052S3;
-	Fri, 10 Nov 2023 17:30:39 +0800 (CST)
-Received: from localhost.localdomain (unknown [112.20.112.120])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxnd49+E1lUfw9AA--.5972S2;
-	Fri, 10 Nov 2023 17:30:38 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com
-Cc: Yanteng Si <siyanteng@loongson.cn>,
-	fancer.lancer@gmail.com,
-	Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn,
-	linux@armlinux.org.uk,
-	dongbiao@loongson.cn,
-	guyinggang@loongson.cn,
-	netdev@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	chris.chenfeiyang@gmail.com
-Subject: [PATCH v5 9/9] net: stmmac: Disable coe for some Loongson GNET
-Date: Fri, 10 Nov 2023 17:30:27 +0800
-Message-Id: <c55b7c78c7a992fa3d41f88c87b67b4550373980.1699533745.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
-In-Reply-To: <cover.1699533745.git.siyanteng@loongson.cn>
-References: <cover.1699533745.git.siyanteng@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F71E125D3
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:31:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A647424488
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:30:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699608659; x=1731144659;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xO//tMHiCHTu6JKtWLb8iOLpZiGDRktwJKxFo0U0Fms=;
+  b=GJyw1hn2kNhPFTmwrg81DyxE8wabbiOUzaWlGYpQFOVogkhDOnAuZnKZ
+   QD+9WCicPTtwkG+tRnzMTFHwGMCTPVHORquB3t3PUeC0ICu+gNn/oS5+Y
+   yPR47oG70WLDBsdto7cpH3t8SK7JaNZdlIdd2IVgmySgFb6OTNrjTXhtR
+   MFGLgOyMI1ZQLOyUQPjNiMBZhCkFJ1fGt4uIlHVUVe5FEkzHsH0hVeeCz
+   SXHHRfIq74NXTS+PbCWmZyGTUDUYHEtPQM/NvS7XAzilo6eYXtFPQFOS2
+   8iNrwNrCd/RH+zPyxZhLnHpnxHwcXiDVAAv9pvOhFEfsYXdPaJGTDVglk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10889"; a="387323983"
+X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
+   d="scan'208";a="387323983"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 01:30:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,291,1694761200"; 
+   d="scan'208";a="4810029"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Nov 2023 01:30:56 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 10 Nov 2023 01:30:54 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 10 Nov 2023 01:30:54 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 10 Nov 2023 01:30:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QSOrGeIofoa7X1Cm7IIDo8cSfcLh7PvgA9B1PJpEaHLUFVXYRIiNIRG4D0jrFCfGX04B+HaLV7gjoOOQVMfs8IzUKYEdxEhOgKFzKHUrmWsigmLEqWrRp5xXp87iSpHUyxwwk/4EpNO2yDtFPg/V9+BgFep8zfZrIRA6ca1N8JJDT3kC/Gci/UmHWhrhxRE5CT1lU91cJ+ffJ9tWkxunRP56V5SAI8RoLK+/GDP0bfHMcf8KFDKDwxId4llBcQ5HZ34vJczMI8HuOpBRc/HhHFXa9F6qfl/71QlRCeU3BKvJP4+9GwEe+6vxcbMcaAmfRufIn8BvJUGLMPosbMIFvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EB6jgrTwA6TEAmvnpeun+YwHXNg91uHBf3GT4uCxPgk=;
+ b=d0gppj383wnN6wPRC4otiZFDdamDU0+HAoBnJoUrmgm7HVBA+EUxfX+egaGmeDe4CbWmNbniy9VUpA7eTsMuzD1bBYWv5qkBXktkvzme/0xm4NC/wmfiJo+6vLvFGjAGyIB+/IclSBiKtLnirzDf4sl4w1dskhlelRxq3liDeoKQvqci+9cX3cCYTkDfE7U62IP/bBnsb1XxJ6d/X4wfKRIvHmS5oMXxQwHLYE3f5XakzcvizmjbGIqo/jOjmzoEQJodPMZVpsFP8tSs+9MWftGX6pk3DPwAkC44vrns+nTQuIQtip5x4Iu1GNidZhNHZ3uhvPmWnew6kqYo9GC2UQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5354.namprd11.prod.outlook.com (2603:10b6:408:11b::7)
+ by PH0PR11MB5952.namprd11.prod.outlook.com (2603:10b6:510:147::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.18; Fri, 10 Nov
+ 2023 09:30:49 +0000
+Received: from BN9PR11MB5354.namprd11.prod.outlook.com
+ ([fe80::e716:9ed:e589:aa69]) by BN9PR11MB5354.namprd11.prod.outlook.com
+ ([fe80::e716:9ed:e589:aa69%4]) with mapi id 15.20.6977.019; Fri, 10 Nov 2023
+ 09:30:49 +0000
+From: "Arland, ArpanaX" <arpanax.arland@intel.com>
+To: "Greenwalt, Paul" <paul.greenwalt@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Nowlin, Dan" <dan.nowlin@intel.com>, "Fijalkowski, Maciej"
+	<maciej.fijalkowski@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Greenwalt, Paul" <paul.greenwalt@intel.com>,
+	"horms@kernel.org" <horms@kernel.org>, "Drewek, Wojciech"
+	<wojciech.drewek@intel.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package
+ download for packages without signature segment
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package
+ download for packages without signature segment
+Thread-Index: AQHaEaGgDo2pwu4lPUytI94AsyT9TbBzLzzA
+Date: Fri, 10 Nov 2023 09:30:48 +0000
+Message-ID: <BN9PR11MB5354BE41B278F3CA1E9FB35B80AEA@BN9PR11MB5354.namprd11.prod.outlook.com>
+References: <20231107173227.862417-1-paul.greenwalt@intel.com>
+In-Reply-To: <20231107173227.862417-1-paul.greenwalt@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5354:EE_|PH0PR11MB5952:EE_
+x-ms-office365-filtering-correlation-id: 0cb1a3a2-3119-401a-c9c8-08dbe1cfb98d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oQUggzoQ4TXxAsmwfX4DW+StxO56zzWGVSgUBtyroQzowqwKstBhcywzETfYDJmZT5Xf/57y53AqT6O22rx791BaSM1z8cpzYbvd0gWrQCqMyOPC4YdPsx1kH4wFSrVAm7VvMJ2RKnhowiPvo73fWuJYkJB2rBOFzxblvuhVrSTbWJF6lc83STePJgoJ3yRA0pAzOlVfF7HdcAtSbsm2y2HqzZtcJpIhTjhQ4blnvnTccTSNCuiDiwSY6/tZnkw8OmBrtqwmfmoJsg0V3TUo5jmONqteuz5Wd9AqT9XmViSsXReIHbYZd9/hOBd4RKN5g+qoyukhUbkex33RiWNj/CiYn8wgDtK6fQt4HRRQKMMWBZiN+vDuIAOlC91Dlj07uEiGREm/Fz7ozv8WBWY98FUHvxGAFSQaU36qJoiHYEXjkyHg3Mn0BVqmR0BvXwXWsJoFFh/KoEOIeR2YtBglnUANwR/0EqcriWz9X4Wuz0JkhGO8A4SPmB54XMbH0onKn2GC0gVUlYdtnO58aSAJw0N3luuEh22q9PcUlOY9o0jvO7k4QVV0dO+mIJF+Nh2x3w79vrWDSh6+bADg2PCn+8fEuWiEJrNICb9cfH6GTlcWUAjDYcSiZSxLd70ng+uDqYtJEtovrbJmgM/X91nRpg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5354.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(39860400002)(376002)(396003)(136003)(230922051799003)(186009)(451199024)(64100799003)(1800799009)(9686003)(33656002)(55236004)(38100700002)(7696005)(53546011)(6506007)(71200400001)(26005)(41300700001)(83380400001)(38070700009)(110136005)(64756008)(66446008)(54906003)(66556008)(66946007)(5660300002)(66476007)(76116006)(55016003)(86362001)(316002)(82960400001)(122000001)(52536014)(8936002)(8676002)(2906002)(966005)(4326008)(478600001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VfGVbCISDFsvCWsqxtIaR4f6EZ5cSCtkKfB3qvwXwsU3ZvCYguk0K6uUk4bj?=
+ =?us-ascii?Q?pm2AvSp5mtFR39ozEEAvB3JhFLGph8s0voTJgwC62fqqGlSsk6VExh/w9PWw?=
+ =?us-ascii?Q?txqwhNPVcTyE0neZCou/VrFRfU5SOSTv82gsS5MnrY1egpi9wfdI5MMOOoi8?=
+ =?us-ascii?Q?1wo0CH58xFzhnIL3Jlk9NuZMS0781ubAKtPYrJu/w0EhaJ9v4TYXIY7TotKa?=
+ =?us-ascii?Q?Y5lHg5I6nIPeASUa0wJGaRCvrF2jZFb4+DpTu0VqHxomAhtc0Fwi7jeR/s1X?=
+ =?us-ascii?Q?L9izNlyENaDEAtfJQc7Z17p9FbqXCdC+S7X36S1EVEmin3Z+j4ho+amhbBkq?=
+ =?us-ascii?Q?rxrKSLvSjvmGX/Re2fsPNVEdbj4eXtWYM8aDYkcdVG58zxv6vmcl8z78Tvda?=
+ =?us-ascii?Q?K7iyh4umY8K3A08O8emGpmvXhX9eVix6tFnQICR8bZfpDaGRgG+VgqkWdbjw?=
+ =?us-ascii?Q?bFQjFmKldUT94+E+2TZrLwvwsxiIpjLMZqmxK7gK5bl+tG7OfsbNtrNhyT4/?=
+ =?us-ascii?Q?FgEKNJjihE9W3+1hmht3l2et9Wg38wfsjg2g+MAHbmH6/Fd8YAtos8sfu/iI?=
+ =?us-ascii?Q?0Nq61uMs/rRnOAmQk5cZcmF0SQqMq01rPOOZkAZjmZeIIwVtLzLr4iWE5n6Q?=
+ =?us-ascii?Q?bmLa5PFFvc5rvJiXK20eIEDgacsw5+7/zzaoFK77ndUSBaC/shGNokvn5xcg?=
+ =?us-ascii?Q?BQQ9quQa+4CBNOOzE5+PYvePx2G8BEfmWAd70Dp0VfOkAlKBcn1Dc34awGQv?=
+ =?us-ascii?Q?y/GowwvTBIm/UHstyhE4xDk3tMIFwmM0cZe4st314HejImmjAqNQpwxz8bQp?=
+ =?us-ascii?Q?XdIYesl0joKJkSoa1eXqJVht91waV1zDv5X3yN1octh52brx+KzGeTgVTtXc?=
+ =?us-ascii?Q?yoWOTH5Y5IrqAEnsh3UNkOjSg4gj6cYPyI/+QhnVGm/0iUl+yfD5W48aDxfG?=
+ =?us-ascii?Q?gNcQjYOotJA0sXd+WKY3iRSSmSft2oeEkbwMp3JzOs+0jbhiAbi1S1BEqvCR?=
+ =?us-ascii?Q?9OpwKMsqrDQVGti06zryS/CPipfMC3E17WBzpAtiqYisdcvyHrCL0BFiwO2I?=
+ =?us-ascii?Q?tc6MxIuHMSU7ekzZsqSvZHwRcYNWynEEqd/9dv01Bpb4n5iVB0tQ7nNaSuFZ?=
+ =?us-ascii?Q?TNIbCPelZWTneVWlNWRqmIFusas75V+gXxwrUGRvpZQe/PAIrLVA1hek6mR+?=
+ =?us-ascii?Q?95PvVI/t+l+3DAJStvQuoxLbTkLwoyjmR9MUJzF7bKl7wKekHZIe+cod4xwm?=
+ =?us-ascii?Q?RCpa7cdP31Ru9nv45OUaXtWCAku3AE+Oxj/OBqIS35b7nPdUcb2cV7ZKWkGQ?=
+ =?us-ascii?Q?xhnXv9zQT2bwiXnyQVVqJcNUbUfcNe3SDIwVGxV8XvM8C0xK8QsKhhpmQJgj?=
+ =?us-ascii?Q?0KfcIuVlmdqbgW7t0vAG4guhq8ImKaFUXv3rWnxOYHjwIH/45b7B/XdwEx/6?=
+ =?us-ascii?Q?SJ1JGTiVwdugpsxcVdlTNUeted027Zf39rnYZgc9y3EEz/R94gWPKQ0/rBq4?=
+ =?us-ascii?Q?0xa/iu1eyBcfA5BCHv1+KUN2omEuX6xoReftM+em+rwMsmEQYt5B2znrDMLu?=
+ =?us-ascii?Q?nD5SktfLODxdCT2FzatmAOeuL3z8pAzq3mpc0ZmF?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Dxnd49+E1lUfw9AA--.5972S2
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7XFWUZrW8Gr1kJFW3Ww13WrX_yoWfCFXE9F
-	42vrn3Xa1UtF1ak34vgw15Z34S9w4Duw1rAFsFqayFka92g3s8Jr95ur97JFsxur95ZF9r
-	Gr1xt34xAw1xJosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbhkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVWxJr0_GcWln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26Fy2
-	6r45twAv7VC2z280aVAFwI0_Cr0_Gr1UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
-	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
-	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
-	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVW7JVWDJwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42
-	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWxJVW8Jr1lIxAIcVC2z280aVCY
-	1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07j4PfQUUUUU=
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5354.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb1a3a2-3119-401a-c9c8-08dbe1cfb98d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Nov 2023 09:30:49.0106
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xpmLBCKRDFrWbM+BaH/YbvquvdqhilCdn62lOC0VsiFwg+XHlqqkgti5FwovIvrw2WDvnIvvxU22nhzi5aouQ2aaXry6GcF4kg9DaFZiSKg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5952
+X-OriginatorOrg: intel.com
 
-Some chips of Loongson GNET does not support coe, so disable them.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of P=
+aul Greenwalt
+> Sent: Tuesday, November 7, 2023 11:02 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Nowlin, Dan <dan.nowlin@intel.com>; Fijalkowski, Maciej <maciej.fijal=
+kowski@intel.com>; netdev@vger.kernel.org; Brandeburg, Jesse <jesse.brandeb=
+urg@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>; Nguyen, Anthony=
+ L <anthony.l.nguyen@intel.com>; Greenwalt, Paul <paul.greenwalt@intel.com>=
+; horms@kernel.org; Drewek, Wojciech <wojciech.drewek@intel.com>; kuba@kern=
+el.org; davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH iwl-net v3] ice: fix DDP package downlo=
+ad for packages without signature segment
+>
+> From: Dan Nowlin <dan.nowlin@intel.com>
+>
+> Commit 3cbdb0343022 ("ice: Add support for E830 DDP package segment") inc=
+orrectly removed support for package download for packages without a signat=
+ure segment. These packages include the signature buffer inline in the conf=
+igurations buffers, and not in a signature segment.
+>
+> Fix package download by providing download support for both packages with=
+ (ice_download_pkg_with_sig_seg()) and without signature segment (ice_downl=
+oad_pkg_without_sig_seg()).
+>
+> Fixes: 3cbdb0343022 ("ice: Add support for E830 DDP package segment")
+> Reported-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Closes: https://lore.kernel.org/netdev/ZUT50a94kk2pMGKb@boxer/
+> Tested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Dan Nowlin <dan.nowlin@intel.com>
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> ---
+> Changelog
+> v2->v3:
+> - correct Changelog version tag, add Closes, Tested-by and Reviewed-by.
+>   Remove unnecessary local variable initialization in ice_dwnld_cfg_bufs(=
+),
+>   and unnecessary local variable in ice_download_pkg_without_sig_seg(),
+> v1->v2:
+> - correct Reported-by email address.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ddp.c | 103 ++++++++++++++++++++++-
+>  1 file changed, 100 insertions(+), 3 deletions(-)
+>
 
-Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
----
- drivers/net/ethernet/stmicro/stmmac/hwif.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-index e5e7ac03459d..c1ea68514acc 100644
---- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-@@ -72,6 +72,11 @@ static int stmmac_dwmac1_quirks(struct stmmac_priv *priv)
- 		mac->desc = &ndesc_ops;
- 	}
- 
-+	if (priv->synopsys_id == DWGMAC_CORE_1_00) {
-+		priv->plat->tx_coe = 0;
-+		priv->plat->rx_coe = STMMAC_RX_COE_NONE;
-+	}
-+
- 	stmmac_dwmac_mode_quirk(priv);
- 	return 0;
- }
--- 
-2.31.4
-
+Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at=
+ Intel)
+_______________________________________________
+Intel-wired-lan mailing list
+Intel-wired-lan@osuosl.org
+https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
