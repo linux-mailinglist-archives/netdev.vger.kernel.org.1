@@ -1,149 +1,190 @@
-Return-Path: <netdev+bounces-47124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257737E7DB9
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 17:22:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2167F7E7DDA
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 17:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3494B20CDD
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 16:21:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA303B20B55
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 16:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2428B1B279;
-	Fri, 10 Nov 2023 16:21:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EE61BDCF;
+	Fri, 10 Nov 2023 16:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mikYvPre"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SV82QS00"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31E61DFCF
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 16:21:53 +0000 (UTC)
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B72F3D540;
-	Fri, 10 Nov 2023 08:21:52 -0800 (PST)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3AAGLlns116980;
-	Fri, 10 Nov 2023 10:21:47 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1699633307;
-	bh=7UT7IE7MwQ52DU56ZEU9VxjnIavn9yIJBHhLeQX03f4=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=mikYvPrevZMt7LrQaEi4I0KE65Q3004hPcDw13Qf9vwFA3dPQ4WJdI5PIp9E8JR2U
-	 1aEZ/9wH25IAfWQ50GQtbZbzf3q4uhZVCk2+xA0doVGgSCKOW4y+TMboD7zD28/Vbb
-	 5rWhll0H7LDY6eC923g/A/JzneoukFYlewnMEoB8=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3AAGLlSl087796
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 10 Nov 2023 10:21:47 -0600
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
- Nov 2023 10:21:47 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 10 Nov 2023 10:21:47 -0600
-Received: from [10.249.135.225] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
-	by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3AAGLiL3063419;
-	Fri, 10 Nov 2023 10:21:44 -0600
-Message-ID: <e96bd133-7bc7-b2ae-4d70-69f2ad5c9aff@ti.com>
-Date: Fri, 10 Nov 2023 21:51:43 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993AB1774A
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 16:39:59 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE5E3F36F
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:39:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699634397;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YCaLJYbTJ1XyaLZUKfuK+i5NirT8tMGUxj3QqhAqfd8=;
+	b=SV82QS00CQ+bpjxE4hivl8lWr+0v45iXr6XqS43JA/YGM/zntYRJ6Qvmojd/S7drDsmLBO
+	Pk9gxpZr2490UseJ0EPJPIoWF5GlytGUj5FfwB03mntnGagV0rLIw2t+VWWHlikNDZs+Fv
+	vX68oaCjzzYbTmFoUo49og6w2aDam+k=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-510-PZyCvkvTOPabBGdFTO9Jug-1; Fri, 10 Nov 2023 11:39:55 -0500
+X-MC-Unique: PZyCvkvTOPabBGdFTO9Jug-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1cc5ac304e8so22308765ad.1
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:39:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699634394; x=1700239194;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YCaLJYbTJ1XyaLZUKfuK+i5NirT8tMGUxj3QqhAqfd8=;
+        b=krAX5IF/r4hfHjKUf/F15DnE2kA7UBRZDhe7wy2NpF8xNvALreqMG0XfQm3+du3ek+
+         IWnfzcjUoH+aAfsSrNa0B5whbBRPz53rPNdUBoMmK7NymuRA58JtdY0GvgO48pKg+Bl9
+         OfoDAq8fOoRqMkwlw+SlI42LfllmV7+GhRXDnIz+JQgMZQBQPiqjc3bCYbQSNR+e4pYp
+         J6ezCiYVAigdyv8gb62mwTTcLzaiJLu+lBBJia6GrbKTaT0lHVO4LtQQSQO+XT+boFiE
+         bvZkCIzf09FrRXSP4Mm/0VcUi1FYgptMgMa9j8PRbhjVzGo4VQ0P59TNDfuERUqdujZ5
+         bsIQ==
+X-Gm-Message-State: AOJu0YyW69/ycYFyBFFVyg4OTvbLGkYuC8SPNtBS1fP7pIoPLxBBmfZX
+	IMRoOQGSTXU/iMaymfQquvigCzeueTMXieEXOw6YLfkWleVIIK5DGNA6d+nzl/n2eMa7g3NSjgu
+	jUKSlaodaXmOFJv6YpBPEILl2nxs=
+X-Received: by 2002:a17:902:8491:b0:1cc:6597:f42c with SMTP id c17-20020a170902849100b001cc6597f42cmr6902534plo.21.1699634394552;
+        Fri, 10 Nov 2023 08:39:54 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGbQE2GvdXTsFkafL9xBUcTuuKJ2jOlp3ShRs40L1sXRLNw3XvwSUL0kfGUG8GiD/oZVifaVQ==
+X-Received: by 2002:a17:902:8491:b0:1cc:6597:f42c with SMTP id c17-20020a170902849100b001cc6597f42cmr6902518plo.21.1699634394213;
+        Fri, 10 Nov 2023 08:39:54 -0800 (PST)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:245e:16ff:fe87:c960])
+        by smtp.gmail.com with ESMTPSA id g10-20020a170902934a00b001b0358848b0sm5575655plp.161.2023.11.10.08.39.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Nov 2023 08:39:53 -0800 (PST)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>
+Subject: [PATCH net] tipc: Fix kernel-infoleak due to uninitialized TLV value
+Date: Sat, 11 Nov 2023 01:39:47 +0900
+Message-ID: <20231110163947.1605168-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] MAINTAINERS: net: Update reviewers for TI's Ethernet
- drivers
-Content-Language: en-US
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <netdev@vger.kernel.org>
-CC: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>, <nm@ti.com>, <srk@ti.com>,
-        Md Danish Anwar
-	<danishanwar@ti.com>
-References: <20231110084227.2616-1-r-gunasekaran@ti.com>
- <78cf6806-0bdc-4b81-8d96-51a6f8fb168c@kernel.org>
- <44f68604-b37d-56d9-6fc1-4c4cc503abd3@ti.com>
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <44f68604-b37d-56d9-6fc1-4c4cc503abd3@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
 
-On 11/10/2023 3:08 PM, Ravi Gunasekaran wrote:
-> Roger,
-> 
-> On 11/10/23 2:21 PM, Roger Quadros wrote:
->> Hi Ravi,
->>
->> On 10/11/2023 10:42, Ravi Gunasekaran wrote:
->>> Grygorii is no longer associated with TI and messages addressed to
->>> him bounce.
->>>
->>> Add Siddharth and myself as reviewers.
->>>
->>> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
->>> ---
->>>  MAINTAINERS | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 7b151710e8c5..bd52c33bca02 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -21775,7 +21775,8 @@ F:	Documentation/devicetree/bindings/counter/ti-eqep.yaml
->>>  F:	drivers/counter/ti-eqep.c
->>>  
->>>  TI ETHERNET SWITCH DRIVER (CPSW)
->>> -R:	Grygorii Strashko <grygorii.strashko@ti.com>
->>> +R:	Siddharth Vadapalli <s-vadapalli@ti.com>
->>> +R:	Ravi Gunasekaran <r-gunasekaran@ti.com>
->>
->> Could you please add me as Reviewer as well. Thanks!
-> 
-> Thanks for volunteering to be a reviewer.
-> 
-> I posted a v2 adding you as a reviewer.
-> https://lore.kernel.org/all/20231110092749.3618-1-r-gunasekaran@ti.com/
-> 
->>
->>>  L:	linux-omap@vger.kernel.org
->>>  L:	netdev@vger.kernel.org
->>>  S:	Maintained
->>
->>> F:      drivers/net/ethernet/ti/cpsw*
->>> F:      drivers/net/ethernet/ti/davinci*
->>
->> What about am65-cpsw*?
->>
->> And drivers/net/ethernet/ti/icssg/*
-> 
-> I would prefer a separate entry for ICSSG. Will let Danish comment on this.
-> 
+KMSAN reported the following kernel-infoleak issue:
 
-Sure, I will share a separate patch for this. Roger, do you want me to
-add you as a reviewer in for ICSSG driver as well?
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ copy_to_user_iter lib/iov_iter.c:24 [inline]
+ iterate_ubuf include/linux/iov_iter.h:29 [inline]
+ iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+ iterate_and_advance include/linux/iov_iter.h:271 [inline]
+ _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
+ copy_to_iter include/linux/uio.h:197 [inline]
+ simple_copy_to_iter net/core/datagram.c:532 [inline]
+ __skb_datagram_iter.5+0x148/0xe30 net/core/datagram.c:420
+ skb_copy_datagram_iter+0x52/0x210 net/core/datagram.c:546
+ skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
+ netlink_recvmsg+0x43d/0x1630 net/netlink/af_netlink.c:1967
+ sock_recvmsg_nosec net/socket.c:1044 [inline]
+ sock_recvmsg net/socket.c:1066 [inline]
+ __sys_recvfrom+0x476/0x860 net/socket.c:2246
+ __do_sys_recvfrom net/socket.c:2264 [inline]
+ __se_sys_recvfrom net/socket.c:2260 [inline]
+ __x64_sys_recvfrom+0x130/0x200 net/socket.c:2260
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
->>
->> I also see 
->>
->> OMAP GPIO DRIVER
->> M:      Grygorii Strashko <grygorii.strashko@ti.com>
->>
->> Maybe a separate patch to remove the invalid email-id?
->>
-> Yes, that's the plan. One of us from TI would be posting shortly.
-> 
-> 
+Uninit was created at:
+ slab_post_alloc_hook+0x103/0x9e0 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5f7/0xb50 mm/slub.c:3523
+ kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x2fd/0x770 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ tipc_tlv_alloc net/tipc/netlink_compat.c:156 [inline]
+ tipc_get_err_tlv+0x90/0x5d0 net/tipc/netlink_compat.c:170
+ tipc_nl_compat_recv+0x1042/0x15d0 net/tipc/netlink_compat.c:1324
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+ genl_rcv_msg+0x1220/0x12c0 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x4a4/0x6a0 net/netlink/af_netlink.c:2545
+ genl_rcv+0x41/0x60 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0xf4b/0x1230 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x1242/0x1420 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x997/0xd60 net/socket.c:2588
+ ___sys_sendmsg+0x271/0x3b0 net/socket.c:2642
+ __sys_sendmsg net/socket.c:2671 [inline]
+ __do_sys_sendmsg net/socket.c:2680 [inline]
+ __se_sys_sendmsg net/socket.c:2678 [inline]
+ __x64_sys_sendmsg+0x2fa/0x4a0 net/socket.c:2678
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
+Bytes 34-35 of 36 are uninitialized
+Memory access of size 36 starts at ffff88802d464a00
+Data copied to user address 00007ff55033c0a0
+
+CPU: 0 PID: 30322 Comm: syz-executor.0 Not tainted 6.6.0-14500-g1c41041124bd #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+=====================================================
+
+tipc_add_tlv() puts TLV descriptor and value onto `skb`. This size is
+calculated with TLV_SPACE() macro. It adds the size of struct tlv_desc and
+the length of TLV value passed as an argument, and aligns the result to a
+multiple of TLV_ALIGNTO, i.e., a multiple of 4 bytes.
+
+If the size of struct tlv_desc plus the length of TLV value is not aligned,
+the current implementation leaves the remaining bytes uninitialized. This
+is the cause of the above kernel-infoleak issue.
+
+This patch resolves this issue by clearing data up to an aligned size.
+
+Fixes: d0796d1ef63d ("tipc: convert legacy nl bearer dump to nl compat")
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+ net/tipc/netlink_compat.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/tipc/netlink_compat.c b/net/tipc/netlink_compat.c
+index 5bc076f2fa74..c763008a8adb 100644
+--- a/net/tipc/netlink_compat.c
++++ b/net/tipc/netlink_compat.c
+@@ -102,6 +102,7 @@ static int tipc_add_tlv(struct sk_buff *skb, u16 type, void *data, u16 len)
+ 		return -EMSGSIZE;
+ 
+ 	skb_put(skb, TLV_SPACE(len));
++	memset(tlv, 0, TLV_SPACE(len));
+ 	tlv->tlv_type = htons(type);
+ 	tlv->tlv_len = htons(TLV_LENGTH(len));
+ 	if (len && data)
 -- 
-Thanks and Regards,
-Md Danish Anwar
+2.41.0
+
 
