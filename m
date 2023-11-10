@@ -1,150 +1,183 @@
-Return-Path: <netdev+bounces-47100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DED87E7C65
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 14:11:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657027E7C69
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 14:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 084502812FC
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 13:11:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CDE1C209EF
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 13:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45442156C1;
-	Fri, 10 Nov 2023 13:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9A8179BD;
+	Fri, 10 Nov 2023 13:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="DYeJoR9/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rPSYkBVC"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8211A14A97
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 13:11:14 +0000 (UTC)
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C1B236C47
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 05:11:12 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5a877e0f0d8so26754837b3.1
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 05:11:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1699621872; x=1700226672; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JVsBLmhFioAqkAGu3vwmlejEIxBaHnvJlFfO7ZNdcnQ=;
-        b=DYeJoR9/t72f5FAAAi44KJbDnELHAmYODnqu5zWKR/mHzyhOB+SQIiSW2gVzWJ6ubA
-         E0w0I6Ub2MXJFt23AcTOeJSVCsjL4E1uNd9FsNka4m8b9zYgXawRhKD5wnoNr7fiCPh/
-         oA/AhUFN9TFd2HYVUK+xoTvrSkE98GU41xjv0UD+ZTNd9sByoFV9eTaGoHuKObIrJPXj
-         lFDlq0G1lb27bhXyTVb8hkePJZrJoHUo5Tl6/eFyeSmE7Ga+HAvglb4LPHP9B25cqkJw
-         h8uSG484yN1mTPOFxB0+jmm34GOun2VV8+vDM9ZzDWFhjT1ALSCVwDFMDYvVkIGL46Ef
-         yl7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699621872; x=1700226672;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JVsBLmhFioAqkAGu3vwmlejEIxBaHnvJlFfO7ZNdcnQ=;
-        b=gY1CEaPPocK/VRiCtUe+VmepX7bRhW0LydJUadb3AR8WjAXprhJCxD2UDKWeoWiAIW
-         FD8hzcZzaUPOzPuYxe7NlNR/EK4pw2+pQoJbhFIskGsUzSSxsXCUYYU3cYi4DZLlVUBw
-         7e+0eNrMMDFkQQeg7GhT8slpXpdV80sYUX0Vx00k4eI0ejC3JqoobFr2TSWRMJwdjp5t
-         S1DiWheRf8yxIBCOcE70iCHr5dp2xPJfRdZlXcc2//ffoBqJ+8Sm4P5JKuvnYEqbRppw
-         FLMXbmDawqK80iFLTueahKUek6rFNc0w7omw2FUIJLepKPlQsTIN/qfUaGmYfY0nrlVG
-         VSqg==
-X-Gm-Message-State: AOJu0Yycu1QpgsRheLv7wopVQioGs8ETpD5+/yGbim0Gq4GsfRzugrd2
-	gy6bDefqcVj7HnBOFmHLoFD1QZy/+JhtE1sqrDQawTtH0Qy2JPm3
-X-Google-Smtp-Source: AGHT+IHnUObuqEMP/xCxXfqptw3K5+1pi/Jf7KPfGszuh3hfo52igBJGC4ciazB+qP4AT5a2fpWclTtgmwNqsPFe6wc=
-X-Received: by 2002:a0d:cb94:0:b0:5a7:ba3e:d1d1 with SMTP id
- n142-20020a0dcb94000000b005a7ba3ed1d1mr1314800ywd.25.1699621871820; Fri, 10
- Nov 2023 05:11:11 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E5E17758
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 13:12:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7589CC433C7;
+	Fri, 10 Nov 2023 13:12:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699621947;
+	bh=uRqiRzLlvGBgCBvlICc1h/HlCqP0mTq4GMStsSNxNIM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rPSYkBVCDB1nT77jhdgV7eAj2ou/gQCcCu4rut1Wpij2eQj56vLpjtLkGgggHi74h
+	 +gtEck2MDmZmoLG9GymF54CIpgd4uKumOv+BEGxs77FcJH9Lkz1kX82CfpWoKYvGoK
+	 dbQSwgYst0ypziE6uKClT4WWv6tHnnHiQ6nJA4xd2+VqjKmoRezZ2g5V25eW/EHb5P
+	 mVTWNAzWXpSm8kYvm1OxPBs9ASV3Dx1Nvdy8d6Dfc5Dd17MMueAkYvmyy2pJ2VaTzL
+	 5OBEMApZklItVmdpvGDa3suyeYcRYmrk7mA14PRReMX90i4CSYtdfAKvA/Z6bGkE6F
+	 GDRtokeTqRMkg==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next RFC] net: sfp: rework the RollBall PHY waiting code
+Date: Fri, 10 Nov 2023 14:12:23 +0100
+Message-ID: <20231110131223.32201-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231109000901.949152-1-kuba@kernel.org>
-In-Reply-To: <20231109000901.949152-1-kuba@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 10 Nov 2023 08:11:00 -0500
-Message-ID: <CAM0EoM=DUtju91y_0zsyyJJ+bPxTRAAWyBA_1tM+RwY8VXbbRw@mail.gmail.com>
-Subject: Re: [RFC net-next] net: don't dump stack on queue timeout
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com, 
-	xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 8, 2023 at 7:09=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> The top syzbot report for networking (#14 for the entire kernel)
-> is the queue timeout splat. We kept it around for a long time,
-> because in real life it provides pretty strong signal that
-> something is wrong with the driver or the device.
->
-> Removing it is also likely to break monitoring for those who
-> track it as a kernel warning.
->
-> Nevertheless, WARN()ings are best suited for catching kernel
-> programming bugs. If a Tx queue gets starved due to a pause
-> storm, priority configuration, or other weirdness - that's
-> obviously a problem, but not a problem we can fix at
-> the kernel level.
->
-> Bite the bullet and convert the WARN() to a print.
->
-> Before:
->
->   NETDEV WATCHDOG: eni1np1 (netdevsim): transmit queue 0 timed out 1975 m=
-s
->   WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:525 dev_watchdog+0x39=
-e/0x3b0
->   [... completely pointless stack trace of a timer follows ...]
->
-> Now:
->
->   netdevsim netdevsim1 eni1np1: NETDEV WATCHDOG: CPU: 0: transmit queue 0=
- timed out 1769 ms
->
-> Alternatively we could mark the drivers which syzbot has
-> learned to abuse as "print-instead-of-WARN" selectively.
->
-> Reported-by: syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+RollBall SFP modules allow the access to PHY registers only after a
+certain time has passed. Until then, the registers read 0xffff.
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Currently we have quirks for modules where we need to wait either 25
+seconds or 4 seconds, but recently I got hands on another module where
+the wait is even shorter.
 
-cheers,
-jamal
+Instead of hardcoding different wait times, lets rework the code:
+- increase the PHY retry count to 25
+- when RollBall module is detected, increase the PHY retry time from
+  50ms to 1s
 
-> ---
-> CC: jhs@mojatatu.com
-> CC: xiyou.wangcong@gmail.com
-> CC: jiri@resnulli.us
-> ---
->  net/sched/sch_generic.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> index 4195a4bc26ca..8dd0e5925342 100644
-> --- a/net/sched/sch_generic.c
-> +++ b/net/sched/sch_generic.c
-> @@ -522,8 +522,9 @@ static void dev_watchdog(struct timer_list *t)
->
->                         if (unlikely(timedout_ms)) {
->                                 trace_net_dev_xmit_timeout(dev, i);
-> -                               WARN_ONCE(1, "NETDEV WATCHDOG: %s (%s): t=
-ransmit queue %u timed out %u ms\n",
-> -                                         dev->name, netdev_drivername(de=
-v), i, timedout_ms);
-> +                               netdev_crit(dev, "NETDEV WATCHDOG: CPU: %=
-d: transmit queue %u timed out %u ms\n",
-> +                                           raw_smp_processor_id(),
-> +                                           i, timedout_ms);
->                                 netif_freeze_queues(dev);
->                                 dev->netdev_ops->ndo_tx_timeout(dev, i);
->                                 netif_unfreeze_queues(dev);
-> --
-> 2.41.0
->
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+ drivers/net/phy/sfp.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 5468bd209fab..5eb00295b8bf 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -191,7 +191,7 @@ static const enum gpiod_flags gpio_flags[] = {
+  * R_PHY_RETRY is the number of attempts.
+  */
+ #define T_PHY_RETRY		msecs_to_jiffies(50)
+-#define R_PHY_RETRY		12
++#define R_PHY_RETRY		25
+ 
+ /* SFP module presence detection is poor: the three MOD DEF signals are
+  * the same length on the PCB, which means it's possible for MOD DEF 0 to
+@@ -274,7 +274,7 @@ struct sfp {
+ 	struct sfp_eeprom_id id;
+ 	unsigned int module_power_mW;
+ 	unsigned int module_t_start_up;
+-	unsigned int module_t_wait;
++	unsigned int phy_t_retry;
+ 
+ 	unsigned int rate_kbd;
+ 	unsigned int rs_threshold_kbd;
+@@ -372,18 +372,22 @@ static void sfp_fixup_10gbaset_30m(struct sfp *sfp)
+ 	sfp->id.base.extended_cc = SFF8024_ECC_10GBASE_T_SR;
+ }
+ 
+-static void sfp_fixup_rollball_proto(struct sfp *sfp, unsigned int secs)
++static void sfp_fixup_rollball(struct sfp *sfp)
+ {
+ 	sfp->mdio_protocol = MDIO_I2C_ROLLBALL;
+-	sfp->module_t_wait = msecs_to_jiffies(secs * 1000);
++
++	/* RollBall modules may disallow access to PHY registers for up to 25
++	 * seconds, and the reads return 0xffff before that. Increase the time
++	 * between PHY probe retries from 50ms to 1s so that we will wait for
++	 * the PHY for a sufficient amount of time.
++	 */
++	sfp->phy_t_retry = msecs_to_jiffies(1000);
+ }
+ 
+ static void sfp_fixup_fs_10gt(struct sfp *sfp)
+ {
+ 	sfp_fixup_10gbaset_30m(sfp);
+-
+-	// These SFPs need 4 seconds before the PHY can be accessed
+-	sfp_fixup_rollball_proto(sfp, 4);
++	sfp_fixup_rollball(sfp);
+ }
+ 
+ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+@@ -395,12 +399,6 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+ 	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
+ }
+ 
+-static void sfp_fixup_rollball(struct sfp *sfp)
+-{
+-	// Rollball SFPs need 25 seconds before the PHY can be accessed
+-	sfp_fixup_rollball_proto(sfp, 25);
+-}
+-
+ static void sfp_fixup_rollball_cc(struct sfp *sfp)
+ {
+ 	sfp_fixup_rollball(sfp);
+@@ -2331,7 +2329,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
+ 		mask |= SFP_F_RS1;
+ 
+ 	sfp->module_t_start_up = T_START_UP;
+-	sfp->module_t_wait = T_WAIT;
++	sfp->phy_t_retry = T_PHY_RETRY;
+ 
+ 	sfp->state_ignore_mask = 0;
+ 
+@@ -2568,10 +2566,9 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 
+ 		/* We need to check the TX_FAULT state, which is not defined
+ 		 * while TX_DISABLE is asserted. The earliest we want to do
+-		 * anything (such as probe for a PHY) is 50ms (or more on
+-		 * specific modules).
++		 * anything (such as probe for a PHY) is 50ms.
+ 		 */
+-		sfp_sm_next(sfp, SFP_S_WAIT, sfp->module_t_wait);
++		sfp_sm_next(sfp, SFP_S_WAIT, T_WAIT);
+ 		break;
+ 
+ 	case SFP_S_WAIT:
+@@ -2585,8 +2582,8 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 			 * deasserting.
+ 			 */
+ 			timeout = sfp->module_t_start_up;
+-			if (timeout > sfp->module_t_wait)
+-				timeout -= sfp->module_t_wait;
++			if (timeout > T_WAIT)
++				timeout -= T_WAIT;
+ 			else
+ 				timeout = 1;
+ 
+@@ -2629,7 +2626,11 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 		ret = sfp_sm_probe_for_phy(sfp);
+ 		if (ret == -ENODEV) {
+ 			if (--sfp->sm_phy_retries) {
+-				sfp_sm_next(sfp, SFP_S_INIT_PHY, T_PHY_RETRY);
++				sfp_sm_next(sfp, SFP_S_INIT_PHY,
++					    sfp->phy_t_retry);
++				dev_dbg(sfp->dev,
++					"no PHY detected, %u tries left\n",
++					sfp->sm_phy_retries);
+ 				break;
+ 			} else {
+ 				dev_info(sfp->dev, "no PHY detected\n");
+-- 
+2.41.0
+
 
