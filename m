@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-46962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A5167E76C2
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 02:45:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1777E76CE
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 02:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 537AE1C209FD
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 01:45:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A34721C20BE2
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 01:48:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC557A5F;
-	Fri, 10 Nov 2023 01:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46344EA0;
+	Fri, 10 Nov 2023 01:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E65A47;
-	Fri, 10 Nov 2023 01:44:55 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEDE344A4;
-	Thu,  9 Nov 2023 17:44:53 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw2ST8O_1699580689;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw2ST8O_1699580689)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6029EA47;
+	Fri, 10 Nov 2023 01:48:27 +0000 (UTC)
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F5044A4;
+	Thu,  9 Nov 2023 17:48:25 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R421e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw2RktJ_1699580901;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw2RktJ_1699580901)
           by smtp.aliyun-inc.com;
-          Fri, 10 Nov 2023 09:44:50 +0800
-Message-ID: <1699580672.387567-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 14/21] virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
-Date: Fri, 10 Nov 2023 09:44:32 +0800
+          Fri, 10 Nov 2023 09:48:22 +0800
+Message-ID: <1699580836.3647869-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 17/21] virtio_net: xsk: rx: skip dma unmap when rq is bind with AF_XDP
+Date: Fri, 10 Nov 2023 09:47:16 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: netdev@vger.kernel.org,
@@ -44,128 +44,128 @@ Cc: netdev@vger.kernel.org,
  virtualization@lists.linux-foundation.org,
  bpf@vger.kernel.org
 References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
- <20231107031227.100015-15-xuanzhuo@linux.alibaba.com>
- <20231109061056-mutt-send-email-mst@kernel.org>
- <1699528568.0674586-6-xuanzhuo@linux.alibaba.com>
- <20231109065912-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231109065912-mutt-send-email-mst@kernel.org>
+ <20231107031227.100015-18-xuanzhuo@linux.alibaba.com>
+ <20231109031347-mutt-send-email-mst@kernel.org>
+ <1699528202.3090942-4-xuanzhuo@linux.alibaba.com>
+ <20231109070015-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231109070015-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Thu, 9 Nov 2023 06:59:48 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Nov 09, 2023 at 07:16:08PM +0800, Xuan Zhuo wrote:
-> > On Thu, 9 Nov 2023 06:11:49 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Tue, Nov 07, 2023 at 11:12:20AM +0800, Xuan Zhuo wrote:
-> > > > virtnet_free_old_xmit distinguishes three type ptr(skb, xdp frame, xsk
-> > > > buffer) by the last bits of the pointer.
+On Thu, 9 Nov 2023 07:00:51 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Thu, Nov 09, 2023 at 07:10:02PM +0800, Xuan Zhuo wrote:
+> > On Thu, 9 Nov 2023 03:15:03 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Tue, Nov 07, 2023 at 11:12:23AM +0800, Xuan Zhuo wrote:
+> > > > When rq is bound with AF_XDP, the buffer dma is managed
+> > > > by the AF_XDP APIs. So the buffer got from the virtio core should
+> > > > skip the dma unmap operation.
 > > > >
 > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio/virtio_net.h | 18 ++++++++++++++++--
-> > > >  drivers/net/virtio/xsk.h        |  5 +++++
-> > > >  2 files changed, 21 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
-> > > > index a431a2c1ee47..a13d6d301fdb 100644
-> > > > --- a/drivers/net/virtio/virtio_net.h
-> > > > +++ b/drivers/net/virtio/virtio_net.h
-> > > > @@ -225,6 +225,11 @@ struct virtnet_info {
-> > > >  	struct failover *failover;
-> > > >  };
-> > > >
-> > > > +static inline bool virtnet_is_skb_ptr(void *ptr)
-> > > > +{
-> > > > +	return !((unsigned long)ptr & VIRTIO_XMIT_DATA_MASK);
-> > > > +}
-> > > > +
-> > > >  static inline bool virtnet_is_xdp_frame(void *ptr)
-> > > >  {
-> > > >  	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > > > @@ -235,6 +240,8 @@ static inline struct xdp_frame *virtnet_ptr_to_xdp(void *ptr)
-> > > >  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
-> > > >  }
-> > > >
-> > > > +static inline u32 virtnet_ptr_to_xsk(void *ptr);
-> > > > +
 > > >
-> > > I don't understand why you need this here.
+> > >
+> > > I don't get it - is this like a bugfix?
 > >
-> > The below function virtnet_free_old_xmit needs this.
+> > I want focus on this. So let it as an independent commit.
+> >
+> > > And why do we need our own flag and checks?
+> > > Doesn't virtio core DTRT?
+> >
+> >
+> > struct vring_virtqueue {
+> > 	[....]
+> >
+> > 	/* Do DMA mapping by driver */
+> > 	bool premapped;
+> >
+> > We can not.
+> >
+> > So I add own flag.
 > >
 > > Thanks.
 >
-> I don't understand why is virtnet_free_old_xmit inline, either.
+> Still don't get it. Why not check the premapped flag?
 
-That is in the header file.
+premapped is in the struct vring_virtqueue.
+
+We can not access it from the driver.
 
 
 >
+> >
 > > >
-> > >
-> > > >  static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
-> > > >  {
-> > > >  	struct virtnet_sq_dma *next, *head;
-> > > > @@ -261,11 +268,12 @@ static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
-> > > >  static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> > > >  					 u64 *bytes, u64 *packets)
-> > > >  {
-> > > > +	unsigned int xsknum = 0;
-> > > >  	unsigned int len;
-> > > >  	void *ptr;
+> > > > ---
+> > > >  drivers/net/virtio/main.c       | 8 +++++---
+> > > >  drivers/net/virtio/virtio_net.h | 3 +++
+> > > >  drivers/net/virtio/xsk.c        | 1 +
+> > > >  3 files changed, 9 insertions(+), 3 deletions(-)
 > > > >
-> > > >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
-> > > > -		if (!virtnet_is_xdp_frame(ptr)) {
-> > > > +		if (virtnet_is_skb_ptr(ptr)) {
-> > > >  			struct sk_buff *skb;
+> > > > diff --git a/drivers/net/virtio/main.c b/drivers/net/virtio/main.c
+> > > > index 15943a22e17d..a318b2533b94 100644
+> > > > --- a/drivers/net/virtio/main.c
+> > > > +++ b/drivers/net/virtio/main.c
+> > > > @@ -430,7 +430,7 @@ static void *virtnet_rq_get_buf(struct virtnet_rq *rq, u32 *len, void **ctx)
+> > > >  	void *buf;
 > > > >
-> > > >  			if (sq->do_dma)
-> > > > @@ -277,7 +285,7 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+> > > >  	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> > > > -	if (buf && rq->do_dma)
+> > > > +	if (buf && rq->do_dma_unmap)
+> > > >  		virtnet_rq_unmap(rq, buf, *len);
 > > > >
-> > > >  			*bytes += skb->len;
-> > > >  			napi_consume_skb(skb, in_napi);
-> > > > -		} else {
-> > > > +		} else if (virtnet_is_xdp_frame(ptr)) {
-> > > >  			struct xdp_frame *frame;
+> > > >  	return buf;
+> > > > @@ -561,8 +561,10 @@ static void virtnet_set_premapped(struct virtnet_info *vi)
 > > > >
-> > > >  			if (sq->do_dma)
-> > > > @@ -287,9 +295,15 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
-> > > >
-> > > >  			*bytes += xdp_get_frame_len(frame);
-> > > >  			xdp_return_frame(frame);
-> > > > +		} else {
-> > > > +			*bytes += virtnet_ptr_to_xsk(ptr);
-> > > > +			++xsknum;
+> > > >  		/* disable for big mode */
+> > > >  		if (vi->mergeable_rx_bufs || !vi->big_packets) {
+> > > > -			if (!virtqueue_set_dma_premapped(vi->rq[i].vq))
+> > > > +			if (!virtqueue_set_dma_premapped(vi->rq[i].vq)) {
+> > > >  				vi->rq[i].do_dma = true;
+> > > > +				vi->rq[i].do_dma_unmap = true;
+> > > > +			}
 > > > >  		}
-> > > >  		(*packets)++;
 > > > >  	}
-> > > > +
-> > > > +	if (xsknum)
-> > > > +		xsk_tx_completed(sq->xsk.pool, xsknum);
 > > > >  }
+> > > > @@ -3944,7 +3946,7 @@ void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
 > > > >
-> > > >  static inline bool virtnet_is_xdp_raw_buffer_queue(struct virtnet_info *vi, int q)
-> > > > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
-> > > > index 1bd19dcda649..7ebc9bda7aee 100644
-> > > > --- a/drivers/net/virtio/xsk.h
-> > > > +++ b/drivers/net/virtio/xsk.h
-> > > > @@ -14,6 +14,11 @@ static inline void *virtnet_xsk_to_ptr(u32 len)
-> > > >  	return (void *)(p | VIRTIO_XSK_FLAG);
-> > > >  }
+> > > >  	rq = &vi->rq[i];
 > > > >
-> > > > +static inline u32 virtnet_ptr_to_xsk(void *ptr)
-> > > > +{
-> > > > +	return ((unsigned long)ptr) >> VIRTIO_XSK_FLAG_OFFSET;
-> > > > +}
+> > > > -	if (rq->do_dma)
+> > > > +	if (rq->do_dma_unmap)
+> > > >  		virtnet_rq_unmap(rq, buf, 0);
+> > > >
+> > > >  	virtnet_rq_free_buf(vi, rq, buf);
+> > > > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > > > index 1242785e311e..2005d0cd22e2 100644
+> > > > --- a/drivers/net/virtio/virtio_net.h
+> > > > +++ b/drivers/net/virtio/virtio_net.h
+> > > > @@ -135,6 +135,9 @@ struct virtnet_rq {
+> > > >  	/* Do dma by self */
+> > > >  	bool do_dma;
+> > > >
+> > > > +	/* Do dma unmap after getting buf from virtio core. */
+> > > > +	bool do_dma_unmap;
 > > > > +
-> > > >  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
-> > > >  bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
-> > > >  		      int budget);
+> > > >  	struct {
+> > > >  		struct xsk_buff_pool *pool;
+> > > >
+> > > > diff --git a/drivers/net/virtio/xsk.c b/drivers/net/virtio/xsk.c
+> > > > index e737c3353212..b09c473c29fb 100644
+> > > > --- a/drivers/net/virtio/xsk.c
+> > > > +++ b/drivers/net/virtio/xsk.c
+> > > > @@ -210,6 +210,7 @@ static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct virtnet_rq *
+> > > >  		xdp_rxq_info_unreg(&rq->xsk.xdp_rxq);
+> > > >
+> > > >  	rq->xsk.pool = pool;
+> > > > +	rq->do_dma_unmap = !pool;
+> > > >
+> > > >  	virtnet_rx_resume(vi, rq);
+> > > >
 > > > > --
 > > > > 2.32.0.3.g01195cf9f
 > > >
 > > >
+>
 >
 
