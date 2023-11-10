@@ -1,141 +1,106 @@
-Return-Path: <netdev+bounces-47119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1897E7D77
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 16:36:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367FF7E7D7C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 16:42:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFEEAB20BAC
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:36:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB2EF2813AE
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:42:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC62A1CA89;
-	Fri, 10 Nov 2023 15:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9D51D549;
+	Fri, 10 Nov 2023 15:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hwxR4mnX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpMCsFkr"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5971CA83
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 15:36:36 +0000 (UTC)
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4499A3AE23
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 07:36:35 -0800 (PST)
-Received: by mail-qk1-x72f.google.com with SMTP id af79cd13be357-77891c236fcso140568185a.3
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 07:36:35 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07831CA89;
+	Fri, 10 Nov 2023 15:42:45 +0000 (UTC)
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4CE53B30E;
+	Fri, 10 Nov 2023 07:42:43 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-32f78dcf036so2044833f8f.0;
+        Fri, 10 Nov 2023 07:42:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699630594; x=1700235394; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dmcoxY6SSqGPaF0Dga3rcxKS15grctp8lJRPODJHZKg=;
-        b=hwxR4mnX6utH3QB6wWNO2vRbX5cLxnfkS9rASv3whcCqa9CXeuQxi8tdY5hF8Mc8dv
-         bOknGABWieyAO6YoA3CXk1Of/NZDtbnAlUuBFJTtuHASiOyp4vV3f8VkB8LYQUlgqAa2
-         65Y3NW0g8wl5z2vzmd92mdZ7cd3xKx6HhBnXnse0z7ACjz538a73qNn5U8pr7+lONKCs
-         JUllkDga1dn+u+zTs8Ebai4PhkOzfx/HMduKnxBtOYiPArCCzS+UtDD1C86QRWjPj0Nj
-         FZs4voDuXjOAiKnTwcnImQzVHkmXRdG3CJHuZAtQSNLtUPv80aBTLHUKrm17ltllJACC
-         QbAQ==
+        d=gmail.com; s=20230601; t=1699630962; x=1700235762; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fJfu4EuR1P0NY7PPdaFdwn09q5xxmywPpE4sr+rGJF8=;
+        b=dpMCsFkr7KqlMv2F8TWff6nx1slu5Ucz4B1KDOSM8cAnNZVX05nUe7utT94vJuw3CF
+         9uYj/0cmwbv7DdD549+4fjFdWhZoMC2rE6aX4HGzxSBeNZ+vN7q/1q13qfQilb0WhW1e
+         yl+3TK1PO92UuVjAcs3AWbx+fONkcugyiXFzKMqyYdiHNYp3Vu3MzIu55Q7hXlpuVsoj
+         frEACoQeSq/6d4GzVy008IROBD4rhDWA7awY0KmhsvJ5vf+KPErmlTKFZf4wusWDjXVR
+         JLBmNezPKPKO7M1NP+axGqNGBSWZzvfcSTvzKaEnprwzuprT9qyDOC7tzlc0YeLVIRjr
+         tHvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699630594; x=1700235394;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dmcoxY6SSqGPaF0Dga3rcxKS15grctp8lJRPODJHZKg=;
-        b=rt/B06u16qjnw3U/mTMUIZ1af3aBTfDmn+RIz6IaVLJFfHIcNFLUOf0gGoxgtPQ5yS
-         0KIelBP0RjFJWKS2qGFEfG6KFNRKHbqepDdp6e2yffuuR2pPphdg2BRoFJql6Qg6Kju8
-         2RA3DvgmjhHpBbtTjEi+4wJqlqbDJOnVITREhyokV/A+0W4ZFxV3zBG9M6a+hyRJbAjx
-         EbO+FuTgzRWT5i0fj87YFOgKYVA/9ERdVbae1hS+xFC33I+q/EGIMa8DC1BrU6vXEKGc
-         9eomH9jgGL3Om/N/+alJv+nHzz4eys4RyIhqQFhb30eD91ChQBuGNUcmmvSU1nZK1WeG
-         pIgg==
-X-Gm-Message-State: AOJu0YwjfPMCziOpvS75Xwn+wxiplJRUWybhFZqMfpMg2bhFW6enZrWG
-	fwjkG3Yb744BzdvN2phhIhcNE42RNso=
-X-Google-Smtp-Source: AGHT+IGCS0dxZOXUmDPgwL8USAlWtxtKW2n9KGGn4QZUSg3xdAVZFKE438hNjIJrHt33o+3eOTeemA==
-X-Received: by 2002:ad4:5c66:0:b0:659:e547:ca72 with SMTP id i6-20020ad45c66000000b00659e547ca72mr9979914qvh.40.1699630594007;
-        Fri, 10 Nov 2023 07:36:34 -0800 (PST)
-Received: from willemb.c.googlers.com.com (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id v17-20020a05620a091100b0077731466526sm759525qkv.70.2023.11.10.07.36.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 07:36:33 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net] net: gso_test: support CONFIG_MAX_SKB_FRAGS up to 45
-Date: Fri, 10 Nov 2023 10:36:00 -0500
-Message-ID: <20231110153630.161171-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
+        d=1e100.net; s=20230601; t=1699630962; x=1700235762;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fJfu4EuR1P0NY7PPdaFdwn09q5xxmywPpE4sr+rGJF8=;
+        b=kxZxh6IWAA8ld+hF+HVvWkOyo7W9vCCDmanKdZbg+OQ1gG3hhfi7bnf5gqYxqgsWWK
+         EKOqtyey7t4udkgmTdTQ8sz0yX/fCcYMMzAigZbGqBqtNzuQAjXGAemzV5HIiqSzCi2n
+         FcO/FXPos+Fb6LDCBaIw7FpTZv6WNN8Y3apfkkkeuurmhnT/daaycEPksZC4JYHL6kCY
+         +58bwqbb/tcfSA/SemAjmo73TTFINU3iCxlbikvKF7/jN5lDO1KuQ4AUJ6B/haz3JMnx
+         Nllq13S8RHo3WZpGE7fTYHJiKdaPvjCEPap/GPM9Z0MQHaNwFZiLgqn6qwTgbCyuj5hF
+         biVA==
+X-Gm-Message-State: AOJu0Yw+na5wMUsEk00R/D+1oHQ0KJL5GtO2vK+2Jr+NkuM/YO8qkZ6F
+	nM1OARvifyvbRpwj08Y3e+X0Uik7npH8txOUlPk=
+X-Google-Smtp-Source: AGHT+IHdiDRthT9zPEJ/pFC73tZcrvH+XW9DKwaPydDCy5hA45KwFQZL06We6QzO0MG7LTPU+MUQeFSZuuqjsoT4pVw=
+X-Received: by 2002:a05:6000:682:b0:32f:86e7:9bef with SMTP id
+ bo2-20020a056000068200b0032f86e79befmr3859409wrb.8.1699630961884; Fri, 10 Nov
+ 2023 07:42:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1699609302-8605-1-git-send-email-yangpc@wangsu.com>
+In-Reply-To: <1699609302-8605-1-git-send-email-yangpc@wangsu.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 10 Nov 2023 07:42:30 -0800
+Message-ID: <CAADnVQL=8-ViD7vPy4tQ1Ek6TzC24aMVFwt4_k0Jc7igz-5Jkw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf, sockmap: Bundle psock->sk_redir and
+ redir_ingress into a tagged pointer
+To: Pengcheng Yang <yangpc@wangsu.com>
+Cc: Jakub Sitnicki <jakub@cloudflare.com>, John Fastabend <john.fastabend@gmail.com>, 
+	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Willem de Bruijn <willemb@google.com>
+On Fri, Nov 10, 2023 at 1:44=E2=80=AFAM Pengcheng Yang <yangpc@wangsu.com> =
+wrote:
+>
+> Like skb->_sk_redir, we bundle the sock redirect pointer and
+> the ingress bit to manage them together.
+>
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Link: https://lore.kernel.org/bpf/87cz97cnz8.fsf@cloudflare.com
+> Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
+> ---
+>  include/linux/skmsg.h | 30 ++++++++++++++++++++++++++++--
+>  net/core/skmsg.c      | 18 ++++++++++--------
+>  net/ipv4/tcp_bpf.c    | 13 +++++++------
+>  net/tls/tls_sw.c      | 11 ++++++-----
+>  4 files changed, 51 insertions(+), 21 deletions(-)
+>
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index c1637515a8a4..ae021f511f46 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -78,11 +78,10 @@ struct sk_psock_work_state {
+>
+>  struct sk_psock {
+>         struct sock                     *sk;
+> -       struct sock                     *sk_redir;
+> +       unsigned long                   _sk_redir;
 
-The test allocs a single page to hold all the frag_list skbs. This
-is insufficient on kernels with CONFIG_MAX_SKB_FRAGS=45, due to the
-increased skb_shared_info frags[] array length.
-
-        gso_test_func: ASSERTION FAILED at net/core/gso_test.c:210
-        Expected alloc_size <= ((1UL) << 12), but
-            alloc_size == 5075 (0x13d3)
-            ((1UL) << 12) == 4096 (0x1000)
-
-Simplify the logic. Just allocate a page for each frag_list skb.
-
-Fixes: 4688ecb1385f ("net: expand skb_segment unit test with frag_list coverage")
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- net/core/gso_test.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/net/core/gso_test.c b/net/core/gso_test.c
-index ceb684be4cbf..4c2e77bd12f4 100644
---- a/net/core/gso_test.c
-+++ b/net/core/gso_test.c
-@@ -180,18 +180,17 @@ static void gso_test_func(struct kunit *test)
- 	}
- 
- 	if (tcase->frag_skbs) {
--		unsigned int total_size = 0, total_true_size = 0, alloc_size = 0;
-+		unsigned int total_size = 0, total_true_size = 0;
- 		struct sk_buff *frag_skb, *prev = NULL;
- 
--		page = alloc_page(GFP_KERNEL);
--		KUNIT_ASSERT_NOT_NULL(test, page);
--		page_ref_add(page, tcase->nr_frag_skbs - 1);
--
- 		for (i = 0; i < tcase->nr_frag_skbs; i++) {
- 			unsigned int frag_size;
- 
-+			page = alloc_page(GFP_KERNEL);
-+			KUNIT_ASSERT_NOT_NULL(test, page);
-+
- 			frag_size = tcase->frag_skbs[i];
--			frag_skb = build_skb(page_address(page) + alloc_size,
-+			frag_skb = build_skb(page_address(page),
- 					     frag_size + shinfo_size);
- 			KUNIT_ASSERT_NOT_NULL(test, frag_skb);
- 			__skb_put(frag_skb, frag_size);
-@@ -204,11 +203,8 @@ static void gso_test_func(struct kunit *test)
- 
- 			total_size += frag_size;
- 			total_true_size += frag_skb->truesize;
--			alloc_size += frag_size + shinfo_size;
- 		}
- 
--		KUNIT_ASSERT_LE(test, alloc_size, PAGE_SIZE);
--
- 		skb->len += total_size;
- 		skb->data_len += total_size;
- 		skb->truesize += total_true_size;
--- 
-2.43.0.rc0.421.g78406f8d94-goog
-
+Please don't.
+There is no need to bundle them together.
 
