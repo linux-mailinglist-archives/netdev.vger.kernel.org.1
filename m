@@ -1,209 +1,104 @@
-Return-Path: <netdev+bounces-47117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7217E7D30
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:55:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BCF37E7D50
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 16:13:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5549280D94
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 14:55:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F205281330
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A461C29B;
-	Fri, 10 Nov 2023 14:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77651C6A4;
+	Fri, 10 Nov 2023 15:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="OqJQvu1f"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SrPd3KlF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15001C283
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 14:54:58 +0000 (UTC)
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C244C3A202
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:54:55 -0800 (PST)
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20231110145450epoutp01e3282de326410821ec880d77e9535874~WSr5NlZNP2668026680epoutp01N
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 14:54:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20231110145450epoutp01e3282de326410821ec880d77e9535874~WSr5NlZNP2668026680epoutp01N
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1699628090;
-	bh=yaxyezZ4yKiM0TbBpnaDlCvTUlDcM3TeSUozhx47FaY=;
-	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
-	b=OqJQvu1fm+c0plV9cgFk42mDT8EadPr6lGmVrWNN3DpZ2IyDMPq0skFuQlt/5iTV9
-	 prMCn9ihSpQlXJ9+e73UdBDN5ug+/aNk4V80ImUS5JZpnkqc4PUuLfR57ps80lx92x
-	 YhO+1SwJODgEhYv0+oeWG7sKCeG+CAPAdArZxxW4=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20231110145449epcas1p175b38df7f1ec00914982e7d9ac9062b8~WSr4DeWui2963529635epcas1p1N;
-	Fri, 10 Nov 2023 14:54:49 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.36.225]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4SRhgX6MNcz4x9Pt; Fri, 10 Nov
-	2023 14:54:48 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-	epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-	46.4F.09739.8344E456; Fri, 10 Nov 2023 23:54:48 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-	20231110145448epcas1p2284021ecad63293509006be40343f94b~WSr3GwPaD1409414094epcas1p2q;
-	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
-Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20231110145448epsmtrp1f60c664cb83ab092cf1dcc8c05c316c2~WSr3GKVpo1915419154epsmtrp1b;
-	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
-X-AuditID: b6c32a37-c0bff7000000260b-ca-654e44383cec
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	A4.8C.07368.8344E456; Fri, 10 Nov 2023 23:54:48 +0900 (KST)
-Received: from jongeonpark03 (unknown [10.253.101.166]) by
-	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20231110145448epsmtip2ea6de2413869b56a1a9eeff557328541~WSr26GLXP1057810578epsmtip2V;
-	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
-From: "Jong eon Park" <jongeon.park@samsung.com>
-To: "'Jakub Kicinski'" <kuba@kernel.org>
-Cc: "'Paolo Abeni'" <pabeni@redhat.com>, "'David S. Miller'"
-	<davem@davemloft.net>, "'Eric Dumazet'" <edumazet@google.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "'Dong ha Kang'"
-	<dongha7.kang@samsung.com>
-In-Reply-To: <20231107085347.75bc3802@kernel.org>
-Subject: RE: [PATCH] netlink: introduce netlink poll to resolve fast return
- issue
-Date: Fri, 10 Nov 2023 23:54:48 +0900
-Message-ID: <000001da13e5$d9b99e30$8d2cda90$@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56F51C68E
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 15:13:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8DA3A22E;
+	Fri, 10 Nov 2023 07:13:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xdX945D2Jx/pGt01LPI1xFPqlA8WOj4k1izJoiFM9eQ=; b=SrPd3KlFmcQMHkuhaKnxKIFvww
+	Q3H3bJ0H1V/+MoOzVUmokQ1jhSH84NPi7y1x58BJWzXlnTmv5pZHPAMDfi6cuWzu3CGf3AoFxK36H
+	JUfW4O63U86dKzxelg3FnDtdz3E8W4FbGqf52q1lonSPyiMMGQ4h+XMdEiR4E+yLyd8c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r1TCM-001Iqx-Ry; Fri, 10 Nov 2023 16:13:30 +0100
+Date: Fri, 10 Nov 2023 16:13:30 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: alexey.pakhunov@spacex.com
+Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, siva.kallam@broadcom.com,
+	prashant@broadcom.com
+Subject: Re: [PATCH v2 1/2] tg3: Move the [rt]x_dropped counters to tg3_napi
+Message-ID: <7f1604fd-4bd6-4f16-8aed-2586afac7d15@lunn.ch>
+References: <20231110002340.3612515-1-alexey.pakhunov@spacex.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJoS8HO+cSy/HZb7h5ntB8MEORIdAHf29cGAkyoXsQBixSniALjIF5OrxJU4OA=
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmvq6Fi1+qQfNeXYs551tYLKbfnMps
-	8fTYI3aLC9v6WC0u75rDZnFsgZjFt9NvGB3YPbasvMnksWBTqcemVZ1sHu/3XWXz6NuyitHj
-	8ya5ALaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wc
-	oEuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQVmBXrFibnFpXnpenmpJVaGBgZG
-	pkCFCdkZ365PZi54Jl7xYPpixgbGTfxdjBwcEgImEmt/+nUxcnEICexglOg7/IkJwvnEKHFn
-	8W1GCOcbo0TriSagDCdYx5QfO9khEnsZJZb8fgTlvGGUePBnGyNIFZuAgcSxHz/BbBEBDYl9
-	s+aBjWIWeM4osblhMjNIglPAUOLm6/1gtrBAsMT2HwtZQI5iEVCVOLCpDCTMK2ApsXnPUmYI
-	W1Di5MwnLCA2s4C8xPa3c5ghLlKQ+Pl0GSvELj+JR8e6mCFqRCRmd7Yxg+yVEJjLIfF44yk2
-	iAYXiZ1/5kPZwhKvjm9hh7ClJF72t0HZ2RIvjh1jhQRSgcTVI0oQpr3E+0sWICazgKbE+l36
-	EMWKEjt/z2WE2Mon8e5rD1Qjr0RHmxBEiZrEw5NvWSFsGYnVK+6yTWBUmoXkr1lI/pqF5P5Z
-	CMsWMLKsYhRLLSjOTU8tNiwwhkd1cn7uJkZwEtUy38E47e0HvUOMTByMhxglOJiVRHgvmPik
-	CvGmJFZWpRblxxeV5qQWH2I0BQb0RGYp0eR8YBrPK4k3NLE0MDEzMrEwtjQ2UxLnvfWsN0VI
-	ID2xJDU7NbUgtQimj4mDU6qB6c7kHo1jngmbn73hYQrnaij7r/g5lv9OGIfcrNAfLd9kuATM
-	F8916mCIO+DI9YNrFd/BTaX/Ctk4b371ULq64ml3rFz7o4uyMgFrBGrS6rh874rMWzvbS1Ou
-	rSv+vugjw1SR81xHi51dP17+8vWy40bNC8e2fDLOO3imrcxGM+jN04dNK6vW7U5Nr/r27tYq
-	nQe8Wt4rP5/ceGG1nlJYhGn6sQXTBex+K915ueaCztWoTbe/WD1JVbOe3GcnaML6K6qWb+E1
-	0Q3N5uct0g2ORqcXlh29s09Az4KreKcIX9h65WBlm5719scbk3LrFs/eFq9Xutzi1mQ77y/a
-	AnbJrn21R/hO3tjdd+QEx1opJZbijERDLeai4kQAO/ddYisEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42LZdlhJXtfCxS/V4Nc6Pos551tYLKbfnMps
-	8fTYI3aLC9v6WC0u75rDZnFsgZjFt9NvGB3YPbasvMnksWBTqcemVZ1sHu/3XWXz6NuyitHj
-	8ya5ALYoLpuU1JzMstQifbsEroxv1yczFzwTr3gwfTFjA+Mm/i5GTg4JAROJKT92sncxcnEI
-	CexmlPh1socNIiEjcX3BPpYuRg4gW1ji8OFiiJpXjBIn1+1iBalhEzCQOPbjJyOILSKgIbFv
-	1jwwm1ngNaPEoU8KEA2dTBIvL05hAUlwChhK3Hy9nxnEFhYIlHi/8SsbyAIWAVWJA5vKQMK8
-	ApYSm/csZYawBSVOznwCdgOzgJ5E20ao8fIS29/OYYY4U0Hi59NlrBAn+Ek8OtbFDFEjIjG7
-	s415AqPwLCSTZiFMmoVk0iwkHQsYWVYxSqYWFOem5yYbFhjmpZbrFSfmFpfmpesl5+duYgTH
-	k5bGDsZ78//pHWJk4mA8xCjBwawkwnvBxCdViDclsbIqtSg/vqg0J7X4EKM0B4uSOK/hjNkp
-	QgLpiSWp2ampBalFMFkmDk6pBqYT/z4Fd099Nzvb3GfjwvgvftO4ypuYV/Fw9zl/nHJ5XfmL
-	eNF52xL5Pu3g25giXHDqyF/XZdqJS5tuCAuLSc+ZXeD0K/p5Rc66HYISLTFhb382nzd3uFQf
-	L7nZ6rfSDjvxk9xfPjCfTlj9+eW2s7wytbtCNkVqb5260/bqq8bIroxZOVFvZF3Cl21QXay6
-	/vl/Xv37ogK8e+s9i/9Oz2L+b5Z+SynlLftdFrWbDByPCnfUTL48QcnIavdj3hPzOhd0vVzN
-	sbjE6c/Vycc3/bivsvT1nq51AhsnPH/VbbFIjr3x1gFF0dci3OyzGf8LPvPUrdo5wfCq3pIt
-	Kxt9vjxt5F86/1CubM3UP7L3f183VWIpzkg01GIuKk4EAP0MuJ0WAwAA
-X-CMS-MailID: 20231110145448epcas1p2284021ecad63293509006be40343f94b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
-References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
-	<20231103072209.1005409-1-jongeon.park@samsung.com>
-	<20231106154812.14c470c2@kernel.org>
-	<25c501da111e$d527b010$7f771030$@samsung.com>
-	<20231107085347.75bc3802@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231110002340.3612515-1-alexey.pakhunov@spacex.com>
 
+> @@ -11895,6 +11903,9 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+>  {
+>  	struct rtnl_link_stats64 *old_stats = &tp->net_stats_prev;
+>  	struct tg3_hw_stats *hw_stats = tp->hw_stats;
+> +	unsigned long rx_dropped;
+> +	unsigned long tx_dropped;
+> +	int i;
+>  
+>  	stats->rx_packets = old_stats->rx_packets +
+>  		get_stat64(&hw_stats->rx_ucast_packets) +
+> @@ -11941,8 +11952,26 @@ static void tg3_get_nstats(struct tg3 *tp, struct rtnl_link_stats64 *stats)
+>  	stats->rx_missed_errors = old_stats->rx_missed_errors +
+>  		get_stat64(&hw_stats->rx_discards);
+>  
+> -	stats->rx_dropped = tp->rx_dropped;
+> -	stats->tx_dropped = tp->tx_dropped;
+> +	/* Aggregate per-queue counters. The per-queue counters are updated
+> +	 * by a single writer, race-free. The result computed by this loop
+> +	 * might not be 100% accurate (counters can be updated in the middle of
+> +	 * the loop) but the next tg3_get_nstats() will recompute the current
+> +	 * value so it is acceptable.
+> +	 *
+> +	 * Note that these counters wrap around at 4G on 32bit machines.
+> +	 */
+> +	rx_dropped = (unsigned long)(old_stats->rx_dropped);
+> +	tx_dropped = (unsigned long)(old_stats->tx_dropped);
 
+Isn't this wrapping artificial? old_stats is of type
+rtnl_link_stats64, so the counters are 64 bit.
 
-On Tuesday, Nov 7, 2023 at 08:48 Jakub Kicinski wrote:
-> Why does the wake up happen in the first place?
-> I don't see anything special in the netlink code, so I'm assuming it's
-> because datagram_poll() returns EPOLLERR.
-> 
-> The man page says:
-> 
->        EPOLLERR
->               Error condition happened on the associated file
->               descriptor.  This event is also reported for the write end
->               of a pipe when the read end has been closed.
-> 
->               epoll_wait(2) will always report for this event; it is not
->               necessary to set it in events when calling epoll_ctl().
-> 
-> To me that sounds like EPOLLERR is always implicitly enabled, and should
-> be handled by the application. IOW it's an pure application bug.
-> 
-> Are you aware of any precedent for sockets adding in EPOLLOUT when
-> EPOLLERR is set?
+> +
+> +	for (i = 0; i < tp->irq_cnt; i++) {
+> +		struct tg3_napi *tnapi = &tp->napi[i];
+> +
+> +		rx_dropped += tnapi->rx_dropped;
+> +		tx_dropped += tnapi->tx_dropped;
+> +	}
+> +
+> +	stats->rx_dropped = rx_dropped;
+> +	stats->tx_dropped = tx_dropped;
 
-In my case, the first wake-up was by POLLIN, not POLLERR.
-Please consider the below scenario.
+state is also rtnl_link_stats64 so has 64 bit counters. So this code
+is throwing away the upper 32 bits.
 
-------------CPU1 (kernel)----------  --------------CPU2 (app)--------------
-...
-a driver delivers uevent.              poll was waiting for schedule.
-a driver delivers uevent.
-a driver delivers uevent.
-...
-1) netlink_broadcast_deliver fails.
-(sk_rmem_alloc > sk_rcvbuf)
-                                            getting schedule and poll
-returns,
-                                            and the app calls recv.
-                                            (rcv queue is empied)
-                                            2)
+Why not use include/linux/u64_stats_sync.h, which should cost you
+nothing on 64 bit machines, and do the right thing on 32 bit machines.
 
-netlink_overrun is called.
-(NETLINK_S_CONGESTED flag is set,
-ENOBUF is written in sk_err and,
-wake up poll.)
-                                            finishing its job and call poll
-again.
-                                            poll returns POLLERR.
-
-                                            (the app doesn't have POLLERR
-handler,)
-                                            it calls poll, but getting
-POLLERR.
-                                            it calls poll, but getting
-POLLERR.
-                                            it calls poll, but getting
-POLLERR.
-                                            ...
-									 
-
-Interestingly, in this issue, even though netlink overrun frequently 
-happened and caused POLLERRs, the user was managing it well through 
-POLLIN and 'recv' function without a specific POLLERR handler. 
-However, in the current situation, rcv queue is already empty and 
-NETLINK_S_CONGESTED flag prevents any more incoming packets. This makes 
-it impossible for the user to call 'recv'.
-
-This "congested" situation is a bit ambiguous. The queue is empty, yet 
-'congested' remains. This means kernel can no longer deliver uevents 
-despite the empty queue, and it lead to the persistent 'congested' status.
-
-The reason for the difference in netlink lies in the NETLINK_S_CONGESTED 
-flag. If it were UDP, upon seeing the empty queue, it might have kept 
-pushing the received packets into the queue (making possible to call 
-'recv').
-
-BRs,
-JE Park.
-
-
+	Andrew
 
