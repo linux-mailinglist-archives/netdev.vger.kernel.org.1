@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-47029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCAC7E7A77
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:09:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6446F7E7A8C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9948B20E1C
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:09:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCD2FB20DE4
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4781079C;
-	Fri, 10 Nov 2023 09:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5027810A12;
+	Fri, 10 Nov 2023 09:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Sw97PmtN"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF3BD307
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:09:11 +0000 (UTC)
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1AFDD091
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:09:09 -0800 (PST)
-Received: from loongson.cn (unknown [112.20.112.120])
-	by gateway (Coremail) with SMTP id _____8AxlPAz801lpbI4AA--.46117S3;
-	Fri, 10 Nov 2023 17:09:07 +0800 (CST)
-Received: from localhost.localdomain (unknown [112.20.112.120])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxE+Qt801lQ_Y9AA--.6266S2;
-	Fri, 10 Nov 2023 17:09:02 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com
-Cc: Yanteng Si <siyanteng@loongson.cn>,
-	fancer.lancer@gmail.com,
-	Jose.Abreu@synopsys.com,
-	chenhuacai@loongson.cn,
-	linux@armlinux.org.uk,
-	dongbiao@loongson.cn,
-	guyinggang@loongson.cn,
-	loongson-kernel@lists.loongnix.cn,
-	netdev@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	chris.chenfeiyang@gmail.com
-Subject: [PATCH v5 0/9] stmmac: Add Loongson platform support
-Date: Fri, 10 Nov 2023 17:08:44 +0800
-Message-Id: <cover.1699533745.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B235710950
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:18:19 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4946D2B7F7;
+	Fri, 10 Nov 2023 01:18:18 -0800 (PST)
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AA7ffkm031309;
+	Fri, 10 Nov 2023 09:18:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=G+Zc568Gz0SZ9OiI5OVsUfmYySCMQqqPWyjqT7w2RyA=;
+ b=Sw97PmtNok4qQCownr4UpQJ92SW3DjxoYPy2bGkRbTluWnhVMNJa+E6IZBUrM+gHKyw0
+ Umput+sHnHdrmtJveUAsMI48lo+Bl6cd6K/gnp8bIoFq16Oae5CCa8NdDZAtOzUyJuaU
+ oh7pvCFYv7qvjHcJUw1Uy3BX9NXhaUMJazSxmP1zdVU7hBxazlBJJPXdmcw3kIvug+d6
+ 86vJSTNGzLzn3fL6KsPZ72af2GirguPTcAn30qjLfyMYjiI8B5h0Af7iZoiUKi1PGEm3
+ f3SLBHHCXlKjB7c5/F6wu4fWq+Nwt7tkOfMVl3LkEoy7KYha5Rd0Pqws5N0Hw8mH9Mvq RA== 
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u9f3k0e2b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Nov 2023 09:18:03 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AA9I3o5019512
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Nov 2023 09:18:03 GMT
+Received: from [10.253.8.167] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 10 Nov
+ 2023 01:18:00 -0800
+Message-ID: <46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
+Date: Fri, 10 Nov 2023 17:17:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy support
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20231108113445.24825-1-quic_luoj@quicinc.com>
+ <20231108113445.24825-2-quic_luoj@quicinc.com>
+ <20231108131250.66d1c236@fedora>
+ <423a3ee3-bed5-02f9-f872-7b5dba64f994@quicinc.com>
+ <20231109101618.009efb45@fedora>
+ <0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
+In-Reply-To: <0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxE+Qt801lQ_Y9AA--.6266S2
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxXryUAFW8tw1DCr4rtr4UKFX_yoW5Xw18pF
-	y7Aa4Yqr97tr1xA3Z5Jw1DXF95Gay3tr43Wa1SvrnakaySkryqqrya9FWFqF17ArZ8ZFy2
-	qr1UCw1DCF1qkrbCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
-	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
-	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
-	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xII
-	jxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
-	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
-	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: S-SObheDVJ-FTaJteoWKc8E6pU-F3R-6
+X-Proofpoint-GUID: S-SObheDVJ-FTaJteoWKc8E6pU-F3R-6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-10_05,2023-11-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 impostorscore=0 adultscore=0 bulkscore=0 mlxscore=0
+ priorityscore=1501 phishscore=0 clxscore=1015 mlxlogscore=482
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2311100075
 
-v4 -> v5:
 
-* Remove an ugly and useless patch (fix channel number).
-* Remove the non-standard dma64 driver code, and also remove
-  the HWIF entries, since the associated custom callbacks no
-  longer exist.
-* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
-  support the multi-DMA-channels controller setup.
 
-See:
-v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
-v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
-v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
-v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+On 11/10/2023 4:53 PM, Jie Luo wrote:
+> 
+> 
+> On 11/9/2023 5:16 PM, Maxime Chevallier wrote:
+>> Hello,
+>>
+>> On Thu, 9 Nov 2023 16:32:36 +0800
+>> Jie Luo <quic_luoj@quicinc.com> wrote:
+>>
+>> [...]
+>>
+>>>> What I understand from this is that this PHY can be used either as a
+>>>> switch, in which case port 4 would be connected to the host interface
+>>>> at up to 2.5G, or as a quad-phy, but since it uses QUSGMII the link
+>>>> speed would be limited to 1G per-port, is that correct ?
+>>>
+>>> When the PHY works on the interface mode QUSGMII for quad-phy, all 4
+>>> PHYs can support to the max link speed 2.5G, actually the PHY can
+>>> support to max link speed 2.5G for all supported interface modes
+>>> including qusgmii and sgmii.
+>>
+>> I'm a bit confused then, as the USGMII spec says that Quad USGMII really
+>> is for quad 10/100/1000 speeds, using 10b/8b encoding.
+>>
+>> Aren't you using the USXGMII mode instead, which can convey 4 x 2.5Gbps
+>>   with 66b/64b encoding ?
+>>
+>> Thanks,
+>>
+>> Maxime
+> 
+> Hi Maxime,
+> Yes, for quad PHY mode, it is using 66b/64 encoding.
+> 
+> it seems that PHY_INTERFACE_MODE_USXGMII is for single port,
+> so i take the interface name PHY_INTERFACE_MODE_QUSGMII for
+> quad PHYs here.
+> 
+> can we apply PHY_INTERFACE_MODE_USXGMII to quad PHYs in this
+> case(qca8084 quad PHY mode)?
+> 
+> Thanks,
+> Jie.
 
-Yanteng Si (9):
-  net: stmmac: Pass stmmac_priv and chan in some callbacks
-  net: stmmac: Allow platforms to set irq_flags
-  net: stmmac: Add Loongson DWGMAC definitions
-  net: stmmac: dwmac-loongson: Refactor code for loongson_dwmac_probe()
-  net: stmmac: dwmac-loongson: Add full PCI support
-  net: stmmac: dwmac-loongson: Add MSI support
-  net: stmmac: dwmac-loongson: Add GNET support
-  net: stmmac: dwmac-loongson: Disable flow control for GMAC
-  net: stmmac: Disable coe for some Loongson GNET
-
- .../net/ethernet/stmicro/stmmac/chain_mode.c  |   5 +-
- drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 324 ++++++++++++++----
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  22 +-
- .../ethernet/stmicro/stmmac/dwmac1000_core.c  |   9 +-
- .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  71 +++-
- .../ethernet/stmicro/stmmac/dwmac100_core.c   |   9 +-
- .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  11 +-
- .../ethernet/stmicro/stmmac/dwmac4_descs.c    |  17 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   8 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_dma.h  |   2 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |   2 +-
- .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  62 +++-
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  44 +--
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  11 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  |  17 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  10 +-
- .../net/ethernet/stmicro/stmmac/enh_desc.c    |  17 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.c    |  10 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |  71 ++--
- .../net/ethernet/stmicro/stmmac/norm_desc.c   |  17 +-
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  30 +-
- include/linux/stmmac.h                        |   4 +
- 25 files changed, 563 insertions(+), 219 deletions(-)
-
--- 
-2.31.4
-
+one more thing, if we use the PHY_INTERFACE_MODE_USXGMII for
+the quad PHY here, the MAC serdes can't distinguish the actual
+mode PHY_INTERFACE_MODE_USXGMII and 10G-QXGMII(qca8084 quad phy mode),
+the MAC serdes has the different configurations for usxgmii(10g single 
+port) and qxsgmii(quad PHY).
 
