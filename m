@@ -1,142 +1,1044 @@
-Return-Path: <netdev+bounces-47032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D27E07E7A91
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:19:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E3DB7E7ABA
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:23:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E48F1C20B21
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:19:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA23C28161B
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB2C10A33;
-	Fri, 10 Nov 2023 09:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="um4F9GEg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D11011CB2;
+	Fri, 10 Nov 2023 09:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1044D10A22
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:19:27 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 274EB2BE0B
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:19:26 -0800 (PST)
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com [209.85.167.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id EF5D140C37
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:19:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1699607963;
-	bh=M/V03KjMzwGuzb7oZQUr5e4nxvXwaKWIZ570CjwTnKs=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=um4F9GEg9nftyLzMjkLnMdhRyidGSfGT9eabsy2WYbCjWwLUym3RP0PbAhhURq3Ok
-	 xWekoQ/JNvJZpupgPSAoP3/gASw23Iim8kAMN4AJAEDE1aiN43tZiZpKsgsuCE/JkB
-	 sB0vIOFjSziSl0NilqFtA0QEC+P4Qa318XabZ0wTBBcRfoZZKv3VQUCfrPQYUO5GNP
-	 fd5rSnr5TXsl//guLLNbEctJHimdd4KPSWNbd6x7VKBU/3I/mV6Q0P+DNYEhc6RKkg
-	 tSt1twh/Kc0N7gLI8Hwgt/0WEnzrwTliTUtf0ytiQXhM+C0IsJurLIS6tkPg1iRrOn
-	 dRl/gGHE5dDtQ==
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-5091368e043so2117998e87.2
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:19:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699607963; x=1700212763;
-        h=message-id:date:content-id:mime-version:comments:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=M/V03KjMzwGuzb7oZQUr5e4nxvXwaKWIZ570CjwTnKs=;
-        b=JUIdPdSiZStDDInYHnJspfbvTzr3uPS6z3FwK/d6c8AYN8C5qqHIs89zs8UmJFSVj/
-         RyeqbNLygTf9yXHkwxWOb1KXdq19FVQfNod7JTDO0GFgsMly3EQ6yW+wtkjbffxFRpnG
-         fmz0C7wvBC8JWdX7CfdlYpVe2hfmogcxTuGhDZOmUfNjuShdie7vgF152cCD6GMwNfos
-         hBfWL4IE/0xb0chJ3LgCAHFSCi2gR6tMyVb0S7B3FovEkqxkLWfn+IGtD5/lXGQLasSe
-         qcjs4tkmqJVi4Dr/W/sA12trNIJGOakzhKEVTcTxtZY2mIug26VTtKLqTlOB8cH6xtSK
-         ua4w==
-X-Gm-Message-State: AOJu0Yxy1HH44djfPjd/5KxB+epZzCIRFt3ekrrBuz3QmJ8aOO+lbILF
-	6vgefUTiFeTmRhK7BeuMim/6ROxt2Pb5aZPmA+sGvk5GYRcZBBQV3+DiEEgY1+SoZ2r1IJ0Jl5r
-	AHKw3FJZxW/tTlIXWXnlVjOmyo4WhEhgxuQ==
-X-Received: by 2002:a05:6512:617:b0:509:8eb6:6837 with SMTP id b23-20020a056512061700b005098eb66837mr3298106lfe.47.1699607963449;
-        Fri, 10 Nov 2023 01:19:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGWYrFu+gO/ovDyZjG0tXens3pSjiW63V/nW6cVYUdFk5+H1lQ+RUF2R2S6ZaHcbrD2yQ50Mw==
-X-Received: by 2002:a05:6512:617:b0:509:8eb6:6837 with SMTP id b23-20020a056512061700b005098eb66837mr3298093lfe.47.1699607963100;
-        Fri, 10 Nov 2023 01:19:23 -0800 (PST)
-Received: from vermin.localdomain ([195.13.248.78])
-        by smtp.gmail.com with ESMTPSA id k32-20020a0565123da000b00507f18af7e0sm1324656lfv.4.2023.11.10.01.19.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 01:19:22 -0800 (PST)
-Received: by vermin.localdomain (Postfix, from userid 1000)
-	id 20AF01C3B46; Fri, 10 Nov 2023 01:19:22 -0800 (PST)
-Received: from vermin (localhost [127.0.0.1])
-	by vermin.localdomain (Postfix) with ESMTP id 1F0611C3B45;
-	Fri, 10 Nov 2023 11:19:22 +0200 (EET)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: Eric Dumazet <edumazet@google.com>,
-    "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-    eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] bonding: stop the device in bond_setup_by_slave()
-In-reply-to: <ZU2nBgeOAZVs4KKJ@Laptop-X1>
-References: <20231109180102.4085183-1-edumazet@google.com> <ZU2nBgeOAZVs4KKJ@Laptop-X1>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Fri, 10 Nov 2023 11:44:06 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F69811CA1
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:23:30 +0000 (UTC)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F2245598
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:23:25 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.112.120])
+	by gateway (Coremail) with SMTP id _____8AxueqK9k1llLM4AA--.36012S3;
+	Fri, 10 Nov 2023 17:23:22 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.112.120])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dxvi+G9k1lQPk9AA--.4749S2;
+	Fri, 10 Nov 2023 17:23:19 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	fancer.lancer@gmail.com,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	dongbiao@loongson.cn,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v5 1/9] net: stmmac: Pass stmmac_priv and chan in some callbacks
+Date: Fri, 10 Nov 2023 17:23:18 +0800
+Message-Id: <5d1a11cc016c88c0e8b33489d020c6b6358e2dc7.1699533745.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
+In-Reply-To: <cover.1699533745.git.siyanteng@loongson.cn>
+References: <cover.1699533745.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <84245.1699607962.1@vermin>
-Date: Fri, 10 Nov 2023 11:19:22 +0200
-Message-ID: <84246.1699607962@vermin>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Dxvi+G9k1lQPk9AA--.4749S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9fXoWDXw1kAF45Jry5AFWfXw4xGrX_yoWrCr1DWo
+	WxAFnxJ3WSqw18ur97KF18JFy3X3ZxWw1rCrW7Crs5uayxAa1Yvry2qrWfJ3WUXr1fWFW2
+	va48tF4qyFW7tw4Ul-sFpf9Il3svdjkaLaAFLSUrUUUUnb8apTn2vfkv8UJUUUU8wcxFpf
+	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
+	UjIYCTnIWjp_UUUYC7kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
+	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUXVWUAwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
+	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Jw0_WrylYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04
+	k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7Cj
+	xVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jz5lbUUUUU=
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Loongson GMAC and GNET have some special features. To prepare for that,
+pass stmmac_priv and chan to more callbacks, and adjust the callbacks
+accordingly.
 
->On Thu, Nov 09, 2023 at 06:01:02PM +0000, Eric Dumazet wrote:
->> Commit 9eed321cde22 ("net: lapbether: only support ethernet devices")
->> has been able to keep syzbot away from net/lapb, until today.
->> 
->> In the following splat [1], the issue is that a lapbether device has
->> been created on a bonding device without members. Then adding a non
->> ARPHRD_ETHER member forced the bonding master to change its type.
->> 
->> The fix is to make sure we call dev_close() in bond_setup_by_slave()
->> so that the potential linked lapbether devices (or any other devices
->> having assumptions on the physical device) are removed.
->> 
->> A similar bug has been addressed in commit 40baec225765
->> ("bonding: fix panic on non-ARPHRD_ETHER enslave failure")
->> 
->
->Do we need also do this if the bond changed to ether device from other dev
->type? e.g.
->
->    if (slave_dev->type != ARPHRD_ETHER)
->            bond_setup_by_slave(bond_dev, slave_dev);
->    else
->            bond_ether_setup(bond_dev);
-
-	I'm not sure I follow your comment; bond_enslave() already has
-the above logic.  If the bond is not ARPHRD_ETHER and an ARPHRD_ETHER
-device is added to the bond, the above will take the bond_ether_setup()
-path, which will call ether_setup() which will set the device to
-ARPHRD_ETHER.
-
-	However, my recollection is that the bond device itself should
-be unregistered if the last interface of a non-ARPHRD_ETHER bond is
-removed.  This dates back to d90a162a4ee2 ("net/bonding: Destroy bonding
-master when last slave is gone"), but I don't know if the logic still
-works correctly (I've not heard much about IPoIB with bonding in a
-while).  The bond cannot be initially created as non-ARPHRD_ETHER; the
-type changes when the first such interface is added to the bond.
-
-	-J
-
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 ---
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+ .../net/ethernet/stmicro/stmmac/chain_mode.c  |  5 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 22 +++---
+ .../ethernet/stmicro/stmmac/dwmac1000_core.c  |  9 ++-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  8 ++-
+ .../ethernet/stmicro/stmmac/dwmac100_core.c   |  9 ++-
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 11 +--
+ .../ethernet/stmicro/stmmac/dwmac4_descs.c    | 17 ++---
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  8 ++-
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.h  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  5 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  5 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 11 +--
+ .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  | 17 ++---
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    | 10 +--
+ .../net/ethernet/stmicro/stmmac/enh_desc.c    | 17 ++---
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    | 71 ++++++++++---------
+ .../net/ethernet/stmicro/stmmac/norm_desc.c   | 17 ++---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  6 +-
+ 21 files changed, 146 insertions(+), 110 deletions(-)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+index fb55efd52240..a95866871f3e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
++++ b/drivers/net/ethernet/stmicro/stmmac/chain_mode.c
+@@ -95,8 +95,9 @@ static unsigned int is_jumbo_frm(int len, int enh_desc)
+ 	return ret;
+ }
+ 
+-static void init_dma_chain(void *des, dma_addr_t phy_addr,
+-				  unsigned int size, unsigned int extend_desc)
++static void init_dma_chain(struct stmmac_priv *priv, void *des,
++			   dma_addr_t phy_addr, unsigned int size,
++			   unsigned int extend_desc)
+ {
+ 	/*
+ 	 * In chained mode the des3 points to the next element in the ring.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index 137741b94122..2d3f0848cacb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -283,7 +283,7 @@ static const struct emac_variant emac_variant_h6 = {
+ /* sun8i_dwmac_dma_reset() - reset the EMAC
+  * Called from stmmac via stmmac_dma_ops->reset
+  */
+-static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
++static int sun8i_dwmac_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ {
+ 	writel(0, ioaddr + EMAC_RX_CTL1);
+ 	writel(0, ioaddr + EMAC_TX_CTL1);
+@@ -298,7 +298,7 @@ static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
+ /* sun8i_dwmac_dma_init() - initialize the EMAC
+  * Called from stmmac via stmmac_dma_ops->init
+  */
+-static void sun8i_dwmac_dma_init(void __iomem *ioaddr,
++static void sun8i_dwmac_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 				 struct stmmac_dma_cfg *dma_cfg, int atds)
+ {
+ 	writel(EMAC_RX_INT | EMAC_TX_INT, ioaddr + EMAC_INT_EN);
+@@ -395,7 +395,8 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
+ 	writel(v, ioaddr + EMAC_TX_CTL1);
+ }
+ 
+-static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
++static void sun8i_dwmac_enable_dma_transmission(struct stmmac_priv *priv,
++						void __iomem *ioaddr, u32 chan)
+ {
+ 	u32 v;
+ 
+@@ -643,7 +644,8 @@ static void sun8i_dwmac_set_mac(void __iomem *ioaddr, bool enable)
+  * All slot > 0 need to be enabled with MAC_ADDR_TYPE_DST
+  * If addr is NULL, clear the slot
+  */
+-static void sun8i_dwmac_set_umac_addr(struct mac_device_info *hw,
++static void sun8i_dwmac_set_umac_addr(struct stmmac_priv *priv,
++				      struct mac_device_info *hw,
+ 				      const unsigned char *addr,
+ 				      unsigned int reg_n)
+ {
+@@ -664,7 +666,8 @@ static void sun8i_dwmac_set_umac_addr(struct mac_device_info *hw,
+ 	}
+ }
+ 
+-static void sun8i_dwmac_get_umac_addr(struct mac_device_info *hw,
++static void sun8i_dwmac_get_umac_addr(struct stmmac_priv *priv,
++				      struct mac_device_info *hw,
+ 				      unsigned char *addr,
+ 				      unsigned int reg_n)
+ {
+@@ -687,7 +690,8 @@ static int sun8i_dwmac_rx_ipc_enable(struct mac_device_info *hw)
+ 	return 1;
+ }
+ 
+-static void sun8i_dwmac_set_filter(struct mac_device_info *hw,
++static void sun8i_dwmac_set_filter(struct stmmac_priv *priv,
++				   struct mac_device_info *hw,
+ 				   struct net_device *dev)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+@@ -705,13 +709,13 @@ static void sun8i_dwmac_set_filter(struct mac_device_info *hw,
+ 	} else if (macaddrs <= hw->unicast_filter_entries) {
+ 		if (!netdev_mc_empty(dev)) {
+ 			netdev_for_each_mc_addr(ha, dev) {
+-				sun8i_dwmac_set_umac_addr(hw, ha->addr, i);
++				sun8i_dwmac_set_umac_addr(priv, hw, ha->addr, i);
+ 				i++;
+ 			}
+ 		}
+ 		if (!netdev_uc_empty(dev)) {
+ 			netdev_for_each_uc_addr(ha, dev) {
+-				sun8i_dwmac_set_umac_addr(hw, ha->addr, i);
++				sun8i_dwmac_set_umac_addr(priv, hw, ha->addr, i);
+ 				i++;
+ 			}
+ 		}
+@@ -723,7 +727,7 @@ static void sun8i_dwmac_set_filter(struct mac_device_info *hw,
+ 
+ 	/* Disable unused address filter slots */
+ 	while (i < hw->unicast_filter_entries)
+-		sun8i_dwmac_set_umac_addr(hw, NULL, i++);
++		sun8i_dwmac_set_umac_addr(priv, hw, NULL, i++);
+ 
+ 	writel(v, ioaddr + EMAC_RX_FRM_FLT);
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+index 3927609abc44..b52793edf62f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+@@ -94,7 +94,8 @@ static void dwmac1000_dump_regs(struct mac_device_info *hw, u32 *reg_space)
+ 		reg_space[i] = readl(ioaddr + i * 4);
+ }
+ 
+-static void dwmac1000_set_umac_addr(struct mac_device_info *hw,
++static void dwmac1000_set_umac_addr(struct stmmac_priv *priv,
++				    struct mac_device_info *hw,
+ 				    const unsigned char *addr,
+ 				    unsigned int reg_n)
+ {
+@@ -103,7 +104,8 @@ static void dwmac1000_set_umac_addr(struct mac_device_info *hw,
+ 			    GMAC_ADDR_LOW(reg_n));
+ }
+ 
+-static void dwmac1000_get_umac_addr(struct mac_device_info *hw,
++static void dwmac1000_get_umac_addr(struct stmmac_priv *priv,
++				    struct mac_device_info *hw,
+ 				    unsigned char *addr,
+ 				    unsigned int reg_n)
+ {
+@@ -137,7 +139,8 @@ static void dwmac1000_set_mchash(void __iomem *ioaddr, u32 *mcfilterbits,
+ 		       ioaddr + GMAC_EXTHASH_BASE + regs * 4);
+ }
+ 
+-static void dwmac1000_set_filter(struct mac_device_info *hw,
++static void dwmac1000_set_filter(struct stmmac_priv *priv,
++				 struct mac_device_info *hw,
+ 				 struct net_device *dev)
+ {
+ 	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+index daf79cdbd3ec..ce0e6ca6f3a2 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+@@ -16,7 +16,8 @@
+ #include "dwmac1000.h"
+ #include "dwmac_dma.h"
+ 
+-static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
++static void dwmac1000_dma_axi(struct stmmac_priv *priv, void __iomem *ioaddr,
++			      struct stmmac_axi *axi)
+ {
+ 	u32 value = readl(ioaddr + DMA_AXI_BUS_MODE);
+ 	int i;
+@@ -70,7 +71,7 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+ 	writel(value, ioaddr + DMA_AXI_BUS_MODE);
+ }
+ 
+-static void dwmac1000_dma_init(void __iomem *ioaddr,
++static void dwmac1000_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			       struct stmmac_dma_cfg *dma_cfg, int atds)
+ {
+ 	u32 value = readl(ioaddr + DMA_BUS_MODE);
+@@ -223,7 +224,8 @@ static void dwmac1000_dump_dma_regs(struct stmmac_priv *priv,
+ 				readl(ioaddr + DMA_BUS_MODE + i * 4);
+ }
+ 
+-static int dwmac1000_get_hw_feature(void __iomem *ioaddr,
++static int dwmac1000_get_hw_feature(struct stmmac_priv *priv,
++				    void __iomem *ioaddr,
+ 				    struct dma_features *dma_cap)
+ {
+ 	u32 hw_cap = readl(ioaddr + DMA_HW_FEATURE);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
+index a6e8d7bd9588..c03623edeb75 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
+@@ -59,7 +59,8 @@ static int dwmac100_irq_status(struct mac_device_info *hw,
+ 	return 0;
+ }
+ 
+-static void dwmac100_set_umac_addr(struct mac_device_info *hw,
++static void dwmac100_set_umac_addr(struct stmmac_priv *priv,
++				   struct mac_device_info *hw,
+ 				   const unsigned char *addr,
+ 				   unsigned int reg_n)
+ {
+@@ -67,7 +68,8 @@ static void dwmac100_set_umac_addr(struct mac_device_info *hw,
+ 	stmmac_set_mac_addr(ioaddr, addr, MAC_ADDR_HIGH, MAC_ADDR_LOW);
+ }
+ 
+-static void dwmac100_get_umac_addr(struct mac_device_info *hw,
++static void dwmac100_get_umac_addr(struct stmmac_priv *priv,
++				   struct mac_device_info *hw,
+ 				   unsigned char *addr,
+ 				   unsigned int reg_n)
+ {
+@@ -75,7 +77,8 @@ static void dwmac100_get_umac_addr(struct mac_device_info *hw,
+ 	stmmac_get_mac_addr(ioaddr, addr, MAC_ADDR_HIGH, MAC_ADDR_LOW);
+ }
+ 
+-static void dwmac100_set_filter(struct mac_device_info *hw,
++static void dwmac100_set_filter(struct stmmac_priv *priv,
++				struct mac_device_info *hw,
+ 				struct net_device *dev)
+ {
+ 	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+index dea270f60cc3..105e7d4d798f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_dma.c
+@@ -18,7 +18,7 @@
+ #include "dwmac100.h"
+ #include "dwmac_dma.h"
+ 
+-static void dwmac100_dma_init(void __iomem *ioaddr,
++static void dwmac100_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			      struct stmmac_dma_cfg *dma_cfg, int atds)
+ {
+ 	/* Enable Application Access by writing to DMA CSR0 */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+index c6ff1fa0e04d..5e9b393ad7b3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+@@ -335,7 +335,8 @@ static void dwmac4_pmt(struct mac_device_info *hw, unsigned long mode)
+ 	writel(pmt, ioaddr + GMAC_PMT);
+ }
+ 
+-static void dwmac4_set_umac_addr(struct mac_device_info *hw,
++static void dwmac4_set_umac_addr(struct stmmac_priv *priv,
++				 struct mac_device_info *hw,
+ 				 const unsigned char *addr, unsigned int reg_n)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+@@ -344,7 +345,8 @@ static void dwmac4_set_umac_addr(struct mac_device_info *hw,
+ 				   GMAC_ADDR_LOW(reg_n));
+ }
+ 
+-static void dwmac4_get_umac_addr(struct mac_device_info *hw,
++static void dwmac4_get_umac_addr(struct stmmac_priv *priv,
++				 struct mac_device_info *hw,
+ 				 unsigned char *addr, unsigned int reg_n)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+@@ -593,7 +595,8 @@ static void dwmac4_restore_hw_vlan_rx_fltr(struct net_device *dev,
+ 	}
+ }
+ 
+-static void dwmac4_set_filter(struct mac_device_info *hw,
++static void dwmac4_set_filter(struct stmmac_priv *priv,
++			      struct mac_device_info *hw,
+ 			      struct net_device *dev)
+ {
+ 	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+@@ -669,7 +672,7 @@ static void dwmac4_set_filter(struct mac_device_info *hw,
+ 		int reg = 1;
+ 
+ 		netdev_for_each_uc_addr(ha, dev) {
+-			dwmac4_set_umac_addr(hw, ha->addr, reg);
++			dwmac4_set_umac_addr(priv, hw, ha->addr, reg);
+ 			reg++;
+ 		}
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
+index 89a14084c611..bd3084efc808 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
+@@ -169,7 +169,7 @@ static int dwmac4_wrback_get_rx_status(struct stmmac_extra_stats *x,
+ 	return ret;
+ }
+ 
+-static int dwmac4_rd_get_tx_len(struct dma_desc *p)
++static int dwmac4_rd_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	return (le32_to_cpu(p->des2) & TDES2_BUFFER1_SIZE_MASK);
+ }
+@@ -290,8 +290,8 @@ static int dwmac4_wrback_get_rx_timestamp_status(void *desc, void *next_desc,
+ 	return 0;
+ }
+ 
+-static void dwmac4_rd_init_rx_desc(struct dma_desc *p, int disable_rx_ic,
+-				   int mode, int end, int bfsize)
++static void dwmac4_rd_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				   int disable_rx_ic, int mode, int end, int bfsize)
+ {
+ 	dwmac4_set_rx_owner(p, disable_rx_ic);
+ }
+@@ -304,9 +304,9 @@ static void dwmac4_rd_init_tx_desc(struct dma_desc *p, int mode, int end)
+ 	p->des3 = 0;
+ }
+ 
+-static void dwmac4_rd_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
+-				      bool csum_flag, int mode, bool tx_own,
+-				      bool ls, unsigned int tot_pkt_len)
++static void dwmac4_rd_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				      int is_fs, int len, bool csum_flag, int mode,
++				      bool tx_own, bool ls, unsigned int tot_pkt_len)
+ {
+ 	unsigned int tdes3 = le32_to_cpu(p->des3);
+ 
+@@ -456,13 +456,14 @@ static void dwmac4_set_mss_ctxt(struct dma_desc *p, unsigned int mss)
+ 	p->des3 = cpu_to_le32(TDES3_CONTEXT_TYPE | TDES3_CTXT_TCMSSV);
+ }
+ 
+-static void dwmac4_set_addr(struct dma_desc *p, dma_addr_t addr)
++static void dwmac4_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
++			    dma_addr_t addr)
+ {
+ 	p->des0 = cpu_to_le32(lower_32_bits(addr));
+ 	p->des1 = cpu_to_le32(upper_32_bits(addr));
+ }
+ 
+-static void dwmac4_clear(struct dma_desc *p)
++static void dwmac4_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des0 = 0;
+ 	p->des1 = 0;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+index 84d3a8551b03..97dad00dc850 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
+@@ -15,7 +15,8 @@
+ #include "dwmac4_dma.h"
+ #include "stmmac.h"
+ 
+-static void dwmac4_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
++static void dwmac4_dma_axi(struct stmmac_priv *priv, void __iomem *ioaddr,
++			   struct stmmac_axi *axi)
+ {
+ 	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
+ 	int i;
+@@ -152,7 +153,7 @@ static void dwmac410_dma_init_channel(struct stmmac_priv *priv,
+ 	       ioaddr + DMA_CHAN_INTR_ENA(dwmac4_addrs, chan));
+ }
+ 
+-static void dwmac4_dma_init(void __iomem *ioaddr,
++static void dwmac4_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			    struct stmmac_dma_cfg *dma_cfg, int atds)
+ {
+ 	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
+@@ -374,7 +375,8 @@ static void dwmac4_dma_tx_chan_op_mode(struct stmmac_priv *priv,
+ 	writel(mtl_tx_op, ioaddr +  MTL_CHAN_TX_OP_MODE(dwmac4_addrs, channel));
+ }
+ 
+-static int dwmac4_get_hw_feature(void __iomem *ioaddr,
++static int dwmac4_get_hw_feature(struct stmmac_priv *priv,
++				 void __iomem *ioaddr,
+ 				 struct dma_features *dma_cap)
+ {
+ 	u32 hw_cap = readl(ioaddr + GMAC_HW_FEATURE0);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+index 358e7dcb6a9a..aaab5ab38373 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.h
+@@ -231,7 +231,7 @@ static inline u32 dma_chanx_base_addr(const struct dwmac4_addrs *addrs,
+ #define DMA_CHAN0_DBG_STAT_RPS		GENMASK(11, 8)
+ #define DMA_CHAN0_DBG_STAT_RPS_SHIFT	8
+ 
+-int dwmac4_dma_reset(void __iomem *ioaddr);
++int dwmac4_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr);
+ void dwmac4_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			   u32 chan, bool rx, bool tx);
+ void dwmac410_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+index 9470d3fd2ded..1191f0c1d7f1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+@@ -13,7 +13,7 @@
+ #include "dwmac4.h"
+ #include "stmmac.h"
+ 
+-int dwmac4_dma_reset(void __iomem *ioaddr)
++int dwmac4_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ {
+ 	u32 value = readl(ioaddr + DMA_BUS_MODE);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+index 72672391675f..77141391bd2f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
+@@ -152,7 +152,8 @@
+ #define NUM_DWMAC1000_DMA_REGS	23
+ #define NUM_DWMAC4_DMA_REGS	27
+ 
+-void dwmac_enable_dma_transmission(void __iomem *ioaddr);
++void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
++				   void __iomem *ioaddr, u32 chan);
+ void dwmac_enable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  u32 chan, bool rx, bool tx);
+ void dwmac_disable_dma_irq(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -167,6 +168,6 @@ void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 		       u32 chan);
+ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			struct stmmac_extra_stats *x, u32 chan, u32 dir);
+-int dwmac_dma_reset(void __iomem *ioaddr);
++int dwmac_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr);
+ 
+ #endif /* __DWMAC_DMA_H__ */
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+index 7907d62d3437..0cb337ffb7ac 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+@@ -14,7 +14,7 @@
+ 
+ #define GMAC_HI_REG_AE		0x80000000
+ 
+-int dwmac_dma_reset(void __iomem *ioaddr)
++int dwmac_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ {
+ 	u32 value = readl(ioaddr + DMA_BUS_MODE);
+ 
+@@ -28,7 +28,8 @@ int dwmac_dma_reset(void __iomem *ioaddr)
+ }
+ 
+ /* CSR1 enables the transmit DMA to check for new descriptor */
+-void dwmac_enable_dma_transmission(void __iomem *ioaddr)
++void dwmac_enable_dma_transmission(struct stmmac_priv *priv,
++				   void __iomem *ioaddr, u32 chan)
+ {
+ 	writel(1, ioaddr + DMA_XMT_POLL_DEMAND);
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+index 453e88b75be0..a993591e05bd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+@@ -375,7 +375,8 @@ static void dwxgmac2_pmt(struct mac_device_info *hw, unsigned long mode)
+ 	writel(val, ioaddr + XGMAC_PMT);
+ }
+ 
+-static void dwxgmac2_set_umac_addr(struct mac_device_info *hw,
++static void dwxgmac2_set_umac_addr(struct stmmac_priv *priv,
++				   struct mac_device_info *hw,
+ 				   const unsigned char *addr,
+ 				   unsigned int reg_n)
+ {
+@@ -389,7 +390,8 @@ static void dwxgmac2_set_umac_addr(struct mac_device_info *hw,
+ 	writel(value, ioaddr + XGMAC_ADDRx_LOW(reg_n));
+ }
+ 
+-static void dwxgmac2_get_umac_addr(struct mac_device_info *hw,
++static void dwxgmac2_get_umac_addr(struct stmmac_priv *priv,
++				   struct mac_device_info *hw,
+ 				   unsigned char *addr, unsigned int reg_n)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+@@ -478,7 +480,8 @@ static void dwxgmac2_set_mchash(void __iomem *ioaddr, u32 *mcfilterbits,
+ 		writel(mcfilterbits[regs], ioaddr + XGMAC_HASH_TABLE(regs));
+ }
+ 
+-static void dwxgmac2_set_filter(struct mac_device_info *hw,
++static void dwxgmac2_set_filter(struct stmmac_priv *priv,
++				struct mac_device_info *hw,
+ 				struct net_device *dev)
+ {
+ 	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+@@ -523,7 +526,7 @@ static void dwxgmac2_set_filter(struct mac_device_info *hw,
+ 		int reg = 1;
+ 
+ 		netdev_for_each_uc_addr(ha, dev) {
+-			dwxgmac2_set_umac_addr(hw, ha->addr, reg);
++			dwxgmac2_set_umac_addr(priv, hw, ha->addr, reg);
+ 			reg++;
+ 		}
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+index fc82862a612c..cefcbabab2c0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+@@ -39,7 +39,7 @@ static int dwxgmac2_get_rx_status(struct stmmac_extra_stats *x,
+ 	return good_frame;
+ }
+ 
+-static int dwxgmac2_get_tx_len(struct dma_desc *p)
++static int dwxgmac2_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	return (le32_to_cpu(p->des2) & XGMAC_TDES2_B1L);
+ }
+@@ -126,8 +126,8 @@ static int dwxgmac2_get_rx_timestamp_status(void *desc, void *next_desc,
+ 	return !ret;
+ }
+ 
+-static void dwxgmac2_init_rx_desc(struct dma_desc *p, int disable_rx_ic,
+-				  int mode, int end, int bfsize)
++static void dwxgmac2_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				  int disable_rx_ic, int mode, int end, int bfsize)
+ {
+ 	dwxgmac2_set_rx_owner(p, disable_rx_ic);
+ }
+@@ -140,9 +140,9 @@ static void dwxgmac2_init_tx_desc(struct dma_desc *p, int mode, int end)
+ 	p->des3 = 0;
+ }
+ 
+-static void dwxgmac2_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
+-				     bool csum_flag, int mode, bool tx_own,
+-				     bool ls, unsigned int tot_pkt_len)
++static void dwxgmac2_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				     int is_fs, int len, bool csum_flag, int mode,
++				     bool tx_own, bool ls, unsigned int tot_pkt_len)
+ {
+ 	unsigned int tdes3 = le32_to_cpu(p->des3);
+ 
+@@ -239,13 +239,14 @@ static void dwxgmac2_set_mss(struct dma_desc *p, unsigned int mss)
+ 	p->des3 = cpu_to_le32(XGMAC_TDES3_CTXT | XGMAC_TDES3_TCMSSV);
+ }
+ 
+-static void dwxgmac2_set_addr(struct dma_desc *p, dma_addr_t addr)
++static void dwxgmac2_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
++			      dma_addr_t addr)
+ {
+ 	p->des0 = cpu_to_le32(lower_32_bits(addr));
+ 	p->des1 = cpu_to_le32(upper_32_bits(addr));
+ }
+ 
+-static void dwxgmac2_clear(struct dma_desc *p)
++static void dwxgmac2_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des0 = 0;
+ 	p->des1 = 0;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index 3cde695fec91..4d1dc6d7eacb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -8,7 +8,7 @@
+ #include "stmmac.h"
+ #include "dwxgmac2.h"
+ 
+-static int dwxgmac2_dma_reset(void __iomem *ioaddr)
++static int dwxgmac2_dma_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ {
+ 	u32 value = readl(ioaddr + XGMAC_DMA_MODE);
+ 
+@@ -19,7 +19,7 @@ static int dwxgmac2_dma_reset(void __iomem *ioaddr)
+ 				  !(value & XGMAC_SWR), 0, 100000);
+ }
+ 
+-static void dwxgmac2_dma_init(void __iomem *ioaddr,
++static void dwxgmac2_dma_init(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			      struct stmmac_dma_cfg *dma_cfg, int atds)
+ {
+ 	u32 value = readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
+@@ -81,7 +81,8 @@ static void dwxgmac2_dma_init_tx_chan(struct stmmac_priv *priv,
+ 	writel(lower_32_bits(phy), ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
+ }
+ 
+-static void dwxgmac2_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
++static void dwxgmac2_dma_axi(struct stmmac_priv *priv, void __iomem *ioaddr,
++			     struct stmmac_axi *axi)
+ {
+ 	u32 value = readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
+ 	int i;
+@@ -386,7 +387,8 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+ 	return ret;
+ }
+ 
+-static int dwxgmac2_get_hw_feature(void __iomem *ioaddr,
++static int dwxgmac2_get_hw_feature(struct stmmac_priv *priv,
++				   void __iomem *ioaddr,
+ 				   struct dma_features *dma_cap)
+ {
+ 	u32 hw_cap;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+index 937b7a0466fc..43ae8c7defe1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/enh_desc.c
+@@ -76,7 +76,7 @@ static int enh_desc_get_tx_status(struct stmmac_extra_stats *x,
+ 	return ret;
+ }
+ 
+-static int enh_desc_get_tx_len(struct dma_desc *p)
++static int enh_desc_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	return (le32_to_cpu(p->des1) & ETDES1_BUFFER1_SIZE_MASK);
+ }
+@@ -249,8 +249,8 @@ static int enh_desc_get_rx_status(struct stmmac_extra_stats *x,
+ 	return ret;
+ }
+ 
+-static void enh_desc_init_rx_desc(struct dma_desc *p, int disable_rx_ic,
+-				  int mode, int end, int bfsize)
++static void enh_desc_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				  int disable_rx_ic, int mode, int end, int bfsize)
+ {
+ 	int bfsize1;
+ 
+@@ -308,9 +308,9 @@ static void enh_desc_release_tx_desc(struct dma_desc *p, int mode)
+ 		enh_desc_end_tx_desc_on_ring(p, ter);
+ }
+ 
+-static void enh_desc_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
+-				     bool csum_flag, int mode, bool tx_own,
+-				     bool ls, unsigned int tot_pkt_len)
++static void enh_desc_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				     int is_fs, int len, bool csum_flag, int mode,
++				     bool tx_own, bool ls, unsigned int tot_pkt_len)
+ {
+ 	unsigned int tdes0 = le32_to_cpu(p->des0);
+ 
+@@ -435,12 +435,13 @@ static void enh_desc_display_ring(void *head, unsigned int size, bool rx,
+ 	pr_info("\n");
+ }
+ 
+-static void enh_desc_set_addr(struct dma_desc *p, dma_addr_t addr)
++static void enh_desc_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
++			      dma_addr_t addr)
+ {
+ 	p->des2 = cpu_to_le32(addr);
+ }
+ 
+-static void enh_desc_clear(struct dma_desc *p)
++static void enh_desc_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des2 = 0;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+index b8ba8f2d8041..93cead5613e3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
+@@ -97,7 +97,7 @@ int stmmac_reset(struct stmmac_priv *priv, void __iomem *ioaddr)
+ 	if (plat && plat->fix_soc_reset)
+ 		return plat->fix_soc_reset(plat, ioaddr);
+ 
+-	return stmmac_do_callback(priv, dma, reset, ioaddr);
++	return stmmac_do_callback(priv, dma, reset, priv, ioaddr);
+ }
+ 
+ static const struct stmmac_hwif_entry {
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index b95d3e137813..fd63713fcaa1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -35,14 +35,14 @@ struct dma_edesc;
+ /* Descriptors helpers */
+ struct stmmac_desc_ops {
+ 	/* DMA RX descriptor ring initialization */
+-	void (*init_rx_desc)(struct dma_desc *p, int disable_rx_ic, int mode,
+-			int end, int bfsize);
++	void (*init_rx_desc)(struct stmmac_priv *priv, struct dma_desc *p,
++			int disable_rx_ic, int mode, int end, int bfsize);
+ 	/* DMA TX descriptor ring initialization */
+ 	void (*init_tx_desc)(struct dma_desc *p, int mode, int end);
+ 	/* Invoked by the xmit function to prepare the tx descriptor */
+-	void (*prepare_tx_desc)(struct dma_desc *p, int is_fs, int len,
+-			bool csum_flag, int mode, bool tx_own, bool ls,
+-			unsigned int tot_pkt_len);
++	void (*prepare_tx_desc)(struct stmmac_priv *priv, struct dma_desc *p,
++			int is_fs, int len, bool csum_flag, int mode,
++			bool tx_own, bool ls, unsigned int tot_pkt_len);
+ 	void (*prepare_tso_tx_desc)(struct dma_desc *p, int is_fs, int len1,
+ 			int len2, bool tx_own, bool ls, unsigned int tcphdrlen,
+ 			unsigned int tcppayloadlen);
+@@ -60,7 +60,7 @@ struct stmmac_desc_ops {
+ 	int (*tx_status)(struct stmmac_extra_stats *x,
+ 			 struct dma_desc *p, void __iomem *ioaddr);
+ 	/* Get the buffer size from the descriptor */
+-	int (*get_tx_len)(struct dma_desc *p);
++	int (*get_tx_len)(struct stmmac_priv *priv, struct dma_desc *p);
+ 	/* Handle extra events on specific interrupts hw dependent */
+ 	void (*set_rx_owner)(struct dma_desc *p, int disable_rx_ic);
+ 	/* Get the receive frame size */
+@@ -84,9 +84,10 @@ struct stmmac_desc_ops {
+ 	/* set MSS via context descriptor */
+ 	void (*set_mss)(struct dma_desc *p, unsigned int mss);
+ 	/* set descriptor skbuff address */
+-	void (*set_addr)(struct dma_desc *p, dma_addr_t addr);
++	void (*set_addr)(struct stmmac_priv *priv, struct dma_desc *p,
++			dma_addr_t addr);
+ 	/* clear descriptor */
+-	void (*clear)(struct dma_desc *p);
++	void (*clear)(struct stmmac_priv *priv, struct dma_desc *p);
+ 	/* RSS */
+ 	int (*get_rx_hash)(struct dma_desc *p, u32 *hash,
+ 			   enum pkt_hash_types *type);
+@@ -100,11 +101,11 @@ struct stmmac_desc_ops {
+ };
+ 
+ #define stmmac_init_rx_desc(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, desc, init_rx_desc, __args)
++	stmmac_do_void_callback(__priv, desc, init_rx_desc, __priv, __args)
+ #define stmmac_init_tx_desc(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, desc, init_tx_desc, __args)
+ #define stmmac_prepare_tx_desc(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, desc, prepare_tx_desc, __args)
++	stmmac_do_void_callback(__priv, desc, prepare_tx_desc, __priv, __args)
+ #define stmmac_prepare_tso_tx_desc(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, desc, prepare_tso_tx_desc, __args)
+ #define stmmac_set_tx_owner(__priv, __args...) \
+@@ -120,7 +121,7 @@ struct stmmac_desc_ops {
+ #define stmmac_tx_status(__priv, __args...) \
+ 	stmmac_do_callback(__priv, desc, tx_status, __args)
+ #define stmmac_get_tx_len(__priv, __args...) \
+-	stmmac_do_callback(__priv, desc, get_tx_len, __args)
++	stmmac_do_callback(__priv, desc, get_tx_len, __priv, __args)
+ #define stmmac_set_rx_owner(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, desc, set_rx_owner, __args)
+ #define stmmac_get_rx_frame_len(__priv, __args...) \
+@@ -142,9 +143,9 @@ struct stmmac_desc_ops {
+ #define stmmac_set_mss(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, desc, set_mss, __args)
+ #define stmmac_set_desc_addr(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, desc, set_addr, __args)
++	stmmac_do_void_callback(__priv, desc, set_addr, __priv, __args)
+ #define stmmac_clear_desc(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, desc, clear, __args)
++	stmmac_do_void_callback(__priv, desc, clear, __priv, __args)
+ #define stmmac_get_rx_hash(__priv, __args...) \
+ 	stmmac_do_callback(__priv, desc, get_rx_hash, __args)
+ #define stmmac_get_rx_header_len(__priv, __args...) \
+@@ -166,9 +167,9 @@ struct dma_features;
+ /* Specific DMA helpers */
+ struct stmmac_dma_ops {
+ 	/* DMA core initialization */
+-	int (*reset)(void __iomem *ioaddr);
+-	void (*init)(void __iomem *ioaddr, struct stmmac_dma_cfg *dma_cfg,
+-		     int atds);
++	int (*reset)(struct stmmac_priv *priv, void __iomem *ioaddr);
++	void (*init)(struct stmmac_priv *priv, void __iomem *ioaddr,
++		     struct stmmac_dma_cfg *dma_cfg, int atds);
+ 	void (*init_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  struct stmmac_dma_cfg *dma_cfg, u32 chan);
+ 	void (*init_rx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -178,7 +179,8 @@ struct stmmac_dma_ops {
+ 			     struct stmmac_dma_cfg *dma_cfg,
+ 			     dma_addr_t phy, u32 chan);
+ 	/* Configure the AXI Bus Mode Register */
+-	void (*axi)(void __iomem *ioaddr, struct stmmac_axi *axi);
++	void (*axi)(struct stmmac_priv *priv, void __iomem *ioaddr,
++		    struct stmmac_axi *axi);
+ 	/* Dump DMA registers */
+ 	void (*dump_regs)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			  u32 *reg_space);
+@@ -190,7 +192,8 @@ struct stmmac_dma_ops {
+ 	/* To track extra statistic (if supported) */
+ 	void (*dma_diagnostic_fr)(struct stmmac_extra_stats *x,
+ 				  void __iomem *ioaddr);
+-	void (*enable_dma_transmission) (void __iomem *ioaddr);
++	void (*enable_dma_transmission)(struct stmmac_priv *priv,
++					void __iomem *ioaddr, u32 chan);
+ 	void (*enable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			       u32 chan, bool rx, bool tx);
+ 	void (*disable_dma_irq)(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -206,7 +209,7 @@ struct stmmac_dma_ops {
+ 	int (*dma_interrupt)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			     struct stmmac_extra_stats *x, u32 chan, u32 dir);
+ 	/* If supported then get the optional core features */
+-	int (*get_hw_feature)(void __iomem *ioaddr,
++	int (*get_hw_feature)(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			      struct dma_features *dma_cap);
+ 	/* Program the HW RX Watchdog */
+ 	void (*rx_watchdog)(struct stmmac_priv *priv, void __iomem *ioaddr,
+@@ -232,7 +235,7 @@ struct stmmac_dma_ops {
+ };
+ 
+ #define stmmac_dma_init(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, dma, init, __args)
++	stmmac_do_void_callback(__priv, dma, init, __priv, __args)
+ #define stmmac_init_chan(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, init_chan, __priv, __args)
+ #define stmmac_init_rx_chan(__priv, __args...) \
+@@ -240,7 +243,7 @@ struct stmmac_dma_ops {
+ #define stmmac_init_tx_chan(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, init_tx_chan, __priv, __args)
+ #define stmmac_axi(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, dma, axi, __args)
++	stmmac_do_void_callback(__priv, dma, axi, __priv, __args)
+ #define stmmac_dump_dma_regs(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, dump_regs, __priv, __args)
+ #define stmmac_dma_rx_mode(__priv, __args...) \
+@@ -250,7 +253,7 @@ struct stmmac_dma_ops {
+ #define stmmac_dma_diagnostic_fr(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, dma_diagnostic_fr, __args)
+ #define stmmac_enable_dma_transmission(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __args)
++	stmmac_do_void_callback(__priv, dma, enable_dma_transmission, __priv, __args)
+ #define stmmac_enable_dma_irq(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, enable_dma_irq, __priv, __args)
+ #define stmmac_disable_dma_irq(__priv, __args...) \
+@@ -266,7 +269,7 @@ struct stmmac_dma_ops {
+ #define stmmac_dma_interrupt_status(__priv, __args...) \
+ 	stmmac_do_callback(__priv, dma, dma_interrupt, __priv, __args)
+ #define stmmac_get_hw_feature(__priv, __args...) \
+-	stmmac_do_callback(__priv, dma, get_hw_feature, __args)
++	stmmac_do_callback(__priv, dma, get_hw_feature, __priv, __args)
+ #define stmmac_rx_watchdog(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, dma, rx_watchdog, __priv, __args)
+ #define stmmac_set_tx_ring_len(__priv, __args...) \
+@@ -338,17 +341,21 @@ struct stmmac_ops {
+ 	int (*host_mtl_irq_status)(struct stmmac_priv *priv,
+ 				   struct mac_device_info *hw, u32 chan);
+ 	/* Multicast filter setting */
+-	void (*set_filter)(struct mac_device_info *hw, struct net_device *dev);
++	void (*set_filter)(struct stmmac_priv *priv, struct mac_device_info *hw,
++			   struct net_device *dev);
+ 	/* Flow control setting */
+ 	void (*flow_ctrl)(struct mac_device_info *hw, unsigned int duplex,
+ 			  unsigned int fc, unsigned int pause_time, u32 tx_cnt);
+ 	/* Set power management mode (e.g. magic frame) */
+ 	void (*pmt)(struct mac_device_info *hw, unsigned long mode);
+ 	/* Set/Get Unicast MAC addresses */
+-	void (*set_umac_addr)(struct mac_device_info *hw,
++	void (*set_umac_addr)(struct stmmac_priv *priv,
++			      struct mac_device_info *hw,
+ 			      const unsigned char *addr,
+ 			      unsigned int reg_n);
+-	void (*get_umac_addr)(struct mac_device_info *hw, unsigned char *addr,
++	void (*get_umac_addr)(struct stmmac_priv *priv,
++			      struct mac_device_info *hw,
++			      unsigned char *addr,
+ 			      unsigned int reg_n);
+ 	void (*set_eee_mode)(struct mac_device_info *hw,
+ 			     bool en_tx_lpi_clockgating);
+@@ -452,15 +459,15 @@ struct stmmac_ops {
+ #define stmmac_host_mtl_irq_status(__priv, __args...) \
+ 	stmmac_do_callback(__priv, mac, host_mtl_irq_status, __priv, __args)
+ #define stmmac_set_filter(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, mac, set_filter, __args)
++	stmmac_do_void_callback(__priv, mac, set_filter, __priv, __args)
+ #define stmmac_flow_ctrl(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, mac, flow_ctrl, __args)
+ #define stmmac_pmt(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, mac, pmt, __args)
+ #define stmmac_set_umac_addr(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, mac, set_umac_addr, __args)
++	stmmac_do_void_callback(__priv, mac, set_umac_addr, __priv, __args)
+ #define stmmac_get_umac_addr(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, mac, get_umac_addr, __args)
++	stmmac_do_void_callback(__priv, mac, get_umac_addr, __priv, __args)
+ #define stmmac_set_eee_mode(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, mac, set_eee_mode, __args)
+ #define stmmac_reset_eee_mode(__priv, __args...) \
+@@ -563,8 +570,8 @@ struct stmmac_rx_queue;
+ 
+ /* Helpers to manage the descriptors for chain and ring modes */
+ struct stmmac_mode_ops {
+-	void (*init) (void *des, dma_addr_t phy_addr, unsigned int size,
+-		      unsigned int extend_desc);
++	void (*init)(struct stmmac_priv *priv, void *des, dma_addr_t phy_addr,
++		      unsigned int size, unsigned int extend_desc);
+ 	unsigned int (*is_jumbo_frm) (int len, int ehn_desc);
+ 	int (*jumbo_frm)(struct stmmac_tx_queue *tx_q, struct sk_buff *skb,
+ 			 int csum);
+@@ -575,7 +582,7 @@ struct stmmac_mode_ops {
+ };
+ 
+ #define stmmac_mode_init(__priv, __args...) \
+-	stmmac_do_void_callback(__priv, mode, init, __args)
++	stmmac_do_void_callback(__priv, mode, init, __priv, __args)
+ #define stmmac_is_jumbo_frm(__priv, __args...) \
+ 	stmmac_do_callback(__priv, mode, is_jumbo_frm, __args)
+ #define stmmac_jumbo_frm(__priv, __args...) \
+diff --git a/drivers/net/ethernet/stmicro/stmmac/norm_desc.c b/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
+index 68a7cfcb1d8f..5fb3103db5cd 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/norm_desc.c
+@@ -57,7 +57,7 @@ static int ndesc_get_tx_status(struct stmmac_extra_stats *x,
+ 	return ret;
+ }
+ 
+-static int ndesc_get_tx_len(struct dma_desc *p)
++static int ndesc_get_tx_len(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	return (le32_to_cpu(p->des1) & RDES1_BUFFER1_SIZE_MASK);
+ }
+@@ -115,8 +115,8 @@ static int ndesc_get_rx_status(struct stmmac_extra_stats *x,
+ 	return ret;
+ }
+ 
+-static void ndesc_init_rx_desc(struct dma_desc *p, int disable_rx_ic, int mode,
+-			       int end, int bfsize)
++static void ndesc_init_rx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++			       int disable_rx_ic, int mode, int end, int bfsize)
+ {
+ 	int bfsize1;
+ 
+@@ -174,9 +174,9 @@ static void ndesc_release_tx_desc(struct dma_desc *p, int mode)
+ 		ndesc_end_tx_desc_on_ring(p, ter);
+ }
+ 
+-static void ndesc_prepare_tx_desc(struct dma_desc *p, int is_fs, int len,
+-				  bool csum_flag, int mode, bool tx_own,
+-				  bool ls, unsigned int tot_pkt_len)
++static void ndesc_prepare_tx_desc(struct stmmac_priv *priv, struct dma_desc *p,
++				  int is_fs, int len, bool csum_flag, int mode,
++				  bool tx_own, bool ls, unsigned int tot_pkt_len)
+ {
+ 	unsigned int tdes1 = le32_to_cpu(p->des1);
+ 
+@@ -285,12 +285,13 @@ static void ndesc_display_ring(void *head, unsigned int size, bool rx,
+ 	pr_info("\n");
+ }
+ 
+-static void ndesc_set_addr(struct dma_desc *p, dma_addr_t addr)
++static void ndesc_set_addr(struct stmmac_priv *priv, struct dma_desc *p,
++			   dma_addr_t addr)
+ {
+ 	p->des2 = cpu_to_le32(addr);
+ }
+ 
+-static void ndesc_clear(struct dma_desc *p)
++static void ndesc_clear(struct stmmac_priv *priv, struct dma_desc *p)
+ {
+ 	p->des2 = 0;
+ }
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 3e50fd53a617..132d4f679b95 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2509,7 +2509,7 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+ 				       true, priv->mode, true, true,
+ 				       xdp_desc.len);
+ 
+-		stmmac_enable_dma_transmission(priv, priv->ioaddr);
++		stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
+ 		entry = tx_q->cur_tx;
+@@ -4615,7 +4615,7 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 
+ 	netdev_tx_sent_queue(netdev_get_tx_queue(dev, queue), skb->len);
+ 
+-	stmmac_enable_dma_transmission(priv, priv->ioaddr);
++	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 	stmmac_flush_tx_descriptors(priv, queue);
+ 	stmmac_tx_timer_arm(priv, queue);
+@@ -4835,7 +4835,7 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
+ 	}
+ 
+-	stmmac_enable_dma_transmission(priv, priv->ioaddr);
++	stmmac_enable_dma_transmission(priv, priv->ioaddr, queue);
+ 
+ 	entry = STMMAC_GET_ENTRY(entry, priv->dma_conf.dma_tx_size);
+ 	tx_q->cur_tx = entry;
+-- 
+2.31.4
+
 
