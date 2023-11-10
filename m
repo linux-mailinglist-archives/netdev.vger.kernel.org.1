@@ -1,130 +1,124 @@
-Return-Path: <netdev+bounces-46990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE4A17E787A
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 04:51:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 064D67E79A3
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:03:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA500B217FE
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 03:51:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1232281261
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7BF12B8F;
-	Fri, 10 Nov 2023 03:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2A91875;
+	Fri, 10 Nov 2023 07:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1rywhXUg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA9411CB5
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 03:49:20 +0000 (UTC)
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D82746A1
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 19:49:20 -0800 (PST)
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3A9MYvSD018927
-	for <netdev@vger.kernel.org>; Thu, 9 Nov 2023 19:49:20 -0800
-Received: from mail.thefacebook.com ([163.114.132.120])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3u8xr3pwcn-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 19:49:19 -0800
-Received: from twshared11278.41.prn1.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c085:11d::8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 9 Nov 2023 19:49:16 -0800
-Received: by devbig019.vll3.facebook.com (Postfix, from userid 137359)
-	id 747713B41DCBB; Thu,  9 Nov 2023 19:49:13 -0800 (PST)
-From: Andrii Nakryiko <andrii@kernel.org>
-To: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <paul@paul-moore.com>,
-        <brauner@kernel.org>
-CC: <linux-fsdevel@vger.kernel.org>, <linux-security-module@vger.kernel.org>,
-        <keescook@chromium.org>, <kernel-team@meta.com>, <sargun@sargun.me>
-Subject: [PATCH v10 bpf-next 17/17] bpf,selinux: allocate bpf_security_struct per BPF token
-Date: Thu, 9 Nov 2023 19:48:38 -0800
-Message-ID: <20231110034838.1295764-18-andrii@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231110034838.1295764-1-andrii@kernel.org>
-References: <20231110034838.1295764-1-andrii@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037236AB1
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 07:03:27 +0000 (UTC)
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E22E7689
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 23:03:26 -0800 (PST)
+Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-670e7ae4a2eso24332886d6.1
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 23:03:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699599806; x=1700204606; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eHJDdNWZZ4tIwkHZEN1gC9OcT0HCJr1RVppBH6tmUws=;
+        b=1rywhXUgshQ7lHT3M6vrFXER/FKgtT4rwaEyKb8CF3hKmAatPoLB2nqiOL+dBwaOb7
+         nEGfyQbhmoI+ecLKc1z3nzR3dFBzNS9kFuONOs5EB2wASWq4PnorbHEj6FyeBZyPZv01
+         NbcWMKU8KgNO6/IBEfAFPSsMOwcVKzz/pDddrHE/tihzHahciO/qw2xl2WfeOAMD9J1P
+         0pgiJSUshuaqgNF+iUT7FQdg8b7cQ8bErtXFlxR518AoneghyVkkMSwdQpeNuwPBx0ad
+         mGsW+VYm4k+nN5gdeXC03hwG4imCL6qcxOtXZJU5bzqakR8FUwTAAplREuw5XQsMkfK9
+         i8XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699599806; x=1700204606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eHJDdNWZZ4tIwkHZEN1gC9OcT0HCJr1RVppBH6tmUws=;
+        b=crPdPesVWebwP8YAy5P/E8jAE+ximB43oiG+19tQfLqYEw0pQN/bm7NYZrVEBuOtJH
+         AJXOpovqp/hdLRFJOpyLyQ8WQIehq58aR69QoaLKTY/sZReGK3Lr8nk2s7PWchfU5cuh
+         HBwelqXyt4RpAxoaXw+TDizhuLESsZquqfNZlX4vHUFJyd1iTmNnvES6HYP2xl3U2E+T
+         Qi38MaomuE6aQRHeVbHQA0zpOZvtK8F4bS/kPJXJ/uL5qABxBfKsfpcTHLs6owmSBSnw
+         QCHiLRTv+WHWTKrrMrE8dAelAt/nndO9ZB6aL9DFpauaW0qcSj1IqKMlQBN0xL4KYPP+
+         Fo9w==
+X-Gm-Message-State: AOJu0Yz0m99KCi6Kbqvj5LG7URnst0Eqq2TY9r0RTd2G9u05YqAVSST/
+	IC8/n37Y+nLh5uunJBBGoqfT9GiMX+a7172HAimcBdH1o1dNd4cNjdk=
+X-Google-Smtp-Source: AGHT+IHV8+0MFbC/VQpqHkvElGy/RL/z/ISeA+lbF9gB7A+2xFrkzHZehvrtNrke+02jjGbQaJXjvKRk/eDFLYB8QzU=
+X-Received: by 2002:a05:6102:3d8b:b0:44d:38d6:5cb8 with SMTP id
+ h11-20020a0561023d8b00b0044d38d65cb8mr631035vsv.10.1699589171185; Thu, 09 Nov
+ 2023 20:06:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-9-almasrymina@google.com> <adde2b31fdd9e7bb4a09f0073580b840bea0bab1.camel@redhat.com>
+In-Reply-To: <adde2b31fdd9e7bb4a09f0073580b840bea0bab1.camel@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 9 Nov 2023 20:06:00 -0800
+Message-ID: <CAHS8izMrJVb0ESjFhqUWuxdZ8W5HDmg=yRj1J1sTeGoQjDcJog@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 08/12] net: support non paged skb frags
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: DbvTdHpg4XYACCNp1sD9VOYkguA9Znfp
-X-Proofpoint-ORIG-GUID: DbvTdHpg4XYACCNp1sD9VOYkguA9Znfp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-09_17,2023-11-09_01,2023-05-22_02
 
-Utilize newly added bpf_token_create/bpf_token_free LSM hooks to
-allocate struct bpf_security_struct for each BPF token object in
-SELinux. This just follows similar pattern for BPF prog and map.
+On Thu, Nov 9, 2023 at 1:15=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On Sun, 2023-11-05 at 18:44 -0800, Mina Almasry wrote:
+> [...]
+> > @@ -3421,7 +3446,7 @@ static inline struct page *skb_frag_page(const sk=
+b_frag_t *frag)
+> >   */
+> >  static inline void __skb_frag_ref(skb_frag_t *frag)
+> >  {
+> > -     get_page(skb_frag_page(frag));
+> > +     page_pool_page_get_many(frag->bv_page, 1);
+>
+> I guess the above needs #ifdef CONFIG_PAGE_POOL guards and explicit
+> skb_frag_is_page_pool_iov() check ?
+>
 
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
----
- security/selinux/hooks.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+It doesn't actually. page_pool_page_* helpers are compiled in
+regardless of CONFIG_PAGE_POOL, and handle both page_pool_iov* & page*
+just fine (the checking happens inside the function).
 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 002351ab67b7..1501e95366a1 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6828,6 +6828,29 @@ static void selinux_bpf_prog_free(struct bpf_prog =
-*prog)
- 	prog->aux->security =3D NULL;
- 	kfree(bpfsec);
- }
-+
-+static int selinux_bpf_token_create(struct bpf_token *token, union bpf_a=
-ttr *attr,
-+				    struct path *path)
-+{
-+	struct bpf_security_struct *bpfsec;
-+
-+	bpfsec =3D kzalloc(sizeof(*bpfsec), GFP_KERNEL);
-+	if (!bpfsec)
-+		return -ENOMEM;
-+
-+	bpfsec->sid =3D current_sid();
-+	token->security =3D bpfsec;
-+
-+	return 0;
-+}
-+
-+static void selinux_bpf_token_free(struct bpf_token *token)
-+{
-+	struct bpf_security_struct *bpfsec =3D token->security;
-+
-+	token->security =3D NULL;
-+	kfree(bpfsec);
-+}
- #endif
-=20
- struct lsm_blob_sizes selinux_blob_sizes __ro_after_init =3D {
-@@ -7183,6 +7206,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- 	LSM_HOOK_INIT(bpf_prog, selinux_bpf_prog),
- 	LSM_HOOK_INIT(bpf_map_free, selinux_bpf_map_free),
- 	LSM_HOOK_INIT(bpf_prog_free, selinux_bpf_prog_free),
-+	LSM_HOOK_INIT(bpf_token_free, selinux_bpf_token_free),
- #endif
-=20
- #ifdef CONFIG_PERF_EVENTS
-@@ -7241,6 +7265,7 @@ static struct security_hook_list selinux_hooks[] __=
-ro_after_init =3D {
- #ifdef CONFIG_BPF_SYSCALL
- 	LSM_HOOK_INIT(bpf_map_create, selinux_bpf_map_create),
- 	LSM_HOOK_INIT(bpf_prog_load, selinux_bpf_prog_load),
-+	LSM_HOOK_INIT(bpf_token_create, selinux_bpf_token_create),
- #endif
- #ifdef CONFIG_PERF_EVENTS
- 	LSM_HOOK_INIT(perf_event_alloc, selinux_perf_event_alloc),
+You may yell at me that it's too confusing... I somewhat agree, but
+I'm unsure of what is a better name or location for the helpers. The
+helpers handle (page_pool_iov* || page*) gracefully, so they seem to
+belong in the page pool for me, but it is indeed surprising/confusing
+that these helpers are available even if !CONFIG_PAGE_POOL.
+
+>
+> Cheers,
+>
+> Paolo
+>
+>
+
+
 --=20
-2.34.1
-
+Thanks,
+Mina
 
