@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-47061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F807E7B28
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:07:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EF57E7B2C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71D95B20DC6
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:07:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 975A4B20A4F
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAED5134CA;
-	Fri, 10 Nov 2023 10:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A84134D3;
+	Fri, 10 Nov 2023 10:09:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CEoO7hmM"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oEDQb4bo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05010134A3
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12DD134CA
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:09:51 +0000 (UTC)
 Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425072633F
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:07:20 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-544455a4b56so3029026a12.1
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:07:20 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8769027054
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:09:49 -0800 (PST)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-544455a4b56so3033131a12.1
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:09:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699610839; x=1700215639; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699610988; x=1700215788; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DlBOgBoXPKfJZMcyDI+Q+RUe8URoSOkOPgLxdc2HK+A=;
-        b=CEoO7hmMu5mG4s1xYLGFkHf/LqfUDZ06JWKexO9kf8XrlQVIKyOe+UhlQFDfxnwZzI
-         eOe8XU9iLKf0i29HMkk7s7D37eXGj5KEJ8CUU6pTY9EULlXXWEjXPpxP1gILmjZ7JpJt
-         S+kg7nqHl/a7T5xfAohBZpQ4DEYmmsNUStvfY3itrNc8+f3ALvXIUfi4WglWW1Jwawu3
-         K84oowLBvKapd65uGHjtPP1TMWfyfjRB6l/gijh732q0afUnTNRQGodrhQ9CSOrHG5KN
-         fJplwGVE7QLraLrNV4BPr1CJcVHDC/zEoJZcEyNbKttML6lDqjhhwE2+QbQTqMs3r15v
-         py0w==
+        bh=d0rQC8423D0Etf4086n6r4A4cDWDglKrezyJj3TtoeQ=;
+        b=oEDQb4bo0syhEyCFzMC6Aa87v5wNJffzioDIit5bK/4vDsaTxF+xlpe1satt/0kHm6
+         BTtZKYEmMPAdKsFVc5pl0rbZ/icyyP1wmufNkmmYAd6rdRkBU4ooCmEy+pvOqfR4LD3u
+         CN+TZye6Ca5hjIaJORKxb99ktLbdI/+8eYjRBsfd6DQOj+4wqebYkJJJqXfOZbXhnFfN
+         IzabZtIJYWOyOUwhuU92b82UvA9zmpBxkNEC5vUfRvJYom6XsV2a5iTcm73fjdXzN4HQ
+         ttYjD9P2/PpJ4q4rsoIePeVgZQjslRdrZNrODIvWqW76FVTlk13D01K5TM4WrbX1BXo3
+         Zg8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699610839; x=1700215639;
+        d=1e100.net; s=20230601; t=1699610988; x=1700215788;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DlBOgBoXPKfJZMcyDI+Q+RUe8URoSOkOPgLxdc2HK+A=;
-        b=KYIkpFkBq/X/dzflfdDBcUDMyAaJLdYTOWwqAQZMf0ry5FwrkGG0xjonoAaOl3yB/1
-         08zW+lPpH7ORY9HpMQD+Sg18uYXd9agJwcQBWVMo+r9YrNOw2e75MKbjt2zEiIwfL6Sm
-         BQklZX3eJMnuqXUFGVqcB5FMmnwCmua+JixkgXDGXO1aNjwm/TU7c/pXyyNHvvZIPc4B
-         9Pom4hj5EvLczi+ddm2ARLkeMHr9uKBIjgtl3NWuYPDk2rGCR5+hzyHRqeUu6chEkmb/
-         bvj4dJkSl7K0tL5w1vHhkwZyVPNOTwN2bUO1bnbLWh9Aa+KvGa4sq0jCh3/lqgZ48azC
-         h5hQ==
-X-Gm-Message-State: AOJu0YzXu6tPblaDCx8luvSAvmwZpWkE0LM6hF23RhucWjO9T6cwdVDj
-	X/qUQ8c7sD80FAo8fjcQXVZVcw==
-X-Google-Smtp-Source: AGHT+IEdJj/9Nlub09u+YbnLH8NPEXNplT2jLOejpc7aMwRNAw9rTwzx9nzxdbYobJKrzGF/IK4OVQ==
-X-Received: by 2002:a17:907:2d26:b0:9d8:78f2:7e9a with SMTP id gs38-20020a1709072d2600b009d878f27e9amr6701417ejc.14.1699610838506;
-        Fri, 10 Nov 2023 02:07:18 -0800 (PST)
+        bh=d0rQC8423D0Etf4086n6r4A4cDWDglKrezyJj3TtoeQ=;
+        b=g/QJKlzqGI/c7Uq0G9T76bA4YoCT1VQJk/jKr1zKx/5Na4M4zEUYWQ9Tr3KAk+5gP2
+         080zJyl9NOs4Nf3sO1A/Iz5bL/6tcwBZb+LG4IAQTDBX7IRX9LTOq6YsPPoPSbDu4Ksq
+         1Z914ul8iDZ6SDSDchAfnrwsI+D7XkMGTIF+PVNsftfW+bPjd3XQ1IDTlU1zirRKLBQz
+         AcaVuc6PIqKXKGFEIhTHTYglW05cL/jnBvuw4EC+lRBSpd2OZpPvWA3nwWQ3GhZpTyKu
+         0k013+bTZ0oipDJmNEoT2ku/nlpEuGsZA2fq1OrQBRBYhd7dcVphW3xi+owxE9oHzYqi
+         FtrA==
+X-Gm-Message-State: AOJu0YybVF3gAjCd+vXW1+5rHs+UV39PBLhSt8ZSgRe7XdEpaM9mH+bz
+	FYgilpaHN/Hvk+Lf06HFjLiZjoIsvvo4ukZoc4M+IQ==
+X-Google-Smtp-Source: AGHT+IH9Fv73t0GO7hYDi6Ljdqm0Sf6FjN08DJBwMxUwsEZOxI8zzu61nlYBqgWBIo5Fhl9O5NKcLA==
+X-Received: by 2002:a17:906:4784:b0:9de:cfa1:f072 with SMTP id cw4-20020a170906478400b009decfa1f072mr6674340ejc.25.1699610967101;
+        Fri, 10 Nov 2023 02:09:27 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id bv18-20020a170906b1d200b0098e34446464sm3682728ejb.25.2023.11.10.02.07.17
+        by smtp.gmail.com with ESMTPSA id i17-20020a1709061cd100b00992e14af9c3sm3761148ejh.143.2023.11.10.02.09.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 02:07:17 -0800 (PST)
-Date: Fri, 10 Nov 2023 11:07:16 +0100
+        Fri, 10 Nov 2023 02:09:26 -0800 (PST)
+Date: Fri, 10 Nov 2023 11:09:25 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -66,19 +66,15 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	"Olech, Milena" <milena.olech@intel.com>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
 	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net 3/3] dpll: fix register pin with unregistered parent
- pin
-Message-ID: <ZU4A1FG0+JgVz3HF@nanopsycho>
+Subject: Re: [PATCH net 0/3] dpll: fix unordered unbind/bind registerer issues
+Message-ID: <ZU4BVdPvAwKer+3v@nanopsycho>
 References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
- <20231108103226.1168500-4-arkadiusz.kubalewski@intel.com>
- <ZUukPbTCww26jltC@nanopsycho>
- <DM6PR11MB46572BD8C43DACA0FF15C2CF9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <8b6e3211-3f03-4c17-b0cb-26175bf42213@linux.dev>
- <DM6PR11MB4657C6C1B094DD7B429A22469BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU0fFz+GTdqjA7RD@nanopsycho>
- <DM6PR11MB465763E8D261CEC6B215358C9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
- <ZU3SJdlOwoFOEavA@nanopsycho>
- <DM6PR11MB465767D550C3DF2CE24E70EA9BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <4c251905-308b-4709-8e08-39cda85678f9@linux.dev>
+ <DM6PR11MB465721130A49C22D77E42A799BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU0fzzmmxjnsNW0n@nanopsycho>
+ <DM6PR11MB4657209FFC300E207E600F3F9BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU3SSClU6Ijn3M7B@nanopsycho>
+ <DM6PR11MB4657DE812ADB8C5079705DC99BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,52 +83,159 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <DM6PR11MB465767D550C3DF2CE24E70EA9BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
+In-Reply-To: <DM6PR11MB4657DE812ADB8C5079705DC99BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
 
-Fri, Nov 10, 2023 at 09:50:34AM CET, arkadiusz.kubalewski@intel.com wrote:
+Fri, Nov 10, 2023 at 10:06:59AM CET, arkadiusz.kubalewski@intel.com wrote:
 >>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Friday, November 10, 2023 7:48 AM
+>>Sent: Friday, November 10, 2023 7:49 AM
 >>
->>Fri, Nov 10, 2023 at 12:21:11AM CET, arkadiusz.kubalewski@intel.com wrote:
+>>Fri, Nov 10, 2023 at 12:35:43AM CET, arkadiusz.kubalewski@intel.com wrote:
 >>>>From: Jiri Pirko <jiri@resnulli.us>
->>>>Sent: Thursday, November 9, 2023 7:04 PM
+>>>>Sent: Thursday, November 9, 2023 7:07 PM
 >>>>
->>>>Thu, Nov 09, 2023 at 05:02:48PM CET, arkadiusz.kubalewski@intel.com
+>>>>Thu, Nov 09, 2023 at 06:20:14PM CET, arkadiusz.kubalewski@intel.com
 >>>>wrote:
 >>>>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>>>>Sent: Thursday, November 9, 2023 11:56 AM
->>>>>>To: Kubalewski, Arkadiusz <arkadiusz.kubalewski@intel.com>; Jiri Pirko
+>>>>>>Sent: Thursday, November 9, 2023 11:51 AM
 >>>>>>
->>>>>>On 09/11/2023 09:59, Kubalewski, Arkadiusz wrote:
->>>>>>>> From: Jiri Pirko <jiri@resnulli.us>
->>>>>>>> Sent: Wednesday, November 8, 2023 4:08 PM
->>>>>>>>
->>>>>>>> Wed, Nov 08, 2023 at 11:32:26AM CET, arkadiusz.kubalewski@intel.com
->>>>>>>> wrote:
->>>>>>>>> In case of multiple kernel module instances using the same dpll
->>>>>>>>>device:
->>>>>>>>> if only one registers dpll device, then only that one can register
->>>>>>>>
->>>>>>>> They why you don't register in multiple instances? See mlx5 for a
->>>>>>>> reference.
->>>>>>>>
+>>>>>>On 08/11/2023 10:32, Arkadiusz Kubalewski wrote:
+>>>>>>> Fix issues when performing unordered unbind/bind of a kernel modules
+>>>>>>> which are using a dpll device with DPLL_PIN_TYPE_MUX pins.
+>>>>>>> Currently only serialized bind/unbind of such use case works, fix
+>>>>>>> the issues and allow for unserialized kernel module bind order.
 >>>>>>>
->>>>>>> Every registration requires ops, but for our case only PF0 is able to
->>>>>>> control dpll pins and device, thus only this can provide ops.
->>>>>>> Basically without PF0, dpll is not able to be controlled, as well
->>>>>>> as directly connected pins.
+>>>>>>> The issues are observed on the ice driver, i.e.,
 >>>>>>>
->>>>>>But why do you need other pins then, if FP0 doesn't exist?
+>>>>>>> $ echo 0000:af:00.0 > /sys/bus/pci/drivers/ice/unbind
+>>>>>>> $ echo 0000:af:00.1 > /sys/bus/pci/drivers/ice/unbind
+>>>>>>>
+>>>>>>> results in:
+>>>>>>>
+>>>>>>> ice 0000:af:00.0: Removed PTP clock
+>>>>>>> BUG: kernel NULL pointer dereference, address: 0000000000000010
+>>>>>>> PF: supervisor read access in kernel mode
+>>>>>>> PF: error_code(0x0000) - not-present page
+>>>>>>> PGD 0 P4D 0
+>>>>>>> Oops: 0000 [#1] PREEMPT SMP PTI
+>>>>>>> CPU: 7 PID: 71848 Comm: bash Kdump: loaded Not tainted 6.6.0-
+>>>>>>>rc5_next-
+>>>>>>>queue_19th-Oct-2023-01625-g039e5d15e451 #1
+>>>>>>> Hardware name: Intel Corporation S2600STB/S2600STB, BIOS
+>>>>>>>SE5C620.86B.02.01.0008.031920191559 03/19/2019
+>>>>>>> RIP: 0010:ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>>>>>> Code: 41 57 4d 89 cf 41 56 41 55 4d 89 c5 41 54 55 48 89 f5 53 4c 8b
+>>>>>>>66
+>>>>>>>08 48 89 cb 4d 8d b4 24 f0 49 00 00 4c 89 f7 e8 71 ec 1f c5 <0f> b6 5b
+>>>>>>>10
+>>>>>>>41 0f b6 84 24 30 4b 00 00 29 c3 41 0f b6 84 24 28 4b
+>>>>>>> RSP: 0018:ffffc902b179fb60 EFLAGS: 00010246
+>>>>>>> RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+>>>>>>> RDX: ffff8882c1398000 RSI: ffff888c7435cc60 RDI: ffff888c7435cb90
+>>>>>>> RBP: ffff888c7435cc60 R08: ffffc902b179fbb0 R09: 0000000000000000
+>>>>>>> R10: ffff888ef1fc8050 R11: fffffffffff82700 R12: ffff888c743581a0
+>>>>>>> R13: ffffc902b179fbb0 R14: ffff888c7435cb90 R15: 0000000000000000
+>>>>>>> FS:  00007fdc7dae0740(0000) GS:ffff888c105c0000(0000)
+>>>>>>>knlGS:0000000000000000
+>>>>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>>>> CR2: 0000000000000010 CR3: 0000000132c24002 CR4: 00000000007706e0
+>>>>>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>>>>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>>>>>> PKRU: 55555554
+>>>>>>> Call Trace:
+>>>>>>>   <TASK>
+>>>>>>>   ? __die+0x20/0x70
+>>>>>>>   ? page_fault_oops+0x76/0x170
+>>>>>>>   ? exc_page_fault+0x65/0x150
+>>>>>>>   ? asm_exc_page_fault+0x22/0x30
+>>>>>>>   ? ice_dpll_rclk_state_on_pin_get+0x2f/0x90 [ice]
+>>>>>>>   ? __pfx_ice_dpll_rclk_state_on_pin_get+0x10/0x10 [ice]
+>>>>>>>   dpll_msg_add_pin_parents+0x142/0x1d0
+>>>>>>>   dpll_pin_event_send+0x7d/0x150
+>>>>>>>   dpll_pin_on_pin_unregister+0x3f/0x100
+>>>>>>>   ice_dpll_deinit_pins+0xa1/0x230 [ice]
+>>>>>>>   ice_dpll_deinit+0x29/0xe0 [ice]
+>>>>>>>   ice_remove+0xcd/0x200 [ice]
+>>>>>>>   pci_device_remove+0x33/0xa0
+>>>>>>>   device_release_driver_internal+0x193/0x200
+>>>>>>>   unbind_store+0x9d/0xb0
+>>>>>>>   kernfs_fop_write_iter+0x128/0x1c0
+>>>>>>>   vfs_write+0x2bb/0x3e0
+>>>>>>>   ksys_write+0x5f/0xe0
+>>>>>>>   do_syscall_64+0x59/0x90
+>>>>>>>   ? filp_close+0x1b/0x30
+>>>>>>>   ? do_dup2+0x7d/0xd0
+>>>>>>>   ? syscall_exit_work+0x103/0x130
+>>>>>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>>>>>   ? do_syscall_64+0x69/0x90
+>>>>>>>   ? syscall_exit_work+0x103/0x130
+>>>>>>>   ? syscall_exit_to_user_mode+0x22/0x40
+>>>>>>>   ? do_syscall_64+0x69/0x90
+>>>>>>>   entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+>>>>>>> RIP: 0033:0x7fdc7d93eb97
+>>>>>>> Code: 0b 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f
+>>>>>>>1e
+>>>>>>>fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00
+>>>>>>>f0
+>>>>>>>ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+>>>>>>> RSP: 002b:00007fff2aa91028 EFLAGS: 00000246 ORIG_RAX:
+>>>>>>>0000000000000001
+>>>>>>> RAX: ffffffffffffffda RBX: 000000000000000d RCX: 00007fdc7d93eb97
+>>>>>>> RDX: 000000000000000d RSI: 00005644814ec9b0 RDI: 0000000000000001
+>>>>>>> RBP: 00005644814ec9b0 R08: 0000000000000000 R09: 00007fdc7d9b14e0
+>>>>>>> R10: 00007fdc7d9b13e0 R11: 0000000000000246 R12: 000000000000000d
+>>>>>>> R13: 00007fdc7d9fb780 R14: 000000000000000d R15: 00007fdc7d9f69e0
+>>>>>>>   </TASK>
+>>>>>>> Modules linked in: uinput vfio_pci vfio_pci_core vfio_iommu_type1
+>>>>>>>vfio
+>>>>>>>irqbypass ixgbevf snd_seq_dummy snd_hrtimer snd_seq snd_timer
+>>>>>>>snd_seq_device snd soundcore overlay qrtr rfkill vfat fat xfs
+>>>>>>>libcrc32c
+>>>>>>>rpcrdma sunrpc rdma_ucm ib_srpt ib_isert iscsi_target_mod
+>>>>>>>target_core_mod
+>>>>>>>ib_iser libiscsi scsi_transport_iscsi rdma_cm iw_cm ib_cm
+>>>>>>>intel_rapl_msr
+>>>>>>>intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common
+>>>>>>>isst_if_common skx_edac nfit libnvdimm ipmi_ssif x86_pkg_temp_thermal
+>>>>>>>intel_powerclamp coretemp irdma rapl intel_cstate ib_uverbs iTCO_wdt
+>>>>>>>iTCO_vendor_support acpi_ipmi intel_uncore mei_me ipmi_si pcspkr
+>>>>>>>i2c_i801
+>>>>>>>ib_core mei ipmi_devintf intel_pch_thermal ioatdma i2c_smbus
+>>>>>>>ipmi_msghandler lpc_ich joydev acpi_power_meter acpi_pad ext4 mbcache
+>>>>>>>jbd2
+>>>>>>>sd_mod t10_pi sg ast i2c_algo_bit drm_shmem_helper drm_kms_helper ice
+>>>>>>>crct10dif_pclmul ixgbe crc32_pclmul drm crc32c_intel ahci i40e libahci
+>>>>>>>ghash_clmulni_intel libata mdio dca gnss wmi fuse [last unloaded:
+>>>>>>>iavf]
+>>>>>>> CR2: 0000000000000010
+>>>>>>>
+>>>>>>> Arkadiusz Kubalewski (3):
+>>>>>>>    dpll: fix pin dump crash after module unbind
+>>>>>>>    dpll: fix pin dump crash for rebound module
+>>>>>>>    dpll: fix register pin with unregistered parent pin
+>>>>>>>
+>>>>>>>   drivers/dpll/dpll_core.c    |  8 ++------
+>>>>>>>   drivers/dpll/dpll_core.h    |  4 ++--
+>>>>>>>   drivers/dpll/dpll_netlink.c | 37 ++++++++++++++++++++++------------
+>>>>>>>--
+>>>>>>>-
+>>>>>>>   3 files changed, 26 insertions(+), 23 deletions(-)
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>I still don't get how can we end up with unregistered pin. And
+>>>>>>shouldn't
+>>>>>>drivers do unregister of dpll/pin during release procedure? I thought
+>>>>>>it
+>>>>>>was kind of agreement we reached while developing the subsystem.
 >>>>>>
 >>>>>
->>>>>In general we don't need them at that point, but this is a corner case,
->>>>>where users for some reason decided to unbind PF 0, and I treat this
->>>>>state
->>>>>as temporary, where dpll/pins controllability is temporarily broken.
+>>>>>It's definitely not about ending up with unregistered pins.
+>>>>>
+>>>>>Usually the driver is loaded for PF0, PF1, PF2, PF3 and unloaded in
+>>>>>opposite
+>>>>>order: PF3, PF2, PF1, PF0. And this is working without any issues.
 >>>>
->>>>So resolve this broken situation internally in the driver, registering
->>>>things only in case PF0 is present. Some simple notification infra would
->>>>do. Don't drag this into the subsystem internals.
+>>>>Please fix this in the driver.
 >>>>
 >>>
 >>>Thanks for your feedback, but this is already wrong advice.
@@ -142,25 +245,6 @@ Fri, Nov 10, 2023 at 09:50:34AM CET, arkadiusz.kubalewski@intel.com wrote:
 >>>As you might recall from our sync meetings, the dpll subsystem is to unify
 >>>approaches and reduce the code in the drivers, where your advice is
 >>>exactly
->>
->>No. Your driver knows when what objects are valid or not. Of a pin of
->>PF1 is not valid because the "master" PF0 is gone, it is responsibility
->>of your driver to resolve that. Don't bring this internal dependencies
->>to the dpll core please, does not make any sense to do so. Thanks!
->>
->
->No, a driver doesn't know it, those are separated instances, and you already
->suggested to implement special notification bus in the driver.
->This is not needed and prone for another errors. The dpll subsystem is here to
->make driver life easier.
-
-See the other thread for my reply.
-
->
->Thank you!
->Arkadiusz
->
->>
 >>>opposite, suggested fix would require to implement extra synchronization
 >>>of the
 >>>dpll and pin registration state between driver instances, most probably
@@ -173,143 +257,43 @@ See the other thread for my reply.
 >>>without
 >>>crashing the kernel, so a fix is required in dpll subsystem, not in the
 >>>driver.
+>>
+>>I replied in the other patch thread.
+>>
+>
+>Yes, so did I.
+>But what is the reason you have moved the discussion from the other thread
+>into this one?
+
+I didn't, not sure why you say so. I just wanted to make sure you
+follow.
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
 >>>
 >>>Thank you!
 >>>Arkadiusz
 >>>
 >>>>
 >>>>>
->>>>>The dpll at that point is not registered, all the direct pins are also
->>>>>not registered, thus not available to the users.
+>>>>>Above crash is caused because of unordered driver unload, where dpll
+>>>>>subsystem
+>>>>>tries to notify muxed pin was deleted, but at that time the parent is
+>>>>>already
+>>>>>gone, thus data points to memory which is no longer available, thus
+>>>>>crash
+>>>>>happens when trying to dump pin parents.
 >>>>>
->>>>>When I do dump at that point there are still 3 pins present, one for
->>>>>each
->>>>>PF, although they are all zombies - no parents as their parent pins are
->>>>>not
->>>>>registered (as the other patch [1/3] prevents dump of pin parent if the
->>>>>parent is not registered). Maybe we can remove the REGISTERED mark for
->>>>>all
->>>>>the muxed pins, if all their parents have been unregistered, so they
->>>>>won't
->>>>>be visible to the user at all. Will try to POC that.
->>>>>
->>>>>>>>
->>>>>>>>> directly connected pins with a dpll device. If unregistered parent
->>>>>>>>> determines if the muxed pin can be register with it or not, it
->>>>>>>>>forces
->>>>>>>>> serialized driver load order - first the driver instance which
->>>>>>>>> registers the direct pins needs to be loaded, then the other
->>>>>>>>> instances
->>>>>>>>> could register muxed type pins.
->>>>>>>>>
->>>>>>>>> Allow registration of a pin with a parent even if the parent was
->>>>>>>>>not
->>>>>>>>> yet registered, thus allow ability for unserialized driver instance
->>>>>>>>
->>>>>>>> Weird.
->>>>>>>>
->>>>>>>
->>>>>>> Yeah, this is issue only for MUX/parent pin part, couldn't find
->>>>>>>better
->>>>>>> way, but it doesn't seem to break things around..
->>>>>>>
->>>>>>
->>>>>>I just wonder how do you see the registration procedure? How can parent
->>>>>>pin exist if it's not registered? I believe you cannot get it through
->>>>>>DPLL API, then the only possible way is to create it within the same
->>>>>>driver code, which can be simply re-arranged. Am I wrong here?
->>>>>>
->>>>>
->>>>>By "parent exist" I mean the parent pin exist in the dpll subsystem
->>>>>(allocated on pins xa), but it doesn't mean it is available to the
->>>>>users,
->>>>>as it might not be registered with a dpll device.
->>>>>
->>>>>We have this 2 step init approach:
->>>>>1. dpll_pin_get(..) -> allocate new pin or increase reference if exist
->>>>>2.1. dpll_pin_register(..) -> register with a dpll device
->>>>>2.2. dpll_pin_on_pin_register -> register with a parent pin
->>>>>
->>>>>Basically:
->>>>>- PF 0 does 1 & 2.1 for all the direct inputs, and steps: 1 & 2.2 for
->>>>>its
->>>>>  recovery clock pin,
->>>>>- other PF's only do step 1 for the direct input pins (as they must get
->>>>>  reference to those in order to register recovery clock pin with them),
->>>>>  and steps: 1 & 2.2 for their recovery clock pin.
->>>>>
+>>>>>This series fixes all issues I could find connected to the situation
+>>>>>where
+>>>>>muxed-pins are trying to access their parents, when parent registerer
+>>>>>was
+>>>>>removed
+>>>>>in the meantime.
 >>>>>
 >>>>>Thank you!
 >>>>>Arkadiusz
->>>>>
->>>>>>> Thank you!
->>>>>>> Arkadiusz
->>>>>>>
->>>>>>>>
->>>>>>>>> load order.
->>>>>>>>> Do not WARN_ON notification for unregistered pin, which can be
->>>>>>>>> invoked
->>>>>>>>> for described case, instead just return error.
->>>>>>>>>
->>>>>>>>> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base
->>>>>>>>>functions")
->>>>>>>>> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
->>>>>>>>> functions")
->>>>>>>>> Signed-off-by: Arkadiusz Kubalewski
->>>>>>>>><arkadiusz.kubalewski@intel.com>
->>>>>>>>> ---
->>>>>>>>> drivers/dpll/dpll_core.c    | 4 ----
->>>>>>>>> drivers/dpll/dpll_netlink.c | 2 +-
->>>>>>>>> 2 files changed, 1 insertion(+), 5 deletions(-)
->>>>>>>>>
->>>>>>>>> diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
->>>>>>>>> index
->>>>>>>>> 4077b562ba3b..ae884b92d68c 100644
->>>>>>>>> --- a/drivers/dpll/dpll_core.c
->>>>>>>>> +++ b/drivers/dpll/dpll_core.c
->>>>>>>>> @@ -28,8 +28,6 @@ static u32 dpll_xa_id;
->>>>>>>>> 	WARN_ON_ONCE(!xa_get_mark(&dpll_device_xa, (d)->id,
->>>>>>>>> DPLL_REGISTERED))
->>>>>>>>> #define ASSERT_DPLL_NOT_REGISTERED(d)	\
->>>>>>>>> 	WARN_ON_ONCE(xa_get_mark(&dpll_device_xa, (d)->id,
->>>>>>>>> DPLL_REGISTERED))
->>>>>>>>> -#define ASSERT_PIN_REGISTERED(p)	\
->>>>>>>>> -	WARN_ON_ONCE(!xa_get_mark(&dpll_pin_xa, (p)->id,
->>>>>>>>> DPLL_REGISTERED))
->>>>>>>>>
->>>>>>>>> struct dpll_device_registration {
->>>>>>>>> 	struct list_head list;
->>>>>>>>> @@ -641,8 +639,6 @@ int dpll_pin_on_pin_register(struct dpll_pin
->>>>>>>>> *parent,
->>>>>>>>> struct dpll_pin *pin,
->>>>>>>>> 	    WARN_ON(!ops->state_on_pin_get) ||
->>>>>>>>> 	    WARN_ON(!ops->direction_get))
->>>>>>>>> 		return -EINVAL;
->>>>>>>>> -	if (ASSERT_PIN_REGISTERED(parent))
->>>>>>>>> -		return -EINVAL;
->>>>>>>>>
->>>>>>>>> 	mutex_lock(&dpll_lock);
->>>>>>>>> 	ret = dpll_xa_ref_pin_add(&pin->parent_refs, parent, ops,
->>>>>>>>> priv); diff
->>>>>>>>> --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->>>>>>>>> index
->>>>>>>>> 963bbbbe6660..ff430f43304f 100644
->>>>>>>>> --- a/drivers/dpll/dpll_netlink.c
->>>>>>>>> +++ b/drivers/dpll/dpll_netlink.c
->>>>>>>>> @@ -558,7 +558,7 @@ dpll_pin_event_send(enum dpll_cmd event, struct
->>>>>>>>> dpll_pin *pin)
->>>>>>>>> 	int ret = -ENOMEM;
->>>>>>>>> 	void *hdr;
->>>>>>>>>
->>>>>>>>> -	if (WARN_ON(!xa_get_mark(&dpll_pin_xa, pin->id,
->>>>>>>>> DPLL_REGISTERED)))
->>>>>>>>> +	if (!xa_get_mark(&dpll_pin_xa, pin->id, DPLL_REGISTERED))
->>>>>>>>> 		return -ENODEV;
->>>>>>>>>
->>>>>>>>> 	msg = genlmsg_new(NLMSG_GOODSIZE, GFP_KERNEL);
->>>>>>>>> --
->>>>>>>>> 2.38.1
->>>>>>>>>
->>>>>>
->>>>>
 
