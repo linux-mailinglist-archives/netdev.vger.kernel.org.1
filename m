@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-47072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0F87E7B43
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:16:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EFFF7E7B45
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F2F4B20E88
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8C622818A4
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6574613FE7;
-	Fri, 10 Nov 2023 10:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B203134DF;
+	Fri, 10 Nov 2023 10:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMBTlmUV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0rGncLY"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03469134DF
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:16:32 +0000 (UTC)
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4BCE27B3F
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:31 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-280260db156so1606665a91.2
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:31 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C1E13AED
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:16:36 +0000 (UTC)
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1A186AD
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:35 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1ccbb7f79cdso15738315ad.3
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699611390; x=1700216190; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699611395; x=1700216195; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cAl1qrWA2Vjv6+R6pNb3HshMnAG0HgniuTWWiLPfzQ8=;
-        b=bMBTlmUVzlpq11Suk3gxUHJwXiwexa5/cH5/tekNA6O99tcqQEQqgLhu+taAZWnsyy
-         JMAmH7EtyeqzBw/oxGTAgRxq8y5gHo877IwYA+jdRZc40Ese9ym4ubyQPvCyqik1G8Nw
-         iNLSvw06qUyEWBLH9VGc8+0V1ZkHn0ME5GqxXGDAQOtI4fObcetKH2TMXLJlhOf0hoZ5
-         scIrdhBBSYZ2PNwEhKom/BwjR8LYGgKlUreHTVQoTsl6zHK2jxSuu5cG9OvRIE6k5+Ol
-         yxcpeWyYFyG/nHYZLiHVQAcXCovPg+I3AaLgwKvF+CIhBCF7vet1ht2+69t87PXjPNMI
-         ZBoA==
+        bh=mgXzwv45DXqIjIa1iLwDoPoHFYa3u1erq+7g3zqSByw=;
+        b=J0rGncLY2yqxsHTRRSdpRkOproBR3RM2J5RvUByRJJer5Q+yoJpgrsz5Is2T5HdAL3
+         lWvFJxeD6H3QAxnD9n8V3VEP8pRRSp+AeRxugJ4LJQhEsg77NSfNFqOasTD4zgzoexO+
+         Uni+RHRtxmAlyDwsU9VEPl0FxnvZ2lNiuZ+12/wiKWtJKXum9v2n5uPgoB5XT2ZFmQOf
+         FxPEHfVS8wBhcNx3Bfe+sUN7Ht72i8zCo3ywuK/RoKB4rKHcAaA5WZh60dd3Wc5Nf1XY
+         xkuFBdAZmR1I4Xof85u3sdQquuaOMxAGlQVp/fMLEVpVHtUR8iQudTdZnaOO9ftJicc9
+         G5nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699611390; x=1700216190;
+        d=1e100.net; s=20230601; t=1699611395; x=1700216195;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cAl1qrWA2Vjv6+R6pNb3HshMnAG0HgniuTWWiLPfzQ8=;
-        b=bIlovCDXG/KcvnrxNaxHr2ql2KYa85+JYrCKmpuYBYAJUQb8fxVFMuXSesArH9uqiJ
-         Zh6BvVG70GwXq1my60UaxoSYugdreP997rS1hkuf5RDLaKvVTTOHKdVjj/VbLKQ+mM4q
-         Ck144OTdOZ2bJ8N6pa0YsX8tDELfXBTBTdeP+lZc2zgfod+psVvpLRvkvx5/oezKMI7w
-         7qVWAObdjTcSplPwi/iiP0+u101iqnjIZG9jAY5KooRPYi3F/7DQKbglNsRMIll5vEzJ
-         hGiGMGY02oUIvnZ4wxWK3z+e0pruvwuiNkedloA6ZUnxWkzWWmP0KmzYjEdviMHcvrPG
-         LInw==
-X-Gm-Message-State: AOJu0Yw3NohEoIVXUXKWjEhRkQzRFfrdkYBevoWVPrhiujgCgG4/+G/l
-	EKwbwcodCxpBUr5apVYBvAQlq+xEM/+Cng==
-X-Google-Smtp-Source: AGHT+IFBheYR5oWHREMjyIqz0H6KaoKzJi8ZXutPilkRhE1gcYlQ5I5gg422BvnHqpODg2GjbpKrbw==
-X-Received: by 2002:a17:90b:1b0c:b0:27c:f8f4:fedb with SMTP id nu12-20020a17090b1b0c00b0027cf8f4fedbmr4764777pjb.21.1699611390669;
-        Fri, 10 Nov 2023 02:16:30 -0800 (PST)
+        bh=mgXzwv45DXqIjIa1iLwDoPoHFYa3u1erq+7g3zqSByw=;
+        b=BJw7w0r6QjITLfK+cBP5Dr1jq5RiGYemenD0xlx0ITXvACKZp76Sy8kFfMdPALPeUX
+         kBfOd77vlYJQ2gaPdSic2PMUDnTQlvEAinF1N4DybSQFqkpEKwlA+jzF/1qYaUjcblrD
+         zvjArzN0NDfnrgXLJKtcrFlHxn3IYfpXfjMEMt58aH2dZXwDN6s6mrjpFEb/wZvskyiE
+         l5l+rMm+EdXU/n+SmwXhIavFjE2TecDdDf6ZN/YXwfvPM8udap0Ur9EgFL7F7jubPp0l
+         /NWjZAaycpAcGSG15Kl1YoG0kBe+5vII3X3mV12lLGk++k88dzO7M5MKtx/MqrnGH5Pe
+         DOQg==
+X-Gm-Message-State: AOJu0YwcV0wG0PhxrjtAyXBTU40NSDznYAlrRIHW4z/GpkLAlukBwSkB
+	t85t3GIgqDet0kyWX6q3w9ET3xoaBsrnVA==
+X-Google-Smtp-Source: AGHT+IEipp5smOXO7sdtdo6mrg7+nefauUOuV77yHew8vZqFqiGp6b8LyplUAD5TD9GeBLkAAcwDpg==
+X-Received: by 2002:a17:90a:e7c7:b0:281:1c2e:9e6a with SMTP id kb7-20020a17090ae7c700b002811c2e9e6amr3835979pjb.39.1699611394744;
+        Fri, 10 Nov 2023 02:16:34 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id cc13-20020a17090af10d00b0027d015c365csm1244631pjb.31.2023.11.10.02.16.26
+        by smtp.gmail.com with ESMTPSA id cc13-20020a17090af10d00b0027d015c365csm1244631pjb.31.2023.11.10.02.16.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 02:16:30 -0800 (PST)
+        Fri, 10 Nov 2023 02:16:34 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -75,9 +75,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [RFC PATCHv3 net-next 08/10] docs: bridge: add switchdev doc
-Date: Fri, 10 Nov 2023 18:15:45 +0800
-Message-ID: <20231110101548.1900519-9-liuhangbin@gmail.com>
+Subject: [RFC PATCHv3 net-next 09/10] docs: bridge: add netfilter doc
+Date: Fri, 10 Nov 2023 18:15:46 +0800
+Message-ID: <20231110101548.1900519-10-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231110101548.1900519-1-liuhangbin@gmail.com>
 References: <20231110101548.1900519-1-liuhangbin@gmail.com>
@@ -89,38 +89,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add switchdev part for bridge document.
+Add netfilter part for bridge document.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/networking/bridge.rst | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ Documentation/networking/bridge.rst | 36 +++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-index 1fe645c9543d..4ff1e4ab6dd5 100644
+index 4ff1e4ab6dd5..7f63d21c9f46 100644
 --- a/Documentation/networking/bridge.rst
 +++ b/Documentation/networking/bridge.rst
-@@ -219,6 +219,24 @@ which is disabled by default but can be enabled. And `Multicast Router Discovery
- <https://lore.kernel.org/netdev/20190121062628.2710-1-linus.luessing@c0d3.blue/>`_,
- which help identify the location of multicast routers.
+@@ -237,6 +237,42 @@ kernel.
  
-+Switchdev
+ Please see the :ref:`switchdev` document for more deatils.
+ 
++Netfilter
 +=========
 +
-+Linux Bridge Switchdev is a feature in the Linux kernel that extends the
-+capabilities of the traditional Linux bridge to work more efficiently with
-+hardware switches that support switchdev. With Linux Bridge Switchdev, certain
-+networking functions like forwarding, filtering, and learning of Ethernet
-+frames can be offloaded to a hardware switch. This offloading reduces the
-+burden on the Linux kernel and CPU, leading to improved network performance
-+and lower latency.
++The bridge netfilter module is a legacy feature that allows to filter bridged
++packets with iptables and ip6tables. Its use is discouraged. Users should
++consider using nftables for packet filtering.
 +
-+To use Linux Bridge Switchdev, you need hardware switches that support the
-+switchdev interface. This means that the switch hardware needs to have the
-+necessary drivers and functionality to work in conjunction with the Linux
-+kernel.
++The older ebtables tool is more feature-limited compared to nftables, but
++just like nftables it doesn't need this module either to function.
 +
-+Please see the :ref:`switchdev` document for more deatils.
++The br_netfilter module intercepts packets entering the bridge, performs
++minimal sanity tests on ipv4 and ipv6 packets and then pretends that
++these packets are being routed, not bridged. br_netfilter then calls
++the ip and ipv6 netfilter hooks from the bridge layer, i.e. ip(6)tables
++rulesets will also see these packets.
++
++br_netfilter is also the reason for the iptables *physdev* match:
++This match is the only way to reliably tell routed and bridged packets
++apart in an iptables ruleset.
++
++Note that ebtables and nftables will work fine without the br_netfilter module.
++iptables/ip6tables/arptables do not work for bridged traffic because they
++plug in the routing stack. nftables rules in ip/ip6/inet/arp families won't
++see traffic that is forwarded by a bridge either, but thats very much how it
++should be.
++
++Historically the feature set of ebtables was very limited (it still is),
++this module was added to pretend packets are routed and invoke the ipv4/ipv6
++netfilter hooks from the bridge so users had access to the more feature-rich
++iptables matching capabilities (including conntrack). nftables doesn't have
++this limitation, pretty much all features work regardless of the protocol family.
++
++So, br_netfilter is only needed if users, for some reason, need to use
++ip(6)tables to filter packets forwarded by the bridge, or NAT bridged
++traffic. For pure link layer filtering, this module isn't needed.
 +
  FAQ
  ===
