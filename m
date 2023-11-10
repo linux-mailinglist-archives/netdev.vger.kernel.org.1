@@ -1,110 +1,164 @@
-Return-Path: <netdev+bounces-47015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96A6F7E7A01
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3658A7E79FA
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD2981C20B6E
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:14:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3014E1C2097C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4558A79E6;
-	Fri, 10 Nov 2023 08:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485BB748B;
+	Fri, 10 Nov 2023 08:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fITl/Egu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2nbIZi9"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95167483
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:14:47 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D0C903E
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:14:46 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32da4ffd7e5so1055570f8f.0
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:14:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699604084; x=1700208884; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iHTbnop4lW4koc0QbnAiPUYd//zLPqiRYZVB/oTh6Ig=;
-        b=fITl/EguiF9R1hxkrrwQ7OPm7CHkQwq8QquVZyv8rUX6gdJYdhv5fZD7jKdUi8cMWY
-         c8PH57U+EVXXn86oHnB30c4M22q34CqCtKdqX+KkKfjH9NNskNU0DOumhw4zOv+Go+aW
-         HA/VaeaZ+K6PNGNjskyIeST4WORQuOuDlVCt6DcPm6mSp2TXiPPsV3xoG/IOpGsIHikR
-         IxtYFmdl+Yn+051D/akEQP0ntp9mJd8Y+6UEa53F+wq4bTYo8WI3a0SDZwP7cUB8IUPO
-         2v0lsF8rUI0U36Rel64elOj7Cc1xrkliSThd4MO2sAwFzIVoxkEVTtSvteOV2KlEFHhd
-         0N1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699604084; x=1700208884;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iHTbnop4lW4koc0QbnAiPUYd//zLPqiRYZVB/oTh6Ig=;
-        b=YdgUqyNQgovBg5fDOTQEtlckwcczNWhYvXAMEsd0+P9jCC4qBxzB/zjt1F7hpZMvK0
-         qJJa6gPsFNPko0RZWQ1heM5KLI8B3iyabZguPejpMq/fvSms/41XTtBavf0LIZ+nQLbx
-         MrWhOqBaOtHBu4uhkRFt+AnrydzP21MlxEFENDR9ON7jUJRTI/teYILI4FK9B3dWRKRe
-         rhfR7Jl8LuiPpmEWEC+O1ZUgQpGNTkWPnccSnByydJ+gdJTuPvAeR093XNmAGsBQD0iz
-         R7iQf7+Hxhc72sxIQZUxf+DpXGjfNUIL5EqBSbCZloJ6dPtzTumK4CzTJ2peN/dR/gdY
-         x/MA==
-X-Gm-Message-State: AOJu0YzQtl1ee2Gaj51lxBv7yaKfUOEvsovg5WhbBB/kNE/l6eK0Kjw3
-	PUbs6B/z0GIW4KSPBJpKHNG82dMuGMWy7fD6Evo=
-X-Google-Smtp-Source: AGHT+IEsudDcP7JOqJzb21kA7vqsjYb0Dr2Klckxg1XZRuBAe+vQduJpXgsoOwOvsmaT+bG4GO3VkEaCDLTCGyuu86g=
-X-Received: by 2002:a5d:6f1d:0:b0:32f:89fb:771b with SMTP id
- ay29-20020a5d6f1d000000b0032f89fb771bmr2094116wrb.4.1699604084281; Fri, 10
- Nov 2023 00:14:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9E4747A
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:10:39 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D49318A5F
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:10:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699603837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4GQjFWahYGq4tfrY4kZ+Y1bC9y7ReN8MIM0FcjIcMww=;
+	b=B2nbIZi9AlgjDMqRKaH7w7Hmwo/VOmoo2eWARUfeN2WAc1eDQVxHoBCR0dgbQelps4m9xg
+	b4uGh6Nt8ZB+mkXPTpO22VI5drXix8CTdpretnE3sKfeka4amguprJ9zD5wgdY1Hi/GKzZ
+	mpfqoB9HodWYXBYCmstAzeM2xSe2s0Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-185-v6VMaS5TP3inGFLqfefYRg-1; Fri, 10 Nov 2023 03:10:33 -0500
+X-MC-Unique: v6VMaS5TP3inGFLqfefYRg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67A0085A5B5;
+	Fri, 10 Nov 2023 08:10:33 +0000 (UTC)
+Received: from [10.45.225.136] (unknown [10.45.225.136])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E98BFC1290F;
+	Fri, 10 Nov 2023 08:10:31 +0000 (UTC)
+Message-ID: <ff619fd3-c6df-4ecb-a717-18449620012e@redhat.com>
+Date: Fri, 10 Nov 2023 09:10:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231109000901.949152-1-kuba@kernel.org> <CAGRyCJHiPcKnBkkCDxbannmJYLwZevvz8cnx88PcvnCeYULDaA@mail.gmail.com>
- <20231109071850.053f04a7@kernel.org>
-In-Reply-To: <20231109071850.053f04a7@kernel.org>
-From: Daniele Palmas <dnlplm@gmail.com>
-Date: Fri, 10 Nov 2023 09:01:29 +0100
-Message-ID: <CAGRyCJFLytO-k1ekbQE5Z3LN7RVJciB_4Yh9PUVYA3EZeWMG5A@mail.gmail.com>
-Subject: Re: [RFC net-next] net: don't dump stack on queue timeout
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com, 
-	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net] i40e: Fix max frame size check
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: Jacob Keller <jacob.e.keller@intel.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>
+References: <20231108151018.72670-1-ivecera@redhat.com>
+ <d6114f2b-4ac8-ce15-19f6-483965daf3f3@intel.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <d6114f2b-4ac8-ce15-19f6-483965daf3f3@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Il giorno gio 9 nov 2023 alle ore 16:18 Jakub Kicinski
-<kuba@kernel.org> ha scritto:
->
-> On Thu, 9 Nov 2023 08:40:00 +0100 Daniele Palmas wrote:
-> > For example, I can see the splat with MBIM modems when radio link
-> > failure happens, something for which the host can't really do
-> > anything. So, the main result of using WARN is to scare the users who
-> > are not aware of the reasons behind it and create unneeded support
-> > requests...
->
-> Is it not possible to clear the carrier on downstream devices?
-> Radio link failure sounds like carrier loss.
+On 08. 11. 23 21:38, Jesse Brandeburg wrote:
+> On 11/8/2023 7:10 AM, Ivan Vecera wrote:
+>> Commit 3a2c6ced90e1 ("i40e: Add a check to see if MFS is set") added
+>> a check for port's MFS (max frame size) value. The value is stored
+>> in PRTGL_SAH register for each physical port. According datasheet this
+>> register is defined as:
+>>
+>> PRTGL_SAH[PRT]: (0x001E2140 + 0x4*PRT, PRT=0...3)
+>>
+>> where PRT is physical port number.
+> 
+> <trimmed lkml, and a couple of non-existent intel addresses>
+> 
+> Was there an actual problem here? I suspect if you read all the
+> registers for each PF's BAR, you'll find that all 4 report the same,
+> correct value, for the perspective of the BAR they're being read from.
+> 
+> The i40e hardware does this (somewhat non-obvious) for *lots* of port
+> specific registers, and what happens is no matter which of the 4 you
+> read the value from, you'll get the right "port specific" value. This is
+> because the hardware designers decided to make a different "view" on the
+> register set depending on which PF you access it from. The only time
+> these offsets matter is when the part is in debug mode or when the
+> firmware is reading the internal registers (from the internal firmware
+> register space - which has no aliasing) that rely on the correct offset.
+> 
+> In this case, I think your change won't make any functional difference,
+> but I can see why you want to make the change as the code doesn't match
+> the datasheet's definition of the register.
+> 
+> That all said, unless you can prove a problem, I'm relatively sure that
+> nothing is wrong here in functionality or code. And if you go this
+> route, there might be a lot of other registers to fix that have the same
+> aliasing.
+> 
+> I apologize for the confusing manuals and header file, it's complicated
+> but in practice works really well. Effectively you can't read other
+> port's registers by accident.
+> 
+> Here was my experiment showing the aliasing on X722. You'll note that
+> the lower 16 bits are a MAC address that doesn't change no matter which
+> register you read.
+> 
+> device 20:0.0
+> 0x1e2140 == 0x26008245
+> 0x1e2144 == 0x26008245
+> 0x1e2148 == 0x26008245
+> 0x1e214c == 0x26008245
+> device 20:0.1
+> 0x1e2140 == 0x26008345
+> 0x1e2144 == 0x26008345
+> 0x1e2148 == 0x26008345
+> 0x1e214c == 0x26008345
+> device 20:0.2
+> 0x1e2140 == 0x26008445
+> 0x1e2144 == 0x26008445
+> 0x1e2148 == 0x26008445
+> 0x1e214c == 0x26008445
+> device 20:0.3
+> 0x1e2140 == 0x26008545
+> 0x1e2144 == 0x26008545
+> 0x1e2148 == 0x26008545
+> 0x1e214c == 0x26008545
+> 
+> lspci -d ::0200
+> 20:00.0 Ethernet controller: Intel Corporation Ethernet Connection X722
+> for 10GBASE-T (rev 04)
+> 20:00.1 Ethernet controller: Intel Corporation Ethernet Connection X722
+> for 10GBASE-T (rev 04)
+> 20:00.2 Ethernet controller: Intel Corporation Ethernet Connection X722
+> for 10GbE SFP+ (rev 04)
+> 20:00.3 Ethernet controller: Intel Corporation Ethernet Connection X722
+> for 10GbE SFP+ (rev 04)
+> 
+> Hope this helps!
 
-The problem is that the MBIM standard does not define the
-CDC_NOTIFY_NETWORK_CONNECTION, so carrier loss detection is managed
-through the indications on the control channel.
+Hi Jesse,
+thanks a lot for the explanation. I found this during preparation of my 
+iwl-next stuff and found that variable 'i' is used inappropriately so I 
+checked also the datasheet and found the definition of PRTGL_SAH 
+register that is defined per port but I didn't know there is such 
+aliasing for registers in PF BAR space.
+I will send a new patch that at least fix the wrong usage of 'i' variable.
 
-But the kernel is not aware of what's passing through the control
-channel, so it's the userspace tool that should detect carrier loss,
-disconnect the bearers and set the network interface down.
+Thanks,
+Ivan
 
-For example, ModemManager is capable of doing that, but the problem is
-that usually the standard modem notifications on the control channel
-arrive later than the splat: increasing watchdog_timeo does not seem
-to me a good option, since the notification could arrive much later.
-
-One possible solution is to have some proprietary notifications on the
-control channel that detect RLF early and trigger the above described
-process before the warn happens: by coincidence, I wrote a custom
-ModemManager patch for this a few days ago
-https://gitlab.freedesktop.org/dnlplm/ModemManager/-/commit/89ba8ab65d4bfbd4cf1ff11ed58c08b112aca80f
-
-Regards,
-Daniele
 
