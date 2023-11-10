@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-47068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98FD7E7B37
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:16:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5277E7B38
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:16:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10805B20DDF
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:16:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324271C20EC2
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A418813AED;
-	Fri, 10 Nov 2023 10:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB8E13ADA;
+	Fri, 10 Nov 2023 10:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpEwA951"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVgCfzDJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC53413AEC
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:16:17 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB61E27B3D
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:15 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6c10f098a27so1651512b3a.2
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3DA13FFF
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:16:22 +0000 (UTC)
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E559D27B3F
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:19 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id 98e67ed59e1d1-28003daaaa6so1630826a91.0
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:16:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699611374; x=1700216174; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699611378; x=1700216178; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=navMiCGRd9pBWD05coLFaYzT6FFtcpjB5T1w91L5O+Q=;
-        b=jpEwA951fmSqmSZnd1Ws4UYVfL0UVta3Co0qFnL8/zaUaBo7n6GmiR64uRRRv0tGk2
-         LbjZ/I0CQ7aA3DBgZ7n0k8j4uspMsscIdefn+SWF22ILIX3TPZFMKQegTL5zUuIoqJFb
-         v5XucdpaFFEI419BbZXI2myEa2VYy7BhUiOR92+EMT5uLjm5nTymLFnHwhPtMDX0jDa6
-         O+bxsN7Wlj42XUyRZPM2fWUeJIydKdt5tzPk1B6XD+giPfE2TDxOZ5Q5mcIOwuaDtUe9
-         iQg9fp8we6i8WlAqXO1MohVlCTQoAKvYYQFyoGLznXy4PVKsQ+s9DNfYam6Qi1Ldss2Y
-         aAJw==
+        bh=h38H0mJZ2F6o36bbQbxRN2ee8icupz6sPpnBbZTOYdQ=;
+        b=SVgCfzDJt7fKMBPBILaCj3e7knThCB+o6aUss5LbIbjoiHDBEn4HQ/DOUW83guUNVo
+         CVVvl00GSevO4ljzlxomu0HX5l4jNNYa97Z153CT8PXJCmww4ssU/q2ArdkHp7BWC82I
+         x2QmKlYqu2UXVkmu6sETbOUYdKrd5UCYQVWFuELsLQBmrD9nYyS7E6Eyl6rdMZD4wPQH
+         /W5l1WVYVxrsGIVVf4K69b5beeCHUpFQuIM9RxJKXL9gR5Uf4fs/WsG7VNOwKbdi/x0Y
+         zgehK/iA7exXz6VlMAhdiRZ53gowAhcHnbGwEw1/qRxOG133RJDiXMYDKA91C9GVzH4T
+         CJIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699611374; x=1700216174;
+        d=1e100.net; s=20230601; t=1699611378; x=1700216178;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=navMiCGRd9pBWD05coLFaYzT6FFtcpjB5T1w91L5O+Q=;
-        b=u4YPqaKru3MGDPWYsOFLF4VJi29tYopyAGs4f8VWDL+/UC/6/2dqEcmuuG4lqaDnwW
-         jvLgqsSWzXSUjba9z0hdFyRn8MndOTLyYeQs7pctIs+HxDeBK0MfJJ7Np/sdoeGq8XP6
-         e6Fa0Wg3kozPrNy02oFDQiuuZSggik11c6qRaTpOmnOv8EB6NOEx1D5UQi+EkYeTpuEj
-         2VQ5b8uoI03Emr50tMoJ4N/r0uRKkPZeImtEUYBipLHxyHpGgjBRCHD5mTND5kpluiYx
-         hl5KwZKtobUzf7oHcx4ZJxcajKw+08FV+/C4oHgfvt/dop6QuB1G5q/0GMYvihWaQ0Ad
-         LM4A==
-X-Gm-Message-State: AOJu0YyurrwrckOAT9WlMSXtPLUCEdpSEBZIxyZ/o7Iime/3s8vKxjhw
-	I8+mUkNIo6Zv2m8AsUd8GvV+C8GqMq82rA==
-X-Google-Smtp-Source: AGHT+IHnIMr4aYqcq+AcHylO/ogzlVpUlFmcz5fMvKOIre5714Ks6D7bpfc6a5ysYGTO2pWNp1LXtA==
-X-Received: by 2002:a05:6300:800a:b0:180:7df:76ca with SMTP id an10-20020a056300800a00b0018007df76camr7484556pzc.62.1699611374426;
-        Fri, 10 Nov 2023 02:16:14 -0800 (PST)
+        bh=h38H0mJZ2F6o36bbQbxRN2ee8icupz6sPpnBbZTOYdQ=;
+        b=GZQSvaeUZJcvSFMBk+jhBY0uE1ScMRjVdFXSkp8zQ4G5wZK+6nvTGxnrhjwbv++Oad
+         jNji2rPTeGQZym1cIIQyYVOTjfdZCXHb171OmNn8t03iLlvK+nqKMR3yfKuuVhRw/0KA
+         1W27qu1b2B/gG8xgcYAesNXzt20gUGarlUcJn5TOuvo4kC1psqnK1T7vHD7w3VEYCrga
+         hAvkMA5O2qvipUo19YzYX93S2DVLam+yHhBkO9XXOq0aqxQGwvoxyOm4ftiDjg4leIgT
+         oLPSigwsB4QuDZ61jxzNJO8wSMtgFaooJxCyoAqKgVwJkzDz/CXd/vHt5iUhuChtdS/v
+         t5zQ==
+X-Gm-Message-State: AOJu0YyW3pi56RDDaTxoKt1kIt50+7MzMYAV3sUIHkxom/XWClX5cCDw
+	7h+2StPoPAQ6N9gwr3fnUuyBmjvbDcXLjQ==
+X-Google-Smtp-Source: AGHT+IGKlc3FlfmMscR8OSxdURlYXPqqLK5iAS204zg8PHC6rQloTXp/eKxPJ9GAMoYEDO9HvZ1sqg==
+X-Received: by 2002:a17:90b:4f86:b0:27d:b87b:a9d4 with SMTP id qe6-20020a17090b4f8600b0027db87ba9d4mr4218357pjb.7.1699611378541;
+        Fri, 10 Nov 2023 02:16:18 -0800 (PST)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id cc13-20020a17090af10d00b0027d015c365csm1244631pjb.31.2023.11.10.02.16.10
+        by smtp.gmail.com with ESMTPSA id cc13-20020a17090af10d00b0027d015c365csm1244631pjb.31.2023.11.10.02.16.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 02:16:13 -0800 (PST)
+        Fri, 10 Nov 2023 02:16:17 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -75,9 +75,9 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [RFC PATCHv3 net-next 04/10] docs: bridge: Add kAPI/uAPI fields
-Date: Fri, 10 Nov 2023 18:15:41 +0800
-Message-ID: <20231110101548.1900519-5-liuhangbin@gmail.com>
+Subject: [RFC PATCHv3 net-next 05/10] docs: bridge: add STP doc
+Date: Fri, 10 Nov 2023 18:15:42 +0800
+Message-ID: <20231110101548.1900519-6-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231110101548.1900519-1-liuhangbin@gmail.com>
 References: <20231110101548.1900519-1-liuhangbin@gmail.com>
@@ -89,116 +89,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The current bridge kernel doc is too old. It only pointed to the
-linuxfoundation wiki page which lacks of the new features.
-
-Here let's start the new bridge document and put all the bridge info
-so new developers and users could catch up the last bridge status soon.
-
-First add kAPI/uAPI and FAQ fields. These 2 fileds are only examples and
-more APIs need to be added in future.
+Add STP part for bridge document.
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- Documentation/networking/bridge.rst | 83 +++++++++++++++++++++++++----
- 1 file changed, 73 insertions(+), 10 deletions(-)
+ Documentation/networking/bridge.rst | 85 +++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
 diff --git a/Documentation/networking/bridge.rst b/Documentation/networking/bridge.rst
-index c859f3c1636e..d06c51960f45 100644
+index d06c51960f45..e168f86ddd82 100644
 --- a/Documentation/networking/bridge.rst
 +++ b/Documentation/networking/bridge.rst
-@@ -4,18 +4,81 @@
- Ethernet Bridging
- =================
+@@ -50,6 +50,91 @@ options are added.
+ .. kernel-doc:: net/bridge/br_sysfs_br.c
+    :doc: The sysfs bridge attrs
  
--In order to use the Ethernet bridging functionality, you'll need the
--userspace tools.
-+Introduction
-+============
- 
--Documentation for Linux bridging is on:
--   https://wiki.linuxfoundation.org/networking/bridge
-+A bridge is a way to connect multiple Ethernet segments together in a protocol
-+independent way. Packets are forwarded based on Layer 2 destination Ethernet
-+address, rather than IP address (like a router). Since forwarding is done
-+at Layer 2, all Layer 3 protocols can pass through a bridge transparently.
- 
--The bridge-utilities are maintained at:
--   git://git.kernel.org/pub/scm/linux/kernel/git/shemminger/bridge-utils.git
-+Bridge kAPI
-+===========
- 
--Additionally, the iproute2 utilities can be used to configure
--bridge devices.
-+Here are some core structures of bridge code.
- 
--If you still have questions, don't hesitate to post to the mailing list 
--(more info https://lists.linux-foundation.org/mailman/listinfo/bridge).
-+.. kernel-doc:: net/bridge/br_private.h
-+   :identifiers: net_bridge_vlan
- 
-+Bridge uAPI
-+===========
-+
-+Modern Linux bridge uAPI is accessed via Netlink interface. You can find
-+below files where the bridge and bridge port netlink attributes are defined.
-+
-+Bridge netlink attributes
-+-------------------------
-+
-+.. kernel-doc:: include/uapi/linux/if_link.h
-+   :doc: The bridge enum defination
-+
-+Bridge port netlink attributes
-+------------------------------
-+
-+.. kernel-doc:: include/uapi/linux/if_link.h
-+   :doc: The bridge port enum defination
-+
-+Bridge sysfs
-+------------
-+
-+All the sysfs parameters are also exported via the bridge netlink API.
-+Here you can find the explanation based on the correspond netlink attributes.
-+
-+NOTE: the sysfs interface is deprecated and should not be extended if new
-+options are added.
-+
-+.. kernel-doc:: net/bridge/br_sysfs_br.c
-+   :doc: The sysfs bridge attrs
-+
-+FAQ
++STP
 +===
 +
-+What does a bridge do?
-+----------------------
++The STP (Spanning Tree Protocol) implementation in the Linux bridge driver
++is a critical feature that helps prevent loops and broadcast storms in
++Ethernet networks by identifying and disabling redundant links. In a Linux
++bridge context, STP is crucial for network stability and availability.
 +
-+A bridge transparently forwards traffic between multiple network interfaces.
-+In plain English this means that a bridge connects two or more physical
-+Ethernet networks, to form one larger (logical) Ethernet network.
++STP is a Layer 2 protocol that operates at the Data Link Layer of the OSI
++model. It was originally developed as IEEE 802.1D and has since evolved into
++multiple versions, including Rapid Spanning Tree Protocol (RSTP) and
++`Multiple Spanning Tree Protocol (MSTP)
++<https://lore.kernel.org/netdev/20220316150857.2442916-1-tobias@waldekranz.com/>`_.
 +
-+Is it L3 protocol independent?
-+------------------------------
++Bridge Ports and STP States
++---------------------------
 +
-+Yes. The bridge sees all frames, but it *uses* only L2 headers/information.
-+As such, the bridging functionality is protocol independent, and there should
-+be no trouble forwarding IPX, NetBEUI, IP, IPv6, etc.
++In the context of STP, bridge ports can be in one of the following states:
++  * Blocking: The port is disabled for data traffic and only listens for
++    BPDUs (Bridge Protocol Data Units) from other devices to determine the
++    network topology.
++  * Listening: The port begins to participate in the STP process and listens
++    for BPDUs.
++  * Learning: The port continues to listen for BPDUs and begins to learn MAC
++    addresses from incoming frames but does not forward data frames.
++  * Forwarding: The port is fully operational and forwards both BPDUs and
++    data frames.
++  * Disabled: The port is administratively disabled and does not participate
++    in the STP process. The data frames forwarding are also disabled.
 +
-+Contact Info
-+============
++Root Bridge and Convergence
++---------------------------
 +
-+The code is currently maintained by Roopa Prabhu <roopa@nvidia.com> and
-+Nikolay Aleksandrov <razor@blackwall.org>. Bridge bugs and enhancements
-+are discussed on the linux-netdev mailing list netdev@vger.kernel.org and
-+bridge@lists.linux-foundation.org.
++In the context of networking and Ethernet bridging in Linux, the root bridge
++is a designated switch in a bridged network that serves as a reference point
++for the spanning tree algorithm to create a loop-free topology.
 +
-+The list is open to anyone interested: http://vger.kernel.org/vger-lists.html#netdev
++Here's how the STP works and root bridge is chosen:
++  1. Bridge Priority: Each bridge running a spanning tree protocol, has a
++     configurable Bridge Priority value. The lower the value, the higher the
++     priority. By default, the Bridge Priority is set to a standard value
++     (e.g., 32768).
++  2. Bridge ID: The Bridge ID is composed of two components: Bridge Priority
++     and the MAC address of the bridge. It uniquely identifies each bridge
++     in the network. The Bridge ID is used to compare the priorities of
++     different bridges.
++  3. Bridge Election: When the network starts, all bridges initially assume
++     that they are the root bridge. They start advertising Bridge Protocol
++     Data Units (BPDU) to their neighbors, containing their Bridge ID and
++     other information.
++  4. BPDU Comparison: Bridges exchange BPDUs to determine the root bridge.
++     Each bridge examines the received BPDUs, including the Bridge Priority
++     and Bridge ID, to determine if it should adjust its own priorities.
++     The bridge with the lowest Bridge ID will become the root bridge.
++  5. Root Bridge Announcement: Once the root bridge is determined, it sends
++     BPDUs with information about the root bridge to all other bridges in the
++     network. This information is used by other bridges to calculate the
++     shortest path to the root bridge and, in doing so, create a loop-free
++     topology.
++  6. Forwarding Ports: After the root bridge is selected and the spanning tree
++     topology is established, each bridge determines which of its ports should
++     be in the forwarding state (used for data traffic) and which should be in
++     the blocking state (used to prevent loops). The root bridge's ports are
++     all in the forwarding state. while other bridges have some ports in the
++     blocking state to avoid loops.
++  7. Root Ports: After the root bridge is selected and the spanning tree
++     topology is established, each non-root bridge processes incoming
++     BPDUs and determines which of its ports provides the shortest path to the
++     root bridge based on the information in the received BPDUs. This port is
++     designated as the root port. And it is in the Forwarding state, allowing
++     it to actively forward network traffic.
++  8. Designated ports: A designated port is the port through which the non-root
++     bridge will forward traffic towards the designated segment. Designated ports
++     are placed in the Forwarding state. All other ports on the non-root
++     bridge that are not designated for specific segments are placed in the
++     Blocking state to prevent network loops.
 +
-+External Links
-+==============
++STP ensures network convergence by calculating the shortest path and disabling
++redundant links. When network topology changes occur (e.g., a link failure),
++STP recalculates the network topology to restore connectivity while avoiding loops.
 +
-+The old Documentation for Linux bridging is on:
-+https://wiki.linuxfoundation.org/networking/bridge
++Proper configuration of STP parameters, such as the bridge priority, can
++influence which bridge becomes the Root Bridge. Careful configuration can
++optimize network performance and path selection.
++
+ FAQ
+ ===
+ 
 -- 
 2.41.0
 
