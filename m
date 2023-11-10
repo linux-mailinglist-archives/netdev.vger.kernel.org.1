@@ -1,157 +1,110 @@
-Return-Path: <netdev+bounces-47012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA797E79CA
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:38:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A6F7E7A01
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8BE9B20D09
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:38:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD2981C20B6E
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 08:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131ED20F3;
-	Fri, 10 Nov 2023 07:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4558A79E6;
+	Fri, 10 Nov 2023 08:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fITl/Egu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BF129A5;
-	Fri, 10 Nov 2023 07:38:34 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29DC3869B;
-	Thu,  9 Nov 2023 23:38:32 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SRVtv2NmgzMmjR;
-	Fri, 10 Nov 2023 15:33:59 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 10 Nov
- 2023 15:38:29 +0800
-Subject: Re: [RFC PATCH v3 04/12] netdev: support binding dma-buf to netdevice
-To: Mina Almasry <almasrymina@google.com>, Paolo Abeni <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<linaro-mm-sig@lists.linaro.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, Arnd Bergmann <arnd@arndb.de>, David Ahern
-	<dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>, Shakeel Butt
-	<shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-5-almasrymina@google.com>
- <076fa6505f3e1c79cc8acdf9903809fad6c2fd31.camel@redhat.com>
- <CAHS8izOGSE-PJ1uShkH_Mr6kUoC1EjM_9P1J=_TO6nLFP9K53Q@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <aec0f586-c3b9-8da8-6a39-f313105267f8@huawei.com>
-Date: Fri, 10 Nov 2023 15:38:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95167483
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 08:14:47 +0000 (UTC)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D0C903E
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:14:46 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32da4ffd7e5so1055570f8f.0
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 00:14:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699604084; x=1700208884; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iHTbnop4lW4koc0QbnAiPUYd//zLPqiRYZVB/oTh6Ig=;
+        b=fITl/EguiF9R1hxkrrwQ7OPm7CHkQwq8QquVZyv8rUX6gdJYdhv5fZD7jKdUi8cMWY
+         c8PH57U+EVXXn86oHnB30c4M22q34CqCtKdqX+KkKfjH9NNskNU0DOumhw4zOv+Go+aW
+         HA/VaeaZ+K6PNGNjskyIeST4WORQuOuDlVCt6DcPm6mSp2TXiPPsV3xoG/IOpGsIHikR
+         IxtYFmdl+Yn+051D/akEQP0ntp9mJd8Y+6UEa53F+wq4bTYo8WI3a0SDZwP7cUB8IUPO
+         2v0lsF8rUI0U36Rel64elOj7Cc1xrkliSThd4MO2sAwFzIVoxkEVTtSvteOV2KlEFHhd
+         0N1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699604084; x=1700208884;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iHTbnop4lW4koc0QbnAiPUYd//zLPqiRYZVB/oTh6Ig=;
+        b=YdgUqyNQgovBg5fDOTQEtlckwcczNWhYvXAMEsd0+P9jCC4qBxzB/zjt1F7hpZMvK0
+         qJJa6gPsFNPko0RZWQ1heM5KLI8B3iyabZguPejpMq/fvSms/41XTtBavf0LIZ+nQLbx
+         MrWhOqBaOtHBu4uhkRFt+AnrydzP21MlxEFENDR9ON7jUJRTI/teYILI4FK9B3dWRKRe
+         rhfR7Jl8LuiPpmEWEC+O1ZUgQpGNTkWPnccSnByydJ+gdJTuPvAeR093XNmAGsBQD0iz
+         R7iQf7+Hxhc72sxIQZUxf+DpXGjfNUIL5EqBSbCZloJ6dPtzTumK4CzTJ2peN/dR/gdY
+         x/MA==
+X-Gm-Message-State: AOJu0YzQtl1ee2Gaj51lxBv7yaKfUOEvsovg5WhbBB/kNE/l6eK0Kjw3
+	PUbs6B/z0GIW4KSPBJpKHNG82dMuGMWy7fD6Evo=
+X-Google-Smtp-Source: AGHT+IEsudDcP7JOqJzb21kA7vqsjYb0Dr2Klckxg1XZRuBAe+vQduJpXgsoOwOvsmaT+bG4GO3VkEaCDLTCGyuu86g=
+X-Received: by 2002:a5d:6f1d:0:b0:32f:89fb:771b with SMTP id
+ ay29-20020a5d6f1d000000b0032f89fb771bmr2094116wrb.4.1699604084281; Fri, 10
+ Nov 2023 00:14:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izOGSE-PJ1uShkH_Mr6kUoC1EjM_9P1J=_TO6nLFP9K53Q@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+References: <20231109000901.949152-1-kuba@kernel.org> <CAGRyCJHiPcKnBkkCDxbannmJYLwZevvz8cnx88PcvnCeYULDaA@mail.gmail.com>
+ <20231109071850.053f04a7@kernel.org>
+In-Reply-To: <20231109071850.053f04a7@kernel.org>
+From: Daniele Palmas <dnlplm@gmail.com>
+Date: Fri, 10 Nov 2023 09:01:29 +0100
+Message-ID: <CAGRyCJFLytO-k1ekbQE5Z3LN7RVJciB_4Yh9PUVYA3EZeWMG5A@mail.gmail.com>
+Subject: Re: [RFC net-next] net: don't dump stack on queue timeout
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, syzbot+d55372214aff0faa1f1f@syzkaller.appspotmail.com, 
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+Content-Type: text/plain; charset="UTF-8"
 
-On 2023/11/10 10:59, Mina Almasry wrote:
-> On Thu, Nov 9, 2023 at 12:30 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> I'm trying to wrap my head around the whole infra... the above line is
->> confusing. Why do you increment dma_addr? it will be re-initialized in
->> the next iteration.
->>
-> 
-> That is just a mistake, sorry. Will remove this increment.
+Il giorno gio 9 nov 2023 alle ore 16:18 Jakub Kicinski
+<kuba@kernel.org> ha scritto:
+>
+> On Thu, 9 Nov 2023 08:40:00 +0100 Daniele Palmas wrote:
+> > For example, I can see the splat with MBIM modems when radio link
+> > failure happens, something for which the host can't really do
+> > anything. So, the main result of using WARN is to scare the users who
+> > are not aware of the reasons behind it and create unneeded support
+> > requests...
+>
+> Is it not possible to clear the carrier on downstream devices?
+> Radio link failure sounds like carrier loss.
 
-You seems to be combining comments in different thread and replying in
-one thread, I am not sure that is a good practice and I almost missed the
-reply below as I don't seem to be cc'ed.
+The problem is that the MBIM standard does not define the
+CDC_NOTIFY_NETWORK_CONNECTION, so carrier loss detection is managed
+through the indications on the control channel.
 
-> 
-> On Thu, Nov 9, 2023 at 1:29 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:> >>>
->>>>> gen_pool_destroy BUG_ON() if it's not empty at the time of destroying.
->>>>> Technically that should never happen, because
->>>>> __netdev_devmem_binding_free() should only be called when the refcount
->>>>> hits 0, so all the chunks have been freed back to the gen_pool. But,
->>>>> just in case, I don't want to crash the server just because I'm
->>>>> leaking a chunk... this is a bit of defensive programming that is
->>>>> typically frowned upon, but the behavior of gen_pool is so severe I
->>>>> think the WARN() + check is warranted here.
->>>>
->>>> It seems it is pretty normal for the above to happen nowadays because of
->>>> retransmits timeouts, NAPI defer schemes mentioned below:
->>>>
->>>> https://lkml.kernel.org/netdev/168269854650.2191653.8465259808498269815.stgit@firesoul/
->>>>
->>>> And currently page pool core handles that by using a workqueue.
->>>
->>> Forgive me but I'm not understanding the concern here.
->>>
->>> __netdev_devmem_binding_free() is called when binding->ref hits 0.
->>>
->>> binding->ref is incremented when an iov slice of the dma-buf is
->>> allocated, and decremented when an iov is freed. So,
->>> __netdev_devmem_binding_free() can't really be called unless all the
->>> iovs have been freed, and gen_pool_size() == gen_pool_avail(),
->>> regardless of what's happening on the page_pool side of things, right?
->>
->> I seems to misunderstand it. In that case, it seems to be about
->> defensive programming like other checking.
->>
->> By looking at it more closely, it seems napi_frag_unref() call
->> page_pool_page_put_many() directly， which means devmem seems to
->> be bypassing the napi_safe optimization.
->>
->> Can napi_frag_unref() reuse napi_pp_put_page() in order to reuse
->> the napi_safe optimization?
->>
-> 
-> I think it already does. page_pool_page_put_many() is only called if
-> !recycle or !napi_pp_put_page(). In that case
-> page_pool_page_put_many() is just a replacement for put_page(),
-> because this 'page' may be an iov.
+But the kernel is not aware of what's passing through the control
+channel, so it's the userspace tool that should detect carrier loss,
+disconnect the bearers and set the network interface down.
 
-Is there a reason why not calling napi_pp_put_page() for devmem too
-instead of calling page_pool_page_put_many()? mem provider has a
-'release_page' ops, calling page_pool_page_put_many() directly here
-seems to be bypassing the 'release_page' ops, which means devmem is
-bypassing most of the main features of page pool.
+For example, ModemManager is capable of doing that, but the problem is
+that usually the standard modem notifications on the control channel
+arrive later than the splat: increasing watchdog_timeo does not seem
+to me a good option, since the notification could arrive much later.
 
-As far as I can tell, the main features of page pool:
-1. Allow lockless allocation and freeing in pool->alloc cache by
-   utilizing NAPI non-concurrent context.
-2. Allow concurrent allocation and freeing in pool->ring cache by
-   utilizing ptr_ring.
-3. Allow dma map/unmap and cache sync optimization.
-4. Allow detailed stats logging and tracing.
-5. Allow some bulk allocation and freeing.
-6. support both skb packet and xdp frame.
+One possible solution is to have some proprietary notifications on the
+control channel that detect RLF early and trigger the above described
+process before the warn happens: by coincidence, I wrote a custom
+ModemManager patch for this a few days ago
+https://gitlab.freedesktop.org/dnlplm/ModemManager/-/commit/89ba8ab65d4bfbd4cf1ff11ed58c08b112aca80f
 
-I am wondering what is the main features that devmem is utilizing
-by intergrating into page pool?
-
-It seems the driver can just call netdev_alloc_devmem() and
-napi_frag_unref() can call netdev_free_devmem() directly without
-intergrating into page pool and it should just works too?
-
-Maybe we should consider creating a new thin layer, in order to
-demux to page pool, devmem or other mem type if my suggestion does
-not work out too?
-
-> 
+Regards,
+Daniele
 
