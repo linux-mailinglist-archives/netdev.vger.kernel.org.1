@@ -1,168 +1,419 @@
-Return-Path: <netdev+bounces-47059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8794D7E7B1C
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:56:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3BB27E7B27
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 11:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 171F4B20DC7
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:56:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3020E280E6F
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD8D134A3;
-	Fri, 10 Nov 2023 09:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23586134C8;
+	Fri, 10 Nov 2023 10:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ct5HEE+g"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="kGLE3pej"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBF2134A0
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:56:31 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E773325A0D;
-	Fri, 10 Nov 2023 01:56:29 -0800 (PST)
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AA9iHNL015268;
-	Fri, 10 Nov 2023 09:56:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=dqcOp6uMPuE83dY6kYaHOebngUiHYiPNDGtrKbD1kfY=;
- b=ct5HEE+gnitLwXmqC+KnyB5l/UMTkyESttAYm0AEzg3wis/kH+6aJlECw6tcig2JGcV+
- 4TiM3uyQwiRIRxtDF/GRGOo/z1xycN4q3Hj5jlIUEHbBWrlVU0nQztsgw5cpmWu/sfX+
- kwt2qz7s/AWC1ig2WrWM3SmjuZG+b3fLeC6yV8rP8gMl0QJ03oHu2hmoyIVoF7x66ZLY
- 96/6EuGtmNNWkaP6G/l2J5mjMHBopcLd1uiYFNcbWrST2Mt7HAX/ldh2wrSSYCdZQfzV
- b34SP9+3rCfzdAPXBrZsU+ZO3yjEMjWg4Q33tEdFkgJw1JC7BptnURdDevSUgKv4oQNQ HQ== 
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3u9h9v84qm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Nov 2023 09:56:14 +0000
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AA9uDOP029435
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Nov 2023 09:56:13 GMT
-Received: from [10.253.8.167] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 10 Nov
- 2023 01:56:11 -0800
-Message-ID: <3dd470a9-257e-e2c7-c71a-0c216cf7db88@quicinc.com>
-Date: Fri, 10 Nov 2023 17:56:09 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3850134A0
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 10:06:30 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437BB26334
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:06:27 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9e623356e59so76887566b.0
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 02:06:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1699610786; x=1700215586; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lpOIca++/jQxaZDzsly4c7o+jB8e13YJjkHDH+Fu6dA=;
+        b=kGLE3pejB+Shu3tp6FRGd7k9n9brMTphSnVfRzRY1F4cNv9AuAZqF2B/zqRITBo1pi
+         bdXeDWE7h9SVjYpYjrT4Fh/Algd4bxYvb/kGon2wB14A8dmaJ7vvVdW+g+N/7SOQzV8I
+         L/i98rgZ296OLIjDqmbfGag0rRmlk7hxcp2F2x2eNR+SbTytjCMyVmAjH0lK7DSeOsPM
+         2ytXVFoL/B0ZX5GV2lPp6ziwqh1dmulIqTDILTMQiiWgF/ZZVp/29eR+EOtToUvR+mqK
+         fKGhMrOTRnlP2vjTzW0WJPDH/yX8qedkxKQMlZpcy/EAL3V0DqCvXsrd1TqVNc6HCFyd
+         cjRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699610786; x=1700215586;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lpOIca++/jQxaZDzsly4c7o+jB8e13YJjkHDH+Fu6dA=;
+        b=UZt8k8nXbj+7yGWenDOYlkAMP2+CRlU+AUTJLSnXV3gEVymLeiGRYpDg+3UDlC3lXw
+         1ls23QO6MgJy/Ppvwms4Wk8EPOzr95dO/BsYrSDDixXMOKes83edf4JKNwPkSuRhiwY3
+         wM0GFOHvJOAY8PBVuoke6V900JzndGulguUccb9QWKTsw5lkfYj8WNSUH4iBq+NEi6Wn
+         Mgq8Wlp3qE4C3u26vMS/txit1jShqz1vQfZSh59MXP/zgpF4g2ZsT2+//t9Kym7/n00t
+         3ChYHh/G1Lkt045c8kWFkZzAb0PqLZBdrVC0ed+2DGoh7Ra2FNu91gCl9zbnhnH7mdxx
+         rolg==
+X-Gm-Message-State: AOJu0Yx8bgjXHaREb1OXa5rzXXLKLTh+tWWNXwhOqJyzBNDyFHi/YUTo
+	cWg+32QAjANJVKPVz8/GaZPEbw==
+X-Google-Smtp-Source: AGHT+IF70jYCr/gaZ2YRorcQN2JKKrOxABzbBsggUA5kJ1JeO56+/IyY3vOyuMYETu6rRrsKrgHksA==
+X-Received: by 2002:a17:906:dc94:b0:9d3:f436:6809 with SMTP id cs20-20020a170906dc9400b009d3f4366809mr6537420ejc.39.1699610785596;
+        Fri, 10 Nov 2023 02:06:25 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id kv7-20020a17090778c700b009e60387c630sm731514ejc.220.2023.11.10.02.06.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Nov 2023 02:06:25 -0800 (PST)
+Date: Fri, 10 Nov 2023 11:06:24 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: [PATCH net 2/3] dpll: fix pin dump crash for rebound module
+Message-ID: <ZU4AoNqxo6j5zy+V@nanopsycho>
+References: <20231108103226.1168500-1-arkadiusz.kubalewski@intel.com>
+ <20231108103226.1168500-3-arkadiusz.kubalewski@intel.com>
+ <ZUubagu6B+vbfBqm@nanopsycho>
+ <DM6PR11MB465752FE337EB962B147EB579BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZUzcTBmSPxIs5iH3@nanopsycho>
+ <DM6PR11MB46571D4C776B0B1888F943569BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU0fj5y9mAvVzXuf@nanopsycho>
+ <DM6PR11MB4657DAC525E05B5DB72145119BAFA@DM6PR11MB4657.namprd11.prod.outlook.com>
+ <ZU3RlSmInnoXufxf@nanopsycho>
+ <DM6PR11MB4657B61E86D5DFFAF83BC1E59BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy support
-Content-Language: en-US
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20231108113445.24825-1-quic_luoj@quicinc.com>
- <20231108113445.24825-2-quic_luoj@quicinc.com>
- <20231108131250.66d1c236@fedora>
- <423a3ee3-bed5-02f9-f872-7b5dba64f994@quicinc.com>
- <20231109101618.009efb45@fedora>
- <0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
- <46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
- <20231110103328.0bc3d28f@fedora>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <20231110103328.0bc3d28f@fedora>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: rKUGGD6_5vdy8zfqH4Q7fuTFkZrctYtN
-X-Proofpoint-ORIG-GUID: rKUGGD6_5vdy8zfqH4Q7fuTFkZrctYtN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-10_06,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=580 adultscore=0 lowpriorityscore=0 spamscore=0 phishscore=0
- suspectscore=0 bulkscore=0 impostorscore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2311060000 definitions=main-2311100080
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB4657B61E86D5DFFAF83BC1E59BAEA@DM6PR11MB4657.namprd11.prod.outlook.com>
 
-
-
-On 11/10/2023 5:33 PM, Maxime Chevallier wrote:
-> On Fri, 10 Nov 2023 17:17:58 +0800
-> Jie Luo <quic_luoj@quicinc.com> wrote:
-> 
->> On 11/10/2023 4:53 PM, Jie Luo wrote:
->>>
->>>
->>> On 11/9/2023 5:16 PM, Maxime Chevallier wrote:
->>>> Hello,
->>>>
->>>> On Thu, 9 Nov 2023 16:32:36 +0800
->>>> Jie Luo <quic_luoj@quicinc.com> wrote:
->>>>
->>>> [...]
->>>>   
->>>>>> What I understand from this is that this PHY can be used either as a
->>>>>> switch, in which case port 4 would be connected to the host interface
->>>>>> at up to 2.5G, or as a quad-phy, but since it uses QUSGMII the link
->>>>>> speed would be limited to 1G per-port, is that correct ?
->>>>>
->>>>> When the PHY works on the interface mode QUSGMII for quad-phy, all 4
->>>>> PHYs can support to the max link speed 2.5G, actually the PHY can
->>>>> support to max link speed 2.5G for all supported interface modes
->>>>> including qusgmii and sgmii.
->>>>
->>>> I'm a bit confused then, as the USGMII spec says that Quad USGMII really
->>>> is for quad 10/100/1000 speeds, using 10b/8b encoding.
->>>>
->>>> Aren't you using the USXGMII mode instead, which can convey 4 x 2.5Gbps
->>>>    with 66b/64b encoding ?
->>>>
->>>> Thanks,
->>>>
->>>> Maxime
->>>
->>> Hi Maxime,
->>> Yes, for quad PHY mode, it is using 66b/64 encoding.
->>>
->>> it seems that PHY_INTERFACE_MODE_USXGMII is for single port,
->>> so i take the interface name PHY_INTERFACE_MODE_QUSGMII for
->>> quad PHYs here.
->>>
->>> can we apply PHY_INTERFACE_MODE_USXGMII to quad PHYs in this
->>> case(qca8084 quad PHY mode)?
->>>
->>> Thanks,
->>> Jie.
+Fri, Nov 10, 2023 at 10:01:50AM CET, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Friday, November 10, 2023 7:46 AM
 >>
->> one more thing, if we use the PHY_INTERFACE_MODE_USXGMII for
->> the quad PHY here, the MAC serdes can't distinguish the actual
->> mode PHY_INTERFACE_MODE_USXGMII and 10G-QXGMII(qca8084 quad phy mode),
->> the MAC serdes has the different configurations for usxgmii(10g single
->> port) and qxsgmii(quad PHY).
-> 
-> Yes you do need a way to know which mode to use, what I'm wondering is
-> that the usxgmii spec actually defines something like 9 different modes
-> ( 1/2/4/8 ports, with a total bandwidth ranging from 2.5Gbps to 20 Gbps
-> ), should we define a phy mode for all of these variants, or should we
-> have another way of getting the mode variant (like, saying I want to
-> use usxgmii, in 4 ports mode, with the serdes at 10.3125Gbps).
-> 
-> That being said, QUSGMII already exists to define a specific variant of
-> USGMII, so maybe adding 10G-QXGMII is fine...
+>>Fri, Nov 10, 2023 at 12:32:21AM CET, arkadiusz.kubalewski@intel.com wrote:
+>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>Sent: Thursday, November 9, 2023 7:06 PM
+>>>>
+>>>>Thu, Nov 09, 2023 at 05:30:20PM CET, arkadiusz.kubalewski@intel.com
+>>>>wrote:
+>>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>Sent: Thursday, November 9, 2023 2:19 PM
+>>>>>>
+>>>>>>Thu, Nov 09, 2023 at 01:20:48PM CET, arkadiusz.kubalewski@intel.com
+>>>>>>wrote:
+>>>>>>>>From: Jiri Pirko <jiri@resnulli.us>
+>>>>>>>>Sent: Wednesday, November 8, 2023 3:30 PM
+>>>>>>>>
+>>>>>>>>Wed, Nov 08, 2023 at 11:32:25AM CET, arkadiusz.kubalewski@intel.com
+>>>>>>>>wrote:
+>>>>>>>>>When a kernel module is unbound but the pin resources were not
+>>>>>>>>>entirely
+>>>>>>>>>freed (other kernel module instance have had kept the reference to
+>>>>>>>>>that
+>>>>>>>>>pin), and kernel module is again bound, the pin properties would not
+>>>>>>>>>be
+>>>>>>>>>updated (the properties are only assigned when memory for the pin is
+>>>>>>>>>allocated), prop pointer still points to the kernel module memory of
+>>>>>>>>>the kernel module which was deallocated on the unbind.
+>>>>>>>>>
+>>>>>>>>>If the pin dump is invoked in this state, the result is a kernel
+>>>>>>>>>crash.
+>>>>>>>>>Prevent the crash by storing persistent pin properties in dpll
+>>>>>>>>>subsystem,
+>>>>>>>>>copy the content from the kernel module when pin is allocated,
+>>>>>>>>>instead
+>>>>>>>>>of
+>>>>>>>>>using memory of the kernel module.
+>>>>>>>>>
+>>>>>>>>>Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base
+>>>>>>>>>functions")
+>>>>>>>>>Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base
+>>>>>>>>>functions")
+>>>>>>>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>>>>>>>---
+>>>>>>>>> drivers/dpll/dpll_core.c    |  4 ++--
+>>>>>>>>> drivers/dpll/dpll_core.h    |  4 ++--
+>>>>>>>>> drivers/dpll/dpll_netlink.c | 28 ++++++++++++++--------------
+>>>>>>>>> 3 files changed, 18 insertions(+), 18 deletions(-)
+>>>>>>>>>
+>>>>>>>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>>>>>>>>>index 3568149b9562..4077b562ba3b 100644
+>>>>>>>>>--- a/drivers/dpll/dpll_core.c
+>>>>>>>>>+++ b/drivers/dpll/dpll_core.c
+>>>>>>>>>@@ -442,7 +442,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct
+>>>>>>>>>module *module,
+>>>>>>>>> 		ret = -EINVAL;
+>>>>>>>>> 		goto err;
+>>>>>>>>> 	}
+>>>>>>>>>-	pin->prop = prop;
+>>>>>>>>>+	memcpy(&pin->prop, prop, sizeof(pin->prop));
+>>>>>>>>
+>>>>>>>>Odd, you don't care about the pointer within this structure?
+>>>>>>>>
+>>>>>>>
+>>>>>>>Well, true. Need a fix.
+>>>>>>>Wondering if copying idea is better than just assigning prop pointer
+>>>>>>>on
+>>>>>>>each call to dpll_pin_get(..) function (when pin already exists)?
+>>>>>>
+>>>>>>Not sure what do you mean. Examples please.
+>>>>>>
+>>>>>
+>>>>>Sure,
+>>>>>
+>>>>>Basically this change:
+>>>>>
+>>>>>diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+>>>>>index ae884b92d68c..06b72d5877c3 100644
+>>>>>--- a/drivers/dpll/dpll_core.c
+>>>>>+++ b/drivers/dpll/dpll_core.c
+>>>>>@@ -483,6 +483,7 @@ dpll_pin_get(u64 clock_id, u32 pin_idx, struct
+>>>>>module
+>>>>>*module,
+>>>>>                    pos->pin_idx == pin_idx &&
+>>>>>                    pos->module == module) {
+>>>>>                        ret = pos;
+>>>>>+                       pos->prop = prop;
+>>>>>                        refcount_inc(&ret->refcount);
+>>>>>                        break;
+>>>>>                }
+>>>>>
+>>>>>would replace whole of this patch changes, although seems a bit hacky.
+>>>>
+>>>>Or event better, as I suggested in the other patch reply, resolve this
+>>>>internally in the driver registering things only when they are valid.
+>>>>Much better then to hack anything in dpll core.
+>>>>
+>>>
+>>>This approach seemed to me hacky, that is why started with coping the
+>>>data.
+>>>It is not about registering, rather about unregistering on driver
+>>>unbind, which brakes things, and currently cannot be recovered in
+>>>described case.
+>>
+>>Sure it can. PF0 unbind-> internal notification-> PF1 unregisters all
+>>related object. Very clean and simple.
+>>
+>
+>What you are suggesting is:
+>- special purpose bus in the driver,
 
-Yes, Maxime, I agree with this solution, the name 10G-QXGMII is exactly
-the working mode of qca8084 quad phy mode.
+No, it is a simple notificator. Very common infra over the whole
+kernel code.
 
-> 
-> Also, net-next is still currently closed.
 
-Ok, thanks for this reminder.
+>- dpll-related,
+
+Is this the only thing that PF0 is special with? Perhaps you can
+utilize this for other features as well, since your fw design is like
+this.
+
+
+>- not needed,
+>- prone for errors.
+>
+>The dpll subsystem is here to make driver life easier.
+
+No, the subsystem is never here to handle device specific issues. And
+your PF0 dependency is very clearly something device specific. Don't
+pollute the dpll subsystem with workaround to handle specific device
+needs. create/register the dplls objects from your driver only when it
+is valid to do so. Make sure the lifetime of such object stays in
+the scope of validity. Handle that in the driver. Very clear and simple.
+
+Thanks!
+
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>>
+>>>Thank you!
+>>>Arkadiusz
+>>>
+>>>>
+>>>>>
+>>>>>Thank you!
+>>>>>Arkadiusz
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>>Thank you!
+>>>>>>>Arkadiusz
+>>>>>>>
+>>>>>>>>
+>>>>>>>>> 	refcount_set(&pin->refcount, 1);
+>>>>>>>>> 	xa_init_flags(&pin->dpll_refs, XA_FLAGS_ALLOC);
+>>>>>>>>> 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+>>>>>>>>>@@ -634,7 +634,7 @@ int dpll_pin_on_pin_register(struct dpll_pin
+>>>>>>>>>*parent,
+>>>>>>>>>struct dpll_pin *pin,
+>>>>>>>>> 	unsigned long i, stop;
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>>-	if (WARN_ON(parent->prop->type != DPLL_PIN_TYPE_MUX))
+>>>>>>>>>+	if (WARN_ON(parent->prop.type != DPLL_PIN_TYPE_MUX))
+>>>>>>>>> 		return -EINVAL;
+>>>>>>>>>
+>>>>>>>>> 	if (WARN_ON(!ops) ||
+>>>>>>>>>diff --git a/drivers/dpll/dpll_core.h b/drivers/dpll/dpll_core.h
+>>>>>>>>>index 5585873c5c1b..717f715015c7 100644
+>>>>>>>>>--- a/drivers/dpll/dpll_core.h
+>>>>>>>>>+++ b/drivers/dpll/dpll_core.h
+>>>>>>>>>@@ -44,7 +44,7 @@ struct dpll_device {
+>>>>>>>>>  * @module:		module of creator
+>>>>>>>>>  * @dpll_refs:		hold referencees to dplls pin was registered
+>>>>>>>>>with
+>>>>>>>>>  * @parent_refs:	hold references to parent pins pin was
+>>registered
+>>>>>>>>>with
+>>>>>>>>>- * @prop:		pointer to pin properties given by registerer
+>>>>>>>>>+ * @prop:		pin properties copied from the registerer
+>>>>>>>>>  * @rclk_dev_name:	holds name of device when pin can recover
+>>>>>>>>>clock
+>>>>>>>>>from it
+>>>>>>>>>  * @refcount:		refcount
+>>>>>>>>>  **/
+>>>>>>>>>@@ -55,7 +55,7 @@ struct dpll_pin {
+>>>>>>>>> 	struct module *module;
+>>>>>>>>> 	struct xarray dpll_refs;
+>>>>>>>>> 	struct xarray parent_refs;
+>>>>>>>>>-	const struct dpll_pin_properties *prop;
+>>>>>>>>>+	struct dpll_pin_properties prop;
+>>>>>>>>> 	refcount_t refcount;
+>>>>>>>>> };
+>>>>>>>>>
+>>>>>>>>>diff --git a/drivers/dpll/dpll_netlink.c
+>>b/drivers/dpll/dpll_netlink.c
+>>>>>>>>>index 93fc6c4b8a78..963bbbbe6660 100644
+>>>>>>>>>--- a/drivers/dpll/dpll_netlink.c
+>>>>>>>>>+++ b/drivers/dpll/dpll_netlink.c
+>>>>>>>>>@@ -278,17 +278,17 @@ dpll_msg_add_pin_freq(struct sk_buff *msg,
+>>>>>>>>>struct
+>>>>>>>>>dpll_pin *pin,
+>>>>>>>>> 	if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY, sizeof(freq),
+>>>>>>>>>&freq,
+>>>>>>>>> 			  DPLL_A_PIN_PAD))
+>>>>>>>>> 		return -EMSGSIZE;
+>>>>>>>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++) {
+>>>>>>>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++) {
+>>>>>>>>> 		nest = nla_nest_start(msg,
+>>>>>>>>>DPLL_A_PIN_FREQUENCY_SUPPORTED);
+>>>>>>>>> 		if (!nest)
+>>>>>>>>> 			return -EMSGSIZE;
+>>>>>>>>>-		freq = pin->prop->freq_supported[fs].min;
+>>>>>>>>>+		freq = pin->prop.freq_supported[fs].min;
+>>>>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN,
+>>>>>>>>>sizeof(freq),
+>>>>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>>>>>>>> 			nla_nest_cancel(msg, nest);
+>>>>>>>>> 			return -EMSGSIZE;
+>>>>>>>>> 		}
+>>>>>>>>>-		freq = pin->prop->freq_supported[fs].max;
+>>>>>>>>>+		freq = pin->prop.freq_supported[fs].max;
+>>>>>>>>> 		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX,
+>>>>>>>>>sizeof(freq),
+>>>>>>>>> 				  &freq, DPLL_A_PIN_PAD)) {
+>>>>>>>>> 			nla_nest_cancel(msg, nest);
+>>>>>>>>>@@ -304,9 +304,9 @@ static bool dpll_pin_is_freq_supported(struct
+>>>>>>>>>dpll_pin
+>>>>>>>>>*pin, u32 freq)
+>>>>>>>>> {
+>>>>>>>>> 	int fs;
+>>>>>>>>>
+>>>>>>>>>-	for (fs = 0; fs < pin->prop->freq_supported_num; fs++)
+>>>>>>>>>-		if (freq >= pin->prop->freq_supported[fs].min &&
+>>>>>>>>>-		    freq <= pin->prop->freq_supported[fs].max)
+>>>>>>>>>+	for (fs = 0; fs < pin->prop.freq_supported_num; fs++)
+>>>>>>>>>+		if (freq >= pin->prop.freq_supported[fs].min &&
+>>>>>>>>>+		    freq <= pin->prop.freq_supported[fs].max)
+>>>>>>>>> 			return true;
+>>>>>>>>> 	return false;
+>>>>>>>>> }
+>>>>>>>>>@@ -403,7 +403,7 @@ static int
+>>>>>>>>> dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
+>>>>>>>>> 		     struct netlink_ext_ack *extack)
+>>>>>>>>> {
+>>>>>>>>>-	const struct dpll_pin_properties *prop = pin->prop;
+>>>>>>>>>+	const struct dpll_pin_properties *prop = &pin->prop;
+>>>>>>>>> 	struct dpll_pin_ref *ref;
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>>@@ -696,7 +696,7 @@ dpll_pin_on_pin_state_set(struct dpll_pin *pin,
+>>>>>>>>>u32
+>>>>>>>>>parent_idx,
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>>>>+	      pin->prop.capabilities)) {
+>>>>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>>>>>>>> 		return -EOPNOTSUPP;
+>>>>>>>>> 	}
+>>>>>>>>>@@ -732,7 +732,7 @@ dpll_pin_state_set(struct dpll_device *dpll,
+>>>>>>>>>struct
+>>>>>>>>>dpll_pin *pin,
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_STATE_CAN_CHANGE &
+>>>>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>>>>+	      pin->prop.capabilities)) {
+>>>>>>>>> 		NL_SET_ERR_MSG(extack, "state changing is not allowed");
+>>>>>>>>> 		return -EOPNOTSUPP;
+>>>>>>>>> 	}
+>>>>>>>>>@@ -759,7 +759,7 @@ dpll_pin_prio_set(struct dpll_device *dpll,
+>>struct
+>>>>>>>>>dpll_pin *pin,
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_PRIORITY_CAN_CHANGE &
+>>>>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>>>>+	      pin->prop.capabilities)) {
+>>>>>>>>> 		NL_SET_ERR_MSG(extack, "prio changing is not allowed");
+>>>>>>>>> 		return -EOPNOTSUPP;
+>>>>>>>>> 	}
+>>>>>>>>>@@ -787,7 +787,7 @@ dpll_pin_direction_set(struct dpll_pin *pin,
+>>>>>>>>>struct
+>>>>>>>>>dpll_device *dpll,
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>> 	if (!(DPLL_PIN_CAPABILITIES_DIRECTION_CAN_CHANGE &
+>>>>>>>>>-	      pin->prop->capabilities)) {
+>>>>>>>>>+	      pin->prop.capabilities)) {
+>>>>>>>>> 		NL_SET_ERR_MSG(extack, "direction changing is not
+>>>>>>>>>allowed");
+>>>>>>>>> 		return -EOPNOTSUPP;
+>>>>>>>>> 	}
+>>>>>>>>>@@ -817,8 +817,8 @@ dpll_pin_phase_adj_set(struct dpll_pin *pin,
+>>>>>>>>>struct
+>>>>>>>>>nlattr *phase_adj_attr,
+>>>>>>>>> 	int ret;
+>>>>>>>>>
+>>>>>>>>> 	phase_adj = nla_get_s32(phase_adj_attr);
+>>>>>>>>>-	if (phase_adj > pin->prop->phase_range.max ||
+>>>>>>>>>-	    phase_adj < pin->prop->phase_range.min) {
+>>>>>>>>>+	if (phase_adj > pin->prop.phase_range.max ||
+>>>>>>>>>+	    phase_adj < pin->prop.phase_range.min) {
+>>>>>>>>> 		NL_SET_ERR_MSG_ATTR(extack, phase_adj_attr,
+>>>>>>>>> 				    "phase adjust value not supported");
+>>>>>>>>> 		return -EINVAL;
+>>>>>>>>>@@ -999,7 +999,7 @@ dpll_pin_find(u64 clock_id, struct nlattr
+>>>>>>>>>*mod_name_attr,
+>>>>>>>>> 	unsigned long i;
+>>>>>>>>>
+>>>>>>>>> 	xa_for_each_marked(&dpll_pin_xa, i, pin, DPLL_REGISTERED) {
+>>>>>>>>>-		prop = pin->prop;
+>>>>>>>>>+		prop = &pin->prop;
+>>>>>>>>> 		cid_match = clock_id ? pin->clock_id == clock_id : true;
+>>>>>>>>> 		mod_match = mod_name_attr && module_name(pin->module) ?
+>>>>>>>>> 			!nla_strcmp(mod_name_attr,
+>>>>>>>>>--
+>>>>>>>>>2.38.1
+>>>>>>>>>
+>>>>>>>
+>>>
 
