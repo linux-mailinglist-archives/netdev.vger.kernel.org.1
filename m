@@ -1,193 +1,188 @@
-Return-Path: <netdev+bounces-46999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F7B7E791F
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:18:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2FCF7E793C
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBF7A281766
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:18:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927F21C20D1B
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC4A53AB;
-	Fri, 10 Nov 2023 06:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Hg/4hJj5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DCFE63BB;
+	Fri, 10 Nov 2023 06:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3580C525C
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:18:38 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9651A5FFD
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:18:36 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cc5b7057d5so15329875ad.2
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:18:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1699597115; x=1700201915; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/UY2V4KB781XJBY0gcAuxuyVl/cjuGIjQ/iARGJ/tjI=;
-        b=Hg/4hJj5QNNuzuRv3Ov7/OGPiaHUAJ9hCWpSmqLWbSvtcwgdNc+5z8LdOkkrujpVQw
-         TXnqKgWFeGV9Dc3ufJhR9SqyzGNEkUE+8chIaEfrpf3RSWoQhnrrzpvGAWljQnAKrRur
-         1vFl24INUVnjuQ3UF10dsLGuXgajFyXJGPPfW9Au0XJGWsm4dWHR9l1ad4XbpkqRk+yq
-         9Pevp3sAzEeoQPsM/Jok3ILBlS4pEckp6rTcUs3AzQMCWy8CyCTgLKCWL45qpJbq1ok4
-         /582VCDHPLu0Rtj29RMmUqoi3XQ6NQM3e0HrcHAUr8tArExMr/ZU2fc0BUuMb16hZBkt
-         pExA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699597115; x=1700201915;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/UY2V4KB781XJBY0gcAuxuyVl/cjuGIjQ/iARGJ/tjI=;
-        b=FZO6oHWDJLUdNiyl0uhZ39R7LPtPXqKACjNG+FJ2qW5+bEQ46mZBNSxYVy4LwyWI7O
-         uFJ6anGvDv7Qn21CtnYbfCQWcYF9X+W+SALNIR11c8msASMwRQ8wP2QDcPB5Rb02LcHA
-         a2UarXfk6DQLYrVr+3PqVtYqRr807KNAegUmtnw8ufRZ3BUop3GDtf8Um3qMmuZ06D/+
-         nPbYXNvBUOfBGwCncXiZMlmEezQkESMY8t5+1694NQirduJqQQwXKSzqU5NmzMAuIHgi
-         GdqcYP+q1Um6rw03AYjWsKek6z9ybdMu+lUYInqyj9yPoFt/curmEdibkKHcig53O+N+
-         EQmQ==
-X-Gm-Message-State: AOJu0YzKAPJpQoi436QcVRv41BOhHxIl9e+jT7t4BUsBRSdsv/nr3f0R
-	3rQK8OpWAj/bk8sPDYtllZrwparw7h6/1ebsr9asbg==
-X-Google-Smtp-Source: AGHT+IGWU16myJ7R/xYuGXrXNuN5gAZCZelV+4O+aHR2KdVzrrm6cHrsV5Oc9A6wX98LyUQch0USsw==
-X-Received: by 2002:ad4:4ea1:0:b0:66d:6af7:4571 with SMTP id ed1-20020ad44ea1000000b0066d6af74571mr8513666qvb.17.1699595366906;
-        Thu, 09 Nov 2023 21:49:26 -0800 (PST)
-Received: from debian.debian ([140.141.197.139])
-        by smtp.gmail.com with ESMTPSA id w9-20020ae9e509000000b00765ab6d3e81sm468753qkf.122.2023.11.09.21.49.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Nov 2023 21:49:26 -0800 (PST)
-Date: Thu, 9 Nov 2023 21:49:24 -0800
-From: Yan Zhai <yan@cloudflare.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Weongyo Jeong <weongyo.linux@gmail.com>,
-	Ivan Babrou <ivan@cloudflare.com>, David Ahern <dsahern@kernel.org>,
-	Jesper Brouer <jesper@cloudflare.com>, linux-kernel@vger.kernel.org,
-	kernel-team@cloudflare.com
-Subject: [PATCH net-next] packet: add a generic drop reason for receive
-Message-ID: <ZU3EZKQ3dyLE6T8z@debian.debian>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C4163A8;
+	Fri, 10 Nov 2023 06:24:11 +0000 (UTC)
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585436F82;
+	Thu,  9 Nov 2023 22:24:09 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vw3KEoX_1699595461;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw3KEoX_1699595461)
+          by smtp.aliyun-inc.com;
+          Fri, 10 Nov 2023 13:51:02 +0800
+Message-ID: <1699595409.9489238-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 14/21] virtio_net: xsk: tx: virtnet_free_old_xmit() distinguishes xsk buffer
+Date: Fri, 10 Nov 2023 13:50:09 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux-foundation.org,
+ bpf@vger.kernel.org
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-15-xuanzhuo@linux.alibaba.com>
+ <20231109061056-mutt-send-email-mst@kernel.org>
+ <1699528568.0674586-6-xuanzhuo@linux.alibaba.com>
+ <20231109065912-mutt-send-email-mst@kernel.org>
+ <1699580672.387567-1-xuanzhuo@linux.alibaba.com>
+ <20231110003159-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20231110003159-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Commit da37845fdce2 ("packet: uses kfree_skb() for errors.") switches
-from consume_skb to kfree_skb to improve error handling. However, this
-could bring a lot of noises when we monitor real packet drops in
-kfree_skb[1], because in tpacket_rcv or packet_rcv only packet clones
-can be freed, not actual packets.
+On Fri, 10 Nov 2023 00:32:50 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Fri, Nov 10, 2023 at 09:44:32AM +0800, Xuan Zhuo wrote:
+> > On Thu, 9 Nov 2023 06:59:48 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Thu, Nov 09, 2023 at 07:16:08PM +0800, Xuan Zhuo wrote:
+> > > > On Thu, 9 Nov 2023 06:11:49 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > On Tue, Nov 07, 2023 at 11:12:20AM +0800, Xuan Zhuo wrote:
+> > > > > > virtnet_free_old_xmit distinguishes three type ptr(skb, xdp frame, xsk
+> > > > > > buffer) by the last bits of the pointer.
+> > > > > >
+> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > ---
+> > > > > >  drivers/net/virtio/virtio_net.h | 18 ++++++++++++++++--
+> > > > > >  drivers/net/virtio/xsk.h        |  5 +++++
+> > > > > >  2 files changed, 21 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/net/virtio/virtio_net.h b/drivers/net/virtio/virtio_net.h
+> > > > > > index a431a2c1ee47..a13d6d301fdb 100644
+> > > > > > --- a/drivers/net/virtio/virtio_net.h
+> > > > > > +++ b/drivers/net/virtio/virtio_net.h
+> > > > > > @@ -225,6 +225,11 @@ struct virtnet_info {
+> > > > > >  	struct failover *failover;
+> > > > > >  };
+> > > > > >
+> > > > > > +static inline bool virtnet_is_skb_ptr(void *ptr)
+> > > > > > +{
+> > > > > > +	return !((unsigned long)ptr & VIRTIO_XMIT_DATA_MASK);
+> > > > > > +}
+> > > > > > +
+> > > > > >  static inline bool virtnet_is_xdp_frame(void *ptr)
+> > > > > >  {
+> > > > > >  	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
+> > > > > > @@ -235,6 +240,8 @@ static inline struct xdp_frame *virtnet_ptr_to_xdp(void *ptr)
+> > > > > >  	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline u32 virtnet_ptr_to_xsk(void *ptr);
+> > > > > > +
+> > > > >
+> > > > > I don't understand why you need this here.
+> > > >
+> > > > The below function virtnet_free_old_xmit needs this.
+> > > >
+> > > > Thanks.
+> > >
+> > > I don't understand why is virtnet_free_old_xmit inline, either.
+> >
+> > That is in the header file.
+> >
+>
+> It does not belong there.
 
-Adding a generic drop reason to allow distinguish these "clone drops".
 
-[1]: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=Zah28QwZ_5RU-xcxLFUK2Zj08A8MrLk9jzg@mail.gmail.com/
-Fixes: da37845fdce2 ("packet: uses kfree_skb() for errors.")
-Signed-off-by: Yan Zhai <yan@cloudflare.com>
----
- include/net/dropreason-core.h |  6 ++++++
- net/packet/af_packet.c        | 16 +++++++++++++---
- 2 files changed, 19 insertions(+), 3 deletions(-)
+Do you mean virtnet_free_old_xmit?
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 845dce805de7..6ff543fe8a8b 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -81,6 +81,7 @@
- 	FN(IPV6_NDISC_NS_OTHERHOST)	\
- 	FN(QUEUE_PURGE)			\
- 	FN(TC_ERROR)			\
-+	FN(PACKET_SOCK_ERROR)		\
- 	FNe(MAX)
- 
- /**
-@@ -348,6 +349,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_QUEUE_PURGE,
- 	/** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
- 	SKB_DROP_REASON_TC_ERROR,
-+	/**
-+	 * @SKB_DROP_REASON_PACKET_SOCK_ERROR: generic packet socket errors
-+	 * after its filter matches an incoming packet.
-+	 */
-+	SKB_DROP_REASON_PACKET_SOCK_ERROR,
- 	/**
- 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index a84e00b5904b..94b8a9d8e038 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -2128,6 +2128,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
- 	int skb_len = skb->len;
- 	unsigned int snaplen, res;
- 	bool is_drop_n_account = false;
-+	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 
- 	if (skb->pkt_type == PACKET_LOOPBACK)
- 		goto drop;
-@@ -2161,6 +2162,10 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
- 	res = run_filter(skb, sk, snaplen);
- 	if (!res)
- 		goto drop_n_restore;
-+
-+	/* skb will only be "consumed" not "dropped" before this */
-+	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
-+
- 	if (snaplen > res)
- 		snaplen = res;
- 
-@@ -2230,7 +2235,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (!is_drop_n_account)
- 		consume_skb(skb);
- 	else
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, drop_reason);
- 	return 0;
- }
- 
-@@ -2253,6 +2258,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
- 	bool is_drop_n_account = false;
- 	unsigned int slot_id = 0;
- 	int vnet_hdr_sz = 0;
-+	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 
- 	/* struct tpacket{2,3}_hdr is aligned to a multiple of TPACKET_ALIGNMENT.
- 	 * We may add members to them until current aligned size without forcing
-@@ -2355,6 +2361,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
- 			vnet_hdr_sz = 0;
- 		}
- 	}
-+
-+	/* skb will only be "consumed" not "dropped" before this */
-+	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
-+
- 	spin_lock(&sk->sk_receive_queue.lock);
- 	h.raw = packet_current_rx_frame(po, skb,
- 					TP_STATUS_KERNEL, (macoff+snaplen));
-@@ -2501,7 +2511,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
- 	if (!is_drop_n_account)
- 		consume_skb(skb);
- 	else
--		kfree_skb(skb);
-+		kfree_skb_reason(skb, drop_reason);
- 	return 0;
- 
- drop_n_account:
-@@ -2510,7 +2520,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
- 	is_drop_n_account = true;
- 
- 	sk->sk_data_ready(sk);
--	kfree_skb(copy_skb);
-+	kfree_skb_reason(copy_skb, drop_reason);
- 	goto drop_n_restore;
- }
- 
--- 
-2.30.2
+That will be called by xsk.c. So I move it to the header file.
 
+Thanks.
+
+
+>
+>
+> > >
+> > > > >
+> > > > >
+> > > > > >  static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
+> > > > > >  {
+> > > > > >  	struct virtnet_sq_dma *next, *head;
+> > > > > > @@ -261,11 +268,12 @@ static inline void *virtnet_sq_unmap(struct virtnet_sq *sq, void *data)
+> > > > > >  static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+> > > > > >  					 u64 *bytes, u64 *packets)
+> > > > > >  {
+> > > > > > +	unsigned int xsknum = 0;
+> > > > > >  	unsigned int len;
+> > > > > >  	void *ptr;
+> > > > > >
+> > > > > >  	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+> > > > > > -		if (!virtnet_is_xdp_frame(ptr)) {
+> > > > > > +		if (virtnet_is_skb_ptr(ptr)) {
+> > > > > >  			struct sk_buff *skb;
+> > > > > >
+> > > > > >  			if (sq->do_dma)
+> > > > > > @@ -277,7 +285,7 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+> > > > > >
+> > > > > >  			*bytes += skb->len;
+> > > > > >  			napi_consume_skb(skb, in_napi);
+> > > > > > -		} else {
+> > > > > > +		} else if (virtnet_is_xdp_frame(ptr)) {
+> > > > > >  			struct xdp_frame *frame;
+> > > > > >
+> > > > > >  			if (sq->do_dma)
+> > > > > > @@ -287,9 +295,15 @@ static inline void virtnet_free_old_xmit(struct virtnet_sq *sq, bool in_napi,
+> > > > > >
+> > > > > >  			*bytes += xdp_get_frame_len(frame);
+> > > > > >  			xdp_return_frame(frame);
+> > > > > > +		} else {
+> > > > > > +			*bytes += virtnet_ptr_to_xsk(ptr);
+> > > > > > +			++xsknum;
+> > > > > >  		}
+> > > > > >  		(*packets)++;
+> > > > > >  	}
+> > > > > > +
+> > > > > > +	if (xsknum)
+> > > > > > +		xsk_tx_completed(sq->xsk.pool, xsknum);
+> > > > > >  }
+> > > > > >
+> > > > > >  static inline bool virtnet_is_xdp_raw_buffer_queue(struct virtnet_info *vi, int q)
+> > > > > > diff --git a/drivers/net/virtio/xsk.h b/drivers/net/virtio/xsk.h
+> > > > > > index 1bd19dcda649..7ebc9bda7aee 100644
+> > > > > > --- a/drivers/net/virtio/xsk.h
+> > > > > > +++ b/drivers/net/virtio/xsk.h
+> > > > > > @@ -14,6 +14,11 @@ static inline void *virtnet_xsk_to_ptr(u32 len)
+> > > > > >  	return (void *)(p | VIRTIO_XSK_FLAG);
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline u32 virtnet_ptr_to_xsk(void *ptr)
+> > > > > > +{
+> > > > > > +	return ((unsigned long)ptr) >> VIRTIO_XSK_FLAG_OFFSET;
+> > > > > > +}
+> > > > > > +
+> > > > > >  int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp);
+> > > > > >  bool virtnet_xsk_xmit(struct virtnet_sq *sq, struct xsk_buff_pool *pool,
+> > > > > >  		      int budget);
+> > > > > > --
+> > > > > > 2.32.0.3.g01195cf9f
+> > > > >
+> > > > >
+> > >
+>
 
