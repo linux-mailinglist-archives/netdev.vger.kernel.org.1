@@ -1,214 +1,193 @@
-Return-Path: <netdev+bounces-47003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-46999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4BCD7E7934
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:22:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F7B7E791F
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:18:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DDD91C20D2A
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:22:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBF7A281766
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A9D6131;
-	Fri, 10 Nov 2023 06:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC4A53AB;
+	Fri, 10 Nov 2023 06:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Hg/4hJj5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523405693
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:22:34 +0000 (UTC)
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32E76E98
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:22:31 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R911e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0Vw3QqTU_1699595359;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vw3QqTU_1699595359)
-          by smtp.aliyun-inc.com;
-          Fri, 10 Nov 2023 13:49:20 +0800
-Message-ID: <1699595064.2429245-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net] virtio_net: fix missing dma unmap for resize
-Date: Fri, 10 Nov 2023 13:44:24 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux-foundation.org
-References: <20231106081832.668-1-xuanzhuo@linux.alibaba.com>
- <20231109070359-mutt-send-email-mst@kernel.org>
- <1699581525.5133314-4-xuanzhuo@linux.alibaba.com>
- <20231110003406-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20231110003406-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3580C525C
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:18:38 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9651A5FFD
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:18:36 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1cc5b7057d5so15329875ad.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:18:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1699597115; x=1700201915; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/UY2V4KB781XJBY0gcAuxuyVl/cjuGIjQ/iARGJ/tjI=;
+        b=Hg/4hJj5QNNuzuRv3Ov7/OGPiaHUAJ9hCWpSmqLWbSvtcwgdNc+5z8LdOkkrujpVQw
+         TXnqKgWFeGV9Dc3ufJhR9SqyzGNEkUE+8chIaEfrpf3RSWoQhnrrzpvGAWljQnAKrRur
+         1vFl24INUVnjuQ3UF10dsLGuXgajFyXJGPPfW9Au0XJGWsm4dWHR9l1ad4XbpkqRk+yq
+         9Pevp3sAzEeoQPsM/Jok3ILBlS4pEckp6rTcUs3AzQMCWy8CyCTgLKCWL45qpJbq1ok4
+         /582VCDHPLu0Rtj29RMmUqoi3XQ6NQM3e0HrcHAUr8tArExMr/ZU2fc0BUuMb16hZBkt
+         pExA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699597115; x=1700201915;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/UY2V4KB781XJBY0gcAuxuyVl/cjuGIjQ/iARGJ/tjI=;
+        b=FZO6oHWDJLUdNiyl0uhZ39R7LPtPXqKACjNG+FJ2qW5+bEQ46mZBNSxYVy4LwyWI7O
+         uFJ6anGvDv7Qn21CtnYbfCQWcYF9X+W+SALNIR11c8msASMwRQ8wP2QDcPB5Rb02LcHA
+         a2UarXfk6DQLYrVr+3PqVtYqRr807KNAegUmtnw8ufRZ3BUop3GDtf8Um3qMmuZ06D/+
+         nPbYXNvBUOfBGwCncXiZMlmEezQkESMY8t5+1694NQirduJqQQwXKSzqU5NmzMAuIHgi
+         GdqcYP+q1Um6rw03AYjWsKek6z9ybdMu+lUYInqyj9yPoFt/curmEdibkKHcig53O+N+
+         EQmQ==
+X-Gm-Message-State: AOJu0YzKAPJpQoi436QcVRv41BOhHxIl9e+jT7t4BUsBRSdsv/nr3f0R
+	3rQK8OpWAj/bk8sPDYtllZrwparw7h6/1ebsr9asbg==
+X-Google-Smtp-Source: AGHT+IGWU16myJ7R/xYuGXrXNuN5gAZCZelV+4O+aHR2KdVzrrm6cHrsV5Oc9A6wX98LyUQch0USsw==
+X-Received: by 2002:ad4:4ea1:0:b0:66d:6af7:4571 with SMTP id ed1-20020ad44ea1000000b0066d6af74571mr8513666qvb.17.1699595366906;
+        Thu, 09 Nov 2023 21:49:26 -0800 (PST)
+Received: from debian.debian ([140.141.197.139])
+        by smtp.gmail.com with ESMTPSA id w9-20020ae9e509000000b00765ab6d3e81sm468753qkf.122.2023.11.09.21.49.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Nov 2023 21:49:26 -0800 (PST)
+Date: Thu, 9 Nov 2023 21:49:24 -0800
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Weongyo Jeong <weongyo.linux@gmail.com>,
+	Ivan Babrou <ivan@cloudflare.com>, David Ahern <dsahern@kernel.org>,
+	Jesper Brouer <jesper@cloudflare.com>, linux-kernel@vger.kernel.org,
+	kernel-team@cloudflare.com
+Subject: [PATCH net-next] packet: add a generic drop reason for receive
+Message-ID: <ZU3EZKQ3dyLE6T8z@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Fri, 10 Nov 2023 00:37:32 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Fri, Nov 10, 2023 at 09:58:45AM +0800, Xuan Zhuo wrote:
-> > On Thu, 9 Nov 2023 07:06:16 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > On Mon, Nov 06, 2023 at 04:18:32PM +0800, Xuan Zhuo wrote:
-> > > > For rq, we have three cases getting buffers from virtio core:
-> > > >
-> > > > 1. virtqueue_get_buf{,_ctx}
-> > > > 2. virtqueue_detach_unused_buf
-> > > > 3. callback for virtqueue_resize
-> > > >
-> > > > But in commit 295525e29a5b("virtio_net: merge dma operations when
-> > > > filling mergeable buffers"), I missed the dma unmap for the #3 case.
-> > > >
-> > > > That will leak some memory, because I did not release the pages referred
-> > > > by the unused buffers.
-> > > >
-> > > > If we do such script, we will make the system OOM.
-> > > >
-> > > >     while true
-> > > >     do
-> > > >             ethtool -G ens4 rx 128
-> > > >             ethtool -G ens4 rx 256
-> > > >             free -m
-> > > >     done
-> > > >
-> > > > Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 43 ++++++++++++++++++++--------------------
-> > > >  1 file changed, 22 insertions(+), 21 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index d16f592c2061..6423a3a007ce 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -408,6 +408,17 @@ static struct page *get_a_page(struct receive_queue *rq, gfp_t gfp_mask)
-> > > >  	return p;
-> > > >  }
-> > > >
-> > > > +static void virtnet_rq_free_buf(struct virtnet_info *vi,
-> > > > +				struct receive_queue *rq, void *buf)
-> > > > +{
-> > > > +	if (vi->mergeable_rx_bufs)
-> > > > +		put_page(virt_to_head_page(buf));
-> > > > +	else if (vi->big_packets)
-> > > > +		give_pages(rq, buf);
-> > > > +	else
-> > > > +		put_page(virt_to_head_page(buf));
-> > > > +}
-> > > > +
-> > >
-> > > >  static void enable_delayed_refill(struct virtnet_info *vi)
-> > > >  {
-> > > >  	spin_lock_bh(&vi->refill_lock);
-> > > > @@ -634,17 +645,6 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
-> > > >  	return buf;
-> > > >  }
-> > > >
-> > > > -static void *virtnet_rq_detach_unused_buf(struct receive_queue *rq)
-> > > > -{
-> > > > -	void *buf;
-> > > > -
-> > > > -	buf = virtqueue_detach_unused_buf(rq->vq);
-> > > > -	if (buf && rq->do_dma)
-> > > > -		virtnet_rq_unmap(rq, buf, 0);
-> > > > -
-> > > > -	return buf;
-> > > > -}
-> > > > -
-> > > >  static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
-> > > >  {
-> > > >  	struct virtnet_rq_dma *dma;
-> > > > @@ -1764,7 +1764,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
-> > > >  	if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-> > > >  		pr_debug("%s: short packet %i\n", dev->name, len);
-> > > >  		DEV_STATS_INC(dev, rx_length_errors);
-> > > > -		virtnet_rq_free_unused_buf(rq->vq, buf);
-> > > > +		virtnet_rq_free_buf(vi, rq, buf);
-> > > >  		return;
-> > > >  	}
-> > > >
-> > > > @@ -4034,14 +4034,15 @@ static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > > >  static void virtnet_rq_free_unused_buf(struct virtqueue *vq, void *buf)
-> > > >  {
-> > > >  	struct virtnet_info *vi = vq->vdev->priv;
-> > > > +	struct receive_queue *rq;
-> > > >  	int i = vq2rxq(vq);
-> > > >
-> > > > -	if (vi->mergeable_rx_bufs)
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > -	else if (vi->big_packets)
-> > > > -		give_pages(&vi->rq[i], buf);
-> > > > -	else
-> > > > -		put_page(virt_to_head_page(buf));
-> > > > +	rq = &vi->rq[i];
-> > > > +
-> > > > +	if (rq->do_dma)
-> > > > +		virtnet_rq_unmap(rq, buf, 0);
-> > > > +
-> > > > +	virtnet_rq_free_buf(vi, rq, buf);
-> > > >  }
-> > > >
-> > >
-> > > So we have virtnet_rq_free_buf which sounds like it should free any
-> > > buf, and we have virtnet_rq_free_unused_buf which is only for unused.
-> > > Or so it would seem from names but this is not true.
-> > > Better function names?
-> >
-> > Sorry. not get it.
-> >
-> > virtnet_rq_free_buf() that free the buf passed in. That is called by
-> > virtnet_rq_free_unused_buf or receive_buf to free the buffer. I think
-> > the name is right.
-> >
-> > virtnet_rq_free_unused_buf is called by free_unused_bufs() and the
-> > virtqueue_resize() to free the unused bufs. I think this name is right also.
-> >
-> > So I do not get your mean.
-> > Are there any details I've overlooked?
-> >
-> > Thanks.
->
-> Bad function names - they are too similar. Function name should
-> say what it does not where it's called from.
-> What is the difference? That virtnet_rq_free_unused_buf unmaps
-> and frees and virtnet_rq_free_buf just frees memory?
+Commit da37845fdce2 ("packet: uses kfree_skb() for errors.") switches
+from consume_skb to kfree_skb to improve error handling. However, this
+could bring a lot of noises when we monitor real packet drops in
+kfree_skb[1], because in tpacket_rcv or packet_rcv only packet clones
+can be freed, not actual packets.
 
-Yes. virtnet_rq_free_buf frees memory.
+Adding a generic drop reason to allow distinguish these "clone drops".
 
-For this patch, I think virtnet_rq_free_buf is ok.
-virtnet_rq_free_buf is as your request.
-virtnet_rq_free_unused_buf is named as it want to do. Or as you said.
-Indeed these are similar.
+[1]: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=Zah28QwZ_5RU-xcxLFUK2Zj08A8MrLk9jzg@mail.gmail.com/
+Fixes: da37845fdce2 ("packet: uses kfree_skb() for errors.")
+Signed-off-by: Yan Zhai <yan@cloudflare.com>
+---
+ include/net/dropreason-core.h |  6 ++++++
+ net/packet/af_packet.c        | 16 +++++++++++++---
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-Could you give some advices?
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 845dce805de7..6ff543fe8a8b 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -81,6 +81,7 @@
+ 	FN(IPV6_NDISC_NS_OTHERHOST)	\
+ 	FN(QUEUE_PURGE)			\
+ 	FN(TC_ERROR)			\
++	FN(PACKET_SOCK_ERROR)		\
+ 	FNe(MAX)
+ 
+ /**
+@@ -348,6 +349,11 @@ enum skb_drop_reason {
+ 	SKB_DROP_REASON_QUEUE_PURGE,
+ 	/** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
+ 	SKB_DROP_REASON_TC_ERROR,
++	/**
++	 * @SKB_DROP_REASON_PACKET_SOCK_ERROR: generic packet socket errors
++	 * after its filter matches an incoming packet.
++	 */
++	SKB_DROP_REASON_PACKET_SOCK_ERROR,
+ 	/**
+ 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
+ 	 * shouldn't be used as a real 'reason' - only for tracing code gen
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index a84e00b5904b..94b8a9d8e038 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2128,6 +2128,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	int skb_len = skb->len;
+ 	unsigned int snaplen, res;
+ 	bool is_drop_n_account = false;
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 
+ 	if (skb->pkt_type == PACKET_LOOPBACK)
+ 		goto drop;
+@@ -2161,6 +2162,10 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	res = run_filter(skb, sk, snaplen);
+ 	if (!res)
+ 		goto drop_n_restore;
++
++	/* skb will only be "consumed" not "dropped" before this */
++	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
++
+ 	if (snaplen > res)
+ 		snaplen = res;
+ 
+@@ -2230,7 +2235,7 @@ static int packet_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (!is_drop_n_account)
+ 		consume_skb(skb);
+ 	else
+-		kfree_skb(skb);
++		kfree_skb_reason(skb, drop_reason);
+ 	return 0;
+ }
+ 
+@@ -2253,6 +2258,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	bool is_drop_n_account = false;
+ 	unsigned int slot_id = 0;
+ 	int vnet_hdr_sz = 0;
++	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
+ 
+ 	/* struct tpacket{2,3}_hdr is aligned to a multiple of TPACKET_ALIGNMENT.
+ 	 * We may add members to them until current aligned size without forcing
+@@ -2355,6 +2361,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 			vnet_hdr_sz = 0;
+ 		}
+ 	}
++
++	/* skb will only be "consumed" not "dropped" before this */
++	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
++
+ 	spin_lock(&sk->sk_receive_queue.lock);
+ 	h.raw = packet_current_rx_frame(po, skb,
+ 					TP_STATUS_KERNEL, (macoff+snaplen));
+@@ -2501,7 +2511,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	if (!is_drop_n_account)
+ 		consume_skb(skb);
+ 	else
+-		kfree_skb(skb);
++		kfree_skb_reason(skb, drop_reason);
+ 	return 0;
+ 
+ drop_n_account:
+@@ -2510,7 +2520,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+ 	is_drop_n_account = true;
+ 
+ 	sk->sk_data_ready(sk);
+-	kfree_skb(copy_skb);
++	kfree_skb_reason(copy_skb, drop_reason);
+ 	goto drop_n_restore;
+ }
+ 
+-- 
+2.30.2
 
-Thanks.
-
-
-
->
->
-> > >
-> > > >  static void free_unused_bufs(struct virtnet_info *vi)
-> > > > @@ -4057,10 +4058,10 @@ static void free_unused_bufs(struct virtnet_info *vi)
-> > > >  	}
-> > > >
-> > > >  	for (i = 0; i < vi->max_queue_pairs; i++) {
-> > > > -		struct receive_queue *rq = &vi->rq[i];
-> > > > +		struct virtqueue *vq = vi->rq[i].vq;
-> > > >
-> > > > -		while ((buf = virtnet_rq_detach_unused_buf(rq)) != NULL)
-> > > > -			virtnet_rq_free_unused_buf(rq->vq, buf);
-> > > > +		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
-> > > > +			virtnet_rq_free_unused_buf(vq, buf);
-> > > >  		cond_resched();
-> > > >  	}
-> > > >  }
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
->
 
