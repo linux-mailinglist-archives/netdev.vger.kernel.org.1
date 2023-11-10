@@ -1,232 +1,209 @@
-Return-Path: <netdev+bounces-47116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2343B7E7D28
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:50:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7217E7D30
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 15:55:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF87BB20C30
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 14:50:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5549280D94
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 14:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8C01C286;
-	Fri, 10 Nov 2023 14:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A461C29B;
+	Fri, 10 Nov 2023 14:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRN8qqWN"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="OqJQvu1f"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73371BDF1
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 14:50:33 +0000 (UTC)
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6532339CDD
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:50:31 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-daf2eda7efaso454155276.0
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:50:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699627830; x=1700232630; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TdetoPi/fMl4CXLyGLeXpz69T5bIDCd3i84eo578Wj0=;
-        b=lRN8qqWNj8+KRgnVxuVci5MsE9+GTTh2IlyUQ5+Pl22BgOzSXmPehHfuUWzguWZL30
-         3XnA1W4LmAZTT4NVLZptRjj8JVpGpGTm+YyAk51I55rlNU7RCy5BVFSIyz2y+s0TgJbD
-         QcMOPNwgnD95Kp0FkzQWiI+zJfWRASnNTEO9sNvXkZ7BraF7yIYGHz0IsLAa1F3MSxzx
-         jrgJjhedH8+GJc6AKMBPFuQgzrUe/1OKkc9FiX1iaSrMQSRvE/WD2czbNsT0ldBBHUow
-         gV/bpaGzLI+xS+UJ1aqRH+lgzqr4ZirbNSdSWocw+VZos4P6srTURAE54O5I6GVWzB7d
-         dmHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699627830; x=1700232630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TdetoPi/fMl4CXLyGLeXpz69T5bIDCd3i84eo578Wj0=;
-        b=f5KHfw1MVA3QsHM3/1MLgm2zQS4P8wX+B9b1yk6Sf9qDNMSqKGdXw2qzrI7yVeF8Ag
-         GOOph2E+CiHuJzlLLHTVOs793YHI3+nUlqv4R7CmZM1BZX2CDYk5wUKBrgZB4HiN1pTL
-         rJin0m7SiFL74r3E/AmHfsVpigv++Apa8WVQjXb1PFb1pMNPl0pAfGymF0EB42Xr1V4I
-         ew9ImaeT5oFCcj4rHIztSYfNcsrefwniohZbhJjie8MYF8le3CmMkqm7Klij/CuOU6nT
-         pe6pnfkeoy7FAWozsFludvPgYca4ar4PJ7GpJ8qEu50vI+FUOPwKVTEY+yFp22Sx62tU
-         qHyw==
-X-Gm-Message-State: AOJu0Yyokexjuau7gItMCFhwZabsy2QvUSuq7i2LkVckfpu838d5+fM4
-	EDwbwFIsVXNVfksntpFi+HEeiR9ogpgaO4PVyhXH5udMNkY=
-X-Google-Smtp-Source: AGHT+IFk/iDWtH0OiyL0EgBa0D8iZafDC2vA6fZgyWxIeq44JvZx0G0XW/ny40ZJlWKWZWKXz4CM9G4DiPQ6vi0zerg=
-X-Received: by 2002:a05:6902:1007:b0:da0:86e8:aea4 with SMTP id
- w7-20020a056902100700b00da086e8aea4mr9052247ybt.57.1699627830357; Fri, 10 Nov
- 2023 06:50:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15001C283
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 14:54:58 +0000 (UTC)
+Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C244C3A202
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:54:55 -0800 (PST)
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+	by mailout1.samsung.com (KnoxPortal) with ESMTP id 20231110145450epoutp01e3282de326410821ec880d77e9535874~WSr5NlZNP2668026680epoutp01N
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 14:54:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20231110145450epoutp01e3282de326410821ec880d77e9535874~WSr5NlZNP2668026680epoutp01N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1699628090;
+	bh=yaxyezZ4yKiM0TbBpnaDlCvTUlDcM3TeSUozhx47FaY=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=OqJQvu1fm+c0plV9cgFk42mDT8EadPr6lGmVrWNN3DpZ2IyDMPq0skFuQlt/5iTV9
+	 prMCn9ihSpQlXJ9+e73UdBDN5ug+/aNk4V80ImUS5JZpnkqc4PUuLfR57ps80lx92x
+	 YhO+1SwJODgEhYv0+oeWG7sKCeG+CAPAdArZxxW4=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20231110145449epcas1p175b38df7f1ec00914982e7d9ac9062b8~WSr4DeWui2963529635epcas1p1N;
+	Fri, 10 Nov 2023 14:54:49 +0000 (GMT)
+Received: from epsmges1p3.samsung.com (unknown [182.195.36.225]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4SRhgX6MNcz4x9Pt; Fri, 10 Nov
+	2023 14:54:48 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+	epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
+	46.4F.09739.8344E456; Fri, 10 Nov 2023 23:54:48 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20231110145448epcas1p2284021ecad63293509006be40343f94b~WSr3GwPaD1409414094epcas1p2q;
+	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20231110145448epsmtrp1f60c664cb83ab092cf1dcc8c05c316c2~WSr3GKVpo1915419154epsmtrp1b;
+	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
+X-AuditID: b6c32a37-c0bff7000000260b-ca-654e44383cec
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	A4.8C.07368.8344E456; Fri, 10 Nov 2023 23:54:48 +0900 (KST)
+Received: from jongeonpark03 (unknown [10.253.101.166]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20231110145448epsmtip2ea6de2413869b56a1a9eeff557328541~WSr26GLXP1057810578epsmtip2V;
+	Fri, 10 Nov 2023 14:54:48 +0000 (GMT)
+From: "Jong eon Park" <jongeon.park@samsung.com>
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: "'Paolo Abeni'" <pabeni@redhat.com>, "'David S. Miller'"
+	<davem@davemloft.net>, "'Eric Dumazet'" <edumazet@google.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "'Dong ha Kang'"
+	<dongha7.kang@samsung.com>
+In-Reply-To: <20231107085347.75bc3802@kernel.org>
+Subject: RE: [PATCH] netlink: introduce netlink poll to resolve fast return
+ issue
+Date: Fri, 10 Nov 2023 23:54:48 +0900
+Message-ID: <000001da13e5$d9b99e30$8d2cda90$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <881c23ac-d4f4-09a4-41c6-fb6ff4ec7dc5@kernel.org>
- <CANn89iKEs8_zdEXWbjxd8mC220MqhcRQp3AeHJMS6eD-a45rRA@mail.gmail.com>
- <CADvbK_fR62L+EwjW739MbCXJRFDfW5UTQ1bRrjMhc+cgyGN-dA@mail.gmail.com>
- <CANn89i+Ef7zNz7t6U2_6VEHPDantgyR8d0w3ALOBVVwK0Fe=FQ@mail.gmail.com> <CADvbK_epdT+s-peW9v1oKGrTfttrVFCgSLkdwLLBAT2N+ZDdMQ@mail.gmail.com>
-In-Reply-To: <CADvbK_epdT+s-peW9v1oKGrTfttrVFCgSLkdwLLBAT2N+ZDdMQ@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 10 Nov 2023 09:50:15 -0500
-Message-ID: <CADvbK_fzsXeqmayPkR4BDnkrgKDJcRd5bUXp0JNXSu8rfj-F-A@mail.gmail.com>
-Subject: Re: tcpdump and Big TCP
-To: Eric Dumazet <edumazet@google.com>
-Cc: David Ahern <dsahern@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJoS8HO+cSy/HZb7h5ntB8MEORIdAHf29cGAkyoXsQBixSniALjIF5OrxJU4OA=
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBJsWRmVeSWpSXmKPExsWy7bCmvq6Fi1+qQfNeXYs551tYLKbfnMps
+	8fTYI3aLC9v6WC0u75rDZnFsgZjFt9NvGB3YPbasvMnksWBTqcemVZ1sHu/3XWXz6NuyitHj
+	8ya5ALaobJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtzJYW8xNxUWyUXnwBdt8wc
+	oEuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQVmBXrFibnFpXnpenmpJVaGBgZG
+	pkCFCdkZ365PZi54Jl7xYPpixgbGTfxdjBwcEgImEmt/+nUxcnEICexglOg7/IkJwvnEKHFn
+	8W1GCOcbo0TriSagDCdYx5QfO9khEnsZJZb8fgTlvGGUePBnGyNIFZuAgcSxHz/BbBEBDYl9
+	s+aBjWIWeM4osblhMjNIglPAUOLm6/1gtrBAsMT2HwtZQI5iEVCVOLCpDCTMK2ApsXnPUmYI
+	W1Di5MwnLCA2s4C8xPa3c5ghLlKQ+Pl0GSvELj+JR8e6mCFqRCRmd7Yxg+yVEJjLIfF44yk2
+	iAYXiZ1/5kPZwhKvjm9hh7ClJF72t0HZ2RIvjh1jhQRSgcTVI0oQpr3E+0sWICazgKbE+l36
+	EMWKEjt/z2WE2Mon8e5rD1Qjr0RHmxBEiZrEw5NvWSFsGYnVK+6yTWBUmoXkr1lI/pqF5P5Z
+	CMsWMLKsYhRLLSjOTU8tNiwwhkd1cn7uJkZwEtUy38E47e0HvUOMTByMhxglOJiVRHgvmPik
+	CvGmJFZWpRblxxeV5qQWH2I0BQb0RGYp0eR8YBrPK4k3NLE0MDEzMrEwtjQ2UxLnvfWsN0VI
+	ID2xJDU7NbUgtQimj4mDU6qB6c7kHo1jngmbn73hYQrnaij7r/g5lv9OGIfcrNAfLd9kuATM
+	F8916mCIO+DI9YNrFd/BTaX/Ctk4b371ULq64ml3rFz7o4uyMgFrBGrS6rh874rMWzvbS1Ou
+	rSv+vugjw1SR81xHi51dP17+8vWy40bNC8e2fDLOO3imrcxGM+jN04dNK6vW7U5Nr/r27tYq
+	nQe8Wt4rP5/ceGG1nlJYhGn6sQXTBex+K915ueaCztWoTbe/WD1JVbOe3GcnaML6K6qWb+E1
+	0Q3N5uct0g2ORqcXlh29s09Az4KreKcIX9h65WBlm5719scbk3LrFs/eFq9Xutzi1mQ77y/a
+	AnbJrn21R/hO3tjdd+QEx1opJZbijERDLeai4kQAO/ddYisEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42LZdlhJXtfCxS/V4Nc6Pos551tYLKbfnMps
+	8fTYI3aLC9v6WC0u75rDZnFsgZjFt9NvGB3YPbasvMnksWBTqcemVZ1sHu/3XWXz6NuyitHj
+	8ya5ALYoLpuU1JzMstQifbsEroxv1yczFzwTr3gwfTFjA+Mm/i5GTg4JAROJKT92sncxcnEI
+	CexmlPh1socNIiEjcX3BPpYuRg4gW1ji8OFiiJpXjBIn1+1iBalhEzCQOPbjJyOILSKgIbFv
+	1jwwm1ngNaPEoU8KEA2dTBIvL05hAUlwChhK3Hy9nxnEFhYIlHi/8SsbyAIWAVWJA5vKQMK8
+	ApYSm/csZYawBSVOznwCdgOzgJ5E20ao8fIS29/OYYY4U0Hi59NlrBAn+Ek8OtbFDFEjIjG7
+	s415AqPwLCSTZiFMmoVk0iwkHQsYWVYxSqYWFOem5yYbFhjmpZbrFSfmFpfmpesl5+duYgTH
+	k5bGDsZ78//pHWJk4mA8xCjBwawkwnvBxCdViDclsbIqtSg/vqg0J7X4EKM0B4uSOK/hjNkp
+	QgLpiSWp2ampBalFMFkmDk6pBqYT/z4Fd099Nzvb3GfjwvgvftO4ypuYV/Fw9zl/nHJ5XfmL
+	eNF52xL5Pu3g25giXHDqyF/XZdqJS5tuCAuLSc+ZXeD0K/p5Rc66HYISLTFhb382nzd3uFQf
+	L7nZ6rfSDjvxk9xfPjCfTlj9+eW2s7wytbtCNkVqb5260/bqq8bIroxZOVFvZF3Cl21QXay6
+	/vl/Xv37ogK8e+s9i/9Oz2L+b5Z+SynlLftdFrWbDByPCnfUTL48QcnIavdj3hPzOhd0vVzN
+	sbjE6c/Vycc3/bivsvT1nq51AhsnPH/VbbFIjr3x1gFF0dci3OyzGf8LPvPUrdo5wfCq3pIt
+	Kxt9vjxt5F86/1CubM3UP7L3f183VWIpzkg01GIuKk4EAP0MuJ0WAwAA
+X-CMS-MailID: 20231110145448epcas1p2284021ecad63293509006be40343f94b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
+References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
+	<20231103072209.1005409-1-jongeon.park@samsung.com>
+	<20231106154812.14c470c2@kernel.org>
+	<25c501da111e$d527b010$7f771030$@samsung.com>
+	<20231107085347.75bc3802@kernel.org>
 
-On Mon, Oct 2, 2023 at 2:59=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wrot=
-e:
->
-> On Mon, Oct 2, 2023 at 1:26=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Mon, Oct 2, 2023 at 7:19=E2=80=AFPM Xin Long <lucien.xin@gmail.com> =
-wrote:
-> > >
-> > > On Mon, Oct 2, 2023 at 12:25=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Mon, Oct 2, 2023 at 6:20=E2=80=AFPM David Ahern <dsahern@kernel.=
-org> wrote:
-> > > > >
-> > > > > Eric:
-> > > > >
-> > > > > Looking at the tcpdump source code, it has a GUESS_TSO define tha=
-t can
-> > > > > be enabled to dump IPv4 packets with tot_len =3D 0:
-> > > > >
-> > > > >         if (len < hlen) {
-> > > > > #ifdef GUESS_TSO
-> > > > >             if (len) {
-> > > > >                 ND_PRINT("bad-len %u", len);
-> > > > >                 return;
-> > > > >             }
-> > > > >             else {
-> > > > >                 /* we guess that it is a TSO send */
-> > > > >                 len =3D length;
-> > > > >             }
-> > > > > #else
-> > > > >             ND_PRINT("bad-len %u", len);
-> > > > >             return;
-> > > > > #endif /* GUESS_TSO */
-> > > > >         }
-> > > > >
-> > > > >
-> > > > > The IPv6 version has a similar check but no compile change needed=
-:
-> > > > >         /*
-> > > > >          * RFC 1883 says:
-> > > > >          *
-> > > > >          * The Payload Length field in the IPv6 header must be se=
-t to zero
-> > > > >          * in every packet that carries the Jumbo Payload option.=
-  If a
-> > > > >          * packet is received with a valid Jumbo Payload option p=
-resent and
-> > > > >          * a non-zero IPv6 Payload Length field, an ICMP Paramete=
-r Problem
-> > > > >          * message, Code 0, should be sent to the packet's source=
-, pointing
-> > > > >          * to the Option Type field of the Jumbo Payload option.
-> > > > >          *
-> > > > >          * Later versions of the IPv6 spec don't discuss the Jumb=
-o Payload
-> > > > >          * option.
-> > > > >          *
-> > > > >          * If the payload length is 0, we temporarily just set th=
-e total
-> > > > >          * length to the remaining data in the packet (which, for=
- Ethernet,
-> > > > >          * could include frame padding, but if it's a Jumbo Paylo=
-ad frame,
-> > > > >          * it shouldn't even be sendable over Ethernet, so we don=
-'t worry
-> > > > >          * about that), so we can process the extension headers i=
-n order
-> > > > >          * to *find* a Jumbo Payload hop-by-hop option and, when =
-we've
-> > > > >          * processed all the extension headers, check whether we =
-found
-> > > > >          * a Jumbo Payload option, and fail if we haven't.
-> > > > >          */
-> > > > >         if (payload_len !=3D 0) {
-> > > > >                 len =3D payload_len + sizeof(struct ip6_hdr);
-> > > > >                 if (length < len)
-> > > > >                         ND_PRINT("truncated-ip6 - %u bytes missin=
-g!",
-> > > > >                                 len - length);
-> > > > >         } else
-> > > > >                 len =3D length + sizeof(struct ip6_hdr);
-> > > > >
-> > > > >
-> > > > > Maybe I am missing something, but it appears that no code change =
-to
-> > > > > tcpdump is needed for Linux Big TCP packets other than enabling t=
-hat
-> > > > > macro when building. I did that in a local build and the large pa=
-ckets
-> > > > > were dumped just fine.
-> > > > >
-> > > Right, wireshark/tshark currently has no problem parsing BIG TCP IPv4=
- packets.
-> > > I think it enables GUESS_TSO by default.
-> > >
-> > > We also enabled GUESS_TSO in tcpdump for RHEL-9 when BIG TCP IPv4 was
-> > > backported in it.
-> >
-> > Make sure to enable this in tcpdump source, so that other distros do
-> > not have to 'guess'.
-> Looks the tcpdump maintainer has posted one:
->
-A couple of updates:
 
-> https://github.com/the-tcpdump-group/tcpdump/pull/1085
-In tcpdump, this one has been Merged into master and tcpdump-4.99 branch.
-It means tcpdump has officially supported BIG TCP parsing on upstream and
-its next release version.
 
-For wireshark, according to the maintainer Guy Harris,
-Code in Wireshark to deal with the total length being 0 in the IPv4 header
-dates back to at least 2012.
+On Tuesday, Nov 7, 2023 at 08:48 Jakub Kicinski wrote:
+> Why does the wake up happen in the first place?
+> I don't see anything special in the netlink code, so I'm assuming it's
+> because datagram_poll() returns EPOLLERR.
+> 
+> The man page says:
+> 
+>        EPOLLERR
+>               Error condition happened on the associated file
+>               descriptor.  This event is also reported for the write end
+>               of a pipe when the read end has been closed.
+> 
+>               epoll_wait(2) will always report for this event; it is not
+>               necessary to set it in events when calling epoll_ctl().
+> 
+> To me that sounds like EPOLLERR is always implicitly enabled, and should
+> be handled by the application. IOW it's an pure application bug.
+> 
+> Are you aware of any precedent for sockets adding in EPOLLOUT when
+> EPOLLERR is set?
 
-For the TP_STATUS from packet socket including our TP_STATUS_GSO_TCP,
-it has been merged into the pcapng IETF draft doc:
+In my case, the first wake-up was by POLLIN, not POLLERR.
+Please consider the below scenario.
 
-  https://github.com/IETF-OPSAWG-WG/draft-ietf-opsawg-pcap/pull/144
+------------CPU1 (kernel)----------  --------------CPU2 (app)--------------
+...
+a driver delivers uevent.              poll was waiting for schedule.
+a driver delivers uevent.
+a driver delivers uevent.
+...
+1) netlink_broadcast_deliver fails.
+(sk_rmem_alloc > sk_rcvbuf)
+                                            getting schedule and poll
+returns,
+                                            and the app calls recv.
+                                            (rcv queue is empied)
+                                            2)
 
-and the next step is to implement it in both tcpdump and wireshark.
+netlink_overrun is called.
+(NETLINK_S_CONGESTED flag is set,
+ENOBUF is written in sk_err and,
+wake up poll.)
+                                            finishing its job and call poll
+again.
+                                            poll returns POLLERR.
 
-But in my opinion, this doesn't block the IPv6 jumbo headers removal,
-as both tcpdump and wireshark now have no issue to parse BIG TCP packets.
+                                            (the app doesn't have POLLERR
+handler,)
+                                            it calls poll, but getting
+POLLERR.
+                                            it calls poll, but getting
+POLLERR.
+                                            it calls poll, but getting
+POLLERR.
+                                            ...
+									 
 
-Thanks.
+Interestingly, in this issue, even though netlink overrun frequently 
+happened and caused POLLERRs, the user was managing it well through 
+POLLIN and 'recv' function without a specific POLLERR handler. 
+However, in the current situation, rcv queue is already empty and 
+NETLINK_S_CONGESTED flag prevents any more incoming packets. This makes 
+it impossible for the user to call 'recv'.
 
->
-> >
-> > >
-> > > >
-> > > > My point is that tcpdump should not guess, but look at TP_STATUS_GS=
-O_TCP
-> > > > (and TP_STATUS_CSUM_VALID would also be nice)
-> > > >
-> > > > Otherwise, why add TP_STATUS_GSO_TCP in the first place ?
-> > > That's for more reliable parsing in the future.
-> >
-> > We want this. I thought this was obvious.
-> >
-> > >
-> > > As currently in libpcap, it doesn't save meta_data(like
-> > > TP_STATUS_CSUM_VALID/GSO_TCP)
-> > > to 'pcap' files, and it requires libpcap APIs change and uses the
-> > > 'pcap-ng' file format.
-> > > I think it will take quite some time to implement in userspace.
-> >
-> > Great. Until this is implemented as discussed last year, we will not re=
-move
-> > IPv6 jumbo headers.
-> I will get back to this libpcap APIs and pcap-ng things, and let you
-> know when it's done.
->
-> Thanks.
+This "congested" situation is a bit ambiguous. The queue is empty, yet 
+'congested' remains. This means kernel can no longer deliver uevents 
+despite the empty queue, and it lead to the persistent 'congested' status.
+
+The reason for the difference in netlink lies in the NETLINK_S_CONGESTED 
+flag. If it were UDP, upon seeing the empty queue, it might have kept 
+pushing the received packets into the queue (making possible to call 
+'recv').
+
+BRs,
+JE Park.
+
+
 
