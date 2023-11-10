@@ -1,179 +1,135 @@
-Return-Path: <netdev+bounces-47045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70C717E7AE0
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:31:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85F07E7AED
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FF531C20CA2
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:31:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7885DB20FFF
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A20A125DB;
-	Fri, 10 Nov 2023 09:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6E111CB7;
+	Fri, 10 Nov 2023 09:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GLlmWqNx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="psGwELNb"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494512B68
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:31:10 +0000 (UTC)
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E877124489
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:31:05 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so24096a12.1
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:31:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699608664; x=1700213464; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ksKC5N5S1VwyLBs8puatXQ5O6wSMGiBfXyqCMNWeYS0=;
-        b=GLlmWqNxmYnB2EqluZiCz+8D0g4pXZpw8oYS4Pu0rDkOkG4mLp7P5dywjCL3MKM8pF
-         GNkSz/bI+hDLcu9gkjtcRhFDSezB6SoINxEs5bpMs6i/BuhPG7KiV0iRXWRj//SkXL3R
-         U7zazpVKD3PYbMXUgXKcH+w9SSKZR6BW5+z3mIMOFeDmSjMf6qqGP/llZIDnV6HZLqrJ
-         1lQfsYZdAkOfLs3qG/17zNkep1NQPWneAP150QFMn52QFDW/21AdwIs5ujKRQZaXzqLv
-         1LSG/8uO89HG6EQm09Hnb7UEWCuS9EEkeD7C66JxPy/atUuWNtDUi7cWbNPLa8F/cHL5
-         XErg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699608664; x=1700213464;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ksKC5N5S1VwyLBs8puatXQ5O6wSMGiBfXyqCMNWeYS0=;
-        b=GCp1QCFL5IuNl7eJYjPpU0IYKxpXmRlcmlEYs9yqA4qs+P6c1HARgQKqGxuMe5bJtr
-         djmKi1y09a55wuglUIe7s+la2Z3uH0l+CLwa6noNjEHpXXZQpHSpMcc60KeVsWUU1Pog
-         uvKQZTelmzlmroHTfTuvfiGLDsVGeoOAoPDHuBEKB48/l8d7/kgC9Hl6OthdgunP2DDU
-         uIhGXi/yWN1SSNJqYMuDsnFCSLeEPuiRg/EcEPl0Mev7mM3ip+vNiabY8r6G+aX182Ic
-         GHmfMKUGx8eGx08pLm2vw/18AzIJn0TKL6VMnCwuAbC12NjwPMqk8wj5xZk9m7o7HLBo
-         zs9g==
-X-Gm-Message-State: AOJu0Yy/me9H65NU8BgzVBALndFtj9fPZfUlf6CaGi1McK2VKJk9G6uF
-	Ihd3QBvRwBgdUnSUb2EidQpd/D6q4zTVVWWTBNRsLA==
-X-Google-Smtp-Source: AGHT+IGcsfjTyKWdpxswyD/khdOvVcyNQpeNRxwBtmA6S2pZzXcxgaiSZg7dqCQNUa8KOrtv0uaK5Oi+Gtl9Nk9nbpA=
-X-Received: by 2002:a05:6402:1484:b0:544:466b:3b20 with SMTP id
- e4-20020a056402148400b00544466b3b20mr299720edv.5.1699608663758; Fri, 10 Nov
- 2023 01:31:03 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A9B12E57
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:33:33 +0000 (UTC)
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B88A244A4;
+	Fri, 10 Nov 2023 01:33:31 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DF6CCC0010;
+	Fri, 10 Nov 2023 09:33:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1699608810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nC0pAlOXIGUdD+VbkSZGUyt+AICBgKUhgiU0tdd5070=;
+	b=psGwELNbfHZ+a8j1bBxaVMw71b/wkWrnwxPY/Do7fG5XWdEyK0WagG8cyoVvrbsDHAI9xr
+	0sCuonz2sXS20x2HDGI1tSEwSY7oFYfB5yIcPkhhBvLaaqUYX2iTLjwv4sAnrYlabel93t
+	/88QQyQqhw4MaF1wePocA4xTb8cDK+VH9ur5H/rjsh5gLWFBP4J0QfBkLfutGCICt/LvAt
+	X/vls4T4QRB9tOkeK5sxtn/LFIePkbwDye6Kbo0hUtNdVKR6Uw/ixu0xFNacAHB8vdoA8v
+	J6+4gg4v2GmXtPgwJxRcFa2xvBnVHLXGx1aYfVdb8hXu3O7uV1noXURToMpdRQ==
+Date: Fri, 10 Nov 2023 10:33:28 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy
+ support
+Message-ID: <20231110103328.0bc3d28f@fedora>
+In-Reply-To: <46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
+References: <20231108113445.24825-1-quic_luoj@quicinc.com>
+	<20231108113445.24825-2-quic_luoj@quicinc.com>
+	<20231108131250.66d1c236@fedora>
+	<423a3ee3-bed5-02f9-f872-7b5dba64f994@quicinc.com>
+	<20231109101618.009efb45@fedora>
+	<0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
+	<46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZU3EZKQ3dyLE6T8z@debian.debian>
-In-Reply-To: <ZU3EZKQ3dyLE6T8z@debian.debian>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Nov 2023 10:30:49 +0100
-Message-ID: <CANn89iKZYsWGT1weXZ6W7_z28dqJwTZeg+2_Lw+x+6spUHp8Eg@mail.gmail.com>
-Subject: Re: [PATCH net-next] packet: add a generic drop reason for receive
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Weongyo Jeong <weongyo.linux@gmail.com>, 
-	Ivan Babrou <ivan@cloudflare.com>, David Ahern <dsahern@kernel.org>, 
-	Jesper Brouer <jesper@cloudflare.com>, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Fri, Nov 10, 2023 at 6:49=E2=80=AFAM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> Commit da37845fdce2 ("packet: uses kfree_skb() for errors.") switches
-> from consume_skb to kfree_skb to improve error handling. However, this
-> could bring a lot of noises when we monitor real packet drops in
-> kfree_skb[1], because in tpacket_rcv or packet_rcv only packet clones
-> can be freed, not actual packets.
->
-> Adding a generic drop reason to allow distinguish these "clone drops".
->
-> [1]: https://lore.kernel.org/netdev/CABWYdi00L+O30Q=3DZah28QwZ_5RU-xcxLFU=
-K2Zj08A8MrLk9jzg@mail.gmail.com/
-> Fixes: da37845fdce2 ("packet: uses kfree_skb() for errors.")
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
->  include/net/dropreason-core.h |  6 ++++++
->  net/packet/af_packet.c        | 16 +++++++++++++---
->  2 files changed, 19 insertions(+), 3 deletions(-)
->
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
-h
-> index 845dce805de7..6ff543fe8a8b 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -81,6 +81,7 @@
->         FN(IPV6_NDISC_NS_OTHERHOST)     \
->         FN(QUEUE_PURGE)                 \
->         FN(TC_ERROR)                    \
-> +       FN(PACKET_SOCK_ERROR)           \
->         FNe(MAX)
->
->  /**
-> @@ -348,6 +349,11 @@ enum skb_drop_reason {
->         SKB_DROP_REASON_QUEUE_PURGE,
->         /** @SKB_DROP_REASON_TC_ERROR: generic internal tc error. */
->         SKB_DROP_REASON_TC_ERROR,
-> +       /**
-> +        * @SKB_DROP_REASON_PACKET_SOCK_ERROR: generic packet socket erro=
-rs
-> +        * after its filter matches an incoming packet.
-> +        */
-> +       SKB_DROP_REASON_PACKET_SOCK_ERROR,
->         /**
->          * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
->          * shouldn't be used as a real 'reason' - only for tracing code g=
-en
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index a84e00b5904b..94b8a9d8e038 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -2128,6 +2128,7 @@ static int packet_rcv(struct sk_buff *skb, struct n=
-et_device *dev,
->         int skb_len =3D skb->len;
->         unsigned int snaplen, res;
->         bool is_drop_n_account =3D false;
-> +       enum skb_drop_reason drop_reason =3D SKB_DROP_REASON_NOT_SPECIFIE=
-D;
->
->         if (skb->pkt_type =3D=3D PACKET_LOOPBACK)
->                 goto drop;
-> @@ -2161,6 +2162,10 @@ static int packet_rcv(struct sk_buff *skb, struct =
-net_device *dev,
->         res =3D run_filter(skb, sk, snaplen);
->         if (!res)
->                 goto drop_n_restore;
-> +
-> +       /* skb will only be "consumed" not "dropped" before this */
-> +       drop_reason =3D SKB_DROP_REASON_PACKET_SOCK_ERROR;
-> +
->         if (snaplen > res)
->                 snaplen =3D res;
->
-> @@ -2230,7 +2235,7 @@ static int packet_rcv(struct sk_buff *skb, struct n=
-et_device *dev,
->         if (!is_drop_n_account)
->                 consume_skb(skb);
->         else
-> -               kfree_skb(skb);
-> +               kfree_skb_reason(skb, drop_reason);
->         return 0;
+On Fri, 10 Nov 2023 17:17:58 +0800
+Jie Luo <quic_luoj@quicinc.com> wrote:
 
+> On 11/10/2023 4:53 PM, Jie Luo wrote:
+> >=20
+> >=20
+> > On 11/9/2023 5:16 PM, Maxime Chevallier wrote: =20
+> >> Hello,
+> >>
+> >> On Thu, 9 Nov 2023 16:32:36 +0800
+> >> Jie Luo <quic_luoj@quicinc.com> wrote:
+> >>
+> >> [...]
+> >> =20
+> >>>> What I understand from this is that this PHY can be used either as a
+> >>>> switch, in which case port 4 would be connected to the host interface
+> >>>> at up to 2.5G, or as a quad-phy, but since it uses QUSGMII the link
+> >>>> speed would be limited to 1G per-port, is that correct ? =20
+> >>>
+> >>> When the PHY works on the interface mode QUSGMII for quad-phy, all 4
+> >>> PHYs can support to the max link speed 2.5G, actually the PHY can
+> >>> support to max link speed 2.5G for all supported interface modes
+> >>> including qusgmii and sgmii. =20
+> >>
+> >> I'm a bit confused then, as the USGMII spec says that Quad USGMII real=
+ly
+> >> is for quad 10/100/1000 speeds, using 10b/8b encoding.
+> >>
+> >> Aren't you using the USXGMII mode instead, which can convey 4 x 2.5Gbps
+> >> =C2=A0 with 66b/64b encoding ?
+> >>
+> >> Thanks,
+> >>
+> >> Maxime =20
+> >=20
+> > Hi Maxime,
+> > Yes, for quad PHY mode, it is using 66b/64 encoding.
+> >=20
+> > it seems that PHY_INTERFACE_MODE_USXGMII is for single port,
+> > so i take the interface name PHY_INTERFACE_MODE_QUSGMII for
+> > quad PHYs here.
+> >=20
+> > can we apply PHY_INTERFACE_MODE_USXGMII to quad PHYs in this
+> > case(qca8084 quad PHY mode)?
+> >=20
+> > Thanks,
+> > Jie. =20
+>=20
+> one more thing, if we use the PHY_INTERFACE_MODE_USXGMII for
+> the quad PHY here, the MAC serdes can't distinguish the actual
+> mode PHY_INTERFACE_MODE_USXGMII and 10G-QXGMII(qca8084 quad phy mode),
+> the MAC serdes has the different configurations for usxgmii(10g single=20
+> port) and qxsgmii(quad PHY).
 
-1) Note that net-next is currently closed.
+Yes you do need a way to know which mode to use, what I'm wondering is
+that the usxgmii spec actually defines something like 9 different modes
+( 1/2/4/8 ports, with a total bandwidth ranging from 2.5Gbps to 20 Gbps
+), should we define a phy mode for all of these variants, or should we
+have another way of getting the mode variant (like, saying I want to
+use usxgmii, in 4 ports mode, with the serdes at 10.3125Gbps).
 
-2) Now we have 0e84afe8ebfb ("net: dropreason: add SKB_CONSUMED reason")
+That being said, QUSGMII already exists to define a specific variant of
+USGMII, so maybe adding 10G-QXGMII is fine...
 
-it is time we replace the various constructs which do not help readability:
-
-if (something)
-     consume_skb(skb);
-else
-     kfree_skb_reason(skb, drop_reason);
-
-By:
-
-kfree_skb_reason(skb, drop_reason);
-
-(By using drop_reason =3D=3D SKB_CONSUMED when appropriate)
+Also, net-next is still currently closed.
 
