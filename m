@@ -1,106 +1,233 @@
-Return-Path: <netdev+bounces-47048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AAB7E7B01
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:42:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016C47E7B13
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2C851C20C4F
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:42:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2F492815DF
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7713B12B8A;
-	Fri, 10 Nov 2023 09:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8EB12E42;
+	Fri, 10 Nov 2023 09:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="feXU+wn2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wYXDWjn7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF7E12B70
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:42:15 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D2D624C2B
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:42:14 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-545557de8e6so21933a12.0
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:42:14 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BA4134A3
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:45:46 +0000 (UTC)
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F34725086
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:45:44 -0800 (PST)
+Received: by mail-vs1-xe2f.google.com with SMTP id ada2fe7eead31-45dad6ece90so848456137.0
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:45:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699609333; x=1700214133; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1699609543; x=1700214343; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mmxVCAwdLZFwIuLS2I/EoyhaF6HjD4jvqku72VUlqzc=;
-        b=feXU+wn2x+gdZQzbi+Lg2KLq3ogeGXn93/zJvQL+nDAZ7uEks8k5IdCZUMRS0Kn+Mg
-         fGK2K/95mWmATm9hyMJHP8ruaPvQsMr09FqYt9MHyrd6mjNOjSPTAVKxwfyiZJWCVOSj
-         GAuJxhvqATPpWji3gSCOryfvCQCxaOzv9xdGxw+sNOSxNdkSOMjBp6zX6xRdQvyPdr5M
-         g9Rfyjyz98hejCPaY6fDs0B7ZNcFCHw/vG83ma0muER0XQlPISO7DLO79lVAaq9Y0sy1
-         ifSs+IOwVdqJ3vib0jEl8xIq/S6FoGad7kMOwo+tzEfEKjBK0S0SxF2eYdCURbTXt+CF
-         7Bqw==
+        bh=7pUm/c3POcD26li8+Wke26dcOs+wqv0EJOUWvylNJQo=;
+        b=wYXDWjn7U63zYTzMWT2KkWW3kr8rgGqbDhEyIZZ5Ty4YEcIia9r48p4Dy+2CpAYXB7
+         l+/H/1gWi2YA6I13l4MSSKx7OpCK5aBvOUdy0a9KsF4UTae49Np2UUrswYYXoUhqrnE0
+         8gKbE3zhta89j3NLl92qaHlyyjmWh3+4kPnJ4Jf3RS193wHSWKQBQ/G16Y3PzcFsfQI5
+         iqrYZX93Jvm3B6Sz81vD44uR6HsFywTXRgUS0r/Sfl/Gy7aI9zXhn9gMnm8BCNGtm8+z
+         u45Qgm4wKz9o197av3qEsTzpCIB3+N9cwR5YFs8wn4E3nYRLdvwK8NNSjkTy+9MREi5z
+         E93w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699609333; x=1700214133;
+        d=1e100.net; s=20230601; t=1699609543; x=1700214343;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mmxVCAwdLZFwIuLS2I/EoyhaF6HjD4jvqku72VUlqzc=;
-        b=bMSb26ExRP0aQ6W7zEwgDg4I7sXcWOAFIUtrF6YvFLviRGS70EPHb73EdPgoLmiWkv
-         xnIBEBtyGEXhI2Z/4s3Ikir9TphOja6hzGGfLz/XuHZgw1VXVVPKV7PuHKHT5HMy9hht
-         ZYtRVsTvWkX9ZEiuPavyDGMmuX1mORYfNT5hsvfKAmVtvGeZ5tGRP92kq5hq3JOuZHVb
-         K6mdPVmrssshYot1PMU1TMYmu0W0ym1tju06cOrSoDbp+r0Uk6r6qcV//i9wGkcrdWpY
-         E271AnjqvFEg9if3IiRiZdbDMRKfCrHXUNndbUwZPSunJL5yzRi6rS/6bI7W1OYyHOD8
-         R0Dw==
-X-Gm-Message-State: AOJu0YxE4IvnSbaacsdsL7DsrOEpu5EGp3zkvsv4AdeQigeyEoFjXdru
-	nd59mL9JzAF+uQk7BZQG3JjxEiXWO+lgjbBUxnKd3g==
-X-Google-Smtp-Source: AGHT+IHDZ/W3wralis11OF2Z20K+EJ5HLeNXlezUU6GiSEeujqAMbUN7+Kg7t4DoYI/gz6SgOZVe1WVg+rkDOnOKy8c=
-X-Received: by 2002:a05:6402:1484:b0:544:466b:3b20 with SMTP id
- e4-20020a056402148400b00544466b3b20mr300607edv.5.1699609332822; Fri, 10 Nov
- 2023 01:42:12 -0800 (PST)
+        bh=7pUm/c3POcD26li8+Wke26dcOs+wqv0EJOUWvylNJQo=;
+        b=qqHQHe6jKKvgYn9Z5lkqxKJsv+ZGKZqj7OPEtehEwOYG1UPRKM0DVn/fE7aoKwtrOu
+         4lbWQ2EIiWDh0VRJhKs93aAyfgL3Ovnq294toqHUqK+ju8p+wRldg9KHY09EXbg8FL9V
+         Q5AR2aqwMb0jt/LfG7CjIr4CyLuRdygFFOQL+06J1mRn8YpsH5Wdi2udIKA3H3QPeZB/
+         xwU3d/xBw0m/xtchk51xuEk4uD7UHO8/3yI/XFIurGGKKnhnUbwD/IO5FFl44a6Rk4a3
+         36lE9CRKoNdKbfo3P9AJ7sjqf8yl9u52CnLQELr6IsWVtyRZiyjQXA/M0eDsKzkTsd1T
+         hx0w==
+X-Gm-Message-State: AOJu0YzCi9x+Cus6nwy/f6f7cp+fNc8HX5WY0RzL19QGcnnJwt4Aw0SO
+	cE/mXS3/H42Bdmr4aRcS8/36EVS7cjisZtYXQepzXQ==
+X-Google-Smtp-Source: AGHT+IGwONXBFBpAhD15bfaIVPNRmPgG1R+yrVeei2EXlwNf647dy9292PLH34LJT3G6STTIfr9u5/CLo0iSwGhMU3o=
+X-Received: by 2002:a67:c381:0:b0:45d:a4a6:6fae with SMTP id
+ s1-20020a67c381000000b0045da4a66faemr6419953vsj.30.1699609542944; Fri, 10 Nov
+ 2023 01:45:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231109174859.3995880-1-edumazet@google.com> <ZU2wRnF_w-cEIUK2@hoboy.vegasvil.org>
-In-Reply-To: <ZU2wRnF_w-cEIUK2@hoboy.vegasvil.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Nov 2023 10:42:01 +0100
-Message-ID: <CANn89iL5NC4-auwBRAitOiGMEk1Ewo9LOu2TitYHnU3ekzAaeA@mail.gmail.com>
-Subject: Re: [PATCH net] ptp: annotate data-race around q->head and q->tail
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-5-almasrymina@google.com> <076fa6505f3e1c79cc8acdf9903809fad6c2fd31.camel@redhat.com>
+ <CAHS8izOGSE-PJ1uShkH_Mr6kUoC1EjM_9P1J=_TO6nLFP9K53Q@mail.gmail.com> <aec0f586-c3b9-8da8-6a39-f313105267f8@huawei.com>
+In-Reply-To: <aec0f586-c3b9-8da8-6a39-f313105267f8@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 10 Nov 2023 01:45:29 -0800
+Message-ID: <CAHS8izP64Q3cP5vJ5ESQH9Y3fkSn8RCS+T84orKhK5=pzdJCLA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 04/12] netdev: support binding dma-buf to netdevice
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 10, 2023 at 5:23=E2=80=AFAM Richard Cochran
-<richardcochran@gmail.com> wrote:
+On Thu, Nov 9, 2023 at 11:38=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
 >
-> On Thu, Nov 09, 2023 at 05:48:59PM +0000, Eric Dumazet wrote:
-> > As I was working on a syzbot report, I found that KCSAN would
-> > probably complain that reading q->head or q->tail without
-> > barriers could lead to invalid results.
+> On 2023/11/10 10:59, Mina Almasry wrote:
+> > On Thu, Nov 9, 2023 at 12:30=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >>
+> >> I'm trying to wrap my head around the whole infra... the above line is
+> >> confusing. Why do you increment dma_addr? it will be re-initialized in
+> >> the next iteration.
+> >>
 > >
-> > Add corresponding READ_ONCE() and WRITE_ONCE() to avoid
-> > load-store tearing.
+> > That is just a mistake, sorry. Will remove this increment.
 >
-> Acked-by: Richard Cochran <richardcochran@gmail.com>
+> You seems to be combining comments in different thread and replying in
+> one thread, I am not sure that is a good practice and I almost missed the
+> reply below as I don't seem to be cc'ed.
+>
 
-Note the syzbot report I am looking at point to bugs added in
+Sorry about that.
 
-commit 8f5de6fb245326704f37d91780b9a10253a8a100    ptp: support
-multiple timestamp event readers
+> >
+> > On Thu, Nov 9, 2023 at 1:29=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
+.com> wrote:> >>>
+> >>>>> gen_pool_destroy BUG_ON() if it's not empty at the time of destroyi=
+ng.
+> >>>>> Technically that should never happen, because
+> >>>>> __netdev_devmem_binding_free() should only be called when the refco=
+unt
+> >>>>> hits 0, so all the chunks have been freed back to the gen_pool. But=
+,
+> >>>>> just in case, I don't want to crash the server just because I'm
+> >>>>> leaking a chunk... this is a bit of defensive programming that is
+> >>>>> typically frowned upon, but the behavior of gen_pool is so severe I
+> >>>>> think the WARN() + check is warranted here.
+> >>>>
+> >>>> It seems it is pretty normal for the above to happen nowadays becaus=
+e of
+> >>>> retransmits timeouts, NAPI defer schemes mentioned below:
+> >>>>
+> >>>> https://lkml.kernel.org/netdev/168269854650.2191653.8465259808498269=
+815.stgit@firesoul/
+> >>>>
+> >>>> And currently page pool core handles that by using a workqueue.
+> >>>
+> >>> Forgive me but I'm not understanding the concern here.
+> >>>
+> >>> __netdev_devmem_binding_free() is called when binding->ref hits 0.
+> >>>
+> >>> binding->ref is incremented when an iov slice of the dma-buf is
+> >>> allocated, and decremented when an iov is freed. So,
+> >>> __netdev_devmem_binding_free() can't really be called unless all the
+> >>> iovs have been freed, and gen_pool_size() =3D=3D gen_pool_avail(),
+> >>> regardless of what's happening on the page_pool side of things, right=
+?
+> >>
+> >> I seems to misunderstand it. In that case, it seems to be about
+> >> defensive programming like other checking.
+> >>
+> >> By looking at it more closely, it seems napi_frag_unref() call
+> >> page_pool_page_put_many() directly=EF=BC=8C which means devmem seems t=
+o
+> >> be bypassing the napi_safe optimization.
+> >>
+> >> Can napi_frag_unref() reuse napi_pp_put_page() in order to reuse
+> >> the napi_safe optimization?
+> >>
+> >
+> > I think it already does. page_pool_page_put_many() is only called if
+> > !recycle or !napi_pp_put_page(). In that case
+> > page_pool_page_put_many() is just a replacement for put_page(),
+> > because this 'page' may be an iov.
+>
+> Is there a reason why not calling napi_pp_put_page() for devmem too
+> instead of calling page_pool_page_put_many()? mem provider has a
+> 'release_page' ops, calling page_pool_page_put_many() directly here
+> seems to be bypassing the 'release_page' ops, which means devmem is
+> bypassing most of the main features of page pool.
+>
 
-For instance ptp_poll() can crash.
+I think we're still calling napi_pp_put_page() as normal:
 
-I saw the following patch being merged (without me being CC ?)
+ /**
+@@ -3441,13 +3466,13 @@ bool napi_pp_put_page(struct page *page, bool
+napi_safe);
+ static inline void
+ napi_frag_unref(skb_frag_t *frag, bool recycle, bool napi_safe)
+ {
+-       struct page *page =3D skb_frag_page(frag);
+-
+ #ifdef CONFIG_PAGE_POOL
+-       if (recycle && napi_pp_put_page(page, napi_safe))
++       if (recycle && napi_pp_put_page(frag->bv_page, napi_safe))
+                return;
++       page_pool_page_put_many(frag->bv_page, 1);
++#else
++       put_page(skb_frag_page(frag));
+ #endif
+-       put_page(page);
+ }
 
-commit 8a4f030dbced6fc255cbe67b2d0a129947e18493
-Author: Yuran Pereira <yuran.pereira@hotmail.com>
-Date:   Wed Nov 8 02:18:36 2023 +0530
+The code change here is to replace put_page() with
+page_pool_page_put_many(), only, because bv_page may be a
+page_pool_iov, so we need to use page_pool_page_put_many() which
+handles page_pool_iov correcly. I did not change whether or not
+napi_pp_put_page() is called. It's still called if recycle=3D=3Dtrue.
 
-    ptp: Fixes a null pointer dereference in ptp_ioctl
+> As far as I can tell, the main features of page pool:
+> 1. Allow lockless allocation and freeing in pool->alloc cache by
+>    utilizing NAPI non-concurrent context.
+> 2. Allow concurrent allocation and freeing in pool->ring cache by
+>    utilizing ptr_ring.
+> 3. Allow dma map/unmap and cache sync optimization.
+> 4. Allow detailed stats logging and tracing.
+> 5. Allow some bulk allocation and freeing.
+> 6. support both skb packet and xdp frame.
+>
+> I am wondering what is the main features that devmem is utilizing
+> by intergrating into page pool?
+>
+> It seems the driver can just call netdev_alloc_devmem() and
+> napi_frag_unref() can call netdev_free_devmem() directly without
+> intergrating into page pool and it should just works too?
+>
+> Maybe we should consider creating a new thin layer, in order to
+> demux to page pool, devmem or other mem type if my suggestion does
+> not work out too?
+>
 
-I do not see how races are solved... Shouldn't
-pccontext->private_clkdata be protected by RCU ?
+I went through this discussion with Jesper on RFC v2 in this thread:
+
+https://lore.kernel.org/netdev/CAHS8izOVJGJH5WF68OsRWFKJid1_huzzUK+hpKbLcL4=
+pSOD1Jw@mail.gmail.com/T/#ma9285d53735d82cc315717db67a1796477c89d86
+
+which culminates with that email where he seems on board with the
+change from a performance POV, and seems on board with hiding the
+memory type implementation from the drivers. That thread fully goes
+over the tradeoffs of integrating over the page pool or creating new
+ones. Integrating with the page pool abstracts most of the devmem
+implementation (and other memory types) from the driver. It reuses
+page pool features like page recycling for example.
+
+--=20
+Thanks,
+Mina
 
