@@ -1,104 +1,140 @@
-Return-Path: <netdev+bounces-47056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D131F7E7B09
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:43:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A5157E7AFA
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D8981C20DA2
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:43:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1CC02815EE
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2D514001;
-	Fri, 10 Nov 2023 09:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724D512B85;
+	Fri, 10 Nov 2023 09:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="aXnVgiQs"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC13A134C5
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:42:43 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B922B7E9;
-	Fri, 10 Nov 2023 01:42:41 -0800 (PST)
-Received: from kwepemm000007.china.huawei.com (unknown [172.30.72.54])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4SRYf83JGBzMmjt;
-	Fri, 10 Nov 2023 17:38:08 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Fri, 10 Nov 2023 17:42:38 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V2 net 7/7] net: hns3: fix VF wrong speed and duplex issue
-Date: Fri, 10 Nov 2023 17:37:13 +0800
-Message-ID: <20231110093713.1895949-8-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20231110093713.1895949-1-shaojijie@huawei.com>
-References: <20231110093713.1895949-1-shaojijie@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E2112B68
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:38:22 +0000 (UTC)
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACC0F24C19;
+	Fri, 10 Nov 2023 01:38:20 -0800 (PST)
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 3AA9cHfh105706;
+	Fri, 10 Nov 2023 03:38:17 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1699609097;
+	bh=e/z4IobkrHCnPhosJZd5RkzB3izt0JqBTe790Ch3USA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=aXnVgiQswlPad2DphWvUS9KS9ke9OqQuEI4Udip6nKoBg2vMcTxbLxfSYP2/4ovRS
+	 osigXOzZ3SfZeJ+xriXo6iBSHesyNsjDDLMJMEnsBg1pE5t1tqmWjsEVyEKpkfa7vZ
+	 GGMbvsOGfNDyf/EvHrQGaQBc/eoLCq3MN7rDezKc=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 3AA9cHsr014520
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 10 Nov 2023 03:38:17 -0600
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
+ Nov 2023 03:38:16 -0600
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 10 Nov 2023 03:38:16 -0600
+Received: from [172.24.227.247] (ileaxei01-snat2.itg.ti.com [10.180.69.6])
+	by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 3AA9cDOh027218;
+	Fri, 10 Nov 2023 03:38:14 -0600
+Message-ID: <44f68604-b37d-56d9-6fc1-4c4cc503abd3@ti.com>
+Date: Fri, 10 Nov 2023 15:08:13 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.2]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm000007.china.huawei.com (7.193.23.189)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH] MAINTAINERS: net: Update reviewers for TI's Ethernet
+ drivers
+Content-Language: en-US
+To: Roger Quadros <rogerq@kernel.org>, <netdev@vger.kernel.org>
+CC: <linux-omap@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <s-vadapalli@ti.com>, <nm@ti.com>, <srk@ti.com>,
+        Md Danish Anwar
+	<danishanwar@ti.com>
+References: <20231110084227.2616-1-r-gunasekaran@ti.com>
+ <78cf6806-0bdc-4b81-8d96-51a6f8fb168c@kernel.org>
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+In-Reply-To: <78cf6806-0bdc-4b81-8d96-51a6f8fb168c@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-If PF is down, firmware will returns 10 Mbit/s rate and half-duplex mode
-when PF queries the port information from firmware.
+Roger,
 
-After imp reset command is executed, PF status changes to down,
-and PF will query link status and updates port information
-from firmware in a periodic scheduled task.
+On 11/10/23 2:21 PM, Roger Quadros wrote:
+> Hi Ravi,
+> 
+> On 10/11/2023 10:42, Ravi Gunasekaran wrote:
+>> Grygorii is no longer associated with TI and messages addressed to
+>> him bounce.
+>>
+>> Add Siddharth and myself as reviewers.
+>>
+>> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+>> ---
+>>  MAINTAINERS | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 7b151710e8c5..bd52c33bca02 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -21775,7 +21775,8 @@ F:	Documentation/devicetree/bindings/counter/ti-eqep.yaml
+>>  F:	drivers/counter/ti-eqep.c
+>>  
+>>  TI ETHERNET SWITCH DRIVER (CPSW)
+>> -R:	Grygorii Strashko <grygorii.strashko@ti.com>
+>> +R:	Siddharth Vadapalli <s-vadapalli@ti.com>
+>> +R:	Ravi Gunasekaran <r-gunasekaran@ti.com>
+> 
+> Could you please add me as Reviewer as well. Thanks!
 
-However, there is a low probability that port information is updated
-when PF is down, and then PF link status changes to up.
-In this case, PF synchronizes incorrect rate and duplex mode to VF.
+Thanks for volunteering to be a reviewer.
 
-This patch fixes it by updating port information before
-PF synchronizes the rate and duplex to the VF
-when PF changes to up.
+I posted a v2 adding you as a reviewer.
+https://lore.kernel.org/all/20231110092749.3618-1-r-gunasekaran@ti.com/
 
-Fixes: 18b6e31f8bf4 ("net: hns3: PF add support for pushing link status to VFs")
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> 
+>>  L:	linux-omap@vger.kernel.org
+>>  L:	netdev@vger.kernel.org
+>>  S:	Maintained
+> 
+>> F:      drivers/net/ethernet/ti/cpsw*
+>> F:      drivers/net/ethernet/ti/davinci*
+> 
+> What about am65-cpsw*?
+> 
+> And drivers/net/ethernet/ti/icssg/*
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index c393b4ee4a32..5ea9e59569ef 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -61,6 +61,7 @@ static void hclge_sync_fd_table(struct hclge_dev *hdev);
- static void hclge_update_fec_stats(struct hclge_dev *hdev);
- static int hclge_mac_link_status_wait(struct hclge_dev *hdev, int link_ret,
- 				      int wait_cnt);
-+static int hclge_update_port_info(struct hclge_dev *hdev);
- 
- static struct hnae3_ae_algo ae_algo;
- 
-@@ -3041,6 +3042,9 @@ static void hclge_update_link_status(struct hclge_dev *hdev)
- 
- 	if (state != hdev->hw.mac.link) {
- 		hdev->hw.mac.link = state;
-+		if (state == HCLGE_LINK_STATUS_UP)
-+			hclge_update_port_info(hdev);
-+
- 		client->ops->link_status_change(handle, state);
- 		hclge_config_mac_tnl_int(hdev, state);
- 		if (rclient && rclient->ops->link_status_change)
+I would prefer a separate entry for ICSSG. Will let Danish comment on this.
+
+> 
+> I also see 
+> 
+> OMAP GPIO DRIVER
+> M:      Grygorii Strashko <grygorii.strashko@ti.com>
+> 
+> Maybe a separate patch to remove the invalid email-id?
+> 
+Yes, that's the plan. One of us from TI would be posting shortly.
+
+
 -- 
-2.30.0
-
+Regards,
+Ravi
 
