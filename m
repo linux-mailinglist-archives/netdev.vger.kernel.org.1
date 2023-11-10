@@ -1,101 +1,174 @@
-Return-Path: <netdev+bounces-47034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214D07E7ABF
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:25:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C727E7AC2
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 10:25:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B72EBB20B5E
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B670A28168D
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 09:25:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BEC11CB7;
-	Fri, 10 Nov 2023 09:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nobJaIP4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99577125AF;
+	Fri, 10 Nov 2023 09:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F9F11CB2;
-	Fri, 10 Nov 2023 09:24:58 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4685598;
-	Fri, 10 Nov 2023 01:24:56 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-507a29c7eefso2312364e87.1;
-        Fri, 10 Nov 2023 01:24:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699608295; x=1700213095; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7OZame69zbnU6L0OiwcXF8HyElhtG8ssWy3tTMbANA=;
-        b=nobJaIP444AyT058uc4ydgVR6un+oQHC+oif2obgDWmTYneuU3AUED2zYGoLUqIz+e
-         8eN8AhFIb5y5HqQ4YqocWSsxPLA/+i/9GR/4bypK919DpVWdOBaUFXEu2rcWhJ61QgLC
-         RTRHqE1sgBx4w8DX7ud16FNE1tkjJ4VdIeqBAzyPORar/oS9vFMj35YQxyRvpMZOvuoZ
-         VtrrI7USF3wr6u0Re6BH8fDtYXwDuxFbS/c60szYs5JEegOfpn22UbHeiIAvHVUSVQ3B
-         FAsvIAQO9rcCh0r5utpKXU20Uzngla7OGUlDLRXTCga39RbUWTDubn07w+gr8AfVzyvF
-         whDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699608295; x=1700213095;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z7OZame69zbnU6L0OiwcXF8HyElhtG8ssWy3tTMbANA=;
-        b=u8CnPplH+q6yEcZGo2RcqJwZ3HILqidhw9++QVFqqkiX1qldE+OEPtL9wcZNAhGUx3
-         0Rh1/wLSNtkZqbxqYR8oURdVUd54+kO/jFpW8qZmDtHNM5uUyMdUzSt5+w+wyRAGVAfv
-         vcSmm7GJx1RS57pgIumfozgSCg4AFuocI0KDnJ/nKQO1yJp84RtP/3aoecFfjR0B9AA5
-         eiYu5O1GM3g0GhFsN9S7ggQF74bkgpGQMVSW+erfEhwQHu/RDGx4szpo3BYuYyczb6+S
-         9Q5KImrpxkKENzFZTsPc2GGxQM9qmW6n0Mzwv+L9XCtl1uoplPVe01pO1+vKWkj629r1
-         HUQA==
-X-Gm-Message-State: AOJu0Yw07i20iU5FYxJX+Pg7j2ZglHV0uayB42dlggSIpkrVF/3l6P5B
-	qbWXdL3gM3Q2D2fdlmEsp0E=
-X-Google-Smtp-Source: AGHT+IGwQwDdOl9KvwvxD8XdI4QBBXBUdAEJUoKzciMSK+M2sPiKdejWczdhDwISGn4QdKA4/yFfUw==
-X-Received: by 2002:ac2:58db:0:b0:509:494d:c3d2 with SMTP id u27-20020ac258db000000b00509494dc3d2mr3381216lfo.32.1699608294497;
-        Fri, 10 Nov 2023 01:24:54 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f859:75f8:9bf:1a56])
-        by smtp.gmail.com with ESMTPSA id h12-20020adffd4c000000b00326dd5486dcsm1486945wrs.107.2023.11.10.01.24.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 01:24:53 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,  Breno Leitao <leitao@debian.org>,
-  linux-doc@vger.kernel.org,  netdev@vger.kernel.org,  pabeni@redhat.com,
-  edumazet@google.com
-Subject: Re: [PATCH] Documentation: Document the Netlink spec
-In-Reply-To: <20231108174306.47a64bda@kernel.org> (Jakub Kicinski's message of
-	"Wed, 8 Nov 2023 17:43:06 -0800")
-Date: Fri, 10 Nov 2023 09:23:50 +0000
-Message-ID: <m27cmq3qs9.fsf@gmail.com>
-References: <20231103135622.250314-1-leitao@debian.org>
-	<875y2cxa6n.fsf@meer.lwn.net> <20231108174306.47a64bda@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4E1125A1
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 09:25:48 +0000 (UTC)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2AE822BE31
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 01:25:46 -0800 (PST)
+Received: from loongson.cn (unknown [112.20.112.120])
+	by gateway (Coremail) with SMTP id _____8AxV_EZ901l4bM4AA--.46759S3;
+	Fri, 10 Nov 2023 17:25:45 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.112.120])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfS8X901lPPo9AA--.4768S2;
+	Fri, 10 Nov 2023 17:25:44 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	fancer.lancer@gmail.com,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	dongbiao@loongson.cn,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH v5 2/9] net: stmmac: Allow platforms to set irq_flags
+Date: Fri, 10 Nov 2023 17:25:41 +0800
+Message-Id: <e18edf4ab0a83de235fa3475eee4ba8ac88ee651.1699533745.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
+In-Reply-To: <cover.1699533745.git.siyanteng@loongson.cn>
+References: <cover.1699533745.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxfS8X901lPPo9AA--.4768S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJFW3tF18Kw4fXrWxZw15WrX_yoWrGFy8pa
+	y7Aas5trs7tr12gan8AayDZFy5K34xJayxAa4fJwnxAFWIyr9avr1FqrySyr1fCrZ5ArWa
+	qFWDua18C3WjgrgCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x02
+	67AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Some platforms need extra irq flags when request multi msi, add
+irq_flags variable for them.
 
-> On Wed, 08 Nov 2023 13:27:28 -0700 Jonathan Corbet wrote:
->> I do have to wonder, though, whether a sphinx extension is the right way
->> to solve this problem.  You're essentially implementing a filter that
->> turns one YAML file into one RST file; might it be better to keep that
->> outside of sphinx as a standalone script, invoked by the Makefile?
->
-> If we're considering other ways of generating the files - I'd also like
-> to voice a weak preference towards removing the need for the "stub"
-> files.
->
-> Get all the docs rendered under Documentation/netlink/ with an
-> auto-generated index.
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c    | 16 +++++++++-------
+ include/linux/stmmac.h                           |  1 +
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-FWIW the index could use a toctree glob pattern like we do in
-Documentation/bpf/maps.rst then it wouldn't need to be auto-generated.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 132d4f679b95..7371713c116d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3552,7 +3552,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 	int_name = priv->int_name_mac;
+ 	sprintf(int_name, "%s:%s", dev->name, "mac");
+ 	ret = request_irq(dev->irq, stmmac_mac_interrupt,
+-			  0, int_name, dev);
++			  priv->plat->irq_flags, int_name, dev);
+ 	if (unlikely(ret < 0)) {
+ 		netdev_err(priv->dev,
+ 			   "%s: alloc mac MSI %d (error: %d)\n",
+@@ -3569,7 +3569,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "wol");
+ 		ret = request_irq(priv->wol_irq,
+ 				  stmmac_mac_interrupt,
+-				  0, int_name, dev);
++				  priv->plat->irq_flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc wol MSI %d (error: %d)\n",
+@@ -3587,7 +3587,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "lpi");
+ 		ret = request_irq(priv->lpi_irq,
+ 				  stmmac_mac_interrupt,
+-				  0, int_name, dev);
++				  priv->plat->irq_flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc lpi MSI %d (error: %d)\n",
+@@ -3605,7 +3605,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "safety-ce");
+ 		ret = request_irq(priv->sfty_ce_irq,
+ 				  stmmac_safety_interrupt,
+-				  0, int_name, dev);
++				  priv->plat->irq_flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc sfty ce MSI %d (error: %d)\n",
+@@ -3623,7 +3623,7 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s", dev->name, "safety-ue");
+ 		ret = request_irq(priv->sfty_ue_irq,
+ 				  stmmac_safety_interrupt,
+-				  0, int_name, dev);
++				  priv->plat->irq_flags, int_name, dev);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc sfty ue MSI %d (error: %d)\n",
+@@ -3644,7 +3644,8 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s-%d", dev->name, "rx", i);
+ 		ret = request_irq(priv->rx_irq[i],
+ 				  stmmac_msi_intr_rx,
+-				  0, int_name, &priv->dma_conf.rx_queue[i]);
++				  priv->plat->irq_flags, int_name,
++				  &priv->dma_conf.rx_queue[i]);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc rx-%d  MSI %d (error: %d)\n",
+@@ -3669,7 +3670,8 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+ 		sprintf(int_name, "%s:%s-%d", dev->name, "tx", i);
+ 		ret = request_irq(priv->tx_irq[i],
+ 				  stmmac_msi_intr_tx,
+-				  0, int_name, &priv->dma_conf.tx_queue[i]);
++				  priv->plat->irq_flags, int_name,
++				  &priv->dma_conf.tx_queue[i]);
+ 		if (unlikely(ret < 0)) {
+ 			netdev_err(priv->dev,
+ 				   "%s: alloc tx-%d  MSI %d (error: %d)\n",
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 0b4658a7eceb..664a0e1cefc2 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -312,5 +312,6 @@ struct plat_stmmacenet_data {
+ 	int msi_tx_base_vec;
+ 	const struct dwmac4_addrs *dwmac4_addrs;
+ 	unsigned int flags;
++	unsigned int irq_flags;
+ };
+ #endif
+-- 
+2.31.4
 
-> This way newcomers won't have to remember to add a stub to get the doc
-> rendered. One fewer thing to worry about during review.
 
