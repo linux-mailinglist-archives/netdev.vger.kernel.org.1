@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-47009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F0907E7986
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:49:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 560AD7E797F
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 07:43:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E8171C20D27
-	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:49:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F022281149
+	for <lists+netdev@lfdr.de>; Fri, 10 Nov 2023 06:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79364610E;
-	Fri, 10 Nov 2023 06:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66416AA5;
+	Fri, 10 Nov 2023 06:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Oki42Wmw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="J5S3CaSD"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7491875
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:49:08 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1FC07DA8
-	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:49:07 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9ae2cc4d17eso286075066b.1
-        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:49:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558BA6AB1
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 06:43:54 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208B77D89
+	for <netdev@vger.kernel.org>; Thu,  9 Nov 2023 22:43:53 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-54553e4888bso2506535a12.2
+        for <netdev@vger.kernel.org>; Thu, 09 Nov 2023 22:43:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1699598946; x=1700203746; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1699598631; x=1700203431; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Gd0i7NYUTcrBtdhbo3Y6AdwFoId3RpYbGfU64KSxsnc=;
-        b=Oki42WmwYWp42rmWNpoHFMCQeZuMpI7KxNwl4B4AAtPzocBIAc4Po9t8Modutb5bJy
-         ON6u6fa3bOkKkPLQMieWaw93Aef0m7FYDzUuPNli4YisNgv5AUKeiyJQg9Tz+pPUboZ3
-         oLZkt921MG1/h8ChdDLZG9FKoNXrr1y2Fnl4E=
+        bh=5aAyrsi/OdYTJt7ztD1zdPN9A45VA9yQ9S/fXiOmzBc=;
+        b=J5S3CaSDAdc/e4xSzvGhgW7snrNo6ae70n04Yf855IZS+Ba+ujCMitmKbCz6NiFfPs
+         4oFEVjb31Gxn6YqT00BdZso8DkQ4BsBMyhUFGhT7h8JFE6sMoEHR4hTqrLcsTV9G0F0T
+         s8NfOD43A07c/wSPw3UhKcpTk7QAlDK2tV+NY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699598946; x=1700203746;
+        d=1e100.net; s=20230601; t=1699598631; x=1700203431;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Gd0i7NYUTcrBtdhbo3Y6AdwFoId3RpYbGfU64KSxsnc=;
-        b=pwkH+LelJ02wJA+09ELBAU7Moh+KZeoS2Up2ksED/72w/IdxLxQ7E4EaiUtidMnA6P
-         GNJ4kAEVhxO6R8nXglebYiF1Z3tRZeA3x6xCk0aXhR90VEUCQq2rtn6Qw/OQyLOrXgwA
-         w7DsdJ8vyMWuU3o5prTaGnvDqAMChl9XYKxuH8lEi7MpRPGVGhnADboICItgqWVWTZt5
-         QBT3/x8zSxHqIyYOJfFPz2i1pbgi05eYYRcQ09u5fv/+KTqGljJQFcOFwCP5JcZ6CLyM
-         c6qa+TLcm0JzS9tc55NlTTYnwxC5FuxQElgPHnKzGxKqDV86OxhBO/wANwjiy5NbUZSa
-         HZcg==
-X-Gm-Message-State: AOJu0YwFP5xvvfDhTgxVikixKOftL/EobFMAszISb3wlORrPFAWTZQSb
-	OPtIfur0SrKmIAaPmUY8QdV+ujBX0RJBh85XkrkmHmCWpPh/9HMN
-X-Google-Smtp-Source: AGHT+IHRrSOKFPIlFjr8Bhd0Vb8KE+RrMTXKE6i9bTjVib1dsexoFzAXOfaFWhzyXEtlxPWScmQQdNHWO/Kis2fCLUM=
-X-Received: by 2002:a50:a6ce:0:b0:543:5f7a:9e27 with SMTP id
- f14-20020a50a6ce000000b005435f7a9e27mr5809505edc.12.1699592153827; Thu, 09
- Nov 2023 20:55:53 -0800 (PST)
+        bh=5aAyrsi/OdYTJt7ztD1zdPN9A45VA9yQ9S/fXiOmzBc=;
+        b=PN/IzWiU8wMV82FFvQV9VUVlD/fGuYF5eZvcgGoKHN7t4+9cpguSdzAnP5wEvfIEPs
+         mEZFDBhgZd6WxkLYq54DOq1M7zgAiOVYBzZox7mCEhnOFtYnYadJ4SBhdLaLwCEDbrFA
+         KJgEo8IycO8/BFYJL0cOT4/KYe4+2xYW211L3OyMOeRfnK0qqXfdASl5Hmf+NZ/NmZaB
+         hyrALLi/NYxpxm82cnsaZ8X+gIIzNLwbf/vFekTtSDjH3qYuEV7cBy12skUspjpMxcoC
+         cyQ6CFONrhLLpgKedKUKN71fXA6/fe4egOZz40Si9nBY3NUFEHTg+nSZClNj6H3qrmEe
+         8pKA==
+X-Gm-Message-State: AOJu0Yy6NsEolBCPB+WWEBgpD2M/oIMfR4gJu6uVlKM11Z+8nc6UHvfN
+	fbmG+cgIY7eh7okZn46x68U21d6xgIbY2/gW1QucA9PauitAqCzC
+X-Google-Smtp-Source: AGHT+IGNIclidNAlX0bKuPEoO8+P0utqB9UWfIj7BHmAgCgipVSJkQHDhkEHEBzr+YUc1On/0f+M/uFn2Xfgq20iyX0=
+X-Received: by 2002:a50:d65c:0:b0:53d:eca8:8775 with SMTP id
+ c28-20020a50d65c000000b0053deca88775mr6077048edj.26.1699592222329; Thu, 09
+ Nov 2023 20:57:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231110002340.3612515-1-alexey.pakhunov@spacex.com>
-In-Reply-To: <20231110002340.3612515-1-alexey.pakhunov@spacex.com>
+References: <20231110002340.3612515-1-alexey.pakhunov@spacex.com> <20231110002340.3612515-2-alexey.pakhunov@spacex.com>
+In-Reply-To: <20231110002340.3612515-2-alexey.pakhunov@spacex.com>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 9 Nov 2023 20:55:42 -0800
-Message-ID: <CACKFLim_W+4Sz6YAr42+X0re6Lwq2VmPXti2dxFEh291j9q7tw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] tg3: Move the [rt]x_dropped counters to tg3_napi
+Date: Thu, 9 Nov 2023 20:56:51 -0800
+Message-ID: <CACKFLinOyTgH9STGbFc89sr6eqEiFeWWDvD4DurJjq3_-7+y+A@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] tg3: Increment tx_dropped in tg3_tso_bug()
 To: alexey.pakhunov@spacex.com
 Cc: mchan@broadcom.com, vincent.wong2@spacex.com, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000079288b0609c6b772"
+	boundary="000000000000b3f9930609c6a470"
 
---00000000000079288b0609c6b772
+--000000000000b3f9930609c6a470
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -77,8 +77,8 @@ On Thu, Nov 9, 2023 at 4:24=E2=80=AFPM <alexey.pakhunov@spacex.com> wrote:
 >
 > From: Alex Pakhunov <alexey.pakhunov@spacex.com>
 >
-> This change moves [rt]x_dropped counters to tg3_napi so that they can be
-> updated by a single writer, race-free.
+> tg3_tso_bug() drops a packet if it cannot be segmented for any reason.
+> The number of discarded frames should be incremented accordingly.
 >
 > Signed-off-by: Alex Pakhunov <alexey.pakhunov@spacex.com>
 > Signed-off-by: Vincent Wong <vincent.wong2@spacex.com>
@@ -86,7 +86,7 @@ On Thu, Nov 9, 2023 at 4:24=E2=80=AFPM <alexey.pakhunov@spacex.com> wrote:
 Thanks.
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
---00000000000079288b0609c6b772
+--000000000000b3f9930609c6a470
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -157,14 +157,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBKp6cuXFa2zE/rwj8ZgLvutKRDMHro8
-pw1WuHjn4qskMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
-MDA2NDkwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOJdBDTGK7zYgvlmeacSHEwRyeU3AO+l
+jLH5zjeGNwPOMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
+MDA2NDM1MVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCZWZzWn0TlVlktfbbEsHmFYVEntJ7XVKcfiSkXptmYyMbr1U7h
-Qw2xOvv62DlnlBeOG4cj7rwpffZ2O6i5wKorntOjcwCaX1OiSVa5hyYnKX5v+2YuseJT5Wzd1Yqg
-tCwMcrlfBjCdwAjP++AtwuQsjEyCwwIefleU1cIOzTP+eO3lG6M4GWmS6197fh/oqmMPqDEItMMr
-NS4wy2e1KPT5bTceKSuQew8/7U/DmFWVTYt6zM1NweXDorDNhVjDqOPdQ4WMXicENQD1Yo1Jy5mK
-+iORCywHOqdzo8WWgTI8ut7iI3SBByMqjml73tZuWl2IHpieXNa2slDAIql5wqIE
---00000000000079288b0609c6b772--
+ATANBgkqhkiG9w0BAQEFAASCAQB2+Q0u0hb8W8t/rzaEA3ZnAXiD7VVDn4i26R8gNOp+PesSj3mP
+POO5+HSfl4EeBpQwYZxnUySifyi13TgB+Y1TPqHyJ2CEh3Mca+UBdtoqJ5m4tMNHfs129axULY2b
+v7PJG5NjI8mrVfCbdLbP7eA3KCQRYLcCwfnNpdd8/ms08wMkIqlSSIRelstU22aL8aPMR7MEtaXu
+YN0L11n6rkznMo/dlICdBbKEzctFmPT8Q6l0HrMujl89Cu1D+coe3loikEYDeBNHGBsPcrWHovg3
+5b1DgXtHOUC3fahAIDzPxBWT4SIvCIqsyZZh/e5OSW78dWF0HxfE2mFdvXmGlHAQ
+--000000000000b3f9930609c6a470--
 
