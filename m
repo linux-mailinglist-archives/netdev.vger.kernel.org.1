@@ -1,120 +1,188 @@
-Return-Path: <netdev+bounces-47182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99ED87E8AF8
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 13:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 652FF7E8B67
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 16:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD7121C2083D
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 12:56:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 910E31C20846
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 15:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76C814014;
-	Sat, 11 Nov 2023 12:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41B5182AE;
+	Sat, 11 Nov 2023 15:47:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCB2FrO7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DWRXpKq7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0507713ADC
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 12:55:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A74463A87
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 04:55:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699707355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FWtuM3rWBnpV7rVtzL0eR+/PEqwZ6X+zWoLWnScSfdI=;
-	b=fCB2FrO7/6TsWaXD86+/fUBmdjUQQ6Y7e2Ox9ZkU+qj7TFuHnVbcGe3zFOeKPK0IuvfZJp
-	YCEX6ljOQ9bLotWyD0/yF+bglm4gDTq8lKxaVSWGpboMMvIIjCKzHRmG2VClk2JMFUELql
-	ISUpKeOHZIyim4FnN3g0bVjlRQab98w=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-3P8EXirrP0CIJzq_44yD9w-1; Sat, 11 Nov 2023 07:55:53 -0500
-X-MC-Unique: 3P8EXirrP0CIJzq_44yD9w-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8101811E7B;
-	Sat, 11 Nov 2023 12:55:52 +0000 (UTC)
-Received: from renaissance-vector.redhat.com (unknown [10.39.192.48])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id ABB04492BFA;
-	Sat, 11 Nov 2023 12:55:51 +0000 (UTC)
-From: Andrea Claudi <aclaudi@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Andrea Claudi <aclaudi@redhat.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@gmail.com>,
-	Luca Boccassi <luca.boccassi@gmail.com>
-Subject: [PATCH iproute2] Makefile: use /usr/share/iproute2 for config files
-Date: Sat, 11 Nov 2023 13:55:41 +0100
-Message-ID: <c26af87143b645cc19ce93e4624923ef3f25204d.1699707062.git.aclaudi@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6534179B5;
+	Sat, 11 Nov 2023 15:47:01 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0741FC4;
+	Sat, 11 Nov 2023 07:47:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BRoAErZ5yOtvfNP0SlKlWtBLjRZYFNsbyXZVc9WMORo=; b=DWRXpKq7JJi+mzvFky3MJjJqNW
+	UnBga+6yQRg/hhJhLh0CXDxZwPZlrt2R/SywT8ELO2g1pTB+pu4sG7ZgAU5p9FDnk3DV5tQh1o+jM
+	0A3uizk3/lmYQwpqH20SMhJbmBS5F7E2RGxjpt63DD0V37DXVicyrdFr6XnKdS8cFcFo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r1qC2-001Ma7-Eb; Sat, 11 Nov 2023 16:46:42 +0100
+Date: Sat, 11 Nov 2023 16:46:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Simon Horman <horms@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v6 3/4] net: phy: aquantia: add firmware
+ load support
+Message-ID: <e75a8874-5ffe-4d8d-bcb9-27d8dff1cd09@lunn.ch>
+References: <20231109123253.3933-1-ansuelsmth@gmail.com>
+ <20231109123253.3933-3-ansuelsmth@gmail.com>
+ <20231110195628.GA673918@kernel.org>
+ <654eae99.df0a0220.14db7.0cb8@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <654eae99.df0a0220.14db7.0cb8@mx.google.com>
 
-CONF_USR_DIR was initially set to $(PREFIX)/lib/iproute2, then moved to
-$(LIBDIR)/iproute2 to honour the libdir user config. However, as
-reported by Luca, most distros use an arch-dependent LIBDIR, which is
-the wrong directory to place architecture-independent configuration
-files.
+On Fri, Nov 10, 2023 at 11:28:36PM +0100, Christian Marangi wrote:
+> On Fri, Nov 10, 2023 at 07:57:02PM +0000, Simon Horman wrote:
+> > On Thu, Nov 09, 2023 at 01:32:52PM +0100, Christian Marangi wrote:
+> > > From: Robert Marko <robimarko@gmail.com>
+> > > 
+> > > Aquantia PHY-s require firmware to be loaded before they start operating.
+> > > It can be automatically loaded in case when there is a SPI-NOR connected
+> > > to Aquantia PHY-s or can be loaded from the host via MDIO.
+> > > 
+> > > This patch adds support for loading the firmware via MDIO as in most cases
+> > > there is no SPI-NOR being used to save on cost.
+> > > Firmware loading code itself is ported from mainline U-boot with cleanups.
+> > > 
+> > > The firmware has mixed values both in big and little endian.
+> > > PHY core itself is big-endian but it expects values to be in little-endian.
+> > > The firmware is little-endian but CRC-16 value for it is stored at the end
+> > > of firmware in big-endian.
+> > > 
+> > > It seems the PHY does the conversion internally from firmware that is
+> > > little-endian to the PHY that is big-endian on using the mailbox
+> > > but mailbox returns a big-endian CRC-16 to verify the written data
+> > > integrity.
+> > > 
+> > > Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+> > > Signed-off-by: Robert Marko <robimarko@gmail.com>
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > 
+> > Hi Christian and Robert,
+> > 
+> > thanks for your patch-set.
+> > 
+> > I spotted some minor endien issues which I have highlighted below.
+> > 
+> > ...
+> >
+> 
+> Hi Simon,
+> 
+> thanks for the check!
+> 
+> > > +/* load data into the phy's memory */
+> > > +static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
+> > > +			      const u8 *data, size_t len)
+> > > +{
+> > > +	u16 crc = 0, up_crc;
+> > > +	size_t pos;
+> > > +
+> > > +	/* PHY expect addr in LE */
+> > > +	addr = cpu_to_le32(addr);
+> > 
+> > The type of addr is host byte-order,
+> > but here it is assigned a little-endian value.
+> > 
+> > Flagged by Sparse.
+> > 
+> > > +
+> > > +	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
+> > > +		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
+> > > +	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > > +		      VEND1_GLOBAL_MAILBOX_INTERFACE3,
+> > > +		      VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(addr));
+> > 
+> > VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR() performs a bit-shift on addr,
+> > and applies a mask which is in host-byte order.
+> > But, as highlighted above, addr is a little-endian value.
+> > This does not seem right.
+> >
+> 
+> It's really just some magic to split the addr and swap if we are not
+> in little-endian. The passed addr are defined here in the code and are
+> hardcoded, they doesn't come from the firmware. What I can do is just
+> recast __le32 to u32 again with __force to mute the warning...
+> 
+> Resulting in this snippet:
+> 
+> 	__le32 addr;
+> 	size_t pos;
+> 
+> 	/* PHY expect addr in LE */
+> 	addr = cpu_to_le32(load_addr);
+> 
+> 	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE1,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE1_CRC_RESET);
+> 	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE3,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR((__force u32)addr));
+> 	phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE4,
+> 		      VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR((__force u32)addr));
+> 
+> Also things needs to be casted to u16 anyway as phy_write_mmd expect a
+> u16. And as you said FILED_PREP will use int (from the define) so I
+> wonder if a more clean way would be just addr = (__force u32)cpu_to_le32(load_addr)
+> resulting in a simple bswap32 if we are in big-endian.
+> 
+> Would love some feedback about this.
 
-According to FHS:
+I don't think sparse is giving much value here. As you say,
+phy_write_mmd() expects a u16, host endian. The endianness of the bus
+is well defined in 802.3, and we expect the MDIO bus driver to take
+care of converting host endian to whatever is needed by the
+hardware. And typically, that is nothing since it is all integrated.
 
-"/usr/lib includes object files and libraries. On some systems, it may
-also include internal binaries that are not intended to be executed
-directly by users or shell scripts."
+There does not appear to be a cpu_to_le32() without sparse markup. So
+i think you are forced to use the ugly __force. I would do that as
+soon as possible, as part of the cpu_to_le32() line.
 
-A better directory to store config files is /usr/share:
+> > This is all hidden by a cast in VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR()
+> > This seems dangerous to me.
 
-"The /usr/share hierarchy is for all read-only architecture independent
-data files.
+That cast could be made more visible. The macro itself looks safe on
+different endians. It uses > and & operations. So try taking the cast
+out of the macro and make it part of the phy_write_mmd() call? I
+assume the cast is needed because you get a compiler warning, passing
+a u32 when a u16 is expected?
 
-This hierarchy is intended to be shareable among all architecture
-platforms of a given OS; thus, for example, a site with i386, Alpha, and
-PPC platforms might maintain a single /usr/share directory that is
-centrally-mounted."
-
-Accordingly, move configuration files to $(DATADIR)/iproute2.
-
-Fixes: 946753a4459b ("Makefile: ensure CONF_USR_DIR honours the libdir config")
-Reported-by: Luca Boccassi <luca.boccassi@gmail.com>
-Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 5c559c8d..8024d45e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -16,12 +16,12 @@ endif
- 
- PREFIX?=/usr
- SBINDIR?=/sbin
--CONF_ETC_DIR?=/etc/iproute2
--CONF_USR_DIR?=$(LIBDIR)/iproute2
- NETNS_RUN_DIR?=/var/run/netns
- NETNS_ETC_DIR?=/etc/netns
- DATADIR?=$(PREFIX)/share
- HDRDIR?=$(PREFIX)/include/iproute2
-+CONF_ETC_DIR?=/etc/iproute2
-+CONF_USR_DIR?=$(DATADIR)/iproute2
- DOCDIR?=$(DATADIR)/doc/iproute2
- MANDIR?=$(DATADIR)/man
- ARPDDIR?=/var/lib/arpd
--- 
-2.41.0
-
+	Andrew
 
