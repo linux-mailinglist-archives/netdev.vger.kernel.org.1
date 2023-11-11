@@ -1,307 +1,278 @@
-Return-Path: <netdev+bounces-47178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34667E898C
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 07:38:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CD37E89C1
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 09:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32EE2B20BB5
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 06:38:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D8A4B20ADB
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 08:14:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2276FBE;
-	Sat, 11 Nov 2023 06:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D6BD514;
+	Sat, 11 Nov 2023 08:14:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ahd0UHyZ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wufoJrYk"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 664CD569F;
-	Sat, 11 Nov 2023 06:38:02 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F5FE1BD;
-	Fri, 10 Nov 2023 22:38:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699684680; x=1731220680;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D+tGfvCQJ9V1xx3mrnTac1Wu9FAKjry3Gfbn3Hb4aTc=;
-  b=Ahd0UHyZ5P2jpO60l/vX7gBKbqEG5rzfqrc6vkg4DlXPf2tAW+Soq/XJ
-   taSb9OozByxFoYXvP1Mlzb6E4m1rYUqkcToAbNx+VruFFk5sBaXeg7MJs
-   9t0uOf5OlMVttptNO3ruknvdzf712BWv6O5YB0sN0aNwcaP0xMLOwOSTr
-   fdmEBDRuO3HhqJ+BAPe7DSCrPBL0TOIwa3V/sPRHT5nezs7/fiV1el3Zm
-   zbBpXOLLrAsehM9/A6kFU9izjPVNoF5sgg4PRe9B0RUQ+7GBYouI41HGb
-   +Ti7nORVlZ+CoikJEIeiwWug1w5a8hW/j7tcpz1iCfAOLiwxFCxz6s/+7
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10890"; a="370463648"
-X-IronPort-AV: E=Sophos;i="6.03,294,1694761200"; 
-   d="scan'208";a="370463648"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2023 22:37:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10890"; a="740312473"
-X-IronPort-AV: E=Sophos;i="6.03,294,1694761200"; 
-   d="scan'208";a="740312473"
-Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 10 Nov 2023 22:37:55 -0800
-Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r1hcv-000AGk-0u;
-	Sat, 11 Nov 2023 06:37:53 +0000
-Date: Sat, 11 Nov 2023 14:37:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>,
-	ralf@linux-mips.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Bragatheswaran Manickavel <bragathemanick0908@gmail.com>,
-	linux-hams@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+0145ea560de205bc09f0@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: memory leak in nr_rx_frame
-Message-ID: <202311111418.ojyVQuqO-lkp@intel.com>
-References: <20231110173632.2511-1-bragathemanick0908@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33111703
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 08:13:59 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C0F3C3C
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 00:13:57 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40838915cecso21445995e9.2
+        for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 00:13:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1699690435; x=1700295235; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hbD/sFHhqCgv+rc21fEZQqviHdww1+qYyJF/3ffER+g=;
+        b=wufoJrYkiClm7GJyRhFUoLTidDsVWAzSRRb6WmbpJwiEIdAI7cyBmPJmEM3j4Dttzj
+         kh2PIfhTRJllA+wB9b5ILJcqJfoqRF/Q4jiKtE6yD3BWwwfpN0Hgka4g9o9C2emuNqaV
+         phur9EXpTkUt5qNZR5Lc4Y5AOtS+t16mZxAAGmtvsjts95wm1Xn8CoVR8YVKwX7rnXSP
+         3b1o0Z0ZoT0kw2E69VdfSz9I5JM1cnBx0lqAzWpLgtmnhLQZD4gfMGpDZ9PaUAJk0yUZ
+         o+LYemPFZ5Wb1Ctvya/fMznwcI3kwvDJashdys1Nmqp868AMKP1HAqz7Gx/rVQO2iMvp
+         Yjdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699690435; x=1700295235;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hbD/sFHhqCgv+rc21fEZQqviHdww1+qYyJF/3ffER+g=;
+        b=eeV8KmdLSAC8GSeoXjaKShTAnrd3Ayspo24nbnW8fDSEbizTfP3Fq1kt+loh/72OVT
+         QeLxkuKjIq2zhDVfym671JMu0vVedWvkr8Lq/LTUNElEf9K6pJxTSvkeMzHF6bKJRn9s
+         kpRfXQMUOmjF5ntYKZHLh9trgbSmM2MyBus38TyQY5P0Nv1d3CIQzq8Fk8aWRXnty0Q1
+         uzDXxeegaawMVzonFxan3qE4o31AH+X172sTzpZVLeKckxW4nkgwqi9hJe+QS2sJHu0L
+         0LBkgny/+ppDyoF/JXaMLdJ/njcmz2GRI36j1r76XBAI34bdxkbu1lIL2NL/RM1XkZNJ
+         Shiw==
+X-Gm-Message-State: AOJu0YzmDWOnY9MajUlwfH7UkwLWg+PPX1WSFy7wYsDq3ZJI70uoUcLx
+	N/D5zPpCNjmn0UU4YxoXj8qDAA==
+X-Google-Smtp-Source: AGHT+IG8F5780iVYGMmIwg2z/khiYfoNnFqsg579K+pHph0JUAyx+INzjzlKPTIrThsPFg7vXACArg==
+X-Received: by 2002:a05:600c:30d3:b0:409:85d:5a6e with SMTP id h19-20020a05600c30d300b00409085d5a6emr1168539wmn.29.1699690435330;
+        Sat, 11 Nov 2023 00:13:55 -0800 (PST)
+Received: from [10.230.170.72] (46-253-189-43.dynamic.monzoon.net. [46.253.189.43])
+        by smtp.gmail.com with ESMTPSA id hg12-20020a05600c538c00b0040a4835d2b2sm3019298wmb.37.2023.11.11.00.13.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Nov 2023 00:13:54 -0800 (PST)
+Message-ID: <0819b2e0-fa1f-4452-9925-e93b8bb2e940@linaro.org>
+Date: Sat, 11 Nov 2023 09:13:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231110173632.2511-1-bragathemanick0908@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 5/8] dt-bindings: net: pcs: add bindings for MediaTek
+ USXGMII PCS
+To: Daniel Golle <daniel@makrotopia.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chunfeng Yun
+ <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+ John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
+ Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>,
+ Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-phy@lists.infradead.org
+References: <cover.1699565880.git.daniel@makrotopia.org>
+ <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Bragatheswaran,
+On 09/11/2023 22:51, Daniel Golle wrote:
+> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
+> it in order to configure and monitor the Ethernet SerDes link in
+> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
+> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
+> interface modes are also available.
+> 
 
-kernel test robot noticed the following build warnings:
+A nit, subject: drop second/last, redundant "bindings for". The
+"dt-bindings" prefix is already stating that these are bindings.
 
-[auto build test WARNING on net-next/main]
-[also build test WARNING on net/main linus/master horms-ipvs/master v6.6 next-20231110]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/net/pcs/mediatek,usxgmii.yaml    | 105 ++++++++++++++++++
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bragatheswaran-Manickavel/net-memory-leak-in-nr_rx_frame/20231111-013821
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231110173632.2511-1-bragathemanick0908%40gmail.com
-patch subject: [PATCH] net: memory leak in nr_rx_frame
-config: powerpc64-allyesconfig (https://download.01.org/0day-ci/archive/20231111/202311111418.ojyVQuqO-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231111/202311111418.ojyVQuqO-lkp@intel.com/reproduce)
+Use compatible as filename (especially that you do not expect it to grow).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311111418.ojyVQuqO-lkp@intel.com/
+>  1 file changed, 105 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+> new file mode 100644
+> index 0000000000000..199cf47859e31
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+> @@ -0,0 +1,105 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/pcs/mediatek,usxgmii.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek USXGMII PCS
 
-All warnings (new ones prefixed by >>):
+MT7888 I guess?
 
->> net/netrom/af_netrom.c:968:6: warning: variable 'make' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-     968 |         if (sk == NULL || sk_acceptq_is_full(sk) ||
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   net/netrom/af_netrom.c:973:7: note: uninitialized use occurs here
-     973 |                 if (make)
-         |                     ^~~~
-   net/netrom/af_netrom.c:968:6: note: remove the '||' if its condition is always false
-     968 |         if (sk == NULL || sk_acceptq_is_full(sk) ||
-         |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> net/netrom/af_netrom.c:968:6: warning: variable 'make' is used uninitialized whenever '||' condition is true [-Wsometimes-uninitialized]
-     968 |         if (sk == NULL || sk_acceptq_is_full(sk) ||
-         |             ^~~~~~~~~~
-   net/netrom/af_netrom.c:973:7: note: uninitialized use occurs here
-     973 |                 if (make)
-         |                     ^~~~
-   net/netrom/af_netrom.c:968:6: note: remove the '||' if its condition is always false
-     968 |         if (sk == NULL || sk_acceptq_is_full(sk) ||
-         |             ^~~~~~~~~~~~~
-   net/netrom/af_netrom.c:874:19: note: initialize the variable 'make' to silence this warning
-     874 |         struct sock *make;
-         |                          ^
-         |                           = NULL
-   2 warnings generated.
+> +
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description:
+> +  The MediaTek USXGMII PCS provides physical link control and status
+> +  for USXGMII, 10GBase-R and 5GBase-R links on the SerDes interfaces
+> +  provided by the PEXTP PHY.
+> +  In order to also support legacy 2500Base-X, 1000Base-X and Cisco
+> +  SGMII an existing mediatek,*-sgmiisys LynxI PCS is wrapped to
+> +  provide those interfaces modes on the same SerDes interfaces shared
+> +  with the USXGMII PCS.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^pcs@[0-9a-f]+$"
+
+Drop, we do not enforce naming in individual device schemas.
+
+> +
+> +  compatible:
+> +    const: mediatek,mt7988-usxgmiisys
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: USXGMII top-level clock
+> +      - description: SGMII top-level clock
+> +      - description: SGMII subsystem TX clock
+> +      - description: SGMII subsystem RX clock
+> +      - description: XFI PLL clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: usxgmii
+> +      - const: sgmii_sel
+> +      - const: sgmii_tx
+> +      - const: sgmii_rx
+> +      - const: xfi_pll
+> +
+> +  phys:
+> +    items:
+> +      - description: PEXTP SerDes PHY
+> +
+> +  mediatek,sgmiisys:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to the syscon node of the corresponding SGMII LynxI PCS.
+
+"syscon node" is Linux term. Instead describe to what part of hardware
+this phandle is and why do you need it.
+
+> +
+> +  resets:
+> +    items:
+> +      - description: XFI reset
+> +      - description: SGMII reset
+> +
+> +  reset-names:
+> +    items:
+> +      - const: xfi
+> +      - const: sgmii
+> +
+> +  "#pcs-cells":
+> +    const: 0
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - phys
+> +  - mediatek,sgmiisys
+> +  - resets
+> +  - reset-names
+> +  - "#pcs-cells"
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+> +    #include <dt-bindings/reset/mediatek,mt7988-resets.h>
+> +    soc {
+> +      #address-cells = <2>;
+> +      #size-cells = <2>;
+> +        usxgmiisys0: pcs@10080000 {
+
+Odd/Messed indentation.
+
+Use 4 spaces for example indentation.
 
 
-vim +968 net/netrom/af_netrom.c
 
-^1da177e4c3f41 Linus Torvalds            2005-04-16   870  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   871  int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
-^1da177e4c3f41 Linus Torvalds            2005-04-16   872  {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   873  	struct sock *sk;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   874  	struct sock *make;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   875  	struct nr_sock *nr_make;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   876  	ax25_address *src, *dest, *user;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   877  	unsigned short circuit_index, circuit_id;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   878  	unsigned short peer_circuit_index, peer_circuit_id;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   879  	unsigned short frametype, flags, window, timeout;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   880  	int ret;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   881  
-c8c8218ec5af5d Cong Wang                 2019-06-27   882  	skb_orphan(skb);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   883  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   884  	/*
-^1da177e4c3f41 Linus Torvalds            2005-04-16   885  	 *	skb->data points to the netrom frame start
-^1da177e4c3f41 Linus Torvalds            2005-04-16   886  	 */
-^1da177e4c3f41 Linus Torvalds            2005-04-16   887  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   888  	src  = (ax25_address *)(skb->data + 0);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   889  	dest = (ax25_address *)(skb->data + 7);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   890  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   891  	circuit_index      = skb->data[15];
-^1da177e4c3f41 Linus Torvalds            2005-04-16   892  	circuit_id         = skb->data[16];
-^1da177e4c3f41 Linus Torvalds            2005-04-16   893  	peer_circuit_index = skb->data[17];
-^1da177e4c3f41 Linus Torvalds            2005-04-16   894  	peer_circuit_id    = skb->data[18];
-^1da177e4c3f41 Linus Torvalds            2005-04-16   895  	frametype          = skb->data[19] & 0x0F;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   896  	flags              = skb->data[19] & 0xF0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   897  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   898  	/*
-^1da177e4c3f41 Linus Torvalds            2005-04-16   899  	 * Check for an incoming IP over NET/ROM frame.
-^1da177e4c3f41 Linus Torvalds            2005-04-16   900  	 */
-98a82febb63404 Ralf Baechle              2005-08-24   901  	if (frametype == NR_PROTOEXT &&
-98a82febb63404 Ralf Baechle              2005-08-24   902  	    circuit_index == NR_PROTO_IP && circuit_id == NR_PROTO_IP) {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   903  		skb_pull(skb, NR_NETWORK_LEN + NR_TRANSPORT_LEN);
-badff6d01a8589 Arnaldo Carvalho de Melo  2007-03-13   904  		skb_reset_transport_header(skb);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   905  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   906  		return nr_rx_ip(skb, dev);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   907  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16   908  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   909  	/*
-^1da177e4c3f41 Linus Torvalds            2005-04-16   910  	 * Find an existing socket connection, based on circuit ID, if it's
-^1da177e4c3f41 Linus Torvalds            2005-04-16   911  	 * a Connect Request base it on their circuit ID.
-^1da177e4c3f41 Linus Torvalds            2005-04-16   912  	 *
-^1da177e4c3f41 Linus Torvalds            2005-04-16   913  	 * Circuit ID 0/0 is not valid but it could still be a "reset" for a
-^1da177e4c3f41 Linus Torvalds            2005-04-16   914  	 * circuit that no longer exists at the other end ...
-^1da177e4c3f41 Linus Torvalds            2005-04-16   915  	 */
-^1da177e4c3f41 Linus Torvalds            2005-04-16   916  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   917  	sk = NULL;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   918  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   919  	if (circuit_index == 0 && circuit_id == 0) {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   920  		if (frametype == NR_CONNACK && flags == NR_CHOKE_FLAG)
-^1da177e4c3f41 Linus Torvalds            2005-04-16   921  			sk = nr_find_peer(peer_circuit_index, peer_circuit_id, src);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   922  	} else {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   923  		if (frametype == NR_CONNREQ)
-^1da177e4c3f41 Linus Torvalds            2005-04-16   924  			sk = nr_find_peer(circuit_index, circuit_id, src);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   925  		else
-^1da177e4c3f41 Linus Torvalds            2005-04-16   926  			sk = nr_find_socket(circuit_index, circuit_id);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   927  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16   928  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   929  	if (sk != NULL) {
-7314f5480f3e37 Cong Wang                 2018-12-29   930  		bh_lock_sock(sk);
-badff6d01a8589 Arnaldo Carvalho de Melo  2007-03-13   931  		skb_reset_transport_header(skb);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   932  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   933  		if (frametype == NR_CONNACK && skb->len == 22)
-^1da177e4c3f41 Linus Torvalds            2005-04-16   934  			nr_sk(sk)->bpqext = 1;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   935  		else
-^1da177e4c3f41 Linus Torvalds            2005-04-16   936  			nr_sk(sk)->bpqext = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   937  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   938  		ret = nr_process_rx_frame(sk, skb);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   939  		bh_unlock_sock(sk);
-7314f5480f3e37 Cong Wang                 2018-12-29   940  		sock_put(sk);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   941  		return ret;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   942  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16   943  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   944  	/*
-^1da177e4c3f41 Linus Torvalds            2005-04-16   945  	 * Now it should be a CONNREQ.
-^1da177e4c3f41 Linus Torvalds            2005-04-16   946  	 */
-^1da177e4c3f41 Linus Torvalds            2005-04-16   947  	if (frametype != NR_CONNREQ) {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   948  		/*
-^1da177e4c3f41 Linus Torvalds            2005-04-16   949  		 * Here it would be nice to be able to send a reset but
-e21ce8c7c013fb Ralf Baechle              2005-09-12   950  		 * NET/ROM doesn't have one.  We've tried to extend the protocol
-e21ce8c7c013fb Ralf Baechle              2005-09-12   951  		 * by sending NR_CONNACK | NR_CHOKE_FLAGS replies but that
-e21ce8c7c013fb Ralf Baechle              2005-09-12   952  		 * apparently kills BPQ boxes... :-(
-e21ce8c7c013fb Ralf Baechle              2005-09-12   953  		 * So now we try to follow the established behaviour of
-e21ce8c7c013fb Ralf Baechle              2005-09-12   954  		 * G8PZT's Xrouter which is sending packets with command type 7
-e21ce8c7c013fb Ralf Baechle              2005-09-12   955  		 * as an extension of the protocol.
-^1da177e4c3f41 Linus Torvalds            2005-04-16   956  		 */
-e21ce8c7c013fb Ralf Baechle              2005-09-12   957  		if (sysctl_netrom_reset_circuit &&
-e21ce8c7c013fb Ralf Baechle              2005-09-12   958  		    (frametype != NR_RESET || flags != 0))
-e21ce8c7c013fb Ralf Baechle              2005-09-12   959  			nr_transmit_reset(skb, 1);
-e21ce8c7c013fb Ralf Baechle              2005-09-12   960  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   961  		return 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   962  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16   963  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   964  	sk = nr_find_listener(dest);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   965  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   966  	user = (ax25_address *)(skb->data + 21);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   967  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  @968  	if (sk == NULL || sk_acceptq_is_full(sk) ||
-^1da177e4c3f41 Linus Torvalds            2005-04-16   969  	    (make = nr_make_new(sk)) == NULL) {
-^1da177e4c3f41 Linus Torvalds            2005-04-16   970  		nr_transmit_refusal(skb, 0);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   971  		if (sk)
-7314f5480f3e37 Cong Wang                 2018-12-29   972  			sock_put(sk);
-d05be0015c62fa Bragatheswaran Manickavel 2023-11-10   973  		if (make)
-d05be0015c62fa Bragatheswaran Manickavel 2023-11-10   974  			sock_put(make);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   975  		return 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   976  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16   977  
-7314f5480f3e37 Cong Wang                 2018-12-29   978  	bh_lock_sock(sk);
-7314f5480f3e37 Cong Wang                 2018-12-29   979  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   980  	window = skb->data[20];
-^1da177e4c3f41 Linus Torvalds            2005-04-16   981  
-4638faac032756 Cong Wang                 2019-07-22   982  	sock_hold(make);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   983  	skb->sk             = make;
-c8c8218ec5af5d Cong Wang                 2019-06-27   984  	skb->destructor     = sock_efree;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   985  	make->sk_state	    = TCP_ESTABLISHED;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   986  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   987  	/* Fill in his circuit details */
-^1da177e4c3f41 Linus Torvalds            2005-04-16   988  	nr_make = nr_sk(make);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   989  	nr_make->source_addr = *dest;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   990  	nr_make->dest_addr   = *src;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   991  	nr_make->user_addr   = *user;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   992  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   993  	nr_make->your_index  = circuit_index;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   994  	nr_make->your_id     = circuit_id;
-^1da177e4c3f41 Linus Torvalds            2005-04-16   995  
-^1da177e4c3f41 Linus Torvalds            2005-04-16   996  	bh_unlock_sock(sk);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   997  	circuit = nr_find_next_circuit();
-^1da177e4c3f41 Linus Torvalds            2005-04-16   998  	bh_lock_sock(sk);
-^1da177e4c3f41 Linus Torvalds            2005-04-16   999  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1000  	nr_make->my_index    = circuit / 256;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1001  	nr_make->my_id       = circuit % 256;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1002  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1003  	circuit++;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1004  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1005  	/* Window negotiation */
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1006  	if (window < nr_make->window)
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1007  		nr_make->window = window;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1008  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1009  	/* L4 timeout negotiation */
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1010  	if (skb->len == 37) {
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1011  		timeout = skb->data[36] * 256 + skb->data[35];
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1012  		if (timeout * HZ < nr_make->t1)
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1013  			nr_make->t1 = timeout * HZ;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1014  		nr_make->bpqext = 1;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1015  	} else {
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1016  		nr_make->bpqext = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1017  	}
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1018  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1019  	nr_write_internal(make, NR_CONNACK);
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1020  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1021  	nr_make->condition = 0x00;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1022  	nr_make->vs        = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1023  	nr_make->va        = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1024  	nr_make->vr        = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1025  	nr_make->vl        = 0;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1026  	nr_make->state     = NR_STATE_3;
-18601a7d30c834 Ralf Baechle              2006-07-03  1027  	sk_acceptq_added(sk);
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1028  	skb_queue_head(&sk->sk_receive_queue, skb);
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1029  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1030  	if (!sock_flag(sk, SOCK_DEAD))
-676d23690fb62b David S. Miller           2014-04-11  1031  		sk->sk_data_ready(sk);
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1032  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1033  	bh_unlock_sock(sk);
-7314f5480f3e37 Cong Wang                 2018-12-29  1034  	sock_put(sk);
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1035  
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1036  	nr_insert_socket(make);
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1037  
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1038  	nr_start_heartbeat(make);
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1039  	nr_start_idletimer(make);
-5cc29e3bea7709 Ralf Baechle              2006-07-10  1040  
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1041  	return 1;
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1042  }
-^1da177e4c3f41 Linus Torvalds            2005-04-16  1043  
+Best regards,
+Krzysztof
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
