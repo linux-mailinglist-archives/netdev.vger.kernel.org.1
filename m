@@ -1,140 +1,122 @@
-Return-Path: <netdev+bounces-47175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 440967E897A
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 07:16:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDB17E8985
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 07:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7C6FB20BA1
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 06:16:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 126011F20EEF
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 06:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7283C6FC5;
-	Sat, 11 Nov 2023 06:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114116FC8;
+	Sat, 11 Nov 2023 06:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKjnFmH2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJfha56h"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF196FBD;
-	Sat, 11 Nov 2023 06:16:30 +0000 (UTC)
-Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E02421C;
-	Fri, 10 Nov 2023 22:16:28 -0800 (PST)
-Received: by mail-oo1-xc2e.google.com with SMTP id 006d021491bc7-58786e23d38so1582878eaf.3;
-        Fri, 10 Nov 2023 22:16:28 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB526FBE
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 06:28:47 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CEE4204
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:28:46 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cc1e1e74beso24919105ad.1
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:28:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699683387; x=1700288187; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QrI9vZKDek1tIeFt5gh+W4x7vSBsa7cCvKx3i4hMZUg=;
-        b=hKjnFmH2b5nfNiYNvebscUwBdRBrxfu+2/5DVUBZQe00MJvAC3x6OQf+GoE7HMoM47
-         9wh8rIN2+UVqxk7i7/CUup5rB7862l90rVR2ElnWFA5vD7cqFSIMwCj6h862ntwKS+0B
-         kFI+n6fza5ZOyHfYO+Zkhv/ZCEm8DxCttpze/wXFyA9pk/6xSnNRiOGqh24l+beFoVM4
-         V6Af55RJbUcO2T7kLlSx09bvNZSN87GWcTwCyI6oMNOljmB0UpoK8JlnplASd4i4rbzw
-         qkkAs66BVFBYl/nMY0iT4hGgcxiBzlfvSIufHFdt/MHRaG9F8IvAyAly3xpu/SoWXgtp
-         C7sQ==
+        d=gmail.com; s=20230601; t=1699684125; x=1700288925; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=E63zgqUKaQM4aLm+widqkwMi/0OVWJqab8uh2TRe2so=;
+        b=KJfha56hOQOCJUj5fk52vyR2H1tNaJ/nHl9WAUtrU9m2mddsQZpMrxXnED+tO59sqp
+         yl9cccYjgb+1MAyzaSz8UzNYzd8q1c1U1uRp0qIYlzPeLeB9Dh0MNv3u8bIysqx/ryV/
+         G4kDGd1UQzDtBNDS3jO1pluexJ9MDKsjr0KI2S4hYkbr+weQvRBQW5lYLJ2MgbKqTDmq
+         NN8UAkRzEfRf3NE0djs6Hk+PUVj3q2aQPLfyNR7T2xPKejNTPPLnm5Amaq7m5PL7Se7k
+         asODeshlknRULsLfpk4V40ttNrW95HjYH+KcrzjMQuNdTTEJRRM3VUIRI3Zg22kQhT4N
+         4FDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699683387; x=1700288187;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1699684125; x=1700288925;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QrI9vZKDek1tIeFt5gh+W4x7vSBsa7cCvKx3i4hMZUg=;
-        b=fipReqBYac9yxdazikbDPjslmBlfYZhx2U3R7on89N1q9uNDVKsvSodkCGdUFHuIjA
-         IbE8ZO0Qwoac1y2uhCjLAVjRZSNZvGDFc4I7huzKtimasKOScr5Vtcxg8oHrg1y6lIjZ
-         q8gWZm4pXtD7uEO9G/ap+SSVU5gzIPiIjiFhGXrxwOzCODOBsvTQdunBxDWgFzv+5wS8
-         09VtBed4uRqgMVsqpivZIcj7lYx8pGgeWpFxlCJpneI1TzJmpKEDw7nKyDVnku9ME3I5
-         IhEsZpogdIEwgJCCUk+ScletuS1eSaiLBEWyYB0esnvrmlT/n/tYAvPTBtKU1WiBsmO7
-         pLBg==
-X-Gm-Message-State: AOJu0Ywq7J/84UiOJzR/P4Ry1FWWs+qERW4FOtM+hA6sXuT8wRF4aKeu
-	fktM6VloWHBjys8tBs0/RTA=
-X-Google-Smtp-Source: AGHT+IHxm7+O8Lnr+DnWRJVJqFYhjmXh8x+psbnYQVwlMKTgGCoLSjY7aHLGhQCng5I/mHuSev/HuQ==
-X-Received: by 2002:a05:6870:fb87:b0:1e9:bd5c:ae40 with SMTP id kv7-20020a056870fb8700b001e9bd5cae40mr1873631oab.38.1699683387478;
-        Fri, 10 Nov 2023 22:16:27 -0800 (PST)
-Received: from [192.168.1.4] ([59.182.200.204])
-        by smtp.gmail.com with ESMTPSA id e16-20020aa78250000000b006c346c98a90sm680322pfn.92.2023.11.10.22.16.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Nov 2023 22:16:26 -0800 (PST)
-Message-ID: <16a0e7e8-a03a-401e-a25a-a12b07d621a3@gmail.com>
-Date: Sat, 11 Nov 2023 11:46:20 +0530
+        bh=E63zgqUKaQM4aLm+widqkwMi/0OVWJqab8uh2TRe2so=;
+        b=EmQyxX93IwOSBPB4UGWygzi6s1tBMvEEpkkJp+dLS6LJTkd46f19fupAK4YgVI8wyl
+         /P5LaJOPeLY19azhGAUFQlxXMIF2frKxV+O92n+oHL7ydgUzJu5kzvpm+Q+49K9tE2sg
+         IciAavfIfBiJLsm9rjcgx+FQrHXLeaW3RJJWO3GHItg1RECdKknxuVHR3vXJaL6nmmVx
+         oPtN3ImD9BUfA7HUGtkWdPdAzAiaIIlMGn8e7mwmNQ61KAzjBijt7cfX/jZHje6rtyT6
+         5h8ICJDCb3lFx/gYR2JnofxP+CVe3HPY143ypnUZsUZH5tVZqIYYPJX28GHffrSn6oKU
+         +85A==
+X-Gm-Message-State: AOJu0YzoYleWHVlbkP4tdT0A2DKPet7cLa3dYyPe7oLSnUI3P1rpYpzs
+	le/5unJCyjTcCwYoCIaN11w=
+X-Google-Smtp-Source: AGHT+IG8RYqG4+cbr0cXBnA3+mUwD+Xoszuj6S15SKaHRrhyPYaVUjDk701ujiA4DD2KyAWN305WSQ==
+X-Received: by 2002:a17:903:41c9:b0:1cc:4a84:27f2 with SMTP id u9-20020a17090341c900b001cc4a8427f2mr2264972ple.0.1699684125547;
+        Fri, 10 Nov 2023 22:28:45 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id h10-20020a170902f54a00b001c5f7e06256sm653048plf.152.2023.11.10.22.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Nov 2023 22:28:44 -0800 (PST)
+Date: Sat, 11 Nov 2023 14:28:40 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net] bonding: stop the device in bond_setup_by_slave()
+Message-ID: <ZU8fGPrYauq9pojf@Laptop-X1>
+References: <20231109180102.4085183-1-edumazet@google.com>
+ <ZU2nBgeOAZVs4KKJ@Laptop-X1>
+ <CANn89iLXNnHNdApy3JaOpnq-hkrDyR-vTYjDEiTaU5oJ1uAPTg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: memory leak in nr_rx_frame
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, ralf@linux-mips.org,
- syzbot+0145ea560de205bc09f0@syzkaller.appspotmail.com
-References: <20231110173632.2511-1-bragathemanick0908@gmail.com>
- <20231110213147.68823-1-kuniyu@amazon.com>
-From: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
-In-Reply-To: <20231110213147.68823-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLXNnHNdApy3JaOpnq-hkrDyR-vTYjDEiTaU5oJ1uAPTg@mail.gmail.com>
 
+On Fri, Nov 10, 2023 at 09:38:18AM +0100, Eric Dumazet wrote:
+> On Fri, Nov 10, 2023 at 4:44 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
+> >
+> > On Thu, Nov 09, 2023 at 06:01:02PM +0000, Eric Dumazet wrote:
+> > > Commit 9eed321cde22 ("net: lapbether: only support ethernet devices")
+> > > has been able to keep syzbot away from net/lapb, until today.
+> > >
+> > > In the following splat [1], the issue is that a lapbether device has
+> > > been created on a bonding device without members. Then adding a non
+> > > ARPHRD_ETHER member forced the bonding master to change its type.
+> > >
+> > > The fix is to make sure we call dev_close() in bond_setup_by_slave()
+> > > so that the potential linked lapbether devices (or any other devices
+> > > having assumptions on the physical device) are removed.
+> > >
+> > > A similar bug has been addressed in commit 40baec225765
+> > > ("bonding: fix panic on non-ARPHRD_ETHER enslave failure")
+> > >
+> >
+> > Do we need also do this if the bond changed to ether device from other dev
+> > type? e.g.
+> >
+> >     if (slave_dev->type != ARPHRD_ETHER)
+> >             bond_setup_by_slave(bond_dev, slave_dev);
+> >     else
+> >             bond_ether_setup(bond_dev);
+> 
+> Hmmm... possibly, but as far as I know, nothing can be stacked on top of IPoIB
 
-On 11/11/23 03:01, Kuniyuki Iwashima wrote:
-> From: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
-> Date: Fri, 10 Nov 2023 23:06:32 +0530
->> The condition (make = nr_make_new(sk)) == NULL suggests
->> that nr_make_new allocates memory and returns a pointer.
->> If this allocation fails (returns NULL), it indicates a
->> potential memory leak.
-> If make is NULL, nothing is allocated and leaked here, and
-> your code will never be executed as "if (make)" is always false.
->
->
->> Added sock_put() for make which can potentially solve
->> this issue
-> Sounds like the patch is not tested with kmemleak.
+The "stacked on top of IPoIB", do you mean IPoIB as an up layer or down layer
+device?
 
-Yes, Had some issue with reproducer. So, haven't tested it
+BTW, not only IPoIB can be enslaved to bond, but also other types like gre could be
+enslaved to bond.
 
->
->
->> Reported-by: syzbot+0145ea560de205bc09f0@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=0145ea560de205bc09f0
->> Signed-off-by: Bragatheswaran Manickavel <bragathemanick0908@gmail.com>
->> ---
->>   net/netrom/af_netrom.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/net/netrom/af_netrom.c b/net/netrom/af_netrom.c
->> index 0eed00184adf..7d7cda4ae300 100644
->> --- a/net/netrom/af_netrom.c
->> +++ b/net/netrom/af_netrom.c
->> @@ -970,6 +970,8 @@ int nr_rx_frame(struct sk_buff *skb, struct net_device *dev)
->>   		nr_transmit_refusal(skb, 0);
->>   		if (sk)
->>   			sock_put(sk);
->> +		if (make)
->> +			sock_put(make);
-> Also, make could be uninitialised here if the first two
-> condition is true.
->
->     if (sk == NULL || sk_acceptq_is_full(sk) ||
->
->
->>   		return 0;
->>   	}
->>   
->> -- 
->> 2.34.1
-
-
-Sorry for the inconvenience, let me check the code and get back properly.
-
-Thanks,
-Bragathe
-
-
+Thanks
+Hangbin
 
