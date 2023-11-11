@@ -1,140 +1,104 @@
-Return-Path: <netdev+bounces-47189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99D3B7E8BD5
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 18:19:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 709C67E8BE5
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 18:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30650280E84
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 17:19:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E392FB20A7C
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 17:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7494C1BDC3;
-	Sat, 11 Nov 2023 17:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED201BDE0;
+	Sat, 11 Nov 2023 17:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hFKFk+Za"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSdOCO6+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385F41A282;
-	Sat, 11 Nov 2023 17:19:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C2DC433C8;
-	Sat, 11 Nov 2023 17:19:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10A8D1BDD1
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 17:36:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 891A2C433C7;
+	Sat, 11 Nov 2023 17:36:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699723147;
-	bh=NgpKnj5nzW/ae95+vZHVPjMxvDXA89DOUJ9HvG7wcRg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=hFKFk+ZamKmhKyj7bEJVHKQQ1UL6rBZnH9b8IwFaQflQC0QDjGiR8TW+vR2jfuH5F
-	 cANfiI4eIvdmmyIUqoXiRpJC4s7BxEvWM9oh1SOwBP/kdL4Yk8j9+NfqVYlSQpB1hO
-	 6bFisDNKhGV9lGq/O7MZStKzfpUNVqOGTNikgZ4FBpwqvQ4PnXHgy15fcm3LnKdlka
-	 UqH4WHVRR44ISDNH0scX2ITCDFZz6qbUG/EkCkheyKe10W41KlEfTmvmDZlHGbr24R
-	 J5G6ziaMn6j191JLlKPmjSH9rz/sPK96QLPCJmT20V+qeocSSGy67LHqpy8m1tfc/X
-	 MAwiRifHVFSiQ==
-Message-ID: <f59c200f-4659-4c71-8c83-4457d0b08fe1@kernel.org>
-Date: Sat, 11 Nov 2023 10:19:05 -0700
+	s=k20201202; t=1699724208;
+	bh=+Vz53DeCV5Vse+Bo7UeORdfbctoXg66BvH2ZgI1/BeU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jSdOCO6+DO3PwQvgepWVAqnGLFYE/4yFhmqf1445wRGnovs7Xm8I+dQFC3/k9cvM/
+	 KqPgvIuhJupS4GLqiqGjd+pnOvWBhgCHiqvLIFc42/ofoB3LprINu8t52kejjSafr3
+	 +00ySVYB2tOgGhwTB3+xwP25irwkW/5toKYYym4jqHxrTjxHrbGTvLtvlpKO4eNjuQ
+	 HdJWgQIEe9w4hyIK7xkcohPEEMmRshEqgzdwGUvgUVahxITURQ48L6HqWWIlQx6Dcb
+	 WUHO1dkefX3lbSuuATxvibhHiFR4Zn18vg9n9JoztzyQ96/oLiUzX25irUDSgUJZy4
+	 dv4Z6Ni25nQcA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72F69E00083;
+	Sat, 11 Nov 2023 17:36:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 05/12] netdev: netdevice devmem allocator
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>,
- Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Arnd Bergmann
- <arnd@arndb.de>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-References: <20231106024413.2801438-1-almasrymina@google.com>
- <20231106024413.2801438-6-almasrymina@google.com>
- <3b0d612c-e33b-48aa-a861-fbb042572fc9@kernel.org>
- <CAHS8izOHYx+oYnzksUDrK1S0+6CdMJmirApntP5W862yFumezw@mail.gmail.com>
- <a5b95e6b-8716-4e2e-9183-959b754b5b5e@kernel.org>
- <CAHS8izMKDOw5_y2MLRfuJHs=ai+sZ6GF7Rg1NuR_JqONg-5u5Q@mail.gmail.com>
- <3687e70e-29e6-34af-c943-8c0830ff92b8@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <3687e70e-29e6-34af-c943-8c0830ff92b8@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [patch iproute2-next v5 0/7] expose devlink instances relationships
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169972420846.7909.13965137063864264701.git-patchwork-notify@kernel.org>
+Date: Sat, 11 Nov 2023 17:36:48 +0000
+References: <20231107080607.190414-1-jiri@resnulli.us>
+In-Reply-To: <20231107080607.190414-1-jiri@resnulli.us>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com,
+ daniel.machon@microchip.com
 
-On 11/10/23 7:26 AM, Pavel Begunkov wrote:
-> On 11/7/23 23:03, Mina Almasry wrote:
->> On Tue, Nov 7, 2023 at 2:55 PM David Ahern <dsahern@kernel.org> wrote:
->>>
->>> On 11/7/23 3:10 PM, Mina Almasry wrote:
->>>> On Mon, Nov 6, 2023 at 3:44 PM David Ahern <dsahern@kernel.org> wrote:
->>>>>
->>>>> On 11/5/23 7:44 PM, Mina Almasry wrote:
->>>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>>>>> index eeeda849115c..1c351c138a5b 100644
->>>>>> --- a/include/linux/netdevice.h
->>>>>> +++ b/include/linux/netdevice.h
->>>>>> @@ -843,6 +843,9 @@ struct netdev_dmabuf_binding {
->>>>>>   };
->>>>>>
->>>>>>   #ifdef CONFIG_DMA_SHARED_BUFFER
->>>>>> +struct page_pool_iov *
->>>>>> +netdev_alloc_devmem(struct netdev_dmabuf_binding *binding);
->>>>>> +void netdev_free_devmem(struct page_pool_iov *ppiov);
->>>>>
->>>>> netdev_{alloc,free}_dmabuf?
->>>>>
->>>>
->>>> Can do.
->>>>
->>>>> I say that because a dmabuf can be host memory, at least I am not
->>>>> aware
->>>>> of a restriction that a dmabuf is device memory.
->>>>>
->>>>
->>>> In my limited experience dma-buf is generally device memory, and
->>>> that's really its use case. CONFIG_UDMABUF is a driver that mocks
->>>> dma-buf with a memfd which I think is used for testing. But I can do
->>>> the rename, it's more clear anyway, I think.
->>>
->>> config UDMABUF
->>>          bool "userspace dmabuf misc driver"
->>>          default n
->>>          depends on DMA_SHARED_BUFFER
->>>          depends on MEMFD_CREATE || COMPILE_TEST
->>>          help
->>>            A driver to let userspace turn memfd regions into dma-bufs.
->>>            Qemu can use this to create host dmabufs for guest
->>> framebuffers.
->>>
->>>
->>> Qemu is just a userspace process; it is no way a special one.
->>>
->>> Treating host memory as a dmabuf should radically simplify the io_uring
->>> extension of this set.
->>
->> I agree actually, and I was about to make that comment to David Wei's
->> series once I have the time.
->>
->> David, your io_uring RX zerocopy proposal actually works with devmem
->> TCP, if you're inclined to do that instead, what you'd do roughly is
->> (I think):
-> That would be a Frankenstein's monster api with no good reason for it.
+Hello:
 
-It brings a consistent API from a networking perspective.
+This series was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-io_uring should not need to be in the page pool and memory management
-business. Have you or David coded up the re-use of the socket APIs with
-dmabuf to see how much smaller it makes the io_uring change - or even
-walked through from a theoretical perspective?
+On Tue,  7 Nov 2023 09:06:00 +0100 you wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Print out recently added attributes that expose relationships between
+> devlink instances. This patchset extends the outputs by
+> "nested_devlink" attributes.
+> 
+> Examples:
+> $ devlink dev
+> pci/0000:08:00.0:
+>   nested_devlink:
+>     auxiliary/mlx5_core.eth.0
+> auxiliary/mlx5_core.eth.0
+> pci/0000:08:00.1:
+>   nested_devlink:
+>     auxiliary/mlx5_core.eth.1
+> auxiliary/mlx5_core.eth.1
+> 
+> [...]
+
+Here is the summary with links:
+  - [iproute2-next,v5,1/7] ip/ipnetns: move internals of get_netnsid_from_name() into namespace.c
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=a59b83f73d45
+  - [iproute2-next,v5,2/7] devlink: use snprintf instead of sprintf
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=8265b39f0c25
+  - [iproute2-next,v5,3/7] devlink: do conditional new line print in pr_out_port_handle_end()
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=fb47796cd606
+  - [iproute2-next,v5,4/7] devlink: extend pr_out_nested_handle() to print object
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e98d5084f7cd
+  - [iproute2-next,v5,5/7] devlink: introduce support for netns id for nested handle
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=2ded9c18a37b
+  - [iproute2-next,v5,6/7] devlink: print nested handle for port function
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=3e90f377f49b
+  - [iproute2-next,v5,7/7] devlink: print nested devlink handle for devlink dev
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=1ac0c4450f61
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
