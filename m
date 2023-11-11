@@ -1,272 +1,199 @@
-Return-Path: <netdev+bounces-47180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712037E8A16
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 10:49:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B3F7E8A74
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 12:04:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD445B20ABA
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 09:49:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A67671F20F51
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 11:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3B311C9B;
-	Sat, 11 Nov 2023 09:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2324412B7A;
+	Sat, 11 Nov 2023 11:04:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZZps5wk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SMN9fsyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9243F1170F
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 09:49:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45ADC433C8;
-	Sat, 11 Nov 2023 09:49:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699696151;
-	bh=HuMp3aDBc6eDQKmMTmycdyRqEdjmcWmMwpTTcBuCirg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dZZps5wkj/9aeHWxtZPVUW7UAznDqOf6aiTftPBEQv6Ne/QahFtWnFnFmzx2WgpPk
-	 i6Ktk+LpCvy/Xd3kEbFStKlgPJ5RAky3EBH+cmRvYMKLLqLABPmtaaDO8AIYTJ737x
-	 km16WMHG3F/wP7rs3hH0MeukU5u/wvQRPK4fLNyVhjpQaxr541IWlobNs0itZv4QU7
-	 FVKXEQLKHSqyNOEMY6mQmQrRet1k8A4vTGr0pTDripEmO5LGnb8UoZ1m17onF9KWmU
-	 +i8P/vYUM3SB/rapdrb8tlMNM5JL9YtsJUimATth8AR5eijAXXzcZG0n/LseaFT7a3
-	 pWUjBRB/CzhoA==
-Date: Sat, 11 Nov 2023 10:49:07 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Sven Auhagen <sven.auhagen@voleatech.de>
-Cc: netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, brouer@redhat.com,
-	ilias.apalodimas@linaro.org, mcroce@microsoft.com, leon@kernel.org,
-	kuba@kernel.org
-Subject: Re: [PATCH v5] net: mvneta: fix calls to page_pool_get_stats
-Message-ID: <ZU9OEwz7GoHbBE1m@lore-desk>
-References: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8015678
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 11:04:50 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 902DB3AA8;
+	Sat, 11 Nov 2023 03:04:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699700688; x=1731236688;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dKsMwuafOZwoy0GmZuR9O/Rq8lZfnlbj8aei6lxUmuI=;
+  b=SMN9fsybQC2toaJzF9DC8PzYGyPpH3PMs4b3Z2Bxo7qG64VbpN0NWbNU
+   8IbaX15wiNfXCQubT0S2/VrScHxGj6EPB+KvuDTWBo+SLXF8JzmEx6Udr
+   Jw6AD4YYZgcUG8ixJ9yJzcIQqPRb3G8heBF2SlHy8APhBdcdT+kiD0XR4
+   MBubB2triQld9UZhwG+Ktkq41Kioc6gJ1h6VBY7BAofJZVTx/p7gV5khy
+   MFoOsJ/KbpILkVrmo014EPW5fYqCOQc6o/9EOE7LXPZQT/b9JPHT9/Ekp
+   /qwBGYcN6u1p7mF+vRDMm4bW9UboDo22PFwtmjDccfIFq4hJjvMhMwAfN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10890"; a="369601039"
+X-IronPort-AV: E=Sophos;i="6.03,294,1694761200"; 
+   d="scan'208";a="369601039"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2023 03:04:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,294,1694761200"; 
+   d="scan'208";a="12050365"
+Received: from lkp-server01.sh.intel.com (HELO 17d9e85e5079) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 11 Nov 2023 03:04:42 -0800
+Received: from kbuild by 17d9e85e5079 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r1ln5-000AOI-2p;
+	Sat, 11 Nov 2023 11:04:39 +0000
+Date: Sat, 11 Nov 2023 19:03:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Min Li <lnimi@hotmail.com>, richardcochran@gmail.com, lee@kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v2 1/1] ptp: clockmatrix: support 32-bit address
+ space
+Message-ID: <202311111829.GoGXlH8b-lkp@intel.com>
+References: <MW5PR03MB6932A4AAD4F612B45E9F6856A0AFA@MW5PR03MB6932.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="coe4qxv7etPQ1vbQ"
-Content-Disposition: inline
-In-Reply-To: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
-
-
---coe4qxv7etPQ1vbQ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <MW5PR03MB6932A4AAD4F612B45E9F6856A0AFA@MW5PR03MB6932.namprd03.prod.outlook.com>
 
-> Calling page_pool_get_stats in the mvneta driver without checks
-> leads to kernel crashes.
-> First the page pool is only available if the bm is not used.
-> The page pool is also not allocated when the port is stopped.
-> It can also be not allocated in case of errors.
->=20
-> The current implementation leads to the following crash calling
-> ethstats on a port that is down or when calling it at the wrong moment:
->=20
-> ble to handle kernel NULL pointer dereference at virtual address 00000070
-> [00000070] *pgd=3D00000000
-> Internal error: Oops: 5 [#1] SMP ARM
-> Hardware name: Marvell Armada 380/385 (Device Tree)
-> PC is at page_pool_get_stats+0x18/0x1cc
-> LR is at mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
-> pc : [<c0b413cc>]    lr : [<bf0a98d8>]    psr: a0000013
-> sp : f1439d48  ip : f1439dc0  fp : 0000001d
-> r10: 00000100  r9 : c4816b80  r8 : f0d75150
-> r7 : bf0b400c  r6 : c238f000  r5 : 00000000  r4 : f1439d68
-> r3 : c2091040  r2 : ffffffd8  r1 : f1439d68  r0 : 00000000
-> Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-> Control: 10c5387d  Table: 066b004a  DAC: 00000051
-> Register r0 information: NULL pointer
-> Register r1 information: 2-page vmalloc region starting at 0xf1438000 all=
-ocated at kernel_clone+0x9c/0x390
-> Register r2 information: non-paged memory
-> Register r3 information: slab kmalloc-2k start c2091000 pointer offset 64=
- size 2048
-> Register r4 information: 2-page vmalloc region starting at 0xf1438000 all=
-ocated at kernel_clone+0x9c/0x390
-> Register r5 information: NULL pointer
-> Register r6 information: slab kmalloc-cg-4k start c238f000 pointer offset=
- 0 size 4096
-> Register r7 information: 15-page vmalloc region starting at 0xbf0a8000 al=
-located at load_module+0xa30/0x219c
-> Register r8 information: 1-page vmalloc region starting at 0xf0d75000 all=
-ocated at ethtool_get_stats+0x138/0x208
-> Register r9 information: slab task_struct start c4816b80 pointer offset 0
-> Register r10 information: non-paged memory
-> Register r11 information: non-paged memory
-> Register r12 information: 2-page vmalloc region starting at 0xf1438000 al=
-located at kernel_clone+0x9c/0x390
-> Process snmpd (pid: 733, stack limit =3D 0x38de3a88)
-> Stack: (0xf1439d48 to 0xf143a000)
-> 9d40:                   000000c0 00000001 c238f000 bf0b400c f0d75150 c481=
-6b80
-> 9d60: 00000100 bf0a98d8 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9d80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9da0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9dc0: 00000dc0 5335509c 00000035 c238f000 bf0b2214 01067f50 f0d75000 c0b9=
-b9c8
-> 9de0: 0000001d 00000035 c2212094 5335509c c4816b80 c238f000 c5ad6e00 0106=
-7f50
-> 9e00: c1b0be80 c4816b80 00014813 c0b9d7f0 00000000 00000000 0000001d 0000=
-001d
-> 9e20: 00000000 00001200 00000000 00000000 c216ed90 c73943b8 00000000 0000=
-0000
-> 9e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9e60: 00000000 c0ad9034 00000000 00000000 00000000 00000000 00000000 0000=
-0000
-> 9e80: 00000000 00000000 00000000 5335509c c1b0be80 f1439ee4 00008946 c1b0=
-be80
-> 9ea0: 01067f50 f1439ee3 00000000 00000046 b6d77ae0 c0b383f0 00008946 becc=
-83e8
-> 9ec0: c1b0be80 00000051 0000000b c68ca480 c7172d00 c0ad8ff0 f1439ee3 cf60=
-0e40
-> 9ee0: 01600e40 32687465 00000000 00000000 00000000 01067f50 00000000 0000=
-0000
-> 9f00: 00000000 5335509c 00008946 00008946 00000000 c68ca480 becc83e8 c05e=
-2de0
-> 9f20: f1439fb0 c03002f0 00000006 5ac3c35a c4816b80 00000006 b6d77ae0 c030=
-caf0
-> 9f40: c4817350 00000014 f1439e1c 0000000c 00000000 00000051 01000000 0000=
-0014
-> 9f60: 00003fec f1439edc 00000001 c0372abc b6d77ae0 c0372abc cf600e40 5335=
-509c
-> 9f80: c21e6800 01015c9c 0000000b 00008946 00000036 c03002f0 c4816b80 0000=
-0036
-> 9fa0: b6d77ae0 c03000c0 01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
-0000
-> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
-7ae0
-> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858 40000030 0000000b 00000000 0000=
-0000
->  page_pool_get_stats from mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
->  mvneta_ethtool_get_stats [mvneta] from ethtool_get_stats+0x154/0x208
->  ethtool_get_stats from dev_ethtool+0xf48/0x2480
->  dev_ethtool from dev_ioctl+0x538/0x63c
->  dev_ioctl from sock_ioctl+0x49c/0x53c
->  sock_ioctl from sys_ioctl+0x134/0xbd8
->  sys_ioctl from ret_fast_syscall+0x0/0x1c
-> Exception stack(0xf1439fa8 to 0xf1439ff0)
-> 9fa0:                   01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
-0000
-> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
-7ae0
-> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858
-> Code: e28dd004 e1a05000 e2514000 0a00006a (e5902070)
->=20
-> This commit adds the proper checks before calling page_pool_get_stats.
->=20
-> Fixes: b3fc79225f05 ("net: mvneta: add support for page_pool_get_stats")
-> Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
-> Reported-by: Paulo Da Silva <Paulo.DaSilva@kyberna.com>
+Hi Min,
 
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+kernel test robot noticed the following build warnings:
 
-> ---
-> Change from v4:
-> 	* Remove is_stopped check
-> 	* Variable ordering
->=20
-> Change from v3:
-> 	* Move the page pool check back to mvneta
->=20
-> Change from v2:
-> 	* Fix the fixes tag
->=20
-> Change from v1:
-> 	* Add cover letter
-> 	* Move the page pool check in mvneta to the ethtool stats
-> 	  function
->=20
-> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet=
-/marvell/mvneta.c
-> index 8b0f12a0e0f2..c498ef831d61 100644
-> --- a/drivers/net/ethernet/marvell/mvneta.c
-> +++ b/drivers/net/ethernet/marvell/mvneta.c
-> @@ -4733,14 +4733,17 @@ static void mvneta_ethtool_get_strings(struct net=
-_device *netdev, u32 sset,
->  				       u8 *data)
->  {
->  	if (sset =3D=3D ETH_SS_STATS) {
-> +		struct mvneta_port *pp =3D netdev_priv(netdev);
->  		int i;
-> =20
->  		for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
->  			memcpy(data + i * ETH_GSTRING_LEN,
->  			       mvneta_statistics[i].name, ETH_GSTRING_LEN);
-> =20
-> -		data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> -		page_pool_ethtool_stats_get_strings(data);
-> +		if (!pp->bm_priv) {
-> +			data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
-> +			page_pool_ethtool_stats_get_strings(data);
-> +		}
->  	}
->  }
-> =20
-> @@ -4858,8 +4861,10 @@ static void mvneta_ethtool_pp_stats(struct mvneta_=
-port *pp, u64 *data)
->  	struct page_pool_stats stats =3D {};
->  	int i;
-> =20
-> -	for (i =3D 0; i < rxq_number; i++)
-> -		page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> +	for (i =3D 0; i < rxq_number; i++) {
-> +		if (pp->rxqs[i].page_pool)
-> +			page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
-> +	}
-> =20
->  	page_pool_ethtool_stats_get(data, &stats);
->  }
-> @@ -4875,14 +4880,21 @@ static void mvneta_ethtool_get_stats(struct net_d=
-evice *dev,
->  	for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
->  		*data++ =3D pp->ethtool_stats[i];
-> =20
-> -	mvneta_ethtool_pp_stats(pp, data);
-> +	if (!pp->bm_priv)
-> +		mvneta_ethtool_pp_stats(pp, data);
->  }
-> =20
->  static int mvneta_ethtool_get_sset_count(struct net_device *dev, int sse=
-t)
->  {
-> -	if (sset =3D=3D ETH_SS_STATS)
-> -		return ARRAY_SIZE(mvneta_statistics) +
-> -		       page_pool_ethtool_stats_get_count();
-> +	if (sset =3D=3D ETH_SS_STATS) {
-> +		int count =3D ARRAY_SIZE(mvneta_statistics);
-> +		struct mvneta_port *pp =3D netdev_priv(dev);
-> +
-> +		if (!pp->bm_priv)
-> +			count +=3D page_pool_ethtool_stats_get_count();
-> +
-> +		return count;
-> +	}
-> =20
->  	return -EOPNOTSUPP;
->  }
-> --=20
-> 2.42.0
->=20
+[auto build test WARNING on net-next/main]
 
---coe4qxv7etPQ1vbQ
-Content-Type: application/pgp-signature; name="signature.asc"
+url:    https://github.com/intel-lab-lkp/linux/commits/Min-Li/ptp-clockmatrix-support-32-bit-address-space/20231110-044554
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/MW5PR03MB6932A4AAD4F612B45E9F6856A0AFA%40MW5PR03MB6932.namprd03.prod.outlook.com
+patch subject: [PATCH net-next v2 1/1] ptp: clockmatrix: support 32-bit address space
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20231111/202311111829.GoGXlH8b-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231111/202311111829.GoGXlH8b-lkp@intel.com/reproduce)
 
------BEGIN PGP SIGNATURE-----
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311111829.GoGXlH8b-lkp@intel.com/
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZU9OEwAKCRA6cBh0uS2t
-rN3hAP9NroWJYl+w8i0eGc7r/DR9XBPZNzTHNMuZ5QWeRTAB6wEAuRC55P5spyeH
-4TafyKF88ADRSYHBVV93HcDT6vCUTwQ=
-=O3E1
------END PGP SIGNATURE-----
+All warnings (new ones prefixed by >>):
 
---coe4qxv7etPQ1vbQ--
+>> drivers/ptp/ptp_clockmatrix.c:1257:50: warning: implicit conversion from 'int' to 'u16' (aka 'unsigned short') changes value from 537972560 to 53072 [-Wconstant-conversion]
+    1257 |         u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
+         |             ~~~~~~~                                     ^~~~~~~
+   include/linux/mfd/idt8a340_reg.h:454:43: note: expanded from macro 'SCRATCH'
+     454 | #define SCRATCH                           0x2010cf50
+         |                                           ^~~~~~~~~~
+   include/linux/mfd/idt8a340_reg.h:673:55: note: expanded from macro 'IDTCM_FW_REG'
+     673 | #define IDTCM_FW_REG(FW, VER, REG)      (((FW) < (VER)) ? (REG) : (REG##_##VER))
+         |                                                            ^~~
+   drivers/ptp/ptp_clockmatrix.c:1257:16: warning: implicit conversion from 'int' to 'u16' (aka 'unsigned short') changes value from 537972556 to 53068 [-Wconstant-conversion]
+    1257 |         u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
+         |             ~~~~~~~   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/mfd/idt8a340_reg.h:673:63: note: expanded from macro 'IDTCM_FW_REG'
+     673 | #define IDTCM_FW_REG(FW, VER, REG)      (((FW) < (VER)) ? (REG) : (REG##_##VER))
+         |                                                                    ^~~~~~~~~~~
+   <scratch space>:144:1: note: expanded from here
+     144 | SCRATCH_V520
+         | ^~~~~~~~~~~~
+   include/linux/mfd/idt8a340_reg.h:455:43: note: expanded from macro 'SCRATCH_V520'
+     455 | #define SCRATCH_V520                      0x2010cf4c
+         |                                           ^~~~~~~~~~
+   2 warnings generated.
+
+
+vim +1257 drivers/ptp/ptp_clockmatrix.c
+
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1253  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1254  static int idtcm_load_firmware(struct idtcm *idtcm,
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1255  			       struct device *dev)
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1256  {
+794c3dffacc166 Min Li        2021-09-13 @1257  	u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
+7ea5fda2b1325e Min Li        2020-07-28  1258  	char fname[128] = FW_FILENAME;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1259  	const struct firmware *fw;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1260  	struct idtcm_fwrc *rec;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1261  	u32 regaddr;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1262  	int err;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1263  	s32 len;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1264  	u8 val;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1265  	u8 loaddr;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1266  
+7ea5fda2b1325e Min Li        2020-07-28  1267  	if (firmware) /* module parameter */
+7ea5fda2b1325e Min Li        2020-07-28  1268  		snprintf(fname, sizeof(fname), "%s", firmware);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1269  
+930dfa56315517 Min Li        2021-09-24  1270  	dev_info(idtcm->dev, "requesting firmware '%s'", fname);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1271  
+7ea5fda2b1325e Min Li        2020-07-28  1272  	err = request_firmware(&fw, fname, dev);
+7ea5fda2b1325e Min Li        2020-07-28  1273  	if (err) {
+930dfa56315517 Min Li        2021-09-24  1274  		dev_err(idtcm->dev,
+1c49d3e947783b Vincent Cheng 2021-02-17  1275  			"Failed at line %d in %s!", __LINE__, __func__);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1276  		return err;
+7ea5fda2b1325e Min Li        2020-07-28  1277  	}
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1278  
+930dfa56315517 Min Li        2021-09-24  1279  	dev_dbg(idtcm->dev, "firmware size %zu bytes", fw->size);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1280  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1281  	rec = (struct idtcm_fwrc *) fw->data;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1282  
+794c3dffacc166 Min Li        2021-09-13  1283  	if (contains_full_configuration(idtcm, fw))
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1284  		idtcm_state_machine_reset(idtcm);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1285  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1286  	for (len = fw->size; len > 0; len -= sizeof(*rec)) {
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1287  		if (rec->reserved) {
+930dfa56315517 Min Li        2021-09-24  1288  			dev_err(idtcm->dev,
+1c49d3e947783b Vincent Cheng 2021-02-17  1289  				"bad firmware, reserved field non-zero");
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1290  			err = -EINVAL;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1291  		} else {
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1292  			regaddr = rec->hiaddr << 8;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1293  			regaddr |= rec->loaddr;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1294  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1295  			val = rec->value;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1296  			loaddr = rec->loaddr;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1297  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1298  			rec++;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1299  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1300  			err = check_and_set_masks(idtcm, regaddr, val);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1301  		}
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1302  
+7ea5fda2b1325e Min Li        2020-07-28  1303  		if (err != -EINVAL) {
+7ea5fda2b1325e Min Li        2020-07-28  1304  			err = 0;
+7ea5fda2b1325e Min Li        2020-07-28  1305  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1306  			/* Top (status registers) and bottom are read-only */
+9fe9b9792d7236 Min Li        2023-11-09  1307  			if (regaddr < SCSR_ADDR(GPIO_USER_CONTROL) || regaddr >= scratch)
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1308  				continue;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1309  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1310  			/* Page size 128, last 4 bytes of page skipped */
+77fdb168a3e2a6 Vincent Cheng 2021-02-17  1311  			if ((loaddr > 0x7b && loaddr <= 0x7f) || loaddr > 0xfb)
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1312  				continue;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1313  
+9fe9b9792d7236 Min Li        2023-11-09  1314  			err = idtcm_write(idtcm, SCSR_BASE, regaddr, &val, sizeof(val));
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1315  		}
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1316  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1317  		if (err)
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1318  			goto out;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1319  	}
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1320  
+7ea5fda2b1325e Min Li        2020-07-28  1321  	display_pll_and_masks(idtcm);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1322  
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1323  out:
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1324  	release_firmware(fw);
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1325  	return err;
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1326  }
+3a6ba7dc779935 Vincent Cheng 2019-10-31  1327  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
