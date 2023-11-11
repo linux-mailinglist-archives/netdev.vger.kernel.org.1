@@ -1,278 +1,272 @@
-Return-Path: <netdev+bounces-47179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27CD37E89C1
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 09:14:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 712037E8A16
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 10:49:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D8A4B20ADB
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 08:14:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD445B20ABA
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 09:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D6BD514;
-	Sat, 11 Nov 2023 08:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3B311C9B;
+	Sat, 11 Nov 2023 09:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wufoJrYk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZZps5wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A33111703
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 08:13:59 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04C0F3C3C
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 00:13:57 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40838915cecso21445995e9.2
-        for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 00:13:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699690435; x=1700295235; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbD/sFHhqCgv+rc21fEZQqviHdww1+qYyJF/3ffER+g=;
-        b=wufoJrYkiClm7GJyRhFUoLTidDsVWAzSRRb6WmbpJwiEIdAI7cyBmPJmEM3j4Dttzj
-         kh2PIfhTRJllA+wB9b5ILJcqJfoqRF/Q4jiKtE6yD3BWwwfpN0Hgka4g9o9C2emuNqaV
-         phur9EXpTkUt5qNZR5Lc4Y5AOtS+t16mZxAAGmtvsjts95wm1Xn8CoVR8YVKwX7rnXSP
-         3b1o0Z0ZoT0kw2E69VdfSz9I5JM1cnBx0lqAzWpLgtmnhLQZD4gfMGpDZ9PaUAJk0yUZ
-         o+LYemPFZ5Wb1Ctvya/fMznwcI3kwvDJashdys1Nmqp868AMKP1HAqz7Gx/rVQO2iMvp
-         Yjdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699690435; x=1700295235;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hbD/sFHhqCgv+rc21fEZQqviHdww1+qYyJF/3ffER+g=;
-        b=eeV8KmdLSAC8GSeoXjaKShTAnrd3Ayspo24nbnW8fDSEbizTfP3Fq1kt+loh/72OVT
-         QeLxkuKjIq2zhDVfym671JMu0vVedWvkr8Lq/LTUNElEf9K6pJxTSvkeMzHF6bKJRn9s
-         kpRfXQMUOmjF5ntYKZHLh9trgbSmM2MyBus38TyQY5P0Nv1d3CIQzq8Fk8aWRXnty0Q1
-         uzDXxeegaawMVzonFxan3qE4o31AH+X172sTzpZVLeKckxW4nkgwqi9hJe+QS2sJHu0L
-         0LBkgny/+ppDyoF/JXaMLdJ/njcmz2GRI36j1r76XBAI34bdxkbu1lIL2NL/RM1XkZNJ
-         Shiw==
-X-Gm-Message-State: AOJu0YzmDWOnY9MajUlwfH7UkwLWg+PPX1WSFy7wYsDq3ZJI70uoUcLx
-	N/D5zPpCNjmn0UU4YxoXj8qDAA==
-X-Google-Smtp-Source: AGHT+IG8F5780iVYGMmIwg2z/khiYfoNnFqsg579K+pHph0JUAyx+INzjzlKPTIrThsPFg7vXACArg==
-X-Received: by 2002:a05:600c:30d3:b0:409:85d:5a6e with SMTP id h19-20020a05600c30d300b00409085d5a6emr1168539wmn.29.1699690435330;
-        Sat, 11 Nov 2023 00:13:55 -0800 (PST)
-Received: from [10.230.170.72] (46-253-189-43.dynamic.monzoon.net. [46.253.189.43])
-        by smtp.gmail.com with ESMTPSA id hg12-20020a05600c538c00b0040a4835d2b2sm3019298wmb.37.2023.11.11.00.13.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Nov 2023 00:13:54 -0800 (PST)
-Message-ID: <0819b2e0-fa1f-4452-9925-e93b8bb2e940@linaro.org>
-Date: Sat, 11 Nov 2023 09:13:53 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9243F1170F
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 09:49:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A45ADC433C8;
+	Sat, 11 Nov 2023 09:49:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699696151;
+	bh=HuMp3aDBc6eDQKmMTmycdyRqEdjmcWmMwpTTcBuCirg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dZZps5wkj/9aeHWxtZPVUW7UAznDqOf6aiTftPBEQv6Ne/QahFtWnFnFmzx2WgpPk
+	 i6Ktk+LpCvy/Xd3kEbFStKlgPJ5RAky3EBH+cmRvYMKLLqLABPmtaaDO8AIYTJ737x
+	 km16WMHG3F/wP7rs3hH0MeukU5u/wvQRPK4fLNyVhjpQaxr541IWlobNs0itZv4QU7
+	 FVKXEQLKHSqyNOEMY6mQmQrRet1k8A4vTGr0pTDripEmO5LGnb8UoZ1m17onF9KWmU
+	 +i8P/vYUM3SB/rapdrb8tlMNM5JL9YtsJUimATth8AR5eijAXXzcZG0n/LseaFT7a3
+	 pWUjBRB/CzhoA==
+Date: Sat, 11 Nov 2023 10:49:07 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Sven Auhagen <sven.auhagen@voleatech.de>
+Cc: netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, brouer@redhat.com,
+	ilias.apalodimas@linaro.org, mcroce@microsoft.com, leon@kernel.org,
+	kuba@kernel.org
+Subject: Re: [PATCH v5] net: mvneta: fix calls to page_pool_get_stats
+Message-ID: <ZU9OEwz7GoHbBE1m@lore-desk>
+References: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 5/8] dt-bindings: net: pcs: add bindings for MediaTek
- USXGMII PCS
-To: Daniel Golle <daniel@makrotopia.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Chunfeng Yun
- <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- John Crispin <john@phrozen.org>, Sean Wang <sean.wang@mediatek.com>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Alexander Couzens <lynxis@fe80.eu>,
- Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-phy@lists.infradead.org
-References: <cover.1699565880.git.daniel@makrotopia.org>
- <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="coe4qxv7etPQ1vbQ"
+Content-Disposition: inline
+In-Reply-To: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
 
-On 09/11/2023 22:51, Daniel Golle wrote:
-> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
-> it in order to configure and monitor the Ethernet SerDes link in
-> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
-> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
-> interface modes are also available.
-> 
 
-A nit, subject: drop second/last, redundant "bindings for". The
-"dt-bindings" prefix is already stating that these are bindings.
+--coe4qxv7etPQ1vbQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Calling page_pool_get_stats in the mvneta driver without checks
+> leads to kernel crashes.
+> First the page pool is only available if the bm is not used.
+> The page pool is also not allocated when the port is stopped.
+> It can also be not allocated in case of errors.
+>=20
+> The current implementation leads to the following crash calling
+> ethstats on a port that is down or when calling it at the wrong moment:
+>=20
+> ble to handle kernel NULL pointer dereference at virtual address 00000070
+> [00000070] *pgd=3D00000000
+> Internal error: Oops: 5 [#1] SMP ARM
+> Hardware name: Marvell Armada 380/385 (Device Tree)
+> PC is at page_pool_get_stats+0x18/0x1cc
+> LR is at mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
+> pc : [<c0b413cc>]    lr : [<bf0a98d8>]    psr: a0000013
+> sp : f1439d48  ip : f1439dc0  fp : 0000001d
+> r10: 00000100  r9 : c4816b80  r8 : f0d75150
+> r7 : bf0b400c  r6 : c238f000  r5 : 00000000  r4 : f1439d68
+> r3 : c2091040  r2 : ffffffd8  r1 : f1439d68  r0 : 00000000
+> Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> Control: 10c5387d  Table: 066b004a  DAC: 00000051
+> Register r0 information: NULL pointer
+> Register r1 information: 2-page vmalloc region starting at 0xf1438000 all=
+ocated at kernel_clone+0x9c/0x390
+> Register r2 information: non-paged memory
+> Register r3 information: slab kmalloc-2k start c2091000 pointer offset 64=
+ size 2048
+> Register r4 information: 2-page vmalloc region starting at 0xf1438000 all=
+ocated at kernel_clone+0x9c/0x390
+> Register r5 information: NULL pointer
+> Register r6 information: slab kmalloc-cg-4k start c238f000 pointer offset=
+ 0 size 4096
+> Register r7 information: 15-page vmalloc region starting at 0xbf0a8000 al=
+located at load_module+0xa30/0x219c
+> Register r8 information: 1-page vmalloc region starting at 0xf0d75000 all=
+ocated at ethtool_get_stats+0x138/0x208
+> Register r9 information: slab task_struct start c4816b80 pointer offset 0
+> Register r10 information: non-paged memory
+> Register r11 information: non-paged memory
+> Register r12 information: 2-page vmalloc region starting at 0xf1438000 al=
+located at kernel_clone+0x9c/0x390
+> Process snmpd (pid: 733, stack limit =3D 0x38de3a88)
+> Stack: (0xf1439d48 to 0xf143a000)
+> 9d40:                   000000c0 00000001 c238f000 bf0b400c f0d75150 c481=
+6b80
+> 9d60: 00000100 bf0a98d8 00000000 00000000 00000000 00000000 00000000 0000=
+0000
+> 9d80: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
+0000
+> 9da0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
+0000
+> 9dc0: 00000dc0 5335509c 00000035 c238f000 bf0b2214 01067f50 f0d75000 c0b9=
+b9c8
+> 9de0: 0000001d 00000035 c2212094 5335509c c4816b80 c238f000 c5ad6e00 0106=
+7f50
+> 9e00: c1b0be80 c4816b80 00014813 c0b9d7f0 00000000 00000000 0000001d 0000=
+001d
+> 9e20: 00000000 00001200 00000000 00000000 c216ed90 c73943b8 00000000 0000=
+0000
+> 9e40: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 0000=
+0000
+> 9e60: 00000000 c0ad9034 00000000 00000000 00000000 00000000 00000000 0000=
+0000
+> 9e80: 00000000 00000000 00000000 5335509c c1b0be80 f1439ee4 00008946 c1b0=
+be80
+> 9ea0: 01067f50 f1439ee3 00000000 00000046 b6d77ae0 c0b383f0 00008946 becc=
+83e8
+> 9ec0: c1b0be80 00000051 0000000b c68ca480 c7172d00 c0ad8ff0 f1439ee3 cf60=
+0e40
+> 9ee0: 01600e40 32687465 00000000 00000000 00000000 01067f50 00000000 0000=
+0000
+> 9f00: 00000000 5335509c 00008946 00008946 00000000 c68ca480 becc83e8 c05e=
+2de0
+> 9f20: f1439fb0 c03002f0 00000006 5ac3c35a c4816b80 00000006 b6d77ae0 c030=
+caf0
+> 9f40: c4817350 00000014 f1439e1c 0000000c 00000000 00000051 01000000 0000=
+0014
+> 9f60: 00003fec f1439edc 00000001 c0372abc b6d77ae0 c0372abc cf600e40 5335=
+509c
+> 9f80: c21e6800 01015c9c 0000000b 00008946 00000036 c03002f0 c4816b80 0000=
+0036
+> 9fa0: b6d77ae0 c03000c0 01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
+0000
+> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
+7ae0
+> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858 40000030 0000000b 00000000 0000=
+0000
+>  page_pool_get_stats from mvneta_ethtool_get_stats+0xa0/0xe0 [mvneta]
+>  mvneta_ethtool_get_stats [mvneta] from ethtool_get_stats+0x154/0x208
+>  ethtool_get_stats from dev_ethtool+0xf48/0x2480
+>  dev_ethtool from dev_ioctl+0x538/0x63c
+>  dev_ioctl from sock_ioctl+0x49c/0x53c
+>  sock_ioctl from sys_ioctl+0x134/0xbd8
+>  sys_ioctl from ret_fast_syscall+0x0/0x1c
+> Exception stack(0xf1439fa8 to 0xf1439ff0)
+> 9fa0:                   01015c9c 0000000b 0000000b 00008946 becc83e8 0000=
+0000
+> 9fc0: 01015c9c 0000000b 00008946 00000036 00000035 010678a0 b6d797ec b6d7=
+7ae0
+> 9fe0: b6dbf738 becc838c b6d186d7 b6baa858
+> Code: e28dd004 e1a05000 e2514000 0a00006a (e5902070)
+>=20
+> This commit adds the proper checks before calling page_pool_get_stats.
+>=20
+> Fixes: b3fc79225f05 ("net: mvneta: add support for page_pool_get_stats")
+> Signed-off-by: Sven Auhagen <sven.auhagen@voleatech.de>
+> Reported-by: Paulo Da Silva <Paulo.DaSilva@kyberna.com>
+
+Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+
 > ---
->  .../bindings/net/pcs/mediatek,usxgmii.yaml    | 105 ++++++++++++++++++
+> Change from v4:
+> 	* Remove is_stopped check
+> 	* Variable ordering
+>=20
+> Change from v3:
+> 	* Move the page pool check back to mvneta
+>=20
+> Change from v2:
+> 	* Fix the fixes tag
+>=20
+> Change from v1:
+> 	* Add cover letter
+> 	* Move the page pool check in mvneta to the ethtool stats
+> 	  function
+>=20
+> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet=
+/marvell/mvneta.c
+> index 8b0f12a0e0f2..c498ef831d61 100644
+> --- a/drivers/net/ethernet/marvell/mvneta.c
+> +++ b/drivers/net/ethernet/marvell/mvneta.c
+> @@ -4733,14 +4733,17 @@ static void mvneta_ethtool_get_strings(struct net=
+_device *netdev, u32 sset,
+>  				       u8 *data)
+>  {
+>  	if (sset =3D=3D ETH_SS_STATS) {
+> +		struct mvneta_port *pp =3D netdev_priv(netdev);
+>  		int i;
+> =20
+>  		for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
+>  			memcpy(data + i * ETH_GSTRING_LEN,
+>  			       mvneta_statistics[i].name, ETH_GSTRING_LEN);
+> =20
+> -		data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
+> -		page_pool_ethtool_stats_get_strings(data);
+> +		if (!pp->bm_priv) {
+> +			data +=3D ETH_GSTRING_LEN * ARRAY_SIZE(mvneta_statistics);
+> +			page_pool_ethtool_stats_get_strings(data);
+> +		}
+>  	}
+>  }
+> =20
+> @@ -4858,8 +4861,10 @@ static void mvneta_ethtool_pp_stats(struct mvneta_=
+port *pp, u64 *data)
+>  	struct page_pool_stats stats =3D {};
+>  	int i;
+> =20
+> -	for (i =3D 0; i < rxq_number; i++)
+> -		page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
+> +	for (i =3D 0; i < rxq_number; i++) {
+> +		if (pp->rxqs[i].page_pool)
+> +			page_pool_get_stats(pp->rxqs[i].page_pool, &stats);
+> +	}
+> =20
+>  	page_pool_ethtool_stats_get(data, &stats);
+>  }
+> @@ -4875,14 +4880,21 @@ static void mvneta_ethtool_get_stats(struct net_d=
+evice *dev,
+>  	for (i =3D 0; i < ARRAY_SIZE(mvneta_statistics); i++)
+>  		*data++ =3D pp->ethtool_stats[i];
+> =20
+> -	mvneta_ethtool_pp_stats(pp, data);
+> +	if (!pp->bm_priv)
+> +		mvneta_ethtool_pp_stats(pp, data);
+>  }
+> =20
+>  static int mvneta_ethtool_get_sset_count(struct net_device *dev, int sse=
+t)
+>  {
+> -	if (sset =3D=3D ETH_SS_STATS)
+> -		return ARRAY_SIZE(mvneta_statistics) +
+> -		       page_pool_ethtool_stats_get_count();
+> +	if (sset =3D=3D ETH_SS_STATS) {
+> +		int count =3D ARRAY_SIZE(mvneta_statistics);
+> +		struct mvneta_port *pp =3D netdev_priv(dev);
+> +
+> +		if (!pp->bm_priv)
+> +			count +=3D page_pool_ethtool_stats_get_count();
+> +
+> +		return count;
+> +	}
+> =20
+>  	return -EOPNOTSUPP;
+>  }
+> --=20
+> 2.42.0
+>=20
 
-Use compatible as filename (especially that you do not expect it to grow).
+--coe4qxv7etPQ1vbQ
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  1 file changed, 105 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
-> new file mode 100644
-> index 0000000000000..199cf47859e31
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
-> @@ -0,0 +1,105 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/pcs/mediatek,usxgmii.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek USXGMII PCS
+-----BEGIN PGP SIGNATURE-----
 
-MT7888 I guess?
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZU9OEwAKCRA6cBh0uS2t
+rN3hAP9NroWJYl+w8i0eGc7r/DR9XBPZNzTHNMuZ5QWeRTAB6wEAuRC55P5spyeH
+4TafyKF88ADRSYHBVV93HcDT6vCUTwQ=
+=O3E1
+-----END PGP SIGNATURE-----
 
-> +
-> +maintainers:
-> +  - Daniel Golle <daniel@makrotopia.org>
-> +
-> +description:
-> +  The MediaTek USXGMII PCS provides physical link control and status
-> +  for USXGMII, 10GBase-R and 5GBase-R links on the SerDes interfaces
-> +  provided by the PEXTP PHY.
-> +  In order to also support legacy 2500Base-X, 1000Base-X and Cisco
-> +  SGMII an existing mediatek,*-sgmiisys LynxI PCS is wrapped to
-> +  provide those interfaces modes on the same SerDes interfaces shared
-> +  with the USXGMII PCS.
-> +
-> +properties:
-> +  $nodename:
-> +    pattern: "^pcs@[0-9a-f]+$"
-
-Drop, we do not enforce naming in individual device schemas.
-
-> +
-> +  compatible:
-> +    const: mediatek,mt7988-usxgmiisys
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: USXGMII top-level clock
-> +      - description: SGMII top-level clock
-> +      - description: SGMII subsystem TX clock
-> +      - description: SGMII subsystem RX clock
-> +      - description: XFI PLL clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: usxgmii
-> +      - const: sgmii_sel
-> +      - const: sgmii_tx
-> +      - const: sgmii_rx
-> +      - const: xfi_pll
-> +
-> +  phys:
-> +    items:
-> +      - description: PEXTP SerDes PHY
-> +
-> +  mediatek,sgmiisys:
-> +    $ref: /schemas/types.yaml#/definitions/phandle
-> +    description:
-> +      Phandle to the syscon node of the corresponding SGMII LynxI PCS.
-
-"syscon node" is Linux term. Instead describe to what part of hardware
-this phandle is and why do you need it.
-
-> +
-> +  resets:
-> +    items:
-> +      - description: XFI reset
-> +      - description: SGMII reset
-> +
-> +  reset-names:
-> +    items:
-> +      - const: xfi
-> +      - const: sgmii
-> +
-> +  "#pcs-cells":
-> +    const: 0
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - phys
-> +  - mediatek,sgmiisys
-> +  - resets
-> +  - reset-names
-> +  - "#pcs-cells"
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
-> +    #include <dt-bindings/reset/mediatek,mt7988-resets.h>
-> +    soc {
-> +      #address-cells = <2>;
-> +      #size-cells = <2>;
-> +        usxgmiisys0: pcs@10080000 {
-
-Odd/Messed indentation.
-
-Use 4 spaces for example indentation.
-
-
-
-Best regards,
-Krzysztof
-
+--coe4qxv7etPQ1vbQ--
 
