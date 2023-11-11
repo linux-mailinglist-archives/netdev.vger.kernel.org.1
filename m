@@ -1,185 +1,123 @@
-Return-Path: <netdev+bounces-47170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706F07E881B
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 03:13:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B7457E8825
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 03:19:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76671B20B73
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 02:13:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 565F91C2097C
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 02:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918AD3C29;
-	Sat, 11 Nov 2023 02:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4032A4405;
+	Sat, 11 Nov 2023 02:19:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYCUOqka"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1+rZdFdj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7123C16
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 02:13:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0870C433C7;
-	Sat, 11 Nov 2023 02:13:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699668807;
-	bh=fXnXbitxTtpKPlWt+QUPo/mebXC5xgI/Lqfvg7L3HSs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QYCUOqkaCkE3Yfe6l6Y4x2Wp1h/xdyuQXW2aBNJjUdaH9J8F/zKaP91S76MWnPQl4
-	 eb4R93e37pACnRAM+iwFLyVwk89VLIEQAQOrVtvQwssLhKfyw+dCY745FhGQxXfbXM
-	 LtgW4LKw76flzuYhpK7v+CVqp5gtNLq30w9dYQK+n3vcDcM5+GgrSJwR77Az0evjFL
-	 EtN0MW2Osr8u/6UEuK0JPHo2hwMXcFPEKrUXXSPk/OQHiJ33Wzz+WbqKDSMaJCQpry
-	 /brYgpLgO6ooNq6oyIQjTO5b1GbdrzKVC6dpw+vdWaxzeO9jEEcgPV5cgQvOaaWG1R
-	 obk1thq9DL3fQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: gregkh@linuxfoundation.org,
-	dxld@darkboxed.org
-Cc: netdev@vger.kernel.org,
-	richard@nod.at,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC net-next] net: do not send a MOVE event when netdev changes netns
-Date: Fri, 10 Nov 2023 18:13:24 -0800
-Message-ID: <20231111021324.1702591-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231016184514.5dda6518@kernel.org>
-References: <20231016184514.5dda6518@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45723C2B
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 02:19:40 +0000 (UTC)
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0493F3C39
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 18:19:39 -0800 (PST)
+Received: by mail-ua1-x92e.google.com with SMTP id a1e0cc1a2514c-7ba6fa81aabso1103845241.0
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 18:19:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699669178; x=1700273978; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NgqBnf0ilIbbmVz4uCSI7pHuUwmF6tF2MbGnmYFmbLE=;
+        b=1+rZdFdjFSthMrsgVq4lr5yiWG2/2crNAzZriXlHWiM+p8m6VZrMRS2cTYEt4AJmMg
+         Vw+MLQtZuDncZLp2zMwgS5VVoz2T67+jXsb3xI7voYek+oxYh78djVY1JZNH5+Ljr8Vk
+         xNHRs06dXbOm/7XxkYdVYDaXKbrNWQMzlnyLyMeXeNTBpRANi2uDsKZnRwqi64LtsO5x
+         pUm5+4a/4reIXei27neTKjb0XFjJb0mu5/c1RYP2YLKcRbyZRzVpEsocdxG1BfHniNSU
+         bAE6L5zuymEAE5ng57YS9/lK3Q8gJrL/CIIEziTm5BwKqwtb0mrJpq36lM5c7UEfwpCw
+         LTkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699669178; x=1700273978;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NgqBnf0ilIbbmVz4uCSI7pHuUwmF6tF2MbGnmYFmbLE=;
+        b=W4ulFHiK0jOjLCE3i1XxXYNMbtMK39Vm3MiAXIo71M1Qpd9RU3bR2sm1KwkTnRxCkH
+         Gp325+zR7NKnAeykiUUtAAbtckM6/EkL4pFgZW5X9h3MagoYtet9t9IDd6qcSLO8RRzb
+         Wn2hFHGFyqj4xLF11vBJjvYjdzy/WlsJX7LY4RevyoiEfRY/afvMlb/BNPDDa0CDlK6y
+         aBHmxEtGzd1MCRQs5akYYNoGF3tDKiYLA+wvQi7f4kpGA2JOTlTEd1xdhRU5NrYMi82V
+         NfTKC9Wx+uV2WJEUpTiuf/lE5IFosDPqI1YmKgKu5n9FsvEnlum8sbJ2DXt7Q1a+BZHM
+         07Sw==
+X-Gm-Message-State: AOJu0Yz6hrAi9qYyfm138t6jOViklwJ512rK4TD/zbc1+TI1PlxzABAH
+	8GxH5T2rrEXyRBUSPaenfaWH8x/oMMPoSMWy+aNtdw==
+X-Google-Smtp-Source: AGHT+IF27drF2ibPIv5e35tDpvNbfT/4JCRv/7iIXX2a/YulrAcvekKKHgSNmcTCaUBg7ZoYtol1hSAIqIT6V1YCrfg=
+X-Received: by 2002:a05:6102:5f09:b0:460:f40a:95f8 with SMTP id
+ ik9-20020a0561025f0900b00460f40a95f8mr1152743vsb.24.1699669177954; Fri, 10
+ Nov 2023 18:19:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20231106024413.2801438-1-almasrymina@google.com>
+ <20231106024413.2801438-5-almasrymina@google.com> <20231110151953.75c03297@kernel.org>
+In-Reply-To: <20231110151953.75c03297@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 10 Nov 2023 18:19:24 -0800
+Message-ID: <CAHS8izOx99K=0O1fkb93mS54Yw0dqMj31D68gLG6OpH1J9LBhQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 04/12] netdev: support binding dma-buf to netdevice
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	linaro-mm-sig@lists.linaro.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Networking supports changing netdevice's netns and name
-at the same time. This allows avoiding name conflicts
-and having to rename the interface in multiple steps.
-E.g. netns1={eth0, eth1}, netns2={eth1} - we want
-to move netns1:eth1 to netns2 and call it eth0 there.
-If we can't rename "in flight" we'd need to (1) rename
-eth1 -> $tmp, (2) change netns, (3) rename $tmp -> eth0.
+On Fri, Nov 10, 2023 at 3:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sun,  5 Nov 2023 18:44:03 -0800 Mina Almasry wrote:
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -52,6 +52,8 @@
+> >  #include <net/net_trackers.h>
+> >  #include <net/net_debug.h>
+> >  #include <net/dropreason-core.h>
+> > +#include <linux/xarray.h>
+> > +#include <linux/refcount.h>
+> >
+> >  struct netpoll_info;
+> >  struct device;
+> > @@ -808,6 +810,84 @@ bool rps_may_expire_flow(struct net_device *dev, u=
+16 rxq_index, u32 flow_id,
+> >  #endif
+> >  #endif /* CONFIG_RPS */
+> >
+> > +struct netdev_dmabuf_binding {
+>
+> Similar nitpick to the skbuff.h comment. Take this somewhere else,
+> please, it doesn't need to be included in netdevice.h
+>
+> > +     struct netdev_dmabuf_binding *rbinding;
+>
+> the 'r' in rbinding stands for rx? =F0=9F=A4=94=EF=B8=8F
+>
 
-To rename the underlying struct device we have to call
-device_rename(). The rename()'s MOVE event, however, doesn't
-"belong" to either the old or the new namespace.
-If there are conflicts on both sides it's actually impossible
-to issue a real MOVE (old name -> new name) without confusing
-user space. And Daniel reports that such confusions do in fact
-happen for systemd, in real life.
-
-Since we already issue explicit REMOVE and ADD events
-manually - suppress the MOVE event completely. Move
-the ADD after the rename, so that the REMOVE uses
-the old name, and the ADD the new one.
-
-If there is no rename this changes the picture as follows:
-
-Before:
-
-old ns | KERNEL[213.399289] remove   /devices/virtual/net/eth0 (net)
-new ns | KERNEL[213.401302] add      /devices/virtual/net/eth0 (net)
-new ns | KERNEL[213.401397] move     /devices/virtual/net/eth0 (net)
-
-After:
-
-old ns | KERNEL[266.774257] remove   /devices/virtual/net/eth0 (net)
-new ns | KERNEL[266.774509] add      /devices/virtual/net/eth0 (net)
-
-If there is a rename and a conflict (using the exact eth0/eth1
-example explained above) we get this:
-
-Before:
-
-old ns | KERNEL[224.316833] remove   /devices/virtual/net/eth1 (net)
-new ns | KERNEL[224.318551] add      /devices/virtual/net/eth1 (net)
-new ns | KERNEL[224.319662] move     /devices/virtual/net/eth0 (net)
-
-After:
-
-old ns | KERNEL[333.033166] remove   /devices/virtual/net/eth1 (net)
-new ns | KERNEL[333.035098] add      /devices/virtual/net/eth0 (net)
-
-Note that "in flight" rename is only performed when needed.
-If there is no conflict for old name in the target netns -
-the rename will be performed separately by dev_change_name(),
-as if the rename was a different command, and there will still
-be a MOVE event for the rename:
-
-Before:
-
-old ns | KERNEL[194.416429] remove   /devices/virtual/net/eth0 (net)
-new ns | KERNEL[194.418809] add      /devices/virtual/net/eth0 (net)
-new ns | KERNEL[194.418869] move     /devices/virtual/net/eth0 (net)
-new ns | KERNEL[194.420866] move     /devices/virtual/net/eth1 (net)
-
-After:
-
-old ns | KERNEL[71.917520] remove   /devices/virtual/net/eth0 (net)
-new ns | KERNEL[71.919155] add      /devices/virtual/net/eth0 (net)
-new ns | KERNEL[71.920729] move     /devices/virtual/net/eth1 (net)
-
-If deleting the MOVE event breaks some user space we should insert
-an explicit kobject_uevent(MOVE) after the ADD, like this:
-
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11192,6 +11192,12 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
- 	netdev_adjacent_add_links(dev);
-
-+	/* User space wants an explicit MOVE event, issue one unless
-+	 * dev_change_name() will get called later and issue one.
-+	 */
-+	if (!pat || new_name[0])
-+		kobject_uevent(&dev->dev.kobj, KOBJ_MOVE);
-+
- 	/* Adapt owner in case owning user namespace of target network
- 	 * namespace is different from the original one.
- 	 */
-
-CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reported-by: Daniel Gröber <dxld@darkboxed.org>
-Link: https://lore.kernel.org/all/20231010121003.x3yi6fihecewjy4e@House.clients.dxld.at/
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-WDYT?
----
- net/core/dev.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0d548431f3fa..a26200cbf687 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11179,17 +11179,19 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	dev_net_set(dev, net);
- 	dev->ifindex = new_ifindex;
- 
--	/* Send a netdev-add uevent to the new namespace */
--	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
--	netdev_adjacent_add_links(dev);
--
- 	if (new_name[0]) /* Rename the netdev to prepared name */
- 		strscpy(dev->name, new_name, IFNAMSIZ);
- 
- 	/* Fixup kobjects */
-+	dev_set_uevent_suppress(&dev->dev, 1);
- 	err = device_rename(&dev->dev, dev->name);
-+	dev_set_uevent_suppress(&dev->dev, 0);
- 	WARN_ON(err);
- 
-+	/* Send a netdev-add uevent to the new namespace */
-+	kobject_uevent(&dev->dev.kobj, KOBJ_ADD);
-+	netdev_adjacent_add_links(dev);
-+
- 	/* Adapt owner in case owning user namespace of target network
- 	 * namespace is different from the original one.
- 	 */
--- 
-2.41.0
-
+reverse binding. As in usually it's netdev->binding, but the reverse
+map holds the bindings themselves so we can unbind them from the
+netdev.
+--=20
+Thanks,
+Mina
 
