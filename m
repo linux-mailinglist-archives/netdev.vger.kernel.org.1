@@ -1,121 +1,130 @@
-Return-Path: <netdev+bounces-47176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDB17E8985
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 07:28:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 894CB7E8989
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 07:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 126011F20EEF
-	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 06:28:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC0541C2074C
+	for <lists+netdev@lfdr.de>; Sat, 11 Nov 2023 06:34:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114116FC8;
-	Sat, 11 Nov 2023 06:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5404E161;
+	Sat, 11 Nov 2023 06:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJfha56h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJV+kzfo"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB526FBE
-	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 06:28:47 +0000 (UTC)
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CEE4204
-	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:28:46 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cc1e1e74beso24919105ad.1
-        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:28:46 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91C75227
+	for <netdev@vger.kernel.org>; Sat, 11 Nov 2023 06:34:53 +0000 (UTC)
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A44D55
+	for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:34:52 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id 98e67ed59e1d1-27ff83feb29so2565979a91.3
+        for <netdev@vger.kernel.org>; Fri, 10 Nov 2023 22:34:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699684125; x=1700288925; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=E63zgqUKaQM4aLm+widqkwMi/0OVWJqab8uh2TRe2so=;
-        b=KJfha56hOQOCJUj5fk52vyR2H1tNaJ/nHl9WAUtrU9m2mddsQZpMrxXnED+tO59sqp
-         yl9cccYjgb+1MAyzaSz8UzNYzd8q1c1U1uRp0qIYlzPeLeB9Dh0MNv3u8bIysqx/ryV/
-         G4kDGd1UQzDtBNDS3jO1pluexJ9MDKsjr0KI2S4hYkbr+weQvRBQW5lYLJ2MgbKqTDmq
-         NN8UAkRzEfRf3NE0djs6Hk+PUVj3q2aQPLfyNR7T2xPKejNTPPLnm5Amaq7m5PL7Se7k
-         asODeshlknRULsLfpk4V40ttNrW95HjYH+KcrzjMQuNdTTEJRRM3VUIRI3Zg22kQhT4N
-         4FDg==
+        d=gmail.com; s=20230601; t=1699684492; x=1700289292; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKu2MfyEEqZOiqRvlkmynwqLs8+5RYT8TR7o4ca3DYE=;
+        b=OJV+kzfo5cl3ugr3QRC6aPjJVo99xSwmyPgFtAiJmJTgVYSdwCzspeflGSTgQIhAYh
+         KeeYIabP4h5lkAKFymoMCvAnZZ1HxHmNYg/qt4n8AnnkH1iKwUikAYW4ppTTtt9pHCzk
+         AVDsCHBK2hoc2UlaDBs0kSkiISAJ6iU5Hf2Gxm5YEw/Lc/igVm4ulzdBF9HEkUeRupgs
+         x5tHQoqpkgVWC48EqF5F1aLNb9aH9Pbaxcp074d5jiqWzLdcLg1c8v326FbMz65XWMPB
+         YeebbF5sU6mwn4RG8KWWWpmmTHaCCVLyCwfzLYJpM1EZSv4vPrDT8i++3HZ29uKw3l21
+         sQAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699684125; x=1700288925;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E63zgqUKaQM4aLm+widqkwMi/0OVWJqab8uh2TRe2so=;
-        b=EmQyxX93IwOSBPB4UGWygzi6s1tBMvEEpkkJp+dLS6LJTkd46f19fupAK4YgVI8wyl
-         /P5LaJOPeLY19azhGAUFQlxXMIF2frKxV+O92n+oHL7ydgUzJu5kzvpm+Q+49K9tE2sg
-         IciAavfIfBiJLsm9rjcgx+FQrHXLeaW3RJJWO3GHItg1RECdKknxuVHR3vXJaL6nmmVx
-         oPtN3ImD9BUfA7HUGtkWdPdAzAiaIIlMGn8e7mwmNQ61KAzjBijt7cfX/jZHje6rtyT6
-         5h8ICJDCb3lFx/gYR2JnofxP+CVe3HPY143ypnUZsUZH5tVZqIYYPJX28GHffrSn6oKU
-         +85A==
-X-Gm-Message-State: AOJu0YzoYleWHVlbkP4tdT0A2DKPet7cLa3dYyPe7oLSnUI3P1rpYpzs
-	le/5unJCyjTcCwYoCIaN11w=
-X-Google-Smtp-Source: AGHT+IG8RYqG4+cbr0cXBnA3+mUwD+Xoszuj6S15SKaHRrhyPYaVUjDk701ujiA4DD2KyAWN305WSQ==
-X-Received: by 2002:a17:903:41c9:b0:1cc:4a84:27f2 with SMTP id u9-20020a17090341c900b001cc4a8427f2mr2264972ple.0.1699684125547;
-        Fri, 10 Nov 2023 22:28:45 -0800 (PST)
+        d=1e100.net; s=20230601; t=1699684492; x=1700289292;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZKu2MfyEEqZOiqRvlkmynwqLs8+5RYT8TR7o4ca3DYE=;
+        b=MM3evj4+BB+bazj15ANp02K66bD5Bbdwh5Wkf1T8D0RoRxBspwJ2s3uguhwzXrj00d
+         dirudE3swoJA6MAzjVjPzAgS+CoiivATVSM6FN1G/faMO0kVUFgSrKBkPMC4Chd2XZlK
+         Cod7WnlPeTO+BTKzGePz8dtyTLhJcBOnZPmh0xaEzuO1uonPqVFeQW08n+hpiP8bGK9Z
+         hmc2MAKuiOEG1KUs7TYYFlXJl/j9avze/8dfNX3pCg+msn7paAuO+5SDg0GjDRs8gfLw
+         VUtvlE6IO4HppkdCMG7wXyX7KX26Xi7ac5xfTXjm7/ruYkhuk3mFwfwowsEpNukgJJsf
+         Jm0w==
+X-Gm-Message-State: AOJu0Yw2SUbNWAIRrKnhF93uFVDDGmdzqb7xemLq51/uXaXxM5m9EnzS
+	vpRZ3aRSQSVxttPHXAoZPjs=
+X-Google-Smtp-Source: AGHT+IGA5tgzROVEy8LICOCjY+a00VcbMGVY0ZL9yWnZYfjU0cxHYyr6gwIqpk7vdVKTvbuIG2aV+w==
+X-Received: by 2002:a17:90b:4b87:b0:280:74ce:ae8d with SMTP id lr7-20020a17090b4b8700b0028074ceae8dmr1134379pjb.20.1699684491867;
+        Fri, 10 Nov 2023 22:34:51 -0800 (PST)
 Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id h10-20020a170902f54a00b001c5f7e06256sm653048plf.152.2023.11.10.22.28.42
+        by smtp.gmail.com with ESMTPSA id l18-20020a170903245200b001b9be3b94d3sm658905pls.140.2023.11.10.22.34.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Nov 2023 22:28:44 -0800 (PST)
-Date: Sat, 11 Nov 2023 14:28:40 +0800
+        Fri, 10 Nov 2023 22:34:51 -0800 (PST)
+Date: Sat, 11 Nov 2023 14:34:47 +0800
 From: Hangbin Liu <liuhangbin@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
 	Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
 	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>
 Subject: Re: [PATCH net] bonding: stop the device in bond_setup_by_slave()
-Message-ID: <ZU8fGPrYauq9pojf@Laptop-X1>
+Message-ID: <ZU8ghyf+tAUnk7gI@Laptop-X1>
 References: <20231109180102.4085183-1-edumazet@google.com>
  <ZU2nBgeOAZVs4KKJ@Laptop-X1>
- <CANn89iLXNnHNdApy3JaOpnq-hkrDyR-vTYjDEiTaU5oJ1uAPTg@mail.gmail.com>
+ <84246.1699607962@vermin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLXNnHNdApy3JaOpnq-hkrDyR-vTYjDEiTaU5oJ1uAPTg@mail.gmail.com>
+In-Reply-To: <84246.1699607962@vermin>
 
-On Fri, Nov 10, 2023 at 09:38:18AM +0100, Eric Dumazet wrote:
-> On Fri, Nov 10, 2023 at 4:44 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
+On Fri, Nov 10, 2023 at 11:19:22AM +0200, Jay Vosburgh wrote:
+> >Do we need also do this if the bond changed to ether device from other dev
+> >type? e.g.
 > >
-> > On Thu, Nov 09, 2023 at 06:01:02PM +0000, Eric Dumazet wrote:
-> > > Commit 9eed321cde22 ("net: lapbether: only support ethernet devices")
-> > > has been able to keep syzbot away from net/lapb, until today.
-> > >
-> > > In the following splat [1], the issue is that a lapbether device has
-> > > been created on a bonding device without members. Then adding a non
-> > > ARPHRD_ETHER member forced the bonding master to change its type.
-> > >
-> > > The fix is to make sure we call dev_close() in bond_setup_by_slave()
-> > > so that the potential linked lapbether devices (or any other devices
-> > > having assumptions on the physical device) are removed.
-> > >
-> > > A similar bug has been addressed in commit 40baec225765
-> > > ("bonding: fix panic on non-ARPHRD_ETHER enslave failure")
-> > >
-> >
-> > Do we need also do this if the bond changed to ether device from other dev
-> > type? e.g.
-> >
-> >     if (slave_dev->type != ARPHRD_ETHER)
-> >             bond_setup_by_slave(bond_dev, slave_dev);
-> >     else
-> >             bond_ether_setup(bond_dev);
+> >    if (slave_dev->type != ARPHRD_ETHER)
+> >            bond_setup_by_slave(bond_dev, slave_dev);
+> >    else
+> >            bond_ether_setup(bond_dev);
 > 
-> Hmmm... possibly, but as far as I know, nothing can be stacked on top of IPoIB
+> 	I'm not sure I follow your comment; bond_enslave() already has
+> the above logic.  If the bond is not ARPHRD_ETHER and an ARPHRD_ETHER
+> device is added to the bond, the above will take the bond_ether_setup()
+> path, which will call ether_setup() which will set the device to
+> ARPHRD_ETHER.
+> 
+> 	However, my recollection is that the bond device itself should
+> be unregistered if the last interface of a non-ARPHRD_ETHER bond is
+> removed.  This dates back to d90a162a4ee2 ("net/bonding: Destroy bonding
+> master when last slave is gone"), but I don't know if the logic still
+> works correctly (I've not heard much about IPoIB with bonding in a
+> while).  The bond cannot be initially created as non-ARPHRD_ETHER; the
+> type changes when the first such interface is added to the bond.
 
-The "stacked on top of IPoIB", do you mean IPoIB as an up layer or down layer
-device?
+Ah, thanks for this info. I just tried and it still works. Which looks
+there is no need to close bond dev before bond_ether_setup().
 
-BTW, not only IPoIB can be enslaved to bond, but also other types like gre could be
-enslaved to bond.
+BTW, I tried to set gre0's master to bond0 and change the types. After that,
+`ip link del gre0` will return 0 but gre0 is actually not deleted. I have to
+remove the gre mode to delete the link. Is that expected?
+
+```
+# ip link add bond0 type bond mode 1 miimon 100
+# ip link add gre0 type gre
+# ip link set gre0 master bond0
+# ip link show bond0
+21: bond0: <BROADCAST,MULTICAST,MASTER> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/gre 0.0.0.0 brd 0.0.0.0
+# ip link del gre0
+# echo $?
+0
+# ip link show gre0
+18: gre0@NONE: <NOARP,SLAVE,UP,LOWER_UP> mtu 1500 qdisc noqueue master bond0 state UNKNOWN mode DEFAULT group default qlen 1000
+    link/gre 0.0.0.0 brd 0.0.0.0
+
+```
 
 Thanks
 Hangbin
