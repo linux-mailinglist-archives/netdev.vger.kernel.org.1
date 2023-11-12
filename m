@@ -1,172 +1,166 @@
-Return-Path: <netdev+bounces-47228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80C6E7E8F79
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 11:25:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFA0B7E8F83
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 11:38:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7463EB208F3
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 10:25:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F55280C82
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 10:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82DF749C;
-	Sun, 12 Nov 2023 10:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B102C23DD;
+	Sun, 12 Nov 2023 10:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aGCaXIxS"
+	dkim=pass (1024-bit key) header.d=labn.onmicrosoft.com header.i=@labn.onmicrosoft.com header.b="cJ+H7Sr9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45167468
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 10:25:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C12C433C7;
-	Sun, 12 Nov 2023 10:25:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699784723;
-	bh=0QkLo9IpYIbHDWyOm+BKqCtxL99jBaY9bKdH4NXtmJQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aGCaXIxSRxIMnCY6UiUqIg0d1r5hI521GzoIUoSwW8kZJ862Zhzr+j7DcYlgCxU/1
-	 IUgQ7RuEh7u8V6epkCzBWap/VA1XGRPeZo3H66vmzwzVz2ApYJLaHoy6DZIqnazI6u
-	 0y1sbg0gXbjxTmImFcAFtAZ5x+hBAtxOJUpCSdgm9FNpQ281sMRZXup3WD2Z3SbPoa
-	 ZvZKIr1JwLfIFQ9ctq9JaIIASrpDZBLYbXnoeX5F8VRWrTIVS48b3Ne8WZhiAexm/H
-	 fI4EMnfBEdXLCqlTazld6QX3bTSZ28Y0ZtI623rOLzdinXwyStiVTeoYOhUCTu+eUG
-	 V4NO1WLJEtUVQ==
-Date: Sun, 12 Nov 2023 10:25:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] tipc: Fix kernel-infoleak due to uninitialized TLV
- value
-Message-ID: <20231112102513.GJ705326@kernel.org>
-References: <20231110163947.1605168-1-syoshida@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83096FA3
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 10:38:53 +0000 (UTC)
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2114.outbound.protection.outlook.com [40.107.96.114])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7273A2D46
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 02:38:52 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LXAXGboFl0lJ1XAB52Kd1JcIr4lUKag6LUNZ8TG9016te3vvRN8cYOevl2ibE0dOti+SwVVYiWPuTGF42jtR2bwV/O0zApk207fMGubNtG0qs+LIszAa0vZznWosyOk+ZPuL//dRDoI7xpVORYVdNTOUq83ytI/90JiUHi6+0GxOW4e4pSkseiIKQ61m787FqP52QHkUwYamB6CI26AKF7la18uUTUbQNnCwApvFffde8yFQ40y0ktNdzhDjkBZ17j7lCDdP6gloZQOE2nXPbyzt/m+vB+dwvlcyAI7P5FU+oZY/eRWrp8EnrIwihUhcu/5Sb63ryRQzZ1yw+PtDDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aObfHLUiFetfGbQGfJv5pp+6YpsoWkaoR9NdlOTIwnU=;
+ b=OsEGgDQcAAi4PvfVu0hYUjLA5OVhhWGyfw/FtzN4hrZ9GVcWuW5NgNigsJ4NAP96WAk5ib1y6IuW2V/ECBAYXxbG5rARfSWRddhhU7k7/cyw8kGn08wdTSbz2syFoiiRbxBUfhh92E+rArer/P1ruIKNRhUaK7O+x6B4WhWOtl3M658H2kC7+9QQgpOBV3yHi4+7CGqsBbKLIVfJ8Z7rPzRCRAZmc7LXhPkaHiqtbwvLFsvHF7NKa8A0hhsEFW0gLiQkcm1htdlL7+VgJ1AjGdmVAPjHiqSwpmTTH9WVUMdvMMQxUmB/GXjgtbWKjXENE9/LJOkMEEXvi2k7GE98Gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=labn.net; dmarc=pass action=none header.from=labn.net;
+ dkim=pass header.d=labn.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=labn.onmicrosoft.com;
+ s=selector2-labn-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aObfHLUiFetfGbQGfJv5pp+6YpsoWkaoR9NdlOTIwnU=;
+ b=cJ+H7Sr9D7mUC55oW8zkMnjOCKKPEUlVeT7NndqKGV7l8QczUsmcgEBiayHJ+8crbg//4NH2hba+ZmEHozYZtgISceA537OioWXR9Tai74bne82j/3c7kiqTDrIL6jfATh9o1QtEHf8kmiJL4Kcg9QV6RvOOqiP6nDw3M3LHQ/E=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=labn.net;
+Received: from CH2PR14MB4152.namprd14.prod.outlook.com (2603:10b6:610:a9::10)
+ by SA1PR14MB4594.namprd14.prod.outlook.com (2603:10b6:806:1ad::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19; Sun, 12 Nov
+ 2023 10:38:50 +0000
+Received: from CH2PR14MB4152.namprd14.prod.outlook.com
+ ([fe80::72bc:7cd2:adb5:be40]) by CH2PR14MB4152.namprd14.prod.outlook.com
+ ([fe80::72bc:7cd2:adb5:be40%7]) with mapi id 15.20.6977.028; Sun, 12 Nov 2023
+ 10:38:49 +0000
+References: <20231110113719.3055788-1-chopps@chopps.org>
+ <20231110113719.3055788-5-chopps@chopps.org> <3808085.1699777584@dyas>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@labn.net>
+To: Michael Richardson <mcr@sandelman.ca>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
+ netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [RFC ipsec-next 4/8] iptfs: sysctl: allow
+ configuration of global default values
+Date: Sun, 12 Nov 2023 05:28:16 -0500
+In-reply-to: <3808085.1699777584@dyas>
+Message-ID: <m2bkbz5k96.fsf@ja.int.chopps.org>
+Content-Type: text/plain; format=flowed
+X-ClientProxiedBy: CH0P221CA0021.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11c::17) To CH2PR14MB4152.namprd14.prod.outlook.com
+ (2603:10b6:610:a9::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231110163947.1605168-1-syoshida@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PR14MB4152:EE_|SA1PR14MB4594:EE_
+X-MS-Office365-Filtering-Correlation-Id: bde3dbdd-fc60-42e4-5cb8-08dbe36b8deb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ut1Fo+i8Xkspklaz5JSBTsTWNONy2bwDl+LxUz9fxZ/FzGUIVxQE3ml/7IhPEx6Iq4aMJkfyMo8qVPc26qyiK3+5GXZ3iHTGZPWv1+4X1yDlTzrS4zgqoIFqII5e3tehaBj0z8/4oF15IA5w/ZQoscmlsihvdMyQzlZVwIvL6lvH0ZVIRgamcBP5Yh8mE1hr4VCKfcgqUkihfFpH8Ms+Z1A2tOPe2UMO77IwdTu9j8UOt2OqRiT3kFQxrD/MI4fcn9h2660ZlJFGPQjL5nBSexIZUWUpvyd44Vq3zrHedzNmS83pL2aojWcl5WLes1S2Xxs5ZYE023tOMLIgE1xqRAoJSKV/EfFCcbjWb6KQ2PPDnaf+rsjj0Zs9PAnNxU+yVwtqoRxnNm5Ju4iL72/seokQPL1UYmSgEDBEV8QrTVi6GqXih9LaNjSuKwsTDP7dkrYTa6hk+KctJmnS5qYVZpWXbZaxXwD/oGFyFFHmttZPjv4hiVdLkKqqBIK9y9CErVInWFATOXBA2N/AtUVIROCJVB1XS9tiwFM11tKpeKXNcBEqIRlUVI9cMUGZ55G2mhZE1ikdp98h8uCFSW6Gaktc43Mbx2YklaVuc7uWwMDFDxK03c69nDLpGxQT5TDj
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR14MB4152.namprd14.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(39830400003)(366004)(396003)(136003)(230922051799003)(186009)(64100799003)(1800799009)(451199024)(2906002)(6486002)(478600001)(66946007)(66556008)(54906003)(6916009)(316002)(66476007)(5660300002)(8676002)(4326008)(6666004)(6506007)(8936002)(52116002)(6512007)(107886003)(26005)(41300700001)(38350700005)(83380400001)(9686003)(86362001)(38100700002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?X8iblRPRPlL69oKex0NpWym/huIysAdythUwEWH/iko7UHzZkysTYmcrRn1W?=
+ =?us-ascii?Q?NV9xEN7QfGkTYkHCovg/l/x2kWdTL5cVHVJn79UI6Z5/JmL7aNTTDN82Xkf7?=
+ =?us-ascii?Q?5M3VqPH4xi39U1baSoIcInem9rTfszXH+8smzKo3dCduNSjDZpYSAffgEjrK?=
+ =?us-ascii?Q?zxGurbNEWB19fbCeYsaxA9EF6J38SaxJ+X5l2MC/WnVySyOkz4onOFgjOxDF?=
+ =?us-ascii?Q?75uyq2vUa96skEzQSNzvhkxwnqJEFDfsGb/3d53TMDrpn+6kK8AxhmfzK3Qr?=
+ =?us-ascii?Q?H+ytoCgqkfl3wICJC8TRmeDtDhIsiIBaQX35v6vgS9Nf6eeOQAmyHGnroiXG?=
+ =?us-ascii?Q?ZlexG25ZLeXOFzLIhmhtfV1efe7dlPgVdOOQ2I18sjHePxeZM80CUHwwyIHS?=
+ =?us-ascii?Q?VZ6CHn5vkeogLc3H59nSVNV0RD8+MMap2ymXKyRUOuQoGFNjatDjt4LFPnsW?=
+ =?us-ascii?Q?NXC66qeKGaEGxE8ol44bZJa3sr9c9IPpjU6kgKv4vPnEu8QWQCIbU4cx8+Uq?=
+ =?us-ascii?Q?oJ+Ed91f4keGmnpu5F5jzXvC3X0Ql6ViDymR9fMe/Ue54bfurYpovPIFWfIG?=
+ =?us-ascii?Q?yIM0RwJRzIqBM5bzYriT+69z5KqqMjEsvTYeSs1NwKjYAMmHRell7BoTJ07J?=
+ =?us-ascii?Q?q0LFl9xx74xS59OmiH7VGED1e4l1T6rcx6upcSWLgVr7GFvZBHuV8X8SyUF3?=
+ =?us-ascii?Q?lqwUIa6cKH4F7iZW2ikSNZO/+EZyp2BxHAbczUcXZWxJaawc0itmrH0fdD6E?=
+ =?us-ascii?Q?FswBB1szSe3pSVVpHSYfx9Zctz2USbXWSVlbbNrgkjr0zeICKVBVPWQ+4C1B?=
+ =?us-ascii?Q?1ND+68tF+h6WabT3XA9n6VkLul8TheeF0ISNEkPR3hOOpJiQmLw6r6BZxXaB?=
+ =?us-ascii?Q?5f5AKaF1at4aMY7XjzybLTZtCGXT1SCtSWjBuwnbihYIbCv9NfX368YE/rlE?=
+ =?us-ascii?Q?mxdx63QB32+cI4D8sxPP5bv0z9kHcXU9lNoV9p0N1Gl6QcCFxNpnwS3WGbW9?=
+ =?us-ascii?Q?Sapp88RFxSXRzy/HZklvCnt+QcqHSisONYniTORt4xBopBhArmbCmg7dfgKa?=
+ =?us-ascii?Q?yYCJkusOlTP5EnrNlTI9Unk2BMSHyA1pG5HE/Rk1fVJ3mYMoHGEWoDGr6mCY?=
+ =?us-ascii?Q?PGk1gOKWwnNd0vxnjxXuhvqqn6pSzHt4DA+VXv5TlT03dkOrTNsGC2QlBioo?=
+ =?us-ascii?Q?ZytQUBGhn3/AYm4tvrg3XInhMZ0Gms864z8HuFl9/ETGm4IZkKnhrJSqc8ok?=
+ =?us-ascii?Q?Xc/C43yqEkKagqM78btLSvxhKlcwbycZ1284NR4/U64auH6HzBq0ZZ0o9m3P?=
+ =?us-ascii?Q?WdddFqYFTfeDHgx7RGakEf1MOrOb0ZQ9K8SEyy/pXUKn03E7RDWbqbxuOoh5?=
+ =?us-ascii?Q?hpkr3HoXCpdplr+S1jXg8hcJoVyiAAsSu068TV6QPcAwqhek0GToSDT0mPvd?=
+ =?us-ascii?Q?6T1frNErMmB0/BiRu08x2GN+/M/yrrZI/NShxOUzxxhGaVQ2lqEurnnOBGcy?=
+ =?us-ascii?Q?UidqIVwjHSEMM7BknaX3cJkU4+cElgONfcIfpRxUCqqQVPJg/c+ei5sAnOM+?=
+ =?us-ascii?Q?Owfv1pnwzbrsj5XTPTNf4o4rYgK7Sg/vm4egbUx1?=
+X-OriginatorOrg: labn.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: bde3dbdd-fc60-42e4-5cb8-08dbe36b8deb
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR14MB4152.namprd14.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2023 10:38:49.0597
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: eb60ac54-2184-4344-9b60-40c8b2b72561
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1yETkFAA6lOf/1lUbRFZGdAmkHwPO2EpciuIrdDfqqCq5ur8gXKLOqVlvnwAu28z7Har/2sluDeyYMgAOiKqCQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR14MB4594
 
-On Sat, Nov 11, 2023 at 01:39:47AM +0900, Shigeru Yoshida wrote:
-> KMSAN reported the following kernel-infoleak issue:
-> 
-> =====================================================
-> BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-> BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
-> BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
-> BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
-> BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
-> BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
->  instrument_copy_to_user include/linux/instrumented.h:114 [inline]
->  copy_to_user_iter lib/iov_iter.c:24 [inline]
->  iterate_ubuf include/linux/iov_iter.h:29 [inline]
->  iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
->  iterate_and_advance include/linux/iov_iter.h:271 [inline]
->  _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
->  copy_to_iter include/linux/uio.h:197 [inline]
->  simple_copy_to_iter net/core/datagram.c:532 [inline]
->  __skb_datagram_iter.5+0x148/0xe30 net/core/datagram.c:420
->  skb_copy_datagram_iter+0x52/0x210 net/core/datagram.c:546
->  skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
->  netlink_recvmsg+0x43d/0x1630 net/netlink/af_netlink.c:1967
->  sock_recvmsg_nosec net/socket.c:1044 [inline]
->  sock_recvmsg net/socket.c:1066 [inline]
->  __sys_recvfrom+0x476/0x860 net/socket.c:2246
->  __do_sys_recvfrom net/socket.c:2264 [inline]
->  __se_sys_recvfrom net/socket.c:2260 [inline]
->  __x64_sys_recvfrom+0x130/0x200 net/socket.c:2260
->  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> 
-> Uninit was created at:
->  slab_post_alloc_hook+0x103/0x9e0 mm/slab.h:768
->  slab_alloc_node mm/slub.c:3478 [inline]
->  kmem_cache_alloc_node+0x5f7/0xb50 mm/slub.c:3523
->  kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:560
->  __alloc_skb+0x2fd/0x770 net/core/skbuff.c:651
->  alloc_skb include/linux/skbuff.h:1286 [inline]
->  tipc_tlv_alloc net/tipc/netlink_compat.c:156 [inline]
->  tipc_get_err_tlv+0x90/0x5d0 net/tipc/netlink_compat.c:170
->  tipc_nl_compat_recv+0x1042/0x15d0 net/tipc/netlink_compat.c:1324
->  genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
->  genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
->  genl_rcv_msg+0x1220/0x12c0 net/netlink/genetlink.c:1067
->  netlink_rcv_skb+0x4a4/0x6a0 net/netlink/af_netlink.c:2545
->  genl_rcv+0x41/0x60 net/netlink/genetlink.c:1076
->  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
->  netlink_unicast+0xf4b/0x1230 net/netlink/af_netlink.c:1368
->  netlink_sendmsg+0x1242/0x1420 net/netlink/af_netlink.c:1910
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg net/socket.c:745 [inline]
->  ____sys_sendmsg+0x997/0xd60 net/socket.c:2588
->  ___sys_sendmsg+0x271/0x3b0 net/socket.c:2642
->  __sys_sendmsg net/socket.c:2671 [inline]
->  __do_sys_sendmsg net/socket.c:2680 [inline]
->  __se_sys_sendmsg net/socket.c:2678 [inline]
->  __x64_sys_sendmsg+0x2fa/0x4a0 net/socket.c:2678
->  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
->  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
->  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> 
-> Bytes 34-35 of 36 are uninitialized
-> Memory access of size 36 starts at ffff88802d464a00
-> Data copied to user address 00007ff55033c0a0
-> 
-> CPU: 0 PID: 30322 Comm: syz-executor.0 Not tainted 6.6.0-14500-g1c41041124bd #10
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
-> =====================================================
-> 
-> tipc_add_tlv() puts TLV descriptor and value onto `skb`. This size is
-> calculated with TLV_SPACE() macro. It adds the size of struct tlv_desc and
-> the length of TLV value passed as an argument, and aligns the result to a
-> multiple of TLV_ALIGNTO, i.e., a multiple of 4 bytes.
-> 
-> If the size of struct tlv_desc plus the length of TLV value is not aligned,
-> the current implementation leaves the remaining bytes uninitialized. This
-> is the cause of the above kernel-infoleak issue.
-> 
-> This patch resolves this issue by clearing data up to an aligned size.
-> 
-> Fixes: d0796d1ef63d ("tipc: convert legacy nl bearer dump to nl compat")
-> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+Michael Richardson <mcr@sandelman.ca> writes:
 
-Thanks Yoshida-san,
+> [[PGP Signed Part:Signature made by expired key 7002AEC2CCD88043 Michael Richardson <mcr+china@sandelman.ca>]]
+>
+>>>>>> Christian Hopps <chopps@labn.net> writes:
+> Christian Hopps via Devel <devel@linux-ipsec.org> wrote:
+>     > Add sysctls for the changing the IPTFS default SA values.
+>
+> Add sysctls for the changing the IPTFS default SA values.
+>
+> +xfrm_iptfs_idelay - UNSIGNED INTEGER
+> +        The default IPTFS initial output delay. The initial output delay is the
+> +        amount of time prior to servicing the output queue after queueing the
+> +        first packet on said queue.
+>
+> I'm guessing this is in miliseconds, but the documentation here does not say.
 
-I agree with both your analysis and that the fix is correct.
-I also agree that the problem was introduced by the cited commit.
+It's microseconds actually, thanks for noticing this. Drop timer is the same.
 
-I did wonder if there would be an advantage to only zeroing the
-otherwise uninitialised portion of tlv, but I guess that the complexity
-isn't worth any gain: all of TLV likely fits into a single cacheline
-anyway.
+> +xfrm_iptfs_rewin - UNSIGNED INTEGER
+> +        The default IPTFS reorder window size. The reorder window size dictates
+> +        the maximum number of IPTFS tunnel packets in a sequence that may arrive
+> +        out of order.
+> +
+> +        Default 3.
+>
+> Why three?
+> Is there some experimental reason to pick three?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+B/c I had no idea what the right value was (guesses but no data), and so I asked the TCP guys at IETF and that's what the TCP guys told me they used. :)
 
-> ---
->  net/tipc/netlink_compat.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/tipc/netlink_compat.c b/net/tipc/netlink_compat.c
-> index 5bc076f2fa74..c763008a8adb 100644
-> --- a/net/tipc/netlink_compat.c
-> +++ b/net/tipc/netlink_compat.c
-> @@ -102,6 +102,7 @@ static int tipc_add_tlv(struct sk_buff *skb, u16 type, void *data, u16 len)
->  		return -EMSGSIZE;
->  
->  	skb_put(skb, TLV_SPACE(len));
-> +	memset(tlv, 0, TLV_SPACE(len));
->  	tlv->tlv_type = htons(type);
->  	tlv->tlv_len = htons(TLV_LENGTH(len));
->  	if (len && data)
-> -- 
-> 2.41.0
-> 
-> 
+> It seems that maybe the reorder window size could have been a per-SA attribute.
+
+All of these are per-SA values. These sysctl variables adjust the defaults assigned to an SA when the user does not specify a value.
+
+> I read through the rest of the patches, and they seem great, but I didn't
+> read with a lot of comprehension.  I found the explanatory comments and
+> diagrams very well done!
+
+Thanks, :)
+Chris.
 
