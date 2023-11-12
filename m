@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-47217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21F357E8EFE
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 08:37:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EDA7E8F02
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 08:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533DC1C2040C
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 07:37:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A8DC1C204D6
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 07:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A4B5392;
-	Sun, 12 Nov 2023 07:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3351953B4;
+	Sun, 12 Nov 2023 07:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iNayrCcR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+rIDpOA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E16A5CAF;
-	Sun, 12 Nov 2023 07:37:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A4FC433C7;
-	Sun, 12 Nov 2023 07:37:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157D05397
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 07:39:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59DEAC433C7;
+	Sun, 12 Nov 2023 07:39:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699774659;
-	bh=dX1vZGEJZo/cEKQ1GkxT0C8N/DZuyYVXv+EngihfWoQ=;
+	s=k20201202; t=1699774768;
+	bh=/KYNVtN71OssaD2HqH6jz24Utw2sqO//cXVIaFzgXdg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=iNayrCcR2KmxH7V1M/83V/nmtv8T1sodU5AaylOWL5PAoaThPbfvdNK3n19R8lKzq
-	 Xjh66v11Z4eQqr5/ZxDod+/WrILkEdD6ZJOLQ0xGyCb5SEPN4wX/donjUNwigLeaqa
-	 Ni14h/tKAUc1OBE0GZfEhpSQx28cGS7E5ZUVCe2IOvQNc+0qj0rW+bhWMvQmIGff5k
-	 2dNH7kKC9jjVKz5SnXZF0by4XgMAWbPctxnhLj5cGcJQfzrFeCdZCwgTtRJko00KIO
-	 yfucYgS0WF6Yy7WbCpOKswgRrr+KT/2DuyW+zm2gl26VSCJ+xEslWcMJg2/0/Fd/sB
-	 gdQPwunxBWfYQ==
-Message-ID: <87433a37-ca5a-4439-b25a-1c7ad6025b41@kernel.org>
-Date: Sun, 12 Nov 2023 08:37:30 +0100
+	b=p+rIDpOAiJlmzEW+UjjWTxt5yPWXqKhUTBeEKH3BBduE7VjDRnjOE5snWnnheRMhv
+	 39/MsRk/N7Y+Tu4gqqgCFUCsVJ9yZJ85awuTIbuWBIWvIeG3Dw8BuSIoZ2t+pAp1K1
+	 KdGMi1KSzE6sUJLZ4aDFPilgp9G67FXQ9TxVwni+s7B+0HqPlyBEKbRNIcsI1RNLEk
+	 8ZDWaoy7u+lBC8xHU7j9hHjsCCU0pHJaRxLzKxabcB6RCQ/IACGAC360/VC4iHfa5N
+	 s2yNpa6HabUCKs9iJvuXwP6rZ5DPBER4nvLTINTKNDOGAMSU2ZgJ+aClBs5xUv8mE+
+	 WBou5qaWq1hPg==
+Message-ID: <9bdbe85d-b45f-407c-8763-42439bc096e2@kernel.org>
+Date: Sun, 12 Nov 2023 08:39:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,17 +41,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 1/5] dt-bindings: net: dsa: realtek: reset-gpios is
- not required
+Subject: Re: [RFC net-next 3/5] net: dsa: realtek: create realtek-common
 Content-Language: en-US
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
  vivien.didelot@gmail.com, f.fainelli@gmail.com, olteanv@gmail.com,
  davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzk+dt@kernel.org, arinc.unal@arinc9.com, devicetree@vger.kernel.org,
- Rob Herring <robh@kernel.org>
+ krzk+dt@kernel.org, arinc.unal@arinc9.com
 References: <20231111215647.4966-1-luizluca@gmail.com>
- <20231111215647.4966-2-luizluca@gmail.com>
+ <20231111215647.4966-4-luizluca@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -96,28 +94,45 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20231111215647.4966-2-luizluca@gmail.com>
+In-Reply-To: <20231111215647.4966-4-luizluca@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 11/11/2023 22:51, Luiz Angelo Daros de Luca wrote:
-> The 'reset-gpios' should not be mandatory. although they might be
-> required for some devices if the switch reset was left asserted by a
-> previous driver, such as the bootloader.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Cc: devicetree@vger.kernel.org
-> Acked-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Acked-by: Rob Herring <robh@kernel.org>
+>  	ret = priv->ops->detect(priv);
+>  	if (ret) {
+> @@ -218,18 +149,12 @@ static int realtek_mdio_probe(struct mdio_device *mdiodev)
+>  		return ret;
+>  	}
+>  
+> -	priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
+> -	if (!priv->ds)
+> -		return -ENOMEM;
+> -
+> -	priv->ds->dev = dev;
+>  	priv->ds->num_ports = priv->num_ports;
+> -	priv->ds->priv = priv;
+> -	priv->ds->ops = var->ds_ops_mdio;
+>  
+>  	ret = dsa_register_switch(priv->ds);
+>  	if (ret) {
+> -		dev_err(priv->dev, "unable to register switch ret = %d\n", ret);
+> +		dev_err_probe(dev, ret, "unable to register switch ret = %pe\n",
+> +			      ERR_PTR(ret));
 
-If this is first RFC, how did you get the Acks? If this is not v1,
-provide changelog.
+This is some weird code. Why do you print ret twice? This was not
+explained in the commit msg.
 
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
+
+...
+> -	priv->ds->ops = var->ds_ops_smi;
+>  	ret = dsa_register_switch(priv->ds);
+>  	if (ret) {
+> -		dev_err_probe(dev, ret, "unable to register switch\n");
+> +		dev_err_probe(dev, ret, "unable to register switch ret = %pe\n",
+> +			      ERR_PTR(ret));
+
+Same problem.
 
 Best regards,
 Krzysztof
