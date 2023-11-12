@@ -1,296 +1,358 @@
-Return-Path: <netdev+bounces-47241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC9287E9171
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 16:33:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF197E924E
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 20:44:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BCC81F20E8F
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 15:33:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB632280A78
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 19:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B7014288;
-	Sun, 12 Nov 2023 15:33:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B58168C1;
+	Sun, 12 Nov 2023 19:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UqwajYst";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ArrTadjK"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="M1XsnmLm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E1E14A9D
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 15:33:39 +0000 (UTC)
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9D9D26A4;
-	Sun, 12 Nov 2023 07:33:37 -0800 (PST)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ACFH5QH005182;
-	Sun, 12 Nov 2023 15:33:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
- bh=oJhgR6Swh4iVCZnpMH4Yr5fPwotWmwhx5WmN3gPXBgY=;
- b=UqwajYstv7mkuaAHeW9H+O9/OAoPefzXCS/6FLxRwL0TUfo00DbJdd3cdbbvBRUS+ifQ
- G0vVkNm/P0aatjCJBvz4HuAvqKKfntDLAUJ4llvt84bT4wmbFf9sKqkLPa5zU7ohbfql
- 8UzaGv4+kB64lsGQI1pahkzOY4eLBMZ+OvmWS9mP3v/LoqsglisAWGYHEGCzB8mBb/1y
- 52owl+P6J4tTu+X0PYvq9JPPSK005Vcdrt3f5DHnfrgpuWopgjdQH7H7j/tkEI5TXO7E
- BwVlZalaWEKQca5WSSVzJ/8Xg5zanaFcOjS/CTEzK7Ad14LHLnTdE2AvMnNGTGJt9sxo 9Q== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ua2n9shya-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 12 Nov 2023 15:33:26 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 3ACCRtam029807;
-	Sun, 12 Nov 2023 15:33:26 GMT
-Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam04lp2169.outbound.protection.outlook.com [104.47.73.169])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3uaxqp2us6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 12 Nov 2023 15:33:26 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YN1mQP9jrIJLNQ+pSkSLWGmRf/nR60f16ZUICR/E1fWgNlaOV0tBi9lfQvomyanHzrrdjqG0J4EHMDpre2jRUPCOy1pbYJTa7nMSuX1OV6/ikjzxJOmeU50rTWFaplUJyTu1lz3xT625DdBwSy+CDYQaSIF+HCRlpwXY3Cq+hlujcb4pI/Gn9PdikdiDgzdeIAzAQ/tMpggeh6BvW/c6i5yXUSwFqGf2x0GoYAsTlH2V8ivrXlVJDmCOelKpCFVzEfGZT7Ugg1WwhrjlR5ZyaUumztCRpqsSOYjzwAzGr2isIB6U80SDq9eJtFjKPlw0QLwoGrTQRqth6j5y17Q3dQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oJhgR6Swh4iVCZnpMH4Yr5fPwotWmwhx5WmN3gPXBgY=;
- b=bs9CwGe+NrDpJ7juyHvDzxyLvA6hEi9kxXHDyFlghbXD8ItMokZYcofBb/R92/D6UHIskw6vUe0cIH/eYX2GSNWV4ExubXz0VNIYVkkKr7G53ZMtf3YqMIjf+nfOD89p12g0vEkCik+APGJktwOm9deY2dXlc+HXw8hTWM/TCXHd9Go/FVOQ2RpiH6eGqZvJ5BAVr0xts57olQsOUqNvnqyEVOavYbwkDNmO1WVzMrOVXyuPwl8AHsmDNzDRxhxyF7EezKenWkeZyCB7ZaBZWEzx0tt84XWEFbj+Dr0DTNvgs6fa+albX3XouR1xUbFVxFJL38PJz9Y+soqOw2kijg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC44171B7
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 19:44:28 +0000 (UTC)
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4489E2139
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 11:44:26 -0800 (PST)
+X-KPN-MessageId: d7d7f522-8193-11ee-a148-005056abad63
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id d7d7f522-8193-11ee-a148-005056abad63;
+	Sun, 12 Nov 2023 20:44:07 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oJhgR6Swh4iVCZnpMH4Yr5fPwotWmwhx5WmN3gPXBgY=;
- b=ArrTadjKvHb537Zvy3UuVHS/6d6cG8mTGV2VblIEpoaqZwrEMPwFI5vgKN1KawnQ5sRO8SlAL5DMwjugiFzWvRDfgi9/pFdZvU4Ztj4SM32mQ0XgeUqlBBe8g+5QWZmMpF79UbkQ7QGns6bub8l/ZBaQJJjMwd82d9KbZaw9uPE=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by SA2PR10MB4538.namprd10.prod.outlook.com (2603:10b6:806:115::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.28; Sun, 12 Nov
- 2023 15:33:23 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::360b:b3c0:c5a9:3b3c]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::360b:b3c0:c5a9:3b3c%4]) with mapi id 15.20.6977.029; Sun, 12 Nov 2023
- 15:33:23 +0000
-From: Chuck Lever III <chuck.lever@oracle.com>
-To: Jeff Layton <jlayton@kernel.org>
-CC: Lorenzo Bianconi <lorenzo@kernel.org>,
-        Linux NFS Mailing List
-	<linux-nfs@vger.kernel.org>,
-        Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-        Neil Brown <neilb@suse.de>,
-        "open list:NETWORKING [GENERAL]"
-	<netdev@vger.kernel.org>,
-        "kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH v4 0/3] convert write_threads, write_version and
- write_ports to netlink commands
-Thread-Topic: [PATCH v4 0/3] convert write_threads, write_version and
- write_ports to netlink commands
-Thread-Index: AQHaDxAOgGm9oQY2Q0u75SE8Twdz07B1kySAgADtgwCAABKUAIAASbwA
-Date: Sun, 12 Nov 2023 15:33:23 +0000
-Message-ID: <BB9DF012-0E69-46CA-B7FF-6B963AA22C02@oracle.com>
-References: <cover.1699095665.git.lorenzo@kernel.org>
- <7fdd6dd0d8ab75181eb350f78a4822a039cacaa5.camel@kernel.org>
- <ZVCiyNQtkumDheU4@lore-desk>
- <0f0467f396777722022403727824104b4f0a8d85.camel@kernel.org>
-In-Reply-To: <0f0467f396777722022403727824104b4f0a8d85.camel@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3731.700.6)
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5128:EE_|SA2PR10MB4538:EE_
-x-ms-office365-filtering-correlation-id: d6e72b38-bcd8-4ee7-b0ca-08dbe394b4ea
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- B3Te+niVXJ/RoVwUFTKH6eiATIuf3hpi0l/Sc2oiMlcXXfmrYO7R7v4IuEgjL6o453Yeb9qr701BkHF0oZzAoc+SSzyaLxLj1ysHX6XY98Jirt+WqgzGTITFGWHUdrwelq5mcnq03HvjZXHXqx3qw5xH/cawJE4ewFPcYn+DGeIrrkUNfUB6+pkzHDKvvCYoLU8GLNNtKHQ4wtkmrNyJjH6s70XKvwzl/9uSRwJ8EfwTO8nRpL3udsjlq0UnJmj1CtEKeXKi2n1hHQq5xjLzDCAmkQlyQzKeHV6jEhOV6lKhZDTVQbQtNTI8EAm67QNqronTOgnE7iOLQbeBb+D7HmQnFukrwTxQ3a0xysTgJYUuk6hGmr3qEygJ3gpdXepscNUuBl7GWRI0pYOMgf7mB9hQd7eHw+kKGGB7SgHSaIMBOQ4WE3XrduJb6T3FpzZGhSnUgBXZnmusKMMEAnPdjPfjhrIZYkmHBI4z2iw5wyjXtglmDATROLEWqf86mm1SPzDbO7zIdVdz1m2mA7lmrnTDrfWjW6hFWOw5YaCXdnPqbsdcUuKBsYxo+Qj/D3S05CLUstFZDr3du83SVn/qqdAiF34z+tJUF/DA4ubDYrrVMhWdeLqvzYbsP5n4wlBynygDlzneX9olUJwM7106cQ==
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(136003)(39860400002)(366004)(396003)(230922051799003)(1800799009)(64100799003)(186009)(451199024)(26005)(2616005)(6506007)(53546011)(71200400001)(6512007)(83380400001)(5660300002)(4326008)(8676002)(8936002)(41300700001)(2906002)(4001150100001)(966005)(6486002)(478600001)(316002)(91956017)(76116006)(6916009)(54906003)(64756008)(66446008)(66476007)(66556008)(66946007)(36756003)(33656002)(86362001)(38100700002)(122000001)(38070700009)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?HuxSqXJupm0kkr/DILDFkpMIVjTDb0y57l+JBG7/IZy6gaMe5Ax9naDabMa3?=
- =?us-ascii?Q?1T82xKWMJBCsub7LwzTJPgMXUBRCvJ0Y3JwrmKAU1Woi/11B4IvncF6IkvFw?=
- =?us-ascii?Q?yYEG9eUmjvk3xOzy2N7m/AHQRtohgdIE6lrbL5eWT2LouSFVudft6+Yl+3oV?=
- =?us-ascii?Q?jRRr/eB5OnUNjfbyzvFpDnx9KhiMTfWPDifaAfu0fysR9Vb+diQjVaTomhja?=
- =?us-ascii?Q?AR8PYfWOq5M4rzMSthNFAoYFTnkkaBFcD39rZsSKblt1MN045rNhXvO13386?=
- =?us-ascii?Q?Bp6hz0vGGMvtEGHLZ5W6rbuJ2IzpaVSRsv+iGQQiHJzl8bDWdPnHj2gKyTqY?=
- =?us-ascii?Q?LJdZB+CQzb7Zd3S5Zo/+9CF+ebe9Y7ZlDm2akR1eXjepGD/9BZ6vwBjbxYY0?=
- =?us-ascii?Q?7QSdlIsJa87XC9Dh+gwPbdeKyoEoSbYdZH392X9DPr+N9JEb6PKldW1+Jt+q?=
- =?us-ascii?Q?pGpia9/J7GiURPyMbUGR5F0YA3XSypwFMDs+cuksyVbejMZq0hWQWw0NY4k+?=
- =?us-ascii?Q?jLp2fs0HmdmrIJYez5UGtuxO3r8YvNt3ucFWrKJ8C+P7ehxROApPNyS/vhC6?=
- =?us-ascii?Q?wlCrWy3IxpRp/wcpPsFV4hnjr37sGyQcHHhWGjMeLU8qdz786Gsuetega+su?=
- =?us-ascii?Q?BJczXGHnGJqcKheOyyKrTWZlwKLe6lpjMBx+ulT5A+YLCsJKgy987nU1okqE?=
- =?us-ascii?Q?CVZCdMobQL87+r3prVP+3EQEI6k4Tjtde0RICNMvyGxjZsOrjOnlABb+1LQk?=
- =?us-ascii?Q?78e+VzBla8mllcbUEBIqgVe7jbHjTHDg2ZSWXNqs+2Ob8gWcFm+Nhe7UhTSW?=
- =?us-ascii?Q?6WgCR6iv22WOazP+WK9xxsgbQe6V/7WHuTwunIPwsgpC2/mt5jmulk+94WTH?=
- =?us-ascii?Q?8jcVvQoHi6/y9j/vAihOwV/aoOpIXqE6Y91GL20LhaUtGO44VYm9aK6DJFDY?=
- =?us-ascii?Q?m6ZyXwt6FLquT9y7mW8ro4ToPsDdH3QVyNOQRdFUwg02+Q4C8UFPnH0EGO8X?=
- =?us-ascii?Q?k41QYoYLJRyOz5bxbgAeLF4ng7Vj/XDX0TJKny/WZB0ea1WrrbztlVctq4UN?=
- =?us-ascii?Q?4Bc3wGdps6zc/hY/oX47w+0WFZJlRc0+1uJh7LtI+VJg8bvCzwTPa+1TCe/G?=
- =?us-ascii?Q?KiKrE122A4DsrAe51+A7hNBk31YEhOoodpKsCu0agcV1LuPG3IkLcKRkIJYz?=
- =?us-ascii?Q?j3la0uAoh10iaM7G9LTZY1FpcoHdTEHcgebWyKYrdH3hwxJPIHvm+rREN44S?=
- =?us-ascii?Q?qBCVmE0b68eNFjZdYsSbdtaNUBnXNAo/AogUNLDMiEM9lGdMFLqYENoCcRjb?=
- =?us-ascii?Q?ymrB/Z4PGl57/frtPvaYZkXV2dSbpnMTgcl0xPeS1nYKnqHhqrYMklFhHkRA?=
- =?us-ascii?Q?TAfEpyWgGuB0jowtjh5/YC50u1U4APrODZc9Sql0oVuIIsM/cvRhbJTvNivY?=
- =?us-ascii?Q?d93AN2VOXZmz9uGJIVsGqv0BD36bnMJ31dVdsH/UuvN9hO7M0Ph82RTAIriN?=
- =?us-ascii?Q?AzCXzzpPWsrG95SJsVw7TbFcDE0W2PUROM226LeffylmHa4h83YnAeisSRW7?=
- =?us-ascii?Q?tdp0qATovXFliZrw/8U3RuVLWdIHeRDGm7kLNv/7S4jORNEBRHqVLKsef0uD?=
- =?us-ascii?Q?Cw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <8B2D48E4D9BB1F43A02AFAB0C27EDD3B@namprd10.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=z8CeK2qn35c/cKwVTtRVX+fXPSMX9h36E6ugfipkplI=;
+	b=M1XsnmLm67IIYczZBbPRwf1p8QmgxXX6OhvtptpSvPGjPzfECELLgcXDIR41U+Y0XuFkVzfUTEXrg
+	 3RUaD3sxd78QIkuZho92kaY3iEH+8JLEERGAlwg6ljlYcTJOpOPw4Iv/Oy0Fc8DcyH3MLZsC3Cnkva
+	 gXlsWX0DLBOFLiNI=
+X-KPN-MID: 33|NlNFOYu6pFnf2K+AiPs2h+Geo0DsPLqrH/vdxCuplxfm+fUZ14s22TGLMl7pA3V
+ iuR3d3vAQFVMD1juABsvv0NXYcKknFkAQL/lq8MKePNo=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|ln1kbnQ1Fa7lwY/QIj2CBzmcE8nck1Id1nshA5olEoMG6AWoSV17v0/3qdFBrxT
+ CAM419vFn0LDzs6wxxFo1dA==
+X-Originating-IP: 213.10.186.43
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id e0c4bca7-8193-11ee-8249-005056ab1411;
+	Sun, 12 Nov 2023 20:44:23 +0100 (CET)
+Date: Sun, 12 Nov 2023 20:44:22 +0100
+From: Antony Antony <antony@phenome.org>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, netdev@vger.kernel.org,
+	Christian Hopps <chopps@labn.net>
+Subject: Re: [devel-ipsec] [RFC ipsec-next 7/8] iptfs: xfrm: add generic
+ iptfs defines and functionality
+Message-ID: <ZVErFh72plGBUNK0@Antony2201.local>
+References: <20231110113719.3055788-1-chopps@chopps.org>
+ <20231110113719.3055788-8-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	mx1E3fwORUlGDo66TiU8w1Pw3+clteSMv899U2UMWBJiFe/+jqlLWCbngOpfDL+HMXorKXrRUYq/2zo4YPJ5/PbY17lCAAO0k5uE8EJFbaNHsui2pio/K4fk3C7No2zlfd77CUh2c9b+H2FBv/2ilxrhtdDyKpYFWfeJ1/UojRu3Xfjh7Ihujr/PfWt/HXXdpfLEgkyAHdc6d2CwGHFe3iljDPJ7TbHqOlXo0gdWVCm8oBEwf1MlWTKiy3R3y3YhBljoFToyci8/5mCUMObE64+JWMa0GsHhNjJlpbWuG8fvUNL2vDa1qKYFbs4bhcbTR4qRw06X1TjyJJXBDUYd5wXawDC+obVoWbENWFfcYz4YbQYU+UBcXYoM3cfYAtCyrwS4PQWNtGngEGntlHN0zRcRlz6mCkYgTRcMixfG/bZqx4MbCjlXiyc6cidmojHvU8FJAKTuY+h9AGMn1S4d42+H6breFZcPng+fGQpLTqYSF7wM0eKq/QsJEfKvTjmJMz0JgoEIC4HCqx0qRyYiuK/1uAyDBGDmLurwBHizV0xIx5Kw54WfQOTxhxjqxRl8Npg7p1IO55nMVNe/YEABcuBLlGZi31f0590FBgodzrTWW5d1vjD/naZVKPiGkxXlUxPMVc10KCqzTVDYs27NDEMbve2Z8pA3E0xHyKbrlkSRU/S9i+RkJsg8IGztz8jvpqHsgODBLcn5P0gYbbtYYzUXY0V+sSCCibUQKpjQrCIoSb1V+iDxgbQXV/t7i8jG+Xp2ApKhOaG7S/GJ6CLs3dZBFwnnu75l12gvmenoyGR5oey1QRXKTqJ5MOsbKDjhRaqcqui4Uv7AB3WS9zb+zQ==
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d6e72b38-bcd8-4ee7-b0ca-08dbe394b4ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2023 15:33:23.2792
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2RnP8XJg2i2d9YjcC9o7moY4BGwZrNFkuHc9psLNRzUCNViHb2t+/DgUEhBDcTCwCh5y0vWxe2IGp5tNsZDymg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4538
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-12_14,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311120137
-X-Proofpoint-GUID: e3XUmD4Cb_w_6PfXkjTnXRb2hBSSa7ok
-X-Proofpoint-ORIG-GUID: e3XUmD4Cb_w_6PfXkjTnXRb2hBSSa7ok
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231110113719.3055788-8-chopps@chopps.org>
+
+On Fri, Nov 10, 2023 at 06:37:18AM -0500, Christian Hopps via Devel wrote:
+> From: Christian Hopps <chopps@labn.net>
+> 
+> Define `XFRM_MODE_IPTFS` and `IPSEC_MODE_IPTFS` constants, and add these to
+> switch case and conditionals adjacent with the existing TUNNEL modes.
+> 
+> Signed-off-by: Christian Hopps <chopps@labn.net>
+> ---
+>  include/net/xfrm.h         |  1 +
+>  include/uapi/linux/ipsec.h |  3 ++-
+>  include/uapi/linux/snmp.h  |  2 ++
+>  include/uapi/linux/xfrm.h  |  3 ++-
+>  net/ipv4/esp4.c            |  3 ++-
+>  net/ipv6/esp6.c            |  3 ++-
+>  net/netfilter/nft_xfrm.c   |  3 ++-
+>  net/xfrm/xfrm_device.c     |  1 +
+>  net/xfrm/xfrm_output.c     |  4 ++++
+>  net/xfrm/xfrm_policy.c     |  8 ++++++--
+>  net/xfrm/xfrm_proc.c       |  2 ++
+>  net/xfrm/xfrm_state.c      | 12 ++++++++++++
+>  net/xfrm/xfrm_user.c       |  3 +++
+>  13 files changed, 41 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index aeeadadc9545..a6e0e848918d 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -37,6 +37,7 @@
+>  #define XFRM_PROTO_COMP		108
+>  #define XFRM_PROTO_IPIP		4
+>  #define XFRM_PROTO_IPV6		41
+> +#define XFRM_PROTO_IPTFS	IPPROTO_AGGFRAG
+>  #define XFRM_PROTO_ROUTING	IPPROTO_ROUTING
+>  #define XFRM_PROTO_DSTOPTS	IPPROTO_DSTOPTS
+>  
+> diff --git a/include/uapi/linux/ipsec.h b/include/uapi/linux/ipsec.h
+> index 50d8ee1791e2..696b790f4346 100644
+> --- a/include/uapi/linux/ipsec.h
+> +++ b/include/uapi/linux/ipsec.h
+> @@ -14,7 +14,8 @@ enum {
+>  	IPSEC_MODE_ANY		= 0,	/* We do not support this for SA */
+>  	IPSEC_MODE_TRANSPORT	= 1,
+>  	IPSEC_MODE_TUNNEL	= 2,
+> -	IPSEC_MODE_BEET         = 3
+> +	IPSEC_MODE_BEET         = 3,
+> +	IPSEC_MODE_IPTFS        = 4
+
+Consider using 'IPSEC_MODE_IPTFS_TUNNEL' for a more descriptive name? 
+
+I imagine IPSEC_MODE_BEET could support IPTFS, resulting in 'iptfs-beet.' 
+
+In applications like iproute2, using 
+'ip xfrm state add ...  mode iptfs-tunnel' might be clearer than 'iptfs' 
+alone, especially with possibility of IPTF 'Congestion Control' and  
+'Non-Congestion-Controlled'. Would be seperate modes? Or attributes of 
+"iptfs" mode?
 
 
+>  };
+>  
+>  enum {
+> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
+> index 26f33a4c253d..d0b45f4c22c7 100644
+> --- a/include/uapi/linux/snmp.h
+> +++ b/include/uapi/linux/snmp.h
+> @@ -331,6 +331,8 @@ enum
+>  	LINUX_MIB_XFRMFWDHDRERROR,		/* XfrmFwdHdrError*/
+>  	LINUX_MIB_XFRMOUTSTATEINVALID,		/* XfrmOutStateInvalid */
+>  	LINUX_MIB_XFRMACQUIREERROR,		/* XfrmAcquireError */
+> +	LINUX_MIB_XFRMINIPTFSERROR,		/* XfrmInIptfsError */
+> +	LINUX_MIB_XFRMOUTNOQSPACE,		/* XfrmOutNoQueueSpace */
+>  	__LINUX_MIB_XFRMMAX
+>  };
+>  
+> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> index fa6d264f2ad1..2e7ffc9b7309 100644
+> --- a/include/uapi/linux/xfrm.h
+> +++ b/include/uapi/linux/xfrm.h
+> @@ -153,7 +153,8 @@ enum {
+>  #define XFRM_MODE_ROUTEOPTIMIZATION 2
+>  #define XFRM_MODE_IN_TRIGGER 3
+>  #define XFRM_MODE_BEET 4
+> -#define XFRM_MODE_MAX 5
+> +#define XFRM_MODE_IPTFS 5
 
-> On Nov 12, 2023, at 6:09 AM, Jeff Layton <jlayton@kernel.org> wrote:
->=20
-> On Sun, 2023-11-12 at 11:02 +0100, Lorenzo Bianconi wrote:
->>> On Sat, 2023-11-04 at 12:13 +0100, Lorenzo Bianconi wrote:
->>>> Introduce write_threads, write_version and write_ports netlink
->>>> commands similar to the ones available through the procfs.
->>>>=20
->>>> Changes since v3:
->>>> - drop write_maxconn and write_maxblksize for the moment
->>>> - add write_version and write_ports commands
->>>> Changes since v2:
->>>> - use u32 to store nthreads in nfsd_nl_threads_set_doit
->>>> - rename server-attr in control-plane in nfsd.yaml specs
->>>> Changes since v1:
->>>> - remove write_v4_end_grace command
->>>> - add write_maxblksize and write_maxconn netlink commands
->>>>=20
->>>> This patch can be tested with user-space tool reported below:
->>>> https://github.com/LorenzoBianconi/nfsd-netlink.git
->>>> This series is based on the commit below available in net-next tree
->>>>=20
->>>> commit e0fadcffdd172d3a762cb3d0e2e185b8198532d9
->>>> Author: Jakub Kicinski <kuba@kernel.org>
->>>> Date:   Fri Oct 6 06:50:32 2023 -0700
->>>>=20
->>>>     tools: ynl-gen: handle do ops with no input attrs
->>>>=20
->>>>     The code supports dumps with no input attributes currently
->>>>     thru a combination of special-casing and luck.
->>>>     Clean up the handling of ops with no inputs. Create empty
->>>>     Structs, and skip printing of empty types.
->>>>     This makes dos with no inputs work.
->>>>=20
->>>> Lorenzo Bianconi (3):
->>>>   NFSD: convert write_threads to netlink commands
->>>>   NFSD: convert write_version to netlink commands
->>>>   NFSD: convert write_ports to netlink commands
->>>>=20
->>>>  Documentation/netlink/specs/nfsd.yaml |  83 ++++++++
->>>>  fs/nfsd/netlink.c                     |  54 ++++++
->>>>  fs/nfsd/netlink.h                     |   8 +
->>>>  fs/nfsd/nfsctl.c                      | 267 +++++++++++++++++++++++++=
--
->>>>  include/uapi/linux/nfsd_netlink.h     |  30 +++
->>>>  tools/net/ynl/generated/nfsd-user.c   | 254 ++++++++++++++++++++++++
->>>>  tools/net/ynl/generated/nfsd-user.h   | 156 +++++++++++++++
->>>>  7 files changed, 845 insertions(+), 7 deletions(-)
->>>>=20
->>>=20
->>> Nice work, Lorenzo! Now comes the bikeshedding...
->>=20
->> Hi Jeff,
->>=20
->>>=20
->>> With the nfsdfs interface, we sort of had to split things up into
->>> multiple files like this, but it has some drawbacks, in particular with
->>> weird behavior when people do things out of order.
->>=20
->> what do you mean with 'weird behavior'? Something not expected?
->>=20
->=20
-> Yeah.
->=20
-> For instance, if you set up sockets but never write anything to the
-> "threads" file, those sockets will sit around in perpetuity. Granted
-> most people use rpc.nfsd to start the server, so this generally doesn't
-> happen often, but it's always been a klunky interface regardless.
->=20
->>>=20
->>> Would it make more sense to instead have a single netlink command that
->>> sets up ports and versions, and then spawns the requisite amount of
->>> threads, all in one fell swoop?
->>=20
->> I do not have a strong opinion about it but I would say having a dedicat=
-ed
->> set/get for each paramater allow us to have more granularity (e.g. if yo=
-u want
->> to change just a parameter we do not need to send all of them to the ker=
-nel).
->> What do you think?
->>=20
->=20
-> It's pretty rare to need to twiddle settings on the server while it's up
-> and running. Restarting the server in the face of even minor changes is
-> not generally a huge problem, so I don't see this as necessary.
+same here XFRM_MODE_IPTFS_TUNNEL 
 
-I don't have a problem creating a single "set" netlink command
-that takes a number of optional arguments to adjust nfsd's
-configuration in a single operation.
-
-And a matching "get" command to query all of the server settings
-at one time.
+I wonder if the patches are in the right order. While XFRM_MODE_IPTFS is 
+defined in 7/8 it is already used in 5/8. May be Simon Horman pointed out 
+the same.
 
 
-> Also, it's always been a bit hit and miss as to which settings take
-> immediate effect. For instance, if I (e.g.) turn off NFSv4 serving
-> altogether on a running server, it doesn't purge the existing NFSv4
-> state, but v4 RPCs would be immediately rejected. Eventually it would
-> time out, but it is odd.
->=20
-> Personally, I think this is amenable to a declarative interface:
->=20
-> Have userland always send down a complete description of what the server
-> should look like, and then the kernel can do what it needs to make that
-> happen (starting/stopping threads, opening/closing sockets, changing
-> versions served, etc.).
->=20
->>>=20
->>> That does presuppose we can send down a variable-length frame though,
->>> but I assume that is possible with netlink.
->>=20
->> sure, we can do it.
-> --=20
-> Jeff Layton <jlayton@kernel.org>
-
-
---
-Chuck Lever
-
-
+> +#define XFRM_MODE_MAX 6
+>  
+>  /* Netlink configuration messages.  */
+>  enum {
+> diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+> index 2be2d4922557..b7047c0dd7ea 100644
+> --- a/net/ipv4/esp4.c
+> +++ b/net/ipv4/esp4.c
+> @@ -816,7 +816,8 @@ int esp_input_done2(struct sk_buff *skb, int err)
+>  	}
+>  
+>  	skb_pull_rcsum(skb, hlen);
+> -	if (x->props.mode == XFRM_MODE_TUNNEL)
+> +	if (x->props.mode == XFRM_MODE_TUNNEL ||
+> +	    x->props.mode == XFRM_MODE_IPTFS)
+>  		skb_reset_transport_header(skb);
+>  	else
+>  		skb_set_transport_header(skb, -ihl);
+> diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+> index fddd0cbdede1..10f2190207a8 100644
+> --- a/net/ipv6/esp6.c
+> +++ b/net/ipv6/esp6.c
+> @@ -865,7 +865,8 @@ int esp6_input_done2(struct sk_buff *skb, int err)
+>  	skb_postpull_rcsum(skb, skb_network_header(skb),
+>  			   skb_network_header_len(skb));
+>  	skb_pull_rcsum(skb, hlen);
+> -	if (x->props.mode == XFRM_MODE_TUNNEL)
+> +	if (x->props.mode == XFRM_MODE_TUNNEL ||
+> +	    x->props.mode == XFRM_MODE_IPTFS)
+>  		skb_reset_transport_header(skb);
+>  	else
+>  		skb_set_transport_header(skb, -hdr_len);
+> diff --git a/net/netfilter/nft_xfrm.c b/net/netfilter/nft_xfrm.c
+> index 452f8587adda..291b029391cd 100644
+> --- a/net/netfilter/nft_xfrm.c
+> +++ b/net/netfilter/nft_xfrm.c
+> @@ -112,7 +112,8 @@ static bool xfrm_state_addr_ok(enum nft_xfrm_keys k, u8 family, u8 mode)
+>  		return true;
+>  	}
+>  
+> -	return mode == XFRM_MODE_BEET || mode == XFRM_MODE_TUNNEL;
+> +	return mode == XFRM_MODE_BEET || mode == XFRM_MODE_TUNNEL ||
+> +	       mode == XFRM_MODE_IPTFS;
+>  }
+>  
+>  static void nft_xfrm_state_get_key(const struct nft_xfrm *priv,
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index 8b848540ea47..a40f5e09829e 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -69,6 +69,7 @@ static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
+>  static void xfrm_outer_mode_prep(struct xfrm_state *x, struct sk_buff *skb)
+>  {
+>  	switch (x->outer_mode.encap) {
+> +	case XFRM_MODE_IPTFS:
+>  	case XFRM_MODE_TUNNEL:
+>  		if (x->outer_mode.family == AF_INET)
+>  			return __xfrm_mode_tunnel_prep(x, skb,
+> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> index 4390c111410d..16c981ca61ca 100644
+> --- a/net/xfrm/xfrm_output.c
+> +++ b/net/xfrm/xfrm_output.c
+> @@ -680,6 +680,10 @@ static void xfrm_get_inner_ipproto(struct sk_buff *skb, struct xfrm_state *x)
+>  
+>  		return;
+>  	}
+> +	if (x->outer_mode.encap == XFRM_MODE_IPTFS) {
+> +		xo->inner_ipproto = IPPROTO_AGGFRAG;
+> +		return;
+> +	}
+>  
+>  	/* non-Tunnel Mode */
+>  	if (!skb->encapsulation)
+> diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> index 3220b01121f3..94e5889a77d6 100644
+> --- a/net/xfrm/xfrm_policy.c
+> +++ b/net/xfrm/xfrm_policy.c
+> @@ -2468,6 +2468,7 @@ xfrm_tmpl_resolve_one(struct xfrm_policy *policy, const struct flowi *fl,
+>  		struct xfrm_tmpl *tmpl = &policy->xfrm_vec[i];
+>  
+>  		if (tmpl->mode == XFRM_MODE_TUNNEL ||
+> +		    tmpl->mode == XFRM_MODE_IPTFS ||
+>  		    tmpl->mode == XFRM_MODE_BEET) {
+>  			remote = &tmpl->id.daddr;
+>  			local = &tmpl->saddr;
+> @@ -3252,7 +3253,8 @@ struct dst_entry *xfrm_lookup_with_ifid(struct net *net,
+>  ok:
+>  	xfrm_pols_put(pols, drop_pols);
+>  	if (dst && dst->xfrm &&
+> -	    dst->xfrm->props.mode == XFRM_MODE_TUNNEL)
+> +	    (dst->xfrm->props.mode == XFRM_MODE_TUNNEL ||
+> +	     dst->xfrm->props.mode == XFRM_MODE_IPTFS))
+>  		dst->flags |= DST_XFRM_TUNNEL;
+>  	return dst;
+>  
+> @@ -4353,6 +4355,7 @@ static int migrate_tmpl_match(const struct xfrm_migrate *m, const struct xfrm_tm
+>  		switch (t->mode) {
+>  		case XFRM_MODE_TUNNEL:
+>  		case XFRM_MODE_BEET:
+> +		case XFRM_MODE_IPTFS:
+>  			if (xfrm_addr_equal(&t->id.daddr, &m->old_daddr,
+>  					    m->old_family) &&
+>  			    xfrm_addr_equal(&t->saddr, &m->old_saddr,
+> @@ -4395,7 +4398,8 @@ static int xfrm_policy_migrate(struct xfrm_policy *pol,
+>  				continue;
+>  			n++;
+>  			if (pol->xfrm_vec[i].mode != XFRM_MODE_TUNNEL &&
+> -			    pol->xfrm_vec[i].mode != XFRM_MODE_BEET)
+> +			    pol->xfrm_vec[i].mode != XFRM_MODE_BEET &&
+> +			    pol->xfrm_vec[i].mode != XFRM_MODE_IPTFS)
+>  				continue;
+>  			/* update endpoints */
+>  			memcpy(&pol->xfrm_vec[i].id.daddr, &mp->new_daddr,
+> diff --git a/net/xfrm/xfrm_proc.c b/net/xfrm/xfrm_proc.c
+> index fee9b5cf37a7..d92b1b760749 100644
+> --- a/net/xfrm/xfrm_proc.c
+> +++ b/net/xfrm/xfrm_proc.c
+> @@ -41,6 +41,8 @@ static const struct snmp_mib xfrm_mib_list[] = {
+>  	SNMP_MIB_ITEM("XfrmFwdHdrError", LINUX_MIB_XFRMFWDHDRERROR),
+>  	SNMP_MIB_ITEM("XfrmOutStateInvalid", LINUX_MIB_XFRMOUTSTATEINVALID),
+>  	SNMP_MIB_ITEM("XfrmAcquireError", LINUX_MIB_XFRMACQUIREERROR),
+> +	SNMP_MIB_ITEM("XfrmInIptfsError", LINUX_MIB_XFRMINIPTFSERROR),
+> +	SNMP_MIB_ITEM("XfrmOutNoQueueSpace", LINUX_MIB_XFRMOUTNOQSPACE),
+>  	SNMP_MIB_SENTINEL
+>  };
+>  
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index f5e1a17ebf74..786f3fc0d428 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -465,6 +465,11 @@ static const struct xfrm_mode xfrm4_mode_map[XFRM_MODE_MAX] = {
+>  		.flags = XFRM_MODE_FLAG_TUNNEL,
+>  		.family = AF_INET,
+>  	},
+> +	[XFRM_MODE_IPTFS] = {
+> +		.encap = XFRM_MODE_IPTFS,
+> +		.flags = XFRM_MODE_FLAG_TUNNEL,
+> +		.family = AF_INET,
+> +	},
+>  };
+>  
+>  static const struct xfrm_mode xfrm6_mode_map[XFRM_MODE_MAX] = {
+> @@ -486,6 +491,11 @@ static const struct xfrm_mode xfrm6_mode_map[XFRM_MODE_MAX] = {
+>  		.flags = XFRM_MODE_FLAG_TUNNEL,
+>  		.family = AF_INET6,
+>  	},
+> +	[XFRM_MODE_IPTFS] = {
+> +		.encap = XFRM_MODE_IPTFS,
+> +		.flags = XFRM_MODE_FLAG_TUNNEL,
+> +		.family = AF_INET6,
+> +	},
+>  };
+>  
+>  static const struct xfrm_mode *xfrm_get_mode(unsigned int encap, int family)
+> @@ -2083,6 +2093,7 @@ static int __xfrm6_state_sort_cmp(const void *p)
+>  #endif
+>  	case XFRM_MODE_TUNNEL:
+>  	case XFRM_MODE_BEET:
+> +	case XFRM_MODE_IPTFS:
+>  		return 4;
+>  	}
+>  	return 5;
+> @@ -2109,6 +2120,7 @@ static int __xfrm6_tmpl_sort_cmp(const void *p)
+>  #endif
+>  	case XFRM_MODE_TUNNEL:
+>  	case XFRM_MODE_BEET:
+> +	case XFRM_MODE_IPTFS:
+>  		return 3;
+>  	}
+>  	return 4;
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 8a504331e369..389656056326 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -353,6 +353,7 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+>  	case XFRM_MODE_TUNNEL:
+>  	case XFRM_MODE_ROUTEOPTIMIZATION:
+>  	case XFRM_MODE_BEET:
+> +	case XFRM_MODE_IPTFS:
+>  		break;
+>  
+>  	default:
+> @@ -1830,6 +1831,8 @@ static int validate_tmpl(int nr, struct xfrm_user_tmpl *ut, u16 family,
+>  				return -EINVAL;
+>  			}
+>  			break;
+> +		case XFRM_MODE_IPTFS:
+> +			break;
+>  		default:
+>  			if (ut[i].family != prev_family) {
+>  				NL_SET_ERR_MSG(extack, "Mode in template doesn't support a family change");
+> -- 
+> 2.42.0
+> 
+> -- 
+> Devel mailing list
+> Devel@linux-ipsec.org
+> https://linux-ipsec.org/mailman/listinfo/devel
 
