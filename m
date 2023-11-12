@@ -1,172 +1,451 @@
-Return-Path: <netdev+bounces-47233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 252A27E8F91
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 12:09:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70147E8F9C
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 12:28:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEE1DB208B6
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 11:09:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A85E280BEC
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 11:28:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1F779EE;
-	Sun, 12 Nov 2023 11:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4A468468;
+	Sun, 12 Nov 2023 11:28:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MbON22Sc"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CynmBtPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F36679C6
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 11:09:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBE72C433C8;
-	Sun, 12 Nov 2023 11:09:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699787360;
-	bh=uAwJfcPxifN1IFgJyCqdZCneQ3IO9cQNDhSVK351WmI=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=MbON22SccwvhS6omwAME3RaTK/3JuO8cWIdXbrGQAHX/LepltxVkeie1CJjjBqliF
-	 6NqOQN2jzA9NakiuCsvU1e9IjXJ3Ra+UjT4n+REOcoW+IhAkNRwf28fl4g9MnsxMjQ
-	 cwFXtzOudM+0a1GNXXkOPHrbSSSioXQtls9ua5XRrxikox4LaV2WNlaGRlBeMILu52
-	 iMf260eUF7WXs/jQ9TITXHZaC90n4TuJvUW7Lx10998vlY/iU85ZRGB8jcdnjlvLU1
-	 U65qENcZhpK5aguNnXa1BetIX626m4iKdJ1SNpOIvu9u6m+ADUpR+wcdgG+HZ/LNaX
-	 dmUP3ThuRGtXg==
-Message-ID: <0f0467f396777722022403727824104b4f0a8d85.camel@kernel.org>
-Subject: Re: [PATCH v4 0/3] convert write_threads, write_version and
- write_ports to netlink commands
-From: Jeff Layton <jlayton@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com, neilb@suse.de, 
-	chuck.lever@oracle.com, netdev@vger.kernel.org, kuba@kernel.org
-Date: Sun, 12 Nov 2023 06:09:18 -0500
-In-Reply-To: <ZVCiyNQtkumDheU4@lore-desk>
-References: <cover.1699095665.git.lorenzo@kernel.org>
-	 <7fdd6dd0d8ab75181eb350f78a4822a039cacaa5.camel@kernel.org>
-	 <ZVCiyNQtkumDheU4@lore-desk>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.1 (3.50.1-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC48079FB
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 11:28:19 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130162D61;
+	Sun, 12 Nov 2023 03:28:16 -0800 (PST)
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ACBNaYN027806;
+	Sun, 12 Nov 2023 11:27:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=eluVFXF/zDhn+nAJLjkudgCY1/xSTlO42J8saCnG2v8=;
+ b=CynmBtPyQ+oTFMC9lgncuJbNZDr2kfSuDD+w6GanFfaSRkzrrbhZGgUNeQpEnc0e1tZE
+ gAQaIZuRKUlcio4pnZgwIDhEvIYCJQbHOErOGelKhOmzeZfQKP8zrSqgR5tqr25eZnZ4
+ hNMi919HXRLFISMc3+QYktaJliYBvN86OaLooBcakEpP6tJi2+iIMcc6Wxr3AzHBz7yj
+ vVbcZp9CacBb6No66CFcFehliCW8a4Wr56U+kTiZ2sl8HeGqa5pI3EAz0ulTyZmmHb4f
+ 10gXXJShDvFSALLARwbm5f5sK3B7FlvuNctTY3jlwUhqf+IdC1MzH2eAHVxSMsL8Q8qL bQ== 
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ua1q1ht78-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 12 Nov 2023 11:27:57 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ACBRu7C028179
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 12 Nov 2023 11:27:56 GMT
+Received: from [10.253.35.223] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Sun, 12 Nov
+ 2023 03:27:53 -0800
+Message-ID: <39a8341f-04df-4eba-9cc2-433e9e6a798e@quicinc.com>
+Date: Sun, 12 Nov 2023 19:27:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] net: phy: at803x: add QCA8084 ethernet phy support
+To: Vladimir Oltean <olteanv@gmail.com>
+CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, <andrew@lunn.ch>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20231108113445.24825-1-quic_luoj@quicinc.com>
+ <20231108113445.24825-2-quic_luoj@quicinc.com>
+ <20231108131250.66d1c236@fedora>
+ <423a3ee3-bed5-02f9-f872-7b5dba64f994@quicinc.com>
+ <20231109101618.009efb45@fedora>
+ <0898312d-4796-c142-6401-c9d802d19ff4@quicinc.com>
+ <46d61a29-96bf-868b-22b9-a31e48576803@quicinc.com>
+ <20231110103328.0bc3d28f@fedora>
+ <3dd470a9-257e-e2c7-c71a-0c216cf7db88@quicinc.com>
+ <20231111225441.vpcosrowzcudb5jg@skbuf>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <20231111225441.vpcosrowzcudb5jg@skbuf>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: REw80F_v5U3Ue9eHA4NhN7jxBdmu8FDU
+X-Proofpoint-ORIG-GUID: REw80F_v5U3Ue9eHA4NhN7jxBdmu8FDU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-12_09,2023-11-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ clxscore=1011 adultscore=0 spamscore=0 malwarescore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 impostorscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311120101
 
-On Sun, 2023-11-12 at 11:02 +0100, Lorenzo Bianconi wrote:
-> > On Sat, 2023-11-04 at 12:13 +0100, Lorenzo Bianconi wrote:
-> > > Introduce write_threads, write_version and write_ports netlink
-> > > commands similar to the ones available through the procfs.
-> > >=20
-> > > Changes since v3:
-> > > - drop write_maxconn and write_maxblksize for the moment
-> > > - add write_version and write_ports commands
-> > > Changes since v2:
-> > > - use u32 to store nthreads in nfsd_nl_threads_set_doit
-> > > - rename server-attr in control-plane in nfsd.yaml specs
-> > > Changes since v1:
-> > > - remove write_v4_end_grace command
-> > > - add write_maxblksize and write_maxconn netlink commands
-> > >=20
-> > > This patch can be tested with user-space tool reported below:
-> > > https://github.com/LorenzoBianconi/nfsd-netlink.git
-> > > This series is based on the commit below available in net-next tree
-> > >=20
-> > > commit e0fadcffdd172d3a762cb3d0e2e185b8198532d9
-> > > Author: Jakub Kicinski <kuba@kernel.org>
-> > > Date:   Fri Oct 6 06:50:32 2023 -0700
-> > >=20
-> > > =A0=A0=A0=A0tools: ynl-gen: handle do ops with no input attrs
-> > >=20
-> > > =A0=A0=A0=A0The code supports dumps with no input attributes currentl=
-y
-> > > =A0=A0=A0=A0thru a combination of special-casing and luck.
-> > > =A0=A0=A0=A0Clean up the handling of ops with no inputs. Create empty
-> > > =A0=A0=A0=A0Structs, and skip printing of empty types.
-> > > =A0=A0=A0=A0This makes dos with no inputs work.
-> > >=20
-> > > Lorenzo Bianconi (3):
-> > > =A0=A0NFSD: convert write_threads to netlink commands
-> > > =A0=A0NFSD: convert write_version to netlink commands
-> > > =A0=A0NFSD: convert write_ports to netlink commands
-> > >=20
-> > > =A0Documentation/netlink/specs/nfsd.yaml |  83 ++++++++
-> > > =A0fs/nfsd/netlink.c                     |  54 ++++++
-> > > =A0fs/nfsd/netlink.h                     |   8 +
-> > > =A0fs/nfsd/nfsctl.c                      | 267 ++++++++++++++++++++++=
-+++-
-> > > =A0include/uapi/linux/nfsd_netlink.h     |  30 +++
-> > > =A0tools/net/ynl/generated/nfsd-user.c   | 254 ++++++++++++++++++++++=
-++
-> > > =A0tools/net/ynl/generated/nfsd-user.h   | 156 +++++++++++++++
-> > > =A07 files changed, 845 insertions(+), 7 deletions(-)
-> > >=20
-> >=20
-> > Nice work, Lorenzo! Now comes the bikeshedding...
->=20
-> Hi Jeff,
->=20
-> >=20
-> > With the nfsdfs interface, we sort of had to split things up into
-> > multiple files like this, but it has some drawbacks, in particular with
-> > weird behavior when people do things out of order.
->=20
-> what do you mean with 'weird behavior'? Something not expected?
->=20
 
-Yeah.
 
-For instance, if you set up sockets but never write anything to the
-"threads" file, those sockets will sit around in perpetuity. Granted
-most people use rpc.nfsd to start the server, so this generally doesn't
-happen often, but it's always been a klunky interface regardless.
+On 11/12/2023 6:54 AM, Vladimir Oltean wrote:
+> On Fri, Nov 10, 2023 at 05:56:09PM +0800, Jie Luo wrote:
+>>>>>>>> What I understand from this is that this PHY can be used either as a
+>>>>>>>> switch, in which case port 4 would be connected to the host interface
+>>>>>>>> at up to 2.5G, or as a quad-phy, but since it uses QUSGMII the link
+>>>>>>>> speed would be limited to 1G per-port, is that correct ?
+>>>>>>>
+>>>>>>> When the PHY works on the interface mode QUSGMII for quad-phy, all 4
+>>>>>>> PHYs can support to the max link speed 2.5G, actually the PHY can
+>>>>>>> support to max link speed 2.5G for all supported interface modes
+>>>>>>> including qusgmii and sgmii.
+>>>>>>
+>>>>>> I'm a bit confused then, as the USGMII spec says that Quad USGMII really
+>>>>>> is for quad 10/100/1000 speeds, using 10b/8b encoding.
+>>>>>>
+>>>>>> Aren't you using the USXGMII mode instead, which can convey 4 x 2.5Gbps
+>>>>>>     with 66b/64b encoding ?
+>>>>>
+>>>>> Hi Maxime,
+>>>>> Yes, for quad PHY mode, it is using 66b/64 encoding.
+>>>>>
+>>>>> it seems that PHY_INTERFACE_MODE_USXGMII is for single port,
+>>>>> so i take the interface name PHY_INTERFACE_MODE_QUSGMII for
+>>>>> quad PHYs here.
+>>>>>
+>>>>> can we apply PHY_INTERFACE_MODE_USXGMII to quad PHYs in this
+>>>>> case(qca8084 quad PHY mode)?
+>>>>>
+>>>>> Thanks,
+>>>>> Jie.
+>>>>
+>>>> one more thing, if we use the PHY_INTERFACE_MODE_USXGMII for
+>>>> the quad PHY here, the MAC serdes can't distinguish the actual
+>>>> mode PHY_INTERFACE_MODE_USXGMII and 10G-QXGMII(qca8084 quad phy mode),
+>>>> the MAC serdes has the different configurations for usxgmii(10g single
+>>>> port) and qxsgmii(quad PHY).
+>>>
+>>> Yes you do need a way to know which mode to use, what I'm wondering is
+>>> that the usxgmii spec actually defines something like 9 different modes
+>>> ( 1/2/4/8 ports, with a total bandwidth ranging from 2.5Gbps to 20 Gbps
+>>> ), should we define a phy mode for all of these variants, or should we
+>>> have another way of getting the mode variant (like, saying I want to
+>>> use usxgmii, in 4 ports mode, with the serdes at 10.3125Gbps).
+>>>
+>>> That being said, QUSGMII already exists to define a specific variant of
+>>> USGMII, so maybe adding 10G-QXGMII is fine...
+>>
+>> Yes, Maxime, I agree with this solution, the name 10G-QXGMII is exactly
+>> the working mode of qca8084 quad phy mode.
+> 
+> FWIW, NXP has these 2 patches in its trees. One day I was going to make
+> an attempt at upstreaming them, but the Aquantia PHY driver is a bit of
+> a sticky topic since I could find no way to distinguish between the
+> single-port and multi-port variants of USXGMII in this PHY IP, and the
+> AQR412 uses a multi-port mode which is now treated as USXGMII by Linux.
+> 
+> Anyway, if you do make progress with this ahead of me, please be aware
+> that these patches exist, and I would appreciate if you tried to keep
+> the name as "10g-qxgmii" so that I don't have to modify the (downstream)
+> device trees again :)
+> 
+>  From 8f4c8227362bb7acad09cd756390f1efd3311395 Mon Sep 17 00:00:00 2001
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Date: Fri, 6 Oct 2023 23:42:35 +0300
+> Subject: [PATCH] net: dsa: felix: introduce phy-mode = "10g-qxgmii" to replace
+>   "usxgmii"
+> 
+> The "USXGMII" mode that the Felix switch ports support on LS1028A is not
+> quite USXGMII, it is defined by the USXGMII multiport specification
+> document as 10G-QXGMII. It uses the same signaling as USXGMII, but it
+> multiplexes 4 ports over the link, resulting in a maximum speed of 2.5G
+> per port.
+> 
+> This change is needed in preparation for the lynx-10g driver on LS1028A,
+> which will make a more clear distinction between usxgmii (supported on
+> lane 0) and 10g-qxgmii (supported on lane 1). These protocols have their
+> configuration in different PCCR registers (PCCRB vs PCCR9).
+> 
+> We touch the entire kernel side: the phylib core, phylink, the Felix
+> switch driver, the Lynx PCS and the AQR412 driver. The existing
+> LS1028A-QDS device trees will continue to work with "usxgmii", and will
+> be updated to "10g-qxgmii" as a separate patch.
 
-> >=20
-> > Would it make more sense to instead have a single netlink command that
-> > sets up ports and versions, and then spawns the requisite amount of
-> > threads, all in one fell swoop?
->=20
-> I do not have a strong opinion about it but I would say having a dedicate=
-d
-> set/get for each paramater allow us to have more granularity (e.g. if you=
- want
-> to change just a parameter we do not need to send all of them to the kern=
-el).
-> What do you think?
->=20
+Sure Vladimir, Thanks for sharing this patch.
 
-It's pretty rare to need to twiddle settings on the server while it's up
-and running. Restarting the server in the face of even minor changes is
-not generally a huge problem, so I don't see this as necessary.
+BTW, When do you upstream this patch? or Maybe you can upstream the
+separate patch for introducing the new interface mode 10g-qxgmii 
+firstly? if that, i can also update qca8084 phy driver based on
+your patch.
 
-Also, it's always been a bit hit and miss as to which settings take
-immediate effect. For instance, if I (e.g.) turn off NFSv4 serving
-altogether on a running server, it doesn't purge the existing NFSv4
-state, but v4 RPCs would be immediately rejected. Eventually it would
-time out, but it is odd.
-
-Personally, I think this is amenable to a declarative interface:
-
-Have userland always send down a complete description of what the server
-should look like, and then the kernel can do what it needs to make that
-happen (starting/stopping threads, opening/closing sockets, changing
-versions served, etc.).
-
-> >=20
-> > That does presuppose we can send down a variable-length frame though,
-> > but I assume that is possible with netlink.
->=20
-> sure, we can do it.
---=20
-Jeff Layton <jlayton@kernel.org>
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>   .../bindings/net/ethernet-controller.yaml         |  1 +
+>   Documentation/networking/phy.rst                  |  6 ++++++
+>   drivers/net/dsa/ocelot/felix.c                    |  1 +
+>   drivers/net/dsa/ocelot/felix.h                    |  3 ++-
+>   drivers/net/dsa/ocelot/felix_vsc9959.c            |  3 ++-
+>   drivers/net/pcs/pcs-lynx.c                        |  8 ++++++--
+>   drivers/net/phy/aquantia_main.c                   | 15 +++++++++++++++
+>   drivers/net/phy/phy-core.c                        |  1 +
+>   drivers/net/phy/phylink.c                         | 12 ++++++++++--
+>   include/linux/phy.h                               |  4 ++++
+>   include/linux/phylink.h                           |  1 +
+>   11 files changed, 49 insertions(+), 6 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 9f6a5ccbcefe..044880d804db 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -104,6 +104,7 @@ properties:
+>         - usxgmii
+>         - 10gbase-r
+>         - 25gbase-r
+> +      - 10g-qxgmii
+>   
+>     phy-mode:
+>       $ref: "#/properties/phy-connection-type"
+> diff --git a/Documentation/networking/phy.rst b/Documentation/networking/phy.rst
+> index 1283240d7620..f64641417c54 100644
+> --- a/Documentation/networking/phy.rst
+> +++ b/Documentation/networking/phy.rst
+> @@ -327,6 +327,12 @@ Some of the interface modes are described below:
+>       This is the Penta SGMII mode, it is similar to QSGMII but it combines 5
+>       SGMII lines into a single link compared to 4 on QSGMII.
+>   
+> +``PHY_INTERFACE_MODE_10G_QXGMII``
+> +    Represents the 10G-QXGMII PHY-MAC interface as defined by the Cisco USXGMII
+> +    Multiport Copper Interface document. It supports 4 ports over a 10.3125 GHz
+> +    SerDes lane, each port having speeds of 2.5G / 1G / 100M / 10M achieved
+> +    through symbol replication. The PCS expects the standard USXGMII code word.
+> +
+>   Pause frames / flow control
+>   ===========================
+>   
+> diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+> index 9a3e5ec16972..17fa31b58be4 100644
+> --- a/drivers/net/dsa/ocelot/felix.c
+> +++ b/drivers/net/dsa/ocelot/felix.c
+> @@ -1232,6 +1232,7 @@ static const u32 felix_phy_match_table[PHY_INTERFACE_MODE_MAX] = {
+>   	[PHY_INTERFACE_MODE_SGMII] = OCELOT_PORT_MODE_SGMII,
+>   	[PHY_INTERFACE_MODE_QSGMII] = OCELOT_PORT_MODE_QSGMII,
+>   	[PHY_INTERFACE_MODE_USXGMII] = OCELOT_PORT_MODE_USXGMII,
+> +	[PHY_INTERFACE_MODE_10G_QXGMII] = OCELOT_PORT_MODE_10G_QXGMII,
+>   	[PHY_INTERFACE_MODE_1000BASEX] = OCELOT_PORT_MODE_1000BASEX,
+>   	[PHY_INTERFACE_MODE_2500BASEX] = OCELOT_PORT_MODE_2500BASEX,
+>   };
+> diff --git a/drivers/net/dsa/ocelot/felix.h b/drivers/net/dsa/ocelot/felix.h
+> index 1d4befe7cfe8..4cf849e5782f 100644
+> --- a/drivers/net/dsa/ocelot/felix.h
+> +++ b/drivers/net/dsa/ocelot/felix.h
+> @@ -12,8 +12,9 @@
+>   #define OCELOT_PORT_MODE_SGMII		BIT(1)
+>   #define OCELOT_PORT_MODE_QSGMII		BIT(2)
+>   #define OCELOT_PORT_MODE_2500BASEX	BIT(3)
+> -#define OCELOT_PORT_MODE_USXGMII	BIT(4)
+> +#define OCELOT_PORT_MODE_USXGMII	BIT(4) /* compatibility */
+>   #define OCELOT_PORT_MODE_1000BASEX	BIT(5)
+> +#define OCELOT_PORT_MODE_10G_QXGMII	BIT(6)
+>   
+>   struct device_node;
+>   
+> diff --git a/drivers/net/dsa/ocelot/felix_vsc9959.c b/drivers/net/dsa/ocelot/felix_vsc9959.c
+> index 3c5509e75a54..8ae9c2e340ab 100644
+> --- a/drivers/net/dsa/ocelot/felix_vsc9959.c
+> +++ b/drivers/net/dsa/ocelot/felix_vsc9959.c
+> @@ -34,7 +34,8 @@
+>   					 OCELOT_PORT_MODE_QSGMII | \
+>   					 OCELOT_PORT_MODE_1000BASEX | \
+>   					 OCELOT_PORT_MODE_2500BASEX | \
+> -					 OCELOT_PORT_MODE_USXGMII)
+> +					 OCELOT_PORT_MODE_USXGMII | \
+> +					 OCELOT_PORT_MODE_10G_QXGMII)
+>   
+>   static const u32 vsc9959_port_modes[VSC9959_NUM_PORTS] = {
+>   	VSC9959_PORT_MODE_SERDES,
+> diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
+> index 7e1e8f61f043..f3ab17ef4e31 100644
+> --- a/drivers/net/pcs/pcs-lynx.c
+> +++ b/drivers/net/pcs/pcs-lynx.c
+> @@ -95,6 +95,7 @@ static void lynx_pcs_get_state(struct phylink_pcs *pcs,
+>   		lynx_pcs_get_state_2500basex(lynx->mdio, state);
+>   		break;
+>   	case PHY_INTERFACE_MODE_USXGMII:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		lynx_pcs_get_state_usxgmii(lynx->mdio, state);
+>   		break;
+>   	case PHY_INTERFACE_MODE_10GBASER:
+> @@ -151,6 +152,7 @@ static int lynx_pcs_config_giga(struct mdio_device *pcs,
+>   }
+>   
+>   static int lynx_pcs_config_usxgmii(struct mdio_device *pcs,
+> +				   phy_interface_t interface,
+>   				   const unsigned long *advertising,
+>   				   unsigned int neg_mode)
+>   {
+> @@ -158,7 +160,8 @@ static int lynx_pcs_config_usxgmii(struct mdio_device *pcs,
+>   	int addr = pcs->addr;
+>   
+>   	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED) {
+> -		dev_err(&pcs->dev, "USXGMII only supports in-band AN for now\n");
+> +		dev_err(&pcs->dev, "%s only supports in-band AN for now\n",
+> +			phy_modes(interface));
+>   		return -EOPNOTSUPP;
+>   	}
+>   
+> @@ -189,7 +192,8 @@ static int lynx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+>   		}
+>   		break;
+>   	case PHY_INTERFACE_MODE_USXGMII:
+> -		return lynx_pcs_config_usxgmii(lynx->mdio, advertising,
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+> +		return lynx_pcs_config_usxgmii(lynx->mdio, ifmode, advertising,
+>   					       neg_mode);
+>   	case PHY_INTERFACE_MODE_10GBASER:
+>   	case PHY_INTERFACE_MODE_25GBASER:
+> diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia_main.c
+> index 5fc93bbfbe49..4f5e6575be7b 100644
+> --- a/drivers/net/phy/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia_main.c
+> @@ -512,6 +512,20 @@ static int aqr107_read_status(struct phy_device *phydev)
+>   	if (!phydev->link || phydev->autoneg == AUTONEG_DISABLE)
+>   		return 0;
+>   
+> +	/* Quad port PHYs like AQR412 have 4 system interfaces, but they can
+> +	 * also be used with a single system interface over which all 4 ports
+> +	 * are multiplexed (10G-QXGMII). To the MDIO registers, this mode is
+> +	 * indistinguishable from USXGMII (which implies a single 10G port),
+> +	 * which is problematic because the detection logic below would
+> +	 * overwrite phydev->interface with a wrong value. If the device tree
+> +	 * is configured for "10g-qxgmii", always trust that value, since it is
+> +	 * very unlikely that the PHY firmware was configured for protocol
+> +	 * switching depending on link speed (all USXGMII variants are capable
+> +	 * of symbol replication).
+> +	 */
+> +	if (phydev->interface == PHY_INTERFACE_MODE_10G_QXGMII)
+> +		goto skip_iface_detection;
+> +
+>   	val = phy_read_mmd(phydev, MDIO_MMD_PHYXS, MDIO_PHYXS_VEND_IF_STATUS);
+>   	if (val < 0)
+>   		return val;
+> @@ -546,6 +560,7 @@ static int aqr107_read_status(struct phy_device *phydev)
+>   		break;
+>   	}
+>   
+> +skip_iface_detection:
+>   	/* Read possibly downshifted rate from vendor register */
+>   	return aqr107_read_rate(phydev);
+>   }
+> diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+> index cfa6f08d8ca3..95222680a82d 100644
+> --- a/drivers/net/phy/phy-core.c
+> +++ b/drivers/net/phy/phy-core.c
+> @@ -142,6 +142,7 @@ int phy_interface_num_ports(phy_interface_t interface)
+>   		return 1;
+>   	case PHY_INTERFACE_MODE_QSGMII:
+>   	case PHY_INTERFACE_MODE_QUSGMII:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		return 4;
+>   	case PHY_INTERFACE_MODE_PSGMII:
+>   		return 5;
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 3bf923f88494..dd0ac7139aa4 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -191,6 +191,7 @@ static unsigned int phylink_pcs_neg_mode(unsigned int mode, phy_interface_t inte
+>   	case PHY_INTERFACE_MODE_QSGMII:
+>   	case PHY_INTERFACE_MODE_QUSGMII:
+>   	case PHY_INTERFACE_MODE_USXGMII:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		/* These protocols are designed for use with a PHY which
+>   		 * communicates its negotiation result back to the MAC via
+>   		 * inband communication. Note: there exist PHYs that run
+> @@ -284,6 +285,7 @@ static int phylink_interface_max_speed(phy_interface_t interface)
+>   
+>   	case PHY_INTERFACE_MODE_2500BASEX:
+>   	case PHY_INTERFACE_MODE_2500SGMII:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		return SPEED_2500;
+>   
+>   	case PHY_INTERFACE_MODE_5GBASER:
+> @@ -553,7 +555,11 @@ unsigned long phylink_get_capabilities(phy_interface_t interface,
+>   
+>   	switch (interface) {
+>   	case PHY_INTERFACE_MODE_USXGMII:
+> -		caps |= MAC_10000FD | MAC_5000FD | MAC_2500FD;
+> +		caps |= MAC_10000FD | MAC_5000FD;
+> +		fallthrough;
+> +
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+> +		caps |= MAC_2500FD;
+>   		fallthrough;
+>   
+>   	case PHY_INTERFACE_MODE_RGMII_TXID:
+> @@ -969,6 +975,7 @@ static int phylink_parse_mode(struct phylink *pl,
+>   		case PHY_INTERFACE_MODE_5GBASER:
+>   		case PHY_INTERFACE_MODE_25GBASER:
+>   		case PHY_INTERFACE_MODE_USXGMII:
+> +		case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		case PHY_INTERFACE_MODE_10GKR:
+>   		case PHY_INTERFACE_MODE_10GBASER:
+>   		case PHY_INTERFACE_MODE_XLGMII:
+> @@ -1804,7 +1811,8 @@ static int phylink_bringup_phy(struct phylink *pl, struct phy_device *phy,
+>   	if (phy->is_c45 && config.rate_matching == RATE_MATCH_NONE &&
+>   	    interface != PHY_INTERFACE_MODE_RXAUI &&
+>   	    interface != PHY_INTERFACE_MODE_XAUI &&
+> -	    interface != PHY_INTERFACE_MODE_USXGMII)
+> +	    interface != PHY_INTERFACE_MODE_USXGMII &&
+> +	    interface != PHY_INTERFACE_MODE_10G_QXGMII)
+>   		config.interface = PHY_INTERFACE_MODE_NA;
+>   	else
+>   		config.interface = interface;
+> diff --git a/include/linux/phy.h b/include/linux/phy.h
+> index 184b04422877..0eeeea50d9a2 100644
+> --- a/include/linux/phy.h
+> +++ b/include/linux/phy.h
+> @@ -125,6 +125,7 @@ extern const int phy_10gbit_features_array[1];
+>    * @PHY_INTERFACE_MODE_10GKR: 10GBASE-KR - with Clause 73 AN
+>    * @PHY_INTERFACE_MODE_QUSGMII: Quad Universal SGMII
+>    * @PHY_INTERFACE_MODE_1000BASEKX: 1000Base-KX - with Clause 73 AN
+> + * @PHY_INTERFACE_MODE_10G_QXGMII: 10G-QXGMII - 4 ports over 10G USXGMII
+>    * @PHY_INTERFACE_MODE_MAX: Book keeping
+>    *
+>    * Describes the interface between the MAC and PHY.
+> @@ -166,6 +167,7 @@ typedef enum {
+>   	PHY_INTERFACE_MODE_QUSGMII,
+>   	PHY_INTERFACE_MODE_1000BASEKX,
+>   	PHY_INTERFACE_MODE_2500SGMII,
+> +	PHY_INTERFACE_MODE_10G_QXGMII,
+>   	PHY_INTERFACE_MODE_MAX,
+>   } phy_interface_t;
+>   
+> @@ -289,6 +291,8 @@ static inline const char *phy_modes(phy_interface_t interface)
+>   		return "qusgmii";
+>   	case PHY_INTERFACE_MODE_2500SGMII:
+>   		return "sgmii-2500";
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+> +		return "10g-qxgmii";
+>   	default:
+>   		return "unknown";
+>   	}
+> diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+> index 871db640ceb6..336780e76e34 100644
+> --- a/include/linux/phylink.h
+> +++ b/include/linux/phylink.h
+> @@ -648,6 +648,7 @@ static inline int phylink_get_link_timer_ns(phy_interface_t interface)
+>   	case PHY_INTERFACE_MODE_SGMII:
+>   	case PHY_INTERFACE_MODE_QSGMII:
+>   	case PHY_INTERFACE_MODE_USXGMII:
+> +	case PHY_INTERFACE_MODE_10G_QXGMII:
+>   		return 1600000;
+>   
+>   	case PHY_INTERFACE_MODE_1000BASEX:
 
