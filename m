@@ -1,151 +1,125 @@
-Return-Path: <netdev+bounces-47220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909267E8F31
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 09:48:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB79A7E8F57
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 10:41:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E25D9B20927
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 08:48:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 301C6280C96
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 09:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A252100;
-	Sun, 12 Nov 2023 08:48:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCE55238;
+	Sun, 12 Nov 2023 09:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPs+lAjZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umeAOQNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE1933DA
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 08:48:31 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3669930C2
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 00:48:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1699778908;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iIPVggcCbq7LcYX+Jf5+S89tifEldcvYLyAZFYsDVZY=;
-	b=jPs+lAjZEvjsebwI2DKWWyk8jEOkKvFkpqT2N3u+SbY4iqdBuydql7ffzHIRzB78icEBCj
-	m+SQss1Ea5zBBhO9/JRJ0mhZklMxXM2m3u/SvLEEnnCUwhi8WZk8oVQ67OViHsCPVsOg41
-	oUDJq3HGtPVZ0pRkBXqPLNrXPk3HHJ8=
-Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com
- [209.85.160.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-AC8-XUoFOWyAcT0hVlCdMA-1; Sun, 12 Nov 2023 03:48:24 -0500
-X-MC-Unique: AC8-XUoFOWyAcT0hVlCdMA-1
-Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1f00b6ba9d6so519164fac.0
-        for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 00:48:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699778904; x=1700383704;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iIPVggcCbq7LcYX+Jf5+S89tifEldcvYLyAZFYsDVZY=;
-        b=ZylakCpypqfO8DWyKn5EnCZJeFcCCWAou7GflCi31jjGyzryWrPPkoxhiu8m9Hs2wC
-         ZIkU+wTW91sBZbK74YTxSV5ZBFSAe8xHEwIXR1TGtoh5Z2+51pQjzdBOZ1Nd+EdGOIA9
-         oc7QrDsmxX8gEudgwzUDxwob90bXOznTJLRThO1VgRcANKeYrXc0KfY8gCnhfZNWHDRt
-         sf0GYPyztm5M87Im7kfelBft9IbeLz9kGnKyYmAg2rRaTnt6MYQpNLE4p3YJ9FHIppYF
-         LHCen1FBJlJ3tgU8huOQs3ZVNWh4uPH+/49iF1yvSiQ7Y+HEtNvWx0jGqLCOKf7McQ0m
-         rUtA==
-X-Gm-Message-State: AOJu0YwMZuQa/iXn3VgBF/MjDY2uS9Q/wW366sPdfv5NnDBnXdhRbNaB
-	NR2t6S7yXF+KaYKn1NofyJhMtc8NM/0355yGCfoM+WqBLD/ssSHAI0pOaIlJSVyD1aO9qe53pfb
-	1uBTFSqqZD9jWE0wI9cGfs1Bp
-X-Received: by 2002:a05:6808:10c9:b0:3ae:5650:c6ae with SMTP id s9-20020a05680810c900b003ae5650c6aemr4609613ois.0.1699778904105;
-        Sun, 12 Nov 2023 00:48:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFsPmX2n53ePJLKsj3bFbjYk6N74rn0FClVhQRaeAMWSJu4SMph//BmwaQ4k+C8v1TOSsvQcQ==
-X-Received: by 2002:a05:6808:10c9:b0:3ae:5650:c6ae with SMTP id s9-20020a05680810c900b003ae5650c6aemr4609602ois.0.1699778903871;
-        Sun, 12 Nov 2023 00:48:23 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-229-114.dyn.eolo.it. [146.241.229.114])
-        by smtp.gmail.com with ESMTPSA id v17-20020ac873d1000000b0041950c7f6d8sm1048343qtp.60.2023.11.12.00.48.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Nov 2023 00:48:23 -0800 (PST)
-Message-ID: <63b9b3f40d0476ada2972ea8f6058b3613520ba8.camel@redhat.com>
-Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
-From: Paolo Abeni <pabeni@redhat.com>
-To: Maxim Mikityanskiy <maxtram95@gmail.com>, "Chittim, Madhu"
-	 <madhu.chittim@intel.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>,  Gal Pressman <gal@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, xuejun.zhang@intel.com,  sridhar.samudrala@intel.com
-Date: Sun, 12 Nov 2023 09:48:19 +0100
-In-Reply-To: <ZU4PBY1g_-N7cd8A@mail.gmail.com>
-References: 
-	<ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
-	 <ZTvBoQHfu23ynWf-@mail.gmail.com>
-	 <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
-	 <ZUEQzsKiIlgtbN-S@mail.gmail.com>
-	 <5d873c14-9d17-4c48-8e11-951b99270b75@intel.com>
-	 <ZU4PBY1g_-N7cd8A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175505228;
+	Sun, 12 Nov 2023 09:41:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17725C433C7;
+	Sun, 12 Nov 2023 09:41:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699782085;
+	bh=QbWO5jczDTWfiCBuWGRjNrmWNSsp8db3vx0cMyEInsQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=umeAOQNvYTTSjOARLRDC8O83rwJGdTlNbnWGhFv+AtM1FcY6KDGpu0ebt34mXyMgs
+	 mzx0rO291VsLcpjMPdY/+qqpyqcHiwVs4driFi4ruXjHDBpqdNxdN5x8odw4LgZ9el
+	 fAov68D2HIVZOwkG774JqCWgLv+hs4uA90uvqXzRa/fP023WJEH1imsbh8e4KzmJ6L
+	 +AVidXc0e1g+uBfpun3DIuvUPzzxkHSHSmjdtn6AXbxcCD719eeFnIGQPofdh1WPE3
+	 EIipNt01pq8UELRHjoKHEcBADsVRNSUSeM5S0Jy+TbrU3pKVX5K8BkYRXVenpiGCI7
+	 yQivqWp6ApWqw==
+Date: Sun, 12 Nov 2023 09:41:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com,
+	wei.liu@kernel.org, decui@microsoft.com, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net,v4, 2/3] hv_netvsc: Fix race of
+ register_netdevice_notifier and VF register
+Message-ID: <20231112094115.GE705326@kernel.org>
+References: <1699627140-28003-1-git-send-email-haiyangz@microsoft.com>
+ <1699627140-28003-3-git-send-email-haiyangz@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1699627140-28003-3-git-send-email-haiyangz@microsoft.com>
 
-On Fri, 2023-11-10 at 13:07 +0200, Maxim Mikityanskiy wrote:
-> On Thu, 09 Nov 2023 at 13:54:17 -0800, Chittim, Madhu wrote:
-> > We would like to enable Tx rate limiting using htb offload on all the
-> > existing queues.
->=20
-> I don't seem to understand how you see it possible with HTB.
+On Fri, Nov 10, 2023 at 06:38:59AM -0800, Haiyang Zhang wrote:
+> If VF NIC is registered earlier, NETDEV_REGISTER event is replayed,
+> but NETDEV_POST_INIT is not.
+> 
+> Move register_netdevice_notifier() earlier, so the call back
+> function is set before probing.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: e04e7a7bbd4b ("hv_netvsc: Fix a deadlock by getting rtnl lock earlier in netvsc_probe()")
+> Reported-by: Dexuan Cui <decui@microsoft.com>
+> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> 
+> ---
+> v3:
+>   Divide it into two patches, suggested by Jakub Kicinski.
+> v2:
+>   Fix rtnl_unlock() in error handling as found by Wojciech Drewek.
+> ---
+>  drivers/net/hyperv/netvsc_drv.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
+> index 5e528a76f5f5..1d1491da303b 100644
+> --- a/drivers/net/hyperv/netvsc_drv.c
+> +++ b/drivers/net/hyperv/netvsc_drv.c
+> @@ -2793,11 +2793,14 @@ static int __init netvsc_drv_init(void)
+>  	}
+>  	netvsc_ring_bytes = ring_size * PAGE_SIZE;
+>  
+> +	register_netdevice_notifier(&netvsc_netdev_notifier);
+> +
+>  	ret = vmbus_driver_register(&netvsc_drv);
+> -	if (ret)
+> +	if (ret) {
+> +		unregister_netdevice_notifier(&netvsc_netdev_notifier);
+>  		return ret;
+> +	}
+>  
+> -	register_netdevice_notifier(&netvsc_netdev_notifier);
+>  	return 0;
+>  }
 
-I must admit I feel sorry for not being able to join any of the
-upcoming conferences, but to me it looks like there is some
-communication gap that could be filled by in-person discussion.
+Hi Haiyang Zhang,
 
-Specifically the above to me sounds contradictory to what you stated
-here:
+functionally this change looks good to me, thanks!
 
-https://lore.kernel.org/netdev/ZUEQzsKiIlgtbN-S@mail.gmail.com/
+I'm wondering if we could improve things slightly by using a more idiomatic
+form for the error path. Something like the following (completely untested!).
 
-"""
-> Can HTB actually configure H/W shaping on
-> real_num_tx_queues?
+My reasoning is that this way things are less likely go to wrong if more
+error conditions are added to this function later.
 
-It will be on real_num_tx_queues, but after it's increased to add new
-HTB queues. The original queues [0, N) are used for direct traffic,
-same as the non-offloaded HTB's direct_queue (it's not shaped).
-"""
+	...
 
-> What is your goal?=C2=A0
+	register_netdevice_notifier(&netvsc_netdev_notifier);
 
-We are looking for clean interface to configure individually min/max
-shaping on each TX queue for a given netdev (actually virtual
-function).
+	ret = vmbus_driver_register(&netvsc_drv);
+	if (ret)
+		goto err_unregister_netdevice_notifier;
 
-Jiri's suggested to use TC:
+	return 0;
 
-https://lore.kernel.org/netdev/ZOTVkXWCLY88YfjV@nanopsycho/
-
-which IMHO makes sense as far as there is an existing interface (qdisc)
-providing the required features (almost) out-of-the-box.=C2=A0It looks like
-it's not the case.
-
-If a non trivial configuration and/or significant implementation are
-required, IMHO other options could be better...
-
-> If you need shaping for the whole netdev, maybe HTB
-> is not needed, and it's enough to attach a catchall filter with the
-> police action? Or use /sys/class/net/eth0/queues/tx-*/tx_maxrate
-> per-queue?
-
-... specifically this latter one (it will require implementing in-
-kernel support for 'max_rate', but should quite straight-forward).
-
-It would be great to converge on some agreement on the way forward,
-thanks!
-
-Paolo
+err_unregister_netdevice_notifier:
+	unregister_netdevice_notifier(&netvsc_netdev_notifier);
+	return ret;
+}
 
 
