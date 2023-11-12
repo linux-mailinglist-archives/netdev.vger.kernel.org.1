@@ -1,219 +1,108 @@
-Return-Path: <netdev+bounces-47245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6FCC7E9287
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 21:22:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5E817E9298
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 21:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A40B3B2096F
-	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 20:22:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC6BEB209D8
+	for <lists+netdev@lfdr.de>; Sun, 12 Nov 2023 20:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F48E182C7;
-	Sun, 12 Nov 2023 20:22:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B82B01863E;
+	Sun, 12 Nov 2023 20:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="NdPXLPAq";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HSt4mM9t"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="h3eF882u"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3498717729
-	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 20:22:35 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBB32129;
-	Sun, 12 Nov 2023 12:22:33 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8E8012189E;
-	Sun, 12 Nov 2023 20:22:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1699820551; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4PRTsARRf4wBatpAVW6gWqFEvTJ1mDk/y2FhbQeP80g=;
-	b=NdPXLPAqh/I93pYQNJZsKhemZKsBrwB0vXQSexcgCPBEbgwTJfkHqrqPWdccM7lVbJE1eD
-	PCctPYLyCJB+hHAE1gB0K8bX6Wy6nOUdRuPnOv3bT2qXBXWxUg/+4sSY9wvHMFXbSnqqQK
-	qF0VRNnfqvqLkjE4FnnwTdzqNKKZ9wc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1699820551;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4PRTsARRf4wBatpAVW6gWqFEvTJ1mDk/y2FhbQeP80g=;
-	b=HSt4mM9tcf9eq9Nq29mArXQ+TWF+93j4KIxfQw7nN7zx8On8ODx85mGVuEd72oM4TBp46O
-	hUz5pXILq/WjeSAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4936313915;
-	Sun, 12 Nov 2023 20:22:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id FWQeAQU0UWXtYwAAMHmgww
-	(envelope-from <neilb@suse.de>); Sun, 12 Nov 2023 20:22:29 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ED518659;
+	Sun, 12 Nov 2023 20:30:32 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3467211F;
+	Sun, 12 Nov 2023 12:30:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=FsrVfXnHffVTlIAYpkv5IXtpVOKK7hJReDa/CZ+Yv1s=; b=h3eF882uO4O0Q796pa/8wo41gz
+	5ADKQXrNRcL74ICo2CYFtVFXL65Kh0Nnl9twWChB0J+/fMkkrKKXrhTXF02rbKuB0chGJPbzmqLA+
+	sP/hjvZHBfrwepl6nyyhFZcPMrnztXeBevORxwwmmro3UOFkDBrFgGJBplMeUvvnPel79cs6RMOUW
+	GOMWZkWgZhuQYlt4pnHpVDdoNpnyAGoiaR9BkVTNI08pzBG1qDk3pG9tqBb1ah1OvHzU6LBbz/0HA
+	4+1+bLUOqkQS6Y+0axhrifpqrxe4WICtzNVd63T5Ukg5jHcd9uV0H0+ZlywDvQbgKMKIbFXZ2Q6U5
+	SpWHx3Bw==;
+Received: from mob-194-230-158-57.cgn.sunrise.net ([194.230.158.57] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r2H6B-0002Td-Oa; Sun, 12 Nov 2023 21:30:28 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: martin.lau@kernel.org
+Cc: kuba@kernel.org,
+	razor@blackwall.org,
+	sdf@google.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>
+Subject: [PATCH bpf v2 0/8] bpf_redirect_peer fixes
+Date: Sun, 12 Nov 2023 21:30:01 +0100
+Message-Id: <20231112203009.26073-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>, linux-nfs@vger.kernel.org,
- lorenzo.bianconi@redhat.com, chuck.lever@oracle.com, netdev@vger.kernel.org,
- kuba@kernel.org
-Subject: Re: [PATCH v4 0/3] convert write_threads, write_version and
- write_ports to netlink commands
-In-reply-to: <0f0467f396777722022403727824104b4f0a8d85.camel@kernel.org>
-References: <cover.1699095665.git.lorenzo@kernel.org>,
- <7fdd6dd0d8ab75181eb350f78a4822a039cacaa5.camel@kernel.org>,
- <ZVCiyNQtkumDheU4@lore-desk>,
- <0f0467f396777722022403727824104b4f0a8d85.camel@kernel.org>
-Date: Mon, 13 Nov 2023 07:22:26 +1100
-Message-id: <169982054606.2582.2797096885323571291@noble.neil.brown.name>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27091/Sun Nov 12 09:38:11 2023)
 
-On Sun, 12 Nov 2023, Jeff Layton wrote:
-> On Sun, 2023-11-12 at 11:02 +0100, Lorenzo Bianconi wrote:
-> > > On Sat, 2023-11-04 at 12:13 +0100, Lorenzo Bianconi wrote:
-> > > > Introduce write_threads, write_version and write_ports netlink
-> > > > commands similar to the ones available through the procfs.
-> > > >=20
-> > > > Changes since v3:
-> > > > - drop write_maxconn and write_maxblksize for the moment
-> > > > - add write_version and write_ports commands
-> > > > Changes since v2:
-> > > > - use u32 to store nthreads in nfsd_nl_threads_set_doit
-> > > > - rename server-attr in control-plane in nfsd.yaml specs
-> > > > Changes since v1:
-> > > > - remove write_v4_end_grace command
-> > > > - add write_maxblksize and write_maxconn netlink commands
-> > > >=20
-> > > > This patch can be tested with user-space tool reported below:
-> > > > https://github.com/LorenzoBianconi/nfsd-netlink.git
-> > > > This series is based on the commit below available in net-next tree
-> > > >=20
-> > > > commit e0fadcffdd172d3a762cb3d0e2e185b8198532d9
-> > > > Author: Jakub Kicinski <kuba@kernel.org>
-> > > > Date:   Fri Oct 6 06:50:32 2023 -0700
-> > > >=20
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0tools: ynl-gen: handle do ops with no input a=
-ttrs
-> > > >=20
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0The code supports dumps with no input attribu=
-tes currently
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0thru a combination of special-casing and luck.
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0Clean up the handling of ops with no inputs. =
-Create empty
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0Structs, and skip printing of empty types.
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0This makes dos with no inputs work.
-> > > >=20
-> > > > Lorenzo Bianconi (3):
-> > > > =C2=A0=C2=A0NFSD: convert write_threads to netlink commands
-> > > > =C2=A0=C2=A0NFSD: convert write_version to netlink commands
-> > > > =C2=A0=C2=A0NFSD: convert write_ports to netlink commands
-> > > >=20
-> > > > =C2=A0Documentation/netlink/specs/nfsd.yaml |  83 ++++++++
-> > > > =C2=A0fs/nfsd/netlink.c                     |  54 ++++++
-> > > > =C2=A0fs/nfsd/netlink.h                     |   8 +
-> > > > =C2=A0fs/nfsd/nfsctl.c                      | 267 +++++++++++++++++++=
-++++++-
-> > > > =C2=A0include/uapi/linux/nfsd_netlink.h     |  30 +++
-> > > > =C2=A0tools/net/ynl/generated/nfsd-user.c   | 254 +++++++++++++++++++=
-+++++
-> > > > =C2=A0tools/net/ynl/generated/nfsd-user.h   | 156 +++++++++++++++
-> > > > =C2=A07 files changed, 845 insertions(+), 7 deletions(-)
-> > > >=20
-> > >=20
-> > > Nice work, Lorenzo! Now comes the bikeshedding...
-> >=20
-> > Hi Jeff,
-> >=20
-> > >=20
-> > > With the nfsdfs interface, we sort of had to split things up into
-> > > multiple files like this, but it has some drawbacks, in particular with
-> > > weird behavior when people do things out of order.
-> >=20
-> > what do you mean with 'weird behavior'? Something not expected?
-> >=20
->=20
-> Yeah.
->=20
-> For instance, if you set up sockets but never write anything to the
-> "threads" file, those sockets will sit around in perpetuity. Granted
-> most people use rpc.nfsd to start the server, so this generally doesn't
-> happen often, but it's always been a klunky interface regardless.
+This fixes bpf_redirect_peer stats accounting for veth and netkit,
+and adds tstats in the first place for the latter. Utilise indirect
+call wrapper for bpf_redirect_peer, and improve test coverage of the
+latter also for netkit devices. Details in the patches, thanks!
 
-If you set up sockets but *do* write something to the "threads" file,
-then those sockets will *still* sit around in perpetuity.
-i.e. until you shut down the NFS server (rpc.nfsd 0).
+The series was targeted at bpf originally, and is done here as well,
+so it can trigger BPF CI. Jakub, if you think directly going via net
+is better since the majority of the diff touches net anyway, that is
+fine, too.
 
-I don't really see the problem.
+Thanks!
 
-It is true that you can use use the interface to ask for meaningless
-things.  The maxim that applies is "If you make it fool-proof, only a
-fool will use it". :-)
+v1 -> v2:
+  - Move stats allocation/freeing into net core (Jakub)
+  - As prepwork for the above, move vrf's dstats over into the core
+  - Add a check into stats alloc to enforce tstats upon
+    implementing ndo_get_peer_dev
+  - Add Acks from the mailing list to unchanged patches
 
-I'm not against exploring changes to the interface style in conjunction
-with moving from nfsd-fs to netlink, but I would want a bit more
-justification for any change.
+Daniel Borkmann (6):
+  net, vrf: Move dstats structure to core
+  net: Move {l,t,d}stats allocation to core and convert veth & vrf
+  netkit: Add tstats per-CPU traffic counters
+  bpf, netkit: Add indirect call wrapper for fetching peer dev
+  selftests/bpf: De-veth-ize the tc_redirect test case
+  selftests/bpf: Add netkit to tc_redirect selftest
 
-Thanks,
-NeilBrown
+Peilin Ye (2):
+  veth: Use tstats per-CPU traffic counters
+  bpf: Fix dev's rx stats for bpf_redirect_peer traffic
 
->=20
-> > >=20
-> > > Would it make more sense to instead have a single netlink command that
-> > > sets up ports and versions, and then spawns the requisite amount of
-> > > threads, all in one fell swoop?
-> >=20
-> > I do not have a strong opinion about it but I would say having a dedicated
-> > set/get for each paramater allow us to have more granularity (e.g. if you=
- want
-> > to change just a parameter we do not need to send all of them to the kern=
-el).
-> > What do you think?
-> >=20
->=20
-> It's pretty rare to need to twiddle settings on the server while it's up
-> and running. Restarting the server in the face of even minor changes is
-> not generally a huge problem, so I don't see this as necessary.
+ drivers/net/netkit.c                          |  22 +-
+ drivers/net/veth.c                            |  44 +--
+ drivers/net/vrf.c                             |  38 +--
+ include/linux/netdevice.h                     |  18 +
+ include/net/netkit.h                          |   6 +
+ net/core/dev.c                                |  55 ++-
+ net/core/filter.c                             |  19 +-
+ .../selftests/bpf/prog_tests/tc_redirect.c    | 317 +++++++++++-------
+ 8 files changed, 324 insertions(+), 195 deletions(-)
 
-Restarting the server is not zero-cost.  It restarts the grace period.
-So I would rather not require it for minor changes.
-
-NeilBrown
-
-
->=20
-> Also, it's always been a bit hit and miss as to which settings take
-> immediate effect. For instance, if I (e.g.) turn off NFSv4 serving
-> altogether on a running server, it doesn't purge the existing NFSv4
-> state, but v4 RPCs would be immediately rejected. Eventually it would
-> time out, but it is odd.
->=20
-> Personally, I think this is amenable to a declarative interface:
->=20
-> Have userland always send down a complete description of what the server
-> should look like, and then the kernel can do what it needs to make that
-> happen (starting/stopping threads, opening/closing sockets, changing
-> versions served, etc.).
->=20
-> > >=20
-> > > That does presuppose we can send down a variable-length frame though,
-> > > but I assume that is possible with netlink.
-> >=20
-> > sure, we can do it.
-> --=20
-> Jeff Layton <jlayton@kernel.org>
->=20
+-- 
+2.34.1
 
 
