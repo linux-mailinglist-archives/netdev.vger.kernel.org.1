@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-47489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929C37EA68C
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:01:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93C47EA68D
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:02:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53CA9281266
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:01:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 613B3B20A9B
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06ED03D99F;
-	Mon, 13 Nov 2023 23:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D173D99D;
+	Mon, 13 Nov 2023 23:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecU7uxso"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7xFcKit"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEB3B3D99D
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:01:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C753C433CA;
-	Mon, 13 Nov 2023 23:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6629B3E468
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:01:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD4EFC433C7;
+	Mon, 13 Nov 2023 23:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699916483;
-	bh=IA1tjeTxdtQ7fgfvF6vDbESOk+gY6fyIr/NCPY9ruCc=;
+	s=k20201202; t=1699916484;
+	bh=kF9vr75SmtZu9p/rXgYjqhwRPyT0NZ2SZvQB0tjJLvs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ecU7uxsoe+GaBGBlrMhxF5RkT8/ylX2/L/Md2s5d1vpTH6gIaD36S7zVUMh7fj+8U
-	 bFupsZGiCeytDwnZN0x14t4kDvqy1AfUwrGGMWBxHbcnHwHTO5xUqnPNl0aQfXIBjr
-	 IvvbyeIGwm2ikFBJ9LSaz9dVHOCbXG0qq8qo5VGq2DtvuXo2mKVI9gOl3YPtqPck+x
-	 FjMuP18GpoHFJMDLJn37Z1CpR0vHHNfhPxmT5b0IiTySl8DeTAfG2w/fgGBjBZ/2Eu
-	 13UoeOBdGE2PugxuJeBwmiF7kz4mdadlkQidTkWR6lX0p7pOSwKrQwolGUsgOFfnUN
-	 9YPfY65JqmJLg==
+	b=u7xFcKitSmrJ/6+cjHVORr+c+nYf/XbTDYOyR5kQ+su0vvAh7utBwEi7ncLaj31+y
+	 xZ6pyjFFb8GzrLnPrbVMPKAEYsjLH7ppuOYFDZuuBI1fE7RXmFaqLvohI+Ia8uxbnQ
+	 50EowTGuVESAH42OwijcX69+CpEIgWaj0b5K648YPmgSsbJrFOYu19frmE+gqgnmhB
+	 MdKURegXCYpoeBGrNRXTohvy3wO0JRLdqqBcBnOINorewrWpk8YjIfAK4eWYezul8x
+	 +CSQilbohjz2m57fzhAWvK3wHG5431kjScQ6Hm7Yv0JWctBxAIHhYF8GegtfwgXOwo
+	 K6hg4smtoKwGg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,9 +41,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [net-next 08/14] net/mlx5e: Introduce lost_cqe statistic counter for PTP Tx port timestamping CQ
-Date: Mon, 13 Nov 2023 15:00:45 -0800
-Message-ID: <20231113230051.58229-9-saeed@kernel.org>
+Subject: [net-next 09/14] net/mlx5: Refactor real time clock operation checks for PHC
+Date: Mon, 13 Nov 2023 15:00:46 -0800
+Message-ID: <20231113230051.58229-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231113230051.58229-1-saeed@kernel.org>
 References: <20231113230051.58229-1-saeed@kernel.org>
@@ -57,75 +57,117 @@ Content-Transfer-Encoding: 8bit
 
 From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-Track the number of times the a CQE was expected to not be delivered on PTP
-Tx port timestamping CQ. A CQE is expected to not be delivered of a certain
-amount of time passes since the corresponding CQE containing the DMA
-timestamp information has arrived. Increment the late_cqe counter when such
-a CQE does manage to be delivered to the CQ.
+Check if the MTUTC register of the NIC can be modified before attempting to
+execute a real-time clock operation. Previous implementation aborted the
+real-time clock operation pre-emptively when the MTUTC register used to
+control the real-time clock was not modifiable, indicating real-time clock
+mode was not enabled on the NIC. The original control flow was confusing
+since the noop-if-RTC-disabled branch looked similar to an error handling
+guard clause. The purpose of this patch is purely for improving readability
+and should lead to no functional change.
 
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../device_drivers/ethernet/mellanox/mlx5/counters.rst      | 6 ++++++
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c            | 1 +
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c          | 1 +
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.h          | 1 +
- 4 files changed, 9 insertions(+)
+ .../ethernet/mellanox/mlx5/core/lib/clock.c   | 41 +++++++++----------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
-index f69ee1ebee01..5464cd9e2694 100644
---- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
-+++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
-@@ -702,6 +702,12 @@ the software port.
-        the device typically ensures not posting the CQE.
-      - Error
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+index aa29f09e8356..c4f4d1c63463 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+@@ -266,9 +266,6 @@ static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
+ {
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
  
-+   * - `ptp_cq[i]_lost_cqe`
-+     - Number of times a CQE is expected to not be delivered on the PTP
-+       timestamping CQE by the device due to a time delta elapsing. If such a
-+       CQE is somehow delivered, `ptp_cq[i]_late_cqe` is incremented.
-+     - Error
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	if (ts->tv_sec < 0 || ts->tv_sec > U32_MAX ||
+ 	    ts->tv_nsec < 0 || ts->tv_nsec > NSEC_PER_SEC)
+ 		return -EINVAL;
+@@ -286,12 +283,15 @@ static int mlx5_ptp_settime(struct ptp_clock_info *ptp, const struct timespec64
+ 	struct mlx5_timer *timer = &clock->timer;
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+-	int err;
+ 
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+-	err = mlx5_ptp_settime_real_time(mdev, ts);
+-	if (err)
+-		return err;
 +
- .. [#ring_global] The corresponding ring and global counters do not share the
-                   same name (i.e. do not follow the common naming scheme).
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_settime_real_time(mdev, ts);
++
++		if (err)
++			return err;
++	}
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index bb11e644d24f..a81f9c672b69 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -169,6 +169,7 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
- 		WARN_ON_ONCE(!pos->inuse);
- 		pos->inuse = false;
- 		list_del(&pos->entry);
-+		ptpsq->cq_stats->lost_cqe++;
- 	}
- 	spin_unlock(&cqe_list->tracker_list_lock);
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-index 4b96ad657145..7e63d7c88894 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-@@ -2158,6 +2158,7 @@ static const struct counter_desc ptp_cq_stats_desc[] = {
- 	{ MLX5E_DECLARE_PTP_CQ_STAT(struct mlx5e_ptp_cq_stats, abort) },
- 	{ MLX5E_DECLARE_PTP_CQ_STAT(struct mlx5e_ptp_cq_stats, abort_abs_diff_ns) },
- 	{ MLX5E_DECLARE_PTP_CQ_STAT(struct mlx5e_ptp_cq_stats, late_cqe) },
-+	{ MLX5E_DECLARE_PTP_CQ_STAT(struct mlx5e_ptp_cq_stats, lost_cqe) },
- };
+ 	write_seqlock_irqsave(&clock->lock, flags);
+ 	timecounter_init(&timer->tc, &timer->cycles, timespec64_to_ns(ts));
+@@ -341,9 +341,6 @@ static int mlx5_ptp_adjtime_real_time(struct mlx5_core_dev *mdev, s64 delta)
+ {
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
  
- static const struct counter_desc ptp_rq_stats_desc[] = {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-index 477c547dcc04..2584f049ec53 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-@@ -461,6 +461,7 @@ struct mlx5e_ptp_cq_stats {
- 	u64 abort;
- 	u64 abort_abs_diff_ns;
- 	u64 late_cqe;
-+	u64 lost_cqe;
- };
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	/* HW time adjustment range is checked. If out of range, settime instead */
+ 	if (!mlx5_is_mtutc_time_adj_cap(mdev, delta)) {
+ 		struct timespec64 ts;
+@@ -367,13 +364,16 @@ static int mlx5_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	struct mlx5_timer *timer = &clock->timer;
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+-	int err;
  
- struct mlx5e_rep_stats {
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+ 
+-	err = mlx5_ptp_adjtime_real_time(mdev, delta);
+-	if (err)
+-		return err;
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_adjtime_real_time(mdev, delta);
++
++		if (err)
++			return err;
++	}
++
+ 	write_seqlock_irqsave(&clock->lock, flags);
+ 	timecounter_adjtime(&timer->tc, delta);
+ 	mlx5_update_clock_info_page(mdev);
+@@ -391,9 +391,6 @@ static int mlx5_ptp_freq_adj_real_time(struct mlx5_core_dev *mdev, long scaled_p
+ {
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
+ 
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	MLX5_SET(mtutc_reg, in, operation, MLX5_MTUTC_OPERATION_ADJUST_FREQ_UTC);
+ 
+ 	if (MLX5_CAP_MCAM_FEATURE(mdev, mtutc_freq_adj_units)) {
+@@ -415,13 +412,15 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+ 	u32 mult;
+-	int err;
+ 
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+ 
+-	err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
+-	if (err)
+-		return err;
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
++
++		if (err)
++			return err;
++	}
+ 
+ 	mult = (u32)adjust_by_scaled_ppm(timer->nominal_c_mult, scaled_ppm);
+ 
 -- 
 2.41.0
 
