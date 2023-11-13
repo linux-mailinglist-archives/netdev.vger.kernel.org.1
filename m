@@ -1,83 +1,107 @@
-Return-Path: <netdev+bounces-47382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A507E9EB6
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 15:29:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 695427E9F11
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 15:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C11D2B209AB
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:29:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A02EB1C208DC
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44C121107;
-	Mon, 13 Nov 2023 14:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA17920B35;
+	Mon, 13 Nov 2023 14:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="tSW75R4W"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qF9JMBBP";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5IDGdCbN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90FEE210E7;
-	Mon, 13 Nov 2023 14:29:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F1D9C433C7;
-	Mon, 13 Nov 2023 14:29:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1699885783;
-	bh=rNE2QrdjIdpu7UFsTQxx90lK9l5ol0pX7lsm3WH4CMg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tSW75R4WJBQ9NPl33UBWSBmNMIFvCcsUWCTM9NLS8EzqN4hZc35yJ+Nk0xGqGifNj
-	 dXrH917eivkzjrbD7oZ2KIzm66QA2cPMJPcEwEM5LaFREMHFT/gv/TX1hX3F/EaMOk
-	 OT0D2OcZrsK09FsKS68/BgnjCfNhGWWcwDcxwUPs=
-Date: Mon, 13 Nov 2023 09:29:39 -0500
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Yang Yingliang <yangyingliang@huawei.com>,
-	Mark Brown <broonie@kernel.org>, linux-input@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-spi@vger.kernel.org,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v1 1/1] treewide, spi: Get rid of SPI_MASTER_HALF_DUPLEX
-Message-ID: <2023111307-payer-retiring-0d72@gregkh>
-References: <20231113111249.3982461-1-andriy.shevchenko@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3FD1F5FC;
+	Mon, 13 Nov 2023 14:45:40 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B1A19AD;
+	Mon, 13 Nov 2023 06:45:26 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 314712187C;
+	Mon, 13 Nov 2023 14:45:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1699886724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=C55/Qkp749YOdFLW3Ql7AV3TyMx7ZOja0OEUL1O7cmw=;
+	b=qF9JMBBPs6ELBULaJOXIQpMdwXEebNyty/ILRRrgEWaAkekhfn9984wQY7H6/cBJC+bZAE
+	Zg4Fbai+9c8354J73virj+hNnWpkzFP4OQxSEINqwU+LfokvIO65p4+e6Vf2MmcGc2QENO
+	5A2JFHjJRc86q/DoCgcxY21Jo4DlYqw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1699886724;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=C55/Qkp749YOdFLW3Ql7AV3TyMx7ZOja0OEUL1O7cmw=;
+	b=5IDGdCbNOcZw4YEcqrXFOuDhcXXlLZTpdU/bEj2+Qwa1iJdVEBcvyWfBzZq5VYQwN0+vNW
+	D6DGVF2logXv5JCA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2E5613398;
+	Mon, 13 Nov 2023 14:45:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id oS+aOYM2UmX/MwAAMHmgww
+	(envelope-from <jdelvare@suse.de>); Mon, 13 Nov 2023 14:45:23 +0000
+Date: Mon, 13 Nov 2023 15:45:22 +0100
+From: Jean Delvare <jdelvare@suse.de>
+To: Keguang Zhang <keguang.zhang@gmail.com>
+Cc: linux-mips@vger.kernel.org, netdev@vger.kernel.org, LKML
+ <linux-kernel@vger.kernel.org>
+Subject: |PATCH] stmmac: dwmac-loongson: Add architecture dependency
+Message-ID: <20231113154522.0bca3521@endymion.delvare>
+Organization: SUSE Linux
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.34; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231113111249.3982461-1-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 13, 2023 at 01:12:49PM +0200, Andy Shevchenko wrote:
-> The SPI_MASTER_HALF_DUPLEX is the legacy name of a definition
-> for a half duplex flag. Since all others had been replaced with
-> the respective SPI_CONTROLLER prefix get rid of the last one
-> as well. There is no functional change intended.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/input/rmi4/rmi_spi.c             | 2 +-
->  drivers/mmc/host/mmc_spi.c               | 2 +-
->  drivers/net/ethernet/micrel/ks8851_spi.c | 4 ++--
->  drivers/usb/gadget/udc/max3420_udc.c     | 2 +-
->  include/linux/spi/spi.h                  | 2 --
->  5 files changed, 5 insertions(+), 7 deletions(-)
+Only present the DWMAC_LOONGSON option on architectures where it can
+actually be used.
 
-This should go through the spi tree, right?  If so:
+This follows the same logic as the DWMAC_INTEL option.
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Jean Delvare <jdelvare@suse.de>
+Cc: Keguang Zhang <keguang.zhang@gmail.com>
+---
+I'm not familiar with the hardware, so please let me know if the
+dependency needs to be adjusted somehow.
 
-For the USB portion.
+ drivers/net/ethernet/stmicro/stmmac/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks,
+--- linux-6.6.orig/drivers/net/ethernet/stmicro/stmmac/Kconfig
++++ linux-6.6/drivers/net/ethernet/stmicro/stmmac/Kconfig
+@@ -269,7 +269,7 @@ config DWMAC_INTEL
+ config DWMAC_LOONGSON
+ 	tristate "Loongson PCI DWMAC support"
+ 	default MACH_LOONGSON64
+-	depends on STMMAC_ETH && PCI
++	depends on MACH_LOONGSON64 && STMMAC_ETH && PCI
+ 	depends on COMMON_CLK
+ 	help
+ 	  This selects the LOONGSON PCI bus support for the stmmac driver,
 
-greg k-h
+
+-- 
+Jean Delvare
+SUSE L3 Support
 
