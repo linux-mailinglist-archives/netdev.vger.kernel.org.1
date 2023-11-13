@@ -1,107 +1,163 @@
-Return-Path: <netdev+bounces-47383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 695427E9F11
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 15:45:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8687E9F30
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 15:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A02EB1C208DC
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:45:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D1CBB20955
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA17920B35;
-	Mon, 13 Nov 2023 14:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F401920B3B;
+	Mon, 13 Nov 2023 14:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qF9JMBBP";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="5IDGdCbN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cxJ35U9+"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B3FD1F5FC;
-	Mon, 13 Nov 2023 14:45:40 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B1A19AD;
-	Mon, 13 Nov 2023 06:45:26 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 314712187C;
-	Mon, 13 Nov 2023 14:45:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1699886724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=C55/Qkp749YOdFLW3Ql7AV3TyMx7ZOja0OEUL1O7cmw=;
-	b=qF9JMBBPs6ELBULaJOXIQpMdwXEebNyty/ILRRrgEWaAkekhfn9984wQY7H6/cBJC+bZAE
-	Zg4Fbai+9c8354J73virj+hNnWpkzFP4OQxSEINqwU+LfokvIO65p4+e6Vf2MmcGc2QENO
-	5A2JFHjJRc86q/DoCgcxY21Jo4DlYqw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1699886724;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=C55/Qkp749YOdFLW3Ql7AV3TyMx7ZOja0OEUL1O7cmw=;
-	b=5IDGdCbNOcZw4YEcqrXFOuDhcXXlLZTpdU/bEj2+Qwa1iJdVEBcvyWfBzZq5VYQwN0+vNW
-	D6DGVF2logXv5JCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F2E5613398;
-	Mon, 13 Nov 2023 14:45:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id oS+aOYM2UmX/MwAAMHmgww
-	(envelope-from <jdelvare@suse.de>); Mon, 13 Nov 2023 14:45:23 +0000
-Date: Mon, 13 Nov 2023 15:45:22 +0100
-From: Jean Delvare <jdelvare@suse.de>
-To: Keguang Zhang <keguang.zhang@gmail.com>
-Cc: linux-mips@vger.kernel.org, netdev@vger.kernel.org, LKML
- <linux-kernel@vger.kernel.org>
-Subject: |PATCH] stmmac: dwmac-loongson: Add architecture dependency
-Message-ID: <20231113154522.0bca3521@endymion.delvare>
-Organization: SUSE Linux
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.34; x86_64-suse-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB2D20B3D
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 14:52:01 +0000 (UTC)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 680A019F
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 06:51:56 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-543923af573so7007634a12.0
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 06:51:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699887115; x=1700491915; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=nTvRuDI9BOasudtu0gVcjNrp1zN5CwZUulqYbjdj11E=;
+        b=cxJ35U9+JotGw3t380QrNP6wCONGzk0dbjRx4zsiiqI+BF23zHVcS+7jve3ehc0UNo
+         RusGGCZsvT/1hKCUDuHpJFXCJCrfLuk6IqzMvaMhG/2hQE75u5jwwH2YCe7Jax9PL2i6
+         43TZeVjbhqpfE1JD9TSWDO+aO1t9M9m3LyRJ2a3njUgnAE7Aca3S0vkhKl1Z8hdwbSAa
+         ifQPd0oh/tOALwiVVJg0CaCS8LFMVdE5HL2mJkCZyH2EdgYnAwfE8T2ygtn0NNkGifLi
+         udKEu1PdlYYcp7arubMlxD87tymS7hyIxPEGoq2Ov/zapQmfsw3CiQppoErMuBLJuIwx
+         X7BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699887115; x=1700491915;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTvRuDI9BOasudtu0gVcjNrp1zN5CwZUulqYbjdj11E=;
+        b=nVUEeimLy/KKba6aXqCk30sjP1o5ycm1RnOivYqCGY4qnlZEMSGtMSlShwfk89A4Gh
+         neA51CUQe8iSjPvtzYAvTYvWWwNeNgA4sEsafU3da27Kz5/8++e4/QIbZtqq8PqqXuP8
+         9iQLhwmBqO0BruFCpKSZDsm6Og5prJplZJ73PFtaYbNUa1MBBwtygDu8ucyRQrC6d9z0
+         Xk4Ez/C6L+iOj4cNvFtyEJYh/XHkHVrUlmc7sT9LBoItktjUFquZBjsQcul3mrT12vHJ
+         pvHE8u2Wf5BMGb1ayVkjgBgRQeSlQUtVD12GQIf+U/DPwSagjf4nDPieGbvs4iqvbBzd
+         RYdw==
+X-Gm-Message-State: AOJu0YzCnxCEB0K+0VbmnCDxGjotQQMt3WrI6urKuFPo58HsjVSc8iC/
+	VCkSyq/kCHhpOqFrT/3mrAc=
+X-Google-Smtp-Source: AGHT+IFvwprtirbG/c02UrP5m5Owzq5JjhW68OthFc10HE/OeK4jyisHrmgFETXImzViK466Ynb2Aw==
+X-Received: by 2002:a05:6402:793:b0:540:ef06:23d7 with SMTP id d19-20020a056402079300b00540ef0623d7mr5705833edy.1.1699887114586;
+        Mon, 13 Nov 2023 06:51:54 -0800 (PST)
+Received: from localhost (srv28160.blue.kundencontroller.de. [81.7.10.216])
+        by smtp.gmail.com with ESMTPSA id bx23-20020a0564020b5700b00533dad8a9c5sm3825810edb.38.2023.11.13.06.51.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 06:51:54 -0800 (PST)
+Date: Mon, 13 Nov 2023 16:51:39 +0200
+From: Maxim Mikityanskiy <maxtram95@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "Chittim, Madhu" <madhu.chittim@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	xuejun.zhang@intel.com, sridhar.samudrala@intel.com
+Subject: Re: [PATCH net] net: sched: fix warn on htb offloaded class creation
+Message-ID: <ZVI3-w5dsLIhqHav@mail.gmail.com>
+References: <ff51f20f596b01c6d12633e984881be555660ede.1698334391.git.pabeni@redhat.com>
+ <ZTvBoQHfu23ynWf-@mail.gmail.com>
+ <131da9645be5ef6ea584da27ecde795c52dfbb00.camel@redhat.com>
+ <ZUEQzsKiIlgtbN-S@mail.gmail.com>
+ <5d873c14-9d17-4c48-8e11-951b99270b75@intel.com>
+ <ZU4PBY1g_-N7cd8A@mail.gmail.com>
+ <63b9b3f40d0476ada2972ea8f6058b3613520ba8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <63b9b3f40d0476ada2972ea8f6058b3613520ba8.camel@redhat.com>
+X-Spam-Level: **
 
-Only present the DWMAC_LOONGSON option on architectures where it can
-actually be used.
+On Sun, 12 Nov 2023 at 09:48:19 +0100, Paolo Abeni wrote:
+> On Fri, 2023-11-10 at 13:07 +0200, Maxim Mikityanskiy wrote:
+> > On Thu, 09 Nov 2023 at 13:54:17 -0800, Chittim, Madhu wrote:
+> > > We would like to enable Tx rate limiting using htb offload on all the
+> > > existing queues.
+> > 
+> > I don't seem to understand how you see it possible with HTB.
+> 
+> I must admit I feel sorry for not being able to join any of the
+> upcoming conferences, but to me it looks like there is some
+> communication gap that could be filled by in-person discussion.
+> 
+> Specifically the above to me sounds contradictory to what you stated
+> here:
+> 
+> https://lore.kernel.org/netdev/ZUEQzsKiIlgtbN-S@mail.gmail.com/
+> 
+> """
+> > Can HTB actually configure H/W shaping on
+> > real_num_tx_queues?
+> 
+> It will be on real_num_tx_queues, but after it's increased to add new
+> HTB queues. The original queues [0, N) are used for direct traffic,
+> same as the non-offloaded HTB's direct_queue (it's not shaped).
+> """
 
-This follows the same logic as the DWMAC_INTEL option.
+Sorry if that was confusing, there is actually no contradition, let me
+rephrase. Queues number [0, orig_real_num_tx_queues) are direct, they
+are not shaped, they correspond to HTB's unclassified traffic. Queues
+number [orig_real_num_tx_queues, real_num_tx_queues) correspond to HTB
+classes and are shaped. Here orig_real_num_tx_queues is how many queues
+the netdev had before HTB offload was attached. It's basically the
+standard set of queues, and HTB creates a new queue per class. Let me
+know if that helps.
 
-Signed-off-by: Jean Delvare <jdelvare@suse.de>
-Cc: Keguang Zhang <keguang.zhang@gmail.com>
----
-I'm not familiar with the hardware, so please let me know if the
-dependency needs to be adjusted somehow.
+> > What is your goal? 
+> 
+> We are looking for clean interface to configure individually min/max
+> shaping on each TX queue for a given netdev (actually virtual
+> function).
 
- drivers/net/ethernet/stmicro/stmmac/Kconfig |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Have you tried tc mqprio? If you set `mode channel` and create queue
+groups with only one queue each, you can set min_rate and max_rate for
+each group (==queue), and it works with the existing set of queues.
 
---- linux-6.6.orig/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ linux-6.6/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -269,7 +269,7 @@ config DWMAC_INTEL
- config DWMAC_LOONGSON
- 	tristate "Loongson PCI DWMAC support"
- 	default MACH_LOONGSON64
--	depends on STMMAC_ETH && PCI
-+	depends on MACH_LOONGSON64 && STMMAC_ETH && PCI
- 	depends on COMMON_CLK
- 	help
- 	  This selects the LOONGSON PCI bus support for the stmmac driver,
-
-
--- 
-Jean Delvare
-SUSE L3 Support
+> Jiri's suggested to use TC:
+> 
+> https://lore.kernel.org/netdev/ZOTVkXWCLY88YfjV@nanopsycho/
+> 
+> which IMHO makes sense as far as there is an existing interface (qdisc)
+> providing the required features (almost) out-of-the-box. It looks like
+> it's not the case.
+> 
+> If a non trivial configuration and/or significant implementation are
+> required, IMHO other options could be better...
+> 
+> > If you need shaping for the whole netdev, maybe HTB
+> > is not needed, and it's enough to attach a catchall filter with the
+> > police action? Or use /sys/class/net/eth0/queues/tx-*/tx_maxrate
+> > per-queue?
+> 
+> ... specifically this latter one (it will require implementing in-
+> kernel support for 'max_rate', but should quite straight-forward).
+> 
+> It would be great to converge on some agreement on the way forward,
+> thanks!
+> 
+> Paolo
+> 
 
