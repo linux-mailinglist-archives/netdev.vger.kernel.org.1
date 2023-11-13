@@ -1,52 +1,62 @@
-Return-Path: <netdev+bounces-47495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111387EA692
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:02:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91567EA6AE
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:06:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0A862815B4
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:02:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0586D1C209EB
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8A93E499;
-	Mon, 13 Nov 2023 23:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B383D399;
+	Mon, 13 Nov 2023 23:06:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jtrm6bwD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SVMJfSyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11103D3A4
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:01:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B35C433C7;
-	Mon, 13 Nov 2023 23:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699916490;
-	bh=RJCHsO/j81Ch3TOk+80uDyM7v3CGIJRGarrYVT4QWXo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jtrm6bwDbDtWGioKoYvwcGBwOPyyUByl3Osxo8t87SHKyM5tVmltvHo1GATm4CWbn
-	 8rfwlVGYGFQxvAzAYAuQGPJiljwFbIJJCeKcuc/WKvAhTwe87lRIYaxShOfzBy0Zos
-	 QO1/2jGC4Yx0Y38u1/w+XMgvw0UqoMtUAQExF8hqPDyJIQhqDzveJTncVWimY7lO74
-	 p4n+AOBZdlpQ56RT2ANV5oxGeWOFeD2L57ESJcBKygsaBJQGVmI4AUM6FfWwGpbgCx
-	 a03aYImbWtrS919g2FeT0ght/irDat5KP4+txiHMkquqZ0VmttRk8lZvCJG05/+F2K
-	 LkRIrj3GJP34A==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [net-next 14/14] net/mlx5e: Remove early assignment to netdev->features
-Date: Mon, 13 Nov 2023 15:00:51 -0800
-Message-ID: <20231113230051.58229-15-saeed@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2762D63C
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:06:01 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C13D73
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:06:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699916760; x=1731452760;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NAUaRjdVg/qgvQ/OTJz9SSqHfG4oWFEhe8tysbvoYaI=;
+  b=SVMJfSyCW2uQBZFdFMwZ20ycGI03hJwVOXGLFifKDYEglUisVetFneoq
+   826RykLSO5v6XOmBXC1LMgXiDODWo0ku5fcFUl5tWLW8aJjUm64vgRdTk
+   /0Ko/alhMwpdaCi/xJ+TkKYWk5zwdo8j+bwNdWEKBaaolEnzOwX/6ygp1
+   PIMf9gmLtAWvxAjFMvOL1O5EYwzNDjZAKfoTjGLjEmGqY0p5kvYhqVPb/
+   VxPX/2ABv0WSQZYEQVvzwwkx8rhwlItGJPK6IxcAfcvgDPt+fut1sBnxU
+   7MhzYUQqfUzLci+3SWjqRnwSdm4VbAgTmlpFCv4su9jE/BHH+uToi3UBo
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="421633153"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="421633153"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 15:06:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="12598032"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa001.fm.intel.com with ESMTP; 13 Nov 2023 15:05:59 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2023-11-13 (ice)
+Date: Mon, 13 Nov 2023 15:05:45 -0800
+Message-ID: <20231113230551.548489-1-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231113230051.58229-1-saeed@kernel.org>
-References: <20231113230051.58229-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,30 +65,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Tariq Toukan <tariqt@nvidia.com>
+This series contains updates to ice driver only.
 
-The netdev->features is initialized to netdev->hw_features at a later
-point in the flow. Remove any redundant earlier assignment.
+Arkadiusz ensures the device is initialized with valid lock status
+value. He also removes range checking of dpll priority to allow firmware
+to process the request; supported values are firmware dependent.
+Finally, he removes setting of can change capability for pins that
+cannot be changed.
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 1 -
- 1 file changed, 1 deletion(-)
+Dan restores ability to load a package which doesn't contain a signature
+segment.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ea58c6917433..3aecdf099a2f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5244,7 +5244,6 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 
- 	netdev->gso_partial_features             |= NETIF_F_GSO_UDP_L4;
- 	netdev->hw_features                      |= NETIF_F_GSO_UDP_L4;
--	netdev->features                         |= NETIF_F_GSO_UDP_L4;
- 
- 	mlx5_query_port_fcs(mdev, &fcs_supported, &fcs_enabled);
- 
+The following are changes since commit c0a2a1b0d631fc460d830f52d06211838874d655:
+  ppp: limit MRU to 64K
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Arkadiusz Kubalewski (3):
+  ice: dpll: fix initial lock status of dpll
+  ice: dpll: fix check for dpll input priority range
+  ice: dpll: fix output pin capabilities
+
+Dan Nowlin (1):
+  ice: fix DDP package download for packages without signature segment
+
+ drivers/net/ethernet/intel/ice/ice_ddp.c    | 103 +++++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.c   |  21 ++--
+ drivers/net/ethernet/intel/ice/ice_dpll.h   |   1 -
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  54 ++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   2 +
+ 5 files changed, 165 insertions(+), 16 deletions(-)
+
 -- 
 2.41.0
 
