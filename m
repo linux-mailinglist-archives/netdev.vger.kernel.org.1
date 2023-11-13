@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-47540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEA37EA71A
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:36:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274DA7EA71C
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:36:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C3F71C20A5D
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:36:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A9461F235DF
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A6C3E47D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1EF3FB17;
 	Mon, 13 Nov 2023 23:36:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uU/KBqdw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OdgI0zWm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710733FB2A
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:36:11 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A4A172A
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:36:08 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso66040791fa.3
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:36:08 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F723FB3F
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:36:12 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA66173A
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:36:09 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2c595f5dc84so65419841fa.0
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:36:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1699918566; x=1700523366; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1699918568; x=1700523368; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XzpjgIoTApBpg6RH8jtn7hI12q8Te+BGFiuT3n+0Mpg=;
-        b=uU/KBqdwoiS0R7cUYvjtAYtLQGt3GqnCwBeS+O0UWPG6cQRV2s+ceDoE11Z5miV8ug
-         85GBJc/C9N9iPO0upMx83NZBjqYX9U7OPLMCjlpFLjiQM4mzQ8T04cuL77oql77j7/BW
-         tIF8GbUsSi4fBhiC4bqtwc/ju3WioxwcyM1CFrdUgSSL9CJUUcNE/SpYxUHe6PsdsWes
-         fBwVm+smyqXEy9uKl39N7xjNZcNktMA4jv4zQGWJpZNbVPL0duaKdfUOYO2oXxSChI2m
-         gD3oaWVXa2xPEqwBFsbTOX2olo9wUd6pz/dXX2KjAEltW6wFEbr67P4ZCYePmFQ8PZHw
-         j1TQ==
+        bh=lIz/GtmN1t9bIiyorUy96/+eOLVRUGVLvuVaAhEDkG8=;
+        b=OdgI0zWmy9KTh8RatOScq/MmE9nEeSB7fThpWdc4w7s68S0HWOOS9Ufcyn87JiUFH3
+         30cMbwkZnE1h9RTkgP0NMjpbg/GZfSESdT9xhEWrwMYlGkvDQhm9cbYnDBYYbAMR0eBx
+         QglxdpHS/iPrhyE0vNTHl6rgPlOga1UiyVz5nu5c3mhO/XHHhUFUdGlskuQ2NcffSYCb
+         0N1QESSM/K7CyOfi5b9GjrmVJS5wvuo9hdgKM96kuNRwp1YeyWgx5qOFHDe5u1efQBvz
+         2aIoaOuyQticBmGL4YbVKBhEfhKxRCQeEV7UG33g+W4/6Xppf8QHze1ZbXI8wIkt9jAa
+         Vy6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699918566; x=1700523366;
+        d=1e100.net; s=20230601; t=1699918568; x=1700523368;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XzpjgIoTApBpg6RH8jtn7hI12q8Te+BGFiuT3n+0Mpg=;
-        b=a4rswiqVUWetd4BmFVzIwLJAFzN0wPvvGM7kAe2fr7EofSdoSuycYX5z9Qy+vZJP9m
-         HGzwC7hli5s+6xYNUrGdMZXjC9F7Z/05AqzK9aROh4Bdir/Q/yEr+1fwoGWoc13tfBuT
-         s/FXIvUrXnwv8oLmVTk+U+JAJuwwdJA33KSjgbCaLIr4+4gvT0WcHQgZAag/wCTq6DB7
-         kubwaqa74UeS1GBKltuchgLvr12Vr0/bozFSSpHjny9lE9YTAQLINeBjqDGSmdCQPS6b
-         h8PkuKSf+dHX7GSsFCJXirks8uDuIIMdQ118pa9DCtCFQIAcBQF6fh5t+9FdXk9tJ5QU
-         /VMQ==
-X-Gm-Message-State: AOJu0YwG6vlxDvechCNCGzqcCjKEz6Hgs1cweFConmAPjh3qaz0yCdHe
-	L2gX3Yc06uFsBif7moKZH4IjCg==
-X-Google-Smtp-Source: AGHT+IFNcKHf6oE6p5RPbdVx7uMMDCSOP+eTKVss4Nmp8f/70WXA9vQVoDVofrpkOT5vFPot1i3/QQ==
-X-Received: by 2002:a2e:bc28:0:b0:2c6:eccb:344d with SMTP id b40-20020a2ebc28000000b002c6eccb344dmr646562ljf.40.1699918566771;
-        Mon, 13 Nov 2023 15:36:06 -0800 (PST)
+        bh=lIz/GtmN1t9bIiyorUy96/+eOLVRUGVLvuVaAhEDkG8=;
+        b=E44aJjm2vjoksLlhPe1HygAa5kuoiec6Ji+aaCHvZuksXQECTjSnwGqmlD/CczXSVg
+         UjJYmwOGP7kULwVMZZLFsu4jEL9FEKOdc6Plky9C15tDlKYWsW+/TY76nSDCqvY+qrxI
+         4+Ag65cUtOUBcLdQ1CjUt02egZoUu+CyDIz/YLcwJCpWabK28VGZx86xj589qGWhrOpz
+         /3LRUHrGmxk7m3R3yM6HZXC/Zjp0B0sT3Ts1avVktiF4fU9yDelb2zALE2f7Q1e18E5n
+         brISi96wvoTa4YmgckaJ4FLcGnJgP0p4hsnLAnD4BzXE9kzXcQ5Qt3lz5u85tlOegnOR
+         UC+w==
+X-Gm-Message-State: AOJu0YwJJimGFY9RI5oxeNFVoub+iX2K5daCMQiD2rEHfDDWeaEVkxTn
+	XZDTIaIy0W6pIRPVFESMSSOlTw==
+X-Google-Smtp-Source: AGHT+IFxSldNF2UOlvgvflSNOcHswJutVDAUwO0Tw9t/H8g7uE54ZPrkfTELcjw4bqAhmaVslya7Cg==
+X-Received: by 2002:a2e:99ce:0:b0:2c3:e35d:13d with SMTP id l14-20020a2e99ce000000b002c3e35d013dmr183482ljj.5.1699918567898;
+        Mon, 13 Nov 2023 15:36:07 -0800 (PST)
 Received: from [127.0.1.1] ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id 17-20020a2e0611000000b002b70a8478ddsm1202859ljg.44.2023.11.13.15.36.05
+        by smtp.gmail.com with ESMTPSA id 17-20020a2e0611000000b002b70a8478ddsm1202859ljg.44.2023.11.13.15.36.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 15:36:06 -0800 (PST)
+        Mon, 13 Nov 2023 15:36:07 -0800 (PST)
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Tue, 14 Nov 2023 00:36:03 +0100
-Subject: [PATCH net-next v8 8/9] ARM64: dts: Add special compatibles for
- the Turris Mox
+Date: Tue, 14 Nov 2023 00:36:04 +0100
+Subject: [PATCH net-next v8 9/9] dt-bindings: marvell: Add Marvell
+ MV88E6060 DSA schema
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231114-marvell-88e6152-wan-led-v8-8-50688741691b@linaro.org>
+Message-Id: <20231114-marvell-88e6152-wan-led-v8-9-50688741691b@linaro.org>
 References: <20231114-marvell-88e6152-wan-led-v8-0-50688741691b@linaro.org>
 In-Reply-To: <20231114-marvell-88e6152-wan-led-v8-0-50688741691b@linaro.org>
 To: Andrew Lunn <andrew@lunn.ch>, 
@@ -87,77 +87,134 @@ To: Andrew Lunn <andrew@lunn.ch>,
 Cc: Christian Marangi <ansuelsmth@gmail.com>, 
  linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Linus Walleij <linus.walleij@linaro.org>
+ Linus Walleij <linus.walleij@linaro.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Rob Herring <robh@kernel.org>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>
 X-Mailer: b4 0.12.4
 
-These special compatibles are added to the Marvell Armada 3720
-Turris Mox in order to be able to special-case and avoid
-warnings on the non-standard nodenames that are ABI on this
-one board due to being used in deployed versions of U-Boot.
+The Marvell MV88E6060 is one of the oldest DSA switches from
+Marvell, and it has DT bindings used in the wild. Let's define
+them properly.
 
+It is different enough from the rest of the MV88E6xxx switches
+that it deserves its own binding.
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 ---
- arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ .../bindings/net/dsa/marvell,mv88e6060.yaml        | 88 ++++++++++++++++++++++
+ MAINTAINERS                                        |  1 +
+ 2 files changed, 89 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-index 66cd98b67744..a89747d2a600 100644
---- a/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-+++ b/arch/arm64/boot/dts/marvell/armada-3720-turris-mox.dts
-@@ -312,7 +312,7 @@ phy1: ethernet-phy@1 {
- 	 * Also do not touch the "ports" or "port@n" nodes. These are also ABI.
- 	 */
- 	switch0@10 {
--		compatible = "marvell,mv88e6190";
-+		compatible = "marvell,turris-mox-mv88e6190", "marvell,mv88e6190";
- 		reg = <0x10>;
- 		dsa,member = <0 0>;
- 		interrupt-parent = <&moxtet>;
-@@ -438,7 +438,7 @@ port-sfp@a {
- 
- 	/* NOTE: this node name is ABI, don't change it! */
- 	switch0@2 {
--		compatible = "marvell,mv88e6085";
-+		compatible = "marvell,turris-mox-mv88e6085", "marvell,mv88e6085";
- 		reg = <0x2>;
- 		dsa,member = <0 0>;
- 		interrupt-parent = <&moxtet>;
-@@ -506,7 +506,7 @@ port@5 {
- 
- 	/* NOTE: this node name is ABI, don't change it! */
- 	switch1@11 {
--		compatible = "marvell,mv88e6190";
-+		compatible = "marvell,turris-mox-mv88e6190", "marvell,mv88e6190";
- 		reg = <0x11>;
- 		dsa,member = <0 1>;
- 		interrupt-parent = <&moxtet>;
-@@ -632,7 +632,7 @@ port-sfp@a {
- 
- 	/* NOTE: this node name is ABI, don't change it! */
- 	switch1@2 {
--		compatible = "marvell,mv88e6085";
-+		compatible = "marvell,turris-mox-mv88e6085", "marvell,mv88e6085";
- 		reg = <0x2>;
- 		dsa,member = <0 1>;
- 		interrupt-parent = <&moxtet>;
-@@ -700,7 +700,7 @@ port@5 {
- 
- 	/* NOTE: this node name is ABI, don't change it! */
- 	switch2@12 {
--		compatible = "marvell,mv88e6190";
-+		compatible = "marvell,turris-mox-mv88e6190", "marvell,mv88e6190";
- 		reg = <0x12>;
- 		dsa,member = <0 2>;
- 		interrupt-parent = <&moxtet>;
-@@ -817,7 +817,7 @@ port-sfp@a {
- 
- 	/* NOTE: this node name is ABI, don't change it! */
- 	switch2@2 {
--		compatible = "marvell,mv88e6085";
-+		compatible = "marvell,turris-mox-mv88e6085", "marvell,mv88e6085";
- 		reg = <0x2>;
- 		dsa,member = <0 2>;
- 		interrupt-parent = <&moxtet>;
+diff --git a/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
+new file mode 100644
+index 000000000000..4f1adf00431a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
+@@ -0,0 +1,88 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/dsa/marvell,mv88e6060.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Marvell MV88E6060 DSA switch
++
++maintainers:
++  - Andrew Lunn <andrew@lunn.ch>
++
++description:
++  The Marvell MV88E6060 switch has been produced and sold by Marvell
++  since at least 2008. The switch has one pin ADDR4 that controls the
++  MDIO address of the switch to be 0x10 or 0x00, and on the MDIO bus
++  connected to the switch, the PHYs inside the switch appear as
++  independent devices on address 0x00-0x04 or 0x10-0x14, so in difference
++  from many other DSA switches this switch does not have an internal
++  MDIO bus for the PHY devices.
++
++properties:
++  compatible:
++    const: marvell,mv88e6060
++    description:
++      The MV88E6060 is the oldest Marvell DSA switch product, and
++      as such a bit limited in features compared to later hardware.
++
++  reg:
++    maxItems: 1
++
++  reset-gpios:
++    description:
++      GPIO to be used to reset the whole device
++    maxItems: 1
++
++allOf:
++  - $ref: dsa.yaml#/$defs/ethernet-ports
++
++required:
++  - compatible
++  - reg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethernet-switch@16 {
++            compatible = "marvell,mv88e6060";
++            reg = <16>;
++
++            ethernet-ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                ethernet-port@0 {
++                    reg = <0>;
++                    label = "lan1";
++                };
++                ethernet-port@1 {
++                    reg = <1>;
++                    label = "lan2";
++                };
++                ethernet-port@2 {
++                    reg = <2>;
++                    label = "lan3";
++                };
++                ethernet-port@3 {
++                    reg = <3>;
++                    label = "lan4";
++                };
++                ethernet-port@5 {
++                    reg = <5>;
++                    phy-mode = "rev-mii";
++                    ethernet = <&ethc>;
++                    fixed-link {
++                        speed = <100>;
++                        full-duplex;
++                    };
++                };
++            };
++        };
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1b4475254d27..4c933a2a56ad 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12625,6 +12625,7 @@ MARVELL 88E6XXX ETHERNET SWITCH FABRIC DRIVER
+ M:	Andrew Lunn <andrew@lunn.ch>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
++F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6060.yaml
+ F:	Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
+ F:	Documentation/networking/devlink/mv88e6xxx.rst
+ F:	drivers/net/dsa/mv88e6xxx/
 
 -- 
 2.34.1
