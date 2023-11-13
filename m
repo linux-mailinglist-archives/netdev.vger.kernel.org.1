@@ -1,114 +1,72 @@
-Return-Path: <netdev+bounces-47475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5E57EA607
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:23:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 903B37EA618
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 253AD280D46
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:23:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C335FB20A6C
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9CF2E62F;
-	Mon, 13 Nov 2023 22:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90573C699;
+	Mon, 13 Nov 2023 22:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GboDRKk4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dqz8r4KO"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1B9249F5;
-	Mon, 13 Nov 2023 22:23:35 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF3FCD51;
-	Mon, 13 Nov 2023 14:23:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/ixNTtee1tXYvFF1HyRnYYFOqNMAUcB4cs4QBlEVS/M=; b=GboDRKk4kb3umCCSjVG3Xt9gj8
-	HgWsjqM2ZXPTJFb6elv/EJNCZtLddqLwBtk2Dj90A79FkaFf2uxUn+i9AcSatpv3fYii02QEJ0yFW
-	sNX0ojw+5C53kjjfkSNo9P5eTQubyADwCHPX8kxpLq/y//mZjUktxDBhUAj0J9LpXpCc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r2fL5-0006pa-Sc; Mon, 13 Nov 2023 23:23:27 +0100
-Date: Mon, 13 Nov 2023 23:23:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Fabio Estevam <festevam@gmail.com>, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, Fabio Estevam <festevam@denx.de>
-Subject: Re: [PATCH net-next] dt-bindings: net: snps,dwmac: Do not make
- 'phy-mode' required
-Message-ID: <22d3ed94-2c8b-4d7d-9c19-1ab13ee2c4a4@lunn.ch>
-References: <20231113204052.43688-1-festevam@gmail.com>
- <43d176e2-d95f-40dd-8e42-8d7d5ed6492c@lunn.ch>
- <3acda2a2-3c99-4a14-ab68-ab166ce08194@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3ED3C685
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 22:38:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B0AEC433C7;
+	Mon, 13 Nov 2023 22:38:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699915099;
+	bh=FGsv7wdXiQu6Iku/2xGrGpaJYro5jFVKqvwxloDF4qk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Dqz8r4KOXJO7ioJ0Oww+RFpXkPQA9G/1IJBJ4RNT9gw7tQhCP+3cxeGRkP/c9z8Q3
+	 rObwpp4LQqBjWfP13VfknEbzcwKDua/LRRplbQn9zkxUe6oDwGPbXbe6YKsFEGGHXn
+	 ZCbvI+UtsuNsImVwf5rXQPo5WX0//LHKJOjXitMPwdtJU2ABxtfAosLZbnWmCfS2bj
+	 mZ2T2qCFDWaNMAUAjimjHQYo7FFL4lry2szcGldpzEFm2Qk88qrwwV6rDOM21HPcEZ
+	 /g2HA9iHpFVRR5o25GfY8PIaPddQdKr8xUsLzMBHeMzmPm428/ZOvQ8qUuQF3uyGaD
+	 0AZAO+IH62w6A==
+Message-ID: <f27315c4-c20c-48cc-9fee-7f00c853921e@kernel.org>
+Date: Mon, 13 Nov 2023 15:38:18 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3acda2a2-3c99-4a14-ab68-ab166ce08194@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] ip, link: Add support for netkit
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: razor@blackwall.org, martin.lau@kernel.org, netdev@vger.kernel.org
+References: <20231113032323.14717-1-daniel@iogearbox.net>
+ <20231113093429.434186eb@hermes.local>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231113093429.434186eb@hermes.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 13, 2023 at 02:03:00PM -0800, Florian Fainelli wrote:
-> On 11/13/23 13:51, Andrew Lunn wrote:
-> > On Mon, Nov 13, 2023 at 05:40:52PM -0300, Fabio Estevam wrote:
-> > > From: Fabio Estevam <festevam@denx.de>
-> > > 
-> > > The property 'phy-connection-type' can also be used to describe
-> > > the interface type between the Ethernet device and the Ethernet PHY
-> > > device.
-> > > 
-> > > Mark 'phy-mode' as a non required property.
-> > 
-> > Hi Fabio
-> > 
-> > What does the driver actually require? Will it error out if neither is
-> > provided?
-> > 
-> > Maybe we should be changing the condition that one or the other is
-> > required?
+On 11/13/23 10:34 AM, Stephen Hemminger wrote:
+> On Mon, 13 Nov 2023 04:23:23 +0100
+> Daniel Borkmann <daniel@iogearbox.net> wrote:
+> 
+>> +	if (tb[IFLA_NETKIT_POLICY]) {
+>> +		__u32 policy = rta_getattr_u32(tb[IFLA_NETKIT_POLICY]);
+>> +		const char *policy_str =
+>> +			policy == NETKIT_PASS ? "forward" :
+>> +			policy == NETKIT_DROP ? "blackhole" : "unknown";
+>> +
+> 
+> If you plan to add more modes in future, a table or helper would be good idea.
+> 
 
-Hi Florian
-
- 
-> 'phy-connection-type' is the deprecated version of 'phy-mode'
-
-I thought that too, but
-Documentation/devicetree/bindings/net/ethernet-controller.yaml does
-not mark it deprecated.
-
-The original .txt file has a different wording:
-
-- phy-mode: string, operation mode of the PHY interface. This is now a de-facto
-  standard property; supported values are:
-  * "internal" (Internal means there is not a standard bus between the MAC and
-     the PHY, something proprietary is being used to embed the PHY in the MAC.)
-  * "mii"
-  * "gmii"
-
-- phy-connection-type: the same as "phy-mode" property but described in the
-  Devicetree Specification;
-
-So it could technically be we cannot deprecate phy-connection-type
-because it is part of the standard, and we need to accept it.
-
-> which
-> of_get_phy_mode() will fall back to if 'phy-mode' is not provided. It does
-> not appear that stmmac attempts to use anything other than of_get_phy_mode()
-> therefore would not it be acceptable to update the relevant .dts file such
-> that it uses 'phy-mode'?
-
-Using phy-mode would be more consistent, since its used > 10x more
-than phy-connection-type.
-
-     Andrew
+I would prefer a table driven approach through a helper than the
+multi-line logic here.
 
