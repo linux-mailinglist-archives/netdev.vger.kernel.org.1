@@ -1,110 +1,107 @@
-Return-Path: <netdev+bounces-47401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214C77EA174
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:44:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2384C7EA190
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B46251F21D44
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 16:44:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7268EB2089F
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 16:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145AE2232E;
-	Mon, 13 Nov 2023 16:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8911420B38;
+	Mon, 13 Nov 2023 16:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="DUKo/RSm"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="tbZSuFmy"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DC52031F
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:44:46 +0000 (UTC)
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE8111727
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:44:42 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9d0b4dfd60dso707519466b.1
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:44:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1699893881; x=1700498681; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VgsY0E8FO3fh5yKJiKNC1hyDJiyScrO0HTp/YO5tOjU=;
-        b=DUKo/RSmF8kOxE+ZYaIDKkaXxvtY+UcA38o0w6vB//2tl919EmHNwV15iNoGAJcme6
-         89ChQLuRg7UaPvvs2lpYuq4zxjfOZKKEZtdufHCFoqefY8yTtr+dKvjrVgvdhBIXSeSc
-         Oe6whMg3EAmYyhtNTzM6xMy1ZpaKtIPC+i99ivXZTFARfoS43kduw8157/3p/5tMnJ9C
-         D+fv0QyKsgTSf58p+JZdhvSepPZHWDsqSD5F3DzxOLPYZzkejShkCKqVJ4ZN8aCk53YL
-         nJBjFurnUPUg4mLh25deTCx92EiIu+xirhyQfY1Ex6AZe/9/wRK6i4Gkvw3pk+5RT4/G
-         MnPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699893881; x=1700498681;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VgsY0E8FO3fh5yKJiKNC1hyDJiyScrO0HTp/YO5tOjU=;
-        b=TnMSEC3Fu3NmDPBX7zN0c9ZC8jhsImbzD9e4odyFLxQJttxOCAag+ceFaFe1qYsH93
-         5d7pLuytFsM/TJigJ4dfgbVvOHPwxYW8dSX24rjGNA8hMi12+ZwzXJbAEQeDTrznYkzZ
-         2fp29hEY3SHJoDuSyImVaSvHaW5nGjY43+7jGvgiDTU6SN1XhO1TQyQcs+/D+aq3ZHve
-         +gWCZVrV7dXQAwHcOQ+i7QfQF2Pu29OGjKKrM49bxxvfGPQlN7Sj51CgGO+TFNC16NO3
-         osV0OUXRIqaHcA4W8/vDW1+HOSG9Pr0+n1IE4UztKrpCmPI/NuhKo4IFX0P95IrcHlrc
-         CU1A==
-X-Gm-Message-State: AOJu0YwCj205S9taz0+6LeN2I1OTzxBVAsG3D99ZnGgWrnkDvzyFS3yo
-	7Kdo9oaDd3jXdeYCaEbxrzfk3w==
-X-Google-Smtp-Source: AGHT+IF0/oq07H15BhIrlnU5Chnldqw+Vlb5lrdFsjiIO9ZdYJfOokY0kiWvYGP1pBxv+wB9RKx4jQ==
-X-Received: by 2002:a17:906:34cc:b0:9e0:2319:16f2 with SMTP id h12-20020a17090634cc00b009e0231916f2mr5174214ejb.43.1699893881309;
-        Mon, 13 Nov 2023 08:44:41 -0800 (PST)
-Received: from sleipner.berto.se (p54ac5f7d.dip0.t-ipconnect.de. [84.172.95.125])
-        by smtp.googlemail.com with ESMTPSA id y26-20020a170906471a00b009dd8debf9d8sm4262334ejq.157.2023.11.13.08.44.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 08:44:40 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Prasanna Vengateshan <prasanna.vengateshan@microchip.com>,
-	devicetree@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [PATCH] dt-bindings: net: ethernet-controller: Fix formatting error
-Date: Mon, 13 Nov 2023 17:44:12 +0100
-Message-ID: <20231113164412.945365-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.42.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E28D22309
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:57:31 +0000 (UTC)
+X-Greylist: delayed 408 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 13 Nov 2023 08:57:31 PST
+Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 150C9D59
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:57:31 -0800 (PST)
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id E20D5C0000F8;
+	Mon, 13 Nov 2023 08:50:41 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com E20D5C0000F8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1699894241;
+	bh=9tYcZbeteCSzUeb5BAfg8kvTY0sU1YEKvYdln3CCNik=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tbZSuFmytvRL6cUeBvX0cXJNotWkz40/rESxo0FWqj9EUBDiEM2lFh2GulcVak1tJ
+	 RGqKRJexXnPVvp0GsVV6SbAnelsfRJGAHpe4b0TaV6GBWYlz8sSo+LrgtxOLY5XeCG
+	 u4tUECbOFHwaBQHMtRDlozFAYBOLljjmNikPev9o=
+Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 8836A18041CAC4;
+	Mon, 13 Nov 2023 08:50:40 -0800 (PST)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net-next] net: dsa: tag_rtl4_a: Use existing ETH_P_REALTEK constant
+Date: Mon, 13 Nov 2023 08:50:30 -0800
+Message-Id: <20231113165030.2440083-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-When moving the *-internal-delay-ps properties to only apply for RGMII
-interface modes there where a typo in the text formatting.
+No functional change, uses the existing ETH_P_REALTEK constant already
+defined in if_ether.h.
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
 ---
- .../devicetree/bindings/net/ethernet-controller.yaml          | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/dsa/tag_rtl4_a.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-index 9f6a5ccbcefe..d14d123ad7a0 100644
---- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-@@ -275,12 +275,12 @@ allOf:
-       properties:
-         rx-internal-delay-ps:
-           description:
--            RGMII Receive Clock Delay defined in pico seconds.This is used for
-+            RGMII Receive Clock Delay defined in pico seconds. This is used for
-             controllers that have configurable RX internal delays. If this
-             property is present then the MAC applies the RX delay.
-         tx-internal-delay-ps:
-           description:
--            RGMII Transmit Clock Delay defined in pico seconds.This is used for
-+            RGMII Transmit Clock Delay defined in pico seconds. This is used for
-             controllers that have configurable TX internal delays. If this
-             property is present then the MAC applies the TX delay.
+diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
+index 4da5bad1a7aa..a019226ec6d2 100644
+--- a/net/dsa/tag_rtl4_a.c
++++ b/net/dsa/tag_rtl4_a.c
+@@ -23,7 +23,6 @@
+ #define RTL4_A_NAME		"rtl4a"
  
+ #define RTL4_A_HDR_LEN		4
+-#define RTL4_A_ETHERTYPE	0x8899
+ #define RTL4_A_PROTOCOL_SHIFT	12
+ /*
+  * 0x1 = Realtek Remote Control protocol (RRCP)
+@@ -54,7 +53,7 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
+ 
+ 	/* Set Ethertype */
+ 	p = (__be16 *)tag;
+-	*p = htons(RTL4_A_ETHERTYPE);
++	*p = htons(ETH_P_REALTEK);
+ 
+ 	out = (RTL4_A_PROTOCOL_RTL8366RB << RTL4_A_PROTOCOL_SHIFT);
+ 	/* The lower bits indicate the port number */
+@@ -82,7 +81,7 @@ static struct sk_buff *rtl4a_tag_rcv(struct sk_buff *skb,
+ 	tag = dsa_etype_header_pos_rx(skb);
+ 	p = (__be16 *)tag;
+ 	etype = ntohs(*p);
+-	if (etype != RTL4_A_ETHERTYPE) {
++	if (etype != ETH_P_REALTEK) {
+ 		/* Not custom, just pass through */
+ 		netdev_dbg(dev, "non-realtek ethertype 0x%04x\n", etype);
+ 		return skb;
 -- 
-2.42.1
+2.34.1
 
 
