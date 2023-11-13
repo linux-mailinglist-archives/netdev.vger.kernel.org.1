@@ -1,107 +1,226 @@
-Return-Path: <netdev+bounces-47402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2384C7EA190
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:57:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA447EA19E
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 18:03:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7268EB2089F
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 16:57:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0BD5280DD1
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8911420B38;
-	Mon, 13 Nov 2023 16:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEDF224CC;
+	Mon, 13 Nov 2023 17:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="tbZSuFmy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BvRTT1j5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E28D22309
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:57:31 +0000 (UTC)
-X-Greylist: delayed 408 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 13 Nov 2023 08:57:31 PST
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 150C9D59
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:57:31 -0800 (PST)
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id E20D5C0000F8;
-	Mon, 13 Nov 2023 08:50:41 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com E20D5C0000F8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1699894241;
-	bh=9tYcZbeteCSzUeb5BAfg8kvTY0sU1YEKvYdln3CCNik=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tbZSuFmytvRL6cUeBvX0cXJNotWkz40/rESxo0FWqj9EUBDiEM2lFh2GulcVak1tJ
-	 RGqKRJexXnPVvp0GsVV6SbAnelsfRJGAHpe4b0TaV6GBWYlz8sSo+LrgtxOLY5XeCG
-	 u4tUECbOFHwaBQHMtRDlozFAYBOLljjmNikPev9o=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 8836A18041CAC4;
-	Mon, 13 Nov 2023 08:50:40 -0800 (PST)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: dsa: tag_rtl4_a: Use existing ETH_P_REALTEK constant
-Date: Mon, 13 Nov 2023 08:50:30 -0800
-Message-Id: <20231113165030.2440083-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3F12233A
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 17:02:57 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21B85173C
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 09:02:51 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5b0e9c78309so66008737b3.1
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 09:02:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699894970; x=1700499770; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PAJhDBnKSX8hMywTnbhs2D/NpNn8H7rbhedPkq9pcUg=;
+        b=BvRTT1j5XCFMVASLP/RQAgdSITod8DqLjDYV9mm52u4rnVplYyNZVOdqpnDunLG45n
+         bfyqzN50sS0rlqAObD1t9cduOcoZtzEbQk5YRkFLGgToFzycR8Wh+SztV2nGQCB9prUv
+         Ha7zeTpPgp83tuG3Q5yVhkcpwP6S0CEncoGT6s08PmrwMyerd0fBMGlhd2o+kYLm4V6H
+         3f7qPJujy4bzl/jVcBBtmyGB1Q9a2pJe3y9kasQrMjTWcCutEEmnZtar3zsRbjUTg30M
+         69kwK9RZ+oUUVxI1YZmyRVRieTD0z4o7q46t9dXAMgxtOmsdVOLHXXvsM598lO+xzd43
+         nLMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699894970; x=1700499770;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PAJhDBnKSX8hMywTnbhs2D/NpNn8H7rbhedPkq9pcUg=;
+        b=p0I+HZqjGyKWuUL02/HmegD9GpBJFm1Ig/GvVGPH/WWftOf0Q9qnJ196zYCxtc2Yr2
+         DnWR0g3Ww7zqgiLPacXHBY7O+Z2JUNEaryhfedshraLlMUAbZiuh/IcPBc0dQN0xWjSa
+         kE05DWhNLyi/cOGVuyPCzTVGnOsp3u0+dFsTip6wZ86CfPiNLHQAdqZmtxA4u6B2dyjZ
+         6ToZYonC45hwp4LL3FLI7h9MrmV5ZS65+Tim73s1r8L7wvUck4ahbjZKk9k1etTA0n2X
+         CHlahjOtHkIBbhSIgqvd8ISBE6wOfDMrvX3Pzguok51WDlL/I316pSlNpldvJYmia313
+         9KgQ==
+X-Gm-Message-State: AOJu0Yz8BzrM2252iSoVfEofayfPLv0YQD6KlnypWObUB45TscxWJd5S
+	SM3R+eWRqxfAU5QiBhr51+pB1F8=
+X-Google-Smtp-Source: AGHT+IFZlJzNBRz95LZBqclb+YjjBicOGP4YIjHzDU2LitrspIlAvgFGBM0RoSZXrWON7epmyCoFpU4=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:690c:a9d:b0:5c1:47e1:fb45 with SMTP id
+ ci29-20020a05690c0a9d00b005c147e1fb45mr172083ywb.0.1699894970352; Mon, 13 Nov
+ 2023 09:02:50 -0800 (PST)
+Date: Mon, 13 Nov 2023 09:02:48 -0800
+In-Reply-To: <2ed17b27-f211-4f58-95b5-5a71914264f3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20231102225837.1141915-1-sdf@google.com> <20231102225837.1141915-3-sdf@google.com>
+ <c9bfe356-1942-4e49-b025-115faeec39dd@kernel.org> <CAKH8qBtiv8ArtbbMW9+c75y+NfkX-Tk-rcPuHBVdKDMmmFdtdA@mail.gmail.com>
+ <2ed17b27-f211-4f58-95b5-5a71914264f3@kernel.org>
+Message-ID: <ZVJWuB4qtWfC-W_h@google.com>
+Subject: Re: [PATCH bpf-next v5 02/13] xsk: Add TX timestamp and TX checksum
+ offload support
+From: Stanislav Fomichev <sdf@google.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
+	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
+	maciej.fijalkowski@intel.com, yoong.siang.song@intel.com, 
+	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-No functional change, uses the existing ETH_P_REALTEK constant already
-defined in if_ether.h.
+On 11/13, Jesper Dangaard Brouer wrote:
+>=20
+>=20
+> On 11/13/23 15:10, Stanislav Fomichev wrote:
+> > On Mon, Nov 13, 2023 at 5:16=E2=80=AFAM Jesper Dangaard Brouer <hawk@ke=
+rnel.org> wrote:
+> > >=20
+> > >=20
+> > > On 11/2/23 23:58, Stanislav Fomichev wrote:
+> > > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xd=
+p.h
+> > > > index 2ecf79282c26..b0ee7ad19b51 100644
+> > > > --- a/include/uapi/linux/if_xdp.h
+> > > > +++ b/include/uapi/linux/if_xdp.h
+> > > > @@ -106,6 +106,41 @@ struct xdp_options {
+> > > >    #define XSK_UNALIGNED_BUF_ADDR_MASK \
+> > > >        ((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
+> > > >=20
+> > > > +/* Request transmit timestamp. Upon completion, put it into tx_tim=
+estamp
+> > > > + * field of struct xsk_tx_metadata.
+> > > > + */
+> > > > +#define XDP_TXMD_FLAGS_TIMESTAMP             (1 << 0)
+> > > > +
+> > > > +/* Request transmit checksum offload. Checksum start position and =
+offset
+> > > > + * are communicated via csum_start and csum_offset fields of struc=
+t
+> > > > + * xsk_tx_metadata.
+> > > > + */
+> > > > +#define XDP_TXMD_FLAGS_CHECKSUM                      (1 << 1)
+> > > > +
+> > > > +/* AF_XDP offloads request. 'request' union member is consumed by =
+the driver
+> > > > + * when the packet is being transmitted. 'completion' union member=
+ is
+> > > > + * filled by the driver when the transmit completion arrives.
+> > > > + */
+> > > > +struct xsk_tx_metadata {
+> > > > +     union {
+> > > > +             struct {
+> > > > +                     __u32 flags;
+> > > > +
+> > > > +                     /* XDP_TXMD_FLAGS_CHECKSUM */
+> > > > +
+> > > > +                     /* Offset from desc->addr where checksumming =
+should start. */
+> > > > +                     __u16 csum_start;
+> > > > +                     /* Offset from csum_start where checksum shou=
+ld be stored. */
+> > > > +                     __u16 csum_offset;
+> > > > +             } request;
+> > > > +
+> > > > +             struct {
+> > > > +                     /* XDP_TXMD_FLAGS_TIMESTAMP */
+> > > > +                     __u64 tx_timestamp;
+> > > > +             } completion;
+> > > > +     };
+> > > > +};
+> > >=20
+> > > This looks wrong to me. It looks like member @flags is not avail at
+> > > completion time.  At completion time, I assume we also want to know i=
+f
+> > > someone requested to get the timestamp for this packet (else we could
+> > > read garbage).
+> >=20
+> > I've moved the parts that are preserved across tx and tx completion
+> > into xsk_tx_metadata_compl.
+> > This is to address Magnus/Maciej feedback where userspace might race
+> > with the kernel.
+> > See: https://lore.kernel.org/bpf/ZNoJenzKXW5QSR3E@boxer/
+> >=20
+>=20
+> Does this mean that every driver have to extend their TX-desc ring with
+> sizeof(struct xsk_tx_metadata_compl)?
+> Won't this affect the performance of this V5?
 
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- net/dsa/tag_rtl4_a.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Yes, but it doesn't have to be a descriptor. Might be some internal
+driver completion queue (as in the case of mlx5). And definitely does
+affect performance :-( (see all the static branches to disable it)
+=20
+>  $ pahole -C xsk_tx_metadata_compl
+> ./drivers/net/ethernet/stmicro/stmmac/stmmac.ko
+>  struct xsk_tx_metadata_compl {
+> 	__u64 *              tx_timestamp;         /*     0     8 */
+>=20
+> 	/* size: 8, cachelines: 1, members: 1 */
+> 	/* last cacheline: 8 bytes */
+>  };
+>=20
+> Guess, I must be misunderstanding, as I was expecting to see the @flags
+> member being preserved across, as I get the race there.
+>
+> Looking at stmmac driver, it does look like this xsk_tx_metadata_compl
+> is part of the TX-ring for completion (tx_skbuff_dma) and the
+> tx_timestamp data is getting stored here.  How is userspace AF_XDP
+> application getting access to the tx_timestamp data?
+> I though this was suppose to get stored in metadata data area (umem)?
+>
+> Also looking at the code, the kernel would not have a "crash" race on
+> the flags member (if we preserve in struct), because the code checks the
+> driver HW-TS config-state + TX-descriptor for the availability of a
+> HW-TS in the descriptor.
 
-diff --git a/net/dsa/tag_rtl4_a.c b/net/dsa/tag_rtl4_a.c
-index 4da5bad1a7aa..a019226ec6d2 100644
---- a/net/dsa/tag_rtl4_a.c
-+++ b/net/dsa/tag_rtl4_a.c
-@@ -23,7 +23,6 @@
- #define RTL4_A_NAME		"rtl4a"
- 
- #define RTL4_A_HDR_LEN		4
--#define RTL4_A_ETHERTYPE	0x8899
- #define RTL4_A_PROTOCOL_SHIFT	12
- /*
-  * 0x1 = Realtek Remote Control protocol (RRCP)
-@@ -54,7 +53,7 @@ static struct sk_buff *rtl4a_tag_xmit(struct sk_buff *skb,
- 
- 	/* Set Ethertype */
- 	p = (__be16 *)tag;
--	*p = htons(RTL4_A_ETHERTYPE);
-+	*p = htons(ETH_P_REALTEK);
- 
- 	out = (RTL4_A_PROTOCOL_RTL8366RB << RTL4_A_PROTOCOL_SHIFT);
- 	/* The lower bits indicate the port number */
-@@ -82,7 +81,7 @@ static struct sk_buff *rtl4a_tag_rcv(struct sk_buff *skb,
- 	tag = dsa_etype_header_pos_rx(skb);
- 	p = (__be16 *)tag;
- 	etype = ntohs(*p);
--	if (etype != RTL4_A_ETHERTYPE) {
-+	if (etype != ETH_P_REALTEK) {
- 		/* Not custom, just pass through */
- 		netdev_dbg(dev, "non-realtek ethertype 0x%04x\n", etype);
- 		return skb;
--- 
-2.34.1
+xsk_tx_metadata_compl stores a pointer to the completion timestamp
+in the umem, so everything still arrives via the metadata area.
 
+We want to make sure the flags are not changing across tx and tx completion=
+.
+Instead of saving the flags, we just use that xsk_tx_metadata_compl to
+signal to the completion that "I know that I've requested the tx
+completion timestamp, please put it at this address in umem".
+
+I store the pointer instead of flags to avoid doing pointer math again
+at completion. But it's an implementation detail and somewhat abstracted
+from the drivers (besides the fact that it's probably has to fit in 8
+bytes).
+
+> > > Another thing (I've raised this before): It would be really practical=
+ to
+> > > store an u64 opaque value at TX and then read it at Completion time.
+> > > One use-case is a forwarding application storing HW RX-time and
+> > > comparing this to TX completion time to deduce the time spend process=
+ing
+> > > the packet.
+> >=20
+> > This can be another member, right? But note that extending
+> > xsk_tx_metadata_compl might be a bit complicated because drivers have
+> > to carry this info somewhere. So we have to balance the amount of
+> > passed data between the tx and the completion.
+>=20
+> I don't think my opaque value proposal is subject to same race problem.
+> I think this can be stores in metadata area and across tx and tx
+> completion, because any race on a flags change is the userspace
+> programmers problem, as it cannot cause any kernel crash (given kernel
+> have no need to read this).
+
+Thinking about it, I don't think this needs any special handing?
+You can request sizeof(struct xsk_tx_metadata) + sizeof(opaque data)
+as metadata. The kernel won't touch the 'opaque data' part. Or am I missing
+something?
 
