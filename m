@@ -1,281 +1,156 @@
-Return-Path: <netdev+bounces-47376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 458CF7E9DC4
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:49:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E2C97E9E01
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 15:01:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D93321F212D4
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:49:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98C771C2086A
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3965720325;
-	Mon, 13 Nov 2023 13:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857AD20B1D;
+	Mon, 13 Nov 2023 14:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DX6Phu0e"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ca7hg33M"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8427D1C2B5
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:49:43 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C9BF1731
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:49:41 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a90d6ab944so64364797b3.2
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:49:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699883380; x=1700488180; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=v3FV+/eNR7SjLuuxWSMis2rPcjHX+CtfLa59tHahMlE=;
-        b=DX6Phu0eJ2xilDu73sJwb9qQzM2StGHSJKQ97KKWUP0jeIwniSQ3a0DabNuijcLUBM
-         60kMF5mf3nSuGgeUXsWB74GAdRTAhjd9UCYdOY9+4bx7II+LWOAVOow2CVoI441QrwZP
-         aTbA+fQMuV3ciZ+lUCT7UyXlodTuPwYvnEdv2gZVuB8gc59VDTPJtUOQ5uKNpprMSiJs
-         IB9DD3XKj91NF7pHCz0LwBEGQmx34y9AI0UsNEV9bb5SX4A2U7Zx9FBwxF+e2JfHRgEf
-         4ugbXhbjAfyvooHUBX+tpsivES7pE7x7Ci34yYlflwlm0EENJAFaijoaCAHJeUbhT9p6
-         oUHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699883380; x=1700488180;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=v3FV+/eNR7SjLuuxWSMis2rPcjHX+CtfLa59tHahMlE=;
-        b=VJ7Ix0/MDUmKIZ41T2feNVjCqDgB6ggaq2ijo4HmNuMyNgcI4jBu3wh7sbbMS/jJ6j
-         F5NX9A6izvZk/t2VAYXoROzYMIvtI3PlPNIvb70I9ZgX3hD8CN9cz+kHgMsCH5zS+vmt
-         sj500uwjWGX7IWbQZp43homqxDSKMGqfK/9lCW3VENAIXPwedN1teZYLXaJjlvynLlJT
-         f4xsH9knZ971YpgBgoM5ZBHpGk36a/QBjI3wAsHM0Tq1NizPnMn8GseYS9glP4PSZJUQ
-         /A5tYllBse2Wa6ebPrLdjO5z6hASw2x3FgMY3EVm823Yn0umHnoco7CVjrvwnfrzWvDc
-         TsSg==
-X-Gm-Message-State: AOJu0YwKSHjg+Wu/OdiDoaVERn5D11YQ51l4lZmllk4yq5sXk4CBM201
-	eshw59debpwCTGv9jyGbmJWSA4S3jtfPwg==
-X-Google-Smtp-Source: AGHT+IHzZvmn48UEgG5fk/L1DgN2z6TenB+WiN66r/8LIRXzTaAMrlJkzplwTWPDUpj7Pi3w4w8FmmMvOywLbw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d6c5:0:b0:daf:d9a1:ef48 with SMTP id
- n188-20020a25d6c5000000b00dafd9a1ef48mr20061ybg.9.1699883380663; Mon, 13 Nov
- 2023 05:49:40 -0800 (PST)
-Date: Mon, 13 Nov 2023 13:49:38 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E255208A7
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 14:01:32 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2050.outbound.protection.outlook.com [40.107.244.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC994D63
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 06:01:30 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MlSnEMM6h9POTXnfMpgs4qfh+soqMHP0I3+p4koPVDjbK9jXossz4MXIJjUAmbEcwEX81orpLXqq76rEO1TgKRW6B4hStNg+E7H2d/Cw8m6QpnI48+54s+HnANqkRzW3UaT1HgwjlqnjxndMNF1awLofQT6Iz7EKNujgE1uUp8NrlPlFUJvjsYdA3ZGm3zrAQ4nwVxielbXqkrD3wznAksWRDOw3BErgqOp2dn97aXKbLK0179VoqfNa2s8VXL08ba1JEnTpl1uqi5oA5zmXGLOtU29tHSHIZ37S1eXvAVwpuq6hgzL2ShLSwo1Bp2S6PlDnNbQcDpksiF6ac8FJKA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Od31lEac9VCVNzHjVhIHt6EqpbYR03b/zaMD3chUQw8=;
+ b=MyRMqp+xm1g4Rced6rSo8J68jKQmjlp2lBweCP1d5+dIufFc7lSQflebq8lqoJyBlTlFFDHDjFuyhc4p42YidYhmaI9GHBNUQFdQynQjYYMgvzoebtofmh1GlJe1T5QwfrdKiBlBaHFCK6J0H8VieRcB5enxSMN04duJs98x3cfK0FsoBfPa081+1vvWRFovsXsQx174cRRiLmmLcsuQQm6DEge3WWz0AvIlZLybYGvg1y80eTdRyw3KOPDDmLf1b57ZDlpdSFZuwX00XrtAnTQV7KJ6fY0RUWzaTvbgCLXkWCfxyZ2UHx9SLzLzvrmBwSQ/+nB0EEoBivy6EVkbXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Od31lEac9VCVNzHjVhIHt6EqpbYR03b/zaMD3chUQw8=;
+ b=Ca7hg33M4j4EFx1UFvgwy9D0AaIT0TaiQjMN3UwCLfXP/kUCmehg3qSQxtczy3clzzuoXHnqQ1UgQohu89ACSqIcWdyCCdJtYEwEb6ck42hX3dlmosC5LDhiCOTfLtSNAw8y8SwhKL7KOpYRTWLSmoz/zVDAdfwauXTjYgm451kYDnjE/tj8fMIBd7z8cLi7eRmKqpAKba3WyndIPh3Ykg/cfiM7l0yNe5f3qIGt24hCrsqOlisRlwNg9wmh1EMF8Hz6q2AC9XgnUs9rf541SLQp7+RvF7HFeHBwJxXGb8eykh7KhnftM9D2td1ShOHOJqpCnPUGX0+utvdbHY8y5w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
+ PH7PR12MB6955.namprd12.prod.outlook.com (2603:10b6:510:1b8::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6977.29; Mon, 13 Nov 2023 14:01:28 +0000
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::8cde:e637:db89:eae6]) by DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::8cde:e637:db89:eae6%5]) with mapi id 15.20.6977.029; Mon, 13 Nov 2023
+ 14:01:27 +0000
+Message-ID: <dc40af68-80a2-4821-b674-12462086973b@nvidia.com>
+Date: Mon, 13 Nov 2023 16:01:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: Fix undefined behavior in netdev name allocation
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, netdev@vger.kernel.org, Vlad Buslov <vladbu@nvidia.com>
+References: <20231113083544.1685919-1-gal@nvidia.com>
+ <20231113095333.GM705326@kernel.org>
+Content-Language: en-US
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <20231113095333.GM705326@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0189.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a::33) To DS7PR12MB6288.namprd12.prod.outlook.com
+ (2603:10b6:8:93::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231113134938.168151-1-edumazet@google.com>
-Subject: [PATCH net] af_unix: fix use-after-free in unix_stream_read_actor()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+7a2d546fa43e49315ed3@syzkaller.appspotmail.com, 
-	Rao Shoaib <rao.shoaib@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|PH7PR12MB6955:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71f71a23-c9a0-4393-0d66-08dbe4510763
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Bl74UvQZ4E8zKiQwRXNIPvVJiZ5DZnzw/CVjoiaNVJ7yGhGpARMprNDtJ0IVr6f48gYVNwrXPUCrpri2n5rBPOPBnr5qGBVjOLn+7pmj9sreuTdc/0Om3QZYQQrTRGYchGssQQV198PPvrkzg1/hIoi46ON+WvCKkWTTTphIJylR5APwtQZ0wMxT9Hx07QzRHGAwmslqfeQOMdL3QANBjp7Fbh4eLYn6HCvAQ5jZPZRt+PgoWmuUtjrdK64FvcppzDF19HqvqRjYoYeDIoK1gNKAlJwwUOpVhk3ILzj5401ykPlmHTRxNXeGrJFhPvnophjn4qr4oYyM+HDpCsBzsVN6darRWjsDwtaJu5pIsuekQYCn7GZdmNY0p/HxEyJMxL1LYs9lAUopdwcFUgDGCovUKpQIvWRASOKrSJPA5/KXW6uJuveehyZaJpmbCi3iRWNqPPSNviOCZw1rfwxxMNFIXxvjrzgjzSWIBsLDuZU9m2qhy5Dj9txc86DfxCbS9pqGrQjYL6SkmQivcjY76sSaJrgOs3MxNBBsvAxq3dBw1oS0RLHfh9i6a5fCrDTVPZhE5cfAoGYlWir7X6ds4ptHweVsK89wqevPlw8JCFDPms3v+C3xsw0FAVaDYYJKq2mdDG1yEx6RoQzkxg5n5g==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(376002)(366004)(396003)(136003)(39850400004)(230922051799003)(1800799009)(451199024)(186009)(64100799003)(26005)(107886003)(53546011)(6506007)(6666004)(2616005)(6512007)(5660300002)(8676002)(8936002)(41300700001)(4326008)(4744005)(2906002)(6486002)(478600001)(6916009)(54906003)(66556008)(66946007)(66476007)(316002)(31696002)(36756003)(86362001)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?U2RvcjVKNUVicFRBOFNQYVZxS1hwRC85SktCOGRRRU02UGxHYUVDcmFQcjBx?=
+ =?utf-8?B?SGUwVDFEMDVpUUxpSXcwd0pYZjN5UWtaQ0x5Z2tnWlJVckJkazVRSmtIQTJw?=
+ =?utf-8?B?SkhrM3ZCZ1d0eTR0RnVsd0kvc05jM0szby9UT0h4cmpkUlo2YkdpdXJITmVh?=
+ =?utf-8?B?WGNjYitNbW9KZWNXUC8vdlNrWmVIWmcwMCt5d0cvd2VVamlQb3l4QWFwdEps?=
+ =?utf-8?B?WVR1NnVOUnA1aTdqRVRQSmMwak1GSTJGL2ZqMTFLcG11MTc0TzlFTWVoeXNE?=
+ =?utf-8?B?Q2lzNWJNdTBaZ0E0ZStVTTlZOVh1L1BuN3h6amRaMGJkeWdaUnJaUUExQmlE?=
+ =?utf-8?B?Q204d1dkNVd6NkNlSis1c2R3Y3d5UjhNUjNyRFNDZEpCZGZEUXFlVTFsZ0xS?=
+ =?utf-8?B?Q2lHZ3JPQy9zRGtjQ0lMaVpnZ2dSbEtOVTJFQkJEQ0FOTHErbXNNY3FDQzlw?=
+ =?utf-8?B?VGVnUHRQQWN4MndmK0FWRjlHTUNhSHY1MDJGb0lPVXlEWGFLZ1kwOCs1cW1K?=
+ =?utf-8?B?bVpFNkh0bEpVZEYwVXM1cEpiWFVyWHhTbGoxb3F4eVdCVmVZVUJoWDVEU05a?=
+ =?utf-8?B?MEZacHBVSlc3dmZGaTFtbng0M0lPUHMvbE51eUJmbXR2a25NTTAyU2R4Q2c5?=
+ =?utf-8?B?ekFjdDcvaDJEajJ5SDFqU3BsTmcxZUpIcnlPYVZmVWpHOHV3UG9oSmVyVThv?=
+ =?utf-8?B?RUcrc21vL1g1Q2FvUTRQMHZ5end5TWllWmRLV1BCaFYvNG53NGpkRzRFQ0dh?=
+ =?utf-8?B?VUl0Y2RxeHRqeWViWnZiaFc5ZVl0c0MxbStoakNXV0Z2dlVTckN2ZXNOaW9o?=
+ =?utf-8?B?eDN5TW9xUmpUenNmaEE0RWJTaE5ZaG9LMHZKZ2ZNMUJqajQzd1ZJb2xPZExi?=
+ =?utf-8?B?TUk4VHZlWFRFSnF2eVkxTjlFS25VV0JCbGlpamJ6MmRXN3FEd1hRUjhjaTZ2?=
+ =?utf-8?B?RFFJTlJSR3IyTkZoNjVIWVlzd1BYZGljam9TUFRKUFZrVXRveUxEUTFOcjRx?=
+ =?utf-8?B?dm81MTdIVHZLMnI3Qk9HOWhxWGg5QWtSSStZMXRIMWRwWW5iYzJFSnlJWXlY?=
+ =?utf-8?B?Y1hVSGVtelkzQ0tQVmtxdGsyUzc0YkxMZXl1ODBDVWFSMFNVTGxtR1oyVnJJ?=
+ =?utf-8?B?YS82dVdLdThGemZLaWsySDlHamRoV0kvMVllN05oOXUzc2YrWkN3T0hublFa?=
+ =?utf-8?B?RTFHTUNIMFFkQTB3NWtBNG9UT05oeUpoZ1NMcllGSjhnamp0VUZzUkZzMHJJ?=
+ =?utf-8?B?QnBHVnZOSjk4VjFST0ZjVkRZNkhlTDFxTk5kSytrQzc4UmJyTTFxZ1pNbnVj?=
+ =?utf-8?B?TTdEbWcxT3pPWHo0U250RlVpeHppYW8wTkZkWEFBbHI1Nk53MnpnY2cwd3da?=
+ =?utf-8?B?R3o5d3c5UEJLRUdkYUVnVVl5RkwvcHVVeGlDZ3lYTjM3Nm9UUUFGWTFUbmZw?=
+ =?utf-8?B?NFVmL3FCMldaVGVZaTduajU5M1lib1RQbkUxMGp2ZmIwQ2pJZGw2MXZTY0tI?=
+ =?utf-8?B?a1R6RnhhSTRUbTFQRWVRcElpV1NWQmhSeXY4aEhTYlRhWHg4MWRDNy9lekI4?=
+ =?utf-8?B?VjR3S2NZS3dNaDN4dXdJMFNqdVFaczFqdEJheEpheWVvMlo2WkZPQVljejB0?=
+ =?utf-8?B?TXlsN25ac29GK25hR0pmOWZRMjVBZURFZzlZdXQ4Sk5wUHBvdmV0bzZqdDF4?=
+ =?utf-8?B?eVdSc0J4OWpYRG1qNG45OTBxUmdhbjlvTVgzRWh0YnJINU83aXpHTi9EN1ZJ?=
+ =?utf-8?B?ckdjWVRZUHBlQy9IaVhpOG9qQlF6VHRhSC9KSUVUMjhoUDkzOU94ME45Uk9o?=
+ =?utf-8?B?VSs3UGhMU0RLclJTWVVYNG9qYmwwOWxMaGltUVhjY05vcHlRbWd5WFNrNHhN?=
+ =?utf-8?B?SVlTL2RLdW02dkQ2M1ZrNmhiMnRwNm0yWHE5NjRGN2NtSlltVWQyM3oxa0Z2?=
+ =?utf-8?B?cHJpUzNFNjJyYldpT2JCMGdXdU5zbGU0a0trSFFVYmdlYkp2QnpsRU1NajBz?=
+ =?utf-8?B?clhYdkFhMXl1d0ZyUFN2d0VtR0xWWTUrYm9jdDQ5Yjl0Ykh5WnNvdlZ5UW56?=
+ =?utf-8?B?dElyN1hwVXNOcDNLRVBtUS8yeE1hVW82K2U4SjMzMVE2UGtPSHY4MytRdk5z?=
+ =?utf-8?Q?Q5/KrV61w0gzlgXtY3+uZCge8?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71f71a23-c9a0-4393-0d66-08dbe4510763
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2023 14:01:27.3209
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Th5QCDm/l5N7RG5jsHL54+fmeHpSokLGi+6YrHyHgQiUMlcqqNYVShAlBI7N1Iql
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6955
 
-syzbot reported the following crash [1]
+On 13/11/2023 11:53, Simon Horman wrote:
+> On Mon, Nov 13, 2023 at 10:35:44AM +0200, Gal Pressman wrote:
+>> Cited commit removed the strscpy() call and kept the snprintf() only.
+>>
+>> When allocating a netdev, 'res' and 'name' pointers are equal, but
+>> according to POSIX, if copying takes place between objects that overlap
+>> as a result of a call to sprintf() or snprintf(), the results are
+>> undefined.
+>>
+>> Add back the strscpy() and use 'buf' as an intermediate buffer.
+>>
+>> Fixes: 9a810468126c ("net: reduce indentation of __dev_alloc_name()")
+> 
+> Hi Gal,
+> 
+> perhaps my eyes are deceiving me, but I wonder if this fixes the following:
+> 
+>   7ad17b04dc7b ("net: trust the bitmap in __dev_alloc_name()")
 
-After releasing unix socket lock, u->oob_skb can be changed
-by another thread. We must temporarily increase skb refcount
-to make sure this other thread will not free the skb under us.
+Thanks Simon, you're right.
 
-[1]
-
-BUG: KASAN: slab-use-after-free in unix_stream_read_actor+0xa7/0xc0 net/unix/af_unix.c:2866
-Read of size 4 at addr ffff88801f3b9cc4 by task syz-executor107/5297
-
-CPU: 1 PID: 5297 Comm: syz-executor107 Not tainted 6.6.0-syzkaller-15910-gb8e3a87a627b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
-Call Trace:
-<TASK>
-__dump_stack lib/dump_stack.c:88 [inline]
-dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
-print_address_description mm/kasan/report.c:364 [inline]
-print_report+0xc4/0x620 mm/kasan/report.c:475
-kasan_report+0xda/0x110 mm/kasan/report.c:588
-unix_stream_read_actor+0xa7/0xc0 net/unix/af_unix.c:2866
-unix_stream_recv_urg net/unix/af_unix.c:2587 [inline]
-unix_stream_read_generic+0x19a5/0x2480 net/unix/af_unix.c:2666
-unix_stream_recvmsg+0x189/0x1b0 net/unix/af_unix.c:2903
-sock_recvmsg_nosec net/socket.c:1044 [inline]
-sock_recvmsg+0xe2/0x170 net/socket.c:1066
-____sys_recvmsg+0x21f/0x5c0 net/socket.c:2803
-___sys_recvmsg+0x115/0x1a0 net/socket.c:2845
-__sys_recvmsg+0x114/0x1e0 net/socket.c:2875
-do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fc67492c559
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc6748ab228 EFLAGS: 00000246 ORIG_RAX: 000000000000002f
-RAX: ffffffffffffffda RBX: 000000000000001c RCX: 00007fc67492c559
-RDX: 0000000040010083 RSI: 0000000020000140 RDI: 0000000000000004
-RBP: 00007fc6749b6348 R08: 00007fc6748ab6c0 R09: 00007fc6748ab6c0
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fc6749b6340
-R13: 00007fc6749b634c R14: 00007ffe9fac52a0 R15: 00007ffe9fac5388
-</TASK>
-
-Allocated by task 5295:
-kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
-kasan_set_track+0x25/0x30 mm/kasan/common.c:52
-__kasan_slab_alloc+0x81/0x90 mm/kasan/common.c:328
-kasan_slab_alloc include/linux/kasan.h:188 [inline]
-slab_post_alloc_hook mm/slab.h:763 [inline]
-slab_alloc_node mm/slub.c:3478 [inline]
-kmem_cache_alloc_node+0x180/0x3c0 mm/slub.c:3523
-__alloc_skb+0x287/0x330 net/core/skbuff.c:641
-alloc_skb include/linux/skbuff.h:1286 [inline]
-alloc_skb_with_frags+0xe4/0x710 net/core/skbuff.c:6331
-sock_alloc_send_pskb+0x7e4/0x970 net/core/sock.c:2780
-sock_alloc_send_skb include/net/sock.h:1884 [inline]
-queue_oob net/unix/af_unix.c:2147 [inline]
-unix_stream_sendmsg+0xb5f/0x10a0 net/unix/af_unix.c:2301
-sock_sendmsg_nosec net/socket.c:730 [inline]
-__sock_sendmsg+0xd5/0x180 net/socket.c:745
-____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
-___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
-__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
-do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Freed by task 5295:
-kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
-kasan_set_track+0x25/0x30 mm/kasan/common.c:52
-kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
-____kasan_slab_free mm/kasan/common.c:236 [inline]
-____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
-kasan_slab_free include/linux/kasan.h:164 [inline]
-slab_free_hook mm/slub.c:1800 [inline]
-slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
-slab_free mm/slub.c:3809 [inline]
-kmem_cache_free+0xf8/0x340 mm/slub.c:3831
-kfree_skbmem+0xef/0x1b0 net/core/skbuff.c:1015
-__kfree_skb net/core/skbuff.c:1073 [inline]
-consume_skb net/core/skbuff.c:1288 [inline]
-consume_skb+0xdf/0x170 net/core/skbuff.c:1282
-queue_oob net/unix/af_unix.c:2178 [inline]
-unix_stream_sendmsg+0xd49/0x10a0 net/unix/af_unix.c:2301
-sock_sendmsg_nosec net/socket.c:730 [inline]
-__sock_sendmsg+0xd5/0x180 net/socket.c:745
-____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
-___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
-__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
-do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-The buggy address belongs to the object at ffff88801f3b9c80
-which belongs to the cache skbuff_head_cache of size 240
-The buggy address is located 68 bytes inside of
-freed 240-byte region [ffff88801f3b9c80, ffff88801f3b9d70)
-
-The buggy address belongs to the physical page:
-page:ffffea00007cee40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1f3b9
-flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffffff()
-raw: 00fff00000000800 ffff888142a60640 dead000000000122 0000000000000000
-raw: 0000000000000000 00000000000c000c 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5299, tgid 5283 (syz-executor107), ts 103803840339, free_ts 103600093431
-set_page_owner include/linux/page_owner.h:31 [inline]
-post_alloc_hook+0x2cf/0x340 mm/page_alloc.c:1537
-prep_new_page mm/page_alloc.c:1544 [inline]
-get_page_from_freelist+0xa25/0x36c0 mm/page_alloc.c:3312
-__alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4568
-alloc_pages_mpol+0x258/0x5f0 mm/mempolicy.c:2133
-alloc_slab_page mm/slub.c:1870 [inline]
-allocate_slab+0x251/0x380 mm/slub.c:2017
-new_slab mm/slub.c:2070 [inline]
-___slab_alloc+0x8c7/0x1580 mm/slub.c:3223
-__slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3322
-__slab_alloc_node mm/slub.c:3375 [inline]
-slab_alloc_node mm/slub.c:3468 [inline]
-kmem_cache_alloc_node+0x132/0x3c0 mm/slub.c:3523
-__alloc_skb+0x287/0x330 net/core/skbuff.c:641
-alloc_skb include/linux/skbuff.h:1286 [inline]
-alloc_skb_with_frags+0xe4/0x710 net/core/skbuff.c:6331
-sock_alloc_send_pskb+0x7e4/0x970 net/core/sock.c:2780
-sock_alloc_send_skb include/net/sock.h:1884 [inline]
-queue_oob net/unix/af_unix.c:2147 [inline]
-unix_stream_sendmsg+0xb5f/0x10a0 net/unix/af_unix.c:2301
-sock_sendmsg_nosec net/socket.c:730 [inline]
-__sock_sendmsg+0xd5/0x180 net/socket.c:745
-____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
-___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
-__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
-page last free stack trace:
-reset_page_owner include/linux/page_owner.h:24 [inline]
-free_pages_prepare mm/page_alloc.c:1137 [inline]
-free_unref_page_prepare+0x4f8/0xa90 mm/page_alloc.c:2347
-free_unref_page+0x33/0x3b0 mm/page_alloc.c:2487
-__unfreeze_partials+0x21d/0x240 mm/slub.c:2655
-qlink_free mm/kasan/quarantine.c:168 [inline]
-qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:187
-kasan_quarantine_reduce+0x18e/0x1d0 mm/kasan/quarantine.c:294
-__kasan_slab_alloc+0x65/0x90 mm/kasan/common.c:305
-kasan_slab_alloc include/linux/kasan.h:188 [inline]
-slab_post_alloc_hook mm/slab.h:763 [inline]
-slab_alloc_node mm/slub.c:3478 [inline]
-slab_alloc mm/slub.c:3486 [inline]
-__kmem_cache_alloc_lru mm/slub.c:3493 [inline]
-kmem_cache_alloc+0x15d/0x380 mm/slub.c:3502
-vm_area_dup+0x21/0x2f0 kernel/fork.c:500
-__split_vma+0x17d/0x1070 mm/mmap.c:2365
-split_vma mm/mmap.c:2437 [inline]
-vma_modify+0x25d/0x450 mm/mmap.c:2472
-vma_modify_flags include/linux/mm.h:3271 [inline]
-mprotect_fixup+0x228/0xc80 mm/mprotect.c:635
-do_mprotect_pkey+0x852/0xd60 mm/mprotect.c:809
-__do_sys_mprotect mm/mprotect.c:830 [inline]
-__se_sys_mprotect mm/mprotect.c:827 [inline]
-__x64_sys_mprotect+0x78/0xb0 mm/mprotect.c:827
-do_syscall_x64 arch/x86/entry/common.c:51 [inline]
-do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
-entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Memory state around the buggy address:
-ffff88801f3b9b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-ffff88801f3b9c00: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
->ffff88801f3b9c80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-^
-ffff88801f3b9d00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
-ffff88801f3b9d80: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
-
-Fixes: 876c14ad014d ("af_unix: fix holding spinlock in oob handling")
-Reported-and-tested-by: syzbot+7a2d546fa43e49315ed3@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Rao Shoaib <rao.shoaib@oracle.com>
----
- net/unix/af_unix.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 45506a95b25f8acdb99699c3c9256f50d0e7e5d0..a357dc5f24046d98674da9935eccbb9e18ea4616 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2581,15 +2581,16 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
- 
- 	if (!(state->flags & MSG_PEEK))
- 		WRITE_ONCE(u->oob_skb, NULL);
--
-+	else
-+		skb_get(oob_skb);
- 	unix_state_unlock(sk);
- 
- 	chunk = state->recv_actor(oob_skb, 0, chunk, state);
- 
--	if (!(state->flags & MSG_PEEK)) {
-+	if (!(state->flags & MSG_PEEK))
- 		UNIXCB(oob_skb).consumed += 1;
--		kfree_skb(oob_skb);
--	}
-+
-+	consume_skb(oob_skb);
- 
- 	mutex_unlock(&u->iolock);
- 
--- 
-2.42.0.869.gea05f2083d-goog
-
+Should I resubmit?
 
