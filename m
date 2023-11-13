@@ -1,54 +1,60 @@
-Return-Path: <netdev+bounces-47417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF757EA247
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 18:44:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124107EA26D
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 18:52:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55C14280E2A
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:44:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF34D1F2202D
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FFF2110E;
-	Mon, 13 Nov 2023 17:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6DB2137E;
+	Mon, 13 Nov 2023 17:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b="H/wQHR+1"
+	dkim=pass (2048-bit key) header.d=spacex.com header.i=@spacex.com header.b="mz296ekG"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E86822EE0
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 17:44:50 +0000 (UTC)
-Received: from mail.tkos.co.il (hours.tkos.co.il [84.110.109.230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EE0210F4
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 09:44:49 -0800 (PST)
-Received: from tarshish.tkos.co.il (unknown [10.0.8.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail.tkos.co.il (Postfix) with ESMTPS id 6DFDA440DAA;
-	Mon, 13 Nov 2023 19:43:46 +0200 (IST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
-	s=default; t=1699897426;
-	bh=MW871yMW+SlH+sDGpXeIRnmhp7FvyDE/Bs/X6DKNx4E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=H/wQHR+1hDaQQLWslaOJmc7rhh4UQOEsvSBm6xncV4LkcJE0taaHd48dcIyyK8K6Y
-	 cljzk9Wak7yG1M94/DgBQ9uzl0a1MLoh65KunPBCAoE2zE7i5dmFLxdtGiZ6dAXDm7
-	 4d+i1F/6GBY/RFG59UKGfWmusxmH77P+fJv4dC+wU9XTkkzaQWV9qZftga54bfGlgn
-	 EIjVtuQnJSeN8iEZ5t2HDELjuAanD4avHyxrg14fvJWHl70+xAjlV5H45TRwPm0j7M
-	 oNMtRKpCh1BVzej4Zv6aWoDLuacog7nPtV+4Crn3ezXrwhvn+Ls/hPHPoM6skxcYRi
-	 kAFeqnj8qcW9A==
-From: Baruch Siach <baruch@tkos.co.il>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	Baruch Siach <baruch@tkos.co.il>
-Subject: [PATCH net-next 2/2] net: stmmac: reduce dma ring display code duplication
-Date: Mon, 13 Nov 2023 19:44:43 +0200
-Message-ID: <fe95e2443cc06bc73a2d3b9851ceb98dfd608551.1699897483.git.baruch@tkos.co.il>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699897483.git.baruch@tkos.co.il>
-References: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699897483.git.baruch@tkos.co.il>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF76225A6
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 17:52:27 +0000 (UTC)
+Received: from mx5.spacex.com (mx5.spacex.com [192.31.242.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B2F510EC;
+	Mon, 13 Nov 2023 09:52:26 -0800 (PST)
+Received: from pps.filterd (mx5.spacex.com [127.0.0.1])
+	by mx5.spacex.com (8.17.1.19/8.17.1.19) with ESMTP id 3ADG7ufB026420;
+	Mon, 13 Nov 2023 09:52:17 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=spacex.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=dkim;
+ bh=OAedADIDq7Yy/leBF8yLvmN9Q5ZHAfPjVXFuK05A8Vc=;
+ b=mz296ekGLs70ZxPAJF0XIvMpdOeHglBRTI+pNcSlk4BrQP6Kr7Iigz1tY1KNi6o+jRRb
+ /noTs+2XV351CMpprXq9xMVadi61hb7AQFoY+qvhHe2zFqb69kmT1w+Xa2Pm9+vBEf7g
+ OqDpvec4eecutQir9Llv3fqzfU3yCQTkB6e0tnZvMJ+dcMwFGMNn01fOFRHR4WdaYlAa
+ SKh1YUoJL1rRAV1qR2+8jTsfP0vCoomdmefdfXxUAGf4WisLB2qihxPE978d9mm3TYRw
+ cY+pciNDAMxHo+dFYjrEFn02l4uAgPsNUvAE3nxeZOTUj3s2Jq94/uk930Ui01cWTM0U QQ== 
+Received: from smtp.spacex.corp ([10.34.3.234])
+	by mx5.spacex.com (PPS) with ESMTPS id 3ua7wsa55f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 13 Nov 2023 09:52:17 -0800
+Received: from apakhunov-z4.spacex.corp (10.1.32.161) by
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 13 Nov 2023 09:52:16 -0800
+From: Alex Pakhunov <alexey.pakhunov@spacex.com>
+To: <andrew@lunn.ch>
+CC: <alexey.pakhunov@spacex.com>, <linux-kernel@vger.kernel.org>,
+        <mchan@broadcom.com>, <netdev@vger.kernel.org>,
+        <prashant@broadcom.com>, <siva.kallam@broadcom.com>,
+        <vincent.wong2@spacex.com>
+Subject: Re: [PATCH v2 1/2] tg3: Move the [rt]x_dropped counters to tg3_napi
+Date: Mon, 13 Nov 2023 09:52:04 -0800
+Message-ID: <20231113175204.4193922-1-alexey.pakhunov@spacex.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <7f1604fd-4bd6-4f16-8aed-2586afac7d15@lunn.ch>
+References: <7f1604fd-4bd6-4f16-8aed-2586afac7d15@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,54 +62,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ht-dc-ex-d4-n2.spacex.corp (10.34.3.240) To
+ HT-DC-EX-D2-N2.spacex.corp (10.34.3.234)
+X-Proofpoint-GUID: _5hxAL3tMxclKqisjqg7aZvMArbTyrld
+X-Proofpoint-ORIG-GUID: _5hxAL3tMxclKqisjqg7aZvMArbTyrld
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 impostorscore=0 malwarescore=0 mlxscore=0 adultscore=0
+ bulkscore=0 clxscore=1011 lowpriorityscore=0 spamscore=0 phishscore=0
+ mlxlogscore=562 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311130147
 
-The code to show extended descriptor is identical to normal one.
-Consolidate the code to remove duplication.
+Hi,
 
-Signed-off-by: Baruch Siach <baruch@tkos.co.il>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 26 +++++++------------
- 1 file changed, 9 insertions(+), 17 deletions(-)
+> Isn't this wrapping artificial? old_stats is of type
+> rtnl_link_stats64, so the counters are 64 bit.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 39336fe5e89d..f39e2bde325f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6184,24 +6184,16 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
- 	struct dma_desc *p = (struct dma_desc *)head;
- 	dma_addr_t dma_addr;
- 
-+	if (extend_desc)
-+		p = &ep->basic;
-+
- 	for (i = 0; i < size; i++) {
--		if (extend_desc) {
--			dma_addr = dma_phy_addr + i * sizeof(*ep);
--			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
--				   i, &dma_addr,
--				   le32_to_cpu(ep->basic.des0),
--				   le32_to_cpu(ep->basic.des1),
--				   le32_to_cpu(ep->basic.des2),
--				   le32_to_cpu(ep->basic.des3));
--			ep++;
--		} else {
--			dma_addr = dma_phy_addr + i * sizeof(*p);
--			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
--				   i, &dma_addr,
--				   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
--				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
--			p++;
--		}
-+		dma_addr = dma_phy_addr + i * sizeof(*p);
-+		seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
-+				i, &dma_addr,
-+				le32_to_cpu(p->des0), le32_to_cpu(p->des1),
-+				le32_to_cpu(p->des2), le32_to_cpu(p->des3));
-+		p++;
- 	}
- }
- 
--- 
-2.42.0
+The wrapping here is needed as long as tnapi->[rt]x_dropped counters are 32
+bit wide. It makes sure the resulting value is correctly wrapped.
+tnapi->[rt]x_dropped counters are 32 bit on 32 bit systems to make sure
+they can be read atomically.
 
+> Why not use include/linux/u64_stats_sync.h, which should cost you
+> nothing on 64 bit machines, and do the right thing on 32 bit machines.
+
+It should be possible to use include/linux/u64_stats_sync.h but it seems
+like overkill in this case. First, we mostly care whether the counters are
+not zero and/or incremening. We typically don't care about the exact value.
+Second, the counters are unlikely to ever reach 4G. Essentially, they are
+incremented on memory allocation failures only meaning that the system need
+to be in a completely wedged state for a very long time for this to happen.
+
+Given the above additional complexity of u64_stats_sync.h does not seem to
+be worth it.
+
+Alex.
 
