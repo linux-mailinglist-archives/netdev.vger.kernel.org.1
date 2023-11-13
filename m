@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-47280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA2A87E95C4
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 04:54:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C907E95C5
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 04:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4978EB20A89
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 03:54:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B36031F211A8
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 03:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1384FDDC8;
-	Mon, 13 Nov 2023 03:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012A91172F;
+	Mon, 13 Nov 2023 03:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B08E882A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776C08F42
 	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 03:54:04 +0000 (UTC)
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8AD14173E
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9272A1980
 	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 19:54:02 -0800 (PST)
 Received: from labnh.int.chopps.org (172-222-091-149.res.spectrum.com [172.222.91.149])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id DC1F27D12A;
-	Mon, 13 Nov 2023 03:54:00 +0000 (UTC)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 40D607D12B;
+	Mon, 13 Nov 2023 03:54:01 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	netdev@vger.kernel.org,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [RFC ipsec-next v2 5/8] iptfs: netlink: add config (netlink) options
-Date: Sun, 12 Nov 2023 22:52:16 -0500
-Message-ID: <20231113035219.920136-6-chopps@chopps.org>
+Subject: [RFC ipsec-next v2 6/8] iptfs: xfrm: Add mode_cbs module functionality
+Date: Sun, 12 Nov 2023 22:52:17 -0500
+Message-ID: <20231113035219.920136-7-chopps@chopps.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231113035219.920136-1-chopps@chopps.org>
 References: <20231113035219.920136-1-chopps@chopps.org>
@@ -50,106 +50,302 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Add netlink options for configuring IP-TFS SAs.
+Add a set of callbacks xfrm_mode_cbs to xfrm_state. These callbacks
+enable the addition of new xfrm modes, such as IP-TFS to be defined
+in modules.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- include/uapi/linux/xfrm.h |  9 ++++++++-
- net/xfrm/xfrm_compat.c    | 10 ++++++++--
- net/xfrm/xfrm_user.c      | 16 ++++++++++++++++
- 3 files changed, 32 insertions(+), 3 deletions(-)
+ include/net/xfrm.h     | 36 ++++++++++++++++++++++++++++++++++++
+ net/xfrm/xfrm_device.c |  3 ++-
+ net/xfrm/xfrm_input.c  | 14 ++++++++++++--
+ net/xfrm/xfrm_output.c |  9 +++++++--
+ net/xfrm/xfrm_policy.c | 18 +++++++++++-------
+ net/xfrm/xfrm_state.c  | 41 +++++++++++++++++++++++++++++++++++++++++
+ net/xfrm/xfrm_user.c   | 10 ++++++++++
+ 7 files changed, 119 insertions(+), 12 deletions(-)
 
-diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
-index 6a77328be114..3e98d45d70a6 100644
---- a/include/uapi/linux/xfrm.h
-+++ b/include/uapi/linux/xfrm.h
-@@ -153,7 +153,8 @@ enum {
- #define XFRM_MODE_ROUTEOPTIMIZATION 2
- #define XFRM_MODE_IN_TRIGGER 3
- #define XFRM_MODE_BEET 4
--#define XFRM_MODE_MAX 5
-+#define XFRM_MODE_IPTFS 5
-+#define XFRM_MODE_MAX 6
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index d2e87344d175..aeeadadc9545 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -204,6 +204,7 @@ struct xfrm_state {
+ 		u16		family;
+ 		xfrm_address_t	saddr;
+ 		int		header_len;
++		int		enc_hdr_len;
+ 		int		trailer_len;
+ 		u32		extra_flags;
+ 		struct xfrm_mark	smark;
+@@ -289,6 +290,9 @@ struct xfrm_state {
+ 	/* Private data of this transformer, format is opaque,
+ 	 * interpreted by xfrm_type methods. */
+ 	void			*data;
++
++	const struct xfrm_mode_cbs	*mode_cbs;
++	void				*mode_data;
+ };
  
- /* Netlink configuration messages.  */
- enum {
-@@ -315,6 +316,12 @@ enum xfrm_attr_type_t {
- 	XFRMA_SET_MARK_MASK,	/* __u32 */
- 	XFRMA_IF_ID,		/* __u32 */
- 	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
-+	XFRMA_IPTFS_PKT_SIZE,	/* __u32 Size of outer packet, 0 for PMTU */
-+	XFRMA_IPTFS_MAX_QSIZE,	/* __u32 max ingress queue size */
-+	XFRMA_IPTFS_DONT_FRAG,	/* don't use fragmentation */
-+	XFRMA_IPTFS_DROP_TIME,	/* __u32 usec to wait for next seq */
-+	XFRMA_IPTFS_REORD_WIN,	/* __u16 reorder window size */
-+	XFRMA_IPTFS_INIT_DELAY,	/* __u32 initial packet wait delay (usec) */
- 	__XFRMA_MAX
+ static inline struct net *xs_net(struct xfrm_state *x)
+@@ -441,6 +445,38 @@ struct xfrm_type_offload {
+ int xfrm_register_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+ void xfrm_unregister_type_offload(const struct xfrm_type_offload *type, unsigned short family);
  
- #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
-diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-index 655fe4ff8621..35b2abf33e54 100644
---- a/net/xfrm/xfrm_compat.c
-+++ b/net/xfrm/xfrm_compat.c
-@@ -277,9 +277,15 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
- 	case XFRMA_SET_MARK_MASK:
- 	case XFRMA_IF_ID:
- 	case XFRMA_MTIMER_THRESH:
-+	case XFRMA_IPTFS_PKT_SIZE:
-+	case XFRMA_IPTFS_MAX_QSIZE:
-+	case XFRMA_IPTFS_DONT_FRAG:
-+	case XFRMA_IPTFS_DROP_TIME:
-+	case XFRMA_IPTFS_REORD_WIN:
-+	case XFRMA_IPTFS_INIT_DELAY:
- 		return xfrm_nla_cpy(dst, src, nla_len(src));
++struct xfrm_mode_cbs {
++	struct module	*owner;
++	/* Add/delete state in the new xfrm_state in `x`. */
++	int	(*create_state)(struct xfrm_state *x);
++	void	(*delete_state)(struct xfrm_state *x);
++
++	/* Called while handling the user netlink options. */
++	int	(*user_init)(struct net *net, struct xfrm_state *x,
++			     struct nlattr **attrs);
++	int	(*copy_to_user)(struct xfrm_state *x, struct sk_buff *skb);
++
++	u32	(*get_inner_mtu)(struct xfrm_state *x, int outer_mtu);
++
++	/* Called to handle received xfrm (egress) packets. */
++	int	(*input)(struct xfrm_state *x, struct sk_buff *skb);
++
++	/* Placed in dst_output of the dst when an xfrm_state is bound. */
++	int	(*output)(struct net *net, struct sock *sk, struct sk_buff *skb);
++
++	/**
++	 * Prepare the skb for output for the given mode. Returns:
++	 *    Error value, if 0 then skb values should be as follows:
++	 *    transport_header should point at ESP header
++	 *    network_header should point at Outer IP header
++	 *    mac_header should point at protocol/nexthdr of the outer IP
++	 */
++	int	(*prepare_output)(struct xfrm_state *x, struct sk_buff *skb);
++};
++
++int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs);
++void xfrm_unregister_mode_cbs(u8 mode);
++
+ static inline int xfrm_af2proto(unsigned int family)
+ {
+ 	switch(family) {
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 3784534c9185..8b848540ea47 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -42,7 +42,8 @@ static void __xfrm_mode_tunnel_prep(struct xfrm_state *x, struct sk_buff *skb,
+ 		skb->transport_header = skb->network_header + hsize;
+ 
+ 	skb_reset_mac_len(skb);
+-	pskb_pull(skb, skb->mac_len + x->props.header_len);
++	pskb_pull(skb,
++		  skb->mac_len + x->props.header_len - x->props.enc_hdr_len);
+ }
+ 
+ static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index bd4ce21d76d7..824f7b7f90e0 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -437,6 +437,9 @@ static int xfrm_inner_mode_input(struct xfrm_state *x,
+ 		WARN_ON_ONCE(1);
+ 		break;
  	default:
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_IPTFS_INIT_DELAY);
- 		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
- 		return -EOPNOTSUPP;
++		if (x->mode_cbs && x->mode_cbs->input)
++			return x->mode_cbs->input(x, skb);
++
+ 		WARN_ON_ONCE(1);
+ 		break;
  	}
-@@ -434,7 +440,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
- 	int err;
+@@ -479,6 +482,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
  
- 	if (type > XFRMA_MAX) {
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_IPTFS_INIT_DELAY);
- 		NL_SET_ERR_MSG(extack, "Bad attribute");
- 		return -EOPNOTSUPP;
+ 		family = x->props.family;
+ 
++		/* An encap_type of -3 indicates reconstructed inner packet */
++		if (encap_type == -3)
++			goto resume_decapped;
++
+ 		/* An encap_type of -1 indicates async resumption. */
+ 		if (encap_type == -1) {
+ 			async = 1;
+@@ -660,11 +667,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+ 
+ 		XFRM_MODE_SKB_CB(skb)->protocol = nexthdr;
+ 
+-		if (xfrm_inner_mode_input(x, skb)) {
++		err = xfrm_inner_mode_input(x, skb);
++		if (err == -EINPROGRESS)
++			return 0;
++		else if (err) {
+ 			XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMODEERROR);
+ 			goto drop;
+ 		}
+-
++resume_decapped:
+ 		if (x->outer_mode.flags & XFRM_MODE_FLAG_TUNNEL) {
+ 			decaps = 1;
+ 			break;
+diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+index 662c83beb345..4390c111410d 100644
+--- a/net/xfrm/xfrm_output.c
++++ b/net/xfrm/xfrm_output.c
+@@ -280,7 +280,9 @@ static int xfrm4_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
+ 	skb_set_inner_network_header(skb, skb_network_offset(skb));
+ 	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
+ 
+-	skb_set_network_header(skb, -x->props.header_len);
++	/* backup to add space for the outer encap */
++	skb_set_network_header(skb,
++			       -x->props.header_len + x->props.enc_hdr_len);
+ 	skb->mac_header = skb->network_header +
+ 			  offsetof(struct iphdr, protocol);
+ 	skb->transport_header = skb->network_header + sizeof(*top_iph);
+@@ -325,7 +327,8 @@ static int xfrm6_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
+ 	skb_set_inner_network_header(skb, skb_network_offset(skb));
+ 	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
+ 
+-	skb_set_network_header(skb, -x->props.header_len);
++	skb_set_network_header(skb,
++			       -x->props.header_len + x->props.enc_hdr_len);
+ 	skb->mac_header = skb->network_header +
+ 			  offsetof(struct ipv6hdr, nexthdr);
+ 	skb->transport_header = skb->network_header + sizeof(*top_iph);
+@@ -472,6 +475,8 @@ static int xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb)
+ 		WARN_ON_ONCE(1);
+ 		break;
+ 	default:
++		if (x->mode_cbs->prepare_output)
++			return x->mode_cbs->prepare_output(x, skb);
+ 		WARN_ON_ONCE(1);
+ 		break;
  	}
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index d2dddc570f4f..3220b01121f3 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -2707,13 +2707,17 @@ static struct dst_entry *xfrm_bundle_create(struct xfrm_policy *policy,
+ 
+ 		dst1->input = dst_discard;
+ 
+-		rcu_read_lock();
+-		afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
+-		if (likely(afinfo))
+-			dst1->output = afinfo->output;
+-		else
+-			dst1->output = dst_discard_out;
+-		rcu_read_unlock();
++		if (xfrm[i]->mode_cbs && xfrm[i]->mode_cbs->output) {
++			dst1->output = xfrm[i]->mode_cbs->output;
++		} else {
++			rcu_read_lock();
++			afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
++			if (likely(afinfo))
++				dst1->output = afinfo->output;
++			else
++				dst1->output = dst_discard_out;
++			rcu_read_unlock();
++		}
+ 
+ 		xdst_prev = xdst;
+ 
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index bda5327bf34d..f5e1a17ebf74 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -513,6 +513,36 @@ static const struct xfrm_mode *xfrm_get_mode(unsigned int encap, int family)
+ 	return NULL;
+ }
+ 
++static struct xfrm_mode_cbs xfrm_mode_cbs_map[XFRM_MODE_MAX];
++
++int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs)
++{
++	if (mode >= XFRM_MODE_MAX)
++		return -EINVAL;
++
++	xfrm_mode_cbs_map[mode] = *mode_cbs;
++	return 0;
++}
++EXPORT_SYMBOL(xfrm_register_mode_cbs);
++
++void xfrm_unregister_mode_cbs(u8 mode)
++{
++	if (mode >= XFRM_MODE_MAX)
++		return;
++
++	memset(&xfrm_mode_cbs_map[mode], 0, sizeof(xfrm_mode_cbs_map[mode]));
++}
++EXPORT_SYMBOL(xfrm_unregister_mode_cbs);
++
++static const struct xfrm_mode_cbs *xfrm_get_mode_cbs(u8 mode)
++{
++	if (mode >= XFRM_MODE_MAX)
++		return NULL;
++	if (mode == XFRM_MODE_IPTFS && !xfrm_mode_cbs_map[mode].create_state)
++		request_module("xfrm-iptfs");
++	return &xfrm_mode_cbs_map[mode];
++}
++
+ void xfrm_state_free(struct xfrm_state *x)
+ {
+ 	kmem_cache_free(xfrm_state_cache, x);
+@@ -521,6 +551,8 @@ EXPORT_SYMBOL(xfrm_state_free);
+ 
+ static void ___xfrm_state_destroy(struct xfrm_state *x)
+ {
++	if (x->mode_cbs && x->mode_cbs->delete_state)
++		x->mode_cbs->delete_state(x);
+ 	hrtimer_cancel(&x->mtimer);
+ 	del_timer_sync(&x->rtimer);
+ 	kfree(x->aead);
+@@ -2765,6 +2797,9 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
+ 	case XFRM_MODE_TUNNEL:
+ 		break;
+ 	default:
++		if (x->mode_cbs && x->mode_cbs->get_inner_mtu)
++			return x->mode_cbs->get_inner_mtu(x, mtu);
++
+ 		WARN_ON_ONCE(1);
+ 		break;
+ 	}
+@@ -2850,6 +2885,12 @@ int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
+ 			goto error;
+ 	}
+ 
++	x->mode_cbs = xfrm_get_mode_cbs(x->props.mode);
++	if (x->mode_cbs && x->mode_cbs->create_state) {
++		err = x->mode_cbs->create_state(x);
++		if (err)
++			goto error;
++	}
+ error:
+ 	return err;
+ }
 diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index ad01997c3aa9..fa2059de51f5 100644
+index fa2059de51f5..795da945fbc2 100644
 --- a/net/xfrm/xfrm_user.c
 +++ b/net/xfrm/xfrm_user.c
-@@ -272,6 +272,16 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 			NL_SET_ERR_MSG(extack, "TFC padding can only be used in tunnel mode");
+@@ -779,6 +779,12 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
+ 			goto error;
+ 	}
+ 
++	if (x->mode_cbs && x->mode_cbs->user_init) {
++		err = x->mode_cbs->user_init(net, x, attrs);
++		if (err)
++			goto error;
++	}
++
+ 	return x;
+ 
+ error:
+@@ -1192,6 +1198,10 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+ 		if (ret)
  			goto out;
- 		}
-+		if ((attrs[XFRMA_IPTFS_PKT_SIZE] ||
-+		     attrs[XFRMA_IPTFS_MAX_QSIZE] ||
-+		     attrs[XFRMA_IPTFS_DONT_FRAG] ||
-+		     attrs[XFRMA_IPTFS_DROP_TIME] ||
-+		     attrs[XFRMA_IPTFS_REORD_WIN] ||
-+		     attrs[XFRMA_IPTFS_INIT_DELAY]) &&
-+		    p->mode != XFRM_MODE_IPTFS) {
-+			NL_SET_ERR_MSG(extack, "IPTFS options can only be used in IPTFS mode");
-+			goto out;
-+		}
- 		break;
- 
- 	case IPPROTO_COMP:
-@@ -3046,6 +3056,12 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
- 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
- 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
- 	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-+	[XFRMA_IPTFS_PKT_SIZE]	= { .type = NLA_U32 },
-+	[XFRMA_IPTFS_MAX_QSIZE]	= { .type = NLA_U32 },
-+	[XFRMA_IPTFS_DONT_FRAG]	= { .type = NLA_FLAG },
-+	[XFRMA_IPTFS_DROP_TIME]	= { .type = NLA_U32 },
-+	[XFRMA_IPTFS_REORD_WIN]	= { .type = NLA_U16 },
-+	[XFRMA_IPTFS_INIT_DELAY] = { .type = NLA_U32 },
- };
- EXPORT_SYMBOL_GPL(xfrma_policy);
- 
+ 	}
++	if (x->mode_cbs && x->mode_cbs->copy_to_user)
++		ret = x->mode_cbs->copy_to_user(x, skb);
++	if (ret)
++		goto out;
+ 	if (x->mapping_maxage)
+ 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
+ out:
 -- 
 2.42.0
 
