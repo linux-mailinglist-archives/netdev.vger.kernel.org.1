@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-47302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86C27E9832
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 09:55:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 434387E9837
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 09:55:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72A72280A98
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 08:55:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFBAAB207B4
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 08:55:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCB618022;
-	Mon, 13 Nov 2023 08:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B321A18022;
+	Mon, 13 Nov 2023 08:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zzgUp/Tr"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="NX3JtGnM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 030D7168A9
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:55:24 +0000 (UTC)
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4115C10FD
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 00:55:23 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-53e04b17132so6436956a12.0
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 00:55:23 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3687415AF6
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:55:39 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C99381704
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 00:55:37 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9c603e235d1so632203166b.3
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 00:55:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1699865721; x=1700470521; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1699865736; x=1700470536; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=p+RCKOZ1pbHVKPfv412Tsfm0etqBMn9v/AzzigRmMoc=;
-        b=zzgUp/TrB6CY/9aPRh5R/yZtTm+FyXlaQdV6viSrgVmeO/L9Os1+z+ybAScAIVz0Dm
-         zKsqczQpe4HIBbweNNDKMW4rVG26nouWIqX6LGBFYEmO7AZNjQfpxrUsAR56L4k+XsJb
-         r2FaGRR1adq/ZtJitEztROHGdmBVgXwiHjPZJ1CQTEa0uqoQlmSBZ5NxvH4ai98X7lGO
-         rGIi+a182zjbCdC0hByD2HFzSekS6JN4Ge3CkvOxsnDgZ+yqIPHreNeV8JRsyXBVkX7G
-         TkUk9QMXvTdZ7IplZhAlgycpRtMHNq10F4e91qUid1D/FD8exjyFchcYf4Lu1yCgD3TY
-         sKBA==
+        bh=fxdEd1wour3zDOqRujjcDyz9k3KjzIMb/Xvtn0yY41Y=;
+        b=NX3JtGnM4flZR51xtZLemlVGFRn4QVZX00J8Dy4SkIujmAiRCWp9MIxeq1kjEnvc9+
+         Xc/PPndnCg8CWXZsthSjiLSDHkrJkWDN8ac2il4Y9wEFH+rC8jAHHQrJhz9TEbXYiRay
+         QzReSe8/qXVmUL0NiK1gh1w10+nn9H7Z6W5Xv6u2mkmhX/PqYWsnG6yXz+BFtqnWw5aY
+         /LG+w1FH38vVrcbeZTedUIgycN9Zn1uISp9SKPrVD588+AmB3rkOI88u0C7ks78HmbNI
+         j1eZ4DHOuso0xXzRCs8U37+GKDfskhiAlVQO+sIt1pPNq/lwGFRYnVs7qs4bfVxNK/kf
+         IAxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699865721; x=1700470521;
+        d=1e100.net; s=20230601; t=1699865736; x=1700470536;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p+RCKOZ1pbHVKPfv412Tsfm0etqBMn9v/AzzigRmMoc=;
-        b=KJA6wOClI+emoJqZuiJyJ/ft+8wMKnBQm+4a00sC7tITUbn8/Rem+sAHq65Btx1jMp
-         A5tldoHrM1bqkpxE413tUDRZTlUH3236WnW2NzCfdXFcQBOP66aWMhz0i5DgC1AGhrC/
-         U7vMB7dElK5w8F8z6BS4DLyimgXS7B9MVUVOFx9a5zBb/B7toJ950QoSwdLUgmRUQl/8
-         V/HvXMtA6/DAu4BmHXPhVHBwKjzVys6AJoAZekfDROs9Ez3mlyuiBfqVVXdeMU24CQSy
-         WMceZEXdiM5yr2I40cxEROGXxuv9iHzmjlyubb+2BbOd80y7zP1sbHsmhEeGlvyZIUHO
-         Y6BA==
-X-Gm-Message-State: AOJu0YzHh5sIwPTy4JTGkF6vXzw4gCua9alnYcVmdTuQVQnkMn4wBb94
-	WzmtRWrMboKXk1MSHgNqBHhXDg==
-X-Google-Smtp-Source: AGHT+IF0U0pR4SaqswqagdeawVq5Z6f+WTJLE7GeYSo9H9D4XsbGsF2BYlsd+z9pW1Rsvp8Bb3JUIQ==
-X-Received: by 2002:aa7:ce18:0:b0:543:5886:71c3 with SMTP id d24-20020aa7ce18000000b00543588671c3mr3843031edv.25.1699865721464;
-        Mon, 13 Nov 2023 00:55:21 -0800 (PST)
+        bh=fxdEd1wour3zDOqRujjcDyz9k3KjzIMb/Xvtn0yY41Y=;
+        b=G2UTxGsBRq/b4/cW8v0hwflLi0hOaC5Iuts8shXhPhw62IjbfEnaR7yc6BBPf3V8AA
+         nPy9cdSvkksOfC0jnCxnUsR9xer6NmJ/tXixntrcZaJV981kYb8SDI/2IImJn+TLL7tb
+         6bXyAZdztWnnLE92O79qUFeonRIiJp4pF0eJWQo0k4N9+tCJO08oYljeifpOPifmG+/T
+         xg5J+KkW0u1dWQ87VUy5QGNWE0G4VixmQJzaKNHfv00Ul12RwoZVhktx39NcPe7GvyFp
+         N/zPxFMi7cbImY8PN6McqY5JUyBcDxNREM14QaUoS/iM1kutRycPWOP+iCjEZl5/wzi7
+         fstA==
+X-Gm-Message-State: AOJu0Yy4umyZ0OMBTuQYTXxysecvHfkdoymoV7GuNUqaoa0SY2JoalJ9
+	n2HC3wJuwXhcz82iTsEfzNg+0ccdWQKQ5w4dS+8=
+X-Google-Smtp-Source: AGHT+IFPxqLxFoRl9yAj7DA0ZD9F5WtLGeJf0FTh94K8nuK0/ID82TWQc8bNHB2npcZBGKlW/HeRiA==
+X-Received: by 2002:a17:906:e0cb:b0:9a5:7759:19c0 with SMTP id gl11-20020a170906e0cb00b009a5775919c0mr4417240ejb.64.1699865736278;
+        Mon, 13 Nov 2023 00:55:36 -0800 (PST)
 Received: from [192.168.0.106] (starletless.turnabout.volia.net. [93.73.214.90])
-        by smtp.gmail.com with ESMTPSA id fd7-20020a056402388700b0053e07fe8d98sm3391688edb.79.2023.11.13.00.55.20
+        by smtp.gmail.com with ESMTPSA id u12-20020a170906780c00b009c0c511bd62sm3667510ejm.197.2023.11.13.00.55.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Nov 2023 00:55:21 -0800 (PST)
-Message-ID: <22b43700-1cdf-9f19-0d01-0f694db5159f@blackwall.org>
-Date: Mon, 13 Nov 2023 10:55:19 +0200
+        Mon, 13 Nov 2023 00:55:35 -0800 (PST)
+Message-ID: <9e700566-8ea4-919b-320b-1d58ef96f116@blackwall.org>
+Date: Mon, 13 Nov 2023 10:55:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,29 +68,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.0
-Subject: Re: [PATCH bpf v2 7/8] selftests/bpf: De-veth-ize the tc_redirect
- test case
+Subject: Re: [PATCH bpf v2 8/8] selftests/bpf: Add netkit to tc_redirect
+ selftest
 Content-Language: en-US
 To: Daniel Borkmann <daniel@iogearbox.net>, martin.lau@kernel.org
 Cc: kuba@kernel.org, sdf@google.com, netdev@vger.kernel.org,
  bpf@vger.kernel.org
 References: <20231112203009.26073-1-daniel@iogearbox.net>
- <20231112203009.26073-8-daniel@iogearbox.net>
+ <20231112203009.26073-9-daniel@iogearbox.net>
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20231112203009.26073-8-daniel@iogearbox.net>
+In-Reply-To: <20231112203009.26073-9-daniel@iogearbox.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/12/23 22:30, Daniel Borkmann wrote:
-> No functional changes to the test case, but just renaming various functions,
-> variables, etc, to remove veth part of their name for making it more generic
-> and reusable later on (e.g. for netkit).
+> Extend the existing tc_redirect selftest to also cover netkit devices
+> for exercising the bpf_redirect_peer() code paths, so that we have both
+> veth as well as netkit covered, all tests still pass after this change.
 > 
 > Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > Acked-by: Stanislav Fomichev <sdf@google.com>
 > ---
->   .../selftests/bpf/prog_tests/tc_redirect.c    | 263 +++++++++---------
->   1 file changed, 137 insertions(+), 126 deletions(-)
+>   .../selftests/bpf/prog_tests/tc_redirect.c    | 52 +++++++++++++++++++
+>   1 file changed, 52 insertions(+)
 > 
 
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
