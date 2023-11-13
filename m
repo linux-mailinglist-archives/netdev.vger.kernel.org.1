@@ -1,185 +1,216 @@
-Return-Path: <netdev+bounces-47286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058697E9666
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 05:58:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A99E7E966E
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 06:17:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3472280C4C
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 04:58:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294E11C2090D
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 05:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D129C2CD;
-	Mon, 13 Nov 2023 04:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1352C2CD;
+	Mon, 13 Nov 2023 05:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+fLLwIt"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F2E8F42
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 04:58:04 +0000 (UTC)
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4507171B;
-	Sun, 12 Nov 2023 20:58:01 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VwC2BlG_1699851478;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VwC2BlG_1699851478)
-          by smtp.aliyun-inc.com;
-          Mon, 13 Nov 2023 12:57:59 +0800
-Date: Mon, 13 Nov 2023 12:57:58 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net/smc: Introduce IPPROTO_SMC for smc
-Message-ID: <20231113045758.GB121324@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43181F9C7
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:17:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A257115
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 21:17:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699852637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w0EKo20azYW2WTjljoSqBOIe0bi/IXBCve7wEZgAe2Q=;
+	b=A+fLLwItuJ4Yi/OHauJsYVUs2+URHpRq0ekVdWIUt4vDW/h5CqnJJF4EZOHTShnpK0ORRP
+	JX5VVgq2sXBlCukhGMlIgxMIBc3R9lApV1Hi4lsJOl13ytXILAQ3rcAjTRF+VMYIWgwFqH
+	YCmdgbK50Z6yTZhA0UaA3UUxcoT7KTI=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-245-Z-qYkSCQMC65EHiqNDxOzg-1; Mon, 13 Nov 2023 00:17:13 -0500
+X-MC-Unique: Z-qYkSCQMC65EHiqNDxOzg-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6bf2b098e43so3765423b3a.3
+        for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 21:17:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699852632; x=1700457432;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=w0EKo20azYW2WTjljoSqBOIe0bi/IXBCve7wEZgAe2Q=;
+        b=Ken+Is3exica4iyadO7V5pBzJg/FxjnR+vahy+I1P8eFDXqLJtqvD3/xj0QIxbMEX4
+         mGaYjFxZAfd0VoR5mWEsRila0iBg0WEYea/+258Tkf840ttQmK4WByxOVnf56wfeUkZ7
+         gm3O/aE0eZ4I2O/Ou+8WO7K/EryRV5AQDuoz/Jpfu3bwN0jLNx+L1+CNUMxhH/kvAzpB
+         ovOvqUQuxPXGqLB0J2HRIVaClMqvfFaOvfk0HHX5peI00cq4V8RY8NVxxdF3RhS2G+I1
+         iRaQK1F3nY0oAjYgGxmZLNamXb9+KlVWZFXoFVK53CB+xNnlZRn/f8pcqBpZs157n6gy
+         GLiw==
+X-Gm-Message-State: AOJu0YyMihTHtkFq5Va9TCUeN2dblEENCjLwK+zE91OZ1+X1vAVTt3Jv
+	fR6nQwLwf1tC51UEuwAQ3IuNahpOwieNkiYyIjkpw1y6PtP4ZefRNU5n11IUY6E4hrxFyyZgKgq
+	tAjHyKievezE9wxml
+X-Received: by 2002:a05:6a00:1d9b:b0:6bd:705b:56fb with SMTP id z27-20020a056a001d9b00b006bd705b56fbmr3993734pfw.6.1699852632636;
+        Sun, 12 Nov 2023 21:17:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHXe+sRI1NklZI0XuaDjOUM9VMGUIGGDjfD9+GOMH5Go/rxfOfDKUbPDfWV+SObWzFXCLG5KA==
+X-Received: by 2002:a05:6a00:1d9b:b0:6bd:705b:56fb with SMTP id z27-20020a056a001d9b00b006bd705b56fbmr3993720pfw.6.1699852632315;
+        Sun, 12 Nov 2023 21:17:12 -0800 (PST)
+Received: from localhost ([240d:1a:c0d:9f00:f0fd:a9ac:beeb:ad24])
+        by smtp.gmail.com with ESMTPSA id x26-20020a056a000bda00b0069ee4242f89sm3274216pfu.13.2023.11.12.21.17.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Nov 2023 21:17:12 -0800 (PST)
+Date: Mon, 13 Nov 2023 14:17:06 +0900 (JST)
+Message-Id: <20231113.141706.1726048567891462701.syoshida@redhat.com>
+To: horms@kernel.org
+Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] tipc: Fix kernel-infoleak due to uninitialized TLV
+ value
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <20231112102513.GJ705326@kernel.org>
+References: <20231110163947.1605168-1-syoshida@redhat.com>
+	<20231112102513.GJ705326@kernel.org>
+X-Mailer: Mew version 6.9 on Emacs 28.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1699442703-25015-1-git-send-email-alibuda@linux.alibaba.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 08, 2023 at 07:25:03PM +0800, D. Wythe wrote:
->From: "D. Wythe" <alibuda@linux.alibaba.com>
->
->This patch attempts to initiate a discussion on creating smc socket
->via AF_INET, similar to the following code snippet:
->
->/* create v4 smc sock */
->v4 = socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
->
->/* create v6 smc sock */
->v6 = socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
->
->As we all know, the way we currently create an SMC socket as
->follows.
->
->/* create v4 smc sock */
->v4 = socket(AF_SMC, SOCK_STREAM, SMCPROTO_SMC);
->
->/* create v6 smc sock */
->v6 = socket(AF_SMC, SOCK_STREAM, SMCPROTO_SMC6);
->
->Note: This is not to suggest removing the SMC path, but rather to propose
->adding a new path (inet path).
->
->There are several reasons why we believe it is much better than AF_SMC:
->
->Semantics:
->
->SMC extends the TCP protocol and switches it's data path to RDMA path if
->RDMA link is ready. Otherwise, SMC should always try its best to degrade to
->TCP. From this perspective, SMC is a protocol derived from TCP and can also
->fallback to TCP, It should be considered as part of the same protocol
->family as TCP (AF_INET and AF_INET6).
->
->Compatibility & Scalability:
->
->Due to the presence of fallback, we needs to handle it very carefully to
->keep the consistent with the TCP sockets. SMC has done a lot of work to
->ensure that, but still, there are quite a few issues left, such as:
->
->1. The "ss" command cannot display the process name and ID associated with
->the fallback socket.
->
->2. The linger option is ineffective when user try’s to close the fallback
->socket.
->
->3. Some eBPF attach points related to INET_SOCK are ineffective under
->fallback socket, such as BPF_CGROUP_INET_SOCK_RELEASE.
->
->4. SO_PEEK_OFF is a un-supported sock option for fallback sockets, while
->it’s of course supported for tcp sockets.
->
->Of course, we can fix each issue one by one, but it is not a fundamental
->solution. Any changes on the inet path may require re-synchronization,
->including bug fixes, security fixes, tracing, new features and more. For
->example, there is a commit which we think is very valueable:
->
->commit 0dd061a6a115 ("bpf: Add update_socket_protocol hook")
->
->This commit allows users to modify dynamically the protocol before socket
->created through eBPF programs, which provides a more flexible approach
->than smc_run (LP_PRELOAD). It does not require the process restart
->and allows for controlling replacement at the connection level, whereas
->smc_run operates at the process level.
->
->However, to benefit from it under the SMC path requires additional
->code submission while nothing changes requires to do under inet path.
->
->I'm not saying that these issues cannot be fixed under smc path, however,
->the solution for these issues often involves duplicating work that already
->done on inet path. Thats to say, if we can be under the inet path, we can
->easily reuse the existing infrastructure.
->
->Performance:
->
->In order to ensure consistency between fallback sockets and TCP sockets,
->SMC creates an additional TCP socket. This introduces additional overhead
->of approximately 15%-20% for the establishment and destruction of fallback
->sockets. In fact, for the users we have contacted who have shown interest
->in SMC, ensuring consistency in performance between fallback and TCP has
->always been their top priority. Since no one can guarantee the
->availability of RDMA links, support for SMC on both sides, or if the
->user's environment is 100% suitable for SMC. Fallback is the only way to
->address those issues, but the additional performance overhead is
->unacceptable, as fallback cannot provide the benefits of RDMA and only
->brings burden right now.
->
->In inet path, we can embed TCP sock into SMC sock, when fallback occurs,
->the socket behaves exactly like a TCP socket. In our POC, the performance
->of fallback socket under inet path is almost indistinguishable from of
->tcp socket, with less than 1% loss. Additionally, and more importantly,
->it has full feature compatibility with TCP socket.
->
->Of course, it is also possible under smc path, but in that way, it
->would require a significant amount of work to ensure compatibility with
->tcp sockets, which most of them has already been done in inet path.
->And still, any changes in inet path may require re-synchronization.
->
->I also noticed that there have been some discussions on this issue before.
->
->Link: https://lore.kernel.org/stable/4a873ea1-ba83-1506-9172-e955d5f9ae16@redhat.com/
->
->And I saw some supportive opinions here, maybe it is time to continue
->discussing this matter now.
->
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->---
-> include/uapi/linux/in.h | 2 ++
-> 1 file changed, 2 insertions(+)
->
->diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
->index e682ab6..0c6322b 100644
->--- a/include/uapi/linux/in.h
->+++ b/include/uapi/linux/in.h
->@@ -83,6 +83,8 @@ enum {
-> #define IPPROTO_RAW		IPPROTO_RAW
->   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
-> #define IPPROTO_MPTCP		IPPROTO_MPTCP
->+  IPPROTO_SMC = 263,		/* Shared Memory Communications		*/
->+#define IPPROTO_SMC		IPPROTO_SMC
+On Sun, 12 Nov 2023 10:25:13 +0000, Simon Horman wrote:
+> On Sat, Nov 11, 2023 at 01:39:47AM +0900, Shigeru Yoshida wrote:
+>> KMSAN reported the following kernel-infoleak issue:
+>> 
+>> =====================================================
+>> BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+>> BUG: KMSAN: kernel-infoleak in copy_to_user_iter lib/iov_iter.c:24 [inline]
+>> BUG: KMSAN: kernel-infoleak in iterate_ubuf include/linux/iov_iter.h:29 [inline]
+>> BUG: KMSAN: kernel-infoleak in iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+>> BUG: KMSAN: kernel-infoleak in iterate_and_advance include/linux/iov_iter.h:271 [inline]
+>> BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
+>>  instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+>>  copy_to_user_iter lib/iov_iter.c:24 [inline]
+>>  iterate_ubuf include/linux/iov_iter.h:29 [inline]
+>>  iterate_and_advance2 include/linux/iov_iter.h:245 [inline]
+>>  iterate_and_advance include/linux/iov_iter.h:271 [inline]
+>>  _copy_to_iter+0x4ec/0x2bc0 lib/iov_iter.c:186
+>>  copy_to_iter include/linux/uio.h:197 [inline]
+>>  simple_copy_to_iter net/core/datagram.c:532 [inline]
+>>  __skb_datagram_iter.5+0x148/0xe30 net/core/datagram.c:420
+>>  skb_copy_datagram_iter+0x52/0x210 net/core/datagram.c:546
+>>  skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
+>>  netlink_recvmsg+0x43d/0x1630 net/netlink/af_netlink.c:1967
+>>  sock_recvmsg_nosec net/socket.c:1044 [inline]
+>>  sock_recvmsg net/socket.c:1066 [inline]
+>>  __sys_recvfrom+0x476/0x860 net/socket.c:2246
+>>  __do_sys_recvfrom net/socket.c:2264 [inline]
+>>  __se_sys_recvfrom net/socket.c:2260 [inline]
+>>  __x64_sys_recvfrom+0x130/0x200 net/socket.c:2260
+>>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>>  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+>>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>> 
+>> Uninit was created at:
+>>  slab_post_alloc_hook+0x103/0x9e0 mm/slab.h:768
+>>  slab_alloc_node mm/slub.c:3478 [inline]
+>>  kmem_cache_alloc_node+0x5f7/0xb50 mm/slub.c:3523
+>>  kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:560
+>>  __alloc_skb+0x2fd/0x770 net/core/skbuff.c:651
+>>  alloc_skb include/linux/skbuff.h:1286 [inline]
+>>  tipc_tlv_alloc net/tipc/netlink_compat.c:156 [inline]
+>>  tipc_get_err_tlv+0x90/0x5d0 net/tipc/netlink_compat.c:170
+>>  tipc_nl_compat_recv+0x1042/0x15d0 net/tipc/netlink_compat.c:1324
+>>  genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
+>>  genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+>>  genl_rcv_msg+0x1220/0x12c0 net/netlink/genetlink.c:1067
+>>  netlink_rcv_skb+0x4a4/0x6a0 net/netlink/af_netlink.c:2545
+>>  genl_rcv+0x41/0x60 net/netlink/genetlink.c:1076
+>>  netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+>>  netlink_unicast+0xf4b/0x1230 net/netlink/af_netlink.c:1368
+>>  netlink_sendmsg+0x1242/0x1420 net/netlink/af_netlink.c:1910
+>>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>>  __sock_sendmsg net/socket.c:745 [inline]
+>>  ____sys_sendmsg+0x997/0xd60 net/socket.c:2588
+>>  ___sys_sendmsg+0x271/0x3b0 net/socket.c:2642
+>>  __sys_sendmsg net/socket.c:2671 [inline]
+>>  __do_sys_sendmsg net/socket.c:2680 [inline]
+>>  __se_sys_sendmsg net/socket.c:2678 [inline]
+>>  __x64_sys_sendmsg+0x2fa/0x4a0 net/socket.c:2678
+>>  do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+>>  do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
+>>  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+>> 
+>> Bytes 34-35 of 36 are uninitialized
+>> Memory access of size 36 starts at ffff88802d464a00
+>> Data copied to user address 00007ff55033c0a0
+>> 
+>> CPU: 0 PID: 30322 Comm: syz-executor.0 Not tainted 6.6.0-14500-g1c41041124bd #10
+>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
+>> =====================================================
+>> 
+>> tipc_add_tlv() puts TLV descriptor and value onto `skb`. This size is
+>> calculated with TLV_SPACE() macro. It adds the size of struct tlv_desc and
+>> the length of TLV value passed as an argument, and aligns the result to a
+>> multiple of TLV_ALIGNTO, i.e., a multiple of 4 bytes.
+>> 
+>> If the size of struct tlv_desc plus the length of TLV value is not aligned,
+>> the current implementation leaves the remaining bytes uninitialized. This
+>> is the cause of the above kernel-infoleak issue.
+>> 
+>> This patch resolves this issue by clearing data up to an aligned size.
+>> 
+>> Fixes: d0796d1ef63d ("tipc: convert legacy nl bearer dump to nl compat")
+>> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> 
+> Thanks Yoshida-san,
+> 
+> I agree with both your analysis and that the fix is correct.
+> I also agree that the problem was introduced by the cited commit.
+> 
+> I did wonder if there would be an advantage to only zeroing the
+> otherwise uninitialised portion of tlv, but I guess that the complexity
+> isn't worth any gain: all of TLV likely fits into a single cacheline
+> anyway.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-I think adding a new IPPROTO_SMC protocol is good, but we need to make
-sure this won't break AF_SMC.
+Hi Simon,
 
+Thank you so much for always reviewing my work :)
 
-Best regards,
-Dust
+Shigeru
 
+> 
+>> ---
+>>  net/tipc/netlink_compat.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>> 
+>> diff --git a/net/tipc/netlink_compat.c b/net/tipc/netlink_compat.c
+>> index 5bc076f2fa74..c763008a8adb 100644
+>> --- a/net/tipc/netlink_compat.c
+>> +++ b/net/tipc/netlink_compat.c
+>> @@ -102,6 +102,7 @@ static int tipc_add_tlv(struct sk_buff *skb, u16 type, void *data, u16 len)
+>>  		return -EMSGSIZE;
+>>  
+>>  	skb_put(skb, TLV_SPACE(len));
+>> +	memset(tlv, 0, TLV_SPACE(len));
+>>  	tlv->tlv_type = htons(type);
+>>  	tlv->tlv_len = htons(TLV_LENGTH(len));
+>>  	if (len && data)
+>> -- 
+>> 2.41.0
+>> 
+>> 
+> 
 
-
->   IPPROTO_MAX
-> };
-> #endif
->-- 
->1.8.3.1
 
