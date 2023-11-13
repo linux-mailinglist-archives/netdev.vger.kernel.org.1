@@ -1,123 +1,93 @@
-Return-Path: <netdev+bounces-47542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09C107EA723
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:38:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 734F87EA732
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:59:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7A8E280F74
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C5E8280C6A
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267413E461;
-	Mon, 13 Nov 2023 23:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00983E476;
+	Mon, 13 Nov 2023 23:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GAzwpJec"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TKAi6KWp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3780C3D988
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:38:33 +0000 (UTC)
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80DD2D6C
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:38:31 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id 98e67ed59e1d1-2802c41b716so4321204a91.1
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:38:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1699918711; x=1700523511; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YGVDrs1dPOe05s0Ikf2zO3iHd4KSPZQpgv/WPATEGYk=;
-        b=GAzwpJecV4hWjeC9Rb5z8FhLPrRhhCcaPsr3ki3cXM7cYEGnapVmnbq48pBXcZfpHV
-         ntd35dUzzWqG1AQUR9ovsjb8IGafrnpfduAdQyti2XzCb1dLAxt0nhrPpzaHFFu2tM32
-         DRfjGksl7JYLx65/GLpHLqaAaiTAviA2jzRWhIcqU79WaHVQSegQ2SncbFbUa6pS5itA
-         km8ykEc7PtCAGW5ucvApNFpB8YxtxQ3jn+oidPG6cEaOpxgwpDQpc1PR1LCgE67O4YzZ
-         MGJdosXDMJf8xz302GEFVLcQMj8z98ugUpROa3DZQPuKcYbPKahXAE9kRoWzaldKzYso
-         Pvyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699918711; x=1700523511;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YGVDrs1dPOe05s0Ikf2zO3iHd4KSPZQpgv/WPATEGYk=;
-        b=RpYhISD/FyDOjUw5ATFtTtcEugodhoQMJdHTfwfc7WbIdLliaHiQBaY8sMbNa5npRi
-         BPTUt5vOHk52Q9CAnoor2/LOSNcwomnMuULEfL20DUxCXXfPUlUHxFnoXTteT4fV3l2S
-         KVpd9e++Xds2zC9h8C/p5uI4L4s6GuZCyjtw2syrfc3gLIDi4k1GcQ906SAp7Fv1sS/E
-         Y6rb1SG0JXcYULLjXUXHjcWf2zjYvEFhqft9d1CqsLve8m5mwxjgnY2/D21FE8MZdmZ8
-         beZdpeg8Fk1up6hvCbMpY2mtZhUBRrjm2Qtva5Fxx5C6GMG/CsR4D6k0qzFiulIOJmyA
-         iFow==
-X-Gm-Message-State: AOJu0YwuLbU5KEeywok5Kjg0js66+kwrY3omOwEQimtp78SftO3yPIIX
-	7cRUa5Xe3XWDmywD7zH5UslOZg==
-X-Google-Smtp-Source: AGHT+IGKDTbhiQLtd2EaTcDhXIkTP+MdZvEa1SZy1Glq5U4jiWPEFNINTxjziLJd/vZmxGuJuXlDgQ==
-X-Received: by 2002:a17:90b:1651:b0:27d:6d9c:6959 with SMTP id il17-20020a17090b165100b0027d6d9c6959mr5458555pjb.25.1699918710978;
-        Mon, 13 Nov 2023 15:38:30 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id l16-20020a17090aec1000b002800d17a21csm6071959pjy.15.2023.11.13.15.38.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 15:38:30 -0800 (PST)
-Date: Mon, 13 Nov 2023 15:38:28 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Andrea Claudi <aclaudi@redhat.com>
-Cc: Luca Boccassi <luca.boccassi@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2] Revert "Makefile: ensure CONF_USR_DIR honours
- the libdir config"
-Message-ID: <20231113153828.31ebef51@hermes.local>
-In-Reply-To: <ZVJnKjhLm-MiHn6e@renaissance-vector>
-References: <20231106001410.183542-1-luca.boccassi@gmail.com>
-	<169989362317.31764.14802237194303164325.git-patchwork-notify@kernel.org>
-	<ZVJnKjhLm-MiHn6e@renaissance-vector>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04EBB3E461
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:59:04 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A69D8F
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:59:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699919944; x=1731455944;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fH4JpMdDEZAExostlD6al4nlrb0YZR0fPX257O4FYuM=;
+  b=TKAi6KWptnvhumVHp9f7356SqInLHQhWqrsFCxcbSmqFomWJnXQh0TRF
+   uB2cgp0LRsO8rrO6lnAgGMaRvS4yjzywEP4WrNw7i1l6Fq4PaqxZqhhwm
+   eRNmD6Z0d8j0DkccPBHVcprnRC53Apg99E6Ek5itAkgjokJt2OOMmrcXf
+   k/st7EW4WNA5eqllcgD2CjOHlBH9AYkwZSHRhohMEutvfyOUyuTEMDgib
+   itoxAIlUI5tW9m2FN2Wgxrvl5GSQKnMRHWH2QvIF68rxdCl4jdHY427qU
+   ri3Q92hSld/ZHMHNuF/sxDd7ZER1SgRHUK8h3q4ZeN+Hjc9RLYNNBchfB
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="370728155"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="370728155"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 15:59:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="5816389"
+Received: from sbahadur1-bxdsw.sj.intel.com ([10.232.237.139])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 15:59:03 -0800
+From: Sachin Bahadur <sachin.bahadur@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-next v2] ice: Block PF reinit if attached to bond
+Date: Mon, 13 Nov 2023 15:58:56 -0800
+Message-Id: <20231113235856.772920-1-sachin.bahadur@intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 Nov 2023 19:12:58 +0100
-Andrea Claudi <aclaudi@redhat.com> wrote:
+PF interface part of LAG should not allow driver reinit via devlink. The
+Bond config will be lost due to driver reinit. ice_devlink_reload_down is
+called before PF driver reinit. If PF is attached to bond,
+ice_devlink_reload_down returns error.
 
-> On Mon, Nov 13, 2023 at 04:40:23PM +0000, patchwork-bot+netdevbpf@kernel.org wrote:
-> > Hello:
-> > 
-> > This patch was applied to iproute2/iproute2.git (main)
-> > by Stephen Hemminger <stephen@networkplumber.org>:
-> > 
-> > On Mon,  6 Nov 2023 00:14:10 +0000 you wrote:  
-> > > From: Luca Boccassi <bluca@debian.org>
-> > > 
-> > > LIBDIR in Debian and derivatives is not /usr/lib/, it's
-> > > /usr/lib/<architecture triplet>/, which is different, and it's the
-> > > wrong location where to install architecture-independent default
-> > > configuration files, which should always go to /usr/lib/ instead.
-> > > Installing these files to the per-architecture directory is not
-> > > the right thing, hence revert the change.
-> > > 
-> > > [...]  
-> > 
-> > Here is the summary with links:
-> >   - [iproute2] Revert "Makefile: ensure CONF_USR_DIR honours the libdir config"
-> >     https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=deb66acabe44
-> > 
-> > You are awesome, thank you!
-> > -- 
-> > Deet-doot-dot, I am a bot.
-> > https://korg.docs.kernel.org/patchwork/pwbot.html
-> > 
-> >  
-> 
-> Hi Stephen, actually Luca and I agreed on a different solution, see
-> "[PATCH iproute2] Makefile: use /usr/share/iproute2 for config files".
-> 
-> I can rebase that patch on top of this one, if this is ok for you.
-> 
-> Regards,
-> Andrea
-> 
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: Sachin Bahadur <sachin.bahadur@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_devlink.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Send a new patch please. 
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index f4e24d11ebd0..5fe88e949b09 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -457,6 +457,10 @@ ice_devlink_reload_down(struct devlink *devlink, bool netns_change,
+ 					   "Remove all VFs before doing reinit\n");
+ 			return -EOPNOTSUPP;
+ 		}
++		if (pf->lag && pf->lag->bonded) {
++			NL_SET_ERR_MSG_MOD(extack, "Remove all associated Bonds before doing reinit");
++			return -EBUSY;
++		}
+ 		ice_unload(pf);
+ 		return 0;
+ 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+-- 
+2.25.1
+
 
