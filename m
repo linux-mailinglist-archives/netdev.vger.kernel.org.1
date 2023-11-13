@@ -1,41 +1,76 @@
-Return-Path: <netdev+bounces-47331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09B67E9AC9
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 12:10:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD0527E9AD7
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 12:15:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E3F5B20A49
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 11:10:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E508B20AC7
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 11:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8D81CA90;
-	Mon, 13 Nov 2023 11:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400D71CA88;
+	Mon, 13 Nov 2023 11:15:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJNoYI/m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iCygM4xr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BB01C6B7
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 99047C433CD;
-	Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699873824;
-	bh=vVg6FRkkta/ogCT2/KXPlW4+P3XtletmhVt1qTizlWs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gJNoYI/mlQOQC+woI+t6cXqu/JfGm9lKSS5JpEXctTuGPZeA7Le3oGUSf/OakeJBY
-	 YzhQUF5LLfMYJ6/KWAJYI5ir3+Y/odfa+DArJFlJxnvkvdTKourDA0YyyGkDjUnC++
-	 iMqAhpR2pto5DC9p52j7VJ0S84evOraON1EYWReuWXQyrtcjxIuqUDSKvp4eq73Kec
-	 uDCUQkxu/1nbsRLbwAqRgh0zDma/I+liIVBWQAOCDb2ZKUtV63rAUotm6uSaOhCjOD
-	 xq2mgE0zWNJ67nLM5c9ZeZHIH3VlEYie8I3RtqfUlC0jw4jauk2zFabPKN2pAVzcq0
-	 Zjq4XTE3UU/wQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7A893E32712;
-	Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1A21C2AF;
+	Mon, 13 Nov 2023 11:15:08 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1AC7D5C;
+	Mon, 13 Nov 2023 03:15:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699874106; x=1731410106;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LbRnYdRPeFJ5gAHOR1oLBzeoo2auHB7sRXGXnI/SXvQ=;
+  b=iCygM4xr5RAPzLPnRQUiO8VGlN1PfMcNq74Ae4NUf2nH1mACrV6zaCFr
+   7st5FOhcxpEhR8QbjT0R8FMEvjS56FhcXWROFu3R2tTonkY6k1phESqgw
+   8ERorta6Sg0duW6HYai0WTtdNZte3nvxkJjaHgSV5FEZ5beCvq1mfqfZv
+   JPtuRg3f8dBe6QSQP4dcYzlvzUIkVHvoJUfgsFWm5eCEkA6j3sasU0VU4
+   X70ELEMdmNHkWUTW3Lctr2CclstPDJyI8Zv60NI50P2KmZBFF+mAGGbA8
+   CohHZ389bCIRRawQVmHNhjUPGVyXUjLt82QhiKL6eSYCNPRB8JT7q+5RQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10892"; a="387581132"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="387581132"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 03:13:01 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10892"; a="834688980"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="834688980"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga004.fm.intel.com with ESMTP; 13 Nov 2023 03:12:56 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id A689E574; Mon, 13 Nov 2023 13:12:55 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Yang Yingliang <yangyingliang@huawei.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Mark Brown <broonie@kernel.org>,
+	linux-input@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-spi@vger.kernel.org
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v1 1/1] treewide, spi: Get rid of SPI_MASTER_HALF_DUPLEX
+Date: Mon, 13 Nov 2023 13:12:49 +0200
+Message-ID: <20231113111249.3982461-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,43 +78,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] net: mvneta: fix calls to page_pool_get_stats
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169987382449.356.6300472910901255906.git-patchwork-notify@kernel.org>
-Date: Mon, 13 Nov 2023 11:10:24 +0000
-References: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
-In-Reply-To: <ydvyjmjgpppf2hd7rzb6iu2hi6aiuxoa7sq5qnorknwk5txuca@7fgznkjwynsf>
-To: Sven Auhagen <sven.auhagen@voleatech.de>
-Cc: netdev@vger.kernel.org, thomas.petazzoni@bootlin.com, brouer@redhat.com,
- lorenzo@kernel.org, ilias.apalodimas@linaro.org, mcroce@microsoft.com,
- leon@kernel.org, kuba@kernel.org
 
-Hello:
+The SPI_MASTER_HALF_DUPLEX is the legacy name of a definition
+for a half duplex flag. Since all others had been replaced with
+the respective SPI_CONTROLLER prefix get rid of the last one
+as well. There is no functional change intended.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/input/rmi4/rmi_spi.c             | 2 +-
+ drivers/mmc/host/mmc_spi.c               | 2 +-
+ drivers/net/ethernet/micrel/ks8851_spi.c | 4 ++--
+ drivers/usb/gadget/udc/max3420_udc.c     | 2 +-
+ include/linux/spi/spi.h                  | 2 --
+ 5 files changed, 5 insertions(+), 7 deletions(-)
 
-On Sat, 11 Nov 2023 05:41:12 +0100 you wrote:
-> Calling page_pool_get_stats in the mvneta driver without checks
-> leads to kernel crashes.
-> First the page pool is only available if the bm is not used.
-> The page pool is also not allocated when the port is stopped.
-> It can also be not allocated in case of errors.
-> 
-> The current implementation leads to the following crash calling
-> ethstats on a port that is down or when calling it at the wrong moment:
-> 
-> [...]
-
-Here is the summary with links:
-  - [v5] net: mvneta: fix calls to page_pool_get_stats
-    https://git.kernel.org/netdev/net/c/ca8add922f9c
-
-You are awesome, thank you!
+diff --git a/drivers/input/rmi4/rmi_spi.c b/drivers/input/rmi4/rmi_spi.c
+index 852aeb0b2c07..07c866f42296 100644
+--- a/drivers/input/rmi4/rmi_spi.c
++++ b/drivers/input/rmi4/rmi_spi.c
+@@ -375,7 +375,7 @@ static int rmi_spi_probe(struct spi_device *spi)
+ 	struct rmi_device_platform_data *spi_pdata = spi->dev.platform_data;
+ 	int error;
+ 
+-	if (spi->master->flags & SPI_MASTER_HALF_DUPLEX)
++	if (spi->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
+ 		return -EINVAL;
+ 
+ 	rmi_spi = devm_kzalloc(&spi->dev, sizeof(struct rmi_spi_xport),
+diff --git a/drivers/mmc/host/mmc_spi.c b/drivers/mmc/host/mmc_spi.c
+index cc333ad67cac..b0cccef4cfbf 100644
+--- a/drivers/mmc/host/mmc_spi.c
++++ b/drivers/mmc/host/mmc_spi.c
+@@ -1322,7 +1322,7 @@ static int mmc_spi_probe(struct spi_device *spi)
+ 	/* We rely on full duplex transfers, mostly to reduce
+ 	 * per-transfer overheads (by making fewer transfers).
+ 	 */
+-	if (spi->master->flags & SPI_MASTER_HALF_DUPLEX)
++	if (spi->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
+ 		return -EINVAL;
+ 
+ 	/* MMC and SD specs only seem to care that sampling is on the
+diff --git a/drivers/net/ethernet/micrel/ks8851_spi.c b/drivers/net/ethernet/micrel/ks8851_spi.c
+index 70bc7253454f..7c41623dac90 100644
+--- a/drivers/net/ethernet/micrel/ks8851_spi.c
++++ b/drivers/net/ethernet/micrel/ks8851_spi.c
+@@ -156,7 +156,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
+ 
+ 	txb[0] = cpu_to_le16(op | KS_SPIOP_RD);
+ 
+-	if (kss->spidev->master->flags & SPI_MASTER_HALF_DUPLEX) {
++	if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX) {
+ 		msg = &kss->spi_msg2;
+ 		xfer = kss->spi_xfer2;
+ 
+@@ -180,7 +180,7 @@ static void ks8851_rdreg(struct ks8851_net *ks, unsigned int op,
+ 	ret = spi_sync(kss->spidev, msg);
+ 	if (ret < 0)
+ 		netdev_err(ks->netdev, "read: spi_sync() failed\n");
+-	else if (kss->spidev->master->flags & SPI_MASTER_HALF_DUPLEX)
++	else if (kss->spidev->master->flags & SPI_CONTROLLER_HALF_DUPLEX)
+ 		memcpy(rxb, trx, rxl);
+ 	else
+ 		memcpy(rxb, trx + 2, rxl);
+diff --git a/drivers/usb/gadget/udc/max3420_udc.c b/drivers/usb/gadget/udc/max3420_udc.c
+index 2d57786d3db7..89e8cf2a2a7d 100644
+--- a/drivers/usb/gadget/udc/max3420_udc.c
++++ b/drivers/usb/gadget/udc/max3420_udc.c
+@@ -1201,7 +1201,7 @@ static int max3420_probe(struct spi_device *spi)
+ 	int err, irq;
+ 	u8 reg[8];
+ 
+-	if (spi->master->flags & SPI_MASTER_HALF_DUPLEX) {
++	if (spi->master->flags & SPI_CONTROLLER_HALF_DUPLEX) {
+ 		dev_err(&spi->dev, "UDC needs full duplex to work\n");
+ 		return -EINVAL;
+ 	}
+diff --git a/include/linux/spi/spi.h b/include/linux/spi/spi.h
+index 255a0562aea5..7b4baff63c5c 100644
+--- a/include/linux/spi/spi.h
++++ b/include/linux/spi/spi.h
+@@ -1638,8 +1638,6 @@ spi_transfer_is_last(struct spi_controller *ctlr, struct spi_transfer *xfer)
+ /* Compatibility layer */
+ #define spi_master			spi_controller
+ 
+-#define SPI_MASTER_HALF_DUPLEX		SPI_CONTROLLER_HALF_DUPLEX
+-
+ #define spi_master_get_devdata(_ctlr)	spi_controller_get_devdata(_ctlr)
+ #define spi_master_set_devdata(_ctlr, _data)	\
+ 	spi_controller_set_devdata(_ctlr, _data)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0.rc1.1.gbec44491f096
 
 
