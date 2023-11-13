@@ -1,227 +1,225 @@
-Return-Path: <netdev+bounces-47359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C757E9CBD
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:07:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E72C17E9CC0
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 442BA1C2084F
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:07:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 225531C203B8
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:09:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B281D527;
-	Mon, 13 Nov 2023 13:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4B11DDF4;
+	Mon, 13 Nov 2023 13:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="fxGg2Z8R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eIWZQcRI"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E151DFC0
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:07:51 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 854D9D6E
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:07:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=VpfCUDpp5tANXHf2ycVEMUXS6Ph6TPaSO+o/OJt2oi8=; b=fxGg2Z8R1l2IY0sULfd4fH0a37
-	jqS7Ms6F3VIbRApkjWjdp/ETR76LSLocOlkqMQVkiTcWIVivyyh75nQOLAsxd+GWxMx77XCy/n2om
-	8pGjWagrrFOvCHor1APwD0Qpf9NatNzjFFtNz43vG69diz3dfpVNOfMsC32worLmeXinRTBHYqofF
-	81JwKXzhSQDsYntmmvFMxnt9zqliTdYj3h9udlrKv2DonOcXqU4X+BAk7/Cmx4KPBp9dpOsbbXHZE
-	k2LeuoZeKt+IYK7u8FzAr642t1v6DZvx4CtqRW/IjapqTAfZrSribpeATrOnarNdjZwVsGn8WX7v4
-	4Sd0w/Bw==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r2WfK-0006Ek-AY; Mon, 13 Nov 2023 14:07:46 +0100
-Received: from [194.230.158.57] (helo=localhost.localdomain)
-	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r2WfJ-000IZ0-SV; Mon, 13 Nov 2023 14:07:46 +0100
-Subject: Re: [PATCH iproute2] ip, link: Add support for netkit
-To: Nikolay Aleksandrov <razor@blackwall.org>, stephen@networkplumber.org
-Cc: martin.lau@kernel.org, netdev@vger.kernel.org
-References: <20231113032323.14717-1-daniel@iogearbox.net>
- <b444e479-b2fc-fffd-cd6d-e82fd3e6e64b@blackwall.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <d8a6b803-7602-4156-0572-a17d5fc321b7@iogearbox.net>
-Date: Mon, 13 Nov 2023 14:07:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199081DDEC
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:09:43 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063F3D7E;
+	Mon, 13 Nov 2023 05:09:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699880983; x=1731416983;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BlHXTJHQjr7yLZEg5wJ+Ke6O/l4l+x0J+eP5dSxaXLA=;
+  b=eIWZQcRIpzO0xYbd4UKgmTYPTbQ9r1wJjUHHDsB2biR93NsOAHVBe+E5
+   POOGowOv32Ta0lpLJl7lMcXVACx8H5PV6Cr9CwMHTF7pOJEM3KaZMYHmA
+   yI4bIh5UhpswHZtdS/NpFfqM7IVRH+OAGvXc4KSskGs4x9ByFXuU4Xg8h
+   p54OtFr+mOhB40CORZVGaMiu7+WvIhXGDwQsDdbU3zww+p9+I3u79aWLf
+   U9YOho2M7xApNaiQlL3SKpNEmRllRmn6S4+Pq8mWaNcaFeog3LxeIUDFi
+   bAOo+Ilka7KxNcLCJz4qWPW1uoajBQaDoK9C0Tm6Z6yf9jtXrBTYChppQ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="389296289"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="389296289"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 05:09:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="799186031"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="799186031"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Nov 2023 05:09:42 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 13 Nov 2023 05:09:42 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 13 Nov 2023 05:09:41 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 13 Nov 2023 05:09:41 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 13 Nov 2023 05:09:41 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HvQqxpTz8lwQHXN3V8bmDCjuLBrzYXlK0rad2mfXeIs6MAMsQS86gjOQ70au1twiabmzFU+BMTpy5eSqEXrmoAciJnHhKKvOlBLCvX7i1LshOTyGscr3SDWdwTt9BnWJgaDDRcOCaHp719McRLISayEs+bVDe64z5ZSTmcGu5wcx5FRmGa8nTxaHdknAfN8A0CHqwjAUQCKqeuKDPV5343u0o1vgXcyi6LigYtu61zSmx+LtKH5W2dKgC86O+HyNy1HyBIHelVDZNAiS8rl4Ys21eDgdLvujtDxTlE/bnb2wYvB1oSmJD4RuHMxLxYebMpfBHyNt/P7Wvk+A5nr/CQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VUfxWp55ijqd2gKWiPtcUQxyCqogorwsIijB7vclkdc=;
+ b=VQ0s5lhUFY7TKpZsofdk9W24mFjUJCfZTKVYXBeOnPHSnHi3cMaxwkcWJf/1h1GflqPa8QB6ELGx4S/6sqaVFoyrsTHG6OYY+j8ai01YRGp1DZTFUwn8B7qxz2mQu3sLW4GCM+dsPVBfn8cmtNJIWTztAHyHniEFGs7sYcGqHkmcldHAC2dTWACdvm1pfI/3MhfWQYBEb22rq9cglWlv/EtLF5rVXzNDV4RjmVvRz8xS/ku+QzMXlZDsRuF/vjMgZin+WXvi5mCAD/CU2NMKSZEWoXB8PGLQFri1ypUrhwLjYB3i9yIRA8r+jFFUg9or7u8r4aZ4cMwSyWUjyXPeTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by PH0PR11MB5000.namprd11.prod.outlook.com (2603:10b6:510:41::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.29; Mon, 13 Nov
+ 2023 13:09:33 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::49fc:ba56:787e:1fb3%7]) with mapi id 15.20.6977.029; Mon, 13 Nov 2023
+ 13:09:33 +0000
+Message-ID: <2e6ecdf9-1608-4e51-a17c-8c136e14a9ba@intel.com>
+Date: Mon, 13 Nov 2023 14:09:26 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next 1/5] i40e: Use existing helper to find flow
+ director VSI
+To: Ivan Vecera <ivecera@redhat.com>, <netdev@vger.kernel.org>
+CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-kernel@vger.kernel.org>, Jacob Keller <jacob.e.keller@intel.com>,
+	Simon Horman <horms@kernel.org>, <mschmidt@redhat.com>
+References: <20231113125856.346047-1-ivecera@redhat.com>
+ <20231113125856.346047-2-ivecera@redhat.com>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20231113125856.346047-2-ivecera@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA1P291CA0024.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::18) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <b444e479-b2fc-fffd-cd6d-e82fd3e6e64b@blackwall.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27092/Mon Nov 13 09:38:20 2023)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|PH0PR11MB5000:EE_
+X-MS-Office365-Filtering-Correlation-Id: bf8bc8d0-7190-4a3a-8311-08dbe449c708
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tb78H2F9gPgAgMzflgnvJcSmr3CGNcXDHPrS9DNC8NR1Fw4a0Q9qpFlwwPOwrTn1SMvtK1yEDlTp/m9PiDqrxeu7rYRGpS5KeDY13vYsUc6wVSQSGJSPQN3fhp4XDQ/lhDj2INrBjvIV5HLtG60WpvGWMg6Fw4DdUYqvsq5YuyNKhPqhvymRVhKHYdqTl9dDActDzXiO8S+8jIvoCQX49hu5FrQGzX62KMxC/WqDckLPyg9UOURT+uZsM+A9YcvUHSG5P8evj0mWUvpQN0E3etTcUrnGiQ78XRnTD2O8C+6H7nPBRsWnipOBsdI3A5G3Os/38GNQ9ltuQpArHSiJGZRrSmhb8wtt/1Om9ePindiX7EQv+o6gOCz4zC3gyt3AXVNi2NdZcNzn3uigdFYerGDC9Xi7oeJMjH1yJ5zAwQY2PCl3V4njOsU3Ijo3d12s+3DrLnnSzb1y2xR6npFKar+AFklxIl0ZmGxzz+oSdF+5JhhhFdt03cDH1fVxyUZkL1n5w+D2t7p9/LRo6vhdlUi0AU2h2SH+iCb7TmD5JCEsPzReoMhWHEyk7xFvz9kwqO4GhZivg9XtjDz2rCrSP/5Qcgio/oHJgqZnVd7oJpObsjLN2CnjpY5a6lK7T+WalQNANRBJaXH1XIVyftwAojVEJ5+sP77W91nmbPPrnWs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(136003)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(8936002)(4326008)(8676002)(316002)(66946007)(66556008)(66476007)(54906003)(2906002)(41300700001)(44832011)(31696002)(86362001)(5660300002)(7416002)(83380400001)(2616005)(82960400001)(26005)(38100700002)(31686004)(478600001)(36756003)(6486002)(6666004)(6512007)(53546011)(6506007)(37363002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?M3pBcjRhWmdQa3VDdjF6UUhPRXkwQUVUMlRxUXFxcFhsZ1ZkZE9YZkpoU3JC?=
+ =?utf-8?B?MmpBQnhGaENjRUFVd0s0dnVUNzliNjU2K3kxTlRnSDlJM2xKWUtpcWtGS1U1?=
+ =?utf-8?B?ajMzUThvdVdaZER3dEZWN2F4dW44MjZzbDBTQnk4WDl1dnFKYUxTSG53aEoz?=
+ =?utf-8?B?QlpYalBicGRublZwVE1KMFhYMVVqZ1U2S2pqWDd2dTJsdVN5c1lUWHErTWcy?=
+ =?utf-8?B?OUY1ek1wSDJWKzRNaFFVYXlVS1FGeUNyZ2NKZzhIM2pmQzNMdHNsK3phOXYv?=
+ =?utf-8?B?QVE2cmY5STY2dHZQT25rVHg5N09GSyszMVB0RUM5MDBBdm9BRzJodUdXVzhR?=
+ =?utf-8?B?VWd3MytraGRvQVFwdTZqa210elJRb1NQY0tWd2h1MElLcEZPem02ckUyVWF2?=
+ =?utf-8?B?ZU5SN2xOQTBWRHc4WXFtZS9wSmNZMzFCeXBmdjMwVWEvTkY4c1BxTEtKY3g3?=
+ =?utf-8?B?a2M3L20yekx1VUFaNk56Ri9YSWc1elRBVHhpL25OKy9LZDcyRlpUekNWR3lI?=
+ =?utf-8?B?WHg1dTBYNXNpdmhUMnNodTAwa3R2R1M0VzNmdllsNlNUenFSYkt2ZlRlNmFS?=
+ =?utf-8?B?d1hmNGdQcStYN2NJNXBncU16L3Jzd3JXbnBaQlJ6NWZUZGYxK0xCSForVmts?=
+ =?utf-8?B?U3hURVMzdDRmOXQ5WUNMVDVjYUdtL1ZkTURRRFZRbktQdkI5Y29MeEVFMVpz?=
+ =?utf-8?B?R3kvcjZoWm9rck1FZFpkUG9HbndIUzZWTTFoa1R5dU40UlBCc295dklOZ3NC?=
+ =?utf-8?B?UGhBeHpLbzZTcUIwaDFpc1pEQjdhWXl2QTJFZDk3ZUNlWXJ4UzgzNVRQM3lh?=
+ =?utf-8?B?YnhZWk1DSkU1K3lkanZ2WEpVUldLOUxaSHlyS0oyVUttcVpnZEY0WERQRktP?=
+ =?utf-8?B?dkIwY0t5d0JWclJvWThteWdXNk9pMCsvNFVreW84SzZzSWthL3RPK25jUDJW?=
+ =?utf-8?B?UUgyeHZYNGJXcnJzTG1jbVZSU3IwOTZoQ050VXNjRFFoN0JpY3Z1aVZKeldl?=
+ =?utf-8?B?Z1J0b2ZFV2ZONzI3TjhWWVhXRThsdm5WcTlmYTYzM3lqREpaKzhYcVZxOXVq?=
+ =?utf-8?B?VVhSQWp0TzZ5N0x1dXZsc0FZOENDMVBiSitaUmJ4dGgyRFk4M1VsVWkwSjEx?=
+ =?utf-8?B?Ky85T0RyVy83TEswOWNFQ25WTU9zK25QSlQwdlpKVDNiVG50YW90dVFUT092?=
+ =?utf-8?B?UkgxZnpkUlVsQ0tXNDRXM0dkTm12bEpxZjRuallFN1BLQ1VBQTlqVnhKZ1Fn?=
+ =?utf-8?B?Rko1Ni9GbkNrQWh0UWxZYlAxakRXc2g2YUFNcmFhYkhMaTJ1aFVUb29rQVRY?=
+ =?utf-8?B?dGFQSGRGNW9hQm9iK24zSUFnR1ppQzFzSldDRTVMUSs0ZHRsQURVRS80eEdo?=
+ =?utf-8?B?OEFkck02S280TDVadGY5Z21TMk80dGw3NDgxa2k5UVVVa2ZRbnV3NlZWTERM?=
+ =?utf-8?B?Tm9vMWlpaEYyUGZ2ZTliTlVSTkQxdy9qTXlxcFQ2SG5BL29MKzVkMWxwcytr?=
+ =?utf-8?B?bnErMmplRytna0JJaXFnaDRUSkZHem5QS3hWZy9IYzNMYlRXWkRLdXFrOXBq?=
+ =?utf-8?B?TDJOUWl1UkpFZ2JUK0NYbE9sVExrbnBrMXhhRktCdkpNMitHMlpYemRqUXR4?=
+ =?utf-8?B?VHBQTk1mcEE5ckkvbVdPV0p4YkNtZUxBTUdnalhjcko2endLczNEVFBvWGFW?=
+ =?utf-8?B?MVpUWkxpYkxROTNvaUovYkpuOHBzOHRBaWhIZkNIY2tHR0NvazNmY0RPbmZQ?=
+ =?utf-8?B?c0loenVySmJ4SUZ3QzVOMzd3Vk4xOHB0ajB2NVdPVVNjVWovbll2Q2V5NEwv?=
+ =?utf-8?B?UWhleEtoTEZYM1FMcjVpb0cybm5MeVN3MTRpbnE4ekRsa2dpYlZFWDBKV3Jk?=
+ =?utf-8?B?c1FGU2JURDZYMGtzWHhIMHlmMHErUEZyQUtVNXBGMGNMTjlzbHI4bEVvL3JS?=
+ =?utf-8?B?cFppeGFEVTk4OHlwRjVwRlE4YStXUFE2V0NpOEg3TUQ0YjRrb3RlbUNYR0Vo?=
+ =?utf-8?B?cU1oTE9EUVAvbTlxTWNMSlBWM1gzNU4xZ3dOOVRoTWw1NnhhTmdqeEJlN3N1?=
+ =?utf-8?B?M0tmZVpneW1WTFB0cWdxZ2F0M0FZMTFLKythaThpR3RtR0dWNEE2cWRwNkwx?=
+ =?utf-8?B?Y3JzUXRnQy9TNkN6K2FmUkNHL0Z6WGZtdzJvWkpUYXBIczdUTmFTSlh4OGRm?=
+ =?utf-8?B?OWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf8bc8d0-7190-4a3a-8311-08dbe449c708
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2023 13:09:32.9417
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VZqY6lKZXlh/sZLzO47ldX9Tf40gMmNMI4GZV+Ct1/ISN8WmFOTzcRGa8RTAehl0PyX+bR4T1ImLN36lwa6l6KAcoDUJnZD57XYOwNQ27fg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5000
+X-OriginatorOrg: intel.com
 
-On 11/13/23 1:42 PM, Nikolay Aleksandrov wrote:
-> On 11/13/23 05:23, Daniel Borkmann wrote:
->> Add base support for creating/dumping netkit devices.
->>
->> Minimal example usage:
->>
->>    # ip link add type netkit
->>    # ip -d a
->>    [...]
->>    7: nk0@nk1: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->>      netkit mode l3 type peer policy forward numtxqueues 1 numrxqueues 1 [...]
->>    8: nk1@nk0: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->>      link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->>      netkit mode l3 type primary policy forward numtxqueues 1 numrxqueues 1 [...]
->>
->> Example usage with netns (for BPF examples, see BPF selftests linked below):
->>
->>    # ip netns add blue
->>    # ip link add nk0 type netkit peer nk1 netns blue
->>    # ip link set up nk0
->>    # ip addr add 10.0.0.1/24 dev nk0
->>    # ip -n blue link set up nk1
->>    # ip -n blue addr add 10.0.0.2/24 dev nk1
->>    # ping -c1 10.0.0.2
->>    PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
->>    64 bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.021 ms
->>
->> Example usage with L2 mode and peer blackholing when no BPF is attached:
->>
->>    # ip link add foo type netkit mode l2 forward peer blackhole bar
->>    # ip -d a
->>    [...]
->>    13: bar@foo: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->>       link/ether 5e:5b:81:17:02:27 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->>       netkit mode l2 type peer policy blackhole numtxqueues 1 numrxqueues 1 [...]
->>    14: foo@bar: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
->>       link/ether de:01:a5:88:9e:99 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
->>       netkit mode l2 type primary policy forward numtxqueues 1 numrxqueues 1 [...]
->>
->> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
->> Link: https://git.kernel.org/torvalds/c/35dfaad7188c
->> Link: https://git.kernel.org/torvalds/c/05c31b4ab205
->> Link: https://git.kernel.org/torvalds/c/ace15f91e569
->> ---
->>   (Targeted for iproute2 v6.7.0.)
->>
-> 
->>   ip/Makefile              |   2 +-
->>   ip/iplink.c              |   4 +-
->>   ip/iplink_netkit.c       | 160 +++++++++++++++++++++++++++++++++++++++
->>   man/man8/ip-address.8.in |   3 +-
->>   man/man8/ip-link.8.in    |  44 +++++++++++
->>   5 files changed, 209 insertions(+), 4 deletions(-)
->>   create mode 100644 ip/iplink_netkit.c
->>
->> diff --git a/ip/Makefile b/ip/Makefile
->> index 8fd9e295..3535ba78 100644
->> --- a/ip/Makefile
->> +++ b/ip/Makefile
->> @@ -13,7 +13,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
->>       ipvrf.o iplink_xstats.o ipseg6.o iplink_netdevsim.o iplink_rmnet.o \
->>       ipnexthop.o ipmptcp.o iplink_bareudp.o iplink_wwan.o ipioam6.o \
->>       iplink_amt.o iplink_batadv.o iplink_gtp.o iplink_virt_wifi.o \
->> -    ipstats.o
->> +    iplink_netkit.o ipstats.o
->>   RTMONOBJ=rtmon.o
->> diff --git a/ip/iplink.c b/ip/iplink.c
->> index 9a548dd3..6989cc4d 100644
->> --- a/ip/iplink.c
->> +++ b/ip/iplink.c
->> @@ -46,8 +46,8 @@ void iplink_types_usage(void)
->>           "          dsa | dummy | erspan | geneve | gre | gretap | gtp | ifb |\n"
->>           "          ip6erspan | ip6gre | ip6gretap | ip6tnl |\n"
->>           "          ipip | ipoib | ipvlan | ipvtap |\n"
->> -        "          macsec | macvlan | macvtap |\n"
->> -        "          netdevsim | nlmon | rmnet | sit | team | team_slave |\n"
->> +        "          macsec | macvlan | macvtap | netdevsim |\n"
->> +        "          netkit | nlmon | rmnet | sit | team | team_slave |\n"
->>           "          vcan | veth | vlan | vrf | vti | vxcan | vxlan | wwan |\n"
->>           "          xfrm | virt_wifi }\n");
->>   }
->> diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
->> new file mode 100644
->> index 00000000..c539777a
->> --- /dev/null
->> +++ b/ip/iplink_netkit.c
->> @@ -0,0 +1,160 @@
->> +/* SPDX-License-Identifier: GPL-2.0-or-later */
->> +/*
->> + * iplink_netkit.c netkit device management
->> + *
->> + * Authors:        Daniel Borkmann <daniel@iogearbox.net>
->> + */
->> +#include <stdio.h>
->> +#include <stdlib.h>
->> +#include <string.h>
->> +#include <sys/socket.h>
->> +#include <linux/if_link.h>
->> +
->> +#include "rt_names.h"
->> +#include "utils.h"
->> +#include "ip_common.h"
->> +
->> +static void explain(struct link_util *lu, FILE *f)
->> +{
->> +    fprintf(f,
->> +        "Usage: ... %s [ mode MODE ] [ POLICY ] [ peer [ POLICY <options> ] ]\n"
->> +        "\n"
->> +        "MODE: l3 | l2\n"
->> +        "POLICY: forward | blackhole\n"
->> +        "(first values are the defaults if nothing is specified)\n"
->> +        "\n"
->> +        "To get <options> type 'ip link add help'.\n",
->> +        lu->id);
->> +}
->> +
->> +static bool seen_mode, seen_peer;
->> +static struct rtattr *data;
->> +
->> +static int netkit_parse_opt(struct link_util *lu, int argc, char **argv,
->> +                struct nlmsghdr *n)
->> +{
->> +    __u32 ifi_flags, ifi_change, ifi_index;
->> +    struct ifinfomsg *ifm, *peer_ifm;
->> +    int err;
->> +
->> +    ifm = NLMSG_DATA(n);
->> +    ifi_flags = ifm->ifi_flags;
->> +    ifi_change = ifm->ifi_change;
->> +    ifi_index = ifm->ifi_index;
->> +    ifm->ifi_flags = 0;
->> +    ifm->ifi_change = 0;
->> +    ifm->ifi_index = 0;
->> +    while (argc > 0) {
->> +        if (matches(*argv, "mode") == 0) {
-> 
-> matches() should not be used anymore, only strcmp
-> 
->> +            __u32 mode = 0;
->> +
->> +            NEXT_ARG();
->> +            if (seen_mode)
->> +                duparg("mode", *argv);
->> +            seen_mode = true;
->> +
->> +            if (strcmp(*argv, "l3") == 0)
->> +                mode = NETKIT_L3;
->> +            else if (strcmp(*argv, "l2") == 0)
->> +                mode = NETKIT_L2;
-> 
-> minor nit: curly braces for all cases
 
-Thanks will address all and send a v2.
 
-Cheers,
-Daniel
+On 13.11.2023 13:58, Ivan Vecera wrote:
+> Use existing i40e_find_vsi_by_type() to find a VSI
+> associated with flow director.
+> 
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+
+Thanks Ivan, nice cleanup
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 51ee870ffa36..90966878333c 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -15645,6 +15645,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  #ifdef CONFIG_I40E_DCB
+>  	enum i40e_get_fw_lldp_status_resp lldp_status;
+>  #endif /* CONFIG_I40E_DCB */
+> +	struct i40e_vsi *vsi;
+>  	struct i40e_pf *pf;
+>  	struct i40e_hw *hw;
+>  	u16 wol_nvm_bits;
+> @@ -15655,7 +15656,6 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  #endif /* CONFIG_I40E_DCB */
+>  	int err;
+>  	u32 val;
+> -	u32 i;
+>  
+>  	err = pci_enable_device_mem(pdev);
+>  	if (err)
+> @@ -16005,12 +16005,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	INIT_LIST_HEAD(&pf->vsi[pf->lan_vsi]->ch_list);
+>  
+>  	/* if FDIR VSI was set up, start it now */
+> -	for (i = 0; i < pf->num_alloc_vsi; i++) {
+> -		if (pf->vsi[i] && pf->vsi[i]->type == I40E_VSI_FDIR) {
+> -			i40e_vsi_open(pf->vsi[i]);
+> -			break;
+> -		}
+> -	}
+> +	vsi = i40e_find_vsi_by_type(pf, I40E_VSI_FDIR);
+> +	if (vsi)
+> +		i40e_vsi_open(vsi);
+>  
+>  	/* The driver only wants link up/down and module qualification
+>  	 * reports from firmware.  Note the negative logic.
 
