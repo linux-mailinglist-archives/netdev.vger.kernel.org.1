@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-47451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B257EA55C
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:15:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6FB97EA55D
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:15:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E34E91F22B6E
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20C6F1F22C01
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9018A2E626;
-	Mon, 13 Nov 2023 21:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E163AC29;
+	Mon, 13 Nov 2023 21:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhCCZWk6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B3S4WEA4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747BC2E625
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B88225105
 	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 21:08:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD6E0C433CB;
-	Mon, 13 Nov 2023 21:08:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0759C433C7;
+	Mon, 13 Nov 2023 21:08:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699909716;
-	bh=Wyb2eZs0DfMtKWa3ozCNl2p9XpdjUL1C9e2WVWpwrVs=;
+	s=k20201202; t=1699909717;
+	bh=aZUIYIfbHil3p5WTobBy/TJKEbhmQ/8OnAEGkuTVSWQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hhCCZWk6wawEh8dhy/lWepa9hlJTG5ZSmcuTm1gW2beJfoNVFzKKW8dL1gX3fz3Ui
-	 VJK4xAdtGAfsKkEu3ymw/n1BtdmZQj2QbSaA2lSpEUgT6PBUYYO5chxVL99zd2Co/L
-	 Z/0R8tU4na7VwSGQAmzPCq/Z9Wi9bhshtoSfsAu29JVv3gugv4XMjWQCJEv1ZZCruW
-	 INpIO6y1XSHYvCHfdeg2/TKP0lgxOpUuW8aLaacV+YwBv1mzk8vlVe1jv5XNOGvp9y
-	 nG4T5RRRFgvomY38q10oQ3ao1wi/cxaehlwdNXrmXouJ9+Orl1gaQliGOqgmDffjOt
-	 Q8PVMEFlO47RQ==
+	b=B3S4WEA4jUnAWKftFDg2BlT6GHaIA/oM7ldQVleoPuIJq3T6N+jAYx8ZXY+iNcQL4
+	 ydthXStCDB+tdj6uZ1uOMAKhd/AO+NIeCcpwrgX5Vbc/OupGoqcy7pA6PmuQZu/HxG
+	 OiCUCiALUbseCeafwq3KF61FWXZEot6G4PU+e42YPj3SFsscqmR8HljIbtlKxjhYMW
+	 pZcvbt6Hqf6kkzw83FCf0+xkGctl7ugxgCG1VBxspyHjeq3QWudA/hl3Wr75Jmii9i
+	 aDP2YFTwaiuJo9SFFH0Fe5ubrXGjVXq7PmqJAqzfW+G8HMHPEo+qOGxqbBPYGE8us9
+	 8Xj581fccdisw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Gavin Li <gavinl@nvidia.com>
-Subject: [net 06/17] net/mlx5e: fix double free of encap_header in update funcs
-Date: Mon, 13 Nov 2023 13:08:15 -0800
-Message-ID: <20231113210826.47593-7-saeed@kernel.org>
+	Vlad Buslov <vladbu@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>
+Subject: [net 07/17] net/mlx5e: Fix pedit endianness
+Date: Mon, 13 Nov 2023 13:08:16 -0800
+Message-ID: <20231113210826.47593-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231113210826.47593-1-saeed@kernel.org>
 References: <20231113210826.47593-1-saeed@kernel.org>
@@ -55,95 +56,167 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Gavin Li <gavinl@nvidia.com>
+From: Vlad Buslov <vladbu@nvidia.com>
 
-Follow up to the previous patch to fix the same issue for
-mlx5e_tc_tun_update_header_ipv4{6} when mlx5_packet_reformat_alloc()
-fails.
+Referenced commit addressed endianness issue in mlx5 pedit implementation
+in ad hoc manner instead of systematically treating integer values
+according to their types which left pedit fields of sizes not equal to 4
+and where the bytes being modified are not least significant ones broken on
+big endian machines since wrong bits will be consumed during parsing which
+leads to following example error when applying pedit to source and
+destination MAC addresses:
 
-When mlx5_packet_reformat_alloc() fails, the encap_header allocated in
-mlx5e_tc_tun_update_header_ipv4{6} will be released within it. However,
-e->encap_header is already set to the previously freed encap_header
-before mlx5_packet_reformat_alloc(). As a result, the later
-mlx5e_encap_put() will free e->encap_header again, causing a double free
-issue.
+[Wed Oct 18 12:52:42 2023] mlx5_core 0001:00:00.1 p1v3_r: attempt to offload an unsupported field (cmd 0)
+[Wed Oct 18 12:52:42 2023] mask: 00000000330c5b68: 00 00 00 00 ff ff 00 00 00 00 ff ff 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 0000000017d22fd9: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 000000008186d717: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 0000000029eb6149: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 000000007ed103e4: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 00000000db8101a6: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+[Wed Oct 18 12:52:42 2023] mask: 00000000ec3c08a9: 00 00 00 00 00 00 00 00 00 00 00 00              ............
 
-mlx5e_encap_put()
-     --> mlx5e_encap_dealloc()
-         --> kfree(e->encap_header)
+Treat masks and values of pedit and filter match as network byte order,
+refactor pointers to them to void pointers instead of confusing u32
+pointers and only cast to pointer-to-integer when reading a value from
+them. Treat pedit mlx5_fields->field_mask as host byte order according to
+its type u32, change the constants in fields array accordingly.
 
-This patch fix it by not setting e->encap_header until
-mlx5_packet_reformat_alloc() success.
-
-Fixes: a54e20b4fcae ("net/mlx5e: Add basic TC tunnel set action for SRIOV offloads")
-Signed-off-by: Gavin Li <gavinl@nvidia.com>
+Fixes: 82198d8bcdef ("net/mlx5e: Fix endianness when calculating pedit mask first bit")
+Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/core/en/tc_tun.c   | 20 +++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en_tc.c   | 60 ++++++++++---------
+ 1 file changed, 32 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
-index 8bca696b6658..668da5c70e63 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun.c
-@@ -403,16 +403,12 @@ int mlx5e_tc_tun_update_header_ipv4(struct mlx5e_priv *priv,
- 	if (err)
- 		goto free_encap;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 9a5a5c2c7da9..7ca9e5b86778 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -3147,7 +3147,7 @@ static struct mlx5_fields fields[] = {
+ 	OFFLOAD(DIPV6_31_0,   32, U32_MAX, ip6.daddr.s6_addr32[3], 0,
+ 		dst_ipv4_dst_ipv6.ipv6_layout.ipv6[12]),
+ 	OFFLOAD(IPV6_HOPLIMIT, 8,  U8_MAX, ip6.hop_limit, 0, ttl_hoplimit),
+-	OFFLOAD(IP_DSCP, 16,  0xc00f, ip6, 0, ip_dscp),
++	OFFLOAD(IP_DSCP, 16,  0x0fc0, ip6, 0, ip_dscp),
  
--	e->encap_size = ipv4_encap_size;
--	kfree(e->encap_header);
--	e->encap_header = encap_header;
+ 	OFFLOAD(TCP_SPORT, 16, U16_MAX, tcp.source,  0, tcp_sport),
+ 	OFFLOAD(TCP_DPORT, 16, U16_MAX, tcp.dest,    0, tcp_dport),
+@@ -3158,21 +3158,31 @@ static struct mlx5_fields fields[] = {
+ 	OFFLOAD(UDP_DPORT, 16, U16_MAX, udp.dest,   0, udp_dport),
+ };
+ 
+-static unsigned long mask_to_le(unsigned long mask, int size)
++static u32 mask_field_get(void *mask, struct mlx5_fields *f)
+ {
+-	__be32 mask_be32;
+-	__be16 mask_be16;
 -
- 	if (!(nud_state & NUD_VALID)) {
- 		neigh_event_send(attr.n, NULL);
- 		/* the encap entry will be made valid on neigh update event
- 		 * and not used before that.
- 		 */
--		goto release_neigh;
-+		goto free_encap;
+-	if (size == 32) {
+-		mask_be32 = (__force __be32)(mask);
+-		mask = (__force unsigned long)cpu_to_le32(be32_to_cpu(mask_be32));
+-	} else if (size == 16) {
+-		mask_be32 = (__force __be32)(mask);
+-		mask_be16 = *(__be16 *)&mask_be32;
+-		mask = (__force unsigned long)cpu_to_le16(be16_to_cpu(mask_be16));
++	switch (f->field_bsize) {
++	case 32:
++		return be32_to_cpu(*(__be32 *)mask) & f->field_mask;
++	case 16:
++		return be16_to_cpu(*(__be16 *)mask) & (u16)f->field_mask;
++	default:
++		return *(u8 *)mask & (u8)f->field_mask;
  	}
++}
  
- 	memset(&reformat_params, 0, sizeof(reformat_params));
-@@ -426,6 +422,10 @@ int mlx5e_tc_tun_update_header_ipv4(struct mlx5e_priv *priv,
- 		goto free_encap;
- 	}
+-	return mask;
++static void mask_field_clear(void *mask, struct mlx5_fields *f)
++{
++	switch (f->field_bsize) {
++	case 32:
++		*(__be32 *)mask &= ~cpu_to_be32(f->field_mask);
++		break;
++	case 16:
++		*(__be16 *)mask &= ~cpu_to_be16((u16)f->field_mask);
++		break;
++	default:
++		*(u8 *)mask &= ~(u8)f->field_mask;
++		break;
++	}
+ }
  
-+	e->encap_size = ipv4_encap_size;
-+	kfree(e->encap_header);
-+	e->encap_header = encap_header;
-+
- 	e->flags |= MLX5_ENCAP_ENTRY_VALID;
- 	mlx5e_rep_queue_neigh_stats_work(netdev_priv(attr.out_dev));
- 	mlx5e_route_lookup_ipv4_put(&attr);
-@@ -669,16 +669,12 @@ int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
- 	if (err)
- 		goto free_encap;
+ static int offload_pedit_fields(struct mlx5e_priv *priv,
+@@ -3184,11 +3194,12 @@ static int offload_pedit_fields(struct mlx5e_priv *priv,
+ 	struct pedit_headers *set_masks, *add_masks, *set_vals, *add_vals;
+ 	struct pedit_headers_action *hdrs = parse_attr->hdrs;
+ 	void *headers_c, *headers_v, *action, *vals_p;
+-	u32 *s_masks_p, *a_masks_p, s_mask, a_mask;
+ 	struct mlx5e_tc_mod_hdr_acts *mod_acts;
+-	unsigned long mask, field_mask;
++	void *s_masks_p, *a_masks_p;
+ 	int i, first, last, next_z;
+ 	struct mlx5_fields *f;
++	unsigned long mask;
++	u32 s_mask, a_mask;
+ 	u8 cmd;
  
--	e->encap_size = ipv6_encap_size;
--	kfree(e->encap_header);
--	e->encap_header = encap_header;
+ 	mod_acts = &parse_attr->mod_hdr_acts;
+@@ -3204,15 +3215,11 @@ static int offload_pedit_fields(struct mlx5e_priv *priv,
+ 		bool skip;
+ 
+ 		f = &fields[i];
+-		/* avoid seeing bits set from previous iterations */
+-		s_mask = 0;
+-		a_mask = 0;
 -
- 	if (!(nud_state & NUD_VALID)) {
- 		neigh_event_send(attr.n, NULL);
- 		/* the encap entry will be made valid on neigh update event
- 		 * and not used before that.
- 		 */
--		goto release_neigh;
-+		goto free_encap;
- 	}
+ 		s_masks_p = (void *)set_masks + f->offset;
+ 		a_masks_p = (void *)add_masks + f->offset;
  
- 	memset(&reformat_params, 0, sizeof(reformat_params));
-@@ -692,6 +688,10 @@ int mlx5e_tc_tun_update_header_ipv6(struct mlx5e_priv *priv,
- 		goto free_encap;
- 	}
+-		s_mask = *s_masks_p & f->field_mask;
+-		a_mask = *a_masks_p & f->field_mask;
++		s_mask = mask_field_get(s_masks_p, f);
++		a_mask = mask_field_get(a_masks_p, f);
  
-+	e->encap_size = ipv6_encap_size;
-+	kfree(e->encap_header);
-+	e->encap_header = encap_header;
-+
- 	e->flags |= MLX5_ENCAP_ENTRY_VALID;
- 	mlx5e_rep_queue_neigh_stats_work(netdev_priv(attr.out_dev));
- 	mlx5e_route_lookup_ipv6_put(&attr);
+ 		if (!s_mask && !a_mask) /* nothing to offload here */
+ 			continue;
+@@ -3239,22 +3246,20 @@ static int offload_pedit_fields(struct mlx5e_priv *priv,
+ 					 match_mask, f->field_bsize))
+ 				skip = true;
+ 			/* clear to denote we consumed this field */
+-			*s_masks_p &= ~f->field_mask;
++			mask_field_clear(s_masks_p, f);
+ 		} else {
+ 			cmd  = MLX5_ACTION_TYPE_ADD;
+ 			mask = a_mask;
+ 			vals_p = (void *)add_vals + f->offset;
+ 			/* add 0 is no change */
+-			if ((*(u32 *)vals_p & f->field_mask) == 0)
++			if (!mask_field_get(vals_p, f))
+ 				skip = true;
+ 			/* clear to denote we consumed this field */
+-			*a_masks_p &= ~f->field_mask;
++			mask_field_clear(a_masks_p, f);
+ 		}
+ 		if (skip)
+ 			continue;
+ 
+-		mask = mask_to_le(mask, f->field_bsize);
+-
+ 		first = find_first_bit(&mask, f->field_bsize);
+ 		next_z = find_next_zero_bit(&mask, f->field_bsize, first);
+ 		last  = find_last_bit(&mask, f->field_bsize);
+@@ -3281,10 +3286,9 @@ static int offload_pedit_fields(struct mlx5e_priv *priv,
+ 		MLX5_SET(set_action_in, action, field, f->field);
+ 
+ 		if (cmd == MLX5_ACTION_TYPE_SET) {
++			unsigned long field_mask = f->field_mask;
+ 			int start;
+ 
+-			field_mask = mask_to_le(f->field_mask, f->field_bsize);
+-
+ 			/* if field is bit sized it can start not from first bit */
+ 			start = find_first_bit(&field_mask, f->field_bsize);
+ 
 -- 
 2.41.0
 
