@@ -1,135 +1,146 @@
-Return-Path: <netdev+bounces-47273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B427E95AE
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 04:45:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BB87E95BB
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 04:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7D1E280A04
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 03:45:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAB2B1F21077
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 03:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E991D882A;
-	Mon, 13 Nov 2023 03:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B7F79D8;
+	Mon, 13 Nov 2023 03:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="UA61zY8V"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585F84C8A
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 03:45:03 +0000 (UTC)
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89451729;
-	Sun, 12 Nov 2023 19:45:00 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VwBn65N_1699847097;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VwBn65N_1699847097)
-          by smtp.aliyun-inc.com;
-          Mon, 13 Nov 2023 11:44:58 +0800
-Date: Mon, 13 Nov 2023 11:44:57 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net v1] net/smc: avoid data corruption caused by decline
-Message-ID: <20231113034457.GA121324@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FDAC12A
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 03:50:18 +0000 (UTC)
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E6C1D1
+	for <netdev@vger.kernel.org>; Sun, 12 Nov 2023 19:50:14 -0800 (PST)
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20231113035010epoutp03043307865d51dd78f97c9c6d73e44781~XEjbGYLeI2436224362epoutp03b
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 03:50:10 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20231113035010epoutp03043307865d51dd78f97c9c6d73e44781~XEjbGYLeI2436224362epoutp03b
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1699847410;
+	bh=K/SRvaHr2etDt+D7s7OyZDI+2nNmv+JzThALR5+aLzA=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=UA61zY8Vs+KjLA//ahMa1YGiIuArquNrTIizLv4O/HYVlDTEIqQGYxKbuD+NDCmNk
+	 MVZhvs2hIsLRzN2Gc23lJZ1odEKRCyJ0MY8Jp+U5rq2DI7/mMqrQ1i0/EASw86Ko2t
+	 2LJqHmSgnElPcMfs+49TFmYQL4RkPTf+a66ZFs+Q=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+	epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20231113035010epcas1p12f30a5492d79468a57bdddd4862bea85~XEjalhdC20099300993epcas1p1u;
+	Mon, 13 Nov 2023 03:50:10 +0000 (GMT)
+Received: from epsmgec1p1.samsung.com (unknown [182.195.38.250]) by
+	epsnrtp3.localdomain (Postfix) with ESMTP id 4STFnF5xZqz4x9Q1; Mon, 13 Nov
+	2023 03:50:09 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+	epsmgec1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	22.AA.09731.1FC91556; Mon, 13 Nov 2023 12:50:09 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+	epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+	20231113035009epcas1p31f0e0ce293e8be86de521a8f99b82d3b~XEjZ6RJ941020310203epcas1p3L;
+	Mon, 13 Nov 2023 03:50:09 +0000 (GMT)
+Received: from epsmgmc1p1new.samsung.com (unknown [182.195.42.40]) by
+	epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+	20231113035009epsmtrp28db343bf25a1835e0be12e55bdcfc81f~XEjZ5oVeW0273602736epsmtrp2P;
+	Mon, 13 Nov 2023 03:50:09 +0000 (GMT)
+X-AuditID: b6c32a36-a7dff70000002603-e5-65519cf190e9
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+	epsmgmc1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	35.DF.07368.1FC91556; Mon, 13 Nov 2023 12:50:09 +0900 (KST)
+Received: from jongeonpark03 (unknown [10.253.101.166]) by
+	epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20231113035009epsmtip25c31b90c5345f1c0dd516e752adb7878~XEjZv3qh02252222522epsmtip2t;
+	Mon, 13 Nov 2023 03:50:09 +0000 (GMT)
+From: "Jong eon Park" <jongeon.park@samsung.com>
+To: "'Jakub Kicinski'" <kuba@kernel.org>
+Cc: "'Paolo Abeni'" <pabeni@redhat.com>, "'David S. Miller'"
+	<davem@davemloft.net>, "'Eric Dumazet'" <edumazet@google.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "'Dong ha Kang'"
+	<dongha7.kang@samsung.com>
+In-Reply-To: <20231110110002.7279f895@kernel.org>
+Subject: RE: [PATCH] netlink: introduce netlink poll to resolve fast return
+ issue
+Date: Mon, 13 Nov 2023 12:50:09 +0900
+Message-ID: <000001da15e4$7f5a6bd0$7e0f4370$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQJoS8HO+cSy/HZb7h5ntB8MEORIdAHf29cGAkyoXsQBixSniALjIF5OAiFwHxEBTj42xq762NKQ
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJJsWRmVeSWpSXmKPExsWy7bCmge7HOYGpBlce61nMOd/CYjH95lRm
+	i6fHHrFbXNjWx2pxedccNotjC8Qsvp1+w+jA7rFl5U0mjwWbSj02repk83i/7yqbR9+WVYwe
+	nzfJBbBFZdtkpCampBYppOYl56dk5qXbKnkHxzvHm5oZGOoaWlqYKynkJeam2iq5+AToumXm
+	AF2ipFCWmFMKFApILC5W0rezKcovLUlVyMgvLrFVSi1IySkwK9ArTswtLs1L18tLLbEyNDAw
+	MgUqTMjOWNz0hangBVNFU3MPYwPjTKYuRk4OCQETiT1H+ti6GLk4hAR2MEo83reFHcL5xCgx
+	ceksZgjnG6PE/h9tbDAtK6evgGrZyyhxY85nqJY3jBJ/TvSyg1SxCRhIHPvxkxHEFhHQkNg3
+	ax4jSBGzwHNGic0Nk5lBEpwChhI3zzwAaxAWCJbY/mMhC4jNIqAq0X7mIdg6XgFLiZnPnkDZ
+	ghInZz4Bq2EWkJfY/nYOM8RJChI/ny5j7WLkAFoWJbFvpQtEiYjE7M42sBckBKZySNybexXq
+	BReJA6euQ0NAWOLV8S3sELaUxOd3e6FqsiVeHDsGNlNCoEDi6hElCNNe4v0lCxCTWUBTYv0u
+	fYhiRYmdv+cyQmzlk3j3tQeqkVeio00IokRN4uHJt6wQtozE6hV32SYwKs1C8tYsJG/NQnL/
+	LIRlCxhZVjGKpRYU56anFhsWGMHjOjk/dxMjOI1qme1gnPT2g94hRiYOxkOMEhzMSiK8eZoB
+	qUK8KYmVValF+fFFpTmpxYcYTYEBPZFZSjQ5H5jI80riDU0sDUzMjEwsjC2NzZTEeec87k0R
+	EkhPLEnNTk0tSC2C6WPi4JRqYGoxWTHpgYQ3yztez6uu83vF/doWCrQ+UNzgV2e+1LbQem7P
+	2urX/KHmh83rg5+cEc9+cCelqtza/+GPXQJXefInPK3sCS3d/avG3yNc9WP9oXuqP/R2eUTN
+	Ej0kecxL7/i7efFh08NmBRjKlLlXu/5/utqJ7WjtIoZ3h/3PCAZ/Vb0qIbH3zwzPOV2Kp2vu
+	3VnIelZ5w9ykQikZVd48/rbj09qUX+k6r6l02xS4OfOcwylpDsdEx+xGG7vlK793+HGoR266
+	WDfzJ0vpEyPlFauut/jnCxyu3PF027zAjmVrF8SlCgqY564RWXjgla585cWi3+HHnrY+XPFS
+	/FmKnXul3q6fQiys/jG//rv1KrEUZyQaajEXFScCAEgcRh4sBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42LZdlhJXvfjnMBUg313pS3mnG9hsZh+cyqz
+	xdNjj9gtLmzrY7W4vGsOm8WxBWIW306/YXRg99iy8iaTx4JNpR6bVnWyebzfd5XNo2/LKkaP
+	z5vkAtiiuGxSUnMyy1KL9O0SuDIWN31hKnjBVNHU3MPYwDiTqYuRk0NCwERi5fQVbF2MXBxC
+	ArsZJe7MncIMkZCRuL5gH0sXIweQLSxx+HAxRM0rRom9ez6wgdSwCRhIHPvxkxHEFhHQkNg3
+	ax6YzSzwmlHi0CcFiIY7TBIXTvSDDeUUMJS4eeYBO4gtLBAo8X7jV7BBLAKqEu1nHoLZvAKW
+	EjOfPYGyBSVOznwCdgSzgJ5E20ao+fIS29/OgbpTQeLn02WsICUiAlES+1a6QJSISMzubGOe
+	wCg8C8mgWQiDZiEZNAtJxwJGllWMkqkFxbnpucmGBYZ5qeV6xYm5xaV56XrJ+bmbGMHxpKWx
+	g/He/H96hxiZOBgPMUpwMCuJ8OZpBqQK8aYkVlalFuXHF5XmpBYfYpTmYFES5zWcMTtFSCA9
+	sSQ1OzW1ILUIJsvEwSnVwCQVe3gab5keS1J7xeTa3bltPAe2NtspO9Qf5+R8/OON30mL2t8H
+	9iVVTfCxEFkZW/zHs+j9isC0d5r5/+b3p72t3urlebK6PvgQ9ycb5u+us2f9255Zvoh9QZvX
+	sbQ9sfytX6UsOdJcvGq4wr0d355ce0K2lnt1T2KsZzWPTu27y9n/zBMKM+0/PGn9IPu9cKnC
+	HYUbK1aZzDw4/TIbg9KOY54Ml12cDjDUFPG+1F/2ufPcAWWX6fFRpRk/jS+7dgQtztoj+O4j
+	66EFk9d8udgQNYOhQaW85dm5DsMpAoZe/b/XliWKXjQQkLvxYcUFZebLhRz8tRr3uA8m3LVW
+	nMOtrOv50+d3rVG77DZ/JZbijERDLeai4kQARTTVQRYDAAA=
+X-CMS-MailID: 20231113035009epcas1p31f0e0ce293e8be86de521a8f99b82d3b
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77
+References: <CGME20231103072245epcas1p4471a31e9f579e38501c8c856d3ca2a77@epcas1p4.samsung.com>
+	<20231103072209.1005409-1-jongeon.park@samsung.com>
+	<20231106154812.14c470c2@kernel.org>
+	<25c501da111e$d527b010$7f771030$@samsung.com>
+	<20231107085347.75bc3802@kernel.org>
+	<000001da13e5$d9b99e30$8d2cda90$@samsung.com>
+	<20231110110002.7279f895@kernel.org>
 
-On Wed, Nov 08, 2023 at 05:48:29PM +0800, D. Wythe wrote:
->From: "D. Wythe" <alibuda@linux.alibaba.com>
->
->We found a data corruption issue during testing of SMC-R on Redis
->applications.
->
->The benchmark has a low probability of reporting a strange error as
->shown below.
->
->"Error: Protocol error, got "\xe2" as reply type byte"
->
->Finally, we found that the retrieved error data was as follows:
->
->0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
->0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
->
->It is quite obvious that this is a SMC DECLINE message, which means that
->the applications received SMC protocol message.
->We found that this was caused by the following situations:
->
->client			server
->	   proposal
->	------------->
->	   accept
->	<-------------
->	   confirm
->	------------->
->wait confirm
->
->	 failed llc confirm
->	    x------
->(after 2s)timeout
->			wait rsp
->
->wait decline
->
->(after 1s) timeout
->			(after 2s) timeout
->	    decline
->	-------------->
->	    decline
->	<--------------
->
->As a result, a decline message was sent in the implementation, and this
->message was read from TCP by the already-fallback connection.
->
->This patch double the client timeout as 2x of the server value,
->With this simple change, the Decline messages should never cross or
->collide (during Confirm link timeout).
->
->This issue requires an immediate solution, since the protocol updates
->involve a more long-term solution.
->
->Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->---
-> net/smc/af_smc.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->index abd2667..5b91f55 100644
->--- a/net/smc/af_smc.c
->+++ b/net/smc/af_smc.c
->@@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
-> 	int rc;
+On Saturday, November 11, 2023 4:00 AM, Jakub Kicinski wrote:
 > 
-> 	/* receive CONFIRM LINK request from server over RoCE fabric */
->-	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
->+	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
-> 			      SMC_LLC_CONFIRM_LINK);
+> I see, please add a comment saying that NETLINK_S_CONGESTED prevents
+> new skbs from being queued before the new test in netlink_poll().
+> 
+> Please repost next week (i.e. after the merge window) with subject
+> tagged [PATCH net-next v2].
 
-It may be difficult for people to understand why LLC_WAIT_TIME is
-different, especially without any comments explaining its purpose.
-People are required to use git to find the reason, which I believe is
-not conducive to easy maintenance.
+Got it. Thanks Jakub.
 
-Best regards,
-Dust
+BRs,
+JE Park.
 
 
-
-> 	if (!qentry) {
-> 		struct smc_clc_msg_decline dclc;
->-- 
->1.8.3.1
 
