@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-47511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220517EA6BF
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:11:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE4E17EA6BD
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DCFD1F230BA
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 235CB1F23080
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F733E49D;
-	Mon, 13 Nov 2023 23:11:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE393E48E;
+	Mon, 13 Nov 2023 23:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CCvLmgh0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E2Uddfkm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021503E47D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FAB3E478
 	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:11:01 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB1ED71
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:10:58 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E17C5D55
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:10:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699917058; x=1731453058;
+  t=1699917060; x=1731453060;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=2cqz4UvtULwVanOfEP/BJwS4QAnTQLaFNmcIqQS4Wn8=;
-  b=CCvLmgh0zghyNF+ReR+jHX6NXbX7G2KawYU0ZFEY0UTgD46BYy6hCIBF
-   1dNFpizSI3qycpmL94yaHwG1lgj0bL+6ADmooNfHawIwsHp9ZQ0gN1z/t
-   AWMqf0uUnu7RKVLLaXVEJpsTcoG7UgLjsLy8+tNUZnbenpOkyD8AEUNyM
-   NIywrW7JHfRA8V9bDxrRvZKDq2nts+fnRXpoF4GxdxWibQr2b5jVmsPxi
-   voaXM+hm1YgDvNfpY3Gz3CgLZtP1N93NTc8SNlfQ2Esb8jeuRcGRc0WTF
-   f9jyBOo2PzZRuImFEFuKM/Me2d9HngHKl4cR5eZUtv7RoDIUVIElHZBY4
+  bh=loDVw9NK7A6jlYT47ck8TKzqrp5WKHVhSbj8yHv1Lw8=;
+  b=E2Uddfkm68H1OkUMXly0as2F/i/ZTeFJXrPrqHimtVCfbImxfgQgl1k4
+   rLy8CEm0s99ZusUTe6WZVWNmr89GbHdCRW8Xzp7bs/bdy4cTem5LBTFzz
+   CQ7KOT4i/qn3ge34n+Lq2IJgmoczOMiSR3jqTZKTkGuk+tD1BuyWDj2gp
+   louRj2fBFYhcemF15JlFWVesb04Ipqa5Mqt4lwe/7XnOr43NL5aqYaQIO
+   nYhr6HSNWeL68HZ4x4od3boL/dQgDWpDeGnx4yzmTVRC8+l3Fxj0DW9a1
+   JYdbUZczv3fhjSJ75z5P56PMZqtUTixnHAEmxCBedJNLa17/elQcjniEG
    w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="375562634"
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="375562640"
 X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
-   d="scan'208";a="375562634"
+   d="scan'208";a="375562640"
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 15:10:53 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="888051417"
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="888051420"
 X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
-   d="scan'208";a="888051417"
+   d="scan'208";a="888051420"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga004.jf.intel.com with ESMTP; 13 Nov 2023 15:10:53 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -57,9 +57,9 @@ Cc: Ivan Vecera <ivecera@redhat.com>,
 	anthony.l.nguyen@intel.com,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 08/15] i40e: Consolidate hardware capabilities
-Date: Mon, 13 Nov 2023 15:10:27 -0800
-Message-ID: <20231113231047.548659-9-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 09/15] i40e: Initialize hardware capabilities at single place
+Date: Mon, 13 Nov 2023 15:10:28 -0800
+Message-ID: <20231113231047.548659-10-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231113231047.548659-1-anthony.l.nguyen@intel.com>
 References: <20231113231047.548659-1-anthony.l.nguyen@intel.com>
@@ -73,580 +73,217 @@ Content-Transfer-Encoding: 8bit
 
 From: Ivan Vecera <ivecera@redhat.com>
 
-Fields .caps in i40e_hw and .hw_features in i40e_pf both indicate
-capabilities provided by hardware. Move and merge i40e_pf.hw_features
-into i40e_hw.caps as this is more appropriate place for them and
-adjust their names to I40E_HW_CAP_... convention.
+Some i40e_hw.caps bits are set in i40e_set_hw_caps(), some of them
+in i40e_init_adminq() and the rest of them in i40e_sw_init().
+Consolidate the initialization to single proper place i40e_set_hw_caps().
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/i40e/i40e.h        | 27 +------
- .../net/ethernet/intel/i40e/i40e_ethtool.c    | 36 ++++-----
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 78 +++++++++----------
- drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  6 +-
- drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_type.h   | 18 +++++
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  8 +-
- 7 files changed, 85 insertions(+), 90 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c | 66 ++++++++++++++-----
+ drivers/net/ethernet/intel/i40e/i40e_debug.h  |  1 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 55 +---------------
+ .../net/ethernet/intel/i40e/i40e_register.h   |  1 +
+ 4 files changed, 51 insertions(+), 72 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index ba87870e0fb4..6022944d04f8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -34,11 +34,11 @@
- #define I40E_MIN_VSI_ALLOC		83 /* LAN, ATR, FCOE, 64 VF */
- /* max 16 qps */
- #define i40e_default_queues_per_vmdq(pf) \
--	(test_bit(I40E_HW_RSS_AQ_CAPABLE, (pf)->hw_features) ? 4 : 1)
-+	(test_bit(I40E_HW_CAP_RSS_AQ, (pf)->hw.caps) ? 4 : 1)
- #define I40E_DEFAULT_QUEUES_PER_VF	4
- #define I40E_MAX_VF_QUEUES		16
- #define i40e_pf_get_max_q_per_tc(pf) \
--	(test_bit(I40E_HW_128_QP_RSS_CAPABLE, (pf)->hw_features) ? 128 : 64)
-+	(test_bit(I40E_HW_CAP_128_QP_RSS, (pf)->hw.caps) ? 128 : 64)
- #define I40E_FDIR_RING_COUNT		32
- #define I40E_MAX_AQ_BUF_SIZE		4096
- #define I40E_AQ_LEN			256
-@@ -139,28 +139,6 @@ enum i40e_vsi_state {
- 	__I40E_VSI_STATE_SIZE__,
- };
- 
--enum i40e_pf_hw_features {
--	I40E_HW_RSS_AQ_CAPABLE,
--	I40E_HW_128_QP_RSS_CAPABLE,
--	I40E_HW_ATR_EVICT_CAPABLE,
--	I40E_HW_WB_ON_ITR_CAPABLE,
--	I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE,
--	I40E_HW_NO_PCI_LINK_CHECK,
--	I40E_HW_100M_SGMII_CAPABLE,
--	I40E_HW_NO_DCB_SUPPORT,
--	I40E_HW_USE_SET_LLDP_MIB,
--	I40E_HW_GENEVE_OFFLOAD_CAPABLE,
--	I40E_HW_PTP_L4_CAPABLE,
--	I40E_HW_WOL_MC_MAGIC_PKT_WAKE,
--	I40E_HW_HAVE_CRT_RETIMER,
--	I40E_HW_OUTER_UDP_CSUM_CAPABLE,
--	I40E_HW_PHY_CONTROLS_LEDS,
--	I40E_HW_STOP_FW_LLDP,
--	I40E_HW_PORT_ID_VALID,
--	I40E_HW_RESTART_AUTONEG,
--	I40E_PF_HW_FEATURES_NBITS,	/* must be last */
--};
--
- enum i40e_pf_flags {
- 	I40E_FLAG_MSI_ENA,
- 	I40E_FLAG_MSIX_ENA,
-@@ -557,7 +535,6 @@ struct i40e_pf {
- 	struct timer_list service_timer;
- 	struct work_struct service_task;
- 
--	DECLARE_BITMAP(hw_features, I40E_PF_HW_FEATURES_NBITS);
- 	DECLARE_BITMAP(flags, I40E_PF_FLAGS_NBITS);
- 	struct i40e_client_instance *cinst;
- 	bool stat_offsets_loaded;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index b4cc9bb4bc4e..eb9a7b32af73 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -502,7 +502,7 @@ static void i40e_phy_type_to_ethtool(struct i40e_pf *pf,
- 		if (hw_link_info->requested_speeds & I40E_LINK_SPEED_1GB)
- 			ethtool_link_ksettings_add_link_mode(ks, advertising,
- 							     1000baseT_Full);
--		if (test_bit(I40E_HW_100M_SGMII_CAPABLE, pf->hw_features)) {
-+		if (test_bit(I40E_HW_CAP_100M_SGMII, pf->hw.caps)) {
- 			ethtool_link_ksettings_add_link_mode(ks, supported,
- 							     100baseT_Full);
- 			ethtool_link_ksettings_add_link_mode(ks, advertising,
-@@ -601,7 +601,7 @@ static void i40e_phy_type_to_ethtool(struct i40e_pf *pf,
- 							     10000baseKX4_Full);
- 	}
- 	if (phy_types & I40E_CAP_PHY_TYPE_10GBASE_KR &&
--	    !test_bit(I40E_HW_HAVE_CRT_RETIMER, pf->hw_features)) {
-+	    !test_bit(I40E_HW_CAP_CRT_RETIMER, pf->hw.caps)) {
- 		ethtool_link_ksettings_add_link_mode(ks, supported,
- 						     10000baseKR_Full);
- 		if (hw_link_info->requested_speeds & I40E_LINK_SPEED_10GB)
-@@ -609,7 +609,7 @@ static void i40e_phy_type_to_ethtool(struct i40e_pf *pf,
- 							     10000baseKR_Full);
- 	}
- 	if (phy_types & I40E_CAP_PHY_TYPE_1000BASE_KX &&
--	    !test_bit(I40E_HW_HAVE_CRT_RETIMER, pf->hw_features)) {
-+	    !test_bit(I40E_HW_CAP_CRT_RETIMER, pf->hw.caps)) {
- 		ethtool_link_ksettings_add_link_mode(ks, supported,
- 						     1000baseKX_Full);
- 		if (hw_link_info->requested_speeds & I40E_LINK_SPEED_1GB)
-@@ -917,7 +917,7 @@ static void i40e_get_settings_link_up(struct i40e_hw *hw,
- 		if (hw_link_info->requested_speeds & I40E_LINK_SPEED_1GB)
- 			ethtool_link_ksettings_add_link_mode(ks, advertising,
- 							     1000baseT_Full);
--		if (test_bit(I40E_HW_100M_SGMII_CAPABLE, pf->hw_features)) {
-+		if (test_bit(I40E_HW_CAP_100M_SGMII, pf->hw.caps)) {
- 			ethtool_link_ksettings_add_link_mode(ks, supported,
- 							     100baseT_Full);
- 			if (hw_link_info->requested_speeds &
-@@ -2579,7 +2579,7 @@ static int i40e_get_ts_info(struct net_device *dev,
- 			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_SYNC) |
- 			   BIT(HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ);
- 
--	if (test_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features))
-+	if (test_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps))
- 		info->rx_filters |= BIT(HWTSTAMP_FILTER_PTP_V1_L4_SYNC) |
- 				    BIT(HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ) |
- 				    BIT(HWTSTAMP_FILTER_PTP_V2_EVENT) |
-@@ -2828,7 +2828,7 @@ static int i40e_set_phys_id(struct net_device *netdev,
- 
- 	switch (state) {
- 	case ETHTOOL_ID_ACTIVE:
--		if (!test_bit(I40E_HW_PHY_CONTROLS_LEDS, pf->hw_features)) {
-+		if (!test_bit(I40E_HW_CAP_PHY_CONTROLS_LEDS, pf->hw.caps)) {
- 			pf->led_status = i40e_led_get(hw);
- 		} else {
- 			if (!test_bit(I40E_HW_CAP_AQ_PHY_ACCESS, hw->caps))
-@@ -2840,19 +2840,19 @@ static int i40e_set_phys_id(struct net_device *netdev,
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_adminq.c b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+index 6754f6b3508c..86591140f748 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_adminq.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_adminq.c
+@@ -522,10 +522,52 @@ static void i40e_set_hw_caps(struct i40e_hw *hw)
+ 			/* The ability to RX (not drop) 802.1ad frames */
+ 			set_bit(I40E_HW_CAP_802_1AD, hw->caps);
  		}
- 		return blink_freq;
- 	case ETHTOOL_ID_ON:
--		if (!test_bit(I40E_HW_PHY_CONTROLS_LEDS, pf->hw_features))
-+		if (!test_bit(I40E_HW_CAP_PHY_CONTROLS_LEDS, pf->hw.caps))
- 			i40e_led_set(hw, 0xf, false);
- 		else
- 			ret = i40e_led_set_phy(hw, true, pf->led_status, 0);
++		if ((aq->api_maj_ver == 1 && aq->api_min_ver > 4) ||
++		    aq->api_maj_ver > 1) {
++			/* Supported in FW API version higher than 1.4 */
++			set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, hw->caps);
++		}
++		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver < 33) ||
++		    aq->fw_maj_ver < 4) {
++			set_bit(I40E_HW_CAP_RESTART_AUTONEG, hw->caps);
++			/* No DCB support  for FW < v4.33 */
++			set_bit(I40E_HW_CAP_NO_DCB_SUPPORT, hw->caps);
++		}
++		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver < 3) ||
++		    aq->fw_maj_ver < 4) {
++			/* Disable FW LLDP if FW < v4.3 */
++			set_bit(I40E_HW_CAP_STOP_FW_LLDP, hw->caps);
++		}
++		if ((aq->fw_maj_ver == 4 && aq->fw_min_ver >= 40) ||
++		    aq->fw_maj_ver >= 5) {
++			/* Use the FW Set LLDP MIB API if FW > v4.40 */
++			set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, hw->caps);
++		}
++		if (aq->fw_maj_ver >= 6) {
++			/* Enable PTP L4 if FW > v6.0 */
++			set_bit(I40E_HW_CAP_PTP_L4, hw->caps);
++		}
  		break;
- 	case ETHTOOL_ID_OFF:
--		if (!test_bit(I40E_HW_PHY_CONTROLS_LEDS, pf->hw_features))
-+		if (!test_bit(I40E_HW_CAP_PHY_CONTROLS_LEDS, pf->hw.caps))
- 			i40e_led_set(hw, 0x0, false);
- 		else
- 			ret = i40e_led_set_phy(hw, false, pf->led_status, 0);
- 		break;
- 	case ETHTOOL_ID_INACTIVE:
--		if (!test_bit(I40E_HW_PHY_CONTROLS_LEDS, pf->hw_features)) {
-+		if (!test_bit(I40E_HW_CAP_PHY_CONTROLS_LEDS, pf->hw.caps)) {
- 			i40e_led_set(hw, pf->led_status, false);
- 		} else {
- 			ret = i40e_led_set_phy(hw, false, pf->led_status,
-@@ -3653,22 +3653,22 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
- 	switch (nfc->flow_type) {
- 	case TCP_V4_FLOW:
- 		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP, flow_pctypes);
--		if (test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE,
--			     pf->hw_features))
-+		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
-+			     pf->hw.caps))
- 			set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_TCP_SYN_NO_ACK,
- 				flow_pctypes);
- 		break;
- 	case TCP_V6_FLOW:
- 		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP, flow_pctypes);
--		if (test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE,
--			     pf->hw_features))
-+		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
-+			     pf->hw.caps))
- 			set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_TCP_SYN_NO_ACK,
- 				flow_pctypes);
- 		break;
- 	case UDP_V4_FLOW:
- 		set_bit(I40E_FILTER_PCTYPE_NONF_IPV4_UDP, flow_pctypes);
--		if (test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE,
--			     pf->hw_features)) {
-+		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
-+			     pf->hw.caps)) {
- 			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV4_UDP,
- 				flow_pctypes);
- 			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV4_UDP,
-@@ -3678,8 +3678,8 @@ static int i40e_set_rss_hash_opt(struct i40e_pf *pf, struct ethtool_rxnfc *nfc)
- 		break;
- 	case UDP_V6_FLOW:
- 		set_bit(I40E_FILTER_PCTYPE_NONF_IPV6_UDP, flow_pctypes);
--		if (test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE,
--			     pf->hw_features)) {
-+		if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
-+			     pf->hw.caps)) {
- 			set_bit(I40E_FILTER_PCTYPE_NONF_UNICAST_IPV6_UDP,
- 				flow_pctypes);
- 			set_bit(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP,
-@@ -5328,7 +5328,7 @@ static int i40e_set_priv_flags(struct net_device *dev, u32 flags)
+ 	case I40E_MAC_X722:
+ 		set_bit(I40E_HW_CAP_AQ_SRCTL_ACCESS_ENABLE, hw->caps);
+ 		set_bit(I40E_HW_CAP_NVM_READ_REQUIRES_LOCK, hw->caps);
++		set_bit(I40E_HW_CAP_RSS_AQ, hw->caps);
++		set_bit(I40E_HW_CAP_128_QP_RSS, hw->caps);
++		set_bit(I40E_HW_CAP_ATR_EVICT, hw->caps);
++		set_bit(I40E_HW_CAP_WB_ON_ITR, hw->caps);
++		set_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, hw->caps);
++		set_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, hw->caps);
++		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, hw->caps);
++		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, hw->caps);
++		set_bit(I40E_HW_CAP_PTP_L4, hw->caps);
++		set_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, hw->caps);
++		set_bit(I40E_HW_CAP_OUTER_UDP_CSUM, hw->caps);
++
++		if (rd32(hw, I40E_GLQF_FDEVICTENA(1)) !=
++		    I40E_FDEVICT_PCTYPE_DEFAULT) {
++			hw_warn(hw, "FD EVICT PCTYPES are not right, disable FD HW EVICT\n");
++			clear_bit(I40E_HW_CAP_ATR_EVICT, hw->caps);
++		}
  
- 	/* ATR eviction is not supported on all devices */
- 	if (test_bit(I40E_FLAG_HW_ATR_EVICT_ENA, new_flags) &&
--	    !test_bit(I40E_HW_ATR_EVICT_CAPABLE, pf->hw_features))
-+	    !test_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps))
- 		return -EOPNOTSUPP;
+ 		if (aq->api_maj_ver > 1 ||
+ 		    (aq->api_maj_ver == 1 &&
+@@ -553,6 +595,12 @@ static void i40e_set_hw_caps(struct i40e_hw *hw)
+ 	     aq->api_min_ver >= 5))
+ 		set_bit(I40E_HW_CAP_NVM_READ_REQUIRES_LOCK, hw->caps);
  
- 	/* If the driver detected FW LLDP was disabled on init, this flag could
++	/* The ability to RX (not drop) 802.1ad frames was added in API 1.7 */
++	if (aq->api_maj_ver > 1 ||
++	    (aq->api_maj_ver == 1 &&
++	     aq->api_min_ver >= 7))
++		set_bit(I40E_HW_CAP_802_1AD, hw->caps);
++
+ 	if (aq->api_maj_ver > 1 ||
+ 	    (aq->api_maj_ver == 1 &&
+ 	     aq->api_min_ver >= 8))
+@@ -646,24 +694,6 @@ int i40e_init_adminq(struct i40e_hw *hw)
+ 			   &oem_lo);
+ 	hw->nvm.oem_ver = ((u32)oem_hi << 16) | oem_lo;
+ 
+-	if (hw->mac.type == I40E_MAC_XL710 &&
+-	    hw->aq.api_maj_ver == I40E_FW_API_VERSION_MAJOR &&
+-	    hw->aq.api_min_ver >= I40E_MINOR_VER_GET_LINK_INFO_XL710) {
+-		set_bit(I40E_HW_CAP_AQ_PHY_ACCESS, hw->caps);
+-		set_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, hw->caps);
+-	}
+-	if (hw->mac.type == I40E_MAC_X722 &&
+-	    hw->aq.api_maj_ver == I40E_FW_API_VERSION_MAJOR &&
+-	    hw->aq.api_min_ver >= I40E_MINOR_VER_FW_LLDP_STOPPABLE_X722) {
+-		set_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, hw->caps);
+-	}
+-
+-	/* The ability to RX (not drop) 802.1ad frames was added in API 1.7 */
+-	if (hw->aq.api_maj_ver > 1 ||
+-	    (hw->aq.api_maj_ver == 1 &&
+-	     hw->aq.api_min_ver >= 7))
+-		set_bit(I40E_HW_CAP_802_1AD, hw->caps);
+-
+ 	if (hw->aq.api_maj_ver > I40E_FW_API_VERSION_MAJOR) {
+ 		ret_code = -EIO;
+ 		goto init_adminq_free_arq;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_debug.h b/drivers/net/ethernet/intel/i40e/i40e_debug.h
+index 27ebc72d8bfe..e9871dfb32bd 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_debug.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_debug.h
+@@ -37,6 +37,7 @@ struct i40e_hw;
+ struct device *i40e_hw_to_dev(struct i40e_hw *hw);
+ 
+ #define hw_dbg(hw, S, A...) dev_dbg(i40e_hw_to_dev(hw), S, ##A)
++#define hw_warn(hw, S, A...) dev_warn(i40e_hw_to_dev(hw), S, ##A)
+ 
+ #define i40e_debug(h, m, s, ...)				\
+ do {								\
 diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 7523ac4bd430..5696864c5151 100644
+index 5696864c5151..8948bdc8bda1 100644
 --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
 +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -1890,7 +1890,7 @@ static int i40e_vsi_config_rss(struct i40e_vsi *vsi)
- 	u8 *lut;
- 	int ret;
- 
--	if (!test_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features))
-+	if (!test_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps))
- 		return 0;
- 	if (!vsi->rss_size)
- 		vsi->rss_size = min_t(int, pf->alloc_rss_size,
-@@ -7085,7 +7085,7 @@ int i40e_hw_dcb_config(struct i40e_pf *pf, struct i40e_dcbx_config *new_cfg)
- 			set_bit(__I40E_CLIENT_L2_CHANGE, pf->state);
- 		}
- 		/* registers are set, lets apply */
--		if (test_bit(I40E_HW_USE_SET_LLDP_MIB, pf->hw_features))
-+		if (test_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps))
- 			ret = i40e_hw_set_dcb_config(pf, new_cfg);
+@@ -12782,62 +12782,10 @@ static int i40e_sw_init(struct i40e_pf *pf)
+ 				 pf->hw.func_caps.fd_filters_best_effort;
  	}
  
-@@ -7106,7 +7106,7 @@ int i40e_dcb_sw_default_config(struct i40e_pf *pf)
- 	struct i40e_hw *hw = &pf->hw;
- 	int err;
- 
--	if (test_bit(I40E_HW_USE_SET_LLDP_MIB, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps)) {
- 		/* Update the local cached instance with TC0 ETS */
- 		memset(&pf->tmp_cfg, 0, sizeof(struct i40e_dcbx_config));
- 		pf->tmp_cfg.etscfg.willing = I40E_IEEE_DEFAULT_ETS_WILLING;
-@@ -7167,7 +7167,7 @@ static int i40e_init_pf_dcb(struct i40e_pf *pf)
- 	/* Do not enable DCB for SW1 and SW2 images even if the FW is capable
- 	 * Also do not enable DCBx if FW LLDP agent is disabled
- 	 */
--	if (test_bit(I40E_HW_NO_DCB_SUPPORT, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_NO_DCB_SUPPORT, pf->hw.caps)) {
- 		dev_info(&pf->pdev->dev, "DCB is not supported.\n");
- 		err = -EOPNOTSUPP;
- 		goto out;
-@@ -11069,7 +11069,7 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
- 		wr32(hw, I40E_REG_MSS, val);
- 	}
- 
--	if (test_bit(I40E_HW_RESTART_AUTONEG, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_RESTART_AUTONEG, pf->hw.caps)) {
- 		msleep(75);
- 		ret = i40e_aq_set_link_restart_an(&pf->hw, true, NULL);
- 		if (ret)
-@@ -11672,7 +11672,7 @@ static int i40e_alloc_rings(struct i40e_vsi *vsi)
- 		ring->count = vsi->num_tx_desc;
- 		ring->size = 0;
- 		ring->dcb_tc = 0;
--		if (test_bit(I40E_HW_WB_ON_ITR_CAPABLE, vsi->back->hw_features))
-+		if (test_bit(I40E_HW_CAP_WB_ON_ITR, vsi->back->hw.caps))
- 			ring->flags = I40E_TXR_FLAGS_WB_ON_ITR;
- 		ring->itr_setting = pf->tx_itr_default;
- 		WRITE_ONCE(vsi->tx_rings[i], ring++);
-@@ -11689,7 +11689,7 @@ static int i40e_alloc_rings(struct i40e_vsi *vsi)
- 		ring->count = vsi->num_tx_desc;
- 		ring->size = 0;
- 		ring->dcb_tc = 0;
--		if (test_bit(I40E_HW_WB_ON_ITR_CAPABLE, vsi->back->hw_features))
-+		if (test_bit(I40E_HW_CAP_WB_ON_ITR, vsi->back->hw.caps))
- 			ring->flags = I40E_TXR_FLAGS_WB_ON_ITR;
- 		set_ring_xdp(ring);
- 		ring->itr_setting = pf->tx_itr_default;
-@@ -12367,7 +12367,7 @@ int i40e_config_rss(struct i40e_vsi *vsi, u8 *seed, u8 *lut, u16 lut_size)
- {
- 	struct i40e_pf *pf = vsi->back;
- 
--	if (test_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features))
-+	if (test_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps))
- 		return i40e_config_rss_aq(vsi, seed, lut, lut_size);
- 	else
- 		return i40e_config_rss_reg(vsi, seed, lut, lut_size);
-@@ -12386,7 +12386,7 @@ int i40e_get_rss(struct i40e_vsi *vsi, u8 *seed, u8 *lut, u16 lut_size)
- {
- 	struct i40e_pf *pf = vsi->back;
- 
--	if (test_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features))
-+	if (test_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps))
- 		return i40e_get_rss_aq(vsi, seed, lut, lut_size);
- 	else
- 		return i40e_get_rss_reg(vsi, seed, lut, lut_size);
-@@ -12783,60 +12783,60 @@ static int i40e_sw_init(struct i40e_pf *pf)
- 	}
- 
- 	if (pf->hw.mac.type == I40E_MAC_X722) {
--		set_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_128_QP_RSS_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_ATR_EVICT_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_WB_ON_ITR_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE, pf->hw_features);
--		set_bit(I40E_HW_NO_PCI_LINK_CHECK, pf->hw_features);
--		set_bit(I40E_HW_USE_SET_LLDP_MIB, pf->hw_features);
--		set_bit(I40E_HW_GENEVE_OFFLOAD_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features);
--		set_bit(I40E_HW_WOL_MC_MAGIC_PKT_WAKE, pf->hw_features);
--		set_bit(I40E_HW_OUTER_UDP_CSUM_CAPABLE, pf->hw_features);
-+		set_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_128_QP_RSS, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_WB_ON_ITR, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps);
-+		set_bit(I40E_HW_CAP_OUTER_UDP_CSUM, pf->hw.caps);
- 
- #define I40E_FDEVICT_PCTYPE_DEFAULT 0xc03
- 		if (rd32(&pf->hw, I40E_GLQF_FDEVICTENA(1)) !=
- 		    I40E_FDEVICT_PCTYPE_DEFAULT) {
- 			dev_warn(&pf->pdev->dev,
- 				 "FD EVICT PCTYPES are not right, disable FD HW EVICT\n");
--			clear_bit(I40E_HW_ATR_EVICT_CAPABLE, pf->hw_features);
-+			clear_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
- 		}
- 	} else if ((pf->hw.aq.api_maj_ver > 1) ||
- 		   ((pf->hw.aq.api_maj_ver == 1) &&
- 		    (pf->hw.aq.api_min_ver > 4))) {
- 		/* Supported in FW API version higher than 1.4 */
--		set_bit(I40E_HW_GENEVE_OFFLOAD_CAPABLE, pf->hw_features);
-+		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
- 	}
- 
+-	if (pf->hw.mac.type == I40E_MAC_X722) {
+-		set_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_128_QP_RSS, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_WB_ON_ITR, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps);
+-		set_bit(I40E_HW_CAP_OUTER_UDP_CSUM, pf->hw.caps);
+-
+-#define I40E_FDEVICT_PCTYPE_DEFAULT 0xc03
+-		if (rd32(&pf->hw, I40E_GLQF_FDEVICTENA(1)) !=
+-		    I40E_FDEVICT_PCTYPE_DEFAULT) {
+-			dev_warn(&pf->pdev->dev,
+-				 "FD EVICT PCTYPES are not right, disable FD HW EVICT\n");
+-			clear_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps);
+-		}
+-	} else if ((pf->hw.aq.api_maj_ver > 1) ||
+-		   ((pf->hw.aq.api_maj_ver == 1) &&
+-		    (pf->hw.aq.api_min_ver > 4))) {
+-		/* Supported in FW API version higher than 1.4 */
+-		set_bit(I40E_HW_CAP_GENEVE_OFFLOAD, pf->hw.caps);
+-	}
+-
  	/* Enable HW ATR eviction if possible */
--	if (test_bit(I40E_HW_ATR_EVICT_CAPABLE, pf->hw_features))
-+	if (test_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps))
+ 	if (test_bit(I40E_HW_CAP_ATR_EVICT, pf->hw.caps))
  		set_bit(I40E_FLAG_HW_ATR_EVICT_ENA, pf->flags);
  
- 	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
- 	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 33)) ||
- 	    (pf->hw.aq.fw_maj_ver < 4))) {
--		set_bit(I40E_HW_RESTART_AUTONEG, pf->hw_features);
-+		set_bit(I40E_HW_CAP_RESTART_AUTONEG, pf->hw.caps);
- 		/* No DCB support  for FW < v4.33 */
--		set_bit(I40E_HW_NO_DCB_SUPPORT, pf->hw_features);
-+		set_bit(I40E_HW_CAP_NO_DCB_SUPPORT, pf->hw.caps);
- 	}
- 
- 	/* Disable FW LLDP if FW < v4.3 */
- 	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
- 	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 3)) ||
- 	    (pf->hw.aq.fw_maj_ver < 4)))
--		set_bit(I40E_HW_STOP_FW_LLDP, pf->hw_features);
-+		set_bit(I40E_HW_CAP_STOP_FW_LLDP, pf->hw.caps);
- 
- 	/* Use the FW Set LLDP MIB API if FW > v4.40 */
- 	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
- 	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver >= 40)) ||
- 	    (pf->hw.aq.fw_maj_ver >= 5)))
--		set_bit(I40E_HW_USE_SET_LLDP_MIB, pf->hw_features);
-+		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
- 
- 	/* Enable PTP L4 if FW > v6.0 */
- 	if (pf->hw.mac.type == I40E_MAC_XL710 &&
- 	    pf->hw.aq.fw_maj_ver >= 6)
--		set_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features);
-+		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
- 
+-	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
+-	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 33)) ||
+-	    (pf->hw.aq.fw_maj_ver < 4))) {
+-		set_bit(I40E_HW_CAP_RESTART_AUTONEG, pf->hw.caps);
+-		/* No DCB support  for FW < v4.33 */
+-		set_bit(I40E_HW_CAP_NO_DCB_SUPPORT, pf->hw.caps);
+-	}
+-
+-	/* Disable FW LLDP if FW < v4.3 */
+-	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
+-	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver < 3)) ||
+-	    (pf->hw.aq.fw_maj_ver < 4)))
+-		set_bit(I40E_HW_CAP_STOP_FW_LLDP, pf->hw.caps);
+-
+-	/* Use the FW Set LLDP MIB API if FW > v4.40 */
+-	if ((pf->hw.mac.type == I40E_MAC_XL710) &&
+-	    (((pf->hw.aq.fw_maj_ver == 4) && (pf->hw.aq.fw_min_ver >= 40)) ||
+-	    (pf->hw.aq.fw_maj_ver >= 5)))
+-		set_bit(I40E_HW_CAP_USE_SET_LLDP_MIB, pf->hw.caps);
+-
+-	/* Enable PTP L4 if FW > v6.0 */
+-	if (pf->hw.mac.type == I40E_MAC_XL710 &&
+-	    pf->hw.aq.fw_maj_ver >= 6)
+-		set_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps);
+-
  	if (pf->hw.func_caps.vmdq && num_online_cpus() != 1) {
  		pf->num_vmdq_vsis = I40E_DEFAULT_NUM_VMDQ_VSI;
-@@ -13092,7 +13092,7 @@ static int i40e_get_phys_port_id(struct net_device *netdev,
- 	struct i40e_pf *pf = np->vsi->back;
- 	struct i40e_hw *hw = &pf->hw;
- 
--	if (!test_bit(I40E_HW_PORT_ID_VALID, pf->hw_features))
-+	if (!test_bit(I40E_HW_CAP_PORT_ID_VALID, pf->hw.caps))
- 		return -EOPNOTSUPP;
- 
- 	ppid->id_len = min_t(int, sizeof(hw->mac.port_addr), sizeof(ppid->id));
-@@ -13767,7 +13767,7 @@ static int i40e_config_netdev(struct i40e_vsi *vsi)
- 			  NETIF_F_RXCSUM		|
- 			  0;
- 
--	if (!test_bit(I40E_HW_OUTER_UDP_CSUM_CAPABLE, pf->hw_features))
-+	if (!test_bit(I40E_HW_CAP_OUTER_UDP_CSUM, pf->hw.caps))
- 		netdev->gso_partial_features |= NETIF_F_GSO_UDP_TUNNEL_CSUM;
- 
- 	netdev->udp_tunnel_nic_info = &pf->udp_tunnel_nic;
-@@ -14593,7 +14593,7 @@ struct i40e_vsi *i40e_vsi_setup(struct i40e_pf *pf, u8 type,
- 		break;
- 	}
- 
--	if (test_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features) &&
-+	if (test_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps) &&
- 	    vsi->type == I40E_VSI_VMDQ2) {
- 		ret = i40e_vsi_config_rss(vsi);
- 		if (ret)
-@@ -15927,7 +15927,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 * Ignore error return codes because if it was already disabled via
- 	 * hardware settings this will fail
+ 		set_bit(I40E_FLAG_VMDQ_ENA, pf->flags);
+@@ -12855,8 +12803,7 @@ static int i40e_sw_init(struct i40e_pf *pf)
+ 	 * if NPAR is functioning so unset this hw flag in this case.
  	 */
--	if (test_bit(I40E_HW_STOP_FW_LLDP, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_STOP_FW_LLDP, pf->hw.caps)) {
- 		dev_info(&pdev->dev, "Stopping firmware LLDP agent.\n");
- 		i40e_aq_stop_lldp(hw, true, false, NULL);
- 	}
-@@ -15944,7 +15944,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	ether_addr_copy(hw->mac.perm_addr, hw->mac.addr);
- 	i40e_get_port_mac_addr(hw, hw->mac.port_addr);
- 	if (is_valid_ether_addr(hw->mac.port_addr))
--		set_bit(I40E_HW_PORT_ID_VALID, pf->hw_features);
-+		set_bit(I40E_HW_CAP_PORT_ID_VALID, pf->hw.caps);
+ 	if (pf->hw.mac.type == I40E_MAC_XL710 &&
+-	    pf->hw.func_caps.npar_enable &&
+-	    test_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, pf->hw.caps))
++	    pf->hw.func_caps.npar_enable)
+ 		clear_bit(I40E_HW_CAP_FW_LLDP_STOPPABLE, pf->hw.caps);
  
- 	i40e_ptp_alloc_pins(pf);
- 	pci_set_drvdata(pdev, pf);
-@@ -16081,7 +16081,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		wr32(hw, I40E_REG_MSS, val);
- 	}
- 
--	if (test_bit(I40E_HW_RESTART_AUTONEG, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_RESTART_AUTONEG, pf->hw.caps)) {
- 		msleep(75);
- 		err = i40e_aq_set_link_restart_an(&pf->hw, true, NULL);
- 		if (err)
-@@ -16170,7 +16170,7 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	 * and will report PCI Gen 1 x 1 by default so don't bother
- 	 * checking them.
- 	 */
--	if (!test_bit(I40E_HW_NO_PCI_LINK_CHECK, pf->hw_features)) {
-+	if (!test_bit(I40E_HW_CAP_NO_PCI_LINK_CHECK, pf->hw.caps)) {
- 		char speed[PCI_SPEED_SIZE] = "Unknown";
- 		char width[PCI_WIDTH_SIZE] = "Unknown";
- 
-@@ -16252,9 +16252,9 @@ static int i40e_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 
- 	if ((pf->hw.device_id == I40E_DEV_ID_10G_BASE_T) ||
- 	    (pf->hw.device_id == I40E_DEV_ID_10G_BASE_T4))
--		set_bit(I40E_HW_PHY_CONTROLS_LEDS, pf->hw_features);
-+		set_bit(I40E_HW_CAP_PHY_CONTROLS_LEDS, pf->hw.caps);
- 	if (pf->hw.device_id == I40E_DEV_ID_SFP_I_X722)
--		set_bit(I40E_HW_HAVE_CRT_RETIMER, pf->hw_features);
-+		set_bit(I40E_HW_CAP_CRT_RETIMER, pf->hw.caps);
- 	/* print a string summarizing features */
- 	i40e_print_features(pf);
- 
-@@ -16616,7 +16616,7 @@ static void i40e_shutdown(struct pci_dev *pdev)
- 	 */
- 	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
- 
--	if (test_bit(I40E_HW_WOL_MC_MAGIC_PKT_WAKE, pf->hw_features) &&
-+	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
- 		i40e_enable_mc_magic_wake(pf);
- 
-@@ -16670,7 +16670,7 @@ static int __maybe_unused i40e_suspend(struct device *dev)
- 	 */
- 	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi], false);
- 
--	if (test_bit(I40E_HW_WOL_MC_MAGIC_PKT_WAKE, pf->hw_features) &&
-+	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps) &&
- 	    pf->wol_en)
- 		i40e_enable_mc_magic_wake(pf);
- 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-index 10fb83d2ffe1..1cf993a79438 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
-@@ -1211,7 +1211,7 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- 	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
- 	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
- 	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
--		if (!test_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features))
-+		if (!test_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps))
- 			return -ERANGE;
- 		pf->ptp_rx = true;
- 		tsyntype = I40E_PRTTSYN_CTL1_V1MESSTYPE0_MASK |
-@@ -1225,7 +1225,7 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- 	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
- 	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
- 	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
--		if (!test_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features))
-+		if (!test_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps))
- 			return -ERANGE;
- 		fallthrough;
- 	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-@@ -1234,7 +1234,7 @@ static int i40e_ptp_set_timestamp_mode(struct i40e_pf *pf,
- 		pf->ptp_rx = true;
- 		tsyntype = I40E_PRTTSYN_CTL1_V2MESSTYPE0_MASK |
- 			   I40E_PRTTSYN_CTL1_TSYNTYPE_V2;
--		if (test_bit(I40E_HW_PTP_L4_CAPABLE, pf->hw_features)) {
-+		if (test_bit(I40E_HW_CAP_PTP_L4, pf->hw.caps)) {
- 			tsyntype |= I40E_PRTTSYN_CTL1_UDP_ENA_MASK;
- 			config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
- 		} else {
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-index cbc2eda0ddaa..abf15067eb5d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-@@ -92,7 +92,7 @@ enum i40e_dyn_idx {
- 	BIT_ULL(I40E_FILTER_PCTYPE_NONF_MULTICAST_IPV6_UDP))
- 
- #define i40e_pf_get_default_rss_hena(pf) \
--	(test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE, (pf)->hw_features) ? \
-+	(test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, (pf)->hw.caps) ? \
- 	 I40E_DEFAULT_RSS_HENA_EXPANDED : I40E_DEFAULT_RSS_HENA)
- 
- /* Supported Rx Buffer Sizes (a multiple of 128) */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_type.h b/drivers/net/ethernet/intel/i40e/i40e_type.h
-index 889bc2404738..346a74a516a8 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_type.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_type.h
-@@ -491,6 +491,24 @@ enum i40e_hw_flags {
- 	I40E_HW_CAP_FW_LLDP_PERSISTENT,
- 	I40E_HW_CAP_AQ_PHY_ACCESS_EXTENDED,
- 	I40E_HW_CAP_X722_FEC_REQUEST,
-+	I40E_HW_CAP_RSS_AQ,
-+	I40E_HW_CAP_128_QP_RSS,
-+	I40E_HW_CAP_ATR_EVICT,
-+	I40E_HW_CAP_WB_ON_ITR,
-+	I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE,
-+	I40E_HW_CAP_NO_PCI_LINK_CHECK,
-+	I40E_HW_CAP_100M_SGMII,
-+	I40E_HW_CAP_NO_DCB_SUPPORT,
-+	I40E_HW_CAP_USE_SET_LLDP_MIB,
-+	I40E_HW_CAP_GENEVE_OFFLOAD,
-+	I40E_HW_CAP_PTP_L4,
-+	I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE,
-+	I40E_HW_CAP_CRT_RETIMER,
-+	I40E_HW_CAP_OUTER_UDP_CSUM,
-+	I40E_HW_CAP_PHY_CONTROLS_LEDS,
-+	I40E_HW_CAP_STOP_FW_LLDP,
-+	I40E_HW_CAP_PORT_ID_VALID,
-+	I40E_HW_CAP_RESTART_AUTONEG,
- 	I40E_HW_CAPS_NBITS,
- };
- 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 8236baedfadd..af47ba51e28a 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2137,14 +2137,14 @@ static int i40e_vc_get_vf_resources_msg(struct i40e_vf *vf, u8 *msg)
- 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_RSS_PF) {
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_RSS_PF;
- 	} else {
--		if (test_bit(I40E_HW_RSS_AQ_CAPABLE, pf->hw_features) &&
-+		if (test_bit(I40E_HW_CAP_RSS_AQ, pf->hw.caps) &&
- 		    (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_RSS_AQ))
- 			vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_RSS_AQ;
- 		else
- 			vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_RSS_REG;
- 	}
- 
--	if (test_bit(I40E_HW_MULTIPLE_TCP_UDP_RSS_PCTYPE, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_MULTI_TCP_UDP_RSS_PCTYPE, pf->hw.caps)) {
- 		if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2)
- 			vfres->vf_cap_flags |=
- 				VIRTCHNL_VF_OFFLOAD_RSS_PCTYPE_V2;
-@@ -2153,7 +2153,7 @@ static int i40e_vc_get_vf_resources_msg(struct i40e_vf *vf, u8 *msg)
- 	if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_ENCAP)
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_ENCAP;
- 
--	if (test_bit(I40E_HW_OUTER_UDP_CSUM_CAPABLE, pf->hw_features) &&
-+	if (test_bit(I40E_HW_CAP_OUTER_UDP_CSUM, pf->hw.caps) &&
- 	    (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM))
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_ENCAP_CSUM;
- 
-@@ -2168,7 +2168,7 @@ static int i40e_vc_get_vf_resources_msg(struct i40e_vf *vf, u8 *msg)
- 		vfres->vf_cap_flags |= VIRTCHNL_VF_OFFLOAD_RX_POLLING;
- 	}
- 
--	if (test_bit(I40E_HW_WB_ON_ITR_CAPABLE, pf->hw_features)) {
-+	if (test_bit(I40E_HW_CAP_WB_ON_ITR, pf->hw.caps)) {
- 		if (vf->driver_caps & VIRTCHNL_VF_OFFLOAD_WB_ON_ITR)
- 			vfres->vf_cap_flags |=
- 					VIRTCHNL_VF_OFFLOAD_WB_ON_ITR;
+ #ifdef CONFIG_PCI_IOV
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
+index f408fcf23ce8..d561687303ea 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_register.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
+@@ -899,6 +899,7 @@
+ #define I40E_GLQF_ORT_FLX_PAYLOAD_SHIFT 7
+ #define I40E_GLQF_ORT_FLX_PAYLOAD_MASK I40E_MASK(0x1, I40E_GLQF_ORT_FLX_PAYLOAD_SHIFT)
+ #define I40E_GLQF_FDEVICTENA(_i) (0x00270384 + ((_i) * 4)) /* _i=0...1 */ /* Reset: CORER */
++#define I40E_FDEVICT_PCTYPE_DEFAULT 0xc03
+ /* Redefined for X722 family */
+ #define I40E_GLGEN_STAT_CLEAR 0x00390004 /* Reset: CORER */
+ #endif /* _I40E_REGISTER_H_ */
 -- 
 2.41.0
 
