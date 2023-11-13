@@ -1,89 +1,166 @@
-Return-Path: <netdev+bounces-47404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83767EA1ED
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 18:34:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908007EA208
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 18:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24C911C208CA
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:34:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1A471C20873
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD7F224D6;
-	Mon, 13 Nov 2023 17:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156F6224DE;
+	Mon, 13 Nov 2023 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="gzXuywB6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kRG9iMY/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A759224D3
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 17:34:32 +0000 (UTC)
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEBF10EC
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 09:34:31 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-28010522882so3954574a91.0
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 09:34:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1699896871; x=1700501671; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pE6fvYT+1obOtjWO9/BRfYWE7SohUEDX3W6dmYTnkAQ=;
-        b=gzXuywB6vqls++UxPNviUMKefIi3CavuZjI4t0echSKNugTrzXRU+r66yIUIQATcy8
-         mcmX1mGW30aXLCrdopBnzs3rcBa7R8i9q6xhA/Fw890AsvPDNQSaoo15abkAkLx3uUbV
-         16YISzdKGaxlfZlxovu8tpSdAYR/MgOeku+ffCis61GYTAK3JAAsLZYyCtbP3EQASGKR
-         fRTo86wLs6BxSvcFYNc77brrJb7WDLQz44uhVNwlO1Z25MrYBhFZQmETlWkvsb46xbLZ
-         kjmgTC7WlEfpxnqHhX8qfoGGnPnPzciRX7GHU/FxWNOeBStKoMXcIdx+AtphRvhfRwtm
-         ocRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699896871; x=1700501671;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pE6fvYT+1obOtjWO9/BRfYWE7SohUEDX3W6dmYTnkAQ=;
-        b=BSV7QOueTFjLbthupORlyQOMVcZUgWq//TiRDiog3E8HOL2WzbirB6djA/WAsg9KWn
-         wSkJkfck1SfUgaIkiVdG6kolsuxCQbN5WXcCOp7rnVvPniLajTIrrUlqQKuBzwtmltxq
-         VSSdGS2FqPAL5/7WIFvPASMTXpAnpHEkWX/6VVm4+DeKp8gVNmg4F2kQJ+X69HbRXBP5
-         iBpUis6U9vaufd0F/V/oyrzdsVig2PbFaYnEDvJrR3gRbLbwzNonqL9H5nlz3tZTpGIJ
-         Cm4PRGSlAkuceoovxi4IHgIfAXBJhOa4NWE9iU+QR9QniNER5pxAMEUdDvoddhwJ5MYu
-         qU9g==
-X-Gm-Message-State: AOJu0YzQpdbpZhORQJo8FynW201zmHl8VdQtuhCtbn05sKrQAldKSd2D
-	vmKkg1tnKRwzbG3BV4NfPvWukK5wlZgbef9oYhA=
-X-Google-Smtp-Source: AGHT+IFiKhNSiH2ShgZgNbKiGI9VU/PNLX+mtJxT66yEH8O65pRCNVd97uFFWL8XYc+l1vu1cdr/2A==
-X-Received: by 2002:a17:90b:1b0a:b0:280:200c:2e20 with SMTP id nu10-20020a17090b1b0a00b00280200c2e20mr4898813pjb.27.1699896871019;
-        Mon, 13 Nov 2023 09:34:31 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 2-20020a17090a0d4200b002801ca4fad2sm6504540pju.10.2023.11.13.09.34.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 09:34:30 -0800 (PST)
-Date: Mon, 13 Nov 2023 09:34:29 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: razor@blackwall.org, martin.lau@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2] ip, link: Add support for netkit
-Message-ID: <20231113093429.434186eb@hermes.local>
-In-Reply-To: <20231113032323.14717-1-daniel@iogearbox.net>
-References: <20231113032323.14717-1-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84D7224D7;
+	Mon, 13 Nov 2023 17:37:26 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D16310D0;
+	Mon, 13 Nov 2023 09:37:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699897045; x=1731433045;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DSacYvT1P2f6YUj8jbQzn2GhMgTBmy/U4Xnu4aI0x0g=;
+  b=kRG9iMY/7yMVhTrgcK4xIrLsVI/mqv/ui6cQB30XWJjQS9dXrV4v1JjN
+   L+6M4DnwA/OfbNcy3MSKZVrGkE2Fuv831udkE1knDPQp0RyiCBtnd5mxw
+   ftGxsiN7XGnMpEedJS3xPRiZUwrvvyIq6Jr2Epxqrn1s9rdB5wsQQOb7h
+   tymg8RdNH637jaEU+hDR2xkphuRCCggYUlLQ51bj+bXnPdlkMplzlUiDT
+   gxSSVRVFO59CmCAUSNRKsYvF/VJoQsnAL1caZKXsGdNBmSrNzth8ib8bg
+   KXwEwKsQktWo+3lBIslUkx6oTfONZMkccg6Oeg8Yij/PmD/Cb2Ah93qIz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="370671493"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="370671493"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 09:37:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="1095812617"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="1095812617"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmsmga005.fm.intel.com with ESMTP; 13 Nov 2023 09:37:21 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Alexander Potapenko <glider@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org,
+	linux-btrfs@vger.kernel.org,
+	dm-devel@redhat.com,
+	ntfs3@lists.linux.dev,
+	linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 00/11] bitmap: prereqs for ip_tunnel flags conversion
+Date: Mon, 13 Nov 2023 18:37:06 +0100
+Message-ID: <20231113173717.927056-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 Nov 2023 04:23:23 +0100
-Daniel Borkmann <daniel@iogearbox.net> wrote:
+Based on top of "lib/bitmap: add bitmap_{read,write}()"[0] from Alexander
+Potapenko as it uses those new bitmap_{read,write}() functions to not
+introduce another pair of similar ones.
 
-> +	if (tb[IFLA_NETKIT_POLICY]) {
-> +		__u32 policy = rta_getattr_u32(tb[IFLA_NETKIT_POLICY]);
-> +		const char *policy_str =
-> +			policy == NETKIT_PASS ? "forward" :
-> +			policy == NETKIT_DROP ? "blackhole" : "unknown";
-> +
+Derived from the PFCP support series[1] as this grew bigger (2 -> 13
+commits in v2) and involved more core bitmap changes, finally transforming
+into a pure bitmap series. The actual mentioned ip_tunnel flags conversion
+from `__be16` to bitmaps will be submitted bundled with the PFCP set after
+this one lands.
 
-If you plan to add more modes in future, a table or helper would be good idea.
+Little breakdown:
+ * #1, #8, #10: misc cleanups;
+ * #2, #5, #6, #7: symbol scope, name collisions;
+ * #3, #4, #9, #11: compile-time optimizations.
+
+[0] https://lore.kernel.org/lkml/20231109151106.2385155-1-glider@google.com
+[1] https://lore.kernel.org/netdev/20230721071532.613888-1-marcin.szycik@linux.intel.com
+
+Alexander Lobakin (11):
+  bitops: add missing prototype check
+  bitops: make BYTES_TO_BITS() treewide-available
+  bitops: let the compiler optimize {__,}assign_bit()
+  linkmode: convert linkmode_{test,set,clear,mod}_bit() to macros
+  s390/cio: rename bitmap_size() -> idset_bitmap_size()
+  fs/ntfs3: add prefix to bitmap_size() and use BITS_TO_U64()
+  btrfs: rename bitmap_set_bits() -> btrfs_bitmap_set_bits()
+  tools: move alignment-related macros to new <linux/align.h>
+  bitmap: introduce generic optimized bitmap_size()
+  bitmap: make bitmap_{get,set}_value8() use bitmap_{read,write}()
+  lib/bitmap: add compile-time test for __assign_bit() optimization
+
+ drivers/md/dm-clone-metadata.c |  5 ----
+ drivers/s390/cio/idset.c       | 12 +++++----
+ fs/btrfs/free-space-cache.c    |  8 +++---
+ fs/ntfs3/bitmap.c              |  4 +--
+ fs/ntfs3/fsntfs.c              |  2 +-
+ fs/ntfs3/index.c               | 11 ++++----
+ fs/ntfs3/ntfs_fs.h             |  4 +--
+ fs/ntfs3/super.c               |  2 +-
+ include/linux/bitmap.h         | 46 ++++++++--------------------------
+ include/linux/bitops.h         | 23 ++++++-----------
+ include/linux/cpumask.h        |  2 +-
+ include/linux/linkmode.h       | 27 +++-----------------
+ kernel/trace/trace_probe.c     |  2 --
+ lib/math/prime_numbers.c       |  2 --
+ lib/test_bitmap.c              | 18 +++++++------
+ tools/include/linux/align.h    | 11 ++++++++
+ tools/include/linux/bitmap.h   |  9 ++++---
+ tools/include/linux/bitops.h   |  2 ++
+ tools/include/linux/mm.h       |  5 +---
+ tools/perf/util/probe-finder.c |  4 +--
+ 20 files changed, 75 insertions(+), 124 deletions(-)
+ create mode 100644 tools/include/linux/align.h
+
+---
+From v2[2]:
+ * 00: drop ip_tunnel part: will be sent together with the PFCP part once
+   this gets accepted (Jakub, Yury);
+ * 02: fix format string literal build warning due to the new generic
+   macro having different implicit type (Stephen);
+ * 04: pick Acked-by (Jakub);
+ * 08: new;
+ * 09: pick Acked-by (Yury), fix including the header not existing under
+   the tools/ tree (via #8) (Stephen);.
+
+From v1[3]:
+ * 03: convert assign_bit() to a macro as well, saves some bytes and
+   looks more consistent (Yury);
+ * 03: enclose each argument into own pair of braces (Yury);
+ * 06: use generic BITS_TO_U64() while at it (Yury);
+ * 07: pick Acked-by (David);
+ * 08: Acked-by, use bitmap_size() in the code from 05 as well (Yury);
+ * 09: instead of introducing a new pair of functions, use generic
+   bitmap_{read,write}() from [0]. bloat-o-meter shows no regressions
+   from the switch (Yury, also Andy).
+
+Old pfcp -> bitmap changelog:
+
+As for former commits (now 10 and 11), almost all of the changes were
+suggested by Andy, notably: stop violating bitmap API, use
+__assign_bit() where appropriate, and add more tests to make sure
+everything works as expected. Apart from that, add simple wrappers for
+bitmap_*() used in the IP tunnel code to avoid manually specifying
+``__IP_TUNNEL_FLAG_NUM`` each time.
+
+[2] https://lore.kernel.org/lkml/20231016165247.14212-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/lkml/20231009151026.66145-1-aleksander.lobakin@intel.com
+-- 
+2.41.0
+
 
