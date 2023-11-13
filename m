@@ -1,91 +1,135 @@
-Return-Path: <netdev+bounces-47496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CBD7EA6AD
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:06:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC407EA6B6
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5852B20980
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:06:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CEDDB20A82
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 23:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA45D3C08A;
-	Mon, 13 Nov 2023 23:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE823C6BB;
+	Mon, 13 Nov 2023 23:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAF7N6Xb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GKUXX4sv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6362D63C
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:05:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68507C433C8;
-	Mon, 13 Nov 2023 23:05:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699916759;
-	bh=KIbg7WSXtun715GyZV7F9AzyWxN0+AZgQG21Rel54vE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lAF7N6XbdGowJElZh0Qpcpm1mQ8RILmUNzGFr9fu3JccuyDj0m2XKcSyMz4ukLBR5
-	 SQy0QCW9oecl/BFfCp1O4+40xnUJO2YYCckLGGLcxR4dABVz0emOSiP02Nc/ehr9uj
-	 mfLlyB/h4oafSQOp+qKwVz0eCy/D5d3jA71cLvJlBsOHv/OfPEK+gV/itm6+5AGLu+
-	 K1GTQfXaZbAHNCnOLXg1ou7Bl/vuhGOalboG1CSEX1A29PO9x9mIN6kx/szK3JVRz+
-	 M+6PmL08K0CZcO/mU3lcoZ08JWATpETmcwtI8x2tnm/nT0h2SMcaTmZraYlBaM26qc
-	 41cd/lYa1NVkw==
-Date: Mon, 13 Nov 2023 18:05:54 -0500
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>, Yunsheng Lin
- <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-Message-ID: <20231113180554.1d1c6b1a@kernel.org>
-In-Reply-To: <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
-	<20231113130041.58124-4-linyunsheng@huawei.com>
-	<CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F50E2E41A
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 23:10:54 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3111899
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 15:10:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1699917053; x=1731453053;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZbWWEd2vLVjyAzDPGj6sqcTGxMa/7xXLaJg3Tc6yfgo=;
+  b=GKUXX4svA7kQNudCkg0kOEAZLhSDebm8WUBswMUaVg0P88FXprxkQvDZ
+   jo24q9ASOz+a0Da2MXe9aOTP2FOIytAB1hJidD3fYm62C7sKG6LWDPNVV
+   Af8+wB0SWDd7TNBPpiQeeAhEVAfVZWXnAYczJiebke3NLdZ9IG1JKY+pD
+   9BK6Nrdv2kaVMrwFhVuN9oBA0vumnH67/Vs3aHblM7UfCr/dkc6I2uiNu
+   Lt3L1sUltq8ivKzOzR2e5tEWbc4D5QMQXIZxORLBFsZNlB6ydOphKiBaa
+   rHTWlwi8UpsPapHfQYPapj35dL3fFhtXuYBzVNi98E9vcd99mSC1qJaix
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="375562588"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="375562588"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2023 15:10:52 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10893"; a="888051390"
+X-IronPort-AV: E=Sophos;i="6.03,299,1694761200"; 
+   d="scan'208";a="888051390"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga004.jf.intel.com with ESMTP; 13 Nov 2023 15:10:52 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 00/15][pull request] Intel Wired LAN Driver Updates 2023-11-13 (i40e)
+Date: Mon, 13 Nov 2023 15:10:19 -0800
+Message-ID: <20231113231047.548659-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 Nov 2023 05:42:16 -0800 Mina Almasry wrote:
-> You're doing exactly what I think you're doing, and what was nacked in RFC v1.
-> 
-> You've converted 'struct page_pool_iov' to essentially become a
-> duplicate of 'struct page'. Then, you're casting page_pool_iov* into
-> struct page* in mp_dmabuf_devmem_alloc_pages(), then, you're calling
-> mm APIs like page_ref_*() on the page_pool_iov* because you've fooled
-> the mm stack into thinking dma-buf memory is a struct page.
-> 
-> RFC v1 was almost exactly the same, except instead of creating a
-> duplicate definition of struct page, it just allocated 'struct page'
-> instead of allocating another struct that is identical to struct page
-> and casting it into struct page.
-> 
-> I don't think what you're doing here reverses the nacks I got in RFC
-> v1. You also did not CC any dma-buf or mm people on this proposal that
-> would bring up these concerns again.
+This series contains updates to i40e driver only.
 
-Right, but the mirror struct has some appeal to a non-mm person like
-myself. The problem IIUC is that this patch is the wrong way around, we
-should be converting everyone who can deal with non-host mem to struct
-page_pool_iov. Using page_address() on ppiov which hns3 seems to do in
-this series does not compute for me.
+Justin Bronder increases number of allowable descriptors for XL710
+devices.
 
-Then we can turn the existing non-iov helpers to be a thin wrapper with
-just a cast from struct page to struct page_pool_iov, and a call of the
-iov helper. Again - never cast the other way around.
+Su Hui adds error check, and unroll, for RSS configuration.
 
-Also I think this conversion can be done completely separately from the
-mem provider changes. Just add struct page_pool_iov and start using it.
+Andrii changes module read error message to debug and makes it more
+verbose.
 
-Does that make more sense?
+Ivan Vecera performs numerous clean-ups and refactors to driver such as
+removing unused defines and fields, converting use of flags to bitmaps,
+adding helpers, re-organizing code, etc.
+
+The following are changes since commit 89cdf9d556016a54ff6ddd62324aa5ec790c05cc:
+  Merge tag 'net-6.7-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
+
+Andrii Staikov (1):
+  i40e: Change user notification of non-SFP module in
+    i40e_get_module_info()
+
+Ivan Vecera (12):
+  i40e: Remove unused flags
+  i40e: Remove _t suffix from enum type names
+  i40e: Use DECLARE_BITMAP for flags and hw_features fields in i40e_pf
+  i40e: Use DECLARE_BITMAP for flags field in i40e_hw
+  i40e: Consolidate hardware capabilities
+  i40e: Initialize hardware capabilities at single place
+  i40e: Move i40e_is_aq_api_ver_ge helper
+  i40e: Add other helpers to check version of running firmware and AQ
+    API
+  i40e: Use helpers to check running FW and AQ API versions
+  i40e: Remove VF MAC types
+  i40e: Move inline helpers to i40e_prototype.h
+  i40e: Delete unused i40e_mac_info fields
+
+Justin Bronder (1):
+  i40e: increase max descriptors for XL710
+
+Su Hui (1):
+  i40e: add an error code check in i40e_vsi_setup
+
+ drivers/net/ethernet/intel/i40e/i40e.h        | 148 ++---
+ drivers/net/ethernet/intel/i40e/i40e_adminq.c | 163 +++--
+ drivers/net/ethernet/intel/i40e/i40e_common.c |  68 +-
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    |   9 +-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  29 +-
+ drivers/net/ethernet/intel/i40e/i40e_debug.h  |   1 +
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |   7 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    | 246 +++----
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 620 +++++++++---------
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  10 +-
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |  70 ++
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c    |  32 +-
+ .../net/ethernet/intel/i40e/i40e_register.h   |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  20 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   8 +-
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |  51 +-
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  20 +-
+ 17 files changed, 764 insertions(+), 739 deletions(-)
+
+-- 
+2.41.0
+
 
