@@ -1,242 +1,281 @@
-Return-Path: <netdev+bounces-47375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2DDA7E9DB9
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:48:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 458CF7E9DC4
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:49:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D22281C2080C
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:48:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D93321F212D4
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9B9208A8;
-	Mon, 13 Nov 2023 13:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3965720325;
+	Mon, 13 Nov 2023 13:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DX6Phu0e"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2D11B295
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:48:08 +0000 (UTC)
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 376E110FB
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:48:07 -0800 (PST)
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b7dfda133dso3936779a12.0
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:48:07 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8427D1C2B5
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:49:43 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C9BF1731
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:49:41 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a90d6ab944so64364797b3.2
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 05:49:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699883380; x=1700488180; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=v3FV+/eNR7SjLuuxWSMis2rPcjHX+CtfLa59tHahMlE=;
+        b=DX6Phu0eJ2xilDu73sJwb9qQzM2StGHSJKQ97KKWUP0jeIwniSQ3a0DabNuijcLUBM
+         60kMF5mf3nSuGgeUXsWB74GAdRTAhjd9UCYdOY9+4bx7II+LWOAVOow2CVoI441QrwZP
+         aTbA+fQMuV3ciZ+lUCT7UyXlodTuPwYvnEdv2gZVuB8gc59VDTPJtUOQ5uKNpprMSiJs
+         IB9DD3XKj91NF7pHCz0LwBEGQmx34y9AI0UsNEV9bb5SX4A2U7Zx9FBwxF+e2JfHRgEf
+         4ugbXhbjAfyvooHUBX+tpsivES7pE7x7Ci34yYlflwlm0EENJAFaijoaCAHJeUbhT9p6
+         oUHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699883287; x=1700488087;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P94GWkkkXSfaeDa143rsNEzOvizo0J7Gzg+Ivy2rDaM=;
-        b=FFWnkbXK9TccJ1vRzbPEFuBux1YF0KhgmK7ewZEQc4XxsRS4QjVyubkEKvarHAGH7X
-         3RsjeUw7P6yLPhnArXNMvC9o3DcLbcp+VYLmOrxG7ShYgr2hEp65tAggq9i2qHPtrIi9
-         L13XMMjDdpLVSGJB2sWgAt+uP+G6LUjStDG2M8kI0x/Fq6H4st4YPTWI4enbC2IuL8Ij
-         N71iQ5quEof2uMkW5ahn3fgEKWY2wM1lgHn2rEgI5B992wxoxzLnnTBc5G9939eU+MPp
-         Sen8dWHqTAwNy1pzNZVdaeN51uNJ9s6MemU9mqzgardDIw1E4bE1el+eHwJlmrhriFkg
-         +5sA==
-X-Gm-Message-State: AOJu0YwJyQrr7tbyzX6Of04uTh4DHla/T0R6r+qKdi00dX2pXFixlO7c
-	z0726z39FjJB+jYFyO8LDiq7ndku2j1+oM8t4Anlj7psjciR
-X-Google-Smtp-Source: AGHT+IHuK2pDShfzcJI+/NHY7C1j/oMYf5VLfQ31JVwDpLtbttIDT+YuHGF2NGrEY9GOeKmg4elZh3GI6k76sCeWvZXZ2Fd25M/r
+        d=1e100.net; s=20230601; t=1699883380; x=1700488180;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=v3FV+/eNR7SjLuuxWSMis2rPcjHX+CtfLa59tHahMlE=;
+        b=VJ7Ix0/MDUmKIZ41T2feNVjCqDgB6ggaq2ijo4HmNuMyNgcI4jBu3wh7sbbMS/jJ6j
+         F5NX9A6izvZk/t2VAYXoROzYMIvtI3PlPNIvb70I9ZgX3hD8CN9cz+kHgMsCH5zS+vmt
+         sj500uwjWGX7IWbQZp43homqxDSKMGqfK/9lCW3VENAIXPwedN1teZYLXaJjlvynLlJT
+         f4xsH9knZ971YpgBgoM5ZBHpGk36a/QBjI3wAsHM0Tq1NizPnMn8GseYS9glP4PSZJUQ
+         /A5tYllBse2Wa6ebPrLdjO5z6hASw2x3FgMY3EVm823Yn0umHnoco7CVjrvwnfrzWvDc
+         TsSg==
+X-Gm-Message-State: AOJu0YwKSHjg+Wu/OdiDoaVERn5D11YQ51l4lZmllk4yq5sXk4CBM201
+	eshw59debpwCTGv9jyGbmJWSA4S3jtfPwg==
+X-Google-Smtp-Source: AGHT+IHzZvmn48UEgG5fk/L1DgN2z6TenB+WiN66r/8LIRXzTaAMrlJkzplwTWPDUpj7Pi3w4w8FmmMvOywLbw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:d6c5:0:b0:daf:d9a1:ef48 with SMTP id
+ n188-20020a25d6c5000000b00dafd9a1ef48mr20061ybg.9.1699883380663; Mon, 13 Nov
+ 2023 05:49:40 -0800 (PST)
+Date: Mon, 13 Nov 2023 13:49:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a17:90a:7e88:b0:280:2609:6d5d with SMTP id
- j8-20020a17090a7e8800b0028026096d5dmr1651684pjl.4.1699883286731; Mon, 13 Nov
- 2023 05:48:06 -0800 (PST)
-Date: Mon, 13 Nov 2023 05:48:06 -0800
-In-Reply-To: <7d56a505-3093-4863-a7b1-9454ec6447ae@siddh.me>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000773043060a08ebcc@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in nfc_alloc_send_skb
-From: syzbot <syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com>
-To: code@siddh.me, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
+Message-ID: <20231113134938.168151-1-edumazet@google.com>
+Subject: [PATCH net] af_unix: fix use-after-free in unix_stream_read_actor()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+7a2d546fa43e49315ed3@syzkaller.appspotmail.com, 
+	Rao Shoaib <rao.shoaib@oracle.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot reported the following crash [1]
 
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-KASAN: slab-use-after-free Read in nfc_alloc_send_skb
+After releasing unix socket lock, u->oob_skb can be changed
+by another thread. We must temporarily increase skb refcount
+to make sure this other thread will not free the skb under us.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in nfc_alloc_send_skb+0x189/0x1c0 net/nfc/core.c:726
-Read of size 4 at addr ffff888020c66548 by task syz-executor.0/5482
+[1]
 
-CPU: 0 PID: 5482 Comm: syz-executor.0 Not tainted 6.7.0-rc1-syzkaller-gb85ea95d0864-dirty #0
+BUG: KASAN: slab-use-after-free in unix_stream_read_actor+0xa7/0xc0 net/unix/af_unix.c:2866
+Read of size 4 at addr ffff88801f3b9cc4 by task syz-executor107/5297
+
+CPU: 1 PID: 5297 Comm: syz-executor107 Not tainted 6.6.0-syzkaller-15910-gb8e3a87a627b #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/09/2023
 Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
- print_address_description mm/kasan/report.c:364 [inline]
- print_report+0x163/0x540 mm/kasan/report.c:475
- kasan_report+0x142/0x170 mm/kasan/report.c:588
- nfc_alloc_send_skb+0x189/0x1c0 net/nfc/core.c:726
- nfc_llcp_send_ui_frame+0x2ac/0x670 net/nfc/llcp_commands.c:766
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x592/0x890 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmmsg+0x3b2/0x730 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2753 [inline]
- __se_sys_sendmmsg net/socket.c:2750 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fc24e27cae9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc24efbd0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007fc24e39bf80 RCX: 00007fc24e27cae9
-RDX: 0000000000000001 RSI: 00000000200013c0 RDI: 0000000000000004
-RBP: 00007fc24e2c847a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007fc24e39bf80 R15: 00007ffff6582e38
- </TASK>
+<TASK>
+__dump_stack lib/dump_stack.c:88 [inline]
+dump_stack_lvl+0xd9/0x1b0 lib/dump_stack.c:106
+print_address_description mm/kasan/report.c:364 [inline]
+print_report+0xc4/0x620 mm/kasan/report.c:475
+kasan_report+0xda/0x110 mm/kasan/report.c:588
+unix_stream_read_actor+0xa7/0xc0 net/unix/af_unix.c:2866
+unix_stream_recv_urg net/unix/af_unix.c:2587 [inline]
+unix_stream_read_generic+0x19a5/0x2480 net/unix/af_unix.c:2666
+unix_stream_recvmsg+0x189/0x1b0 net/unix/af_unix.c:2903
+sock_recvmsg_nosec net/socket.c:1044 [inline]
+sock_recvmsg+0xe2/0x170 net/socket.c:1066
+____sys_recvmsg+0x21f/0x5c0 net/socket.c:2803
+___sys_recvmsg+0x115/0x1a0 net/socket.c:2845
+__sys_recvmsg+0x114/0x1e0 net/socket.c:2875
+do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fc67492c559
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc6748ab228 EFLAGS: 00000246 ORIG_RAX: 000000000000002f
+RAX: ffffffffffffffda RBX: 000000000000001c RCX: 00007fc67492c559
+RDX: 0000000040010083 RSI: 0000000020000140 RDI: 0000000000000004
+RBP: 00007fc6749b6348 R08: 00007fc6748ab6c0 R09: 00007fc6748ab6c0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fc6749b6340
+R13: 00007fc6749b634c R14: 00007ffe9fac52a0 R15: 00007ffe9fac5388
+</TASK>
 
-Allocated by task 5482:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- ____kasan_kmalloc mm/kasan/common.c:374 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:383
- kmalloc include/linux/slab.h:600 [inline]
- kzalloc include/linux/slab.h:721 [inline]
- nfc_allocate_device+0x12f/0x520 net/nfc/core.c:1065
- nci_allocate_device+0x1e2/0x360 net/nfc/nci/core.c:1179
- virtual_ncidev_open+0x75/0x1b0 drivers/nfc/virtual_ncidev.c:136
- misc_open+0x30b/0x380 drivers/char/misc.c:165
- chrdev_open+0x5ab/0x630 fs/char_dev.c:414
- do_dentry_open+0x8fd/0x1590 fs/open.c:948
- do_open fs/namei.c:3622 [inline]
- path_openat+0x2845/0x3280 fs/namei.c:3779
- do_filp_open+0x234/0x490 fs/namei.c:3809
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1440
- do_sys_open fs/open.c:1455 [inline]
- __do_sys_openat fs/open.c:1471 [inline]
- __se_sys_openat fs/open.c:1466 [inline]
- __x64_sys_openat+0x247/0x290 fs/open.c:1466
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Allocated by task 5295:
+kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+__kasan_slab_alloc+0x81/0x90 mm/kasan/common.c:328
+kasan_slab_alloc include/linux/kasan.h:188 [inline]
+slab_post_alloc_hook mm/slab.h:763 [inline]
+slab_alloc_node mm/slub.c:3478 [inline]
+kmem_cache_alloc_node+0x180/0x3c0 mm/slub.c:3523
+__alloc_skb+0x287/0x330 net/core/skbuff.c:641
+alloc_skb include/linux/skbuff.h:1286 [inline]
+alloc_skb_with_frags+0xe4/0x710 net/core/skbuff.c:6331
+sock_alloc_send_pskb+0x7e4/0x970 net/core/sock.c:2780
+sock_alloc_send_skb include/net/sock.h:1884 [inline]
+queue_oob net/unix/af_unix.c:2147 [inline]
+unix_stream_sendmsg+0xb5f/0x10a0 net/unix/af_unix.c:2301
+sock_sendmsg_nosec net/socket.c:730 [inline]
+__sock_sendmsg+0xd5/0x180 net/socket.c:745
+____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-Freed by task 5481:
- kasan_save_stack mm/kasan/common.c:45 [inline]
- kasan_set_track+0x4f/0x70 mm/kasan/common.c:52
- kasan_save_free_info+0x28/0x40 mm/kasan/generic.c:522
- ____kasan_slab_free+0xd6/0x120 mm/kasan/common.c:236
- kasan_slab_free include/linux/kasan.h:164 [inline]
- slab_free_hook mm/slub.c:1800 [inline]
- slab_free_freelist_hook mm/slub.c:1826 [inline]
- slab_free mm/slub.c:3809 [inline]
- __kmem_cache_free+0x263/0x3a0 mm/slub.c:3822
- device_release+0x95/0x1c0
- kobject_cleanup lib/kobject.c:682 [inline]
- kobject_release lib/kobject.c:716 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1ee/0x430 lib/kobject.c:733
- nfc_free_device include/net/nfc/nfc.h:213 [inline]
- nci_free_device+0x38/0x50 net/nfc/nci/core.c:1209
- virtual_ncidev_close+0x70/0x90 drivers/nfc/virtual_ncidev.c:164
- __fput+0x3cc/0xa10 fs/file_table.c:394
- __do_sys_close fs/open.c:1590 [inline]
- __se_sys_close+0x15f/0x220 fs/open.c:1575
- do_syscall_x64 arch/x86/entry/common.c:51 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:82
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
+Freed by task 5295:
+kasan_save_stack+0x33/0x50 mm/kasan/common.c:45
+kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:522
+____kasan_slab_free mm/kasan/common.c:236 [inline]
+____kasan_slab_free+0x15b/0x1b0 mm/kasan/common.c:200
+kasan_slab_free include/linux/kasan.h:164 [inline]
+slab_free_hook mm/slub.c:1800 [inline]
+slab_free_freelist_hook+0x114/0x1e0 mm/slub.c:1826
+slab_free mm/slub.c:3809 [inline]
+kmem_cache_free+0xf8/0x340 mm/slub.c:3831
+kfree_skbmem+0xef/0x1b0 net/core/skbuff.c:1015
+__kfree_skb net/core/skbuff.c:1073 [inline]
+consume_skb net/core/skbuff.c:1288 [inline]
+consume_skb+0xdf/0x170 net/core/skbuff.c:1282
+queue_oob net/unix/af_unix.c:2178 [inline]
+unix_stream_sendmsg+0xd49/0x10a0 net/unix/af_unix.c:2301
+sock_sendmsg_nosec net/socket.c:730 [inline]
+__sock_sendmsg+0xd5/0x180 net/socket.c:745
+____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
-The buggy address belongs to the object at ffff888020c66000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 1352 bytes inside of
- freed 2048-byte region [ffff888020c66000, ffff888020c66800)
+The buggy address belongs to the object at ffff88801f3b9c80
+which belongs to the cache skbuff_head_cache of size 240
+The buggy address is located 68 bytes inside of
+freed 240-byte region [ffff88801f3b9c80, ffff88801f3b9d70)
 
 The buggy address belongs to the physical page:
-page:ffffea0000831800 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x20c60
-head:ffffea0000831800 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page:ffffea00007cee40 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1f3b9
+flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
 page_type: 0xffffffff()
-raw: 00fff00000000840 ffff888012c42000 dead000000000122 0000000000000000
-raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
+raw: 00fff00000000800 ffff888142a60640 dead000000000122 0000000000000000
+raw: 0000000000000000 00000000000c000c 00000001ffffffff 0000000000000000
 page dumped because: kasan: bad access detected
 page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 8, tgid 8 (kworker/0:0), ts 87575041484, free_ts 86099705668
- set_page_owner include/linux/page_owner.h:31 [inline]
- post_alloc_hook+0x1e6/0x210 mm/page_alloc.c:1537
- prep_new_page mm/page_alloc.c:1544 [inline]
- get_page_from_freelist+0x339a/0x3530 mm/page_alloc.c:3312
- __alloc_pages+0x255/0x670 mm/page_alloc.c:4568
- alloc_pages_mpol+0x3de/0x640 mm/mempolicy.c:2133
- alloc_slab_page+0x6a/0x160 mm/slub.c:1870
- allocate_slab mm/slub.c:2017 [inline]
- new_slab+0x84/0x2f0 mm/slub.c:2070
- ___slab_alloc+0xc85/0x1310 mm/slub.c:3223
- __slab_alloc mm/slub.c:3322 [inline]
- __slab_alloc_node mm/slub.c:3375 [inline]
- slab_alloc_node mm/slub.c:3468 [inline]
- __kmem_cache_alloc_node+0x21d/0x300 mm/slub.c:3517
- __do_kmalloc_node mm/slab_common.c:1006 [inline]
- __kmalloc_node_track_caller+0xa5/0x230 mm/slab_common.c:1027
- kmalloc_reserve+0xf3/0x260 net/core/skbuff.c:582
- __alloc_skb+0x1b1/0x420 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- alloc_skb_with_frags+0xc3/0x780 net/core/skbuff.c:6331
- sock_alloc_send_pskb+0x919/0xa50 net/core/sock.c:2780
- sock_alloc_send_skb include/net/sock.h:1884 [inline]
- mld_newpack+0x1c9/0xa90 net/ipv6/mcast.c:1746
- add_grhead net/ipv6/mcast.c:1849 [inline]
- add_grec+0x148d/0x1990 net/ipv6/mcast.c:1987
- mld_send_cr net/ipv6/mcast.c:2113 [inline]
- mld_ifc_work+0x6bf/0xb20 net/ipv6/mcast.c:2650
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 5299, tgid 5283 (syz-executor107), ts 103803840339, free_ts 103600093431
+set_page_owner include/linux/page_owner.h:31 [inline]
+post_alloc_hook+0x2cf/0x340 mm/page_alloc.c:1537
+prep_new_page mm/page_alloc.c:1544 [inline]
+get_page_from_freelist+0xa25/0x36c0 mm/page_alloc.c:3312
+__alloc_pages+0x1d0/0x4a0 mm/page_alloc.c:4568
+alloc_pages_mpol+0x258/0x5f0 mm/mempolicy.c:2133
+alloc_slab_page mm/slub.c:1870 [inline]
+allocate_slab+0x251/0x380 mm/slub.c:2017
+new_slab mm/slub.c:2070 [inline]
+___slab_alloc+0x8c7/0x1580 mm/slub.c:3223
+__slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3322
+__slab_alloc_node mm/slub.c:3375 [inline]
+slab_alloc_node mm/slub.c:3468 [inline]
+kmem_cache_alloc_node+0x132/0x3c0 mm/slub.c:3523
+__alloc_skb+0x287/0x330 net/core/skbuff.c:641
+alloc_skb include/linux/skbuff.h:1286 [inline]
+alloc_skb_with_frags+0xe4/0x710 net/core/skbuff.c:6331
+sock_alloc_send_pskb+0x7e4/0x970 net/core/sock.c:2780
+sock_alloc_send_skb include/net/sock.h:1884 [inline]
+queue_oob net/unix/af_unix.c:2147 [inline]
+unix_stream_sendmsg+0xb5f/0x10a0 net/unix/af_unix.c:2301
+sock_sendmsg_nosec net/socket.c:730 [inline]
+__sock_sendmsg+0xd5/0x180 net/socket.c:745
+____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+__sys_sendmsg+0x117/0x1e0 net/socket.c:2667
 page last free stack trace:
- reset_page_owner include/linux/page_owner.h:24 [inline]
- free_pages_prepare mm/page_alloc.c:1137 [inline]
- free_unref_page_prepare+0x92a/0xa50 mm/page_alloc.c:2347
- free_unref_page+0x37/0x3f0 mm/page_alloc.c:2487
- discard_slab mm/slub.c:2116 [inline]
- __unfreeze_partials+0x1dc/0x220 mm/slub.c:2655
- put_cpu_partial+0x17b/0x250 mm/slub.c:2731
- __slab_free+0x2b6/0x390 mm/slub.c:3679
- qlink_free mm/kasan/quarantine.c:168 [inline]
- qlist_free_all+0x75/0xe0 mm/kasan/quarantine.c:187
- kasan_quarantine_reduce+0x14b/0x160 mm/kasan/quarantine.c:294
- __kasan_slab_alloc+0x23/0x70 mm/kasan/common.c:305
- kasan_slab_alloc include/linux/kasan.h:188 [inline]
- slab_post_alloc_hook+0x6c/0x3c0 mm/slab.h:763
- slab_alloc_node mm/slub.c:3478 [inline]
- slab_alloc mm/slub.c:3486 [inline]
- __kmem_cache_alloc_lru mm/slub.c:3493 [inline]
- kmem_cache_alloc_lru+0x100/0x2c0 mm/slub.c:3509
- __d_alloc+0x31/0x710 fs/dcache.c:1768
- d_alloc fs/dcache.c:1848 [inline]
- d_alloc_parallel+0xe1/0x1590 fs/dcache.c:2637
- __lookup_slow+0x117/0x3e0 fs/namei.c:1679
- lookup_slow+0x53/0x70 fs/namei.c:1711
- walk_component fs/namei.c:2002 [inline]
- link_path_walk+0x9c8/0xe70 fs/namei.c:2329
- path_openat+0x25d/0x3280 fs/namei.c:3775
+reset_page_owner include/linux/page_owner.h:24 [inline]
+free_pages_prepare mm/page_alloc.c:1137 [inline]
+free_unref_page_prepare+0x4f8/0xa90 mm/page_alloc.c:2347
+free_unref_page+0x33/0x3b0 mm/page_alloc.c:2487
+__unfreeze_partials+0x21d/0x240 mm/slub.c:2655
+qlink_free mm/kasan/quarantine.c:168 [inline]
+qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:187
+kasan_quarantine_reduce+0x18e/0x1d0 mm/kasan/quarantine.c:294
+__kasan_slab_alloc+0x65/0x90 mm/kasan/common.c:305
+kasan_slab_alloc include/linux/kasan.h:188 [inline]
+slab_post_alloc_hook mm/slab.h:763 [inline]
+slab_alloc_node mm/slub.c:3478 [inline]
+slab_alloc mm/slub.c:3486 [inline]
+__kmem_cache_alloc_lru mm/slub.c:3493 [inline]
+kmem_cache_alloc+0x15d/0x380 mm/slub.c:3502
+vm_area_dup+0x21/0x2f0 kernel/fork.c:500
+__split_vma+0x17d/0x1070 mm/mmap.c:2365
+split_vma mm/mmap.c:2437 [inline]
+vma_modify+0x25d/0x450 mm/mmap.c:2472
+vma_modify_flags include/linux/mm.h:3271 [inline]
+mprotect_fixup+0x228/0xc80 mm/mprotect.c:635
+do_mprotect_pkey+0x852/0xd60 mm/mprotect.c:809
+__do_sys_mprotect mm/mprotect.c:830 [inline]
+__se_sys_mprotect mm/mprotect.c:827 [inline]
+__x64_sys_mprotect+0x78/0xb0 mm/mprotect.c:827
+do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+do_syscall_64+0x3f/0x110 arch/x86/entry/common.c:82
+entry_SYSCALL_64_after_hwframe+0x63/0x6b
 
 Memory state around the buggy address:
- ffff888020c66400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888020c66480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888020c66500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                              ^
- ffff888020c66580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888020c66600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+ffff88801f3b9b80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ffff88801f3b9c00: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
+>ffff88801f3b9c80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+^
+ffff88801f3b9d00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+ffff88801f3b9d80: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
 
+Fixes: 876c14ad014d ("af_unix: fix holding spinlock in oob handling")
+Reported-and-tested-by: syzbot+7a2d546fa43e49315ed3@syzkaller.appspotmail.com
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Rao Shoaib <rao.shoaib@oracle.com>
+---
+ net/unix/af_unix.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-Tested on:
-
-commit:         b85ea95d Linux 6.7-rc1
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-console output: https://syzkaller.appspot.com/x/log.txt?x=113c6a57680000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b5bf1661f609e7f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=bbe84a4010eeea00982d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=12d9c9a8e80000
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 45506a95b25f8acdb99699c3c9256f50d0e7e5d0..a357dc5f24046d98674da9935eccbb9e18ea4616 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2581,15 +2581,16 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
+ 
+ 	if (!(state->flags & MSG_PEEK))
+ 		WRITE_ONCE(u->oob_skb, NULL);
+-
++	else
++		skb_get(oob_skb);
+ 	unix_state_unlock(sk);
+ 
+ 	chunk = state->recv_actor(oob_skb, 0, chunk, state);
+ 
+-	if (!(state->flags & MSG_PEEK)) {
++	if (!(state->flags & MSG_PEEK))
+ 		UNIXCB(oob_skb).consumed += 1;
+-		kfree_skb(oob_skb);
+-	}
++
++	consume_skb(oob_skb);
+ 
+ 	mutex_unlock(&u->iolock);
+ 
+-- 
+2.42.0.869.gea05f2083d-goog
 
 
