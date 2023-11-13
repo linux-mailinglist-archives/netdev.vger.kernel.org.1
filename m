@@ -1,117 +1,110 @@
-Return-Path: <netdev+bounces-47400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9BB7EA167
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:42:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 214C77EA174
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 17:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73B4A1F21CD8
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 16:42:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B46251F21D44
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 16:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7E121A11;
-	Mon, 13 Nov 2023 16:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145AE2232E;
+	Mon, 13 Nov 2023 16:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QnPyGvSy"
+	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="DUKo/RSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F09D21A02
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:42:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A37C433C8;
-	Mon, 13 Nov 2023 16:42:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699893728;
-	bh=HqMXtrWSxjrCtdFd9atXD7V+Fi8AvvX+vHT85WZiBBc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QnPyGvSyT9ntR663bNXD5X30SvDQfzSECRWF8EldQveajlk47xSHlHgelt6tkCo/T
-	 NWc8vlrrQtuxJSguZq6xliAmHd0V3tBpTj/TFzIBSWzL/76OIsxyRVoIQ7blZCUA1U
-	 FMdalRP0D8ZXD5Ex+1FzvtTO2/B/dJUHE3Q6+ZTtgUBoTJe0WknV9wpnUQNsSyH9cB
-	 w9Op67OljpQ44MYDz7Fx4Y2n36kKPveyptLlvQRANU5IWnFJj5WcZGClmBQq4iVrcx
-	 Jrs6s8E0CVe5G4aWzcEhlUYWWc1IF5W/jue7JY9D2bj9klfHaA+uvYE6GNze/pojqN
-	 kGU00h3RaHang==
-Date: Mon, 13 Nov 2023 16:42:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com,
-	r-gunasekaran@ti.com, srk@ti.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: ethernet: am65-cpsw: Add standard
- Ethernet MAC stats to ethtool
-Message-ID: <20231113164204.GB4482@kernel.org>
-References: <20231113110708.137379-1-rogerq@kernel.org>
- <20231113110708.137379-2-rogerq@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DC52031F
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:44:46 +0000 (UTC)
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE8111727
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:44:42 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id a640c23a62f3a-9d0b4dfd60dso707519466b.1
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 08:44:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1699893881; x=1700498681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VgsY0E8FO3fh5yKJiKNC1hyDJiyScrO0HTp/YO5tOjU=;
+        b=DUKo/RSmF8kOxE+ZYaIDKkaXxvtY+UcA38o0w6vB//2tl919EmHNwV15iNoGAJcme6
+         89ChQLuRg7UaPvvs2lpYuq4zxjfOZKKEZtdufHCFoqefY8yTtr+dKvjrVgvdhBIXSeSc
+         Oe6whMg3EAmYyhtNTzM6xMy1ZpaKtIPC+i99ivXZTFARfoS43kduw8157/3p/5tMnJ9C
+         D+fv0QyKsgTSf58p+JZdhvSepPZHWDsqSD5F3DzxOLPYZzkejShkCKqVJ4ZN8aCk53YL
+         nJBjFurnUPUg4mLh25deTCx92EiIu+xirhyQfY1Ex6AZe/9/wRK6i4Gkvw3pk+5RT4/G
+         MnPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699893881; x=1700498681;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VgsY0E8FO3fh5yKJiKNC1hyDJiyScrO0HTp/YO5tOjU=;
+        b=TnMSEC3Fu3NmDPBX7zN0c9ZC8jhsImbzD9e4odyFLxQJttxOCAag+ceFaFe1qYsH93
+         5d7pLuytFsM/TJigJ4dfgbVvOHPwxYW8dSX24rjGNA8hMi12+ZwzXJbAEQeDTrznYkzZ
+         2fp29hEY3SHJoDuSyImVaSvHaW5nGjY43+7jGvgiDTU6SN1XhO1TQyQcs+/D+aq3ZHve
+         +gWCZVrV7dXQAwHcOQ+i7QfQF2Pu29OGjKKrM49bxxvfGPQlN7Sj51CgGO+TFNC16NO3
+         osV0OUXRIqaHcA4W8/vDW1+HOSG9Pr0+n1IE4UztKrpCmPI/NuhKo4IFX0P95IrcHlrc
+         CU1A==
+X-Gm-Message-State: AOJu0YwCj205S9taz0+6LeN2I1OTzxBVAsG3D99ZnGgWrnkDvzyFS3yo
+	7Kdo9oaDd3jXdeYCaEbxrzfk3w==
+X-Google-Smtp-Source: AGHT+IF0/oq07H15BhIrlnU5Chnldqw+Vlb5lrdFsjiIO9ZdYJfOokY0kiWvYGP1pBxv+wB9RKx4jQ==
+X-Received: by 2002:a17:906:34cc:b0:9e0:2319:16f2 with SMTP id h12-20020a17090634cc00b009e0231916f2mr5174214ejb.43.1699893881309;
+        Mon, 13 Nov 2023 08:44:41 -0800 (PST)
+Received: from sleipner.berto.se (p54ac5f7d.dip0.t-ipconnect.de. [84.172.95.125])
+        by smtp.googlemail.com with ESMTPSA id y26-20020a170906471a00b009dd8debf9d8sm4262334ejq.157.2023.11.13.08.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Nov 2023 08:44:40 -0800 (PST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Prasanna Vengateshan <prasanna.vengateshan@microchip.com>,
+	devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [PATCH] dt-bindings: net: ethernet-controller: Fix formatting error
+Date: Mon, 13 Nov 2023 17:44:12 +0100
+Message-ID: <20231113164412.945365-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231113110708.137379-2-rogerq@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 13, 2023 at 01:07:06PM +0200, Roger Quadros wrote:
-> Gets 'ethtool -S eth0 --groups eth-mac' command to work.
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 26 +++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> index c51e2af91f69..ac7276f0f77a 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-> @@ -662,6 +662,31 @@ static void am65_cpsw_get_ethtool_stats(struct net_device *ndev,
->  					hw_stats[i].offset);
->  }
->  
-> +static void am65_cpsw_get_eth_mac_stats(struct net_device *ndev,
-> +					struct ethtool_eth_mac_stats *s)
-> +{
-> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-> +	struct am65_cpsw_stats_regs *stats;
+When moving the *-internal-delay-ps properties to only apply for RGMII
+interface modes there where a typo in the text formatting.
 
-Hi Roger,
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+ .../devicetree/bindings/net/ethernet-controller.yaml          | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I think that stats needs an __iomem annotation
-to address the issues flagged by Sparse.
+diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+index 9f6a5ccbcefe..d14d123ad7a0 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+@@ -275,12 +275,12 @@ allOf:
+       properties:
+         rx-internal-delay-ps:
+           description:
+-            RGMII Receive Clock Delay defined in pico seconds.This is used for
++            RGMII Receive Clock Delay defined in pico seconds. This is used for
+             controllers that have configurable RX internal delays. If this
+             property is present then the MAC applies the RX delay.
+         tx-internal-delay-ps:
+           description:
+-            RGMII Transmit Clock Delay defined in pico seconds.This is used for
++            RGMII Transmit Clock Delay defined in pico seconds. This is used for
+             controllers that have configurable TX internal delays. If this
+             property is present then the MAC applies the TX delay.
+ 
+-- 
+2.42.1
 
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15: warning: incorrect type in assignment (different address spaces)
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15:    expected struct am65_cpsw_stats_regs *stats
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15:    got void [noderef] __iomem *stat_base
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34: warning: incorrect type in argument 1 (different address spaces)
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34:    expected void const volatile [noderef] __iomem *addr
-drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34:    got unsigned int *
-...
-
-> +
-> +	stats = port->stat_base;
-> +
-> +	s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
-> +	s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
-> +	s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
-> +	s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
-> +	s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
-> +	s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
-> +	s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
-> +	s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
-> +	s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
-> +	s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
-> +	s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
-> +	s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
-> +	s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
-> +	s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
-> +	s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
-> +};
-> +
->  static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
->  					 struct ethtool_ts_info *info)
->  {
-
-...
 
