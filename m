@@ -1,173 +1,221 @@
-Return-Path: <netdev+bounces-47467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA807EA589
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:38:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275B27EA59A
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFE8B280F2A
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:37:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79F151F2264C
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B93862D620;
-	Mon, 13 Nov 2023 21:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641092D621;
+	Mon, 13 Nov 2023 21:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="hheqxdV4"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="FuPI9pdh"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077FD2510C
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 21:37:55 +0000 (UTC)
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB8AB10E0
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:37:52 -0800 (PST)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5afabb23900so58348847b3.2
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:37:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1699911472; x=1700516272; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0LV0ITokBPcXbAa2Z8QDIqjjz9JHHk6U13CgWTeVF9E=;
-        b=hheqxdV4CpJzoN2QwmhNQ2ov6iUgsEefoOO69GTncUKu/lwPJj8ZdNFKLwnFYWcOIi
-         Z0mSg4Kn0/7o7KaPAZgM/E6iQfUzXhcB/iQBOOjyUmuI8etCZFuwXKUMy/OVNO8882Is
-         2U0FrS++uLZLKKIeuXSVN3pBSejnt1ov9hYA1FWD2B4p+kxi27ad48sGnV+Bsck6wo/N
-         JPJw67J39ByqBQPNCs4afdK10cPdCQnfp93+igMpF6mlj9pGxpNI076TaGsmKTHc/qbF
-         ZF3K7/sqhTMK/D8KSpldR7P6zDSfovqiWFreuQE80RiiizeUfiuNTGtwRefcnTkhctgj
-         PpHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699911472; x=1700516272;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0LV0ITokBPcXbAa2Z8QDIqjjz9JHHk6U13CgWTeVF9E=;
-        b=VGPc8210nvKA1Iz6YhXc1F2Fu7fP/exgj/68DT2U/ic763R7mnUDoXGa0acmQgXBJx
-         O1p777IgwxDevli4KIFvl2o3ke4V5tszTFuXM+l4SfwTY+Tm8Xc44dxMHdUYJyHXDsWl
-         8rljBRoObpxrOGBda8OSW5VrkD0ASG7425o/4yDJ9kzPtuqZLaV3e8bUVjXhaGqucyM6
-         DenLbX7pdeMSZE1DybHdCATPoQ8OZGf6SQU4dSyDj29tkhnIylRK+GLHAbJ+wcXrTkVj
-         CEpzAgU2suc10tlQjttW2ZeR89E9KjewJNFkjXsr0E74XcL6v+xRu2UUZ93OgXIXhhhx
-         hdOA==
-X-Gm-Message-State: AOJu0YwzvWqH9AzmR34W++pTJ1nk1SU0QiOJJctXzGouqoH+lnvsvOv6
-	UGDltSxfcNFcKhrUX6wVbx/ijw3iRUD4pz5hbGADcQ==
-X-Google-Smtp-Source: AGHT+IHCSCOAUmrAIL9hd0EjRkCiqGB6Ldd01trnssnK4XAVGcdaUTAafiirYqU2uAlU2oqUA+xLDZiWDam1V55/5Qs=
-X-Received: by 2002:a05:690c:306:b0:569:e7cb:cd4e with SMTP id
- bg6-20020a05690c030600b00569e7cbcd4emr5724235ywb.48.1699911472071; Mon, 13
- Nov 2023 13:37:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94EE224D9
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 21:50:46 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2035.outbound.protection.outlook.com [40.92.41.35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E1619D;
+	Mon, 13 Nov 2023 13:50:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KwJmKPlar8HTZfEK5P/hO7kHcoVwrjdF1hgBO0IO81vplcB1JKbNrpdrm+AO9Lomx+jcGeswb2xNKVXH3AdYx6g8o6OOGIiP6kro8e2twT5acudOBC//8k4p6m4VjAkZwkRFTSgTUIK+n05suXYdCLrNalZr1lbNGNG96U8d862Nqr0dffjs42WdOLg+oVlTmKUkwHg/9urBDInqBiGpbmJUBmwd20Q0Eq8u/BPyzjyDjyzlMAv3EDvmijian/oIXqLbuXeK3v9UU28yVIKkyMw79BJl+9w/Vryalog9liMA0nLEO7Aa9vZ8XdjM0vz+gmdbsBkaruoF0uYLx9CQow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2byRroOSLkvMjnOus5DWUJotAMGvn0TLDn9K8ShmcIA=;
+ b=N281wrq8ly4mrjRAIBjRZ+lOJ7C0MWsKiATYsI+WczXtxcl+p4d62urzvy4akKZ3q+jtlPheoy03lFfk+6E0DV6MaqZIpRphIGq+zXoZRp/pkM/Wx0JAGMMt3c8RO+vEPlSZ/Onect3aP8Xwsb2fWGMkHmEHfu9Dxby330UTKratn490ov2TMMAUyDcbG17iXBYn4B1esRqgRo9peIv8/MgbxPUEvbi1pCu3R7hKRtRDryGh0suQavilua8kDXpHurxlBS6Jgbgc34QdoMlJS7+i/eeNKYYr/ZuA169T/IkLYaioQiudhgdZvrilb5sLRiVmWMXoxnM2qz5CVsQE/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2byRroOSLkvMjnOus5DWUJotAMGvn0TLDn9K8ShmcIA=;
+ b=FuPI9pdhwfcnvyNynJR+OcZYvfM8QlYbdguCt793AFNIwgsxqo9xeBdwUVUsxMjRc8nj9AOGOymTO4kAgAxwjvxxf2FTqF1di0Pqn0tt5822jWuO/QdMFDGvygQtMKa0YQTNh2YbNHC3032/5c7cVUvGnsDbqbs68x45bAgtQv3VXWCLEYAUD6QbdpgPvMi7wvEMBAKbh1CIQkrZleVLZKyfCLRWWIeSD7QLijWaRua6AjHAyhqtrX3BzGOoxdOTDbO0NhHnwTUbn6k/SJ44+bLtajFjFMuKZ0ojoQtdhjkarZBv2Qo8gkChYz8FvzoM2w2MaFtA/hPDJV8jAUHRQw==
+Received: from MW5PR03MB6932.namprd03.prod.outlook.com (2603:10b6:303:1cd::22)
+ by CH2PR03MB5158.namprd03.prod.outlook.com (2603:10b6:610:92::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Mon, 13 Nov
+ 2023 21:50:43 +0000
+Received: from MW5PR03MB6932.namprd03.prod.outlook.com
+ ([fe80::e204:782d:2249:36d8]) by MW5PR03MB6932.namprd03.prod.outlook.com
+ ([fe80::e204:782d:2249:36d8%7]) with mapi id 15.20.7002.015; Mon, 13 Nov 2023
+ 21:50:43 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net-next RFC 1/1] ptp: use extts interface for the measured external offset
+Date: Mon, 13 Nov 2023 16:50:25 -0500
+Message-ID:
+ <MW5PR03MB6932F6DB45F5ED179DF0BA4DA0B3A@MW5PR03MB6932.namprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [J7BIvzjlHmgAaq4gfuYjZ/mhD3t6IX+8]
+X-ClientProxiedBy: BN9PR03CA0058.namprd03.prod.outlook.com
+ (2603:10b6:408:fb::33) To MW5PR03MB6932.namprd03.prod.outlook.com
+ (2603:10b6:303:1cd::22)
+X-Microsoft-Original-Message-ID: <20231113215025.17448-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
-In-Reply-To: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 13 Nov 2023 16:37:40 -0500
-Message-ID: <CAM0EoMmnzonWhGY7Di2wgrt--hJf5TrcCObPnkOuehLuiziKdw@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: do not offload flows with a helper in act_ct
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Vladyslav Tarasiuk <vladyslavt@nvidia.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW5PR03MB6932:EE_|CH2PR03MB5158:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd62116c-2d39-439d-a913-08dbe49293be
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yAflIVxXzSms+pJLWrMezxEMbvfweN0ghwlzC/jjmnACCQHxGaY1vJpwHmePpoN/n3QwO2J6lpxfnwwZxbrhm1LMynOjCVwEQnccKFbIkiDKX5ZM7XAelXzrpSymxHVI46QiFFeifOSYjW/PirUmvDQect7bHpjERlnvOHAg204jEk7NikwTYoP2es9+ifwl4N+IrdGce5HnDR5opboyijxnZhWNeZNhWSg5E0SUGqBXB0uFS2l2hzoZc73R42zuT3nGQlQ+VdwvH2ZMBVBKGJC8MJ4EyTl8r6Jho7kf5RnrbTHRDCKeAZ6iWJ5BiYZzBVdThM/gY+jZqZxzSqb/hy0mHW9h98fn0DDrCH0c7K6SEyxw2QAI1dubCR5LFIIgLcIi898fdCagqmOVhQloapOOYuAbnytrtvV8YPkU6PkfllfGlSsHCPVhhnmVOt1OdVGzne8ogtfjNWU1lEGTI3ZCsZ1C+7IpTxIbQkGEztCtvP+lp0cBoueHbN8zfYajORFLtpp16GMOViVl/nusVaXGCqF2XpH5U6foD39lS8NWUDFKotkx/BveKV7j7Ox5
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Dq5rmsqbD08P/BmesLAldLB1vV0dKQRxvTSKdK/vMbIg3pTx7i0mXgfCzOoS?=
+ =?us-ascii?Q?WH9v+a03y2RSAyqdkAFr17MnJZb48khKynMsa3XgaLnF9E900L56gzke8hn6?=
+ =?us-ascii?Q?L7S2FNy7QHKL4EgTZe23QIOkt1LiS9SFIBXCggTSbIzifHRsyjnov/jfG5pk?=
+ =?us-ascii?Q?6UEYMGBUnLrm88Z8ef85tAWVmqb8aYdcjGJ9ViJAXJoxEXqfADq9gbkW6ISx?=
+ =?us-ascii?Q?9hLNW4aLEHzoNHr4Qbe0AGB+CF2vCyTiWFlyHkA+qwd3EV6jD0jei9OqtfH7?=
+ =?us-ascii?Q?J78X8KwE9g2ymiLpIS4i0bV02vzk/Q+lEgzvlQ1nS5sm5HTQ+wO/j8yi+YyI?=
+ =?us-ascii?Q?GmBchqbWwdRWgEYJNDwSlm+Ko63eZvnQHYiUDFKR6OU4lnQFlB3SXS4XmOqt?=
+ =?us-ascii?Q?43ROQ2c1wGKlMDLx2KL3lWsMQHBQygaI3VayNQdPHZ/seH0UWxfctYqRWbfr?=
+ =?us-ascii?Q?QULIkp8JvvjJYmMeAALGbhF9A/5DJtCh28FTsFkTX/icoe/VuOEGzLjAKIIO?=
+ =?us-ascii?Q?W1gTOyYx2pbJ00xtwoFXQj9eh/6a2LGHlmMDDBDI9Ipil4hIFFM+nzmMQ2kV?=
+ =?us-ascii?Q?OVUzrP0ugW/LEwgYooLr2h6v4TQX6EbQ+n+F1pl6y9ZkQ//PlRDLcb7svu8E?=
+ =?us-ascii?Q?s5hSC76xexFIEsILXNn/YBmJHX35vqg+m8eUebd8lBpM1/C6eFj9eobqWB0z?=
+ =?us-ascii?Q?aCr1l3akk3uzye/wc3v0pzocn7I6+yeZLY3rdKRgHOD9pVeahYZKDnoKhjS6?=
+ =?us-ascii?Q?NQfsFz5CRaHtm/QmhaNK4ZXkBmptQSkn0Y5dZzfOhdKmgR1HeyxDk8M3YZPP?=
+ =?us-ascii?Q?Z0RvN6g1dGPNJvpBO3mk+EISkAqmPqbstBeh81Y8lKTewzZyLW+tCnsgGQC3?=
+ =?us-ascii?Q?xmKA7G6e1SzOk78jauwSriP6QzUlXkJ8rj31pp6N4PneFT6UUzkmI6LAfrFX?=
+ =?us-ascii?Q?wZwkbG8i3MCxOFexKQRdvgTySFJTTvZ82i52MjKDGNmTxXNWP55mbriV7+YP?=
+ =?us-ascii?Q?T2BmhnCmOTq0I/ak63NQ+w1PIUWjnJkX1UP7KZxLU1J/LggOUi5tYTZKFRm9?=
+ =?us-ascii?Q?Ulbf456C+WSbcLEpi7s94jAbh4UgLHy9MupBkFTzRKLiZA7lUjmEd4AU5620?=
+ =?us-ascii?Q?L8DRhSFp9HT1//Q6+L1TPq73V2pFtUxVDojcvCWmAz+vPS9pfBv+0Mzmknlj?=
+ =?us-ascii?Q?OK1M1oRnef35NdTzXSomv0LMJKQsMt6pTgF47A=3D=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-839f4.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd62116c-2d39-439d-a913-08dbe49293be
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR03MB6932.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2023 21:50:40.4984
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR03MB5158
 
-On Mon, Nov 13, 2023 at 12:53=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wr=
-ote:
->
-> There is no hardware supporting ct helper offload. However, prior to this
-> patch, a flower filter with a helper in the ct action can be successfully
-> set into the HW, for example (eth1 is a bnxt NIC):
->
->   # tc qdisc add dev eth1 ingress_block 22 ingress
->   # tc filter add block 22 proto ip flower skip_sw ip_proto tcp \
->     dst_port 21 ct_state -trk action ct helper ipv4-tcp-ftp
->   # tc filter show dev eth1 ingress
->
->     filter block 22 protocol ip pref 49152 flower chain 0 handle 0x1
->       eth_type ipv4
->       ip_proto tcp
->       dst_port 21
->       ct_state -trk
->       skip_sw
->       in_hw in_hw_count 1   <----
->         action order 1: ct zone 0 helper ipv4-tcp-ftp pipe
->          index 2 ref 1 bind 1
->         used_hw_stats delayed
->
-> This might cause the flower filter not to work as expected in the HW.
->
-> This patch avoids this problem by simply returning -EOPNOTSUPP in
-> tcf_ct_offload_act_setup() to not allow to offload flows with a helper
-> in act_ct.
->
-> Fixes: a21b06e73191 ("net: sched: add helper support in act_ct")
-> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+From: Min Li <min.li.xe@renesas.com>
 
-I didnt quite follow:
-The driver accepted the config, but the driver "kind of '' supports
-it. (enough to not complain and then display it when queried).
-Should the driver have rejected something it doesnt fully support?
+This change is for the PHC devices that can measure the
+phase offset between PHC signal and the external signal, such
+as GNSS. With this change, ts2phc can use the existing extts
+interface to retrieve measurement offset so that the alignment
+between PHC and the external signal can be achieved.
 
-cheers,
-jamal
+Signed-off-by: Min Li <min.li.xe@renesas.com>
+---
+ drivers/ptp/ptp_clock.c          | 12 +++++++++---
+ include/linux/ptp_clock_kernel.h |  2 ++
+ include/uapi/linux/ptp_clock.h   |  9 +++++++--
+ 3 files changed, 18 insertions(+), 5 deletions(-)
 
-> ---
->  include/net/tc_act/tc_ct.h | 9 +++++++++
->  net/sched/act_ct.c         | 3 +++
->  2 files changed, 12 insertions(+)
->
-> diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
-> index 8a6dbfb23336..77f87c622a2e 100644
-> --- a/include/net/tc_act/tc_ct.h
-> +++ b/include/net/tc_act/tc_ct.h
-> @@ -58,6 +58,11 @@ static inline struct nf_flowtable *tcf_ct_ft(const str=
-uct tc_action *a)
->         return to_ct_params(a)->nf_ft;
->  }
->
-> +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_=
-action *a)
-> +{
-> +       return to_ct_params(a)->helper;
-> +}
-> +
->  #else
->  static inline uint16_t tcf_ct_zone(const struct tc_action *a) { return 0=
-; }
->  static inline int tcf_ct_action(const struct tc_action *a) { return 0; }
-> @@ -65,6 +70,10 @@ static inline struct nf_flowtable *tcf_ct_ft(const str=
-uct tc_action *a)
->  {
->         return NULL;
->  }
-> +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_=
-action *a)
-> +{
-> +       return NULL;
-> +}
->  #endif /* CONFIG_NF_CONNTRACK */
->
->  #if IS_ENABLED(CONFIG_NET_ACT_CT)
-> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-> index 0db0ecf1d110..b3f4a503ee2b 100644
-> --- a/net/sched/act_ct.c
-> +++ b/net/sched/act_ct.c
-> @@ -1549,6 +1549,9 @@ static int tcf_ct_offload_act_setup(struct tc_actio=
-n *act, void *entry_data,
->         if (bind) {
->                 struct flow_action_entry *entry =3D entry_data;
->
-> +               if (tcf_ct_helper(act))
-> +                       return -EOPNOTSUPP;
-> +
->                 entry->id =3D FLOW_ACTION_CT;
->                 entry->ct.action =3D tcf_ct_action(act);
->                 entry->ct.zone =3D tcf_ct_zone(act);
-> --
-> 2.39.1
->
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3134568af622..c87954c8642f 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -48,14 +48,19 @@ static void enqueue_external_timestamp(struct timestamp_event_queue *queue,
+ 	s64 seconds;
+ 	u32 remainder;
+ 
+-	seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
++	if(src->type != PTP_CLOCK_EXTOFF)
++		seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
+ 
+ 	spin_lock_irqsave(&queue->lock, flags);
+ 
+ 	dst = &queue->buf[queue->tail];
+ 	dst->index = src->index;
+-	dst->t.sec = seconds;
+-	dst->t.nsec = remainder;
++	if(src->type != PTP_CLOCK_EXTOFF) {
++		dst->t.sec = seconds;
++		dst->t.nsec = remainder;
++	} else {
++		dst->o = src->offset;
++	}
+ 
+ 	if (!queue_free(queue))
+ 		queue->head = (queue->head + 1) % PTP_MAX_TIMESTAMPS;
+@@ -416,6 +421,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
+ 		break;
+ 
+ 	case PTP_CLOCK_EXTTS:
++	case PTP_CLOCK_EXTOFF:
+ 		/* Enqueue timestamp on selected queues */
+ 		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+ 		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index 1ef4e0f9bd2a..7f2d1e1cc185 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -200,6 +200,7 @@ struct ptp_clock;
+ enum ptp_clock_events {
+ 	PTP_CLOCK_ALARM,
+ 	PTP_CLOCK_EXTTS,
++	PTP_CLOCK_EXTOFF,
+ 	PTP_CLOCK_PPS,
+ 	PTP_CLOCK_PPSUSR,
+ };
+@@ -218,6 +219,7 @@ struct ptp_clock_event {
+ 	int index;
+ 	union {
+ 		u64 timestamp;
++		s64 offset;
+ 		struct pps_event_time pps_times;
+ 	};
+ };
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index da700999cad4..61e0473cdf53 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -32,6 +32,7 @@
+ #define PTP_RISING_EDGE    (1<<1)
+ #define PTP_FALLING_EDGE   (1<<2)
+ #define PTP_STRICT_FLAGS   (1<<3)
++#define PTP_EXT_OFFSET     (1<<4)
+ #define PTP_EXTTS_EDGES    (PTP_RISING_EDGE | PTP_FALLING_EDGE)
+ 
+ /*
+@@ -40,7 +41,8 @@
+ #define PTP_EXTTS_VALID_FLAGS	(PTP_ENABLE_FEATURE |	\
+ 				 PTP_RISING_EDGE |	\
+ 				 PTP_FALLING_EDGE |	\
+-				 PTP_STRICT_FLAGS)
++				 PTP_STRICT_FLAGS |	\
++				 PTP_EXT_OFFSET)
+ 
+ /*
+  * flag fields valid for the original PTP_EXTTS_REQUEST ioctl.
+@@ -228,7 +230,10 @@ struct ptp_pin_desc {
+ #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
+ 
+ struct ptp_extts_event {
+-	struct ptp_clock_time t; /* Time event occured. */
++	union {
++		struct ptp_clock_time t; /* Time event occured. */
++		__s64 o; /* measured offset */
++	};
+ 	unsigned int index;      /* Which channel produced the event. */
+ 	unsigned int flags;      /* Reserved for future use. */
+ 	unsigned int rsv[2];     /* Reserved for future use. */
+-- 
+2.39.2
+
 
