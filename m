@@ -1,55 +1,41 @@
-Return-Path: <netdev+bounces-47329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD8E7E9AA9
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 12:07:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 156927E9AC6
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 12:10:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 466F1280CC7
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 11:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD1E9280CE1
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 11:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAAF61CA94;
-	Mon, 13 Nov 2023 11:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FAC21CA94;
+	Mon, 13 Nov 2023 11:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFTOq4h4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utTQ57/7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC561CA93
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 11:07:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FF6AC433C7;
-	Mon, 13 Nov 2023 11:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BF81CA88
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D12AC433CC;
+	Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699873646;
-	bh=ZR/DMZiyPsFy+qz8rEgRfcpH4vlRg6uq7If8iaVqgDs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fFTOq4h4BIeRZgABsCAYrICCROmZWg0yTLFR3qD5fmh+i5iCyUQPRjfQQGloe+CVs
-	 lbKAIqSv4CnJYPudxvm8kyBTs91R49XO6RJ6A2xp5He0htSmV9aVPldmxwsGB8rwrZ
-	 Ng8UTO3zR9LsV/fzOKooOF7ko/kbkiFsvfyj7jMGh0DDWKpUhwwuaLNF4zO8uCl6mk
-	 7mkAxj25in57JrKMZ1+nhdbOpPMNwNOH3pkhgAqZbg/8E2U7YhD6qVQ/Xkna2IHyOZ
-	 UIiwbsQI2ssUJURO2STSw9ZqQUUHJSBYnoN4h68JvpsNEGGhTmEknEc0p1n/tGDMMo
-	 rSYeDRj26szDg==
-From: Roger Quadros <rogerq@kernel.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: vladimir.oltean@nxp.com,
-	s-vadapalli@ti.com,
-	r-gunasekaran@ti.com,
-	srk@ti.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Roger Quadros <rogerq@kernel.org>
-Subject: [PATCH net-next 3/3] net: ethernet: am65-cpsw: Error out if Enable TX/RX channel fails
-Date: Mon, 13 Nov 2023 13:07:08 +0200
-Message-Id: <20231113110708.137379-4-rogerq@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231113110708.137379-1-rogerq@kernel.org>
-References: <20231113110708.137379-1-rogerq@kernel.org>
+	s=k20201202; t=1699873824;
+	bh=ExY8ABX+iV1daP2D0jLDdL7Fvhf76TXH+N7JEGyRTRI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=utTQ57/7tis1IBrFNvNhsfTp8PD2nGin4E3EZxjUcgTEUlGlmZXTsOlx34/fl80Lz
+	 yAZG7Oyqi2x5UIdUVf+UxVBbYn9H9PvA4SpY/ATQBZgxCb98EjU0g7ALaZ09tOslY/
+	 gf5wYeZBKTijG6uoAG1Bsi7mR9agqcErfzvcFI0ySG/4mSbY/UAIIZ3LeDG4WLnVph
+	 qkCXI7tnTwRpddt5wHt1pIzCCvBwiCIw97ThPLhnc9NByj0vFKDgGiPx7XaMgIBBQd
+	 CxvMneHmCLbqwvHdrBJXleCKa5KmHIUAgn91R+khUKFx2SSapqPuoIIbaSsyiaLaSV
+	 IsLBEdHFld3yw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6A69BC04DD9;
+	Mon, 13 Nov 2023 11:10:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,75 +43,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] ppp: limit MRU to 64K
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <169987382443.356.16944997528877845349.git-patchwork-notify@kernel.org>
+Date: Mon, 13 Nov 2023 11:10:24 +0000
+References: <20231113031705.803615-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20231113031705.803615-1-willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux-ppp@vger.kernel.org,
+ stable@vger.kernel.org, mitch@sfgoth.com, mostrows@earthlink.net,
+ jchapman@katalix.com, willemb@google.com,
+ syzbot+6177e1f90d92583bcc58@syzkaller.appspotmail.com
 
-k3_udma_glue_enable_rx/tx_chn returns error code on failure.
-Bail out on error while enabling TX/RX channel.
+Hello:
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 33 +++++++++++++++++++-----
- 1 file changed, 26 insertions(+), 7 deletions(-)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 7c440899c93c..340f25bf33b1 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -372,7 +372,7 @@ static void am65_cpsw_init_port_emac_ale(struct am65_cpsw_port *port);
- static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- {
- 	struct am65_cpsw_host *host_p = am65_common_get_host(common);
--	int port_idx, i, ret;
-+	int port_idx, i, ret, tx;
- 	struct sk_buff *skb;
- 	u32 val, port_mask;
- 
-@@ -453,13 +453,22 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 		}
- 		kmemleak_not_leak(skb);
- 	}
--	k3_udma_glue_enable_rx_chn(common->rx_chns.rx_chn);
- 
--	for (i = 0; i < common->tx_ch_num; i++) {
--		ret = k3_udma_glue_enable_tx_chn(common->tx_chns[i].tx_chn);
--		if (ret)
--			return ret;
--		napi_enable(&common->tx_chns[i].napi_tx);
-+	ret = k3_udma_glue_enable_rx_chn(common->rx_chns.rx_chn);
-+	if (ret) {
-+		dev_err(common->dev, "couldn't enable rx chn: %d\n", ret);
-+		return ret;
-+	}
-+
-+	for (tx = 0; tx < common->tx_ch_num; tx++) {
-+		ret = k3_udma_glue_enable_tx_chn(common->tx_chns[tx].tx_chn);
-+		if (ret) {
-+			dev_err(common->dev, "couldn't enable tx chn %d: %d\n",
-+				tx, ret);
-+			tx--;
-+			goto fail_tx;
-+		}
-+		napi_enable(&common->tx_chns[tx].napi_tx);
- 	}
- 
- 	napi_enable(&common->napi_rx);
-@@ -470,6 +479,16 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 
- 	dev_dbg(common->dev, "cpsw_nuss started\n");
- 	return 0;
-+
-+fail_tx:
-+	while (tx >= 0) {
-+		napi_disable(&common->tx_chns[tx].napi_tx);
-+		k3_udma_glue_disable_tx_chn(common->tx_chns[tx].tx_chn);
-+		tx--;
-+	}
-+
-+	k3_udma_glue_disable_rx_chn(common->rx_chns.rx_chn);
-+	return ret;
- }
- 
- static void am65_cpsw_nuss_tx_cleanup(void *data, dma_addr_t desc_dma);
+On Sun, 12 Nov 2023 22:16:32 -0500 you wrote:
+> From: Willem de Bruijn <willemb@google.com>
+> 
+> ppp_sync_ioctl allows setting device MRU, but does not sanity check
+> this input.
+> 
+> Limit to a sane upper bound of 64KB.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] ppp: limit MRU to 64K
+    https://git.kernel.org/netdev/net/c/c0a2a1b0d631
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
