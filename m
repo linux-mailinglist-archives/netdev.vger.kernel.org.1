@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-47454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1A6D7EA53C
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:09:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E1F47EA53D
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 22:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65A1F1F22D99
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:09:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F3811C20954
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 21:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB51B3C088;
-	Mon, 13 Nov 2023 21:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE55F3C689;
+	Mon, 13 Nov 2023 21:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VL9WKbzp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S/aYKoAU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914753C067
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 21:08:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ABA8C433C9;
-	Mon, 13 Nov 2023 21:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6943C680
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 21:08:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F638C433C8;
+	Mon, 13 Nov 2023 21:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699909719;
-	bh=sfqj7BDpKAcb64THPOF02zidFNtaJRrUUhus6LZjwfw=;
+	s=k20201202; t=1699909720;
+	bh=flrhQtjisAB4oq7jwgHK6gDW/4qpObavqqwfwxnwVh8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VL9WKbzp/+x6ipEFEwE1M9LJ9uhfRXTgQUIoBFlrJN+jVsstHI5eKlTd2mb5dpAYI
-	 Hrd+NijxmeiyT+uEUIuHUqJMynuGnVI3wB/7UMKjjzzEKqWoaMX167LwSiaIokfdF0
-	 sDdC8DXQxJF2RM4tASD4G55FiJBRarSn8QgxHZT7ECiOXkvkR882SMr5AxBjPTPM4w
-	 /dAI90rFCCZkpJZCox+5OXlzkbtJlnuQXNmJqE8InhX9zK2R9ikrm6ruMkGmTMb+N6
-	 CLoLvnkF+KOWGjr9SDJO841GsFzltH6kN9yen8FSvp2Jk6pCYpc16qYmDfN0aaoQYX
-	 xqszrK1Vs9bSA==
+	b=S/aYKoAU0LLzdMpMLR8HaxDgOoyKc60803E90SyypMBPBzqlJD92liKQS/9lsHDTk
+	 7MCdE18FxAUEuXpn2iJm7oNgtbY9SPUcdeuR/xFTk+49r1aiLzz1TrEmQlOTtwnbmm
+	 lMDpO8uNU4dcz+XckeaWYy1cwCiQbdhMiZznIxnp+86HpahJ4uFiEXraUL65Ss2pqk
+	 cTt+0/RdF8EUzP7Ovzpf6DTqP2RkgePGhcCcc7hLG4oP4ursSZXdsCKpzHmyMTQfpO
+	 Zno0K5MTqkqSxC5MAA94TzMXjYEEdgUoWAJAxynXIjyoxygTAPcXAbxQD0I+7njiUn
+	 Hm8VGGT6J65Nw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,12 +40,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Roi Dayan <roid@nvidia.com>
-Subject: [net 09/17] net/mlx5e: Don't modify the peer sent-to-vport rules for IPSec offload
-Date: Mon, 13 Nov 2023 13:08:18 -0800
-Message-ID: <20231113210826.47593-10-saeed@kernel.org>
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net 10/17] net/mlx5e: Avoid referencing skb after free-ing in drop path of mlx5e_sq_xmit_wqe
+Date: Mon, 13 Nov 2023 13:08:19 -0800
+Message-ID: <20231113210826.47593-11-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231113210826.47593-1-saeed@kernel.org>
 References: <20231113210826.47593-1-saeed@kernel.org>
@@ -57,34 +55,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Jianbo Liu <jianbol@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-As IPSec packet offload in switchdev mode is not supported with LAG,
-it's unnecessary to modify those sent-to-vport rules to the peer eswitch.
+When SQ is a port timestamping SQ for PTP, do not access tx flags of skb
+after free-ing the skb. Free the skb only after all references that depend
+on it have been handled in the dropped WQE path.
 
-Fixes: c6c2bf5db4ea ("net/mlx5e: Support IPsec packet offload for TX in switchdev mode")
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
-Reviewed-by: Roi Dayan <roid@nvidia.com>
+Fixes: 3178308ad4ca ("net/mlx5e: Make tx_port_ts logic resilient to out-of-order CQEs")
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index b296ac52a439..88236e75fd90 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -984,7 +984,8 @@ mlx5_eswitch_add_send_to_vport_rule(struct mlx5_eswitch *on_esw,
- 	dest.vport.flags |= MLX5_FLOW_DEST_VPORT_VHCA_ID;
- 	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_FWD_DEST;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+index d41435c22ce5..19f2c25b05a0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tx.c
+@@ -494,10 +494,10 @@ mlx5e_sq_xmit_wqe(struct mlx5e_txqsq *sq, struct sk_buff *skb,
  
--	if (rep->vport == MLX5_VPORT_UPLINK && on_esw->offloads.ft_ipsec_tx_pol) {
-+	if (rep->vport == MLX5_VPORT_UPLINK &&
-+	    on_esw == from_esw && on_esw->offloads.ft_ipsec_tx_pol) {
- 		dest.ft = on_esw->offloads.ft_ipsec_tx_pol;
- 		flow_act.flags = FLOW_ACT_IGNORE_FLOW_LEVEL;
- 		dest.type = MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE;
+ err_drop:
+ 	stats->dropped++;
+-	dev_kfree_skb_any(skb);
+ 	if (unlikely(sq->ptpsq && (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)))
+ 		mlx5e_ptp_metadata_fifo_push(&sq->ptpsq->metadata_freelist,
+ 					     be32_to_cpu(eseg->flow_table_metadata));
++	dev_kfree_skb_any(skb);
+ 	mlx5e_tx_flush(sq);
+ }
+ 
 -- 
 2.41.0
 
