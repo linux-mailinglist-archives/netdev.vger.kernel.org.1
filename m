@@ -1,84 +1,101 @@
-Return-Path: <netdev+bounces-47356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F9C7E9CAB
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:01:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D7757E9CB4
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 14:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17801280E3C
-	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:01:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93BCF1C20831
+	for <lists+netdev@lfdr.de>; Mon, 13 Nov 2023 13:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB70C1DFCA;
-	Mon, 13 Nov 2023 13:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C331CF8F;
+	Mon, 13 Nov 2023 13:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gn59903S"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D14C1DA53
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 13:00:53 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7FF1727;
-	Mon, 13 Nov 2023 05:00:51 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4STV0G0LFJzWhLY;
-	Mon, 13 Nov 2023 21:00:30 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.31; Mon, 13 Nov 2023 21:00:50 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Eric Dumazet <edumazet@google.com>
-Subject: [PATCH RFC 8/8] net: temp hack for dmabuf page in __skb_datagram_iter()
-Date: Mon, 13 Nov 2023 21:00:40 +0800
-Message-ID: <20231113130041.58124-9-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20231113130041.58124-1-linyunsheng@huawei.com>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444331C6AB;
+	Mon, 13 Nov 2023 13:04:21 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D8CD171A;
+	Mon, 13 Nov 2023 05:04:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=/Gb3y5AJkHr5bVZJk5oNYpmoITSyFTVmd+9XOWJkguc=; b=gn59903SZ3oCT38rYL2beWo3Gk
+	lbKqsUaOF6UlnU4hF2p9pZhsJWbqK2pI81Ixd/OLLnJ/nsy7RqJyniZJfGSHV0aVPSjzLpLXUY1df
+	JXy4cpFvhwzPLIXg+54A9EfKVsMeAS44mx/uJGqx7tOtksdOAihmoemJxmL63rOxxE05vfT4DJwSk
+	jtHnGHeRmXzuSTexyk1eEMDLB0FTRhocmSMaBDfM635lwb48ATDz7vZysPu4vzBo0DHLVI2MXGCdW
+	qcQStxrBsZ5L475mVOsNHCLp0cf9smVwRYHfAjZFBFfFzVxpuMxp4qT1GnFOlROmOcpRZ+xx8EWvS
+	JVkkzJng==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r2Wbs-0005tM-Oy; Mon, 13 Nov 2023 14:04:12 +0100
+Received: from [194.230.158.57] (helo=localhost.localdomain)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1r2Wbs-000X3e-3P; Mon, 13 Nov 2023 14:04:12 +0100
+Subject: Re: [PATCH bpf v2 2/8] net: Move {l,t,d}stats allocation to core and
+ convert veth & vrf
+To: Simon Horman <horms@kernel.org>
+Cc: martin.lau@kernel.org, kuba@kernel.org, razor@blackwall.org,
+ sdf@google.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ David Ahern <dsahern@kernel.org>
+References: <20231112203009.26073-1-daniel@iogearbox.net>
+ <20231112203009.26073-3-daniel@iogearbox.net>
+ <20231113095744.GN705326@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <2afc248b-4218-2812-77e8-926065fa647f@iogearbox.net>
+Date: Mon, 13 Nov 2023 14:04:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+In-Reply-To: <20231113095744.GN705326@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27092/Mon Nov 13 09:38:20 2023)
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- net/core/datagram.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+On 11/13/23 10:57 AM, Simon Horman wrote:
+> On Sun, Nov 12, 2023 at 09:30:03PM +0100, Daniel Borkmann wrote:
+>> Move {l,t,d}stats allocation to the core and let netdevs pick the stats
+>> type they need. That way the driver doesn't have to bother with error
+>> handling (allocation failure checking, making sure free happens in the
+>> right spot, etc) - all happening in the core.
+>>
+>> Co-developed-by: Jakub Kicinski <kuba@kernel.org>
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> Cc: David Ahern <dsahern@kernel.org>
+> 
+> ...
+> 
+>> @@ -2354,6 +2361,7 @@ struct net_device {
+>>   	void				*ml_priv;
+>>   	enum netdev_ml_priv_type	ml_priv_type;
+>>   
+>> +	enum netdev_stat_type		pcpu_stat_type:8;
+> 
+> Hi Daniel,
+> 
+> nit: Please consider adding documentation for this new field to
+>       the kernel doc for net_device.
+> 
 
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 103d46fa0eeb..5556782ac658 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -436,7 +436,15 @@ static int __skb_datagram_iter(const struct sk_buff *skb, int offset,
- 		end = start + skb_frag_size(frag);
- 		if ((copy = end - offset) > 0) {
- 			struct page *page = skb_frag_page(frag);
--			u8 *vaddr = kmap(page);
-+			u8 *vaddr;
-+
-+			if ((page->pp_magic & ~0x3UL) == PP_SIGNATURE) {
-+				struct page_pool_iov *ppiov = (struct page_pool_iov *)page;
-+
-+				page = ppiov->page;
-+			}
-+
-+			vaddr = kmap(page);
- 
- 			if (copy > len)
- 				copy = len;
--- 
-2.33.0
-
+Will add, thanks Simon!
 
