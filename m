@@ -1,296 +1,141 @@
-Return-Path: <netdev+bounces-47659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32727EAE9A
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:09:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90A577EAEC6
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:26:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5D7B209B7
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:09:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30E0FB20A79
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306381946D;
-	Tue, 14 Nov 2023 11:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8D222EFE;
+	Tue, 14 Nov 2023 11:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="hMi+p64p";
-	dkim=pass (2048-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="IYRV3z2s";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=synopsys.com header.i=@synopsys.com header.b="BNjlxunQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLbOp/7B"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81641D527
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 11:08:58 +0000 (UTC)
-Received: from mx0a-00230701.pphosted.com (mx0a-00230701.pphosted.com [148.163.156.19])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D89E18D;
-	Tue, 14 Nov 2023 03:08:57 -0800 (PST)
-Received: from pps.filterd (m0297266.ppops.net [127.0.0.1])
-	by mx0a-00230701.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AE6JQYT023337;
-	Tue, 14 Nov 2023 03:07:43 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pfptdkimsnps;
- bh=5upned94RJmGtGMEnfNY2GByuzpE7QBAhcHfiGogd4g=;
- b=hMi+p64p0mQ7EtzhgEbkVTElWIFZcz2cueMbfzfew9yFsbqyqCeRuHA5gPY5Va1XM48d
- oDh08aVAkxq0zQpIKY6bi+hrHQ48jimbCUKIuDRDtU3CfJWrcVSH7DkD6n4ElV0VkznU
- F+PO1Ot+SRZgc358NNVPyDfjpMbk7ukPil3w+ZfuuxM2iGaFFIcDarofY+tUfDuMx1Qc
- n3R+5DP7del4L1UPkTv5RAaHsrkThOjCEUgL73DDbDjCV9IUbylci7UiKcoNSr1ml4IW
- bmqS5WC3f/rMwhzMzfFs5rtyhO8B2xQu8kBvelxGXSYvxlvmK21QBHl4/Rj70X10zS/E 2g== 
-Received: from smtprelay-out1.synopsys.com (smtprelay-out1.synopsys.com [149.117.87.133])
-	by mx0a-00230701.pphosted.com (PPS) with ESMTPS id 3ua9r9tenk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Nov 2023 03:07:43 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synopsys.com; s=mail;
-	t=1699960062; bh=X03xgP17TOAEOIOtkhCOXnQ1OXpk0zqXjnh68ZRBZTg=;
-	h=From:To:CC:Subject:Date:From;
-	b=IYRV3z2sm0eXEvf3UblsnEoMjokxjciT7gedMZdYpESx2uQ8V0J8ElfRwq5/oJkQh
-	 2ydRswT0y9gi5+RITVgWJi6/pE0f6lxlOKRPY4MLs6vg5E8NiQ9pFay7c/2srUH0ns
-	 EeDM8aps3Ja+zXPCt6MaI4Sly4z9kB22IrzRtYygJrMNGoLfGcDjR05cv0bHLmJqKr
-	 IvtJpzNsSiSwN43EJXh0nG5Q7Ld/F01AGkq/VgDN0ugrwhyVrPdzjH7V8UCeEryLWw
-	 Mdn+sSYRLfh8IbYKatC5LhX+qx3aUVfJdl3JtyFCmDXWFXTx6rqKJYQRATA+Rs2zQa
-	 ZE9HuXwhSuNCw==
-Received: from mailhost.synopsys.com (badc-mailhost4.synopsys.com [10.192.0.82])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits)
-	 client-signature RSA-PSS (2048 bits))
-	(Client CN "mailhost.synopsys.com", Issuer "SNPSica2" (verified OK))
-	by smtprelay-out1.synopsys.com (Postfix) with ESMTPS id 31BF540407;
-	Tue, 14 Nov 2023 11:07:40 +0000 (UTC)
-Received: from o365relay-in.synopsys.com (sv2-o365relay1.synopsys.com [10.202.1.137])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(Client CN "o365relay-in.synopsys.com", Issuer "Entrust Certification Authority - L1K" (verified OK))
-	by mailhost.synopsys.com (Postfix) with ESMTPS id 13E85A00B1;
-	Tue, 14 Nov 2023 11:07:39 +0000 (UTC)
-Authentication-Results: o365relay-in.synopsys.com; dmarc=pass (p=reject dis=none) header.from=synopsys.com
-Authentication-Results: o365relay-in.synopsys.com; spf=pass smtp.mailfrom=synopsys.com
-Authentication-Results: o365relay-in.synopsys.com;
-	dkim=pass (1024-bit key; unprotected) header.d=synopsys.com header.i=@synopsys.com header.a=rsa-sha256 header.s=selector1 header.b=BNjlxunQ;
-	dkim-atps=neutral
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "mail.protection.outlook.com", Issuer "DigiCert Cloud Services CA-1" (verified OK))
-	by o365relay-in.synopsys.com (Postfix) with ESMTPS id DB521404AC;
-	Tue, 14 Nov 2023 11:07:37 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jlhZuflzL8DxUdQLwZ0HkjRqkFyqpkwFIbiFtBmWu+F5djItY7JslCycGnOtTLDlYxQ6qVk6cu3oUIY9ewSyEsAqIEaSXmrUvNjCRTFjd8eVGV0rZ8C9eJjXcuk8/3vZ3ab3+GnoM/zldZmozKF0htEf5zzOb//sEmxjP7Tm5tRhbGhVMwixG7Gqmn7w3o+w4PBi6cLsT8+oAgCsDut3WC74QLCL/H1tG48o07n/j+AHj7YczGdWAPw+aEIQagMAnH/RfcOz+bEhH0iORjQW/qUW9lNtEmmvqLKqv9VQ1UfdMf0hxAoTE81ryeEOPyvBrVVtQjdEAmQQatNzfS+Mew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5upned94RJmGtGMEnfNY2GByuzpE7QBAhcHfiGogd4g=;
- b=bc5+YEASYU0hXIbvhG3M+PNsW5uUqVs0wfUkTblnqUIVO424HkOwfXqixT0+yy4Kt74MIj302xkIzkzhzNEOMvJ4zFNJj5LDNGlbVPOGxqbALBv/Ejhqh3Q3EXtn1iEnOUhI8SUCdJAuBwlNTe8Y1bhFumBVhz5z4TkL4E7DKO8NP8YVorI+dx6VorSq68Qxvhf+O3iMd3qdBu0Ik5D1CNjq4pYmALpIxHKDlgICxsfB747JpmQLkBnyZd4kcHh6Tepd2LnqO68592Eqmd4BrTU/r7MIaSmtdBHY8ELJYwVM3Igq5KsW/hDfF9wg2u7h/hVtEwGSQ/ek69fIuJlSvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=synopsys.com; dmarc=pass action=none header.from=synopsys.com;
- dkim=pass header.d=synopsys.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=synopsys.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5upned94RJmGtGMEnfNY2GByuzpE7QBAhcHfiGogd4g=;
- b=BNjlxunQ7OlnahbAXI41iVTcuph9AvpXgTldniv90bXyVA1Ena05VnE71w5Nl4HRIYiGN8fgrm9NmsMawVdXy0PaQfKiZLmnmoN3SEsrxutIZwpk2R7rFxz8EFzCKhu683LG14l2bVIXJF+RlfLYCHkebXCUddqOi5k/SBV1coY=
-Received: from CY5PR12MB6372.namprd12.prod.outlook.com (2603:10b6:930:e::5) by
- SJ0PR12MB6712.namprd12.prod.outlook.com (2603:10b6:a03:44e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Tue, 14 Nov
- 2023 11:07:34 +0000
-Received: from CY5PR12MB6372.namprd12.prod.outlook.com
- ([fe80::45da:22ed:5900:420c]) by CY5PR12MB6372.namprd12.prod.outlook.com
- ([fe80::45da:22ed:5900:420c%4]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
- 11:07:34 +0000
-X-SNPS-Relay: synopsys.com
-From: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <Jose.Abreu@synopsys.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Tan Tee Min <tee.min.tan@intel.com>,
-        Ong Boon Leong <boon.leong.ong@intel.com>,
-        Voon Weifeng <weifeng.voon@intel.com>,
-        Mohammad Athari Bin Ismail <mohammad.athari.ismail@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] net: stmmac: fix FPE events losing
-Thread-Topic: [PATCH] net: stmmac: fix FPE events losing
-Thread-Index: AdoW3Xfb3QHiuCaqTA2ROZ4444S4Mg==
-Date: Tue, 14 Nov 2023 11:07:34 +0000
-Message-ID: 
- <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY5PR12MB6372:EE_|SJ0PR12MB6712:EE_
-x-ms-office365-filtering-correlation-id: 0bde247e-4116-4ce0-2f3c-08dbe501e779
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- 1VYw6RZrapz5J98gumkov8A/FIRU1U1lorOj4zpRst4vacewJwEoJt/iHYIQI3ZodeSqku7N+2b5p/DOBM6U4YjG9ksy1o1CiRnnHI2Kvm8UEVAd/IeYh469bMuAuxikyYbLXmKiwgL4GF2D2jBC5b0Irg/vs/tTHZCEP6P5ZhwXUMGNgBcbsIqBIXtw6Rco7ixd3cnw7MUBIj9PXF+9uRC0fwivm8nbiYZpyaMdwC16vfUNW5vx0Qpbzd6nmYlXgyijbqqeaoUvKZAIE/GUznb4ZyLjzpt3jWerYNhELbY5ZCBIIcw+bdzg4yl0UhAWumXGdqJe/1FhMTeuGYHcVaDREJEuIhOZSm3/lmuLh4eJdjFt3+STPzKj0PUFqoS4GkLEQBB5HLd6fnEDAQehPqcLCHdTCQaP2ufEFRyr3kh7I3dMCMuZjhnz+dvJiVm8T6QfmJiNSYSnJoaaA2ae57n0VWGq1f2ek61qfkqp/fuZ9o25/5PkjktzM6W8Au5Jgm3OQcoEU9mPqxxPkPy6pBp0zG/IVNW7aIWb+DDJJCcw1jtXbvauXK7xnhCQpaPKJZML5FjcL9N+Fg30vzmtiw6dV8gTX0inx3Ycy9rwxIHWu+mjmaD8D8AwIeb+TDZQ
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6372.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(396003)(376002)(346002)(366004)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799009)(38100700002)(55016003)(7696005)(6506007)(71200400001)(83380400001)(122000001)(26005)(9686003)(33656002)(7416002)(41300700001)(921008)(2906002)(5660300002)(8936002)(8676002)(4326008)(86362001)(52536014)(38070700009)(76116006)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(110136005)(316002)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?uJtJ4IRT59PLAAXK21klsvBFhGsmMmVKwF1Xq93JN7zcjbZM4qG6xB25LY+T?=
- =?us-ascii?Q?dWFE76vRuoaI2EWai5oxA6G9qeRrtpU7eMVgBtdw3NQET6bSUhQp6OHXtIF7?=
- =?us-ascii?Q?JtgPTpoHn9q5W4a1aJ8hwTGLMwEQbmUCBF0cd7iyEwykle/dTv7yvZk0q/FP?=
- =?us-ascii?Q?v3vumbcv1e/RQDhhIOATa8ZcU2npMS6YteQeOg+s/kPWZ7coOuFNmnsjlBAm?=
- =?us-ascii?Q?1x4zpTxXYyyMMdmlZW5BZoDPGihZTUK6BTZY7YhAatGt4hwj/rjU7WWdoqp0?=
- =?us-ascii?Q?dj5PI9jDCvT19pstvBJmgiJHaXQo/XOgDk3PruoZoie+odolQNRDVYdyJp05?=
- =?us-ascii?Q?c6zAf99kv7RJL8yCJppaKvJ6lD7KJHFxCy2j7n+3en0RVkiHGEHKBIw4SfT0?=
- =?us-ascii?Q?udYJsFPCLV1yQLC1oIcGlS96C0w90RcDXT+lXGokHVsZGmLGn9kjzgoeqm8o?=
- =?us-ascii?Q?DK63oh+RSRdRrH+KJ5MP08K4SUAaMmFKyhbG6w8qmy1r0fmCe5YiSB+hu2kv?=
- =?us-ascii?Q?no5pugGa7NPm4t7VWuLrP4rAM9ZarEe8kSqn558HVVHiaEljkP3s/f3h8k/d?=
- =?us-ascii?Q?vM/jOe9n+x0PC5kJBASbNPXxs+w7oqX9q68D0C95Imnr89DvdDwUT1MoNiPW?=
- =?us-ascii?Q?XyXjiYpocsOKSIJQiJu2n0ehRrI6dIPLax7gnNGzmFnPVanHJu2Hze4F2Fbk?=
- =?us-ascii?Q?hFCipfNKszzv5vpzGmDHRu/DshuJ0eqDmPAirMBt2PhiFnAFCHyK5if2xXYF?=
- =?us-ascii?Q?MClp4YyrwrPpwPxPF/8hmm5d/J5GSD4G1Ea265jA2ah6wuAfA2VcRghqMVMD?=
- =?us-ascii?Q?J09/2BLTULyZbUGLOHf33tFZYQL0NjnPIWFTWukB8copPFw00j+evRG0ad4c?=
- =?us-ascii?Q?PwNBTEYm4HXjiU/5h0UIvHv5sWM3t6jVpsSZ8Y01V4YjctoQrwCKrek9feA6?=
- =?us-ascii?Q?o6Qe1J0I82T/r65rLG8LmzNxKWgvRw9AnOGrTDavvbzvKxp+seGojrxdRepF?=
- =?us-ascii?Q?u8ocU3SvWiONtcdDimLb9edK0o2qV/JleQ8No/IqR4kF0QdGiYPTcFGGPl9N?=
- =?us-ascii?Q?gvxYvNPp41CLhVigTePHWaNpVycn8NurXjFXR+9LHN9S08O4svR+Ur5LKPaH?=
- =?us-ascii?Q?zLz+HYHW+jfdyblWwoL8NG4Wqww/3/FN0dmKqjcvCiFCgZhwuvn6kBD6onqZ?=
- =?us-ascii?Q?S+lGVhtuxT9IoZ7WMYyzOu1fal1xHCQHWW43OPKiSBa7A15jIzY0Ub7cTnhe?=
- =?us-ascii?Q?n9vnK30KKBEaJsCffxxwCnpPnH4YpmctSCuNK0DvsdK3XrhSRU/fS51Gqqwn?=
- =?us-ascii?Q?sllRuTOjxwyS3/gQchq80Cgzx1vJ+T4CjHEe/S0vdzLlAOlNMmuQezbqWPNz?=
- =?us-ascii?Q?YrVzLMRj+4g7bsNogpH8SXkZi+Sr/No4HrSs1+Nredg6tf1RZUDrBlnyL0Gm?=
- =?us-ascii?Q?0Ps9eNGaEMDiUNOjbw7hVYcJbxwXlzy4iYFcHrWyLB6+Z5sQuU+x/3Z0zGZl?=
- =?us-ascii?Q?VKSkoDc4jRWCTcIY3Lu9dHRcNiboSKs/OhAkK5O36rMtq+/1SNdvPFbNg0/X?=
- =?us-ascii?Q?xnOm6sPFgbjZv6ERyLWS8DudcN6Sr7e1mQMeD6H8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1131F176
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 11:26:00 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BE13CC
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 03:25:59 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c50fbc218bso71931281fa.3
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 03:25:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699961157; x=1700565957; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cJjjImeTrPnGFwJKi3DEK+//Y6PKNxHHYUkeNZMR2FQ=;
+        b=fLbOp/7BnyfjlNf5OieqtJSjt7htwTlXbsY2tWd/rRJIBCqE46I2GkUs4M2V8uJ2RD
+         K4608gUIR8OFjQKT6ki8n8pvjDtKHav0l9O9hhSSKFomvuWTJXW6GAC/aZmGJPe/aYKQ
+         AUkaDxrAdJ0pbQv5RfLygZ29Jph3IOfiwz5+1eEZUc+reUzhgnlcoYxq8hy+ti/8/ihW
+         hW8FaRjWxuYtFmw7hAbCsZY7Tm8gQ73RpQeedYe5sRA5X/FthSIslpC2ERIJpK/kVFGZ
+         nHvbJSWOrHPk/gMIx9lBBFHGmBwkhZrsl6OE2ahyDFWgm4nxvpYeOX1uQDCGth+GYcT6
+         SJaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699961157; x=1700565957;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cJjjImeTrPnGFwJKi3DEK+//Y6PKNxHHYUkeNZMR2FQ=;
+        b=KV72Ch8Kf3T7rQS3vIUbxbW/tu0RpwMd46UUt+5w6wQKeqUqhCQNrhKkCW/C3SDhrA
+         UrnNSZEkpvjjrXX3G1b1h19u6xc9LEmmk9OiO/wn1qCQdhvzxrKk8S7AYUQ23WcxQRvL
+         tU6txckWyUbGon4yGkVZcXhmvcHtIhpxl0KyUKE15G18M3D26v+NZ35CstlWKa2ej2sA
+         mHB8ld8G3mRBfaG6QN2uG8AhbuK43OHHm9w4nPyM1hgP/ea6iwWWV+vPu4EmjvpcxzVs
+         exJzrTVqN3zCZgSgT3bHyK06/wYT1/maL0AVVgvKs4FVgw+kOAE9v+HIzSMnpOPXKZ35
+         IOjQ==
+X-Gm-Message-State: AOJu0YwhGOFu7Nc3gSUEt4qBz6IigzoODAWEFADak4HWLJZDgXCDMbB3
+	zTg8yIZN0W2RHR1PS/VyisE=
+X-Google-Smtp-Source: AGHT+IHCiIYyD7OSwv+FcDnQl+sMVYpGFNNghuAs72u5NvtwbUcOp8cx4d1yz0bcSQnI/lMmze1+3A==
+X-Received: by 2002:a2e:3515:0:b0:2c5:55a:b6b5 with SMTP id z21-20020a2e3515000000b002c5055ab6b5mr1501550ljz.28.1699961157052;
+        Tue, 14 Nov 2023 03:25:57 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id s22-20020a2eb8d6000000b002c0336f0f27sm1286453ljp.119.2023.11.14.03.25.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 03:25:56 -0800 (PST)
+Date: Tue, 14 Nov 2023 14:25:54 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Baruch Siach <baruch@tkos.co.il>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: stmmac: fix rx budget limit check
+Message-ID: <3enhwmz5sfuj6wb2h74xamyjsihiy4fagklqre7tojbwprnuib@t3w7ykzvofqx>
+References: <d9486296c3b6b12ab3a0515fcd47d56447a07bfc.1699897370.git.baruch@tkos.co.il>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?us-ascii?Q?l8J6qPWxpEjfZqSQpBhtxou2/ohcMQf9f4GtBaLoAkjdWOkJU9BVFuUwXWnj?=
- =?us-ascii?Q?Jf3X825f0MFUE8nDfkxBaywnwZSMHbNyXvc+GAalmzl+s3U73wMCw5M1TEDm?=
- =?us-ascii?Q?hhup0e+X5RFwxjRFY4s+VUua0k8GP6OzfkTyA+AWmdhe0DE1785GEwkfil62?=
- =?us-ascii?Q?zFbVT85FZ8PbQXVCTAYNxVZeQLMvzDz4dpGH5Yq007zjvlPg6YI66Z8iQm6A?=
- =?us-ascii?Q?dCzRo+LE4T+jDl1dIah72TiPPg70OFD+kqeKtoqql6jqCuONeRDGW/Jby2AH?=
- =?us-ascii?Q?juwm3EuDLB+MMZyjIjufCmRvIB6pdJ28cj15yhnonRnT257nzIYyYEivb6hG?=
- =?us-ascii?Q?0vocsi+P7C460SWWg/DGc6wW1svhwAmFK2AHZvd0oIsRjVnxJgFlM9zpe4CF?=
- =?us-ascii?Q?PoKYlzEy0kPPXQbATe/fU9ydASFPiNa55zMUS+uVXF6pGNz7+WGtkS4HeVHC?=
- =?us-ascii?Q?cOlVBzt4ediXlEtaUKmly/swcIQOBn2jVPFSvmNiS89qCrKaWEnf3jf2aeRQ?=
- =?us-ascii?Q?dLSjtpkI2GE/sOQYQaRFx/sxVRb9KUbwnh/bFaU6c4i716xy6FXc+upgHua5?=
- =?us-ascii?Q?L2avx4F8l9zzB6Gpese9kTcCZ3Jv5cIOl3mN3YPQm3piaka5QCtfYeBGTpxp?=
- =?us-ascii?Q?4OQ7/iYvV9/TgDt4fHq76bSW+1dAlH2g+eZ3S/+G9LU+K2BezWg6K9hMmHz0?=
- =?us-ascii?Q?Zm8h6yE3k8A4Ql3s/0ny/szHfY2GGrMcLOXN1DO0KYmtfsFA/MMBJ/3wkZ2/?=
- =?us-ascii?Q?t93bRWz6vuqNCrchPtv0EcbIPzhT7EOl/Didt22KFMlZvaheXLZie4dmywD7?=
- =?us-ascii?Q?HnBQF8nabLYlQ9UKW0XXOkunPD3qfnMc1ZQzlLH8rGMuz0/w0YBkTWtoIrOW?=
- =?us-ascii?Q?t/lOGXXWvdUH3B2O2sL1fuEahcojYMqcOSZyq4abAujGx0esItbFYbzTgU/4?=
- =?us-ascii?Q?nWFYxHbN3o44J7V0P63fRLCjzg+iUqKZ+/8CC5dsmdaQV/5zXgbjXCiLVPbB?=
- =?us-ascii?Q?Cl76bjKFDnxH0r3ClGGCIGTC1pjhHIXlFCIn9Bd8wjJVSCzS2M3WagiNt0jV?=
- =?us-ascii?Q?jsOGimqrwkznURSvcaJ3LWIwu2Z/2tPr7YoGEgEowCxaOAuvWqILNdoSsO+U?=
- =?us-ascii?Q?4F+ykCmfIUJnIn8jzZo+BGD4Jx/wHw3lJg=3D=3D?=
-X-OriginatorOrg: synopsys.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6372.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0bde247e-4116-4ce0-2f3c-08dbe501e779
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 11:07:34.3679
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: c33c9f88-1eb7-4099-9700-16013fd9e8aa
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TBNVnHDLgsl9k0g9MRUqZ1fVmVwzjkhCi9CN1krDXkeJ6OS6YI9EeTOh0jvqbbm+jBbUX9qPb4H9ujz5Qb2UqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6712
-X-Proofpoint-ORIG-GUID: GbqgLbUAt9C87f2uyes8MwUluCym8mn3
-X-Proofpoint-GUID: GbqgLbUAt9C87f2uyes8MwUluCym8mn3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-14_10,2023-11-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_active_cloned_notspam policy=outbound_active_cloned score=0
- suspectscore=0 adultscore=0 spamscore=0 priorityscore=1501 clxscore=1011
- bulkscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0 phishscore=0
- mlxlogscore=648 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311140086
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d9486296c3b6b12ab3a0515fcd47d56447a07bfc.1699897370.git.baruch@tkos.co.il>
 
-The 32-bit access of register MAC_FPE_CTRL_STS may clear the FPE status
-bits unexpectedly. Use 8-bit access for MAC_FPE_CTRL_STS control bits to
-avoid unexpected access of MAC_FPE_CTRL_STS status bits that can reduce
-the FPE handshake retries.
+On Mon, Nov 13, 2023 at 07:42:49PM +0200, Baruch Siach wrote:
+> The while loop condition verifies 'count < limit'. Neither value change
+> before the 'count >= limit' check. As is this check is dead code. But
+> code inspection reveals a code path that modifies 'count' and then goto
+> 'drain_data' and back to 'read_again'. So there is a need to verify
+> count value sanity after 'read_again'.
+> 
+> Move 'read_again' up to fix the count limit check.
 
-The bit[19:17] of register MAC_FPE_CTRL_STS are status register bits.
-Those bits are clear on read (or write of 1 when RCWE bit in
-MAC_CSR_SW_Ctrl register is set). Using 32-bit access for
-MAC_FPE_CTRL_STS control bits makes side effects that clear the status
-bits. Then the stmmac interrupt handler missing FPE event status and
-leads to FPE handshake failure and retries.
+Nice catch! My local fix was to just drop the statement, but obviously
+it was wrong. Indeed it's possible to have an implicit loop based on
+two goto'es. So for this change definitely:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-The bit[7:0] of register MAC_FPE_CTRL_STS are control bits or reserved
-that have no access side effects, so can use 8-bit access for
-MAC_FPE_CTRL_STS control bits.
+From the patch perspective seeing how clumsy the
+stmmac_rx()/stmmac_xmit() methods look here and in several/multiple
+other net-drivers here is a question to the subsystem maintainers. Is
+it really a preferred practice to design them that way with gotos and
+embed all the various stuff directly to a single function? Wouldn't it
+be better at least from the readability point of view to split them up
+into a set of smaller coherent functions and get rid from the gotos?
 
-Fixes: 5a5586112b92 ("net: stmmac: support FPE link partner hand-shaking pr=
-ocedure")
-Signed-off-by: jianheng <jianheng@synopsys.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac5.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+I am wondering because normally it would be indeed better, but network
+subsystem may have some special requirements for such methods (if so
+is it described anywhere in the kernel doc?), for instance, to reach a
+greater performance by not relying on the compiler to embed the
+sub-functions body into the denoted functions or by using the gotos so
+not to increment the loop-counter and preserve the indentation level.
+All of that may improve the code performance in some extent, but in
+its turn it significantly reduces the code readability and
+maintainability.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/eth=
-ernet/stmicro/stmmac/dwmac5.c
-index e95d35f..7333995 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-@@ -716,11 +716,11 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 n=
-um_txq, u32 num_rxq,
- 	u32 value;
-=20
- 	if (!enable) {
--		value =3D readl(ioaddr + MAC_FPE_CTRL_STS);
-+		value =3D readb(ioaddr + MAC_FPE_CTRL_STS);
-=20
- 		value &=3D ~EFPE;
-=20
--		writel(value, ioaddr + MAC_FPE_CTRL_STS);
-+		writeb(value, ioaddr + MAC_FPE_CTRL_STS);
- 		return;
- 	}
-=20
-@@ -729,9 +729,9 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num=
-_txq, u32 num_rxq,
- 	value |=3D (num_rxq - 1) << GMAC_RXQCTRL_FPRQ_SHIFT;
- 	writel(value, ioaddr + GMAC_RXQ_CTRL1);
-=20
--	value =3D readl(ioaddr + MAC_FPE_CTRL_STS);
-+	value =3D readb(ioaddr + MAC_FPE_CTRL_STS);
- 	value |=3D EFPE;
--	writel(value, ioaddr + MAC_FPE_CTRL_STS);
-+	writeb(value, ioaddr + MAC_FPE_CTRL_STS);
- }
-=20
- int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
-@@ -770,7 +770,7 @@ void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum=
- stmmac_mpacket_type type
- {
- 	u32 value;
-=20
--	value =3D readl(ioaddr + MAC_FPE_CTRL_STS);
-+	value =3D readb(ioaddr + MAC_FPE_CTRL_STS);
-=20
- 	if (type =3D=3D MPACKET_VERIFY) {
- 		value &=3D ~SRSP;
-@@ -780,5 +780,5 @@ void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum=
- stmmac_mpacket_type type
- 		value |=3D SRSP;
- 	}
-=20
--	writel(value, ioaddr + MAC_FPE_CTRL_STS);
-+	writeb(value, ioaddr + MAC_FPE_CTRL_STS);
- }
---=20
-1.8.3.1
+-Serge(y)
 
+> 
+> Fixes: ec222003bd94 ("net: stmmac: Prepare to add Split Header support")
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3e50fd53a617..f28838c8cdb3 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -5328,10 +5328,10 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+>  			len = 0;
+>  		}
+>  
+> +read_again:
+>  		if (count >= limit)
+>  			break;
+>  
+> -read_again:
+>  		buf1_len = 0;
+>  		buf2_len = 0;
+>  		entry = next_entry;
+> -- 
+> 2.42.0
+> 
+> 
 
