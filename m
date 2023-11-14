@@ -1,85 +1,183 @@
-Return-Path: <netdev+bounces-47728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F3F7EB0E8
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:30:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113487EB10C
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B6BF1C2082D
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3979C1C20A2B
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8103FE5A;
-	Tue, 14 Nov 2023 13:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A887405C8;
+	Tue, 14 Nov 2023 13:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433CE3FE48
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 13:30:43 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B3D91AD;
-	Tue, 14 Nov 2023 05:30:41 -0800 (PST)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1r2tV1-0005lF-JY; Tue, 14 Nov 2023 14:30:39 +0100
-Message-ID: <0442b8d1-f01c-4ac4-97ca-d69d76eca25f@leemhuis.info>
-Date: Tue, 14 Nov 2023 14:30:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7EF405C2;
+	Tue, 14 Nov 2023 13:43:19 +0000 (UTC)
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 092DB1B6;
+	Tue, 14 Nov 2023 05:43:18 -0800 (PST)
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-6ce37d0f1a9so2936375a34.0;
+        Tue, 14 Nov 2023 05:43:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699969397; x=1700574197;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pKwkP963gOr3zzH+sOtigbWk+LV0roLBXICZMNqn3/c=;
+        b=Pedb4DlB6o4guja5i4OpHgJwFRUJBvUAg19e5OiIFbwz+WD1WHlOnph8hUlsxkPaT+
+         r4MWDlLr/qqn0JjUwft3Wt5hZBIZv6GbOR/VCyE21lvy27xdrviqWTOj99Utw2gHijDh
+         j5zHhcQej0NZAyvEC6b0MqSWiZg6nVBxAXqWtAJhQ4IEOs0D6kVolXJNuXkzID18adZJ
+         ZtfpISGSrM+tTYoInf8B1UgK8qUkafmcUWn5WmXRYIMptGW/nUkiFdJnZt/JWINmckmL
+         jYH17SBnqdfJ8SbPs19RULS80/4G3a7ib5iDZtu/vv71lc9QRjjSbjSL1j2LmmEkpzLe
+         nupA==
+X-Gm-Message-State: AOJu0YyV8SurvfmM6p4I6gIJR95IwVTIa3A8iGOXGPjWPLpShX20WM0Z
+	sWYYrUi/eMmsMQIdZ3oJ+w==
+X-Google-Smtp-Source: AGHT+IEewtgCzuIB1eQL3luUwxLZaGnVSFEKF90crdWiR8BoDUsAFfrvOT5VpkzrnZyuSj/5tJismw==
+X-Received: by 2002:a05:6870:c1d1:b0:1e9:c18b:b2da with SMTP id i17-20020a056870c1d100b001e9c18bb2damr13151127oad.18.1699969397286;
+        Tue, 14 Nov 2023 05:43:17 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id o7-20020a9d7647000000b006bf0f95f702sm199993otl.64.2023.11.14.05.43.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 05:43:16 -0800 (PST)
+Received: (nullmailer pid 1650336 invoked by uid 1000);
+	Tue, 14 Nov 2023 13:43:15 -0000
+Date: Tue, 14 Nov 2023 07:43:15 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Alexander Couzens <lynxis@fe80.eu>, Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH 1/8] dt-bindings: phy: mediatek,xfi-pextp: add new
+ bindings
+Message-ID: <20231114134315.GA1645963-robh@kernel.org>
+References: <cover.1699565880.git.daniel@makrotopia.org>
+ <924c2c6316e6d51a17423eded3a2c5c5bbf349d2.1699565880.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL v2] Networking for 6.7
-Content-Language: en-US, de-DE
-To: Linux kernel regressions list <regressions@lists.linux.dev>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231028011741.2400327-1-kuba@kernel.org>
- <20231031210948.2651866-1-kuba@kernel.org>
- <20231109154934.4saimljtqx625l3v@box.shutemov.name>
-From: "Linux regression tracking #adding (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <20231109154934.4saimljtqx625l3v@box.shutemov.name>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1699968641;a106b028;
-X-HE-SMSGID: 1r2tV1-0005lF-JY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <924c2c6316e6d51a17423eded3a2c5c5bbf349d2.1699565880.git.daniel@makrotopia.org>
 
-[TLDR: This mail in primarily relevant for Linux kernel regression
-tracking. See link in footer if these mails annoy you.]
-
-On 09.11.23 16:49, Kirill A. Shutemov wrote:
-> On Tue, Oct 31, 2023 at 02:09:48PM -0700, Jakub Kicinski wrote:
->>       bpf: Add support for non-fix-size percpu mem allocation
+On Thu, Nov 09, 2023 at 09:50:55PM +0000, Daniel Golle wrote:
+> Add bindings for the MediaTek PEXTP Ethernet SerDes PHY found in the
+> MediaTek MT7988 SoC which can operate at various interfaces modes:
 > 
-> Recent changes in BPF increased per-CPU memory consumption a lot.
+>  * USXGMII
+>  * 10GBase-R
+>  * 5GBase-R
+>  * 2500Base-X
+>  * 1000Base-X
+>  * Cisco SGMII (MAC side)
 > 
-> On virtual machine with 288 CPUs, per-CPU consumtion increased from 111 MB
-> to 969 MB, or 8.7x.
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/phy/mediatek,xfi-pextp.yaml      | 71 +++++++++++++++++++
+>  1 file changed, 71 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml
 > 
-> I've bisected it to the commit 41a5db8d8161 ("bpf: Add support for
-> non-fix-size percpu mem allocation"), which part of the pull request.
+> diff --git a/Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml b/Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml
+> new file mode 100644
+> index 0000000000000..948d5031af1e3
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/phy/mediatek,xfi-pextp.yaml
+> @@ -0,0 +1,71 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/phy/mediatek,xfi-pextp.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek XFI PEXTP SerDes PHY
+> +
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description: |
 
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
+Don't need '|' here.
 
-#regzbot ^introduced 41a5db8d8161
-#regzbot title bpf: recent changes in BPF increased per-CPU memory
-consumption a lot.
-#regzbot monitor:
-https://lore.kernel.org/all/20231110172050.2235758-1-yonghong.song@linux.dev/
-#regzbot fix: bpf: Do not allocate percpu memory at init stage
-#regzbot ignore-activity
+> +  The MediaTek XFI PEXTP SerDes PHY provides the physical SerDes lanes
+> +  used by the MediaTek USXGMII PCS.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^phy@[0-9a-f]+$"
+> +
+> +  compatible:
+> +    const: mediatek,mt7988-xfi-pextp
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: XFI PHY clock
+> +
+> +  resets:
+> +    items:
+> +      - description: PEXTP reset
+> +
+> +  mediatek,usxgmii-performance-errata:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      USXGMII0 on MT7988 suffers from a performance problem in 10GBase-R
+> +      mode which needs a work-around in the driver. The work-around is
+> +      enabled using this flag.
+> +
+> +  "#phy-cells":
+> +    const: 0
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - resets
+> +  - "#phy-cells"
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+> +    #include <dt-bindings/reset/mediatek,mt7988-resets.h>
+> +    soc {
+> +      #address-cells = <2>;
+> +      #size-cells = <2>;
+> +
+> +      xfi_pextp0: phy@11f20000 {
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
+Drop unused labels.
+
+> +        compatible = "mediatek,mt7988-xfi-pextp";
+> +        reg = <0 0x11f20000 0 0x10000>;
+> +        clocks = <&topckgen CLK_TOP_XFI_PHY_0_XTAL_SEL>;
+> +        resets = <&watchdog MT7988_TOPRGU_XFI_PEXTP0_GRST>;
+> +        mediatek,usxgmii-performance-errata;
+> +        #phy-cells = <0>;
+> +      };
+> +    };
+> +
+> +...
+> -- 
+> 2.42.1
 
