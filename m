@@ -1,126 +1,172 @@
-Return-Path: <netdev+bounces-47648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528897EAE43
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:44:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C2F7EAE5E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29290B20AB7
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:44:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4ADE6B20A8F
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14391199D1;
-	Tue, 14 Nov 2023 10:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551A01946C;
+	Tue, 14 Nov 2023 10:55:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="erNXnvAA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YyMEmwGc"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7968C8C8
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 10:44:36 +0000 (UTC)
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE63D186
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 02:44:34 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3b6cb515917so2875968b6e.1
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 02:44:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699958674; x=1700563474; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ese5ke2XLpSRBDcMeCq3hzLNmJ5F/1muLUoYSwpaxSU=;
-        b=erNXnvAAQjmZY/8N0o3UONhQBz7It+nSvZWY9NZYb1AneNnRakG//zneGcIkL6uQHC
-         eCErB1XeMetW/8SB7Jg8GW3bPu0GFSpQ5OZ2yFcoMp2DJRpzJwJFNMYqfO3bLf3w5y8D
-         cK55hGQKYULYoRsABhdMuehBlZpsH+gyD8c3U1VMcuO3fjPMt/r06unNWobcNljs/ZTy
-         Cpgp2UNJ3MDNkuUu25Rjo2StmaP1UGwdD8Rt/NLXevPfVwV5YoHCR7adMO8xHaxRuyjR
-         405GVgACr2qsH+uTFr3ppqCPdTCUogKVZQ2xYzCi7dBHg9k/sWLeWXIEDpvGUiP8YK2t
-         ESrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699958674; x=1700563474;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ese5ke2XLpSRBDcMeCq3hzLNmJ5F/1muLUoYSwpaxSU=;
-        b=SEM1/APk3JnLttX3O1fqfb79nmUYroRVnrMbarLwAS06qvyD94OywO3Oo3YaYii1jd
-         eRjELu2Gn6/9tR6b4MZJDw5McyNoHscVY4hJmsgTqS4X8+cnskVZw6q1KLtuwAgF6d8J
-         HHx27PJMHtwfPHd9EywPXihTj/EX/eLammN7PRnNOWx6sZYm5SWNPeSm+xhwzDGvPBY1
-         N5o7d+EfKNfspF985Uy4z/M9JNKNCTGQN35mosNZk4H5O5WzEQB55oeYN7J10aNZBByu
-         NzfnmtJ6QjrIfAfybh5NHxjhTyAxXCaKBr8/IYlxSn8XfeqI5QtdjLFQJVJ36+gdoTvb
-         DW0g==
-X-Gm-Message-State: AOJu0YzLGEmYmr0KdBJZr3awS/6+0jVxMK1xmPn4AGHAlkIUGJzo9JPE
-	qFP0OhUE+/ZQkVNhX2Rnj54=
-X-Google-Smtp-Source: AGHT+IGQnH4wysP3HUc+bm76QQNnQoy8z59V+hxPrwkW//Up3vQN2jRytRbS8C5DgblMsthrDZb/xA==
-X-Received: by 2002:a05:6808:1794:b0:3ae:4cb2:fb43 with SMTP id bg20-20020a056808179400b003ae4cb2fb43mr13561395oib.21.1699958673982;
-        Tue, 14 Nov 2023 02:44:33 -0800 (PST)
-Received: from swarup-virtual-machine ([171.76.83.22])
-        by smtp.gmail.com with ESMTPSA id 201-20020a6301d2000000b005b3cc663c8csm5279641pgb.21.2023.11.14.02.44.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 02:44:33 -0800 (PST)
-Date: Tue, 14 Nov 2023 16:14:27 +0530
-From: swarup <swarupkotikalapudi@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	jiri@resnulli.us, netdev@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] netlink: specs: devlink: add missing attributes in
- devlink.yaml and re-generate the related code
-Message-ID: <ZVNPi7pmJIDJ6Ms7@swarup-virtual-machine>
-References: <20231113063904.22179-1-swarupkotikalapudi@gmail.com>
- <0d902d2b15ef44e9e0157d8012c42347ffeec86e.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9011A582;
+	Tue, 14 Nov 2023 10:55:53 +0000 (UTC)
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24411186;
+	Tue, 14 Nov 2023 02:55:49 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 32BA62000A;
+	Tue, 14 Nov 2023 10:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1699959348;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=uX1qAm3PoNBjcV71gubQoriGUAtfUipgUKlDAbAe2Og=;
+	b=YyMEmwGcOAZb3/vG+C4mQhSrCpsNt1hxFFDhRqeN/3udwY0nnAIJsvavTcIDzJPmr1F1+K
+	9ulvGXleLBQBazGSodrxSYe1X+1NxgGTGJuOC1R+9BaJfYyNUgBAKL+j03oV+E8ZVibXBu
+	1UoJoMy9ANnL2keTWm6nwnFfwpvSF1tfyCOzcMtY3KT5oH+X2hqrKvY1AL4sqVkkNtcTxE
+	YAejF1dUw3zZdOdtNKEPBEkgR40GL4lYN2Agk0p6RKHwShMvGMlHluEbenx8V37XOVfH66
+	G03shzfxke5RnDyXFc1ecJQAfDepID1fMeBlutnhTrFwhLvRr7h8MyrxvqP1yw==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: [PATCH net-next v3 0/8] net: qualcomm: ipqess: introduce Qualcomm IPQESS driver
+Date: Tue, 14 Nov 2023 11:55:50 +0100
+Message-ID: <20231114105600.1012056-1-romain.gantois@bootlin.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d902d2b15ef44e9e0157d8012c42347ffeec86e.camel@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: romain.gantois@bootlin.com
 
-eOn Tue, Nov 14, 2023 at 10:45:23AM +0100, Paolo Abeni wrote:
-> On Mon, 2023-11-13 at 12:09 +0530, Swarup Laxman Kotiaklapudi wrote:
-> > Add missing attributes in devlink.yaml.
-> > 
-> > Re-generate the related devlink-user.[ch] code.
-> > 
-> > trap-get command prints nested attributes.
-> > 
-> > Test result with trap-get command:
-> > 
-> > sudo ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/devlink.yaml
-> > --do trap-get --json '{"bus-name": "netdevsim", "dev-name": "netdevsim1",
-> > "trap-name": "ttl_value_is_too_small"}' --process-unknown
-> > 
-> > {'attr-stats': {'rx-bytes': 30931292, 'rx-dropped': 87,
-> >  'rx-packets': 217826},
-> >  'bus-name': 'netdevsim',
-> >  'dev-name': 'netdevsim1',
-> >  'trap-action': 'trap',
-> >  'trap-generic': True,
-> >  'trap-group-name': 'l3_exceptions',
-> >  'trap-metadata': {'metadata-type-in-port': True},
-> >  'trap-name': 'ttl_value_is_too_small',
-> >  'trap-type': 'exception'}
-> > 
-> > Signed-off-by: Swarup Laxman Kotiaklapudi <swarupkotikalapudi@gmail.com>
-> > Suggested-by: Jiri Pirko <jiri@resnulli.us>
-> 
-> Please insert the target tree in the subj prefix (in this case 'net-
-> next')
-> 
-> Does not apply cleanly to net-next, please rebase it. 
-> 
-> Thanks,
-> 
-> Paolo
-> 
-Hi Paolo,
+Hello everyone,
 
-I have some emergency,
-hence will not have access to computer for next 2-3 days,
-once i am back, i will rebase and submit the patch again.
+This is the 3rd iteration on the Qualcomm IPQ4019 Ethernet Switch Subsystem
+driver. I made some patch separation mistakes in the v2, sorry about that.
 
-Thanks,
-Swarup
+Notable changes in v3:
+ - Fixed formatting of 3/8.
+
+Notable changes in v2:
+ - Refactored the PSGMII calibration procedure to exclude
+   PHY-model-specific code from the switch driver. Added two new callbacks
+   to the phy_driver struct to enable PHY-agnostic calibration control from
+   the MAC driver.
+ - Modified the EDMA Ethernet driver to use page_pool for skb handling.
+ - Refactored several qca8k-common.c functions to enable calling them from
+   the IPQESS driver rather than reimplementing them.
+
+The IPQ4019 SoC integrates a modified version of the QCA8K Ethernet switch.
+One major difference with the original switch IP is that port tags are
+passed to the integrated Ethernet controller out-of-band.
+
+Previous DSA versions of this driver were rejected because they required
+adding out-of-band tagging support to the DSA subsystem. Therefore, we
+rewrote the driver as a pure switchdev module, which shares a common
+backend library with the current QCA8K driver.
+
+The main driver components are:
+ - ipqess_switch.c which registers and configures the integrated switch
+ - ipqess_port.c which creates net devices for each one of the front-facing
+   ports.
+ - ipqess_edma.c which handles the integrated EDMA Ethernet controller
+   linked to the CPU port.
+ - drivers/net/dsa/qca/qca8k-common.c which defines low-level ESS access
+   methods common to this driver and the original DSA QCA8K driver.
+
+Thanks to the people from Sartura for providing us hardware and working on
+the base QCA8K driver, and to Maxime for his work on the EDMA code.
+
+Best regards,
+
+Romain
+
+Romain Gantois (8):
+  dt-bindings: net: Introduce the Qualcomm IPQESS Ethernet switch
+  net: dsa: qca8k: Make the QCA8K hardware library available globally
+  net: qualcomm: ipqess: introduce the Qualcomm IPQESS driver
+  net: qualcomm: ipqess: Add Ethtool ops to IPQESS port netdevices
+  net: qualcomm: ipqess: add bridge offloading features to the IPQESS
+    driver
+  net: phy: add calibration callbacks to phy_driver
+  net: qualcomm: ipqess: add a PSGMII calibration procedure to the
+    IPQESS driver
+  ARM: dts: qcom: ipq4019: Add description for the IPQ4019 ESS EDMA and
+    switch
+
+ .../bindings/net/qcom,ipq4019-ess.yaml        |  152 ++
+ MAINTAINERS                                   |    7 +
+ .../boot/dts/qcom/qcom-ipq4018-ap120c-ac.dtsi |   13 +
+ arch/arm/boot/dts/qcom/qcom-ipq4019.dtsi      |   94 +
+ drivers/net/dsa/qca/Kconfig                   |   10 +
+ drivers/net/dsa/qca/Makefile                  |    5 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c              |   51 +-
+ drivers/net/dsa/qca/qca8k-common.c            |  126 +-
+ drivers/net/dsa/qca/qca8k-leds.c              |    2 +-
+ drivers/net/ethernet/qualcomm/Kconfig         |   15 +
+ drivers/net/ethernet/qualcomm/Makefile        |    2 +
+ drivers/net/ethernet/qualcomm/ipqess/Makefile |    8 +
+ .../ethernet/qualcomm/ipqess/ipqess_calib.c   |  156 ++
+ .../ethernet/qualcomm/ipqess/ipqess_edma.c    | 1195 ++++++++++++
+ .../ethernet/qualcomm/ipqess/ipqess_edma.h    |  488 +++++
+ .../ethernet/qualcomm/ipqess/ipqess_ethtool.c |  245 +++
+ .../qualcomm/ipqess/ipqess_notifiers.c        |  306 +++
+ .../qualcomm/ipqess/ipqess_notifiers.h        |   29 +
+ .../ethernet/qualcomm/ipqess/ipqess_port.c    | 1686 +++++++++++++++++
+ .../ethernet/qualcomm/ipqess/ipqess_port.h    |  102 +
+ .../ethernet/qualcomm/ipqess/ipqess_switch.c  |  533 ++++++
+ .../ethernet/qualcomm/ipqess/ipqess_switch.h  |   36 +
+ .../net/dsa/qca => include/linux/dsa}/qca8k.h |   61 +-
+ include/linux/phy.h                           |   28 +
+ 24 files changed, 5296 insertions(+), 54 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qcom,ipq4019-ess.yaml
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/Makefile
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_calib.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_edma.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_ethtool.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_notifiers.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_notifiers.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_port.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_port.h
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_switch.c
+ create mode 100644 drivers/net/ethernet/qualcomm/ipqess/ipqess_switch.h
+ rename {drivers/net/dsa/qca => include/linux/dsa}/qca8k.h (90%)
+
+-- 
+2.42.0
+
 
