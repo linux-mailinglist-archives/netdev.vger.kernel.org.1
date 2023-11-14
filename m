@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-47736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287F57EB139
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:52:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE9C47EB13E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:56:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92DFCB20A12
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:52:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DE7E1F24B49
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:56:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4AC405CF;
-	Tue, 14 Nov 2023 13:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnAHubb5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639E4405D5;
+	Tue, 14 Nov 2023 13:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6774405CD
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 13:52:17 +0000 (UTC)
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A801A1
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 05:52:15 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-507bd644a96so8086956e87.3
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 05:52:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699969934; x=1700574734; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j757N9wl2OC9S0nDdSseR3c4Ld+DiVkQ7HuzMo3m75Q=;
-        b=QnAHubb5AOxHa7gbJGe903NOBGUKaW4WvAj2L/dAgaBWuV5BfJoBqnJa0Dh9I2WjMa
-         UGeeyD+PvYbHRX4uwUsXfwyqkxn4bmBq9mTFpvolSTesXtSdS1brVDghHruHztrWVYe1
-         4lBRtDGMWFrbIftFZ3nRQHMl7w0Im5otEgIMD1agnHvKFZ6/miwYpIL3KrD8nAHODsIh
-         iw9aBXxKHt3VdZ2SHlHT51hD4Sj4p9NS7CIG1axq0Xh3Ypi8jtYjUBqgxNDJu1upZ6x1
-         ZAL7+1vw9QAlpYVDT7RaGgUXKrE3kkugvep1LVfo59X0fTFziqv0A6lHSeSdTk/dEPpy
-         w0zA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34073FE43;
+	Tue, 14 Nov 2023 13:56:08 +0000 (UTC)
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B98132;
+	Tue, 14 Nov 2023 05:56:07 -0800 (PST)
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-1efa01323b4so3443564fac.3;
+        Tue, 14 Nov 2023 05:56:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699969934; x=1700574734;
+        d=1e100.net; s=20230601; t=1699970167; x=1700574967;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j757N9wl2OC9S0nDdSseR3c4Ld+DiVkQ7HuzMo3m75Q=;
-        b=Mee1QmRhjIaxziRPlIlsP0sNbyDs82LopaX0c6WSRWQMfxqN01yANYGbi30oPTPkpu
-         AlaCH02Bnx7gluUmkzYQmxsgAg2erug+76SHU1yGS2Qqb8tN6Xd7xikvw/Of8/L36CMH
-         dJOXdk9/DHycKArV+Q3LVknjWlW4D8DwFG87nNIkgiccmX4VkxKhzPenerxUokVBw8sp
-         Q/+4I1QuOxGuDGQ3G+sxruYMHtnQ05zXa1wqL566xgomh8GlV2J9+qX79aXdr9AoKX2U
-         uaT4IhkJFjLqEwUTy4Jgklo+fTK0ysSDKs8aNcMY6MUWMpev4Vqy9yldQJ7PNXTdhFuP
-         M/vg==
-X-Gm-Message-State: AOJu0YzVZODgFgQvpYgXnFnxUOOCo3N+iGHeRvu47j4dgoUddFWmOwAd
-	wDf4yZl4/XfibKQF2JlP2bQ=
-X-Google-Smtp-Source: AGHT+IH+04Ch+9kgm6dAVSo7aGbw26wa30Ipxu0PNeFpJ35bUOf3NQzVs8clX8L5DUeqviqV4eG/UQ==
-X-Received: by 2002:a05:6512:3251:b0:50a:71d8:c94f with SMTP id c17-20020a056512325100b0050a71d8c94fmr6239613lfr.60.1699969933332;
-        Tue, 14 Nov 2023 05:52:13 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id i12-20020a056512340c00b00505677e7a99sm1345393lfr.139.2023.11.14.05.52.12
+        bh=QiASBl9VrAjzQgmOuXmfWuxNZgNwYoFGLkzwqXtE/qw=;
+        b=hcEPTm2ogQo3AX1d8RkwYEdT95D16WfIGCgK9lYmPJSnGhhMZYYS/MEGow9VB3ZLNB
+         OzrDoyQRQqzBR4DctL9bSIoWHXGqMWUV0U24yXhguiqPDv+V/eUgACphFn0kz/Z3NdBf
+         Ex357we+IpZIUxCdBnFPBrGe2eCfsYMhO5X5XVwBLPEgkPgJJs1XDpHWUBNvYUi8Zkea
+         vi9Ps2LVuqnhzzvw7fqitENFY4J0eUzz8NhSx8G69YgGeesswgACZKm7pj33mRqGa1ud
+         DujMP+sMmpooYEdBN+4Ty96P2hsRvyvutInE6fdO02gcPfBJesWz2XSFxztYdZE7w+Q1
+         0MqA==
+X-Gm-Message-State: AOJu0Yyvt6+6aNEglA33//BiWbj/EsE7jP7Zy3VfT8VVcWkxkpR35V8y
+	nh844IFYVqBiP2peEYHwKm6b1WFudA==
+X-Google-Smtp-Source: AGHT+IFYOuCtYvhZonQy046WfyrIoy4A+vOjsLbnefhLS1WXzW1gHM/v6TjGpVo+25v7X/N6wfLMGQ==
+X-Received: by 2002:a05:6870:40d2:b0:1e9:d8a4:551f with SMTP id l18-20020a05687040d200b001e9d8a4551fmr11788936oal.17.1699970166709;
+        Tue, 14 Nov 2023 05:56:06 -0800 (PST)
+Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id ec21-20020a0568708c1500b001e5ad4b2f65sm1372872oab.19.2023.11.14.05.56.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 05:52:12 -0800 (PST)
-Date: Tue, 14 Nov 2023 16:52:11 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Baruch Siach <baruch@tkos.co.il>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: stmmac: reduce dma ring display
- code duplication
-Message-ID: <qw2ymgim7ikxmgyznzdh7acf66rm62gqdkqnjpshgksdqkdar5@52gef7yifpfg>
-References: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
- <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
+        Tue, 14 Nov 2023 05:56:06 -0800 (PST)
+Received: (nullmailer pid 1664148 invoked by uid 1000);
+	Tue, 14 Nov 2023 13:56:04 -0000
+Date: Tue, 14 Nov 2023 07:56:04 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Alexander Couzens <lynxis@fe80.eu>, Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH 5/8] dt-bindings: net: pcs: add bindings for MediaTek
+ USXGMII PCS
+Message-ID: <20231114135604.GA1661768-robh@kernel.org>
+References: <cover.1699565880.git.daniel@makrotopia.org>
+ <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,116 +76,95 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
+In-Reply-To: <2dff6aff7006573d3232ec2ddd93c1792740d4d3.1699565880.git.daniel@makrotopia.org>
 
-On Tue, Nov 14, 2023 at 09:03:10AM +0200, Baruch Siach wrote:
-> The code to show extended descriptor is identical to normal one.
-> Consolidate the code to remove duplication.
+On Thu, Nov 09, 2023 at 09:51:47PM +0000, Daniel Golle wrote:
+> MediaTek's USXGMII can be found in the MT7988 SoC. We need to access
+> it in order to configure and monitor the Ethernet SerDes link in
+> USXGMII, 10GBase-R and 5GBase-R mode. By including a wrapped
+> legacy 1000Base-X/2500Base-X/Cisco SGMII LynxI PCS as well, those
+> interface modes are also available.
 > 
-> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
-> v2: Fix extended descriptor case, and properly test both cases
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++------------
->  1 file changed, 9 insertions(+), 16 deletions(-)
+>  .../bindings/net/pcs/mediatek,usxgmii.yaml    | 105 ++++++++++++++++++
+>  1 file changed, 105 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 39336fe5e89d..cf818a2bc9d5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -6182,26 +6182,19 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
->  	int i;
->  	struct dma_extended_desc *ep = (struct dma_extended_desc *)head;
->  	struct dma_desc *p = (struct dma_desc *)head;
+> diff --git a/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+> new file mode 100644
+> index 0000000000000..199cf47859e31
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/pcs/mediatek,usxgmii.yaml
+> @@ -0,0 +1,105 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/pcs/mediatek,usxgmii.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek USXGMII PCS
+> +
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description:
+> +  The MediaTek USXGMII PCS provides physical link control and status
+> +  for USXGMII, 10GBase-R and 5GBase-R links on the SerDes interfaces
+> +  provided by the PEXTP PHY.
+> +  In order to also support legacy 2500Base-X, 1000Base-X and Cisco
+> +  SGMII an existing mediatek,*-sgmiisys LynxI PCS is wrapped to
+> +  provide those interfaces modes on the same SerDes interfaces shared
+> +  with the USXGMII PCS.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^pcs@[0-9a-f]+$"
+> +
+> +  compatible:
+> +    const: mediatek,mt7988-usxgmiisys
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: USXGMII top-level clock
+> +      - description: SGMII top-level clock
+> +      - description: SGMII subsystem TX clock
+> +      - description: SGMII subsystem RX clock
+> +      - description: XFI PLL clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: usxgmii
+> +      - const: sgmii_sel
+> +      - const: sgmii_tx
+> +      - const: sgmii_rx
+> +      - const: xfi_pll
+> +
+> +  phys:
+> +    items:
+> +      - description: PEXTP SerDes PHY
+> +
+> +  mediatek,sgmiisys:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to the syscon node of the corresponding SGMII LynxI PCS.
+> +
+> +  resets:
+> +    items:
+> +      - description: XFI reset
+> +      - description: SGMII reset
+> +
+> +  reset-names:
+> +    items:
+> +      - const: xfi
+> +      - const: sgmii
+> +
+> +  "#pcs-cells":
 
-> +	unsigned long desc_size = extend_desc ? sizeof(*ep) : sizeof(*p);
+There is no such property defined.
 
-From readability point of view it's better to keep the initializers as
-simple as possible: just type casts or container-of-based inits. The
-more complex init-statements including the ternary-based ones is better to
-move to the code section closer to the place of the vars usage. So could
-you please move the initialization statement from the vars declaration
-section to being performed right before the loop entrance? It shall
-improve the readability a tiny bit.
-
->  	dma_addr_t dma_addr;
->  
->  	for (i = 0; i < size; i++) {
-> -		if (extend_desc) {
-> -			dma_addr = dma_phy_addr + i * sizeof(*ep);
-> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
-> -				   i, &dma_addr,
-> -				   le32_to_cpu(ep->basic.des0),
-> -				   le32_to_cpu(ep->basic.des1),
-> -				   le32_to_cpu(ep->basic.des2),
-> -				   le32_to_cpu(ep->basic.des3));
-> -			ep++;
-> -		} else {
-> -			dma_addr = dma_phy_addr + i * sizeof(*p);
-> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
-> -				   i, &dma_addr,
-> -				   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
-> -				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
-> +		dma_addr = dma_phy_addr + i * desc_size;
-> +		seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
-> +				i, &dma_addr,
-> +				le32_to_cpu(p->des0), le32_to_cpu(p->des1),
-> +				le32_to_cpu(p->des2), le32_to_cpu(p->des3));
-> +		if (extend_desc)
-> +			p = &(++ep)->basic;
-> +		else
->  			p++;
-> -		}
->  	}
-
-If I were simplifying/improving things I would have done it in the
-next way:
-
-static void stmmac_display_ring(void *head, int size, int extend_desc,
-			       struct seq_file *seq, dma_addr_t dma_addr)
-{
-        struct dma_desc *p;
-	size_t desc_size;
-	int i;
-
-	if (extend_desc)
-		desc_size = sizeof(struct dma_extended_desc);
-	else
-		desc_size = sizeof(struct dma_desc);
-
-	for (i = 0; i < size; i++) {
-		if (extend_desc)
-			p = &((struct dma_extended_desc *)head)->basic;
-		else
-			p = head;
-
-		seq_printf(seq, "%d [%pad]: 0x%08x 0x%08x 0x%08x 0x%08x\n",
-			   i, &dma_addr,
-			   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
-			   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
-
-		dma_addr += desc_size;
-		head += desc_size;
-	}
-}
-
-1. Add 0x%08x format to have the aligned data printout.
-2. Use the desc-size to increment the virt and phys addresses for
-unification.
-3. Replace sysfs_ prefix with stmmac_ since the method is no longer
-used for sysfs node.
-
-On the other hand having the extended data printed would be also
-useful at the very least for the Rx descriptors, which expose VLAN,
-Timestamp and IPvX related info. Extended Tx descriptors have only the
-timestamp in the extended part.
-
--Serge(y)
-
->  }
->  
-> -- 
-> 2.42.0
-> 
-> 
+Rob
 
