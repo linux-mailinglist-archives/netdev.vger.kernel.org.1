@@ -1,278 +1,79 @@
-Return-Path: <netdev+bounces-47829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 137847EB727
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB557EB7A1
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 21:16:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 924241F25B02
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:59:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C20D81F258F7
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:16:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9EB33097;
-	Tue, 14 Nov 2023 19:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87DED35F00;
+	Tue, 14 Nov 2023 20:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YofL318M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3p2RH03"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5321B3308F;
-	Tue, 14 Nov 2023 19:58:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7472C433CA;
-	Tue, 14 Nov 2023 19:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8F726AD1
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 20:16:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B87C1C433C7;
+	Tue, 14 Nov 2023 20:16:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699991907;
-	bh=zCPFw32MQoNUIdTL34FO8e2tOrxOjgtQ275K/Av8apw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=YofL318MfoeJdQu0Qgk0syRFWYy+qwc1LLiWz6xlUMjefUbSLvTIkPFPGhBuPrAip
-	 z1IoDf8vsbv8okzPwVR4nygZMk1+AgipToX3trHSojQmQ0wQU52H1kFXm1ZlJxQXnY
-	 FVuHLQ0EVVarhU0JW5Jj6G0nFG6Axhg2npiUv98mFhj9ttMg5YyhSs48IJotf51sxA
-	 OKpGna9hEsvemvQ8J6pOsja3PBsQ/rFDGUuhsyxpW9slFsK+5LQfknPvB36ltpi5dl
-	 +28DP82dwbVyRVs8tFgt3levXtQzlhHzBxZO2vljkEIfCTVW0JEyAI6hA658taxRPy
-	 B7lY/HIU9OPUw==
-From: Mat Martineau <martineau@kernel.org>
-Date: Tue, 14 Nov 2023 11:56:57 -0800
-Subject: [PATCH net-next v2 15/15] selftests: mptcp: add
- mptcp_lib_wait_local_port_listen
+	s=k20201202; t=1699993011;
+	bh=8mmL3I3erEwwdl8wOfZypEEHw8UywftF8yDJWg/57kM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=M3p2RH03l1i6INY0wbihE+Jde/WWCLYu7RCYouEgYsVe8pqVXx5qbivbIlnThfgNs
+	 c2e8Le2gNfZXZHHcM2JhmuWOhMsCKu2nx6MGLyWjYkDOpNo3ABSu7YQeF4yGTyWTcu
+	 O45GOQUnyunGrJVcutsbdFGm9a063bhoEmVBQ9WMtC6thEf9WU4pSUL4BYy4Fmzav7
+	 2TFh0x/NyFFi3FWq2RWoyBsNRb/6iIQV5RMcf7D6605ezwP4kLfJxrLHhi+1eVIzH4
+	 nLaleIpKIcY9B6OZ93ZiCFqMowPzecuinhoS7JGc0UFmAMMtgClWD62JFFMdPdr7L0
+	 fPh9wHDHn1t9Q==
+Message-ID: <0fe29f0c-5418-49a6-ab62-f210f8f7e765@kernel.org>
+Date: Tue, 14 Nov 2023 22:16:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: ethernet: am65-cpsw: Set default TX
+ channels to maximum
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com, srk@ti.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Pekka Varis <p-varis@ti.com>
+References: <20231113110708.137379-1-rogerq@kernel.org>
+ <20231113110708.137379-3-rogerq@kernel.org>
+ <20231114121343.o3nk3lddzy57mqgw@skbuf>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231114121343.o3nk3lddzy57mqgw@skbuf>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231114-send-net-next-2023107-v2-15-b650a477362c@kernel.org>
-References: <20231114-send-net-next-2023107-v2-0-b650a477362c@kernel.org>
-In-Reply-To: <20231114-send-net-next-2023107-v2-0-b650a477362c@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@suse.com>
-X-Mailer: b4 0.12.4
 
-From: Geliang Tang <geliang.tang@suse.com>
 
-To avoid duplicated code in different MPTCP selftests, we can add
-and use helpers defined in mptcp_lib.sh.
 
-wait_local_port_listen() helper is defined in diag.sh, mptcp_connect.sh,
-mptcp_join.sh and simult_flows.sh, export it into mptcp_lib.sh and
-rename it with mptcp_lib_ prefix. Use this new helper in all these
-scripts.
+On 14/11/2023 14:13, Vladimir Oltean wrote:
+> On Mon, Nov 13, 2023 at 01:07:07PM +0200, Roger Quadros wrote:
+>> am65-cpsw supports 8 TX hardware queues. Set this as default.
+> 
+> Motivation? Drawbacks / reasons why this was not done from the beginning?
 
-Note: We only have IPv4 connections in this helper, not looking at IPv6
-(tcp6) but that's OK because we only have IPv4 connections here in diag.sh.
+Motivation was to get the "kselftest -t net/forwarding:ethtool_mm.sh" test to work
+without requiring additional manual step of increasing the TX channels.
 
-Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
-Signed-off-by: Geliang Tang <geliang.tang@suse.com>
-Signed-off-by: Mat Martineau <martineau@kernel.org>
----
- tools/testing/selftests/net/mptcp/diag.sh          | 23 +++-------------------
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 19 +-----------------
- tools/testing/selftests/net/mptcp/mptcp_join.sh    | 20 +------------------
- tools/testing/selftests/net/mptcp/mptcp_lib.sh     | 18 +++++++++++++++++
- tools/testing/selftests/net/mptcp/simult_flows.sh  | 19 +-----------------
- 5 files changed, 24 insertions(+), 75 deletions(-)
+Another issue is that all network interfaces (can be up to 4 on some devices) have to be
+brought down if TX channel count needs to change.
 
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index 85a8ee9395b3..95b498efacd1 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -182,23 +182,6 @@ chk_msk_inuse()
- 	__chk_nr get_msk_inuse $expected "$msg" 0
- }
- 
--# $1: ns, $2: port
--wait_local_port_listen()
--{
--	local listener_ns="${1}"
--	local port="${2}"
--
--	local port_hex i
--
--	port_hex="$(printf "%04X" "${port}")"
--	for i in $(seq 10); do
--		ip netns exec "${listener_ns}" cat /proc/net/tcp | \
--			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) {rc=0; exit}} END {exit rc}" &&
--			break
--		sleep 0.1
--	done
--}
--
- wait_connected()
- {
- 	local listener_ns="${1}"
-@@ -222,7 +205,7 @@ echo "a" | \
- 		ip netns exec $ns \
- 			./mptcp_connect -p 10000 -l -t ${timeout_poll} -w 20 \
- 				0.0.0.0 >/dev/null &
--wait_local_port_listen $ns 10000
-+mptcp_lib_wait_local_port_listen $ns 10000
- chk_msk_nr 0 "no msk on netns creation"
- chk_msk_listen 10000
- 
-@@ -245,7 +228,7 @@ echo "a" | \
- 		ip netns exec $ns \
- 			./mptcp_connect -p 10001 -l -s TCP -t ${timeout_poll} -w 20 \
- 				0.0.0.0 >/dev/null &
--wait_local_port_listen $ns 10001
-+mptcp_lib_wait_local_port_listen $ns 10001
- echo "b" | \
- 	timeout ${timeout_test} \
- 		ip netns exec $ns \
-@@ -266,7 +249,7 @@ for I in `seq 1 $NR_CLIENTS`; do
- 				./mptcp_connect -p $((I+10001)) -l -w 20 \
- 					-t ${timeout_poll} 0.0.0.0 >/dev/null &
- done
--wait_local_port_listen $ns $((NR_CLIENTS + 10001))
-+mptcp_lib_wait_local_port_listen $ns $((NR_CLIENTS + 10001))
- 
- for I in `seq 1 $NR_CLIENTS`; do
- 	echo "b" | \
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index 537f180aa51e..7898d62fce0b 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -310,23 +310,6 @@ do_ping()
- 	return 0
- }
- 
--# $1: ns, $2: port
--wait_local_port_listen()
--{
--	local listener_ns="${1}"
--	local port="${2}"
--
--	local port_hex i
--
--	port_hex="$(printf "%04X" "${port}")"
--	for i in $(seq 10); do
--		ip netns exec "${listener_ns}" cat /proc/net/tcp* | \
--			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) {rc=0; exit}} END {exit rc}" &&
--			break
--		sleep 0.1
--	done
--}
--
- do_transfer()
- {
- 	local listener_ns="$1"
-@@ -408,7 +391,7 @@ do_transfer()
- 				$extra_args $local_addr < "$sin" > "$sout" &
- 	local spid=$!
- 
--	wait_local_port_listen "${listener_ns}" "${port}"
-+	mptcp_lib_wait_local_port_listen "${listener_ns}" "${port}"
- 
- 	local start
- 	start=$(date +%s%3N)
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index cd3412eac8a7..995280882428 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -580,24 +580,6 @@ link_failure()
- 	done
- }
- 
--# $1: ns, $2: port
--wait_local_port_listen()
--{
--	local listener_ns="${1}"
--	local port="${2}"
--
--	local port_hex
--	port_hex="$(printf "%04X" "${port}")"
--
--	local i
--	for i in $(seq 10); do
--		ip netns exec "${listener_ns}" cat /proc/net/tcp* | \
--			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) {rc=0; exit}} END {exit rc}" &&
--			break
--		sleep 0.1
--	done
--}
--
- rm_addr_count()
- {
- 	mptcp_lib_get_counter "${1}" "MPTcpExtRmAddr"
-@@ -1082,7 +1064,7 @@ do_transfer()
- 	fi
- 	local spid=$!
- 
--	wait_local_port_listen "${listener_ns}" "${port}"
-+	mptcp_lib_wait_local_port_listen "${listener_ns}" "${port}"
- 
- 	extra_cl_args="$extra_args $extra_cl_args"
- 	if [ "$test_linkfail" -eq 0 ];then
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-index 9e51b9471d3a..1f8be9dd0e20 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-@@ -281,3 +281,21 @@ mptcp_lib_check_transfer() {
- 
- 	return 0
- }
-+
-+# $1: ns, $2: port
-+mptcp_lib_wait_local_port_listen() {
-+	local listener_ns="${1}"
-+	local port="${2}"
-+
-+	local port_hex
-+	port_hex="$(printf "%04X" "${port}")"
-+
-+	local _
-+	for _ in $(seq 10); do
-+		ip netns exec "${listener_ns}" cat /proc/net/tcp* | \
-+			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) \
-+			     {rc=0; exit}} END {exit rc}" &&
-+			break
-+		sleep 0.1
-+	done
-+}
-diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh b/tools/testing/selftests/net/mptcp/simult_flows.sh
-index ce9203b817f8..ae8ad5d6fb9d 100755
---- a/tools/testing/selftests/net/mptcp/simult_flows.sh
-+++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
-@@ -123,23 +123,6 @@ setup()
- 	grep -q ' kmemleak_init$\| lockdep_init$\| kasan_init$\| prove_locking$' /proc/kallsyms && slack=$((slack+550))
- }
- 
--# $1: ns, $2: port
--wait_local_port_listen()
--{
--	local listener_ns="${1}"
--	local port="${2}"
--
--	local port_hex i
--
--	port_hex="$(printf "%04X" "${port}")"
--	for i in $(seq 10); do
--		ip netns exec "${listener_ns}" cat /proc/net/tcp* | \
--			awk "BEGIN {rc=1} {if (\$2 ~ /:${port_hex}\$/ && \$4 ~ /0A/) {rc=0; exit}} END {exit rc}" &&
--			break
--		sleep 0.1
--	done
--}
--
- do_transfer()
- {
- 	local cin=$1
-@@ -179,7 +162,7 @@ do_transfer()
- 				0.0.0.0 < "$sin" > "$sout" &
- 	local spid=$!
- 
--	wait_local_port_listen "${ns3}" "${port}"
-+	mptcp_lib_wait_local_port_listen "${ns3}" "${port}"
- 
- 	timeout ${timeout_test} \
- 		ip netns exec ${ns1} \
+I am not aware why this was not done from the beginning.
 
 -- 
-2.41.0
-
+cheers,
+-roger
 
