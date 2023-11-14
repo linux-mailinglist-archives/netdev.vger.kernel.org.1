@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-47595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A777EA964
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 05:14:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291E47EA96D
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 05:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 145661F23DBF
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 04:14:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17051F2369F
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 04:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26C5946E;
-	Tue, 14 Nov 2023 04:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67B7B64F;
+	Tue, 14 Nov 2023 04:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDCCvnyy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VY0EXT9D"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5331EB64D
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:14:17 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5CE5D0;
-	Mon, 13 Nov 2023 20:14:15 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1cc4d306fe9so8276045ad.0;
-        Mon, 13 Nov 2023 20:14:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BF2947E
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:15:54 +0000 (UTC)
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF84ED0;
+	Mon, 13 Nov 2023 20:15:51 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-28099d11c49so1092883a91.1;
+        Mon, 13 Nov 2023 20:15:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699935255; x=1700540055; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699935351; x=1700540151; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=muBwcP9mUDyva964KLM9ef52aqzazwIwTn3pnbunHbA=;
-        b=lDCCvnyyXbncsR5wwyXYZJLwdMrBf5KzO9UocCk2ZiTexXRkmlXvh9B61GdVxA6gpr
-         JdIUIZKoFGfc2Gc/khmOrOG/b1MeCyQ7a6KSqz8rACOon1cz1okpuHlzUPkVM0i3r0MY
-         A4tvovDrgZsGomf/0kHhHhU+ajaZ3deOAeyM/OPnWDEl9QifryIPNwwA91v/I3q2pueU
-         znrKhwvhoyBHR9aA1pqGkpT3oFI8UR1c4oQFxweqnyKV81YGpPuCitY5y0hirSB7Zcs7
-         Sm1tcgnLNZ2ZY11fTCquayciMDwKRlQYLIyw8KJrhWqoCBAqektzAVjOH6+WZbwqYYBA
-         gTog==
+        bh=RE6VvMtBCo/S66AHg+l/y7o7DeXG142T7fh8adrCVRU=;
+        b=VY0EXT9DhjkwauQy4GuJoboDuFUFFod56LKCa6cRqA2z4wtySGsE8HrBrbkBw2XRyd
+         VAN8Lou6sLBEmYdU/sZgi2+JK2HXeATDyA0NtIoKZU+YcuCJx6NFKFxbImZR/g1ee4Hb
+         wol278qI7bylw6Dz96+LyzPJoiFSA+IjIzMpjO8KZZnmmgj0zXFXHa6KMsueLxIbe0So
+         NMIAF1fq4k0c+vnVjYM6GGiIBhZjQZBKICl9zVVsWYlTBdHaA5FHBCa30xsXOLJFbKCe
+         xkqKZeBVA/LIqsNOaNA4++aKSaaI1z+qXjrZPdSP10XdzHUX2nHICwSSZBNBCjM34np9
+         ZxUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699935255; x=1700540055;
+        d=1e100.net; s=20230601; t=1699935351; x=1700540151;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=muBwcP9mUDyva964KLM9ef52aqzazwIwTn3pnbunHbA=;
-        b=MGtvPPEuHPR15OQGaSwLGx0JKfNz5X3Y0N6VtM42kBVHFvmqYb/wVSsKHAXm09OHlk
-         kr6vTFDXOvosh9Fp5PaLKLvoFUQNcN0CwWjuHuOOAIwzkmDF++NNEALuNfHTDBWipIB8
-         Af0XCFlOUPykfx0+VSbjsbEYuR2dyL0EnLjTbeqm+iMjGpCG73J/vBAyBt8ol6lPOT3I
-         4aN5MEBcyNnee5ng4VaZx3Is04OnBZevqCooPqNamoPYS8mBOo2rjr+kiYkc3EWas1Ul
-         JD8FdfWpwJ8ZClB8H28KZw5iSQaj7+ifNa8r5L6fo1JBj1qXi8b28u1uP5BzdvsyXwjE
-         LXcw==
-X-Gm-Message-State: AOJu0Yz/78R7p/oPvkKqyvO9z1tNThn+dVY053Dqd8pfFtyL7MzwpEy1
-	ZOP10kZnSIdfkQNT25vZT8U=
-X-Google-Smtp-Source: AGHT+IEGGyweHVZKhRyo7BS5bHq4rv9HAHBCRFbKwuBJWnxmFui/U17RUIycDcmIlYxbBMGHjI35uQ==
-X-Received: by 2002:a05:6a21:789b:b0:17b:170c:2d11 with SMTP id bf27-20020a056a21789b00b0017b170c2d11mr1373664pzc.6.1699935255028;
-        Mon, 13 Nov 2023 20:14:15 -0800 (PST)
+        bh=RE6VvMtBCo/S66AHg+l/y7o7DeXG142T7fh8adrCVRU=;
+        b=d5Uy486kzzVp65MrWUhP2YhPkQ4mI7VklYPiZY1W35M+J63lnyIA61tZRANeeYP04X
+         JIMSQ/9MLkJLYiFUq55JlxZdMoNhGqCyIZGSyZctCmov244w0QVJy+DuGg5d/dusI/Ez
+         bCAiwCiY0VoyVPwTYOQqo5UILg4fxwwPoZHD9IqnA/z1E7jSRalS23zz5uobqzHtXyKN
+         8UiPf/CnEhuFqbxu7nGIao5mRSogb2Xsxuw+ta/s6Txna7l97+CIsDuS8YOqZrwAHI3I
+         Il4OzOXcLbljk4yjeUBr7Kl6VFIMiMhyVz0JSRG0PAOcBvp0xp9mL7Y8nlElu66BNXC4
+         vDWw==
+X-Gm-Message-State: AOJu0Yy2v39PNG2PFL1heffjiH7kvGqZZvA09czGd1GHO8OAkhGaRTL4
+	3KiywKoFHGG+aHPmcma0rli7DJkLmaM=
+X-Google-Smtp-Source: AGHT+IGD0DYTC/XhPUxLNhCWa3XebHSt7NuxtQDxk3WZdWqhVNDlNiQL9U5WCkhJfeGD+iGDRsjI/A==
+X-Received: by 2002:a17:90b:e13:b0:27f:f8d6:9622 with SMTP id ge19-20020a17090b0e1300b0027ff8d69622mr1021370pjb.0.1699935351275;
+        Mon, 13 Nov 2023 20:15:51 -0800 (PST)
 Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id u14-20020aa7838e000000b006c345e192cfsm344097pfm.119.2023.11.13.20.14.13
+        by smtp.gmail.com with ESMTPSA id c3-20020a17090ad90300b002805740d668sm6324359pjv.4.2023.11.13.20.15.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 20:14:14 -0800 (PST)
-Date: Mon, 13 Nov 2023 20:14:12 -0800
+        Mon, 13 Nov 2023 20:15:50 -0800 (PST)
+Date: Mon, 13 Nov 2023 20:15:48 -0800
 From: Richard Cochran <richardcochran@gmail.com>
-To: Min Li <lnimi@hotmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Min Li <lnimi@hotmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
 Subject: Re: [PATCH net-next RFC 1/1] ptp: use extts interface for the
  measured external offset
-Message-ID: <ZVL0FDZ4Dn4qo7hn@hoboy.vegasvil.org>
+Message-ID: <ZVL0dIpwCE94ylfH@hoboy.vegasvil.org>
 References: <MW5PR03MB6932F6DB45F5ED179DF0BA4DA0B3A@MW5PR03MB6932.namprd03.prod.outlook.com>
+ <490abfce-47b6-430c-8fc1-99536284c1a6@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,123 +75,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MW5PR03MB6932F6DB45F5ED179DF0BA4DA0B3A@MW5PR03MB6932.namprd03.prod.outlook.com>
+In-Reply-To: <490abfce-47b6-430c-8fc1-99536284c1a6@intel.com>
 
-On Mon, Nov 13, 2023 at 04:50:25PM -0500, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
-> 
-> This change is for the PHC devices that can measure the
-> phase offset between PHC signal and the external signal, such
-> as GNSS. With this change, ts2phc can use the existing extts
-> interface to retrieve measurement offset so that the alignment
-> between PHC and the external signal can be achieved.
-> 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
->  drivers/ptp/ptp_clock.c          | 12 +++++++++---
->  include/linux/ptp_clock_kernel.h |  2 ++
->  include/uapi/linux/ptp_clock.h   |  9 +++++++--
->  3 files changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 3134568af622..c87954c8642f 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -48,14 +48,19 @@ static void enqueue_external_timestamp(struct timestamp_event_queue *queue,
->  	s64 seconds;
->  	u32 remainder;
->  
-> -	seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
-> +	if(src->type != PTP_CLOCK_EXTOFF)
+On Mon, Nov 13, 2023 at 03:00:15PM -0800, Jacob Keller wrote:
+> You mention GNSS, but is there an example or a link to a driver change
+> you could provide to show its use?
 
-Space after 'if' keyword please.
+Yes, the new option must wait for a driver that implements it.  Can
+you make a patch series where the driver change appears in the second
+patch?
 
-> +		seconds = div_u64_rem(src->timestamp, 1000000000, &remainder);
->  
->  	spin_lock_irqsave(&queue->lock, flags);
->  
->  	dst = &queue->buf[queue->tail];
->  	dst->index = src->index;
-> -	dst->t.sec = seconds;
-> -	dst->t.nsec = remainder;
-> +	if(src->type != PTP_CLOCK_EXTOFF) {
-
-ditto.
-
-> +		dst->t.sec = seconds;
-> +		dst->t.nsec = remainder;
-> +	} else {
-> +		dst->o = src->offset;
-> +	}
->  
->  	if (!queue_free(queue))
->  		queue->head = (queue->head + 1) % PTP_MAX_TIMESTAMPS;
-> @@ -416,6 +421,7 @@ void ptp_clock_event(struct ptp_clock *ptp, struct ptp_clock_event *event)
->  		break;
->  
->  	case PTP_CLOCK_EXTTS:
-> +	case PTP_CLOCK_EXTOFF:
->  		/* Enqueue timestamp on selected queues */
->  		spin_lock_irqsave(&ptp->tsevqs_lock, flags);
->  		list_for_each_entry(tsevq, &ptp->tsevqs, qlist) {
-> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
-> index 1ef4e0f9bd2a..7f2d1e1cc185 100644
-> --- a/include/linux/ptp_clock_kernel.h
-> +++ b/include/linux/ptp_clock_kernel.h
-> @@ -200,6 +200,7 @@ struct ptp_clock;
->  enum ptp_clock_events {
->  	PTP_CLOCK_ALARM,
->  	PTP_CLOCK_EXTTS,
-> +	PTP_CLOCK_EXTOFF,
->  	PTP_CLOCK_PPS,
->  	PTP_CLOCK_PPSUSR,
->  };
-> @@ -218,6 +219,7 @@ struct ptp_clock_event {
->  	int index;
->  	union {
->  		u64 timestamp;
-> +		s64 offset;
->  		struct pps_event_time pps_times;
->  	};
->  };
-> diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
-> index da700999cad4..61e0473cdf53 100644
-> --- a/include/uapi/linux/ptp_clock.h
-> +++ b/include/uapi/linux/ptp_clock.h
-> @@ -32,6 +32,7 @@
->  #define PTP_RISING_EDGE    (1<<1)
->  #define PTP_FALLING_EDGE   (1<<2)
->  #define PTP_STRICT_FLAGS   (1<<3)
-> +#define PTP_EXT_OFFSET     (1<<4)
->  #define PTP_EXTTS_EDGES    (PTP_RISING_EDGE | PTP_FALLING_EDGE)
->  
->  /*
-> @@ -40,7 +41,8 @@
->  #define PTP_EXTTS_VALID_FLAGS	(PTP_ENABLE_FEATURE |	\
->  				 PTP_RISING_EDGE |	\
->  				 PTP_FALLING_EDGE |	\
-> -				 PTP_STRICT_FLAGS)
-> +				 PTP_STRICT_FLAGS |	\
-> +				 PTP_EXT_OFFSET)
->  
->  /*
->   * flag fields valid for the original PTP_EXTTS_REQUEST ioctl.
-> @@ -228,7 +230,10 @@ struct ptp_pin_desc {
->  #define PTP_MASK_EN_SINGLE  _IOW(PTP_CLK_MAGIC, 20, unsigned int)
->  
->  struct ptp_extts_event {
-> -	struct ptp_clock_time t; /* Time event occured. */
-> +	union {
-> +		struct ptp_clock_time t; /* Time event occured. */
-> +		__s64 o; /* measured offset */
-
-How about calling it offset_ns so that the unit is clear?
-
-> +	};
->  	unsigned int index;      /* Which channel produced the event. */
->  	unsigned int flags;      /* Reserved for future use. */
->  	unsigned int rsv[2];     /* Reserved for future use. */
-> -- 
-> 2.39.2
-> 
+Thanks,
+Richard
 
