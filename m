@@ -1,205 +1,132 @@
-Return-Path: <netdev+bounces-47832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C745E7EB7DD
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 21:33:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EFA7EB7C1
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 21:25:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E547B20B6C
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:33:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4572C28138B
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E0035EE3;
-	Tue, 14 Nov 2023 20:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC5C35F0B;
+	Tue, 14 Nov 2023 20:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nSyzurO8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GiJElAs0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B0D2FC30
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 20:33:08 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4F7F1;
-	Tue, 14 Nov 2023 12:33:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1699993987; x=1731529987;
-  h=references:from:to:cc:subject:date:in-reply-to:
-   message-id:mime-version;
-  bh=HKNLBVi/uu5buORnrJ40SoCVcpO7bot+2hpeBuTdJq8=;
-  b=nSyzurO8IIA8A8vri0yXqzgaCpyWel3F1evpqfrH3v577PVEgma8fGX7
-   m64GuCOAItoTK/hNHx8odwA/yzdCa29tQm9t2I2prkXmi2Q0qryseHJF0
-   vlyf0bB8ZdI68NTNWPOxRnpE+T/j3rbdSk9aQLrxMLTJCmZhVyrryjC+L
-   q6enrjKXKKORfwuzxRUpEaoEN8RZIoxqPpwc9m94nQZxI3ugC+4T3K4dt
-   E4S6ZUTkg1DjMs356wnC0Y7DiVEMGDrejEZ2tR+ByK6mk5Mslap8CTF76
-   rBLs803BOUiD9cOcpA4OD4DO0OfY0QqQNRAOUdoNq+msXJwpw/8UMTD7S
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="476962218"
-X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
-   d="scan'208";a="476962218"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 12:33:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.03,303,1694761200"; 
-   d="scan'208";a="12911543"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Nov 2023 12:33:06 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Tue, 14 Nov 2023 12:33:05 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Tue, 14 Nov 2023 12:33:05 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Tue, 14 Nov 2023 12:33:05 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X6iBHBW9YZ88APemq5gA6CVmneH3LfuxegeDWI/z5Il90nuBZeFcvjF3q+nI79+uhRxTzibPFzSmn1lD08VG8qPJkPelnniCj0F6/OMY6lIjm6vtcDmswUanL4ESQkI6VzHRQ+4bi5kNSi0xYaVjfI7OKQTdult3QaRZrj++zLZu6TCnNaGxJEjeMFBFjdzh3PiV75dp7XQX0DSSbAdtyysNBAgu5Fq8gV6agrw6xJA+My7zloeIrbBPVJzPSqbbLRXRdpnsMclo17cCaKOy6qd3LAz2rZzvkV0IOM6/Bv1TrFL6/yt0UZg6c3gF85a8GvZuvNBux1Uv2EFJpagybA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Tn65o72jiVA/avvWlfunqrMek4hRBxmxhvug6uR0wXo=;
- b=CXh2qpojt6gfmesh2ldStTzAJaYzWt6GkP3ueCXNTMczC8b6Wmw4vfKwJnWI0bthtZeVEfriWGmSnS8eo87PYVpFo4OHF/Gd8PjwbX65AV5xeAR0Qf7N/8yLvDtW79ynu1xV1JdHp+/vbsQyoS+almFXWVGhF8SOjn6gQ9nlUP6sT5B/WhkSkWGTWbM6Lf8a97/UsqUzC7kX4Lh2Y/mP7s0NvnK8uiKvbYYWpnz/pqqkk5GBMuQQCjExNZ/eoQtB+tya61iazRMFdTlBaAfTuajfITtOTHrJ8KhVHjXdMewWzku6i9Zrob80Fp3nXhGPBE+ZdMwabDtKVNxXgm79Zw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SA2PR11MB4954.namprd11.prod.outlook.com (2603:10b6:806:11b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Tue, 14 Nov
- 2023 20:33:03 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::5d1:aa22:7c98:f3c6%7]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
- 20:33:03 +0000
-References: <20231113163029.106912-1-johnathanx.mantey@intel.com>
- <20231114194616.GG74656@kernel.org>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Johnathan Mantey <johnathanx.mantey@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: <netdev@vger.kernel.org>, <sam@mendozajonas.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] Revert ncsi: Propagate carrier gain/loss events
- to the NCSI controller
-Date: Tue, 14 Nov 2023 12:20:52 -0800
-In-Reply-To: <20231114194616.GG74656@kernel.org>
-Message-ID: <87bkbwvzwn.fsf@intel.com>
-Content-Type: text/plain; format=flowed
-X-ClientProxiedBy: SJ0PR03CA0034.namprd03.prod.outlook.com
- (2603:10b6:a03:33e::9) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469BD26AF3
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 20:24:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011E4F5
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:24:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699993490;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AMPhiKJAbm8zeR4hjWFuhSxhTnmbxSsETxgcPx+yeuk=;
+	b=GiJElAs004ekM/yexPC3t3iwltqsVCVLV0xfUH5aXZlkYjC8Ocid1BrWTYBY7vT3KdpCg4
+	FZWzsCZmxxBvLGjTOneDQAQjE5cmPm4R6Am1puEGd6Ff5mnwxJCpQyX61Y+HkSPziq7FPJ
+	P76yDKxO/R0coPv9xtM6XB+/MjQhnEk=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-620-2S2C9qRcNqKRut9g4sxKSA-1; Tue, 14 Nov 2023 15:24:48 -0500
+X-MC-Unique: 2S2C9qRcNqKRut9g4sxKSA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-408534c3ec7so39437365e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:24:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699993482; x=1700598282;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AMPhiKJAbm8zeR4hjWFuhSxhTnmbxSsETxgcPx+yeuk=;
+        b=F39sEGO8DkhJb8m6Iv7Qwg62O5Zfsv9VHVe5XHBNmmbtx7aNm9iSnePCTf34ozMhRU
+         D9q9jf5FGOKzwkjzqOpItpeMV+D8D3GC1jIaJngegGjxYjfalH16LuvtpmOVLsBI4k3n
+         SJxn+XDV4yGtBAjFcqjqjUjzQjEstTz+iG35oOv4bO6mJfQIy7MaiwkLsO6zRvRsXczh
+         81VNgOAROpcQpnthLxSONrPDwlwMm2lQgfg6KQ9jq7evzVfA2AdBjHWaWyPoWDqvXtQa
+         BKSLaCgNTgXp4i/XUHTHt+VNYVaR1DGRUeviUFjtIeSiDiBD2+8UkeRRzW+87vMPWYkO
+         WyZA==
+X-Gm-Message-State: AOJu0YwF0PViDswCh9VDu1UpgyAA0Pgq1kPKgNukE8LXWnETbbpPfQfB
+	z1GHidAp6cAym8mBk/OtUertSXS9O9AwhDUpHtaoxSJrjcqoeaJberXSs2lFIjqS5M/GfIrH7Ie
+	6xIPUmn3FhHd7emUl
+X-Received: by 2002:a05:600c:3b15:b0:40a:49c1:94d9 with SMTP id m21-20020a05600c3b1500b0040a49c194d9mr8706186wms.27.1699993482667;
+        Tue, 14 Nov 2023 12:24:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF8mSpIgY64wNwqmPqSR229VYTqr3lkVUkbVTKDvrSUJWsccUbrWwL5VGr9Xp2Iyf3uhHqJvg==
+X-Received: by 2002:a05:600c:3b15:b0:40a:49c1:94d9 with SMTP id m21-20020a05600c3b1500b0040a49c194d9mr8706157wms.27.1699993482303;
+        Tue, 14 Nov 2023 12:24:42 -0800 (PST)
+Received: from redhat.com ([2a02:14f:17a:44fb:a682:dfbc:c3ae:7cff])
+        by smtp.gmail.com with ESMTPSA id az19-20020a05600c601300b0040849ce7116sm18662069wmb.43.2023.11.14.12.24.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 12:24:41 -0800 (PST)
+Date: Tue, 14 Nov 2023 15:24:36 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alistair.francis@wdc.com, bjorn@rivosinc.com, cleger@rivosinc.com,
+	dan.carpenter@linaro.org, eperezma@redhat.com, jakub@cloudflare.com,
+	jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
+Subject: [GIT PULL] vhost,virtio,vdpa,firmware: bugfixes
+Message-ID: <20231114152436-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|SA2PR11MB4954:EE_
-X-MS-Office365-Filtering-Correlation-Id: 75602151-09bd-4a37-376f-08dbe550e692
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2CBVLa/PP5pzbisMkqbFrXDld+4tmCe0DzPDXAo6lMquJTt7rLXsb4M6aWu8J0i5HUkDSAqAhJ1fPRNsvad/WV1ju7S48Aoae5KpiTGu4Yhsacio2LJvVPQXZLOlP2gIazjzbHxxCgBuEhMh+BT5fpuUxFefbVEgFn+cNNmOt68Ek7a2GNHY34XYscH7uGTLgeXQ3VKJPBfO3nwLkjqa9/i+SNSoS7M7mFkcO/LP6TMePiC3CxUh6+OEGecjHUB97MXM4ejZEPsMBeYbmimKBO81L9JUeQV18btzlyM2GKT6rqXd/H8l5RE1Gfn2/01xwnnsvOZVRlSWrw5H3ZDSr8NeasOV8/FUlSf9Ic+FGike1ICw7VC+2UCUDPtPUxM8IpdYzuRzbZ0VJwzxZkXRgRwREjBYnwxSrGwNijq/OCBJp1VPXWkVuCTx3sTPkpsg4Ck830aDM+BPopD6feRjwd4Gfb7m55mNy+jZHxu39wBFyAdbblU4pDuf1wq2Gph4LR7EcXiWdP5duXYczmAkvKYyIsGOcVC3VDYvjtevWnw8Ts038meyvkPTyo9ZZTEr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(39860400002)(376002)(346002)(230922051799003)(1800799009)(186009)(451199024)(64100799003)(2906002)(83380400001)(82960400001)(86362001)(36756003)(41300700001)(6666004)(38100700002)(4326008)(8676002)(8936002)(6506007)(478600001)(6512007)(316002)(6486002)(6916009)(66476007)(66946007)(66556008)(5660300002)(2616005)(26005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/qAihkHRXVg8awInlrbB+yjFFmsX0SHKrLcJrjSCMkpO4HdWp0exGzE8fEk/?=
- =?us-ascii?Q?vRVmfUkaLzImqvp2zVc7z3e4vgNfCwL/D4jtfftUr+oGRcIxx6uR+tdGKWGl?=
- =?us-ascii?Q?lRwU83zD2dXy+JyJxG5o88Cj08sAz+HMPvaOriBeT3B/JYQMMwm0ls/Rd8Pw?=
- =?us-ascii?Q?DPHFzkV7ac4WeWylCXTp3xFkdvAy4fyOPLG95Blc+ElJptKDbOiai3JDMNIA?=
- =?us-ascii?Q?fLnK8wBdzj/6aDBdvoCUOtFMh40nRXxmhi7rD/b6150xN9B23lycz1OzaB3H?=
- =?us-ascii?Q?W0fADBWKdjaRelU2DVp9JDJ1enrCrAaafGur/dO/0RMRxKdc+xq7AsL3luK/?=
- =?us-ascii?Q?d2ETPW/GErSm/odqbX2+LUG/DqdanFuiA2SNpk2VhcBoiTUalNf1R4bIGGvL?=
- =?us-ascii?Q?Fbe6EZoIaMXiqU4VlnolWT2WBKsH7etHdEE7vJ/3+PsZ/YRZNiWrC5FT0hnb?=
- =?us-ascii?Q?6xTuj/uVWekInbXPfHOnR94jUl0k6uKI0m8M3O1pdudYOrciMZEdEOXlZzdv?=
- =?us-ascii?Q?Hg29PqJuAXFt5/JTwmE/s905JpP9HQT5MtyFcYmbwBS3+QVykqDnB7Ctxs6h?=
- =?us-ascii?Q?B2rAJo4kYVm0PKmaKBJ+ZGRb37pUbpBDt7FZaOJgYXyOTMEBMUuxJcvGz4cP?=
- =?us-ascii?Q?3dtGgRzOC+k7dksHch0WZv+Rj/7bG+ORJ94sE8UwBe/rgEKRGVxqiBn50eMB?=
- =?us-ascii?Q?yCXUPPZw1y8wu5HboYja8xVQyoVLpbcILhjfvZ4mjiDJPRmYr4nHZYD1Dcj6?=
- =?us-ascii?Q?J67ssl4pdCzESizOblC+Rn0v0yRyjkkC8d+F/cif1jDF4MSmvN4+Acn1llrD?=
- =?us-ascii?Q?7ldTzk72sQW0sTkqe58mtqMb394/wr7ZHGHyWsYh1wd6AtoeRcsV8470BEEm?=
- =?us-ascii?Q?17Rs4v8Fn4Q4imxjTwXTxlifR2a9am723xofRFMdOrwNfZLyJY8HpbnbPRrz?=
- =?us-ascii?Q?xyJI1veirSswm4TtRUkEiVKvv0J0soIF7d029ZDeItKH/mIvEJKW/axNIYHN?=
- =?us-ascii?Q?FNX9UA5+jxt4HrGqfrcE3ZXntvZPT9wzjkJ7yIdDgFElC8c7XXRbCL8Yb4Dj?=
- =?us-ascii?Q?vIOYB4mKYZiWApVLXvOKnn6NW3Kvm/b6TbPW8IaR8B/oEkNqWz7TONYupjEH?=
- =?us-ascii?Q?UmVb96PwpWM90sDZ6a8r9qmFuIVYRiwNKKTCyiCD4nRzVCkD63xmSBDTlgJp?=
- =?us-ascii?Q?hgOlVV89ayeEH+2plrRQ9XiOAZ861EPg0ln+TW9R5r7zX2pZvvkdSrVi7auZ?=
- =?us-ascii?Q?eoHbvfdwlh2aIANJAr7JGVOTdzSOGIjUjKePuXQAOyXrr336m0o+iijegHAz?=
- =?us-ascii?Q?Cyl43nFoGKEL/6ATD10JFB1qAIjkDzjnbpLfHWLOSO6JGPZSrZloGZCjGve1?=
- =?us-ascii?Q?D6nmmujr7DE9VmUEpGgIpq1Ndsa2byhB3nRETb735U3Wgot+MnmYmBlcE/MR?=
- =?us-ascii?Q?G8J0SbVqV2w0Ce3rtJD/kLBpn/8/vmrwRy8ISpNoO7BrFUrFwNoHA6f6a3hl?=
- =?us-ascii?Q?PPnwnKkFUkj+1VlyO5EcS2xP3RYq66RDtcdnXI68pA8oHaBfWWZ7tX6zrkvT?=
- =?us-ascii?Q?kjGlxpKrqlBucVUAgg5G9eVLXuxM9D2R+TZWgbwlnlXgEdFiDRxq33N/vTNz?=
- =?us-ascii?Q?6A=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75602151-09bd-4a37-376f-08dbe550e692
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 20:33:03.3523
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tfSI+gLgNkKXlzE3XTeu3Hszh0PE2VaPYN60wMRNIo73Kr0wJC+f5sxX8jwuTnjkE5eWF3svq7JH+GpTn789fWGquMk4+rvupI/8hx4+FZA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4954
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
 
+The following changes since commit 86f6c224c97911b4392cb7b402e6a4ed323a449e:
 
-Simon Horman <horms@kernel.org> writes:
+  vdpa_sim: implement .reset_map support (2023-11-01 09:20:00 -0400)
 
-> On Mon, Nov 13, 2023 at 08:30:29AM -0800, Johnathan Mantey 
-> wrote:
->> This reverts commit 3780bb29311eccb7a1c9641032a112eed237f7e3.
->> 
->> The cited commit introduced unwanted behavior.
->> 
->> The intent for the commit was to be able to detect carrier 
->> loss/gain
->> for just the NIC connected to the BMC. The unwanted effect is a
->> carrier loss for auxiliary paths also causes the BMC to lose
->> carrier. The BMC never regains carrier despite the secondary 
->> NIC
->> regaining a link.
->> 
->> This change, when merged, needs to be backported to stable 
->> kernels.
->> 5.4-stable, 5.10-stable, 5.15-stable, 6.1-stable, 6.5-stable
->> 
->> Fixes: 3780bb29311e ("ncsi: Propagate carrier gain/loss events 
->> to the NCSI controller")
->> CC: stable@vger.kernel.org
->> Signed-off-by: Johnathan Mantey <johnathanx.mantey@intel.com>
->
-> Hi Jonathan,
->
-> thanks for addressing my feedback on v2.
->
-> So far as addressing a regression goes, this looks good to me.
-> But I do wonder what can be done about the issue that
-> the cited commit was intended to address: will this patch 
-> regress things
-> on that front?
+are available in the Git repository at:
 
-Unfortunately the original issue will reoccur. I'm not sure which 
-behavior is worse. What's been present for the lifespan of the 
-ncsi driver, or this new issue I've introduced. In both instances 
-a cable unplug causes undesirable behavior. I'm going to 
-investigate solving this for Intel's specific use case ATM. NCSI 
-has numerous modes in which it can be configured. I don't have a 
-good feel for how to generalize the code given the side effect 
-introduced by my change.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
->
-> ...
+for you to fetch changes up to e07754e0a1ea2d63fb29574253d1fd7405607343:
 
+  vhost-vdpa: fix use after free in vhost_vdpa_probe() (2023-11-01 09:31:16 -0400)
 
--- 
-Johnathan Mantey
+----------------------------------------------------------------
+vhost,virtio,vdpa,firmware: bugfixes
+
+bugfixes all over the place
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Björn Töpel (1):
+      riscv, qemu_fw_cfg: Add support for RISC-V architecture
+
+Dan Carpenter (1):
+      vhost-vdpa: fix use after free in vhost_vdpa_probe()
+
+Jakub Sitnicki (1):
+      virtio_pci: Switch away from deprecated irq_set_affinity_hint
+
+Michael S. Tsirkin (1):
+      virtio_pci: move structure to a header
+
+Stefano Garzarella (1):
+      vdpa_sim_blk: allocate the buffer zeroed
+
+ drivers/firmware/Kconfig               |  2 +-
+ drivers/firmware/qemu_fw_cfg.c         |  2 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c   |  4 ++--
+ drivers/vhost/vdpa.c                   |  1 -
+ drivers/virtio/virtio_pci_common.c     |  6 +++---
+ drivers/virtio/virtio_pci_modern_dev.c |  7 ++++---
+ include/linux/virtio_pci_modern.h      |  7 -------
+ include/uapi/linux/virtio_pci.h        | 11 +++++++++++
+ 8 files changed, 22 insertions(+), 18 deletions(-)
+
 
