@@ -1,177 +1,143 @@
-Return-Path: <netdev+bounces-47685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B5097EAF92
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:00:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1D7B7EAF9B
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:04:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3691F20F0B
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:00:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2051F234CE
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFD73D3A4;
-	Tue, 14 Nov 2023 12:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ck8s53Fb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3AB3D3BC;
+	Tue, 14 Nov 2023 12:04:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923433C68A
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:00:04 +0000 (UTC)
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0F6F1;
-	Tue, 14 Nov 2023 04:00:02 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2c504a5e1deso75280441fa.2;
-        Tue, 14 Nov 2023 04:00:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699963200; x=1700568000; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+6KJAeM0fgwzrataiQJvaJXR0VKO4m2xUhSp/qxzWEU=;
-        b=Ck8s53FbMCarzT+7VjnwgMYBHVYsiOEQqKIMKU6p5v2Y2xa6+AZ1tjGoaEO/hzdsNT
-         cWE8ShUiMqIMtNi4bC/UEgbTxvfMreDMxVsniv/PQ4NUE54hZ1VAz0BRoMPEorlH23pP
-         VfmBKIk8GXaNKRzwvK//H6kJukBxO8GJIRM3B+z14XaOwklyH8QGevoopexQpEY2qQl+
-         +Fbs55V7spWKJC2/f69qgp/Uuoi+6sIvkrvxr9GsmLy707Qk+NzGH9lkrNzK9q+MuFYo
-         x/7oHsafeUmpHYkQzLNynG9EUUPZFZ1zzhTxBCHF7lKTAIpZjEXzg8KYW6ezfdNqNqJT
-         KfdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699963200; x=1700568000;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+6KJAeM0fgwzrataiQJvaJXR0VKO4m2xUhSp/qxzWEU=;
-        b=c6m6bGXwC14AFA4+aJ0hq0mqcNxtFkjH1wBEV4X5vlUv9foaEl0CsaOO6gSFjzAmD5
-         ++OJGjlacozr4w8SjpD0Glsd8H9tnMXgamWzf11+T/SgOTqVGL+L3yiLFzIrW8uKrJs/
-         JNWiIArOt4hNUXettlwMizhTfQNlQJQj1a+fSJi8q721LCl+5TPTiDArttm6ikf024nu
-         goe3DliRjmzV5PSr03girFjap/C86NiG9ZW7Y1IjqHyX4MMTd8FAjEmxfHpDJ/NCGGef
-         aJd5/HUJ2lVuLcd3CTf+JdhyHFr1lb7LXqRZNGvCaf2LBbXg46kQ0UILKcd/5iWeQjpv
-         /KmA==
-X-Gm-Message-State: AOJu0Yzj1VNetkLLA9XghKN+mZeU9FhpibFrscoS0Xtu9CV00RP2wsAH
-	QJ2Uj6pxy4GsaUoTZDSV6hQ=
-X-Google-Smtp-Source: AGHT+IGkg/dZ2j3ZhRtPnnWF3nQd6Z1yanz+Og6hQVCouER01/X1PxmY2rEi6+qInKZZQyQytLevyw==
-X-Received: by 2002:a05:651c:1055:b0:2c5:3139:2d04 with SMTP id x21-20020a05651c105500b002c531392d04mr1494405ljm.47.1699963200069;
-        Tue, 14 Nov 2023 04:00:00 -0800 (PST)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id w21-20020a05651c119500b002c847782e14sm590774ljo.95.2023.11.14.03.59.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 03:59:59 -0800 (PST)
-Date: Tue, 14 Nov 2023 14:59:57 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Jianheng Zhang <Jianheng.Zhang@synopsys.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <Jose.Abreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Tan Tee Min <tee.min.tan@intel.com>, Ong Boon Leong <boon.leong.ong@intel.com>, 
-	Voon Weifeng <weifeng.voon@intel.com>, Mohammad Athari Bin Ismail <mohammad.athari.ismail@intel.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: stmmac: fix FPE events losing
-Message-ID: <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
-References: <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C673A3D978
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:04:28 +0000 (UTC)
+Received: from baidu.com (mx20.baidu.com [111.202.115.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0144F1
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:04:26 -0800 (PST)
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
+	"anjali.k.kulkarni@oracle.com" <anjali.k.kulkarni@oracle.com>,
+	"leon@kernel.org" <leon@kernel.org>, "fw@strlen.de" <fw@strlen.de>,
+	"shayagr@amazon.com" <shayagr@amazon.com>, "idosch@nvidia.com"
+	<idosch@nvidia.com>, "razor@blackwall.org" <razor@blackwall.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH][net-next][v2] rtnetlink: instroduce vnlmsg_new and use it
+ in rtnl_getlink
+Thread-Topic: [PATCH][net-next][v2] rtnetlink: instroduce vnlmsg_new and use
+ it in rtnl_getlink
+Thread-Index: AQHaFu4gAvjmgJQbKkeACp0CxDL/lLB5tfvw
+Date: Tue, 14 Nov 2023 12:02:12 +0000
+Message-ID: <3f479dcb95c04e54b689fa96386022e0@baidu.com>
+References: <20231114095522.27939-1-lirongqing@baidu.com>
+ <7f60f869-ec5c-a58c-a490-80cfcdd0fda7@huawei.com>
+In-Reply-To: <7f60f869-ec5c-a58c-a490-80cfcdd0fda7@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.206.6]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex15_2023-11-14 20:02:12:876
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
+X-FEAS-Client-IP: 10.127.64.38
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 15:10:21:SYSTEM
 
-On Tue, Nov 14, 2023 at 11:07:34AM +0000, Jianheng Zhang wrote:
-> The 32-bit access of register MAC_FPE_CTRL_STS may clear the FPE status
-> bits unexpectedly. Use 8-bit access for MAC_FPE_CTRL_STS control bits to
-> avoid unexpected access of MAC_FPE_CTRL_STS status bits that can reduce
-> the FPE handshake retries.
-> 
-> The bit[19:17] of register MAC_FPE_CTRL_STS are status register bits.
-> Those bits are clear on read (or write of 1 when RCWE bit in
-> MAC_CSR_SW_Ctrl register is set). Using 32-bit access for
-> MAC_FPE_CTRL_STS control bits makes side effects that clear the status
-> bits. Then the stmmac interrupt handler missing FPE event status and
-> leads to FPE handshake failure and retries.
-> 
-> The bit[7:0] of register MAC_FPE_CTRL_STS are control bits or reserved
-> that have no access side effects, so can use 8-bit access for
-> MAC_FPE_CTRL_STS control bits.
-> 
-> Fixes: 5a5586112b92 ("net: stmmac: support FPE link partner hand-shaking procedure")
-> Signed-off-by: jianheng <jianheng@synopsys.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac5.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> index e95d35f..7333995 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> @@ -716,11 +716,11 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
->  	u32 value;
->  
->  	if (!enable) {
-
-> -		value = readl(ioaddr + MAC_FPE_CTRL_STS);
-> +		value = readb(ioaddr + MAC_FPE_CTRL_STS);
-
-Note this may break the platforms which don't support non-32 MMIOs for
-some devices. None of the currently supported glue-drivers explicitly
-state they have such peculiarity, but at the same time the STMMAC-core
-driver at the present state uses the dword IO ops only. For instance
-the PCIe subsystem has the special accessors for such cases:
-pci_generic_config_read32()
-pci_generic_config_write32()
-which at the very least are utilized on the Tegra and Loongson
-platforms to access the host CSR spaces. These platforms are also
-equipped with the DW MACs. The problem might be irrelevant for all the
-currently supported DW MAC controllers implementations though, but
-still it worth to draw an attention to the problem possibility and in
-order to prevent it before ahead it would be better to just avoid
-using the byte-/word- IOs if it's possible.
-
--Serge(y)
-
->  
->  		value &= ~EFPE;
->  
-> -		writel(value, ioaddr + MAC_FPE_CTRL_STS);
-> +		writeb(value, ioaddr + MAC_FPE_CTRL_STS);
->  		return;
->  	}
->  
-> @@ -729,9 +729,9 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
->  	value |= (num_rxq - 1) << GMAC_RXQCTRL_FPRQ_SHIFT;
->  	writel(value, ioaddr + GMAC_RXQ_CTRL1);
->  
-> -	value = readl(ioaddr + MAC_FPE_CTRL_STS);
-> +	value = readb(ioaddr + MAC_FPE_CTRL_STS);
->  	value |= EFPE;
-> -	writel(value, ioaddr + MAC_FPE_CTRL_STS);
-> +	writeb(value, ioaddr + MAC_FPE_CTRL_STS);
->  }
->  
->  int dwmac5_fpe_irq_status(void __iomem *ioaddr, struct net_device *dev)
-> @@ -770,7 +770,7 @@ void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum stmmac_mpacket_type type
->  {
->  	u32 value;
->  
-> -	value = readl(ioaddr + MAC_FPE_CTRL_STS);
-> +	value = readb(ioaddr + MAC_FPE_CTRL_STS);
->  
->  	if (type == MPACKET_VERIFY) {
->  		value &= ~SRSP;
-> @@ -780,5 +780,5 @@ void dwmac5_fpe_send_mpacket(void __iomem *ioaddr, enum stmmac_mpacket_type type
->  		value |= SRSP;
->  	}
->  
-> -	writel(value, ioaddr + MAC_FPE_CTRL_STS);
-> +	writeb(value, ioaddr + MAC_FPE_CTRL_STS);
->  }
-> -- 
-> 1.8.3.1
-> 
-> 
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogWXVuc2hlbmcgTGluIDxs
+aW55dW5zaGVuZ0BodWF3ZWkuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBOb3ZlbWJlciAxNCwgMjAy
+MyA3OjMyIFBNDQo+IFRvOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+OyBkYXZl
+bUBkYXZlbWxvZnQubmV0Ow0KPiBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7
+IHBhYmVuaUByZWRoYXQuY29tOw0KPiBMaWFtLkhvd2xldHRAb3JhY2xlLmNvbTsgYW5qYWxpLmsu
+a3Vsa2FybmlAb3JhY2xlLmNvbTsgbGVvbkBrZXJuZWwub3JnOw0KPiBmd0BzdHJsZW4uZGU7IHNo
+YXlhZ3JAYW1hem9uLmNvbTsgaWRvc2NoQG52aWRpYS5jb207DQo+IHJhem9yQGJsYWNrd2FsbC5v
+cmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSF1bbmV0LW5l
+eHRdW3YyXSBydG5ldGxpbms6IGluc3Ryb2R1Y2Ugdm5sbXNnX25ldyBhbmQgdXNlIGl0DQo+IGlu
+IHJ0bmxfZ2V0bGluaw0KPiANCj4gT24gMjAyMy8xMS8xNCAxNzo1NSwgTGkgUm9uZ1Fpbmcgd3Jv
+dGU6DQo+ID4gaWYgYSBQRiBoYXMgMjU2IG9yIG1vcmUgVkZzLCBpcCBsaW5rIGNvbW1hbmQgd2ls
+bCBhbGxvY2F0ZSBhIG9yZGVyIDMNCj4gPiBtZW1vcnkgb3IgbW9yZSwgYW5kIG1heWJlIHRyaWdn
+ZXIgT09NIGR1ZSB0byBtZW1vcnkgZnJhZ2VtZW50LA0KPiANCj4gZnJhZ2VtZW50IC0+IGZyYWdt
+ZW50Pw0KDQpJIHdpbGwgZml4IGl0IA0KVGhhbmtzDQoNCj4gDQo+ID4gdGhlIFZGcyBuZWVkZWQg
+bWVtb3J5IHNpemUgaXMgY29tcHV0ZWQgaW4gcnRubF92ZmluZm9fc2l6ZS4NCj4gPg0KPiA+IHNv
+IGluc3Ryb2R1Y2Ugdm5sbXNnX25ldyB3aGljaCBjYWxscyBuZXRsaW5rX2FsbG9jX2xhcmdlX3Nr
+YiBpbiB3aGljaA0KPiANCj4gaW5zdHJvZHVjZSAtPiBpbnRyb2R1Y2U/DQoNClRoYW5rcw0KDQo+
+IA0KPiA+IHZtYWxsb2MgaXMgdXNlZCBmb3IgbGFyZ2UgbWVtb3J5LCB0byBhdm9pZCB0aGUgZmFp
+bHVyZSBvZiBhbGxvY2F0aW5nDQo+ID4gbWVtb3J5DQo+ID4NCj4gPiAgICAgaXAgaW52b2tlZCBv
+b20ta2lsbGVyOg0KPiBnZnBfbWFzaz0weGMyY2MwKEdGUF9LRVJORUx8X19HRlBfTk9XQVJOfFwN
+Cj4gPiAJX19HRlBfQ09NUHxfX0dGUF9OT01FTUFMTE9DKSwgb3JkZXI9Mywgb29tX3Njb3JlX2Fk
+aj0wDQo+ID4gICAgIENQVTogNzQgUElEOiAyMDQ0MTQgQ29tbTogaXAgS2R1bXA6IGxvYWRlZCBU
+YWludGVkOiBQDQo+IE9FDQo+ID4gICAgIENhbGwgVHJhY2U6DQo+ID4gICAgIGR1bXBfc3RhY2sr
+MHg1Ny8weDZhDQo+ID4gICAgIGR1bXBfaGVhZGVyKzB4NGEvMHgyMTANCj4gPiAgICAgb29tX2tp
+bGxfcHJvY2VzcysweGU0LzB4MTQwDQo+ID4gICAgIG91dF9vZl9tZW1vcnkrMHgzZTgvMHg3OTAN
+Cj4gPiAgICAgX19hbGxvY19wYWdlc19zbG93cGF0aC5jb25zdHByb3AuMTE2KzB4OTUzLzB4YzUw
+DQo+ID4gICAgIF9fYWxsb2NfcGFnZXNfbm9kZW1hc2srMHgyYWYvMHgzMTANCj4gPiAgICAga21h
+bGxvY19sYXJnZV9ub2RlKzB4MzgvMHhmMA0KPiA+ICAgICBfX2ttYWxsb2Nfbm9kZV90cmFja19j
+YWxsZXIrMHg0MTcvMHg0ZDANCj4gPiAgICAgX19rbWFsbG9jX3Jlc2VydmUuaXNyYS42MSsweDJl
+LzB4ODANCj4gPiAgICAgX19hbGxvY19za2IrMHg4Mi8weDFjMA0KPiA+ICAgICBydG5sX2dldGxp
+bmsrMHgyNGYvMHgzNzANCj4gPiAgICAgcnRuZXRsaW5rX3Jjdl9tc2crMHgxMmMvMHgzNTANCj4g
+PiAgICAgbmV0bGlua19yY3Zfc2tiKzB4NTAvMHgxMDANCj4gPiAgICAgbmV0bGlua191bmljYXN0
+KzB4MWIyLzB4MjgwDQo+ID4gICAgIG5ldGxpbmtfc2VuZG1zZysweDM1NS8weDRhMA0KPiA+ICAg
+ICBzb2NrX3NlbmRtc2crMHg1Yi8weDYwDQo+ID4gICAgIF9fX19zeXNfc2VuZG1zZysweDFlYS8w
+eDI1MA0KPiA+ICAgICBfX19zeXNfc2VuZG1zZysweDg4LzB4ZDANCj4gPiAgICAgX19zeXNfc2Vu
+ZG1zZysweDVlLzB4YTANCj4gPiAgICAgZG9fc3lzY2FsbF82NCsweDMzLzB4NDANCj4gPiAgICAg
+ZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NDQvMHhhOQ0KPiA+ICAgICBSSVA6IDAw
+MzM6MHg3Zjk1YTY1YTViNzANCj4gPg0KPiA+IENjOiBZdW5zaGVuZyBMaW4gPGxpbnl1bnNoZW5n
+QGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdA
+YmFpZHUuY29tPg0KPiA+IC0tLQ0KPiA+IGRpZmYgd2l0aCB2MTogbm90IG1vdmUgbmV0bGlua19h
+bGxvY19sYXJnZV9za2IgdG8gc2tidWZmLmMNCj4gPg0KPiA+ICBpbmNsdWRlL2xpbnV4L25ldGxp
+bmsuaCAgfCAgMSArDQo+ID4gIGluY2x1ZGUvbmV0L25ldGxpbmsuaCAgICB8IDE3ICsrKysrKysr
+KysrKysrKysrDQo+ID4gIG5ldC9jb3JlL3J0bmV0bGluay5jICAgICB8ICAyICstDQo+ID4gIG5l
+dC9uZXRsaW5rL2FmX25ldGxpbmsuYyB8ICAyICstDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMjAg
+aW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNs
+dWRlL2xpbnV4L25ldGxpbmsuaCBiL2luY2x1ZGUvbGludXgvbmV0bGluay5oIGluZGV4DQo+ID4g
+NzVkN2RlMy4uYWJlOTFlZCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L25ldGxpbmsu
+aA0KPiA+ICsrKyBiL2luY2x1ZGUvbGludXgvbmV0bGluay5oDQo+ID4gQEAgLTM1MSw1ICszNTEs
+NiBAQCBib29sIG5ldGxpbmtfbnNfY2FwYWJsZShjb25zdCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLA0K
+PiA+ICAJCQlzdHJ1Y3QgdXNlcl9uYW1lc3BhY2UgKm5zLCBpbnQgY2FwKTsgIGJvb2wNCj4gbmV0
+bGlua19jYXBhYmxlKGNvbnN0DQo+ID4gc3RydWN0IHNrX2J1ZmYgKnNrYiwgaW50IGNhcCk7ICBi
+b29sIG5ldGxpbmtfbmV0X2NhcGFibGUoY29uc3Qgc3RydWN0DQo+ID4gc2tfYnVmZiAqc2tiLCBp
+bnQgY2FwKTsNCj4gPiArc3RydWN0IHNrX2J1ZmYgKm5ldGxpbmtfYWxsb2NfbGFyZ2Vfc2tiKHVu
+c2lnbmVkIGludCBzaXplLCBpbnQNCj4gPiArYnJvYWRjYXN0KTsNCj4gPg0KPiA+ICAjZW5kaWYJ
+LyogX19MSU5VWF9ORVRMSU5LX0ggKi8NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvbmV0
+bGluay5oIGIvaW5jbHVkZS9uZXQvbmV0bGluay5oIGluZGV4DQo+ID4gODNiZGY3OC4uN2QzMTIx
+NyAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL25ldC9uZXRsaW5rLmgNCj4gPiArKysgYi9pbmNs
+dWRlL25ldC9uZXRsaW5rLmgNCj4gPiBAQCAtMTAxMSw2ICsxMDExLDIzIEBAIHN0YXRpYyBpbmxp
+bmUgc3RydWN0IHNrX2J1ZmYgKm5sbXNnX25ldyhzaXplX3QNCj4gPiBwYXlsb2FkLCBnZnBfdCBm
+bGFncykgIH0NCj4gPg0KPiA+ICAvKioNCj4gPiArICogdm5sbXNnX25ldyAtIEFsbG9jYXRlIGEg
+bmV3IG5ldGxpbmsgbWVzc2FnZSB3aXRoIG5vbi1jb250aWd1b3VzDQo+ID4gKyAqIHBoeXNpY2Fs
+IG1lbW9yeQ0KPiA+ICsgKiBAcGF5bG9hZDogc2l6ZSBvZiB0aGUgbWVzc2FnZSBwYXlsb2FkDQo+
+ID4gKyAqDQo+ID4gKyAqIFVzZSBOTE1TR19ERUZBVUxUX1NJWkUgaWYgdGhlIHNpemUgb2YgdGhl
+IHBheWxvYWQgaXNuJ3Qga25vd24NCj4gPiArICogYW5kIGEgZ29vZCBkZWZhdWx0IGlzIG5lZWRl
+ZC4NCj4gPiArICoNCj4gPiArICogVGhlIGFsbG9jYXRlZCBza2IgaXMgdW5hYmxlIHRvIGhhdmUg
+ZnJhZyBwYWdlIGZvciBzaGluZm8tPmZyYWdzKiwNCj4gPiArICogYXMgdGhlIE5VTEwgc2V0dGlu
+ZyBmb3Igc2tiLT5oZWFkIGluIG5ldGxpbmtfc2tiX2Rlc3RydWN0b3IoKSB3aWxsDQo+ID4gKyAq
+IGJ5cGFzcyBtb3N0IG9mIHRoZSBoYW5kbGluZyBpbiBza2JfcmVsZWFzZV9kYXRhKCkgICovIHN0
+YXRpYw0KPiA+ICtpbmxpbmUgc3RydWN0IHNrX2J1ZmYgKnZubG1zZ19uZXcoc2l6ZV90IHBheWxv
+YWQpIHsNCj4gPiArCXJldHVybiBuZXRsaW5rX2FsbG9jX2xhcmdlX3NrYihubG1zZ190b3RhbF9z
+aXplKHBheWxvYWQpLCAwKTsgfQ0KPiANCj4gVGhlIG5sbXNnX25ldygpIGhhcyB0aGUgYmVsb3cg
+cGFyYW1ldGVycywgdGhlcmUgaXMgbm8gZ2ZwIGZsYWdzIGZvcg0KPiB2bmxtc2dfbmV3KCkgYW5k
+IGFsd2F5cyBhc3N1bWluZyBHRlBfS0VSTkVMPw0KPiANCg0KSSB0aGluayB0aGF0IHZubG1zZ19u
+ZXcgaXMgc2ltaWxhciBhcyB2bWFsbG9jLCAgc28gbm8gZmxhZyBpcyBuZWVkZWQsIGFuZCBhbHdh
+eXMgYXNzdW1pbmcgR0ZQX0tFUk5FTCANCg0KLUxpDQo+ICAqIEBwYXlsb2FkOiBzaXplIG9mIHRo
+ZSBtZXNzYWdlIHBheWxvYWQNCj4gICogQGZsYWdzOiB0aGUgdHlwZSBvZiBtZW1vcnkgdG8gYWxs
+b2NhdGUuDQo+IA0KPiBUaGVyZSBhcmUgYSBsb3Qgb2YgY2FsbGVycyBmb3Igbmxtc2dfbmV3KCks
+IEkgYW0gd29uZGVyaW5nIGhvdyBtYW55IG9mIGV4aXN0aW5nDQo+IG5sbXNnX25ldygpIGNhbGxl
+ciBjYW4gY2hhbmdlIHRvIHVzZSB2bmxtc2dfbmV3KCkuDQo+IGh0dHBzOi8vZWxpeGlyLmZyZWUt
+ZWxlY3Ryb25zLmNvbS9saW51eC92Ni43LXJjMS9BL2lkZW50L25sbXNnX25ldw0KPiANCg0K
 
