@@ -1,143 +1,110 @@
-Return-Path: <netdev+bounces-47686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1D7B7EAF9B
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:04:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F237EAF9E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2051F234CE
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:04:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C8F21F230DD
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD3AB3D3BC;
-	Tue, 14 Nov 2023 12:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2437D3D984;
+	Tue, 14 Nov 2023 12:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KoQGIjbw"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C673A3D978
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:04:28 +0000 (UTC)
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0144F1
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:04:26 -0800 (PST)
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>,
-	"anjali.k.kulkarni@oracle.com" <anjali.k.kulkarni@oracle.com>,
-	"leon@kernel.org" <leon@kernel.org>, "fw@strlen.de" <fw@strlen.de>,
-	"shayagr@amazon.com" <shayagr@amazon.com>, "idosch@nvidia.com"
-	<idosch@nvidia.com>, "razor@blackwall.org" <razor@blackwall.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH][net-next][v2] rtnetlink: instroduce vnlmsg_new and use it
- in rtnl_getlink
-Thread-Topic: [PATCH][net-next][v2] rtnetlink: instroduce vnlmsg_new and use
- it in rtnl_getlink
-Thread-Index: AQHaFu4gAvjmgJQbKkeACp0CxDL/lLB5tfvw
-Date: Tue, 14 Nov 2023 12:02:12 +0000
-Message-ID: <3f479dcb95c04e54b689fa96386022e0@baidu.com>
-References: <20231114095522.27939-1-lirongqing@baidu.com>
- <7f60f869-ec5c-a58c-a490-80cfcdd0fda7@huawei.com>
-In-Reply-To: <7f60f869-ec5c-a58c-a490-80cfcdd0fda7@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.206.6]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex15_2023-11-14 20:02:12:876
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9B6291F
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:06:05 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA27DF0
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:06:03 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507be298d2aso7384198e87.1
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:06:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699963562; x=1700568362; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZggK9siKn7KExoQxFcIHD3TyD4//iFjzA6iSpMA3G10=;
+        b=KoQGIjbwR8WdSMcmt+DOOdac9ZjwlFShTufW42cdF5bHd8W2aG6jsrj84mtMzO1TLC
+         b6iH1AIgcMQ5mqCAvxU/vTT6SWOAcqWEqE5+tpKWewmTo5bUaYGDqTMUUqD8GfYF8aTF
+         rvTO8bBoEPAsauFNqBcZi3yt5ZP/avnTp8P7UrEn+PahnCoHwtTZMqY/zR5YnraSq2FD
+         UKvNMvo9k6SIqHTYZmVojwfmzZq345hoi9xjxSmpUoLLXut/GaLBG3IyQRxtFQFP0A8t
+         jcT0hCtEpiOVra+Kh48ogEah6E9EKLwMyvLyYfvfvwUeuT8HGsfIgyeglnkOXVX7bxdE
+         ISOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699963562; x=1700568362;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZggK9siKn7KExoQxFcIHD3TyD4//iFjzA6iSpMA3G10=;
+        b=IfKT3BGu6qP/i4KLqmu74YMtKcNV2Pt3EWWG4EFa5p+l+52U/hcMgPxv9IQEswwbii
+         jnX/8VQhny8+QaVZuyYmL8nmLmq6zXr7LGziUYMvcXIGkovXTyr61I3O5iBEwCjAAiVt
+         oKyqJBjraMTMoe7nzBSNRXLLakZ0zqxBXQHr7Ii18z7zUEF+1q+uzDYKVsA4xmsHql/s
+         pPNx8ClHUQmToRkBfpL4nI93xSzCUfHTLVMxz69F4fiVwG/BVl4y2aA+w2lJHVt2tuog
+         G6HKBvrMUHXTTLTXK1zUATSIyjcvbBmZ/0Kyc0MHa6qlmNF6EAW8HwfhmdDH8FsXPR2v
+         R2Vw==
+X-Gm-Message-State: AOJu0YzkWbLISrfXKT84O0/MEWHTeSmOUpon6N25TjGZztIC/fY11S+Y
+	st3PgPv+KW2MJ4mesRwfy/PIN+mdAfgY+A==
+X-Google-Smtp-Source: AGHT+IEwjt0LujeowNoQLGcYpLszzW+/j0oIkWyUq6CS50C4N8rjEVqcKDGphdIx4klIWW9g5m/Nvg==
+X-Received: by 2002:a05:6512:238c:b0:509:d97:c84f with SMTP id c12-20020a056512238c00b005090d97c84fmr7844254lfv.23.1699963561724;
+        Tue, 14 Nov 2023 04:06:01 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id bp22-20020a056512159600b00507cee141c9sm1300459lfb.32.2023.11.14.04.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 04:06:01 -0800 (PST)
+Date: Tue, 14 Nov 2023 15:05:59 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Baruch Siach <baruch@tkos.co.il>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: stmmac: remove extra newline from
+ descriptors display
+Message-ID: <la55hpdihraxfe4u35w6kyurkkjqij7ss5qpirehat47hwzo62@aj5qku6vypdi>
+References: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 10.127.64.38
-X-FE-Last-Public-Client-IP: 100.100.100.38
-X-FE-Policy-ID: 15:10:21:SYSTEM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogWXVuc2hlbmcgTGluIDxs
-aW55dW5zaGVuZ0BodWF3ZWkuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBOb3ZlbWJlciAxNCwgMjAy
-MyA3OjMyIFBNDQo+IFRvOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+OyBkYXZl
-bUBkYXZlbWxvZnQubmV0Ow0KPiBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7
-IHBhYmVuaUByZWRoYXQuY29tOw0KPiBMaWFtLkhvd2xldHRAb3JhY2xlLmNvbTsgYW5qYWxpLmsu
-a3Vsa2FybmlAb3JhY2xlLmNvbTsgbGVvbkBrZXJuZWwub3JnOw0KPiBmd0BzdHJsZW4uZGU7IHNo
-YXlhZ3JAYW1hem9uLmNvbTsgaWRvc2NoQG52aWRpYS5jb207DQo+IHJhem9yQGJsYWNrd2FsbC5v
-cmc7IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQQVRDSF1bbmV0LW5l
-eHRdW3YyXSBydG5ldGxpbms6IGluc3Ryb2R1Y2Ugdm5sbXNnX25ldyBhbmQgdXNlIGl0DQo+IGlu
-IHJ0bmxfZ2V0bGluaw0KPiANCj4gT24gMjAyMy8xMS8xNCAxNzo1NSwgTGkgUm9uZ1Fpbmcgd3Jv
-dGU6DQo+ID4gaWYgYSBQRiBoYXMgMjU2IG9yIG1vcmUgVkZzLCBpcCBsaW5rIGNvbW1hbmQgd2ls
-bCBhbGxvY2F0ZSBhIG9yZGVyIDMNCj4gPiBtZW1vcnkgb3IgbW9yZSwgYW5kIG1heWJlIHRyaWdn
-ZXIgT09NIGR1ZSB0byBtZW1vcnkgZnJhZ2VtZW50LA0KPiANCj4gZnJhZ2VtZW50IC0+IGZyYWdt
-ZW50Pw0KDQpJIHdpbGwgZml4IGl0IA0KVGhhbmtzDQoNCj4gDQo+ID4gdGhlIFZGcyBuZWVkZWQg
-bWVtb3J5IHNpemUgaXMgY29tcHV0ZWQgaW4gcnRubF92ZmluZm9fc2l6ZS4NCj4gPg0KPiA+IHNv
-IGluc3Ryb2R1Y2Ugdm5sbXNnX25ldyB3aGljaCBjYWxscyBuZXRsaW5rX2FsbG9jX2xhcmdlX3Nr
-YiBpbiB3aGljaA0KPiANCj4gaW5zdHJvZHVjZSAtPiBpbnRyb2R1Y2U/DQoNClRoYW5rcw0KDQo+
-IA0KPiA+IHZtYWxsb2MgaXMgdXNlZCBmb3IgbGFyZ2UgbWVtb3J5LCB0byBhdm9pZCB0aGUgZmFp
-bHVyZSBvZiBhbGxvY2F0aW5nDQo+ID4gbWVtb3J5DQo+ID4NCj4gPiAgICAgaXAgaW52b2tlZCBv
-b20ta2lsbGVyOg0KPiBnZnBfbWFzaz0weGMyY2MwKEdGUF9LRVJORUx8X19HRlBfTk9XQVJOfFwN
-Cj4gPiAJX19HRlBfQ09NUHxfX0dGUF9OT01FTUFMTE9DKSwgb3JkZXI9Mywgb29tX3Njb3JlX2Fk
-aj0wDQo+ID4gICAgIENQVTogNzQgUElEOiAyMDQ0MTQgQ29tbTogaXAgS2R1bXA6IGxvYWRlZCBU
-YWludGVkOiBQDQo+IE9FDQo+ID4gICAgIENhbGwgVHJhY2U6DQo+ID4gICAgIGR1bXBfc3RhY2sr
-MHg1Ny8weDZhDQo+ID4gICAgIGR1bXBfaGVhZGVyKzB4NGEvMHgyMTANCj4gPiAgICAgb29tX2tp
-bGxfcHJvY2VzcysweGU0LzB4MTQwDQo+ID4gICAgIG91dF9vZl9tZW1vcnkrMHgzZTgvMHg3OTAN
-Cj4gPiAgICAgX19hbGxvY19wYWdlc19zbG93cGF0aC5jb25zdHByb3AuMTE2KzB4OTUzLzB4YzUw
-DQo+ID4gICAgIF9fYWxsb2NfcGFnZXNfbm9kZW1hc2srMHgyYWYvMHgzMTANCj4gPiAgICAga21h
-bGxvY19sYXJnZV9ub2RlKzB4MzgvMHhmMA0KPiA+ICAgICBfX2ttYWxsb2Nfbm9kZV90cmFja19j
-YWxsZXIrMHg0MTcvMHg0ZDANCj4gPiAgICAgX19rbWFsbG9jX3Jlc2VydmUuaXNyYS42MSsweDJl
-LzB4ODANCj4gPiAgICAgX19hbGxvY19za2IrMHg4Mi8weDFjMA0KPiA+ICAgICBydG5sX2dldGxp
-bmsrMHgyNGYvMHgzNzANCj4gPiAgICAgcnRuZXRsaW5rX3Jjdl9tc2crMHgxMmMvMHgzNTANCj4g
-PiAgICAgbmV0bGlua19yY3Zfc2tiKzB4NTAvMHgxMDANCj4gPiAgICAgbmV0bGlua191bmljYXN0
-KzB4MWIyLzB4MjgwDQo+ID4gICAgIG5ldGxpbmtfc2VuZG1zZysweDM1NS8weDRhMA0KPiA+ICAg
-ICBzb2NrX3NlbmRtc2crMHg1Yi8weDYwDQo+ID4gICAgIF9fX19zeXNfc2VuZG1zZysweDFlYS8w
-eDI1MA0KPiA+ICAgICBfX19zeXNfc2VuZG1zZysweDg4LzB4ZDANCj4gPiAgICAgX19zeXNfc2Vu
-ZG1zZysweDVlLzB4YTANCj4gPiAgICAgZG9fc3lzY2FsbF82NCsweDMzLzB4NDANCj4gPiAgICAg
-ZW50cnlfU1lTQ0FMTF82NF9hZnRlcl9od2ZyYW1lKzB4NDQvMHhhOQ0KPiA+ICAgICBSSVA6IDAw
-MzM6MHg3Zjk1YTY1YTViNzANCj4gPg0KPiA+IENjOiBZdW5zaGVuZyBMaW4gPGxpbnl1bnNoZW5n
-QGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTGkgUm9uZ1FpbmcgPGxpcm9uZ3FpbmdA
-YmFpZHUuY29tPg0KPiA+IC0tLQ0KPiA+IGRpZmYgd2l0aCB2MTogbm90IG1vdmUgbmV0bGlua19h
-bGxvY19sYXJnZV9za2IgdG8gc2tidWZmLmMNCj4gPg0KPiA+ICBpbmNsdWRlL2xpbnV4L25ldGxp
-bmsuaCAgfCAgMSArDQo+ID4gIGluY2x1ZGUvbmV0L25ldGxpbmsuaCAgICB8IDE3ICsrKysrKysr
-KysrKysrKysrDQo+ID4gIG5ldC9jb3JlL3J0bmV0bGluay5jICAgICB8ICAyICstDQo+ID4gIG5l
-dC9uZXRsaW5rL2FmX25ldGxpbmsuYyB8ICAyICstDQo+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMjAg
-aW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9pbmNs
-dWRlL2xpbnV4L25ldGxpbmsuaCBiL2luY2x1ZGUvbGludXgvbmV0bGluay5oIGluZGV4DQo+ID4g
-NzVkN2RlMy4uYWJlOTFlZCAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L25ldGxpbmsu
-aA0KPiA+ICsrKyBiL2luY2x1ZGUvbGludXgvbmV0bGluay5oDQo+ID4gQEAgLTM1MSw1ICszNTEs
-NiBAQCBib29sIG5ldGxpbmtfbnNfY2FwYWJsZShjb25zdCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLA0K
-PiA+ICAJCQlzdHJ1Y3QgdXNlcl9uYW1lc3BhY2UgKm5zLCBpbnQgY2FwKTsgIGJvb2wNCj4gbmV0
-bGlua19jYXBhYmxlKGNvbnN0DQo+ID4gc3RydWN0IHNrX2J1ZmYgKnNrYiwgaW50IGNhcCk7ICBi
-b29sIG5ldGxpbmtfbmV0X2NhcGFibGUoY29uc3Qgc3RydWN0DQo+ID4gc2tfYnVmZiAqc2tiLCBp
-bnQgY2FwKTsNCj4gPiArc3RydWN0IHNrX2J1ZmYgKm5ldGxpbmtfYWxsb2NfbGFyZ2Vfc2tiKHVu
-c2lnbmVkIGludCBzaXplLCBpbnQNCj4gPiArYnJvYWRjYXN0KTsNCj4gPg0KPiA+ICAjZW5kaWYJ
-LyogX19MSU5VWF9ORVRMSU5LX0ggKi8NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvbmV0
-bGluay5oIGIvaW5jbHVkZS9uZXQvbmV0bGluay5oIGluZGV4DQo+ID4gODNiZGY3OC4uN2QzMTIx
-NyAxMDA2NDQNCj4gPiAtLS0gYS9pbmNsdWRlL25ldC9uZXRsaW5rLmgNCj4gPiArKysgYi9pbmNs
-dWRlL25ldC9uZXRsaW5rLmgNCj4gPiBAQCAtMTAxMSw2ICsxMDExLDIzIEBAIHN0YXRpYyBpbmxp
-bmUgc3RydWN0IHNrX2J1ZmYgKm5sbXNnX25ldyhzaXplX3QNCj4gPiBwYXlsb2FkLCBnZnBfdCBm
-bGFncykgIH0NCj4gPg0KPiA+ICAvKioNCj4gPiArICogdm5sbXNnX25ldyAtIEFsbG9jYXRlIGEg
-bmV3IG5ldGxpbmsgbWVzc2FnZSB3aXRoIG5vbi1jb250aWd1b3VzDQo+ID4gKyAqIHBoeXNpY2Fs
-IG1lbW9yeQ0KPiA+ICsgKiBAcGF5bG9hZDogc2l6ZSBvZiB0aGUgbWVzc2FnZSBwYXlsb2FkDQo+
-ID4gKyAqDQo+ID4gKyAqIFVzZSBOTE1TR19ERUZBVUxUX1NJWkUgaWYgdGhlIHNpemUgb2YgdGhl
-IHBheWxvYWQgaXNuJ3Qga25vd24NCj4gPiArICogYW5kIGEgZ29vZCBkZWZhdWx0IGlzIG5lZWRl
-ZC4NCj4gPiArICoNCj4gPiArICogVGhlIGFsbG9jYXRlZCBza2IgaXMgdW5hYmxlIHRvIGhhdmUg
-ZnJhZyBwYWdlIGZvciBzaGluZm8tPmZyYWdzKiwNCj4gPiArICogYXMgdGhlIE5VTEwgc2V0dGlu
-ZyBmb3Igc2tiLT5oZWFkIGluIG5ldGxpbmtfc2tiX2Rlc3RydWN0b3IoKSB3aWxsDQo+ID4gKyAq
-IGJ5cGFzcyBtb3N0IG9mIHRoZSBoYW5kbGluZyBpbiBza2JfcmVsZWFzZV9kYXRhKCkgICovIHN0
-YXRpYw0KPiA+ICtpbmxpbmUgc3RydWN0IHNrX2J1ZmYgKnZubG1zZ19uZXcoc2l6ZV90IHBheWxv
-YWQpIHsNCj4gPiArCXJldHVybiBuZXRsaW5rX2FsbG9jX2xhcmdlX3NrYihubG1zZ190b3RhbF9z
-aXplKHBheWxvYWQpLCAwKTsgfQ0KPiANCj4gVGhlIG5sbXNnX25ldygpIGhhcyB0aGUgYmVsb3cg
-cGFyYW1ldGVycywgdGhlcmUgaXMgbm8gZ2ZwIGZsYWdzIGZvcg0KPiB2bmxtc2dfbmV3KCkgYW5k
-IGFsd2F5cyBhc3N1bWluZyBHRlBfS0VSTkVMPw0KPiANCg0KSSB0aGluayB0aGF0IHZubG1zZ19u
-ZXcgaXMgc2ltaWxhciBhcyB2bWFsbG9jLCAgc28gbm8gZmxhZyBpcyBuZWVkZWQsIGFuZCBhbHdh
-eXMgYXNzdW1pbmcgR0ZQX0tFUk5FTCANCg0KLUxpDQo+ICAqIEBwYXlsb2FkOiBzaXplIG9mIHRo
-ZSBtZXNzYWdlIHBheWxvYWQNCj4gICogQGZsYWdzOiB0aGUgdHlwZSBvZiBtZW1vcnkgdG8gYWxs
-b2NhdGUuDQo+IA0KPiBUaGVyZSBhcmUgYSBsb3Qgb2YgY2FsbGVycyBmb3Igbmxtc2dfbmV3KCks
-IEkgYW0gd29uZGVyaW5nIGhvdyBtYW55IG9mIGV4aXN0aW5nDQo+IG5sbXNnX25ldygpIGNhbGxl
-ciBjYW4gY2hhbmdlIHRvIHVzZSB2bmxtc2dfbmV3KCkuDQo+IGh0dHBzOi8vZWxpeGlyLmZyZWUt
-ZWxlY3Ryb25zLmNvbS9saW51eC92Ni43LXJjMS9BL2lkZW50L25sbXNnX25ldw0KPiANCg0K
+On Tue, Nov 14, 2023 at 09:03:09AM +0200, Baruch Siach wrote:
+> One newline per line should be enough. Reduce the verbosity of
+> descriptors dump.
+
+Why not. Thanks.
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+-Serge(y)
+
+> 
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3e50fd53a617..39336fe5e89d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6202,7 +6202,6 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
+>  				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+>  			p++;
+>  		}
+> -		seq_printf(seq, "\n");
+>  	}
+>  }
+>  
+> -- 
+> 2.42.0
+> 
+> 
 
