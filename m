@@ -1,253 +1,168 @@
-Return-Path: <netdev+bounces-47693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDEE7EAFBD
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:21:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739DB7EAFC4
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146E31F241CC
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2293B281163
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FCC3E49B;
-	Tue, 14 Nov 2023 12:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3215B3FB01;
+	Tue, 14 Nov 2023 12:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RzDdaCIr"
+	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="Su+06ohn"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCF43E49A
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:21:43 +0000 (UTC)
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06778F0
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:21:41 -0800 (PST)
-Received: by mail-vs1-xe2c.google.com with SMTP id ada2fe7eead31-45da75867d3so1979002137.2
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:21:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699964500; x=1700569300; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7rB/rX7UtaFpyUffk9v/aC4bo/cSeZRZqRPvQXU+ii4=;
-        b=RzDdaCIrrEQFTNYqm9vP0XVvrltW2psmt0183H4aVzZSkvEUNeXtpW21q4rBMqNgLw
-         i1oglvZeAx8NjJSjyVG67yG2IJdZIt5DE1gVkX1WPstlOFP0Np7vQ49mt9LJslFjBXSc
-         YZF/9OaZu5lNHaN/WcANhIHSIRnOXuaQeBLUUDaVM2611cLtjgFmes7YZssFhXBMsdnC
-         SpUzY5TkVmH1PTx8oJMX1NIZ4XsfEZk9VPifmbaX11FqLI03HMxeApt1xFw0ospZ7hPJ
-         WWjV1r9nvmSClml0A/O6aqlm1tsQZ5Gs1OcWCLooIEGpl1Azc/tsAAZ6uJsR44SzrvyE
-         N9IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699964500; x=1700569300;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7rB/rX7UtaFpyUffk9v/aC4bo/cSeZRZqRPvQXU+ii4=;
-        b=KPaOYTSY8idwSCA9XV+QxYY20ZyIyDIcqh4Uef6aRZsGNMyPfB4OpqAYZVezT50eDZ
-         9av2uchU9Y0wf1K7h2wjNX3oJyEpYE6wChDySA/6hjePlZWCzKGCqzQNmB9c5dDctWAa
-         0iMl4TH2m4dp7+8ZbdEGdETF2N4zwcWifUHiSu70RjUFtwsLtbYsZvjq8phZQR0XQmg7
-         lLrjG+zr+IVAGzWA3Th/xTQ6RHnSJYFhQI+ftVhlqmDh4o0CLGI4bbntYiTL0elMtr7F
-         v/+i0Ll0DtULFNxldKwAZxfKMiV4vfE+RPcCL8utA/kTXkM7XdHgeBNuZCA7DzdoPPr5
-         Ktpw==
-X-Gm-Message-State: AOJu0YyUmTjT71aLydgYRcw1LWIU6EOfV/AzASycIEFtbGP9nOCOatKA
-	LtYDJIPwZXsJ8AHwhs2rTN3ejuJh5PTPDJpONyf+Vebf5ceQefnuQGilGQ==
-X-Google-Smtp-Source: AGHT+IGc1Ov9oNbuvwvh4LdxXUNBo/5A+bmcIQaRqmSXDOC/iNxjkaUqIkEq8ZfknmFTAIOaX2mUNtHflVlsKzJ2EtE=
-X-Received: by 2002:a67:e10d:0:b0:45f:68cb:d55d with SMTP id
- d13-20020a67e10d000000b0045f68cbd55dmr8102580vsl.15.1699964499870; Tue, 14
- Nov 2023 04:21:39 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C483FB00;
+	Tue, 14 Nov 2023 12:23:07 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2115.outbound.protection.outlook.com [40.107.7.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61B94F0;
+	Tue, 14 Nov 2023 04:23:06 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=i+Zt7VabX5dLUzT3K4wKBnBQk6pEqBVMzR2YzDnj/CsaDlzLRF9CS3ENcD6n4ZIxG/qmMFYUUTy+InJewX2dk+r5pHzN66x8FoDZChFHxGDIEKzm139pCiGZ5vzOJZxKjTtLtiEqoDua9LJEx0aqTj98NUkkN+P775E89AioFcTaHjYTebkqIsz2zbgQ+wT5G44cO+b6Qfl0sRENZ6ISVTia9dtfKwBtxe8zCtXgOHa4Lq48M0e6pvVWWQsSY6CJPubDOp7iRU+JWKCVwqCzRHp7/d5OUG0EnJ7pN9kWxcYwRlaE8SJWQLctLyJLT5gCFnaaqgNup/vuMbQRv7sfUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=084P5TCrfriA559dxobDpcFEy2sCup5lDG1QUb2LZAI=;
+ b=IEN2c8D2sgLlsMXoN1Kefc6CMDOGxoZLH5pGVYYpIKMZREnTAjlAwwgnjZXXMxak7aUhl4crLb4Z5oT3Qow5GsRPLaAb4Pmz2bYxYQ2zs1Cfxolesi9qYwu5msIcfvEqMCpTs23xOhs9qtggHZLUbhiCruav18MubC27NGO84hdM8dM6C1zj2qWcQH1niBj88cup6ykKczf4MHT4Pz/eSkvQI/t2FXaFVf4eL1cHcu6/fV9ZplJb5tdPBSjkt/Q8lEv3OegPefMfWPLVwlpnK3GL8vXe2crxIjuUMg/p5QPu1t45BjsB4IRkixds6Y/emT2Zp8x3j6dMjexyX1uGyA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
+ header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=084P5TCrfriA559dxobDpcFEy2sCup5lDG1QUb2LZAI=;
+ b=Su+06ohndhNXVJ6NJV2nXZMakjM0q40MdT32j2Phf7UWt4a1In8q2T5G/mplQzswlWcYDEjXKazm2PfC4pk1JUOdkPHjEKb+P4G+a/+nF+7VM1lDUvgDdjNafHbNZJqRhO+LNSBgOPjDtnrKZ3bQd1+2H89cU9VL1I/Xaj60QBk=
+Received: from AM6PR03MB3943.eurprd03.prod.outlook.com (2603:10a6:20b:26::24)
+ by DB8PR03MB6170.eurprd03.prod.outlook.com (2603:10a6:10:141::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.19; Tue, 14 Nov
+ 2023 12:23:02 +0000
+Received: from AM6PR03MB3943.eurprd03.prod.outlook.com
+ ([fe80::99e4:a3b2:357f:b073]) by AM6PR03MB3943.eurprd03.prod.outlook.com
+ ([fe80::99e4:a3b2:357f:b073%3]) with mapi id 15.20.6977.029; Tue, 14 Nov 2023
+ 12:23:02 +0000
+From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linus.walleij@linaro.org" <linus.walleij@linaro.org>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "vivien.didelot@gmail.com" <vivien.didelot@gmail.com>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "olteanv@gmail.com"
+	<olteanv@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "arinc.unal@arinc9.com" <arinc.unal@arinc9.com>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring
+	<robh@kernel.org>
+Subject: Re: [RFC net-next 1/5] dt-bindings: net: dsa: realtek: reset-gpios is
+ not required
+Thread-Topic: [RFC net-next 1/5] dt-bindings: net: dsa: realtek: reset-gpios
+ is not required
+Thread-Index: AQHaFOoHFxdASMBB+0KGJ90WdhgJ6bB5wNAA
+Date: Tue, 14 Nov 2023 12:23:02 +0000
+Message-ID: <5zxa73cgtgxyiqgcpcl6s33srrazr5htpzluoxptu3qsupoxgt@qcwpzmmwymbf>
+References: <20231111215647.4966-1-luizluca@gmail.com>
+ <20231111215647.4966-2-luizluca@gmail.com>
+In-Reply-To: <20231111215647.4966-2-luizluca@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM6PR03MB3943:EE_|DB8PR03MB6170:EE_
+x-ms-office365-filtering-correlation-id: d5a76613-0097-47b8-d4aa-08dbe50c727a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ CPv2uyMsCwFg24RTkGzJJhw/bxb9uiQiwoZaUgf+vn9CUK/bwMwzxv4cMKub3Y/KCYzyyZmpXN27Kcfhem5qhzThp0Vh6s58eDfpfC7CC3bFFnHTNQFeqKIkT/qXX9fDI5UzQH9bjEEhofyS34cZsfKnAOAArrWgngWXcXDwezP63VPr+kjIrNhVWFeYNfu7kgkKAXNMf97xILURoUn93Zu98JFc4T4cXcFKFR30+Ny/YeF+ox4uBzAJnrocRpC9tnRttCGuDxzKf4C6S5tsYE91KCd06YD17da7+NfavSfbYjbCZx8mYDvE2k/koIlHXcyrvpNfP70T7+ymf6ntDOmm4FMgR9McG0ATIOLg6K5ju/yintRQTJ1EEO5awBF8NVZrm+XrNFO8JvCenZL9GtcdaA37rrUUnkg9WuLuVLEqs7uqOwmoyWyTKlmQvfZJyLoJCgerim6C37MToiSHw0uIyVw3ZBT/mpCJlLDybWtf59A5NPCkMfMbUIHO/jvdh0p6oU1TZ7DedJWLJE2Ss3LAxqOLvMHoZJxTclW/XY5tVs/1tsqBJQFD4LzQpHbmhNIyKs/Zrv6C5lxtYG1doXJ8iL/8AqXwgW/lgfyEapVqsbbp0Yz8exZJThLhwTJenORTDilDRM/+KQiTd9lLsw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR03MB3943.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(346002)(366004)(376002)(39860400002)(136003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(54906003)(66556008)(66946007)(64756008)(66446008)(6916009)(66476007)(91956017)(76116006)(38100700002)(316002)(85202003)(38070700009)(86362001)(122000001)(85182001)(26005)(9686003)(83380400001)(6512007)(33716001)(6506007)(66574015)(2906002)(6486002)(8676002)(4744005)(478600001)(5660300002)(7416002)(4326008)(8936002)(71200400001)(41300700001)(27246005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?WjN5V2dIalQ2UTlRLy9qNnM4WHE5K2JHTG1ZdWlWYTJ4bGxPNDZ1S3IwUXJp?=
+ =?utf-8?B?aHJQSVZUdGpUQlkyaWNmNnZDY2NYaE13YjYvT1lRWWVEUDJQcmw2NGV6c29C?=
+ =?utf-8?B?aW96NU4wa2lWV2FMSWluUFl5aVBIOW5pWnNlWGgyN0VPZWpEZmtlWWZkNDJ2?=
+ =?utf-8?B?WnZiRGRoNzlWQ3B5dzd2NitGd1lIMGhBZU9uNFVBRmFpSXkrc1RFOHZsY1NC?=
+ =?utf-8?B?RzIyWitMSzd4QkFyYlpkanpBWE0yRnJRMkt5LytUNXpLaXhhVGdIQ3kvTko3?=
+ =?utf-8?B?Z0E1SURhUnh3N3VWVjZRWWNPNGVYWXFiQlBQczVibEdkNWRDc04ydUVKMlF4?=
+ =?utf-8?B?TTlXVlZlNXVnTllBWXc3dHZFWlpGbUpOYnlraVJoT3Z4S3dDai9xRlYreHA4?=
+ =?utf-8?B?azQxZllMWXhPY1IvNDVxY1JnaFNKa2xUekFIakRTMSttaXo1Z05XakxBOHAr?=
+ =?utf-8?B?d3lkMWNqd0ROUFZ2ZGRlYnVHN0FnOWE5WmRjUk01WXdoQ1hCb1BNSnRLMGV4?=
+ =?utf-8?B?aW1SMHUwQ0dtNkt4WVdRcGh5MnE2eWl2K2k3WnhCc3l5TE1wcmdMYW5pck1G?=
+ =?utf-8?B?RDU5S0grUlVZblRzcHhVbExKOHhObWkwMm5nMXBkSS9nczl5T09HRmRwa1RZ?=
+ =?utf-8?B?Q2l6TlNRNXhHVDFLaFNXc1BTaDZ1NmFTdDFyVXAxSFRVVE5PSktGcnVNOUQ4?=
+ =?utf-8?B?RXNVdlIwUVQvRHZZdStFNTlPMlMyNFNjNEgwQlliVHRvYnVPeUxuS2RkUzJm?=
+ =?utf-8?B?cFZQaXNJd3lldUdKbHdQTmtKRi9TbTZZMkNFMXVJUzRJc2FYNWtUWVBJOTg1?=
+ =?utf-8?B?Tlh5c0t5TnZJdkRQNEhiV0pWSExETzJqUTllTXJYMjhXMW9DZVJyOXhUWHk3?=
+ =?utf-8?B?L3NlMEMxczc1enl6Yk92QlVTRE8rTHVFQzZrWnF4OWt2K29sbE4xMndOeVdB?=
+ =?utf-8?B?QmVEUlFUK3VKT2IyVWR1RGZzKzFPd3hzbGRDamwrRlZqaTZVd0JKUmx3c3B6?=
+ =?utf-8?B?WDFtcEkzVkNDR3hUMk5jNG9BeE5lZ1NUdUNyamMvY0JpMk5KUlpzQU9tMkFD?=
+ =?utf-8?B?YjJoV1kweXpOdHFEWDlpUXhnaEhZcUZmZ3hXZFNlQmVJNityb0UveFdLNTNL?=
+ =?utf-8?B?cWJsclpJdHAycXhSeFhOY0Vab0hCWHVHWkEwYjJSZjRtbnNjVGV1ZTJINjQz?=
+ =?utf-8?B?L3lXZEhKSjFZQWwxVTA1NDFTcGx2L2xiSjVGYmlmdGVBZWU4cWUreE80ME5K?=
+ =?utf-8?B?WUdWbE45Vm9XbDh4Tk1zVUxpQVh1bEJXNGN0dnFyVG5tWU50S0tONlQrSmlB?=
+ =?utf-8?B?VEw5MWJGVEo1Nkx5UFVxMnRJY2FjWXI3UGhIOEhHbU8wNUpndkgza3MrUkFN?=
+ =?utf-8?B?eVprZ2V4Q2kyTnQ2U3pxbHIya3N0UFRJMXp3SXJkVU9hQVJGcTRtTjAzTlFH?=
+ =?utf-8?B?WDF0RXRCNUNLRitVU3gvelUwVG0zSHRzYmNQQnZHdjFLTXVaYVB4MzRaUFFW?=
+ =?utf-8?B?WHRpRFQvT1VjazlrcFoxbjNRQW52SXFYdjhMMnozNDNWQmwySlg2NE9USUFu?=
+ =?utf-8?B?eTV5MS9WSml1SVQxODU3ZGt4VWxSYjhIMElocVhEbnJDMTk3WlBpRWNJakRP?=
+ =?utf-8?B?Qmp0MU83Q1VvZEJ6c015b1J5ZVYxZmg4Qk5pY2UzSWVaWlh3K016dkdBZW1W?=
+ =?utf-8?B?TTlTMFA3NmRuUnJnU2ZaTElDNEtWQktRenE1anZNUEREUDUwMkJXTGc1WDJp?=
+ =?utf-8?B?dkpmem9iSWVIdTNhRVFMUFhScVR0ekxDOXdFNHBjMEJ5bytWRHN5bTRaSTUv?=
+ =?utf-8?B?anNjKzIvUTNDYTRoYWlFeDMxSGxSUHFIK0RCcnRLZlk1WG9BVm90UEZUMGs2?=
+ =?utf-8?B?R0Z0TGlIcnN6TkIzRGhJRGVhN1F6WWJPQ0JYRTgzZGV5VERVT01RcnlnMjNG?=
+ =?utf-8?B?eXVlb2ZxelBpcEp1VnBudHhHbnd1ajVWbEJ3UFN5VU50TCtMZTZualdpUEgy?=
+ =?utf-8?B?aGkzNzVvSVFxS0lGai9tMUQ2c2VDYVdtcXRQMkdQV3NuNVdkbHc2MDlYdmtk?=
+ =?utf-8?B?OHFEb0VBSTY3L1JXQ0U0bXYyMTcrb2xYbG1oN0VzTGJRU1BYRW12RHJFa0JY?=
+ =?utf-8?B?RkhIYi9sbmFucnJDQXlUUTlielN3RDQxRDFzNUYxaTk4RERXdmR2YXUrWGlh?=
+ =?utf-8?B?Umc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BB368322A3778840B69638FCCFA4CBD7@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com> <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org> <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
-In-Reply-To: <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 14 Nov 2023 04:21:26 -0800
-Message-ID: <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, Matthew Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: bang-olufsen.dk
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB3943.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5a76613-0097-47b8-d4aa-08dbe50c727a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 12:23:02.5562
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: D+ENWiGFAerDBNIOcH1UQsYMA4QcwQY1DiNFWVuKFs8IMX54PPlLJP8stZEX9qTgoN7UfjaCOOnrHW7vR9fAqg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR03MB6170
 
-On Tue, Nov 14, 2023 at 12:23=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.c=
-om> wrote:
->
-> +cc Christian, Jason and Willy
->
-> On 2023/11/14 7:05, Jakub Kicinski wrote:
-> > On Mon, 13 Nov 2023 05:42:16 -0800 Mina Almasry wrote:
-> >> You're doing exactly what I think you're doing, and what was nacked in=
- RFC v1.
-> >>
-> >> You've converted 'struct page_pool_iov' to essentially become a
-> >> duplicate of 'struct page'. Then, you're casting page_pool_iov* into
-> >> struct page* in mp_dmabuf_devmem_alloc_pages(), then, you're calling
-> >> mm APIs like page_ref_*() on the page_pool_iov* because you've fooled
-> >> the mm stack into thinking dma-buf memory is a struct page.
->
-> Yes, something like above, but I am not sure about the 'fooled the mm
-> stack into thinking dma-buf memory is a struct page' part, because:
-> 1. We never let the 'struct page' for devmem leaking out of net stacking
->    through the 'not kmap()able and not readable' checking in your patchse=
-t.
-
-RFC never used dma-buf pages outside the net stack, so that is the same.
-
-You are not able to get rid of the 'net kmap()able and not readable'
-checking with this approach, because dma-buf memory is fundamentally
-unkmapable and unreadable. This approach would still need
-skb_frags_not_readable checks in net stack, so that is also the same.
-
-> 2. We inititiate page->_refcount for devmem to one and it remains as one,
->    we will never call page_ref_inc()/page_ref_dec()/get_page()/put_page()=
-,
->    instead, we use page pool's pp_frag_count to do reference counting for
->    devmem page in patch 6.
->
-
-I'm not sure that moves the needle in terms of allowing dma-buf
-memory to look like struct pages.
-
-> >>
-> >> RFC v1 was almost exactly the same, except instead of creating a
-> >> duplicate definition of struct page, it just allocated 'struct page'
-> >> instead of allocating another struct that is identical to struct page
-> >> and casting it into struct page.
->
-> Perhaps it is more accurate to say this is something between RFC v1 and
-> RFC v3, in order to decouple 'struct page' for devmem from mm subsystem,
-> but still have most unified handling for both normal memory and devmem
-> in page pool and net stack.
->
-> The main difference between this patchset and RFC v1:
-> 1. The mm subsystem is not supposed to see the 'struct page' for devmem
->    in this patchset, I guess we could say it is decoupled from the mm
->    subsystem even though we still call PageTail()/page_ref_count()/
->    page_is_pfmemalloc() on 'struct page' for devmem.
->
-
-In this patchset you pretty much allocate a struct page for your
-dma-buf memory, and then cast it into a struct page, so all the mm
-calls in page_pool.c are seeing a struct page when it's really dma-buf
-memory.
-
-'even though we still call
-PageTail()/page_ref_count()/page_is_pfmemalloc() on 'struct page' for
-devmem' is basically making dma-buf memory look like struct pages.
-
-Actually because you put the 'strtuct page for devmem' in
-skb->bv_frag, the net stack will grab the 'struct page' for devmem
-using skb_frag_page() then call things like page_address(), kmap,
-get_page, put_page, etc, etc, etc.
-
-> The main difference between this patchset and RFC v3:
-> 1. It reuses the 'struct page' to have more unified handling between
->    normal page and devmem page for net stack.
-
-This is what was nacked in RFC v1.
-
-> 2. It relies on the page->pp_frag_count to do reference counting.
->
-
-I don't see you change any of the page_ref_* calls in page_pool.c, for
-example this one:
-
-https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L601
-
-So the reference the page_pool is seeing is actually page->_refcount,
-not page->pp_frag_count? I'm confused here. Is this a bug in the
-patchset?
-
-> >>
-> >> I don't think what you're doing here reverses the nacks I got in RFC
-> >> v1. You also did not CC any dma-buf or mm people on this proposal that
-> >> would bring up these concerns again.
-> >
-> > Right, but the mirror struct has some appeal to a non-mm person like
-> > myself. The problem IIUC is that this patch is the wrong way around, we
-> > should be converting everyone who can deal with non-host mem to struct
-> > page_pool_iov. Using page_address() on ppiov which hns3 seems to do in
-> > this series does not compute for me.
->
-> The hacking use of ppiov in hns3 is only used to do the some prototype
-> testing, so ignore it.
->
-> >
-> > Then we can turn the existing non-iov helpers to be a thin wrapper with
-> > just a cast from struct page to struct page_pool_iov, and a call of the
-> > iov helper. Again - never cast the other way around.
->
-> I am agreed that a cast from struct page to struct page_pool_iov is allow=
-ed,
-> but a cast from struct page_pool_iov to struct page is not allowed if I a=
-m
-> understanding you correctly.
->
-> Before we can also completely decouple 'struct page' allocated using budd=
-y
-> allocator directly from mm subsystem in netstack, below is what I have in
-> mind in order to support different memory provider.
->
->                                 +--------------+
->                                 |   Netstack   |
->                                 |'struct page' |
->                                 +--------------+
->                                         ^
->                                         |
->                                         |
->                                         v
->                               +---------------------+
-> +----------------------+      |                     |      +-------------=
---+
-> |      devmem MP       |<---->|     Page pool       |----->|    **** MP  =
-  |
-> |'struct page_pool_iov'|      |   'struct page'     |      |'struct **_io=
-v'|
-> +----------------------+      |                     |      +-------------=
---+
->                               +---------------------+
->                                         ^
->                                         |
->                                         |
->                                         v
->                                 +---------------+
->                                 |    Driver     |
->                                 | 'struct page' |
->                                 +---------------+
->
-> I would expect net stack, page pool, driver still see the 'struct page',
-> only memory provider see the specific struct for itself, for the above,
-> devmem memory provider sees the 'struct page_pool_iov'.
->
-> The reason I still expect driver to see the 'struct page' is that driver
-> will still need to support normal memory besides devmem.
->
-> >
-> > Also I think this conversion can be done completely separately from the
-> > mem provider changes. Just add struct page_pool_iov and start using it.
->
-> I am not sure I understand what does "Just add struct page_pool_iov and
-> start using it" mean yet.
->
-> >
-> > Does that make more sense?
-> >
-> > .
-> >
-
-
-
---
-Thanks,
-Mina
+T24gU2F0LCBOb3YgMTEsIDIwMjMgYXQgMDY6NTE6MDRQTSAtMDMwMCwgTHVpeiBBbmdlbG8gRGFy
+b3MgZGUgTHVjYSB3cm90ZToNCj4gVGhlICdyZXNldC1ncGlvcycgc2hvdWxkIG5vdCBiZSBtYW5k
+YXRvcnkuIGFsdGhvdWdoIHRoZXkgbWlnaHQgYmUNCj4gcmVxdWlyZWQgZm9yIHNvbWUgZGV2aWNl
+cyBpZiB0aGUgc3dpdGNoIHJlc2V0IHdhcyBsZWZ0IGFzc2VydGVkIGJ5IGENCj4gcHJldmlvdXMg
+ZHJpdmVyLCBzdWNoIGFzIHRoZSBib290bG9hZGVyLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogTHVp
+eiBBbmdlbG8gRGFyb3MgZGUgTHVjYSA8bHVpemx1Y2FAZ21haWwuY29tPg0KPiBDYzogZGV2aWNl
+dHJlZUB2Z2VyLmtlcm5lbC5vcmcNCj4gQWNrZWQtYnk6IEFyxLFuw6cgw5xOQUwgPGFyaW5jLnVu
+YWxAYXJpbmM5LmNvbT4NCj4gQWNrZWQtYnk6IFJvYiBIZXJyaW5nIDxyb2JoQGtlcm5lbC5vcmc+
+DQoNClJldmlld2VkLWJ5OiBBbHZpbiDFoGlwcmFnYSA8YWxzaUBiYW5nLW9sdWZzZW4uZGs+DQoN
+Cj4gLS0tDQo+ICBEb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2RzYS9yZWFs
+dGVrLnlhbWwgfCAxIC0NCj4gIDEgZmlsZSBjaGFuZ2VkLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBk
+aWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9kc2EvcmVh
+bHRlay55YW1sIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9kc2EvcmVh
+bHRlay55YW1sDQo+IGluZGV4IGNjZTY5MmY1N2IwOC4uNDZlMTEzZGY3N2M4IDEwMDY0NA0KPiAt
+LS0gYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L2RzYS9yZWFsdGVrLnlh
+bWwNCj4gKysrIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9kc2EvcmVh
+bHRlay55YW1sDQo+IEBAIC0xMjcsNyArMTI3LDYgQEAgZWxzZToNCj4gICAgICAtIG1kYy1ncGlv
+cw0KPiAgICAgIC0gbWRpby1ncGlvcw0KPiAgICAgIC0gbWRpbw0KPiAtICAgIC0gcmVzZXQtZ3Bp
+b3MNCj4gIA0KPiAgcmVxdWlyZWQ6DQo+ICAgIC0gY29tcGF0aWJsZQ0KPiAtLSANCj4gMi40Mi4x
+DQo+
 
