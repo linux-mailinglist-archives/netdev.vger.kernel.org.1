@@ -1,184 +1,297 @@
-Return-Path: <netdev+bounces-47773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E2E7EB578
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:23:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 131837EB59E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:37:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 815FD281319
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BE7C1C20A42
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E8E2C196;
-	Tue, 14 Nov 2023 17:23:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723DF2C193;
+	Tue, 14 Nov 2023 17:37:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NP2Cqp49"
+	dkim=pass (1024-bit key) header.d=lafranque.net header.i=@lafranque.net header.b="Z7lljUif"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9462C18A
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 17:23:49 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB15CF1
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:23:47 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-daf6c1591d5so2197600276.1
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:23:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699982627; x=1700587427; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eUkDREpvnPGXIq+muWkYhdTXd+teuC8g8pb7QYn5qX4=;
-        b=NP2Cqp49hsT+6lTkvg5/cdDi3hHscaqBmd1thbH+OnQ1qCIboVMSUdeS4xdHIZeS8O
-         T8UsLE4W7bPS2Tsd49zEm5tcqOFX+g/cjwNYWI7D8pHtbBNLOPthr98pAzsZs4RMo1d6
-         Rr6e6LF+9LXngrLR5cFKmQHNcZTB4vkGmBzPZmtWVxMwAyMPUzcomim8D9EGCTlXio5U
-         U2BRS1W63AporyAGYc1WWp4fXkPOKoB5qTghAH+eTwe6LuijVV3J9w8PNZXqWSo3oSrF
-         V0ik69nOqGFKEQ9xmEROMOsJx7dKQrlO3EMypGLzoBUt+aYqIyUJXVF1gyG77u1egMFU
-         WLGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699982627; x=1700587427;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eUkDREpvnPGXIq+muWkYhdTXd+teuC8g8pb7QYn5qX4=;
-        b=TmFKfHgAD4BcCWb9bY9+55Kxz4wOvx+cQH2ZRf7BJYlo9dZlyGAHZciEDaOBgV1g1m
-         Kxkl0e6M6WRTx/EPB4aXEZut8E+MQa/dwvibpAJVFom6Ft2+6XACqYNka0n0PxR+4YGm
-         T2QQ3Oy74ddDqvkVjdZ5M/gy4Qcgxn/OqZJ9D+Kxc430rFur6U1q2nNleZ+Qkl6f6oMc
-         RPfV0jDr546PJ8VJwILjRDhQUG5Qw988VxC6iRSZz0h7MMzwZHLJYv5HepUrEbQHjT0v
-         4ceHnMGRIVgH5Y9BLIG425g+pBqmQdfXkEwBD4qk4/OHGqMHJ45wftJyJ6wEFHgviuLe
-         IaMw==
-X-Gm-Message-State: AOJu0Yy1JOpVdxsrsNY/vhnh+e9LdCd2QXGwLgqryBErKPMA+fQt/+s0
-	r0BuwpTPmv9wDVusOcQoZSbYpXpYR71RQg==
-X-Google-Smtp-Source: AGHT+IG8Z9o48pH6RXZanf6JC6wetwZf9RrfuUSh9UnI66oKdoV5qnMbnzp837IECufwCZ/V4BvmJAciQhPQ+A==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:694:b0:d9a:ff08:e090 with SMTP
- id i20-20020a056902069400b00d9aff08e090mr236080ybt.5.1699982627133; Tue, 14
- Nov 2023 09:23:47 -0800 (PST)
-Date: Tue, 14 Nov 2023 17:23:41 +0000
-In-Reply-To: <20231114172341.1306769-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACE02C180
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 17:37:12 +0000 (UTC)
+Received: from mail.lac-coloc.fr (unknown [45.90.160.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4624994
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:37:10 -0800 (PST)
+Authentication-Results: mail.lac-coloc.fr;
+	auth=pass (plain)
+From: Alce Lafranque <alce@lafranque.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	netdev@vger.kernel.org
+Cc: Alce Lafranque <alce@lafranque.net>,
+	Vincent Bernat <vincent@bernat.ch>
+Subject: [PATCH net-next v9] vxlan: add support for flowlabel inherit
+Date: Tue, 14 Nov 2023 11:36:57 -0600
+Message-Id: <20231114173657.1553-1-alce@lafranque.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231114172341.1306769-1-edumazet@google.com>
-X-Mailer: git-send-email 2.42.0.869.gea05f2083d-goog
-Message-ID: <20231114172341.1306769-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] tcp: no longer abort SYN_SENT when receiving
- some ICMP
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Neal Cardwell <ncardwell@google.com>, Yuchung Cheng <ycheng@google.com>, 
-	David Morley <morleyd@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.lac-coloc.fr (Haraka/3.0.1) with ESMTPSA id 5127CCC8-8AD7-4065-B3AA-1FCF9087A34F.1
+	envelope-from <alce@lafranque.net>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Tue, 14 Nov 2023 17:37:07 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=lafranque.net; s=s20211111873;
+	h=from:subject:date:message-id:to:cc:mime-version;
+	bh=rvdOA4cGg8x8rUUD+z/tgkH/0c3HC35Y8Ij/5fVZ2WU=;
+	b=Z7lljUifoFebcQ7f6WmfhKeisPC5YNJV1sY21I+jNvmHpEGkCww/KkTJWBK385HQgVvJSsQ7Et
+	No/s2MnnEC2mfAMfTvLfSnmZnufnSQ5a7/9ARXV1bYYpylSCK+ctGAG3ReYtqVEnYYZtj7Ao4PJY
+	JCZJrx95bYZDyw2u5Ze60=
 
-Currently, non fatal ICMP messages received on behalf
-of SYN_SENT sockets do call tcp_ld_RTO_revert()
-to implement RFC 6069, but immediately call tcp_done(),
-thus aborting the connect() attempt.
+By default, VXLAN encapsulation over IPv6 sets the flow label to 0, with
+an option for a fixed value. This commits add the ability to inherit the
+flow label from the inner packet, like for other tunnel implementations.
+This enables devices using only L3 headers for ECMP to correctly balance
+VXLAN-encapsulated IPv6 packets.
 
-This violates RFC 1122 following requirement:
+```
+$ ./ip/ip link add dummy1 type dummy
+$ ./ip/ip addr add 2001:db8::2/64 dev dummy1
+$ ./ip/ip link set up dev dummy1
+$ ./ip/ip link add vxlan1 type vxlan id 100 flowlabel inherit remote 2001:db8::1 local 2001:db8::2
+$ ./ip/ip link set up dev vxlan1
+$ ./ip/ip addr add 2001:db8:1::2/64 dev vxlan1
+$ ./ip/ip link set arp off dev vxlan1
+$ ping -q 2001:db8:1::1 &
+$ tshark -d udp.port==8472,vxlan -Vpni dummy1 -c1
+[...]
+Internet Protocol Version 6, Src: 2001:db8::2, Dst: 2001:db8::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+[...]
+Virtual eXtensible Local Area Network
+    Flags: 0x0800, VXLAN Network ID (VNI)
+    Group Policy ID: 0
+    VXLAN Network Identifier (VNI): 100
+[...]
+Internet Protocol Version 6, Src: 2001:db8:1::2, Dst: 2001:db8:1::1
+    0110 .... = Version: 6
+    .... 0000 0000 .... .... .... .... .... = Traffic Class: 0x00 (DSCP: CS0, ECN: Not-ECT)
+        .... 0000 00.. .... .... .... .... .... = Differentiated Services Codepoint: Default (0)
+        .... .... ..00 .... .... .... .... .... = Explicit Congestion Notification: Not ECN-Capable Transport (0)
+    .... 1011 0001 1010 1111 1011 = Flow Label: 0xb1afb
+```
 
-4.2.3.9  ICMP Messages
-...
-          o    Destination Unreachable -- codes 0, 1, 5
+Signed-off-by: Alce Lafranque <alce@lafranque.net>
+Co-developed-by: Vincent Bernat <vincent@bernat.ch>
+Signed-off-by: Vincent Bernat <vincent@bernat.ch>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-                 Since these Unreachable messages indicate soft error
-                 conditions, TCP MUST NOT abort the connection, and it
-                 SHOULD make the information available to the
-                 application.
-
-This patch makes sure non 'fatal' ICMP[v6] messages do not
-abort the connection attempt.
-
-It enables RFC 6069 for SYN_SENT sockets as a result.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: David Morley <morleyd@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Yuchung Cheng <ycheng@google.com>
 ---
- net/ipv4/tcp_ipv4.c | 6 ++++++
- net/ipv6/tcp_ipv6.c | 9 ++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
+v9:
+  - no change
+v8: https://lore.kernel.org/all/20231030193119.342497-1-alce@lafranque.net/
+  - Add comment for IFLA_VXLAN_LABEL_POLICY
+  - Switch to u32 for netlink attribute
+v7: https://lore.kernel.org/all/20231024165028.251294-1-alce@lafranque.net/
+  - Rebase patch
+v6: https://lore.kernel.org/all/20231022191444.220695-1-alce@lafranque.net/
+  - Rebase patch
+v5: https://lore.kernel.org/netdev/20231019180417.210523-1-alce@lafranque.net/
+  - Rollback policy label to fixed by default
+v4: https://lore.kernel.org/all/20231014132102.54051-1-alce@lafranque.net/
+  - Fix tabs
+v3: https://lore.kernel.org/all/20231014131320.51810-1-alce@lafranque.net/
+  - Adopt policy label inherit by default
+  - Set policy to label fixed when flowlabel is set
+  - Rename IFLA_VXLAN_LABEL_BEHAVIOR to IFLA_VXLAN_LABEL_POLICY
+v2: https://lore.kernel.org/all/20231007142624.739192-1-alce@lafranque.net/
+  - Use an enum instead of flag to define label behavior
+v1: https://lore.kernel.org/all/4444C5AE-FA5A-49A4-9700-7DD9D7916C0F.1@mail.lac-coloc.fr/
+---
+ drivers/net/vxlan/vxlan_core.c | 23 ++++++++++++++++++++++-
+ include/net/ip_tunnels.h       | 11 +++++++++++
+ include/net/vxlan.h            | 33 +++++++++++++++++----------------
+ include/uapi/linux/if_link.h   |  8 ++++++++
+ 4 files changed, 58 insertions(+), 17 deletions(-)
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 5f693bbd578d2261b78aa0be6bf69499bbd5117e..86cc6d36f8188ec6a761c3a949382c03e74c91f8 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -482,6 +482,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 	const int code = icmp_hdr(skb)->code;
- 	struct sock *sk;
- 	struct request_sock *fastopen;
-+	bool harderr = false;
- 	u32 seq, snd_una;
- 	int err;
- 	struct net *net = dev_net(skb->dev);
-@@ -555,6 +556,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 		goto out;
- 	case ICMP_PARAMETERPROB:
- 		err = EPROTO;
-+		harderr = true;
- 		break;
- 	case ICMP_DEST_UNREACH:
- 		if (code > NR_ICMP_UNREACH)
-@@ -579,6 +581,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 		}
- 
- 		err = icmp_err_convert[code].errno;
-+		harderr = icmp_err_convert[code].fatal;
- 		/* check if this ICMP message allows revert of backoff.
- 		 * (see RFC 6069)
- 		 */
-@@ -604,6 +607,9 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 
- 		ip_icmp_error(sk, skb, err, th->dest, info, (u8 *)th);
- 
-+		if (!harderr)
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 412c3c0b6990..764ea02ff911 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -2379,7 +2379,17 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		else
+ 			udp_sum = !(flags & VXLAN_F_UDP_ZERO_CSUM6_TX);
+ #if IS_ENABLED(CONFIG_IPV6)
+-		key.label = vxlan->cfg.label;
++		switch (vxlan->cfg.label_policy) {
++		case VXLAN_LABEL_FIXED:
++			key.label = vxlan->cfg.label;
 +			break;
-+
- 		if (!sock_owned_by_user(sk)) {
- 			WRITE_ONCE(sk->sk_err, err);
++		case VXLAN_LABEL_INHERIT:
++			key.label = ip_tunnel_get_flowlabel(old_iph, skb);
++			break;
++		default:
++			DEBUG_NET_WARN_ON_ONCE(1);
++			goto drop;
++		}
+ #endif
+ 	} else {
+ 		if (!info) {
+@@ -3366,6 +3376,7 @@ static const struct nla_policy vxlan_policy[IFLA_VXLAN_MAX + 1] = {
+ 	[IFLA_VXLAN_DF]		= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_VNIFILTER]	= { .type = NLA_U8 },
+ 	[IFLA_VXLAN_LOCALBYPASS]	= NLA_POLICY_MAX(NLA_U8, 1),
++	[IFLA_VXLAN_LABEL_POLICY]       = NLA_POLICY_MAX(NLA_U32, VXLAN_LABEL_MAX),
+ };
  
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 937a02c2e5345390ed592b19faa661cd703a23f0..43deda49cc521278f0bd869135e70bbe7aed6d35 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -381,7 +381,7 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 	struct tcp_sock *tp;
- 	__u32 seq, snd_una;
- 	struct sock *sk;
--	bool fatal;
-+	bool harderr;
- 	int err;
- 
- 	sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
-@@ -402,9 +402,9 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 		return 0;
- 	}
- 	seq = ntohl(th->seq);
--	fatal = icmpv6_err_convert(type, code, &err);
-+	harderr = icmpv6_err_convert(type, code, &err);
- 	if (sk->sk_state == TCP_NEW_SYN_RECV) {
--		tcp_req_err(sk, seq, fatal);
-+		tcp_req_err(sk, seq, harderr);
- 		return 0;
+ static int vxlan_validate(struct nlattr *tb[], struct nlattr *data[],
+@@ -3740,6 +3751,12 @@ static int vxlan_config_validate(struct net *src_net, struct vxlan_config *conf,
+ 		return -EINVAL;
  	}
  
-@@ -489,6 +489,9 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 
- 		ipv6_icmp_error(sk, skb, err, th->dest, ntohl(info), (u8 *)th);
- 
-+		if (!harderr)
-+			break;
++	if (conf->label_policy && !use_ipv6) {
++		NL_SET_ERR_MSG(extack,
++			       "Label policy only applies to IPv6 VXLAN devices");
++		return -EINVAL;
++	}
 +
- 		if (!sock_owned_by_user(sk)) {
- 			WRITE_ONCE(sk->sk_err, err);
- 			sk_error_report(sk);		/* Wake people up to see the error (see connect in sock.c) */
+ 	if (conf->remote_ifindex) {
+ 		struct net_device *lowerdev;
+ 
+@@ -4082,6 +4099,8 @@ static int vxlan_nl2conf(struct nlattr *tb[], struct nlattr *data[],
+ 	if (data[IFLA_VXLAN_LABEL])
+ 		conf->label = nla_get_be32(data[IFLA_VXLAN_LABEL]) &
+ 			     IPV6_FLOWLABEL_MASK;
++	if (data[IFLA_VXLAN_LABEL_POLICY])
++		conf->label_policy = nla_get_u32(data[IFLA_VXLAN_LABEL_POLICY]);
+ 
+ 	if (data[IFLA_VXLAN_LEARNING]) {
+ 		err = vxlan_nl2flag(conf, data, IFLA_VXLAN_LEARNING,
+@@ -4398,6 +4417,7 @@ static size_t vxlan_get_size(const struct net_device *dev)
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_TOS */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_DF */
+ 		nla_total_size(sizeof(__be32)) + /* IFLA_VXLAN_LABEL */
++		nla_total_size(sizeof(__u32)) +  /* IFLA_VXLAN_LABEL_POLICY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_LEARNING */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_PROXY */
+ 		nla_total_size(sizeof(__u8)) +	/* IFLA_VXLAN_RSC */
+@@ -4471,6 +4491,7 @@ static int vxlan_fill_info(struct sk_buff *skb, const struct net_device *dev)
+ 	    nla_put_u8(skb, IFLA_VXLAN_TOS, vxlan->cfg.tos) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_DF, vxlan->cfg.df) ||
+ 	    nla_put_be32(skb, IFLA_VXLAN_LABEL, vxlan->cfg.label) ||
++	    nla_put_u32(skb, IFLA_VXLAN_LABEL_POLICY, vxlan->cfg.label_policy) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_LEARNING,
+ 		       !!(vxlan->cfg.flags & VXLAN_F_LEARN)) ||
+ 	    nla_put_u8(skb, IFLA_VXLAN_PROXY,
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index f346b4efbc30..2d746f4c9a0a 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -416,6 +416,17 @@ static inline u8 ip_tunnel_get_dsfield(const struct iphdr *iph,
+ 		return 0;
+ }
+ 
++static inline __be32 ip_tunnel_get_flowlabel(const struct iphdr *iph,
++					     const struct sk_buff *skb)
++{
++	__be16 payload_protocol = skb_protocol(skb, true);
++
++	if (payload_protocol == htons(ETH_P_IPV6))
++		return ip6_flowlabel((const struct ipv6hdr *)iph);
++	else
++		return 0;
++}
++
+ static inline u8 ip_tunnel_get_ttl(const struct iphdr *iph,
+ 				       const struct sk_buff *skb)
+ {
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index 6a9f8a5f387c..33ba6fc151cf 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -210,22 +210,23 @@ struct vxlan_rdst {
+ };
+ 
+ struct vxlan_config {
+-	union vxlan_addr	remote_ip;
+-	union vxlan_addr	saddr;
+-	__be32			vni;
+-	int			remote_ifindex;
+-	int			mtu;
+-	__be16			dst_port;
+-	u16			port_min;
+-	u16			port_max;
+-	u8			tos;
+-	u8			ttl;
+-	__be32			label;
+-	u32			flags;
+-	unsigned long		age_interval;
+-	unsigned int		addrmax;
+-	bool			no_share;
+-	enum ifla_vxlan_df	df;
++	union vxlan_addr		remote_ip;
++	union vxlan_addr		saddr;
++	__be32				vni;
++	int				remote_ifindex;
++	int				mtu;
++	__be16				dst_port;
++	u16				port_min;
++	u16				port_max;
++	u8				tos;
++	u8				ttl;
++	__be32				label;
++	enum ifla_vxlan_label_policy	label_policy;
++	u32				flags;
++	unsigned long			age_interval;
++	unsigned int			addrmax;
++	bool				no_share;
++	enum ifla_vxlan_df		df;
+ };
+ 
+ enum {
+diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+index 29ff80da2775..8181ef23a7a2 100644
+--- a/include/uapi/linux/if_link.h
++++ b/include/uapi/linux/if_link.h
+@@ -856,6 +856,7 @@ enum {
+ 	IFLA_VXLAN_DF,
+ 	IFLA_VXLAN_VNIFILTER, /* only applicable with COLLECT_METADATA mode */
+ 	IFLA_VXLAN_LOCALBYPASS,
++	IFLA_VXLAN_LABEL_POLICY, /* IPv6 flow label policy; ifla_vxlan_label_policy */
+ 	__IFLA_VXLAN_MAX
+ };
+ #define IFLA_VXLAN_MAX	(__IFLA_VXLAN_MAX - 1)
+@@ -873,6 +874,13 @@ enum ifla_vxlan_df {
+ 	VXLAN_DF_MAX = __VXLAN_DF_END - 1,
+ };
+ 
++enum ifla_vxlan_label_policy {
++	VXLAN_LABEL_FIXED = 0,
++	VXLAN_LABEL_INHERIT = 1,
++	__VXLAN_LABEL_END,
++	VXLAN_LABEL_MAX = __VXLAN_LABEL_END - 1,
++};
++
+ /* GENEVE section */
+ enum {
+ 	IFLA_GENEVE_UNSPEC,
 -- 
-2.42.0.869.gea05f2083d-goog
+2.39.2
 
 
