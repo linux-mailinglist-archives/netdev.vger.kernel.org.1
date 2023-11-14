@@ -1,56 +1,49 @@
-Return-Path: <netdev+bounces-47859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D827EB94C
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 23:25:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7740D7EB962
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 23:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95A9B1F25926
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 22:25:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A78621C2090E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 22:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F05C2E841;
-	Tue, 14 Nov 2023 22:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096D010F7;
+	Tue, 14 Nov 2023 22:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fURdyQnS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrSbzbqT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503012E83A
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 22:25:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E3CFC433C7;
-	Tue, 14 Nov 2023 22:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0473308B
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 22:32:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EBB6C433C7;
+	Tue, 14 Nov 2023 22:32:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700000736;
-	bh=CmbeBBJW6eNCnDWG7XFbzoz+Cww0cN4u7zfWKAxDRDQ=;
+	s=k20201202; t=1700001157;
+	bh=L/Td8SUxhKjIwgOy9zT63pN/TrB/RPCUA8hz09s7wbE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fURdyQnSVpbf5t99V71LcNGLgelOR6R2rlvm4Ps4Y94iRNSdGks4P+r39GuN8prsE
-	 SnwMYYPOcrMFzpgeZv5zPIx0DGuPNU0m4yZsJZH7GJ/3OycmmbUSdySaqA5cQpDsf1
-	 54YN7mHw2Ctl2/qxN2x6uury/PSVoI5x19U6FVTmQOnITzYzOfTAjI1MJiWNYaUNMx
-	 9N65IAi9cn+VznLN7nGXUZ/T5Xc/ufmD18N7dZH/ZWpRsySs1vJ06WkrIbw+Ea+hXA
-	 W2fV1SIKoKukwV8p6nFWFUwpDBuYf+L05OTkqLy9/75bseMChSyXwYbsZ51VS2y8Ra
-	 8b2fSnaLiENmg==
-Date: Tue, 14 Nov 2023 17:25:34 -0500
+	b=OrSbzbqTQWNORXytNu0tKWaCCsFv1ky14Kx0QFS+cVXYBz3VsBX/IuxS7f5t7/hxK
+	 BidFt4G3Kj+nylR3V2q8W0WkYlu5OlMaHIPWY92cK685bO4QHefBZtp2mxS6+s0p45
+	 qGOivF7vlF02esNdwcGmWaipus5WbxH94UA0V0wcMzIQxKTMnsITZeeN7eTLYy78bd
+	 DdIJf46FvIYv+3Ek1KZQQ5CajYuyx6nUeg0V9pSQlzYFSlOMXGFGQWfYV5JzURM2K3
+	 /UdXQnPCqyfqLDW2fupIajXhK4La0cxOzNVDLB1ML+Z7xJmPzSb9/cIh/ItPPpkqWH
+	 hfrXw4NFPeq1g==
+Date: Tue, 14 Nov 2023 17:32:35 -0500
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Mina Almasry <almasrymina@google.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Jason Gunthorpe <jgg@nvidia.com>, Matthew
- Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-Message-ID: <20231114172534.124f544c@kernel.org>
-In-Reply-To: <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
-	<20231113130041.58124-4-linyunsheng@huawei.com>
-	<CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
-	<20231113180554.1d1c6b1a@kernel.org>
-	<0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org, michal.swiatkowski@linux.intel.com,
+ wojciech.drewek@intel.com, marcin.szycik@intel.com,
+ piotr.raczynski@intel.com
+Subject: Re: [PATCH net-next 00/15][pull request] ice: one by one port
+ representors creation
+Message-ID: <20231114173235.2c57c642@kernel.org>
+In-Reply-To: <20231114181449.1290117-1-anthony.l.nguyen@intel.com>
+References: <20231114181449.1290117-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,15 +53,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 14 Nov 2023 16:23:29 +0800 Yunsheng Lin wrote:
-> I would expect net stack, page pool, driver still see the 'struct page',
-> only memory provider see the specific struct for itself, for the above,
-> devmem memory provider sees the 'struct page_pool_iov'.
+On Tue, 14 Nov 2023 10:14:20 -0800 Tony Nguyen wrote:
+> Michal Swiatkowski says:
+> 
+> Currently ice supports creating port representors only for VFs. For that
+> use case they can be created and removed in one step.
+> 
+> This patchset is refactoring current flow to support port representor
+> creation also for subfunctions and SIOV. In this case port representors
+> need to be created and removed one by one. Also, they can be added and
+> removed while other port representors are running.
+> 
+> To achieve that we need to change the switchdev configuration flow.
+> Three first patches are only cosmetic (renaming, removing not used code).
+> Next few ones are preparation for new flow. The most important one
+> is "add VF representor one by one". It fully implements new flow.
+> 
+> New type of port representor (for subfunction) will be introduced in
+> follow up patchset.
 
-You can't lie to the driver that an _iov is a page either.
-The driver must explicitly "opt-in" to using the _iov variant,
-by calling the _iov set of APIs.
+There's way too much stuff from Intel in the review queue right
+now and the fact that some of us are at LPC isn't helping.
 
-Only drivers which can support header-data split can reasonably
-use the _iov API, for data pages.
+Please slow down a bit.
 
