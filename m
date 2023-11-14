@@ -1,41 +1,40 @@
-Return-Path: <netdev+bounces-47823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C807EB71E
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:59:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA7F7EB720
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:59:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16232281366
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:59:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAEFEB20B5C
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80AFD26AFB;
-	Tue, 14 Nov 2023 19:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CABF41AAB;
+	Tue, 14 Nov 2023 19:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ja8J2G5y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRDaJlMc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7202FC5E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BC141774;
 	Tue, 14 Nov 2023 19:58:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AFA5C116B2;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BAD2C433AD;
 	Tue, 14 Nov 2023 19:58:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1699991906;
-	bh=G71lLpDxX6kFXjhdOVS0qXeBjx9Toz63+e21f7hLf7M=;
+	bh=skX2daHDqclEr02BORrXyDZ777jUVYqscZkAWDUK4pA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Ja8J2G5y//md4zsXgb+rABtpyja+QJ0X7ApDmsBrIe2nYxDgow+QUn5OiasxBVkM+
-	 AjIPjHe8rULnPJyzG/o1z9RwtMnV9b6tJytfRZN91eYTDLk3fommtCFBVfWvNztQUy
-	 QCJ5725C3wWDJmVN75tS+rlIJZHYTH7CiwryVmInPrVsBtONxB9BPAtXuTFKrcY9/A
-	 wmE/S2CiSa5f6Zalf/dOvrD+4zEqJDilL/vhFt65l5VHca25w1CyA4o6QG7DKuVM/T
-	 Uihj6pHThpebyoe+waxZq0gH9rHo3iCG0fEVU2aAjjCy+4c6X0lb2M1OIWWxsZVQKU
-	 X2n9erbw1cyog==
+	b=vRDaJlMcuEAsqDNc84oOl4zyIbexmsAhL1nFfr/IbFvRtRcCG0XfsZH1TH8ebYaWJ
+	 5HyTE1k3Q2+kGrdsxc3lcN9n0rtghbQKPN0+POAbf8rSvpA9kXcCNWCXvInTM/NvOe
+	 fTr4OhfIvE0Jsba3RPGFD20J7cPa8Kk+49iKfzRycdM5tyB00EfWWo1tbHEegFxmHa
+	 GEvq26ArwluIFLgOyl+AFOXdWm+OzzZSsqkme+VdWT6Tvllnz7Zeu4faGO5IL6x+QI
+	 9aLsnGDaG6DLNCpNTONhDjSKtnGUCr+QSCQQtb2mDmjUKc8GozAo9nqoD8f4G+j0tP
+	 5N0JyOrKDdjaQ==
 From: Mat Martineau <martineau@kernel.org>
-Date: Tue, 14 Nov 2023 11:56:51 -0800
-Subject: [PATCH net-next v2 09/15] selftests: mptcp: add
- mptcp_lib_kill_wait
+Date: Tue, 14 Nov 2023 11:56:52 -0800
+Subject: [PATCH net-next v2 10/15] selftests: mptcp: add mptcp_lib_is_v6
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,7 +43,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231114-send-net-next-2023107-v2-9-b650a477362c@kernel.org>
+Message-Id: <20231114-send-net-next-2023107-v2-10-b650a477362c@kernel.org>
 References: <20231114-send-net-next-2023107-v2-0-b650a477362c@kernel.org>
 In-Reply-To: <20231114-send-net-next-2023107-v2-0-b650a477362c@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>, 
@@ -59,178 +58,171 @@ From: Geliang Tang <geliang.tang@suse.com>
 To avoid duplicated code in different MPTCP selftests, we can add
 and use helpers defined in mptcp_lib.sh.
 
-Export kill_wait() helper in userspace_pm.sh into mptcp_lib.sh and
-rename it as mptcp_lib_kill_wait(). It can be used to instead of
-kill_wait() in mptcp_join.sh. Use the new helper in both scripts.
+is_v6() helper is defined in mptcp_connect.sh, mptcp_join.sh and
+mptcp_sockopt.sh, so export it into mptcp_lib.sh and rename it as
+mptcp_lib_is_v6(). Use this new helper in all scripts.
 
 Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh   | 10 ++------
- tools/testing/selftests/net/mptcp/mptcp_lib.sh    |  9 +++++++
- tools/testing/selftests/net/mptcp/userspace_pm.sh | 31 ++++++++---------------
- 3 files changed, 22 insertions(+), 28 deletions(-)
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh | 16 +++++-----------
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 14 ++++----------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh     |  5 +++++
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |  8 +-------
+ 4 files changed, 15 insertions(+), 28 deletions(-)
 
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
+index b1fc8afd072d..4cf62b2b0480 100755
+--- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
++++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
+@@ -310,12 +310,6 @@ check_mptcp_disabled()
+ 	return 0
+ }
+ 
+-# $1: IP address
+-is_v6()
+-{
+-	[ -z "${1##*:*}" ]
+-}
+-
+ do_ping()
+ {
+ 	local listener_ns="$1"
+@@ -324,7 +318,7 @@ do_ping()
+ 	local ping_args="-q -c 1"
+ 	local rc=0
+ 
+-	if is_v6 "${connect_addr}"; then
++	if mptcp_lib_is_v6 "${connect_addr}"; then
+ 		$ipv6 || return 0
+ 		ping_args="${ping_args} -6"
+ 	fi
+@@ -635,12 +629,12 @@ run_tests_lo()
+ 	fi
+ 
+ 	# skip if we don't want v6
+-	if ! $ipv6 && is_v6 "${connect_addr}"; then
++	if ! $ipv6 && mptcp_lib_is_v6 "${connect_addr}"; then
+ 		return 0
+ 	fi
+ 
+ 	local local_addr
+-	if is_v6 "${connect_addr}"; then
++	if mptcp_lib_is_v6 "${connect_addr}"; then
+ 		local_addr="::"
+ 	else
+ 		local_addr="0.0.0.0"
+@@ -708,7 +702,7 @@ run_test_transparent()
+ 	TEST_GROUP="${msg}"
+ 
+ 	# skip if we don't want v6
+-	if ! $ipv6 && is_v6 "${connect_addr}"; then
++	if ! $ipv6 && mptcp_lib_is_v6 "${connect_addr}"; then
+ 		return 0
+ 	fi
+ 
+@@ -741,7 +735,7 @@ EOF
+ 	fi
+ 
+ 	local local_addr
+-	if is_v6 "${connect_addr}"; then
++	if mptcp_lib_is_v6 "${connect_addr}"; then
+ 		local_addr="::"
+ 		r6flag="-6"
+ 	else
 diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index a2b58cf71bef..c6ebe2143ef0 100755
+index c6ebe2143ef0..1f0a6c09e605 100755
 --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
 +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -682,16 +682,10 @@ wait_mpj()
+@@ -587,12 +587,6 @@ link_failure()
  	done
  }
  
--kill_wait()
+-# $1: IP address
+-is_v6()
 -{
--	kill $1 > /dev/null 2>&1
--	wait $1 2>/dev/null
+-	[ -z "${1##*:*}" ]
 -}
 -
- kill_events_pids()
+ # $1: ns, $2: port
+ wait_local_port_listen()
  {
--	kill_wait $evts_ns1_pid
--	kill_wait $evts_ns2_pid
-+	mptcp_lib_kill_wait $evts_ns1_pid
-+	mptcp_lib_kill_wait $evts_ns2_pid
- }
+@@ -895,7 +889,7 @@ pm_nl_set_endpoint()
+ 		local id=10
+ 		while [ $add_nr_ns1 -gt 0 ]; do
+ 			local addr
+-			if is_v6 "${connect_addr}"; then
++			if mptcp_lib_is_v6 "${connect_addr}"; then
+ 				addr="dead:beef:$counter::1"
+ 			else
+ 				addr="10.0.$counter.1"
+@@ -947,7 +941,7 @@ pm_nl_set_endpoint()
+ 		local id=20
+ 		while [ $add_nr_ns2 -gt 0 ]; do
+ 			local addr
+-			if is_v6 "${connect_addr}"; then
++			if mptcp_lib_is_v6 "${connect_addr}"; then
+ 				addr="dead:beef:$counter::2"
+ 			else
+ 				addr="10.0.$counter.2"
+@@ -989,7 +983,7 @@ pm_nl_set_endpoint()
+ 			pm_nl_flush_endpoint ${connector_ns}
+ 		elif [ $rm_nr_ns2 -eq 9 ]; then
+ 			local addr
+-			if is_v6 "${connect_addr}"; then
++			if mptcp_lib_is_v6 "${connect_addr}"; then
+ 				addr="dead:beef:1::2"
+ 			else
+ 				addr="10.0.1.2"
+@@ -3356,7 +3350,7 @@ userspace_pm_rm_sf()
+ 	local cnt
  
- kill_tests_wait()
+ 	[ "$1" == "$ns2" ] && evts=$evts_ns2
+-	if is_v6 $2; then ip=6; fi
++	if mptcp_lib_is_v6 $2; then ip=6; fi
+ 	tk=$(mptcp_lib_evts_get_info token "$evts")
+ 	da=$(mptcp_lib_evts_get_info "daddr$ip" "$evts" $t)
+ 	dp=$(mptcp_lib_evts_get_info dport "$evts" $t)
 diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-index 56cbd57abbae..e421b658d748 100644
+index e421b658d748..447292cad33c 100644
 --- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
 +++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
-@@ -217,3 +217,12 @@ mptcp_lib_get_info_value() {
- mptcp_lib_evts_get_info() {
- 	mptcp_lib_get_info_value "${1}" "^type:${3:-1}," < "${2}"
+@@ -226,3 +226,8 @@ mptcp_lib_kill_wait() {
+ 	kill "${1}" > /dev/null 2>&1
+ 	wait "${1}" 2>/dev/null
  }
 +
-+# $1: PID
-+mptcp_lib_kill_wait() {
-+	[ "${1}" -eq 0 ] && return 0
-+
-+	kill -SIGUSR1 "${1}" > /dev/null 2>&1
-+	kill "${1}" > /dev/null 2>&1
-+	wait "${1}" 2>/dev/null
++# $1: IP address
++mptcp_lib_is_v6() {
++	[ -z "${1##*:*}" ]
 +}
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 2413059a42e5..f4e352494f05 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -108,15 +108,6 @@ test_fail()
- 	mptcp_lib_result_fail "${test_name}"
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
+index a817af6616ec..bfa744e350ef 100755
+--- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
++++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
+@@ -161,12 +161,6 @@ check_transfer()
+ 	return 0
  }
  
--kill_wait()
+-# $1: IP address
+-is_v6()
 -{
--	[ $1 -eq 0 ] && return 0
--
--	kill -SIGUSR1 $1 > /dev/null 2>&1
--	kill $1 > /dev/null 2>&1
--	wait $1 2>/dev/null
+-	[ -z "${1##*:*}" ]
 -}
 -
- # This function is used in the cleanup trap
- #shellcheck disable=SC2317
- cleanup()
-@@ -128,7 +119,7 @@ cleanup()
- 	for pid in $client4_pid $server4_pid $client6_pid $server6_pid\
- 		   $server_evts_pid $client_evts_pid
- 	do
--		kill_wait $pid
-+		mptcp_lib_kill_wait $pid
- 	done
+ do_transfer()
+ {
+ 	local listener_ns="$1"
+@@ -183,7 +177,7 @@ do_transfer()
+ 	local mptcp_connect="./mptcp_connect -r 20"
  
- 	local netns
-@@ -210,7 +201,7 @@ make_connection()
- 	fi
- 	:>"$client_evts"
- 	if [ $client_evts_pid -ne 0 ]; then
--		kill_wait $client_evts_pid
-+		mptcp_lib_kill_wait $client_evts_pid
- 	fi
- 	ip netns exec "$ns2" ./pm_nl_ctl events >> "$client_evts" 2>&1 &
- 	client_evts_pid=$!
-@@ -219,7 +210,7 @@ make_connection()
- 	fi
- 	:>"$server_evts"
- 	if [ $server_evts_pid -ne 0 ]; then
--		kill_wait $server_evts_pid
-+		mptcp_lib_kill_wait $server_evts_pid
- 	fi
- 	ip netns exec "$ns1" ./pm_nl_ctl events >> "$server_evts" 2>&1 &
- 	server_evts_pid=$!
-@@ -624,7 +615,7 @@ test_subflows()
- 			      "10.0.2.2" "$client4_port" "23" "$client_addr_id" "ns1" "ns2"
- 
- 	# Delete the listener from the client ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	local sport
- 	sport=$(mptcp_lib_evts_get_info sport "$server_evts" $SUB_ESTABLISHED)
-@@ -663,7 +654,7 @@ test_subflows()
- 			      "$client_addr_id" "ns1" "ns2"
- 
- 	# Delete the listener from the client ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$server_evts" $SUB_ESTABLISHED)
- 
-@@ -702,7 +693,7 @@ test_subflows()
- 			      "$client_addr_id" "ns1" "ns2"
- 
- 	# Delete the listener from the client ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$server_evts" $SUB_ESTABLISHED)
- 
-@@ -740,7 +731,7 @@ test_subflows()
- 			      "10.0.2.1" "$app4_port" "23" "$server_addr_id" "ns2" "ns1"
- 
- 	# Delete the listener from the server ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
- 
-@@ -779,7 +770,7 @@ test_subflows()
- 			      "$server_addr_id" "ns2" "ns1"
- 
- 	# Delete the listener from the server ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
- 
-@@ -816,7 +807,7 @@ test_subflows()
- 			      "10.0.2.2" "10.0.2.1" "$new4_port" "23" "$server_addr_id" "ns2" "ns1"
- 
- 	# Delete the listener from the server ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
- 
-@@ -862,7 +853,7 @@ test_subflows_v4_v6_mix()
- 			      "$server_addr_id" "ns2" "ns1"
- 
- 	# Delete the listener from the server ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
- 
-@@ -974,7 +965,7 @@ test_listener()
- 	sleep 0.5
- 
- 	# Delete the listener from the client ns, if one was created
--	kill_wait $listener_pid
-+	mptcp_lib_kill_wait $listener_pid
- 
- 	sleep 0.5
- 	verify_listener_events $client_evts $LISTENER_CLOSED $AF_INET 10.0.2.2 $client4_port
+ 	local local_addr ip
+-	if is_v6 "${connect_addr}"; then
++	if mptcp_lib_is_v6 "${connect_addr}"; then
+ 		local_addr="::"
+ 		ip=ipv6
+ 	else
 
 -- 
 2.41.0
