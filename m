@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-47794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BE27EB63D
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:16:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1621D7EB63E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DE69B20CB4
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:16:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37FC21C20C31
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D842FC54;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FC83FE5D;
 	Tue, 14 Nov 2023 18:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VwmKl6mG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bEZs7fiX"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB0F26AFD
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 18:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4A32FC24
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 18:15:28 +0000 (UTC)
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 441B112A
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB90FD
 	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 10:15:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1699985726; x=1731521726;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cBPVgZxMIijm1JL9SShegT7OpDRHU5HjqTKVTKXO/Fc=;
-  b=VwmKl6mGNqskHIwE3OWwYHhpkju0UM+FUFoJzlIl0QCe7qnoPJdDFIIo
-   /6tA6i+o1PQW93wrlFSUjDARxLu71qbDNdEKd++bMSKIi0Y4695vAwpzN
-   ziPW+aFA0PkI7G5X+nXPoZ0iYvGl4R0OITE2+Fzos0iH7QII5S4lRDHeT
-   LGcanQEjye7TWjM2N5z8VmayAhAWvQuSTQUxJgi9gA1nr0zVpYIMsHX+m
-   +Ha6FQd+s70qkc8ff0a+uPquoCjEvI2NnLTccURC3Yu1UCO6gB9Mgl1qX
-   +QNOabYY+dVN/BRpKakgSWlaXTDO+6xC2SKLXKzj+x+RnTGv0cCcVfD8N
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390514539"
+  bh=l54GLRaBaI61RtfuyJyZZg5Ru6YTJgszvjuT93D6f2A=;
+  b=bEZs7fiXy4UR69MXKnxEw2uVRyQV9K1cexyZwXN+EHlDjCjwRa0FunK1
+   ch3BnMj4rSs+iBC6haLtyKN/rD0bgS5AANukIWjno9bG0f8ItX4qiUlDU
+   1l6AbwqDyUvMtO+zeEtFWtSPP67YoVfjtzApRJCqo24FCcnGclK8QgCTE
+   gZPoXelaR3MNWVcpxRkYvUCOnFH2nKDIY6SsfaFxkAmN8qGA0PIaBCVY0
+   +9QjfmTKtMKGYh2Zj5u/iTLLumIYwOvm3hqr5WQP2pidooiPcArROUgx2
+   IbHywi+YYSmDyLXEo3+GKgPq6YIC8r2Y8YJjDNFWGX+0Ult+UuYYICLuY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="390514541"
 X-IronPort-AV: E=Sophos;i="6.03,302,1694761200"; 
-   d="scan'208";a="390514539"
+   d="scan'208";a="390514541"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2023 10:15:04 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="741160971"
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="741160975"
 X-IronPort-AV: E=Sophos;i="6.03,302,1694761200"; 
-   d="scan'208";a="741160971"
+   d="scan'208";a="741160975"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orsmga006.jf.intel.com with ESMTP; 14 Nov 2023 10:15:02 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -59,9 +59,9 @@ Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	marcin.szycik@intel.com,
 	piotr.raczynski@intel.com,
 	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net-next 14/15] ice: adjust switchdev rebuild path
-Date: Tue, 14 Nov 2023 10:14:34 -0800
-Message-ID: <20231114181449.1290117-15-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 15/15] ice: reserve number of CP queues
+Date: Tue, 14 Nov 2023 10:14:35 -0800
+Message-ID: <20231114181449.1290117-16-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231114181449.1290117-1-anthony.l.nguyen@intel.com>
 References: <20231114181449.1290117-1-anthony.l.nguyen@intel.com>
@@ -75,158 +75,184 @@ Content-Transfer-Encoding: 8bit
 
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-There is no need to use specific functions for rebuilding path. Let's
-use current implementation by removing all representors and as the
-result remove switchdev environment.
+Rebuilding CP VSI each time the PR is created drastically increase the
+time of maximum VFs creation. Add function to reserve number of CP
+queues to deal with this problem.
 
-It will be added in devices rebuild path. For example during adding VFs,
-port representors for them also will be created.
+Use the same function to decrease number of queues in case of removing
+VFs. Assume that caller of ice_eswitch_reserve_cp_queues() will also
+call ice_eswitch_attach/detach() correct number of times.
 
-Rebuild control plane VSI before removing representors with INIT_VSI
-flag set to reinit VSI in hardware after reset.
+Still one by one PR adding is handy for VF resetting routine.
 
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_eswitch.c | 66 +++++++-------------
- drivers/net/ethernet/intel/ice/ice_main.c    |  4 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c  |  7 +--
- 3 files changed, 28 insertions(+), 49 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h         |  6 +++
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 52 +++++++++++++++++---
+ drivers/net/ethernet/intel/ice/ice_eswitch.h |  4 ++
+ drivers/net/ethernet/intel/ice/ice_sriov.c   |  3 ++
+ 4 files changed, 58 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 597bdb6945c6..cd7dcd0fa7f2 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -528,6 +528,12 @@ struct ice_eswitch {
+ 	struct ice_esw_br_offloads *br_offloads;
+ 	struct xarray reprs;
+ 	bool is_running;
++	/* struct to allow cp queues management optimization */
++	struct {
++		int to_reach;
++		int value;
++		bool is_reaching;
++	} qs;
+ };
+ 
+ struct ice_agg_node {
 diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index de5744aa5c2a..9ff4fe4fb133 100644
+index 9ff4fe4fb133..3f80e2081e5d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
 +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -406,19 +406,6 @@ ice_eswitch_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	return ice_vsi_setup(pf, &params);
+@@ -176,7 +176,7 @@ static void ice_eswitch_remap_rings_to_vectors(struct ice_eswitch *eswitch)
+ 
+ 		repr = xa_find(&eswitch->reprs, &repr_id, U32_MAX,
+ 			       XA_PRESENT);
+-		if (WARN_ON(!repr))
++		if (!repr)
+ 			break;
+ 
+ 		repr_id += 1;
+@@ -455,6 +455,8 @@ static int ice_eswitch_enable_switchdev(struct ice_pf *pf)
+ 		return -ENODEV;
+ 
+ 	ctrl_vsi = pf->eswitch.control_vsi;
++	/* cp VSI is createad with 1 queue as default */
++	pf->eswitch.qs.value = 1;
+ 	pf->eswitch.uplink_vsi = uplink_vsi;
+ 
+ 	if (ice_eswitch_setup_env(pf))
+@@ -487,6 +489,7 @@ static void ice_eswitch_disable_switchdev(struct ice_pf *pf)
+ 	ice_vsi_release(ctrl_vsi);
+ 
+ 	pf->eswitch.is_running = false;
++	pf->eswitch.qs.is_reaching = false;
  }
  
--/**
-- * ice_eswitch_napi_del - remove NAPI handle for all port representors
-- * @reprs: xarray of reprs
-- */
--static void ice_eswitch_napi_del(struct xarray *reprs)
--{
--	struct ice_repr *repr;
--	unsigned long id;
--
--	xa_for_each(reprs, id, repr)
--		netif_napi_del(&repr->q_vector->napi);
--}
--
  /**
-  * ice_eswitch_napi_enable - enable NAPI for all port representors
-  * @reprs: xarray of reprs
-@@ -624,36 +611,6 @@ static void ice_eswitch_start_reprs(struct ice_pf *pf)
- 	ice_eswitch_add_sp_rules(pf);
- }
- 
--/**
-- * ice_eswitch_rebuild - rebuild eswitch
-- * @pf: pointer to PF structure
-- */
--int ice_eswitch_rebuild(struct ice_pf *pf)
--{
--	struct ice_vsi *ctrl_vsi = pf->eswitch.control_vsi;
--	int status;
--
--	ice_eswitch_napi_disable(&pf->eswitch.reprs);
--	ice_eswitch_napi_del(&pf->eswitch.reprs);
--
--	status = ice_eswitch_setup_env(pf);
--	if (status)
--		return status;
--
--	ice_eswitch_remap_rings_to_vectors(&pf->eswitch);
--
--	ice_replay_tc_fltrs(pf);
--
--	status = ice_vsi_open(ctrl_vsi);
--	if (status)
--		return status;
--
--	ice_eswitch_napi_enable(&pf->eswitch.reprs);
--	ice_eswitch_start_all_tx_queues(pf);
--
--	return 0;
--}
--
- static void
+@@ -615,15 +618,33 @@ static void
  ice_eswitch_cp_change_queues(struct ice_eswitch *eswitch, int change)
  {
-@@ -752,3 +709,26 @@ void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf)
- 		ice_eswitch_start_reprs(pf);
+ 	struct ice_vsi *cp = eswitch->control_vsi;
++	int queues = 0;
++
++	if (eswitch->qs.is_reaching) {
++		if (eswitch->qs.to_reach >= eswitch->qs.value + change) {
++			queues = eswitch->qs.to_reach;
++			eswitch->qs.is_reaching = false;
++		} else {
++			queues = 0;
++		}
++	} else if ((change > 0 && cp->alloc_txq <= eswitch->qs.value) ||
++		   change < 0) {
++		queues = cp->alloc_txq + change;
++	}
+ 
+-	ice_vsi_close(cp);
++	if (queues) {
++		cp->req_txq = queues;
++		cp->req_rxq = queues;
++		ice_vsi_close(cp);
++		ice_vsi_rebuild(cp, ICE_VSI_FLAG_NO_INIT);
++		ice_vsi_open(cp);
++	} else if (!change) {
++		/* change == 0 means that VSI wasn't open, open it here */
++		ice_vsi_open(cp);
++	}
+ 
+-	cp->req_txq = cp->alloc_txq + change;
+-	cp->req_rxq = cp->alloc_rxq + change;
+-	ice_vsi_rebuild(cp, ICE_VSI_FLAG_NO_INIT);
++	eswitch->qs.value += change;
+ 	ice_eswitch_remap_rings_to_vectors(eswitch);
+-
+-	ice_vsi_open(cp);
+ }
+ 
+ int
+@@ -641,6 +662,7 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
+ 		if (err)
+ 			return err;
+ 		/* Control plane VSI is created with 1 queue as default */
++		pf->eswitch.qs.to_reach -= 1;
+ 		change = 0;
  	}
+ 
+@@ -732,3 +754,19 @@ int ice_eswitch_rebuild(struct ice_pf *pf)
+ 
+ 	return 0;
  }
 +
 +/**
-+ * ice_eswitch_rebuild - rebuild eswitch
++ * ice_eswitch_reserve_cp_queues - reserve control plane VSI queues
 + * @pf: pointer to PF structure
++ * @change: how many more (or less) queues is needed
++ *
++ * Remember to call ice_eswitch_attach/detach() the "change" times.
 + */
-+int ice_eswitch_rebuild(struct ice_pf *pf)
++void ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change)
 +{
-+	struct ice_repr *repr;
-+	unsigned long id;
-+	int err;
++	if (pf->eswitch.qs.value + change < 0)
++		return;
 +
-+	if (!ice_is_switchdev_running(pf))
-+		return 0;
-+
-+	err = ice_vsi_rebuild(pf->eswitch.control_vsi, ICE_VSI_FLAG_INIT);
-+	if (err)
-+		return err;
-+
-+	xa_for_each(&pf->eswitch.reprs, id, repr)
-+		ice_eswitch_detach(pf, repr->vf);
-+
-+	return 0;
++	pf->eswitch.qs.to_reach = pf->eswitch.qs.value + change;
++	pf->eswitch.qs.is_reaching = true;
 +}
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 7ea6e2ad3272..10822011de22 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -7412,9 +7412,9 @@ static void ice_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 			ice_ptp_cfg_timestamp(pf, true);
- 	}
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
+index 59d51c0d14e5..1a288a03a79a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
+@@ -26,6 +26,7 @@ void ice_eswitch_set_target_vsi(struct sk_buff *skb,
+ 				struct ice_tx_offload_params *off);
+ netdev_tx_t
+ ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev);
++void ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change);
+ #else /* CONFIG_ICE_SWITCHDEV */
+ static inline void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf) { }
  
--	err = ice_vsi_rebuild_by_type(pf, ICE_VSI_SWITCHDEV_CTRL);
-+	err = ice_eswitch_rebuild(pf);
- 	if (err) {
--		dev_err(dev, "Switchdev CTRL VSI rebuild failed: %d\n", err);
-+		dev_err(dev, "Switchdev rebuild failed: %d\n", err);
- 		goto err_vsi_rebuild;
- 	}
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index 68f9de0a7a8f..d2a99a20c4ad 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -760,6 +760,7 @@ void ice_reset_all_vfs(struct ice_pf *pf)
- 	ice_for_each_vf(pf, bkt, vf) {
- 		mutex_lock(&vf->cfg_lock);
- 
-+		ice_eswitch_detach(pf, vf);
- 		vf->driver_caps = 0;
- 		ice_vc_set_default_allowlist(vf);
- 
-@@ -775,13 +776,11 @@ void ice_reset_all_vfs(struct ice_pf *pf)
- 		ice_vf_rebuild_vsi(vf);
- 		ice_vf_post_vsi_rebuild(vf);
- 
-+		ice_eswitch_attach(pf, vf);
+@@ -76,5 +77,8 @@ ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev)
+ {
+ 	return NETDEV_TX_BUSY;
+ }
 +
- 		mutex_unlock(&vf->cfg_lock);
++static inline void
++ice_eswitch_reserve_cp_queues(struct ice_pf *pf, int change) { }
+ #endif /* CONFIG_ICE_SWITCHDEV */
+ #endif /* _ICE_ESWITCH_H_ */
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 51f5f420d632..5a45bd5ce6ad 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -172,6 +172,8 @@ void ice_free_vfs(struct ice_pf *pf)
+ 	else
+ 		dev_warn(dev, "VFs are assigned - not disabling SR-IOV\n");
+ 
++	ice_eswitch_reserve_cp_queues(pf, -ice_get_num_vfs(pf));
++
+ 	mutex_lock(&vfs->table_lock);
+ 
+ 	ice_for_each_vf(pf, bkt, vf) {
+@@ -930,6 +932,7 @@ static int ice_ena_vfs(struct ice_pf *pf, u16 num_vfs)
+ 		goto err_unroll_sriov;
  	}
  
--	if (ice_is_eswitch_mode_switchdev(pf))
--		if (ice_eswitch_rebuild(pf))
--			dev_warn(dev, "eswitch rebuild failed\n");
--
- 	ice_flush(hw);
- 	clear_bit(ICE_VF_DIS, pf->state);
- 
++	ice_eswitch_reserve_cp_queues(pf, num_vfs);
+ 	ret = ice_start_vfs(pf);
+ 	if (ret) {
+ 		dev_err(dev, "Failed to start %d VFs, err %d\n", num_vfs, ret);
 -- 
 2.41.0
 
