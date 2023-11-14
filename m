@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-47850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E3957EB919
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 22:59:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E257EB91A
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 23:00:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98548B20B19
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 21:59:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98C76B20C47
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 21:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49CA2E82F;
-	Tue, 14 Nov 2023 21:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E350F2E83D;
+	Tue, 14 Nov 2023 21:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LVlZHNF5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nqxd3Dig"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77542E82C
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 21:59:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66E2EC433CA;
-	Tue, 14 Nov 2023 21:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C33AE2E83A
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 21:59:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8100BC433CB;
+	Tue, 14 Nov 2023 21:59:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699999149;
-	bh=5jvyaK8QPzsSqcnxW3vS9yR1Svr+QZt4wE8NgIROQCw=;
+	s=k20201202; t=1699999150;
+	bh=947nMR0Clwqdj98CC+zQOc1NkB/J1bUVrdQxJMScJJs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LVlZHNF5/9tuAPiyDOuTlERB95VppSHVTekjfhDFtBUvwB3NV6nuFKnDyoqGwIKdQ
-	 vK++gxNo1vlhskLotcZMe+S914CWhqxmOUihxqQMYa//tUf2vS2+rcOudwaIB5B4iI
-	 ZXzGanNv2RqIW5vYrljwwWk20JEoHx7fw1Tabs2ofbIsig5zW4SzMa+H0mZKyLEPJ2
-	 2CFfkmg5x8UsRZJjWk2Fe6pmO0OF3ie6OXxY7313rMOmdQ1J36PcJGzKsYrsmcFL0H
-	 4Mr4zNCktH9hTdxZfiLe/nTkFAVmMzgVap1ZwcphpOH7Uy/maSQdhGRfwt1oQVIzf5
-	 IFit9zHZxCGEw==
+	b=Nqxd3DigUko66rQZNcG/J2fyJCsCpQVSz5dpdSwzK7C2IElL734syLYiPvdVnYIk0
+	 U6d5wr2CwxSqbsJLaKf4yGLf+dOd+ZDTClCnh/AguAmUmCZn1uRXq6eknDv7UwVvkL
+	 rvfoqZ8EjapTpqGiAnL4zpjpr2wFoK+/PjCEScNJ2I18/WlRmFxxnUX/69+VNUk470
+	 X+QO8oSRWbF2Zl1TYQFni48Gd06xY/1umIw7NqeO5m0pdCX4LZJD7wsylKFpKhqTa5
+	 amzGn7g/qt2S7nxQZA2c4Aejc1QIf1QNuoj/GTXIjssa0DJD6ZMJQFnyyD9FLNiJtJ
+	 km9lGZNaiR62A==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,10 +40,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [net V2 11/15] net/mlx5e: Update doorbell for port timestamping CQ before the software counter
-Date: Tue, 14 Nov 2023 13:58:42 -0800
-Message-ID: <20231114215846.5902-12-saeed@kernel.org>
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net V2 12/15] net/mlx5: Increase size of irq name buffer
+Date: Tue, 14 Nov 2023 13:58:43 -0800
+Message-ID: <20231114215846.5902-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231114215846.5902-1-saeed@kernel.org>
 References: <20231114215846.5902-1-saeed@kernel.org>
@@ -57,87 +58,67 @@ Content-Transfer-Encoding: 8bit
 
 From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-Previously, mlx5e_ptp_poll_ts_cq would update the device doorbell with the
-incremented consumer index after the relevant software counters in the
-kernel were updated. In the mlx5e_sq_xmit_wqe context, this would lead to
-either overrunning the device CQ or exceeding the expected software buffer
-size in the device CQ if the device CQ size was greater than the software
-buffer size. Update the relevant software counter only after updating the
-device CQ consumer index in the port timestamping napi_poll context.
+Without increased buffer size, will trigger -Wformat-truncation with W=1
+for the snprintf operation writing to the buffer.
 
-Log:
-    mlx5_core 0000:08:00.0: cq_err_event_notifier:517:(pid 0): CQ error on CQN 0x487, syndrome 0x1
-    mlx5_core 0000:08:00.0 eth2: mlx5e_cq_error_event: cqn=0x000487 event=0x04
+    drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c: In function 'mlx5_irq_alloc':
+    drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:296:7: error: '@pci:' directive output may be truncated writing 5 bytes into a region of size between 1 and 32 [-Werror=format-truncation=]
+      296 |    "%s@pci:%s", name, pci_name(dev->pdev));
+          |       ^~~~~
+    drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c:295:2: note: 'snprintf' output 6 or more bytes (assuming 37) into a destination of size 32
+      295 |  snprintf(irq->name, MLX5_MAX_IRQ_NAME,
+          |  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      296 |    "%s@pci:%s", name, pci_name(dev->pdev));
+          |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Fixes: 1880bc4e4a96 ("net/mlx5e: Add TX port timestamp support")
+Fixes: ada9f5d00797 ("IB/mlx5: Fix eq names to display nicely in /proc/interrupts")
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=6d4ab2e97dcfbcd748ae71761a9d8e5e41cc732c
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en/ptp.c  | 20 +++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c | 6 +++---
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h | 3 +++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-index bb11e644d24f..af3928eddafd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
-@@ -177,6 +177,8 @@ static void mlx5e_ptpsq_mark_ts_cqes_undelivered(struct mlx5e_ptpsq *ptpsq,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+index 653648216730..4dcf995cb1a2 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+@@ -28,7 +28,7 @@
+ struct mlx5_irq {
+ 	struct atomic_notifier_head nh;
+ 	cpumask_var_t mask;
+-	char name[MLX5_MAX_IRQ_NAME];
++	char name[MLX5_MAX_IRQ_FORMATTED_NAME];
+ 	struct mlx5_irq_pool *pool;
+ 	int refcount;
+ 	struct msi_map map;
+@@ -292,8 +292,8 @@ struct mlx5_irq *mlx5_irq_alloc(struct mlx5_irq_pool *pool, int i,
+ 	else
+ 		irq_sf_set_name(pool, name, i);
+ 	ATOMIC_INIT_NOTIFIER_HEAD(&irq->nh);
+-	snprintf(irq->name, MLX5_MAX_IRQ_NAME,
+-		 "%s@pci:%s", name, pci_name(dev->pdev));
++	snprintf(irq->name, MLX5_MAX_IRQ_FORMATTED_NAME,
++		 MLX5_IRQ_NAME_FORMAT_STR, name, pci_name(dev->pdev));
+ 	err = request_irq(irq->map.virq, irq_int_handler, 0, irq->name,
+ 			  &irq->nh);
+ 	if (err) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h
+index d3a77a0ab848..c4d377f8df30 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h
+@@ -7,6 +7,9 @@
+ #include <linux/mlx5/driver.h>
  
- static void mlx5e_ptp_handle_ts_cqe(struct mlx5e_ptpsq *ptpsq,
- 				    struct mlx5_cqe64 *cqe,
-+				    u8 *md_buff,
-+				    u8 *md_buff_sz,
- 				    int budget)
- {
- 	struct mlx5e_ptp_port_ts_cqe_list *pending_cqe_list = ptpsq->ts_cqe_pending_list;
-@@ -211,19 +213,24 @@ static void mlx5e_ptp_handle_ts_cqe(struct mlx5e_ptpsq *ptpsq,
- 	mlx5e_ptpsq_mark_ts_cqes_undelivered(ptpsq, hwtstamp);
- out:
- 	napi_consume_skb(skb, budget);
--	mlx5e_ptp_metadata_fifo_push(&ptpsq->metadata_freelist, metadata_id);
-+	md_buff[*md_buff_sz++] = metadata_id;
- 	if (unlikely(mlx5e_ptp_metadata_map_unhealthy(&ptpsq->metadata_map)) &&
- 	    !test_and_set_bit(MLX5E_SQ_STATE_RECOVERING, &sq->state))
- 		queue_work(ptpsq->txqsq.priv->wq, &ptpsq->report_unhealthy_work);
- }
- 
--static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int budget)
-+static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int napi_budget)
- {
- 	struct mlx5e_ptpsq *ptpsq = container_of(cq, struct mlx5e_ptpsq, ts_cq);
--	struct mlx5_cqwq *cqwq = &cq->wq;
-+	int budget = min(napi_budget, MLX5E_TX_CQ_POLL_BUDGET);
-+	u8 metadata_buff[MLX5E_TX_CQ_POLL_BUDGET];
-+	u8 metadata_buff_sz = 0;
-+	struct mlx5_cqwq *cqwq;
- 	struct mlx5_cqe64 *cqe;
- 	int work_done = 0;
- 
-+	cqwq = &cq->wq;
-+
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_ENABLED, &ptpsq->txqsq.state)))
- 		return false;
- 
-@@ -234,7 +241,8 @@ static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int budget)
- 	do {
- 		mlx5_cqwq_pop(cqwq);
- 
--		mlx5e_ptp_handle_ts_cqe(ptpsq, cqe, budget);
-+		mlx5e_ptp_handle_ts_cqe(ptpsq, cqe,
-+					metadata_buff, &metadata_buff_sz, napi_budget);
- 	} while ((++work_done < budget) && (cqe = mlx5_cqwq_get_cqe(cqwq)));
- 
- 	mlx5_cqwq_update_db_record(cqwq);
-@@ -242,6 +250,10 @@ static bool mlx5e_ptp_poll_ts_cq(struct mlx5e_cq *cq, int budget)
- 	/* ensure cq space is freed before enabling more cqes */
- 	wmb();
- 
-+	while (metadata_buff_sz > 0)
-+		mlx5e_ptp_metadata_fifo_push(&ptpsq->metadata_freelist,
-+					     metadata_buff[--metadata_buff_sz]);
-+
- 	mlx5e_txqsq_wake(&ptpsq->txqsq);
- 
- 	return work_done == budget;
+ #define MLX5_MAX_IRQ_NAME (32)
++#define MLX5_IRQ_NAME_FORMAT_STR ("%s@pci:%s")
++#define MLX5_MAX_IRQ_FORMATTED_NAME \
++	(MLX5_MAX_IRQ_NAME + sizeof(MLX5_IRQ_NAME_FORMAT_STR))
+ /* max irq_index is 2047, so four chars */
+ #define MLX5_MAX_IRQ_IDX_CHARS (4)
+ #define MLX5_EQ_REFS_PER_IRQ (2)
 -- 
 2.41.0
 
