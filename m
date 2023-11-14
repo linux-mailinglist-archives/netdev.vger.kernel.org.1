@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-47565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69147EA762
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 01:17:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5D8C7EA761
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 01:17:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CCDAB20A69
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:17:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6A6A280F64
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4994B1385;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CADD17C4;
 	Tue, 14 Nov 2023 00:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BmBQuolh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Lda47WuP"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A855241
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E11F5246
 	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 00:17:09 +0000 (UTC)
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43311D53
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6D0A1B2
 	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:17:07 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-5b99bfca064so3256814a12.3
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5aa7172bafdso3255426a12.1
         for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:17:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google; t=1699921027; x=1700525827; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2VRyMKxJX8fyyFmdZwQji2gc9ZTNEkEM8Hw38TPtaE=;
-        b=BmBQuolhAE8mutKfAa9vT6XfXcEDZ+SLn46oT0RpPw4cBVNfOEVlTKJX/Bt4TB64s5
-         dKc9yJ4cfALnDPPxcxDXhLlTxZgcYHbL4AgupGMc9S3IOZ15CMGtPOa/yUUre5+TZbOX
-         cUivvrwcR2PzkphBfmGEug8fq6/+78bm+Pb4s=
+        bh=pXuF8wwHgb+LSMQZOdtTslJ9HsVmzec3aBIoPJ3M51M=;
+        b=Lda47WuPXwYTdyBu/S5fIfqk1iSKBles7mTprWQ1q6CSN0dyNZnJCGiEa+UZ3H0/9L
+         tJg04gnqJc6XyF29ec/JSyRw08AC2ObrQGsNPpBHmua39sabcti+DYlaJczT3ALC2QKu
+         rjCnUK12/V9MUUaqZJcM0vOLAHlbi0zW5s2IE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1699921027; x=1700525827;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2VRyMKxJX8fyyFmdZwQji2gc9ZTNEkEM8Hw38TPtaE=;
-        b=PPU4wljtAo290q9llDAuwdQs0vOYrP6C+zjFAMTiv8y1vH7TU6RA8bdrFNmE6Cv7vK
-         bOceOD0lSOKY49h2zn/sYgFzYJ7QNvf6taWRNexMxLcOKG5VYLYZsrWWYDB+TuV7Cm2w
-         lt0ysDI81DsLlm6gw7uBIclFUwCHlgJUs/Q/MY4VfyR7vccoCMVXJsTM4GCa/y0sPRdM
-         PPDqWh6R+a9jvCivOCYajIRWdWG0Uc/ovx8r1yBO23RkSebiXC0kIr0EJoKIL2H/pgUT
-         oKUecQ2zb7sXUluZx5L/2kXMON0mu+5BPFIO06V6uhNmoLrq6bVXlQogUeXe/hFbJK21
-         GslA==
-X-Gm-Message-State: AOJu0YwdNaxse+smPWgX7RtRvmVVP+lb97sFDK+qcgW5lePGXxFsJmrA
-	ZJMA9+FXp7ms88mUBGLusSBcXg==
-X-Google-Smtp-Source: AGHT+IH1NE5EkGvT0ye44IWdRsC5N8u33tqNKWOM9p7YUDF7XIZBSbUaIUZWQfO9Y+On4q0myOZ5jw==
-X-Received: by 2002:a05:6a20:54a7:b0:17e:2afd:408a with SMTP id i39-20020a056a2054a700b0017e2afd408amr7478626pzk.5.1699921026220;
-        Mon, 13 Nov 2023 16:17:06 -0800 (PST)
+        bh=pXuF8wwHgb+LSMQZOdtTslJ9HsVmzec3aBIoPJ3M51M=;
+        b=IiCBpGyh/52x7vKclxlzUjm8jA8EP5goVUB2JEv7f18U3I5EoZQ0Xmui+4YBw52/NK
+         oncLg9/ZQL5Qm3aseTm7YI0TkqPkLf2cZgG9/QM+amrZwi1x3a2nEenb4YGJphpMM4w9
+         DSVOWVAv+mPbQeYS02lbgpwViTJLuyhqKjem6b0dPnmc7+J+OZeycI+sF9KwNcl3f9e9
+         lCp5Nsa5dM4Z76L8EtsWsLK2Iof1r72LKpLQwH/UADJ2MU9HUSKe6BUxRRefcUMes6Qa
+         iuy5yDJyTYLcroYuWi5wkUwsYW7SRkCUSALlHzLb1YFLQI6Ywk6YCkHKhBu4bwKlCdJM
+         VGHw==
+X-Gm-Message-State: AOJu0YzOoTijYGptCztaWoz8Rnz9/lBqo/j5rFq+fcOq5vjsrJ1gLJEs
+	wCXtmaiRy3BW1Xi9ZQiMD89lwrNDCjOwGu3QAjY=
+X-Google-Smtp-Source: AGHT+IHvbCWapwdr90DXvyPcYsrCZf3BnO7Lr8M2RbIZapVaK8dTLOja2S85C5Fi/dFJ/3zIgbgM+g==
+X-Received: by 2002:a17:90b:4d0e:b0:280:a01a:906a with SMTP id mw14-20020a17090b4d0e00b00280a01a906amr6513113pjb.5.1699921027233;
+        Mon, 13 Nov 2023 16:17:07 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id p6-20020a17090a680600b0027ffff956bcsm4063478pjj.47.2023.11.13.16.17.04
+        by smtp.gmail.com with ESMTPSA id p6-20020a17090a680600b0027ffff956bcsm4063478pjj.47.2023.11.13.16.17.06
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 13 Nov 2023 16:17:05 -0800 (PST)
+        Mon, 13 Nov 2023 16:17:06 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
 	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: [PATCH net-next v2 10/13] bnxt_en: Add helper to get the number of CP rings required for TX rings
-Date: Mon, 13 Nov 2023 16:16:18 -0800
-Message-Id: <20231114001621.101284-11-michael.chan@broadcom.com>
+Subject: [PATCH net-next v2 11/13] bnxt_en: Add macros related to TC and TX rings
+Date: Mon, 13 Nov 2023 16:16:19 -0800
+Message-Id: <20231114001621.101284-12-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231114001621.101284-1-michael.chan@broadcom.com>
 References: <20231114001621.101284-1-michael.chan@broadcom.com>
@@ -74,297 +74,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f68008060a11b4f8"
+	boundary="000000000000002331060a11b56b"
 
---000000000000f68008060a11b4f8
+--000000000000002331060a11b56b
 Content-Transfer-Encoding: 8bit
 
-Up until now, each TX ring always requires a completion ring/NQ/MSIX.
-bnxt_trim_rings() and the assignment of bp->cp_nr_rings always make
-this assumption.  This will no longer be true in the next patches, so
-we refactor and add helper functions to determine the proper relationship
-between TX rings and the required completion ring/NQ/MSIX.  This patch
-does not change the 1:1 relationship yet.
-
-Note that on P5 chips, each RX and TX ring still requires a completion
-ring.  Only the number of NQs has been reduced.  We should no longer call
-bnxt_trim_rings() to adjust the RX and TX rings on P5 chips.  Replace with
-simple logic to check that RX + TX < CP and adjust accordingly.
-
-bnxt_check_rings() should call _bnxt_get_max_rings() to get the raw
-number of rings instead of bnxt_get_max_rings().  If we are about to
-create TCs, bnxt_get_max_rings() would not be able to calculate the max
-rings correctly.
+Add 3 macros that handle to conversions between TC numbers and TX
+ring numbers.  These will help to clarify the existing logic and the
+new logic in the next patch.
 
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 95 +++++++++++++++----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 +
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  5 +-
- 4 files changed, 82 insertions(+), 25 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6002b834e898..7c1a3db651f5 100644
+index 7c1a3db651f5..d0eca7648927 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6284,7 +6284,8 @@ static int bnxt_hwrm_get_rings(struct bnxt *bp)
- 			if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 				rx >>= 1;
- 			if (cp < (rx + tx)) {
--				bnxt_trim_rings(bp, &rx, &tx, cp, false);
-+				rx = cp / 2;
-+				tx = rx;
- 				if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 					rx <<= 1;
- 				hw_resc->resv_rx_rings = rx;
-@@ -6585,6 +6586,7 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	int grp, rx_rings, rc;
- 	int vnic = 1, stat;
- 	bool sh = false;
-+	int tx_cp;
- 
- 	if (!bnxt_need_reserve_rings(bp))
- 		return 0;
-@@ -6634,7 +6636,8 @@ static int __bnxt_reserve_rings(struct bnxt *bp)
- 	rc = bnxt_trim_rings(bp, &rx_rings, &tx, cp, sh);
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 		rx = rx_rings << 1;
--	cp = sh ? max_t(int, tx, rx_rings) : tx + rx_rings;
-+	tx_cp = bnxt_num_tx_to_cp(bp, tx);
-+	cp = sh ? max_t(int, tx_cp, rx_rings) : tx_cp + rx_rings;
- 	bp->tx_nr_rings = tx;
- 
- 	/* If we cannot reserve all the RX rings, reset the RSS map only
-@@ -9061,8 +9064,8 @@ static int bnxt_set_real_num_queues(struct bnxt *bp)
- 	return rc;
+@@ -3415,6 +3415,15 @@ static void bnxt_free_tx_rings(struct bnxt *bp)
+ 	}
  }
  
--static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
--			   bool shared)
-+static int __bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
-+			     bool shared)
++#define BNXT_TC_TO_RING_BASE(bp, tc)	\
++	((tc) * (bp)->tx_nr_rings_per_tc)
++
++#define BNXT_RING_TO_TC_OFF(bp, tx)	\
++	((tx) % (bp)->tx_nr_rings_per_tc)
++
++#define BNXT_RING_TO_TC(bp, tx)		\
++	((tx) / (bp)->tx_nr_rings_per_tc)
++
+ static int bnxt_alloc_tx_rings(struct bnxt *bp)
  {
- 	int _rx = *rx, _tx = *tx;
- 
-@@ -9085,6 +9088,46 @@ static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
+ 	int i, j, rc;
+@@ -3470,7 +3479,7 @@ static int bnxt_alloc_tx_rings(struct bnxt *bp)
+ 		spin_lock_init(&txr->xdp_tx_lock);
+ 		if (i < bp->tx_nr_rings_xdp)
+ 			continue;
+-		if (i % bp->tx_nr_rings_per_tc == (bp->tx_nr_rings_per_tc - 1))
++		if (BNXT_RING_TO_TC_OFF(bp, i) == (bp->tx_nr_rings_per_tc - 1))
+ 			j++;
+ 	}
  	return 0;
- }
+@@ -9140,7 +9149,7 @@ static void bnxt_setup_msix(struct bnxt *bp)
  
-+static int __bnxt_num_tx_to_cp(struct bnxt *bp, int tx, int tx_sets, int tx_xdp)
-+{
-+	return tx;
-+}
-+
-+int bnxt_num_tx_to_cp(struct bnxt *bp, int tx)
-+{
-+	int tcs = netdev_get_num_tc(bp->dev);
-+
-+	if (!tcs)
-+		tcs = 1;
-+	return __bnxt_num_tx_to_cp(bp, tx, tcs, bp->tx_nr_rings_xdp);
-+}
-+
-+static int bnxt_num_cp_to_tx(struct bnxt *bp, int tx_cp)
-+{
-+	int tcs = netdev_get_num_tc(bp->dev);
-+
-+	return (tx_cp - bp->tx_nr_rings_xdp) * tcs +
-+	       bp->tx_nr_rings_xdp;
-+}
-+
-+static int bnxt_trim_rings(struct bnxt *bp, int *rx, int *tx, int max,
-+			   bool sh)
-+{
-+	int tx_cp = bnxt_num_tx_to_cp(bp, *tx);
-+
-+	if (tx_cp != *tx) {
-+		int tx_saved = tx_cp, rc;
-+
-+		rc = __bnxt_trim_rings(bp, rx, &tx_cp, max, sh);
-+		if (rc)
-+			return rc;
-+		if (tx_cp != tx_saved)
-+			*tx = bnxt_num_cp_to_tx(bp, tx_cp);
-+		return 0;
-+	}
-+	return __bnxt_trim_rings(bp, rx, tx, max, sh);
-+}
-+
- static void bnxt_setup_msix(struct bnxt *bp)
- {
- 	const int len = sizeof(bp->irq_tbl[0].name);
-@@ -9247,7 +9290,7 @@ static int bnxt_get_num_msix(struct bnxt *bp)
- 
- static int bnxt_init_msix(struct bnxt *bp)
- {
--	int i, total_vecs, max, rc = 0, min = 1, ulp_msix;
-+	int i, total_vecs, max, rc = 0, min = 1, ulp_msix, tx_cp;
- 	struct msix_entry *msix_ent;
- 
- 	total_vecs = bnxt_get_num_msix(bp);
-@@ -9289,9 +9332,10 @@ static int bnxt_init_msix(struct bnxt *bp)
- 		if (rc)
- 			goto msix_setup_exit;
- 
-+		tx_cp = bnxt_num_tx_to_cp(bp, bp->tx_nr_rings);
- 		bp->cp_nr_rings = (min == 1) ?
--				  max_t(int, bp->tx_nr_rings, bp->rx_nr_rings) :
--				  bp->tx_nr_rings + bp->rx_nr_rings;
-+				  max_t(int, tx_cp, bp->rx_nr_rings) :
-+				  tx_cp + bp->rx_nr_rings;
- 
- 	} else {
- 		rc = -ENOMEM;
-@@ -12186,23 +12230,27 @@ static void bnxt_sp_task(struct work_struct *work)
- 	clear_bit(BNXT_STATE_IN_SP_TASK, &bp->state);
- }
- 
-+static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
-+				int *max_cp);
-+
- /* Under rtnl_lock */
- int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 		     int tx_xdp)
- {
--	int max_rx, max_tx, tx_sets = 1;
-+	int max_rx, max_tx, max_cp, tx_sets = 1, tx_cp;
- 	int tx_rings_needed, stats;
- 	int rx_rings = rx;
--	int cp, vnics, rc;
-+	int cp, vnics;
- 
- 	if (tcs)
- 		tx_sets = tcs;
- 
--	rc = bnxt_get_max_rings(bp, &max_rx, &max_tx, sh);
--	if (rc)
--		return rc;
-+	if (bp->flags & BNXT_FLAG_AGG_RINGS)
-+		rx_rings <<= 1;
- 
--	if (max_rx < rx)
-+	_bnxt_get_max_rings(bp, &max_rx, &max_tx, &max_cp);
-+
-+	if (max_rx < rx_rings)
- 		return -ENOMEM;
- 
- 	tx_rings_needed = tx * tx_sets + tx_xdp;
-@@ -12211,11 +12259,12 @@ int bnxt_check_rings(struct bnxt *bp, int tx, int rx, bool sh, int tcs,
- 
- 	vnics = 1;
- 	if ((bp->flags & (BNXT_FLAG_RFS | BNXT_FLAG_CHIP_P5)) == BNXT_FLAG_RFS)
--		vnics += rx_rings;
-+		vnics += rx;
- 
--	if (bp->flags & BNXT_FLAG_AGG_RINGS)
--		rx_rings <<= 1;
--	cp = sh ? max_t(int, tx_rings_needed, rx) : tx_rings_needed + rx;
-+	tx_cp = __bnxt_num_tx_to_cp(bp, tx_rings_needed, tx_sets, tx_xdp);
-+	cp = sh ? max_t(int, tx_cp, rx) : tx_cp + rx;
-+	if (max_cp < cp)
-+		return -ENOMEM;
- 	stats = cp;
- 	if (BNXT_NEW_RM(bp)) {
- 		cp += bnxt_get_ulp_msix_num(bp);
-@@ -12849,7 +12898,7 @@ int bnxt_setup_mq_tc(struct net_device *dev, u8 tc)
- {
- 	struct bnxt *bp = netdev_priv(dev);
- 	bool sh = false;
--	int rc;
-+	int rc, tx_cp;
- 
- 	if (tc > bp->max_tc) {
- 		netdev_err(dev, "Too many traffic classes requested: %d. Max supported is %d.\n",
-@@ -12880,8 +12929,9 @@ int bnxt_setup_mq_tc(struct net_device *dev, u8 tc)
- 		netdev_reset_tc(dev);
+ 		for (i = 0; i < tcs; i++) {
+ 			count = bp->tx_nr_rings_per_tc;
+-			off = i * count;
++			off = BNXT_TC_TO_RING_BASE(bp, i);
+ 			netdev_set_tc_queue(dev, i, count, off);
+ 		}
  	}
- 	bp->tx_nr_rings += bp->tx_nr_rings_xdp;
--	bp->cp_nr_rings = sh ? max_t(int, bp->tx_nr_rings, bp->rx_nr_rings) :
--			       bp->tx_nr_rings + bp->rx_nr_rings;
-+	tx_cp = bnxt_num_tx_to_cp(bp, bp->tx_nr_rings);
-+	bp->cp_nr_rings = sh ? max_t(int, tx_cp, bp->rx_nr_rings) :
-+			       tx_cp + bp->rx_nr_rings;
- 
- 	if (netif_running(bp->dev))
- 		return bnxt_open_nic(bp, true, false);
-@@ -13360,7 +13410,10 @@ static void _bnxt_get_max_rings(struct bnxt *bp, int *max_rx, int *max_tx,
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
- 		*max_rx >>= 1;
- 	if (bp->flags & BNXT_FLAG_CHIP_P5) {
--		bnxt_trim_rings(bp, max_rx, max_tx, *max_cp, false);
-+		if (*max_cp < (*max_rx + *max_tx)) {
-+			*max_rx = *max_cp / 2;
-+			*max_tx = *max_rx;
-+		}
- 		/* On P5 chips, max_cp output param should be available NQs */
- 		*max_cp = max_irq;
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 2028233c0561..4ce993943924 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2393,6 +2393,7 @@ int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
- int bnxt_hwrm_set_coal(struct bnxt *);
- void bnxt_free_ctx_mem(struct bnxt *bp);
-+int bnxt_num_tx_to_cp(struct bnxt *bp, int tx);
- unsigned int bnxt_get_max_func_stat_ctxs(struct bnxt *bp);
- unsigned int bnxt_get_avail_stat_ctxs_for_en(struct bnxt *bp);
- unsigned int bnxt_get_max_func_cp_rings(struct bnxt *bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 18c06158fead..76f2eab52ce7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -923,6 +923,7 @@ static int bnxt_set_channels(struct net_device *dev,
- 	bool sh = false;
- 	int tx_xdp = 0;
- 	int rc = 0;
-+	int tx_cp;
- 
- 	if (channel->other_count)
- 		return -EINVAL;
-@@ -994,8 +995,9 @@ static int bnxt_set_channels(struct net_device *dev,
- 	if (tcs > 1)
- 		bp->tx_nr_rings = bp->tx_nr_rings_per_tc * tcs + tx_xdp;
- 
--	bp->cp_nr_rings = sh ? max_t(int, bp->tx_nr_rings, bp->rx_nr_rings) :
--			       bp->tx_nr_rings + bp->rx_nr_rings;
-+	tx_cp = bnxt_num_tx_to_cp(bp, bp->tx_nr_rings);
-+	bp->cp_nr_rings = sh ? max_t(int, tx_cp, bp->rx_nr_rings) :
-+			       tx_cp + bp->rx_nr_rings;
- 
- 	/* After changing number of rx channels, update NTUPLE feature. */
- 	netdev_update_features(dev);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-index 52b75108e130..9d428eb3fdb9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c
-@@ -398,7 +398,7 @@ int bnxt_xdp_xmit(struct net_device *dev, int num_frames,
- static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
- {
- 	struct net_device *dev = bp->dev;
--	int tx_xdp = 0, rc, tc;
-+	int tx_xdp = 0, tx_cp, rc, tc;
- 	struct bpf_prog *old;
- 
- 	if (prog && !prog->aux->xdp_has_frags &&
-@@ -446,7 +446,8 @@ static int bnxt_xdp_set(struct bnxt *bp, struct bpf_prog *prog)
- 	}
- 	bp->tx_nr_rings_xdp = tx_xdp;
- 	bp->tx_nr_rings = bp->tx_nr_rings_per_tc * tc + tx_xdp;
--	bp->cp_nr_rings = max_t(int, bp->tx_nr_rings, bp->rx_nr_rings);
-+	tx_cp = bnxt_num_tx_to_cp(bp, bp->tx_nr_rings);
-+	bp->cp_nr_rings = max_t(int, tx_cp, bp->rx_nr_rings);
- 	bnxt_set_tpa_flags(bp);
- 	bnxt_set_ring_params(bp);
- 
 -- 
 2.30.1
 
 
---000000000000f68008060a11b4f8
+--000000000000002331060a11b56b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -435,14 +202,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILiEG7SA5Cnrz/URgS2wHH/qAEh+ejX3
-2+UE5Tbg192aMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAwD5v4toglDP1/UhLUdMubdOLxqqmwV
+9I420dt2V4iiMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
 NDAwMTcwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBumXp5Rje3vMqU4vfo5NGzNKtKUecxw6Zl6c1so0TJEDkdX7OC
-ac2xbpfQBrcK7tTevXMn+zw87hN9puxnPF3Ex0r5jupIK35RMRfcpw919LU/yF3as1Uoc+6Yb0p0
-SedGXuaLrRr4v/bVyfiOC+bH823GTmBv7x94gfHrTyeYuxjvj/x1aRN3vQXjMj/Nbm0Gmlsl8sd+
-PVX2CN4RDGJqp5G5NQhHCTvREJsKcjVF/wLbx6ru48OmxjnjZAquKvTGrlUvtVoRID7lwGsmdSR2
-ylO9Zua7bwiRdxkTtil/6c4Rzdu235xaXMxdvF5wPsSmfmQLj0bwupJLfcloM9Qb
---000000000000f68008060a11b4f8--
+ATANBgkqhkiG9w0BAQEFAASCAQAFY6PHak18P7cyyw//NzqkscW+1I42cwWPfkcMZB7T3JKiDXYU
+Bc3rgIzUnp9r5o/8Wy/VEDUWU4OMqZzfoMAvSatBBzpzSnnCOcOZEt5MRg8JnvBTvk2M+3ZiApgg
+R4GbPLktLieKUIPwh11BbyCJwzL0QeolD43eteo9bMuI1Iu8rjw7iiSDd3toqwD6eKunaZsjdr3f
+Fby7iOTzaQauaAZc0NqzR8PRUxM5iNbfrotINFTF/w7xbhJ9d8s+xBFdr2+8ZrQgA7ZyebO4Q/KL
+1Vd5yfIpNJaEyzaR0LcD/TQyF6EqeAvMSwYxflowAWSERxaoH7C0wiI5YE4NcWvA
+--000000000000002331060a11b56b--
 
