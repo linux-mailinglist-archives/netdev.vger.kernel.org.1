@@ -1,227 +1,112 @@
-Return-Path: <netdev+bounces-47640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DFF7EAD66
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:52:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E18D57EAD70
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E1E11F22F62
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 09:52:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B010280E20
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 09:55:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFF58168D8;
-	Tue, 14 Nov 2023 09:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7515171AD;
+	Tue, 14 Nov 2023 09:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="STLJeDmD"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6B9168D3
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:52:51 +0000 (UTC)
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091B6D42;
-	Tue, 14 Nov 2023 01:52:48 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VwP4wni_1699955565;
-Received: from 30.221.149.133(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VwP4wni_1699955565)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Nov 2023 17:52:46 +0800
-Message-ID: <4fc4e577-1e1f-1f0b-ca0c-1b525fafcce5@linux.alibaba.com>
-Date: Tue, 14 Nov 2023 17:52:44 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7521214AB5;
+	Tue, 14 Nov 2023 09:55:14 +0000 (UTC)
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1374A194;
+	Tue, 14 Nov 2023 01:55:13 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 41be03b00d2f7-5bd6ac9833fso3380454a12.0;
+        Tue, 14 Nov 2023 01:55:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699955712; x=1700560512; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dRCTQHNf+ndVVANEprGa5HyYqlhBNGtDrHdcK2WIu8M=;
+        b=STLJeDmDtTaApqeuq+jK81SWyXdJodnToUi5Z81TLUF+DGmhOs4Nxn3G0sUNG2yKQP
+         5ZXNa5ykn5bhL2kbnQw+2oSCFgY3aLASuWuVXVX0t1kcgmwq4NkzrmbhzY8InA4+cGpr
+         PHveab4L9OxhCEsH/4bET9OlEsX0mSbfN7Bqx0WfLumvFDxfwbHPiixwr7W52ac+GDtu
+         lsHuhQfYSWDk/jtHDjXvtbypHcqoqCfy4Lr2OastuYyIFmUWUl4PP3GUpby6kMhpaMCH
+         xHV6wK188dVFHIig9NHDvJDUROIrfxJHjy40iLrQk/kMUuKjMnWxOwpB5Wn1A3X4IWhn
+         QcrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699955712; x=1700560512;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dRCTQHNf+ndVVANEprGa5HyYqlhBNGtDrHdcK2WIu8M=;
+        b=g0ysruRoQM8iurt8ZIBb/KNqiaPKsrZjsjqGd63OixZNO2zD0jm/58ppcWdVdTtKNL
+         G+ZqME1xvIdhJfkfLbaSXvSXsz2AS8GU57A+d2orfNBWv2suytYVHIcmhPlTOLRjRvyr
+         h9jaoXUT6nyh9FwqfCOywAT6iWh145oYVibi7dgYPKggl8dfYN/JcqJRPrOrVXM0woYm
+         K/bsm/dpTOuwb1J/Cf2UbHu2iTIvA81S8tUThT47gGVb3Oc6qC6/PnpLpa7+2zV2WrCY
+         MEoHc3eVyuScOkg6Bi3XZXOZQr053gy407FEHvDXsG/0qbBXmctWlWUKXHrdfLBP/5Me
+         +utw==
+X-Gm-Message-State: AOJu0Yx6JqUqbQwh8yths5F/lH4LB9BEKRTh4pl5zbPEy7venSEmW2aQ
+	XkZRWNdsi8BcKWJn+rM/m5y3dtKIWlR3aA==
+X-Google-Smtp-Source: AGHT+IEZHkkLwaT/b3h0NXABxPM/d6iwqXuwqppGiQvaWFJl28Ewcc0ddOqQw7Ie47d0LErDzkYC5A==
+X-Received: by 2002:a05:6a20:12ca:b0:15e:a46f:fcfc with SMTP id v10-20020a056a2012ca00b0015ea46ffcfcmr8106665pzg.21.1699955712001;
+        Tue, 14 Nov 2023 01:55:12 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id a17-20020a170902ecd100b001c9cb2fb8d8sm5328369plh.49.2023.11.14.01.55.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 01:55:11 -0800 (PST)
+Date: Tue, 14 Nov 2023 17:55:05 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, David Ahern <dsahern@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Po-Hsu Lin <po-hsu.lin@canonical.com>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: [Discuss] Seeking advice on net selftests netns naming method
+Message-ID: <ZVND+e6RKLFudYQA@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net v1] net/smc: avoid data corruption caused by decline
-Content-Language: en-US
-To: Wenjia Zhang <wenjia@linux.ibm.com>, kgraul@linux.ibm.com,
- jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
- <05c29431-c941-45d1-8e14-0527accc3993@linux.ibm.com>
- <b3ce2dfe-ece9-919b-024d-051cd66609ed@linux.alibaba.com>
- <3f3080e2-cb2c-16f4-02b1-ca17394d2813@linux.alibaba.com>
- <d099d572-3feb-44a0-8b63-60a18af28943@linux.ibm.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <d099d572-3feb-44a0-8b63-60a18af28943@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+Hi,
 
+Good day! Following Guillaume's suggestion, I've been working on updating all
+net self-tests to run in their respective netns. This modification allows us
+to execute all tests in parallel, potentially saving a significant amount of
+test time.
 
-On 11/13/23 6:57 PM, Wenjia Zhang wrote:
->
->
-> On 13.11.23 03:50, D. Wythe wrote:
->>
->>
->> On 11/10/23 10:51 AM, D. Wythe wrote:
->>>
->>>
->>> On 11/8/23 9:00 PM, Wenjia Zhang wrote:
->>>>
->>>>
->>>> On 08.11.23 10:48, D. Wythe wrote:
->>>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>
->>>>> We found a data corruption issue during testing of SMC-R on Redis
->>>>> applications.
->>>>>
->>>>> The benchmark has a low probability of reporting a strange error as
->>>>> shown below.
->>>>>
->>>>> "Error: Protocol error, got "\xe2" as reply type byte"
->>>>>
->>>>> Finally, we found that the retrieved error data was as follows:
->>>>>
->>>>> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
->>>>> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->>>>> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
->>>>>
->>>>> It is quite obvious that this is a SMC DECLINE message, which 
->>>>> means that
->>>>> the applications received SMC protocol message.
->>>>> We found that this was caused by the following situations:
->>>>>
->>>>> client            server
->>>>>        proposal
->>>>>     ------------->
->>>>>        accept
->>>>>     <-------------
->>>>>        confirm
->>>>>     ------------->
->>>>> wait confirm
->>>>>
->>>>>      failed llc confirm
->>>>>         x------
->>>>> (after 2s)timeout
->>>>>             wait rsp
->>>>>
->>>>> wait decline
->>>>>
->>>>> (after 1s) timeout
->>>>>             (after 2s) timeout
->>>>>         decline
->>>>>     -------------->
->>>>>         decline
->>>>>     <--------------
->>>>>
->>>>> As a result, a decline message was sent in the implementation, and 
->>>>> this
->>>>> message was read from TCP by the already-fallback connection.
->>>>>
->>>>> This patch double the client timeout as 2x of the server value,
->>>>> With this simple change, the Decline messages should never cross or
->>>>> collide (during Confirm link timeout).
->>>>>
->>>>> This issue requires an immediate solution, since the protocol updates
->>>>> involve a more long-term solution.
->>>>>
->>>>> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the 
->>>>> LLC flow")
->>>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>>>> ---
->>>>>   net/smc/af_smc.c | 2 +-
->>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->>>>> index abd2667..5b91f55 100644
->>>>> --- a/net/smc/af_smc.c
->>>>> +++ b/net/smc/af_smc.c
->>>>> @@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct 
->>>>> smc_sock *smc)
->>>>>       int rc;
->>>>>         /* receive CONFIRM LINK request from server over RoCE 
->>>>> fabric */
->>>>> -    qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
->>>>> +    qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
->>>>>                     SMC_LLC_CONFIRM_LINK);
->>>>>       if (!qentry) {
->>>>>           struct smc_clc_msg_decline dclc;
->>>> I'm wondering if the double time (if sufficient) of timeout could 
->>>> be for waiting for CLC_DECLINE on the client's side. i.e.
->>>>
->>>
->>> It depends. We can indeed introduce a sysctl to allow server to 
->>> manager their Confirm Link timeout,
->>> but if there will be protocol updates, this introduction will no 
->>> longer be necessary, and we will
->>> have to maintain it continuously.
->>>
-> no, I don't think, either, that we need a sysctl for that.
+However, I've encountered a challenge while making these modifications. The
+net selftest folder contains around 80 tests (excluding the forwarding test),
+with some tests using common netns names and others using self-defined names.
+I've considered two methods to address this issue:
 
-I am okay about that.
+One approach is to retain the original names but append a unique suffix using
+$(mktemp -u XXXXXX). While this is a straightforward solution, it may not
+prevent future tests from using common names.
 
->>> I believe the core of the solution is to ensure that decline 
->>> messages never cross or collide. Increasing
->>> the client's timeout by twice as much as the server's timeout can 
->>> temporarily solve this problem.
->
-> I have no objection with that, but my question is why you don't 
-> increase the timeout waiting for CLC_DECLINE instead of waiting 
-> LLC_Confirm_Link? Shouldn't they have the same effect?
->
+Another option is to establish a general netns lib. Similar to the NUM_NETIFS
+variable in the forwarding test, we could introduce a variable like NUM_NS.
+This variable would define the number of netns instances, and all tests would
+use the netns lib to set up and clean up netns accordingly. However, this
+approach might complicate test debugging, especially for tests like
+fib_nexthops.sh, which relies on clear and visually netns names
+(e.g., me/peer/remote).
 
-Logically speaking, of course, they have the same effect, but there are 
-two reasons that i choose to increase LLC timeout here:
+I'm reaching out to gather your insights on this matter. Do you have any
+suggestions or preferences regarding the two proposed methods, or do you have
+an alternative solution in mind?
 
-1. to avoid DECLINE  cross or collide, we need a bigger time gap, a 
-simple math is
+Your expertise in this area would be greatly appreciated.
 
-     2 ( LLC_Confirm_Link) + 1 (CLC_DECLINE) = 3
-     2 (LLC_Confirm_Link)  + 1 * 2 (CLC_DECLINE) = 4
-     2 * 2(LLC_Confirm_Link) + 1 (CLC_DECLINE) = 5
-
-Obviously, double the LLC_Confirm_Link will result in more time gaps.
-
-2. increase LLC timeout to allow as many RDMA link as possible to 
-succeed, rather than fallback.
-
-D. Wythe
-
->>> If Jerry's proposed protocol updates are too complex or if there 
->>> won't be any future protocol updates,
->>> it's still not late to let server manager their Confirm Link timeout 
->>> then.
->>>
->>> Best wishes,
->>> D. Wythe
->>>
->>
->> FYI:
->>
->> It seems that my email was not successfully delivered due to some 
->> reasons. Sorry
->> for that.
->>
->> D. Wythe
->>
->>
->
->>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->>>> index 35ddebae8894..9b1feef1013d 100644
->>>> --- a/net/smc/af_smc.c
->>>> +++ b/net/smc/af_smc.c
->>>> @@ -605,7 +605,7 @@ static int smcr_clnt_conf_first_link(struct 
->>>> smc_sock *smc)
->>>>                 struct smc_clc_msg_decline dclc;
->>>>
->>>>                 rc = smc_clc_wait_msg(smc, &dclc, sizeof(dclc),
->>>> -                                     SMC_CLC_DECLINE, 
->>>> CLC_WAIT_TIME_SHORT);
->>>> +                                     SMC_CLC_DECLINE, 2 * 
->>>> CLC_WAIT_TIME_SHORT);
->>>>                 return rc == -EAGAIN ? SMC_CLC_DECL_TIMEOUT_CL : rc;
->>>>         }
->>>>         smc_llc_save_peer_uid(qentry);
->>>>
->>>> Because the purpose is to let the server have the control to deline.
->>>
->>
-
+Best Regards
+Hangbin
 
