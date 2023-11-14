@@ -1,172 +1,74 @@
-Return-Path: <netdev+bounces-47719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937D57EB02F
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:49:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C2067EB03E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:52:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC33E1C20A3E
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:49:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFE81B20BD9
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE663FB33;
-	Tue, 14 Nov 2023 12:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB3C3FB32;
+	Tue, 14 Nov 2023 12:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQoNlFGT"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244243FB26
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:49:13 +0000 (UTC)
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF4518B;
-	Tue, 14 Nov 2023 04:49:10 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SV5ct2vmsz1P7cN;
-	Tue, 14 Nov 2023 20:45:50 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Tue, 14 Nov
- 2023 20:49:08 +0800
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: Mina Almasry <almasrymina@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Jason Gunthorpe <jgg@nvidia.com>, Matthew Wilcox
-	<willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <fa5d2f4c-5ccc-e23e-1926-2d7625b66b91@huawei.com>
-Date: Tue, 14 Nov 2023 20:49:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83503FB26
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:51:59 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393EA19B
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:51:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699966317;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ebvZe4TIPBxRze+Pu3P24AV1eNd9MQIB23VhEMldQz0=;
+	b=bQoNlFGTJr1Y+rIzD5Zh1UxaIV8RbLfGmy4nxLVP+YSaqLsfuLUarEfcGtkmjo/eOgplhC
+	ZZ0410xsCPGn/oQZl0NlvQocB0CHf0x82P3cUjKgu+toRwGxnzH7dIL6tFWy5fCaOdXpeA
+	1BE3FV+7rztMH62E/bcutMN3HZiPEP0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-265-Znp_XnGwOXuaeN0YZOHPww-1; Tue,
+ 14 Nov 2023 07:51:54 -0500
+X-MC-Unique: Znp_XnGwOXuaeN0YZOHPww-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7C261C05149;
+	Tue, 14 Nov 2023 12:51:53 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.95])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8B3D72026D4C;
+	Tue, 14 Nov 2023 12:51:51 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: jtornosm@redhat.com,
+	weihao.bj@ieisystem.com
+Subject: [PATCH 0/2] net: usb: ax88179_178a: fix and improve reset procedure
+Date: Tue, 14 Nov 2023 13:50:43 +0100
+Message-ID: <20231114125111.313229-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On 2023/11/14 20:21, Mina Almasry wrote:
-> On Tue, Nov 14, 2023 at 12:23 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> +cc Christian, Jason and Willy
->>
->> On 2023/11/14 7:05, Jakub Kicinski wrote:
->>> On Mon, 13 Nov 2023 05:42:16 -0800 Mina Almasry wrote:
->>>> You're doing exactly what I think you're doing, and what was nacked in RFC v1.
->>>>
->>>> You've converted 'struct page_pool_iov' to essentially become a
->>>> duplicate of 'struct page'. Then, you're casting page_pool_iov* into
->>>> struct page* in mp_dmabuf_devmem_alloc_pages(), then, you're calling
->>>> mm APIs like page_ref_*() on the page_pool_iov* because you've fooled
->>>> the mm stack into thinking dma-buf memory is a struct page.
->>
->> Yes, something like above, but I am not sure about the 'fooled the mm
->> stack into thinking dma-buf memory is a struct page' part, because:
->> 1. We never let the 'struct page' for devmem leaking out of net stacking
->>    through the 'not kmap()able and not readable' checking in your patchset.
-> 
-> RFC never used dma-buf pages outside the net stack, so that is the same.
-> 
-> You are not able to get rid of the 'net kmap()able and not readable'
-> checking with this approach, because dma-buf memory is fundamentally
-> unkmapable and unreadable. This approach would still need
-> skb_frags_not_readable checks in net stack, so that is also the same.
+Intensive reset testing has detected some problems that need to be fixed
+to get a correct initialization.
 
-Yes, I am agreed that checking is still needed whatever the proposal is.
-
-> 
->> 2. We inititiate page->_refcount for devmem to one and it remains as one,
->>    we will never call page_ref_inc()/page_ref_dec()/get_page()/put_page(),
->>    instead, we use page pool's pp_frag_count to do reference counting for
->>    devmem page in patch 6.
->>
-> 
-> I'm not sure that moves the needle in terms of allowing dma-buf
-> memory to look like struct pages.
-> 
->>>>
->>>> RFC v1 was almost exactly the same, except instead of creating a
->>>> duplicate definition of struct page, it just allocated 'struct page'
->>>> instead of allocating another struct that is identical to struct page
->>>> and casting it into struct page.
->>
->> Perhaps it is more accurate to say this is something between RFC v1 and
->> RFC v3, in order to decouple 'struct page' for devmem from mm subsystem,
->> but still have most unified handling for both normal memory and devmem
->> in page pool and net stack.
->>
->> The main difference between this patchset and RFC v1:
->> 1. The mm subsystem is not supposed to see the 'struct page' for devmem
->>    in this patchset, I guess we could say it is decoupled from the mm
->>    subsystem even though we still call PageTail()/page_ref_count()/
->>    page_is_pfmemalloc() on 'struct page' for devmem.
->>
-> 
-> In this patchset you pretty much allocate a struct page for your
-> dma-buf memory, and then cast it into a struct page, so all the mm
-> calls in page_pool.c are seeing a struct page when it's really dma-buf
-> memory.
-> 
-> 'even though we still call
-> PageTail()/page_ref_count()/page_is_pfmemalloc() on 'struct page' for
-> devmem' is basically making dma-buf memory look like struct pages.
-> 
-> Actually because you put the 'strtuct page for devmem' in
-> skb->bv_frag, the net stack will grab the 'struct page' for devmem
-> using skb_frag_page() then call things like page_address(), kmap,
-> get_page, put_page, etc, etc, etc.
-
-Yes, as above, skb_frags_not_readable() checking is still needed for
-kmap() and page_address().
-
-get_page, put_page related calling is avoided in page_pool_frag_ref()
-and napi_pp_put_page() for devmem page as the above checking is true
-for devmem page:
-(pp_iov->pp_magic & ~0x3UL) == PP_SIGNATURE
-
-> 
->> The main difference between this patchset and RFC v3:
->> 1. It reuses the 'struct page' to have more unified handling between
->>    normal page and devmem page for net stack.
-> 
-> This is what was nacked in RFC v1.
-> 
->> 2. It relies on the page->pp_frag_count to do reference counting.
->>
-> 
-> I don't see you change any of the page_ref_* calls in page_pool.c, for
-> example this one:
-> 
-> https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L601
-> 
-> So the reference the page_pool is seeing is actually page->_refcount,
-> not page->pp_frag_count? I'm confused here. Is this a bug in the
-> patchset?
-
-page->_refcount is the same as page_pool_iov->_refcount for devmem, which
-is ensured by the 'PAGE_POOL_MATCH(_refcount, _refcount);', and
-page_pool_iov->_refcount is set to one in mp_dmabuf_devmem_alloc_pages()
-by calling 'refcount_set(&ppiov->_refcount, 1)' and always remains as one.
-
-So the 'page_ref_count(page) == 1' checking is always true for devmem page.
 
