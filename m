@@ -1,84 +1,114 @@
-Return-Path: <netdev+bounces-47644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B7867EADA9
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:10:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB5B87EADCA
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C9B31F22643
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1157828107E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:16:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAAB18652;
-	Tue, 14 Nov 2023 10:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51161863F;
+	Tue, 14 Nov 2023 10:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nuB+0l0s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIhAW+cS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E1601863F
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 10:10:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F230BC433C9;
-	Tue, 14 Nov 2023 10:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1699956623;
-	bh=OaJc768p/TfNTHeRrgysLojXYfuqN+drG0p5UWrxU2g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nuB+0l0sDMogYhXFl41leVaGbIwl90MCwokJRm7+lIoZPCsQOOth0eWsFiilYafKP
-	 w6TahPW7WfCNqK9KjrGwFQ793uT8+PBX9SHwgHiLvdvGsugA+34LA2nffENCTSDYms
-	 p5d9BhyNQEKOe2Pt0P/9kx48BIQg+FvOTml60NuYH1OzfIMK52mW/pOj0+qLag5AAX
-	 QvY//wxBMCFxWzboIc8K/H67a1RRHPSpRzqSMt1NcORXyUngst7H89OJTJ0p8o+iFh
-	 s8XwP6aZddeWTqO5CxkQZ9u1WZBck9vgWxerPtkuAV6ALaSIFmIXdVr/C9v1lgg/LQ
-	 x5OoNfMGwajcw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DAFAAE1F676;
-	Tue, 14 Nov 2023 10:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E2E19453
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 10:16:42 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D24583
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 02:16:42 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-6c4884521f6so4584862b3a.0
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 02:16:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699957001; x=1700561801; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h9HLh5chAiBR///+94swHNlYrbRytOcJ5TEltqsM6iU=;
+        b=NIhAW+cS1PoPymmdvhRwmPkL7dGNNhDBKz3Y2CBtUGAeEZQ8r+QqUh8bcp31pFfprY
+         036l6MoZ3R8kb14GNpMKVpV0YGd1Tuqdj+/6865ICqmQ1R95VX0XIqX8mDf3cBOskToJ
+         1/E+yamp/3F2DURJgmjKgv9VIPYxsQGA9q9KuaSvzYIbYXZw2zMMzTpuQkhxKTaQvrZq
+         Rg9ciD6zZcwzXi8XsE3l650sk0/iY0+dNNivMb5xqgDyEQIyXrp1Q/H3ISc3+TzS/UQR
+         he/KCRP22Qr/zMynfGGSsicO7MmNcX3V40F+V/Us+aqVt209qQKL809pqWtoKz/5vZJJ
+         gJGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699957001; x=1700561801;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h9HLh5chAiBR///+94swHNlYrbRytOcJ5TEltqsM6iU=;
+        b=Q0h+kD1EogtTUjsyPG8TemrAi4FAAOa1zI5G5MF3aGUGrNfaHeO0hnQ7fmUlqKDADQ
+         Klxz/uw9Qzn3T1+e0uh5dAFiYHLGUTyzVEzSwcKiHaQXVqHoUudVuI32q69MYtb0y0VU
+         04I39Yo5cbfpxiadLSYZR+OvXgEhVsYyFRvfHzrCS0X/TiO3XNboC+D/UERHo9+IvVqt
+         bVGy/kfnlU3oygIXUn8KYnCAaDI1oMN0KquDEW1kZWUEJjEUg77o5rTcLx5wkNLdq2fB
+         RaxtGcyfWvEvT3Rlu88PVOJ2zpbRyTulXbVpHngsTNcCfjo+H9Xli/B5uW/RrjEOpM4f
+         2ivw==
+X-Gm-Message-State: AOJu0YwCexEHHRoOj2w8Vt1swqkvWEeC1M9F+REejLt4ufZTYrT3bLMm
+	LJZ4ouTghxd9Eeg1GBooPwk=
+X-Google-Smtp-Source: AGHT+IHgw8rnk/JvUyUOMgz/sQV4TylsG0Ys2QzZjOCzG3324zOZKYbmVp5nN5S1jyzNiwVfDtMEPg==
+X-Received: by 2002:a05:6a20:a112:b0:14c:c393:6af with SMTP id q18-20020a056a20a11200b0014cc39306afmr7536771pzk.0.1699957001449;
+        Tue, 14 Nov 2023 02:16:41 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e7-20020a635447000000b0056b6d1ac949sm5209067pgm.13.2023.11.14.02.16.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 02:16:40 -0800 (PST)
+Date: Tue, 14 Nov 2023 18:16:36 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, j.vosburgh@gmail.com,
+	andy@greyhouse.net, weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next,v2] bonding: use WARN_ON_ONCE instead of BUG in
+ alb_upper_dev_walk
+Message-ID: <ZVNJBEuJw+rT/Biq@Laptop-X1>
+References: <20231114091829.2509952-1-shaozhengchao@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] af_unix: fix use-after-free in unix_stream_read_actor()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <169995662289.4194.12253465317532052618.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Nov 2023 10:10:22 +0000
-References: <20231113134938.168151-1-edumazet@google.com>
-In-Reply-To: <20231113134938.168151-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+7a2d546fa43e49315ed3@syzkaller.appspotmail.com, rao.shoaib@oracle.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114091829.2509952-1-shaozhengchao@huawei.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 13 Nov 2023 13:49:38 +0000 you wrote:
-> syzbot reported the following crash [1]
+On Tue, Nov 14, 2023 at 05:18:29PM +0800, Zhengchao Shao wrote:
+> If failed to allocate "tags" or could not find the final upper device from
+> start_dev's upper list in bond_verify_device_path(), only the loopback
+> detection of the current upper device should be affected, and the system is
+> no need to be panic.
+> Using WARN_ON_ONCE here is to avoid spamming the log if there's a lot of
+> macvlans above the bond.
 > 
-> After releasing unix socket lock, u->oob_skb can be changed
-> by another thread. We must temporarily increase skb refcount
-> to make sure this other thread will not free the skb under us.
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> ---
+> v2: use WARN_ON_ONCE instead of WARN_ON
+> ---
+>  drivers/net/bonding/bond_alb.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> [1]
-> 
-> [...]
+> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+> index dc2c7b979656..a7bad0fff8cb 100644
+> --- a/drivers/net/bonding/bond_alb.c
+> +++ b/drivers/net/bonding/bond_alb.c
+> @@ -984,8 +984,10 @@ static int alb_upper_dev_walk(struct net_device *upper,
+>  	 */
+>  	if (netif_is_macvlan(upper) && !strict_match) {
+>  		tags = bond_verify_device_path(bond->dev, upper, 0);
+> -		if (IS_ERR_OR_NULL(tags))
+> -			BUG();
+> +		if (IS_ERR_OR_NULL(tags)) {
+> +			WARN_ON_ONCE(1);
+> +			return 0;
 
-Here is the summary with links:
-  - [net] af_unix: fix use-after-free in unix_stream_read_actor()
-    https://git.kernel.org/netdev/net/c/4b7b492615cf
+Return 0 for an error looks weird. Should we keep walking the list if
+allocate "tags" failed?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks
+Hangbin
 
