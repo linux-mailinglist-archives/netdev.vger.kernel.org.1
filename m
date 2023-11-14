@@ -1,50 +1,39 @@
-Return-Path: <netdev+bounces-47688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2976B7EAF9F
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:06:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 596FD7EAFA2
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:06:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A2D1F2389F
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:06:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5414E1C209C7
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE7B3D984;
-	Tue, 14 Nov 2023 12:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179B53E483;
+	Tue, 14 Nov 2023 12:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="QiTqiAeT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q97ZyIuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA483A28E
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:06:47 +0000 (UTC)
-Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C7FF1;
-	Tue, 14 Nov 2023 04:06:42 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; t=1699963593; cv=none; 
-	d=zohomail.in; s=zohoarc; 
-	b=QRiZ0ovh7eNv3NVE9cFBIjepjH+y2iEhgs2VFfsJI+y+GvfkMvDH3FV3/kEPkzr1dcofnhyXlD2grZpxVRRY2NBMzH0NoxjYZDUbOpiVAtR1TExxWtSpK8DhOMRoyCGxNtVqTTigfAujkLASEzH/3p1oEH99jULySt8M1IIVGac=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
-	t=1699963593; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=T4rNGeLByRlCebNC4mv6V/yHuowhMU4zziKayPFdTiE=; 
-	b=H3RHCjwewdZnogcWkC2fpLbJfxQrcdM+Wsq2VToczthSAfUCzQk6VqxakucJbff3092QYWpv1cgSqI3rJoaJonK5imRqHvdoM1x0KEROzii2gbiHHZXb8LBxabDyC3lLRd6yhfyPUCiZyWwg8nM3yFgN3o51YrEyHqQY4KL4xvA=
-ARC-Authentication-Results: i=1; mx.zohomail.in;
-	dkim=pass  header.i=siddh.me;
-	spf=pass  smtp.mailfrom=code@siddh.me;
-	dmarc=pass header.from=<code@siddh.me>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1699963593;
-	s=zmail; d=siddh.me; i=code@siddh.me;
-	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=T4rNGeLByRlCebNC4mv6V/yHuowhMU4zziKayPFdTiE=;
-	b=QiTqiAeTWzfy+kAbVtuZQgouw+bKgwAUKoDOysuvp7WEVI7OWEDeUfV/p7DEQrgk
-	3Qf2ynFkgu7wOEfVOlKF2TnOi6KmIIXt9JN0W9tWa76JR2mOkDqf5grWtiPVvrR9S5e
-	ElNBdIlheRUBHoHSGP8Z7ty7eNmuGq7B7p1Kv+Rk=
-Received: from [192.168.1.11] (106.201.112.144 [106.201.112.144]) by mx.zoho.in
-	with SMTPS id 1699963591183647.2368112754372; Tue, 14 Nov 2023 17:36:31 +0530 (IST)
-Message-ID: <3df56245-d104-4ce2-ab88-0fb1d29cd629@siddh.me>
-Date: Tue, 14 Nov 2023 17:36:27 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8EF3E47D
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 12:06:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3941C433C7;
+	Tue, 14 Nov 2023 12:06:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1699963610;
+	bh=B/cuiYf3xoa7ZBqITbU7+4yaCtY4LMzTglSLKmmzqPI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q97ZyIuqZAC5GgJUeQHnC0EOi3hcLKMDPeHFYwujSSyqNf1rawAxNOMRZ/WdL7ULF
+	 vMfH9q+PluLnpg2b/BTYVpK2lU0othBWYt8ReI1MptYEyG8cGAqPQSTiKJVdATHtyU
+	 l44zT3cgtUqOyQpyDZs97ax3uFYsjn/ybxdJITWu80esVJOI+/T/9A7uhnEeq4k+f3
+	 1KYuNInJwVi5TBLFnMcaE1LITnBgS6CgEgojDc6Saann4TvhbjEVlbIryX8Hbnlifb
+	 EwRsE5CjcBnqYG5aWgSNBrd2eYzTbPUmyWXMz0cANIY2LnTRNqvc/GKJTZ/MOveWV9
+	 4J2s91JF+5cww==
+Message-ID: <2b4c0405-064e-4e3d-8cf8-36fee1dcc687@kernel.org>
+Date: Tue, 14 Nov 2023 14:06:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,81 +41,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <000000000000cb112e0609b419d3@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
- nfc_alloc_send_skb
-Content-Language: en-US, en-GB, hi-IN
-From: Siddh Raman Pant <code@siddh.me>
-In-Reply-To: <000000000000cb112e0609b419d3@google.com>
+Subject: Re: [PATCH net-next 1/3] net: ethernet: am65-cpsw: Add standard
+ Ethernet MAC stats to ethtool
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, vladimir.oltean@nxp.com, s-vadapalli@ti.com,
+ r-gunasekaran@ti.com, srk@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231113110708.137379-1-rogerq@kernel.org>
+ <20231113110708.137379-2-rogerq@kernel.org>
+ <20231113164204.GB4482@kernel.org>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231113164204.GB4482@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
 
-#syz test https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
----
- net/nfc/llcp_sock.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 645677f84dba..699f7f6cc0b8 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -791,33 +791,39 @@ static int llcp_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	if (!llcp_sock->local) {
--		release_sock(sk);
--		return -ENODEV;
-+		ret = -ENODEV;
-+		goto out;
- 	}
- 
- 	if (sk->sk_type == SOCK_DGRAM) {
-+		if (sk->sk_state != LLCP_BOUND) {
-+			ret = -ENOLINK;
-+			goto out;
-+		}
-+
- 		DECLARE_SOCKADDR(struct sockaddr_nfc_llcp *, addr,
- 				 msg->msg_name);
- 
- 		if (msg->msg_namelen < sizeof(*addr)) {
--			release_sock(sk);
--			return -EINVAL;
-+			ret = -EINVAL;
-+			goto out;
- 		}
- 
--		release_sock(sk);
--
--		return nfc_llcp_send_ui_frame(llcp_sock, addr->dsap, addr->ssap,
--					      msg, len);
-+		ret = nfc_llcp_send_ui_frame(llcp_sock, addr->dsap, addr->ssap,
-+					     msg, len);
-+		goto out;
- 	}
- 
- 	if (sk->sk_state != LLCP_CONNECTED) {
--		release_sock(sk);
--		return -ENOTCONN;
-+		ret = -ENOTCONN;
-+		goto out;
- 	}
- 
--	release_sock(sk);
-+	ret = nfc_llcp_send_i_frame(llcp_sock, msg, len);
- 
--	return nfc_llcp_send_i_frame(llcp_sock, msg, len);
-+out:
-+	release_sock(sk);
-+	return ret;
- }
- 
- static int llcp_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+On 13/11/2023 18:42, Simon Horman wrote:
+> On Mon, Nov 13, 2023 at 01:07:06PM +0200, Roger Quadros wrote:
+>> Gets 'ethtool -S eth0 --groups eth-mac' command to work.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> ---
+>>  drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 26 +++++++++++++++++++++
+>>  1 file changed, 26 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> index c51e2af91f69..ac7276f0f77a 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+>> @@ -662,6 +662,31 @@ static void am65_cpsw_get_ethtool_stats(struct net_device *ndev,
+>>  					hw_stats[i].offset);
+>>  }
+>>  
+>> +static void am65_cpsw_get_eth_mac_stats(struct net_device *ndev,
+>> +					struct ethtool_eth_mac_stats *s)
+>> +{
+>> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
+>> +	struct am65_cpsw_stats_regs *stats;
+> 
+> Hi Roger,
+> 
+> I think that stats needs an __iomem annotation
+> to address the issues flagged by Sparse.
+> 
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15: warning: incorrect type in assignment (different address spaces)
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15:    expected struct am65_cpsw_stats_regs *stats
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:671:15:    got void [noderef] __iomem *stat_base
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34: warning: incorrect type in argument 1 (different address spaces)
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34:    expected void const volatile [noderef] __iomem *addr
+> drivers/net/ethernet/ti/am65-cpsw-ethtool.c:673:34:    got unsigned int *
+> ...
+
+Thanks for the catch Simon.
+I'll fix it up.
+
+> 
+>> +
+>> +	stats = port->stat_base;
+>> +
+>> +	s->FramesTransmittedOK = readl_relaxed(&stats->tx_good_frames);
+>> +	s->SingleCollisionFrames = readl_relaxed(&stats->tx_single_coll_frames);
+>> +	s->MultipleCollisionFrames = readl_relaxed(&stats->tx_mult_coll_frames);
+>> +	s->FramesReceivedOK = readl_relaxed(&stats->rx_good_frames);
+>> +	s->FrameCheckSequenceErrors = readl_relaxed(&stats->rx_crc_errors);
+>> +	s->AlignmentErrors = readl_relaxed(&stats->rx_align_code_errors);
+>> +	s->OctetsTransmittedOK = readl_relaxed(&stats->tx_octets);
+>> +	s->FramesWithDeferredXmissions = readl_relaxed(&stats->tx_deferred_frames);
+>> +	s->LateCollisions = readl_relaxed(&stats->tx_late_collisions);
+>> +	s->CarrierSenseErrors = readl_relaxed(&stats->tx_carrier_sense_errors);
+>> +	s->OctetsReceivedOK = readl_relaxed(&stats->rx_octets);
+>> +	s->MulticastFramesXmittedOK = readl_relaxed(&stats->tx_multicast_frames);
+>> +	s->BroadcastFramesXmittedOK = readl_relaxed(&stats->tx_broadcast_frames);
+>> +	s->MulticastFramesReceivedOK = readl_relaxed(&stats->rx_multicast_frames);
+>> +	s->BroadcastFramesReceivedOK = readl_relaxed(&stats->rx_broadcast_frames);
+>> +};
+>> +
+>>  static int am65_cpsw_get_ethtool_ts_info(struct net_device *ndev,
+>>  					 struct ethtool_ts_info *info)
+>>  {
+> 
+> ...
+
 -- 
-2.42.0
+cheers,
+-roger
 
