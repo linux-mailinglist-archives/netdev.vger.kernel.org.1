@@ -1,223 +1,190 @@
-Return-Path: <netdev+bounces-47734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AEB7EB122
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:46:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287F57EB139
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:52:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE912812D5
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:46:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92DFCB20A12
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 13:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F255405EF;
-	Tue, 14 Nov 2023 13:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4AC405CF;
+	Tue, 14 Nov 2023 13:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="X6hBJshj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QnAHubb5"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC43405CF
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 13:45:57 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9639132;
-	Tue, 14 Nov 2023 05:45:55 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AE84nPL017684;
-	Tue, 14 Nov 2023 05:45:49 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=pfpt0220;
- bh=3wc5P8WLQQ7TN5OjSZbRJnjfWuESLwFLz9t5HbnNk6k=;
- b=X6hBJshj6Pq/aoYfwwNE2Vu0pwzr1Gg5h+5dD/lLqLS82OAuLp9L470F0zuqXzS749Vm
- 6iFcDwPN6n2qvnQCotVF9vWdezfhdgbIGs0pBXvkjmnhZFiWsckN7XqUYuAcW1f9MrcK
- /mixDTjWHBx6mel5EASOrgNrMavaGZCztTPMEAhS2r+pPEZGtaWTEVnOdT4bDflrgtbA
- xdWKwNXzrFocRQSWko1sotA/rxQNT9wX/l30l/Dv/TJXXumei/rfoLNwnye15mtwnF92
- +5pT0jS0yER6UzqWqlQ3J0RUIDO+K5KTFRCVXe9d4C7rg1X2SBjRnAeZjSduAzCb6dIQ pw== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uc52eh2gq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Tue, 14 Nov 2023 05:45:49 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 14 Nov
- 2023 05:45:48 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Tue, 14 Nov 2023 05:45:48 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 6AE873F7055;
-	Tue, 14 Nov 2023 05:45:47 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
-        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
-        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
-        "Veerasenareddy
- Burru" <vburru@marvell.com>,
-        Sathesh Edara <sedara@marvell.com>,
-        Eric Dumazet
-	<edumazet@google.com>
-Subject: [PATCH net-next v3 RESEND 4/4] octeon_ep: remove atomic variable usage in Tx data path
-Date: Tue, 14 Nov 2023 05:45:35 -0800
-Message-ID: <20231114134535.2455051-5-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20231114134535.2455051-1-srasheed@marvell.com>
-References: <20231114134535.2455051-1-srasheed@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6774405CD
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 13:52:17 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86A801A1
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 05:52:15 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-507bd644a96so8086956e87.3
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 05:52:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699969934; x=1700574734; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j757N9wl2OC9S0nDdSseR3c4Ld+DiVkQ7HuzMo3m75Q=;
+        b=QnAHubb5AOxHa7gbJGe903NOBGUKaW4WvAj2L/dAgaBWuV5BfJoBqnJa0Dh9I2WjMa
+         UGeeyD+PvYbHRX4uwUsXfwyqkxn4bmBq9mTFpvolSTesXtSdS1brVDghHruHztrWVYe1
+         4lBRtDGMWFrbIftFZ3nRQHMl7w0Im5otEgIMD1agnHvKFZ6/miwYpIL3KrD8nAHODsIh
+         iw9aBXxKHt3VdZ2SHlHT51hD4Sj4p9NS7CIG1axq0Xh3Ypi8jtYjUBqgxNDJu1upZ6x1
+         ZAL7+1vw9QAlpYVDT7RaGgUXKrE3kkugvep1LVfo59X0fTFziqv0A6lHSeSdTk/dEPpy
+         w0zA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1699969934; x=1700574734;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j757N9wl2OC9S0nDdSseR3c4Ld+DiVkQ7HuzMo3m75Q=;
+        b=Mee1QmRhjIaxziRPlIlsP0sNbyDs82LopaX0c6WSRWQMfxqN01yANYGbi30oPTPkpu
+         AlaCH02Bnx7gluUmkzYQmxsgAg2erug+76SHU1yGS2Qqb8tN6Xd7xikvw/Of8/L36CMH
+         dJOXdk9/DHycKArV+Q3LVknjWlW4D8DwFG87nNIkgiccmX4VkxKhzPenerxUokVBw8sp
+         Q/+4I1QuOxGuDGQ3G+sxruYMHtnQ05zXa1wqL566xgomh8GlV2J9+qX79aXdr9AoKX2U
+         uaT4IhkJFjLqEwUTy4Jgklo+fTK0ysSDKs8aNcMY6MUWMpev4Vqy9yldQJ7PNXTdhFuP
+         M/vg==
+X-Gm-Message-State: AOJu0YzVZODgFgQvpYgXnFnxUOOCo3N+iGHeRvu47j4dgoUddFWmOwAd
+	wDf4yZl4/XfibKQF2JlP2bQ=
+X-Google-Smtp-Source: AGHT+IH+04Ch+9kgm6dAVSo7aGbw26wa30Ipxu0PNeFpJ35bUOf3NQzVs8clX8L5DUeqviqV4eG/UQ==
+X-Received: by 2002:a05:6512:3251:b0:50a:71d8:c94f with SMTP id c17-20020a056512325100b0050a71d8c94fmr6239613lfr.60.1699969933332;
+        Tue, 14 Nov 2023 05:52:13 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id i12-20020a056512340c00b00505677e7a99sm1345393lfr.139.2023.11.14.05.52.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 05:52:12 -0800 (PST)
+Date: Tue, 14 Nov 2023 16:52:11 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Baruch Siach <baruch@tkos.co.il>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: reduce dma ring display
+ code duplication
+Message-ID: <qw2ymgim7ikxmgyznzdh7acf66rm62gqdkqnjpshgksdqkdar5@52gef7yifpfg>
+References: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
+ <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Hi5Ev0UPbINi1FZW_ZzhJXTqtv9l6sB_
-X-Proofpoint-ORIG-GUID: Hi5Ev0UPbINi1FZW_ZzhJXTqtv9l6sB_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-14_13,2023-11-09_01,2023-05-22_02
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
 
-Replace atomic variable "instr_pending" which represents number of
-posted tx instructions pending completion, with host_write_idx and
-flush_index variables in the xmit and completion processing respectively.
+On Tue, Nov 14, 2023 at 09:03:10AM +0200, Baruch Siach wrote:
+> The code to show extended descriptor is identical to normal one.
+> Consolidate the code to remove duplication.
+> 
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+> ---
+> v2: Fix extended descriptor case, and properly test both cases
+> ---
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++------------
+>  1 file changed, 9 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 39336fe5e89d..cf818a2bc9d5 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -6182,26 +6182,19 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
+>  	int i;
+>  	struct dma_extended_desc *ep = (struct dma_extended_desc *)head;
+>  	struct dma_desc *p = (struct dma_desc *)head;
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V3:
-  - No changes.
-V2: https://lore.kernel.org/all/20231024145119.2366588-5-srasheed@marvell.com/
-  - No changes.
-V1: https://lore.kernel.org/all/20231023114449.2362147-4-srasheed@marvell.com/
+> +	unsigned long desc_size = extend_desc ? sizeof(*ep) : sizeof(*p);
 
- drivers/net/ethernet/marvell/octeon_ep/octep_config.h | 1 +
- drivers/net/ethernet/marvell/octeon_ep/octep_main.c   | 9 +++------
- drivers/net/ethernet/marvell/octeon_ep/octep_main.h   | 9 +++++++++
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.c     | 5 +----
- drivers/net/ethernet/marvell/octeon_ep/octep_tx.h     | 3 ---
- 5 files changed, 14 insertions(+), 13 deletions(-)
+From readability point of view it's better to keep the initializers as
+simple as possible: just type casts or container-of-based inits. The
+more complex init-statements including the ternary-based ones is better to
+move to the code section closer to the place of the vars usage. So could
+you please move the initialization statement from the vars declaration
+section to being performed right before the loop entrance? It shall
+improve the readability a tiny bit.
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-index ed8b1ace56b9..91cfa19c65b9 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_config.h
-@@ -13,6 +13,7 @@
- #define OCTEP_64BYTE_INSTR  64
- 
- /* Tx Queue: maximum descriptors per ring */
-+/* This needs to be a power of 2 */
- #define OCTEP_IQ_MAX_DESCRIPTORS    1024
- /* Minimum input (Tx) requests to be enqueued to ring doorbell */
- #define OCTEP_DB_MIN                8
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-index 2d1bcdc589f3..974a34be9ffa 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
-@@ -777,7 +777,7 @@ static int octep_stop(struct net_device *netdev)
-  */
- static inline int octep_iq_full_check(struct octep_iq *iq)
- {
--	if (likely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (likely((IQ_INSTR_SPACE(iq)) >
- 		   OCTEP_WAKE_QUEUE_THRESHOLD))
- 		return 0;
- 
-@@ -794,7 +794,7 @@ static inline int octep_iq_full_check(struct octep_iq *iq)
- 	/* check again and restart the queue, in case NAPI has just freed
- 	 * enough Tx ring entries.
- 	 */
--	if (unlikely((iq->max_count - atomic_read(&iq->instr_pending)) >=
-+	if (unlikely(IQ_INSTR_SPACE(iq) >
- 		     OCTEP_WAKE_QUEUE_THRESHOLD)) {
- 		netif_start_subqueue(iq->netdev, iq->q_no);
- 		iq->stats.restart_cnt++;
-@@ -903,12 +903,9 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
- 	__netdev_tx_sent_queue(iq->netdev_q, skb->len, xmit_more);
- 
- 	skb_tx_timestamp(skb);
--	atomic_inc(&iq->instr_pending);
- 	iq->fill_cnt++;
- 	wi++;
--	if (wi == iq->max_count)
--		wi = 0;
--	iq->host_write_index = wi;
-+	iq->host_write_index = wi & iq->ring_size_mask;
- 
- 	/* octep_iq_full_check stops the queue and returns
- 	 * true if so, in case the queue has become full
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-index 6df902ebb7f3..c33e046b69a4 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.h
-@@ -40,6 +40,15 @@
- #define  OCTEP_OQ_INTR_RESEND_BIT  59
- 
- #define  OCTEP_MMIO_REGIONS     3
-+
-+#define  IQ_INSTR_PENDING(iq)  ({ typeof(iq) iq__ = (iq); \
-+				  ((iq__)->host_write_index - (iq__)->flush_index) & \
-+				  (iq__)->ring_size_mask; \
-+				})
-+#define  IQ_INSTR_SPACE(iq)    ({ typeof(iq) iq_ = (iq); \
-+				  (iq_)->max_count - IQ_INSTR_PENDING(iq_); \
-+				})
-+
- /* PCI address space mapping information.
-  * Each of the 3 address spaces given by BAR0, BAR2 and BAR4 of
-  * Octeon gets mapped to different physical address spaces in
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-index d0adb82d65c3..06851b78aa28 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.c
-@@ -21,7 +21,6 @@ static void octep_iq_reset_indices(struct octep_iq *iq)
- 	iq->flush_index = 0;
- 	iq->pkts_processed = 0;
- 	iq->pkt_in_done = 0;
--	atomic_set(&iq->instr_pending, 0);
- }
- 
- /**
-@@ -82,7 +81,6 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	}
- 
- 	iq->pkts_processed += compl_pkts;
--	atomic_sub(compl_pkts, &iq->instr_pending);
- 	iq->stats.instr_completed += compl_pkts;
- 	iq->stats.bytes_sent += compl_bytes;
- 	iq->stats.sgentry_sent += compl_sg;
-@@ -91,7 +89,7 @@ int octep_iq_process_completions(struct octep_iq *iq, u16 budget)
- 	netdev_tx_completed_queue(iq->netdev_q, compl_pkts, compl_bytes);
- 
- 	if (unlikely(__netif_subqueue_stopped(iq->netdev, iq->q_no)) &&
--	    ((iq->max_count - atomic_read(&iq->instr_pending)) >
-+	    (IQ_INSTR_SPACE(iq) >
- 	     OCTEP_WAKE_QUEUE_THRESHOLD))
- 		netif_wake_subqueue(iq->netdev, iq->q_no);
- 	return !budget;
-@@ -144,7 +142,6 @@ static void octep_iq_free_pending(struct octep_iq *iq)
- 		dev_kfree_skb_any(skb);
- 	}
- 
--	atomic_set(&iq->instr_pending, 0);
- 	iq->flush_index = fi;
- 	netdev_tx_reset_queue(netdev_get_tx_queue(iq->netdev, iq->q_no));
- }
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-index 86c98b13fc44..1ba4ff65e54d 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_tx.h
-@@ -172,9 +172,6 @@ struct octep_iq {
- 	/* Statistics for this input queue. */
- 	struct octep_iq_stats stats;
- 
--	/* This field keeps track of the instructions pending in this queue. */
--	atomic_t instr_pending;
--
- 	/* Pointer to the Virtual Base addr of the input ring. */
- 	struct octep_tx_desc_hw *desc_ring;
- 
--- 
-2.25.1
+>  	dma_addr_t dma_addr;
+>  
+>  	for (i = 0; i < size; i++) {
+> -		if (extend_desc) {
+> -			dma_addr = dma_phy_addr + i * sizeof(*ep);
+> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+> -				   i, &dma_addr,
+> -				   le32_to_cpu(ep->basic.des0),
+> -				   le32_to_cpu(ep->basic.des1),
+> -				   le32_to_cpu(ep->basic.des2),
+> -				   le32_to_cpu(ep->basic.des3));
+> -			ep++;
+> -		} else {
+> -			dma_addr = dma_phy_addr + i * sizeof(*p);
+> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+> -				   i, &dma_addr,
+> -				   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+> -				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+> +		dma_addr = dma_phy_addr + i * desc_size;
+> +		seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+> +				i, &dma_addr,
+> +				le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+> +				le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+> +		if (extend_desc)
+> +			p = &(++ep)->basic;
+> +		else
+>  			p++;
+> -		}
+>  	}
 
+If I were simplifying/improving things I would have done it in the
+next way:
+
+static void stmmac_display_ring(void *head, int size, int extend_desc,
+			       struct seq_file *seq, dma_addr_t dma_addr)
+{
+        struct dma_desc *p;
+	size_t desc_size;
+	int i;
+
+	if (extend_desc)
+		desc_size = sizeof(struct dma_extended_desc);
+	else
+		desc_size = sizeof(struct dma_desc);
+
+	for (i = 0; i < size; i++) {
+		if (extend_desc)
+			p = &((struct dma_extended_desc *)head)->basic;
+		else
+			p = head;
+
+		seq_printf(seq, "%d [%pad]: 0x%08x 0x%08x 0x%08x 0x%08x\n",
+			   i, &dma_addr,
+			   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+			   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+
+		dma_addr += desc_size;
+		head += desc_size;
+	}
+}
+
+1. Add 0x%08x format to have the aligned data printout.
+2. Use the desc-size to increment the virt and phys addresses for
+unification.
+3. Replace sysfs_ prefix with stmmac_ since the method is no longer
+used for sysfs node.
+
+On the other hand having the extended data printed would be also
+useful at the very least for the Rx descriptors, which expose VLAN,
+Timestamp and IPvX related info. Extended Tx descriptors have only the
+timestamp in the extended part.
+
+-Serge(y)
+
+>  }
+>  
+> -- 
+> 2.42.0
+> 
+> 
 
