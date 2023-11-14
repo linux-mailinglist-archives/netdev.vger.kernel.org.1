@@ -1,165 +1,286 @@
-Return-Path: <netdev+bounces-47768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093317EB507
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:40:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 020217EB515
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:43:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E69C280F39
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:40:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A139FB20A23
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D13D1CABB;
-	Tue, 14 Nov 2023 16:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E0A2AF18;
+	Tue, 14 Nov 2023 16:42:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="KN3m+IY/"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="WxNHnOVR"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C20D13AF3
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:40:01 +0000 (UTC)
-Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01on2130.outbound.protection.outlook.com [40.107.114.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1B1120;
-	Tue, 14 Nov 2023 08:39:58 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MM3wi61g1OR5HO5xuTEDm5qWS5ENVWmq5SpjJ02CXCWayQopMolqgA/gq5bf2Jb5T677eS4/QniKNKsKf7NJ61089OUZZRSUzUUPR9W5P5eCQbRTOIMGtXZEXtjIDf0R+6+2CX2JCz6hpHlIpbseqN/ZlSfg8zMiSbZ34wwYhGobdygHb9wLjN6n7AYgt84Dq3Fsm3os+flPfp15y8jg7wQ9PBU1wEJelzV890A3qY5KwRS29YX31mdpwU9IGNLQkhoLhHmdS1YAoy6HAE9V6GX7Sc9229WIOvWADtDGj1APccACKvdw6lRlsfDfhvkcHTVGw8EVf7pFbART5mswFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LxCIhFU5stRvk7SPaS/5tWwJ725fEdIRWt2n4v0Cb/g=;
- b=BDwyqFltHyhgj+kf+I9NxdGWLrzDMRtctsMDnrAfMNIj6EcEURi5Qd8j1swsuYCxOeERNVHIWe4Dwvwrnr1GPAD3wtAJecgibEaVQNqC9yp249m/yknnfyN+guuMQ8XYzl98kRg2U6r9KlrzmZSp22b/M4Ne4zAK1MB+6A6rWsIxpldUD5eTbjzod2CRi34Q4gzE7VknuxlVJbe4ypzvyechmbCaedEYF3ddTz2EKjV/tzU8Af0HEDfMhmfBE6atWubDgRLagO+oFRxRO1G93+0ehNfLLJ0DPcyia4kV1FsFswjrHsRH2Slx2LvAffrhj4nptH0Wew0OBDj80mUE/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LxCIhFU5stRvk7SPaS/5tWwJ725fEdIRWt2n4v0Cb/g=;
- b=KN3m+IY/NXts6Hl3Z7/mjofVEzWjxqhNMGN2TJ6CzNUKakoNNW+dg2qgkJId1a6qxmrcyuYl9VfTI1yoeJmaPPD9qCi+hRAJuinzD186uab9fkwxUTdlV+Mjq1YGQqYFBTx4IXyeBMR3W7xBxr6dvotwjFddNQPYFVp9krTd3EI=
-Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com (2603:1096:604:101::7)
- by TYCPR01MB6078.jpnprd01.prod.outlook.com (2603:1096:400:4d::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Tue, 14 Nov
- 2023 16:39:54 +0000
-Received: from OS3PR01MB6593.jpnprd01.prod.outlook.com
- ([fe80::3f89:e42b:ed6a:489b]) by OS3PR01MB6593.jpnprd01.prod.outlook.com
- ([fe80::3f89:e42b:ed6a:489b%3]) with mapi id 15.20.7002.015; Tue, 14 Nov 2023
- 16:39:54 +0000
-From: Min Li <min.li.xe@renesas.com>
-To: Richard Cochran <richardcochran@gmail.com>, Jacob Keller
-	<jacob.e.keller@intel.com>
-CC: Min Li <lnimi@hotmail.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH net-next RFC 1/1] ptp: use extts interface for the
- measured external offset
-Thread-Topic: [PATCH net-next RFC 1/1] ptp: use extts interface for the
- measured external offset
-Thread-Index: AQHaFnt1CkDQLo7CIUey3eYN7z24uLB43VyAgABYKgCAAM+88A==
-Date: Tue, 14 Nov 2023 16:39:54 +0000
-Message-ID:
- <OS3PR01MB6593C29DA43E7C5E862ECD3EBAB2A@OS3PR01MB6593.jpnprd01.prod.outlook.com>
-References:
- <MW5PR03MB6932F6DB45F5ED179DF0BA4DA0B3A@MW5PR03MB6932.namprd03.prod.outlook.com>
- <490abfce-47b6-430c-8fc1-99536284c1a6@intel.com>
- <ZVL0dIpwCE94ylfH@hoboy.vegasvil.org>
-In-Reply-To: <ZVL0dIpwCE94ylfH@hoboy.vegasvil.org>
-Accept-Language: en-CA, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: OS3PR01MB6593:EE_|TYCPR01MB6078:EE_
-x-ms-office365-filtering-correlation-id: a41970a9-db2c-4ce6-74af-08dbe530548c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- reDAjN1AjRWDsR8mktqcWXiA9i5uf6L8gpXIkrDkwTfofr5RMvxV0jzlALJhN7PdkGv7rqzUWSk7Bi3+m0lTW/gJc5wT+NW5j5npZ2nxM6cU4JlduYnDuAkhqErMiuLQV2/MF9G6p6LIDoreOMMYNBg16gQRMBfN2Qwz+u2e4V0DU+5mUih5rhBVEnc8mistNQi7jfIQ7rO1b1XQTUFKWIYTp+Peilis14fVDfGvm8SyE6dvZHsCYX42RxTaVd5edj2jN7rk3/JYlp874WluoLgPvkihQXch0V1jFm2b5cguh8NKone3SCcpYLfdP6XBG4rasKq8k8+x9a/ewd6yVxUlpQBViNRQlgcrkuJOCxJ/8bNGd42yxqHdpqAjX5nvgxgmzsCwG29b8W7kmjc31PSKzXXwSy1gmalFQGQDO7q/Ebfbjuf840lm963cH6hguT6gv5CTbrIwdnpkvS7K72BnuiLRTohb9iNP3Rn4Gd8z6HYLQ1iTYwT6+Vvy3WVclhDBdiqm3O/O//gxlSqO3HPb1BSE01P+/cUVuWj6akp6NLWya6p0CPfRgGf9fUBdNQ5Opr7oBTm4p52PavORmmvwvT7EabdVtHWXLsA89bplh5rxUl+8ygw9R8yYYDps
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6593.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(39860400002)(136003)(396003)(230922051799003)(64100799003)(1800799009)(186009)(451199024)(9686003)(26005)(478600001)(52536014)(86362001)(4326008)(8676002)(8936002)(5660300002)(41300700001)(33656002)(2906002)(38070700009)(54906003)(64756008)(66446008)(66476007)(66556008)(66946007)(76116006)(316002)(110136005)(6506007)(7696005)(55236004)(71200400001)(38100700002)(55016003)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?JjsutibHbysE0bkq8H47l7amXyVdkGdKgR2hyYENHOKf8NOtqc0pDmXkeOAa?=
- =?us-ascii?Q?k0eu8UMKvuPmn8r9YGWIfqbi6pNoHY/M4Ru5BzaAlH5QtjcRvc5ZioFdOLyx?=
- =?us-ascii?Q?eqP+s1NnE9y+G7t4WjYfj1wJYYQU2BW1FrsXZoXCrzkqGM7dgkq1GATdHPsE?=
- =?us-ascii?Q?oRPeins+jeLJl/WfftCas6rp0woRdUMrlZxM+9PPKTz/y6MlYrmIQQBfapPJ?=
- =?us-ascii?Q?mB/00gPRqdyBRzUngNmJRtACZxAfRy0FHQEM11dVSIWEpBOnAUqRwarvJ6We?=
- =?us-ascii?Q?JalS30WQFdLRD2xRpwvykh8HgykZRChJtmUch+jK6fJ53qsdUV85RwiDfW4q?=
- =?us-ascii?Q?BSTjdkViZDBTuNPagnwtrWPyFRL0iTs47USo9iPY8uUwhfODlHmUDJ3tqqev?=
- =?us-ascii?Q?2NGqwZ1yZmgXQrk0NR1J+b4i7xbaDDI3JvZDkf2iWlc5y8VFxK1IRkJ8GBym?=
- =?us-ascii?Q?q602Xh4OD2n44V/bbU6oP5sP3PFqMkiMzDtB9DfBX7MX+XM/UeNYDZNZpuyg?=
- =?us-ascii?Q?SBOT77g8tJVl0sot/mafhrrhRVb3zVAhzOgGbDD5JIzaGTgQnAwGHLLMhFXV?=
- =?us-ascii?Q?ft4FmQSlyiNGm90aq7hZaEb5ax0xXZv/BazaTfksfrFDJCF22NAJ6i4QN5VT?=
- =?us-ascii?Q?FDo7guQRHuzrPWgwDPj+8+gmMy0wXs7uPitrHPOoI8SiINtaPlK4wNGotmxZ?=
- =?us-ascii?Q?jDCjwzg39sqh0vhs1iIj144qabM6TH/kOAIOQCO5REXBdIjnJltaCJH0N0vm?=
- =?us-ascii?Q?1gS8DQqnf1vBx3io1zgKMAns1shUVOZeS7e4+rlH2PwbPOEVNhD90Ppj7k6M?=
- =?us-ascii?Q?p/rXsZQegR3trCNgeOaFA7XYRUTWPeU9M86GaqTIeHlxkUVDCW1CQatNmsKH?=
- =?us-ascii?Q?8uai8ZrYA5RTaNNddZghd95dX9FN4BV6h/tp5R+++kuuSHWXrzpt1soHCElE?=
- =?us-ascii?Q?ii70F2Avg6rmZslNhUFiN0LfruBJzkIXkkdCmgRM8ZlqpvjNOu8+kololDxY?=
- =?us-ascii?Q?0oRpTg0f6jgflbdKS8zCJ6zh1v3wgqMq01/x3YTiNN50iIs5BxDWCREzNXPJ?=
- =?us-ascii?Q?2W/0g7AwjRKmCbe8oWXKTCBBdIxJDUTnENFKMa51ZS5/s/73m2v9kRSUsl0T?=
- =?us-ascii?Q?HRR9MH2SMNyRiyyds38fLhlzDWQEYVmZiifc4tm3vH0F+bpN/DPsdtYFDA22?=
- =?us-ascii?Q?DaLyfo+NjJtuPkK5ELlOym0Ti3t6mjDmDS+4ZQaexg98syyhB4wkRT2r+xD0?=
- =?us-ascii?Q?euZiWPMjmbIEgRUYoWn0dgFhRYmzyxqUqJL+rFN6nJJ2iDZbKfnxSGzRdhFV?=
- =?us-ascii?Q?yOA9HLO0vod2md21Vt8kZfIDtx2oDimcOGTU5/UlYNha2Si86VVKeYH61VQ0?=
- =?us-ascii?Q?mKpfR4FR5JLeyfuJxH4gMw2bKeb2lkmHiYq50y2OHoLLDDz/rerhFE+Aw4mM?=
- =?us-ascii?Q?jfkcwlFJ3gO/OheWm/7XyIbRsFX2viasCZEsQP8kPdnlUHro9pD0vFPXAT33?=
- =?us-ascii?Q?6WxMMvKbwU2fJ2X1S71sDsLU3BMUc2oMOd5l4Tk699cV4QnlO8v3REaI7OIf?=
- =?us-ascii?Q?kuZ6ESZ6UnRAEctnEy8ovUP14AWhdQOGp6idJc14?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EE73E476
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:42:52 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-26.smtpout.orange.fr [80.12.242.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846F0184
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 08:42:48 -0800 (PST)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id 2wUvroyuPy6Qa2wUvrFwKl; Tue, 14 Nov 2023 17:42:46 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1699980166;
+	bh=QVCWaVtsfj67lsleFFewQkVZBIvHs6icaAj7eQrDp4A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=WxNHnOVRSXie5ZC1eBjlITHPmCAFVcBPn+4y1BnZd/evWslOdQdVMnCslFPvxk854
+	 atKuremXfNabRpEPWqpd8rI0F7AIVAPdrgbZMkJgl7jjL/y2W303Nc6uPiXNJFExsh
+	 3YF/Yn1lWWeTuEzkjesh5CDewUawDpZXzZ08sF43GPIRhryCu8pDnGAzWUUkPTM2K3
+	 OMTirDfVRRff+3qryriSzIipOAgbu0RrA49p3ocLhrH0UW7JBffWCHJ56vTihN6M2k
+	 PL0joO8204OLZ8uRS+f821nggFtyRMnYryRjUlEgPzQUU79acE1ROsIBANdwS24nAu
+	 eSIv/pegGj0Vg==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Tue, 14 Nov 2023 17:42:46 +0100
+X-ME-IP: 86.243.2.178
+Message-ID: <dd6f8eb0-0cca-4bb0-bceb-8c2e76ff0bc5@wanadoo.fr>
+Date: Tue, 14 Nov 2023 17:42:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6593.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a41970a9-db2c-4ce6-74af-08dbe530548c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 16:39:54.2618
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jVDoG2sndoHGrT9IVuSrfXbKL5UHPBSWiHDOYP1/PjINrNDm242NKFmoqEQj9RBrGzxlk80x5x0brPUwRp393A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB6078
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH] octeontx2: Fix klockwork and coverity issues
+To: Suman Ghosh <sumang@marvell.com>, sgoutham@marvell.com,
+ gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+ lcherian@marvell.com, jerinj@marvell.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org
+Cc: Ratheesh Kannoth <rkannoth@marvell.com>
+References: <20231101074919.2614608-1-sumang@marvell.com>
+Content-Language: fr
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20231101074919.2614608-1-sumang@marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
->=20
-> On Mon, Nov 13, 2023 at 03:00:15PM -0800, Jacob Keller wrote:
-> > You mention GNSS, but is there an example or a link to a driver change
-> > you could provide to show its use?
->=20
-> Yes, the new option must wait for a driver that implements it.  Can you m=
-ake
-> a patch series where the driver change appears in the second patch?
+Le 01/11/2023 à 08:49, Suman Ghosh a écrit :
+> Fix all klockwork and coverity issues reported on AF and PF/VF driver.
+> 
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> ---
+>   .../net/ethernet/marvell/octeontx2/af/cgx.c   | 14 ++++-
+>   .../marvell/octeontx2/af/mcs_rvu_if.c         |  8 ++-
+>   .../net/ethernet/marvell/octeontx2/af/ptp.c   | 11 +++-
+>   .../ethernet/marvell/octeontx2/af/rvu_cpt.c   |  2 +-
+>   .../marvell/octeontx2/af/rvu_debugfs.c        |  8 ++-
+>   .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  2 +-
+>   .../ethernet/marvell/octeontx2/af/rvu_npc.c   |  2 +-
+>   .../marvell/octeontx2/nic/otx2_common.c       |  8 +--
+>   .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  3 +
+>   .../ethernet/marvell/octeontx2/nic/otx2_reg.h | 55 ++++++++++---------
+>   .../marvell/octeontx2/nic/otx2_txrx.c         |  2 +-
+>   .../net/ethernet/marvell/octeontx2/nic/qos.c  |  7 ++-
+>   12 files changed, 77 insertions(+), 45 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> index 6c70c8498690..5a672888577e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+> @@ -457,12 +457,19 @@ int cgx_lmac_addr_max_entries_get(u8 cgx_id, u8 lmac_id)
+>   u64 cgx_lmac_addr_get(u8 cgx_id, u8 lmac_id)
+>   {
+>   	struct cgx *cgx_dev = cgx_get_pdata(cgx_id);
+> -	struct lmac *lmac = lmac_pdata(lmac_id, cgx_dev);
+>   	struct mac_ops *mac_ops;
+> +	struct lmac *lmac;
+>   	int index;
+>   	u64 cfg;
+>   	int id;
+>   
+> +	if (!cgx_dev)
+> +		return 0;
+> +
+> +	lmac = lmac_pdata(lmac_id, cgx_dev);
+> +	if (!lmac)
+> +		return 0;
+> +
+>   	mac_ops = cgx_dev->mac_ops;
+>   
+>   	id = get_sequence_id_of_lmac(cgx_dev, lmac_id);
+> @@ -955,6 +962,9 @@ int cgx_lmac_pfc_config(void *cgxd, int lmac_id, u8 tx_pause,
+>   
+>   	/* Write source MAC address which will be filled into PFC packet */
+>   	cfg = cgx_lmac_addr_get(cgx->cgx_id, lmac_id);
+> +	if (!cfg)
+> +		return -ENODEV;
+> +
+>   	cgx_write(cgx, lmac_id, CGXX_SMUX_SMAC, cfg);
+>   
+>   	return 0;
+> @@ -1617,7 +1627,7 @@ unsigned long cgx_get_lmac_bmap(void *cgxd)
+>   static int cgx_lmac_init(struct cgx *cgx)
+>   {
+>   	struct lmac *lmac;
+> -	u64 lmac_list;
+> +	u64 lmac_list = 0;
 
-Hi Richard/Jacob
+This is not needed.
+The static checker is not good enough to see it, that's all :).
 
-Thanks for the review. Unfortunately, I don't have the patch based on the=20
-Existing PHC driver.
+>   	int i, err;
+>   
+>   	/* lmac_list specifies which lmacs are enabled
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+> index dfd23580e3b8..1b0b022f5493 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c
+> @@ -625,8 +625,8 @@ int rvu_mbox_handler_mcs_free_resources(struct rvu *rvu,
+>   {
+>   	u16 pcifunc = req->hdr.pcifunc;
+>   	struct mcs_rsrc_map *map;
+> +	int rc = -EINVAL;
+>   	struct mcs *mcs;
+> -	int rc = 0;
 
-But I have a brand new PHC driver for our new timing HW that implements=20
-the feature. The measurement is done by the HW using the=20
-Time to Digital Converter (TDC) that performs the function of a stopwatch a=
-nd=20
-measures the elapsed time between a START pulse and STOP pulses. So I have
-GNSS 1pps input to the HW and TDC will perform continuous measurement
-between the input 1pps and the 1pps of the onboard PHC.
+This should be argumented.
 
-I also have the ts2phc patch ready along with the PHC change. I already=20
-tested them on our HW and proved that ts2phc can align the 2 signal using=20
-the existing PI filter.
+This changes the behavior of the code. Why should we return -EINVAL if 
+nothing in the switch below matches?
 
-Please let me know how you wanna proceed. Do you want me to attach the
-new PHC with this patch?
+>   
+>   	if (req->mcs_id >= rvu->mcs_blk_cnt)
+>   		return MCS_AF_ERR_INVALID_MCSID;
+> @@ -675,8 +675,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
+>   {
+>   	u16 pcifunc = req->hdr.pcifunc;
+>   	struct mcs_rsrc_map *map;
+> +	int rsrc_id = -EINVAL, i;
+>   	struct mcs *mcs;
+> -	int rsrc_id, i;
 
-Min
+Same
+
+>   
+>   	if (req->mcs_id >= rvu->mcs_blk_cnt)
+>   		return MCS_AF_ERR_INVALID_MCSID;
+> @@ -737,6 +737,8 @@ int rvu_mbox_handler_mcs_alloc_resources(struct rvu *rvu,
+>   			rsp->rsrc_cnt++;
+>   		}
+>   		break;
+> +	default:
+> +		goto exit;
+>   	}
+>   
+>   	rsp->rsrc_type = req->rsrc_type;
+> @@ -849,7 +851,7 @@ int rvu_mbox_handler_mcs_ctrl_pkt_rule_write(struct rvu *rvu,
+>   static void rvu_mcs_set_lmac_bmap(struct rvu *rvu)
+>   {
+>   	struct mcs *mcs = mcs_get_pdata(0);
+> -	unsigned long lmac_bmap;
+> +	unsigned long lmac_bmap = 0;
+>   	int cgx, lmac, port;
+>   
+>   	for (port = 0; port < mcs->hw->lmac_cnt; port++) {
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+> index bcc96eed2481..a199b1123ba7 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/ptp.c
+> @@ -518,6 +518,7 @@ static int ptp_probe(struct pci_dev *pdev,
+>   		     const struct pci_device_id *ent)
+>   {
+>   	struct ptp *ptp;
+> +	void __iomem * const *base;
+>   	int err;
+>   
+>   	ptp = kzalloc(sizeof(*ptp), GFP_KERNEL);
+> @@ -536,7 +537,15 @@ static int ptp_probe(struct pci_dev *pdev,
+>   	if (err)
+>   		goto error_free;
+>   
+> -	ptp->reg_base = pcim_iomap_table(pdev)[PCI_PTP_BAR_NO];
+> +	base = pcim_iomap_table(pdev);
+> +	if (!base)
+> +		goto error_free;
+> +
+> +	ptp->reg_base = base[PCI_PTP_BAR_NO];
+> +	if (!ptp->reg_base) {
+> +		err = -ENODEV;
+> +		goto error_free;
+> +	}
+>   
+>   	pci_set_drvdata(pdev, ptp);
+>   	if (!first_ptp_block)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> index f047185f38e0..a1a919fcda47 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> @@ -43,7 +43,7 @@ static irqreturn_t cpt_af_flt_intr_handler(int vec, void *ptr)
+>   	struct rvu *rvu = block->rvu;
+>   	int blkaddr = block->addr;
+>   	u64 reg, val;
+> -	int i, eng;
+> +	int i, eng = 0;
+
+Why is this the correct value if nothing else matches in the switch below?
+
+>   	u8 grp;
+>   
+>   	reg = rvu_read64(rvu, blkaddr, CPT_AF_FLTX_INT(vec));
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> index bd817ee88735..307942ff1b10 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+> @@ -519,12 +519,16 @@ RVU_DEBUG_SEQ_FOPS(mcs_rx_secy_stats, mcs_rx_secy_stats_display, NULL);
+>   static void rvu_dbg_mcs_init(struct rvu *rvu)
+>   {
+>   	struct mcs *mcs;
+> -	char dname[10];
+> +	char *dname = NULL;
+
+=NULL is not needed, but see below.
+
+>   	int i;
+>   
+>   	if (!rvu->mcs_blk_cnt)
+>   		return;
+>   
+> +	dname = kmalloc_array(rvu->mcs_blk_cnt, sizeof(char), GFP_KERNEL);
+
+Hi,
+
+I think that kmalloc() would be enough here.
+
+More importantly, I think it is wrong.
+This dbname buffer is used to store "mcs%d". %d can be up to 
+rvu->mcs_blk_cnt, but it does not require that amount of memory.
+
+(if mcs_blk_cnt = 1000, we need 3 + 4 + 1 = 8 byte ("mcs" + "1000" + 
+\0), not 1000 bytes.
+
+If mcs_blk_cnt is small, we under-allocate, if it is high we allocate 
+way too much memory.
+
+Maybe kasprintf()/kfree() would be a cleaner option.
+
+
+> +	if (!dname)
+> +		return;
+> +
+>   	rvu->rvu_dbg.mcs_root = debugfs_create_dir("mcs", rvu->rvu_dbg.root);
+>   
+>   	for (i = 0; i < rvu->mcs_blk_cnt; i++) {
+> @@ -568,6 +572,8 @@ static void rvu_dbg_mcs_init(struct rvu *rvu)
+>   		debugfs_create_file("port", 0600, rvu->rvu_dbg.mcs_tx, mcs,
+>   				    &rvu_dbg_mcs_tx_port_stats_fops);
+>   	}
+> +
+> +	kfree(dname);
+>   }
+>   
+
+...
+
+(I have not looked the code below that)
 
 
