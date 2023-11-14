@@ -1,378 +1,188 @@
-Return-Path: <netdev+bounces-47738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22B847EB185
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 15:07:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0D47EB193
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 15:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD1E91F24B48
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:07:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00F49B20AA4
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 14:09:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39A1405E5;
-	Tue, 14 Nov 2023 14:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEBC405EB;
+	Tue, 14 Nov 2023 14:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJ1AOiNM"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33273405C2;
-	Tue, 14 Nov 2023 14:07:27 +0000 (UTC)
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30996AD;
-	Tue, 14 Nov 2023 06:07:25 -0800 (PST)
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-1efad296d42so3347774fac.2;
-        Tue, 14 Nov 2023 06:07:25 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D033FE43;
+	Tue, 14 Nov 2023 14:08:53 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68768BB;
+	Tue, 14 Nov 2023 06:08:51 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-4081ccf69dcso38837805e9.0;
+        Tue, 14 Nov 2023 06:08:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1699970930; x=1700575730; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n7943oKRp3R3IuzxtlnXP/7CISrexN7FA/cPf5oBTeI=;
+        b=jJ1AOiNMmbAHi+gdZS/z3Z3yA9Vlcn5gLJmKtC2pbyG63RYG55kfc8WhSJxGA4FGfe
+         JJU/5iNvu5Xvyhv+yf26TDPOQ/GlOO7D2+lk2QMNE0SpXLI/KCXbqHQVG3IDKCG7ZfDS
+         V5DYx7h7MU4Xfw1IDE2dEbFHB23XLlwaobDQQiKBzjW5oX5QLMo6I2tzJOgMvgemnbZs
+         SqrfDddw6bAWvcCuh98ljJeOFctvAc+LDstfCW4rk0R0ZKXVIL9ym4MBU9gNz/LLrt3T
+         tY8LGLmyUMZMQrFaPOjl93yXzlLceVeZ7EuylBIL+TfUi89kaNZ8OpHArAdyH2JFk/3f
+         Stpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699970844; x=1700575644;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FEs/ownMYNKE+UjNbrLE1kweeHoQ3jzAJN+nYgsgw4A=;
-        b=XRgdnW+08czhM/VGSGmdKa/mf/XsozCkptULmqcUe2xQCN6akCBcAKrCRDayi4jmnX
-         ZG6K/0c3KEpeaV4UiPKi5svQ1gzMR/ltE67PBxiFvHhK41ry2d08bCQHOSkCgvC0n+fV
-         b6WhfvNHKwBfmjnLER6AIe1DlFhpko8ODCU+sNSEvOhF3mtYjeWO4XZf8qIWUCfjmD5Q
-         yutVXKR7WOPk0zk+tx/fHI3kvlxFkCd0SG241pP8QfxLMNCpaxWKZf/pTbT/GAepWR82
-         k475COvimhPdLpcMIUfjTZq6ZMO1J7NUa718UIMc3dlvSMY56j5hjzyMimoRiK5mXK00
-         kNbA==
-X-Gm-Message-State: AOJu0YzanDumGb9Q1tDszmmDVJ5rp85Jqi2g0oRxaIkMVHaEMVvccTZv
-	/sDuFoBG93rnnlzdx+vNmA==
-X-Google-Smtp-Source: AGHT+IH0CprHDJph4F0ArxeLmLU96GyyoKL7u7UOlWmtp34VMZS0p4pd66e3/sX3/RKBBWpf/EV12w==
-X-Received: by 2002:a05:6870:d14a:b0:1ef:b4ae:e2a3 with SMTP id f10-20020a056870d14a00b001efb4aee2a3mr13279733oac.5.1699970843005;
-        Tue, 14 Nov 2023 06:07:23 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id r8-20020a05683001c800b006c4d38e12b9sm201972ota.65.2023.11.14.06.07.21
+        d=1e100.net; s=20230601; t=1699970930; x=1700575730;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n7943oKRp3R3IuzxtlnXP/7CISrexN7FA/cPf5oBTeI=;
+        b=c0nWrOO20c4Z0Tr43Pd3BBlQMQ6E2A728pRql6rb+JkYMw+jCeXURGMGxEK5e2dir6
+         5RmppmaWIHHJGZn2aG/f0Ud3/lkGVuwtn4A/9wAAK2yFNGL6STsTFXvJx8vrNT63eNUC
+         6A1XPZpIhZYF0tTiM4HoWR8fVIZOr74gReokPem81tr5bZYuG9innFEupZMzIbKU3Ezh
+         RxeJ2hTE1/cRAIYiDF/VkVRYFjMANyPJfVIXuUy7BG2Mp+uRnZxXuV3DO0vy+56qEF+7
+         PIeyz9bxdzXbtwak05O/3rP1VXA77yFJW73b/FPBLqTy4mP7Nt3TqnkaHrHlzYz6HzUZ
+         CO3g==
+X-Gm-Message-State: AOJu0Yxtdt97Q7ke7YXRSG3PcyWzSg6H2snToKmEh67FHAjgPqF9RedD
+	Ns7DtUpSCFb1k0cUm1F8APY=
+X-Google-Smtp-Source: AGHT+IGvVl0Slcius3dYeBPCYWSPVFQabECyQW3Hm+Z4k4dH88V8/VeVonjzEJck22etRRIl6FzTCA==
+X-Received: by 2002:adf:d1c6:0:b0:32f:b47c:f1f6 with SMTP id b6-20020adfd1c6000000b0032fb47cf1f6mr2267205wrd.32.1699970929495;
+        Tue, 14 Nov 2023 06:08:49 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id q2-20020adf9dc2000000b0032db4825495sm8014603wre.22.2023.11.14.06.08.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 06:07:22 -0800 (PST)
-Received: (nullmailer pid 1676214 invoked by uid 1000);
-	Tue, 14 Nov 2023 14:07:19 -0000
-Date: Tue, 14 Nov 2023 08:07:19 -0600
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Alexander Couzens <lynxis@fe80.eu>, Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH 7/8] dt-bindings: net: mediatek,net: fix and complete
- mt7988-eth binding
-Message-ID: <20231114140719.GA1664629-robh@kernel.org>
-References: <cover.1699565880.git.daniel@makrotopia.org>
- <d8152679b6558ce9fd177ff20478e3fbc2ab73b4.1699565880.git.daniel@makrotopia.org>
+        Tue, 14 Nov 2023 06:08:49 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH v8 1/4] net: phy: aquantia: move to separate directory
+Date: Tue, 14 Nov 2023 15:08:41 +0100
+Message-Id: <20231114140844.9596-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8152679b6558ce9fd177ff20478e3fbc2ab73b4.1699565880.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 09, 2023 at 09:52:09PM +0000, Daniel Golle wrote:
-> Remove clocks which were copied from the vendor driver but are now taken
-> care of by dedicated drivers for PCS and PHY in the upstream driver.
-> Also remove mediatek,sgmiisys phandle which isn't required on MT7988
-> because we use pcs-handle on the MAC nodes instead.
-> Last but not least, add an example for MT7988.
+Move aquantia PHY driver to separate driectory in preparation for
+firmware loading support to keep things tidy.
 
-'Also' is a clue for it should be a separate patch. These changes are 
-all ABI breakage. Please explain why that's okay.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+Changes v8:
+- Out of RFC
+Changes v7:
+- Add Reviewed-by tag
+Changes v4:
+- Keep order for kconfig config
+Changes v3:
+- Add this patch
 
-> 
-> Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../devicetree/bindings/net/mediatek,net.yaml | 171 +++++++++++++++---
->  1 file changed, 142 insertions(+), 29 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> index e74502a0afe86..c0f7bb6f3ef8d 100644
-> --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
-> @@ -27,9 +27,6 @@ properties:
->        - mediatek,mt7988-eth
->        - ralink,rt5350-eth
->  
-> -  reg:
-> -    maxItems: 1
-> -
+ drivers/net/phy/Kconfig                         | 5 +----
+ drivers/net/phy/Makefile                        | 6 +-----
+ drivers/net/phy/aquantia/Kconfig                | 5 +++++
+ drivers/net/phy/aquantia/Makefile               | 6 ++++++
+ drivers/net/phy/{ => aquantia}/aquantia.h       | 0
+ drivers/net/phy/{ => aquantia}/aquantia_hwmon.c | 0
+ drivers/net/phy/{ => aquantia}/aquantia_main.c  | 0
+ 7 files changed, 13 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/net/phy/aquantia/Kconfig
+ create mode 100644 drivers/net/phy/aquantia/Makefile
+ rename drivers/net/phy/{ => aquantia}/aquantia.h (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_hwmon.c (100%)
+ rename drivers/net/phy/{ => aquantia}/aquantia_main.c (100%)
 
-It's not clear what this change is from the commit msg.
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 421d2b62918f..25cfc5ded1da 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -96,10 +96,7 @@ config ADIN1100_PHY
+ 	  Currently supports the:
+ 	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
+ 
+-config AQUANTIA_PHY
+-	tristate "Aquantia PHYs"
+-	help
+-	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
++source "drivers/net/phy/aquantia/Kconfig"
+ 
+ config AX88796B_PHY
+ 	tristate "Asix PHYs"
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index c945ed9bd14b..f65e85c91fc1 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -35,11 +35,7 @@ obj-y				+= $(sfp-obj-y) $(sfp-obj-m)
+ obj-$(CONFIG_ADIN_PHY)		+= adin.o
+ obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
+ obj-$(CONFIG_AMD_PHY)		+= amd.o
+-aquantia-objs			+= aquantia_main.o
+-ifdef CONFIG_HWMON
+-aquantia-objs			+= aquantia_hwmon.o
+-endif
+-obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
+ obj-$(CONFIG_AT803X_PHY)	+= at803x.o
+ obj-$(CONFIG_AX88796B_PHY)	+= ax88796b.o
+ obj-$(CONFIG_BCM54140_PHY)	+= bcm54140.o
+diff --git a/drivers/net/phy/aquantia/Kconfig b/drivers/net/phy/aquantia/Kconfig
+new file mode 100644
+index 000000000000..226146417a6a
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config AQUANTIA_PHY
++	tristate "Aquantia PHYs"
++	help
++	  Currently supports the Aquantia AQ1202, AQ2104, AQR105, AQR405
+diff --git a/drivers/net/phy/aquantia/Makefile b/drivers/net/phy/aquantia/Makefile
+new file mode 100644
+index 000000000000..346f350bc084
+--- /dev/null
++++ b/drivers/net/phy/aquantia/Makefile
+@@ -0,0 +1,6 @@
++# SPDX-License-Identifier: GPL-2.0
++aquantia-objs			+= aquantia_main.o
++ifdef CONFIG_HWMON
++aquantia-objs			+= aquantia_hwmon.o
++endif
++obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia.o
+diff --git a/drivers/net/phy/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
+similarity index 100%
+rename from drivers/net/phy/aquantia.h
+rename to drivers/net/phy/aquantia/aquantia.h
+diff --git a/drivers/net/phy/aquantia_hwmon.c b/drivers/net/phy/aquantia/aquantia_hwmon.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_hwmon.c
+rename to drivers/net/phy/aquantia/aquantia_hwmon.c
+diff --git a/drivers/net/phy/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+similarity index 100%
+rename from drivers/net/phy/aquantia_main.c
+rename to drivers/net/phy/aquantia/aquantia_main.c
+-- 
+2.40.1
 
-This should stay and be:
-
-reg:
-  minItems: 1
-  items:
-    - description: what's in the 1st region
-    - description: what's in the 2nd region
-
->    clocks: true
->    clock-names: true
->  
-> @@ -115,6 +112,9 @@ allOf:
->                - mediatek,mt7623-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
->          interrupts:
->            maxItems: 3
->  
-> @@ -149,6 +149,9 @@ allOf:
->                - mediatek,mt7621-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
->          interrupts:
->            maxItems: 1
->  
-> @@ -174,6 +177,9 @@ allOf:
->              const: mediatek,mt7622-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
->          interrupts:
->            maxItems: 3
->  
-> @@ -215,6 +221,9 @@ allOf:
->              const: mediatek,mt7629-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
->          interrupts:
->            maxItems: 3
->  
-> @@ -257,6 +266,9 @@ allOf:
->              const: mediatek,mt7981-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
->          interrupts:
->            minItems: 4
->  
-> @@ -295,6 +307,9 @@ allOf:
->              const: mediatek,mt7986-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 1
-> +
-
-Looks like lots of duplication. Perhaps there's a cleaner way.
-
->          interrupts:
->            minItems: 4
->  
-> @@ -333,36 +348,32 @@ allOf:
->              const: mediatek,mt7988-eth
->      then:
->        properties:
-> +        reg:
-> +          maxItems: 2
-> +          minItems: 2
-> +
->          interrupts:
->            minItems: 4
-> +          maxItems: 4
->  
->          clocks:
-> -          minItems: 34
-> -          maxItems: 34
-> +          minItems: 24
-> +          maxItems: 24
->  
->          clock-names:
->            items:
-> -            - const: crypto
-> +            - const: xgp1
-> +            - const: xgp2
-> +            - const: xgp3
->              - const: fe
->              - const: gp2
->              - const: gp1
->              - const: gp3
-> +            - const: esw
-> +            - const: crypto
->              - const: ethwarp_wocpu2
->              - const: ethwarp_wocpu1
->              - const: ethwarp_wocpu0
-> -            - const: esw
-> -            - const: netsys0
-> -            - const: netsys1
-> -            - const: sgmii_tx250m
-> -            - const: sgmii_rx250m
-> -            - const: sgmii2_tx250m
-> -            - const: sgmii2_rx250m
-> -            - const: top_usxgmii0_sel
-> -            - const: top_usxgmii1_sel
-> -            - const: top_sgm0_sel
-> -            - const: top_sgm1_sel
-> -            - const: top_xfi_phy0_xtal_sel
-> -            - const: top_xfi_phy1_xtal_sel
->              - const: top_eth_gmii_sel
->              - const: top_eth_refck_50m_sel
->              - const: top_eth_sys_200m_sel
-> @@ -375,18 +386,9 @@ allOf:
->              - const: top_netsys_sync_250m_sel
->              - const: top_netsys_ppefb_250m_sel
->              - const: top_netsys_warp_sel
-> -            - const: wocpu1
-> -            - const: wocpu0
-> -            - const: xgp1
-> -            - const: xgp2
-> -            - const: xgp3
-> -
-> -        mediatek,sgmiisys:
-> -          minItems: 2
-> -          maxItems: 2
->  
->  patternProperties:
-> -  "^mac@[0-1]$":
-> +  "^mac@[0-2]$":
->      type: object
->      unevaluatedProperties: false
->      allOf:
-> @@ -577,3 +579,114 @@ examples:
->          };
->        };
->      };
-> +
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
-> +
-> +    soc {
-> +      #address-cells = <2>;
-> +      #size-cells = <2>;
-> +
-> +      ethernet@15100000 {
-> +        compatible = "mediatek,mt7988-eth";
-> +        reg = <0 0x15100000 0 0x80000>, <0 0x15400000 0 0x380000>;
-> +        interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
-> +                     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
-> +                     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
-> +                     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
-> +
-> +        clocks = <&ethsys CLK_ETHDMA_XGP1_EN>,
-> +                 <&ethsys CLK_ETHDMA_XGP2_EN>,
-> +                 <&ethsys CLK_ETHDMA_XGP3_EN>,
-> +                 <&ethsys CLK_ETHDMA_FE_EN>,
-> +                 <&ethsys CLK_ETHDMA_GP2_EN>,
-> +                 <&ethsys CLK_ETHDMA_GP1_EN>,
-> +                 <&ethsys CLK_ETHDMA_GP3_EN>,
-> +                 <&ethsys CLK_ETHDMA_ESW_EN>,
-> +                 <&ethsys CLK_ETHDMA_CRYPT0_EN>,
-> +                 <&ethwarp CLK_ETHWARP_WOCPU2_EN>,
-> +                 <&ethwarp CLK_ETHWARP_WOCPU1_EN>,
-> +                 <&ethwarp CLK_ETHWARP_WOCPU0_EN>,
-> +                 <&topckgen CLK_TOP_ETH_GMII_SEL>,
-> +                 <&topckgen CLK_TOP_ETH_REFCK_50M_SEL>,
-> +                 <&topckgen CLK_TOP_ETH_SYS_200M_SEL>,
-> +                 <&topckgen CLK_TOP_ETH_SYS_SEL>,
-> +                 <&topckgen CLK_TOP_ETH_XGMII_SEL>,
-> +                 <&topckgen CLK_TOP_ETH_MII_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_500M_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_PAO_2X_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_SYNC_250M_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_PPEFB_250M_SEL>,
-> +                 <&topckgen CLK_TOP_NETSYS_WARP_SEL>;
-> +
-> +        clock-names = "xgp1", "xgp2", "xgp3", "fe", "gp2", "gp1",
-> +                      "gp3", "esw", "crypto",
-> +                      "ethwarp_wocpu2", "ethwarp_wocpu1",
-> +                      "ethwarp_wocpu0", "top_eth_gmii_sel",
-> +                      "top_eth_refck_50m_sel", "top_eth_sys_200m_sel",
-> +                      "top_eth_sys_sel", "top_eth_xgmii_sel",
-> +                      "top_eth_mii_sel", "top_netsys_sel",
-> +                      "top_netsys_500m_sel", "top_netsys_pao_2x_sel",
-> +                      "top_netsys_sync_250m_sel",
-> +                      "top_netsys_ppefb_250m_sel",
-> +                      "top_netsys_warp_sel";
-> +        assigned-clocks = <&topckgen CLK_TOP_NETSYS_2X_SEL>,
-> +                          <&topckgen CLK_TOP_NETSYS_GSW_SEL>,
-> +                          <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>,
-> +                          <&topckgen CLK_TOP_USXGMII_SBUS_1_SEL>,
-> +                          <&topckgen CLK_TOP_SGM_0_SEL>,
-> +                          <&topckgen CLK_TOP_SGM_1_SEL>;
-> +        assigned-clock-parents = <&apmixedsys CLK_APMIXED_NET2PLL>,
-> +                                 <&topckgen CLK_TOP_NET1PLL_D4>,
-> +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
-> +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
-> +                                 <&apmixedsys CLK_APMIXED_SGMPLL>,
-> +                                 <&apmixedsys CLK_APMIXED_SGMPLL>;
-> +        mediatek,ethsys = <&ethsys>;
-> +        mediatek,infracfg = <&topmisc>;
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        mac@0 {
-> +          compatible = "mediatek,eth-mac";
-> +          reg = <0>;
-> +          phy-mode = "internal";
-> +          status = "disabled";
-
-Examples should be enabled.
-
-> +
-> +          fixed-link {
-> +            speed = <10000>;
-> +            full-duplex;
-> +            pause;
-> +          };
-> +        };
-> +
-> +        mac@1 {
-> +          compatible = "mediatek,eth-mac";
-> +          reg = <1>;
-> +          status = "disabled";
-> +          pcs-handle = <&usxgmiisys1>;
-> +        };
-> +
-> +        mac@2 {
-> +          compatible = "mediatek,eth-mac";
-> +          reg = <2>;
-> +          status = "disabled";
-> +          pcs-handle = <&usxgmiisys0>;
-> +        };
-> +
-> +        mdio_bus: mdio-bus {
-
-mdio {
-
-> +          #address-cells = <1>;
-> +          #size-cells = <0>;
-> +
-> +          /* internal 2.5G PHY */
-> +          int_2p5g_phy: ethernet-phy@15 {
-> +            reg = <15>;
-> +            compatible = "ethernet-phy-ieee802.3-c45";
-> +            phy-mode = "internal";
-> +          };
-> +        };
-> +      };
-> +    };
-> -- 
-> 2.42.1
 
