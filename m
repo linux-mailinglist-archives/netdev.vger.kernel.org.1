@@ -1,166 +1,265 @@
-Return-Path: <netdev+bounces-47803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 650CC7EB6C4
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:09:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B897EB6C7
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 20:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AC42B209B3
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:09:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E6561C20A6A
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1158717D8;
-	Tue, 14 Nov 2023 19:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E100443C;
+	Tue, 14 Nov 2023 19:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rrX+g084"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aIxpFehF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EAF81FD3
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 19:09:19 +0000 (UTC)
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F90BF4
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 11:09:17 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-54366bb1c02so1902a12.1
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 11:09:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1699988956; x=1700593756; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JMhZhxj9GWSVyzmmYjvAklSYcqYI+VSCH3sYmo0njbg=;
-        b=rrX+g084MlkTqwwTZ1xvX3ZDxnj2mUyUWehFlHQzrSwpCHSvuEJPh1lZA5xBJvuOuX
-         PRFOFa3IuJ6pW3glvn9gu6thD+ZPkUOtY4chvbltsplXsZr96GL3efDQ5Vel9JOsJFcb
-         riOULrBBvUJiNhv11gCt4yh3ULcsNPOM9/yCQzoPe2if1Zyz//GQdF8YCJ3AWbOXoHDt
-         v/n/gZyoxy9U5A2yffwQCWCY3l3W3m0h/h/ax67BtSjiwkZfkYfj6L91Il6nsEDmtAMb
-         ANq5dHNpxmq97MILpiDqM1mBXu3CT2/N7grH5Lg3WelYrXloBudGLZyLfVI+uADOba8J
-         73kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699988956; x=1700593756;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JMhZhxj9GWSVyzmmYjvAklSYcqYI+VSCH3sYmo0njbg=;
-        b=ucr+A8Ta10CokVI3vxUTNHTD5kO8bOgtP5JbCz+dM1JNcMdpu7lzLKK+0Zxmc71lHN
-         q4OeoYFXRLYdYNI95CBZzdo0in/3uKAshV0mBvfMA372pE/OzfdUt5SitQyEWV2gsoAV
-         2rARoM5PSCGbEadTvG/OjALMyry8GIe4wmuGBjGBzFT7J+svdlRgyAgt61AK3i1E91xJ
-         K3N4PAAK16MjewAjlysp4P/9zVsSADH9yO1BHeP+xl/Pq/Q7jvuzvbz3mDrstlx0pqI/
-         KP/htrqi/qhRUpmrYTlPblBex9+SpvhFOedOOaG5aWCgu02poC1vQAkRbgfQb8Tkd+/C
-         AKEg==
-X-Gm-Message-State: AOJu0Yzbhfh11WGq/uJCQTrtYO6zjo718IXzkzF8wxRpS8Dal/kovFOa
-	1ifOL9WUZug+ZXaKwW/dRtjb+WIUHpgAJtwQJfSbqVLlPHO87wk7JD4=
-X-Google-Smtp-Source: AGHT+IGvNrcGeJdNSqL7F2roS50cvcWensFlP8KNw5x412VNrZW749jTCQ4qhNKQs2sXr/A9YcpETXz0rCqg0/D0VhU=
-X-Received: by 2002:a05:6402:e95:b0:544:f741:62f4 with SMTP id
- h21-20020a0564020e9500b00544f74162f4mr30134eda.0.1699988955795; Tue, 14 Nov
- 2023 11:09:15 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E591217D8;
+	Tue, 14 Nov 2023 19:10:52 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDF7F4;
+	Tue, 14 Nov 2023 11:10:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JNLArOzkNx8faUQdzL9sGLoJY9ZsQNr6hJmyeuSCIjs=; b=aIxpFehFBgHsJiDqKEQaZW/qA9
+	ASVTxqLZ1v/IOlscBs5X7ED5dczyvRV7bg8AwSpDB/gEGCzYNtz3s2huaE0xPeMqznS8uj+rgJv+9
+	xKlKeH6gkvBRL0BQZIy6pFeDjKXHeQtQFfJ793tyxkjTnF062VnJU03+19qcuY5NGf7U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r2yo8-000BUO-Dm; Tue, 14 Nov 2023 20:10:44 +0100
+Date: Tue, 14 Nov 2023 20:10:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: davem@davemloft.net, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the
+ Qualcomm IPQESS driver
+Message-ID: <f6ce0c15-8b72-4568-8ba2-f0216db84ffd@lunn.ch>
+References: <20231114105600.1012056-1-romain.gantois@bootlin.com>
+ <20231114105600.1012056-4-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAFYr1XM_UGejZdnUYYBQomq0jBDMpV+HWCd1ZDorD=xOGXq4CQ@mail.gmail.com>
-In-Reply-To: <CAFYr1XM_UGejZdnUYYBQomq0jBDMpV+HWCd1ZDorD=xOGXq4CQ@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Nov 2023 20:09:01 +0100
-Message-ID: <CANn89iKhboBst+Jx2bjF6xvi1UALnxwC+pv-VFaL+82r_XQ9Hg@mail.gmail.com>
-Subject: Re: Potential bug in linux TCP pacing implementation
-To: Anup Agarwal <anupa@andrew.cmu.edu>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114105600.1012056-4-romain.gantois@bootlin.com>
 
-On Tue, Nov 14, 2023 at 7:59=E2=80=AFPM Anup Agarwal <anupa@andrew.cmu.edu>=
- wrote:
->
-> Hi Eric,
->
-> Sorry for the duplicate email. I am sending again as I got an
-> automated response from netdev@vger.kernel.org that my email was
-> rejected because of using HTML formatting. I have resent a plain text
-> version. Hopefully this email goes through.
->
-> I saw that you are the maintainer for the linux networking TCP stack
-> (https://www.kernel.org/doc/linux/MAINTAINERS), and wanted to report a
-> potential bug. Please let me know if I should be reaching out to
-> someone else or using some other method to report.
->
-> Based on my understanding there is a bug in the kernel's pacing
-> implementation. It does not faithfully follow the pacing rate set by
-> the congestion control algorithm (CCA).
->
-> Description:
-> For enforcing pacing, I think the kernel computes "tcp_wstamp_ns" or
-> the time to deliver the next packet. This computation is only done
-> after transmission of packets "tcp_update_skb_after_send" in
-> "net/ipv4/tcp_output.c". However, the rate, i.e., "sk_pacing_rate" can
-> be updated when packets are received (e.g., when the CCA gets a
-> "rate_sample" for an ACK). As a result if the rate is changed by the
-> CCA frequently, then the kernel uses a stale pacing value.
->
-> Example:
-> For a concrete example, say the pacing rate is 1 pkt per second at
-> t=3D0, and a packet was just transmitted at t=3D0, and the tcp_wstamp_ns
-> is then set to  t=3D1 sec. Now say an ACK arrived at t=3D1us and caused
-> the CCA to update rate to 100 pkts per second. The next packet could
-> then be sent at 1us + 0.01s. But since tcp_wstamp_ns is set to 1 sec.
-> So roughly 100 pkts worth of transmission opportunity is lost.
->
-> Thoughts:
-> I guess the goal of the kernel pacing is to enforce an upper bound on
-> transmission rate (or lower bound on inter-send time), rather than
-> follow the "sk_pacing_rate" as a transmission rate directly. In that
-> sense it is not a bug, i.e., the time between sends is never shorter
-> than inverse sk_pacing_rate. But if sk_pacing_rate is changed
-> frequently by large enough magnitudes, the time between sends can be
-> much longer than the inverse pacing rate. Due to not incorporating all
-> updates to "sk_pacing_rate", the kernel is very conservative and
-> misses many send opportunities.
->
-> Why this matters:
-> I was implementing a rate based CCA that does not use cwnd at all.
-> There were cases when I had to restrict inflight and would temporarily
-> set sk_pacing_rate close to zero. When I reset the sk_pacing_rate, the
-> kernel does not start using this rate for a long time as it has cached
-> the time to next send using the "close to zero" rate. Rate based CCAs
-> are more robust to jitter in the network. To me it seems useful to
-> actually use pacing rate as transmission rate instead of just an upper
-> bound on transmission rate. Fundamentally by setting a rate, a CCA can
-> implement any tx behavior, whereas cwnd limits the possible behaviors.
-> Even if folks disagree with this and want to interpret pacing rate as
-> an upper bound on tx rate rather than tx rate directly, I think the
-> enforcement can still be modified to avoid this bug and follow
-> sk_pacing_rate more closely.
->
-> Potential fix:
-> // Update credit whenever (1) sk_pacing_rate is changed, and (2)
-> before checking if transmission is allowed by pacing.
-> credit_in_bytes =3D last_sk_pacing_rate * (now - last_credit_update)
-> last_credit_update =3D now
-> last_sk_pacing_rate =3D sk_pacing_rate
-> // The idea is that last_sk_pacing_rate was set by the CCA for the
-> time interval [last_credit_update, now). And we integrate (sum up)
-> this rate over the interval to computing credits.
-> // I think this is also robust to OS jitter as credits increase even
-> for any intervals missed due to scheduling delays.
->
-> // To check if it is ok to send pkt due to pacing, one can just check
-> if (sent_till_now + pkt_size <=3D credit_in_bytes)
->
-> Please let me know if you have additional thoughts/feedback.
+> +static void ipqess_port_stp_state_set(struct ipqess_port *port,
+> +				      u8 state)
+> +{
+> +	struct qca8k_priv *priv = port->sw->priv;
+> +	u32 stp_state;
+> +	int err;
+> +
+> +	switch (state) {
+> +	case BR_STATE_DISABLED:
+> +		stp_state = QCA8K_PORT_LOOKUP_STATE_DISABLED;
+> +		break;
+> +	case BR_STATE_BLOCKING:
+> +		stp_state = QCA8K_PORT_LOOKUP_STATE_BLOCKING;
+> +		break;
+> +	case BR_STATE_LISTENING:
+> +		stp_state = QCA8K_PORT_LOOKUP_STATE_LISTENING;
+> +		break;
+> +	case BR_STATE_LEARNING:
+> +		stp_state = QCA8K_PORT_LOOKUP_STATE_LEARNING;
+> +		break;
+> +	case BR_STATE_FORWARDING:
+> +	default:
+> +		stp_state = QCA8K_PORT_LOOKUP_STATE_FORWARD;
+> +		break;
+> +	}
+> +
+> +	err = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port->index),
+> +			QCA8K_PORT_LOOKUP_STATE_MASK, stp_state);
 
-This was a conscious choice really. More state in TCP socket (or in
-FQ) means higher costs.
+When i compare this to qca8k_port_stp_state_set() it is 90% identical.
+What differs is how you get to struct qca8k_priv *priv. What you need
+to do is refactor the existing functions to separate the DSA parts out
+and have a core function which takes qca8k_priv and in port. The DSA
+core can then call it, and this function can call it, after extracting
+qca8k_priv and index from port.
 
-For conventional CC, difference between pacing P1 and P2, and usual
-packet sizes (typically 1ms of airtime)
-make the difference pretty small in practice.
+> +static int ipqess_port_enable_rt(struct ipqess_port *port,
+> +				 struct phy_device *phy)
+> +{
+> +	struct qca8k_priv *priv = port->sw->priv;
+> +
+> +	qca8k_port_set_status(priv, port->index, 1);
+> +	priv->port_enabled_map |= BIT(port->index);
+> +
+> +	phy_support_asym_pause(phy);
+> +
+> +	ipqess_port_set_state_now(port, BR_STATE_FORWARDING, false);
+> +
+> +	if (port->pl)
+> +		phylink_start(port->pl);
 
-Also, pacing is offloaded (either in FQ qdisc, or in timer wheel on
-some NIC hardware).
+That looks odd. You unconditionally call phy_support_asym_pause() yet
+conditionally call phylink_start(). I would expect there to always be
+a phylink instance.
 
-With EDT  model, you probably can implement whatever schem you prefer
-in your CC module, storing extra state in the CC private state.
+Also, you should be telling phylink about the pause capabilities in
+config->mac_capabilities. It is then phylinks problem to tell the PHY,
+or the PCS driving the SFP etc about pause.
+
+
+> +static int
+> +ipqess_port_fdb_do_dump(const unsigned char *addr, u16 vid,
+> +			bool is_static, void *data)
+> +{
+> +	struct ipqess_port_dump_ctx *dump = data;
+> +	u32 portid = NETLINK_CB(dump->cb->skb).portid;
+> +	u32 seq = dump->cb->nlh->nlmsg_seq;
+> +	struct nlmsghdr *nlh;
+> +	struct ndmsg *ndm;
+> +
+> +	if (dump->idx < dump->cb->args[2])
+> +		goto skip;
+> +
+> +	nlh = nlmsg_put(dump->skb, portid, seq, RTM_NEWNEIGH,
+> +			sizeof(*ndm), NLM_F_MULTI);
+> +	if (!nlh)
+> +		return -EMSGSIZE;
+> +
+> +	ndm = nlmsg_data(nlh);
+> +	ndm->ndm_family  = AF_BRIDGE;
+> +	ndm->ndm_pad1    = 0;
+> +	ndm->ndm_pad2    = 0;
+> +	ndm->ndm_flags   = NTF_SELF;
+> +	ndm->ndm_type    = 0;
+> +	ndm->ndm_ifindex = dump->dev->ifindex;
+> +	ndm->ndm_state   = is_static ? NUD_NOARP : NUD_REACHABLE;
+> +
+> +	if (nla_put(dump->skb, NDA_LLADDR, ETH_ALEN, addr))
+> +		goto nla_put_failure;
+> +
+> +	if (vid && nla_put_u16(dump->skb, NDA_VLAN, vid))
+> +		goto nla_put_failure;
+> +
+> +	nlmsg_end(dump->skb, nlh);
+> +
+> +skip:
+> +	dump->idx++;
+> +	return 0;
+> +
+> +nla_put_failure:
+> +	nlmsg_cancel(dump->skb, nlh);
+> +	return -EMSGSIZE;
+> +}
+
+This looks identical to dsa_slave_port_fdb_do_dump(). Please export
+and reuse it.
+
+> +
+> +static int
+> +ipqess_port_fdb_dump(struct sk_buff *skb, struct netlink_callback *cb,
+> +		     struct net_device *dev, struct net_device *filter_dev,
+> +		     int *idx)
+> +{
+> +	struct ipqess_port *port = netdev_priv(dev);
+> +	struct qca8k_priv *priv = port->sw->priv;
+> +	struct ipqess_port_dump_ctx dump = {
+> +		.dev = dev,
+> +		.skb = skb,
+> +		.cb = cb,
+> +		.idx = *idx,
+> +	};
+> +	int cnt = QCA8K_NUM_FDB_RECORDS;
+> +	struct qca8k_fdb _fdb = { 0 };
+> +	bool is_static;
+> +	int ret = 0;
+> +
+> +	mutex_lock(&priv->reg_mutex);
+> +	while (cnt-- && !qca8k_fdb_next(priv, &_fdb, port->index)) {
+> +		if (!_fdb.aging)
+> +			break;
+> +		is_static = (_fdb.aging == QCA8K_ATU_STATUS_STATIC);
+> +		ret = ipqess_port_fdb_do_dump(_fdb.mac, _fdb.vid, is_static, &dump);
+> +		if (ret)
+> +			break;
+> +	}
+> +	mutex_unlock(&priv->reg_mutex);
+> +
+> +	*idx = dump.idx;
+> +
+> +	return ret;
+> +}
+
+And with a little bit of refactoring you can reuse the core of
+qca8k_port_fdb_dump.
+
+> +static void ipqess_phylink_mac_link_up(struct phylink_config *config,
+> +				       struct phy_device *phydev,
+> +				       unsigned int mode,
+> +				       phy_interface_t interface,
+> +				       int speed, int duplex,
+> +				       bool tx_pause, bool rx_pause)
+> +{
+> +	struct ipqess_port *port = ipqess_port_from_pl_state(config, pl_config);
+> +	struct qca8k_priv *priv = port->sw->priv;
+> +	u32 reg;
+> +
+> +	if (phylink_autoneg_inband(mode)) {
+> +		reg = QCA8K_PORT_STATUS_LINK_AUTO;
+> +	} else {
+> +		switch (speed) {
+> +		case SPEED_10:
+> +			reg = QCA8K_PORT_STATUS_SPEED_10;
+> +			break;
+> +		case SPEED_100:
+> +			reg = QCA8K_PORT_STATUS_SPEED_100;
+> +			break;
+> +		case SPEED_1000:
+> +			reg = QCA8K_PORT_STATUS_SPEED_1000;
+> +			break;
+> +		default:
+> +			reg = QCA8K_PORT_STATUS_LINK_AUTO;
+> +			break;
+> +		}
+> +
+> +		if (duplex == DUPLEX_FULL)
+> +			reg |= QCA8K_PORT_STATUS_DUPLEX;
+> +
+> +		if (rx_pause || port->index == 0)
+> +			reg |= QCA8K_PORT_STATUS_RXFLOW;
+> +
+> +		if (tx_pause || port->index == 0)
+> +			reg |= QCA8K_PORT_STATUS_TXFLOW;
+> +	}
+> +
+> +	reg |= QCA8K_PORT_STATUS_TXMAC | QCA8K_PORT_STATUS_RXMAC;
+> +
+> +	qca8k_write(priv, QCA8K_REG_PORT_STATUS(port->index), reg);
+> +}
+
+qca8k_phylink_mac_link_up() with some refactoring can be
+reused. Please look through the driver and find other instances like
+this where you can reuse more code.
+
+     Andrew
 
