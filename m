@@ -1,224 +1,307 @@
-Return-Path: <netdev+bounces-47627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE5E7EAC86
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:08:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503AD7EACEB
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 10:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75F45B20A88
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 09:08:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04E33281102
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 09:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 869BF15AD8;
-	Tue, 14 Nov 2023 09:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4128216424;
+	Tue, 14 Nov 2023 09:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="p0iK73Bg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bgWiz2oJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA5D156EF
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:08:12 +0000 (UTC)
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68037198
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 01:08:10 -0800 (PST)
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-	by mailout3.samsung.com (KnoxPortal) with ESMTP id 20231114090806epoutp03dad6d7498890971de711e4341d6d0386~XciSw5WDt1604016040epoutp03w
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:08:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20231114090806epoutp03dad6d7498890971de711e4341d6d0386~XciSw5WDt1604016040epoutp03w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1699952886;
-	bh=Vp4dd4/NjtzTg6uPkQ0NQC0+Zz9GCW5jd8SMRqJkBew=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=p0iK73Bg09LChraEpvQnysniMfkk34PwWCTAhjY6BSOLZHTuhR9LeXS/Ey47O01Yo
-	 UNtaYHcW5aY3psuge2qcv5eXm8a3SgbLx3qTctGp7wIPzns3n59lju9/CRgh7WXBe1
-	 RBg3ocrQutbHBJHo6EHMZIu3X7sDXVuIs6cQ7cXo=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-	epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20231114090805epcas1p2cc1703367d5b6380e8335dfb7ffab8d9~XciSNdOlv2649526495epcas1p24;
-	Tue, 14 Nov 2023 09:08:05 +0000 (GMT)
-Received: from epsmgec1p1.samsung.com (unknown [182.195.38.241]) by
-	epsnrtp1.localdomain (Postfix) with ESMTP id 4SV0nd1PFFz4x9Pv; Tue, 14 Nov
-	2023 09:08:05 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-	epsmgec1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	10.56.08572.5F833556; Tue, 14 Nov 2023 18:08:05 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-	epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-	20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b~XciQzpEib2665226652epcas1p3V;
-	Tue, 14 Nov 2023 09:08:04 +0000 (GMT)
-Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
-	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20231114090804epsmtrp14e771ce47042c22e21a099d5c3946e30~XciQzCfsO2768527685epsmtrp1C;
-	Tue, 14 Nov 2023 09:08:04 +0000 (GMT)
-X-AuditID: b6c32a33-cefff7000000217c-0d-655338f59077
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
-	B6.F4.18939.4F833556; Tue, 14 Nov 2023 18:08:04 +0900 (KST)
-Received: from U20PB1-0469.tn.corp.samsungelectronics.net (unknown
-	[10.253.238.38]) by epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20231114090803epsmtip16997e4ecf1165d871aa8f532971a0e51~XciQnWWIy1771417714epsmtip19;
-	Tue, 14 Nov 2023 09:08:03 +0000 (GMT)
-From: Jong eon Park <jongeon.park@samsung.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dongha7.kang@samsung.com, jongeon.park@samsung.com
-Subject: [PATCH net-next v2] netlink: introduce netlink poll to resolve fast
- return issue
-Date: Tue, 14 Nov 2023 18:07:48 +0900
-Message-Id: <20231114090748.694646-1-jongeon.park@samsung.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF9413FE4
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:20:58 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE7B132;
+	Tue, 14 Nov 2023 01:20:56 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AE8qHCE019234;
+	Tue, 14 Nov 2023 09:20:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=Ks2hsF7gZAH/CA2oPifrySYvXDbnvpyOc24DwlQLRRI=;
+ b=bgWiz2oJ6ZZlvNaRfX/eoFNWpxEFkmlmCuh2oAPoECxKyakiM7d2ZaogY37d4da01QWP
+ rl+REUqEpwaV+nRZZNgcp0NTQXJI5pb5zo/lJmFFXgWBlDUZxke3Rn0ucNkA0mmctpIC
+ X1OVAYkli5k4uD7NhumW4xVoMsSeOlmMoK45VrpM2n1Fmdebtxxn1tXbNtjQvsS16A3U
+ J/8MU9kARcnxHPMx7jVB2OzY4ux/sirPFbh56ntNrAXU9qvSsDMPlfDSChp5akA2DspC
+ f1U/lhGOEZDstJTMh27uQmtcxs1WirDLqAIAvWw6bXi3wh066ULTHfJkLjTAtM+n/OsY pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uc5rtgs02-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Nov 2023 09:20:42 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AE99XZ0013503;
+	Tue, 14 Nov 2023 09:20:42 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3uc5rtgrx7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Nov 2023 09:20:42 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AE8HBML029383;
+	Tue, 14 Nov 2023 09:17:22 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uakxsq44v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Nov 2023 09:17:22 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AE9HJPo45089462
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Nov 2023 09:17:19 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6BB6C20043;
+	Tue, 14 Nov 2023 09:17:19 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1ED720040;
+	Tue, 14 Nov 2023 09:17:18 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 14 Nov 2023 09:17:18 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
+        Gerd Bayer <gbayer@linux.ibm.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH net] s390/ism: ism driver implies smc protocol
+Date: Tue, 14 Nov 2023 10:17:18 +0100
+Message-Id: <20231114091718.3482624-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <b152ec7c0e690027da1086b777a3ec512001ba1f.camel@linux.ibm.com>
+References: <b152ec7c0e690027da1086b777a3ec512001ba1f.camel@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: p6faRSdtuUaeLj9kgRrzykTDpW0F4nCP
+X-Proofpoint-ORIG-GUID: ApJWhliNsGoyPriNAESks3LX29EEEAZF
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmphk+LIzCtJLcpLzFFi42LZdljTQPerRXCqwbJZ7BZzzrewWEy/OZXZ
-	4umxR+wWD6fHWlzY1sdqcXnXHDaLYwvELL6dfsPowOGxZeVNJo8Fm0o9Nq3qZPN4v+8qm0ff
-	llWMHp83yQWwRWXbZKQmpqQWKaTmJeenZOal2yp5B8c7x5uaGRjqGlpamCsp5CXmptoqufgE
-	6Lpl5gBdo6RQlphTChQKSCwuVtK3synKLy1JVcjILy6xVUotSMkpMCvQK07MLS7NS9fLSy2x
-	MjQwMDIFKkzIzvjZspGp4Jh8xYSJy5gaGKeLdzFyckgImEisWjmTuYuRi0NIYAejxL6b/5gg
-	nE+MElee3GKFc449nsgI07Lx+mEWiMRORolzbVOgqjqYJC5MXs8OUsUmoCdx8dlxdpCEiMA0
-	Rokjs1aBtTML5Elc+nWBBcQWFoiWWP/uKBuIzSKgKvHlXBPQJRwcvAJ2Ehf+CkJsk5eYeek7
-	2ExeAUGJkzOfsECMkZdo3jqbGaLmGrvEtW4jCNtF4vaHTSwQtrDEq+Nb2CFsKYmX/W1QdrbE
-	i2PHWEFWSQgUSFw9ogRh2ku8v2QBYjILaEqs36UPUawosfP3XKjb+STefe2BauSV6GgTgihR
-	k3h48i0rhC0jsXrFXTYI20PizJ8WsBuFBGIlJl6+zTyBUX4WkldmIXllFsLiBYzMqxjFUguK
-	c9NTkw0LDOFRmpyfu4kRnBy1jHcwXp7/T+8QIxMH4yFGCQ5mJRHePM2AVCHelMTKqtSi/Pii
-	0pzU4kOMpsCwncgsJZqcD0zPeSXxhiaWBiZmRiYWxpbGZkrivIoTZqcICaQnlqRmp6YWpBbB
-	9DFxcEo1MMlvfPLB/oUO5/zr5umn1F393T/KPcgq4D3XtOJs9//uzYfbHHOCgj7ni674bi6x
-	LDiFL3LS8uUaF274//wkKbN+itefS7kra15fmHj3ps3E2XtZ/70Jb3m0ZsPHpJtfZkSeYPii
-	PdHvipeTmATXpv6Fc6+vC+GeKfLKQd9TIfa6QU+CjI1d4qrklMN3Xr5tMIy4Knm76Ngub8Mv
-	78WVV+749cTPZYJ235YpG14ofmO/qDRd3dsrYgprzdNZ3h90xB+6nz21Oeo/6z/nVHvFJW9P
-	ZGduO355c+rmT2xCveWdz5/6ZK9qqVywWu73pfkP/E+UyfMwePTqNFVoabyaK2bQt+y90w8x
-	jaPXGphlK7OUWIozEg21mIuKEwHo9XzEFwQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrALMWRmVeSWpSXmKPExsWy7bCSnO4Xi+BUg+ffmS3mnG9hsZh+cyqz
-	xdNjj9gtHk6PtbiwrY/V4vKuOWwWxxaIWXw7/YbRgcNjy8qbTB4LNpV6bFrVyebxft9VNo++
-	LasYPT5vkgtgi+KySUnNySxLLdK3S+DK+NmykangmHzFhInLmBoYp4t3MXJySAiYSGy8fpil
-	i5GLQ0hgO6NEy7y5LBAJGYnrC/YB2RxAtrDE4cPFEDVtTBJvHp5iB6lhE9CTuPjsOJgtIjCD
-	UaLxkCiIzSxQJLH+yUI2EFtYIFLi/9d9jCA2i4CqxJdzTcwgM3kF7CQu/BWEWCUvMfPSd7Ax
-	vAKCEidnPmGBGCMv0bx1NvMERr5ZSFKzkKQWMDKtYhRNLSjOTc9NLjDUK07MLS7NS9dLzs/d
-	xAgOVK2gHYzL1v/VO8TIxMF4iFGCg1lJhDdPMyBViDclsbIqtSg/vqg0J7X4EKM0B4uSOK9y
-	TmeKkEB6YklqdmpqQWoRTJaJg1OqgSnwVceefO9izpLnkVbXCsq/HnP1WcKp+2jup5kfVn06
-	tO3U58RLP3aWbIxoCBQ0fi8yb+mLPw+Sjj66GTLVTE/cNUxI5vqE7PY4b55TJ/Tz1/vFr8+o
-	fOY29fKX0LVs7QdsKrjDDllf7fI7yXJIr9btF8/lR6oMi1jCApO2O+dbRsdOe3t21Xa3X1Nj
-	2+a8UDpz6MEL19TSf40JNmt8DC1XHN3DlS3qf71yq17MjsjPjW/3Jp3hWxiiJn90G6Nxb29u
-	05MlVa76dhUvxLmOvT8s1d69ged8MO/EVYpVpvISn018ry2Y0n52z7q1UjU7HeunVgUExyQe
-	3WAamH/n4NX9uZdPHbrUEn/f1/71z8NKLMUZiYZazEXFiQCO/pQXwwIAAA==
-X-CMS-MailID: 20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b
-References: <CGME20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b@epcas1p3.samsung.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-14_08,2023-11-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 impostorscore=0 mlxscore=0 clxscore=1011 bulkscore=0
+ suspectscore=0 adultscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2311060000 definitions=main-2311140072
 
-In very rare cases, there was an issue where a user's 'poll' function
-waiting for a uevent would continuously return very quickly, causing
-excessive CPU usage due to the following scenario.
+Since commit a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+you can build the ism code without selecting the SMC network protocol.
+That leaves some ism functions be reported as unused. Move these
+functions under the conditional compile with CONFIG_SMC.
 
-When sk_rmem_alloc exceeds sk_rcvbuf, netlink_broadcast_deliver returns an
-error and netlink_overrun is called. However, if netlink_overrun was
-called in a context just before a another context returns from the 'poll'
-and 'recv' is invoked, emptying the rcv queue, sk->sk_err = ENOBUF is
-written to the netlink socket belatedly and it enters the
-NETLINK_S_CONGESTED state. If the user does not check for POLLERR, they
-cannot consume and clean sk_err and repeatedly enter the situation where
-they call 'poll' again but return immediately. Moreover, in this
-situation, rcv queue is already empty and NETLINK_S_CONGESTED flag
-prevents any more incoming packets. This makes it impossible for the user
-to call 'recv'.
+Also codify the suggestion to also configure the SMC protocol in ism's
+Kconfig - but with an "imply" rather than a "select" as SMC depends on
+other config options and allow for a deliberate decision not to build
+SMC. Also, mention that in ISM's help.
 
-This "congested" situation is a bit ambiguous. The queue is empty, yet
-'congested' remains. This means kernel can no longer deliver uevents
-despite the empty queue, and it lead to the persistent 'congested' status.
-
-------------CPU1 (kernel)----------  --------------CPU2 (app)--------------
-...
-a driver delivers uevent.            poll was waiting for schedule.
-a driver delivers uevent.
-a driver delivers uevent.
-...
-1) netlink_broadcast_deliver fails.
-(sk_rmem_alloc > sk_rcvbuf)
-                                      getting schedule and poll returns,
-                                      and the app calls recv.
-                                      (rcv queue is empied)
-                                      2)
-
-netlink_overrun is called.
-(NETLINK_S_CONGESTED flag is set,
-ENOBUF is written in sk_err and,
-wake up poll.)
-                                      finishing its job and call poll.
-                                      poll returns POLLERR.
-
-                                      (the app doesn't have POLLERR handler)
-                                      it calls poll, but getting POLLERR.
-                                      it calls poll, but getting POLLERR.
-                                      it calls poll, but getting POLLERR.
-                                      ...
-
-To address this issue, I would like to introduce the following netlink
-poll.
-
-After calling the datagram_poll, netlink poll checks the
-NETLINK_S_CONGESTED status and rcv queue, and this make the user to be
-readable once more even if the user has already emptied rcv queue. This
-allows the user to be able to consume sk->sk_err value through
-netlink_recvmsg, thus the situation described above can be avoided.
-
-Co-developed-by: Dong ha Kang <dongha7.kang@samsung.com>
-Signed-off-by: Jong eon Park <jongeon.park@samsung.com>
-
+Fixes: a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/netdev/afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org/
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 ---
-v2:
- - Add more detailed explanation.
----
- net/netlink/af_netlink.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index eb086b06d60d..f08c10220041 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2002,6 +2002,20 @@ static int netlink_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	return err ? : copied;
+Hi Randy,
+
+sorry for the long wait. We had some internal discussions about how to 
+tackle this and decided to send out the short-term solution first and 
+work on better isolating the ISM device and SMC protocol together 
+with the work to extend ISM,
+e.g. at https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+
+Cheers, Gerd
+
+ drivers/s390/net/Kconfig   |  3 +-
+ drivers/s390/net/ism_drv.c | 92 +++++++++++++++++++-------------------
+ 2 files changed, 48 insertions(+), 47 deletions(-)
+
+diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+index 4902d45e929c..c61e6427384c 100644
+--- a/drivers/s390/net/Kconfig
++++ b/drivers/s390/net/Kconfig
+@@ -103,10 +103,11 @@ config CCWGROUP
+ config ISM
+ 	tristate "Support for ISM vPCI Adapter"
+ 	depends on PCI
++	imply SMC
+ 	default n
+ 	help
+ 	  Select this option if you want to use the Internal Shared Memory
+-	  vPCI Adapter.
++	  vPCI Adapter. The adapter can be used with the SMC network protocol.
+ 
+ 	  To compile as a module choose M. The module name is ism.
+ 	  If unsure, choose N.
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 6df7f377d2f9..ec112a00b135 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -289,22 +289,6 @@ static int ism_read_local_gid(struct ism_dev *ism)
+ 	return ret;
  }
  
-+static __poll_t netlink_poll(struct file *file, struct socket *sock,
-+			     poll_table *wait)
+-static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
+-			  u32 vid)
+-{
+-	union ism_query_rgid cmd;
+-
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.request.hdr.cmd = ISM_QUERY_RGID;
+-	cmd.request.hdr.len = sizeof(cmd.request);
+-
+-	cmd.request.rgid = rgid;
+-	cmd.request.vlan_valid = vid_valid;
+-	cmd.request.vlan_id = vid;
+-
+-	return ism_cmd(ism, &cmd);
+-}
+-
+ static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+@@ -429,23 +413,6 @@ static int ism_del_vlan_id(struct ism_dev *ism, u64 vlan_id)
+ 	return ism_cmd(ism, &cmd);
+ }
+ 
+-static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
+-			  u32 event_code, u64 info)
+-{
+-	union ism_sig_ieq cmd;
+-
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
+-	cmd.request.hdr.len = sizeof(cmd.request);
+-
+-	cmd.request.rgid = rgid;
+-	cmd.request.trigger_irq = trigger_irq;
+-	cmd.request.event_code = event_code;
+-	cmd.request.info = info;
+-
+-	return ism_cmd(ism, &cmd);
+-}
+-
+ static unsigned int max_bytes(unsigned int start, unsigned int len,
+ 			      unsigned int boundary)
+ {
+@@ -503,14 +470,6 @@ u8 *ism_get_seid(void)
+ }
+ EXPORT_SYMBOL_GPL(ism_get_seid);
+ 
+-static u16 ism_get_chid(struct ism_dev *ism)
+-{
+-	if (!ism || !ism->pdev)
+-		return 0;
+-
+-	return to_zpci(ism->pdev)->pchid;
+-}
+-
+ static void ism_handle_event(struct ism_dev *ism)
+ {
+ 	struct ism_event *entry;
+@@ -569,11 +528,6 @@ static irqreturn_t ism_handle_irq(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static u64 ism_get_local_gid(struct ism_dev *ism)
+-{
+-	return ism->local_gid;
+-}
+-
+ static int ism_dev_init(struct ism_dev *ism)
+ {
+ 	struct pci_dev *pdev = ism->pdev;
+@@ -774,6 +728,22 @@ module_exit(ism_exit);
+ /*************************** SMC-D Implementation *****************************/
+ 
+ #if IS_ENABLED(CONFIG_SMC)
++static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
++			  u32 vid)
 +{
-+	__poll_t mask = datagram_poll(file, sock, wait);
-+	struct sock *sk = sock->sk;
-+	struct netlink_sock *nlk = nlk_sk(sk);
++	union ism_query_rgid cmd;
 +
-+	if (test_bit(NETLINK_S_CONGESTED, &nlk->state) &&
-+	    skb_queue_empty_lockless(&sk->sk_receive_queue))
-+		mask |= EPOLLIN | EPOLLRDNORM;
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.request.hdr.cmd = ISM_QUERY_RGID;
++	cmd.request.hdr.len = sizeof(cmd.request);
 +
-+	return mask;
++	cmd.request.rgid = rgid;
++	cmd.request.vlan_valid = vid_valid;
++	cmd.request.vlan_id = vid;
++
++	return ism_cmd(ism, &cmd);
 +}
 +
- static void netlink_data_ready(struct sock *sk)
+ static int smcd_query_rgid(struct smcd_dev *smcd, u64 rgid, u32 vid_valid,
+ 			   u32 vid)
  {
- 	BUG();
-@@ -2803,7 +2817,7 @@ static const struct proto_ops netlink_ops = {
- 	.socketpair =	sock_no_socketpair,
- 	.accept =	sock_no_accept,
- 	.getname =	netlink_getname,
--	.poll =		datagram_poll,
-+	.poll =		netlink_poll,
- 	.ioctl =	netlink_ioctl,
- 	.listen =	sock_no_listen,
- 	.shutdown =	sock_no_shutdown,
+@@ -811,6 +781,23 @@ static int smcd_reset_vlan_required(struct smcd_dev *smcd)
+ 	return ism_cmd_simple(smcd->priv, ISM_RESET_VLAN);
+ }
+ 
++static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
++			  u32 event_code, u64 info)
++{
++	union ism_sig_ieq cmd;
++
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
++	cmd.request.hdr.len = sizeof(cmd.request);
++
++	cmd.request.rgid = rgid;
++	cmd.request.trigger_irq = trigger_irq;
++	cmd.request.event_code = event_code;
++	cmd.request.info = info;
++
++	return ism_cmd(ism, &cmd);
++}
++
+ static int smcd_signal_ieq(struct smcd_dev *smcd, u64 rgid, u32 trigger_irq,
+ 			   u32 event_code, u64 info)
+ {
+@@ -830,11 +817,24 @@ static int smcd_supports_v2(void)
+ 		SYSTEM_EID.type[0] != '0';
+ }
+ 
++static u64 ism_get_local_gid(struct ism_dev *ism)
++{
++	return ism->local_gid;
++}
++
+ static u64 smcd_get_local_gid(struct smcd_dev *smcd)
+ {
+ 	return ism_get_local_gid(smcd->priv);
+ }
+ 
++static u16 ism_get_chid(struct ism_dev *ism)
++{
++	if (!ism || !ism->pdev)
++		return 0;
++
++	return to_zpci(ism->pdev)->pchid;
++}
++
+ static u16 smcd_get_chid(struct smcd_dev *smcd)
+ {
+ 	return ism_get_chid(smcd->priv);
 -- 
-2.25.1
+2.39.2
 
 
