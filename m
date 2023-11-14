@@ -1,162 +1,186 @@
-Return-Path: <netdev+bounces-47778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B597EB5FD
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:59:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BFF7EB62E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 19:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04DCF1F252AC
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:59:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53C9C1C20AE7
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EDE02C1B0;
-	Tue, 14 Nov 2023 17:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883902AF19;
+	Tue, 14 Nov 2023 18:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GsLvOxWf"
+	dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b="ZecOo3P3"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93B42C1AA
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 17:59:39 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EAE1FD
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:59:38 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TAphjtX46K/OycYNc1BXTmVaTw6lBOpWJ46+Kq/ee8QKTZLf8//ZWr58zVs3eq5ZwVgqU3uV4brKcuQ8J0owYR/I/0Qgoh4zNmeHRWcQFOWdYmhUKfwoWgT/Ibv8hMr9HQmjYVQNV4pi/ld8xB9JIMFA0D3NowLNwyEZjsTLUONsO/mWkYAXWCsSFfGSr9BmA2DYffK2pplwoVjIuYBHQSck04Kie2PYpq+k/p8NJuVhMQ/sWvIxYUxvhmfsyIUHXCcjM3zwxVgTpAJ6ULr90v6nE7PtyS/iXlEFUFm3QXCE6hTIe7Naqh7iZ8I7eCme1oHRfDu3Pz5JMAGHF/Xt1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s6EVJcnfezbrgodo2/MdaqjWLR5RSMF+jqsiNuT/idI=;
- b=VjLB2ir5crUOeedTduJBlNbn194cVwp0I7sDcX3DFD44vv8LIZ2DG9glCRpHZLnR4+luLPDOeMI9A+gbpbcdEGTN2/OWAmc5YKP4Ef2gC4Orgijs0bts8YnLNLOOvNTDJ6vo1tQ9IOdXgGNnTWMAIYnvLRH3Ih0JKol/FlFWf5zwx4gdfD3dGC35Tue/WEI2SGTbiYy9PLL1e3fmJ5LczcWAtHzRjw24lNz6HVNilsB5sYx0B+I6qKH5IWXdOXLg8G57pIUvLMmW+GoyRcxiyNiHR1Jb9t15cON/ENXqfU8YwWqvKGm4QVVkMg+Uxz9VM3kDulJXv/88/CYCMwFZTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s6EVJcnfezbrgodo2/MdaqjWLR5RSMF+jqsiNuT/idI=;
- b=GsLvOxWfKYCCp+gHWKvZAmksCk0km9Croc8AD2Ogx9+h1L3CJ6qkDf0lFlvu+DPUJHYL5YKayFJu+T6A4EDZeZDvkERmrojXTx8l12QGE/AtK7uDoYV1OVo4m5uTMWFcHObON9nOddRP0yggQxiVQev25/ytuH28xquV+9GQJo9k0KvV9xpaRldbiDZhcNiZPz7z3GSqO12j5qRMdSJRs/Fz2W3qG8zGBH04lFvZ5eLvgVRDLRLzI30vxLzXkvksoQ0p5GrmfSxx7LIJVZEXD86yHlba+KQXNjKMDIcrIuTQdEM379iOxaMPRgz2FBQDM20DUY05WIMTRV55+PMFLw==
-Received: from BLAPR03CA0115.namprd03.prod.outlook.com (2603:10b6:208:32a::30)
- by CH0PR12MB8552.namprd12.prod.outlook.com (2603:10b6:610:18e::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6977.31; Tue, 14 Nov
- 2023 17:59:35 +0000
-Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
- (2603:10b6:208:32a:cafe::6d) by BLAPR03CA0115.outlook.office365.com
- (2603:10b6:208:32a::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17 via Frontend
- Transport; Tue, 14 Nov 2023 17:59:35 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7002.14 via Frontend Transport; Tue, 14 Nov 2023 17:59:35 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 14 Nov
- 2023 09:59:21 -0800
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 14 Nov
- 2023 09:59:20 -0800
-Received: from vdi.nvidia.com (10.127.8.14) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.986.41 via Frontend Transport; Tue, 14 Nov
- 2023 09:59:18 -0800
-From: Vlad Buslov <vladbu@nvidia.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <vyasevic@redhat.com>, Vlad Buslov
-	<vladbu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Subject: [PATCH net] macvlan: Don't propagate promisc change to lower dev in passthru
-Date: Tue, 14 Nov 2023 18:59:15 +0100
-Message-ID: <20231114175915.1649154-1-vladbu@nvidia.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB192C1BD
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 18:14:09 +0000 (UTC)
+Received: from mail.tkos.co.il (hours.tkos.co.il [84.110.109.230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831FD121
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 10:14:07 -0800 (PST)
+Received: from tarshish (unknown [10.0.8.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.tkos.co.il (Postfix) with ESMTPS id AF8A9440576;
+	Tue, 14 Nov 2023 20:13:03 +0200 (IST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
+	s=default; t=1699985583;
+	bh=5ZSVUMiPozNPbjLvDyJEKRkQZEv1+jBMbhUS03XMLrs=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:From;
+	b=ZecOo3P3y93oC675ZgM6E2Y0G0oIr5BvbRdVd6+fvRv/c3VyyNmpFSnnwumE8H+DB
+	 6VO9dLIjajXeYyQJGh5/MC56VXG6SZcEJH6cyfTwNXsK1vuJFHkGKyoBNKuKdcyD5l
+	 M9dtfoiWAKqYtb+IyyokrzaZC7b2B2Ee19ampk6nIKDIjd1Wcrq9DmUw2VK9J+zx2d
+	 wxEA0Q5n7ESY7dO6j9Jlf2jFadL3Wmdu2WGmdeWddZJnQ9Ay4UWB+ntGnByGPKa4Dj
+	 TaU2sKkXOX+3GbhJYfE7/9x0PheD3Qy6rF7MCMxMaBrZwlIhvOLjGZYV2XP0yri+LQ
+	 3x+KYqmQ8VXfQ==
+References: <8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
+ <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
+ <qw2ymgim7ikxmgyznzdh7acf66rm62gqdkqnjpshgksdqkdar5@52gef7yifpfg>
+User-agent: mu4e 1.10.7; emacs 29.1
+From: Baruch Siach <baruch@tkos.co.il>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: reduce dma ring display
+ code duplication
+Date: Tue, 14 Nov 2023 20:06:14 +0200
+In-reply-to: <qw2ymgim7ikxmgyznzdh7acf66rm62gqdkqnjpshgksdqkdar5@52gef7yifpfg>
+Message-ID: <87zfzgb3te.fsf@tarshish>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|CH0PR12MB8552:EE_
-X-MS-Office365-Filtering-Correlation-Id: 41e0bd53-6306-4b05-ce8a-08dbe53b7659
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	GEEHsqTyugbRxjP0GdbrJpSr8JNpnzPd9kxlguo3ieFpmQI1nN/vmkc/yyUEQfc7LKYKnKBSWRa/Vn3P1Qua5pM4yDFCS1XkLk/TO+UPSVnk5OPCCiHIGkj5qLxobh9YfInIu46HYWHaR8DbnWteFhtkAC184tPj3ZzqJv/qpXPXoH0P5engSqUDJ4K4cyZeXFlF84q9DZQ89VxYfp6O+VY0GoK6bAssTKMBz56kXgiSgpez8Ec5Gbm+5W1JcFvrxrz7czk7cx3cOgwzBQv1bVPMo+4g5bD5cArI5b/5Km0vpgTwCDGANpVp4mYoXWrt7DhpBZd3h4QS7oJ2atYzDrHKO6o2hSPksIw0QNqx7Vd1Gu4EdjP71d00dOy1P5Ij/feTi6bFFzUC28AkuwEOUeqZzfAxNzCwLeFUZHWuuHvIhEErtJI4UXCEu0bBQk3DLZ0IctBRejE6ydERqyE6QSrvVqRmTwqT78UUK556k8rXz799EphKcf3HehO45tDYdAutQnTWYtsjV9ksfEp8KxwX7WGSZo7+mK2pQrIND0Jqtdb8Exx8T+elsiY7zAOmro09EKDjOHWmCzxlYZWItqusfK7wTa2JshjqMPyH5TPUsLpSI3ctbi+CgH/UuRM6KLJLkXLCTGgOrdeGkd2hZCth6Fz2gB/ZhPmTwgZJu00TPuNite+qCycCNT2zYbz0TigaQsfxsziaVqVnoqVKoUasrWfema3X1VrMmT+iAfuyjFSqjmF2n0ZRpd/41H3B
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(376002)(39860400002)(136003)(230922051799003)(64100799003)(82310400011)(451199024)(186009)(1800799009)(36840700001)(46966006)(40470700004)(2616005)(426003)(40460700003)(336012)(107886003)(1076003)(26005)(2906002)(478600001)(4326008)(36756003)(86362001)(5660300002)(41300700001)(8676002)(8936002)(316002)(70586007)(70206006)(54906003)(110136005)(82740400003)(7696005)(6666004)(7636003)(356005)(40480700001)(47076005)(83380400001)(36860700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Nov 2023 17:59:35.2454
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 41e0bd53-6306-4b05-ce8a-08dbe53b7659
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD8.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8552
 
-Macvlan device in passthru mode sets its lower device promiscuous mode
-according to its MACVLAN_FLAG_NOPROMISC flag instead of synchronizing it to
-its own promiscuity setting. However, macvlan_change_rx_flags() function
-doesn't check the mode before propagating such changes to the lower device
-which can cause net_device->promiscuity counter overflow as illustrated by
-reproduction example [0] and resulting dmesg log [1]. Fix the issue by
-first verifying the mode in macvlan_change_rx_flags() function before
-propagating promiscuous mode change to the lower device.
+Hi Serge,
 
-[0]:
-ip link add macvlan1 link enp8s0f0 type macvlan mode passthru
-ip link set macvlan1 promisc on
-ip l set dev macvlan1 up
-ip link set macvlan1 promisc off
-ip l set dev macvlan1 down
-ip l set dev macvlan1 up
+On Tue, Nov 14 2023, Serge Semin wrote:
+> On Tue, Nov 14, 2023 at 09:03:10AM +0200, Baruch Siach wrote:
+>> The code to show extended descriptor is identical to normal one.
+>> Consolidate the code to remove duplication.
+>> 
+>> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+>> ---
+>> v2: Fix extended descriptor case, and properly test both cases
+>> ---
+>>  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++------------
+>>  1 file changed, 9 insertions(+), 16 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index 39336fe5e89d..cf818a2bc9d5 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -6182,26 +6182,19 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
+>>  	int i;
+>>  	struct dma_extended_desc *ep = (struct dma_extended_desc *)head;
+>>  	struct dma_desc *p = (struct dma_desc *)head;
+>
+>> +	unsigned long desc_size = extend_desc ? sizeof(*ep) : sizeof(*p);
+>
+> From readability point of view it's better to keep the initializers as
+> simple as possible: just type casts or container-of-based inits. The
+> more complex init-statements including the ternary-based ones is better to
+> move to the code section closer to the place of the vars usage. So could
+> you please move the initialization statement from the vars declaration
+> section to being performed right before the loop entrance? It shall
+> improve the readability a tiny bit.
+>
+>>  	dma_addr_t dma_addr;
+>>  
+>>  	for (i = 0; i < size; i++) {
+>> -		if (extend_desc) {
+>> -			dma_addr = dma_phy_addr + i * sizeof(*ep);
+>> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+>> -				   i, &dma_addr,
+>> -				   le32_to_cpu(ep->basic.des0),
+>> -				   le32_to_cpu(ep->basic.des1),
+>> -				   le32_to_cpu(ep->basic.des2),
+>> -				   le32_to_cpu(ep->basic.des3));
+>> -			ep++;
+>> -		} else {
+>> -			dma_addr = dma_phy_addr + i * sizeof(*p);
+>> -			seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+>> -				   i, &dma_addr,
+>> -				   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+>> -				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+>> +		dma_addr = dma_phy_addr + i * desc_size;
+>> +		seq_printf(seq, "%d [%pad]: 0x%x 0x%x 0x%x 0x%x\n",
+>> +				i, &dma_addr,
+>> +				le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+>> +				le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+>> +		if (extend_desc)
+>> +			p = &(++ep)->basic;
+>> +		else
+>>  			p++;
+>> -		}
+>>  	}
+>
+> If I were simplifying/improving things I would have done it in the
+> next way:
 
-[1]:
-[ 5156.281724] macvlan1: entered promiscuous mode
-[ 5156.285467] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
-[ 5156.287639] macvlan1: left promiscuous mode
-[ 5156.288339] mlx5_core 0000:08:00.0 enp8s0f0: left promiscuous mode
-[ 5156.290907] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
-[ 5156.317197] mlx5_core 0000:08:00.0 enp8s0f0: promiscuity touches roof, set promiscuity failed. promiscuity feature of device might be broken.
+Thanks for your thorough review and detailed comments.
 
-Fixes: efdbd2b30caa ("macvlan: Propagate promiscuity setting to lower devices.")
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
----
- drivers/net/macvlan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I find your suggestion more verbose for little readability
+gain. Readability is a matter of taste, I guess.
 
-diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-index 02bd201bc7e5..c8da94af4161 100644
---- a/drivers/net/macvlan.c
-+++ b/drivers/net/macvlan.c
-@@ -780,7 +780,7 @@ static void macvlan_change_rx_flags(struct net_device *dev, int change)
- 	if (dev->flags & IFF_UP) {
- 		if (change & IFF_ALLMULTI)
- 			dev_set_allmulti(lowerdev, dev->flags & IFF_ALLMULTI ? 1 : -1);
--		if (change & IFF_PROMISC)
-+		if (!macvlan_passthru(vlan->port) && change & IFF_PROMISC)
- 			dev_set_promiscuity(lowerdev,
- 					    dev->flags & IFF_PROMISC ? 1 : -1);
- 
+I don't feel strongly about this patch. I would be fine with any
+decision whether to take it in some form or not.
+
+baruch
+
+>
+> static void stmmac_display_ring(void *head, int size, int extend_desc,
+> 			       struct seq_file *seq, dma_addr_t dma_addr)
+> {
+>         struct dma_desc *p;
+> 	size_t desc_size;
+> 	int i;
+>
+> 	if (extend_desc)
+> 		desc_size = sizeof(struct dma_extended_desc);
+> 	else
+> 		desc_size = sizeof(struct dma_desc);
+>
+> 	for (i = 0; i < size; i++) {
+> 		if (extend_desc)
+> 			p = &((struct dma_extended_desc *)head)->basic;
+> 		else
+> 			p = head;
+>
+> 		seq_printf(seq, "%d [%pad]: 0x%08x 0x%08x 0x%08x 0x%08x\n",
+> 			   i, &dma_addr,
+> 			   le32_to_cpu(p->des0), le32_to_cpu(p->des1),
+> 			   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+>
+> 		dma_addr += desc_size;
+> 		head += desc_size;
+> 	}
+> }
+>
+> 1. Add 0x%08x format to have the aligned data printout.
+> 2. Use the desc-size to increment the virt and phys addresses for
+> unification.
+> 3. Replace sysfs_ prefix with stmmac_ since the method is no longer
+> used for sysfs node.
+>
+> On the other hand having the extended data printed would be also
+> useful at the very least for the Rx descriptors, which expose VLAN,
+> Timestamp and IPvX related info. Extended Tx descriptors have only the
+> timestamp in the extended part.
+>
+> -Serge(y)
+>
+>>  }
+
 -- 
-2.39.2
-
+                                                     ~. .~   Tk Open Systems
+=}------------------------------------------------ooO--U--Ooo------------{=
+   - baruch@tkos.co.il - tel: +972.52.368.4656, http://www.tkos.co.il -
 
