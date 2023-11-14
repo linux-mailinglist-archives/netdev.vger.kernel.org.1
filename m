@@ -1,93 +1,79 @@
-Return-Path: <netdev+bounces-47753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46D97EB3F5
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:42:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84C627EB408
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:46:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A1B8B20A9A
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 15:42:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2423F1F24B6D
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 15:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C5C41765;
-	Tue, 14 Nov 2023 15:41:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA3B3FE37;
+	Tue, 14 Nov 2023 15:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WikkVV6b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eF4WlJ2J"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB07741762
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 15:41:57 +0000 (UTC)
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D992FE;
-	Tue, 14 Nov 2023 07:41:55 -0800 (PST)
-Received: by mail-qt1-x82e.google.com with SMTP id d75a77b69052e-41e1921da84so36487781cf.1;
-        Tue, 14 Nov 2023 07:41:55 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6FC41767;
+	Tue, 14 Nov 2023 15:46:50 +0000 (UTC)
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909AEBB;
+	Tue, 14 Nov 2023 07:46:49 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id 6a1803df08f44-677a0ac3797so21975176d6.1;
+        Tue, 14 Nov 2023 07:46:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699976514; x=1700581314; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1699976808; x=1700581608; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OHuPbGTkYgcRjXR0hklnMMX7c/POaWOgK07UCodpGXc=;
-        b=WikkVV6b7JRsehG6wm7zCddjinfnnizaiCewlrH4sTaxXw4GrJ2+lHUS5NU6iGSY6J
-         /hLs9w04nF2Bk4D8n+I3VTSaBpFbSAo+rnMlqxg5fv0ShJCIBuVwcdapLsw76X5zpH2W
-         1UkI5syhCfEmpHHljBtzFRnLBzs/DxD/l2653i3piGCmGe+3kGYHOjzm1qX407jfcs6j
-         F/hlsMaVOA6L0JwQUPk9FS/OAApEtOaAxJxWqxSTL0eKXs6LVHaKHLsC39gf74fgn+5/
-         xeH00EaTiHNBfvOAYWIbjoq8FpDjQXFVy9ysTRw4NSkgWmzg9gb0+1cRyykAz2zGpqDI
-         MXOg==
+        bh=TW9wBDyWoRbGwVU/PloT5Dc64rb+TukhhYbMYHHOQuI=;
+        b=eF4WlJ2JfpVEhzQJ4sJT/cV+I5iyqOM/k+xNZH6ucXrT4xFZRGZoRVOQo4kXScdlIj
+         uKB925WkiwrkuZlNbeHfFYdF4+LV42taFpN25YbAxtvQIbOT7ut7e4Zxd2ZFnjSfvjfx
+         mTabClR2FnVxHrbW8N48qeQBXHeDbVfkmN7tEZFmIRmX3hPIJmICfj2h+Cuy143VrAjw
+         3+GSmbghyMkbJysiJVKYBWQPY/1ykg+WRjie37z7Zaze0mrsyZRZXBB/t7aTIYpXJQoP
+         dqnfWOi60dD2zXgHmRwATtJs9c8sGUN8j3QYcyculpXTddqMsBvp9BglOkbro0wPfKEv
+         gySg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699976514; x=1700581314;
+        d=1e100.net; s=20230601; t=1699976808; x=1700581608;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=OHuPbGTkYgcRjXR0hklnMMX7c/POaWOgK07UCodpGXc=;
-        b=U/sL8UxmQJ2yJDlFBymL+tblBYl/2EfEwJoVFHoxobLroryw7t0lzC2u+z0R4dD4yE
-         bluXohX9jC3oLrRnONZBXyz43BTcWJwxaGmQ3yRkQaLqilBR9+3NoV2LolXoldmj4QIT
-         EZ+7wvWAoPruVj3IU8xWK9j5CPR9jqAUCMWbPDC/0AUeKk86xvgKcTf+dry4O96d3qqe
-         n6cZxwO5Adqy+oYX8M7E+M5vnL1ieh4Tp1DOfuusshtKh2f5CzPtOnZAAGfLG/Apw5kv
-         ap7cNeedhEsKbHg7R0LMfO6s7SUcVYaM4qKpVHHA7rkh0faR+/IBKqX51bUkEJrbucnf
-         geLw==
-X-Gm-Message-State: AOJu0YxPvVN059uChIkq1a/liaVeWpkzJWs7DKwj6EmDH48LdgqPAxFo
-	qzPxyqmUu8coAOOyNeWKLTw=
-X-Google-Smtp-Source: AGHT+IFs64/UsS9fZvQ9xDBNoANRH+wyYXjr0la/mrjhV9dTBqJKDbpQ+ydNpWVgesakcWDxb3pZVg==
-X-Received: by 2002:a05:622a:1792:b0:41c:bbd0:48c2 with SMTP id s18-20020a05622a179200b0041cbbd048c2mr2618524qtk.59.1699976514116;
-        Tue, 14 Nov 2023 07:41:54 -0800 (PST)
+        bh=TW9wBDyWoRbGwVU/PloT5Dc64rb+TukhhYbMYHHOQuI=;
+        b=vXHAQzn+sn8OrG4FEDVUefRVGZ7D2xcl3RYADe2t1Xb7fZJk/MoT9wDPQ/3b4aP+BO
+         mTusskB794xfUpXiZYiltLTr1jy9lnOJ+CiRvX2Ouw/7+pEu8UqWzmbDJqobSi4/01b2
+         prmFff1uUwmalEFUcQ/y/JH3C5DQrHke5wEYl8+pcNfdJA9wDjwWpqRoCzHqiSMLUeXK
+         KvovajX3Q5zRxSqrKwi5QnQdH59W9al79+EbtY2YSWvrZNsvw0yOVkAMALI7ceBICoWL
+         Tmb1Utwr7+g070Xn1lfSmCPL3pgmeIbZK1YH9QNZ9wRV5fLa1uVIJJxBdQCcQTatjClE
+         oP7g==
+X-Gm-Message-State: AOJu0YwuFNadFFh5+iLHhYGUOy5hmmBlAgrpH2bXmjFM+T1LLVrw3+gL
+	EbRFjYBopwGlmCpNd9FhLjU=
+X-Google-Smtp-Source: AGHT+IFKbf8FR4PFFuO7HqTTBYa6xqAKgw/C37wRYaXRX+PCkQKWkH7a1FiLqgRkJ6vkJ7NOPCaWRg==
+X-Received: by 2002:a0c:fd86:0:b0:672:22d:270d with SMTP id p6-20020a0cfd86000000b00672022d270dmr2592636qvr.30.1699976808712;
+        Tue, 14 Nov 2023 07:46:48 -0800 (PST)
 Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
-        by smtp.gmail.com with ESMTPSA id o11-20020ac8428b000000b004166ab2e509sm2804405qtl.92.2023.11.14.07.41.53
+        by smtp.gmail.com with ESMTPSA id z13-20020a0cd78d000000b0066d04196c3dsm3017341qvi.49.2023.11.14.07.46.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 07:41:53 -0800 (PST)
-Date: Tue, 14 Nov 2023 10:41:53 -0500
+        Tue, 14 Nov 2023 07:46:48 -0800 (PST)
+Date: Tue, 14 Nov 2023 10:46:48 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, 
- Mina Almasry <almasrymina@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net, 
- pabeni@redhat.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>, 
- Kaiyuan Zhang <kaiyuanz@google.com>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+To: Lucas Karpinski <lkarpins@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, 
- =?UTF-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>, 
- Jason Gunthorpe <jgg@nvidia.com>, 
- Matthew Wilcox <willy@infradead.org>, 
- Linux-MM <linux-mm@kvack.org>
-Message-ID: <6553954141762_1245c529423@willemb.c.googlers.com.notmuch>
-In-Reply-To: <3ff54a20-7e5f-562a-ca2e-b078cc4b4120@huawei.com>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <fa5d2f4c-5ccc-e23e-1926-2d7625b66b91@huawei.com>
- <CAHS8izMj_89dMVaMr73r1-3Kewgc1YL3A1mjvixoax2War8kUg@mail.gmail.com>
- <3ff54a20-7e5f-562a-ca2e-b078cc4b4120@huawei.com>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <6553966832afc_125ffe294b5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <jvzrm33xjrhal3qro37tfpfw2w4jbh35byjlogcc776xt4fpzy@zkmfoqn5ipil>
+References: <jvzrm33xjrhal3qro37tfpfw2w4jbh35byjlogcc776xt4fpzy@zkmfoqn5ipil>
+Subject: Re: [PATCH net-next v3] selftests/net: synchronize udpgro tests' tx
+ and rx connection
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,79 +84,15 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Yunsheng Lin wrote:
-> On 2023/11/14 20:58, Mina Almasry wrote:
+Lucas Karpinski wrote:
+> The sockets used by udpgso_bench_tx aren't always ready when
+> udpgso_bench_tx transmits packets. This issue is more prevalent in -rt
+> kernels, but can occur in both. Replace the hacky sleep calls with a
+> function that checks whether the ports in the namespace are ready for
+> use.
 > 
-> >>
-> >> Yes, as above, skb_frags_not_readable() checking is still needed for
-> >> kmap() and page_address().
-> >>
-> >> get_page, put_page related calling is avoided in page_pool_frag_ref()
-> >> and napi_pp_put_page() for devmem page as the above checking is true
-> >> for devmem page:
-> >> (pp_iov->pp_magic & ~0x3UL) == PP_SIGNATURE
-> >>
-> > 
-> > So, devmem needs special handling with if statement for refcounting,
-> > even after using struct pages for devmem, which is not allowed (IIUC
-> > the dma-buf maintainer).
-> 
-> It reuses the already existing checking or optimization, that is the point
-> of 'mirror struct'.
-> 
-> > 
-> >>>
-> >>>> The main difference between this patchset and RFC v3:
-> >>>> 1. It reuses the 'struct page' to have more unified handling between
-> >>>>    normal page and devmem page for net stack.
-> >>>
-> >>> This is what was nacked in RFC v1.
-> >>>
-> >>>> 2. It relies on the page->pp_frag_count to do reference counting.
-> >>>>
-> >>>
-> >>> I don't see you change any of the page_ref_* calls in page_pool.c, for
-> >>> example this one:
-> >>>
-> >>> https://elixir.bootlin.com/linux/latest/source/net/core/page_pool.c#L601
-> >>>
-> >>> So the reference the page_pool is seeing is actually page->_refcount,
-> >>> not page->pp_frag_count? I'm confused here. Is this a bug in the
-> >>> patchset?
-> >>
-> >> page->_refcount is the same as page_pool_iov->_refcount for devmem, which
-> >> is ensured by the 'PAGE_POOL_MATCH(_refcount, _refcount);', and
-> >> page_pool_iov->_refcount is set to one in mp_dmabuf_devmem_alloc_pages()
-> >> by calling 'refcount_set(&ppiov->_refcount, 1)' and always remains as one.
-> >>
-> >> So the 'page_ref_count(page) == 1' checking is always true for devmem page.
-> > 
-> > Which, of course, is a bug in the patchset, and it only works because
-> > it's a POC for you. devmem pages (which shouldn't exist according to
-> > the dma-buf maintainer, IIUC) can't be recycled all the time. See
-> > SO_DEVMEM_DONTNEED patch in my RFC and refcounting needed for devmem.
-> 
-> I am not sure dma-buf maintainer's concern is still there with this patchset.
-> 
-> Whatever name you calling it for the struct, however you arrange each field
-> in the struct, some metadata is always needed for dmabuf to intergrate into
-> page pool.
-> 
-> If the above is true, why not utilize the 'struct page' to have more unified
-> handling?
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Lucas Karpinski <lkarpins@redhat.com>
 
-My understanding is that there is a general preference to simplify struct
-page, and at the least not move in the other direction by overloading the
-struct in new ways.
-
-If using struct page for something that is not memory, there is ZONE_DEVICE.
-But using that correctly is non-trivial:
-
-https://lore.kernel.org/all/ZKyZBbKEpmkFkpWV@ziepe.ca/ 
-
-Since all we need is a handle that does not leave the network stack,
-a network specific struct like page_pool_iov entirely avoids this issue.
-RFC v3 seems like a good simplification over RFC v1 in that regard to me.
-I was also pleasantly surprised how minimal the change to the users of
-skb_frag_t actually proved to be.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
