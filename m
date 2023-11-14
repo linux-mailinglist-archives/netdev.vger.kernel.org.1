@@ -1,90 +1,175 @@
-Return-Path: <netdev+bounces-47596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 291E47EA96D
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 05:16:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437307EA97C
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 05:27:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17051F2369F
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 04:15:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9845EB209B8
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 04:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67B7B64F;
-	Tue, 14 Nov 2023 04:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 926DFB650;
+	Tue, 14 Nov 2023 04:27:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VY0EXT9D"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPqFDXS/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BF2947E
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:15:54 +0000 (UTC)
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF84ED0;
-	Mon, 13 Nov 2023 20:15:51 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-28099d11c49so1092883a91.1;
-        Mon, 13 Nov 2023 20:15:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1699935351; x=1700540151; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RE6VvMtBCo/S66AHg+l/y7o7DeXG142T7fh8adrCVRU=;
-        b=VY0EXT9DhjkwauQy4GuJoboDuFUFFod56LKCa6cRqA2z4wtySGsE8HrBrbkBw2XRyd
-         VAN8Lou6sLBEmYdU/sZgi2+JK2HXeATDyA0NtIoKZU+YcuCJx6NFKFxbImZR/g1ee4Hb
-         wol278qI7bylw6Dz96+LyzPJoiFSA+IjIzMpjO8KZZnmmgj0zXFXHa6KMsueLxIbe0So
-         NMIAF1fq4k0c+vnVjYM6GGiIBhZjQZBKICl9zVVsWYlTBdHaA5FHBCa30xsXOLJFbKCe
-         xkqKZeBVA/LIqsNOaNA4++aKSaaI1z+qXjrZPdSP10XdzHUX2nHICwSSZBNBCjM34np9
-         ZxUg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB321BA22
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 04:27:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0189D0
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 20:27:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1699936055;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eqzadG70JH4Sh39cERPLnN+o1n04W3gfURARvOks5hs=;
+	b=DPqFDXS/Cjw/HmTuEOO5eIN7rcj97SuklnDGmzof4xYyDU1aDDvQJ693q+k/EtmV7koikX
+	ZwwKspRpLp5dSZbCCNDpOV7xrTCCx0OIwNDA1I0WZDfpJ7ISj6m4AUSvwaNg81plz/rE5R
+	2ZTKZ34S93J6WgSrZvicTp6S0xmjNxg=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-681-B7h0cw9-ND6y20AU97BPnQ-1; Mon, 13 Nov 2023 23:27:33 -0500
+X-MC-Unique: B7h0cw9-ND6y20AU97BPnQ-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-507d208be33so5090504e87.3
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 20:27:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699935351; x=1700540151;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RE6VvMtBCo/S66AHg+l/y7o7DeXG142T7fh8adrCVRU=;
-        b=d5Uy486kzzVp65MrWUhP2YhPkQ4mI7VklYPiZY1W35M+J63lnyIA61tZRANeeYP04X
-         JIMSQ/9MLkJLYiFUq55JlxZdMoNhGqCyIZGSyZctCmov244w0QVJy+DuGg5d/dusI/Ez
-         bCAiwCiY0VoyVPwTYOQqo5UILg4fxwwPoZHD9IqnA/z1E7jSRalS23zz5uobqzHtXyKN
-         8UiPf/CnEhuFqbxu7nGIao5mRSogb2Xsxuw+ta/s6Txna7l97+CIsDuS8YOqZrwAHI3I
-         Il4OzOXcLbljk4yjeUBr7Kl6VFIMiMhyVz0JSRG0PAOcBvp0xp9mL7Y8nlElu66BNXC4
-         vDWw==
-X-Gm-Message-State: AOJu0Yy2v39PNG2PFL1heffjiH7kvGqZZvA09czGd1GHO8OAkhGaRTL4
-	3KiywKoFHGG+aHPmcma0rli7DJkLmaM=
-X-Google-Smtp-Source: AGHT+IGD0DYTC/XhPUxLNhCWa3XebHSt7NuxtQDxk3WZdWqhVNDlNiQL9U5WCkhJfeGD+iGDRsjI/A==
-X-Received: by 2002:a17:90b:e13:b0:27f:f8d6:9622 with SMTP id ge19-20020a17090b0e1300b0027ff8d69622mr1021370pjb.0.1699935351275;
-        Mon, 13 Nov 2023 20:15:51 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2601:640:8000:54:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id c3-20020a17090ad90300b002805740d668sm6324359pjv.4.2023.11.13.20.15.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Nov 2023 20:15:50 -0800 (PST)
-Date: Mon, 13 Nov 2023 20:15:48 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Min Li <lnimi@hotmail.com>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next RFC 1/1] ptp: use extts interface for the
- measured external offset
-Message-ID: <ZVL0dIpwCE94ylfH@hoboy.vegasvil.org>
-References: <MW5PR03MB6932F6DB45F5ED179DF0BA4DA0B3A@MW5PR03MB6932.namprd03.prod.outlook.com>
- <490abfce-47b6-430c-8fc1-99536284c1a6@intel.com>
+        d=1e100.net; s=20230601; t=1699936052; x=1700540852;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eqzadG70JH4Sh39cERPLnN+o1n04W3gfURARvOks5hs=;
+        b=ezDAi9yyhAiL3+7puDzsodsgVTq6fSeZyNHp+ZEPcN2mtwcAmVPE2dd/eCmYdAd8W9
+         CzKVb7qQJitndrexk4lKcHqGChL92VsbIpTiZHKkPAwU9Ph3Fjl2uZ9EguiQNPx8Oidq
+         S16mq6OGTaaj+MBk5GCcA74Ffid790aMBNmeBniYAtKv23H62NOXvh69hvokbTesIVKM
+         kexqP9aJFDWOeWPIT1FVpq64XCE3YIuRekgJ29Df6+I0OkrZbyr9vw13/wWO2S0mf7np
+         wvVAQoObDJjtvdDOdER4k30lDV6FGZObWbjFH0R4EGuzajJvZ6mgEK7J2PgHFOZpwO49
+         b1qA==
+X-Gm-Message-State: AOJu0Yw/HjYuhlgvNCnOvr2f4LddWqSk41+yk0FJrf51elbrJu1k4mLL
+	XtjDx5Wd9RGC9NBs2FFsbj0FCv+dX/PFL/wxn4t8q6KGWPpjZ1ySC7/6R7qXLH0/toKF9cnvhBs
+	t/27NrbKYtPJEBcePNsPnsAL3GInK9ZbH
+X-Received: by 2002:a05:6512:533:b0:503:38f2:6e1 with SMTP id o19-20020a056512053300b0050338f206e1mr5369345lfc.5.1699936052166;
+        Mon, 13 Nov 2023 20:27:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFTQc75GuYH0OpfWK6f+j/4uCF3vj2Wn36+SpCeW73CuziG47fk3TyDtJKBHUcsdK5q5pFV/sxdIftw0vuJE/8=
+X-Received: by 2002:a05:6512:533:b0:503:38f2:6e1 with SMTP id
+ o19-20020a056512053300b0050338f206e1mr5369330lfc.5.1699936051768; Mon, 13 Nov
+ 2023 20:27:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <490abfce-47b6-430c-8fc1-99536284c1a6@intel.com>
+References: <20231107031227.100015-1-xuanzhuo@linux.alibaba.com>
+ <20231107031227.100015-9-xuanzhuo@linux.alibaba.com> <CACGkMEtLee8ELzqFnV_zOu3p5tU6hivouKM=WjtNAq+2wQzAFQ@mail.gmail.com>
+ <1699527528.5637772-2-xuanzhuo@linux.alibaba.com> <CACGkMEu4toAuAuJdrXF0AJqsHc-ovPg3vi8=My-+BxaMi+TBSw@mail.gmail.com>
+ <1699932516.9040368-2-xuanzhuo@linux.alibaba.com> <CACGkMEv7-U4HNe8UOENx9A+5fj-GJ7wvO=aw8v+axoiG7yhqdA@mail.gmail.com>
+ <1699934262.516097-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1699934262.516097-4-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 14 Nov 2023 12:27:20 +0800
+Message-ID: <CACGkMEuvdA1xWtLLsV49XCGwD8S+AXDkHeq2K3-AsqgWixZVXg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 08/21] virtio_net: sq support premapped mode
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux-foundation.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 13, 2023 at 03:00:15PM -0800, Jacob Keller wrote:
-> You mention GNSS, but is there an example or a link to a driver change
-> you could provide to show its use?
+On Tue, Nov 14, 2023 at 11:59=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+>
+> On Tue, 14 Nov 2023 11:55:52 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Tue, Nov 14, 2023 at 11:42=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alib=
+aba.com> wrote:
+> > >
+> > > On Tue, 14 Nov 2023 11:26:42 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Thu, Nov 9, 2023 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.al=
+ibaba.com> wrote:
+> > > > >
+> > > > > On Thu, 9 Nov 2023 14:37:38 +0800, Jason Wang <jasowang@redhat.co=
+m> wrote:
+> > > > > > On Tue, Nov 7, 2023 at 11:12=E2=80=AFAM Xuan Zhuo <xuanzhuo@lin=
+ux.alibaba.com> wrote:
+> > > > > > >
+> > > > > > > If the xsk is enabling, the xsk tx will share the send queue.
+> > > > > > > But the xsk requires that the send queue use the premapped mo=
+de.
+> > > > > > > So the send queue must support premapped mode.
+> > > > > > >
+> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > ---
+> > > > > > >  drivers/net/virtio/main.c       | 163 ++++++++++++++++++++++=
+++++++----
+> > > > > > >  drivers/net/virtio/virtio_net.h |  16 ++++
+> > > > > > >  2 files changed, 163 insertions(+), 16 deletions(-)
+> > > > > > >
+> >
+> > [...]
+> >
+> > > > > >
+> > > > > > I think we need to seek a way to reuse what has been stored by =
+virtio
+> > > > > > core. It should be much more efficient.
+> > > > >
+> > > > >
+> > > > > Yes.
+> > > > >
+> > > > > But that is for net-next branch.
+> > > > >
+> > > > > Can we do that as a fix after that is merged to 6.8?
+> > > >
+> > > > We still have time. I would like to do it from the start.
+> > >
+> > >
+> > > I want to finish the job including new AF_XDP ZC feature.
+> > > Because that this must wait the merge window.
+> > > Base on that, the optimizing work can be done everytime.
+> > >
+> > > If we work from the new virtio prepare, that can be merged to 6.8.
+> > > And the AF_XDP zc must wait 6.9. right?
+> >
+> > It can be part of this series. Or anything I missed?
+> >
+> > My understanding is that, since the information is handy, it just
+> > requires new helpers. So I don't expect it needs a large series.
+>
+> Now, this is pushing to net-next.
+>
+> If we add an new virtio-core helper. That must be pushed to virtio branch=
+.
+> And this patch set must wait that.
 
-Yes, the new option must wait for a driver that implements it.  Can
-you make a patch series where the driver change appears in the second
-patch?
+I don't think so if it's just a matter of new helpers. The
+acknowledgement from the virtio maintainer should be sufficient.
 
-Thanks,
-Richard
+Let's just try and see?
+
+THanks
+
+>
+> Thanks.
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks
+> > >
+> >
+>
+
 
