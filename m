@@ -1,97 +1,89 @@
-Return-Path: <netdev+bounces-47680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4213D7EAF63
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:42:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121717EAF6A
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 12:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D763C1F21680
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:42:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAEBA281168
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 11:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020663D3A4;
-	Tue, 14 Nov 2023 11:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991B72E626;
+	Tue, 14 Nov 2023 11:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83F25224E1;
-	Tue, 14 Nov 2023 11:42:24 +0000 (UTC)
-Received: from wangsu.com (unknown [180.101.34.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7965FAB;
-	Tue, 14 Nov 2023 03:42:22 -0800 (PST)
-Received: from 102.wangsu.com (unknown [59.61.78.234])
-	by app2 (Coremail) with SMTP id SyJltADX3QkZXVNlXr9cAA--.24900S5;
-	Tue, 14 Nov 2023 19:42:19 +0800 (CST)
-From: Pengcheng Yang <yangpc@wangsu.com>
-To: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Pengcheng Yang <yangpc@wangsu.com>
-Subject: [PATCH bpf-next 3/3] tcp_diag: Add the data length in skmsg to rx_queue
-Date: Tue, 14 Nov 2023 19:42:00 +0800
-Message-Id: <1699962120-3390-4-git-send-email-yangpc@wangsu.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1699962120-3390-1-git-send-email-yangpc@wangsu.com>
-References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com>
-X-CM-TRANSID:SyJltADX3QkZXVNlXr9cAA--.24900S5
-X-Coremail-Antispam: 1UD129KBjvdXoWrZF4fAr13AF1fCr47Jr17Awb_yoW3Kwb_uw
-	n7ZrW8W3srXr1xta1xZFZxJFyYk34IyFn5W3WS9a4qy34DJF9xuw4rXF98Ars7CanxCrZ5
-	ur1DJryUG34rujkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxAFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wA2ocxC64kI
-	II0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7
-	xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2
-	z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4
-	xG64xvF2IEw4CE5I8CrVC2j2WlYx0EF7xvrVAajcxG14v26r1j6r4UMcIj6x8ErcxFaVAv
-	8VW8GwAv7VCY1x0262k0Y48FwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48Icx
-	kI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY02Avz4vE14v_Gw4l42xK82IYc2Ij
-	64vIr41l42xK82IY6x8ErcxFaVAv8VW8GwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_
-	Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
-	6r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0J
-	jesjbUUUUU=
-X-CM-SenderInfo: p1dqw1nf6zt0xjvxhudrp/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD023FB00
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 11:43:40 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF8BA7;
+	Tue, 14 Nov 2023 03:43:38 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SV4Dn11HMzvPyP;
+	Tue, 14 Nov 2023 19:43:21 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.31; Tue, 14 Nov 2023 19:43:36 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>
+Subject: [PATCH net-next v3] page_pool: Add myself as page pool reviewer in MAINTAINERS
+Date: Tue, 14 Nov 2023 19:43:21 +0800
+Message-ID: <20231114114322.27452-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-In order to help us track the data length in ingress_msg
-when using sk_msg redirect.
+I have added frag support for page pool, made some improvement
+for it recently, and reviewed some related patches too.
 
-Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
+So add myself as reviewer so that future patch will be cc'ed
+to my email.
+
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+CC: Jesper Dangaard Brouer <hawk@kernel.org>
+CC: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: David S. Miller <davem@davemloft.net>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Netdev <netdev@vger.kernel.org>
 ---
- net/ipv4/tcp_diag.c | 2 ++
- 1 file changed, 2 insertions(+)
+V3: rebased on latest net-next and repost targetting net-next
+V2: add missing ":" as pointed out by Jesper
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/ipv4/tcp_diag.c b/net/ipv4/tcp_diag.c
-index 01b50fa79189..b22382820a4b 100644
---- a/net/ipv4/tcp_diag.c
-+++ b/net/ipv4/tcp_diag.c
-@@ -11,6 +11,7 @@
- #include <linux/inet_diag.h>
- 
- #include <linux/tcp.h>
-+#include <linux/skmsg.h>
- 
- #include <net/netlink.h>
- #include <net/tcp.h>
-@@ -28,6 +29,7 @@ static void tcp_diag_get_info(struct sock *sk, struct inet_diag_msg *r,
- 
- 		r->idiag_rqueue = max_t(int, READ_ONCE(tp->rcv_nxt) -
- 					     READ_ONCE(tp->copied_seq), 0);
-+		r->idiag_rqueue += sk_msg_queue_len(sk);
- 		r->idiag_wqueue = READ_ONCE(tp->write_seq) - tp->snd_una;
- 	}
- 	if (info)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 350d00657f6b..605fe1f9e5ec 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -16342,6 +16342,7 @@ F:	mm/truncate.c
+ PAGE POOL
+ M:	Jesper Dangaard Brouer <hawk@kernel.org>
+ M:	Ilias Apalodimas <ilias.apalodimas@linaro.org>
++R:	Yunsheng Lin <linyunsheng@huawei.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+ F:	Documentation/networking/page_pool.rst
 -- 
-2.38.1
+2.33.0
 
 
