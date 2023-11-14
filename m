@@ -1,147 +1,160 @@
-Return-Path: <netdev+bounces-47569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E7C07EA786
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 01:31:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A3B7EA79B
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 01:41:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6FCA280FF9
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:31:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F5228106F
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 00:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C771C05;
-	Tue, 14 Nov 2023 00:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488FB816;
+	Tue, 14 Nov 2023 00:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="eRrNIWgV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IvbEBsXg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB6817EF
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 00:31:46 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE5DD67
-	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:31:44 -0800 (PST)
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id A4EC240C55
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 00:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1699921902;
-	bh=cwc6NfaIKFI0vWpuvPcxk4kM/LAeLbAV4iG8Wtk28vc=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=eRrNIWgV6oi8d8hDNbwOU4K+QpwiyEajPTwzMf67wEJ9CZO6+hkvURjRsFNlfngFz
-	 fIL5wlCzB9pFtTINv23edFVY4PrLbK3wtYnrEw0nuRaTkY1dVr2f0e1C7Zn1/cV1e/
-	 MPdtqhov6Cv3AWR60cojvD+Nt7QAoiUzSNNPzG/xXzxTuy/T6FtcFRXWChHtO2M6kN
-	 LxYfDW4p/e9/ETcY31xhnR9KrFqshHSeK35DtdlGEDzevvCtP3XYEVNlyR6gXiirvI
-	 pFh8FNTGS+5qA6U0RU31mrwnLvifrzWhW/fp3ppZ8JtXrOhDL80EF7nxArSLCaCF+E
-	 OrwkZaCbXwncQ==
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5be39ccc2e9so4279720a12.3
-        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:31:42 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4C35C9B
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 00:41:50 +0000 (UTC)
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB873D53
+	for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:41:49 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d9443c01a7336-1cc41aed6a5so56463855ad.0
+        for <netdev@vger.kernel.org>; Mon, 13 Nov 2023 16:41:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1699922509; x=1700527309; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=zyBgD9ylUBJw8cZaeW5giSbG/erUfVCuOr5v29FOJ38=;
+        b=IvbEBsXgRtSNrtyXcFIWg12KiQrlp28gX0/QQZMOgbkY6EsBUO48N7hP9DeL9cV95D
+         D8CWSBmZ99cWyJnWghXyBnPhSt5OqW0CRXNBJI/UYa3w6tCqAGW1/jn2pd0k/yqCpIt/
+         ihFM22OFXijZUPffk7RPeaeiOhR6ZTAiJIWJhz0Ov5VkN3qdch6m3cJkSPPegpKFqUZW
+         nJ5RhkdhDeO2LMRCvDVBleNuAq2GOXrnY7H0r+5G4CU3eh2EYrIzBKgsU4xz4/CRJ6jx
+         EvfydTZtVvodfIbABCSzBgaa6q5wPwuEiOfIWVwF/zb7HYwSbiLRvc0N+vJIRNqP+QTQ
+         mk3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1699921901; x=1700526701;
-        h=message-id:date:content-id:mime-version:comments:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cwc6NfaIKFI0vWpuvPcxk4kM/LAeLbAV4iG8Wtk28vc=;
-        b=I32BX3oAmnSYa8jC0nnoUvvobPzEWxIozX7iYBLfvPwnXCDyGtsSRYVtlHonebGrvg
-         WVfgkyloBTzk1EkVNRNpXroWqDN3WpnmddtQOSVX/OU75grBnq/QLwNKt1S7HyhJSHf7
-         UQTlIga80ZHD/OBTJsNxjerKOYuFzMSbVDQS9iscb1fOTZyB3XfGKST++8nzyF3hNkOU
-         aiUNGUZyOo9p7RV+Mo+QfNpz7cv5Wk1jrx7aeWfAeyJAF56G7/ZxRS5CwaTrCyU5Zf6A
-         FQqy34vEzO8hijSOpJXvyFBC6iYS2GAL+Il3cFK9InuYCjgg38TY6MiCkV+icJzPm6GS
-         BMrw==
-X-Gm-Message-State: AOJu0Yw+DpvkgXDSZFspA5eG4/Fg2KT4VJOpT6WEtkNFjaafsbMKmCpy
-	DRKh23jg7JUSj8oAFDsGzPO1npfyL/jQ/iOMGdglfmDLC5e+QkNFtPFFrQpM8byctbsr1TVjGiM
-	y7l5yn74OQxh8fiov9S9zkP/QEf+/jsNcvA==
-X-Received: by 2002:a17:903:11c9:b0:1cc:29ed:96ae with SMTP id q9-20020a17090311c900b001cc29ed96aemr945022plh.41.1699921901041;
-        Mon, 13 Nov 2023 16:31:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF+6yvcYzcAXYZ+MmOoDrL6rQF1qKFVvwFJkSIu5P+hcu2MOry98qgolVeqprGlQviRbx7ZHg==
-X-Received: by 2002:a17:903:11c9:b0:1cc:29ed:96ae with SMTP id q9-20020a17090311c900b001cc29ed96aemr944993plh.41.1699921900698;
-        Mon, 13 Nov 2023 16:31:40 -0800 (PST)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id az2-20020a170902a58200b001c62c9d7289sm4576227plb.104.2023.11.13.16.31.40
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 13 Nov 2023 16:31:40 -0800 (PST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id DBB945FFF6; Mon, 13 Nov 2023 16:31:39 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id D45DC9F88E;
-	Mon, 13 Nov 2023 16:31:39 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-    kuba@kernel.org, pabeni@redhat.com, andy@greyhouse.net,
-    weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next] bonding: use WARN_ON instead of BUG in alb_upper_dev_walk
-In-reply-to: <20231113092754.3285306-1-shaozhengchao@huawei.com>
-References: <20231113092754.3285306-1-shaozhengchao@huawei.com>
-Comments: In-reply-to Zhengchao Shao <shaozhengchao@huawei.com>
-   message dated "Mon, 13 Nov 2023 17:27:54 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+        d=1e100.net; s=20230601; t=1699922509; x=1700527309;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zyBgD9ylUBJw8cZaeW5giSbG/erUfVCuOr5v29FOJ38=;
+        b=XY99z5VBRU2YnBmgsnMztInDFslNXO0E7K61wZ1q7FJJqWdxJxvkOuXMmaOd5VdNGg
+         +gdFvM61PthfzRI11VXMcbtDgLgOYwx/CVgHa3PgBnnKMAzlR3RGr0rkq1Cwxm/rh2sX
+         QIaV8ITXF4w9PK5suhKAyPOKyPUl7j4DVMlDxyQIonGWQ5yXWxuc9FpUWenKMLufNGOx
+         4VnDGdeWY9/oHrUCy7la/fXMRwqnlYCKXomqxIbMxOHFa19uCoq5K3im4wMrLlPa5DH9
+         ijxLgl8t/e730kkrLmUbY4YXlOBl8UaO5aszsctd97ntSmZ/moFWIRTIQ9wqQRb9TAyn
+         +1BQ==
+X-Gm-Message-State: AOJu0YwZlh3MTpxlyx8Y0CFjQ52q1T+1xCDebgNbIod/J1EAZZ5Hs3YA
+	2GavR+jLkfl0hBMN4Act/MaEa1lCtHx8Qj92DdlBxDswPFOzDIpYoP3y6nt6t8iLvXfiDEjhdQ6
+	/NGfREYZkr9LzXXsJZZRuJIVQAsvmXgUrjvpR0GVWoiSCQmnl0egufW9G0ijPix1xhz5B/Q==
+X-Google-Smtp-Source: AGHT+IEmE3fBSkl1WakSf+0JrgrW/hSDw02MQQ1y2FhtFZzr3H7LTgp75zfge+8giPnaBqwpxMxUFMFPRDd117k=
+X-Received: from ziweixiao.sea.corp.google.com ([2620:15c:11c:202:79cb:40a5:1ac2:549b])
+ (user=ziweixiao job=sendgmr) by 2002:a17:903:181:b0:1cc:4136:2b4b with SMTP
+ id z1-20020a170903018100b001cc41362b4bmr247993plg.4.1699922509001; Mon, 13
+ Nov 2023 16:41:49 -0800 (PST)
+Date: Mon, 13 Nov 2023 16:41:44 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <9927.1699921899.1@famine>
-Date: Mon, 13 Nov 2023 16:31:39 -0800
-Message-ID: <9928.1699921899@famine>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
+Message-ID: <20231114004144.2022268-1-ziweixiao@google.com>
+Subject: [PATCH net v2] gve: Fixes for napi_poll when budget is 0
+From: Ziwei Xiao <ziweixiao@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, stable@kernel.org, willemb@google.com, csully@google.com, 
+	shailend@google.com, jeroendb@google.com, pkaligineedi@google.com, 
+	jonolson@google.com, sagis@google.com, lrizzo@google.com, bpf@vger.kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, Ziwei Xiao <ziweixiao@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Zhengchao Shao <shaozhengchao@huawei.com> wrote:
+Netpoll will explicilty pass the polling call with a budget of 0 to
+indicate it's clearing the Tx path only. For the gve_rx_poll and
+gve_xdp_poll, they were mistakenly taking the 0 budget as the indication
+to do all the work. Add check to avoid the rx path and xdp path being
+called when budget is 0. And also avoid napi_complete_done being called
+when budget is 0 for netpoll.
 
->If failed to allocate "tags" or could not find the final upper device from
->start_dev's upper list in bond_verify_device_path(), only the loopback
->detection of the current upper device should be affected, and the system is
->no need to be panic.
->
->Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->---
-> drivers/net/bonding/bond_alb.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
->index dc2c7b979656..5519cc95b966 100644
->--- a/drivers/net/bonding/bond_alb.c
->+++ b/drivers/net/bonding/bond_alb.c
->@@ -984,8 +984,10 @@ static int alb_upper_dev_walk(struct net_device *upper,
-> 	 */
-> 	if (netif_is_macvlan(upper) && !strict_match) {
-> 		tags = bond_verify_device_path(bond->dev, upper, 0);
->-		if (IS_ERR_OR_NULL(tags))
->-			BUG();
->+		if (IS_ERR_OR_NULL(tags)) {
->+			WARN_ON(1);
->+			return 0;
-
-	This seems reasonable enough, although I'd suggest the using
-WARN_ON_ONCE instead of WARN_ON.  Alternatively, this could stay as
-WARN_ON if the above also returns non-zero in order to terminate the
-netdev_walk_all_upper_dev_rcu walk.  The intent here is to avoid
-spamming the log if there's a lot of macvlans above the bond.  If the
-allocation in bond_verify_device_path failed, trying again immediately
-seems likely to fail as well.
-
-	We could also arrange for whatever called alb_upper_dev_walk to
-reschedule at a slightly later time, but I don't think that's worth the
-trouble.  The bond will by default resend learning packets once per
-second, so issues related to a lost learning packet should resolve
-relatively quickly.
-
-	-J
-
->+		}
-> 		alb_send_lp_vid(slave, upper->dev_addr,
-> 				tags[0].vlan_proto, tags[0].vlan_id);
-> 		kfree(tags);
->-- 
->2.34.1
-
+Fixes: f5cedc84a30d ("gve: Add transmit and receive support")
+Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
 ---
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+Changes since v1:
+ - Adjust the logic of checking budget when it's 0
+ - Update the commit message based on the new change
+ - CCed the maintainers queried from get_maintainer.pl, but it outputs 19 lines which seems excessive
+
+ drivers/net/ethernet/google/gve/gve_main.c | 8 +++++++-
+ drivers/net/ethernet/google/gve/gve_rx.c   | 4 ----
+ drivers/net/ethernet/google/gve/gve_tx.c   | 4 ----
+ 3 files changed, 7 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index 276f996f95dc..2d42e733837b 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -254,10 +254,13 @@ static int gve_napi_poll(struct napi_struct *napi, int budget)
+ 	if (block->tx) {
+ 		if (block->tx->q_num < priv->tx_cfg.num_queues)
+ 			reschedule |= gve_tx_poll(block, budget);
+-		else
++		else if (budget)
+ 			reschedule |= gve_xdp_poll(block, budget);
+ 	}
+ 
++	if (!budget)
++		return 0;
++
+ 	if (block->rx) {
+ 		work_done = gve_rx_poll(block, budget);
+ 		reschedule |= work_done == budget;
+@@ -298,6 +301,9 @@ static int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
+ 	if (block->tx)
+ 		reschedule |= gve_tx_poll_dqo(block, /*do_clean=*/true);
+ 
++	if (!budget)
++		return 0;
++
+ 	if (block->rx) {
+ 		work_done = gve_rx_poll_dqo(block, budget);
+ 		reschedule |= work_done == budget;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index e84a066aa1a4..73655347902d 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -1007,10 +1007,6 @@ int gve_rx_poll(struct gve_notify_block *block, int budget)
+ 
+ 	feat = block->napi.dev->features;
+ 
+-	/* If budget is 0, do all the work */
+-	if (budget == 0)
+-		budget = INT_MAX;
+-
+ 	if (budget > 0)
+ 		work_done = gve_clean_rx_done(rx, budget, feat);
+ 
+diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
+index 6957a865cff3..9f6ffc4a54f0 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx.c
++++ b/drivers/net/ethernet/google/gve/gve_tx.c
+@@ -925,10 +925,6 @@ bool gve_xdp_poll(struct gve_notify_block *block, int budget)
+ 	bool repoll;
+ 	u32 to_do;
+ 
+-	/* If budget is 0, do all the work */
+-	if (budget == 0)
+-		budget = INT_MAX;
+-
+ 	/* Find out how much work there is to be done */
+ 	nic_done = gve_tx_load_event_counter(priv, tx);
+ 	to_do = min_t(u32, (nic_done - tx->done), budget);
+-- 
+2.43.0.rc0.421.g78406f8d94-goog
+
 
