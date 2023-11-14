@@ -1,151 +1,134 @@
-Return-Path: <netdev+bounces-47865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5B37EBA4C
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 00:48:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB9F97EBA59
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 00:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 798551C2083B
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 23:48:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD6E12813A8
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 23:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0672FC55;
-	Tue, 14 Nov 2023 23:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02CD2FC5F;
+	Tue, 14 Nov 2023 23:59:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="DkrFA9AA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItE+1blx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D464C2FC2D
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:48:47 +0000 (UTC)
-Received: from JPN01-OS0-obe.outbound.protection.outlook.com (mail-os0jpn01on2116.outbound.protection.outlook.com [40.107.113.116])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30DACD6;
-	Tue, 14 Nov 2023 15:48:46 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hz7r/cxK6akiYPd+NynHRzfCYszNnWxJllMQLX3QLe8XjQmgLQg6ucipIz5ntWpYlzJHkzkSdY19dTq5CZgiCS4CfzTpANvoxX9p7TzwfHGm8Jas2U4GIwa4BNSNPoCRiL5+odxP0EEd3B5u1PSgKmobWdOzzwCOKolVoJv8xWR3JubOZSjbU+xvhMCiOUEel+e1mM3ojPQOkjNTNgb00T3zv+0roOHlF9HGFkGRd5HWYIS/yJd8nygiA+MufIoU2fckdS39aABbcNCjjOyeLwkk3xjc++8wWRPcqiCzEKMZhLtVYTgI/2GHi930VLQMqJ+bnqdgqYRyx4xXTqfw2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vTRdrRqVlzNtSLvlZz5+LPl2I1Bv/kJW6KN+IjMJ2Rk=;
- b=jQqXcne7OmB8W7JfaHjfn3D73exBMyK2L8GK1+jwAEly/sO7hysv7NVnETE/Fb1XPAKlhWd//QMFvzsI+s2gEWl6DYcV3QkK0mmgHZQiJAhiGDXLUj+UkkPO2m7qTgc39pHKB/Flo1PxcCxUsHkxjIkdGGaLv7+Cj621ZjYReL57zICDo4L5h7c2Jcy5EC+JjKbnW1iBY7hQv2qZrwXkb3Nlr2uxh1+w8W3h/eHpmm/me6AB022GE/w/V1/yR4pXJOd7RPYbyyHLLvHasuxOIKbz+2HDRtimtuwApp7VJLYxC40GboD5GNa29TIPhksXKeXEXgf9Hra6xX1nzdBNmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vTRdrRqVlzNtSLvlZz5+LPl2I1Bv/kJW6KN+IjMJ2Rk=;
- b=DkrFA9AAFD5fE6DXXACdckKS6LQOVAmquXBuP1cz8YX80z3kjIig/zhYjwpMmzTSrdWG+4oxjJu0uUEmI+T7r2KiWGaraxu2+VTgYRJRa+DcTMBJ78aaYBQJaFKltwSz+FCvCNnkxaDGkBXYEZsi3MnaJ/Xudp1QvwbCZ5SNhN4=
-Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
- (2603:1096:404:8028::13) by TY3PR01MB11690.jpnprd01.prod.outlook.com
- (2603:1096:400:3dd::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.18; Tue, 14 Nov
- 2023 23:48:43 +0000
-Received: from TYBPR01MB5341.jpnprd01.prod.outlook.com
- ([fe80::50f5:eb2b:710a:b7c7]) by TYBPR01MB5341.jpnprd01.prod.outlook.com
- ([fe80::50f5:eb2b:710a:b7c7%7]) with mapi id 15.20.7002.018; Tue, 14 Nov 2023
- 23:48:43 +0000
-From: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "s.shtylyov@omp.ru" <s.shtylyov@omp.ru>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>
-Subject: RE: [PATCH net v2] ravb: Fix races between ravb_tx_timeout_work() and
- net related ops
-Thread-Topic: [PATCH net v2] ravb: Fix races between ravb_tx_timeout_work()
- and net related ops
-Thread-Index: AQHaAoALb6SIWPIxUEiZAXqbN+NjubB5qghAgADfkQCAABtP8A==
-Date: Tue, 14 Nov 2023 23:48:43 +0000
-Message-ID:
- <TYBPR01MB5341769D1052C7379510A6C1D8B2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-References: <20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com>
-	<TYBPR01MB534172F049F8072E3F77AC25D8B2A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
- <20231114170956.7bddff5b@kernel.org>
-In-Reply-To: <20231114170956.7bddff5b@kernel.org>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TYBPR01MB5341:EE_|TY3PR01MB11690:EE_
-x-ms-office365-filtering-correlation-id: 9efd2e2b-85b3-49d3-6fb1-08dbe56c3c3e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- k9DN5QfjMFwVDpaLM7lfQpXxhKLusnCRQ1ktu3d2ns3RQHzqo3TEolqC8cC8ZRAuQjw9zmy/VZ841XxulCk6q0antG4m/R4fylOdq1Yn198kum52ExVyxX+XDLWc4woXdk+lVGcTE1vOC2nbkAAe4MLLxF5SsuDYv7sPQkjx14hCm+4kqQSZv2NNpanYdcFARgpQy5nJn/Vle/5jVQBD6+9Qk3iSPpADgf8hVO0z0J1LA/2zvMNwWH1a9U2QhvZrNIFsn0coHFK+hR+BzCa9iwgbI9q2MlB3iyr+Agq4RoNsJ5/QDifSNTyyVLlWUoXpPoCevIBVOg6JYLaJJAi1TdWRjBIPiBpt230wEjbwB+RC1hKCva0gU3OawG0JTfSMdSYZBW7XAYm14vIexWj3nqwN6wyshWd4cJOj7QR/Wxu38M2qocT7hXB0lMZJKz8hqXL72qYWf4liJjfuU7ovPDqvmwWTsU3737YwwHrVTnfge2Psd5a757ihgHSu8YEobYciZ1MpYmI2NygKz+8FBlxJYF4P8KELiPw8yi5iPV+oszbpkRa7gJv3Ek0cQdg/+uD7EFVZDlegPnVzz6v83vOCmHCP7UovsL/rrlBxiq5VMZFVgNU3vXFuMCaUDI1W
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYBPR01MB5341.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39860400002)(396003)(230922051799003)(186009)(1800799009)(451199024)(64100799003)(38070700009)(71200400001)(38100700002)(122000001)(7696005)(6506007)(41300700001)(9686003)(83380400001)(52536014)(8676002)(8936002)(4326008)(4744005)(2906002)(86362001)(316002)(5660300002)(66946007)(66556008)(66476007)(66446008)(64756008)(54906003)(76116006)(6916009)(55016003)(33656002)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?t1bLNnYep64G3wH9yy3ZHSBNRGTogfuBCEJZ4OW/jtB3C+s82iPYyg2+ut9N?=
- =?us-ascii?Q?H1o1TmEqcUO9dY4GbYHwnz78ZJ0NeNU5G67A+jTxxlj+qixpXr2MLv9Iz4xo?=
- =?us-ascii?Q?zHYTFbTIsAmIi+60fYCoNMQy1DF2BEA62CuSf1nKNQ2vjRqW7CyIf5XpgvTV?=
- =?us-ascii?Q?dOsDDwOTTH7Dh4e4KXzvV7XMD220sxkUmH9WiqtSQxCykulBvxJGhW3omxnb?=
- =?us-ascii?Q?bSgyPfwdxn5NuImNUPbpC7mMrJgDcGKmYMDPs7GJk5PDvDWlYFHjTlCXsb6M?=
- =?us-ascii?Q?VvE1bhtBlTm+ztMLJaJlrp/JvsUFh04ryE509cp03HpybkATLiWNhmGf1jaS?=
- =?us-ascii?Q?SRNl3XxUvWwk901PY7ZwFob0f/F37/Fj6a4B8D1n9KJYWlTuNjm+zvFWcpdE?=
- =?us-ascii?Q?2yI8kYwHp/k6keUSIB65LrtjbXRxjl8Wyae7FUmiOvw2K4bhs3Z6k/OmOHcy?=
- =?us-ascii?Q?ehTMd0SYsGzplD7iSjcGtXxXkhS+K/4ijwOqjBMlumDq3Y1lXyY1mgG3XrQo?=
- =?us-ascii?Q?i7qjTjzMzGCYD+UJMtbZgodW3r/QMQd4re5EF56W1Gpd6vY+2x2EA0U9GZBU?=
- =?us-ascii?Q?lEMWUXBqWGFy9HD3nfdGUatz1+aIxc+qzdOEPDM84wQLs3bEaO+eXpvnY1Ki?=
- =?us-ascii?Q?cJG4XmdksJNpn4G35W1rEjWRkyYe9+2kCh5ARVWsgwiyD1OHmoV+JS8/Lgtd?=
- =?us-ascii?Q?Fza9J3bAikgj0bzKSoERBrFKqo2SMaINkrH08G64uyzZZSN3qK+/fzOdKodq?=
- =?us-ascii?Q?Vga+4B/dfSyyU01gPyiAxDSATVQ4lwW2NnDopfKBJUaq7is1vq7J7nfaZsoV?=
- =?us-ascii?Q?HBJVZClMI/QULK06ZCeDwtL8A5iX9QaB7cnewpy4AcYC8nxEDQZISnw8TQp2?=
- =?us-ascii?Q?ixTUaQw/FS5h0F7JrwWuol9WGNJa70ZaPUSsOjX0+NFr06p+VmTHy6N/mVi+?=
- =?us-ascii?Q?jUFlUTkeBC8sSltKFq92lVlQuii9+af2MfS5h48qf9D700WJERdcsabWCsxA?=
- =?us-ascii?Q?j+CuoZKP6cScVTLsQ0QZ0UJLxCYX0Gh8BU7rBMMAESTlFgcZz4Y97RbOHHH6?=
- =?us-ascii?Q?4i8wWzNQoJmhR0ydGkshsFnsL9MDvxjGeC1LNp7JNdfAmDXdsRrFJVEQH8XE?=
- =?us-ascii?Q?totxewpxlz2Ub5/j9esa5sdEN3uMQXcubTf+smWwI9I+M2GbNBp9Nmdr4xK6?=
- =?us-ascii?Q?px052m/4+q4TmBs/RQ8J/NaaflcaaEwl6EM8seBJDkiFE3enmbzsdQ6UyzGr?=
- =?us-ascii?Q?ohvfGuSE+gCyvGc/lAofR0rZwfcYOjHRUtgDDlSsFwXXvo/wTI8YWNk3uPbi?=
- =?us-ascii?Q?BV7fh9U+jdLarPxDO+ljP+qvLa9A0mmMpkHDvnsOmZakAvUVAh+7eDI1Pwmd?=
- =?us-ascii?Q?DAYzq9FrSeBoOogXcm2nyPtxnzOQpbEQCWf+WQJD3denR6hZUunx3kS46SJZ?=
- =?us-ascii?Q?NDp6Ev8ly7bLMe5N5Gc98QceX+n7D8QKIP6iOMWjHBto7/H5phLF2wf9+15w?=
- =?us-ascii?Q?nLizmIqBtROopNQ95DDZw1bJ/1It7SfQjaSrP0cYuMRBhva3/hoEc6DyF/mx?=
- =?us-ascii?Q?TggY3SOpcEuXWK0QssOZSHqdun/Rm7UWOf8ef81JybF1umdMdVg8+/Xkhjnk?=
- =?us-ascii?Q?TkFXQOXoirTH4vrHTL0Ij+W1D9V+i0LlABSPfePExyNZaR5vhJ4x3YBUv7nC?=
- =?us-ascii?Q?5YNyRQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659452FC5C
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:59:14 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64DB6C2;
+	Tue, 14 Nov 2023 15:59:13 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cc316ccc38so49023915ad.1;
+        Tue, 14 Nov 2023 15:59:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700006352; x=1700611152; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U28cHFzBVkR11z4RuPSvS1sL4RTNO+cnLUGQEPnb7SU=;
+        b=ItE+1blxL4WXLi85dgykTPHnVvjfIVJzPkcVw2q3zch2y2bcYEfda3DzDgpvHbATtb
+         kxf/qLcw3HblbNrPlbSZTT26pYECC0+sNmBK7rIAeQuM7INrl/yfVGe/5YRkgqr4tJdT
+         k4OEvXJoBkJSqp1d4yY0p0NReE7sSasMo4EqoqGeAZIMElK2dF44z/xVkOalQTpTFEyI
+         WWtbbeqK1MWfNWnPANhfmJcPobxF75xFE+WVWsGDOjndofz4hhZ90l+DF1KXjR5ka8Au
+         PObw55nENkLOrLl4h4CwumOhQ7gDTuj+t7v5aPYP9wa923dWugR0BhfOvhKNKIevbeWv
+         WEzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700006352; x=1700611152;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=U28cHFzBVkR11z4RuPSvS1sL4RTNO+cnLUGQEPnb7SU=;
+        b=RpG1HwU9/bRpRQr166nPEuGHGTt2KGx7lfZz9RaI1VESwz10f4LoLk2hpLFemhXC1E
+         wn2ukyOo9SzA76maBoj/DRb/KrAo4LrT8t79U2BmfeJpWyWP/e8VbvTOi1W/CVAz+H0f
+         GuDCf91URQruCgrH9EE8KXxP99ARj8pbkTlvkd7M8PuEknE9XiEiKEzPuG4kR+5B9Ay7
+         35XWYv5GlzWIJbuWhmUAARcCQhF95cD+jdH7aRMYkFX3LbwkQSPYMtF7m+tl6QHDrEgn
+         IBdsk94BYypqrDWZGrdHkS+AS1kd6XhZmUhSInvhpdnmL4XR0KiRjeqrZqyIJK3PvF8K
+         qG/g==
+X-Gm-Message-State: AOJu0Yw8XmiMk2jWHwrnU2ude1po0qkOYv7petYU8pj7V1zyrwnf+hn/
+	mwMDJLSo0vpqHVUIeB+cK3QANRf0d9oNvg==
+X-Google-Smtp-Source: AGHT+IFMeftzfcV39U6BZ/StdmHwqGFz5CwiraE6RrTHkQW6l2CoWrog5MrXkcFrCsLrAiB8ZOrAjw==
+X-Received: by 2002:a17:902:6808:b0:1cc:3ac9:7189 with SMTP id h8-20020a170902680800b001cc3ac97189mr3780268plk.7.1700006352543;
+        Tue, 14 Nov 2023 15:59:12 -0800 (PST)
+Received: from [192.168.0.106] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id b6-20020a170902d50600b001bc21222e34sm6190560plg.285.2023.11.14.15.59.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Nov 2023 15:59:12 -0800 (PST)
+Message-ID: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
+Date: Wed, 15 Nov 2023 06:59:06 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TYBPR01MB5341.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9efd2e2b-85b3-49d3-6fb1-08dbe56c3c3e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2023 23:48:43.2785
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fnpc0REMeoU3q/NAtgmuFx0v3cDfcBZAMkSod+4NwsC8JoODfncLxV+kV9urQ1oayh5crM8SRQwLyO1V/N5g+LtmZwfZbyUN7ju0DIuVKb2Tml4Uapd+P8YsLAPrx3+C
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3PR01MB11690
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Thorsten Leemhuis <regressions@leemhuis.info>,
+ Linux Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+ Linux Regressions <regressions@lists.linux.dev>
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek
+ <andy@greyhouse.net>, Ivan Vecera <ivecera@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Anil Choudhary <anilchabba@gmail.com>
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: sr-iov related bonding regression (two regressions in one report)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> From: Jakub Kicinski, Sent: Wednesday, November 15, 2023 7:10 AM
->=20
-> On Tue, 14 Nov 2023 08:52:29 +0000 Yoshihiro Shimoda wrote:
-> > Gentle ping. I confirmed that I could apply this patch on
-> > the latest net.git / main branch.
->=20
-> At a glance the suggestion from Sergei makes sense.
-> You need to reply to him.
+Hi Thorsten and all,
 
-Thank you for your reply. I completely overlooked his suggestion.
-I'll check it and reply to him.
+I come across LACP bonding regression on Bugzilla [1]. The reporter
+(Cc'ed) has two regressions. The first is actual LACP bonding
+regression (but terse):
 
-Best regards,
-Yoshihiro Shimoda
+> Till linkx kernel 6.5.7 it is working fine, but after upgrading to 6.6.1 ping stop working with LACP bonding.
+> When we disable SR-IOV from bios , everything working fine
 
+And the second is out-of-tree module FTBFS:
+
+> Also we are not able to compile 
+> driver: ice
+> version: 1.12.6
+> We are getting following error.
+> 
+> 
+> 
+> With inter driver code(version 1.12.6) while complaining I am getting following error.
+> /root/1.12.6/build/src/ice_txrx.h:363:29: error: field ‘xdp_rxq’ has incomplete type
+>   363 |         struct xdp_rxq_info xdp_rxq;
+>       |                             ^~~~~~~
+> /root/1.12.6/build/src/ice_main.c: In function ‘ice_remove_recovery_mode’:
+> /root/1.12.6/build/src/ice_main.c:1540:9: error: implicit declaration of function ‘pci_disable_pcie_error_reporting’ [-Werror=implicit-function-declaration]
+>  1540 |         pci_disable_pcie_error_reporting(pf->pdev);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> /root/1.12.6/build/src/ice_main.c: In function ‘ice_probe’:
+> /root/1.12.6/build/src/ice_main.c:7046:9: error: implicit declaration of function ‘pci_enable_pcie_error_reporting’ [-Werror=implicit-function-declaration]
+>  7046 |         pci_enable_pcie_error_reporting(pdev);
+>       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> cc1: some warnings being treated as errors
+> make[3]: *** [scripts/Makefile.build:243: /root/1.12.6/build/src/ice_main.o] Error 1
+> make[2]: *** [/usr/src/linux-headers-6.6.0-rc7-vdx/Makefile:1913: /root/1.12.6/build/src] Error 2
+> make[1]: *** [Makefile:234: __sub-make] Error 2
+> make[1]: Leaving directory '/usr/src/linux-headers-6.6.0-rc7-vdx'
+> make: *** [Makefile:174: all] Error 2
+
+Should I add the first regression to regzbot (since the second one
+is obviously out-of-tree problem), or should I asked detailed regression
+info to the reporter?
+
+Thanks.
+
+[1]: https://bugzilla.kernel.org/show_bug.cgi?id=218139
+
+-- 
+An old man doll... just what I always wanted! - Clara
 
