@@ -1,263 +1,120 @@
-Return-Path: <netdev+bounces-47765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27AFF7EB478
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:08:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C6D77EB49C
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B1C11C209FC
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:08:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29DD51C20A3E
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 16:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E0A41AA4;
-	Tue, 14 Nov 2023 16:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3449E41A98;
+	Tue, 14 Nov 2023 16:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=stwcx.xyz header.i=@stwcx.xyz header.b="nuz9FySi";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="tuRA20ZQ"
+	dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b="MCmVG1Q6"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BB141A8F
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:07:57 +0000 (UTC)
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BFFF13D;
-	Tue, 14 Nov 2023 08:07:56 -0800 (PST)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 8D0805C02A6;
-	Tue, 14 Nov 2023 11:07:55 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Tue, 14 Nov 2023 11:07:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm3; t=1699978075; x=
-	1700064475; bh=20tfSKNtHL+rKOlEuM96Y15IraCN16Lw4pR+Bb7sBnM=; b=n
-	uz9FySiZwgmabLbS+33isxpTquEj7qDTwpswH6tug+s/deFbwh465LwmfjzhGa0a
-	b9k/HD8UWNSJFAQmIeYQ5AmBwv0GI4c0368yaMQoxCHRdUioHJw+MXRkZd1D40ir
-	x2jCjPtzJgeMTOqpIDMrSMsBh+EULWRIPHgET6ucSvRjhRkT/IXrxB6Xj5tpWTnV
-	PjLNBB+Gk30kTiaQIKOJJAx+xjRmw2xrO8Iw6hlONMnOUPPewF3rsgm8CriAlC/n
-	zfWFt9vjod1peaTI3TGKt549NmoG1ZE8PGlUTYisqcFcDdF9zsl65Vh0hf3ld8ly
-	3WT9ZemJNd2R59VE20l5A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1699978075; x=
-	1700064475; bh=20tfSKNtHL+rKOlEuM96Y15IraCN16Lw4pR+Bb7sBnM=; b=t
-	uRA20ZQNoGPMXxR8yH1MzaBsgatm/pc2QgyCUE3NS69RLfS61OZark6Gxxcna7Hm
-	WLm6UjJYqLkMMyew0cDA0svi9bDPunWBb+hpZLYQEvk+EVvpY644neuCM1tqFVD0
-	+hAJEailPRdIMNKfzbOx/LDNYM+I35IP7Pz0UZcAqKDHigKtHPFhY5bmHSeo/8Cz
-	5KjR/ULCmFdhpaL0gHWR6BNhE5IbKY8v3jeDTolwnClW+pCF+Xv2bDMijDnPvude
-	skg2sfLybP0m+MxEPUywuA946/wvCjKaSLurZrm47IcwQicH668FFv3PNsPOpgzs
-	jJHnUkx8UeF9YQb4H5r6g==
-X-ME-Sender: <xms:W5tTZc1FSEtx_CwNLhEQ4QX9S2Aq1Dvyl25QtRxEPxDJmcisVmZgiA>
-    <xme:W5tTZXECbmPRP0X01JdTr3qx9LPdmi9Dq9Di5mjBBUxQlb09FYXyF382jYg8xoZ8E
-    4rCOB2Q9huYkMVaCyQ>
-X-ME-Received: <xmr:W5tTZU7olGFBczUG3xNfC1Qfl7BO5Oo9XIEX9x0MJYdPY0-KDjeo-omL-k7KcSKKCgl6dAxqx3gZg2_4dBkx_85gXka85fBnHMs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrudefvddgkeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdlvdefmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertder
-    tddtnecuhfhrohhmpefrrghtrhhitghkucghihhllhhirghmshcuoehprghtrhhitghkse
-    hsthiftgigrdighiiiqeenucggtffrrghtthgvrhhnpeejffekudffkeefiedtjeelgeej
-    hfffgeffgedvgfffleevgfekkeetffdtheefhfenucffohhmrghinhepughmthhfrdhorh
-    hgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepphgr
-    thhrihgtkhesshhtfigtgidrgiihii
-X-ME-Proxy: <xmx:W5tTZV1p6GWv88jJ9dVAJ4NPqXxpyV3LzNgl6g2G2FmwCUo5WbnOdg>
-    <xmx:W5tTZfEunjZ6IQ3fJ-vbeuXV6FKxXhyd_1D96mPiIaAb-1NUy9SWgA>
-    <xmx:W5tTZe8emSTO7Vr-OhilWG1VSvnRtCbCZa5QDV0ceNTVg_FawXs6HQ>
-    <xmx:W5tTZe0KkYgPJa4G9rx1SJct61ICzChuImbGPH3XzgiMYLPSgaCI0g>
-Feedback-ID: i68a1478a:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 14 Nov 2023 11:07:54 -0500 (EST)
-From: Patrick Williams <patrick@stwcx.xyz>
-To: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Peter Delevoryas <peter@pjd.dev>,
-	Patrick Williams <patrick@stwcx.xyz>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net/ncsi: Add NC-SI 1.2 Get MC MAC Address command
-Date: Tue, 14 Nov 2023 10:07:35 -0600
-Message-ID: <20231114160737.3209218-4-patrick@stwcx.xyz>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231114160737.3209218-1-patrick@stwcx.xyz>
-References: <20231114160737.3209218-1-patrick@stwcx.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8587041A94
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:18:33 +0000 (UTC)
+Received: from mail.tkos.co.il (wiki.tkos.co.il [84.110.109.230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34F04183
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 08:18:32 -0800 (PST)
+Received: from tarshish (unknown [10.0.8.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.tkos.co.il (Postfix) with ESMTPS id BD0064402E9;
+	Tue, 14 Nov 2023 18:17:27 +0200 (IST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
+	s=default; t=1699978647;
+	bh=MXUufhnQc4E7e0CoSv9KYV8Jam2iwE7MtiQuj2v8Z0g=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:From;
+	b=MCmVG1Q6KXRCTnBO3L53foF5Lr1LO4avTBnLrSPnTH8xCqUUlnssThGO0c1OYPSAG
+	 /VwUG5GP2fF8TPm3AcnpvcyDoWY9AVYMqgAPC7uydHnTZFnIa/wvHjvu8S/mOUWbrD
+	 cVQfL1oCR4ve8regqlS18XT/v9g17NGPpFrzzzX+3ajqFHUli+oa1+JWGCHiQ/Mv3x
+	 dWL8cUDYsm7dAA/uBP32wR8RHtxhv2+ylGjzMeHVPDVbqVdDbirplv7ijcloUUrBFD
+	 vtcvz/GjKcu/0e4+xOq1Hxwn6lzz+CBV2dr7uOkD0AGTWNPhsx9C5jEwKK7Xf6ngGp
+	 m4eYMI0usa0Iw==
+References: <d9486296c3b6b12ab3a0515fcd47d56447a07bfc.1699897370.git.baruch@tkos.co.il>
+ <d95413e44c97d4692e72cec13a75f894abeb6998.1699897370.git.baruch@tkos.co.il>
+ <ysmqbuxjcgbcq4urtru5elda3dcbyejo2db3ds5cousy2trjdh@6fe774njbiam>
+User-agent: mu4e 1.10.7; emacs 29.1
+From: Baruch Siach <baruch@tkos.co.il>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: stmmac: avoid rx queue overrun
+Date: Tue, 14 Nov 2023 18:09:17 +0200
+In-reply-to: <ysmqbuxjcgbcq4urtru5elda3dcbyejo2db3ds5cousy2trjdh@6fe774njbiam>
+Message-ID: <874jhocnqi.fsf@tarshish>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Peter Delevoryas <peter@pjd.dev>
+Hi Serge,
 
-This change adds support for the NC-SI 1.2 Get MC MAC Address command,
-specified here:
+On Tue, Nov 14 2023, Serge Semin wrote:
+> On Mon, Nov 13, 2023 at 07:42:50PM +0200, Baruch Siach wrote:
+>> dma_rx_size can be set as low as 64. Rx budget might be higher than
+>> that. Make sure to not overrun allocated rx buffers when budget is
+>> larger.
+>> 
+>> Leave one descriptor unused to avoid wrap around of 'dirty_rx' vs
+>> 'cur_rx'.
+>
+> Have you ever met the denoted problem? I am asking because what you
+> say can happen only if the incoming traffic overruns the Rx-buffer,
+> otherwise the loop will break on the first found DMA-own descriptor.
+> But if that happens AFAICS the result will likely to be fatal because
+> the stmmac_rx() method will try to handle the already handled and not
+> yet recycled descriptor with no buffers assigned.
 
-https://www.dmtf.org/sites/default/files/standards/documents/DSP0222_1.2.0.pdf
+I have encountered this issue. When stmmac_rx() consumes all dma_rx_size
+descriptors in one go, dirty_rx == cur_rx, which leads stmmac_rx_dirty()
+to return zero. That in turn makes stmmac_rx_refill() skip
+stmmac_set_rx_owner() so that Rx hangs completely.
 
-It serves the exact same function as the existing OEM Get MAC Address
-commands, so if a channel reports that it supports NC-SI 1.2, we prefer
-to use the standard command rather than the OEM command.
+> So after adding the Fixes tag feel tree to add:
+> Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-Verified with an invalid MAC address and 2 valid ones:
+Thanks,
+baruch
 
-[   55.137072] ftgmac100 1e690000.ftgmac eth0: NCSI: Received 3 provisioned MAC addresses
-[   55.137614] ftgmac100 1e690000.ftgmac eth0: NCSI: MAC address 0: 00:00:00:00:00:00
-[   55.138026] ftgmac100 1e690000.ftgmac eth0: NCSI: MAC address 1: fa:ce:b0:0c:20:22
-[   55.138528] ftgmac100 1e690000.ftgmac eth0: NCSI: MAC address 2: fa:ce:b0:0c:20:23
-[   55.139241] ftgmac100 1e690000.ftgmac eth0: NCSI: Unable to assign 00:00:00:00:00:00 to device
-[   55.140098] ftgmac100 1e690000.ftgmac eth0: NCSI: Set MAC address to fa:ce:b0:0c:20:22
+> -Serge(y)
+>
+>> 
+>> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>> 
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index f28838c8cdb3..2afb2bd25977 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -5293,6 +5293,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+>>  
+>>  	dma_dir = page_pool_get_dma_dir(rx_q->page_pool);
+>>  	buf_sz = DIV_ROUND_UP(priv->dma_conf.dma_buf_sz, PAGE_SIZE) * PAGE_SIZE;
+>> +	limit = min(priv->dma_conf.dma_rx_size - 1, (unsigned int)limit);
+>>  
+>>  	if (netif_msg_rx_status(priv)) {
+>>  		void *rx_head;
+>> -- 
+>> 2.42.0
+>> 
+>> 
 
-Signed-off-by: Peter Delevoryas <peter@pjd.dev>
-Signed-off-by: Patrick Williams <patrick@stwcx.xyz>
----
- net/ncsi/ncsi-cmd.c    |  3 ++-
- net/ncsi/ncsi-manage.c |  9 +++++++--
- net/ncsi/ncsi-pkt.h    | 10 ++++++++++
- net/ncsi/ncsi-rsp.c    | 41 ++++++++++++++++++++++++++++++++++++++++-
- 4 files changed, 59 insertions(+), 4 deletions(-)
 
-diff --git a/net/ncsi/ncsi-cmd.c b/net/ncsi/ncsi-cmd.c
-index fd2236ee9a79..b3ff37a181d7 100644
---- a/net/ncsi/ncsi-cmd.c
-+++ b/net/ncsi/ncsi-cmd.c
-@@ -270,7 +270,8 @@ static struct ncsi_cmd_handler {
- 	{ NCSI_PKT_CMD_GPS,    0, ncsi_cmd_handler_default },
- 	{ NCSI_PKT_CMD_OEM,   -1, ncsi_cmd_handler_oem     },
- 	{ NCSI_PKT_CMD_PLDM,   0, NULL                     },
--	{ NCSI_PKT_CMD_GPUUID, 0, ncsi_cmd_handler_default }
-+	{ NCSI_PKT_CMD_GPUUID, 0, ncsi_cmd_handler_default },
-+	{ NCSI_PKT_CMD_GMCMA,  0, ncsi_cmd_handler_default }
- };
- 
- static struct ncsi_request *ncsi_alloc_command(struct ncsi_cmd_arg *nca)
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index f3d7fe86fea1..745c788f1d1d 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -1038,11 +1038,16 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
- 	case ncsi_dev_state_config_oem_gma:
- 		nd->state = ncsi_dev_state_config_clear_vids;
- 
--		nca.type = NCSI_PKT_CMD_OEM;
- 		nca.package = np->id;
- 		nca.channel = nc->id;
- 		ndp->pending_req_num = 1;
--		ret = ncsi_gma_handler(&nca, nc->version.mf_id);
-+		if (nc->version.major >= 1 && nc->version.minor >= 2) {
-+			nca.type = NCSI_PKT_CMD_GMCMA;
-+			ret = ncsi_xmit_cmd(&nca);
-+		} else {
-+			nca.type = NCSI_PKT_CMD_OEM;
-+			ret = ncsi_gma_handler(&nca, nc->version.mf_id);
-+		}
- 		if (ret < 0)
- 			schedule_work(&ndp->work);
- 
-diff --git a/net/ncsi/ncsi-pkt.h b/net/ncsi/ncsi-pkt.h
-index c9d1da34dc4d..f2f3b5c1b941 100644
---- a/net/ncsi/ncsi-pkt.h
-+++ b/net/ncsi/ncsi-pkt.h
-@@ -338,6 +338,14 @@ struct ncsi_rsp_gpuuid_pkt {
- 	__be32                  checksum;
- };
- 
-+/* Get MC MAC Address */
-+struct ncsi_rsp_gmcma_pkt {
-+	struct ncsi_rsp_pkt_hdr rsp;
-+	unsigned char           address_count;
-+	unsigned char           reserved[3];
-+	unsigned char           addresses[][ETH_ALEN];
-+};
-+
- /* AEN: Link State Change */
- struct ncsi_aen_lsc_pkt {
- 	struct ncsi_aen_pkt_hdr aen;        /* AEN header      */
-@@ -398,6 +406,7 @@ struct ncsi_aen_hncdsc_pkt {
- #define NCSI_PKT_CMD_GPUUID	0x52 /* Get package UUID                 */
- #define NCSI_PKT_CMD_QPNPR	0x56 /* Query Pending NC PLDM request */
- #define NCSI_PKT_CMD_SNPR	0x57 /* Send NC PLDM Reply  */
-+#define NCSI_PKT_CMD_GMCMA	0x58 /* Get MC MAC Address */
- 
- 
- /* NCSI packet responses */
-@@ -433,6 +442,7 @@ struct ncsi_aen_hncdsc_pkt {
- #define NCSI_PKT_RSP_GPUUID	(NCSI_PKT_CMD_GPUUID + 0x80)
- #define NCSI_PKT_RSP_QPNPR	(NCSI_PKT_CMD_QPNPR   + 0x80)
- #define NCSI_PKT_RSP_SNPR	(NCSI_PKT_CMD_SNPR   + 0x80)
-+#define NCSI_PKT_RSP_GMCMA	(NCSI_PKT_CMD_GMCMA  + 0x80)
- 
- /* NCSI response code/reason */
- #define NCSI_PKT_RSP_C_COMPLETED	0x0000 /* Command Completed        */
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index 480e80e3c283..bee290d0f48b 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -1091,6 +1091,44 @@ static int ncsi_rsp_handler_netlink(struct ncsi_request *nr)
- 	return ret;
- }
- 
-+static int ncsi_rsp_handler_gmcma(struct ncsi_request *nr)
-+{
-+	struct ncsi_dev_priv *ndp = nr->ndp;
-+	struct net_device *ndev = ndp->ndev.dev;
-+	struct ncsi_rsp_gmcma_pkt *rsp;
-+	struct sockaddr saddr;
-+	int ret = -1;
-+	int i;
-+
-+	rsp = (struct ncsi_rsp_gmcma_pkt *)skb_network_header(nr->rsp);
-+	saddr.sa_family = ndev->type;
-+	ndev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
-+
-+	netdev_info(ndev, "NCSI: Received %d provisioned MAC addresses\n",
-+		    rsp->address_count);
-+	for (i = 0; i < rsp->address_count; i++) {
-+		netdev_info(ndev, "NCSI: MAC address %d: %02x:%02x:%02x:%02x:%02x:%02x\n",
-+			    i, rsp->addresses[i][0], rsp->addresses[i][1],
-+			    rsp->addresses[i][2], rsp->addresses[i][3],
-+			    rsp->addresses[i][4], rsp->addresses[i][5]);
-+	}
-+
-+	for (i = 0; i < rsp->address_count; i++) {
-+		memcpy(saddr.sa_data, &rsp->addresses[i], ETH_ALEN);
-+		ret = ndev->netdev_ops->ndo_set_mac_address(ndev, &saddr);
-+		if (ret < 0) {
-+			netdev_warn(ndev, "NCSI: Unable to assign %pM to device\n",
-+				    saddr.sa_data);
-+			continue;
-+		}
-+		netdev_warn(ndev, "NCSI: Set MAC address to %pM\n", saddr.sa_data);
-+		break;
-+	}
-+
-+	ndp->gma_flag = ret == 0;
-+	return ret;
-+}
-+
- static struct ncsi_rsp_handler {
- 	unsigned char	type;
- 	int             payload;
-@@ -1127,7 +1165,8 @@ static struct ncsi_rsp_handler {
- 	{ NCSI_PKT_RSP_PLDM,   -1, ncsi_rsp_handler_pldm    },
- 	{ NCSI_PKT_RSP_GPUUID, 20, ncsi_rsp_handler_gpuuid  },
- 	{ NCSI_PKT_RSP_QPNPR,  -1, ncsi_rsp_handler_pldm    },
--	{ NCSI_PKT_RSP_SNPR,   -1, ncsi_rsp_handler_pldm    }
-+	{ NCSI_PKT_RSP_SNPR,   -1, ncsi_rsp_handler_pldm    },
-+	{ NCSI_PKT_RSP_GMCMA,  -1, ncsi_rsp_handler_gmcma   },
- };
- 
- int ncsi_rcv_rsp(struct sk_buff *skb, struct net_device *dev,
 -- 
-2.41.0
-
+                                                     ~. .~   Tk Open Systems
+=}------------------------------------------------ooO--U--Ooo------------{=
+   - baruch@tkos.co.il - tel: +972.52.368.4656, http://www.tkos.co.il -
 
