@@ -1,122 +1,390 @@
-Return-Path: <netdev+bounces-47775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAC027EB5A6
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:40:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAB837EB5AE
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 18:42:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F5321F25029
-	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85385281246
+	for <lists+netdev@lfdr.de>; Tue, 14 Nov 2023 17:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4638F15BC;
-	Tue, 14 Nov 2023 17:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mWBH9jv/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7E72C1A1;
+	Tue, 14 Nov 2023 17:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732E92C194
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 17:40:01 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C83A94
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 09:40:00 -0800 (PST)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AEHaYT8020684;
-	Tue, 14 Nov 2023 17:39:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : from : to : cc : references : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=uf9A/zo8jpT8XRT89eZDvEfa2LllxQ8BVy6Zwo247X8=;
- b=mWBH9jv/gv+1Wqm+v9ruqgU6GUA/rM0mm3+zm9J76nQupccHQlDbuSyg/K9BPKJNXa0Q
- 8j90fVQRFVnywhb63f/f+b2QNfnNF/DO0ll0g0zwBBX+2NXNPcon/c9a9Z2hb2R4UNj1
- daHkXQNiL5/DHM9lT+Gkm/jI8L/G4nzUUTRD7CVRI74A6K/WlzNBmhk7wf3BBYeG+rpW
- cJp+0kCF+q2QyLTPINjcMvDSUuBzwyrR+O5EbQud1xi2+tikku/R0YSTlbqbYyDjO/Vu
- nbbyFpJal7DZ3c8W9QfcgC1joS642pfIJ/n1PYiSXH66cRzxZUhLcEMQzP4M76hFyQhJ VA== 
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucdeg82xy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Nov 2023 17:39:58 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AEGXrtL022283;
-	Tue, 14 Nov 2023 17:39:57 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uap5k137r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Nov 2023 17:39:57 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AEHdvie26346224
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 14 Nov 2023 17:39:57 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3DA745805A;
-	Tue, 14 Nov 2023 17:39:57 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1500258051;
-	Tue, 14 Nov 2023 17:39:56 +0000 (GMT)
-Received: from [9.67.169.53] (unknown [9.67.169.53])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 14 Nov 2023 17:39:55 +0000 (GMT)
-Message-ID: <e76f324b-b043-4349-bd19-455542c6480e@linux.vnet.ibm.com>
-Date: Tue, 14 Nov 2023 11:39:59 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1C92C19E;
+	Tue, 14 Nov 2023 17:42:46 +0000 (UTC)
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC75310A;
+	Tue, 14 Nov 2023 09:42:43 -0800 (PST)
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1r2xQd-0000r4-31;
+	Tue, 14 Nov 2023 17:42:24 +0000
+Date: Tue, 14 Nov 2023 17:42:16 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
+Subject: Re: [RFC PATCH 7/8] dt-bindings: net: mediatek,net: fix and complete
+ mt7988-eth binding
+Message-ID: <ZVOxeCAUhFPnxzQr@makrotopia.org>
+References: <cover.1699565880.git.daniel@makrotopia.org>
+ <d8152679b6558ce9fd177ff20478e3fbc2ab73b4.1699565880.git.daniel@makrotopia.org>
+ <20231114140719.GA1664629-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net/tg3: fix race condition in tg3_reset_task()
-Content-Language: en-US
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com,
-        mchan@broadcom.com, pavan.chebbi@broadcom.com, drc@linux.vnet.ibm.com,
-        venkata.sai.duggi@ibm.com
-References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
- <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
- <CACKFLimX4Pjm89cneeTa36B519DN3mdXXo5FXfDFi6e0SBwUSA@mail.gmail.com>
- <14584a37-2882-4cd8-9380-40a532d07731@linux.vnet.ibm.com>
-In-Reply-To: <14584a37-2882-4cd8-9380-40a532d07731@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 2qg999YD3_cG3WvoUpqyuLwhckUGK7pn
-X-Proofpoint-GUID: 2qg999YD3_cG3WvoUpqyuLwhckUGK7pn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-14_17,2023-11-14_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=589 malwarescore=0 spamscore=0 adultscore=0
- mlxscore=0 impostorscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311140134
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114140719.GA1664629-robh@kernel.org>
 
-Hi Michael,
+Hi Rob,
 
-On 11/2/2023 3:37 PM, Thinh Tran wrote:
-> Thanks for the review.
+thank you for reviewing this patch.
+
+On Tue, Nov 14, 2023 at 08:07:19AM -0600, Rob Herring wrote:
+> On Thu, Nov 09, 2023 at 09:52:09PM +0000, Daniel Golle wrote:
+> > Remove clocks which were copied from the vendor driver but are now taken
+> > care of by dedicated drivers for PCS and PHY in the upstream driver.
+> > Also remove mediatek,sgmiisys phandle which isn't required on MT7988
+> > because we use pcs-handle on the MAC nodes instead.
+> > Last but not least, add an example for MT7988.
 > 
-> On 11/2/2023 12:27 PM, Michael Chan wrote:
->>
->> This scenario can affect other drivers too, right?  Shouldn't this be
->> handled in a higher layer before calling ->ndo_tx_timeout() so we
->> don't have to add this logic to all the other drivers?  Thanks.
-> 
-> Yes, it does. We can add this into the dev_watchdog() function, but 
-> further investigations are required. This is because each driver may 
-> have a different approach to handling its own ->ndo_tx_timeout() function.
-> 
-> Thinh Tran
+> 'Also' is a clue for it should be a separate patch. These changes are 
+> all ABI breakage. Please explain why that's okay.
 
-I attempted to relocate the fix into the dev_watchdog(), but we 
-experienced crashes in various drivers, leading to the destabilization 
-of other drivers.
-I propose to accept the current patch, rather than introducing a new fix 
-that may potentially create issues for other drivers
+I hope that it's ok because the driver at this point never supported
+any SerDes modes and we are still in the process of bringing up
+mainline support for this SoC. All of clk, pinctrl, reset, ... driver
+and dt-bindings are still pending or being prepared for submission.
 
-Thanks,
-Thinh Tran
+> 
+> > 
+> > Fixes: c94a9aabec36 ("dt-bindings: net: mediatek,net: add mt7988-eth binding")
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  .../devicetree/bindings/net/mediatek,net.yaml | 171 +++++++++++++++---
+> >  1 file changed, 142 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/mediatek,net.yaml b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > index e74502a0afe86..c0f7bb6f3ef8d 100644
+> > --- a/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > +++ b/Documentation/devicetree/bindings/net/mediatek,net.yaml
+> > @@ -27,9 +27,6 @@ properties:
+> >        - mediatek,mt7988-eth
+> >        - ralink,rt5350-eth
+> >  
+> > -  reg:
+> > -    maxItems: 1
+> > -
+> 
+> It's not clear what this change is from the commit msg.
+> 
+> This should stay and be:
+> 
+> reg:
+>   minItems: 1
+>   items:
+>     - description: what's in the 1st region
+>     - description: what's in the 2nd region
+
+Ack.
+
+> 
+> >    clocks: true
+> >    clock-names: true
+> >  
+> > @@ -115,6 +112,9 @@ allOf:
+> >                - mediatek,mt7623-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> >          interrupts:
+> >            maxItems: 3
+> >  
+> > @@ -149,6 +149,9 @@ allOf:
+> >                - mediatek,mt7621-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> >          interrupts:
+> >            maxItems: 1
+> >  
+> > @@ -174,6 +177,9 @@ allOf:
+> >              const: mediatek,mt7622-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> >          interrupts:
+> >            maxItems: 3
+> >  
+> > @@ -215,6 +221,9 @@ allOf:
+> >              const: mediatek,mt7629-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> >          interrupts:
+> >            maxItems: 3
+> >  
+> > @@ -257,6 +266,9 @@ allOf:
+> >              const: mediatek,mt7981-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> >          interrupts:
+> >            minItems: 4
+> >  
+> > @@ -295,6 +307,9 @@ allOf:
+> >              const: mediatek,mt7986-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 1
+> > +
+> 
+> Looks like lots of duplication. Perhaps there's a cleaner way.
+
+Hm, I don't really see any better way. Suggestions anyone?
+
+> 
+> >          interrupts:
+> >            minItems: 4
+> >  
+> > @@ -333,36 +348,32 @@ allOf:
+> >              const: mediatek,mt7988-eth
+> >      then:
+> >        properties:
+> > +        reg:
+> > +          maxItems: 2
+> > +          minItems: 2
+> > +
+> >          interrupts:
+> >            minItems: 4
+> > +          maxItems: 4
+> >  
+> >          clocks:
+> > -          minItems: 34
+> > -          maxItems: 34
+> > +          minItems: 24
+> > +          maxItems: 24
+> >  
+> >          clock-names:
+> >            items:
+> > -            - const: crypto
+> > +            - const: xgp1
+> > +            - const: xgp2
+> > +            - const: xgp3
+> >              - const: fe
+> >              - const: gp2
+> >              - const: gp1
+> >              - const: gp3
+> > +            - const: esw
+> > +            - const: crypto
+> >              - const: ethwarp_wocpu2
+> >              - const: ethwarp_wocpu1
+> >              - const: ethwarp_wocpu0
+> > -            - const: esw
+> > -            - const: netsys0
+> > -            - const: netsys1
+> > -            - const: sgmii_tx250m
+> > -            - const: sgmii_rx250m
+> > -            - const: sgmii2_tx250m
+> > -            - const: sgmii2_rx250m
+> > -            - const: top_usxgmii0_sel
+> > -            - const: top_usxgmii1_sel
+> > -            - const: top_sgm0_sel
+> > -            - const: top_sgm1_sel
+> > -            - const: top_xfi_phy0_xtal_sel
+> > -            - const: top_xfi_phy1_xtal_sel
+> >              - const: top_eth_gmii_sel
+> >              - const: top_eth_refck_50m_sel
+> >              - const: top_eth_sys_200m_sel
+> > @@ -375,18 +386,9 @@ allOf:
+> >              - const: top_netsys_sync_250m_sel
+> >              - const: top_netsys_ppefb_250m_sel
+> >              - const: top_netsys_warp_sel
+> > -            - const: wocpu1
+> > -            - const: wocpu0
+> > -            - const: xgp1
+> > -            - const: xgp2
+> > -            - const: xgp3
+> > -
+> > -        mediatek,sgmiisys:
+> > -          minItems: 2
+> > -          maxItems: 2
+> >  
+> >  patternProperties:
+> > -  "^mac@[0-1]$":
+> > +  "^mac@[0-2]$":
+> >      type: object
+> >      unevaluatedProperties: false
+> >      allOf:
+> > @@ -577,3 +579,114 @@ examples:
+> >          };
+> >        };
+> >      };
+> > +
+> > +  - |
+> > +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> > +    #include <dt-bindings/interrupt-controller/irq.h>
+> > +    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
+> > +
+> > +    soc {
+> > +      #address-cells = <2>;
+> > +      #size-cells = <2>;
+> > +
+> > +      ethernet@15100000 {
+> > +        compatible = "mediatek,mt7988-eth";
+> > +        reg = <0 0x15100000 0 0x80000>, <0 0x15400000 0 0x380000>;
+> > +        interrupts = <GIC_SPI 196 IRQ_TYPE_LEVEL_HIGH>,
+> > +                     <GIC_SPI 197 IRQ_TYPE_LEVEL_HIGH>,
+> > +                     <GIC_SPI 198 IRQ_TYPE_LEVEL_HIGH>,
+> > +                     <GIC_SPI 199 IRQ_TYPE_LEVEL_HIGH>;
+> > +
+> > +        clocks = <&ethsys CLK_ETHDMA_XGP1_EN>,
+> > +                 <&ethsys CLK_ETHDMA_XGP2_EN>,
+> > +                 <&ethsys CLK_ETHDMA_XGP3_EN>,
+> > +                 <&ethsys CLK_ETHDMA_FE_EN>,
+> > +                 <&ethsys CLK_ETHDMA_GP2_EN>,
+> > +                 <&ethsys CLK_ETHDMA_GP1_EN>,
+> > +                 <&ethsys CLK_ETHDMA_GP3_EN>,
+> > +                 <&ethsys CLK_ETHDMA_ESW_EN>,
+> > +                 <&ethsys CLK_ETHDMA_CRYPT0_EN>,
+> > +                 <&ethwarp CLK_ETHWARP_WOCPU2_EN>,
+> > +                 <&ethwarp CLK_ETHWARP_WOCPU1_EN>,
+> > +                 <&ethwarp CLK_ETHWARP_WOCPU0_EN>,
+> > +                 <&topckgen CLK_TOP_ETH_GMII_SEL>,
+> > +                 <&topckgen CLK_TOP_ETH_REFCK_50M_SEL>,
+> > +                 <&topckgen CLK_TOP_ETH_SYS_200M_SEL>,
+> > +                 <&topckgen CLK_TOP_ETH_SYS_SEL>,
+> > +                 <&topckgen CLK_TOP_ETH_XGMII_SEL>,
+> > +                 <&topckgen CLK_TOP_ETH_MII_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_500M_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_PAO_2X_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_SYNC_250M_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_PPEFB_250M_SEL>,
+> > +                 <&topckgen CLK_TOP_NETSYS_WARP_SEL>;
+> > +
+> > +        clock-names = "xgp1", "xgp2", "xgp3", "fe", "gp2", "gp1",
+> > +                      "gp3", "esw", "crypto",
+> > +                      "ethwarp_wocpu2", "ethwarp_wocpu1",
+> > +                      "ethwarp_wocpu0", "top_eth_gmii_sel",
+> > +                      "top_eth_refck_50m_sel", "top_eth_sys_200m_sel",
+> > +                      "top_eth_sys_sel", "top_eth_xgmii_sel",
+> > +                      "top_eth_mii_sel", "top_netsys_sel",
+> > +                      "top_netsys_500m_sel", "top_netsys_pao_2x_sel",
+> > +                      "top_netsys_sync_250m_sel",
+> > +                      "top_netsys_ppefb_250m_sel",
+> > +                      "top_netsys_warp_sel";
+> > +        assigned-clocks = <&topckgen CLK_TOP_NETSYS_2X_SEL>,
+> > +                          <&topckgen CLK_TOP_NETSYS_GSW_SEL>,
+> > +                          <&topckgen CLK_TOP_USXGMII_SBUS_0_SEL>,
+> > +                          <&topckgen CLK_TOP_USXGMII_SBUS_1_SEL>,
+> > +                          <&topckgen CLK_TOP_SGM_0_SEL>,
+> > +                          <&topckgen CLK_TOP_SGM_1_SEL>;
+> > +        assigned-clock-parents = <&apmixedsys CLK_APMIXED_NET2PLL>,
+> > +                                 <&topckgen CLK_TOP_NET1PLL_D4>,
+> > +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
+> > +                                 <&topckgen CLK_TOP_NET1PLL_D8_D4>,
+> > +                                 <&apmixedsys CLK_APMIXED_SGMPLL>,
+> > +                                 <&apmixedsys CLK_APMIXED_SGMPLL>;
+> > +        mediatek,ethsys = <&ethsys>;
+> > +        mediatek,infracfg = <&topmisc>;
+> > +        #address-cells = <1>;
+> > +        #size-cells = <0>;
+> > +
+> > +        mac@0 {
+> > +          compatible = "mediatek,eth-mac";
+> > +          reg = <0>;
+> > +          phy-mode = "internal";
+> > +          status = "disabled";
+> 
+> Examples should be enabled.
+
+Ack.
+
+> 
+> > +
+> > +          fixed-link {
+> > +            speed = <10000>;
+> > +            full-duplex;
+> > +            pause;
+> > +          };
+> > +        };
+> > +
+> > +        mac@1 {
+> > +          compatible = "mediatek,eth-mac";
+> > +          reg = <1>;
+> > +          status = "disabled";
+> > +          pcs-handle = <&usxgmiisys1>;
+> > +        };
+> > +
+> > +        mac@2 {
+> > +          compatible = "mediatek,eth-mac";
+> > +          reg = <2>;
+> > +          status = "disabled";
+> > +          pcs-handle = <&usxgmiisys0>;
+> > +        };
+> > +
+> > +        mdio_bus: mdio-bus {
+> 
+> mdio {
+> 
+> > +          #address-cells = <1>;
+> > +          #size-cells = <0>;
+> > +
+> > +          /* internal 2.5G PHY */
+> > +          int_2p5g_phy: ethernet-phy@15 {
+> > +            reg = <15>;
+> > +            compatible = "ethernet-phy-ieee802.3-c45";
+> > +            phy-mode = "internal";
+> > +          };
+> > +        };
+> > +      };
+> > +    };
+> > -- 
+> > 2.42.1
+> 
 
