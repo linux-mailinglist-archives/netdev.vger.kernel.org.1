@@ -1,132 +1,167 @@
-Return-Path: <netdev+bounces-47945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5017EC0F8
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:53:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBFE17EC116
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:08:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 795961C2082A
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:53:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59D87B209FD
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F30125D5;
-	Wed, 15 Nov 2023 10:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E51A156D4;
+	Wed, 15 Nov 2023 11:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="T5OUra8i";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="SCWWF6CP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hu/bNW6/"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2685614F60;
-	Wed, 15 Nov 2023 10:53:36 +0000 (UTC)
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F910E5;
-	Wed, 15 Nov 2023 02:53:35 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id AC412204E1;
-	Wed, 15 Nov 2023 10:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1700045613; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nJlTjVsKvqAx1MhYNThg4ZiwuUl92g9J7t21qFU454A=;
-	b=T5OUra8iaaEu/czuEVDvIjZCJxhUTMykkkKpHoBiOhUs+8dusly/UfxhxfH4Ox2ucEbhgM
-	8knFx9+AQqnZfG62lEh+34nfcyC5izn+7zLwQ0XrNvkwkxKmGfhWjXfPuUS7FoYOYzWHQ+
-	xcqZi4ofPahjA2h0AsPkIgxSAEl4BOc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1700045613;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nJlTjVsKvqAx1MhYNThg4ZiwuUl92g9J7t21qFU454A=;
-	b=SCWWF6CPFX72r/CoFBBnQaHOQAL8xvDdECHe00FWN9sFGmC8nYTMlZZktjXVlj10QxiKhi
-	tUJMQD0aZgepvDCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7C73313587;
-	Wed, 15 Nov 2023 10:53:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id cKXAHC2jVGULXgAAMHmgww
-	(envelope-from <jdelvare@suse.de>); Wed, 15 Nov 2023 10:53:33 +0000
-Date: Wed, 15 Nov 2023 11:53:31 +0100
-From: Jean Delvare <jdelvare@suse.de>
-To: Keguang Zhang <keguang.zhang@gmail.com>
-Cc: linux-mips@vger.kernel.org, netdev@vger.kernel.org, LKML 
- <linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
-Subject: [PATCH v2] stmmac: dwmac-loongson: Add architecture dependency
-Message-ID: <20231115115331.19eb0c24@endymion.delvare>
-Organization: SUSE Linux
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.34; x86_64-suse-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAA0125D5
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 11:08:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 659B092
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 03:08:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700046511;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=30YlxcbouoHUqbszSietM15X2VzsRmxEM5Z6VzVk+yg=;
+	b=hu/bNW6/3vyAHjwBIUmADTmarsYKaL0BcL/g/tetEtgEq6YwSgME7EzDbJ9zBO4sGpwqcg
+	BHxgJl1WVpLW0EoDCqkgZ/O9b2MfEQwFArs49k8R6q3YBTDZPibsSOShjNRDlcCb5KuSfE
+	EsJ3DLxvFHTG/h5okMMHZ4veEfoGtlM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-183-0JQg3GapOrCjtldwSKY4Og-1; Wed, 15 Nov 2023 06:08:30 -0500
+X-MC-Unique: 0JQg3GapOrCjtldwSKY4Og-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-9c983b42c3bso91560266b.1
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 03:08:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700046509; x=1700651309;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=30YlxcbouoHUqbszSietM15X2VzsRmxEM5Z6VzVk+yg=;
+        b=viHbSHTuPwqTh0aDZCNReGVCSkqNyUm3yZC2TnILbKAVxY85oEV4S84t38TaKYBxVy
+         4io4ZrI8CO0znj/L0FWBMDfaaUufDgfNwcfOLeq/KsIlG2pW9uveduk2XsGnRiMHWGpW
+         duLomeMWzsO1MkIlXt5MgD4wlIkdlQ877l+c3T6dEZR+6/HZ6M5ZVayt3nQ67mxIoOIz
+         qS+4A0EpeHsr/yM6vWbc2Fb+JdNOnlCfvsV5L5xJuL/rkl2/kHTU5LXwXF9FaA9CFQ9T
+         UW293MDhaLOfPt6Z1vQD7pRxxpbzG4teSEEOxdyqriwALuynIF0t1gUh9VutvHMpwHdo
+         CMZA==
+X-Gm-Message-State: AOJu0YybUTFoe5pcXZO05nyGg7Es+ijppXK329FKVkaICRmLwoC+skTD
+	GuXqOQiZieEEPjgg4twfNxnCzMzkjW53/rZp/eFVwqNurfJSnmAYjA4lEAjROipDAY6omzbSpJm
+	vnPxjO0NAQkvbEOOQ
+X-Received: by 2002:a17:906:66d9:b0:9e6:2c5a:450a with SMTP id k25-20020a17090666d900b009e62c5a450amr4490045ejp.26.1700046509091;
+        Wed, 15 Nov 2023 03:08:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHve6gIrQ6JWmFSezcPN9+P/sMdMQNqa9BHvI8TeelpKxEVC6UBoL04CyyICjC7dN059GHFfA==
+X-Received: by 2002:a17:906:66d9:b0:9e6:2c5a:450a with SMTP id k25-20020a17090666d900b009e62c5a450amr4490025ejp.26.1700046508757;
+        Wed, 15 Nov 2023 03:08:28 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-199.retail.telecomitalia.it. [79.46.200.199])
+        by smtp.gmail.com with ESMTPSA id v6-20020a056402174600b00530a9488623sm6410463edx.46.2023.11.15.03.08.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 03:08:28 -0800 (PST)
+Date: Wed, 15 Nov 2023 12:08:23 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 0/2] send credit update during setting SO_RCVLOWAT
+Message-ID: <fqhgsbepjwftqmpv6xn7oqizdgmp25ri66seiewiikreglmmsd@uyouhusmjtby>
+References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -4.39
-X-Spamd-Result: default: False [-4.39 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-3.00)[-1.000];
-	 RCPT_COUNT_FIVE(0.00)[5];
-	 HAS_ORG_HEADER(0.00)[];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-1.00)[-1.000];
-	 FREEMAIL_TO(0.00)[gmail.com];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.29)[74.63%]
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
 
-Only present the DWMAC_LOONGSON option on architectures where it can
-actually be used.
+On Wed, Nov 08, 2023 at 10:20:02AM +0300, Arseniy Krasnov wrote:
+>Hello,
+>
+>                               DESCRIPTION
+>
+>This patchset fixes old problem with hungup of both rx/tx sides and adds
+>test for it. This happens due to non-default SO_RCVLOWAT value and
+>deferred credit update in virtio/vsock. Link to previous old patchset:
+>https://lore.kernel.org/netdev/39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru/
+>
+>Here is what happens step by step:
+>
+>                                  TEST
+>
+>                            INITIAL CONDITIONS
+>
+>1) Vsock buffer size is 128KB.
+>2) Maximum packet size is also 64KB as defined in header (yes it is
+>   hardcoded, just to remind about that value).
+>3) SO_RCVLOWAT is default, e.g. 1 byte.
+>
+>
+>                                 STEPS
+>
+>            SENDER                              RECEIVER
+>1) sends 128KB + 1 byte in a
+>   single buffer. 128KB will
+>   be sent, but for 1 byte
+>   sender will wait for free
+>   space at peer. Sender goes
+>   to sleep.
+>
+>
+>2)                                     reads 64KB, credit update not sent
+>3)                                     sets SO_RCVLOWAT to 64KB + 1
+>4)                                     poll() -> wait forever, there is
+>                                       only 64KB available to read.
+>
+>So in step 4) receiver also goes to sleep, waiting for enough data or
+>connection shutdown message from the sender. Idea to fix it is that rx
+>kicks tx side to continue transmission (and may be close connection)
+>when rx changes number of bytes to be woken up (e.g. SO_RCVLOWAT) and
+>this value is bigger than number of available bytes to read.
+>
+>I've added small test for this, but not sure as it uses hardcoded value
 
-This follows the same logic as the DWMAC_INTEL option.
+Thanks for adding the test!
 
-Signed-off-by: Jean Delvare <jdelvare@suse.de>
-Cc: Keguang Zhang <keguang.zhang@gmail.com>
----
-Changes since v1:
-* Enable build testing (suggested by Simon Horman)
+>for maximum packet length, this value is defined in kernel header and
+>used to control deferred credit update. And as this is not available to
+>userspace, I can't control test parameters correctly (if one day this
+>define will be changed - test may become useless).
 
- drivers/net/ethernet/stmicro/stmmac/Kconfig |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I see, I'll leave a comment in the patch!
 
---- linux-6.6.orig/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ linux-6.6/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -269,7 +269,7 @@ config DWMAC_INTEL
- config DWMAC_LOONGSON
- 	tristate "Loongson PCI DWMAC support"
- 	default MACH_LOONGSON64
--	depends on STMMAC_ETH && PCI
-+	depends on (MACH_LOONGSON64 || COMPILE_TEST) && STMMAC_ETH && PCI
- 	depends on COMMON_CLK
- 	help
- 	  This selects the LOONGSON PCI bus support for the stmmac driver,
+Thanks,
+Stefano
 
+>
+>Head for this patchset is:
+>https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=ff269e2cd5adce4ae14f883fc9c8803bc43ee1e9
+>
+>Arseniy Krasnov (2):
+>  virtio/vsock: send credit update during setting SO_RCVLOWAT
+>  vsock/test: SO_RCVLOWAT + deferred credit update test
+>
+> drivers/vhost/vsock.c                   |   2 +
+> include/linux/virtio_vsock.h            |   1 +
+> net/vmw_vsock/virtio_transport.c        |   2 +
+> net/vmw_vsock/virtio_transport_common.c |  31 ++++++
+> net/vmw_vsock/vsock_loopback.c          |   2 +
+> tools/testing/vsock/vsock_test.c        | 131 ++++++++++++++++++++++++
+> 6 files changed, 169 insertions(+)
+>
+>-- 
+>2.25.1
+>
 
--- 
-Jean Delvare
-SUSE L3 Support
 
