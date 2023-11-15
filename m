@@ -1,452 +1,169 @@
-Return-Path: <netdev+bounces-48058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9449E7EC608
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:43:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A8C7EC648
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:49:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B5EF1F278B9
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:43:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05D43B20A88
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA6F3EA94;
-	Wed, 15 Nov 2023 14:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8B617743;
+	Wed, 15 Nov 2023 14:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mMf/1O3A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NU+bZ67r"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D50E3BB28;
-	Wed, 15 Nov 2023 14:41:19 +0000 (UTC)
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFD1171F;
-	Wed, 15 Nov 2023 06:41:01 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPA id 492FEFF820;
-	Wed, 15 Nov 2023 14:40:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700059260;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A273EA7A
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:49:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E789B187
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:49:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700059763;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7Ysg7h1PUHm7UOv27Tdv/l4knAulSkq2gkBV+9dzYtw=;
-	b=mMf/1O3ArtQzW3/JIXnGnCAFSFNxtq5ZzU4oiqOzcGKc/QAGt9QQgjc9IsvS3C/TDqgLkd
-	wyILROSDd1t4ie86mHYQnc23BGxy0EhuK+IfGkAl3kFkmWuF/bjim++fS+rzi7GfyBNeTv
-	S3g7FzfUee3LonFuzCsVSG+Ey6dAPb9JnN8LF1JclYxGyvdoXQGvmgy+4KX8iyBrbWiPZD
-	QCixosIrWm/5Mjos5cKJuEbBGTX+vpuAEYoT5QPztmQEtVsry4JGg6o35ctgqhfIkhmgVC
-	0hgrVRkI1GlK1pSetMlaHYEDNYX/CVp7tMYDmivcqwmhArHVVNjKv0uPf+DrIg==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>,
-	Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>,
-	Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v9 27/27] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Wed, 15 Nov 2023 15:40:03 +0100
-Message-ID: <20231115144007.478111-28-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231115144007.478111-1-herve.codina@bootlin.com>
-References: <20231115144007.478111-1-herve.codina@bootlin.com>
+	bh=zHkzs+ps70Z5GXuD30h9mGNv1mAJncdsZa6jleaf8rI=;
+	b=NU+bZ67rLJ+cTxjEAD8frMuXZPg3qhZyv8qJOQO3jNCERtbes1N1wORNFYimjXJBEGyNTW
+	mkE5byR/pHPEyJFOdLaVNxTNC6uN9d3Bua1GFGphZtCbjldh1xeSqzLERNAc2/pzw0xChi
+	FhBZ/D0b27744ExwMc4r7JSzLhKQZxo=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-662-8T2unkjGNQmHI7np0fOEag-1; Wed, 15 Nov 2023 09:49:19 -0500
+X-MC-Unique: 8T2unkjGNQmHI7np0fOEag-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c39f53775fso52345966b.1
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:49:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700059758; x=1700664558;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zHkzs+ps70Z5GXuD30h9mGNv1mAJncdsZa6jleaf8rI=;
+        b=QHKdfdjvtps3kGbdgiCcGBP0+RwCW80HaZKGxaHUw+PTnEtbx8qe/bEci1tAe97yam
+         jfCq8/cY02wSabcTlPamJ3Wi9A6XcxTyNh7+w2ugXddkmbmYvmgu93pwlB1r0dAHOHEC
+         wqwVhf9TzF8THouf/sOcRD6g47SDUajmB0YgIsnU72O0icrtfIKJ388fKnr0+JNOv1rK
+         K3meTZ1UGFpyXqt5Za4hLgrDaCYCU5k1uZlGE4MuQCbyxkrlZAJbRnob1d8K26sWlzC9
+         1rd2SnnSY5P3FxLNrA/KFeoASSb139eaqJ9yY0e3AD4PH/hUi6FJzrUVTuVa4t0gWRQO
+         thjg==
+X-Gm-Message-State: AOJu0YyhEE6cbGLy95rYm9e1cs79c90rcZ+Q2oHouHkWGEQI/DNILrG+
+	2e1af8eEuJdc5TlfrOv4xSxnQ1r5i6Zl5kpmFeaOVleVkp+L/jn9vY14ClkKSEddgRUAaajITNa
+	JB+XF8JpExP89vD8G
+X-Received: by 2002:a17:906:74c7:b0:9c4:4b20:44a5 with SMTP id z7-20020a17090674c700b009c44b2044a5mr3818320ejl.4.1700059758552;
+        Wed, 15 Nov 2023 06:49:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHvgKtKBhigODP4vMAdyOAfLJaUmOSX75yR/hH8B496MgTOteUFPLgPY9ZiDpnInT3OHyNX5w==
+X-Received: by 2002:a17:906:74c7:b0:9c4:4b20:44a5 with SMTP id z7-20020a17090674c700b009c44b2044a5mr3818307ejl.4.1700059758184;
+        Wed, 15 Nov 2023 06:49:18 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-232-35.dyn.eolo.it. [146.241.232.35])
+        by smtp.gmail.com with ESMTPSA id y10-20020a1709064b0a00b009dd7bc622fbsm7149455eju.113.2023.11.15.06.49.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 06:49:17 -0800 (PST)
+Message-ID: <d599922fd89b3e61c7cf531a03ea8b81cbcb003e.camel@redhat.com>
+Subject: Re: [PATCH net-next v2] netlink: introduce netlink poll to resolve
+ fast return issue
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jong eon Park <jongeon.park@samsung.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dongha7.kang@samsung.com
+Date: Wed, 15 Nov 2023 15:49:16 +0100
+In-Reply-To: <20231114090748.694646-1-jongeon.park@samsung.com>
+References: 
+	<CGME20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b@epcas1p3.samsung.com>
+	 <20231114090748.694646-1-jongeon.park@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
+Hi,
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 235 insertions(+), 4 deletions(-)
+I'm sorry for the delayed feedback.
 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 82019cd96365..9bfb506a90cd 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -27,6 +28,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -40,6 +44,195 @@ static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	unsigned long flags;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	spin_lock_irqsave(&qmc_hdlc->carrier_lock, flags);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto end;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+end:
-+	spin_unlock_irqrestore(&qmc_hdlc->carrier_lock, flags);
-+	return ret;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
-@@ -313,6 +506,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -320,11 +519,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -334,6 +538,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -367,10 +576,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -420,6 +636,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -455,6 +673,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -503,6 +722,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = &pdev->dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(qmc_hdlc->dev, np);
- 	if (IS_ERR(qmc_hdlc->qmc_chan)) {
-@@ -531,10 +751,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(qmc_hdlc->dev, "fsl,framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
- 	if (!qmc_hdlc->netdev) {
- 		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto framer_exit;
- 	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
-@@ -550,11 +779,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -564,6 +794,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
--- 
-2.41.0
+On Tue, 2023-11-14 at 18:07 +0900, Jong eon Park wrote:
+> In very rare cases, there was an issue where a user's 'poll' function
+> waiting for a uevent would continuously return very quickly, causing
+> excessive CPU usage due to the following scenario.
+>=20
+> When sk_rmem_alloc exceeds sk_rcvbuf, netlink_broadcast_deliver returns a=
+n
+> error and netlink_overrun is called. However, if netlink_overrun was
+> called in a context just before a another context returns from the 'poll'
+> and 'recv' is invoked, emptying the rcv queue, sk->sk_err =3D ENOBUF is
+> written to the netlink socket belatedly and it enters the
+> NETLINK_S_CONGESTED state. If the user does not check for POLLERR, they
+> cannot consume and clean sk_err and repeatedly enter the situation where
+> they call 'poll' again but return immediately. Moreover, in this
+> situation, rcv queue is already empty and NETLINK_S_CONGESTED flag
+> prevents any more incoming packets. This makes it impossible for the user
+> to call 'recv'.
+>=20
+> This "congested" situation is a bit ambiguous. The queue is empty, yet
+> 'congested' remains. This means kernel can no longer deliver uevents
+> despite the empty queue, and it lead to the persistent 'congested' status=
+.
+>=20
+> ------------CPU1 (kernel)----------  --------------CPU2 (app)------------=
+--
+> ...
+> a driver delivers uevent.            poll was waiting for schedule.
+> a driver delivers uevent.
+> a driver delivers uevent.
+> ...
+> 1) netlink_broadcast_deliver fails.
+> (sk_rmem_alloc > sk_rcvbuf)
+>                                       getting schedule and poll returns,
+>                                       and the app calls recv.
+>                                       (rcv queue is empied)
+>                                       2)
+>=20
+> netlink_overrun is called.
+> (NETLINK_S_CONGESTED flag is set,
+> ENOBUF is written in sk_err and,
+> wake up poll.)
+>                                       finishing its job and call poll.
+>                                       poll returns POLLERR.
+>=20
+>                                       (the app doesn't have POLLERR handl=
+er)
+>                                       it calls poll, but getting POLLERR.
+>                                       it calls poll, but getting POLLERR.
+>                                       it calls poll, but getting POLLERR.
+>                                       ...
+>=20
+> To address this issue, I would like to introduce the following netlink
+> poll.
+
+IMHO the above is an application bug, and should not be addressed in
+the kernel.
+
+If you want to limit the amount of CPU time your application could use,
+you have to resort to process scheduler setting and/or container
+limits: nothing could prevent a [buggy?] application from doing:
+
+# in shell script
+while true; do :; done
+
+The above condition is IMHO not very different from the above: the
+application is requesting POLLERR event and not processing them.
+
+To more accurate is like looping on poll() getting read event without
+reading any data. Nothing we should address in the kernel.
+
+Cheers,
+
+Paolo
 
 
