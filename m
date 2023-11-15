@@ -1,127 +1,154 @@
-Return-Path: <netdev+bounces-48098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5185B7EC835
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:12:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D12F7EC840
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:14:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C217280E4A
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:12:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A97EAB20B33
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0058E31759;
-	Wed, 15 Nov 2023 16:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7591931756;
+	Wed, 15 Nov 2023 16:14:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="h1/7xNMi"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="p633r7Bx"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62F23174F
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:12:40 +0000 (UTC)
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB1E1A5
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:12:36 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-9becde9ea7bso210223266b.0
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:12:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FF031755
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:14:10 +0000 (UTC)
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E72CC
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:14:09 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1cc3216b2a1so55156865ad.2
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:14:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1700064755; x=1700669555; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1ab4jnXj8Bjx21zU5WbouPNL4gj/h303kBNvkdQgDmY=;
-        b=h1/7xNMieJaAuf/jrXyUHehG13wEAiqZ5f8n7rRqeSoXwyqJpaPyqF+CWZ/Du51dXz
-         CtnC9ol4Qoa7nTY0AuL3KV6vgQ/KOXXm2rSmEbhZIvpWCi0UG4/xsKK1XUBKU7d7DbZX
-         OcRybgUOO5+gFWl/SjNuiPdfh+qS31MXFAvjI=
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700064848; x=1700669648; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JTCjyeTH3cX9fhqDGQ0kYumqDVFAGEVz5sOZJI6Fmmc=;
+        b=p633r7BxseyXEyYD4g+qS7QQi0R67eFeUmiOAu0p7BZ9CzVKvgz8sO+tWhpEHPWZAn
+         5kMcz+oDzhi+/oFiBQxk53GEaPwqpOERWVk/eRaQWOX3X6CRdtujVJUXS1SzyB+XzTUz
+         TP/7KhhPG7ln2CJoFtgc6stjvCoQ+TNgWhI3IxHHjlCZHEYLTvcIgGxoh2oPqc61cqi6
+         24yrBHlFd4mj36eRzDAPzqUfGbd6t7hlxHvnNMYRsbOLzbG3DX9uz9rYJ9BUdHQOK1Pm
+         ceodcXIu3+lFetPgGnb/HXpUcOnLPpKmYlgVel9lj0N/5gHSmoCE3w0f7/7ewVgp3N9s
+         iqVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700064755; x=1700669555;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1ab4jnXj8Bjx21zU5WbouPNL4gj/h303kBNvkdQgDmY=;
-        b=QeIIpWKlSqWA9nsXGrL/S5NT9/TGKX1WRpA9zTSWMG4j0q7A3asq1ZnmYWbdncXJSc
-         D/zwJTBl8IURc/4nBXEop3omzqJmjTf1ERKoKUoeALlxxUiJXHZh//x/4uHDrZu5YV85
-         AHqtWracYLq4E31n7iiEaAHN6fvnlbqDXej55Yq8pSUBA7magOJw87btBX6Vsmr5hbdN
-         12thSH0/ALFxHOLJXiL/pLYokZcXnhg8q6KF97MHVaAq98lq2HkTUPN1E3yOD6zfrt1A
-         UHPqmcpVUkIURL4zwyCsA2vK2LitdehBlt4NZ+D1K+Dj1NSCMM6v/1phPfn6/ERGnqR7
-         nFKA==
-X-Gm-Message-State: AOJu0YwKetJvj6Kvi6n2iKX8aaXCoZ0lS/VHoXwoSTQRfumRVlX5lpK5
-	uvuZZMAQqcpbOMj4g/nqPpiJ8m1Ndm3ty4/M7sJi3WXS
-X-Google-Smtp-Source: AGHT+IG2CtwXskCnfS5Ee9/ysXasbkjc5A4etpiJytSrG8Gj+MlvWbEkODgPQ+LFFSYOY9bhdR1Arg==
-X-Received: by 2002:a17:907:3f27:b0:9f4:1bd6:2d26 with SMTP id hq39-20020a1709073f2700b009f41bd62d26mr1057380ejc.0.1700064754819;
-        Wed, 15 Nov 2023 08:12:34 -0800 (PST)
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com. [209.85.208.50])
-        by smtp.gmail.com with ESMTPSA id h18-20020a1709063b5200b009adc81bb544sm7255987ejf.106.2023.11.15.08.12.34
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 08:12:34 -0800 (PST)
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-540c54944c4so2072905a12.1
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:12:34 -0800 (PST)
-X-Received: by 2002:aa7:da07:0:b0:542:ff1b:6c7a with SMTP id
- r7-20020aa7da07000000b00542ff1b6c7amr5958727eds.9.1700064753769; Wed, 15 Nov
- 2023 08:12:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700064848; x=1700669648;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JTCjyeTH3cX9fhqDGQ0kYumqDVFAGEVz5sOZJI6Fmmc=;
+        b=D6OPg8IiTH2Sh1vzNBoP/IaurRwSXyX7CwEijDSylhZ9719ePOH7cvIH+b7W++3XOG
+         5JDiI+isEOroilgTEqw0auOe5DOW1x4XdXObuTk9miTt7Z+51oim9L5UdJLGl/naU2SX
+         Q8jml7Xx/Xyb8YpeCZNizJrgPIsFbZhOTC+55LOUxrH8M9FXdHEUSKJ1m1CmD5lah68K
+         5ggKWRRkGwu1fODrYE6cRzIQ0UFyexV5V+kPOkvxLISZDbfim2ZP22z94O4mF9l+7OFI
+         N0MP845PschbxBHOfKuBaXV/qNIyVtrRUfR0W+bd4pM6TOAANNhROPCzzObj8DIOrjKo
+         xD8Q==
+X-Gm-Message-State: AOJu0Yyrr21E9FW3EVCpry5JLAI9cvRsPYMWZcGsbY3NFIpBvDQkY0w2
+	nc6ls2LK9vUgh69EdwwLwW8lOw==
+X-Google-Smtp-Source: AGHT+IFPxVuantrSxAcCvMlrCYYrRgIhtNjOf+BcgTmeK5U97bC0eKioUiPx7iEOm5vGs5yo7yxYQw==
+X-Received: by 2002:a17:902:8c96:b0:1cc:47d5:b761 with SMTP id t22-20020a1709028c9600b001cc47d5b761mr5496398plo.35.1700064848428;
+        Wed, 15 Nov 2023 08:14:08 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id j9-20020a170903024900b001b8b1f6619asm7600557plh.75.2023.11.15.08.14.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 08:14:08 -0800 (PST)
+Date: Wed, 15 Nov 2023 08:14:06 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Long Li <longli@microsoft.com>, "longli@linuxonhyperv.com"
+ <longli@linuxonhyperv.com>, KY Srinivasan <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v4] hv_netvsc: Mark VF as slave before exposing
+ it to user-mode
+Message-ID: <20231115081406.1bd9a4ed@hermes.local>
+In-Reply-To: <20231110120513.45ed505c@kernel.org>
+References: <1699484212-24079-1-git-send-email-longli@linuxonhyperv.com>
+	<20231108181318.5360af18@kernel.org>
+	<PH7PR21MB3263EBCF9600EEBD6D962B6ECEAEA@PH7PR21MB3263.namprd21.prod.outlook.com>
+	<20231110120513.45ed505c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231115154946.3933808-1-dhowells@redhat.com> <20231115154946.3933808-6-dhowells@redhat.com>
-In-Reply-To: <20231115154946.3933808-6-dhowells@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Wed, 15 Nov 2023 11:12:17 -0500
-X-Gmail-Original-Message-ID: <CAHk-=wgHciqm3iaq6hhtP64+Zsca6Y6z5UfzHzjfhUhA=jP0zA@mail.gmail.com>
-Message-ID: <CAHk-=wgHciqm3iaq6hhtP64+Zsca6Y6z5UfzHzjfhUhA=jP0zA@mail.gmail.com>
-Subject: Re: [PATCH v3 05/10] iov_iter: Create a function to prepare userspace
- VM for UBUF/IOVEC tests
-To: David Howells <dhowells@redhat.com>
-Cc: Christian Brauner <christian@brauner.io>, Jens Axboe <axboe@kernel.dk>, 
-	Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>, 
-	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, 
-	Brendan Higgins <brendanhiggins@google.com>, David Gow <davidgow@google.com>, 
-	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Christian Brauner <brauner@kernel.org>, 
-	David Hildenbrand <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, loongarch@lists.linux.dev, linux-s390@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 15 Nov 2023 at 10:50, David Howells <dhowells@redhat.com> wrote:
->
-> This requires access to otherwise unexported core symbols: mm_alloc(),
-> vm_area_alloc(), insert_vm_struct() arch_pick_mmap_layout() and
-> anon_inode_getfile_secure(), which I've exported _GPL.
->
-> [?] Would it be better if this were done in core and not in a module?
+On Fri, 10 Nov 2023 12:05:13 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-I'm not going to take this, even if it were to be sent to me through Christian.
+> On Fri, 10 Nov 2023 00:43:55 +0000 Long Li wrote:
+> > The code above needs to work with and without netvsc (the possible
+> > master device) present.  
+> 
+> I don't think that's a reasonable requirement for the kernel code.
+> 
+> The auto-bonding already puts the kernel into business of guessing
+> policy, which frankly we shouldn't be in.
+> 
+> Having the kernel guess even harder that there will be a master,
+> but it's not there yet, is not reasonable.
+> 
 
-I think the exports really show that this shouldn't be done. And yes,
-doing it in core would avoid the exports, but would be even worse.
+I wrote the netvsc automatic VF code almost six years ago.
+So let me give a little history. The original support of VF's was
+done by using a bonding device and script. Haiyang worked hard
+to get to work but it could not work on many distro's and had
+lots of races and problems.
 
-Those functions exist for setting up user space. You should be doing
-this in user space.
+Jakub is right that in an ideal world, this could all be managed by
+userspace. But the management of network devices in Linux is a
+dumpster fire! Every distro invents there own solution, last time
+I counted there were six different tools claiming to be the
+"one network device manager to rule them all". And that doesn't
+include all the custom scripts and vendor appliances.
 
-I'm getting really fed up with the problems that ther KUnit tests
-cause. We have a long history of self-inflicted pain due to "unit
-testing", where it has caused stupid problems like just overflowing
-the kernel stack etc.
+The users requirements were:
+ - VF networking should work out of the box
+ - VF networking should require no userspace changes
+ - It must work with legacy enterprise distro's
+ - The first network device must show up as eth0 and it must work.
 
-This needs to stop. And this is where I'm putting my foot down. No
-more KUnit tests that make up interfaces - or use interfaces - that
-they have absolutely no place using.
+The Linux ecosystem of userspace but the kernel is a common base.
+It was much easier for Microsoft to tell partners to
+"use these upstream kernel components" and it will work.
+Windows and BSD OS's have a tight binding between kernel and management
+from userspace, therefore it is possible to handle things in userspace.
 
-From a quick look, what you were doing was checking that the patterns
-you set up in user space came through ok. Dammit, what's wrong with
-just using read()/write() on a pipe, or splice, or whatever. It will
-test exactly the same iov_iter thing.
+There are still problems (as Long indicated in the patch) because
+the VF device does appear in the list of network devices. And
+getting the transparent VF support to work in the face of all
+the trash of userspace scripts is hard. Part of the problem is
+that the state model of Linux network devices is fractured and
+poorly documented.
 
-Kernel code should do things that can *only* be done in the kernel.
-This is not it.
+The IFF_SLAVE flag is already used to indicate device is managed
+by another driver. It keeps IPv6 from doing local address assignment
+and existing userspace should be looking at it. The problem was
+that userspace must not see a non-flagged VF device, or it will
+get confused.
 
-              Linus
+Microsoft should have exposed only one device in hardware.
+Other vendors only expose the VF device and hairpin packets any
+pre-processed packets. Part of the problem here is that
+VF firmware needs to be updated (too often) and it is a requirement
+that VM's do not lose connectivity.
+
+Ideally, several things should happen:
+   - Linux should support hiding devices managed by another device
+   - the naming of device roles needs to not be master/slave.
+
+   
 
