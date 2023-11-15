@@ -1,261 +1,158 @@
-Return-Path: <netdev+bounces-48003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48004-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 675F87EC3DF
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:37:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6867EC3E3
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E87FF1F26FB8
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 13:37:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD14F1C204DA
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 13:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638581CABB;
-	Wed, 15 Nov 2023 13:37:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151271C6B0;
+	Wed, 15 Nov 2023 13:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wmuV+qkq"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sACNQd0F"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935961A712
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 13:37:44 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA71130
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 05:37:43 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-da033914f7cso8558949276.0
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 05:37:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700055462; x=1700660262; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d6Y4JZqzeRPDX2aVbkBkG6coIBurA72j+ZY4YIDxfRE=;
-        b=wmuV+qkqrdnFbmYX2kSpnk81iWkHqsK8nFxRcd3UKIUZvpZYBsbQ3aB6LFf2anBEXM
-         vl8yagD+aJrMd69NQCo76xEA4jVUKNnqEYqL4X9Zjn6vggM2ub9nuFGue49qQwPmRefh
-         Wk+H93rJu813EoeYq8DfebpCDIChnrmFewUIydHXJIFOn8cZ3iLw2t+t/alvi/MiX07+
-         h0oQ+WnzrDUL0bwp9bjJPcOC4FjaDqY0SDa/984/R1uO2CtwSK+jWywv/cPmQRqaXW3a
-         Vr9DaoIyj1UbqENbzMOOvum2DQYkPEMnfufOUITPfAd8PMT31ySEBkoFgAjVmwqQQarn
-         P9dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700055462; x=1700660262;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=d6Y4JZqzeRPDX2aVbkBkG6coIBurA72j+ZY4YIDxfRE=;
-        b=hjcPvJFQLv1Dd1nUn7bjoEwco6gk8Vg7SgUu42lPFDG6SblgWDK8j3kQHb+UwKkUjk
-         jsQWH9DZwEHbmopDcQbKpo4GwLgpBk+HqTkbM0/7HAC8vkZ7ZgGn2/rG+7zTrbbPL5uA
-         CNSzgJuDVaCEKRDXLKZXty64H3fI4ZbzxDsGgBvDs0kAG/+lMIaCD1+IQ6LYrQK/B3P5
-         0L5NWVQIP++Vuza8lSYn7FFTOqArIIdJs9GQH0+ICBbBT2XTsgkv5asTxUp5LYed2YGY
-         NURxdKjOhkBAyjGMthBarlsK35n5K8loW+o/trCSexA1UTt39214yoaKZDmACrfdm3zt
-         7vOA==
-X-Gm-Message-State: AOJu0YxTAXqMWrW04A5cH7nUpDZ/IvSwUGusmhG+fr7Mo05SK/p/9lq4
-	cOE97PN0/xPGjd75dD4MxUZnP0c=
-X-Google-Smtp-Source: AGHT+IHudoqLVI+ZRIzobBV2wzVqa7iNw3w1qgcY/yY8PMGboMHuHX0E+irz3yJhKzVAY4RZXtLi2KI=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:8912:0:b0:d9a:fd29:4fe6 with SMTP id
- e18-20020a258912000000b00d9afd294fe6mr332664ybl.3.1700055462314; Wed, 15 Nov
- 2023 05:37:42 -0800 (PST)
-Date: Wed, 15 Nov 2023 05:37:40 -0800
-In-Reply-To: <be6186c1-52ee-42aa-b53c-39781af3a1ec@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F16E18636
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 13:38:32 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2065.outbound.protection.outlook.com [40.107.95.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20E82A1;
+	Wed, 15 Nov 2023 05:38:31 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DAgUjqgAXicER97FYG8d5JB+fwRKMrWqt+B8oI/yzqZgxkKtgrJDlpqRUQmFz3TCRt2b7+E2KquP4vv1IsPQu8X2LHXXec1OUEWJoWtVLDoAIpP7koU+5dVzcadg+k/P46tdJ4Wj3UCMNHy2NLXvi2VeWEUv2EcJPXjRyMC6+eLQQ0Fcqq6hLTc5rEf9kLV7VTi9dwaalBgb77PnlQ/7207amUyZ+1bRsx7lz5sA9Ebl5k/0Zi7wDqj+3Ffx3rIIXbRCtbAwsPanY99XInUD+cACtkjxYGH6rdbGYTNA5e2/HeCHB1Z/7usAPXFeCTyOR+bJLXa1Dg+BLlclZMXwyA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vDlxjag/87aD/QrHHf9WZad2TsFXihDcbl7CHppPvts=;
+ b=hGT/VJoZ8rxJ62Ul64MjJBh8lhoMjPF2p7axGa2xfNHlrdfsb+qwI/hNWDJFOnhVMjnk38ZWw8qm953PoqboIyzqp6SmiPUWVnOEgmuo+ZPZMteQ6n2Hnu59ihteY1R//YLXdO6QKeNQyGsDwkfricO6/HtG65BHNP5odvteJL7eOygRzLC/KC/SYFolD/yOXOYj3Voo52xg6tZqsMHBtNeiNuB8oTRtD//hyLJIiMLP2z7v2t8mrnSkylMVa2Gx6cIOypB4NseJrW/SVPKw5Nr/d6mWEA5EuiEbXwjLPqelfc8MUnbcq9sW0EKYDx/Trj1YeyJ/8MTJNa4WMvKCoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vDlxjag/87aD/QrHHf9WZad2TsFXihDcbl7CHppPvts=;
+ b=sACNQd0FG8WwPWmhx29IJInQvcekbp6lqkHJp3iEa5uaoa7QmA66QmUmrCSxi2cURODJVWUvewEcyVTKCef6oLSq/UuXgJnYWmu5tgqbsXsRIfQxKbhAHzg2q9Lx2Lkpag+Y6eXPD2DWznPAgcqOGlLAWae/wDMWF/hB19kivC2DujirEyvF3urMvfZkqRPS0Me2ZrjSPyQbNLbNXoL48YyFFVhhfxoQQ7lgUuDrqJw6n3mVx8+/SSxW/HicoAGWucSHk3rNy2D/wbYAN7VGAUwLv89SssTXc64NIfndktv1/uXjoZH9E9dpJQULPZy8v9lH6MRQ7bFnCjf5hth6Aw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7682.namprd12.prod.outlook.com (2603:10b6:930:85::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Wed, 15 Nov
+ 2023 13:38:28 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.6977.029; Wed, 15 Nov 2023
+ 13:38:28 +0000
+Date: Wed, 15 Nov 2023 09:38:27 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Matthew Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
+Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+Message-ID: <ZVTJ0/lm1oUDzzHe@nvidia.com>
+References: <20231113130041.58124-1-linyunsheng@huawei.com>
+ <20231113130041.58124-4-linyunsheng@huawei.com>
+ <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+ <20231113180554.1d1c6b1a@kernel.org>
+ <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+ <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
+ <ZVNzS2EA4zQRwIQ7@nvidia.com>
+ <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
+X-ClientProxiedBy: BLAPR03CA0114.namprd03.prod.outlook.com
+ (2603:10b6:208:32a::29) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231102225837.1141915-1-sdf@google.com> <20231102225837.1141915-3-sdf@google.com>
- <c9bfe356-1942-4e49-b025-115faeec39dd@kernel.org> <CAKH8qBtiv8ArtbbMW9+c75y+NfkX-Tk-rcPuHBVdKDMmmFdtdA@mail.gmail.com>
- <2ed17b27-f211-4f58-95b5-5a71914264f3@kernel.org> <ZVJWuB4qtWfC-W_h@google.com>
- <be6186c1-52ee-42aa-b53c-39781af3a1ec@kernel.org>
-Message-ID: <ZVTJpLoSCaLoBa67@google.com>
-Subject: Re: [PATCH bpf-next v5 02/13] xsk: Add TX timestamp and TX checksum
- offload support
-From: Stanislav Fomichev <sdf@google.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, yoong.siang.song@intel.com, 
-	netdev@vger.kernel.org, xdp-hints@xdp-project.net
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7682:EE_
+X-MS-Office365-Filtering-Correlation-Id: e7a3696e-b06d-40b6-94a8-08dbe5e0267d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yq/PvE1A+j+s/u3IPHl0FVqfDuCmdnMGxqPBAEiMAuMo3ahYf+r9G/fIAAljA1LG2qPfJVbNfLXuvb2cg/tvZ/F7/fYNgRt7ACu9hBbzRPPBXnKPBoJbnA3kNSCuiqxKCN0K0Goku/2wmvc6XkbTBajk+hhGA+4QPcalK+TQ90SEqWhclewRPLWmnaz0f9HTkmSROVJk1wVSXLw7rlAFqZNQZ+zlfL38KYhgEFLzAMvPi+/vAbqVu9RueNTDQuSEfF5wNbgDrokM/v6hQV7Z3JZqnZ52suKl0nhJV5zDJ9l3+VS9T3J+5K6oXrwZybBisG5j54j1QsAr+iyUWGLRNo7Wx6PLySfvcEj953B6fB6ohvQq/JNg6v2kyX6jOHzrE3eTkuX0xEsx7sJHy1to2gPYWeWaMYB4j60BK9Z00Vf1HurqC2gOGdTrAY2hxU/up7Ro3Q47+IuSbYbWBH5MVMpPI473nraBsoOH84x9ZP7PrKVvTFcAAW+PA2HhRxRfNKNNvmcCfaQ/+XffoLpbxQ+OwscoJKoKxQ66YJinjJ0hTJOnpiLGr/TqezvD+5wz
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(39860400002)(346002)(376002)(396003)(136003)(230922051799003)(186009)(451199024)(1800799009)(64100799003)(6506007)(38100700002)(2616005)(6512007)(7416002)(4744005)(41300700001)(2906002)(5660300002)(86362001)(36756003)(8676002)(4326008)(8936002)(66476007)(66556008)(66946007)(54906003)(6916009)(316002)(26005)(6486002)(478600001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XRZwmAGl8b4yNfwhKI4jXvnOtJ0cIcruefraNBCPVMjTjQwsbPcz9QSLROln?=
+ =?us-ascii?Q?b2TRWjYo4Qt2Mqijptb7f5vo6q9mP5QqEOCgz2+9n4OhLvGKOGITWKOMOasx?=
+ =?us-ascii?Q?CcEjuEzXS9BWB+uBxyIXrp16FJjTQ6d4wBrmjPCzQyRGa63ooxcY3JB5r0mG?=
+ =?us-ascii?Q?FjCZMTkq3NgFSWBm6ToJwHomOLMLw5dc+T5VhSnVXrBnl94OGgaQtZrOQQE1?=
+ =?us-ascii?Q?NP4WT/gl/abP9JF0iX6Sya4/zPNuXp+LDTUnl6ataSZ3Uo/+g8OU74Ii18zG?=
+ =?us-ascii?Q?tJFnyC/XgxESM0TWI4/KuMsWTJjHYLq3K+D84ZmeL3ZxA4GUQcaKiGu709Ds?=
+ =?us-ascii?Q?6tJrhNBb2Q842TiKMqCKvQ3KQB30s9xcJtklAIQAIvuccCV3t0W17fJQl+2j?=
+ =?us-ascii?Q?/yuDs+E9HIUyr93IlZ8keGD/YBbWo1cQ9X1vlJ/2oM67ScPkdZttwUYcgVug?=
+ =?us-ascii?Q?vL77Og2JIdfJf9e8ScS1FilnfNzEN67FnjLBG8Hxv8u5cLDspUWeCmKa0eyZ?=
+ =?us-ascii?Q?za3mSS4A6Gf2XoA2U+o869ku3P04MKmi58z6o4LWQeJbDyTml7J12Y/+CSSZ?=
+ =?us-ascii?Q?rxnL4PEWdiPUAoSgXInF4OvdLT4ePu1dgCyr1sDAS/lNu33xv0aaSG4YyARm?=
+ =?us-ascii?Q?+A2HOdwfGjFD6b5ZVB+Jk6S57u1jeyKrjM4KyIAFrJ6dRQ14MB8FA+nYLpxA?=
+ =?us-ascii?Q?Hm7BQHZ2DPVvQM8Vb7REhSIQ2BTzE87lIS7xoIAXicSVj5aIySruR0YC2c/5?=
+ =?us-ascii?Q?WFZZIXmpxU/rJiDIIx4h0u2Yz6zeLe4mZCWjvy7vq0vwsNA5kQVMWFzEIb9a?=
+ =?us-ascii?Q?NdY7+VmMp6FQ+/W6ZaNDQbL8R/uZWrq36jHBEb4Xm+KGeSKRsYXd2W3tvecl?=
+ =?us-ascii?Q?KL27704XaEXIlFZU1k4BJq1FyJZ7tPr2i0TZduvSVqoqW9SEiK8W7k49yZ6C?=
+ =?us-ascii?Q?nu3/Gmh1bO38H5Phu20U4yGZhTw+shDj/ZdmHGDIwXSJa5gEtgBtuftwjQJW?=
+ =?us-ascii?Q?GP70ewp1EdF5d42HlaapXM5PC5EBFQ+lp69zlRqzR97jwSssbf7akuY9hp8S?=
+ =?us-ascii?Q?aCeHZXb+5CDL13iUE/ntYOnKm1ASQRkGY9Uk5B6P6rqUR48/VeU5K/RW8YgY?=
+ =?us-ascii?Q?/802NDa+EQcWSTJ2S5am2eO8a0Hgx2SfTwCSiBMETBx2OgvGYfwCbmHk3pyj?=
+ =?us-ascii?Q?Zuip7yUxp7DclqeOG/L47B97h8lxFg7E10FTiqqMHxOHyCQCDZLZR8jpNF1t?=
+ =?us-ascii?Q?uheLyzXSny+SqwnVE3d/+4BP/xazjNmugieB3wBweiM7EyeUN7prc7BVAY1Y?=
+ =?us-ascii?Q?Pb9uRksNb5fQG0gTqKTRKxJisPfD2lQRH3q/jAFcYw/sb63gUoScDRLnC20c?=
+ =?us-ascii?Q?umKbD/ErsNZqZAFf3KPC3JmbTpYPaxic79ULD3WHDgRQvSrxdpv/2Rum2fPV?=
+ =?us-ascii?Q?gHc2QUmtmh/OoRi66n5la8m1fjJ2zcdX/3AYqpJYwYzrl/RBy90TU6fJnUcj?=
+ =?us-ascii?Q?xwqcPxpqhDYV5Z5q/JguoZodkk/ZDnkaOWfIdLwF/eJEpbaumwlDaFT/XDK3?=
+ =?us-ascii?Q?llwG2LeQaNAZ2Qgx9b0=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7a3696e-b06d-40b6-94a8-08dbe5e0267d
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 13:38:28.5095
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1tmZfMTwW850R15jcNEBW85QIyc4kF1GLNLBiJnotqeNnJkdfQh8NPgOW1uSD9As
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7682
 
-On 11/15, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 11/13/23 18:02, Stanislav Fomichev wrote:
-> > On 11/13, Jesper Dangaard Brouer wrote:
-> > >=20
-> > >=20
-> > > On 11/13/23 15:10, Stanislav Fomichev wrote:
-> > > > On Mon, Nov 13, 2023 at 5:16=E2=80=AFAM Jesper Dangaard Brouer <haw=
-k@kernel.org> wrote:
-> > > > >=20
-> > > > >=20
-> > > > > On 11/2/23 23:58, Stanislav Fomichev wrote:
-> > > > > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/i=
-f_xdp.h
-> > > > > > index 2ecf79282c26..b0ee7ad19b51 100644
-> > > > > > --- a/include/uapi/linux/if_xdp.h
-> > > > > > +++ b/include/uapi/linux/if_xdp.h
-> > > > > > @@ -106,6 +106,41 @@ struct xdp_options {
-> > > > > >     #define XSK_UNALIGNED_BUF_ADDR_MASK \
-> > > > > >         ((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
-> > > > > >=20
-> > > > > > +/* Request transmit timestamp. Upon completion, put it into tx=
-_timestamp
-> > > > > > + * field of struct xsk_tx_metadata.
-> > > > > > + */
-> > > > > > +#define XDP_TXMD_FLAGS_TIMESTAMP             (1 << 0)
-> > > > > > +
-> > > > > > +/* Request transmit checksum offload. Checksum start position =
-and offset
-> > > > > > + * are communicated via csum_start and csum_offset fields of s=
-truct
-> > > > > > + * xsk_tx_metadata.
-> > > > > > + */
-> > > > > > +#define XDP_TXMD_FLAGS_CHECKSUM                      (1 << 1)
-> > > > > > +
-> > > > > > +/* AF_XDP offloads request. 'request' union member is consumed=
- by the driver
-> > > > > > + * when the packet is being transmitted. 'completion' union me=
-mber is
-> > > > > > + * filled by the driver when the transmit completion arrives.
-> > > > > > + */
-> > > > > > +struct xsk_tx_metadata {
-> > > > > > +     union {
-> > > > > > +             struct {
-> > > > > > +                     __u32 flags;
-> > > > > > +
-> > > > > > +                     /* XDP_TXMD_FLAGS_CHECKSUM */
-> > > > > > +
-> > > > > > +                     /* Offset from desc->addr where checksumm=
-ing should start. */
-> > > > > > +                     __u16 csum_start;
-> > > > > > +                     /* Offset from csum_start where checksum =
-should be stored. */
-> > > > > > +                     __u16 csum_offset;
-> > > > > > +             } request;
-> > > > > > +
-> > > > > > +             struct {
-> > > > > > +                     /* XDP_TXMD_FLAGS_TIMESTAMP */
-> > > > > > +                     __u64 tx_timestamp;
-> > > > > > +             } completion;
-> > > > > > +     };
-> > > > > > +};
-> > > > >=20
-> > > > > This looks wrong to me. It looks like member @flags is not avail =
-at
-> > > > > completion time.  At completion time, I assume we also want to kn=
-ow if
-> > > > > someone requested to get the timestamp for this packet (else we c=
-ould
-> > > > > read garbage).
-> > > >=20
-> > > > I've moved the parts that are preserved across tx and tx completion
-> > > > into xsk_tx_metadata_compl.
-> > > > This is to address Magnus/Maciej feedback where userspace might rac=
-e
-> > > > with the kernel.
-> > > > See: https://lore.kernel.org/bpf/ZNoJenzKXW5QSR3E@boxer/
-> > > >=20
-> > >=20
-> > > Does this mean that every driver have to extend their TX-desc ring wi=
-th
-> > > sizeof(struct xsk_tx_metadata_compl)?
-> > > Won't this affect the performance of this V5?
-> >=20
-> > Yes, but it doesn't have to be a descriptor. Might be some internal
-> > driver completion queue (as in the case of mlx5). And definitely does
-> > affect performance :-( (see all the static branches to disable it)
-> > >   $ pahole -C xsk_tx_metadata_compl
-> > > ./drivers/net/ethernet/stmicro/stmmac/stmmac.ko
-> > >   struct xsk_tx_metadata_compl {
-> > > 	__u64 *              tx_timestamp;         /*     0     8 */
-> > >=20
-> > > 	/* size: 8, cachelines: 1, members: 1 */
-> > > 	/* last cacheline: 8 bytes */
-> > >   };
-> > >=20
-> > > Guess, I must be misunderstanding, as I was expecting to see the @fla=
-gs
-> > > member being preserved across, as I get the race there.
-> > >=20
-> > > Looking at stmmac driver, it does look like this xsk_tx_metadata_comp=
-l
-> > > is part of the TX-ring for completion (tx_skbuff_dma) and the
-> > > tx_timestamp data is getting stored here.  How is userspace AF_XDP
-> > > application getting access to the tx_timestamp data?
-> > > I though this was suppose to get stored in metadata data area (umem)?
-> > >=20
-> > > Also looking at the code, the kernel would not have a "crash" race on
-> > > the flags member (if we preserve in struct), because the code checks =
-the
-> > > driver HW-TS config-state + TX-descriptor for the availability of a
-> > > HW-TS in the descriptor.
-> >=20
-> > xsk_tx_metadata_compl stores a pointer to the completion timestamp
-> > in the umem, so everything still arrives via the metadata area.
-> >=20
-> > We want to make sure the flags are not changing across tx and tx comple=
-tion.
-> > Instead of saving the flags, we just use that xsk_tx_metadata_compl to
-> > signal to the completion that "I know that I've requested the tx
-> > completion timestamp, please put it at this address in umem".
-> >=20
-> > I store the pointer instead of flags to avoid doing pointer math again
-> > at completion. But it's an implementation detail and somewhat abstracte=
-d
-> > from the drivers (besides the fact that it's probably has to fit in 8
-> > bytes).
->=20
-> I see it now (what I missed). At TX time you are storing a pointer where
-> to (later) write the TS at completion time.  It just seems overkill to
-> store 8 byte (pointer) to signal (via NULL) if the HWTS was requested.
-> Space in the drivers TX-ring is performance critical, and I think driver
-> developers would prefer to find a bit to indicate HWTS requested.
->=20
-> If HWTS was *NOT* requested, then the metadata area will not be updated
-> (right, correct?). Then memory area is basically garbage that survived.
-> How does the AF_XDP application know this packet contains a HWTS or not?
->=20
-> From an UAPI PoV wouldn't it be easier to use (and extend) via keeping
-> the @flags member (in struct xsk_tx_metadata), but (as you already do)
-> not let kernel checks depend on it (to avoid the races).
+On Wed, Nov 15, 2023 at 05:21:02PM +0800, Yunsheng Lin wrote:
 
-I was assuming the userspace can keep this signal out of band or use
-the same idea as suggested with padding struct xsk_tx_metadata to keep
-some data around. But I see your point, it might be convenient to
-keep the original flags around during completion on the uapi side.
+> >>> I would expect net stack, page pool, driver still see the 'struct page',
+> >>> only memory provider see the specific struct for itself, for the above,
+> >>> devmem memory provider sees the 'struct page_pool_iov'.
+> >>>
+> >>> The reason I still expect driver to see the 'struct page' is that driver
+> >>> will still need to support normal memory besides devmem.
+> > 
+> > I wouldn't say this approach is unreasonable, but it does have to be
+> > done carefully to isolate the mm. Keeping the struct page in the API
+> > is going to make this very hard.
+> 
+> I would expect that most of the isolation is done in page pool, as far as
+> I can see:
 
-I think I can just move flags from the request union member to the outer
-struct. So the struct xsk_tx_metadata would look like:
+It is the sort of thing that is important enough it should have
+compiler help via types to prove that it is being done
+properly. Otherwise it will be full of mistakes over time.
 
-struct xsk_tx_metadata {
-	__u32 flags; /* maybe can even make this u64? */
-
-	union {
-		__u16 csum_start;
-		__u16 csum_offset;
-	} request;
-
-	union {
-		__u64 tx_timestamp;
-	} completion;
-
-	__u32 padding; /* to drop this padding */
-};
-
-But I'd also keep the existing xsk_tx_metadata_compl to carry the
-pointer+signal around. As I mentioned previously, it's completely
-opaque to the driver and we can change the internals in the future.
-
-IOW, we won't override the flags from the kernel side and as long
-as the userspace consumer doesn't mess them up it should receive
-the original value at completion.
-
-Would that work for you?
+Jason
 
