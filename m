@@ -1,52 +1,47 @@
-Return-Path: <netdev+bounces-47900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D287EBC9E
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 05:32:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B2247EBCA9
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 05:48:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03EF21C20ACE
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 04:32:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E406B20A61
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 04:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F557E;
-	Wed, 15 Nov 2023 04:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61510642;
+	Wed, 15 Nov 2023 04:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMSxlRo3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f90tJtMv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254379461
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 04:32:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45381C433C8;
-	Wed, 15 Nov 2023 04:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F06A50
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 04:48:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 122FDC433C8;
+	Wed, 15 Nov 2023 04:48:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700022740;
-	bh=DcJpZza30H4zfnwfFjo1F5dIGsEQgJRcTEb1Fu4/AK4=;
+	s=k20201202; t=1700023683;
+	bh=EfAbGrOuV2NI0uz0v5xYGE+7CaVbAyNA3Ux45qLjFp8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sMSxlRo3WjV0AAFn0miy28kV0y4JWuk+HkQfoSjzTS3V3GCyjj4r0Q3FAO5XNX3BN
-	 4soGEUeu4Vw8/hqF1cQ7pyNRKefmzqslHcjyDymUXQNGNJvQxKDWYnjv22cMKL9kmw
-	 jWFCUEu9HdZWs4q31mXj2hJZVZi3/e7oT/E5Xlfq1JUlTCQopewpAGABGLySxp5/bW
-	 Y3S6NXaYrKKiT2pRapK77KWheO1Q6byaTgKSHvUVTZVnoPUoQTpH+l6UKikFZKiyXl
-	 Qzh9IZeZdV6slOA0wZoZHH/DeRnosEoOEJBvJGjatKZWsM6DHnyJEweSdzCFt/Z9ym
-	 Ym15AOFGO0P0w==
-Date: Tue, 14 Nov 2023 23:32:17 -0500
+	b=f90tJtMvoC7LzYgv03HvMgcFrwwMTWsndca9diaI2uoW4ah0LhNvBq6FFp3iNxliU
+	 tbieooIW+SvvCWuFaK6ok3tq/JkwarRWam2i6iZfk6jQjhYWDXSyt2Fx9Kba1PKzpA
+	 4ItMI7pqxkjbUmT0/iPCYUUYjL7zAyVM297RYgUv7QGH8HGd5ONl5sBYYUN2s+leUK
+	 wz7dAsEJFHl16LS7vcxwxjrDJSB/2r9jHql6Fpfs8HenQRbogj2Zil/ReEcITEjp72
+	 zVk8iBloBj1ZxQgMFrAF+2TZUmV386vZpqeZ7lJpo7WNRZx2beLVka9LhM4XF0sRy4
+	 qzVEngi08TQBQ==
+Date: Tue, 14 Nov 2023 23:48:01 -0500
 From: Jakub Kicinski <kuba@kernel.org>
-To: Coco Li <lixiaoyan@google.com>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell
- <ncardwell@google.com>, Mubashir Adnan Qureshi <mubashirq@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Jonathan
- Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu
- <wwchao@google.com>, Wei Wang <weiwan@google.com>, Pradeep Nemavat
- <pnemavat@google.com>
-Subject: Re: [PATCH v7 net-next 2/5] cache: enforce cache groups
-Message-ID: <20231114233217.03e03fd2@kernel.org>
-In-Reply-To: <20231113233301.1020992-3-lixiaoyan@google.com>
-References: <20231113233301.1020992-1-lixiaoyan@google.com>
-	<20231113233301.1020992-3-lixiaoyan@google.com>
+To: Amritha Nambiar <amritha.nambiar@intel.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, sridhar.samudrala@intel.com
+Subject: Re: [net-next PATCH v7 01/10] netdev-genl: spec: Extend netdev
+ netlink spec in YAML for queue
+Message-ID: <20231114234801.0faee5db@kernel.org>
+In-Reply-To: <169992177699.3867.16531901770683676993.stgit@anambiarhost.jf.intel.com>
+References: <169992138566.3867.856803351434134324.stgit@anambiarhost.jf.intel.com>
+	<169992177699.3867.16531901770683676993.stgit@anambiarhost.jf.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,17 +51,84 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 13 Nov 2023 23:32:58 +0000 Coco Li wrote:
-> Set up build time warnings to safeguard against future header changes of
-> organized structs.
+On Mon, 13 Nov 2023 16:29:37 -0800 Amritha Nambiar wrote:
+> Add support in netlink spec(netdev.yaml) for queue information.
+> Add code generated from the spec.
 > 
-> Warning includes:
-> 
-> 1) whether all variables are still in the same cache group
-> 2) whether all the cache groups have the sum of the members size (in the
->    maximum condition, including all members defined in configs)
+> Note: The "queue-type" attribute takes values 0 and 1 for rx
+> and tx queue type respectively.
 
-Could you extend scripts/kernel-doc to ignore the new macros?
-It's fairly simple script, should hopefully be very easy.
-Otherwise using the macros will cause warning spew with W=1.
+
+> index 14511b13f305..e7bf6007d77f 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -55,6 +55,10 @@ definitions:
+>          name: hash
+>          doc:
+>            Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
+> +  -
+> +    name: queue-type
+> +    type: enum
+> +    entries: [ rx, tx ]
+>  
+>  attribute-sets:
+>    -
+> @@ -87,6 +91,31 @@ attribute-sets:
+>          type: u64
+>          enum: xdp-rx-metadata
+>  
+> +  -
+> +    name: queue
+> +    attributes:
+> +      -
+> +        name: queue-id
+
+Hm. I guess it looks okay in the Python / JSON but the C defines
+will say NETDEV_QUEUE_QUEUE_ID or some such. Should we drop the word
+queue from all attrs in the queue set?
+
+Sorry, not sure how I missed this earlier. Some extra nits below while
+I'm requesting changes...
+
+> +        doc: Queue index for most queue types are indexed like a C array, with
+
+s/ for/;/ ?
+
+> +             indexes starting at 0 and ending at queue count - 1. Queue indexes
+> +             are scoped to an interface and queue type.
+> +        type: u32
+> +      -
+> +        name: ifindex
+> +        doc: ifindex of the netdevice to which the queue belongs.
+> +        type: u32
+> +        checks:
+> +          min: 1
+> +      -
+> +        name: queue-type
+> +        doc: queue type as rx, tx
+
+Add: ". Each queue type defines a separate ID space."
+
+> +        type: u32
+> +        enum: queue-type
+> +      -
+> +        name: napi-id
+> +        doc: ID of the NAPI instance which services this queue.
+> +        type: u32
+> +
+>  operations:
+>    list:
+>      -
+> @@ -120,6 +149,29 @@ operations:
+>        doc: Notification about device configuration being changed.
+>        notify: dev-get
+>        mcgrp: mgmt
+> +    -
+> +      name: queue-get
+> +      doc: Get queue information from the kernel.
+> +           Only configured queues will be reported (as opposed to all available
+> +           queues).
+
+maybe add "hardware", so "all available hardware queues)" ?
+That may help the reader connect the dots
 
