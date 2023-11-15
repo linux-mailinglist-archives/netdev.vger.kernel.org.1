@@ -1,196 +1,132 @@
-Return-Path: <netdev+bounces-48029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158A17EC562
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:33:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA327EC4AE
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46F261C209A5
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:33:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 733FB281467
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6C1171B3;
-	Wed, 15 Nov 2023 14:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C95E23747;
+	Wed, 15 Nov 2023 14:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j0K2FEMi"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cClH3Zzv"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BFD2EAFC
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:33:02 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875C1181;
-	Wed, 15 Nov 2023 06:33:01 -0800 (PST)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFDqmaB006569;
-	Wed, 15 Nov 2023 14:32:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vNYzonvJUeWWqXdSrIhWgKiUlZPWCbFb6OfWF1QU2wo=;
- b=j0K2FEMiOBpvWR95/1fICXEeci5Zx5aIP1NbFmh7N3IuHYlSL5QU0ekMwaV7hZ+mvKIZ
- X0TRaoZeWv+ZuIgQMw2yddDtgF6AkR+PYX7BaoNrizYEpWJsNacMi7fcW+KNwAi/KQmf
- M7zgPdGnEVPMk1Jlyn5W5xXGDGzbEUCEXC/DLSiGdKdt9TpXTPL45/QRT6Bwk0VcmpRV
- qjTnhv4MwoCRC79q105kXrP2CabG6jWtXnDL1ohw/H2ULUQaCFhgsUSL2HKSOqDktzkF
- 2GypJmlKWJpmMAJhFFFJvjWJDZ67FwPH3CzwJGOyI0UoLwJAKawC8yTsEyKun+3FiqJ/ OQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucy8jh80y-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40A121348;
+	Wed, 15 Nov 2023 14:08:57 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B2DB3;
+	Wed, 15 Nov 2023 06:08:56 -0800 (PST)
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFCgZ3E032064;
+	Wed, 15 Nov 2023 14:08:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=E43rW8abNEmb6j0ipQlvTrBofnJJgY2qLpietswJZ6s=;
+ b=cClH3ZzvoVIBkwf0c6KSR9/qKMmYSuenfHuuntpUMorN/bQ5MwBGfTFZdBdZ7vua3Jx9
+ zUa9HfAbwsnNr98Lg56feXuAQnPOy6Hpd5kOaWQGgRy2O/bQ5gxfMVV1o7uzKm3jd5Nm
+ Ixw6TMG6jl3z6RaCfHX8KpIleMKvL7mHjzNRgjFyWr/2+u6V+6IPsK+NdPOFPNIFENKY
+ 2vWpZiTJKiOzQ7/vdIpbkR/1PQUSBE557yfrQnw/e1KySd41JxnTXxjj/bIDQJbMbkrw
+ lgOiXHRR++L9xorJRqDiXlG9NLqwlUZaVeEiUMrUCnY2m2sodYOjGB7Kx3b063X9uM1h UQ== 
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ucmbahfh1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:32:54 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AFDrNVV007426;
-	Wed, 15 Nov 2023 14:32:53 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucy8jh7x9-3
+	Wed, 15 Nov 2023 14:08:41 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AFE8eCl015943
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:32:53 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFDnCWN021761;
-	Wed, 15 Nov 2023 14:06:24 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uamayfrjk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 14:06:24 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AFE6NZM15336056
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Nov 2023 14:06:24 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B56DF58062;
-	Wed, 15 Nov 2023 14:06:23 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 299CD58064;
-	Wed, 15 Nov 2023 14:06:22 +0000 (GMT)
-Received: from [9.179.28.193] (unknown [9.179.28.193])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 15 Nov 2023 14:06:21 +0000 (GMT)
-Message-ID: <17abf559-ec8b-47e9-b4e4-59adfbc6943b@linux.ibm.com>
-Date: Wed, 15 Nov 2023 15:06:21 +0100
+	Wed, 15 Nov 2023 14:08:40 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Wed, 15 Nov 2023 06:08:37 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+Subject: [PATCH v3 0/6] add qca8084 ethernet phy driver
+Date: Wed, 15 Nov 2023 22:06:24 +0800
+Message-ID: <20231115140630.10858-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v1] net/smc: avoid data corruption caused by decline
-Content-Language: en-GB
-To: dust.li@linux.alibaba.com, "D. Wythe" <alibuda@linux.alibaba.com>,
-        kgraul@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
-References: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
- <20231113034457.GA121324@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <20231113034457.GA121324@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZDCrUeiQ7dAQAE5ASA8qYCsHI89K-Sqp
-X-Proofpoint-ORIG-GUID: e0uqV9OKo_tYLh6jovTcpsmKQ0EjH5fF
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: UqUp-tg-hTFh3LSAaVigv0iWjWbD2Z3o
+X-Proofpoint-ORIG-GUID: UqUp-tg-hTFh3LSAaVigv0iWjWbD2Z3o
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-15_13,2023-11-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
- malwarescore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- clxscore=1015 bulkscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311150113
+ definitions=2023-11-15_12,2023-11-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ adultscore=0 mlxlogscore=776 impostorscore=0 spamscore=0
+ lowpriorityscore=0 priorityscore=1501 clxscore=1011 malwarescore=0
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311150109
+
+QCA8084 is four-port PHY with maximum link capability 2.5G,
+which supports the interface mode qusgmii and sgmii mode,
+there are two PCSs available to connected with ethernet port.
+
+QCA8084 can work in switch mode or PHY mode.
+For switch mode, both PCS0 and PCS1 work on sgmii mode.
+For PHY mode, PCS1 works on qusgmii mode, the last port
+(the fourth port) works on sgmii mode.
+
+Besides this PHY driver patches, the PCS driver is also needed
+to bring up the qca8084 device, which mainly configurs PCS
+and clocks.
+
+Changes in v3:
+	1. pick the two patches to introduce the interface mode
+	10g-qxgmii from Vladimir Oltean(olteanv@gmail.com).
+
+	2. add the function phydev_id_is_qca808x to identify the
+	PHY qca8081 and qca8084.
+
+	3. update the interface mode name PHY_INTERFACE_MODE_QUSGMII
+	to PHY_INTERFACE_MODE_10G_QXGMII.
+
+Luo Jie (4):
+  net: phy: at803x: add QCA8084 ethernet phy support
+  net: phy: at803x: add the function phydev_id_is_qca808x
+  net: phy: at803x: Add qca8084_config_init function
+  net: phy: qca8084: add qca8084_link_change_notify
+
+Vladimir Oltean (2):
+  net: phylink: move phylink_pcs_neg_mode() to phylink.c
+  net: phy: introduce core support for phy-mode = "10g-qxgmii"
+
+ .../bindings/net/ethernet-controller.yaml     |   1 +
+ Documentation/networking/phy.rst              |   6 +
+ drivers/net/phy/at803x.c                      | 130 +++++++++++++++++-
+ drivers/net/phy/phy-core.c                    |   1 +
+ drivers/net/phy/phylink.c                     |  77 ++++++++++-
+ include/linux/phy.h                           |   4 +
+ include/linux/phylink.h                       |  67 +--------
+ 7 files changed, 212 insertions(+), 74 deletions(-)
 
 
+base-commit: bc962b35b139dd52319e6fc0f4bab00593bf38c9
+-- 
+2.42.0
 
-On 13.11.23 04:44, Dust Li wrote:
-> On Wed, Nov 08, 2023 at 05:48:29PM +0800, D. Wythe wrote:
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> We found a data corruption issue during testing of SMC-R on Redis
->> applications.
->>
->> The benchmark has a low probability of reporting a strange error as
->> shown below.
->>
->> "Error: Protocol error, got "\xe2" as reply type byte"
->>
->> Finally, we found that the retrieved error data was as follows:
->>
->> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
->> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
->>
->> It is quite obvious that this is a SMC DECLINE message, which means that
->> the applications received SMC protocol message.
->> We found that this was caused by the following situations:
->>
->> client			server
->> 	   proposal
->> 	------------->
->> 	   accept
->> 	<-------------
->> 	   confirm
->> 	------------->
->> wait confirm
->>
->> 	 failed llc confirm
->> 	    x------
->> (after 2s)timeout
->> 			wait rsp
->>
->> wait decline
->>
->> (after 1s) timeout
->> 			(after 2s) timeout
->> 	    decline
->> 	-------------->
->> 	    decline
->> 	<--------------
->>
->> As a result, a decline message was sent in the implementation, and this
->> message was read from TCP by the already-fallback connection.
->>
->> This patch double the client timeout as 2x of the server value,
->> With this simple change, the Decline messages should never cross or
->> collide (during Confirm link timeout).
->>
->> This issue requires an immediate solution, since the protocol updates
->> involve a more long-term solution.
->>
->> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->> net/smc/af_smc.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index abd2667..5b91f55 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
->> 	int rc;
->>
->> 	/* receive CONFIRM LINK request from server over RoCE fabric */
->> -	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
->> +	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
->> 			      SMC_LLC_CONFIRM_LINK);
-> 
-> It may be difficult for people to understand why LLC_WAIT_TIME is
-> different, especially without any comments explaining its purpose.
-> People are required to use git to find the reason, which I believe is
-> not conducive to easy maintenance.
-> 
-> Best regards,
-> Dust
-> 
-> 
-Good point! @D.Wythe, could you please try to add a simple commet to 
-explain it?
-
-Thanks,
-Wenjia
-> 
->> 	if (!qentry) {
->> 		struct smc_clc_msg_decline dclc;
->> -- 
->> 1.8.3.1
 
