@@ -1,218 +1,144 @@
-Return-Path: <netdev+bounces-47935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 182BC7EBFEB
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:05:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 463B57EC03F
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E63F1C20621
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:05:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 739741C2036F
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B94BE50;
-	Wed, 15 Nov 2023 10:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F37C129;
+	Wed, 15 Nov 2023 10:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6sxZnuL"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="kfL+GC14"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1683E947F;
-	Wed, 15 Nov 2023 10:05:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5126BC433C7;
-	Wed, 15 Nov 2023 10:05:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700042721;
-	bh=DZed9r/uuffRfe8k59h8AmxiUG073vO6ie7IjrT87lQ=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=T6sxZnuLR6e7N9aXymb2tIfTziRk/3poR8ZcYZhPWeut0365Va7yc+RLZPoj58BRC
-	 h7+Z2xCfrC7zvujGof+obMMhIl+QUc4RqrnBGX+URz39uFfqfSuTslo3wT1e+Rj2u4
-	 c7BfZbjbZKUhF0vf42HcOhE7B1O1nGGE619LFWh6gBIJqFL0+28nxvALEcRSJQIzwr
-	 V1zl6Rp4TKMky1/tPsqxhE1fV/GspKUKxmYwzjUzCbkDODa9Jlg7/8tJgSV/HyfJXr
-	 ZlmGoOXBEXKzYO+59hfsSmVdn4c7P1vYry9jSXrVzqgr/ZBKsDf9rMsyOHx3ML00OE
-	 O0TOb6vqYlI+g==
-Message-ID: <be6186c1-52ee-42aa-b53c-39781af3a1ec@kernel.org>
-Date: Wed, 15 Nov 2023 11:05:12 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C223B947F;
+	Wed, 15 Nov 2023 10:09:05 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E159101;
+	Wed, 15 Nov 2023 02:09:04 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 504D1228F8;
+	Wed, 15 Nov 2023 10:09:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1700042941; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=FFXEaaV+TfDojPP2G4oq8f6AMOzppbX8rIYFnYjWCzU=;
+	b=kfL+GC14yeJRXzkedz8+KaZGKNyrvjBIhjvQi/A1KpAGBxkYMduA783NNhl2w4TiI0YZrE
+	o65hFpJ0FiDvW0vF8X5iQ1XlLFHYSGXp2Im7kcGPLzC6UX6BoEsuow/WyDF5s9/n+jRjXo
+	BWkNz6B7npIZoFJqS+cBZnsdSO3sGFQ=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id EE7ED13592;
+	Wed, 15 Nov 2023 10:09:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id RQNyOLyYVGUARQAAMHmgww
+	(envelope-from <oneukum@suse.com>); Wed, 15 Nov 2023 10:09:00 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: dmitry.bezrukov@aquantia.com,
+	marcinguy@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Subject: [PATCH] usb: aqc111: check packet for fixup for true limit
+Date: Wed, 15 Nov 2023 11:08:57 +0100
+Message-ID: <20231115100857.24659-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: hawk@kernel.org, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- haoluo@google.com, jolsa@kernel.org, kuba@kernel.org, toke@kernel.org,
- willemb@google.com, dsahern@kernel.org, magnus.karlsson@intel.com,
- bjorn@kernel.org, maciej.fijalkowski@intel.com, yoong.siang.song@intel.com,
- netdev@vger.kernel.org, xdp-hints@xdp-project.net
-Subject: Re: [PATCH bpf-next v5 02/13] xsk: Add TX timestamp and TX checksum
- offload support
-Content-Language: en-US
-To: Stanislav Fomichev <sdf@google.com>
-References: <20231102225837.1141915-1-sdf@google.com>
- <20231102225837.1141915-3-sdf@google.com>
- <c9bfe356-1942-4e49-b025-115faeec39dd@kernel.org>
- <CAKH8qBtiv8ArtbbMW9+c75y+NfkX-Tk-rcPuHBVdKDMmmFdtdA@mail.gmail.com>
- <2ed17b27-f211-4f58-95b5-5a71914264f3@kernel.org>
- <ZVJWuB4qtWfC-W_h@google.com>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <ZVJWuB4qtWfC-W_h@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: 0.90
+X-Spamd-Result: default: False [0.90 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 R_MISSING_CHARSET(2.50)[];
+	 BROKEN_CONTENT_TYPE(1.50)[];
+	 NEURAL_HAM_LONG(-3.00)[-1.000];
+	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	 NEURAL_HAM_SHORT(-1.00)[-1.000];
+	 RCPT_COUNT_SEVEN(0.00)[9];
+	 MID_CONTAINS_FROM(1.00)[];
+	 FREEMAIL_TO(0.00)[aquantia.com,gmail.com,davemloft.net,google.com,kernel.org,redhat.com,vger.kernel.org];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_COUNT_TWO(0.00)[2];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-0.00)[11.70%]
 
+If a device sends a packet that is inbetween 0
+and sizeof(u64) the value passed to skb_trim()
+as length will wrap around ending up as some very
+large value.
 
+The driver will then proceed to parse the header
+located at that position, which will either oops or
+process some random value.
 
-On 11/13/23 18:02, Stanislav Fomichev wrote:
-> On 11/13, Jesper Dangaard Brouer wrote:
->>
->>
->> On 11/13/23 15:10, Stanislav Fomichev wrote:
->>> On Mon, Nov 13, 2023 at 5:16 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>>>
->>>>
->>>> On 11/2/23 23:58, Stanislav Fomichev wrote:
->>>>> diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/linux/if_xdp.h
->>>>> index 2ecf79282c26..b0ee7ad19b51 100644
->>>>> --- a/include/uapi/linux/if_xdp.h
->>>>> +++ b/include/uapi/linux/if_xdp.h
->>>>> @@ -106,6 +106,41 @@ struct xdp_options {
->>>>>     #define XSK_UNALIGNED_BUF_ADDR_MASK \
->>>>>         ((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
->>>>>
->>>>> +/* Request transmit timestamp. Upon completion, put it into tx_timestamp
->>>>> + * field of struct xsk_tx_metadata.
->>>>> + */
->>>>> +#define XDP_TXMD_FLAGS_TIMESTAMP             (1 << 0)
->>>>> +
->>>>> +/* Request transmit checksum offload. Checksum start position and offset
->>>>> + * are communicated via csum_start and csum_offset fields of struct
->>>>> + * xsk_tx_metadata.
->>>>> + */
->>>>> +#define XDP_TXMD_FLAGS_CHECKSUM                      (1 << 1)
->>>>> +
->>>>> +/* AF_XDP offloads request. 'request' union member is consumed by the driver
->>>>> + * when the packet is being transmitted. 'completion' union member is
->>>>> + * filled by the driver when the transmit completion arrives.
->>>>> + */
->>>>> +struct xsk_tx_metadata {
->>>>> +     union {
->>>>> +             struct {
->>>>> +                     __u32 flags;
->>>>> +
->>>>> +                     /* XDP_TXMD_FLAGS_CHECKSUM */
->>>>> +
->>>>> +                     /* Offset from desc->addr where checksumming should start. */
->>>>> +                     __u16 csum_start;
->>>>> +                     /* Offset from csum_start where checksum should be stored. */
->>>>> +                     __u16 csum_offset;
->>>>> +             } request;
->>>>> +
->>>>> +             struct {
->>>>> +                     /* XDP_TXMD_FLAGS_TIMESTAMP */
->>>>> +                     __u64 tx_timestamp;
->>>>> +             } completion;
->>>>> +     };
->>>>> +};
->>>>
->>>> This looks wrong to me. It looks like member @flags is not avail at
->>>> completion time.  At completion time, I assume we also want to know if
->>>> someone requested to get the timestamp for this packet (else we could
->>>> read garbage).
->>>
->>> I've moved the parts that are preserved across tx and tx completion
->>> into xsk_tx_metadata_compl.
->>> This is to address Magnus/Maciej feedback where userspace might race
->>> with the kernel.
->>> See: https://lore.kernel.org/bpf/ZNoJenzKXW5QSR3E@boxer/
->>>
->>
->> Does this mean that every driver have to extend their TX-desc ring with
->> sizeof(struct xsk_tx_metadata_compl)?
->> Won't this affect the performance of this V5?
-> 
-> Yes, but it doesn't have to be a descriptor. Might be some internal
-> driver completion queue (as in the case of mlx5). And definitely does
-> affect performance :-( (see all the static branches to disable it)
->   
->>   $ pahole -C xsk_tx_metadata_compl
->> ./drivers/net/ethernet/stmicro/stmmac/stmmac.ko
->>   struct xsk_tx_metadata_compl {
->> 	__u64 *              tx_timestamp;         /*     0     8 */
->>
->> 	/* size: 8, cachelines: 1, members: 1 */
->> 	/* last cacheline: 8 bytes */
->>   };
->>
->> Guess, I must be misunderstanding, as I was expecting to see the @flags
->> member being preserved across, as I get the race there.
->>
->> Looking at stmmac driver, it does look like this xsk_tx_metadata_compl
->> is part of the TX-ring for completion (tx_skbuff_dma) and the
->> tx_timestamp data is getting stored here.  How is userspace AF_XDP
->> application getting access to the tx_timestamp data?
->> I though this was suppose to get stored in metadata data area (umem)?
->>
->> Also looking at the code, the kernel would not have a "crash" race on
->> the flags member (if we preserve in struct), because the code checks the
->> driver HW-TS config-state + TX-descriptor for the availability of a
->> HW-TS in the descriptor.
-> 
-> xsk_tx_metadata_compl stores a pointer to the completion timestamp
-> in the umem, so everything still arrives via the metadata area.
-> 
-> We want to make sure the flags are not changing across tx and tx completion.
-> Instead of saving the flags, we just use that xsk_tx_metadata_compl to
-> signal to the completion that "I know that I've requested the tx
-> completion timestamp, please put it at this address in umem".
-> 
-> I store the pointer instead of flags to avoid doing pointer math again
-> at completion. But it's an implementation detail and somewhat abstracted
-> from the drivers (besides the fact that it's probably has to fit in 8
-> bytes).
+The fix is to check against sizeof(u64) rather than
+0, which the driver currently does. The issue exists
+since the introduction of the driver.
 
-I see it now (what I missed). At TX time you are storing a pointer where
-to (later) write the TS at completion time.  It just seems overkill to
-store 8 byte (pointer) to signal (via NULL) if the HWTS was requested.
-Space in the drivers TX-ring is performance critical, and I think driver
-developers would prefer to find a bit to indicate HWTS requested.
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+---
+ drivers/net/usb/aqc111.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-If HWTS was *NOT* requested, then the metadata area will not be updated
-(right, correct?). Then memory area is basically garbage that survived.
-How does the AF_XDP application know this packet contains a HWTS or not?
+diff --git a/drivers/net/usb/aqc111.c b/drivers/net/usb/aqc111.c
+index a017e9de2119..7b8afa589a53 100644
+--- a/drivers/net/usb/aqc111.c
++++ b/drivers/net/usb/aqc111.c
+@@ -1079,17 +1079,17 @@ static int aqc111_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+ 	u16 pkt_count = 0;
+ 	u64 desc_hdr = 0;
+ 	u16 vlan_tag = 0;
+-	u32 skb_len = 0;
++	u32 skb_len;
+ 
+ 	if (!skb)
+ 		goto err;
+ 
+-	if (skb->len == 0)
++	skb_len = skb->len;
++	if (skb_len < sizeof(desc_hdr))
+ 		goto err;
+ 
+-	skb_len = skb->len;
+ 	/* RX Descriptor Header */
+-	skb_trim(skb, skb->len - sizeof(desc_hdr));
++	skb_trim(skb, skb_len - sizeof(desc_hdr));
+ 	desc_hdr = le64_to_cpup((u64 *)skb_tail_pointer(skb));
+ 
+ 	/* Check these packets */
+-- 
+2.42.0
 
- From an UAPI PoV wouldn't it be easier to use (and extend) via keeping
-the @flags member (in struct xsk_tx_metadata), but (as you already do)
-not let kernel checks depend on it (to avoid the races).
-
-> 
->>>> Another thing (I've raised this before): It would be really practical to
->>>> store an u64 opaque value at TX and then read it at Completion time.
->>>> One use-case is a forwarding application storing HW RX-time and
->>>> comparing this to TX completion time to deduce the time spend processing
->>>> the packet.
->>>
->>> This can be another member, right? But note that extending
->>> xsk_tx_metadata_compl might be a bit complicated because drivers have
->>> to carry this info somewhere. So we have to balance the amount of
->>> passed data between the tx and the completion.
->>
->> I don't think my opaque value proposal is subject to same race problem.
->> I think this can be stores in metadata area and across tx and tx
->> completion, because any race on a flags change is the userspace
->> programmers problem, as it cannot cause any kernel crash (given kernel
->> have no need to read this).
-> 
-> Thinking about it, I don't think this needs any special handing?
-> You can request sizeof(struct xsk_tx_metadata) + sizeof(opaque data)
-> as metadata. The kernel won't touch the 'opaque data' part. Or am I missing
-> something?
-
-Sure, I can just create some room after struct xsk_tx_metadata, via 
-setting something larger than sizeof(struct xsk_tx_metadata).  I'm 
-buying that.
-
---Jesper
 
