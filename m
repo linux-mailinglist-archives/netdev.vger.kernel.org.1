@@ -1,80 +1,98 @@
-Return-Path: <netdev+bounces-47953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC8E7EC15C
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:39:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E3F7EC15D
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:39:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A45C280F1B
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:39:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CBEE1C2090F
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F9E0168DC;
-	Wed, 15 Nov 2023 11:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EA7168BB;
+	Wed, 15 Nov 2023 11:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="erUUlA6L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NtOWzfnu"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7BF168A2
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 11:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF304171A3
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 11:39:22 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4088CC
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 03:39:11 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C870BCC
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 03:39:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=4gQqcD7nW3Sf+fy4qCTuJt2uxJYNJCN9decTfi9tMd0=; b=erUUlA6LDGMaSpW77xxX9swKbF
-	XDeAJCA9hXJXNjX3hEM15c173edOmwB8qLaGBQoGuNqsC2LDVTI1eiHSju+//eDWCeUCiT058kiFN
-	AUcB34p3HkGgISlugeXWqO5WbHVKFfRZOIog/L8Q93Z4tp/SGbLYCBLi9qy997bwawvjUbsCUFVFL
-	qU8SAM1oaAYYPiOuJHingZiCpdCUxM5gXL/egbZAAdl/GPU3X5r1kPLU7KKOeBUHEsQH3g8kMOqjt
-	jhxokoaDMQ/b9AHjYPxe73jpuFdivjqQlYsuBLSE3xsaBm6Vo58CIyYgjsOcSA5pyOmS/hr6dZbl1
-	WtSE0TSg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34528)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gQNUZP8yVS8Jh5fvWhjYIVJRa8z0OIF7ANw6PcWCdYs=; b=NtOWzfnuhmQ6TkvRI0a02QlJjU
+	Vc6nEQ8YWGz41fUSP3MucyJ6aC8NMKpTRQ7MSAQfXBJyVXaSGMsxpmTGT0psaEzuFhwzzwOL9dxc8
+	uZh8beTuaiKogW/FGHGCsPFlkpra9oi3xthq6HI+d4BF9ZpENIksC78ZqgO55BcFplVs9/tSBzbuS
+	0fyvP59MVTeX0V+uvINFbPEzJDt6NONtxu9E34gAFqUsgsyLr5K7HVthTK00dckmDDhSuOMVxPyN6
+	os8PD0a0Ib0CTRavkYa0LYMoszoXWYDM0QnuY1+BloBZcvnC5SLvjRD30X9RO3umdicS7NRTSZlkV
+	kTsYX43Q==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46202 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r3EEa-0000Zz-1N;
-	Wed, 15 Nov 2023 11:39:04 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r3EEb-0006Xg-7U; Wed, 15 Nov 2023 11:39:05 +0000
-Date: Wed, 15 Nov 2023 11:39:05 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1r3EEm-0000aA-1k;
+	Wed, 15 Nov 2023 11:39:16 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1r3EEo-00CfC6-Ez; Wed, 15 Nov 2023 11:39:18 +0000
+In-Reply-To: <ZVSt2e9Z5swJNf+7@shell.armlinux.org.uk>
+References: <ZVSt2e9Z5swJNf+7@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/3] Add linkmode_fill, use linkmode_*() in
- phylink/sfp code
-Message-ID: <ZVSt2e9Z5swJNf+7@shell.armlinux.org.uk>
+Subject: [PATCH net-next 1/3] net: linkmode: add linkmode_fill() helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1r3EEo-00CfC6-Ez@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Wed, 15 Nov 2023 11:39:18 +0000
 
-Hi,
+Add a linkmode_fill() helper, which will allow us to convert phylink's
+open coded bitmap_fill() operations.
 
-This small series adds a linkmode_fill() op, and uses it in phylink.
-The SFP code is also converted to use linkmode_*() ops.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ include/linux/linkmode.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
- drivers/net/phy/phylink.c | 4 ++--
- drivers/net/phy/sfp-bus.c | 2 +-
- include/linux/linkmode.h  | 5 +++++
- 3 files changed, 8 insertions(+), 3 deletions(-)
-
+diff --git a/include/linux/linkmode.h b/include/linux/linkmode.h
+index 7303b4bc2ce0..287f590ed56b 100644
+--- a/include/linux/linkmode.h
++++ b/include/linux/linkmode.h
+@@ -10,6 +10,11 @@ static inline void linkmode_zero(unsigned long *dst)
+ 	bitmap_zero(dst, __ETHTOOL_LINK_MODE_MASK_NBITS);
+ }
+ 
++static inline void linkmode_fill(unsigned long *dst)
++{
++	bitmap_fill(dst, __ETHTOOL_LINK_MODE_MASK_NBITS);
++}
++
+ static inline void linkmode_copy(unsigned long *dst, const unsigned long *src)
+ {
+ 	bitmap_copy(dst, src, __ETHTOOL_LINK_MODE_MASK_NBITS);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
