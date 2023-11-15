@@ -1,103 +1,111 @@
-Return-Path: <netdev+bounces-47911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F4AA7EBD57
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:07:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 404597EBD7B
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:16:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10DC8B20B08
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:07:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3581C20A22
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AC52E849;
-	Wed, 15 Nov 2023 07:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C382E2E856;
+	Wed, 15 Nov 2023 07:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P1mbosZs"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tyDtAudz"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC714416
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:07:22 +0000 (UTC)
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFFDF9
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:07:21 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so9984a12.0
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:07:21 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8656D5CBC
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:16:33 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A794F8E
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:16:30 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9e1fb7faa9dso958204766b.2
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:16:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700032039; x=1700636839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JfcFysjIr9TqyTxRI4vH5GxZK+CUP4M6Ew3Hyv78EmA=;
-        b=P1mbosZsVZYp3/8Lw8OOAHtNh/KFc6iNCcJW4izgujXWh9flMRTmaZjFEnlvaY7rUA
-         GDIadhmYgqdBvIJ4TH16PU50y8RykAg99dtjM/15vYqjDJWcrpah83Bd6ejlc3f1CH1/
-         qF5pUzejwfipS4vsDFLyuDCXUgpF+JuMB68tLzh9HyytiImPF0Svlp6+Ol4sgBanQhct
-         oMyD6vBd7xNdpsmayqWIacGhEfDeqvolKPXQcbk2VrfyBmWFpgyAz/GcSLz/9kPcLsZh
-         eETmOM549W/e7wkvvX3ovhzzE8q44XFIuFSzmGR4MvokCf6beMYjkVhixgPYrIkUgzwP
-         koGg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700032589; x=1700637389; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HV8Eb4g7P4o9iQFCN+YkhdZXGat6CVP5qSXvbBBGeGg=;
+        b=tyDtAudzOhKp0wu22SQh75suVspYOa/QaBTMyZMgal4flrEiyE2ug215deWuJcvWyG
+         zgsIGSybKCERZui/uu7aDJPoAD9hTd70Pbuk+J4JLTXSBdCxACPhX2YhScJ3IPyrzZkH
+         rh33eZqJtvv20ILCSelyw0Pv1PpHIBjxW46+xZPRIgF9yG2fhpbUTN0Q4qeKBE6Di9TO
+         7ukKvofbSCBNBpu95SbB+q/n6lCD0TB/BAHIYABNd9Evz7rMrv2F3YgwNRpXzcepC0Yz
+         O95YF8zcVxnrBRLDllmzPfXoe8JHK+Awykt180O7x/nMGHzvxb2B0ZN8opcyQJZRGkTA
+         iqVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700032039; x=1700636839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JfcFysjIr9TqyTxRI4vH5GxZK+CUP4M6Ew3Hyv78EmA=;
-        b=RcW9SGyMfbWaZBA6UfjscFaX1qCv9JxlSeZmggd7vvG0dzDCTUlsNUxqVdEGEnvh/y
-         7D13wwo7klrX1omRSjR5nudkvaxKHgpGrBaZ1SVLuAj3P41VmmozqVkliHgkBpwoLPNn
-         XFgIZBBdDN+tG3lahaPb2bmCjKA62PDGEciGJDID2JiD+4YMPZrPVC0py54Zf35qUWoE
-         ya9fTxsmOY1DeEzvvCSQQSmy6UM7vWTtAJsmBALji1K7YGNlKXtT8zFjvUT16SSEpypE
-         NfAHm/nBCEN9lGwLK/Pi+pdve5RFAVL9dkr0sad+B3F3oU8U3v4iw8l2bIgGtzXommmW
-         /QOQ==
-X-Gm-Message-State: AOJu0Yxx2sqqEgvvKgMGiHODPrABXlYJRZG7OEgKBbD6wgAupoaWnQpD
-	Fkf170Tmcf+vWoiU2a6OrOyFVBvuLhUYSw8b2x79pQ==
-X-Google-Smtp-Source: AGHT+IGOLauAwxi/BVJJJqHU1QJ0WaHUKOi8vg43jvV0SnYXaSneautYd/FXuCN9zH7eMhIxdWsktlry1dmzNP9/pp4=
-X-Received: by 2002:a05:6402:e95:b0:544:f741:62f4 with SMTP id
- h21-20020a0564020e9500b00544f74162f4mr116505eda.0.1700032039377; Tue, 14 Nov
- 2023 23:07:19 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700032589; x=1700637389;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HV8Eb4g7P4o9iQFCN+YkhdZXGat6CVP5qSXvbBBGeGg=;
+        b=AGziNE9E6sZdQ1m7y0kvWvZdH9GQnuCgxgGdnotROV8EAjCR3ZKGZJulkAI8eMShHQ
+         JHYwelBDFSEMCWhduL/X0/Fsy/27/jsdm6nntDG7Sdh1Eif405CH3k1ryTxYH62IrLtI
+         GVI+lXP40rkpEfd93d4Q1BoZEMAZ/NaO18C08Idt71Q9uFVQJTnA+rdCJSfkOqqifSih
+         Fw65DkcHcw5UME8B9t8xBDapowMIelR3LUpNYbcWbWYAG0b61GK1TAso1LpfCsHeKqWI
+         qpI+Utm5kqLBI0OdalgJzKjB6PmiM9rV+vCxTXU3T+9cpBa2eDhdw1DDd0LbWhDHeWOa
+         KMFA==
+X-Gm-Message-State: AOJu0YwjbtjdikhWrBQnw9r6tUxJfajR6YL3s/4abDmCWNEka9FdoA+G
+	vZ2SYEUBQEtOzPvS0yMRrbM+Cw==
+X-Google-Smtp-Source: AGHT+IFUVutrq51us2jaCCn3nKDzT/Gqmth/HhdBv1WwLpVgabZCQG38LXe0u1IYLY62df8jtIHOVw==
+X-Received: by 2002:a17:906:fa9b:b0:9dd:6664:1a3a with SMTP id lt27-20020a170906fa9b00b009dd66641a3amr7938038ejb.51.1700032589035;
+        Tue, 14 Nov 2023 23:16:29 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id dt10-20020a170906b78a00b009a5f1d15644sm6552546ejb.119.2023.11.14.23.16.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Nov 2023 23:16:28 -0800 (PST)
+Date: Wed, 15 Nov 2023 08:16:27 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Vlad Buslov <vladbu@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org, vyasevic@redhat.com,
+	Gal Pressman <gal@nvidia.com>
+Subject: Re: [PATCH net] macvlan: Don't propagate promisc change to lower dev
+ in passthru
+Message-ID: <ZVRwS4wIy1ORH4jS@nanopsycho>
+References: <20231114175915.1649154-1-vladbu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231113233301.1020992-1-lixiaoyan@google.com>
- <20231113233301.1020992-2-lixiaoyan@google.com> <20231114233056.5f798249@kernel.org>
-In-Reply-To: <20231114233056.5f798249@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 15 Nov 2023 08:07:05 +0100
-Message-ID: <CANn89iKtXMMgX7AMb3J8+0sgm-GWnCST+8JQsGmEaiL1fkVCzA@mail.gmail.com>
-Subject: Re: [PATCH v7 net-next 1/5] Documentations: Analyze heavily used
- Networking related structs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Coco Li <lixiaoyan@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	Mubashir Adnan Qureshi <mubashirq@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, Chao Wu <wwchao@google.com>, 
-	Wei Wang <weiwan@google.com>, Pradeep Nemavat <pnemavat@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114175915.1649154-1-vladbu@nvidia.com>
 
-On Wed, Nov 15, 2023 at 5:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+Tue, Nov 14, 2023 at 06:59:15PM CET, vladbu@nvidia.com wrote:
+>Macvlan device in passthru mode sets its lower device promiscuous mode
+>according to its MACVLAN_FLAG_NOPROMISC flag instead of synchronizing it to
+>its own promiscuity setting. However, macvlan_change_rx_flags() function
+>doesn't check the mode before propagating such changes to the lower device
+>which can cause net_device->promiscuity counter overflow as illustrated by
+>reproduction example [0] and resulting dmesg log [1]. Fix the issue by
+>first verifying the mode in macvlan_change_rx_flags() function before
+>propagating promiscuous mode change to the lower device.
 >
-> On Mon, 13 Nov 2023 23:32:57 +0000 Coco Li wrote:
-> >  create mode 100644 Documentation/networking/net_cachelines/index.rst
-> >  create mode 100644 Documentation/networking/net_cachelines/inet_connec=
-tion_sock.rst
-> >  create mode 100644 Documentation/networking/net_cachelines/inet_sock.r=
-st
-> >  create mode 100644 Documentation/networking/net_cachelines/net_device.=
-rst
-> >  create mode 100644 Documentation/networking/net_cachelines/netns_ipv4_=
-sysctl.rst
-> >  create mode 100644 Documentation/networking/net_cachelines/snmp.rst
-> >  create mode 100644 Documentation/networking/net_cachelines/tcp_sock.rs=
-t
+>[0]:
+>ip link add macvlan1 link enp8s0f0 type macvlan mode passthru
+>ip link set macvlan1 promisc on
+>ip l set dev macvlan1 up
+>ip link set macvlan1 promisc off
+>ip l set dev macvlan1 down
+>ip l set dev macvlan1 up
 >
-> Can we add a small MAINTAINERS file entry for these files?
-> To clearly state who's taking on keeping them in sync?
-> Maybe Eric?
+>[1]:
+>[ 5156.281724] macvlan1: entered promiscuous mode
+>[ 5156.285467] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
+>[ 5156.287639] macvlan1: left promiscuous mode
+>[ 5156.288339] mlx5_core 0000:08:00.0 enp8s0f0: left promiscuous mode
+>[ 5156.290907] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
+>[ 5156.317197] mlx5_core 0000:08:00.0 enp8s0f0: promiscuity touches roof, set promiscuity failed. promiscuity feature of device might be broken.
+>
+>Fixes: efdbd2b30caa ("macvlan: Propagate promiscuity setting to lower devices.")
+>Reviewed-by: Gal Pressman <gal@nvidia.com>
+>Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
 
-+2, I am the one ;)
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
