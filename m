@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-48205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A76267ED636
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 22:50:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B3567ED66A
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 22:57:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6C31F25695
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:50:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E99111F2587E
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1653E3FE20;
-	Wed, 15 Nov 2023 21:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F9C23FB08;
+	Wed, 15 Nov 2023 21:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GA+hDQeu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A2kFn1/q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95543E1;
-	Wed, 15 Nov 2023 13:49:54 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id 5614622812f47-3b3e13fc1f7so91919b6e.0;
-        Wed, 15 Nov 2023 13:49:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700084994; x=1700689794; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/mwaERQ3SwmBrI38ngnf3Sqr/Nx6mt0Sl6+BMU0ILU4=;
-        b=GA+hDQeuqeD4JgVEETFLb607gnypVVz26gC0a8EYe4XHjmH7IJeq7znV7JdO0CToCr
-         lhojdDagvOBIUbks9MP9duvUZOPDwm9zPdgB6k3G/YSEjBevJYnxxRFzF6cDjGVMb5QZ
-         sxyjgm6ZZt3VzWpgcm3QZBmQk7E2SlL1jhT1NHHrRMsEsMo6HMyU9/IIzJHiq9AEczUk
-         Xwb/w/NbEYifRm1Acxettzx0ZD68RlxVEZn88yppx9o2ieWzsUvDBU5S+PioX9hP6n5q
-         LLvos2yz7CUnDN00GTqOWCYBFNLfxB599MfDEQLnpqCGqtpH7THmUMy3RpdnCarl1GFu
-         1Edg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700084994; x=1700689794;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/mwaERQ3SwmBrI38ngnf3Sqr/Nx6mt0Sl6+BMU0ILU4=;
-        b=Jm+DnhwavYl9WbvG2u4mlTxr0+brPahB/WxHf2JD33JhiFn1YCy+9+Cwd1+BnbMsIG
-         v/3JSbRaFro/jJVjcIZJUtOIDBGaUZ81Wk17fBAxMKG5rCL9e6dhVd2sZjxuJJtksriu
-         A8n4XfUsogXkSukUpm5JlZlhGYvMPpTO023c6vFl5uwOGHpdbrOTnIInrMfjqYH1gNN8
-         AVlSqrEVb4rbjUR7QXvd+ljwYDo4UWq/NNzPeNvUSBOWBFTCiDSDDkJuVR1PlGdz545c
-         R3+78VHyUed35dEf0wpUj6quAAQI0Gr2GNBew68c2oXTJHlu9uwPnODVEgndBG2zTScb
-         YHJg==
-X-Gm-Message-State: AOJu0YwjuCBi/NgEFNMB1UuYadJzUsxT7QV9xLicNxMDRR8Io6y4hLNU
-	LP3jEcWShNKlHn+5ym0UDqo=
-X-Google-Smtp-Source: AGHT+IGN/DZMh28EybqJsKqiSuMABTnc0NCP3BZUHgseuo2lzHBa/VpDdttCWXpspGPeXiBYt5RV9A==
-X-Received: by 2002:a05:6358:e99:b0:16b:fa63:4f44 with SMTP id 25-20020a0563580e9900b0016bfa634f44mr6054764rwg.10.1700084991699;
-        Wed, 15 Nov 2023 13:49:51 -0800 (PST)
-Received: from localhost.localdomain ([2620:10d:c091:400::5:54b4])
-        by smtp.gmail.com with ESMTPSA id z14-20020ac86b8e000000b0041977932fc6sm3845666qts.18.2023.11.15.13.49.50
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 15 Nov 2023 13:49:51 -0800 (PST)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	kernel-team@fb.com
-Subject: pull-request: bpf 2023-11-15
-Date: Wed, 15 Nov 2023 13:49:49 -0800
-Message-Id: <20231115214949.48854-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C0F45BEB;
+	Wed, 15 Nov 2023 21:57:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A5C7C433C8;
+	Wed, 15 Nov 2023 21:57:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700085452;
+	bh=utRWzAUPDR/YGuRAiQgw7t0J+7beCClfBghAq9tfy7s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A2kFn1/qvdpWpt6Sa7+G3dXsJ4Cbv1CzVhvzu5dwJsUqmu6iyOBj92/iAP71LyWS/
+	 jq9esZ/hPoY3l1tjHBR/OvQhykIHE7aPhN8YdTgP/PLj7wd7RxkMagETuErzXWWPln
+	 sa1S95Bv9wII2Fsh/2Wi+eJnpjbRHmmeFS26QcFkIkEYQcu7EJjvrZ2HqcvSCTniH3
+	 oC3eucpdS3xJAee2huLROhIBCdXn2OHG8glRQyL2JJ/IiOTFY6HJzKeDoXRJXupYmH
+	 rbxs/qEmZjYlSOGYJN3S2Ug+XIXce5G39JyWXQ2DXihOW7acP8ane0RmDfs5oWrNwi
+	 mPDpGauwFHNZw==
+Date: Wed, 15 Nov 2023 21:57:28 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
+	Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH] dt-bindings: net: renesas,etheravb: Document RZ/Five SoC
+Message-ID: <20231115-marry-lagoon-d78d6085f7d7@squawk>
+References: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bQAUvGBLU9yZJPAS"
+Content-Disposition: inline
+In-Reply-To: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
 
-The following pull-request contains BPF updates for your *net* tree.
+--bQAUvGBLU9yZJPAS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We've added 7 non-merge commits during the last 6 day(s) which contain
-a total of 9 files changed, 200 insertions(+), 49 deletions(-).
+On Wed, Nov 15, 2023 at 09:04:48PM +0000, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>=20
+> The Gigabit Ethernet IP block on the RZ/Five SoC is identical to one
+> found on the RZ/G2UL SoC. "renesas,r9a07g043-gbeth" compatible string
+> will be used on the RZ/Five SoC so to make this clear and to keep this
+> file consistent, update the comment to include RZ/Five SoC.
+>=20
+> No driver changes are required as generic compatible string
+> "renesas,rzg2l-gbeth" will be used as a fallback on RZ/Five SoC.
+>=20
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-The main changes are:
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-1) Do not allocate bpf specific percpu memory unconditionally, from Yonghong.
+Cheers,
+Conor.
 
-2) Fix precision backtracking instruction iteration, from Andrii.
+--bQAUvGBLU9yZJPAS
+Content-Type: application/pgp-signature; name="signature.asc"
 
-3) Fix control flow graph checking, from Andrii.
+-----BEGIN PGP SIGNATURE-----
 
-4) Fix xskxceiver selftest build, from Anders.
+iHUEARYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZVU+xQAKCRB4tDGHoIJi
+0ksWAQCrH2BGWrEy+3mGVr9EmqX6AEJBK8pFi/wB9kpSOcLm+AD9FhX7YgTDDIxI
+1mt+waCdmjiuk7XHFmrMnYATmhKa2AA=
+=f8sj
+-----END PGP SIGNATURE-----
 
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Eduard Zingerman, Hao Sun, Hou Tao
-
-----------------------------------------------------------------
-
-The following changes since commit 89cdf9d556016a54ff6ddd62324aa5ec790c05cc:
-
-  Merge tag 'net-6.7-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-11-09 17:09:35 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 
-
-for you to fetch changes up to 1fda5bb66ad8fb24ecb3858e61a13a6548428898:
-
-  bpf: Do not allocate percpu memory at init stage (2023-11-15 07:51:06 -0800)
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'bpf-control-flow-graph-and-precision-backtrack-fixes'
-
-Anders Roxell (1):
-      selftests: bpf: xskxceiver: ksft_print_msg: fix format type error
-
-Andrii Nakryiko (5):
-      bpf: handle ldimm64 properly in check_cfg()
-      bpf: fix precision backtracking instruction iteration
-      selftests/bpf: add edge case backtracking logic test
-      bpf: fix control-flow graph checking in privileged mode
-      selftests/bpf: add more test cases for check_cfg()
-
-Yonghong Song (1):
-      bpf: Do not allocate percpu memory at init stage
-
- include/linux/bpf.h                                | 10 ++-
- kernel/bpf/core.c                                  |  8 +-
- kernel/bpf/verifier.c                              | 87 ++++++++++++++++------
- tools/testing/selftests/bpf/progs/verifier_cfg.c   | 62 +++++++++++++++
- .../testing/selftests/bpf/progs/verifier_loops1.c  |  9 ++-
- .../selftests/bpf/progs/verifier_precision.c       | 40 ++++++++++
- tools/testing/selftests/bpf/verifier/calls.c       |  6 +-
- tools/testing/selftests/bpf/verifier/ld_imm64.c    |  8 +-
- tools/testing/selftests/bpf/xskxceiver.c           | 19 +++--
- 9 files changed, 200 insertions(+), 49 deletions(-)
+--bQAUvGBLU9yZJPAS--
 
