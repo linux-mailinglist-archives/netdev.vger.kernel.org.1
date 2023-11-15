@@ -1,103 +1,107 @@
-Return-Path: <netdev+bounces-47928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42C47EBF89
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:33:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 511E07EBF95
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:36:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05EC7B20ACD
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:33:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FE6F1C208C9
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE2B6AB3;
-	Wed, 15 Nov 2023 09:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDFB7465;
+	Wed, 15 Nov 2023 09:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBtyPwJp"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5A611A
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:33:17 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279849B;
-	Wed, 15 Nov 2023 01:33:16 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SVdHl2pfNzWh7S;
-	Wed, 15 Nov 2023 17:32:51 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 15 Nov
- 2023 17:33:14 +0800
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Mina Almasry <almasrymina@google.com>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Jason Gunthorpe <jgg@nvidia.com>, Matthew Wilcox
-	<willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <20231114172534.124f544c@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <56314b48-5273-6885-f3eb-5d60535faba0@huawei.com>
-Date: Wed, 15 Nov 2023 17:33:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50716AB3;
+	Wed, 15 Nov 2023 09:35:58 +0000 (UTC)
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB9FFE;
+	Wed, 15 Nov 2023 01:35:57 -0800 (PST)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3b6a837a2e1so3726803b6e.0;
+        Wed, 15 Nov 2023 01:35:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700040956; x=1700645756; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y14CWVBX/6BOBmenjOqPw5zX4JOn2XRwD65cHjQ6RJI=;
+        b=GBtyPwJpPi7hopnbrJuw0gSl3IDaR8vT2kKcSaE23Y2Ml7MY7eCFTmLJP3Xkc+B+0v
+         kGgSwle5Bl4jJXlCYgZBUmwncdL4rSEXuSTp5B+pk29+cOZhChFQY6ONEa3h69Z91ypo
+         gEUFC/eKDXXE/j5GZcRZThYHJrpm9yYqSvKhLK3jUvHDzcv64fgz/gZaINBkjEvtCZ8y
+         9vZqz/CqVh6XrZ3g/BfYt2IsgQnV9n1LsQQSJeIU7meZo8RoHnhPRICMoizpnu7jsLM2
+         eiA7ISpmWs1WTYx2LNvS1ZFVjBgMRbbFtWQMrOkCxTit1zy3dr+tSQwsnqbxMON+PcSc
+         UOPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700040956; x=1700645756;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y14CWVBX/6BOBmenjOqPw5zX4JOn2XRwD65cHjQ6RJI=;
+        b=kK0yWhSHp55d5K0b5Nu14kF6vioHrK5jR2d0VQLutUzMClLbdmf5ubRShQENncdRfx
+         yzkI2DI/K3TFr7pFFkS0gckGx0FJ8NHRDrkpquM2KpWDwBeCtQym3xbVDTuyNr6lmOvO
+         CeKFRD36eIzmuH0aLWQDJko7iTLcTmaYcSgZhcmtLJTUs4xpeAPM76tTRsR+fW/VYBTs
+         dXyfVQNoRd3Lnt/gPT1HlIKeYZcSnA8ghVJB/uCQpfM1VHuhAysvhS9YB+pH+8XIpSh1
+         ndziJxh5kbaJAnndiEFn8chRoT6ti74dJMmyhCNVDxz+I+njSDjsic24xch1+1Fn2o2G
+         nS/g==
+X-Gm-Message-State: AOJu0Yxs5+HygLGil4znqJg/t4s6O4lhN8iv8Fw95ZQqlFDGMAgCibOh
+	X0pYrwoG57chSNlo2AgfisU=
+X-Google-Smtp-Source: AGHT+IF93sBNiCaIC3uDNKSKRZJrQ7DHkVcEW6f7Hvccg1iM+XVYLdO3Z/l9xAVoTwcXGCuKeQ2lqw==
+X-Received: by 2002:a54:4397:0:b0:3b2:df83:a760 with SMTP id u23-20020a544397000000b003b2df83a760mr14740212oiv.41.1700040956687;
+        Wed, 15 Nov 2023 01:35:56 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id s18-20020a656452000000b0057825bd3448sm730224pgv.51.2023.11.15.01.35.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 01:35:56 -0800 (PST)
+Date: Wed, 15 Nov 2023 17:35:51 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Po-Hsu Lin <po-hsu.lin@canonical.com>,
+	Guillaume Nault <gnault@redhat.com>
+Subject: Re: [Discuss] Seeking advice on net selftests netns naming method
+Message-ID: <ZVSQ9y37zobubeN+@Laptop-X1>
+References: <ZVND+e6RKLFudYQA@Laptop-X1>
+ <7b2d70645fecf83f30d71c44ae0071da1b3be67c.camel@redhat.com>
+ <ZVR4j+ZYQmb68/V9@Laptop-X1>
+ <8093c847a556cf38c40f5e9329b087ea34f59e29.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231114172534.124f544c@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8093c847a556cf38c40f5e9329b087ea34f59e29.camel@redhat.com>
 
-On 2023/11/15 6:25, Jakub Kicinski wrote:
-> On Tue, 14 Nov 2023 16:23:29 +0800 Yunsheng Lin wrote:
->> I would expect net stack, page pool, driver still see the 'struct page',
->> only memory provider see the specific struct for itself, for the above,
->> devmem memory provider sees the 'struct page_pool_iov'.
+On Wed, Nov 15, 2023 at 10:10:38AM +0100, Paolo Abeni wrote:
+> > Thanks, this is a good idea. I reviewed all the test cases and it should works
+> > for most of them. Only the SRv6 tests are a little complex as they use 2 id
+> > number for netns name. e.g. the setup_hs() in
+> > srv6_end_dt46_l3vpn_test.sh. I plan to add the tmp string between the hs/rt and
+> > ids. e.g. hs-xxxxxx-t100-1, rt-xxxxxx-1. I will have a try first.
 > 
-> You can't lie to the driver that an _iov is a page either.
-
-Yes, agreed about that.
-
-As a matter of fact, the driver should be awared of what kind of
-memory provider is using when it calls page_pool_create() during
-init process.
-
-> The driver must explicitly "opt-in" to using the _iov variant,
-> by calling the _iov set of APIs.
+> Supposing netns_init() creates a namespace named <unique>, I think the
+> following (very hackish thing) would work:
 > 
-> Only drivers which can support header-data split can reasonably
-> use the _iov API, for data pages.
+> # create an alias for the namespace
+> ln -s /var/run/netns/<unique> /var/run/netns/hs-t${tid}-${hs}
 
-But those drivers can still allow allocating normal memory, right?
-sometimes for data and header part, and sometimes for the header part.
+We can't do this as the purpose of using "unique" namespace name is do
+Parallel testing. If we create the soft link and run multi SRv6 tests (there
+are multi SRv6 tests with same netns name) at the same time, the naming will
+be conflict.
 
-Do those drivers need to support two sets of APIs? the one with _iov
-for devmem, and the one without _iov for normal memory. It seems somewhat
-unnecessary from driver' point of veiw to support two sets of APIs?
-The driver seems to know which type of page it is expecting when calling
-page_pool_alloc() with a specific page_pool instance.
-
-Or do we use the API with _iov to allocate both devmem and normal memory
-in the new driver supporting devmem page?  If that is the case, does it
-really matter if the API is with _iov or not?
-
-> .
-> 
+Thanks
+Hangbin
 
