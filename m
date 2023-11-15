@@ -1,165 +1,113 @@
-Return-Path: <netdev+bounces-48123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1573C7EC9DC
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:44:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564A77EC9E5
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:50:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9581F23EB8
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFD8280EBB
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1743D33CD9;
-	Wed, 15 Nov 2023 17:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2533EA94;
+	Wed, 15 Nov 2023 17:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SwhCU04B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Op6umecg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7CC4E0
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:44:51 -0800 (PST)
-Received: by mail-vk1-xa29.google.com with SMTP id 71dfb90a1353d-4af5ea40b7bso1781420e0c.2
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:44:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700070291; x=1700675091; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yA0mSDgxgLYHALoqWknT9J7D4wZ2ecpGCOc3KqqrcZQ=;
-        b=SwhCU04BPZ9EP8tQWeVlrXnomNWBQTJLe4hTlLdwyFmJFWlfGTS+3/zZTXJBEhH8VE
-         Nc/UVDhLDpLC/Lu4a6fmgiUVgWKKjH1wq0ipjlHsleiEnJORdw3Nwgj7j+ubCPVV0wwh
-         2qGmfoScdW5A2Q2zJwmFhe+s4uJYOHM+CUUZRUPWQB/FDjLSLOoANFAeSUk6Z8TKl6pP
-         3ufDsMIOLxtG5a6aHgAxRNLLI2mCdgKa614ZZjo5geUtStfOoO+7YiLqo5Az4u3xI23A
-         AU4PPvG1KSmQueLkjhwncmlNXafL0PZ/Ee4VpsJ5tyv564vCujoFg1HlzjSQBFlGCs4E
-         ElDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700070291; x=1700675091;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yA0mSDgxgLYHALoqWknT9J7D4wZ2ecpGCOc3KqqrcZQ=;
-        b=d5dfGFH96oAwrVqj4fOOP7s1seXagXY9FuT4pvr17ZCxXwksy3PWRRqs1PQOo7mnn8
-         1EdC0gB9XFPgUkj0v9RhtZWbIS4vsyc9+RnhcwSBPv2yCfCy3IIdkwn9vzlouMathxOy
-         DajQ2MQzXRL3FATG8MTQOqOTezBBBVV5RvVuIZwH8powZk4ZsYzQUB5AgtC5p1ipA5sQ
-         E/uGsuMvujUONeQ18tTrpjkH1qina7VFN5tTzXl3zpYXi4iirP+V0TOj2Jgw0SSO+2TD
-         d/VcnwahtRNLt1RiKMV11WJLjOp8H9ZdxZS5BJ943CuZO84im6dmtaQczTWnZPmrM9xq
-         SINA==
-X-Gm-Message-State: AOJu0Yypa/3yqk/NlMjhqJnw6dBwbrb0SHgAYkTDxz09oyS82bRGwWDQ
-	3Y1wK8PItgTDzWtniQyVBKkCMbdGjAc/lcg7wiRZDg==
-X-Google-Smtp-Source: AGHT+IGCeekYmgCpDMKNfje7s/UUbIYwx3KAkOWA4nSYbX+koWgmhlu9SKjkYgbwCqGGk4LNHymbvB4ZbInN8ydoQiM=
-X-Received: by 2002:a05:6122:922:b0:4ac:462b:7417 with SMTP id
- j34-20020a056122092200b004ac462b7417mr14917004vka.8.1700070290777; Wed, 15
- Nov 2023 09:44:50 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31683BB49
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 17:50:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1285C433C7;
+	Wed, 15 Nov 2023 17:49:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700070600;
+	bh=n0s6JumETlN+9n/hXQMQBMbeMTivYx2zxD8T9/2FEpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Op6umecgS3kdGWXBPIQpr8QXahiAFcCYy6QB5H+/XLhqNdBrq4j+/oPyrekch31qW
+	 95PAB/l7naHebPdSa1/MmVUSH0vKETCAJrB3bInfAJglI6hWRCxevUVwHiV7k9Dazt
+	 hIWqP0aG/MhdnyVzcOyU0vM/REHR4zLNBTfXDCREroLNbjT7IoCoBAvu+CT+HANirC
+	 FrHsUbyXNvgUVOcQz4nmU9C9bipVhmq96yy6g+ggN4nXC+eB8X+EXocA9Xu9shCTYI
+	 lhiMowGhh+Fy2by9cTTHHUX2NdQMaV3e8PVQMg9eBFk4NeN66j7/ID8/Axs6ROaUJW
+	 XrUFWb/gZ1ZPg==
+Date: Wed, 15 Nov 2023 17:49:55 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, j.vosburgh@gmail.com, andy@greyhouse.net,
+	weiyongjun1@huawei.com, yuehaibing@huawei.com
+Subject: Re: [PATCH net-next,v3] bonding: use WARN_ON instead of BUG in
+ alb_upper_dev_walk
+Message-ID: <20231115174955.GV74656@kernel.org>
+References: <20231115115537.420374-1-shaozhengchao@huawei.com>
+ <ZVTUL4QByIyGyfDP@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com> <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org> <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <ZVNzS2EA4zQRwIQ7@nvidia.com> <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
-In-Reply-To: <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 15 Nov 2023 09:44:37 -0800
-Message-ID: <CAHS8izMR-FrTtCty8v29atAMor5FmzV_Ogk85H=gqGaJNvJnuA@mail.gmail.com>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Eric Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Matthew Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZVTUL4QByIyGyfDP@nanopsycho>
 
-On Wed, Nov 15, 2023 at 1:21=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2023/11/14 21:16, Jason Gunthorpe wrote:
-> > On Tue, Nov 14, 2023 at 04:21:26AM -0800, Mina Almasry wrote:
+On Wed, Nov 15, 2023 at 03:22:39PM +0100, Jiri Pirko wrote:
+> Wed, Nov 15, 2023 at 12:55:37PM CET, shaozhengchao@huawei.com wrote:
+> >If failed to allocate "tags" or could not find the final upper device from
+> >start_dev's upper list in bond_verify_device_path(), only the loopback
+> >detection of the current upper device should be affected, and the system is
+> >no need to be panic.
 > >
-> >> Actually because you put the 'strtuct page for devmem' in
-> >> skb->bv_frag, the net stack will grab the 'struct page' for devmem
-> >> using skb_frag_page() then call things like page_address(), kmap,
-> >> get_page, put_page, etc, etc, etc.
-> >
-> > Yikes, please no. If net has its own struct page look alike it has to
-> > stay entirely inside net. A non-mm owned struct page should not be
-> > passed into mm calls. It is just way too hacky to be seriously
-> > considered :(
->
-> Yes, that is something this patchset is trying to do, defining its own
-> struct page look alike for page pool to support devmem.
->
-> struct page for devmem will not be called into the mm subsystem, so most
-> of the mm calls is avoided by calling into the devmem memory provider'
-> ops instead of calling mm calls.
->
-> As far as I see for now, only page_ref_count(), page_is_pfmemalloc() and
-> PageTail() is called for devmem page, which should be easy to ensure that
-> those call for devmem page is consistent with the struct page owned by mm=
-.
+> >Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+> >---
+> >v3: return -ENOMEM instead of zero to stop walk
+> >v2: use WARN_ON_ONCE instead of WARN_ON
+> 
+> Yet the WARN_ON is back :O
 
-I'm not sure this is true. These 3 calls are just the calls you're
-aware of. In your proposal you're casting mirror pages into page* and
-releasing them into the net stack. You need to scrub the entire net
-stack for mm calls, i.e. all driver code and all skb_frag_page() call
-sites. Of the top of my head, the driver is probably calling
-page_address() and illegal_highdma() is calling PageHighMem(). TCP
-zerocopy receive is calling vm_insert_pages().
+Hi Jiri,
 
-> I am not sure if we can use some kind of compile/runtime checking to ensu=
-re
-> those kinds of consistency?
->
-> >
-> >>> I would expect net stack, page pool, driver still see the 'struct pag=
-e',
-> >>> only memory provider see the specific struct for itself, for the abov=
-e,
-> >>> devmem memory provider sees the 'struct page_pool_iov'.
-> >>>
-> >>> The reason I still expect driver to see the 'struct page' is that dri=
-ver
-> >>> will still need to support normal memory besides devmem.
-> >
-> > I wouldn't say this approach is unreasonable, but it does have to be
-> > done carefully to isolate the mm. Keeping the struct page in the API
-> > is going to make this very hard.
->
-> I would expect that most of the isolation is done in page pool, as far as
-> I can see:
->
-> 1. For control part: the driver may need to tell the page pool which memo=
-ry
->                      provider it want to use. Or the administrator specif=
-ies
->                      which memory provider to use by some netlink-based c=
-md.
->
-> 2. For data part: I am thinking that driver should only call page_pool_al=
-loc(),
->                   page_pool_free() and page_pool_get_dma_addr related fun=
-ction.
->
-> Of course the driver may need to be aware of that if it can call kmap() o=
-r
-> page_address() on the page returned from page_pool_alloc(), and maybe tel=
-l
-> net stack that those pages is not kmap()'able and page_address()'able.
->
-> >
-> > Jason
-> > .
-> >
+I think the suggestion was to either:
 
+1. WARN_ON_ONCE(); return 0;      <= this was v2
+2. WARN_ON(); return -ESOMETHING; <= this is v3
+(But not, WARN_ON(); return 0;    <= this was v1)
 
+And after v2 it was determined that the approach taken here in v3 is
+preferred.
 
---=20
-Thanks,
-Mina
+So I think this patch is consistent with the feedback given by Jay
+in his reviews so far.
+
+> 
+> 
+> >---
+> > drivers/net/bonding/bond_alb.c | 6 ++++--
+> > 1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> >diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+> >index dc2c7b979656..21f1cb8e453b 100644
+> >--- a/drivers/net/bonding/bond_alb.c
+> >+++ b/drivers/net/bonding/bond_alb.c
+> >@@ -984,8 +984,10 @@ static int alb_upper_dev_walk(struct net_device *upper,
+> > 	 */
+> > 	if (netif_is_macvlan(upper) && !strict_match) {
+> > 		tags = bond_verify_device_path(bond->dev, upper, 0);
+> >-		if (IS_ERR_OR_NULL(tags))
+> >-			BUG();
+> >+		if (IS_ERR_OR_NULL(tags)) {
+> >+			WARN_ON(1);
+> >+			return -ENOMEM;
+> >+		}
+> > 		alb_send_lp_vid(slave, upper->dev_addr,
+> > 				tags[0].vlan_proto, tags[0].vlan_id);
+> > 		kfree(tags);
+> >-- 
+> >2.34.1
+> >
+> >
+> 
 
