@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-48092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0F107EC7FD
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:58:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55CD37EC800
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C1280FF3
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:58:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8821B20B22
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:59:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CE433CF;
-	Wed, 15 Nov 2023 15:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDE3433D2;
+	Wed, 15 Nov 2023 15:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="elQNmp/7"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="E+0weaCF"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81192C848
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:58:03 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9BBA2
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:58:02 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c4ed8eef16so5378824b3a.0
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:58:02 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164C2C85A
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:59:24 +0000 (UTC)
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15A4B9
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:59:23 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6be1bc5aa1cso7105750b3a.3
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:59:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700063882; x=1700668682; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700063963; x=1700668763; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kZD+QVCMTfwt5SQkaapp8sA6RDdyskoGJOT1ImXj0xQ=;
-        b=elQNmp/7re7TrhJDAl80u7g9/yk/yLMKYIypiqLd187YaGsyW2QLhLlESuZnmJDL4B
-         2y6YY2zJuZKEs9lfKeVM7jMY9klUhDGZDHPRaz2UIKdwCizW7LZ4kZJ9X4ykwNXEk+yH
-         S4apGGLDHr1Kw/fNfSHJtXUrq6nbIG7Df73poZoPFR0VjHVJcpC6MamdzFeDxf0tV6fB
-         exHy1auLy+6eDWNn1HK20QYp85eayY0AZYg0D98ixgV38SXDkWJbjMf/b5mXrg2jfLWa
-         L+zZsCvpxGP9mOGvdyyY8KkUCTGG95ccnLKZmP35z33HAfT0LSdzdLqmQuneXNcPY/1I
-         qzWw==
+        bh=ZHUTStH98CPi8Qn9gNHX+C8Dffz4kEdqV2rCwN9VAu0=;
+        b=E+0weaCFNoB4229I4WQdAOFkzr4isJN+3arQir/n6cITOjGgvNq6zmEYGOedKSsdCk
+         uWt/RQtpl7zPldK7q+y2UPJwju5Kth+8lrChskuoUqQ0fe4wLe+91/O/4Bs7FNvUpZeA
+         y90PP4ikvjtQnLPLzNUa3nh8Vw26NxVzDCmrPSjVNH5N9tjORw9Z8a+6FPXiluC4z5pI
+         spSZ0UlHEY+QUKaxA9ewgA+tNyfoao3YwwJ66d9ZRIQ93SphHVcT3/DQP6oTTH7Abq7/
+         AjsCbpnGHya7qRVaWrjfIOwnhe+JolY1wQCcpVHyJoclI5dNABSMB+NqP7Guw41tteob
+         D4ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700063882; x=1700668682;
+        d=1e100.net; s=20230601; t=1700063963; x=1700668763;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kZD+QVCMTfwt5SQkaapp8sA6RDdyskoGJOT1ImXj0xQ=;
-        b=WobWR0UqCq3JI63vDuKF5W6VcWw2TrsaIJzHi0VbdFg9Np+q1275LhjjVLYKU7AMGz
-         p9Q3U+WfR36j3sxd9/U5yrmCGsHD8So7JSKksVEv3NAeppZ9NCe7czW/w+eB507FX4tl
-         BHebu6dokzzUOquSvpqe35GZGiNeVV4Bxyb2Y4R/Ylro6+gfHGljBIlP/M763tx88jk+
-         z1fQqp/7v8g+n1X84wSF4LQMG3gm6k28FRceNu3prDKgKZAp8X4VuOQq2aziZiR2MXTl
-         nA1A/xJ5JjDUQGPOb4hA6n6qgZ5+6GddpJDxQAzGZipG07QA95/Qy4TbLyF/Iv7WsyHy
-         Y8vQ==
-X-Gm-Message-State: AOJu0YxauZ2m0FdayfMP3EvBuQq0/ryYKmZQg5ug9UAclURjOdkP9+Mi
-	hKP+n9TPdvXZ1sYQgpJLfYDfSQ==
-X-Google-Smtp-Source: AGHT+IEozYd1s+NVHo/yFwGaFR8ZBn/1l+FhWxYvAxe5plJn6hoRA0Ujhz6tqQ9ImGkVp7L13DHrAw==
-X-Received: by 2002:a05:6a00:1bca:b0:6c3:5f49:6da7 with SMTP id o10-20020a056a001bca00b006c35f496da7mr14861647pfw.2.1700063881718;
-        Wed, 15 Nov 2023 07:58:01 -0800 (PST)
+        bh=ZHUTStH98CPi8Qn9gNHX+C8Dffz4kEdqV2rCwN9VAu0=;
+        b=t9kJHFJcOBZyhjS8fcYzZXoMs/VkqHOWo0TwCfVPQBjDO/95sHofdrdj/oYeshgteX
+         kfZjEN/S5ehA8uOuBJW1ErLoRIuijgsvkmAIMtjxFTCLldelkTKGVjhhP9nOXzsp7Lkf
+         v9+vye0/tQZPncaw2muVq0NC7QWgio9lEJRh1e9d0aIZWkK0VpMnhqXHFf+sLHuWHTG0
+         1lqgEpmPTV7HOVJhR/840YRhiVmjZDq0ibQBKu0pIq+MSHkHCkGzr3vodndJWNhr4hiw
+         rE3SsGCmteykRhFaxM6B3WON0x1gPv3krGlmI6h09+iumx/bU4vRu5HQVusxNN5Smrzy
+         PCSA==
+X-Gm-Message-State: AOJu0Yyc6yVhQsiwpbcNl3qt8g4ai6GECvX+eASPQ5jLF0M88GijW5xy
+	Us/DEFWZ02m8FcYqriIPp5fLug==
+X-Google-Smtp-Source: AGHT+IEDnTNQe8QWlw4OeizPDpqo7B4w4v1z7OW1Fg2iu7afcPbu7Xtl813sJOzp1S/lUEJwrmhNRQ==
+X-Received: by 2002:a05:6a00:8e02:b0:6c3:625e:6950 with SMTP id io2-20020a056a008e0200b006c3625e6950mr15497942pfb.21.1700063963473;
+        Wed, 15 Nov 2023 07:59:23 -0800 (PST)
 Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id t38-20020aa78fa6000000b006bfb9575c53sm2949255pfs.180.2023.11.15.07.58.01
+        by smtp.gmail.com with ESMTPSA id n4-20020a056a0007c400b006c4d47a7668sm2990958pfu.127.2023.11.15.07.59.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 07:58:01 -0800 (PST)
-Date: Wed, 15 Nov 2023 07:57:59 -0800
+        Wed, 15 Nov 2023 07:59:22 -0800 (PST)
+Date: Wed, 15 Nov 2023 07:59:21 -0800
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Petr Machata <petrm@nvidia.com>
 Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>, Patrisious
  Haddad <phaddad@nvidia.com>
 Subject: Re: [PATCH iproute2-next 3/3] lib: utils: Add
  parse_one_of_deprecated(), parse_on_off_deprecated()
-Message-ID: <20231115075759.08921704@hermes.local>
+Message-ID: <20231115075921.198fad24@hermes.local>
 In-Reply-To: <8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
 References: <cover.1700061513.git.petrm@nvidia.com>
 	<8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
@@ -89,6 +89,5 @@ Petr Machata <petrm@nvidia.com> wrote:
 > Similar issues are in principle also possible for parse_one_of() uses,
 > though currently this does not come up.
 
-If we need to keep accepting shorthands, I would prefer that any
-use of shorthand would cause a warning message.
+This was probably a bug, I am open to breaking shorthand usage in this case.
 
