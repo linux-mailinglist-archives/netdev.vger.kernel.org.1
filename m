@@ -1,140 +1,123 @@
-Return-Path: <netdev+bounces-48118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C94B7EC979
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:16:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B969F7EC901
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44F821C208A3
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:16:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7510B281597
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5801128372;
-	Wed, 15 Nov 2023 17:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71853EA72;
+	Wed, 15 Nov 2023 16:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZT/YRkws"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="XKo7BfFs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2076.outbound.protection.outlook.com [40.107.220.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EDED18E
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:16:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bQkkM682oqWtPMhAv1Tas2bFZLWgsN/6TKsp6AGTzVWSPuHxkEG/+9RkJKv/qtbBGNNFHCq4makczmZAT0cwfrpwcb4Wx6pseaZ2kVSCpdbkDW85C8euLmJ4n+RaRzW3VqJHMzEeIFfBhhUWwuQz5PwI0zNBSAVQSVLc8q5vBZhPMJu2t4QRsqmMYoXzNbnoO/Pa5n7yJUsnLWHwvKzt8BfzTWKDLh17eMb8yGX4/X0Gv+J/gd1sIta4QeDz0B1atZRqH8XZP/K9TR007Ehq/A+kMFK2rwZj75aBRPyFcw1JFO9daHYb6Hva13aTjovcae7/2ERPmifeH5XEh8SQ/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YcPU6Y/Q6LChQBjAEwrH7EyDvZ2eZzqXGQlTUphjJkU=;
- b=ZCCKQZNHslO1Wpun4bVByLVj2MSunPTWaHmr8H3io//aIOKitTZuw/W+ebY18pYmny3R7RUz1n3U01g2V3yj64llUNSodZptXSU7U5UjiZ51bn7BA05H4TE5TVkmzu9EgPsDLTzK82x1emUEzom3wNIrielotL5jRAmp4bwQxpNn+6Wg5dAhT3bW+uOrCFZMJb10by8goOKu3B8r2gJMnfpWXFGi8qPCL0vJjlgIaPNK9HqxICeZ/ogtFnGWo77QA6r2vgqdelCqCmkf0T16Q4XCKUuh/hI0jYx3oA7cMJrxzICwjMGoowndmhkrN8Zq0HrDRnZ1v5GQRZiLpTLepw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YcPU6Y/Q6LChQBjAEwrH7EyDvZ2eZzqXGQlTUphjJkU=;
- b=ZT/YRkwsMSXUWmQcjMU816jCBSp+INZhQ2DMNryGKAmCMFyJHtaVzsyYdszDf5H9CnCzWdJ7gCGBny+E7RwsNyRakRhiH7RgbKv5Msxb6mFU2W6vXFIhS0w1clXoV2H1U0plKm+Ll+szpPBtkBzeEOYtHx3ywamtpF62dnQTLXihsH91EyI8kvlb7Un978fnEzrXmLEgPKOt7LaV4LjMBkB7pze3ZfaoO+bBxcuTLb6UnejHg74/bDsuQM4a3WgMYmhKKH2g06jn2hAhq5vcrTAadAChpD+NxTs2WlHjmPQ+IRkJ08EnyjZtFG2nEQ/dAH8K1jOt9GeFa4YBF+ZXVg==
-Received: from CYXPR02CA0062.namprd02.prod.outlook.com (2603:10b6:930:cd::25)
- by SA0PR12MB7092.namprd12.prod.outlook.com (2603:10b6:806:2d5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.20; Wed, 15 Nov
- 2023 17:16:31 +0000
-Received: from CY4PEPF0000EE32.namprd05.prod.outlook.com
- (2603:10b6:930:cd:cafe::f4) by CYXPR02CA0062.outlook.office365.com
- (2603:10b6:930:cd::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.20 via Frontend
- Transport; Wed, 15 Nov 2023 17:16:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000EE32.mail.protection.outlook.com (10.167.242.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7002.19 via Frontend Transport; Wed, 15 Nov 2023 17:16:31 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 15 Nov
- 2023 09:16:21 -0800
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Wed, 15 Nov
- 2023 09:16:19 -0800
-References: <cover.1700061513.git.petrm@nvidia.com>
- <8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
- <20231115075921.198fad24@hermes.local>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-CC: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@gmail.com>,
-	<netdev@vger.kernel.org>, Patrisious Haddad <phaddad@nvidia.com>
-Subject: Re: [PATCH iproute2-next 3/3] lib: utils: Add
- parse_one_of_deprecated(), parse_on_off_deprecated()
-Date: Wed, 15 Nov 2023 17:57:27 +0100
-In-Reply-To: <20231115075921.198fad24@hermes.local>
-Message-ID: <87pm0bvswu.fsf@nvidia.com>
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF24535EFB
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:59:10 +0000 (UTC)
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314D1FA
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:59:08 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso10007928e87.2
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:59:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1700067546; x=1700672346; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ac4Ls6gftQvQgbcRf5XLhX5PwcgnIwraX4CtQN05HrE=;
+        b=XKo7BfFsmcb0YnmWGpFnRQNbI2Ieviv+2uP/0392a453G8aponkQClciBNjNx83HvJ
+         otRxo545V4Qaj3CIzSwU9Nu3f9Hi1VuVhDDc3eVgvL+7UiuqvYnXeRvozTm4NBl4NcDf
+         1b0+PoQFPZN2fbqXb/iAYA+fXVjOg9nCJA2Gg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700067546; x=1700672346;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ac4Ls6gftQvQgbcRf5XLhX5PwcgnIwraX4CtQN05HrE=;
+        b=FUjrV24yNVQW4tgA7gb9AkApg9aMStPAw/FhMway8wD19nhC7gZQVWFLwQCSUt3kDh
+         qx6BZO66S2gX5p2RCR7ac+EW3aKsqI877d2+mxSWKw5Yd2h9T4Fa15rLUfD/sXNOWFUD
+         fA+/jAupLblr1RY4CHd81CV2VJM/zmy5hPikt2LB2QDQW5UaCWxMcx1qRfwM5Bh1v3I4
+         qfETScLTV/LGTAP+1F4WH+LB/Fzcx8CpwFmTew4GBpgkSmOjSBdTYFyLNxreLSdYqNEc
+         FGJ4jZ0nz+qUEPUJJ3s0H471hFaCgysfGW1QuuEEbVKxcgkQkMbRfldZq9YOdzEPuVI1
+         N7GQ==
+X-Gm-Message-State: AOJu0YyQl9R5TSxNfdLl//eEBpL5CQmwf859yT4NbuUe1xyyns21pKzy
+	RgZMqZx+39Fqr9UNozDpFd9V+8ohuC3Hn/+zzqK8cyS+
+X-Google-Smtp-Source: AGHT+IGmzQgDlsIajpfAKGWm7KIbLzuoWkgkhT1onJBenDhACv4fn7xZSmooCi2dFguYFx1YDFrIBA==
+X-Received: by 2002:ac2:4e0a:0:b0:502:d743:9fc4 with SMTP id e10-20020ac24e0a000000b00502d7439fc4mr11833501lfr.37.1700067546469;
+        Wed, 15 Nov 2023 08:59:06 -0800 (PST)
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com. [209.85.167.46])
+        by smtp.gmail.com with ESMTPSA id f21-20020ac25335000000b004fb7848bacbsm1686733lfh.46.2023.11.15.08.59.05
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Nov 2023 08:59:06 -0800 (PST)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-507975d34e8so10008882e87.1
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:59:05 -0800 (PST)
+X-Received: by 2002:a19:7119:0:b0:507:9787:6773 with SMTP id
+ m25-20020a197119000000b0050797876773mr9107681lfc.36.1700067545585; Wed, 15
+ Nov 2023 08:59:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE32:EE_|SA0PR12MB7092:EE_
-X-MS-Office365-Filtering-Correlation-Id: 10a3a2b7-22be-40f4-5ddd-08dbe5fe9c6e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	XXMEffD0KYyhE/FW9D9GhMgIxmWKEd7FaHx78iifwDnoKVWTIpZ6EtOErZNgvd7IaTQpXFPDlsLJZxhRICL+AbP8l2vIxcHaS8BRk8gYEAespFTisHKIrIkgF9+oJjH7ZkMh5dt6vxCXXtWaz/gaSK119u7ssWM5WRyI4i77lTXIZM+HVTnKBs+973obvUiLVwHQRgvMCUrki00334LApP10cP1Xes233cQ9nUh9DzDOIKNdVLYJZKZI6p2o/MyzTNbO96N5hE8p5JwImmWvH168blAs6ZOv2WE9U+Sbtrvxb5aTF0fxMOJXxP2hhYRi1KPNp0cIod5Nu1yhihkUNQVrIXdrJIdS0K9vZ/73ZpbTcqLApm5bphRDl8ogVNeRPQkkHJd2t40j7hW2DxUk5NUX2TjGARiw0ROe0rRT9VSlTn6ArQ1UEIdeOzsFP3h0V+UQC+RQx/1t092rVD6NU0+nQByQynZikMo0qpXVZdLgB14gwLA1S/x7GP+FQ29ZB+yz7HDoIwDJQAT8xDGYR8zwkbDj62K+J01JoZ5dAEKfJTelhRrCsSphIe4Npp1B96hvr0Cnq0EVx8b8+Xuke8I59Q805IENLZFK7BoV1lfQjGsMe7sU8k8BDWqZxDgnXY/ezm96P/mmM956ZOvYFY9JVvtEfM/mMS98lOQ7oB2MbpGioIawcf7honyttC3nAHKxCCYhpUvLavvUQsyrkkiQSv7levcz4Xb8q4HfL1C/9LHfg8EsjJscXlViF0tr/m2eZ2Vh9WGGlVEYP79JvRI7Oi53pnzVK4Wew5UF/ak=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(376002)(346002)(136003)(396003)(230273577357003)(230173577357003)(230922051799003)(451199024)(64100799003)(82310400011)(1800799009)(186009)(46966006)(40470700004)(36840700001)(26005)(40460700003)(16526019)(107886003)(336012)(426003)(6666004)(2616005)(36860700001)(83380400001)(47076005)(5660300002)(4326008)(8676002)(8936002)(41300700001)(2906002)(478600001)(6916009)(316002)(54906003)(70586007)(70206006)(82740400003)(86362001)(36756003)(7636003)(356005)(40480700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 17:16:31.0583
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10a3a2b7-22be-40f4-5ddd-08dbe5fe9c6e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE32.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7092
+References: <20231115154946.3933808-1-dhowells@redhat.com> <20231115154946.3933808-6-dhowells@redhat.com>
+ <CAHk-=wgHciqm3iaq6hhtP64+Zsca6Y6z5UfzHzjfhUhA=jP0zA@mail.gmail.com> <3936726.1700066370@warthog.procyon.org.uk>
+In-Reply-To: <3936726.1700066370@warthog.procyon.org.uk>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 15 Nov 2023 11:58:48 -0500
+X-Gmail-Original-Message-ID: <CAHk-=whEj_+oP0mwNr7eArnOzWf_380-+-6LD9RtQXVs29fYJQ@mail.gmail.com>
+Message-ID: <CAHk-=whEj_+oP0mwNr7eArnOzWf_380-+-6LD9RtQXVs29fYJQ@mail.gmail.com>
+Subject: Re: [PATCH v3 05/10] iov_iter: Create a function to prepare userspace
+ VM for UBUF/IOVEC tests
+To: David Howells <dhowells@redhat.com>
+Cc: Christian Brauner <christian@brauner.io>, Jens Axboe <axboe@kernel.dk>, 
+	Al Viro <viro@zeniv.linux.org.uk>, Christoph Hellwig <hch@lst.de>, 
+	David Laight <David.Laight@aculab.com>, Matthew Wilcox <willy@infradead.org>, 
+	Brendan Higgins <brendanhiggins@google.com>, David Gow <davidgow@google.com>, 
+	linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, Christian Brauner <brauner@kernel.org>, 
+	David Hildenbrand <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, loongarch@lists.linux.dev, linux-s390@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-
-Stephen Hemminger <stephen@networkplumber.org> writes:
-
-> On Wed, 15 Nov 2023 16:31:59 +0100
-> Petr Machata <petrm@nvidia.com> wrote:
+On Wed, 15 Nov 2023 at 11:39, David Howells <dhowells@redhat.com> wrote:
 >
->> The functions parse_on_off() and parse_one_of() currently use matches() for
->> string comparison under the hood. This has some odd consequences. In
->> particular, "o" can be used as a shorthand for "off", which is not obvious,
->> because "o" is the prefix of both. By sheer luck, the end result actually
->> makes some sense: "on" means on, anything else means off (or errors out).
->> Similar issues are in principle also possible for parse_one_of() uses,
->> though currently this does not come up.
->
-> This was probably a bug, I am open to breaking shorthand usage in this case.
+> I was trying to make it possible to do these tests before starting userspace
+> as there's a good chance that if the UBUF/IOVEC iterators don't work right
+> then your system can't be booted.
 
-There were uses of matches() for on/off parsing even before adding
-parse_on_off(). The bug was converting _everyone_ to matches().
+Oh, I don't think that any unit test should bother to check for that
+kind of catastrophic case.
 
-I figured you'd be against just s/matches/strcmp, but if you think it's
-OK, I have no problem with that. Shorthanding on/off just makes no
-sense to me, not even by mistake.
+If something is so broken that the kernel doesn't boot properly even
+into some basic test infrastructure, then bisection will trivially
+find where that breakage was introduced.
 
-How about the parse_one_of() users? E.g. the disabled/check/strict for
-macsec validate, I could see someone mistyping it as "disable", so now
-it lives in some deployment script, or testing harness, or whatever.
+And if it's something as core as the iov iterators, it won't even get
+past the initial developer unless it's some odd build system
+interaction.
 
-Maybe do the warning thing in this case? And retire it a couple releases
-down the line in favor of just accepting strcmp?
+So extreme cases aren't even worth checking for. What's worth testing
+is "the system boots and works, but I want to check the edge cases".
+
+IOW, when it comes to things like user copies, it's things like
+alignment, and the page fault edge cases with EFAULT in particular.
+You can easily get the return value wrong for a user copy that ends up
+with an unaligned fault at the end of the last mapped page. Everything
+normal will still work fine, because nobody does something that odd.
+
+But those are best handled as user mode tests.
+
+           Linus
 
