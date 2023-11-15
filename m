@@ -1,38 +1,37 @@
-Return-Path: <netdev+bounces-47927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D8D7EBF7A
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:29:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42C47EBF89
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:33:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 032CF281392
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:29:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05EC7B20ACD
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8596120;
-	Wed, 15 Nov 2023 09:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE2B6AB3;
+	Wed, 15 Nov 2023 09:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C9A63A5
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5A611A
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:33:17 +0000 (UTC)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67769B;
-	Wed, 15 Nov 2023 01:29:19 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SVd6n2G6vzNm6J;
-	Wed, 15 Nov 2023 17:25:05 +0800 (CST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279849B;
+	Wed, 15 Nov 2023 01:33:16 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SVdHl2pfNzWh7S;
+	Wed, 15 Nov 2023 17:32:51 +0800 (CST)
 Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
  (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 15 Nov
- 2023 17:29:17 +0800
+ 2023 17:33:14 +0800
 Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Mina Almasry
-	<almasrymina@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Mina Almasry <almasrymina@google.com>, <davem@davemloft.net>,
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
 	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
@@ -45,14 +44,10 @@ References: <20231113130041.58124-1-linyunsheng@huawei.com>
  <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
  <20231113180554.1d1c6b1a@kernel.org>
  <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <fa5d2f4c-5ccc-e23e-1926-2d7625b66b91@huawei.com>
- <CAHS8izMj_89dMVaMr73r1-3Kewgc1YL3A1mjvixoax2War8kUg@mail.gmail.com>
- <3ff54a20-7e5f-562a-ca2e-b078cc4b4120@huawei.com>
- <6553954141762_1245c529423@willemb.c.googlers.com.notmuch>
+ <20231114172534.124f544c@kernel.org>
 From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <8b7d25eb-1f10-3e37-8753-92b42da3fb34@huawei.com>
-Date: Wed, 15 Nov 2023 17:29:17 +0800
+Message-ID: <56314b48-5273-6885-f3eb-5d60535faba0@huawei.com>
+Date: Wed, 15 Nov 2023 17:33:13 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.2.0
 Precedence: bulk
@@ -61,107 +56,48 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6553954141762_1245c529423@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231114172534.124f544c@kernel.org>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 X-CFilter-Loop: Reflected
 
-On 2023/11/14 23:41, Willem de Bruijn wrote:
->>
->> I am not sure dma-buf maintainer's concern is still there with this patchset.
->>
->> Whatever name you calling it for the struct, however you arrange each field
->> in the struct, some metadata is always needed for dmabuf to intergrate into
->> page pool.
->>
->> If the above is true, why not utilize the 'struct page' to have more unified
->> handling?
+On 2023/11/15 6:25, Jakub Kicinski wrote:
+> On Tue, 14 Nov 2023 16:23:29 +0800 Yunsheng Lin wrote:
+>> I would expect net stack, page pool, driver still see the 'struct page',
+>> only memory provider see the specific struct for itself, for the above,
+>> devmem memory provider sees the 'struct page_pool_iov'.
 > 
-> My understanding is that there is a general preference to simplify struct
-> page, and at the least not move in the other direction by overloading the
-> struct in new ways.
+> You can't lie to the driver that an _iov is a page either.
 
-As my understanding, the new struct is just mirroring the struct page pool
-is already using, see:
-https://elixir.free-electrons.com/linux/v6.7-rc1/source/include/linux/mm_types.h#L119
+Yes, agreed about that.
 
-If there is simplifying to the struct page_pool is using, I think the new
-stuct the devmem memory provider is using can adjust accordingly.
+As a matter of fact, the driver should be awared of what kind of
+memory provider is using when it calls page_pool_create() during
+init process.
 
-As a matter of fact, I think the way 'struct page' for devmem is decoupled
-from mm subsystem may provide a way to simplify or decoupled the already
-existing 'struct page' used in netstack from mm subsystem, before this
-patchset, it seems we have the below types of 'struct page':
-1. page allocated in the netstack using page pool.
-2. page allocated in the netstack using buddy allocator.
-3. page allocated in other subsystem and passed to the netstack, such as
-   zcopy or spliced page?
-
-If we can decouple 'struct page' for devmem from mm subsystem, we may be able
-to decouple the above 'struct page' from mm subsystem one by one.
-
+> The driver must explicitly "opt-in" to using the _iov variant,
+> by calling the _iov set of APIs.
 > 
-> If using struct page for something that is not memory, there is ZONE_DEVICE.
-> But using that correctly is non-trivial:
-> 
-> https://lore.kernel.org/all/ZKyZBbKEpmkFkpWV@ziepe.ca/ 
-> 
-> Since all we need is a handle that does not leave the network stack,
-> a network specific struct like page_pool_iov entirely avoids this issue.
+> Only drivers which can support header-data split can reasonably
+> use the _iov API, for data pages.
 
-Yes, I am agree about the network specific struct.
-I am wondering if we can make the struct more generic if we want to
-intergrate it into page_pool and use it in net stack.
+But those drivers can still allow allocating normal memory, right?
+sometimes for data and header part, and sometimes for the header part.
 
-> RFC v3 seems like a good simplification over RFC v1 in that regard to me.
-> I was also pleasantly surprised how minimal the change to the users of
-> skb_frag_t actually proved to be.
+Do those drivers need to support two sets of APIs? the one with _iov
+for devmem, and the one without _iov for normal memory. It seems somewhat
+unnecessary from driver' point of veiw to support two sets of APIs?
+The driver seems to know which type of page it is expecting when calling
+page_pool_alloc() with a specific page_pool instance.
 
-Yes, I am agreed about that too. Maybe we can make it simpler by using
-a more abstract struct as page_pool, and utilize some features of
-page_pool too.
+Or do we use the API with _iov to allocate both devmem and normal memory
+in the new driver supporting devmem page?  If that is the case, does it
+really matter if the API is with _iov or not?
 
-For example, from the page_pool doc, page_pool have fast cache and
-ptr-ring cache as below, but if napi_frag_unref() call
-page_pool_page_put_many() and return the dmabuf chunk directly to
-gen_pool in the memory provider, then it seems we are bypassing the
-below caches in the page_pool.
-
-    +------------------+
-    |       Driver     |
-    +------------------+
-            ^
-            |
-            |
-            |
-            v
-    +--------------------------------------------+
-    |                request memory              |
-    +--------------------------------------------+
-        ^                                  ^
-        |                                  |
-        | Pool empty                       | Pool has entries
-        |                                  |
-        v                                  v
-    +-----------------------+     +------------------------+
-    | alloc (and map) pages |     |  get page from cache   |
-    +-----------------------+     +------------------------+
-                                    ^                    ^
-                                    |                    |
-                                    | cache available    | No entries, refill
-                                    |                    | from ptr-ring
-                                    |                    |
-                                    v                    v
-                          +-----------------+     +------------------+
-                          |   Fast cache    |     |  ptr-ring cache  |
-                          +-----------------+     +------------------+
-
-
-> 
 > .
 > 
 
