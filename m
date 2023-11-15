@@ -1,54 +1,81 @@
-Return-Path: <netdev+bounces-48198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65BB67ED52D
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 22:01:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89AE7ED562
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 22:05:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 218511C20756
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:01:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3376280E26
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:05:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CC735EED;
-	Wed, 15 Nov 2023 21:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA02439FF1;
+	Wed, 15 Nov 2023 21:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axelKK0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E4CD79;
-	Wed, 15 Nov 2023 13:01:34 -0800 (PST)
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5869914484fso66072eaf.0;
-        Wed, 15 Nov 2023 13:01:34 -0800 (PST)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B6C19BD;
+	Wed, 15 Nov 2023 13:05:00 -0800 (PST)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2c504a5e1deso905001fa.2;
+        Wed, 15 Nov 2023 13:04:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700082298; x=1700687098; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LuzKSdvR1du8T/9eWZvj/7thMH6CYFOCmDm+RmP0jR8=;
+        b=axelKK0sCK7Ot2Yo2YxwJoTkrN6kZn7ZzozKCMyTMxToqLpgPdgE60MIyxXqpC5BpL
+         jAd5T4ULuRKwy37psk0dLsGwjQ3MMrx2P/MrgUYXADPib6D7FQxf4+PKW1C05kkW4dil
+         hNkSnJwnZW4VhBFEyEmRxtf9PRSaQDsaBRAZoKAyeeE4LPOSEHAmpSunJYCT2vbrd5Cu
+         RGmjsC2ZmI282i4MouErT6i7A//Y2wc6w4FvACKUqCd3elGwSanj30VCu9RQ40BC4q0F
+         kWuGNfud1xHqA4sThGexuwy2rYDx2RUbmhPujB3IdgliG9Qms+uW6hJPFV5hkNcZAtGw
+         ijIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700082094; x=1700686894;
+        d=1e100.net; s=20230601; t=1700082298; x=1700687098;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Duhiu363zZXggZ2tT9xIehHJIKV7YXtPT/E+W7lu59o=;
-        b=X+FOlwkhkepXg0QMxwUliO87bV2PrfEsIJyNdzTqkZqMwC7cfXK/Da1mJnu3qNNPet
-         nFKNHg6rwYanRYUH0oYYn9obP2NEBB/XtU4PPKrJ3E+ZOiaS7OGdJuoBeZ6/A74j1QaN
-         vK0Nlq+61ZzJTRP8uWmBSoM8xp9BdE+BOKcK1gfTcJqCmzW945NUyJ3meElF8jkIxAHL
-         Zkq7+g5az9QixsKACOWKZdY+uoWADHLUXG/RzfiNBCS1uayTjvKQuYi8q/AWmUwTWsfq
-         sIzkC55ZJ7p1ezxLnkjfpyxeoZVSjk9Mz6EIY7bSVcefPXuWIFunMbQPleXDCfqyEEYO
-         V2Sg==
-X-Gm-Message-State: AOJu0YzuoyGg7z6DLw3dTMBBgJnEaM3de9oa2okjn6mLtX9jrNIewBgE
-	lKUzDZQGzJvpwHZJQ5xn9Q==
-X-Google-Smtp-Source: AGHT+IFPPnhO39v8qSE2EKT/HxIVWh6OStRmuQ0hHy6sDMZSxY8Jttc7oJW7BQ2s36jYm/8+/W5SXQ==
-X-Received: by 2002:a4a:3457:0:b0:56c:d297:164c with SMTP id n23-20020a4a3457000000b0056cd297164cmr13317917oof.4.1700082094065;
-        Wed, 15 Nov 2023 13:01:34 -0800 (PST)
-Received: from herring.priv (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id 123-20020a4a0081000000b00584078d1e17sm826254ooh.45.2023.11.15.13.01.32
+        bh=LuzKSdvR1du8T/9eWZvj/7thMH6CYFOCmDm+RmP0jR8=;
+        b=FlpOZ4kvw3vyG6TJixCiIWGUylaiKlRzoTrucFjgnoRH+4P2NLMNIoiE/Twv8l1a93
+         YWsvC9nCXtd3ancgZ3GLVgIRzdSViIxqgMYboZ50aS5FaoT7dCyapDN+rvMRSzWJzV3s
+         pnZ6NOhqX0Ec9+2Z5BvLeVektQxTF20nSxCH7UhcjVdq/Dghz4WzX0xZVZa3W6GjhZmB
+         y2P6At0oCz5YMrVeFaRmgcf0XsxU4RzjHTtOaWHD34hLmObVYczHR2eN2sXk/4EYl69q
+         u2zzlwQgSiJb0Aag5IIA5v0TaJboYY0PSrFsVcREhIulvCsBTTGK/O6Ivqzk4oMQNVR7
+         uZLg==
+X-Gm-Message-State: AOJu0YxX5YYxvaIVSX0DkRUgKhvvi8ZarCPLAvAf6kZBjzNJ56SRKb8Z
+	yXPXjFIX3Mtta9RrjhdQeqVPTQWnTqk=
+X-Google-Smtp-Source: AGHT+IFlYTBjGqhKEE5ak9EXGj1yavpZnydYl0Gaw2fiSKDF+4KFkGqGr7TmKt0+hjqqzZpQZhcmlQ==
+X-Received: by 2002:a05:651c:4d1:b0:2c5:17c0:cd53 with SMTP id e17-20020a05651c04d100b002c517c0cd53mr5905903lji.42.1700082297892;
+        Wed, 15 Nov 2023 13:04:57 -0800 (PST)
+Received: from prasmi.home ([2a00:23c8:2500:a01:e8e:4851:e049:93fd])
+        by smtp.gmail.com with ESMTPSA id l15-20020a05600c4f0f00b00405959469afsm909249wmq.3.2023.11.15.13.04.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 13:01:33 -0800 (PST)
-Received: (nullmailer pid 3740022 invoked by uid 1000);
-	Wed, 15 Nov 2023 21:01:32 -0000
-From: Rob Herring <robh@kernel.org>
-To: Wolfgang Grandegger <wg@grandegger.com>, Marc Kleine-Budde <mkl@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Appana Durga Kedareswara rao <appana.durga.rao@xilinx.com>, Naga Sureshkumar Relli <naga.sureshkumar.relli@xilinx.com>, Michal Simek <michal.simek@amd.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [RESEND PATCH] net: can: Use device_get_match_data()
-Date: Wed, 15 Nov 2023 15:01:28 -0600
-Message-ID: <20231115210129.3739377-1-robh@kernel.org>
-X-Mailer: git-send-email 2.42.0
+        Wed, 15 Nov 2023 13:04:57 -0800 (PST)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc: Magnus Damm <magnus.damm@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH] dt-bindings: net: renesas,etheravb: Document RZ/Five SoC
+Date: Wed, 15 Nov 2023 21:04:48 +0000
+Message-Id: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,164 +84,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use preferred device_get_match_data() instead of of_match_device() to
-get the driver match data. With this, adjust the includes to explicitly
-include the correct headers.
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Signed-off-by: Rob Herring <robh@kernel.org>
+The Gigabit Ethernet IP block on the RZ/Five SoC is identical to one
+found on the RZ/G2UL SoC. "renesas,r9a07g043-gbeth" compatible string
+will be used on the RZ/Five SoC so to make this clear and to keep this
+file consistent, update the comment to include RZ/Five SoC.
+
+No driver changes are required as generic compatible string
+"renesas,rzg2l-gbeth" will be used as a fallback on RZ/Five SoC.
+
+Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 ---
- drivers/net/can/c_can/c_can_platform.c | 9 +++------
- drivers/net/can/flexcan/flexcan-core.c | 9 +++------
- drivers/net/can/mscan/mpc5xxx_can.c    | 8 ++++----
- drivers/net/can/xilinx_can.c           | 7 ++-----
- 4 files changed, 12 insertions(+), 21 deletions(-)
+ Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/can/c_can/c_can_platform.c b/drivers/net/can/c_can/c_can_platform.c
-index f44ba2600415..caa781018b09 100644
---- a/drivers/net/can/c_can/c_can_platform.c
-+++ b/drivers/net/can/c_can/c_can_platform.c
-@@ -30,9 +30,9 @@
- #include <linux/io.h>
- #include <linux/platform_device.h>
- #include <linux/pm_runtime.h>
-+#include <linux/property.h>
- #include <linux/clk.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/mfd/syscon.h>
- #include <linux/regmap.h>
+diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+index 3f41294f5997..8125e9023e8b 100644
+--- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
++++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+@@ -55,7 +55,7 @@ properties:
  
-@@ -259,17 +259,14 @@ static int c_can_plat_probe(struct platform_device *pdev)
- 	void __iomem *addr;
- 	struct net_device *dev;
- 	struct c_can_priv *priv;
--	const struct of_device_id *match;
- 	struct resource *mem;
- 	int irq;
- 	struct clk *clk;
- 	const struct c_can_driver_data *drvdata;
- 	struct device_node *np = pdev->dev.of_node;
- 
--	match = of_match_device(c_can_of_table, &pdev->dev);
--	if (match) {
--		drvdata = match->data;
--	} else if (pdev->id_entry->driver_data) {
-+	drvdata = device_get_match_data(&pdev->dev);
-+	if (!drvdata && pdev->id_entry->driver_data) {
- 		drvdata = (struct c_can_driver_data *)
- 			platform_get_device_id(pdev)->driver_data;
- 	} else {
-diff --git a/drivers/net/can/flexcan/flexcan-core.c b/drivers/net/can/flexcan/flexcan-core.c
-index d15f85a40c1e..19ea7ebc04ab 100644
---- a/drivers/net/can/flexcan/flexcan-core.c
-+++ b/drivers/net/can/flexcan/flexcan-core.c
-@@ -23,11 +23,11 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/pinctrl/consumer.h>
- #include <linux/platform_device.h>
- #include <linux/can/platform/flexcan.h>
- #include <linux/pm_runtime.h>
-+#include <linux/property.h>
- #include <linux/regmap.h>
- #include <linux/regulator/consumer.h>
- 
-@@ -2034,7 +2034,6 @@ MODULE_DEVICE_TABLE(platform, flexcan_id_table);
- 
- static int flexcan_probe(struct platform_device *pdev)
- {
--	const struct of_device_id *of_id;
- 	const struct flexcan_devtype_data *devtype_data;
- 	struct net_device *dev;
- 	struct flexcan_priv *priv;
-@@ -2090,10 +2089,8 @@ static int flexcan_probe(struct platform_device *pdev)
- 	if (IS_ERR(regs))
- 		return PTR_ERR(regs);
- 
--	of_id = of_match_device(flexcan_of_match, &pdev->dev);
--	if (of_id)
--		devtype_data = of_id->data;
--	else if (platform_get_device_id(pdev)->driver_data)
-+	devtype_data = device_get_match_data(&pdev->dev);
-+	if (!devtype_data && pdev->id_entry->driver_data)
- 		devtype_data = (struct flexcan_devtype_data *)
- 			platform_get_device_id(pdev)->driver_data;
- 	else
-diff --git a/drivers/net/can/mscan/mpc5xxx_can.c b/drivers/net/can/mscan/mpc5xxx_can.c
-index 4837df6efa92..5b3d69c3b6b6 100644
---- a/drivers/net/can/mscan/mpc5xxx_can.c
-+++ b/drivers/net/can/mscan/mpc5xxx_can.c
-@@ -12,8 +12,10 @@
- #include <linux/module.h>
- #include <linux/interrupt.h>
- #include <linux/platform_device.h>
-+#include <linux/property.h>
- #include <linux/netdevice.h>
- #include <linux/can/dev.h>
-+#include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
- #include <linux/of_platform.h>
-@@ -290,7 +292,7 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
- 	int irq, mscan_clksrc = 0;
- 	int err = -ENOMEM;
- 
--	data = of_device_get_match_data(&ofdev->dev);
-+	data = device_get_match_data(&ofdev->dev);
- 	if (!data)
- 		return -EINVAL;
- 
-@@ -351,13 +353,11 @@ static int mpc5xxx_can_probe(struct platform_device *ofdev)
- 
- static void mpc5xxx_can_remove(struct platform_device *ofdev)
- {
--	const struct of_device_id *match;
- 	const struct mpc5xxx_can_data *data;
- 	struct net_device *dev = platform_get_drvdata(ofdev);
- 	struct mscan_priv *priv = netdev_priv(dev);
- 
--	match = of_match_device(mpc5xxx_can_table, &ofdev->dev);
--	data = match ? match->data : NULL;
-+	data = device_get_match_data(&ofdev->dev);
- 
- 	unregister_mscandev(dev);
- 	if (data && data->put_clock)
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index abe58f103043..f17fd43d03c0 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -20,8 +20,8 @@
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/of.h>
--#include <linux/of_device.h>
- #include <linux/platform_device.h>
-+#include <linux/property.h>
- #include <linux/skbuff.h>
- #include <linux/spinlock.h>
- #include <linux/string.h>
-@@ -1726,7 +1726,6 @@ static int xcan_probe(struct platform_device *pdev)
- 	struct net_device *ndev;
- 	struct xcan_priv *priv;
- 	struct phy *transceiver;
--	const struct of_device_id *of_id;
- 	const struct xcan_devtype_data *devtype = &xcan_axi_data;
- 	void __iomem *addr;
- 	int ret;
-@@ -1741,9 +1740,7 @@ static int xcan_probe(struct platform_device *pdev)
- 		goto err;
- 	}
- 
--	of_id = of_match_device(xcan_of_match, &pdev->dev);
--	if (of_id && of_id->data)
--		devtype = of_id->data;
-+	devtype = device_get_match_data(&pdev->dev);
- 
- 	hw_tx_max_property = devtype->flags & XCAN_FLAG_TX_MAILBOXES ?
- 			     "tx-mailbox-count" : "tx-fifo-depth";
+       - items:
+           - enum:
+-              - renesas,r9a07g043-gbeth # RZ/G2UL
++              - renesas,r9a07g043-gbeth # RZ/G2UL and RZ/Five
+               - renesas,r9a07g044-gbeth # RZ/G2{L,LC}
+               - renesas,r9a07g054-gbeth # RZ/V2L
+           - const: renesas,rzg2l-gbeth  # RZ/{G2L,G2UL,V2L} family
 -- 
-2.42.0
+2.34.1
 
 
