@@ -1,140 +1,98 @@
-Return-Path: <netdev+bounces-48027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645D87EC51B
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:26:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 123DF7EC55C
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:31:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924451C20362
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:25:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 726D5B20C68
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C22F28E24;
-	Wed, 15 Nov 2023 14:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356FD28E3E;
+	Wed, 15 Nov 2023 14:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="R4lvU8ao"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nP4tn9Mu"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3671EB41
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:25:54 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050FCC8;
-	Wed, 15 Nov 2023 06:25:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9vAuO/jfgQB1UhChgmKpQEPKWuu2SwX00yO6kwgCd+o=; b=R4lvU8aoiGhmjKhmijiJcU0iOy
-	cAFpoOGF6geENuGKG0YERvll8BorOKMgpETeDfOenRJ/baC0yUb/LPQ0bzEvibDeTEx8pg+UqzJZX
-	DiXzYAyu6xh2RAcZXaVmLLSkf6ebbkDE7vk0n7xZsoLaCoCOF0NfWiYw7vHbCRCpaFkYy7OQpB8c5
-	dWL+bu3jjtB+rceCR1XlxEtTlIdNgmzKQDYzsPgxInn4wZHAlnohohCygd0SX3BRLblu85XHopmUc
-	a4Lx7XLISx0Zxo2gBolM+cmym5uUH1Xzw+aDc+vdTdYCQ3oWa1BaofAM5/ulIgY9uU2e1ToyOux04
-	nclip+Sw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50016)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r3Gpl-0000md-0s;
-	Wed, 15 Nov 2023 14:25:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r3Gpl-0006ec-5X; Wed, 15 Nov 2023 14:25:37 +0000
-Date: Wed, 15 Nov 2023 14:25:37 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Jianheng Zhang <Jianheng.Zhang@synopsys.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Tan Tee Min <tee.min.tan@intel.com>,
-	Ong Boon Leong <boon.leong.ong@intel.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Mohammad Athari Bin Ismail <mohammad.athari.ismail@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: stmmac: fix FPE events losing
-Message-ID: <ZVTU4TTFYSMLswTs@shell.armlinux.org.uk>
-References: <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
- <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DAF2EAFC;
+	Wed, 15 Nov 2023 14:31:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0114C433C8;
+	Wed, 15 Nov 2023 14:31:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700058696;
+	bh=X0zwMR33P3gQ46xEwVzb9xCqEqYvEjlN3eTg/GpDNGk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nP4tn9Mu8JvKtU+ZDP3/W5VC2NFUaH/x4lOHm/kgG/GkHCPKz45TL26QPPtTwLm9D
+	 qr4Sr6/oRQUr7TYpXvxjkx/92nMMV4wluYHckaXJKFyiM2iHT5MOJuAfHaNuNAcHAv
+	 TxeZbdahEDGB6D/HBOpxathOcukgToVb1k969olr9dvEFRxTuUps2FKGt/TD50d+MV
+	 gjnsgUSdmOY6FtKj6Xd7kduafmgG2dXU/pvmhOZQHm49qKHnOcZFoSY5eufHqD49Hs
+	 C4mSzSLNAYWqHhH3kA5IaFhS5vDcsmKobwcpBCYLknhm98APAVrVZB5qKlUNpYAtaT
+	 9c/iWw47iQvmQ==
+Date: Wed, 15 Nov 2023 14:31:32 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v3 2/6] net: phy: introduce core support for phy-mode =
+ "10g-qxgmii"
+Message-ID: <20231115-tightness-naturist-459776cff199@squawk>
+References: <20231115140630.10858-1-quic_luoj@quicinc.com>
+ <20231115140630.10858-3-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Z3tph6xppgMkCCjq"
+Content-Disposition: inline
+In-Reply-To: <20231115140630.10858-3-quic_luoj@quicinc.com>
+
+
+--Z3tph6xppgMkCCjq
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 14, 2023 at 02:59:57PM +0300, Serge Semin wrote:
-> On Tue, Nov 14, 2023 at 11:07:34AM +0000, Jianheng Zhang wrote:
-> > The 32-bit access of register MAC_FPE_CTRL_STS may clear the FPE status
-> > bits unexpectedly. Use 8-bit access for MAC_FPE_CTRL_STS control bits to
-> > avoid unexpected access of MAC_FPE_CTRL_STS status bits that can reduce
-> > the FPE handshake retries.
-> > 
-> > The bit[19:17] of register MAC_FPE_CTRL_STS are status register bits.
-> > Those bits are clear on read (or write of 1 when RCWE bit in
-> > MAC_CSR_SW_Ctrl register is set). Using 32-bit access for
-> > MAC_FPE_CTRL_STS control bits makes side effects that clear the status
-> > bits. Then the stmmac interrupt handler missing FPE event status and
-> > leads to FPE handshake failure and retries.
-> > 
-> > The bit[7:0] of register MAC_FPE_CTRL_STS are control bits or reserved
-> > that have no access side effects, so can use 8-bit access for
-> > MAC_FPE_CTRL_STS control bits.
-> > 
-> > Fixes: 5a5586112b92 ("net: stmmac: support FPE link partner hand-shaking procedure")
-> > Signed-off-by: jianheng <jianheng@synopsys.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac5.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> > index e95d35f..7333995 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
-> > @@ -716,11 +716,11 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
-> >  	u32 value;
-> >  
-> >  	if (!enable) {
-> 
-> > -		value = readl(ioaddr + MAC_FPE_CTRL_STS);
-> > +		value = readb(ioaddr + MAC_FPE_CTRL_STS);
-> 
-> Note this may break the platforms which don't support non-32 MMIOs for
-> some devices. None of the currently supported glue-drivers explicitly
-> state they have such peculiarity, but at the same time the STMMAC-core
-> driver at the present state uses the dword IO ops only. For instance
-> the PCIe subsystem has the special accessors for such cases:
-> pci_generic_config_read32()
-> pci_generic_config_write32()
-> which at the very least are utilized on the Tegra and Loongson
-> platforms to access the host CSR spaces. These platforms are also
-> equipped with the DW MACs. The problem might be irrelevant for all the
-> currently supported DW MAC controllers implementations though, but
-> still it worth to draw an attention to the problem possibility and in
-> order to prevent it before ahead it would be better to just avoid
-> using the byte-/word- IOs if it's possible.
+On Wed, Nov 15, 2023 at 10:06:26PM +0800, Luo Jie wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+>=20
+> 10G-QXGMII is a MAC-to-PHY interface defined by the USXGMII multiport
+> specification. It uses the same signaling as USXGMII, but it multiplexes
+> 4 ports over the link, resulting in a maximum speed of 2.5G per port.
+>=20
+> Some in-tree SoCs like the NXP LS1028A use "usxgmii" when they mean
+> either the single-port USXGMII or the quad-port 10G-QXGMII variant, and
+> they could get away just fine with that thus far. But there is a need to
+> distinguish between the 2 as far as SerDes drivers are concerned.
+>=20
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  .../devicetree/bindings/net/ethernet-controller.yaml |  1 +
 
-Yes, this exists for configuration accesses, and is damn annoying
-because the read-modify-write of these can end up clearing PCI
-status register bits that are W1C.
+I know it is one line, but bindings need to be in their own patches
+please.
 
-I've never heard of that problem with MMIO though.
+--Z3tph6xppgMkCCjq
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYKAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZVTWQAAKCRB4tDGHoIJi
+0hLcAQD09A4z6eyfiteENmtAECCBlON0RrlWKjJUA+IaFCdg6AEA4z6TN2X+C7f4
+JZsjVtMpNWoKnI7Ao8uM7RN927kPUw0=
+=mswn
+-----END PGP SIGNATURE-----
+
+--Z3tph6xppgMkCCjq--
 
