@@ -1,110 +1,140 @@
-Return-Path: <netdev+bounces-48026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA137EC516
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:24:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645D87EC51B
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:26:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDEC71F274B9
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:24:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924451C20362
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A01E28DDB;
-	Wed, 15 Nov 2023 14:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C22F28E24;
+	Wed, 15 Nov 2023 14:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bn2RZwDO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="R4lvU8ao"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE2128DC1;
-	Wed, 15 Nov 2023 14:24:29 +0000 (UTC)
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D636E7;
-	Wed, 15 Nov 2023 06:24:26 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5D90C1BF203;
-	Wed, 15 Nov 2023 14:24:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700058264;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o95CTeV4om7p3zXCFThJzE74VGhCEm09N2PyQwbv0X8=;
-	b=Bn2RZwDOGrLsOcdbw80S3FjkZg7GLKrKK763aTT81E0zWNQCwiDk1Q6dKKi95CYXBXbMWe
-	hQ0FICnfz/3E8jN94UUhgQBV6jlXnQCt5+Y4oH2It4S/cig9DXuM3aFZzM0C+uQ0e1aSR8
-	jcGsya9AKRBnGFpFHRr2NXbO2B5cOm1/mDtFR2M81jXivDAQa6/o29BjA5RVURAL2t5i+2
-	bpXS+S8XMI5gceb8FbuZIbxGiOq1U+5S9R9TYuyTAO9K5EzSYxa1GFqT/VVU38ojZiHhq2
-	F5TeyBWYTyBUhjQqH8TzvjmLxcCSsu0h4mq2fyYysK9/kfJM2o1bJvGab9chdw==
-Date: Wed, 15 Nov 2023 15:24:37 +0100 (CET)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net, 
-    Rob Herring <robh+dt@kernel.org>, 
-    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-    thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-    Vladimir Oltean <vladimir.oltean@nxp.com>, 
-    Luka Perkov <luka.perkov@sartura.hr>, 
-    Robert Marko <robert.marko@sartura.hr>, Andy Gross <agross@kernel.org>, 
-    Bjorn Andersson <andersson@kernel.org>, 
-    Konrad Dybcio <konrad.dybcio@somainline.org>
-Subject: Re: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the
- Qualcomm IPQESS driver
-In-Reply-To: <f6ce0c15-8b72-4568-8ba2-f0216db84ffd@lunn.ch>
-Message-ID: <d60c1fd1-3ee1-3c15-6072-06c70f09d6d2@bootlin.com>
-References: <20231114105600.1012056-1-romain.gantois@bootlin.com> <20231114105600.1012056-4-romain.gantois@bootlin.com> <f6ce0c15-8b72-4568-8ba2-f0216db84ffd@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3671EB41
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:25:54 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050FCC8;
+	Wed, 15 Nov 2023 06:25:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9vAuO/jfgQB1UhChgmKpQEPKWuu2SwX00yO6kwgCd+o=; b=R4lvU8aoiGhmjKhmijiJcU0iOy
+	cAFpoOGF6geENuGKG0YERvll8BorOKMgpETeDfOenRJ/baC0yUb/LPQ0bzEvibDeTEx8pg+UqzJZX
+	DiXzYAyu6xh2RAcZXaVmLLSkf6ebbkDE7vk0n7xZsoLaCoCOF0NfWiYw7vHbCRCpaFkYy7OQpB8c5
+	dWL+bu3jjtB+rceCR1XlxEtTlIdNgmzKQDYzsPgxInn4wZHAlnohohCygd0SX3BRLblu85XHopmUc
+	a4Lx7XLISx0Zxo2gBolM+cmym5uUH1Xzw+aDc+vdTdYCQ3oWa1BaofAM5/ulIgY9uU2e1ToyOux04
+	nclip+Sw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50016)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r3Gpl-0000md-0s;
+	Wed, 15 Nov 2023 14:25:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r3Gpl-0006ec-5X; Wed, 15 Nov 2023 14:25:37 +0000
+Date: Wed, 15 Nov 2023 14:25:37 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Jianheng Zhang <Jianheng.Zhang@synopsys.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Tan Tee Min <tee.min.tan@intel.com>,
+	Ong Boon Leong <boon.leong.ong@intel.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Mohammad Athari Bin Ismail <mohammad.athari.ismail@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: stmmac: fix FPE events losing
+Message-ID: <ZVTU4TTFYSMLswTs@shell.armlinux.org.uk>
+References: <CY5PR12MB6372857133451464780FD6B7BFB2A@CY5PR12MB6372.namprd12.prod.outlook.com>
+ <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xo4cbvc35zewabg4ite73trijy6fvbsaxsy6hag5qsr3dyharm@predjydxblsf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 14 Nov 2023, Andrew Lunn wrote:
-...
-> > +	phy_support_asym_pause(phy);
-> > +
-> > +	ipqess_port_set_state_now(port, BR_STATE_FORWARDING, false);
-> > +
-> > +	if (port->pl)
-> > +		phylink_start(port->pl);
+On Tue, Nov 14, 2023 at 02:59:57PM +0300, Serge Semin wrote:
+> On Tue, Nov 14, 2023 at 11:07:34AM +0000, Jianheng Zhang wrote:
+> > The 32-bit access of register MAC_FPE_CTRL_STS may clear the FPE status
+> > bits unexpectedly. Use 8-bit access for MAC_FPE_CTRL_STS control bits to
+> > avoid unexpected access of MAC_FPE_CTRL_STS status bits that can reduce
+> > the FPE handshake retries.
+> > 
+> > The bit[19:17] of register MAC_FPE_CTRL_STS are status register bits.
+> > Those bits are clear on read (or write of 1 when RCWE bit in
+> > MAC_CSR_SW_Ctrl register is set). Using 32-bit access for
+> > MAC_FPE_CTRL_STS control bits makes side effects that clear the status
+> > bits. Then the stmmac interrupt handler missing FPE event status and
+> > leads to FPE handshake failure and retries.
+> > 
+> > The bit[7:0] of register MAC_FPE_CTRL_STS are control bits or reserved
+> > that have no access side effects, so can use 8-bit access for
+> > MAC_FPE_CTRL_STS control bits.
+> > 
+> > Fixes: 5a5586112b92 ("net: stmmac: support FPE link partner hand-shaking procedure")
+> > Signed-off-by: jianheng <jianheng@synopsys.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/dwmac5.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > index e95d35f..7333995 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac5.c
+> > @@ -716,11 +716,11 @@ void dwmac5_fpe_configure(void __iomem *ioaddr, u32 num_txq, u32 num_rxq,
+> >  	u32 value;
+> >  
+> >  	if (!enable) {
 > 
-> That looks odd. You unconditionally call phy_support_asym_pause() yet
-> conditionally call phylink_start(). I would expect there to always be
-> a phylink instance.
+> > -		value = readl(ioaddr + MAC_FPE_CTRL_STS);
+> > +		value = readb(ioaddr + MAC_FPE_CTRL_STS);
 > 
-> Also, you should be telling phylink about the pause capabilities in
-> config->mac_capabilities. It is then phylinks problem to tell the PHY,
-> or the PCS driving the SFP etc about pause.
-You are correct. I probably fumbled this when splitting the calibration code.
+> Note this may break the platforms which don't support non-32 MMIOs for
+> some devices. None of the currently supported glue-drivers explicitly
+> state they have such peculiarity, but at the same time the STMMAC-core
+> driver at the present state uses the dword IO ops only. For instance
+> the PCIe subsystem has the special accessors for such cases:
+> pci_generic_config_read32()
+> pci_generic_config_write32()
+> which at the very least are utilized on the Tegra and Loongson
+> platforms to access the host CSR spaces. These platforms are also
+> equipped with the DW MACs. The problem might be irrelevant for all the
+> currently supported DW MAC controllers implementations though, but
+> still it worth to draw an attention to the problem possibility and in
+> order to prevent it before ahead it would be better to just avoid
+> using the byte-/word- IOs if it's possible.
 
-> > +		if (tx_pause || port->index == 0)
-> > +			reg |= QCA8K_PORT_STATUS_TXFLOW;
-> > +	}
-> > +
-> > +	reg |= QCA8K_PORT_STATUS_TXMAC | QCA8K_PORT_STATUS_RXMAC;
-> > +
-> > +	qca8k_write(priv, QCA8K_REG_PORT_STATUS(port->index), reg);
-> > +}
-> 
-> qca8k_phylink_mac_link_up() with some refactoring can be
-> reused. Please look through the driver and find other instances like
-> this where you can reuse more code.
-I tried to be conservative with modifying qca8k-common.c when it required 
-modifying qca8k-8xxx.c. But I'll factor this code more aggressively since you 
-think it is preferable.
+Yes, this exists for configuration accesses, and is damn annoying
+because the read-modify-write of these can end up clearing PCI
+status register bits that are W1C.
 
-Best,
+I've never heard of that problem with MMIO though.
 
 -- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
