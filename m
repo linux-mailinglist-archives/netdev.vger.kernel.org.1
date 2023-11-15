@@ -1,130 +1,126 @@
-Return-Path: <netdev+bounces-48073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5C347EC743
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:29:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D837EC74C
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:31:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6103728124D
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:29:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18DA2B20B87
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E36F39FC5;
-	Wed, 15 Nov 2023 15:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9954B39FCF;
+	Wed, 15 Nov 2023 15:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EZxZwSfY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iPaW/d66"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2628A39FCA
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:29:48 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4AAE1988;
-	Wed, 15 Nov 2023 07:29:41 -0800 (PST)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFEu10a002860;
-	Wed, 15 Nov 2023 15:29:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=mCRfXeVfqIfdj4/VheE7oWXWFYZcQ0SHTKDQdtVUyzU=;
- b=EZxZwSfY6jSm9cxeRn7GTebqRQOnUEwWPuBqcQxMJ+YJ2CIoO/RZjiTklhhDg6gQsj/X
- CtXAvtm4TA3ZxTI6l5dUeZuEO1teUVzcPblnLEQyeMQfMAW4sNC0/yhIrv5Z1FIwF207
- AMlIuIzotQvu7KY3zOht0LYlK+UzxbHY5MEAAUGZXwFl5wJ/U8Awh5u8Q2iBT/+aPFEG
- yNmIrmsvLh/vkEMEFWkJfqGvo2slTEhpE+GHFUL1qpiOpN5zniUn4PU8nc8VYzi7euvR
- oEeqqdLiqMgLt/AQ0Lmjgi83/BsAAA4Mj66g7TExXK8j4pnTj6p6Esw2CIAL7MKtPB5k zg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ud068946p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 15:29:27 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AFEv1b8006656;
-	Wed, 15 Nov 2023 15:29:26 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ud0689461-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 15:29:26 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFDn20Z018837;
-	Wed, 15 Nov 2023 15:29:25 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uanekqxwy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Nov 2023 15:29:25 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AFFTMl821561876
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 15 Nov 2023 15:29:22 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 470512004F;
-	Wed, 15 Nov 2023 15:29:22 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ED20A2004D;
-	Wed, 15 Nov 2023 15:29:21 +0000 (GMT)
-Received: from [9.152.224.39] (unknown [9.152.224.39])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 15 Nov 2023 15:29:21 +0000 (GMT)
-Message-ID: <8130636d3a46329a5f18cc55ec4946d4adb8c9f5.camel@linux.ibm.com>
-Subject: Re: [PATCH net] s390/ism: ism driver implies smc protocol
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Alexandra Winter <wintera@linux.ibm.com>,
-        Wenjia Zhang
- <wenjia@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
-        Wen Gu
- <guwen@linux.alibaba.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander
- Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 15 Nov 2023 16:29:21 +0100
-In-Reply-To: <20231115102304.GN74656@kernel.org>
-References: <b152ec7c0e690027da1086b777a3ec512001ba1f.camel@linux.ibm.com>
-	 <20231114091718.3482624-1-gbayer@linux.ibm.com>
-	 <20231115102304.GN74656@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.module_f38+17164+63eeee4a) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35332381DD;
+	Wed, 15 Nov 2023 15:30:56 +0000 (UTC)
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E65A1A1;
+	Wed, 15 Nov 2023 07:30:54 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BF8501BF20A;
+	Wed, 15 Nov 2023 15:30:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700062253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yGGXh/tPnXL+P4n+7AuLV8zTk3Fq7KZAHBE5VIThsu4=;
+	b=iPaW/d66IhN5NdRncx4yPDUzHnm6FBhB21+9vMHQSjywf2E1BZPiadZ6h+3dmxYLEhEdrQ
+	lNQSFomaZnyg5YQfiRSskdqpQfsDzBjI0G1e23n26s0rANrPDWKF/b0yLRo7psbtaiXb8a
+	5rQmpiR6bMKlmnr0oAI4n11sI9ApabAVJjh9lqRE7b8Gh0NEFAPt4Tx3ofMPwJN33rsbYm
+	bEoJ6LHX3WNotP0dpOGQHqgCez8ZAsYllAIjSveVRY1e2yhjWjqHV9ujHVp/YcLJYyH7QN
+	ANSZnl6zlT7adNC2QhVry7sHf42+Jk4H//CV8pFhFYORkJcZhMgjgMWdQ6mCRg==
+Date: Wed, 15 Nov 2023 16:31:07 +0100 (CET)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net, 
+    Rob Herring <robh+dt@kernel.org>, 
+    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+    thomas.petazzoni@bootlin.com, Florian Fainelli <f.fainelli@gmail.com>, 
+    Heiner Kallweit <hkallweit1@gmail.com>, 
+    Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
+    Vladimir Oltean <vladimir.oltean@nxp.com>, 
+    Luka Perkov <luka.perkov@sartura.hr>, 
+    Robert Marko <robert.marko@sartura.hr>, Andy Gross <agross@kernel.org>, 
+    Bjorn Andersson <andersson@kernel.org>, 
+    Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 6/8] net: phy: add calibration callbacks to
+ phy_driver
+In-Reply-To: <a4dd8cb4-f662-4dc7-8311-712c64de6f21@lunn.ch>
+Message-ID: <2d4c7054-1aa8-1531-ffa3-7be342ed9a07@bootlin.com>
+References: <20231114105600.1012056-1-romain.gantois@bootlin.com> <20231114105600.1012056-7-romain.gantois@bootlin.com> <a4dd8cb4-f662-4dc7-8311-712c64de6f21@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: F8J7LDGbOIxk1cEC3jhbjcbpoBPILYD6
-X-Proofpoint-ORIG-GUID: XrPaLA6I8H1b4MrvK015HOk20Syy69vZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-15_13,2023-11-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 mlxscore=0 bulkscore=0
- mlxlogscore=874 adultscore=0 spamscore=0 priorityscore=1501 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311150115
+Content-Type: text/plain; charset=US-ASCII
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Wed, 2023-11-15 at 10:23 +0000, Simon Horman wrote:
-> Hi Gerd,
->=20
-> In a similar vein, I am wondering if the forward declaration of
-> ism_ops could be removed.=C2=A0 In my very light compile test it shows up
-> as unused when CONFIG_SMC is unset.
+On Tue, 14 Nov 2023, Andrew Lunn wrote:
 
-Hi Simon,
+> > +static inline
+> > +int phy_start_calibration(struct phy_device *phydev)
+> > +{
+> > +	if (!(phydev->drv &&
+> > +	      phydev->drv->calibration_start &&
+> > +	      phydev->drv->calibration_stop))
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	return phydev->drv->calibration_start(phydev);
+> > +}
+> > +
+> > +static inline
+> > +int phy_stop_calibration(struct phy_device *phydev)
+> > +{
+> > +	if (!(phydev->drv &&
+> > +	      phydev->drv->calibration_stop))
+> > +		return -EOPNOTSUPP;
+> > +
+> > +	return phydev->drv->calibration_stop(phydev);
+> > +}
+> > +
+> 
+> What is the locking model?
+> 
+>      Andrew
+> 
+This driver currently uses an atomic flag to make sure that the calibration 
+doesn't run twice. It doesn't acquire any locks before calling 
+phy_start_calibration(), which is a mistake.
 
-sure, will do. Guess I need to make it a habit to compile with W=3D1.
-ism (and smc) need some more work, though anyway.
-I'll send a v2.
+I think a good locking model for this would be similar to the one used for 
+phy_cable_test. The phy_start_calibration() and phy_stop_calibration() wrappers 
+would acquire a lock on the PHY device and then test phydev->state, to check for 
+an ongoing calibration. A new enum member such as PHY_CALIB could be defined for 
+this purpose. The lock would be released by the phylib wrapper once the 
+phy_driver callback returns.
 
-Thanks for spotting this!
+The problem with this is that one calibration run can access multiple 
+phy_device instances at the same time, e.g. if a switch is linked to a multiport 
+PHY via a PSGMII link.
 
-Gerd
+So acquiring a lock on a single phy device isn't enough. Ideally, these 
+calls could somehow acquire one lock on all the hardware resources of a 
+multiport PHY simultaneously. From what I've seen, there is no standard kernel 
+interface that allows MAC drivers to know about link-sharing between phy 
+devices. I'll have to do more research on this but if you know of an existing 
+interface that I can use for this, please tell me.
+
+Best,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
