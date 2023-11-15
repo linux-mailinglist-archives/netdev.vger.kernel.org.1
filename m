@@ -1,128 +1,155 @@
-Return-Path: <netdev+bounces-47914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A757EBE3C
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:51:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C178E7EBE4A
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 489B52812EF
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:51:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CA4DB20AED
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98825441A;
-	Wed, 15 Nov 2023 07:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6fomB6C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54044416;
+	Wed, 15 Nov 2023 07:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACF64416;
-	Wed, 15 Nov 2023 07:51:50 +0000 (UTC)
-Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40C4C8;
-	Tue, 14 Nov 2023 23:51:49 -0800 (PST)
-Received: by mail-ot1-x330.google.com with SMTP id 46e09a7af769-6ce2add34c9so3706095a34.1;
-        Tue, 14 Nov 2023 23:51:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700034709; x=1700639509; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OglTwC5vnjVMX8d3aLPLAd5qQX6D3HCXF24D7yTj60M=;
-        b=B6fomB6Cj6ofHZY99C2wBH0niujjlTyBJlCFXeSnxijWhoWndxplgsxV2JUfI+kOaM
-         ZFsVDhG+0di6VZvgzGguxMgjUyxpjG5aI0vhq/fGUZ1FfWK9mLrND1FpSuMY1DkHboLE
-         pOVL7A0WqpfqdTGrL7LsZll2JK0ftCm+qSlFPGCDfWHJAss+KapW+B0hSfxiVuo3WeqN
-         V+cSQX8IBs+7oqSbnWfrepaBhTt7tDSePq8rCTPkQhmP8EkN02qbXhGgmEEIyEfDR2GN
-         /2y9qLihOUfUGWT6jY5kuBfjbEiji0etIlRlcarf+qeyMFp7B5Xekp5qchYnbOYxLHZw
-         fI/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700034709; x=1700639509;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OglTwC5vnjVMX8d3aLPLAd5qQX6D3HCXF24D7yTj60M=;
-        b=TnmNxiT7kMJJZByX9RI1LZTeSISFk/y//12+ynIT5WgwUA+S2uaQJfDQw+szEvsv3N
-         x+AaFD28pN5mzErdkaWwwxQKVzBYOlszv16yfXXPF0MT7dsPOiZmjz1UGyMm/1Wg1WFo
-         du4edaiQ8s7zHCcVtzphCSje5zIedDmN48SFwSFEhD1SDByQZSpcXj6SIsNCQZjgbBl9
-         8oyS3gbjBRhUwF+NyXcCdnxoa4ubAy3qac4NqlLzdkeYIbpGOmu/77yQZI/rYpCffV6C
-         LfZ+eTa2HBm5eG+//0SVw3J2R9f0MsFfKHIxv2FjlCPeZcgH5UCTxd5ex9PsDF2PVprL
-         80eA==
-X-Gm-Message-State: AOJu0YykosVZckk7nEjrk9JEiSwSdV8Y3rjVFsTZis4HBWryi6PH6Nt2
-	pKnLvrqRUJsPobdPPI9y2/H8VH3dESL/qg==
-X-Google-Smtp-Source: AGHT+IHxEfAlB8VacsaCIbE8zcQYB702s8jMGacnLwklhhkYWBFEf3a16uvigNGXjmbsP5N576/SwA==
-X-Received: by 2002:a9d:6202:0:b0:6b8:6f94:d3a2 with SMTP id g2-20020a9d6202000000b006b86f94d3a2mr4476076otj.25.1700034709195;
-        Tue, 14 Nov 2023 23:51:49 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id s14-20020a65690e000000b0057c44503835sm574766pgq.65.2023.11.14.23.51.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 23:51:48 -0800 (PST)
-Date: Wed, 15 Nov 2023 15:51:43 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
-	David Ahern <dsahern@kernel.org>, linux-kselftest@vger.kernel.org,
-	Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Guillaume Nault <gnault@redhat.com>
-Subject: Re: [Discuss] Seeking advice on net selftests netns naming method
-Message-ID: <ZVR4j+ZYQmb68/V9@Laptop-X1>
-References: <ZVND+e6RKLFudYQA@Laptop-X1>
- <7b2d70645fecf83f30d71c44ae0071da1b3be67c.camel@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE8D4683
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:57:22 +0000 (UTC)
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C5ADF
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:57:20 -0800 (PST)
+X-UUID: ce9a1f6715334c44a6b4085671728ffd-20231115
+X-CID-O-RULE: Release_Ham
+X-CID-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:243d9842-c331-4b9d-9b26-682e620c9a3c,IP:5,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-10
+X-CID-INFO: VERSION:1.1.32,REQID:243d9842-c331-4b9d-9b26-682e620c9a3c,IP:5,URL
+	:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:-10
+X-CID-META: VersionHash:5f78ec9,CLOUDID:26deac72-1bd3-4f48-b671-ada88705968c,B
+	ulkID:231115155707MSYSYJBK,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,
+	TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0
+	,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
+X-UUID: ce9a1f6715334c44a6b4085671728ffd-20231115
+X-User: heminhong@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.169)] by mailgw
+	(envelope-from <heminhong@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1227758986; Wed, 15 Nov 2023 15:57:05 +0800
+From: heminhong <heminhong@kylinos.cn>
+To: stephen@networkplumber.org
+Cc: heminhong@kylinos.cn,
+	netdev@vger.kernel.org
+Subject: [PATCH v3] iproute2: prevent memory leak
+Date: Wed, 15 Nov 2023 15:56:50 +0800
+Message-Id: <20231115075650.33219-1-heminhong@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231114193350.475050ae@hermes.local>
+References: <20231114193350.475050ae@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <7b2d70645fecf83f30d71c44ae0071da1b3be67c.camel@redhat.com>
 
-On Tue, Nov 14, 2023 at 12:02:00PM +0100, Paolo Abeni wrote:
-> I personally would like sort of both :) e.g. lib function(s) to
-> automatically create and dispose netns, and retain a script-
-> specific/related name prefix. 
-> 
-> The library function could optionally set  the newly created namespaces
-> name in global variables provided by the caller, e.g.:
-> 
-> # create 3 namespaces:
-> netns_init 3 
-> 
-> # create 3 namespaces and set the global variables:
-> # $remote, $local $me 
-> # to their respective names
-> netns_init 3 remote local me
-> 
-> The trick to do such assignment would be using the 'eval' statement,
-> something alike
-> 
-> netns_init()
-> {
-> 	# create the netns
-> 
-> 	shift
-> 	while [ -n "$1" ]; do
-> 		eval $1=$NETNS_NAMES[0]
-> 		shift
-> 	done
-> }
-> 
-> While at that, it would be useful to package some common helper e.g. to
-> wait for a (tcp) listener to be created (available) on a given port.
-> 
-> WDYT?
+When the return value of rtnl_talk() is greater than
+or equal to 0, 'answer' will be allocated.
+The 'answer' should be free after using,
+otherwise it will cause memory leak.
 
-Thanks, this is a good idea. I reviewed all the test cases and it should works
-for most of them. Only the SRv6 tests are a little complex as they use 2 id
-number for netns name. e.g. the setup_hs() in
-srv6_end_dt46_l3vpn_test.sh. I plan to add the tmp string between the hs/rt and
-ids. e.g. hs-xxxxxx-t100-1, rt-xxxxxx-1. I will have a try first.
+Signed-off-by: heminhong <heminhong@kylinos.cn>
+---
+ ip/link_gre.c    | 1 +
+ ip/link_gre6.c   | 1 +
+ ip/link_ip6tnl.c | 1 +
+ ip/link_iptnl.c  | 1 +
+ ip/link_vti.c    | 1 +
+ ip/link_vti6.c   | 1 +
+ 6 files changed, 6 insertions(+)
 
-Cheers
-Hangbin
+diff --git a/ip/link_gre.c b/ip/link_gre.c
+index 74a5b5e9..3d3fcbae 100644
+--- a/ip/link_gre.c
++++ b/ip/link_gre.c
+@@ -113,6 +113,7 @@ static int gre_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+diff --git a/ip/link_gre6.c b/ip/link_gre6.c
+index b03bd65a..d74472d2 100644
+--- a/ip/link_gre6.c
++++ b/ip/link_gre6.c
+@@ -115,6 +115,7 @@ static int gre_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+diff --git a/ip/link_ip6tnl.c b/ip/link_ip6tnl.c
+index b27d696f..8498b726 100644
+--- a/ip/link_ip6tnl.c
++++ b/ip/link_ip6tnl.c
+@@ -101,6 +101,7 @@ static int ip6tunnel_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+diff --git a/ip/link_iptnl.c b/ip/link_iptnl.c
+index 1315aebe..2ee4011d 100644
+--- a/ip/link_iptnl.c
++++ b/ip/link_iptnl.c
+@@ -105,6 +105,7 @@ static int iptunnel_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+diff --git a/ip/link_vti.c b/ip/link_vti.c
+index 50943254..dbbfcb2b 100644
+--- a/ip/link_vti.c
++++ b/ip/link_vti.c
+@@ -69,6 +69,7 @@ static int vti_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+diff --git a/ip/link_vti6.c b/ip/link_vti6.c
+index 5764221e..096759e6 100644
+--- a/ip/link_vti6.c
++++ b/ip/link_vti6.c
+@@ -71,6 +71,7 @@ static int vti6_parse_opt(struct link_util *lu, int argc, char **argv,
+ get_failed:
+ 			fprintf(stderr,
+ 				"Failed to get existing tunnel info.\n");
++			free(answer);
+ 			return -1;
+ 		}
+ 
+-- 
+2.25.1
+
 
