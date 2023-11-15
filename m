@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-48179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418377ECD90
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DE727ECD93
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEB7A281563
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC15E28114C
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AA1446AF;
-	Wed, 15 Nov 2023 19:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA99A446C0;
+	Wed, 15 Nov 2023 19:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5HI3W3H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mX30fVlc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7DC446AD
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:36:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 741F6C433C9;
-	Wed, 15 Nov 2023 19:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB58446BF
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:36:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62EA6C433C8;
+	Wed, 15 Nov 2023 19:36:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700077015;
-	bh=etudxdGtBrISOhVFfZeRsNdQQI6GSAO3tH9FQxYSOVk=;
+	s=k20201202; t=1700077016;
+	bh=zvXd7pFUQNTRC+R6e2nxdu7t0YyF3Z07Sc/sSGBOShU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c5HI3W3HdXbedmLCntujT1NdzxmTAC5K2A9OCDY+T1qT1JF3uKOd9UD4kmllfZbNh
-	 LYpUXJgLESPLcFG/D+J3HLtYweokLPsgoHbTL28yhldLXG3jTRtTH8DFHGeDT5XWtO
-	 CeqSBEl1UiU9QLmnD8cUTwSOvJ6UW28UQW7BykvIi1n3W6UMwm+ht4ZYrzh+Id2VIS
-	 ONrJaB5n5YlE/lcDd2IrSLl29lyhphPGka2JawLOSJvRc6yH5vfS9LUQwfnRY5xq08
-	 CvYXT9LgpZQ5/eq/ArG0vbBR/tAFjCyu5e3V2/0QMhfeqkLaYddIOptvHXuw6Cx8Ws
-	 72IUdpeMZ5tHg==
+	b=mX30fVlc3C4dN0Y/jJFy+nD58Bk8W4+/hxJBTznlD22kYrEuCt+AKXsT1qB7iMJSM
+	 zmR637pc5PhI3xYKEsUR/qwIggKssuZfuQE9TtjyDShIHNGvgrKjgt0AO/AT2Xi3Vy
+	 kua2dxk7wHwOVpqIVfpDODpihmOA3HrxSBaBaZBt4nT6BwAGIsJLaEPfKq+Q6GEam0
+	 /iOAf1HaYvtzRenyVPS8i/L/acpETJZl3i/CRnnFbiIhgf8rWRlHeD144o5HKcu/Ek
+	 Ai08LM2uchBA1IQ34Zr+zdCLsPK1ATbppsgxHo30LzmrJToG8lw6WNqazX0PHbtxiP
+	 caIWYf8zKfjzw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -46,9 +46,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Justin Stitt <justinstitt@google.com>,
 	"Gustavo A . R . Silva" <gustavoars@kernel.org>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next V2 04/13] net/mlx5: Annotate struct mlx5_fc_bulk with __counted_by
-Date: Wed, 15 Nov 2023 11:36:40 -0800
-Message-ID: <20231115193649.8756-5-saeed@kernel.org>
+Subject: [net-next V2 05/13] net/mlx5: Annotate struct mlx5_flow_handle with __counted_by
+Date: Wed, 15 Nov 2023 11:36:41 -0800
+Message-ID: <20231115193649.8756-6-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231115193649.8756-1-saeed@kernel.org>
 References: <20231115193649.8756-1-saeed@kernel.org>
@@ -68,7 +68,7 @@ their accesses bounds-checked at run-time via CONFIG_UBSAN_BOUNDS (for
 array indexing) and CONFIG_FORTIFY_SOURCE (for strcpy/memcpy-family
 functions).
 
-As found with Coccinelle[1], add __counted_by for struct mlx5_fc_bulk.
+As found with Coccinelle[1], add __counted_by for struct mlx5_flow_handle.
 
 Cc: Saeed Mahameed <saeedm@nvidia.com>
 Cc: Leon Romanovsky <leon@kernel.org>
@@ -85,22 +85,22 @@ Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
-index 17fe30a4c06c..0c26d707eed2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_counters.c
-@@ -539,7 +539,7 @@ struct mlx5_fc_bulk {
- 	u32 base_id;
- 	int bulk_len;
- 	unsigned long *bitmask;
--	struct mlx5_fc fcs[];
-+	struct mlx5_fc fcs[] __counted_by(bulk_len);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
+index 4aed1768b85f..78eb6b7097e1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
+@@ -181,7 +181,7 @@ struct mlx5_flow_rule {
+ 
+ struct mlx5_flow_handle {
+ 	int num_rules;
+-	struct mlx5_flow_rule *rule[];
++	struct mlx5_flow_rule *rule[] __counted_by(num_rules);
  };
  
- static void mlx5_fc_init(struct mlx5_fc *counter, struct mlx5_fc_bulk *bulk,
+ /* Type of children is mlx5_flow_group */
 -- 
 2.41.0
 
