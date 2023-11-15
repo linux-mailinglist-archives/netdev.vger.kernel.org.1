@@ -1,178 +1,644 @@
-Return-Path: <netdev+bounces-48168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4AF87ECACE
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:57:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75BC7ECAFA
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:05:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2484B1F23BE6
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:57:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B21B280A4B
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047F32D799;
-	Wed, 15 Nov 2023 18:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5AE2C861;
+	Wed, 15 Nov 2023 19:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BH8RYuD0"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="HqWnpIRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C31D498
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 10:57:11 -0800 (PST)
-Received: by mail-lf1-x132.google.com with SMTP id 2adb3069b0e04-5079f6efd64so9513399e87.2
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 10:57:11 -0800 (PST)
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2AFAFA
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 11:04:55 -0800 (PST)
+X-KPN-MessageId: d1750cdb-83e9-11ee-a148-005056abad63
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id d1750cdb-83e9-11ee-a148-005056abad63;
+	Wed, 15 Nov 2023 20:04:35 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1700074630; x=1700679430; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eDR5yB4XJJSB4l2qOaGOxQgzVSe4PUs4l8yohGDUY4s=;
-        b=BH8RYuD0R6bCHb5qUdxRdo6t4qA+STpx8sAWq0mTD/pb6wrQxoI3+DG24NaJiDRRY/
-         T0+Fy+bOcxKUYWFueZyq62j2CFsp1bQqsPuDlhcvSZ0bWSGwuusm6+U8cNRX01gBRohV
-         eCTOpRsyAwA7l37U3f+hR7dnUI8CurQmXmMGI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700074630; x=1700679430;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eDR5yB4XJJSB4l2qOaGOxQgzVSe4PUs4l8yohGDUY4s=;
-        b=UogcrGP5RyhHeOzr5qvwrkk636pE1y0+dz7UGsDWO0V7hShW5GAGQhsTUSBXxrW84d
-         wqloZUbaFycYTPRSXRIXwi/Y/09Y0Cm7yFmx2x7X66zNUTX/7Yp2Vpr0mbYe7ctP6lru
-         2cZ3XHzyxRDRRc/KOpsWxEtf64RhfYGInO6BwSXjuB3lUNI0do23/thFyttzRsHkYz59
-         EIwYASucujQMhid96ujJ/G9xfvocjYc9YOTbsemNSUMDuUGnB0SCtxZ/eYjTzRaL8fKu
-         KRcez+DueRRLljQGnEQr6qa7B8/wvKHLeGzQa5flltBk7Q1tbgMjrLBKlFPzbCN8zfUh
-         WjLA==
-X-Gm-Message-State: AOJu0Yx6krvYDC5erPay+1aXJIBywJ1jsWcTuLn78uRAlRMdErAog6W5
-	Yk7PKD0E8hIcUUpYViFoQ5w7HZaIaLhZ4Kr6YlIPxw==
-X-Google-Smtp-Source: AGHT+IFzGUliKwyRZ8fZE0zYODfcIatNss3kEsBbcyN8/yg1vwaw9Mvlym3rtX74JUAptdINvsE0OBJ4lixPyVoSG9w=
-X-Received: by 2002:a19:4f47:0:b0:4fb:7559:aea3 with SMTP id
- a7-20020a194f47000000b004fb7559aea3mr9027356lfk.39.1700074629444; Wed, 15 Nov
- 2023 10:57:09 -0800 (PST)
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=j1ew/7OGdB9oAiuu120nCYXk48i/IYV8imjG9KRQsGY=;
+	b=HqWnpIRztok0W3OKsUIET6UwiyDyMokgdAM+EYx9EaZXJl3f06EvUCPNWObZsFOqM3s++J1YoF4fZ
+	 vucSOmPz1DYP6OQBAq354QstJ5WwdjSUVcVDZ/O0HeLSs0EK5WDp/Hq+Oy3Xxmozm1T6K2ErlNV3og
+	 cL7BiFhR0pVgvHkc=
+X-KPN-MID: 33|Kka1u52nTKhati2HZklGdzlCrAK6dJUAtCY9TtMkv0YZyXaSJVjm5ONRI4eQYp9
+ GT1ZkmUvGhZteqsu6A7XpSQJv6LhSTbJgOiioaz2QdaA=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|E+xve0HHCd5q8Joug4c70FktoAa5xDw6zkPWOt3jmxfKaO6sIGFuYCbJPSKPxRV
+ Edlh5TO7fNR4Wqi63Wywb6A==
+X-Originating-IP: 213.10.186.43
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id db2d713b-83e9-11ee-8249-005056ab1411;
+	Wed, 15 Nov 2023 20:04:53 +0100 (CET)
+Date: Wed, 15 Nov 2023 20:04:52 +0100
+From: Antony Antony <antony@phenome.org>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, netdev@vger.kernel.org,
+	Christian Hopps <chopps@labn.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [devel-ipsec] [RFC ipsec-next v2 6/8] iptfs: xfrm: Add mode_cbs
+ module functionality
+Message-ID: <ZVUWVO-c6Sq-188h@Antony2201.local>
+References: <20231113035219.920136-1-chopps@chopps.org>
+ <20231113035219.920136-7-chopps@chopps.org>
+ <ZVItv0C5ilXGvgW6@Antony2201.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231002185510.1488-1-thinhtr@linux.vnet.ibm.com>
- <20231102161219.220-1-thinhtr@linux.vnet.ibm.com> <CACKFLimX4Pjm89cneeTa36B519DN3mdXXo5FXfDFi6e0SBwUSA@mail.gmail.com>
- <14584a37-2882-4cd8-9380-40a532d07731@linux.vnet.ibm.com> <e76f324b-b043-4349-bd19-455542c6480e@linux.vnet.ibm.com>
- <CACKFLinMiWBabbBdHE=T=vR_BG1st2EsgyCN7GpPYt0g6Pq_AQ@mail.gmail.com> <bab94c00-c26e-4883-98c9-eb0a31b781fd@linux.vnet.ibm.com>
-In-Reply-To: <bab94c00-c26e-4883-98c9-eb0a31b781fd@linux.vnet.ibm.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 15 Nov 2023 10:56:57 -0800
-Message-ID: <CACKFLimy_DUPvMzApbgy7j701WCwkzTy_EARd1nmd+XKWC28kw@mail.gmail.com>
-Subject: Re: [PATCH v2] net/tg3: fix race condition in tg3_reset_task()
-To: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Cc: netdev@vger.kernel.org, siva.kallam@broadcom.com, prashant@broadcom.com, 
-	mchan@broadcom.com, pavan.chebbi@broadcom.com, drc@linux.vnet.ibm.com, 
-	venkata.sai.duggi@ibm.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006d76eb060a357866"
+Content-Type: multipart/mixed; boundary="JOmFblaPWscOC16+"
+Content-Disposition: inline
+In-Reply-To: <ZVItv0C5ilXGvgW6@Antony2201.local>
+X-Spam-Level: *
 
---0000000000006d76eb060a357866
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 15, 2023 at 10:23=E2=80=AFAM Thinh Tran <thinhtr@linux.vnet.ibm=
-.com> wrote:
->
->
-> On 11/14/2023 3:03 PM, Michael Chan wrote:
-> >
-> > Could you provide more information about the crashes?  The
-> > dev_watchdog() code already checks for netif_device_present() and
-> > netif_running() and netif_carrier_ok() before proceeding to check for
-> > TX timeout.  Why would adding some additional checks for PCI errors
-> > cause problems?  Of course the additional checks should only be done
-> > on PCI devices only.  Thanks.
->
-> The checking for PCI errors is not the problem, avoiding calling drivers
-> ->ndo_tx_timeout() function, causing some issue.
+--JOmFblaPWscOC16+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I see.  By skipping TX timeout during PCI errors, bnx2x crashes in
-.ndo_start_xmit() after EEH error recovery.
+Hi Chris,
 
-I think it should be fine to fix the original EEH issue in tg3 then.
-Please re-post the tg3 patch.  Thanks.
+On Mon, Nov 13, 2023 at 03:07:59PM +0100, Antony Antony wrote:
+> Hi Chris,
+> 
+> I got couple of more questions. I am trying flush them out. Here is one. And 
+> I am still formulating another question.
+> 
+> On Sun, Nov 12, 2023 at 10:52:17PM -0500, Christian Hopps via Devel wrote:
+> > From: Christian Hopps <chopps@labn.net>
+> > 
+> > Add a set of callbacks xfrm_mode_cbs to xfrm_state. These callbacks
+> > enable the addition of new xfrm modes, such as IP-TFS to be defined
+> > in modules.
+> > 
+> > Signed-off-by: Christian Hopps <chopps@labn.net>
+> > ---
+> >  include/net/xfrm.h     | 36 ++++++++++++++++++++++++++++++++++++
+> >  net/xfrm/xfrm_device.c |  3 ++-
+> >  net/xfrm/xfrm_input.c  | 14 ++++++++++++--
+> >  net/xfrm/xfrm_output.c |  9 +++++++--
+> >  net/xfrm/xfrm_policy.c | 18 +++++++++++-------
+> >  net/xfrm/xfrm_state.c  | 41 +++++++++++++++++++++++++++++++++++++++++
+> >  net/xfrm/xfrm_user.c   | 10 ++++++++++
+> >  7 files changed, 119 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > index d2e87344d175..aeeadadc9545 100644
+> > --- a/include/net/xfrm.h
+> > +++ b/include/net/xfrm.h
+> > @@ -204,6 +204,7 @@ struct xfrm_state {
+> >  		u16		family;
+> >  		xfrm_address_t	saddr;
+> >  		int		header_len;
+> > +		int		enc_hdr_len;
+> >  		int		trailer_len;
+> >  		u32		extra_flags;
+> >  		struct xfrm_mark	smark;
+> > @@ -289,6 +290,9 @@ struct xfrm_state {
+> >  	/* Private data of this transformer, format is opaque,
+> >  	 * interpreted by xfrm_type methods. */
+> >  	void			*data;
+> > +
+> > +	const struct xfrm_mode_cbs	*mode_cbs;
+> > +	void				*mode_data;
+> >  };
+> >  
+> >  static inline struct net *xs_net(struct xfrm_state *x)
+> > @@ -441,6 +445,38 @@ struct xfrm_type_offload {
+> >  int xfrm_register_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+> >  void xfrm_unregister_type_offload(const struct xfrm_type_offload *type, unsigned short family);
+> >  
+> > +struct xfrm_mode_cbs {
+> > +	struct module	*owner;
+> > +	/* Add/delete state in the new xfrm_state in `x`. */
+> > +	int	(*create_state)(struct xfrm_state *x);
+> > +	void	(*delete_state)(struct xfrm_state *x);
+> > +
+> > +	/* Called while handling the user netlink options. */
+> > +	int	(*user_init)(struct net *net, struct xfrm_state *x,
+> > +			     struct nlattr **attrs);
+> > +	int	(*copy_to_user)(struct xfrm_state *x, struct sk_buff *skb);
+> 
+> 
+> I'm curious about how xfrm_state_clone() is supported, particularly when 
+> it's called in this sequence:
+> 
+> 
+> XFRM_MSG_MIGRATE
+> xfrm_do_migrate()
+>    xfrm_migrate()
+>      xfrm_state_migrate()
+>         xfrm_state_clone()
+> 
+> I've been pondering if perhaps IP-TFS is missing clone support?
+> It seems like something along the lines of the attached fragment might be 
+> needed.
 
---0000000000006d76eb060a357866
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Here's a tested fix that supports XFRM_MSG_MIGRATE with iptfs. I tested it 
+using IPv4, and it's working. I included some memset with zeros to be sure 
+those timers are initialized properly. May be it is not necessary!
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIFR//bTX+loaoC57h3bOAOR1rJrQuBr
-b8liaHgIsWZBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
-NTE4NTcxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBjN1LpNEm8kcP8gxhQEkDhEO2Dw5H98g5xHVdDfdHhbycQQBkP
-yz9JKtzthDCWVnwj0q6JdkSAcMmVTS5IUvpE9OJxgq4CylZ7UulA3uCxb7Ti77wXp3FI9+++8lHn
-46tngL3/0tCFJy9WxKungM8dnAHvOlBdxg2UCPqiAjQy72i0WLA4+r3wTdYXa4z/X+M+gAGLnC2t
-pw74xrIu9qf8yoMqBJ22EhPS6R+Z8+v4qewV2IVswEJeZW9x986waBE+uUqgtJhKssw6ForQGC0X
-eHp2nGtXNXBpQqjThw/ZLWtDDX/aFwrfHDmzzmGwfOxh9ZZ7A3S9SsSNZ3BfzxWo
---0000000000006d76eb060a357866--
+> And speaking of clone, it got me thinking: could there be packet drops 
+> when XFRM_MSG_UPDSA triggers iptfs_delete_state()? Given that an update 
+> creates a new state and deletes the old one, it's possible there might be 
+> some packet loss. Maybe it's unavoidable?
+> 
+> Also, I've been wondering state timers or limits expire. What happens when 
+> the byte or packet limit exceeds and the state gets deleted? Could that lead 
+> to packet loss? The same question applies to rekeying from userspace IKEd.  
+> Users are often very sensitive to packet loss during rekeying, and a lot of 
+> effort has gone into minimizing it. I'm curious if this has been carefully 
+> handled, or if there are considerations we should be aware of."
+> 
+> > +
+> > +	u32	(*get_inner_mtu)(struct xfrm_state *x, int outer_mtu);
+> > +
+> > +	/* Called to handle received xfrm (egress) packets. */
+> > +	int	(*input)(struct xfrm_state *x, struct sk_buff *skb);
+> > +
+> > +	/* Placed in dst_output of the dst when an xfrm_state is bound. */
+> > +	int	(*output)(struct net *net, struct sock *sk, struct sk_buff *skb);
+> > +
+> > +	/**
+> > +	 * Prepare the skb for output for the given mode. Returns:
+> > +	 *    Error value, if 0 then skb values should be as follows:
+> > +	 *    transport_header should point at ESP header
+> > +	 *    network_header should point at Outer IP header
+> > +	 *    mac_header should point at protocol/nexthdr of the outer IP
+> > +	 */
+> > +	int	(*prepare_output)(struct xfrm_state *x, struct sk_buff *skb);
+> > +};
+> > +
+> > +int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs);
+> > +void xfrm_unregister_mode_cbs(u8 mode);
+> > +
+> >  static inline int xfrm_af2proto(unsigned int family)
+> >  {
+> >  	switch(family) {
+> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> > index 3784534c9185..8b848540ea47 100644
+> > --- a/net/xfrm/xfrm_device.c
+> > +++ b/net/xfrm/xfrm_device.c
+> > @@ -42,7 +42,8 @@ static void __xfrm_mode_tunnel_prep(struct xfrm_state *x, struct sk_buff *skb,
+> >  		skb->transport_header = skb->network_header + hsize;
+> >  
+> >  	skb_reset_mac_len(skb);
+> > -	pskb_pull(skb, skb->mac_len + x->props.header_len);
+> > +	pskb_pull(skb,
+> > +		  skb->mac_len + x->props.header_len - x->props.enc_hdr_len);
+> >  }
+> >  
+> >  static void __xfrm_mode_beet_prep(struct xfrm_state *x, struct sk_buff *skb,
+> > diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+> > index bd4ce21d76d7..824f7b7f90e0 100644
+> > --- a/net/xfrm/xfrm_input.c
+> > +++ b/net/xfrm/xfrm_input.c
+> > @@ -437,6 +437,9 @@ static int xfrm_inner_mode_input(struct xfrm_state *x,
+> >  		WARN_ON_ONCE(1);
+> >  		break;
+> >  	default:
+> > +		if (x->mode_cbs && x->mode_cbs->input)
+> > +			return x->mode_cbs->input(x, skb);
+> > +
+> >  		WARN_ON_ONCE(1);
+> >  		break;
+> >  	}
+> > @@ -479,6 +482,10 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+> >  
+> >  		family = x->props.family;
+> >  
+> > +		/* An encap_type of -3 indicates reconstructed inner packet */
+> > +		if (encap_type == -3)
+> > +			goto resume_decapped;
+> > +
+> >  		/* An encap_type of -1 indicates async resumption. */
+> >  		if (encap_type == -1) {
+> >  			async = 1;
+> > @@ -660,11 +667,14 @@ int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_type)
+> >  
+> >  		XFRM_MODE_SKB_CB(skb)->protocol = nexthdr;
+> >  
+> > -		if (xfrm_inner_mode_input(x, skb)) {
+> > +		err = xfrm_inner_mode_input(x, skb);
+> > +		if (err == -EINPROGRESS)
+> > +			return 0;
+> > +		else if (err) {
+> >  			XFRM_INC_STATS(net, LINUX_MIB_XFRMINSTATEMODEERROR);
+> >  			goto drop;
+> >  		}
+> > -
+> > +resume_decapped:
+> >  		if (x->outer_mode.flags & XFRM_MODE_FLAG_TUNNEL) {
+> >  			decaps = 1;
+> >  			break;
+> > diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+> > index 662c83beb345..4390c111410d 100644
+> > --- a/net/xfrm/xfrm_output.c
+> > +++ b/net/xfrm/xfrm_output.c
+> > @@ -280,7 +280,9 @@ static int xfrm4_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
+> >  	skb_set_inner_network_header(skb, skb_network_offset(skb));
+> >  	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
+> >  
+> > -	skb_set_network_header(skb, -x->props.header_len);
+> > +	/* backup to add space for the outer encap */
+> > +	skb_set_network_header(skb,
+> > +			       -x->props.header_len + x->props.enc_hdr_len);
+> >  	skb->mac_header = skb->network_header +
+> >  			  offsetof(struct iphdr, protocol);
+> >  	skb->transport_header = skb->network_header + sizeof(*top_iph);
+> > @@ -325,7 +327,8 @@ static int xfrm6_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
+> >  	skb_set_inner_network_header(skb, skb_network_offset(skb));
+> >  	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
+> >  
+> > -	skb_set_network_header(skb, -x->props.header_len);
+> > +	skb_set_network_header(skb,
+> > +			       -x->props.header_len + x->props.enc_hdr_len);
+> >  	skb->mac_header = skb->network_header +
+> >  			  offsetof(struct ipv6hdr, nexthdr);
+> >  	skb->transport_header = skb->network_header + sizeof(*top_iph);
+> > @@ -472,6 +475,8 @@ static int xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb)
+> >  		WARN_ON_ONCE(1);
+> >  		break;
+> >  	default:
+> > +		if (x->mode_cbs->prepare_output)
+> > +			return x->mode_cbs->prepare_output(x, skb);
+> >  		WARN_ON_ONCE(1);
+> >  		break;
+> >  	}
+> > diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+> > index d2dddc570f4f..3220b01121f3 100644
+> > --- a/net/xfrm/xfrm_policy.c
+> > +++ b/net/xfrm/xfrm_policy.c
+> > @@ -2707,13 +2707,17 @@ static struct dst_entry *xfrm_bundle_create(struct xfrm_policy *policy,
+> >  
+> >  		dst1->input = dst_discard;
+> >  
+> > -		rcu_read_lock();
+> > -		afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
+> > -		if (likely(afinfo))
+> > -			dst1->output = afinfo->output;
+> > -		else
+> > -			dst1->output = dst_discard_out;
+> > -		rcu_read_unlock();
+> > +		if (xfrm[i]->mode_cbs && xfrm[i]->mode_cbs->output) {
+> > +			dst1->output = xfrm[i]->mode_cbs->output;
+> > +		} else {
+> > +			rcu_read_lock();
+> > +			afinfo = xfrm_state_afinfo_get_rcu(inner_mode->family);
+> > +			if (likely(afinfo))
+> > +				dst1->output = afinfo->output;
+> > +			else
+> > +				dst1->output = dst_discard_out;
+> > +			rcu_read_unlock();
+> > +		}
+> >  
+> >  		xdst_prev = xdst;
+> >  
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index bda5327bf34d..f5e1a17ebf74 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -513,6 +513,36 @@ static const struct xfrm_mode *xfrm_get_mode(unsigned int encap, int family)
+> >  	return NULL;
+> >  }
+> >  
+> > +static struct xfrm_mode_cbs xfrm_mode_cbs_map[XFRM_MODE_MAX];
+> > +
+> > +int xfrm_register_mode_cbs(u8 mode, const struct xfrm_mode_cbs *mode_cbs)
+> > +{
+> > +	if (mode >= XFRM_MODE_MAX)
+> > +		return -EINVAL;
+> > +
+> > +	xfrm_mode_cbs_map[mode] = *mode_cbs;
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL(xfrm_register_mode_cbs);
+> > +
+> > +void xfrm_unregister_mode_cbs(u8 mode)
+> > +{
+> > +	if (mode >= XFRM_MODE_MAX)
+> > +		return;
+> > +
+> > +	memset(&xfrm_mode_cbs_map[mode], 0, sizeof(xfrm_mode_cbs_map[mode]));
+> > +}
+> > +EXPORT_SYMBOL(xfrm_unregister_mode_cbs);
+> > +
+> > +static const struct xfrm_mode_cbs *xfrm_get_mode_cbs(u8 mode)
+> > +{
+> > +	if (mode >= XFRM_MODE_MAX)
+> > +		return NULL;
+> > +	if (mode == XFRM_MODE_IPTFS && !xfrm_mode_cbs_map[mode].create_state)
+> > +		request_module("xfrm-iptfs");
+> > +	return &xfrm_mode_cbs_map[mode];
+> > +}
+> > +
+> >  void xfrm_state_free(struct xfrm_state *x)
+> >  {
+> >  	kmem_cache_free(xfrm_state_cache, x);
+> > @@ -521,6 +551,8 @@ EXPORT_SYMBOL(xfrm_state_free);
+> >  
+> >  static void ___xfrm_state_destroy(struct xfrm_state *x)
+> >  {
+> > +	if (x->mode_cbs && x->mode_cbs->delete_state)
+> > +		x->mode_cbs->delete_state(x);
+> >  	hrtimer_cancel(&x->mtimer);
+> >  	del_timer_sync(&x->rtimer);
+> >  	kfree(x->aead);
+> > @@ -2765,6 +2797,9 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
+> >  	case XFRM_MODE_TUNNEL:
+> >  		break;
+> >  	default:
+> > +		if (x->mode_cbs && x->mode_cbs->get_inner_mtu)
+> > +			return x->mode_cbs->get_inner_mtu(x, mtu);
+> > +
+> >  		WARN_ON_ONCE(1);
+> >  		break;
+> >  	}
+> > @@ -2850,6 +2885,12 @@ int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
+> >  			goto error;
+> >  	}
+> >  
+> > +	x->mode_cbs = xfrm_get_mode_cbs(x->props.mode);
+> > +	if (x->mode_cbs && x->mode_cbs->create_state) {
+> > +		err = x->mode_cbs->create_state(x);
+> > +		if (err)
+> > +			goto error;
+> > +	}
+> >  error:
+> >  	return err;
+> >  }
+> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> > index fa2059de51f5..795da945fbc2 100644
+> > --- a/net/xfrm/xfrm_user.c
+> > +++ b/net/xfrm/xfrm_user.c
+> > @@ -779,6 +779,12 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
+> >  			goto error;
+> >  	}
+> >  
+> > +	if (x->mode_cbs && x->mode_cbs->user_init) {
+> > +		err = x->mode_cbs->user_init(net, x, attrs);
+> > +		if (err)
+> > +			goto error;
+> > +	}
+> > +
+> >  	return x;
+> >  
+> >  error:
+> > @@ -1192,6 +1198,10 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+> >  		if (ret)
+> >  			goto out;
+> >  	}
+> > +	if (x->mode_cbs && x->mode_cbs->copy_to_user)
+> > +		ret = x->mode_cbs->copy_to_user(x, skb);
+> > +	if (ret)
+> > +		goto out;
+> >  	if (x->mapping_maxage)
+> >  		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
+> >  out:
+> > -- 
+> > 2.42.0
+> > 
+> > -- 
+> > Devel mailing list
+> > Devel@linux-ipsec.org
+> > https://linux-ipsec.org/mailman/listinfo/devel
+
+> From 00fc5af96f90846f1e1882b141699fb62a9f0a73 Mon Sep 17 00:00:00 2001
+> From: Antony Antony <antony.antony@secunet.com>
+> Date: Mon, 13 Nov 2023 14:20:45 +0100
+> Subject: [PATCH] xfrm iptfs migrate poc
+> 
+> proof of concept for IP-TFS migrate support
+> ---
+>  include/net/xfrm.h    |  1 +
+>  net/xfrm/xfrm_iptfs.c | 20 ++++++++++++++++++++
+>  net/xfrm/xfrm_state.c |  6 ++++++
+>  3 files changed, 27 insertions(+)
+> 
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index a6e0e848918d..176ab5ac436e 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -456,6 +456,7 @@ struct xfrm_mode_cbs {
+>  	int	(*user_init)(struct net *net, struct xfrm_state *x,
+>  			     struct nlattr **attrs);
+>  	int	(*copy_to_user)(struct xfrm_state *x, struct sk_buff *skb);
+> +	int     (*clone)(struct xfrm_state *orig, struct xfrm_state *x);
+>  
+>  	u32	(*get_inner_mtu)(struct xfrm_state *x, int outer_mtu);
+>  
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> index 65f7acdbe6a8..cef269a02b11 100644
+> --- a/net/xfrm/xfrm_iptfs.c
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -2613,6 +2613,25 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+>  	return ret;
+>  }
+>  
+> +static int iptfs_clone(struct xfrm_state *orig,  struct xfrm_state *x)
+> +{
+> +
+> +	x->mode_data = kmemdup(orig->mode_data, sizeof(*x->mode_data),
+> +			       GFP_KERNEL);
+> +	/**  may be some values, such as the following, should not be copied ??
+> +	 * and need different handling ?
+> +	 * xtfs->iptfs_timer;
+> +	 * xtfs->drop_timer
+> +         * xtfs->drop_lock
+> +         * xtfs->w_saved
+> +         * xtfs;
+> +	 */
+> +
+> +	if (!x->mode_data)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+>  static int iptfs_create_state(struct xfrm_state *x)
+>  {
+>  	struct xfrm_iptfs_data *xtfs;
+> @@ -2667,6 +2686,7 @@ static const struct xfrm_mode_cbs iptfs_mode_cbs = {
+>  	.delete_state = iptfs_delete_state,
+>  	.user_init = iptfs_user_init,
+>  	.copy_to_user = iptfs_copy_to_user,
+> +	.clone = iptfs_clone,
+>  	.get_inner_mtu = iptfs_get_inner_mtu,
+>  	.input = iptfs_input,
+>  	.output = iptfs_output_collect,
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 786f3fc0d428..c56d3be56229 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -720,6 +720,7 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
+>  		x->replay_maxage = 0;
+>  		x->replay_maxdiff = 0;
+>  		spin_lock_init(&x->lock);
+> +		x->mode_data = NULL;
+>  	}
+>  	return x;
+>  }
+> @@ -1787,6 +1788,11 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+>  	x->new_mapping = 0;
+>  	x->new_mapping_sport = 0;
+>  
+> +	if (x->mode_cbs && x->mode_cbs->clone && orig->mode_data) {
+> +		if (!x->mode_cbs->clone(x,orig))
+> +			goto error;
+> +	}
+> +
+>  	return x;
+>  
+>   error:
+> -- 
+> 2.42.0
+> 
+
+
+--JOmFblaPWscOC16+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-xfrm-iptfs-migrate-poc.patch"
+
+From 6d1ec5adddbe3a904591f465ff8487bc694de139 Mon Sep 17 00:00:00 2001
+In-Reply-To: <20231113035219.920136-7-chopps@chopps.org>
+References: <20231113035219.920136-7-chopps@chopps.org>
+From: Antony Antony <antony@phenome.org>
+Date: Mon, 13 Nov 2023 14:20:45 +0100
+Subject: [PATCH] xfrm iptfs migrate poc
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org,
+    netdev@vger.kernel.org,
+    Christian Hopps <chopps@labn.net>,
+    Steffen Klassert via Devel <devel@linux-ipsec.org>
+
+From: Antony Antony <antony.antony@secunet.com>
+
+proof of concept for IP-TFS migrate support
+
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+ include/net/xfrm.h    |  1 +
+ net/xfrm/xfrm_iptfs.c | 42 ++++++++++++++++++++++++++++++++++++------
+ net/xfrm/xfrm_state.c |  6 ++++++
+ 3 files changed, 43 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index a6e0e848918d..176ab5ac436e 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -456,6 +456,7 @@ struct xfrm_mode_cbs {
+ 	int	(*user_init)(struct net *net, struct xfrm_state *x,
+ 			     struct nlattr **attrs);
+ 	int	(*copy_to_user)(struct xfrm_state *x, struct sk_buff *skb);
++	int     (*clone)(struct xfrm_state *orig, struct xfrm_state *x);
+ 
+ 	u32	(*get_inner_mtu)(struct xfrm_state *x, int outer_mtu);
+ 
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 65f7acdbe6a8..910c5e060931 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2617,12 +2617,15 @@ static int iptfs_create_state(struct xfrm_state *x)
+ {
+ 	struct xfrm_iptfs_data *xtfs;
+ 
+-	xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
+-	if (!xtfs)
+-		return -ENOMEM;
+-	x->mode_data = xtfs;
+-
+-	xtfs->x = x;
++	if (!x->mode_data) {
++		xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
++		if (!xtfs)
++			return -ENOMEM;
++		x->mode_data = xtfs;
++		xtfs->x = x;
++	} else { /* this is a cloned state */
++		xtfs = (struct xfrm_iptfs_data *) x->mode_data;
++	}
+ 
+ 	__skb_queue_head_init(&xtfs->queue);
+ 	xtfs->init_delay_ns = xtfs->cfg.init_delay_us * NSECS_IN_USEC;
+@@ -2661,12 +2664,39 @@ static void iptfs_delete_state(struct xfrm_state *x)
+ 	kfree_sensitive(xtfs);
+ }
+ 
++static int iptfs_clone(struct xfrm_state *orig,  struct xfrm_state *x)
++{
++	struct xfrm_iptfs_data *xtfs;
++	struct xfrm_iptfs_config *xc;
++
++	x->mode_data = kmemdup(orig->mode_data, sizeof(struct xfrm_iptfs_data),
++			       GFP_KERNEL);
++	if (IS_ERR_OR_NULL(x->mode_data))
++		return -ENOMEM;
++
++	xtfs = (struct xfrm_iptfs_data *)x->mode_data;
++	xtfs->x = x;
++	xc = &xtfs->cfg;
++	if (xc->reorder_win_size)
++		xtfs->w_saved = kcalloc(xc->reorder_win_size, sizeof(*xtfs->w_saved),
++					GFP_KERNEL);
++	xtfs->ra_newskb = NULL;
++	memset(&xtfs->iptfs_timer, 0, sizeof(xtfs->iptfs_timer));
++	memset(&xtfs->drop_timer, 0,sizeof(xtfs->drop_timer));
++	memset(&xtfs->drop_lock, 0, sizeof(xtfs->drop_lock));
++
++	/* x->mode_cbs->create_state(x) will initialize the rest of xtfs */
++
++	return 0;
++}
++
+ static const struct xfrm_mode_cbs iptfs_mode_cbs = {
+ 	.owner = THIS_MODULE,
+ 	.create_state = iptfs_create_state,
+ 	.delete_state = iptfs_delete_state,
+ 	.user_init = iptfs_user_init,
+ 	.copy_to_user = iptfs_copy_to_user,
++	.clone = iptfs_clone,
+ 	.get_inner_mtu = iptfs_get_inner_mtu,
+ 	.input = iptfs_input,
+ 	.output = iptfs_output_collect,
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index 786f3fc0d428..fd592bf4d311 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -720,6 +720,7 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
+ 		x->replay_maxage = 0;
+ 		x->replay_maxdiff = 0;
+ 		spin_lock_init(&x->lock);
++		x->mode_data = NULL;
+ 	}
+ 	return x;
+ }
+@@ -1787,6 +1788,11 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+ 	x->new_mapping = 0;
+ 	x->new_mapping_sport = 0;
+ 
++	if (orig->mode_cbs && orig->mode_cbs->clone && orig->mode_data) {
++		if (orig->mode_cbs->clone(orig, x))
++			goto error;
++	}
++
+ 	return x;
+ 
+  error:
+-- 
+2.42.0
+
+
+--JOmFblaPWscOC16+--
 
