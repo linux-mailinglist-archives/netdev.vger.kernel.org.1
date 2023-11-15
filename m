@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-48023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6900E7EC4F4
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:18:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EEA7EC4F5
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:18:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B311BB20A60
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:18:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCB52280E43
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F482E620;
-	Wed, 15 Nov 2023 14:17:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30C828E36;
+	Wed, 15 Nov 2023 14:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RakQxarJ"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="SlfJ+yeD"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8152D63C
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:17:45 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B51D3AC
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:17:43 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9e623356e59so792107566b.0
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:17:43 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815502E63B
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:17:48 +0000 (UTC)
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D12E1
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:17:46 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-5079f6efd64so9082781e87.2
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:17:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700057862; x=1700662662; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700057864; x=1700662664; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=htebmSb+wNlEeqd9kaA68nWsJmpSi+7d0VYs1jUfc3U=;
-        b=RakQxarJCd6tulBSQNt6U0a+sBt51Wfgo3aNBqawIBXbCm4hyuRfatH/c1rxzsgf9e
-         vhCBL01EHjEMmJAQyGpVdfcWDmLMmT/GAo7UgoRFFmabTeaQJQgI3dP43pY5PnsYCTT2
-         vFy+pTWI6/YLJczZSysnBqDnsxeCqnGIu5uM/HNwE4g9j1YGIgnTpou6NKhhcAOmjc++
-         5jnAW70lCiz1gEaClNjth+IaRjWxVb6MSfrk6JlEixb9aob5KT6kdbsytmlC6qbjd4nG
-         k8c5hKnHMC60quvf2M/HoNw7MBJ6K1h5ttNlckfUdurZwvKpbKgunqvKnjoIEGV5a2oD
-         DCjQ==
+        bh=NA/ZFK3xawEcyb9omOiGWO1jMML/5COVB0SorPJoKYQ=;
+        b=SlfJ+yeDAh51gqWfyOw29PvgsDgO/TKi0xxN99cD5q7ycKw8AJMxfw+kLhDOXaNVoW
+         XcqGI5kq4qmMUipJGfvFThqWixBYNczA4WQek4fEqv1Ihp1oRwg+NOwzbVR0Fap6WOgK
+         fYuPH+vrVgY0OyN6oR7/WrMzEVKbZV+qWZB8Ssbbs2/PP/IXFbEkntZ0DY+bVOvWcP5d
+         DSrycII8up/9eVAtnN5uf37+sW8ftprvCm/cAnr3aeVbJ4VMVfrefRc0b9Dv/vq2d2cv
+         QJ3QO7MIolVR7U8TMla8XxNtvh+maFVheyCjIhCKoGAZru0FFt6ZsKo8kzFUaaIBz9GR
+         vYbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700057862; x=1700662662;
+        d=1e100.net; s=20230601; t=1700057864; x=1700662664;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=htebmSb+wNlEeqd9kaA68nWsJmpSi+7d0VYs1jUfc3U=;
-        b=HusJsANesq1p5TIG80x3xbcVv4g2Ql4Xk5ifkbnPyQSD+ireDoRm+koLxkjWBgO7HN
-         QL1ew18n+SpAkwIfLkDuby5rlXCg4N8C9/bZSvmmOXA4zq309oW0CdY6da/jmQWo5I9+
-         nPTeJ1TgX3u5s/vzH0LDmjPDPipmDNDgop5lWQlW90oK00tOjxFdQvefiKDLvCSIRGCI
-         4WtbCqkgVXMLLpWb+xgzEsuRrgautS4a2NeW82uz84t4QHhFNJnmfjQskEa+hxKGLeWw
-         4cXDl28kbFib1XbRqKSJPX97UWLNvgfJF8FrK22TZnLo0Tt1WW/JP410iMxGac6HvPuJ
-         WEgA==
-X-Gm-Message-State: AOJu0Yy/08KvdTp4AVgMy90udkwkcwYMepWeeLaxzPskxYwD4/awFCe4
-	phypczizEJ//2Qr3ek0N88b6PtsLkxuxymwf8rk=
-X-Google-Smtp-Source: AGHT+IF8LmXBBzKcAJrAX+3tc9+nrKD75CrakFpDazOiTnFiUyfBFgQ9NUuF7czXWYqKm6q2h47ctA==
-X-Received: by 2002:a17:906:680c:b0:9e6:2b14:936c with SMTP id k12-20020a170906680c00b009e62b14936cmr10056113ejr.51.1700057862237;
-        Wed, 15 Nov 2023 06:17:42 -0800 (PST)
+        bh=NA/ZFK3xawEcyb9omOiGWO1jMML/5COVB0SorPJoKYQ=;
+        b=XG08gpTPO50tlKVH3MRaIleNSzUFS5VsijcH0axR3IJqHAQcCSKV/Fz/zQxavPWUY2
+         irgByAziGWRv4UYv5wr63Ce8Iu6hcAq9B9RiWmpW2+AJBhr4l7mcsCv6Qt3Yt0TRqlrq
+         DzXC/2Epna8V61P0+YOE51Ur8fDJN/7EXlsTMTN6u6ZHNF7tgWvseOs+h2beb2QLiJGy
+         GR21i+PkdtcU7RIqVXYHNx7IGM+KDI6hsWScUgF8H4D6UaIC8ArA8xsX0x57Ue1+54Px
+         4tCzadmzzvedJNWbP+TXeX0+60fCEFPR15sddr0fRJTk8MMFynKhZIteobwi4WIqqaGL
+         CAKA==
+X-Gm-Message-State: AOJu0YxXuvv/bLA1ab7dLCxAPiRH2BtDdn+FuSrFgGDnozDmcdmxpmzx
+	ZYYAshnJPPKsoFXnr7RZBZoBOtbUUy4QKOrnbWc=
+X-Google-Smtp-Source: AGHT+IG40o9RcpsW73ukEPy2DTq84ciQkjPbcIA7h5hDVEAbHBFSrvAXnq/n36vkyylikVs7HOBxFg==
+X-Received: by 2002:ac2:46c6:0:b0:50a:3c38:6b68 with SMTP id p6-20020ac246c6000000b0050a3c386b68mr8571983lfo.24.1700057864361;
+        Wed, 15 Nov 2023 06:17:44 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id c26-20020a17090603da00b009adce1c97ccsm7081167eja.53.2023.11.15.06.17.41
+        by smtp.gmail.com with ESMTPSA id b4-20020a50b404000000b005438ce5bf80sm6693251edh.20.2023.11.15.06.17.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 06:17:41 -0800 (PST)
+        Wed, 15 Nov 2023 06:17:43 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -70,9 +70,9 @@ Cc: kuba@kernel.org,
 	andriy.shevchenko@linux.intel.com,
 	amritha.nambiar@intel.com,
 	sdf@google.com
-Subject: [patch net-next 7/8] devlink: add a command to set notification filter and use it for multicasts
-Date: Wed, 15 Nov 2023 15:17:23 +0100
-Message-ID: <20231115141724.411507-8-jiri@resnulli.us>
+Subject: [patch net-next 8/8] devlink: extend multicast filtering by port index
+Date: Wed, 15 Nov 2023 15:17:24 +0100
+Message-ID: <20231115141724.411507-9-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231115141724.411507-1-jiri@resnulli.us>
 References: <20231115141724.411507-1-jiri@resnulli.us>
@@ -86,340 +86,206 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Currently the user listening on a socket for devlink notifications
-gets always all messages for all existing instances, even if he is
-interested only in one of those. That may cause unnecessary overhead
-on setups with thousands of instances present.
-
-User is currently able to narrow down the devlink objects replies
-to dump commands by specifying select attributes.
-
-Allow similar approach for notifications. Introduce a new devlink
-NOTIFY_FILTER_SET which the user passes the select attributes. Store
-these per-socket and use them for filtering messages
-during multicast send.
+Expose the previously introduced notification multicast messages
+filtering infrastructure and allow the user to select messages using
+port index.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml | 10 ++++
- include/uapi/linux/devlink.h             |  2 +
- net/devlink/devl_internal.h              | 33 +++++++++++-
- net/devlink/netlink.c                    | 69 ++++++++++++++++++++++++
- net/devlink/netlink_gen.c                | 15 +++++-
- net/devlink/netlink_gen.h                |  4 +-
- tools/net/ynl/generated/devlink-user.c   | 31 +++++++++++
- tools/net/ynl/generated/devlink-user.h   | 47 ++++++++++++++++
- 8 files changed, 207 insertions(+), 4 deletions(-)
+ Documentation/netlink/specs/devlink.yaml |  1 +
+ net/devlink/devl_internal.h              |  9 +++++++++
+ net/devlink/health.c                     |  6 +++++-
+ net/devlink/netlink.c                    | 10 +++++++++-
+ net/devlink/netlink_gen.c                |  5 +++--
+ net/devlink/port.c                       |  5 ++++-
+ tools/net/ynl/generated/devlink-user.c   |  2 ++
+ tools/net/ynl/generated/devlink-user.h   |  9 +++++++++
+ 8 files changed, 42 insertions(+), 5 deletions(-)
 
 diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 572d83a414d0..cc4991cbce83 100644
+index cc4991cbce83..49d4fbf3fe44 100644
 --- a/Documentation/netlink/specs/devlink.yaml
 +++ b/Documentation/netlink/specs/devlink.yaml
-@@ -2055,3 +2055,13 @@ operations:
+@@ -2065,3 +2065,4 @@ operations:
+           attributes:
              - bus-name
              - dev-name
-             - selftests
-+
-+    -
-+      name: notify-filter-set
-+      doc: Set notification messages socket filter.
-+      attribute-set: devlink
-+      do:
-+        request:
-+          attributes:
-+            - bus-name
-+            - dev-name
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index b3c8383d342d..130cae0d3e20 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -139,6 +139,8 @@ enum devlink_command {
- 	DEVLINK_CMD_SELFTESTS_GET,	/* can dump */
- 	DEVLINK_CMD_SELFTESTS_RUN,
- 
-+	DEVLINK_CMD_NOTIFY_FILTER_SET,
-+
- 	/* add new commands above here */
- 	__DEVLINK_CMD_MAX,
- 	DEVLINK_CMD_MAX = __DEVLINK_CMD_MAX - 1
++            - port-index
 diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index e19e8dd47092..0ee0bcdd4a7d 100644
+index 0ee0bcdd4a7d..3ed7808013f1 100644
 --- a/net/devlink/devl_internal.h
 +++ b/net/devlink/devl_internal.h
-@@ -178,11 +178,40 @@ static inline bool devlink_nl_notify_need(struct devlink *devlink)
- 				  DEVLINK_MCGRP_CONFIG);
+@@ -181,6 +181,8 @@ static inline bool devlink_nl_notify_need(struct devlink *devlink)
+ struct devlink_obj_desc {
+ 	const char *bus_name;
+ 	const char *dev_name;
++	unsigned int port_index;
++	bool port_index_valid;
+ 	long data[];
+ };
+ 
+@@ -192,6 +194,13 @@ static inline void devlink_nl_obj_desc_init(struct devlink_obj_desc *desc,
+ 	desc->dev_name = dev_name(devlink->dev);
  }
  
-+struct devlink_obj_desc {
-+	const char *bus_name;
-+	const char *dev_name;
-+	long data[];
-+};
-+
-+static inline void devlink_nl_obj_desc_init(struct devlink_obj_desc *desc,
-+					    struct devlink *devlink)
++static inline void devlink_nl_obj_desc_port_set(struct devlink_obj_desc *desc,
++						struct devlink_port *devlink_port)
 +{
-+	memset(desc, 0, sizeof(*desc));
-+	desc->bus_name = devlink->dev->bus->name;
-+	desc->dev_name = dev_name(devlink->dev);
++	desc->port_index = devlink_port->index;
++	desc->port_index_valid = true;
 +}
 +
-+int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data);
-+
-+static inline void devlink_nl_notify_send_desc(struct devlink *devlink,
-+					       struct sk_buff *msg,
-+					       struct devlink_obj_desc *desc)
-+{
-+	genlmsg_multicast_netns_filtered(&devlink_nl_family,
-+					 devlink_net(devlink),
-+					 msg, 0, DEVLINK_MCGRP_CONFIG,
-+					 GFP_KERNEL,
-+					 devlink_nl_notify_filter, desc);
-+}
-+
- static inline void devlink_nl_notify_send(struct devlink *devlink,
- 					  struct sk_buff *msg)
+ int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data);
+ 
+ static inline void devlink_nl_notify_send_desc(struct devlink *devlink,
+diff --git a/net/devlink/health.c b/net/devlink/health.c
+index 2f06e4ddbf3b..0e96d26203f1 100644
+--- a/net/devlink/health.c
++++ b/net/devlink/health.c
+@@ -490,6 +490,7 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
+ 				   enum devlink_command cmd)
  {
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
+ 	struct devlink *devlink = reporter->devlink;
 +	struct devlink_obj_desc desc;
-+
+ 	struct sk_buff *msg;
+ 	int err;
+ 
+@@ -509,7 +510,10 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
+ 		return;
+ 	}
+ 
+-	devlink_nl_notify_send(devlink, msg);
 +	devlink_nl_obj_desc_init(&desc, devlink);
++	if (reporter->devlink_port)
++		devlink_nl_obj_desc_port_set(&desc, reporter->devlink_port);
 +	devlink_nl_notify_send_desc(devlink, msg, &desc);
  }
  
- /* Notify */
+ void
 diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index d0b90ebc8b15..738e2f340ab9 100644
+index 738e2f340ab9..6c033d1f7e64 100644
 --- a/net/devlink/netlink.c
 +++ b/net/devlink/netlink.c
-@@ -13,6 +13,75 @@ static const struct genl_multicast_group devlink_nl_mcgrps[] = {
- 	[DEVLINK_MCGRP_CONFIG] = { .name = DEVLINK_GENL_MCGRP_CONFIG_NAME },
- };
+@@ -46,11 +46,16 @@ int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
+ 		flt->dev_name = pos;
+ 	}
  
-+int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
-+				      struct genl_info *info)
-+{
-+	struct sock *sk = NETLINK_CB(skb).sk;
-+	struct nlattr **attrs = info->attrs;
-+	struct devlink_obj_desc *flt;
-+	size_t data_offset = 0;
-+	size_t data_size = 0;
-+	char *pos;
-+
-+	if (attrs[DEVLINK_ATTR_BUS_NAME])
-+		data_size += nla_len(attrs[DEVLINK_ATTR_BUS_NAME]) + 1;
-+	if (attrs[DEVLINK_ATTR_DEV_NAME])
-+		data_size += nla_len(attrs[DEVLINK_ATTR_DEV_NAME]) + 1;
-+
-+	flt = kzalloc(sizeof(*flt) + data_size, GFP_KERNEL);
-+	if (!flt)
-+		return -ENOMEM;
-+
-+	pos = (char *) flt->data;
-+	if (attrs[DEVLINK_ATTR_BUS_NAME]) {
-+		data_offset += nla_strscpy(pos,
-+					   attrs[DEVLINK_ATTR_BUS_NAME],
-+					   data_size) + 1;
-+		flt->bus_name = pos;
-+		pos += data_offset;
-+	}
-+	if (attrs[DEVLINK_ATTR_DEV_NAME]) {
-+		nla_strscpy(pos, attrs[DEVLINK_ATTR_DEV_NAME],
-+			    data_size - data_offset);
-+		flt->dev_name = pos;
++	if (attrs[DEVLINK_ATTR_PORT_INDEX]) {
++		flt->port_index = nla_get_u32(attrs[DEVLINK_ATTR_PORT_INDEX]);
++		flt->port_index_valid = true;
 +	}
 +
-+	/* Free the existing filter if any. */
-+	kfree(sk->sk_user_data);
-+
-+	/* Don't attach empty filter. */
-+	if (!flt->bus_name && !flt->dev_name) {
-+		kfree(flt);
-+		flt = NULL;
-+	}
-+
-+	sk->sk_user_data = flt;
-+	return 0;
-+}
-+
-+static bool devlink_obj_desc_match(const struct devlink_obj_desc *desc,
-+				   const struct devlink_obj_desc *flt)
-+{
-+	if (desc->bus_name && flt->bus_name &&
-+	    strcmp(desc->bus_name, flt->bus_name))
+ 	/* Free the existing filter if any. */
+ 	kfree(sk->sk_user_data);
+ 
+ 	/* Don't attach empty filter. */
+-	if (!flt->bus_name && !flt->dev_name) {
++	if (!flt->bus_name && !flt->dev_name && !flt->port_index_valid) {
+ 		kfree(flt);
+ 		flt = NULL;
+ 	}
+@@ -68,6 +73,9 @@ static bool devlink_obj_desc_match(const struct devlink_obj_desc *desc,
+ 	if (desc->dev_name && flt->dev_name &&
+ 	    strcmp(desc->dev_name, flt->dev_name))
+ 		return false;
++	if (desc->port_index_valid && flt->port_index_valid &&
++	    desc->port_index != flt->port_index)
 +		return false;
-+	if (desc->dev_name && flt->dev_name &&
-+	    strcmp(desc->dev_name, flt->dev_name))
-+		return false;
-+	return true;
-+}
-+
-+int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data)
-+{
-+	struct devlink_obj_desc *flt = dsk->sk_user_data;
-+	struct devlink_obj_desc *desc = data;
-+
-+	if (!flt)
-+		return 0;
-+
-+	return !devlink_obj_desc_match(desc, flt);
-+}
-+
- int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
- 				 struct devlink *devlink, int attrtype)
- {
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 788dfdc498a9..f207f3fc7e20 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -560,8 +560,14 @@ static const struct nla_policy devlink_selftests_run_nl_policy[DEVLINK_ATTR_SELF
- 	[DEVLINK_ATTR_SELFTESTS] = NLA_POLICY_NESTED(devlink_dl_selftest_id_nl_policy),
- };
- 
-+/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
-+static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
-+	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
-+};
-+
- /* Ops table for devlink */
--const struct genl_split_ops devlink_nl_ops[73] = {
-+const struct genl_split_ops devlink_nl_ops[74] = {
- 	{
- 		.cmd		= DEVLINK_CMD_GET,
- 		.validate	= GENL_DONT_VALIDATE_STRICT,
-@@ -1233,4 +1239,11 @@ const struct genl_split_ops devlink_nl_ops[73] = {
- 		.maxattr	= DEVLINK_ATTR_SELFTESTS,
- 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	},
-+	{
-+		.cmd		= DEVLINK_CMD_NOTIFY_FILTER_SET,
-+		.doit		= devlink_nl_notify_filter_set_doit,
-+		.policy		= devlink_notify_filter_set_nl_policy,
-+		.maxattr	= DEVLINK_ATTR_DEV_NAME,
-+		.flags		= GENL_CMD_CAP_DO,
-+	},
- };
-diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
-index 0e9e89c31c31..71693d834ad2 100644
---- a/net/devlink/netlink_gen.h
-+++ b/net/devlink/netlink_gen.h
-@@ -16,7 +16,7 @@ extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_F
- extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
- 
- /* Ops table for devlink */
--extern const struct genl_split_ops devlink_nl_ops[73];
-+extern const struct genl_split_ops devlink_nl_ops[74];
- 
- int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
- 			struct genl_info *info);
-@@ -137,5 +137,7 @@ int devlink_nl_selftests_get_doit(struct sk_buff *skb, struct genl_info *info);
- int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
- 				    struct netlink_callback *cb);
- int devlink_nl_selftests_run_doit(struct sk_buff *skb, struct genl_info *info);
-+int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
-+				      struct genl_info *info);
- 
- #endif /* _LINUX_DEVLINK_GEN_H */
-diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
-index bc5065bd99b2..cd5f70eadf5b 100644
---- a/tools/net/ynl/generated/devlink-user.c
-+++ b/tools/net/ynl/generated/devlink-user.c
-@@ -6830,6 +6830,37 @@ int devlink_selftests_run(struct ynl_sock *ys,
- 	return 0;
+ 	return true;
  }
  
-+/* ============== DEVLINK_CMD_NOTIFY_FILTER_SET ============== */
-+/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
-+void
-+devlink_notify_filter_set_req_free(struct devlink_notify_filter_set_req *req)
-+{
-+	free(req->bus_name);
-+	free(req->dev_name);
-+	free(req);
-+}
-+
-+int devlink_notify_filter_set(struct ynl_sock *ys,
-+			      struct devlink_notify_filter_set_req *req)
-+{
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_NOTIFY_FILTER_SET, 1);
-+	ys->req_policy = &devlink_nest;
-+
-+	if (req->_present.bus_name_len)
-+		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
-+	if (req->_present.dev_name_len)
-+		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
-+
-+	err = ynl_exec(ys, nlh, NULL);
-+	if (err < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
- const struct ynl_family ynl_devlink_family =  {
- 	.name		= "devlink",
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index f207f3fc7e20..b3f37e3c1b64 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -561,9 +561,10 @@ static const struct nla_policy devlink_selftests_run_nl_policy[DEVLINK_ATTR_SELF
  };
+ 
+ /* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
+-static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
++static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
+ 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+ 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
+ };
+ 
+ /* Ops table for devlink */
+@@ -1243,7 +1244,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
+ 		.cmd		= DEVLINK_CMD_NOTIFY_FILTER_SET,
+ 		.doit		= devlink_nl_notify_filter_set_doit,
+ 		.policy		= devlink_notify_filter_set_nl_policy,
+-		.maxattr	= DEVLINK_ATTR_DEV_NAME,
++		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
+ 		.flags		= GENL_CMD_CAP_DO,
+ 	},
+ };
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 758df3000a1b..62e54e152ecf 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -507,6 +507,7 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
+ 				enum devlink_command cmd)
+ {
+ 	struct devlink *devlink = devlink_port->devlink;
++	struct devlink_obj_desc desc;
+ 	struct sk_buff *msg;
+ 	int err;
+ 
+@@ -525,7 +526,9 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
+ 		return;
+ 	}
+ 
+-	devlink_nl_notify_send(devlink, msg);
++	devlink_nl_obj_desc_init(&desc, devlink);
++	devlink_nl_obj_desc_port_set(&desc, devlink_port);
++	devlink_nl_notify_send_desc(devlink, msg, &desc);
+ }
+ 
+ static void devlink_ports_notify(struct devlink *devlink,
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index cd5f70eadf5b..86392da0b52c 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -6853,6 +6853,8 @@ int devlink_notify_filter_set(struct ynl_sock *ys,
+ 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
+ 	if (req->_present.dev_name_len)
+ 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++	if (req->_present.port_index)
++		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
+ 
+ 	err = ynl_exec(ys, nlh, NULL);
+ 	if (err < 0)
 diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
-index 1db4edc36eaa..e5d79b824a67 100644
+index e5d79b824a67..b96837663e6e 100644
 --- a/tools/net/ynl/generated/devlink-user.h
 +++ b/tools/net/ynl/generated/devlink-user.h
-@@ -5252,4 +5252,51 @@ devlink_selftests_run_req_set_selftests_flash(struct devlink_selftests_run_req *
- int devlink_selftests_run(struct ynl_sock *ys,
- 			  struct devlink_selftests_run_req *req);
+@@ -5258,10 +5258,12 @@ struct devlink_notify_filter_set_req {
+ 	struct {
+ 		__u32 bus_name_len;
+ 		__u32 dev_name_len;
++		__u32 port_index:1;
+ 	} _present;
  
-+/* ============== DEVLINK_CMD_NOTIFY_FILTER_SET ============== */
-+/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
-+struct devlink_notify_filter_set_req {
-+	struct {
-+		__u32 bus_name_len;
-+		__u32 dev_name_len;
-+	} _present;
-+
-+	char *bus_name;
-+	char *dev_name;
-+};
-+
-+static inline struct devlink_notify_filter_set_req *
-+devlink_notify_filter_set_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct devlink_notify_filter_set_req));
-+}
-+void
-+devlink_notify_filter_set_req_free(struct devlink_notify_filter_set_req *req);
-+
+ 	char *bus_name;
+ 	char *dev_name;
++	__u32 port_index;
+ };
+ 
+ static inline struct devlink_notify_filter_set_req *
+@@ -5292,6 +5294,13 @@ devlink_notify_filter_set_req_set_dev_name(struct devlink_notify_filter_set_req
+ 	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
+ 	req->dev_name[req->_present.dev_name_len] = 0;
+ }
 +static inline void
-+devlink_notify_filter_set_req_set_bus_name(struct devlink_notify_filter_set_req *req,
-+					   const char *bus_name)
++devlink_notify_filter_set_req_set_port_index(struct devlink_notify_filter_set_req *req,
++					     __u32 port_index)
 +{
-+	free(req->bus_name);
-+	req->_present.bus_name_len = strlen(bus_name);
-+	req->bus_name = malloc(req->_present.bus_name_len + 1);
-+	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
-+	req->bus_name[req->_present.bus_name_len] = 0;
++	req->_present.port_index = 1;
++	req->port_index = port_index;
 +}
-+static inline void
-+devlink_notify_filter_set_req_set_dev_name(struct devlink_notify_filter_set_req *req,
-+					   const char *dev_name)
-+{
-+	free(req->dev_name);
-+	req->_present.dev_name_len = strlen(dev_name);
-+	req->dev_name = malloc(req->_present.dev_name_len + 1);
-+	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
-+	req->dev_name[req->_present.dev_name_len] = 0;
-+}
-+
-+/*
-+ * Set notification messages socket filter.
-+ */
-+int devlink_notify_filter_set(struct ynl_sock *ys,
-+			      struct devlink_notify_filter_set_req *req);
-+
- #endif /* _LINUX_DEVLINK_GEN_H */
+ 
+ /*
+  * Set notification messages socket filter.
 -- 
 2.41.0
 
