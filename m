@@ -1,89 +1,167 @@
-Return-Path: <netdev+bounces-47926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A20947EBF73
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:28:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D8D7EBF7A
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A38A28127B
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:28:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 032CF281392
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5208463D5;
-	Wed, 15 Nov 2023 09:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JK9BtimM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE8596120;
+	Wed, 15 Nov 2023 09:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3577263C4
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:28:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7630DC433C9;
-	Wed, 15 Nov 2023 09:28:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700040504;
-	bh=C6njI5GfsfbHSX6PlTamyWsg4v02QlUD8BMV6EcIvEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JK9BtimMFM1PNtOHSVdfsjWRvDjR+3Pxsl8Putq9a7V6tpYZwEaMnUCvTII0fv43T
-	 4PUpebbSpSMOXBsZYG97txWDJRR1RXgllbdYTeA6DLe83tYo3VRWlcz/RIRL+qm+op
-	 /SIYG2Zum76DWgpsAnBr28sga5cqS43ojOoP8FphxFH7CmJWCZ4igdr12uQXmqYcoa
-	 5u4uqrCvHxLnUTA77uBWnJqHmxYGbnVnjjSdN02eKNBlBghL8iH0bz1h/Rq9KBSQ/D
-	 h80yCqYQz4zCYt4T94obL13AUjXMnSQa0goZDDme11BHzPdzXKvY6josg+muK9bp3N
-	 aSGYzaXFDtOYA==
-Date: Wed, 15 Nov 2023 09:28:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Vlad Buslov <vladbu@nvidia.com>
-Subject: Re: [PATCH net] net: Fix undefined behavior in netdev name allocation
-Message-ID: <20231115092821.GK74656@kernel.org>
-References: <20231113083544.1685919-1-gal@nvidia.com>
- <20231113095333.GM705326@kernel.org>
- <dc40af68-80a2-4821-b674-12462086973b@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C9A63A5
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:29:21 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67769B;
+	Wed, 15 Nov 2023 01:29:19 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.57])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SVd6n2G6vzNm6J;
+	Wed, 15 Nov 2023 17:25:05 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 15 Nov
+ 2023 17:29:17 +0800
+Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Mina Almasry
+	<almasrymina@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
+ Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Jason Gunthorpe <jgg@nvidia.com>, Matthew Wilcox
+	<willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
+References: <20231113130041.58124-1-linyunsheng@huawei.com>
+ <20231113130041.58124-4-linyunsheng@huawei.com>
+ <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+ <20231113180554.1d1c6b1a@kernel.org>
+ <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+ <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
+ <fa5d2f4c-5ccc-e23e-1926-2d7625b66b91@huawei.com>
+ <CAHS8izMj_89dMVaMr73r1-3Kewgc1YL3A1mjvixoax2War8kUg@mail.gmail.com>
+ <3ff54a20-7e5f-562a-ca2e-b078cc4b4120@huawei.com>
+ <6553954141762_1245c529423@willemb.c.googlers.com.notmuch>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <8b7d25eb-1f10-3e37-8753-92b42da3fb34@huawei.com>
+Date: Wed, 15 Nov 2023 17:29:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc40af68-80a2-4821-b674-12462086973b@nvidia.com>
+In-Reply-To: <6553954141762_1245c529423@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-On Mon, Nov 13, 2023 at 04:01:23PM +0200, Gal Pressman wrote:
-> On 13/11/2023 11:53, Simon Horman wrote:
-> > On Mon, Nov 13, 2023 at 10:35:44AM +0200, Gal Pressman wrote:
-> >> Cited commit removed the strscpy() call and kept the snprintf() only.
-> >>
-> >> When allocating a netdev, 'res' and 'name' pointers are equal, but
-> >> according to POSIX, if copying takes place between objects that overlap
-> >> as a result of a call to sprintf() or snprintf(), the results are
-> >> undefined.
-> >>
-> >> Add back the strscpy() and use 'buf' as an intermediate buffer.
-> >>
-> >> Fixes: 9a810468126c ("net: reduce indentation of __dev_alloc_name()")
-> > 
-> > Hi Gal,
-> > 
-> > perhaps my eyes are deceiving me, but I wonder if this fixes the following:
-> > 
-> >   7ad17b04dc7b ("net: trust the bitmap in __dev_alloc_name()")
+On 2023/11/14 23:41, Willem de Bruijn wrote:
+>>
+>> I am not sure dma-buf maintainer's concern is still there with this patchset.
+>>
+>> Whatever name you calling it for the struct, however you arrange each field
+>> in the struct, some metadata is always needed for dmabuf to intergrate into
+>> page pool.
+>>
+>> If the above is true, why not utilize the 'struct page' to have more unified
+>> handling?
 > 
-> Thanks Simon, you're right.
+> My understanding is that there is a general preference to simplify struct
+> page, and at the least not move in the other direction by overloading the
+> struct in new ways.
+
+As my understanding, the new struct is just mirroring the struct page pool
+is already using, see:
+https://elixir.free-electrons.com/linux/v6.7-rc1/source/include/linux/mm_types.h#L119
+
+If there is simplifying to the struct page_pool is using, I think the new
+stuct the devmem memory provider is using can adjust accordingly.
+
+As a matter of fact, I think the way 'struct page' for devmem is decoupled
+from mm subsystem may provide a way to simplify or decoupled the already
+existing 'struct page' used in netstack from mm subsystem, before this
+patchset, it seems we have the below types of 'struct page':
+1. page allocated in the netstack using page pool.
+2. page allocated in the netstack using buddy allocator.
+3. page allocated in other subsystem and passed to the netstack, such as
+   zcopy or spliced page?
+
+If we can decouple 'struct page' for devmem from mm subsystem, we may be able
+to decouple the above 'struct page' from mm subsystem one by one.
+
 > 
-> Should I resubmit?
+> If using struct page for something that is not memory, there is ZONE_DEVICE.
+> But using that correctly is non-trivial:
+> 
+> https://lore.kernel.org/all/ZKyZBbKEpmkFkpWV@ziepe.ca/ 
+> 
+> Since all we need is a handle that does not leave the network stack,
+> a network specific struct like page_pool_iov entirely avoids this issue.
 
-I guess that it is not strictly necessary,
-but it might be a good idea as I imagine it makes things
-slightly easier for the maintainers.
+Yes, I am agree about the network specific struct.
+I am wondering if we can make the struct more generic if we want to
+intergrate it into page_pool and use it in net stack.
 
-In any case, thanks for confirming and with this changed (somehow)
-this patch looks good to me.
+> RFC v3 seems like a good simplification over RFC v1 in that regard to me.
+> I was also pleasantly surprised how minimal the change to the users of
+> skb_frag_t actually proved to be.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Yes, I am agreed about that too. Maybe we can make it simpler by using
+a more abstract struct as page_pool, and utilize some features of
+page_pool too.
 
+For example, from the page_pool doc, page_pool have fast cache and
+ptr-ring cache as below, but if napi_frag_unref() call
+page_pool_page_put_many() and return the dmabuf chunk directly to
+gen_pool in the memory provider, then it seems we are bypassing the
+below caches in the page_pool.
+
+    +------------------+
+    |       Driver     |
+    +------------------+
+            ^
+            |
+            |
+            |
+            v
+    +--------------------------------------------+
+    |                request memory              |
+    +--------------------------------------------+
+        ^                                  ^
+        |                                  |
+        | Pool empty                       | Pool has entries
+        |                                  |
+        v                                  v
+    +-----------------------+     +------------------------+
+    | alloc (and map) pages |     |  get page from cache   |
+    +-----------------------+     +------------------------+
+                                    ^                    ^
+                                    |                    |
+                                    | cache available    | No entries, refill
+                                    |                    | from ptr-ring
+                                    |                    |
+                                    v                    v
+                          +-----------------+     +------------------+
+                          |   Fast cache    |     |  ptr-ring cache  |
+                          +-----------------+     +------------------+
+
+
+> 
+> .
+> 
 
