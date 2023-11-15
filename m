@@ -1,74 +1,55 @@
-Return-Path: <netdev+bounces-47939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D51BF7EC055
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 741717EC05D
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D8111C203B9
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:14:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF4D1C204BF
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE3BC2FD;
-	Wed, 15 Nov 2023 10:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A396AD6;
+	Wed, 15 Nov 2023 10:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="u9Og2uP3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzRN+vhe"
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B0BC8EE
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 10:14:47 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F919C
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 02:14:45 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-53df747cfe5so10221453a12.2
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 02:14:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700043283; x=1700648083; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUrvNnPjdmhN7swaMdYslu65aOtTlRA+U1vSW8EoaqY=;
-        b=u9Og2uP3wIarceH4HtckW8iejQtrJdHJOxvZ9DLVC25mZhFzcnGVCiwQigP+209wkw
-         y3d9/yPNSwbvXzQPlQqQuyA1EIkD5D+TnFhgtxnC4MFHLhL6t2ULWQ1GxS2L91TytVID
-         0IrvyiCYlWlx4nBLWw8RmKX5y6gcQKXsVpvN5/xZwm8txyJBACFEwLVkYTnrzO4Gglf8
-         vfDbyb4rk1A3ch7uW9zkJPt26UAsZyKeb5v+9sRAz/wQ2m8XyA2P2V0iKzXJ+VUho6dB
-         u0kZinbSVkKmGli3nM6v+dQLxlHJZHMIiSFa7+11zzhc2zx+deUzxCH82hNIq+P2lgrK
-         dabQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700043283; x=1700648083;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NUrvNnPjdmhN7swaMdYslu65aOtTlRA+U1vSW8EoaqY=;
-        b=gxgl4qdQ9+WmQxxLBy3vlRRK9tryzyoRJMCK6H7yiGQnNqHbGNUqHpJ4kzxGp093to
-         Nhd6HGb+y22ph+JHnQTIprNHY3o9gzZ5ZBxjMva2qTcFBpfmOJxcSEYK/m35PV0NTQu5
-         nx1J/dBfiW65VtQF0opmJEas9U4M+Gu0NnKDrqjQhq2Azj2bvaZcjs2kexIZHREQyrF3
-         sGhPhXjQwyXkSsLnzYOF/Dj4i5x1Lsf4fhBsb9KDqET0jGwQr4Ce2W+icm5JLt+ehUDS
-         JBKfE52GhPTorieGbO4L5uRnleK9mxU9IA8rZwTRQTsZD1d1rLswKKkVRHx0GVzGqhxm
-         8JbQ==
-X-Gm-Message-State: AOJu0YygRPlU9u/b2+VBFoqBI6vk+/reBhH4b0GREEOcyxx9Y0fVvRnd
-	Aln7ol9zLFqBbr9DCvT/r2/ERg==
-X-Google-Smtp-Source: AGHT+IFpFi1fqB5PmI7Ayyou3rQK1sZt3rFJX8kzjZoMvwHdWTBN6GL4WvelgABRuPaJUcfwlXWOoQ==
-X-Received: by 2002:a17:906:bc99:b0:9d7:1388:e554 with SMTP id lv25-20020a170906bc9900b009d71388e554mr8727360ejb.17.1700043283423;
-        Wed, 15 Nov 2023 02:14:43 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id dt10-20020a170906b78a00b009a5f1d15644sm6753687ejb.119.2023.11.15.02.14.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 02:14:42 -0800 (PST)
-Date: Wed, 15 Nov 2023 11:14:41 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Vlad Buslov <vladbu@nvidia.com>
-Subject: Re: [PATCH net v2] net: Fix undefined behavior in netdev name
- allocation
-Message-ID: <ZVSaEaNaeRzAm/Jv@nanopsycho>
-References: <20231114075618.1698547-1-gal@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AC7E555
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 10:23:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93AA3C433C7;
+	Wed, 15 Nov 2023 10:23:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700043789;
+	bh=DWYELWdhnmyOJkCXuhTFzSkejMRb7zklpUwmxG2CRGI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lzRN+vhe015zWHPFTdSqu5jvlbLrYQk4W6HYXNX3lzL9UlQl9yMZnsFuthl1oCQKs
+	 SAhdmhbkrlNg7hi6myCW/MdrNIRLKqh/eiSsy8tdKOSWkULpjoAnj1VqRqQd9PcZ/5
+	 hxWaj4cc9mi6WOLzHLWW62YuvN8/N/77X6ABaFZSq3pBxQO+E6wrIGo1HWlJkhqet6
+	 LTGWIUZnVlvzd0k0bX/r3r1Xl7off4Bl3qodZT7RAhnZ2nP7q69fGq2akd7I1T3qXS
+	 sA+/QN6h6piiEBXfW5/HkRMLV/NVUmtrPrsrkEd4xxJHDdd1OjEoqwOgPmqDEp4NtT
+	 63TsJhLhX/yxA==
+Date: Wed, 15 Nov 2023 10:23:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Alexandra Winter <wintera@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] s390/ism: ism driver implies smc protocol
+Message-ID: <20231115102304.GN74656@kernel.org>
+References: <b152ec7c0e690027da1086b777a3ec512001ba1f.camel@linux.ibm.com>
+ <20231114091718.3482624-1-gbayer@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,25 +58,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231114075618.1698547-1-gal@nvidia.com>
+In-Reply-To: <20231114091718.3482624-1-gbayer@linux.ibm.com>
 
-Tue, Nov 14, 2023 at 08:56:18AM CET, gal@nvidia.com wrote:
->Cited commit removed the strscpy() call and kept the snprintf() only.
->
->It is common to use 'dev->name' as the format string before a netdev is
->registered, this results in 'res' and 'name' pointers being equal.
->According to POSIX, if copying takes place between objects that overlap
->as a result of a call to sprintf() or snprintf(), the results are
->undefined.
->
->Add back the strscpy() and use 'buf' as an intermediate buffer.
->
->Fixes: 7ad17b04dc7b ("net: trust the bitmap in __dev_alloc_name()")
->Cc: Jakub Kicinski <kuba@kernel.org>
->Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
->Signed-off-by: Gal Pressman <gal@nvidia.com>
->Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+On Tue, Nov 14, 2023 at 10:17:18AM +0100, Gerd Bayer wrote:
+> Since commit a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+> you can build the ism code without selecting the SMC network protocol.
+> That leaves some ism functions be reported as unused. Move these
+> functions under the conditional compile with CONFIG_SMC.
+> 
+> Also codify the suggestion to also configure the SMC protocol in ism's
+> Kconfig - but with an "imply" rather than a "select" as SMC depends on
+> other config options and allow for a deliberate decision not to build
+> SMC. Also, mention that in ISM's help.
+> 
+> Fixes: a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Closes: https://lore.kernel.org/netdev/afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org/
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
+Hi Gerd,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+In a similar vein, I am wondering if the forward declaration of ism_ops
+could be removed.  In my very light compile test it shows up as unused when
+CONFIG_SMC is unset.
 
