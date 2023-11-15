@@ -1,223 +1,94 @@
-Return-Path: <netdev+bounces-48091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A59B07EC7DC
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:52:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0F107EC7FD
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E481B20C47
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:52:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C1280FF3
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A461A433DC;
-	Wed, 15 Nov 2023 15:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CE433CF;
+	Wed, 15 Nov 2023 15:58:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUdId3Wn"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="elQNmp/7"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95B46433C3
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:50:48 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F801BD0
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:50:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700063437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YZNprSzbt9e8k58JcxEUqpXJf2zPy5yDQe5/rD+YGMw=;
-	b=cUdId3WnDvdXpOHHciEeRKFP5wLaGwNuDPfg4m8bTaOKOHfPiJ0nsh9hCZybmlSO6ozKYC
-	aNpByuaqFQikxVpIjO2gQuukdISu8rUs0PxXEJN+M/UV4upG7jCbpUKPNcDOIy4nGGRFpP
-	vkYF7FNHerBPN9YxEnmvUJiElNfLq7Y=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-67-_sSUMIArNcOe3p2xkegZtQ-1; Wed,
- 15 Nov 2023 10:50:33 -0500
-X-MC-Unique: _sSUMIArNcOe3p2xkegZtQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3E6A23C000BB;
-	Wed, 15 Nov 2023 15:50:32 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 043102166B27;
-	Wed, 15 Nov 2023 15:50:27 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>
-Cc: David Howells <dhowells@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Al Viro <viro@zeniv.linux.org.uk>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christoph Hellwig <hch@lst.de>,
-	David Laight <David.Laight@ACULAB.COM>,
-	Matthew Wilcox <willy@infradead.org>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	linux-fsdevel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <david@redhat.com>,
-	John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH v3 10/10] iov_iter: Add benchmarking kunit tests for UBUF/IOVEC
-Date: Wed, 15 Nov 2023 15:49:46 +0000
-Message-ID: <20231115154946.3933808-11-dhowells@redhat.com>
-In-Reply-To: <20231115154946.3933808-1-dhowells@redhat.com>
-References: <20231115154946.3933808-1-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81192C848
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:58:03 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9BBA2
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:58:02 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c4ed8eef16so5378824b3a.0
+        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:58:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700063882; x=1700668682; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kZD+QVCMTfwt5SQkaapp8sA6RDdyskoGJOT1ImXj0xQ=;
+        b=elQNmp/7re7TrhJDAl80u7g9/yk/yLMKYIypiqLd187YaGsyW2QLhLlESuZnmJDL4B
+         2y6YY2zJuZKEs9lfKeVM7jMY9klUhDGZDHPRaz2UIKdwCizW7LZ4kZJ9X4ykwNXEk+yH
+         S4apGGLDHr1Kw/fNfSHJtXUrq6nbIG7Df73poZoPFR0VjHVJcpC6MamdzFeDxf0tV6fB
+         exHy1auLy+6eDWNn1HK20QYp85eayY0AZYg0D98ixgV38SXDkWJbjMf/b5mXrg2jfLWa
+         L+zZsCvpxGP9mOGvdyyY8KkUCTGG95ccnLKZmP35z33HAfT0LSdzdLqmQuneXNcPY/1I
+         qzWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700063882; x=1700668682;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kZD+QVCMTfwt5SQkaapp8sA6RDdyskoGJOT1ImXj0xQ=;
+        b=WobWR0UqCq3JI63vDuKF5W6VcWw2TrsaIJzHi0VbdFg9Np+q1275LhjjVLYKU7AMGz
+         p9Q3U+WfR36j3sxd9/U5yrmCGsHD8So7JSKksVEv3NAeppZ9NCe7czW/w+eB507FX4tl
+         BHebu6dokzzUOquSvpqe35GZGiNeVV4Bxyb2Y4R/Ylro6+gfHGljBIlP/M763tx88jk+
+         z1fQqp/7v8g+n1X84wSF4LQMG3gm6k28FRceNu3prDKgKZAp8X4VuOQq2aziZiR2MXTl
+         nA1A/xJ5JjDUQGPOb4hA6n6qgZ5+6GddpJDxQAzGZipG07QA95/Qy4TbLyF/Iv7WsyHy
+         Y8vQ==
+X-Gm-Message-State: AOJu0YxauZ2m0FdayfMP3EvBuQq0/ryYKmZQg5ug9UAclURjOdkP9+Mi
+	hKP+n9TPdvXZ1sYQgpJLfYDfSQ==
+X-Google-Smtp-Source: AGHT+IEozYd1s+NVHo/yFwGaFR8ZBn/1l+FhWxYvAxe5plJn6hoRA0Ujhz6tqQ9ImGkVp7L13DHrAw==
+X-Received: by 2002:a05:6a00:1bca:b0:6c3:5f49:6da7 with SMTP id o10-20020a056a001bca00b006c35f496da7mr14861647pfw.2.1700063881718;
+        Wed, 15 Nov 2023 07:58:01 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id t38-20020aa78fa6000000b006bfb9575c53sm2949255pfs.180.2023.11.15.07.58.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Nov 2023 07:58:01 -0800 (PST)
+Date: Wed, 15 Nov 2023 07:57:59 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>, Patrisious
+ Haddad <phaddad@nvidia.com>
+Subject: Re: [PATCH iproute2-next 3/3] lib: utils: Add
+ parse_one_of_deprecated(), parse_on_off_deprecated()
+Message-ID: <20231115075759.08921704@hermes.local>
+In-Reply-To: <8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
+References: <cover.1700061513.git.petrm@nvidia.com>
+	<8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add kunit tests to benchmark 256MiB copies to a UBUF iterator and an IOVEC
-iterator.  This attaches a userspace VM with a mapped file in it
-temporarily to the test thread.
+On Wed, 15 Nov 2023 16:31:59 +0100
+Petr Machata <petrm@nvidia.com> wrote:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Andrew Morton <akpm@linux-foundation.org>
-cc: Christoph Hellwig <hch@lst.de>
-cc: Christian Brauner <brauner@kernel.org>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Al Viro <viro@zeniv.linux.org.uk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: David Hildenbrand <david@redhat.com>
-cc: John Hubbard <jhubbard@nvidia.com>
-cc: Brendan Higgins <brendanhiggins@google.com>
-cc: David Gow <davidgow@google.com>
-cc: linux-kselftest@vger.kernel.org
-cc: kunit-dev@googlegroups.com
-cc: linux-mm@kvack.org
-cc: linux-fsdevel@vger.kernel.org
----
- lib/kunit_iov_iter.c | 95 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 95 insertions(+)
+> The functions parse_on_off() and parse_one_of() currently use matches() for
+> string comparison under the hood. This has some odd consequences. In
+> particular, "o" can be used as a shorthand for "off", which is not obvious,
+> because "o" is the prefix of both. By sheer luck, the end result actually
+> makes some sense: "on" means on, anything else means off (or errors out).
+> Similar issues are in principle also possible for parse_one_of() uses,
+> though currently this does not come up.
 
-diff --git a/lib/kunit_iov_iter.c b/lib/kunit_iov_iter.c
-index 2fbe6f2afb26..d5b7517f4f47 100644
---- a/lib/kunit_iov_iter.c
-+++ b/lib/kunit_iov_iter.c
-@@ -1325,6 +1325,99 @@ static void *__init iov_kunit_create_source(struct kunit *test, size_t npages)
- 	return scratch;
- }
- 
-+/*
-+ * Time copying 256MiB through an ITER_UBUF.
-+ */
-+static void __init iov_kunit_benchmark_ubuf(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over UBUF:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		size_t remain = size;
-+
-+		a = ktime_get_real();
-+		do {
-+			size_t part = min(remain, PAGE_SIZE);
-+
-+			iov_iter_ubuf(&iter, ITER_SOURCE, buffer, part);
-+			copied = copy_from_iter(scratch, part, &iter);
-+			KUNIT_EXPECT_EQ(test, copied, part);
-+			remain -= part;
-+		} while (remain > 0);
-+		b = ktime_get_real();
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
-+/*
-+ * Time copying 256MiB through an ITER_IOVEC.
-+ */
-+static void __init iov_kunit_benchmark_iovec(struct kunit *test)
-+{
-+	struct iov_iter iter;
-+	struct iovec *iov;
-+	unsigned int samples[IOV_KUNIT_NR_SAMPLES];
-+	ktime_t a, b;
-+	ssize_t copied;
-+	size_t size = 256 * 1024 * 1024, npages = size / PAGE_SIZE, part;
-+	size_t ioc = size / PAGE_SIZE;
-+	void *scratch;
-+	int i;
-+	u8 __user *buffer;
-+
-+	iov = kunit_kmalloc_array(test, ioc, sizeof(*iov), GFP_KERNEL);
-+	KUNIT_ASSERT_NOT_NULL(test, iov);
-+
-+	/* Allocate a huge buffer and populate it with pages. */
-+	buffer = iov_kunit_create_user_buf(test, npages, NULL);
-+
-+	/* Create a single large buffer to copy to/from. */
-+	scratch = iov_kunit_create_source(test, npages);
-+
-+	/* Split the target over a number of iovecs */
-+	copied = 0;
-+	for (i = 0; i < ioc; i++) {
-+		part = size / ioc;
-+		iov[i].iov_base = buffer + copied;
-+		iov[i].iov_len = part;
-+		copied += part;
-+	}
-+	iov[i - 1].iov_len += size - part;
-+
-+	/* Perform and time a bunch of copies. */
-+	kunit_info(test, "Benchmarking copy_to_iter() over IOVEC:\n");
-+	for (i = 0; i < IOV_KUNIT_NR_SAMPLES; i++) {
-+		iov_iter_init(&iter, ITER_SOURCE, iov, npages, size);
-+
-+		a = ktime_get_real();
-+		copied = copy_from_iter(scratch, size, &iter);
-+		b = ktime_get_real();
-+		KUNIT_EXPECT_EQ(test, copied, size);
-+		samples[i] = ktime_to_us(ktime_sub(b, a));
-+	}
-+
-+	iov_kunit_benchmark_print_stats(test, samples);
-+	KUNIT_SUCCEED();
-+}
-+
- /*
-  * Time copying 256MiB through an ITER_KVEC.
-  */
-@@ -1611,6 +1704,8 @@ static struct kunit_case __refdata iov_kunit_cases[] = {
- 	KUNIT_CASE(iov_kunit_extract_pages_kvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_bvec),
- 	KUNIT_CASE(iov_kunit_extract_pages_xarray),
-+	KUNIT_CASE(iov_kunit_benchmark_ubuf),
-+	KUNIT_CASE(iov_kunit_benchmark_iovec),
- 	KUNIT_CASE(iov_kunit_benchmark_kvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec),
- 	KUNIT_CASE(iov_kunit_benchmark_bvec_split),
-
+If we need to keep accepting shorthands, I would prefer that any
+use of shorthand would cause a warning message.
 
