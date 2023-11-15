@@ -1,93 +1,315 @@
-Return-Path: <netdev+bounces-48093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55CD37EC800
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:59:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D367EC802
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:00:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8821B20B22
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:59:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E46D7280D4B
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CDE3433D2;
-	Wed, 15 Nov 2023 15:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CA0433D9;
+	Wed, 15 Nov 2023 16:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="E+0weaCF"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Yx1/zhHg"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164C2C85A
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:59:24 +0000 (UTC)
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F15A4B9
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:59:23 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id d2e1a72fcca58-6be1bc5aa1cso7105750b3a.3
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:59:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700063963; x=1700668763; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZHUTStH98CPi8Qn9gNHX+C8Dffz4kEdqV2rCwN9VAu0=;
-        b=E+0weaCFNoB4229I4WQdAOFkzr4isJN+3arQir/n6cITOjGgvNq6zmEYGOedKSsdCk
-         uWt/RQtpl7zPldK7q+y2UPJwju5Kth+8lrChskuoUqQ0fe4wLe+91/O/4Bs7FNvUpZeA
-         y90PP4ikvjtQnLPLzNUa3nh8Vw26NxVzDCmrPSjVNH5N9tjORw9Z8a+6FPXiluC4z5pI
-         spSZ0UlHEY+QUKaxA9ewgA+tNyfoao3YwwJ66d9ZRIQ93SphHVcT3/DQP6oTTH7Abq7/
-         AjsCbpnGHya7qRVaWrjfIOwnhe+JolY1wQCcpVHyJoclI5dNABSMB+NqP7Guw41tteob
-         D4ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700063963; x=1700668763;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZHUTStH98CPi8Qn9gNHX+C8Dffz4kEdqV2rCwN9VAu0=;
-        b=t9kJHFJcOBZyhjS8fcYzZXoMs/VkqHOWo0TwCfVPQBjDO/95sHofdrdj/oYeshgteX
-         kfZjEN/S5ehA8uOuBJW1ErLoRIuijgsvkmAIMtjxFTCLldelkTKGVjhhP9nOXzsp7Lkf
-         v9+vye0/tQZPncaw2muVq0NC7QWgio9lEJRh1e9d0aIZWkK0VpMnhqXHFf+sLHuWHTG0
-         1lqgEpmPTV7HOVJhR/840YRhiVmjZDq0ibQBKu0pIq+MSHkHCkGzr3vodndJWNhr4hiw
-         rE3SsGCmteykRhFaxM6B3WON0x1gPv3krGlmI6h09+iumx/bU4vRu5HQVusxNN5Smrzy
-         PCSA==
-X-Gm-Message-State: AOJu0Yyc6yVhQsiwpbcNl3qt8g4ai6GECvX+eASPQ5jLF0M88GijW5xy
-	Us/DEFWZ02m8FcYqriIPp5fLug==
-X-Google-Smtp-Source: AGHT+IEDnTNQe8QWlw4OeizPDpqo7B4w4v1z7OW1Fg2iu7afcPbu7Xtl813sJOzp1S/lUEJwrmhNRQ==
-X-Received: by 2002:a05:6a00:8e02:b0:6c3:625e:6950 with SMTP id io2-20020a056a008e0200b006c3625e6950mr15497942pfb.21.1700063963473;
-        Wed, 15 Nov 2023 07:59:23 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id n4-20020a056a0007c400b006c4d47a7668sm2990958pfu.127.2023.11.15.07.59.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 07:59:22 -0800 (PST)
-Date: Wed, 15 Nov 2023 07:59:21 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: David Ahern <dsahern@gmail.com>, <netdev@vger.kernel.org>, Patrisious
- Haddad <phaddad@nvidia.com>
-Subject: Re: [PATCH iproute2-next 3/3] lib: utils: Add
- parse_one_of_deprecated(), parse_on_off_deprecated()
-Message-ID: <20231115075921.198fad24@hermes.local>
-In-Reply-To: <8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
-References: <cover.1700061513.git.petrm@nvidia.com>
-	<8ca3747c14bacccf87408280663c0598d0dc824e.1700061513.git.petrm@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579C0433A7
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:00:17 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBC56A2;
+	Wed, 15 Nov 2023 08:00:15 -0800 (PST)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFEWF6c020263;
+	Wed, 15 Nov 2023 16:00:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : content-transfer-encoding
+ : mime-version; s=pp1; bh=3/RdvkiRQs4wQ9WD0pjcbOmT1S7iG6rxX0yAIR1BOec=;
+ b=Yx1/zhHgwX4DxK5Ys8mgW+ejPniXVNAagtDp2AEwgAR+PiHiqu5p6WpM0bpi+f7Z00sm
+ 2nBbH2e8huWTyXEuqPvnXzX9HV9p7kVk5A9lKmPd9rrgxEG/UBHkyN84WWcYQmFUhx/s
+ Jmkq22sXYQwvAoJTMRE0ub4YEMbDoljOQkE1uL5XeuJPAAF43LfBAKxYXGBG08mASkqp
+ ekE3AAM0mXAhSl5EgSfGG4Ezwk6Kp9LCpegNHSc5MYkL7dmtp31Qx1n2GdnA7r5mvgoF
+ UmtGPf/hw36IlwMo6QCduy2Lx45b53357L9qtmP3OWuOo4onT2ArCy9OVsccm07UiOo5 Qg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucyu92r2s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 16:00:04 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AFFjwxE014258;
+	Wed, 15 Nov 2023 16:00:03 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ucyu92r1f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 16:00:03 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AFDn6Wl031622;
+	Wed, 15 Nov 2023 16:00:02 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3uapn1qtgv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Nov 2023 16:00:02 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AFFxxBF53019130
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Nov 2023 15:59:59 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 548922004B;
+	Wed, 15 Nov 2023 15:59:59 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DB4C820043;
+	Wed, 15 Nov 2023 15:59:58 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 15 Nov 2023 15:59:58 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Randy Dunlap <rdunlap@infradead.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
+        Gerd Bayer <gbayer@linux.ibm.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH net v2] s390/ism: ism driver implies smc protocol
+Date: Wed, 15 Nov 2023 16:59:58 +0100
+Message-Id: <20231115155958.3249645-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231115102304.GN74656@kernel.org>
+References: <20231115102304.GN74656@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WsZ0XPT6lNbfF53ax00eGkiK4KUjpW8D
+X-Proofpoint-ORIG-GUID: -2u5jCJqXymb6jCP-nL3KtIAtY6Z4Fo8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-15_15,2023-11-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ clxscore=1015 phishscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311150122
 
-On Wed, 15 Nov 2023 16:31:59 +0100
-Petr Machata <petrm@nvidia.com> wrote:
+Since commit a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+you can build the ism code without selecting the SMC network protocol.
+That leaves some ism functions be reported as unused. Move these
+functions under the conditional compile with CONFIG_SMC.
 
-> The functions parse_on_off() and parse_one_of() currently use matches() for
-> string comparison under the hood. This has some odd consequences. In
-> particular, "o" can be used as a shorthand for "off", which is not obvious,
-> because "o" is the prefix of both. By sheer luck, the end result actually
-> makes some sense: "on" means on, anything else means off (or errors out).
-> Similar issues are in principle also possible for parse_one_of() uses,
-> though currently this does not come up.
+Also codify the suggestion to also configure the SMC protocol in ism's
+Kconfig - but with an "imply" rather than a "select" as SMC depends on
+other config options and allow for a deliberate decision not to build
+SMC. Also, mention that in ISM's help.
 
-This was probably a bug, I am open to breaking shorthand usage in this case.
+Fixes: a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/netdev/afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org/
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+---
+ drivers/s390/net/Kconfig   |  3 +-
+ drivers/s390/net/ism_drv.c | 93 +++++++++++++++++++-------------------
+ 2 files changed, 48 insertions(+), 48 deletions(-)
+
+Hi Simon,
+
+this is version 2, that removes the unused forward declaration that you
+found in v1 per:
+https://lore.kernel.org/netdev/20231115102304.GN74656@kernel.org/#t
+Other than that the patch is unchanged.
+
+Thanks,
+Gerd
+
+
+diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+index 4902d45e929c..c61e6427384c 100644
+--- a/drivers/s390/net/Kconfig
++++ b/drivers/s390/net/Kconfig
+@@ -103,10 +103,11 @@ config CCWGROUP
+ config ISM
+ 	tristate "Support for ISM vPCI Adapter"
+ 	depends on PCI
++	imply SMC
+ 	default n
+ 	help
+ 	  Select this option if you want to use the Internal Shared Memory
+-	  vPCI Adapter.
++	  vPCI Adapter. The adapter can be used with the SMC network protocol.
+ 
+ 	  To compile as a module choose M. The module name is ism.
+ 	  If unsure, choose N.
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 6df7f377d2f9..81aabbfbbe2c 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -30,7 +30,6 @@ static const struct pci_device_id ism_device_table[] = {
+ MODULE_DEVICE_TABLE(pci, ism_device_table);
+ 
+ static debug_info_t *ism_debug_info;
+-static const struct smcd_ops ism_ops;
+ 
+ #define NO_CLIENT		0xff		/* must be >= MAX_CLIENTS */
+ static struct ism_client *clients[MAX_CLIENTS];	/* use an array rather than */
+@@ -289,22 +288,6 @@ static int ism_read_local_gid(struct ism_dev *ism)
+ 	return ret;
+ }
+ 
+-static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
+-			  u32 vid)
+-{
+-	union ism_query_rgid cmd;
+-
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.request.hdr.cmd = ISM_QUERY_RGID;
+-	cmd.request.hdr.len = sizeof(cmd.request);
+-
+-	cmd.request.rgid = rgid;
+-	cmd.request.vlan_valid = vid_valid;
+-	cmd.request.vlan_id = vid;
+-
+-	return ism_cmd(ism, &cmd);
+-}
+-
+ static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+@@ -429,23 +412,6 @@ static int ism_del_vlan_id(struct ism_dev *ism, u64 vlan_id)
+ 	return ism_cmd(ism, &cmd);
+ }
+ 
+-static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
+-			  u32 event_code, u64 info)
+-{
+-	union ism_sig_ieq cmd;
+-
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
+-	cmd.request.hdr.len = sizeof(cmd.request);
+-
+-	cmd.request.rgid = rgid;
+-	cmd.request.trigger_irq = trigger_irq;
+-	cmd.request.event_code = event_code;
+-	cmd.request.info = info;
+-
+-	return ism_cmd(ism, &cmd);
+-}
+-
+ static unsigned int max_bytes(unsigned int start, unsigned int len,
+ 			      unsigned int boundary)
+ {
+@@ -503,14 +469,6 @@ u8 *ism_get_seid(void)
+ }
+ EXPORT_SYMBOL_GPL(ism_get_seid);
+ 
+-static u16 ism_get_chid(struct ism_dev *ism)
+-{
+-	if (!ism || !ism->pdev)
+-		return 0;
+-
+-	return to_zpci(ism->pdev)->pchid;
+-}
+-
+ static void ism_handle_event(struct ism_dev *ism)
+ {
+ 	struct ism_event *entry;
+@@ -569,11 +527,6 @@ static irqreturn_t ism_handle_irq(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static u64 ism_get_local_gid(struct ism_dev *ism)
+-{
+-	return ism->local_gid;
+-}
+-
+ static int ism_dev_init(struct ism_dev *ism)
+ {
+ 	struct pci_dev *pdev = ism->pdev;
+@@ -774,6 +727,22 @@ module_exit(ism_exit);
+ /*************************** SMC-D Implementation *****************************/
+ 
+ #if IS_ENABLED(CONFIG_SMC)
++static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
++			  u32 vid)
++{
++	union ism_query_rgid cmd;
++
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.request.hdr.cmd = ISM_QUERY_RGID;
++	cmd.request.hdr.len = sizeof(cmd.request);
++
++	cmd.request.rgid = rgid;
++	cmd.request.vlan_valid = vid_valid;
++	cmd.request.vlan_id = vid;
++
++	return ism_cmd(ism, &cmd);
++}
++
+ static int smcd_query_rgid(struct smcd_dev *smcd, u64 rgid, u32 vid_valid,
+ 			   u32 vid)
+ {
+@@ -811,6 +780,23 @@ static int smcd_reset_vlan_required(struct smcd_dev *smcd)
+ 	return ism_cmd_simple(smcd->priv, ISM_RESET_VLAN);
+ }
+ 
++static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
++			  u32 event_code, u64 info)
++{
++	union ism_sig_ieq cmd;
++
++	memset(&cmd, 0, sizeof(cmd));
++	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
++	cmd.request.hdr.len = sizeof(cmd.request);
++
++	cmd.request.rgid = rgid;
++	cmd.request.trigger_irq = trigger_irq;
++	cmd.request.event_code = event_code;
++	cmd.request.info = info;
++
++	return ism_cmd(ism, &cmd);
++}
++
+ static int smcd_signal_ieq(struct smcd_dev *smcd, u64 rgid, u32 trigger_irq,
+ 			   u32 event_code, u64 info)
+ {
+@@ -830,11 +816,24 @@ static int smcd_supports_v2(void)
+ 		SYSTEM_EID.type[0] != '0';
+ }
+ 
++static u64 ism_get_local_gid(struct ism_dev *ism)
++{
++	return ism->local_gid;
++}
++
+ static u64 smcd_get_local_gid(struct smcd_dev *smcd)
+ {
+ 	return ism_get_local_gid(smcd->priv);
+ }
+ 
++static u16 ism_get_chid(struct ism_dev *ism)
++{
++	if (!ism || !ism->pdev)
++		return 0;
++
++	return to_zpci(ism->pdev)->pchid;
++}
++
+ static u16 smcd_get_chid(struct smcd_dev *smcd)
+ {
+ 	return ism_get_chid(smcd->priv);
+-- 
+2.39.2
+
 
