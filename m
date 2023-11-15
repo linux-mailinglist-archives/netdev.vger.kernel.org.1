@@ -1,129 +1,198 @@
-Return-Path: <netdev+bounces-47958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 078BE7EC167
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:45:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 371767EC169
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:46:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 368B61C20902
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:45:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CADD5B20ADF
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F309171D5;
-	Wed, 15 Nov 2023 11:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34925171C4;
+	Wed, 15 Nov 2023 11:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="cyw0t6W0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0579171A3;
-	Wed, 15 Nov 2023 11:45:28 +0000 (UTC)
-Received: from wangsu.com (unknown [180.101.34.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C2AD6E9;
-	Wed, 15 Nov 2023 03:45:26 -0800 (PST)
-Received: from XMCDN1207038 (unknown [59.61.78.234])
-	by app2 (Coremail) with SMTP id SyJltADn7QlQr1RlDnFeAA--.25295S2;
-	Wed, 15 Nov 2023 19:45:21 +0800 (CST)
-From: "Pengcheng Yang" <yangpc@wangsu.com>
-To: "'John Fastabend'" <john.fastabend@gmail.com>,
-	"'Jakub Sitnicki'" <jakub@cloudflare.com>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	<bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com> <1699962120-3390-3-git-send-email-yangpc@wangsu.com> <6554713028d5b_3733620856@john.notmuch>
-In-Reply-To: <6554713028d5b_3733620856@john.notmuch>
-Subject: Re: [PATCH bpf-next 2/3] tcp: Add the data length in skmsg to SIOCINQ ioctl
-Date: Wed, 15 Nov 2023 19:45:20 +0800
-Message-ID: <000101da17b9$36951720$a3bf4560$@wangsu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B097F17723;
+	Wed, 15 Nov 2023 11:46:00 +0000 (UTC)
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2087.outbound.protection.outlook.com [40.107.13.87])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5686CCC;
+	Wed, 15 Nov 2023 03:45:59 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mM5ZNWQ7yPwnUyuF2cVQrqTxxdUPu5qszwF0yKxuzPB80tdGBvDh5pH6ZGFtMvGQ3z4CzxSJhao496L++2GBXw3XkOtL3C5phn7ZVA9oll1EP0BX5SSG7nezl6ssLxJ6/PuEbQxrdIfwwSBY84j6rd5ipwyPoSB+6mUmlgDtgGkVRlaVjPnanMq5e94Oc7xDQ/LaSPcQjgLjFR9Sug3g1C7GoZhlN2IcZkU68VSpJE4eHMUGM7XK8KZL+hrahvVeVsxkzUQQSCqx6YGogJvnzO20k4nY7T6Nqhz01vs2dSMb8cF5+Gai32zp2CwRWs+GlKGCxFaid/aMkC5BHOGnDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GkZ+ZSyZwa9J1ANePX4FIWBQv6Yx3p4N7NTiBQzxpUk=;
+ b=LInESdLEa+9ylymOO7gWaYVvt/hQGuZapupKkGqF3HM1LGu+j8N1gw+/o04BkgBrR9WmbpVXB8HQd5HCJD7DusTYDxsnSo+CHjx9qY757uUgSI6/cyUoCpKsx8eb7Eg6yhzPHHz3aCKt7mw+H2xilraDAQZzuhx2q77c7xOoRVlyVNwcSU+Mufea0qK9ClrdRs+iTVNugfZIelP3c2qXqYnCeHcGiXSLXd3b66bVWzC/e9ZCChevJkh3eJTlQ4cl608YzPAffmB42fPM6UtYhjS/RAmcSjV5k5ij1EZTvKZRD8dK3HE7jsdb2s71xz0o1ww5egnuHjvJOp2y5CidtA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
+ dkim=pass header.d=suse.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GkZ+ZSyZwa9J1ANePX4FIWBQv6Yx3p4N7NTiBQzxpUk=;
+ b=cyw0t6W0ohmH9OoYVyHDJZCfhpPFgVk4Gv8ZntGavgktFbADFkyRV5dCMW9XBQ762zM13BTbxPymaQyyBLa+GNX+QS//SwIOh6U0KfpVnHTXMRe8IQvIW3dlytDlTzPmP2wWdXoIVRnY0hh2i4zt9dCO+Z8SsNoI48ZOO8ctwX9KtRZDx19y1MLQPhMeSGcLYk8mMzgzuWa95ZMLYvTVlEQ/KezQHq9bUOeKdsB2CzUsFEL4WuBk8EW4Q+iZvEju6+fT52QAu/3UIraZ+o1d7ZH7gbtS/lSuVxKlYQq+3mnjgsng6FRYDuYb6MigIM4D+3oaON7MoCekRDFS6qb5Yw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=suse.com;
+Received: from AM0PR04MB6467.eurprd04.prod.outlook.com (2603:10a6:208:16c::20)
+ by AS8PR04MB7528.eurprd04.prod.outlook.com (2603:10a6:20b:297::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.20; Wed, 15 Nov
+ 2023 11:45:56 +0000
+Received: from AM0PR04MB6467.eurprd04.prod.outlook.com
+ ([fe80::5c46:ada1:fcf3:68e6]) by AM0PR04MB6467.eurprd04.prod.outlook.com
+ ([fe80::5c46:ada1:fcf3:68e6%6]) with mapi id 15.20.7002.018; Wed, 15 Nov 2023
+ 11:45:56 +0000
+Message-ID: <7f704401-8fe8-487f-8d45-397e3a88417f@suse.com>
+Date: Wed, 15 Nov 2023 12:45:53 +0100
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Szymon Heidrich <szymon.heidrich@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ USB list <linux-usb@vger.kernel.org>
+From: Oliver Neukum <oneukum@suse.com>
+Subject: possible proble with skb_pull() in smsc75xx_rx_fixup()
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0160.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:99::9) To AM0PR04MB6467.eurprd04.prod.outlook.com
+ (2603:10a6:208:16c::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHO/J1mBkmXfIRCzv54wVJwMMBhiQJx1G0UAqlCf8SwaJ/CIA==
-Content-Language: zh-cn
-X-CM-TRANSID:SyJltADn7QlQr1RlDnFeAA--.25295S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXr18XF4DWF45Gw4UWr4xCrg_yoW5XryrpF
-	WrK3Z3Ar4kGrW8ArWvkr4fXa12k397KF13XF1kA3y5Zws8CFySyr45GF1YvF4ktr4ruw4Y
-	vrW0grWvkas8Za7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU92b7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
-	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0EF7xvrVAajcxG14v2
-	6r1j6r4UMcIj6x8ErcxFaVAv8VW8GwAv7VCY1x0262k0Y48FwI0_Cr0_Gr1UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY02Av
-	z4vE14v_Gw4l42xK82IYc2Ij64vIr41l42xK82IY6x8ErcxFaVAv8VW8GwCFx2IqxVCFs4
-	IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1r
-	MI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJV
-	WUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j
-	6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYx
-	BIdaVFxhVjvjDU0xZFpf9x07b82-5UUUUU=
-X-CM-SenderInfo: p1dqw1nf6zt0xjvxhudrp/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6467:EE_|AS8PR04MB7528:EE_
+X-MS-Office365-Filtering-Correlation-Id: aeca0be1-77fc-4dc9-d058-08dbe5d06d8f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	xIUXrcq0xRko82KIRgPGCpuBAq2Kz890uHjzSmqTcIeOiGXY+YEr1l1lvVlxyF9FDyCuSd88NvRz7IyuVif1UoKJkVRQzNZFomtEljhAxN52TCwoH+X870nlXqytENbe4zCcCnUnjWmW4TxrOC0GahztFE51jTAu4PJEWCJxb0YopqHg4jlVGFzqbAaY3jkiAdgWnaGNKs63Kuh3EcubMiLcrR6zLC7H/JOzDfYFnuEjUqsIWNdKC+fD+2FiAfQMjGs5ot385f8FSKeI2KcU6jJdxUPC4UswUjpBLI1dDVL15bWT+6AvzOlAsNGV71DMB/ba6WKAmF2xs/yH50ELPqgGb1UooQf25iExO+d6DPKtybEK+swgMQvRWuXuc3GZ/8QgSu2eu2nmAIr2lfRTMcRTCQnX6YUwyo9kzZBMQOfch5QnjLqT9M1skj/9Oa4ft9J3EBRqeGyT0ZolsYSO9Pd/CuLgSRDPaTp/hH2IdLuyGSUABUbhBflYZ/KQJ9wpJzWuGc/A0XcdKXuYuquER/ClFadrFDFfyXQMOdgnVyow820Xi8m4Jh7NyuQHdWCV6qzbHKsiZa9Oc2P4IsUB83qcrT0mMgd+Dd4sdrd8HV13BVBzGwd9hAL69Nt88ZzLaOfrEEZx8TiqNTa/J8gyMA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6467.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(376002)(366004)(346002)(396003)(136003)(230922051799003)(451199024)(64100799003)(1800799009)(186009)(41300700001)(36756003)(8676002)(4326008)(66476007)(66556008)(66946007)(54906003)(316002)(6916009)(8936002)(2906002)(5660300002)(6666004)(478600001)(38100700002)(86362001)(83380400001)(31696002)(6512007)(6506007)(2616005)(31686004)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?OXhSWDBxNFVrdlpVZ0xpS0pjNTRyZ1o1NnVrL1YydkhDWWd3ZjlVOHBBYmNn?=
+ =?utf-8?B?alJWVVhWc1VnRndlT2U5bHFYMGNCRnhkcmhpbTdXdEEvQjZYQk0xb3dQRDM4?=
+ =?utf-8?B?RlczbW1STEtObkZhbjhZTmhmMUZ5Mmhlek1hZXdnT3pLN2NrRzI5Y2ZwWk5H?=
+ =?utf-8?B?RWtrSk1mbGQ0QU5GQVdUcFlzOStYUG1xMnF5MGF0d2ZhRnVtV2pkeU5nbG1t?=
+ =?utf-8?B?VWNLRlF5VG1YZmRDWUtHWDUyTm9PQUhtb2xER2UyK3dNK0M5Q2Z3NGFwUmsr?=
+ =?utf-8?B?WW1TOTV5bGs1NlZoN2MwcGk5ZU4xaWFCbCtaSnFCRkNoNERlOElWS0VIU3Fa?=
+ =?utf-8?B?dmxVU0NzR0FpWGFTUjBRWnhyUEJOUnZJVGVBcmczQVd3Mm9IVm05RmZ0ODhB?=
+ =?utf-8?B?ekVNQkpCVkUrTGM5N0czYmtoQjNTM2xnZElPMHN6Rm9ESXRtS3hucW1pRzl3?=
+ =?utf-8?B?Umc4aTkwaDlYNjB1Q1B6ejg3MFBQSjFJcWJGTjVaNFRjR0ZDYS95dDVJVjQz?=
+ =?utf-8?B?RlRXUk5sZno4MFBCS09aSDdKVzhGU0QzVjRVQjlYczJ5TUlqQjVqaFlVZVM1?=
+ =?utf-8?B?WFhqOHlIYWVqUU5PV2c5clhIK3lHVG9HV2h4bWo3ai9DNGdCU0xPNHp0WG9O?=
+ =?utf-8?B?RkdadzlxSVdaR3dBRWtYOE5hUG9ROS9JVHNleVRwQVpGMWdoQjhHL3ljWXVX?=
+ =?utf-8?B?ekF0bTU5UGtvbFM0N25xL2FZR3hJSFFZUlNENll5S21pOWhob0UyeXMzQzQw?=
+ =?utf-8?B?L3p0VE8rNjY3T09jVFJieHovdVJJRHVJcFI1Z2dHcXFsWmZFRGg4WUZLTkl6?=
+ =?utf-8?B?SC9hZU1rY20vYm02REh1NlBWeUJaRmdFcGdOWm1aeE1NdWlhaW9DTStRVlFm?=
+ =?utf-8?B?am43MGxXcjNKUXVLa213VU1aWG14VGpIVnB3aEtUYXJvSWVJQ2wyUG4zZTd4?=
+ =?utf-8?B?Wjl2ZUhnb3hJRXFObWorTVJKdGN2VVFGTk5rbmY5S3IyTmhjcEFlbkZCYUYx?=
+ =?utf-8?B?Z2w2V2ZxTXNRRnZyektzZzM1dUpKU3RQclhIbTFQRXBJMWZJZ1hTa2dFRUFI?=
+ =?utf-8?B?S094Zll2V1RWcW44b3JNNWJFbyswWDFTMXpnRzlNWk5DZm9SV0JaaWVRU01i?=
+ =?utf-8?B?TGNaUWozWjBrN0N0V25kVHBPaE15WlRzdkJNNTIxYjJ5YkwrWU12K0lNV3pU?=
+ =?utf-8?B?cGluOVU3ZDFyOXJYMjJScWo2ekZwU1htKzZRaFBTV1JiS09rcFBEMWRTcEtr?=
+ =?utf-8?B?d0xjV0lvaUd2MG14SkRuTFdSUnlqSnFoTHJUZk9BeUlnUXJ1M05hRXIyZmlK?=
+ =?utf-8?B?OUIyZ3NYZ29yQllEMkdjWlM2amZTbGFYZitzY0lYZGdtaGw5aElMa1VqTGxU?=
+ =?utf-8?B?WkRENC9UOUJIZm9tMTk0RUs4U0RKY3JRTk5NS3ZJUFhLbkM2N21SZENzSjB4?=
+ =?utf-8?B?ektIcDNmd3FkbWlaVXJ2Tm12MGJOZFU2WVNyL0kvR2JudlJQYjdwVm1XUzVN?=
+ =?utf-8?B?ZjcyNk1VMUYwQWc5VlZlWUpyeFNpWmovcnlGRTFoYUY2L0Z4YWFNVXlGRWQz?=
+ =?utf-8?B?b2w5TUlML3A4clVhbjdvck1WTzdEeWZCVTl0WXZpbjZlMmpPdS9YVTVSMXcz?=
+ =?utf-8?B?L3VnU2FvRnd6MTdPMkFCV2tyMGVhVjZYeW55UjR5bXk3cU5hMFd2YnFMQ2VH?=
+ =?utf-8?B?dzNLc0JFTEJoNlFDb1BvUFJtNFRwRVN5TjJUdzE5bktyaHYzaDEwOHpmaDR2?=
+ =?utf-8?B?eUlKNWthdisrQmNLTFZNTXcxWXc3NnVvUW9JYmFOTkdqL1lkNkFVNVUwbXlj?=
+ =?utf-8?B?eTJtb1JNUFJkOHRwVTE5RUdWUUdZakZZKzB3YUFkYzlsbHJhcTNQbWlOaVZB?=
+ =?utf-8?B?azdHZUttWkF1NHVaVWY4alhLVEpmOHRmKzZZY3ZKQ2poUHJHbXNianBsMlp1?=
+ =?utf-8?B?M1NqMlBoRjRWU1dNNFQyTWxQQWdMVHNabDNDakxGelZzWjUzanRwcWNySkVF?=
+ =?utf-8?B?TnEyZGtEOFVzdXRwazE5SERRb1VlSVB3eXljaEVaK3FiVHFsTWhyRXdEQmFl?=
+ =?utf-8?B?MldOc1ZsUUZMcUNlZnp4SE85d1YvNWlvVkxIV0NCdFZiTm1HejZ0YngwNEN1?=
+ =?utf-8?B?THpYRHBNUWliUFMvYVpzTi9iWGkrQW9QSVdGZUJYQXB0UFB2REZkVDFxbkdw?=
+ =?utf-8?Q?GvYrYFzqoz2v7yihJH76xkeuhyF5DITa4Cha5LtDhb2i?=
+X-OriginatorOrg: suse.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aeca0be1-77fc-4dc9-d058-08dbe5d06d8f
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6467.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2023 11:45:56.0335
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QNPq2+yNBDD3QJRJe5AS6lxNVo8IIlqoRQ47Am8xAF9qcA2qmqVjjowJRAu2V68CS/V5pHj4H92IVFWulmq4iw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7528
 
-John Fastabend <john.fastabend@gmail.com> wrote:
-> Pengcheng Yang wrote:
-> > SIOCINQ ioctl returns the number unread bytes of the receive
-> > queue but does not include the ingress_msg queue. With the
-> > sk_msg redirect, an application may get a value 0 if it calls
-> > SIOCINQ ioctl before recv() to determine the readable size.
-> >
-> > Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
-> 
-> This will break the SK_PASS case I believe. Here we do
-> not update copied_seq until data is actually copied into user
-> space. This also ensures tcp_epollin_ready works correctly and
-> tcp_inq. The fix is relatively recent.
-> 
->  commit e5c6de5fa025882babf89cecbed80acf49b987fa
->  Author: John Fastabend <john.fastabend@gmail.com>
->  Date:   Mon May 22 19:56:12 2023 -0700
-> 
->     bpf, sockmap: Incorrectly handling copied_seq
-> 
-> The previous patch increments the msg_len for all cases even
-> the SK_PASS case so you will get double counting.
+Hi,
 
-You are right, I missed the SK_PASS case of skb stream verdict.
+looking at your security fixes, it seems to me that there
+is a further issue they do not cover.
 
-> 
-> I was starting to poke around at how to fix the other cases e.g.
-> stream parser is in use and redirects but haven't got to it  yet.
-> By the way I think even with this patch epollin_ready is likely
-> not correct still. We observe this as either failing to wake up
-> or waking up an application to early when using stream parser.
-> 
-> The other thing to consider is redirected skb into another socket
-> and then read off the list increment the copied_seq even though
-> they shouldn't if they came from another sock?  The result would
-> be tcp_inq would be incorrect even negative perhaps?
-> 
-> What does your test setup look like? Simple redirect between
-> two TCP sockets? With or without stream parser? My guess is we
-> need to fix underlying copied_seq issues related to the redirect
-> and stream parser case. I believe the fix is, only increment
-> copied_seq for data that was put on the ingress_queue from SK_PASS.
-> Then update previous patch to only incrmeent sk_msg_queue_len()
-> for redirect paths. And this patch plus fix to tcp_epollin_ready
-> would resolve most the issues. Its a bit unfortunate to leak the
-> sk_sg_queue_len() into tcp_ioctl and tcp_epollin but I don't have
-> a cleaner idea right now.
-> 
+If we look at this:
 
-What I tested was to use msg_verdict to redirect between two sockets
-without stream parser, and the problem I encountered is that msg has
-been queued in psock->ingress_msg, and the application has been woken up
-by epoll (because of sk_psock_data_ready), but the ioctl(FIONREAD) returns 0.
+         while (skb->len > 0) {
 
-The key is that the rcv_nxt is not updated on ingress redirect, or we only need
-to update rcv_nxt on ingress redirect, such as in bpf_tcp_ingress() and
-sk_psock_skb_ingress_enqueue() ?
+len is positive ...
+
+                 u32 rx_cmd_a, rx_cmd_b, align_count, size;
+                 struct sk_buff *ax_skb;
+                 unsigned char *packet;
+
+                 rx_cmd_a = get_unaligned_le32(skb->data);
+                 skb_pull(skb, 4);
+
+... but it may be smaller than 4
+If that happens skb_pull() is a nop.
+
+                 rx_cmd_b = get_unaligned_le32(skb->data);
+                 skb_pull(skb, 4 + RXW_PADDING);
+
+Then this is a nop, too.
+That means that rx_cmd_a and rx_cmd_b are identical and garbage.
+
+                 packet = skb->data;
+
+                 /* get the packet length */
+                 size = (rx_cmd_a & RX_CMD_A_LEN) - RXW_PADDING;
+
+In that case size is unpredictable.
+
+                 align_count = (4 - ((size + RXW_PADDING) % 4)) % 4;
+
+                 if (unlikely(size > skb->len)) {
+
+That means that this check may or may not work.
+
+                         netif_dbg(dev, rx_err, dev->net,
+                                   "size err rx_cmd_a=0x%08x\n",
+                                   rx_cmd_a);
+                         return 0;
+                 }
+
+There is also an error case where 4 <= skb->len < 4 + RXW_PADDING
+
+I think we really need to check for the amount of buffer that is pulled.
+Something like this:
+
+  static int smsc75xx_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
+  {
++       u32 rx_cmd_a, rx_cmd_b, align_count, size;
++
+         /* This check is no longer done by usbnet */
+         if (skb->len < dev->net->hard_header_len)
+                 return 0;
+  
+-       while (skb->len > 0) {
+-               u32 rx_cmd_a, rx_cmd_b, align_count, size;
++       while (skb->len > (sizeof(rx_cmd_a) + sizeof(rx_cmd_b) + RXW_PADDING)) {
+
+	Regards
+		Oliver
 
 
