@@ -1,128 +1,171 @@
-Return-Path: <netdev+bounces-47988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F66D7EC359
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:11:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C3A7EC3CC
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D401BB209E1
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 13:11:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89AED281054
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 13:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A832018C27;
-	Wed, 15 Nov 2023 13:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDPxzKBi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D60901EB2B;
+	Wed, 15 Nov 2023 13:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F22418B1B
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 13:11:10 +0000 (UTC)
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B36311F;
-	Wed, 15 Nov 2023 05:11:08 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5b9a456798eso4266334a12.3;
-        Wed, 15 Nov 2023 05:11:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700053868; x=1700658668; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EhfVaGER9sTAd2B+qVaDfxqJSQ9hYyt4DuktjBuV3bs=;
-        b=lDPxzKBioboqkoosHxSvQhzSIdgzhOKvDgY7jpy3NRdxG8bzHnZjoSdTnJvHRFw0P+
-         mGCYk+9vtiGxoRMH/jPQWEbT/EQa11j3ykjn3LgdH9kKclu/ZA0lERC2ughjNva1AJJz
-         9N+441W+pc+x30q2f5+wuMHZ4mJKK3UXYSaliiJxg909YyIXyrcwIoB1kpfSrn0vfEk8
-         lQ2Rx3l1sCk90XEVAAZNzbvvGaK11rbDr8+uSdIzgVylKBFnfIAk/4ToKwiPF/d19dUc
-         uAZCUG5v42SWlqjGVOzkNuBzBbh+VelEX8EH1I102pQwCBG0JFcj+GHPoXWPnbBrJ2nX
-         4XZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700053868; x=1700658668;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EhfVaGER9sTAd2B+qVaDfxqJSQ9hYyt4DuktjBuV3bs=;
-        b=LpQCMY1skXmSbFgIu7Tz+Ko4W9671W0dfDCvahg46msDdRGfyobrzFHzLcqtVG1G7M
-         8tEltmeAB4yst8tcPpCkrsJd9I1PfVTXLgLMS2WhROi+XDBeTXWho9trBBmH72gDi/11
-         qqRlJWV98FK7Q6HzFRGZeGUk4Q0HX+l+9Tz61DL5YroWhEYL0LK89fO0e/FBu5DF6e+s
-         tc0AUGTR9IPa60LrNSYABHu7df7J4xpVJ7YVKRJPrKt/SYpBjjqh6jjPP29xi2KR6XMj
-         tqD1PKsHJJLvVbpRpWIJ2DbJVoUlJ3oqHrc2sdXRYqGgBtNlJiOgxEskAoUblyGZumCS
-         h4Cw==
-X-Gm-Message-State: AOJu0Ywui/3cugu6JmiX0YTk1KArU4inbXplYQjaflUUJzfUAVJHjZ3F
-	HGQWEkNSvEMC52aXK0WGNPo=
-X-Google-Smtp-Source: AGHT+IF+Tp/0plK9/VgBp5NpeKL0shngz+o/5+5GbHwpQgFqtAF/n2vwDB9t8Qvx+i5meirX7aUHMw==
-X-Received: by 2002:a17:90b:3149:b0:27d:4901:b0b7 with SMTP id ip9-20020a17090b314900b0027d4901b0b7mr11047462pjb.30.1700053867647;
-        Wed, 15 Nov 2023 05:11:07 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id f6-20020a17090a8e8600b0027df6ff00eesm6757051pjo.19.2023.11.15.05.11.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 05:11:07 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id CA40910D2CF4C; Wed, 15 Nov 2023 20:11:04 +0700 (WIB)
-Date: Wed, 15 Nov 2023 20:11:04 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Anil Choudhary <anilchabba@gmail.com>,
-	Linux Regressions <regressions@lists.linux.dev>
-Cc: Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: sr-iov related bonding regression (two regressions in one report)
-Message-ID: <ZVTDaJOtjxEOPbNq@archie.me>
-References: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
- <32716.1700009673@famine>
- <0f97acf9-012d-4bb2-a766-0c2737e32b2c@leemhuis.info>
- <CC024511-980A-4508-8ABF-659A04367C2B@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF801A71D
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 13:36:19 +0000 (UTC)
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F1919A8;
+	Wed, 15 Nov 2023 05:36:08 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AFDZmUkA1694208, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AFDZmUkA1694208
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Nov 2023 21:35:48 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Wed, 15 Nov 2023 21:34:22 +0800
+Received: from RTDOMAIN (172.21.210.160) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.7; Wed, 15 Nov
+ 2023 21:34:21 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <pkshih@realtek.com>, <larry.chiu@realtek.com>,
+        Justin Lai
+	<justinlai0215@realtek.com>
+Subject: [PATCH net-next v11 00/13] Add Realtek automotive PCIe driver
+Date: Wed, 15 Nov 2023 21:34:01 +0800
+Message-ID: <20231115133414.1221480-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5OAjmnZvSGI+Kva2"
-Content-Disposition: inline
-In-Reply-To: <CC024511-980A-4508-8ABF-659A04367C2B@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.21.210.160]
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
+This series includes adding realtek automotive ethernet driver 
+and adding rtase ethernet driver entry in MAINTAINERS file.
 
---5OAjmnZvSGI+Kva2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This ethernet device driver for the PCIe interface of 
+Realtek Automotive Ethernet Switch,applicable to 
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
 
-On Tue, Nov 14, 2023 at 10:19:25PM -0800, Anil Choudhary wrote:
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
 
->=20
->=20
->=20
-> Following error error scribing to said is also new
->=20
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
 
-Please don't top-post; reply inline with appropriate context instead.
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
 
-What error? Can you reply with logs pasted (with error you mentioned)?
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
 
-Confused...
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
 
---=20
-An old man doll... just what I always wanted! - Clara
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
 
---5OAjmnZvSGI+Kva2
-Content-Type: application/pgp-signature; name="signature.asc"
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to 
+calculate packet number mitigation. Users can use these two functions 
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more 
+verification, so we currently do not plan to use it in this patch.
 
------BEGIN PGP SIGNATURE-----
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
 
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZVTDaAAKCRD2uYlJVVFO
-o+HWAQCGEf3FzxnS66Tm5OsffefCiiLmkMPkFzFUGydECWnqQgEAuTWunm1ReBNR
-PWiCRjKLt7pQpv6KX8OQt1zipha9ngI=
-=PeMO
------END PGP SIGNATURE-----
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum 
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
 
---5OAjmnZvSGI+Kva2--
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+Justin Lai (13):
+  net:ethernet:realtek:rtase: Add pci table supported in this module
+  net:ethernet:realtek:rtase: Implement the .ndo_open function
+  net:ethernet:realtek:rtase: Implement the rtase_down function
+  net:ethernet:realtek:rtase: Implement the interrupt routine and
+    rtase_poll
+  net:ethernet:realtek:rtase: Implement hardware configuration function
+  net:ethernet:realtek:rtase: Implement .ndo_start_xmit function
+  net:ethernet:realtek:rtase: Implement a function to receive packets
+  net:ethernet:realtek:rtase: Implement net_device_ops
+  net:ethernet:realtek:rtase: Implement pci_driver suspend and resume
+    function
+  net:ethernet:realtek:rtase: Implement ethtool function
+  net:ethernet:realtek:rtase: Add a Makefile in the rtase folder
+  net:ethernet:realtek: Update the Makefile and Kconfig in the realtek
+    folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   17 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  353 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2542 +++++++++++++++++
+ drivers/net/ethernet/realtek/rtase/tt.c       | 2542 +++++++++++++++++
+ drivers/net/ethernet/realtek/rtase/tt.h       |  353 +++
+ 8 files changed, 5825 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+ create mode 100644 drivers/net/ethernet/realtek/rtase/tt.c
+ create mode 100644 drivers/net/ethernet/realtek/rtase/tt.h
+
+-- 
+2.34.1
+
 
