@@ -1,111 +1,161 @@
-Return-Path: <netdev+bounces-47912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404597EBD7B
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:16:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFD5C7EBDBA
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 08:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3581C20A22
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:16:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE9911C20AEF
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 07:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C382E2E856;
-	Wed, 15 Nov 2023 07:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BE33D6C;
+	Wed, 15 Nov 2023 07:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tyDtAudz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6CPalQl"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8656D5CBC
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 07:16:33 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A794F8E
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:16:30 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9e1fb7faa9dso958204766b.2
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 23:16:30 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FDB34C6E;
+	Wed, 15 Nov 2023 07:20:23 +0000 (UTC)
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D770D1;
+	Tue, 14 Nov 2023 23:20:19 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1cc938f9612so43195735ad.1;
+        Tue, 14 Nov 2023 23:20:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700032589; x=1700637389; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HV8Eb4g7P4o9iQFCN+YkhdZXGat6CVP5qSXvbBBGeGg=;
-        b=tyDtAudzOhKp0wu22SQh75suVspYOa/QaBTMyZMgal4flrEiyE2ug215deWuJcvWyG
-         zgsIGSybKCERZui/uu7aDJPoAD9hTd70Pbuk+J4JLTXSBdCxACPhX2YhScJ3IPyrzZkH
-         rh33eZqJtvv20ILCSelyw0Pv1PpHIBjxW46+xZPRIgF9yG2fhpbUTN0Q4qeKBE6Di9TO
-         7ukKvofbSCBNBpu95SbB+q/n6lCD0TB/BAHIYABNd9Evz7rMrv2F3YgwNRpXzcepC0Yz
-         O95YF8zcVxnrBRLDllmzPfXoe8JHK+Awykt180O7x/nMGHzvxb2B0ZN8opcyQJZRGkTA
-         iqVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700032589; x=1700637389;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1700032818; x=1700637618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HV8Eb4g7P4o9iQFCN+YkhdZXGat6CVP5qSXvbBBGeGg=;
-        b=AGziNE9E6sZdQ1m7y0kvWvZdH9GQnuCgxgGdnotROV8EAjCR3ZKGZJulkAI8eMShHQ
-         JHYwelBDFSEMCWhduL/X0/Fsy/27/jsdm6nntDG7Sdh1Eif405CH3k1ryTxYH62IrLtI
-         GVI+lXP40rkpEfd93d4Q1BoZEMAZ/NaO18C08Idt71Q9uFVQJTnA+rdCJSfkOqqifSih
-         Fw65DkcHcw5UME8B9t8xBDapowMIelR3LUpNYbcWbWYAG0b61GK1TAso1LpfCsHeKqWI
-         qpI+Utm5kqLBI0OdalgJzKjB6PmiM9rV+vCxTXU3T+9cpBa2eDhdw1DDd0LbWhDHeWOa
-         KMFA==
-X-Gm-Message-State: AOJu0YwjbtjdikhWrBQnw9r6tUxJfajR6YL3s/4abDmCWNEka9FdoA+G
-	vZ2SYEUBQEtOzPvS0yMRrbM+Cw==
-X-Google-Smtp-Source: AGHT+IFUVutrq51us2jaCCn3nKDzT/Gqmth/HhdBv1WwLpVgabZCQG38LXe0u1IYLY62df8jtIHOVw==
-X-Received: by 2002:a17:906:fa9b:b0:9dd:6664:1a3a with SMTP id lt27-20020a170906fa9b00b009dd66641a3amr7938038ejb.51.1700032589035;
-        Tue, 14 Nov 2023 23:16:29 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id dt10-20020a170906b78a00b009a5f1d15644sm6552546ejb.119.2023.11.14.23.16.28
+        bh=rWur9p9WEqJynqifmDwPsUi7J1xquqc62P0x0XG0Cko=;
+        b=L6CPalQlTzir+UC4iC5Bs4pGq52JeNUoguWEXIfOC06y8nsKo7bOYd+QUb/a+92vHR
+         GdQ06wfZR0opxL3FecnPXbrOKAq2/4tiwO2nre2tWkwXhXhbgqk5/fhEoKI50KV37AFr
+         a0/fWC4axO2QBfybrwOqnoeWdn/S2KRNjyOQQv7cUQZLPoeuTHWz32AI83rBIpaig2a+
+         fgi1swxigJJN6UVaas9bIdMKz0TZIAd6n2VHrL3M2Jp5xPIrq+uQgUNT7z12ySt7Amc4
+         fF6MIPE5VXusAuhFawfZEn6d6dNegL1f2c2CTX8Y+Q07nZVsws2l7ctDSGsfsma2mtd0
+         ukNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700032818; x=1700637618;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rWur9p9WEqJynqifmDwPsUi7J1xquqc62P0x0XG0Cko=;
+        b=pR59D3Bki3LSAssiQvjUi9EiR+JT3db5vIxsj4og+ohih2bLuZy34MJwdWJ6CwOYaM
+         8cpZpwUoH5dLpBDVmBZScGtthaqj8PrEiyVPnNQMtPbh7d9lOEr/uxjwjZ0tm53yC/Y9
+         Lb7wnXy6rbFIDiJwS4AMDEXrHeBiwQsV1d1l1COSCGYMaVdcUN9wBk0M9eNutJxodJ2H
+         qpV4NM63CB+3k+JDrRPeahkyVGP3WKw8/1LY++1SsXiMOXB5rNPVaWCiRS7LYWsbxUyC
+         WTyf2t27eOS4907equ1/UzLrdGvI6rIl2257tiJXvP2zH2EPiirMvf4ygpSAEO5iU/QH
+         XXIw==
+X-Gm-Message-State: AOJu0YyYGvUFyYgJvjMayZ/E9zdfnigtapa2wZ3n9ffghZ2Rzczx8UVU
+	2Au4E7oEKo0/Lei5mXVXPxrA4jeArNE=
+X-Google-Smtp-Source: AGHT+IHe7+0wF9DGuenP0VZjXsTFgat4CfJpTYd29Atmc0g6oiqpYshcS1xnYHfETfIXJ7xdR3h8Yw==
+X-Received: by 2002:a17:902:db0a:b0:1cb:dc81:379a with SMTP id m10-20020a170902db0a00b001cbdc81379amr4710116plx.53.1700032818503;
+        Tue, 14 Nov 2023 23:20:18 -0800 (PST)
+Received: from localhost ([2605:59c8:148:ba10:17fb:8618:ef90:4679])
+        by smtp.gmail.com with ESMTPSA id e13-20020a17090301cd00b001b03a1a3151sm6838382plh.70.2023.11.14.23.20.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 23:16:28 -0800 (PST)
-Date: Wed, 15 Nov 2023 08:16:27 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vlad Buslov <vladbu@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, netdev@vger.kernel.org, vyasevic@redhat.com,
-	Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH net] macvlan: Don't propagate promisc change to lower dev
- in passthru
-Message-ID: <ZVRwS4wIy1ORH4jS@nanopsycho>
-References: <20231114175915.1649154-1-vladbu@nvidia.com>
+        Tue, 14 Nov 2023 23:20:17 -0800 (PST)
+Date: Tue, 14 Nov 2023 23:20:16 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Pengcheng Yang <yangpc@wangsu.com>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Pengcheng Yang <yangpc@wangsu.com>
+Message-ID: <6554713028d5b_3733620856@john.notmuch>
+In-Reply-To: <1699962120-3390-3-git-send-email-yangpc@wangsu.com>
+References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com>
+ <1699962120-3390-3-git-send-email-yangpc@wangsu.com>
+Subject: RE: [PATCH bpf-next 2/3] tcp: Add the data length in skmsg to SIOCINQ
+ ioctl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231114175915.1649154-1-vladbu@nvidia.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Tue, Nov 14, 2023 at 06:59:15PM CET, vladbu@nvidia.com wrote:
->Macvlan device in passthru mode sets its lower device promiscuous mode
->according to its MACVLAN_FLAG_NOPROMISC flag instead of synchronizing it to
->its own promiscuity setting. However, macvlan_change_rx_flags() function
->doesn't check the mode before propagating such changes to the lower device
->which can cause net_device->promiscuity counter overflow as illustrated by
->reproduction example [0] and resulting dmesg log [1]. Fix the issue by
->first verifying the mode in macvlan_change_rx_flags() function before
->propagating promiscuous mode change to the lower device.
->
->[0]:
->ip link add macvlan1 link enp8s0f0 type macvlan mode passthru
->ip link set macvlan1 promisc on
->ip l set dev macvlan1 up
->ip link set macvlan1 promisc off
->ip l set dev macvlan1 down
->ip l set dev macvlan1 up
->
->[1]:
->[ 5156.281724] macvlan1: entered promiscuous mode
->[ 5156.285467] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
->[ 5156.287639] macvlan1: left promiscuous mode
->[ 5156.288339] mlx5_core 0000:08:00.0 enp8s0f0: left promiscuous mode
->[ 5156.290907] mlx5_core 0000:08:00.0 enp8s0f0: entered promiscuous mode
->[ 5156.317197] mlx5_core 0000:08:00.0 enp8s0f0: promiscuity touches roof, set promiscuity failed. promiscuity feature of device might be broken.
->
->Fixes: efdbd2b30caa ("macvlan: Propagate promiscuity setting to lower devices.")
->Reviewed-by: Gal Pressman <gal@nvidia.com>
->Signed-off-by: Vlad Buslov <vladbu@nvidia.com>
+Pengcheng Yang wrote:
+> SIOCINQ ioctl returns the number unread bytes of the receive
+> queue but does not include the ingress_msg queue. With the
+> sk_msg redirect, an application may get a value 0 if it calls
+> SIOCINQ ioctl before recv() to determine the readable size.
+> 
+> Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
+> ---
+>  net/ipv4/tcp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 3d3a24f79573..04da0684c397 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -267,6 +267,7 @@
+>  #include <linux/errqueue.h>
+>  #include <linux/static_key.h>
+>  #include <linux/btf.h>
+> +#include <linux/skmsg.h>
+>  
+>  #include <net/icmp.h>
+>  #include <net/inet_common.h>
+> @@ -613,7 +614,7 @@ int tcp_ioctl(struct sock *sk, int cmd, int *karg)
+>  			return -EINVAL;
+>  
+>  		slow = lock_sock_fast(sk);
+> -		answ = tcp_inq(sk);
+> +		answ = tcp_inq(sk) + sk_msg_queue_len(sk);
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+This will break the SK_PASS case I believe. Here we do
+not update copied_seq until data is actually copied into user
+space. This also ensures tcp_epollin_ready works correctly and
+tcp_inq. The fix is relatively recent.
+
+ commit e5c6de5fa025882babf89cecbed80acf49b987fa
+ Author: John Fastabend <john.fastabend@gmail.com>
+ Date:   Mon May 22 19:56:12 2023 -0700
+
+    bpf, sockmap: Incorrectly handling copied_seq
+
+The previous patch increments the msg_len for all cases even
+the SK_PASS case so you will get double counting.
+
+I was starting to poke around at how to fix the other cases e.g.
+stream parser is in use and redirects but haven't got to it  yet.
+By the way I think even with this patch epollin_ready is likely
+not correct still. We observe this as either failing to wake up
+or waking up an application to early when using stream parser.
+
+The other thing to consider is redirected skb into another socket
+and then read off the list increment the copied_seq even though
+they shouldn't if they came from another sock?  The result would
+be tcp_inq would be incorrect even negative perhaps?
+
+What does your test setup look like? Simple redirect between
+two TCP sockets? With or without stream parser? My guess is we
+need to fix underlying copied_seq issues related to the redirect
+and stream parser case. I believe the fix is, only increment
+copied_seq for data that was put on the ingress_queue from SK_PASS.
+Then update previous patch to only incrmeent sk_msg_queue_len()
+for redirect paths. And this patch plus fix to tcp_epollin_ready
+would resolve most the issues. Its a bit unfortunate to leak the
+sk_sg_queue_len() into tcp_ioctl and tcp_epollin but I don't have
+a cleaner idea right now.
+
+>  		unlock_sock_fast(sk, slow);
+>  		break;
+>  	case SIOCATMARK:
+> -- 
+> 2.38.1
+> 
+
+
 
