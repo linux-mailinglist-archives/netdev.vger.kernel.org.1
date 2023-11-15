@@ -1,174 +1,128 @@
-Return-Path: <netdev+bounces-47967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F2D7EC1C4
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:57:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A19D7EC1C0
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 12:56:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 223371F24D1E
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:57:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53214280FE6
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 11:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3802817751;
-	Wed, 15 Nov 2023 11:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 236101774B;
+	Wed, 15 Nov 2023 11:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PNZfJUdo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eWb8rl9O"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092B21798F;
-	Wed, 15 Nov 2023 11:57:20 +0000 (UTC)
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A18122;
-	Wed, 15 Nov 2023 03:57:19 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A7517742
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 11:56:43 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0324F123;
+	Wed, 15 Nov 2023 03:56:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700049439; x=1731585439;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=16w+40d0xLLcfCPMxmhTbWzTg032nxyn4BeL0NpQz0U=;
-  b=PNZfJUdoTG4knPVq+6eUmG2OJZn0DqIvInOC+iaCghBm3gaOFCJbfIDy
-   aRMdgnIDmbqWkf2jAeEKi3aknPXLhz3UaaJ06i8HUyNN4uaoWwNpW6YGv
-   7Mw7URB2KJX1eLTaBaqP1bUyklytHNsuo2y8/7BVRAIfJ6A6zodkBVvPJ
-   4i+ob/DUnacKYsnU2VbjoxCuG91D8AFvjlSktEJ7Vgx3bYe9sl4PAPy+v
-   rp+/JImr5FihRt9TK3godglHDZRyseY6zuSX6brqWkGZ3iLi+mFUDCcjo
-   jo/NUh2oreaJchPtrTEhgrsLX2khV09J+Zaw7Nro5+VW6AoNPXXpsdwxP
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="12411016"
+  t=1700049402; x=1731585402;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=R0mXXm6p5XT6FEWcco9xQ+q5sm5FNZi/lrOuokDfPIc=;
+  b=eWb8rl9OtUZZVvXTXmlmxxD2C9aHKr4f1FNKKHZ1O4d4yzRNdcZ0X5E3
+   Fea0TF0Z0nSMqX6EiSWqlYcGAIinfsiyBMHkGUiuhqI4gGl0lXvwGtVGP
+   vUTG6h8gg99u/BK8dyF+0G08ABisQ53nVC6m3MXivYbhyKQNUUOUkatqX
+   pHh5OTNsoptgDV3Vmg5mXxJFQlYsUb6S6WUMUOBFQo01UAohzpG71Kg5g
+   UDqiDgpOf1RcC2vDK3bM9kp3MhJxIWYyD7IrmMF27Bd1Xmc9yXzvpsQdR
+   UHv6kcHUeL4Pvp2ljd2/bu8wZbXjuggmJbL/rm8hibM74PhaARGmMXzWG
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="393720233"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="12411016"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 03:57:19 -0800
+   d="scan'208";a="393720233"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 03:56:41 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10894"; a="908753522"
 X-IronPort-AV: E=Sophos;i="6.03,304,1694761200"; 
-   d="scan'208";a="6377009"
-Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 15 Nov 2023 03:57:13 -0800
-Received: from kbuild by b8de5498638e with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1r3EW6-0000J1-2q;
-	Wed, 15 Nov 2023 11:57:10 +0000
-Date: Wed, 15 Nov 2023 19:56:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Luka Perkov <luka.perkov@sartura.hr>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@somainline.org>
-Subject: Re: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge
- offloading features to the IPQESS driver
-Message-ID: <202311151907.EpWA1jzi-lkp@intel.com>
-References: <20231114105600.1012056-6-romain.gantois@bootlin.com>
+   d="scan'208";a="908753522"
+Received: from mohdfai2-mobl.gar.corp.intel.com (HELO [10.214.157.166]) ([10.214.157.166])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 03:56:38 -0800
+Message-ID: <ee7624e7-02e0-4fee-b4ac-48e7c79cd221@linux.intel.com>
+Date: Wed, 15 Nov 2023 19:56:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231114105600.1012056-6-romain.gantois@bootlin.com>
-
-Hi Romain,
-
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20231114105600.1012056-6-romain.gantois%40bootlin.com
-patch subject: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge offloading features to the IPQESS driver
-config: x86_64-randconfig-003-20231115 (https://download.01.org/0day-ci/archive/20231115/202311151907.EpWA1jzi-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231115/202311151907.EpWA1jzi-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202311151907.EpWA1jzi-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/dsa/qca/qca8k-8xxx.c:1982:5: warning: no previous prototype for 'qca8k_dsa_port_fdb_dump' [-Wmissing-prototypes]
-    1982 | int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
-         |     ^~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/qca/qca8k-8xxx.c:1988:6: warning: no previous prototype for 'qca8k_dsa_port_stp_state_set' [-Wmissing-prototypes]
-    1988 | void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/qca/qca8k-8xxx.c:1995:6: warning: no previous prototype for 'qca8k_dsa_port_fast_age' [-Wmissing-prototypes]
-    1995 | void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/qca/qca8k-8xxx.c:2000:5: warning: no previous prototype for 'qca8k_dsa_set_ageing_time' [-Wmissing-prototypes]
-    2000 | int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/qca/qca8k-8xxx.c:2005:5: warning: no previous prototype for 'qca8k_dsa_port_vlan_filtering' [-Wmissing-prototypes]
-    2005 | int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/dsa/qca/qca8k-8xxx.c:2012:5: warning: no previous prototype for 'qca8k_dsa_vlan_add' [-Wmissing-prototypes]
-    2012 | int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
-         |     ^~~~~~~~~~~~~~~~~~
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net 6/7] net/sched: taprio: fix q->current_entry is
+ NULL before its expiry
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-7-faizal.abdul.rahim@linux.intel.com>
+ <20231109115527.loaz76xp5wxwbqav@skbuf>
+From: "Abdul Rahim, Faizal" <faizal.abdul.rahim@linux.intel.com>
+In-Reply-To: <20231109115527.loaz76xp5wxwbqav@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-vim +/qca8k_dsa_port_fdb_dump +1982 drivers/net/dsa/qca/qca8k-8xxx.c
 
-  1981	
-> 1982	int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
-  1983				    dsa_fdb_dump_cb_t *cb, void *data)
-  1984	{
-  1985		return qca8k_port_fdb_dump(ds->priv, port, cb, data);
-  1986	}
-  1987	
-> 1988	void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
-  1989					  u8 state)
-  1990	{
-  1991		qca8k_port_stp_state_set(ds->priv, port, state,
-  1992					 dsa_to_port(ds, port)->learning, true);
-  1993	}
-  1994	
-> 1995	void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
-  1996	{
-  1997		qca8k_port_fast_age(ds->priv, port);
-  1998	}
-  1999	
-> 2000	int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
-  2001	{
-  2002		return qca8k_set_ageing_time(ds->priv, msecs);
-  2003	}
-  2004	
-> 2005	int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
-  2006					  bool vlan_filtering,
-  2007					  struct netlink_ext_ack *extack)
-  2008	{
-  2009		return qca8k_port_vlan_filtering(ds->priv, port, vlan_filtering);
-  2010	}
-  2011	
-> 2012	int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
-  2013			       const struct switchdev_obj_port_vlan *vlan,
-  2014			       struct netlink_ext_ack *extack)
-  2015	{
-  2016		return qca8k_port_vlan_add(ds->priv, port, vlan, extack);
-  2017	}
-  2018	
+On 9/11/2023 7:55 pm, Vladimir Oltean wrote:
+> On Tue, Nov 07, 2023 at 06:20:22AM -0500, Faizal Rahim wrote:
+>> Fix the issue of prematurely setting q->current_entry to NULL in the
+>> setup_first_end_time() function when a new admin schedule arrives
+>> while the oper schedule is still running but hasn't transitioned yet.
+>> This premature setting causes problems because any reference to
+>> q->current_entry, such as in taprio_dequeue(), will result in NULL
+>> during this period, which is incorrect. q->current_entry should remain
+>> valid until the currently running entry expires.
+>>
+>> To address this issue, only set q->current_entry to NULL when there is
+>> no oper schedule currently running.
+>>
+>> Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
+> 
+> The "Fixes" tag represents the commit where the code started becoming a
+> problem, not when the code that you're changing was first introduced.
+> 
+> I find it hard to believe that the problem was in commit 5a781ccbd19e
+> ("tc: Add support for configuring the taprio scheduler"), because we
+> didn't support admin -> oper dynamic schedules back then.
+> 
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+My bad, will update accordingly.
+
+>> Signed-off-by: Faizal Rahim <faizal.abdul.rahim@linux.intel.com>
+>> ---
+>>   net/sched/sch_taprio.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+>> index 01b114edec30..c60e9e7ac193 100644
+>> --- a/net/sched/sch_taprio.c
+>> +++ b/net/sched/sch_taprio.c
+>> @@ -1375,7 +1375,8 @@ static void setup_first_end_time(struct taprio_sched *q,
+>>   			first->gate_close_time[tc] = ktime_add_ns(base, first->gate_duration[tc]);
+>>   	}
+>>   
+>> -	rcu_assign_pointer(q->current_entry, NULL);
+>> +	if (!hrtimer_active(&q->advance_timer))
+>> +		rcu_assign_pointer(q->current_entry, NULL);
+>>   }
+>>   
+>>   static void taprio_start_sched(struct Qdisc *sch,
+>> -- 
+>> 2.25.1
+>>
 
