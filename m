@@ -1,65 +1,54 @@
-Return-Path: <netdev+bounces-48112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3647EC923
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:01:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B54827EC924
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 18:01:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441AD1C20BA1
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:01:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E72B81C208A3
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834F633063;
-	Wed, 15 Nov 2023 17:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFE7433063;
+	Wed, 15 Nov 2023 17:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AxVRDLQH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btjtdVd1"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A87A3175A
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 17:01:26 +0000 (UTC)
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A19FA
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:01:25 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 38308e7fff4ca-2c594196344so91420121fa.3
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:01:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700067684; x=1700672484; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nr6vuhfPEics7daBdGQpqD1rLR5BjzbdvN+08xBD+q8=;
-        b=AxVRDLQH+RVBookmP+3DwqtfiQuAunIROpp+gwEgC1RcI7bt9Rtv4PXWqg03juw3JU
-         BI8CBoBGlFZJnThxL1X5MbXULEiArII7Yenoz+fMBXRxbQk2C8IZsaWfDvx/mM7Ox8gG
-         RZVkdE+f2OwqoFn5oAajapplo4hSgsQDtFIn/NgoDc0kdCniEs4Kc3RD0u4JeVYhyaj2
-         EDbLFaKyz1N2WStEFDIdKcDWtwj4eVclNJl8z/APb5Z1Dz1ZUw+Z35kKSNFuW5JYaJHw
-         eQqDB327sZwX7liyASR3OvS28PnnUAjuX4iPdEvDAppEPZhGTbPPxQnv3hBMa1s20YI3
-         be+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700067684; x=1700672484;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nr6vuhfPEics7daBdGQpqD1rLR5BjzbdvN+08xBD+q8=;
-        b=Ip9skq3vGTbX+R/qko3amgEsgNvOOP0jbVZ6dA4orcD7U7+5w3uMKPWHjPYikSoBjG
-         PKb7L6/rfPvXstYLhJtHDQayK8PZyPqcYeIFMePTd+2yl4H8kCOGa8nt0YFSx7UTt26o
-         YF7W6OIVftSAHnjY9rVQzKgk3T3n5I5YBchYFVWYF3Sl6MDcFYSo2+AqujIfhzgfzzTq
-         73Tg8L/JC3yZV/eWAGvBTJCDVwRZSLfNu3ptM5J9ANCKGWqHvTBsgkTnjt4088ViG3Vf
-         OJKQnjZGyQYDywz9/dg9iUoSGjCzq6lQg6sDhGx/hADipWFzsEjs6qTSKwm9cgtzWE0n
-         1YBg==
-X-Gm-Message-State: AOJu0YyqJQwn9AqOK1B3rgXEJSyNAUSEVghkHoCeNX2rOwstm4XpD+vu
-	uixx6MeW1fPBqw9qi6vp0MjQFg==
-X-Google-Smtp-Source: AGHT+IEPUYkKyHBiFfTLuh8TKtrGvK9xxvJ/BsN6m2FxavNOkoOEWZwhNsaG6LdlbntqkUILzUlnCw==
-X-Received: by 2002:a05:651c:1a24:b0:2c5:2eaa:5397 with SMTP id by36-20020a05651c1a2400b002c52eaa5397mr5131497ljb.11.1700067679053;
-        Wed, 15 Nov 2023 09:01:19 -0800 (PST)
-Received: from [172.30.204.150] (UNUSED.212-182-62-129.lubman.net.pl. [212.182.62.129])
-        by smtp.gmail.com with ESMTPSA id h24-20020a2eb0f8000000b002c00da5c522sm1716220ljl.78.2023.11.15.09.01.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Nov 2023 09:01:18 -0800 (PST)
-Message-ID: <cb4131d1-534d-4412-a562-fb26edfea0d1@linaro.org>
-Date: Wed, 15 Nov 2023 18:01:14 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECE12EB18
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 17:01:52 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF2D019E
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:01:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700067709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L79P9mU6uMtA5BVIKvZRb2x0oslwt8sbrqaeDExdV6s=;
+	b=btjtdVd1tk3abJohWnz1VCSEGjQxOgF7qw8/BUL0glo6C1TAPcJ9EQI0D0Qevwn7G080aH
+	xUhxAUaSVEtMYEOljPwmPdomjDzr5LqyPfpj2ofDsQQKoemrn8CaCmntqizmec1FO30oOY
+	CHJ4vWeZypgKsPA7nryoi+FofUxSiCk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-369-PYBy6ho4NKS4WAf1KUKUZw-1; Wed, 15 Nov 2023 12:01:48 -0500
+X-MC-Unique: PYBy6ho4NKS4WAf1KUKUZw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1CDFD810FCA;
+	Wed, 15 Nov 2023 17:01:47 +0000 (UTC)
+Received: from [10.45.225.144] (unknown [10.45.225.144])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4EBFC492BFD;
+	Wed, 15 Nov 2023 17:01:45 +0000 (UTC)
+Message-ID: <36889885-71c7-46f7-8c21-e5791986ad5a@redhat.com>
+Date: Wed, 15 Nov 2023 18:01:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,37 +56,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/9] net: mdio: ipq4019: add qca8084 configurations
+Subject: Re: [PATCH iwl-next 3/5] i40e: Add helpers to find VSI and VEB by
+ SEID and use them
+To: Wojciech Drewek <wojciech.drewek@intel.com>, netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org,
+ Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
+ mschmidt@redhat.com
+References: <20231113125856.346047-1-ivecera@redhat.com>
+ <20231113125856.346047-4-ivecera@redhat.com>
+ <3c640be7-8f1e-4f9e-8556-3aac92644dec@intel.com>
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Luo Jie <quic_luoj@quicinc.com>
-Cc: agross@kernel.org, andersson@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-9-quic_luoj@quicinc.com>
- <a1954855-f82d-434b-afd1-aa05c7a1b39b@lunn.ch>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-In-Reply-To: <a1954855-f82d-434b-afd1-aa05c7a1b39b@lunn.ch>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <3c640be7-8f1e-4f9e-8556-3aac92644dec@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Level: *
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
 
-
-On 11/15/23 17:20, Andrew Lunn wrote:
-> On Wed, Nov 15, 2023 at 11:25:14AM +0800, Luo Jie wrote:
->> The PHY & PCS clocks need to be enabled and the reset
->> sequence needs to be completed to make qca8084 PHY
->> probeable by MDIO bus.
+On 13. 11. 23 14:27, Wojciech Drewek wrote:
 > 
-> Is all this guaranteed to be the same between different boards?
-No, this looks like a total subsystem overreach, these should be
-taken care of from within clk framework and consumed with the clk
-APIs.
+> On 13.11.2023 13:58, Ivan Vecera wrote:
+>> Add two helpers i40e_(veb|vsi)_get_by_seid() to find corresponding
+>> VEB or VSI by their SEID value and use these helpers to replace
+>> existing open-coded loops.
+>>
+>> Signed-off-by: Ivan Vecera<ivecera@redhat.com>
+>> ---
+> Only one nit
+> Reviewed-by: Wojciech Drewek<wojciech.drewek@intel.com>
+> 
+>>   drivers/net/ethernet/intel/i40e/i40e.h        | 34 +++++++++
+>>   .../net/ethernet/intel/i40e/i40e_debugfs.c    | 38 ++--------
+>>   drivers/net/ethernet/intel/i40e/i40e_main.c   | 76 ++++++-------------
+>>   3 files changed, 64 insertions(+), 84 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+>> index 1e9266de270b..220b5ce31519 100644
+>> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+>> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+>> @@ -1360,4 +1360,38 @@ static inline struct i40e_pf *i40e_hw_to_pf(struct i40e_hw *hw)
+>>   
+>>   struct device *i40e_hw_to_dev(struct i40e_hw *hw);
+>>   
+>> +/**
+>> + * i40e_vsi_get_by_seid - find VSI by SEID
+>> + * @pf: pointer to a PF
+>> + **/
+>> +static inline struct i40e_vsi *
+>> +i40e_vsi_get_by_seid(struct i40e_pf *pf, u16 seid)
+>> +{
+>> +	struct i40e_vsi *vsi;
+>> +	int i;
+>> +
+>> +	i40e_pf_for_each_vsi(pf, i, vsi)
+>> +		if (vsi->seid == seid)
+>> +			return vsi;
+>> +
+>> +	return NULL;
+>> +}
+>> +
+>> +/**
+>> + * i40e_veb_get_by_seid - find VEB by SEID
+>> + * @pf: pointer to a PF
+>> + **/
+>> +static inline struct i40e_veb *
+>> +i40e_veb_get_by_seid(struct i40e_pf *pf, u16 seid)
+>> +{
+>> +	struct i40e_veb *veb;
+>> +	int i;
+>> +
+>> +	i40e_pf_for_each_veb(pf, i, veb)
+>> +		if (veb->seid == seid)
+>> +			return veb;
+>> +
+>> +	return NULL;
+>> +}
+> I would prefer i40e_get_{veb|vsi}_by_seid but it's my opinion.
 
-Konrad
+I'd rather use i40e_pf_ prefix...
+
+What about i40e_pf_get_vsi_by_seid() and i40e_pf_get_veb_by_seid() ?
+
+Ivan
+
 
