@@ -1,169 +1,146 @@
-Return-Path: <netdev+bounces-48059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A8C7EC648
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:49:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBA27EC661
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 15:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05D43B20A88
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:49:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C5E1F2770C
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 14:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8B617743;
-	Wed, 15 Nov 2023 14:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A2D2EB06;
+	Wed, 15 Nov 2023 14:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NU+bZ67r"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dA8trfEm"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A273EA7A
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:49:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E789B187
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:49:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700059763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zHkzs+ps70Z5GXuD30h9mGNv1mAJncdsZa6jleaf8rI=;
-	b=NU+bZ67rLJ+cTxjEAD8frMuXZPg3qhZyv8qJOQO3jNCERtbes1N1wORNFYimjXJBEGyNTW
-	mkE5byR/pHPEyJFOdLaVNxTNC6uN9d3Bua1GFGphZtCbjldh1xeSqzLERNAc2/pzw0xChi
-	FhBZ/D0b27744ExwMc4r7JSzLhKQZxo=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-8T2unkjGNQmHI7np0fOEag-1; Wed, 15 Nov 2023 09:49:19 -0500
-X-MC-Unique: 8T2unkjGNQmHI7np0fOEag-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9c39f53775fso52345966b.1
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:49:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700059758; x=1700664558;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zHkzs+ps70Z5GXuD30h9mGNv1mAJncdsZa6jleaf8rI=;
-        b=QHKdfdjvtps3kGbdgiCcGBP0+RwCW80HaZKGxaHUw+PTnEtbx8qe/bEci1tAe97yam
-         jfCq8/cY02wSabcTlPamJ3Wi9A6XcxTyNh7+w2ugXddkmbmYvmgu93pwlB1r0dAHOHEC
-         wqwVhf9TzF8THouf/sOcRD6g47SDUajmB0YgIsnU72O0icrtfIKJ388fKnr0+JNOv1rK
-         K3meTZ1UGFpyXqt5Za4hLgrDaCYCU5k1uZlGE4MuQCbyxkrlZAJbRnob1d8K26sWlzC9
-         1rd2SnnSY5P3FxLNrA/KFeoASSb139eaqJ9yY0e3AD4PH/hUi6FJzrUVTuVa4t0gWRQO
-         thjg==
-X-Gm-Message-State: AOJu0YyhEE6cbGLy95rYm9e1cs79c90rcZ+Q2oHouHkWGEQI/DNILrG+
-	2e1af8eEuJdc5TlfrOv4xSxnQ1r5i6Zl5kpmFeaOVleVkp+L/jn9vY14ClkKSEddgRUAaajITNa
-	JB+XF8JpExP89vD8G
-X-Received: by 2002:a17:906:74c7:b0:9c4:4b20:44a5 with SMTP id z7-20020a17090674c700b009c44b2044a5mr3818320ejl.4.1700059758552;
-        Wed, 15 Nov 2023 06:49:18 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHvgKtKBhigODP4vMAdyOAfLJaUmOSX75yR/hH8B496MgTOteUFPLgPY9ZiDpnInT3OHyNX5w==
-X-Received: by 2002:a17:906:74c7:b0:9c4:4b20:44a5 with SMTP id z7-20020a17090674c700b009c44b2044a5mr3818307ejl.4.1700059758184;
-        Wed, 15 Nov 2023 06:49:18 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-232-35.dyn.eolo.it. [146.241.232.35])
-        by smtp.gmail.com with ESMTPSA id y10-20020a1709064b0a00b009dd7bc622fbsm7149455eju.113.2023.11.15.06.49.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 06:49:17 -0800 (PST)
-Message-ID: <d599922fd89b3e61c7cf531a03ea8b81cbcb003e.camel@redhat.com>
-Subject: Re: [PATCH net-next v2] netlink: introduce netlink poll to resolve
- fast return issue
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jong eon Park <jongeon.park@samsung.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dongha7.kang@samsung.com
-Date: Wed, 15 Nov 2023 15:49:16 +0100
-In-Reply-To: <20231114090748.694646-1-jongeon.park@samsung.com>
-References: 
-	<CGME20231114090804epcas1p35fde5f79e9ad1419b3199e6cdc45bc0b@epcas1p3.samsung.com>
-	 <20231114090748.694646-1-jongeon.park@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976F42D022
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 14:53:46 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9644A6
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 06:53:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700060025; x=1731596025;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yAi7jHAIMqeMc6zhgZ7aaOgbisx8HpuZ3ec/cK4oxiY=;
+  b=dA8trfEmQv5HJZd+PZDFWxC7ahOMbGPj8a7XHg6EaX+IimWVMtSVshvz
+   jbBV943MbJqYghw7OoZ28PTnESpBwr5ErMS4s7X1Pw2CTyNm1XPBrs8nC
+   mVzHXcdF17xqSRlOXw9WYsiBalKEWaqff7UTMTyVFxGsDfdzNEY5ak0xv
+   WpTbGX+/2/HOMsio4NfQPqDunO16APK6GZx40kB5Rxr7Jx6S8Xc9NtaIP
+   +1irmH4v09vhRQLKqO108RV/I9WIQ7erHZgctJ15Htn2xrOKSf5ziYfxG
+   CSGmmql1mq9SFUS5m/S4qmaNz26sslvJI6reCGK9u046ROB+HgenCPnza
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="394807407"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="394807407"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 06:53:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="758511575"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="758511575"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orsmga007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 06:53:41 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1r3HGs-0000000ELJb-0kto;
+	Wed, 15 Nov 2023 16:53:38 +0200
+Date: Wed, 15 Nov 2023 16:53:37 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
+	jhs@mojatatu.com, johannes@sipsolutions.net,
+	amritha.nambiar@intel.com, sdf@google.com
+Subject: Re: [patch net-next 6/8] genetlink: introduce helpers to do filtered
+ multicast
+Message-ID: <ZVTbccC0VhT4CetU@smile.fi.intel.com>
+References: <20231115141724.411507-1-jiri@resnulli.us>
+ <20231115141724.411507-7-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115141724.411507-7-jiri@resnulli.us>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-Hi,
+On Wed, Nov 15, 2023 at 03:17:22PM +0100, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Currently it is possible for netlink kernel user to pass custom
+> filter function to broadcast send function netlink_broadcast_filtered().
+> However, this is not exposed to multicast send and to generic
+> netlink users.
+> 
+> Extend the api and introduce a netlink helper nlmsg_multicast_filtered()
+> and a generic netlink helper genlmsg_multicast_netns_filtered()
+> to allow generic netlink families to specify filter function
+> while sending multicast messages.
 
-I'm sorry for the delayed feedback.
+...
 
-On Tue, 2023-11-14 at 18:07 +0900, Jong eon Park wrote:
-> In very rare cases, there was an issue where a user's 'poll' function
-> waiting for a uevent would continuously return very quickly, causing
-> excessive CPU usage due to the following scenario.
->=20
-> When sk_rmem_alloc exceeds sk_rcvbuf, netlink_broadcast_deliver returns a=
-n
-> error and netlink_overrun is called. However, if netlink_overrun was
-> called in a context just before a another context returns from the 'poll'
-> and 'recv' is invoked, emptying the rcv queue, sk->sk_err =3D ENOBUF is
-> written to the netlink socket belatedly and it enters the
-> NETLINK_S_CONGESTED state. If the user does not check for POLLERR, they
-> cannot consume and clean sk_err and repeatedly enter the situation where
-> they call 'poll' again but return immediately. Moreover, in this
-> situation, rcv queue is already empty and NETLINK_S_CONGESTED flag
-> prevents any more incoming packets. This makes it impossible for the user
-> to call 'recv'.
->=20
-> This "congested" situation is a bit ambiguous. The queue is empty, yet
-> 'congested' remains. This means kernel can no longer deliver uevents
-> despite the empty queue, and it lead to the persistent 'congested' status=
-.
->=20
-> ------------CPU1 (kernel)----------  --------------CPU2 (app)------------=
---
-> ...
-> a driver delivers uevent.            poll was waiting for schedule.
-> a driver delivers uevent.
-> a driver delivers uevent.
-> ...
-> 1) netlink_broadcast_deliver fails.
-> (sk_rmem_alloc > sk_rcvbuf)
->                                       getting schedule and poll returns,
->                                       and the app calls recv.
->                                       (rcv queue is empied)
->                                       2)
->=20
-> netlink_overrun is called.
-> (NETLINK_S_CONGESTED flag is set,
-> ENOBUF is written in sk_err and,
-> wake up poll.)
->                                       finishing its job and call poll.
->                                       poll returns POLLERR.
->=20
->                                       (the app doesn't have POLLERR handl=
-er)
->                                       it calls poll, but getting POLLERR.
->                                       it calls poll, but getting POLLERR.
->                                       it calls poll, but getting POLLERR.
->                                       ...
->=20
-> To address this issue, I would like to introduce the following netlink
-> poll.
+> +/**
+> + * genlmsg_multicast_netns_filtered - multicast a netlink message
+> + *				      to a specific netns with filter
+> + *				      function
+> + * @family: the generic netlink family
+> + * @net: the net namespace
+> + * @skb: netlink message as socket buffer
+> + * @portid: own netlink portid to avoid sending to yourself
+> + * @group: offset of multicast group in groups array
+> + * @flags: allocation flags
+> + * @filter: filter function
+> + * @filter_data: filter function private data
 
-IMHO the above is an application bug, and should not be addressed in
-the kernel.
+	scripts/kernel-doc -v -none -Wall ...
 
-If you want to limit the amount of CPU time your application could use,
-you have to resort to process scheduler setting and/or container
-limits: nothing could prevent a [buggy?] application from doing:
+will complain.
 
-# in shell script
-while true; do :; done
+> + */
 
-The above condition is IMHO not very different from the above: the
-application is requesting POLLERR event and not processing them.
+...
 
-To more accurate is like looping on poll() getting read event without
-reading any data. Nothing we should address in the kernel.
+> +				 int (*filter)(struct sock *dsk,
+> +					       struct sk_buff *skb,
+> +					       void *data),
 
-Cheers,
+Since it occurs more than once, perhaps
 
-Paolo
+typedef int (*genlmsg_filter_fn)(struct sock *, struct sk_buff *, void *);
+
+?
+
+...
+
+>  /**
+> - * nlmsg_multicast - multicast a netlink message
+> + * nlmsg_multicast_filtered - multicast a netlink message with filter function
+>   * @sk: netlink socket to spread messages to
+>   * @skb: netlink message as socket buffer
+>   * @portid: own netlink portid to avoid sending to yourself
+>   * @group: multicast group id
+>   * @flags: allocation flags
+> + * @filter: filter function
+> + * @filter_data: filter function private data
+
+I believe same complain by kernel-doc here and in more places...
+
+Can you at least make sure your patches do not add new ones and removes ones
+where you touch the code?
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
 
 
