@@ -1,96 +1,149 @@
-Return-Path: <netdev+bounces-47867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082167EBA9E
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 01:36:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C607EBAB4
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 01:54:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5429281389
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 00:36:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EE92813AE
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 00:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D10D19D;
-	Wed, 15 Nov 2023 00:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8C739B;
+	Wed, 15 Nov 2023 00:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="aRjZQ1DH"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="TPHgo+Ly"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21BD375
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 00:36:21 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B69EE4
-	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:36:20 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6be0277c05bso5669319b3a.0
-        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:36:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700008580; x=1700613380; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bjX6z+JwxYqT8aozp/Yx+gDJ3sCgyfJoEdhMLf6jqcM=;
-        b=aRjZQ1DHDTcgEH8/6HUs6J5JxqM6E/hb4Zaj5lZrDn0wUCOw0sB/6HFh2CszeZpGfN
-         S0mzegBndYRgo2kQQLlscvh+3UwiUDixMXVCfFCUTbUdzPaZFrbzBy2Gi4c/CaNRpz6V
-         yt36y6eRXn+ZQpxkfla4DU8Vw826FIgW/+9529ZzQ1sVa1RxqXYQQLsJlHusxsq/MCvN
-         BjJoADExEs8FAZxHxTOYAiPMxRZSfzskoE7uokb/VKF6Z0JdSGU0x7AAE2pbUAnde0Ar
-         cS9fNV7SmKlo+f0zhzbOWBWZMz2fAojCtlIzmvFjAl26VbDsjnvm2GYg6HJbPQf6eR5o
-         btnw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC5D394
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 00:54:40 +0000 (UTC)
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3200BE
+	for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:54:37 -0800 (PST)
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4AE06402D7
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 00:54:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1700009676;
+	bh=WDpC+/TU8OYxwd/ov/BIBH/XSQn/0HPjA18j9hJej6Q=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=TPHgo+LylhDCJ8i4MFjUMv/pvzb8ZhEiGPvRop6QHIWKT+lh/+hmwRLiMSVM/iUpB
+	 vzWWUylpPyJfaV7nt96tY5yLgYHVRoI5QRQ2UqZyGWjq1hvm+kzxSj5bG0ydFmKTEU
+	 s9ophOHZsOzArppr+yCSMksv5ufBB5jerCcuebGM2rTJgxwVEkkZocUCjdxm5yGdjQ
+	 oaaKvJN7Ee68ZO0w8oPKNQYqr8Xi6FPqn8r3ZYQ2tTNlJksQtu0VxGiINEii2jHuIn
+	 Pm0TNzZV5L6+0svzy6YafJ3D0Dxg3jhwt94UnOEtgauuPC4TrxIZD6Wpuboo/Vid4a
+	 G9vZWdrEpQiRw==
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-589d544dc87so5902250eaf.1
+        for <netdev@vger.kernel.org>; Tue, 14 Nov 2023 16:54:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700008580; x=1700613380;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bjX6z+JwxYqT8aozp/Yx+gDJ3sCgyfJoEdhMLf6jqcM=;
-        b=i87U59x3XEG0CwpnFLjrjnu0+AwZvqjbeGYiOLBjd5YGibCTddo7yBAAK2eat4OBj8
-         OOcYicPCTJlH7JCyh0C/OS7BfSqJ7pQuNzy79h11PsQNEhEEy32HU8cD/9mfAyCUSehh
-         vzY1FANQ6VTbGhEuizxdP8+d0GeeRMAKj+4FW1RU91Z7IhDxl9dGjveJ9orTWKJOepfO
-         LOREppjKBhMh5ZxIWyH7mZGPfS+vzUQtWq1q+kWXJ7BreXZHcIDMvovGGGyJ0rBIQpVw
-         dnmgkOU4VHPBX+uECW9AJkdvQdTOx0WMSl00baYje1Mq8n8lPC7OX9+2KUEMVMsT7Jc8
-         AdpA==
-X-Gm-Message-State: AOJu0YwfRNnkTEA6mX6n84hZtQVN6Jcc6dOyTLGhdlJ64aloLfi8g7cq
-	y+YSFrgykauuVFJF8unZCZ6R3u+DiyvaQhXRaSg=
-X-Google-Smtp-Source: AGHT+IHpimjOwXmYGxVVtcINwAYlf+s//h7vSseocTkYEDUL62KButEnbSJWy5aFaP/kZbd2djASDg==
-X-Received: by 2002:a05:6a20:4404:b0:181:10ee:20c6 with SMTP id ce4-20020a056a20440400b0018110ee20c6mr11602047pzb.42.1700008579897;
-        Tue, 14 Nov 2023 16:36:19 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id o9-20020a170902778900b001ccb81e851bsm6207148pll.103.2023.11.14.16.36.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Nov 2023 16:36:19 -0800 (PST)
-Date: Tue, 14 Nov 2023 16:36:17 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: heminhong <heminhong@kylinos.cn>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] iproute2: prevent memory leak
-Message-ID: <20231114163617.25a7990f@hermes.local>
-In-Reply-To: <20231114092410.43635-1-heminhong@kylinos.cn>
-References: <20231114092410.43635-1-heminhong@kylinos.cn>
+        d=1e100.net; s=20230601; t=1700009675; x=1700614475;
+        h=message-id:date:content-transfer-encoding:content-id:mime-version
+         :comments:references:in-reply-to:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WDpC+/TU8OYxwd/ov/BIBH/XSQn/0HPjA18j9hJej6Q=;
+        b=NsjgXURHvhHKdvRiuPgC7azjx+iEiGEfQoJZx3+1S5mZdBTRptF0ameqgIP8Vr4757
+         Lq9r0Skg/GTMYkJQ74ec1vhZM5AdytAbL0NL/pqzFqpX5ZBu2z5IPVzuF4BWitl86k8B
+         OcXyXW1XtuOxq4DgKUxfFEJPTiaPZNq7xSYhK8plFFf1AoiA0bo1EnLzFoHcgYJOLPin
+         wssSIN7Js9hJcSzgHZjIT4IPB6nTzWR1Gor2lYE3Kcr9cMPGMLfr5N6asLpiEGDoXz/Z
+         XucoPE1K/p2gnBZ8xCAaSqXwxhdVAls889GFkZ9rfQ5M42U81OQnBS27cxKwJBac6cXk
+         6AVg==
+X-Gm-Message-State: AOJu0YzLnM543CnzcicSJBWI8RR98SabRRrKkkWvgiAjVwNIYDnbdMZi
+	+Uqrk6bSQATxwed1pW5gpQu4XshMrqAM0Wn3XRSGWRUsQpYPPMZsh0T7Z0EuKYSJzDQGp/UpjKp
+	tFxJ7aZXh4Isvg0KUtuemtpnZYBCcio7+fQ==
+X-Received: by 2002:a05:6358:24a3:b0:16b:7049:e8f9 with SMTP id m35-20020a05635824a300b0016b7049e8f9mr4744193rwc.8.1700009675082;
+        Tue, 14 Nov 2023 16:54:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGjS1Eza3HfJ+1w5VNAFHLX0iHyrhrcjQz7hpZTmu4fpoC03xWrJ7Vip0QyJP/Ynp1eP/c67g==
+X-Received: by 2002:a05:6358:24a3:b0:16b:7049:e8f9 with SMTP id m35-20020a05635824a300b0016b7049e8f9mr4744177rwc.8.1700009674772;
+        Tue, 14 Nov 2023 16:54:34 -0800 (PST)
+Received: from famine.localdomain ([50.125.80.253])
+        by smtp.gmail.com with ESMTPSA id a20-20020a634d14000000b005b83bc255fbsm136600pgb.71.2023.11.14.16.54.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 14 Nov 2023 16:54:34 -0800 (PST)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 02DAE5FFF6; Tue, 14 Nov 2023 16:54:33 -0800 (PST)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id EFDF99F88E;
+	Tue, 14 Nov 2023 16:54:33 -0800 (PST)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+    Linux Networking <netdev@vger.kernel.org>,
+    Thorsten Leemhuis <regressions@leemhuis.info>,
+    Linux Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+    Linux Regressions <regressions@lists.linux.dev>,
+    Andy Gospodarek <andy@greyhouse.net>,
+    Ivan Vecera <ivecera@redhat.com>,
+    Jesse Brandeburg <jesse.brandeburg@intel.com>,
+    Tony Nguyen <anthony.l.nguyen@intel.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Anil Choudhary <anilchabba@gmail.com>
+Subject: Re: sr-iov related bonding regression (two regressions in one report)
+In-reply-to: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
+References: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
+Comments: In-reply-to Bagas Sanjaya <bagasdotme@gmail.com>
+   message dated "Wed, 15 Nov 2023 06:59:06 +0700."
+X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <32715.1700009673.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 14 Nov 2023 16:54:33 -0800
+Message-ID: <32716.1700009673@famine>
 
-On Tue, 14 Nov 2023 17:24:10 +0800
-heminhong <heminhong@kylinos.cn> wrote:
+Bagas Sanjaya <bagasdotme@gmail.com> wrote:
 
-> +			if (NULL != answer)
-> +			{
-> +				free(answer);
-> +			}
+>Hi Thorsten and all,
+>
+>I come across LACP bonding regression on Bugzilla [1]. The reporter
+>(Cc'ed) has two regressions. The first is actual LACP bonding
+>regression (but terse):
+>
+>> Till linkx kernel 6.5.7 it is working fine, but after upgrading to 6.6.=
+1 ping stop working with LACP bonding.
+>> When we disable SR-IOV from bios , everything working fine
+>
+>And the second is out-of-tree module FTBFS:
 
-Four style problems here:
-	1. Don't use Windows convention of NULL first
-	2. Don't use Windows style bracket indentation
-	3. Brackets are not used in kernel style for single statment if()
-	4. Since free of NULL is a perfectly valid nop. Just call free() and skip the if.
+[... skip OOT stuff ...]
 
-If you read the existing code, you would see that it uses kernel style.
-Any change should follow the conventions of existing code.
+>
+>Should I add the first regression to regzbot (since the second one
+>is obviously out-of-tree problem), or should I asked detailed regression
+>info to the reporter?
 
+	My vote is to get additional information.  Given the nature of
+the workaround ("When we disable SR-IOV from bios , everything working
+fine"), it's plausible that the underlying cause is something
+platform-specific.
 
+	Interestingly, we've been chasing internally an issue with
+bonding LACP mode on ice (E810-XXV, I think) when running on the Ubuntu
+kernel.  That manifests as occasional TX timeouts, and doesn't happen if
+the Intel OOT driver is used, so I wonder if that bugzilla reporter is
+also seeing TX timeouts that correlate with their ping failures.
+
+	-J
+
+>Thanks.
+>
+>[1]: https://bugzilla.kernel.org/show_bug.cgi?id=3D218139
+>
+>-- =
+
+>An old man doll... just what I always wanted! - Clara
+
+---
+	-Jay Vosburgh, jay.vosburgh@canonical.com
 
