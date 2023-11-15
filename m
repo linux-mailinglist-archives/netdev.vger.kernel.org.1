@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-48183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5EC67ECDA0
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 255EC7ECDA2
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 322BC2810BF
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31191C20991
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D13C3C460;
-	Wed, 15 Nov 2023 19:36:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395393C46B;
+	Wed, 15 Nov 2023 19:37:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsQTG5g7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nx9S+NCs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82197446DE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB1A3C468
 	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:36:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B31C433C8;
-	Wed, 15 Nov 2023 19:36:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B3DC433C7;
+	Wed, 15 Nov 2023 19:36:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700077019;
-	bh=kF9vr75SmtZu9p/rXgYjqhwRPyT0NZ2SZvQB0tjJLvs=;
+	bh=e26f/y5Z6tDOPgogltnRDDerM8rLY3R8QEGGvlTIH3w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rsQTG5g7qJK7ujxjM8fp9PVz8Ti8vx52iQAJ0Ui2FM7ukvXOliNJuqo3qe/ZDb8yU
-	 FMXwgqWFLEf0abM+DlvH66MCFefElV0HvjvdX4Z06PmRNumeU9B7C03+tM6XCakkP9
-	 f8aC9reMsSwQn0Q9KvXcvtKVSjshoA+xBOY29as+oekkzBO4IAyNQEuT0Cy3cdEZQq
-	 O7KH5vOXm3n2q4Xzldw5OeTCWH2xweUCBuFqpz6pmX9ZSlrrXq16s35DsF0Zt22u5S
-	 NUCyBLCqAmSJtt09DKhbIYdZA5WYlmDoKSpVqKxmZv16+ewvv7BZvJCj6CG2ojiDax
-	 rw49J6Iea6ARQ==
+	b=nx9S+NCsF+XzbozzKFbzC1arMmuGU+FMhRFYK9xL7z213wf/K0xDbBpWKaBtjaeTH
+	 OQkMVR2f0jf7SMAn8hJ350uZXVSME0qeYvgDZPbCXacXKg2SLKmtc93Bjx1+++Y2j3
+	 aC1jIb+8CV4LfvWWj6vL/O3pnvhjzLF07QwhYQNuXwi7Lre0SKX+ONYdor/9KuPObm
+	 CEfwIRssPH9fR7wLqDVnhN+lXxjpAGJJkGNzfTrW/XPlILFTaGw3O+L0o3okaG0olz
+	 zXPbu4iKtiQMRNub98e73C8KNW0pwNjiahdEhQu6M28NjKbn7avugBNLFKEHN1hy10
+	 sjdIymcsHElmQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -41,9 +41,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [net-next V2 08/13] net/mlx5: Refactor real time clock operation checks for PHC
-Date: Wed, 15 Nov 2023 11:36:44 -0800
-Message-ID: <20231115193649.8756-9-saeed@kernel.org>
+Subject: [net-next V2 09/13] net/mlx5: Initialize clock->ptp_info inside mlx5_init_timer_clock
+Date: Wed, 15 Nov 2023 11:36:45 -0800
+Message-ID: <20231115193649.8756-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231115193649.8756-1-saeed@kernel.org>
 References: <20231115193649.8756-1-saeed@kernel.org>
@@ -57,117 +57,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-Check if the MTUTC register of the NIC can be modified before attempting to
-execute a real-time clock operation. Previous implementation aborted the
-real-time clock operation pre-emptively when the MTUTC register used to
-control the real-time clock was not modifiable, indicating real-time clock
-mode was not enabled on the NIC. The original control flow was confusing
-since the noop-if-RTC-disabled branch looked similar to an error handling
-guard clause. The purpose of this patch is purely for improving readability
-and should lead to no functional change.
+Configure the PHC inside mlx5_init_timer_clock for calling mlx5_ptp_settime
+later in the function. Would previously use mlx5_ptp_clock_info instance to
+invoke mlx5_ptp_settime to set the NIC real-time clock to be synchronized
+with the host system clock.
 
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/core/lib/clock.c   | 41 +++++++++----------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-index aa29f09e8356..c4f4d1c63463 100644
+index c4f4d1c63463..ca7691930f6b 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-@@ -266,9 +266,6 @@ static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
+@@ -1002,10 +1002,12 @@ static void mlx5_init_timer_clock(struct mlx5_core_dev *mdev)
  {
- 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
+ 	struct mlx5_clock *clock = &mdev->clock;
  
--	if (!mlx5_modify_mtutc_allowed(mdev))
--		return 0;
--
- 	if (ts->tv_sec < 0 || ts->tv_sec > U32_MAX ||
- 	    ts->tv_nsec < 0 || ts->tv_nsec > NSEC_PER_SEC)
- 		return -EINVAL;
-@@ -286,12 +283,15 @@ static int mlx5_ptp_settime(struct ptp_clock_info *ptp, const struct timespec64
- 	struct mlx5_timer *timer = &clock->timer;
- 	struct mlx5_core_dev *mdev;
- 	unsigned long flags;
--	int err;
- 
- 	mdev = container_of(clock, struct mlx5_core_dev, clock);
--	err = mlx5_ptp_settime_real_time(mdev, ts);
--	if (err)
--		return err;
++	/* Configure the PHC */
++	clock->ptp_info = mlx5_ptp_clock_info;
 +
-+	if (mlx5_modify_mtutc_allowed(mdev)) {
-+		int err = mlx5_ptp_settime_real_time(mdev, ts);
-+
-+		if (err)
-+			return err;
-+	}
+ 	mlx5_timecounter_init(mdev);
+ 	mlx5_init_clock_info(mdev);
+ 	mlx5_init_overflow_period(clock);
+-	clock->ptp_info = mlx5_ptp_clock_info;
  
- 	write_seqlock_irqsave(&clock->lock, flags);
- 	timecounter_init(&timer->tc, &timer->cycles, timespec64_to_ns(ts));
-@@ -341,9 +341,6 @@ static int mlx5_ptp_adjtime_real_time(struct mlx5_core_dev *mdev, s64 delta)
- {
- 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
- 
--	if (!mlx5_modify_mtutc_allowed(mdev))
--		return 0;
--
- 	/* HW time adjustment range is checked. If out of range, settime instead */
- 	if (!mlx5_is_mtutc_time_adj_cap(mdev, delta)) {
+ 	if (mlx5_real_time_mode(mdev)) {
  		struct timespec64 ts;
-@@ -367,13 +364,16 @@ static int mlx5_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
- 	struct mlx5_timer *timer = &clock->timer;
- 	struct mlx5_core_dev *mdev;
- 	unsigned long flags;
--	int err;
+@@ -1036,11 +1038,10 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
+ 	}
  
- 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+ 	seqlock_init(&clock->lock);
+-	mlx5_init_timer_clock(mdev);
+ 	INIT_WORK(&clock->pps_info.out_work, mlx5_pps_out);
  
--	err = mlx5_ptp_adjtime_real_time(mdev, delta);
--	if (err)
--		return err;
-+	if (mlx5_modify_mtutc_allowed(mdev)) {
-+		int err = mlx5_ptp_adjtime_real_time(mdev, delta);
-+
-+		if (err)
-+			return err;
-+	}
-+
- 	write_seqlock_irqsave(&clock->lock, flags);
- 	timecounter_adjtime(&timer->tc, delta);
- 	mlx5_update_clock_info_page(mdev);
-@@ -391,9 +391,6 @@ static int mlx5_ptp_freq_adj_real_time(struct mlx5_core_dev *mdev, long scaled_p
- {
- 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
+-	/* Configure the PHC */
+-	clock->ptp_info = mlx5_ptp_clock_info;
++	/* Initialize the device clock */
++	mlx5_init_timer_clock(mdev);
  
--	if (!mlx5_modify_mtutc_allowed(mdev))
--		return 0;
--
- 	MLX5_SET(mtutc_reg, in, operation, MLX5_MTUTC_OPERATION_ADJUST_FREQ_UTC);
- 
- 	if (MLX5_CAP_MCAM_FEATURE(mdev, mtutc_freq_adj_units)) {
-@@ -415,13 +412,15 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- 	struct mlx5_core_dev *mdev;
- 	unsigned long flags;
- 	u32 mult;
--	int err;
- 
- 	mdev = container_of(clock, struct mlx5_core_dev, clock);
- 
--	err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
--	if (err)
--		return err;
-+	if (mlx5_modify_mtutc_allowed(mdev)) {
-+		int err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
-+
-+		if (err)
-+			return err;
-+	}
- 
- 	mult = (u32)adjust_by_scaled_ppm(timer->nominal_c_mult, scaled_ppm);
- 
+ 	/* Initialize 1PPS data structures */
+ 	mlx5_init_pps(mdev);
 -- 
 2.41.0
 
