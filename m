@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-48182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A86B7ECD9B
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5EC67ECDA0
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5791C20970
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 322BC2810BF
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73167446D4;
-	Wed, 15 Nov 2023 19:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D13C3C460;
+	Wed, 15 Nov 2023 19:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNNYw3Eh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rsQTG5g7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D63446CF
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:36:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DF04C433CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82197446DE
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:36:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4B31C433C8;
 	Wed, 15 Nov 2023 19:36:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700077018;
-	bh=nuxlBhuUKTe3LUPoLZrWONHSAdHypwshY0IvsFSl4EE=;
+	s=k20201202; t=1700077019;
+	bh=kF9vr75SmtZu9p/rXgYjqhwRPyT0NZ2SZvQB0tjJLvs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KNNYw3Eh4PwxV5NKeRkjigIyyO1ANzAy+T5Z/wRYHjgpFERr5ADZFqW8f8tPm0ekN
-	 wJROR2IMZJ2dwOBf3vQ+sqhKL8ejAG3FWW7sU4s5rwHT2F/6RplFsfuSc23NTCp62x
-	 aONHTWSlHcg9e0NCvs56QqRBTOqjiuUxsCV936nhoU8xvJdNWlZajmFrKlCKVeK4+P
-	 2aNvC6KN04GsnzGCGI52xWryWL/xlF61j8slGefGH1+GZwwHQfsP+SdkBhLPNOur8I
-	 QGk0quf0jzCEoWHcs5ZI1pitQywm5vNb3jzqc8Ama4rzF0ksNFtAPth8WRAEIZKhKN
-	 kFmsl7yjDWeSA==
+	b=rsQTG5g7qJK7ujxjM8fp9PVz8Ti8vx52iQAJ0Ui2FM7ukvXOliNJuqo3qe/ZDb8yU
+	 FMXwgqWFLEf0abM+DlvH66MCFefElV0HvjvdX4Z06PmRNumeU9B7C03+tM6XCakkP9
+	 f8aC9reMsSwQn0Q9KvXcvtKVSjshoA+xBOY29as+oekkzBO4IAyNQEuT0Cy3cdEZQq
+	 O7KH5vOXm3n2q4Xzldw5OeTCWH2xweUCBuFqpz6pmX9ZSlrrXq16s35DsF0Zt22u5S
+	 NUCyBLCqAmSJtt09DKhbIYdZA5WYlmDoKSpVqKxmZv16+ewvv7BZvJCj6CG2ojiDax
+	 rw49J6Iea6ARQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,11 +40,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Vlad Buslov <vladbu@nvidia.com>
-Subject: [net-next V2 07/13] net/mlx5e: Access array with enum values instead of magic numbers
-Date: Wed, 15 Nov 2023 11:36:43 -0800
-Message-ID: <20231115193649.8756-8-saeed@kernel.org>
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net-next V2 08/13] net/mlx5: Refactor real time clock operation checks for PHC
+Date: Wed, 15 Nov 2023 11:36:44 -0800
+Message-ID: <20231115193649.8756-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231115193649.8756-1-saeed@kernel.org>
 References: <20231115193649.8756-1-saeed@kernel.org>
@@ -56,52 +55,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Gal Pressman <gal@nvidia.com>
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
-Access the headers array using pedit_cmd enum values, and don't assume
-anything about their values.
+Check if the MTUTC register of the NIC can be modified before attempting to
+execute a real-time clock operation. Previous implementation aborted the
+real-time clock operation pre-emptively when the MTUTC register used to
+control the real-time clock was not modifiable, indicating real-time clock
+mode was not enabled on the NIC. The original control flow was confusing
+since the noop-if-RTC-disabled branch looked similar to an error handling
+guard clause. The purpose of this patch is purely for improving readability
+and should lead to no functional change.
 
-Signed-off-by: Gal Pressman <gal@nvidia.com>
-Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c | 3 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c           | 8 ++++----
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ .../ethernet/mellanox/mlx5/core/lib/clock.c   | 41 +++++++++----------
+ 1 file changed, 20 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-index 368a95fa77d3..b14cd62edffc 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc/act/pedit.c
-@@ -48,7 +48,8 @@ mlx5e_tc_act_pedit_parse_action(struct mlx5e_priv *priv,
- 				struct pedit_headers_action *hdrs,
- 				struct netlink_ext_ack *extack)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+index aa29f09e8356..c4f4d1c63463 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+@@ -266,9 +266,6 @@ static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
  {
--	u8 cmd = (act->id == FLOW_ACTION_MANGLE) ? 0 : 1;
-+	u8 cmd = (act->id == FLOW_ACTION_MANGLE) ? TCA_PEDIT_KEY_EX_CMD_SET :
-+						   TCA_PEDIT_KEY_EX_CMD_ADD;
- 	u8 htype = act->mangle.htype;
- 	int err = -EOPNOTSUPP;
- 	u32 mask, val, offset;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 25743a7eda26..4e1f339e381f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -3195,10 +3195,10 @@ static int offload_pedit_fields(struct mlx5e_priv *priv,
- 	headers_c = mlx5e_get_match_headers_criteria(*action_flags, &parse_attr->spec);
- 	headers_v = mlx5e_get_match_headers_value(*action_flags, &parse_attr->spec);
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
  
--	set_masks = &hdrs[0].masks;
--	add_masks = &hdrs[1].masks;
--	set_vals = &hdrs[0].vals;
--	add_vals = &hdrs[1].vals;
-+	set_masks = &hdrs[TCA_PEDIT_KEY_EX_CMD_SET].masks;
-+	add_masks = &hdrs[TCA_PEDIT_KEY_EX_CMD_ADD].masks;
-+	set_vals = &hdrs[TCA_PEDIT_KEY_EX_CMD_SET].vals;
-+	add_vals = &hdrs[TCA_PEDIT_KEY_EX_CMD_ADD].vals;
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	if (ts->tv_sec < 0 || ts->tv_sec > U32_MAX ||
+ 	    ts->tv_nsec < 0 || ts->tv_nsec > NSEC_PER_SEC)
+ 		return -EINVAL;
+@@ -286,12 +283,15 @@ static int mlx5_ptp_settime(struct ptp_clock_info *ptp, const struct timespec64
+ 	struct mlx5_timer *timer = &clock->timer;
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+-	int err;
  
- 	for (i = 0; i < ARRAY_SIZE(fields); i++) {
- 		bool skip;
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+-	err = mlx5_ptp_settime_real_time(mdev, ts);
+-	if (err)
+-		return err;
++
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_settime_real_time(mdev, ts);
++
++		if (err)
++			return err;
++	}
+ 
+ 	write_seqlock_irqsave(&clock->lock, flags);
+ 	timecounter_init(&timer->tc, &timer->cycles, timespec64_to_ns(ts));
+@@ -341,9 +341,6 @@ static int mlx5_ptp_adjtime_real_time(struct mlx5_core_dev *mdev, s64 delta)
+ {
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
+ 
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	/* HW time adjustment range is checked. If out of range, settime instead */
+ 	if (!mlx5_is_mtutc_time_adj_cap(mdev, delta)) {
+ 		struct timespec64 ts;
+@@ -367,13 +364,16 @@ static int mlx5_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	struct mlx5_timer *timer = &clock->timer;
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+-	int err;
+ 
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+ 
+-	err = mlx5_ptp_adjtime_real_time(mdev, delta);
+-	if (err)
+-		return err;
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_adjtime_real_time(mdev, delta);
++
++		if (err)
++			return err;
++	}
++
+ 	write_seqlock_irqsave(&clock->lock, flags);
+ 	timecounter_adjtime(&timer->tc, delta);
+ 	mlx5_update_clock_info_page(mdev);
+@@ -391,9 +391,6 @@ static int mlx5_ptp_freq_adj_real_time(struct mlx5_core_dev *mdev, long scaled_p
+ {
+ 	u32 in[MLX5_ST_SZ_DW(mtutc_reg)] = {};
+ 
+-	if (!mlx5_modify_mtutc_allowed(mdev))
+-		return 0;
+-
+ 	MLX5_SET(mtutc_reg, in, operation, MLX5_MTUTC_OPERATION_ADJUST_FREQ_UTC);
+ 
+ 	if (MLX5_CAP_MCAM_FEATURE(mdev, mtutc_freq_adj_units)) {
+@@ -415,13 +412,15 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ 	struct mlx5_core_dev *mdev;
+ 	unsigned long flags;
+ 	u32 mult;
+-	int err;
+ 
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
+ 
+-	err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
+-	if (err)
+-		return err;
++	if (mlx5_modify_mtutc_allowed(mdev)) {
++		int err = mlx5_ptp_freq_adj_real_time(mdev, scaled_ppm);
++
++		if (err)
++			return err;
++	}
+ 
+ 	mult = (u32)adjust_by_scaled_ppm(timer->nominal_c_mult, scaled_ppm);
+ 
 -- 
 2.41.0
 
