@@ -1,106 +1,107 @@
-Return-Path: <netdev+bounces-48109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85D6D7EC8BD
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:39:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 322437EC8C2
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 17:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B67571C20B18
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:39:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD29D1F2203A
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 16:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0311EB33;
-	Wed, 15 Nov 2023 16:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182972EB19;
+	Wed, 15 Nov 2023 16:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="mHEuVwwm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBHC/CA0"
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28883BB4A
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:39:41 +0000 (UTC)
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0521A10D5
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:39:38 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a822f96aedso82491037b3.2
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:39:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700066376; x=1700671176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sclyE0ziPJ1+RIK1lEIDO4+EmCUAYIEkRU2ZMlLkr24=;
-        b=mHEuVwwmrWbL4bSsCdz6VnMnc939og9LWeXw+hNdYUAh5+2WRyi9rUkJxrlVx0S1Jn
-         rNNEnu2mYTzQRneNT6aWyfPt+9DMVtUzC1GQBMfG9cF3iiHCBZfsnuq2EA5m85og5bCs
-         K4ZQ9DQ8B7d6oaal20ja6xaOPBkH0W+aNUP5VJYeH6eCfR0G8f4CzY/MJgGRy/RXD/wg
-         qFt1GxeQvV1caW8puvT8xOMDyBJJbzpQeBQxkDSZ6tr6KI5jLfKiRSP1z2EDSF5qmJvJ
-         xiPTAwOHw8pBSQzmtdzopiXxJDVQSO6Q8xcgkksiWBL36aSaBup4fkfidrVUhDSu5EnE
-         10rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700066376; x=1700671176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sclyE0ziPJ1+RIK1lEIDO4+EmCUAYIEkRU2ZMlLkr24=;
-        b=RSPPp5ItuJHzcyKfLx/MLyIF5qvC2JHN8tj8gqDym96EQCPEFgfqaLjL9Ih07W0TMl
-         AFKN4Ksx4MorxxAjbrZU10qt/osnuOc+w8vra8jzBNorojnZi0X8DnSq5umzH6S0BfJ+
-         AEHvAVU28ZQVyy59xyAA4aIVvWeiTHf5La2QkQ8tsl/DQPFPnCtE7hajKYSKrgpypcr3
-         hnB57KfT7lF10Q7yEnAiPduTxqfkqb+l1sL3rDpjNpHblNyetbMktozHyRaa5zRLF3tw
-         wAEA8jJQGkwpHvnemdmh+hx6HVg3ibQlmjiBfwXLW3tT8icScVRnWOBYx5hOCFKdymMm
-         mfng==
-X-Gm-Message-State: AOJu0YyuIsqDJgC/nfduxHhT9seAWODRtWrUlwKaBjlBt6o6/v88+08n
-	CInEhyJmRHSol6EhSHqiJxIrjCANNpwrIWUEZf/pOA==
-X-Google-Smtp-Source: AGHT+IHXwXRrLUFepxYuIzYv0ES+hnj5ZzDdepBo3t5XRgmfwTaRf0rqUUnJ0WDuuenrS6DnRQ7xSNKw9sDi9Ov5be8=
-X-Received: by 2002:a81:7208:0:b0:59b:2be2:3560 with SMTP id
- n8-20020a817208000000b0059b2be23560mr13410331ywc.48.1700066376062; Wed, 15
- Nov 2023 08:39:36 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CF53BB5A
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 16:40:09 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3D81FDB
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 08:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700066394;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HCpNMTIKyOeROsc7/RWOAvMZhqSI0z3duXfnje8m3KQ=;
+	b=CBHC/CA0M0yuJmdrlDFc38PPvdba8DEtaO4YXIgf8r1qNwIXXVGILgHCP5HeQ26hwsd25g
+	YjoW43HWvYYHiwd7TwBOhygVm+GxAMFObTKJdBM5l8ZcwDnEcJIvFz95Xi9UipsWlt3Kcn
+	kfynip3zZEJac1c50mT0a/9/ZWNecfw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-121-UdDnholkMuG4DRRASuNUrQ-1; Wed, 15 Nov 2023 11:39:50 -0500
+X-MC-Unique: UdDnholkMuG4DRRASuNUrQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E6F20101B04B;
+	Wed, 15 Nov 2023 16:39:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id F0B85492BE8;
+	Wed, 15 Nov 2023 16:39:33 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAHk-=wgHciqm3iaq6hhtP64+Zsca6Y6z5UfzHzjfhUhA=jP0zA@mail.gmail.com>
+References: <CAHk-=wgHciqm3iaq6hhtP64+Zsca6Y6z5UfzHzjfhUhA=jP0zA@mail.gmail.com> <20231115154946.3933808-1-dhowells@redhat.com> <20231115154946.3933808-6-dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>,
+    Christoph Hellwig <hch@lst.de>,
+    David Laight <David.Laight@aculab.com>,
+    Matthew Wilcox <willy@infradead.org>,
+    Brendan Higgins <brendanhiggins@google.com>,
+    David Gow <davidgow@google.com>, linux-fsdevel@vger.kernel.org,
+    linux-block@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+    kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Christian Brauner <brauner@kernel.org>,
+    David Hildenbrand <david@redhat.com>,
+    John Hubbard <jhubbard@nvidia.com>,
+    Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+    Heiko Carstens <hca@linux.ibm.com>,
+    Vasily Gorbik <gor@linux.ibm.com>,
+    Alexander Gordeev <agordeev@linux.ibm.com>,
+    Christian Borntraeger <borntraeger@linux.ibm.com>,
+    Sven Schnelle <svens@linux.ibm.com>, loongarch@lists.linux.dev,
+    linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 05/10] iov_iter: Create a function to prepare userspace VM for UBUF/IOVEC tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231114160442.1023815-1-pctammela@mojatatu.com>
-In-Reply-To: <20231114160442.1023815-1-pctammela@mojatatu.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 15 Nov 2023 11:39:25 -0500
-Message-ID: <CAM0EoMnQm2_ytosyhRTrxG=OBEJLC4ZxFVf1j1_bsKtUsXqd3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/4] selftests: tc-testing: updates to tdc
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	shuah@kernel.org, victor@mojatatu.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3936725.1700066370.1@warthog.procyon.org.uk>
+Date: Wed, 15 Nov 2023 16:39:30 +0000
+Message-ID: <3936726.1700066370@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Tue, Nov 14, 2023 at 11:05=E2=80=AFAM Pedro Tammela <pctammela@mojatatu.=
-com> wrote:
->
-> - Patch 1 removes an obscure feature from tdc
-> - Patch 2 reworks the namespace and devices setup giving a nice speed
-> boost
-> - Patch 3 preloads all tc modules when running kselftests
-> - Patch 4 turns on parallel testing in kselftests
->
-> Pedro Tammela (4):
->   selftests: tc-testing: drop '-N' argument from nsPlugin
->   selftests: tc-testing: rework namespaces and devices setup
->   selftests: tc-testing: preload all modules in kselftests
->   selftests: tc-testing: use parallel tdc in kselftests
->
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-To the series:
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> From a quick look, what you were doing was checking that the patterns
+> you set up in user space came through ok. Dammit, what's wrong with
+> just using read()/write() on a pipe, or splice, or whatever. It will
+> test exactly the same iov_iter thing.
 
-cheers,
-jamal
+I was trying to make it possible to do these tests before starting userspace
+as there's a good chance that if the UBUF/IOVEC iterators don't work right
+then your system can't be booted.
 
->  .../tc-testing/plugin-lib/nsPlugin.py         | 112 +++++++++---------
->  tools/testing/selftests/tc-testing/tdc.sh     |  69 ++++++++++-
->  2 files changed, 124 insertions(+), 57 deletions(-)
->
-> --
-> 2.40.1
->
+Anyway, if I drop patches 5, 6, 7 and 10 (ie. the ones doing stuff with UBUF
+and IOVEC-type iterators), would you be okay with the rest?
+
+David
+
 
