@@ -1,85 +1,190 @@
-Return-Path: <netdev+bounces-48188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2900C7ECDAF
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:37:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 372D37ED0EE
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:58:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A8721C20BF0
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A89E1C20BFB
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 19:58:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FC93C493;
-	Wed, 15 Nov 2023 19:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C04B3DB8F;
+	Wed, 15 Nov 2023 19:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LpCpnWte"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cDj83SD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8640F3C48F
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 19:37:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E3A0C433CA;
-	Wed, 15 Nov 2023 19:37:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700077023;
-	bh=RJCHsO/j81Ch3TOk+80uDyM7v3CGIJRGarrYVT4QWXo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LpCpnWte0gGGfGlL7KZzeEgij0S4pR8lsZm14tAdIZl3WjMwUqpbNs2Cggk/0lYgX
-	 c9i2adqV8o8kq2HhjsCqcPR6o2/tWlIds1cGSABoWrRtrF9UaAV1RaH6oLX9aWPMmS
-	 Hcg7hRQPqSlXEZOXBP7ViQcI1+0yvI4bKx9oE/bRiU/3rXQWC0U0R26XqD/mWNBtlB
-	 De7BNtoM+QrOX8AAcv4KSPmkTfgBvpTUv0mopKfEYCD8tgnHYIbIfNPY7EUdDy1P8O
-	 V/DbVxnfxkjbARt5owJyMb0u2mJVkqWgA6TSw+yMvD3Z6mlyDavTajvU9d9ptDbeQq
-	 b8alIWjPhV0xA==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [net-next V2 13/13] net/mlx5e: Remove early assignment to netdev->features
-Date: Wed, 15 Nov 2023 11:36:49 -0800
-Message-ID: <20231115193649.8756-14-saeed@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231115193649.8756-1-saeed@kernel.org>
-References: <20231115193649.8756-1-saeed@kernel.org>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A85EC2;
+	Wed, 15 Nov 2023 11:58:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700078303; x=1731614303;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wyzrHGjQw2aoiAimp6drxsmKrMLf4ZbFv0gRpykk8KI=;
+  b=cDj83SD98t9WpOG+B3tHhqwmEYHxGv+NzSmENAHyvOxv58dJCSSjmjjs
+   cG74UIWzetY600pAEcb2+e4vdMxGH6NTUACaRAM64X8+nZz+gNIT/RPaK
+   ks6MD2yvez4/Z3jooEctsAT7ahywTsAK7iLOkXjUW9NJuPB63Zk8dB1xh
+   r+5VrMqi51ZWo2XNnz8o4ySj3mk0SUgr1AhAHN8EC9raljl3zHa/KBERK
+   mDStSfEEwX1w5pIewS6AoYUkjZO7gpcq0i0Y4bAQvNmWOtNYc2/PEqKyD
+   oC0GqCxY03HZXou2C6Fl1JjmGxuiJg1hOCaarEcXQbTwpqmweiL7QG2BJ
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="370294325"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="370294325"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 11:58:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="1096542631"
+X-IronPort-AV: E=Sophos;i="6.03,305,1694761200"; 
+   d="scan'208";a="1096542631"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Nov 2023 11:58:19 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r3M1h-0000m3-03;
+	Wed, 15 Nov 2023 19:58:17 +0000
+Date: Thu, 16 Nov 2023 03:58:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Justin Lai <justinlai0215@realtek.com>, kuba@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, pkshih@realtek.com,
+	larry.chiu@realtek.com, Justin Lai <justinlai0215@realtek.com>
+Subject: Re: [PATCH net-next v11 12/13] net:ethernet:realtek: Update the
+ Makefile and Kconfig in the realtek folder
+Message-ID: <202311160332.4oEPIsQA-lkp@intel.com>
+References: <20231115133414.1221480-13-justinlai0215@realtek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115133414.1221480-13-justinlai0215@realtek.com>
 
-From: Tariq Toukan <tariqt@nvidia.com>
+Hi Justin,
 
-The netdev->features is initialized to netdev->hw_features at a later
-point in the flow. Remove any redundant earlier assignment.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 1 -
- 1 file changed, 1 deletion(-)
+[auto build test WARNING on net-next/main]
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index ea58c6917433..3aecdf099a2f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5244,7 +5244,6 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 
- 	netdev->gso_partial_features             |= NETIF_F_GSO_UDP_L4;
- 	netdev->hw_features                      |= NETIF_F_GSO_UDP_L4;
--	netdev->features                         |= NETIF_F_GSO_UDP_L4;
- 
- 	mlx5_query_port_fcs(mdev, &fcs_supported, &fcs_enabled);
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Justin-Lai/net-ethernet-realtek-rtase-Add-pci-table-supported-in-this-module/20231115-213811
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231115133414.1221480-13-justinlai0215%40realtek.com
+patch subject: [PATCH net-next v11 12/13] net:ethernet:realtek: Update the Makefile and Kconfig in the realtek folder
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20231116/202311160332.4oEPIsQA-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231116/202311160332.4oEPIsQA-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311160332.4oEPIsQA-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/realtek/rtase/rtase_main.c: In function 'rtase_dump_state':
+>> drivers/net/ethernet/realtek/rtase/rtase_main.c:1586:44: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 3 has type 'dma_addr_t' {aka 'unsigned int'} [-Wformat=]
+    1586 |         netdev_err(dev, "Tx phyAddr = 0x%llx\n", ring->phy_addr);
+         |                                         ~~~^     ~~~~~~~~~~~~~~
+         |                                            |         |
+         |                                            |         dma_addr_t {aka unsigned int}
+         |                                            long long unsigned int
+         |                                         %x
+   drivers/net/ethernet/realtek/rtase/rtase_main.c:1592:44: warning: format '%llx' expects argument of type 'long long unsigned int', but argument 3 has type 'dma_addr_t' {aka 'unsigned int'} [-Wformat=]
+    1592 |         netdev_err(dev, "Rx phyAddr = 0x%llx\n", ring->phy_addr);
+         |                                         ~~~^     ~~~~~~~~~~~~~~
+         |                                            |         |
+         |                                            |         dma_addr_t {aka unsigned int}
+         |                                            long long unsigned int
+         |                                         %x
+
+
+vim +1586 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+ee13d5d822aea2 Justin Lai 2023-11-15  1572  
+ee13d5d822aea2 Justin Lai 2023-11-15  1573  static void rtase_dump_state(const struct net_device *dev)
+ee13d5d822aea2 Justin Lai 2023-11-15  1574  {
+ee13d5d822aea2 Justin Lai 2023-11-15  1575  	const struct rtase_private *tp = netdev_priv(dev);
+ee13d5d822aea2 Justin Lai 2023-11-15  1576  	const struct rtase_counters *counters;
+ee13d5d822aea2 Justin Lai 2023-11-15  1577  	int max_reg_size = RTASE_PCI_REGS_SIZE;
+ee13d5d822aea2 Justin Lai 2023-11-15  1578  	const struct rtase_ring *ring;
+ee13d5d822aea2 Justin Lai 2023-11-15  1579  	u32 dword_rd;
+ee13d5d822aea2 Justin Lai 2023-11-15  1580  	int n = 0;
+ee13d5d822aea2 Justin Lai 2023-11-15  1581  
+ee13d5d822aea2 Justin Lai 2023-11-15  1582  	ring = &tp->tx_ring[0];
+ee13d5d822aea2 Justin Lai 2023-11-15  1583  	netdev_err(dev, "Tx descriptor info:\n");
+ee13d5d822aea2 Justin Lai 2023-11-15  1584  	netdev_err(dev, "Tx curIdx = 0x%x\n", ring->cur_idx);
+ee13d5d822aea2 Justin Lai 2023-11-15  1585  	netdev_err(dev, "Tx dirtyIdx = 0x%x\n", ring->dirty_idx);
+ee13d5d822aea2 Justin Lai 2023-11-15 @1586  	netdev_err(dev, "Tx phyAddr = 0x%llx\n", ring->phy_addr);
+ee13d5d822aea2 Justin Lai 2023-11-15  1587  
+ee13d5d822aea2 Justin Lai 2023-11-15  1588  	ring = &tp->rx_ring[0];
+ee13d5d822aea2 Justin Lai 2023-11-15  1589  	netdev_err(dev, "Rx descriptor info:\n");
+ee13d5d822aea2 Justin Lai 2023-11-15  1590  	netdev_err(dev, "Rx curIdx = 0x%x\n", ring->cur_idx);
+ee13d5d822aea2 Justin Lai 2023-11-15  1591  	netdev_err(dev, "Rx dirtyIdx = 0x%x\n", ring->dirty_idx);
+ee13d5d822aea2 Justin Lai 2023-11-15  1592  	netdev_err(dev, "Rx phyAddr = 0x%llx\n", ring->phy_addr);
+ee13d5d822aea2 Justin Lai 2023-11-15  1593  
+ee13d5d822aea2 Justin Lai 2023-11-15  1594  	netdev_err(dev, "Device Registers:\n");
+ee13d5d822aea2 Justin Lai 2023-11-15  1595  	netdev_err(dev, "Chip Command = 0x%02x\n", rtase_r8(tp, RTASE_CHIP_CMD));
+ee13d5d822aea2 Justin Lai 2023-11-15  1596  	netdev_err(dev, "IMR = %08x\n", rtase_r32(tp, RTASE_IMR0));
+ee13d5d822aea2 Justin Lai 2023-11-15  1597  	netdev_err(dev, "ISR = %08x\n", rtase_r32(tp, RTASE_ISR0));
+ee13d5d822aea2 Justin Lai 2023-11-15  1598  	netdev_err(dev, "Boot Ctrl Reg(0xE004) = %04x\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1599  		   rtase_r16(tp, RTASE_BOOT_CTL));
+ee13d5d822aea2 Justin Lai 2023-11-15  1600  	netdev_err(dev, "EPHY ISR(0xE014) = %04x\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1601  		   rtase_r16(tp, RTASE_EPHY_ISR));
+ee13d5d822aea2 Justin Lai 2023-11-15  1602  	netdev_err(dev, "EPHY IMR(0xE016) = %04x\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1603  		   rtase_r16(tp, RTASE_EPHY_IMR));
+ee13d5d822aea2 Justin Lai 2023-11-15  1604  	netdev_err(dev, "CLKSW SET REG(0xE018) = %04x\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1605  		   rtase_r16(tp, RTASE_CLKSW_SET));
+ee13d5d822aea2 Justin Lai 2023-11-15  1606  
+ee13d5d822aea2 Justin Lai 2023-11-15  1607  	netdev_err(dev, "Dump PCI Registers:\n");
+ee13d5d822aea2 Justin Lai 2023-11-15  1608  
+ee13d5d822aea2 Justin Lai 2023-11-15  1609  	while (n < max_reg_size) {
+ee13d5d822aea2 Justin Lai 2023-11-15  1610  		if ((n % RTASE_DWORD_MOD) == 0)
+ee13d5d822aea2 Justin Lai 2023-11-15  1611  			netdev_err(tp->dev, "0x%03x:\n", n);
+ee13d5d822aea2 Justin Lai 2023-11-15  1612  
+ee13d5d822aea2 Justin Lai 2023-11-15  1613  		pci_read_config_dword(tp->pdev, n, &dword_rd);
+ee13d5d822aea2 Justin Lai 2023-11-15  1614  		netdev_err(tp->dev, "%08x\n", dword_rd);
+ee13d5d822aea2 Justin Lai 2023-11-15  1615  		n += 4;
+ee13d5d822aea2 Justin Lai 2023-11-15  1616  	}
+ee13d5d822aea2 Justin Lai 2023-11-15  1617  
+ee13d5d822aea2 Justin Lai 2023-11-15  1618  	netdev_err(dev, "Dump tally counter:\n");
+ee13d5d822aea2 Justin Lai 2023-11-15  1619  	counters = tp->tally_vaddr;
+ee13d5d822aea2 Justin Lai 2023-11-15  1620  	rtase_dump_tally_counter(tp);
+ee13d5d822aea2 Justin Lai 2023-11-15  1621  
+ee13d5d822aea2 Justin Lai 2023-11-15  1622  	netdev_err(dev, "tx_packets %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1623  		   le64_to_cpu(counters->tx_packets));
+ee13d5d822aea2 Justin Lai 2023-11-15  1624  	netdev_err(dev, "rx_packets %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1625  		   le64_to_cpu(counters->rx_packets));
+ee13d5d822aea2 Justin Lai 2023-11-15  1626  	netdev_err(dev, "tx_errors %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1627  		   le64_to_cpu(counters->tx_errors));
+ee13d5d822aea2 Justin Lai 2023-11-15  1628  	netdev_err(dev, "rx_missed %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1629  		   le64_to_cpu(counters->rx_missed));
+ee13d5d822aea2 Justin Lai 2023-11-15  1630  	netdev_err(dev, "align_errors %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1631  		   le64_to_cpu(counters->align_errors));
+ee13d5d822aea2 Justin Lai 2023-11-15  1632  	netdev_err(dev, "tx_one_collision %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1633  		   le64_to_cpu(counters->tx_one_collision));
+ee13d5d822aea2 Justin Lai 2023-11-15  1634  	netdev_err(dev, "tx_multi_collision %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1635  		   le64_to_cpu(counters->tx_multi_collision));
+ee13d5d822aea2 Justin Lai 2023-11-15  1636  	netdev_err(dev, "rx_unicast %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1637  		   le64_to_cpu(counters->rx_unicast));
+ee13d5d822aea2 Justin Lai 2023-11-15  1638  	netdev_err(dev, "rx_broadcast %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1639  		   le64_to_cpu(counters->rx_broadcast));
+ee13d5d822aea2 Justin Lai 2023-11-15  1640  	netdev_err(dev, "rx_multicast %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1641  		   le64_to_cpu(counters->rx_multicast));
+ee13d5d822aea2 Justin Lai 2023-11-15  1642  	netdev_err(dev, "tx_aborted %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1643  		   le64_to_cpu(counters->tx_aborted));
+ee13d5d822aea2 Justin Lai 2023-11-15  1644  	netdev_err(dev, "tx_underun %lld\n",
+ee13d5d822aea2 Justin Lai 2023-11-15  1645  		   le64_to_cpu(counters->tx_underun));
+ee13d5d822aea2 Justin Lai 2023-11-15  1646  }
+ee13d5d822aea2 Justin Lai 2023-11-15  1647  
+
 -- 
-2.41.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
