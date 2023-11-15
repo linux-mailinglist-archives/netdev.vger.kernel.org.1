@@ -1,281 +1,187 @@
-Return-Path: <netdev+bounces-48196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D746A7ED2C4
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:43:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5659E7ED350
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 21:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D24F280FF0
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E5D2281037
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 20:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2667043AA8;
-	Wed, 15 Nov 2023 20:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDFE43AC2;
+	Wed, 15 Nov 2023 20:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YY3g41TT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XtnnQkcY"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5EEAE5;
-	Wed, 15 Nov 2023 12:43:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=qfvpVy7oscEPa2fig06HQWlFHR2nFdfV8IbvwiE3Aaw=; b=YY3g41TTWKnLmh1mdwWzhIhO4h
-	VkUDm2AQ4M/++mJDYmYPYZlW9BoAgkvFahMvtJzJGs5DV2saCvgdS6BoIBSAXNMAllGbFUzf5r8Rn
-	ZcMsLEF4BW+p9Suqp/QYAJf0+j3CcHuAeoXOwM3juim1ezQt03w94iajNV8oioX1gpLSb/YjRIybx
-	Ajnf5ZWiieS0kqFNCEGpU9Zh1Kfx/TEhMaFhWiTE1uyPgWF29kbb++AMULZ3owXj7LdGS7Y8+1hAM
-	yuSvgZiBvDk+xCPhaKVCrS6R7wMMvi07gm4CUfx35MuM2RkoguzHNYgC94LKK9v35HAER4mle9geO
-	PaUwogBQ==;
-Received: from [50.53.46.231] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r3MjL-001gz0-1S;
-	Wed, 15 Nov 2023 20:43:23 +0000
-Message-ID: <9af0e158-e2c6-418a-8081-972460012ee7@infradead.org>
-Date: Wed, 15 Nov 2023 12:43:22 -0800
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770718F;
+	Wed, 15 Nov 2023 12:49:09 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id d9443c01a7336-1ce1603f5cdso1031855ad.3;
+        Wed, 15 Nov 2023 12:49:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700081344; x=1700686144; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K/b24oZBDOyviv88keLNJvELffPgYkOMIvr7ryRw2UM=;
+        b=XtnnQkcYX//AJrZRlO5YN8J+hjsp0qNlm1BtvIKVM5cBv/ajaJhVoDsXkkr/HecJBA
+         OwDEuntKH8xCW15vl4tPiQIFk+r1Gm0rI5y85xd9GuRzKWdbao2F+52fhFLXWwkPZFXU
+         o3UL0rwbfX8IJzC5KbAu8Ht3OBW2mAsSg7YQEOnqPUUAUt1zxbOeCXQy/iL3IMlGEQTN
+         K4HdFvgd6L0S9jPZ+IDeXFAB4ftFeW8HDNDayX4FkbjpgLVZSNeemr6wQ3FJ4k1FgSoc
+         nFM7+9pemHZbVgT4THwo8UBnbYDnnBtC8xwrxGbMgCdIggAUdHIG8UBaYui3aUM6PN4+
+         UsJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700081344; x=1700686144;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K/b24oZBDOyviv88keLNJvELffPgYkOMIvr7ryRw2UM=;
+        b=i37moZ2hBKwDhUH8XAwmEHWvd7yPDhpaZ29rQFg8OZgFbXw/bAen6/gX5i56bhDj9n
+         GQJIC5yAOvQRDNqcYxopnZ36RXmjcjmSYW3KOnZG8XojJGMS0EeELly8vZwRYyen9H11
+         b7Dlclpln20iwQoHKTWbISyAIwXDk659Cvhwys8iX2Gu41kelVyHC7rIomd5RZDm9c1K
+         wOjsgkN3jgpR4/2n73Ei685SULF04Ppx1Z4cX2u6zvpezMfMWsAIKSf2RbseImAJ5HNk
+         SF6FsMKCBbnH9NVpbdsspcUivtQCmVuUHBDhqHBlCy1irb/+Nhm+h/Bc/AvDVly+dJkc
+         neuQ==
+X-Gm-Message-State: AOJu0Yw+NURbdRYSLetBa40rux+mGB3vf0hXP8eGXeGYaVRdpy7SoLQ/
+	EkJb3RecrBSEA3O84FtcGWQ=
+X-Google-Smtp-Source: AGHT+IFcg6wRPt2wGlOlDs7bsLg5pKynCaCBOiBofUa2G4WFh1uKKgFi0RVSnyPH4Z6hYwgeTh3C2A==
+X-Received: by 2002:a17:902:ec84:b0:1c8:9d32:339e with SMTP id x4-20020a170902ec8400b001c89d32339emr7774092plg.50.1700081343562;
+        Wed, 15 Nov 2023 12:49:03 -0800 (PST)
+Received: from smtpclient.apple ([2601:600:967f:6b00:30f7:e7fd:e49d:14a0])
+        by smtp.gmail.com with ESMTPSA id f8-20020a170902684800b001cc46240491sm7991640pln.136.2023.11.15.12.49.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Nov 2023 12:49:03 -0800 (PST)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] s390/ism: ism driver implies smc protocol
-Content-Language: en-US
-To: Gerd Bayer <gbayer@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>, Wenjia Zhang
- <wenjia@linux.ibm.com>, Simon Horman <horms@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Wen Gu <guwen@linux.alibaba.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, dust.li@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20231115102304.GN74656@kernel.org>
- <20231115155958.3249645-1-gbayer@linux.ibm.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20231115155958.3249645-1-gbayer@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.700.6\))
+Subject: Re: sr-iov related bonding regression (two regressions in one report)
+From: Anil Choudhary <anilchabba@gmail.com>
+In-Reply-To: <CC024511-980A-4508-8ABF-659A04367C2B@gmail.com>
+Date: Wed, 15 Nov 2023 12:48:51 -0800
+Cc: Jay Vosburgh <jay.vosburgh@canonical.com>,
+ Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+ Andy Gospodarek <andy@greyhouse.net>,
+ Ivan Vecera <ivecera@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7AC9E8F6-B229-47AA-84CE-1149F45D7E0F@gmail.com>
+References: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
+ <32716.1700009673@famine>
+ <0f97acf9-012d-4bb2-a766-0c2737e32b2c@leemhuis.info>
+ <CC024511-980A-4508-8ABF-659A04367C2B@gmail.com>
+To: Linux regressions mailing list <regressions@lists.linux.dev>
+X-Mailer: Apple Mail (2.3731.700.6)
+
+We are getting errorError subscribing to SWID 0x0000.
+ from following code
+root@us-ash-r1-c2-m1:~/linux# grep -rn -e "subscribing to " .
+grep: =
+./debian/linux-image/lib/modules/6.6.1-vdx/kernel/drivers/net/ethernet/int=
+el/ice/ice.ko: binary file matches
+./samples/connector/ucon.c:149: ulog("subscribing to %u.%u\n", =
+CN_TEST_IDX, CN_TEST_VAL);
+./Documentation/driver-api/media/v4l2-event.rst:117:add      called when =
+a new listener gets added (subscribing to the same
+./Documentation/driver-api/media/v4l2-event.rst:130:Unsubscribing to an =
+event is via:
+./Documentation/maintainer/feature-and-driver-maintainers.rst:44:mailing =
+list. Either by subscribing to the whole list or using more
+grep: ./drivers/net/ethernet/intel/ice/ice_lag.o: binary file matches
+grep: ./drivers/net/ethernet/intel/ice/ice.o: binary file matches
+grep: ./drivers/net/ethernet/intel/ice/ice.ko: binary file matches
+./drivers/net/ethernet/intel/ice/ice_lag.c:1007:                =
+dev_err(ice_pf_to_dev(local_lag->pf), "Error subscribing to SWID =
+0x%04X\n",
+root@us-ash-r1-c2-m1:~/linux#
+
+
+Thanks,
+Anil
 
 
 
-On 11/15/23 07:59, Gerd Bayer wrote:
-> Since commit a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
-> you can build the ism code without selecting the SMC network protocol.
-> That leaves some ism functions be reported as unused. Move these
-> functions under the conditional compile with CONFIG_SMC.
-> 
-> Also codify the suggestion to also configure the SMC protocol in ism's
-> Kconfig - but with an "imply" rather than a "select" as SMC depends on
-> other config options and allow for a deliberate decision not to build
-> SMC. Also, mention that in ISM's help.
-> 
-> Fixes: a72178cfe855 ("net/smc: Fix dependency of SMC on ISM")
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Closes: https://lore.kernel.org/netdev/afd142a2-1fa0-46b9-8b2d-7652d41d3ab8@infradead.org/
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> On Nov 14, 2023, at 10:19 PM, Anil Choudhary <anilchabba@gmail.com> =
+wrote:
+>=20
+> <PastedGraphic-1.png>
+>=20
+>=20
+> Following error error scribing to said is also new
+>=20
+>> On Nov 14, 2023, at 9:50 PM, Linux regression tracking (Thorsten =
+Leemhuis) <regressions@leemhuis.info> wrote:
+>>=20
+>> On 15.11.23 01:54, Jay Vosburgh wrote:
+>>> Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>>>=20
+>>>> I come across LACP bonding regression on Bugzilla [1].
+>>=20
+>> Side note: Stephen forwards some (all?) network regressions to the =
+right
+>> people:
+>> https://lore.kernel.org/all/20231113083746.5e02f8b0@hermes.local/
+>>=20
+>> Would be best to check for that, no need to forward things twice, =
+that
+>> just results in a mess.
+>>=20
+>>>> The reporter
+>>>> (Cc'ed) has two regressions. The first is actual LACP bonding
+>>>> regression (but terse):
+>>>>=20
+>>>>> Till linkx kernel 6.5.7 it is working fine, but after upgrading to =
+6.6.1 ping stop working with LACP bonding.
+>>>>> When we disable SR-IOV from bios , everything working fine
+>>=20
+>> Makes me wonder if things have been working with or without the OOT
+>> module on 6.5.7, as strictly speaking it's only considered a kernel
+>> regression if thing worked with a vanilla kernel (e.g. without OOT
+>> modules) beforehand and broke when switching to a newer vanilla =
+kernel.
+>> If that's the case it would be okay to add to regzbot.
+>>=20
+>>>> And the second is out-of-tree module FTBFS:
+>>> [... skip OOT stuff ...]
+>>>=20
+>>>> Should I add the first regression to regzbot (since the second one
+>>>> is obviously out-of-tree problem), or should I asked detailed =
+regression
+>>>> info to the reporter?
+>>>=20
+>>> 	My vote is to get additional information.  Given the nature of
+>>> the workaround ("When we disable SR-IOV from bios , everything =
+working
+>>> fine"), it's plausible that the underlying cause is something
+>>> platform-specific.
+>>=20
+>> Maybe, but when it comes to the "no regressions" rule that likely =
+makes
+>> no difference from Linus perspective.
+>>=20
+>> But I guess unless the intel folks or someone else has an idea what
+>> might be wrong here we likely need a bisection (with vanilla kernels =
+of
+>> course) to get anywhere.
+>>=20
+>> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' =
+hat)
+>> --
+>> Everything you wanna know about Linux kernel regression tracking:
+>> https://linux-regtracking.leemhuis.info/about/#tldr
+>> If I did something stupid, please tell me, as explained on that page.
+>=20
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
-
-Thanks.
-
-> ---
->  drivers/s390/net/Kconfig   |  3 +-
->  drivers/s390/net/ism_drv.c | 93 +++++++++++++++++++-------------------
->  2 files changed, 48 insertions(+), 48 deletions(-)
-> 
-> Hi Simon,
-> 
-> this is version 2, that removes the unused forward declaration that you
-> found in v1 per:
-> https://lore.kernel.org/netdev/20231115102304.GN74656@kernel.org/#t
-> Other than that the patch is unchanged.
-> 
-> Thanks,
-> Gerd
-> 
-> 
-> diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
-> index 4902d45e929c..c61e6427384c 100644
-> --- a/drivers/s390/net/Kconfig
-> +++ b/drivers/s390/net/Kconfig
-> @@ -103,10 +103,11 @@ config CCWGROUP
->  config ISM
->  	tristate "Support for ISM vPCI Adapter"
->  	depends on PCI
-> +	imply SMC
->  	default n
->  	help
->  	  Select this option if you want to use the Internal Shared Memory
-> -	  vPCI Adapter.
-> +	  vPCI Adapter. The adapter can be used with the SMC network protocol.
->  
->  	  To compile as a module choose M. The module name is ism.
->  	  If unsure, choose N.
-> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-> index 6df7f377d2f9..81aabbfbbe2c 100644
-> --- a/drivers/s390/net/ism_drv.c
-> +++ b/drivers/s390/net/ism_drv.c
-> @@ -30,7 +30,6 @@ static const struct pci_device_id ism_device_table[] = {
->  MODULE_DEVICE_TABLE(pci, ism_device_table);
->  
->  static debug_info_t *ism_debug_info;
-> -static const struct smcd_ops ism_ops;
->  
->  #define NO_CLIENT		0xff		/* must be >= MAX_CLIENTS */
->  static struct ism_client *clients[MAX_CLIENTS];	/* use an array rather than */
-> @@ -289,22 +288,6 @@ static int ism_read_local_gid(struct ism_dev *ism)
->  	return ret;
->  }
->  
-> -static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
-> -			  u32 vid)
-> -{
-> -	union ism_query_rgid cmd;
-> -
-> -	memset(&cmd, 0, sizeof(cmd));
-> -	cmd.request.hdr.cmd = ISM_QUERY_RGID;
-> -	cmd.request.hdr.len = sizeof(cmd.request);
-> -
-> -	cmd.request.rgid = rgid;
-> -	cmd.request.vlan_valid = vid_valid;
-> -	cmd.request.vlan_id = vid;
-> -
-> -	return ism_cmd(ism, &cmd);
-> -}
-> -
->  static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
->  {
->  	clear_bit(dmb->sba_idx, ism->sba_bitmap);
-> @@ -429,23 +412,6 @@ static int ism_del_vlan_id(struct ism_dev *ism, u64 vlan_id)
->  	return ism_cmd(ism, &cmd);
->  }
->  
-> -static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
-> -			  u32 event_code, u64 info)
-> -{
-> -	union ism_sig_ieq cmd;
-> -
-> -	memset(&cmd, 0, sizeof(cmd));
-> -	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
-> -	cmd.request.hdr.len = sizeof(cmd.request);
-> -
-> -	cmd.request.rgid = rgid;
-> -	cmd.request.trigger_irq = trigger_irq;
-> -	cmd.request.event_code = event_code;
-> -	cmd.request.info = info;
-> -
-> -	return ism_cmd(ism, &cmd);
-> -}
-> -
->  static unsigned int max_bytes(unsigned int start, unsigned int len,
->  			      unsigned int boundary)
->  {
-> @@ -503,14 +469,6 @@ u8 *ism_get_seid(void)
->  }
->  EXPORT_SYMBOL_GPL(ism_get_seid);
->  
-> -static u16 ism_get_chid(struct ism_dev *ism)
-> -{
-> -	if (!ism || !ism->pdev)
-> -		return 0;
-> -
-> -	return to_zpci(ism->pdev)->pchid;
-> -}
-> -
->  static void ism_handle_event(struct ism_dev *ism)
->  {
->  	struct ism_event *entry;
-> @@ -569,11 +527,6 @@ static irqreturn_t ism_handle_irq(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> -static u64 ism_get_local_gid(struct ism_dev *ism)
-> -{
-> -	return ism->local_gid;
-> -}
-> -
->  static int ism_dev_init(struct ism_dev *ism)
->  {
->  	struct pci_dev *pdev = ism->pdev;
-> @@ -774,6 +727,22 @@ module_exit(ism_exit);
->  /*************************** SMC-D Implementation *****************************/
->  
->  #if IS_ENABLED(CONFIG_SMC)
-> +static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
-> +			  u32 vid)
-> +{
-> +	union ism_query_rgid cmd;
-> +
-> +	memset(&cmd, 0, sizeof(cmd));
-> +	cmd.request.hdr.cmd = ISM_QUERY_RGID;
-> +	cmd.request.hdr.len = sizeof(cmd.request);
-> +
-> +	cmd.request.rgid = rgid;
-> +	cmd.request.vlan_valid = vid_valid;
-> +	cmd.request.vlan_id = vid;
-> +
-> +	return ism_cmd(ism, &cmd);
-> +}
-> +
->  static int smcd_query_rgid(struct smcd_dev *smcd, u64 rgid, u32 vid_valid,
->  			   u32 vid)
->  {
-> @@ -811,6 +780,23 @@ static int smcd_reset_vlan_required(struct smcd_dev *smcd)
->  	return ism_cmd_simple(smcd->priv, ISM_RESET_VLAN);
->  }
->  
-> +static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
-> +			  u32 event_code, u64 info)
-> +{
-> +	union ism_sig_ieq cmd;
-> +
-> +	memset(&cmd, 0, sizeof(cmd));
-> +	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
-> +	cmd.request.hdr.len = sizeof(cmd.request);
-> +
-> +	cmd.request.rgid = rgid;
-> +	cmd.request.trigger_irq = trigger_irq;
-> +	cmd.request.event_code = event_code;
-> +	cmd.request.info = info;
-> +
-> +	return ism_cmd(ism, &cmd);
-> +}
-> +
->  static int smcd_signal_ieq(struct smcd_dev *smcd, u64 rgid, u32 trigger_irq,
->  			   u32 event_code, u64 info)
->  {
-> @@ -830,11 +816,24 @@ static int smcd_supports_v2(void)
->  		SYSTEM_EID.type[0] != '0';
->  }
->  
-> +static u64 ism_get_local_gid(struct ism_dev *ism)
-> +{
-> +	return ism->local_gid;
-> +}
-> +
->  static u64 smcd_get_local_gid(struct smcd_dev *smcd)
->  {
->  	return ism_get_local_gid(smcd->priv);
->  }
->  
-> +static u16 ism_get_chid(struct ism_dev *ism)
-> +{
-> +	if (!ism || !ism->pdev)
-> +		return 0;
-> +
-> +	return to_zpci(ism->pdev)->pchid;
-> +}
-> +
->  static u16 smcd_get_chid(struct smcd_dev *smcd)
->  {
->  	return ism_get_chid(smcd->priv);
-
--- 
-~Randy
 
