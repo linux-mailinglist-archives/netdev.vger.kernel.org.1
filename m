@@ -1,120 +1,125 @@
-Return-Path: <netdev+bounces-47921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-47922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DA5C7EBF38
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:13:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD097EBF5A
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 10:21:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C22A1C208D0
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:13:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 441E6280EA6
+	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 09:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1418B5239;
-	Wed, 15 Nov 2023 09:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PA8J11Ky"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F3F53B3;
+	Wed, 15 Nov 2023 09:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF3E7E
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:13:51 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 857BFFE
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 01:13:50 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6c396ef9a3dso5687422b3a.1
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 01:13:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700039630; x=1700644430; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=shzSNLKjeBGZlzshuHQ0IDJbnCmF6ysl05Xn7LAj+I0=;
-        b=PA8J11KyGVZvG+jiTAV7z9aeM4XLGtOm112IrIYU3MWNPt5NGwak4qFd+gGg8rwFxp
-         b1uqHCAtACEAVUSYkX0EMBWACz1ZUtmFvK8c4FDEnB0cnLCvuwCgvmv4BUktGx/Psy/p
-         iq+t/A91gT5O+4prJzvxJQar6F+ZChtdMixZOrt+axlRGGUDCBFT4ud+wdM32TB2M0bz
-         mZm9B9cxTxxc4sj23SY2QcNges4KMGXFn6oZZYYQyskSHr8nbWGZhyhQTtZKuGu8dCfj
-         ykC2u1wV50lpns2LPX/57fF5rB7Poamxt1QpwJ/ZIRbfCl9+6ca+bsfBuz+2aC3e0iD5
-         wIOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700039630; x=1700644430;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=shzSNLKjeBGZlzshuHQ0IDJbnCmF6ysl05Xn7LAj+I0=;
-        b=WC0apNFSvYq90gl7SOG/uuXT4Jku3VeTjZkQoO3nSWwdJ0ZKXvFQ5widMCsYgfKl9Q
-         hN6WH4JZP1nNpT98o0QFzJwYxlh1rWPhC43DCUfJ7J3HB4XJ2Bsdhpsin1m8VT5E8qC8
-         cPkrdz+cRsI+T0kI6McNLcsESHVB8xSV0hsvZwaWye5BvN/Pyw/kFFIeqX1c/trCeL4A
-         sd8kr+4pG5s2oapc88gBV0nIXtoSmQcAFNA20GEhH89hZ9ry1herZKS0DJsAcpjSRzzG
-         7MzcHomus5YEtWYL5hZangZKIcXJ07fNIz4MnLCj5RooDBvNkuCTfkLcwWFfezgTDKjg
-         Uahw==
-X-Gm-Message-State: AOJu0YzWoYAlr5HoH8gsQwoKbuA/Ela/G4uPbN8o+lVdkNI4iUnYEy72
-	mwFpPpXzraH3/g6EoeXlfnY=
-X-Google-Smtp-Source: AGHT+IHFDbuiQ0gZVR052yLmTTOLElphtgzDoREVNl+4L2CJ4zCW0FtfOrIY5dcYw1Ee/siLIHq0VA==
-X-Received: by 2002:a05:6a21:7889:b0:187:15e2:fe02 with SMTP id bf9-20020a056a21788900b0018715e2fe02mr4752614pzc.13.1700039629940;
-        Wed, 15 Nov 2023 01:13:49 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id mm24-20020a17090b359800b00280a2275e4bsm8357826pjb.27.2023.11.15.01.13.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 01:13:49 -0800 (PST)
-Date: Wed, 15 Nov 2023 17:13:43 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ido Schimmel <idosch@idosch.org>, Roopa Prabhu <roopa@nvidia.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Florian Westphal <fw@strlen.de>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [RFC PATCHv3 net-next 04/10] docs: bridge: Add kAPI/uAPI fields
-Message-ID: <ZVSLx9JH7MQGTWGU@Laptop-X1>
-References: <20231110101548.1900519-1-liuhangbin@gmail.com>
- <20231110101548.1900519-5-liuhangbin@gmail.com>
- <873cd494-dbab-96a6-c6cb-0ee3689f9010@blackwall.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0733753AA
+	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 09:21:06 +0000 (UTC)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08E1EFC;
+	Wed, 15 Nov 2023 01:21:04 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.53])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SVcyG45DXzmXDl;
+	Wed, 15 Nov 2023 17:17:42 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Wed, 15 Nov
+ 2023 17:21:02 +0800
+Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+To: Jason Gunthorpe <jgg@nvidia.com>, Mina Almasry <almasrymina@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
+ Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Matthew Wilcox <willy@infradead.org>, Linux-MM
+	<linux-mm@kvack.org>
+References: <20231113130041.58124-1-linyunsheng@huawei.com>
+ <20231113130041.58124-4-linyunsheng@huawei.com>
+ <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+ <20231113180554.1d1c6b1a@kernel.org>
+ <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+ <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
+ <ZVNzS2EA4zQRwIQ7@nvidia.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
+Date: Wed, 15 Nov 2023 17:21:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <873cd494-dbab-96a6-c6cb-0ee3689f9010@blackwall.org>
+In-Reply-To: <ZVNzS2EA4zQRwIQ7@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-On Mon, Nov 13, 2023 at 11:49:28AM +0200, Nikolay Aleksandrov wrote:
-> > +Bridge sysfs
-> > +------------
-> > +
-> > +All the sysfs parameters are also exported via the bridge netlink API.
+On 2023/11/14 21:16, Jason Gunthorpe wrote:
+> On Tue, Nov 14, 2023 at 04:21:26AM -0800, Mina Almasry wrote:
 > 
-> drop "the" here, all sysfs parameters
+>> Actually because you put the 'strtuct page for devmem' in
+>> skb->bv_frag, the net stack will grab the 'struct page' for devmem
+>> using skb_frag_page() then call things like page_address(), kmap,
+>> get_page, put_page, etc, etc, etc.
 > 
-> > +Here you can find the explanation based on the correspond netlink attributes.
-> 
-> "Here you can find sysfs parameter explanation based on the
-> corresponding  netlink attributes."
-> But where is "Here"? Not sure what you mean.
-> 
+> Yikes, please no. If net has its own struct page look alike it has to
+> stay entirely inside net. A non-mm owned struct page should not be
+> passed into mm calls. It is just way too hacky to be seriously
+> considered :(
 
-How about change it to 
+Yes, that is something this patchset is trying to do, defining its own
+struct page look alike for page pool to support devmem.
 
-All sysfs attributes are also exported via the bridge netlink API.
-You can find each attribute explanation based on the correspond netlink
-attribute.
+struct page for devmem will not be called into the mm subsystem, so most
+of the mm calls is avoided by calling into the devmem memory provider'
+ops instead of calling mm calls.
 
-> > +
-> > +NOTE: the sysfs interface is deprecated and should not be extended if new
-> > +options are added.
-> > +
-> > +.. kernel-doc:: net/bridge/br_sysfs_br.c
-> > +   :doc: The sysfs bridge attrs
+As far as I see for now, only page_ref_count(), page_is_pfmemalloc() and
+PageTail() is called for devmem page, which should be easy to ensure that
+those call for devmem page is consistent with the struct page owned by mm.
+I am not sure if we can use some kind of compile/runtime checking to ensure
+those kinds of consistency?
+
 > 
-> You use "sysfs parameters", here it is "sysfs attrs". Be consistent and
-> use one of them. Drop "the" here.
+>>> I would expect net stack, page pool, driver still see the 'struct page',
+>>> only memory provider see the specific struct for itself, for the above,
+>>> devmem memory provider sees the 'struct page_pool_iov'.
+>>>
+>>> The reason I still expect driver to see the 'struct page' is that driver
+>>> will still need to support normal memory besides devmem.
+> 
+> I wouldn't say this approach is unreasonable, but it does have to be
+> done carefully to isolate the mm. Keeping the struct page in the API
+> is going to make this very hard.
 
-Thanks
-Hangbin
+I would expect that most of the isolation is done in page pool, as far as
+I can see:
+
+1. For control part: the driver may need to tell the page pool which memory
+                     provider it want to use. Or the administrator specifies
+                     which memory provider to use by some netlink-based cmd.
+
+2. For data part: I am thinking that driver should only call page_pool_alloc(),
+                  page_pool_free() and page_pool_get_dma_addr related function.
+
+Of course the driver may need to be aware of that if it can call kmap() or
+page_address() on the page returned from page_pool_alloc(), and maybe tell
+net stack that those pages is not kmap()'able and page_address()'able.
+
+> 
+> Jason
+> .
+> 
 
