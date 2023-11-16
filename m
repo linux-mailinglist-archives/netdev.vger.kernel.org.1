@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-48480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A0A7EE879
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 21:49:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42B747EE881
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 21:50:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533C11C2087E
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 20:49:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47C91F25868
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 20:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484734644F;
-	Thu, 16 Nov 2023 20:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DBC46533;
+	Thu, 16 Nov 2023 20:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H7OxJWrC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="awcFxJrv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A45D49
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 12:48:57 -0800 (PST)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-1e9bb3a0bfeso672210fac.3
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 12:48:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700167737; x=1700772537; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XyLQeO6ktRRdjm4NCHxaev8frUkZMSxDVHmBr9qSRS8=;
-        b=H7OxJWrCR2UmstSBTZPHaS9Et/r/NMPsX5lHlJ7Lf9d9HEQFi7yPhtPvNM4ug1NDsd
-         0GhrEe71HbDGnI+TXRv19ps1982cLbZr+OMYUHGbOsJYqADg12JcL3bbzRy7NFbD+NTw
-         omh1TEYIKFssDqT/vpFYz40+VZed1F1tFf644Lg7VchqGQvek9jDXolyvybQtk0BxMAR
-         0+ouMsq1Vkm4Z4i+l5vKNoWevBz1ljppLL0sLJ4NhHewBgIxP6bidw51nYb/iwRfOyvG
-         uy3nluUoz3BfPbB6vqcxtSNJqpmBsOWtS90QdcnnuxrfrnZrnRUbcM3gTaNugR7HDeRz
-         a1Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700167737; x=1700772537;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XyLQeO6ktRRdjm4NCHxaev8frUkZMSxDVHmBr9qSRS8=;
-        b=N0YgZJxZu2RNYbcHNs+J1HYw288w6t63AW7f0U4GZ/2zB1NFDJRGDYng30ffz6TJeR
-         s9lghKdHsNBTSwC77m/R2OlNcU412LVLMGrtMEQm+DMi9ngDqIpNO+hmZWeihUGlABIn
-         pKbbwHCXfUpZDjTCJQAQi+3PeBhsq/Y+SbDjKtUug6/Y3VrpWKP/thxfj0am8ZO7FZcp
-         rLDRQ+Acs+lQZrwioK16cIKa0JF5UF/WQofI2ZmhlPSy+0rIEmtzvGtFfus4jMPhC7PM
-         4dVwTv+RGXhlYjhZOIHrTR8UO4Ool8ZLK0FeqdUyq1alfZzQynk/MAjgOn7Rrc6x3/V6
-         ybNA==
-X-Gm-Message-State: AOJu0YyvwXTNv9wbXFM+PLacA4X4RvHPSK93j32piBZennGWO6IkfYJV
-	ekf88D+X0tgti3bom5U7GI6prKaL3AY=
-X-Google-Smtp-Source: AGHT+IGL9wnzljRWGtHFd+lnhMgIT3eoZCwIxN8dEi64LBwjwj5NJFPseFA6/hleWoHVVzjBdxrtYw==
-X-Received: by 2002:a05:6870:1d07:b0:1f0:3259:3ec0 with SMTP id pa7-20020a0568701d0700b001f032593ec0mr20379960oab.54.1700167736980;
-        Thu, 16 Nov 2023 12:48:56 -0800 (PST)
-Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
-        by smtp.gmail.com with ESMTPSA id q14-20020ae9e40e000000b0077407e3d68asm80128qkc.111.2023.11.16.12.48.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 12:48:56 -0800 (PST)
-Date: Thu, 16 Nov 2023 15:48:55 -0500
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: bjorn@mork.no, netdev@vger.kernel.org
-Subject: Re: [RFC] usbnet: assign unique random MAC
-Message-ID: <ZVaAN28EeKJeMKPJ@d3>
-References: <20231116140616.4848-1-oneukum@suse.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0973D51
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 12:50:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700167842; x=1731703842;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UCBWxgYOdvDpizYZV7+ud+iHcd1i1ABfkVy5RhbIbI0=;
+  b=awcFxJrvEGT/zk04rFW29JbVlaLtlvV9JH3QNhg+pugoH2KtatUIuBzD
+   1JiLwXgqDHyQd+z/plHrzY0lmr4PhADoTm+Kao2k5BHTf22pm/rVC6e8m
+   b3SxHSkYSKx+qihNybLNg+hzUhrJxBfx5XDgD+3BQkHSgzAIjxN7b0rAZ
+   2KAUv+V8DNQ8HixyYyUCsye6q4GEijgY/wbUQ88+Q5Ptxc0LFhYjAopaG
+   j8qepV17VAM0d5YMDRNLwwydxMDKwmKUa7pmxMgi/dbWgQvwKqfG3fIB6
+   7SQsSTwkamVa/WCfcoyXO7IAf0XWRaqC5d23sQnYHTRw/Rakvg8WGBgNU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="370535843"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="370535843"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 12:50:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="741880404"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="741880404"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 16 Nov 2023 12:50:39 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r3jJt-00023f-0c;
+	Thu, 16 Nov 2023 20:50:37 +0000
+Date: Fri, 17 Nov 2023 04:49:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, Shyam-sundar.S-k@amd.com,
+	Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: Re: [PATCH v2 net-next 4/4] amd-xgbe: use smn functions to avoid race
+Message-ID: <202311170405.t3M3Drrw-lkp@intel.com>
+References: <20231116135416.3371367-5-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,69 +63,284 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231116140616.4848-1-oneukum@suse.com>
+In-Reply-To: <20231116135416.3371367-5-Raju.Rangoju@amd.com>
 
-On 2023-11-16 15:05 +0100, Oliver Neukum wrote:
-> The old method had the bug of issuing the same
-> random MAC over and over even to every device.
-> This bug is as old as the driver.
-> 
-> This new method generates each device whose minidriver
-> does not provide its own MAC its own unique random
-> MAC.
-> 
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
-> ---
->  drivers/net/usb/usbnet.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-> index 2d14b0d78541..37e3bb2170bc 100644
-> --- a/drivers/net/usb/usbnet.c
-> +++ b/drivers/net/usb/usbnet.c
-> @@ -61,9 +61,6 @@
->  
->  /*-------------------------------------------------------------------------*/
->  
-> -// randomly generated ethernet address
-> -static u8	node_id [ETH_ALEN];
-> -
->  /* use ethtool to change the level for any given device */
->  static int msg_level = -1;
->  module_param (msg_level, int, 0);
-> @@ -1731,7 +1728,6 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
->  
->  	dev->net = net;
->  	strscpy(net->name, "usb%d", sizeof(net->name));
-> -	eth_hw_addr_set(net, node_id);
->  
->  	/* rx and tx sides can use different message sizes;
->  	 * bind() should set rx_urb_size in that case.
-> @@ -1805,9 +1801,13 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
->  		goto out4;
->  	}
->  
-> -	/* let userspace know we have a random address */
-> -	if (ether_addr_equal(net->dev_addr, node_id))
-> -		net->addr_assign_type = NET_ADDR_RANDOM;
-> +	/*
-> +	 * if the device does not come with a MAC
+Hi Raju,
 
-The patch's formatting has some problems. Please run checkpatch before
-resubmitting.
+kernel test robot noticed the following build errors:
 
-> +	 * we ask the network core to generate us one
-> +	 * and flag the device accordingly
-> +	 */
-> +	if (!is_valid_ether_addr(net->dev_addr))
-> +			eth_hw_addr_random(net);
+[auto build test ERROR on net-next/main]
 
-Before initialization, dev_addr is null (00:00:00:00:00:00). Since this
-patch moves the fallback address initialization after the 
-	if (info->bind) {
-block, if the bind() did not initialize the address, this patch changes
-the result of the
-		     (net->dev_addr [0] & 0x02) == 0))
-test within the block, no? The test now takes place on an uninitialized
-address and the result goes from false to true.
+url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Rangoju/amd-xgbe-reorganize-the-code-of-XPCS-access/20231116-215630
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231116135416.3371367-5-Raju.Rangoju%40amd.com
+patch subject: [PATCH v2 net-next 4/4] amd-xgbe: use smn functions to avoid race
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20231117/202311170405.t3M3Drrw-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231117/202311170405.t3M3Drrw-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311170405.t3M3Drrw-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/amd/xgbe/xgbe-pci.c: In function 'xgbe_pci_probe':
+>> drivers/net/ethernet/amd/xgbe/xgbe-pci.c:316:17: error: implicit declaration of function 'amd_smn_read' [-Werror=implicit-function-declaration]
+     316 |                 amd_smn_read(0, pdata->smn_base + (pdata->xpcs_window_def_reg), &reg);
+         |                 ^~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+--
+   drivers/net/ethernet/amd/xgbe/xgbe-dev.c: In function 'xgbe_read_mmd_regs_v3':
+>> drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1194:9: error: implicit declaration of function 'amd_smn_write'; did you mean 'pmd_mkwrite'? [-Werror=implicit-function-declaration]
+    1194 |         amd_smn_write(0, (pdata->smn_base + pdata->xpcs_window_sel_reg), index);
+         |         ^~~~~~~~~~~~~
+         |         pmd_mkwrite
+>> drivers/net/ethernet/amd/xgbe/xgbe-dev.c:1195:9: error: implicit declaration of function 'amd_smn_read' [-Werror=implicit-function-declaration]
+    1195 |         amd_smn_read(0, pdata->smn_base + offset, &mmd_data);
+         |         ^~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+
+
+vim +/amd_smn_read +316 drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+
+   211	
+   212	static int xgbe_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+   213	{
+   214		struct xgbe_prv_data *pdata;
+   215		struct device *dev = &pdev->dev;
+   216		void __iomem * const *iomap_table;
+   217		struct pci_dev *rdev;
+   218		unsigned int ma_lo, ma_hi;
+   219		unsigned int reg;
+   220		int bar_mask;
+   221		int ret;
+   222	
+   223		pdata = xgbe_alloc_pdata(dev);
+   224		if (IS_ERR(pdata)) {
+   225			ret = PTR_ERR(pdata);
+   226			goto err_alloc;
+   227		}
+   228	
+   229		pdata->pcidev = pdev;
+   230		pci_set_drvdata(pdev, pdata);
+   231	
+   232		/* Get the version data */
+   233		pdata->vdata = (struct xgbe_version_data *)id->driver_data;
+   234	
+   235		ret = pcim_enable_device(pdev);
+   236		if (ret) {
+   237			dev_err(dev, "pcim_enable_device failed\n");
+   238			goto err_pci_enable;
+   239		}
+   240	
+   241		/* Obtain the mmio areas for the device */
+   242		bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
+   243		ret = pcim_iomap_regions(pdev, bar_mask, XGBE_DRV_NAME);
+   244		if (ret) {
+   245			dev_err(dev, "pcim_iomap_regions failed\n");
+   246			goto err_pci_enable;
+   247		}
+   248	
+   249		iomap_table = pcim_iomap_table(pdev);
+   250		if (!iomap_table) {
+   251			dev_err(dev, "pcim_iomap_table failed\n");
+   252			ret = -ENOMEM;
+   253			goto err_pci_enable;
+   254		}
+   255	
+   256		pdata->xgmac_regs = iomap_table[XGBE_XGMAC_BAR];
+   257		if (!pdata->xgmac_regs) {
+   258			dev_err(dev, "xgmac ioremap failed\n");
+   259			ret = -ENOMEM;
+   260			goto err_pci_enable;
+   261		}
+   262		pdata->xprop_regs = pdata->xgmac_regs + XGBE_MAC_PROP_OFFSET;
+   263		pdata->xi2c_regs = pdata->xgmac_regs + XGBE_I2C_CTRL_OFFSET;
+   264		if (netif_msg_probe(pdata)) {
+   265			dev_dbg(dev, "xgmac_regs = %p\n", pdata->xgmac_regs);
+   266			dev_dbg(dev, "xprop_regs = %p\n", pdata->xprop_regs);
+   267			dev_dbg(dev, "xi2c_regs  = %p\n", pdata->xi2c_regs);
+   268		}
+   269	
+   270		pdata->xpcs_regs = iomap_table[XGBE_XPCS_BAR];
+   271		if (!pdata->xpcs_regs) {
+   272			dev_err(dev, "xpcs ioremap failed\n");
+   273			ret = -ENOMEM;
+   274			goto err_pci_enable;
+   275		}
+   276		if (netif_msg_probe(pdata))
+   277			dev_dbg(dev, "xpcs_regs  = %p\n", pdata->xpcs_regs);
+   278	
+   279		/* Set the PCS indirect addressing definition registers */
+   280		rdev = pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(0, 0));
+   281	
+   282		if (!(rdev && rdev->vendor == PCI_VENDOR_ID_AMD))
+   283			goto err_pci_enable;
+   284	
+   285		switch (rdev->device) {
+   286		case 0x15d0:
+   287			pdata->xpcs_window_def_reg = PCS_V2_RV_WINDOW_DEF;
+   288			pdata->xpcs_window_sel_reg = PCS_V2_RV_WINDOW_SELECT;
+   289			break;
+   290		case 0x14b5:
+   291			pdata->xpcs_window_def_reg = PCS_V2_YC_WINDOW_DEF;
+   292			pdata->xpcs_window_sel_reg = PCS_V2_YC_WINDOW_SELECT;
+   293	
+   294			/* Yellow Carp devices do not need cdr workaround */
+   295			pdata->vdata->an_cdr_workaround = 0;
+   296	
+   297			/* Yellow Carp devices do not need rrc */
+   298			pdata->vdata->enable_rrc = 0;
+   299			break;
+   300		case 0x1630:
+   301			pdata->xpcs_window_def_reg = PCS_V2_RN_WINDOW_DEF;
+   302			pdata->xpcs_window_sel_reg = PCS_V2_RN_WINDOW_SELECT;
+   303			break;
+   304		default:
+   305			pdata->xpcs_window_def_reg = PCS_V2_WINDOW_DEF;
+   306			pdata->xpcs_window_sel_reg = PCS_V2_WINDOW_SELECT;
+   307			break;
+   308		}
+   309		pci_dev_put(rdev);
+   310	
+   311		/* Configure the PCS indirect addressing support */
+   312		if (pdata->vdata->xpcs_access == XGBE_XPCS_ACCESS_V3) {
+   313			reg = XP_IOREAD(pdata, XP_PROP_0);
+   314			pdata->smn_base = PCS_RN_SMN_BASE_ADDR +
+   315					  (PCS_RN_PORT_ADDR_SIZE * XP_GET_BITS(reg, XP_PROP_0, PORT_ID));
+ > 316			amd_smn_read(0, pdata->smn_base + (pdata->xpcs_window_def_reg), &reg);
+   317		} else {
+   318			reg = XPCS32_IOREAD(pdata, pdata->xpcs_window_def_reg);
+   319		}
+   320	
+   321		pdata->xpcs_window = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, OFFSET);
+   322		pdata->xpcs_window <<= 6;
+   323		pdata->xpcs_window_size = XPCS_GET_BITS(reg, PCS_V2_WINDOW_DEF, SIZE);
+   324		pdata->xpcs_window_size = 1 << (pdata->xpcs_window_size + 7);
+   325		pdata->xpcs_window_mask = pdata->xpcs_window_size - 1;
+   326		if (netif_msg_probe(pdata)) {
+   327			dev_dbg(dev, "xpcs window def  = %#010x\n",
+   328				pdata->xpcs_window_def_reg);
+   329			dev_dbg(dev, "xpcs window sel  = %#010x\n",
+   330				pdata->xpcs_window_sel_reg);
+   331			dev_dbg(dev, "xpcs window      = %#010x\n",
+   332				pdata->xpcs_window);
+   333			dev_dbg(dev, "xpcs window size = %#010x\n",
+   334				pdata->xpcs_window_size);
+   335			dev_dbg(dev, "xpcs window mask = %#010x\n",
+   336				pdata->xpcs_window_mask);
+   337		}
+   338	
+   339		pci_set_master(pdev);
+   340	
+   341		/* Enable all interrupts in the hardware */
+   342		XP_IOWRITE(pdata, XP_INT_EN, 0x1fffff);
+   343	
+   344		/* Retrieve the MAC address */
+   345		ma_lo = XP_IOREAD(pdata, XP_MAC_ADDR_LO);
+   346		ma_hi = XP_IOREAD(pdata, XP_MAC_ADDR_HI);
+   347		pdata->mac_addr[0] = ma_lo & 0xff;
+   348		pdata->mac_addr[1] = (ma_lo >> 8) & 0xff;
+   349		pdata->mac_addr[2] = (ma_lo >> 16) & 0xff;
+   350		pdata->mac_addr[3] = (ma_lo >> 24) & 0xff;
+   351		pdata->mac_addr[4] = ma_hi & 0xff;
+   352		pdata->mac_addr[5] = (ma_hi >> 8) & 0xff;
+   353		if (!XP_GET_BITS(ma_hi, XP_MAC_ADDR_HI, VALID) ||
+   354		    !is_valid_ether_addr(pdata->mac_addr)) {
+   355			dev_err(dev, "invalid mac address\n");
+   356			ret = -EINVAL;
+   357			goto err_pci_enable;
+   358		}
+   359	
+   360		/* Clock settings */
+   361		pdata->sysclk_rate = XGBE_V2_DMA_CLOCK_FREQ;
+   362		pdata->ptpclk_rate = XGBE_V2_PTP_CLOCK_FREQ;
+   363	
+   364		/* Set the DMA coherency values */
+   365		pdata->coherent = 1;
+   366		pdata->arcr = XGBE_DMA_PCI_ARCR;
+   367		pdata->awcr = XGBE_DMA_PCI_AWCR;
+   368		pdata->awarcr = XGBE_DMA_PCI_AWARCR;
+   369	
+   370		/* Read the port property registers */
+   371		pdata->pp0 = XP_IOREAD(pdata, XP_PROP_0);
+   372		pdata->pp1 = XP_IOREAD(pdata, XP_PROP_1);
+   373		pdata->pp2 = XP_IOREAD(pdata, XP_PROP_2);
+   374		pdata->pp3 = XP_IOREAD(pdata, XP_PROP_3);
+   375		pdata->pp4 = XP_IOREAD(pdata, XP_PROP_4);
+   376		if (netif_msg_probe(pdata)) {
+   377			dev_dbg(dev, "port property 0 = %#010x\n", pdata->pp0);
+   378			dev_dbg(dev, "port property 1 = %#010x\n", pdata->pp1);
+   379			dev_dbg(dev, "port property 2 = %#010x\n", pdata->pp2);
+   380			dev_dbg(dev, "port property 3 = %#010x\n", pdata->pp3);
+   381			dev_dbg(dev, "port property 4 = %#010x\n", pdata->pp4);
+   382		}
+   383	
+   384		/* Set the maximum channels and queues */
+   385		pdata->tx_max_channel_count = XP_GET_BITS(pdata->pp1, XP_PROP_1,
+   386							  MAX_TX_DMA);
+   387		pdata->rx_max_channel_count = XP_GET_BITS(pdata->pp1, XP_PROP_1,
+   388							  MAX_RX_DMA);
+   389		pdata->tx_max_q_count = XP_GET_BITS(pdata->pp1, XP_PROP_1,
+   390						    MAX_TX_QUEUES);
+   391		pdata->rx_max_q_count = XP_GET_BITS(pdata->pp1, XP_PROP_1,
+   392						    MAX_RX_QUEUES);
+   393		if (netif_msg_probe(pdata)) {
+   394			dev_dbg(dev, "max tx/rx channel count = %u/%u\n",
+   395				pdata->tx_max_channel_count,
+   396				pdata->rx_max_channel_count);
+   397			dev_dbg(dev, "max tx/rx hw queue count = %u/%u\n",
+   398				pdata->tx_max_q_count, pdata->rx_max_q_count);
+   399		}
+   400	
+   401		/* Set the hardware channel and queue counts */
+   402		xgbe_set_counts(pdata);
+   403	
+   404		/* Set the maximum fifo amounts */
+   405		pdata->tx_max_fifo_size = XP_GET_BITS(pdata->pp2, XP_PROP_2,
+   406						      TX_FIFO_SIZE);
+   407		pdata->tx_max_fifo_size *= 16384;
+   408		pdata->tx_max_fifo_size = min(pdata->tx_max_fifo_size,
+   409					      pdata->vdata->tx_max_fifo_size);
+   410		pdata->rx_max_fifo_size = XP_GET_BITS(pdata->pp2, XP_PROP_2,
+   411						      RX_FIFO_SIZE);
+   412		pdata->rx_max_fifo_size *= 16384;
+   413		pdata->rx_max_fifo_size = min(pdata->rx_max_fifo_size,
+   414					      pdata->vdata->rx_max_fifo_size);
+   415		if (netif_msg_probe(pdata))
+   416			dev_dbg(dev, "max tx/rx max fifo size = %u/%u\n",
+   417				pdata->tx_max_fifo_size, pdata->rx_max_fifo_size);
+   418	
+   419		/* Configure interrupt support */
+   420		ret = xgbe_config_irqs(pdata);
+   421		if (ret)
+   422			goto err_pci_enable;
+   423	
+   424		/* Configure the netdev resource */
+   425		ret = xgbe_config_netdev(pdata);
+   426		if (ret)
+   427			goto err_irq_vectors;
+   428	
+   429		netdev_notice(pdata->netdev, "net device enabled\n");
+   430	
+   431		return 0;
+   432	
+   433	err_irq_vectors:
+   434		pci_free_irq_vectors(pdata->pcidev);
+   435	
+   436	err_pci_enable:
+   437		xgbe_free_pdata(pdata);
+   438	
+   439	err_alloc:
+   440		dev_notice(dev, "net device not enabled\n");
+   441	
+   442		return ret;
+   443	}
+   444	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
