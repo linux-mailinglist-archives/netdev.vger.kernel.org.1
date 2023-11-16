@@ -1,287 +1,117 @@
-Return-Path: <netdev+bounces-48445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 734C57EE57E
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:49:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E52BF7EE597
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:56:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C2C61C20BC2
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DE1B280FFB
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25CD941A9A;
-	Thu, 16 Nov 2023 16:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A9A34560;
+	Thu, 16 Nov 2023 16:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZEnTi0/F"
+	dkim=pass (1024-bit key) header.d=siddh.me header.i=code@siddh.me header.b="nLGtAtR+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0B7D6C
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:39 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9dbb3e0ff65so149822766b.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700153318; x=1700758118; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NA/ZFK3xawEcyb9omOiGWO1jMML/5COVB0SorPJoKYQ=;
-        b=ZEnTi0/F9hSJOqSUWS3399Un4b848iOxxSJs0fYFs1qka8cvU4KS23p8HS11Zthg3R
-         2w0n6c6rSgS8+yhhhoGRwgaMY5TaVNHU27qwwFlGuMiOu82g1Rn75BXkD26Pqr0IsIyO
-         M5i0KWZDjO3hcc8aKYZSwpEzdytDtKVLPmuI73r+D3CA3vwbrB+5xevwqeklGaRMo7Dd
-         l/XtTvNU1QPqxzx92IuTOmt/K6OQiYmBwVHxUbvTuZzrf5mswt51TwCLi2lPW/dPJbw5
-         oM1VQkWqAPjN+g9tfAIA4nnIrxQeDiH6PMeCk5nF7HmbpDR8zosaaRVS4HfiXpFmX4Jk
-         rIRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700153318; x=1700758118;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NA/ZFK3xawEcyb9omOiGWO1jMML/5COVB0SorPJoKYQ=;
-        b=dlSR2Gbn2SJSPYxcjyXiDTcFTPkM0KKYZcKvw/bpR05pgbcps68XoGDzQCwiUbLqsa
-         c1xwYMmB0C0Q+W5z3NYGMvIt3lFrHI0TPHngUx6G2wJQLUfC90vsLU+oBCgBSEMPDNeD
-         /aeo5iH6I46X3cfjNGN5S09Hqws3ZFO7mdnbAPU1EJKo5x18n/BuKhFkpZy6MrVKSaId
-         6G0jyRVJc2X0C7rnYAJZW0H4sInSBrHfMRTT8uNu1MZomB82a4U/oLTXBErO9+u1OAwV
-         kVmBlcfbnUygTz8gHLDb0FMi+K8CqrXUQgkSmLR+io/wpUhOePBWDxnM5MShVOxPAq31
-         5MWA==
-X-Gm-Message-State: AOJu0Yx+Cm3qSYKAZsipNxvdvNzJKjXYR7+ThjiWtWnclqGqviGZCwQ+
-	7KVLHOWI02bc7b9aLMKbgCdCGIAqVxK87GNpbMU=
-X-Google-Smtp-Source: AGHT+IE2+tshUJwqRFdoRAMbc5rlHSkGXsilK3xu2cgSsXqU0GtijYzBqfY/5DU3nA7XMJmnySWSow==
-X-Received: by 2002:a17:907:3608:b0:9de:32bb:faab with SMTP id bk8-20020a170907360800b009de32bbfaabmr15484082ejc.32.1700153318210;
-        Thu, 16 Nov 2023 08:48:38 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id lt7-20020a170906fa8700b009a1a5a7ebacsm8542177ejb.201.2023.11.16.08.48.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 08:48:37 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	jacob.e.keller@intel.com,
-	jhs@mojatatu.com,
-	johannes@sipsolutions.net,
-	andriy.shevchenko@linux.intel.com,
-	amritha.nambiar@intel.com,
-	sdf@google.com
-Subject: [patch net-next v2 9/9] devlink: extend multicast filtering by port index
-Date: Thu, 16 Nov 2023 17:48:21 +0100
-Message-ID: <20231116164822.427485-10-jiri@resnulli.us>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231116164822.427485-1-jiri@resnulli.us>
-References: <20231116164822.427485-1-jiri@resnulli.us>
+Received: from sender-of-o51.zoho.in (sender-of-o51.zoho.in [103.117.158.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E260B7;
+	Thu, 16 Nov 2023 08:56:27 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; t=1700153758; cv=none; 
+	d=zohomail.in; s=zohoarc; 
+	b=EBFhDQIZ/ojh3iwmVoYLmu7j2lhkfgvGQv9g8VbQOyDP8pjX3ABO3FIHvg6AU30KenHhm408h83yuPNpred96gJF6b1/h7SD/V5IxR13eqQ8WJPhuRiLoM/e05HKFWFXRn9GCUt/e4eRHayqlEQrjnHTZ6WW+fWCzqG+Obhf2fc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+	t=1700153758; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=jF/VM6Ul6I5Q3qO6v36yzMs2LjPy0A7+pMrSCdzjPQY=; 
+	b=AB3UXrOjOulybkeopPnvgv3loT6r3KVqRSVaR3zKKzn81GlY47m9WfREfwcSrexzlR7GUgkFRTBAdrJg7H0CP1a+jeXK+UmOIbbMgbk5LMHteH7u6anTb7tH8b7n9nHs4tp2mZzpvTO1pue+JbB2d823l3fI4367i9o+hesqcXQ=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+	dkim=pass  header.i=siddh.me;
+	spf=pass  smtp.mailfrom=code@siddh.me;
+	dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1700153758;
+	s=zmail; d=siddh.me; i=code@siddh.me;
+	h=Message-ID:Date:Date:MIME-Version:To:To:Cc:Cc:References:Subject:Subject:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=jF/VM6Ul6I5Q3qO6v36yzMs2LjPy0A7+pMrSCdzjPQY=;
+	b=nLGtAtR+WeGYnQeiqkfbAOojEyOxm/e/JnJYKgiTDy41u2VEIe7A5mof6QZAYnJz
+	oewTIoT+OPoeJiJx5MaoXMP79eOh8nautjXS+TIt0Coir96wAIgiZd2EbzBJK/vAKDI
+	x0NADcOS1IAzj1yyI4/m/c55+PKlTyN73/Rc3mxA=
+Received: from [192.168.1.11] (106.201.112.144 [106.201.112.144]) by mx.zoho.in
+	with SMTPS id 170015375587354.15308217634913; Thu, 16 Nov 2023 22:25:55 +0530 (IST)
+Message-ID: <7824cf85-178f-4fca-8058-b9a1f49d3113@siddh.me>
+Date: Thu, 16 Nov 2023 22:25:53 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
+References: <000000000000cb112e0609b419d3@google.com>
+Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
+ nfc_alloc_send_skb
+Content-Language: en-US, en-GB, hi-IN
+From: Siddh Raman Pant <code@siddh.me>
+In-Reply-To: <000000000000cb112e0609b419d3@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-From: Jiri Pirko <jiri@nvidia.com>
+TLDR: Different stages of 1 and 2 can race with each other causing UAF.
 
-Expose the previously introduced notification multicast messages
-filtering infrastructure and allow the user to select messages using
-port index.
+1. llcp_sock_sendmsg -> nfc_llcp_send_ui_frame -> loop call (nfc_alloc_send_skb(nfc_dev))
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+2. virtual_ncidev_close -> [... -> nfc_llcp_socket_release -> ...] -> [... -> nfc_free_device]
+
 ---
- Documentation/netlink/specs/devlink.yaml |  1 +
- net/devlink/devl_internal.h              |  9 +++++++++
- net/devlink/health.c                     |  6 +++++-
- net/devlink/netlink.c                    | 10 +++++++++-
- net/devlink/netlink_gen.c                |  5 +++--
- net/devlink/port.c                       |  5 ++++-
- tools/net/ynl/generated/devlink-user.c   |  2 ++
- tools/net/ynl/generated/devlink-user.h   |  9 +++++++++
- 8 files changed, 42 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index cc4991cbce83..49d4fbf3fe44 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -2065,3 +2065,4 @@ operations:
-           attributes:
-             - bus-name
-             - dev-name
-+            - port-index
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 0ee0bcdd4a7d..3ed7808013f1 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -181,6 +181,8 @@ static inline bool devlink_nl_notify_need(struct devlink *devlink)
- struct devlink_obj_desc {
- 	const char *bus_name;
- 	const char *dev_name;
-+	unsigned int port_index;
-+	bool port_index_valid;
- 	long data[];
- };
- 
-@@ -192,6 +194,13 @@ static inline void devlink_nl_obj_desc_init(struct devlink_obj_desc *desc,
- 	desc->dev_name = dev_name(devlink->dev);
- }
- 
-+static inline void devlink_nl_obj_desc_port_set(struct devlink_obj_desc *desc,
-+						struct devlink_port *devlink_port)
-+{
-+	desc->port_index = devlink_port->index;
-+	desc->port_index_valid = true;
-+}
-+
- int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data);
- 
- static inline void devlink_nl_notify_send_desc(struct devlink *devlink,
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index 2f06e4ddbf3b..0e96d26203f1 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -490,6 +490,7 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
- 				   enum devlink_command cmd)
- {
- 	struct devlink *devlink = reporter->devlink;
-+	struct devlink_obj_desc desc;
- 	struct sk_buff *msg;
- 	int err;
- 
-@@ -509,7 +510,10 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
- 		return;
- 	}
- 
--	devlink_nl_notify_send(devlink, msg);
-+	devlink_nl_obj_desc_init(&desc, devlink);
-+	if (reporter->devlink_port)
-+		devlink_nl_obj_desc_port_set(&desc, reporter->devlink_port);
-+	devlink_nl_notify_send_desc(devlink, msg, &desc);
- }
- 
- void
-diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
-index 738e2f340ab9..6c033d1f7e64 100644
---- a/net/devlink/netlink.c
-+++ b/net/devlink/netlink.c
-@@ -46,11 +46,16 @@ int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
- 		flt->dev_name = pos;
- 	}
- 
-+	if (attrs[DEVLINK_ATTR_PORT_INDEX]) {
-+		flt->port_index = nla_get_u32(attrs[DEVLINK_ATTR_PORT_INDEX]);
-+		flt->port_index_valid = true;
-+	}
-+
- 	/* Free the existing filter if any. */
- 	kfree(sk->sk_user_data);
- 
- 	/* Don't attach empty filter. */
--	if (!flt->bus_name && !flt->dev_name) {
-+	if (!flt->bus_name && !flt->dev_name && !flt->port_index_valid) {
- 		kfree(flt);
- 		flt = NULL;
- 	}
-@@ -68,6 +73,9 @@ static bool devlink_obj_desc_match(const struct devlink_obj_desc *desc,
- 	if (desc->dev_name && flt->dev_name &&
- 	    strcmp(desc->dev_name, flt->dev_name))
- 		return false;
-+	if (desc->port_index_valid && flt->port_index_valid &&
-+	    desc->port_index != flt->port_index)
-+		return false;
- 	return true;
- }
- 
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index f207f3fc7e20..b3f37e3c1b64 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -561,9 +561,10 @@ static const struct nla_policy devlink_selftests_run_nl_policy[DEVLINK_ATTR_SELF
- };
- 
- /* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
--static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
-+static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_PORT_INDEX + 1] = {
- 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
-+	[DEVLINK_ATTR_PORT_INDEX] = { .type = NLA_U32, },
- };
- 
- /* Ops table for devlink */
-@@ -1243,7 +1244,7 @@ const struct genl_split_ops devlink_nl_ops[74] = {
- 		.cmd		= DEVLINK_CMD_NOTIFY_FILTER_SET,
- 		.doit		= devlink_nl_notify_filter_set_doit,
- 		.policy		= devlink_notify_filter_set_nl_policy,
--		.maxattr	= DEVLINK_ATTR_DEV_NAME,
-+		.maxattr	= DEVLINK_ATTR_PORT_INDEX,
- 		.flags		= GENL_CMD_CAP_DO,
- 	},
- };
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 758df3000a1b..62e54e152ecf 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -507,6 +507,7 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
- 				enum devlink_command cmd)
- {
- 	struct devlink *devlink = devlink_port->devlink;
-+	struct devlink_obj_desc desc;
- 	struct sk_buff *msg;
- 	int err;
- 
-@@ -525,7 +526,9 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
- 		return;
- 	}
- 
--	devlink_nl_notify_send(devlink, msg);
-+	devlink_nl_obj_desc_init(&desc, devlink);
-+	devlink_nl_obj_desc_port_set(&desc, devlink_port);
-+	devlink_nl_notify_send_desc(devlink, msg, &desc);
- }
- 
- static void devlink_ports_notify(struct devlink *devlink,
-diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
-index cd5f70eadf5b..86392da0b52c 100644
---- a/tools/net/ynl/generated/devlink-user.c
-+++ b/tools/net/ynl/generated/devlink-user.c
-@@ -6853,6 +6853,8 @@ int devlink_notify_filter_set(struct ynl_sock *ys,
- 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
- 	if (req->_present.dev_name_len)
- 		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
-+	if (req->_present.port_index)
-+		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PORT_INDEX, req->port_index);
- 
- 	err = ynl_exec(ys, nlh, NULL);
- 	if (err < 0)
-diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
-index e5d79b824a67..b96837663e6e 100644
---- a/tools/net/ynl/generated/devlink-user.h
-+++ b/tools/net/ynl/generated/devlink-user.h
-@@ -5258,10 +5258,12 @@ struct devlink_notify_filter_set_req {
- 	struct {
- 		__u32 bus_name_len;
- 		__u32 dev_name_len;
-+		__u32 port_index:1;
- 	} _present;
- 
- 	char *bus_name;
- 	char *dev_name;
-+	__u32 port_index;
- };
- 
- static inline struct devlink_notify_filter_set_req *
-@@ -5292,6 +5294,13 @@ devlink_notify_filter_set_req_set_dev_name(struct devlink_notify_filter_set_req
- 	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
- 	req->dev_name[req->_present.dev_name_len] = 0;
- }
-+static inline void
-+devlink_notify_filter_set_req_set_port_index(struct devlink_notify_filter_set_req *req,
-+					     __u32 port_index)
-+{
-+	req->_present.port_index = 1;
-+	req->port_index = port_index;
-+}
- 
- /*
-  * Set notification messages socket filter.
--- 
-2.41.0
+Hi,
 
+I've been trying to fix this bug for some time but ending up getting
+stuck every now and then. If someone could give more inputs or fix it,
+it will be really helpful.
+
+This bug is due to racing between sendmsg and freeing of nfc_dev.
+
+For connectionless transmission, llcp_sock_sendmsg() codepath will
+eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
+an argument for calculating the total size for skb allocation.
+
+virtual_ncidev_close() codepath eventually releases socket by calling
+nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
+and afterwards the nfc_dev will be eventually freed.
+
+When an ndev gets freed, llcp_sock_sendmsg() will result in an
+use-after-free as it
+
+(1) doesn't have any checks in place for avoiding the datagram sending.
+	(1.1) Checking for LLCP_CLOSED in llcp_sock_sendmsg() does make
+	      the racing less likely. For -smp 6 it did not trigger on
+	      my PC, leading me to naively think that was the solution
+	      until syzbot told me quite some time later that it isn't.
+
+(2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop which
+    can race with freeing (a msg with size of 4096 is sent in chunks of
+    128 in this repro).
+	(2.1) By this I mean just moving the nfc_dev access from
+	      nfc_alloc_send_skb to inside this function, be it
+	      inside or outside the loop, naturally doesn't work.
+
+When an nfc_dev is freed and we happened to get headroom and tailroom,
+PDU skb seems to be not allocated and ENXIO is returned.
+
+I tried to look at other code in net subsystem to get an idea how other
+places handle it, but accessing device later in the codepath does not
+seem to not be a norm. So I am starting to think some refactoring of the
+locking logic may be needed (or maybe RCU protect headroom and tailroom?).
+
+I don't know if I'm correct, but anyways where does one start?
+
+Thanks,
+Siddh
 
