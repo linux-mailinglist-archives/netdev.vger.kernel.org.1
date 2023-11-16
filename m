@@ -1,118 +1,130 @@
-Return-Path: <netdev+bounces-48296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E7D7EDF9B
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:23:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E157EDFA9
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:25:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B042280EF7
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:23:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44E0F280FEF
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9483D2E3F8;
-	Thu, 16 Nov 2023 11:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA492E413;
+	Thu, 16 Nov 2023 11:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lokva/9Z"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="R6BA0qW0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D545FC2
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:23:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700133823;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Brvh1BhIJ8KXHLR0fDM4ZkBOA834wM7cVUNTZ+vSCKA=;
-	b=Lokva/9ZH4ZfF1ZzCc6TFdMJM9meCRIPvBu9RvIBxS6H3KFyGIEgaGOmRJFfeMDSDp6s2Y
-	Bnsv02MkDLYV2o956NaHXQWstrXGhCaiGK84OkRaQD6TeVk7gMpm8NFX3sVR73DVjtTTnO
-	gCdSJbjXZzUwe0jZi2kdwUZQAwrddCU=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-EUksorlBN523OhuBhVf80g-1; Thu, 16 Nov 2023 06:23:42 -0500
-X-MC-Unique: EUksorlBN523OhuBhVf80g-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-66d7b75c854so1802166d6.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:23:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700133822; x=1700738622;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Brvh1BhIJ8KXHLR0fDM4ZkBOA834wM7cVUNTZ+vSCKA=;
-        b=vN/Ava2hQw5pJPEx3F5O3iQ+NegrvAm/DPDGNZ8Q7D0vfXpc3IYBW5ARcHmuhdZ5vZ
-         9Nww3MQQPSmyNycs495nkCFXLvTDlrGPHeeEYoj/Fss3xStjGvGL0W7lbIjXdXu8JQN8
-         vLrQMiL3BbBdHeyZyU0sxZpLIhgQwCkejVKyr4vGbvOliy2lAjkrp3ZAeWyIkeQmjo/j
-         /C3heOmTG4k2L39mEHvSekOPc0lT5Fu3aChp+P0xTp1ebkiDjzeWDAwJ4TQxOnWxjiLJ
-         kH4yEj/yF/KTPOLfPda8VaYf05PfLrYiBpnQ82dpSFtJwPU3yGs+Pbau65yAOZfVS/mF
-         doZg==
-X-Gm-Message-State: AOJu0Yw+BdRZqe34t6JnFESq1+17hBWIKJv6mrKC59fZmZ6Vkio99evE
-	iotuqsHAJLVPxsitPKBRlIUtOyCGr71//cMhABOayifscGnh2lmyNjUF9Di1yJBjcbnNhMDyFb4
-	0KeKrHHYthyqgIPOV7mbdXJuC
-X-Received: by 2002:a05:6214:4943:b0:66d:169a:a661 with SMTP id pe3-20020a056214494300b0066d169aa661mr8516429qvb.4.1700133821989;
-        Thu, 16 Nov 2023 03:23:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGoAyGrYwumHGr29A3fDD3Q+4eI4+1J9vhfHO2t8qPo9z83ClD9DEtrZfiEqtQNu893kZgNSg==
-X-Received: by 2002:a05:6214:4943:b0:66d:169a:a661 with SMTP id pe3-20020a056214494300b0066d169aa661mr8516415qvb.4.1700133821618;
-        Thu, 16 Nov 2023 03:23:41 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-98-67.dyn.eolo.it. [146.241.98.67])
-        by smtp.gmail.com with ESMTPSA id l16-20020ad44d10000000b00656e2464719sm1305025qvl.92.2023.11.16.03.23.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 03:23:41 -0800 (PST)
-Message-ID: <ef465a6bde6c2845e7e2537c12efbab9a6fb5157.camel@redhat.com>
-Subject: Re: [PATCH net-next v2 2/2] net: stmmac: reduce dma ring display
- code duplication
-From: Paolo Abeni <pabeni@redhat.com>
-To: Baruch Siach <baruch@tkos.co.il>, Alexandre Torgue
-	 <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org
-Date: Thu, 16 Nov 2023 12:23:38 +0100
-In-Reply-To: <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
-References: 
-	<8e3121170d479cbe095f985e01fc5e0386f2afff.1699945390.git.baruch@tkos.co.il>
-	 <27ad91b102bf9555e61bb1013672c2bc558e97b9.1699945390.git.baruch@tkos.co.il>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62118E0;
+	Thu, 16 Nov 2023 03:25:16 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGAXI6r013372;
+	Thu, 16 Nov 2023 11:25:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=/ooACc8jx1rN0v4nvJOZ7IzOnyVXEda+38RURk8IomU=;
+ b=R6BA0qW0nJkOzOhEeQT+qN8L081L5SybyzNjRHxbOICd/LTL4p6yKrRiSlVIZT/T4U5D
+ goCVMXREhugTlBA1+ro+lGrrhxg2QKJnhXpQvdWq4qyJSzzRL/GJUwPNXph0LYmBDtEu
+ cX3DEFkzD3r+sINMyndwkoTpJI+AF64k7Ac5+bJvlq19xnzMPL2OFOQShG5w0zQfRovn
+ gQG4O4HZ6nPYR5kWg3zedj2Ifr35JScftY3LXWLvOd0iwGxQzV/iB6iz20srICSkjEey
+ nE2gqE5gEm5mqikeTZcIp9Ut1bCqrNAjk2qHojhNhkLRTUTtU2ePorQH2Cf5JSHj+8WB qg== 
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3udhe1r32j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 11:25:02 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AGBP1x9015792
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 11:25:01 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Thu, 16 Nov 2023 03:24:57 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+Subject: [PATCH v4 0/6] add qca8084 ethernet phy driver
+Date: Thu, 16 Nov 2023 19:24:31 +0800
+Message-ID: <20231116112437.10578-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 8MM2JxxeT1WhJHQQMKpWI28DIDtTpXuX
+X-Proofpoint-ORIG-GUID: 8MM2JxxeT1WhJHQQMKpWI28DIDtTpXuX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_09,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 bulkscore=0 mlxlogscore=661
+ clxscore=1015 impostorscore=0 lowpriorityscore=0 mlxscore=0 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311160091
 
-On Tue, 2023-11-14 at 09:03 +0200, Baruch Siach wrote:
-> The code to show extended descriptor is identical to normal one.
-> Consolidate the code to remove duplication.
->=20
-> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
-> ---
-> v2: Fix extended descriptor case, and properly test both cases
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 25 +++++++------------
->  1 file changed, 9 insertions(+), 16 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/=
-net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 39336fe5e89d..cf818a2bc9d5 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -6182,26 +6182,19 @@ static void sysfs_display_ring(void *head, int si=
-ze, int extend_desc,
->  	int i;
->  	struct dma_extended_desc *ep =3D (struct dma_extended_desc *)head;
->  	struct dma_desc *p =3D (struct dma_desc *)head;
-> +	unsigned long desc_size =3D extend_desc ? sizeof(*ep) : sizeof(*p);
->  	dma_addr_t dma_addr;
+QCA8084 is four-port PHY with maximum link capability 2.5G,
+which supports the interface mode qusgmii and sgmii mode,
+there are two PCSs available to connected with ethernet port.
 
-Since this is a cleanup refactor, please reorganize the variables
-declarations to respect the reverse xmas tree order.
+QCA8084 can work in switch mode or PHY mode.
+For switch mode, both PCS0 and PCS1 work on sgmii mode.
+For PHY mode, PCS1 works on qusgmii mode, the last port
+(the fourth port) works on sgmii mode.
 
-WRT the ternary operator at initialization time, I also feel it should
-be better move it out of the declaration.
+Besides this PHY driver patches, the PCS driver is also needed
+to bring up the qca8084 device, which mainly configurs PCS
+and clocks.
 
-Cheers,
+Changes in v3:
+	* pick the two patches to introduce the interface mode
+	  10g-qxgmii from Vladimir Oltean(olteanv@gmail.com).
+	* add the function phydev_id_is_qca808x to identify the
+	  PHY qca8081 and qca8084.
+	* update the interface mode name PHY_INTERFACE_MODE_QUSGMII
+	  to PHY_INTERFACE_MODE_10G_QXGMII.
 
-Paolo
+Changes in v4:
+	* remove the following patch:
+	  <net: phylink: move phylink_pcs_neg_mode() to phylink.c>.
+	* split out 10g_qxgmii change of ethernet-controller.yaml.
+
+Luo Jie (5):
+  dt-bindings: net: ethernet-controller: add 10g-qxgmii mode
+  net: phy: at803x: add QCA8084 ethernet phy support
+  net: phy: at803x: add the function phydev_id_is_qca808x
+  net: phy: at803x: Add qca8084_config_init function
+  net: phy: qca8084: add qca8084_link_change_notify
+
+Vladimir Oltean (1):
+  net: phy: introduce core support for phy-mode = "10g-qxgmii"
+
+ .../bindings/net/ethernet-controller.yaml     |   1 +
+ Documentation/networking/phy.rst              |   6 +
+ drivers/net/phy/at803x.c                      | 130 +++++++++++++++++-
+ drivers/net/phy/phy-core.c                    |   1 +
+ drivers/net/phy/phylink.c                     |  11 +-
+ include/linux/phy.h                           |   4 +
+ include/linux/phylink.h                       |   2 +
+ 7 files changed, 147 insertions(+), 8 deletions(-)
+
+
+base-commit: f31817cbcf48d191faee7cebfb59197d2048cd64
+-- 
+2.42.0
 
 
