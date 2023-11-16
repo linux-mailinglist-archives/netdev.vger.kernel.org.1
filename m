@@ -1,87 +1,62 @@
-Return-Path: <netdev+bounces-48242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6602F7EDB7B
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 07:18:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C7E7EDB98
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 07:35:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00C1AB209DD
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 06:18:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59D35280F74
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 06:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2093211A;
-	Thu, 16 Nov 2023 06:18:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE218FC00;
+	Thu, 16 Nov 2023 06:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfzDTwae"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5108519F;
-	Wed, 15 Nov 2023 22:18:14 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=dust.li@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VwV9lei_1700115491;
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0VwV9lei_1700115491)
-          by smtp.aliyun-inc.com;
-          Thu, 16 Nov 2023 14:18:12 +0800
-Date: Thu, 16 Nov 2023 14:18:11 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Li RongQing <lirongqing@baidu.com>, wenjia@linux.ibm.co,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in the
- tx path when possible
-Message-ID: <20231116061811.GC121324@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20231116022041.51959-1-lirongqing@baidu.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32BDFBFA
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 06:35:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F419CC433C8;
+	Thu, 16 Nov 2023 06:35:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700116543;
+	bh=v69CuXVoE5R2qnzAizfMmufeV7uCr6kk8MAEC8MSm0s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qfzDTwaezedcLRffdKZ89SpQ7W3A7uRR49ec/zgTuaH5H7ZQNRaZX0qVdyvwag6Lh
+	 mjLtDmyolB1QoTXwbPMME3m898P4bU1Yg2kSPgjVJtCT7KM0IKXfuLpP/d2p01VnG2
+	 Fr5xAKOuRngkM6bbtZHb7NkA3cB/MHoAi/wc+pfJH8ED76FUrGoWrDZJpoJGEL3NiK
+	 UhhACqi1haL+3QZDV7V5/cvBfPeeTSph25JGZbqHOk3QoNKUhyYl8qabWlcqiIrau6
+	 9MwL9+AR9c5DevM1O8gIv/CKlvfS4vaOXr6u/nemNFevl4oj70Hj3fN3i4KU/Z831L
+	 2z2fW8G8TcnRw==
+Date: Thu, 16 Nov 2023 01:35:40 -0500
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, Dust Li <dust.li@linux.alibaba.com>, Cruz Zhao
+ <cruzzhao@linux.alibaba.com>, Tianchen Ding <dtcccc@linux.alibaba.com>,
+ Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [net V2 05/15] net/mlx5e: fix double free of encap_header
+Message-ID: <20231116013540.3296775c@kernel.org>
+In-Reply-To: <20231114215846.5902-6-saeed@kernel.org>
+References: <20231114215846.5902-1-saeed@kernel.org>
+	<20231114215846.5902-6-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116022041.51959-1-lirongqing@baidu.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 16, 2023 at 10:20:41AM +0800, Li RongQing wrote:
->there is rare possibility that conn->tx_pushing is not 1, since
->tx_pushing is just checked with 1, so move the setting tx_pushing
->to 1 after atomic_dec_and_test() return false, to avoid atomic_set
->and smp_wmb in tx path
->
->Signed-off-by: Li RongQing <lirongqing@baidu.com>
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+On Tue, 14 Nov 2023 13:58:36 -0800 Saeed Mahameed wrote:
+> Fixes: d589e785baf5e("net/mlx5e: Allow concurrent creation of encap entries")
 
->---
-> net/smc/smc_tx.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
->
->diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
->index 3b0ff3b..72dbdee 100644
->--- a/net/smc/smc_tx.c
->+++ b/net/smc/smc_tx.c
->@@ -667,8 +667,6 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
-> 		return 0;
-> 
-> again:
->-	atomic_set(&conn->tx_pushing, 1);
->-	smp_wmb(); /* Make sure tx_pushing is 1 before real send */
-> 	rc = __smc_tx_sndbuf_nonempty(conn);
-> 
-> 	/* We need to check whether someone else have added some data into
->@@ -677,8 +675,11 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
-> 	 * If so, we need to push again to prevent those data hang in the send
-> 	 * queue.
-> 	 */
->-	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing)))
->+	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing))) {
->+		atomic_set(&conn->tx_pushing, 1);
->+		smp_wmb(); /* Make sure tx_pushing is 1 before real send */
-nit: it would be better if we change the comments to "send again".
-
-Thanks
-> 		goto again;
->+	}
-> 
-> 	return rc;
-> }
->-- 
->2.9.4
+Applied from the list 'cause I had to fix this tag.
 
