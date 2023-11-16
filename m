@@ -1,205 +1,78 @@
-Return-Path: <netdev+bounces-48261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB047EDD2C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 09:57:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0C347EDD6B
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:15:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 242C0280F51
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 08:57:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801491F2383F
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 09:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47A214007;
-	Thu, 16 Nov 2023 08:57:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD42F9FF;
+	Thu, 16 Nov 2023 09:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0eE+k1/b"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="220jhNCF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4FFBA1
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 00:57:09 -0800 (PST)
-Received: by mail-qt1-x84a.google.com with SMTP id d75a77b69052e-41cdc2cc0b4so12327501cf.0
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 00:57:09 -0800 (PST)
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D14194
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 01:14:53 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-9c3aec5f326so350042666b.1
+        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 01:14:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700125029; x=1700729829; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Gh6Pqt15Uuq2Bjcq9HMGiXCbv9ksR71uUms8zAT74i8=;
-        b=0eE+k1/bz6j9n7Crlf4XNm54r8Es1c9xpIqEnAof1YhNaSxiofGBxmpcJmMiei26T2
-         JsuZzVw7mXFLLbiXznWhu1rfYYAbwrq9hArsLRBE21NrdQW4hnE6ZU/ANxG/uuYhQsS4
-         HBWA0Ixq6qwDuCYSSPVADP1L4hNTm+vAeeYxvcRnmHNXdSw3Lo7jqOmscZjaTqzB9vxm
-         YQnISruGe6uMOMEcB0+e3fDUiLEE8OhQcYdsDmWXLJAuy+5tY45GGAzJOi5g/U12+076
-         CkrxXGnjIgDYPWgFptxzjknK4vpn7QkeG1H7PJ5sJCiyjO4e9gDVP/Ri8OEGsgblMJwc
-         UbDQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700126092; x=1700730892; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nzbtEz+MoP0GqU42tqaCpjBYfEcN+vCU2DxNlTwl56k=;
+        b=220jhNCFfeSd0XvlqyOE6hYm3UaUqoqCa8J6vOC0MzsEWnS13GUYgoX2zdbh5tGXfN
+         /AxHIJGxEQ9NUzCnv75Pr5Nb0Rz2QxWQN2T4qb7LKYdHyXss0q+bGalsBYn1thIhEgHc
+         zYxxnH4w/e4mgZJBMypIX1P0H+YH5+xquzsgp5mOKUUrvV6SN2ckIf5C0W9IQ6i0lz0o
+         K2Wz2/g4W+akER12f1G4B3XyHa1hGV2sKsorYnmnLSVAU5WbunJXvmUKWBCJ+UzqhJVb
+         eA2Sp1NiDZz4T5eCeoOnDEs22t+WdWNEi/7RbkYggfzPuWABawZfXZeU480WUkP/MZa3
+         ZZIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700125029; x=1700729829;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gh6Pqt15Uuq2Bjcq9HMGiXCbv9ksR71uUms8zAT74i8=;
-        b=Y6ew4rdLs3+kgZHkbpK4vrYcS/vs4EUAnYMhLoOe6xafzLkFqSVdhbgT+YuyhvGOUw
-         iw7ZRGSdwvljwx7TbsTKnhW5G7c+mVQzBeGPZsFmLP+TbnCdUiv9eTx2Upj4VZ6qAeOI
-         m5Yosi8xjRV/pTnexFiKOGHTF5N+68oXwI9hk7Ab7UgJMHxAV02p0lL7cuMosW3NMWgV
-         NfRgkn2kURJ0OI9Aaq1OpvjLVLQM1i+J1T/3WOFebzniGriKvXiB7RoQ/P++zYovPkXJ
-         nVBl8p15pf5ayvXr6brJ2FdRnWYlUulbdieSXkpYcouBnefehJboUjpvvC5/3APTfpt8
-         bYiQ==
-X-Gm-Message-State: AOJu0YyvsnJBgoyP50l/t94wxFXtgITG3q07sVkA5m9EnN2Oq1Xh7M9u
-	X45OEv+div18uJ6YeZbOOyI4CUUKXZe+EQ==
-X-Google-Smtp-Source: AGHT+IHWJWWDZayozSsMbefU7jKca3r+V1LrJVtEyI6SrSKNVY2gIGxMuyeTAPyhlxPH7vKXK2yRjXmYVBvtSA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:ac8:620f:0:b0:41b:1957:55b with SMTP id
- ks15-20020ac8620f000000b0041b1957055bmr23060qtb.4.1700125028990; Thu, 16 Nov
- 2023 00:57:08 -0800 (PST)
-Date: Thu, 16 Nov 2023 08:57:07 +0000
+        d=1e100.net; s=20230601; t=1700126092; x=1700730892;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nzbtEz+MoP0GqU42tqaCpjBYfEcN+vCU2DxNlTwl56k=;
+        b=hEoHU9qzWI4LMiFodEmZAmWKO/jD5JeDPVLlkYtYAgX7uRBdEUkeNOS70+aewe9BII
+         9adlCCdg4K+1+U+bxK2j9GECVcQdaNAm6E+pEdaPH9GETMfFnDAVDxmkJo7T11muphWj
+         lxf4Z9tB9o2hMWIqhYQENWZ2vicm5tXnmZIZ6+9BOrfr4sE8eyCtCoZ9ya6kGhlPcjgo
+         L/3JkCIFiZHIKJoEYMmREMGKGpYAFm+VTrto18lJbQBsPwL0+nw8xvXenmxsY5Ci8jg0
+         Q2t/ZejJDPy4h2sOsHdRZ5uLiGo3f2RJQ8sWY7ShLQhK6PVhOh3mWqY96OJFYoDHOsds
+         nTqQ==
+X-Gm-Message-State: AOJu0YyXgOwNy8AXAlwoGH4nPwvlI0Cy1Sb/UrEXKhJWgxp3j5QOdwKI
+	9aWDAPMIEMnEKUjkORroTbS/Wauff41pCyv1UEw=
+X-Google-Smtp-Source: AGHT+IEd3F17JeRj8Ig9VT/Pt4oSPQ+TeZPGT6PytL3JK5nNYjiF5NQqXRcNbtMyhyHGxiTTqJEl+Q==
+X-Received: by 2002:a17:906:a413:b0:9d5:96e7:5ae1 with SMTP id l19-20020a170906a41300b009d596e75ae1mr1138744ejz.12.1700126092043;
+        Thu, 16 Nov 2023 01:14:52 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id g13-20020a170906348d00b009a1dbf55665sm8024819ejb.161.2023.11.16.01.14.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 01:14:51 -0800 (PST)
+Date: Thu, 16 Nov 2023 10:14:50 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	edumazet@google.com, jacob.e.keller@intel.com, jhs@mojatatu.com,
+	johannes@sipsolutions.net, andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com, sdf@google.com
+Subject: Re: [patch net-next 0/8] devlink: introduce notifications filtering
+Message-ID: <ZVXdirvX5tQiVmto@nanopsycho>
+References: <20231115141724.411507-1-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231116085707.2475816-1-edumazet@google.com>
-Subject: [PATCH net] gve: add gve_features_check()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Bailey Forrest <bcf@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Ziwei Xiao <ziweixiao@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115141724.411507-1-jiri@resnulli.us>
 
-It is suboptimal to attempt skb linearization from ndo_start_xmit()
-if a gso skb has pathological layout, or if host stack does not have
-access to the payload (TCP direct). Linearization of large skbs
-can also fail under memory pressure.
+Will send v2 soon
 
-We should instead have an ndo_features_check() so that we can
-fallback to GSO, which is supported even for TCP direct,
-and generally much more efficient (no payload copy).
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Bailey Forrest <bcf@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Jeroen de Borst <jeroendb@google.com>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>
-Cc: Shailend Chand <shailend@google.com>
-Cc: Ziwei Xiao <ziweixiao@google.com>
----
- drivers/net/ethernet/google/gve/gve_dqo.h    |  3 ++
- drivers/net/ethernet/google/gve/gve_main.c   | 13 +++++++
- drivers/net/ethernet/google/gve/gve_tx_dqo.c | 37 ++++++++------------
- 3 files changed, 31 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_dqo.h b/drivers/net/ethernet/google/gve/gve_dqo.h
-index 1eb4d5fd8561f1e32813e0973f96e43221d44e6b..c36b93f0de15b569eafbcb7222492013782fd441 100644
---- a/drivers/net/ethernet/google/gve/gve_dqo.h
-+++ b/drivers/net/ethernet/google/gve/gve_dqo.h
-@@ -33,6 +33,9 @@
- #define GVE_DEALLOCATE_COMPL_TIMEOUT 60
- 
- netdev_tx_t gve_tx_dqo(struct sk_buff *skb, struct net_device *dev);
-+netdev_features_t gve_features_check_dqo(struct sk_buff *skb,
-+					 struct net_device *dev,
-+					 netdev_features_t features);
- bool gve_tx_poll_dqo(struct gve_notify_block *block, bool do_clean);
- int gve_rx_poll_dqo(struct gve_notify_block *block, int budget);
- int gve_tx_alloc_rings_dqo(struct gve_priv *priv);
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 276f996f95dcc8b6ab3c5eb51958b95c19e61dd2..0b01166642b38118888fd0d2a4e73e2577876e82 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -79,6 +79,18 @@ static int gve_verify_driver_compatibility(struct gve_priv *priv)
- 	return err;
- }
- 
-+static netdev_features_t gve_features_check(struct sk_buff *skb,
-+					    struct net_device *dev,
-+					    netdev_features_t features)
-+{
-+	struct gve_priv *priv = netdev_priv(dev);
-+
-+	if (!gve_is_gqi(priv))
-+		return gve_features_check_dqo(skb, dev, features);
-+
-+	return features;
-+}
-+
- static netdev_tx_t gve_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct gve_priv *priv = netdev_priv(dev);
-@@ -1873,6 +1885,7 @@ static int gve_set_features(struct net_device *netdev,
- 
- static const struct net_device_ops gve_netdev_ops = {
- 	.ndo_start_xmit		=	gve_start_xmit,
-+	.ndo_features_check	=	gve_features_check,
- 	.ndo_open		=	gve_open,
- 	.ndo_stop		=	gve_close,
- 	.ndo_get_stats64	=	gve_get_stats,
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 1e19b834a6130e8e32b236280ee17a21c17905fd..f59c4710f118822e30be39476f75b59595328ee0 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -843,6 +843,16 @@ static bool gve_can_send_tso(const struct sk_buff *skb)
- 	return true;
- }
- 
-+netdev_features_t gve_features_check_dqo(struct sk_buff *skb,
-+					 struct net_device *dev,
-+					 netdev_features_t features)
-+{
-+	if (skb_is_gso(skb) && !gve_can_send_tso(skb))
-+		return features & ~NETIF_F_GSO_MASK;
-+
-+	return features;
-+}
-+
- /* Attempt to transmit specified SKB.
-  *
-  * Returns 0 if the SKB was transmitted or dropped.
-@@ -854,11 +864,10 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
- 	int num_buffer_descs;
- 	int total_num_descs;
- 
--	if (tx->dqo.qpl) {
--		if (skb_is_gso(skb))
--			if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
--				goto drop;
-+	if (skb_is_gso(skb) && unlikely(ipv6_hopopt_jumbo_remove(skb)))
-+		goto drop;
- 
-+	if (tx->dqo.qpl) {
- 		/* We do not need to verify the number of buffers used per
- 		 * packet or per segment in case of TSO as with 2K size buffers
- 		 * none of the TX packet rules would be violated.
-@@ -868,24 +877,8 @@ static int gve_try_tx_skb(struct gve_priv *priv, struct gve_tx_ring *tx,
- 		 */
- 		num_buffer_descs = DIV_ROUND_UP(skb->len, GVE_TX_BUF_SIZE_DQO);
- 	} else {
--		if (skb_is_gso(skb)) {
--			/* If TSO doesn't meet HW requirements, attempt to linearize the
--			 * packet.
--			 */
--			if (unlikely(!gve_can_send_tso(skb) &&
--				     skb_linearize(skb) < 0)) {
--				net_err_ratelimited("%s: Failed to transmit TSO packet\n",
--						    priv->dev->name);
--				goto drop;
--			}
--
--			if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
--				goto drop;
--
--			num_buffer_descs = gve_num_buffer_descs_needed(skb);
--		} else {
--			num_buffer_descs = gve_num_buffer_descs_needed(skb);
--
-+		num_buffer_descs = gve_num_buffer_descs_needed(skb);
-+		if (!skb_is_gso(skb)) {
- 			if (unlikely(num_buffer_descs > GVE_TX_MAX_DATA_DESCS)) {
- 				if (unlikely(skb_linearize(skb) < 0))
- 					goto drop;
--- 
-2.43.0.rc0.421.g78406f8d94-goog
-
+pw-bot: cr
 
