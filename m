@@ -1,213 +1,95 @@
-Return-Path: <netdev+bounces-48423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 384507EE4B0
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:52:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB3277EE4BF
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B162817AE
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A769B20BC1
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4759130F91;
-	Thu, 16 Nov 2023 15:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302FF358A8;
+	Thu, 16 Nov 2023 15:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k/d08LaH"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="f8VsnTiO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D916101;
-	Thu, 16 Nov 2023 07:52:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700149934; x=1731685934;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Q+SpuiHWixl/2iHDOZJhDhjvPhOIxB3kw33rkALx/ac=;
-  b=k/d08LaHZfnTFUpsha7nnKP1gCixjmJ6wnJ0mFet3OwPiV88IEaxoKx6
-   4xtfB4NramR0mwx+sOmbnx2O+bg55y1omt/HPjTZ8dlxL9bvCmAvW+1AB
-   B7jXh61CyL3dTT5N+cmNQ8K/no5MGHgK3kkWaMQeIXwDkT43vgT/vsx6X
-   F5JclvONi+Ar379WM1VeD7yPhEsuGIVm03W9X6mVA7t5uiPp2O7nemrW9
-   c8+u4UddVYO0Y5Ms6+OL5HALsEV7k63Pg0yt1Ng72BRfuIqgvYj7mfIf6
-   1vYlXEYuSfgHoFrDj+3NVjnvxp12ZNWEgQ2Cg16l8cqRMoS5EExPYmoim
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="371293305"
-X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
-   d="scan'208";a="371293305"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 07:52:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="741802053"
-X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
-   d="scan'208";a="741802053"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Nov 2023 07:52:13 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 16 Nov 2023 07:52:12 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 16 Nov 2023 07:52:11 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 16 Nov 2023 07:52:11 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 16 Nov 2023 07:52:11 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FkxKHukG0tnb5jeSPAFfR5PEudC4ks0scfLHwjPcG0kjqP06z4UHoBVg9D7cTiKe8MipZWqwp2vZVJl8x6Menqf9lAV0iPvRcNwsQJzXdOWuPeq1GbApB3u5Q3NO/d73grR+RXRPUdjRQhSXhUiWqScqj31bhEVJECNOhf7WR5I3aYsj3h8IcMuHUv8403Ka4QH675lvxH6m9VlmBzuRUCFSHBinIgxWRWZNlWqq9YxZEX57pPTzsQ7/puXihvEvtCm65a1E95XQgUHWBSOOGFxououvb/+xhDIOx6tCNCA0JeAdnjsQRyGkN6TXN2jjaX7GGm9N2k9RkTg5D9HiuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q+SpuiHWixl/2iHDOZJhDhjvPhOIxB3kw33rkALx/ac=;
- b=m9K9W5QJS1vemEbdVb534eD7FHNhd78d2wXO276FvwbqndaqIEhFoG/aIMW39gX2ATXpeM3tla6nqsmNzdxSSMjVckGlOpTQ+GnFF/tS7KV1X0tZdMwmBtvkhFi1XA9EqR7CmtBvcvyn07CXLzX03n8oJ9QKLvDwqLyBVqP4auOTZiu7mlEgVqwSGpvKOIRNVWmFIv3GBgM0qt45Xycf/CppdiriZ3dPYXvqp/OtpEIUW0fowgtWK0wFZtKgUbee4hxi17iftNp4a8dRLws+XCSvyxgV7nKbovxepo6S5L5G+F5p1+pZbWcFirJs3Ok8CJvzRgB2xEv7/TqUutdqZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com (2603:10b6:208:7b::32)
- by SJ0PR11MB6768.namprd11.prod.outlook.com (2603:10b6:a03:47f::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.20; Thu, 16 Nov
- 2023 15:52:07 +0000
-Received: from BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::2a7:165b:5c95:7a5d]) by BL0PR11MB3521.namprd11.prod.outlook.com
- ([fe80::2a7:165b:5c95:7a5d%7]) with mapi id 15.20.7002.021; Thu, 16 Nov 2023
- 15:52:06 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: Simon Horman <horms@kernel.org>, ivecera <ivecera@redhat.com>
-CC: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Eric Dumazet
-	<edumazet@google.com>, "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next] iavf: Remove queue tracking
- fields from iavf_adminq_ring
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] iavf: Remove queue tracking
- fields from iavf_adminq_ring
-Thread-Index: AQHaB+gUbHAaPQzHrE2HZOs0BH2JpLBo4TEAgBRYnhA=
-Date: Thu, 16 Nov 2023 15:52:06 +0000
-Message-ID: <BL0PR11MB3521C0334FF07B3C3DD69D9D8FB0A@BL0PR11MB3521.namprd11.prod.outlook.com>
-References: <20231026083932.2623631-1-ivecera@redhat.com>
- <20231103170928.GD714036@kernel.org>
-In-Reply-To: <20231103170928.GD714036@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL0PR11MB3521:EE_|SJ0PR11MB6768:EE_
-x-ms-office365-filtering-correlation-id: 5c23fe34-5b00-4ff4-138b-08dbe6bbfbff
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: rk/dqzMl4wZ3px1I7WW7O6qsrzf9CwMlaoAL5G5Rx60Zj9UPRtwdX0/EjC7T0uFM6/zK5pExfnuYTgEcO6/nyEr/t5weaEhIUodHVXGzIVg1tVZRnZCOS433YqGPY7xjtG7ZtZgB/TnKcSFBS1+6gZiPKjzO7ao4EfuFP/+ad46cAkaJQNavrwbagKPqwe/+D0hJzcd3uYoVW5Ve3Y3pwwy7UekndQZJb5gSL6IIF+q4lXHT0VREP1WSIfaCHlojuZ7VOacVD24gim2GfIGtBD6eA7DZa8W/RuZ/E8QEIiu3pbkextCzZXVd7PtTi+P/3xJYvwB10134EBcUJYyrxPYQYMRKjZBokcZDqKcrJqsddnydK4OiR4Reb1ZVOw1He3pffmj98mWWJsBdE9ITp3AhWjisjGiNnIralADICprazrzztdZ3cucOSW3x4e9C6IjxK8juLVjeW0+TD4i0vOJRpNguC9k5aDIpB+Pu2XU6VeJLlQPGC4yMsC3pI+1B2B1XsyQizuqKTbvu5Q9EQWTzZJOvXcIUJqUZJ5zhngvnVt7Y0OakhoxXPtEbU67+iN0w2Xy6MB3AUHEBnMwCJiou+ss2lxr1zC3vK1v7dB0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB3521.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(376002)(39860400002)(366004)(396003)(230922051799003)(1800799009)(451199024)(64100799003)(186009)(966005)(478600001)(2906002)(6506007)(9686003)(53546011)(7696005)(52536014)(33656002)(5660300002)(86362001)(71200400001)(316002)(64756008)(54906003)(66946007)(66476007)(66556008)(66446008)(76116006)(4326008)(8936002)(8676002)(38100700002)(38070700009)(83380400001)(110136005)(41300700001)(55016003)(26005)(82960400001)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rYsfQEZFedn6fZqC9pxW6qtOJ8b6U6wnld9Bs6i2mvZEMRMerUG2vntQuoQr?=
- =?us-ascii?Q?bSm4fhNTvOLeBoNKArAwssD9/3X5XHEJ8X7JznMk1FMurbzYvCCpoRT3LWNN?=
- =?us-ascii?Q?2C6SRRN+4adb2UF6GKWWyB/u6gbu34zm0VYX0Cr7fi3d1YPcoxfUF7/6/jOw?=
- =?us-ascii?Q?YBhjO3AR5azX48zyLzxm6Quq8fkN/C6U/u6XovLEmYldat1dxhHqZKbOLa55?=
- =?us-ascii?Q?ENzhjSlrv0dYoeo2COJxVumw+LoDSP7eIz/8TQv4w+b6opkWuvpzNIhjxdo9?=
- =?us-ascii?Q?qFYLp1yXLsV7GrMUcGJ4BwgNO7HB3pVIh/hgNykY/OF6HZckzDSCs/+zgE5W?=
- =?us-ascii?Q?pn8XP+8YWdoSC/ApUVTJxRuHvK5TNzQ8aD50LPXOlGNZIrGOC793VrtAtvDd?=
- =?us-ascii?Q?DQsnVqONGMgcMDCoJ8jw67+JkKi4iSMQM2EyIj4tQOIzOlaqAcdTBsmdcbxX?=
- =?us-ascii?Q?ZX3HARVWnloDz1Z45bAgDLJzcWZAfupFPRVkGwXM5CBSX3SgDQ2aqjR/3XRw?=
- =?us-ascii?Q?FMuEfv5qpEgOe05mdZXnDQg+7qb7WzlyduXzDpBJ0VgsGqm6i1on+kI/Uweu?=
- =?us-ascii?Q?JI3JNHaQ+LT6t/BID/OP+RTCFH2uAJhWO3IiNOeMZJ/o2fo/mNa0Tj/8CRkW?=
- =?us-ascii?Q?l9V+66oCtiWBSqrNqSrWDlsuQkmfIUo7dxz5owKMaj2MPimqNnfkT5YBkt9q?=
- =?us-ascii?Q?Na0SOASBIPji2X0Cib34it4JlFgQxCSodR3HvTaND18/zx94gdJLDONenKQm?=
- =?us-ascii?Q?vxgMlA2GCOGWqXJvXvXUhzSQIsCAMErGThi8zaWbj/hk7w4+1LWRfkFbSXnq?=
- =?us-ascii?Q?woLYR92QYCkbldQOxoafjk6fnrzmA3Fxff5pVm3Hr9yoe9olfncxlFB9yRMw?=
- =?us-ascii?Q?Ml0cDElM+5uDA2Iu3/WkEdAxbeXY7RAO86tvOPUDs7sAHpOADNHrbefmt/FC?=
- =?us-ascii?Q?lXTcddMIZsSP7zLPDeNQXtBZUhiVYrpZRtP/xPnQiM9/nvMPFWrQucR+Av5o?=
- =?us-ascii?Q?ZN5DBr8AacqRwHFzPfscFvRFIdL9a61e0WGXS8mVWpPGXtAahxHNU7wbQsI+?=
- =?us-ascii?Q?l4b1eJNObGliuAEpJ6Oj+Rhy8UYCh5P+bS7rtf4CMnEugywnv8duQJC0hxjV?=
- =?us-ascii?Q?Y7qGgEKKBuBEi1NgWBBQMizOKw6ehsTMJJJgJ6eZT5U862XUVP7a5IjkOeW6?=
- =?us-ascii?Q?hHBSttPfjjoNP0KggOPkP7mBlntq2OCYt2tKy3WFye2YrfSu5uAua/BNfAW4?=
- =?us-ascii?Q?eXSrYI4Ak5gFIPerldhzcqJj2GbQ2RO+YpuM1sW2SM3ob9uxrZtfcDcjqbJ7?=
- =?us-ascii?Q?6uABMvKDgWptuKICBwstGFf1bFRLxgZOX9qhzEkFU6vnrfWTvhuziwhnjIeH?=
- =?us-ascii?Q?TKN+4Uz+ktP4yBQ3Yf7MdPUCFgDN/JjIqLeV1g9Xyvv6HJVRJV1bpteovotc?=
- =?us-ascii?Q?U2sxvbGibuoDuLN1q7zXSb3FOgk+0bO3KAayOWcxvdHK68odx+2Y/jD1tqt+?=
- =?us-ascii?Q?zcpTVDsjUj5yeXcFQ3Sw3fs5BsSyQFe98BHcA73GxOMxtS110JmLupMXYsPY?=
- =?us-ascii?Q?S2NkoOagEblplEEJMjNWrPgKsZLvRROr7i9Lp+ejEBSXIBG2OvYvun5/uQ5j?=
- =?us-ascii?Q?tg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BF61730;
+	Thu, 16 Nov 2023 07:53:49 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGFYo1n026432;
+	Thu, 16 Nov 2023 07:53:43 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=JeKDzoMiZqT1iDVG+sGjuWO4Gjc5/5UniKLk0NXFhQE=;
+ b=f8VsnTiOUOozfhawlZm7Oxbp8pN9fAdVdYehLpR1QiRtWohvyvLeFCur+eWLPljmj191
+ s42NMMqCLhbdCb+nhFmXObEv+evGq7LTRSb+beTl93+2pLDlwGH4WABOdlmqb4021Wzm
+ /fsLy9cj+mvhnEB5VtwFLbypPoVRwPxjEqw2JyPb1luzNkCq5Kfa0BG7h/Lwz9qerolG
+ pI5CDd+RYlTqzkElBpOD85+PggApccAGDO7IABiWSuzT3/zg/7+aw9ko2VDagXXGnYEl
+ d79Iol6hAEUNLGpWFOfISRMqGl8h+oz4iEk4g1K2ykmhA/l4PdHN3s/yw+b51By/j7SY Ig== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3udgkah705-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 07:53:42 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 16 Nov
+ 2023 07:53:41 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 16 Nov 2023 07:53:41 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 03F733F705C;
+	Thu, 16 Nov 2023 07:53:36 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Fix memory leak during interface down
+Date: Thu, 16 Nov 2023 21:23:34 +0530
+Message-ID: <20231116155334.3277905-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB3521.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c23fe34-5b00-4ff4-138b-08dbe6bbfbff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2023 15:52:06.3798
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8Wwc+fiwKQwMa5MRzBJeDh2rhEbdHJX7H2PXB0rRD/qOl1uuqIQo/27Q/mlcmJZHoeMcH1+5DsLUiHpDV55SxXMR3kE/4vZgopVxPxvMkEM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6768
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: lP9ZmLzL8t5JUo74U3Vd9m-hrpj7uFkq
+X-Proofpoint-GUID: lP9ZmLzL8t5JUo74U3Vd9m-hrpj7uFkq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_16,2023-11-16_01,2023-05-22_02
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Simon Horman
-> Sent: Friday, November 3, 2023 6:09 PM
-> To: ivecera <ivecera@redhat.com>
-> Cc: Drewek, Wojciech <wojciech.drewek@intel.com>;
-> netdev@vger.kernel.org; Brandeburg, Jesse <jesse.brandeburg@intel.com>;
-> linux-kernel@vger.kernel.org; Eric Dumazet <edumazet@google.com>;
-> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; intel-wired-
-> lan@lists.osuosl.org; Keller, Jacob E <jacob.e.keller@intel.com>; Jakub K=
-icinski
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller
-> <davem@davemloft.net>
-> Subject: Re: [Intel-wired-lan] [PATCH iwl-next] iavf: Remove queue tracki=
-ng
-> fields from iavf_adminq_ring
->=20
-> On Thu, Oct 26, 2023 at 10:39:32AM +0200, Ivan Vecera wrote:
-> > Fields 'head', 'tail', 'len', 'bah' and 'bal' in iavf_adminq_ring are
-> > used to store register offsets. These offsets are initialized and
-> > remains constant so there is no need to store them in the
-> > iavf_adminq_ring structure.
-> >
-> > Remove these fields from iavf_adminq_ring and use register offset
-> > constants instead. Remove iavf_adminq_init_regs() that originally
-> > stores these constants into these fields.
-> >
-> > Finally improve iavf_check_asq_alive() that assumes that non-zero
-> > value of hw->aq.asq.len indicates fully initialized AdminQ send queue.
-> > Replace it by check for non-zero value of field hw->aq.asq.count that
-> > is non-zero when the sending queue is initialized and is zeroed during
-> > shutdown of the queue.
-> >
-> > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->=20
-> Thanks, this is a nice cleanup.
->=20
-> Reviewed-by: Simon Horman <horms@kernel.org>
->=20
-> ...
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+During 'ifconfig <netdev> down' one RSS memory was not getting freed.
+This patch fixes the same.
 
+Fixes: f12098ce9b43 ("octeontx2-pf: Clear RSS enable flag on interace down")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index 91b99fd70361..ba95ac913274 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1934,6 +1934,8 @@ int otx2_stop(struct net_device *netdev)
+ 	/* Clear RSS enable flag */
+ 	rss = &pf->hw.rss_info;
+ 	rss->enable = false;
++	if (!netif_is_rxfh_configured(netdev))
++		kfree(rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP]);
+ 
+ 	/* Cleanup Queue IRQ */
+ 	vec = pci_irq_vector(pf->pdev,
+-- 
+2.25.1
 
 
