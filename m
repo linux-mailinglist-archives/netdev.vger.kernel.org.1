@@ -1,203 +1,325 @@
-Return-Path: <netdev+bounces-48486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC707EE8D0
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:34:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B026D7EE8D6
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:36:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE0B1F24055
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 21:34:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B5C71F24215
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 21:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7C646457;
-	Thu, 16 Nov 2023 21:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89066482F0;
+	Thu, 16 Nov 2023 21:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K616CgmD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HVMx+FXQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E06DA7
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 13:34:22 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-54394328f65so1864862a12.3
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 13:34:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1700170460; x=1700775260; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NZc4BbK6M2p254PUqFluagwyhBPW+qWHRSv4L+o+OI0=;
-        b=K616CgmDD0LgfrYfzYyDc2O38vHRLRjAtMqxmkugBKwkfaOR7OIAaoap1Wehi4ZXCS
-         9nSsAKt/7k0yPhqAH6b2UP3cq7Byh/NB30ilda/5gOXYXxlxwx9yltz38tCt5rjpxaQx
-         jVXiaXqv0OTFbQT7AQZoU8JWZPI7De5oktVYk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700170460; x=1700775260;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NZc4BbK6M2p254PUqFluagwyhBPW+qWHRSv4L+o+OI0=;
-        b=hTxFBMwTJ399RSEHIaVFmLrkKjFDDjeyc6ggCIsCFowuZZtQxQPgtLi/gPer+++9bP
-         OY0Suyaj/v2PPxRJr7U/jPs/OdBpZDsxjutI8B6BcU0OslvkTpzyrNUsOYo8s0hNE7eO
-         m5W+RgRN7awOuPlMiHBBd8+mKN0NS2KSQ1hSGdTCrEMteVykLYs/l5LUmEQDxD5QdV9D
-         nkTyuhcis/KpbVYO6h1rfewuSDpLw8dFU8vwpkU3AfF9nZyVS+cRT9NzsGJdBMcjP844
-         jnIbKlmeLGYG8fzQMoX/jkyDgTvHufBNN9ovBu5dZrqhUNqhiPhJxtpGsULOJpPTgTac
-         IqCQ==
-X-Gm-Message-State: AOJu0Yzg//0Dyp/QxY+iXP5rCLSoHUIC4C7nX/bnahAO20LEQRVZxQRY
-	waqRbPguaMReRp61gIIFH/6xJ2fHhOZuPT611Umcag==
-X-Google-Smtp-Source: AGHT+IH8mv/QcW8kW+EiDmGcDVeasjVUu4PGHadCyJfi7itrrq2LEAEJRBkw5FjF3/HJVsqtSSVjO8DaL5mLdr3k2M4=
-X-Received: by 2002:aa7:d4c8:0:b0:53f:737c:93fe with SMTP id
- t8-20020aa7d4c8000000b0053f737c93femr11465212edr.38.1700170460355; Thu, 16
- Nov 2023 13:34:20 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 241EB181
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 13:36:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700170602; x=1731706602;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=6R6iO9Y/5AUnXiv8WX+w60/ejRbjJ4zWC5dUy0RzCn0=;
+  b=HVMx+FXQZrogjSEWIK9WVCPHNB+3p3VB6vx4E2SJ2SEt5BDX0H4DjrjB
+   vuwg0gIkseFBIdlW+bNhIN91nVG1XMIl0hvI3TMrHrjFS+WjtL/rhNWRv
+   jHLDt2A1nERtAwYBM3QAgJnq13lsKZNlS4L5WKc7pbj7zvdjjSJqb+/AB
+   /QE3UZvbYedaCIXzaxGVP1w3ybpoWBsN13v9ygaciEKIRH5dKtU1VegBW
+   xOMUnzetR+C8avwCVmbe1iRqsmxf5HGQbd1vUSPqz6GJEQLwAmAz5h1VQ
+   Ml7DHCxJfuGvfdhwQ4DWce8pdJE6osxMGzquyowv6024l9hnDscxSa74T
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="477406852"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="477406852"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 13:36:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="715351610"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="715351610"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Nov 2023 13:36:41 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 13:36:40 -0800
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 13:36:40 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 16 Nov 2023 13:36:40 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 16 Nov 2023 13:36:40 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eg+/ZMRlIhIvebXmyeLpqUCfmoAq+E3MbtXUA8lgDN8RMxjveUCnvmU2NmTJZ18Corzywjd/upJVRmziAWI3qhWEGq2FhlQoJP82Y4M7th20s4m8TBnhXlaKwr0t2H9w1PLtXZBc4ooklobiy3zOBUYOXf0w2eXkOgN1QDOgUtzQKSEs58eRf3vjqITdtCHPeBSu9gQKFDHHJUv49gUFlH940so1U5pwx7VTSwMfeIi507VFOhGGmESqVNUupLq1IcRgG0xu073cBXgOY+f+Ig6ERxJvokBqmZqmxWAbvGjwxHNWB9EOGPiptgN4g3XIZh9i433g3baF8Qp35QWo9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TxAkrEj8iLzjRvvaI41WMh3wtFOxy+zyOr+S4UpM/YA=;
+ b=newBwtzRBfHQ/saXSTeKfJiqEyvRKWql/fONLhQM61rXFR1lhr0dLsUDhvFsdUISzloklHLGPFh0g2xKVMqOStGlSO+LCf+gEKS3pz3K/d9sjQUY6v8fcwC/KRNdLQB2swN4hsluxIhiZM+lNZmybHEFWC2ZHBLhXT9UXikXcWjH2aKisTdT33Tb6vHpARfsT2EidVXj9+w1e1ZpL//Z9s1Nk8AFb055ptPMMVXy5tzZaO3lIYkkY472ROOfk4g+pR/AqcEMua9Wlqw2bpzDH9TbDeIYE3V53JiqUPK+SK5ETSj+ien0+pp0tX+UeWcgAxEWjGxWKGUurjaoVFniTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW5PR11MB5811.namprd11.prod.outlook.com (2603:10b6:303:198::18)
+ by PH7PR11MB7025.namprd11.prod.outlook.com (2603:10b6:510:208::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.21; Thu, 16 Nov
+ 2023 21:36:38 +0000
+Received: from MW5PR11MB5811.namprd11.prod.outlook.com
+ ([fe80::f6f9:943e:b38e:70de]) by MW5PR11MB5811.namprd11.prod.outlook.com
+ ([fe80::f6f9:943e:b38e:70de%3]) with mapi id 15.20.6977.029; Thu, 16 Nov 2023
+ 21:36:38 +0000
+From: "Ertman, David M" <david.m.ertman@intel.com>
+To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Wyborny, Carolyn" <carolyn.wyborny@intel.com>,
+	"daniel.machon@microchip.com" <daniel.machon@microchip.com>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>, "Buvaneswaran, Sujai"
+	<sujai.buvaneswaran@intel.com>
+Subject: RE: [PATCH net] ice: Fix VF Reset paths when interface in a failed
+ over aggregate
+Thread-Topic: [PATCH net] ice: Fix VF Reset paths when interface in a failed
+ over aggregate
+Thread-Index: AQHaGAh+TuRVRlC/0k+ODV3JK/6fpLB9AIMAgAB1h7A=
+Date: Thu, 16 Nov 2023 21:36:37 +0000
+Message-ID: <MW5PR11MB5811FEDAF2D1E3113C3ADCD9DDB0A@MW5PR11MB5811.namprd11.prod.outlook.com>
+References: <20231115211242.1747810-1-anthony.l.nguyen@intel.com>
+ <ZVYllBDzdLIB97e2@boxer>
+In-Reply-To: <ZVYllBDzdLIB97e2@boxer>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW5PR11MB5811:EE_|PH7PR11MB7025:EE_
+x-ms-office365-filtering-correlation-id: cf658bb6-e1eb-4fab-49c0-08dbe6ec1d35
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qwTrWCcRd09vpCMw1Zl96zLi8t7NQ2bobvJEcyUj2X92Imli/GtOVZtetNiXacPEwOpZyAz05h912sw8eF2sT3emCTtCo055oqjQmd+kR1+sYpm5EEnZSWF0g4p//jhw+CoyBBL0Cj1smCYCGd9Ii/09Gej8v9yjyonbkok8U3cop5fg1JAPsUoCU0AuuaWqeROowlv813u2r6VGDWKYCw6Lj32KZKLPFikGeazQMFeA5SVW6rYANpx7I+POkidO1ZMqyzsY4dUMpHnPCifpqylb2xbynciqnh2DiZMiUUn15DPuSpDB0zboFK6SCDmZC7k1FMl+8ekdCOL6PH01N405P790R3AZV273P/66p6lR9zak7yRGQ+8usLuL6HrgrurNJeIegvB0QfPga7yMHtlx6IJzrfuXmtI6MueDEW+I+YMCoGyQsdd7PnuHQur87mOnGTK4Bcfu0IubS+neriQTcvw5hSTIuYJ70QuyuA5akCrJEEQ4UDVhyvMjLo5EBfhLIqr9LjpyIJWsFEiGxCfoaVED2L+vF0+3Xf+dX5A00Q4DLBlYYWeAlLL3d8nVFc2/CFYZsdJZJSGUqGqobbG3nfS0KhuHWB1dxo7kiuo=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW5PR11MB5811.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(366004)(396003)(346002)(376002)(230922051799003)(451199024)(1800799009)(64100799003)(186009)(71200400001)(122000001)(83380400001)(107886003)(7696005)(9686003)(53546011)(82960400001)(6506007)(26005)(38100700002)(316002)(110136005)(6636002)(76116006)(66946007)(54906003)(66556008)(66476007)(66446008)(64756008)(38070700009)(55016003)(5660300002)(33656002)(41300700001)(2906002)(86362001)(8936002)(8676002)(4326008)(52536014)(478600001)(966005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pQozXj2VMNQbBJ/+/jcznHwVqFyRho/nH7CLqLnSodOCcbe6kctOJjnwonCs?=
+ =?us-ascii?Q?aiKipuJyA+7gvKgCdQY7DGjz664zR/oq7PilQenxaXpNDzHDwW3EtfoQwe0K?=
+ =?us-ascii?Q?ZRxAY6FinD3TLO9IWKgPNi4lGx+nJ3ky0yLbwEEsCLt3pEKyP/czkyUPvuQY?=
+ =?us-ascii?Q?hMiyNQMudh2DpDcRm8touaJPja60ZjU2lUiQBYuz3d3fUsY0S5WvQ47fE03d?=
+ =?us-ascii?Q?/eMLf0QYaMD4YcLs3L5WjNojNCpT+FkHNZsYAf8ejAQeqGeJTb/MHww2WEkL?=
+ =?us-ascii?Q?D9UptX9AH9hiiPIo3sq66B4GD0zt21mHD2f5RJBvNxr9VYMH0MHrqA0eQE8L?=
+ =?us-ascii?Q?dByWL+jsWs8OdUBeTh6creiJk6esKAB6IXcxy3jWYVYHNANzKKj44x6B8yeq?=
+ =?us-ascii?Q?A6X4uMWTAkvr+TeBmRG74zNmYomXBAgYeO6nWkd4OFR+2KQE+/TlOBJrjzJk?=
+ =?us-ascii?Q?lKQX9aTL//AVGINjzrWyKlTG+ACEUHo653YLOemIqmeHG0VparNpCHNyxJgU?=
+ =?us-ascii?Q?ZsGK/e05RhjDH0wK3TXIuki6al7J+7jF/fyaRoF7SwV1AmS9oUDfjGZtnsFH?=
+ =?us-ascii?Q?NmYOQafKr115wCgSd1dMrtMj+GEnIWRgiypRQGK+joyxgyPrHE1k3y+zglSo?=
+ =?us-ascii?Q?YFfCLanZwaombTNbBvmeJuwI4wBsBKACnOE+TYKk+tj+TEUfwsUFk2jCqJev?=
+ =?us-ascii?Q?PFkPK5v13NrRW/X/eMwAPUz57PaRacpiOCIBGgq2VHSluvsmEIFmkfc27mxZ?=
+ =?us-ascii?Q?txWzSAeBhTjvh2uRhtbpU8Gi+JmIWuVue7Y/hEybRnBnRqz1lKU5frKCrZ5D?=
+ =?us-ascii?Q?IoKPdIdBhQddGJ7m4CiXsgSbq6Xb9PClIuLcQSBUTWwNO88ske+mNn2g/udI?=
+ =?us-ascii?Q?1f3SnDG2cFRuWqqP5Pe5Xhnx07Rpd9HKEbGhAxrl6OUFvqZ/7C8LUG9t2xQj?=
+ =?us-ascii?Q?dp4tVGFYNvsuCgxI420BCCrQiI4o8zSHHr71YRVBN/WiLafAzNza85ItEsKo?=
+ =?us-ascii?Q?SjdLId8tCfklRjFr3okrN7K2rPRQ3FjbK5f0tev6JjyP3PLoT9RjmcsiixLG?=
+ =?us-ascii?Q?bJN8MiJyhZcIPoTI8KJFYc/1j8MOwUHHe583qYqKkvnaCiFX2o4QBaZJdWGd?=
+ =?us-ascii?Q?vmbnVQP+mc93mOfq3eOQy2buWDvmp9LNty0YPOdC5eJ/GjB568WMs3vv10Pf?=
+ =?us-ascii?Q?YekuuBdIAUoENNlLByPrre5j84yDNX2Uv0JCgQ3B9pT2hsOPaV9+f80y9CwP?=
+ =?us-ascii?Q?OEhVQu7YDK4BUptwc7eTdasGqVGgukukJK0237WxgD2IVNn00Afn9dBzlJGl?=
+ =?us-ascii?Q?8+YvEwurNn0GbO1fVAeQPPgHY8/brRyWee2s7z99rfchPymp/7LJgRwzJZZU?=
+ =?us-ascii?Q?5pU5CNIq79tO4v11Ouqv4+60sie4rC6m6PBLRIWi1Rd4OwyKooyq7IhyvQpL?=
+ =?us-ascii?Q?rRB4XvdkuZj7bOJ3hDSCNdSXXkJykTAAfseeLj+VNcpedKz3Vtthz0/hiujY?=
+ =?us-ascii?Q?COwRbuOsBQiMtUrtDPrLRgnHrqdq8PYGuJ98nQwKvbQyk0GvyLW8ToGvWFlH?=
+ =?us-ascii?Q?k33+u+Wnu1oa83uPUtUosFM5msXaAhxxHiOEXnx+?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231102161219.220-1-thinhtr@linux.vnet.ibm.com> <20231116151822.281-1-thinhtr@linux.vnet.ibm.com>
-In-Reply-To: <20231116151822.281-1-thinhtr@linux.vnet.ibm.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 16 Nov 2023 13:34:07 -0800
-Message-ID: <CACKFLik9h4pOPWtyaOutRwnwE+KEyO+50Cf+dMknvR2ybONTzQ@mail.gmail.com>
-Subject: Re: [PATCH v3] net/tg3: fix race condition in tg3_reset_task()
-To: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Cc: mchan@broadcom.com, pavan.chebbi@broadcom.com, netdev@vger.kernel.org, 
-	prashant@broadcom.com, siva.kallam@broadcom.com, drc@linux.vnet.ibm.com, 
-	venkata.sai.duggi@ibm.com, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, davem@davemloft.net
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000060e7df060a4bc86e"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW5PR11MB5811.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf658bb6-e1eb-4fab-49c0-08dbe6ec1d35
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2023 21:36:37.9673
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1+SKLS1N8Itp6c/W1njklfFMmkF/N+v0Jc9Mqv51NBtccHLtZHNAH8p3LWlGdz1naSGqMrs8R6Ocq/BjiGnJBL+/wfYvzctWUOzakRMl8nc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7025
+X-OriginatorOrg: intel.com
 
---00000000000060e7df060a4bc86e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> -----Original Message-----
+> From: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>
+> Sent: Thursday, November 16, 2023 6:22 AM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
+> Cc: davem@davemloft.net; kuba@kernel.org; pabeni@redhat.com;
+> edumazet@google.com; netdev@vger.kernel.org; Ertman, David M
+> <david.m.ertman@intel.com>; Wyborny, Carolyn
+> <carolyn.wyborny@intel.com>; daniel.machon@microchip.com; Kitszel,
+> Przemyslaw <przemyslaw.kitszel@intel.com>; Buvaneswaran, Sujai
+> <sujai.buvaneswaran@intel.com>
+> Subject: Re: [PATCH net] ice: Fix VF Reset paths when interface in a fail=
+ed
+> over aggregate
+>=20
+> On Wed, Nov 15, 2023 at 01:12:41PM -0800, Tony Nguyen wrote:
+> > From: Dave Ertman <david.m.ertman@intel.com>
+> >
+> > There is an error when an interface has the following conditions:
+> > - PF is in an aggregate (bond)
+> > - PF has VFs created on it
+> > - bond is in a state where it is failed-over to the secondary interface
+> > - A VF reset is issued on one or more of those VFs
+> >
+> > The issue is generated by the originating PF trying to rebuild or
+> > reconfigure the VF resources.  Since the bond is failed over to the
+> > secondary interface the queue contexts are in a modified state.
+> >
+> > To fix this issue, have the originating interface reclaim its resources
+> > prior to the tear-down and rebuild or reconfigure.  Then after the proc=
+ess
+> > is complete, move the resources back to the currently active interface.
+> >
+> > There are multiple paths that can be used depending on what triggered t=
+he
+> > event, so create a helper function to move the queues and use paired ca=
+lls
+> > to the helper (back to origin, process, then move back to active interf=
+ace)
+> > under the same lag_mutex lock.
+> >
+> > Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIO=
+V
+> on bonded interface")
+> > Signed-off-by: Dave Ertman <david.m.ertman@intel.com>
+> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+> > Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> > ---
+> > This is the net patch mentioned yesterday:
+> > https://lore.kernel.org/netdev/71058999-50d9-cc17-d940-
+> 3f043734e0ee@intel.com/
+> >
+> >  drivers/net/ethernet/intel/ice/ice_lag.c      | 42 +++++++++++++++++++
+> >  drivers/net/ethernet/intel/ice/ice_lag.h      |  1 +
+> >  drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 20 +++++++++
+> >  drivers/net/ethernet/intel/ice/ice_virtchnl.c | 25 +++++++++++
+> >  4 files changed, 88 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c
+> b/drivers/net/ethernet/intel/ice/ice_lag.c
+> > index cd065ec48c87..9eed93baa59b 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_lag.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+> > @@ -679,6 +679,48 @@ static void ice_lag_move_vf_nodes(struct ice_lag
+> *lag, u8 oldport, u8 newport)
+> >  			ice_lag_move_single_vf_nodes(lag, oldport,
+> newport, i);
+> >  }
+> >
+> > +/**
+> > + * ice_lag_move_vf_nodes_cfg - move VF nodes outside LAG netdev
+> event context
+> > + * @lag: local lag struct
+> > + * @src_prt: lport value for source port
+> > + * @dst_prt: lport value for destination port
+> > + *
+> > + * This function is used to move nodes during an out-of-netdev-event
+> situation,
+> > + * primarily when the driver needs to reconfigure or recreate resource=
+s.
+> > + *
+> > + * Must be called while holding the lag_mutex to avoid lag events from
+> > + * processing while out-of-sync moves are happening.  Also, paired
+> moves,
+> > + * such as used in a reset flow, should both be called under the same
+> mutex
+> > + * lock to avoid changes between start of reset and end of reset.
+> > + */
+> > +void ice_lag_move_vf_nodes_cfg(struct ice_lag *lag, u8 src_prt, u8
+> dst_prt)
+> > +{
+> > +	struct ice_lag_netdev_list ndlist, *nl;
+> > +	struct list_head *tmp, *n;
+> > +	struct net_device *tmp_nd;
+> > +
+> > +	INIT_LIST_HEAD(&ndlist.node);
+> > +	rcu_read_lock();
+> > +	for_each_netdev_in_bond_rcu(lag->upper_netdev, tmp_nd) {
+>=20
+> Why do you need rcu section for that?
+>=20
+> under mutex? lacking context here.
+>=20
 
-On Thu, Nov 16, 2023 at 7:19=E2=80=AFAM Thinh Tran <thinhtr@linux.vnet.ibm.=
-com> wrote:
-> diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/b=
-roadcom/tg3.c
-> index 14b311196b8f..1c72ef05ab1b 100644
-> --- a/drivers/net/ethernet/broadcom/tg3.c
-> +++ b/drivers/net/ethernet/broadcom/tg3.c
-> @@ -7630,6 +7630,26 @@ static void tg3_tx_timeout(struct net_device *dev,=
- unsigned int txqueue)
->  {
->         struct tg3 *tp =3D netdev_priv(dev);
->
-> +       /* checking the PCI channel state for hard errors
-> +        * for pci_channel_io_frozen case
-> +        *   - I/O to channel is blocked.
-> +        *     The EEH layer and I/O error detections will
-> +        *     handle the reset procedure
-> +        * for pci_channel_io_perm_failure  case
-> +        *   - the PCI card is dead.
-> +        *     The reset will not help
-> +        * report the error for both cases and return.
-> +        */
-> +       if (tp->pdev->error_state =3D=3D pci_channel_io_frozen) {
-> +               netdev_err(dev, " %s, I/O to channel is blocked\n", __fun=
-c__);
-> +               return;
-> +       }
-> +
-> +       if (tp->pdev->error_state =3D=3D pci_channel_io_perm_failure) {
-> +               netdev_err(dev, " %s, adapter has failed permanently!\n",=
- __func__);
-> +               return;
-> +       }
-> +
+Mutex lock is to stop lag event thread from processing any other event unti=
+l
+after the asynchronous reset is processed.  RCU lock is to stop upper kerne=
+l
+bonding driver from changing elements while reset is building a list.
 
-I think it will be better to add these 2 checks in tg3_reset_task().
-We are already doing a similar check there for tp->pcierr_recovery so
-it is better to centralize all the related checks in the same place.
-I don't think tg3_dump_state() below will cause any problems.  We'll
-probably read 0xffffffff for all registers and it will actually
-confirm that the registers are not readable.
+> > +		nl =3D kzalloc(sizeof(*nl), GFP_ATOMIC);
+>=20
+> do these have to be new allocations or could you just use list_move?
+>=20
 
->         if (netif_msg_tx_err(tp)) {
->                 netdev_err(dev, "transmit timed out, resetting\n");
->                 tg3_dump_state(tp);
-> --
-> 2.25.1
->
+Building a list from scratch - nothing to move until it is created.
 
---00000000000060e7df060a4bc86e
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> > +		if (!nl)
+> > +			break;
+> > +
+> > +		nl->netdev =3D tmp_nd;
+> > +		list_add(&nl->node, &ndlist.node);
+>=20
+> list_add_rcu ?
+>=20
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHs45jTS974yuaZAwc0x6JwNACLV89+N
-WPZHjhYPFM76MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEx
-NjIxMzQyMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAvFHQOcLBpIcy6je4nL/cWq1ihfPAjXgwCzgtT2u0CTzwwWV/t
-Cq93eEBgZ7DoS67HMtaqgRchX0b8krpYumQWBOMr6kvXoDviqV6t9ZijfgPYbO2agx8oYXLjODbS
-YyeX/kzZFahkr3Dse+W2SPTqojizGPv6RIF9sxAKUkEVJuMEkQjL8d1+APZquC27JffzCSoX2VLt
-W3qmezqgAacF10Lo+2GCvI5FqCFUlV9p6PxKiVwzEgNjGtlq29orVjg8AFb+nJP5cTk8++EyIkgZ
-rf0uwXZOqDAgkCg1fvose7bmndfuRHAs/Jocs5ZFtbDPHp4VUDVxPhAcj1nERYaM
---00000000000060e7df060a4bc86e--
+I thought list_add_rcu was for internal list manipulation when prev and nex=
+t
+Are both known and defined?
+
+> > +	}
+> > +	rcu_read_unlock();
+>=20
+> you have the very same chunk of code in ice_lag_move_new_vf_nodes().
+> pull
+> this out to common function?
+>=20
+> ...and in ice_lag_rebuild().
+>=20
+
+Nice catch - for v2, pulled out code into two helper function:
+ice_lag_build_netdev_list()
+Iie_lag_destroy_netdev_list()
+
+
+> > +	lag->netdev_head =3D &ndlist.node;
+> > +	ice_lag_move_vf_nodes(lag, src_prt, dst_prt);
+> > +
+> > +	list_for_each_safe(tmp, n, &ndlist.node) {
+>=20
+> use list_for_each_entry_safe()
+>=20
+
+Changed in v2.
+
+> > +		nl =3D list_entry(tmp, struct ice_lag_netdev_list, node);
+> > +		list_del(&nl->node);
+> > +		kfree(nl);
+> > +	}
+> > +	lag->netdev_head =3D NULL;
+
+Thanks for the review!
+DaveE
 
