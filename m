@@ -1,221 +1,145 @@
-Return-Path: <netdev+bounces-48375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CF217EE2DF
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:31:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09967EE306
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 907B61F2705D
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:31:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2BC51C20A0A
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E244328C5;
-	Thu, 16 Nov 2023 14:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344D22FC2E;
+	Thu, 16 Nov 2023 14:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pafVVW2S"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="YwDOT95B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23BF196
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 06:31:44 -0800 (PST)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-6707401e1edso4571086d6.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 06:31:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700145104; x=1700749904; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ze34MzP6ZzMJQHTOgbQ+ZaBo2IhiBlOffFMR4boWctc=;
-        b=pafVVW2Szad6C4pwuc5xf2rxCWR92qX0kCif6h3VDlJfmj7vweBt92h+Ixx/lYIc1e
-         P+r452sBzPYGwxXiyl3Nm0vgesWwXmNxGObFPd6ejFq3Bi902pi64OkfzDXXStjVix/3
-         wm2JvMRuoS6jjtRqwFNw6OYED9d6h1Ejuv+8Gt/37bVSpRqgFXJtP6p4Td9AkPBw/v6A
-         F/gAyyGsN8l0YwOptwzqxF8cPXLKAMPE0lKAqH784gjZH9ma2i4CqqvM8nQxWOM/HW40
-         OhI3Q3JbS0C/0aFUxizEnpYVkKIfKqB/TAm29P09yXg9uZaYZJQwz64/uYAN4lTu83YG
-         3Yqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700145104; x=1700749904;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ze34MzP6ZzMJQHTOgbQ+ZaBo2IhiBlOffFMR4boWctc=;
-        b=Wc6HeJG7i7vNq4NMkuMLQ3A/BFWjRvOaIScyVmeq9q+1KpuhSf3doDGkop9kPIwK88
-         WPhgFxrLWsfIJroTWCC7fJTT8dgazYn7a5TOMepjGnSojL1Mp8tsja4JxwG1B9Hgvix7
-         rLWkfkPSSkeXlULFKcmjM1wr81RiR5WEVS2HLWJmDJC+K8YnBUIGSY/qF8PeCtVhT9fh
-         oaYAdpCGXv1RRVwbShGoAw7idoQZyS5rxoys/KFrlD+G8wtV4xEHxRWrwbJZDp+HX936
-         MGdSRmi0sxJvhJSZiYw5AQcVUWJk6Yb8Ho5KOI5eWGxwBqGHnye4kqnk6u3hn5HOoKOE
-         2MPg==
-X-Gm-Message-State: AOJu0YwQ+HX00WnAFGQ2wEzeXnv0Lh7fMlk9ZgB7jTD9KxewwyZw/eGo
-	N7UhJqCoU/eaOuRoK+11ynh9yA==
-X-Google-Smtp-Source: AGHT+IERuHXTJmKC9tmJtPGJkbsVbQWeftwOI0w7HvRGFXG9ymG+DUtOY7bCy0DxYQg3Lwha15fpcQ==
-X-Received: by 2002:a05:6214:519a:b0:66f:ae60:8c51 with SMTP id kl26-20020a056214519a00b0066fae608c51mr10878210qvb.11.1700145104052;
-        Thu, 16 Nov 2023 06:31:44 -0800 (PST)
-Received: from [10.50.4.74] ([50.201.115.146])
-        by smtp.gmail.com with ESMTPSA id jy8-20020a0562142b4800b0065d0d0c752csm1401427qvb.116.2023.11.16.06.31.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 06:31:43 -0800 (PST)
-Message-ID: <6b39c522-1486-4e30-b958-b8a57104cede@linaro.org>
-Date: Thu, 16 Nov 2023 15:31:42 +0100
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2048.outbound.protection.outlook.com [40.107.241.48])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7C1C4;
+	Thu, 16 Nov 2023 06:39:19 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dac6oB6XbsEzgP5UYzOKs8/gVpDIE2HWG4Bc1netRZfP+IxdyW5SwPya8klIFkpRMcCzx3Rp9Gb2eSO7wg/3aYzV/zREmSSs3094vfsJ7hdzIrsLdf6FRlh/vnbCAr99oq3oq4kT8xVwX7pYVtHDM4g2HsT2kKF8APlsnNksD31q11cSRsNZmSwmzNDSM0pAUHLW2Hb2hhcYU5pTXuQ04EnviZQ4lnTzkVj82VXie2+rvxAxUN8c2K6rGQJKDL34K8SL6SfgXd1RMVUs0BVe5iLxLOGrVAegdWxBO/RS/uYLK7v3t5T4plWaUE1ClY0QdjeaKssuAF7ZZ5wmHFnUEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iqRoIkmRqBso5fRfq/80W7PUrao3Mm9xEwTtC30ov8Y=;
+ b=LIfJccGklxELDsjX7443riNJepYr0GHYNYAzU2FLbIHg/HuzerHQs9egSO3kdLlGuhoVyCjpo2AAk2+le0y6HI7eOmDgSxHEma9DsmIORXky2RZGemUhFuEbslllIgKt9ZnD+JuEB8WzRZhfYyQ25UrQrF1AzJ4U1K0Pv3jQTazQx7jlAdvqscqL0Lg5svnIgINimNQGEV/BE36tPq2cqTIVmlk+cKnyKXnw3qBYnuZihpTeVSPl4Jve8Se7vBSjP3F55YWS2YNMlpyW/VQBNRbJFm7beQi050UJznL2tcKrdo5XpuSs81J1E+OYce/1EBuAAsd5IeMxUfWR7zcNGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iqRoIkmRqBso5fRfq/80W7PUrao3Mm9xEwTtC30ov8Y=;
+ b=YwDOT95BmI4V32Ef9W5AKSSDMD2Ph4Ff8wcZSWMhJi6Micl78nlS+nh5nLidB3X+hecRvY9Tto21496KJWeg6k0Ssu7hl+dk56uykL1X4QGxH6zAv8IphtRFV+rKPxnr4zJhqXs0aIP+qD7Pr4+TZHYqEBFT6bA6ph+dteS5nls=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by VI1PR04MB7070.eurprd04.prod.outlook.com (2603:10a6:800:123::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.8; Thu, 16 Nov
+ 2023 14:39:12 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.007; Thu, 16 Nov 2023
+ 14:39:12 +0000
+Date: Thu, 16 Nov 2023 16:39:05 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the
+ Qualcomm IPQESS driver
+Message-ID: <20231116143905.fovty5c5qqfo7inq@skbuf>
+References: <20231114105600.1012056-1-romain.gantois@bootlin.com>
+ <20231114105600.1012056-4-romain.gantois@bootlin.com>
+ <59e1edc3-2ebc-40a9-a05b-cab02e8b0c10@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59e1edc3-2ebc-40a9-a05b-cab02e8b0c10@intel.com>
+X-ClientProxiedBy: AS4PR09CA0007.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 8/9] dt-bindings: net: pse-pd: Add bindings for
- PD692x0 PSE controller
-To: Kory Maincent <kory.maincent@bootlin.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>,
- Russ Weight <russ.weight@linux.dev>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-8-be48044bf249@bootlin.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20231116-feature_poe-v1-8-be48044bf249@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB7070:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3f0b436-79ea-407e-731c-08dbe6b1ccd3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ma1zhqhK5GwCPmM3Sknz2FOYRYl4yTGZ1AxiE3nVKHrmG2n55WjNWEl6MtEUob3e/TDko1pfoc6DW2hV7uqfOZmCGDMHnJmkqcxzKJzyGuTGpguCgYYVmTIV0gOKLgR+06jNNSfU6Oktu5GOKyd95fIADyEkFX/ysKKCa2hYQ2nYw9aceoZWmbl2hlVj5Jxtf9LD4b2YULQElmFuKDhQd1+Gcx3oZAhxU6lfMo+kZpC40APW+GknTjsln6iwwJzoyJyd/uQrYLXNQT8ii7KbCdYqdf93O6ybmLoEY0yq+CLFE2h3aopZvvgLnyT8d1OiCwQ9MDyFLbK0rpbClyUCWj6g6wndVkbnkQnZ+Z7zmtYYJX4KoFnNyfCW0rQXuhcu40kX7Zj+nu17RCnz+xE3a8bvi7t0BHG68bdGWNT0/pufFQk9Fxd5z8tcDQNUMRPvyL7vjOSROp0F6OMVgoZQQmmL+LN3tV4H4PzPWYGW/YkMj+dh2me2RORUmca8vXwkNmFXKpzQs9QkK8l+d76jJTPFS0v2fa1KlRwE6YJKm9wYv13Fg5UJKuBVlHeOMpX7
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(230922051799003)(186009)(1800799009)(451199024)(7416002)(4744005)(5660300002)(2906002)(44832011)(4326008)(8676002)(8936002)(6916009)(54906003)(66476007)(66556008)(66946007)(508600001)(6666004)(6486002)(6512007)(6506007)(9686003)(1076003)(33716001)(26005)(38100700002)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?cIJxVeyJJcXqkAP2+mVKPvOln/9EogRbXwiGOdsPJKpyjRmTGWiIESvllnde?=
+ =?us-ascii?Q?i/EvlpZo5bXLpx5k51d0tmv73X/B8zxtceqOGrvxpJn+aCF+wpY4/IjdXpbw?=
+ =?us-ascii?Q?LayRnJ1EePytcQuW4LUPfy4QTadIFox7LvEz7aB8l+sk4FCbNAxNV7dipRcl?=
+ =?us-ascii?Q?FU+ZVRCx4iyxw9DunmFEbsOIp43/69BWEmne/iCq591zCf2mc7SDGrXVFYlb?=
+ =?us-ascii?Q?UDvkcYG6fLuexHb+JhwzbB+DfIek3xWAVAh+yPXE1lsCzSAixY9RXUuJpeF0?=
+ =?us-ascii?Q?9eOGf85tCh5Cp+MCxJDRAiyF0e5mdtue96BaCH5ZwkHyo6wyuBOFvWAqQL08?=
+ =?us-ascii?Q?gai5hoIsuE+X2r9ySGk5VnZR0HWKcSp545B4Ov/i2qBH8ui+wYHwA9oI6hgN?=
+ =?us-ascii?Q?xUhSDz1mnRVNyBRGCFJjlT4VxbYb6Fkfk1wKHFCsjCYakn0DNoPXlD0FqA5Q?=
+ =?us-ascii?Q?QZ7og7976ABECkClRxGCtCFuu0BPWFji4vpj6LWYLS5LVZ8SbjVI4XMkxMYl?=
+ =?us-ascii?Q?9JSM/+kepoLFgusU60evbR6fgHimg9gyBFb1e82sK848Of5RFB6Pb6JZ2+xV?=
+ =?us-ascii?Q?9dkhIp4ifVyerQ3lvWLp53YkKb8LNFhz2V8XeL8fkEMx2H+H34dGx0EvdWt/?=
+ =?us-ascii?Q?kdEUpwj1EuRJieWT3zgxZlkla/gyicfh2aw89u9XM8KQeeq+NvjUNRrP3fTY?=
+ =?us-ascii?Q?HgXtZhZrlIVBZLH52DE+hKgjVkZJDNFcGOm1SPUy7HUI/Am0puCx6EpRR5Qm?=
+ =?us-ascii?Q?srFmdt6Lbus8lb0knRNfV4m1QT+JA4NarFm3p4dTPPaetwr4vWxNXbb2PmwW?=
+ =?us-ascii?Q?OksM584AYVzJ2axMBiqjkQPnrg2lA+CpsZRrRDOUcEKTKXO93AJYhnenoqXg?=
+ =?us-ascii?Q?ci17xzY5c14x8hUmyIYCCsyCuXc+c2zWs2tcF71OLs1NYwPghFZnT/68ojdn?=
+ =?us-ascii?Q?/2jV+IK+4GNPW6rvmFH43FGNUZVRLREqy2FNnBKcrcdjCt6HmHMb8yKBYjl6?=
+ =?us-ascii?Q?Zvs8pKf3OfeyzMEksNgcbKyB0bPGixk4o1l3u0OgWvN2iMTEWSwEcZweKzqV?=
+ =?us-ascii?Q?i1zlnRO59K1VAPeSt1x3s2eV2n7FHquG1H2mu2yc4bU5itlaUEo7QqCnWuHR?=
+ =?us-ascii?Q?nCq4NzWF9tUsMaTUz4uX3Wl0W+iYw/q+79C2TFV6m6z19fbed5hU9sEh3DHk?=
+ =?us-ascii?Q?ynJtmc+09VpwdeWRPicw96AO3NXFu0znkQVrWcSZtHWJ8rjFUJnayTxo5zEO?=
+ =?us-ascii?Q?660/woBRDi3Gb0Z1xHSeFaGy1uqQn7DN24Q+j4ISsrS8W8/d3Kf4OTOzAkHw?=
+ =?us-ascii?Q?k5ep0y8boVPlCiMSCGs8dd392vkrFmLicC/T09NruRxoPd7USbhvms+rccl4?=
+ =?us-ascii?Q?H7f5fKS2GQIiktQNtXYUO5A2dqzDHmF4srOwRRTCShH1+pSh05e7dZaoK+ee?=
+ =?us-ascii?Q?BczX0TUFzZtR3Kuo2XT7gfcR1cXVRyX/2NzsUMicSYmSWWLIQ9Kcb9bSm/fr?=
+ =?us-ascii?Q?g8suLa1UvmjNseyE7jHUAT9F4IW53H95lmQ1LqZOVUfnj/5iHboCCSiWSYki?=
+ =?us-ascii?Q?iP0djEsADBWaO8mb3hUrz6OZDqRhdmmoAX1i1m7i2enQM952DktJibsdgiAN?=
+ =?us-ascii?Q?Sg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3f0b436-79ea-407e-731c-08dbe6b1ccd3
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 14:39:12.4937
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4+m+JUvYiBgv+gOCsG4LHmoN38eI5C4nSUU1WT6TWF9mO4wNGav+5h18Eu/pPw4BUDunwuoEbIJly/BuvsYL7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7070
 
-On 16/11/2023 15:01, Kory Maincent wrote:
-> Add the PD692x0 I2C Power Sourcing Equipment controller device tree
-> bindings documentation.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->  .../bindings/net/pse-pd/microchip,pd692x0_i2c.yaml | 70 ++++++++++++++++++++++
->  MAINTAINERS                                        |  6 ++
->  2 files changed, 76 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0_i2c.yaml b/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0_i2c.yaml
-> new file mode 100644
-> index 000000000000..c42bbc427988
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/pse-pd/microchip,pd692x0_i2c.yaml
+On Wed, Nov 15, 2023 at 01:55:07PM +0100, Wojciech Drewek wrote:
+> Hi Romain,
+> I see that you splitted the patch, thanks for that.
+> However it's still too big IMHO, edma ipqess_edma could be introduced in seperate file e.g.
 
-Filename should match compatibles, so drop i2c suffix.
-
-> @@ -0,0 +1,70 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/pse-pd/microchip,pd692x0_i2c.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Microchip PD692x0 Power Sourcing Equipment controller
-> +
-> +maintainers:
-> +  - Kory Maincent <kory.maincent@bootlin.com>
-> +
-> +allOf:
-> +  - $ref: pse-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - microchip,pd69200
-> +      - microchip,pd69210
-> +      - microchip,pd69220
-
-Your driver suggests these are compatible.
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  '#pse-cells':
-> +    const: 1
-> +
-> +  ports-matrix:
-> +    description: Port conversion matrix configuration
-
-I do not see such property defined anywhere. Your description should
-explain what the purpose is and what it is exactly. Currently you just
-repeat property name, so quite pointless.
-
-
-> +    $ref: /schemas/types.yaml#/definitions/uint32-matrix
-> +    minItems: 1
-> +    maxItems: 48
-> +    items:
-> +      items:
-> +        - description: Logical port number
-> +          minimum: 0
-> +          maximum: 47
-> +        - description: Physical port number A (0xff for undefined)
-> +          oneOf:
-> +            - minimum: 0
-> +              maximum: 95
-> +            - const: 0xff
-> +        - description: Physical port number B (0xff for undefined)
-> +          oneOf:
-> +            - minimum: 0
-> +              maximum: 95
-> +            - const: 0xff
-> +
-> +additionalProperties: false
-
-unevaluatedProperties: false instead
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> 
-
-Best regards,
-Krzysztof
-
+I agree that it's way too much code in one go (also too much code in
+general). It doesn't help that much of it is blindly copied from DSA or
+duplicated from the qca8k driver from the without much thought. It looks
+like the EDMA portion could be separated from the switch portion.
 
