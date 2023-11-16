@@ -1,106 +1,154 @@
-Return-Path: <netdev+bounces-48308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFD067EE001
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:42:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889DD7EE022
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F45AB209C8
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:42:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FC3B1F219FA
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962022DF9D;
-	Thu, 16 Nov 2023 11:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Ca+HDLgo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742DD2F535;
+	Thu, 16 Nov 2023 11:50:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93A9182
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:42:04 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-6b77ab73c6fso528522b3a.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:42:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700134924; x=1700739724; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Y3a3I6T3ynb1aD8/N7le6GGs5vGQafrGkelqcFRqTs=;
-        b=Ca+HDLgo+cQwnOIdBisEWKsCjU41bJd9t9FseQmE5DCKHyFgClUT8PfQ6w2aM7bXNq
-         MGUGKZDes8uS1XWZhvjWbVSeOnQAaWeXsgwvJyLYhXg49NOVuDTRMEE8ghXn0h7j9fUJ
-         cIqNQO+9mIweWgiB2VmdFf7UUHhB/JdwFgd5Cm0N6126+UQdp10iXXDUJsxQwu+xrZb/
-         LTLWEHL2ON6SRyn4fNC8lNjUMC69xV070ZzjkeM3g5R2MVyk23n+gbSU9cbzoevxsjJG
-         XDbEqSMs42LI10oOiofHW+VhwTXYTYsco5R43bMrBZW23/cfPWIrfbydQUxzhkxil3yp
-         yNzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700134924; x=1700739724;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6Y3a3I6T3ynb1aD8/N7le6GGs5vGQafrGkelqcFRqTs=;
-        b=bOigoO6OeQOOV6XZ97M3ZUwchHZgDjHt9dfG0yPqGgxnvNzZnOMZNcBsR6APX92kQa
-         o0DKYfl110098AoQHdInLv1T059uKW2KMTcQjmqAjbFEkeeZhDm3e/22A9dkakZrLOqE
-         tX2mB7hlcZBIkGP+TPDKQc8HDUumRFdiM8eC8444ouKYP3wU2G4iO9TDlE5jAOuzTojc
-         5saSr9c+8zMUqycFa/ufOEp7nuzTquvmCNAP8FjchseqUsx6Sikl4mOxEqKsvlhyasfp
-         9N6HpR7bSybQYmL4szOCn9n9FbNp6XIESOd8xNlT+8yW6wfZPKNZZwWdrYLdkZPltmmZ
-         mZsQ==
-X-Gm-Message-State: AOJu0YxAyImIx4CYLLEXw170FJmzCoiaNWRuUWc49wbiCfLAupZ1kiFG
-	LgKk+oz2O/V9ss7APfbee6Y0vQ==
-X-Google-Smtp-Source: AGHT+IHH4rNcD9vWbtsk5f/2nk2Pqt1+wCLMj9nH/ql+RdHA1p48ijIxJb7paX8q+GAjLu7Gqox02w==
-X-Received: by 2002:a05:6a00:1304:b0:6c3:415a:5c05 with SMTP id j4-20020a056a00130400b006c3415a5c05mr2353312pfu.14.1700134924154;
-        Thu, 16 Nov 2023 03:42:04 -0800 (PST)
-Received: from C02FG34NMD6R.bytedance.net ([2001:c10:ff04:0:1000:0:1:7])
-        by smtp.gmail.com with ESMTPSA id e3-20020aa78c43000000b006c4d4d5a197sm4440457pfd.171.2023.11.16.03.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 03:42:03 -0800 (PST)
-From: Albert Huang <huangjie.albert@bytedance.com>
-To: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Albert Huang <huangjie.albert@bytedance.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Toshiaki Makita <toshiaki.makita1@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] veth: fix ethtool statistical errors
-Date: Thu, 16 Nov 2023 19:41:50 +0800
-Message-Id: <20231116114150.48639-1-huangjie.albert@bytedance.com>
-X-Mailer: git-send-email 2.37.1 (Apple Git-137.1)
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB094B0;
+	Thu, 16 Nov 2023 03:50:08 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R271e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0VwWMTyL_1700135405;
+Received: from 30.221.149.90(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VwWMTyL_1700135405)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Nov 2023 19:50:06 +0800
+Message-ID: <a307f9c4-2c4c-3ed9-b2ce-5e74f3a5bbb1@linux.alibaba.com>
+Date: Thu, 16 Nov 2023 19:50:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net v1] net/smc: avoid data corruption caused by decline
+Content-Language: en-US
+To: Wenjia Zhang <wenjia@linux.ibm.com>, dust.li@linux.alibaba.com,
+ kgraul@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <1699436909-22767-1-git-send-email-alibuda@linux.alibaba.com>
+ <20231113034457.GA121324@linux.alibaba.com>
+ <17abf559-ec8b-47e9-b4e4-59adfbc6943b@linux.ibm.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <17abf559-ec8b-47e9-b4e4-59adfbc6943b@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-if peer->real_num_rx_queues > 1, the ethtool -s command for
-veth network device will display some error statistical values.
-The value of tx_idx is reset with each iteration, so even if
-peer->real_num_rx_queues is greater than 1, the value of tx_idx
-will remain constant. This results in incorrect statistical values.
-To fix this issue, assign the value of pp_idx to tx_idx.
 
-Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit accounting")
-Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
----
- drivers/net/veth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 0deefd1573cf..3a8e3fc5eeb5 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net_device *dev,
- 	for (i = 0; i < peer->real_num_rx_queues; i++) {
- 		const struct veth_rq_stats *rq_stats = &rcv_priv->rq[i].stats;
- 		const void *base = (void *)&rq_stats->vs;
--		unsigned int start, tx_idx = idx;
-+		unsigned int start, tx_idx = pp_idx;
- 		size_t offset;
- 
- 		tx_idx += (i % dev->real_num_tx_queues) * VETH_TQ_STATS_LEN;
--- 
-2.20.1
+On 11/15/23 10:06 PM, Wenjia Zhang wrote:
+>
+>
+> On 13.11.23 04:44, Dust Li wrote:
+>> On Wed, Nov 08, 2023 at 05:48:29PM +0800, D. Wythe wrote:
+>>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>
+>>> We found a data corruption issue during testing of SMC-R on Redis
+>>> applications.
+>>>
+>>> The benchmark has a low probability of reporting a strange error as
+>>> shown below.
+>>>
+>>> "Error: Protocol error, got "\xe2" as reply type byte"
+>>>
+>>> Finally, we found that the retrieved error data was as follows:
+>>>
+>>> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+>>> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>>> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+>>>
+>>> It is quite obvious that this is a SMC DECLINE message, which means 
+>>> that
+>>> the applications received SMC protocol message.
+>>> We found that this was caused by the following situations:
+>>>
+>>> client            server
+>>>        proposal
+>>>     ------------->
+>>>        accept
+>>>     <-------------
+>>>        confirm
+>>>     ------------->
+>>> wait confirm
+>>>
+>>>      failed llc confirm
+>>>         x------
+>>> (after 2s)timeout
+>>>             wait rsp
+>>>
+>>> wait decline
+>>>
+>>> (after 1s) timeout
+>>>             (after 2s) timeout
+>>>         decline
+>>>     -------------->
+>>>         decline
+>>>     <--------------
+>>>
+>>> As a result, a decline message was sent in the implementation, and this
+>>> message was read from TCP by the already-fallback connection.
+>>>
+>>> This patch double the client timeout as 2x of the server value,
+>>> With this simple change, the Decline messages should never cross or
+>>> collide (during Confirm link timeout).
+>>>
+>>> This issue requires an immediate solution, since the protocol updates
+>>> involve a more long-term solution.
+>>>
+>>> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC 
+>>> flow")
+>>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>> ---
+>>> net/smc/af_smc.c | 2 +-
+>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>>> index abd2667..5b91f55 100644
+>>> --- a/net/smc/af_smc.c
+>>> +++ b/net/smc/af_smc.c
+>>> @@ -599,7 +599,7 @@ static int smcr_clnt_conf_first_link(struct 
+>>> smc_sock *smc)
+>>>     int rc;
+>>>
+>>>     /* receive CONFIRM LINK request from server over RoCE fabric */
+>>> -    qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
+>>> +    qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
+>>>                   SMC_LLC_CONFIRM_LINK);
+>>
+>> It may be difficult for people to understand why LLC_WAIT_TIME is
+>> different, especially without any comments explaining its purpose.
+>> People are required to use git to find the reason, which I believe is
+>> not conducive to easy maintenance.
+>>
+>> Best regards,
+>> Dust
+>>
+>>
+> Good point! @D.Wythe, could you please try to add a simple commet to 
+> explain it?
+>
+
+Also good to me, i will add comment to explain it.
+
+D. Wythe
+
+> Thanks,
+> Wenjia
+>>
+>>>     if (!qentry) {
+>>>         struct smc_clc_msg_decline dclc;
+>>> -- 
+>>> 1.8.3.1
 
 
