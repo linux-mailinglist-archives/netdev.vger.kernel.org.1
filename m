@@ -1,147 +1,103 @@
-Return-Path: <netdev+bounces-48359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A01A7EE254
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:06:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE89E7EE252
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:06:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FBF31C20A09
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:06:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DD76280F69
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F65131725;
-	Thu, 16 Nov 2023 14:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="GT0Zan+s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A712C857;
+	Thu, 16 Nov 2023 14:06:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16AF385
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 06:06:26 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id C0FE222944;
-	Thu, 16 Nov 2023 14:06:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1700143584; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=A7mQ0ktd/kh1TcU81IqXVc9Up90CuK8Zi6v6OxZQE+k=;
-	b=GT0Zan+s2/54ZCOZ5j4Bbnrty0O1QMNHHc1mjfiJQwsMAIRmPAwcOxN6WJrlN3JO0Lfivg
-	VUjaDzy4dZEBuBrCLidioluQx9ub+wfn5IfU3Aj1FPrvSOPXdYNniwJkZhGYtYd+jP78Nz
-	25+A9tcAkGRYW2fzkrdvA7NA2+iqp7c=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 93CEB139C4;
-	Thu, 16 Nov 2023 14:06:24 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id RsVdIuAhVmVCJgAAMHmgww
-	(envelope-from <oneukum@suse.com>); Thu, 16 Nov 2023 14:06:24 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: bjorn@mork.no,
-	netdev@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [RFC] usbnet: assign unique random MAC
-Date: Thu, 16 Nov 2023 15:05:52 +0100
-Message-ID: <20231116140616.4848-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.42.1
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F60812F;
+	Thu, 16 Nov 2023 06:06:23 -0800 (PST)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-5bf58204b7aso8754877b3.3;
+        Thu, 16 Nov 2023 06:06:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700143582; x=1700748382;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pEPUom4+S9HspVdedIGhs90OWgXiSLz4bkpRQsQLtVY=;
+        b=wDh2W52UAmJq+OUeg+wgykBKBLCJ6TFf8qd9xkhwdZY9z/mQwWuDJ2x6ZHVlYNDnNs
+         eT/b0Hr2M5G88EHfFu90hhnexRQFATpv6yfoTJB4L7jqe4oR4bGR8vAKmtXCO6rMzEUL
+         r3bVXjJUTaGr1Qgc/tr0443X4PAV+la4P0rLM47VWgaFBse8c4rGM7Resyh2rGmTDVBd
+         G+b9Ihjxv4v0fx1YNihjtSfm46bb/ZQe23bFnNShYdkEFzqsysLwM5NFzBD3apqfd+Rg
+         Dd3o8ZxhMn3HxLLLO5GX9FVDgAb43jtfSxCO3S1qPDYY5Ga2jHBAJQ1/yIyfFqXLrq74
+         C+Hw==
+X-Gm-Message-State: AOJu0Yw6B5ZYgRZOxo58U13j+7nIGM1JilOaiS0kQkWSoq+rO22drzds
+	hE6WxjqP45Akz8YaGxxCiN7a3AlQhl+BCg==
+X-Google-Smtp-Source: AGHT+IF8wudKwS97Tv3Klxmzo1yEYk5N+m59Gv7vf8mWO/WQc/WreLLot09iHG/ZwbggQDA2Ut6K6A==
+X-Received: by 2002:a05:690c:368f:b0:5a7:a817:be43 with SMTP id fu15-20020a05690c368f00b005a7a817be43mr4875432ywb.6.1700143581817;
+        Thu, 16 Nov 2023 06:06:21 -0800 (PST)
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com. [209.85.128.175])
+        by smtp.gmail.com with ESMTPSA id i12-20020a81d50c000000b005af5bb5e840sm1005405ywj.34.2023.11.16.06.06.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Nov 2023 06:06:21 -0800 (PST)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5c516f92759so8768687b3.2;
+        Thu, 16 Nov 2023 06:06:21 -0800 (PST)
+X-Received: by 2002:a81:6c41:0:b0:5af:a73f:53d3 with SMTP id
+ h62-20020a816c41000000b005afa73f53d3mr16703732ywc.13.1700143581293; Thu, 16
+ Nov 2023 06:06:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: 0.71
-X-Spamd-Result: default: False [0.71 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[3];
-	 R_MISSING_CHARSET(2.50)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 TO_DN_SOME(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 MID_CONTAINS_FROM(1.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-2.99)[99.96%]
+References: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 16 Nov 2023 15:06:10 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXRyvQ+z7O7wZ5U5y+1OcPWwzL0f1EYu1vuC67p=mBwWg@mail.gmail.com>
+Message-ID: <CAMuHMdXRyvQ+z7O7wZ5U5y+1OcPWwzL0f1EYu1vuC67p=mBwWg@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: renesas,etheravb: Document RZ/Five SoC
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Sergei Shtylyov <sergei.shtylyov@gmail.com>, 
+	Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The old method had the bug of issuing the same
-random MAC over and over even to every device.
-This bug is as old as the driver.
+On Wed, Nov 15, 2023 at 10:05=E2=80=AFPM Prabhakar <prabhakar.csengg@gmail.=
+com> wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> The Gigabit Ethernet IP block on the RZ/Five SoC is identical to one
+> found on the RZ/G2UL SoC. "renesas,r9a07g043-gbeth" compatible string
+> will be used on the RZ/Five SoC so to make this clear and to keep this
+> file consistent, update the comment to include RZ/Five SoC.
+>
+> No driver changes are required as generic compatible string
+> "renesas,rzg2l-gbeth" will be used as a fallback on RZ/Five SoC.
+>
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-This new method generates each device whose minidriver
-does not provide its own MAC its own unique random
-MAC.
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
----
- drivers/net/usb/usbnet.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+Gr{oetje,eeting}s,
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 2d14b0d78541..37e3bb2170bc 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -61,9 +61,6 @@
- 
- /*-------------------------------------------------------------------------*/
- 
--// randomly generated ethernet address
--static u8	node_id [ETH_ALEN];
--
- /* use ethtool to change the level for any given device */
- static int msg_level = -1;
- module_param (msg_level, int, 0);
-@@ -1731,7 +1728,6 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 
- 	dev->net = net;
- 	strscpy(net->name, "usb%d", sizeof(net->name));
--	eth_hw_addr_set(net, node_id);
- 
- 	/* rx and tx sides can use different message sizes;
- 	 * bind() should set rx_urb_size in that case.
-@@ -1805,9 +1801,13 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 		goto out4;
- 	}
- 
--	/* let userspace know we have a random address */
--	if (ether_addr_equal(net->dev_addr, node_id))
--		net->addr_assign_type = NET_ADDR_RANDOM;
-+	/*
-+	 * if the device does not come with a MAC
-+	 * we ask the network core to generate us one
-+	 * and flag the device accordingly
-+	 */
-+	if (!is_valid_ether_addr(net->dev_addr))
-+			eth_hw_addr_random(net);
- 
- 	if ((dev->driver_info->flags & FLAG_WLAN) != 0)
- 		SET_NETDEV_DEVTYPE(net, &wlan_type);
-@@ -2217,7 +2217,6 @@ static int __init usbnet_init(void)
- 	BUILD_BUG_ON(
- 		sizeof_field(struct sk_buff, cb) < sizeof(struct skb_data));
- 
--	eth_random_addr(node_id);
- 	return 0;
- }
- module_init(usbnet_init);
--- 
-2.42.1
+                        Geert
 
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
