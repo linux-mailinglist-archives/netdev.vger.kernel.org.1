@@ -1,151 +1,261 @@
-Return-Path: <netdev+bounces-48453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEBC47EE61C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 18:45:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2D17EE620
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 18:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62731C20921
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:45:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6620B1C208A3
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96FE47784;
-	Thu, 16 Nov 2023 17:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F01482D3;
+	Thu, 16 Nov 2023 17:48:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TdV5KPPN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRoDn6uG"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2083.outbound.protection.outlook.com [40.107.22.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E10DFA5
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 09:45:33 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fzXOdMFYTwVse/AHCDc81iPj0S791oKK3p9v+ShrYLXOSk3jPnhlz5yJpCBhnallagWWc9aApinLAJJe9tLmAZfGVKLgGflMgpJbp2hmMaz5r8p0OlO29ga9XGEOAXJa8tSOSM+NwO5JROi3NeRGJeZUMjbROE/Bb31xYW4a7co+1LzbdsvlpRSDtWfWSnbW32ppgGKkSK2BKoQOtiFoMlwBnQo9P0Y6vj72LvTHnlqqVpozmWFqE9p8y+43KreHOZvHgHtf0rp9Cw4I3UBhthBvUopNBNkHTHB6QTd06EHnVLmHW2bC0OLQYp7rkEsgTFxLgaUxFywh46gyy5VEHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=glLM556R7EuRaz7JjkwBdJdevD0uIS6nnKEgWojMNYo=;
- b=cxlh86jzK+ewA+Zp4orMkQ3KT1cVzD0o4HlMT52HmDzHP+XoZL7pr6XRMFbDjhYB3XIaYNiUuGC7Z834+p3LsHAoc55mboNre//gbRtQPXV4TYoQ+fD9SlAot29WcCAfWmYkZ7ux+XP96Zy5GkykznzObUP9sOXefymPvFPx1s7/av6YTIZmBN5hr2UyIEr5hZ92JVp1LwIHq/8BILqbbmDGNZArOMQBQb+aUejYI5RR7wRXm26paSuYEoY4j9VetXv6tcK2a4ZMf1hSTSfk4o4dMGsh2tukVYgGaNgujJqQ2Ef7TfRT9Pyll12QQxfC07N2W4pABd6hJv2X+rkP+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=glLM556R7EuRaz7JjkwBdJdevD0uIS6nnKEgWojMNYo=;
- b=TdV5KPPN1umthsnzvNCa19XHJ/5D+bqijvzqhZFywvYr0pOSTVZ6jsL31yidkWuISWHof5iluj3thKfkv4NYzgjqw2QtTtsU35swYwecjmaLdazcU9Nn+tBjPSc/BM82pbyHgNeYESl2v2xgZizY5D8eDfyRyPcBVfiyMJqg/nhvCYtPDavc0SBYe41z+cIMR8SBcZQfqlIlHqr+qCPhQ2/v/Do2UFMVh0gwqSacjZMQHmKvPQznfAWTNhcAOJLFqy/zQuEmE8yHuDau9AaNJnArCobrm2aJFmen/8Qud/TPcFGWClOD0gG9TsK3MwXhIzPExw5mpynyQtTMgnhMtA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from VE1PR04MB6478.eurprd04.prod.outlook.com (2603:10a6:803:12a::10)
- by DU0PR04MB9672.eurprd04.prod.outlook.com (2603:10a6:10:31d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.18; Thu, 16 Nov
- 2023 17:45:30 +0000
-Received: from VE1PR04MB6478.eurprd04.prod.outlook.com
- ([fe80::775f:9e9:ef9a:6a09]) by VE1PR04MB6478.eurprd04.prod.outlook.com
- ([fe80::775f:9e9:ef9a:6a09%4]) with mapi id 15.20.7002.015; Thu, 16 Nov 2023
- 17:45:30 +0000
-Message-ID: <b8e59ad0-c22b-4e44-94e0-cb46c4bbd5be@suse.com>
-Date: Thu, 16 Nov 2023 18:45:27 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] usbnet: assign unique random MAC
-Content-Language: en-US
-To: =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>,
- Oliver Neukum <oneukum@suse.com>
-Cc: netdev@vger.kernel.org
-References: <20231116123033.26035-1-oneukum@suse.com>
- <87ttplg9cw.fsf@miraculix.mork.no>
- <774a8092-c677-4942-9a0a-9a42ea5ca1fd@suse.com>
- <87il61g7fz.fsf@miraculix.mork.no>
- <6eba35aa-c20e-434d-9d4d-71c1c06c7a1d@suse.com>
- <875y21g3cv.fsf@miraculix.mork.no>
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <875y21g3cv.fsf@miraculix.mork.no>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR4P281CA0292.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e7::8) To VE1PR04MB6478.eurprd04.prod.outlook.com
- (2603:10a6:803:12a::10)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C83D7A5
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 09:48:07 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9443c01a7336-1cc30bf9e22so8255805ad.1
+        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 09:48:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700156887; x=1700761687; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VDVOkFM35A6XlieuXe05/rvDEFLMVMfOweYDBT9mYaY=;
+        b=XRoDn6uGlWFLL1+qIHl/gN3vLT+8OD3sx8tR0syd6WJb5ecmIN7ERB1yUKYA2ibvCp
+         uv9KA8j55c9UDmYRH1EG/sZQBnMPcr8WmySVBmkpChm4vivuT4M46JJ07UdbLpQ0KoZ+
+         Ymj7hCSIiL6+u+UH4lEW7v3QAqoD5Vx3Byiz05DRdg+KvQQjeIDKZMVd5ATXv8P9uWF8
+         ALMr4A1PyYS80vLU5yQImKDv1+OXmvFqFoq2sFAkAOS0FUaCPJa5E+rVc56R9DVMRNUc
+         GER83Wdx71blWIy0LBJIs7yFbXfA47Ueo5YzCyjBTkteSYcyPi7DTEProRAm/A4RCOut
+         qxbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700156887; x=1700761687;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=VDVOkFM35A6XlieuXe05/rvDEFLMVMfOweYDBT9mYaY=;
+        b=Ko76uC9DZehta+hUhPSTwFegXf+YHeyN6rX1Bren9ux3in2Ay/Je333jFM3iB33Z5D
+         jLAYnRqF5LEtlX9HrURLMAYbY0hnFtbK8KR9TB6U6wpYhPM3wUE+K8WIs+prig0xGTPv
+         UyTap148tOVzApvHdMPv8ayxt+w1iNjUnM2IUXwOiVdVb0ZKYgU7D8Xs47QBppbyescT
+         5trtbiDjOY2G8u+4bzzfl6G8KM/xmP+sDZuPCAxriyd4elyE4v7xJ/D9si4QXAXbLzRH
+         qd3+g0HkhsJXcNdfKspyYrLCxfxWRAq5bCwFf09EGg0/xLgAyUaht9thbIEuP5XWY/Tw
+         wdfQ==
+X-Gm-Message-State: AOJu0Yw7zbj3K7DD5qC+mnQB7Xq/YpjmrJXq+U/naXB1+dd8YJaFeTVy
+	XTGSQArStiiKu/24IzTC4hk=
+X-Google-Smtp-Source: AGHT+IGvl28KPsX61xqrmIZHifidx5iAS1CeHTgQ/OWzDEYw9wOkqecutJjJSYonwCuZNJsGgptZwA==
+X-Received: by 2002:a17:902:e5cd:b0:1cc:33e7:95f5 with SMTP id u13-20020a170902e5cd00b001cc33e795f5mr3474726plf.33.1700156887114;
+        Thu, 16 Nov 2023 09:48:07 -0800 (PST)
+Received: from t14s.localdomain ([2804:29b8:5086:6485:61b4:61a6:e9fe:e6ca])
+        by smtp.gmail.com with ESMTPSA id m6-20020a170902db8600b001cc4e477861sm9440823pld.212.2023.11.16.09.48.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 09:48:06 -0800 (PST)
+Received: by t14s.localdomain (Postfix, from userid 1000)
+	id 467C07D7C55; Thu, 16 Nov 2023 14:48:04 -0300 (-03)
+Date: Thu, 16 Nov 2023 14:48:04 -0300
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Vladyslav Tarasiuk <vladyslavt@nvidia.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH net] net: sched: do not offload flows with a helper in
+ act_ct
+Message-ID: <ZVZV1KLhmuC/Nb2V@t14s.localdomain>
+References: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
+ <CAM0EoMmnzonWhGY7Di2wgrt--hJf5TrcCObPnkOuehLuiziKdw@mail.gmail.com>
+ <CADvbK_fBwMohTb7eHBC5gosgfBUoeRw2uOPmE6SFRUC0isCL7A@mail.gmail.com>
+ <CAM0EoMmMMMyxsktxCezjw-oePU-Lqsw2MMwMA5_hOLXiv5i4WA@mail.gmail.com>
+ <ZVX+prlJ2EfB3kuF@t14s.localdomain>
+ <CAM0EoMkue6_7G-_BWEDbjuEYPfjSCXdnmvMsEG+QUWAfJNoz4A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB6478:EE_|DU0PR04MB9672:EE_
-X-MS-Office365-Filtering-Correlation-Id: 415f89b4-46b9-41d7-f568-08dbe6cbd347
-X-LD-Processed: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba,ExtFwd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cT6E0si7jlNHFZbDFX/mCoQVrKx9R969jYJIX/hgtZpuCm3kPGeH2kVsNJv3f4pGIuEFZ0F3SVwxzlK82MP9esd6hwK+/0MeCJujuYJPhX/GNYWEMqByujAXjOg6nqFBVskSLUBCAD6FdykQ0kBl8f24PiNP3SRO6czBwXgaFFGQKFUe9Z1TypLjS55/vejgzrq83e47mdtNjeGybViOxMWglEi8ELTh1JtwNpPHSiAAH6iRWgxBCjGK4D3GGf21UuhqDUj5o9LCTH4rC0epnG0G/jNbJXyaDjkhFpWgfiGHsCMph5AovvmJ9HMDDI9eApMJ71vxGIW54vCNdKSSH1RECwWDNmj8oQ3rei0V1GZQyRJVCxTQAMd8Q3HQqwCWWMHokjty5wUOzAiMa4yZvAElmRsFgnUXG7sk/y2nAC3xAcAhMq1Ld4auVNyZgZrJPx8CmOd+wqF1ieU2QZheJpfEyk9bNWRM29t4BziYZQ58HhezbQUGB+a7M5SUd326u/j6LVlnhqrKd+1V0p17tJ2EJycbfOk5EqZg2EC7CaP/FDvBaeNgNCxSitEsf2olgIEosNpspkXIbk9+CLanzh39ZWDWqqT15X3H6zKCIedX//FbHkCF9AoDlgTxQeF0TGCbOn2BT0K2JSrHJcgbtA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB6478.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(346002)(39860400002)(396003)(230922051799003)(64100799003)(186009)(451199024)(1800799009)(38100700002)(6666004)(6506007)(53546011)(31686004)(83380400001)(2616005)(6512007)(86362001)(41300700001)(2906002)(5660300002)(4744005)(66946007)(8936002)(36756003)(31696002)(8676002)(110136005)(66556008)(66476007)(316002)(4326008)(478600001)(6486002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NFAyWVRvV1RUSm9RRnl2SGFKTFl6aUwxZEdZcTVhTXRSRnhFeXBpTnZsNlcw?=
- =?utf-8?B?dVpucVlwWDVOdml4NnNIUkpnOG9kRHd4aUhxcTRQbXp0MHhmbllnU09OTURY?=
- =?utf-8?B?a0g3SDJDbFlpODJuSEE3YW1ZRmR6Qnd3NDNpaFZmOFpIaUxSQzlrT3JIQmhO?=
- =?utf-8?B?M1NMMlArcW1kY1p0Q2VGbWFXTkpKZERVN2lvc1pUQXNkL2oxNGQ2Ri8yM1lh?=
- =?utf-8?B?TFFvL01uKzBtTzNrRmN4NWVucXN2VXRUZm5ycUQraWR5cHEvMWxPR2xMeG5s?=
- =?utf-8?B?RXFGelpxREc0MmtYUjZOZ0Fqek5QamxEY05QelBYbGQ0eGJ2VEo4L3hKbUpr?=
- =?utf-8?B?SzQ5SUFIaWxCUkpiZ2RrQ25PRVlVaXpxaFVNTXkxZlFiRjJlSHYzYm1JQVhj?=
- =?utf-8?B?MmlXS0lPRUhsbTNiREp3NTEzVG9nOVp1Zm5ualF3MkxZTHRFRFpFQzcxWlVv?=
- =?utf-8?B?eWkrUnp1TSs5VmJIN3ArL1dWcmp1N282NTVSY2tmR3pXRndwRGpOUWFqM05k?=
- =?utf-8?B?Q2VBUEJCamh6YnVpVDZ0RHQvbHVHbVVKWEtMNjBaOS82N3p5OUIyZVdxbDVL?=
- =?utf-8?B?Q2crRmtxZWVPSHRueHNYbk41eXFGL09lMjBJbFlsbldZRjhKdmtabUYrbnVm?=
- =?utf-8?B?Y2NoeHA5eWlTVS9Pa0J2TktEc25mTHNVd29xdSt2YnVPcE8ramY1YmlBeWhH?=
- =?utf-8?B?T2tWSms2TXR6Y0xPRndiR1RzZzl2d0pPTHk3QzFZSmVYbGtmK3VuMTNIUjVP?=
- =?utf-8?B?bFZVY0V2U0tnV1lITEIwQndQNEJ2U1djMSs5VURuNnZZRnlaRUx3SWgra2hB?=
- =?utf-8?B?REZRUEJLS2ZNTHBtRWNTQVNqWnhHZU41VHdURkg3WnFZQzBwejdIK0ozeG1T?=
- =?utf-8?B?eS9CcXBEcGRkWXlzbGJRSVdyWndhbEYyQ0x5bVJ6MXhPSnI4NWlYRjV1TFBU?=
- =?utf-8?B?M2VvaW5hUVNmcFVTdndPNDIxL25sL3NQZTdRcHJ1QTBHcUgySExYRkY5U0I5?=
- =?utf-8?B?Wjd6T1RwUndoOGNPTnUxVkJUam1kSVQxK1p1ak5jR0F3NjUrU0pFYlJCNzV1?=
- =?utf-8?B?cVllb3liM3NRUDVzcFJBakkvRS9rc2k1azlsdUZ1cExUaEg4MGRSVHhsa3FT?=
- =?utf-8?B?aU9MTVloSG5QU1BBSlZkN2ZiSFcvZDhUTzZ6eHNSMTQ3QjJqYWx1bnNKTUsz?=
- =?utf-8?B?QmRCcFZyd082ZFIrWjBEVDQyMkRrdjFkWDd2S2kranlRNDlVM3pIYURXU2tz?=
- =?utf-8?B?d3RseC92RXhqdVlhd0FHU0dtNGVRVlozQ2c1Z0F1T0dGYWkyQVo1UVU2QkN1?=
- =?utf-8?B?Z2dsdlJPakROaVNTOGlCekN3UWFPZGNaM1MvUVh2V3ZkMmt4WjNTakpBbENF?=
- =?utf-8?B?aS9QQ1VKRGFtOFFpYlVQNjk1S2JsR2JqdmZLM2lOSmV0Rkt0b2p2c3dUMHFk?=
- =?utf-8?B?dWdtdzdYRW5hVEhnZEpmOE5XRGtGRE5PVTVqT2hDTTZDZUFxNXY1UE5qOXpo?=
- =?utf-8?B?WmtybWhWSDQrU3JVMEduKzdWdTl4UHg2YVE4Q2t3VkExb0NqMG1sR085VG9T?=
- =?utf-8?B?WCs3eU5Iek9tS2RBUndDbG54QU1jZFZZbWowVDFRcmVWTVJKWXhMM2drMk1J?=
- =?utf-8?B?ZEhnMWlFQTl5cW9wcWJDMHRRTzI5bkNmRTdDY29aQUZ1M0pISUZ5WHdlSDBk?=
- =?utf-8?B?NkNuUURHSGExNUE3VzYyZHl3R01BTldPbWxjVzllR1E5cW5SQ3JyL3FaQ3N6?=
- =?utf-8?B?TVJIWklPUkFKb2hqZ0V3RUtEdjFSUG5hYTRKbFBwWUVYaWRCTlA0UzFFT3Vx?=
- =?utf-8?B?YldmWnVFV2M1WmlkdTVTeHo4c0pNZGt4Y0xXYU8vV3JHQ29KNUI1d3dYQXdR?=
- =?utf-8?B?VU02YmhKZmh0TnY4VllTYkw3czY4TTNDU3poa0FLTDMxakJZc01xcFB2NWdR?=
- =?utf-8?B?azN4N2xFMHhGR3NNR3RjTlJKb1NKYVl5WTRhNkdqN3FxNEsxNkswYmJxY1h4?=
- =?utf-8?B?US90QWFROHUwdU4zZVdDZE1OTWlWaTM1cnJZcWgxcHEzRCtFeXZGSEhoa3da?=
- =?utf-8?B?dzViMzFmWDVweEYrNmpEU2JTMWplcDVpR21XNmlOM2Nkd3FiU0FHZVlvdVJl?=
- =?utf-8?B?d2pueVg0Z29yM1psVFk4TG5UVmxPK0swZlc5dW9lTzJtNU43cHh0WjRCMm9B?=
- =?utf-8?Q?uF4tQ0Z/VylYNKALE+PTJ2E+jELgLJ4k18v2PY847uFf?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 415f89b4-46b9-41d7-f568-08dbe6cbd347
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB6478.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 17:45:30.4388
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iuRGM6uXfyrn76Ol/5QybIzd2wFea7XoySTR3dz0gTYfflgsPXT4EO6Ug3t42Q7R6AZq5Si8F/vmQsN37AMcuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU0PR04MB9672
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMkue6_7G-_BWEDbjuEYPfjSCXdnmvMsEG+QUWAfJNoz4A@mail.gmail.com>
 
+On Thu, Nov 16, 2023 at 10:29:39AM -0500, Jamal Hadi Salim wrote:
+> Hi Marcelo,
 
+heya!
 
-On 16.11.23 15:49, Bjørn Mork wrote:
-> Oliver Neukum <oneukum@suse.com> writes:
 > 
->> You could argue that handing out the same MAC twice
->> violates standards.
+> On Thu, Nov 16, 2023 at 6:36 AM Marcelo Ricardo Leitner
+> <marcelo.leitner@gmail.com> wrote:
+> >
+> > On Wed, Nov 15, 2023 at 11:37:51AM -0500, Jamal Hadi Salim wrote:
+> > > Hi Xin,
+> > >
+> > > On Tue, Nov 14, 2023 at 10:18 AM Xin Long <lucien.xin@gmail.com> wrote:
+> > > >
+> > > > On Mon, Nov 13, 2023 at 4:37 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+> > > > >
+> > > > > On Mon, Nov 13, 2023 at 12:53 PM Xin Long <lucien.xin@gmail.com> wrote:
+> > > > > >
+> > > > > > There is no hardware supporting ct helper offload. However, prior to this
+> > > > > > patch, a flower filter with a helper in the ct action can be successfully
+> > > > > > set into the HW, for example (eth1 is a bnxt NIC):
+> > > > > >
+> > > > > >   # tc qdisc add dev eth1 ingress_block 22 ingress
+> > > > > >   # tc filter add block 22 proto ip flower skip_sw ip_proto tcp \
+> > > > > >     dst_port 21 ct_state -trk action ct helper ipv4-tcp-ftp
+> > > > > >   # tc filter show dev eth1 ingress
+> > > > > >
+> > > > > >     filter block 22 protocol ip pref 49152 flower chain 0 handle 0x1
+> > > > > >       eth_type ipv4
+> > > > > >       ip_proto tcp
+> > > > > >       dst_port 21
+> > > > > >       ct_state -trk
+> > > > > >       skip_sw
+> > > > > >       in_hw in_hw_count 1   <----
+> > > > > >         action order 1: ct zone 0 helper ipv4-tcp-ftp pipe
+> > > > > >          index 2 ref 1 bind 1
+> > > > > >         used_hw_stats delayed
+> > > > > >
+> > > > > > This might cause the flower filter not to work as expected in the HW.
+> > > > > >
+> > > > > > This patch avoids this problem by simply returning -EOPNOTSUPP in
+> > > > > > tcf_ct_offload_act_setup() to not allow to offload flows with a helper
+> > > > > > in act_ct.
+> > > > > >
+> > > > > > Fixes: a21b06e73191 ("net: sched: add helper support in act_ct")
+> > > > > > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > > > >
+> > > > > I didnt quite follow:
+> > > > > The driver accepted the config, but the driver "kind of '' supports
+> > > > > it. (enough to not complain and then display it when queried).
+> > > > > Should the driver have rejected something it doesnt fully support?
+> > > > Hi, Jamal,
+> > > >
+> > > > The sad thing is now it does not pass the 'helper' param to the HW in
+> > > > tcf_ct_offload_act_setup() via struct flow_action_entry, in fact
+> > > > flow_action_entry does not even have a member to keep 'helper'.
+> > > >
+> > > > Since no HW currently supports 'helper', we can stop it setting to HW
+> > > > from here for now. In future, if HWs and struct flow_action_entry
+> > > > support it, we can set it to the entry and reply on HWs to reject
+> > > > it when not supported, as you mentioned above.
+> > >
+> > > That makes sense - so i am wondering why that was ever added there to
+> > > begin with. Would there be any hardware that would have any helper
+> > > support? If no, Shouldnt that code be deleted altogether?
+> >
+> > Not sure if I follow you, Jamal. There's no code at all to pass the
+> > helper information down to the drivers. So drivers ended up accepting
+> > this flow because they had no idea that a helper was attached to it.
+> >
 > 
-> You can't argue that to the Sparc crowd.  Which has to be considered
-> when sending stuff to netdev :-)
+> So is the goal:
+> a) if there's a helper it doesnt make sense to offload the flow or
+> b) if there's a helper then it(the helper) works in s/w only but the
+> flow offload is still legit?
 
-Should I reword the commit message?
+It is #a.
 
-	Regards
-		Oliver
+> 
+> If it is #a then my question was why is that code even there in the
+> offload path...
+> Likely i am missing something..
 
+And the part I am missing is, which code are you referring to? :D
+
+This check is being done at tcf_ct_offload_act_setup() because that's
+the callback that gets executed when it tries to
+serialize/export/whatever act_ct info into flow_action_entry. With
+this, it notices that for this instance it can't serialize and aborts
+it. AFAIK there isn't an earlier moment on which this check can be
+done.
+
+Cheers,
+Marcelo
+
+> 
+> cheers,
+> jamal
+> 
+> > Then yes, ideally, it should be driver the one to reject the flow that
+> > it doesn't support. But as currently zero drivers support it, and I
+> > doubt one will in the future [*], this patch simplifies it by instead
+> > of adding all the helper stuff to flow_action_entry, to just abort the
+> > offload earlier.
+> >
+> > [*] it requires parsing TCP payload, including over packet boundaries.
+> > This is very expensive in hw. And leads to another problem: the HW
+> > having to tell the SW stack about new conntrack expectations.
+> >
+> 
+> 
+> > Chers,
+> > Marcelo
+> >
+> > >
+> > > In any case, to the code correctness:
+> > > Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > >
+> > > cheers,
+> > > jamal
+> > > > Thanks.
+> > > > >
+> > > > >
+> > > > > cheers,
+> > > > > jamal
+> > > > >
+> > > > > > ---
+> > > > > >  include/net/tc_act/tc_ct.h | 9 +++++++++
+> > > > > >  net/sched/act_ct.c         | 3 +++
+> > > > > >  2 files changed, 12 insertions(+)
+> > > > > >
+> > > > > > diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
+> > > > > > index 8a6dbfb23336..77f87c622a2e 100644
+> > > > > > --- a/include/net/tc_act/tc_ct.h
+> > > > > > +++ b/include/net/tc_act/tc_ct.h
+> > > > > > @@ -58,6 +58,11 @@ static inline struct nf_flowtable *tcf_ct_ft(const struct tc_action *a)
+> > > > > >         return to_ct_params(a)->nf_ft;
+> > > > > >  }
+> > > > > >
+> > > > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_action *a)
+> > > > > > +{
+> > > > > > +       return to_ct_params(a)->helper;
+> > > > > > +}
+> > > > > > +
+> > > > > >  #else
+> > > > > >  static inline uint16_t tcf_ct_zone(const struct tc_action *a) { return 0; }
+> > > > > >  static inline int tcf_ct_action(const struct tc_action *a) { return 0; }
+> > > > > > @@ -65,6 +70,10 @@ static inline struct nf_flowtable *tcf_ct_ft(const struct tc_action *a)
+> > > > > >  {
+> > > > > >         return NULL;
+> > > > > >  }
+> > > > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_action *a)
+> > > > > > +{
+> > > > > > +       return NULL;
+> > > > > > +}
+> > > > > >  #endif /* CONFIG_NF_CONNTRACK */
+> > > > > >
+> > > > > >  #if IS_ENABLED(CONFIG_NET_ACT_CT)
+> > > > > > diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+> > > > > > index 0db0ecf1d110..b3f4a503ee2b 100644
+> > > > > > --- a/net/sched/act_ct.c
+> > > > > > +++ b/net/sched/act_ct.c
+> > > > > > @@ -1549,6 +1549,9 @@ static int tcf_ct_offload_act_setup(struct tc_action *act, void *entry_data,
+> > > > > >         if (bind) {
+> > > > > >                 struct flow_action_entry *entry = entry_data;
+> > > > > >
+> > > > > > +               if (tcf_ct_helper(act))
+> > > > > > +                       return -EOPNOTSUPP;
+> > > > > > +
+> > > > > >                 entry->id = FLOW_ACTION_CT;
+> > > > > >                 entry->ct.action = tcf_ct_action(act);
+> > > > > >                 entry->ct.zone = tcf_ct_zone(act);
+> > > > > > --
+> > > > > > 2.39.1
+> > > > > >
 
