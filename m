@@ -1,176 +1,97 @@
-Return-Path: <netdev+bounces-48330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEC6A7EE124
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:13:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1ED7EE146
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A00B280354
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D49BE280EFB
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE1D30671;
-	Thu, 16 Nov 2023 13:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FE52D7B3;
+	Thu, 16 Nov 2023 13:15:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2Gxs2ra"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="dm27RZPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20521D4B
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 05:13:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700140391;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pni06L1Erygx16Uv1x1PI2n1eAvBA/ceTvUPGaZmGjw=;
-	b=H2Gxs2rat7tFZd3BCrEnO8axVaorRTZRs8rNbmLFTPtpeGJBBNpY/2qbSwMIGHD2akct8A
-	LaHwMT6I7O53a3kpvydJJpw1cEpX9QQKzv5odP1bj36G2eyfnf+R74NI2Cot/zED+v5gKw
-	hNtAabEdNqsBICKkwotYo9ls/3nSS7Q=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-495-5lcP13W_Nei-aSb7UBKm-Q-1; Thu,
- 16 Nov 2023 08:13:07 -0500
-X-MC-Unique: 5lcP13W_Nei-aSb7UBKm-Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCB7CE;
+	Thu, 16 Nov 2023 05:15:52 -0800 (PST)
+Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 541263C14903;
-	Thu, 16 Nov 2023 13:13:07 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.16])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1B5EF2026D66;
-	Thu, 16 Nov 2023 13:13:06 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 2/2] rxrpc: Defer the response to a PING ACK until we've parsed it
-Date: Thu, 16 Nov 2023 13:12:59 +0000
-Message-ID: <20231116131259.103513-3-dhowells@redhat.com>
-In-Reply-To: <20231116131259.103513-1-dhowells@redhat.com>
-References: <20231116131259.103513-1-dhowells@redhat.com>
+	(Authenticated sender: cristicc)
+	by madras.collabora.co.uk (Postfix) with ESMTPSA id 4C9A56607346;
+	Thu, 16 Nov 2023 13:15:49 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1700140550;
+	bh=FheqyWG5oYvdCs8XtH6cmP60r9uz+9KnrY6VzNg5O78=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=dm27RZPNxmcmHyvomtwlEgtdO2kSvRTcyqGzL8VH0w8o5o0vVlJOZ2j5Nz0H06egL
+	 djXzOYk/C3/Tdp+XcYP9FRTbNQ3Nepoe08B/Jc8SforDRhp1DYbfu46Th2xQV8DjO+
+	 FQFujPBoHELizF0oDJcFBzjD5q7fJgJpdkHZlQ+A2rHcURp+zwJALeZi9yVia4Qlvw
+	 Jf/NwAaaod2Wz2DgOKw7N0DOR6pNuu1hDKCk7PngXmB8d4hPw8ZOKgQYuqQ+E2ueH1
+	 SbIg8i5QjI0C7kevhMN5N6XYzG6navy0j9hPV15fj25yq8yrIOJfsDgPqlafTQt16T
+	 CyXa6LEC5tR0g==
+Message-ID: <cb6597be-2185-45ad-aa47-c6804ff68c85@collabora.com>
+Date: Thu, 16 Nov 2023 15:15:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
+ beaglev-starlight: Enable gmac
+Content-Language: en-US
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+To: Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>,
+ Emil Renner Berthing <kernel@esmil.dk>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
+ <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
+ <f253b50a-a0ac-40c6-b13d-013de7bac407@lunn.ch>
+ <233a45e1-15ac-40da-badf-dee2d3d60777@collabora.com>
+In-Reply-To: <233a45e1-15ac-40da-badf-dee2d3d60777@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Defer the generation of a PING RESPONSE ACK in response to a PING ACK until
-we've parsed the PING ACK so that we pick up any changes to the packet
-queue so that we can update ackinfo.
+On 10/30/23 00:53, Cristian Ciocaltea wrote:
+> On 10/29/23 20:46, Andrew Lunn wrote:
+>> On Sun, Oct 29, 2023 at 06:27:12AM +0200, Cristian Ciocaltea wrote:
+>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
+>>> RGMII-ID.
+>>>
+>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
+>>> yes, add the mdio & phy sub-nodes.
+>>
+>> Please could you try to get this tested. It might shed some light on
+>> what is going on here, since it is a different PHY.
+> 
+> Actually, this is the main reason I added the patch. I don't have access
+> to this board, so it would be great if we could get some help with testing.
 
-This is also applied to an ACK generated in response to an ACK with the
-REQUEST_ACK flag set.
+@Emil, @Conor: Any idea who might help us with a quick test on the
+BeagleV Starlight board?
 
-Note that whilst the problem was added in commit 248f219cb8bc, it didn't
-really matter at that point because the ACK was proposed in softirq mode
-and generated asynchronously later in process context, taking the latest
-values at the time.  But this fix is only needed since the move to parse
-incoming packets in an I/O thread rather than in softirq and generate the
-ACK at point of proposal (b0346843b1076b34a0278ff601f8f287535cb064).
-
-Fixes: 248f219cb8bc ("rxrpc: Rewrite the data and ack handling code")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/input.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
-
-diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
-index 3f9594d12519..92495e73b869 100644
---- a/net/rxrpc/input.c
-+++ b/net/rxrpc/input.c
-@@ -814,14 +814,6 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 		}
- 	}
- 
--	if (ack.reason == RXRPC_ACK_PING) {
--		rxrpc_send_ACK(call, RXRPC_ACK_PING_RESPONSE, ack_serial,
--			       rxrpc_propose_ack_respond_to_ping);
--	} else if (sp->hdr.flags & RXRPC_REQUEST_ACK) {
--		rxrpc_send_ACK(call, RXRPC_ACK_REQUESTED, ack_serial,
--			       rxrpc_propose_ack_respond_to_ack);
--	}
--
- 	/* If we get an EXCEEDS_WINDOW ACK from the server, it probably
- 	 * indicates that the client address changed due to NAT.  The server
- 	 * lost the call because it switched to a different peer.
-@@ -832,7 +824,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	    rxrpc_is_client_call(call)) {
- 		rxrpc_set_call_completion(call, RXRPC_CALL_REMOTELY_ABORTED,
- 					  0, -ENETRESET);
--		return;
-+		goto send_response;
- 	}
- 
- 	/* If we get an OUT_OF_SEQUENCE ACK from the server, that can also
-@@ -846,7 +838,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	    rxrpc_is_client_call(call)) {
- 		rxrpc_set_call_completion(call, RXRPC_CALL_REMOTELY_ABORTED,
- 					  0, -ENETRESET);
--		return;
-+		goto send_response;
- 	}
- 
- 	/* Discard any out-of-order or duplicate ACKs (outside lock). */
-@@ -854,7 +846,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 		trace_rxrpc_rx_discard_ack(call->debug_id, ack_serial,
- 					   first_soft_ack, call->acks_first_seq,
- 					   prev_pkt, call->acks_prev_seq);
--		return;
-+		goto send_response;
- 	}
- 
- 	info.rxMTU = 0;
-@@ -894,7 +886,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	case RXRPC_CALL_SERVER_AWAIT_ACK:
- 		break;
- 	default:
--		return;
-+		goto send_response;
- 	}
- 
- 	if (before(hard_ack, call->acks_hard_ack) ||
-@@ -906,7 +898,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 	if (after(hard_ack, call->acks_hard_ack)) {
- 		if (rxrpc_rotate_tx_window(call, hard_ack, &summary)) {
- 			rxrpc_end_tx_phase(call, false, rxrpc_eproto_unexpected_ack);
--			return;
-+			goto send_response;
- 		}
- 	}
- 
-@@ -924,6 +916,14 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
- 				   rxrpc_propose_ack_ping_for_lost_reply);
- 
- 	rxrpc_congestion_management(call, skb, &summary, acked_serial);
-+
-+send_response:
-+	if (ack.reason == RXRPC_ACK_PING)
-+		rxrpc_send_ACK(call, RXRPC_ACK_PING_RESPONSE, ack_serial,
-+			       rxrpc_propose_ack_respond_to_ping);
-+	else if (sp->hdr.flags & RXRPC_REQUEST_ACK)
-+		rxrpc_send_ACK(call, RXRPC_ACK_REQUESTED, ack_serial,
-+			       rxrpc_propose_ack_respond_to_ack);
- }
- 
- /*
-
+Thanks,
+Cristian
 
