@@ -1,71 +1,91 @@
-Return-Path: <netdev+bounces-48326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 676307EE10D
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:07:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBEAF7EE121
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 215A6280E5B
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:07:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46B40B20A59
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACB730644;
-	Thu, 16 Nov 2023 13:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC4B30659;
+	Thu, 16 Nov 2023 13:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBmwkGjI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9lc6bAD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C87CE
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 05:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700140385;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=56qEDo8yIqTUJHP8P2HT8aLUWZCphDYXUxLI2O0HehM=;
+	b=K9lc6bADjFiXNXCBvxcCVStrYgXw7znSELzjF7VRJrXDJzJj/zG8YPKKtIa7dC1OvN/9Df
+	KN6H13L0uEwRGQWRt01FqxQWqStS6+aCArFfSO2sDRX+ZUL/sw0gryxUBBfqTry1bvqhFK
+	lqVtiUPOH4oVx/iqQgyv/UBLcv22g18=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-375-Ddy73NA3Nwaye6z-spbp7g-1; Thu,
+ 16 Nov 2023 08:13:04 -0500
+X-MC-Unique: Ddy73NA3Nwaye6z-spbp7g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1488645943;
-	Thu, 16 Nov 2023 13:06:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A2F81C433C8;
-	Thu, 16 Nov 2023 13:06:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700140018;
-	bh=p4MjUYmwNsoB0zXjL2QElamoa3NDWfUyYXsPy3eVInM=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=JBmwkGjIsSE1vcTsOpwTK1gUCAMeXbLozosp2IWfDBGlRfxi3kXwckKu3+iIZsT9N
-	 vLqxMktN/9pUTIyq0Q81/B+sN/NxpIzqIt2YuEAxX3dScmd+vDHIHSzUJhrIHRUY7l
-	 maZmdKKfKc9gpuIU6jQE9TgRk+iEYlcsyXwHtVg/RRw7+9x7pU8xTSlskLNbNC+N30
-	 YmkNuaUA31R6ogLVckBmFCfLeQXY1vURh2Pii4GiTPLMBBrgYEur9cposQpME9XE/2
-	 ivAR1q+kLEe6H98Gw4O3ox8dADglM+/H+TsizvaI/DZtgPbHcWk0tl1vAyCXvGcYY8
-	 5AcippUo6AmNw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 90506E1F660;
-	Thu, 16 Nov 2023 13:06:58 +0000 (UTC)
-Subject: Re: [GIT PULL] vhost,virtio,vdpa,firmware: bugfixes
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20231114152436-mutt-send-email-mst@kernel.org>
-References: <20231114152436-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20231114152436-mutt-send-email-mst@kernel.org>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
-X-PR-Tracked-Commit-Id: e07754e0a1ea2d63fb29574253d1fd7405607343
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 372bed5fbb87314abf410c3916e51578cd382cd1
-Message-Id: <170014001858.19711.13760886707112955163.pr-tracker-bot@kernel.org>
-Date: Thu, 16 Nov 2023 13:06:58 +0000
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, alistair.francis@wdc.com, bjorn@rivosinc.com, cleger@rivosinc.com, dan.carpenter@linaro.org, eperezma@redhat.com, jakub@cloudflare.com, jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7E3E51C05193;
+	Thu, 16 Nov 2023 13:13:03 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.16])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 35F5F2166B27;
+	Thu, 16 Nov 2023 13:13:02 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/2] rxrpc: ACK handling fixes
+Date: Thu, 16 Nov 2023 13:12:57 +0000
+Message-ID: <20231116131259.103513-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-The pull request you sent on Tue, 14 Nov 2023 15:24:36 -0500:
+Here are a couple of patches to fix ACK handling in AF_RXRPC:
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+ (1) Allow RTT determination to use an ACK of any type as the response from
+     which to calculate RTT, provided ack.serial matches the serial number
+     of the outgoing packet.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/372bed5fbb87314abf410c3916e51578cd382cd1
+ (2) Defer the response to a PING ACK packet (or any ACK with the
+     REQUEST_ACK flag set) until after we've parsed the packet so that we
+     carry up to date information if the Tx or Rx rings are advanced.
 
-Thank you!
+David
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+---
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
+
+David Howells (2):
+  rxrpc: Fix RTT determination to use any ACK as a source
+  rxrpc: Defer the response to a PING ACK until we've parsed it
+
+ include/trace/events/rxrpc.h |  2 +-
+ net/rxrpc/input.c            | 61 +++++++++++++++++-------------------
+ 2 files changed, 30 insertions(+), 33 deletions(-)
+
 
