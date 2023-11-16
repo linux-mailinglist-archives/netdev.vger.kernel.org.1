@@ -1,120 +1,116 @@
-Return-Path: <netdev+bounces-48433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E19997EE53A
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:33:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAE5C7EE4F2
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C82AB20B69
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:33:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9511F23F0C
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8AD2DF7E;
-	Thu, 16 Nov 2023 16:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D971B3A8E8;
+	Thu, 16 Nov 2023 16:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MD2QYuEC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XNJNgO4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40E16192
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:33:04 -0800 (PST)
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGGLZJh002719;
-	Thu, 16 Nov 2023 16:32:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date : from
- : to : cc : reply-to : subject : content-type : content-transfer-encoding
- : mime-version; s=pp1; bh=rI1/LRzYOWqT4y27p3BtLc1C0dFhzV1aUw+nxs7SIz8=;
- b=MD2QYuEC2pMbFryuxuSwj1e57ght+5UoQ3HpuIIbK/d0M+3wzp4jJs/3h6Bnmq9s1vWK
- zuj/dqyNDVMY0lE4z/gOIkFRmEA5F6jKOBJiYa888QlcppR1oem7dzHVzTK5iL/pIvXg
- FAypYreXUqzH+yIDJV6wPoXb2aoRiYpIbmqZZySVi2pwc4Oye670MxpCyBwbBKl+YZId
- z/vHg2/A8C89MNdby6Pt9IK4wpch4ixmZsIpaJUna733benMrw3EIwti586o4MD5AuxO
- zybIyjAZUnF789rVuY0NZaWbEUoSydLX6PR3T3UYxrl2rG3VC0ci5nezvacWVtHiFM0j Wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3udph98eap-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Nov 2023 16:32:57 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AGGMPcT005166;
-	Thu, 16 Nov 2023 16:32:56 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3udph98e9j-2
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Nov 2023 16:32:56 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGFY39A029878;
-	Thu, 16 Nov 2023 16:08:37 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uamxnqp7t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Nov 2023 16:08:37 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AGG8Zmf3670742
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Nov 2023 16:08:35 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1532E5805F;
-	Thu, 16 Nov 2023 16:08:35 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 611E758068;
-	Thu, 16 Nov 2023 16:08:34 +0000 (GMT)
-Received: from [9.41.99.4] (unknown [9.41.99.4])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Nov 2023 16:08:34 +0000 (GMT)
-Message-ID: <4bc40774-eae9-4134-be51-af23ad0b6f84@linux.vnet.ibm.com>
-Date: Thu, 16 Nov 2023 10:08:34 -0600
-User-Agent: Mozilla Thunderbird
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: aelior@marvell.com, davem@davemloft.net, edumazet@google.com,
-        manishc@marvell.com, netdev@vger.kernel.org, pabeni@redhat.com,
-        skalluru@marvell.com, VENKATA.SAI.DUGGI@ibm.com,
-        Thinh Tran <thinhtr@linux.vnet.ibm.com>,
-        Abdul Haleem <abdhalee@in.ibm.com>,
-        David Christensen <drc@linux.vnet.ibm.com>,
-        Simon Horman <simon.horman@corigine.com>
-Reply-To: 20230818161443.708785-1-thinhtr@linux.vnet.ibm.com
-Subject: Re: [Patch v6 0/4] bnx2x: Fix error recovering in switch
- configuration
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 35FwgLdXfyh8GnqqJ-EKDzDLcWxn-Gyr
-X-Proofpoint-ORIG-GUID: zAd19Fbc4aViA0HPsx27z5Htv6Gr7eMu
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434C61A8;
+	Thu, 16 Nov 2023 08:09:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700150967; x=1731686967;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4jAC/OAjhM3lZ3eKiniR3cDYGZlMg0wHRHqqAdytbUs=;
+  b=XNJNgO4TLZfgLzL+UBt5X30dErXMWbErtHUBGMNIn43Gb2VTCUPCQgHf
+   okQooLgxCzKWycOHupOiqc8ccPVIs4u6j+s4Y8fpEY0dOb0A/Ar1EojRi
+   lodZAO7lZ9yzohrUgrprIvwaU14PMbHOquAAgLrwl1BudwHXlhy7Sl89O
+   TGozdPzDyON7hWxR4lo/Qoykg7H8LLFTSb5BxB1q/9sIg9ypjeiPDKYeu
+   OZhCVqBF88kdkgUJgrxlVpJUEoRiSWjb0EDDGMhWRtzXqo1svNttlOrRk
+   SUu1ABpWU7JCj10yLbDfXJG8GDw6e/Uol9bu3c/8obQXfEkr4WK8FlkuX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="4244382"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="4244382"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 08:09:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="758878380"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="758878380"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by orsmga007.jf.intel.com with ESMTP; 16 Nov 2023 08:09:19 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r3evd-0001rX-00;
+	Thu, 16 Nov 2023 16:09:17 +0000
+Date: Fri, 17 Nov 2023 00:08:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the
+ Qualcomm IPQESS driver
+Message-ID: <202311162336.2BYtVL3Q-lkp@intel.com>
+References: <20231114105600.1012056-4-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_16,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- phishscore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
- adultscore=0 priorityscore=1501 malwarescore=0 clxscore=1011 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311160128
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114105600.1012056-4-romain.gantois@bootlin.com>
 
-Hi,
+Hi Romain,
 
-Could we proceed with advancing these patches? They've been in the 
-"Awaiting Upstream" state for a while now. Notably, one of them has 
-successfully made it to the mainline kernel:
-  [v6,1/4] bnx2x: new flag for tracking HW resource
- 
-https://github.com/torvalds/linux/commit/bf23ffc8a9a777dfdeb04232e0946b803adbb6a9
+kernel test robot noticed the following build warnings:
 
-As testing the latest kernel, we are still encountering crashes due to 
-the absence of one of the patches:
-   [v6,3/4] bnx2x: Prevent access to a freed page in page_pool.
+[auto build test WARNING on net-next/main]
 
-Is there anything specific I need to do to help moving these patches 
-forward?
-We would greatly appreciate if they could be incorporated into the 
-mainline kernel.
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231114105600.1012056-4-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the Qualcomm IPQESS driver
+config: i386-kismet-CONFIG_NET_DSA-CONFIG_QCOM_IPQ4019_ESS-0-0 (https://download.01.org/0day-ci/archive/20231116/202311162336.2BYtVL3Q-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20231116/202311162336.2BYtVL3Q-lkp@intel.com/reproduce)
 
-Thank you,
-Thinh Tran
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311162336.2BYtVL3Q-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for NET_DSA when selected by QCOM_IPQ4019_ESS
+   
+   WARNING: unmet direct dependencies detected for NET_DSA
+     Depends on [n]: NET [=y] && (BRIDGE [=n] || BRIDGE [=n]=n) && (HSR [=n] || HSR [=n]=n) && INET [=n] && NETDEVICES [=y]
+     Selected by [y]:
+     - QCOM_IPQ4019_ESS [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_QUALCOMM [=y] && (OF [=n] && ARCH_QCOM || COMPILE_TEST [=y])
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
