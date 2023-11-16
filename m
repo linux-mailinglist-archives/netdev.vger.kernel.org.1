@@ -1,100 +1,140 @@
-Return-Path: <netdev+bounces-48290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 033DB7EDF47
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:12:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E4E7EDF4E
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:14:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0EE7B20A4B
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:12:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F3FA1C209D2
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CEE22D7BD;
-	Thu, 16 Nov 2023 11:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEED2DF87;
+	Thu, 16 Nov 2023 11:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LJeIhkqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AD3DAA;
-	Thu, 16 Nov 2023 03:12:35 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4SWHS01cx5zvQpM;
-	Thu, 16 Nov 2023 19:12:16 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Thu, 16 Nov
- 2023 19:12:33 +0800
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, Mina
- Almasry <almasrymina@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Matthew Wilcox <willy@infradead.org>, Linux-MM
-	<linux-mm@kvack.org>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <ZVNzS2EA4zQRwIQ7@nvidia.com>
- <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
- <ee10d050-ef24-49b2-8712-c9bc8a911c2a@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <15c404e4-8efa-cc1c-174f-0752005b6755@huawei.com>
-Date: Thu, 16 Nov 2023 19:12:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FED485;
+	Thu, 16 Nov 2023 03:14:37 -0800 (PST)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AG7fxpb001720;
+	Thu, 16 Nov 2023 11:14:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=WG+vTW6SxUmCCV/6GleBb07NZzuJmnHKZogC3uQzSVg=;
+ b=LJeIhkqjABZNoBIdh0rf0XtzpcTY+tSctWQpzGB5uay0odDBIKNlQK+IUUMSJv67Cm57
+ 6Az1aSIQBhwr805xVqXC5lmkSfg1W7UaQYuaNT5KJenk5fikT4vQYi4dwjyhX8fJl7oT
+ K5Guqj7yopy8qfM+2RrN8Ln0ekX7dATkrZ4Z+aB0WK6r3Gp9AkiFX+B9bt8Bi7WgCYe2
+ q1NRFMpuWLNFZAi3wWAYE3EjWK4e6mFx0HPKh0tkyQdbuEjvqUTpDksTbc/BcWNcO+tk
+ HUH8ekI9CsRyq7YJCDWFOH/PcSQHGqcqPQFfE/ylE5M4yKh1nObaPCSW4nBHrvseMbVR 7w== 
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3udeww8e95-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 11:14:23 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AGBDsN2021454
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 11:13:54 GMT
+Received: from [10.253.72.184] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 16 Nov
+ 2023 03:13:50 -0800
+Message-ID: <33246b49-2579-4889-9fcb-babec5003a88@quicinc.com>
+Date: Thu, 16 Nov 2023 19:13:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ee10d050-ef24-49b2-8712-c9bc8a911c2a@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/9] net: mdio: ipq4019: Enable GPIO reset for ipq5332
+ platform
 Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-4-quic_luoj@quicinc.com>
+ <e740a206-37af-49b1-a6b6-baa3c99165c0@lunn.ch>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <e740a206-37af-49b1-a6b6-baa3c99165c0@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 46NsgQtgK9drv1wuiyk85wDjaDNh9j8M
+X-Proofpoint-GUID: 46NsgQtgK9drv1wuiyk85wDjaDNh9j8M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_09,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0
+ clxscore=1015 impostorscore=0 bulkscore=0 malwarescore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311160090
 
-On 2023/11/16 1:57, David Ahern wrote:
-> On 11/15/23 2:21 AM, Yunsheng Lin wrote:
->> On 2023/11/14 21:16, Jason Gunthorpe wrote:
->>> On Tue, Nov 14, 2023 at 04:21:26AM -0800, Mina Almasry wrote:
->>>
->>>> Actually because you put the 'strtuct page for devmem' in
->>>> skb->bv_frag, the net stack will grab the 'struct page' for devmem
->>>> using skb_frag_page() then call things like page_address(), kmap,
->>>> get_page, put_page, etc, etc, etc.
->>>
->>> Yikes, please no. If net has its own struct page look alike it has to
->>> stay entirely inside net. A non-mm owned struct page should not be
->>> passed into mm calls. It is just way too hacky to be seriously
->>> considered :(
+
+
+On 11/15/2023 11:11 PM, Andrew Lunn wrote:
+> On Wed, Nov 15, 2023 at 11:25:09AM +0800, Luo Jie wrote:
+>> Before doing GPIO reset on the MDIO slave devices, the common clock
+>> output to MDIO slave device should be enabled, and the related GCC
+>> clocks also need to be configured.
 >>
->> Yes, that is something this patchset is trying to do, defining its own
->> struct page look alike for page pool to support devmem.
->>
+>> Because of these extra configurations, the MDIO bus level GPIO and
+>> PHY device level GPIO can't be leveraged.
 > 
-> Networking needs to be able to move away from struct page references.
-> The devmem and host memory for Rx use cases do not need to be page based.
+> Its not clear to me why the normal reset cannot be used. The MBIO bus
+> driver can probe, setup the clocks, and then register the MDIO bus to
+> the core. The core can then use the GPIO resets.
+> 
+> What am i missing?
+> 
+>       Andrew
 
-Yes, I am agreed the ultimate goal is to move away from struct page
-references. But I am not sure if we can do it right away as there
-still are different types of existing 'struct page' in the netstack,
-see:
+Hi Andrew,
+Looks we can leverage the MDIO bus GPIO to reset qca8084 PHY, but the
+mdio bus gpio only supports one GPIO number.
 
-https://lore.kernel.org/all/8b7d25eb-1f10-3e37-8753-92b42da3fb34@huawei.com/
+Here are the reasons i put the GPIO reset here.
+1. Currently one MDIO bus instance only connects one qca8084 PHY as
+MDIO slave device on IPQ5332 platform, since the MDIO address
+occupied by qca8084. if the other type PHY also needs to use MDIO
+bus GPIO reset, then we can't cover this case.
 
-> 
-> 
-> .
-> 
+2. Before doing the GPIO reset on qca8084, we need to enable the clock
+output to qca8084 by configuring eth_ldo_rdy register, and the mdio
+bus->reset is called after the mdio bus level reset.
+
+3. program the mdio address of qca8084 PHY and the initialization
+configurations needed before the registers of qca8084 can be accessed.
+if we take the PHY level GPIO reset for qca8084, there is no call point
+to do the initialization configurations and programing PHY address in
+the MDIO driver code.
+
+i will check the feasibility of taking the PHY level GPIO reset and do
+the initial configurations in the PHY probe function.
+
+FYI, here is the sequence to bring up qca8084.
+a. enable clock output to qca8084.
+b. do gpio reset of qca8084.
+c. customize MDIO address and initialization configurations.
+d. the PHY ID can be acquired.
+
+
+Thanks,
+Jie.
 
