@@ -1,113 +1,156 @@
-Return-Path: <netdev+bounces-48247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 309867EDBBA
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 08:03:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0700E7EDBC3
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 08:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC9F6280EA1
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 07:03:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B06F11F233C6
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 07:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4CF3C13;
-	Thu, 16 Nov 2023 07:03:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F737C2C0;
+	Thu, 16 Nov 2023 07:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YfgV7Hfv"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx20.baidu.com [111.202.115.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761DE192;
-	Wed, 15 Nov 2023 23:02:55 -0800 (PST)
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: "dust.li@linux.alibaba.com" <dust.li@linux.alibaba.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>
-Subject: RE: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in the tx
- path when possible
-Thread-Topic: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in the
- tx path when possible
-Thread-Index: AQHaGFSsV3lsEoc0T0O8PDgZDtb7pLB8hMpw
-Date: Thu, 16 Nov 2023 07:02:50 +0000
-Message-ID: <64c98eb20e1244b981d0db9a912ce589@baidu.com>
-References: <20231116022041.51959-1-lirongqing@baidu.com>
- <20231116061811.GC121324@linux.alibaba.com>
-In-Reply-To: <20231116061811.GC121324@linux.alibaba.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.22.206.6]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3562319B;
+	Wed, 15 Nov 2023 23:05:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700118341; x=1731654341;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zrSn4dHtKABJjLjHU8IiMSRjR+fTXk8KJTyDoZtEKEg=;
+  b=YfgV7Hfvn71NsDGIYRVxAMEGzLBUpppDhuX4VU+FY8TP6botZcAOjEV4
+   CFUnGvw3eCo2CqtmEGD8j0eBQ30yiDqCubTZZk6TfnP0w6GHhV1unlxmT
+   pHU766EE/ZOzcaenwFGeyEdbRleZMyQ4GPCyXJEyiVWNaN4NpDKxq5aDk
+   2C9ylwKeyIIELRm4PTzzHCcBC9Yw2p43OHnOjKVs1KoiaWegjhfbBDixc
+   0n80arpmwOwxNVulCV6oh7VWvUrP+Hv0xUPp7y19g6L9HkiVZ3gnAOD3I
+   MJulfYbPtJ0PqYLe+FZsjFKeLqmr9F197Cl/KoEiWQnQqmtIcM+Gnr/m6
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="4159757"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="4159757"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2023 23:05:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10895"; a="855893638"
+X-IronPort-AV: E=Sophos;i="6.03,307,1694761200"; 
+   d="scan'208";a="855893638"
+Received: from lkp-server02.sh.intel.com (HELO b8de5498638e) ([10.239.97.151])
+  by FMSMGA003.fm.intel.com with ESMTP; 15 Nov 2023 23:05:34 -0800
+Received: from kbuild by b8de5498638e with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1r3WRQ-0001Qz-08;
+	Thu, 16 Nov 2023 07:05:32 +0000
+Date: Thu, 16 Nov 2023 15:04:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Luka Perkov <luka.perkov@sartura.hr>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@somainline.org>
+Subject: Re: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge
+ offloading features to the IPQESS driver
+Message-ID: <202311161434.PGyQCKWs-lkp@intel.com>
+References: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 10.127.64.36
-X-FE-Last-Public-Client-IP: 100.100.100.38
-X-FE-Policy-ID: 15:10:21:SYSTEM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231114105600.1012056-6-romain.gantois@bootlin.com>
 
-> -----Original Message-----
-> From: Dust Li <dust.li@linux.alibaba.com>
-> Sent: Thursday, November 16, 2023 2:18 PM
-> To: Li,Rongqing <lirongqing@baidu.com>; wenjia@linux.ibm.co;
-> netdev@vger.kernel.org; linux-s390@vger.kernel.org
-> Subject: Re: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in t=
-he
-> tx path when possible
->=20
-> On Thu, Nov 16, 2023 at 10:20:41AM +0800, Li RongQing wrote:
-> >there is rare possibility that conn->tx_pushing is not 1, since
-> >tx_pushing is just checked with 1, so move the setting tx_pushing to 1
-> >after atomic_dec_and_test() return false, to avoid atomic_set and
-> >smp_wmb in tx path
-> >
-> >Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
->=20
-> >---
-> > net/smc/smc_tx.c | 7 ++++---
-> > 1 file changed, 4 insertions(+), 3 deletions(-)
-> >
-> >diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c index 3b0ff3b..72dbdee
-> >100644
-> >--- a/net/smc/smc_tx.c
-> >+++ b/net/smc/smc_tx.c
-> >@@ -667,8 +667,6 @@ int smc_tx_sndbuf_nonempty(struct smc_connection
-> *conn)
-> > 		return 0;
-> >
-> > again:
-> >-	atomic_set(&conn->tx_pushing, 1);
-> >-	smp_wmb(); /* Make sure tx_pushing is 1 before real send */
-> > 	rc =3D __smc_tx_sndbuf_nonempty(conn);
-> >
-> > 	/* We need to check whether someone else have added some data into
-> @@
-> >-677,8 +675,11 @@ int smc_tx_sndbuf_nonempty(struct smc_connection
-> *conn)
-> > 	 * If so, we need to push again to prevent those data hang in the send
-> > 	 * queue.
-> > 	 */
-> >-	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing)))
-> >+	if (unlikely(!atomic_dec_and_test(&conn->tx_pushing))) {
-> >+		atomic_set(&conn->tx_pushing, 1);
-> >+		smp_wmb(); /* Make sure tx_pushing is 1 before real send */
-> nit: it would be better if we change the comments to "send again".
->=20
+Hi Romain,
 
-Ok, I will fix it, thanks
+kernel test robot noticed the following build warnings:
 
--Li
+[auto build test WARNING on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/dt-bindings-net-Introduce-the-Qualcomm-IPQESS-Ethernet-switch/20231114-185953
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20231114105600.1012056-6-romain.gantois%40bootlin.com
+patch subject: [PATCH net-next v3 5/8] net: qualcomm: ipqess: add bridge offloading features to the IPQESS driver
+config: arc-randconfig-r112-20231116 (https://download.01.org/0day-ci/archive/20231116/202311161434.PGyQCKWs-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20231116/202311161434.PGyQCKWs-lkp@intel.com/reproduce)
 
-> Thanks
-> > 		goto again;
-> >+	}
-> >
-> > 	return rc;
-> > }
-> >--
-> >2.9.4
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202311161434.PGyQCKWs-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1982:5: sparse: sparse: symbol 'qca8k_dsa_port_fdb_dump' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1988:6: sparse: sparse: symbol 'qca8k_dsa_port_stp_state_set' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:1995:6: sparse: sparse: symbol 'qca8k_dsa_port_fast_age' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2000:5: sparse: sparse: symbol 'qca8k_dsa_set_ageing_time' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2005:5: sparse: sparse: symbol 'qca8k_dsa_port_vlan_filtering' was not declared. Should it be static?
+>> drivers/net/dsa/qca/qca8k-8xxx.c:2012:5: sparse: sparse: symbol 'qca8k_dsa_vlan_add' was not declared. Should it be static?
+
+vim +/qca8k_dsa_port_fdb_dump +1982 drivers/net/dsa/qca/qca8k-8xxx.c
+
+  1981	
+> 1982	int qca8k_dsa_port_fdb_dump(struct dsa_switch *ds, int port,
+  1983				    dsa_fdb_dump_cb_t *cb, void *data)
+  1984	{
+  1985		return qca8k_port_fdb_dump(ds->priv, port, cb, data);
+  1986	}
+  1987	
+> 1988	void qca8k_dsa_port_stp_state_set(struct dsa_switch *ds, int port,
+  1989					  u8 state)
+  1990	{
+  1991		qca8k_port_stp_state_set(ds->priv, port, state,
+  1992					 dsa_to_port(ds, port)->learning, true);
+  1993	}
+  1994	
+> 1995	void qca8k_dsa_port_fast_age(struct dsa_switch *ds, int port)
+  1996	{
+  1997		qca8k_port_fast_age(ds->priv, port);
+  1998	}
+  1999	
+> 2000	int qca8k_dsa_set_ageing_time(struct dsa_switch *ds, unsigned int msecs)
+  2001	{
+  2002		return qca8k_set_ageing_time(ds->priv, msecs);
+  2003	}
+  2004	
+> 2005	int qca8k_dsa_port_vlan_filtering(struct dsa_switch *ds, int port,
+  2006					  bool vlan_filtering,
+  2007					  struct netlink_ext_ack *extack)
+  2008	{
+  2009		return qca8k_port_vlan_filtering(ds->priv, port, vlan_filtering);
+  2010	}
+  2011	
+> 2012	int qca8k_dsa_vlan_add(struct dsa_switch *ds, int port,
+  2013			       const struct switchdev_obj_port_vlan *vlan,
+  2014			       struct netlink_ext_ack *extack)
+  2015	{
+  2016		return qca8k_port_vlan_add(ds->priv, port, vlan, extack);
+  2017	}
+  2018	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
