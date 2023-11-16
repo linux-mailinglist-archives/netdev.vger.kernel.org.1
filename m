@@ -1,110 +1,403 @@
-Return-Path: <netdev+bounces-48315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02ECD7EE089
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:15:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4307EE09D
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:22:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAFFB280FAD
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:15:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0E0D1C20848
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CEC2FC43;
-	Thu, 16 Nov 2023 12:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831E32FE04;
+	Thu, 16 Nov 2023 12:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmStcDHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 348AB9C;
-	Thu, 16 Nov 2023 04:15:43 -0800 (PST)
-Received: from [192.168.1.103] (31.173.85.185) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 16 Nov
- 2023 15:15:37 +0300
-Subject: Re: [PATCH] dt-bindings: net: renesas,etheravb: Document RZ/Five SoC
-To: Prabhakar <prabhakar.csengg@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>, Sergei Shtylyov
-	<sergei.shtylyov@gmail.com>
-CC: Magnus Damm <magnus.damm@gmail.com>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, Biju Das <biju.das.jz@bp.renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <856ee06a-d644-2aa6-3fc0-04b90095d275@omp.ru>
-Date: Thu, 16 Nov 2023 15:15:37 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F4318B
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 04:22:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700137330;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RS6x6ngjtH6dv8LjllYNvgoIqtxlV5eVBlBJB1lPQw0=;
+	b=gmStcDHot9/PKLeoYfIKclmsH0jvGYNuzH9HKED048KyivyyNp6VkuWoeI5y5ChUsbipnx
+	UJuaruW222L4tg/rBiKMmPVqybYdHvRtLwZ2S7hOCLwGmsChRD6EA7ZETOJ7shKauGaWBA
+	HJMOMJ40YlghBKplve97llLztnGNKn8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-288-Bz-tVgdkMS-6XDk3p12g6A-1; Thu, 16 Nov 2023 07:22:07 -0500
+X-MC-Unique: Bz-tVgdkMS-6XDk3p12g6A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3ABBA8007B3;
+	Thu, 16 Nov 2023 12:22:07 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.130])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id ECF762026D4C;
+	Thu, 16 Nov 2023 12:22:05 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.7-rc2
+Date: Thu, 16 Nov 2023 13:21:40 +0100
+Message-ID: <20231116122140.28033-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231115210448.31575-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.85.185]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/16/2023 11:52:07
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 181413 [Nov 16 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.85.185
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/16/2023 11:58:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/16/2023 10:54:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On 11/16/23 12:04 AM, Prabhakar wrote:
+Hi Linus!
 
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> The Gigabit Ethernet IP block on the RZ/Five SoC is identical to one
-> found on the RZ/G2UL SoC. "renesas,r9a07g043-gbeth" compatible string
-> will be used on the RZ/Five SoC so to make this clear and to keep this
-> file consistent, update the comment to include RZ/Five SoC.
+Notably this includes the fix for the eBPF regression you have been
+notified of.
 
-   Well, I'm not sure if re-using the "compatible" string from another SoC
-is really a good idea...
+The following changes since commit 89cdf9d556016a54ff6ddd62324aa5ec790c05cc:
 
-> No driver changes are required as generic compatible string
-> "renesas,rzg2l-gbeth" will be used as a fallback on RZ/Five SoC.
-> 
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+  Merge tag 'net-6.7-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-11-09 17:09:35 -0800)
 
-   Nevertheless:
+are available in the Git repository at:
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.7-rc2
 
-[...]
+for you to fetch changes up to cff088d924df871296412e6b819823f42d1bb9a5:
 
-MBR, Sergey
+  Merge tag 'nf-23-11-15' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2023-11-16 11:02:52 +0100)
+
+----------------------------------------------------------------
+Including fixes from BPF and netfilter.
+
+Current release - regressions:
+
+ - core: fix undefined behavior in netdev name allocation
+
+ - bpf: do not allocate percpu memory at init stage
+
+ - netfilter: nf_tables: split async and sync catchall in two functions
+
+ - mptcp: fix possible NULL pointer dereference on close
+
+Current release - new code bugs:
+
+ - eth: ice: dpll: fix initial lock status of dpll
+
+Previous releases - regressions:
+
+ - bpf: fix precision backtracking instruction iteration
+
+ - af_unix: fix use-after-free in unix_stream_read_actor()
+
+ - tipc: fix kernel-infoleak due to uninitialized TLV value
+
+ - eth: bonding: stop the device in bond_setup_by_slave()
+
+ - eth: mlx5:
+   - fix double free of encap_header
+   - avoid referencing skb after free-ing in drop path
+
+ - eth: hns3: fix VF reset
+
+ - eth: mvneta: fix calls to page_pool_get_stats
+
+Previous releases - always broken:
+
+ - core: set SOCK_RCU_FREE before inserting socket into hashtable
+
+ - bpf: fix control-flow graph checking in privileged mode
+
+ - eth: ppp: limit MRU to 64K
+
+ - eth: stmmac: avoid rx queue overrun
+
+ - eth: icssg-prueth: fix error cleanup on failing initialization
+
+ - eth: hns3: fix out-of-bounds access may occur when coalesce info is
+ 	      read via debugfs
+
+ - eth: cortina: handle large frames
+
+Misc:
+
+ - selftests: gso: support CONFIG_MAX_SKB_FRAGS up to 45
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alex Pakhunov (2):
+      tg3: Move the [rt]x_dropped counters to tg3_napi
+      tg3: Increment tx_dropped in tg3_tso_bug()
+
+Alexei Starovoitov (1):
+      Merge branch 'bpf-control-flow-graph-and-precision-backtrack-fixes'
+
+Anders Roxell (1):
+      selftests: bpf: xskxceiver: ksft_print_msg: fix format type error
+
+Andrii Nakryiko (5):
+      bpf: handle ldimm64 properly in check_cfg()
+      bpf: fix precision backtracking instruction iteration
+      selftests/bpf: add edge case backtracking logic test
+      bpf: fix control-flow graph checking in privileged mode
+      selftests/bpf: add more test cases for check_cfg()
+
+Arkadiusz Kubalewski (3):
+      ice: dpll: fix initial lock status of dpll
+      ice: dpll: fix check for dpll input priority range
+      ice: dpll: fix output pin capabilities
+
+Baruch Siach (2):
+      net: stmmac: fix rx budget limit check
+      net: stmmac: avoid rx queue overrun
+
+ChunHao Lin (2):
+      r8169: add handling DASH when DASH is disabled
+      r8169: fix network lost after resume on DASH systems
+
+Dan Carpenter (1):
+      netfilter: nf_tables: fix pointer math issue in nft_byteorder_eval()
+
+Dan Nowlin (1):
+      ice: fix DDP package download for packages without signature segment
+
+David S. Miller (1):
+      Merge branch 'hns3-fixes'
+
+Dust Li (1):
+      net/mlx5e: fix double free of encap_header
+
+Erez Shitrit (1):
+      net/mlx5: DR, Allow old devices to use multi destination FTE
+
+Eric Dumazet (4):
+      ipvlan: add ipvlan_route_v6_outbound() helper
+      ptp: annotate data-race around q->head and q->tail
+      bonding: stop the device in bond_setup_by_slave()
+      af_unix: fix use-after-free in unix_stream_read_actor()
+
+Gal Pressman (1):
+      net: Fix undefined behavior in netdev name allocation
+
+Gavin Li (1):
+      net/mlx5e: fix double free of encap_header in update funcs
+
+Geliang Tang (1):
+      mptcp: add validity check for sending RM_ADDR
+
+Itamar Gozlan (1):
+      Revert "net/mlx5: DR, Supporting inline WQE when possible"
+
+Jakub Kicinski (8):
+      Revert "ptp: Fixes a null pointer dereference in ptp_ioctl"
+      Merge branch 'fix-large-frames-in-the-gemini-ethernet-driver'
+      Merge branch 'r8169-fix-dash-devices-network-lost-issue'
+      Merge branch 'pds_core-fix-irq-index-bug-and-compiler-warnings'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge branch 'mptcp-misc-fixes-for-v6-7'
+      Merge https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge branch 'mlx5-fixes-2023-11-13-manual'
+
+Jan Kiszka (2):
+      net: ti: icssg-prueth: Add missing icss_iep_put to error path
+      net: ti: icssg-prueth: Fix error cleanup on failing pruss_request_mem_region
+
+Jian Shen (2):
+      net: hns3: fix add VLAN fail issue
+      net: hns3: fix incorrect capability bit display for copper port
+
+Jianbo Liu (1):
+      net/mlx5e: Don't modify the peer sent-to-vport rules for IPSec offload
+
+Jijie Shao (2):
+      net: hns3: fix VF reset fail issue
+      net: hns3: fix VF wrong speed and duplex issue
+
+Johnathan Mantey (1):
+      Revert ncsi: Propagate carrier gain/loss events to the NCSI controller
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: fix race condition between swap/destroy and kernel side add/del/test
+
+Linkui Xiao (1):
+      netfilter: nf_conntrack_bridge: initialize err to 0
+
+Linus Walleij (3):
+      net: ethernet: cortina: Fix max RX frame define
+      net: ethernet: cortina: Handle large frames
+      net: ethernet: cortina: Fix MTU max setting
+
+MD Danish Anwar (1):
+      MAINTAINERS: add entry for TI ICSSG Ethernet driver
+
+Maher Sanalla (1):
+      net/mlx5: Free used cpus mask when an IRQ is released
+
+Marek Behún (1):
+      net: mdio: fix typo in header
+
+Niklas Söderlund (1):
+      dt-bindings: net: ethernet-controller: Fix formatting error
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_tables: bogus ENOENT when destroying element which does not exist
+      netfilter: nf_tables: split async and sync catchall in two functions
+
+Paolo Abeni (5):
+      mptcp: deal with large GSO size
+      mptcp: fix possible NULL pointer dereference on close
+      mptcp: fix setsockopt(IP_TOS) subflow locking
+      selftests: mptcp: fix fastclose with csum failure
+      Merge tag 'nf-23-11-15' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Rahul Rameshbabu (7):
+      net/mlx5: Decouple PHC .adjtime and .adjphase implementations
+      net/mlx5e: Avoid referencing skb after free-ing in drop path of mlx5e_sq_xmit_wqe
+      net/mlx5e: Track xmit submission to PTP WQ after populating metadata map
+      net/mlx5e: Update doorbell for port timestamping CQ before the software counter
+      net/mlx5: Increase size of irq name buffer
+      net/mlx5e: Check return value of snprintf writing to fw_version buffer
+      net/mlx5e: Check return value of snprintf writing to fw_version buffer for representors
+
+Ravi Gunasekaran (1):
+      MAINTAINERS: net: Update reviewers for TI's Ethernet drivers
+
+Saeed Mahameed (1):
+      net/mlx5e: Reduce the size of icosq_str
+
+Shannon Nelson (2):
+      pds_core: use correct index to mask irq
+      pds_core: fix up some format-truncation complaints
+
+Shigeru Yoshida (2):
+      tty: Fix uninit-value access in ppp_sync_receive()
+      tipc: Fix kernel-infoleak due to uninitialized TLV value
+
+Stanislav Fomichev (1):
+      net: set SOCK_RCU_FREE before inserting socket into hashtable
+
+Sven Auhagen (1):
+      net: mvneta: fix calls to page_pool_get_stats
+
+Vlad Buslov (2):
+      net/mlx5e: Fix pedit endianness
+      macvlan: Don't propagate promisc change to lower dev in passthru
+
+Willem de Bruijn (2):
+      net: gso_test: support CONFIG_MAX_SKB_FRAGS up to 45
+      ppp: limit MRU to 64K
+
+Xin Long (1):
+      net: sched: do not offload flows with a helper in act_ct
+
+Yang Li (1):
+      netfilter: nft_set_rbtree: Remove unused variable nft_net
+
+Yonghong Song (1):
+      bpf: Do not allocate percpu memory at init stage
+
+Yonglong Liu (3):
+      net: hns3: add barrier in vf mailbox reply process
+      net: hns3: fix out-of-bounds access may occur when coalesce info is read via debugfs
+      net: hns3: fix variable may not initialized problem in hns3_init_mac_addr()
+
+Yuran Pereira (1):
+      ptp: Fixes a null pointer dereference in ptp_ioctl
+
+Ziwei Xiao (1):
+      gve: Fixes for napi_poll when budget is 0
+
+ .../bindings/net/ethernet-controller.yaml          |   4 +-
+ MAINTAINERS                                        |  13 ++-
+ drivers/net/bonding/bond_main.c                    |   6 ++
+ drivers/net/ethernet/amd/pds_core/adminq.c         |   2 +-
+ drivers/net/ethernet/amd/pds_core/core.h           |   2 +-
+ drivers/net/ethernet/amd/pds_core/dev.c            |   8 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c        |   2 +-
+ drivers/net/ethernet/broadcom/tg3.c                |  42 ++++++--
+ drivers/net/ethernet/broadcom/tg3.h                |   4 +-
+ drivers/net/ethernet/cortina/gemini.c              |  45 +++++---
+ drivers/net/ethernet/cortina/gemini.h              |   4 +-
+ drivers/net/ethernet/google/gve/gve_main.c         |   8 +-
+ drivers/net/ethernet/google/gve/gve_rx.c           |   4 -
+ drivers/net/ethernet/google/gve/gve_tx.c           |   4 -
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c |   9 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |   2 +-
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  33 ++++--
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c  |  25 ++++-
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h  |   1 +
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_mbx.c   |   7 ++
+ drivers/net/ethernet/intel/ice/ice_ddp.c           | 103 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.c          |  21 ++--
+ drivers/net/ethernet/intel/ice/ice_dpll.h          |   1 -
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c        |  54 ++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h        |   2 +
+ drivers/net/ethernet/marvell/mvneta.c              |  28 +++--
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  20 +++-
+ .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en/tc_tun.c    |  30 +++---
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  13 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_rep.c   |  12 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |  60 ++++++-----
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c    |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c       |  25 +++--
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/irq_affinity.c |  42 --------
+ .../net/ethernet/mellanox/mlx5/core/lib/clock.c    |   7 +-
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.h  |   3 +
+ .../mellanox/mlx5/core/steering/dr_action.c        |   3 +-
+ .../ethernet/mellanox/mlx5/core/steering/dr_send.c | 115 +++------------------
+ drivers/net/ethernet/realtek/r8169_main.c          |  42 ++++++--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   3 +-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c       |  15 ++-
+ drivers/net/ipvlan/ipvlan_core.c                   |  41 +++++---
+ drivers/net/macvlan.c                              |   2 +-
+ drivers/net/ppp/ppp_synctty.c                      |   6 +-
+ drivers/ptp/ptp_chardev.c                          |   3 +-
+ drivers/ptp/ptp_clock.c                            |   5 +-
+ drivers/ptp/ptp_private.h                          |   8 +-
+ drivers/ptp/ptp_sysfs.c                            |   3 +-
+ include/linux/bpf.h                                |  10 +-
+ include/linux/mdio.h                               |   2 +-
+ include/net/netfilter/nf_tables.h                  |   4 +-
+ include/net/tc_act/tc_ct.h                         |   9 ++
+ kernel/bpf/core.c                                  |   8 +-
+ kernel/bpf/verifier.c                              |  87 +++++++++++-----
+ net/bridge/netfilter/nf_conntrack_bridge.c         |   2 +-
+ net/core/dev.c                                     |   4 +-
+ net/core/gso_test.c                                |  14 +--
+ net/ipv4/inet_hashtables.c                         |   2 +-
+ net/mptcp/pm_netlink.c                             |   5 +-
+ net/mptcp/protocol.c                               |  11 +-
+ net/mptcp/sockopt.c                                |   3 +
+ net/ncsi/ncsi-aen.c                                |   5 -
+ net/netfilter/ipset/ip_set_core.c                  |  14 +--
+ net/netfilter/nf_tables_api.c                      |  60 ++++++-----
+ net/netfilter/nft_byteorder.c                      |   5 +-
+ net/netfilter/nft_meta.c                           |   2 +-
+ net/netfilter/nft_set_rbtree.c                     |   2 -
+ net/sched/act_ct.c                                 |   3 +
+ net/tipc/netlink_compat.c                          |   1 +
+ net/unix/af_unix.c                                 |   9 +-
+ tools/testing/selftests/bpf/progs/verifier_cfg.c   |  62 +++++++++++
+ .../testing/selftests/bpf/progs/verifier_loops1.c  |   9 +-
+ .../selftests/bpf/progs/verifier_precision.c       |  40 +++++++
+ tools/testing/selftests/bpf/verifier/calls.c       |   6 +-
+ tools/testing/selftests/bpf/verifier/ld_imm64.c    |   8 +-
+ tools/testing/selftests/bpf/xskxceiver.c           |  19 ++--
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    |   2 +-
+ 80 files changed, 860 insertions(+), 457 deletions(-)
+
 
