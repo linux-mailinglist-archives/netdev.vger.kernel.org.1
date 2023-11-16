@@ -1,109 +1,84 @@
-Return-Path: <netdev+bounces-48435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4B407EE55A
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:42:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD9487EE58D
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113571C20A9A
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:42:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE6A21C2097D
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEAF39FD2;
-	Thu, 16 Nov 2023 16:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E79128361;
+	Thu, 16 Nov 2023 16:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="nwExwMZW"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="g7L1Bsii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C091A8
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:42:13 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-40839807e82so6540445e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:42:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700152931; x=1700757731; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ey6FPqM3ezE5TkOnnp/QUGAqqxTUcssiF8OATJaVuv4=;
-        b=nwExwMZWCVsthw8COGUwgE3raeK6Gs7loTDKm2Z2T8p/b8bszcMro1Euz9Sloiz3BR
-         15Hb+ts4k4u9YMvrO001t07P4Oc9zGYiu7LSdfTpj658BZRB0g159LlynGjWA5YfPOXV
-         7RfNyBlTz2z+sgg04Hmk7LGSTveDoWTD6+o6B+BCOP0mvpTpYQ4ET4cw+BEE1WGlO7Z8
-         UeY2c1PVmNW/XdoHbtrHbloga+3x9/GlIXaYh/1w54C0wmzysRB2uRsWt/dB43HIJtnR
-         gabPQUlbitjMC6W37EOshT5FCU2oBEzDAkVLnRoavYMOezPB83+MGHu1Uin7kvqAUSj3
-         vUFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700152931; x=1700757731;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ey6FPqM3ezE5TkOnnp/QUGAqqxTUcssiF8OATJaVuv4=;
-        b=NqAnuXh5hdUjBD/ier2UVdHT/ddLBKwnM9lk16odIq0KgNR/5kiMvZftEETlxd8Tj+
-         +EfOzYlNDkxRoEZTACfiEv9am3MTmDyz4MEvM8Fls+V0J3LrQ1ewbhMYKdaTitsnuUHK
-         gP2vV4lKX3ir6Fi/BJYwO6AC00lv78/GtcVX72jvoVnAbmhJk4XcyMXJPEdTxNWBmh1c
-         o2npkfvkR6354zEJmjFzPJ8bXgLLQiDrbIBoMlggTIVTXMdsMQzurl7293CphzXfmVDD
-         NASSoYCeeP67EJ6xCnkK1v7k42KskWy3AEjMN5NRTbv1bcCDtpvGASIfooUl3xzYgING
-         utMA==
-X-Gm-Message-State: AOJu0YygR5lQN9pZvBDaOi+LkEPfGOONEO2sm/L4XJScvb7bxgxPxEO6
-	ZXheAtxR/v6nD4OktWBq/cPw9g==
-X-Google-Smtp-Source: AGHT+IGQ203pwjBxxfw2G6h6b9/XqW9U9jtEKCxq4ItGKaFpBXaLbN0FEFVC2YwJ41X/7QvwGzLsXg==
-X-Received: by 2002:a05:600c:1c9e:b0:407:4126:f71c with SMTP id k30-20020a05600c1c9e00b004074126f71cmr2200349wms.6.1700152931379;
-        Thu, 16 Nov 2023 08:42:11 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o27-20020a05600c511b00b0040839fcb217sm4346255wms.8.2023.11.16.08.42.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 08:42:10 -0800 (PST)
-Date: Thu, 16 Nov 2023 17:42:09 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
-	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
-	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
-	toke@redhat.com, mattyk@nvidia.com
-Subject: Re: [PATCH net-next v8 15/15] p4tc: Add P4 extern interface
-Message-ID: <ZVZGYQDk/LyC7+8z@nanopsycho>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <20231116145948.203001-16-jhs@mojatatu.com>
+X-Greylist: delayed 313 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 16 Nov 2023 08:52:05 PST
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528231A8;
+	Thu, 16 Nov 2023 08:52:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1700153521; x=1700758321; i=markus.elfring@web.de;
+	bh=6S/RFMzhybHWCrHyIb3KI2oR/z3S7irZPJDIIkKG6ow=;
+	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
+	 In-Reply-To;
+	b=g7L1BsiiMFc9uzSqKvwVKXDfyTGDAy7s3E3YO1f1BnuRkUaViDYINWqmW7++wFuF
+	 nKD1YWwve+NZ9QCeN6mkTrmjkIodCmcAECXw5EBESEQflnfDLHE9boc3+8SHl41X+
+	 WQvhfiFDPsnTOyeJyvyJjwzK2ybj4rtAjybppvDEHJYSrz2l8YgwU/I5Tb4IjWnH8
+	 h/Q4QOZWpfxicUwW/dIrXTxD9hfGcbyAAZ2JfHT891gIiJYBYWBCJTsiHPq0mBWz4
+	 mwEoPTfDAXPsiOxEz/KxaO0Smxs2cyVFaRn3qprsMW4uwdxVLUlxXwUfyMwaaPM/6
+	 pFq08FGB6otbXF3Dvw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MdO9E-1rd0KR1sJM-00ZEnv; Thu, 16
+ Nov 2023 17:46:35 +0100
+Message-ID: <ab3b74bf-cbf2-4e05-8a02-d8039d712150@web.de>
+Date: Thu, 16 Nov 2023 17:46:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116145948.203001-16-jhs@mojatatu.com>
+User-Agent: Mozilla Thunderbird
+To: Minjie Du <duminjie@vivo.com>, opensource.kernel@vivo.com,
+ netdev@vger.kernel.org
+Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ LKML <linux-kernel@vger.kernel.org>
+References: <20231116022213.28795-1-duminjie@vivo.com>
+Subject: Re: [PATCH v2] net/tcp: use kfree_sensitive() instend of kfree() in
+ two functions
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20231116022213.28795-1-duminjie@vivo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:5esQfuXyC+xmKWMvbojAv+dGoR+lQMP5LTjCitvWpU9vPrO1blm
+ 4qHfKMMdUXtTZDSMtQL/0OmKBBs3j8IFU1IXiyULkzMdDKILsPUjOyer73duInMWjs/eYwD
+ FelyCZGRyptuCSLMHtH+mCeCHQ8PRZ0Dox5qLOFe9PB8i9CH+fJHERGWKXfYYsoESwCJE/r
+ E39e9ZdERrSnOl17NSAdA==
+UI-OutboundReport: notjunk:1;M01:P0:Fj667MnM4iY=;Aih/313UfwHLlINCjtAyJ4p99Yd
+ VW4AHk+Z1PHuy0As5kOPtrEEO3x4Km4ryTXDmrx7xQmxfdldx+wOMTBZf1vpTKyeQMs8gtkQO
+ wgPkrDF2WMM4ypI+cM1J07UkwE8liBgAvliGatFc6aIgPYg8tEsmH8OPpqNwNgV/gaECHlyLQ
+ J5hOtx/kTXr7IJWNDjASaD/HyTuAaQwGGtIbQmJPkVw0kKXDMinlTxij0hASXfHX0Cqbsz/A7
+ Uxz5Gxz2EMgQASKdgGY4YVVEwlBSGXw7+7w0MoXRY3nibE7yqQN6Krq2mAHClJ5sDcRaYMxU3
+ 9CzzgjxCz50vURrkTs5kGn4nH4gekK4YW1G/mFmN1Tz+pLi/X9gltnMuP7IWYCCybZEH6YTOS
+ kgl4pDhUUCT/LAzfYfH+D+XoZUU7Vy8s9CaDDARW9KVLiTJYuxzWX4CO8PXprzRFXf/S1QwkR
+ sumntw4CNUnz1cpE5cuhu+fEuHwLhEk6guo84uNJ3fIHXD785CsmdK3XtSEfvVKXEV3YXEXVh
+ 7FpHEADdecRiMuoV2c0xrvVaZqDXlXk/s6KT7bMNURwLmCyRDpc+19EvgupyJvCxiDpdTASBX
+ 64koC5+oPW5apm8mpyGOBjI0N5jMUrIIx/RF27h9K8WLEwxroPg+Ka1ZvgdgYS9Fu7aqsNjyU
+ YpwwoD1IWSYxQpGws353x2BmaurcWZoTKfeUxU9spwbODWWeyE08RP0QKaqHCfvMUW8nYXGxs
+ +mlp+wb030ycEfPlgh+ozCxif4Fow3NuFT+89Buc3I0k1hRoPhO4K+NW2omqbVRC8rbT6t1St
+ SWQhgA0zkk4bQSWeIDtzaID5wP0jaoWouQTkVYoz6Tuy5QqqjHTV715t5hP2cCQf6m1UfUHxP
+ tBwqGSqIG3MzbMrTIQ8HF61A+dIngEzZ//GNoD24A3o+ulNaNgSjQRczj03vSD03pM626kpU5
+ 9nrk4Q==
 
-Thu, Nov 16, 2023 at 03:59:48PM CET, jhs@mojatatu.com wrote:
+Please avoid a typo in the patch subject.
 
-[...]
-
-> include/net/p4tc.h                |  161 +++
-> include/net/p4tc_ext_api.h        |  199 +++
-> include/uapi/linux/p4tc.h         |   61 +
-> include/uapi/linux/p4tc_ext.h     |   36 +
-> net/sched/p4tc/Makefile           |    2 +-
-> net/sched/p4tc/p4tc_bpf.c         |   79 +-
-> net/sched/p4tc/p4tc_ext.c         | 2204 ++++++++++++++++++++++++++++
-> net/sched/p4tc/p4tc_pipeline.c    |   34 +-
-> net/sched/p4tc/p4tc_runtime_api.c |   10 +-
-> net/sched/p4tc/p4tc_table.c       |   57 +-
-> net/sched/p4tc/p4tc_tbl_entry.c   |   25 +-
-> net/sched/p4tc/p4tc_tmpl_api.c    |    4 +
-> net/sched/p4tc/p4tc_tmpl_ext.c    | 2221 +++++++++++++++++++++++++++++
-> 13 files changed, 5083 insertions(+), 10 deletions(-)
-
-This is for this patch. Now for the whole patchset you have:
- 30 files changed, 16676 insertions(+), 39 deletions(-)
-
-I understand that you want to fit into 15 patches with all the work.
-But sorry, patches like this are unreviewable. My suggestion is to split
-the patchset into multiple ones including smaller patches and allow
-people to digest this. I don't believe that anyone can seriously stand
-to review a patch with more than 200 lines changes.
-
-[...]
+Regards,
+Markus
 
