@@ -1,88 +1,72 @@
-Return-Path: <netdev+bounces-48312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F667EE055
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:05:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51DAF7EE05C
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 13:06:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2C2E280C7D
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:05:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CA08280CCF
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C982F861;
-	Thu, 16 Nov 2023 12:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5D5BJfY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369A728E09;
+	Thu, 16 Nov 2023 12:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB2129C
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 04:05:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700136307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YXjCf62csbMxYH8waOeun5LYImbq0Jl0VT25cr1M6AI=;
-	b=f5D5BJfYHuwR1XW7cSf7ZlD0YJXlwCBwIKrIFSY8PwF5E1rfhIRQ2X91X5oggrTSKnQmAB
-	o9kDCasyzSmyhvWjLQd4qBQVilAmOfRw/NAnRCv5Smp6py+IDioz/T0wtOPJ4mlDHlJhwq
-	YKyl3JC6Cecdc12x+Iy/oRQoJaBO/ag=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-MyMPN7OdN8mKt9r2tcoVXw-1; Thu, 16 Nov 2023 07:05:06 -0500
-X-MC-Unique: MyMPN7OdN8mKt9r2tcoVXw-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-66d026cae6eso7645986d6.3
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 04:05:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700136305; x=1700741105;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YXjCf62csbMxYH8waOeun5LYImbq0Jl0VT25cr1M6AI=;
-        b=dN9ZFnXzgcfiaJdnVcQxaCIbNXCaRYMse3Hq884DD7uC2dHnm8N40DMuXFVktiJ5uf
-         xGh3zrHnnI2tli370t5jW+MetkM6bnRIuUT2NyXSxjR/nJiClBtcSfYHb4Zo8LSt/hxv
-         EYiYBoOLd6Nu9PpSh9lVTghu49xiS3sDuQ5IIuZokZjAeuKqzBXKKVb2QnT6bXwAIb19
-         gq6yCRnJ9Ko0rM7D1nm2WWIARV+gTP0+tx4+1MchGUirSM3bVY6GuqhfMbCSR4b39rFs
-         42subBIFOwtgW8LXuqnfAi8Il4epTAsU81MzLcuZGJl83BUzpMm+jIMoxeHERSFB3k4g
-         hePw==
-X-Gm-Message-State: AOJu0YyaG8SUYDqmkheHMDLUGEwPv3JhWeTvMlXqJQP+foEqDz3EhZCt
-	ssBoUN/Ga30gEmKoDyDt3Ox8NWmR6puclvlh77T3/40PCOLvg+Kz4nuj8Fpdencu+isxsEZtLHb
-	o0BSd2gToxY69WH6cEvJcTQlK
-X-Received: by 2002:ad4:48c2:0:b0:65b:7a2:eecd with SMTP id v2-20020ad448c2000000b0065b07a2eecdmr7634936qvx.61.1700136305623;
-        Thu, 16 Nov 2023 04:05:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH0nx6R/PtjNTsXH+MHlQqgiHScSQvm+h3pWsUSIvN7cbC4fpaq9LRumIhEBDcIxhqC1SWCMA==
-X-Received: by 2002:ad4:48c2:0:b0:65b:7a2:eecd with SMTP id v2-20020ad448c2000000b0065b07a2eecdmr7634924qvx.61.1700136305407;
-        Thu, 16 Nov 2023 04:05:05 -0800 (PST)
-Received: from localhost ([37.163.136.74])
-        by smtp.gmail.com with ESMTPSA id o9-20020ac872c9000000b00419b094537esm4320166qtp.59.2023.11.16.04.05.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 04:05:05 -0800 (PST)
-Date: Thu, 16 Nov 2023 13:04:59 +0100
-From: Andrea Claudi <aclaudi@redhat.com>
-To: heminhong <heminhong@kylinos.cn>
-Cc: petrm@nvidia.com, netdev@vger.kernel.org, stephen@networkplumber.org
-Subject: Re: [PATCH v4] iproute2: prevent memory leak
-Message-ID: <ZVYFa5s4l_v4Oz0J@renaissance-vector>
-References: <87y1ezwbk8.fsf@nvidia.com>
- <20231116031308.16519-1-heminhong@kylinos.cn>
+Received: from baidu.com (mx20.baidu.com [111.202.115.85])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF46AB4;
+	Thu, 16 Nov 2023 04:06:25 -0800 (PST)
+From: "Li,Rongqing" <lirongqing@baidu.com>
+To: Wen Gu <guwen@linux.alibaba.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-s390@vger.kernel.org"
+	<linux-s390@vger.kernel.org>, "dust.li@linux.alibaba.com"
+	<dust.li@linux.alibaba.com>
+Subject: RE: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in the tx
+ path when possible
+Thread-Topic: [PATCH][net-next] net/smc: avoid atomic_set and smp_wmb in the
+ tx path when possible
+Thread-Index: AQHaGG86V3lsEoc0T0O8PDgZDtb7pLB82Zzg
+Date: Thu, 16 Nov 2023 12:06:21 +0000
+Message-ID: <3816364405a04427999739f5ca0b0536@baidu.com>
+References: <20231116022041.51959-1-lirongqing@baidu.com>
+ <d8c0ac0d-f28b-8984-06f9-41bfdcb03425@linux.alibaba.com>
+In-Reply-To: <d8c0ac0d-f28b-8984-06f9-41bfdcb03425@linux.alibaba.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [172.22.206.6]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116031308.16519-1-heminhong@kylinos.cn>
+X-FEAS-Client-IP: 172.31.51.53
+X-FE-Last-Public-Client-IP: 100.100.100.38
+X-FE-Policy-ID: 15:10:21:SYSTEM
 
-On Thu, Nov 16, 2023 at 11:13:08AM +0800, heminhong wrote:
-> When the return value of rtnl_talk() is not less than 0,
-> 'answer' will be allocated. The 'answer' should be free
-> after using, otherwise it will cause memory leak.
-> 
-> Signed-off-by: heminhong <heminhong@kylinos.cn>
-
-Reviewed-by: Andrea Claudi <aclaudi@redhat.com>
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogV2VuIEd1IDxndXdlbkBs
+aW51eC5hbGliYWJhLmNvbT4NCj4gU2VudDogVGh1cnNkYXksIE5vdmVtYmVyIDE2LCAyMDIzIDU6
+MjggUE0NCj4gVG86IExpLFJvbmdxaW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IHdlbmppYUBs
+aW51eC5pYm0uY287DQo+IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXMzOTBAdmdlci5r
+ZXJuZWwub3JnOyBkdXN0LmxpQGxpbnV4LmFsaWJhYmEuY29tDQo+IFN1YmplY3Q6IFJlOiBbUEFU
+Q0hdW25ldC1uZXh0XSBuZXQvc21jOiBhdm9pZCBhdG9taWNfc2V0IGFuZCBzbXBfd21iIGluIHRo
+ZQ0KPiB0eCBwYXRoIHdoZW4gcG9zc2libGUNCj4gDQo+IA0KPiANCj4gT24gMjAyMy8xMS8xNiAx
+MDoyMCwgTGkgUm9uZ1Fpbmcgd3JvdGU6DQo+ID4gdGhlcmUgaXMgcmFyZSBwb3NzaWJpbGl0eSB0
+aGF0IGNvbm4tPnR4X3B1c2hpbmcgaXMgbm90IDEsIHNpbmNlDQo+ICAgIFRoZXJlDQo+ID4gdHhf
+cHVzaGluZyBpcyBqdXN0IGNoZWNrZWQgd2l0aCAxLCBzbyBtb3ZlIHRoZSBzZXR0aW5nIHR4X3B1
+c2hpbmcgdG8gMQ0KPiA+IGFmdGVyIGF0b21pY19kZWNfYW5kX3Rlc3QoKSByZXR1cm4gZmFsc2Us
+IHRvIGF2b2lkIGF0b21pY19zZXQgYW5kDQo+ID4gc21wX3dtYiBpbiB0eCBwYXRoDQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAuDQo+ID4NCj4gDQo+IFNvbWUgbml0czoNCj4gDQo+IDEuIEl0
+IGlzIG5vcm1hbGx5IHVzaW5nIFtQQVRDSCBuZXQtbmV4dF0gcmF0aGVyIHRoYW4gW1BBVENIXVtu
+ZXQtbmV4dF0NCj4gICAgIGluIHN1YmplY3QuIEFuZCBuZXcgdmVyc2lvbiBzaG91bGQgYmV0dGVy
+IGJlIG1hcmtlZC4gc3VjaCBhczoNCj4gDQo+ICAgICAjIGdpdCBmb3JtYXQtcGF0Y2ggLS1zdWJq
+ZWN0LXByZWZpeD0iUEFUQ0ggbmV0LW5leHQiIC12IDMNCj4gDQo+ICAgICBBbmQgQ0MgYWxsIHJl
+bGV2YW50IHBlb3BsZSBsaXN0ZWQgYnk6DQo+IA0KPiAgICAgIyAuL3NjcmlwdHMvZ2V0X21haW50
+YWluZXIucGwgPHlvdXIgcGF0Y2g+DQo+IA0KPiAyLiBGZXcgaW1wcm92ZW1lbnRzIGluIHRoZSBj
+b21taXQgYm9keS4NCj4gDQo+IA0KDQpPaywgdGhhbmtzIA0KDQotTGkNCg0K
 
