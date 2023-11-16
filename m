@@ -1,94 +1,111 @@
-Return-Path: <netdev+bounces-48274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B39EB7EDE77
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:29:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1ED7EDEBB
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E33C71C2084C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:29:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB051C209AD
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593232CCD9;
-	Thu, 16 Nov 2023 10:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9405C156C6;
+	Thu, 16 Nov 2023 10:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q3Ckb7P9"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EJrx+9Cc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6482CCB2
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 10:29:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C2A54C433C7;
-	Thu, 16 Nov 2023 10:29:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700130572;
-	bh=sYxm+o9mysruVaMMu8BHgciGInB8OETPhkga4z0YhmU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q3Ckb7P9p719w4kQjKkUo4DZe1Y2NpHUoZ1RlYEnbUQaeZfTxjQ9t08lvQx9pl1TL
-	 AOyCXkck4YobQmQNYC/k2yYHufodJfnFwBrjmsT8SnbfLpKEwvVMFNacsrTJohacuL
-	 G8etXrVVjJSVVlVoKCVBTXjtjVBud8rmspKqEdKYCUa2CbQgT+QI7AULDsx8OTj482
-	 RIGr26aXVfDI8UHeGdiJ7dwJenywcvDS2UFE7ux8X/xoU/8y62rxOiNJ3tbK21MjbG
-	 AS2rG+gE42gpiFBAAjMYguQFu/2g756LgB5qKrodo1E+b+InOcq26P/Ih+mt8ySQtc
-	 9+z1OhMLXELxw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2ACFC4166E;
-	Thu, 16 Nov 2023 10:29:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6119118B;
+	Thu, 16 Nov 2023 02:44:45 -0800 (PST)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AG8Vakx004901;
+	Thu, 16 Nov 2023 10:44:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=D1svzL+K4mX38CebFwfuvfAb54VtCzK1NOI55/OaP1w=;
+ b=EJrx+9CctyeAF0U2Sq28VpTjQIduRpRZHsS9oEBP6M8lURbSpsR88+ZlwvkZRzyMkTIm
+ Bck56GTPURRmDZz2KICOsce6FtRnOLOqJIiyXR2pSI4uMwj8lwbqOAbEo82epofV+vO+
+ Rg80ms/wFz918EnctIvik+mtQezNX8Mo4pTiqz3DJKt+1EhLzjq08VF4AK17eie5WqCO
+ LkJ2GpQCq/y0lRoLvucPqjgvOZKbwfP8eWW0KzUUlt+dG9YJh5M7yJ/9F/+DFd9XFNdy
+ lvqh2b+k5HHuYpOIaH6jNmFwNaOt+KTiGHLtCWFW5en6rdvwrCpXyLFqyfCoFUehhv1R hg== 
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ucuac32ct-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 10:44:28 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AGAiLm2023401
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 10:44:21 GMT
+Received: from [10.253.72.184] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 16 Nov
+ 2023 02:44:17 -0800
+Message-ID: <8608e88e-e379-4e08-b376-86d9f25d2270@quicinc.com>
+Date: Thu, 16 Nov 2023 18:44:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] netfilter: nft_set_rbtree: Remove unused variable
- nft_net
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170013057266.29188.8784130938113311187.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Nov 2023 10:29:32 +0000
-References: <20231115184514.8965-2-pablo@netfilter.org>
-In-Reply-To: <20231115184514.8965-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 8/9] net: mdio: ipq4019: add qca8084 configurations
+Content-Language: en-US
+To: Konrad Dybcio <konrad.dybcio@linaro.org>, Andrew Lunn <andrew@lunn.ch>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-9-quic_luoj@quicinc.com>
+ <a1954855-f82d-434b-afd1-aa05c7a1b39b@lunn.ch>
+ <cb4131d1-534d-4412-a562-fb26edfea0d1@linaro.org>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <cb4131d1-534d-4412-a562-fb26edfea0d1@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: aO_XPBb_fBjY-CpFbSBD2d8e64uf5W3x
+X-Proofpoint-GUID: aO_XPBb_fBjY-CpFbSBD2d8e64uf5W3x
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_09,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=450
+ spamscore=0 malwarescore=0 mlxscore=0 bulkscore=0 clxscore=1015
+ adultscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311160086
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-On Wed, 15 Nov 2023 19:45:09 +0100 you wrote:
-> From: Yang Li <yang.lee@linux.alibaba.com>
+On 11/16/2023 1:01 AM, Konrad Dybcio wrote:
 > 
-> The code that uses nft_net has been removed, and the nft_pernet function
-> is merely obtaining a reference to shared data through the net pointer.
-> The content of the net pointer is not modified or changed, so both of
-> them should be removed.
 > 
-> [...]
+> On 11/15/23 17:20, Andrew Lunn wrote:
+>> On Wed, Nov 15, 2023 at 11:25:14AM +0800, Luo Jie wrote:
+>>> The PHY & PCS clocks need to be enabled and the reset
+>>> sequence needs to be completed to make qca8084 PHY
+>>> probeable by MDIO bus.
+>>
+>> Is all this guaranteed to be the same between different boards?
+> No, this looks like a total subsystem overreach, these should be
+> taken care of from within clk framework and consumed with the clk
+> APIs.
+> 
+> Konrad
 
-Here is the summary with links:
-  - [net,1/6] netfilter: nft_set_rbtree: Remove unused variable nft_net
-    https://git.kernel.org/netdev/net/c/67059b61597c
-  - [net,2/6] netfilter: nf_conntrack_bridge: initialize err to 0
-    https://git.kernel.org/netdev/net/c/a44af08e3d4d
-  - [net,3/6] netfilter: nf_tables: fix pointer math issue in nft_byteorder_eval()
-    https://git.kernel.org/netdev/net/c/c301f0981fdd
-  - [net,4/6] netfilter: nf_tables: bogus ENOENT when destroying element which does not exist
-    https://git.kernel.org/netdev/net/c/a7d5a955bfa8
-  - [net,5/6] netfilter: ipset: fix race condition between swap/destroy and kernel side add/del/test
-    https://git.kernel.org/netdev/net/c/28628fa952fe
-  - [net,6/6] netfilter: nf_tables: split async and sync catchall in two functions
-    https://git.kernel.org/netdev/net/c/8837ba3e58ea
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hi Konrad,
+As Robert shared the link of the clock provider driver, which is
+registered as MDIO device and not available until to the qca8084
+initializations completed done here, so i need to do raw read/write
+the clock registers in this patch.
 
