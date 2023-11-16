@@ -1,86 +1,119 @@
-Return-Path: <netdev+bounces-48264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ACA17EDD9C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:30:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF637EDDBA
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0791C2084B
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 09:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 741D5280F36
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 09:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE7A28DA4;
-	Thu, 16 Nov 2023 09:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9692228DD6;
+	Thu, 16 Nov 2023 09:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f3ROC4rN"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ePhMpjb+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCF41371
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 09:30:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 98E83C433C8;
-	Thu, 16 Nov 2023 09:30:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700127022;
-	bh=17JsJ32Hy365OXvGZ7b96zxUA0m8qXl3kFpnEYgbNBQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f3ROC4rNsoJaMlvcoNIv6VRoByxP05+94Tw64AA7At6GmF6ZHBl6nyqsJYBXrGzp1
-	 U20OBWsLjn8iBC4reZmroUvf7T3x6YWZHX33xcDiVOgdv1SxMXLfjwVUM31XmiF02w
-	 3Ooc6Y5RDBc0n2FJdolUnxfgi0JvtsfeW1tNL0Ck3mNylAV+ygPsMdP5ItYdwjR3Tg
-	 a8nYkbFmhq7xh0Z4vbWbdEEEDIGcZ6JDmuZmi6A6S36IG0Wub4Z+5l9CSovo8orCm6
-	 vv44T2hDvOOnTQMl+03rq+uFLd8k5jQPk/dNxw4x1iLGYqWZN/8lsoomJiuWmltD7b
-	 HcebzeIljhAeQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F9DEE1F66A;
-	Thu, 16 Nov 2023 09:30:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354C01BC0;
+	Thu, 16 Nov 2023 01:36:10 -0800 (PST)
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AG5AkBw032381;
+	Thu, 16 Nov 2023 09:35:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=GEuP6Rpji2X+1oMcUTO94Nar7xPCb3N4/EUxMMrf/9g=;
+ b=ePhMpjb+EHMZuVH+IIKJnXvKthI7OxRzandm8JFsCLlW7ZWEDuXik7els5LAUytggbkx
+ j8djCv7k4gTwFdD/U3yAjnyB+RmbD+EKpxvvi62YmvTmxynOwRMmHZ35OLLMecdMYB0K
+ isjUeDf8u2SdQCzILgzexB2hYz7ZQ4PGyMKTYMESGY0udqT/divkIbKV8buQmXAdBlFx
+ 8lVQxLT3SSw1nJ0Xd3loQYbCw1ok+AJF1JyDlVz8zLMthNj7zfL+WLjl0Npbp+w8LK4k
+ suxENXthknOakvv0sNewPJs8JYSf5BhrBwOULXP8OeJjTbCxYrrvQ8QRc1DmEifmUYG+ 6A== 
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ud1k51vg8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 09:35:57 +0000
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AG9Ztg8028243
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 09:35:55 GMT
+Received: from [10.253.72.184] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 16 Nov
+ 2023 01:35:52 -0800
+Message-ID: <ccb4bdbd-b7d7-49f0-b8f4-6ea13a4ab407@quicinc.com>
+Date: Thu, 16 Nov 2023 17:35:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: sched: do not offload flows with a helper in act_ct
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170012702251.16472.12210926887637759770.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Nov 2023 09:30:22 +0000
-References: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
-In-Reply-To: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, vladyslavt@nvidia.com,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- marcelo.leitner@gmail.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] net: mdio: ipq4019: increase eth_ldo_rdy for ipq5332
+ platform
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-2-quic_luoj@quicinc.com>
+ <c7ae6561-fbcc-40d9-a02c-61fc76e089d0@lunn.ch>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <c7ae6561-fbcc-40d9-a02c-61fc76e089d0@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: TH3DcYruvcjW6eYr3stYd3ERefWUPhEi
+X-Proofpoint-ORIG-GUID: TH3DcYruvcjW6eYr3stYd3ERefWUPhEi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_07,2023-11-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=592 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1015 malwarescore=0 priorityscore=1501
+ impostorscore=0 phishscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
+ definitions=main-2311160076
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
 
-On Mon, 13 Nov 2023 12:53:28 -0500 you wrote:
-> There is no hardware supporting ct helper offload. However, prior to this
-> patch, a flower filter with a helper in the ct action can be successfully
-> set into the HW, for example (eth1 is a bnxt NIC):
+On 11/15/2023 9:44 PM, Andrew Lunn wrote:
+>> +	for (ret = 0; ret < ETH_LDO_RDY_CNT; ret++) {
+>> +		if (priv->eth_ldo_rdy[ret]) {
+>> +			val = readl(priv->eth_ldo_rdy[ret]);
+>> +			val |= BIT(0);
+>> +			writel(val, priv->eth_ldo_rdy[ret]);
+>> +			fsleep(IPQ_PHY_SET_DELAY_US);
+>> +		}
 > 
->   # tc qdisc add dev eth1 ingress_block 22 ingress
->   # tc filter add block 22 proto ip flower skip_sw ip_proto tcp \
->     dst_port 21 ct_state -trk action ct helper ipv4-tcp-ftp
->   # tc filter show dev eth1 ingress
+> Please add a new variable, rather than use ret this way.
+
+OK, will add it in the next patch set.
+
 > 
-> [...]
+>> +	for (ret = 0; ret < ETH_LDO_RDY_CNT; ret++) {
+>> +		res = platform_get_resource(pdev, IORESOURCE_MEM, ret + 1);
+>> +		if (res)
+>> +			priv->eth_ldo_rdy[ret] = devm_ioremap(&pdev->dev,
+> 
+> same here.
 
-Here is the summary with links:
-  - [net] net: sched: do not offload flows with a helper in act_ct
-    https://git.kernel.org/netdev/net/c/7cd5af0e937a
+Ok.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> 
+>      Andrew
+> 
+> ---
+> pw-bot: cr
 
