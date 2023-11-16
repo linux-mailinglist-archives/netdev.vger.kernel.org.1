@@ -1,86 +1,120 @@
-Return-Path: <netdev+bounces-48209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 569AC7ED854
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 00:53:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 942177ED885
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 01:31:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5F6628111D
-	for <lists+netdev@lfdr.de>; Wed, 15 Nov 2023 23:53:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7542B20A9A
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 00:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C4A4595E;
-	Wed, 15 Nov 2023 23:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D5EA5D;
+	Thu, 16 Nov 2023 00:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="E3Am9kHr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JN4nnd3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E398198
-	for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:53:01 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1cc68c1fac2so2501885ad.0
-        for <netdev@vger.kernel.org>; Wed, 15 Nov 2023 15:53:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700092380; x=1700697180; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DNz1LZLWLqztNC1mkWelul3LmT7uMEIxjhxqq8dOWJk=;
-        b=E3Am9kHrzGiKvuQ7Wd3p1RtKWgvVBsR+Hwym+gYpCIu1YzMG6e2EEDY7D97fEWMe09
-         xieMnX9zRJuZ5cfKNmtKGSjJRQjVeDwjntPuBLtHAsxeucEELoD57FBXzD5QXgq02q+5
-         FxdQ99Ik8qW7DtUz3WqOsHOOS0kOka5F+vBXD392JG+jYsC+FLMfZZylaH99OLbw4Odu
-         L4TcFcqH/JF/GXMfaapgLL8e4+1C2y9dnXvc1G8+ydcIP6b2UXT5qfOYS48fy3RwUdRR
-         8ue7LgHqswrHw+e9Kj8VPLFhxrWIOtj/tP6qFh+7jNFBKGHUN2p0wHUIHaN7oHqsj21H
-         0hHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700092380; x=1700697180;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DNz1LZLWLqztNC1mkWelul3LmT7uMEIxjhxqq8dOWJk=;
-        b=LEJ6GHJHePIpjSEgH6Y+61+1B/G8ATCbVUpxGl1YzZk6egB5L7O+dlfBHFxr/TfUvR
-         4h2zUrK59fl9xhogQ3K7HTcEPZGTrmOVYNX9R1ImHHZX1Ec8PgvQqXH7F24yMm2NMRuL
-         jSOYiM6VvqA5Z75qeJH+npDKbq+HvwGHJIohA+oNScsF1ixphGtmNMPSpHAq6SB2huOD
-         yIH3IOP+q6O136QKUVlZ437Bnvizaei8ea7mEdxq7dC3s+CNG6dKTm9h1lEvFhf6n/gK
-         /DZKSYNv9s7aFSkN2n8kohxUKWs0c1hUiVJenDqZiFbeAUALFLbt84TB5SVz0FUv6P9l
-         1k4Q==
-X-Gm-Message-State: AOJu0YyHkBsLbMKW3YB1jp/a8rOdXMQIjvIpzM2CZDo30HBJY26qwbbq
-	U8os0G8N3fzZfqopK4GkNY69zw==
-X-Google-Smtp-Source: AGHT+IFXwoOe3aV75o7N/RNqxVPQxI4r3UiEus4sBc1W5lL/WagI4kLVy6eVv3qf/8n+XUliy6+PZg==
-X-Received: by 2002:a17:903:2341:b0:1c7:5f03:8562 with SMTP id c1-20020a170903234100b001c75f038562mr9891201plh.30.1700092380545;
-        Wed, 15 Nov 2023 15:53:00 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id y12-20020a170902ed4c00b001c9ba6c7287sm7923702plb.143.2023.11.15.15.52.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Nov 2023 15:53:00 -0800 (PST)
-Date: Wed, 15 Nov 2023 15:52:58 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- linux-kernel@vger.kernel.org, Long Li <longli@microsoft.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH net,v4, 3/3] hv_netvsc: Mark VF as slave before exposing
- it to user-mode
-Message-ID: <20231115155258.5b3f360b@hermes.local>
-In-Reply-To: <1699627140-28003-4-git-send-email-haiyangz@microsoft.com>
-References: <1699627140-28003-1-git-send-email-haiyangz@microsoft.com>
-	<1699627140-28003-4-git-send-email-haiyangz@microsoft.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F2DA49;
+	Thu, 16 Nov 2023 00:31:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36406C433C8;
+	Thu, 16 Nov 2023 00:31:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700094710;
+	bh=CNUAOWR1w/IUn5WlrVt0SaeCfOhOT/KbgQVs5ydqFVk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=JN4nnd3ZSedgmtXd3GRXgToarbdHxTaW/ODlBxFNvee511NjhmhVbkAcwOUF/Q7mz
+	 As1TSS5BLpQV15LTD6dkv5BnV8j2gVuUuEvImkDaTJYZaawI1zynu2+zk/L17LBZHu
+	 1/ag9MEVdoo60iBameRKtIGWcvja3AqozX9WqbJlmlig7yw2oyRdRIR1nnrxVB66uy
+	 LwBn01p7PXCGjfxxy05N/5iGbjFf9H2zoZENkVFhrrze5P66QV+5Ml7ALYwx/k7HIZ
+	 qIrjXrkWgZVM3PxR74lVyndNYjwB7AveOb0VcgE8PppeRtNze8995pBRAkhENqsEu1
+	 0kUlkpfYmQmMg==
+From: Mat Martineau <martineau@kernel.org>
+Subject: [PATCH net-next v3 00/15] mptcp: More selftest coverage and code
+ cleanup for net-next
+Date: Wed, 15 Nov 2023 16:31:28 -0800
+Message-Id: <20231115-send-net-next-2023107-v3-0-1ef58145a882@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOBiVWUC/4XNSw6CMBAG4KuQWVvTToFaV97DuECYQqMppCUNh
+ nB3mxpjXBgXs/jn8c0KgbylAMdiBU/RBju6FOSugHZoXE/MdikDcpSCo2KBXMcczamWmb3aimk
+ 0TVurg1ZcQLqdPBm7ZPcM7224pMlgwzz6R34YRZ7/saNgnHFJxuiyQl2p0428o/t+9H0mI34YI
+ cpfDCbmWle8KZWSNbZfzLZtT3/Od6EMAQAA
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang.tang@suse.com>
+X-Mailer: b4 0.12.4
 
-On Fri, 10 Nov 2023 06:39:00 -0800
-Haiyang Zhang <haiyangz@microsoft.com> wrote:
+Patches 1-5 and 7-8 add selftest coverage (and an associated subflow
+counter in the kernel) to validate the recently-updated handling of
+subflows with ID 0.
 
-> +static int netvsc_prepare_slave(struct net_device *vf_netdev)
+Patch 6 renames a label in the userspace path manager for clarity.
 
-It would be good to not introduce another instance of non-inclusive naming in network code.
-Please think of a better term. Can't change IFF_SLAVE but the rest could change.
+Patches 9-11 and 13-15 factor out common selftest code by moving certain
+functions to mptcp_lib.sh
+
+Patch 12 makes sure the random data file generated for selftest
+payloads has the intended size.
+
+Signed-off-by: Mat Martineau <martineau@kernel.org>
+---
+Changes in v3:
+- Include Geliang's fixup for patch 11, to include test_prio in the refactor
+- Rebased
+- Link to v2: https://lore.kernel.org/r/20231114-send-net-next-2023107-v2-0-b650a477362c@kernel.org
+
+Changes in v2:
+- Rebased on current net-next (v1 was deferred due to net-next PR timing)
+- Link to v1: https://lore.kernel.org/r/20231027-send-net-next-2023107-v1-0-03eff9452957@kernel.org
+
+---
+Geliang Tang (15):
+      mptcp: add mptcpi_subflows_total counter
+      selftests: mptcp: add evts_get_info helper
+      selftests: mptcp: add chk_subflows_total helper
+      selftests: mptcp: update userspace pm test helpers
+      selftests: mptcp: userspace pm create id 0 subflow
+      mptcp: userspace pm rename remove_err to out
+      selftests: mptcp: userspace pm remove initial subflow
+      selftests: mptcp: userspace pm send RM_ADDR for ID 0
+      selftests: mptcp: add mptcp_lib_kill_wait
+      selftests: mptcp: add mptcp_lib_is_v6
+      selftests: mptcp: add mptcp_lib_get_counter
+      selftests: mptcp: add missing oflag=append
+      selftests: mptcp: add mptcp_lib_make_file
+      selftests: mptcp: add mptcp_lib_check_transfer
+      selftests: mptcp: add mptcp_lib_wait_local_port_listen
+
+ include/uapi/linux/mptcp.h                         |   1 +
+ net/mptcp/pm_userspace.c                           |   8 +-
+ net/mptcp/protocol.h                               |   9 +
+ net/mptcp/sockopt.c                                |   2 +
+ tools/testing/selftests/net/mptcp/diag.sh          |  23 +-
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh | 110 ++----
+ tools/testing/selftests/net/mptcp/mptcp_join.sh    | 375 ++++++++++++---------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh     |  92 +++++
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh |  39 +--
+ tools/testing/selftests/net/mptcp/simult_flows.sh  |  19 +-
+ tools/testing/selftests/net/mptcp/userspace_pm.sh  | 143 ++++----
+ 11 files changed, 409 insertions(+), 412 deletions(-)
+---
+base-commit: e316dd1cf1358ff9c44b37c7be273a7dc4349986
+change-id: 20231027-send-net-next-2023107-92fac6789701
+
+Best regards,
+-- 
+Mat Martineau <martineau@kernel.org>
+
 
