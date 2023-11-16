@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-48376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C09967EE306
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:39:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 130647EE319
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:41:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2BC51C20A0A
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:39:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 428851C208C4
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 14:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344D22FC2E;
-	Thu, 16 Nov 2023 14:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF81C28DA9;
+	Thu, 16 Nov 2023 14:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="YwDOT95B"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYAGySi+"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2048.outbound.protection.outlook.com [40.107.241.48])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B7C1C4;
-	Thu, 16 Nov 2023 06:39:19 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dac6oB6XbsEzgP5UYzOKs8/gVpDIE2HWG4Bc1netRZfP+IxdyW5SwPya8klIFkpRMcCzx3Rp9Gb2eSO7wg/3aYzV/zREmSSs3094vfsJ7hdzIrsLdf6FRlh/vnbCAr99oq3oq4kT8xVwX7pYVtHDM4g2HsT2kKF8APlsnNksD31q11cSRsNZmSwmzNDSM0pAUHLW2Hb2hhcYU5pTXuQ04EnviZQ4lnTzkVj82VXie2+rvxAxUN8c2K6rGQJKDL34K8SL6SfgXd1RMVUs0BVe5iLxLOGrVAegdWxBO/RS/uYLK7v3t5T4plWaUE1ClY0QdjeaKssuAF7ZZ5wmHFnUEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iqRoIkmRqBso5fRfq/80W7PUrao3Mm9xEwTtC30ov8Y=;
- b=LIfJccGklxELDsjX7443riNJepYr0GHYNYAzU2FLbIHg/HuzerHQs9egSO3kdLlGuhoVyCjpo2AAk2+le0y6HI7eOmDgSxHEma9DsmIORXky2RZGemUhFuEbslllIgKt9ZnD+JuEB8WzRZhfYyQ25UrQrF1AzJ4U1K0Pv3jQTazQx7jlAdvqscqL0Lg5svnIgINimNQGEV/BE36tPq2cqTIVmlk+cKnyKXnw3qBYnuZihpTeVSPl4Jve8Se7vBSjP3F55YWS2YNMlpyW/VQBNRbJFm7beQi050UJznL2tcKrdo5XpuSs81J1E+OYce/1EBuAAsd5IeMxUfWR7zcNGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iqRoIkmRqBso5fRfq/80W7PUrao3Mm9xEwTtC30ov8Y=;
- b=YwDOT95BmI4V32Ef9W5AKSSDMD2Ph4Ff8wcZSWMhJi6Micl78nlS+nh5nLidB3X+hecRvY9Tto21496KJWeg6k0Ssu7hl+dk56uykL1X4QGxH6zAv8IphtRFV+rKPxnr4zJhqXs0aIP+qD7Pr4+TZHYqEBFT6bA6ph+dteS5nls=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by VI1PR04MB7070.eurprd04.prod.outlook.com (2603:10a6:800:123::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.8; Thu, 16 Nov
- 2023 14:39:12 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.007; Thu, 16 Nov 2023
- 14:39:12 +0000
-Date: Thu, 16 Nov 2023 16:39:05 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: Romain Gantois <romain.gantois@bootlin.com>, davem@davemloft.net,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A146C4
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 06:41:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700145686;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0n2sOTqh54K6KjJovop+KA+rmVAdCcqfFg/Rllk/gGo=;
+	b=AYAGySi+wL0foSh3QHeZusCZ+oEduVE6MsLQ4KV0c9lY7GeTxBoGn5acr0xzqi9ySdXq4y
+	5EWjamUlH6/zp4aEuGWFCxBxzvVf2afVhHKCjTyw0q+2CsMZYo7DFIU/UjJ20QkqNb2jUO
+	J4pPuwTdSoWK4s6KSsBzzen+LLZ+Iz4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-277-ahEH4LZvP-aUNoHtbYXUAQ-1; Thu,
+ 16 Nov 2023 09:41:23 -0500
+X-MC-Unique: ahEH4LZvP-aUNoHtbYXUAQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7CC442800B42;
+	Thu, 16 Nov 2023 14:41:22 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.225.144])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 956761121306;
+	Thu, 16 Nov 2023 14:41:20 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Luka Perkov <luka.perkov@sartura.hr>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@somainline.org>
-Subject: Re: [PATCH net-next v3 3/8] net: qualcomm: ipqess: introduce the
- Qualcomm IPQESS driver
-Message-ID: <20231116143905.fovty5c5qqfo7inq@skbuf>
-References: <20231114105600.1012056-1-romain.gantois@bootlin.com>
- <20231114105600.1012056-4-romain.gantois@bootlin.com>
- <59e1edc3-2ebc-40a9-a05b-cab02e8b0c10@intel.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59e1edc3-2ebc-40a9-a05b-cab02e8b0c10@intel.com>
-X-ClientProxiedBy: AS4PR09CA0007.eurprd09.prod.outlook.com
- (2603:10a6:20b:5e0::8) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	mschmidt@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH iwl-next v2 0/5] i40e: Simplify VSI and VEB handling
+Date: Thu, 16 Nov 2023 15:41:14 +0100
+Message-ID: <20231116144119.78769-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|VI1PR04MB7070:EE_
-X-MS-Office365-Filtering-Correlation-Id: d3f0b436-79ea-407e-731c-08dbe6b1ccd3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ma1zhqhK5GwCPmM3Sknz2FOYRYl4yTGZ1AxiE3nVKHrmG2n55WjNWEl6MtEUob3e/TDko1pfoc6DW2hV7uqfOZmCGDMHnJmkqcxzKJzyGuTGpguCgYYVmTIV0gOKLgR+06jNNSfU6Oktu5GOKyd95fIADyEkFX/ysKKCa2hYQ2nYw9aceoZWmbl2hlVj5Jxtf9LD4b2YULQElmFuKDhQd1+Gcx3oZAhxU6lfMo+kZpC40APW+GknTjsln6iwwJzoyJyd/uQrYLXNQT8ii7KbCdYqdf93O6ybmLoEY0yq+CLFE2h3aopZvvgLnyT8d1OiCwQ9MDyFLbK0rpbClyUCWj6g6wndVkbnkQnZ+Z7zmtYYJX4KoFnNyfCW0rQXuhcu40kX7Zj+nu17RCnz+xE3a8bvi7t0BHG68bdGWNT0/pufFQk9Fxd5z8tcDQNUMRPvyL7vjOSROp0F6OMVgoZQQmmL+LN3tV4H4PzPWYGW/YkMj+dh2me2RORUmca8vXwkNmFXKpzQs9QkK8l+d76jJTPFS0v2fa1KlRwE6YJKm9wYv13Fg5UJKuBVlHeOMpX7
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(230922051799003)(186009)(1800799009)(451199024)(7416002)(4744005)(5660300002)(2906002)(44832011)(4326008)(8676002)(8936002)(6916009)(54906003)(66476007)(66556008)(66946007)(508600001)(6666004)(6486002)(6512007)(6506007)(9686003)(1076003)(33716001)(26005)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cIJxVeyJJcXqkAP2+mVKPvOln/9EogRbXwiGOdsPJKpyjRmTGWiIESvllnde?=
- =?us-ascii?Q?i/EvlpZo5bXLpx5k51d0tmv73X/B8zxtceqOGrvxpJn+aCF+wpY4/IjdXpbw?=
- =?us-ascii?Q?LayRnJ1EePytcQuW4LUPfy4QTadIFox7LvEz7aB8l+sk4FCbNAxNV7dipRcl?=
- =?us-ascii?Q?FU+ZVRCx4iyxw9DunmFEbsOIp43/69BWEmne/iCq591zCf2mc7SDGrXVFYlb?=
- =?us-ascii?Q?UDvkcYG6fLuexHb+JhwzbB+DfIek3xWAVAh+yPXE1lsCzSAixY9RXUuJpeF0?=
- =?us-ascii?Q?9eOGf85tCh5Cp+MCxJDRAiyF0e5mdtue96BaCH5ZwkHyo6wyuBOFvWAqQL08?=
- =?us-ascii?Q?gai5hoIsuE+X2r9ySGk5VnZR0HWKcSp545B4Ov/i2qBH8ui+wYHwA9oI6hgN?=
- =?us-ascii?Q?xUhSDz1mnRVNyBRGCFJjlT4VxbYb6Fkfk1wKHFCsjCYakn0DNoPXlD0FqA5Q?=
- =?us-ascii?Q?QZ7og7976ABECkClRxGCtCFuu0BPWFji4vpj6LWYLS5LVZ8SbjVI4XMkxMYl?=
- =?us-ascii?Q?9JSM/+kepoLFgusU60evbR6fgHimg9gyBFb1e82sK848Of5RFB6Pb6JZ2+xV?=
- =?us-ascii?Q?9dkhIp4ifVyerQ3lvWLp53YkKb8LNFhz2V8XeL8fkEMx2H+H34dGx0EvdWt/?=
- =?us-ascii?Q?kdEUpwj1EuRJieWT3zgxZlkla/gyicfh2aw89u9XM8KQeeq+NvjUNRrP3fTY?=
- =?us-ascii?Q?HgXtZhZrlIVBZLH52DE+hKgjVkZJDNFcGOm1SPUy7HUI/Am0puCx6EpRR5Qm?=
- =?us-ascii?Q?srFmdt6Lbus8lb0knRNfV4m1QT+JA4NarFm3p4dTPPaetwr4vWxNXbb2PmwW?=
- =?us-ascii?Q?OksM584AYVzJ2axMBiqjkQPnrg2lA+CpsZRrRDOUcEKTKXO93AJYhnenoqXg?=
- =?us-ascii?Q?ci17xzY5c14x8hUmyIYCCsyCuXc+c2zWs2tcF71OLs1NYwPghFZnT/68ojdn?=
- =?us-ascii?Q?/2jV+IK+4GNPW6rvmFH43FGNUZVRLREqy2FNnBKcrcdjCt6HmHMb8yKBYjl6?=
- =?us-ascii?Q?Zvs8pKf3OfeyzMEksNgcbKyB0bPGixk4o1l3u0OgWvN2iMTEWSwEcZweKzqV?=
- =?us-ascii?Q?i1zlnRO59K1VAPeSt1x3s2eV2n7FHquG1H2mu2yc4bU5itlaUEo7QqCnWuHR?=
- =?us-ascii?Q?nCq4NzWF9tUsMaTUz4uX3Wl0W+iYw/q+79C2TFV6m6z19fbed5hU9sEh3DHk?=
- =?us-ascii?Q?ynJtmc+09VpwdeWRPicw96AO3NXFu0znkQVrWcSZtHWJ8rjFUJnayTxo5zEO?=
- =?us-ascii?Q?660/woBRDi3Gb0Z1xHSeFaGy1uqQn7DN24Q+j4ISsrS8W8/d3Kf4OTOzAkHw?=
- =?us-ascii?Q?k5ep0y8boVPlCiMSCGs8dd392vkrFmLicC/T09NruRxoPd7USbhvms+rccl4?=
- =?us-ascii?Q?H7f5fKS2GQIiktQNtXYUO5A2dqzDHmF4srOwRRTCShH1+pSh05e7dZaoK+ee?=
- =?us-ascii?Q?BczX0TUFzZtR3Kuo2XT7gfcR1cXVRyX/2NzsUMicSYmSWWLIQ9Kcb9bSm/fr?=
- =?us-ascii?Q?g8suLa1UvmjNseyE7jHUAT9F4IW53H95lmQ1LqZOVUfnj/5iHboCCSiWSYki?=
- =?us-ascii?Q?iP0djEsADBWaO8mb3hUrz6OZDqRhdmmoAX1i1m7i2enQM952DktJibsdgiAN?=
- =?us-ascii?Q?Sg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3f0b436-79ea-407e-731c-08dbe6b1ccd3
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 14:39:12.4937
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4+m+JUvYiBgv+gOCsG4LHmoN38eI5C4nSUU1WT6TWF9mO4wNGav+5h18Eu/pPw4BUDunwuoEbIJly/BuvsYL7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7070
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Wed, Nov 15, 2023 at 01:55:07PM +0100, Wojciech Drewek wrote:
-> Hi Romain,
-> I see that you splitted the patch, thanks for that.
-> However it's still too big IMHO, edma ipqess_edma could be introduced in seperate file e.g.
+The series simplifies handling of VSIs and VEBs by introducing for-each
+iterating macros, 'find' helper functions. Also removes the VEB
+recursion because the VEBs cannot have sub-VEBs according datasheet and
+fixes the support for floating VEBs.
 
-I agree that it's way too much code in one go (also too much code in
-general). It doesn't help that much of it is blindly copied from DSA or
-duplicated from the qca8k driver from the without much thought. It looks
-like the EDMA portion could be separated from the switch portion.
+The series content:
+Patch 1 - Uses existing helper function for find FDIR VSI instead of loop
+Patch 2 - Adds and uses macros to iterate VSI and VEB arrays
+Patch 3 - Adds 2 helper functions to find VSIs and VEBs by their SEID
+Patch 4 - Fixes broken support for floating VEBs
+Patch 5 - Removes VEB recursion and simplifies VEB handling
+
+Changelog:
+v1->v2 - small correction in patch 4 description
+       - changed helper names in patch 3
+
+Ivan Vecera (5):
+  i40e: Use existing helper to find flow director VSI
+  i40e: Introduce and use macros for iterating VSIs and VEBs
+  i40e: Add helpers to find VSI and VEB by SEID and use them
+  i40e: Fix broken support for floating VEBs
+  i40e: Remove VEB recursion
+
+ drivers/net/ethernet/intel/i40e/i40e.h        |  91 ++-
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |  10 +-
+ .../net/ethernet/intel/i40e/i40e_debugfs.c    |  97 ++-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   | 563 ++++++++----------
+ 4 files changed, 371 insertions(+), 390 deletions(-)
+
+-- 
+2.41.0
+
 
