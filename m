@@ -1,53 +1,75 @@
-Return-Path: <netdev+bounces-48306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F2EA7EDFE5
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:32:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8AA87EDFEF
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 12:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06351C20847
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066EE1C2084C
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1838C2E634;
-	Thu, 16 Nov 2023 11:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105262E654;
+	Thu, 16 Nov 2023 11:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="FVPfc51v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mrap0l7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [IPv6:2a01:4f9:c010:a439::d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52106DA
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:32:12 -0800 (PST)
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10da:6900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.17.1.9/8.17.1.9) with ESMTPSA id 3AGBVmSE3632276
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 16 Nov 2023 11:31:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1700134303; bh=x4l0ZCBUiGQBhM2oFX0ut6jp9gWfv6PJjV8vzL/P6iE=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=FVPfc51vG0i9GVNElXq73WzRhDbctfQgLVFclOrGBtvvhuCB8gC6HePDvT3TV2BUw
-	 5AfnnBRcjN4njt4EBHloKcU8plzCpiIAB25syda2iNsj6HZueMva2xsFuyn7WPQxRX
-	 vCq/mS5ldBx3Szs08dsLwLZd7jcUQ2srFPFd/YH4=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10da:690a:d43d:737:5289:b66f])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.17.1.9/8.17.1.9) with ESMTPSA id 3AGBVh4M3933896
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Thu, 16 Nov 2023 12:31:43 +0100
-Received: (nullmailer pid 2274955 invoked by uid 1000);
-	Thu, 16 Nov 2023 11:31:43 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>
-Subject: Re: question on random MAC in usbnet
-Organization: m
-References: <53b66aee-c4ad-4aec-b59f-94649323bcd6@suse.com>
-Date: Thu, 16 Nov 2023 12:31:43 +0100
-In-Reply-To: <53b66aee-c4ad-4aec-b59f-94649323bcd6@suse.com> (Oliver Neukum's
-	message of "Thu, 16 Nov 2023 11:14:49 +0100")
-Message-ID: <87zfzeexy8.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1109085
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:36:10 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id 98e67ed59e1d1-282ff1a97dcso509090a91.1
+        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 03:36:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700134569; x=1700739369; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ANo9zyxOtx5BIKUfarL5sMj5EFyIDyCvSVW0leCtQ+8=;
+        b=Mrap0l7e2ssVCLwSjf6INd2WE3E3j7BtoeeqfzY3oK1kssAzsqyjCIi9A/xopdcHq1
+         DZYRwvAd0L/D9B8P+oaqECRC4JhXYugWgjMXCBOt6WlbC+0Y+ze9IzafDS2Kp6TreSph
+         rQq4iPOjARwf+o/pMoCXj77ppshSkGAAmK+jB0LOdP400YSou7rQzR/o4uR2ef8Tc5/N
+         WicGxkl5Fq1lfjI1hEl+XtGS96S8EX0lu3Z+R2PEEgWGgyVRArHZAJawn4P9Kb2tLTae
+         91EtIdUUuwIpUImVv2MA8En1jWeMYj/uOEoa9Q3V2Z0jrASYjzerRunjtl7SDcdatB2t
+         af5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700134569; x=1700739369;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ANo9zyxOtx5BIKUfarL5sMj5EFyIDyCvSVW0leCtQ+8=;
+        b=hecCDOdvESztVhYQPr3M+sfsNjdOBmDE2FT9iZ2n6NeGdYvK7tsn068H4lCUeQWTGS
+         6bY4DEueqWAr/ccnjlZeG9SGkbo3bZahPP5M3sf8bXg70ngNe+Dt2ql/3YYz/khjk5Me
+         XyE2/BNBJ2pc5BS5OH+bWJkvYTxthfbtrGzl7pt3/+czBeETMnHiTih3TSiCsoHvtZym
+         D6TEIQkfNRKX7sFzqFzu7Pi8WwyyfyEryj9tOSchJBBlwg8a5M0eC5FngFsyLRvKLbrC
+         loZLCZpQSRoMdpU7fCyuuazp+XTOaLboItHp0tVjej+aZEaWnlOht1KzqAcnyIthTBCK
+         oikg==
+X-Gm-Message-State: AOJu0YyqgctMEPHNCeq/bh73zk9iTG8Z6nLB3Ia3SItD63d/t6hfMudT
+	xTU1yQF447WrreRQs0SCr3Y=
+X-Google-Smtp-Source: AGHT+IEw53RYxszSzkKmG1jd/oHPDlxhPT9wtgKhQfw+Ds/om4JqtP7xtzkajWlbt9ldUf3tV/TdmA==
+X-Received: by 2002:a17:90b:3904:b0:274:8949:d834 with SMTP id ob4-20020a17090b390400b002748949d834mr10314565pjb.49.1700134569373;
+        Thu, 16 Nov 2023 03:36:09 -0800 (PST)
+Received: from t14s.localdomain ([2804:29b8:5086:6485:61b4:61a6:e9fe:e6ca])
+        by smtp.gmail.com with ESMTPSA id f8-20020a17090a9b0800b0026b12768e46sm1365504pjp.42.2023.11.16.03.36.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 03:36:08 -0800 (PST)
+Received: by t14s.localdomain (Postfix, from userid 1000)
+	id 38C207D6E74; Thu, 16 Nov 2023 08:36:06 -0300 (-03)
+Date: Thu, 16 Nov 2023 08:36:06 -0300
+From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Vladyslav Tarasiuk <vladyslavt@nvidia.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH net] net: sched: do not offload flows with a helper in
+ act_ct
+Message-ID: <ZVX+prlJ2EfB3kuF@t14s.localdomain>
+References: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
+ <CAM0EoMmnzonWhGY7Di2wgrt--hJf5TrcCObPnkOuehLuiziKdw@mail.gmail.com>
+ <CADvbK_fBwMohTb7eHBC5gosgfBUoeRw2uOPmE6SFRUC0isCL7A@mail.gmail.com>
+ <CAM0EoMmMMMyxsktxCezjw-oePU-Lqsw2MMwMA5_hOLXiv5i4WA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,57 +77,143 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.0.3 at canardo
-X-Virus-Status: Clean
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMmMMMyxsktxCezjw-oePU-Lqsw2MMwMA5_hOLXiv5i4WA@mail.gmail.com>
 
-Oliver Neukum <oneukum@suse.com> writes:
+On Wed, Nov 15, 2023 at 11:37:51AM -0500, Jamal Hadi Salim wrote:
+> Hi Xin,
+> 
+> On Tue, Nov 14, 2023 at 10:18 AM Xin Long <lucien.xin@gmail.com> wrote:
+> >
+> > On Mon, Nov 13, 2023 at 4:37 PM Jamal Hadi Salim <jhs@mojatatu.com> wrote:
+> > >
+> > > On Mon, Nov 13, 2023 at 12:53 PM Xin Long <lucien.xin@gmail.com> wrote:
+> > > >
+> > > > There is no hardware supporting ct helper offload. However, prior to this
+> > > > patch, a flower filter with a helper in the ct action can be successfully
+> > > > set into the HW, for example (eth1 is a bnxt NIC):
+> > > >
+> > > >   # tc qdisc add dev eth1 ingress_block 22 ingress
+> > > >   # tc filter add block 22 proto ip flower skip_sw ip_proto tcp \
+> > > >     dst_port 21 ct_state -trk action ct helper ipv4-tcp-ftp
+> > > >   # tc filter show dev eth1 ingress
+> > > >
+> > > >     filter block 22 protocol ip pref 49152 flower chain 0 handle 0x1
+> > > >       eth_type ipv4
+> > > >       ip_proto tcp
+> > > >       dst_port 21
+> > > >       ct_state -trk
+> > > >       skip_sw
+> > > >       in_hw in_hw_count 1   <----
+> > > >         action order 1: ct zone 0 helper ipv4-tcp-ftp pipe
+> > > >          index 2 ref 1 bind 1
+> > > >         used_hw_stats delayed
+> > > >
+> > > > This might cause the flower filter not to work as expected in the HW.
+> > > >
+> > > > This patch avoids this problem by simply returning -EOPNOTSUPP in
+> > > > tcf_ct_offload_act_setup() to not allow to offload flows with a helper
+> > > > in act_ct.
+> > > >
+> > > > Fixes: a21b06e73191 ("net: sched: add helper support in act_ct")
+> > > > Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> > >
+> > > I didnt quite follow:
+> > > The driver accepted the config, but the driver "kind of '' supports
+> > > it. (enough to not complain and then display it when queried).
+> > > Should the driver have rejected something it doesnt fully support?
+> > Hi, Jamal,
+> >
+> > The sad thing is now it does not pass the 'helper' param to the HW in
+> > tcf_ct_offload_act_setup() via struct flow_action_entry, in fact
+> > flow_action_entry does not even have a member to keep 'helper'.
+> >
+> > Since no HW currently supports 'helper', we can stop it setting to HW
+> > from here for now. In future, if HWs and struct flow_action_entry
+> > support it, we can set it to the entry and reply on HWs to reject
+> > it when not supported, as you mentioned above.
+> 
+> That makes sense - so i am wondering why that was ever added there to
+> begin with. Would there be any hardware that would have any helper
+> support? If no, Shouldnt that code be deleted altogether?
 
-> I am wondering about the MAC address usbnet is handing
-> out. In particular why that is a singular address.
+Not sure if I follow you, Jamal. There's no code at all to pass the
+helper information down to the drivers. So drivers ended up accepting
+this flow because they had no idea that a helper was attached to it.
 
-This has been the case since long long before I ever looked at usbnet.c.
-The variable declaration is in fact still attributed to the initial git
-commit:
+Then yes, ideally, it should be driver the one to reject the flow that
+it doesn't support. But as currently zero drivers support it, and I
+doubt one will in the future [*], this patch simplifies it by instead
+of adding all the helper stuff to flow_action_entry, to just abort the
+offload earlier.
 
- ^1da177e4c3f4 drivers/usb/net/usbnet.c (Linus Torvalds              2005-0=
-4-16 15:20:36 -0700   64) // randomly generated ethernet address
- ^1da177e4c3f4 drivers/usb/net/usbnet.c (Linus Torvalds              2005-0=
-4-16 15:20:36 -0700   65) static u8   node_id [ETH_ALEN];
+[*] it requires parsing TCP payload, including over packet boundaries.
+This is very expensive in hw. And leads to another problem: the HW
+having to tell the SW stack about new conntrack expectations.
 
-Pretty impressive given the churn we've had since then :)
+Chers,
+Marcelo
 
-If I were to guess why it ended up like that, I'd say that it probably
-was because it was considered an exceptional fallback only.
-
-If you wrote a driver with the USB-IF communication class spec in mind,
-then it was reasonable to expect a functional decriptor pointing to a
-string descriptor with a globally unique mac address, assigned by the
-device manufacturer.
-
-A host using more than one usbnet device was also unlikely 20 years
-ago.  So host unique was good enough in any case.
-
-These factors have change a lot since then, obviously.
-
-> Frankly that seems plainly wrong. A MAC is supposed
-> to be unique, which is just fundamentally incompatible
-> to using the same MAC for multiple devices, as usbnet
-> currently potentially does.
-
-Agreed.
-
-> Do you think that behavior should be changed to using
-> a separate random MAC for each device that requires it?
-
-I'm in favour.
-
-I could be wrong, but I don't expect anything to break if we did that.
-The current static address comes from eth_random_addr() in any case, so
-the end result as seen from the mini drivers should be identical.  The
-difference will be seen in userspace and surrounding equipment, And
-those should be for the better.
-
-
-Bj=C3=B8rn
+> 
+> In any case, to the code correctness:
+> Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> 
+> cheers,
+> jamal
+> > Thanks.
+> > >
+> > >
+> > > cheers,
+> > > jamal
+> > >
+> > > > ---
+> > > >  include/net/tc_act/tc_ct.h | 9 +++++++++
+> > > >  net/sched/act_ct.c         | 3 +++
+> > > >  2 files changed, 12 insertions(+)
+> > > >
+> > > > diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_ct.h
+> > > > index 8a6dbfb23336..77f87c622a2e 100644
+> > > > --- a/include/net/tc_act/tc_ct.h
+> > > > +++ b/include/net/tc_act/tc_ct.h
+> > > > @@ -58,6 +58,11 @@ static inline struct nf_flowtable *tcf_ct_ft(const struct tc_action *a)
+> > > >         return to_ct_params(a)->nf_ft;
+> > > >  }
+> > > >
+> > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_action *a)
+> > > > +{
+> > > > +       return to_ct_params(a)->helper;
+> > > > +}
+> > > > +
+> > > >  #else
+> > > >  static inline uint16_t tcf_ct_zone(const struct tc_action *a) { return 0; }
+> > > >  static inline int tcf_ct_action(const struct tc_action *a) { return 0; }
+> > > > @@ -65,6 +70,10 @@ static inline struct nf_flowtable *tcf_ct_ft(const struct tc_action *a)
+> > > >  {
+> > > >         return NULL;
+> > > >  }
+> > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const struct tc_action *a)
+> > > > +{
+> > > > +       return NULL;
+> > > > +}
+> > > >  #endif /* CONFIG_NF_CONNTRACK */
+> > > >
+> > > >  #if IS_ENABLED(CONFIG_NET_ACT_CT)
+> > > > diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+> > > > index 0db0ecf1d110..b3f4a503ee2b 100644
+> > > > --- a/net/sched/act_ct.c
+> > > > +++ b/net/sched/act_ct.c
+> > > > @@ -1549,6 +1549,9 @@ static int tcf_ct_offload_act_setup(struct tc_action *act, void *entry_data,
+> > > >         if (bind) {
+> > > >                 struct flow_action_entry *entry = entry_data;
+> > > >
+> > > > +               if (tcf_ct_helper(act))
+> > > > +                       return -EOPNOTSUPP;
+> > > > +
+> > > >                 entry->id = FLOW_ACTION_CT;
+> > > >                 entry->ct.action = tcf_ct_action(act);
+> > > >                 entry->ct.zone = tcf_ct_zone(act);
+> > > > --
+> > > > 2.39.1
+> > > >
 
