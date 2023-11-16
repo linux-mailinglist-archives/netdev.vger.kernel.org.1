@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-48497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CEAD7EE970
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 23:42:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43AAC7EE989
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 23:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8CC2810E5
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:42:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DB291C209E2
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61931171E;
-	Thu, 16 Nov 2023 22:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB7B12E6F;
+	Thu, 16 Nov 2023 22:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="t0zoFcRv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gjgZDIOb"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 637F3127;
-	Thu, 16 Nov 2023 14:42:02 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC375131;
+	Thu, 16 Nov 2023 14:54:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=d6i/j7sl9K/e4ZF3LfPA+7jvTA/d+P4WyjlNqptN/k8=; b=t0zoFcRvjYhChzhzEEJmj64iyX
-	3plkVMReYk5ppIA0GlgOtTg5/60YI19fUN/ZSqxl+Nl835+8zNDvVAw+pmU/4AxaeuzOIQLQ8vvYY
-	O5al5MlHSIR74vz3pxzE69fnXGukuXL7epdMshBcQqgfWI0NH29os5OVEf3BF/9a1h9I=;
+	bh=AB/zOObnjmn6/qxfJ4axAvR6RytRyEYQfSsVYOf8oNs=; b=gjgZDIObtC9FIFb+VX0j7YnCoa
+	QNvxS3QscbVJIPn2MhcRk7ms12nzkAJWjWIZ+DCbFToa6JO89EQD2VNciFMWoHb4+0JK20v3spZzq
+	ErXKXUj4/KaKfsYbzpHAU4dJ9t+2M0TiXo92+iKDV4GSkhaETAAD0d3l8xQRA6PsHnmQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1r3l3b-000OUo-L4; Thu, 16 Nov 2023 23:41:55 +0100
-Date: Thu, 16 Nov 2023 23:41:55 +0100
+	id 1r3lFL-000OWE-0U; Thu, 16 Nov 2023 23:54:03 +0100
+Date: Thu, 16 Nov 2023 23:54:02 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -48,7 +48,7 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
 Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
  driver
-Message-ID: <8e077bbe-3b65-47ee-a3e0-fdb0611a2d3a@lunn.ch>
+Message-ID: <2ff8bea5-5972-4d1a-a692-34ad27b05446@lunn.ch>
 References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
  <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
 Precedence: bulk
@@ -61,28 +61,65 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
 
-> +struct pd692x0_msg {
-> +	struct pd692x0_msg_content content;
-> +	u16 delay_recv;
-> +};
+I'm reading this patch first, so this might be a dumb question...
 
-> +	if (msg->delay_recv)
-> +		msleep(msg->delay_recv);
-> +	else
-> +		msleep(30);
+> +static int pd692x0_recv_msg(struct pd692x0_priv *priv,
+> +			    struct pd692x0_msg *msg,
+> +			    struct pd692x0_msg_content *buf)
+> +{
 
-> +	if (msg->delay_recv)
-> +		msleep(msg->delay_recv);
-> +	else
-> +		msleep(30);
+...
 
-> +	if (msg->delay_recv)
-> +		msleep(msg->delay_recv);
-> +	else
-> +		msleep(30);
+> +	i2c_master_recv(client, (u8 *)buf, sizeof(*buf));
+> +	if (buf->key)
+> +		goto out;
 > +
+> +	msleep(10000);
 
-As far as i can see with a quick search, nothing ever sets delay_recv?
+That is 10 seconds, right?
 
-	Andrew
+> +static int pd692x0_sendrecv_msg(struct pd692x0_priv *priv,
+> +				struct pd692x0_msg *msg,
+> +				struct pd692x0_msg_content *buf)
+> +{
+> +	struct device *dev = &priv->client->dev;
+> +	int ret;
+> +
+> +	ret = pd692x0_send_msg(priv, msg);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = pd692x0_recv_msg(priv, msg, buf);
+
+So this function takes at least 10 seconds?
+
+> +static int pd692x0_ethtool_set_config(struct pse_controller_dev *pcdev,
+> +				      unsigned long id,
+> +				      struct netlink_ext_ack *extack,
+> +				      const struct pse_control_config *config)
+> +{
+
+....
+
+> +	switch (config->admin_control) {
+> +	case ETHTOOL_PSE_ADMIN_STATE_ENABLED:
+> +		msg.content.data[0] = 0x1;
+> +		break;
+> +	case ETHTOOL_PSE_ADMIN_STATE_DISABLED:
+> +		msg.content.data[0] = 0x0;
+> +		break;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+> +	msg.content.sub[2] = id;
+> +	ret = pd692x0_sendrecv_msg(priv, &msg, &buf);
+
+So this is also 10 seconds? 
+
+Given its name, it looks like this is called via ethtool? Is the
+ethtool core holding RTNL? It is generally considered bad to hold RTNL for
+that long.
+
+     Andrew
 
