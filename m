@@ -1,518 +1,353 @@
-Return-Path: <netdev+bounces-48419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE607EE423
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:22:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D537EE417
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:21:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27B621F24F19
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:22:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36D2D1C20A7E
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99AD347D1;
-	Thu, 16 Nov 2023 15:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8619C358A7;
+	Thu, 16 Nov 2023 15:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h9d2L5PS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WW50UbWC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B09FBD75
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:21:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700148094;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2ZTScLppJWVGKPHQqR8DqdFOGy0PitC5NYiBrS/u1A0=;
-	b=h9d2L5PSG3B3tp/3SrvtQ9jdHNW0WXiE3GDfUGYVdEyw6v7q9IdwnKBK8Src1fgFyniLtj
-	H+IB2x5Xpa0qs147XcKQvj0RSwD2otMr2MzcOmCOKCmWo6h47OGXu7LDvTpKob23CtLQLk
-	KigrApekf1hBCYJM8yyJw+3R4XHWC7I=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-564-Xr5BfC3tNlGbK_H2VYpiaQ-1; Thu,
- 16 Nov 2023 10:21:28 -0500
-X-MC-Unique: Xr5BfC3tNlGbK_H2VYpiaQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D3EAD3C0274E;
-	Thu, 16 Nov 2023 15:21:27 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.144])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 0571D40C6EBB;
-	Thu, 16 Nov 2023 15:21:25 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	mschmidt@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH iwl-next v3 5/5] i40e: Remove VEB recursion
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CBE1AD;
+	Thu, 16 Nov 2023 07:21:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700148086; x=1731684086;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=zFk+F/T2I7NhpyUVICWjBYM11j9EYhq0X3tgetM31q0=;
+  b=WW50UbWCObHsPfwvFAPsCUfeKDereeQWoL8Nce9uSfx3TM/9HQzbdy4M
+   qzqH80L1ymgTUW55EYb17GGWjVLE8qI7TzB6Z8yA8SEefcqcmAthzVDDT
+   N1jqCUdK4GdAOSjIQuFFxw3n+22EwrU3aWAOekBvpdepNzrqpjIdD3kL4
+   tAjzqX/6YTx3Ojfb4iCVgfw8JmbQCJ/6Cu3zVYyyPV+W1qO0/U+iM42Vw
+   PlL//Oum4yWZ4YmSs7xmPCMvyrMvseP8DGk6obYW8KBzibawZSnmWM34M
+   1F5P59IcqLB2NLq7M1vmV2Fz/TBZgfGaYB4LCnfSB51QEJpkR2bFbB9Uo
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="422199665"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="422199665"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 07:21:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="856037806"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="856037806"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Nov 2023 07:21:26 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:21:25 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:21:25 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 16 Nov 2023 07:21:25 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:21:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nkOpor61Gs8sTkwF9UMyc6awIDenyqtGYuJFBJttjnjmwKNJBy2V+Dd/EWDe/yjfjaxkvGrlhUTziqx+4/C1eQowRoTUKaqT6PqpvnKE6JmSYP/F3bG6fQ/W4r+KGlyAhm/lrBmE7zl3hiuaJS0u9c4rr3RcHNLajSC3/MU4xhUWM5g6Ir+6Ejc+oO7YzT4MnwwLai2yU79K08534PJjlWHPyZoEcfZp+RPurUgATuGV3vkPXC01uL8nUvoCpqXx10Kynvn8g6bWa4PfCS86zFIifM1NihsaPy5EineChnxrXt4K9cR6rzL0OUXhQG+jzn9ud8u6WCJU2/wxMkCWew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mRnsWvmuKi0q34qzWBOsD8t+nVQfWJnzar4P7oo/21o=;
+ b=brpwaazD18DVuiOH0J2H1xn44oCDRmSnhDkRea5SwLR9P519va/AP54Wo3AYdLUToSLd1PR5cTmTOxALSa/8xuvC/el4NAAuCgoj2FaBBHnW4CTDV+lubhndeLeBVCOR+xprzILFYKBs7toNk50lQA6T1oFL3oWYrL38VHvE/xExt9mR/FgDCrErhJ/PnVmVRxY3qqkry2DM1ic775+XDh0o0gatyoEEp0ZZQijyShSV0lUjPnHcsKYMhcmdceC8zllaHOQAROOTtn4vak9dEdCi4AIb3WGm62uZCPTO+Z1djQJ5NBzSMsgiFh8P0tz+vmrh21LeLSDbz4ved+Y3jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ DM4PR11MB6238.namprd11.prod.outlook.com (2603:10b6:8:a8::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7002.18; Thu, 16 Nov 2023 15:21:21 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53%7]) with mapi id 15.20.7002.021; Thu, 16 Nov 2023
+ 15:21:21 +0000
 Date: Thu, 16 Nov 2023 16:21:14 +0100
-Message-ID: <20231116152114.88515-6-ivecera@redhat.com>
-In-Reply-To: <20231116152114.88515-1-ivecera@redhat.com>
-References: <20231116152114.88515-1-ivecera@redhat.com>
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Tariq Toukan <tariqt@mellanox.com>, "Saeed
+ Mahameed" <saeedm@mellanox.com>
+Subject: Re: [PATCH bpf-next v7 05/18] ice: Support HW timestamp hint
+Message-ID: <ZVYzasQqh18fo8Kr@boxer>
+References: <20231115175301.534113-1-larysa.zaremba@intel.com>
+ <20231115175301.534113-6-larysa.zaremba@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20231115175301.534113-6-larysa.zaremba@intel.com>
+X-ClientProxiedBy: DB8P191CA0021.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:130::31) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DM4PR11MB6238:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9310a308-f353-40b0-628e-08dbe6b7b048
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I2GCy1oLohWmRnkkWPnUPQetTItJyfrFwjX7UhepV6YCmkiM8fEZ8w2CgGT7nID5AIBqZDTCh89KpDCtyYrKT1PZ3TxmLdhiWVPhEp494rzKjUYXNuz/pg1i3DqRrMD8ySXGloWqwp+ip5GzTniRIPEB9y8VHf1+1LBYvwx0t7carO9nJP/5t41No8f/StrxULOPxopJl+n5X6zhOkppCBqUtmRbqJoG79IgMJjRLi96hW/ULsWOI/GN0DslKsQllioLopWnqskJCnSC9X3ZZgf+9+VYkNGzKyu67a+31x6HWltAcRCZpqO/ovmN5bPI2OKkh+KbNWB7/ybLb124MCk6b2kBCLk41ddovBuRziH3WoAw2RSGnEmJzWaPGXib5N/W3H5fciWfTqqOmT3ZNtR/Pv25qZw6t86B1CEcZfip3icLsoMxTA5a4zurv00lWIu4aae/ThgxRZ3WIglzMENMTb1ik8IYP+QPm8H5805oGH4+pbte3iM0FDa5an8339PpdrlpjD2snSPiypsVE9jgCHoAyP8/VG4vU5upilnDgNN1lqABJW+PDpm2Lw2Y
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(376002)(396003)(136003)(39860400002)(230922051799003)(64100799003)(186009)(1800799009)(451199024)(8676002)(2906002)(8936002)(4326008)(6862004)(6506007)(26005)(83380400001)(41300700001)(82960400001)(9686003)(38100700002)(6512007)(6486002)(6666004)(66476007)(66556008)(66946007)(6636002)(54906003)(316002)(86362001)(7416002)(5660300002)(33716001)(478600001)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?fDwEf8cl6v/ce+wT4WLOjtH8066UqsNhFxBwO124inC9bBugL3i6uzjRwh/p?=
+ =?us-ascii?Q?nFvAA5hW62D9f9DuK8MD7/u9XShwE0H1Pqv7rMHuE+BokjSX6HQUk3fZFkh/?=
+ =?us-ascii?Q?7uVtMJBl6o24GsP6O6yHMptYdY4lyIDgtTdIQlTKOktKQJEBY0Oz5mbHmKh4?=
+ =?us-ascii?Q?vtA0Y5LSekBBTOkbcwqfcz00NDFHi7ciSkV2auntPyBuJdI9ZPb4wCpL9Leh?=
+ =?us-ascii?Q?x+rr3YhWdPaAVA6iUYYOaa8dznqzkhO7jYbuZ4Ab3qI4OZVSesEp2vmLogvt?=
+ =?us-ascii?Q?kJqZAC17LpNy3MxyR5p6j30iRJqlk1wvvO3ak43keENk5AVXKH8GbuDd7QRB?=
+ =?us-ascii?Q?E4a9JnG+qkXsYszBbd+CRVwda8+l/KAA26nUD8rX63k+6T6TIeCFM+Znp/M6?=
+ =?us-ascii?Q?NbMxatimx9kUdOYVlueEwldhnH28Svz9D4HMByeG4L2gfPbEnr2BEtSox2MR?=
+ =?us-ascii?Q?AR9ylrbXaUxtQZDRYMcgoHlpN47yLdWEMMUhbB/gmE5dnmvp3MBzOxLhUOTl?=
+ =?us-ascii?Q?maGn13BbSvPSMryLieaKadJ7mMy0Lhww1/NsesUWJgrzcUDhSJQJl1OzgLgH?=
+ =?us-ascii?Q?u+sUCQtvws0HKA5VC9JuRi7vRprnGm3OaovjPFSVL60iPQUJrxOkd9iDFo2w?=
+ =?us-ascii?Q?lCLZ11kOTXLoYWT9OoG5Kn7FQteK3PQkRce1IMFUuNZQBHgJKILVEWIg597U?=
+ =?us-ascii?Q?I0iSfDWiDKH1MuWnv8WgCAFyiyggNJCPY0YUKbXQqdbvLRLpj1Pfa5Nu1/k9?=
+ =?us-ascii?Q?6/SVmOQBrts8cyi8d3PbA79FHyrOyzCVMEu7zH6QvGRiw6hbALUyXrPE82hG?=
+ =?us-ascii?Q?ZCOJzwEO03YXJFomkLerA7gaPuQBzF/9e3n7MebTM7oOlqRQjIsXxJuXrnew?=
+ =?us-ascii?Q?Ee7kM5OeGqJXF/wo8HR937xUg0g0jW9CPFTUc1z+mLMuajQKey3yQgWSJDX3?=
+ =?us-ascii?Q?yDCaRjUYou828SBD2U/XTD7N91eVi7NLXgjXHYdhOnNMTiF7UGLuiPOZV6y/?=
+ =?us-ascii?Q?n4HaS1ujfpQOzftZJoh2ylYcsaNY+r58RE8TzAxo3Pt+3lw+nSRFeN4B28VV?=
+ =?us-ascii?Q?K74WIElP9HqXrlpd7KyHZ58nb1n8mijh6u4d6EQKDlXmepkZG3LmiSVB+Bt8?=
+ =?us-ascii?Q?bhBxIqfb+lviFjni5HQcIUn+tzcEexlCbN2D/XxW/Uwo8OKkFfJPhv6TzwGa?=
+ =?us-ascii?Q?26svOa+uFwVAw3nEuFs5ZjYc8uWLHoivkVKkwHdwnS/XLJYhPj1q5+tSrHv6?=
+ =?us-ascii?Q?R2/JDshGuEX6OGtkyhqbkhyN0p+3OC0fCauI1H6gDbU12SnlF+HEDlP0FLwY?=
+ =?us-ascii?Q?BIoDEiOSwhh3wVa2rQ+KOvsK0tiHGFldoaUhFuvE36e8omwdnYB4DTWe1NT+?=
+ =?us-ascii?Q?hUQHqaUVQzRhrGFmNUHEgFR5jaqYSz58kMT8CEugKwc2GcbEhHwSsehWJqw8?=
+ =?us-ascii?Q?FgXZ59Brxeya1ZHTjEx9w1+6ZauC3tigoai4ObV1zkbjkaLeKZ+VHnYAH/Mz?=
+ =?us-ascii?Q?XAI8RB08t1yrbHekUst159vtXu8ZHIN6ZBQNnHVH++5nY2doI9kxtNX5tSf+?=
+ =?us-ascii?Q?2z/4RdiRkJRG/JEYYXWKNijrKCZmjYBxsxT4UECHCz7CfxH2+yf7BuotkOBc?=
+ =?us-ascii?Q?qQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9310a308-f353-40b0-628e-08dbe6b7b048
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 15:21:21.5494
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o2uReNKF6TCX7PEDrzJ2VN9gGE4vIFTMN1bIDiHIH8fRY0WM520IFJmxeyoGfZ+85No0TkSWk/35vb7ZlG1W8MdfuX2YMGTw+5HxFLbx/98=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6238
+X-OriginatorOrg: intel.com
 
-The VEB (virtual embedded switch) as a switch element can be
-connected according datasheet though its uplink to:
-- Physical port
-- Port Virtualizer (not used directly by i40e driver but can
-  be present in MFP mode where the physical port is shared
-  between PFs)
-- No uplink (aka floating VEB)
+On Wed, Nov 15, 2023 at 06:52:47PM +0100, Larysa Zaremba wrote:
+> Use previously refactored code and create a function
+> that allows XDP code to read HW timestamp.
+> 
+> Also, introduce packet context, where hints-related data will be stored.
+> ice_xdp_buff contains only a pointer to this structure, to avoid copying it
+> in ZC mode later in the series.
+> 
+> HW timestamp is the first supported hint in the driver,
+> so also add xdp_metadata_ops.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 
-But VEB uplink cannot be connected to another VEB and any attempt
-to do so results in:
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-"i40e 0000:02:00.0: couldn't add VEB, err -EIO aq_err I40E_AQ_RC_ENOENT"
-
-that indicates "the uplink SEID does not point to valid element".
-
-Remove this logic from the driver code this way:
-
-1) For debugfs only allow to build floating VEB (uplink_seid == 0)
-   or main VEB (uplink_seid == mac_seid)
-2) Do not recurse in i40e_veb_link_event() as no VEB cannot have
-   sub-VEBs
-3) Ditto for i40e_veb_rebuild() + simplify the function as we know
-   that the VEB for rebuild can be only the main LAN VEB or some
-   of the floating VEBs
-4) In i40e_rebuild() there is no need to check veb->uplink_seid
-   as the possible ones are 0 and MAC SEID
-5) In i40e_vsi_release() do not take into account VEBs whose
-   uplink is another VEB as this is not possible
-6) Remove veb_idx field from i40e_veb as a VEB cannot have
-   sub-VEBs
-
-Tested using i40e debugfs interface:
-1) Initial state
-[root@cnb-03 net-next]# CMD="/sys/kernel/debug/i40e/0000:02:00.0/command"
-[root@cnb-03 net-next]# echo dump switch > $CMD
-[root@cnb-03 net-next]# dmesg -c
-[   98.440641] i40e 0000:02:00.0: header: 3 reported 3 total
-[   98.446053] i40e 0000:02:00.0: type=19 seid=392 uplink=160 downlink=16
-[   98.452593] i40e 0000:02:00.0: type=17 seid=160 uplink=2 downlink=0
-[   98.458856] i40e 0000:02:00.0: type=19 seid=390 uplink=160 downlink=16
-
-2) Add floating VEB
-[root@cnb-03 net-next]# echo add relay > $CMD
-[root@cnb-03 net-next]# dmesg -c
-[  122.745630] i40e 0000:02:00.0: added relay 162
-[root@cnb-03 net-next]# echo dump switch > $CMD
-[root@cnb-03 net-next]# dmesg -c
-[  136.650049] i40e 0000:02:00.0: header: 4 reported 4 total
-[  136.655466] i40e 0000:02:00.0: type=19 seid=392 uplink=160 downlink=16
-[  136.661994] i40e 0000:02:00.0: type=17 seid=160 uplink=2 downlink=0
-[  136.668264] i40e 0000:02:00.0: type=19 seid=390 uplink=160 downlink=16
-[  136.674787] i40e 0000:02:00.0: type=17 seid=162 uplink=0 downlink=0
-
-3) Add VMDQ2 VSI to this new VEB
-[root@cnb-03 net-next]# dmesg -c
-[  168.351763] i40e 0000:02:00.0: added VSI 394 to relay 162
-[  168.374652] enp2s0f0np0v0: NIC Link is Up, 40 Gbps Full Duplex, Flow Control: None
-[root@cnb-03 net-next]# echo dump switch > $CMD
-[root@cnb-03 net-next]# dmesg -c
-[  195.683204] i40e 0000:02:00.0: header: 5 reported 5 total
-[  195.688611] i40e 0000:02:00.0: type=19 seid=394 uplink=162 downlink=16
-[  195.695143] i40e 0000:02:00.0: type=17 seid=162 uplink=0 downlink=0
-[  195.701410] i40e 0000:02:00.0: type=19 seid=392 uplink=160 downlink=16
-[  195.707935] i40e 0000:02:00.0: type=17 seid=160 uplink=2 downlink=0
-[  195.714201] i40e 0000:02:00.0: type=19 seid=390 uplink=160 downlink=16
-
-4) Try to delete the VEB
-[root@cnb-03 net-next]# echo del relay 162 > $CMD
-[root@cnb-03 net-next]# dmesg -c
-[  239.260901] i40e 0000:02:00.0: deleting relay 162
-[  239.265621] i40e 0000:02:00.0: can't remove VEB 162 with 1 VSIs left
-
-5) Do PF reset and check switch status after rebuild
-[root@cnb-03 net-next]# echo pfr > $CMD
-[root@cnb-03 net-next]# echo dump switch > $CMD
-[root@cnb-03 net-next]# dmesg -c
-...
-[  272.333655] i40e 0000:02:00.0: header: 5 reported 5 total
-[  272.339066] i40e 0000:02:00.0: type=19 seid=394 uplink=162 downlink=16
-[  272.345599] i40e 0000:02:00.0: type=17 seid=162 uplink=0 downlink=0
-[  272.351862] i40e 0000:02:00.0: type=19 seid=392 uplink=160 downlink=16
-[  272.358387] i40e 0000:02:00.0: type=17 seid=160 uplink=2 downlink=0
-[  272.364654] i40e 0000:02:00.0: type=19 seid=390 uplink=160 downlink=16
-
-6) Delete VSI and delete VEB
-[  297.199116] i40e 0000:02:00.0: deleting VSI 394
-[  299.807580] i40e 0000:02:00.0: deleting relay 162
-[  309.767905] i40e 0000:02:00.0: header: 3 reported 3 total
-[  309.773318] i40e 0000:02:00.0: type=19 seid=392 uplink=160 downlink=16
-[  309.779845] i40e 0000:02:00.0: type=17 seid=160 uplink=2 downlink=0
-[  309.786111] i40e 0000:02:00.0: type=19 seid=390 uplink=160 downlink=16
-
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h        |   1 -
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |   8 +-
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 176 ++++++++----------
- 3 files changed, 76 insertions(+), 109 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index ca8997d29c02..0fd38fb4dd1f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -783,7 +783,6 @@ struct i40e_new_mac_filter {
- struct i40e_veb {
- 	struct i40e_pf *pf;
- 	u16 idx;
--	u16 veb_idx;		/* index of VEB parent */
- 	u16 seid;
- 	u16 uplink_seid;
- 	u16 stats_idx;		/* index of VEB parent */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-index 921a97d5479e..f9ba45f596c9 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-@@ -683,9 +683,8 @@ static void i40e_dbg_dump_veb_seid(struct i40e_pf *pf, int seid)
- 		return;
- 	}
- 	dev_info(&pf->pdev->dev,
--		 "veb idx=%d,%d stats_ic=%d  seid=%d uplink=%d mode=%s\n",
--		 veb->idx, veb->veb_idx, veb->stats_idx, veb->seid,
--		 veb->uplink_seid,
-+		 "veb idx=%d stats_ic=%d  seid=%d uplink=%d mode=%s\n",
-+		 veb->idx, veb->stats_idx, veb->seid, veb->uplink_seid,
- 		 veb->bridge_mode == BRIDGE_MODE_VEPA ? "VEPA" : "VEB");
- 	i40e_dbg_dump_eth_stats(pf, &veb->stats);
- }
-@@ -848,8 +847,7 @@ static ssize_t i40e_dbg_command_write(struct file *filp,
- 			goto command_write_done;
- 		}
- 
--		veb = i40e_pf_get_veb_by_seid(pf, uplink_seid);
--		if (!veb && uplink_seid != 0 && uplink_seid != pf->mac_seid) {
-+		if (uplink_seid != 0 && uplink_seid != pf->mac_seid) {
- 			dev_info(&pf->pdev->dev,
- 				 "add relay: relay uplink %d not found\n",
- 				 uplink_seid);
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 7af5cb056786..7d8aabee3869 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -9871,7 +9871,6 @@ static void i40e_vsi_link_event(struct i40e_vsi *vsi, bool link_up)
-  **/
- static void i40e_veb_link_event(struct i40e_veb *veb, bool link_up)
- {
--	struct i40e_veb *veb_it;
- 	struct i40e_vsi *vsi;
- 	struct i40e_pf *pf;
- 	int i;
-@@ -9880,12 +9879,7 @@ static void i40e_veb_link_event(struct i40e_veb *veb, bool link_up)
- 		return;
- 	pf = veb->pf;
- 
--	/* depth first... */
--	i40e_pf_for_each_veb(pf, i, veb_it)
--		if (veb_it->uplink_seid == veb->seid)
--			i40e_veb_link_event(veb_it, link_up);
--
--	/* ... now the local VSIs */
-+	/* Send link event to contained VSIs */
- 	i40e_pf_for_each_vsi(pf, i, vsi)
- 		if (vsi->uplink_seid == veb->seid)
- 			i40e_vsi_link_event(vsi, link_up);
-@@ -10363,56 +10357,57 @@ static void i40e_config_bridge_mode(struct i40e_veb *veb)
- }
- 
- /**
-- * i40e_reconstitute_veb - rebuild the VEB and anything connected to it
-+ * i40e_reconstitute_veb - rebuild the VEB and VSIs connected to it
-  * @veb: pointer to the VEB instance
-  *
-- * This is a recursive function that first builds the attached VSIs then
-- * recurses in to build the next layer of VEB.  We track the connections
-- * through our own index numbers because the seid's from the HW could
-- * change across the reset.
-+ * This is a function that builds the attached VSIs. We track the connections
-+ * through our own index numbers because the seid's from the HW could change
-+ * across the reset.
-  **/
- static int i40e_reconstitute_veb(struct i40e_veb *veb)
- {
- 	struct i40e_vsi *ctl_vsi = NULL;
- 	struct i40e_pf *pf = veb->pf;
--	struct i40e_veb *veb_it;
- 	struct i40e_vsi *vsi;
- 	int v, ret;
- 
--	if (veb->uplink_seid) {
--		/* Look for VSI that owns this VEB, temporarily attached to base VEB */
--		i40e_pf_for_each_vsi(pf, v, vsi)
--			if (vsi->veb_idx == veb->idx &&
--			    vsi->flags & I40E_VSI_FLAG_VEB_OWNER) {
--				ctl_vsi = vsi;
--				break;
--			}
-+	/* As we do not maintain PV (port virtualizer) switch element then
-+	 * there can be only one non-floating VEB that have uplink to MAC SEID
-+	 * and its control VSI is the main one.
-+	 */
-+	if (WARN_ON(veb->uplink_seid && veb->uplink_seid != pf->mac_seid)) {
-+		dev_err(&pf->pdev->dev,
-+			"Invalid uplink SEID for VEB %d\n", veb->idx);
-+		return -ENOENT;
-+	}
- 
--		if (!ctl_vsi) {
--			dev_info(&pf->pdev->dev,
--				 "missing owner VSI for veb_idx %d\n",
--				 veb->idx);
--			ret = -ENOENT;
--			goto end_reconstitute;
-+	if (veb->uplink_seid == pf->mac_seid) {
-+		/* Check that the LAN VSI has VEB owning flag set */
-+		ctl_vsi = pf->vsi[pf->lan_vsi];
-+
-+		if (WARN_ON(ctl_vsi->veb_idx != veb->idx ||
-+			    !(ctl_vsi->flags & I40E_VSI_FLAG_VEB_OWNER))) {
-+			dev_err(&pf->pdev->dev,
-+				"Invalid control VSI for VEB %d\n", veb->idx);
-+			return -ENOENT;
- 		}
--		if (ctl_vsi != pf->vsi[pf->lan_vsi])
--			ctl_vsi->uplink_seid =
--				pf->vsi[pf->lan_vsi]->uplink_seid;
- 
-+		/* Add the control VSI to switch */
- 		ret = i40e_add_vsi(ctl_vsi);
- 		if (ret) {
--			dev_info(&pf->pdev->dev,
--				 "rebuild of veb_idx %d owner VSI failed: %d\n",
--				 veb->idx, ret);
--			goto end_reconstitute;
-+			dev_err(&pf->pdev->dev,
-+				"Rebuild of owner VSI for VEB %d failed: %d\n",
-+				veb->idx, ret);
-+			return ret;
- 		}
-+
- 		i40e_vsi_reset_stats(ctl_vsi);
- 	}
- 
- 	/* create the VEB in the switch and move the VSI onto the VEB */
- 	ret = i40e_add_veb(veb, ctl_vsi);
- 	if (ret)
--		goto end_reconstitute;
-+		return ret;
- 
- 	if (veb->uplink_seid) {
- 		if (test_bit(I40E_FLAG_VEB_MODE_ENA, pf->flags))
-@@ -10434,23 +10429,12 @@ static int i40e_reconstitute_veb(struct i40e_veb *veb)
- 				dev_info(&pf->pdev->dev,
- 					 "rebuild of vsi_idx %d failed: %d\n",
- 					 v, ret);
--				goto end_reconstitute;
-+				return ret;
- 			}
- 			i40e_vsi_reset_stats(vsi);
- 		}
- 	}
- 
--	/* create any VEBs attached to this VEB - RECURSION */
--	i40e_pf_for_each_veb(pf, v, veb_it) {
--		if (veb_it->veb_idx == veb->idx) {
--			veb_it->uplink_seid = veb->seid;
--			ret = i40e_reconstitute_veb(veb_it);
--			if (ret)
--				break;
--		}
--	}
--
--end_reconstitute:
- 	return ret;
- }
- 
-@@ -10990,31 +10974,29 @@ static void i40e_rebuild(struct i40e_pf *pf, bool reinit, bool lock_acquired)
- 	 */
- 	if (vsi->uplink_seid != pf->mac_seid) {
- 		dev_dbg(&pf->pdev->dev, "attempting to rebuild switch\n");
--		/* find the one VEB connected to the MAC, and find orphans */
-+
-+		/* Rebuild VEBs */
- 		i40e_pf_for_each_veb(pf, v, veb) {
--			if (veb->uplink_seid == pf->mac_seid ||
--			    veb->uplink_seid == 0) {
--				ret = i40e_reconstitute_veb(veb);
--				if (!ret)
--					continue;
--
--				/* If Main VEB failed, we're in deep doodoo,
--				 * so give up rebuilding the switch and set up
--				 * for minimal rebuild of PF VSI.
--				 * If orphan failed, we'll report the error
--				 * but try to keep going.
--				 */
--				if (veb->uplink_seid == pf->mac_seid) {
--					dev_info(&pf->pdev->dev,
--						 "rebuild of switch failed: %d, will try to set up simple PF connection\n",
--						 ret);
--					vsi->uplink_seid = pf->mac_seid;
--					break;
--				} else if (veb->uplink_seid == 0) {
--					dev_info(&pf->pdev->dev,
--						 "rebuild of orphan VEB failed: %d\n",
--						 ret);
--				}
-+			ret = i40e_reconstitute_veb(veb);
-+			if (!ret)
-+				continue;
-+
-+			/* If Main VEB failed, we're in deep doodoo,
-+			 * so give up rebuilding the switch and set up
-+			 * for minimal rebuild of PF VSI.
-+			 * If orphan failed, we'll report the error
-+			 * but try to keep going.
-+			 */
-+			if (veb->uplink_seid == pf->mac_seid) {
-+				dev_info(&pf->pdev->dev,
-+					 "rebuild of switch failed: %d, will try to set up simple PF connection\n",
-+					 ret);
-+				vsi->uplink_seid = pf->mac_seid;
-+				break;
-+			} else if (veb->uplink_seid == 0) {
-+				dev_info(&pf->pdev->dev,
-+					 "rebuild of orphan VEB failed: %d\n",
-+					 ret);
- 			}
- 		}
- 	}
-@@ -14138,9 +14120,9 @@ static int i40e_add_vsi(struct i40e_vsi *vsi)
-  **/
- int i40e_vsi_release(struct i40e_vsi *vsi)
- {
--	struct i40e_veb *veb, *veb_it;
- 	struct i40e_mac_filter *f;
- 	struct hlist_node *h;
-+	struct i40e_veb *veb;
- 	struct i40e_pf *pf;
- 	u16 uplink_seid;
- 	int i, n, bkt;
-@@ -14204,27 +14186,28 @@ int i40e_vsi_release(struct i40e_vsi *vsi)
- 
- 	/* If this was the last thing on the VEB, except for the
- 	 * controlling VSI, remove the VEB, which puts the controlling
--	 * VSI onto the next level down in the switch.
-+	 * VSI onto the uplink port.
- 	 *
- 	 * Well, okay, there's one more exception here: don't remove
--	 * the orphan VEBs yet.  We'll wait for an explicit remove request
-+	 * the floating VEBs yet.  We'll wait for an explicit remove request
- 	 * from up the network stack.
- 	 */
--	n = 0;
--	i40e_pf_for_each_vsi(pf, i, vsi)
--		if (vsi->uplink_seid == uplink_seid &&
--		    (vsi->flags & I40E_VSI_FLAG_VEB_OWNER) == 0)
--			n++;      /* count the VSIs */
-+	veb = i40e_pf_get_veb_by_seid(pf, uplink_seid);
-+	if (veb && veb->uplink_seid) {
-+		n = 0;
-+
-+		/* Count non-controlling VSIs present on  the VEB */
-+		i40e_pf_for_each_vsi(pf, i, vsi)
-+			if (vsi->uplink_seid == uplink_seid &&
-+			    (vsi->flags & I40E_VSI_FLAG_VEB_OWNER) == 0)
-+				n++;
- 
--	veb = NULL;
--	i40e_pf_for_each_veb(pf, i, veb_it) {
--		if (veb_it->uplink_seid == uplink_seid)
--			n++;     /* count the VEBs */
--		if (veb_it->seid == uplink_seid)
--			veb = veb_it;
-+		/* If there is no VSI except the control one then release
-+		 * the VEB and put the control VSI onto VEB uplink.
-+		 */
-+		if (!n)
-+			i40e_veb_release(veb);
- 	}
--	if (n == 0 && veb && veb->uplink_seid != 0)
--		i40e_veb_release(veb);
- 
- 	return 0;
- }
-@@ -14738,14 +14721,11 @@ void i40e_veb_release(struct i40e_veb *veb)
- 		return;
- 	}
- 
--	/* For regular VEB move the owner VSI to uplink VEB */
-+	/* For regular VEB move the owner VSI to uplink port */
- 	if (veb->uplink_seid) {
- 		vsi->flags &= ~I40E_VSI_FLAG_VEB_OWNER;
- 		vsi->uplink_seid = veb->uplink_seid;
--		if (veb->uplink_seid == pf->mac_seid)
--			vsi->veb_idx = I40E_NO_VEB;
--		else
--			vsi->veb_idx = veb->veb_idx;
-+		vsi->veb_idx = I40E_NO_VEB;
- 	}
- 
- 	i40e_aq_delete_element(&pf->hw, veb->seid, NULL);
-@@ -14825,8 +14805,8 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
- 				u16 uplink_seid, u16 vsi_seid,
- 				u8 enabled_tc)
- {
--	struct i40e_veb *veb, *uplink_veb = NULL;
- 	struct i40e_vsi *vsi = NULL;
-+	struct i40e_veb *veb;
- 	int veb_idx;
- 	int ret;
- 
-@@ -14848,14 +14828,6 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
- 			return NULL;
- 		}
- 	}
--	if (uplink_seid && uplink_seid != pf->mac_seid) {
--		uplink_veb = i40e_pf_get_veb_by_seid(pf, uplink_seid);
--		if (!uplink_veb) {
--			dev_info(&pf->pdev->dev,
--				 "uplink seid %d not found\n", uplink_seid);
--			return NULL;
--		}
--	}
- 
- 	/* get veb sw struct */
- 	veb_idx = i40e_veb_mem_alloc(pf);
-@@ -14864,7 +14836,6 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
- 	veb = pf->veb[veb_idx];
- 	veb->flags = flags;
- 	veb->uplink_seid = uplink_seid;
--	veb->veb_idx = (uplink_veb ? uplink_veb->idx : I40E_NO_VEB);
- 	veb->enabled_tc = (enabled_tc ? enabled_tc : 0x1);
- 
- 	/* create the VEB in the switch */
-@@ -14935,7 +14906,6 @@ static void i40e_setup_pf_switch_element(struct i40e_pf *pf,
- 		pf->veb[pf->lan_veb]->seid = seid;
- 		pf->veb[pf->lan_veb]->uplink_seid = pf->mac_seid;
- 		pf->veb[pf->lan_veb]->pf = pf;
--		pf->veb[pf->lan_veb]->veb_idx = I40E_NO_VEB;
- 		break;
- 	case I40E_SWITCH_ELEMENT_TYPE_VSI:
- 		if (num_reported != 1)
--- 
-2.41.0
-
+> ---
+>  drivers/net/ethernet/intel/ice/ice.h          |  2 ++
+>  drivers/net/ethernet/intel/ice/ice_base.c     |  1 +
+>  drivers/net/ethernet/intel/ice/ice_main.c     |  1 +
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      |  6 ++---
+>  drivers/net/ethernet/intel/ice/ice_ptp.h      |  4 +--
+>  drivers/net/ethernet/intel/ice/ice_txrx.h     | 10 +++++++-
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 25 ++++++++++++++++++-
+>  7 files changed, 42 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index 351e0d36df44..366c82a87e56 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -989,4 +989,6 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
+>  	set_bit(ICE_FLAG_UNPLUG_AUX_DEV, pf->flags);
+>  	clear_bit(ICE_FLAG_RDMA_ENA, pf->flags);
+>  }
+> +
+> +extern const struct xdp_metadata_ops ice_xdp_md_ops;
+>  #endif /* _ICE_H_ */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+> index 7fa43827a3f0..2d83f3c029e7 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_base.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_base.c
+> @@ -575,6 +575,7 @@ int ice_vsi_cfg_rxq(struct ice_rx_ring *ring)
+>  
+>  	xdp_init_buff(&ring->xdp, ice_rx_pg_size(ring) / 2, &ring->xdp_rxq);
+>  	ring->xdp.data = NULL;
+> +	ring->xdp_ext.pkt_ctx = &ring->pkt_ctx;
+>  	err = ice_setup_rx_ctx(ring);
+>  	if (err) {
+>  		dev_err(dev, "ice_setup_rx_ctx failed for RxQ %d, err %d\n",
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 6607fa6fe556..cfb6beadcc60 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -3397,6 +3397,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
+>  
+>  	netdev->netdev_ops = &ice_netdev_ops;
+>  	netdev->udp_tunnel_nic_info = &pf->hw.udp_tunnel_nic;
+> +	netdev->xdp_metadata_ops = &ice_xdp_md_ops;
+>  	ice_set_ethtool_ops(netdev);
+>  
+>  	if (vsi->type != ICE_VSI_PF)
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index a435f89b262f..667264c8dc8b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -2105,12 +2105,12 @@ int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr)
+>  /**
+>   * ice_ptp_get_rx_hwts - Get packet Rx timestamp in ns
+>   * @rx_desc: Receive descriptor
+> - * @rx_ring: Ring to get the cached time
+> + * @pkt_ctx: Packet context to get the cached time
+>   *
+>   * The driver receives a notification in the receive descriptor with timestamp.
+>   */
+>  u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+> -			struct ice_rx_ring *rx_ring)
+> +			const struct ice_pkt_ctx *pkt_ctx)
+>  {
+>  	u64 ts_ns, cached_time;
+>  	u32 ts_high;
+> @@ -2118,7 +2118,7 @@ u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+>  	if (!(rx_desc->wb.time_stamp_low & ICE_PTP_TS_VALID))
+>  		return 0;
+>  
+> -	cached_time = READ_ONCE(rx_ring->cached_phctime);
+> +	cached_time = READ_ONCE(pkt_ctx->cached_phctime);
+>  
+>  	/* Do not report a timestamp if we don't have a cached PHC time */
+>  	if (!cached_time)
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+> index 0274da964fe3..30b382ed204d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+> @@ -299,7 +299,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
+>  enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
+>  
+>  u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+> -			struct ice_rx_ring *rx_ring);
+> +			const struct ice_pkt_ctx *pkt_ctx);
+>  void ice_ptp_reset(struct ice_pf *pf);
+>  void ice_ptp_prepare_for_reset(struct ice_pf *pf);
+>  void ice_ptp_init(struct ice_pf *pf);
+> @@ -332,7 +332,7 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
+>  
+>  static inline u64
+>  ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+> -		    struct ice_rx_ring *rx_ring)
+> +		    const struct ice_pkt_ctx *pkt_ctx)
+>  {
+>  	return 0;
+>  }
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index 9efb42f99415..3d77c058c6de 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -257,9 +257,14 @@ enum ice_rx_dtype {
+>  	ICE_RX_DTYPE_SPLIT_ALWAYS	= 2,
+>  };
+>  
+> +struct ice_pkt_ctx {
+> +	u64 cached_phctime;
+> +};
+> +
+>  struct ice_xdp_buff {
+>  	struct xdp_buff xdp_buff;
+>  	const union ice_32b_rx_flex_desc *eop_desc;
+> +	const struct ice_pkt_ctx *pkt_ctx;
+>  };
+>  
+>  /* Required for compatibility with xdp_buffs from xsk_pool */
+> @@ -328,6 +333,10 @@ struct ice_rx_ring {
+>  		struct xdp_buff xdp;
+>  	};
+>  	/* CL3 - 3rd cacheline starts here */
+> +	union {
+> +		struct ice_pkt_ctx pkt_ctx;
+> +		u64 cached_phctime;
+> +	};
+>  	struct bpf_prog *xdp_prog;
+>  	u16 rx_offset;
+>  
+> @@ -346,7 +355,6 @@ struct ice_rx_ring {
+>  	struct ice_rx_ring *next;	/* pointer to next ring in q_vector */
+>  	struct xsk_buff_pool *xsk_pool;
+>  	dma_addr_t dma;			/* physical address of ring */
+> -	u64 cached_phctime;
+>  	u16 rx_buf_len;
+>  	u8 dcb_tc;			/* Traffic class of ring */
+>  	u8 ptp_rx;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> index 1fc1794b8e80..d57019b85641 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> @@ -197,7 +197,7 @@ ice_ptp_rx_hwts_to_skb(struct ice_rx_ring *rx_ring,
+>  		       const union ice_32b_rx_flex_desc *rx_desc,
+>  		       struct sk_buff *skb)
+>  {
+> -	u64 ts_ns = ice_ptp_get_rx_hwts(rx_desc, rx_ring);
+> +	u64 ts_ns = ice_ptp_get_rx_hwts(rx_desc, &rx_ring->pkt_ctx);
+>  
+>  	*skb_hwtstamps(skb) = (struct skb_shared_hwtstamps){
+>  		.hwtstamp	= ns_to_ktime(ts_ns),
+> @@ -509,3 +509,26 @@ void ice_finalize_xdp_rx(struct ice_tx_ring *xdp_ring, unsigned int xdp_res,
+>  			spin_unlock(&xdp_ring->tx_lock);
+>  	}
+>  }
+> +
+> +/**
+> + * ice_xdp_rx_hw_ts - HW timestamp XDP hint handler
+> + * @ctx: XDP buff pointer
+> + * @ts_ns: destination address
+> + *
+> + * Copy HW timestamp (if available) to the destination address.
+> + */
+> +static int ice_xdp_rx_hw_ts(const struct xdp_md *ctx, u64 *ts_ns)
+> +{
+> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+> +
+> +	*ts_ns = ice_ptp_get_rx_hwts(xdp_ext->eop_desc,
+> +				     xdp_ext->pkt_ctx);
+> +	if (!*ts_ns)
+> +		return -ENODATA;
+> +
+> +	return 0;
+> +}
+> +
+> +const struct xdp_metadata_ops ice_xdp_md_ops = {
+> +	.xmo_rx_timestamp		= ice_xdp_rx_hw_ts,
+> +};
+> -- 
+> 2.41.0
+> 
 
