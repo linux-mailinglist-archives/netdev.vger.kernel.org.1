@@ -1,78 +1,109 @@
-Return-Path: <netdev+bounces-48421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD7C97EE46E
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:32:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846297EE495
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51705B209F4
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:32:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36D5B2811E1
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1419328AC;
-	Thu, 16 Nov 2023 15:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B6436AF1;
+	Thu, 16 Nov 2023 15:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ql7kZbE9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VbuRKSEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2049.outbound.protection.outlook.com [40.107.94.49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B71BC7;
-	Thu, 16 Nov 2023 07:31:54 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48810194;
+	Thu, 16 Nov 2023 07:48:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700149686; x=1731685686;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=x1E0Xw3GkS7dtepuC+60PreflwbAJ7u2Ht0VijXLRZI=;
+  b=VbuRKSEMtNvXcwhgQ1CMmoOt/TQFNN2ugbzjFRyrqbpYFW3hKaz24yLH
+   dWPPEGr8E93J3NRASDrWVBSqXjDFoWgtEKbuELktN7ZXlxxObVMZP1TF1
+   0fY+mdH09usVge6K3cRnfAt+Va2GsHc7+a1CTKzkXXex/2lxCHr55zxyI
+   7QKVuQyheHY5YqtL+DGLwvd1kQ3yWD4TmwljJOrGzXZ179KcrOr07iPNS
+   KfFxiIcqjzQsnSZ1UYgY7u3nNB67ZnS3oF6Hubrpec/Zpsb4EJuoWnqtQ
+   oHu2Fr1jjIJz4DD16f9mqTTub5v141/nqcxZoKGg90TMA8KcWzNKMUewg
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="395030670"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="395030670"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 07:48:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="765335533"
+X-IronPort-AV: E=Sophos;i="6.04,204,1695711600"; 
+   d="scan'208";a="765335533"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orsmga002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Nov 2023 07:48:04 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:48:04 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:48:03 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Thu, 16 Nov 2023 07:48:03 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Thu, 16 Nov 2023 07:48:03 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EGqDQU/OgXbktdkWHb/aJXFzGQJVqS3lwnScsf4EQDVGzT7AmyB3jbEH1IDKlpZ5+CulL1UqFiiVe4iybBuleD1xQfChSzUnE+kL/FmJtZVrWGmX9cFQkFNbucgV3BhJLcH1swZ43crVyIn+XpjqN21VAAgBKxQSGjUOOag2UutOmQPVE79vSEqqY6Ailt3wxLqGfJoOSiOwh+EHd4uDIBHb88oPWDg2XRtApZAj28ahpkm0rToFcA5n40oBNE9t4XOtRSjQwgGoYd3OhTT130EMpC9dOpHEjNiLU1bOc0EwvkC5oqIux6xNCp5Lcemg3w2EcX7bJUvmTPPYvQW3cg==
+ b=n29oHO5DBCtiqEaz/FsojZjjKGVFzOWH8WMlz/GBLdAVh7hZCcO2fZV6mjqobzcAu+BQPdRBBuel+vG7rYT5OjZwU+JrB3xBrzqrOMuRF9twH5S6an1n8/yhBjdmtterVY2gAunFMfxFN7B6+Qvsj4LFY3pPjf1zSY1Lt9fRaOJoqRsJEPYgbsfkuXCoathCUMWy+5cnNb5XS5VijANpBiekOc7Rg4AVNSAstwVgO28jtPwFigF8dJsJLU5XS9ryTckRZs+ERebfBOJK+5LN8C9pBYy03BvvhU71z/OuJ2qbxwuJU4KbRQsQ/xnJCalC5w8yHYQ+dzfkQscqZSJhYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xAYBSKfP4pU3rqewRvgC57MxHVjYdDHw92TAgwIzleQ=;
- b=T7T0TuKKuVKy5XvClNUI03wzucOT266msTR3MRekRemQoD5Sd9Q7z7BIeyRGVG8uQbTf9+1/VorFdyF8vi0QmZ+NNB1lo1idq021vU1C+zHKIcpZtU2CvpL29nxYl3PtwlBtIFUV6ig9afDee5YIk2FoSyDXD/MwYSyKa8ZhxAFTzltxM7buj5OvMaR2aECo0c1Dv20WpMJ4w0xjjkE1KBvhJqrOjBsVPORQNyerrsN178nEzlizpffiRor5tByKDBEx42NddAi/hkMCI6YTHs1Tfu/pn4+Fy1U9pvKIwdnRgHs6cF3/3JM0qIhyc+WaT53bz1aFHvJn1R+b0KbleA==
+ bh=90TrwEGyrqeFYCGGj6pshu7ogF5ow4FS9uNYNRdq89A=;
+ b=aByYXC/H/C5CJ/K3S3xCq5VOWbxIgs7gUhHByG+rOvlCqL+DOymlMXvEd1xvOH+towYES4NardMZiH3HtDmPVBZHMtLdHDfekMOv8nawH5MGVXOae4OcDuMGQwma+bj5odlWFOt9TIpQGZ8ZlGwJ2xAU9jq+HxHf0/5G3Bg0YGWQ6o8kk8zQNrecQ1EifhnsrlkZw6n+nWzOiexP6V+CVvRzZlXeWlWYbqbb/ek/ewR168S8W3pfK+xJizCD9P1wo7K5DXLYR1Z29GGjm3kbhI1sTfaVSRevxaBWKSvg2ic7OA0H+HDBRC4FB8ggetznGujn6vz83BAMPQ3z6MxfEw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xAYBSKfP4pU3rqewRvgC57MxHVjYdDHw92TAgwIzleQ=;
- b=Ql7kZbE9rrvarDroMOeScGdVpLS/pquJfUwRLi6qSzFEPvCgXHixPK2wPMc+AGveeSbeJtxoVOZOJxsJwtj14Urbh1bMJaXTo86y31n8AOH0PgThQdsN2TtL85jrjDJWT5jiT9ehVj5b+LEOjHE57ayFGqyzz2Nm3BYpVuMqlzGSk3WMaSAvwlVvIqZ39lnL1ezG5A+2qONwb5pevEc5hOxC+JLCtdhzLZbBTj+aa73/FErakaREOe4YFZLL6T5iVwUgn4hEiuODaRWvzN7ADyf2mBQV7Uf3w5MM093CDr6F2vj4oPg32TC4ZU4w7IlD/mD1+uWBm6SfbUucVcQwKw==
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB6280.namprd12.prod.outlook.com (2603:10b6:8:a2::11) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ SA1PR11MB8327.namprd11.prod.outlook.com (2603:10b6:806:378::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Thu, 16 Nov
- 2023 15:31:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7002.021; Thu, 16 Nov 2023
- 15:31:48 +0000
-Date: Thu, 16 Nov 2023 11:31:47 -0400
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Matthew Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-Message-ID: <ZVY14zBmi1wgZBiw@nvidia.com>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <ZVNzS2EA4zQRwIQ7@nvidia.com>
- <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
- <ZVTJ0/lm1oUDzzHe@nvidia.com>
- <0a1cdd5a-c4c5-3d77-20a2-2beb8e3a6411@huawei.com>
-Content-Type: text/plain; charset=us-ascii
+ 2023 15:48:00 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::ee54:9452:634e:8c53%7]) with mapi id 15.20.7002.021; Thu, 16 Nov 2023
+ 15:48:00 +0000
+Date: Thu, 16 Nov 2023 16:47:46 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
+	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov
+	<alexei.starovoitov@gmail.com>, Tariq Toukan <tariqt@mellanox.com>, "Saeed
+ Mahameed" <saeedm@mellanox.com>
+Subject: Re: [PATCH bpf-next v7 10/18] ice: Implement VLAN tag hint
+Message-ID: <ZVY5ohBkChMPJxGT@boxer>
+References: <20231115175301.534113-1-larysa.zaremba@intel.com>
+ <20231115175301.534113-11-larysa.zaremba@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <0a1cdd5a-c4c5-3d77-20a2-2beb8e3a6411@huawei.com>
-X-ClientProxiedBy: MN2PR01CA0012.prod.exchangelabs.com (2603:10b6:208:10c::25)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+In-Reply-To: <20231115175301.534113-11-larysa.zaremba@intel.com>
+X-ClientProxiedBy: DU6P191CA0009.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:10:540::9) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,90 +111,256 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6280:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0d2036a7-a806-4355-1717-08dbe6b925e4
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|SA1PR11MB8327:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c7e9f92-8522-4138-1508-08dbe6bb68c9
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Zip2sGGvK1VzJ1t+mXTxfbOzsDPuVdgahrzxtHyDTVWf6tqtZWbIup8dRlI9lrMv8srU6mF8NjMV59wy6KQy8ZgJcEty3Np/1LaQM1Wj4frAxG95hjqkLv6O7D42TyRqfTyWMBg/GVM5rY88SN5P3grH9oWP7mL005l2n53O8yoePw8YazYSWkWzjtgkC6UULFdnGEYs7X1mo/LgP3JU7HDEERr77ulSvsAVBY0Cc6CfPcyrSs0swx+yH+D9WsI6ryF+DVx1X8IhoOlmjuqApW579lKlnXdovw5ReW1xMYLUgRDfKhBHl/24NE6HCR6havCVY1HutIIDUAfnRArmzVb565u8Wdy8JsU/pZYeXrXekr3scxt+L6gy8gJY8ulK8Ip+bnbWHnhxQiEoTYrkzZPUtdIvrH42pyuJMl6wRIvn/W+3d4s2Tl7NYkxz+1nEPDIkCqMKbO5PlzMz7NFvX34YGVqWBxptI/DZOMIKsDmfJZZCej/YZieyQ6U1Dmgrt1vSIJ4WMnxdYbO7wfKzfHHfPcYjdrRQXlxfUlLuJBQQG6PLVWB2rNNTqpTDwrT6
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(39860400002)(376002)(396003)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(36756003)(83380400001)(6512007)(6506007)(478600001)(6486002)(4326008)(8936002)(66556008)(8676002)(2616005)(54906003)(55236004)(53546011)(26005)(6916009)(316002)(66476007)(66946007)(7416002)(2906002)(86362001)(38100700002)(41300700001)(5660300002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: wuXJ5ZIOuG1niiDYWX7/crCnnJW5CkwvbRqWLQr+Vb2NAWM5AQvUXOyQ6DtQbh5GpaJkmdpiF37jTRp9b33tN+1UkS0l00Cacw2z4muT3YsmcE8mXD/PY1xgoOF73ouqrX2yyOfREeOZUZNimxQa5wINAfJPuyO0UUNk6VsIaVNY2sovks+P/z+/oCh3YaaSO9wkAKA07qquHrODpNOxWPnxjCFeHekOqU5ZdxNcXK+EPVxExs3S/0zC44zIlMjiBfirOEmX6VebWUNcV+rN7R+J9FMec1npNneh3Q07NmLsVYC34HGKkXftRGq/XhJC0NCdimMVD2e6W/ZQw5cKFP14zZJoZVizIOl+2q37TV0kTP0WBc0XU3csyzMrlU8CDaftQ48WVP9pfGLsYwE2V8+ZdrIp09LDGP7r5Iy4AnvrAPF3MlXjKw9e842KiFABEGSTFoe8fk/CnHi3PF1E8/b0MouZSFBtMN/ZcHCIhM6qb/IxJl46VR6IF5ttuU6YNIp5bf1SeqxlVBDxcV5SpJBfGs6rYLhapSx4zlK2bzbDnDps/riW3Q7oJnbHaLcP
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(396003)(346002)(39860400002)(366004)(376002)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(86362001)(33716001)(316002)(54906003)(66556008)(66946007)(66476007)(6636002)(8676002)(83380400001)(6862004)(4326008)(8936002)(6666004)(2906002)(26005)(41300700001)(44832011)(6512007)(9686003)(6506007)(7416002)(5660300002)(82960400001)(6486002)(478600001)(38100700002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SalxX0l0mbvb4JaLOjGZmgfHyt55sZ/6z54FDTQOfLjyquJFGzr4yk1YhCOU?=
- =?us-ascii?Q?9TI4sAYlEPnnUgqvRQriH0bQiHkCsYuv9TQAZk01Wwmx5m95l9d0VBxOjhTI?=
- =?us-ascii?Q?AVVxL1Ljfi4dOcAA1Yj/agW+eKhpkvK5fkvMqry9Zz/9+BRmegot2yoMrYRE?=
- =?us-ascii?Q?azqrgnoKC1WJzSfiUMYz2kiIF2JCRS78aZpmpT6zeOlHknsYGxsPpBVerZSp?=
- =?us-ascii?Q?XI4trQ7p0k0Uvggd3Qzkhj5EuEm/e7Yc07pop+8TAMgh0ywPG06UI/TQyjze?=
- =?us-ascii?Q?wItDajRNzEAqQ8AIadpSrjEGrTSX0QexUBoNx0nZZ0ZBRNB54idSAUlp5Kas?=
- =?us-ascii?Q?e+AAmRz5lOPTsI3glSrjdNVvgavjUY9Lx/ZvtSO8WR9EQHZcfGi5QqLHRXQs?=
- =?us-ascii?Q?CO3Cgcf41TWJiVNUoFUvSMWr6PNn/rkHWpiZ34fiRjhzVThCvJN6H6Q29qPs?=
- =?us-ascii?Q?Enxvt1g0CK44bSvuMYFQ4VliGKy6vrgvnO12pxlCAkticEBFN9PEm6LYBl+/?=
- =?us-ascii?Q?qmRMi0qicE4tg0pEGICj9ZSA2sv8w/a6FyUcWBAQ/flu1arVImK5jKmLo3Xi?=
- =?us-ascii?Q?9U6k0KkaW1BktKhSRi9P9FG9rgatINFtZOs8hWh+GLVywmNUtvNdBt6JAFsC?=
- =?us-ascii?Q?gXvO8r2PgQwHc8XqMjDlI+PUzVcAtcFvNrjCHc0l1Ijk6Ff+5jZF5Adu1xy8?=
- =?us-ascii?Q?xW9xAj2fQW459Zrn24EDHbeQAZJ3a/T/H7A/x5n0qoS6EsralEOwEPE7kB06?=
- =?us-ascii?Q?PUC+dPpuQbBjC4+9YekFWH85t0gLfnPa0hW/BZ9bwcYQWz3MBcmlaswCKPAA?=
- =?us-ascii?Q?RRH5OqgSV3mF3D3EGV/jarCJldkizsclQqVeBT0rHCm/251Lz+GKNz2Ulzoo?=
- =?us-ascii?Q?SSbuzl/gA9GAe7d+fTn7bzJXryk8DKOyhUzc6p/CiB5BI7NqOMl63HfRes0V?=
- =?us-ascii?Q?2goqpM7oUet+m+qXUfrK9amnRbCiCCSe38kx57OwVA//Nsb2ISgKTDrV2qtp?=
- =?us-ascii?Q?uADOxJb/OHMAw+ijdt2P7I02ElL+gKvL1uOpNg0XXCHQEVYAWbNJExUng7gQ?=
- =?us-ascii?Q?8tYxufjbK3hkqDISA6Dtd8diFDXRhe+Z73/U7MxjKwAckEwQAwwSHKHnTwma?=
- =?us-ascii?Q?CCJ2I4E7I1L0gC7FlEnQJirfvHlvVt0JIXznHUnficAWO5QXNpun7v1YVna8?=
- =?us-ascii?Q?45/2OCDSIa+oeNnfupUOsTOP5uMrek97zab+zvBeRniGLns9+iBGoBtQz63f?=
- =?us-ascii?Q?SAU+7IBTRk54ikDQTAhKFgDY3qxG0BrUWmN/y8VVT+eR7MUErq4V0qLXx8YY?=
- =?us-ascii?Q?Mlgk4P9ZCAGiGMP4wxFbSGjn4t7gtWLYzEYvjuAlsDzUzOLuk1d/7jRW8YIr?=
- =?us-ascii?Q?2oCOFQckET3ETj6VuGC0rIcyzTRuEqGGR5DQsYWjZ1hOPW+eotvXTv6p1k7z?=
- =?us-ascii?Q?sUuOdsJrnyuYmEd7+lI7x5OCPW3eWi0umM5gVViQFYoSbW67tYqcZNxAJSCH?=
- =?us-ascii?Q?rAOdNBjJScbIIxk/244Tha1WGg+au5xgQ2mUpI3QZVdieK+Z8z9JG8e3tcT/?=
- =?us-ascii?Q?f8MUx22oRs5v3YfFfvhIn2Lu5HatGotnLD5dkkt9?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2036a7-a806-4355-1717-08dbe6b925e4
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0dw670O+Lxdx3Y9iUM0+DUPEgJEdZkr6zTWvWktZkOE+lFohdUxgkXvTjYv2?=
+ =?us-ascii?Q?AOTk2Dm6T7iJlt6/yIkjVju2IpyDL1/dETgy1N0Z14N7cpE4jwEDCXbtU2dG?=
+ =?us-ascii?Q?WNB6FbajrieEbMQdT9NZJQSnQFjw0VpCzpZbFYYCF6vOjdT9Tsvcfp2wzooj?=
+ =?us-ascii?Q?iFxJm8qyGXBx3WIDhskMYok1eaFZ3WpmTdRh3/gj6M6ajX2pSqqku3jtMedt?=
+ =?us-ascii?Q?GJeOtFcimwYMsi6bZE92Labcj8rxbw0XMY8r0pLDQ9o76LlnhqlDwz467+E7?=
+ =?us-ascii?Q?zrxfTn/nIbHHYF8qV4N6YUpceZVVypo+tteizt+wal9cbuWHvc3lVNil3vmC?=
+ =?us-ascii?Q?A2rzCQ6SwGIES6XjYazQ0at2+W+IF2SAkcW1anIJ4Yuj4fno8nXO9YNv9fOZ?=
+ =?us-ascii?Q?X32lmpAPs42eviu9bVuMTMiCRuAnpIk9mp5z5QZ5S4z6eRIqqARy3JvAshtt?=
+ =?us-ascii?Q?pEJlWvrUbyb9RVegqi6vzG2h342qtaxJ3LgVaHAPU1ZVEB7MUTQjNdQtgst/?=
+ =?us-ascii?Q?DQNZYOblW7SJ/GmiOwKDMROjxKbJ3Jw+ULv2ZFJCjCdQzmML4KTnKUKHKp/R?=
+ =?us-ascii?Q?O1NrbJLtR7bP21PsOQrJMFNJ0pWZk9bqhSAsUjX+5hImoq7uLI++kQursHXn?=
+ =?us-ascii?Q?4TmXbaAHGRcUFiiqkUETLYn7jVgpye1tLe95sPg1SpWt6Cga+ylzPkckjo7S?=
+ =?us-ascii?Q?uPXA0uV1APPlurSH0/eYj2VCzWgQvmkRdTkUCQDjyts+CiCYvfaUwtyRef64?=
+ =?us-ascii?Q?3eeHnKOx1DFKxz0LFJTizzvqQyqCAScbv3YBsQEVsar1FY9dVyblQ5XqN5jq?=
+ =?us-ascii?Q?P7hHpDDQFIJ9FLpUm3V64mxeWxOHkq9ByIS9EyciYCbKFEyIkPGXZIBFIMx4?=
+ =?us-ascii?Q?T42BvT4lYjsURZXUZ214m7gDENnlRoHDTsxHtWL5EZSX9JonpfBapwCifeGx?=
+ =?us-ascii?Q?xNZnygpVFQptFHkBT9iXCEJvpDTaJ+t4/4SO4ZoZzcsyMCbJaHw+3L3ZkOVE?=
+ =?us-ascii?Q?o5uLcvrwDUshqYc0X3RP2wZxGM4H1NpER6jiE3KO9d/11xMfgCqjB9pGmKdM?=
+ =?us-ascii?Q?CBFfnF/Xyrahdr6njFPolioPQPFyOndkw69BqurCspa1+fMfvqXV8pqL58/U?=
+ =?us-ascii?Q?6B6qaXIwI/btFym9znDawtDBJKKaD/AE4a4C0W8SQwQb6bPUkcYn0tbKdUPg?=
+ =?us-ascii?Q?0TJs1km1Y74uzIoZXKBaa4U/IQF2EQK6WbnTAaYgufTWtd4d9qwX1YAac1FR?=
+ =?us-ascii?Q?aRRU7leeCOHGaHf2POjIMvwYXGoK6OzmH8cxpec416mR5GyDK2hTinERTAVV?=
+ =?us-ascii?Q?OQ4iLCzzkngd0jri5wPJ+e+kdT5Y9hc7AYhabFVmnjyvpwm61GIhsodXPNYu?=
+ =?us-ascii?Q?LhnCoYKdK0O3BtoVZbZeNIwFsAlVkJSiQqVU8cWRgIRq1mbLM+NZv1yaMQjF?=
+ =?us-ascii?Q?UvSWz2whHV0YT3yym0mYqKWEAhugb6azY1GvOFux5Nme47PlvvzsDEhVHmcm?=
+ =?us-ascii?Q?j13y+Y8X5yQBafnlb5WGK55dhIESc3DdjrZgt7xX6rP6CuFi0I8pVpVY64Kx?=
+ =?us-ascii?Q?T92LeR+BiKSphfNeE5BVZDCwHdaUx0rJHG1iCIrB0XtV1NYiECngTCdEG2mP?=
+ =?us-ascii?Q?Rg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c7e9f92-8522-4138-1508-08dbe6bb68c9
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 15:31:48.3994
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 15:48:00.1567
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JFrTSH138ZaUuBrwLePA3Kpo2JQj3fzVaA6pD4EBLFvWj1d7eu5hG3jWd1UtJ6pH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6280
+X-MS-Exchange-CrossTenant-UserPrincipalName: W6BLoJGyg/C/r2eBEg6DshEcHmtO6ZK2kYG/S9J45dpZtuOidNkEnZ3kLCIx6DtLozRpET+uLft0YIXAAFFd5vKL2HA5EsHSnINQi7pEeb8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8327
+X-OriginatorOrg: intel.com
 
-On Thu, Nov 16, 2023 at 07:10:01PM +0800, Yunsheng Lin wrote:
-> On 2023/11/15 21:38, Jason Gunthorpe wrote:
-> > On Wed, Nov 15, 2023 at 05:21:02PM +0800, Yunsheng Lin wrote:
-> > 
-> >>>>> I would expect net stack, page pool, driver still see the 'struct page',
-> >>>>> only memory provider see the specific struct for itself, for the above,
-> >>>>> devmem memory provider sees the 'struct page_pool_iov'.
-> >>>>>
-> >>>>> The reason I still expect driver to see the 'struct page' is that driver
-> >>>>> will still need to support normal memory besides devmem.
-> >>>
-> >>> I wouldn't say this approach is unreasonable, but it does have to be
-> >>> done carefully to isolate the mm. Keeping the struct page in the API
-> >>> is going to make this very hard.
-> >>
-> >> I would expect that most of the isolation is done in page pool, as far as
-> >> I can see:
-> > 
-> > It is the sort of thing that is important enough it should have
-> > compiler help via types to prove that it is being done
-> > properly. Otherwise it will be full of mistakes over time.
+On Wed, Nov 15, 2023 at 06:52:52PM +0100, Larysa Zaremba wrote:
+> Implement .xmo_rx_vlan_tag callback to allow XDP code to read
+> packet's VLAN tag.
 > 
-> Yes, agreed.
+> At the same time, use vlan_tci instead of vlan_tag in touched code,
+> because VLAN tag often refers to VLAN proto and VLAN TCI combined,
+> while in the code we clearly store only VLAN TCI.
 > 
-> I have done something similar as willy has done for some of
-> folio conversion as below:
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 
-That is not at all what I mean, I mean you should not use
-struct page * types at all in code that flows from the _iov version
-except via limited accessors that can be audited and have appropriate
-assertions.
+Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-Just releasing struct page * that is not a struct page * everywhere
-without type safety will never be correct long term.
-
-Jason
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c     | 20 ++++++++++++++
+>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  6 ++---
+>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  6 ++++-
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 26 +++++++++++++++++++
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  4 +--
+>  drivers/net/ethernet/intel/ice/ice_xsk.c      |  6 ++---
+>  6 files changed, 59 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index cfb6beadcc60..485c561c129c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -6041,6 +6041,23 @@ ice_fix_features(struct net_device *netdev, netdev_features_t features)
+>  	return features;
+>  }
+>  
+> +/**
+> + * ice_set_rx_rings_vlan_proto - update rings with new stripped VLAN proto
+> + * @vsi: PF's VSI
+> + * @vlan_ethertype: VLAN ethertype (802.1Q or 802.1ad) in network byte order
+> + *
+> + * Store current stripped VLAN proto in ring packet context,
+> + * so it can be accessed more efficiently by packet processing code.
+> + */
+> +static void
+> +ice_set_rx_rings_vlan_proto(struct ice_vsi *vsi, __be16 vlan_ethertype)
+> +{
+> +	u16 i;
+> +
+> +	ice_for_each_alloc_rxq(vsi, i)
+> +		vsi->rx_rings[i]->pkt_ctx.vlan_proto = vlan_ethertype;
+> +}
+> +
+>  /**
+>   * ice_set_vlan_offload_features - set VLAN offload features for the PF VSI
+>   * @vsi: PF's VSI
+> @@ -6083,6 +6100,9 @@ ice_set_vlan_offload_features(struct ice_vsi *vsi, netdev_features_t features)
+>  	if (strip_err || insert_err)
+>  		return -EIO;
+>  
+> +	ice_set_rx_rings_vlan_proto(vsi, enable_stripping ?
+> +				    htons(vlan_ethertype) : 0);
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> index 4e6546d9cf85..4fd7614f243d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+> @@ -1183,7 +1183,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  		struct sk_buff *skb;
+>  		unsigned int size;
+>  		u16 stat_err_bits;
+> -		u16 vlan_tag = 0;
+> +		u16 vlan_tci;
+>  
+>  		/* get the Rx desc from Rx ring based on 'next_to_clean' */
+>  		rx_desc = ICE_RX_DESC(rx_ring, ntc);
+> @@ -1278,7 +1278,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  			continue;
+>  		}
+>  
+> -		vlan_tag = ice_get_vlan_tag_from_rx_desc(rx_desc);
+> +		vlan_tci = ice_get_vlan_tci(rx_desc);
+>  
+>  		/* pad the skb if needed, to make a valid ethernet frame */
+>  		if (eth_skb_pad(skb))
+> @@ -1292,7 +1292,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
+>  
+>  		ice_trace(clean_rx_irq_indicate, rx_ring, rx_desc, skb);
+>  		/* send completed skb up the stack */
+> -		ice_receive_skb(rx_ring, skb, vlan_tag);
+> +		ice_receive_skb(rx_ring, skb, vlan_tci);
+>  
+>  		/* update budget accounting */
+>  		total_rx_pkts++;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index 3d77c058c6de..886ac8450e78 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -259,6 +259,7 @@ enum ice_rx_dtype {
+>  
+>  struct ice_pkt_ctx {
+>  	u64 cached_phctime;
+> +	__be16 vlan_proto;
+>  };
+>  
+>  struct ice_xdp_buff {
+> @@ -335,7 +336,10 @@ struct ice_rx_ring {
+>  	/* CL3 - 3rd cacheline starts here */
+>  	union {
+>  		struct ice_pkt_ctx pkt_ctx;
+> -		u64 cached_phctime;
+> +		struct {
+> +			u64 cached_phctime;
+> +			__be16 vlan_proto;
+> +		};
+>  	};
+>  	struct bpf_prog *xdp_prog;
+>  	u16 rx_offset;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> index 26a2c218e96d..63bf9f882363 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> @@ -601,7 +601,33 @@ static int ice_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
+>  	return 0;
+>  }
+>  
+> +/**
+> + * ice_xdp_rx_vlan_tag - VLAN tag XDP hint handler
+> + * @ctx: XDP buff pointer
+> + * @vlan_proto: destination address for VLAN protocol
+> + * @vlan_tci: destination address for VLAN TCI
+> + *
+> + * Copy VLAN tag (if was stripped) and corresponding protocol
+> + * to the destination address.
+> + */
+> +static int ice_xdp_rx_vlan_tag(const struct xdp_md *ctx, __be16 *vlan_proto,
+> +			       u16 *vlan_tci)
+> +{
+> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+> +
+> +	*vlan_proto = xdp_ext->pkt_ctx->vlan_proto;
+> +	if (!*vlan_proto)
+> +		return -ENODATA;
+> +
+> +	*vlan_tci = ice_get_vlan_tci(xdp_ext->eop_desc);
+> +	if (!*vlan_tci)
+> +		return -ENODATA;
+> +
+> +	return 0;
+> +}
+> +
+>  const struct xdp_metadata_ops ice_xdp_md_ops = {
+>  	.xmo_rx_timestamp		= ice_xdp_rx_hw_ts,
+>  	.xmo_rx_hash			= ice_xdp_rx_hash,
+> +	.xmo_rx_vlan_tag		= ice_xdp_rx_vlan_tag,
+>  };
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> index 81b8856d8e13..3893af1c11f3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
+> @@ -84,7 +84,7 @@ ice_build_ctob(u64 td_cmd, u64 td_offset, unsigned int size, u64 td_tag)
+>  }
+>  
+>  /**
+> - * ice_get_vlan_tag_from_rx_desc - get VLAN from Rx flex descriptor
+> + * ice_get_vlan_tci - get VLAN TCI from Rx flex descriptor
+>   * @rx_desc: Rx 32b flex descriptor with RXDID=2
+>   *
+>   * The OS and current PF implementation only support stripping a single VLAN tag
+> @@ -92,7 +92,7 @@ ice_build_ctob(u64 td_cmd, u64 td_offset, unsigned int size, u64 td_tag)
+>   * one is found return the tag, else return 0 to mean no VLAN tag was found.
+>   */
+>  static inline u16
+> -ice_get_vlan_tag_from_rx_desc(union ice_32b_rx_flex_desc *rx_desc)
+> +ice_get_vlan_tci(const union ice_32b_rx_flex_desc *rx_desc)
+>  {
+>  	u16 stat_err_bits;
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> index a690e34ea8ae..aeaf6692696e 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_xsk.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+> @@ -868,7 +868,7 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
+>  		struct xdp_buff *xdp;
+>  		struct sk_buff *skb;
+>  		u16 stat_err_bits;
+> -		u16 vlan_tag = 0;
+> +		u16 vlan_tci;
+>  
+>  		rx_desc = ICE_RX_DESC(rx_ring, ntc);
+>  
+> @@ -946,10 +946,10 @@ int ice_clean_rx_irq_zc(struct ice_rx_ring *rx_ring, int budget)
+>  		total_rx_bytes += skb->len;
+>  		total_rx_packets++;
+>  
+> -		vlan_tag = ice_get_vlan_tag_from_rx_desc(rx_desc);
+> +		vlan_tci = ice_get_vlan_tci(rx_desc);
+>  
+>  		ice_process_skb_fields(rx_ring, rx_desc, skb);
+> -		ice_receive_skb(rx_ring, skb, vlan_tag);
+> +		ice_receive_skb(rx_ring, skb, vlan_tci);
+>  	}
+>  
+>  	rx_ring->next_to_clean = ntc;
+> -- 
+> 2.41.0
+> 
 
