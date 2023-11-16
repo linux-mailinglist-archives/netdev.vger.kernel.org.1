@@ -1,80 +1,184 @@
-Return-Path: <netdev+bounces-48410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74507EE3FE
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:14:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8357EE409
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:19:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11C4B1C208C4
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:14:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB0FEB20A13
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C08E534555;
-	Thu, 16 Nov 2023 15:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B399531A7E;
+	Thu, 16 Nov 2023 15:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNF8+aBH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tj85W4tW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82FCF18D
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:14:32 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5431614d90eso1376944a12.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:14:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700147671; x=1700752471; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zchWcd1VetQFlDRCGcO3MnXKCURIM84DnJ28E7Wray0=;
-        b=CNF8+aBHx+/kRmT1EeKqyISILJJ9LJS6pirWZtACqC2rJtZY1CWzd2PyW2NOPMuXcw
-         0KMoihGGqgbgIx53fj3RhQIiKlL6xEQMFyQwmbCMAlUVMkVoG45wqoL5FsG50Sk/8Lyp
-         AoAQbVmqdaJXjzhQu70nB8g6UaM1i8flKqoFVegN+yhdib8PhQdAH81lLMFt+BdL+Qlx
-         wtYP3wJsxFVw1FyE+z/N6f2lgR1X2kl52waQFOdm/CLDOB0pVRLpEos0I1bHVsYRqC5k
-         N+uQdLlx8/Ss7k1QmF4LEU5AOqVx5zwZcQNAQvD/BbyVjPjIWcth3Qr7RM98xRo/2+Km
-         aV6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700147671; x=1700752471;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zchWcd1VetQFlDRCGcO3MnXKCURIM84DnJ28E7Wray0=;
-        b=QSTA2FuEL2yNPHF5Cfvrx4nnLqwm4T+49h2Q+jhF26ljFSuOiCeKNFcxWbH5ae6yPC
-         kzjeONQi3Xoj4Ktsa8AqWnKU0hpa3IcNlLUUAkvPZq48FlnfRuTRgea3HvSuN0129f/m
-         nliInfuWGOUSkESh7T4DdlfT32nHAlvrsm/FP4FdY1vCeVg2n8HKeuRBWkWwjz9P+ZTO
-         FLp64BXnrxtud2N51UTEyo9+1XGWMES15ywjY2t/R4B1WeqdbXa77lqsMLaUcfyl4K3+
-         yvX1cLt0aJwWgU8Wxm4nJSR/o9AW+THh5L7OYSibRhg+IyiiKV8PD3wfs82QuQcepA1E
-         L/fw==
-X-Gm-Message-State: AOJu0Yx1VwvBodOxLPsNSrmw9t+f0qEgwaPrVPzT5LxgnsyMZqMaYtRz
-	JFoz1Q3ralnKmbRFvsHh0uvCo+yx9p2W/alXX/Ps4xc=
-X-Google-Smtp-Source: AGHT+IFAGGq1m+5fhjcl4MekPgKa3neNani6ipg2hXcCjqEDn2aDCpO4BD5jWCLDvSQb0F3g9b95orjBOpPaYR9wdEs=
-X-Received: by 2002:a17:906:3452:b0:9ae:7870:1539 with SMTP id
- d18-20020a170906345200b009ae78701539mr12801874ejb.76.1700147670793; Thu, 16
- Nov 2023 07:14:30 -0800 (PST)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1AE195
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:19:39 -0800 (PST)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGFFHr2005453;
+	Thu, 16 Nov 2023 15:19:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=zzZ32tTgRNSb2ua0SnhVIVGZH87LnQAqUHUs0Im3qh0=;
+ b=tj85W4tWSVG2WUE4cdX8XNBmDTD56oaT/vFXTldb5I9CKWEMbD37rjLM39Ayjswii/FC
+ lIf3bb74DXsXqninXQX9saqTDZm9ggbair52dZX8BAtZUNCAmCQT/G/OFiLnFRP4Gqcd
+ +aGyrumnFhbi1/cTGy7cYhLHnwCpfohdzqrA6NDOXZPRBf9qkCK7Ox/OHwvYlM1GZ6ty
+ tJEnp3+fHUdcvjgrARcvB7jT76V3Ra3BjijWi5jQCw4nVGxDOOrNKVeuOtJvxJiPEqyN
+ mXPrQBJ7+0sqCIvwqBDj2F95m1FNlXy6C8iuXK8diCer0nyWv/GscM4nC8tyPMnBToRI OQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3udnjd84r1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 15:19:32 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AGFHAUd014166;
+	Thu, 16 Nov 2023 15:19:32 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3udnjd84px-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 15:19:31 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AGFJ1RC012139;
+	Thu, 16 Nov 2023 15:19:30 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uamxnqe2b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Nov 2023 15:19:30 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AGFJUSU11338392
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Nov 2023 15:19:30 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EBE8858059;
+	Thu, 16 Nov 2023 15:19:29 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AAEFF58058;
+	Thu, 16 Nov 2023 15:19:29 +0000 (GMT)
+Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 16 Nov 2023 15:19:29 +0000 (GMT)
+From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+To: mchan@broadcom.com
+Cc: pavan.chebbi@broadcom.com, netdev@vger.kernel.org, prashant@broadcom.com,
+        siva.kallam@broadcom.com, drc@linux.vnet.ibm.com,
+        venkata.sai.duggi@ibm.com, thinhtr@linux.vnet.ibm.com,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        davem@davemloft.net
+Subject: [PATCH v3] net/tg3: fix race condition in tg3_reset_task()
+Date: Thu, 16 Nov 2023 09:18:22 -0600
+Message-Id: <20231116151822.281-1-thinhtr@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
+References: <20231102161219.220-1-thinhtr@linux.vnet.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231113035219.920136-1-chopps@chopps.org> <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
-In-Reply-To: <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
-From: Andrew Cagney <andrew.cagney@gmail.com>
-Date: Thu, 16 Nov 2023 10:14:18 -0500
-Message-ID: <CAJeAr6t_k32cqnzxqeuF8Kca6Q4w1FrDbKYABptKGz+HYAkyCw@mail.gmail.com>
-Subject: Re: [devel-ipsec] [RFC ipsec-next v2 0/8] Add IP-TFS mode to xfrm
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, netdev@vger.kernel.org, 
-	Christian Hopps <chopps@labn.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 1udnFHlFgsNrt66vBHY4kjT-v9jiVM8I
+X-Proofpoint-GUID: bzeaEeSqGctd7lk-SGOzF7yofCU8Dy4Y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-16_15,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0
+ adultscore=0 phishscore=0 mlxlogscore=975 bulkscore=0 clxscore=1011
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311160119
 
-> I did a multiple days peer review with Chris on this pachset. So my
-> concerns are already addressed.
->
-> Further reviews are welcome! This is a bigger change and it would
-> be nice if more people could look at it.
+When an EEH error is encountered by a PCI adapter, the EEH driver
+modifies the PCI channel's state as shown below:
 
-I have a usability question.  What name should appear when a user
-interacts with and sees log messages from this feature?
-    ip-tfs, IP-TFS, IP_TFS
-or:
-   iptfs, IPTFS, ...
+   enum {
+      /* I/O channel is in normal state */
+      pci_channel_io_normal = (__force pci_channel_state_t) 1,
+
+      /* I/O to channel is blocked */
+      pci_channel_io_frozen = (__force pci_channel_state_t) 2,
+
+      /* PCI card is dead */
+      pci_channel_io_perm_failure = (__force pci_channel_state_t) 3,
+   };
+
+If the same EEH error then causes the tg3 driver's transmit timeout
+logic to execute, the tg3_tx_timeout() function schedules a reset
+task via tg3_reset_task_schedule(), which may cause a race condition
+between the tg3 and EEH driver as both attempt to recover the HW via
+a reset action.
+
+EEH driver gets error event
+--> eeh_set_channel_state()
+    and set device to one of
+    error state above		scheduler: tg3_reset_task() get 
+   				returned error from tg3_init_hw()
+			     --> dev_close() shuts down the interface
+
+tg3_io_slot_reset() and 
+tg3_io_resume() fail to
+reset/resume the device
+
+
+To resolve this issue, we avoid the race condition by checking the PCI
+channel state in the tg3_tx_timeout() function and skip the tg3 driver
+initiated reset when the PCI channel is not in the normal state.  (The
+driver has no access to tg3 device registers at this point and cannot
+even complete the reset task successfully without external assistance.)
+We'll leave the reset procedure to be managed by the EEH driver which
+calls the tg3_io_error_detected(), tg3_io_slot_reset() and 
+tg3_io_resume() functions as appropriate. 
+
+
+
+Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+Tested-by: Venkata Sai Duggi <venkata.sai.duggi@ibm.com>
+Reviewed-by: David Christensen <drc@linux.vnet.ibm.com>
+
+  v3: re-post the patch.
+  v2: checking PCI errors in tg3_tx_timeout()
+
+---
+ drivers/net/ethernet/broadcom/tg3.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index 14b311196b8f..1c72ef05ab1b 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -7630,6 +7630,26 @@ static void tg3_tx_timeout(struct net_device *dev, unsigned int txqueue)
+ {
+ 	struct tg3 *tp = netdev_priv(dev);
+ 
++	/* checking the PCI channel state for hard errors
++	 * for pci_channel_io_frozen case
++	 *   - I/O to channel is blocked.
++	 *     The EEH layer and I/O error detections will
++	 *     handle the reset procedure
++	 * for pci_channel_io_perm_failure  case
++	 *   - the PCI card is dead.
++	 *     The reset will not help
++	 * report the error for both cases and return.
++	 */
++	if (tp->pdev->error_state == pci_channel_io_frozen) {
++		netdev_err(dev, " %s, I/O to channel is blocked\n", __func__);
++		return;
++	}
++
++	if (tp->pdev->error_state == pci_channel_io_perm_failure) {
++		netdev_err(dev, " %s, adapter has failed permanently!\n", __func__);
++		return;
++	}
++
+ 	if (netif_msg_tx_err(tp)) {
+ 		netdev_err(dev, "transmit timed out, resetting\n");
+ 		tg3_dump_state(tp);
+-- 
+2.25.1
+
 
