@@ -1,247 +1,169 @@
-Return-Path: <netdev+bounces-48420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A35467EE469
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:30:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7C97EE46E
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DBB31F22D56
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:30:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51705B209F4
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 15:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22810358A5;
-	Thu, 16 Nov 2023 15:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1419328AC;
+	Thu, 16 Nov 2023 15:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="pVeKY0lE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ql7kZbE9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50D2D2127
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:29:51 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-5a87ac9d245so10509977b3.3
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 07:29:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700148590; x=1700753390; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vKiqozhKbUACM4wOnociWaUHNpXxfzgPkJ66kCbAsYs=;
-        b=pVeKY0lEy4eDh4LM6TqtYXsobSl2IxRj97lk3dS9GRwK91lbEwnKg0p1WLu4aoIHwo
-         Fs7U1gv3esKjwCJPlc+OQ4lVWvElTOJOvqyD0avgZYKISXFkYUBwLIiRRaiecXBB+sVH
-         SkVj2rk37UFA5uOVejh8ERGDpmJhJ3CXCAWpVD2iWVE3vZnf2WQFBdSoW+K3LWGSVXE0
-         um9QTYjs85zOl+Y79W+6+OxYbU4TAUxsMQCYkPjoGjcZVllWMtzxvFDIOkI2TiSVCMdY
-         npI081Ldo90lm0ju39Fj+QfduvyGadpWgt1XkIFyEWrzd4fpMRpI/t7JJv8fKL0mXq29
-         EJ2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700148590; x=1700753390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vKiqozhKbUACM4wOnociWaUHNpXxfzgPkJ66kCbAsYs=;
-        b=dIrR/ihwd841bpQ+jwwhWYeREnyl8sHcnb4xXHvobQtXq2yi6JyKuyvnC35Z7cMgpq
-         VhYZWPHg1R2G5zViGiBscSTfSwO/Xf+QW89/quSOfnb47ojSAFxNSExtwtuh77k17qHt
-         yZS7KcU5H/bt2u1yjNoGujbDERx8X5WMFKhgRdW0Wzc2gT12AXTGLzbq4A/pmMG6uick
-         10OlNfCFIU5UJW/N+XQ22KLyu8Lz/xmz0q2t8azzu/5e7dGrs1Zfrzukxw3sCQ4z2Y22
-         NlRtnBd0/4b32jvi1jpHCBZt7RL7Y7LPj0Lh9RKD3+J6u+kn4+QeGac5YX+6Up8b9nu9
-         00yA==
-X-Gm-Message-State: AOJu0YxiGgh4aQkBl2XvgPqErX9D5yuIhXTu9Qvq141+arxRglRH4dX7
-	BZBQXCGMbwOn1AcFUvdYeiIsjea0EFb44Zb7ftVAMg==
-X-Google-Smtp-Source: AGHT+IF54TMSUIHzcb+npXq+vlh9d73RrCmH+OgkSmuVbkFRmR8b3q9DctESoBSCTAXClrB2GEJ7ClHSQWqdq8x9Jyk=
-X-Received: by 2002:a0d:d9c8:0:b0:589:b3c6:95ff with SMTP id
- b191-20020a0dd9c8000000b00589b3c695ffmr18091329ywe.36.1700148590284; Thu, 16
- Nov 2023 07:29:50 -0800 (PST)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2049.outbound.protection.outlook.com [40.107.94.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B71BC7;
+	Thu, 16 Nov 2023 07:31:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EGqDQU/OgXbktdkWHb/aJXFzGQJVqS3lwnScsf4EQDVGzT7AmyB3jbEH1IDKlpZ5+CulL1UqFiiVe4iybBuleD1xQfChSzUnE+kL/FmJtZVrWGmX9cFQkFNbucgV3BhJLcH1swZ43crVyIn+XpjqN21VAAgBKxQSGjUOOag2UutOmQPVE79vSEqqY6Ailt3wxLqGfJoOSiOwh+EHd4uDIBHb88oPWDg2XRtApZAj28ahpkm0rToFcA5n40oBNE9t4XOtRSjQwgGoYd3OhTT130EMpC9dOpHEjNiLU1bOc0EwvkC5oqIux6xNCp5Lcemg3w2EcX7bJUvmTPPYvQW3cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xAYBSKfP4pU3rqewRvgC57MxHVjYdDHw92TAgwIzleQ=;
+ b=T7T0TuKKuVKy5XvClNUI03wzucOT266msTR3MRekRemQoD5Sd9Q7z7BIeyRGVG8uQbTf9+1/VorFdyF8vi0QmZ+NNB1lo1idq021vU1C+zHKIcpZtU2CvpL29nxYl3PtwlBtIFUV6ig9afDee5YIk2FoSyDXD/MwYSyKa8ZhxAFTzltxM7buj5OvMaR2aECo0c1Dv20WpMJ4w0xjjkE1KBvhJqrOjBsVPORQNyerrsN178nEzlizpffiRor5tByKDBEx42NddAi/hkMCI6YTHs1Tfu/pn4+Fy1U9pvKIwdnRgHs6cF3/3JM0qIhyc+WaT53bz1aFHvJn1R+b0KbleA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xAYBSKfP4pU3rqewRvgC57MxHVjYdDHw92TAgwIzleQ=;
+ b=Ql7kZbE9rrvarDroMOeScGdVpLS/pquJfUwRLi6qSzFEPvCgXHixPK2wPMc+AGveeSbeJtxoVOZOJxsJwtj14Urbh1bMJaXTo86y31n8AOH0PgThQdsN2TtL85jrjDJWT5jiT9ehVj5b+LEOjHE57ayFGqyzz2Nm3BYpVuMqlzGSk3WMaSAvwlVvIqZ39lnL1ezG5A+2qONwb5pevEc5hOxC+JLCtdhzLZbBTj+aa73/FErakaREOe4YFZLL6T5iVwUgn4hEiuODaRWvzN7ADyf2mBQV7Uf3w5MM093CDr6F2vj4oPg32TC4ZU4w7IlD/mD1+uWBm6SfbUucVcQwKw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by DM4PR12MB6280.namprd12.prod.outlook.com (2603:10b6:8:a2::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.17; Thu, 16 Nov
+ 2023 15:31:48 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::60d4:c1e3:e1aa:8f93%4]) with mapi id 15.20.7002.021; Thu, 16 Nov 2023
+ 15:31:48 +0000
+Date: Thu, 16 Nov 2023 11:31:47 -0400
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Matthew Wilcox <willy@infradead.org>, Linux-MM <linux-mm@kvack.org>
+Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+Message-ID: <ZVY14zBmi1wgZBiw@nvidia.com>
+References: <20231113130041.58124-1-linyunsheng@huawei.com>
+ <20231113130041.58124-4-linyunsheng@huawei.com>
+ <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+ <20231113180554.1d1c6b1a@kernel.org>
+ <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+ <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
+ <ZVNzS2EA4zQRwIQ7@nvidia.com>
+ <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
+ <ZVTJ0/lm1oUDzzHe@nvidia.com>
+ <0a1cdd5a-c4c5-3d77-20a2-2beb8e3a6411@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0a1cdd5a-c4c5-3d77-20a2-2beb8e3a6411@huawei.com>
+X-ClientProxiedBy: MN2PR01CA0012.prod.exchangelabs.com (2603:10b6:208:10c::25)
+ To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f8685ec7702c4a448a1371a8b34b43217b583b9d.1699898008.git.lucien.xin@gmail.com>
- <CAM0EoMmnzonWhGY7Di2wgrt--hJf5TrcCObPnkOuehLuiziKdw@mail.gmail.com>
- <CADvbK_fBwMohTb7eHBC5gosgfBUoeRw2uOPmE6SFRUC0isCL7A@mail.gmail.com>
- <CAM0EoMmMMMyxsktxCezjw-oePU-Lqsw2MMwMA5_hOLXiv5i4WA@mail.gmail.com> <ZVX+prlJ2EfB3kuF@t14s.localdomain>
-In-Reply-To: <ZVX+prlJ2EfB3kuF@t14s.localdomain>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 16 Nov 2023 10:29:39 -0500
-Message-ID: <CAM0EoMkue6_7G-_BWEDbjuEYPfjSCXdnmvMsEG+QUWAfJNoz4A@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: do not offload flows with a helper in act_ct
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Vladyslav Tarasiuk <vladyslavt@nvidia.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6280:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0d2036a7-a806-4355-1717-08dbe6b925e4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Zip2sGGvK1VzJ1t+mXTxfbOzsDPuVdgahrzxtHyDTVWf6tqtZWbIup8dRlI9lrMv8srU6mF8NjMV59wy6KQy8ZgJcEty3Np/1LaQM1Wj4frAxG95hjqkLv6O7D42TyRqfTyWMBg/GVM5rY88SN5P3grH9oWP7mL005l2n53O8yoePw8YazYSWkWzjtgkC6UULFdnGEYs7X1mo/LgP3JU7HDEERr77ulSvsAVBY0Cc6CfPcyrSs0swx+yH+D9WsI6ryF+DVx1X8IhoOlmjuqApW579lKlnXdovw5ReW1xMYLUgRDfKhBHl/24NE6HCR6havCVY1HutIIDUAfnRArmzVb565u8Wdy8JsU/pZYeXrXekr3scxt+L6gy8gJY8ulK8Ip+bnbWHnhxQiEoTYrkzZPUtdIvrH42pyuJMl6wRIvn/W+3d4s2Tl7NYkxz+1nEPDIkCqMKbO5PlzMz7NFvX34YGVqWBxptI/DZOMIKsDmfJZZCej/YZieyQ6U1Dmgrt1vSIJ4WMnxdYbO7wfKzfHHfPcYjdrRQXlxfUlLuJBQQG6PLVWB2rNNTqpTDwrT6
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(346002)(39860400002)(376002)(396003)(230922051799003)(64100799003)(451199024)(1800799009)(186009)(36756003)(83380400001)(6512007)(6506007)(478600001)(6486002)(4326008)(8936002)(66556008)(8676002)(2616005)(54906003)(55236004)(53546011)(26005)(6916009)(316002)(66476007)(66946007)(7416002)(2906002)(86362001)(38100700002)(41300700001)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SalxX0l0mbvb4JaLOjGZmgfHyt55sZ/6z54FDTQOfLjyquJFGzr4yk1YhCOU?=
+ =?us-ascii?Q?9TI4sAYlEPnnUgqvRQriH0bQiHkCsYuv9TQAZk01Wwmx5m95l9d0VBxOjhTI?=
+ =?us-ascii?Q?AVVxL1Ljfi4dOcAA1Yj/agW+eKhpkvK5fkvMqry9Zz/9+BRmegot2yoMrYRE?=
+ =?us-ascii?Q?azqrgnoKC1WJzSfiUMYz2kiIF2JCRS78aZpmpT6zeOlHknsYGxsPpBVerZSp?=
+ =?us-ascii?Q?XI4trQ7p0k0Uvggd3Qzkhj5EuEm/e7Yc07pop+8TAMgh0ywPG06UI/TQyjze?=
+ =?us-ascii?Q?wItDajRNzEAqQ8AIadpSrjEGrTSX0QexUBoNx0nZZ0ZBRNB54idSAUlp5Kas?=
+ =?us-ascii?Q?e+AAmRz5lOPTsI3glSrjdNVvgavjUY9Lx/ZvtSO8WR9EQHZcfGi5QqLHRXQs?=
+ =?us-ascii?Q?CO3Cgcf41TWJiVNUoFUvSMWr6PNn/rkHWpiZ34fiRjhzVThCvJN6H6Q29qPs?=
+ =?us-ascii?Q?Enxvt1g0CK44bSvuMYFQ4VliGKy6vrgvnO12pxlCAkticEBFN9PEm6LYBl+/?=
+ =?us-ascii?Q?qmRMi0qicE4tg0pEGICj9ZSA2sv8w/a6FyUcWBAQ/flu1arVImK5jKmLo3Xi?=
+ =?us-ascii?Q?9U6k0KkaW1BktKhSRi9P9FG9rgatINFtZOs8hWh+GLVywmNUtvNdBt6JAFsC?=
+ =?us-ascii?Q?gXvO8r2PgQwHc8XqMjDlI+PUzVcAtcFvNrjCHc0l1Ijk6Ff+5jZF5Adu1xy8?=
+ =?us-ascii?Q?xW9xAj2fQW459Zrn24EDHbeQAZJ3a/T/H7A/x5n0qoS6EsralEOwEPE7kB06?=
+ =?us-ascii?Q?PUC+dPpuQbBjC4+9YekFWH85t0gLfnPa0hW/BZ9bwcYQWz3MBcmlaswCKPAA?=
+ =?us-ascii?Q?RRH5OqgSV3mF3D3EGV/jarCJldkizsclQqVeBT0rHCm/251Lz+GKNz2Ulzoo?=
+ =?us-ascii?Q?SSbuzl/gA9GAe7d+fTn7bzJXryk8DKOyhUzc6p/CiB5BI7NqOMl63HfRes0V?=
+ =?us-ascii?Q?2goqpM7oUet+m+qXUfrK9amnRbCiCCSe38kx57OwVA//Nsb2ISgKTDrV2qtp?=
+ =?us-ascii?Q?uADOxJb/OHMAw+ijdt2P7I02ElL+gKvL1uOpNg0XXCHQEVYAWbNJExUng7gQ?=
+ =?us-ascii?Q?8tYxufjbK3hkqDISA6Dtd8diFDXRhe+Z73/U7MxjKwAckEwQAwwSHKHnTwma?=
+ =?us-ascii?Q?CCJ2I4E7I1L0gC7FlEnQJirfvHlvVt0JIXznHUnficAWO5QXNpun7v1YVna8?=
+ =?us-ascii?Q?45/2OCDSIa+oeNnfupUOsTOP5uMrek97zab+zvBeRniGLns9+iBGoBtQz63f?=
+ =?us-ascii?Q?SAU+7IBTRk54ikDQTAhKFgDY3qxG0BrUWmN/y8VVT+eR7MUErq4V0qLXx8YY?=
+ =?us-ascii?Q?Mlgk4P9ZCAGiGMP4wxFbSGjn4t7gtWLYzEYvjuAlsDzUzOLuk1d/7jRW8YIr?=
+ =?us-ascii?Q?2oCOFQckET3ETj6VuGC0rIcyzTRuEqGGR5DQsYWjZ1hOPW+eotvXTv6p1k7z?=
+ =?us-ascii?Q?sUuOdsJrnyuYmEd7+lI7x5OCPW3eWi0umM5gVViQFYoSbW67tYqcZNxAJSCH?=
+ =?us-ascii?Q?rAOdNBjJScbIIxk/244Tha1WGg+au5xgQ2mUpI3QZVdieK+Z8z9JG8e3tcT/?=
+ =?us-ascii?Q?f8MUx22oRs5v3YfFfvhIn2Lu5HatGotnLD5dkkt9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0d2036a7-a806-4355-1717-08dbe6b925e4
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2023 15:31:48.3994
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JFrTSH138ZaUuBrwLePA3Kpo2JQj3fzVaA6pD4EBLFvWj1d7eu5hG3jWd1UtJ6pH
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6280
 
-Hi Marcelo,
+On Thu, Nov 16, 2023 at 07:10:01PM +0800, Yunsheng Lin wrote:
+> On 2023/11/15 21:38, Jason Gunthorpe wrote:
+> > On Wed, Nov 15, 2023 at 05:21:02PM +0800, Yunsheng Lin wrote:
+> > 
+> >>>>> I would expect net stack, page pool, driver still see the 'struct page',
+> >>>>> only memory provider see the specific struct for itself, for the above,
+> >>>>> devmem memory provider sees the 'struct page_pool_iov'.
+> >>>>>
+> >>>>> The reason I still expect driver to see the 'struct page' is that driver
+> >>>>> will still need to support normal memory besides devmem.
+> >>>
+> >>> I wouldn't say this approach is unreasonable, but it does have to be
+> >>> done carefully to isolate the mm. Keeping the struct page in the API
+> >>> is going to make this very hard.
+> >>
+> >> I would expect that most of the isolation is done in page pool, as far as
+> >> I can see:
+> > 
+> > It is the sort of thing that is important enough it should have
+> > compiler help via types to prove that it is being done
+> > properly. Otherwise it will be full of mistakes over time.
+> 
+> Yes, agreed.
+> 
+> I have done something similar as willy has done for some of
+> folio conversion as below:
 
-On Thu, Nov 16, 2023 at 6:36=E2=80=AFAM Marcelo Ricardo Leitner
-<marcelo.leitner@gmail.com> wrote:
->
-> On Wed, Nov 15, 2023 at 11:37:51AM -0500, Jamal Hadi Salim wrote:
-> > Hi Xin,
-> >
-> > On Tue, Nov 14, 2023 at 10:18=E2=80=AFAM Xin Long <lucien.xin@gmail.com=
-> wrote:
-> > >
-> > > On Mon, Nov 13, 2023 at 4:37=E2=80=AFPM Jamal Hadi Salim <jhs@mojatat=
-u.com> wrote:
-> > > >
-> > > > On Mon, Nov 13, 2023 at 12:53=E2=80=AFPM Xin Long <lucien.xin@gmail=
-.com> wrote:
-> > > > >
-> > > > > There is no hardware supporting ct helper offload. However, prior=
- to this
-> > > > > patch, a flower filter with a helper in the ct action can be succ=
-essfully
-> > > > > set into the HW, for example (eth1 is a bnxt NIC):
-> > > > >
-> > > > >   # tc qdisc add dev eth1 ingress_block 22 ingress
-> > > > >   # tc filter add block 22 proto ip flower skip_sw ip_proto tcp \
-> > > > >     dst_port 21 ct_state -trk action ct helper ipv4-tcp-ftp
-> > > > >   # tc filter show dev eth1 ingress
-> > > > >
-> > > > >     filter block 22 protocol ip pref 49152 flower chain 0 handle =
-0x1
-> > > > >       eth_type ipv4
-> > > > >       ip_proto tcp
-> > > > >       dst_port 21
-> > > > >       ct_state -trk
-> > > > >       skip_sw
-> > > > >       in_hw in_hw_count 1   <----
-> > > > >         action order 1: ct zone 0 helper ipv4-tcp-ftp pipe
-> > > > >          index 2 ref 1 bind 1
-> > > > >         used_hw_stats delayed
-> > > > >
-> > > > > This might cause the flower filter not to work as expected in the=
- HW.
-> > > > >
-> > > > > This patch avoids this problem by simply returning -EOPNOTSUPP in
-> > > > > tcf_ct_offload_act_setup() to not allow to offload flows with a h=
-elper
-> > > > > in act_ct.
-> > > > >
-> > > > > Fixes: a21b06e73191 ("net: sched: add helper support in act_ct")
-> > > > > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > > >
-> > > > I didnt quite follow:
-> > > > The driver accepted the config, but the driver "kind of '' supports
-> > > > it. (enough to not complain and then display it when queried).
-> > > > Should the driver have rejected something it doesnt fully support?
-> > > Hi, Jamal,
-> > >
-> > > The sad thing is now it does not pass the 'helper' param to the HW in
-> > > tcf_ct_offload_act_setup() via struct flow_action_entry, in fact
-> > > flow_action_entry does not even have a member to keep 'helper'.
-> > >
-> > > Since no HW currently supports 'helper', we can stop it setting to HW
-> > > from here for now. In future, if HWs and struct flow_action_entry
-> > > support it, we can set it to the entry and reply on HWs to reject
-> > > it when not supported, as you mentioned above.
-> >
-> > That makes sense - so i am wondering why that was ever added there to
-> > begin with. Would there be any hardware that would have any helper
-> > support? If no, Shouldnt that code be deleted altogether?
->
-> Not sure if I follow you, Jamal. There's no code at all to pass the
-> helper information down to the drivers. So drivers ended up accepting
-> this flow because they had no idea that a helper was attached to it.
->
+That is not at all what I mean, I mean you should not use
+struct page * types at all in code that flows from the _iov version
+except via limited accessors that can be audited and have appropriate
+assertions.
 
-So is the goal:
-a) if there's a helper it doesnt make sense to offload the flow or
-b) if there's a helper then it(the helper) works in s/w only but the
-flow offload is still legit?
+Just releasing struct page * that is not a struct page * everywhere
+without type safety will never be correct long term.
 
-If it is #a then my question was why is that code even there in the
-offload path...
-Likely i am missing something..
-
-cheers,
-jamal
-
-> Then yes, ideally, it should be driver the one to reject the flow that
-> it doesn't support. But as currently zero drivers support it, and I
-> doubt one will in the future [*], this patch simplifies it by instead
-> of adding all the helper stuff to flow_action_entry, to just abort the
-> offload earlier.
->
-> [*] it requires parsing TCP payload, including over packet boundaries.
-> This is very expensive in hw. And leads to another problem: the HW
-> having to tell the SW stack about new conntrack expectations.
->
-
-
-> Chers,
-> Marcelo
->
-> >
-> > In any case, to the code correctness:
-> > Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >
-> > cheers,
-> > jamal
-> > > Thanks.
-> > > >
-> > > >
-> > > > cheers,
-> > > > jamal
-> > > >
-> > > > > ---
-> > > > >  include/net/tc_act/tc_ct.h | 9 +++++++++
-> > > > >  net/sched/act_ct.c         | 3 +++
-> > > > >  2 files changed, 12 insertions(+)
-> > > > >
-> > > > > diff --git a/include/net/tc_act/tc_ct.h b/include/net/tc_act/tc_c=
-t.h
-> > > > > index 8a6dbfb23336..77f87c622a2e 100644
-> > > > > --- a/include/net/tc_act/tc_ct.h
-> > > > > +++ b/include/net/tc_act/tc_ct.h
-> > > > > @@ -58,6 +58,11 @@ static inline struct nf_flowtable *tcf_ct_ft(c=
-onst struct tc_action *a)
-> > > > >         return to_ct_params(a)->nf_ft;
-> > > > >  }
-> > > > >
-> > > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const st=
-ruct tc_action *a)
-> > > > > +{
-> > > > > +       return to_ct_params(a)->helper;
-> > > > > +}
-> > > > > +
-> > > > >  #else
-> > > > >  static inline uint16_t tcf_ct_zone(const struct tc_action *a) { =
-return 0; }
-> > > > >  static inline int tcf_ct_action(const struct tc_action *a) { ret=
-urn 0; }
-> > > > > @@ -65,6 +70,10 @@ static inline struct nf_flowtable *tcf_ct_ft(c=
-onst struct tc_action *a)
-> > > > >  {
-> > > > >         return NULL;
-> > > > >  }
-> > > > > +static inline struct nf_conntrack_helper *tcf_ct_helper(const st=
-ruct tc_action *a)
-> > > > > +{
-> > > > > +       return NULL;
-> > > > > +}
-> > > > >  #endif /* CONFIG_NF_CONNTRACK */
-> > > > >
-> > > > >  #if IS_ENABLED(CONFIG_NET_ACT_CT)
-> > > > > diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-> > > > > index 0db0ecf1d110..b3f4a503ee2b 100644
-> > > > > --- a/net/sched/act_ct.c
-> > > > > +++ b/net/sched/act_ct.c
-> > > > > @@ -1549,6 +1549,9 @@ static int tcf_ct_offload_act_setup(struct =
-tc_action *act, void *entry_data,
-> > > > >         if (bind) {
-> > > > >                 struct flow_action_entry *entry =3D entry_data;
-> > > > >
-> > > > > +               if (tcf_ct_helper(act))
-> > > > > +                       return -EOPNOTSUPP;
-> > > > > +
-> > > > >                 entry->id =3D FLOW_ACTION_CT;
-> > > > >                 entry->ct.action =3D tcf_ct_action(act);
-> > > > >                 entry->ct.zone =3D tcf_ct_zone(act);
-> > > > > --
-> > > > > 2.39.1
-> > > > >
+Jason
 
