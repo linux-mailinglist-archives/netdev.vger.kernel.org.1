@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-48443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84BF47EE57C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:49:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 710507EE57D
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 17:49:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03D4E1F260D1
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:49:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93D901C20A27
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 16:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143D54122C;
-	Thu, 16 Nov 2023 16:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E173D3BB;
+	Thu, 16 Nov 2023 16:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NkGsDill"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="D8IaA2sv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72342D4B
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:36 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-9c3aec5f326so441141566b.1
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:36 -0800 (PST)
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356B4D59
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:38 -0800 (PST)
+Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-53dd752685fso1560725a12.3
+        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 08:48:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700153315; x=1700758115; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700153316; x=1700758116; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZINPLM47jewxX8k6AZrQ3FkxNVby2E3liigCGzybfzQ=;
-        b=NkGsDillaLjvbCWTmCbwkeqx/+OvxVExqpCEf1ZurMP9WBMqsXj6oa2k0Sp92r9x64
-         qmf6THs+3iVvhrsfGs55hyKuPB7WgPdTp9v6L0/BFFPPuSEoEeeMOoifuuRtHYgDQNpk
-         nk6k1udf6msVR1xX424qpdW7pAHBlv2jEZFS1zowjW0PCV6U20nkQx4cxjQUUUmFzVsW
-         ajTZRUKuu8FYErgeui/HBc0Vhiyvs1RuNjd7FNTa45Ik/9ZU2MALr9NkK9QkQCMSLKaX
-         +uTrWTDSL/6KSJKK4qqPtb6v7nAj7Mwh3k203XjCjJ6tGyNYV48CCtshyqUjX9ETomCV
-         vquw==
+        bh=htebmSb+wNlEeqd9kaA68nWsJmpSi+7d0VYs1jUfc3U=;
+        b=D8IaA2svju9dNgKiVWwAkJDcZmyzklb6DyFtLF0ga/I/3+2Gq2Ip0T0e579lvJouw8
+         pyH/7sk9mUsG555vc2RGKbreVhab9bg4CrFn0dU1eto0IgUe84gQRwUE3FDwUoMgW7yS
+         bcAj3aHlTgLL3FlLckwOdJ7LT2uDRbjcC8aaBczO+YxTmKbk1E/MBpc1CHZcWfK8NFVy
+         2TSwznn/XIZqSTAMNXflcurQqjOwy+ND7sOQc/dT9BrLfrBB73kFA6NWRJ+gXewapwno
+         /kVi4E8xolxzvBB4KkDyKnMAqkedMrfbMwXGW1FsfjuvELqE7B4BXZq5og+9lVWPMYXr
+         z2HQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700153315; x=1700758115;
+        d=1e100.net; s=20230601; t=1700153316; x=1700758116;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZINPLM47jewxX8k6AZrQ3FkxNVby2E3liigCGzybfzQ=;
-        b=YOAigHHHMOODFp+WACaF38UkxT2j85+W6kfGH7VRDTc0G7a2WP31Lbtx68Tqqaoa8F
-         7eK3AJQdwZRz4HpAqTl4FynMgNJuFrqmRMGWuQtuE0KWy0/WSQ1Sv2xn12l9o9Al3+fE
-         DifRCW9lGLOUIQH95eDFkk79IB6sBxlOxlODZpdOnU2BbrkIfLcDSuws76Ji7/RK86qS
-         3RoiNuMdFj8KRpy5P4yyW+onkr9hmhTFh46zgTt4k4h/OdzAUpzv/HLJN1860Atzul5O
-         GHyyAJMOgYDHJaeADPDn+n8Qa3LUTr2yC1+2/8S9euJzMqKDHOWmaYU+SSHidiDl0C5g
-         Mr5A==
-X-Gm-Message-State: AOJu0YxUJBzXyfJ7uj/EPtJwg5SsBSoJAMMlNyr7ZuMBI2o8hFw9D+x5
-	RCn9aVMq0vA+/Mtmx30NMPh/9dTgSxYKg9MyXtc=
-X-Google-Smtp-Source: AGHT+IG1swJGR8h/cneIYl81IXBXGVTsbo/CqaVFRaLZsbOJTRc5g/E0jXa+fpGaI2UzoVkZK2scjA==
-X-Received: by 2002:a17:906:f1c6:b0:9a2:295a:9bbc with SMTP id gx6-20020a170906f1c600b009a2295a9bbcmr2113713ejb.37.1700153314761;
-        Thu, 16 Nov 2023 08:48:34 -0800 (PST)
+        bh=htebmSb+wNlEeqd9kaA68nWsJmpSi+7d0VYs1jUfc3U=;
+        b=Py4l9OY0z2FSRBeKj4Io5xtg5Kka+iGSYAJDonqsmkygioESgPlQJKTIOoK17S7CPo
+         6JS9CsD/hTl9UorrSvp6KilDid1i2Lv3C7Is/3qEXGubiUBSh/GDb9R40uBQqz6Zw84L
+         QMy+bieDtIAQxfOSMNuiHL0sY/ICvaIk/FUzyF02iagJW9olTMY3Ktc5bt6BP9yXsxLZ
+         jj7QQQoZCpH16Fjq7U6PxtHErBCjSM9lsQvBQ94lgLFffarzFCFZ6CILbNN9ktF3rJf+
+         BzjkvZo93qP4/UltCJVDFbNMaIUE0kzSPPra8WcErzkMtb1PCsbvBtOd62yULMfdk4lt
+         rTRQ==
+X-Gm-Message-State: AOJu0YxMFbl6OR/H5o3RrVaA9fJ/XRonLg0FWcKLv3NlGZHHaGhkL+mC
+	Gh88BhmGyBD9WwQN3nIBjq1YZxCJG5m4hrfNy8M=
+X-Google-Smtp-Source: AGHT+IGto1g4OF4lw4/MnpcLq5nDXUgNy7om9PkbOEWWIapk7Ppkz/pBbXMsvFsfhFnqmnNM/h7gZw==
+X-Received: by 2002:a17:906:517:b0:9ae:6a60:81a2 with SMTP id j23-20020a170906051700b009ae6a6081a2mr12938798eja.25.1700153316634;
+        Thu, 16 Nov 2023 08:48:36 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id b13-20020a170906038d00b009bd9ac83a9fsm8639131eja.152.2023.11.16.08.48.33
+        by smtp.gmail.com with ESMTPSA id k9-20020a1709061c0900b009dd6aca60c6sm8576095ejg.89.2023.11.16.08.48.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 08:48:34 -0800 (PST)
+        Thu, 16 Nov 2023 08:48:35 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -65,9 +65,9 @@ Cc: kuba@kernel.org,
 	andriy.shevchenko@linux.intel.com,
 	amritha.nambiar@intel.com,
 	sdf@google.com
-Subject: [patch net-next v2 7/9] genetlink: introduce helpers to do filtered multicast
-Date: Thu, 16 Nov 2023 17:48:19 +0100
-Message-ID: <20231116164822.427485-8-jiri@resnulli.us>
+Subject: [patch net-next v2 8/9] devlink: add a command to set notification filter and use it for multicasts
+Date: Thu, 16 Nov 2023 17:48:20 +0100
+Message-ID: <20231116164822.427485-9-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231116164822.427485-1-jiri@resnulli.us>
 References: <20231116164822.427485-1-jiri@resnulli.us>
@@ -81,138 +81,340 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Currently it is possible for netlink kernel user to pass custom
-filter function to broadcast send function netlink_broadcast_filtered().
-However, this is not exposed to multicast send and to generic
-netlink users.
+Currently the user listening on a socket for devlink notifications
+gets always all messages for all existing instances, even if he is
+interested only in one of those. That may cause unnecessary overhead
+on setups with thousands of instances present.
 
-Extend the api and introduce a netlink helper nlmsg_multicast_filtered()
-and a generic netlink helper genlmsg_multicast_netns_filtered()
-to allow generic netlink families to specify filter function
-while sending multicast messages.
+User is currently able to narrow down the devlink objects replies
+to dump commands by specifying select attributes.
+
+Allow similar approach for notifications. Introduce a new devlink
+NOTIFY_FILTER_SET which the user passes the select attributes. Store
+these per-socket and use them for filtering messages
+during multicast send.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
-v1->v2:
-- used netlink_filter_fn introduce by the previous patch
-- added return comments to silence scripts/kernel-doc warnings
----
- include/net/genetlink.h | 35 +++++++++++++++++++++++++++++++----
- include/net/netlink.h   | 31 +++++++++++++++++++++++++++----
- 2 files changed, 58 insertions(+), 8 deletions(-)
+ Documentation/netlink/specs/devlink.yaml | 10 ++++
+ include/uapi/linux/devlink.h             |  2 +
+ net/devlink/devl_internal.h              | 33 +++++++++++-
+ net/devlink/netlink.c                    | 69 ++++++++++++++++++++++++
+ net/devlink/netlink_gen.c                | 15 +++++-
+ net/devlink/netlink_gen.h                |  4 +-
+ tools/net/ynl/generated/devlink-user.c   | 31 +++++++++++
+ tools/net/ynl/generated/devlink-user.h   | 47 ++++++++++++++++
+ 8 files changed, 207 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/genetlink.h b/include/net/genetlink.h
-index e18a4c0d69ee..246912033e77 100644
---- a/include/net/genetlink.h
-+++ b/include/net/genetlink.h
-@@ -435,6 +435,35 @@ static inline void genlmsg_cancel(struct sk_buff *skb, void *hdr)
- 		nlmsg_cancel(skb, hdr - GENL_HDRLEN - NLMSG_HDRLEN);
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 572d83a414d0..cc4991cbce83 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -2055,3 +2055,13 @@ operations:
+             - bus-name
+             - dev-name
+             - selftests
++
++    -
++      name: notify-filter-set
++      doc: Set notification messages socket filter.
++      attribute-set: devlink
++      do:
++        request:
++          attributes:
++            - bus-name
++            - dev-name
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index b3c8383d342d..130cae0d3e20 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -139,6 +139,8 @@ enum devlink_command {
+ 	DEVLINK_CMD_SELFTESTS_GET,	/* can dump */
+ 	DEVLINK_CMD_SELFTESTS_RUN,
+ 
++	DEVLINK_CMD_NOTIFY_FILTER_SET,
++
+ 	/* add new commands above here */
+ 	__DEVLINK_CMD_MAX,
+ 	DEVLINK_CMD_MAX = __DEVLINK_CMD_MAX - 1
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index e19e8dd47092..0ee0bcdd4a7d 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -178,11 +178,40 @@ static inline bool devlink_nl_notify_need(struct devlink *devlink)
+ 				  DEVLINK_MCGRP_CONFIG);
  }
  
-+/**
-+ * genlmsg_multicast_netns_filtered - multicast a netlink message
-+ *				      to a specific netns with filter
-+ *				      function
-+ * @family: the generic netlink family
-+ * @net: the net namespace
-+ * @skb: netlink message as socket buffer
-+ * @portid: own netlink portid to avoid sending to yourself
-+ * @group: offset of multicast group in groups array
-+ * @flags: allocation flags
-+ * @filter: filter function
-+ * @filter_data: filter function private data
-+ *
-+ * Return: 0 on success, negative error code for failure.
-+ */
-+static inline int
-+genlmsg_multicast_netns_filtered(const struct genl_family *family,
-+				 struct net *net, struct sk_buff *skb,
-+				 u32 portid, unsigned int group, gfp_t flags,
-+				 netlink_filter_fn filter,
-+				 void *filter_data)
++struct devlink_obj_desc {
++	const char *bus_name;
++	const char *dev_name;
++	long data[];
++};
++
++static inline void devlink_nl_obj_desc_init(struct devlink_obj_desc *desc,
++					    struct devlink *devlink)
 +{
-+	if (WARN_ON_ONCE(group >= family->n_mcgrps))
-+		return -EINVAL;
-+	group = family->mcgrp_offset + group;
-+	return nlmsg_multicast_filtered(net->genl_sock, skb, portid, group,
-+					flags, filter, filter_data);
++	memset(desc, 0, sizeof(*desc));
++	desc->bus_name = devlink->dev->bus->name;
++	desc->dev_name = dev_name(devlink->dev);
 +}
 +
- /**
-  * genlmsg_multicast_netns - multicast a netlink message to a specific netns
-  * @family: the generic netlink family
-@@ -448,10 +477,8 @@ static inline int genlmsg_multicast_netns(const struct genl_family *family,
- 					  struct net *net, struct sk_buff *skb,
- 					  u32 portid, unsigned int group, gfp_t flags)
- {
--	if (WARN_ON_ONCE(group >= family->n_mcgrps))
--		return -EINVAL;
--	group = family->mcgrp_offset + group;
--	return nlmsg_multicast(net->genl_sock, skb, portid, group, flags);
-+	return genlmsg_multicast_netns_filtered(family, net, skb, portid,
-+						group, flags, NULL, NULL);
- }
- 
- /**
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index 83bdf787aeee..f5423de36c21 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -1073,27 +1073,50 @@ static inline void nlmsg_free(struct sk_buff *skb)
- }
- 
- /**
-- * nlmsg_multicast - multicast a netlink message
-+ * nlmsg_multicast_filtered - multicast a netlink message with filter function
-  * @sk: netlink socket to spread messages to
-  * @skb: netlink message as socket buffer
-  * @portid: own netlink portid to avoid sending to yourself
-  * @group: multicast group id
-  * @flags: allocation flags
-+ * @filter: filter function
-+ * @filter_data: filter function private data
-+ *
-+ * Return: 0 on success, negative error code for failure.
-  */
--static inline int nlmsg_multicast(struct sock *sk, struct sk_buff *skb,
--				  u32 portid, unsigned int group, gfp_t flags)
-+static inline int nlmsg_multicast_filtered(struct sock *sk, struct sk_buff *skb,
-+					   u32 portid, unsigned int group,
-+					   gfp_t flags,
-+					   netlink_filter_fn filter,
-+					   void *filter_data)
- {
- 	int err;
- 
- 	NETLINK_CB(skb).dst_group = group;
- 
--	err = netlink_broadcast(sk, skb, portid, group, flags);
-+	err = netlink_broadcast_filtered(sk, skb, portid, group, flags,
-+					 filter, filter_data);
- 	if (err > 0)
- 		err = 0;
- 
- 	return err;
- }
- 
-+/**
-+ * nlmsg_multicast - multicast a netlink message
-+ * @sk: netlink socket to spread messages to
-+ * @skb: netlink message as socket buffer
-+ * @portid: own netlink portid to avoid sending to yourself
-+ * @group: multicast group id
-+ * @flags: allocation flags
-+ */
-+static inline int nlmsg_multicast(struct sock *sk, struct sk_buff *skb,
-+				  u32 portid, unsigned int group, gfp_t flags)
++int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data);
++
++static inline void devlink_nl_notify_send_desc(struct devlink *devlink,
++					       struct sk_buff *msg,
++					       struct devlink_obj_desc *desc)
 +{
-+	return nlmsg_multicast_filtered(sk, skb, portid, group, flags,
-+					NULL, NULL);
++	genlmsg_multicast_netns_filtered(&devlink_nl_family,
++					 devlink_net(devlink),
++					 msg, 0, DEVLINK_MCGRP_CONFIG,
++					 GFP_KERNEL,
++					 devlink_nl_notify_filter, desc);
 +}
 +
- /**
-  * nlmsg_unicast - unicast a netlink message
-  * @sk: netlink socket to spread message to
+ static inline void devlink_nl_notify_send(struct devlink *devlink,
+ 					  struct sk_buff *msg)
+ {
+-	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
+-				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
++	struct devlink_obj_desc desc;
++
++	devlink_nl_obj_desc_init(&desc, devlink);
++	devlink_nl_notify_send_desc(devlink, msg, &desc);
+ }
+ 
+ /* Notify */
+diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
+index d0b90ebc8b15..738e2f340ab9 100644
+--- a/net/devlink/netlink.c
++++ b/net/devlink/netlink.c
+@@ -13,6 +13,75 @@ static const struct genl_multicast_group devlink_nl_mcgrps[] = {
+ 	[DEVLINK_MCGRP_CONFIG] = { .name = DEVLINK_GENL_MCGRP_CONFIG_NAME },
+ };
+ 
++int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
++				      struct genl_info *info)
++{
++	struct sock *sk = NETLINK_CB(skb).sk;
++	struct nlattr **attrs = info->attrs;
++	struct devlink_obj_desc *flt;
++	size_t data_offset = 0;
++	size_t data_size = 0;
++	char *pos;
++
++	if (attrs[DEVLINK_ATTR_BUS_NAME])
++		data_size += nla_len(attrs[DEVLINK_ATTR_BUS_NAME]) + 1;
++	if (attrs[DEVLINK_ATTR_DEV_NAME])
++		data_size += nla_len(attrs[DEVLINK_ATTR_DEV_NAME]) + 1;
++
++	flt = kzalloc(sizeof(*flt) + data_size, GFP_KERNEL);
++	if (!flt)
++		return -ENOMEM;
++
++	pos = (char *) flt->data;
++	if (attrs[DEVLINK_ATTR_BUS_NAME]) {
++		data_offset += nla_strscpy(pos,
++					   attrs[DEVLINK_ATTR_BUS_NAME],
++					   data_size) + 1;
++		flt->bus_name = pos;
++		pos += data_offset;
++	}
++	if (attrs[DEVLINK_ATTR_DEV_NAME]) {
++		nla_strscpy(pos, attrs[DEVLINK_ATTR_DEV_NAME],
++			    data_size - data_offset);
++		flt->dev_name = pos;
++	}
++
++	/* Free the existing filter if any. */
++	kfree(sk->sk_user_data);
++
++	/* Don't attach empty filter. */
++	if (!flt->bus_name && !flt->dev_name) {
++		kfree(flt);
++		flt = NULL;
++	}
++
++	sk->sk_user_data = flt;
++	return 0;
++}
++
++static bool devlink_obj_desc_match(const struct devlink_obj_desc *desc,
++				   const struct devlink_obj_desc *flt)
++{
++	if (desc->bus_name && flt->bus_name &&
++	    strcmp(desc->bus_name, flt->bus_name))
++		return false;
++	if (desc->dev_name && flt->dev_name &&
++	    strcmp(desc->dev_name, flt->dev_name))
++		return false;
++	return true;
++}
++
++int devlink_nl_notify_filter(struct sock *dsk, struct sk_buff *skb, void *data)
++{
++	struct devlink_obj_desc *flt = dsk->sk_user_data;
++	struct devlink_obj_desc *desc = data;
++
++	if (!flt)
++		return 0;
++
++	return !devlink_obj_desc_match(desc, flt);
++}
++
+ int devlink_nl_put_nested_handle(struct sk_buff *msg, struct net *net,
+ 				 struct devlink *devlink, int attrtype)
+ {
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index 788dfdc498a9..f207f3fc7e20 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -560,8 +560,14 @@ static const struct nla_policy devlink_selftests_run_nl_policy[DEVLINK_ATTR_SELF
+ 	[DEVLINK_ATTR_SELFTESTS] = NLA_POLICY_NESTED(devlink_dl_selftest_id_nl_policy),
+ };
+ 
++/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
++static const struct nla_policy devlink_notify_filter_set_nl_policy[DEVLINK_ATTR_DEV_NAME + 1] = {
++	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
++	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
++};
++
+ /* Ops table for devlink */
+-const struct genl_split_ops devlink_nl_ops[73] = {
++const struct genl_split_ops devlink_nl_ops[74] = {
+ 	{
+ 		.cmd		= DEVLINK_CMD_GET,
+ 		.validate	= GENL_DONT_VALIDATE_STRICT,
+@@ -1233,4 +1239,11 @@ const struct genl_split_ops devlink_nl_ops[73] = {
+ 		.maxattr	= DEVLINK_ATTR_SELFTESTS,
+ 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+ 	},
++	{
++		.cmd		= DEVLINK_CMD_NOTIFY_FILTER_SET,
++		.doit		= devlink_nl_notify_filter_set_doit,
++		.policy		= devlink_notify_filter_set_nl_policy,
++		.maxattr	= DEVLINK_ATTR_DEV_NAME,
++		.flags		= GENL_CMD_CAP_DO,
++	},
+ };
+diff --git a/net/devlink/netlink_gen.h b/net/devlink/netlink_gen.h
+index 0e9e89c31c31..71693d834ad2 100644
+--- a/net/devlink/netlink_gen.h
++++ b/net/devlink/netlink_gen.h
+@@ -16,7 +16,7 @@ extern const struct nla_policy devlink_dl_port_function_nl_policy[DEVLINK_PORT_F
+ extern const struct nla_policy devlink_dl_selftest_id_nl_policy[DEVLINK_ATTR_SELFTEST_ID_FLASH + 1];
+ 
+ /* Ops table for devlink */
+-extern const struct genl_split_ops devlink_nl_ops[73];
++extern const struct genl_split_ops devlink_nl_ops[74];
+ 
+ int devlink_nl_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 			struct genl_info *info);
+@@ -137,5 +137,7 @@ int devlink_nl_selftests_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int devlink_nl_selftests_get_dumpit(struct sk_buff *skb,
+ 				    struct netlink_callback *cb);
+ int devlink_nl_selftests_run_doit(struct sk_buff *skb, struct genl_info *info);
++int devlink_nl_notify_filter_set_doit(struct sk_buff *skb,
++				      struct genl_info *info);
+ 
+ #endif /* _LINUX_DEVLINK_GEN_H */
+diff --git a/tools/net/ynl/generated/devlink-user.c b/tools/net/ynl/generated/devlink-user.c
+index bc5065bd99b2..cd5f70eadf5b 100644
+--- a/tools/net/ynl/generated/devlink-user.c
++++ b/tools/net/ynl/generated/devlink-user.c
+@@ -6830,6 +6830,37 @@ int devlink_selftests_run(struct ynl_sock *ys,
+ 	return 0;
+ }
+ 
++/* ============== DEVLINK_CMD_NOTIFY_FILTER_SET ============== */
++/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
++void
++devlink_notify_filter_set_req_free(struct devlink_notify_filter_set_req *req)
++{
++	free(req->bus_name);
++	free(req->dev_name);
++	free(req);
++}
++
++int devlink_notify_filter_set(struct ynl_sock *ys,
++			      struct devlink_notify_filter_set_req *req)
++{
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, DEVLINK_CMD_NOTIFY_FILTER_SET, 1);
++	ys->req_policy = &devlink_nest;
++
++	if (req->_present.bus_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_BUS_NAME, req->bus_name);
++	if (req->_present.dev_name_len)
++		mnl_attr_put_strz(nlh, DEVLINK_ATTR_DEV_NAME, req->dev_name);
++
++	err = ynl_exec(ys, nlh, NULL);
++	if (err < 0)
++		return -1;
++
++	return 0;
++}
++
+ const struct ynl_family ynl_devlink_family =  {
+ 	.name		= "devlink",
+ };
+diff --git a/tools/net/ynl/generated/devlink-user.h b/tools/net/ynl/generated/devlink-user.h
+index 1db4edc36eaa..e5d79b824a67 100644
+--- a/tools/net/ynl/generated/devlink-user.h
++++ b/tools/net/ynl/generated/devlink-user.h
+@@ -5252,4 +5252,51 @@ devlink_selftests_run_req_set_selftests_flash(struct devlink_selftests_run_req *
+ int devlink_selftests_run(struct ynl_sock *ys,
+ 			  struct devlink_selftests_run_req *req);
+ 
++/* ============== DEVLINK_CMD_NOTIFY_FILTER_SET ============== */
++/* DEVLINK_CMD_NOTIFY_FILTER_SET - do */
++struct devlink_notify_filter_set_req {
++	struct {
++		__u32 bus_name_len;
++		__u32 dev_name_len;
++	} _present;
++
++	char *bus_name;
++	char *dev_name;
++};
++
++static inline struct devlink_notify_filter_set_req *
++devlink_notify_filter_set_req_alloc(void)
++{
++	return calloc(1, sizeof(struct devlink_notify_filter_set_req));
++}
++void
++devlink_notify_filter_set_req_free(struct devlink_notify_filter_set_req *req);
++
++static inline void
++devlink_notify_filter_set_req_set_bus_name(struct devlink_notify_filter_set_req *req,
++					   const char *bus_name)
++{
++	free(req->bus_name);
++	req->_present.bus_name_len = strlen(bus_name);
++	req->bus_name = malloc(req->_present.bus_name_len + 1);
++	memcpy(req->bus_name, bus_name, req->_present.bus_name_len);
++	req->bus_name[req->_present.bus_name_len] = 0;
++}
++static inline void
++devlink_notify_filter_set_req_set_dev_name(struct devlink_notify_filter_set_req *req,
++					   const char *dev_name)
++{
++	free(req->dev_name);
++	req->_present.dev_name_len = strlen(dev_name);
++	req->dev_name = malloc(req->_present.dev_name_len + 1);
++	memcpy(req->dev_name, dev_name, req->_present.dev_name_len);
++	req->dev_name[req->_present.dev_name_len] = 0;
++}
++
++/*
++ * Set notification messages socket filter.
++ */
++int devlink_notify_filter_set(struct ynl_sock *ys,
++			      struct devlink_notify_filter_set_req *req);
++
+ #endif /* _LINUX_DEVLINK_GEN_H */
 -- 
 2.41.0
 
