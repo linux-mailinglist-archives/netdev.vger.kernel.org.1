@@ -1,169 +1,78 @@
-Return-Path: <netdev+bounces-48458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4251E7EE674
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 19:11:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53F177EE67D
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 19:12:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF850281116
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 18:11:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84E051C20A60
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 18:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7B930CE5;
-	Thu, 16 Nov 2023 18:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C417D35883;
+	Thu, 16 Nov 2023 18:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="foy417+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF009195;
-	Thu, 16 Nov 2023 10:11:40 -0800 (PST)
-Received: from [192.168.1.103] (31.173.84.76) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 16 Nov
- 2023 21:11:31 +0300
-Subject: Re: [PATCH net v2] ravb: Fix races between ravb_tx_timeout_work() and
- net related ops
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>
-References: <20231019113308.1133944-1-yoshihiro.shimoda.uh@renesas.com>
- <f5421248-3341-a5f7-84e6-c601df470a63@omp.ru>
- <TYBPR01MB5341061AB0A805D0AF71FBB5D8B1A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
- <69392d22-8ade-81aa-72b1-6a4abce8a4a7@omp.ru>
- <TYBPR01MB5341A4AE46EA9261469C735DD8B0A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <29603244-d65a-5ca0-90d4-fdd9f410e180@omp.ru>
-Date: Thu, 16 Nov 2023 21:11:31 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795921A8;
+	Thu, 16 Nov 2023 10:12:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Dy6raJ/CUfjvTNheXRnlkCtCUSg34o+Shs1RwXwxo50=; b=foy417+0rwd88OmjIiXATRdbnM
+	ebmY3QKC+9RcmTTKlAaWak/su2hkQZRHoLIkH9q7qaah/Oedanah7hl3YJYYeZPDwZ2B1wKlXmd9c
+	cFXJGupiyyk4jm1MdT5u0lxJM/W+vwMS7hAc/yumY+702JR9NA5FULiSMAvSlTjVRm00=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r3gqR-000NVy-Iq; Thu, 16 Nov 2023 19:12:03 +0100
+Date: Thu, 16 Nov 2023 19:12:03 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Conor Dooley <conor@kernel.org>
+Cc: Luo Jie <quic_luoj@quicinc.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	corbet@lwn.net, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v4 2/6] dt-bindings: net: ethernet-controller: add
+ 10g-qxgmii mode
+Message-ID: <739c89ec-739e-4c5d-8e42-88ed9a89979b@lunn.ch>
+References: <20231116112437.10578-1-quic_luoj@quicinc.com>
+ <20231116112437.10578-3-quic_luoj@quicinc.com>
+ <20231116-flier-washed-eb1a45481323@squawk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <TYBPR01MB5341A4AE46EA9261469C735DD8B0A@TYBPR01MB5341.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.84.76]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/16/2023 17:56:40
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181428 [Nov 16 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.84.76 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.84.76
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/16/2023 18:01:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/16/2023 3:28:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116-flier-washed-eb1a45481323@squawk>
 
-On 11/16/23 5:15 AM, Yoshihiro Shimoda wrote:
-[...]
-
->>>>> Fix races between ravb_tx_timeout_work() and functions of net_device_ops
->>>>> and ethtool_ops by using rtnl_trylock() and rtnl_unlock(). Note that
->>>>> since ravb_close() is under the rtnl lock and calls cancel_work_sync(),
->>>>> ravb_tx_timeout_work() should calls rtnl_trylock(). Otherwise, a deadlock
->>>>> may happen in ravb_tx_timeout_work() like below:
->>>>>
->>>>> CPU0			CPU1
->>>>> 			ravb_tx_timeout()
->>>>> 			schedule_work()
->>>>> ...
->>>>> __dev_close_many()
->>>>> // Under rtnl lock
->>>>> ravb_close()
->>>>> cancel_work_sync()
->>>>> // Waiting
->>>>> 			ravb_tx_timeout_work()
->>>>> 			rtnl_lock()
->>>>> 			// This is possible to cause a deadlock
->>>>>
->>>>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
->>>>> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->>>>
->>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->>
->> [...]
->>
->>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>>>> index 0ef0b88b7145..300c1885e1e1 100644
->>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->>>>> @@ -1874,6 +1874,9 @@ static void ravb_tx_timeout_work(struct work_struct *work)
->>>>>  	struct net_device *ndev = priv->ndev;
->>>>>  	int error;
->>>>>
->>>>> +	if (!rtnl_trylock())
->>>>> +		return;
->>>>
->>>>    I wonder if we should reschedule the work here...
->>>
->>> I think so. But, it should reschedule the work if the netif is still running because
->>> Use-after-free issue happens again when cancel_work_sync() is calling. Also, I also think
->>> we should use schedule_delayed_work() instead. So, I'll submit such a patch as v3.
->>
->>    I'm not really sure about that one. Note that cancel_work_sync() should
->> work with the works requeueing themselves, the comments say...
+On Thu, Nov 16, 2023 at 02:22:41PM +0000, Conor Dooley wrote:
+> On Thu, Nov 16, 2023 at 07:24:33PM +0800, Luo Jie wrote:
+> > Add the new interface mode 10g-qxgmii, which is similar to
+> > usxgmii but extend to 4 channels to support maximum of 4
+> > ports with the link speed 10M/100M/1G/2.5G.
+> > 
 > 
-> I'm sorry, I completely mistook to explain this... I should have said:
+> > This patch is separated from Vladimir Oltean's previous patch
+> > <net: phy: introduce core support for phy-mode = "10g-qxgmii">.
+> 
+> This belongs in the changelog under the --- line.
+> 
+> > 
+> > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> Are you missing a from: line in this patch?
 
-   Don't worry, my uncertainty was about using the "delayed" flavor of
-the works. :-)
+You probably need to use git commit --am --author=<author> to fix
+this.
 
-> It should not reschedule the work if the netif is not running because
->           ~~~                                     ~~~
-> use-after-free issue happens again when cancel_work_sync() is called from ravb_remove().
->                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   Well, it's called from ravb_close() -- which is called by the networking
-core when unregister_netdev() is called bt ravb_remove()...
-
-> Also, I completely misunderstood the behavior of cancel_{schedule_}work_sync().
-
-   cancel_{delayed_}work_sync(), you meant...
-
-> In the function(s), since WORK_STRUCT_PENDING_BIT is set, schedule_{delayed_}work()
-> will not schedule the work anymore. So, I'll drop a condition netif_running()
-> from the ravb_tx_timeout_work().
-
-  Hm, this caused me to rummage in the work queue code for more time than
-I could afford... still not sure what you meant... :-/
-
-> Best regards,
-> Yoshihiro Shimoda
-[...]
-
-MBR, Sergey
+	Andrew
 
