@@ -1,77 +1,86 @@
-Return-Path: <netdev+bounces-48493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4242D7EE95C
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 23:38:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080267EE965
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 23:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0551C209A3
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:38:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A54C2281112
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 22:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E89FFBE8;
-	Thu, 16 Nov 2023 22:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0801C1171E;
+	Thu, 16 Nov 2023 22:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wPvRW8it"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4gMdz1A"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E38127;
-	Thu, 16 Nov 2023 14:38:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xuF2C8TJoQo2qBcUEs/xMXKLb/wi1r/KhlqS7IpgHyw=; b=wPvRW8itCui06NIV77eqBmTEPN
-	NhCEInIkOCMV8sZZNNf1trGFQZSVV2CWaqEYMlmV/CbRBLqs3+SNgJfqUgHYaStxCepL5rD5NEpsQ
-	Sr6U2kCZAYezeBxgUKSDFCiHexDLzOrca+0ADevRFm/1LkdhQ38oc8lRmWztGfqojBc0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r3kzw-000OSv-5i; Thu, 16 Nov 2023 23:38:08 +0100
-Date: Thu, 16 Nov 2023 23:38:08 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
- driver
-Message-ID: <47d42d52-943c-467d-bcc0-fcb274f69841@lunn.ch>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D274011718;
+	Thu, 16 Nov 2023 22:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 633FAC433C9;
+	Thu, 16 Nov 2023 22:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700174426;
+	bh=hhJxCwgkhNq5mTKwgfqKGY5emDpnAzXQlHkFgPmYc4o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=R4gMdz1AeYvYzouClPzwzjMPLEOwKFQMHmTQQAiHd0UPMC63KNQP1XhJHI4xWhL3m
+	 HgZ6aI6N7f0PpazRRax3Guk6mXAba8jCbTFoGZYRKXDhEBv5RBGUm9elIE0k+b6V6S
+	 YEs9261FGCTRcKqEP3mVmAs+Z1IlcUOzQBYaS2yO/i5BNRvpq3CRgokli2E8OXMTqI
+	 F7nCn5vjn9aMBV5/T5dvDBXBBMBRihgXNTmVOU7+HIiwpPnoi/7KEAsyznv4Pr1D/v
+	 x/S4wCt8k0HDdStFS825iHeU2tHQ8JnnPeGG5+VJk4W6QTZwyG4IkV94+oP14ih499
+	 95twpEA1TJy2A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46BA1E00090;
+	Thu, 16 Nov 2023 22:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] selftests/net: synchronize udpgro tests' tx and
+ rx connection
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170017442628.21715.12487651571633570474.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Nov 2023 22:40:26 +0000
+References: <jvzrm33xjrhal3qro37tfpfw2w4jbh35byjlogcc776xt4fpzy@zkmfoqn5ipil>
+In-Reply-To: <jvzrm33xjrhal3qro37tfpfw2w4jbh35byjlogcc776xt4fpzy@zkmfoqn5ipil>
+To: Lucas Karpinski <lkarpins@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-> +static int pd692x0_send_msg(struct pd692x0_priv *priv, struct pd692x0_msg *msg)
-> +{
-> +	const struct i2c_client *client = priv->client;
-> +	int ret;
-> +
-> +	if (msg->content.key == PD692X0_KEY_CMD && priv->last_cmd_key) {
-> +		while (time_is_after_jiffies(msecs_to_jiffies(30) + priv->last_cmd_key_time))
-> +			usleep_range(1000, 2000);
+Hello:
 
-That is a bit odd. Could you not just calculate how long a sleep is
-needed, rather than loop?
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-	Andrew
+On Tue, 14 Nov 2023 10:11:31 -0500 you wrote:
+> The sockets used by udpgso_bench_tx aren't always ready when
+> udpgso_bench_tx transmits packets. This issue is more prevalent in -rt
+> kernels, but can occur in both. Replace the hacky sleep calls with a
+> function that checks whether the ports in the namespace are ready for
+> use.
+> 
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Signed-off-by: Lucas Karpinski <lkarpins@redhat.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] selftests/net: synchronize udpgro tests' tx and rx connection
+    https://git.kernel.org/netdev/net-next/c/3bdd9fd29cb0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
