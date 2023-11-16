@@ -1,154 +1,145 @@
-Return-Path: <netdev+bounces-48280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8C057EDEDE
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:49:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49EB27EDEE8
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 11:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB85A1C209F1
-	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:49:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9B9D280F56
+	for <lists+netdev@lfdr.de>; Thu, 16 Nov 2023 10:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0C0C29434;
-	Thu, 16 Nov 2023 10:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 356312D04E;
+	Thu, 16 Nov 2023 10:53:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WHqdBDWc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbhSAl7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28C5618B;
-	Thu, 16 Nov 2023 02:48:53 -0800 (PST)
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AG4r8A2027231;
-	Thu, 16 Nov 2023 10:48:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=J/GfrTozsME6TxWB6Io+G6rYB6XogVeT7NQ1aAvCyrE=;
- b=WHqdBDWc/J6jobRFhpx+Yr/6hjfHtfqJuPYh3z4lXevgRxd942vm6kZwd/EXnGMz2Xli
- OPoUQvJ1Y0I2jyyYVNLS2IZNBXNWzwBYwMc9FpSE4MtpNKzkOF4pdH2MZEp/WojJv4Vl
- xNVljAHurZxGTlusa2ATGPRA7IIWzkYxoPPFJdIL7F27wOvH3WBJgNuRzaHa2PKAGFBQ
- bcXu6MRvG1FzYEx0pRNX0FEhJ7hgnZ8CDtgFJIxUTpCGeVjP6USYqi7cx9QLDSGLxra5
- amERxp2mebbjlDdUGvkberZOfrDR0uW2N+f0AGjDLWOO+ZeMOL4K3z7073SCnXSERhi4 GQ== 
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ud6echbe1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Nov 2023 10:48:40 +0000
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AGAmdO9031656
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Nov 2023 10:48:39 GMT
-Received: from [10.253.72.184] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Thu, 16 Nov
- 2023 02:48:34 -0800
-Message-ID: <4cdaf41c-6cc0-470f-97a7-8b08fdde7f6c@quicinc.com>
-Date: Thu, 16 Nov 2023 18:48:34 +0800
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3021AE;
+	Thu, 16 Nov 2023 02:53:18 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-5c184b3bbc4so498512a12.1;
+        Thu, 16 Nov 2023 02:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700131997; x=1700736797; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6wLYSXzg5tmYqidzmV/DNDn2+dFtQpnSIBReQdUv9g=;
+        b=PbhSAl7hch40DGTORDWg9KAdz/piYCL8XZRCIdxK0N+pRQRDjZBHB0ZW6z5V1D8/58
+         CR1zJKqCN063BFQRXpHXCxFISK7i9k4H9ZK/eq/ZWWjRUqeVR9LLU2qnzKoVyH3n0Ru/
+         jWRRzphJhtXtmzhOLCdvfGN/JsXucF8K5UH7bX83X1PDm7pnlNqUjyszfDA4QRSbI7dm
+         +kKit5yVZpqFpD33K/ZMItnt2j/24DitPjfr458j2wc4Zxg3wrkPRE9HHLbXm+6qMqJR
+         aC3m/NGqof/aHgfrvhPnYX1KAdvXGjxgSF4T75DwMo9LsRlSPXFHrwSfclapLAe5jp6k
+         oO+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700131997; x=1700736797;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J6wLYSXzg5tmYqidzmV/DNDn2+dFtQpnSIBReQdUv9g=;
+        b=ozaxevbCiLoCyyEFgsXZwcbZU86YRKJUv9HebqXb0eADRu4frYH+h8wPccWuLj/uIR
+         6KqAoRQ2J6gMXDb23BGd8EWx2a4Q3Qn4Leyz8eOf/ny6+KyDfPhGXAfL6w/aWl8tY3YD
+         Ps3NYZiU5R+K3ONYaeuSlWl79NLPEKC+356PAZ+uOB9mmnWpts4Iz9ki+9wyZyENMyFa
+         YM6frpwQTex3cQs809h1pUBbkpf1ItqYTzZl+I7nvcPSxNJYYzy/yHZZiylw/+kbhFJb
+         T4uqN3cT4UE0AsZeKddQrGoqVDcombvshPxGmuvNbaQERQcquehxCfpfceISVWnZXCSQ
+         7QGA==
+X-Gm-Message-State: AOJu0YwIGBICnsZlab+ltfXGw0RRVj5PVjd0WUV1oMcl4PuVvIGZk58w
+	Xb+4e11HFm+EeJR5hfCcIrA=
+X-Google-Smtp-Source: AGHT+IHviUA6wsN7WBJ0vdUlc5oRn54uPX/2SL1zM7nRFKveJPLaxBH16YaTE8jA32XcURweaSCFnA==
+X-Received: by 2002:a17:90b:1810:b0:280:2652:d42 with SMTP id lw16-20020a17090b181000b0028026520d42mr17763037pjb.23.1700131997392;
+        Thu, 16 Nov 2023 02:53:17 -0800 (PST)
+Received: from archie.me ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id r6-20020a17090a560600b0026b3f76a063sm1300560pjf.44.2023.11.16.02.53.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 02:53:16 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 9876410206E62; Thu, 16 Nov 2023 17:53:11 +0700 (WIB)
+Date: Thu, 16 Nov 2023 17:53:11 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Anil Choudhary <anilchabba@gmail.com>,
+	Linux regressions mailing list <regressions@lists.linux.dev>
+Cc: Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: sr-iov related bonding regression (two regressions in one report)
+Message-ID: <ZVX0l0pTgbe0LKp7@archie.me>
+References: <986716ed-f898-4a02-a8f6-94f85b355a05@gmail.com>
+ <32716.1700009673@famine>
+ <0f97acf9-012d-4bb2-a766-0c2737e32b2c@leemhuis.info>
+ <CC024511-980A-4508-8ABF-659A04367C2B@gmail.com>
+ <7AC9E8F6-B229-47AA-84CE-1149F45D7E0F@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/9] net: mdio: ipq4019: configure CMN PLL clock for
- ipq5332
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-5-quic_luoj@quicinc.com>
- <e1fecfd7-3de1-4719-879b-fd486fdc3815@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <e1fecfd7-3de1-4719-879b-fd486fdc3815@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: xQMCGXHJXj6dafljrE4_RKd20FN4NeAo
-X-Proofpoint-ORIG-GUID: xQMCGXHJXj6dafljrE4_RKd20FN4NeAo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-16_09,2023-11-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 mlxlogscore=783 bulkscore=0
- suspectscore=0 phishscore=0 priorityscore=1501 spamscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311160085
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="e1HJro3cB6s4ipwc"
+Content-Disposition: inline
+In-Reply-To: <7AC9E8F6-B229-47AA-84CE-1149F45D7E0F@gmail.com>
 
 
+--e1HJro3cB6s4ipwc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 11/15/2023 11:19 PM, Andrew Lunn wrote:
->> +static void ipq_cmn_clock_config(struct mii_bus *bus)
->> +{
->> +	u32 reg_val;
->> +	const char *cmn_ref_clk;
->> +	struct ipq4019_mdio_data *priv = bus->priv;
-> 
-> Reverse christmass tree place.
+On Wed, Nov 15, 2023 at 12:48:51PM -0800, Anil Choudhary wrote:
+> We are getting errorError subscribing to SWID 0x0000.
+>  from following code
+> root@us-ash-r1-c2-m1:~/linux# grep -rn -e "subscribing to " .
+> grep: ./debian/linux-image/lib/modules/6.6.1-vdx/kernel/drivers/net/ether=
+net/intel/ice/ice.ko: binary file matches
+> ./samples/connector/ucon.c:149: ulog("subscribing to %u.%u\n", CN_TEST_ID=
+X, CN_TEST_VAL);
+> ./Documentation/driver-api/media/v4l2-event.rst:117:add      called when =
+a new listener gets added (subscribing to the same
+> ./Documentation/driver-api/media/v4l2-event.rst:130:Unsubscribing to an e=
+vent is via:
+> ./Documentation/maintainer/feature-and-driver-maintainers.rst:44:mailing =
+list. Either by subscribing to the whole list or using more
+> grep: ./drivers/net/ethernet/intel/ice/ice_lag.o: binary file matches
+> grep: ./drivers/net/ethernet/intel/ice/ice.o: binary file matches
+> grep: ./drivers/net/ethernet/intel/ice/ice.ko: binary file matches
+> ./drivers/net/ethernet/intel/ice/ice_lag.c:1007:                dev_err(i=
+ce_pf_to_dev(local_lag->pf), "Error subscribing to SWID 0x%04X\n",
+> root@us-ash-r1-c2-m1:~/linux#
+>=20
 
-will fix it in the next patch set.
+Again, please don't top-post; reply inline with appropriate context instead.
+You may need to configure your email client to start reply below the quoted
+context.
 
-> 
->> +
->> +	if (priv && priv->cmn_membase) {
-> 
-> Can priv be NULL? Can cmn_membase be NULL?
+OK, now on your Bugzilla ticket, please attach the full log (either from
+dmesg or from journalctl). And don't forget to perform bisection if
+you'd like to get this regression fixed.
 
-priv can't be NULL, cmn_membase is optional, the legacy chip does not
-provide the cmn_membase in device node.
+Thanks.
 
-will remove the priv check here.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-> 
->> +		reg_val = readl(priv->cmn_membase + CMN_PLL_REFERENCE_CLOCK);
->> +		reg_val &= ~(CMN_PLL_REFCLK_EXTERNAL | CMN_PLL_REFCLK_INDEX);
->> +
->> +		/* Select reference clock source */
->> +		cmn_ref_clk = of_get_property(bus->parent->of_node, "cmn_ref_clk", NULL);
->> +		if (!cmn_ref_clk) {
->> +			/* Internal 48MHZ selected by default */
->> +			reg_val |= FIELD_PREP(CMN_PLL_REFCLK_INDEX, 7);
->> +		} else {
->> +			if (!strcmp(cmn_ref_clk, "external_25MHz"))
-> 
-> Not strings, please use u32 values. You can then list the valid values
-> in the yaml file, and get te tools to verify the DT.
+--e1HJro3cB6s4ipwc
+Content-Type: application/pgp-signature; name="signature.asc"
 
-will update this in the next patch.
+-----BEGIN PGP SIGNATURE-----
 
-> 
->> +				reg_val |= (CMN_PLL_REFCLK_EXTERNAL |
->> +					    FIELD_PREP(CMN_PLL_REFCLK_INDEX, 3));
->> +			else if (!strcmp(cmn_ref_clk, "external_31250KHz"))
->> +				reg_val |= (CMN_PLL_REFCLK_EXTERNAL |
->> +					    FIELD_PREP(CMN_PLL_REFCLK_INDEX, 4));
->> +			else if (!strcmp(cmn_ref_clk, "external_40MHz"))
->> +				reg_val |= (CMN_PLL_REFCLK_EXTERNAL |
->> +					    FIELD_PREP(CMN_PLL_REFCLK_INDEX, 6));
->> +			else if (!strcmp(cmn_ref_clk, "external_48MHz"))
->> +				reg_val |= (CMN_PLL_REFCLK_EXTERNAL |
->> +					    FIELD_PREP(CMN_PLL_REFCLK_INDEX, 7));
->> +			else if (!strcmp(cmn_ref_clk, "external_50MHz"))
->> +				reg_val |= (CMN_PLL_REFCLK_EXTERNAL |
->> +					    FIELD_PREP(CMN_PLL_REFCLK_INDEX, 8));
->> +			else
->> +				reg_val |= FIELD_PREP(CMN_PLL_REFCLK_INDEX, 7);
-> 
-> If the value is not valid, return -EINVAL.
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZVX0kwAKCRD2uYlJVVFO
+o7fjAQC0MeTuZpur/LspKJ2Mx7S+c45gX313sk1uD4kt7ANNVwEA/ivKY/8tlYLK
+LIZuHFWvA3qMyHT4vgtG8fcqbuN8igc=
+=O+Fn
+-----END PGP SIGNATURE-----
 
-will add it in the next patch set.
-
-> 
->     Andrew
+--e1HJro3cB6s4ipwc--
 
