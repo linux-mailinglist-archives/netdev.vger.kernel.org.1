@@ -1,40 +1,60 @@
-Return-Path: <netdev+bounces-48682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0FA7EF37E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:09:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7CB7EF375
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13DE5281268
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:09:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94986B20BEB
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:08:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1848C30CF7;
-	Fri, 17 Nov 2023 13:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1929431735;
+	Fri, 17 Nov 2023 13:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="OWVZZU4a"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="Q+2mo0fS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567FD10D5;
-	Fri, 17 Nov 2023 05:09:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1700226503; x=1700831303; i=markus.elfring@web.de;
-	bh=iZYfyA85WBO41mIJWajYdm+66zp6Smj869NjgfI995I=;
-	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
-	 In-Reply-To;
-	b=OWVZZU4ad9bIVuYSWUi+4xtwKYx9hEdmknfy7WgxMs1XWHHCxQFiBDylSaXf7eUu
-	 3JiDluNOST0hny9812v+8ObZesB7RRvl4yTJ0Wp1NLmvKYlUhM2nVCNmrfYV9D/I7
-	 spEmHsRnEY3l128uEe7M7Ubmr7TnAoydrY5HjiK4+vAk0mKO1DDT9gdp4mrKi0dOK
-	 esuSOUhp5qHQJari9qL/nKgfLgib7Mp/6xnyKRCohMH1gi9IK69HDb4t6n4/lqd1t
-	 uUKaZIQ26AYpBinfJmq9TIHwwb/jugpOdI0NaRf/6Hixtowujq4GEwj98dZ7kR4mZ
-	 zkesh26UwHMyVzOgCA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MrOdp-1rflWC0J9z-00oImp; Fri, 17
- Nov 2023 14:08:23 +0100
-Message-ID: <2745ab4e-acac-40d4-83bf-37f2600d0c3d@web.de>
-Date: Fri, 17 Nov 2023 14:07:47 +0100
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60953198A
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 05:08:02 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 41be03b00d2f7-5bdf5a025c1so1435185a12.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 05:08:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1700226481; x=1700831281; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d9fdCxWyHirIf75E8ne+77U4HI/4T7vekYV9npqdJ2s=;
+        b=Q+2mo0fS/WnFTIEOaUwWzeukaBfD/GNJgzuXcz7DVeqXrZsngozfAbxWtjBjpd8qZu
+         rrEZ/KS3npRjRhk7YGnZt2P7wD175G/NEiFEIz9+D0Gda8mSsrBxQKjrE3gQAC+mMThs
+         KOu0wJjhQyBGfcDv5GLQ0U3qDHkb1fzesiIjVp0Zjeg0F/TJOWfsDLzA5Vg6X0D2PNY1
+         mzNil6EeJvm5o9wLy24oANbWiLlWhtgv09tcdn7GmQEUXRnpsEQYkJd6hN2xxS7YKPkN
+         ozudVog0ohNgT5XxKgBVLAJ0MwoPS0N7tr/DJ40IgnN4L8OsEF32XCyPX3vMKgO/rxfR
+         +y2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700226481; x=1700831281;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d9fdCxWyHirIf75E8ne+77U4HI/4T7vekYV9npqdJ2s=;
+        b=LpW0edwlxeSd9AV3H+E1rtAW5msSFXsdCDkQeAk/BcsZV65v3bLWwLCxtmItKfX8Ku
+         bZvYb7IPuANKjZSst7sheQ8ESfrLrqFNMrNf8pJilTY+zQb4IpNpsKXiJBI1K4F5f1K/
+         N8CWArRidLINEBthvUC6r1SYOllq1fnBqzOxjpjCxB2+KG37Z14PEfCXHTJ1OQu1Npzy
+         7tvnfNhmRK4ott3cyIFaYEJO8590noJgt8WBCDAh5uZV9lHXdjJJ6iRJIa2DRAD33nw6
+         IJ3PLna9GrODw3P1ioYMk8biSHvYW0Zn4iotoWxC/YBY/mW9noZa7ir6cEhNsX3Vd/Zs
+         qlgg==
+X-Gm-Message-State: AOJu0Yxy/DGWK2ciYmJPCRHImM+qU0s4xI4ijcgqKYS2HBFTpXp4LhZ0
+	RiaVxp8vDJ+fJrLy6kMq+dpSOg==
+X-Google-Smtp-Source: AGHT+IHv3bjAyGwReXBeWwfu4ee84yUM0tRIPUR3mRnPcXCX/nhgkHOlVIJ/4G1aznUdKoi/6ZQhuQ==
+X-Received: by 2002:a17:90b:3a87:b0:279:1367:b9a3 with SMTP id om7-20020a17090b3a8700b002791367b9a3mr17276460pjb.4.1700226481568;
+        Fri, 17 Nov 2023 05:08:01 -0800 (PST)
+Received: from [10.254.46.51] ([139.177.225.228])
+        by smtp.gmail.com with ESMTPSA id 5-20020a17090a1a4500b0028017a2a8fasm1488628pjl.3.2023.11.17.05.07.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Nov 2023 05:08:01 -0800 (PST)
+Message-ID: <46a997c2-5a38-4b60-b589-6073b1fac677@bytedance.com>
+Date: Fri, 17 Nov 2023 21:07:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,64 +62,274 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Dmitry Safonov <dima@arista.com>, David Ahern <dsahern@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Paolo Abeni <pabeni@redhat.com>, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Andy Lutomirski
- <luto@amacapital.net>, Ard Biesheuvel <ardb@kernel.org>,
- Bob Gilligan <gilligan@arista.com>, Dan Carpenter <error27@gmail.com>,
- David Laight <David.Laight@aculab.com>, Dmitry Safonov
- <0x7f454c46@gmail.com>, Dominik Gaillardetz <dgaillar@ciena.com>,
- Donald Cassidy <dcassidy@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- Francesco Ruggeri <fruggeri05@gmail.com>,
- Francois Tetreault <ftetreau@ciena.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Hideaki Yoshifuji <yoshfuji@linux-ipv6.org>,
- Ivan Delalande <colona@arista.com>, Leonard Crestez <cdleonard@gmail.com>,
- Mohammad Nassiri <mnassiri@ciena.com>,
- Salam Noureddine <noureddine@arista.com>, Simon Horman <horms@kernel.org>
-References: <20231023192217.426455-24-dima@arista.com>
-Subject: Re: [PATCH v16 net-next 23/23] Documentation/tcp: Add TCP-AO
- documentation
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20231023192217.426455-24-dima@arista.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:8FSoGo8zdqcp7mpZWq477RGhG5Hqd7w+By7DXykamyPi+Noo7Vt
- vVSD8kF/TLgjanN0k33t82HAauWC9lOSyztubyi5snvX+a93ra7snpLVaZJHwMkHjmQG9AP
- o+BTP+d0WFLCHjMz08bTl5W+ZFWiBI4k0DnijEsVF55eb3p8Hqw3x9hdMDgBpfV1zxwnevo
- pgFtPwH7l19MaQkcwpl5g==
-UI-OutboundReport: notjunk:1;M01:P0:bUxgAhWCPss=;iKMNGM0QHwl6Ll42MyaU2Zdo2hj
- qlU0gDDLYZtkpKwRkrYShyOzipomjCrzNaLYtBlwJMRyy8SwRYiwyd3NqWOKZAKZFQ9B0waW4
- d/Y+ugttBNPg2HRD6vb/P0RwiXXXWl3rKhs9g9J9k78lgUE0b0GvZgqLhpMMAhYWQYajimvtL
- xG1OJch7ytNFWm/GTqdwD/pk8Ffrz20kAZVikF4i7GFf1mwU15jdgEjgea7mYBpakbsv8yT1h
- ZileBZYvCV90QrSIxpDaieUB3fU6WJCFWiEJzSn+L/3X2TX3rB8z9mwRyievM2g04MGeilL6T
- vY7cUpbg958ZL8BypOCfYx1N6ActPS+MHeD3mDQI2kci0v1zHk2ylQzVgShwCiCVeJZ88KauY
- wSAirNtIV9QtaOcwabIF5hwjeeluNoOl13S8F40CafdpwpYSpMpzW6mfqNPauIIEfJ8TVuNTR
- 40Z5bvy5w2vTCzAYJb+rJFYvWEe+2I1g4WD0KvpgZy0SI20r+YOS/JCGkvntedjuYbgTc5qkl
- Wuz7b8SJ+s1vUBCDtdnx77iLptzfXHe3DsTNhYoUqL+P9f0gMh0hwnssP3gnHJivPFj7lBkLZ
- iHajLsbGdCJ9jReEeoxt/SSYAIxAvqzo41bkV048iYxRdVpFKbbnnbP2KOX7Wt6mYUBpnJOxC
- C548MES1ddI7j/fQLjz7gARDwSbvgOHEMRuUotDa05uta+cN7sUI4p+zwZ8SBSJ10dq+C5tf0
- TwmUNQdu+OLvhmoulzelccPB3krwcSjiMLBO2v1jk7yrRGn2s694aELOVPLbZd0HE1brm6WgJ
- akIKv3bp76Kiq4sDM2P974h8nNWJ3kN1QVpWH79+QY+g4LZjtp8gPXNvZn5E8JR2V+ls2n4Or
- wz9178pqF1zOW37Vwz3+OjCmv/C2W9IZfyzBnFBDrdBe+FvJ74ogY0RB3m/COZQ4bPeKobdfp
- jb+ohA==
+Subject: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair:
+ Add lag based placement)
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>,
+ Tobias Huschle <huschle@linux.ibm.com>
+Cc: Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <ZVdbdSXg4qefTNtg@DESKTOP-2CCOB1S.>
+ <20231117123759.GP8262@noisy.programming.kicks-ass.net>
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20231117123759.GP8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-=E2=80=A6
-> +++ b/Documentation/networking/tcp_ao.rst
-> @@ -0,0 +1,444 @@
-=E2=80=A6
-> +                                          =E2=80=A6 failure. But sine k=
-eeping
-=E2=80=A6
+On 11/17/23 8:37 PM, Peter Zijlstra Wrote:
+> On Fri, Nov 17, 2023 at 01:24:21PM +0100, Tobias Huschle wrote:
+>> On Fri, Nov 17, 2023 at 10:23:18AM +0100, Peter Zijlstra wrote:
+> 
+>>> kworkers are typically not in cgroups and are part of the root cgroup,
+>>> but what's a vhost and where does it live?
+>>
+>> The qemu instances of the two KVM guests are placed into cgroups.
+>> The vhosts run within the context of these qemu instances (4 threads per guest).
+>> So they are also put into those cgroups.
+>>
+>> I'll answer the other questions you brought up as well, but I guess that one
+>> is most critical:
+>>
+>>>
+>>> After confirming both tasks are indeed in the same cgroup ofcourse,
+>>> because if they're not, vruntime will be meaningless to compare and we
+>>> should look elsewhere.
+>>
+>> In that case we probably have to go with elsewhere ... which is good to know.
+> 
+> Ah, so if this is a cgroup issue, it might be worth trying this patch
+> that we have in tip/sched/urgent.
 
-I find this wording improvable.
-How do you think about to use the word =E2=80=9Csince=E2=80=9D here?
+And please also apply this fix:
+https://lore.kernel.org/all/20231117080106.12890-1-s921975628@gmail.com/
 
-Regards,
-Markus
+> 
+> I'll try and read the rest of the email a little later, gotta run
+> errands first.
+> 
+> ---
+> 
+> commit eab03c23c2a162085b13200d7942fc5a00b5ccc8
+> Author: Abel Wu <wuyun.abel@bytedance.com>
+> Date:   Tue Nov 7 17:05:07 2023 +0800
+> 
+>      sched/eevdf: Fix vruntime adjustment on reweight
+>      
+>      vruntime of the (on_rq && !0-lag) entity needs to be adjusted when
+>      it gets re-weighted, and the calculations can be simplified based
+>      on the fact that re-weight won't change the w-average of all the
+>      entities. Please check the proofs in comments.
+>      
+>      But adjusting vruntime can also cause position change in RB-tree
+>      hence require re-queue to fix up which might be costly. This might
+>      be avoided by deferring adjustment to the time the entity actually
+>      leaves tree (dequeue/pick), but that will negatively affect task
+>      selection and probably not good enough either.
+>      
+>      Fixes: 147f3efaa241 ("sched/fair: Implement an EEVDF-like scheduling policy")
+>      Signed-off-by: Abel Wu <wuyun.abel@bytedance.com>
+>      Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>      Link: https://lkml.kernel.org/r/20231107090510.71322-2-wuyun.abel@bytedance.com
+> 
+> diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+> index 2048138ce54b..025d90925bf6 100644
+> --- a/kernel/sched/fair.c
+> +++ b/kernel/sched/fair.c
+> @@ -3666,41 +3666,140 @@ static inline void
+>   dequeue_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se) { }
+>   #endif
+>   
+> +static void reweight_eevdf(struct cfs_rq *cfs_rq, struct sched_entity *se,
+> +			   unsigned long weight)
+> +{
+> +	unsigned long old_weight = se->load.weight;
+> +	u64 avruntime = avg_vruntime(cfs_rq);
+> +	s64 vlag, vslice;
+> +
+> +	/*
+> +	 * VRUNTIME
+> +	 * ========
+> +	 *
+> +	 * COROLLARY #1: The virtual runtime of the entity needs to be
+> +	 * adjusted if re-weight at !0-lag point.
+> +	 *
+> +	 * Proof: For contradiction assume this is not true, so we can
+> +	 * re-weight without changing vruntime at !0-lag point.
+> +	 *
+> +	 *             Weight	VRuntime   Avg-VRuntime
+> +	 *     before    w          v            V
+> +	 *      after    w'         v'           V'
+> +	 *
+> +	 * Since lag needs to be preserved through re-weight:
+> +	 *
+> +	 *	lag = (V - v)*w = (V'- v')*w', where v = v'
+> +	 *	==>	V' = (V - v)*w/w' + v		(1)
+> +	 *
+> +	 * Let W be the total weight of the entities before reweight,
+> +	 * since V' is the new weighted average of entities:
+> +	 *
+> +	 *	V' = (WV + w'v - wv) / (W + w' - w)	(2)
+> +	 *
+> +	 * by using (1) & (2) we obtain:
+> +	 *
+> +	 *	(WV + w'v - wv) / (W + w' - w) = (V - v)*w/w' + v
+> +	 *	==> (WV-Wv+Wv+w'v-wv)/(W+w'-w) = (V - v)*w/w' + v
+> +	 *	==> (WV - Wv)/(W + w' - w) + v = (V - v)*w/w' + v
+> +	 *	==>	(V - v)*W/(W + w' - w) = (V - v)*w/w' (3)
+> +	 *
+> +	 * Since we are doing at !0-lag point which means V != v, we
+> +	 * can simplify (3):
+> +	 *
+> +	 *	==>	W / (W + w' - w) = w / w'
+> +	 *	==>	Ww' = Ww + ww' - ww
+> +	 *	==>	W * (w' - w) = w * (w' - w)
+> +	 *	==>	W = w	(re-weight indicates w' != w)
+> +	 *
+> +	 * So the cfs_rq contains only one entity, hence vruntime of
+> +	 * the entity @v should always equal to the cfs_rq's weighted
+> +	 * average vruntime @V, which means we will always re-weight
+> +	 * at 0-lag point, thus breach assumption. Proof completed.
+> +	 *
+> +	 *
+> +	 * COROLLARY #2: Re-weight does NOT affect weighted average
+> +	 * vruntime of all the entities.
+> +	 *
+> +	 * Proof: According to corollary #1, Eq. (1) should be:
+> +	 *
+> +	 *	(V - v)*w = (V' - v')*w'
+> +	 *	==>    v' = V' - (V - v)*w/w'		(4)
+> +	 *
+> +	 * According to the weighted average formula, we have:
+> +	 *
+> +	 *	V' = (WV - wv + w'v') / (W - w + w')
+> +	 *	   = (WV - wv + w'(V' - (V - v)w/w')) / (W - w + w')
+> +	 *	   = (WV - wv + w'V' - Vw + wv) / (W - w + w')
+> +	 *	   = (WV + w'V' - Vw) / (W - w + w')
+> +	 *
+> +	 *	==>  V'*(W - w + w') = WV + w'V' - Vw
+> +	 *	==>	V' * (W - w) = (W - w) * V	(5)
+> +	 *
+> +	 * If the entity is the only one in the cfs_rq, then reweight
+> +	 * always occurs at 0-lag point, so V won't change. Or else
+> +	 * there are other entities, hence W != w, then Eq. (5) turns
+> +	 * into V' = V. So V won't change in either case, proof done.
+> +	 *
+> +	 *
+> +	 * So according to corollary #1 & #2, the effect of re-weight
+> +	 * on vruntime should be:
+> +	 *
+> +	 *	v' = V' - (V - v) * w / w'		(4)
+> +	 *	   = V  - (V - v) * w / w'
+> +	 *	   = V  - vl * w / w'
+> +	 *	   = V  - vl'
+> +	 */
+> +	if (avruntime != se->vruntime) {
+> +		vlag = (s64)(avruntime - se->vruntime);
+> +		vlag = div_s64(vlag * old_weight, weight);
+> +		se->vruntime = avruntime - vlag;
+> +	}
+> +
+> +	/*
+> +	 * DEADLINE
+> +	 * ========
+> +	 *
+> +	 * When the weight changes, the virtual time slope changes and
+> +	 * we should adjust the relative virtual deadline accordingly.
+> +	 *
+> +	 *	d' = v' + (d - v)*w/w'
+> +	 *	   = V' - (V - v)*w/w' + (d - v)*w/w'
+> +	 *	   = V  - (V - v)*w/w' + (d - v)*w/w'
+> +	 *	   = V  + (d - V)*w/w'
+> +	 */
+> +	vslice = (s64)(se->deadline - avruntime);
+> +	vslice = div_s64(vslice * old_weight, weight);
+> +	se->deadline = avruntime + vslice;
+> +}
+> +
+>   static void reweight_entity(struct cfs_rq *cfs_rq, struct sched_entity *se,
+>   			    unsigned long weight)
+>   {
+> -	unsigned long old_weight = se->load.weight;
+> +	bool curr = cfs_rq->curr == se;
+>   
+>   	if (se->on_rq) {
+>   		/* commit outstanding execution time */
+> -		if (cfs_rq->curr == se)
+> +		if (curr)
+>   			update_curr(cfs_rq);
+>   		else
+> -			avg_vruntime_sub(cfs_rq, se);
+> +			__dequeue_entity(cfs_rq, se);
+>   		update_load_sub(&cfs_rq->load, se->load.weight);
+>   	}
+>   	dequeue_load_avg(cfs_rq, se);
+>   
+> -	update_load_set(&se->load, weight);
+> -
+>   	if (!se->on_rq) {
+>   		/*
+>   		 * Because we keep se->vlag = V - v_i, while: lag_i = w_i*(V - v_i),
+>   		 * we need to scale se->vlag when w_i changes.
+>   		 */
+> -		se->vlag = div_s64(se->vlag * old_weight, weight);
+> +		se->vlag = div_s64(se->vlag * se->load.weight, weight);
+>   	} else {
+> -		s64 deadline = se->deadline - se->vruntime;
+> -		/*
+> -		 * When the weight changes, the virtual time slope changes and
+> -		 * we should adjust the relative virtual deadline accordingly.
+> -		 */
+> -		deadline = div_s64(deadline * old_weight, weight);
+> -		se->deadline = se->vruntime + deadline;
+> -		if (se != cfs_rq->curr)
+> -			min_deadline_cb_propagate(&se->run_node, NULL);
+> +		reweight_eevdf(cfs_rq, se, weight);
+>   	}
+>   
+> +	update_load_set(&se->load, weight);
+> +
+>   #ifdef CONFIG_SMP
+>   	do {
+>   		u32 divider = get_pelt_divider(&se->avg);
+> @@ -3712,8 +3811,17 @@ static void reweight_entity(struct cfs_rq *cfs_rq, struct sched_entity *se,
+>   	enqueue_load_avg(cfs_rq, se);
+>   	if (se->on_rq) {
+>   		update_load_add(&cfs_rq->load, se->load.weight);
+> -		if (cfs_rq->curr != se)
+> -			avg_vruntime_add(cfs_rq, se);
+> +		if (!curr) {
+> +			/*
+> +			 * The entity's vruntime has been adjusted, so let's check
+> +			 * whether the rq-wide min_vruntime needs updated too. Since
+> +			 * the calculations above require stable min_vruntime rather
+> +			 * than up-to-date one, we do the update at the end of the
+> +			 * reweight process.
+> +			 */
+> +			__enqueue_entity(cfs_rq, se);
+> +			update_min_vruntime(cfs_rq);
+> +		}
+>   	}
+>   }
+>   
+> @@ -3857,14 +3965,11 @@ static void update_cfs_group(struct sched_entity *se)
+>   
+>   #ifndef CONFIG_SMP
+>   	shares = READ_ONCE(gcfs_rq->tg->shares);
+> -
+> -	if (likely(se->load.weight == shares))
+> -		return;
+>   #else
+> -	shares   = calc_group_shares(gcfs_rq);
+> +	shares = calc_group_shares(gcfs_rq);
+>   #endif
+> -
+> -	reweight_entity(cfs_rq_of(se), se, shares);
+> +	if (unlikely(se->load.weight != shares))
+> +		reweight_entity(cfs_rq_of(se), se, shares);
+>   }
+>   
+>   #else /* CONFIG_FAIR_GROUP_SCHED */
 
