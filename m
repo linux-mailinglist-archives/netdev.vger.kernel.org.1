@@ -1,221 +1,158 @@
-Return-Path: <netdev+bounces-48645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9850A7EF147
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:59:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0068A7EF149
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB28F1C2084D
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:59:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7AF51F2890A
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D18C1A719;
-	Fri, 17 Nov 2023 10:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1W/gjNcg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9BC1A728;
+	Fri, 17 Nov 2023 11:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53097B3
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:59:42 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so7428a12.1
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:59:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700218781; x=1700823581; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vGSJhMQLQHd9biRHUxWSjeHfJhsfFu4krkHp3T9mhXE=;
-        b=1W/gjNcgwACeQkSRlaIOy6nekpNO9R5VaFkHjQrmCs1CFbgPBdbT9NeshWDDjQ0nYR
-         tVOObHzQQKzJnK8SRfqGTHgyrD1vu6irbzgqoUZnnjQK5m3RQJHZlE9tTGF3bdw8LUV+
-         6naiQ93CWjPMr/vFAah1XjQJbKvb/HtHHTPR2uC52sgEL+vsg6L88h0BWuxBbE5oTbbm
-         UTuHfGJtUb227S1qclr0IfwXFiYAoiGSMnvuEzVc70GdZ+oj+8XWTnnyTvZbTfOGvsFK
-         5s3OIZb0UhqayC31ihUU9Xwp/rhNjkWl32M1629HsQehz5X6ii5ObaMdfCrg0V60LXtw
-         kCRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700218781; x=1700823581;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vGSJhMQLQHd9biRHUxWSjeHfJhsfFu4krkHp3T9mhXE=;
-        b=lXdgW55iTmslMXkd3dEVkQFIbVTn3LrTgtM+1hD7GQMDcNg5+pkLeu5c/QtIpZKL2i
-         lhNykOPt+9TJFg7FpavSz6e9pVYEM/3rBvdAVzWHcinb85YcUL1fNVLqSleIJHFnY3YT
-         9Z6rQYjycGmjwTpL2oqoXfjthPu9JGzV2WSLKyGQ0nWgypKBdmMNPaZYaakjZyKu3eU+
-         uADkR4nTo1Zv5IUL+DWUjiAaSOCnpxGKOWxHOk9lTu9x9mVFolFeF7OVsdaqLL3vFTK8
-         MYFar3VfHK1QfwZorDxr6o17PQASi4YLsABdOtneGjFsJOzS0XnnS77wOjG0YOMGo1NP
-         5rZg==
-X-Gm-Message-State: AOJu0YwtFFLiPyLWjGvl5tJWQhv60sUKmiS2kw6VKeGnVtVhpF3xTgYE
-	tt8YVpL3tiB98//0oXJSTnNSFWlqBycsJY95lPhOqw==
-X-Google-Smtp-Source: AGHT+IEZCsl7cGhKoqE5WneQsLe+U1yQ/gra+BndxIG1+VURv+zKznyx2chZoVGDEYpKu+UqLrDXYcPwtlJmEQgjZ1Q=
-X-Received: by 2002:a05:6402:10ca:b0:544:466b:3b20 with SMTP id
- p10-20020a05640210ca00b00544466b3b20mr87286edu.5.1700218780533; Fri, 17 Nov
- 2023 02:59:40 -0800 (PST)
+Received: from wangsu.com (unknown [180.101.34.75])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 122E611D;
+	Fri, 17 Nov 2023 02:59:54 -0800 (PST)
+Received: from XMCDN1207038 (unknown [59.61.78.234])
+	by app2 (Coremail) with SMTP id SyJltACHAhKmR1dl66hhAA--.26433S2;
+	Fri, 17 Nov 2023 18:59:51 +0800 (CST)
+From: "Pengcheng Yang" <yangpc@wangsu.com>
+To: "'John Fastabend'" <john.fastabend@gmail.com>,
+	"'Jakub Sitnicki'" <jakub@cloudflare.com>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	<bpf@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com> <1699962120-3390-3-git-send-email-yangpc@wangsu.com> <6554713028d5b_3733620856@john.notmuch> <000101da17b9$36951720$a3bf4560$@wangsu.com> <6556c2c238099_537dc208ab@john.notmuch>
+In-Reply-To: <6556c2c238099_537dc208ab@john.notmuch>
+Subject: Re: [PATCH bpf-next 2/3] tcp: Add the data length in skmsg to SIOCINQ ioctl
+Date: Fri, 17 Nov 2023 18:59:50 +0800
+Message-ID: <009601da1945$2ff0d0c0$8fd27240$@wangsu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
- <20231117104311.1273-1-haifeng.xu@shopee.com>
-In-Reply-To: <20231117104311.1273-1-haifeng.xu@shopee.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 17 Nov 2023 11:59:27 +0100
-Message-ID: <CANn89iKsirkSvxK4L9KQqD7Q7r0MaxOx71VBk73RCi8b1NkiZw@mail.gmail.com>
-Subject: Re: [PATCH v2] bonding: use a read-write lock in bonding_show_bonds()
-To: Haifeng Xu <haifeng.xu@shopee.com>
-Cc: andy@greyhouse.net, davem@davemloft.net, j.vosburgh@gmail.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHO/J1mBkmXfIRCzv54wVJwMMBhiQJx1G0UAqlCf8QBxnk5/QJgXLDNsEp4bpA=
+Content-Language: zh-cn
+X-CM-TRANSID:SyJltACHAhKmR1dl66hhAA--.26433S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXw1xZw43AF4UXFyxAFykAFb_yoWrAw1UpF
+	W5KF1Skr4kCr4xArZ2vw1fX3W3K393KF17Xrn8t3y3Aws0kFySyr45GF4Y9FZ7tr4rur4Y
+	vr4jgrWS9wn8ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Ib7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
+	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
+	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4
+	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0EF7xvrVAajcxG14v2
+	6r1j6r4UMcIj6x8ErcxFaVAv8VW8GwAv7VCY1x0262k0Y48FwI0_Gr1j6F4UJwAm72CE4I
+	kC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xS
+	Y4AK67AK6r4DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
+	IYCTnIWIevJa73UjIFyTuYvjxUD0edUUUUU
+X-CM-SenderInfo: p1dqw1nf6zt0xjvxhudrp/
 
-On Fri, Nov 17, 2023 at 11:43=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.com>=
- wrote:
->
-> Problem description:
->
-> Call stack:
-> ......
-> PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
-> [ffffa7a8e96bbac0] __schedule at ffffffffb0719898
-> [ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
-> [ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
-> [ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
-> [ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
-> [ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
-> [ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
-> [ffffa7a8e96bbc80] device_del at ffffffffb0209af8
-> [ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
-> [ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
-> [ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
-> [ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
-> [ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
-> [ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
-> [ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
-> [ffffa7a8e96bbf10] kthread at ffffffffafae132a
-> [ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
->
-> 290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-expor=
-ter"
-> [ffffa7a8d14dbb80] __schedule at ffffffffb0719898
-> [ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
-> [ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
-> [ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
-> [ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
-> [ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
-> [ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
-> [ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
-> [ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
-> [ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
-> [ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
-> [ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
-> [ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
-> [ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
-> [ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
-> [ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
-> [ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
-> [ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
-> [ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
-> ......
->
-> Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
-> but there are many readers which hold the kernfs_rwsem, so it has to slee=
-p
-> for a long time to wait the readers release the lock. Thread 278176 and a=
-ny
-> other threads which call bonding_show_bonds() also need to wait because
-> they try to acquire the rtnl_mutex.
->
-> bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
-> However, the addition and deletion of bond_list are only performed in
-> bond_init()/bond_uninit(), so we can introduce a separate read-write lock
-> to synchronize bond list mutation.
->
-> What are the benefits of this change?
->
-> 1) All threads which call bonding_show_bonds() only wait when the
-> registration or unregistration of bond device happens.
->
-> 2) There are many other users of rtnl_mutex, so bonding_show_bonds()
-> won't compete with them.
->
-> In a word, this change reduces the lock contention of rtnl_mutex.
->
-> Signed-off-by: Haifeng Xu <haifeng.xu@shopee.com>
-> ---
-> v2:
-> - move the call stack after the description
-> - fix typos in the changelog
-> ---
->  drivers/net/bonding/bond_main.c  | 4 ++++
->  drivers/net/bonding/bond_sysfs.c | 6 ++++--
->  include/net/bonding.h            | 3 +++
->  3 files changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
-> index 8e6cc0e133b7..db8f1efaab78 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -5957,7 +5957,9 @@ static void bond_uninit(struct net_device *bond_dev=
-)
->
->         bond_set_slave_arr(bond, NULL, NULL);
->
-> +       write_lock(&bonding_dev_lock);
->         list_del(&bond->bond_list);
-> +       write_unlock(&bonding_dev_lock);
->
->         bond_debug_unregister(bond);
->  }
-> @@ -6370,7 +6372,9 @@ static int bond_init(struct net_device *bond_dev)
->         spin_lock_init(&bond->stats_lock);
->         netdev_lockdep_set_classes(bond_dev);
->
-> +       write_lock(&bonding_dev_lock);
->         list_add_tail(&bond->bond_list, &bn->dev_list);
-> +       write_unlock(&bonding_dev_lock);
->
->         bond_prepare_sysfs_group(bond);
->
-> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_=
-sysfs.c
-> index 2805135a7205..e107c1d7a6bf 100644
-> --- a/drivers/net/bonding/bond_sysfs.c
-> +++ b/drivers/net/bonding/bond_sysfs.c
-> @@ -28,6 +28,8 @@
->
->  #define to_bond(cd)    ((struct bonding *)(netdev_priv(to_net_dev(cd))))
->
-> +DEFINE_RWLOCK(bonding_dev_lock);
-> +
->  /* "show" function for the bond_masters attribute.
->   * The class parameter is ignored.
->   */
-> @@ -40,7 +42,7 @@ static ssize_t bonding_show_bonds(const struct class *c=
-ls,
->         int res =3D 0;
->         struct bonding *bond;
->
-> -       rtnl_lock();
-> +       read_lock(&bonding_dev_lock);
->
->         list_for_each_entry(bond, &bn->dev_list, bond_list) {
->                 if (res > (PAGE_SIZE - IFNAMSIZ)) {
-> @@ -55,7 +57,7 @@ static ssize_t bonding_show_bonds(const struct class *c=
-ls,
->         if (res)
->                 buf[res-1] =3D '\n'; /* eat the leftover space */
->
-> -       rtnl_unlock();
-> +       read_unlock(&bonding_dev_lock);
->         return res;
->  }
+John Fastabend <john.fastabend@gmail.com> wrote:
+> Pengcheng Yang wrote:
+> > John Fastabend <john.fastabend@gmail.com> wrote:
+> > > Pengcheng Yang wrote:
+> > > > SIOCINQ ioctl returns the number unread bytes of the receive
+> > > > queue but does not include the ingress_msg queue. With the
+> > > > sk_msg redirect, an application may get a value 0 if it calls
+> > > > SIOCINQ ioctl before recv() to determine the readable size.
+> > > >
+> > > > Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
+> > >
+> > > This will break the SK_PASS case I believe. Here we do
+> > > not update copied_seq until data is actually copied into user
+> > > space. This also ensures tcp_epollin_ready works correctly and
+> > > tcp_inq. The fix is relatively recent.
+> > >
+> > >  commit e5c6de5fa025882babf89cecbed80acf49b987fa
+> > >  Author: John Fastabend <john.fastabend@gmail.com>
+> > >  Date:   Mon May 22 19:56:12 2023 -0700
+> > >
+> > >     bpf, sockmap: Incorrectly handling copied_seq
+> > >
+> > > The previous patch increments the msg_len for all cases even
+> > > the SK_PASS case so you will get double counting.
+> >
+> > You are right, I missed the SK_PASS case of skb stream verdict.
+> >
+> > >
+> > > I was starting to poke around at how to fix the other cases e.g.
+> > > stream parser is in use and redirects but haven't got to it  yet.
+> > > By the way I think even with this patch epollin_ready is likely
+> > > not correct still. We observe this as either failing to wake up
+> > > or waking up an application to early when using stream parser.
+> > >
+> > > The other thing to consider is redirected skb into another socket
+> > > and then read off the list increment the copied_seq even though
+> > > they shouldn't if they came from another sock?  The result would
+> > > be tcp_inq would be incorrect even negative perhaps?
+> > >
+> > > What does your test setup look like? Simple redirect between
+> > > two TCP sockets? With or without stream parser? My guess is we
+> > > need to fix underlying copied_seq issues related to the redirect
+> > > and stream parser case. I believe the fix is, only increment
+> > > copied_seq for data that was put on the ingress_queue from SK_PASS.
+> > > Then update previous patch to only incrmeent sk_msg_queue_len()
+> > > for redirect paths. And this patch plus fix to tcp_epollin_ready
+> > > would resolve most the issues. Its a bit unfortunate to leak the
+> > > sk_sg_queue_len() into tcp_ioctl and tcp_epollin but I don't have
+> > > a cleaner idea right now.
+> > >
+> >
+> > What I tested was to use msg_verdict to redirect between two sockets
+> > without stream parser, and the problem I encountered is that msg has
+> > been queued in psock->ingress_msg, and the application has been woken up
+> > by epoll (because of sk_psock_data_ready), but the ioctl(FIONREAD) returns 0.
+> 
+> Yep makes sense.
+> 
+> >
+> > The key is that the rcv_nxt is not updated on ingress redirect, or we only need
+> > to update rcv_nxt on ingress redirect, such as in bpf_tcp_ingress() and
+> > sk_psock_skb_ingress_enqueue() ?
+> >
+> 
+> I think its likely best not to touch rcv_nxt. 'rcv_nxt' is used in
+> the tcp stack to calculate lots of things. If you just bump it and
+> then ever received an actual TCP pkt you would get some really
+> odd behavior because seq numbers and rcv_nxt would be unrelated then.
+> 
+> The approach you have is really the best bet IMO, but mask out
+> the increment msg_len where its not needed. Then it should be OK.
+> 
 
-This unfortunately would race with dev_change_name()
+I think we can add a flag to msg to identify whether msg comes from the same
+sock's receive_queue. In this way, we can increase and decrease the msg_len
+based on this flag when msg is queued to ingress_msg and when it is read by
+the application.
 
-You probably need to read_lock(&devnet_rename_sem); before copying dev->nam=
-e,
-or use netdev_get_name(net, temp_buffer, bond->dev->ifindex)
+And, this can also fix the case you mentioned above:
+
+	"The other thing to consider is redirected skb into another socket
+	and then read off the list increment the copied_seq even though
+	they shouldn't if they came from another sock?  The result would
+	be tcp_inq would be incorrect even negative perhaps?"
+
+During recv in tcp_bpf_recvmsg_parser(), we only need to increment copied_seq
+when the msg comes from the same sock's receive_queue, otherwise copied_seq
+may overflow rcv_nxt in this case.
+
+> Mixing ingress redirect and TCP sending/recv pkts doesn't usually work
+> very well anyway but I still think leaving rcv_nxt alone is best.
+
 
