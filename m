@@ -1,304 +1,122 @@
-Return-Path: <netdev+bounces-48653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D76B7EF1B1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:26:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C607EF1B4
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:27:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FC52B209F8
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87C931C2048A
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE421A5B6;
-	Fri, 17 Nov 2023 11:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33C2FE2D;
+	Fri, 17 Nov 2023 11:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB35129
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 03:26:28 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 24E3E20861;
-	Fri, 17 Nov 2023 12:26:26 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id WTDVtJgFAS5C; Fri, 17 Nov 2023 12:26:25 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 21F7F20754;
-	Fri, 17 Nov 2023 12:26:25 +0100 (CET)
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 162FB80004A;
-	Fri, 17 Nov 2023 12:26:25 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Fri, 17 Nov 2023 12:26:24 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 17 Nov
- 2023 12:26:24 +0100
-Date: Fri, 17 Nov 2023 12:26:16 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-CC: Florian Westphal <fw@strlen.de>, Herbert Xu <herbert@gondor.apana.org.au>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andreas Gruenbacher
-	<agruenba@redhat.com>, <devel@linux-ipsec.org>, <netdev@vger.kernel.org>
-Subject: [PATCH ipsec-next] udpencap: Remove Obsolete
- UDP_ENCAP_ESPINUDP_NON_IKE Support
-Message-ID: <6a62426745e9689ab18ca60a1560e047f78884f9.1700220201.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
-References: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9575CA6;
+	Fri, 17 Nov 2023 03:27:48 -0800 (PST)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SWvfX5qpSzNnw5;
+	Fri, 17 Nov 2023 19:23:32 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 17 Nov
+ 2023 19:27:46 +0800
+Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
+To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, Mina
+ Almasry <almasrymina@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
+	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
+ Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
+	<christian.koenig@amd.com>, Matthew Wilcox <willy@infradead.org>, Linux-MM
+	<linux-mm@kvack.org>
+References: <20231113130041.58124-1-linyunsheng@huawei.com>
+ <20231113130041.58124-4-linyunsheng@huawei.com>
+ <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
+ <20231113180554.1d1c6b1a@kernel.org>
+ <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
+ <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
+ <ZVNzS2EA4zQRwIQ7@nvidia.com>
+ <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
+ <ee10d050-ef24-49b2-8712-c9bc8a911c2a@kernel.org>
+ <15c404e4-8efa-cc1c-174f-0752005b6755@huawei.com>
+ <d5672499-ce5b-45c0-b47a-e5bb188f6c7f@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <f70b2a3f-692c-dfcf-22d2-c688360c3dda@huawei.com>
+Date: Fri, 17 Nov 2023 19:27:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <b604dc470c708e1e70c954f1513e4b461531e7cc.1698136108.git.antony.antony@secunet.com>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <d5672499-ce5b-45c0-b47a-e5bb188f6c7f@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 
-The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
-in 2004 [2], has remained inactive and obsolete for an extended period.
+On 2023/11/16 23:58, David Ahern wrote:
+> On 11/16/23 4:12 AM, Yunsheng Lin wrote:
+>> On 2023/11/16 1:57, David Ahern wrote:
+>>> On 11/15/23 2:21 AM, Yunsheng Lin wrote:
+>>>> On 2023/11/14 21:16, Jason Gunthorpe wrote:
+>>>>> On Tue, Nov 14, 2023 at 04:21:26AM -0800, Mina Almasry wrote:
+>>>>>
+>>>>>> Actually because you put the 'strtuct page for devmem' in
+>>>>>> skb->bv_frag, the net stack will grab the 'struct page' for devmem
+>>>>>> using skb_frag_page() then call things like page_address(), kmap,
+>>>>>> get_page, put_page, etc, etc, etc.
+>>>>>
+>>>>> Yikes, please no. If net has its own struct page look alike it has to
+>>>>> stay entirely inside net. A non-mm owned struct page should not be
+>>>>> passed into mm calls. It is just way too hacky to be seriously
+>>>>> considered :(
+>>>>
+>>>> Yes, that is something this patchset is trying to do, defining its own
+>>>> struct page look alike for page pool to support devmem.
+>>>>
+>>>
+>>> Networking needs to be able to move away from struct page references.
+>>> The devmem and host memory for Rx use cases do not need to be page based.
+>>
+>> Yes, I am agreed the ultimate goal is to move away from struct page
+>> references. But I am not sure if we can do it right away as there
+>> still are different types of existing 'struct page' in the netstack,
+>> see:
+>>
+>> https://lore.kernel.org/all/8b7d25eb-1f10-3e37-8753-92b42da3fb34@huawei.com/
+> 
+> yes, that is the point of a blended approach -- pages and buffers (or
+> iov) -- leveraging the LSB of the address. That proposal is the right
 
-This mode was originally defined in an early version of an IETF draft
-[1] from 2001. By the time it was integrated into the kernel in 2004 [2],
-it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
-versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
+I am not sure leveraging the LSB of the address is necessary yet, as it
+does not seems to provide the type check protection, it seems to just
+provide a way to demux between pages(including page pool owned page and
+non-page pool owned page) and page pool owned buffer.
+That info is avaliable through the page->pp_magic and page->pp->mp_*
+too if we mirror the page pool specific union in 'struct page'.
 
-Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
-known use cases.
+> direction to be moving for co-existence. Adding fake struct page
+> instances is the wrong direction.
 
-With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
-simplifying the codebase and eliminating unnecessary complexity.
-Actually, we remove the functionality and wrap  UDP_ENCAP_ESPINUDP_NON_IKE
-defination in "#ifndef __KERNEL__". If it is used again in kernel code
-your build will fail.
+Perhaps a fake struct page with type check protection is the right
+direction?
 
-References:
-[1] https://datatracker.ietf.org/doc/html/draft-ietf-ipsec-udp-encaps-00.txt
+Intergrating devmem to page pool without a unified metadata between
+pages and buffers or without a proper abstract layer does not seems
+like the good direction either.
 
-[2] Commit that added UDP_ENCAP_ESPINUDP_NON_IKE to the Linux historic
-    repository.
-
-    Author: Andreas Gruenbacher <agruen@suse.de>
-    Date: Fri Apr 9 01:47:47 2004 -0700
-
-   [IPSEC]: Support draft-ietf-ipsec-udp-encaps-00/01, some ipec impls need it.
-
-[3] Commit that added UDP_ENCAP_ESPINUDP to the Linux historic
-    repository.
-
-    Author: Derek Atkins <derek@ihtfp.com>
-    Date: Wed Apr 2 13:21:02 2003 -0800
-
-    [IPSEC]: Implement UDP Encapsulation framework.
-
-
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
-RFC -> v1
-- keep removed defination wrapped in #ifndef __KERNEL__
----
- include/uapi/linux/udp.h |  5 ++++-
- net/ipv4/esp4.c          | 12 ------------
- net/ipv4/udp.c           |  2 --
- net/ipv4/xfrm4_input.c   | 13 -------------
- net/ipv6/esp6.c          | 12 ------------
- net/ipv6/xfrm6_input.c   | 13 -------------
- 6 files changed, 4 insertions(+), 53 deletions(-)
-
-diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
-index 4828794efcf8..66344971d955 100644
---- a/include/uapi/linux/udp.h
-+++ b/include/uapi/linux/udp.h
-@@ -36,7 +36,10 @@ struct udphdr {
- #define UDP_GRO		104	/* This socket can receive UDP GRO packets */
-
- /* UDP encapsulation types */
--#define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* draft-ietf-ipsec-nat-t-ike-00/01 */
-+#ifndef __KERNEL__
-+#define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* (obsolete) draft-ietf-ipsec-nat-t-ike-00/01 */
-+#endif
-+
- #define UDP_ENCAP_ESPINUDP	2 /* draft-ietf-ipsec-udp-encaps-06 */
- #define UDP_ENCAP_L2TPINUDP	3 /* rfc2661 */
- #define UDP_ENCAP_GTP0		4 /* GSM TS 09.60 */
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index 4ccfc104f13a..eea61260d902 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -347,7 +347,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
- 					       __be16 dport)
- {
- 	struct udphdr *uh;
--	__be32 *udpdata32;
- 	unsigned int len;
-
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
-@@ -362,12 +361,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
-
- 	*skb_mac_header(skb) = IPPROTO_UDP;
-
--	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
--		udpdata32 = (__be32 *)(uh + 1);
--		udpdata32[0] = udpdata32[1] = 0;
--		return (struct ip_esp_hdr *)(udpdata32 + 2);
--	}
--
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-
-@@ -423,7 +416,6 @@ static int esp_output_encap(struct xfrm_state *x, struct sk_buff *skb,
- 	switch (encap_type) {
- 	default:
- 	case UDP_ENCAP_ESPINUDP:
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
- 		esph = esp_output_udp_encap(skb, encap_type, esp, sport, dport);
- 		break;
- 	case TCP_ENCAP_ESPINTCP:
-@@ -775,7 +767,6 @@ int esp_input_done2(struct sk_buff *skb, int err)
- 			source = th->source;
- 			break;
- 		case UDP_ENCAP_ESPINUDP:
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- 			source = uh->source;
- 			break;
- 		default:
-@@ -1179,9 +1170,6 @@ static int esp_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
- 		case UDP_ENCAP_ESPINUDP:
- 			x->props.header_len += sizeof(struct udphdr);
- 			break;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
--			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
--			break;
- #ifdef CONFIG_INET_ESPINTCP
- 		case TCP_ENCAP_ESPINTCP:
- 			/* only the length field, TCP encap is done by
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 89e5a806b82e..31727d2c13c6 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2693,8 +2693,6 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- #ifdef CONFIG_XFRM
- 		case UDP_ENCAP_ESPINUDP:
- 			set_xfrm_gro_udp_encap_rcv(val, sk->sk_family, sk);
--			fallthrough;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- #if IS_ENABLED(CONFIG_IPV6)
- 			if (sk->sk_family == AF_INET6)
- 				WRITE_ONCE(up->encap_rcv,
-diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
-index c54676998eb6..067a422e5e40 100644
---- a/net/ipv4/xfrm4_input.c
-+++ b/net/ipv4/xfrm4_input.c
-@@ -113,19 +113,6 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
- 			/* Must be an IKE packet.. pass it through */
- 			return 1;
- 		break;
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
--		/* Check if this is a keepalive packet.  If so, eat it. */
--		if (len == 1 && udpdata[0] == 0xff) {
--			return -EINVAL;
--		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
--			   udpdata32[0] == 0 && udpdata32[1] == 0) {
--
--			/* ESP Packet with Non-IKE marker */
--			len = sizeof(struct udphdr) + 2 * sizeof(u32);
--		} else
--			/* Must be an IKE packet.. pass it through */
--			return 1;
--		break;
- 	}
-
- 	/* At this point we are sure that this is an ESPinUDP packet,
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index 2cc1a45742d8..39d94638398d 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -383,7 +383,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
- 					       __be16 dport)
- {
- 	struct udphdr *uh;
--	__be32 *udpdata32;
- 	unsigned int len;
-
- 	len = skb->len + esp->tailen - skb_transport_offset(skb);
-@@ -398,12 +397,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
-
- 	*skb_mac_header(skb) = IPPROTO_UDP;
-
--	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
--		udpdata32 = (__be32 *)(uh + 1);
--		udpdata32[0] = udpdata32[1] = 0;
--		return (struct ip_esp_hdr *)(udpdata32 + 2);
--	}
--
- 	return (struct ip_esp_hdr *)(uh + 1);
- }
-
-@@ -459,7 +452,6 @@ static int esp6_output_encap(struct xfrm_state *x, struct sk_buff *skb,
- 	switch (encap_type) {
- 	default:
- 	case UDP_ENCAP_ESPINUDP:
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
- 		esph = esp6_output_udp_encap(skb, encap_type, esp, sport, dport);
- 		break;
- 	case TCP_ENCAP_ESPINTCP:
-@@ -822,7 +814,6 @@ int esp6_input_done2(struct sk_buff *skb, int err)
- 			source = th->source;
- 			break;
- 		case UDP_ENCAP_ESPINUDP:
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
- 			source = uh->source;
- 			break;
- 		default:
-@@ -1232,9 +1223,6 @@ static int esp6_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
- 		case UDP_ENCAP_ESPINUDP:
- 			x->props.header_len += sizeof(struct udphdr);
- 			break;
--		case UDP_ENCAP_ESPINUDP_NON_IKE:
--			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
--			break;
- #ifdef CONFIG_INET6_ESPINTCP
- 		case TCP_ENCAP_ESPINTCP:
- 			/* only the length field, TCP encap is done by
-diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
-index 6e36e5047fba..093cff85f61f 100644
---- a/net/ipv6/xfrm6_input.c
-+++ b/net/ipv6/xfrm6_input.c
-@@ -109,19 +109,6 @@ static int __xfrm6_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
- 			/* Must be an IKE packet.. pass it through */
- 			return 1;
- 		break;
--	case UDP_ENCAP_ESPINUDP_NON_IKE:
--		/* Check if this is a keepalive packet.  If so, eat it. */
--		if (len == 1 && udpdata[0] == 0xff) {
--			return -EINVAL;
--		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
--			   udpdata32[0] == 0 && udpdata32[1] == 0) {
--
--			/* ESP Packet with Non-IKE marker */
--			len = sizeof(struct udphdr) + 2 * sizeof(u32);
--		} else
--			/* Must be an IKE packet.. pass it through */
--			return 1;
--		break;
- 	}
-
- 	/* At this point we are sure that this is an ESPinUDP packet,
---
-2.30.2
-
+> .
+> 
 
