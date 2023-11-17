@@ -1,84 +1,106 @@
-Return-Path: <netdev+bounces-48762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1C97EF6EA
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8412D7EF6F6
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBF9B280CFF
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:20:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA548B20AE2
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:29:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9BB36B1D;
-	Fri, 17 Nov 2023 17:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0291374D4;
+	Fri, 17 Nov 2023 17:29:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rMr6fF+J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KBqn4DQs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627963BB46
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 17:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ABC9EC433C8;
-	Fri, 17 Nov 2023 17:20:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700241623;
-	bh=9SQl7nvG+qlvBjxavotdbaLS/oX8/OIgvUbEJ81WXbk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rMr6fF+J6dOpIQRb8Fjs1PyWwjySPK1kStwN96y3pUUDcDNIiEg2QwgIUrzJIDTKi
-	 U2Frtp4oEiiAsZ3ZL1n6Xkjdj8HQ2JjK2fRkE0dpYWhUrqkq9oQWMPL6fuprER83af
-	 BXkAq04fs27oWSt//UcafD3c7D0jk0PWtU3Ryz6XjvuULmtH88JF0TEocKVpHKUF80
-	 5I56ZuirGzbpWvUFcrLo2StjCqEl0WFhr534+9XJiKwuOG65/tllTp0y0ZP/0SqNCD
-	 23YuDRF9WBchpb8LzoUFKcZ5hYnw0DBQ2mQk9D5a6QZsMWMz6w/LRQfURPOiuZr61h
-	 B7pxeMPyBWMLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8D5A7E1F663;
-	Fri, 17 Nov 2023 17:20:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C2B2E5
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:29:23 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-54744e66d27so0a12.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:29:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700242161; x=1700846961; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zNX5vSn4trFssKgOhtnpJClEAgcyxOvOwHdl3OyYifg=;
+        b=KBqn4DQsWEAbn271fd2Xx0QfbuuF6nlpMdCjEHyP8CKuga5GQhnzq2kRgVdYBGDSVG
+         OVO/Waqp6LGymP6q2qrQnOyeq8MQR2LReI3NxYueBQFY991U0eJnzOr/wBeDvJPKLtaE
+         kheSEzsaG8CxZNECYtI4+8ZH5pCDvnuAKQTsaJv/C9p5sKAXH0UrwVlVXjV54NugzxAL
+         7c4KCZ/1DWItqFWSwunBbkP+6L5RIF2aa1GsS8lrjlypeIVpILNLki47C8x+bxHbzOu1
+         OLKqR4SMqnXOdmxOHVXp+EsuRds+H+nwjL+uqyY1IL3YHB0vsrDRJ6ARE8jOsr20sAxp
+         LqOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700242161; x=1700846961;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zNX5vSn4trFssKgOhtnpJClEAgcyxOvOwHdl3OyYifg=;
+        b=gEV6sCggT9ifF+1UCpWL0/MpbDBGbtKyi8iWkvgDyTYVOuP/tP3Pc+C6VNn/pb+j7O
+         hyFnzeG/aVGPLbEnJJ3WLoYoYXvCE/z4DxPJ2sfBpEbFE2dTfwFuRdpqGvm8h441ZArb
+         JyTzZ793Koy5Y2ukWaxf5ca+p1ZI529qTaTIGbvy+ST6R1+/Ylc9yenb5iokUdWVYjhs
+         IVzEZticCcXJ34beuVFJlhOtNpzL9IhiC9nUQvltj2uPO4MSHJqjjtcKDFB4na1B6cHI
+         Q8WqrRCz0HUrKghd7DW2nAQUHp6QFj5P3TAkGLLFjkPJdYYkwnaiwA2qAiV+3uSuTg4Y
+         3QtA==
+X-Gm-Message-State: AOJu0YzHi51McFBxly+oMSe9It8ELKRjkWu/alLZ7uMzxAX6+LUw7DDn
+	PnD71bymHiznJv8q1qHn9kYRrVEzEPAP70gez3aTdQ==
+X-Google-Smtp-Source: AGHT+IHZqKyWH2HNr9y7AtGf0eJxIce50Dug2CDO7QDkXuoh+B16qm3v+4PTfiSFawj5mE80S2Hn3+GdWACHh3DVNfs=
+X-Received: by 2002:a05:6402:c41:b0:544:e249:be8f with SMTP id
+ cs1-20020a0564020c4100b00544e249be8fmr14129edb.1.1700242161208; Fri, 17 Nov
+ 2023 09:29:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2 v2] Makefile: use /usr/share/iproute2 for config
- files
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170024162357.26596.1027063151357340869.git-patchwork-notify@kernel.org>
-Date: Fri, 17 Nov 2023 17:20:23 +0000
-References: <71e8bd3f2d49cd4fd745fb264e84c15e123c5788.1700068869.git.aclaudi@redhat.com>
-In-Reply-To: <71e8bd3f2d49cd4fd745fb264e84c15e123c5788.1700068869.git.aclaudi@redhat.com>
-To: Andrea Claudi <aclaudi@redhat.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com,
- luca.boccassi@gmail.com
+References: <20231117154831.2518110-1-chentao@kylinos.cn>
+In-Reply-To: <20231117154831.2518110-1-chentao@kylinos.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 17 Nov 2023 18:29:10 +0100
+Message-ID: <CANn89iKJ=Na2hWGv9Dau36Ojivt-icnd1BRgke033Z=a+E9Wcw@mail.gmail.com>
+Subject: Re: [PATCH] ipv6: Correct/silence an endian warning in ip6_multipath_l3_keys
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, kunwu.chan@hotmail.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, Nov 17, 2023 at 6:06=E2=80=AFPM Kunwu Chan <chentao@kylinos.cn> wro=
+te:
+>
+> net/ipv6/route.c:2332:39: warning: incorrect type in assignment (differen=
+t base types)
+> net/ipv6/route.c:2332:39:    expected unsigned int [usertype] flow_label
+> net/ipv6/route.c:2332:39:    got restricted __be32
+>
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+Same remark, we need a Fixes: tag
 
-On Wed, 15 Nov 2023 18:25:35 +0100 you wrote:
-> According to FHS:
-> 
-> "/usr/lib includes object files and libraries. On some systems, it may
-> also include internal binaries that are not intended to be executed
-> directly by users or shell scripts."
-> 
-> A better directory to store config files is /usr/share:
-> 
-> [...]
+> ---
+>  net/ipv6/route.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index b132feae3393..692c811eb786 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -2329,7 +2329,7 @@ static void ip6_multipath_l3_keys(const struct sk_b=
+uff *skb,
+>         } else {
+>                 keys->addrs.v6addrs.src =3D key_iph->saddr;
+>                 keys->addrs.v6addrs.dst =3D key_iph->daddr;
+> -               keys->tags.flow_label =3D ip6_flowlabel(key_iph);
+> +               keys->tags.flow_label =3D be32_to_cpu(ip6_flowlabel(key_i=
+ph));
+>                 keys->basic.ip_proto =3D key_iph->nexthdr;
+>         }
 
-Here is the summary with links:
-  - [iproute2,v2] Makefile: use /usr/share/iproute2 for config files
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=962692356a1c
+This is not consistent with line 2541 doing:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+hash_keys.tags.flow_label =3D (__force u32)flowi6_get_flowlabel(fl6);
 
