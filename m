@@ -1,220 +1,97 @@
-Return-Path: <netdev+bounces-48674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 259797EF2E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:43:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 761047EF2EA
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:46:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 481F11C208E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:43:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 794331C20897
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D86728363;
-	Fri, 17 Nov 2023 12:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3FA1A725;
+	Fri, 17 Nov 2023 12:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o2SYsnYJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DPiPJrWk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43143D5E
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:43:15 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-54394328f65so2743164a12.3
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:43:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700224994; x=1700829794; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wmy0vwHLNSalg0GyBNA6b2vQ5xOe/KV1rGIN3z1r2II=;
-        b=o2SYsnYJAsLFkxkASrNueX3dInnjxjich1AD0VOn1KHf0EQodRf0DEUasLYoHEtxIC
-         AEKfgLbz2l5AOFqNaSqOCLagByHk9Thpspl528Tz2nx9eNjuUFiRkN81+ysCqRtYZ92O
-         di7b8GFYxrwcpfJDbCTahimdaFmfiQvMMdQ6cpuR+9s00jOaVnFNYubOGdcha6Imxx4P
-         qvjzi99UoUczQvyRqMCoenkS4uWxlJq560225Yi88ly3x/NfMc3OEqPf1HazzeBHJ8GH
-         f8AFMMzsxQhMB3nY/84FED7lrpME4cbefaO+vkYsCV1RTCqo+o3cQU09SgFpwDLXBMtq
-         YOYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700224994; x=1700829794;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wmy0vwHLNSalg0GyBNA6b2vQ5xOe/KV1rGIN3z1r2II=;
-        b=PcTW3K90WnB4qMsylWGZiPAk3+HyBdqdq2+PiF46lHZ5oAVhckOO6p4gEqSr64B4vE
-         knhG9+wXaoDUuVAmvjsZl0W2Gw4mDoTVto2w78+vGYfXoCXePo50SPNMyoS5Rbp8zxHT
-         bIgxFFeKyvNpHJT2DQM5Hf+V5UGVRiRfGwRbNEZuAjaqzfO4xmo98WpoSQHJiho1buCd
-         NWzWQWTjCTWisLts5aXu/aqYCBminwcrDb+s8WsnO2n7mSB57aTY1uqSAzHADKI60sVp
-         /rkEQnDSA8PLNpn0rtn78PM7yPPhcQ9HKOd7b04FlCZFUQX4z/zo9abR0LdmGi4qdIys
-         3aTw==
-X-Gm-Message-State: AOJu0YzSB1ME0aR/rSmGZVnQEOvnmcT/kgQXdI3Coh8Y+IeyHc/pC/qA
-	Agfi68lDcR/Mr00db8fV68O/2zRDEfhNTMv5quuekA==
-X-Google-Smtp-Source: AGHT+IGK8RpBkwmAlFDIK9TkhCN4GNO8OFT48dloJfm4+dv1liqy0C2k2bVJqW4uR0lmAaGJzX/HMQ==
-X-Received: by 2002:a17:906:1919:b0:9e7:494a:8ed with SMTP id a25-20020a170906191900b009e7494a08edmr14101320eje.72.1700224993723;
-        Fri, 17 Nov 2023 04:43:13 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id i14-20020a170906090e00b009ae57888718sm744664ejd.207.2023.11.17.04.43.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 04:43:12 -0800 (PST)
-Message-ID: <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
-Date: Fri, 17 Nov 2023 13:43:10 +0100
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C5BD4E;
+	Fri, 17 Nov 2023 04:46:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+YOin7g0g4T8byZD5QObPXU2WYjbG0dAcuL7qKb6CFQ=; b=DPiPJrWkqqPu/2Ozcap4dDcGnH
+	X1Y2JjbeKoMJOj6KZlKumVBPARupNyrG0VJdUZnJ5KyyYhMlGnrSEKMhLvsMLIIidfacdkSWgPvSm
+	JB9Xp9iqqX9uYVZQgKbrlTeO5lPpXL/iaff+I4NVmjqZIc8dFTM7DZHR6rd88gD2ACoE+Dp4mb+dp
+	jbAE8qK6HR8G2pAc/hpEUEmzatlRF5GzL3C8kyRNeMXz5Xj0OMAYN5i4KizcfLWiMdoX/vmCE6poB
+	ba8D5bztG6nyrWYUPyQJM/+y/OEj3Po1s2GsJN/jvbP7DHKYagJqB1tYGGHIJzZvmarsVxQqXFHJE
+	AYl1ZgdA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35790)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r3yEi-0002qX-2g;
+	Fri, 17 Nov 2023 12:46:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r3yEk-00008Q-DK; Fri, 17 Nov 2023 12:46:18 +0000
+Date: Fri, 17 Nov 2023 12:46:18 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Robert Marko <robimarko@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ansuelsmth@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: phy: aquantia: validate PHY mode on
+ AQR107
+Message-ID: <ZVdgmpvI+F4ClNmG@shell.armlinux.org.uk>
+References: <20231117100958.425354-1-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Content-Language: en-US
-To: Jie Luo <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- konrad.dybcio@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-10-quic_luoj@quicinc.com>
- <834cbb58-3a88-4ba6-8db6-10440a4d0893@linaro.org>
- <76e081ba-9d5a-41df-9c1b-d782e5656973@quicinc.com>
- <2a9bb683-da73-47af-8800-f14a833e8ee4@linaro.org>
- <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117100958.425354-1-robimarko@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 17/11/2023 12:20, Jie Luo wrote:
+On Fri, Nov 17, 2023 at 11:09:48AM +0100, Robert Marko wrote:
+> The Aquantia driver is not setting the PHY mode itself, but it does however
+> still check if the PHY mode set in DTS is one of the supported modes.
 > 
-> 
-> On 11/17/2023 6:40 PM, Krzysztof Kozlowski wrote:
->> On 17/11/2023 11:36, Jie Luo wrote:
->>>>>      clocks:
->>>>> -    items:
->>>>> -      - description: MDIO clock source frequency fixed to 100MHZ
->>>>> +    minItems: 1
->>>>> +    maxItems: 5
->>>>> +    description:
->>>>
->>>> Doesn't this make all other variants with incorrect constraints?
->>>
->>> There are 5 clock items, the first one is the legacy MDIO clock, the
->>> other clocks are new added for ipq5332 platform, will describe it more
->>> clearly in the next patch set.
->>
->> OTHER variants. Not this one.
-> 
-> The change here is for the clock number added for the ipq5332 platform,
-> the other platforms still use only legacy MDIO clock.
+> However, the set PHY mode does not have to match the actual one, so lets
+> add update the PHY mode during .config_init and warn if they differ.
 
-Then your patch is wrong as I said. You now affect other variants. I
-don't quite get your responses. Style of them suggests that you
-disagree, but you are not providing any relevant argument.
+This looks completely wrong to me. These PHYs can be configured to
+change their MAC-facing interface mode according to the media negotiated
+speed, but you are only checking that _if_ the media is up, then the
+interface that has resulted from that negotiation matches what is in
+DTS. That could be dependent on the link partner, so what works for a
+platform when connected to one link partner may issue your "info"-level
+warning when connected to a different link partner.
 
-> 
-> so i add minItems  and maxItems, i will check other .yaml files for the
-> reference.
-> 
->>
->>>
->>>>
->>>>> +      MDIO system clock frequency fixed to 100MHZ, and the GCC uniphy
->>>>> +      clocks enabled for resetting ethernet PHY.
->>>>>    
->>>>>      clock-names:
->>>>> -    items:
->>>>> -      - const: gcc_mdio_ahb_clk
->>>>> +    minItems: 1
->>>>> +    maxItems: 5
->>>>> +
->>>>> +  phy-reset-gpio:
->>>>
->>>> No, for multiple reasons. It's gpios first of all. Where do you see such
->>>> property? Where is the existing definition?
->>>
->>> will remove this property, and update to use the exited PHY GPIO reset.
->>>
->>>>
->>>> Then it is "reset-gpios" if this is MDIO. Why do you put phy properties
->>>> in MDIO?
->>>>
->>>>> +    minItems: 1
->>>>> +    maxItems: 3
->>>>> +    description:
->>>>> +      GPIO used to reset the PHY, each GPIO is for resetting the connected
->>>>> +      ethernet PHY device.
->>>>> +
->>>>> +  phyaddr-fixup:
->>>>> +    description: Register address for programing MDIO address of PHY devices
->>>>
->>>> You did not test code which you sent.
->>>
->>> Hi Krzysztof,
->>> This patch is passed with the following command in my workspace.
->>> i will upgrade and install yamllint to make sure there is no
->>> warning reported anymore.
->>>
->>> make dt_bg_check
->>
->> No clue what's this, but no, I do not believe you tested it at all. It's
->> not about yamllint. It's was not tested. Look at errors reported on
->> mailing list.
->>
->>> DT_SCHEMA_FILES=Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
->>
-> 
-> Hi Krzysztof,
-> Here is the output when i run the dt check with this patch applied in my 
-> workspace, md64 is the alias for compiling the arm64 platform.
+So no, this to me looks completely wrong.
 
-We still do not know your base and dtschema version.
+You need to check the VEND1_GLOBAL_CFG_* registers, and determine from
+those what interface mode(s) will be used, and then use that to validate
+the mode.
 
+It just so happens that...
 
-Best regards,
-Krzysztof
+http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=f7b531ee8855f81d267a8a42c44da51576f48daf
+http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=f55389aa5d11da8a32dfd65a1b98049878ce09f0
 
+builds a bitmap that can then be tested to check this. Whether the
+above is entirely correct or not, I can't really say, I don't have
+enough information on this PHY.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
