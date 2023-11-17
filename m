@@ -1,183 +1,119 @@
-Return-Path: <netdev+bounces-48582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59A4C7EEE68
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:25:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE3017EEE6A
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:26:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C647AB20AD6
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:25:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29AB61C20AD4
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:26:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70A212E55;
-	Fri, 17 Nov 2023 09:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CA912E7A;
+	Fri, 17 Nov 2023 09:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SrKj/vIs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDxpoXME"
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E0ED56;
-	Fri, 17 Nov 2023 01:25:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=guXus9uH0FtCWZaDTlKgZ0PR6col0jhDMGMT5oJhEVM=; b=SrKj/vIsYJgpnCM83sG0ipdpJ0
-	N0MsKblH+oANZx/KJGb2LUz+KuEqjAdFJSoFDqUktMPYDNZpx3Nn044HkgXDLjRxet8aM8jg4zJ71
-	pa/9d46jAhrcGLiMf3nTRJd4LWciONWgjxt0doUoVOh1m+LeE31wOZz4YxBU+jFWCOh2yD+dYv7ha
-	fv8+JtjkT3cSeBGEifCEZIOVmQ1/0ByvSlFV3/o66SthRI2xrJ7+y5qa99pgijYfned9S/+Y7YvDR
-	oS2IkgkXulz897E8P0Fy5Wo/EluUYw5ekPn1FNsZO1wN/yIcbMhtiJdK2cQvUzGw9+NI2JVZ+0TGb
-	3/ARDTOQ==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r3v4I-007B1g-1Z;
-	Fri, 17 Nov 2023 09:25:19 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 29F8A300478; Fri, 17 Nov 2023 10:23:18 +0100 (CET)
-Date: Fri, 17 Nov 2023 10:23:18 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com
-Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
- lag based placement)
-Message-ID: <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C8CDF60
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:25:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB81C433C7;
+	Fri, 17 Nov 2023 09:25:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700213151;
+	bh=ynP6wGzU5LUouTfo4D4BIT9n/6thiSEuoVGu3nB7YEY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FDxpoXMEU2eEutnSwR58ZwSYEmEEkQoep3f+3MKVPVW280HlDub9DJTIODSirzftT
+	 GOhp+iwygQCMejWYZPNGV4Ufp0gsLHb61pEDRS3JK31CGw/hSnIiYUg9zwVgwPJokJ
+	 h+twd3Fi2YcBDa/SI7zTPJ+1pGGo2f5jbCve3sZ3HbpJaWuVR53htwbqjomx8sOwQc
+	 6+cT4CkBwQ4E/BT0oPDDdEbBfJDfi1FTuSsFOhoKt//UnQQOqPOVipT3jXTWYEKQRs
+	 LZuVZ5j65IrlPYwdvL1njCyxxu/rydwtdT6MRisgdfPiuJNBpk2Q6c/UEvU6NZiWYm
+	 Gx0SVvxakukhA==
+Date: Fri, 17 Nov 2023 10:25:47 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Albert Huang <huangjie.albert@bytedance.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Toshiaki Makita <toshiaki.makita1@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] veth: fix ethtool statistical errors
+Message-ID: <ZVcxmwm/DRTB8QwO@lore-desk>
+References: <20231116114150.48639-1-huangjie.albert@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="wM0LZ3in3H4K3W0K"
+Content-Disposition: inline
+In-Reply-To: <20231116114150.48639-1-huangjie.albert@bytedance.com>
+
+
+--wM0LZ3in3H4K3W0K
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+Content-Transfer-Encoding: quoted-printable
 
+> if peer->real_num_rx_queues > 1, the ethtool -s command for
+> veth network device will display some error statistical values.
+> The value of tx_idx is reset with each iteration, so even if
+> peer->real_num_rx_queues is greater than 1, the value of tx_idx
+> will remain constant. This results in incorrect statistical values.
+> To fix this issue, assign the value of pp_idx to tx_idx.
+>=20
+> Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit account=
+ing")
+> Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> ---
+>  drivers/net/veth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index 0deefd1573cf..3a8e3fc5eeb5 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net_device =
+*dev,
+>  	for (i =3D 0; i < peer->real_num_rx_queues; i++) {
+>  		const struct veth_rq_stats *rq_stats =3D &rcv_priv->rq[i].stats;
+>  		const void *base =3D (void *)&rq_stats->vs;
+> -		unsigned int start, tx_idx =3D idx;
+> +		unsigned int start, tx_idx =3D pp_idx;
+>  		size_t offset;
+> =20
+>  		tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ_STATS_LEN;
+> --=20
+> 2.20.1
+>=20
 
-Your email is pretty badly mangled by wrapping, please try and
-reconfigure your MUA, esp. the trace and debug output is unreadable.
+Hi Albert,
 
-On Thu, Nov 16, 2023 at 07:58:18PM +0100, Tobias Huschle wrote:
+Can you please provide more details about the issue you are facing?
+In particular, what is the number of configured tx and rx queues for both
+peers?
+tx_idx is the index of the current (local) tx queue and it must restart from
+idx in each iteration otherwise we will have an issue when
+peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
 
-> The base scenario are two KVM guests running on an s390 LPAR. One guest
-> hosts the uperf server, one the uperf client.
-> With EEVDF we observe a regression of ~50% for a strburst test.
-> For a more detailed description of the setup see the section TEST SUMMARY at
-> the bottom.
+Regards,
+Lorenzo
 
-Well, that's not good :/
+--wM0LZ3in3H4K3W0K
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> Short summary:
-> The mentioned kworker has been scheduled to CPU 14 before the tracing was
-> enabled.
-> A vhost process is migrated onto CPU 14.
-> The vruntimes of kworker and vhost differ significantly (86642125805 vs
-> 4242563284 -> factor 20)
+-----BEGIN PGP SIGNATURE-----
 
-So bear with me, I know absolutely nothing about virt stuff. I suspect
-there's cgroups involved because shiny or something.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZVcxmwAKCRA6cBh0uS2t
+rL8vAQCJSYOePaGYIAzOPQ5MeXrdFWCb6zjNMqja2zjHP45xGgEAwDNcSm8iPh7+
+8RLoiNT+UNlBNyHWxEGBO5trDBfoRgg=
+=15I0
+-----END PGP SIGNATURE-----
 
-kworkers are typically not in cgroups and are part of the root cgroup,
-but what's a vhost and where does it live?
-
-Also, what are their weights / nice values?
-
-> The vhost process wants to wake up the kworker, therefore the kworker is
-> placed onto the runqueue again and set to runnable.
-> The vhost process continues to execute, waking up other vhost processes on
-> other CPUs.
-> 
-> So far this behavior is not different to what we see on pre-EEVDF kernels.
-> 
-> On timestamp 576.162767, the vhost process triggers the last wake up of
-> another vhost on another CPU.
-> Until timestamp 576.171155, we see no other activity. Now, the vhost process
-> ends its time slice.
-> Then, vhost gets re-assigned new time slices 4 times and gets then migrated
-> off to CPU 15.
-
-So why does this vhost stay on the CPU if it doesn't have anything to
-do? (I've not tried to make sense of the trace, that's just too
-painful).
-
-> This does not occur with older kernels.
-> The kworker has to wait for the migration to happen in order to be able to
-> execute again.
-> This is due to the fact, that the vruntime of the kworker is significantly
-> larger than the one of vhost.
-
-That's, weird. Can you add a trace_printk() to update_entity_lag() and
-have it print out the lag, limit and vlag (post clamping) values? And
-also in place_entity() for the reverse process, lag pre and post scaling
-or something.
-
-After confirming both tasks are indeed in the same cgroup ofcourse,
-because if they're not, vruntime will be meaningless to compare and we
-should look elsewhere.
-
-Also, what HZ and what preemption mode are you running? If kworker is
-somehow vastly over-shooting it's slice -- keeps running way past the
-avg_vruntime, then it will build up a giant lag and you get what you
-describe, next time it wakes up it gets placed far to the right (exactly
-where it was when it 'finally' went to sleep, relatively speaking).
-
-> We found some options which sound plausible but we are not sure if they are
-> valid or not:
-> 
-> 1. The wake up path has a dependency on the vruntime metrics that now delays
-> the execution of the kworker.
-> 2. The previous commit af4cf40470c2 (sched/fair: Add cfs_rq::avg_vruntime)
-> which updates the way cfs_rq->min_vruntime and
->     cfs_rq->avg_runtime are set might have introduced an issue which is
-> uncovered with the commit mentioned above.
-
-Suppose you have a few tasks (of equal weight) on you virtual timeline
-like so:
-
-   ---------+---+---+---+---+------
-            ^       ^
-	    |       `avg_vruntime
-	    `-min_vruntime
-
-Then the above would be more or less the relative placements of these
-values. avg_vruntime is the weighted average of the various vruntimes
-and is therefore always in the 'middle' of the tasks, and not somewhere
-out-there.
-
-min_vruntime is a monotonically increasing 'minimum' that's left-ish on
-the tree (there's a few cases where a new task can be placed left of
-min_vruntime and its no longer actuall the minimum, but whatever).
-
-These values should be relatively close to one another, depending
-ofcourse on the spread of the tasks. So I don't think this is causing
-trouble.
-
-Anyway, the big difference with lag based placement is that where
-previously tasks (that do not migrate) retain their old vruntime and on
-placing they get pulled forward to at least min_vruntime, so a task that
-wildly overshoots, but then doesn't run for significant time can still
-be overtaken and then when placed again be 'okay'.
-
-Now OTOH, with lag-based placement,  we strictly preserve their relative
-offset vs avg_vruntime. So if they were *far* too the right when they go
-to sleep, they will again be there on placement.
-
-Sleeping doesn't help them anymore.
-
-Now, IF this is the problem, I might have a patch that helps:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git/commit/?h=sched/eevdf&id=119feac4fcc77001cd9bf199b25f08d232289a5c
-
-That branch is based on v6.7-rc1 and then some, but I think it's
-relatively easy to rebase the lot on v6.6 (which I'm assuming you're
-on).
-
-I'm a little conflicted on the patch, conceptually I like what it does,
-but the code it turned into is quite horrible. I've tried implementing
-it differently a number of times but always ended up with things that
-either didn't work or were worse.
-
-But if it works, it works I suppose.
-
+--wM0LZ3in3H4K3W0K--
 
