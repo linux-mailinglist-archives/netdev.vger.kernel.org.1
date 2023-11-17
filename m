@@ -1,196 +1,103 @@
-Return-Path: <netdev+bounces-48549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEA037EEC67
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:53:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4197F7EEC6F
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:06:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895522810CD
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7698A1F227C1
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC46D2F9;
-	Fri, 17 Nov 2023 06:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AA0B663;
+	Fri, 17 Nov 2023 07:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wYbcyism"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE04192;
-	Thu, 16 Nov 2023 22:53:07 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VwYgl8u_1700203983;
-Received: from 30.221.148.229(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VwYgl8u_1700203983)
-          by smtp.aliyun-inc.com;
-          Fri, 17 Nov 2023 14:53:05 +0800
-Message-ID: <44551f7f-5890-2141-cf90-9d7095d55502@linux.alibaba.com>
-Date: Fri, 17 Nov 2023 14:53:02 +0800
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F472D52
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 23:06:04 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-d9ab7badadeso2297493276.1
+        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 23:06:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700204764; x=1700809564; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ag4QJwAFTMvtxQitzc3wtKGcikFcJHkhggRFwsEsrq0=;
+        b=wYbcyismUeYAijn1luK7Jw1lzwWusAjVrj34nY4wxVco1FKhDa1tQ252xFXxT1EaZY
+         JpK4j5T68fvlPrFG9X7rP/8qqIouLoUsCiOXgsYOwXP/3h2ilAtJoMyo+p7irUL2qqS/
+         nIPu+hR0Y54VkQo+WjHrfhZINVbN/Mooa4TqJCr4/zbLXPO/d1fO3DfZra/7tdPaW+8h
+         ko7qxLAzUfDNek/mwFF2T3ejAWC3PRPsoTVMvTCt96zfP7BOsMy/wtNp3A/PUwbqWqpd
+         0NtI2LEXNeizVfmMFuwqTfSFxga5ldIN7xm4+FIF2jCj/eQAZh2qxqWjGHDAx9yyPrbr
+         OcYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700204764; x=1700809564;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ag4QJwAFTMvtxQitzc3wtKGcikFcJHkhggRFwsEsrq0=;
+        b=wy0RYBoSKzPM64rMVcKplx9WPKbDP6vkMV1yOqN1W5iq4HdVcTM2CiSSArpsMHN08V
+         otJR7mS1ezqjwqdokua0FxdZGKb/8UYRXZOszjJ8tVcHw9lrZBlRXxu1MQwjqjFfDAXa
+         T5XgoUxsqdsAFDySmlEo8Z7LnCEfpBd10p2oVySlsEHOetIMdzeLTPkRojWU7sRz8HId
+         YEnImLgFBdYLbZcjocrOQbNwaO5NlWUlGgEeF7f5a0ENX/h7N+2oBAE3+VNffKfwtZod
+         RaHB47JWoOZORxLroN6Ryp2C2k1KPEUOHLDPnPLT/JunGS0jr/Q/4r7TijtBUGPulxB/
+         fXFA==
+X-Gm-Message-State: AOJu0Yzej3nFArz5mgziC7V3idt1v3fdM/ejwnHiSHtQsMO2KVyT9A4A
+	C1ZkZbfEkn44arnV6u23gZwb8NB15GQS8hc=
+X-Google-Smtp-Source: AGHT+IFlg4APaNYf7GwSTUnP88nwpRaVjMbWzpUCF47Lp2ZpGyDFLNx6bFd/UNTDKzI78d+cxFGju9X2VC/9kkc=
+X-Received: from jlw.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:41a])
+ (user=jinliangw job=sendgmr) by 2002:a5b:151:0:b0:d9a:468f:480e with SMTP id
+ c17-20020a5b0151000000b00d9a468f480emr420396ybp.5.1700204763883; Thu, 16 Nov
+ 2023 23:06:03 -0800 (PST)
+Date: Thu, 16 Nov 2023 23:04:57 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.15.1
-Subject: Re: [PATCH net v2] net/smc: avoid data corruption caused by decline
-Content-Language: en-US
-To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
- <a0c9e8d5-14fc-3eba-f891-ef7c3ee9bd03@linux.alibaba.com>
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <a0c9e8d5-14fc-3eba-f891-ef7c3ee9bd03@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
+Message-ID: <20231117070457.1970786-1-jinliangw@google.com>
+Subject: [PATCH] mctp-i2c: increase the MCTP_I2C_TX_WORK_LEN to 500
+From: Jinliang Wang <jinliangw@google.com>
+To: Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>
+Cc: William Kennington <wak@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jinliang Wang <jinliangw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+The original value (100) is not sufficient for our use case.
+For example, we have 4 NVMe-mi devices on the same i2c bus.
+When sending namespace create Admin command concurrently, they
+will send 4x4KB data to device concurrently, which may be
+split into 4x(4KB/64B)=256 packets.
 
+Tested:
+Before the fix, we will see below message in kernel log when
+concurrently sending namespace create commands to the 4 NVMe-MI
+devices on the same i2c bus:
+kernel: i2c i2c-6 mctpi2c6: BUG! Tx Ring full when queue awake!
 
-On 11/17/23 2:47 PM, Wen Gu wrote:
->
->
-> On 2023/11/17 12:59, D. Wythe wrote:
->
->> From: "D. Wythe" <alibuda@linux.alibaba.com>
->>
->> We found a data corruption issue during testing of SMC-R on Redis
->> applications.
->>
->> The benchmark has a low probability of reporting a strange error as
->> shown below.
->>
->> "Error: Protocol error, got "\xe2" as reply type byte"
->>
->> Finally, we found that the retrieved error data was as follows:
->>
->> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
->> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
->> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
->>
->> It is quite obvious that this is a SMC DECLINE message, which means that
->> the applications received SMC protocol message.
->> We found that this was caused by the following situations:
->>
->> client            server
->>        proposal
->>     ------------->
->>        accept
->>     <-------------
->>        confirm
->>     ------------->
->> wait confirm
->>
->>      failed llc confirm
->>         x------
->> (after 2s)timeout
->>             wait rsp
->>
->> wait decline
->>
->> (after 1s) timeout
->>             (after 2s) timeout
->>         decline
->>     -------------->
->>         decline
->>     <--------------
->>
->> As a result, a decline message was sent in the implementation, and this
->> message was read from TCP by the already-fallback connection.
->>
->> This patch double the client timeout as 2x of the server value,
->
-> Is the client's timeout doubled?
->
-> From the code below, it is server's timeout that has been doubled.
->
+After the fix, the error message is gone.
 
-Forget to fix description, i'll fix that in next revision.
+Signed-off-by: Jinliang Wang <jinliangw@google.com>
+---
+ drivers/net/mctp/mctp-i2c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> With this simple change, the Decline messages should never cross or
->> collide (during Confirm link timeout).
->>
->> This issue requires an immediate solution, since the protocol updates
->> involve a more long-term solution.
->>
->> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC 
->> flow")
->> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->> ---
->>   include/net/netns/smc.h |  2 ++
->>   net/smc/af_smc.c        |  3 ++-
->>   net/smc/smc_sysctl.c    | 12 ++++++++++++
->>   3 files changed, 16 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
->> index 582212a..5198896 100644
->> --- a/include/net/netns/smc.h
->> +++ b/include/net/netns/smc.h
->> @@ -22,5 +22,7 @@ struct netns_smc {
->>       int                sysctl_smcr_testlink_time;
->>       int                sysctl_wmem;
->>       int                sysctl_rmem;
->> +    /* server's Confirm Link timeout in seconds */
->> +    int                sysctl_smcr_srv_confirm_link_timeout;
->>   };
->>   #endif
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index abd2667..b86ad30 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -1870,7 +1870,8 @@ static int smcr_serv_conf_first_link(struct 
->> smc_sock *smc)
->>           return SMC_CLC_DECL_TIMEOUT_CL;
->>         /* receive CONFIRM LINK response from client over the RoCE 
->> fabric */
->> -    qentry = smc_llc_wait(link->lgr, link, SMC_LLC_WAIT_TIME,
->> +    qentry = smc_llc_wait(link->lgr, link,
->> + sock_net(&smc->sk)->smc.sysctl_smcr_srv_confirm_link_timeout,
->>                     SMC_LLC_CONFIRM_LINK);
->>       if (!qentry) {
->>           struct smc_clc_msg_decline dclc;
->> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
->> index 5cbc18c..919f3f7 100644
->> --- a/net/smc/smc_sysctl.c
->> +++ b/net/smc/smc_sysctl.c
->> @@ -51,6 +51,13 @@
->>           .proc_handler    = proc_dointvec_jiffies,
->>       },
->>       {
->> +        .procname    = "smcr_srv_confirm_link_timeout",
->> +        .data        = 
->> &init_net.smc.sysctl_smcr_srv_confirm_link_timeout,
->> +        .maxlen        = sizeof(int),
->> +        .mode        = 0644,
->> +        .proc_handler    = proc_dointvec_jiffies,
->> +    },
->> +    {
->>           .procname    = "wmem",
->>           .data        = &init_net.smc.sysctl_wmem,
->>           .maxlen        = sizeof(int),
->> @@ -95,6 +102,11 @@ int __net_init smc_sysctl_net_init(struct net *net)
->>       net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
->>       net->smc.sysctl_smcr_buf_type = SMCR_PHYS_CONT_BUFS;
->>       net->smc.sysctl_smcr_testlink_time = 
->> SMC_LLC_TESTLINK_DEFAULT_TIME;
->> +    /* Increasing the server's timeout by twice as much as the client's
->> +     * timeout by default can temporarily avoid decline messages of
->> +     * both side been crossed or collided.
->
-> 'both sides' or maybe better for
->
-> '..avoid decline messages of both sides crossing or colliding.'
->
->
-Look nice. I'll adopt that.
->
-> Thanks,
-> Wen Gu
->
->> +     */
->> +    net->smc.sysctl_smcr_srv_confirm_link_timeout = 2 * 
->> SMC_LLC_WAIT_TIME;
->>       WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
->>       WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
+diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+index b37a9e4bade4..b658aa040620 100644
+--- a/drivers/net/mctp/mctp-i2c.c
++++ b/drivers/net/mctp/mctp-i2c.c
+@@ -34,7 +34,7 @@
+ #define MCTP_I2C_BUFSZ (3 + MCTP_I2C_MAXBLOCK + 1)
+ #define MCTP_I2C_MINLEN 8
+ #define MCTP_I2C_COMMANDCODE 0x0f
+-#define MCTP_I2C_TX_WORK_LEN 100
++#define MCTP_I2C_TX_WORK_LEN 500
+ /* Sufficient for 64kB at min mtu */
+ #define MCTP_I2C_TX_QUEUE_LEN 1100
+ 
+-- 
+2.43.0.rc0.421.g78406f8d94-goog
 
 
