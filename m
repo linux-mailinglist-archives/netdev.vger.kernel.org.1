@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-48766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F34F97EF741
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C74D7EF745
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:52:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABA8F280F60
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:49:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCB99280F49
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A288F36B1E;
-	Fri, 17 Nov 2023 17:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B391A704;
+	Fri, 17 Nov 2023 17:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="STU2KUYp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HJ6lawmV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832374315C
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 17:49:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 259DAC433C8;
-	Fri, 17 Nov 2023 17:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4554314E
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 17:52:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5D14C433C8;
+	Fri, 17 Nov 2023 17:52:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700243371;
-	bh=t3RO+MQ9z2LUNsTVC1dHHAaM1f/KVns6ngZmVPaHF1k=;
+	s=k20201202; t=1700243552;
+	bh=q47uRSF51QGBCQgdwow/CsS84crTBnmjByt3KU3Fb1I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=STU2KUYp5jr/X06ogCS6ZPJtO5jcca8O2vPZ5PsqtmMwgX2jqevkoWWvoVpgRsj+I
-	 SGN9EBASuBae5QEC0nWT6YEfAN2mBSRsHogwC0CwOYRPee99MQdsR5eVeE5KevN80c
-	 +0vBu8Y7uahxgj0U9RecmVleym3gJZr85twUrAth1Zgr4DsV1EhsOocNSlaU8+56O8
-	 7veBLh8s1G/ezdb+Omw7h2BRjSJ9nabp82rSLfFjQtD4jruy8J3KVi5121VCtN9WHz
-	 MJhfc+Q28JJAtVx9Q1t75Y/S+FRQYgDlaoyeZwJVWIfiISPk6mPwex8TOQCsaK0eN7
-	 LMl76ipr9xw9w==
-Date: Fri, 17 Nov 2023 12:49:29 -0500
+	b=HJ6lawmVBN+9L0mvvaWpFCl3RsrX83j+p/244P6O3TmgsJgadKoXdzFYWv6uWuoU9
+	 wXTs1Y+NrdsyR6sYEGj/AisN+3NdlE2CzWo+9bMhINqeJklk0z1vg9Moap0ub7s5OA
+	 tAeXInF8B9T2JvqNMjJ05SH6lsVbOa5O/3G20n3uMfCS2n4bKRtIuJbt1+dxCJ9/bn
+	 B83HTRSZndGuImZsJk4Pue10gobMMFzp3Ej34RZZS+opJOzwPb09L6Qq84T5mbiqGP
+	 hnngjAadPz/GGKgFjYbqkXBOI83RdfC5KToUFhLOVBvIb33QfeGZxZrTbAGiQj89FY
+	 fuFH5kWPmvkaA==
+Date: Fri, 17 Nov 2023 12:52:30 -0500
 From: Wolfram Sang <wsa@kernel.org>
 To: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -40,9 +40,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 1/5] net: ethernet: renesas: rcar_gen4_ptp: Remove
- incorrect comment
-Message-ID: <ZVenqeTESTUSOyJq@shikoro>
+Subject: Re: [net-next 2/5] net: ethernet: renesas: rcar_gen4_ptp: Fail on
+ unknown register layout
+Message-ID: <ZVeoXiAC3/m2NVQR@shikoro>
 Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
 	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -51,7 +51,7 @@ Mail-Followup-To: Wolfram Sang <wsa@kernel.org>,
 	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org
 References: <20231117164332.354443-1-niklas.soderlund+renesas@ragnatech.se>
- <20231117164332.354443-2-niklas.soderlund+renesas@ragnatech.se>
+ <20231117164332.354443-3-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,22 +59,20 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4haptCi5eTjC83Le"
+	protocol="application/pgp-signature"; boundary="6sG5jACAcQ1LRzVL"
 Content-Disposition: inline
-In-Reply-To: <20231117164332.354443-2-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20231117164332.354443-3-niklas.soderlund+renesas@ragnatech.se>
 
 
---4haptCi5eTjC83Le
+--6sG5jACAcQ1LRzVL
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 17, 2023 at 05:43:28PM +0100, Niklas S=C3=B6derlund wrote:
-> The comments intent was to indicates which function uses the enum. While
-> upstreaming rcar_gen4_ptp the function was renamed but this comment was
-> left with the old function name.
->=20
-> Instead of correcting the comment remove it, it adds little value.
+On Fri, Nov 17, 2023 at 05:43:29PM +0100, Niklas S=C3=B6derlund wrote:
+> Instead of printing a warning and proceeding with an unknown register
+> layout return an error. The only call site is already prepared to
+> propagate the error.
 >=20
 > Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.=
 se>
@@ -82,25 +80,25 @@ se>
 Reviewed-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
 
 
---4haptCi5eTjC83Le
+--6sG5jACAcQ1LRzVL
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmVXp6kACgkQFA3kzBSg
-KbZISQ//ePUZVmIbDWM38cFGxmHCwcX/DK0ujyjsIW4qiyBQTTbHXB4l0yA9ZUGt
-msshuzWUSytgHn4K84/DYeaT8kTSkapM1884EcNiZQLHYZJy4OSHpeeiUQt/ld6v
-vq9Vckdh/tU7BtjoZQRpcObmItxWQF/eqBL8miJ0XK3f6o5URcuPmRwpGPRJW2oA
-e1LeD7ExITSNQIzy4AbEbaGUq0IL4vz0cS+B79829LNRGpidc1xUCR3VMzl8psfI
-XHCVipg13mxuoWai6FY3JmIB+yGplE5Smlmw8WEWgaLn5yc0BDCCq88tjOdoGQA/
-FEgY2Qw+zBqYAN/mwpaFRX68CFMHVMUNNgMO9ZiEfQ+z8oQNwm3tTvpBevhtC2UB
-8wbhpD/WllV06+W8+AbodofB6AxP/mDFVZh9HJ4Ki5K5xHeDtd0DqfIXKN0k72k+
-ieCjSoh7MKRbf5pm3YfvJtLTC448+VvvVK+LdW8FQBBWmrBI+3pIGJtqv1xt7S3x
-HjBXK8yiUrELQ/6mcOxMugIs/WIVMK5Vh5sZvNuVdg7jbNLHOe2eZpglvNQqdRWk
-b6MkOqXPQLWronmYKi+8PQqVp4FfsrQYRUTsesKcX1oKgfF05qj//tb1uz6XVZJw
-LaOqXNcTLvp3DdxQFqWuI1FgpJnxVe/zQSnwlfBCCm1fhd05VYw=
-=mQel
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmVXqF4ACgkQFA3kzBSg
+Kbbt8BAAsTpmqTq2y+c1pexZv2yUNr78sk1jGalfMtpKOP4sszRW4AY6Ii4w/bYX
+CwNA0BQKiwBqUzUBDHphgj+PK+NuQs1Y2KcKghvG3/OrEFxvQCn6LjHVNdBzRp8M
+B4bWZtd3NfL9ZBxwmPTAH++QUT1bpBdvyiXFHwq1DTW76SJtx1wBPIFeq5joCK3b
+Ba50dY7Xl25aMU3Z6+vubQwjkS1p+655eCA9ds6imK+zBUHGDUHNr5zJ25l/rjqD
+HTRdl06DF0KOlNzx5B4EIJGj8qxTwnaG2FOXivgo2HdaN/gor6iLDD+ytqRhE0Au
+4xtZX92zQhW3zV2akq2GBGv7XIyX29oAn3qiTLjVl/9Xh0KAExoM6o8aoL1bSlRO
+LLctfpEoVk8ELWyJnZ4COlFEDC16WcULHPKBEijDx3u6LYc1ZOMZ4fIWmC4lCPTJ
+fPnVyeWfC9fXg+70VVRaypVtfhQGLE7b+UjF8VyciPutVhQ+LgQTkPRPXXbEG1DY
+N5pgWJZZE7ZqubrzfFzuvu4xTWWftOqZeTuwWWI2T1p2aJzBW5V9xPCdGchdfdO1
+jSlPjanDxKPnNPJcQd5r6QwihRoKMenIhumHhRLuNJH19F7SxCNdrxIcgUaaGbA9
+LU/8oAIKPwh3+0pBHkH6ArOyO+7TPCyS7e9+O6BJ4ElqEWPBlUE=
+=27q8
 -----END PGP SIGNATURE-----
 
---4haptCi5eTjC83Le--
+--6sG5jACAcQ1LRzVL--
 
