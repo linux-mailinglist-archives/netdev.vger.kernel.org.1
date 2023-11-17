@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-48754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C1C7EF6C7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:12:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD46A7EF6CA
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BBC41C20926
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:12:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29B66280DC0
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CE94177B;
-	Fri, 17 Nov 2023 17:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD743DB9E;
+	Fri, 17 Nov 2023 17:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SAvVAj92"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="KQya1Tm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C4B5D57
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:12:31 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1cc3bb4c307so20165535ad.0
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:12:31 -0800 (PST)
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C3CD57
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:12:34 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cc131e52f1so25272165ad.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:12:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700241151; x=1700845951; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700241154; x=1700845954; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zsXp4akWhByUsbhRVOnU84CPXghQ4aI2lN+tCctcdH0=;
-        b=SAvVAj92HZ1HS6L78aWxMpa9vL0HjaFNGoE/xzkniHjbft2fBCxGAKVC3fDWIMtz8T
-         0Q8Gdwus425xXVjB/oaD3Vk+F9eHq9Zb5inaJy64cF4HA0wppnlNMlW9zZxjJnEsF0KJ
-         GeOcb3Slo1SOYuGq4uM3N1p7yVi6nIDt9e63G/i4iu3QXq0pYDrIabjgXhMGa81+QCQP
-         c0TO+NMNcWbkhocxVTyxNByNQQSe1q97mq+BCJIUuPSOHforYwoteZPVEaqxkN0fCp2h
-         Qqj8obZYP9b+Ax2JoRO37LE1HJ44tJmJsLwwGsa421F8OaQl8lHfeQePbB7XOUAF0Nlw
-         4RIg==
+        bh=ZxDQzw6ad5px6yFhBl5tnkJGwPfE9XAaXdVR53d4yv4=;
+        b=KQya1Tm00LfHfngzCT8W6zFsg72buOrdaooLPVGLw+CuiuHQU07VfmODOQAZFlKPp2
+         93vL4eYRvE5JmMdODROKFhXlpmvZMc5x2GXc8rXDvPG/CB9gCaiOZa/OEQoAVZGMhbZe
+         5gBknA0I9nTA0buiutw2y64k1cFs5qx7dnF4YanoCgeMsIiI5sPdPDDgcF8/K3FeiDAx
+         BPdu4hJCfsadyNG41JWwljN/FmTuCdAr61b8wXSnGFQKLM0UWlzBzUh9dUrCy9aOoerS
+         JnJtAnmqEnqNSlfR+CM2tTsrM4cBx3AqaYIsAJh447a4miQzrAjeZ5snPZoOb+TW1TGa
+         5ZjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700241151; x=1700845951;
+        d=1e100.net; s=20230601; t=1700241154; x=1700845954;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zsXp4akWhByUsbhRVOnU84CPXghQ4aI2lN+tCctcdH0=;
-        b=LJhy8c2Uuoqv1GgR+tGdJ9XwRmPXmI1A5JS5XAk2cFM/lz5Ya7skuM39gTLV9ji5tq
-         c06n/0gW/dHzYJelighYzc0YwK8ufXHxja+Byq8ppWFvy6WHNRrUn3LthBigSY6PtLSm
-         VOLfwwsl6fcKBpN4UApFkwh4SgoX3RA96DBFNI/cBkk5Ma04zixZj91vgHDADLAtDbpw
-         zQjglemvIhoXK061MNPTziFviHmgfQ/wO+aEXUwmhuS4K3vr8GvRqltZ9U/YnqvSBzCN
-         zb+5v0ov+4CzRk87AgC5Q+BeHCvMgg3OAkEeQl/BolTaxlWSgrfGAygHpHQBU+TanavI
-         61xA==
-X-Gm-Message-State: AOJu0Yy6j6seICyf3lZW/S3oGCCz/G3wKINZYYxwP503p2f5Z81O7oHi
-	ejErjviltUgeKlZvn1fcWQidjU61L1tIlefRTuw=
-X-Google-Smtp-Source: AGHT+IEzO7OOtRz7VaeGDR7n3NTuNYAzXgo6/Y08x7WKenl0GXzaR+ddYY2iPY3JBetDqAL8dTTk6w==
-X-Received: by 2002:a17:902:ecc1:b0:1cc:6dd4:5955 with SMTP id a1-20020a170902ecc100b001cc6dd45955mr287585plh.19.1700241150708;
-        Fri, 17 Nov 2023 09:12:30 -0800 (PST)
+        bh=ZxDQzw6ad5px6yFhBl5tnkJGwPfE9XAaXdVR53d4yv4=;
+        b=h70mnp7zL2EgMqyZ3Bi2ZdT3P9KyXy5VXxNaAH590hNEtBYNBzFAcSKsrVu9hDRHSX
+         ISduiXi2yyHkftdOqJowL8aCVzCJXHOKeCd/YnTxfx1XhdwGZ6ODEqmu5C0OUhRbPmB/
+         V77irszw7l3FctMYjSWOUGFjmsoW0m54OSBLU9DRpDzxPDh/qk2B5bPBCJl6GWTL7AGw
+         NK5c3ZgVDcmnpk6XLBAgWapLv55lQw3ZuyyuRKNO1NklwEkFArIWP+4SBni8xruwOD/E
+         ANLLyT8xNV+M/3PD3K1NBC0KaivBjZqAbLkMMJ4SGX+z4daZLgz06i4dnJXkk3zhbiZV
+         q6Gw==
+X-Gm-Message-State: AOJu0Yz9R6fJMw53/NKFJa8bXaUF4A2ryIG66JHrNeGW0vyHogDmgr44
+	DtN2jlQADBcT7R2a6QY52hfqd1BrqEVzevWfyQI=
+X-Google-Smtp-Source: AGHT+IF2cH447d6VEGuB1MVbsnaSO4m7AUa+vAiCkF0qQHPup8CjAbliC+QXGDaav3HeTShdQU8t8g==
+X-Received: by 2002:a17:902:f7cf:b0:1cc:5f5a:5d3 with SMTP id h15-20020a170902f7cf00b001cc5f5a05d3mr6474902plw.22.1700241154151;
+        Fri, 17 Nov 2023 09:12:34 -0800 (PST)
 Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:49f6:37e1:cbd9:76d])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170902c1c400b001ce5f0de726sm1343979plc.70.2023.11.17.09.12.27
+        by smtp.gmail.com with ESMTPSA id c4-20020a170902c1c400b001ce5f0de726sm1343979plc.70.2023.11.17.09.12.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 09:12:30 -0800 (PST)
+        Fri, 17 Nov 2023 09:12:33 -0800 (PST)
 From: Pedro Tammela <pctammela@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: jhs@mojatatu.com,
@@ -64,10 +64,11 @@ Cc: jhs@mojatatu.com,
 	pabeni@redhat.com,
 	shuah@kernel.org,
 	pctammela@mojatatu.com,
-	victor@mojatatu.com
-Subject: [PATCH net-next 1/6] selftests: tc-testing: cap parallel tdc to 4 cores
-Date: Fri, 17 Nov 2023 14:12:03 -0300
-Message-Id: <20231117171208.2066136-2-pctammela@mojatatu.com>
+	victor@mojatatu.com,
+	kernel test robot <oliver.sang@intel.com>
+Subject: [PATCH net-next 2/6] selftests: tc-testing: move back to per test ns setup
+Date: Fri, 17 Nov 2023 14:12:04 -0300
+Message-Id: <20231117171208.2066136-3-pctammela@mojatatu.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231117171208.2066136-1-pctammela@mojatatu.com>
 References: <20231117171208.2066136-1-pctammela@mojatatu.com>
@@ -79,30 +80,114 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We have observed a lot of lock contention and test instability when running with >8 cores.
-Enough to actually make the tests run slower than with fewer cores.
+Surprisingly in kernel configs with most of the debug knobs turned on,
+pre-allocating the test resources makes tdc run much slower overall than
+when allocating resources on a per test basis.
 
-Cap the maximum cores of parallel tdc to 4 which showed in testing to
-be a reasonable number for efficiency and stability in different kernel
-config scenarios.
+As these knobs are used in kselftests in downstream CIs, let's go back
+to the old way of doing things to avoid kselftests timeouts.
 
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Closes: https://lore.kernel.org/oe-lkp/202311161129.3b45ed53-oliver.sang@intel.com
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 ---
- tools/testing/selftests/tc-testing/tdc.py | 1 +
- 1 file changed, 1 insertion(+)
+ .../tc-testing/plugin-lib/nsPlugin.py         | 68 +++++++------------
+ 1 file changed, 25 insertions(+), 43 deletions(-)
 
-diff --git a/tools/testing/selftests/tc-testing/tdc.py b/tools/testing/selftests/tc-testing/tdc.py
-index a6718192aff3..f764b43f112b 100755
---- a/tools/testing/selftests/tc-testing/tdc.py
-+++ b/tools/testing/selftests/tc-testing/tdc.py
-@@ -1017,6 +1017,7 @@ def main():
-     parser = pm.call_add_args(parser)
-     (args, remaining) = parser.parse_known_args()
-     args.NAMES = NAMES
-+    args.mp = min(args.mp, 4)
-     pm.set_args(args)
-     check_default_settings(args, remaining, pm)
-     if args.verbose > 2:
+diff --git a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+index 62974bd3a4a5..2b8cbfdf1083 100644
+--- a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
++++ b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+@@ -17,44 +17,6 @@ except ImportError:
+     netlink = False
+     print("!!! Consider installing pyroute2 !!!")
+ 
+-def prepare_suite(obj, test):
+-    original = obj.args.NAMES
+-
+-    if 'skip' in test and test['skip'] == 'yes':
+-        return
+-
+-    if 'nsPlugin' not in test['plugins']:
+-        return
+-
+-    shadow = {}
+-    shadow['IP'] = original['IP']
+-    shadow['TC'] = original['TC']
+-    shadow['NS'] = '{}-{}'.format(original['NS'], test['random'])
+-    shadow['DEV0'] = '{}id{}'.format(original['DEV0'], test['id'])
+-    shadow['DEV1'] = '{}id{}'.format(original['DEV1'], test['id'])
+-    shadow['DUMMY'] = '{}id{}'.format(original['DUMMY'], test['id'])
+-    shadow['DEV2'] = original['DEV2']
+-    obj.args.NAMES = shadow
+-
+-    if netlink == True:
+-        obj._nl_ns_create()
+-    else:
+-        obj._ns_create()
+-
+-    # Make sure the netns is visible in the fs
+-    while True:
+-        obj._proc_check()
+-        try:
+-            ns = obj.args.NAMES['NS']
+-            f = open('/run/netns/{}'.format(ns))
+-            f.close()
+-            break
+-        except:
+-            time.sleep(0.1)
+-            continue
+-
+-    obj.args.NAMES = original
+-
+ class SubPlugin(TdcPlugin):
+     def __init__(self):
+         self.sub_class = 'ns/SubPlugin'
+@@ -65,19 +27,39 @@ class SubPlugin(TdcPlugin):
+ 
+         super().pre_suite(testcount, testlist)
+ 
+-        print("Setting up namespaces and devices...")
++    def prepare_test(self, test):
++        if 'skip' in test and test['skip'] == 'yes':
++            return
+ 
+-        with Pool(self.args.mp) as p:
+-            it = zip(cycle([self]), testlist)
+-            p.starmap(prepare_suite, it)
++        if 'nsPlugin' not in test['plugins']:
++            return
+ 
+-    def pre_case(self, caseinfo, test_skip):
++        if netlink == True:
++            self._nl_ns_create()
++        else:
++            self._ns_create()
++
++        # Make sure the netns is visible in the fs
++        while True:
++            self._proc_check()
++            try:
++                ns = self.args.NAMES['NS']
++                f = open('/run/netns/{}'.format(ns))
++                f.close()
++                break
++            except:
++                time.sleep(0.1)
++                continue
++
++    def pre_case(self, test, test_skip):
+         if self.args.verbose:
+             print('{}.pre_case'.format(self.sub_class))
+ 
+         if test_skip:
+             return
+ 
++        self.prepare_test(test)
++
+     def post_case(self):
+         if self.args.verbose:
+             print('{}.post_case'.format(self.sub_class))
 -- 
 2.40.1
 
