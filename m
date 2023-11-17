@@ -1,76 +1,48 @@
-Return-Path: <netdev+bounces-48632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E52B7EEFCC
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:10:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 847A77EEFA3
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:02:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD1722812C4
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:10:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 833481C2089A
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173BC182C6;
-	Fri, 17 Nov 2023 10:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUtaIKXt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CFA517994;
+	Fri, 17 Nov 2023 10:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB707C4;
-	Fri, 17 Nov 2023 02:10:04 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9df8d0c2505so344637666b.0;
-        Fri, 17 Nov 2023 02:10:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700215803; x=1700820603; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qkMOHJc0OcMmrqNaANsP5Qp8DkKGD0Xp7KJHYY+XOZs=;
-        b=BUtaIKXtDID03EDI65cRNTd4bjOZO08xakCsZ5hPpjrE7k9VQb/5otwjiGgrk+DTb3
-         KYsURxs7e6doawx3klGqIVRBUrfuLXxyRTP+lSSODXR97Q2JFOGvn9i+G40AjtL/x0VC
-         YC0Jdf2pJ/JvT8x6SDP2jxsgmz6fkGpGssccKnZiZRpgok3bUnwThmqSyQapuM7afRba
-         FUldef5oMfsRcijPydxQuTjZkHn+SNk+XYW6sp6XJW+h3xJsC3o/esZ5H+FvjCIp6PQW
-         H0BH3pv+F3q7rqDZocLJO9OpmlxbJTTMEyOmrnwNETkCyUv6xMImhxTDZMdQZNpMiXmO
-         mNIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700215803; x=1700820603;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qkMOHJc0OcMmrqNaANsP5Qp8DkKGD0Xp7KJHYY+XOZs=;
-        b=fgWS1vBzn7CJSEuiQXqGZxr5Fqj0MWZOee+JMVp+yJqqB4phFJ2ftdWlFHLIyelC3E
-         iCO4gyhrJHDOZgG/ejJYHiTnYEbDazMgPLMPZc3yfbAR8PUFpGJZ5BmYwhV4oxuMQDw4
-         xZEoPp2KbjAyKS2M0EQSjyKw7T6ok8wJul20ZB1xociGFezbgSlZZ1KRPk/Te+mTS6k+
-         HKsuxQZjFcYLYH0T1gwnFy7MDXKBNoN6zULNFgG21KOgrkLPfQhtENglMx84bBnwMnGu
-         wGTcF3vv9VUvYRoDhUt68bpZYJC2727U3Ui0g6BKIvDl/qtVd/lRqiKa4xFWfjQYHSfo
-         6z1g==
-X-Gm-Message-State: AOJu0YwnNWQcOFhgpuerPVjO+F+PmfajuPqLbNrZ0vnpZWRDB8tO6p/M
-	fn7oXE1/PH2479Pu51WIlaI=
-X-Google-Smtp-Source: AGHT+IGFl1KnB4AxZBJI3CYh9611cwLe5zHHRJSF8ohVLd8UH2H4mYNf8rIvVa5gztii6HcHHt8NJw==
-X-Received: by 2002:a17:906:fcc2:b0:9ad:8a9e:23ee with SMTP id qx2-20020a170906fcc200b009ad8a9e23eemr4152841ejb.13.1700215803309;
-        Fri, 17 Nov 2023 02:10:03 -0800 (PST)
-Received: from fedora.. (dh207-97-146.xnet.hr. [88.207.97.146])
-        by smtp.googlemail.com with ESMTPSA id u22-20020a17090617d600b009e5e4ff01d4sm610599eje.129.2023.11.17.02.10.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 02:10:02 -0800 (PST)
-From: Robert Marko <robimarko@gmail.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AAB885;
+	Fri, 17 Nov 2023 02:02:27 -0800 (PST)
+X-QQ-mid: bizesmtp74t1700215208t84gf9pf
+Received: from wxdbg.localdomain.com ( [183.128.129.197])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 17 Nov 2023 17:59:55 +0800 (CST)
+X-QQ-SSF: 01400000000000K0Z000000A0000000
+X-QQ-FEAT: RrZlkntZBfnLu0O2zBM0wuvxGlmC4CpbclQi4DdcfoRIXX/3azRKVAtAwoJ2K
+	CzyjIWfFOuTO+h2VfTYXgcQv0z2Twj9nX9JbKAhCGALJdwNKbnQdr0AndLa0aI0jbixVZYp
+	E7Im19LmuOP1D/wtobJ18A7/OOXhnUEYBN3onkBUFYic7tI1TpXlM3aV2FVyNjaHQDho58E
+	jyTqv4Km3J7Mlpz0Rq1LflpxFP9HGe/NZbzaxZqrgMYeFN3FyR/lGfqVM07Iag0j5Slzsk1
+	nFd6pN3xpT0kIRHQxFgaOMzZuKFO8YWdyPNawCX688qz/YT8f+WY9KEeUxzgbNSla/dMqNj
+	3tb8HOpJN4w9skO85dhwiMDKSk5eZ1gX6SOkAKfCIrbL7vj87JJU11VBsTZa6Nze/ToqUiC
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 8508710331023806557
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	ansuelsmth@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Robert Marko <robimarko@gmail.com>
-Subject: [PATCH net-next 2/2] net: phy: aquantia: enable USXGMII autoneg on AQR107
-Date: Fri, 17 Nov 2023 11:09:49 +0100
-Message-ID: <20231117100958.425354-2-robimarko@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231117100958.425354-1-robimarko@gmail.com>
-References: <20231117100958.425354-1-robimarko@gmail.com>
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	stable@vger.kernel.org,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net] net: wangxun: fix kernel panic due to null pointer
+Date: Fri, 17 Nov 2023 18:11:08 +0800
+Message-Id: <20231117101108.893335-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,49 +50,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-In case USXGMII is being used as the PHY interface mode then USXGMII
-autoneg must be enabled as well.
+When the device uses a custom subsystem vendor ID, the function
+wx_sw_init() returns before the memory of 'wx->mac_table' is allocated.
+The null pointer will causes the kernel panic.
 
-HW defaults to USXGMII autoneg being disabled which then results in
-autoneg timeout, so enable it in case USXGMII is used.
-
-Signed-off-by: Robert Marko <robimarko@gmail.com>
+Fixes: 79625f45ca73 ("net: wangxun: Move MAC address handling to libwx")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- drivers/net/phy/aquantia/aquantia_main.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c      | 8 +++++---
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c   | 4 +---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 4 +---
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 7711e052e737..c602873052a0 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -26,6 +26,9 @@
- #define PHY_ID_AQR412	0x03a1b712
- #define PHY_ID_AQR113C	0x31c31c12
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index a3c5de9d547a..533e912af089 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -1769,10 +1769,12 @@ int wx_sw_init(struct wx *wx)
+ 		wx->subsystem_device_id = pdev->subsystem_device;
+ 	} else {
+ 		err = wx_flash_read_dword(wx, 0xfffdc, &ssid);
+-		if (!err)
+-			wx->subsystem_device_id = swab16((u16)ssid);
++		if (err < 0) {
++			wx_err(wx, "read of internal subsystem device id failed\n");
++			return err;
++		}
  
-+#define MDIO_PHYXS_XAUI_RX_VEND2		0xc441
-+#define MDIO_PHYXS_XAUI_RX_VEND2_USX_AUTONEG_EN	BIT(3)
-+
- #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK	GENMASK(7, 3)
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_KR	0
-@@ -545,6 +548,15 @@ static int aqr107_config_init(struct phy_device *phydev)
+-		return err;
++		wx->subsystem_device_id = swab16((u16)ssid);
+ 	}
  
- 	aqr107_validate_mode(phydev, phydev->interface);
+ 	wx->mac_table = kcalloc(wx->mac.num_rar_entries,
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index 3d43f808c86b..8db804543e66 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -121,10 +121,8 @@ static int ngbe_sw_init(struct wx *wx)
  
-+	if (phydev->interface == PHY_INTERFACE_MODE_USXGMII) {
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_PHYXS,
-+				     MDIO_PHYXS_XAUI_RX_VEND2,
-+				     MDIO_PHYXS_XAUI_RX_VEND2_USX_AUTONEG_EN,
-+				     MDIO_PHYXS_XAUI_RX_VEND2_USX_AUTONEG_EN);
-+		if (ret)
-+			return ret;
-+	}
-+
- 	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
- }
+ 	/* PCI config space info */
+ 	err = wx_sw_init(wx);
+-	if (err < 0) {
+-		wx_err(wx, "read of internal subsystem device id failed\n");
++	if (err < 0)
+ 		return err;
+-	}
+ 
+ 	/* mac type, phy type , oem type */
+ 	ngbe_init_type_code(wx);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 70f0b5c01dac..526250102db2 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -364,10 +364,8 @@ static int txgbe_sw_init(struct wx *wx)
+ 
+ 	/* PCI config space info */
+ 	err = wx_sw_init(wx);
+-	if (err < 0) {
+-		wx_err(wx, "read of internal subsystem device id failed\n");
++	if (err < 0)
+ 		return err;
+-	}
+ 
+ 	txgbe_init_type_code(wx);
  
 -- 
-2.42.0
+2.27.0
 
 
