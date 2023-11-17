@@ -1,104 +1,221 @@
-Return-Path: <netdev+bounces-48644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC6957EF0E6
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:46:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9850A7EF147
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBE411C20905
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB28F1C2084D
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6982819BBB;
-	Fri, 17 Nov 2023 10:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D18C1A719;
+	Fri, 17 Nov 2023 10:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1W/gjNcg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D355BC;
-	Fri, 17 Nov 2023 02:46:19 -0800 (PST)
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-5a7eef0b931so20253567b3.0;
-        Fri, 17 Nov 2023 02:46:19 -0800 (PST)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53097B3
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:59:42 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so7428a12.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:59:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700218781; x=1700823581; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vGSJhMQLQHd9biRHUxWSjeHfJhsfFu4krkHp3T9mhXE=;
+        b=1W/gjNcgwACeQkSRlaIOy6nekpNO9R5VaFkHjQrmCs1CFbgPBdbT9NeshWDDjQ0nYR
+         tVOObHzQQKzJnK8SRfqGTHgyrD1vu6irbzgqoUZnnjQK5m3RQJHZlE9tTGF3bdw8LUV+
+         6naiQ93CWjPMr/vFAah1XjQJbKvb/HtHHTPR2uC52sgEL+vsg6L88h0BWuxBbE5oTbbm
+         UTuHfGJtUb227S1qclr0IfwXFiYAoiGSMnvuEzVc70GdZ+oj+8XWTnnyTvZbTfOGvsFK
+         5s3OIZb0UhqayC31ihUU9Xwp/rhNjkWl32M1629HsQehz5X6ii5ObaMdfCrg0V60LXtw
+         kCRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700217978; x=1700822778;
+        d=1e100.net; s=20230601; t=1700218781; x=1700823581;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=b1rSD1WUzjMOB3zIQCdXu9P2m4qgtIOBF99SoD+96p0=;
-        b=kGPPedj6/4ja35ycxroOUQBVcfmMdIAd/nNSfDomKcc/V+AoLitYLEmrmn+EJ0IG2N
-         3+PzrhZ48ZMlsWyj6fiOVYpzzDGkVfdu26CXjZpwYKUQoUpyKGZCgmgL86kZyGrUbEHB
-         dPL8VfDGvHQTgf3erG+DfWRzR/h6slS7o8xwTURw3IUi+KwgM6z7A3ABX6Qj1/ihOrWx
-         3kio4fU/kyjqNZcwSYRjS22Rp6oataq6BL3YJyUXiZ3V0nqcLetTM8SBicYNj58Oc3sI
-         OcPQFjb0A2kqvhxRLPFA1OtTGJ8ONpvz06rA7w7AN4s+P0sSbSfxo45DfeCxXZMDgMOq
-         +N9w==
-X-Gm-Message-State: AOJu0YwheO8+qIobf2QZdERBFil5YJsA6ZShT5y5W+sKDAgPs8Sso8Vl
-	c5lZB8Ogyn7+pvQ284KYHM2kHVTLuSFuVg==
-X-Google-Smtp-Source: AGHT+IHYxaTvRxDOWnGePpjVhGhAr66InLuy+uNvHlSARBT8/i/UobfoS4bYK9Q8713DVSCH+hUmXA==
-X-Received: by 2002:a0d:cb0f:0:b0:5a7:dbd1:4889 with SMTP id n15-20020a0dcb0f000000b005a7dbd14889mr22492504ywd.2.1700217978265;
-        Fri, 17 Nov 2023 02:46:18 -0800 (PST)
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com. [209.85.219.179])
-        by smtp.gmail.com with ESMTPSA id k68-20020a0dc847000000b005a7dd6b7eefsm419644ywd.66.2023.11.17.02.46.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 02:46:16 -0800 (PST)
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-da0cfcb9f40so1827791276.2;
-        Fri, 17 Nov 2023 02:46:15 -0800 (PST)
-X-Received: by 2002:a05:6902:1149:b0:da0:5346:f32b with SMTP id
- p9-20020a056902114900b00da05346f32bmr21676255ybu.53.1700217975652; Fri, 17
- Nov 2023 02:46:15 -0800 (PST)
+        bh=vGSJhMQLQHd9biRHUxWSjeHfJhsfFu4krkHp3T9mhXE=;
+        b=lXdgW55iTmslMXkd3dEVkQFIbVTn3LrTgtM+1hD7GQMDcNg5+pkLeu5c/QtIpZKL2i
+         lhNykOPt+9TJFg7FpavSz6e9pVYEM/3rBvdAVzWHcinb85YcUL1fNVLqSleIJHFnY3YT
+         9Z6rQYjycGmjwTpL2oqoXfjthPu9JGzV2WSLKyGQ0nWgypKBdmMNPaZYaakjZyKu3eU+
+         uADkR4nTo1Zv5IUL+DWUjiAaSOCnpxGKOWxHOk9lTu9x9mVFolFeF7OVsdaqLL3vFTK8
+         MYFar3VfHK1QfwZorDxr6o17PQASi4YLsABdOtneGjFsJOzS0XnnS77wOjG0YOMGo1NP
+         5rZg==
+X-Gm-Message-State: AOJu0YwtFFLiPyLWjGvl5tJWQhv60sUKmiS2kw6VKeGnVtVhpF3xTgYE
+	tt8YVpL3tiB98//0oXJSTnNSFWlqBycsJY95lPhOqw==
+X-Google-Smtp-Source: AGHT+IEZCsl7cGhKoqE5WneQsLe+U1yQ/gra+BndxIG1+VURv+zKznyx2chZoVGDEYpKu+UqLrDXYcPwtlJmEQgjZ1Q=
+X-Received: by 2002:a05:6402:10ca:b0:544:466b:3b20 with SMTP id
+ p10-20020a05640210ca00b00544466b3b20mr87286edu.5.1700218780533; Fri, 17 Nov
+ 2023 02:59:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de> <20231117095922.876489-5-u.kleine-koenig@pengutronix.de>
-In-Reply-To: <20231117095922.876489-5-u.kleine-koenig@pengutronix.de>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 17 Nov 2023 11:46:03 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVpYMgTo4myqusSb=qhcMw-AWsMZ-M++E_Y25rMmN62JA@mail.gmail.com>
-Message-ID: <CAMuHMdVpYMgTo4myqusSb=qhcMw-AWsMZ-M++E_Y25rMmN62JA@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/10] net: pcs: rzn1-miic: Convert to platform
- remove callback returning void
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, kernel@pengutronix.de
+References: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
+ <20231117104311.1273-1-haifeng.xu@shopee.com>
+In-Reply-To: <20231117104311.1273-1-haifeng.xu@shopee.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 17 Nov 2023 11:59:27 +0100
+Message-ID: <CANn89iKsirkSvxK4L9KQqD7Q7r0MaxOx71VBk73RCi8b1NkiZw@mail.gmail.com>
+Subject: Re: [PATCH v2] bonding: use a read-write lock in bonding_show_bonds()
+To: Haifeng Xu <haifeng.xu@shopee.com>
+Cc: andy@greyhouse.net, davem@davemloft.net, j.vosburgh@gmail.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 17, 2023 at 11:00=E2=80=AFAM Uwe Kleine-K=C3=B6nig
-<u.kleine-koenig@pengutronix.de> wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
+On Fri, Nov 17, 2023 at 11:43=E2=80=AFAM Haifeng Xu <haifeng.xu@shopee.com>=
+ wrote:
 >
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
+> Problem description:
 >
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
+> Call stack:
+> ......
+> PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
+> [ffffa7a8e96bbac0] __schedule at ffffffffb0719898
+> [ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
+> [ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
+> [ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
+> [ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
+> [ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
+> [ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
+> [ffffa7a8e96bbc80] device_del at ffffffffb0209af8
+> [ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
+> [ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
+> [ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
+> [ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
+> [ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
+> [ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
+> [ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
+> [ffffa7a8e96bbf10] kthread at ffffffffafae132a
+> [ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
 >
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+> 290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-expor=
+ter"
+> [ffffa7a8d14dbb80] __schedule at ffffffffb0719898
+> [ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
+> [ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
+> [ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
+> [ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
+> [ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
+> [ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
+> [ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
+> [ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
+> [ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
+> [ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
+> [ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
+> [ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
+> [ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
+> [ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
+> [ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
+> [ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
+> [ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
+> [ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
+> ......
+>
+> Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
+> but there are many readers which hold the kernfs_rwsem, so it has to slee=
+p
+> for a long time to wait the readers release the lock. Thread 278176 and a=
+ny
+> other threads which call bonding_show_bonds() also need to wait because
+> they try to acquire the rtnl_mutex.
+>
+> bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
+> However, the addition and deletion of bond_list are only performed in
+> bond_init()/bond_uninit(), so we can introduce a separate read-write lock
+> to synchronize bond list mutation.
+>
+> What are the benefits of this change?
+>
+> 1) All threads which call bonding_show_bonds() only wait when the
+> registration or unregistration of bond device happens.
+>
+> 2) There are many other users of rtnl_mutex, so bonding_show_bonds()
+> won't compete with them.
+>
+> In a word, this change reduces the lock contention of rtnl_mutex.
+>
+> Signed-off-by: Haifeng Xu <haifeng.xu@shopee.com>
+> ---
+> v2:
+> - move the call stack after the description
+> - fix typos in the changelog
+> ---
+>  drivers/net/bonding/bond_main.c  | 4 ++++
+>  drivers/net/bonding/bond_sysfs.c | 6 ++++--
+>  include/net/bonding.h            | 3 +++
+>  3 files changed, 11 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+> index 8e6cc0e133b7..db8f1efaab78 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -5957,7 +5957,9 @@ static void bond_uninit(struct net_device *bond_dev=
+)
+>
+>         bond_set_slave_arr(bond, NULL, NULL);
+>
+> +       write_lock(&bonding_dev_lock);
+>         list_del(&bond->bond_list);
+> +       write_unlock(&bonding_dev_lock);
+>
+>         bond_debug_unregister(bond);
+>  }
+> @@ -6370,7 +6372,9 @@ static int bond_init(struct net_device *bond_dev)
+>         spin_lock_init(&bond->stats_lock);
+>         netdev_lockdep_set_classes(bond_dev);
+>
+> +       write_lock(&bonding_dev_lock);
+>         list_add_tail(&bond->bond_list, &bn->dev_list);
+> +       write_unlock(&bonding_dev_lock);
+>
+>         bond_prepare_sysfs_group(bond);
+>
+> diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_=
+sysfs.c
+> index 2805135a7205..e107c1d7a6bf 100644
+> --- a/drivers/net/bonding/bond_sysfs.c
+> +++ b/drivers/net/bonding/bond_sysfs.c
+> @@ -28,6 +28,8 @@
+>
+>  #define to_bond(cd)    ((struct bonding *)(netdev_priv(to_net_dev(cd))))
+>
+> +DEFINE_RWLOCK(bonding_dev_lock);
+> +
+>  /* "show" function for the bond_masters attribute.
+>   * The class parameter is ignored.
+>   */
+> @@ -40,7 +42,7 @@ static ssize_t bonding_show_bonds(const struct class *c=
+ls,
+>         int res =3D 0;
+>         struct bonding *bond;
+>
+> -       rtnl_lock();
+> +       read_lock(&bonding_dev_lock);
+>
+>         list_for_each_entry(bond, &bn->dev_list, bond_list) {
+>                 if (res > (PAGE_SIZE - IFNAMSIZ)) {
+> @@ -55,7 +57,7 @@ static ssize_t bonding_show_bonds(const struct class *c=
+ls,
+>         if (res)
+>                 buf[res-1] =3D '\n'; /* eat the leftover space */
+>
+> -       rtnl_unlock();
+> +       read_unlock(&bonding_dev_lock);
+>         return res;
+>  }
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+This unfortunately would race with dev_change_name()
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+You probably need to read_lock(&devnet_rename_sem); before copying dev->nam=
+e,
+or use netdev_get_name(net, temp_buffer, bond->dev->ifindex)
 
