@@ -1,135 +1,178 @@
-Return-Path: <netdev+bounces-48692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 958BE7EF441
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:16:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E038F7EF449
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 162A9B20B37
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:16:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7083DB20ACB
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B7D31A60;
-	Fri, 17 Nov 2023 14:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E00328D2;
+	Fri, 17 Nov 2023 14:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="OSHULDO+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QGzpLw5O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC539D4B
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:16:04 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-359c1f42680so6654295ab.2
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:16:04 -0800 (PST)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEAB0D5B
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:17:35 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da03390793fso2543708276.3
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:17:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1700230564; x=1700835364; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k0zkkaGQQfuew0hR3yiZNKRsG691DBdOcjFfvtSIFng=;
-        b=OSHULDO+hPUMmriSxtAD13eY1r4DFSjN97ynlcCmgN0MpLscxyRlvB9//FU0ZymZ/8
-         +b/bQ5TOR8EJFpaNmDY8sd+zbojVsQ4D9iWqepqoHsZ2Ah2eoEc+XHaGzG9Kv3QPK0o2
-         rdgkRTJmNZsGFBIifDxD20HUwy5p010bOylgg=
+        d=google.com; s=20230601; t=1700230655; x=1700835455; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=q672V32c6aOkNy0wM1VkDi/b7qHbgbgk590/M+FBRgw=;
+        b=QGzpLw5ORn8WDOjysE2WEzIdc2xGD+8FBtamAGtjh7UFhE7qPQrubtUZaPswY2UK9e
+         QFXoP+MuqjGIToB9Z5HTqVuMiP3g/J7VRXtcFndApb1rrnpKUnfR2vHmS0sbMGxqLZGu
+         d6q97UnknReYUbb9AWxLLNzda9HVIybftBez9LW46uMvjmLDCAIcv+bIGyONJ1guTdEf
+         xueiP3d5NYmwAss2RsHhnERQyD70fvkUmGT0jcR7/pzUgB4ad9uZih7mX+jVlOr8Hbz/
+         YPdQvUDpELyCJhhY29a/V4wps5GZX6RjOaL858qBv5cup2lekbRdHM0VHh4xz4bpKhpo
+         iBRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700230564; x=1700835364;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k0zkkaGQQfuew0hR3yiZNKRsG691DBdOcjFfvtSIFng=;
-        b=gXcdgxiR8Na1kgf9EqOpqc802+I3GTqZRwCXkqgRoAjDiW2n6v95RlAyIQxfew5b+Y
-         buQAR45eemjyQJz+6ikSn7AiGMsTDo+ns9KkmlTyYeVrjOe7rMGaeBmA0eiITEDyku5t
-         6xsRioD5bkpn/y/niTDkR4Iwdom8necoEYxyFWKV3xA3IG5DzPLVOl3K/tEmQpyPIvGx
-         +SDJtqP2rEDlCQfRsSCLssJmkCkHXTGgbFBHq6alaDYKTQuDDYaN0P4iyuP1RViCPgmX
-         Dp6c6GMISKMMilnhSM0HBWt1Vi4NgnR9bH6lQQBEhk/40n5viiU8YDQqV/1E+Zoqk+P3
-         fgLA==
-X-Gm-Message-State: AOJu0YyYBnA5b5blxN69gcArINVsk0oENMenqsbjYsE+yJVzEvd5PlS2
-	62vEIyiDeH99EwSd2JXnWUBNcQ==
-X-Google-Smtp-Source: AGHT+IHrslgqUbhSMSKPfCItRaJiFm+81phLKiF4fYW7uc8VLB3ATt3nV390Bao0abd+AcVqYEmQEw==
-X-Received: by 2002:a05:6e02:1a09:b0:359:c239:3f57 with SMTP id s9-20020a056e021a0900b00359c2393f57mr24128553ild.16.1700230564196;
-        Fri, 17 Nov 2023 06:16:04 -0800 (PST)
-Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
-        by smtp.googlemail.com with ESMTPSA id h7-20020a056e021d8700b00359c1e6cf78sm504795ila.38.2023.11.17.06.16.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 06:16:03 -0800 (PST)
-Message-ID: <79f4a1ff-c4af-45be-b15c-fa07bc67f449@ieee.org>
-Date: Fri, 17 Nov 2023 08:16:02 -0600
+        d=1e100.net; s=20230601; t=1700230655; x=1700835455;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q672V32c6aOkNy0wM1VkDi/b7qHbgbgk590/M+FBRgw=;
+        b=DMqWvFxbdMbegLh8XHpSLobf2iOcsFqryVA2x9lPqUeoCMdDLR/Ul1HpE+ppYQpxFL
+         kGftTo9vuJWL3bLNk6H8NvScYXWwRNwZIqBo50DtDpSk+JitSj/ihU0hXJME4iTZbYow
+         cHS8quLEI1Pqr5A0F2NQ3GTmX2SQip2rEd0zOmXJRy1ufUck/et9i05l+u9+7yVRMSgn
+         FE8Wx2IVXEGk81moT7X//S9nRM7kNCSgrz0PMa8OumgWPGUrbod8rH4XPBaVpz3ADLKw
+         lHCPSKrLC5uiqfS1YhUAP3xDy0ri5oLrKuYkEY4gwecPW/1pcGVRbibCETT/qSqTiL3D
+         sFuw==
+X-Gm-Message-State: AOJu0YxGbLtqT29dxoxCMX2O+aU7G/q9jpGXVuEHtBq0EFA1EIMFyokG
+	Dhm6fLuo+7lW2oUAqyKq6SrKFFuqXMoUaQ==
+X-Google-Smtp-Source: AGHT+IHCpgbvNbLch0DLjexV3V/FVPkie7esmivC+Mv23HobcABjo09NMOx++eE/Rk5AsYFpQ1zsVw9zfBiYSQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:206:b0:d9a:e3d9:99bd with SMTP
+ id j6-20020a056902020600b00d9ae3d999bdmr452862ybs.5.1700230655021; Fri, 17
+ Nov 2023 06:17:35 -0800 (PST)
+Date: Fri, 17 Nov 2023 14:17:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 01/10] net: ipa: Don't error out in .remove()
-Content-Language: en-US
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de
-References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
- <20231117095922.876489-2-u.kleine-koenig@pengutronix.de>
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20231117095922.876489-2-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
+Message-ID: <20231117141733.3344158-1-edumazet@google.com>
+Subject: [PATCH v2 net] wireguard: use DEV_STATS_INC()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>, Hangbin Liu <liuhangbin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/17/23 3:59 AM, Uwe Kleine-König wrote:
-> Returning early from .remove() with an error code still results in the
-> driver unbinding the device. So the driver core ignores the returned error
-> code and the resources that were not freed are never catched up. In
-> combination with devm this also often results in use-after-free bugs.
-> 
-> Here even if the modem cannot be stopped, resources must be freed. So
-> replace the early error return by an error message an continue to clean up.
-> 
-> This prepares changing ipa_remove() to return void.
-> 
-> Fixes: cdf2e9419dd9 ("soc: qcom: ipa: main code")
+wg_xmit() can be called concurrently, KCSAN reported [1]
+some device stats updates can be lost.
 
-Is this really a bug fix?  This code was doing the right
-thing even if the caller was not.
+Use DEV_STATS_INC() for this unlikely case.
 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->   drivers/net/ipa/ipa_main.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-> index da853353a5c7..60e4f590f5de 100644
-> --- a/drivers/net/ipa/ipa_main.c
-> +++ b/drivers/net/ipa/ipa_main.c
-> @@ -960,7 +960,8 @@ static int ipa_remove(struct platform_device *pdev)
->   			ret = ipa_modem_stop(ipa);
->   		}
->   		if (ret)
-> -			return ret;
-> +			dev_err(dev, "Failed to stop modem (%pe)\n",
-> +				ERR_PTR(ret));
+[1]
+BUG: KCSAN: data-race in wg_xmit / wg_xmit
 
-I think this is not correct, or rather, I think it is less
-correct than returning early.
+read-write to 0xffff888104239160 of 8 bytes by task 1375 on cpu 0:
+wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
+__netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+xmit_one net/core/dev.c:3543 [inline]
+dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
+...
 
-What's happening here is we're trying to stop the modem.
-It is an external entity that might have some in-flight
-activity that could include "owning" some buffers provided
-by Linux, to be filled with received data.  There's a
-chance that cleaning up (with the call to ipa_teardown())
-can do the right thing, but I'm not going to sign off on
-this until I've looked at that in closer detail.
+read-write to 0xffff888104239160 of 8 bytes by task 1378 on cpu 1:
+wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
+__netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+xmit_one net/core/dev.c:3543 [inline]
+dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
+...
 
-This is something that *could* happen but is not *expected*
-to happen.  We expect stopping the modem to succeed so if
-it doesn't, something's wrong and it's not 100% clear how
-to properly handle it.
+v2: also change wg_packet_consume_data_done() (Hangbin Liu)
+    and wg_packet_purge_staged_packets()
 
-For now...  you know a little more about my hesitation, but
-please wait to commit this change until I've had a chance
-to spend more time reviewing.
+Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>
+---
+ drivers/net/wireguard/device.c  |  4 ++--
+ drivers/net/wireguard/receive.c | 12 ++++++------
+ drivers/net/wireguard/send.c    |  3 ++-
+ 3 files changed, 10 insertions(+), 9 deletions(-)
 
-					-Alex
-
->   
->   		ipa_teardown(ipa);
->   	}
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index 258dcc1039216f311a223fd348295d4b5e03a3ed..deb9636b0ecf8f47e832a0b07e9e049ba19bdf16 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -210,7 +210,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	 */
+ 	while (skb_queue_len(&peer->staged_packet_queue) > MAX_STAGED_PACKETS) {
+ 		dev_kfree_skb(__skb_dequeue(&peer->staged_packet_queue));
+-		++dev->stats.tx_dropped;
++		DEV_STATS_INC(dev, tx_dropped);
+ 	}
+ 	skb_queue_splice_tail(&packets, &peer->staged_packet_queue);
+ 	spin_unlock_bh(&peer->staged_packet_queue.lock);
+@@ -228,7 +228,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	else if (skb->protocol == htons(ETH_P_IPV6))
+ 		icmpv6_ndo_send(skb, ICMPV6_DEST_UNREACH, ICMPV6_ADDR_UNREACH, 0);
+ err:
+-	++dev->stats.tx_errors;
++	DEV_STATS_INC(dev, tx_errors);
+ 	kfree_skb(skb);
+ 	return ret;
+ }
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receive.c
+index 0b3f0c843550957ee1fe3bed7185a7d990246c2b..a176653c88616b1bc871fe52fcea778b5e189f69 100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -416,20 +416,20 @@ static void wg_packet_consume_data_done(struct wg_peer *peer,
+ 	net_dbg_skb_ratelimited("%s: Packet has unallowed src IP (%pISc) from peer %llu (%pISpfsc)\n",
+ 				dev->name, skb, peer->internal_id,
+ 				&peer->endpoint.addr);
+-	++dev->stats.rx_errors;
+-	++dev->stats.rx_frame_errors;
++	DEV_STATS_INC(dev, rx_errors);
++	DEV_STATS_INC(dev, rx_frame_errors);
+ 	goto packet_processed;
+ dishonest_packet_type:
+ 	net_dbg_ratelimited("%s: Packet is neither ipv4 nor ipv6 from peer %llu (%pISpfsc)\n",
+ 			    dev->name, peer->internal_id, &peer->endpoint.addr);
+-	++dev->stats.rx_errors;
+-	++dev->stats.rx_frame_errors;
++	DEV_STATS_INC(dev, rx_errors);
++	DEV_STATS_INC(dev, rx_frame_errors);
+ 	goto packet_processed;
+ dishonest_packet_size:
+ 	net_dbg_ratelimited("%s: Packet has incorrect size from peer %llu (%pISpfsc)\n",
+ 			    dev->name, peer->internal_id, &peer->endpoint.addr);
+-	++dev->stats.rx_errors;
+-	++dev->stats.rx_length_errors;
++	DEV_STATS_INC(dev, rx_errors);
++	DEV_STATS_INC(dev, rx_length_errors);
+ 	goto packet_processed;
+ packet_processed:
+ 	dev_kfree_skb(skb);
+diff --git a/drivers/net/wireguard/send.c b/drivers/net/wireguard/send.c
+index 95c853b59e1dae1df8b4e5cbf4e3541e35806b82..0d48e0f4a1ba3e1f11825136a65de0867b204496 100644
+--- a/drivers/net/wireguard/send.c
++++ b/drivers/net/wireguard/send.c
+@@ -333,7 +333,8 @@ static void wg_packet_create_data(struct wg_peer *peer, struct sk_buff *first)
+ void wg_packet_purge_staged_packets(struct wg_peer *peer)
+ {
+ 	spin_lock_bh(&peer->staged_packet_queue.lock);
+-	peer->device->dev->stats.tx_dropped += peer->staged_packet_queue.qlen;
++	DEV_STATS_ADD(peer->device->dev, tx_dropped,
++		      peer->staged_packet_queue.qlen);
+ 	__skb_queue_purge(&peer->staged_packet_queue);
+ 	spin_unlock_bh(&peer->staged_packet_queue.lock);
+ }
+-- 
+2.43.0.rc0.421.g78406f8d94-goog
 
 
