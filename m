@@ -1,112 +1,128 @@
-Return-Path: <netdev+bounces-48625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF837EEF9A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 530B07EEFC5
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE57C2812ED
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D931C2082F
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11FC018028;
-	Fri, 17 Nov 2023 10:00:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9963A1803F;
+	Fri, 17 Nov 2023 10:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AyVKdcVo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VhASmIP3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C53284;
-	Fri, 17 Nov 2023 02:00:13 -0800 (PST)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AH9KDIL002157;
-	Fri, 17 Nov 2023 09:59:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=q3iC62ynP/mZpKHk8fWgTSo66zEj7Zi2/0wjFcoZTGQ=;
- b=AyVKdcVov8hJCEoszwR2yzPg3FtYQpFAdLCOUa7IkkAHIW3yLfu/cIFgnXe3kisPG/C8
- HN/xE3WgmimYrTZERjSsijSfrXapuGaJ63qIH2VmgysX59q0O2CRzDOLoVA42l2OFayr
- nGbMKGoa4zWinQUTgJFC9IOQegFjvaYkIB6dKQluAmVsSKABJT8ylxHD3sutd45uoK4F
- Snd9P7WBL1JKyZoNk3QcIUa5tf4RfBcBUGUGP3NDHNazMwv09Fu1WbDLiaDxq8Z1+V9X
- jPCgEO3FWKlEIKDzZeDnTtIXv3gjyM3GwJ4TtJ+ADkrTvRcUrnxOEtFYZeFERAFJY3/8 1A== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ue5exr2hq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 09:59:59 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AH9xvmZ009296
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 09:59:57 GMT
-Received: from [10.253.8.81] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 17 Nov
- 2023 01:59:53 -0800
-Message-ID: <7e856fc9-25c7-489f-8a42-759ed126ae68@quicinc.com>
-Date: Fri, 17 Nov 2023 17:59:51 +0800
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF45FA6;
+	Fri, 17 Nov 2023 02:08:52 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-53e751aeb3cso2598846a12.2;
+        Fri, 17 Nov 2023 02:08:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700215731; x=1700820531; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EbmgR2wWjkRCjoHXAmGAF8yTKa5Bp0SAasTthhu3X1w=;
+        b=VhASmIP3iTphEAWMfz1ZyJ8teYhhq70fay9LNZzcNhpIeSnGDnXxJIvk9C07CS38Wf
+         T6xqW6kxM0wIrUwDDmXiORQBAAmQbAVNLXwQpXZWdc0qmqGsskqki9g1aEWTKR7iAozP
+         F6ji+yLJRPt9YVKNvCNj2AehyfC1sITgkqqdAIWI7U3f+D1uJzTp8iseDXdVPScMqpQT
+         2qMj1rUh4KnnSWBfM/RnOOJQctxzXBXNzc4z8UzYLmVlTRRDsI1W1wxGrUgHrJnNkbik
+         0G+CdXgC84dMeWuprD8tTzqqBTKQnQTNaAN53y08IhOQiU6fCIiUCsGUppoBEGMYA8o3
+         7hWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700215731; x=1700820531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EbmgR2wWjkRCjoHXAmGAF8yTKa5Bp0SAasTthhu3X1w=;
+        b=QxvjRoMAr87X0XFfh1gBXRBKVosuD9pIJi/8vGtLLt+zaVoeVe6DqLGk3IbFrXxlLE
+         bb9yREnmZahY37y3lW/znnmIrCJXcyRK3leZzhcdu3wnthHR3u/Uw4B7HOX9YtIWPF9q
+         xa8UiFdLs9gjuKQ9+1qAYtRZCc6uCyGA2TysE4NDmdBMM2Utyu4ggGPlYNTW6dnuo5oS
+         O15XOjH6R51kcqP3Bb14mJ/MWByE5w/OBwxO8QyHsl8+Ig8YZX49ob0M7TawtfFzsn8M
+         ZER1r05tjRprwnrSbhd+taiiooQS28ORxEW/NXykKYAVmTi3+gOLwvol5JdQvENnTw0L
+         rEHA==
+X-Gm-Message-State: AOJu0Yz4/DtRs1ryHuea1fZFLGcvVXF69rjKiUe6LgUpv8wOHbQZUMTW
+	r/n9LshexRu+TCk96RiQAyQ=
+X-Google-Smtp-Source: AGHT+IECgkxdQdU9bxD60OX+sU3zhWfKV3n8cBsWD4ljTBzUxmLZEmKXWQeY91gOusS4DVmThHuXFQ==
+X-Received: by 2002:aa7:d801:0:b0:545:5601:414e with SMTP id v1-20020aa7d801000000b005455601414emr14671872edq.5.1700215730944;
+        Fri, 17 Nov 2023 02:08:50 -0800 (PST)
+Received: from fedora.. (dh207-97-146.xnet.hr. [88.207.97.146])
+        by smtp.googlemail.com with ESMTPSA id n26-20020a056402061a00b0054358525a5bsm554368edv.62.2023.11.17.02.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 02:08:50 -0800 (PST)
+From: Robert Marko <robimarko@gmail.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ansuelsmth@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Robert Marko <robimarko@gmail.com>
+Subject: [PATCH 1/2] net: phy: aquantia: validate PHY mode on AQR107
+Date: Fri, 17 Nov 2023 11:05:04 +0100
+Message-ID: <20231117100848.424372-1-robimarko@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/9] net: mdio: ipq4019: Enable GPIO reset for ipq5332
- platform
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-4-quic_luoj@quicinc.com>
- <e740a206-37af-49b1-a6b6-baa3c99165c0@lunn.ch>
- <33246b49-2579-4889-9fcb-babec5003a88@quicinc.com>
- <dd2c3cfa-f7ee-4abb-9eff-2aac04fa914f@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <dd2c3cfa-f7ee-4abb-9eff-2aac04fa914f@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: M_yXy1nGjp7G9GwYZKFTPx6kEDNQjrct
-X-Proofpoint-ORIG-GUID: M_yXy1nGjp7G9GwYZKFTPx6kEDNQjrct
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-17_07,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- impostorscore=0 bulkscore=0 phishscore=0 malwarescore=0 adultscore=0
- priorityscore=1501 clxscore=1015 lowpriorityscore=0 spamscore=0
- mlxlogscore=774 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311170073
+Content-Transfer-Encoding: 8bit
 
+The Aquantia driver is not setting the PHY mode itself, but it does however
+still check if the PHY mode set in DTS is one of the supported modes.
 
+However, the set PHY mode does not have to match the actual one, so lets
+add update the PHY mode during .config_init and warn if they differ.
 
-On 11/17/2023 1:20 AM, Andrew Lunn wrote:
->> FYI, here is the sequence to bring up qca8084.
->> a. enable clock output to qca8084.
->> b. do gpio reset of qca8084.
->> c. customize MDIO address and initialization configurations.
->> d. the PHY ID can be acquired.
-> 
-> This all sounds like it is specific to the qca8084, so it should be in
-> the driver for the qca8084.
-> 
-> Its been pointed out you can get the driver to load by using the PHY
-> ID in the compatible. You want the SoC clock driver to export a CCF
-> clock, which the PHY driver can use. The PHY driver should also be
-> able to get the GPIO. So i think the PHY driver can do all this.
-> 
->       Andrew
+Signed-off-by: Robert Marko <robimarko@gmail.com>
+---
+ drivers/net/phy/aquantia/aquantia_main.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Yes, Andrew, that is feasible, i will update the patches to move the
-initialized clock configs in the PHY probe function.
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+index cc4a97741c4a..7711e052e737 100644
+--- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -505,6 +505,21 @@ static void aqr107_chip_info(struct phy_device *phydev)
+ 		   fw_major, fw_minor, build_id, prov_id);
+ }
+ 
++static void aqr107_validate_mode(struct phy_device *phydev,
++				 phy_interface_t dts_mode)
++{
++	int ret;
++
++	/* Get the actual PHY mode */
++	ret = aqr107_read_status(phydev);
++	if (ret)
++		return;
++
++	if (dts_mode != phydev->interface)
++		phydev_info(phydev, "%s mode is set in DTS while %s mode is actual. Please update your devicetree.\n",
++			    phy_modes(dts_mode), phy_modes(phydev->interface));
++}
++
+ static int aqr107_config_init(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -528,6 +543,8 @@ static int aqr107_config_init(struct phy_device *phydev)
+ 	if (!ret)
+ 		aqr107_chip_info(phydev);
+ 
++	aqr107_validate_mode(phydev, phydev->interface);
++
+ 	return aqr107_set_downshift(phydev, MDIO_AN_VEND_PROV_DOWNSHIFT_DFLT);
+ }
+ 
+-- 
+2.42.0
+
 
