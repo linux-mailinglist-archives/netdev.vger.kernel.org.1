@@ -1,185 +1,542 @@
-Return-Path: <netdev+bounces-48677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025307EF2F3
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:49:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411B47EF2FA
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5442F280C66
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:49:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96627B209F7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62CDD28366;
-	Fri, 17 Nov 2023 12:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7ACE30329;
+	Fri, 17 Nov 2023 12:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZYtTHoTh"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="pvXb/sHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CC87D52
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:49:01 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32f737deedfso1273275f8f.3
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:49:00 -0800 (PST)
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1284FD5A
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:49:56 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-59b5484fbe6so21366407b3.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:49:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700225339; x=1700830139; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1bFhrBcoDdC2v1NgNhvFX0tt6WAIIwqB9ILvwOogMH0=;
-        b=ZYtTHoThGOsJIoo8fHrbA3HIsnZQUDRGXMrSp5xDkRBZHUfy/Lw/id5xVDHOO7WCip
-         kkBV6+R40ozL2tx1loOhkhB4OYliRN+9GA3QiI4YrrCOq/MJqVLSGOFttG48Qn9eVVxT
-         t08ELySeAQJHiEkZllrbqayqIQAKbDyTxTHj4azR7xPgQR1HNb+kZhDPGhje3eIK5lho
-         OfRH/uI8WlEu/Z5cbGCUJCbGY52uWbn1uiv+a16t5wYDZZjzlZBjSB7tlIUKWXuORO9k
-         dHVltVXplILqpPjzCJv3j/E9U66/byu8RLjGw0XYhJuJcmzHKH7yuTCbzVa49QojsFfb
-         LD9A==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700225395; x=1700830195; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oNAxIj0/yflYGUPdCd7AGcyBDkjbQtiWMLnIzQGxluU=;
+        b=pvXb/sHRDorCVfCmbDrkQGyw2oBhBkzTO+/VzAKmImyOr2BtFaBO3gjUPblgX29gSQ
+         4RpZjjoeunuO8YjBx97O4QLg6qj9Gdo2hAlnueie7hyx+qm+dR7Hemhr0pP7mGHNjNke
+         EMZs5RnX83HHdScXshbvw7PcXuub4h+nvo7oehellRv7rh0Yv/DY7Jp6EfGtKlKO+3vv
+         J5YfR/Vrlb4nqewYHSjGnU/Gl/CkTfYPwXmwAlWdnN1YDC8ymUmY0g1MiKv0gHaoPdIZ
+         7J4SqI7bEsxg+3j8bCvxWjnAROboeXGvWlxqAfCgEwRDshaQxRcviFO5ejfYh4aKKgtK
+         ogiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700225339; x=1700830139;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1bFhrBcoDdC2v1NgNhvFX0tt6WAIIwqB9ILvwOogMH0=;
-        b=k5yXaf3/BQqLdU+k4fPrBSFeTEBV42sIaENCpxvDD35R0viwZciPVI6yLRyLN7MmMG
-         Mv6DypAVtHaPf4tGAi2I+LaOvmv32RlrpZ0QSK4GaZlcO5REJ+oYsNH0y1KHb7+HWLT9
-         oqYY9FfjBYz0WKEe18eM3N0ogMquLNXGzsWh20VqSy5kBw3mb4a3QmO6bFmsRSAmWJoP
-         1AtO9BWLVGllzxSGsCyxfKynYi5ccyqaIN65jTbJuPjs/67hEKVOB0MM5dWH9QMnQ/hl
-         Gc/kUuWdM0qQWi1R3LmlM0E7qfNO/yuMuZCtzWeiUr2DxxzvNHnknzt+Z8/KQgp/2W+5
-         HeAA==
-X-Gm-Message-State: AOJu0YxdDvJfeQRGL+FI6xH7CjdTFxyVeEsKE4iIYBzNJW0iObtzmuC3
-	n1hXoT7kDc5yzBIFVO+X8FUTJDFzaeCFUCVMuDUEgA==
-X-Google-Smtp-Source: AGHT+IFaSwZiSL3VoR03Kf36LoRVfCcIWmQo0E5pw+2peAThwpZrZvuXPanUG9UHdJJcpOH9P7v/3w==
-X-Received: by 2002:a05:6000:1acf:b0:32f:7ae2:4165 with SMTP id i15-20020a0560001acf00b0032f7ae24165mr19379925wry.9.1700225339457;
-        Fri, 17 Nov 2023 04:48:59 -0800 (PST)
-Received: from [192.168.1.20] ([178.197.218.126])
-        by smtp.gmail.com with ESMTPSA id d4-20020a5d4f84000000b0032d96dd703bsm2194274wru.70.2023.11.17.04.48.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 04:48:58 -0800 (PST)
-Message-ID: <bdbb321b-64e4-4e21-bcf8-e1d201f0a5dc@linaro.org>
-Date: Fri, 17 Nov 2023 13:48:56 +0100
+        d=1e100.net; s=20230601; t=1700225395; x=1700830195;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oNAxIj0/yflYGUPdCd7AGcyBDkjbQtiWMLnIzQGxluU=;
+        b=I4hNF+pEJwQmD+yYzZuqbGQMUMEjofPG3NQZUgMDkqry0q3OKKxndeGIw7YArtVot/
+         sS/VBKDELbr9N6w8d9wJ5MCti1YKK66KpNJdvYxyXvvX1B4Dbh9CDEdXa6pO38mcLMTH
+         QK/g+iUFrNEKVmE3DcNUHH5CZp7pTto01cgsiwCTN16yUDo3gj2Guu8DyT1JKPwaUy4f
+         NpL3uYKDXCwfKp/HNuPDNAk1YUCvINfgrXWY/pZNez6L3oiylFToj+c0qkbBATLZ2fUK
+         JW489oYAKvBTjgTeuGC1h0Lk2lZAaOcE+xJxMTUSdQv3F3YcqOSf/NPGK/P6Siom+8gB
+         q4ZA==
+X-Gm-Message-State: AOJu0YxuXyoeSAWKk1rsywT5c1bX8c5f3iSAS7UGgBdTDDuR3b5PMn47
+	MuRhtTIfWEa2tsW92J2ODK6oIzNChOOo459dM8Rs3Q==
+X-Google-Smtp-Source: AGHT+IEr+JU/6+XFmEPT0KKfBsZVkjxlpVba1nKZ2elVQ97ev99MWnPlR2FxQjam68ZF080qIGjJJa/C90DDS4UplFU=
+X-Received: by 2002:a81:8306:0:b0:5b3:22f1:e42f with SMTP id
+ t6-20020a818306000000b005b322f1e42fmr19391768ywf.26.1700225395108; Fri, 17
+ Nov 2023 04:49:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] [nfc?] KASAN: slab-use-after-free Read in
- nfc_alloc_send_skb
-Content-Language: en-US
-To: Siddh Raman Pant <code@siddh.me>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- syzkaller-bugs@googlegroups.com,
- syzbot+bbe84a4010eeea00982d@syzkaller.appspotmail.com
-References: <000000000000cb112e0609b419d3@google.com>
- <7824cf85-178f-4fca-8058-b9a1f49d3113@siddh.me>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <7824cf85-178f-4fca-8058-b9a1f49d3113@siddh.me>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20231116145948.203001-1-jhs@mojatatu.com> <655707db8d55e_55d7320812@john.notmuch>
+In-Reply-To: <655707db8d55e_55d7320812@john.notmuch>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 17 Nov 2023 07:49:43 -0500
+Message-ID: <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
+	jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, 
+	horms@kernel.org, daniel@iogearbox.net, bpf@vger.kernel.org, 
+	khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, dan.daly@intel.com, 
+	chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16/11/2023 17:55, Siddh Raman Pant wrote:
-> TLDR: Different stages of 1 and 2 can race with each other causing UAF.
-> 
-> 1. llcp_sock_sendmsg -> nfc_llcp_send_ui_frame -> loop call (nfc_alloc_send_skb(nfc_dev))
-> 
-> 2. virtual_ncidev_close -> [... -> nfc_llcp_socket_release -> ...] -> [... -> nfc_free_device]
-> 
-> ---
-> 
-> Hi,
-> 
-> I've been trying to fix this bug for some time but ending up getting
-> stuck every now and then. If someone could give more inputs or fix it,
-> it will be really helpful.
-> 
-> This bug is due to racing between sendmsg and freeing of nfc_dev.
-> 
-> For connectionless transmission, llcp_sock_sendmsg() codepath will
-> eventually call nfc_alloc_send_skb() which takes in an nfc_dev as
-> an argument for calculating the total size for skb allocation.
-> 
-> virtual_ncidev_close() codepath eventually releases socket by calling
-> nfc_llcp_socket_release() (which sets the sk->sk_state to LLCP_CLOSED)
-> and afterwards the nfc_dev will be eventually freed.
-> 
-> When an ndev gets freed, llcp_sock_sendmsg() will result in an
-> use-after-free as it
-> 
-> (1) doesn't have any checks in place for avoiding the datagram sending.
-> 	(1.1) Checking for LLCP_CLOSED in llcp_sock_sendmsg() does make
-> 	      the racing less likely. For -smp 6 it did not trigger on
-> 	      my PC, leading me to naively think that was the solution
-> 	      until syzbot told me quite some time later that it isn't.
-> 
-> (2) calls nfc_llcp_send_ui_frame(), which also has a do-while loop which
->     can race with freeing (a msg with size of 4096 is sent in chunks of
->     128 in this repro).
-> 	(2.1) By this I mean just moving the nfc_dev access from
-> 	      nfc_alloc_send_skb to inside this function, be it
-> 	      inside or outside the loop, naturally doesn't work.
-> 
-> When an nfc_dev is freed and we happened to get headroom and tailroom,
-> PDU skb seems to be not allocated and ENXIO is returned.
-> 
-> I tried to look at other code in net subsystem to get an idea how other
-> places handle it, but accessing device later in the codepath does not
-> seem to not be a norm. So I am starting to think some refactoring of the
-> locking logic may be needed (or maybe RCU protect headroom and tailroom?).
-> 
-> I don't know if I'm correct, but anyways where does one start?
+On Fri, Nov 17, 2023 at 1:27=E2=80=AFAM John Fastabend <john.fastabend@gmai=
+l.com> wrote:
+>
+> Jamal Hadi Salim wrote:
+> > We are seeking community feedback on P4TC patches.
+> >
+>
+> [...]
+>
+> >
+> > What is P4?
+> > -----------
+>
+> I read the cover letter here is my high level takeaway.
+>
 
-Any checks would need to have proper locking. Or at least barriers...
-Adding checks without locks usually does not solve race conditions.
+At least you read the cover letter this time ;->
 
-Other start is proper ref counting, so the structures are not released
-too early. We have several bugs like this in NFC before, so you can take
-a look at their fixes.
+> P4c-bpf backend exists and I don't see why we wouldn't use that as a star=
+ting
+> point.
 
-Best regards,
-Krzysztof
+Are you familiar with P4 architectures? That code was for PSA (which
+is essentially for switches) we are doing PNA (which is more nic
+oriented).
+And yes, we used that code as a starting point and made the necessary
+changes needed to conform to PNA. We made it actually work better by
+using kfuncs.
 
+> At least the cover letter needs to explain why this path is not taken.
+
+I thought we had a reference to that backend - but will add it for the
+next update.
+
+> From the cover letter there appears to be bpf pieces and non-bpf pieces, =
+but
+> I don't see any reason not to just land it all in BPF. Support exists and=
+ if
+> its missing some smaller things add them and everyone gets them vs niche =
+P4
+> backend.
+
+Ok, i thought you said you read the cover letter. Reasons are well
+stated, primarily that we need to make sure all P4 programs work.
+
+>
+> Without hardware support for any of this its impossible to understand how=
+ 'tc'
+> would work as a hardware offload interface for a p4 device so we need har=
+dware
+> support to evaluate. For example I'm not even sure how you would take a B=
+PF
+> parser into hardware on most network devices that aren't processor based.
+>
+
+P4 has nothing to do with parsers in hardware. Where did you get this
+requirement from?
+
+> P4 has a P4Runtime I think most folks would prefer a P4 UI vs typing in '=
+tc'
+> commands so arguing for 'tc' UI is nice is not going to be very compellin=
+g.
+> Best we can say is it works well enough and we use it.
+
+
+The control plane interface is netlink. This part is not negotiable.
+You can write whatever you want on top of it(for example P4runtime
+using netlink as its southbound interface). We feel that tc - a well
+understood utility - is one we should make publicly available for the
+rest of the world to use. For example we have rust code that runs on
+top of netlink to do performance testing.
+
+> more commentary below.
+>
+> >
+> > The Programming Protocol-independent Packet Processors (P4) is an open =
+source,
+> > domain-specific programming language for specifying data plane behavior=
+.
+> >
+> > The P4 ecosystem includes an extensive range of deployments, products, =
+projects
+> > and services, etc[9][10][11][12].
+> >
+> > __What is P4TC?__
+> >
+> > P4TC is a net-namespace aware implementation, meaning multiple P4 progr=
+ams can
+> > run independently in different namespaces alongside their appropriate s=
+tate. The
+> > implementation builds on top of many years of Linux TC experiences.
+> > On why P4 - see small treatise here:[4].
+> >
+> > There have been many discussions and meetings since about 2015 in regar=
+ds to
+> > P4 over TC[2] and we are finally proving the naysayers that we do get s=
+tuff
+> > done!
+> >
+> > A lot more of the P4TC motivation is captured at:
+> > https://github.com/p4tc-dev/docs/blob/main/why-p4tc.md
+> >
+> > **In this patch series we focus on s/w datapath only**.
+>
+> I don't see the value in adding 16676 lines of code for s/w only datapath
+> of something we already can do with p4c-ebpf backend.
+
+Please please stop this entitlement politics (which i frankly think
+you guys have been getting away with for a few years now).
+This code does not touch any core code - you guys constantly push code
+that touches core code and it is not unusual we have to pick up the
+pieces after but now you are going to call me out for the number of
+lines of code? Is it ok for you to write lines of code in the kernel
+but not me? Judge the technical work then we can have a meaningful
+discussion.
+
+TBH, I am trying very hard to see if i should respond to any more
+comments from you. I was very happy with our original scriptable
+approach and you came out and banged on the table that you want ebpf.
+We spent 10 months of multiple people working on this code to make it
+ebpf friendly and now you want more (actually i am not sure what the
+hell you want).
+
+> Or one of the other
+> backends already there. Namely take P4 programs and run them on CPUs in L=
+inux.
+>
+> Also I suspect a pipelined datapath is going to be slower than a O(1) loo=
+kup
+> datapath so I'm guessing its slower than most datapaths we have already.
+>
+> What do we gain here over existing p4c-ebpf?
+>
+
+see above.
+
+> >
+> > __P4TC Workflow__
+> >
+> > These patches enable kernel and user space code change _independence_ f=
+or any
+> > new P4 program that describes a new datapath. The workflow is as follow=
+s:
+> >
+> >   1) A developer writes a P4 program, "myprog"
+> >
+> >   2) Compiles it using the P4C compiler[8]. The compiler generates 3 ou=
+tputs:
+> >      a) shell script(s) which form template definitions for the differe=
+nt P4
+> >      objects "myprog" utilizes (tables, externs, actions etc).
+>
+> This is odd to me. I think packing around shell scrips as a program is no=
+t
+> very usable. Why not just an object file.
+>
+> >      b) the parser and the rest of the datapath are generated
+> >      in eBPF and need to be compiled into binaries.
+> >      c) A json introspection file used for the control plane (by iprout=
+e2/tc).
+>
+> Why split up the eBPF and control plane like this? eBPF has a control pla=
+ne
+> just use the existing one?
+>
+
+The cover letter clearly states that we are using netlink as the
+control api. Does eBPF support netlink?
+
+> >
+> >   3) The developer (or operator) executes the shell script(s) to manife=
+st the
+> >      functional "myprog" into the kernel.
+> >
+> >   4) The developer (or operator) instantiates "myprog" via the tc P4 fi=
+lter
+> >      to ingress/egress (depending on P4 arch) of one or more netdevs/po=
+rts.
+> >
+> >      Example1: parser is an action:
+> >        "tc filter add block 22 ingress protocol all prio 10 p4 pname my=
+prog \
+> >         action bpf obj $PARSER.o section parser/tc-ingress \
+> >         action bpf obj $PROGNAME.o section p4prog/tc"
+> >
+> >      Example2: parser explicitly bound and rest of dpath as an action:
+> >        "tc filter add block 22 ingress protocol all prio 10 p4 pname my=
+prog \
+> >         prog tc obj $PARSER.o section parser/tc-ingress \
+> >         action bpf obj $PROGNAME.o section p4prog/tc"
+> >
+> >      Example3: parser is at XDP, rest of dpath as an action:
+> >        "tc filter add block 22 ingress protocol all prio 10 p4 pname my=
+prog \
+> >         prog type xdp obj $PARSER.o section parser/xdp-ingress \
+> >       pinned_link /path/to/xdp-prog-link \
+> >         action bpf obj $PROGNAME.o section p4prog/tc"
+> >
+> >      Example4: parser+prog at XDP:
+> >        "tc filter add block 22 ingress protocol all prio 10 p4 pname my=
+prog \
+> >         prog type xdp obj $PROGNAME.o section p4prog/xdp \
+> >       pinned_link /path/to/xdp-prog-link"
+> >
+> >     see individual patches for more examples tc vs xdp etc. Also see se=
+ction on
+> >     "challenges" (on this cover letter).
+> >
+> > Once "myprog" P4 program is instantiated one can start updating table e=
+ntries
+> > that are associated with myprog's table named "mytable". Example:
+> >
+> >   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
+> >     action send_to_port param port eno1
+>
+> As a UI above is entirely cryptic to most folks I bet.
+>
+
+But ebpf is not?
+
+> myprog table is a BPF map? If so then I don't see any need for this just
+> interact with it like a BPF map. I suspect its some other object, but
+> I don't see any ratoinal for that.
+
+All the P4 objects sit in the TC domain. The datapath program is ebpf.
+Control is via netlink.
+
+
+> >
+> > A packet arriving on ingress of any of the ports on block 22 will first=
+ be
+> > exercised via the (eBPF) parser to find the headers pointing to the ip
+> > destination address.
+> > The remainder eBPF datapath uses the result dstAddr as a key to do a lo=
+okup in
+> > myprog's mytable which returns the action params which are then used to=
+ execute
+> > the action in the eBPF datapath (eventually sending out packets to eno1=
+).
+> > On a table miss, mytable's default miss action is executed.
+>
+> This chunk looks like standard BPF program. Parse pkt, lookup an action,
+> do the action.
+>
+
+Yes, the ebpf datapath does the parsing, and then interacts with
+kfuncs to the tc world before it (the ebpf datapath) executes the
+action.
+Note: ebpf did not invent any of that (parse, lookup, action). It has
+existed in tc for 20 years before ebpf existed.
+
+> > __Description of Patches__
+> >
+> > P4TC is designed to have no impact on the core code for other users
+> > of TC. IOW, you can compile it out but even if it compiled in and you d=
+ont use
+> > it there should be no impact on your performance.
+> >
+> > We do make core kernel changes. Patch #1 adds infrastructure for "dynam=
+ic"
+> > actions that can be created on "the fly" based on the P4 program requir=
+ement.
+>
+> the common pattern in bpf for this is to use a tail call map and populate
+> it at runtime and/or just compile your program with the actions. Here
+> the actions came from the p4 back up at step 1 so no reason we can't
+> just compile them with p4c.
+>
+> > This patch makes a small incision into act_api which shouldn't affect t=
+he
+> > performance (or functionality) of the existing actions. Patches 2-4,6-7=
+ are
+> > minimalist enablers for P4TC and have no effect the classical tc action=
+.
+> > Patch 5 adds infrastructure support for preallocation of dynamic action=
+s.
+> >
+> > The core P4TC code implements several P4 objects.
+>
+> [...]
+>
+> >
+> > __Restating Our Requirements__
+> >
+> > The initial release made in January/2023 had a "scriptable" datapath (t=
+hink u32
+> > classifier and pedit action). In this section we review the scriptable =
+version
+> > against the current implementation we are pushing upstream which uses e=
+BPF.
+> >
+> > Our intention is to target the TC crowd.
+> > Essentially developers and ops people deploying TC based infra.
+> > More importantly the original intent for P4TC was to enable _ops folks_=
+ more than
+> > devs (given code is being generated and doesn't need humans to write it=
+).
+>
+> I don't follow. humans wrote the p4.
+>
+
+But not the ebpf code, that is compiler generated. P4 is a higher
+level Domain specific language and ebpf is just one backend (others
+s/w variants include DPDK, Rust, C, etc)
+
+> I think the intent should be to enable P4 to run on Linux. Ideally effici=
+ently.
+> If the _ops folks are writing P4 great as long as we give them an efficie=
+nt
+> way to run their p4 I don't think they care about what executes it.
+>
+> >
+> > With TC, we get whole "familiar" package of match-action pipeline abstr=
+action++,
+> > meaning from the control plane all the way to the tooling infra, i.e
+> > iproute2/tc cli, netlink infra(request/resp, event subscribe/multicast-=
+publish,
+> > congestion control etc), s/w and h/w symbiosis, the autonomous kernel c=
+ontrol,
+> > etc.
+> > The main advantage is that we have a singular vendor-neutral interface =
+via the
+> > kernel using well understood mechanisms based on deployment experience =
+(and
+> > at least this part doesnt need retraining).
+>
+> A seemless p4 experience would be great. That looks like a tooling proble=
+m
+> at the p4c-backend and p4c-frontend problem. Rather than a bunch of 'tc' =
+glue
+> I would aim for,
+>
+>   $ p4c-* myprog.p4
+>   $ p4cRun ./myprog
+>
+> And maybe some options like,
+>
+>   $ p4cRun -i eth0 ./myprog
+
+Armchair lawyering and classical ML bikesheding
+
+> Then use the p4runtime to interface with the system. If you don't like th=
+e
+> runtime then it should be brought up in that working group.
+>
+> >
+> > 1) Supporting expressibility of the universe set of P4 progs
+> >
+> > It is a must to support 100% of all possible P4 programs. In the past t=
+he eBPF
+> > verifier had to be worked around and even then there are cases where we=
+ couldnt
+> > avoid path explosion when branching is involved. Kfunc-ing solves these=
+ issues
+> > for us. Note, there are still challenges running all potential P4 progr=
+ams at
+> > the XDP level - the solution to that is to have the compiler generate X=
+DP based
+> > code only if it possible to map it to that layer.
+>
+> Examples and we can fix it.
+
+Right. Let me wait for you to fix something 5 years from now. I would
+never have used eBPF at all but the kfunc is what changed my mind.
+
+> >
+> > 2) Support for P4 HW and SW equivalence.
+> >
+> > This feature continues to work even in the presence of eBPF as the s/w
+> > datapath. There are cases of square-hole-round-peg scenarios but
+> > those are implementation issues we can live with.
+>
+> But no hw support.
+>
+
+This patcheset has nothing to do with offload (you read the cover
+letter?). All above is saying is that by virtue of using TC we have a
+path to a proven offload approach.
+
+
+> >
+> > 3) Operational usability
+> >
+> > By maintaining the TC control plane (even in presence of eBPF datapath)
+> > runtime aspects remain unchanged. So for our target audience of folks
+> > who have deployed tc including offloads - the comfort zone is unchanged=
+.
+> > There is also the comfort zone of continuing to use the true-and-tried =
+netlink
+> > interfacing.
+>
+> The P4 control plane should be P4Runtime.
+>
+
+And be my guest and write it on top of netlink.
+
+cheers,
+jamal
+
+> >
+> > There is some loss in operational usability because we now have more kn=
+obs:
+> > the extra compilation, loading and syncing of ebpf binaries, etc.
+> > IOW, I can no longer just ship someone a shell script in an email to
+> > say go run this and "myprog" will just work.
+> >
+> > 4) Operational and development Debuggability
+> >
+> > If something goes wrong, the tc craftsperson is now required to have ad=
+ditional
+> > knowledge of eBPF code and process. This applies to both the operationa=
+l person
+> > as well as someone who wrote a driver. We dont believe this is solvable=
+.
+> >
+> > 5) Opportunity for rapid prototyping of new ideas
+>
+> [...]
+>
+> > 6) Supporting per namespace program
+> >
+> > This requirement is still met (by virtue of keeping P4 control objects =
+within the
+> > TC domain).
+>
+> BPF can also be network namespaced I'm not sure I understand comment.
+>
+> >
+> > __Challenges__
+> >
+> > 1) Concept of tc block in XDP is _very tedious_ to implement. It would =
+be nice
+> >    if we can use concept there as well, since we expect P4 to work with=
+ many
+> >    ports. It will likely require some core patches to fix this.
+> >
+> > 2) Right now we are using "packed" construct to enforce alignment in kf=
+unc data
+> >    exchange; but we're wondering if there is potential to use BTF to un=
+derstand
+> >    parameters and their offsets and encode this information at the comp=
+iler
+> >    level.
+> >
+> > 3) At the moment we are creating a static buffer of 128B to retrieve th=
+e action
+> >    parameters. If you have a lot of table entries and individual(non-sh=
+ared)
+> >    action instances with actions that require very little (or no) param=
+ space
+> >    a lot of memory is wasted. There may also be cases where 128B may no=
+t be
+> >    enough; (likely this is something we can teach the P4C compiler). If=
+ we can
+> >    have dynamic pointers instead for kfunc fixed length parameterizatio=
+n then
+> >    this issue is resolvable.
+> >
+> > 4) See "Restating Our Requirements" #5.
+> >    We would really appreciate ideas/suggestions, etc.
+> >
+> > __References__
+>
+> Thanks,
+> John
 
