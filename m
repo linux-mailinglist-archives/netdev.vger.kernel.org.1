@@ -1,89 +1,101 @@
-Return-Path: <netdev+bounces-48558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418BD7EEC92
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:20:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B217EECA6
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 288911C20431
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:20:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 435E01F24846
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE06DDB7;
-	Fri, 17 Nov 2023 07:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9FCD2F1;
+	Fri, 17 Nov 2023 07:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="UNBw6HWu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE388194;
-	Thu, 16 Nov 2023 23:20:00 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0VwYll-M_1700205588;
-Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0VwYll-M_1700205588)
-          by smtp.aliyun-inc.com;
-          Fri, 17 Nov 2023 15:19:58 +0800
-From: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-To: saeedm@nvidia.com
-Cc: leon@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-	Abaci Robot <abaci@linux.alibaba.com>
-Subject: [PATCH] net/mlx5: DR, Use swap() instead of open coding it
-Date: Fri, 17 Nov 2023 15:19:47 +0800
-Message-Id: <20231117071947.112856-1-jiapeng.chong@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.7.g153144c
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0D5196;
+	Thu, 16 Nov 2023 23:29:10 -0800 (PST)
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 5CD722012D;
+	Fri, 17 Nov 2023 15:29:05 +0800 (AWST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1700206145;
+	bh=7sEQcgSTINlPYHwYMq1CMcVwbUsEYi/P5XQkuSsDRCo=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=UNBw6HWul8s+67Ir3ekXoy2rLntGk1qPfoPfscIFFECmO4z1ujMe4+FykYoxi+JkT
+	 6C0Naxi2l2oKkysuem0u8TxEXx75V5JlzTo4Bvi2THAwZixBgidrb8yAw1c11UQN/A
+	 7msLVMGqUUvI2aIgRcPw20bZZl8wQShfDCXqq/Zx8yiRdzFHW4CJUtoyf22ocLprpw
+	 aVKUEsbY4z+/6XJDYGVE+FJrqXom7Hw/ccDurc5l/3Yt9pgifDgdI/FXmhl6FRb5e7
+	 KI9BMP44lSMOwK0PQEpksG+t/m0ch3aNn8pbEOPKH8pFWfJdcYVGqGzF+LC/4LN/Zj
+	 AMSX+AbxubzHg==
+Message-ID: <bd01e1544e388eb71b8713e94ea2165d1a805b54.camel@codeconstruct.com.au>
+Subject: Re: [PATCH] mctp-i2c: increase the MCTP_I2C_TX_WORK_LEN to 500
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Jinliang Wang <jinliangw@google.com>, Matt Johnston
+	 <matt@codeconstruct.com.au>
+Cc: William Kennington <wak@google.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Fri, 17 Nov 2023 15:29:05 +0800
+In-Reply-To: <20231117070457.1970786-1-jinliangw@google.com>
+References: <20231117070457.1970786-1-jinliangw@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Swap is a function interface that provides exchange function. To avoid
-code duplication, we can use swap function.
+Hi Jinliang,
 
-./drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c:1254:50-51: WARNING opportunity for swap().
+> Tested:
+> Before the fix, we will see below message in kernel log when
+> concurrently sending namespace create commands to the 4 NVMe-MI
+> devices on the same i2c bus:
+> kernel: i2c i2c-6 mctpi2c6: BUG! Tx Ring full when queue awake!
+>=20
+> After the fix, the error message is gone.
 
-Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=7580
-Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
----
- .../net/ethernet/mellanox/mlx5/core/steering/dr_action.c  | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Thanks for the report, but I don't think this is the correct fix: you
+should not hit that error even if > TX_WORK_LEN packets need to be sent.
+The net core should not be attempting to queue more skbs after
+netif_stop_queue(), which we do in the conditional below the warning:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
-index e3ec559369fa..6f9790e97fed 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_action.c
-@@ -1170,7 +1170,6 @@ mlx5dr_action_create_mult_dest_tbl(struct mlx5dr_domain *dmn,
- 				   bool ignore_flow_level,
- 				   u32 flow_source)
- {
--	struct mlx5dr_cmd_flow_destination_hw_info tmp_hw_dest;
- 	struct mlx5dr_cmd_flow_destination_hw_info *hw_dests;
- 	struct mlx5dr_action **ref_actions;
- 	struct mlx5dr_action *action;
-@@ -1249,11 +1248,8 @@ mlx5dr_action_create_mult_dest_tbl(struct mlx5dr_domain *dmn,
- 	 * one that done in the TX.
- 	 * So, if one of the ft target is wire, put it at the end of the dest list.
- 	 */
--	if (is_ft_wire && num_dst_ft > 1) {
--		tmp_hw_dest = hw_dests[last_dest];
--		hw_dests[last_dest] = hw_dests[num_of_dests - 1];
--		hw_dests[num_of_dests - 1] = tmp_hw_dest;
--	}
-+	if (is_ft_wire && num_dst_ft > 1)
-+		swap(hw_dests[last_dest], hw_dests[num_of_dests - 1]);
- 
- 	action = dr_action_create_generic(DR_ACTION_TYP_FT);
- 	if (!action)
--- 
-2.20.1.7.g153144c
+	spin_lock_irqsave(&midev->tx_queue.lock, flags);
+	if (skb_queue_len(&midev->tx_queue) >=3D MCTP_I2C_TX_WORK_LEN) {
+		netif_stop_queue(dev);
+		spin_unlock_irqrestore(&midev->tx_queue.lock, flags);
+		netdev_err(dev, "BUG! Tx Ring full when queue awake!\n");
+		return NETDEV_TX_BUSY;
+	}
 
+	__skb_queue_tail(&midev->tx_queue, skb);
+	if (skb_queue_len(&midev->tx_queue) =3D=3D MCTP_I2C_TX_WORK_LEN)
+		netif_stop_queue(dev);
+	spin_unlock_irqrestore(&midev->tx_queue.lock, flags);
+
+What looks like has happened here:
+
+ 1) we have TX_WORK_LEN-1 packets queued
+ 2) we release a flow, which queues the "marker" skb. the tx_queue now
+    has TX_WORK_LEN items
+ 3) we queue another packet, ending up with TX_WORK_LEN+1 in the queue
+ 4) the =3D=3D TX_WORK_LEN test fails, so we dont do a netif_stop_queue()
+
+A couple of potential fixes:
+
+ * We do the check and conditional netif_stop_queue() in (2)
+ * We change the check there to be `>=3D MCTP_I2C_TX_WORK_LEN`
+
+Matt, any preferences?
+
+Cheers,
+
+
+Jeremy
 
