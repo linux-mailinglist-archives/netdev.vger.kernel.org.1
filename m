@@ -1,195 +1,156 @@
-Return-Path: <netdev+bounces-48849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931D37EFB9A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 23:49:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09FB47EFBA3
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 23:54:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9BD6B20ADF
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 22:49:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80AD1B20AD7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 22:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00211446D8;
-	Fri, 17 Nov 2023 22:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA24F8BE0;
+	Fri, 17 Nov 2023 22:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="FZQKVqdj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i2xdgMLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B237D5B;
-	Fri, 17 Nov 2023 14:49:05 -0800 (PST)
-Received: from [100.116.17.117] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madras.collabora.co.uk (Postfix) with ESMTPSA id D91826607392;
-	Fri, 17 Nov 2023 22:49:01 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1700261343;
-	bh=0tjjKjAurRBn5zKIbePAVaEbSE3D2bVElukfuHa4ky0=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=FZQKVqdj8c4YnfPf8Ln2LNSP1PEuIphRLQYbKAGWR6YfGVw1MtjOEX/wct3rVvHY1
-	 SA4Ihjwc2X8BRBh/O69W4lpnlnnzwloaKupoS7dPFrBaZXvrihuVyXVJHa29VGKyOC
-	 OuBVPmsy2ClqfU2zxcRpNQsjtbromviSrfF8aA/PF3gLcODKw3n1B/mbG1D01xADGx
-	 h1hsLodXzXwkQYI9QaRonqclZzteXFm8ErvbEhg3rWNd6hCIvBvYfVwPLW4YvsGVKh
-	 EaE+iRLu3x1gDXDtlQhJVfQvGew/L5al27uQ8WUyDkB6zBm++op7EKXhK/2KQpXDoh
-	 53YJXXX+alJVw==
-Message-ID: <daa8c056-0279-4c2d-9a22-2375fd63f0a1@collabora.com>
-Date: Sat, 18 Nov 2023 00:48:58 +0200
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B21BA194;
+	Fri, 17 Nov 2023 14:54:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OWS1IK5QydUi2U8bvSiXqhP7t+L6DFEwapGeMPvU5gI=; b=i2xdgMLI/hcW4QHeXe2L8eR3Z+
+	hUkv+B7Da65QJnVKu16/iEW5qGWlO66WpEhRiQ2XEg3wG08BXe3iowmMmgAOUAUYZL4BZDH8lZMRx
+	PB12hRCHkaDznfMnno7tQX4mONSElR4VhgASZUebz/PFqnNJPtnMGJ1grKKGg9232X54=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r47iz-000Tib-6n; Fri, 17 Nov 2023 23:54:09 +0100
+Date: Fri, 17 Nov 2023 23:54:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+	wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 2/5] rust: net::phy add module_phy_driver
+ macro
+Message-ID: <66455d50-9a3c-4b5c-ba2c-5188dae247a9@lunn.ch>
+References: <20231026001050.1720612-1-fujita.tomonori@gmail.com>
+ <20231026001050.1720612-3-fujita.tomonori@gmail.com>
+ <ZVfncj5R9-8aU7vB@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] [UNTESTED] riscv: dts: starfive:
- beaglev-starlight: Enable gmac
-Content-Language: en-US
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Conor Dooley <conor@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Samin Guo <samin.guo@starfivetech.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20231029042712.520010-1-cristian.ciocaltea@collabora.com>
- <20231029042712.520010-13-cristian.ciocaltea@collabora.com>
- <f253b50a-a0ac-40c6-b13d-013de7bac407@lunn.ch>
- <233a45e1-15ac-40da-badf-dee2d3d60777@collabora.com>
- <cb6597be-2185-45ad-aa47-c6804ff68c85@collabora.com>
- <20231116-stellar-anguished-7cf06eb5634a@squawk>
- <CAMuHMdXdeW9SRN8hq-0722CiLvXDFVwpJxjFTGgdc2mhT=ppYw@mail.gmail.com>
- <b4a3a139-4831-447e-94ed-d590986aed8c@collabora.com>
- <84fd076b-6db4-4251-aff8-36befc28e574@collabora.com>
- <CAMuHMdVXAx+b6=70PdgJrpbegBkDpb3w1UF0_u1Odi=JoYL2-w@mail.gmail.com>
- <e2f4ba34-24db-4669-bac4-ac64ea7761cf@collabora.com>
-In-Reply-To: <e2f4ba34-24db-4669-bac4-ac64ea7761cf@collabora.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZVfncj5R9-8aU7vB@boqun-archlinux>
 
-On 11/17/23 13:19, Cristian Ciocaltea wrote:
-> On 11/17/23 11:12, Geert Uytterhoeven wrote:
->> Hi Cristian,
->>
->> On Fri, Nov 17, 2023 at 9:59 AM Cristian Ciocaltea
->> <cristian.ciocaltea@collabora.com> wrote:
->>> On 11/17/23 10:49, Cristian Ciocaltea wrote:
->>>> On 11/17/23 10:37, Geert Uytterhoeven wrote:
->>>>> On Thu, Nov 16, 2023 at 6:55 PM Conor Dooley <conor@kernel.org> wrote:
->>>>>> On Thu, Nov 16, 2023 at 03:15:46PM +0200, Cristian Ciocaltea wrote:
->>>>>>> On 10/30/23 00:53, Cristian Ciocaltea wrote:
->>>>>>>> On 10/29/23 20:46, Andrew Lunn wrote:
->>>>>>>>> On Sun, Oct 29, 2023 at 06:27:12AM +0200, Cristian Ciocaltea wrote:
->>>>>>>>>> The BeagleV Starlight SBC uses a Microchip KSZ9031RNXCA PHY supporting
->>>>>>>>>> RGMII-ID.
->>>>>>>>>>
->>>>>>>>>> TODO: Verify if manual adjustment of the RX internal delay is needed. If
->>>>>>>>>> yes, add the mdio & phy sub-nodes.
->>>>>>>>>
->>>>>>>>> Please could you try to get this tested. It might shed some light on
->>>>>>>>> what is going on here, since it is a different PHY.
->>>>>>>>
->>>>>>>> Actually, this is the main reason I added the patch. I don't have access
->>>>>>>> to this board, so it would be great if we could get some help with testing.
->>>>>>>
->>>>>>> @Emil, @Conor: Any idea who might help us with a quick test on the
->>>>>>> BeagleV Starlight board?
->>>>>>
->>>>>> I don't have one & I am not sure if Emil does. Geert (CCed) should have
->>>>>
->>>>> I believe Esmil has.
->>>>>
->>>>>> one though. Is there a specific test you need to have done?
->>>>>
->>>>> I gave it a try, on top of latest renesas-drivers[1].
->>>
->>> [...]
->>>
->>>>>
->>>>> Looks like it needs more non-coherent support before we can test
->>>>> Ethernet.
->>>>
->>>> Hi Geert,
->>>>
->>>> Thanks for taking the time to test this!
->>>>
->>>> Could you please check if the following are enabled in your kernel config:
->>>>
->>>>   CONFIG_DMA_GLOBAL_POOL
->>>>   CONFIG_RISCV_DMA_NONCOHERENT
->>>>   CONFIG_RISCV_NONSTANDARD_CACHE_OPS
->>>>   CONFIG_SIFIVE_CCACHE
->>
->> CONFIG_DMA_GLOBAL_POOL and CONFIG_RISCV_NONSTANDARD_CACHE_OPS were
->> indeed no longer enabled, as they cannot be enabled manually.
->>
->> After cherry-picking commit e14ad9ff67fd51dc ("riscv: errata: Add
->> StarFive JH7100 errata") in esmil/visionfive these options become
->> enabled. Now it gets a bit further, but still lots of CCACHE DataFail
->> errors.
+On Fri, Nov 17, 2023 at 02:21:38PM -0800, Boqun Feng wrote:
+> On Thu, Oct 26, 2023 at 09:10:47AM +0900, FUJITA Tomonori wrote:
+> [...]
+> > +
+> > +/// Declares a kernel module for PHYs drivers.
+> > +///
+> > +/// This creates a static array of kernel's `struct phy_driver` and registers it.
+> > +/// This also corresponds to the kernel's `MODULE_DEVICE_TABLE` macro, which embeds the information
+> > +/// for module loading into the module binary file. Every driver needs an entry in `device_table`.
+> > +///
+> > +/// # Examples
+> > +///
+> > +/// ```
+> > +/// # mod module_phy_driver_sample {
+> > +/// use kernel::c_str;
+> > +/// use kernel::net::phy::{self, DeviceId};
+> > +/// use kernel::prelude::*;
+> > +///
+> > +/// kernel::module_phy_driver! {
+> > +///     drivers: [PhyAX88772A],
+> > +///     device_table: [
+> > +///         DeviceId::new_with_driver::<PhyAX88772A>()
+> > +///     ],
+> > +///     name: "rust_asix_phy",
+> > +///     author: "Rust for Linux Contributors",
+> > +///     description: "Rust Asix PHYs driver",
+> > +///     license: "GPL",
+> > +/// }
+> > +///
+> > +/// struct PhyAX88772A;
+> > +///
+> > +/// #[vtable]
+> > +/// impl phy::Driver for PhyAX88772A {
+> > +///     const NAME: &'static CStr = c_str!("Asix Electronics AX88772A");
+> > +///     const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x003b1861);
+> > +/// }
+> > +/// # }
+> > +/// ```
 > 
-> Right, there is an open question [2] in PATCH v2 08/12 if this patch
-> should have been part of Emil's ccache series or I will send it in v3
-> of my series.
+> When run the following kunit command:
 > 
-> [2]: https://lore.kernel.org/lkml/4f661818-1585-41d8-a305-96fd359bc8b8@collabora.com/
+> ./tools/testing/kunit/kunit.py run --make_options LLVM=1 --arch x86_64 \
+> 	--kconfig_add CONFIG_RUST=y \
+> 	--kconfig_add CONFIG_RUST_PHYLIB_ABSTRACTIONS=y \
+> 	--kconfig_add CONFIG_PHYLIB=y \
+> 	--kconfig_add CONFIG_NETDEVICES=y \
+> 	--kconfig_add CONFIG_NET=y \
+> 	--kconfig_add CONFIG_AX88796B_RUST_PHY=y \
+> 	--kconfig_add CONFIG_AX88796B_PHY=y
 > 
->>> Also please note the series requires the SiFive Composable Cache
->>> controller patches provided by Emil [1].
->>>
->>> [1]: https://lore.kernel.org/all/20231031141444.53426-1-emil.renner.berthing@canonical.com/
->>
->> That series does not contain any Kconfig changes, so there must be
->> other missing dependencies?
+> I got the following errors:
 > 
-> There shouldn't be any additional Kconfig changes or dependencies as 
-> those patches just extend an already existing driver. There were some 
-> changes in v2, but they are still compatible with this series (I've 
-> retested that to make sure).
+> 	ERROR:root:ld.lld: error: duplicate symbol: __rust_asix_phy_init
+> 	>>> defined at doctests_kernel_generated.5ed8fd29a53cf22f-cgu.0
+> 	>>>            rust/doctests_kernel_generated.o:(__rust_asix_phy_init) in archive vmlinux.a
+> 	>>> defined at ax88796b_rust.37fb93aefca595fa-cgu.0
+> 	>>>            drivers/net/phy/ax88796b_rust.o:(.text+0x160) in archive vmlinux.a
 > 
-> My tree is based on next-20231024, so I'm going to rebase it onto
-> next-20231117, to exclude the possibility of a regression somewhere.
+> 	ld.lld: error: duplicate symbol: __rust_asix_phy_exit
+> 	>>> defined at doctests_kernel_generated.5ed8fd29a53cf22f-cgu.0
+> 	>>>            rust/doctests_kernel_generated.o:(__rust_asix_phy_exit) in archive vmlinux.a
+> 	>>> defined at ax88796b_rust.37fb93aefca595fa-cgu.0
+> 	>>>            drivers/net/phy/ax88796b_rust.o:(.text+0x1E0) in archive vmlinux.a
 > 
-> I will also test with renesas-drivers.
+> 	ld.lld: error: duplicate symbol: __mod_mdio__phydev_device_table
+> 	>>> defined at doctests_kernel_generated.5ed8fd29a53cf22f-cgu.0
+> 	>>>            rust/doctests_kernel_generated.o:(__mod_mdio__phydev_device_table) in archive vmlinux.a
+> 	>>> defined at ax88796b_rust.37fb93aefca595fa-cgu.0
+> 	>>>            drivers/net/phy/ax88796b_rust.o:(.rodata+0x58) in archive vmlinux.a
+> 
+> Because kunit will use the above doc test to generate test, and since
+> CONFIG_AX88796B_RUST_PHY is also selected, the `module_phy_driver!` has
+> been called twice, and causes duplicate symbols.
+> 
+> For "rust_asix_phy_*" symbols, it's easy to fix: just rename the usage
+> in the example. But for __mod_mdio__phydev_device_table, it's hard-coded
+> in `module_phy_driver!`, I don't have a quick fix right now. Also, does
+> it mean `module_phy_driver!` is only supposed to be "called" once for
+> the entire kernel?
 
-I verified with both trees and didn't notice any issues with my 
-VisionFive board, so I don't really understand why BeagleV Starlight 
-shows a different behavior.
+Each kernel module should be in its own symbol name space. The only
+symbols which are visible outside of the module are those exported
+using EXPORT_SYMBOL_GPL() or EXPORT_SYMBOL(). A PHY driver does not
+export anything, in general.
 
-For reference, please see [3] which contains all required patches 
-applied on top of next-20231117. The top-most one 9d36dec7e6da ("riscv: 
-dts: starfive: Add JH7100 MMC nodes") is optional, I added it to extend 
-a bit the test suite (SD-card card access also works fine).
+Being built in also does not change this.
 
-[3]: https://gitlab.collabora.com/cristicc/linux-next/-/tree/visionfive-eth
+Neither drivers/net/phy/ax88796b_rust.o nor
+rust/doctests_kernel_generated.o should have exported this symbol.
 
-For configuring the kernel, I used:
+I've no idea how this actually works, i guess there are multiple
+passes through the linker? Maybe once to resolve symbols across object
+files within a module. Normal global symbols are then made local,
+leaving only those exported with EXPORT_SYMBOL_GPL() or
+EXPORT_SYMBOL()? A second pass through linker then links all the
+exported symbols thorough the kernel?
 
-  $ make [...] defconfig
-  $ scripts/config --enable CONFIG_NONPORTABLE --enable ERRATA_STARFIVE_JH7100
+	Andrew
 
-I also noticed a warning message right before building starts, but it 
-doesn't seem to be harmful:
 
-WARNING: unmet direct dependencies detected for DMA_GLOBAL_POOL
-  Depends on [n]: !ARCH_HAS_DMA_SET_UNCACHED [=n] && !DMA_DIRECT_REMAP [=y]
-  Selected by [y]:
-  - ERRATA_STARFIVE_JH7100 [=y] && ARCH_STARFIVE [=y] && NONPORTABLE [=y]
 
-Thanks,
-Cristian
 
