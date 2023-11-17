@@ -1,142 +1,182 @@
-Return-Path: <netdev+bounces-48546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538F87EEC57
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:43:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ADDA7EEC5E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:47:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837EE1C204DA
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:43:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80664B20A5B
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAF36125;
-	Fri, 17 Nov 2023 06:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ra9KCfHq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E37179C5;
+	Fri, 17 Nov 2023 06:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B04D50
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 22:43:05 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-40790b0a224so12718775e9.0
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 22:43:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700203384; x=1700808184; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=v8o8h07/2SBzo4GeLq+9MenFkMAW+cR0ertyvXzFlHA=;
-        b=Ra9KCfHqRUqUedZ+eFkEa4RXEbv+Cq7ufgWRlIq5fUUmaAnjTm4nKufuQh/O4bWdXS
-         9g3uAOMdc7qnvqbkXO57vkI5ShXQ3CvMjKIKqGucy6eBuzt38ylEyxozZU6Uqdi+Pq5c
-         jHMqZ7MkOiclv8rBjeJhuLYlXIeoznkYJ3QYCN98QqM/BXtkVRwYos8Ef3UCbLV1IBV0
-         qJlYDAj6CxFRoYi5INeW0ywsxxTNHLKSo7mXsJPYGswIMtdNAVj3HKXMlDbmsGHGPMDw
-         WpctWnbdFXWxvXMrLbrywPnEWjDhMveukVPwsk2QyKRBbCBMV3NAsUExuZRmeGeBC1/6
-         Dl0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700203384; x=1700808184;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v8o8h07/2SBzo4GeLq+9MenFkMAW+cR0ertyvXzFlHA=;
-        b=IE9Xoec/wjBo2qGWtzSI2+/il8EQRdtKLGerxm+L+IOCkO7MuqrX/dTNLjF3+4dx38
-         LqmQd1Qv9NBMYGZEGTLKDbItGkelWcGbR5cYpJlnleIvl/ObewfIdV8vKT6Vg99BEjbp
-         cKwbhmItNjeUA3d0BDMVpswMb50Bh2hWbI/4wuwUuVQLrGKw7+DAF+kuuuhaLgxc5HUV
-         nxadoWLQafwj53YccAsqGRIGQqSnI8ADe7SdcxSdCSM3rREK7D8/SYHFlEsHlPa6tEMa
-         hsRgFh2cnhjy015LQs2Gjby/43QvI//rA79ExASClstqhLwubK9tVgNsTJocGqbmQOTD
-         KFMg==
-X-Gm-Message-State: AOJu0Yw0/U+l1Wu3BXwd4N6w8wMp9hO3D2XhP4weXMtbqLgmzWqdwAb3
-	qwR5OcrDTQgweMFJ01ugPMzlQAB9lLk=
-X-Google-Smtp-Source: AGHT+IE+R5wfh/vxdfyQGNVCTcyOXCm2CoOOwVVEnO+Oil+jRsSaDSdqTFm5OdKpSGOYQLyMb/7ZNg==
-X-Received: by 2002:a05:600c:1392:b0:408:575e:f24f with SMTP id u18-20020a05600c139200b00408575ef24fmr13208092wmf.28.1700203383412;
-        Thu, 16 Nov 2023 22:43:03 -0800 (PST)
-Received: from ?IPV6:2a01:c23:b96e:ed00:c0d:6914:f32c:c6f8? (dynamic-2a01-0c23-b96e-ed00-0c0d-6914-f32c-c6f8.c23.pool.telefonica.de. [2a01:c23:b96e:ed00:c0d:6914:f32c:c6f8])
-        by smtp.googlemail.com with ESMTPSA id bg3-20020a05600c3c8300b004077219aed5sm6186560wmb.6.2023.11.16.22.43.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 22:43:03 -0800 (PST)
-Message-ID: <2c3087b1-706e-4b8c-839c-1db1b99c5080@gmail.com>
-Date: Fri, 17 Nov 2023 07:43:04 +0100
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC6C2B7;
+	Thu, 16 Nov 2023 22:47:42 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VwYgjMP_1700203659;
+Received: from 30.221.132.130(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0VwYgjMP_1700203659)
+          by smtp.aliyun-inc.com;
+          Fri, 17 Nov 2023 14:47:40 +0800
+Message-ID: <a0c9e8d5-14fc-3eba-f891-ef7c3ee9bd03@linux.alibaba.com>
+Date: Fri, 17 Nov 2023 14:47:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] r8169: improve RTL8411b phy-down fixup
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-References: <f1a5f918-e9fd-48e6-8956-2c79648e563e@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <f1a5f918-e9fd-48e6-8956-2c79648e563e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net v2] net/smc: avoid data corruption caused by decline
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 13.11.2023 20:13, Heiner Kallweit wrote:
-> Mirsad proposed a patch to reduce the number of spinlock lock/unlock
-> operations and the function code size. This can be further improved
-> because the function sets a consecutive register block.
-> 
-> Suggested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 139 +++++-----------------
->  1 file changed, 28 insertions(+), 111 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 93929d835..e883db468 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -3084,6 +3084,33 @@ static void rtl_hw_start_8168g_2(struct rtl8169_private *tp)
->  	rtl_ephy_init(tp, e_info_8168g_2);
->  }
->  
-Is there a specific reason why patch has status "Deferred" in patchwork?
 
+
+On 2023/11/17 12:59, D. Wythe wrote:
+
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> We found a data corruption issue during testing of SMC-R on Redis
+> applications.
+> 
+> The benchmark has a low probability of reporting a strange error as
+> shown below.
+> 
+> "Error: Protocol error, got "\xe2" as reply type byte"
+> 
+> Finally, we found that the retrieved error data was as follows:
+> 
+> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+> 
+> It is quite obvious that this is a SMC DECLINE message, which means that
+> the applications received SMC protocol message.
+> We found that this was caused by the following situations:
+> 
+> client			server
+> 	   proposal
+> 	------------->
+> 	   accept
+> 	<-------------
+> 	   confirm
+> 	------------->
+> wait confirm
+> 
+> 	 failed llc confirm
+> 	    x------
+> (after 2s)timeout
+> 			wait rsp
+> 
+> wait decline
+> 
+> (after 1s) timeout
+> 			(after 2s) timeout
+> 	    decline
+> 	-------------->
+> 	    decline
+> 	<--------------
+> 
+> As a result, a decline message was sent in the implementation, and this
+> message was read from TCP by the already-fallback connection.
+> 
+> This patch double the client timeout as 2x of the server value,
+
+Is the client's timeout doubled?
+
+ From the code below, it is server's timeout that has been doubled.
+
+> With this simple change, the Decline messages should never cross or
+> collide (during Confirm link timeout).
+> 
+> This issue requires an immediate solution, since the protocol updates
+> involve a more long-term solution.
+> 
+> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>   include/net/netns/smc.h |  2 ++
+>   net/smc/af_smc.c        |  3 ++-
+>   net/smc/smc_sysctl.c    | 12 ++++++++++++
+>   3 files changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+> index 582212a..5198896 100644
+> --- a/include/net/netns/smc.h
+> +++ b/include/net/netns/smc.h
+> @@ -22,5 +22,7 @@ struct netns_smc {
+>   	int				sysctl_smcr_testlink_time;
+>   	int				sysctl_wmem;
+>   	int				sysctl_rmem;
+> +	/* server's Confirm Link timeout in seconds */
+> +	int				sysctl_smcr_srv_confirm_link_timeout;
+>   };
+>   #endif
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index abd2667..b86ad30 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -1870,7 +1870,8 @@ static int smcr_serv_conf_first_link(struct smc_sock *smc)
+>   		return SMC_CLC_DECL_TIMEOUT_CL;
+>   
+>   	/* receive CONFIRM LINK response from client over the RoCE fabric */
+> -	qentry = smc_llc_wait(link->lgr, link, SMC_LLC_WAIT_TIME,
+> +	qentry = smc_llc_wait(link->lgr, link,
+> +			      sock_net(&smc->sk)->smc.sysctl_smcr_srv_confirm_link_timeout,
+>   			      SMC_LLC_CONFIRM_LINK);
+>   	if (!qentry) {
+>   		struct smc_clc_msg_decline dclc;
+> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+> index 5cbc18c..919f3f7 100644
+> --- a/net/smc/smc_sysctl.c
+> +++ b/net/smc/smc_sysctl.c
+> @@ -51,6 +51,13 @@
+>   		.proc_handler	= proc_dointvec_jiffies,
+>   	},
+>   	{
+> +		.procname	= "smcr_srv_confirm_link_timeout",
+> +		.data		= &init_net.smc.sysctl_smcr_srv_confirm_link_timeout,
+> +		.maxlen		= sizeof(int),
+> +		.mode		= 0644,
+> +		.proc_handler	= proc_dointvec_jiffies,
+> +	},
+> +	{
+>   		.procname	= "wmem",
+>   		.data		= &init_net.smc.sysctl_wmem,
+>   		.maxlen		= sizeof(int),
+> @@ -95,6 +102,11 @@ int __net_init smc_sysctl_net_init(struct net *net)
+>   	net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
+>   	net->smc.sysctl_smcr_buf_type = SMCR_PHYS_CONT_BUFS;
+>   	net->smc.sysctl_smcr_testlink_time = SMC_LLC_TESTLINK_DEFAULT_TIME;
+> +	/* Increasing the server's timeout by twice as much as the client's
+> +	 * timeout by default can temporarily avoid decline messages of
+> +	 * both side been crossed or collided.
+
+'both sides' or maybe better for
+
+'..avoid decline messages of both sides crossing or colliding.'
+
+
+
+Thanks,
+Wen Gu
+
+> +	 */
+> +	net->smc.sysctl_smcr_srv_confirm_link_timeout = 2 * SMC_LLC_WAIT_TIME;
+>   	WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
+>   	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
+>   
 
