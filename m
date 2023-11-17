@@ -1,118 +1,86 @@
-Return-Path: <netdev+bounces-48760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 535047EF6DB
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:15:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39B3F7EF6E9
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00AC81F226D0
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:15:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E980E280CE6
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5F7D4314D;
-	Fri, 17 Nov 2023 17:15:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA17543174;
+	Fri, 17 Nov 2023 17:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mBSzlkdV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AcIRyl00"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22ECAD72
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:15:24 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-53eeb28e8e5so13573a12.1
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:15:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700241322; x=1700846122; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sgyNHLwb0dCQ1IvlWod8L7reerP9hkPsOGuvcVTdywg=;
-        b=mBSzlkdVuTTDp0sbH//yk/Df5seSktt1cKvsclg01h8kgKOuaGQDTsdPta6wd10z7j
-         ipeM1Wp4IQP7QqWzpdjIxCagToQ1y8FbW9cAbluhIizqfS1heYRdEEJ+mq4TpQTlEK7S
-         tIdOx0husrVAC66FtscwTBAj/p26nDMMzOb5tqbzf40UxCHymXGP3aXSkLBpfM4y7R0z
-         wtleBuPqm3eBgJIQJ3P9OqcJwSFHD/ZVsIK4VlALNTG8m+NQ68VbW4mxA7K0wItL0vkG
-         fk/mPsbs1es6oaasxQuXweTRq+RD3c5h4XpElSM/3WoGxy1VAn2dWMpVUxnsC16Ni5DE
-         548g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700241322; x=1700846122;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sgyNHLwb0dCQ1IvlWod8L7reerP9hkPsOGuvcVTdywg=;
-        b=hxIjrHRA9N/THLchG7jbwfMgfU2BSwrEbzvJ0A0wpWU6jhp8Gq3TNJq8ZgelVk62l1
-         EshSRfswOJ3XpPTRz95eXDvJvoZ7N6SDjCZh/EdQ2TMMNkzfB1lDYdkFMbiE8ZQSDkSt
-         eZkVa3icCMi0WsHXmVAZReRvMHc7yJ6t0wslpEi98p0CGp3BP7/MZrmrdrTl364A+72/
-         8y8mAOgRpWq6WGbNfAaRpFoGZoq3uOeZZp6UGSzVaL+RrdRuBGHusiPwBHZj/fdDkRuS
-         PwyNbbtDbrkARjIi5JjLdKuDNWXUw0a9UozoWdZWklqCEj1foCVPaitp98Rb5UJomAZP
-         mcYg==
-X-Gm-Message-State: AOJu0YzSSS/D0ZwygJn/6Z64/pKLpqYk+xEj0nbzJ624aU/ghv3bkss4
-	2MqR6OJGwCFRGB3ZFJKhGMZl74FW1M5ZtVGSvTOyhg==
-X-Google-Smtp-Source: AGHT+IGHaoxd6OBoU/9H58wg8QaFcYeqOGKdluo8DNtBVbnfVOwOK02JJAT/4aIMsyxVMxrNja0cakOcyd6K3U/OEpY=
-X-Received: by 2002:aa7:c954:0:b0:545:279:d075 with SMTP id
- h20-20020aa7c954000000b005450279d075mr142936edt.1.1700241322418; Fri, 17 Nov
- 2023 09:15:22 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478F030655
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 17:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FF34C433CB;
+	Fri, 17 Nov 2023 17:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700241623;
+	bh=gzKLK25pchZx2+7U8UW7pwvd/X2fInSU3w+HR1kIkMY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AcIRyl00tgv3HcMdysqWKmWeFuAgSjJ1M03Q+ziAL9G5AUiqTt2f1UYZrP17rK9h9
+	 58V8nuwPFYULblu/Xt88QKo8w2HVTR+9uBT0vRxri+sD2gEhEjfQ5+yLcj427zArO4
+	 MnmnaW+uk0ZZ3FVF5VF5zpNlh/M9h1xZYKyVnzxpz5Ao4k0GuHM/07wo5fgzbqT7tY
+	 PzYiS4ltF5NHG6xEOEJSF0pcpRjggyM8+R1nixJCmNuGfbA2HWMM21bLpUEQzsH174
+	 Ff3AEfCxLatowFuIFoEuw9jH4BpYMD0EZhQyN2ytvqZc0u0IbBNeOxUMI+rva1VHoj
+	 vW1rGmDemVzzg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 86B8DE00098;
+	Fri, 17 Nov 2023 17:20:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117152728.2286551-1-chentao@kylinos.cn>
-In-Reply-To: <20231117152728.2286551-1-chentao@kylinos.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 17 Nov 2023 18:15:08 +0100
-Message-ID: <CANn89iLHd9oxO6yXmZMfO5cTsnSzqa==ZBCnNEySKpiH86q54Q@mail.gmail.com>
-Subject: Re: [PATCH] ipv4: Correct/silence an endian warning in __ip_do_redirect
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, kunwu.chan@hotmail.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4] iproute2: prevent memory leak
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170024162354.26596.18193202556756297538.git-patchwork-notify@kernel.org>
+Date: Fri, 17 Nov 2023 17:20:23 +0000
+References: <20231116031308.16519-1-heminhong@kylinos.cn>
+In-Reply-To: <20231116031308.16519-1-heminhong@kylinos.cn>
+To: heminhong <heminhong@kylinos.cn>
+Cc: petrm@nvidia.com, netdev@vger.kernel.org, stephen@networkplumber.org
 
-On Fri, Nov 17, 2023 at 6:07=E2=80=AFPM Kunwu Chan <chentao@kylinos.cn> wro=
-te:
->
-> net/ipv4/route.c:783:46: warning: incorrect type in argument 2 (different=
- base types)
-> net/ipv4/route.c:783:46:    expected unsigned int [usertype] key
-> net/ipv4/route.c:783:46:    got restricted __be32 [usertype] new_gw
->
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+Hello:
 
-We need Fixes: tag for networking patches.
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
+On Thu, 16 Nov 2023 11:13:08 +0800 you wrote:
+> When the return value of rtnl_talk() is not less than 0,
+> 'answer' will be allocated. The 'answer' should be free
+> after using, otherwise it will cause memory leak.
+> 
+> Signed-off-by: heminhong <heminhong@kylinos.cn>
 > ---
->  net/ipv4/route.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-> index 3290a4442b4a..e8a542c6b031 100644
-> --- a/net/ipv4/route.c
-> +++ b/net/ipv4/route.c
-> @@ -780,7 +780,7 @@ static void __ip_do_redirect(struct rtable *rt, struc=
-t sk_buff *skb, struct flow
->                         goto reject_redirect;
->         }
->
-> -       n =3D __ipv4_neigh_lookup(rt->dst.dev, new_gw);
-> +       n =3D __ipv4_neigh_lookup(rt->dst.dev, be32_to_cpu(new_gw));
->         if (!n)
->                 n =3D neigh_create(&arp_tbl, &new_gw, rt->dst.dev);
->         if (!IS_ERR(n)) {
-> --
-> 2.34.1
->
+>  ip/link_gre.c    | 3 ++-
+>  ip/link_gre6.c   | 3 ++-
+>  ip/link_ip6tnl.c | 3 ++-
+>  ip/link_iptnl.c  | 3 ++-
+>  ip/link_vti.c    | 3 ++-
+>  ip/link_vti6.c   | 3 ++-
+>  6 files changed, 12 insertions(+), 6 deletions(-)
 
-How was this patch tested ?
+Here is the summary with links:
+  - [v4] iproute2: prevent memory leak
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=2c3ebb2ae08a
 
-You are 'fixing' sparse warnings by replacing them with real bugs.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-be32_to_cpu() is going to swap bytes on x86, so the lookup will fail horrib=
-ly.
 
-Here, if you must silence sparse, you want (__force u32)new_gw
-
-Look at this commit for a template.
-
-commit 3c42b2019863b327caa233072c50739d4144dd16
 
