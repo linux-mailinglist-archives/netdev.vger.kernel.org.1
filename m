@@ -1,241 +1,179 @@
-Return-Path: <netdev+bounces-48542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A55A7EEC14
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:53:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD3177EEC1E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:03:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D64C8280EF7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 05:53:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 693921F23369
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACD7D2E4;
-	Fri, 17 Nov 2023 05:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F04D28A;
+	Fri, 17 Nov 2023 06:03:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gpwUx0JO"
+	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="F5O3aTqP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22D33196
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 21:52:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700200376; x=1731736376;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mSlgATPvLf/69kwfBGk20vR5draP5kCxUKIFVcSYaVY=;
-  b=gpwUx0JOgK2KWRf02mkkHpMIjUCnwtdNcVgUweYe2Hk3zX2S4RdD3SLj
-   Tib0RCwrUvEBYBtYsJwxPcRd8PJi4GOscasHuO9LkYRt6QI/K9p5Iwh/2
-   DgiShRXSOy/EFEYXwr8YoENUwp6iC2VJkRMuTSl9uhp8EnwKWOp8A6omo
-   W8FUXNzJd+1n+WBFaYDzaDoV3TXiv26JPjfvfo5PqnX+HFah/bWPqqVff
-   fu1k4ka8LuU9eSn+QuWNFaoavXZChJkchX6tCAeBLaIVWimCPo/v7C5Ij
-   LULzcUgC4YGd7sce58MSFNPti0SNCmPnZnmUZMIs1pjGRawa65tOFlI0k
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="4375972"
-X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="4375972"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 21:52:56 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="715435648"
-X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
-   d="scan'208";a="715435648"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Nov 2023 21:52:55 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34; Thu, 16 Nov 2023 21:52:55 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.34 via Frontend Transport; Thu, 16 Nov 2023 21:52:55 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.34; Thu, 16 Nov 2023 21:52:55 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DYvn7kBto5E+bZmepIEy6Olh11yp6CZQ3WuJUhgX4RUYPnYfsF236X+CvR9SrX3Ko5hrdU3FbCHTHH89kwxcv/FgTBdSqJ2BhqXwNgxJvpCvRj/hnDDXgWUVNNYAlErSoVz0PlSvE4U7y8erS2HlDSfl3QtZYDiWZJKIcTxGmpX7z7oJON30QiavrPgj8GiNWbkeY19B1ryw/gZcG44N21nY7z5s+8H/1QRlJg3Pqc7Ih7ymwtg/E0lcEtt+hHSjPI9/FSh0B7hXeS61jJ6KIvAnj4juG6tEkVPsGepR5TXiKW3+HBUAOR/Q6d9KjFTCOdtBEeGpAVLtn7yYRH6fIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xSA5/srXzS2dqmkzyXXBwXE328CQy28vDATTknk7z8k=;
- b=dJ305qOvvUxZVuPXtIgxfsWC+fM+51UK2rLxy9c5S8KB9f188cngjAqxMxDIDlb9u4ElIFBUfgW8/HukmpCkwc0XQD8oovJtIZ7BNcyV22PlNFAOvLroV0DbIK3Xw9vUV6TYR1fTsNncizp4TyBd6w5u9e661WYFTfV7P4527pyWaJh2NU6IK1paiTePrknD6hw6nlGlLs6/q/C+IUd8ctQuMUgzDPIw1dP4y/LIj9kfuLcbILfd3adrIzzEBHFXz2MFe11lWTIRCnEo4R+/ZSkz2BwPbf3FL4G62TyqjTqe9laXxpmoVca2Ih0DI4l6AIL7j/MB0D1w0wgw1gf2dQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB3175.namprd11.prod.outlook.com (2603:10b6:a03:7c::23)
- by LV8PR11MB8534.namprd11.prod.outlook.com (2603:10b6:408:1f7::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.21; Fri, 17 Nov
- 2023 05:52:52 +0000
-Received: from BYAPR11MB3175.namprd11.prod.outlook.com
- ([fe80::124:ae3c:93d1:981b]) by BYAPR11MB3175.namprd11.prod.outlook.com
- ([fe80::124:ae3c:93d1:981b%7]) with mapi id 15.20.7002.022; Fri, 17 Nov 2023
- 05:52:52 +0000
-Message-ID: <bdb0137a-b735-41d9-9fea-38b238db0305@intel.com>
-Date: Thu, 16 Nov 2023 21:52:49 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v4 0/5] iavf: Add devlink and
- devlink rate support'
-Content-Language: en-US
-From: "Zhang, Xuejun" <xuejun.zhang@intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <qi.z.zhang@intel.com>, Jakub Kicinski
-	<kuba@kernel.org>, Wenjun Wu <wenjun1.wu@intel.com>, <maxtram95@gmail.com>,
-	"Chittim, Madhu" <madhu.chittim@intel.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, <pabeni@redhat.com>
-References: <20230727021021.961119-1-wenjun1.wu@intel.com>
- <20230822034003.31628-1-wenjun1.wu@intel.com> <ZORRzEBcUDEjMniz@nanopsycho>
- <20230822081255.7a36fa4d@kernel.org> <ZOTVkXWCLY88YfjV@nanopsycho>
- <0893327b-1c84-7c25-d10c-1cc93595825a@intel.com>
- <ZOcBEt59zHW9qHhT@nanopsycho>
- <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-In-Reply-To: <5aed9b87-28f8-f0b0-67c4-346e1d8f762c@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR04CA0128.namprd04.prod.outlook.com
- (2603:10b6:303:84::13) To BYAPR11MB3175.namprd11.prod.outlook.com
- (2603:10b6:a03:7c::23)
+Received: from sequoia-grove.ad.secure-endpoints.com (sequoia-grove.ad.secure-endpoints.com [IPv6:2001:470:1f07:f77:70f5:c082:a96a:5685])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179FE196
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 22:03:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
+	d=auristor.com; s=MDaemon; r=y; t=1700200983; x=1700805783;
+	i=jaltman@auristor.com; q=dns/txt; h=Message-ID:Date:
+	MIME-Version:User-Agent:Subject:Content-Language:To:Cc:
+	References:From:Organization:In-Reply-To:Content-Type; bh=JWqTxk
+	Ey4Nn8JupgPjTeKuSs1KAQokAcIqlD3AbgzP0=; b=F5O3aTqPn4KrDZjWotMCGc
+	zKQTE5CK0Gyp0H4VajWn/qhiAlYRUjHGk6mTDGXo+e3vfCp3peo/ojPDe5XBvD8i
+	SiDg/mDA79RVeLSLKke4N7X4lTSeRhz9BZC0Lr6kGA48wvl86o5SBjBBuMpNXl1r
+	y7+ESbM00uwXTDx6ffR7Y=
+X-MDAV-Result: clean
+X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:03:03 -0500
+Received: from [IPV6:2603:7000:73d:b00:39f9:c05a:677:9528] by auristor.com (IPv6:2001:470:1f07:f77:28d9:68fb:855d:c2a5) (MDaemon PRO v23.5.1c) 
+	with ESMTPSA id md5001003746708.msg; Fri, 17 Nov 2023 01:03:03 -0500
+X-Spam-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:03:03 -0500
+	(not processed: message from trusted or authenticated source)
+X-MDRemoteIP: 2603:7000:73d:b00:39f9:c05a:677:9528
+X-MDHelo: [IPV6:2603:7000:73d:b00:39f9:c05a:677:9528]
+X-MDArrival-Date: Fri, 17 Nov 2023 01:03:03 -0500
+X-MDOrigin-Country: US, NA
+X-Authenticated-Sender: jaltman@auristor.com
+X-Return-Path: prvs=16855eaa48=jaltman@auristor.com
+X-Envelope-From: jaltman@auristor.com
+X-MDaemon-Deliver-To: netdev@vger.kernel.org
+Message-ID: <b13a17c9-f374-4466-be02-371a632a7f2d@auristor.com>
+Date: Fri, 17 Nov 2023 01:02:51 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB3175:EE_|LV8PR11MB8534:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3f4b7b05-e914-4927-c36c-08dbe7317015
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Iuiv1DhxM18PExaTBcajZdO/lHbCRykDN8gQZg6EK0PsZ5yKYtJ44QE/cpi9h4d/3lryoKbMViOFperJER9SAxdG4SZ5lsC3Zff0iPJh4tv34dF92uZ1/o3SJh8MwdB6UR2C401MeBcqqiazgHyyoBvaoma+peAU5WsKR4lIdBSDzPv3lns8JbQ8XZ+n436MddscgopCGnzHxmF9syxJClwLbZAULVuyDhdzSFv1a8MgOBwveN+RjXizIIUalsqZHx5Aeb2/eLKCpt6y6nxjVpEdDMQJreFtDhgAnypnzxbNSBOHp77vHCi/yJWFbVQ35Fw4OZIM3bOZiCngdYcGl5ZQ+iICmDIWo5DokT7hy4Cb8BDWKyhDvSn9XJF5fl6hJ7rfSwyM2k3DmiHvDFiLhxRz40bCEG7tGkcWy7QlJr5fA26eKvzL+2/+uznuUaB5Q0RYM0FhySrcM8eRNziVZc/Q46v4vfJG/YYvKMCyLB6x1eRsjR785fGxLG7J2FbnPmK7Qu/cIQCeUTtHcNNQNnnKcv07Fn53ljhoFH8daWtHgbUm2HnS1yHqNO9dTDBv/6ykHchi/T5kSCFuxGYV2+mBoG8iS0MnPyCTb+nrzZVsp0Dr50EtO3lSm/XvuIlW7s99jEaYyVgObzsCMjzi7uhOnYMz6Iq0qrtIUNnVL9OoqbKv4GuaK1Pmtaqx6Bti
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB3175.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(376002)(346002)(136003)(39860400002)(396003)(230922051799003)(1800799009)(186009)(64100799003)(451199024)(36756003)(26005)(6666004)(6512007)(53546011)(2616005)(83380400001)(5660300002)(8936002)(8676002)(478600001)(4326008)(41300700001)(966005)(2906002)(6486002)(316002)(31696002)(66476007)(66556008)(54906003)(6916009)(82960400001)(66946007)(86362001)(38100700002)(6506007)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eU05bk9UOEpLRFlPSmFxMzlVZHlQTEo3MmZwdHkwSk1PUDJ6MkdoMnArb2Fz?=
- =?utf-8?B?YU9oRzkvMldYSlNvdmw5c29RQ3NLOFZrZGo5b1F0UWRxRnBuc1dMblFQUlo3?=
- =?utf-8?B?bXVUWWZ4K1JkbzRmYk9pRVlkeXlrMlkvS2pIZlZIVXRZNHkwN25COU53T2c2?=
- =?utf-8?B?UXBhSUVodmlEbURUVVFkaEFBR1RqbWlIUFJ0Z3doVlo2T1NDVldXbDE1bW55?=
- =?utf-8?B?b0h2VGZGZ3dxSFQyOHlXaXdOR2FwY0IzQithMHl4YnJSS2o0MnVmQVgzS0dJ?=
- =?utf-8?B?bWpKRzNOTFNkMWEvcmxTWUFVeUdMaUtua3kzWmF2MGhYZThHVzV6czNrMTU2?=
- =?utf-8?B?SWx5dG9GNTRXRlUzdlZGem45WmlNRThUUjJQYjNQeTFIWDVBV0t3YWVvVFFY?=
- =?utf-8?B?OEhSenF3T3lDU2c5MmRvU21QbGM4aEJLZ3BlcDByVlRoem1VdjdxVmJ2TWNl?=
- =?utf-8?B?OXdGNFdVNS80OHBPcjRqYmx0NEJ0cnFmYU4wZExBU2xWV2FWSkdES09oTzFa?=
- =?utf-8?B?OG42NG5KOXlaMndWSWxKc1NFek1Ba2xYRkZYb28xQk1JWEZ5MVgxaVN4RVEv?=
- =?utf-8?B?VzUvenFqdElrNUxZbXdaRkh2OWFrWWRnayt0aW4rZDd3MHZtblk3UFA0UWRK?=
- =?utf-8?B?WDl6cEJVT0YwWVdJeWVlYzlZYVJ1L2JrNGZlbHArTFFBQVM3WXFHc3Q0S05u?=
- =?utf-8?B?d1ZtUTIzYnpmV3NxRHViL21kM3M1K1pyK2hNVmJnaGF1SWdMSVlmMXd2ZjE1?=
- =?utf-8?B?T05sTHNZMlkzWERMbnNEalJjZEg1SUxScElEVVBac1pOdHF4MHRacFFpUkQv?=
- =?utf-8?B?ZEtqNVZIalpBMjY3cnhxajROYXl6SHRFcmw0NktXaWVSMTcwZ2NKU0JDdFhh?=
- =?utf-8?B?Y1RJOVhHRFpxbEF3bFNSTHdsOWFVWFJQTFRJSnhwcVV5ZDMrekhEUE0zU1Ja?=
- =?utf-8?B?Yk9UQVRaVVJCTmI4Tlh6TmhiWlFxMDRTNXZsaUVHb0dLTS9IQmtFVCtna3Y3?=
- =?utf-8?B?b0libmd2T2cyYkF5amt2b0ErN2loOW1WTlRNVldGMXNGbTRvUXhGTHBhTldN?=
- =?utf-8?B?WWsyMW5MUXFPMHBBQk5oTytvOGlEeURWQTBQVjZHWE9iNXczTWZZQzhnTWlP?=
- =?utf-8?B?VnVSQ1BEdmxOaDBjQXRML1hBTFlueitrdkNGWHVPeGlYWW44SGxvVnpMbkR6?=
- =?utf-8?B?eE1PMnBsZG8zUU5OdkN3SUN4WU1XUUY5NFk5N3BvdEFMbkVwT01DQTk2dURF?=
- =?utf-8?B?VWh1MHRRQlNZdVZtcVAxVFhnMFFuRWxyTnNyU2J2WmZFQkZhcHFtbHZlK2pS?=
- =?utf-8?B?cGw4cWQ3TkFjSXlJQnVRV3E4d1NUMG1aVExIUVBqOW1lTmlBOWxXNXBMRGFZ?=
- =?utf-8?B?NVRFbjVFSko5TjFTNUl3OXpFbzZnb29UcjZ3dElneFpaVmE0a3VzWTZPb3BG?=
- =?utf-8?B?NDdWMTZPak5KeXRwYVNvQTEzYjl0V25YeXVQNndQWDdMV1g4NWNEZVc0a1hL?=
- =?utf-8?B?bDlBSnZVNGk5OC9YOUpLQkEraUQvT3p2TVZpdkNPL0tOc0syWEJRYzlxTzVy?=
- =?utf-8?B?RVlER0JGMllRMmthNGN3LzlMd0dhN3kxSkFuUmljOHQ4MVJIMVp3L3hmOHZh?=
- =?utf-8?B?dGpvWlZjZEJtckdRN2VCYlNpSkMrN3dKWllLNmVmTzV2VnpwbXg3ZXFicExW?=
- =?utf-8?B?UGRiOFFObzBmdFovUmRDcXhtNGpESU1CRUpNdmdudXprcW1QeElQUnhNU3lr?=
- =?utf-8?B?L210L2RJQkZaMlh5TmNTK016bjMxb3R3T3ZGYXVhZFowL3J0aWdTYVJjRFFG?=
- =?utf-8?B?UDJ3U1Z5UG9jcERnQS9JOWZMWFlwVFh1cTM1Y3RWTmZnbm0xdCtRdDZhMkpF?=
- =?utf-8?B?ZndzSmpBYlBYV1poM3dZN3dsWkJBajJwc1ZOSU9BKzM5THdNc2FUdVBYUlR6?=
- =?utf-8?B?ejhGNURCUFQzUlR4TXVaM2lLcWpDeHR3V0VPNUJiTWdmTnJEMW9KY0hUNHdo?=
- =?utf-8?B?UTFGYmlUZFY5SThLUFVvazc3bGRKQm9zaS9FeUtYMnVORVNTZjI4Wm45VUVL?=
- =?utf-8?B?OWRodDhjL0xydXl3ZGpKS3JQeFhMZXUyQzNVMXEvbjlVWWs5S0VtNWY2UGtC?=
- =?utf-8?Q?jtI1sgUeCa0gyD9OYL1TikCBi?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3f4b7b05-e914-4927-c36c-08dbe7317015
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB3175.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2023 05:52:52.4853
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: cVI8fLZw+fyXh7E6WR5S/hHyG01DmclkDhMOY8PADvCEwBr9PI5bbVvLeRuTu0ebtNzKIBYa0opyboiQeTWlKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8534
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] rxrpc: Fix RTT determination to use any ACK as a
+ source
+Content-Language: en-US
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Marc Dionne <marc.dionne@auristor.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20231116131259.103513-1-dhowells@redhat.com>
+ <20231116131259.103513-2-dhowells@redhat.com>
+From: Jeffrey E Altman <jaltman@auristor.com>
+Organization: AuriStor, Inc.
+In-Reply-To: <20231116131259.103513-2-dhowells@redhat.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms040509050003080500080001"
+X-MDCFSigsAdded: auristor.com
 
-Hello Jiri & Jakub,
+This is a cryptographically signed message in MIME format.
 
-Thanks for looking into our last patch with devlink API. Really 
-appreciate your candid review.
+--------------ms040509050003080500080001
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Following your suggestion, we have looked into 3 tc offload options to 
-support queue rate limiting
+On 11/16/2023 8:12 AM, David Howells wrote:
 
-#1 mq + matchall + police
-
-#2 mq + tbf
-
-#3 htb
-
-all 3 tc offload options require some level of tc extensions to support 
-VF tx queue rate limiting (tx_maxrate & tx_minrate)
-
-htb offload requires minimal tc changes or no change with similar change 
-done @ driver (we can share patch for review).
-
-After discussing with Maxim Mikityanskiy( 
-https://lore.kernel.org/netdev/54a7dd27-a612-46f1-80dd-b43e28f8e4ce@intel.com/ 
-), looks like sysfs interface with tx_minrate extension could be the 
-option we can take.
-
-Look forward your opinion & guidance. Thanks for your time!
-
-Regards,
-
-Jun
-
-On 8/28/2023 3:46 PM, Zhang, Xuejun wrote:
+> Fix RTT determination to be able to use any type of ACK as the response
+> from which RTT can be calculated provided its ack.serial is non-zero and
+> matches the serial number of an outgoing DATA or ACK packet.  This
+> shouldn't be limited to REQUESTED-type ACKs as these can have other types
+> substituted for them for things like duplicate or out-of-order packets.
 >
-> On 8/24/2023 12:04 AM, Jiri Pirko wrote:
->> Wed, Aug 23, 2023 at 09:13:34PM CEST, xuejun.zhang@intel.com wrote:
->>> On 8/22/2023 8:34 AM, Jiri Pirko wrote:
->>>> Tue, Aug 22, 2023 at 05:12:55PM CEST,kuba@kernel.org  wrote:
->>>>> On Tue, 22 Aug 2023 08:12:28 +0200 Jiri Pirko wrote:
->>>>>> NACK! Port function is there to configure the VF/SF from the eswitch
->>>>>> side. Yet you use it for the configureation of the actual VF, 
->>>>>> which is
->>>>>> clear misuse. Please don't
->>>>> Stating where they are supposed to configure the rate would be 
->>>>> helpful.
->>>> TC?
->>> Our implementation is an extension to this commit 42c2eb6b1f43 ice: 
->>> Implement
->>> devlink-rate API).
->>>
->>> We are setting the Tx max & share rates of individual queues in a VF 
->>> using
->>> the devlink rate API.
->>>
->>> Here we are using DEVLINK_PORT_FLAVOUR_VIRTUAL as the attribute for 
->>> the port
->>> to distinguish it from being eswitch.
->> I understand, that is a wrong object. So again, you should use
->> "function" subobject of devlink port to configure "the other side of the
->> wire", that means the function related to a eswitch port. Here, you are
->> doing it for the VF directly, which is wrong. If you need some rate
->> limiting to be configured on an actual VF, use what you use for any
->> other nic. Offload TC.
-> Thanks for detailed explanation and suggestions. Sorry for late reply 
-> as it took a bit longer to understand options.
->
-> As sysfs has similar rate configuration on per queue basis with 
-> tx_maxrate, is it a viable option for our use case (i.e allow user to 
-> configure tx rate for each allocated queue in a VF).
->
-> Pls aslo see If adding tx_minrate to sysfs tx queue entry is feasible 
-> on the current framework.
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+> Fixes: 4700c4d80b7b ("rxrpc: Fix loss of RTT samples due to interposed ACK")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Marc Dionne <marc.dionne@auristor.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: linux-afs@lists.infradead.org
+> cc: netdev@vger.kernel.org
+
+Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
+
+
+--------------ms040509050003080500080001
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
+DHEwggXSMIIEuqADAgECAhBAAYJpmi/rPn/F0fJyDlzMMA0GCSqGSIb3DQEBCwUAMDoxCzAJ
+BgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEz
+MB4XDTIyMDgwNDE2MDQ0OFoXDTI1MTAzMTE2MDM0OFowcDEvMC0GCgmSJomT8ixkAQETH0Ew
+MTQxMEQwMDAwMDE4MjY5OUEyRkQyMDAwMjMzQ0QxGTAXBgNVBAMTEEplZmZyZXkgRSBBbHRt
+YW4xFTATBgNVBAoTDEF1cmlTdG9yIEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCkC7PKBBZnQqDKPtZPMLAy77zo2DPvwtGnd1hNjPvbXrpGxUb3
+xHZRtv179LHKAOcsY2jIctzieMxf82OMyhpBziMPsFAG/ukihBMFj3/xEeZVso3K27pSAyyN
+fO/wJ0rX7G+ges22Dd7goZul8rPaTJBIxbZDuaykJMGpNq4PQ8VPcnYZx+6b+nJwJJoJ46kI
+EEfNh3UKvB/vM0qtxS690iAdgmQIhTl+qfXq4IxWB6b+3NeQxgR6KLU4P7v88/tvJTpxIKkg
+9xj89ruzeThyRFd2DSe3vfdnq9+g4qJSHRXyTft6W3Lkp7UWTM4kMqOcc4VSRdufVKBQNXjG
+IcnhAgMBAAGjggKcMIICmDAOBgNVHQ8BAf8EBAMCBPAwgYQGCCsGAQUFBwEBBHgwdjAwBggr
+BgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVudHJ1c3QuY29tMEIGCCsGAQUF
+BzAChjZodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NlcnRzL3RydXN0aWRjYWEx
+My5wN2MwHwYDVR0jBBgwFoAULbfeG1l+KpguzeHUG+PFEBJe6RQwCQYDVR0TBAIwADCCASsG
+A1UdIASCASIwggEeMIIBGgYLYIZIAYb5LwAGAgEwggEJMEoGCCsGAQUFBwIBFj5odHRwczov
+L3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRt
+bDCBugYIKwYBBQUHAgIwga0MgapUaGlzIFRydXN0SUQgQ2VydGlmaWNhdGUgaGFzIGJlZW4g
+aXNzdWVkIGluIGFjY29yZGFuY2Ugd2l0aCBJZGVuVHJ1c3QncyBUcnVzdElEIENlcnRpZmlj
+YXRlIFBvbGljeSBmb3VuZCBhdCBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRp
+ZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRtbDBFBgNVHR8EPjA8MDqgOKA2hjRodHRwOi8v
+dmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NybC90cnVzdGlkY2FhMTMuY3JsMB8GA1UdEQQY
+MBaBFGphbHRtYW5AYXVyaXN0b3IuY29tMB0GA1UdDgQWBBQB+nzqgljLocLTsiUn2yWqEc2s
+gjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAJwV
+eycprp8Ox1npiTyfwc5QaVaqtoe8Dcg2JXZc0h4DmYGW2rRLHp8YL43snEV93rPJVk6B2v4c
+WLeQfaMrnyNeEuvHx/2CT44cdLtaEk5zyqo3GYJYlLcRVz6EcSGHv1qPXgDT0xB/25etwGYq
+utYF4Chkxu4KzIpq90eDMw5ajkexw+8ARQz4N5+d6NRbmMCovd7wTGi8th/BZvz8hgKUiUJo
+Qle4wDxrdXdnIhCP7g87InXKefWgZBF4VX21t2+hkc04qrhIJlHrocPG9mRSnnk2WpsY0MXt
+a8ivbVKtfpY7uSNDZSKTDi1izEFH5oeQdYRkgIGb319a7FjslV8wggaXMIIEf6ADAgECAhBA
+AXA7OrqBjMk8rp4OuNQSMA0GCSqGSIb3DQEBCwUAMEoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
+EwlJZGVuVHJ1c3QxJzAlBgNVBAMTHklkZW5UcnVzdCBDb21tZXJjaWFsIFJvb3QgQ0EgMTAe
+Fw0yMDAyMTIyMTA3NDlaFw0zMDAyMTIyMTA3NDlaMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
+EwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEzMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAu6sUO01SDD99PM+QdZkNxKxJNt0NgQE+Zt6ixaNP0JKSjTd+SG5L
+wqxBWjnOgI/3dlwgtSNeN77AgSs+rA4bK4GJ75cUZZANUXRKw/et8pf9Qn6iqgB63OdHxBN/
+15KbM3HR+PyiHXQoUVIevCKW8nnlWnnZabT1FejOhRRKVUg5HACGOTfnCOONrlxlg+m1Vjgn
+o1uNqNuLM/jkD1z6phNZ/G9IfZGI0ppHX5AA/bViWceX248VmefNhSR14ADZJtlAAWOi2un0
+3bqrBPHA9nDyXxI8rgWLfUP5rDy8jx2hEItg95+ORF5wfkGUq787HBjspE86CcaduLka/Bk2
+VwIDAQABo4IChzCCAoMwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwgYkG
+CCsGAQUFBwEBBH0wezAwBggrBgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVu
+dHJ1c3QuY29tMEcGCCsGAQUFBzAChjtodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29t
+L3Jvb3RzL2NvbW1lcmNpYWxyb290Y2ExLnA3YzAfBgNVHSMEGDAWgBTtRBnA0/AGi+6ke75C
+5yZUyI42djCCASQGA1UdIASCARswggEXMIIBEwYEVR0gADCCAQkwSgYIKwYBBQUHAgEWPmh0
+dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRl
+eC5odG1sMIG6BggrBgEFBQcCAjCBrQyBqlRoaXMgVHJ1c3RJRCBDZXJ0aWZpY2F0ZSBoYXMg
+YmVlbiBpc3N1ZWQgaW4gYWNjb3JkYW5jZSB3aXRoIElkZW5UcnVzdCdzIFRydXN0SUQgQ2Vy
+dGlmaWNhdGUgUG9saWN5IGZvdW5kIGF0IGh0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20v
+Y2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRleC5odG1sMEoGA1UdHwRDMEEwP6A9oDuGOWh0
+dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2NvbW1lcmNpYWxyb290Y2ExLmNy
+bDAdBgNVHQ4EFgQULbfeG1l+KpguzeHUG+PFEBJe6RQwHQYDVR0lBBYwFAYIKwYBBQUHAwIG
+CCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4ICAQB/7BKcygLX6Nl4a03cDHt7TLdPxCzFvDF2
+bkVYCFTRX47UfeomF1gBPFDee3H/IPlLRmuTPoNt0qjdpfQzmDWN95jUXLdLPRToNxyaoB5s
+0hOhcV6H08u3FHACBif55i0DTDzVSaBv0AZ9h1XeuGx4Fih1Vm3Xxz24GBqqVudvPRLyMJ7u
+6hvBqTIKJ53uCs3dyQLZT9DXnp+kJv8y7ZSAY+QVrI/dysT8avtn8d7k7azNBkfnbRq+0e88
+QoBnel6u+fpwbd5NLRHywXeH+phbzULCa+bLPRMqJaW2lbhvSWrMHRDy3/d8HvgnLCBFK2s4
+Spns4YCN4xVcbqlGWzgolHCKUH39vpcsDo1ymZFrJ8QR6ihIn8FmJ5oKwAnnd/G6ADXFC9bu
+db9+532phSAXOZrrecIQn+vtP366PC+aClAPsIIDJDsotS5z4X2JUFsNIuEgXGqhiKE7SuZb
+rFG9sdcLprSlJN7TsRDc0W2b9nqwD+rj/5MN0C+eKwha+8ydv0+qzTyxPP90KRgaegGowC4d
+UsZyTk2n4Z3MuAHX5nAZL/Vh/SyDj/ajorV44yqZBzQ3ChKhXbfUSwe2xMmygA2Z5DRwMRJn
+p/BscizYdNk2WXJMTnH+wVLN8sLEwEtQR4eTLoFmQvrK2AMBS9kW5sBkMzINt/ZbbcZ3F+eA
+MDGCAxQwggMQAgEBME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEXMBUG
+A1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwDQYJYIZIAWUDBAIBBQCg
+ggGXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTExNzA2
+MDI1MVowLwYJKoZIhvcNAQkEMSIEIDmMcaJtrtv48tMBu7bC+PC4+Mp1fO+wmlv3JdMWinXa
+MF0GCSsGAQQBgjcQBDFQME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEX
+MBUGA1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwXwYLKoZIhvcNAQkQ
+AgsxUKBOMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRy
+dXN0SUQgQ0EgQTEzAhBAAYJpmi/rPn/F0fJyDlzMMGwGCSqGSIb3DQEJDzFfMF0wCwYJYIZI
+AWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZI
+hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAHezb
+FjrJq6QKZQe/G6cIlLRhQC4Tm5Qf2cAqcybHls2RIDb69lGjbOmh7DewzB5ZgTfv7aA7i0jC
+VSaTJ9PmwNwSbwXVDWweKtxLaR6rQO7e0NrLZ/OJLUBVFuGRh/K16TSBetsy3Ocjny17/NFT
+SK4i732mBcJDTkrXuBLahIRsGCW3f8yiIiT1H08cQLP5yP4H5Y49Ra32+1lKrlGUiIYJiRb9
+hkOuoDOSFk6r+uit6kuu37LZmnKbcXytdQ8b3MV3etTwkIuuG2MNvZVF9wLwoRv3go9S6crC
+x/TI+cVdt3lEFqOf8/cubLpOqC7+b/5btQ2CHhzeCDIFKuTgmwAAAAAAAA==
+--------------ms040509050003080500080001--
+
 
