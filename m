@@ -1,171 +1,229 @@
-Return-Path: <netdev+bounces-48552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 476227EEC7A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:09:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A427EEC86
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:18:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D461C20995
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:09:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54FE328115C
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 988F0DDA2;
-	Fri, 17 Nov 2023 07:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0ED8DDC3;
+	Fri, 17 Nov 2023 07:18:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MSqStNsR"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="D6NFNpiP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A84194;
-	Thu, 16 Nov 2023 23:09:13 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id d9443c01a7336-1cc34c3420bso15078725ad.3;
-        Thu, 16 Nov 2023 23:09:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700204953; x=1700809753; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oKGrB53cKKY0Owh0a3XvEKXkqzVrBqUCTPJE4dZj0yw=;
-        b=MSqStNsR9OGuRwnx+vkeGmhTNUHRLp1xe3doP8S6nQtExpgFpWv2meHAGtGlrBxkuA
-         GUlo5gKoSJSIu66+flxyLg0B9Zxur7j87Vz24uEOYiYEOz2NiMdECwAYM6Aq9rwiM6E0
-         lRhMxIePX6ZMvN5NsjgN3hdJIA6ax3jg4jocOqFDPo0eb0zba5R2l+2asG8+8I5Ulh8w
-         Ia+Qih6TnI6Fb2Z0TaBSGHkSYpDPC7Gl0ioqBQTVaYYA+C+/zFM16EDIdA/DayKQrbEB
-         Q12wcAVpWkK4mP88+PjUBqefpZ8NSxHe8RAlVJuGqLRfGz4Dlu83M+wxSoWCnzSEeYEV
-         huGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700204953; x=1700809753;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oKGrB53cKKY0Owh0a3XvEKXkqzVrBqUCTPJE4dZj0yw=;
-        b=sMYtQ2PHpvO2BiPmZzttUPMkmdLLsAINAHpx0WCukRyHVfHY4psr7TJ3h1B4wHQUTH
-         fKeRdow5Iqp3r+9Uve066x2PMDQJYYS+97koNnXxd6ioY/MOGRSGuf2jX0ZCm6qhbNQe
-         zyk0hcvqVgl3cP/CA/XT5ykavqXKr+gZiMBcekmfQTzpA5kvArl98dFT/28YRDC5g4T1
-         LUNylqgGBDlU+2WwpAc1yOuwnRxANSlYfj/2f2hVJEKvlh6EpofbqtC7ESDmItfbLnkk
-         uMqmO7oRiEJ8DepU/r4Y2E5kGRmpMZ0tOucz+ZXWLShnjoS1h5z5LqoqqK2nR+4hbNU5
-         tbKA==
-X-Gm-Message-State: AOJu0Yy5TbuHhkPnU5CaQvIVSCP6AEVWoe7c78Y8V7O/Ye0jkSdxkpuO
-	Cexe72kM/4hR5GpFajjnkeI=
-X-Google-Smtp-Source: AGHT+IHUP9H2HU25w7abrLgLF04fFn3SPDzr6faUfmJDYOl+TgAZp6hmU/YvbWT3o+QdiKsh2vE+CA==
-X-Received: by 2002:a17:902:8542:b0:1c3:1f0c:fb82 with SMTP id d2-20020a170902854200b001c31f0cfb82mr9176199plo.41.1700204952839;
-        Thu, 16 Nov 2023 23:09:12 -0800 (PST)
-Received: from localhost ([2605:59c8:148:ba10:377e:7905:3027:d8fd])
-        by smtp.gmail.com with ESMTPSA id u18-20020a170902e5d200b001b8b2a6c4a4sm738973plf.172.2023.11.16.23.09.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 23:09:12 -0800 (PST)
-Date: Thu, 16 Nov 2023 23:09:10 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, 
- netdev@vger.kernel.org
-Cc: deb.chatterjee@intel.com, 
- anjali.singhai@intel.com, 
- namrata.limaye@intel.com, 
- tom@sipanda.io, 
- mleitner@redhat.com, 
- Mahesh.Shirshyad@amd.com, 
- tomasz.osinski@intel.com, 
- jiri@resnulli.us, 
- xiyou.wangcong@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- vladbu@nvidia.com, 
- horms@kernel.org, 
- daniel@iogearbox.net, 
- bpf@vger.kernel.org, 
- khalidm@nvidia.com, 
- toke@redhat.com, 
- mattyk@nvidia.com
-Message-ID: <65571196cff83_55d7320865@john.notmuch>
-In-Reply-To: <20231116145948.203001-14-jhs@mojatatu.com>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <20231116145948.203001-14-jhs@mojatatu.com>
-Subject: RE: [PATCH net-next v8 13/15] p4tc: add set of P4TC table kfuncs
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A327D51;
+	Thu, 16 Nov 2023 23:17:57 -0800 (PST)
+Received: from p-infra-ksmg-sc-msk01 (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id A33E2100053;
+	Fri, 17 Nov 2023 10:17:52 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A33E2100053
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1700205472;
+	bh=1fkmIGYzp5c7rAK+NR4+zP/oYo2cB5TkkjHXMWdQCgU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=D6NFNpiPLM+x8x/5pPmInanARsPkHeQ9DY9bAjY6pfaCMIzIIqRMfrhDCITnqd8sA
+	 rcXdWJTYQqWPqbpWp9qUJOTLptmzgaWQ4H8eP0hpNZdcvxhhzNPjgvQQrSOenIGXWm
+	 rN6uDqi+kpYS4T6/kSmMbfAvdvj5AvKGXqgPOHJT4hIgi707M2kijApzQ5NgWFmvWI
+	 jSKwW4raAHISahMXFwRkTu/4V2h9xS976ZUF03kY6Zmv82m1Dstic+q4TaiSoWTbXW
+	 hAQaZfye17Jw2PqqcGUa0eIuC/fpbLYENKhnfR4UIw2OaHo5g9L1OiUpAia327o6Rq
+	 1tvE0tNkkgtuQ==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Fri, 17 Nov 2023 10:17:51 +0300 (MSK)
+Received: from [192.168.0.106] (100.64.160.123) by
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 17 Nov 2023 10:17:51 +0300
+Message-ID: <99935734-4006-509f-5e02-3229f0847b67@salutedevices.com>
+Date: Fri, 17 Nov 2023 10:10:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v1 1/2] virtio/vsock: send credit update during
+ setting SO_RCVLOWAT
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
+ <20231108072004.1045669-2-avkrasnov@salutedevices.com>
+ <6owgy5zo5lmx3w2vsu6ux552olyuq4lnqzrawngc3gmi5fonn6@6emsez7krq7f>
+Content-Language: en-US
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <6owgy5zo5lmx3w2vsu6ux552olyuq4lnqzrawngc3gmi5fonn6@6emsez7krq7f>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 181429 [Nov 17 2023]
+X-KSMG-AntiSpam-Version: 6.0.0.2
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;100.64.160.123:7.1.2;p-i-exch-sc-m01.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/17 06:08:00 #22469568
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Jamal Hadi Salim wrote:
-> We add an initial set of kfuncs to allow interactions from eBPF programs
-> to the P4TC domain.
->
 
-If you just use bpf maps then you get all the bpf map type for
-free and you get the bpf_map_* ops from BPF side.
 
-I don't see any use for this duplication.
+On 15.11.2023 14:08, Stefano Garzarella wrote:
+> On Wed, Nov 08, 2023 at 10:20:03AM +0300, Arseniy Krasnov wrote:
+>> This adds sending credit update message when SO_RCVLOWAT is updated and
+>> it is bigger than number of bytes in rx queue. It is needed, because
+>> 'poll()' will wait until number of bytes in rx queue will be not smaller
+>> than SO_RCVLOWAT, so kick sender to send more data. Otherwise mutual
+>> hungup for tx/rx is possible: sender waits for free space and receiver
+>> is waiting data in 'poll()'.
+>>
+>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> ---
+>> drivers/vhost/vsock.c                   |  2 ++
+>> include/linux/virtio_vsock.h            |  1 +
+>> net/vmw_vsock/virtio_transport.c        |  2 ++
+>> net/vmw_vsock/virtio_transport_common.c | 31 +++++++++++++++++++++++++
+>> net/vmw_vsock/vsock_loopback.c          |  2 ++
+>> 5 files changed, 38 insertions(+)
+>>
+>> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> index f75731396b7e..ecfa5c11f5ee 100644
+>> --- a/drivers/vhost/vsock.c
+>> +++ b/drivers/vhost/vsock.c
+>> @@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>
+>>         .read_skb = virtio_transport_read_skb,
+>> +
+>> +        .set_rcvlowat             = virtio_transport_set_rcvlowat
+>>     },
+>>
+>>     .send_pkt = vhost_transport_send_pkt,
+>> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> index ebb3ce63d64d..97dc1bebc69c 100644
+>> --- a/include/linux/virtio_vsock.h
+>> +++ b/include/linux/virtio_vsock.h
+>> @@ -256,4 +256,5 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit);
+>> void virtio_transport_deliver_tap_pkt(struct sk_buff *skb);
+>> int virtio_transport_purge_skbs(void *vsk, struct sk_buff_head *list);
+>> int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t read_actor);
+>> +int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val);
+>> #endif /* _LINUX_VIRTIO_VSOCK_H */
+>> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>> index af5bab1acee1..cf3431189d0c 100644
+>> --- a/net/vmw_vsock/virtio_transport.c
+>> +++ b/net/vmw_vsock/virtio_transport.c
+>> @@ -539,6 +539,8 @@ static struct virtio_transport virtio_transport = {
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>
+>>         .read_skb = virtio_transport_read_skb,
+>> +
+>> +        .set_rcvlowat             = virtio_transport_set_rcvlowat
+>>     },
+>>
+>>     .send_pkt = virtio_transport_send_pkt,
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index e22c81435ef7..88a58163046e 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -1676,6 +1676,37 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+>> }
+>> EXPORT_SYMBOL_GPL(virtio_transport_read_skb);
+>>
+>> +int virtio_transport_set_rcvlowat(struct vsock_sock *vsk, int val)
+>> +{
+>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>> +    bool send_update = false;
+> 
+> I'd declare this not initialized.
+> 
+>> +
+>> +    spin_lock_bh(&vvs->rx_lock);
+>> +
+>> +    /* If number of available bytes is less than new
+>> +     * SO_RCVLOWAT value, kick sender to send more
+>> +     * data, because sender may sleep in its 'send()'
+>> +     * syscall waiting for enough space at our side.
+>> +     */
+>> +    if (vvs->rx_bytes < val)
+>> +        send_update = true;
+> 
+> Then here just:
+>     send_update = vvs->rx_bytes < val;
+> 
+>> +
+>> +    spin_unlock_bh(&vvs->rx_lock);
+>> +
+>> +    if (send_update) {
+>> +        int err;
+>> +
+>> +        err = virtio_transport_send_credit_update(vsk);
+>> +        if (err < 0)
+>> +            return err;
+>> +    }
+>> +
+>> +    WRITE_ONCE(sk_vsock(vsk)->sk_rcvlowat, val ? : 1);
+> 
+> Not in this patch, but what about doing this in vsock_set_rcvlowat() in af_vsock.c?
+> 
+> I mean avoid to return if `transport->set_rcvlowat(vsk, val)` is
+> successfully, so set sk_rcvlowat in a single point.
 
-> - bpf_p4tc_tbl_read: Used to lookup a table entry from a BPF
-> program installed in TC. To find the table entry we take in an skb, the
-> pipeline ID, the table ID, a key and a key size.
-> We use the skb to get the network namespace structure where all the
-> pipelines are stored. After that we use the pipeline ID and the table
-> ID, to find the table. We then use the key to search for the entry.
-> We return an entry on success and NULL on failure.
+Yes, we can do it, I'll include new patch as 0001 in v2, don't remember why it wasn't implemented in this
+way before.
+
+Thanks, Arseniy
+
 > 
-> - xdp_p4tc_tbl_read: Used to lookup a table entry from a BPF
-> program installed in XDP. To find the table entry we take in an xdp_md,
-> the pipeline ID, the table ID, a key and a key size.
-> We use struct xdp_md to get the network namespace structure where all
-> the pipelines are stored. After that we use the pipeline ID and the table
-> ID, to find the table. We then use the key to search for the entry.
-> We return an entry on success and NULL on failure.
+> The rest LGTM!
 > 
-> - bpf_p4tc_entry_create: Used to create a table entry from a BPF
-> program installed in TC. To create the table entry we take an skb, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
+> Stefano
 > 
-> - xdp_p4tc_entry_create: Used to create a table entry from a BPF
-> program installed in XDP. To create the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
+>> +
+>> +    return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(virtio_transport_set_rcvlowat);
+>> +
+>> MODULE_LICENSE("GPL v2");
+>> MODULE_AUTHOR("Asias He");
+>> MODULE_DESCRIPTION("common code for virtio vsock");
+>> diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>> index 048640167411..388c157f6633 100644
+>> --- a/net/vmw_vsock/vsock_loopback.c
+>> +++ b/net/vmw_vsock/vsock_loopback.c
+>> @@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
+>>         .notify_buffer_size       = virtio_transport_notify_buffer_size,
+>>
+>>         .read_skb = virtio_transport_read_skb,
+>> +
+>> +        .set_rcvlowat             = virtio_transport_set_rcvlowat
+>>     },
+>>
+>>     .send_pkt = vsock_loopback_send_pkt,
+>> -- 2.25.1
+>>
 > 
-> - bpf_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
-> First does a lookup using the passed key and upon a miss will add the entry
-> to the table.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_create_on_miss: conforms to PNA "add on miss".
-> First does a lookup using the passed key and upon a miss will add the entry
-> to the table.
-> We return 0 on success and a negative errno on failure
-> 
-> - bpf_p4tc_entry_update: Used to update a table entry from a BPF
-> program installed in TC. To update the table entry we take an skb, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_update: Used to update a table entry from a BPF
-> program installed in XDP. To update the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and its size, and an action which will
-> be associated with the new entry.
-> We return 0 on success and a negative errno on failure
-> 
-> - bpf_p4tc_entry_delete: Used to delete a table entry from a BPF
-> program installed in TC. To delete the table entry we take an skb, the
-> pipeline ID, the table ID, a key and a key size.
-> We return 0 on success and a negative errno on failure
-> 
-> - xdp_p4tc_entry_delete: Used to delete a table entry from a BPF
-> program installed in XDP. To delete the table entry we take an xdp_md, the
-> pipeline ID, the table ID, a key and a key size.
-> We return 0 on success and a negative errno on failure
-> 
-> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> ---
 
