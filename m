@@ -1,98 +1,156 @@
-Return-Path: <netdev+bounces-48525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D167EEAAF
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:27:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1847EEAB4
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:33:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 901E5280EE1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:27:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F08D5281074
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C54D111D;
-	Fri, 17 Nov 2023 01:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914D61368;
+	Fri, 17 Nov 2023 01:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="XvbhMbyo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DgRObeCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEEDC5
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 17:27:21 -0800 (PST)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-1f055438492so788745fac.3
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 17:27:21 -0800 (PST)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABDD71A8;
+	Thu, 16 Nov 2023 17:32:53 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id 41be03b00d2f7-5bdb0be3591so1173458a12.2;
+        Thu, 16 Nov 2023 17:32:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700184440; x=1700789240; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=aKf/LZV/kvSMDigtlOXJdd990tp8RAjm519fFm7u9Sc=;
-        b=XvbhMbyotVUY7kSB4pm2wrtlQnw9iGsTbTgHT3tu92ZOA8QmwwlgRVtV1DBB2IAHll
-         tnMHrs7fck9cNJB7ePEo7xvAnsiQMHQFAUN3njz+CwTd2uYfMAuxTvOJHfKE/elR7VNU
-         caJD7CN+zD8uFSJolo8EPV6/4E63D49upO7l1bHy9+AkUQ6wR3x24gOuVwTS61yjt4aE
-         EKPaz7pMnghMLvJ68YHHr+rhelx2y6O0JIZKnsjiwJU8PLl+ZtkrFtUNBrHfi8K+A20i
-         3h099f7fexEaKe5jORKvYM+sR2c2ZHO8H/3juip2p42lXhAq4IQcg51yJDdfuRRD7r/v
-         G1tQ==
+        d=gmail.com; s=20230601; t=1700184773; x=1700789573; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hu/ZPQV80A4ISgZrwoGV5UgX5RK6K+Si4rWx0zCLHuc=;
+        b=DgRObeCY2B2RY/QWfPXsZ0ec5mVQO8S5a07iXR8s7/omzVMLwXRs0e13bibb91a4n8
+         4t1WOfaPu6M4AgOA5MjCk8NMiip5c2JOMhimGZq3fxp7/smnyVWTmvZlJHGOhJ99JHXa
+         2J21mYi+dGtQtHVvFWZ0Or2XJ+YSwR2LbjHrVBK92csOqrh+e8hXgyjic44fZ53T3c80
+         FDiigeJwYw0apzPbPfR4sgsxIGNZAq9I9M9ECQXnkTeeDSOvnmxyVqOyc99SoSAqLJmn
+         cxJGmR+CttE94vPgAYlZjCS0Cl0VVQNvAnnwQCJujm1Ih0gdDrL7uKCGowiNFC4q6dNt
+         f0AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700184440; x=1700789240;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aKf/LZV/kvSMDigtlOXJdd990tp8RAjm519fFm7u9Sc=;
-        b=m7CzVksoJ3gIdJ4rJzHLD+you5EB5j5jy0EDl0xD6MpExPMx4pJeA5zD2qEXedPI0c
-         LwUJ+F4wSvFeeeYGa7+MNIuDg/+Y2tZUZFvxS2ObSeTmUzvU1IPznM0sATrqwcMRLPKT
-         ZUTIJMLd2AHfjGUyYIxt7UaCWs2bLoEYE2OpaDlfzAwnclhqQyubjMm4FghbH5sjp5ef
-         CBwT4FM91dUOAUZ85eCxGyB5w56QxWVCF8p7Pqeu0l2weM0G+d18mPXb38v3WYJ4YdJZ
-         ZC2T3QqiLF4Ty03XeJHCJ/3lO7MPnhf7P9d0/dEK/IGPAAWcQQMKRkR2HI1aDsdb0wgO
-         oMgg==
-X-Gm-Message-State: AOJu0YxbkjVVeMI7M82c856KJKszITHkLjkYyw+lfWhtvt5YPIffqru9
-	ZIVRvzJHvNZOXD8C61yA8CdaUg==
-X-Google-Smtp-Source: AGHT+IHe+gWJw0AKxuVcbBIXwt32o0SzEtp1hkMypo+gLCWDCnHgrd9UcktssVj7AN6A8lUEGQalJA==
-X-Received: by 2002:a05:6870:d210:b0:1f0:630c:a58a with SMTP id g16-20020a056870d21000b001f0630ca58amr21197727oac.51.1700184440236;
-        Thu, 16 Nov 2023 17:27:20 -0800 (PST)
-Received: from ?IPV6:2804:14d:5c5e:44fb:7741:c354:44be:5c3f? ([2804:14d:5c5e:44fb:7741:c354:44be:5c3f])
-        by smtp.gmail.com with ESMTPSA id y19-20020a056a00191300b0069ee4242f89sm372131pfi.13.2023.11.16.17.27.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Nov 2023 17:27:19 -0800 (PST)
-Message-ID: <8c0bc61e-c0f1-49d8-8696-812c336fb74b@mojatatu.com>
-Date: Thu, 16 Nov 2023 22:27:15 -0300
+        d=1e100.net; s=20230601; t=1700184773; x=1700789573;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hu/ZPQV80A4ISgZrwoGV5UgX5RK6K+Si4rWx0zCLHuc=;
+        b=Pkpyz3v567T/mxW3Z+dJ4/F4jEpVV1teSG2e5nRFUi5KTa25KKxYY9FNzS1Lr2BS4m
+         tOrHHvCWVMk7wL497NdW3ZbiGLC/fi5vhKpiYvL4I9KCMwhXbcD3BnEyXFKDnCRSFBei
+         HhEh/fzbW4pg5b79QkHKiqTZElh3AurqKNBayNUK87D+AWs40BLCBasyVB1XsmsV24x5
+         4nIOMD6P1kN9EFrtWeVPTUPwOUAYpR6c5qjcSXNsJDXFhXoxm1vqrDf63o2Ox2P/uHTw
+         mPhZpaJQGkj8lZ0gXjj9fxMu/QCjQzpamjmBgGNKi5TjC3KbI32wjOvt9B5uN5Y7zpJ/
+         uUMQ==
+X-Gm-Message-State: AOJu0YxgaVUFcVsARWZ/taRMf0oQTKki9x1IJ4XdFAzY2LIiIEwbivQl
+	8YtTEmtAxtnOCPcKRNjXPDE=
+X-Google-Smtp-Source: AGHT+IElEsWtMyi+Au04aGz/UC7A60cwpWW3SkM12tnJDAjm16MTW66txPqgPSmqELnre4Wn6EXTsA==
+X-Received: by 2002:a05:6a20:7d93:b0:188:1125:88bd with SMTP id v19-20020a056a207d9300b00188112588bdmr558627pzj.43.1700184773019;
+        Thu, 16 Nov 2023 17:32:53 -0800 (PST)
+Received: from localhost ([2605:59c8:148:ba10:5efa:e403:ded8:175e])
+        by smtp.gmail.com with ESMTPSA id t10-20020a1709028c8a00b001a9b29b6759sm289132plo.183.2023.11.16.17.32.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Nov 2023 17:32:51 -0800 (PST)
+Date: Thu, 16 Nov 2023 17:32:50 -0800
+From: John Fastabend <john.fastabend@gmail.com>
+To: Pengcheng Yang <yangpc@wangsu.com>, 
+ 'John Fastabend' <john.fastabend@gmail.com>, 
+ 'Jakub Sitnicki' <jakub@cloudflare.com>, 
+ 'Eric Dumazet' <edumazet@google.com>, 
+ 'Jakub Kicinski' <kuba@kernel.org>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Message-ID: <6556c2c238099_537dc208ab@john.notmuch>
+In-Reply-To: <000101da17b9$36951720$a3bf4560$@wangsu.com>
+References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com>
+ <1699962120-3390-3-git-send-email-yangpc@wangsu.com>
+ <6554713028d5b_3733620856@john.notmuch>
+ <000101da17b9$36951720$a3bf4560$@wangsu.com>
+Subject: Re: [PATCH bpf-next 2/3] tcp: Add the data length in skmsg to SIOCINQ
+ ioctl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [linus:master] [selftests/tc] d227cc0b1e:
- kernel-selftests.tc-testing.tdc.sh.fail
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Davide Caratti <dcaratti@redhat.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
-References: <202311161129.3b45ed53-oliver.sang@intel.com>
- <f9f772dd-5708-4823-9a7f-20ae8536b5e5@mojatatu.com>
-Content-Language: en-US
-In-Reply-To: <f9f772dd-5708-4823-9a7f-20ae8536b5e5@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 16/11/2023 11:16, Pedro Tammela wrote:
-> On 16/11/2023 03:42, kernel test robot wrote:
->> [...]
+Pengcheng Yang wrote:
+> John Fastabend <john.fastabend@gmail.com> wrote:
+> > Pengcheng Yang wrote:
+> > > SIOCINQ ioctl returns the number unread bytes of the receive
+> > > queue but does not include the ingress_msg queue. With the
+> > > sk_msg redirect, an application may get a value 0 if it calls
+> > > SIOCINQ ioctl before recv() to determine the readable size.
+> > >
+> > > Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
+> > 
+> > This will break the SK_PASS case I believe. Here we do
+> > not update copied_seq until data is actually copied into user
+> > space. This also ensures tcp_epollin_ready works correctly and
+> > tcp_inq. The fix is relatively recent.
+> > 
+> >  commit e5c6de5fa025882babf89cecbed80acf49b987fa
+> >  Author: John Fastabend <john.fastabend@gmail.com>
+> >  Date:   Mon May 22 19:56:12 2023 -0700
+> > 
+> >     bpf, sockmap: Incorrectly handling copied_seq
+> > 
+> > The previous patch increments the msg_len for all cases even
+> > the SK_PASS case so you will get double counting.
 > 
-> Hi!
-> Thanks for the report.
-> I'm trying to address this issue and others in this series:
-> [PATCH net-next 0/4] selftests: tc-testing: updates to tdc
+> You are right, I missed the SK_PASS case of skb stream verdict.
 > 
-> I have seen this timeout in other CIs as well, but I cannot reproduce 
-> locally, even with the CI build running on my laptop. I did notice in my 
-> local tests that KVM is a big factor for test completion, so it begs the 
-> question, is it running on a KVM enabled instance?
+> > 
+> > I was starting to poke around at how to fix the other cases e.g.
+> > stream parser is in use and redirects but haven't got to it  yet.
+> > By the way I think even with this patch epollin_ready is likely
+> > not correct still. We observe this as either failing to wake up
+> > or waking up an application to early when using stream parser.
+> > 
+> > The other thing to consider is redirected skb into another socket
+> > and then read off the list increment the copied_seq even though
+> > they shouldn't if they came from another sock?  The result would
+> > be tcp_inq would be incorrect even negative perhaps?
+> > 
+> > What does your test setup look like? Simple redirect between
+> > two TCP sockets? With or without stream parser? My guess is we
+> > need to fix underlying copied_seq issues related to the redirect
+> > and stream parser case. I believe the fix is, only increment
+> > copied_seq for data that was put on the ingress_queue from SK_PASS.
+> > Then update previous patch to only incrmeent sk_msg_queue_len()
+> > for redirect paths. And this patch plus fix to tcp_epollin_ready
+> > would resolve most the issues. Its a bit unfortunate to leak the
+> > sk_sg_queue_len() into tcp_ioctl and tcp_epollin but I don't have
+> > a cleaner idea right now.
+> > 
 > 
-> If there's any document describing the runner instances I would be 
-> interested too.
+> What I tested was to use msg_verdict to redirect between two sockets
+> without stream parser, and the problem I encountered is that msg has
+> been queued in psock->ingress_msg, and the application has been woken up
+> by epoll (because of sk_psock_data_ready), but the ioctl(FIONREAD) returns 0.
 
-OK, I was finally able to reproduce the timeout.
-I have some fixes prepared, will post them tomorrow after more testing!
+Yep makes sense.
+
+> 
+> The key is that the rcv_nxt is not updated on ingress redirect, or we only need
+> to update rcv_nxt on ingress redirect, such as in bpf_tcp_ingress() and
+> sk_psock_skb_ingress_enqueue() ?
+> 
+
+I think its likely best not to touch rcv_nxt. 'rcv_nxt' is used in
+the tcp stack to calculate lots of things. If you just bump it and
+then ever received an actual TCP pkt you would get some really
+odd behavior because seq numbers and rcv_nxt would be unrelated then.
+
+The approach you have is really the best bet IMO, but mask out
+the increment msg_len where its not needed. Then it should be OK.
+
+Mixing ingress redirect and TCP sending/recv pkts doesn't usually work
+very well anyway but I still think leaving rcv_nxt alone is best.
 
