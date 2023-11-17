@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-48543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3177EEC1E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:03:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F95D7EEC20
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:04:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 693921F23369
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:03:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28DCEB20A0E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:04:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F04D28A;
-	Fri, 17 Nov 2023 06:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEC4D2F2;
+	Fri, 17 Nov 2023 06:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="F5O3aTqP"
+	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="tyxqC1tW"
 X-Original-To: netdev@vger.kernel.org
 Received: from sequoia-grove.ad.secure-endpoints.com (sequoia-grove.ad.secure-endpoints.com [IPv6:2001:470:1f07:f77:70f5:c082:a96a:5685])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 179FE196
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 22:03:06 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A664196
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 22:04:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-	d=auristor.com; s=MDaemon; r=y; t=1700200983; x=1700805783;
+	d=auristor.com; s=MDaemon; r=y; t=1700201073; x=1700805873;
 	i=jaltman@auristor.com; q=dns/txt; h=Message-ID:Date:
 	MIME-Version:User-Agent:Subject:Content-Language:To:Cc:
-	References:From:Organization:In-Reply-To:Content-Type; bh=JWqTxk
-	Ey4Nn8JupgPjTeKuSs1KAQokAcIqlD3AbgzP0=; b=F5O3aTqPn4KrDZjWotMCGc
-	zKQTE5CK0Gyp0H4VajWn/qhiAlYRUjHGk6mTDGXo+e3vfCp3peo/ojPDe5XBvD8i
-	SiDg/mDA79RVeLSLKke4N7X4lTSeRhz9BZC0Lr6kGA48wvl86o5SBjBBuMpNXl1r
-	y7+ESbM00uwXTDx6ffR7Y=
+	References:From:Organization:In-Reply-To:Content-Type; bh=f2Octo
+	NzTAPL3sWJ35MWQU7AgQIDajOaReWZh5uw2X4=; b=tyxqC1tW5Q0SBJNCOhNdm7
+	Iy+NwIZQRscmphv/JNDILVUzFqP/FJqIsyJOXqa0gjWqpl4pyqZqxzQVlUQPjkzQ
+	4DUvo9LGuCXCaZT9oEhccVwwzJBT9AEMeiicO93Z4qDg4lfdH/PjeFs1re8Au+vY
+	jiwwsg3plQ1uQkAEEwVb4=
 X-MDAV-Result: clean
-X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:03:03 -0500
+X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:04:33 -0500
 Received: from [IPV6:2603:7000:73d:b00:39f9:c05a:677:9528] by auristor.com (IPv6:2001:470:1f07:f77:28d9:68fb:855d:c2a5) (MDaemon PRO v23.5.1c) 
-	with ESMTPSA id md5001003746708.msg; Fri, 17 Nov 2023 01:03:03 -0500
-X-Spam-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:03:03 -0500
+	with ESMTPSA id md5001003746710.msg; Fri, 17 Nov 2023 01:04:33 -0500
+X-Spam-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 17 Nov 2023 01:04:33 -0500
 	(not processed: message from trusted or authenticated source)
 X-MDRemoteIP: 2603:7000:73d:b00:39f9:c05a:677:9528
 X-MDHelo: [IPV6:2603:7000:73d:b00:39f9:c05a:677:9528]
-X-MDArrival-Date: Fri, 17 Nov 2023 01:03:03 -0500
+X-MDArrival-Date: Fri, 17 Nov 2023 01:04:33 -0500
 X-MDOrigin-Country: US, NA
 X-Authenticated-Sender: jaltman@auristor.com
 X-Return-Path: prvs=16855eaa48=jaltman@auristor.com
 X-Envelope-From: jaltman@auristor.com
 X-MDaemon-Deliver-To: netdev@vger.kernel.org
-Message-ID: <b13a17c9-f374-4466-be02-371a632a7f2d@auristor.com>
-Date: Fri, 17 Nov 2023 01:02:51 -0500
+Message-ID: <c21f3ce9-632e-49c8-a740-a8004c886f3c@auristor.com>
+Date: Fri, 17 Nov 2023 01:04:25 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] rxrpc: Fix RTT determination to use any ACK as a
- source
+Subject: Re: [PATCH net 2/2] rxrpc: Defer the response to a PING ACK until
+ we've parsed it
 Content-Language: en-US
 To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
 Cc: Marc Dionne <marc.dionne@auristor.com>,
@@ -59,28 +59,36 @@ Cc: Marc Dionne <marc.dionne@auristor.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20231116131259.103513-1-dhowells@redhat.com>
- <20231116131259.103513-2-dhowells@redhat.com>
+ <20231116131259.103513-3-dhowells@redhat.com>
 From: Jeffrey E Altman <jaltman@auristor.com>
 Organization: AuriStor, Inc.
-In-Reply-To: <20231116131259.103513-2-dhowells@redhat.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms040509050003080500080001"
+In-Reply-To: <20231116131259.103513-3-dhowells@redhat.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms000509070306010501090505"
 X-MDCFSigsAdded: auristor.com
 
 This is a cryptographically signed message in MIME format.
 
---------------ms040509050003080500080001
+--------------ms000509070306010501090505
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 11/16/2023 8:12 AM, David Howells wrote:
 
-> Fix RTT determination to be able to use any type of ACK as the response
-> from which RTT can be calculated provided its ack.serial is non-zero and
-> matches the serial number of an outgoing DATA or ACK packet.  This
-> shouldn't be limited to REQUESTED-type ACKs as these can have other types
-> substituted for them for things like duplicate or out-of-order packets.
+> Defer the generation of a PING RESPONSE ACK in response to a PING ACK until
+> we've parsed the PING ACK so that we pick up any changes to the packet
+> queue so that we can update ackinfo.
 >
-> Fixes: 4700c4d80b7b ("rxrpc: Fix loss of RTT samples due to interposed ACK")
+> This is also applied to an ACK generated in response to an ACK with the
+> REQUEST_ACK flag set.
+>
+> Note that whilst the problem was added in commit 248f219cb8bc, it didn't
+> really matter at that point because the ACK was proposed in softirq mode
+> and generated asynchronously later in process context, taking the latest
+> values at the time.  But this fix is only needed since the move to parse
+> incoming packets in an I/O thread rather than in softirq and generate the
+> ACK at point of proposal (b0346843b1076b34a0278ff601f8f287535cb064).
+>
+> Fixes: 248f219cb8bc ("rxrpc: Rewrite the data and ack handling code")
 > Signed-off-by: David Howells <dhowells@redhat.com>
 > cc: Marc Dionne <marc.dionne@auristor.com>
 > cc: "David S. Miller" <davem@davemloft.net>
@@ -93,7 +101,7 @@ On 11/16/2023 8:12 AM, David Howells wrote:
 Reviewed-by: Jeffrey Altman <jaltman@auristor.com>
 
 
---------------ms040509050003080500080001
+--------------ms000509070306010501090505
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -162,18 +170,18 @@ p/BscizYdNk2WXJMTnH+wVLN8sLEwEtQR4eTLoFmQvrK2AMBS9kW5sBkMzINt/ZbbcZ3F+eA
 MDGCAxQwggMQAgEBME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEXMBUG
 A1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwDQYJYIZIAWUDBAIBBQCg
 ggGXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTExNzA2
-MDI1MVowLwYJKoZIhvcNAQkEMSIEIDmMcaJtrtv48tMBu7bC+PC4+Mp1fO+wmlv3JdMWinXa
+MDQyNVowLwYJKoZIhvcNAQkEMSIEIKvFgknHDCEgBpnGZydtNw10fbJHxV5Y043PjfijczS1
 MF0GCSsGAQQBgjcQBDFQME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEX
 MBUGA1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwXwYLKoZIhvcNAQkQ
 AgsxUKBOMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRy
 dXN0SUQgQ0EgQTEzAhBAAYJpmi/rPn/F0fJyDlzMMGwGCSqGSIb3DQEJDzFfMF0wCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzAOBggqhkiG9w0DAgICAIAwDQYIKoZI
-hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAHezb
-FjrJq6QKZQe/G6cIlLRhQC4Tm5Qf2cAqcybHls2RIDb69lGjbOmh7DewzB5ZgTfv7aA7i0jC
-VSaTJ9PmwNwSbwXVDWweKtxLaR6rQO7e0NrLZ/OJLUBVFuGRh/K16TSBetsy3Ocjny17/NFT
-SK4i732mBcJDTkrXuBLahIRsGCW3f8yiIiT1H08cQLP5yP4H5Y49Ra32+1lKrlGUiIYJiRb9
-hkOuoDOSFk6r+uit6kuu37LZmnKbcXytdQ8b3MV3etTwkIuuG2MNvZVF9wLwoRv3go9S6crC
-x/TI+cVdt3lEFqOf8/cubLpOqC7+b/5btQ2CHhzeCDIFKuTgmwAAAAAAAA==
---------------ms040509050003080500080001--
+hvcNAwICAUAwBwYFKw4DAgcwDQYIKoZIhvcNAwICASgwDQYJKoZIhvcNAQEBBQAEggEAgqi2
+D1Sk/pyVEPDkN96olZUSlYafnblH5iAHgbFEWDDGNrsbgxId30uSSUJlkzPS+Buq6/5rHEmJ
+31IoyoSlCGHaF511SCY65Bl/c8EkftqoeMJXxnWFqOUbiHQTCCoh9ubi+IJxgzPCSHRqH35m
+OOD5O+b40d8IEcx7yBX1TNnq2hyHdmBKGPSyzmV8PX4URHNyLq655+ImLSLDT+mlr9YsnHNa
+vxOwY5MlWgQf9FTjTr1y9oQmIRYQJ5poQ4FEX0C/ft9G3zdcfCcVGvHq8QGO7l8lEQsZQz09
+jQvBAKISo9YkvSTHlOZDlq9jZbBfe16ooRRevDxxoUfg9/UyvQAAAAAAAA==
+--------------ms000509070306010501090505--
 
 
