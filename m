@@ -1,53 +1,49 @@
-Return-Path: <netdev+bounces-48621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B757EEF93
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A46187EEF97
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4431280F66
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D7E2813D8
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB751798C;
-	Fri, 17 Nov 2023 10:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E1F19468;
+	Fri, 17 Nov 2023 10:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E15A9
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:59:59 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE1C84
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:00:00 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdd-0000Fw-8e; Fri, 17 Nov 2023 10:59:49 +0100
+	id 1r3vdd-0000HS-A4; Fri, 17 Nov 2023 10:59:49 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdc-009eG1-Kc; Fri, 17 Nov 2023 10:59:48 +0100
+	id 1r3vdc-009eG4-RG; Fri, 17 Nov 2023 10:59:48 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdc-002zWO-BD; Fri, 17 Nov 2023 10:59:48 +0100
+	id 1r3vdc-002zWS-I9; Fri, 17 Nov 2023 10:59:48 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Stephan Gerhold <stephan@gerhold.net>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
+Cc: linux-wpan@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 08/10] net: wwan: qcom_bam_dmux: Convert to platform remove callback returning void
-Date: Fri, 17 Nov 2023 10:59:31 +0100
-Message-ID: <20231117095922.876489-9-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 09/10] ieee802154: fakelb: Convert to platform remove callback returning void
+Date: Fri, 17 Nov 2023 10:59:32 +0100
+Message-ID: <20231117095922.876489-10-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0.586.gbc5204569f7d.dirty
 In-Reply-To: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
 References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
@@ -58,7 +54,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1920; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=I0cFjEm08r7Sa/vJ9WgcsZdF39eVvWjUnKoRRtwRSOg=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzmEF/OglZ9axYPnAwVofQSX2s3BG0bx/dQ2C +QUMAS/wAqJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5hAAKCRCPgPtYfRL+ TouEB/9UOKFB8rasl8PENTAGL+VL177GVGlYnmOhAoiYStSVjlTgo2IDJWWEYzwtzXgTMmnC1ZB 7CL8ZNwHmRY5YaJzEqJ2aSkSCkarmKBp2qYGf58S2U89jKys38QcWHW9CbSec1fyanx0O8nwvf+ V0Qbl5B5XXJKb8P74JXK+O2KUg8b1bPhZp1NfltRZd62v1SsknP8EaoYqGf3kzuLCxTLJtCmS5J RTv3QF1GzN9udDDkjhMLbjlaqvQXyGmKUBWi7A1TeR606YFh3ai7znmfsPVn337tQ3Xbxs1IhlE j78kBIiIEoqLI1fZhrAlg5TFs6skoUFtBxMlWs0A/HWpV58u
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1778; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=bW8hRXr41lIHBTT37J3wUaNIhd6NGJvlV2f3mSrYWnQ=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzmF/y5+oroMLNKD1jt7neq6OH+mkdMueiR18 t8eMMZCe+OJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5hQAKCRCPgPtYfRL+ TsDaCACeRO6UhsdRRppzB6k1yO41zwHlacry8lc2ssMarKdztr/lM5gTp8ANYI5VWKTU7233jZS xdw1NCXbLHYu/VwwmrCNnSh6BQy8AOAcVNRC+62ZBN43R1LHGxoSilIBbbpxoZL9kCuuu7p+f6N R55DH0xXmTsbLVFzssC/CXc3/SER6TwCmlFUPawWEiguPLjz6TX9LLBWd8wffyAvkQZHSfZiSIR MqLPE6ODgqq+59TYlMVAno+I5A9j5dcjPGSnD9ebULmsFioms+lBWZYaxLdLM5B1sSnQTUIop6/ BSES++UHkbdiBZz1YYao9j8m7PQuTD4dicaX+zWXdT3X9Nle
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -81,40 +77,38 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/wwan/qcom_bam_dmux.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/ieee802154/fakelb.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/wwan/qcom_bam_dmux.c b/drivers/net/wwan/qcom_bam_dmux.c
-index 17d46f4d2913..26ca719fa0de 100644
---- a/drivers/net/wwan/qcom_bam_dmux.c
-+++ b/drivers/net/wwan/qcom_bam_dmux.c
-@@ -846,7 +846,7 @@ static int bam_dmux_probe(struct platform_device *pdev)
- 	return 0;
+diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
+index 523d13ee02bf..35e55f198e05 100644
+--- a/drivers/net/ieee802154/fakelb.c
++++ b/drivers/net/ieee802154/fakelb.c
+@@ -221,7 +221,7 @@ static int fakelb_probe(struct platform_device *pdev)
+ 	return err;
  }
  
--static int bam_dmux_remove(struct platform_device *pdev)
-+static void bam_dmux_remove(struct platform_device *pdev)
+-static int fakelb_remove(struct platform_device *pdev)
++static void fakelb_remove(struct platform_device *pdev)
  {
- 	struct bam_dmux *dmux = platform_get_drvdata(pdev);
- 	struct device *dev = dmux->dev;
-@@ -877,8 +877,6 @@ static int bam_dmux_remove(struct platform_device *pdev)
- 	disable_irq(dmux->pc_irq);
- 	bam_dmux_power_off(dmux);
- 	bam_dmux_free_skbs(dmux->tx_skbs, DMA_TO_DEVICE);
--
+ 	struct fakelb_phy *phy, *tmp;
+ 
+@@ -229,14 +229,13 @@ static int fakelb_remove(struct platform_device *pdev)
+ 	list_for_each_entry_safe(phy, tmp, &fakelb_phys, list)
+ 		fakelb_del(phy);
+ 	mutex_unlock(&fakelb_phys_lock);
 -	return 0;
  }
  
- static const struct dev_pm_ops bam_dmux_pm_ops = {
-@@ -893,7 +891,7 @@ MODULE_DEVICE_TABLE(of, bam_dmux_of_match);
+ static struct platform_device *ieee802154fake_dev;
  
- static struct platform_driver bam_dmux_driver = {
- 	.probe = bam_dmux_probe,
--	.remove = bam_dmux_remove,
-+	.remove_new = bam_dmux_remove,
+ static struct platform_driver ieee802154fake_driver = {
+ 	.probe = fakelb_probe,
+-	.remove = fakelb_remove,
++	.remove_new = fakelb_remove,
  	.driver = {
- 		.name = "bam-dmux",
- 		.pm = &bam_dmux_pm_ops,
+ 			.name = "ieee802154fakelb",
+ 	},
 -- 
 2.42.0
 
