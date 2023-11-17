@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-48705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A502D7EF516
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:22:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A23C7EF52E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:23:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FD0D1F24104
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:22:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7CAB280DF1
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836FF30FA0;
-	Fri, 17 Nov 2023 15:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AA71C692;
+	Fri, 17 Nov 2023 15:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CImgoJob"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHakJntJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D551C692
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:22:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F375C433C8;
-	Fri, 17 Nov 2023 15:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCC1374C4
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:23:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62DC6C433C7;
+	Fri, 17 Nov 2023 15:23:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700234521;
-	bh=0UKK8vTWjk/9aVzqK03YhqWQKTuR75Y8DkzQmVwxWoc=;
+	s=k20201202; t=1700234596;
+	bh=R9gtMv1mlx1XFPa0IOyEngjAsd6b0IyS9o23nfyNy5U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CImgoJobDMWJ6+MtgLWIjxjvgnigKXjCQwc2Vfr0w1tvSdTSHBmx82IY7ZNu92nkS
-	 ZwY4eOE80dzJ258usPi24YPFY/HfRJ/Aq8cbcR9qwA/ZEuJpJWwK9VHdrVBFpULTsu
-	 yJR6P6iAZDx3kjjYnC8CmU6ycCD37Basr4FxqUkUg0Dh2/quOB+cYjYt/EWIGoRayU
-	 gqhCy5d20JtyvL4DhMmgvPx9DXQEzXCQua0+S5TFAqPbYzS+PS0btDYw/QIfEzxqC8
-	 LgNukoEGc/q3RiIzA1YBmWpKLzCdo2QUS3jNZC/GVw/l6JR7ajvxel9Iclbnf47SLC
-	 vDLccIe/IHX4A==
-Date: Fri, 17 Nov 2023 15:21:56 +0000
+	b=iHakJntJ4U6+/sY3OR5jtcL31/W5aky14gC2LdV2cXi1ByaLLh4oSozqVSkeNANZN
+	 ES+/AdEVl+hOLGwUIT1Xu4gP5xq7rNyoUIrBNa6aLXfmf5oUGTJhLjQJ1KlFuwwi4R
+	 7f/1agrFIZ6FFFs6CsMuSaPe7UD0azOrM81brF+8g/JpaHOTe3xK0pgk+48xpT+RFD
+	 +0DCo3oGKFtqExUSxpfD2RQB7Cqvp4y3HxnNV5tI0Rdc8b6RIy+pq13vOdBQKMjrvN
+	 eyMIJF/DlDFmYpUqdoe+OGXBdcIiAis9HhP0n+mVBAaLgXA7mEw+QOjBKn6Fu0llrZ
+	 YYurBOy/9+5Tw==
+Date: Fri, 17 Nov 2023 15:23:11 +0000
 From: Simon Horman <horms@kernel.org>
 To: Petr Machata <petrm@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -41,11 +41,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
 	Amit Cohen <amcohen@nvidia.com>, mlxsw@nvidia.com,
 	Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 07/14] PCI: Add no PM reset quirk for NVIDIA
- Spectrum devices
-Message-ID: <20231117152156.GB164483@vergenet.net>
+Subject: Re: [PATCH net-next 08/14] PCI: Add debug print for device ready
+ delay
+Message-ID: <20231117152311.GC164483@vergenet.net>
 References: <cover.1700047319.git.petrm@nvidia.com>
- <fe4156c6b9d0f7e8478ae93137586ec88051013d.1700047319.git.petrm@nvidia.com>
+ <63fca173195f5a9d3a2b78da700650a29cf80f96.1700047319.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,67 +54,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fe4156c6b9d0f7e8478ae93137586ec88051013d.1700047319.git.petrm@nvidia.com>
+In-Reply-To: <63fca173195f5a9d3a2b78da700650a29cf80f96.1700047319.git.petrm@nvidia.com>
 
 + linux-pci@vger.kernel.org
 
-On Wed, Nov 15, 2023 at 01:17:16PM +0100, Petr Machata wrote:
+On Wed, Nov 15, 2023 at 01:17:17PM +0100, Petr Machata wrote:
 > From: Ido Schimmel <idosch@nvidia.com>
 > 
-> Spectrum-{1,2,3,4} devices report that a D3hot->D0 transition causes a
-> reset (i.e., they advertise NoSoftRst-). However, this transition does
-> not have any effect on the device: It continues to be operational and
-> network ports remain up. Advertising this support makes it seem as if a
-> PM reset is viable for these devices. Mark it as unavailable to skip it
-> when testing reset methods.
+> Currently, the time it took a PCI device to become ready after reset is
+> only printed if it was longer than 1000ms ('PCI_RESET_WAIT'). However,
+> for debugging purposes it is useful to know this time even if it was
+> shorter. For example, with the device I am working on, hardware
+> engineers asked to verify that it becomes ready on the first try (no
+> delay).
 > 
-> Before:
+> To that end, add a debug level print that can be enabled using dynamic
+> debug. Example:
 > 
->  # cat /sys/bus/pci/devices/0000\:03\:00.0/reset_method
->  pm bus
-> 
-> After:
-> 
->  # cat /sys/bus/pci/devices/0000\:03\:00.0/reset_method
->  bus
+>  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+>  # dmesg -c | grep ready
+>  # echo "file drivers/pci/pci.c +p" > /sys/kernel/debug/dynamic_debug/control
+>  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+>  # dmesg -c | grep ready
+>  [  396.060335] mlxsw_spectrum4 0000:01:00.0: ready 0ms after bus reset
+>  # echo "file drivers/pci/pci.c -p" > /sys/kernel/debug/dynamic_debug/control
+>  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
+>  # dmesg -c | grep ready
 > 
 > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 > Signed-off-by: Petr Machata <petrm@nvidia.com>
 
-Thanks,
-
-my understanding is that this matches the use-case for which
-quirk_no_pm_reset was introduced.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 > ---
->  drivers/pci/quirks.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  drivers/pci/pci.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-> index ea476252280a..d208047d1b8f 100644
-> --- a/drivers/pci/quirks.c
-> +++ b/drivers/pci/quirks.c
-> @@ -3786,6 +3786,19 @@ static void quirk_no_pm_reset(struct pci_dev *dev)
->  DECLARE_PCI_FIXUP_CLASS_HEADER(PCI_VENDOR_ID_ATI, PCI_ANY_ID,
->  			       PCI_CLASS_DISPLAY_VGA, 8, quirk_no_pm_reset);
+> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+> index 55bc3576a985..69d20d585f88 100644
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -1219,6 +1219,9 @@ static int pci_dev_wait(struct pci_dev *dev, char *reset_type, int timeout)
+>  	if (delay > PCI_RESET_WAIT)
+>  		pci_info(dev, "ready %dms after %s\n", delay - 1,
+>  			 reset_type);
+> +	else
+> +		pci_dbg(dev, "ready %dms after %s\n", delay - 1,
+> +			reset_type);
 >  
-> +/*
-> + * Spectrum-{1,2,3,4} devices report that a D3hot->D0 transition causes a reset
-> + * (i.e., they advertise NoSoftRst-). However, this transition does not have
-> + * any effect on the device: It continues to be operational and network ports
-> + * remain up. Advertising this support makes it seem as if a PM reset is viable
-> + * for these devices. Mark it as unavailable to skip it when testing reset
-> + * methods.
-> + */
-> +DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MELLANOX, 0xcb84, quirk_no_pm_reset);
-> +DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MELLANOX, 0xcf6c, quirk_no_pm_reset);
-> +DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MELLANOX, 0xcf70, quirk_no_pm_reset);
-> +DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_MELLANOX, 0xcf80, quirk_no_pm_reset);
-> +
->  /*
->   * Thunderbolt controllers with broken MSI hotplug signaling:
->   * Entire 1st generation (Light Ridge, Eagle Ridge, Light Peak) and part
+>  	return 0;
+>  }
 > -- 
 > 2.41.0
 > 
