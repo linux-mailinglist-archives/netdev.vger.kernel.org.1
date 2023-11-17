@@ -1,54 +1,56 @@
-Return-Path: <netdev+bounces-48513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF057EEA7F
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:00:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB407EEA80
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94F4B1F232A0
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:00:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49CCEB20A8D
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5A17EA;
-	Fri, 17 Nov 2023 01:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0815E7EF;
+	Fri, 17 Nov 2023 01:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="adTly4fL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="erzOsQWZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1828E129
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 17:00:21 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B84182
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 17:00:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700182821; x=1731718821;
-  h=subject:from:to:cc:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aqozqWdhCV9YiAv26LUZfPav39JXonYvy2MpjZ0ll7k=;
-  b=adTly4fLcFmW+5IrkGovOk8EKCabOjqsTsYktKMwwKQqUFna7az/Jomi
-   ls1pADlXJ0LCDj8KDCVMJ9EzGFCIJFKDVIMFFawOcI04ryDSsEqoTs+Mi
-   O35sKWXFJnGH3Y9kjOPrGehjWsmsr9JxOQ2EkkP3dT4jea9oWUFHsDrNV
-   iGJzufSimDomYmrx7YyWr91p1cbO9K4VGwqMQXhqvWwu2fVNLwO4I1sLz
-   bl67HQfkUfFM6UPAxmG43Rn4hwz6PI2EQ+wj91fwrIZUF/Hnirw2HW+QK
-   iNnga6XY48oDF4tGjbba7b6lwk/TEwlcnkOAFVizpQusBnb2HVsYKqhCm
+  t=1700182825; x=1731718825;
+  h=subject:from:to:cc:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HSU9fGPGcBB2GI1yhCIzoHViPqgPSAHOgTazifZEbh0=;
+  b=erzOsQWZeXLtyhJskixO0Tfz1LDseYryzXC1C8q4FxKyVCEQv0pFBBBK
+   cMgifpaVC3hA8IVGUHv6Eb2H4ieMeJYO7UBlsLNUwoBjNT8e7BQAh0ny7
+   y3IHGm5ROnYd8GSrYQ8xASKRrNzknCrz+6duxdMjgKzKEogleHs1khGYu
+   pnkTizwFv78jeJ59oBFyyE1+XkSlyFYm3FrWVE5WQKDT3T5X3R0B3fGSs
+   SgZ1ICMv690ENJWDZazMFWGhP7xXpGXKYxu+IM2az0u0X3kxihwOPQYJZ
+   TUYahGg8IKX1lvRo6Cippw0/h7h+RAWurDg4VsAA130OczqifydDGxKOs
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="390994649"
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="390994662"
 X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
-   d="scan'208";a="390994649"
+   d="scan'208";a="390994662"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 17:00:20 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 17:00:25 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="800331449"
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="800331513"
 X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
-   d="scan'208";a="800331449"
+   d="scan'208";a="800331513"
 Received: from anambiarhost.jf.intel.com ([10.166.29.163])
-  by orsmga001.jf.intel.com with ESMTP; 16 Nov 2023 17:00:20 -0800
-Subject: [net-next PATCH v8 00/10] Introduce queue and NAPI support in
- netdev-genl (Was: Introduce NAPI queues support)
+  by orsmga001.jf.intel.com with ESMTP; 16 Nov 2023 17:00:25 -0800
+Subject: [net-next PATCH v8 01/10] netdev-genl: spec: Extend netdev netlink
+ spec in YAML for queue
 From: Amritha Nambiar <amritha.nambiar@intel.com>
 To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
 Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
-Date: Thu, 16 Nov 2023 17:16:38 -0800
-Message-ID: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
+Date: Thu, 16 Nov 2023 17:16:43 -0800
+Message-ID: <170018380349.3767.8945127703404916538.stgit@anambiarhost.jf.intel.com>
+In-Reply-To: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
+References: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
 User-Agent: StGit/unknown-version
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,133 +61,558 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-Add the capability to export the following via netdev-genl interface:
-- queue information supported by the device
-- NAPI information supported by the device
+Add support in netlink spec(netdev.yaml) for queue information.
+Add code generated from the spec.
 
-Introduce support for associating queue and NAPI instance.
-Extend the netdev_genl generic netlink family for netdev
-with queue and NAPI data. 
+Note: The "queue-type" attribute takes values 0 and 1 for rx
+and tx queue type respectively.
 
-The queue parameters exposed are:
-- queue index
-- queue type
-- ifindex
-- NAPI id associated with the queue
-
-Additional rx and tx queue parameters can be exposed in follow up
-patches by stashing them in netdev queue structures. XDP queue type
-can also be supported in future.
-
-The NAPI fields exposed are:
-- NAPI id
-- NAPI device ifindex
-- Interrupt number associated with the NAPI instance
-- PID for the NAPI thread
-
-This series only supports 'get' ability for retrieving
-certain queue and NAPI attributes. The 'set' ability for
-configuring queue and associated NAPI instance via netdev-genl
-will be submitted as a separate patch series.
-
-Previous discussion at:
-https://lore.kernel.org/netdev/c8476530638a5f4381d64db0e024ed49c2db3b02.camel@gmail.com/T/#m00999652a8b4731fbdb7bf698d2e3666c65a60e7
-
-$ ./cli.py --spec netdev.yaml --do queue-get  --json='{"ifindex": 12, "id": 0, "type": 0}'
-{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'rx'}
-
-$ ./cli.py --spec netdev.yaml  --do queue-get --json='{"ifindex": 12, "id": 0, "type": 1}'
-{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'tx'}
-
-$ ./cli.py --spec netdev.yaml  --dump queue-get --json='{"ifindex": 12}'
-[{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'rx'},
- {'id': 1, 'ifindex': 12, 'napi-id': 594, 'type': 'rx'},
- {'id': 2, 'ifindex': 12, 'napi-id': 595, 'type': 'rx'},
- {'id': 3, 'ifindex': 12, 'napi-id': 596, 'type': 'rx'},
- {'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'tx'},
- {'id': 1, 'ifindex': 12, 'napi-id': 594, 'type': 'tx'},
- {'id': 2, 'ifindex': 12, 'napi-id': 595, 'type': 'tx'},
- {'id': 3, 'ifindex': 12, 'napi-id': 596, 'type': 'tx'}]
-
-$ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
-{'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}
-
-$ ./cli.py --spec netdev.yaml --dump napi-get --json='{"ifindex": 12}'
-[{'id': 596, 'ifindex': 12, 'irq': 294, 'pid': 3724},
- {'id': 595, 'ifindex': 12, 'irq': 293, 'pid': 3725},
- {'id': 594, 'ifindex': 12, 'irq': 292, 'pid': 3726},
- {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}]
-
-v7 -> v8
-* Removed $obj prefix from attribute names in yaml spec
-
-v6 -> v7
-* Added more documentation in spec file
-* Addressed other review comments related to lock
-
-v5 -> v6
-* Fixed build warning in prototype for ice_queue_set_napi()
-
-v4 -> v5
-* Removed tx_maxrate in queue atrributes
-* Added lock protection for queue->napi
-* Addressed other review comments
-
-v3 -> v4
-Minor nits, changed function name, used list_for_each_entry in place
-of _rcu
-
-v2 -> v3
-* Implemented queue as separate netlink object
-with support for exposing per-queue paramters
-* Removed queue-list associations with NAPI
-* Addressed other review feedback WRT tracking list
-iterations
-
-v1 -> v2
-* Removed multi-attr nest for NAPI object
-* Added support for flat/individual NAPI objects
-* Changed 'do' command to take napi-id as argument
-* Supported filtered 'dump' (dump with ifindex for a netdev and dump for
-  all netdevs)
-
-RFC -> v1
-* Changed to separate 'napi_get' command
-* Added support to expose interrupt and PID for the NAPI
-* Used list of netdev queue structs
-* Split patches further and fixed code style and errors
-
+Signed-off-by: Amritha Nambiar <amritha.nambiar@intel.com>
+Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
+ Documentation/netlink/specs/netdev.yaml |   52 +++++++++++
+ include/uapi/linux/netdev.h             |   16 +++
+ net/core/netdev-genl-gen.c              |   26 +++++
+ net/core/netdev-genl-gen.h              |    3 +
+ net/core/netdev-genl.c                  |   10 ++
+ tools/include/uapi/linux/netdev.h       |   16 +++
+ tools/net/ynl/generated/netdev-user.c   |  153 +++++++++++++++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h   |   99 ++++++++++++++++++++
+ 8 files changed, 375 insertions(+)
 
-Amritha Nambiar (10):
-      netdev-genl: spec: Extend netdev netlink spec in YAML for queue
-      net: Add queue and napi association
-      ice: Add support in the driver for associating queue with napi
-      netdev-genl: Add netlink framework functions for queue
-      netdev-genl: spec: Extend netdev netlink spec in YAML for NAPI
-      netdev-genl: Add netlink framework functions for napi
-      netdev-genl: spec: Add irq in netdev netlink YAML spec
-      net: Add NAPI IRQ support
-      netdev-genl: spec: Add PID in netdev netlink YAML spec
-      netdev-genl: Add PID for the NAPI thread
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 14511b13f305..f9382b7705ab 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -55,6 +55,10 @@ definitions:
+         name: hash
+         doc:
+           Device is capable of exposing receive packet hash via bpf_xdp_metadata_rx_hash().
++  -
++    name: queue-type
++    type: enum
++    entries: [ rx, tx ]
+ 
+ attribute-sets:
+   -
+@@ -87,6 +91,31 @@ attribute-sets:
+         type: u64
+         enum: xdp-rx-metadata
+ 
++  -
++    name: queue
++    attributes:
++      -
++        name: id
++        doc: Queue index; most queue types are indexed like a C array, with
++             indexes starting at 0 and ending at queue count - 1. Queue indexes
++             are scoped to an interface and queue type.
++        type: u32
++      -
++        name: ifindex
++        doc: ifindex of the netdevice to which the queue belongs.
++        type: u32
++        checks:
++          min: 1
++      -
++        name: type
++        doc: Queue type as rx, tx. Each queue type defines a separate ID space.
++        type: u32
++        enum: queue-type
++      -
++        name: napi-id
++        doc: ID of the NAPI instance which services this queue.
++        type: u32
++
+ operations:
+   list:
+     -
+@@ -120,6 +149,29 @@ operations:
+       doc: Notification about device configuration being changed.
+       notify: dev-get
+       mcgrp: mgmt
++    -
++      name: queue-get
++      doc: Get queue information from the kernel.
++           Only configured queues will be reported (as opposed to all available
++           hardware queues).
++      attribute-set: queue
++      do:
++        request:
++          attributes:
++            - ifindex
++            - type
++            - id
++        reply: &queue-get-op
++          attributes:
++            - id
++            - type
++            - napi-id
++            - ifindex
++      dump:
++        request:
++          attributes:
++            - ifindex
++        reply: *queue-get-op
+ 
+ mcast-groups:
+   list:
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 2943a151d4f1..c440017241f0 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -53,6 +53,11 @@ enum netdev_xdp_rx_metadata {
+ 	NETDEV_XDP_RX_METADATA_MASK = 3,
+ };
+ 
++enum netdev_queue_type {
++	NETDEV_QUEUE_TYPE_RX,
++	NETDEV_QUEUE_TYPE_TX,
++};
++
+ enum {
+ 	NETDEV_A_DEV_IFINDEX = 1,
+ 	NETDEV_A_DEV_PAD,
+@@ -64,11 +69,22 @@ enum {
+ 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_QUEUE_ID = 1,
++	NETDEV_A_QUEUE_IFINDEX,
++	NETDEV_A_QUEUE_TYPE,
++	NETDEV_A_QUEUE_NAPI_ID,
++
++	__NETDEV_A_QUEUE_MAX,
++	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+ 	NETDEV_CMD_DEV_DEL_NTF,
+ 	NETDEV_CMD_DEV_CHANGE_NTF,
++	NETDEV_CMD_QUEUE_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index ea9231378aa6..97ee7ebbad57 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -15,6 +15,18 @@ static const struct nla_policy netdev_dev_get_nl_policy[NETDEV_A_DEV_IFINDEX + 1
+ 	[NETDEV_A_DEV_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
+ };
+ 
++/* NETDEV_CMD_QUEUE_GET - do */
++static const struct nla_policy netdev_queue_get_do_nl_policy[NETDEV_A_QUEUE_TYPE + 1] = {
++	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
++	[NETDEV_A_QUEUE_TYPE] = NLA_POLICY_MAX(NLA_U32, 1),
++	[NETDEV_A_QUEUE_ID] = { .type = NLA_U32, },
++};
++
++/* NETDEV_CMD_QUEUE_GET - dump */
++static const struct nla_policy netdev_queue_get_dump_nl_policy[NETDEV_A_QUEUE_IFINDEX + 1] = {
++	[NETDEV_A_QUEUE_IFINDEX] = NLA_POLICY_MIN(NLA_U32, 1),
++};
++
+ /* Ops table for netdev */
+ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	{
+@@ -29,6 +41,20 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 		.dumpit	= netdev_nl_dev_get_dumpit,
+ 		.flags	= GENL_CMD_CAP_DUMP,
+ 	},
++	{
++		.cmd		= NETDEV_CMD_QUEUE_GET,
++		.doit		= netdev_nl_queue_get_doit,
++		.policy		= netdev_queue_get_do_nl_policy,
++		.maxattr	= NETDEV_A_QUEUE_TYPE,
++		.flags		= GENL_CMD_CAP_DO,
++	},
++	{
++		.cmd		= NETDEV_CMD_QUEUE_GET,
++		.dumpit		= netdev_nl_queue_get_dumpit,
++		.policy		= netdev_queue_get_dump_nl_policy,
++		.maxattr	= NETDEV_A_QUEUE_IFINDEX,
++		.flags		= GENL_CMD_CAP_DUMP,
++	},
+ };
+ 
+ static const struct genl_multicast_group netdev_nl_mcgrps[] = {
+diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
+index 7b370c073e7d..263c94f77bad 100644
+--- a/net/core/netdev-genl-gen.h
++++ b/net/core/netdev-genl-gen.h
+@@ -13,6 +13,9 @@
+ 
+ int netdev_nl_dev_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
++int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info);
++int netdev_nl_queue_get_dumpit(struct sk_buff *skb,
++			       struct netlink_callback *cb);
+ 
+ enum {
+ 	NETDEV_NLGRP_MGMT,
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index fe61f85bcf33..336c608e6a6b 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -129,6 +129,16 @@ int netdev_nl_dev_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	return skb->len;
+ }
+ 
++int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info)
++{
++	return -EOPNOTSUPP;
++}
++
++int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
++{
++	return -EOPNOTSUPP;
++}
++
+ static int netdev_genl_netdevice_event(struct notifier_block *nb,
+ 				       unsigned long event, void *ptr)
+ {
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 2943a151d4f1..c440017241f0 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -53,6 +53,11 @@ enum netdev_xdp_rx_metadata {
+ 	NETDEV_XDP_RX_METADATA_MASK = 3,
+ };
+ 
++enum netdev_queue_type {
++	NETDEV_QUEUE_TYPE_RX,
++	NETDEV_QUEUE_TYPE_TX,
++};
++
+ enum {
+ 	NETDEV_A_DEV_IFINDEX = 1,
+ 	NETDEV_A_DEV_PAD,
+@@ -64,11 +69,22 @@ enum {
+ 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
+ };
+ 
++enum {
++	NETDEV_A_QUEUE_ID = 1,
++	NETDEV_A_QUEUE_IFINDEX,
++	NETDEV_A_QUEUE_TYPE,
++	NETDEV_A_QUEUE_NAPI_ID,
++
++	__NETDEV_A_QUEUE_MAX,
++	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_CMD_DEV_GET = 1,
+ 	NETDEV_CMD_DEV_ADD_NTF,
+ 	NETDEV_CMD_DEV_DEL_NTF,
+ 	NETDEV_CMD_DEV_CHANGE_NTF,
++	NETDEV_CMD_QUEUE_GET,
+ 
+ 	__NETDEV_CMD_MAX,
+ 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
+diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
+index b5ffe8cd1144..87845c707b95 100644
+--- a/tools/net/ynl/generated/netdev-user.c
++++ b/tools/net/ynl/generated/netdev-user.c
+@@ -18,6 +18,7 @@ static const char * const netdev_op_strmap[] = {
+ 	[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf",
+ 	[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf",
+ 	[NETDEV_CMD_DEV_CHANGE_NTF] = "dev-change-ntf",
++	[NETDEV_CMD_QUEUE_GET] = "queue-get",
+ };
+ 
+ const char *netdev_op_str(int op)
+@@ -58,6 +59,18 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
+ 	return netdev_xdp_rx_metadata_strmap[value];
+ }
+ 
++static const char * const netdev_queue_type_strmap[] = {
++	[0] = "rx",
++	[1] = "tx",
++};
++
++const char *netdev_queue_type_str(enum netdev_queue_type value)
++{
++	if (value < 0 || value >= (int)MNL_ARRAY_SIZE(netdev_queue_type_strmap))
++		return NULL;
++	return netdev_queue_type_strmap[value];
++}
++
+ /* Policies */
+ struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
+ 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
+@@ -72,6 +85,18 @@ struct ynl_policy_nest netdev_dev_nest = {
+ 	.table = netdev_dev_policy,
+ };
+ 
++struct ynl_policy_attr netdev_queue_policy[NETDEV_A_QUEUE_MAX + 1] = {
++	[NETDEV_A_QUEUE_ID] = { .name = "id", .type = YNL_PT_U32, },
++	[NETDEV_A_QUEUE_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
++	[NETDEV_A_QUEUE_TYPE] = { .name = "type", .type = YNL_PT_U32, },
++	[NETDEV_A_QUEUE_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_U32, },
++};
++
++struct ynl_policy_nest netdev_queue_nest = {
++	.max_attr = NETDEV_A_QUEUE_MAX,
++	.table = netdev_queue_policy,
++};
++
+ /* Common nested types */
+ /* ============== NETDEV_CMD_DEV_GET ============== */
+ /* NETDEV_CMD_DEV_GET - do */
+@@ -197,6 +222,134 @@ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp)
+ 	free(rsp);
+ }
+ 
++/* ============== NETDEV_CMD_QUEUE_GET ============== */
++/* NETDEV_CMD_QUEUE_GET - do */
++void netdev_queue_get_req_free(struct netdev_queue_get_req *req)
++{
++	free(req);
++}
++
++void netdev_queue_get_rsp_free(struct netdev_queue_get_rsp *rsp)
++{
++	free(rsp);
++}
++
++int netdev_queue_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
++{
++	struct ynl_parse_arg *yarg = data;
++	struct netdev_queue_get_rsp *dst;
++	const struct nlattr *attr;
++
++	dst = yarg->data;
++
++	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
++		unsigned int type = mnl_attr_get_type(attr);
++
++		if (type == NETDEV_A_QUEUE_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.id = 1;
++			dst->id = mnl_attr_get_u32(attr);
++		} else if (type == NETDEV_A_QUEUE_TYPE) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.type = 1;
++			dst->type = mnl_attr_get_u32(attr);
++		} else if (type == NETDEV_A_QUEUE_NAPI_ID) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.napi_id = 1;
++			dst->napi_id = mnl_attr_get_u32(attr);
++		} else if (type == NETDEV_A_QUEUE_IFINDEX) {
++			if (ynl_attr_validate(yarg, attr))
++				return MNL_CB_ERROR;
++			dst->_present.ifindex = 1;
++			dst->ifindex = mnl_attr_get_u32(attr);
++		}
++	}
++
++	return MNL_CB_OK;
++}
++
++struct netdev_queue_get_rsp *
++netdev_queue_get(struct ynl_sock *ys, struct netdev_queue_get_req *req)
++{
++	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
++	struct netdev_queue_get_rsp *rsp;
++	struct nlmsghdr *nlh;
++	int err;
++
++	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_QUEUE_GET, 1);
++	ys->req_policy = &netdev_queue_nest;
++	yrs.yarg.rsp_policy = &netdev_queue_nest;
++
++	if (req->_present.ifindex)
++		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_IFINDEX, req->ifindex);
++	if (req->_present.type)
++		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_TYPE, req->type);
++	if (req->_present.id)
++		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_ID, req->id);
++
++	rsp = calloc(1, sizeof(*rsp));
++	yrs.yarg.data = rsp;
++	yrs.cb = netdev_queue_get_rsp_parse;
++	yrs.rsp_cmd = NETDEV_CMD_QUEUE_GET;
++
++	err = ynl_exec(ys, nlh, &yrs);
++	if (err < 0)
++		goto err_free;
++
++	return rsp;
++
++err_free:
++	netdev_queue_get_rsp_free(rsp);
++	return NULL;
++}
++
++/* NETDEV_CMD_QUEUE_GET - dump */
++void netdev_queue_get_list_free(struct netdev_queue_get_list *rsp)
++{
++	struct netdev_queue_get_list *next = rsp;
++
++	while ((void *)next != YNL_LIST_END) {
++		rsp = next;
++		next = rsp->next;
++
++		free(rsp);
++	}
++}
++
++struct netdev_queue_get_list *
++netdev_queue_get_dump(struct ynl_sock *ys,
++		      struct netdev_queue_get_req_dump *req)
++{
++	struct ynl_dump_state yds = {};
++	struct nlmsghdr *nlh;
++	int err;
++
++	yds.ys = ys;
++	yds.alloc_sz = sizeof(struct netdev_queue_get_list);
++	yds.cb = netdev_queue_get_rsp_parse;
++	yds.rsp_cmd = NETDEV_CMD_QUEUE_GET;
++	yds.rsp_policy = &netdev_queue_nest;
++
++	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_QUEUE_GET, 1);
++	ys->req_policy = &netdev_queue_nest;
++
++	if (req->_present.ifindex)
++		mnl_attr_put_u32(nlh, NETDEV_A_QUEUE_IFINDEX, req->ifindex);
++
++	err = ynl_exec_dump(ys, nlh, &yds);
++	if (err < 0)
++		goto free_list;
++
++	return yds.first;
++
++free_list:
++	netdev_queue_get_list_free(yds.first);
++	return NULL;
++}
++
+ static const struct ynl_ntf_info netdev_ntf_info[] =  {
+ 	[NETDEV_CMD_DEV_ADD_NTF] =  {
+ 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
+diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
+index 4fafac879df3..50d214e8819d 100644
+--- a/tools/net/ynl/generated/netdev-user.h
++++ b/tools/net/ynl/generated/netdev-user.h
+@@ -19,6 +19,7 @@ extern const struct ynl_family ynl_netdev_family;
+ const char *netdev_op_str(int op);
+ const char *netdev_xdp_act_str(enum netdev_xdp_act value);
+ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
++const char *netdev_queue_type_str(enum netdev_queue_type value);
+ 
+ /* Common nested types */
+ /* ============== NETDEV_CMD_DEV_GET ============== */
+@@ -87,4 +88,102 @@ struct netdev_dev_get_ntf {
+ 
+ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp);
+ 
++/* ============== NETDEV_CMD_QUEUE_GET ============== */
++/* NETDEV_CMD_QUEUE_GET - do */
++struct netdev_queue_get_req {
++	struct {
++		__u32 ifindex:1;
++		__u32 type:1;
++		__u32 id:1;
++	} _present;
++
++	__u32 ifindex;
++	enum netdev_queue_type type;
++	__u32 id;
++};
++
++static inline struct netdev_queue_get_req *netdev_queue_get_req_alloc(void)
++{
++	return calloc(1, sizeof(struct netdev_queue_get_req));
++}
++void netdev_queue_get_req_free(struct netdev_queue_get_req *req);
++
++static inline void
++netdev_queue_get_req_set_ifindex(struct netdev_queue_get_req *req,
++				 __u32 ifindex)
++{
++	req->_present.ifindex = 1;
++	req->ifindex = ifindex;
++}
++static inline void
++netdev_queue_get_req_set_type(struct netdev_queue_get_req *req,
++			      enum netdev_queue_type type)
++{
++	req->_present.type = 1;
++	req->type = type;
++}
++static inline void
++netdev_queue_get_req_set_id(struct netdev_queue_get_req *req, __u32 id)
++{
++	req->_present.id = 1;
++	req->id = id;
++}
++
++struct netdev_queue_get_rsp {
++	struct {
++		__u32 id:1;
++		__u32 type:1;
++		__u32 napi_id:1;
++		__u32 ifindex:1;
++	} _present;
++
++	__u32 id;
++	enum netdev_queue_type type;
++	__u32 napi_id;
++	__u32 ifindex;
++};
++
++void netdev_queue_get_rsp_free(struct netdev_queue_get_rsp *rsp);
++
++/*
++ * Get queue information from the kernel. Only configured queues will be reported (as opposed to all available hardware queues).
++ */
++struct netdev_queue_get_rsp *
++netdev_queue_get(struct ynl_sock *ys, struct netdev_queue_get_req *req);
++
++/* NETDEV_CMD_QUEUE_GET - dump */
++struct netdev_queue_get_req_dump {
++	struct {
++		__u32 ifindex:1;
++	} _present;
++
++	__u32 ifindex;
++};
++
++static inline struct netdev_queue_get_req_dump *
++netdev_queue_get_req_dump_alloc(void)
++{
++	return calloc(1, sizeof(struct netdev_queue_get_req_dump));
++}
++void netdev_queue_get_req_dump_free(struct netdev_queue_get_req_dump *req);
++
++static inline void
++netdev_queue_get_req_dump_set_ifindex(struct netdev_queue_get_req_dump *req,
++				      __u32 ifindex)
++{
++	req->_present.ifindex = 1;
++	req->ifindex = ifindex;
++}
++
++struct netdev_queue_get_list {
++	struct netdev_queue_get_list *next;
++	struct netdev_queue_get_rsp obj __attribute__((aligned(8)));
++};
++
++void netdev_queue_get_list_free(struct netdev_queue_get_list *rsp);
++
++struct netdev_queue_get_list *
++netdev_queue_get_dump(struct ynl_sock *ys,
++		      struct netdev_queue_get_req_dump *req);
++
+ #endif /* _LINUX_NETDEV_GEN_H */
 
-
- Documentation/netlink/specs/netdev.yaml   |   94 +++++++++
- drivers/net/ethernet/intel/ice/ice_lib.c  |   64 ++++++
- drivers/net/ethernet/intel/ice/ice_lib.h  |    4 
- drivers/net/ethernet/intel/ice/ice_main.c |    4 
- include/linux/netdevice.h                 |   17 ++
- include/net/netdev_rx_queue.h             |    4 
- include/uapi/linux/netdev.h               |   27 ++
- net/core/dev.c                            |   49 ++++
- net/core/dev.h                            |    2 
- net/core/netdev-genl-gen.c                |   50 +++++
- net/core/netdev-genl-gen.h                |    5 
- net/core/netdev-genl.c                    |  320 +++++++++++++++++++++++++++++
- tools/include/uapi/linux/netdev.h         |   27 ++
- tools/net/ynl/generated/netdev-user.c     |  289 ++++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h     |  178 ++++++++++++++++
- 15 files changed, 1130 insertions(+), 4 deletions(-)
-
---
 
