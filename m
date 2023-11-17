@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-48616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA0437EEF8D
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904807EEF91
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716351F28218
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 822751C208E5
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA9E17999;
-	Fri, 17 Nov 2023 09:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60736182A3;
+	Fri, 17 Nov 2023 10:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514B185
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:59:54 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B1D85
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:59:57 -0800 (PST)
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdd-0000DT-3D; Fri, 17 Nov 2023 10:59:49 +0100
+	id 1r3vdc-0000F3-UP; Fri, 17 Nov 2023 10:59:48 +0100
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdc-009eFs-48; Fri, 17 Nov 2023 10:59:48 +0100
+	id 1r3vdc-009eFv-B9; Fri, 17 Nov 2023 10:59:48 +0100
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1r3vdb-002zWG-RA; Fri, 17 Nov 2023 10:59:47 +0100
+	id 1r3vdc-002zWK-22; Fri, 17 Nov 2023 10:59:48 +0100
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Zhao Qiang <qiang.zhao@nxp.com>,
+To: Linus Walleij <linusw@kernel.org>,
+	Imre Kaloz <kaloz@openwrt.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
 	kernel@pengutronix.de
-Subject: [PATCH net-next 06/10] net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning void
-Date: Fri, 17 Nov 2023 10:59:29 +0100
-Message-ID: <20231117095922.876489-7-u.kleine-koenig@pengutronix.de>
+Subject: [PATCH net-next 07/10] net: wan/ixp4xx_hss: Convert to platform remove callback returning void
+Date: Fri, 17 Nov 2023 10:59:30 +0100
+Message-ID: <20231117095922.876489-8-u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.42.0.586.gbc5204569f7d.dirty
 In-Reply-To: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
 References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
@@ -52,7 +53,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1871; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=NcjkW4IneIOd0dLZTdAVWdaFwPL7kTl1fdfEPCD9h5I=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzmBIBQWc3YwrHGUgl1NVC071q+J3xqj1LQj9 OBZHa0ZmN2JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5gQAKCRCPgPtYfRL+ Tsw+CAChcjHP+6yzxRri4q0G7oSZfAo0onlNYcorEcXtoIGeDwvEG7p0U4jr4HMunXrIW+Puc4W MBQXqVtK9P+Y53I3/5NRxeKIncunGSW/sK3r7Nx9Bc0IoVP5obik0M0wHUhMu9HtB8EApBcICqw r4Wu2D2NYlV6Ctuqny1pT1U+oCDeaFG1gyf0TO17muS8jqeEImDLfaSpGBIoePDivBtb95xCzSh moZme9sFnUlOV7WoRmLCUGOv+BlLwSuWlsTe3sr64c3c8Q4faSV3Fnqw1dEUBYi8RMyBtDAa0p2 GxmObJMk9eAG6wxOcQPqy6RXxZOKMHjV9XSQzi0cfL+t0Xf+
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1683; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=imcM2zPwOV8/aLvSFu/FCWca9j4c+gKvqqz0ToArDKE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzmDmzbqh2Uq1Mj6vs5HB95nEU8p2R0zHyLWM TfaQIH4m2eJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5gwAKCRCPgPtYfRL+ TuZiB/90rLadLTRDwDEKpCkZ+7l5WKvUQZrg7oJR0ssc/ZL8pAGnAf2a10ErBAyLsLdWRTwGZfw A2TKyE/c3F3zidg0B4yDgQgGNP3oErlO6fSHo/8zO3MsgJfmZKnvcfL/LGObLUvJfz587xq/6bc GwQPvnk+fM7uhh8EeEgmEj3s9EDJ1Tdvgu1rzi495ie7B8MgHDbb+6tNFCXv3FBSpSp1dtVazzX Ms2qGLg4aOlYDA8NKopDBhIzhp21wm02TzaTbvANyHLIurZg8IEcJwOciCvfEI1ybJIvAasImU1 RVM0ghCkkhbkpUnvxzuIZiRbLFlW8qMssM8mWddsdrU4AYRS
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -75,40 +76,36 @@ callback to the void returning variant.
 
 Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 ---
- drivers/net/wan/fsl_ucc_hdlc.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/wan/ixp4xx_hss.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index fd50bb313b92..605e70f7baac 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -1259,7 +1259,7 @@ static int ucc_hdlc_probe(struct platform_device *pdev)
- 	return ret;
+diff --git a/drivers/net/wan/ixp4xx_hss.c b/drivers/net/wan/ixp4xx_hss.c
+index b09f4c235142..931c5ca79ea5 100644
+--- a/drivers/net/wan/ixp4xx_hss.c
++++ b/drivers/net/wan/ixp4xx_hss.c
+@@ -1522,20 +1522,19 @@ static int ixp4xx_hss_probe(struct platform_device *pdev)
+ 	return err;
  }
  
--static int ucc_hdlc_remove(struct platform_device *pdev)
-+static void ucc_hdlc_remove(struct platform_device *pdev)
+-static int ixp4xx_hss_remove(struct platform_device *pdev)
++static void ixp4xx_hss_remove(struct platform_device *pdev)
  {
- 	struct ucc_hdlc_private *priv = dev_get_drvdata(&pdev->dev);
+ 	struct port *port = platform_get_drvdata(pdev);
  
-@@ -1277,8 +1277,6 @@ static int ucc_hdlc_remove(struct platform_device *pdev)
- 	kfree(priv);
- 
- 	dev_info(&pdev->dev, "UCC based hdlc module removed\n");
--
+ 	unregister_hdlc_device(port->netdev);
+ 	free_netdev(port->netdev);
+ 	npe_release(port->npe);
 -	return 0;
  }
  
- static const struct of_device_id fsl_ucc_hdlc_of_match[] = {
-@@ -1292,7 +1290,7 @@ MODULE_DEVICE_TABLE(of, fsl_ucc_hdlc_of_match);
+ static struct platform_driver ixp4xx_hss_driver = {
+ 	.driver.name	= DRV_NAME,
+ 	.probe		= ixp4xx_hss_probe,
+-	.remove		= ixp4xx_hss_remove,
++	.remove_new	= ixp4xx_hss_remove,
+ };
+ module_platform_driver(ixp4xx_hss_driver);
  
- static struct platform_driver ucc_hdlc_driver = {
- 	.probe	= ucc_hdlc_probe,
--	.remove	= ucc_hdlc_remove,
-+	.remove_new = ucc_hdlc_remove,
- 	.driver	= {
- 		.name		= DRV_NAME,
- 		.pm		= HDLC_PM_OPS,
 -- 
 2.42.0
 
