@@ -1,158 +1,91 @@
-Return-Path: <netdev+bounces-48646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0068A7EF149
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:00:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0818F7EF181
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7AF51F2890A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9296AB20A4F
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9BC1A728;
-	Fri, 17 Nov 2023 11:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4AD19BDF;
+	Fri, 17 Nov 2023 11:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bv2DM1K8"
 X-Original-To: netdev@vger.kernel.org
-Received: from wangsu.com (unknown [180.101.34.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 122E611D;
-	Fri, 17 Nov 2023 02:59:54 -0800 (PST)
-Received: from XMCDN1207038 (unknown [59.61.78.234])
-	by app2 (Coremail) with SMTP id SyJltACHAhKmR1dl66hhAA--.26433S2;
-	Fri, 17 Nov 2023 18:59:51 +0800 (CST)
-From: "Pengcheng Yang" <yangpc@wangsu.com>
-To: "'John Fastabend'" <john.fastabend@gmail.com>,
-	"'Jakub Sitnicki'" <jakub@cloudflare.com>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	<bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <1699962120-3390-1-git-send-email-yangpc@wangsu.com> <1699962120-3390-3-git-send-email-yangpc@wangsu.com> <6554713028d5b_3733620856@john.notmuch> <000101da17b9$36951720$a3bf4560$@wangsu.com> <6556c2c238099_537dc208ab@john.notmuch>
-In-Reply-To: <6556c2c238099_537dc208ab@john.notmuch>
-Subject: Re: [PATCH bpf-next 2/3] tcp: Add the data length in skmsg to SIOCINQ ioctl
-Date: Fri, 17 Nov 2023 18:59:50 +0800
-Message-ID: <009601da1945$2ff0d0c0$8fd27240$@wangsu.com>
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E5CEC2;
+	Fri, 17 Nov 2023 03:15:48 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 71B84FF80A;
+	Fri, 17 Nov 2023 11:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700219747;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MEnAPhotGrymqx9LWYvphkRnK4e8fFIFQk+XIJhM+Ew=;
+	b=bv2DM1K8sfN7my6DGyXah1OW8f8ligLTQQbv2oeWPGfbH3pLz1fHL6HIMNb++VwFLFUVVA
+	FE1nA3josktfusczdxPl+/rQoN0T4Ts/w9mObdtiQ3g+qXqd/2nOanonmA9tPh1TFCGkZy
+	vgD1OEXfv9yMX3wPMJBwJ1L7Fioj7+jPPTa2tP2+0VOLLGbavTY4V6X7mdLdLX74HTOCqa
+	Uym+ZBpydJjuw0j3sGy+LIobi0T+MVrTtbNfVQjq1lvXM7AcZSlCvVEPZTOEYdFSrGkwC5
+	I35VqoXtIL/pbJ6TDyFwSYqTOdtcYWRmlpXFo3EoXpFl4VHg/WpGxLAOmMmI4Q==
+Date: Fri, 17 Nov 2023 12:15:45 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 9/9] net: pse-pd: Add PD692x0 PSE controller
+ driver
+Message-ID: <20231117121545.2f950d43@kmaincent-XPS-13-7390>
+In-Reply-To: <47d42d52-943c-467d-bcc0-fcb274f69841@lunn.ch>
+References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
+	<20231116-feature_poe-v1-9-be48044bf249@bootlin.com>
+	<47d42d52-943c-467d-bcc0-fcb274f69841@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQHO/J1mBkmXfIRCzv54wVJwMMBhiQJx1G0UAqlCf8QBxnk5/QJgXLDNsEp4bpA=
-Content-Language: zh-cn
-X-CM-TRANSID:SyJltACHAhKmR1dl66hhAA--.26433S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw1xZw43AF4UXFyxAFykAFb_yoWrAw1UpF
-	W5KF1Skr4kCr4xArZ2vw1fX3W3K393KF17Xrn8t3y3Aws0kFySyr45GF4Y9FZ7tr4rur4Y
-	vr4jgrWS9wn8ZaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Ib7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
-	cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
-	v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK
-	6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4
-	CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0EF7xvrVAajcxG14v2
-	6r1j6r4UMcIj6x8ErcxFaVAv8VW8GwAv7VCY1x0262k0Y48FwI0_Gr1j6F4UJwAm72CE4I
-	kC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc2xS
-	Y4AK67AK6r4DMxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v1sIEY20_Gr4l4I8I3I0E4I
-	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
-	WwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
-	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
-	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJb
-	IYCTnIWIevJa73UjIFyTuYvjxUD0edUUUUU
-X-CM-SenderInfo: p1dqw1nf6zt0xjvxhudrp/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-John Fastabend <john.fastabend@gmail.com> wrote:
-> Pengcheng Yang wrote:
-> > John Fastabend <john.fastabend@gmail.com> wrote:
-> > > Pengcheng Yang wrote:
-> > > > SIOCINQ ioctl returns the number unread bytes of the receive
-> > > > queue but does not include the ingress_msg queue. With the
-> > > > sk_msg redirect, an application may get a value 0 if it calls
-> > > > SIOCINQ ioctl before recv() to determine the readable size.
-> > > >
-> > > > Signed-off-by: Pengcheng Yang <yangpc@wangsu.com>
-> > >
-> > > This will break the SK_PASS case I believe. Here we do
-> > > not update copied_seq until data is actually copied into user
-> > > space. This also ensures tcp_epollin_ready works correctly and
-> > > tcp_inq. The fix is relatively recent.
-> > >
-> > >  commit e5c6de5fa025882babf89cecbed80acf49b987fa
-> > >  Author: John Fastabend <john.fastabend@gmail.com>
-> > >  Date:   Mon May 22 19:56:12 2023 -0700
-> > >
-> > >     bpf, sockmap: Incorrectly handling copied_seq
-> > >
-> > > The previous patch increments the msg_len for all cases even
-> > > the SK_PASS case so you will get double counting.
-> >
-> > You are right, I missed the SK_PASS case of skb stream verdict.
-> >
-> > >
-> > > I was starting to poke around at how to fix the other cases e.g.
-> > > stream parser is in use and redirects but haven't got to it  yet.
-> > > By the way I think even with this patch epollin_ready is likely
-> > > not correct still. We observe this as either failing to wake up
-> > > or waking up an application to early when using stream parser.
-> > >
-> > > The other thing to consider is redirected skb into another socket
-> > > and then read off the list increment the copied_seq even though
-> > > they shouldn't if they came from another sock?  The result would
-> > > be tcp_inq would be incorrect even negative perhaps?
-> > >
-> > > What does your test setup look like? Simple redirect between
-> > > two TCP sockets? With or without stream parser? My guess is we
-> > > need to fix underlying copied_seq issues related to the redirect
-> > > and stream parser case. I believe the fix is, only increment
-> > > copied_seq for data that was put on the ingress_queue from SK_PASS.
-> > > Then update previous patch to only incrmeent sk_msg_queue_len()
-> > > for redirect paths. And this patch plus fix to tcp_epollin_ready
-> > > would resolve most the issues. Its a bit unfortunate to leak the
-> > > sk_sg_queue_len() into tcp_ioctl and tcp_epollin but I don't have
-> > > a cleaner idea right now.
-> > >
-> >
-> > What I tested was to use msg_verdict to redirect between two sockets
-> > without stream parser, and the problem I encountered is that msg has
-> > been queued in psock->ingress_msg, and the application has been woken up
-> > by epoll (because of sk_psock_data_ready), but the ioctl(FIONREAD) returns 0.
-> 
-> Yep makes sense.
-> 
-> >
-> > The key is that the rcv_nxt is not updated on ingress redirect, or we only need
-> > to update rcv_nxt on ingress redirect, such as in bpf_tcp_ingress() and
-> > sk_psock_skb_ingress_enqueue() ?
-> >
-> 
-> I think its likely best not to touch rcv_nxt. 'rcv_nxt' is used in
-> the tcp stack to calculate lots of things. If you just bump it and
-> then ever received an actual TCP pkt you would get some really
-> odd behavior because seq numbers and rcv_nxt would be unrelated then.
-> 
-> The approach you have is really the best bet IMO, but mask out
-> the increment msg_len where its not needed. Then it should be OK.
-> 
+On Thu, 16 Nov 2023 23:38:08 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-I think we can add a flag to msg to identify whether msg comes from the same
-sock's receive_queue. In this way, we can increase and decrease the msg_len
-based on this flag when msg is queued to ingress_msg and when it is read by
-the application.
+> > +static int pd692x0_send_msg(struct pd692x0_priv *priv, struct pd692x0_=
+msg
+> > *msg) +{
+> > +	const struct i2c_client *client =3D priv->client;
+> > +	int ret;
+> > +
+> > +	if (msg->content.key =3D=3D PD692X0_KEY_CMD && priv->last_cmd_key) {
+> > +		while (time_is_after_jiffies(msecs_to_jiffies(30) +
+> > priv->last_cmd_key_time))
+> > +			usleep_range(1000, 2000); =20
+>=20
+> That is a bit odd. Could you not just calculate how long a sleep is
+> needed, rather than loop?
 
-And, this can also fix the case you mentioned above:
+Oh, right indeed! Don't know why my brain wanted a loop here.
 
-	"The other thing to consider is redirected skb into another socket
-	and then read off the list increment the copied_seq even though
-	they shouldn't if they came from another sock?  The result would
-	be tcp_inq would be incorrect even negative perhaps?"
-
-During recv in tcp_bpf_recvmsg_parser(), we only need to increment copied_seq
-when the msg comes from the same sock's receive_queue, otherwise copied_seq
-may overflow rcv_nxt in this case.
-
-> Mixing ingress redirect and TCP sending/recv pkts doesn't usually work
-> very well anyway but I still think leaving rcv_nxt alone is best.
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
