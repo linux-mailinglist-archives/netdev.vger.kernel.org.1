@@ -1,122 +1,158 @@
-Return-Path: <netdev+bounces-48654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C607EF1B4
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:27:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 722BC7EF219
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:48:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87C931C2048A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:27:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BBC0280FAF
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33C2FE2D;
-	Fri, 17 Nov 2023 11:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C542FE20;
+	Fri, 17 Nov 2023 11:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SQDPGvD0"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9575CA6;
-	Fri, 17 Nov 2023 03:27:48 -0800 (PST)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4SWvfX5qpSzNnw5;
-	Fri, 17 Nov 2023 19:23:32 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.31; Fri, 17 Nov
- 2023 19:27:46 +0800
-Subject: Re: [PATCH RFC 3/8] memory-provider: dmabuf devmem memory provider
-To: David Ahern <dsahern@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, Mina
- Almasry <almasrymina@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, =?UTF-8?Q?Christian_K=c3=b6nig?=
-	<christian.koenig@amd.com>, Matthew Wilcox <willy@infradead.org>, Linux-MM
-	<linux-mm@kvack.org>
-References: <20231113130041.58124-1-linyunsheng@huawei.com>
- <20231113130041.58124-4-linyunsheng@huawei.com>
- <CAHS8izMjmj0DRT_vjzVq5HMQyXtZdVK=o4OP0gzbaN=aJdQ3ig@mail.gmail.com>
- <20231113180554.1d1c6b1a@kernel.org>
- <0c39bd57-5d67-3255-9da2-3f3194ee5a66@huawei.com>
- <CAHS8izNxkqiNbTA1y+BjQPAber4Dks3zVFNYo4Bnwc=0JLustA@mail.gmail.com>
- <ZVNzS2EA4zQRwIQ7@nvidia.com>
- <ed875644-95e8-629a-4c28-bf42329efa56@huawei.com>
- <ee10d050-ef24-49b2-8712-c9bc8a911c2a@kernel.org>
- <15c404e4-8efa-cc1c-174f-0752005b6755@huawei.com>
- <d5672499-ce5b-45c0-b47a-e5bb188f6c7f@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <f70b2a3f-692c-dfcf-22d2-c688360c3dda@huawei.com>
-Date: Fri, 17 Nov 2023 19:27:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE8B2E414
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 11:48:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 124ACC433C8;
+	Fri, 17 Nov 2023 11:48:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700221720;
+	bh=3MpaidUztuhrjbf9qeOfLOgAzYrclVMygukdqfl98ew=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SQDPGvD0DiHsGg+o1RnhnxeTuIDZUKMFlu1J/1KrYuPH4Vk4HlEl8kzKkqal16j59
+	 jxK0PZbxmHUERyAmsKFQvGhsmitYublcSBpv1C+1a9CyPm9HxMUgby7k2lF8hez+ue
+	 GLHTn0HpvKTCzSW17Q2PThjasaUbGhwWtj2XG1sX0Yev4e9TgMaqlkNwE7Vqx8yj1B
+	 KZh33a6h9dK9XmDdWdZCoBKal9tJwQMsW9wnWVqEFc/sM7G/QGOPKnxlx87Psdq7rR
+	 UTLXVTwrAYnH4PKO/9Ssv9RdqG2+dxTYTECJ5sL/w7H5lUUbdVr1zn8l3Q2oOCwB59
+	 3ACZiPw2VzACw==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	netdev@vger.kernel.org,
+	liuhangbin@gmail.com,
+	ja@ssi.bg
+Subject: [PATCH net-next] net: ipv4: replace the right route in case prefsrc is used
+Date: Fri, 17 Nov 2023 12:48:36 +0100
+Message-ID: <20231117114837.36100-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <d5672499-ce5b-45c0-b47a-e5bb188f6c7f@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
-On 2023/11/16 23:58, David Ahern wrote:
-> On 11/16/23 4:12 AM, Yunsheng Lin wrote:
->> On 2023/11/16 1:57, David Ahern wrote:
->>> On 11/15/23 2:21 AM, Yunsheng Lin wrote:
->>>> On 2023/11/14 21:16, Jason Gunthorpe wrote:
->>>>> On Tue, Nov 14, 2023 at 04:21:26AM -0800, Mina Almasry wrote:
->>>>>
->>>>>> Actually because you put the 'strtuct page for devmem' in
->>>>>> skb->bv_frag, the net stack will grab the 'struct page' for devmem
->>>>>> using skb_frag_page() then call things like page_address(), kmap,
->>>>>> get_page, put_page, etc, etc, etc.
->>>>>
->>>>> Yikes, please no. If net has its own struct page look alike it has to
->>>>> stay entirely inside net. A non-mm owned struct page should not be
->>>>> passed into mm calls. It is just way too hacky to be seriously
->>>>> considered :(
->>>>
->>>> Yes, that is something this patchset is trying to do, defining its own
->>>> struct page look alike for page pool to support devmem.
->>>>
->>>
->>> Networking needs to be able to move away from struct page references.
->>> The devmem and host memory for Rx use cases do not need to be page based.
->>
->> Yes, I am agreed the ultimate goal is to move away from struct page
->> references. But I am not sure if we can do it right away as there
->> still are different types of existing 'struct page' in the netstack,
->> see:
->>
->> https://lore.kernel.org/all/8b7d25eb-1f10-3e37-8753-92b42da3fb34@huawei.com/
-> 
-> yes, that is the point of a blended approach -- pages and buffers (or
-> iov) -- leveraging the LSB of the address. That proposal is the right
+In case similar routes with different prefsrc are installed, any
+modification of one of those routes will always modify the first one
+found as the prefsrc is not matched. Fix this by updating the entry we
+found in case prefsrc was set in the request.
 
-I am not sure leveraging the LSB of the address is necessary yet, as it
-does not seems to provide the type check protection, it seems to just
-provide a way to demux between pages(including page pool owned page and
-non-page pool owned page) and page pool owned buffer.
-That info is avaliable through the page->pp_magic and page->pp->mp_*
-too if we mirror the page pool specific union in 'struct page'.
+Before the patch:
 
-> direction to be moving for co-existence. Adding fake struct page
-> instances is the wrong direction.
+  $ ip route show
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.2 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.3 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.4 metric 100
+  $ ip route change 172.16.42.0/24 dev eth0 proto kernel scope link \
+        src 172.16.42.4 metric 100 mtu 1280
+  $ ip route show
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.4 metric 100 mtu 1280
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.3 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.4 metric 100
 
-Perhaps a fake struct page with type check protection is the right
-direction?
+After the patch:
 
-Intergrating devmem to page pool without a unified metadata between
-pages and buffers or without a proper abstract layer does not seems
-like the good direction either.
+  $ ip route show
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.2 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.3 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.4 metric 100
+  $ ip route change 172.16.42.0/24 dev eth0 proto kernel scope link \
+        src 172.16.42.4 metric 100 mtu 1280
+  $ ip route show
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.2 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.3 metric 100
+  172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.4 metric 100 mtu 1280
 
-> .
-> 
+All fib selftest ran and no failure was seen.
+
+Note: a selftest wasn't added as `ip route` use NLM_F_EXCL which
+prevents us from constructing the above routes. But this is a valid
+example of what NetworkManager can construct for example.
+
+Signed-off-by: Antoine Tenart <atenart@kernel.org>
+---
+
+Hi, comment/question below,
+
+I'm wondering if we want to fix the above case. I made this patch
+because we already filter on prefsrc when deleting a route[1] to deal
+with the same configurations as above, and that would make the route
+replacement consistent with that.
+
+However even with this (same for [1]) things are not 100% failsafe
+(and we can argue on the use case and feasibility). For example
+consider,
+
+$ ip route show
+172.16.42.0/24 dev eth0 proto kernel scope link src 172.16.42.2 metric 100
+172.16.42.0/24 dev eth0 proto kernel scope link metric 100
+$ ip route del 172.16.42.0/24 dev eth0 proto kernel scope link metric 100
+$ ip route show
+172.16.42.0/24 dev eth0 proto kernel scope link metric 100
+
+Also the differing part could be something else that the prefsrc (not
+that it would necessarily make sense).
+
+Thoughts?
+
+Thanks!
+Antoine
+
+[1] 74cb3c108bc0 ("ipv4: match prefsrc when deleting routes").
+
+---
+ net/ipv4/fib_trie.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/fib_trie.c b/net/ipv4/fib_trie.c
+index 9bdfdab906fe..6cf775d4574e 100644
+--- a/net/ipv4/fib_trie.c
++++ b/net/ipv4/fib_trie.c
+@@ -1263,10 +1263,11 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
+ 
+ 		nlflags &= ~NLM_F_EXCL;
+ 
+-		/* We have 2 goals:
++		/* We have 3 goals:
+ 		 * 1. Find exact match for type, scope, fib_info to avoid
+ 		 * duplicate routes
+ 		 * 2. Find next 'fa' (or head), NLM_F_APPEND inserts before it
++		 * 3. Find the right 'fa' in case a prefsrc is used
+ 		 */
+ 		fa_match = NULL;
+ 		fa_first = fa;
+@@ -1282,6 +1283,9 @@ int fib_table_insert(struct net *net, struct fib_table *tb,
+ 				fa_match = fa;
+ 				break;
+ 			}
++			if (cfg->fc_prefsrc &&
++			    cfg->fc_prefsrc == fa->fa_info->fib_prefsrc)
++				fa_first = fa;
+ 		}
+ 
+ 		if (cfg->fc_nlflags & NLM_F_REPLACE) {
+-- 
+2.41.0
+
 
