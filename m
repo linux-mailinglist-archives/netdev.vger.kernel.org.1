@@ -1,146 +1,167 @@
-Return-Path: <netdev+bounces-48787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ADF47EF8DC
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 21:51:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1AD97EF93E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 22:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8100280D6E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 20:51:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E828B207E2
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 21:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E30645038;
-	Fri, 17 Nov 2023 20:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6CA46435;
+	Fri, 17 Nov 2023 21:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="RdVJkpp8"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kAkHxOwr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77C4D72
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 12:51:00 -0800 (PST)
-Received: by mail-io1-xd2d.google.com with SMTP id ca18e2360f4ac-7a68b87b265so83452239f.2
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 12:51:00 -0800 (PST)
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CC91734
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 13:09:57 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id d2e1a72fcca58-6b2018a11efso2508948b3a.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 13:09:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1700254260; x=1700859060; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+LcdbJ40kwiz4H5n6a5Ekh3a4ElzIpNj2R6AuVc6sU=;
-        b=RdVJkpp8XbMBBxDJUQ8aWejgQyrSXEQ75R3eH7dzP8Bpd1TIIyh8B+8sRosq8TpWmk
-         WDgjgIhdoP4Q24zxu+SdYZ8ZzfWlTettE+rBWYc9RFLGZcB3XWX0/HBBOyjPBmP7h/m+
-         AKQvan0TnCXWESqF6+VEH7yvbCP9/4vyFFeno=
+        d=chromium.org; s=google; t=1700255397; x=1700860197; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6wz1t+l8RssdWaevpsmYkaZfUjbmCNYMu71lLo08Sgs=;
+        b=kAkHxOwrS5quIbPQh6wjHSXX9Wot39Bcq6Hp/m+/pqUFUhGnZcRl+7btX1SmFR0D5I
+         FXtC3Gt36Tpr0pbSdj9GU10CilJmHWfjMp0fKpb9IqpC1Rlkmw3iLhfeeXSbNQCkN568
+         K1hyi32Ruf/h0r0k/6VGfXpiaGAnqDc9ctJAU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700254260; x=1700859060;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q+LcdbJ40kwiz4H5n6a5Ekh3a4ElzIpNj2R6AuVc6sU=;
-        b=OzavWVmnWtScq5F1kFoEnXxVgdhX19Bo0tmk5TUKPkHahTncCLbbqO8vGTNwG7P6qW
-         PfDbvJIbQ6v0m/cXUeIB96BVwGjjZphZmce/kjHJ9nYdbVWNgIihPSqa3QidF5gr8qq2
-         7cbUTjb5/GB4unyuWHoNioBO4lt2HwqWidXdrDuFizHiNli1XFbIfqqDiXRKD13ExXtA
-         HaTQyvBC0hinRQSgPHnG+hDFWtN4vOGYipnZ6DsPdQARrxBMkn9rzGXcrBQLkZqa3QFB
-         ss0yLfLY0kHkltJLII0R9+HrXfZq56X52jHZaj5iF6fh+HnTwqDV5POa3P4WvVNLGudn
-         rYiA==
-X-Gm-Message-State: AOJu0YzUwLPotW429QgYDHZ2JfA2NQurIHY50fgkf5yBYHlJhtR8iOEF
-	AIuuUDHXvVUQiJ5gyudU19XsKg==
-X-Google-Smtp-Source: AGHT+IHycE50SYVPmlqZloaghPwrzD3Yj5yV/Gkna4hMFDFdxWEHcOBMqi/7KvPcZoNbozt/LHNIYw==
-X-Received: by 2002:a6b:5009:0:b0:786:fff8:13c2 with SMTP id e9-20020a6b5009000000b00786fff813c2mr682277iob.11.1700254260005;
-        Fri, 17 Nov 2023 12:51:00 -0800 (PST)
-Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
-        by smtp.googlemail.com with ESMTPSA id s18-20020a5e9812000000b007a951cf9bf4sm631505ioj.26.2023.11.17.12.50.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 12:50:59 -0800 (PST)
-Message-ID: <9a0c97e7-a790-4440-9f92-0dfb077e18c5@ieee.org>
-Date: Fri, 17 Nov 2023 14:50:58 -0600
+        d=1e100.net; s=20230601; t=1700255397; x=1700860197;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6wz1t+l8RssdWaevpsmYkaZfUjbmCNYMu71lLo08Sgs=;
+        b=JNRsnCoI6U8doksCbZ96tO908ibr6aVuV+H8ATfrhc5ituuGNwzIoQJ2ID7Z16B7R4
+         BcgpY2WapKqdp6au1x7Uz+IUxvdVL6L8SI5p1i5SSuNo8iS3vEErgmCL/FepNzyKWq4C
+         a2aWacnHU5cdimVTzTFjbwDLYvqIRpMl+aYP+WUdCyhFIWIUDiB2Y415Re5q5oCLiaVC
+         95L/d2w0oG8h0gXps96Epy0R8qFYKC1jGui2eD5kDEOF6w6/sxj8RX/ut5uGM+uU0Ier
+         TyQkJwPdNhlN6vLFxW0mc0dv7k4fS414YmUn4e+SO5faIYc3FNtA+Zqmnq0P4yvon1ab
+         FZgw==
+X-Gm-Message-State: AOJu0Yw0f29XQF9GHn238N4SIf0M+JxDTud8lT0G5dhuxao4FAuT1HRo
+	dYeRYYPT9UudbpT+oKTX9dMdug==
+X-Google-Smtp-Source: AGHT+IFZoUAtpbAt9CjRIaojkHmlFqJvZdW1uuO02moJ36Q0TclS9DzF+qPPY0wh7Twfrp1yLU3GPQ==
+X-Received: by 2002:a05:6a20:748e:b0:187:fe09:272a with SMTP id p14-20020a056a20748e00b00187fe09272amr424763pzd.49.1700255396830;
+        Fri, 17 Nov 2023 13:09:56 -0800 (PST)
+Received: from tictac2.mtv.corp.google.com ([2620:15c:9d:2:b953:95f4:4240:7018])
+        by smtp.gmail.com with ESMTPSA id h20-20020a056a00219400b006c624e8e7e8sm1780587pfi.83.2023.11.17.13.09.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 13:09:56 -0800 (PST)
+From: Douglas Anderson <dianders@chromium.org>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Hayes Wang <hayeswang@realtek.com>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: Grant Grundler <grundler@chromium.org>,
+	Simon Horman <horms@kernel.org>,
+	Edward Hill <ecgh@chromium.org>,
+	linux-usb@vger.kernel.org,
+	Laura Nao <laura.nao@collabora.com>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Douglas Anderson <dianders@chromium.org>,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2] r8152: Hold the rtnl_lock for all of reset
+Date: Fri, 17 Nov 2023 13:08:41 -0800
+Message-ID: <20231117130836.1.I77097aa9ec01aeca1b3c75fde4ba5007a17fdf76@changeid>
+X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 01/10] net: ipa: Don't error out in .remove()
-Content-Language: en-US
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de
-References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
- <20231117095922.876489-2-u.kleine-koenig@pengutronix.de>
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20231117095922.876489-2-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/17/23 3:59 AM, Uwe Kleine-König wrote:
-> Returning early from .remove() with an error code still results in the
-> driver unbinding the device. So the driver core ignores the returned error
-> code and the resources that were not freed are never catched up. In
-> combination with devm this also often results in use-after-free bugs.
-> 
-> Here even if the modem cannot be stopped, resources must be freed. So
-> replace the early error return by an error message an continue to clean up.
-> 
-> This prepares changing ipa_remove() to return void.
-> 
-> Fixes: cdf2e9419dd9 ("soc: qcom: ipa: main code")
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> ---
->   drivers/net/ipa/ipa_main.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-> index da853353a5c7..60e4f590f5de 100644
-> --- a/drivers/net/ipa/ipa_main.c
-> +++ b/drivers/net/ipa/ipa_main.c
-> @@ -960,7 +960,8 @@ static int ipa_remove(struct platform_device *pdev)
->   			ret = ipa_modem_stop(ipa);
+As of commit d9962b0d4202 ("r8152: Block future register access if
+register access fails") there is a race condition that can happen
+between the USB device reset thread and napi_enable() (not) getting
+called during rtl8152_open(). Specifically:
+* While rtl8152_open() is running we get a register access error
+  that's _not_ -ENODEV and queue up a USB reset.
+* rtl8152_open() exits before calling napi_enable() due to any reason
+  (including usb_submit_urb() returning an error).
 
-This ipa_modem_stop() call is the second one in this function,
-which is called if the first attempt returned an error.  The
-only error that's returned is -EBUSY, which occurs if a request
-to stop the modem arrives at a time when we're in transition.
-That is, either we are in the process of starting it up, or
-we are in the process of stopping it.  In either case, this
-transitional state should come to an end quickly.  This second
-call happens after a short delay, giving a chance for the start
-or stop that's underway to complete.
+In that case:
+* Since the USB reset is perform in a separate thread asynchronously,
+  it can run at anytime USB device lock is not held - even before
+  rtl8152_open() has exited with an error and caused __dev_open() to
+  clear the __LINK_STATE_START bit.
+* The rtl8152_pre_reset() will notice that the netif_running() returns
+  true (since __LINK_STATE_START wasn't cleared) so it won't exit
+  early.
+* rtl8152_pre_reset() will then hang in napi_disable() because
+  napi_enable() was never called.
 
-If the *second* call returns an error, it's assumed we're stuck
-in one of the two transitional states, in which case something is
-wrong with the hardware (we've issued a request that did not
-complete, for example).  And in that case, we have no way of
-knowing whether the hardware will come alive and do something
-with a resource that's been allocated for it.
+We can fix the race by making sure that the r8152 reset routines don't
+run at the same time as we're opening the device. Specifically we need
+the reset routines in their entirety rely on the return value of
+netif_running(). The only way to reliably depend on that is for them
+to hold the rntl_lock() mutex for the duration of reset.
 
-I think I'd rather live with whatever resource leaks occur in
-such an unlikely case, rather than free them without knowing
-what the (broken) hardware is going to do.
+Grabbing the rntl_lock() mutex for the duration of reset seems like a
+long time, but reset is not expected to be common and the rtnl_lock()
+mutex is already held for long durations since the core grabs it
+around the open/close calls.
 
->   		}
->   		if (ret)
-> -			return ret;
-> +			dev_err(dev, "Failed to stop modem (%pe)\n",
-> +				ERR_PTR(ret));
+Fixes: d9962b0d4202 ("r8152: Block future register access if register access fails")
+Signed-off-by: Douglas Anderson <dianders@chromium.org>
+---
 
-By the above reasoning, I'd rather your patch result in the code
-looking like this:
+ drivers/net/usb/r8152.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-	if (ret) {
-		dev_err(dev, "remove: error %d stopping modem\n", ret);
-		return ret;		/* XXX Later: just return; */
-	}
-
-The message is more consistent with the way other messages in the
-driver are written.  If %pe is preferred I'd rather make that change
-comprehensively throughout the driver rather than bit-by-bit.
-
-Thanks.
-
-					-Alex
-
->   		ipa_teardown(ipa);
->   	}
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 2c5c1e91ded6..d6edf0254599 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -8397,6 +8397,8 @@ static int rtl8152_pre_reset(struct usb_interface *intf)
+ 	struct r8152 *tp = usb_get_intfdata(intf);
+ 	struct net_device *netdev;
+ 
++	rtnl_lock();
++
+ 	if (!tp || !test_bit(PROBED_WITH_NO_ERRORS, &tp->flags))
+ 		return 0;
+ 
+@@ -8428,20 +8430,17 @@ static int rtl8152_post_reset(struct usb_interface *intf)
+ 	struct sockaddr sa;
+ 
+ 	if (!tp || !test_bit(PROBED_WITH_NO_ERRORS, &tp->flags))
+-		return 0;
++		goto exit;
+ 
+ 	rtl_set_accessible(tp);
+ 
+ 	/* reset the MAC address in case of policy change */
+-	if (determine_ethernet_addr(tp, &sa) >= 0) {
+-		rtnl_lock();
++	if (determine_ethernet_addr(tp, &sa) >= 0)
+ 		dev_set_mac_address (tp->netdev, &sa, NULL);
+-		rtnl_unlock();
+-	}
+ 
+ 	netdev = tp->netdev;
+ 	if (!netif_running(netdev))
+-		return 0;
++		goto exit;
+ 
+ 	set_bit(WORK_ENABLE, &tp->flags);
+ 	if (netif_carrier_ok(netdev)) {
+@@ -8460,6 +8459,8 @@ static int rtl8152_post_reset(struct usb_interface *intf)
+ 	if (!list_empty(&tp->rx_done))
+ 		napi_schedule(&tp->napi);
+ 
++exit:
++	rtnl_unlock();
+ 	return 0;
+ }
+ 
+-- 
+2.43.0.rc0.421.g78406f8d94-goog
 
 
