@@ -1,109 +1,191 @@
-Return-Path: <netdev+bounces-48512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442DB7EEA71
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:46:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF057EEA7F
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48F381C20986
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 00:46:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94F4B1F232A0
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 01:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56AD38F;
-	Fri, 17 Nov 2023 00:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5A17EA;
+	Fri, 17 Nov 2023 01:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZK3rDC6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="adTly4fL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D3DC130
-	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 16:46:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700181996;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lXPMAIuOJobnbk4l5EMtqu+6sDBuXU0ppSLkGsUmTTE=;
-	b=FZK3rDC6aljkmVcu3W0ypRVgri3RM+rHCtxfWtKu1QPjOqLoVUH20JcUSWE4Kai6x/+82h
-	rivrU47aF1BszSaY+7JuKcdM8rRxXphdgWY4YYKQ9QOtbSP84fWtliDX/rWvE7s1X75BIg
-	7AajemuzMtMiUtYwccJpnA1kuqSJ2mA=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-pTq9jwi7OGemlkG1VEFXUw-1; Thu, 16 Nov 2023 19:46:35 -0500
-X-MC-Unique: pTq9jwi7OGemlkG1VEFXUw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2c53ea92642so12772721fa.2
-        for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 16:46:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700181993; x=1700786793;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lXPMAIuOJobnbk4l5EMtqu+6sDBuXU0ppSLkGsUmTTE=;
-        b=HpDKcsqg0vw4/JUjRJXgt0RPBJ7rh5KEpb3GbByD+5Zd5q4qNn11nWxXpMuGjbvAb7
-         b49oBf95JpOwACWkw+rN3gQXs8MQCUwzu/fbMNgN2AQvv5IHlGQFqIYXUquiZX3SAm2I
-         n5y0xs+cBf1F4okFD26jpplmvon7h014qJreprbG9UvyypheoiULMauyyJebDwiVOcGh
-         qXS1BuKvEez8KjcPDmDBTUcv7rq9jJY89b2rQAfIa3DpuVcgMpo7mIORo0oOqxiQavm4
-         P4ZZ0JuDSz6tH9bFnueeqPlqGRqMO6NX6OpVMkUBAHELDkIP6A+E/H0X7359NXtFDTfu
-         CJYQ==
-X-Gm-Message-State: AOJu0Yw1JE1HEdmYHf6HcLY2C5kCMRGTnz1wtQ/QQwBQpKmTVvuyeUo8
-	ivMakTc0TYry+ZV3jugO7UchEQ2L96YI4KEEO5Sz9mKMC8BnPz9Djy4P4lRxVRTze1Pq6P6WTZN
-	B2PxNyS79bQX8UYMPuiBQ/Adn3qQ=
-X-Received: by 2002:a2e:a4a1:0:b0:2bc:c4af:36b9 with SMTP id g1-20020a2ea4a1000000b002bcc4af36b9mr7275396ljm.52.1700181992960;
-        Thu, 16 Nov 2023 16:46:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/Y489bvhVNh4j1D0RXhb0CrxFegRhnNK3FBPCMCq2tPFWJ7GBl1JPM770O22kir5tBB/VPA==
-X-Received: by 2002:a2e:a4a1:0:b0:2bc:c4af:36b9 with SMTP id g1-20020a2ea4a1000000b002bcc4af36b9mr7275388ljm.52.1700181992526;
-        Thu, 16 Nov 2023 16:46:32 -0800 (PST)
-Received: from localhost ([78.210.17.86])
-        by smtp.gmail.com with ESMTPSA id o5-20020a17090608c500b009adcb6c0f0esm198205eje.193.2023.11.16.16.46.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 16:46:32 -0800 (PST)
-Date: Fri, 17 Nov 2023 01:45:51 +0100
-From: Andrea Claudi <aclaudi@redhat.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: heminhong <heminhong@kylinos.cn>, petrm@nvidia.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v4] iproute2: prevent memory leak
-Message-ID: <ZVa2Oha4ahHnYw16@renaissance-vector>
-References: <87y1ezwbk8.fsf@nvidia.com>
- <20231116031308.16519-1-heminhong@kylinos.cn>
- <20231116150521.66a8ea69@hermes.local>
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1828E129
+	for <netdev@vger.kernel.org>; Thu, 16 Nov 2023 17:00:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700182821; x=1731718821;
+  h=subject:from:to:cc:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aqozqWdhCV9YiAv26LUZfPav39JXonYvy2MpjZ0ll7k=;
+  b=adTly4fLcFmW+5IrkGovOk8EKCabOjqsTsYktKMwwKQqUFna7az/Jomi
+   ls1pADlXJ0LCDj8KDCVMJ9EzGFCIJFKDVIMFFawOcI04ryDSsEqoTs+Mi
+   O35sKWXFJnGH3Y9kjOPrGehjWsmsr9JxOQ2EkkP3dT4jea9oWUFHsDrNV
+   iGJzufSimDomYmrx7YyWr91p1cbO9K4VGwqMQXhqvWwu2fVNLwO4I1sLz
+   bl67HQfkUfFM6UPAxmG43Rn4hwz6PI2EQ+wj91fwrIZUF/Hnirw2HW+QK
+   iNnga6XY48oDF4tGjbba7b6lwk/TEwlcnkOAFVizpQusBnb2HVsYKqhCm
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="390994649"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="390994649"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 17:00:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="800331449"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="800331449"
+Received: from anambiarhost.jf.intel.com ([10.166.29.163])
+  by orsmga001.jf.intel.com with ESMTP; 16 Nov 2023 17:00:20 -0800
+Subject: [net-next PATCH v8 00/10] Introduce queue and NAPI support in
+ netdev-genl (Was: Introduce NAPI queues support)
+From: Amritha Nambiar <amritha.nambiar@intel.com>
+To: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com
+Cc: sridhar.samudrala@intel.com, amritha.nambiar@intel.com
+Date: Thu, 16 Nov 2023 17:16:38 -0800
+Message-ID: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
+User-Agent: StGit/unknown-version
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116150521.66a8ea69@hermes.local>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 16, 2023 at 03:05:21PM -0800, Stephen Hemminger wrote:
-> On Thu, 16 Nov 2023 11:13:08 +0800
-> heminhong <heminhong@kylinos.cn> wrote:
-> 
-> > When the return value of rtnl_talk() is not less than 0,
-> > 'answer' will be allocated. The 'answer' should be free
-> > after using, otherwise it will cause memory leak.
-> > 
-> > Signed-off-by: heminhong <heminhong@kylinos.cn>
-> 
-> I am skeptical, what is the code path through rtn_talk() that
-> returns non zero, and allocates answer.  If so, that should be fixed
-> there.
-> 
-> In current code, the returns are:
-> 	- sendmsg() fails
-> 	- recvmsg() fails
-> 	- truncated message
-> 	
-> The paths that set answer are returning 0
+Add the capability to export the following via netdev-genl interface:
+- queue information supported by the device
+- NAPI information supported by the device
 
-IMHO the memory leak is in the same functions this is patching.
-For example, in ip/link_gre.c:122 we are effectively returning after
-having answer allocated correctly by rtnl_talk().
+Introduce support for associating queue and NAPI instance.
+Extend the netdev_genl generic netlink family for netdev
+with queue and NAPI data. 
 
-The confusion here stems from the fact we are jumping into the error
-path of rtnl_talk() after rtnl_talk() executed fine.
+The queue parameters exposed are:
+- queue index
+- queue type
+- ifindex
+- NAPI id associated with the queue
 
+Additional rx and tx queue parameters can be exposed in follow up
+patches by stashing them in netdev queue structures. XDP queue type
+can also be supported in future.
+
+The NAPI fields exposed are:
+- NAPI id
+- NAPI device ifindex
+- Interrupt number associated with the NAPI instance
+- PID for the NAPI thread
+
+This series only supports 'get' ability for retrieving
+certain queue and NAPI attributes. The 'set' ability for
+configuring queue and associated NAPI instance via netdev-genl
+will be submitted as a separate patch series.
+
+Previous discussion at:
+https://lore.kernel.org/netdev/c8476530638a5f4381d64db0e024ed49c2db3b02.camel@gmail.com/T/#m00999652a8b4731fbdb7bf698d2e3666c65a60e7
+
+$ ./cli.py --spec netdev.yaml --do queue-get  --json='{"ifindex": 12, "id": 0, "type": 0}'
+{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'rx'}
+
+$ ./cli.py --spec netdev.yaml  --do queue-get --json='{"ifindex": 12, "id": 0, "type": 1}'
+{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'tx'}
+
+$ ./cli.py --spec netdev.yaml  --dump queue-get --json='{"ifindex": 12}'
+[{'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'rx'},
+ {'id': 1, 'ifindex': 12, 'napi-id': 594, 'type': 'rx'},
+ {'id': 2, 'ifindex': 12, 'napi-id': 595, 'type': 'rx'},
+ {'id': 3, 'ifindex': 12, 'napi-id': 596, 'type': 'rx'},
+ {'id': 0, 'ifindex': 12, 'napi-id': 593, 'type': 'tx'},
+ {'id': 1, 'ifindex': 12, 'napi-id': 594, 'type': 'tx'},
+ {'id': 2, 'ifindex': 12, 'napi-id': 595, 'type': 'tx'},
+ {'id': 3, 'ifindex': 12, 'napi-id': 596, 'type': 'tx'}]
+
+$ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
+{'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}
+
+$ ./cli.py --spec netdev.yaml --dump napi-get --json='{"ifindex": 12}'
+[{'id': 596, 'ifindex': 12, 'irq': 294, 'pid': 3724},
+ {'id': 595, 'ifindex': 12, 'irq': 293, 'pid': 3725},
+ {'id': 594, 'ifindex': 12, 'irq': 292, 'pid': 3726},
+ {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}]
+
+v7 -> v8
+* Removed $obj prefix from attribute names in yaml spec
+
+v6 -> v7
+* Added more documentation in spec file
+* Addressed other review comments related to lock
+
+v5 -> v6
+* Fixed build warning in prototype for ice_queue_set_napi()
+
+v4 -> v5
+* Removed tx_maxrate in queue atrributes
+* Added lock protection for queue->napi
+* Addressed other review comments
+
+v3 -> v4
+Minor nits, changed function name, used list_for_each_entry in place
+of _rcu
+
+v2 -> v3
+* Implemented queue as separate netlink object
+with support for exposing per-queue paramters
+* Removed queue-list associations with NAPI
+* Addressed other review feedback WRT tracking list
+iterations
+
+v1 -> v2
+* Removed multi-attr nest for NAPI object
+* Added support for flat/individual NAPI objects
+* Changed 'do' command to take napi-id as argument
+* Supported filtered 'dump' (dump with ifindex for a netdev and dump for
+  all netdevs)
+
+RFC -> v1
+* Changed to separate 'napi_get' command
+* Added support to expose interrupt and PID for the NAPI
+* Used list of netdev queue structs
+* Split patches further and fixed code style and errors
+
+---
+
+Amritha Nambiar (10):
+      netdev-genl: spec: Extend netdev netlink spec in YAML for queue
+      net: Add queue and napi association
+      ice: Add support in the driver for associating queue with napi
+      netdev-genl: Add netlink framework functions for queue
+      netdev-genl: spec: Extend netdev netlink spec in YAML for NAPI
+      netdev-genl: Add netlink framework functions for napi
+      netdev-genl: spec: Add irq in netdev netlink YAML spec
+      net: Add NAPI IRQ support
+      netdev-genl: spec: Add PID in netdev netlink YAML spec
+      netdev-genl: Add PID for the NAPI thread
+
+
+ Documentation/netlink/specs/netdev.yaml   |   94 +++++++++
+ drivers/net/ethernet/intel/ice/ice_lib.c  |   64 ++++++
+ drivers/net/ethernet/intel/ice/ice_lib.h  |    4 
+ drivers/net/ethernet/intel/ice/ice_main.c |    4 
+ include/linux/netdevice.h                 |   17 ++
+ include/net/netdev_rx_queue.h             |    4 
+ include/uapi/linux/netdev.h               |   27 ++
+ net/core/dev.c                            |   49 ++++
+ net/core/dev.h                            |    2 
+ net/core/netdev-genl-gen.c                |   50 +++++
+ net/core/netdev-genl-gen.h                |    5 
+ net/core/netdev-genl.c                    |  320 +++++++++++++++++++++++++++++
+ tools/include/uapi/linux/netdev.h         |   27 ++
+ tools/net/ynl/generated/netdev-user.c     |  289 ++++++++++++++++++++++++++
+ tools/net/ynl/generated/netdev-user.h     |  178 ++++++++++++++++
+ 15 files changed, 1130 insertions(+), 4 deletions(-)
+
+--
 
