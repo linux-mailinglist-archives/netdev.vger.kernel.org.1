@@ -1,134 +1,98 @@
-Return-Path: <netdev+bounces-48633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449D77EEFE8
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:16:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EDCE7EEFF2
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:18:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E97A91F27CD6
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:16:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FC1AB20A59
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:18:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EF7A18AEE;
-	Fri, 17 Nov 2023 10:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RaSlQJ4K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DE618B07;
+	Fri, 17 Nov 2023 10:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD2385;
-	Fri, 17 Nov 2023 02:16:04 -0800 (PST)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AH9b98J025794;
-	Fri, 17 Nov 2023 10:15:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=5cKcmiXRyWqcSrnZNV5uxcqTjwzGW9zilSiurwKvu5w=;
- b=RaSlQJ4KsmgP6U4M8kPrL8ZFHPRL8zTL98o8W7cYxVKXwqpKM4bp+jku88WuugXoGOsM
- OG/szis8bQuNpFWsvO5IV5yehpV6oNdvlHYTTLR1hFtPghKPpvWC3Zscu6CINXzIo6oH
- hy0f1M0WGEA4+z+tIbIFOBdHfYBlGvgSWI5CnLysc8AoUS8FlFvd3UxtTkDPTd4y2xev
- B/jvN6hkTj4QQiT5g+5AgOXLAK4Zx5NBu0SKrdH4xvrfDGcP9fPMPqGd/hPvgQhbazjZ
- mbyir2AXY8uEnBm3QreR/pstrEb1Mbft8GNHZCUsRs/pZ8YtgQGF7mjrKfNU6AaSwcTw 0Q== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ue5per2k8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 10:15:46 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AHAFkp3007021
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 10:15:46 GMT
-Received: from [10.253.8.81] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 17 Nov
- 2023 02:15:41 -0800
-Message-ID: <c1233090-b77d-43b7-9419-74f904cfae07@quicinc.com>
-Date: Fri, 17 Nov 2023 18:15:39 +0800
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DC685;
+	Fri, 17 Nov 2023 02:18:32 -0800 (PST)
+X-UUID: 89447f97b7be4fe2a5abb71fe48af864-20231117
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:8c676f36-530e-4e2c-8dbc-4bdd016b5871,IP:15,
+	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:20
+X-CID-INFO: VERSION:1.1.32,REQID:8c676f36-530e-4e2c-8dbc-4bdd016b5871,IP:15,UR
+	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:20
+X-CID-META: VersionHash:5f78ec9,CLOUDID:0e952d60-c89d-4129-91cb-8ebfae4653fc,B
+	ulkID:2311171818217W1R421N,BulkQuantity:0,Recheck:0,SF:19|44|66|38|24|17|1
+	02,TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 89447f97b7be4fe2a5abb71fe48af864-20231117
+X-User: chentao@kylinos.cn
+Received: from vt.. [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 680025267; Fri, 17 Nov 2023 18:18:18 +0800
+From: Kunwu Chan <chentao@kylinos.cn>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: kunwu.chan@hotmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kunwu Chan <chentao@kylinos.cn>
+Subject: [PATCH] net: sched: Fix restricted __be16 degrades to integer
+Date: Fri, 17 Nov 2023 18:18:15 +0800
+Message-Id: <20231117101815.1867175-1-chentao@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/9] net: mdio: ipq4019: add qca8084 configurations
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <agross@kernel.org>, <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-9-quic_luoj@quicinc.com>
- <a1954855-f82d-434b-afd1-aa05c7a1b39b@lunn.ch>
- <2ca3c6eb-93da-4e44-aa6b-c426b8baecb9@quicinc.com>
- <be36ecb8-8bd7-4756-927e-fa5f266510da@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <be36ecb8-8bd7-4756-927e-fa5f266510da@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 2dw2gS6QUg8AWgRyYjJ25oQg8Luqo6Nx
-X-Proofpoint-ORIG-GUID: 2dw2gS6QUg8AWgRyYjJ25oQg8Luqo6Nx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-17_08,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- mlxscore=0 suspectscore=0 mlxlogscore=596 clxscore=1015 lowpriorityscore=0
- malwarescore=0 adultscore=0 priorityscore=1501 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311060000
- definitions=main-2311170075
+Content-Transfer-Encoding: 8bit
 
+net/sched/cls_api.c:2010:25: warning: restricted __be16 degrades to integer
+net/sched/cls_api.c:2695:50: warning: restricted __be16 degrades to integer
 
+Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+---
+ net/sched/cls_api.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 11/17/2023 1:12 AM, Andrew Lunn wrote:
-> On Thu, Nov 16, 2023 at 06:47:08PM +0800, Jie Luo wrote:
->>
->>
->> On 11/16/2023 12:20 AM, Andrew Lunn wrote:
->>> On Wed, Nov 15, 2023 at 11:25:14AM +0800, Luo Jie wrote:
->>>> The PHY & PCS clocks need to be enabled and the reset
->>>> sequence needs to be completed to make qca8084 PHY
->>>> probeable by MDIO bus.
->>>
->>> Is all this guaranteed to be the same between different boards? Can
->>> the board be wired differently and need a different configuration?
->>>
->>>       Andrew
->>
->> Hi Andrew,
->> This configuration sequence is specified to the qca8084 chip,
->> not related with the platform(such as ipq5332).
->>
->> All these configured registers are located in qca8084 chip, we need
->> to complete these configurations to make MDIO bus being able to
->> scan the qca8084 PHY(PHY registers can be accessed).
-> 
-> So nothing here has anything to do with the actual PHYs on the bus?
-> The only clock exposed here is MDC, and that runs at the standard
-> 2.5MHz? All the clock tree configuration is completely internal to the
-> SOC?
-> 
-> What we don't want is some hard coded configuration which only works
-> for one specific reference design.
-> 
-> 	Andrew
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index f73f39f61f66..4c47490eb0c1 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -2007,7 +2007,7 @@ static int tcf_fill_node(struct net *net, struct sk_buff *skb,
+ 		tcm->tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
+ 		tcm->tcm_block_index = block->index;
+ 	}
+-	tcm->tcm_info = TC_H_MAKE(tp->prio, tp->protocol);
++	tcm->tcm_info = TC_H_MAKE(tp->prio, be16_to_cpu(tp->protocol));
+ 	if (nla_put_string(skb, TCA_KIND, tp->ops->kind))
+ 		goto nla_put_failure;
+ 	if (nla_put_u32(skb, TCA_CHAIN, tp->chain->index))
+@@ -2692,7 +2692,7 @@ static bool tcf_chain_dump(struct tcf_chain *chain, struct Qdisc *q, u32 parent,
+ 		    TC_H_MAJ(tcm->tcm_info) != tp->prio)
+ 			continue;
+ 		if (TC_H_MIN(tcm->tcm_info) &&
+-		    TC_H_MIN(tcm->tcm_info) != tp->protocol)
++		    TC_H_MIN(tcm->tcm_info) != be16_to_cpu(tp->protocol))
+ 			continue;
+ 		if (*p_index > index_start)
+ 			memset(&cb->args[1], 0,
+-- 
+2.34.1
 
-These configured registers are related with PHYs, which is located in
-the qca8084 PHY chip, qca8084 PHY chip includes the GCC register that
-is not from the SOC(ipq5332), is a internal part of qca8084 PHY.
-
-qca8084 PHY works on 6.25MHZ and other clock rates below 6.25MHZ.
-
-will move these clock configurations using the clock APIs into the PHY
-probe function in the next patch set, since it is the internal configs
-of qca8084 PHY.
 
