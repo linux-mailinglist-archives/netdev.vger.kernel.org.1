@@ -1,90 +1,161 @@
-Return-Path: <netdev+bounces-48670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDDB17EF2A0
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:28:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56A717EF2B3
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 13:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF82D1C20AA7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:28:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CDA91F26CDA
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 12:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232DF30D0B;
-	Fri, 17 Nov 2023 12:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7251330F99;
+	Fri, 17 Nov 2023 12:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hsz3y+hw"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aKJz0heS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557DBD8
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 04:28:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Fis/JlPpua9SQilrCVejEM8RMkkoIyD4dH+yAJHa/yA=; b=hsz3y+hwsflKHMT/W02jQ+xIjJ
-	0ixCO9qNu9+TiZIaB0eoJk4WLR0IsrqMobjg37DzHNOao/c63OUOG0Aov+6ODAJiNivovi4gYw8FB
-	rtiQIAt+pLXbv2C1gwdoYjRPP1h3917j34hu44YhOO3oP27TqlF/GoCqzp8b5CJQamiM++peIDCAO
-	9i+QtYBohBBJdPbV9OAcVXV1Z8I8Kg0JxlLmGA82ysRwtDtJudcmHFdztPCOfBrzxGB4fH2opKyAi
-	9JsLsx27CwYdNpyNGcZYqAEaf9t3YOobx6AzlAw05dyz1T1fk7UuUj5Rxfn9q5Ygv2zqN3lYjzwCv
-	T/eSSRPA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53150)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r3xxF-0002pu-0R;
-	Fri, 17 Nov 2023 12:28:13 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r3xxF-00007E-Eu; Fri, 17 Nov 2023 12:28:13 +0000
-Date: Fri, 17 Nov 2023 12:28:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 05/10] net: sfp: Convert to platform remove
- callback returning void
-Message-ID: <ZVdcXf9/HVs+T6sW@shell.armlinux.org.uk>
-References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
- <20231117095922.876489-6-u.kleine-koenig@pengutronix.de>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA33D4D;
+	Fri, 17 Nov 2023 04:36:08 -0800 (PST)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AHCZqrf025251;
+	Fri, 17 Nov 2023 12:36:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=VFrrJONvLmL4b2eHMwp2aJoejodP1lZ42Ka/u1xyYsI=;
+ b=aKJz0heSn7f6wiuTdoZkYhIL8tQVQOqtsWnwlIc3mUttpx1V0tRpn/glGbW2hsvSLVip
+ RF3kHvuNXY4NCDxVRI+G1Sgap7Ku8U0NNZQ2CeQMSeMuXF0qFfSigtuAqYhO4oyDwn/S
+ 8Fk2z07WGAOx3O4yh5lxrk+/Yz0x+ZYiLfbZ9BIKPMQMbrTSki75SK+RR81kp5jFTPYH
+ gI2VJKcbv1VOVnfj7XQuWBahsO+lZokCGwGegHTlINaTAVWoQdXqPLYvyay4ye+xGGTD
+ UpGuNPWae/sqPswrpT3bTZopaWiqtfpaw4OOD/Yr75O6DBcA2mJVYijinhoTRtA3J/s/ bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ue7trrx4d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 12:36:05 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AHCZwWD026197;
+	Fri, 17 Nov 2023 12:36:05 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ue7trrx1r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 12:36:04 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AHAYG8M005594;
+	Fri, 17 Nov 2023 12:36:01 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uamayx14a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 12:36:00 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AHCa06p16843452
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Nov 2023 12:36:00 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2094A58058;
+	Fri, 17 Nov 2023 12:36:00 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BEE805805B;
+	Fri, 17 Nov 2023 12:35:57 +0000 (GMT)
+Received: from [9.171.21.89] (unknown [9.171.21.89])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Nov 2023 12:35:57 +0000 (GMT)
+Message-ID: <7fe3a213-3d2e-42d5-b44b-bbd761a01bba@linux.ibm.com>
+Date: Fri, 17 Nov 2023 13:35:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231117095922.876489-6-u.kleine-koenig@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/smc: avoid data corruption caused by decline
+Content-Language: en-GB
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+        jaka@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: anPyA8iWLD8gqgkN3Rk6WnFnb1TwYNEH
+X-Proofpoint-ORIG-GUID: zGlS5DiPKERTsYoFDxchQkZyJoe0WWff
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-17_11,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 phishscore=0 mlxlogscore=777 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 impostorscore=0 adultscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311170093
 
-On Fri, Nov 17, 2023 at 10:59:28AM +0100, Uwe Kleine-König wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
+
+
+On 17.11.23 05:59, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
 > 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
+> We found a data corruption issue during testing of SMC-R on Redis
+> applications.
 > 
-> Trivially convert this driver from always returning zero in the remove
-> callback to the void returning variant.
+> The benchmark has a low probability of reporting a strange error as
+> shown below.
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> "Error: Protocol error, got "\xe2" as reply type byte"
+> 
+> Finally, we found that the retrieved error data was as follows:
+> 
+> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+> 
+> It is quite obvious that this is a SMC DECLINE message, which means that
+> the applications received SMC protocol message.
+> We found that this was caused by the following situations:
+> 
+> client			server
+> 	   proposal
+> 	------------->
+> 	   accept
+> 	<-------------
+> 	   confirm
+> 	------------->
+> wait confirm
+> 
+> 	 failed llc confirm
+> 	    x------
+> (after 2s)timeout
+> 			wait rsp
+> 
+> wait decline
+> 
+> (after 1s) timeout
+> 			(after 2s) timeout
+> 	    decline
+> 	-------------->
+> 	    decline
+> 	<--------------
+> 
+> As a result, a decline message was sent in the implementation, and this
+> message was read from TCP by the already-fallback connection.
+> 
+> This patch double the client timeout as 2x of the server value,
+> With this simple change, the Decline messages should never cross or
+> collide (during Confirm link timeout).
+> 
+> This issue requires an immediate solution, since the protocol updates
+> involve a more long-term solution.
+> 
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hi D.Wythe,
 
-Thanks!
+I think you understood me wrong. I mean we don't need sysctl. I like the 
+first version more, where you just need to add some comments in the code.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+Wenjia
 
