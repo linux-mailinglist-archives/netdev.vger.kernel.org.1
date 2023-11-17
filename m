@@ -1,170 +1,96 @@
-Return-Path: <netdev+bounces-48568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F05007EEDF4
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:58:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0227EEDEE
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:57:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BF5B1F262EA
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:58:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC3E12811A7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 08:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A57D50E;
-	Fri, 17 Nov 2023 08:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E21BD299;
+	Fri, 17 Nov 2023 08:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="fbTB1TKj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="n/XiA9A5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C3A11F;
-	Fri, 17 Nov 2023 00:58:43 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id A64B9120097;
-	Fri, 17 Nov 2023 11:58:40 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru A64B9120097
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1700211520;
-	bh=HN+PvIjLqzQn6wjZP926vHy0wPu+a4K5ITDOFK7AlOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
-	b=fbTB1TKjZE9AIUNudoR0Vy7AVqsTakFba2sLFRyrNstMcANH1pgsLVYXHK6ITrOE+
-	 RU3YvcWfqGgqUCZPQ41moC7zCReP6GTarQHJx0ZYEXm5HuKHgtp4522pitd2wYYxhj
-	 60npuohOI7JFMtLNBsJpdD5RqkxFG/eN6vlFJdIDPDFZ6ENtP1WhdMbe4YvZaOXzSb
-	 gU0RryRcspaEmkqh50nWKgHrDNnf+ELoT6vqhDmJ5yikPagei9i6Ao9Lqkz0at6c5k
-	 SjfoqusdKk5ydlEcvuDF/GlwKsMovwEJjm/jfgKwK1o7cRSbYMQm2ThR5niBnw7M37
-	 J+IcbfY7hiGjQ==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 17 Nov 2023 11:58:40 +0300 (MSK)
-Received: from [192.168.0.106] (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 17 Nov 2023 11:58:40 +0300
-Message-ID: <1700ac19-a355-fad4-79e2-7598ee33bd00@salutedevices.com>
-Date: Fri, 17 Nov 2023 11:50:59 +0300
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67141A5;
+	Fri, 17 Nov 2023 00:56:55 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C5CD61BF208;
+	Fri, 17 Nov 2023 08:56:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700211414;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=leBuYmiuIsLgv0yNkP9hLoHkOgcVyrVhTX124DlAon4=;
+	b=n/XiA9A5RLzOYcQ7AabAP58e6appuXIZiPT/cIAikp3A8eCCxbWFxXufGk8si2vkHTDy77
+	fVAPmaAC2hXZCnqNQvBbxnLqK3yCCQkG7XitU4tyQp+iewHV264WrTZQeRAQo1J9+PBKmk
+	sqoABxYhaJ5zD9zQ9ql5h4zRviGWkQGfciH0TEZup0N0PHksnYHqVHJog0mImow3J0IjCV
+	kYR7me680jK9tlMgeW+2D7X7SBy2vilCeKqDlZtC4aPvVNXbYzos347SyC1l5UNgyvadqz
+	XQrmgOpOIi+9x24KtDBmcXmRW8cx3OlEQTS6jUHmU0iMb0ae5lCx/5/KKN9Z9g==
+Date: Fri, 17 Nov 2023 09:56:51 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 7/9] firmware_loader: Expand Firmware upload
+ error codes
+Message-ID: <20231117095651.5f569fcb@kmaincent-XPS-13-7390>
+In-Reply-To: <014c6bb7-178f-44cf-872f-eb4d59a80756@lunn.ch>
+References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
+	<20231116-feature_poe-v1-7-be48044bf249@bootlin.com>
+	<20231116-t-shirt-supreme-581c8882d5cc@squawk>
+	<014c6bb7-178f-44cf-872f-eb4d59a80756@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [RFC PATCH v1 2/2] vsock/test: SO_RCVLOWAT + deferred credit
- update test
-To: Stefano Garzarella <sgarzare@redhat.com>
-CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
-	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
-References: <20231108072004.1045669-1-avkrasnov@salutedevices.com>
- <20231108072004.1045669-3-avkrasnov@salutedevices.com>
- <zukasb6k7ogta33c2wik6cgadg2rkacestat7pkexd45u53swh@ovso3hafta77>
- <923a6149-3bd5-c5b4-766d-8301f9e7484a@salutedevices.com>
- <tbvwohgvrc6kvlsyap3sk5zqww5q6schsu4szx7e23wgg7pvb3@e7xa5mg5inul>
-Content-Language: en-US
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-In-Reply-To: <tbvwohgvrc6kvlsyap3sk5zqww5q6schsu4szx7e23wgg7pvb3@e7xa5mg5inul>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [100.64.160.123]
-X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181429 [Nov 17 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;docs.kernel.org:7.1.1;100.64.160.123:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2023/11/17 08:17:00
-X-KSMG-LinksScanning: Clean, bases: 2023/11/17 08:17:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/17 07:09:00 #22469944
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Thu, 16 Nov 2023 22:56:10 +0100
+Andrew Lunn <andrew@lunn.ch> wrote:
 
+> > This would be rather helpful to me for some stuff that I am currently
+> > working on and was hoping to send to Arnd for inclusion in 6.8:
+> > https://lore.kernel.org/all/20231020-series-uncooked-077b107af3ae@spud/
+> >=20
+> > I'm currently returning a "HW_ERROR" for something that this would fit
+> > the bill for (in mpfs_auto_update_write()). What would the ETA for this
+> > stuff landing via the net tree be?
+> > Since I am not a netdev contributor its hard to tell how controversial
+> > these patches are! =20
+>=20
+> It already has the needed ACKs, so it could be merged
+> anytime. However, it seems like two different subsystems are
+> interested in it. So rather than merge it via netdev, it might make
+> sense to merge it via its normal tree, driver-core. Then ask for a
+> stable branch which can be pulled into netdev and arm-soc.
 
-On 17.11.2023 11:30, Stefano Garzarella wrote:
-> On Fri, Nov 17, 2023 at 10:12:38AM +0300, Arseniy Krasnov wrote:
->>
->>
->> On 15.11.2023 14:11, Stefano Garzarella wrote:
->>> On Wed, Nov 08, 2023 at 10:20:04AM +0300, Arseniy Krasnov wrote:
->>>> This adds test which checks, that updating SO_RCVLOWAT value also sends
->>>
->>> You can avoid "This adds", and write just "Add test ...".
->>>
->>> See https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
->>>
->>>     Describe your changes in imperative mood, e.g. "make xyzzy do frotz"
->>>     instead of "[This patch] makes xyzzy do frotz" or "[I] changed xyzzy
->>>     to do frotz", as if you are giving orders to the codebase to change
->>>     its behaviour.
->>>
->>> Also in the other patch.
->>>
->>>> credit update message. Otherwise mutual hungup may happen when receiver
->>>> didn't send credit update and then calls 'poll()' with non default
->>>> SO_RCVLOWAT value (e.g. waiting enough bytes to read), while sender
->>>> waits for free space at receiver's side.
->>>>
->>>> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
->>>> ---
->>>> tools/testing/vsock/vsock_test.c | 131 +++++++++++++++++++++++++++++++
->>>> 1 file changed, 131 insertions(+)
->>>>
->>>> diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->>>> index c1f7bc9abd22..c71b3875fd16 100644
->>>> --- a/tools/testing/vsock/vsock_test.c
->>>> +++ b/tools/testing/vsock/vsock_test.c
->>>> @@ -1180,6 +1180,132 @@ static void test_stream_shutrd_server(const struct test_opts *opts)
->>>>     close(fd);
->>>> }
->>>>
->>>> +#define RCVLOWAT_CREDIT_UPD_BUF_SIZE    (1024 * 128)
->>>> +#define VIRTIO_VSOCK_MAX_PKT_BUF_SIZE    (1024 * 64)
->>>
->>> What about adding a comment like the one in the cover letter about
->>> dependency with kernel values?
->>>
->>> Please add it also in the commit description.
->>>
->>> I'm thinking if we should move all the defines that depends on the
->>> kernel in some special header.
->>
->> IIUC it will be new header file in tools/testing/vsock, which includes such defines. At
->> this moment in will contain only VIRTIO_VSOCK_MAX_PKT_BUF_SIZE. Idea is that such defines
-> 
-> So this only works on the virtio transport though, not the other
-> transports, right? (but maybe the others don't have this problem, so
-> it's fine).
+Ok, I will remove this patch from this series in v2 and send it through nor=
+mal
+tree.
 
-Yes, this case is only actual in virtio as this logic exists in virtio
-only (the same situation as for skb merging sometimes ago).
-
-> 
->> are not supposed to use by user (so do not move it to uapi headers), but needed by tests
->> to check kernel behaviour. Please correct me if i'm wrong.
-> 
-> Right!
-> Maybe if it's just one, we can leave it there for now, but with a
-> comment on top explaining where it comes.
-
-Ok, got it, I'll add comment
-
-Thanks, Arseniy
-
-> 
-> Thanks,
-> Stefano
-> 
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
