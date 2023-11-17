@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-48601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8F617EEED1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:39:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A937EEED2
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 513FD2812B0
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:39:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D072CB20BA0
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5621548D;
-	Fri, 17 Nov 2023 09:39:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E4915E99;
+	Fri, 17 Nov 2023 09:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1sTyn8Co"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RaFKD1dK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55EE9D4E
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:06 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-5a828bdcfbaso28535317b3.2
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:06 -0800 (PST)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5470DC4
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:09 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5a7cf717bacso28575257b3.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700213945; x=1700818745; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1700213948; x=1700818748; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8uh/1N+tGpZdyYYLem5NQUA0RzoK2GeeFDzKLPiN8o=;
-        b=1sTyn8CoYXFBhab9awtossnzDuH8n6i5YokbNR2q1TRbwhFEQnXVUidMzTo4+Iz40U
-         WSieg9U9QrXWC59B9NlfGS22S3Drj/3jb8B4/JVGmUqjFkbCSs+8qkJ7i3Mca0qaVUiA
-         pMImzlC1UQbE1lJ1GB+RNCO4S2AY1FzBxKnkp/53n7Q678TU/wCsQTM4QpzY0t+VVemo
-         7R4LBW8fp7hX80WmwrCZxiPfQaUqK1rpGLNLMAKAUyArj/zLP8dF2adA7QXXVmlHVNMx
-         C1YSo9V64vIuMeduYE7FIh2jL8xHr1Bv9pUafppQhBlVuXnS8liO0uRY0uj1jpE59z2m
-         piCQ==
+        bh=IpT542f+phIKyvAyToXvA4pst7LsQBljei9NjXJWFY4=;
+        b=RaFKD1dKmGWQ4gvltIBoLO8I2u3AfoO4/OK2I3pAl0Ig3QKD71PCH0iDvmPvqosr9m
+         3Ec9srMthwSdKAQirKmuzM8kHKvVr/2NgvFUcD0rzPA6bMWnd/V0+AzqjZ+xydB2FoJ6
+         QU/mm+MZ0rwhBFiOUqSF62Gx+AB2APIAA8xwuNKF8cyG79QEEBV9UkDE5iG4OvSVq9dP
+         UnL/I6AVHk3fuoOF0m1Nhbd4/g1l8rJL6CgOXYFW94kI6wLr3daPwIVAeFhGhjQVBjMX
+         x/gDPCAbodOcuSlALwHYeQVm2ht9+K0VRj8NfxMJyXKlvKokMmurooFCmVm4oAt8dN7A
+         eIlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700213945; x=1700818745;
+        d=1e100.net; s=20230601; t=1700213948; x=1700818748;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C8uh/1N+tGpZdyYYLem5NQUA0RzoK2GeeFDzKLPiN8o=;
-        b=ekw9zRi5xf/GvFjZUTl55eswLRSHBSJKukEZdM8EMAP4aGcXX0ZiGukYYe73Tc6PBb
-         DtESywOSbIhEgk9Th30TMvOrtzVXMN+nejXYYS1FGSgDrcNZsqTg84IuJohUOiPJet4V
-         gY8B+NG4lmXyCp6oUj6C7ZAyKnSx/j+sX0Qbe4jPb9TUj4nFEedhv9c1Ie5xYUSO0uZZ
-         vbWXIeSg0cT8QkDDYO4SFLSZi4Dt7cgGwQhUEH1+VJH5mOg5cPkt7pdpLE9EuDjojGEk
-         pUJayTfLMGjNmn0398ZQavcK1u0TZ+IIb0kVPjSE0oufq6u+dcKDuggMplPihzbikN9Y
-         VRJA==
-X-Gm-Message-State: AOJu0Ywkk8/eOv55XRYyXlMxZz9MalxTQzFeQhAh67CB129uFrJLKrCK
-	7ta8cLHfLsjGtAG8xmhf0g2k4pVpH5Dl2Pk=
-X-Google-Smtp-Source: AGHT+IHkqIXq7+Zj+gED8zOASIYbuaF5VQEeDHm9lNOkZoLOGVYm0Gmi0uphUL15OmVFDmSbz7r0W+C1B3Fi61Q=
+        bh=IpT542f+phIKyvAyToXvA4pst7LsQBljei9NjXJWFY4=;
+        b=gYEOHf4uUBLTWDH42OoyktCLEMz7/qJo1CD7uB61YJxvCtzEG4c3wi/cyc76mELoNp
+         OpxC4RgEcExRcwCQs0I9Y8OT+z4D0i4EzyPG5lN2j8mNmJXN06UCWpxwF4WKiatBec55
+         3omAXQubyW6akwsc/z9EDukCzqvzGUxoBXGuz0dPOidXRrBypstnL0oDKhfdKGs/7I5g
+         +HNLJc0EfBLrxUYHU+F8JOaXD9TiXF5Ld33MKfz7h3Swcgx32LkJQnUf6DPHcDmL+EJD
+         5qLCEnvMqhSA7yP6gHkVxc7+sNRfvYW4wnFNEB6AtD4BR/Nh1DYZD+TbfPMorxU9szqc
+         BKSw==
+X-Gm-Message-State: AOJu0YwSdBHQyRMebfiblZdNxuxu3dxb3aGeKdX1kNtJQT0aQNdjU74h
+	1poBSwq3Y7i+iN3YQLnaq2dFBMudLjHg0hE=
+X-Google-Smtp-Source: AGHT+IEYCWqXA585PlgRjcGto1ItBPj05lx45i7zVzrdwWlxdE91oadnFJjcOak+GdItx5loAACpojtArUUFVMo=
 X-Received: from aliceryhl2.c.googlers.com ([fda3:e722:ac3:cc00:68:949d:c0a8:572])
- (user=aliceryhl job=sendgmr) by 2002:a81:6d02:0:b0:5be:a164:566d with SMTP id
- i2-20020a816d02000000b005bea164566dmr484689ywc.1.1700213945524; Fri, 17 Nov
- 2023 01:39:05 -0800 (PST)
-Date: Fri, 17 Nov 2023 09:39:03 +0000
+ (user=aliceryhl job=sendgmr) by 2002:a05:6902:182:b0:d9a:ec95:9687 with SMTP
+ id t2-20020a056902018200b00d9aec959687mr460275ybh.11.1700213948536; Fri, 17
+ Nov 2023 01:39:08 -0800 (PST)
+Date: Fri, 17 Nov 2023 09:39:05 +0000
 In-Reply-To: <20231026001050.1720612-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -59,7 +59,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20231026001050.1720612-2-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231117093903.2514513-1-aliceryhl@google.com>
+Message-ID: <20231117093906.2514808-1-aliceryhl@google.com>
 Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
 From: Alice Ryhl <aliceryhl@google.com>
 To: fujita.tomonori@gmail.com
@@ -86,112 +86,76 @@ FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
 > 
 > Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-I promised Andrew to take a look at these patches at Plumbers. This
-email contains the first part of my review.
+In this reply, I go through my minor nits:
 
-In this email, I will bring up the question of how the safety comments
-should be worded. I know that you've probably discussed this before, but
-my opinion was asked for, and this is the main area where I think
-there's room for improvement.
+> +use crate::{
+> +    prelude::{vtable, Pin},
+> +};
 
-> +    /// # Safety
-> +    ///
-> +    /// This function must only be called from the callbacks in `phy_driver`.
-> +    unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
+Normally, if you're importing specific prelude items by name instead of
+using prelude::*, then you would import them using their non-prelude
+path.
 
-This kind of safety comment where you say "must only be used by internal
-code and nothing else" isn't great. It doesn't really help with checking
-the correctness. It's usually better to document what is actually
-required here, even if it shouldn't be called by non-internal code. I
-recommend something along the lines of:
+> +#[derive(PartialEq)]
+> +pub enum DeviceState {
 
-	# Safety
-	
-	For the duration of 'a, the pointer must point at a valid `phy_device`,
-	and the caller must hold the X mutex.
+If you add PartialEq and you can add Eq, then also add Eq.
 
-Then in methods like this: (which are missing justification for why
-there's no data race!)
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        unsafe { (*phydev).phy_id }
-you instead say:
+> +/// An adapter for the registration of a PHY driver.
+> +struct Adapter<T: Driver> {
+> +    _p: PhantomData<T>,
+> +}
 
-	SAFETY: By the struct invariants, `phydev` points at a valid
-	`phy_device`, and we hold the X lock, which gives us access to
-	the `phy_id` field.
+You don't need this struct. The methods can be top-level functions.
 
-And you would also update the struct invariant accordingly:
+But I know that others have used the same style of defining a useless
+struct, so it's fine with me.
 
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts that the X
-/// mutex is held.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
+> +    /// Defines certain other features this PHY supports.
+> +    /// It is a combination of the flags in the [`flags`] module.
+> +    const FLAGS: u32 = 0;
 
+You need an empty line between the two lines if you intend for them to
+be separate lines in rendered documentation.
 
+> +#[vtable]
+> +pub trait Driver {
+> +    /// Issues a PHY software reset.
+> +    fn soft_reset(_dev: &mut Device) -> Result {
+> +        Err(code::ENOTSUPP)
+> +    }
+>      [...]
+> +}
 
+I believe that the guidance for what to put in optional vtable-trait
+methods was changed in:
 
+https://lore.kernel.org/all/20231026201855.1497680-1-benno.lossin@proton.me/
 
-> +// During the calls to most functions in [`Driver`], the C side (`PHYLIB`) holds a lock that is
-> +// unique for every instance of [`Device`]. `PHYLIB` uses a different serialization technique for
-> +// [`Driver::resume`] and [`Driver::suspend`]: `PHYLIB` updates `phy_device`'s state with
-> +// the lock held, thus guaranteeing that [`Driver::resume`] has exclusive access to the instance.
-> +// [`Driver::resume`] and [`Driver::suspend`] also are called where only one thread can access
-> +// to the instance.
+> +// SAFETY: `Registration` does not expose any of its state across threads.
+> +unsafe impl Send for Registration {}
 
-I used "X mutex" as an example for the synchronization mechanism in the
-above snippets, but it sounds like its more complicated than that? Here
-are some possible alternatives I could come up with:
+I would change this to "it's okay to call phy_drivers_unregister from a
+different thread than the one in which phy_drivers_register was called".
 
-Maybe we don't need synchronization when some operations can't happen?
+> +// SAFETY: `Registration` does not expose any of its state across threads.
+> +unsafe impl Sync for Registration {}
 
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts that the X
-/// mutex is held, or that there are no concurrent operations of type Y.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
+Here, you can say "Registration has no &self methods, so immutable
+references to it are useless".
 
-Maybe we have a separate case for when the device is being initialized
-and nobody else has access yet?
+> +    // macro use only
+> +    #[doc(hidden)]
+> +    pub const fn mdio_device_id(&self) -> bindings::mdio_device_id {
+> +        bindings::mdio_device_id {
+> +            phy_id: self.id,
+> +            phy_id_mask: self.mask.as_int(),
+> +        }
+> +    }
 
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts that the X
-/// mutex is held, or that the reference has exclusive access to the
-/// entire `phy_device`.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
-
-Maybe it is easier to just list the fields we need access to?
-
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts exclusive
-/// access to the following fields: phy_id, state, speed, duplex. And
-/// read access to the following fields: link, autoneg_complete,
-/// autoneg.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
-
-Perhaps we want to avoid duplication with some existing C documentation?
-
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts that the user
-/// is inside a Y scope as defined in Documentation/foo/bar.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
-
-But I don't know how these things are actually synchronized. Maybe
-it is some sixth option. I would be happy to help draft these safety
-comments once the actual synchronization mechanism is clear to me.
-
-Or maybe you prefer to not do it this way, or to punt it for a later
-patch series. I prefer to document these things in the above way, but
-ultimately it is not up to me.
+This is fine, but I probably would just expose it for everyone. It's not
+like it hurts if non-macro code can call this method, even if it doesn't
+have a reason to do so.
 
 Alice
-
 
