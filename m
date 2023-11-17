@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-48740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE2817EF641
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:32:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F277EF658
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:39:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18A291C20A6E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:32:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44D412812B2
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6659E30640;
-	Fri, 17 Nov 2023 16:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7CCFD537;
+	Fri, 17 Nov 2023 16:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vp+mbtyy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c5XcwCnX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96935194
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 08:32:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=JEIhwEZuA/EO5C5JK29s8qNEnP4zzyp4aUEl26D2TUQ=; b=Vp+mbtyyC1mmOfUn6Ew43wFpx1
-	m83kTh09Se3RYc5DhWP/qlPeygFI6efy5UuSiUdQaJ9XfvI6xwLVVPn8/xB+babZSSzvi1yY4Lfsh
-	GNetwoKQShg32SuvfZ+kXGjCyJ9zUTDfPEzbHqvuSBFcTIojaBHf6SWv9TLLj8fB1u6mXbeyf6c5s
-	ar8Aq+s621uBIHY4suu7F6EGKZrJv0NWHbxvq9ukvWhMlgcfx67GLVRUPwFNMeztGv0qafbIrL/QU
-	MqkPHWUjnBC7hcSHws1pT1U6aH3olW8OB8CmU3YTKZIoXKYpzYYV7CEoZWK/WYMVCT0ZB7kT0fHo/
-	kr5DhuiQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33444)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1r41lt-000329-13;
-	Fri, 17 Nov 2023 16:32:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1r41lu-0000HA-Vc; Fri, 17 Nov 2023 16:32:46 +0000
-Date: Fri, 17 Nov 2023 16:32:46 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phylink: use for_each_set_bit()
-Message-ID: <ZVeVrmhZ3GNuE9Yx@shell.armlinux.org.uk>
-References: <E1r3yPo-00CnKQ-JG@rmk-PC.armlinux.org.uk>
- <84b4b1b4-83e7-477b-9316-21c7a76689aa@lunn.ch>
- <ZVeSEv2nN1xioYz5@shell.armlinux.org.uk>
- <07171a9c-ef9c-4dcd-a977-61a7a068dfc6@lunn.ch>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAA94314F
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 16:39:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B380C433C8;
+	Fri, 17 Nov 2023 16:39:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700239185;
+	bh=+JrmKj3mBKSiC/k/Qe2Mzlg1mFGKhEnoV+aFAXa9hqA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=c5XcwCnXEdDMdJeSehfgv1oU9+7vZb0AJtrzZ/uQ3G5PXj68UHxbSCyFvUAbe0tfT
+	 afAlYzOS38cFD0crs6UlDue3C+pIgVYyRGLR3ESgnWrbbrgmGSNwHnLdL5vYcjeqet
+	 jT6SRZ7zU3FilJmLJTtTy2DVNBZnEAhzjpQjmQ7J1pK4WV8J3JVt6+rnN68um2ilLx
+	 eW6X4DkzLOhCdAzDe7+0EIFX5BhV7OS08V4DN1fYx7w3yMh7iLn8+P1g3DCsY3EccG
+	 XtGlk7okjytQYjFWOY9YI0LYsRqJxi1j9F70reNE32qpaBJnYAp+oBaDuu8BNm38G7
+	 WNZUi64S1afhA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: nbd@nbd.name,
+	john@phrozen.org,
+	sean.wang@mediatek.com,
+	Mark-MC.Lee@mediatek.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lorenzo.bianconi@redhat.com
+Subject: [PATCH net-next] net: ethernet: mtk_wed: rely on __dev_alloc_page in mtk_wed_tx_buffer_alloc
+Date: Fri, 17 Nov 2023 17:39:22 +0100
+Message-ID: <a7c859060069205e383a4917205cb265f41083f5.1700239075.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <07171a9c-ef9c-4dcd-a977-61a7a068dfc6@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 17, 2023 at 05:30:41PM +0100, Andrew Lunn wrote:
-> > Hmm, indeed, thanks for spotting. I always forget whether I'll need to
-> > send a v2 for something this trivial or whether netdev folk will fix
-> > it up when committing it. I'm happy to resend.
-> 
-> You should resend. netdev patch acceptance is pretty bot driven, with
-> the normal 'fast path' not allowing the patch to be edited by the
-> merger.
+Simplify the code and use __dev_alloc_page() instead of __dev_alloc_pages()
+with order 0 in mtk_wed_tx_buffer_alloc routine
 
-I think it does happen sometimes? Or maybe I'm misremembering with other
-subsystems...
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/mediatek/mtk_wed.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
+index 9a6744c0d458..2ac35543fcfb 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed.c
+@@ -670,7 +670,7 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
+ 		void *buf;
+ 		int s;
+ 
+-		page = __dev_alloc_pages(GFP_KERNEL, 0);
++		page = __dev_alloc_page(GFP_KERNEL);
+ 		if (!page)
+ 			return -ENOMEM;
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.42.0
+
 
