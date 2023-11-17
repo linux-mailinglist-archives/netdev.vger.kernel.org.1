@@ -1,95 +1,326 @@
-Return-Path: <netdev+bounces-48701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69A187EF4E7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:09:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7277EF4E9
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 496B8B209E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:09:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A0ACB209E6
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FF713035F;
-	Fri, 17 Nov 2023 15:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CCF3035A;
+	Fri, 17 Nov 2023 15:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="auW2A490"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="IhdAyDwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162A2D56
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 07:09:32 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 649A6C0009;
-	Fri, 17 Nov 2023 15:09:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700233771;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UXuNjUVN/i3SDyFOHUKZtsOeHvcsrFLBDRIHM+JisT8=;
-	b=auW2A490Mc6Ork0k0BQPL0UgqqtwKKXb0WYiRcnxmEtIr3/zW3sqJ/OC7+gk8K1crrHu5L
-	ukiJSC7kDfuzGKpa9Vd6TKvKJFWquw4yYbq99M01GuYu/STpuT2fkD5v3AjoBt5Ephemwq
-	etThRVgND/bsidndu8yUSLWrNOghB3qsnUxQyqaGeVStdiH+Q8diZx9DzVdz58YxpHdPJt
-	BuHw6UKAplKQcZi7Gx8qrUxnXjaUdHlPLPCdJ2/UVJbyxc0AhM4quzDTc7itr7p/01EQVY
-	YSJ6NXlz8EhJEjuYUXhYYvmKMv3g2d2QQ0w9yg08Frl/t7DSNCY4eBN3+h/86A==
-Date: Fri, 17 Nov 2023 16:09:28 +0100
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, Wei Fang
- <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, Russell King <linux@armlinux.org.uk>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-imx@nxp.com, netdev@vger.kernel.org, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: Ethernet issue on imx6
-Message-ID: <20231117160928.04ba5359@xps-13>
-In-Reply-To: <20231027225836.11594bd5@xps-13>
-References: <20231012193410.3d1812cf@xps-13>
-	<8e970415-4bc3-4c6f-8cd5-4bbd20d9261d@lunn.ch>
-	<20231012155857.6fd51380@hermes.local>
-	<20231013102718.6b3a2dfe@xps-13>
-	<4736f0df-3db2-4342-8bc1-219cbdd996af@lunn.ch>
-	<20231027225836.11594bd5@xps-13>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60E58D57
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 07:11:41 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5c8c26cf056so2415797b3.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 07:11:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700233900; x=1700838700; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sjrSdC9pvnKdheRWEFlEs9nICPDqDurAxXTJp3YxT8c=;
+        b=IhdAyDwmWv8pHWoa5XTsdtJ8tnr5r4zzlqB2wJ6E93CHYFrQV1rjjnT66u3IlOxs0V
+         dF+207yektd3XayfJ8Nr6zfERvD0Mk+hbVpaonzuxe9aUz2BZepwGVlzsw5pPw3dMIP3
+         ziaq8uCa+FFF+EFLQrdmfNwDWX2kDkqmiW2Wp2BZtCe0Rmskt+5e6hs4IBpx9XVtGyFr
+         eDSrL+kpjsDCNGQ0cVb+kS3Vp0NOtJ3abbAhKoWt512RpiGcT3QkQJrU4TGkGnu4+gWi
+         ZppJmiwsueL29YloVq+bcBXeP+frBpNCJHfOyluZQaL99gRK/Yt5SBi660KFKI0LZhIt
+         nD3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700233900; x=1700838700;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sjrSdC9pvnKdheRWEFlEs9nICPDqDurAxXTJp3YxT8c=;
+        b=NsS/ISKXXVTSwTb5WtwkSQEE1Mk6LmQsUgo5Kby65ZSB1Seymbl0tln2Vewf23LSSf
+         FrthEkiGZ+oKJQqubtwHHQ0HTF4NnDpNOGL4/FnI0TuqbqcvBjaVY0Xxljo5d56pOqkQ
+         1q7Em19tCNOGME8OXHbiiL9+2RSIlSEKkMM7t8rG7VRWMpsim2NoaZ+RYPAnVpX+cMjQ
+         aNzqQwRKI0adSKRejEJuh3ksXR15hXMxkh0r4Lyf9bACG5MKTYvFefnrSw6hctBZGUrV
+         HUabPRpDJQrazCVuYLom8+s53AYnhOLrUAWcINNKEDMBSEZd8csQV4JXVD7+St8+oswT
+         R6Tw==
+X-Gm-Message-State: AOJu0YyVz1sZ2gSyIBSp6xTTnJZXOZsdAQDWRpRM8aK643lj1bIVfzMV
+	pfAF96+nMyJzR7EKQK6fv7O3vOjpYqoLloy7n/knQhsaio+fYE7exTs=
+X-Google-Smtp-Source: AGHT+IEDBn7xNxWFogQAYs52wAmGUgbdOCNqGbi58j1Oiw1Zly+UQureafxtP1DwBpWr16BWcHYH4/v2/mWBP5cLfGU=
+X-Received: by 2002:a81:5d88:0:b0:5a8:62f2:996a with SMTP id
+ r130-20020a815d88000000b005a862f2996amr20133661ywb.6.1700233900499; Fri, 17
+ Nov 2023 07:11:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-11-jhs@mojatatu.com>
+ <ZVZDH9OzqFvc3VSS@nanopsycho>
+In-Reply-To: <ZVZDH9OzqFvc3VSS@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 17 Nov 2023 10:11:29 -0500
+Message-ID: <CAM0EoM=KrC5dD=cC1H7+LsSXfxj386AD=Xpy3sG19QWaiFipCg@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 10/15] p4tc: add action template create,
+ update, delete, get, flush and dump
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
+	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hello,
+On Thu, Nov 16, 2023 at 11:28=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrot=
+e:
+>
+> Thu, Nov 16, 2023 at 03:59:43PM CET, jhs@mojatatu.com wrote:
+>
+> [...]
+>
+>
+> >diff --git a/include/net/act_api.h b/include/net/act_api.h
+> >index cd5a8e86f..b95a9bc29 100644
+> >--- a/include/net/act_api.h
+> >+++ b/include/net/act_api.h
+> >@@ -70,6 +70,7 @@ struct tc_action {
+> > #define TCA_ACT_FLAGS_AT_INGRESS      (1U << (TCA_ACT_FLAGS_USER_BITS +=
+ 4))
+> > #define TCA_ACT_FLAGS_PREALLOC        (1U << (TCA_ACT_FLAGS_USER_BITS +=
+ 5))
+> > #define TCA_ACT_FLAGS_UNREFERENCED    (1U << (TCA_ACT_FLAGS_USER_BITS +=
+ 6))
+> >+#define TCA_ACT_FLAGS_FROM_P4TC       (1U << (TCA_ACT_FLAGS_USER_BITS +=
+ 7))
+> >
+> > /* Update lastuse only if needed, to avoid dirtying a cache line.
+> >  * We use a temp variable to avoid fetching jiffies twice.
+> >diff --git a/include/net/p4tc.h b/include/net/p4tc.h
+> >index ccb54d842..68b00fa72 100644
+> >--- a/include/net/p4tc.h
+> >+++ b/include/net/p4tc.h
+> >@@ -9,17 +9,23 @@
+> > #include <linux/refcount.h>
+> > #include <linux/rhashtable.h>
+> > #include <linux/rhashtable-types.h>
+> >+#include <net/tc_act/p4tc.h>
+> >+#include <net/p4tc_types.h>
+> >
+> > #define P4TC_DEFAULT_NUM_TABLES P4TC_MINTABLES_COUNT
+> > #define P4TC_DEFAULT_MAX_RULES 1
+> > #define P4TC_PATH_MAX 3
+> >+#define P4TC_MAX_TENTRIES 33554432
+>
+> Seeing define like this one always makes me happier. Where does it come
+> from? Why not 0x2000000 at least?
 
-> I've investigated this further and found a strange relationship with
-> the display subsystem. It seems like there is some congestion happening
-> at the interconnect level. I wanted to point out that your hints helped
-> as I observed that the above counters were incrementing as expected,
-> but the packets were just not sent out. My interpretation is some
-> kind of uDMA timeout caused by some hardware locking on the NIC by
-> the IPU which cannot be diagnosed at the ENET level (the interrupt
-> handler is firing but the skb's are not sent out, but we have no
-> error status for that).
->=20
-> Here is the link of the thread I've just started with DRM people in
-> order to really tackle this issue:
-> https://lists.freedesktop.org/archives/dri-devel/2023-October/428251.html
+I dont recall why we decided to do decimal - will change it.
 
-For future reference, the thread mentioned above unfortunately did not
-lead to any discussion (I admit it's not a common topic though) and
-further investigation pointed at the DDR configuration. I had a hard
-time making a link between the reset pad of the DDR controller being
-misconfigured and the Ethernet drop rate, I still fail to do, but in
-practice this very little change apparently had a significant impact and
-totally solved our issue:
-https://lore.kernel.org/u-boot/20231117150044.1792080-1-miquel.raynal@bootl=
-in.com/
+>
+> >
+> > #define P4TC_KERNEL_PIPEID 0
+> >
+> > #define P4TC_PID_IDX 0
+> >+#define P4TC_AID_IDX 1
+> >+#define P4TC_PARSEID_IDX 1
+> >
+> > struct p4tc_dump_ctx {
+> >       u32 ids[P4TC_PATH_MAX];
+> >+      struct rhashtable_iter *iter;
+> > };
+> >
+> > struct p4tc_template_common;
+> >@@ -63,8 +69,10 @@ extern const struct p4tc_template_ops p4tc_pipeline_o=
+ps;
+> >
+> > struct p4tc_pipeline {
+> >       struct p4tc_template_common common;
+> >+      struct idr                  p_act_idr;
+> >       struct rcu_head             rcu;
+> >       struct net                  *net;
+> >+      u32                         num_created_acts;
+> >       /* Accounts for how many entities are referencing this pipeline.
+> >        * As for now only P4 filters can refer to pipelines.
+> >        */
+> >@@ -109,18 +117,157 @@ p4tc_pipeline_find_byany_unsealed(struct net *net=
+, const char *p_name,
+> >                                 const u32 pipeid,
+> >                                 struct netlink_ext_ack *extack);
+> >
+> >+struct p4tc_act *tcf_p4_find_act(struct net *net,
+> >+                               const struct tc_action_ops *a_o,
+> >+                               struct netlink_ext_ack *extack);
+> >+void
+> >+tcf_p4_put_prealloc_act(struct p4tc_act *act, struct tcf_p4act *p4_act)=
+;
+> >+
+> > static inline int p4tc_action_destroy(struct tc_action **acts)
+> > {
+> >+      struct tc_action *acts_non_prealloc[TCA_ACT_MAX_PRIO] =3D {NULL};
+> >       int ret =3D 0;
+> >
+> >       if (acts) {
+> >-              ret =3D tcf_action_destroy(acts, TCA_ACT_UNBIND);
+> >+              int j =3D 0;
+> >+              int i;
+>
+> Move declarations to the beginning of the if body.
+>
 
-Thanks to all of you for your help and feedback,
-Miqu=C3=A8l
+Didnt follow - which specific declaration?
+
+> [...]
+>
+>
+> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
+> >index 4d33f44c1..7b89229a7 100644
+> >--- a/include/uapi/linux/p4tc.h
+> >+++ b/include/uapi/linux/p4tc.h
+> >@@ -4,6 +4,7 @@
+> >
+> > #include <linux/types.h>
+> > #include <linux/pkt_sched.h>
+> >+#include <linux/pkt_cls.h>
+> >
+> > /* pipeline header */
+> > struct p4tcmsg {
+> >@@ -17,9 +18,12 @@ struct p4tcmsg {
+> > #define P4TC_MSGBATCH_SIZE 16
+> >
+> > #define P4TC_MAX_KEYSZ 512
+> >+#define P4TC_DEFAULT_NUM_PREALLOC 16
+> >
+> > #define TEMPLATENAMSZ 32
+> > #define PIPELINENAMSIZ TEMPLATENAMSZ
+> >+#define ACTTMPLNAMSIZ TEMPLATENAMSZ
+> >+#define ACTPARAMNAMSIZ TEMPLATENAMSZ
+>
+> Prefix? This is uapi. Could you please be more careful with naming at
+> least in the uapi area?
+
+Good point.
+
+>
+> [...]
+>
+>
+> >diff --git a/net/sched/p4tc/p4tc_action.c b/net/sched/p4tc/p4tc_action.c
+> >new file mode 100644
+> >index 000000000..19db0772c
+> >--- /dev/null
+> >+++ b/net/sched/p4tc/p4tc_action.c
+> >@@ -0,0 +1,2242 @@
+> >+// SPDX-License-Identifier: GPL-2.0-or-later
+> >+/*
+> >+ * net/sched/p4tc_action.c    P4 TC ACTION TEMPLATES
+> >+ *
+> >+ * Copyright (c) 2022-2023, Mojatatu Networks
+> >+ * Copyright (c) 2022-2023, Intel Corporation.
+> >+ * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
+> >+ *              Victor Nogueira <victor@mojatatu.com>
+> >+ *              Pedro Tammela <pctammela@mojatatu.com>
+> >+ */
+> >+
+> >+#include <linux/err.h>
+> >+#include <linux/errno.h>
+> >+#include <linux/init.h>
+> >+#include <linux/kernel.h>
+> >+#include <linux/kmod.h>
+> >+#include <linux/list.h>
+> >+#include <linux/module.h>
+> >+#include <linux/netdevice.h>
+> >+#include <linux/skbuff.h>
+> >+#include <linux/slab.h>
+> >+#include <linux/string.h>
+> >+#include <linux/types.h>
+> >+#include <net/flow_offload.h>
+> >+#include <net/net_namespace.h>
+> >+#include <net/netlink.h>
+> >+#include <net/pkt_cls.h>
+> >+#include <net/p4tc.h>
+> >+#include <net/sch_generic.h>
+> >+#include <net/sock.h>
+> >+#include <net/tc_act/p4tc.h>
+> >+
+> >+static LIST_HEAD(dynact_list);
+> >+
+> >+#define SEPARATOR "/"
+>
+> Prefix? Btw, why exactly do you need this. It is used only once.
+>
+
+We'll get rid of it.
+
+> To quote a few function names in this file:
+>
+> >+static void set_param_indices(struct idr *params_idr)
+> >+static void generic_free_param_value(struct p4tc_act_param *param)
+> >+static int dev_init_param_value(struct net *net, struct p4tc_act_param_=
+ops *op,
+> >+static void dev_free_param_value(struct p4tc_act_param *param)
+> >+static void tcf_p4_act_params_destroy_rcu(struct rcu_head *head)
+> >+static int __tcf_p4_dyna_init_set(struct p4tc_act *act, struct tc_actio=
+n **a,
+> >+static int tcf_p4_dyna_template_init(struct net *net, struct tc_action =
+**a,
+> >+init_prealloc_param(struct p4tc_act *act, struct idr *params_idr,
+> >+static void p4tc_param_put(struct p4tc_act_param *param)
+> >+static void free_intermediate_param(struct p4tc_act_param *param)
+> >+static void free_intermediate_params_list(struct list_head *params_list=
+)
+> >+static int init_prealloc_params(struct p4tc_act *act,
+> >+struct p4tc_act *p4tc_action_find_byid(struct p4tc_pipeline *pipeline,
+> >+static void tcf_p4_prealloc_list_add(struct p4tc_act *act_tmpl,
+> >+static int tcf_p4_prealloc_acts(struct net *net, struct p4tc_act *act,
+> >+tcf_p4_get_next_prealloc_act(struct p4tc_act *act)
+> >+void tcf_p4_set_init_flags(struct tcf_p4act *p4act)
+> >+static void __tcf_p4_put_prealloc_act(struct p4tc_act *act,
+> >+tcf_p4_put_prealloc_act(struct p4tc_act *act, struct tcf_p4act *p4act)
+> >+static int generic_dump_param_value(struct sk_buff *skb, struct p4tc_ty=
+pe *type,
+> >+static int generic_init_param_value(struct p4tc_act_param *nparam,
+> >+static struct p4tc_act_param *param_find_byname(struct idr *params_idr,
+> >+tcf_param_find_byany(struct p4tc_act *act,
+> >+tcf_param_find_byanyattr(struct p4tc_act *act, struct nlattr *name_attr=
+,
+> >+static int __p4_init_param_type(struct p4tc_act_param *param,
+> >+static int tcf_p4_act_init_params(struct net *net,
+> >+static struct p4tc_act *p4tc_action_find_byname(const char *act_name,
+> >+static int tcf_p4_dyna_init(struct net *net, struct nlattr *nla,
+> >+static int tcf_act_fill_param_type(struct sk_buff *skb,
+> >+static void tcf_p4_dyna_cleanup(struct tc_action *a)
+> >+struct p4tc_act *p4tc_action_find_get(struct p4tc_pipeline *pipeline,
+> >+p4tc_action_find_byanyattr(struct nlattr *act_name_attr, const u32 a_id=
+,
+> >+static void p4_put_many_params(struct idr *params_idr)
+> >+static int p4_init_param_type(struct p4tc_act_param *param,
+> >+static struct p4tc_act_param *p4_create_param(struct p4tc_act *act,
+> >+static struct p4tc_act_param *p4_update_param(struct p4tc_act *act,
+> >+static struct p4tc_act_param *p4_act_init_param(struct p4tc_act *act,
+> >+static void p4tc_action_net_exit(struct tc_action_net *tn)
+> >+static void p4_act_params_put(struct p4tc_act *act)
+> >+static int __tcf_act_put(struct net *net, struct p4tc_pipeline *pipelin=
+e,
+> >+static int _tcf_act_fill_nlmsg(struct net *net, struct sk_buff *skb,
+> >+static int tcf_act_fill_nlmsg(struct net *net, struct sk_buff *skb,
+> >+static int tcf_act_flush(struct sk_buff *skb, struct net *net,
+> >+static void p4tc_params_replace_many(struct p4tc_act *act,
+> >+                                   struct idr *params_idr)
+> >+static struct p4tc_act *tcf_act_create(struct net *net, struct nlattr *=
+*tb,
+> >+tcf_act_cu(struct net *net, struct nlmsghdr *n, struct nlattr *nla,
+>
+> Is there some secret key how you name the functions? To me, this looks
+> completely inconsistent :/
+
+What would be better? tcf_p4_xxxx?
+A lot of the tcf_xxx is because that convention is used in that file
+but we can change it.
+
+cheers,
+jamal
+>
 
