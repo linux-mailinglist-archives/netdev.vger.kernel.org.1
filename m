@@ -1,304 +1,138 @@
-Return-Path: <netdev+bounces-48614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4910E7EEF87
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:59:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCA37EEF9D
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD836B20A2E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:59:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EE8FB20B8A
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAE71798C;
-	Fri, 17 Nov 2023 09:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LeN7DDwJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B011D171A6;
+	Fri, 17 Nov 2023 10:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5F9A7;
-	Fri, 17 Nov 2023 01:58:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Fpc2mbNdYwlAzet5KDJmFtGhBTZCq41Y1vmPk+UljsU=; b=LeN7DDwJjX0tmJvZM3tCEPHYDy
-	clgtnQmoz9tp0+ovs7D4fbNJGI0tJoZ3UcYs8afWeNrH+nNqG3qnR/PF6BwuJNZEvpyUe8p4p2c9C
-	1Nl+mRnze7EJXeCHlJQ1pYFKuqi6cDhhAcj+M9xrRMiKYZreMJ8c5Gg59E/wkWBYwjpk5epvuv7dq
-	dMjwSMZRVp7bFUo0d+EVW7Gxej//KYd1USboLxHWBI1ReCSreTkVb2x4NcguvSknnynLElcbmqa+f
-	N16BOhSu9xHvWDDg1qA4uFj67ACkjw+6tnMQk64+z4XU59s9xMvX8IkP7WEvRzKNM63VRJtuolE90
-	8JRT2arg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1r3vcX-007CyC-1H;
-	Fri, 17 Nov 2023 09:58:46 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 14B82300478; Fri, 17 Nov 2023 10:58:41 +0100 (CET)
-Date: Fri, 17 Nov 2023 10:58:41 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Tobias Huschle <huschle@linux.ibm.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com
-Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
- lag based placement)
-Message-ID: <20231117095841.GL4779@noisy.programming.kicks-ass.net>
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
- <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1687A84
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:00:48 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r3vdd-0000CZ-8i; Fri, 17 Nov 2023 10:59:49 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r3vda-009eFY-MI; Fri, 17 Nov 2023 10:59:46 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r3vda-002zVo-C1; Fri, 17 Nov 2023 10:59:46 +0100
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Alex Elder <elder@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Dawei Li <set_pte_at@outlook.com>,
+	=?utf-8?b?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Zhao Qiang <qiang.zhao@nxp.com>,
+	Linus Walleij <linusw@kernel.org>,
+	Imre Kaloz <kaloz@openwrt.org>,
+	Stephan Gerhold <stephan@gerhold.net>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: netdev@vger.kernel.org,
+	kernel@pengutronix.de,
+	linux-renesas-soc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-arm-msm@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Subject: [PATCH net-next 00/10] net*: Convert to platform remove callback returning void
+Date: Fri, 17 Nov 2023 10:59:23 +0100
+Message-ID: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.42.0.586.gbc5204569f7d.dirty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2113; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=9oXuqsWt/RvURX9K94NXCtM0NJ0gIte8yeS/fqhGQB0=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlVzl7texqFwXoT5gAbvyECD9jkLIXHxLs+T/Jr /qMt/rFfeOJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZVc5ewAKCRCPgPtYfRL+ TvahB/wJQF9QJN/JIp3OWpqrOqErXY/3mGrH+LrcSAyWTQmW3IbON/tzsf0OudQ3GS4JGLYwrwf lr86btNOOf5otyzkyde9JO4eLJ8avvimGDtuJVCJeaYTcGT6IlHjm21zCMoNIxH3XlKMkrUmMYH 0oqnlR2AfeZP6cAxUjo5jJP1AG1OJ/Xt8losaCvn7bsz0CB5zYnZLJq+MNrGc9F0Bf/31+nYK54 8M2gDMXOJ3xh7IST9jk8chwWjoFy2mfa/rYWeB+ctDGzmvj2yQT+QW8WTFasq3UdajLrFen0s7I UHp9cIprBwWEtE2SBKNHHSiRAX7ph979/7RuQaY5V4oAWRFf
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Nov 17, 2023 at 10:23:18AM +0100, Peter Zijlstra wrote:
-> Now, IF this is the problem, I might have a patch that helps:
-> 
->   https://git.kernel.org/pub/scm/linux/kernel/git/peterz/queue.git/commit/?h=sched/eevdf&id=119feac4fcc77001cd9bf199b25f08d232289a5c
+Hello,
 
-And then I turn around and wipe the repository invalidating that link.
+this series converts the platform drivers below drivers/net that are not
+covered in the two other series converting drivers/net/ethernet and
+drivers/net/wireless. I put them all in a single series even though they
+are not maintained together. I thought that to be better than sending
+them out individually, I hope you agree.
 
-The sched/eevdf branch should be re-instated (with different SHA1), but
-I'll include the patch below for reference.
+See commit 5c5a7680e67b ("platform: Provide a remove callback that
+returns no value") for an extended explanation and the eventual goal.
+The TL;DR; is to make it harder for driver authors to leak resources
+without noticing.
 
----
-Subject: sched/eevdf: Delay dequeue
-From: Peter Zijlstra <peterz@infradead.org>
-Date: Fri Sep 15 00:48:45 CEST 2023
+The first patch is a fix, but I don't think it's worth to add that to
+stable, it was broken since v5.7-rc1 and nobody seems to have hit the
+problem.
 
-For tasks that have negative-lag (have received 'excess' service), delay the
-dequeue and keep them in the runnable tree until they're eligible again. Or
-rather, keep them until they're selected again, since finding their eligibility
-crossover point is expensive.
+Best regards
+Uwe
 
-The effect is a bit like sleeper bonus, the tasks keep contending for service
-until either they get a wakeup or until they're selected again and are really
-dequeued.
+Uwe Kleine-König (10):
+  net: ipa: Don't error out in .remove()
+  net: ipa: Convert to platform remove callback returning void
+  net: fjes: Convert to platform remove callback returning void
+  net: pcs: rzn1-miic: Convert to platform remove callback returning
+    void
+  net: sfp: Convert to platform remove callback returning void
+  net: wan/fsl_ucc_hdlc: Convert to platform remove callback returning
+    void
+  net: wan/ixp4xx_hss: Convert to platform remove callback returning
+    void
+  net: wwan: qcom_bam_dmux: Convert to platform remove callback
+    returning void
+  ieee802154: fakelb: Convert to platform remove callback returning void
+  ieee802154: hwsim: Convert to platform remove callback returning void
 
-This means that any actual dequeue happens with positive lag (serviced owed)
-and are more readily ran when woken next.
+ drivers/net/fjes/fjes_main.c             |  6 ++----
+ drivers/net/ieee802154/fakelb.c          |  5 ++---
+ drivers/net/ieee802154/mac802154_hwsim.c |  6 ++----
+ drivers/net/ipa/ipa_main.c               | 20 +++++---------------
+ drivers/net/pcs/pcs-rzn1-miic.c          |  6 ++----
+ drivers/net/phy/sfp.c                    |  6 ++----
+ drivers/net/wan/fsl_ucc_hdlc.c           |  6 ++----
+ drivers/net/wan/ixp4xx_hss.c             |  5 ++---
+ drivers/net/wwan/qcom_bam_dmux.c         |  6 ++----
+ 9 files changed, 21 insertions(+), 45 deletions(-)
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- include/linux/sched.h   |    1 
- kernel/sched/core.c     |   88 +++++++++++++++++++++++++++++++++++++++---------
- kernel/sched/fair.c     |   11 ++++++
- kernel/sched/features.h |   11 ++++++
- kernel/sched/sched.h    |    3 +
- 5 files changed, 97 insertions(+), 17 deletions(-)
+base-commit: eff99d8edbed7918317331ebd1e365d8e955d65e
+-- 
+2.42.0
 
---- a/include/linux/sched.h
-+++ b/include/linux/sched.h
-@@ -916,6 +916,7 @@ struct task_struct {
- 	unsigned			sched_reset_on_fork:1;
- 	unsigned			sched_contributes_to_load:1;
- 	unsigned			sched_migrated:1;
-+	unsigned			sched_delayed:1;
- 
- 	/* Force alignment to the next boundary: */
- 	unsigned			:0;
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -3856,12 +3856,23 @@ static int ttwu_runnable(struct task_str
- 
- 	rq = __task_rq_lock(p, &rf);
- 	if (task_on_rq_queued(p)) {
-+		update_rq_clock(rq);
-+		if (unlikely(p->sched_delayed)) {
-+			p->sched_delayed = 0;
-+			/* mustn't run a delayed task */
-+			WARN_ON_ONCE(task_on_cpu(rq, p));
-+			if (sched_feat(GENTLE_DELAY)) {
-+				dequeue_task(rq, p, DEQUEUE_SAVE | DEQUEUE_NOCLOCK);
-+				if (p->se.vlag > 0)
-+					p->se.vlag = 0;
-+				enqueue_task(rq, p, ENQUEUE_RESTORE | ENQUEUE_NOCLOCK);
-+			}
-+		}
- 		if (!task_on_cpu(rq, p)) {
- 			/*
- 			 * When on_rq && !on_cpu the task is preempted, see if
- 			 * it should preempt the task that is current now.
- 			 */
--			update_rq_clock(rq);
- 			wakeup_preempt(rq, p, wake_flags);
- 		}
- 		ttwu_do_wakeup(p);
-@@ -6565,6 +6576,24 @@ pick_next_task(struct rq *rq, struct tas
- # define SM_MASK_PREEMPT	SM_PREEMPT
- #endif
- 
-+static void deschedule_task(struct rq *rq, struct task_struct *p, unsigned long prev_state)
-+{
-+	p->sched_contributes_to_load =
-+		(prev_state & TASK_UNINTERRUPTIBLE) &&
-+		!(prev_state & TASK_NOLOAD) &&
-+		!(prev_state & TASK_FROZEN);
-+
-+	if (p->sched_contributes_to_load)
-+		rq->nr_uninterruptible++;
-+
-+	deactivate_task(rq, p, DEQUEUE_SLEEP | DEQUEUE_NOCLOCK);
-+
-+	if (p->in_iowait) {
-+		atomic_inc(&rq->nr_iowait);
-+		delayacct_blkio_start();
-+	}
-+}
-+
- /*
-  * __schedule() is the main scheduler function.
-  *
-@@ -6650,6 +6679,8 @@ static void __sched notrace __schedule(u
- 
- 	switch_count = &prev->nivcsw;
- 
-+	WARN_ON_ONCE(prev->sched_delayed);
-+
- 	/*
- 	 * We must load prev->state once (task_struct::state is volatile), such
- 	 * that we form a control dependency vs deactivate_task() below.
-@@ -6659,14 +6690,6 @@ static void __sched notrace __schedule(u
- 		if (signal_pending_state(prev_state, prev)) {
- 			WRITE_ONCE(prev->__state, TASK_RUNNING);
- 		} else {
--			prev->sched_contributes_to_load =
--				(prev_state & TASK_UNINTERRUPTIBLE) &&
--				!(prev_state & TASK_NOLOAD) &&
--				!(prev_state & TASK_FROZEN);
--
--			if (prev->sched_contributes_to_load)
--				rq->nr_uninterruptible++;
--
- 			/*
- 			 * __schedule()			ttwu()
- 			 *   prev_state = prev->state;    if (p->on_rq && ...)
-@@ -6678,17 +6701,50 @@ static void __sched notrace __schedule(u
- 			 *
- 			 * After this, schedule() must not care about p->state any more.
- 			 */
--			deactivate_task(rq, prev, DEQUEUE_SLEEP | DEQUEUE_NOCLOCK);
--
--			if (prev->in_iowait) {
--				atomic_inc(&rq->nr_iowait);
--				delayacct_blkio_start();
--			}
-+			if (sched_feat(DELAY_DEQUEUE) &&
-+			    prev->sched_class->delay_dequeue_task &&
-+			    prev->sched_class->delay_dequeue_task(rq, prev))
-+				prev->sched_delayed = 1;
-+			else
-+				deschedule_task(rq, prev, prev_state);
- 		}
- 		switch_count = &prev->nvcsw;
- 	}
- 
--	next = pick_next_task(rq, prev, &rf);
-+	for (struct task_struct *tmp = prev;;) {
-+		unsigned long tmp_state;
-+
-+		next = pick_next_task(rq, tmp, &rf);
-+		if (unlikely(tmp != prev))
-+			finish_task(tmp);
-+
-+		if (likely(!next->sched_delayed))
-+			break;
-+
-+		next->sched_delayed = 0;
-+
-+		/*
-+		 * A sched_delayed task must not be runnable at this point, see
-+		 * ttwu_runnable().
-+		 */
-+		tmp_state = READ_ONCE(next->__state);
-+		if (WARN_ON_ONCE(!tmp_state))
-+			break;
-+
-+		prepare_task(next);
-+		/*
-+		 * Order ->on_cpu and ->on_rq, see the comments in
-+		 * try_to_wake_up(). Normally this is smp_mb__after_spinlock()
-+		 * above.
-+		 */
-+		smp_wmb();
-+		deschedule_task(rq, next, tmp_state);
-+		if (sched_feat(GENTLE_DELAY) && next->se.vlag > 0)
-+			next->se.vlag = 0;
-+
-+		tmp = next;
-+	}
-+
- 	clear_tsk_need_resched(prev);
- 	clear_preempt_need_resched();
- #ifdef CONFIG_SCHED_DEBUG
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -8540,6 +8540,16 @@ static struct task_struct *__pick_next_t
- 	return pick_next_task_fair(rq, NULL, NULL);
- }
- 
-+static bool delay_dequeue_task_fair(struct rq *rq, struct task_struct *p)
-+{
-+	struct sched_entity *se = &p->se;
-+	struct cfs_rq *cfs_rq = cfs_rq_of(se);
-+
-+	update_curr(cfs_rq);
-+
-+	return !entity_eligible(cfs_rq, se);
-+}
-+
- /*
-  * Account for a descheduled task:
-  */
-@@ -13151,6 +13161,7 @@ DEFINE_SCHED_CLASS(fair) = {
- 
- 	.wakeup_preempt		= check_preempt_wakeup_fair,
- 
-+	.delay_dequeue_task	= delay_dequeue_task_fair,
- 	.pick_next_task		= __pick_next_task_fair,
- 	.put_prev_task		= put_prev_task_fair,
- 	.set_next_task          = set_next_task_fair,
---- a/kernel/sched/features.h
-+++ b/kernel/sched/features.h
-@@ -24,6 +24,17 @@ SCHED_FEAT(PREEMPT_SHORT, true)
-  */
- SCHED_FEAT(PLACE_SLEEPER, false)
- SCHED_FEAT(GENTLE_SLEEPER, true)
-+/*
-+ * Delay dequeueing tasks until they get selected or woken.
-+ *
-+ * By delaying the dequeue for non-eligible tasks, they remain in the
-+ * competition and can burn off their negative lag. When they get selected
-+ * they'll have positive lag by definition.
-+ *
-+ * GENTLE_DELAY clips the lag on dequeue (or wakeup) to 0.
-+ */
-+SCHED_FEAT(DELAY_DEQUEUE, true)
-+SCHED_FEAT(GENTLE_DELAY, true)
- 
- /*
-  * Prefer to schedule the task we woke last (assuming it failed
---- a/kernel/sched/sched.h
-+++ b/kernel/sched/sched.h
-@@ -2254,6 +2254,7 @@ struct sched_class {
- 
- 	void (*wakeup_preempt)(struct rq *rq, struct task_struct *p, int flags);
- 
-+	bool (*delay_dequeue_task)(struct rq *rq, struct task_struct *p);
- 	struct task_struct *(*pick_next_task)(struct rq *rq);
- 
- 	void (*put_prev_task)(struct rq *rq, struct task_struct *p);
-@@ -2307,7 +2308,7 @@ struct sched_class {
- 
- static inline void put_prev_task(struct rq *rq, struct task_struct *prev)
- {
--	WARN_ON_ONCE(rq->curr != prev);
-+//	WARN_ON_ONCE(rq->curr != prev);
- 	prev->sched_class->put_prev_task(rq, prev);
- }
- 
 
