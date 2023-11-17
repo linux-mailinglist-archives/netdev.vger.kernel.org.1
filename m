@@ -1,113 +1,139 @@
-Return-Path: <netdev+bounces-48604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AD37EEED4
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:39:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 614C37EEF1C
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9946A2812E1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:39:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A6EB28121E
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E840F156EE;
-	Fri, 17 Nov 2023 09:39:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41312171A5;
+	Fri, 17 Nov 2023 09:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZGVbgzrN"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jZ9cW8hN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x149.google.com (mail-lf1-x149.google.com [IPv6:2a00:1450:4864:20::149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 027F4C4
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:20 -0800 (PST)
-Received: by mail-lf1-x149.google.com with SMTP id 2adb3069b0e04-507ce973a03so1850936e87.3
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 01:39:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700213958; x=1700818758; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yRP/aW0x+wuYfu3h+kWAPAGUjA7Hx5HhVmNICZELS2A=;
-        b=ZGVbgzrNoEiKIWT4SMGW56A1cWwFPjK5UZHn5v67/yy/xrAr31HINFavgMXN5i9gSM
-         SeLRYWUpVXI+5X6rCmirbDDLKkXQvjmR40CLN8bXwkWF0mE4PekWBE5zuF3Z+104o7fp
-         AQ5vBqpbc/OW7ziJhPzx+HNL1wWyf+0P9zMY4xUE3ueBtT3V8rT0aohnNldTki58ionL
-         gEnJSyM+PQjswfuhmZYAZ8S6CSiu49sSrvLnOZcHoh63iiZZxgvP4hoPXDWH+G9jluW8
-         xLjqZ16vyokJRKJMC2JEFVOdy1iEeURf6HgsM6/15OSLnIwHPLR0Pye7N6y4SAGNc5BQ
-         3rAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700213958; x=1700818758;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yRP/aW0x+wuYfu3h+kWAPAGUjA7Hx5HhVmNICZELS2A=;
-        b=NSDzXq0hcA+K3zv4jkt6wLpnYt4kwf4pmmiSmoJiF3/ghGWdajZoH47B9XDizN9UOV
-         otM+C5rmWoQKIDxexou88JFzF8E1gq64nOdi1Z7+EajoQe4fujyuH3IUhU+ubKpZgJaR
-         CnklXtVXlatqP+UM3+94JezOwaLPuFbQuptKiT2RwdEF8zv6qjrNccXzRnsN9V9rcvUA
-         YTkGNcQAiweG5b+4ViNmnYE60uqYFO4ePhdpaGYxfuELuTOR20wiQzqcD1XY/AzH0OvT
-         OcaOCND/phoYtU1e+fIflCRyIkEmFzDKeDarPJkng2vHpJrsFAi0EuaAQZPKou1T0jwd
-         qI4g==
-X-Gm-Message-State: AOJu0YxZmg9meqd7+XUwDABIJZdYWSwHHKhVDR1M1BmCFeXJXrzhcZdW
-	hwyiSnGAXBUjWsOJRaMqzw6PSqyk1FOR210=
-X-Google-Smtp-Source: AGHT+IH9p4D1RRU0dNE59yvw/KRBe9QqKBsY8rPqsWRGB5cgYzJqnqwfMKyX0F287MZsfIH74dfXzAAmvvU2rWg=
-X-Received: from aliceryhl2.c.googlers.com ([fda3:e722:ac3:cc00:68:949d:c0a8:572])
- (user=aliceryhl job=sendgmr) by 2002:a2e:3006:0:b0:2c5:177d:60cd with SMTP id
- w6-20020a2e3006000000b002c5177d60cdmr171034ljw.9.1700213958182; Fri, 17 Nov
- 2023 01:39:18 -0800 (PST)
-Date: Fri, 17 Nov 2023 09:39:15 +0000
-In-Reply-To: <20231026001050.1720612-6-fujita.tomonori@gmail.com>
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130BDD75;
+	Fri, 17 Nov 2023 01:44:32 -0800 (PST)
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AH6Zubf011447;
+	Fri, 17 Nov 2023 09:44:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=Nzl53A6Ojw58hiwRHky2IDpvZAfop6W4exn3T6bQhDU=;
+ b=jZ9cW8hNI+pOhn9EpQImjvx/GYQg3jwg0jD5pWc2YD2lqPJDupizcrUko1CZrjsYcLCk
+ qaV+hDOCJzzj3DV4M/L8WD2bwMYkhKMFiXQWgA7v4gKcqlHLs2BGxy8N8hkl9r5L9AFs
+ +0Ug1budM0Yq6l8tpE2SCvk8fuLuEJ/xkh5skULgd3JaYKW2DQ3eqB0un4nzvrVA/QX4
+ kZwxjvhb0bASnfjqSgQ+Lu8mJ3vV/iw0ZtH9m3u0w1FSsXaM20co7oviW8H5NUwvFiLk
+ lV9UIRPo08rAGr+AEQCN4OyO1f7+ZATbdxAqXWgvelOdQMkqGrhtAjNNlmjuiV3IB2Hg sA== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3udmw42afx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 09:44:15 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AH9iESh005756
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Nov 2023 09:44:14 GMT
+Received: from [10.253.8.81] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 17 Nov
+ 2023 01:44:10 -0800
+Message-ID: <5103699f-375d-4752-bcb0-9abeb0a86fbe@quicinc.com>
+Date: Fri, 17 Nov 2023 17:44:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231026001050.1720612-6-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231117093915.2515418-1-aliceryhl@google.com>
-Subject: Re: [PATCH net-next v7 5/5] net: phy: add Rust Asix PHY driver
-From: Alice Ryhl <aliceryhl@google.com>
-To: fujita.tomonori@gmail.com
-Cc: andrew@lunn.ch, benno.lossin@proton.me, miguel.ojeda.sandonis@gmail.com, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu, 
-	wedsonaf@gmail.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/6] dt-bindings: net: ethernet-controller: add
+ 10g-qxgmii mode
+To: Conor Dooley <conor@kernel.org>
+CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231116112437.10578-1-quic_luoj@quicinc.com>
+ <20231116112437.10578-3-quic_luoj@quicinc.com>
+ <20231116-flier-washed-eb1a45481323@squawk>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <20231116-flier-washed-eb1a45481323@squawk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Cv7HkOtzsQ3YuNaZP_jp_-b9y1wY-gs7
+X-Proofpoint-ORIG-GUID: Cv7HkOtzsQ3YuNaZP_jp_-b9y1wY-gs7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-17_07,2023-11-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=972
+ clxscore=1015 suspectscore=0 mlxscore=0 malwarescore=0 bulkscore=0
+ priorityscore=1501 adultscore=0 lowpriorityscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311170071
 
-FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
-> This is the Rust implementation of drivers/net/phy/ax88796b.c. The
-> features are equivalent. You can choose C or Rust versionon kernel
-> configuration.
+
+
+On 11/16/2023 10:22 PM, Conor Dooley wrote:
+> On Thu, Nov 16, 2023 at 07:24:33PM +0800, Luo Jie wrote:
+>> Add the new interface mode 10g-qxgmii, which is similar to
+>> usxgmii but extend to 4 channels to support maximum of 4
+>> ports with the link speed 10M/100M/1G/2.5G.
+>>
 > 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Reviewed-by: Benno Lossin <benno.lossin@proton.me>
+>> This patch is separated from Vladimir Oltean's previous patch
+>> <net: phy: introduce core support for phy-mode = "10g-qxgmii">.
+> 
+> This belongs in the changelog under the --- line.
 
-Overall looks reasonable. I found various nits below:
+will move out these two lines.
 
-There's a typo in your commit message: versionon.
+> 
+>>
+>> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> Are you missing a from: line in this patch?
 
-> +use kernel::c_str;
-> +use kernel::net::phy::{self, DeviceId, Driver};
-> +use kernel::prelude::*;
-> +use kernel::uapi;
+will modify the author in the next patch set.
 
-You used the other import style in other patches.
-
-> +        // If MII_LPA is 0, phy_resolve_aneg_linkmode() will fail to resolve
-> +        // linkmode so use MII_BMCR as default values.
-> +        let ret = dev.read(uapi::MII_BMCR as u16)?;
-> +
-> +        if ret as u32 & uapi::BMCR_SPEED100 != 0 {
-
-The `ret as u32` and `uapi::MII_BMCR as u16` casts make me think that
-these constants are defined as the wrong type?
-
-It's probably difficult to get bindgen to change the type, but you could
-do this at the top of the function or file:
-
-	const MII_BMCR: u16 = uapi::MII_BMCR as u16;
-	const BMCR_SPEED100: u16 = uapi::BMCR_SPEED100 as u16;
-
-> +            let _ = dev.init_hw();
-> +            let _ = dev.start_aneg();
-
-Just to confirm: You want to call `start_aneg` even if `init_hw` returns
-failure? And you want to ignore both errors?
-
-Alice
+> 
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> 
+> Otherwise,
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> 
+> Cheers,
+> Conor.
+> 
+>> ---
+>>   Documentation/devicetree/bindings/net/ethernet-controller.yaml | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+>> index d14d123ad7a0..0ef6103c5fd8 100644
+>> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+>> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+>> @@ -104,6 +104,7 @@ properties:
+>>         - usxgmii
+>>         - 10gbase-r
+>>         - 25gbase-r
+>> +      - 10g-qxgmii
+>>   
+>>     phy-mode:
+>>       $ref: "#/properties/phy-connection-type"
+>> -- 
+>> 2.42.0
+>>
 
