@@ -1,219 +1,88 @@
-Return-Path: <netdev+bounces-48722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC7457EF58A
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:42:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3815C7EF598
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7CA1C208B7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:42:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CE901C208B7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C7634CE3;
-	Fri, 17 Nov 2023 15:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dGyZ0E2C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441AB37145;
+	Fri, 17 Nov 2023 15:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245881984
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 07:42:50 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-da31ec03186so1709560276.1
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 07:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700235769; x=1700840569; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8PQm6egy8dPUbOjgkFnReCtJDIVJFmjcu3ZN7vSejc4=;
-        b=dGyZ0E2CwWcenXA0DgOyR+ud8CArd80AF4AyHwilkP1xZJjzQeXT8WBaSCB2kSAYwU
-         oJ5mN+WK+cKObIdWjq+c1xzgE7R4MDlCU5w0iJWkDUPhw0cv0yI5BmvHo6qSPDzPcfnK
-         uJY+1Lk5DuGrT2dWK8PhLvyWs+j9BjYZdYBomdQnYevO40xWCq9CGjg60R6UXPLk6QTK
-         FCv+PQdHzqBDS69K63PZBqfb911qtQln5WzZ+dUiMJT4rzJ6sCGPEtgbaIVifP746Yvm
-         iNciGneDFoIdqF8F1FvNcHOgCw7Jx6DVWCHvpVqrgbzRtS/RPSHIio7vyROu3VgtMo81
-         tHNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700235769; x=1700840569;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8PQm6egy8dPUbOjgkFnReCtJDIVJFmjcu3ZN7vSejc4=;
-        b=wjXJLgPi3HxrpaZemfttJ43w1TtV3bGuXz0+KxyWPgtD4CLNKTxuHO6uGco9YwveDF
-         ZIKdyB481j/hifx3WYAG0XFFtzJYL6DcQ7vBGH5Ai9hPS9UZjNBRVI6mTbagpfcgeWbW
-         GCHVZ3cfO6t/0AL9w7dhcGTVUA3x1VT/17PbwwNLR87Nn3yjXtlMIZGm0NcQtcQP4+Nu
-         WsSFRjJbn7KOsCpp4PEQgj9MMN9YQhO5WVu9q60L5XFxrOz2ZOwmOP+TUy3E0GE5kVNa
-         OUfJdcPYzVcBI/24vgRL36ctrJ5YXzkgCHXWDeXDGDQd3oJtEq/eYHRnOyEpJwxMSXhS
-         7/1g==
-X-Gm-Message-State: AOJu0Ywtg43j5JIYAGuvYy5QylPqxyHsJacp8I/Ek3AFMGdD//UxQIVU
-	rQW7Xc4s2HXes+V2vpQu77PgX4w4AiQ3QJ8=
-X-Google-Smtp-Source: AGHT+IF19Mhe3LUEgDqdN4CbvmeL0fEDlGHdk8DFB/9v/AQIyw6un1NHwJoz1U8gNq+UooeZznMZ2gx/v5iSW/Q=
-X-Received: from aliceryhl2.c.googlers.com ([fda3:e722:ac3:cc00:68:949d:c0a8:572])
- (user=aliceryhl job=sendgmr) by 2002:a05:6902:602:b0:daf:3e84:d016 with SMTP
- id d2-20020a056902060200b00daf3e84d016mr168163ybt.2.1700235769326; Fri, 17
- Nov 2023 07:42:49 -0800 (PST)
-Date: Fri, 17 Nov 2023 15:42:46 +0000
-In-Reply-To: <61f93419-396d-4592-b28b-9c681952a873@lunn.ch>
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D4D8E;
+	Fri, 17 Nov 2023 07:48:41 -0800 (PST)
+X-UUID: 42202419321f4071949da05307dc4218-20231117
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:0a6c0f97-5bf5-41bc-bedf-f1ff9792820f,IP:15,
+	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:20
+X-CID-INFO: VERSION:1.1.32,REQID:0a6c0f97-5bf5-41bc-bedf-f1ff9792820f,IP:15,UR
+	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:20
+X-CID-META: VersionHash:5f78ec9,CLOUDID:55ab8495-10ce-4e4b-85c2-c9b5229ff92b,B
+	ulkID:231117234836C0FXRSJW,BulkQuantity:0,Recheck:0,SF:38|24|17|19|44|66|1
+	02,TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
+X-UUID: 42202419321f4071949da05307dc4218-20231117
+X-User: chentao@kylinos.cn
+Received: from vt.. [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 572890764; Fri, 17 Nov 2023 23:48:35 +0800
+From: Kunwu Chan <chentao@kylinos.cn>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: kunwu.chan@hotmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kunwu Chan <chentao@kylinos.cn>
+Subject: [PATCH] ipv6: Correct/silence an endian warning in ip6_multipath_l3_keys
+Date: Fri, 17 Nov 2023 23:48:31 +0800
+Message-Id: <20231117154831.2518110-1-chentao@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <61f93419-396d-4592-b28b-9c681952a873@lunn.ch>
-X-Mailer: git-send-email 2.43.0.rc0.421.g78406f8d94-goog
-Message-ID: <20231117154246.2571219-1-aliceryhl@google.com>
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY drivers
-From: Alice Ryhl <aliceryhl@google.com>
-To: andrew@lunn.ch
-Cc: aliceryhl@google.com, benno.lossin@proton.me, fujita.tomonori@gmail.com, 
-	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu, wedsonaf@gmail.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Andrew Lunn <andrew@lunn.ch> writes:
->> I used "X mutex" as an example for the synchronization mechanism in the
->> above snippets, but it sounds like its more complicated than that? Here
->> are some possible alternatives I could come up with:
-> 
-> So X would be phy_device->lock.
-> 
-> Suspend and resume don't have this lock held. I don't actually
-> remember the details, but there is an email discussion with Russell
-> King which does explain the problem we had, and why we think it is
-> safe to not hold the lock.
+net/ipv6/route.c:2332:39: warning: incorrect type in assignment (different base types)
+net/ipv6/route.c:2332:39:    expected unsigned int [usertype] flow_label
+net/ipv6/route.c:2332:39:    got restricted __be32
 
-So, what I would prefer to see as the struct invariant would be:
+Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+---
+ net/ipv6/route.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- * Either phy_device->lock is held,
- * or, we are in whatever situation you are in when you call suspend and
-   resume.
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index b132feae3393..692c811eb786 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -2329,7 +2329,7 @@ static void ip6_multipath_l3_keys(const struct sk_buff *skb,
+ 	} else {
+ 		keys->addrs.v6addrs.src = key_iph->saddr;
+ 		keys->addrs.v6addrs.dst = key_iph->daddr;
+-		keys->tags.flow_label = ip6_flowlabel(key_iph);
++		keys->tags.flow_label = be32_to_cpu(ip6_flowlabel(key_iph));
+ 		keys->basic.ip_proto = key_iph->nexthdr;
+ 	}
+ }
+-- 
+2.34.1
 
-The five suggestions I gave were my guesses as to what that situation
-might be.
-
->> /// # Invariants
->> ///
->> /// Referencing a `phy_device` using this struct asserts that the X
->> /// mutex is held, or that the reference has exclusive access to the
->> /// entire `phy_device`.
->> #[repr(transparent)]
->> pub struct Device(Opaque<bindings::phy_device>);
-> 
-> You can never have exclusive access to the entire phy_device, because
-> it contains a mutex. Other threads can block on that mutex, which
-> involves changing the linked list in the mutex.
-> 
-> But that is also a pretty common pattern, put the mutex inside the
-> structure it protects. So when you say 'exclusive access to the entire
-> `phy_device`' you actually mean excluding mutex, spinlocks, atomic
-> variables, etc?
-
-No, I really meant exclusive access to everything. This suggestion is
-where I guessed that the situation might be "we just created the
-phy_device, and haven't yet shared it with anyone, so it's okay to
-access it without the lock". But it sounds like that's not the case.
-
->> /// Referencing a `phy_device` using this struct asserts exclusive
->> /// access to the following fields: phy_id, state, speed, duplex. And
->> /// read access to the following fields: link, autoneg_complete,
->> /// autoneg.
->> #[repr(transparent)]
->> pub struct Device(Opaque<bindings::phy_device>);
-> 
-> For the Rust code, you can maybe do this. But the Rust code calls into
-> C helpers to get the real work done, and they expect to have access to
-> pretty much everything in phy_device.
-
-Yeah, agreed, this is probably the suggestion I disliked the most.
-
->> /// # Invariants
->> ///
->> /// Referencing a `phy_device` using this struct asserts that the user
->> /// is inside a Y scope as defined in Documentation/foo/bar.
->> #[repr(transparent)]
->> pub struct Device(Opaque<bindings::phy_device>);
-> 
-> There is no such documentation that i know of, except it does get
-> repeated again and again on the mailling lists. Its tribal knowledge.
-
-Then, my suggestion would be to write down that tribal knowledge in the
-safety comments.
-
->> But I don't know how these things are actually synchronized. Maybe
->> it is some sixth option. I would be happy to help draft these safety
->> comments once the actual synchronization mechanism is clear to me.
-> 
-> The model is: synchronisation is not the drivers problem.
-> 
-> With a few years of experience reviewing drivers, you notice that
-> there are a number of driver writers who have no idea about
-> locking. They don't even think about it. So where possible, its best
-> to hide all the locking from them in the core. The core is in theory
-> developed by developers who do mostly understand locking and have a
-> better chance of getting it right. Its also exercised a lot more,
-> since its shared by all drivers.
-> 
-> My experience with this one Rust driver so far is that Rust developers
-> have problems accepting that its not the drivers problem.
-
-I agree that locking should not be the driver's problem. If there's any
-comment about locking in patch 5 of this patchset, then something has
-gone wrong.
-
-However, I don't see this file as part of the driver. It's a wrapper
-around the core, which makes it part of the core. Like the C core, the
-Rust abstractions will be shared by all Rust drivers. The correctness of
-the unsafe code here is what ensures that drivers are not able to mess
-up the locking in safe code.
-
-
-Anyway. If you don't want to write down the tribal knowledge here, then
-I suggest this simpler wording:
-
-/// # Invariants
-///
-/// Referencing a `phy_device` using this struct asserts that you are in
-/// a context where all methods defined on this struct are safe to call.
-#[repr(transparent)]
-pub struct Device(Opaque<bindings::phy_device>);
-
-This invariant is much less precise, but at least it is correct.
-
-Other safety comments may then be:
-
-	/// Gets the id of the PHY.
-	pub fn phy_id(&self) -> u32 {
-	    let phydev = self.0.get();
-	    // SAFETY: The struct invariant ensures that we may access
-	    // this field without additional synchronization.
-	    unsafe { (*phydev).phy_id }
-	}
-
-And:
-
-	unsafe extern "C" fn soft_reset_callback(
-	    phydev: *mut bindings::phy_device,
-	) -> core::ffi::c_int {
-	    from_result(|| {
-	        // SAFETY: This callback is called only in contexts
-		// where we hold `phy_device->lock`, so the accessors on
-		// `Device` are okay to call.
-	        let dev = unsafe { Device::from_raw(phydev) };
-	        T::soft_reset(dev)?;
-	        Ok(0)
-	    })
-	}
-
-And:
-
-	unsafe extern "C" fn resume_callback(phydev: *mut bindings::phy_device) -> core::ffi::c_int {
-	    from_result(|| {
-	        // SAFETY: The C core code ensures that the accessors on
-		// `Device` are okay to call even though `phy_device->lock`
-		// might not be held.
-	        let dev = unsafe { Device::from_raw(phydev) };
-	        T::resume(dev)?;
-	        Ok(0)
-	    })
-	}
-
-Alice
 
