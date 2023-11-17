@@ -1,151 +1,107 @@
-Return-Path: <netdev+bounces-48742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0378F7EF667
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:43:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81CB7EF67D
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:45:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF370281108
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:43:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 033451C20AF4
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C82612E78;
-	Fri, 17 Nov 2023 16:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B9343152;
+	Fri, 17 Nov 2023 16:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MCNLKBgt"
+	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="QFcJLbTd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FD276ABF
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 16:43:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D91CC433C7;
-	Fri, 17 Nov 2023 16:43:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700239388;
-	bh=9GiSGpFIH0nr0tJT9r2HkfJJh4/TVWOuBUNY/F3PFPw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=MCNLKBgtzmeGeUedNyDuNDmoAsA3jSX7XfegJgJ1taSqTCTsWhCd4tcZbX45UhJEM
-	 cyLVs1U8+waXwGZJnfCR279ItKSh/9lrrQ7EJEne5UcT5USI950McZZlhBgEMJKOlf
-	 e5rJAkhTWi7DVCmKw82TaMKw9h4r6CRUs5qzIUz5pZ/T7YV/PHlpE17YJk7vf4JmXq
-	 GXfFArkFhfRJ/G0HFo6YtDlx1doASzSABLY+paRNvG6xO3s2pVKZMcwi4ScTh1FfIM
-	 z5JCdrciap5DXkmr+adLeTN9KaZ/OahcL6R4SDgDykmHcznBbpdP8pgK+tW8mV3dAh
-	 2ZYXrUlv/jjng==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: nbd@nbd.name,
-	john@phrozen.org,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	lorenzo.bianconi@redhat.com,
-	sujuan.chen@mediatek.com
-Subject: [PATCH net-next] net: ethernet: mtk_wed: add support for devices with more than 4GB of dram
-Date: Fri, 17 Nov 2023 17:42:59 +0100
-Message-ID: <1c7efdf5d384ea7af3c0209723e40b2ee0f956bf.1700239272.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.42.0
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B52F10C6
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 08:44:55 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-507a29c7eefso3185195e87.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 08:44:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700239493; x=1700844293; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eA55YfApAKQilOmSxAi1H7xzp3FySlfaXmMF1pFLUMY=;
+        b=QFcJLbTdE97VdTsGwBYOgP2MXlO+T5q6LA0On2Mlq462IXQfbiRTh2DXfievKoRQew
+         ZMMxdIbr3VQu/McvZhAjv+dUJ2XWxch55L1t/eBwH6ISw/0XEY8RuEXLDKpYLqH4sYzk
+         7c2iD5c88sn5Vficf4N/bFt5WirVmKUF+EjlwqQU4B7HnJTNmx/8qojGexXumJxtFT6a
+         O1S+gkZuFoloHEFZ/ymY1a1C7nGIoSp04r58N7dNiaexdFW4UnGPGB+0KykHLybMal9f
+         P65oCDPhIGSldT74U0YTO9jZghaVYOmgMVV+0Wg3pad0r6fBlMzUainLe3Ax7g0ee6f9
+         suBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700239493; x=1700844293;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eA55YfApAKQilOmSxAi1H7xzp3FySlfaXmMF1pFLUMY=;
+        b=ewswfPokq7XhWg6mFLtXyzFF9ApcEJgMjXMUdbAroUE/NYgwDs3W1iezOLh8tLQCkU
+         FLU6DiNKkx5bK89gAg7kuW8QcYeHRZ0+900GSFskF2Lc5A/Jdvq+ak9FQkjP2c9jR/18
+         v7UMwpN3kpeMwybFkJVLy/6jz5nUgR8UDs4ieNgBfjXgATK0sCnM8UmIgXIjlopBEIbK
+         S4wyCgRNs6OINQxgyrf/ti3uJ2qQsVvKUfGLc/Wb3Rp4xmbOI2Zk+pbmw7SoKZlqIxtD
+         4uxosz/lVtfxZVDwTc4sv+KLIOdXXTSXjrPrFFPWtU9jXgBhmP6wiCos9y3Z13alOCav
+         fhPg==
+X-Gm-Message-State: AOJu0YyynbRH5NK90Uqy+t+3fAuj3CkivJcwW75LIKGoVRaveB4kD/KV
+	MuILJRrO+O8d78AqVbZlhlWRqA==
+X-Google-Smtp-Source: AGHT+IF7UiC+QJF2Sk0XRI5G1Yt+AuSSfCDAgbG01W6BdSxNi7LKOZ0bq+GUwK4QdhoSqckMwsQQFQ==
+X-Received: by 2002:ac2:5bdb:0:b0:507:b084:d6bb with SMTP id u27-20020ac25bdb000000b00507b084d6bbmr71517lfn.43.1700239493069;
+        Fri, 17 Nov 2023 08:44:53 -0800 (PST)
+Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
+        by smtp.googlemail.com with ESMTPSA id y10-20020adfee0a000000b0032dcb08bf94sm2791947wrn.60.2023.11.17.08.44.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 08:44:52 -0800 (PST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next 0/5] net: ethernet: renesas: rcar_gen4_ptp: Add V4H support
+Date: Fri, 17 Nov 2023 17:43:27 +0100
+Message-ID: <20231117164332.354443-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.42.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Introduce WED offloading support for boards with more than 4GB of
-memory.
+Hello,
 
-Co-developed-by: Sujuan Chen <sujuan.chen@mediatek.com>
-Signed-off-by: Sujuan Chen <sujuan.chen@mediatek.com>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/mtk_eth_soc.c | 5 ++++-
- drivers/net/ethernet/mediatek/mtk_wed.c     | 8 +++++---
- drivers/net/ethernet/mediatek/mtk_wed_wo.c  | 3 ++-
- 3 files changed, 11 insertions(+), 5 deletions(-)
+This small series prepares the rcar_gen4_ptp to be useable both on both 
+R-Car S4 and V4H. The only in-tree driver that make use of this is 
+rswtich on S4. A new Ethernet (R-Car Ethernet TSN) driver for V4H is on 
+it's way that also will make use of rcar_gen4_ptp functionality.
 
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index 3cf6589cfdac..a6e91573f8da 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -1159,15 +1159,18 @@ static int mtk_init_fq_dma(struct mtk_eth *eth)
- 	phy_ring_tail = eth->phy_scratch_ring + soc->txrx.txd_size * (cnt - 1);
- 
- 	for (i = 0; i < cnt; i++) {
-+		dma_addr_t addr = dma_addr + i * MTK_QDMA_PAGE_SIZE;
- 		struct mtk_tx_dma_v2 *txd;
- 
- 		txd = eth->scratch_ring + i * soc->txrx.txd_size;
--		txd->txd1 = dma_addr + i * MTK_QDMA_PAGE_SIZE;
-+		txd->txd1 = addr;
- 		if (i < cnt - 1)
- 			txd->txd2 = eth->phy_scratch_ring +
- 				    (i + 1) * soc->txrx.txd_size;
- 
- 		txd->txd3 = TX_DMA_PLEN0(MTK_QDMA_PAGE_SIZE);
-+		if (MTK_HAS_CAPS(soc->caps, MTK_36BIT_DMA))
-+			txd->txd3 |= TX_DMA_PREP_ADDR64(addr);
- 		txd->txd4 = 0;
- 		if (mtk_is_netsys_v2_or_greater(eth)) {
- 			txd->txd5 = 0;
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed.c b/drivers/net/ethernet/mediatek/mtk_wed.c
-index 2ac35543fcfb..c895e265ae0e 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed.c
-@@ -691,10 +691,11 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- 
- 		for (s = 0; s < MTK_WED_BUF_PER_PAGE; s++) {
- 			struct mtk_wdma_desc *desc = desc_ptr;
-+			u32 ctrl;
- 
- 			desc->buf0 = cpu_to_le32(buf_phys);
- 			if (!mtk_wed_is_v3_or_greater(dev->hw)) {
--				u32 txd_size, ctrl;
-+				u32 txd_size;
- 
- 				txd_size = dev->wlan.init_buf(buf, buf_phys,
- 							      token++);
-@@ -708,11 +709,11 @@ mtk_wed_tx_buffer_alloc(struct mtk_wed_device *dev)
- 					ctrl |= MTK_WDMA_DESC_CTRL_LAST_SEG0 |
- 						FIELD_PREP(MTK_WDMA_DESC_CTRL_LEN1_V2,
- 							   MTK_WED_BUF_SIZE - txd_size);
--				desc->ctrl = cpu_to_le32(ctrl);
- 				desc->info = 0;
- 			} else {
--				desc->ctrl = cpu_to_le32(token << 16);
-+				ctrl = token << 16 | TX_DMA_PREP_ADDR64(buf_phys);
- 			}
-+			desc->ctrl = cpu_to_le32(ctrl);
- 
- 			desc_ptr += desc_size;
- 			buf += MTK_WED_BUF_SIZE;
-@@ -811,6 +812,7 @@ mtk_wed_hwrro_buffer_alloc(struct mtk_wed_device *dev)
- 		buf_phys = page_phys;
- 		for (s = 0; s < MTK_WED_RX_BUF_PER_PAGE; s++) {
- 			desc->buf0 = cpu_to_le32(buf_phys);
-+			desc->token = cpu_to_le32(RX_DMA_PREP_ADDR64(buf_phys));
- 			buf_phys += MTK_WED_PAGE_BUF_SIZE;
- 			desc++;
- 		}
-diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-index 3bd51a3d6650..7ffbd4fca881 100644
---- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-+++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
-@@ -142,7 +142,8 @@ mtk_wed_wo_queue_refill(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q,
- 		dma_addr_t addr;
- 		void *buf;
- 
--		buf = page_frag_alloc(&q->cache, q->buf_size, GFP_ATOMIC);
-+		buf = page_frag_alloc(&q->cache, q->buf_size,
-+				      GFP_ATOMIC | GFP_DMA32);
- 		if (!buf)
- 			break;
- 
+Patch 1-2 are small improvements to the existing driver. While patch 3-4 
+adds V4H support. Finally patch 5 turns rcar_gen4_ptp into a separate 
+module to allow the gPTP functionality to be shared between the two 
+users without having to duplicate the code in each.
+
+Niklas Söderlund (5):
+  net: ethernet: renesas: rcar_gen4_ptp: Remove incorrect comment
+  net: ethernet: renesas: rcar_gen4_ptp: Fail on unknown register layout
+  net: ethernet: renesas: rcar_gen4_ptp: Prepare for shared register
+    layout
+  net: ethernet: renesas: rcar_gen4_ptp: Add V4H clock setting
+  net: ethernet: renesas: rcar_gen4_ptp: Break out to module
+
+ drivers/net/ethernet/renesas/Kconfig         | 10 ++++++++
+ drivers/net/ethernet/renesas/Makefile        |  5 ++--
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 24 +++++++++++++++-----
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.h | 13 +++++++----
+ drivers/net/ethernet/renesas/rswitch.c       |  2 +-
+ 5 files changed, 40 insertions(+), 14 deletions(-)
+
 -- 
-2.42.0
+2.42.1
 
 
