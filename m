@@ -1,86 +1,167 @@
-Return-Path: <netdev+bounces-48530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6277EEB0C
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 03:30:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36F47EEB22
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 03:36:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9F3F1C20947
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:30:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74A091F24C4C
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 02:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D07649F79;
-	Fri, 17 Nov 2023 02:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39B6389;
+	Fri, 17 Nov 2023 02:36:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFJlyho9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TRNdKwlt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D081CA56
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:30:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9F0F6C433C9;
-	Fri, 17 Nov 2023 02:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700188223;
-	bh=Bi++G3J2BXlCQbqHWLtl+LNBbMJokVdqsIbgDw3TS5Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KFJlyho9HYAGTezuDY/KGiPEppGTIqsON5prVvh8nVs0EiSVbTeypHQtCRQH1gSV6
-	 hg8IQ4xL5emrLgW7wd3j/Xqs0Aiq+iClKEoHJEVzSp3YuDXTDLn1awSAVqVjEvN5CI
-	 SmUHlqfLf/x4EwQucrhu6DZ38M+QGUmlEpVuD6lTLZ4sBR163PxqcCwSXtNiSkdwwc
-	 bOlvu+S5GXNZdDSuR0FypPfRDgYNHWz1VKghZh9Abx75g6FiOAnsm0c3zQFkqFij48
-	 laZllMaA+eZgHQYeCFFuXDERGuMnUpZt4P5+8n7c/8uFyiMd5+6zBvpYqdXjtdoxTJ
-	 UoSpyvJ8j0oog==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7AF73E1F661;
-	Fri, 17 Nov 2023 02:30:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173611A7;
+	Thu, 16 Nov 2023 18:36:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700188590; x=1731724590;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=nhO/RuLvLI/Qzv/uO4IXRzJbtBt6rCc4se0l/kw/tSc=;
+  b=TRNdKwltfxW91QlnR2nTe8MVGJ6Xwgfkd2U+V96IFNadPpShoHbAcTxC
+   8wiZjOlN86ayOarlmuvjiCDb2tRfKEVQCfUcgNdW2fRF1Gg4IJ2attpD4
+   9gHQboMDmX0u50LEp01TBdcP/GoDPHImCcMTvqbGiSicjt7c+FD8356Xu
+   /bEUPjqQrjgrnhTrVZEg5c7jpzyjHGhplzhCe7s5hxl7n1lqQgcwDJyVv
+   cZIfxSZeAkMHZAn9x7W5qEb4hPpMGqbM8rIyUK1EJ+fTfvkLbSvk8zdBL
+   2Mf8XQkifm5DK4nTq9oLTR5RGbEri6DxoL5TjmVPToY4BeKaZfUqW1/EE
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="394076414"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="394076414"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 18:36:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10896"; a="856199725"
+X-IronPort-AV: E=Sophos;i="6.04,205,1695711600"; 
+   d="scan'208";a="856199725"
+Received: from jlelizal-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.255.229.114])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2023 18:36:28 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, Faizal Rahim
+ <faizal.abdul.rahim@linux.intel.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, "David S .
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 4/7] net/sched: taprio: get corrected value of
+ cycle_time and interval
+In-Reply-To: <20231109111146.qrnekz6ykyzrcpbd@skbuf>
+References: <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-1-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
+ <20231107112023.676016-5-faizal.abdul.rahim@linux.intel.com>
+ <20231109111146.qrnekz6ykyzrcpbd@skbuf>
+Date: Thu, 16 Nov 2023 18:36:28 -0800
+Message-ID: <87h6llqf6b.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] tipc: Remove redundant call to TLV_SPACE()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170018822349.19040.6248661340876085947.git-patchwork-notify@kernel.org>
-Date: Fri, 17 Nov 2023 02:30:23 +0000
-References: <20231117003704.1738094-1-syoshida@redhat.com>
-In-Reply-To: <20231117003704.1738094-1-syoshida@redhat.com>
-To: Shigeru Yoshida <syoshida@redhat.com>
-Cc: jmaloy@redhat.com, ying.xue@windriver.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Vladimir,
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Vladimir Oltean <vladimir.oltean@nxp.com> writes:
 
-On Fri, 17 Nov 2023 09:37:04 +0900 you wrote:
-> The purpose of TLV_SPACE() is to add the TLV descriptor size to the size of
-> the TLV value passed as argument and align the resulting size to
-> TLV_ALIGNTO.
-> 
-> tipc_tlv_alloc() calls TLV_SPACE() on its argument. In other words,
-> tipc_tlv_alloc() takes its argument as the size of the TLV value. So the
-> call to TLV_SPACE() in tipc_get_err_tlv() is redundant. Let's remove this
-> redundancy.
-> 
-> [...]
+> On Tue, Nov 07, 2023 at 06:20:20AM -0500, Faizal Rahim wrote:
+>> Retrieve adjusted cycle_time and interval values through new APIs.
+>> Note that in some cases where the original values are required,
+>> such as in dump_schedule() and setup_first_end_time(), direct calls
+>> to cycle_time and interval are retained without using the new APIs.
+>>=20
+>> Added a new field, correction_active, in the sched_entry struct to
+>> determine the entry's correction state. This field is required due
+>> to specific flow like find_entry_to_transmit() -> get_interval_end_time()
+>> which retrieves the interval for each entry. During positive cycle
+>> time correction, it's known that the last entry interval requires
+>> correction. However, for negative correction, the affected entry
+>> is unknown, which is why this new field is necessary.
+>
+> I agree with the motivation, but I'm not sure if the chosen solution is
+> correct.
+>
+> static u32 get_interval(const struct sched_entry *entry,
+> 			const struct sched_gate_list *oper)
+> {
+> 	if (entry->correction_active)
+> 		return entry->interval + oper->cycle_time_correction;
+>
+> 	return entry->interval;
+> }
+>
+> What if the schedule looks like this:
+>
+> 	sched-entry S 0x01 125000000
+> 	sched-entry S 0x02 125000000
+> 	sched-entry S 0x04 125000000
+> 	sched-entry S 0x08 125000000
+> 	sched-entry S 0x10 125000000
+> 	sched-entry S 0x20 125000000
+> 	sched-entry S 0x40 125000000
+> 	sched-entry S 0x80 125000000
+>
+> and the calculated cycle_time_correction is -200000000? That would
+> eliminate the entire last sched-entry (0x80), and the previous one
+> (0x40) would run for just 75000000 ns. But your calculation would say
+> that its interval is =E2=88=9275000000 ns (actually reported as an u32 po=
+sitive
+> integer, so it would be a completely bogus value).
+>
+> So not only is the affected entry unknown, but also the amount of cycle
+> time correction that applies to it is unknown.
+>
+> I'm looking at where we need get_interval(), and it's from:
+>
+> taprio_enqueue_one()
+> -> is_valid_interval()
+>    -> find_entry_to_transmit()
+>       -> get_interval_end_time()
+> -> get_packet_txtime()
+>    -> find_entry_to_transmit()
+>
+> I admit it's a part of taprio which I don't understand too well. Why do
+> we perform such complex calculations in get_interval_end_time() when we
+> should have struct sched_entry :: end_time precomputed and available for
+> this purpose (although it was primarily inteded for advance_sched() and
+> not for enqueue())?
+>
+> Vinicius, do you know?
 
-Here is the summary with links:
-  - [net-next,v2] tipc: Remove redundant call to TLV_SPACE()
-    https://git.kernel.org/netdev/net-next/c/d580d265e9ab
+Sorry for the delay, I thought that I went through all the messages in
+this thread, but missed this one.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I think what is missing is some context, this series from Faizal also
+includes fixes for taprio "txtime-assisted mode", where we try to
+support for 801.1Qbv schedules, including cycle-extension and schedules
+with arbitrary number of entries.
+
+The basic idea is that during enqueue, taprio will calculate the txtime
+of a packet so it "follows" the configured schedule, and pass that
+packet to ETF, which is running as child of taprio. It is a bit of hack,
+but it works well enough.
+
+And I agree with your opinion, that this part of the code is
+complicated. I have one permanent item on my todo list to spend some
+quality time looking at it, and trying to make it simpler.
+
+But fixing it to make it work with cycle-time-extension comes first.
+Then, it's on me to not break it later.
+
+Sorry for the rambling. Does this answer your question?
 
 
+Cheers,
+--=20
+Vinicius
 
