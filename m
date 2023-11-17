@@ -1,58 +1,74 @@
-Return-Path: <netdev+bounces-48641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2CFB7EF0BB
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:40:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B46077EF0D1
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 11:43:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B453281182
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:40:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FEC71F28941
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A807125C7;
-	Fri, 17 Nov 2023 10:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C921A71A;
+	Fri, 17 Nov 2023 10:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="CSamzhVQ"
+	dkim=pass (2048-bit key) header.d=shopee.com header.i=@shopee.com header.b="Zd13dAUT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AED0127;
-	Fri, 17 Nov 2023 02:40:39 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AH5Yu7S028673;
-	Fri, 17 Nov 2023 02:40:28 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=2uIlioN1bFST8jawAO6YLw204IOztiIPTnPD9NbgGbU=;
- b=CSamzhVQH4rrYqXlTY2mWd3f3c/vH1Kn5kG8USM4fROCxNApyThCSrhNR8J4bngx1xTt
- /znyB18IEbwZn425D371wsA2i66Tusac/wWjUcj1otpOAPv2FrpidFNKRUr34epf4CgD
- YuJ7VPh+BhAkg1BtCoZRlgbE2tvCIhbHmxniO+gbhRSBIN9dkwJYzhpYr3osCBql8UXE
- U/qBZmSasubUKCqPcCz5xuajE9Hr+KtT9EloE3YUxOH6yeoq7iKB0CPbojD2bc2/Qb2Z
- TvUSXYHLgs6dfvsi/VB3xEXOHezpJKBnFHkeKRBsyOpjuHzPmKJrX9T4marMhHdRw6T8 iA== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3udvh5hsm4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 02:40:27 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 17 Nov
- 2023 02:40:25 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Fri, 17 Nov 2023 02:40:25 -0800
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id D10F33F7086;
-	Fri, 17 Nov 2023 02:40:21 -0800 (PST)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH v2] octeontx2-pf: Fix memory leak during interface down
-Date: Fri, 17 Nov 2023 16:10:18 +0530
-Message-ID: <20231117104018.3435212-1-sumang@marvell.com>
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D046F127
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:43:24 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1cc2fc281cdso15114135ad.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 02:43:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shopee.com; s=shopee.com; t=1700217804; x=1700822604; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4u6cYv7qHS3jfyv6VusFhEGtH9TkwNd/QVhjYn00CtU=;
+        b=Zd13dAUTp54nP+Z8CqTpu4nSy0MF15qBUDAuR4N1Ax4KJI0PMvW+8cNu0Wdtd6C29f
+         TF16LeDplsnU88q6hJ7CU5q2vZyfEcrhMy11KOpywJ+tfjPicLpIcgkvGtMxMqdjdtd4
+         qMsSsWXBMn7NBBsxxqnr0RXT1V0oRQv9RCrp91qcD7mAh5GOazG/zWNMHlUfvlcdGw9x
+         LMRJUeXLa6fBjiIAxYKLwje5CvHq/gQiEdp5w1TgQt9zJ91gDaUQ6oCs2o6l4gjRHmxs
+         sxBjUKGxbvBYno5Mc2Y4ntAmukNoYnNmABd8DWUCLH5vu8kK/b8rrGlUv8rVGsg9askT
+         2ubQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700217804; x=1700822604;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4u6cYv7qHS3jfyv6VusFhEGtH9TkwNd/QVhjYn00CtU=;
+        b=G6LcJfQdHpaNIWFnD2r/H2NFkCkH8Z9X8fbkjQq5FrkBWyt6NcPQf0+JKQx46FARAY
+         ZXVxzHIPIXAaAapZZMxa7rd9eMd1TT2KuhZoePeDapKJ9dBJ0HpWcEvrbz6n1iBd6ZOk
+         4PLkCPzh/v7il0gMc131HKMQEQTipQtmP9VkApZwUaEo8DxnwQ90UTwrZRK7AOc0pBYO
+         bTd5joRo/OVRJH7FzGWAXXI4GMZcy7PlNLk6dJ5LqVdFYT7jqhyCWSyEK2NvMjsmROtS
+         rqXPcxUHlWHqwWwCKV2jcoaW4yk9ew9tdIWTvqeRvGn6T3dO9gjCMKX59nw1SxX5w2pr
+         KyGQ==
+X-Gm-Message-State: AOJu0YwWEQpE/quZsC7J9c/a3MTn7feAJVNYm/4d5v81KcFr9/crLyml
+	2jVYvywdvotdypK2y6bNjqxXEw==
+X-Google-Smtp-Source: AGHT+IHAdwWt+tH7o0//OLex7pxxHbXHHfmO+fsGSLZGL3oaQwvN5ovIeBdWCCrPT26qIsJgH1EADQ==
+X-Received: by 2002:a17:902:eb8f:b0:1cc:bf6b:f3b1 with SMTP id q15-20020a170902eb8f00b001ccbf6bf3b1mr12515205plg.37.1700217804177;
+        Fri, 17 Nov 2023 02:43:24 -0800 (PST)
+Received: from ubuntu-hf2.default.svc.cluster.local ([101.127.248.173])
+        by smtp.gmail.com with ESMTPSA id y7-20020a17090322c700b001b81a97860asm1117883plg.27.2023.11.17.02.43.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 02:43:23 -0800 (PST)
+From: Haifeng Xu <haifeng.xu@shopee.com>
+To: edumazet@google.com
+Cc: andy@greyhouse.net,
+	davem@davemloft.net,
+	j.vosburgh@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haifeng Xu <haifeng.xu@shopee.com>
+Subject: [PATCH v2] bonding: use a read-write lock in bonding_show_bonds()
+Date: Fri, 17 Nov 2023 10:43:11 +0000
+Message-Id: <20231117104311.1273-1-haifeng.xu@shopee.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
+References: <CANn89iJnjp8YYYLqtfAGg6PU9iiSrKbMU43wgDkuEVqX8kSCmA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,38 +76,153 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: PgDUBc2lFmwXsOkEXOWDvtjufiqNpFBx
-X-Proofpoint-ORIG-GUID: PgDUBc2lFmwXsOkEXOWDvtjufiqNpFBx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-17_09,2023-11-16_01,2023-05-22_02
 
-During 'ifconfig <netdev> down' one RSS memory was not getting freed.
-This patch fixes the same.
+Problem description:
 
-Fixes: 81a4362016e7 ("octeontx2-pf: Add RSS multi group support")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
+Call stack:
+......
+PID: 210933  TASK: ffff92424e5ec080  CPU: 13  COMMAND: "kworker/u96:2"
+[ffffa7a8e96bbac0] __schedule at ffffffffb0719898
+[ffffa7a8e96bbb48] schedule at ffffffffb0719e9e
+[ffffa7a8e96bbb68] rwsem_down_write_slowpath at ffffffffafb3167a
+[ffffa7a8e96bbc00] down_write at ffffffffb071bfc1
+[ffffa7a8e96bbc18] kernfs_remove_by_name_ns at ffffffffafe3593e
+[ffffa7a8e96bbc48] sysfs_unmerge_group at ffffffffafe38922
+[ffffa7a8e96bbc68] dpm_sysfs_remove at ffffffffb021c96a
+[ffffa7a8e96bbc80] device_del at ffffffffb0209af8
+[ffffa7a8e96bbcd0] netdev_unregister_kobject at ffffffffb04a6b0e
+[ffffa7a8e96bbcf8] unregister_netdevice_many at ffffffffb046d3d9
+[ffffa7a8e96bbd60] default_device_exit_batch at ffffffffb046d8d1
+[ffffa7a8e96bbdd0] ops_exit_list at ffffffffb045e21d
+[ffffa7a8e96bbe00] cleanup_net at ffffffffb045ea46
+[ffffa7a8e96bbe60] process_one_work at ffffffffafad94bb
+[ffffa7a8e96bbeb0] worker_thread at ffffffffafad96ad
+[ffffa7a8e96bbf10] kthread at ffffffffafae132a
+[ffffa7a8e96bbf50] ret_from_fork at ffffffffafa04b92
+
+290858 PID: 278176  TASK: ffff925deb39a040  CPU: 32  COMMAND: "node-exporter"
+[ffffa7a8d14dbb80] __schedule at ffffffffb0719898
+[ffffa7a8d14dbc08] schedule at ffffffffb0719e9e
+[ffffa7a8d14dbc28] schedule_preempt_disabled at ffffffffb071a24e
+[ffffa7a8d14dbc38] __mutex_lock at ffffffffb071af28
+[ffffa7a8d14dbcb8] __mutex_lock_slowpath at ffffffffb071b1a3
+[ffffa7a8d14dbcc8] mutex_lock at ffffffffb071b1e2
+[ffffa7a8d14dbce0] rtnl_lock at ffffffffb047f4b5
+[ffffa7a8d14dbcf0] bonding_show_bonds at ffffffffc079b1a1 [bonding]
+[ffffa7a8d14dbd20] class_attr_show at ffffffffb02117ce
+[ffffa7a8d14dbd30] sysfs_kf_seq_show at ffffffffafe37ba1
+[ffffa7a8d14dbd50] kernfs_seq_show at ffffffffafe35c07
+[ffffa7a8d14dbd60] seq_read_iter at ffffffffafd9fce0
+[ffffa7a8d14dbdc0] kernfs_fop_read_iter at ffffffffafe36a10
+[ffffa7a8d14dbe00] new_sync_read at ffffffffafd6de23
+[ffffa7a8d14dbe90] vfs_read at ffffffffafd6e64e
+[ffffa7a8d14dbed0] ksys_read at ffffffffafd70977
+[ffffa7a8d14dbf10] __x64_sys_read at ffffffffafd70a0a
+[ffffa7a8d14dbf20] do_syscall_64 at ffffffffb070bf1c
+[ffffa7a8d14dbf50] entry_SYSCALL_64_after_hwframe at ffffffffb080007c
+......
+
+Thread 210933 holds the rtnl_mutex and tries to acquire the kernfs_rwsem,
+but there are many readers which hold the kernfs_rwsem, so it has to sleep
+for a long time to wait the readers release the lock. Thread 278176 and any
+other threads which call bonding_show_bonds() also need to wait because
+they try to acquire the rtnl_mutex.
+
+bonding_show_bonds() uses rtnl_mutex to protect the bond_list traversal.
+However, the addition and deletion of bond_list are only performed in
+bond_init()/bond_uninit(), so we can introduce a separate read-write lock
+to synchronize bond list mutation.
+
+What are the benefits of this change?
+
+1) All threads which call bonding_show_bonds() only wait when the
+registration or unregistration of bond device happens.
+
+2) There are many other users of rtnl_mutex, so bonding_show_bonds()
+won't compete with them.
+
+In a word, this change reduces the lock contention of rtnl_mutex.
+
+Signed-off-by: Haifeng Xu <haifeng.xu@shopee.com>
 ---
-v2 changes:
-- Updated fixes tag
+v2:
+- move the call stack after the description
+- fix typos in the changelog
+---
+ drivers/net/bonding/bond_main.c  | 4 ++++
+ drivers/net/bonding/bond_sysfs.c | 6 ++++--
+ include/net/bonding.h            | 3 +++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 91b99fd70361..ba95ac913274 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1934,6 +1934,8 @@ int otx2_stop(struct net_device *netdev)
- 	/* Clear RSS enable flag */
- 	rss = &pf->hw.rss_info;
- 	rss->enable = false;
-+	if (!netif_is_rxfh_configured(netdev))
-+		kfree(rss->rss_ctx[DEFAULT_RSS_CONTEXT_GROUP]);
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 8e6cc0e133b7..db8f1efaab78 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -5957,7 +5957,9 @@ static void bond_uninit(struct net_device *bond_dev)
  
- 	/* Cleanup Queue IRQ */
- 	vec = pci_irq_vector(pf->pdev,
+ 	bond_set_slave_arr(bond, NULL, NULL);
+ 
++	write_lock(&bonding_dev_lock);
+ 	list_del(&bond->bond_list);
++	write_unlock(&bonding_dev_lock);
+ 
+ 	bond_debug_unregister(bond);
+ }
+@@ -6370,7 +6372,9 @@ static int bond_init(struct net_device *bond_dev)
+ 	spin_lock_init(&bond->stats_lock);
+ 	netdev_lockdep_set_classes(bond_dev);
+ 
++	write_lock(&bonding_dev_lock);
+ 	list_add_tail(&bond->bond_list, &bn->dev_list);
++	write_unlock(&bonding_dev_lock);
+ 
+ 	bond_prepare_sysfs_group(bond);
+ 
+diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_sysfs.c
+index 2805135a7205..e107c1d7a6bf 100644
+--- a/drivers/net/bonding/bond_sysfs.c
++++ b/drivers/net/bonding/bond_sysfs.c
+@@ -28,6 +28,8 @@
+ 
+ #define to_bond(cd)	((struct bonding *)(netdev_priv(to_net_dev(cd))))
+ 
++DEFINE_RWLOCK(bonding_dev_lock);
++
+ /* "show" function for the bond_masters attribute.
+  * The class parameter is ignored.
+  */
+@@ -40,7 +42,7 @@ static ssize_t bonding_show_bonds(const struct class *cls,
+ 	int res = 0;
+ 	struct bonding *bond;
+ 
+-	rtnl_lock();
++	read_lock(&bonding_dev_lock);
+ 
+ 	list_for_each_entry(bond, &bn->dev_list, bond_list) {
+ 		if (res > (PAGE_SIZE - IFNAMSIZ)) {
+@@ -55,7 +57,7 @@ static ssize_t bonding_show_bonds(const struct class *cls,
+ 	if (res)
+ 		buf[res-1] = '\n'; /* eat the leftover space */
+ 
+-	rtnl_unlock();
++	read_unlock(&bonding_dev_lock);
+ 	return res;
+ }
+ 
+diff --git a/include/net/bonding.h b/include/net/bonding.h
+index 5b8b1b644a2d..584ba4b5b8df 100644
+--- a/include/net/bonding.h
++++ b/include/net/bonding.h
+@@ -777,6 +777,9 @@ extern struct rtnl_link_ops bond_link_ops;
+ /* exported from bond_sysfs_slave.c */
+ extern const struct sysfs_ops slave_sysfs_ops;
+ 
++/* exported from bond_sysfs.c */
++extern rwlock_t bonding_dev_lock;
++
+ /* exported from bond_3ad.c */
+ extern const u8 lacpdu_mcast_addr[];
+ 
 -- 
 2.25.1
 
