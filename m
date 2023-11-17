@@ -1,215 +1,177 @@
-Return-Path: <netdev+bounces-48697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378AC7EF46E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:28:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B655C7EF4B3
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:45:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF753B207E7
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:28:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6EA11C20897
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 14:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8301E36AEE;
-	Fri, 17 Nov 2023 14:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DQtMu1q4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F0D328D2;
+	Fri, 17 Nov 2023 14:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646771EA7F
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 14:28:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 883CCC433C7
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 14:28:35 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="DQtMu1q4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1700231310;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+5EC+wGvau4MkSgMzGo/kYP2JA/syf3nTRDtT9fBuA=;
-	b=DQtMu1q4cfPloSoXs7Pxvp+PR6D7eLBIhb6EpgxwCQ1mG3DZ6cS/Souaaz6JYtZahdGEjP
-	3IpMF6ggg/wllpg9M+LKPzc/3sZyL3BFW6tpXO3xjVUUt2i9RNMi4l4GTTH0KIENWHqW6P
-	ea2CfJ18mtpP1bTNY/IRE4fvJ2JC0GA=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e50ba18c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Fri, 17 Nov 2023 14:28:30 +0000 (UTC)
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5ac376d311aso22159557b3.1
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:28:30 -0800 (PST)
-X-Gm-Message-State: AOJu0YxAR6xA2YhBiQ11LwAYDUQTi1hJn9xUDwQfkidUMKmO+vpsxEmF
-	3eXtCTDRfhQwFbDbmSz2hEUoTC9qEDvROqSSQ3k=
-X-Google-Smtp-Source: AGHT+IHbhRda+2hqKwmLijgXdKdZ7yvL10vaMilnSrG94GnMm1ZwxDcY93WCZxln/QUVQXbsYoHfH4cQFSPRbKlWrJs=
-X-Received: by 2002:a81:4113:0:b0:5a8:277f:b378 with SMTP id
- o19-20020a814113000000b005a8277fb378mr15795154ywa.1.1700231309279; Fri, 17
- Nov 2023 06:28:29 -0800 (PST)
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51763A0
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 06:45:16 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r405i-0001Hu-Vc; Fri, 17 Nov 2023 15:45:06 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r405i-009hVT-49; Fri, 17 Nov 2023 15:45:06 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r405h-0037SZ-Qv; Fri, 17 Nov 2023 15:45:05 +0100
+Date: Fri, 17 Nov 2023 15:45:05 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Alex Elder <elder@ieee.org>
+Cc: Alex Elder <elder@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 01/10] net: ipa: Don't error out in .remove()
+Message-ID: <20231117144505.yfilrqpfbdhnhcds@pengutronix.de>
+References: <20231117095922.876489-1-u.kleine-koenig@pengutronix.de>
+ <20231117095922.876489-2-u.kleine-koenig@pengutronix.de>
+ <79f4a1ff-c4af-45be-b15c-fa07bc67f449@ieee.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117141733.3344158-1-edumazet@google.com>
-In-Reply-To: <20231117141733.3344158-1-edumazet@google.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Fri, 17 Nov 2023 15:28:16 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qvTUj4RUBo7AJXKhVSxvKbKxbKsnU0_rDfGSeXLNvb+Q@mail.gmail.com>
-Message-ID: <CAHmME9qvTUj4RUBo7AJXKhVSxvKbKxbKsnU0_rDfGSeXLNvb+Q@mail.gmail.com>
-Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Hangbin Liu <liuhangbin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="saeud3ltthdfugfi"
+Content-Disposition: inline
+In-Reply-To: <79f4a1ff-c4af-45be-b15c-fa07bc67f449@ieee.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--saeud3ltthdfugfi
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+Hello Alex,
 
-On Fri, Nov 17, 2023 at 3:17=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> wg_xmit() can be called concurrently, KCSAN reported [1]
-> some device stats updates can be lost.
->
-> Use DEV_STATS_INC() for this unlikely case.
->
-> [1]
-> BUG: KCSAN: data-race in wg_xmit / wg_xmit
->
-> read-write to 0xffff888104239160 of 8 bytes by task 1375 on cpu 0:
-> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
-> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
-> xmit_one net/core/dev.c:3543 [inline]
-> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
-> ...
->
-> read-write to 0xffff888104239160 of 8 bytes by task 1378 on cpu 1:
-> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
-> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
-> xmit_one net/core/dev.c:3543 [inline]
-> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
-> ...
->
-> v2: also change wg_packet_consume_data_done() (Hangbin Liu)
->     and wg_packet_purge_staged_packets()
->
-> Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> ---
->  drivers/net/wireguard/device.c  |  4 ++--
->  drivers/net/wireguard/receive.c | 12 ++++++------
->  drivers/net/wireguard/send.c    |  3 ++-
->  3 files changed, 10 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/devic=
-e.c
-> index 258dcc1039216f311a223fd348295d4b5e03a3ed..deb9636b0ecf8f47e832a0b07=
-e9e049ba19bdf16 100644
-> --- a/drivers/net/wireguard/device.c
-> +++ b/drivers/net/wireguard/device.c
-> @@ -210,7 +210,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struc=
-t net_device *dev)
->          */
->         while (skb_queue_len(&peer->staged_packet_queue) > MAX_STAGED_PAC=
-KETS) {
->                 dev_kfree_skb(__skb_dequeue(&peer->staged_packet_queue));
-> -               ++dev->stats.tx_dropped;
-> +               DEV_STATS_INC(dev, tx_dropped);
->         }
->         skb_queue_splice_tail(&packets, &peer->staged_packet_queue);
->         spin_unlock_bh(&peer->staged_packet_queue.lock);
-> @@ -228,7 +228,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struc=
-t net_device *dev)
->         else if (skb->protocol =3D=3D htons(ETH_P_IPV6))
->                 icmpv6_ndo_send(skb, ICMPV6_DEST_UNREACH, ICMPV6_ADDR_UNR=
-EACH, 0);
->  err:
-> -       ++dev->stats.tx_errors;
-> +       DEV_STATS_INC(dev, tx_errors);
->         kfree_skb(skb);
->         return ret;
->  }
-> diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/rece=
-ive.c
-> index 0b3f0c843550957ee1fe3bed7185a7d990246c2b..a176653c88616b1bc871fe52f=
-cea778b5e189f69 100644
-> --- a/drivers/net/wireguard/receive.c
-> +++ b/drivers/net/wireguard/receive.c
-> @@ -416,20 +416,20 @@ static void wg_packet_consume_data_done(struct wg_p=
-eer *peer,
->         net_dbg_skb_ratelimited("%s: Packet has unallowed src IP (%pISc) =
-from peer %llu (%pISpfsc)\n",
->                                 dev->name, skb, peer->internal_id,
->                                 &peer->endpoint.addr);
-> -       ++dev->stats.rx_errors;
-> -       ++dev->stats.rx_frame_errors;
-> +       DEV_STATS_INC(dev, rx_errors);
-> +       DEV_STATS_INC(dev, rx_frame_errors);
->         goto packet_processed;
->  dishonest_packet_type:
->         net_dbg_ratelimited("%s: Packet is neither ipv4 nor ipv6 from pee=
-r %llu (%pISpfsc)\n",
->                             dev->name, peer->internal_id, &peer->endpoint=
-.addr);
-> -       ++dev->stats.rx_errors;
-> -       ++dev->stats.rx_frame_errors;
-> +       DEV_STATS_INC(dev, rx_errors);
-> +       DEV_STATS_INC(dev, rx_frame_errors);
->         goto packet_processed;
->  dishonest_packet_size:
->         net_dbg_ratelimited("%s: Packet has incorrect size from peer %llu=
- (%pISpfsc)\n",
->                             dev->name, peer->internal_id, &peer->endpoint=
-.addr);
-> -       ++dev->stats.rx_errors;
-> -       ++dev->stats.rx_length_errors;
-> +       DEV_STATS_INC(dev, rx_errors);
-> +       DEV_STATS_INC(dev, rx_length_errors);
->         goto packet_processed;
->  packet_processed:
->         dev_kfree_skb(skb);
-> diff --git a/drivers/net/wireguard/send.c b/drivers/net/wireguard/send.c
-> index 95c853b59e1dae1df8b4e5cbf4e3541e35806b82..0d48e0f4a1ba3e1f11825136a=
-65de0867b204496 100644
-> --- a/drivers/net/wireguard/send.c
-> +++ b/drivers/net/wireguard/send.c
-> @@ -333,7 +333,8 @@ static void wg_packet_create_data(struct wg_peer *pee=
-r, struct sk_buff *first)
->  void wg_packet_purge_staged_packets(struct wg_peer *peer)
->  {
->         spin_lock_bh(&peer->staged_packet_queue.lock);
-> -       peer->device->dev->stats.tx_dropped +=3D peer->staged_packet_queu=
-e.qlen;
-> +       DEV_STATS_ADD(peer->device->dev, tx_dropped,
-> +                     peer->staged_packet_queue.qlen);
->         __skb_queue_purge(&peer->staged_packet_queue);
->         spin_unlock_bh(&peer->staged_packet_queue.lock);
->  }
+On Fri, Nov 17, 2023 at 08:16:02AM -0600, Alex Elder wrote:
+> On 11/17/23 3:59 AM, Uwe Kleine-K=F6nig wrote:
+> > Returning early from .remove() with an error code still results in the
+> > driver unbinding the device. So the driver core ignores the returned er=
+ror
+> > code and the resources that were not freed are never catched up. In
+> > combination with devm this also often results in use-after-free bugs.
+> >=20
+> > Here even if the modem cannot be stopped, resources must be freed. So
+> > replace the early error return by an error message an continue to clean=
+ up.
+> >=20
+> > This prepares changing ipa_remove() to return void.
+> >=20
+> > Fixes: cdf2e9419dd9 ("soc: qcom: ipa: main code")
+>=20
+> Is this really a bug fix?  This code was doing the right
+> thing even if the caller was not.
 
-This is probably fine if you want to do it and feel strongly about it,
-and you can take this directly into net/net-next with my:
+Yes, since cdf2e9419dd9 the driver is leaking resources if
+ipa_modem_stop() fails. I call that a bug.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+> > ---
+> >   drivers/net/ipa/ipa_main.c | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+> > index da853353a5c7..60e4f590f5de 100644
+> > --- a/drivers/net/ipa/ipa_main.c
+> > +++ b/drivers/net/ipa/ipa_main.c
+> > @@ -960,7 +960,8 @@ static int ipa_remove(struct platform_device *pdev)
+> >   			ret =3D ipa_modem_stop(ipa);
+> >   		}
+> >   		if (ret)
+> > -			return ret;
+> > +			dev_err(dev, "Failed to stop modem (%pe)\n",
+> > +				ERR_PTR(ret));
+>=20
+> I think this is not correct, or rather, I think it is less
+> correct than returning early.
+>=20
+> What's happening here is we're trying to stop the modem.
+> It is an external entity that might have some in-flight
+> activity that could include "owning" some buffers provided
+> by Linux, to be filled with received data.  There's a
+> chance that cleaning up (with the call to ipa_teardown())
+> can do the right thing, but I'm not going to sign off on
+> this until I've looked at that in closer detail.
+>=20
+> This is something that *could* happen but is not *expected*
+> to happen.  We expect stopping the modem to succeed so if
+> it doesn't, something's wrong and it's not 100% clear how
+> to properly handle it.
 
-However, I recall evaluating the races here long ago and deliberately
-deciding not to do anything about it. Sure KCSAN will complain, but
-these stats being pixel perfect isn't really _that_ important and it
-really doesn't seem worth it to have the performance hit of several
-atomics on every packet. There's also peer->{r,t}x_bytes that should
-probably be adjusted if you're going to change these. But again - is
-it really worth it to do that? It just seems like such an unnecessary
-performance hit.
+Returning early is wrong for sure. You skip for example the free_irq
+step, so the irq stays active, it might trigger and use the unbound
+device. And as the device is unbound, .remove() is never retried and the
+irq (and all the other resources) are never freed.
 
-So I think I'd prefer to _not_ fix this. But if you feel really
-strongly about it, I'll be okay deferring to your judgement.
+Take the time you need to review the changes. If you don't want to
+accept the change now, I'd like to apply the following change:
 
-Jason
+diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+index da853353a5c7..f77decf0b1e4 100644
+--- a/drivers/net/ipa/ipa_main.c
++++ b/drivers/net/ipa/ipa_main.c
+@@ -959,8 +959,11 @@ static int ipa_remove(struct platform_device *pdev)
+ 			usleep_range(USEC_PER_MSEC, 2 * USEC_PER_MSEC);
+ 			ret =3D ipa_modem_stop(ipa);
+ 		}
+-		if (ret)
+-			return ret;
++		if (ret) {
++			dev_err(dev, "Failed to stop modem (%pe)\n",
++				ERR_PTR(ret));
++			return 0;
++		}
+=20
+ 		ipa_teardown(ipa);
+ 	}
+
+instead. This introduces no change in behaviour apart from improving the
+error message and allows me to continue with my quest to make .remove
+return void.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--saeud3ltthdfugfi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmVXfHAACgkQj4D7WH0S
+/k7i3AgAmOGLjXAAOT11XfuYtRPd+oIEbnmLnDQIXZ0sDg4GVDEsXZY8b70VlP2j
+JlVgH/x71zyXTjYKynFM0E8StNiHVkkEozKhwGw8gWikff60SZvT000FiGH6CGzf
+PDCmzO9hXxaDaP8o1SQCx/nnhIIo/FktXQSJyzETKD1Dh9qa87AjIo/BMD0qOY0f
+ACUQ7S4VjEQEglKX0UEKwdZXvSri8gLv99ZbfZZaFzPlqVApRI+QsyZEGPVnZ68E
+wzc00sfMiYtrR6CuCbwuAfHOyI3ufguImtBXRjEsYJ9747rq76MW7f8dJQs88h/4
+EoSGAJlLwCNXC0nD1j+hqkZYT+Cdtw==
+=hvU7
+-----END PGP SIGNATURE-----
+
+--saeud3ltthdfugfi--
 
