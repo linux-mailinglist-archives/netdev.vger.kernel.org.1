@@ -1,482 +1,238 @@
-Return-Path: <netdev+bounces-48862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDD557EFC48
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:52:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 919937EFC44
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BE81281417
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 23:52:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 051F2B20A53
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 23:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE7A47763;
-	Fri, 17 Nov 2023 23:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A4B46559;
+	Fri, 17 Nov 2023 23:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PO2l5d3n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bh02h//S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3902292
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:52:29 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6bd73395bceso1939775b3a.0
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:52:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700265148; x=1700869948; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NyVbG5VmZUH+XmjhsyZuY/N3YPHIeOO3qsa4EJahHUM=;
-        b=PO2l5d3npx3KP9vo4o4lRxNhx4q4jeV+RjApaP7I2o2a2MZCBgXBzpZodJ1uMtlwMs
-         uyN+BlSH9NZLLKBMGXUR5L7c3fN6wVmulCh3g69o2n/FKM+hwsqJpKIoOtxJouevumpB
-         1hnniUJtOFVztvOvelr5kzR3bbCXX7gJlsvwfm6Lm7XqyK4y71KEKjhy+VllNjfkskhv
-         akPgIaoi0liBl3IoJOTcPWCbipmtbHI61ZhPwMK0NoYLr7VxyHRX+WqdDmwdM9Vk26hN
-         kMu9LQ7j9mkOXpAF+KqjZruxTATnmC4l6xS+yZU+AvB85GYNuL6dI4r4j3nCwYpTjl0Y
-         l/Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700265148; x=1700869948;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NyVbG5VmZUH+XmjhsyZuY/N3YPHIeOO3qsa4EJahHUM=;
-        b=N+5o4mXUF+4ovYMb1fmpByP48e/xtOGhCTtangXOCTs3XPsvu4R4bUq2R+X8IdhiGT
-         3ZyG0qUkNb6LfL+uGYyoW+VCgj/x6W47Ql1TzfYcjtgVBW+LuPG2QmSdUNcisZ0yjuFa
-         BNZsW6mExPJW3Glb61uOgfDirXMvd5Dcf/g6Fjzcp9asRcwrdQCD9J2g9hH9I2yguPDy
-         HKcOzmpnpD0OUnxUH//wnZ3IXll/OlgLHqOCQuMbyjB44WC5cR7Z49bhftbeBpmj5Rn5
-         Mmj1I1c/Ghp2GQeQGX+ounarNP7LzI7My0LBwXaNPnqdCA6yoNu+GjaM15Sr9NAJz9Aa
-         1dYQ==
-X-Gm-Message-State: AOJu0YyeSYtGvVZFRuvkANWUvTG2mjLOmRikGdwOEKJL6XB5I++mNXrP
-	R8gHsxXnUUmo+/FiiLzw1c+xlW0Fdfxw5g==
-X-Google-Smtp-Source: AGHT+IEkugJuPfGfb1G6o1NTQ3RmODekfWovxvSaMhEaivOunxyPAC4uW3D9LCQCc4ZdpNfOLCytaA==
-X-Received: by 2002:a05:6a00:93a0:b0:6c4:d615:2169 with SMTP id ka32-20020a056a0093a000b006c4d6152169mr10038257pfb.10.1700265147574;
-        Fri, 17 Nov 2023 15:52:27 -0800 (PST)
-Received: from tresc054937.tre-sc.gov.br ([187.94.103.218])
-        by smtp.gmail.com with ESMTPSA id b23-20020a056a0002d700b0066a4e561beesm2001993pft.173.2023.11.17.15.52.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 15:52:27 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org,
-	alsi@bang-olufsen.dk,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	arinc.unal@arinc9.com,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Subject: [net-next 2/2] net: dsa: realtek: load switch variants on demand
-Date: Fri, 17 Nov 2023 20:50:01 -0300
-Message-ID: <20231117235140.1178-3-luizluca@gmail.com>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20231117235140.1178-1-luizluca@gmail.com>
-References: <20231117235140.1178-1-luizluca@gmail.com>
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBC1592;
+	Fri, 17 Nov 2023 15:51:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700265075; x=1731801075;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=x+f8iFqNzkmdCAzRlMsZgZ5ByswuoJK12bNvmCJxbTg=;
+  b=Bh02h//SR+YUNLFt7V49MGK6bB+y0L8PlSC4/lNJF3bWuHpoBjAZnrZA
+   AR079Av4T4657PEhhSZ+y980HxgZB/i3ipjWUdEzbjgj0l/K5ax1ownct
+   jVL5/7ibFqSiPj0/TMIOVlaDv94uUmwQlkHt/G1bkOp8LboJdNiGjyhtU
+   iIJvB8c5al748o5a1Hh3q/pTSCRuqKab6/GKNh4urBZzO1ncYRrxFcLo4
+   WrnRE2g1t1T9LWPUsjGchS0n0d2mzYb8Bnu1864tK84j+kgEYSSeoracV
+   mXrXapuCRwqaYyXCBr5E9cpgM5ZP7j1mFCn+io5pFaZaVFcfwH6n9lBvh
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="4471677"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="4471677"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 15:51:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="715681134"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="715681134"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Nov 2023 15:51:14 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Fri, 17 Nov 2023 15:51:13 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Fri, 17 Nov 2023 15:51:13 -0800
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Fri, 17 Nov 2023 15:51:13 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S+F3jCoGENDZ6gtlEuUV4xYc6xuQmD+apf3METH7dZJfkcOWIskL4rwGmzxwo/HxmQFc6C/zgeVuLqxqQHBQXYred4b5QlcjSx8JHIqyJ4gX2xlu5sM5Uc0UI52/5Iy6DYfAf1MvJ8QONdo7FkJ+wbwL+EN3nytHiHyKm+h64BZmd33pZjgWK9XGL9lLrwPfUdOOJL7s70VnxsRzeeR8de17VcpULNJt6ASrmNRI8NCuoCU0tGNDQjv+wvIA0AvyrI4cpj4BRk2M0xuySUQPQwaI0g8gWuTu0yfojWVwp9IfUVR78ngDR4Su2q78jGi5k4Uj75A8NQwDqiPMHcGphw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jE2TT2nH2Qsaeq8IZ9k14b5iFgvOguPjzY4PiPNgXuE=;
+ b=UChPjZR76XmBJy40KLBgY1etX/Kf2kbbsBevR8cvPhgz0McTZ0JU1sYrRKAzBfG9Gotet1KphbXD+/uGbUzQGjezR6ZTjA2xcYPdaIcCLsocEQDQXox+m3CCfhW4EdfP2OHtXrtK/hoa43Vwb+OMvLaCKIHicExXMNX9Mk4kqOFs0awTiXxztTssjfgYytF/UWtfhkIeBt9BokmRWVXYkng0JQs+iRv7wn047vxj6njQHvQNYrqsuPo0sogLLhditt4r7DLP4T14cQHi4DdlcMF0bi/aTGmFs6uzrX6E7Gn2nI/3Bjam2MeUGxKnZCw/ueFXy1imTbH7oeQaSRvKSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS7PR11MB7906.namprd11.prod.outlook.com (2603:10b6:8:ec::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.25; Fri, 17 Nov
+ 2023 23:51:11 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::dbee:4787:6eeb:57f5]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::dbee:4787:6eeb:57f5%4]) with mapi id 15.20.7002.022; Fri, 17 Nov 2023
+ 23:51:10 +0000
+Message-ID: <03b2fde9-945c-4b28-9177-5e195c866c32@intel.com>
+Date: Fri, 17 Nov 2023 15:51:07 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: microchip: lan743x : bidirectional
+ throughput improvement
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, Vishvambar Panth S
+	<vishvambarpanth.s@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<kuba@kernel.org>, <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>
+References: <20231116054350.620420-1-vishvambarpanth.s@microchip.com>
+ <20231117181602.GP164483@vergenet.net>
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20231117181602.GP164483@vergenet.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0346.namprd03.prod.outlook.com
+ (2603:10b6:303:dc::21) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS7PR11MB7906:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2f9ad91f-6dba-4773-6b2f-08dbe7c812f3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bN5o1HUYEiH1OtV8INf8RfpXidE5MAtYxpOtiWu0mxpnTvFTLFEGs6WaC9htOeynj8XOyrySA9T34pbynMzj+DU+Uo3vrzCSNUS/oKCY1nGHNc4+kbJbhxWxsL4G31I6I7dbCpxoYfVtINIt6czK7hEQhi40j+xwY3J1XyxOXiCfWNzvIsBNxR9fWa2MPSTrpoyjPSm+uuhiNXqRMr44Q8kPn2Dh5huHy/ETfV8PjdxZDbVB23QoFSBDf49JX67yUop/uJojUn2af2t6kOt/m85BWrWa3rbq/N8h3Q3qNb6/s1hTPU84+XGBcXn1CYBdTQFd9P3H5T6jsEVz6aKgROUcm8SNOoOGgVBQwPM2GuEVrmchsa53X3UA9llKUfgxXbbNY2LlDJgKYB5+35XCRxk71bDrfZUhx3CewFwri4HBFUQ/8fQ3aACgZBD7ocgIdyfwoZKl9O1ElTAa05QmQif8QG8KZyc4a07LaDxoyAQESWOH3o0CByO1Hx/fgj1EP/lT+h9jI0hyCqYLaCYmswMyeIAd13JTYdNb+nWMkuVMAhYwdrMb6wUgw1SXeVMF746WMVeyKFjOvHpb2bUYxEYhF5XZ/BNOn/Ui3D0ak0n1C/QY89hMHLkiqokN+SPn
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(346002)(136003)(39860400002)(396003)(230922051799003)(186009)(1800799011)(451199024)(64100799003)(66946007)(66476007)(66556008)(110136005)(31686004)(31696002)(86362001)(2906002)(8936002)(4326008)(8676002)(82960400001)(38100700002)(316002)(5660300002)(7416002)(6486002)(966005)(83380400001)(478600001)(26005)(41300700001)(6666004)(2616005)(6512007)(36756003)(53546011)(6506007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WnJaTmN6Nnk1eDVCKzJhQzlpZkduSzB6dk9GVmlYY3A1SU1kemY2VUhNekpB?=
+ =?utf-8?B?Sm1qNnNGdUljQ1A3anBWM2ZmVFhUUURhKzNLaFZRLzFFNDh2cC9ZTHEyWmpS?=
+ =?utf-8?B?NHM0a0Fvck8xNFRoc2ZZVEJvT29rTEFrcU9ZMzNibnRBMGh5T2d4enJNZ3ZI?=
+ =?utf-8?B?VFZWeGFGTWdydVF4Y2FiaU5Pdm02U1BlV0s4Nnk3MW9YcmtrOFpyc1Z1RjF3?=
+ =?utf-8?B?YWNEV3loeXdtUy81TC83Yjg2RzNrNGNjR3FrTFA0emR4SjRjazY5YW9NUkFP?=
+ =?utf-8?B?akdOTUZGbDJBYW9IUi9uYldjZzc1NkFPZnRMb094aGpkelNXcTVKdXczdXo1?=
+ =?utf-8?B?ZmNJMFpGcWlyOVNreldOc09TUktiaDI3dVdtU2VNak83cmRvbVRuSkp0QlI4?=
+ =?utf-8?B?c242S0U1b1I1a1RZV1B2LzY2RWR6cm9XcDIrTExNQTdmUUFaeXFqSmJ0VzdW?=
+ =?utf-8?B?ZkVZUFhoanNTWFhMOFNxaTJQZ2h6WnJQUVV5eU9iNGM1UThkdnBnc0t4eGpF?=
+ =?utf-8?B?bDRPRTVxUnZ5Y0d0WHFzeXBiUmpiMlMrbFNNY1hVdTU1SFRDQXFpeHpHN2NG?=
+ =?utf-8?B?a2JnTXBJS3JJVFpPWG1WNEs2RGtKS0k5LzBzU2lIZ1VCdFp1dUdpQVk3d3lT?=
+ =?utf-8?B?blBZbUo2NWVpVFZGd24yYXFnUHdEMFU4SGZMT3ZiZTZSTVg0d1NNS3NRMk55?=
+ =?utf-8?B?OUh5N1ErbTJpY1F1M2tyYjVUd1lVREloUlVWZTVCRUlUOWR4RXMvZ0FYQ1FX?=
+ =?utf-8?B?cjhGNXQ1d2NhQncvalBzc3pzOERJcytVVExTUVpQUTRVY3lFWkJJYkMzd1N2?=
+ =?utf-8?B?ZTBDQnhiakVwNENESFNJYVhtWGM4TnMyd05mNG1pOXNtamtHZytITjBKL01p?=
+ =?utf-8?B?czdTV1N4U2F6ZWVMbCtDOThiOXBSQnNmNGtCa0RwclBOSFlJWlN2Mnh4UnRC?=
+ =?utf-8?B?alhyQlJOaFQ1WmZTb3R2QmVUYmVjUDQ1Um9qZEM1ZWJaSEI0ZW94cHlRUDZa?=
+ =?utf-8?B?SFRCT1hOcllDaWRpZTlFcHl0STNpTUZsT0xyVjdHRytWTEE3WjNNelQvSHhR?=
+ =?utf-8?B?NFloZjNtNjQvQjh2YzBrQkRuQkp2cCtCZWFxdGVMMi9SMGtrZjc1K1hxOUtT?=
+ =?utf-8?B?ZWhoM2EwSUtLR3Y5cEVPY213UEc5M1BRY1UyOEZVZVY2Q2pxOWhZNlUwYlhK?=
+ =?utf-8?B?WU1RSWVTR1VMNUZTWmd1SHhscWlsMytQVlByUXBMcGRrVStqZU1kWi9kU3BP?=
+ =?utf-8?B?eUtLVDJpMWhVRDF3T3JKUWVibjFUREIwcEdxUmRBUFU1T2cvbHFBaVBrdG9O?=
+ =?utf-8?B?cUd2enZuSlJsZFRKVkJKSDhYYmI2TlRYaDhQSHhRdVN5ZWxlYkVIVjYxMXBF?=
+ =?utf-8?B?VTIzbnN4VDUvRlRnUXJqU0pkNmtTTHBIUXFtMXRzOTVQUmlkY01BSEpWVWFW?=
+ =?utf-8?B?dU5BRjVsZkFSZFNwK3RLVTBzdGxVa2J1ZWpycFl2WW5zN1hIMC9JdGNLVG9k?=
+ =?utf-8?B?YUNlSm9hR2RLWkFlT3psaUQ1ZXNNb3hFWVJTQnI2U0Y3YWw0VlJjWldqb1pw?=
+ =?utf-8?B?NU92MG5JdWhCL3c1SWZ4R1ViOE9qWGd6THRxUVF6WjVvNGhCOWFGUkVXcGhq?=
+ =?utf-8?B?cmREcWFTZVFCS3I3SW5kQ1FMeTkzdVVCL0N4OWpaRkd3QWtOcm5IdytuR3Ur?=
+ =?utf-8?B?akI0MmNCTHVSVXFUcEFwY3hNUnBLMjM0T0Z4MHdnTGZiVnU1RDJDUGFsMlc0?=
+ =?utf-8?B?R3FPM05ySVkvZU0zeXpXTXo0Nk12dm8yNUEvbklMV1l1dzF3aXFvczRPaDdj?=
+ =?utf-8?B?Q0ZtbVRuODFIaXlZNG56NEZodS9EUXZaQ0RKdW5KNmNqbkVZdVNGbGRmZVlP?=
+ =?utf-8?B?YnJ4bEFDL09SaDc2eHBRVGdvMzJEZzhTN2RRYmhPYSs0S0NJMXNla0tkNmFM?=
+ =?utf-8?B?THVWVUIrN21kdTNiUUpraWg4bFQ5OXB2NDd0YTBYYWtBWGc5Y2grM2R5T25k?=
+ =?utf-8?B?TFE2RFhhRFp3VVg0SjNMeWhxaXVxeWZxcFpXQnJsMzRVbWFMWm5TUTR6cXJz?=
+ =?utf-8?B?eU45RndrOEdka0RHUElzNS9aelR2ejIwdlhyTmtEdmcza2VFVlV5aUxZazVn?=
+ =?utf-8?B?WVN6RmhtdGxSQ2g3UUNKSEIxazk4WGZDUDRjZXV5Rzl3SWJlNWJieWkrOWNl?=
+ =?utf-8?B?U1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2f9ad91f-6dba-4773-6b2f-08dbe7c812f3
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Nov 2023 23:51:10.1513
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c0fRJNzCRsyQzJ7K/n9Hlvlwm+fjmgItCQSdQ02QUzMSQuOnjrplLJ3TPmxFpErwzdG+gec+Unq0wzMJBOLRqxRIPfuLzDAAeL17DPCEXrw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7906
+X-OriginatorOrg: intel.com
 
-realtek-common had a hard dependency on both switch variants. As a
-result, it was not possible to selectively load only one model at
-runtime. Now, variants are registered in the realtek-common module, and
-interface modules look for a variant using the compatible string.
 
-The variant modules use the same compatible string as the module alias.
-This way, an interface module can use the matching compatible string to
-both load the module and get the variant reference.
 
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- drivers/net/dsa/realtek/realtek-common.c | 107 ++++++++++++++++++++---
- drivers/net/dsa/realtek/realtek-common.h |  33 +++++++
- drivers/net/dsa/realtek/realtek-mdio.c   |   9 +-
- drivers/net/dsa/realtek/realtek-smi.c    |  21 +++--
- drivers/net/dsa/realtek/realtek.h        |   3 -
- drivers/net/dsa/realtek/rtl8365mb.c      |   4 +-
- drivers/net/dsa/realtek/rtl8366rb.c      |   4 +-
- 7 files changed, 154 insertions(+), 27 deletions(-)
+On 11/17/2023 10:16 AM, Simon Horman wrote:
+> On Thu, Nov 16, 2023 at 11:13:50AM +0530, Vishvambar Panth S wrote:
+>> The LAN743x/PCI11xxx DMA descriptors are always 4 dwords long, but the
+>> device supports placing the descriptors in memory back to back or
+>> reserving space in between them using its DMA_DESCRIPTOR_SPACE (DSPACE)
+>> configurable hardware setting. Currently DSPACE is unnecessarily set to
+>> match the host's L1 cache line size, resulting in space reserved in
+>> between descriptors in most platforms and causing a suboptimal behavior
+>> (single PCIe Mem transaction per descriptor). By changing the setting
+>> to DSPACE=16 many descriptors can be packed in a single PCIe Mem
+>> transaction resulting in a massive performance improvement in
+>> bidirectional tests without any negative effects.
+>> Tested and verified improvements on x64 PC and several ARM platforms
+>> (typical data below)
+>>
+>> Test setup 1: x64 PC with LAN7430 ---> x64 PC
+>>
+>> iperf3 UDP bidirectional with DSPACE set to L1 CACHE Size:
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID][Role] Interval           Transfer     Bitrate
+>> [  5][TX-C]   0.00-10.00  sec   170 MBytes   143 Mbits/sec  sender
+>> [  5][TX-C]   0.00-10.04  sec   169 MBytes   141 Mbits/sec  receiver
+>> [  7][RX-C]   0.00-10.00  sec  1.02 GBytes   876 Mbits/sec  sender
+>> [  7][RX-C]   0.00-10.04  sec  1.02 GBytes   870 Mbits/sec  receiver
+>>
+>> iperf3 UDP bidirectional with DSPACE set to 16 Bytes
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID][Role] Interval           Transfer     Bitrate
+>> [  5][TX-C]   0.00-10.00  sec  1.11 GBytes   956 Mbits/sec  sender
+>> [  5][TX-C]   0.00-10.04  sec  1.11 GBytes   951 Mbits/sec  receiver
+>> [  7][RX-C]   0.00-10.00  sec  1.10 GBytes   948 Mbits/sec  sender
+>> [  7][RX-C]   0.00-10.04  sec  1.10 GBytes   942 Mbits/sec  receiver
+>>
+>> Test setup 2 : RK3399 with LAN7430 ---> x64 PC
+>>
+>> RK3399 Spec:
+>> The SOM-RK3399 is ARM module designed and developed by FriendlyElec.
+>> Cores: 64-bit Dual Core Cortex-A72 + Quad Core Cortex-A53
+>> Frequency: Cortex-A72(up to 2.0GHz), Cortex-A53(up to 1.5GHz)
+>> PCIe: PCIe x4, compatible with PCIe 2.1, Dual operation mode
+>>
+>> iperf3 UDP bidirectional with DSPACE set to L1 CACHE Size:
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID][Role] Interval           Transfer     Bitrate
+>> [  5][TX-C]   0.00-10.00  sec   534 MBytes   448 Mbits/sec  sender
+>> [  5][TX-C]   0.00-10.05  sec   534 MBytes   446 Mbits/sec  receiver
+>> [  7][RX-C]   0.00-10.00  sec  1.12 GBytes   961 Mbits/sec  sender
+>> [  7][RX-C]   0.00-10.05  sec  1.11 GBytes   946 Mbits/sec  receiver
+>>
+>> iperf3 UDP bidirectional with DSPACE set to 16 Bytes
+>> - - - - - - - - - - - - - - - - - - - - - - - - -
+>> [ ID][Role] Interval           Transfer     Bitrate
+>> [  5][TX-C]   0.00-10.00  sec   966 MBytes   810 Mbits/sec   sender
+>> [  5][TX-C]   0.00-10.04  sec   965 MBytes   806 Mbits/sec   receiver
+>> [  7][RX-C]   0.00-10.00  sec  1.11 GBytes   956 Mbits/sec   sender
+>> [  7][RX-C]   0.00-10.04  sec  1.07 GBytes   919 Mbits/sec   receiver
+>>
+>> Signed-off-by: Vishvambar Panth S <vishvambarpanth.s@microchip.com>
+> 
+> Thanks,
+> 
+> I think you should have included Jacob's Reviewed-by tag from
+> the previous posting of this patch [1].
+> 
+> And echoing his comments there, a very nice performance boost :)
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> [1] https://lore.kernel.org/netdev/e5ffec56-5512-1acc-b85c-ac0771634c22@intel.com/
 
-diff --git a/drivers/net/dsa/realtek/realtek-common.c b/drivers/net/dsa/realtek/realtek-common.c
-index 1b733ac56560..cdd8d77c20d9 100644
---- a/drivers/net/dsa/realtek/realtek-common.c
-+++ b/drivers/net/dsa/realtek/realtek-common.c
-@@ -1,10 +1,72 @@
- // SPDX-License-Identifier: GPL-2.0+
- 
- #include <linux/module.h>
-+#include <linux/of_device.h>
- 
- #include "realtek.h"
- #include "realtek-common.h"
- 
-+static LIST_HEAD(realtek_variants_list);
-+static DEFINE_MUTEX(realtek_variants_lock);
-+
-+void realtek_variant_register(struct realtek_variant_entry *variant_entry)
-+{
-+	mutex_lock(&realtek_variants_lock);
-+	list_add_tail(&variant_entry->list, &realtek_variants_list);
-+	mutex_unlock(&realtek_variants_lock);
-+}
-+EXPORT_SYMBOL_GPL(realtek_variant_register);
-+
-+void realtek_variant_unregister(struct realtek_variant_entry *variant_entry)
-+{
-+	mutex_lock(&realtek_variants_lock);
-+	list_del(&variant_entry->list);
-+	mutex_unlock(&realtek_variants_lock);
-+}
-+EXPORT_SYMBOL_GPL(realtek_variant_unregister);
-+
-+const struct realtek_variant *realtek_variant_get(const char *compatible)
-+{
-+	const struct realtek_variant *variant = ERR_PTR(-ENOENT);
-+	struct realtek_variant_entry *variant_entry;
-+
-+	request_module(compatible);
-+
-+	mutex_lock(&realtek_variants_lock);
-+	list_for_each_entry(variant_entry, &realtek_variants_list, list) {
-+		if (strcmp(compatible, variant_entry->compatible))
-+			continue;
-+
-+		if (!try_module_get(variant_entry->owner))
-+			break;
-+
-+		variant = variant_entry->variant;
-+		break;
-+	}
-+	mutex_unlock(&realtek_variants_lock);
-+
-+	return variant;
-+}
-+EXPORT_SYMBOL_GPL(realtek_variant_get);
-+
-+void realtek_variant_put(const struct realtek_variant *var)
-+{
-+	struct realtek_variant_entry *variant_entry;
-+
-+	mutex_lock(&realtek_variants_lock);
-+	list_for_each_entry(variant_entry, &realtek_variants_list, list) {
-+		if (variant_entry->variant != var)
-+			continue;
-+
-+		if (variant_entry->owner)
-+			module_put(variant_entry->owner);
-+
-+		break;
-+	}
-+	mutex_unlock(&realtek_variants_lock);
-+}
-+EXPORT_SYMBOL_GPL(realtek_variant_put);
-+
- void realtek_common_lock(void *ctx)
- {
- 	struct realtek_priv *priv = ctx;
-@@ -25,18 +87,30 @@ struct realtek_priv *realtek_common_probe(struct device *dev,
- 		struct regmap_config rc, struct regmap_config rc_nolock)
- {
- 	const struct realtek_variant *var;
-+	const struct of_device_id *match;
- 	struct realtek_priv *priv;
- 	struct device_node *np;
- 	int ret;
- 
--	var = of_device_get_match_data(dev);
--	if (!var)
-+	match = of_match_device(dev->driver->of_match_table, dev);
-+	if (!match)
- 		return ERR_PTR(-EINVAL);
- 
-+	var = realtek_variant_get(match->compatible);
-+	if (IS_ERR(var)) {
-+		ret = PTR_ERR(var);
-+		dev_err_probe(dev, ret,
-+			      "failed to get module for alias '%s'",
-+			      match->compatible);
-+		goto err_variant_put;
-+	}
-+
- 	priv = devm_kzalloc(dev, size_add(sizeof(*priv), var->chip_data_sz),
- 			    GFP_KERNEL);
--	if (!priv)
--		return ERR_PTR(-ENOMEM);
-+	if (!priv) {
-+		ret = -ENOMEM;
-+		goto err_variant_put;
-+	}
- 
- 	mutex_init(&priv->map_lock);
- 
-@@ -45,14 +119,14 @@ struct realtek_priv *realtek_common_probe(struct device *dev,
- 	if (IS_ERR(priv->map)) {
- 		ret = PTR_ERR(priv->map);
- 		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ERR_PTR(ret);
-+		goto err_variant_put;
- 	}
- 
- 	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc_nolock);
- 	if (IS_ERR(priv->map_nolock)) {
- 		ret = PTR_ERR(priv->map_nolock);
- 		dev_err(dev, "regmap init failed: %d\n", ret);
--		return ERR_PTR(ret);
-+		goto err_variant_put;
- 	}
- 
- 	/* Link forward and backward */
-@@ -69,11 +143,11 @@ struct realtek_priv *realtek_common_probe(struct device *dev,
- 	priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
- 
- 	/* TODO: if power is software controlled, set up any regulators here */
--
- 	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
- 	if (IS_ERR(priv->reset)) {
-+		ret = PTR_ERR(priv->reset);
- 		dev_err(dev, "failed to get RESET GPIO\n");
--		return ERR_CAST(priv->reset);
-+		goto err_variant_put;
- 	}
- 	if (priv->reset) {
- 		gpiod_set_value(priv->reset, 1);
-@@ -85,13 +159,20 @@ struct realtek_priv *realtek_common_probe(struct device *dev,
- 	}
- 
- 	priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
--	if (!priv->ds)
--		return ERR_PTR(-ENOMEM);
-+	if (!priv->ds) {
-+		ret = -ENOMEM;
-+		goto err_variant_put;
-+	}
- 
- 	priv->ds->dev = dev;
- 	priv->ds->priv = priv;
- 
- 	return priv;
-+
-+err_variant_put:
-+	realtek_variant_put(var);
-+
-+	return ERR_PTR(ret);
- }
- EXPORT_SYMBOL(realtek_common_probe);
- 
-@@ -104,6 +185,8 @@ void realtek_common_remove(struct realtek_priv *priv)
- 	if (priv->user_mii_bus)
- 		of_node_put(priv->user_mii_bus->dev.of_node);
- 
-+	realtek_variant_put(priv->variant);
-+
- 	/* leave the device reset asserted */
- 	if (priv->reset)
- 		gpiod_set_value(priv->reset, 1);
-@@ -112,10 +195,10 @@ EXPORT_SYMBOL(realtek_common_remove);
- 
- const struct of_device_id realtek_common_of_match[] = {
- #if IS_ENABLED(CONFIG_NET_DSA_REALTEK_RTL8366RB)
--	{ .compatible = "realtek,rtl8366rb", .data = &rtl8366rb_variant, },
-+	{ .compatible = "realtek,rtl8366rb", },
- #endif
- #if IS_ENABLED(CONFIG_NET_DSA_REALTEK_RTL8365MB)
--	{ .compatible = "realtek,rtl8365mb", .data = &rtl8365mb_variant, },
-+	{ .compatible = "realtek,rtl8365mb", },
- #endif
- 	{ /* sentinel */ },
- };
-diff --git a/drivers/net/dsa/realtek/realtek-common.h b/drivers/net/dsa/realtek/realtek-common.h
-index 90a949386518..6de4991d8b5c 100644
---- a/drivers/net/dsa/realtek/realtek-common.h
-+++ b/drivers/net/dsa/realtek/realtek-common.h
-@@ -5,6 +5,37 @@
- 
- #include <linux/regmap.h>
- 
-+struct realtek_variant_entry {
-+	const struct realtek_variant *variant;
-+	const char *compatible;
-+	struct module *owner;
-+	struct list_head list;
-+};
-+
-+#define module_realtek_variant(__variant, __compatible)			\
-+static struct realtek_variant_entry __variant ## _entry = {		\
-+	.compatible = __compatible,					\
-+	.variant = &(__variant),					\
-+	.owner = THIS_MODULE,						\
-+};									\
-+static int __init realtek_variant_module_init(void)			\
-+{									\
-+	realtek_variant_register(&__variant ## _entry);			\
-+	return 0;							\
-+}									\
-+module_init(realtek_variant_module_init)				\
-+									\
-+static void __exit realtek_variant_module_exit(void)			\
-+{									\
-+	realtek_variant_unregister(&__variant ## _entry);		\
-+}									\
-+module_exit(realtek_variant_module_exit);				\
-+									\
-+MODULE_ALIAS(__compatible)
-+
-+void realtek_variant_register(struct realtek_variant_entry *variant_entry);
-+void realtek_variant_unregister(struct realtek_variant_entry *variant_entry);
-+
- extern const struct of_device_id realtek_common_of_match[];
- 
- void realtek_common_lock(void *ctx);
-@@ -12,5 +43,7 @@ void realtek_common_unlock(void *ctx);
- struct realtek_priv *realtek_common_probe(struct device *dev,
- 		struct regmap_config rc, struct regmap_config rc_nolock);
- void realtek_common_remove(struct realtek_priv *priv);
-+const struct realtek_variant *realtek_variant_get(const char *compatible);
-+void realtek_variant_put(const struct realtek_variant *var);
- 
- #endif
-diff --git a/drivers/net/dsa/realtek/realtek-mdio.c b/drivers/net/dsa/realtek/realtek-mdio.c
-index b865e11955ca..c447dd815a59 100644
---- a/drivers/net/dsa/realtek/realtek-mdio.c
-+++ b/drivers/net/dsa/realtek/realtek-mdio.c
-@@ -145,7 +145,7 @@ static int realtek_mdio_probe(struct mdio_device *mdiodev)
- 	ret = priv->ops->detect(priv);
- 	if (ret) {
- 		dev_err(dev, "unable to detect switch\n");
--		return ret;
-+		goto err_variant_put;
- 	}
- 
- 	priv->ds->ops = priv->variant->ds_ops_mdio;
-@@ -154,10 +154,15 @@ static int realtek_mdio_probe(struct mdio_device *mdiodev)
- 	ret = dsa_register_switch(priv->ds);
- 	if (ret) {
- 		dev_err_probe(dev, ret, "unable to register switch\n");
--		return ret;
-+		goto err_variant_put;
- 	}
- 
- 	return 0;
-+
-+err_variant_put:
-+	realtek_variant_put(priv->variant);
-+
-+	return ret;
- }
- 
- static void realtek_mdio_remove(struct mdio_device *mdiodev)
-diff --git a/drivers/net/dsa/realtek/realtek-smi.c b/drivers/net/dsa/realtek/realtek-smi.c
-index 2aebcbe0425f..e50b3c6203e6 100644
---- a/drivers/net/dsa/realtek/realtek-smi.c
-+++ b/drivers/net/dsa/realtek/realtek-smi.c
-@@ -408,12 +408,16 @@ static int realtek_smi_probe(struct platform_device *pdev)
- 
- 	/* Fetch MDIO pins */
- 	priv->mdc = devm_gpiod_get_optional(dev, "mdc", GPIOD_OUT_LOW);
--	if (IS_ERR(priv->mdc))
--		return PTR_ERR(priv->mdc);
-+	if (IS_ERR(priv->mdc)) {
-+		ret = PTR_ERR(priv->mdc);
-+		goto err_variant_put;
-+	}
- 
- 	priv->mdio = devm_gpiod_get_optional(dev, "mdio", GPIOD_OUT_LOW);
--	if (IS_ERR(priv->mdio))
--		return PTR_ERR(priv->mdio);
-+	if (IS_ERR(priv->mdio)) {
-+		ret = PTR_ERR(priv->mdc);
-+		goto err_variant_put;
-+	}
- 
- 	priv->setup_interface = realtek_smi_setup_mdio;
- 	priv->write_reg_noack = realtek_smi_write_reg_noack;
-@@ -421,7 +425,7 @@ static int realtek_smi_probe(struct platform_device *pdev)
- 	ret = priv->ops->detect(priv);
- 	if (ret) {
- 		dev_err(dev, "unable to detect switch\n");
--		return ret;
-+		goto err_variant_put;
- 	}
- 
- 	priv->ds->ops = priv->variant->ds_ops_smi;
-@@ -430,10 +434,15 @@ static int realtek_smi_probe(struct platform_device *pdev)
- 	ret = dsa_register_switch(priv->ds);
- 	if (ret) {
- 		dev_err_probe(dev, ret, "unable to register switch\n");
--		return ret;
-+		goto err_variant_put;
- 	}
- 
- 	return 0;
-+
-+err_variant_put:
-+	realtek_variant_put(priv->variant);
-+
-+	return ret;
- }
- 
- static void realtek_smi_remove(struct platform_device *pdev)
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index fbbdf538908e..267a1dc02080 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -143,7 +143,4 @@ void rtl8366_get_strings(struct dsa_switch *ds, int port, u32 stringset,
- int rtl8366_get_sset_count(struct dsa_switch *ds, int port, int sset);
- void rtl8366_get_ethtool_stats(struct dsa_switch *ds, int port, uint64_t *data);
- 
--extern const struct realtek_variant rtl8366rb_variant;
--extern const struct realtek_variant rtl8365mb_variant;
--
- #endif /*  _REALTEK_H */
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index 9b18774e988c..fb214dd717f0 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -2164,7 +2164,7 @@ static const struct realtek_ops rtl8365mb_ops = {
- 	.phy_write = rtl8365mb_phy_write,
- };
- 
--const struct realtek_variant rtl8365mb_variant = {
-+static const struct realtek_variant rtl8365mb_variant = {
- 	.ds_ops_smi = &rtl8365mb_switch_ops_smi,
- 	.ds_ops_mdio = &rtl8365mb_switch_ops_mdio,
- 	.ops = &rtl8365mb_ops,
-@@ -2173,7 +2173,7 @@ const struct realtek_variant rtl8365mb_variant = {
- 	.cmd_write = 0xb8,
- 	.chip_data_sz = sizeof(struct rtl8365mb),
- };
--EXPORT_SYMBOL_GPL(rtl8365mb_variant);
-+module_realtek_variant(rtl8365mb_variant, "realtek,rtl8365mb");
- 
- MODULE_AUTHOR("Alvin Šipraga <alsi@bang-olufsen.dk>");
- MODULE_DESCRIPTION("Driver for RTL8365MB-VC ethernet switch");
-diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-index 1ac2fd098242..143c57c69ace 100644
---- a/drivers/net/dsa/realtek/rtl8366rb.c
-+++ b/drivers/net/dsa/realtek/rtl8366rb.c
-@@ -1912,7 +1912,7 @@ static const struct realtek_ops rtl8366rb_ops = {
- 	.phy_write	= rtl8366rb_phy_write,
- };
- 
--const struct realtek_variant rtl8366rb_variant = {
-+static const struct realtek_variant rtl8366rb_variant = {
- 	.ds_ops_smi = &rtl8366rb_switch_ops_smi,
- 	.ds_ops_mdio = &rtl8366rb_switch_ops_mdio,
- 	.ops = &rtl8366rb_ops,
-@@ -1921,7 +1921,7 @@ const struct realtek_variant rtl8366rb_variant = {
- 	.cmd_write = 0xa8,
- 	.chip_data_sz = sizeof(struct rtl8366rb),
- };
--EXPORT_SYMBOL_GPL(rtl8366rb_variant);
-+module_realtek_variant(rtl8366rb_variant, "realtek,rtl8366rb");
- 
- MODULE_AUTHOR("Linus Walleij <linus.walleij@linaro.org>");
- MODULE_DESCRIPTION("Driver for RTL8366RB ethernet switch");
--- 
-2.42.1
+For the record, this version also looks good to me!
 
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
