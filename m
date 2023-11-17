@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-48706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A23C7EF52E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:23:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBFA7EF52F
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:23:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7CAB280DF1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:23:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E22F51C208B7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AA71C692;
-	Fri, 17 Nov 2023 15:23:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 642C73159B;
+	Fri, 17 Nov 2023 15:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iHakJntJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hHQu+W+J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCC1374C4
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:23:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62DC6C433C7;
-	Fri, 17 Nov 2023 15:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B8230344
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:23:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19B2C433C7;
+	Fri, 17 Nov 2023 15:23:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700234596;
-	bh=R9gtMv1mlx1XFPa0IOyEngjAsd6b0IyS9o23nfyNy5U=;
+	s=k20201202; t=1700234632;
+	bh=8jymyTjlplZ9cSAQWeCDrroYFqyhGA4t0vs4Dt3RKTg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iHakJntJ4U6+/sY3OR5jtcL31/W5aky14gC2LdV2cXi1ByaLLh4oSozqVSkeNANZN
-	 ES+/AdEVl+hOLGwUIT1Xu4gP5xq7rNyoUIrBNa6aLXfmf5oUGTJhLjQJ1KlFuwwi4R
-	 7f/1agrFIZ6FFFs6CsMuSaPe7UD0azOrM81brF+8g/JpaHOTe3xK0pgk+48xpT+RFD
-	 +0DCo3oGKFtqExUSxpfD2RQB7Cqvp4y3HxnNV5tI0Rdc8b6RIy+pq13vOdBQKMjrvN
-	 eyMIJF/DlDFmYpUqdoe+OGXBdcIiAis9HhP0n+mVBAaLgXA7mEw+QOjBKn6Fu0llrZ
-	 YYurBOy/9+5Tw==
-Date: Fri, 17 Nov 2023 15:23:11 +0000
+	b=hHQu+W+JB+1W5hq9FsixrF/13O1Brw15tjMvun6rZ35trYSF7B5BoElNwI1s03hS2
+	 SUaGC6EBOOpbGRykpoP6fOK1kulQ3lbbmJRCGHItVo0ceShScvDEGe29ZeOjjCZU8x
+	 4UxSeLID0NW21wrSD1hVWiiW82D5f11GwOXOFUYPtMNYFXb+AskV2ZI9mzNUd4O21H
+	 0i0vyAsz40En4666HRZP8NC0bDBFePP9BWzP9G7sTzLPo+Bwjq+dXEgtE97G5GuuqC
+	 sjO90p7dw+w6741ScgK51kLNpWrLABNLMXvubK4UrgGO6OiJM040+tov9OFSDQGwsF
+	 xD7slIpXk0SDg==
+Date: Fri, 17 Nov 2023 15:23:48 +0000
 From: Simon Horman <horms@kernel.org>
 To: Petr Machata <petrm@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -40,12 +40,12 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
 	Amit Cohen <amcohen@nvidia.com>, mlxsw@nvidia.com,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 08/14] PCI: Add debug print for device ready
- delay
-Message-ID: <20231117152311.GC164483@vergenet.net>
+	Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next 04/14] devlink: Allow taking device lock in
+ pre_doit operations
+Message-ID: <20231117152348.GD164483@vergenet.net>
 References: <cover.1700047319.git.petrm@nvidia.com>
- <63fca173195f5a9d3a2b78da700650a29cf80f96.1700047319.git.petrm@nvidia.com>
+ <ecb76739d85bb0cb2977520c17c9af31a6228abe.1700047319.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,58 +54,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <63fca173195f5a9d3a2b78da700650a29cf80f96.1700047319.git.petrm@nvidia.com>
+In-Reply-To: <ecb76739d85bb0cb2977520c17c9af31a6228abe.1700047319.git.petrm@nvidia.com>
 
-+ linux-pci@vger.kernel.org
-
-On Wed, Nov 15, 2023 at 01:17:17PM +0100, Petr Machata wrote:
+On Wed, Nov 15, 2023 at 01:17:13PM +0100, Petr Machata wrote:
 > From: Ido Schimmel <idosch@nvidia.com>
 > 
-> Currently, the time it took a PCI device to become ready after reset is
-> only printed if it was longer than 1000ms ('PCI_RESET_WAIT'). However,
-> for debugging purposes it is useful to know this time even if it was
-> shorter. For example, with the device I am working on, hardware
-> engineers asked to verify that it becomes ready on the first try (no
-> delay).
+> Introduce a new private flag ('DEVLINK_NL_FLAG_NEED_DEV_LOCK') to allow
+> netlink commands to specify that they need to acquire the device lock in
+> their pre_doit operation and release it in their post_doit operation.
 > 
-> To that end, add a debug level print that can be enabled using dynamic
-> debug. Example:
+> The reload command will use this flag in the subsequent patch.
 > 
->  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
->  # dmesg -c | grep ready
->  # echo "file drivers/pci/pci.c +p" > /sys/kernel/debug/dynamic_debug/control
->  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
->  # dmesg -c | grep ready
->  [  396.060335] mlxsw_spectrum4 0000:01:00.0: ready 0ms after bus reset
->  # echo "file drivers/pci/pci.c -p" > /sys/kernel/debug/dynamic_debug/control
->  # echo 1 > /sys/bus/pci/devices/0000\:01\:00.0/reset
->  # dmesg -c | grep ready
+> No functional changes intended.
 > 
 > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 > Signed-off-by: Petr Machata <petrm@nvidia.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-> ---
->  drivers/pci/pci.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
-> index 55bc3576a985..69d20d585f88 100644
-> --- a/drivers/pci/pci.c
-> +++ b/drivers/pci/pci.c
-> @@ -1219,6 +1219,9 @@ static int pci_dev_wait(struct pci_dev *dev, char *reset_type, int timeout)
->  	if (delay > PCI_RESET_WAIT)
->  		pci_info(dev, "ready %dms after %s\n", delay - 1,
->  			 reset_type);
-> +	else
-> +		pci_dbg(dev, "ready %dms after %s\n", delay - 1,
-> +			reset_type);
->  
->  	return 0;
->  }
-> -- 
-> 2.41.0
-> 
+...
+
+> @@ -93,11 +95,13 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs)
+>  static int __devlink_nl_pre_doit(struct sk_buff *skb, struct genl_info *info,
+>  				 u8 flags)
+>  {
+> +	bool dev_lock = flags & DEVLINK_NL_FLAG_NEED_DEV_LOCK;
+
+nit: I would have expressed the above as follows, to convert
+     the integer to a bool. But I understand that it makes
+     no difference in this case so there is no need to update the
+     patch for this:
+
+	bool dev_lock = !!(flags & DEVLINK_NL_FLAG_NEED_DEV_LOCK);
+
+...
 
