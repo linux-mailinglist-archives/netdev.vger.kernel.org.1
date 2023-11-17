@@ -1,99 +1,153 @@
-Return-Path: <netdev+bounces-48776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A5B7EF790
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 19:51:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB4C7EF7A7
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 20:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 318DF28102E
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 18:51:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC88B209BC
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 19:05:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDBF3715F;
-	Fri, 17 Nov 2023 18:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98322374CB;
+	Fri, 17 Nov 2023 19:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="VzC+640G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJerZlsF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FBDFE6
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 10:51:44 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso3291961e87.2
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 10:51:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700247102; x=1700851902; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQGatBI0OkqUrIpIX0xAokAM84axFAYGBfdfsPOdbwQ=;
-        b=VzC+640Gqkmtp1CvnLYfrD4xzLHiZRN37M8ENthOc8Cu3tfu4wGytMNlPCvQWbeDLr
-         50tnGzFS4JSlPRtHXFndqFp4PbFcYBdRMCWGguvO2y1C4V22hgfcZoB6OHtV5sS5DFRt
-         Va8z/AIafXSFapEJBuXJAqmamNeZAb+eh1u2GqL4txgntIyqgsmsYxW6367ip1vxayw2
-         gw3YiavtZrDroGKFMWHniN5mM7D8TjvRYY1SBTSo7rg5pSZDNMkM5WkQba04ADuS9nYV
-         exRPMoqmWHXLW4KsEBcfhvEcweNV+KVgm/V+ew5rgqksAA7YMdElvS7qM6DHjV5hOl3E
-         BrVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700247102; x=1700851902;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eQGatBI0OkqUrIpIX0xAokAM84axFAYGBfdfsPOdbwQ=;
-        b=HnydGNq9XV+H4Gz4t6z1P2GnCxngyMpqA3/EwXZZddtvDYD5qxoJ4g9FBLqnBkpdu5
-         KPR0B8wCDioIylPStKT3m0Vkp9bzi8v0UPvu2z46sU/TnVeQEH5/rsCiL3sf3RBdD/Ua
-         MNmTm2wcopavZnfotREdhCZY+ENhagoHEGxZZdjAjAyYARUsuuuuZAB0M/H2m2RwxoZF
-         wjGIZNes7yYhVpOXDw8EGM1tBDQwjp40UtVRIxv3Bi+B58IKOr5rHv+hrwh2QMySCjmk
-         B1PNkJiFRNN4OabfsvVtsrInrfFQ1Vtsx3qbJoHdXokfhZ6Q6v2pSOuakmx9754Mq1L9
-         92BA==
-X-Gm-Message-State: AOJu0YymMqmGny26t1Wd7cYKGZHU3Br8yilgAbF0kjvq5T1wnkmGb5eW
-	RTKRsOURsPS3GK9ggXsjcYpG6Q==
-X-Google-Smtp-Source: AGHT+IGYHEM4uNeVtCO/gTZ0ewg2WFggdTQ5QwKVNBQCQEAOYbFeawwn3Nrq6gMLZoEU7DRPDeB94A==
-X-Received: by 2002:ac2:532f:0:b0:509:4d7a:ab05 with SMTP id f15-20020ac2532f000000b005094d7aab05mr324793lfh.11.1700247102044;
-        Fri, 17 Nov 2023 10:51:42 -0800 (PST)
-Received: from localhost (h-46-59-36-206.A463.priv.bahnhof.se. [46.59.36.206])
-        by smtp.gmail.com with ESMTPSA id 26-20020ac2483a000000b004ff973cb14esm308572lft.108.2023.11.17.10.51.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 10:51:41 -0800 (PST)
-Date: Fri, 17 Nov 2023 19:51:40 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Wolfram Sang <wsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 4/5] net: ethernet: renesas: rcar_gen4_ptp: Add V4H
- clock setting
-Message-ID: <ZVe2PJVQVZgKSFuE@oden.dyn.berto.se>
-References: <20231117164332.354443-1-niklas.soderlund+renesas@ragnatech.se>
- <20231117164332.354443-5-niklas.soderlund+renesas@ragnatech.se>
- <ZVeqSsfBEMsQ+8mP@shikoro>
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619CA90;
+	Fri, 17 Nov 2023 11:05:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700247916; x=1731783916;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ojXatZcyWVDBNEjZqyuSgcR+G6zuPa0I4GRc4/in0jA=;
+  b=iJerZlsFwkO3i8JUcR8MbYCGBDiPd8FDzfMhnYbfyyAnmsYDcgcBJxZ3
+   TdfB+DNIN7xuniR0IJt+oQjddEoQrCCFGwWqMkuywIcxUYYxk7EA1+9n5
+   BkUFaVBEYcn7FneaSSPk9Bhd1+rHwzYFmlTBI+mye5UA8JReCbVWCzLma
+   Ay6tX91q/SL/u6UdKLX66p7CJ0lHW9RdmQ+oDGDaQL22xv+iEjHitNmWo
+   azcB2m5qGnAhdTIxwYBhk2MsQfOpKUQmYPVD3rPzK1WpVjSqSuheo1Bcx
+   y3+5ykpnJnzKdqu7owi1NHT/auWPfrWRasy1eITJffVVv5vVqVKJ87J/u
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="381742112"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="381742112"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Nov 2023 11:05:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10897"; a="800577773"
+X-IronPort-AV: E=Sophos;i="6.04,206,1695711600"; 
+   d="scan'208";a="800577773"
+Received: from mmichali-devpc.igk.intel.com ([10.211.235.239])
+  by orsmga001.jf.intel.com with ESMTP; 17 Nov 2023 11:05:12 -0800
+From: Michal Michalik <michal.michalik@intel.com>
+To: netdev@vger.kernel.org
+Cc: vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	jonathan.lemon@gmail.com,
+	pabeni@redhat.com,
+	poros@redhat.com,
+	milena.olech@intel.com,
+	mschmidt@redhat.com,
+	linux-clk@vger.kernel.org,
+	bvanassche@acm.org,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	Michal Michalik <michal.michalik@intel.com>
+Subject: [PATCH RFC net-next v3 0/2] selftests/dpll: DPLL subsystem integration tests
+Date: Fri, 17 Nov 2023 20:05:03 +0100
+Message-Id: <20231117190505.7819-1-michal.michalik@intel.com>
+X-Mailer: git-send-email 2.9.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZVeqSsfBEMsQ+8mP@shikoro>
 
-Hi Wolfram,
+The recently merged common DPLL interface discussed on a mailing list[1]
+is introducing new, complex subsystem which requires proper integration
+testing - this patchset adds such a framework, as well as the initial
+test cases. Framework does not require neither any special hardware nor
+any special system architecture.
 
-Thanks for your review.
+To properly test the DPLL subsystem this patch adds fake DPLL devices
+and its pins to netdevsim. Two DPLL devices are added: EEC and PPS.
+There are also common pins for each device: PPS and GNSS. Additionally
+each netdevsim port register RCLK (recovered clock) pin for itself. That
+allow us to check mutliple scenarios which might be problematic in real
+implementations (like different ordering etc.)
 
-On 2023-11-17 13:00:42 -0500, Wolfram Sang wrote:
-> 
-> > +#define RCAR_GEN4_PTP_CLOCK_V4H		PTPTIVC_INIT_200MHZ
-> 
-> Is this easier right now or could it be added together with the TSN
-> driver?
-> 
+Patch adds few helper scripts, which are:
+1) tools/testing/selftests/drivers/net/netdevsim/dpll/run_dpll_tests.sh
+    Script is checking for all dependencies, creates temporary
+    environment, installs required libraries and run all tests - can be
+    used standalone
+2) tools/testing/selftests/drivers/net/netdevsim/dpll/ynlfamilyhandler.py˙
+    Library for easier ynl use in the pytest framework - can be used
+    standalone
 
-I could not make up my mind, I think ether is fine. I opted to put it in 
-this series to group all gPTP changes in one series. If you think it's 
-better moved to the upcoming TSN series I can move it there.
+[1] https://lore.kernel.org/netdev/169494842736.21621.10730860855645661664.git-patchwork-notify@kernel.org/
+
+Changelog:
+v2 -> v3:
+- updated the cover letter
+- moved framework from selftests/dpll to selftests/drivers/net/netdevsim/dpll/
+- added `nsim_` prefixes to functions and structs
+- dropped unecessary casts
+- added necessary debugfs entries
+- added random clock id
+- improved error patchs on init
+- removed separate dpll.h header
+- removed unnecesary UAPI dpll header import
+- changed struct names
+- changed private data structs to be embedded
+- moved common pin init to device init
+- added netdev_dpll_pin_set/clear()
+
+v1 -> v2:
+- moved from separate module to implementation in netdevsim
+
+
+Michal Michalik (2):
+  netdevsim: implement DPLL for subsystem selftests
+  selftests/dpll: add DPLL system integration selftests
+
+ drivers/net/Kconfig                                |   1 +
+ drivers/net/netdevsim/Makefile                     |   2 +-
+ drivers/net/netdevsim/dev.c                        |  23 +-
+ drivers/net/netdevsim/dpll.c                       | 490 +++++++++++++++++++++
+ drivers/net/netdevsim/netdev.c                     |  10 +
+ drivers/net/netdevsim/netdevsim.h                  |  44 ++
+ tools/testing/selftests/Makefile                   |   1 +
+ .../selftests/drivers/net/netdevsim/dpll/Makefile  |   8 +
+ .../drivers/net/netdevsim/dpll/__init__.py         |   0
+ .../selftests/drivers/net/netdevsim/dpll/config    |   2 +
+ .../selftests/drivers/net/netdevsim/dpll/consts.py |  40 ++
+ .../drivers/net/netdevsim/dpll/dpll_utils.py       |  94 ++++
+ .../drivers/net/netdevsim/dpll/requirements.txt    |   3 +
+ .../drivers/net/netdevsim/dpll/run_dpll_tests.sh   |  75 ++++
+ .../drivers/net/netdevsim/dpll/test_dpll.py        | 376 ++++++++++++++++
+ .../drivers/net/netdevsim/dpll/ynlfamilyhandler.py |  49 +++
+ 16 files changed, 1216 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/net/netdevsim/dpll.c
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/Makefile
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/__init__.py
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/config
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/consts.py
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/dpll_utils.py
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/requirements.txt
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/dpll/run_dpll_tests.sh
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/test_dpll.py
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/dpll/ynlfamilyhandler.py
 
 -- 
-Kind Regards,
-Niklas Söderlund
+2.9.5
+
+base-commit: 18de1e517ed37ebaf33e771e46faf052e966e163
 
