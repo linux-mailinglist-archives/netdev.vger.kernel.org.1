@@ -1,49 +1,39 @@
-Return-Path: <netdev+bounces-48606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73CD07EEF24
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:46:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C85F77EEF42
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 10:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2C92811E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:45:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 715D71F26518
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 09:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C75D171A8;
-	Fri, 17 Nov 2023 09:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAA6171B1;
+	Fri, 17 Nov 2023 09:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BbHo7e+K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VI4q2I7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51CE2135;
-	Fri, 17 Nov 2023 01:45:52 -0800 (PST)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AH9Nppq022684;
-	Fri, 17 Nov 2023 09:45:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=Wnmg8HFqo4zblBGw7uhKOxVMxoPMpQNE5mJ176EA0kg=;
- b=BbHo7e+KsH0+19ZETk+r+G0sVpqFzdnb6Tma0pXwpHdcfOtJcXx6cprORu6BPEi33h85
- OhQrZKq2Wf6r+LO41v8aDJIrl3NUaHQMAZ1c/0r7gqXMvC5XRZu/jOkDLTNGUlrKAzxC
- w+LjMrYNRR+S4i+YfYWZI5uuhX9KCdsq5R03mpDlBAfFEnM4YTHdZAgKNPzd4Z/flbrW
- H7hkZOSiXTP8xMytSbWpESKdFcezJgUJMXHnRMOAax3LBTVdb983sacLbqN66CCT17Y/
- 8J2R9QXLQpQr/hAPlX2ZiVaMeWpILnX4TybmzzTHz8ds6vuNWeguXeA7e5gHhV23WnS6 Aw== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3udmw42ak7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 09:45:40 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AH9jdpR009346
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Nov 2023 09:45:39 GMT
-Received: from [10.253.8.81] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.39; Fri, 17 Nov
- 2023 01:45:35 -0800
-Message-ID: <c574b621-aa18-460a-b5ed-49e9f143ecf4@quicinc.com>
-Date: Fri, 17 Nov 2023 17:45:35 +0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEBD171A5
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 09:52:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15245C433C7;
+	Fri, 17 Nov 2023 09:51:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700214721;
+	bh=5HsDJUIpq+WzQyoTIrlE2LCZwPI5r2SD0ENhnQYLf1c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VI4q2I7EkqkFG6srWleLxAYUsWZgEVJLttuy3A0pOI2L1sYGJhbWk0hxY+apO057T
+	 dcm56loYfQEy+G4pa12a4kv/3IuXnCEV/YXXAcNBoG+xScoJduED0hv1jd9s7XESmo
+	 KvB9Uj28b6caL4UP7lPC2JuHnueRBLTlwJUuZZ8W7RvA0R0RIJW9l3/oaxDA9TYPVZ
+	 7JkRJVhwKkxehp5h7QaPet4RrIwFjFpTVmQHOOtG4vRCwMqCtA0eMO3DsYNqbHHhX9
+	 Q/tm78NUfm/hWEx4yX3ENGXr7XFIFD88yNnm3w8DOMcLk9Blzmz9fWAaBHHfrNNYt9
+	 I9Q4s6ct/jBAg==
+Message-ID: <e8cf4f85-b05a-4a7a-ae13-406792be1bbe@kernel.org>
+Date: Fri, 17 Nov 2023 11:51:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,64 +41,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/6] dt-bindings: net: ethernet-controller: add
- 10g-qxgmii mode
+Subject: Re: [PATCH 1/7] net: ethernet: ti: am65-cpsw: Don't error out in
+ .remove()
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-References: <20231116112437.10578-1-quic_luoj@quicinc.com>
- <20231116112437.10578-3-quic_luoj@quicinc.com>
- <20231116-flier-washed-eb1a45481323@squawk>
- <739c89ec-739e-4c5d-8e42-88ed9a89979b@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <739c89ec-739e-4c5d-8e42-88ed9a89979b@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: KQWvbExLaIrKlJFmLKkscZdKQOStzyVh
-X-Proofpoint-ORIG-GUID: KQWvbExLaIrKlJFmLKkscZdKQOStzyVh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-17_07,2023-11-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=678
- clxscore=1015 suspectscore=0 mlxscore=0 malwarescore=0 bulkscore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 impostorscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311170071
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, netdev@vger.kernel.org,
+ kernel@pengutronix.de
+References: <20231117091655.872426-1-u.kleine-koenig@pengutronix.de>
+ <20231117091655.872426-2-u.kleine-koenig@pengutronix.de>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20231117091655.872426-2-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
 
-On 11/17/2023 2:12 AM, Andrew Lunn wrote:
-> On Thu, Nov 16, 2023 at 02:22:41PM +0000, Conor Dooley wrote:
->> On Thu, Nov 16, 2023 at 07:24:33PM +0800, Luo Jie wrote:
->>> Add the new interface mode 10g-qxgmii, which is similar to
->>> usxgmii but extend to 4 channels to support maximum of 4
->>> ports with the link speed 10M/100M/1G/2.5G.
->>>
->>
->>> This patch is separated from Vladimir Oltean's previous patch
->>> <net: phy: introduce core support for phy-mode = "10g-qxgmii">.
->>
->> This belongs in the changelog under the --- line.
->>
->>>
->>> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
->>
->> Are you missing a from: line in this patch?
+On 17/11/2023 11:16, Uwe Kleine-König wrote:
+> Returning early from .remove() with an error code still results in the
+> driver unbinding the device. So the driver core ignores the returned error
+> code and the resources that were not freed are never catched up. In
+> combination with devm this also often results in use-after-free bugs.
 > 
-> You probably need to use git commit --am --author=<author> to fix
-> this.
+> In case of the am65-cpsw-nuss driver there is an error path, but it's never
+> taken because am65_cpts_resume() never fails (which however might be
+> another problem). Still make this explicit and drop the early return in
+> exchange for an error message (that is more useful than the error the
+> driver core emits when .remove() returns non-zero).
 > 
-> 	Andrew
+> This prepares changing am65_cpsw_nuss_remove() to return void.
+> 
+> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index ece9f8df98ae..960cb3fa0754 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -3007,9 +3007,12 @@ static int am65_cpsw_nuss_remove(struct platform_device *pdev)
+>  
+>  	common = dev_get_drvdata(dev);
+>  
+> -	ret = pm_runtime_resume_and_get(&pdev->dev);
+> +	ret = pm_runtime_get_sync(&pdev->dev);
 
-will update this in the next patch set, thanks for this instruction.
+Unrelated to this patch but I see pm_runtime_resume_and_get()
+used at multiple places in this driver.
+
+Would it be wise to replace them all with pm_runtime_get_sync()?
+
+>  	if (ret < 0)
+> -		return ret;
+> +		/* am65_cpts_resume() doesn't fail, so handling ret < 0 is only
+> +		 * for the sake of completeness.
+> +		 */
+> +		dev_err(dev, "runtime resume failed (%pe)\n", ERR_PTR(ret));
+>  
+>  	am65_cpsw_unregister_devlink(common);
+>  	am65_cpsw_unregister_notifiers(common);
+
+-- 
+cheers,
+-roger
 
