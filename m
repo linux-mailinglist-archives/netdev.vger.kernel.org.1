@@ -1,246 +1,196 @@
-Return-Path: <netdev+bounces-48548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562FB7EEC63
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:51:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEA037EEC67
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 07:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 002F92810D1
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:51:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895522810CD
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 06:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E662D283;
-	Fri, 17 Nov 2023 06:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yz94nh4f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC46D2F9;
+	Fri, 17 Nov 2023 06:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7494EB7;
-	Thu, 16 Nov 2023 22:51:48 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6c4d06b6ddaso1529025b3a.3;
-        Thu, 16 Nov 2023 22:51:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700203908; x=1700808708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fhWs88U6MPRZe0S+hAPo0cZxqSNW0WDEnXMqzKp3mWQ=;
-        b=Yz94nh4fgnGLp/LagyHfLlissEbtO190eMIO53Q7U4UbZrfa+6wKA0uw40iZNp6NdG
-         EmGaFilYxxaxPWXFYfNA+zmU7Y+vzgcvRzLjIWCmSaJYAIyiEV9PJlABgctRsvsbue4U
-         AILmx/Nnu2KfRrHLqI2zRRPx0pGDmg78GyCz5gr9JXtGjRAgvRlgst6Ayhuc3ht8ZVR3
-         4NR79TXqV2acexx2udOK48m8Q38ttQ3cWToeVktlsFMjFKVvKx13LEFHZkLcnt4DCj7i
-         lKaz5NitYDvhGEp92HNVk5dcZFfGR0n5LQlWnzShc5urq4z+HBbsYqedIYI29ANIyb4T
-         MWRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700203908; x=1700808708;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fhWs88U6MPRZe0S+hAPo0cZxqSNW0WDEnXMqzKp3mWQ=;
-        b=nWwvTdYf7HLw8schrp97DMGJx24g7og4C2vWYX4Qi3XLeFwWA6MLxah6TXUcHfkxbk
-         JueQTpFie4cxscmxqsjnMEpIoE8kalQrHKGaTvyJJCjwXJMS0djGVzCSajHna1HanMEe
-         9Buc8FQcKu8QqpweXvoewv6qBXoyPWESNyCelIyEnoZtfoLigBUHTMKkxV9J4Y41Dvfv
-         OZZqHFGWPZaCPsS1+6IHPtzhJNb+ccKj+UttBv6W2sDZTEaVj7NLV1kWZibEeLLSBCVx
-         OVigVgoFRjazciZIb0V6G72ow8b4f15fUjxtHklmuLuTEA+W95cpLRap3VjAjGUKrPud
-         uslA==
-X-Gm-Message-State: AOJu0YwNrIZ1FFeFmRjDfVgI1Nuhjbgy2tcCdiHS6fFIpgAoEzJc4lMz
-	KDXq5eqU+VagGmgWpAn7ArE=
-X-Google-Smtp-Source: AGHT+IHZ/ljki98Dp5EMoOIgFmx0y22inHV+Gz4sRXRxbMhuIMXbK4kDDBpkquAHF0umEFE2CQ2LAA==
-X-Received: by 2002:a05:6a20:6a92:b0:187:ab4:19b9 with SMTP id bi18-20020a056a206a9200b001870ab419b9mr10692294pzb.35.1700203907835;
-        Thu, 16 Nov 2023 22:51:47 -0800 (PST)
-Received: from localhost ([2605:59c8:148:ba10:377e:7905:3027:d8fd])
-        by smtp.gmail.com with ESMTPSA id bj9-20020a170902850900b001b9e9edbf43sm696908plb.171.2023.11.16.22.51.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Nov 2023 22:51:46 -0800 (PST)
-Date: Thu, 16 Nov 2023 22:51:45 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, 
- netdev@vger.kernel.org
-Cc: deb.chatterjee@intel.com, 
- anjali.singhai@intel.com, 
- namrata.limaye@intel.com, 
- tom@sipanda.io, 
- mleitner@redhat.com, 
- Mahesh.Shirshyad@amd.com, 
- tomasz.osinski@intel.com, 
- jiri@resnulli.us, 
- xiyou.wangcong@gmail.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- vladbu@nvidia.com, 
- horms@kernel.org, 
- daniel@iogearbox.net, 
- bpf@vger.kernel.org, 
- khalidm@nvidia.com, 
- toke@redhat.com, 
- mattyk@nvidia.com
-Message-ID: <65570d81e9db_55d732089f@john.notmuch>
-In-Reply-To: <20231116145948.203001-11-jhs@mojatatu.com>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <20231116145948.203001-11-jhs@mojatatu.com>
-Subject: RE: [PATCH net-next v8 10/15] p4tc: add action template create,
- update, delete, get, flush and dump
+Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AE04192;
+	Thu, 16 Nov 2023 22:53:07 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VwYgl8u_1700203983;
+Received: from 30.221.148.229(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VwYgl8u_1700203983)
+          by smtp.aliyun-inc.com;
+          Fri, 17 Nov 2023 14:53:05 +0800
+Message-ID: <44551f7f-5890-2141-cf90-9d7095d55502@linux.alibaba.com>
+Date: Fri, 17 Nov 2023 14:53:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.1
+Subject: Re: [PATCH net v2] net/smc: avoid data corruption caused by decline
+Content-Language: en-US
+To: Wen Gu <guwen@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1700197181-83136-1-git-send-email-alibuda@linux.alibaba.com>
+ <a0c9e8d5-14fc-3eba-f891-ef7c3ee9bd03@linux.alibaba.com>
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <a0c9e8d5-14fc-3eba-f891-ef7c3ee9bd03@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Jamal Hadi Salim wrote:
-> This commit allows users to create, update, delete, get, flush and dump
-> dynamic action kinds based on P4 action definition.
-> 
-> At the moment dynamic actions are tied to P4 programs only and cannot be
-> used outside of a P4 program definition.
-> 
-> Visualize the following action in a P4 program:
-> 
-> action ipv4_forward(@tc_type("macaddr) bit<48> dstAddr, @tc_type("dev") bit<8> port)
-> {
->      // Action code (generated by the compiler)
 
-So this is BPF or what?
 
-> }
-> 
-> The above is an action called ipv4_forward which receives as parameters
-> a bit<48> dstAddr (a mac address) and a bit<8> port (something close to
-> ifindex).
-> 
-> which is invoked on a P4 table match as such:
-> 
-> table mytable {
->         key = {
->             hdr.ipv4.dstAddr @tc_type("ipv4"): lpm;
->         }
-> 
->         actions = {
->             ipv4_forward;
->             drop;
->             NoAction;
->         }
-> 
->         size = 1024;
-> }
-> 
-> We don't have an equivalent built in "ipv4_forward" action in TC. So we
-> create this action dynamically.
-> 
-> The mechanics of dynamic actions follow the CRUD semantics.
-> 
-> ___DYNAMIC ACTION KIND CREATION___
-> 
-> In this stage we issue the creation command for the dynamic action which
-> specifies the action name, its ID, parameters and the parameter types.
-> So for the ipv4_forward action, the creation would look something like
-> this:
-> 
-> tc p4template create action/aP4proggie/ipv4_forward \
->   param dstAddr type macaddr id 1 param port type dev id 2
-> 
-> Note1: Although the P4 program defined dstAddr as type bit48 we use our
-> type called macaddr (likewise for port) - see commit on p4 types for
-> details.
-> 
-> Note2: All the template commands (tc p4template) are generated by the
-> p4c compiler.
-> 
-> Note that in the template creation op we usually just specify the action
-> name, the parameters and their respective types. Also see that we specify
-> a pipeline name during the template creation command. As an example, the
-> above command creates an action template that is bounded to
-> pipeline or program named aP4proggie.
-> 
-> Note, In P4, actions are assumed to pre-exist and have an upper bound
-> number of instances. Typically if you have 1M table entries you want to allocate
-> enough action instances to cover the 1M entries. However, this is a big waste
-> waste of memory if the action instances are not in use. So for our case, we allow
-> the user to specify a minimal amount of actions instances in the template and then
-> if more dynamic action instances are needed then they will be added on
-> demand as in the current approach with tc filter-action relationship.
-> For example, if one were to create the action ipv4_forward preallocating
-> 128 instances, one would issue the following command:
-> 
-> tc p4template create action/aP4proggie/ipv4_forward num_prealloc 128 \
->   param dstAddr type macaddr id 1 param port type dev id 2
-> 
-> By default, 16 action instances will be preallocated.
-> If the user wishes to have more actions instances, they will have to be
-> created individually by the control plane using the tc actions command.
-> For example:
-> 
-> tc actions add action aP4proggie/ipv4_forward \
-> param dstAddr AA:BB:CC:DD:EE:DD param port eth1
-> 
-> Only then they can issue a table entry creation command using this newly
-> created action instance.
-> 
-> Note, this does not disqualify a user from binding to an existing action
-> instances. For example:
-> 
-> tc p4ctrl create aP4proggie/table/mycontrol/mytable \
->    srcAddr 10.10.10.0/24 action ipv4_forward index 1
-> 
-> ___ACTION KIND ACTIVATION___
-> 
-> Once we provided all the necessary information for the new dynamic action,
-> we can go to the final stage, which is action activation. In this stage,
-> we activate the dynamic action and make it available for instantiation.
-> To activate the action template, we issue the following command:
-> 
-> tc p4template update action aP4proggie/ipv4_forward state active
-> 
-> After the above the command, the action is ready to be instantiated.
-> 
-> ___RUNTIME___
-> 
-> This next section deals with the runtime part of action templates, which
-> handle action template instantiation and binding.
-> 
-> To instantiate a new action that was created from a template, we use the
-> following command:
-> 
-> tc actions add action aP4proggie/ipv4_forward \
-> param dstAddr AA:BB:CC:DD:EE:FF param port eth0 index 1
-> 
-> Observe these are the same semantics as what tc today already provides
-> with a caveat that we have a keyword "param" to precede the appropriate
-> parameters - as such specifying the index is optional (kernel provides
-> one when unspecified).
-> 
-> As previously stated, we refer to the action by it's "full name"
-> (pipeline_name/action_name). Here we are creating an instance of the
-> ipv4_forward action specifying as parameter values AA:BB:CC:DD:EE:FF for
-> dstAddr and eth0 for port. We can create as many instances for action
-> templates as we wish.
-> 
-> To bind the above instantiated action to a table entry, you can do use the
-> same classical approach used to bind ordinary actions to filters, for
-> example:
-> 
-> tc p4ctrl create aP4proggie/table/mycontrol/mytable \
->    srcAddr 10.10.10.0/24 action ipv4_forward index 1
-> 
-> The above command will bind our newly instantiated action to a table
-> entry which is executed if there's a match.
-> 
-> Of course one could have created the table entry as:
-> 
-> tc p4ctrl create aP4proggie/table/mycontrol/mytable \
-> srcAddr 10.10.10.0/24 \
-> action ipv4_forward param dstAddr AA:BB:CC:DD:EE:FF param port eth0
-> 
-> Actions from other P4 control blocks (in the same pipeline) might be
-> referenced as the action index is global within a pipeline.
-> 
+On 11/17/23 2:47 PM, Wen Gu wrote:
+>
+>
+> On 2023/11/17 12:59, D. Wythe wrote:
+>
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> We found a data corruption issue during testing of SMC-R on Redis
+>> applications.
+>>
+>> The benchmark has a low probability of reporting a strange error as
+>> shown below.
+>>
+>> "Error: Protocol error, got "\xe2" as reply type byte"
+>>
+>> Finally, we found that the retrieved error data was as follows:
+>>
+>> 0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+>> 0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+>> 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+>>
+>> It is quite obvious that this is a SMC DECLINE message, which means that
+>> the applications received SMC protocol message.
+>> We found that this was caused by the following situations:
+>>
+>> client            server
+>>        proposal
+>>     ------------->
+>>        accept
+>>     <-------------
+>>        confirm
+>>     ------------->
+>> wait confirm
+>>
+>>      failed llc confirm
+>>         x------
+>> (after 2s)timeout
+>>             wait rsp
+>>
+>> wait decline
+>>
+>> (after 1s) timeout
+>>             (after 2s) timeout
+>>         decline
+>>     -------------->
+>>         decline
+>>     <--------------
+>>
+>> As a result, a decline message was sent in the implementation, and this
+>> message was read from TCP by the already-fallback connection.
+>>
+>> This patch double the client timeout as 2x of the server value,
+>
+> Is the client's timeout doubled?
+>
+> From the code below, it is server's timeout that has been doubled.
+>
 
-Where did what the action actually does get defined? It looks like
-a label at this point, but without code?
+Forget to fix description, i'll fix that in next revision.
+
+>> With this simple change, the Decline messages should never cross or
+>> collide (during Confirm link timeout).
+>>
+>> This issue requires an immediate solution, since the protocol updates
+>> involve a more long-term solution.
+>>
+>> Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC 
+>> flow")
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>> ---
+>>   include/net/netns/smc.h |  2 ++
+>>   net/smc/af_smc.c        |  3 ++-
+>>   net/smc/smc_sysctl.c    | 12 ++++++++++++
+>>   3 files changed, 16 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+>> index 582212a..5198896 100644
+>> --- a/include/net/netns/smc.h
+>> +++ b/include/net/netns/smc.h
+>> @@ -22,5 +22,7 @@ struct netns_smc {
+>>       int                sysctl_smcr_testlink_time;
+>>       int                sysctl_wmem;
+>>       int                sysctl_rmem;
+>> +    /* server's Confirm Link timeout in seconds */
+>> +    int                sysctl_smcr_srv_confirm_link_timeout;
+>>   };
+>>   #endif
+>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>> index abd2667..b86ad30 100644
+>> --- a/net/smc/af_smc.c
+>> +++ b/net/smc/af_smc.c
+>> @@ -1870,7 +1870,8 @@ static int smcr_serv_conf_first_link(struct 
+>> smc_sock *smc)
+>>           return SMC_CLC_DECL_TIMEOUT_CL;
+>>         /* receive CONFIRM LINK response from client over the RoCE 
+>> fabric */
+>> -    qentry = smc_llc_wait(link->lgr, link, SMC_LLC_WAIT_TIME,
+>> +    qentry = smc_llc_wait(link->lgr, link,
+>> + sock_net(&smc->sk)->smc.sysctl_smcr_srv_confirm_link_timeout,
+>>                     SMC_LLC_CONFIRM_LINK);
+>>       if (!qentry) {
+>>           struct smc_clc_msg_decline dclc;
+>> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
+>> index 5cbc18c..919f3f7 100644
+>> --- a/net/smc/smc_sysctl.c
+>> +++ b/net/smc/smc_sysctl.c
+>> @@ -51,6 +51,13 @@
+>>           .proc_handler    = proc_dointvec_jiffies,
+>>       },
+>>       {
+>> +        .procname    = "smcr_srv_confirm_link_timeout",
+>> +        .data        = 
+>> &init_net.smc.sysctl_smcr_srv_confirm_link_timeout,
+>> +        .maxlen        = sizeof(int),
+>> +        .mode        = 0644,
+>> +        .proc_handler    = proc_dointvec_jiffies,
+>> +    },
+>> +    {
+>>           .procname    = "wmem",
+>>           .data        = &init_net.smc.sysctl_wmem,
+>>           .maxlen        = sizeof(int),
+>> @@ -95,6 +102,11 @@ int __net_init smc_sysctl_net_init(struct net *net)
+>>       net->smc.sysctl_autocorking_size = SMC_AUTOCORKING_DEFAULT_SIZE;
+>>       net->smc.sysctl_smcr_buf_type = SMCR_PHYS_CONT_BUFS;
+>>       net->smc.sysctl_smcr_testlink_time = 
+>> SMC_LLC_TESTLINK_DEFAULT_TIME;
+>> +    /* Increasing the server's timeout by twice as much as the client's
+>> +     * timeout by default can temporarily avoid decline messages of
+>> +     * both side been crossed or collided.
+>
+> 'both sides' or maybe better for
+>
+> '..avoid decline messages of both sides crossing or colliding.'
+>
+>
+Look nice. I'll adopt that.
+>
+> Thanks,
+> Wen Gu
+>
+>> +     */
+>> +    net->smc.sysctl_smcr_srv_confirm_link_timeout = 2 * 
+>> SMC_LLC_WAIT_TIME;
+>>       WRITE_ONCE(net->smc.sysctl_wmem, net_smc_wmem_init);
+>>       WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
+
 
