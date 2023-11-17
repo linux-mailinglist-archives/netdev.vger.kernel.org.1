@@ -1,131 +1,101 @@
-Return-Path: <netdev+bounces-48718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943697EF56D
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:40:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883417EF627
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 17:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57866280F6D
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 15:40:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D735B209DF
+	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 16:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F78E381BA;
-	Fri, 17 Nov 2023 15:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8119E31598;
+	Fri, 17 Nov 2023 16:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HpBQbko2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xUIv0VwL"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3057F1730;
-	Fri, 17 Nov 2023 07:40:28 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0D9B11BF206;
-	Fri, 17 Nov 2023 15:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700235626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AMhHnpOtm9zMrjPprPoDTbWEP4fYLLWMhwm1QFdxOsE=;
-	b=HpBQbko2Lfth30TFQzansAXpsxycav51T3K2MMk8X3mitJt+eNTtKgTx0il2lKPXspLtpy
-	hLn3wh7LeC1k4LlH4mOOlObCCIILQxB5RidLTsQnfYM3DF/erXiQugVQIYyzPSWnIUuloe
-	h/MXkybt862u9rGD3RzwkHgLL21kOQErRHn633whTu8lC/SImQ/Urb0nvm865Fxug6V1lF
-	dhJ2Nd4NpiclZuNlOzbWseJqSwsmRLPXhb9GzHjW4915DytziIjqpgXFLGA1KZsqrL8SzO
-	TCcYzgz+NRT06ROZVWXz3245KGLyQhDFERhgkJ+mFCIKQoxmE403cyx3eGnzlQ==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: [RFC PATCH net-next v2 10/10] net: ethtool: strset: Allow querying phy stats by index
-Date: Fri, 17 Nov 2023 17:23:21 +0100
-Message-ID: <20231117162323.626979-11-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20231117162323.626979-1-maxime.chevallier@bootlin.com>
-References: <20231117162323.626979-1-maxime.chevallier@bootlin.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D733D57;
+	Fri, 17 Nov 2023 08:28:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uTBv8mHH9oPH7azaHaXg9APqX/hy+5WYGfmmqmA5tV4=; b=xUIv0VwL0eTtiMLnf/f5vFInpt
+	hvesyRtb9CpEp8CbiEkEh+OBXWaVmYfyKeQ+D08eX31qjQ4h+DaEYTa0mgvyKK5eT7pX1ItBsDBpI
+	m+UDUEmqk56iX0XpgVKL+ZJCrDIALg1GhwvXSBGe7SkCi46fEKGVpclM0VwnoMBxkoWA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r41hP-000SMN-VQ; Fri, 17 Nov 2023 17:28:07 +0100
+Date: Fri, 17 Nov 2023 17:28:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alice Ryhl <aliceryhl@google.com>
+Cc: benno.lossin@proton.me, fujita.tomonori@gmail.com,
+	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
+ drivers
+Message-ID: <9851386b-59c5-4b6c-95e3-128dbea403c9@lunn.ch>
+References: <61f93419-396d-4592-b28b-9c681952a873@lunn.ch>
+ <20231117154246.2571219-1-aliceryhl@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117154246.2571219-1-aliceryhl@google.com>
 
-The ETH_SS_PHY_STATS command gets PHY statistics. Use the phydev pointer
-from the ethnl request to allow query phy stats from each PHY on the
-link.
+> >> /// # Invariants
+> >> ///
+> >> /// Referencing a `phy_device` using this struct asserts that the X
+> >> /// mutex is held, or that the reference has exclusive access to the
+> >> /// entire `phy_device`.
+> >> #[repr(transparent)]
+> >> pub struct Device(Opaque<bindings::phy_device>);
+> > 
+> > You can never have exclusive access to the entire phy_device, because
+> > it contains a mutex. Other threads can block on that mutex, which
+> > involves changing the linked list in the mutex.
+> > 
+> > But that is also a pretty common pattern, put the mutex inside the
+> > structure it protects. So when you say 'exclusive access to the entire
+> > `phy_device`' you actually mean excluding mutex, spinlocks, atomic
+> > variables, etc?
+> 
+> No, I really meant exclusive access to everything. This suggestion is
+> where I guessed that the situation might be "we just created the
+> phy_device, and haven't yet shared it with anyone, so it's okay to
+> access it without the lock". But it sounds like that's not the case.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- net/ethtool/strset.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+It is pretty unusual for a linux driver to actually create a
+device. Some level of core code generally creates a basic device
+structure and passes it to the probe function. The probe can then
+setup members in the device, maybe allocate memory and assign it to
+the device->priv member etc.
 
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index c678b484a079..70c00631c51f 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -233,17 +233,18 @@ static void strset_cleanup_data(struct ethnl_reply_data *reply_base)
- }
- 
- static int strset_prepare_set(struct strset_info *info, struct net_device *dev,
--			      unsigned int id, bool counts_only)
-+			      struct phy_device *phydev, unsigned int id,
-+			      bool counts_only)
- {
- 	const struct ethtool_phy_ops *phy_ops = ethtool_phy_ops;
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	void *strings;
- 	int count, ret;
- 
--	if (id == ETH_SS_PHY_STATS && dev->phydev &&
-+	if (id == ETH_SS_PHY_STATS && phydev &&
- 	    !ops->get_ethtool_phy_stats && phy_ops &&
- 	    phy_ops->get_sset_count)
--		ret = phy_ops->get_sset_count(dev->phydev);
-+		ret = phy_ops->get_sset_count(phydev);
- 	else if (ops->get_sset_count && ops->get_strings)
- 		ret = ops->get_sset_count(dev, id);
- 	else
-@@ -258,10 +259,10 @@ static int strset_prepare_set(struct strset_info *info, struct net_device *dev,
- 		strings = kcalloc(count, ETH_GSTRING_LEN, GFP_KERNEL);
- 		if (!strings)
- 			return -ENOMEM;
--		if (id == ETH_SS_PHY_STATS && dev->phydev &&
-+		if (id == ETH_SS_PHY_STATS && phydev &&
- 		    !ops->get_ethtool_phy_stats && phy_ops &&
- 		    phy_ops->get_strings)
--			phy_ops->get_strings(dev->phydev, strings);
-+			phy_ops->get_strings(phydev, strings);
- 		else
- 			ops->get_strings(dev, id, strings);
- 		info->strings = strings;
-@@ -305,8 +306,8 @@ static int strset_prepare_data(const struct ethnl_req_info *req_base,
- 		    !data->sets[i].per_dev)
- 			continue;
- 
--		ret = strset_prepare_set(&data->sets[i], dev, i,
--					 req_info->counts_only);
-+		ret = strset_prepare_set(&data->sets[i], dev, req_base->phydev,
-+					 i, req_info->counts_only);
- 		if (ret < 0)
- 			goto err_ops;
- 	}
--- 
-2.41.0
+However, in the probe method, it should be safe to assume its not
+globally visible yet, so you can be more relaxed about locking.
 
+> >> /// # Invariants
+> >> ///
+> >> /// Referencing a `phy_device` using this struct asserts that the user
+> >> /// is inside a Y scope as defined in Documentation/foo/bar.
+> >> #[repr(transparent)]
+> >> pub struct Device(Opaque<bindings::phy_device>);
+> > 
+> > There is no such documentation that i know of, except it does get
+> > repeated again and again on the mailling lists. Its tribal knowledge.
+> 
+> Then, my suggestion would be to write down that tribal knowledge in the
+> safety comments.
+
+O.K, we can do that.
+
+     Andrew
 
