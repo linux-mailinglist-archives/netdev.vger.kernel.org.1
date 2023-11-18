@@ -1,106 +1,110 @@
-Return-Path: <netdev+bounces-48892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C817EFF45
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 12:34:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD747EFF4F
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 12:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FD12280FA5
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 11:34:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AC421F23193
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 11:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59381101C9;
-	Sat, 18 Nov 2023 11:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCE6107AA;
+	Sat, 18 Nov 2023 11:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i/Yf9yN4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DPszGSJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BA6E1A1;
-	Sat, 18 Nov 2023 03:34:11 -0800 (PST)
-Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-507be298d2aso3706164e87.1;
-        Sat, 18 Nov 2023 03:34:11 -0800 (PST)
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2D8D52
+	for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 03:38:08 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id 4fb4d7f45d1cf-53d8320f0easo4066758a12.3
+        for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 03:38:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700307249; x=1700912049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/sqZtYPf1d7uCFhAGajJY8T+mb9aQWAUkemimPSnCc=;
-        b=i/Yf9yN4XeWCzaxHY0kOWarvL+Ym2E4SK+I/2i3png7kJd8m22dQNn16L/yPuZVhUt
-         ewCeGnfcfjCD9HwUJmuWtQ3ba20tRNBGqwo66MpcfkBG82HGfRcbmbgbyIHF4neTBTVD
-         4iXBHFkhkqNGU+QldTFnGyvZBU3q1XLMPEZGuia4/fNDX1WvJu6Wy8cCS22WcLsZyfFa
-         X2z/6Y7A5z78w/atybRW6Fd2+8NfbeuO3m9C6XA/lDx9JdqlJVmO5jVoHgxtUv1qs8Py
-         l4vUj15Uwjonwj4IRS8c9Apqw2kymwtHLqhO7Cprzj/6PfZLLDj8YK+p9xhJ0fqo6aqn
-         TebA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700307487; x=1700912287; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwfAcLpPBP9/VcLdhWC2YYKbzJ5W2WwAWFFBT48SHb4=;
+        b=DPszGSJv+/tGL68O9MV438e2U1IphyHA0fsDT2uxnwuiwt7B/0DLfpSDpbwkD3NW2P
+         0zeUrhEuLencCLY0QnjWvHmylomF7ke4W5wXDzibQLR9FYuD55VhCIza49bY3kpMdy4q
+         eK1e5XT5utNGsgO5SAPeXL0/rrj+MVCuePNvhHL03ZfDv5pT8l9WKTkcddPFd6MaaVaG
+         D5tfc/OiNFvXaDYz8MoapDsutZAACb3N6em8x645BeuoB/OXb7H7hiN4rGzpkR3j5iEk
+         GYME1/SpaQZXZlGMt5JoLFf1AkK4byirGEfA4vKNwZtWPmei53xP4bZrpXCJjHIboE0X
+         dFSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700307249; x=1700912049;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q/sqZtYPf1d7uCFhAGajJY8T+mb9aQWAUkemimPSnCc=;
-        b=lOiP1PElQZtTp4N+6ntOVIoACv208i+BgXziQM9PvAaW8rLbb4+rl+ohG4Zt7gdzvA
-         QLxYqDsImcQ03b1tn4W0s4DPr8jR7E6vNM85rdq3qGKVidCGeCtkuqD24VUuu0u5n3Wy
-         eqOI7YKv8faN9U/vH4XjmwLmqz/TN+TeJpNdU8fo0L7nw4WdAqBbbN7p28JwJfELYbp7
-         LhOc4YcEv7dltSBkj/nVRu+rXIZszqGDNyV1vhGSSsiG38tbRSPeXLX+RWHyBTk/Awo2
-         wZtlpiRTyVdAKhIF70Lsptw73NezjXj9iNXmutswwWiEroGuG9mGv0rby7Luh0Yo2dl4
-         u/vA==
-X-Gm-Message-State: AOJu0YxgEADMeJw9S9IaB4gB7HbUTiAeKjm4/9JYptQtD/3CKI3eUNDa
-	LPh6jwxp3v40LOh3LHlO9oA=
-X-Google-Smtp-Source: AGHT+IEm5TDII5VXXDPzzv1iAekAn9g6WwCAuut52LH2oQh2SfXrPp8HC4foHDanR7i7GoBnRR3iyg==
-X-Received: by 2002:a19:5514:0:b0:509:4424:2e0e with SMTP id n20-20020a195514000000b0050944242e0emr1586680lfe.0.1700307249434;
-        Sat, 18 Nov 2023 03:34:09 -0800 (PST)
-Received: from localhost.localdomain (87-206-74-243.dynamic.chello.pl. [87.206.74.243])
-        by smtp.gmail.com with ESMTPSA id w27-20020a05651204db00b0050799f689ddsm557170lfq.200.2023.11.18.03.34.08
+        d=1e100.net; s=20230601; t=1700307487; x=1700912287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jwfAcLpPBP9/VcLdhWC2YYKbzJ5W2WwAWFFBT48SHb4=;
+        b=dIbGsMLCht+6ttxf8F7QyDrOq475jZWy+3zHwcx5LBxIhZvAlZV5oqE1hrU8MuCGER
+         KsBFav6PpdFZHI341q4kwoXPc8ikR+oxCebjNpThwfuIKhNXgx+bICMmstk39nM+2Yvy
+         ozhYE2SUL2oKE0tfbyTjxRibBPSPHV2egrKj7tZED3ra5RhkSE/5xDsrZBBZZO3HE7bt
+         Cm1fKbRallcRpne5TQxz0dDB8/QLcZQZAQ2s2osXHK494OeR3wMxjKlih8RAzokrEgJJ
+         NHExDAzrP9WIfgWcwLgFlOU3lWCOKevC0lrPMSQh6rvwCq6pTGO6jKfqmr4lWDKXB9iN
+         w+qA==
+X-Gm-Message-State: AOJu0YyYEPoLWuWGNftR8jIAZ0VC85DylZcW+08k3iHWaGRK+gAfTIyU
+	D5DtSsVpjSJpi6fFS2JFpwdMNA==
+X-Google-Smtp-Source: AGHT+IE+gKa6JOvpcInpH3bQMumK5AwCQgXOXPQVa/fdX7kkkSyuYgD+wsAxlw24m1SQ73zpdAvBhg==
+X-Received: by 2002:a50:9ec3:0:b0:543:4fca:cc91 with SMTP id a61-20020a509ec3000000b005434fcacc91mr1333532edf.20.1700307486789;
+        Sat, 18 Nov 2023 03:38:06 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id c7-20020aa7c747000000b0053dfd3519f4sm1669355eds.22.2023.11.18.03.38.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Nov 2023 03:34:09 -0800 (PST)
-From: Kamil Duljas <kamil.duljas@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kamil Duljas <kamil.duljas@gmail.com>
-Subject: [PATCH] genetlink: Prevent memory leak when krealloc fail
-Date: Sat, 18 Nov 2023 12:33:57 +0100
-Message-ID: <20231118113357.1999-1-kamil.duljas@gmail.com>
-X-Mailer: git-send-email 2.42.0.windows.2
+        Sat, 18 Nov 2023 03:38:06 -0800 (PST)
+Date: Sat, 18 Nov 2023 12:38:05 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Sachin Bahadur <sachin.bahadur@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH iwl-net v3] ice: Block PF reinit if attached to bond
+Message-ID: <ZViiHS0sYyoXHK+x@nanopsycho>
+References: <20231117164427.912563-1-sachin.bahadur@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117164427.912563-1-sachin.bahadur@intel.com>
 
-genl_allocate_reserve_groups() allocs new memory in while loop
-but if krealloc fail, the memory allocated by kzalloc is not freed.
-It seems allocated memory is unnecessary when the function
-returns -ENOMEM
+Fri, Nov 17, 2023 at 05:44:27PM CET, sachin.bahadur@intel.com wrote:
+>PF interface part of LAG should not allow driver reinit via devlink. The
+>Bond config will be lost due to driver reinit. ice_devlink_reload_down is
 
-Signed-off-by: Kamil Duljas <kamil.duljas@gmail.com>
----
- net/netlink/genetlink.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Reinit whould remove and re-create netdevices. This patch should not be
+needed.
 
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 92ef5ed2e7b0..82273d6eaea3 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -437,8 +437,10 @@ static int genl_allocate_reserve_groups(int n_groups, int *first_id)
- 			} else {
- 				new_groups = krealloc(mc_groups, nlen,
- 						      GFP_KERNEL);
--				if (!new_groups)
-+				if (!new_groups) {
-+					kfree(mc_groups);
- 					return -ENOMEM;
-+				}
- 				mc_groups = new_groups;
- 				for (i = 0; i < BITS_TO_LONGS(n_groups); i++)
- 					mc_groups[mc_groups_longs + i] = 0;
--- 
-2.42.0.windows.2
 
+>called before PF driver reinit. If PF is attached to bond,
+>ice_devlink_reload_down returns error.
+>
+>Fixes: trailer
+>Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+>Signed-off-by: Sachin Bahadur <sachin.bahadur@intel.com>
+>---
+> drivers/net/ethernet/intel/ice/ice_devlink.c | 4 ++++
+> 1 file changed, 4 insertions(+)
+>
+>diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>index f4e24d11ebd0..5fe88e949b09 100644
+>--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+>+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>@@ -457,6 +457,10 @@ ice_devlink_reload_down(struct devlink *devlink, bool netns_change,
+> 					   "Remove all VFs before doing reinit\n");
+> 			return -EOPNOTSUPP;
+> 		}
+>+		if (pf->lag && pf->lag->bonded) {
+>+			NL_SET_ERR_MSG_MOD(extack, "Remove all associated Bonds before doing reinit");
+>+			return -EBUSY;
+>+		}
+> 		ice_unload(pf);
+> 		return 0;
+> 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE:
+>-- 
+>2.25.1
+>
+>
 
