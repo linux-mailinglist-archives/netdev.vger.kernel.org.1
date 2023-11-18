@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-48875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1B047EFE11
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:29:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B8167EFE16
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F4831C209A5
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:29:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F1CBB209DE
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8119DDF65;
-	Sat, 18 Nov 2023 06:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA20310793;
+	Sat, 18 Nov 2023 06:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cUznNwKn"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IWkR7wxQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F5571729;
-	Fri, 17 Nov 2023 22:28:33 -0800 (PST)
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AI5Zohe001999;
-	Sat, 18 Nov 2023 06:28:22 GMT
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2ECD5C;
+	Fri, 17 Nov 2023 22:28:35 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AI5xVLM019281;
+	Sat, 18 Nov 2023 06:28:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=qcppdkim1;
- bh=CLpJvxEOJWPI/XnaXTlnX9ueptBWpRe+/Nh9WcXUebo=;
- b=cUznNwKnIflu4/mn3XfZor3PhXoMOXaIYdK0WeHZ7dmFC6nz724G45mRcLgxk8Fj1LKW
- KYjBR5rzoog+XOsJgBE3L6huWTdASgA9/KiZhXym7UDMi5dQxUWtS0ydPLN7vcBMhiiL
- uxM73C69RWhd6y+6cLbSkQfOCoNHOwAKHJs6sddd53dp5WLMP0tG1qPyxE1F57a51Ygv
- 4uKyiUhuCsUWA5otkouAX9FoEJdrrH1vduMJLp80LnD3kqDgLi8YX/cU8Z9SyiYcLFHR
- eDgT9a8G5BhSwgl2rCHzB0LMqmdwQJbI2DpS2FqsOBiTVC54U6S0NQX/Rv5Jjvx6qmw/ gA== 
+ bh=xoUh7MWwDswQU0Qbcu6kSaukCEbi0jZ75coOg98MRMg=;
+ b=IWkR7wxQNF3xF/1TAV2J/lWHvc4BWLEpC38PnuSPPIagj6iWOUCdKqEDi+s6ISzdiRFP
+ qQLPM2UlL29yJMB0BZ7VOIxIUFINkyvDNs3EIuCDq9Vv3RLbtqyQxdzgOYUR/nJrD97k
+ a6bDjYkvpVbFndA1K4U66OTky+IeRuZZkRGnJUAiMdoCJYpX4IBfW1jI062N/LCp3dNI
+ 7IxivIvph565VhG0XX6tOhoW0MuodtE10kxTpsEHFgztaQOCpyqKkqelLPmavlGwla0T
+ 0Q74UtsABnMOftsbj/P6NUFg3Iw89GP5ORFWneEq/SgGPQLe5SB3lBW6h94EyvretN3X BQ== 
 Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uepf2g3eh-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uem80g8s2-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 18 Nov 2023 06:28:21 +0000
+	Sat, 18 Nov 2023 06:28:25 +0000
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AI6SLJK001339
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AI6SOSN001344
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 18 Nov 2023 06:28:21 GMT
+	Sat, 18 Nov 2023 06:28:24 GMT
 Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
  nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 17 Nov 2023 22:28:17 -0800
+ 15.2.1118.40; Fri, 17 Nov 2023 22:28:21 -0800
 From: Luo Jie <quic_luoj@quicinc.com>
 To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
@@ -49,9 +49,9 @@ To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
         <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>
 CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-Subject: [PATCH v5 4/6] net: phy: at803x: add the function phydev_id_is_qca808x
-Date: Sat, 18 Nov 2023 14:27:52 +0800
-Message-ID: <20231118062754.2453-5-quic_luoj@quicinc.com>
+Subject: [PATCH v5 5/6] net: phy: at803x: Add qca8084_config_init function
+Date: Sat, 18 Nov 2023 14:27:53 +0800
+Message-ID: <20231118062754.2453-6-quic_luoj@quicinc.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231118062754.2453-1-quic_luoj@quicinc.com>
 References: <20231118062754.2453-1-quic_luoj@quicinc.com>
@@ -68,82 +68,76 @@ X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: YOHTUgv66yZKNAiO6xXgThYqHUr9RX94
-X-Proofpoint-GUID: YOHTUgv66yZKNAiO6xXgThYqHUr9RX94
+X-Proofpoint-GUID: -Gic8IksuMB6moj_hsRoU1j51Q3Qc3CP
+X-Proofpoint-ORIG-GUID: -Gic8IksuMB6moj_hsRoU1j51Q3Qc3CP
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2023-11-18_04,2023-11-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 suspectscore=0 phishscore=0 mlxscore=0 mlxlogscore=941
- malwarescore=0 spamscore=0 adultscore=0 impostorscore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
+ adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311060000 definitions=main-2311180045
 
-The function phydev_id_is_qca808x is applicable to the
-PHY qca8081 and qca8084.
+Configure MSE detect threshold and ADC clock edge invert.
 
 Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 ---
- drivers/net/phy/at803x.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ drivers/net/phy/at803x.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 471d5c13d76d..f56202f5944d 100644
+index f56202f5944d..06a068ca5539 100644
 --- a/drivers/net/phy/at803x.c
 +++ b/drivers/net/phy/at803x.c
-@@ -1165,6 +1165,12 @@ static void at803x_link_change_notify(struct phy_device *phydev)
- 	}
+@@ -280,6 +280,15 @@
+ #define QCA8081_PHY_SERDES_MMD1_FIFO_CTRL	0x9072
+ #define QCA8081_PHY_FIFO_RSTN			BIT(11)
+ 
++/* QCA8084 ADC clock edge */
++#define QCA8084_ADC_CLK_SEL			0x8b80
++#define QCA8084_ADC_CLK_SEL_ACLK		GENMASK(7, 4)
++#define QCA8084_ADC_CLK_SEL_ACLK_FALL		0xf
++#define QCA8084_ADC_CLK_SEL_ACLK_RISE		0x0
++
++#define QCA8084_MSE_THRESHOLD			0x800a
++#define QCA8084_MSE_THRESHOLD_2P5G_VAL		0x51c6
++
+ MODULE_DESCRIPTION("Qualcomm Atheros AR803x and QCA808X PHY driver");
+ MODULE_AUTHOR("Matus Ujhelyi");
+ MODULE_LICENSE("GPL");
+@@ -2083,6 +2092,23 @@ static void qca808x_link_change_notify(struct phy_device *phydev)
+ 			QCA8081_PHY_FIFO_RSTN, phydev->link ? QCA8081_PHY_FIFO_RSTN : 0);
  }
  
-+static inline bool phydev_id_is_qca808x(struct phy_device *phydev)
++static int qca8084_config_init(struct phy_device *phydev)
 +{
-+	return phydev_id_compare(phydev, QCA8081_PHY_ID) ||
-+		phydev_id_compare(phydev, QCA8084_PHY_ID);
++	int ret;
++
++	/* Invert ADC clock edge */
++	ret = at803x_debug_reg_mask(phydev, QCA8084_ADC_CLK_SEL,
++				    QCA8084_ADC_CLK_SEL_ACLK,
++				    FIELD_PREP(QCA8084_ADC_CLK_SEL_ACLK,
++					       QCA8084_ADC_CLK_SEL_ACLK_FALL));
++	if (ret < 0)
++		return ret;
++
++	/* Adjust MSE threshold value to avoid link issue with some link partner */
++	return phy_write_mmd(phydev, MDIO_MMD_PMAPMD,
++			     QCA8084_MSE_THRESHOLD, QCA8084_MSE_THRESHOLD_2P5G_VAL);
 +}
 +
- static int at803x_read_specific_status(struct phy_device *phydev)
+ static struct phy_driver at803x_driver[] = {
  {
- 	int ss;
-@@ -1184,8 +1190,8 @@ static int at803x_read_specific_status(struct phy_device *phydev)
- 		if (sfc < 0)
- 			return sfc;
+ 	/* Qualcomm Atheros AR8035 */
+@@ -2280,6 +2306,7 @@ static struct phy_driver at803x_driver[] = {
+ 	.soft_reset		= qca808x_soft_reset,
+ 	.cable_test_start	= qca808x_cable_test_start,
+ 	.cable_test_get_status	= qca808x_cable_test_get_status,
++	.config_init		= qca8084_config_init,
+ }, };
  
--		/* qca8081 takes the different bits for speed value from at803x */
--		if (phydev->drv->phy_id == QCA8081_PHY_ID)
-+		/* qca808x takes the different bits for speed value from at803x */
-+		if (phydev_id_is_qca808x(phydev))
- 			speed = FIELD_GET(QCA808X_SS_SPEED_MASK, ss);
- 		else
- 			speed = FIELD_GET(AT803X_SS_SPEED_MASK, ss);
-@@ -1316,7 +1322,7 @@ static int at803x_config_aneg(struct phy_device *phydev)
- 	 */
- 	ret = 0;
- 
--	if (phydev->drv->phy_id == QCA8081_PHY_ID) {
-+	if (phydev_id_is_qca808x(phydev)) {
- 		int phy_ctrl = 0;
- 
- 		/* The reg MII_BMCR also needs to be configured for force mode, the
-@@ -1470,8 +1476,8 @@ static int at803x_cdt_start(struct phy_device *phydev, int pair)
- {
- 	u16 cdt;
- 
--	/* qca8081 takes the different bit 15 to enable CDT test */
--	if (phydev->drv->phy_id == QCA8081_PHY_ID)
-+	/* qca808x takes the different bit 15 to enable CDT test */
-+	if (phydev_id_is_qca808x(phydev))
- 		cdt = QCA808X_CDT_ENABLE_TEST |
- 			QCA808X_CDT_LENGTH_UNIT |
- 			QCA808X_CDT_INTER_CHECK_DIS;
-@@ -1487,7 +1493,7 @@ static int at803x_cdt_wait_for_completion(struct phy_device *phydev)
- 	int val, ret;
- 	u16 cdt_en;
- 
--	if (phydev->drv->phy_id == QCA8081_PHY_ID)
-+	if (phydev_id_is_qca808x(phydev))
- 		cdt_en = QCA808X_CDT_ENABLE_TEST;
- 	else
- 		cdt_en = AT803X_CDT_ENABLE_TEST;
+ module_phy_driver(at803x_driver);
 -- 
 2.42.0
 
