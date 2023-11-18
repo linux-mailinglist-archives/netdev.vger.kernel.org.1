@@ -1,60 +1,49 @@
-Return-Path: <netdev+bounces-48880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF10D7EFE48
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 08:34:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB207EFE76
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 09:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6230A28127D
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:34:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DCE7B20A53
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 08:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F74101FE;
-	Sat, 18 Nov 2023 07:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FB12EAD5;
+	Sat, 18 Nov 2023 08:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="jJJB/G7W"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="P46aDAL5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C834D4D
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 23:33:51 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5bdc185c449so2027351a12.0
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 23:33:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700292831; x=1700897631; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jvS+TEU7BLZ2Ws+wGWBvl7GPGDJLm60NOOheWwUlA+M=;
-        b=jJJB/G7WdT+AD22gsKqZTpe5tUgS6LBCADl+epd3dgrPilNAT4xihEAWfqpFnFhXfx
-         vXaEMNFqTp7W1bCrsTP5XQwAuV1ULrvBay87HMo3tZHRZq/y0m5ICtHh0r5NEfza8am8
-         ejuQhLV38aXfzpdK4xLW6lChimjQ6OlpcM8oI/mmZsx/ilSTZa4b05UzlYSQ/phKrcXd
-         bBYxZ+WJA7XHmiLlc7Xq/LthHccTUCw+5KqD7v7hDpFntUGMw8OoRGZSfR1CSIeNidNS
-         6pZQZEQ+FZbvBPjoI1AVZav5A9Dk4JsRw+WYc5Ogxvep46y7kj20BUz0jLNoolYtNk+0
-         HgOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700292831; x=1700897631;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jvS+TEU7BLZ2Ws+wGWBvl7GPGDJLm60NOOheWwUlA+M=;
-        b=T1r3o02lsIsh+JI3y6hsfSf5E6h4gt/DG7O39obsFy8I2C2p1XuynJFmxORtVKVkrn
-         4LHO96RXMEtgt7j9pR1Dh2ojRnHeLZtws52jL9O4jjw8EU6ZyYISV+pdBj1TVaAywcmI
-         KvWsGh4BOOIgIZdR3BTDd0RF9OXHq+TQOrOFn0FJLlOhQMnl4R5zj1x+0A3pRlUB2D4F
-         thZrMQu1omsZAZ3RsOvVzMVfeVXblbQXOYQj06JWaExP1AJTI9D1AlUqTwnDrEdO4/ZY
-         iME+D9GIy2BoHQ5ySXg+Rz10jPWmg0K0MgfRTJiLUYvZ9fOJ2vJJmqDGKHMExaNRXqVs
-         cfaQ==
-X-Gm-Message-State: AOJu0YxlpckfZZtMcdokzUYS8VyWcoC9b5vS8PbCu1ExtBciYqIxXJ2j
-	sTj949I2r7du+BlaSlHRqry96w==
-X-Google-Smtp-Source: AGHT+IEumhuQYfV3o4Z721tq/oFbXwiRdHj0B+h8h6mYYmWoONPXZo9l/FJ3wWOkQ2FFk/eykNZFZQ==
-X-Received: by 2002:a05:6a20:e609:b0:186:5265:ed1c with SMTP id my9-20020a056a20e60900b001865265ed1cmr1471698pzb.6.1700292830919;
-        Fri, 17 Nov 2023 23:33:50 -0800 (PST)
-Received: from [10.254.46.51] ([139.177.225.228])
-        by smtp.gmail.com with ESMTPSA id je6-20020a170903264600b001b8a3e2c241sm2482044plb.14.2023.11.17.23.33.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 23:33:50 -0800 (PST)
-Message-ID: <93c0f8f2-f40e-4dea-8260-6f610e77aa7f@bytedance.com>
-Date: Sat, 18 Nov 2023 15:33:44 +0800
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9530D5D;
+	Sat, 18 Nov 2023 00:07:31 -0800 (PST)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AI7a4sH024517;
+	Sat, 18 Nov 2023 08:07:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=HCBNS+RoQsIDvjafJAvRjkAYymAZefxDdkPg6CwX7aI=;
+ b=P46aDAL5YtWR4T/uzWOcxnvUjhxajndri1p/msia8MY83BncEeF/U0uzvfbwJVtmo952
+ l+pNPBC1L1xqx5bt500QmpGi1koGHHTWCprKZHntPPS+MsdNOmI67IzaDKO/HCLBMMOT
+ YwngdlqAOasjz57kq4DmYaaNl2B6glm6IOd5LdNsbvtSmYesnndgUZUYQKkiuozYGyet
+ d7+bgtEik39GZq7qrG0wF2ep26Vsq+gc93V2mjlRjVUc7Hle0CpP0A8yFABW7yDhOZ/H
+ 0cJdPlTiDraVvE86fTXjy6BK68kELO5nLY+RDKmq+xpaTMB3DseCF9uHEyDwrAwxBsSU MQ== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uep1qr7aa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 18 Nov 2023 08:07:13 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AI87Dnw023484
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 18 Nov 2023 08:07:13 GMT
+Received: from [10.253.8.221] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Sat, 18 Nov
+ 2023 00:07:08 -0800
+Message-ID: <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
+Date: Sat, 18 Nov 2023 16:07:06 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,57 +51,194 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
- lag based placement)
+Subject: Re: [PATCH 9/9] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
+        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <robert.marko@sartura.hr>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_srichara@quicinc.com>
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-10-quic_luoj@quicinc.com>
+ <834cbb58-3a88-4ba6-8db6-10440a4d0893@linaro.org>
+ <76e081ba-9d5a-41df-9c1b-d782e5656973@quicinc.com>
+ <2a9bb683-da73-47af-8800-f14a833e8ee4@linaro.org>
+ <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
+ <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
 Content-Language: en-US
-To: Tobias Huschle <huschle@linux.ibm.com>,
- Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-Cc: Peterz <peterz@infradead.org>, mst@redhat.com, jasowang@redhat.com
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: S1IxcI4idQDzTWEvoKDYaTWkaAf4VhZK
+X-Proofpoint-ORIG-GUID: S1IxcI4idQDzTWEvoKDYaTWkaAf4VhZK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-18_07,2023-11-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 phishscore=0 spamscore=0 adultscore=0
+ mlxlogscore=999 clxscore=1015 lowpriorityscore=0 priorityscore=1501
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311180058
 
-On 11/17/23 2:58 AM, Tobias Huschle Wrote:
-> #################### TRACE EXCERPT ####################
-> The sched_place trace event was added to the end of the place_entity function and outputs:
-> sev -> sched_entity vruntime
-> sed -> sched_entity deadline
-> sel -> sched_entity vlag
-> avg -> cfs_rq avg_vruntime
-> min -> cfs_rq min_vruntime
-> cpu -> cpu of cfs_rq
-> nr  -> cfs_rq nr_running
-> ---
->      CPU 3/KVM-2950    [014] d....   576.161432: sched_migrate_task: comm=vhost-2920 pid=2941 prio=120 orig_cpu=15 dest_cpu=14
-> --> migrates task from cpu 15 to 14
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm=vhost-2920 pid=2941 sev=4242563284 sed=4245563284 sel=0 avg=4242563284 min=4242563284 cpu=14 nr=0
-> --> places vhost 2920 on CPU 14 with vruntime 4242563284
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= pid=0 sev=16329848593 sed=16334604010 sel=0 avg=16329848593 min=16329848593 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= pid=0 sev=42560661157 sed=42627443765 sel=0 avg=42560661157 min=42560661157 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= pid=0 sev=53846627372 sed=54125900099 sel=0 avg=53846627372 min=53846627372 cpu=14 nr=0
->      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= pid=0 sev=86640641980 sed=87255041979 sel=0 avg=86640641980 min=86640641980 cpu=14 nr=0
 
-As the following 2 lines indicates that vhost-2920 is on_rq so can be
-picked as next, thus its cfs_rq must have at least one entity.
 
-While the above 4 lines shows nr=0, so the "comm= pid=0" task(s) can't
-be in the same cgroup with vhost-2920.
+On 11/17/2023 8:43 PM, Krzysztof Kozlowski wrote:
+> On 17/11/2023 12:20, Jie Luo wrote:
+>>
+>>
+>> On 11/17/2023 6:40 PM, Krzysztof Kozlowski wrote:
+>>> On 17/11/2023 11:36, Jie Luo wrote:
+>>>>>>       clocks:
+>>>>>> -    items:
+>>>>>> -      - description: MDIO clock source frequency fixed to 100MHZ
+>>>>>> +    minItems: 1
+>>>>>> +    maxItems: 5
+>>>>>> +    description:
+>>>>>
+>>>>> Doesn't this make all other variants with incorrect constraints?
+>>>>
+>>>> There are 5 clock items, the first one is the legacy MDIO clock, the
+>>>> other clocks are new added for ipq5332 platform, will describe it more
+>>>> clearly in the next patch set.
+>>>
+>>> OTHER variants. Not this one.
+>>
+>> The change here is for the clock number added for the ipq5332 platform,
+>> the other platforms still use only legacy MDIO clock.
+> 
+> Then your patch is wrong as I said. You now affect other variants. I
+> don't quite get your responses. Style of them suggests that you
+> disagree, but you are not providing any relevant argument.
 
-Say vhost is in cgroupA, and "comm= pid=0" task with sev=86640641980
-is in cgroupB ...
+The clock arguments are provided in the later part as below. i will also
+provide more detail clock names for the new added clocks for the ipq5332
+platform in description.
 
->      CPU 3/KVM-2950    [014] dN...   576.161434: sched_stat_wait: comm=vhost-2920 pid=2941 delay=9958 [ns]
->      CPU 3/KVM-2950    [014] d....   576.161435: sched_switch: prev_comm=CPU 3/KVM prev_pid=2950 prev_prio=120 prev_state=S ==> next_comm=vhost-2920 next_pid=2941 next_prio=120
->     vhost-2920-2941    [014] D....   576.161439: sched_waking: comm=vhost-2286 pid=2309 prio=120 target_cpu=008
->     vhost-2920-2941    [014] d....   576.161446: sched_waking: comm=kworker/14:0 pid=6525 prio=120 target_cpu=014
->     vhost-2920-2941    [014] d....   576.161447: sched_place: comm=kworker/14:0 pid=6525 sev=86642125805 sed=86645125805 sel=0 avg=86642125805 min=86642125805 cpu=14 nr=1
-> --> places kworker 6525 on cpu 14 with vruntime 86642125805
-> -->  which is far larger than vhost vruntime of  4242563284
+   - if: 
 
-Here nr=1 means there is another entity in the same cfs_rq with the
-newly woken kworker, but which? According to the vruntime, I would
-assume kworker is in cgroupB.
+       properties: 
+
+         compatible: 
+
+           contains: 
+
+             enum: 
+
+               - qcom,ipq5332-mdio 
+
+     then: 
+
+       properties: 
+
+         clocks: 
+
+           items: 
+
+             - description: MDIO clock source frequency fixed to 100MHZ 
+
+             - description: UNIPHY0 AHB clock source frequency fixed to 
+100MHZ
+             - description: UNIPHY0 SYS clock source frequency fixed to 
+24MHZ
+             - description: UNIPHY1 AHB clock source frequency fixed to 
+100MHZ
+             - description: UNIPHY1 SYS clock source frequency fixed to 
+24MHZ
+         clock-names: 
+
+           items: 
+
+             - const: gcc_mdio_ahb_clk 
+
+             - const: gcc_uniphy0_ahb_clk 
+
+             - const: gcc_uniphy0_sys_clk 
+
+             - const: gcc_uniphy1_ahb_clk 
+
+             - const: gcc_uniphy1_sys_clk
+> 
+>>
+>> so i add minItems  and maxItems, i will check other .yaml files for the
+>> reference.
+>>
+>>>
+>>>>
+>>>>>
+>>>>>> +      MDIO system clock frequency fixed to 100MHZ, and the GCC uniphy
+>>>>>> +      clocks enabled for resetting ethernet PHY.
+>>>>>>     
+>>>>>>       clock-names:
+>>>>>> -    items:
+>>>>>> -      - const: gcc_mdio_ahb_clk
+>>>>>> +    minItems: 1
+>>>>>> +    maxItems: 5
+>>>>>> +
+>>>>>> +  phy-reset-gpio:
+>>>>>
+>>>>> No, for multiple reasons. It's gpios first of all. Where do you see such
+>>>>> property? Where is the existing definition?
+>>>>
+>>>> will remove this property, and update to use the exited PHY GPIO reset.
+>>>>
+>>>>>
+>>>>> Then it is "reset-gpios" if this is MDIO. Why do you put phy properties
+>>>>> in MDIO?
+>>>>>
+>>>>>> +    minItems: 1
+>>>>>> +    maxItems: 3
+>>>>>> +    description:
+>>>>>> +      GPIO used to reset the PHY, each GPIO is for resetting the connected
+>>>>>> +      ethernet PHY device.
+>>>>>> +
+>>>>>> +  phyaddr-fixup:
+>>>>>> +    description: Register address for programing MDIO address of PHY devices
+>>>>>
+>>>>> You did not test code which you sent.
+>>>>
+>>>> Hi Krzysztof,
+>>>> This patch is passed with the following command in my workspace.
+>>>> i will upgrade and install yamllint to make sure there is no
+>>>> warning reported anymore.
+>>>>
+>>>> make dt_bg_check
+>>>
+>>> No clue what's this, but no, I do not believe you tested it at all. It's
+>>> not about yamllint. It's was not tested. Look at errors reported on
+>>> mailing list.
+>>>
+>>>> DT_SCHEMA_FILES=Documentation/devicetree/bindings/net/qcom,ipq4019-mdio.yaml
+>>>
+>>
+>> Hi Krzysztof,
+>> Here is the output when i run the dt check with this patch applied in my
+>> workspace, md64 is the alias for compiling the arm64 platform.
+> 
+> We still do not know your base and dtschema version.
+
+The code base is the commit id:
+5ba73bec5e7b0494da7fdca3e003d8b97fa932cd
+<Add linux-next specific files for 20231114>
+
+The dtschema version is as below.
+dt-doc-validate --version
+2023.9
+
+
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
