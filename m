@@ -1,273 +1,134 @@
-Return-Path: <netdev+bounces-48870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 531557EFDD0
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:14:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76BA57EFE00
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:28:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72E77B20ABE
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 05:14:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A42531C208CC
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2FCD297;
-	Sat, 18 Nov 2023 05:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A7EDF5D;
+	Sat, 18 Nov 2023 06:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="BsTnY1nE"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="bzkEC6Sh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C814E10DA
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 21:14:38 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cc5b705769so24050585ad.0
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 21:14:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700284478; x=1700889278; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=clpaUzNSF9Y0euKE8HoT2iNeGOFsJJ2CPhGb7WB9NWY=;
-        b=BsTnY1nEzmKWiPCM+jxUY0lWMAwVTwUSBET17EHcLSQzcvzCcOE/2SuxBXwe9N18S0
-         SOTV5DBinDPjhx3Ut2IVhTGxeUlC/sbjKKPOaMON+bqxDZEj8qFr/K/Sp+i8sz/p6CyO
-         ibkKAUWvoagsNN9NaxPDOpO6bPd9H4Hm1ptEtcpxrJc0TnsrzWer0cfNYwSRSrfElqlD
-         /aM5TUadBK76O7fxAjGc+FqvuHNk6yrSXsJMYkuycmdOHxYvItC8fITNlSx7rD1R9r9g
-         4fXT6J0JWDKroENXS4t4VmsuJaOOjweWDO0IOFiwvG4HS+bPGTWN0r5U00tUcISok5G9
-         qu9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700284478; x=1700889278;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=clpaUzNSF9Y0euKE8HoT2iNeGOFsJJ2CPhGb7WB9NWY=;
-        b=HQFgsw5+l/IJWI0gmnexTKP6oVREP26DKiTQrfYEP9t9HJ53wbcnJnUrtrdZZMxFLH
-         XtYBWy1rxJoLglQHDsLKU9QclJ2aeSZjD2WP4zELVLK8iD7F1fjTVyJQkhsGnP1GJY6L
-         oWiG6DIn1aoYN+Wkatswxhn+s47lIlT3PQf4nc30ua86wUE7+Q6a7Keomwlwe4qmMQSG
-         ASIFaRf2d0VLcKmTHu7c842GWhiAx3t2sxTP3+VIWm3K55SISjpalNj6+uGuAWkap2qf
-         K13upoE9xjnZ4eBMxRs10Y3mAQQLo9V9caknpObzOI9VE8v25mtYthU4K0Zj7f/LDQiZ
-         XkUw==
-X-Gm-Message-State: AOJu0YyxspGd8KsTm12Td0OzL/pwOD21JRscCv1I5dWLqw3JuYp34Ns9
-	6TaZEtUrD72jZIjz6XQETAJoMQ==
-X-Google-Smtp-Source: AGHT+IH+WryRLNe/R1V4RIlPH4bOFnaXQppN9drDViTVHC5Ye2XTJrkIRTbF7/e5t4ucDzSjgCBwhg==
-X-Received: by 2002:a17:903:41cb:b0:1cc:5691:5113 with SMTP id u11-20020a17090341cb00b001cc56915113mr2229960ple.26.1700284478075;
-        Fri, 17 Nov 2023 21:14:38 -0800 (PST)
-Received: from [10.254.46.51] ([139.177.225.228])
-        by smtp.gmail.com with ESMTPSA id e19-20020a170902ed9300b001c61921d4d2sm2214306plj.302.2023.11.17.21.14.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Nov 2023 21:14:37 -0800 (PST)
-Message-ID: <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
-Date: Sat, 18 Nov 2023 13:14:32 +0800
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17155D5D;
+	Fri, 17 Nov 2023 22:28:24 -0800 (PST)
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AI6MOOZ031123;
+	Sat, 18 Nov 2023 06:28:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=y3Zz7GCHDFah9QxpNLHMDf5YRAeO9fNs/MMz1Kc2zS0=;
+ b=bzkEC6Sh9LSiNXxP2zAW/U/utVDAUIxAb4dCapg9H36vd1ZvjSWM5spBGT9gdIbeM7qJ
+ fLPHVN9xKxZjBnIO9E/7kRSwIuClZHbTr1FKmJJ/q1hn3D6kKLPSZG/cKE8p+c8wEmO9
+ Ucm+6z7NndZXv1I9vZK9ydOwk2M4AFoBSBbj2yxxNIkenMMA1BqB9EWqi0mVWKswSNX8
+ NGtqVOJ+GZLoG+vXwD8vDBulQgnTP4bZsDDKByrXqFw+nPDtrv4QDsQqzqOCuqmkviFH
+ 91UoZqlhDHTXMOYT+5dsZjj+XkxYstRJVVcR4aTD3pm+RJUKU9TyO3Qw9t9seIqYItNr zQ== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uem80g8rt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 18 Nov 2023 06:28:07 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AI6S7Am017661
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 18 Nov 2023 06:28:07 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 17 Nov 2023 22:28:03 -0800
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+Subject: [PATCH v5 0/6] add qca8084 ethernet phy driver
+Date: Sat, 18 Nov 2023 14:27:48 +0800
+Message-ID: <20231118062754.2453-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair:
- Add lag based placement)
-Content-Language: en-US
-To: Peter Zijlstra <peterz@infradead.org>,
- Tobias Huschle <huschle@linux.ibm.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
- <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: _9XxuwS-eAsb7qcFOKPmGfEQ8WWrOf4z
+X-Proofpoint-ORIG-GUID: _9XxuwS-eAsb7qcFOKPmGfEQ8WWrOf4z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-18_04,2023-11-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=638
+ adultscore=0 priorityscore=1501 phishscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311180045
 
-On 11/17/23 5:23 PM, Peter Zijlstra Wrote:
-> 
-> Your email is pretty badly mangled by wrapping, please try and
-> reconfigure your MUA, esp. the trace and debug output is unreadable.
-> 
-> On Thu, Nov 16, 2023 at 07:58:18PM +0100, Tobias Huschle wrote:
-> 
->> The base scenario are two KVM guests running on an s390 LPAR. One guest
->> hosts the uperf server, one the uperf client.
->> With EEVDF we observe a regression of ~50% for a strburst test.
->> For a more detailed description of the setup see the section TEST SUMMARY at
->> the bottom.
-> 
-> Well, that's not good :/
-> 
->> Short summary:
->> The mentioned kworker has been scheduled to CPU 14 before the tracing was
->> enabled.
->> A vhost process is migrated onto CPU 14.
->> The vruntimes of kworker and vhost differ significantly (86642125805 vs
->> 4242563284 -> factor 20)
-> 
-> So bear with me, I know absolutely nothing about virt stuff. I suspect
-> there's cgroups involved because shiny or something.
-> 
-> kworkers are typically not in cgroups and are part of the root cgroup,
-> but what's a vhost and where does it live?
-> 
-> Also, what are their weights / nice values?
-> 
->> The vhost process wants to wake up the kworker, therefore the kworker is
->> placed onto the runqueue again and set to runnable.
->> The vhost process continues to execute, waking up other vhost processes on
->> other CPUs.
->>
->> So far this behavior is not different to what we see on pre-EEVDF kernels.
->>
->> On timestamp 576.162767, the vhost process triggers the last wake up of
->> another vhost on another CPU.
->> Until timestamp 576.171155, we see no other activity. Now, the vhost process
->> ends its time slice.
->> Then, vhost gets re-assigned new time slices 4 times and gets then migrated
->> off to CPU 15.
-> 
-> So why does this vhost stay on the CPU if it doesn't have anything to
-> do? (I've not tried to make sense of the trace, that's just too
-> painful).
-> 
->> This does not occur with older kernels.
->> The kworker has to wait for the migration to happen in order to be able to
->> execute again.
->> This is due to the fact, that the vruntime of the kworker is significantly
->> larger than the one of vhost.
-> 
-> That's, weird. Can you add a trace_printk() to update_entity_lag() and
-> have it print out the lag, limit and vlag (post clamping) values? And
-> also in place_entity() for the reverse process, lag pre and post scaling
-> or something.
-> 
-> After confirming both tasks are indeed in the same cgroup ofcourse,
-> because if they're not, vruntime will be meaningless to compare and we
-> should look elsewhere.
-> 
-> Also, what HZ and what preemption mode are you running? If kworker is
-> somehow vastly over-shooting it's slice -- keeps running way past the
-> avg_vruntime, then it will build up a giant lag and you get what you
-> describe, next time it wakes up it gets placed far to the right (exactly
-> where it was when it 'finally' went to sleep, relatively speaking).
-> 
->> We found some options which sound plausible but we are not sure if they are
->> valid or not:
->>
->> 1. The wake up path has a dependency on the vruntime metrics that now delays
->> the execution of the kworker.
->> 2. The previous commit af4cf40470c2 (sched/fair: Add cfs_rq::avg_vruntime)
->> which updates the way cfs_rq->min_vruntime and
->>      cfs_rq->avg_runtime are set might have introduced an issue which is
->> uncovered with the commit mentioned above.
-> 
-> Suppose you have a few tasks (of equal weight) on you virtual timeline
-> like so:
-> 
->     ---------+---+---+---+---+------
->              ^       ^
-> 	    |       `avg_vruntime
-> 	    `-min_vruntime
-> 
-> Then the above would be more or less the relative placements of these
-> values. avg_vruntime is the weighted average of the various vruntimes
-> and is therefore always in the 'middle' of the tasks, and not somewhere
-> out-there.
-> 
-> min_vruntime is a monotonically increasing 'minimum' that's left-ish on
-> the tree (there's a few cases where a new task can be placed left of
-> min_vruntime and its no longer actuall the minimum, but whatever).
-> 
-> These values should be relatively close to one another, depending
-> ofcourse on the spread of the tasks. So I don't think this is causing
-> trouble.
-> 
-> Anyway, the big difference with lag based placement is that where
-> previously tasks (that do not migrate) retain their old vruntime and on
-> placing they get pulled forward to at least min_vruntime, so a task that
-> wildly overshoots, but then doesn't run for significant time can still
-> be overtaken and then when placed again be 'okay'.
-> 
-> Now OTOH, with lag-based placement,  we strictly preserve their relative
-> offset vs avg_vruntime. So if they were *far* too the right when they go
-> to sleep, they will again be there on placement.
+QCA8084 is four-port PHY with maximum link capability 2.5G,
+which supports the interface mode qusgmii and sgmii mode,
+there are two PCSs available to connected with ethernet port.
 
-Hi Peter, I'm a little confused here. As we adopt placement strategy #1
-when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
-Given that the weight doesn't change, we have:
+QCA8084 can work in switch mode or PHY mode.
+For switch mode, both PCS0 and PCS1 work on sgmii mode.
+For PHY mode, PCS1 works on qusgmii mode, the last port
+(the fourth port) works on sgmii mode.
 
-	vl' = vl
+Besides this PHY driver patches, the PCS driver is also needed
+to bring up the qca8084 device, which mainly configurs PCS
+and clocks.
 
-But in fact it is scaled on placement:
+Changes in v3:
+	* pick the two patches to introduce the interface mode
+	  10g-qxgmii from Vladimir Oltean(olteanv@gmail.com).
+	* add the function phydev_id_is_qca808x to identify the
+	  PHY qca8081 and qca8084.
+	* update the interface mode name PHY_INTERFACE_MODE_QUSGMII
+	  to PHY_INTERFACE_MODE_10G_QXGMII.
 
-	vl' = vl * W/(W + w)
+Changes in v4:
+	* remove the following patch:
+	  <net: phylink: move phylink_pcs_neg_mode() to phylink.c>.
+	* split out 10g_qxgmii change of ethernet-controller.yaml.
 
-Does this intended? And to illustrate my understanding of strategy #1:
+Changes in v5:
+	* update the author of the patch below.
+	  <introduce core support for phy-mode = "10g-qxgmii">.
 
-diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
-index 07f555857698..a24ef8b297ed 100644
---- a/kernel/sched/fair.c
-+++ b/kernel/sched/fair.c
-@@ -5131,7 +5131,7 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
-  	 *
-  	 * EEVDF: placement strategy #1 / #2
-  	 */
--	if (sched_feat(PLACE_LAG) && cfs_rq->nr_running) {
-+	if (sched_feat(PLACE_LAG) && cfs_rq->nr_running && se->vlag) {
-  		struct sched_entity *curr = cfs_rq->curr;
-  		unsigned long load;
-  
-@@ -5150,7 +5150,10 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
-  		 * To avoid the 'w_i' term all over the place, we only track
-  		 * the virtual lag:
-  		 *
--		 *   vl_i = V - v_i <=> v_i = V - vl_i
-+		 *   vl_i = V' - v_i <=> v_i = V' - vl_i
-+		 *
-+		 * Where V' is the new weighted average after placing this
-+		 * entity, and v_i is its newly assigned vruntime.
-  		 *
-  		 * And we take V to be the weighted average of all v:
-  		 *
-@@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
-  		 * vl_i is given by:
-  		 *
-  		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
--		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
--		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
--		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
--		 *      = V - w_i*vl_i / (W + w_i)
--		 *
--		 * And the actual lag after adding an entity with vl_i is:
--		 *
--		 *   vl'_i = V' - v_i
--		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
--		 *         = vl_i - w_i*vl_i / (W + w_i)
--		 *
--		 * Which is strictly less than vl_i. So in order to preserve lag
--		 * we should inflate the lag before placement such that the
--		 * effective lag after placement comes out right.
--		 *
--		 * As such, invert the above relation for vl'_i to get the vl_i
--		 * we need to use such that the lag after placement is the lag
--		 * we computed before dequeue.
-+		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
-+		 *      = V - w_i*vl_i / W
-  		 *
--		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
--		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
--		 *
--		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
--		 *                   = W*vl_i
--		 *
--		 *   vl_i = (W + w_i)*vl'_i / W
-  		 */
-  		load = cfs_rq->avg_load;
-  		if (curr && curr->on_rq)
-  			load += scale_load_down(curr->load.weight);
--
--		lag *= load + scale_load_down(se->load.weight);
-  		if (WARN_ON_ONCE(!load))
-  			load = 1;
--		lag = div_s64(lag, load);
-+
-+		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
-  	}
-  
-  	se->vruntime = vruntime - lag;
+Luo Jie (4):
+  net: phy: at803x: add QCA8084 ethernet phy support
+  net: phy: at803x: add the function phydev_id_is_qca808x
+  net: phy: at803x: Add qca8084_config_init function
+  net: phy: qca8084: add qca8084_link_change_notify
+
+Vladimir Oltean (2):
+  net: phy: introduce core support for phy-mode = "10g-qxgmii"
+  dt-bindings: net: ethernet-controller: add 10g-qxgmii mode
+
+ .../bindings/net/ethernet-controller.yaml     |   1 +
+ Documentation/networking/phy.rst              |   6 +
+ drivers/net/phy/at803x.c                      | 130 +++++++++++++++++-
+ drivers/net/phy/phy-core.c                    |   1 +
+ drivers/net/phy/phylink.c                     |  11 +-
+ include/linux/phy.h                           |   4 +
+ include/linux/phylink.h                       |   2 +
+ 7 files changed, 147 insertions(+), 8 deletions(-)
+
+
+base-commit: eff99d8edbed7918317331ebd1e365d8e955d65e
+-- 
+2.42.0
+
 
