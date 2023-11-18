@@ -1,102 +1,128 @@
-Return-Path: <netdev+bounces-48919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D947F0055
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:37:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DED47F005E
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:51:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 753A61F226C2
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:37:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29EE1280DB8
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723FE111A4;
-	Sat, 18 Nov 2023 15:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED3F101E9;
+	Sat, 18 Nov 2023 15:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qj+1T3Y0"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="Ph7IJCtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32134196;
-	Sat, 18 Nov 2023 07:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lg2DVX+DTNx+HzFj1UmL3Pguh/3uet6WpCVMj8vb2sk=; b=Qj+1T3Y0gsC6Lx1YtsxOzYFsKq
-	RkuHUX2ZCDtfKVW5p4cohpAQv90TMMxhnHf12shcnTY0CihPZ4UELi1Ux2qlAMnofLRGs9YLHmhTw
-	rlUGKhsu3nCJCoC6hL72BUORx+Cb1d0a4/qA+tV/VXHQ1IWLxenrEtJpIo3swDfUCuNs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r4NNO-000Vqg-PS; Sat, 18 Nov 2023 16:36:54 +0100
-Date: Sat, 18 Nov 2023 16:36:54 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
-	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
-Subject: Re: [PATCH 9/9] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
-Message-ID: <6e10604f-d463-499b-b00a-57ef22a936bb@lunn.ch>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-10-quic_luoj@quicinc.com>
- <834cbb58-3a88-4ba6-8db6-10440a4d0893@linaro.org>
- <76e081ba-9d5a-41df-9c1b-d782e5656973@quicinc.com>
- <2a9bb683-da73-47af-8800-f14a833e8ee4@linaro.org>
- <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
- <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
- <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85766182;
+	Sat, 18 Nov 2023 07:50:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1700322646;
+	bh=+4tkXT2Y0ZJNldwcYbIGmHyE8OJNqApK4fyYv38niwQ=;
+	h=From:To:Cc:Subject:Date;
+	b=Ph7IJCtdffearbam84VOXcy9Cr4E1x26MWaX/sorrGBpPdDkvUzx2oeVFdE1F+8QW
+	 VMmHOxdM/M2+irGIqdplAjEuBi14dLYzChlYnLZLRk22EPxI7VPLmuMxMPj6wZmtkP
+	 qa4WgpgxnX/SFY9ebzLdly2c05YGxi7OLRz8jbpU=
+Received: from KernelDevBox.byted.org ([180.184.51.70])
+	by newxmesmtplogicsvrsza7-0.qq.com (NewEsmtp) with SMTP
+	id A7591AC6; Sat, 18 Nov 2023 23:41:53 +0800
+X-QQ-mid: xmsmtpt1700322113t5fkws5zs
+Message-ID: <tencent_6BA2BE4A64DD6CD5B66D9D8079789829000A@qq.com>
+X-QQ-XMAILINFO: NfADz11w1YkvGFaZejPHtoEFsxSTRk8Iq0ST/4MclPPTXeprz1fCG8iAMPVEp1
+	 KE2E8eDpie5P8qZOM6eWcNst1uuqvVq7Sf/q0RUHWJ/dEt/c7xicWKmNcnPmKxXAjbP8vp8qZqyG
+	 FPVktayu0ZmNo/oj/41i2AcE+dJRvpch65kHf1xw4TWxpr60hSdp/GidOLQsBqspPOTvIRpf1Vus
+	 Az8lnCJc+p9m/MvGp32KJ9nWfoPPln7LvBUIbWl3Izm5pZSCqoAd/bgLwSU4Uwev6G4PyVj/BzpG
+	 0HY+67f4Q/KpBtlNwd/6Q6E4NG7617GydjeqSh9EYDhMVkITjPrkICJWaGdGHOhK2kdFIytw/H14
+	 7OprbTyPXOkCoXitWTKY91Fpaf8ZFA0JaIQ+ogRuE2IiQW3vSCIbK471H7pfEjzAei6EkTab4JBO
+	 LltpLgx27Pbc8jnjOyG0F5qDfN5WhZinuFs5IxJWnaUdSsab93vwn6UT7Cv2c3Cx3M3yYrM0pnJL
+	 9j2c+q0O9+H5h91Xo3CMvKyNnKUpT2bSewVAc3B8MedXtJ1lmPXSkHt9pBZ7MQOL4yEA7FEDErB8
+	 NhcjnR02GVPka7qmy7JV5bJEicpFQcQcC9GpRn58Doy/O0o4p7OQHOZu+mnFgsTZBrox3GFiUmXk
+	 nTZ0S4LwjIU3+6r9ooZ/5hnmilYXW0NbnfT07CdoCPPWoDJQpZy9ZJdMaKZwZOMNPrilvrO/81Xg
+	 5EI30fr8BxBSETW+NfeuRH7snQH/tIvFooS7V4eIk2f/kUFcU+wIIJQ+Qf3sjx4h4jH3FUS7Rn5D
+	 EZC6xItuOV025OyUAdqqHX/82KT0pk6FYJz7rUUIQGydw7aBws1wBGQ6el+PUCx8H/+pEccNvBHC
+	 ApURqEatnWSbgopuN+GZ/ez8Ig7tBvlzgO8PEXQ8X4iMuh/VyilH19LD7GyAJPfUjzALOuJhvdql
+	 mbU4Lpj2CyvNmVI8ku6e7halg4cYLYw1m/0dFpCDmnJNAob6mJjT2ivEpVAP/Gj0RJJZXl578=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Zhang Shurong <zhang_shurong@foxmail.com>
+To: alex.aring@gmail.com
+Cc: stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	harperchen1110@gmail.com,
+	Zhang Shurong <zhang_shurong@foxmail.com>
+Subject: [PATCH] mac802154: Fix uninit-value access in ieee802154_hdr_push_sechdr
+Date: Sat, 18 Nov 2023 23:41:50 +0800
+X-OQ-MSGID: <20231118154150.1450251-1-zhang_shurong@foxmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-> The clock arguments are provided in the later part as below. i will also
-> provide more detail clock names for the new added clocks for the ipq5332
-> platform in description.
-> 
->   - if:
-> 
->       properties:
-> 
->         compatible:
-> 
->           contains:
-> 
->             enum:
-> 
->               - qcom,ipq5332-mdio
-> 
->     then:
-> 
->       properties:
-> 
->         clocks:
-> 
->           items:
-> 
->             - description: MDIO clock source frequency fixed to 100MHZ
-> 
->             - description: UNIPHY0 AHB clock source frequency fixed to
-> 100MHZ
->             - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
->             - description: UNIPHY1 AHB clock source frequency fixed to
-> 100MHZ
->             - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
+The syzkaller reported an issue:
 
-As i said before, the frequency of the clocks does not matter
-here. That appears to be the drivers problem. I assume every board
-design, with any sort of PHY, needs the same clock configuration?
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0x971/0xb90 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0x9c0/0xc00 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:494 [inline]
+ dgram_sendmsg+0xd1d/0x1500 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x91/0xc0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:725 [inline]
+ sock_sendmsg net/socket.c:748 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2494
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2548
+ __sys_sendmsg+0x225/0x3c0 net/socket.c:2577
+ __compat_sys_sendmsg net/compat.c:346 [inline]
+ __do_compat_sys_sendmsg net/compat.c:353 [inline]
+ __se_compat_sys_sendmsg net/compat.c:350 [inline]
 
-      Andrew
+We found hdr->key_id_mode is uninitialized in mac802154_set_header_security()
+which indicates hdr.fc.security_enabled should be 0. However, it is set to be cb->secen before.
+Later, ieee802154_hdr_push_sechdr is invoked, causing KMSAN complains uninit-value issue.
+Since mac802154_set_header_security() sets hdr.fc.security_enabled based on the variables
+ieee802154_sub_if_data *sdata and ieee802154_mac_cb *cb in a collaborative manner.
+Therefore, we should not set security_enabled prior to mac802154_set_header_security().
+
+Fixed it by removing the line that sets the hdr.fc.security_enabled.
+
+Syzkaller don't provide repro, and I provide a syz repro like:
+r0 = syz_init_net_socket$802154_dgram(0x24, 0x2, 0x0)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000000)=0x2, 0x4)
+setsockopt$WPAN_SECURITY(r0, 0x0, 0x1, &(0x7f0000000080), 0x4)
+sendmsg$802154_dgram(r0, &(0x7f0000000100)={&(0x7f0000000040)={0x24, @short}, 0x14, &(0x7f00000000c0)={0x0}}, 0x0)
+
+Fixes: 32edc40ae65c ("ieee802154: change _cb handling slightly")
+Signed-off-by: Zhang Shurong <zhang_shurong@foxmail.com>
+---
+ net/mac802154/iface.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..c99b6e40a5db 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
+ 
+ 	memset(&hdr.fc, 0, sizeof(hdr.fc));
+ 	hdr.fc.type = cb->type;
+-	hdr.fc.security_enabled = cb->secen;
+ 	hdr.fc.ack_request = cb->ackreq;
+ 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+ 
+-- 
+2.30.2
+
 
