@@ -1,102 +1,120 @@
-Return-Path: <netdev+bounces-48910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CBE27EFFC8
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 14:15:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C1277EFFD4
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 14:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B3A2810A5
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 13:15:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5666F1C20829
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 13:28:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B582213AC2;
-	Sat, 18 Nov 2023 13:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC798107AF;
+	Sat, 18 Nov 2023 13:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="WaKbZMD9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2hTOLBQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7051ED76;
-	Sat, 18 Nov 2023 05:14:59 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D183920004;
-	Sat, 18 Nov 2023 13:14:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1700313298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QHMSEER/SBEH4IqK5yT4ZrjQxH8VpFrbj9NbOVlG2+g=;
-	b=WaKbZMD90W3n3aSXSb3a0ZAU/mvWWrOzYmu/OX+FjY2U++BzndNh1VYokHs8s9NcqXZBQO
-	HjEAkUBwmEAut1Au+7mXn76E7pg4Fvyc9hZYocLl8hf7ondvoS0S/SKOtlHiUzcdSmNQkX
-	wLJNarbKsxYgD8Pod5XGAnzQ6QJ8YK3mRXIe/gI/LxOzODeOHgLAJ0FJ3/4EsT/dY+5pnw
-	0ank40KApmUlWos2qsif/6/gW7SE8P7aW/Co7YVTgZY5baXpE1j3a5NAH8O+yqto4/L3iY
-	jdYgq6gdqTWVF+RkZF7NRQtgANtLpKvumYvDotECsgxItT2b9J+RS+EAKAVOWQ==
-From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
-To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com
-Subject: [PATCH net-next 15/15] net: dsa: mt7530: do not clear config->supported_interfaces
-Date: Sat, 18 Nov 2023 16:13:17 +0300
-Message-Id: <20231118131317.295591-5-arinc.unal@arinc9.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231118123205.266819-1-arinc.unal@arinc9.com>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80EF7131;
+	Sat, 18 Nov 2023 05:28:09 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-9c2a0725825so406922966b.2;
+        Sat, 18 Nov 2023 05:28:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700314088; x=1700918888; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DjRg7NGUQPfxOSlfCXCbAcbz7uHVwoni3DCMCnip4wU=;
+        b=m2hTOLBQAQiRbHf2zgNFapeZXHK1pmihkv3SJU53LxkjE05dxWeV1rg6bYa6xUW/JV
+         2bFsgS7fGNhPWweB1yNrfK7K4OqAY9iPxsSECN93GBqSI7QMapJjRz8e5Gru9xDVNLH0
+         ILkZuaLA2gvB8R/Xz2KmEEeWT3ZVZKCBfjnJ4xB+F0xay4d1zGdpyMEhjwPah40YWLRf
+         PzGVMC4fIqthWzyenLlhfxHKbq+uMFJLqijdUwZBpAfXxKkA7A7SoHxXikg/pltqZ48i
+         I1TH0HtuuA+q9aoknek+u5DdemeNtgvqJiCpmyYW73VnOXEee7AOIOgsR5sNfWdN9pr7
+         ushw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700314088; x=1700918888;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DjRg7NGUQPfxOSlfCXCbAcbz7uHVwoni3DCMCnip4wU=;
+        b=jzo8fgrMAuhg9qr5kMpyWzSXcqh6pYRNsP/RI5jHa5Il/Y1sPex678TbAu+Qf/iuYi
+         EUxHJYRXCrA578zENBhlJYAxM4d9DRi3CiWxWTgh4K4ca6vAH9P1EYUhFx32PM+Sa3JY
+         qQDgWq+mXVCl1ZoLWgfhPXRnXaIY0NhbCZlfbM1Qcnat3qoelaUgD+DOEpeOOkxw2Afg
+         5Ni7hvv2OcBGPO7gK3OYRtTjjKNVsE4cvOYrbMOA8t4SPdrNW3wAbtRIYLR0ovxVZYje
+         DrEh0xUH8ExSTF0XtW6dPb930WydXQCnOJu98wBBM8Mv/PecOO+d+oThBwVj/5HzuR85
+         QGRQ==
+X-Gm-Message-State: AOJu0YxAGT1AA848SQvCFUQF7Fi2C8eKZZqhXMp5iHUtN5efW2Crkz4m
+	apCBJWqc6oZ4dx1hyBjslf2WpaJKL3KwmGqwhw4ZbW/F8bN2vA==
+X-Google-Smtp-Source: AGHT+IGZaajQ/24RQ52ADMl3xDdYk/JIWqcHZy898i7FE89b3T6YfDO3QBEory4JWhR14iCnRUWOGKMKMM+vi5qC3FQ=
+X-Received: by 2002:a17:906:f106:b0:9cf:18ce:95e6 with SMTP id
+ gv6-20020a170906f10600b009cf18ce95e6mr1550870ejb.62.1700314087783; Sat, 18
+ Nov 2023 05:28:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+References: <20231118113357.1999-1-kamil.duljas@gmail.com> <20231118120235.GA30289@breakpoint.cc>
+In-Reply-To: <20231118120235.GA30289@breakpoint.cc>
+From: Kamil Duljas <kamil.duljas@gmail.com>
+Date: Sat, 18 Nov 2023 14:27:56 +0100
+Message-ID: <CAFR=A7nkyx_Lf=p0BS-S68_vxQL97rUoLMZpo4kxHjKykAgTRw@mail.gmail.com>
+Subject: Re: [PATCH] genetlink: Prevent memory leak when krealloc fail
+To: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-There's no need to clear the config->supported_interfaces bitmap before
-reporting the supported interfaces as all bits in the bitmap will already
-be initialized to zero when the phylink_config structure is allocated.
-There's no code that would change the bitmap beforehand. Remove it.
+Yes, you're right. I did not think about it. So if we have a static
+pointer that may be resued, should not restore the pointer as at the
+beginning?
+static unsigned long *mc_groups =3D &mc_group_start;
 
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-Acked-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/net/dsa/mt7530.c | 2 --
- 1 file changed, 2 deletions(-)
+At this moment we don't know how much memory is allocated. What do you
+think about this?
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index ca42005ff3a9..20ae147b823e 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2558,8 +2558,6 @@ static void mt7531_mac_port_get_caps(struct dsa_switch *ds, int port,
- static void mt7988_mac_port_get_caps(struct dsa_switch *ds, int port,
- 				     struct phylink_config *config)
- {
--	phy_interface_zero(config->supported_interfaces);
--
- 	switch (port) {
- 	/* Internal PHY */
- 	case 0 ... 3:
--- 
-2.40.1
+>                               new_groups =3D krealloc(mc_groups, nlen,
+>                                                     GFP_KERNEL);
+> -                             if (!new_groups)
+> +                             if (!new_groups) {
+> +                                     kfree(mc_groups);
+> +                                     mc_groups =3D &mc_group_start;
+>                                       return -ENOMEM;
+> +                             }
 
+
+sob., 18 lis 2023 o 13:02 Florian Westphal <fw@strlen.de> napisa=C5=82(a):
+>
+> Kamil Duljas <kamil.duljas@gmail.com> wrote:
+> > genl_allocate_reserve_groups() allocs new memory in while loop
+> > but if krealloc fail, the memory allocated by kzalloc is not freed.
+> > It seems allocated memory is unnecessary when the function
+> > returns -ENOMEM
+>
+> Why should it be free'd?  mc_groups is not a local variable.
+>
+> >                               new_groups =3D krealloc(mc_groups, nlen,
+> >                                                     GFP_KERNEL);
+> > -                             if (!new_groups)
+> > +                             if (!new_groups) {
+> > +                                     kfree(mc_groups);
+> >                                       return -ENOMEM;
+> > +                             }
+>
+> How did you test this?  AFAICS this results in use-after-free for every
+> access to mc_groups after this error path is taken.
+>
+> Existing code looks correct, we can't grow mc_groups and return an
+> error.
+
+
+
+--=20
+Pozdrawiam,
+Kamil Duljas
 
