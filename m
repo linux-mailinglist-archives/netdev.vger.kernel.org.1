@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-48925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D6E47F00A1
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:52:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 946AE7F00A2
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:52:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5760EB20AF8
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:52:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3B3EB20A23
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CE01775A;
-	Sat, 18 Nov 2023 15:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E57910963;
+	Sat, 18 Nov 2023 15:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S4GwRONQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHFM6tKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF76A1FD9;
-	Sat, 18 Nov 2023 07:51:48 -0800 (PST)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-5c516f92759so32038617b3.2;
-        Sat, 18 Nov 2023 07:51:48 -0800 (PST)
+Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1500D1FEB;
+	Sat, 18 Nov 2023 07:51:52 -0800 (PST)
+Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5c9adcaf514so407127b3.2;
+        Sat, 18 Nov 2023 07:51:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700322708; x=1700927508; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1700322710; x=1700927510; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fm1bHPEyELp3MiPjOSu0bHDojYqM84986duNSStQHBY=;
-        b=S4GwRONQN6Sg7Bq0l5QNXv2PN7PtyWj4PbeIQm1D0PgHld0Aue9+G9wJIa3+VR6r4N
-         69fckYz3ZFtTSrTmp3wBm9HgI4AFnN9oP8kq2NFoUF7zI5qMGuq0QfN8uWOwRlPcugwb
-         SgsXAzhcRoKLyTeBcAykIkmKaVsdwZTdnJ5oMwlTmUIrFNm6hE7uIZwbfaRavFTiFbSN
-         vgLIi9Doss0CR/kd4xoJudiEEg0LxDUQSmpsoAPa9Rmil3o3cEkzZkK+0SN5LNZQnmG0
-         AT8q/gLHLLhO5bFeMeduSD7QNmlMQ2PI9YysiarzIbxyaKqkuWP1uhYJj7ntZbz/adua
-         lqdQ==
+        bh=5/FFRxNdIVmBtGkGik+eY+kvUwCYYAdIhZdGmVH5ny0=;
+        b=XHFM6tKQUtr+ERDMSFScqY8TpsnBRXCGYuutGO0nb1jrhv7VWiCmz8vSZpRl3H4EXu
+         NFFvC0GFb4qTtkyiEroiLv8JYpXsun4dWahd/cWc+aTR+916BWvMI7BLQCQuSJ6Fjx6s
+         090ZZr+pw0FC4Bq1GekOw4/eCTAka5QBvtAP78FJ61Ps42T/bDARzMy98D/iZfaF6UQy
+         a6d+X6NSxvFmKGCYr7Krt+yLnooXahSheZ5psFFQElE+6wVU/Qg4ImNxK3eZUs/xp/2G
+         6wYVpt4CIuhipxn2oo1Jcp08zqJr6C9XjNOupeVlIjjqab8ENkNrALLPhWq33QZFI0FB
+         GFNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700322708; x=1700927508;
+        d=1e100.net; s=20230601; t=1700322710; x=1700927510;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fm1bHPEyELp3MiPjOSu0bHDojYqM84986duNSStQHBY=;
-        b=GvT1qHTA1uEw494ni2VTjuK/ejdoxx2W4wC6b86eetyhkRQcvwqLVuPHZqngQNHWE9
-         dH4nYSxgs41Au6dTRF9+wxsmX1DMAdGL7VCzEidM3cTZGwg1rs/eU/bEz0zTRhR/U9Cv
-         4+s+twvmyjJy2dfHPNz27sxaCqP7cz7hoyB0d8Z8tZ+36nFIJD2LMr98ongzkb7HAhpm
-         mQUe43NT0Q9kPYAErdfb28epsXkRnD2REq0gxnuFzu5G+q9qlahmAT24manx57LN1lPJ
-         OrJhi7ujbDrip45E/9MuE9on4tDNZSIDVWJ11mMeaERVCsriDnS1kjXNYTS+PA6WFcoX
-         Phkw==
-X-Gm-Message-State: AOJu0YxMJB6d2rNmyaG7G7trBdICttbdfXUClSnpYrs9S3nhXHKBdK0e
-	ZNaImNiBiHR4RDMbCI7KngBlwAnUSXF289po
-X-Google-Smtp-Source: AGHT+IEr9EXnIrnz3KfJlWeIhC3M3/FUV0iAGcHYIcYOW9tXgSnWoyx3lY1GC4qxv/GhgpzHagmIGw==
-X-Received: by 2002:a81:ef0d:0:b0:59b:5696:c33 with SMTP id o13-20020a81ef0d000000b0059b56960c33mr2780375ywm.46.1700322707666;
-        Sat, 18 Nov 2023 07:51:47 -0800 (PST)
+        bh=5/FFRxNdIVmBtGkGik+eY+kvUwCYYAdIhZdGmVH5ny0=;
+        b=Ct4nzdt4mx15hxHbv9hsQAhX2ZtgICGYJzYRlqHiHPRHJa6oEGKJrH7qdylsNj3fTL
+         sJJSB0rcQCe5oR1diK6OgnhPWyDBnYIadr+BiR5o2D0ivbOPEBAC8lGnx02/6l+7ltgI
+         2IwAy4Gh1TEPeN9Cw9SejC0a5jb3BGCsPobEwVGuUyYcGKXzHeaBA7s0MBDEp5K3E0NK
+         y6OrDPCOWXEZkU63RC3GSf4EGndtCdoy3sI7N4OS/W3G9blvqoRYkHUwXD9+zoZ52iuQ
+         er4glkaX9oODEHOnf+qZmfVM2+uaDndlXBRNDZHMqxxZAOiaSvAhK/7aG0WEPc3kY2Vm
+         3dqw==
+X-Gm-Message-State: AOJu0YzJqz7WaDwT8PabL6YOTwuYEF3To1B16tJSGFBNFCnd9T2Ywmhw
+	wISDFCj8etrArWmi3LoI2uXtgy5vyjUKZmyU
+X-Google-Smtp-Source: AGHT+IGMZW2BXhTq6urOTFJBRfGUnn7sVaNNC8L1hFUdeATS2oy7Q8NxWcEEhUoAcnJ9H9mWRS92oA==
+X-Received: by 2002:a0d:d951:0:b0:5a7:d412:af32 with SMTP id b78-20020a0dd951000000b005a7d412af32mr2476093ywe.10.1700322710270;
+        Sat, 18 Nov 2023 07:51:50 -0800 (PST)
 Received: from localhost ([2601:344:8301:57f0:48a9:bd4c:868d:dc97])
-        by smtp.gmail.com with ESMTPSA id b65-20020a0dd944000000b005a8c392f498sm1167821ywe.82.2023.11.18.07.51.46
+        by smtp.gmail.com with ESMTPSA id i205-20020a8154d6000000b0059bcadded9dsm1176063ywb.116.2023.11.18.07.51.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Nov 2023 07:51:46 -0800 (PST)
+        Sat, 18 Nov 2023 07:51:49 -0800 (PST)
 From: Yury Norov <yury.norov@gmail.com>
 To: linux-kernel@vger.kernel.org,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Jan Kara <jack@suse.cz>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: Jan Kara <jack@suse.cz>,
 	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
 	Matthew Wilcox <willy@infradead.org>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
 	Alexey Klimov <klimov.linux@gmail.com>
-Subject: [PATCH 26/34] ethernet: rocker: optimize ofdpa_port_internal_vlan_id_get()
-Date: Sat, 18 Nov 2023 07:50:57 -0800
-Message-Id: <20231118155105.25678-27-yury.norov@gmail.com>
+Subject: [PATCH 28/34] bluetooth: optimize cmtp_alloc_block_id()
+Date: Sat, 18 Nov 2023 07:50:59 -0800
+Message-Id: <20231118155105.25678-29-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20231118155105.25678-1-yury.norov@gmail.com>
 References: <20231118155105.25678-1-yury.norov@gmail.com>
@@ -83,37 +83,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Optimize ofdpa_port_internal_vlan_id_get() by using find_and_set_bit(),
-instead of polling every bit from bitmap in a for-loop.
+Instead of polling every bit in blockids, switch it to using a
+dedicated find_and_set_bit(), and make the function a simple one-liner.
 
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
- drivers/net/ethernet/rocker/rocker_ofdpa.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ net/bluetooth/cmtp/core.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/rocker/rocker_ofdpa.c b/drivers/net/ethernet/rocker/rocker_ofdpa.c
-index 826990459fa4..449be8af7ffc 100644
---- a/drivers/net/ethernet/rocker/rocker_ofdpa.c
-+++ b/drivers/net/ethernet/rocker/rocker_ofdpa.c
-@@ -2249,14 +2249,11 @@ static __be16 ofdpa_port_internal_vlan_id_get(struct ofdpa_port *ofdpa_port,
- 	found = entry;
- 	hash_add(ofdpa->internal_vlan_tbl, &found->entry, found->ifindex);
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 90d130588a3e..b1330acbbff3 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -88,15 +88,9 @@ static void __cmtp_copy_session(struct cmtp_session *session, struct cmtp_connin
  
--	for (i = 0; i < OFDPA_N_INTERNAL_VLANS; i++) {
--		if (test_and_set_bit(i, ofdpa->internal_vlan_bitmap))
--			continue;
-+	i = find_and_set_bit(ofdpa->internal_vlan_bitmap, OFDPA_N_INTERNAL_VLANS);
-+	if (i < OFDPA_N_INTERNAL_VLANS)
- 		found->vlan_id = htons(OFDPA_INTERNAL_VLAN_ID_BASE + i);
--		goto found;
--	}
+ static inline int cmtp_alloc_block_id(struct cmtp_session *session)
+ {
+-	int i, id = -1;
++	int id = find_and_set_bit(&session->blockids, 16);
+ 
+-	for (i = 0; i < 16; i++)
+-		if (!test_and_set_bit(i, &session->blockids)) {
+-			id = i;
+-			break;
+-		}
 -
--	netdev_err(ofdpa_port->dev, "Out of internal VLAN IDs\n");
-+	else
-+		netdev_err(ofdpa_port->dev, "Out of internal VLAN IDs\n");
+-	return id;
++	return id < 16 ? id : -1;
+ }
  
- found:
- 	found->ref_count++;
+ static inline void cmtp_free_block_id(struct cmtp_session *session, int id)
 -- 
 2.39.2
 
