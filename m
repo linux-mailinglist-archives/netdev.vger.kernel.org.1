@@ -1,114 +1,138 @@
-Return-Path: <netdev+bounces-48878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DABE57EFE2F
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:58:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DAB37EFE41
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 08:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 851971F23348
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:58:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13DFFB209D6
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4A563CB;
-	Sat, 18 Nov 2023 06:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CFA210F3;
+	Sat, 18 Nov 2023 07:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/SGTLgL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BNPKoSNc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8980E6
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 22:58:14 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6b5cac99cfdso2538167b3a.2
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 22:58:14 -0800 (PST)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381F610C1
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 23:22:01 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-50a6ff9881fso3984124e87.1
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 23:22:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700290694; x=1700895494; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4So+f19Iw9wK9Z0NOg4xqdd1JDG75Z0QdBaz25kwqg=;
-        b=R/SGTLgLub+5U1NrXdh5djKewA2YSfPLgUzfAJkqgFAekLp/wpn423+OPGZa2Oqjb0
-         dZwGFM64uJ+ur2dC2ycMkTFoZ5Wkpo6xWa5+yRiGIfAIuSSwL5iY2LK42DXdw5pNazw8
-         fg+ZPhrYv2EzCpIT4zmCFhFzoyxthUkGzJJkrqRFUyP9a8OsUdih9v4Tzewa8o+GzTKQ
-         9k2LXwwYL7HVsYiYotMSbZ1sI8bOuBI9zdb9xybmpIAY5C45soM9XBdOATb54ypLeAfi
-         9v6Pr0404UP2b6vphS++upb34jZgRwkPkRtxGvrUkyVqF1dYHCAoWFKkXO7EU6+PVaI3
-         nVlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700290694; x=1700895494;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=linaro.org; s=google; t=1700292119; x=1700896919; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S4So+f19Iw9wK9Z0NOg4xqdd1JDG75Z0QdBaz25kwqg=;
-        b=cNRwMJlpcGaHDgnIp85Pqsei6YQnGq+UbBJ7xMbz++ahiASg/scuNCajibbw4SodWW
-         h28cCOyjx1iZaT5LVWn773RkwHkv0hbFVXsJ4GU10qmMPL1dfCswoAiFyBUp7330sGk/
-         HC9BWikEizq0y6TSgBO7uUE5rjOyrb9dVNK0sDoKVh3LLK6zmvldVPcpyHY9fU3ay5zl
-         /axuGaZrjvPVHPwOINSA3v1cTT6TdxyXwp8Nz7gv1+hvr5sOl5teLzLux4MWK3YksvVP
-         Vk7yw/9QcPIUopVXodxTGJQ4hamiIUngASvt6J2C4rOaeD4N+E7CPB3XF1JR+2SAB3sk
-         TaIw==
-X-Gm-Message-State: AOJu0Yz9vU8V0wKSqpFei7hRtgdbiLpCsWyJ6njDzORp02g00Pq6IbGs
-	XLMK2kuXB4xSrcnlrFN4iBY=
-X-Google-Smtp-Source: AGHT+IEj1kGsLQ9DOvAx+VA4nwX1ijmHK0/Z9ZOECzWQyxZdyk2ihYBTkuW4vgk/Sif9RlKyFEYrLQ==
-X-Received: by 2002:a17:902:904a:b0:1cc:1ee2:d41d with SMTP id w10-20020a170902904a00b001cc1ee2d41dmr1461936plz.39.1700290694167;
-        Fri, 17 Nov 2023 22:58:14 -0800 (PST)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a2-20020a170902900200b001cc3c521affsm2364045plp.300.2023.11.17.22.58.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Nov 2023 22:58:13 -0800 (PST)
-Date: Sat, 18 Nov 2023 14:58:03 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
-Message-ID: <ZVhge4HBkuqRKo+Z@Laptop-X1>
-References: <20231117141733.3344158-1-edumazet@google.com>
+        bh=Ck4P2+ZKsmJo86GTwgisAYut3quxIggprqt+AHmxY3Q=;
+        b=BNPKoSNcWHUbvE8qoFNll6YHOBwiJfNFjaZkYG2ogJICcuj8dL/62UZhA4TVgpJWQO
+         4VI48CcBPuzK89sodsPR2BZ0O0IQ+ZtRLyNwMkSud6AYCWDh+0o3copqzNeNXoKoR82T
+         c5++YTDmHyWgp0faxJNH7jZUK7jC/h3VNhr2WRj9wdrv6FSPqGRRqTXBfF4YgfmlFAm4
+         LaEb87nzAeiCPiFzs9jXnzA6tOk63aaSOs/WEvVJGYi9kxPBrH3RfxvnropSz4RgY2hR
+         cf5Xy08uzdmnQqyZPJxgCHmarwUfrbTdY6pdQ/YyHNLKkYvXeXhYpy7Rt986JT9OqiO7
+         SSig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700292119; x=1700896919;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ck4P2+ZKsmJo86GTwgisAYut3quxIggprqt+AHmxY3Q=;
+        b=FnvFkKwq4FCexSlVXgcFHe3rkeNLVinGdMvpFPgyNQp/CO1ivRDYQSBYRZsMGNahIb
+         elPducDJvcYJKaf2dwf2rP4FYs/pMIBwCLC3lDV9cqsRzmKU3A6VLKjMHOGKlJk0YPMo
+         y1ifXsod2fe6scVel8m/Ev44OPUj961bP8sGAKiCjOYpvSKooIDBia4pkh3rISNC+mAO
+         FH7A+/rBMqc74+mA3CkYyZ0PhBUrN3iqTidU4AGEoCX3y74EEc7mOWvRh78/l/0A1zmH
+         egrE0y7q9e/LXZCSQGDtZHUbMV/dbpf9eHDtdxTCSH2CDfBbQQKPK59GcfZsLmHkkEb8
+         unEA==
+X-Gm-Message-State: AOJu0YwIo4SbLKfpMqRetiQ245sPDBBCb1Ha8FT7ANGvRUMGZju91bZb
+	vHZ4163DIRNMPe+2SoDBb1T/1OcuuM3XbTHWNN2z/A==
+X-Google-Smtp-Source: AGHT+IGmCsPW2DtD/iX2I0p/vAioavmL3nUdlFm9LTuiQ8hEFhSVfZynWt3wCr0Ylq+E12kfdVP2MQpjE5tjjXdAwZI=
+X-Received: by 2002:a05:6512:23aa:b0:507:b15b:8b92 with SMTP id
+ c42-20020a05651223aa00b00507b15b8b92mr1551640lfv.59.1700292119299; Fri, 17
+ Nov 2023 23:21:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231117141733.3344158-1-edumazet@google.com>
+References: <20231117091655.872426-1-u.kleine-koenig@pengutronix.de> <20231117091655.872426-4-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20231117091655.872426-4-u.kleine-koenig@pengutronix.de>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Sat, 18 Nov 2023 09:21:23 +0200
+Message-ID: <CAC_iWj+5MskeWaqa242zFsGRrgAxMGuVPHL6kYm1DUtH_jkDTg@mail.gmail.com>
+Subject: Re: [PATCH 3/7] net: ethernet: ti: cpsw-new: Don't error out in .remove()
+To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Marek Majtyka <alardam@gmail.com>, 
+	Gerhard Engleder <gerhard@engleder-embedded.com>, Rob Herring <robh@kernel.org>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
+	kernel@pengutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 17, 2023 at 02:17:33PM +0000, Eric Dumazet wrote:
-> wg_xmit() can be called concurrently, KCSAN reported [1]
-> some device stats updates can be lost.
-> 
-> Use DEV_STATS_INC() for this unlikely case.
-> 
-> [1]
-> BUG: KCSAN: data-race in wg_xmit / wg_xmit
-> 
-> read-write to 0xffff888104239160 of 8 bytes by task 1375 on cpu 0:
-> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
-> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
-> xmit_one net/core/dev.c:3543 [inline]
-> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
-> ...
-> 
-> read-write to 0xffff888104239160 of 8 bytes by task 1378 on cpu 1:
-> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
-> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
-> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
-> xmit_one net/core/dev.c:3543 [inline]
-> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
-> ...
-> 
-> v2: also change wg_packet_consume_data_done() (Hangbin Liu)
->     and wg_packet_purge_staged_packets()
-> 
-> Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
+On Fri, 17 Nov 2023 at 11:17, Uwe Kleine-K=C3=B6nig
+<u.kleine-koenig@pengutronix.de> wrote:
+>
+> Returning early from .remove() with an error code still results in the
+> driver unbinding the device. So the driver core ignores the returned erro=
+r
+> code and the resources that were not freed are never catched up. In
+> combination with devm this also often results in use-after-free bugs.
+>
+> If runtime resume fails, it's still important to free all resources, so
+> don't return with an error code, but emit an error message and continue
+> freeing acquired stuff.
+>
+> This prepares changing cpsw_remove() to return void.
+>
+> Fixes: ed3525eda4c4 ("net: ethernet: ti: introduce cpsw switchdev based d=
+river part 1 - dual-emac")
+> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
 > ---
+>  drivers/net/ethernet/ti/cpsw_new.c | 16 ++++++++++++----
+>  1 file changed, 12 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti=
+/cpsw_new.c
+> index 0e4f526b1753..a6ce409f563c 100644
+> --- a/drivers/net/ethernet/ti/cpsw_new.c
+> +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> @@ -2042,16 +2042,24 @@ static int cpsw_remove(struct platform_device *pd=
+ev)
+>         struct cpsw_common *cpsw =3D platform_get_drvdata(pdev);
+>         int ret;
+>
+> -       ret =3D pm_runtime_resume_and_get(&pdev->dev);
+> +       ret =3D pm_runtime_get_sync(&pdev->dev);
+>         if (ret < 0)
+> -               return ret;
+> +               /* There is no need to do something about that. The impor=
+tant
+> +                * thing is to not exit early, but do all cleanup that do=
+esn't
+> +                * requrie register access.
+> +                */
+> +               dev_err(&pdev->dev, "runtime resume failed (%pe)\n",
+> +                       ERR_PTR(ret));
+>
+>         cpsw_unregister_notifiers(cpsw);
+>         cpsw_unregister_devlink(cpsw);
+>         cpsw_unregister_ports(cpsw);
+>
+> -       cpts_release(cpsw->cpts);
+> -       cpdma_ctlr_destroy(cpsw->dma);
+> +       if (ret >=3D 0) {
+> +               cpts_release(cpsw->cpts);
+> +               cpdma_ctlr_destroy(cpsw->dma);
+> +       }
+> +
+>         cpsw_remove_dt(cpsw);
+>         pm_runtime_put_sync(&pdev->dev);
+>         pm_runtime_disable(&pdev->dev);
+> --
+> 2.42.0
+>
 
-I respect Jason's comments.
-
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Acked-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
