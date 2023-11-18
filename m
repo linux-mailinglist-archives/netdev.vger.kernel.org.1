@@ -1,90 +1,75 @@
-Return-Path: <netdev+bounces-48939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1600B7F015A
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 18:39:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086DD7F0157
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 18:38:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEEE91F22C7F
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 17:39:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FC721C204F7
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 17:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1059D1865E;
-	Sat, 18 Nov 2023 17:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC7713AC6;
+	Sat, 18 Nov 2023 17:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eGCQe3hg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dByqGueY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 935FE1AD;
-	Sat, 18 Nov 2023 09:39:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ODf/EeD7TdfM/V4kFavfoqfzEFUPK1joSi1qIu1/vpo=; b=eGCQe3hghc9aC7kqR7Alui+/Y/
-	Wd918gat2/NjcQkpHigcJScHVxcq/DLVNWKzkD+HFQ2J+T2m+AVawujJT/6g6HqDYVLeCdZYXKjVq
-	fSCofpLsEC86sjc2Kmt3dhd7BKkCbqozrCVEHUGaZkmWN5kgWlx50j/BVbDWj0HUXxo0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r4PHH-000WBY-3h; Sat, 18 Nov 2023 18:38:43 +0100
-Date: Sat, 18 Nov 2023 18:38:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/9] ethtool: Expand Ethernet Power Equipment
- with PoE alongside PoDL
-Message-ID: <04cb7d87-bb6b-4997-878d-490c17bfdfd0@lunn.ch>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A00179A2;
+	Sat, 18 Nov 2023 17:38:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74C23C433C7;
+	Sat, 18 Nov 2023 17:38:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700329131;
+	bh=losrmXlk+odVwrmRe07GJMSdH6r8vdY76JOEkrAnT8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dByqGueYLz6b8vlOUGniQt46dHd66x1kFnRLjJoHw1Hsw7ap5Hv0cLdxFq2R12Pt9
+	 0v7hy1j2j7i5h3ntlKizusHrv8ilYQyGMH547b5A7PBANk1xTOtFDL+SFPjAWHkkpi
+	 hzW/90cbNGqQMOO8zfnR1jjFhklycNUr3v0E/WD+majI3yk4fwhdTk3Ak6fZl3yv/R
+	 fUz03ZUmfzLnot7uFZmXs1e+4JeMfjzJ059NIBzIGi1rUYm28QWJBmDPdu3DucQxnz
+	 qXGmyxbYnDamT/VZzFGsyCupkhj6eL/Oncyv+CVaUvB1ga36HmLi8frpE19ZsTdErw
+	 dYjKI4+y3XU+w==
+Date: Sat, 18 Nov 2023 09:38:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Long Li <longli@microsoft.com>, "longli@linuxonhyperv.com"
+ <longli@linuxonhyperv.com>, KY Srinivasan <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v4] hv_netvsc: Mark VF as slave before exposing
+ it to user-mode
+Message-ID: <20231118093849.14e36043@kernel.org>
+In-Reply-To: <20231115081406.1bd9a4ed@hermes.local>
+References: <1699484212-24079-1-git-send-email-longli@linuxonhyperv.com>
+	<20231108181318.5360af18@kernel.org>
+	<PH7PR21MB3263EBCF9600EEBD6D962B6ECEAEA@PH7PR21MB3263.namprd21.prod.outlook.com>
+	<20231110120513.45ed505c@kernel.org>
+	<20231115081406.1bd9a4ed@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 16, 2023 at 03:01:34PM +0100, Kory Maincent wrote:
-> In the current PSE interface for Ethernet Power Equipment, support is
-> limited to PoDL. This patch extends the interface to accommodate the
-> objects specified in IEEE 802.3-2022 145.2 for Power sourcing
-> Equipment (PSE).
+On Wed, 15 Nov 2023 08:14:06 -0800 Stephen Hemminger wrote:
+> Jakub is right that in an ideal world, this could all be managed by
+> userspace. But the management of network devices in Linux is a
+> dumpster fire! Every distro invents there own solution, last time
+> I counted there were six different tools claiming to be the
+> "one network device manager to rule them all". And that doesn't
+> include all the custom scripts and vendor appliances.
 
-Sorry for taking a while getting to these patches. Plumbers and other
-patches have been keeping me busy.
-
-I'm trying to get my head around naming... Is there some sort of
-hierarchy? Is PSE the generic concept for putting power down the
-cable? Then you have the sub-type PoDL, and the sub-type PoE?
-
->  struct pse_control_config {
->  	enum ethtool_podl_pse_admin_state podl_admin_control;
-> +	enum ethtool_pse_admin_state admin_control;
-
-When i look at this, it seems to me admin_control should be generic
-across all schemes which put power down the cable, and
-podl_admin_control is specific to how PoDL puts power down the cable.
-
-Since you appear to be adding support for a second way to put power
-down the cable, i would expect something like poe_admin_control being
-added here. But maybe that is in a later patch?
-
-      Andrew
+To be clear, I thought Long Li was saying that the goal is work around
+cases where VF is probed before netvsc. That seems like something that
+can be prevented by the hypervisor.
 
