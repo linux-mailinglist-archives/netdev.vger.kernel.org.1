@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-48866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C636F7EFCA4
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 01:39:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6FDE7EFCAB
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 01:44:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3EBC1C20AAD
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:39:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B17C1F277C4
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75999A38;
-	Sat, 18 Nov 2023 00:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7CFA3C;
+	Sat, 18 Nov 2023 00:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IiRkNMZE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qctXKSTq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573B1809;
-	Sat, 18 Nov 2023 00:39:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA6F8C433C7;
-	Sat, 18 Nov 2023 00:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC1EA38
+	for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 00:44:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05FFAC433C7;
+	Sat, 18 Nov 2023 00:44:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700267981;
-	bh=Je/ApF2K7SYvSPIxFVB5Me2FUgzHHhsUTSYdaPeNC2M=;
+	s=k20201202; t=1700268242;
+	bh=7dRtlgTO7MbUOGP0ASKinRXRX8cN0mULAPOvJmEpL98=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IiRkNMZEHCZKk9mAEgz3XMwp/Kpr1kMZDf5cAY6rG5HeZZDPzixvMd8qR6Fj8xuFD
-	 cZqwHUjLKhh2b1MGD4eETVLU/2Bchjyb1yqxJL0X4/cf16yqpnAN3AcaURv+uNDNNa
-	 T/6M6T/aO9SSqKVhXMXSTjgy5BCB3CIRQut3i0KoAllyNEh+d6BhNb0dfKCGv+GbsF
-	 r6Qp0qCQ7GaWaPnhc2x5B4L0eSzAT1mWQ1HIiAgGoN9AQRC4invZO4owDjYwXRSfpw
-	 0JWb7TKjy3qlzWhfyvOxzr6FqW759agQIXUTWV0my+k4T2//Lx1iLWA66ymCW5pgx8
-	 7djxeRIbw8KmQ==
-Date: Fri, 17 Nov 2023 16:39:39 -0800
+	b=qctXKSTqT5w+qoUyy6KSTRkVk/xI93J2RwYpaKD6jl8nAznruBU3qKThU9rT1CzAh
+	 QK5yY0hyI1Ei41P4GTPwthfPWx7JsJX7F8xSCOX8k2wo2FQo3IP7lsYPw74aNefv3u
+	 vyMhRM6LCEG5M649qDIJTQK8FzwEZHXGRp7LCCis0PEQit+OvKggdDirFpcWz6jd7g
+	 SesHfY5i69vq68qPpuud6TrmDQ6KJAiKntHHBJZ4FW7kXwdVlFrdgmA+f89/AXGyw5
+	 +KZxximYd3Uizfg390kzJ1Y1mCoQRyb7Mr3IRWTouD8s31oAg5LM7xejCCUtCOv4uh
+	 f3NSKwiBEZc+Q==
+Date: Fri, 17 Nov 2023 16:44:00 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: leit@meta.com
-Cc: Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>,
- netdev@vger.kernel.org, donald.hunter@gmail.com, linux-doc@vger.kernel.org,
- pabeni@redhat.com, edumazet@google.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Documentation: Document each netlink family
-Message-ID: <20231117163939.2de33e83@kernel.org>
-In-Reply-To: <87y1ew6n4x.fsf@meer.lwn.net>
-References: <20231113202936.242308-1-leitao@debian.org>
-	<87y1ew6n4x.fsf@meer.lwn.net>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ arinc.unal@arinc9.com
+Subject: Re: [net-next 0/2] net: dsa: realtek: Introduce realtek_common,
+ load variants on demand
+Message-ID: <20231117164400.18b5a928@kernel.org>
+In-Reply-To: <CAJq09z6_4H6ZZJrjXZALuL9aHPy20FzvUivWfvSZRU1AXUX-Rw@mail.gmail.com>
+References: <20231117235140.1178-1-luizluca@gmail.com>
+	<CAJq09z6_4H6ZZJrjXZALuL9aHPy20FzvUivWfvSZRU1AXUX-Rw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,27 +54,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 17 Nov 2023 15:17:02 -0700 Jonathan Corbet wrote:
-> In principle I like this approach better.  There is one problem, though:
-> 
-> - In current kernels, on my machine, "make htmldocs" when nothing has
->   changed takes about 6s to complete.
-> 
-> - With this patch applied, it takes a little over 5 *minutes*.
-> 
-> Without having delved into it too far, I am guessing that the
-> unconditional recreation of the netlink RST files is causing the rebuild
-> of much of the documentation.  Even so, I don't quite get it.
-> 
-> That, clearly, would need to be fixed before this can go in.
+On Fri, 17 Nov 2023 20:57:34 -0300 Luiz Angelo Daros de Luca wrote:
+> Sorry, I used the wrong prefix. It is missing PATCH.
 
-FWIW on the C code-gen side we avoid touching the files if nothing
-changed both at the Makefile level:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/tools/net/ynl/generated/Makefile#n28
-
-And the tool itself actually generates to a tempfile and compares
-if the output changed:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=2b7ac0c87d985c92e519995853c52b9649ea4b07
+That's fine, patchwork gobbled it up as is, no need to repost.
 
