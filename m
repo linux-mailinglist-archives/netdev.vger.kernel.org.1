@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-48917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052F87F004A
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:32:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D947F0055
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2566F280D9D
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:32:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 753A61F226C2
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4665210793;
-	Sat, 18 Nov 2023 15:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723FE111A4;
+	Sat, 18 Nov 2023 15:37:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qxRcmJ25"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qj+1T3Y0"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7928812B;
-	Sat, 18 Nov 2023 07:32:32 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32134196;
+	Sat, 18 Nov 2023 07:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Btj9P+VH/CDxOXVVE6NwhbHHPfYUrQJoy/uGXNS0XgM=; b=qxRcmJ25ib7soqFiNZ+wrXmyYG
-	7yDxZZ3gvg1mulRSCbVmQi/n5zRVi5GROj3apoGg3CdWS4/vET0/zPdZy5d2eizQMhpDQ1eT3bEXM
-	F3m4HBEdMZgO/JjMPosV4cNQT09SvMVqGABwo9RJ2+OBTS0JKPnsPc3eRPlS2OCnW3eU=;
+	bh=lg2DVX+DTNx+HzFj1UmL3Pguh/3uet6WpCVMj8vb2sk=; b=Qj+1T3Y0gsC6Lx1YtsxOzYFsKq
+	RkuHUX2ZCDtfKVW5p4cohpAQv90TMMxhnHf12shcnTY0CihPZ4UELi1Ux2qlAMnofLRGs9YLHmhTw
+	rlUGKhsu3nCJCoC6hL72BUORx+Cb1d0a4/qA+tV/VXHQ1IWLxenrEtJpIo3swDfUCuNs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1r4NJ4-000Vp0-2X; Sat, 18 Nov 2023 16:32:26 +0100
-Date: Sat, 18 Nov 2023 16:32:26 +0100
+	id 1r4NNO-000Vqg-PS; Sat, 18 Nov 2023 16:36:54 +0100
+Date: Sat, 18 Nov 2023 16:36:54 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Alice Ryhl <aliceryhl@google.com>,
-	fujita.tomonori@gmail.com, benno.lossin@proton.me,
-	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
- drivers
-Message-ID: <e7d0226a-9a38-4ce9-a9b5-7bb80a19bff6@lunn.ch>
-References: <20231026001050.1720612-2-fujita.tomonori@gmail.com>
- <20231117093906.2514808-1-aliceryhl@google.com>
- <b69b2ac0-752b-42ea-a729-9efdee503602@lunn.ch>
- <2023111709-amiable-everybody-befb@gregkh>
- <ZVf3LvoZ7npy3WxI@boqun-archlinux>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, agross@kernel.org,
+	andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, quic_srichara@quicinc.com
+Subject: Re: [PATCH 9/9] dt-bindings: net: ipq4019-mdio: Document ipq5332
+ platform
+Message-ID: <6e10604f-d463-499b-b00a-57ef22a936bb@lunn.ch>
+References: <20231115032515.4249-1-quic_luoj@quicinc.com>
+ <20231115032515.4249-10-quic_luoj@quicinc.com>
+ <834cbb58-3a88-4ba6-8db6-10440a4d0893@linaro.org>
+ <76e081ba-9d5a-41df-9c1b-d782e5656973@quicinc.com>
+ <2a9bb683-da73-47af-8800-f14a833e8ee4@linaro.org>
+ <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
+ <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
+ <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,28 +59,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZVf3LvoZ7npy3WxI@boqun-archlinux>
+In-Reply-To: <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
 
-> One example of not `Send` type (or `!Send`) is spinlock guard:
+> The clock arguments are provided in the later part as below. i will also
+> provide more detail clock names for the new added clocks for the ipq5332
+> platform in description.
 > 
-> 	let guard: Guard<..> = some_lock.lock();
+>   - if:
 > 
-> creating a Guard means "spin_lock()" and dropping a Guard means
-> "spin_unlock()", since we cannot acquire a spinlock in one context and
-> release it in another context in kernel, so `Guard<..>` is `!Send`.
+>       properties:
+> 
+>         compatible:
+> 
+>           contains:
+> 
+>             enum:
+> 
+>               - qcom,ipq5332-mdio
+> 
+>     then:
+> 
+>       properties:
+> 
+>         clocks:
+> 
+>           items:
+> 
+>             - description: MDIO clock source frequency fixed to 100MHZ
+> 
+>             - description: UNIPHY0 AHB clock source frequency fixed to
+> 100MHZ
+>             - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
+>             - description: UNIPHY1 AHB clock source frequency fixed to
+> 100MHZ
+>             - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
 
-Thanks for the explanation. Kernel people might have a different
-meaning for context, especially in this example. We have process
-context and atomic context. Process context you are allowed to sleep,
-atomic context you cannot sleep. If you are in process context and
-take a spinlock, you change into atomic context. And when you release
-the spinlock you go back to process context. So with this meaning of
-context, you do acquire the spinlock in one context, and release it in
-another.
+As i said before, the frequency of the clocks does not matter
+here. That appears to be the drivers problem. I assume every board
+design, with any sort of PHY, needs the same clock configuration?
 
-So we are going to have to think about the context the word context is
-used in, and expect kernel and Rust people to maybe think of it
-differently.
-
-	Andrew
+      Andrew
 
