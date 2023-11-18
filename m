@@ -1,67 +1,130 @@
-Return-Path: <netdev+bounces-48894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F2707EFF60
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 13:02:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 413977EFF84
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 13:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23679B209CF
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 12:02:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702FC1C20869
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 12:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA0D379;
-	Sat, 18 Nov 2023 12:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05ED84F88F;
+	Sat, 18 Nov 2023 12:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="ADIhRVuC"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FCA0194;
-	Sat, 18 Nov 2023 04:02:49 -0800 (PST)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1r4K1z-0002nv-2p; Sat, 18 Nov 2023 13:02:35 +0100
-Date: Sat, 18 Nov 2023 13:02:35 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Kamil Duljas <kamil.duljas@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] genetlink: Prevent memory leak when krealloc fail
-Message-ID: <20231118120235.GA30289@breakpoint.cc>
-References: <20231118113357.1999-1-kamil.duljas@gmail.com>
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7A4D61;
+	Sat, 18 Nov 2023 04:32:56 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D73B7E0002;
+	Sat, 18 Nov 2023 12:32:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1700310775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N9SnKBhRbqMMe69FRrrc0XQvADn9TWKV4HfE5CZaJv8=;
+	b=ADIhRVuCtojr4MU4BCbgFoLcpOPsIIaqb20ar7ExCA4jhWVPamIORfy2L1zxem9FbywtlJ
+	bEqEiqre949ZvSFkK6S5/YBeky5/MiMx3Uk/caW87xYJnfhAGshXnCm5r7klJsn9BcO+7+
+	kDM3scZBplSsOfh1n8DpF93rWAvi2z3wEcNgFfi1iDBc6nrNjmOGS/FAMwlfuFJK0kF0+n
+	C3ImHe82Tt33MDwRWSBkFQsgsVv8ICY4BYj+yA4nmyNDZsVNSahlDrARFf9Uu5sGTCa0BH
+	NHeenjzyfVEdMdUByx4taLvR1MJ/2hDf7KIniDa0WqnV13DxYB8eSxuNS44QyA==
+From: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>
+To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com
+Subject: [PATCH net-next 00/15] MT7530 DSA subdriver improvements
+Date: Sat, 18 Nov 2023 15:31:50 +0300
+Message-Id: <20231118123205.266819-1-arinc.unal@arinc9.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231118113357.1999-1-kamil.duljas@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Kamil Duljas <kamil.duljas@gmail.com> wrote:
-> genl_allocate_reserve_groups() allocs new memory in while loop
-> but if krealloc fail, the memory allocated by kzalloc is not freed.
-> It seems allocated memory is unnecessary when the function
-> returns -ENOMEM
+Hello!
 
-Why should it be free'd?  mc_groups is not a local variable.
+This patch series simplifies the MT7530 DSA subdriver and improves the
+logic of the support for MT7530, MT7531, and the switch on the MT7988 SoC.
 
->  				new_groups = krealloc(mc_groups, nlen,
->  						      GFP_KERNEL);
-> -				if (!new_groups)
-> +				if (!new_groups) {
-> +					kfree(mc_groups);
->  					return -ENOMEM;
-> +				}
+I have done a simple ping test to confirm basic communication on all switch
+ports on the MCM and standalone MT7530 and MT7531 switch with this patch
+series applied.
 
-How did you test this?  AFAICS this results in use-after-free for every
-access to mc_groups after this error path is taken.
+MT7621 Unielec, MCM MT7530:
 
-Existing code looks correct, we can't grow mc_groups and return an
-error.
+rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
+
+tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
+
+MT7622 Bananapi, MT7531:
+
+gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+
+tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+
+MT7623 Bananapi, standalone MT7530:
+
+rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+
+tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+
+This patch series is the continuation of the one linked below.
+
+https://lore.kernel.org/netdev/20230522121532.86610-1-arinc.unal@arinc9.com/
+
+Arınç
+
+Arınç ÜNAL (15):
+  net: dsa: mt7530: always trap frames to active CPU port on MT7530
+  net: dsa: mt7530: use p5_interface_select as data type for p5_intf_sel
+  net: dsa: mt7530: store port 5 SGMII capability of MT7531
+  net: dsa: mt7530: improve comments regarding port 5 and 6
+  net: dsa: mt7530: improve code path for setting up port 5
+  net: dsa: mt7530: do not set priv->p5_interface on mt7530_setup_port5()
+  net: dsa: mt7530: do not run mt7530_setup_port5() if port 5 is disabled
+  net: dsa: mt7530: empty default case on mt7530_setup_port5()
+  net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
+  net: dsa: mt7530: remove pad_setup function pointer
+  net: dsa: mt7530: move XTAL check to mt7530_setup()
+  net: dsa: mt7530: move enabling port 6 to mt7530_setup_port6()
+  net: dsa: mt7530: simplify mt7530_setup_port6() and change to void
+  net: dsa: mt7530: correct port capabilities of MT7988
+  net: dsa: mt7530: do not clear config->supported_interfaces
+
+ drivers/net/dsa/mt7530-mdio.c |   7 +-
+ drivers/net/dsa/mt7530.c      | 283 ++++++++++++++++---------------------
+ drivers/net/dsa/mt7530.h      |  19 +--
+ 3 files changed, 137 insertions(+), 172 deletions(-)
+
+
 
