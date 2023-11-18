@@ -1,155 +1,114 @@
-Return-Path: <netdev+bounces-48877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FE857EFE17
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:29:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DABE57EFE2F
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 07:58:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 811F41C20A78
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:29:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 851971F23348
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B160101C2;
-	Sat, 18 Nov 2023 06:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4A563CB;
+	Sat, 18 Nov 2023 06:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LgskmfOH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/SGTLgL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0DB172C;
-	Fri, 17 Nov 2023 22:28:39 -0800 (PST)
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AI6Fvig020523;
-	Sat, 18 Nov 2023 06:28:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=qcppdkim1;
- bh=uxMZ5i08IIj1P3XHjsuTSAB7PjcYnIlgE+t3bDDRN3U=;
- b=LgskmfOHbA7H5DmYYRviSSCoJuQsvUKymFqYty4LhrdQC8FYSPwT7IMabJ1DUbIaAJxj
- Emab7zapMpJ+NClQL+szlgr9VYB4KCeyThpGi2HlsAY0VN4JO6mNoH3sSTpE+VqSylxG
- in7WA8bG9QmmSxEAWUlC21QKpMVOLeHCBvfk7zNw0S7M1+RUcinRdU0aSpoNhhdTm7bB
- fOSht250S2MgWOvRxMz1vJYD5Y3a+8Rz4IzFtA7cEW8JTk0ZrecTAWuiplLwVnbtcqy9
- dEyoh3Sofeq3O++Hm6qqjLzUebhQrO0xookEiqS478kZZpkDiOGmDyEeC5Ej4/95kXWS Nw== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3uengb85q7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 18 Nov 2023 06:28:28 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AI6SRjQ017424
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 18 Nov 2023 06:28:27 GMT
-Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 17 Nov 2023 22:28:24 -0800
-From: Luo Jie <quic_luoj@quicinc.com>
-To: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <corbet@lwn.net>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
-Subject: [PATCH v5 6/6] net: phy: qca8084: add qca8084_link_change_notify
-Date: Sat, 18 Nov 2023 14:27:54 +0800
-Message-ID: <20231118062754.2453-7-quic_luoj@quicinc.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231118062754.2453-1-quic_luoj@quicinc.com>
-References: <20231118062754.2453-1-quic_luoj@quicinc.com>
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8980E6
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 22:58:14 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6b5cac99cfdso2538167b3a.2
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 22:58:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700290694; x=1700895494; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S4So+f19Iw9wK9Z0NOg4xqdd1JDG75Z0QdBaz25kwqg=;
+        b=R/SGTLgLub+5U1NrXdh5djKewA2YSfPLgUzfAJkqgFAekLp/wpn423+OPGZa2Oqjb0
+         dZwGFM64uJ+ur2dC2ycMkTFoZ5Wkpo6xWa5+yRiGIfAIuSSwL5iY2LK42DXdw5pNazw8
+         fg+ZPhrYv2EzCpIT4zmCFhFzoyxthUkGzJJkrqRFUyP9a8OsUdih9v4Tzewa8o+GzTKQ
+         9k2LXwwYL7HVsYiYotMSbZ1sI8bOuBI9zdb9xybmpIAY5C45soM9XBdOATb54ypLeAfi
+         9v6Pr0404UP2b6vphS++upb34jZgRwkPkRtxGvrUkyVqF1dYHCAoWFKkXO7EU6+PVaI3
+         nVlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700290694; x=1700895494;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S4So+f19Iw9wK9Z0NOg4xqdd1JDG75Z0QdBaz25kwqg=;
+        b=cNRwMJlpcGaHDgnIp85Pqsei6YQnGq+UbBJ7xMbz++ahiASg/scuNCajibbw4SodWW
+         h28cCOyjx1iZaT5LVWn773RkwHkv0hbFVXsJ4GU10qmMPL1dfCswoAiFyBUp7330sGk/
+         HC9BWikEizq0y6TSgBO7uUE5rjOyrb9dVNK0sDoKVh3LLK6zmvldVPcpyHY9fU3ay5zl
+         /axuGaZrjvPVHPwOINSA3v1cTT6TdxyXwp8Nz7gv1+hvr5sOl5teLzLux4MWK3YksvVP
+         Vk7yw/9QcPIUopVXodxTGJQ4hamiIUngASvt6J2C4rOaeD4N+E7CPB3XF1JR+2SAB3sk
+         TaIw==
+X-Gm-Message-State: AOJu0Yz9vU8V0wKSqpFei7hRtgdbiLpCsWyJ6njDzORp02g00Pq6IbGs
+	XLMK2kuXB4xSrcnlrFN4iBY=
+X-Google-Smtp-Source: AGHT+IEj1kGsLQ9DOvAx+VA4nwX1ijmHK0/Z9ZOECzWQyxZdyk2ihYBTkuW4vgk/Sif9RlKyFEYrLQ==
+X-Received: by 2002:a17:902:904a:b0:1cc:1ee2:d41d with SMTP id w10-20020a170902904a00b001cc1ee2d41dmr1461936plz.39.1700290694167;
+        Fri, 17 Nov 2023 22:58:14 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id a2-20020a170902900200b001cc3c521affsm2364045plp.300.2023.11.17.22.58.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Nov 2023 22:58:13 -0800 (PST)
+Date: Sat, 18 Nov 2023 14:58:03 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot <syzkaller@googlegroups.com>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
+Message-ID: <ZVhge4HBkuqRKo+Z@Laptop-X1>
+References: <20231117141733.3344158-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: EpS834BWoF9oLvU4AY5uaWjxyXYWes-w
-X-Proofpoint-ORIG-GUID: EpS834BWoF9oLvU4AY5uaWjxyXYWes-w
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-18_04,2023-11-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
- mlxlogscore=999 suspectscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311180045
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117141733.3344158-1-edumazet@google.com>
 
-When the link is changed, qca8084 needs to do the fifo reset and
-adjust the IPG level for the qusgmii link speed 1000M.
+On Fri, Nov 17, 2023 at 02:17:33PM +0000, Eric Dumazet wrote:
+> wg_xmit() can be called concurrently, KCSAN reported [1]
+> some device stats updates can be lost.
+> 
+> Use DEV_STATS_INC() for this unlikely case.
+> 
+> [1]
+> BUG: KCSAN: data-race in wg_xmit / wg_xmit
+> 
+> read-write to 0xffff888104239160 of 8 bytes by task 1375 on cpu 0:
+> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
+> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+> xmit_one net/core/dev.c:3543 [inline]
+> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
+> ...
+> 
+> read-write to 0xffff888104239160 of 8 bytes by task 1378 on cpu 1:
+> wg_xmit+0x60f/0x680 drivers/net/wireguard/device.c:231
+> __netdev_start_xmit include/linux/netdevice.h:4918 [inline]
+> netdev_start_xmit include/linux/netdevice.h:4932 [inline]
+> xmit_one net/core/dev.c:3543 [inline]
+> dev_hard_start_xmit+0x11b/0x3f0 net/core/dev.c:3559
+> ...
+> 
+> v2: also change wg_packet_consume_data_done() (Hangbin Liu)
+>     and wg_packet_purge_staged_packets()
+> 
+> Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Hangbin Liu <liuhangbin@gmail.com>
+> ---
 
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- drivers/net/phy/at803x.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+I respect Jason's comments.
 
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 06a068ca5539..7267ce858937 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -289,6 +289,13 @@
- #define QCA8084_MSE_THRESHOLD			0x800a
- #define QCA8084_MSE_THRESHOLD_2P5G_VAL		0x51c6
- 
-+#define QCA8084_FIFO_CONTROL			0x19
-+#define QCA8084_FIFO_MAC_2_PHY			BIT(1)
-+#define QCA8084_FIFO_PHY_2_MAC			BIT(0)
-+
-+#define QCA8084_MMD7_IPG_OP			0x901d
-+#define QCA8084_IPG_10_TO_11_EN			BIT(0)
-+
- MODULE_DESCRIPTION("Qualcomm Atheros AR803x and QCA808X PHY driver");
- MODULE_AUTHOR("Matus Ujhelyi");
- MODULE_LICENSE("GPL");
-@@ -2109,6 +2116,35 @@ static int qca8084_config_init(struct phy_device *phydev)
- 			     QCA8084_MSE_THRESHOLD, QCA8084_MSE_THRESHOLD_2P5G_VAL);
- }
- 
-+static void qca8084_link_change_notify(struct phy_device *phydev)
-+{
-+	int ret;
-+
-+	ret = phy_modify(phydev, QCA8084_FIFO_CONTROL,
-+			 QCA8084_FIFO_MAC_2_PHY | QCA8084_FIFO_PHY_2_MAC,
-+			 0);
-+	if (ret)
-+		return;
-+
-+	/* If the PHY works on PHY_INTERFACE_MODE_10G_QXGMII mode, the fifo needs to
-+	 * be kept as reset state in link down status.
-+	 */
-+	if (phydev->interface != PHY_INTERFACE_MODE_10G_QXGMII || phydev->link) {
-+		msleep(50);
-+		ret = phy_modify(phydev, QCA8084_FIFO_CONTROL,
-+				 QCA8084_FIFO_MAC_2_PHY | QCA8084_FIFO_PHY_2_MAC,
-+				 QCA8084_FIFO_MAC_2_PHY | QCA8084_FIFO_PHY_2_MAC);
-+		if (ret)
-+			return;
-+	}
-+
-+	/* Enable IPG 10 to 11 tuning on link speed 1000M of QUSGMII mode. */
-+	if (phydev->interface == PHY_INTERFACE_MODE_10G_QXGMII)
-+		phy_modify_mmd(phydev, MDIO_MMD_AN, QCA8084_MMD7_IPG_OP,
-+			       QCA8084_IPG_10_TO_11_EN,
-+			       phydev->speed == SPEED_1000 ? QCA8084_IPG_10_TO_11_EN : 0);
-+}
-+
- static struct phy_driver at803x_driver[] = {
- {
- 	/* Qualcomm Atheros AR8035 */
-@@ -2307,6 +2343,7 @@ static struct phy_driver at803x_driver[] = {
- 	.cable_test_start	= qca808x_cable_test_start,
- 	.cable_test_get_status	= qca808x_cable_test_get_status,
- 	.config_init		= qca8084_config_init,
-+	.link_change_notify	= qca8084_link_change_notify,
- }, };
- 
- module_phy_driver(at803x_driver);
--- 
-2.42.0
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
