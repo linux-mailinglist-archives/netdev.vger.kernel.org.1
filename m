@@ -1,89 +1,133 @@
-Return-Path: <netdev+bounces-48916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13C2B7F003D
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:10:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCC317F004B
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B279B2096E
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:10:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5E7DB20981
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7E1168B7;
-	Sat, 18 Nov 2023 15:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HV0XAJbx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEB010793;
+	Sat, 18 Nov 2023 15:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B513214A83
-	for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 15:10:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 03E51C433C8;
-	Sat, 18 Nov 2023 15:10:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700320227;
-	bh=7tQP0fC6mgP0gsULuCrf3QoHhwFbYjBWxb86gwT4xhc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HV0XAJbxwlQBpOLAISmLiS3lqGD4dWJnFcE8zsaKMyAYpq636IKReE0kSCDk6F8QS
-	 CtpTd75vCW2TgmdGgW7K8Btx+wEL5FUC4HO5lNgqN6e275y7BhbcfmmC8WS2jtwjXc
-	 p5FNWM3Yh+DzV0f+ByxdhQiXYTKAQ/Zl/Ym7YhL5KIbouI8ZMG0z4u4fFOstL6E7ED
-	 QjXEospQXXqINqsYIyXfD1d3bVr6QCxc73vaQnlV7JJdj9jq3+qz9dxem1T5UMJE0u
-	 wV+XG67EyRPJyjDyw+lIE9I+Y5HB8nM2Ak/zQyMl6k/6H7fT2+cpdpBxbqzSkdLbj9
-	 CSO/qd69gbE8Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D4E56EA6303;
-	Sat, 18 Nov 2023 15:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+X-Greylist: delayed 182 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 18 Nov 2023 07:33:10 PST
+Received: from mx10.didiglobal.com (mx10.didiglobal.com [111.202.70.125])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 46BC112B;
+	Sat, 18 Nov 2023 07:33:10 -0800 (PST)
+Received: from mail.didiglobal.com (unknown [10.79.64.13])
+	by mx10.didiglobal.com (MailData Gateway V2.8.8) with ESMTPS id 21E9C18F00FBBD;
+	Sat, 18 Nov 2023 23:30:03 +0800 (CST)
+Received: from [172.28.168.151] (10.79.71.102) by
+ ZJY01-ACTMBX-03.didichuxing.com (10.79.64.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.32; Sat, 18 Nov 2023 23:30:02 +0800
+Message-ID: <44b3098e-f98c-4e68-8d13-9d668f92fe36@didichuxing.com>
+Date: Sat, 18 Nov 2023 23:29:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.15.0
+Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
+ lag based placement)
+To: Abel Wu <wuyun.abel@bytedance.com>, Tobias Huschle
+	<huschle@linux.ibm.com>, Linux Kernel <linux-kernel@vger.kernel.org>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<netdev@vger.kernel.org>
+CC: Peterz <peterz@infradead.org>, <mst@redhat.com>, <jasowang@redhat.com>
+Content-Language: en-US
+X-MD-Sfrom: wanghonglei@didiglobal.com
+X-MD-SrcIP: 10.79.64.13
+From: Honglei Wang <wanghonglei@didichuxing.com>
+In-Reply-To: <93c0f8f2-f40e-4dea-8260-6f610e77aa7f@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] net/ncsi: Add NC-SI 1.2 Get MC MAC Address
- command
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170032022686.7145.14748650955833179032.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Nov 2023 15:10:26 +0000
-References: <20231114160737.3209218-1-patrick@stwcx.xyz>
-In-Reply-To: <20231114160737.3209218-1-patrick@stwcx.xyz>
-To: Patrick Williams <patrick@stwcx.xyz>
-Cc: sam@mendozajonas.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, joel@jms.id.au,
- gwshan@linux.vnet.ibm.com, peter@pjd.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+X-Originating-IP: [10.79.71.102]
+X-ClientProxiedBy: ZJY02-PUBMBX-01.didichuxing.com (10.79.65.31) To
+ ZJY01-ACTMBX-03.didichuxing.com (10.79.64.13)
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
 
-On Tue, 14 Nov 2023 10:07:32 -0600 you wrote:
-> NC-SI 1.2 has now been published[1] and adds a new command for "Get MC
-> MAC Address".  This is often used by BMCs to get the assigned MAC
-> address for the channel used by the BMC.
+On 2023/11/18 15:33, Abel Wu wrote:
+> On 11/17/23 2:58 AM, Tobias Huschle Wrote:
+>> #################### TRACE EXCERPT ####################
+>> The sched_place trace event was added to the end of the place_entity 
+>> function and outputs:
+>> sev -> sched_entity vruntime
+>> sed -> sched_entity deadline
+>> sel -> sched_entity vlag
+>> avg -> cfs_rq avg_vruntime
+>> min -> cfs_rq min_vruntime
+>> cpu -> cpu of cfs_rq
+>> nr  -> cfs_rq nr_running
+>> ---
+>>      CPU 3/KVM-2950    [014] d....   576.161432: sched_migrate_task: 
+>> comm=vhost-2920 pid=2941 prio=120 orig_cpu=15 dest_cpu=14
+>> --> migrates task from cpu 15 to 14
+>>      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: 
+>> comm=vhost-2920 pid=2941 sev=4242563284 sed=4245563284 sel=0 
+>> avg=4242563284 min=4242563284 cpu=14 nr=0
+>> --> places vhost 2920 on CPU 14 with vruntime 4242563284
+>>      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= 
+>> pid=0 sev=16329848593 sed=16334604010 sel=0 avg=16329848593 
+>> min=16329848593 cpu=14 nr=0
+>>      CPU 3/KVM-2950    [014] d....   576.161433: sched_place: comm= 
+>> pid=0 sev=42560661157 sed=42627443765 sel=0 avg=42560661157 
+>> min=42560661157 cpu=14 nr=0
+>>      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= 
+>> pid=0 sev=53846627372 sed=54125900099 sel=0 avg=53846627372 
+>> min=53846627372 cpu=14 nr=0
+>>      CPU 3/KVM-2950    [014] d....   576.161434: sched_place: comm= 
+>> pid=0 sev=86640641980 sed=87255041979 sel=0 avg=86640641980 
+>> min=86640641980 cpu=14 nr=0
 > 
-> This change set has been tested on a Broadcomm 200G NIC with updated
-> firmware for NC-SI 1.2 and at least one other non-public NIC design.
+> As the following 2 lines indicates that vhost-2920 is on_rq so can be
+> picked as next, thus its cfs_rq must have at least one entity.
 > 
-> [...]
+> While the above 4 lines shows nr=0, so the "comm= pid=0" task(s) can't
+> be in the same cgroup with vhost-2920.
+> 
+> Say vhost is in cgroupA, and "comm= pid=0" task with sev=86640641980
+> is in cgroupB ...
+> 
+This looks like an hierarchy enqueue staff. The temporary trace can get 
+comm and pid of vhost-2920, but failed for the other 4. I think the 
+reason is they were just se but not tasks. Seems this came from the 
+for_each_sched_entity(se) when doing enqueue vhost-2920. And the last 
+one with cfs_rq vruntime=86640641980 might be the root cgroup which was 
+on same level with kworkers.
 
-Here is the summary with links:
-  - [net-next,v2,1/3] net/ncsi: Simplify Kconfig/dts control flow
-    https://git.kernel.org/netdev/net-next/c/c797ce168930
-  - [net-next,v2,2/3] net/ncsi: Fix netlink major/minor version numbers
-    https://git.kernel.org/netdev/net-next/c/3084b58bfd0b
-  - [net-next,v2,3/3] net/ncsi: Add NC-SI 1.2 Get MC MAC Address command
-    https://git.kernel.org/netdev/net-next/c/b8291cf3d118
+So just from this tiny part of the trace log, there won't be thousands 
+ms level difference. Actually, it might be only 86642125805-86640641980 
+= 1.5 ms.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+correct me if there is anything wrong..
 
-
+Thanks,
+Honglei
+>>      CPU 3/KVM-2950    [014] dN...   576.161434: sched_stat_wait: 
+>> comm=vhost-2920 pid=2941 delay=9958 [ns]
+>>      CPU 3/KVM-2950    [014] d....   576.161435: sched_switch: 
+>> prev_comm=CPU 3/KVM prev_pid=2950 prev_prio=120 prev_state=S ==> 
+>> next_comm=vhost-2920 next_pid=2941 next_prio=120
+>>     vhost-2920-2941    [014] D....   576.161439: sched_waking: 
+>> comm=vhost-2286 pid=2309 prio=120 target_cpu=008
+>>     vhost-2920-2941    [014] d....   576.161446: sched_waking: 
+>> comm=kworker/14:0 pid=6525 prio=120 target_cpu=014
+>>     vhost-2920-2941    [014] d....   576.161447: sched_place: 
+>> comm=kworker/14:0 pid=6525 sev=86642125805 sed=86645125805 sel=0 
+>> avg=86642125805 min=86642125805 cpu=14 nr=1
+>> --> places kworker 6525 on cpu 14 with vruntime 86642125805
+>> -->  which is far larger than vhost vruntime of  4242563284
+> 
+> Here nr=1 means there is another entity in the same cfs_rq with the
+> newly woken kworker, but which? According to the vruntime, I would
+> assume kworker is in cgroupB.
 
