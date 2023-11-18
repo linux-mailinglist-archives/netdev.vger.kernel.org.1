@@ -1,126 +1,84 @@
-Return-Path: <netdev+bounces-48927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 070C37F00A5
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:53:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6FC7F00AA
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 16:53:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 648AE2812AD
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:53:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19B01F22AFF
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 15:53:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EC618C3B;
-	Sat, 18 Nov 2023 15:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660A718E37;
+	Sat, 18 Nov 2023 15:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IT8+IBr/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nm3gHz3a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F821FF3;
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86E71FF7;
 	Sat, 18 Nov 2023 07:51:54 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id 3f1490d57ef6-da3b4b7c6bdso2917083276.2;
-        Sat, 18 Nov 2023 07:51:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700322712; x=1700927512; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FRJAi9fqLnpZBQBfWveY0fRnarAyBBO44GyImL+GpQw=;
-        b=IT8+IBr/GjwsHiuzp7JbGVGoUMD6y1ZMGmXhJaeFaN9TrOcyttSLuKo4qdu1SmXbcG
-         VgMptIT0UAnXXPkr+htmJdWc8gttbfZJkgEawCYNoL3m1PmHFpTdb/1VYtDUa07e+tWc
-         YjIfSHyIXopdgUYFRwTlxcaaOtQKI762QKvW8zdhLUU+jOHItUV2D9HlB/xKYgi2d27J
-         Tx+DKwf0B/ilLwI6vSXqzgjVkD61+aQRmW9T+9xlfrfdXzy9qxHVkFY/cat075drS2di
-         /foAu1lF96mWe7J41kM2yRloUptbCXY6fjPpShM53bkrQJ+krv3IFOWamSUUxClDXG39
-         4i5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700322712; x=1700927512;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FRJAi9fqLnpZBQBfWveY0fRnarAyBBO44GyImL+GpQw=;
-        b=mDBnc/xl3/t16XUHfApkuAktgGMjkyxeKEp9vBN0+hxNFXHTqEHzokNr9YK+VsAsKF
-         FTOEo88in//BEuOU0B3wE8a0L9+6hYJj6TTNznIDk6yy2RaI95MssBIIKBq3Pd0NqI2z
-         wDmH0xpka0HJQ8tgr3kdtTHoi8X0k4U4itbl1aEUWeTU4MKfRPQx3L6BrlEsMVUilQOE
-         aw9m9jzk/Ciy6b3vDILc+FOIFiXzC2zN4SUIe+v+grOfQSWlrcugQQI22Xikx7qyYfVd
-         L+leu3AqRb6r2KsJ0iU0Hv0PYJOwZQ/KjYo7Cnn9/kSZ+yzld/NPLvH/drU8h4DrTGA+
-         KPSQ==
-X-Gm-Message-State: AOJu0Yy+Fkdbs3cozq22sc2AkHohJpbMBiASZs2x7WLhVxu9P0cdIjUm
-	8J08UJJ4YcruDo/4vry5oWqTLuzICP1NQ/lp
-X-Google-Smtp-Source: AGHT+IElJ0U3CjFZG+s3NnFjnzuVmrFeyc2e4WM5oO3xxPOV5mRPbrBHmRloD2DElouQFvaTAENskA==
-X-Received: by 2002:a05:6902:212:b0:d9a:d7a5:e445 with SMTP id j18-20020a056902021200b00d9ad7a5e445mr2342423ybs.49.1700322711961;
-        Sat, 18 Nov 2023 07:51:51 -0800 (PST)
-Received: from localhost ([2601:344:8301:57f0:48a9:bd4c:868d:dc97])
-        by smtp.gmail.com with ESMTPSA id e62-20020a25a3c4000000b00da10d9e96cesm1006690ybi.35.2023.11.18.07.51.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Nov 2023 07:51:51 -0800 (PST)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Yury Norov <yury.norov@gmail.com>,
-	Jan Kara <jack@suse.cz>,
-	Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>,
-	Matthew Wilcox <willy@infradead.org>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
-	Alexey Klimov <klimov.linux@gmail.com>
-Subject: [PATCH 29/34] net: smc: fix opencoded find_and_set_bit() in smc_wr_tx_get_free_slot_index()
-Date: Sat, 18 Nov 2023 07:51:00 -0800
-Message-Id: <20231118155105.25678-30-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20231118155105.25678-1-yury.norov@gmail.com>
-References: <20231118155105.25678-1-yury.norov@gmail.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1hYM5k/OHJIzmc6ChT9Yo9Kr+sThyS1yvMvl/d2IeDU=; b=nm3gHz3aDSLq2/llOzW0U+nuKn
+	o2SNCFi4rcF7TqLhPDzjkyCehL4mE51lMojstFVeXqTHRP1h2YOzZlP4cDCbn7xhn3a/9TEm6F5qJ
+	VkFlZJv8e8E0qeKWJv4aHmvgFm7K9F3EF8b7Lke2vIqCVMYsSOKockkdUeaeaVyIFRK4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r4Nbi-000Vtr-FC; Sat, 18 Nov 2023 16:51:42 +0100
+Date: Sat, 18 Nov 2023 16:51:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, corbet@lwn.net,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
+Message-ID: <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
+References: <20231118062754.2453-1-quic_luoj@quicinc.com>
+ <20231118062754.2453-4-quic_luoj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231118062754.2453-4-quic_luoj@quicinc.com>
 
-The function opencodes find_and_set_bit() with a for_each() loop. Fix
-it, and make the whole function a simple almost one-liner.
+On Sat, Nov 18, 2023 at 02:27:51PM +0800, Luo Jie wrote:
+> Add qca8084 PHY support, which is four-port PHY with maximum
+> link capability 2.5G, the features of each port is almost same
+> as QCA8081 and slave seed config is not needed.
+> 
+> Three kind of interface modes supported by qca8084.
+> PHY_INTERFACE_MODE_10G_QXGMII, PHY_INTERFACE_MODE_2500BASEX and
+> PHY_INTERFACE_MODE_SGMII.
 
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- net/smc/smc_wr.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+Sorry for joining the conversation late.
 
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index 0021065a600a..b6f0cfc52788 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -170,15 +170,11 @@ void smc_wr_tx_cq_handler(struct ib_cq *ib_cq, void *cq_context)
- 
- static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
- {
--	*idx = link->wr_tx_cnt;
- 	if (!smc_link_sendable(link))
- 		return -ENOLINK;
--	for_each_clear_bit(*idx, link->wr_tx_mask, link->wr_tx_cnt) {
--		if (!test_and_set_bit(*idx, link->wr_tx_mask))
--			return 0;
--	}
--	*idx = link->wr_tx_cnt;
--	return -EBUSY;
-+
-+	*idx = find_and_set_bit(link->wr_tx_mask, link->wr_tx_cnt);
-+	return *idx < link->wr_tx_cnt ? 0 : -EBUSY;
- }
- 
- /**
--- 
-2.39.2
+I'm trying to get my head around QXGMII. Let me describe what i think
+is happening, and then you can correct me....
 
+You have 4 MACs, probably in a switch. The MII interfaces from these
+MACs go into a multiplexer, and out comes QXGMII? You then have a
+SERDES interface out of the switch and into the PHY package. Inside
+the PHY package there is a demultiplexor, giving you four MII
+interfaces, one to each PHY in the package.
+
+If you have the PHY SERDES running in 2500BaseX, you have a single
+MAC, no mux/demux, and only one PHY is used? The other three are idle.
+Same from SGMII?
+
+So the interface mode QXGMII is a property of the package. It is not
+really a property of one PHY. Having one PHY using QXGMII and another
+SGMII does not work?
+
+     Andrew
 
