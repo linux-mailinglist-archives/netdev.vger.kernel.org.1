@@ -1,245 +1,273 @@
-Return-Path: <netdev+bounces-48869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A4777EFD5F
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 04:09:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 531557EFDD0
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 06:14:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82A4BB20AAB
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 03:09:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72E77B20ABE
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 05:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8D446B9;
-	Sat, 18 Nov 2023 03:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2FCD297;
+	Sat, 18 Nov 2023 05:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="a1Y3OLky"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="BsTnY1nE"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2086.outbound.protection.outlook.com [40.107.22.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9230D120
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 19:09:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TzhlgPiVMeuu/j7Q1hJEZJ4IrlSLV/K2f21q9fE8f35zY5ET8xj8wUZDpW+tEO/9m4oiMMoWsDL1tixIFiAgx9czjUcorbgbEw7NVRDYYNH8ToKiZiuyclOTzbAeSasq9jh53Co7NY6uAfqiydLFZuGGKmvQKUNmZQU4lsuIkpMwTZi8CucHSe/OnymwZRqcjj14sYszyNs95mQxw5MYp7TNLW9lJFz16qDdcrSVz8gGVBrZstGySP8v1k0QQVghk15Ly48rQ3PaH7FJ85bGF5KlmDqxijdll3RFR/kA2LFrJBrzuh2z+9PGod+wgsIrAv22omZU+8VUdQdNQu1rrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ifE7hpRjf2YCf2xYcatsRt5WEDCIjNbnMyxXUqbJ0Xo=;
- b=da+QJi82ROVu00SvMQ2KTr9lXpkRtBkI0oZKqapWKplsl52J7EOO9ldyU8kILjV9nnpQTxTlFVIhFM2LTuVIvLKmeKytZ44mIdTiaM+qQ3yK+SfOYyyuS/bgPthMLRtmJ6zf2kmYzHX4KYMyc8D7NRQsya+7t4h88TDi/iSHJb24VocbGSbv4U8qQhSl+Mj98w8+SJ4EK0BeOmm9I+GvNjkzoUIOs0cjJDKWh1CBMfW73ulXRxEyIbsesn2goXwzNy9Nn/n4g39RJpZIBD/cgrzz6SA1NigtxpISxtJCrnRgugOs5T/WFpKz5V2+z+T0iVzzHGbWEgEEaZKLhvSKPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=suse.com; dmarc=pass action=none header.from=suse.com;
- dkim=pass header.d=suse.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ifE7hpRjf2YCf2xYcatsRt5WEDCIjNbnMyxXUqbJ0Xo=;
- b=a1Y3OLkyattUrVlhauHmA+rnCUtVxicJ8oX8C/YqR+6OB3LxjpEIwxze6bpKFWW0eTXbGWIh0/m420MmWx3arok9CXFE5YEb83wgjePYnSkLuvlzQtysshFSJMRWzwXqoholPI2L5Tbu8wTK4EEcnxzYRlTYI74JVVZRr9XVPzbEvkP1dITzeN59NpYjPhiK5g0Qs6EZEyXaBspljm4ZdQ2yR3LXC7Hk6kKdqB1b1LB3z8uoGSerShGz6c7jnyi/3WdfubnxPneehdtGOAclMnW4qZtIJ/XM24HRAiWOXgALXpDE+jTR2KO0qGeXG/iuvewyCuRuBzSsmxeqK9kMBQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=suse.com;
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com (2603:10a6:7:83::14)
- by PAXPR04MB8847.eurprd04.prod.outlook.com (2603:10a6:102:20e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.11; Sat, 18 Nov
- 2023 03:09:05 +0000
-Received: from HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::7102:259:f268:5321]) by HE1PR0402MB3497.eurprd04.prod.outlook.com
- ([fe80::7102:259:f268:5321%7]) with mapi id 15.20.7025.009; Sat, 18 Nov 2023
- 03:09:04 +0000
-Date: Sat, 18 Nov 2023 11:09:16 +0800
-From: Geliang Tang <geliang.tang@suse.com>
-To: Mat Martineau <martineau@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next v3 03/15] selftests: mptcp: add
- chk_subflows_total helper
-Message-ID: <20231118030916.GA3271@bogon>
-References: <20231115-send-net-next-2023107-v3-0-1ef58145a882@kernel.org>
- <20231115-send-net-next-2023107-v3-3-1ef58145a882@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231115-send-net-next-2023107-v3-3-1ef58145a882@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-ClientProxiedBy: TYCP286CA0347.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:405:7c::7) To HE1PR0402MB3497.eurprd04.prod.outlook.com
- (2603:10a6:7:83::14)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C814E10DA
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 21:14:38 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1cc5b705769so24050585ad.0
+        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 21:14:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1700284478; x=1700889278; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=clpaUzNSF9Y0euKE8HoT2iNeGOFsJJ2CPhGb7WB9NWY=;
+        b=BsTnY1nEzmKWiPCM+jxUY0lWMAwVTwUSBET17EHcLSQzcvzCcOE/2SuxBXwe9N18S0
+         SOTV5DBinDPjhx3Ut2IVhTGxeUlC/sbjKKPOaMON+bqxDZEj8qFr/K/Sp+i8sz/p6CyO
+         ibkKAUWvoagsNN9NaxPDOpO6bPd9H4Hm1ptEtcpxrJc0TnsrzWer0cfNYwSRSrfElqlD
+         /aM5TUadBK76O7fxAjGc+FqvuHNk6yrSXsJMYkuycmdOHxYvItC8fITNlSx7rD1R9r9g
+         4fXT6J0JWDKroENXS4t4VmsuJaOOjweWDO0IOFiwvG4HS+bPGTWN0r5U00tUcISok5G9
+         qu9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700284478; x=1700889278;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=clpaUzNSF9Y0euKE8HoT2iNeGOFsJJ2CPhGb7WB9NWY=;
+        b=HQFgsw5+l/IJWI0gmnexTKP6oVREP26DKiTQrfYEP9t9HJ53wbcnJnUrtrdZZMxFLH
+         XtYBWy1rxJoLglQHDsLKU9QclJ2aeSZjD2WP4zELVLK8iD7F1fjTVyJQkhsGnP1GJY6L
+         oWiG6DIn1aoYN+Wkatswxhn+s47lIlT3PQf4nc30ua86wUE7+Q6a7Keomwlwe4qmMQSG
+         ASIFaRf2d0VLcKmTHu7c842GWhiAx3t2sxTP3+VIWm3K55SISjpalNj6+uGuAWkap2qf
+         K13upoE9xjnZ4eBMxRs10Y3mAQQLo9V9caknpObzOI9VE8v25mtYthU4K0Zj7f/LDQiZ
+         XkUw==
+X-Gm-Message-State: AOJu0YyxspGd8KsTm12Td0OzL/pwOD21JRscCv1I5dWLqw3JuYp34Ns9
+	6TaZEtUrD72jZIjz6XQETAJoMQ==
+X-Google-Smtp-Source: AGHT+IH+WryRLNe/R1V4RIlPH4bOFnaXQppN9drDViTVHC5Ye2XTJrkIRTbF7/e5t4ucDzSjgCBwhg==
+X-Received: by 2002:a17:903:41cb:b0:1cc:5691:5113 with SMTP id u11-20020a17090341cb00b001cc56915113mr2229960ple.26.1700284478075;
+        Fri, 17 Nov 2023 21:14:38 -0800 (PST)
+Received: from [10.254.46.51] ([139.177.225.228])
+        by smtp.gmail.com with ESMTPSA id e19-20020a170902ed9300b001c61921d4d2sm2214306plj.302.2023.11.17.21.14.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Nov 2023 21:14:37 -0800 (PST)
+Message-ID: <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
+Date: Sat, 18 Nov 2023 13:14:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: HE1PR0402MB3497:EE_|PAXPR04MB8847:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1c0f63f-e482-438a-47bb-08dbe7e3b7ed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yzX7eS48rnWuUuXaC+fE5pzK/FFMXtmPwwe/Li/Dm2bFAy9GeJfCy3saZFEQ4F/dEKLTS/FO6FnedO4O+5MfdqNIYXGjogGcDLd16wiU+kvGduSdxr9IRXbZGarsCnHtYEYJzstnCQbJd366rm7y1/M/ktnO1WPZMB9easGXuIf8vqz4cJ0DgMc+d8QcpH08zdvke7kYAvsfw7vDjqlVK9JjVzKgNwMpdLEWNLyHQX9mBHCDWwWu7WjfY4atikb3AxwbmxfavpwMpXs2eQJSi/PHVR/pZpG7Uag0hDoUPladwcdLNfdNw0QpYwoKKqaIvXzTD27607JyoKcEvQlzbO64hXq/8mkHR7zdC9QHM2+sPsx/jzmoR/v1Pvylkg6KXs0p8KVIgMtO7jCvzJq4OOhOjFLoNrr5aldrPVV02PSWSTMq6R4TVwglUpNz2ZTQp0SnH0VRxmYQgvmTsVWu8KJIaWedAGHtkaZJwqqmv0KRbr7KLaMKEgq/00sV22kj1nlsJzdEetoqHdrGsThlpa2JxSTXUs5aURMB1C8BH5VocqB3Ycv2aOINoikqhXCLcMrBjlW1kJkWzPFpPzQK9aQCAu6hNmyf+16LMjjEXTw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:HE1PR0402MB3497.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(39860400002)(136003)(376002)(396003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(1076003)(5660300002)(86362001)(2906002)(44832011)(8936002)(4326008)(8676002)(33656002)(41300700001)(33716001)(83380400001)(26005)(66556008)(66476007)(54906003)(316002)(6916009)(6666004)(66946007)(6506007)(478600001)(6486002)(6512007)(9686003)(38100700002)(13296009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6NOWEcCa1HuIHTJRANVhQ8kFlE09qgxSrgv+9zharH9CBWdmm+ujzCCreiej?=
- =?us-ascii?Q?d7vaRF907iXQNFHoexTMqa5XMkmFmGZTsaO+zdTfLsHmkF73oCb00FMlmyAT?=
- =?us-ascii?Q?vdHQ87fI5yHuHfGbLV1Rxkv/9PFaOC7RGIWjDBnoNKlGIhpFdpVriMwuadnd?=
- =?us-ascii?Q?GGoZZxK1ZwVeHYVNNS3i5xCxuuqfDLzNSLv6QIgk9EkC5opzjz5qttUmDota?=
- =?us-ascii?Q?A+BEXUHUgCyJ+7qoteTFoPgme6e8pffezqaSD50q+A4d4/xOrrBsVpbbluDM?=
- =?us-ascii?Q?k1Qzt9vr9LUj+lRQbTxVsXmLrq2mh3REoMKyUbRZl3fxW0178WssSDCaE4UY?=
- =?us-ascii?Q?2rOLaEB2k1c2LQfo6egtKjqyRHU9Dkg2MMjDmJbq/jUSplYRwS/9gI+OG2Dt?=
- =?us-ascii?Q?r0yWXjnxGLvItEfLigpmgt7mB6fWBoVTfpNCkq6xk6yQRLU7U8F/FwtEPKkm?=
- =?us-ascii?Q?8/7ND4VCYLcy7PvZsuF4Jj+9MEwwbyj6QbiEwjnpHhj5ZMyJA7VQqLOoQJLc?=
- =?us-ascii?Q?8JI4xfzFCPgjSwwrOdQIkSZzi0IoVOQ7CWk/BfvPul757ncPmOIPF9UO6fM2?=
- =?us-ascii?Q?bUekABZgTJ23CFS4CayMYeQ0foaL4HWUYrm9c/rY2j0OOp1A1PiB0aNcRA1U?=
- =?us-ascii?Q?NQFsd9EyzZfnyGloDBU4qvYqZ4m6QgkO2v2yx96L4a3XjjriAiO1mjBdlOUf?=
- =?us-ascii?Q?ISiFF+cnpj+rVhIZ08+AknAPk4ObuaLaq/kl0Vvpvu0YlXsBT2cEhfAChOFg?=
- =?us-ascii?Q?+jBnrC/yncWySeTnIJgzhsuXhJKmj7lsMyXRd2LuOi96sOqRO2/0ARJp4sdC?=
- =?us-ascii?Q?xuCM+ueqtMUK/PMmuflCwIRPEzf3dLOOpyBw/ewshv8gqApdvq2ZS6KUiXyh?=
- =?us-ascii?Q?gBj+wsfILgjAnHsk3z+5NxoLhawQqE94H2SFATE2Lkpgj6StzFoCWDHFC5HM?=
- =?us-ascii?Q?vSsdVnz+v/R81gsWn1aiKRFz+FOGP8sWM6frrfXfUk+VzdxAZNmMU/49iTTH?=
- =?us-ascii?Q?lm1wxDBU78R4Ia1nWVb5A33jldpUEAAnJhWFc7CcDHRWdpV41XxIApDzWYhc?=
- =?us-ascii?Q?VJflE1T8gFM7hWlyskHCrMknTCW9Q2UHabFPagEMNohd4aOn5FuvXavqh+3m?=
- =?us-ascii?Q?YpAm1migxdfN62Fo8avcHVjQcde8+bal9qk2sejEPiiuKSXCqFAWQM99kBg/?=
- =?us-ascii?Q?0vibguodTkZ0rs/qxAU56SO9ZJtKMQDHRYW0XZssJhu9ir3H5biWLpoVxbkF?=
- =?us-ascii?Q?au6difrShoCtQn4fJ6N0lDQRBPFbOn35xT+QaUKayl6kRrk6HDn76C7aAAvS?=
- =?us-ascii?Q?AWsIOIiz2M6ez81Ni00Qi+TqwvnSzyolXZGRHjPmOkJr6j7rlykV9XHR+3Y3?=
- =?us-ascii?Q?VpINeKFuJOgrW7IZhiLE8+eb4cDVJ7Ut94TIXvm7wGC0sHcnqImNmj4f8Dmg?=
- =?us-ascii?Q?x1q+eLcFXj3BFAkGCqeoqiM9dx8twl92NzxDM6fLwe2VROy6xXdfDcCFdTMW?=
- =?us-ascii?Q?bm3KQwpI6ucG82DjGcHZrQ2nb2rP9eEkOIg9QCUCA7Vah0vqT8cmnWPIsdRV?=
- =?us-ascii?Q?SCCcePJsG7KoMZqTLl2X/tzj5d5QPTZ6xNO5U9yB/Dom4HrD/tBCJ8yWI99E?=
- =?us-ascii?Q?eg=3D=3D?=
-X-OriginatorOrg: suse.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1c0f63f-e482-438a-47bb-08dbe7e3b7ed
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0402MB3497.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2023 03:09:03.7335
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: f7a17af6-1c5c-4a36-aa8b-f5be247aa4ba
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Lfm8CD/2PZcjed+oZV+Av5zi1cfWRKVn4Fx5SYsafDwbiTeH4OB99LqLeoASorsYRwMeept9ug+4u+/Wni0U0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8847
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair:
+ Add lag based placement)
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>,
+ Tobias Huschle <huschle@linux.ibm.com>
+Cc: Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Mat,
-
-On Wed, Nov 15, 2023 at 04:31:31PM -0800, Mat Martineau wrote:
-> From: Geliang Tang <geliang.tang@suse.com>
+On 11/17/23 5:23 PM, Peter Zijlstra Wrote:
 > 
-> This patch adds a new helper chk_subflows_total(), in it use the newly
-> added counter mptcpi_subflows_total to get the "correct" amount of
-> subflows, including the initial one.
+> Your email is pretty badly mangled by wrapping, please try and
+> reconfigure your MUA, esp. the trace and debug output is unreadable.
 > 
-> To be compatible with old 'ss' or kernel versions not supporting this
-> counter, get the total subflows by listing TCP connections that are
-> MPTCP subflows:
+> On Thu, Nov 16, 2023 at 07:58:18PM +0100, Tobias Huschle wrote:
 > 
->     ss -ti state state established state syn-sent state syn-recv |
->         grep -c tcp-ulp-mptcp.
+>> The base scenario are two KVM guests running on an s390 LPAR. One guest
+>> hosts the uperf server, one the uperf client.
+>> With EEVDF we observe a regression of ~50% for a strburst test.
+>> For a more detailed description of the setup see the section TEST SUMMARY at
+>> the bottom.
 > 
-> Reviewed-by: Matthieu Baerts <matttbe@kernel.org>
-> Signed-off-by: Geliang Tang <geliang.tang@suse.com>
-> Signed-off-by: Mat Martineau <martineau@kernel.org>
-> ---
->  tools/testing/selftests/net/mptcp/mptcp_join.sh | 41 ++++++++++++++++++++++++-
->  1 file changed, 40 insertions(+), 1 deletion(-)
+> Well, that's not good :/
 > 
-> diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-> index f064803071f1..2130e3b7790f 100755
-> --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-> +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-> @@ -1867,7 +1867,7 @@ chk_mptcp_info()
->  	local cnt2
->  	local dump_stats
->  
-> -	print_check "mptcp_info ${info1:0:8}=$exp1:$exp2"
-> +	print_check "mptcp_info ${info1:0:15}=$exp1:$exp2"
->  
->  	cnt1=$(ss -N $ns1 -inmHM | mptcp_lib_get_info_value "$info1" "$info1")
->  	cnt2=$(ss -N $ns2 -inmHM | mptcp_lib_get_info_value "$info2" "$info2")
-> @@ -1888,6 +1888,41 @@ chk_mptcp_info()
->  	fi
->  }
->  
-> +# $1: subflows in ns1 ; $2: subflows in ns2
-> +# number of all subflows, including the initial subflow.
-> +chk_subflows_total()
-> +{
-> +	local cnt1
-> +	local cnt2
-> +	local info="subflows_total"
-
-Sorry, this line should be added here:
-
-	local dump_stats
-
-Otherwise, no place to set 0 to dump_stats, if a test fails. Then
-unexpected dump infos will be showed in all the subsequent outputs
-of chk_subflows_total().
-
-I'll send a squash-to patch to fix this.
-
-Thanks,
--Geliang
-
-
-> +
-> +	# if subflows_total counter is supported, use it:
-> +	if [ -n "$(ss -N $ns1 -inmHM | mptcp_lib_get_info_value $info $info)" ]; then
-> +		chk_mptcp_info $info $1 $info $2
-> +		return
-> +	fi
-> +
-> +	print_check "$info $1:$2"
-> +
-> +	# if not, count the TCP connections that are in fact MPTCP subflows
-> +	cnt1=$(ss -N $ns1 -ti state established state syn-sent state syn-recv |
-> +	       grep -c tcp-ulp-mptcp)
-> +	cnt2=$(ss -N $ns2 -ti state established state syn-sent state syn-recv |
-> +	       grep -c tcp-ulp-mptcp)
-> +
-> +	if [ "$1" != "$cnt1" ] || [ "$2" != "$cnt2" ]; then
-> +		fail_test "got subflows $cnt1:$cnt2 expected $1:$2"
-> +		dump_stats=1
-> +	else
-> +		print_ok
-> +	fi
-> +
-> +	if [ "$dump_stats" = 1 ]; then
-> +		ss -N $ns1 -ti
-> +		ss -N $ns2 -ti
-> +	fi
-> +}
-> +
->  chk_link_usage()
->  {
->  	local ns=$1
-> @@ -3431,10 +3466,12 @@ userspace_tests()
->  		chk_join_nr 1 1 1
->  		chk_add_nr 1 1
->  		chk_mptcp_info subflows 1 subflows 1
-> +		chk_subflows_total 2 2
->  		chk_mptcp_info add_addr_signal 1 add_addr_accepted 1
->  		userspace_pm_rm_sf_addr_ns1 10.0.2.1 10
->  		chk_rm_nr 1 1 invert
->  		chk_mptcp_info subflows 0 subflows 0
-> +		chk_subflows_total 1 1
->  		kill_events_pids
->  		wait $tests_pid
->  	fi
-> @@ -3451,9 +3488,11 @@ userspace_tests()
->  		userspace_pm_add_sf 10.0.3.2 20
->  		chk_join_nr 1 1 1
->  		chk_mptcp_info subflows 1 subflows 1
-> +		chk_subflows_total 2 2
->  		userspace_pm_rm_sf_addr_ns2 10.0.3.2 20
->  		chk_rm_nr 1 1
->  		chk_mptcp_info subflows 0 subflows 0
-> +		chk_subflows_total 1 1
->  		kill_events_pids
->  		wait $tests_pid
->  	fi
+>> Short summary:
+>> The mentioned kworker has been scheduled to CPU 14 before the tracing was
+>> enabled.
+>> A vhost process is migrated onto CPU 14.
+>> The vruntimes of kworker and vhost differ significantly (86642125805 vs
+>> 4242563284 -> factor 20)
 > 
-> -- 
-> 2.41.0
+> So bear with me, I know absolutely nothing about virt stuff. I suspect
+> there's cgroups involved because shiny or something.
 > 
+> kworkers are typically not in cgroups and are part of the root cgroup,
+> but what's a vhost and where does it live?
+> 
+> Also, what are their weights / nice values?
+> 
+>> The vhost process wants to wake up the kworker, therefore the kworker is
+>> placed onto the runqueue again and set to runnable.
+>> The vhost process continues to execute, waking up other vhost processes on
+>> other CPUs.
+>>
+>> So far this behavior is not different to what we see on pre-EEVDF kernels.
+>>
+>> On timestamp 576.162767, the vhost process triggers the last wake up of
+>> another vhost on another CPU.
+>> Until timestamp 576.171155, we see no other activity. Now, the vhost process
+>> ends its time slice.
+>> Then, vhost gets re-assigned new time slices 4 times and gets then migrated
+>> off to CPU 15.
+> 
+> So why does this vhost stay on the CPU if it doesn't have anything to
+> do? (I've not tried to make sense of the trace, that's just too
+> painful).
+> 
+>> This does not occur with older kernels.
+>> The kworker has to wait for the migration to happen in order to be able to
+>> execute again.
+>> This is due to the fact, that the vruntime of the kworker is significantly
+>> larger than the one of vhost.
+> 
+> That's, weird. Can you add a trace_printk() to update_entity_lag() and
+> have it print out the lag, limit and vlag (post clamping) values? And
+> also in place_entity() for the reverse process, lag pre and post scaling
+> or something.
+> 
+> After confirming both tasks are indeed in the same cgroup ofcourse,
+> because if they're not, vruntime will be meaningless to compare and we
+> should look elsewhere.
+> 
+> Also, what HZ and what preemption mode are you running? If kworker is
+> somehow vastly over-shooting it's slice -- keeps running way past the
+> avg_vruntime, then it will build up a giant lag and you get what you
+> describe, next time it wakes up it gets placed far to the right (exactly
+> where it was when it 'finally' went to sleep, relatively speaking).
+> 
+>> We found some options which sound plausible but we are not sure if they are
+>> valid or not:
+>>
+>> 1. The wake up path has a dependency on the vruntime metrics that now delays
+>> the execution of the kworker.
+>> 2. The previous commit af4cf40470c2 (sched/fair: Add cfs_rq::avg_vruntime)
+>> which updates the way cfs_rq->min_vruntime and
+>>      cfs_rq->avg_runtime are set might have introduced an issue which is
+>> uncovered with the commit mentioned above.
+> 
+> Suppose you have a few tasks (of equal weight) on you virtual timeline
+> like so:
+> 
+>     ---------+---+---+---+---+------
+>              ^       ^
+> 	    |       `avg_vruntime
+> 	    `-min_vruntime
+> 
+> Then the above would be more or less the relative placements of these
+> values. avg_vruntime is the weighted average of the various vruntimes
+> and is therefore always in the 'middle' of the tasks, and not somewhere
+> out-there.
+> 
+> min_vruntime is a monotonically increasing 'minimum' that's left-ish on
+> the tree (there's a few cases where a new task can be placed left of
+> min_vruntime and its no longer actuall the minimum, but whatever).
+> 
+> These values should be relatively close to one another, depending
+> ofcourse on the spread of the tasks. So I don't think this is causing
+> trouble.
+> 
+> Anyway, the big difference with lag based placement is that where
+> previously tasks (that do not migrate) retain their old vruntime and on
+> placing they get pulled forward to at least min_vruntime, so a task that
+> wildly overshoots, but then doesn't run for significant time can still
+> be overtaken and then when placed again be 'okay'.
+> 
+> Now OTOH, with lag-based placement,  we strictly preserve their relative
+> offset vs avg_vruntime. So if they were *far* too the right when they go
+> to sleep, they will again be there on placement.
+
+Hi Peter, I'm a little confused here. As we adopt placement strategy #1
+when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
+Given that the weight doesn't change, we have:
+
+	vl' = vl
+
+But in fact it is scaled on placement:
+
+	vl' = vl * W/(W + w)
+
+Does this intended? And to illustrate my understanding of strategy #1:
+
+diff --git a/kernel/sched/fair.c b/kernel/sched/fair.c
+index 07f555857698..a24ef8b297ed 100644
+--- a/kernel/sched/fair.c
++++ b/kernel/sched/fair.c
+@@ -5131,7 +5131,7 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+  	 *
+  	 * EEVDF: placement strategy #1 / #2
+  	 */
+-	if (sched_feat(PLACE_LAG) && cfs_rq->nr_running) {
++	if (sched_feat(PLACE_LAG) && cfs_rq->nr_running && se->vlag) {
+  		struct sched_entity *curr = cfs_rq->curr;
+  		unsigned long load;
+  
+@@ -5150,7 +5150,10 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+  		 * To avoid the 'w_i' term all over the place, we only track
+  		 * the virtual lag:
+  		 *
+-		 *   vl_i = V - v_i <=> v_i = V - vl_i
++		 *   vl_i = V' - v_i <=> v_i = V' - vl_i
++		 *
++		 * Where V' is the new weighted average after placing this
++		 * entity, and v_i is its newly assigned vruntime.
+  		 *
+  		 * And we take V to be the weighted average of all v:
+  		 *
+@@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+  		 * vl_i is given by:
+  		 *
+  		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
+-		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
+-		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
+-		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
+-		 *      = V - w_i*vl_i / (W + w_i)
+-		 *
+-		 * And the actual lag after adding an entity with vl_i is:
+-		 *
+-		 *   vl'_i = V' - v_i
+-		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
+-		 *         = vl_i - w_i*vl_i / (W + w_i)
+-		 *
+-		 * Which is strictly less than vl_i. So in order to preserve lag
+-		 * we should inflate the lag before placement such that the
+-		 * effective lag after placement comes out right.
+-		 *
+-		 * As such, invert the above relation for vl'_i to get the vl_i
+-		 * we need to use such that the lag after placement is the lag
+-		 * we computed before dequeue.
++		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
++		 *      = V - w_i*vl_i / W
+  		 *
+-		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
+-		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
+-		 *
+-		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
+-		 *                   = W*vl_i
+-		 *
+-		 *   vl_i = (W + w_i)*vl'_i / W
+  		 */
+  		load = cfs_rq->avg_load;
+  		if (curr && curr->on_rq)
+  			load += scale_load_down(curr->load.weight);
+-
+-		lag *= load + scale_load_down(se->load.weight);
+  		if (WARN_ON_ONCE(!load))
+  			load = 1;
+-		lag = div_s64(lag, load);
++
++		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
+  	}
+  
+  	se->vruntime = vruntime - lag;
 
