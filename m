@@ -1,74 +1,81 @@
-Return-Path: <netdev+bounces-48863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9F47EFC53
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:57:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8BA7EFC57
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 01:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED566B20A4D
-	for <lists+netdev@lfdr.de>; Fri, 17 Nov 2023 23:57:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86BE1C20A3B
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6024776F;
-	Fri, 17 Nov 2023 23:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2783A171DE;
+	Sat, 18 Nov 2023 00:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OCJL40iU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ptWfop5o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D8E1A1
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:57:47 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id 2adb3069b0e04-507be298d2aso3344283e87.1
-        for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 15:57:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700265466; x=1700870266; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RjVbPWtP8LjZJLsEaLgQrThLRhsfxmvypnJxdHR5WAs=;
-        b=OCJL40iU7zR6IvYH1x4Sk1DVKvvdxaaxeYqGr92fLKwf5LYPn+g5bkWjMuF14Xtip7
-         lTY9fmqDx4/90npO20UZ24DZ0JBYM9blRknZMYEsSH43zctaITbeYZaVvVrGwb0OmBz8
-         egZC5oOKwjge7Kio0lFHtIi8exfzzv7Q41qixd4dTuNxoqPi01xpNEJsNPtRZ4irRRLK
-         u2zpi431GpB8SNeD6TXslmMn6PW93MbOwtpdFYUWrkWNdibvsoy6OnoJAOigtOLyWTXZ
-         d21InlZIhhR8iAyzrYUeB+spC44SZiTP4nIxsEeR5Qqk+3L6rncKaz8hRHnrNx0tf9NV
-         CKnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700265466; x=1700870266;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RjVbPWtP8LjZJLsEaLgQrThLRhsfxmvypnJxdHR5WAs=;
-        b=UbNcYosL/qXCailanPM146sQKaCyOncOBPlah0z/5p0s0gTREyhrioyEomsF5IYPva
-         znliqzkyjA+2GqmxYQECQG4WfygWLyA8IxQu+YFYEauZpssT+e2Nu1UGRsmXLLvtrMHH
-         J84s/3BKkXFGoPecb4UkTUW59nm1OdxDHwSXLYZKjjbKW1e0ERYFe1nRQOFBxg6XgYXw
-         SNmhYbTXb6XhNM/qTJAJFfKOC9hSK5UXpAZYxRMu94z9CUBPxMT/AJBdjTGp8tuSByVg
-         hHbciRGFXKCg3UiiCjzERNQIR96nEwpbyiChtedX8+JdAia/4SGe0noh2f+2o2hcPEqO
-         w8cw==
-X-Gm-Message-State: AOJu0YyyNizh3+b5oxMO8BOiR7NVepuH+C/RHBYqx770j35UqFl7MuQe
-	lebH6ioMKqLg8tHzx73WmWAW5foL58vNLZoLZGDzBLL2S8v4KA==
-X-Google-Smtp-Source: AGHT+IECL9/DJvGvbrwdv0bZDXVLktb2KXGdQ5u/kxXeRPDqP/Mz7FijEy7tivkmiMR1mGePqgs4bG8ntF4wPYCRWYg=
-X-Received: by 2002:ac2:4283:0:b0:509:8e81:1aa4 with SMTP id
- m3-20020ac24283000000b005098e811aa4mr667842lfh.39.1700265465633; Fri, 17 Nov
- 2023 15:57:45 -0800 (PST)
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0EE10CE
+	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 16:00:22 -0800 (PST)
+Message-ID: <5b187e42-5cfb-4004-9c96-3caac42749b2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700265620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mCXhv6F+HuhQNpbEGxnDGnDNABQJmtcjmKp9u2zZ4kQ=;
+	b=ptWfop5oRqhFha5LLSrTHtT9G5fkGQkLqROD7pLs6rXkk44GtGEelAbD4/VlVJCeh75UBa
+	W4vb9KFbXJL8fokDl88Pgb4l6RaNGHIxasbLuCUf65wFZHYQmoqjNUClkdizymCMx6MYdd
+	8/e5iP0M+8jgo31yX64e7N8XuXTvPM4=
+Date: Fri, 17 Nov 2023 16:00:13 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231117235140.1178-1-luizluca@gmail.com>
-In-Reply-To: <20231117235140.1178-1-luizluca@gmail.com>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Fri, 17 Nov 2023 20:57:34 -0300
-Message-ID: <CAJq09z6_4H6ZZJrjXZALuL9aHPy20FzvUivWfvSZRU1AXUX-Rw@mail.gmail.com>
-Subject: Re: [net-next 0/2] net: dsa: realtek: Introduce realtek_common, load
- variants on demand
-To: netdev@vger.kernel.org
-Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch, 
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	arinc.unal@arinc9.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH bpf v3 0/8] bpf_redirect_peer fixes
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: kuba@kernel.org, razor@blackwall.org, sdf@google.com, horms@kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, martin.lau@kernel.org
+References: <20231114004220.6495-1-daniel@iogearbox.net>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20231114004220.6495-1-daniel@iogearbox.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Sorry, I used the wrong prefix. It is missing PATCH. I'll fix it in a
-v2 after the first round of reviews.
+On 11/13/23 4:42 PM, Daniel Borkmann wrote:
+> This fixes bpf_redirect_peer stats accounting for veth and netkit,
+> and adds tstats in the first place for the latter. Utilise indirect
+> call wrapper for bpf_redirect_peer, and improve test coverage of the
+> latter also for netkit devices. Details in the patches, thanks!
+> 
+> The series was targeted at bpf originally, and is done here as well,
+> so it can trigger BPF CI. Jakub, if you think directly going via net
+> is better since the majority of the diff touches net anyway, that is
+> fine, too.
+> 
+> Thanks!
+> 
+> v2 -> v3:
+>    - Add kdoc for pcpu_stat_type (Simon)
+>    - Reject invalid type value in netdev_do_alloc_pcpu_stats (Simon)
+>    - Add Reviewed-by tags from list
+> v1 -> v2:
+>    - Move stats allocation/freeing into net core (Jakub)
+>    - As prepwork for the above, move vrf's dstats over into the core
+>    - Add a check into stats alloc to enforce tstats upon
+>      implementing ndo_get_peer_dev
+>    - Add Acked-by tags from list
+
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+
+Considering folks may still be traveling after LPC, will give it an extra 
+weekend before landing.
+
 
