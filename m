@@ -1,81 +1,70 @@
-Return-Path: <netdev+bounces-48864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC8BA7EFC57
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 01:00:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7279B7EFC87
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 01:26:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86BE1C20A3B
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B901F28063
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 00:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2783A171DE;
-	Sat, 18 Nov 2023 00:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D267F4;
+	Sat, 18 Nov 2023 00:26:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ptWfop5o"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p1U5NexM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0EE10CE
-	for <netdev@vger.kernel.org>; Fri, 17 Nov 2023 16:00:22 -0800 (PST)
-Message-ID: <5b187e42-5cfb-4004-9c96-3caac42749b2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1700265620;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mCXhv6F+HuhQNpbEGxnDGnDNABQJmtcjmKp9u2zZ4kQ=;
-	b=ptWfop5oRqhFha5LLSrTHtT9G5fkGQkLqROD7pLs6rXkk44GtGEelAbD4/VlVJCeh75UBa
-	W4vb9KFbXJL8fokDl88Pgb4l6RaNGHIxasbLuCUf65wFZHYQmoqjNUClkdizymCMx6MYdd
-	8/e5iP0M+8jgo31yX64e7N8XuXTvPM4=
-Date: Fri, 17 Nov 2023 16:00:13 -0800
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06101654;
+	Sat, 18 Nov 2023 00:26:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16F43C433C7;
+	Sat, 18 Nov 2023 00:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700267199;
+	bh=GSskpSkb+gqp7Ilh5CwUXkWbfmd9WvqPk0X0bLR5x60=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=p1U5NexMi9d6MmNo06+HGgtQWdWWQOYW3+//xMvP1lzjOS1GdyYhkRVH/MSbNcz9V
+	 QtuJ2PXISDTfIxjBOlcwzYC5WOyWTR0qEH6Y1gem5Xi/lmkRjFo7pMqJ92RV8TO5Z1
+	 Qzl3U9k2b/hvE1G5pNe8VzDTPy9CnIhECBwhx0M8pwxkTY76er2YBGWGAkyn6f/UDU
+	 rSuJDtTjfagGUBeQcpyu8XypxSQGcZGSAOKqcQusTdjWwaOna6dOYVG2fZtS/i61R1
+	 QC3zy2ETnJdpFAqVjgK5zpc+4weFZq7d2vlwQDKiWvrdNglCYGQC/sllPBIbwpF7RI
+	 fiqsujy/KWNhA==
+Date: Fri, 17 Nov 2023 16:26:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ mhi@lists.linux.dev, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, loic.poulain@linaro.org
+Subject: Re: [PATCH v2 0/2] Add MHI Endpoint network driver
+Message-ID: <20231117162638.7cdb3e7d@kernel.org>
+In-Reply-To: <20231117070602.GA10361@thinkpad>
+References: <20230607152427.108607-1-manivannan.sadhasivam@linaro.org>
+	<20230607094922.43106896@kernel.org>
+	<20230607171153.GA109456@thinkpad>
+	<20230607104350.03a51711@kernel.org>
+	<20230608123720.GC5672@thinkpad>
+	<20231117070602.GA10361@thinkpad>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v3 0/8] bpf_redirect_peer fixes
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: kuba@kernel.org, razor@blackwall.org, sdf@google.com, horms@kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, martin.lau@kernel.org
-References: <20231114004220.6495-1-daniel@iogearbox.net>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20231114004220.6495-1-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 11/13/23 4:42 PM, Daniel Borkmann wrote:
-> This fixes bpf_redirect_peer stats accounting for veth and netkit,
-> and adds tstats in the first place for the latter. Utilise indirect
-> call wrapper for bpf_redirect_peer, and improve test coverage of the
-> latter also for netkit devices. Details in the patches, thanks!
-> 
-> The series was targeted at bpf originally, and is done here as well,
-> so it can trigger BPF CI. Jakub, if you think directly going via net
-> is better since the majority of the diff touches net anyway, that is
-> fine, too.
-> 
-> Thanks!
-> 
-> v2 -> v3:
->    - Add kdoc for pcpu_stat_type (Simon)
->    - Reject invalid type value in netdev_do_alloc_pcpu_stats (Simon)
->    - Add Reviewed-by tags from list
-> v1 -> v2:
->    - Move stats allocation/freeing into net core (Jakub)
->    - As prepwork for the above, move vrf's dstats over into the core
->    - Add a check into stats alloc to enforce tstats upon
->      implementing ndo_get_peer_dev
->    - Add Acked-by tags from list
+On Fri, 17 Nov 2023 12:36:02 +0530 Manivannan Sadhasivam wrote:
+> Sorry to revive this old thread, this discussion seems to have fell through the
+> cracks...
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+It did not fall thru the cracks, you got a nack. Here it is in a more
+official form:
 
-Considering folks may still be traveling after LPC, will give it an extra 
-weekend before landing.
+Nacked-by: Jakub Kicinski <kuba@kernel.org>
 
+Please make sure you keep this tag and CC me if you ever post any form
+of these patches again.
 
