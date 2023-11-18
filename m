@@ -1,101 +1,106 @@
-Return-Path: <netdev+bounces-48955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D5107F02DC
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 21:20:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4517F02EA
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 21:38:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A601F223B1
-	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 20:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3E40280E95
+	for <lists+netdev@lfdr.de>; Sat, 18 Nov 2023 20:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03FE1BDC5;
-	Sat, 18 Nov 2023 20:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC2710A2D;
+	Sat, 18 Nov 2023 20:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VLP+pfvd"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lalNSHdx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 863A71A1;
-	Sat, 18 Nov 2023 12:19:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SjXWAYmFEc1rO45Mv1FCK3wC/fa6+5kmEE0zIU9kiS0=; b=VLP+pfvdw1d3r5xTGcSD0PaueI
-	fRcAAr7XA7s+pc4BUmgqQDuhNbefPXcsMgi+BixYwYq/TQY7uZ6ZZyfBYw0XOj/et2KfurHfzYDXa
-	vFJrZg5IX99IXX5Gs3NS/pKMSgKajnXaQpRB1icjMs+NwQwAb5YezfZlmeZFj2S9y+OA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r4Rn2-000WiP-4j; Sat, 18 Nov 2023 21:19:40 +0100
-Date: Sat, 18 Nov 2023 21:19:40 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Luo Jie <quic_luoj@quicinc.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
-Message-ID: <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
-References: <20231118062754.2453-1-quic_luoj@quicinc.com>
- <20231118062754.2453-4-quic_luoj@quicinc.com>
- <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
- <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13CF7EA
+	for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 12:38:21 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-6b709048f32so2800324b3a.0
+        for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 12:38:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700339900; x=1700944700; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6LSMU/ZukUtOx0B/ljZRjSlpSbsqtb25KF9BQkQx1OE=;
+        b=lalNSHdxpdrUJP5cyGraBh49PPVrjZv3nlo5MKwt6savkR929iP6HbcbGVlE1KLgEA
+         oaRuFW+l+HXwR3UProkd4il5IgbJbM365Y78Ee6vAxo2rRiUZPxKWb7xUPkQOfpLa942
+         Q0Xdl5aq7mm6KjHCyM4P7OyUfL5bbWLPwIfma/6egEXKiPDUYdQDZenAXv4RDWMR79Xa
+         DLH/i0HRR75lWHQsDuJZairMeRqobIx+7CnTI5vjdYeGT34YBwNLF8iUVt438pH9DgtX
+         uoiQxWebic72qIuKi9gwIUjmUZJ3DjX0ylbVjEZPZPVj92sWv8bp+83WMAyaQv2ROpls
+         O3jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700339900; x=1700944700;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6LSMU/ZukUtOx0B/ljZRjSlpSbsqtb25KF9BQkQx1OE=;
+        b=CvH8jeV86i6PlY1Mc4qzS2tWKU6iTVqWPM17bsY4LHaM0UA30ZR9aaKm7FxtWSHVHf
+         eQ4zwTpP4nvX/+SsbdGunRNrfW3My70KceVcPH1mZ1VhjNsqs9HT+7Y6XCD19jCBVr9A
+         TGIXqW12n+Kjg6i/XHMEQb6cHDrZZAn1eF6RJd7BUzsO3FQI+usvHr5wCp5YQPNEmq/J
+         /CTsVsT+LAVvWSs6NUcRpvr9Hh4Tl9gzlDgTUHNmiqnIatD8nn71X/RosmLfh91AhrdW
+         dBuyYZI643x6h4cvQBQ2yBzplIxrpk8eTfro8UrnBLRzgaz24xIYERv4gN/ktk/iMtuI
+         Q39Q==
+X-Gm-Message-State: AOJu0YzDsGyTTOVkTJt31yVHtjEJuDKz/psjPqOfZ19u90KZFn2PYHRM
+	oZ/mHdapPCR1JoPA4CFL4fxNKA==
+X-Google-Smtp-Source: AGHT+IFHMhPEwbGpAjkRwDPq1TB+P10y+mh5wr8RBXIjk6csddJYymbHAcyf7nQQoRod6oNDc//50Q==
+X-Received: by 2002:a05:6a00:4509:b0:6bd:b7c5:f777 with SMTP id cw9-20020a056a00450900b006bdb7c5f777mr3274613pfb.16.1700339900429;
+        Sat, 18 Nov 2023 12:38:20 -0800 (PST)
+Received: from localhost.localdomain ([2804:7f1:e2c3:b02d:77:2195:4deb:3614])
+        by smtp.gmail.com with ESMTPSA id g31-20020a63565f000000b005891f3af36asm3403875pgm.87.2023.11.18.12.38.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Nov 2023 12:38:20 -0800 (PST)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	daniel@iogearbox.net
+Cc: netdev@vger.kernel.org,
+	kernel@mojatatu.com
+Subject: [PATCH RFC net-next 0/3] net: sched: Make tc-related drop reason more flexible for remaining qdiscs
+Date: Sat, 18 Nov 2023 17:37:51 -0300
+Message-ID: <20231118203754.2270159-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-> 10G_QXGMII is defined in the Cisco USXGMII multi-port document as one
-> of several possibilities for a USXGMII-M link. The Cisco document can
-> be a little confusing beause it states that 10G_QXGMII supports 10M,
-> 100M, 1G and 2.5G, and then only talks about a 10G and 100M/1G MAC.
-> 
-> For 10G_QXGMII, there are 4 MAC interfaces. These are connected to a
-> rate "adaption" through symbol replication block, and then on to a
-> clause 49 PCS block.
-> 
-> There is then a port MUX and framing block, followed by the PMA
-> serdes which communicates with the remote end over a single pair of
-> transmit/receive serdes lines.
-> 
-> Each interface also has its own clause 37 autoneg block.
-> 
-> So, for an interface to operate in SGMII mode, it would have to be
-> muxed to a different path before being presented to the USXGMII-M
-> block since each interface does not have its own external data lane
-> - thus that's out of scope of USXGMII-M as documented by Cisco.
+This patch builds on Daniel's patch[1] to add initial support of tc drop
+reason. The main goal is to distinguish between policy and error drops for
+the remainder of the egress qdiscs (other than clsact).
+The drop reason is set by cls_api and act_api in the tc skb cb in case
+any error occurred in the data path.
 
-Hi Russell
+Also add new skb drop reasons that are idiosyncratic to TC.
 
-I think it helps.
+[1] https://lore.kernel.org/all/20231009092655.22025-1-daniel@iogearbox.net
 
-Where i'm having trouble is deciding if this is actually an interface
-mode. Interface mode is a per PHY property. Where as it seems
-10G_QXGMII is a property of the USXGMII-M link? Should we be
-representing the package with 4 PHYs in it, and specify the package
-has a PMA which is using 10G_QXGMII over USXGMII-M? The PHY interface
-mode is then internal? Its just the link between the PHY and the MUX?
+Victor Nogueira (3):
+  net: sched: Move drop_reason to struct tc_skb_cb
+  net: sched: Make tc-related drop reason more flexible for remaining
+    qdiscs
+  net: sched: Add initial TC error skb drop reasons
 
-By saying the interface mode is 10G_QXGMII and not describing the PMA
-mode, are we setting ourselves up for problems in the future? Could
-there be a PMA interface which could carry different PHY interface
-modes?
+ include/net/dropreason-core.h | 30 ++++++++++++++++++++---
+ include/net/pkt_cls.h         |  6 -----
+ include/net/pkt_sched.h       | 18 --------------
+ include/net/sch_generic.h     | 46 ++++++++++++++++++++++++++++++++++-
+ net/core/dev.c                | 11 ++++++---
+ net/sched/act_api.c           |  3 ++-
+ net/sched/cls_api.c           | 28 ++++++++++++---------
+ 7 files changed, 98 insertions(+), 44 deletions(-)
 
-If we decide we do want to use 10G_QXGMII as an interface made, i
-think the driver should be doing some validation. If asked to do
-anything else, it should return -EINVAL.
+-- 
+2.25.1
 
-And i don't yet understand how it can also do 1000BaseX and 2500BaseX
-and SGMII?
-
-    Andrew
 
