@@ -1,47 +1,49 @@
-Return-Path: <netdev+bounces-49033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7487F0751
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:08:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D0E67F0757
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:12:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A1C1F21843
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:08:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76E91B208C5
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15EB13FF1;
-	Sun, 19 Nov 2023 16:08:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8618D13AFD;
+	Sun, 19 Nov 2023 16:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wiv31T6A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlud+6eA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCCC2115;
-	Sun, 19 Nov 2023 08:08:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PqNhOHVUB0q9RpdnJQBOzBuTWvuux3ZuN7ljk9fyTT0=; b=wiv31T6A2ILuj9mkka+/EopnqN
-	DogKvvni8xh2OnKytcwm08LvRVlRPh1u/5oCtBDj4f6U4HlX4M1vnkPjfzo9b9aWw7QGh5pDiIhM6
-	kEKg32RbF4Pp845l/zcN2rjOWA5OzOnzTpKzt8gUwAi0WyoJWCcAC5jmOTa9W8n+Hcsw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r4kLN-000ZTH-Gn; Sun, 19 Nov 2023 17:08:21 +0100
-Date: Sun, 19 Nov 2023 17:08:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: aliceryhl@google.com, benno.lossin@proton.me,
-	miguel.ojeda.sandonis@gmail.com, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
-	wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 1/5] rust: core abstractions for network PHY
- drivers
-Message-ID: <dc65b6f9-66ae-4a51-bbfc-bd7af90789ed@lunn.ch>
-References: <20231026001050.1720612-2-fujita.tomonori@gmail.com>
- <20231117093906.2514808-1-aliceryhl@google.com>
- <20231119.225114.390963370394344723.fujita.tomonori@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698D714001
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 16:12:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E07EC433C8;
+	Sun, 19 Nov 2023 16:11:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700410320;
+	bh=FviOo4+HTPFpVUCgfNxlIvuh0YvLmOQEGbiuswYPjOg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dlud+6eA3nh0LxIPG/wYRVifl43OK984NNQfehKMhpfQ2AaXlAfGHo/1bqMhoA3fJ
+	 FIzTXm2vfOD46JEkF3btnF6gUe/LBr/415OkV/F8DJ0tKxCPCL5Kvj2nlz/2LeH0Fc
+	 H5jsthlTQasv8tVnep5+g8Yuiz2TMdgGMpbqDlrwT+BEk8FdxJOe8DgkNavmJ6bQPt
+	 vPBmUJKR+8oslKAioo+epMfJj5vkOMrBxnXKEGgdIlho0uCpH8TNBHAcStvWb6X+NK
+	 arxVOLFH8+rZeDto2k2VBiaogj/OHGT2zTJgYayXvTd2Hgs6JObeXqoRidr+ad/Dml
+	 KtMYFSVWP5k1g==
+Date: Sun, 19 Nov 2023 16:11:55 +0000
+From: Simon Horman <horms@kernel.org>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net PATCH v2] octeontx2-pf: Fix memory leak during interface
+ down
+Message-ID: <20231119161155.GB186930@vergenet.net>
+References: <20231117104018.3435212-1-sumang@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,12 +52,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231119.225114.390963370394344723.fujita.tomonori@gmail.com>
+In-Reply-To: <20231117104018.3435212-1-sumang@marvell.com>
 
-> I don't intend to make them separate lines. If I make thme one line,
-> it's too long (over 100) so I made them two lines.
+On Fri, Nov 17, 2023 at 04:10:18PM +0530, Suman Ghosh wrote:
+> During 'ifconfig <netdev> down' one RSS memory was not getting freed.
+> This patch fixes the same.
+> 
+> Fixes: 81a4362016e7 ("octeontx2-pf: Add RSS multi group support")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> ---
+> v2 changes:
+> - Updated fixes tag
 
-Any networking prefers 80 anyway, so shorter is better.
+Thanks for the update, this now looks good to me.
 
-    Andrew
+Reviewed-by: Simon Horman <horms@kernel.org>
 
