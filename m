@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-49063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B68747F08C3
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 21:10:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9BE7F08C4
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 21:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C88A3280A6B
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:10:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0271FB2098D
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A73199B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF23199DA;
 	Sun, 19 Nov 2023 20:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nub3qUki"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j45PWymq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875ED199B0
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 20:10:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A27CC433C9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57D1199BD;
+	Sun, 19 Nov 2023 20:10:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13EC5C433C7;
 	Sun, 19 Nov 2023 20:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700424624;
-	bh=HRD1g/Jg79BVdEVmw3D4m9NCyvHQqfhE4tHAafr4fOk=;
+	bh=RfcmcSJXbNshmCCmuIQ3OLjalTX/zBZa+mvG0+u9+OQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Nub3qUkigHguAg7eC2AAhWhFyQGOUkJYFA8zUnNTQZkonTbOr8q/NIZrVHHPKpZ++
-	 f7XLd8uxgstUvX+5nvjL4hxqrMHhDg0CVyZbF2stJj8BTj+IXQoIzYZUtF6u3VV6wd
-	 6og49FuA75kX6etW0XuvMl92WFDvECUfsl5TSsGB1mbfodx1vIUFXUuqN1RcxezA05
-	 FrCOlyr94U2h1FsNlmsH64Hc+RDNRLy4ZcFCaqJP5yNLR3h274IuZap6Sfxih+eKc3
-	 17wEGCixXzv9i4eGda8Sre0ixuAhTuBk1qDvZHBA/Edwi5SYkeierOmlG21M0zT4vj
-	 1ENzDW+pI3Qqw==
+	b=j45PWymqb1xFb4zs9J1IsJFg8HnooUak2A+BOQquFgMsnDmBkA/r2GHxyRsPbiMwz
+	 1tNm/mpxE8jdAzOzOV0JVzh3Jxst2rwdYWekOb0BZS79Q+FAdSbcgfP64yy/KALD48
+	 4icnL9dHKIgrw3/g/JXuDxTwdS2H+tl3Mp9JuplIkuE9q4gOnDksLeVWDeEsXUwRhW
+	 K5xrICNaBvCnx/1/YmlSa67kSdLhrRcRkVbW2Q+ewBH3dnrW4KVZ2VnUpRWJN+9yAn
+	 gWbzAnqavepenz6VDL01VAXVw74N1vt1X0fkZTp//ZFghNrjM3ZXsOR3tnocCGNZXB
+	 7r7xXBklox58g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4BDFE000A4;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ED963C4316B;
 	Sun, 19 Nov 2023 20:10:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -43,39 +43,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH v2] octeontx2-pf: Fix memory leak during interface down
+Subject: Re: [PATCH net] net: fill in MODULE_DESCRIPTION()s for SOCK_DIAG modules
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170042462393.21508.8737738082545699896.git-patchwork-notify@kernel.org>
+ <170042462396.21508.74186037666655435.git-patchwork-notify@kernel.org>
 Date: Sun, 19 Nov 2023 20:10:23 +0000
-References: <20231117104018.3435212-1-sumang@marvell.com>
-In-Reply-To: <20231117104018.3435212-1-sumang@marvell.com>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org
+References: <20231119033006.442271-1-kuba@kernel.org>
+In-Reply-To: <20231119033006.442271-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, dsahern@kernel.org, matttbe@kernel.org,
+ martineau@kernel.org, marcelo.leitner@gmail.com, lucien.xin@gmail.com,
+ kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ jmaloy@redhat.com, ying.xue@windriver.com, sgarzare@redhat.com,
+ bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ kuniyu@amazon.com, mptcp@lists.linux.dev, linux-sctp@vger.kernel.org,
+ linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+ virtualization@lists.linux.dev, bpf@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 17 Nov 2023 16:10:18 +0530 you wrote:
-> During 'ifconfig <netdev> down' one RSS memory was not getting freed.
-> This patch fixes the same.
+On Sat, 18 Nov 2023 19:30:06 -0800 you wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to all the sock diag modules in one fell swoop.
 > 
-> Fixes: 81a4362016e7 ("octeontx2-pf: Add RSS multi group support")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> v2 changes:
-> - Updated fixes tag
+> CC: dsahern@kernel.org
+> CC: matttbe@kernel.org
+> CC: martineau@kernel.org
+> CC: marcelo.leitner@gmail.com
+> CC: lucien.xin@gmail.com
+> CC: kgraul@linux.ibm.com
+> CC: wenjia@linux.ibm.com
+> CC: jaka@linux.ibm.com
+> CC: alibuda@linux.alibaba.com
+> CC: tonylu@linux.alibaba.com
+> CC: guwen@linux.alibaba.com
+> CC: jmaloy@redhat.com
+> CC: ying.xue@windriver.com
+> CC: sgarzare@redhat.com
+> CC: bjorn@kernel.org
+> CC: magnus.karlsson@intel.com
+> CC: maciej.fijalkowski@intel.com
+> CC: kuniyu@amazon.com
+> CC: mptcp@lists.linux.dev
+> CC: linux-sctp@vger.kernel.org
+> CC: linux-s390@vger.kernel.org
+> CC: tipc-discussion@lists.sourceforge.net
+> CC: virtualization@lists.linux.dev
+> CC: bpf@vger.kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] octeontx2-pf: Fix memory leak during interface down
-    https://git.kernel.org/netdev/net/c/5f228d7c8a53
+  - [net] net: fill in MODULE_DESCRIPTION()s for SOCK_DIAG modules
+    https://git.kernel.org/netdev/net/c/938dbead34cd
 
 You are awesome, thank you!
 -- 
