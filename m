@@ -1,72 +1,79 @@
-Return-Path: <netdev+bounces-48986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7B87F0451
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 05:44:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691F37F0481
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 06:39:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A639280E4C
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 04:44:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926561C204AB
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 05:39:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2129B65F;
-	Sun, 19 Nov 2023 04:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BF55398;
+	Sun, 19 Nov 2023 05:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q44IyrjB"
+	dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b="pjoWLR9T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.tkos.co.il (hours.tkos.co.il [84.110.109.230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15A28192
+	for <netdev@vger.kernel.org>; Sat, 18 Nov 2023 21:39:50 -0800 (PST)
+Received: from tarshish.tkos.co.il (unknown [10.0.8.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050781848
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 04:44:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAB09C433C8;
-	Sun, 19 Nov 2023 04:44:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700369066;
-	bh=lX9jmudgE0rvRgwTmcrOlAruOBlzOUgPsTThK5jENvw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q44IyrjByKDRhh0GONd6gcTiDIdmWlizpHahTFqY+F/Gk/yYNw6mwxAYr9y/rZD+6
-	 uufdkAlIHr2MxO4DiCvHSGjfu7umHss+RKlEy87mxhL4PxPbflujA+QH7o1lKyw2kO
-	 N9jVSvRS3AmvqySCqXTZ+tQoV9Zpz3CgjMvlCYKpg8xPdStFmXW5QdWn67WjUi1Mzu
-	 WWArUiIMUsn32uwcaSan8DpCWWewRlVu9o6i7yB22yxNFcPdimHoGquq9hZ1JKt4gM
-	 uajDFSuJ4QooJUS33BaCRp1sNCcAIj5WxnUq/MlNzns2nXB6sGueJQdPBc42fGhGRT
-	 kTvHQhs3nzOkg==
-Date: Sat, 18 Nov 2023 20:44:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- vladimir.oltean@nxp.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: ti: am65-cpsw-nuss: Fix NULL pointer
- dereference at module removal
-Message-ID: <20231118204424.21d209a6@kernel.org>
-In-Reply-To: <20231116110930.36244-3-rogerq@kernel.org>
-References: <20231116110930.36244-1-rogerq@kernel.org>
-	<20231116110930.36244-3-rogerq@kernel.org>
+	by mail.tkos.co.il (Postfix) with ESMTPS id BA7CA44065D;
+	Sun, 19 Nov 2023 07:38:37 +0200 (IST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
+	s=default; t=1700372317;
+	bh=UhiRRzAlk5BqKc/Ch0MkFnxLBQcz+X6HuIfKyXh3d18=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pjoWLR9TnazcHk0JFrb+qBHF2shGRhbeqBtGkvuJGcoEN2sd25PVF9B1kgXaRYugc
+	 yF4AFnQrgnzZcfXrpTN668WrzSNpJsIBF3NHfES9cjmAHken+q49kuDiOe1hGC7QU2
+	 SoySCYT+PdNwNkjwAWyQsuLHHBlx4XYHQR4+8U0ZZiqPIgGTvSK5aiq8Nw2E5bqPE1
+	 rtxso93b3mR6oSfxaxj07KDvf04Iu8rYJCLumpO9Yk0EwHrgllI2x6LsyCcJl9cueI
+	 1FjMDROoqN3i2y7V8kIelyPdOkVtz4YDgdnVYt7bqDuudZElwOf6D6UL7AdQ1WL/pU
+	 O1CZC/PidPZvg==
+From: Baruch Siach <baruch@tkos.co.il>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Baruch Siach <baruch@tkos.co.il>
+Subject: [PATCH net-next v3 1/2] net: stmmac: remove extra newline from descriptors display
+Date: Sun, 19 Nov 2023 07:39:40 +0200
+Message-ID: <444f3b1dd409fdb14ed2a1ae7679a86b110dadcd.1700372381.git.baruch@tkos.co.il>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 16 Nov 2023 13:09:30 +0200 Roger Quadros wrote:
-> The NULL pointer derefernce error seems to come from the
-> list_for_each_entry_safe() helper in free_netdev(). It looks like
-> the napi pointers are stale contents but I coudn't figure out why.
+One newline per line should be enough. Reduce the verbosity of
+descriptors dump.
 
-Some interplay with am65_cpsw_nuss_free_tx_chns()?
-It does:
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-	memset(tx_chn, 0, sizeof(*tx_chn));
-
-which will wipe the NAPI instance, including its struct list_head.
-
-AFAICT the patch as posted misses free_netdev() on some error paths.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 2afb2bd25977..8ab99c65ac59 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -6203,7 +6203,6 @@ static void sysfs_display_ring(void *head, int size, int extend_desc,
+ 				   le32_to_cpu(p->des2), le32_to_cpu(p->des3));
+ 			p++;
+ 		}
+-		seq_printf(seq, "\n");
+ 	}
+ }
+ 
 -- 
-pw-bot: cr
+2.42.0
+
 
