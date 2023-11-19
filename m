@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-49028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9997F0716
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:13:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A73E27F072F
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22518B208B3
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:13:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E3CE280D5E
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99E3134C7;
-	Sun, 19 Nov 2023 15:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9uUDLMD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6787EADB;
+	Sun, 19 Nov 2023 15:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205ECB3;
-	Sun, 19 Nov 2023 07:13:10 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-32deb2809daso2345978f8f.3;
-        Sun, 19 Nov 2023 07:13:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700406788; x=1701011588; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDtSNkcu3n6VEBL6cX5/6KUOPyj6eJV5oYhNMI3f5+A=;
-        b=O9uUDLMDJhtz2sX/JQZW1VmB/mLps+faHLhVsh2xBMCpH9AusoOsJgf8ZZKG8XfsEz
-         cdv+SiQBFPUA5Tl7dj0hhtzRA+v3XitkcymeMH+dyqYvhPgQpAbUKGM9dOVmwCtuUnrq
-         sT8OZswoQeOh4DoXXh3VOSXdABdJilvXBkgll4vEfsE2gMosmf/6yMp0NY5FJG9q7EZf
-         GpZttwjc6SViC/oJ2kt7tIWhEt12ySmHoWwQMi1nEuGnSdAa8TY6ymXrp4+RJQErNStN
-         X7Ij9i4UvNzihQ4gdrCDaS/TaIqpfoz0/0Ti2ffDizRXR1+QFFUABxoh7Pq8yX7eShxR
-         3+og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700406788; x=1701011588;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EDtSNkcu3n6VEBL6cX5/6KUOPyj6eJV5oYhNMI3f5+A=;
-        b=V81Hehkaa4+f4dI6JxhGXs7WKIapPZd1bzC0dywWmHpTL2jjvRG8PaTw6LbggMaG+H
-         fyUC6Kg/wHzEMLQY0wNfhvTKtfMt1y5f8v59zWlvAC20cqbjpa2O3iwtlq1iO3zfkkq9
-         QFVUeh0tKxP7I/KQp56FanasNNz6kXaOAsho0ohZvMRxMOsPR7Tu4rrkjLjQOFAK8ZnB
-         QNAKXVkOTOIKBqeQRpmhWyi4bH+e03+oXoqfTQodUn9+Bf0k00HsUXeIBaXTHwl1+SQ2
-         0+Oxs+4qwXjXEnw1ppsG7nKL/SLBLPuCDZ1oCqK0YCgAXq2xBV8kw/096vUP1JGkvXAh
-         bghA==
-X-Gm-Message-State: AOJu0YzDHlcp1xgaGknPDJg7laM3Vt6DGgMY20MB5MVf4GvLKYYIsSlu
-	1oJHMkNLBtN+ASEgEwxHsg4e03Unk6Q=
-X-Google-Smtp-Source: AGHT+IEVZDPP0CD+D6MdB9oueW18RKXcsXrHKRVyv3oaAVMl1DsvLnOQ59+Ypy1csSNjpl22zR/MDA==
-X-Received: by 2002:a5d:64ab:0:b0:31a:d9bc:47a2 with SMTP id m11-20020a5d64ab000000b0031ad9bc47a2mr3160376wrp.53.1700406788088;
-        Sun, 19 Nov 2023 07:13:08 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id m3-20020adffa03000000b00323293bd023sm8321441wrr.6.2023.11.19.07.13.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 07:13:07 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F18E126;
+	Sun, 19 Nov 2023 07:28:26 -0800 (PST)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R711e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VweoVTA_1700407699;
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VweoVTA_1700407699)
+          by smtp.aliyun-inc.com;
+          Sun, 19 Nov 2023 23:28:23 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	stable@vger.kernel.org
-Subject: [net PATCH] net: phy: correctly check soft_reset ret ONLY if defined for PHY
-Date: Sun, 19 Nov 2023 16:12:58 +0100
-Message-Id: <20231119151258.20201-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net v3] net/smc: avoid data corruption caused by decline
+Date: Sun, 19 Nov 2023 23:28:19 +0800
+Message-Id: <1700407699-97350-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-soft_reset call for phy_init_hw had multiple revision across the years
-and the implementation goes back to 2014. Originally was a simple call
-to write the generic PHY reset BIT, it was then moved to a dedicated
-function. It was then added the option for PHY driver to define their
-own special way to reset the PHY. Till this change, checking for ret was
-correct as it was always filled by either the generic reset or the
-custom implementation. This changed tho with commit 6e2d85ec0559 ("net:
-phy: Stop with excessive soft reset"), as the generic reset call to PHY
-was dropped but the ret check was never made entirely optional and
-dependent whether soft_reset was defined for the PHY driver or not.
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Luckly nothing was ever added before the soft_reset call so the ret
-check (in the case where a PHY didn't had soft_reset defined) although
-wrong, never caused problems as ret was init 0 at the start of
-phy_init_hw.
+We found a data corruption issue during testing of SMC-R on Redis
+applications.
 
-To prevent any kind of problem and to make the function cleaner and more
-robust, correctly move the ret check if the soft_reset section making it
-optional and needed only with the function defined.
+The benchmark has a low probability of reporting a strange error as
+shown below.
 
-Cc: stable@vger.kernel.org # v5.8+
-Fixes: 6e2d85ec0559 ("net: phy: Stop with excessive soft reset")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+"Error: Protocol error, got "\xe2" as reply type byte"
+
+Finally, we found that the retrieved error data was as follows:
+
+0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
+0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
+
+It is quite obvious that this is a SMC DECLINE message, which means that
+the applications received SMC protocol message.
+We found that this was caused by the following situations:
+
+client                  server
+        ¦  proposal
+        ------------->
+        ¦  accept
+        <-------------
+        ¦  confirm
+        ------------->
+wait confirm
+
+        ¦failed llc confirm
+        ¦   x------
+(after 2s)timeout
+                        wait rsp
+
+wait decline
+
+(after 1s) timeout
+                        (after 2s) timeout
+        ¦   decline
+        -------------->
+        ¦   decline
+        <--------------
+
+As a result, a decline message was sent in the implementation, and this
+message was read from TCP by the already-fallback connection.
+
+This patch double the client timeout as 2x of the server value,
+With this simple change, the Decline messages should never cross or
+collide (during Confirm link timeout).
+
+This issue requires an immediate solution, since the protocol updates
+involve a more long-term solution.
+
+Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 ---
- drivers/net/phy/phy_device.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/smc/af_smc.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 2ce74593d6e4..478126f6b5bc 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1235,14 +1235,13 @@ int phy_init_hw(struct phy_device *phydev)
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index abd2667..8615cc0 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -598,8 +598,12 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
+ 	struct smc_llc_qentry *qentry;
+ 	int rc;
  
- 	if (phydev->drv->soft_reset) {
- 		ret = phydev->drv->soft_reset(phydev);
-+		if (ret < 0)
-+			return ret;
-+
- 		/* see comment in genphy_soft_reset for an explanation */
--		if (!ret)
--			phydev->suspended = 0;
-+		phydev->suspended = 0;
- 	}
- 
--	if (ret < 0)
--		return ret;
--
- 	ret = phy_scan_fixups(phydev);
- 	if (ret < 0)
- 		return ret;
+-	/* receive CONFIRM LINK request from server over RoCE fabric */
+-	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
++	/* Receive CONFIRM LINK request from server over RoCE fabric.
++	 * Increasing the client's timeout by twice as much as the server's
++	 * timeout by default can temporarily avoid decline messages of
++	 * both sides crossing or colliding
++	 */
++	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
+ 			      SMC_LLC_CONFIRM_LINK);
+ 	if (!qentry) {
+ 		struct smc_clc_msg_decline dclc;
 -- 
-2.40.1
+1.8.3.1
 
 
