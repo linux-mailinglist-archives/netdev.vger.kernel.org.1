@@ -1,100 +1,132 @@
-Return-Path: <netdev+bounces-49046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0195A7F07A9
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:54:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAC67F07AB
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:56:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B4F1F22308
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:54:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B3D1C20837
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:56:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EF4014A83;
-	Sun, 19 Nov 2023 16:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB44814292;
+	Sun, 19 Nov 2023 16:56:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="wbzQOQcX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULIuyBBp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 434F7C2
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 08:53:56 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id e9e14a558f8ab-35ab17957c3so13769395ab.3
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 08:53:56 -0800 (PST)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3978911A;
+	Sun, 19 Nov 2023 08:56:51 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32fadd4ad09so2687591f8f.1;
+        Sun, 19 Nov 2023 08:56:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700412835; x=1701017635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1700413009; x=1701017809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gUS1v3wNMMoGJxYMVaBxxhfLYqoOUIyNu6oyB8+7CoY=;
-        b=wbzQOQcXZjPccipsqkggz9I7/TGZ7HrYMG6u5StgQPR/7lrAu0oK1CDxNdjYo4dFNM
-         yz1XWPaVCXhAXfPE1QRk8aGqqtYvJXdDpWNvt6l6hRjXt0jEadYcIhFqmRL6t8VsdsJD
-         7uglHbQUC4YRD3y9WUKVp2ePcZIMB5oVH2mNNXegVVj9JRGCXFjO3v5qAlZ+XCI+45a9
-         ZeRAJsEo/YP/l0XJm7xCjt7z0U/8IsYwGvSN0zUMXGnUmXPGR1AANwHwFOrWt0GcJ5LC
-         CInrVPuCDy0PcjfaTcOfVaXtit6hmJl+SBVckbveiuZor29rZfzKAtGLq0FiS/a/VkA7
-         dwwA==
+        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
+        b=ULIuyBBpng4LRBCxeJ3S8O0R19NZ1zZOS4e43Q7u5u4KJW+bSpKZfdKFpfRyHRptcr
+         XDuewq3gKMwAU3APLNtexDxZ2hWfYXJ0VgnhiHlX6XFUTYran58dL26lMwVGU9wr9dFr
+         BeXYTIHwlgST0bb6PeH9gTUT545Gqn6uakC5WZzjOLx0TC6KPqd4g3aLNEDx8sX+26lt
+         Gdd0bDToKRRa8ygjTHnXAhyZx0mXig0uo70tJn9xxv7MEfMTT2Fwnd5RxtuA+HbyP/DB
+         ZwstDQVMJpSecnBaAgmPKUJTrpNXqtsInH4P48DCAyM6kJQMGmcg9QJi+zUwulH8w9K6
+         pcNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700412835; x=1701017635;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1700413009; x=1701017809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gUS1v3wNMMoGJxYMVaBxxhfLYqoOUIyNu6oyB8+7CoY=;
-        b=bm4chYnEk0AiVQW6xfWg+sVMQWYqbdX7Uy1z2LSpTK6nepLRvwm/YuuHQjk5vizPJg
-         2metApZ/VhkYyoO91BF+x5UiGN+PpfK+djwD9SGvTxWLL13OjYORO4aF4WDZNtIpVztV
-         M6Hd36k7nZw12nEE19ECKRD5dv3Z/JfYVAPj3dy+gV7Va5AbsnKnBJI3lCywEIbWWMnb
-         Wfl3Ph8JQJHPfu/vRQ5Oz7RAmDykQn15uQoixMwuBAOInw0JO2jSa2fLp8/cUJ494KrL
-         RICtaTqlDgd3meAtSk5x8EGjpXdIaqnJET66/E9OnJ69Al8hXd/KKXZ5fU7RGgCAZXK3
-         +/2Q==
-X-Gm-Message-State: AOJu0Yx3CmYNpJ9++3zlbfm6LjLqwXAc8R0rCsW42oQ5KS3OY6QTsMi3
-	lSLTLjaPYkkzNh6heZVZByNNxQ==
-X-Google-Smtp-Source: AGHT+IGZk8yR7OXDxLijh8akMDnL2tiCC7udbApOFmoHTqjULbw6221/2olHGvdVIKe0x5tKMk3c7w==
-X-Received: by 2002:a05:6e02:154f:b0:357:6bd2:b2ad with SMTP id j15-20020a056e02154f00b003576bd2b2admr7366973ilu.22.1700412835617;
-        Sun, 19 Nov 2023 08:53:55 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id fh6-20020a056a00390600b0069343e474bcsm4537415pfb.104.2023.11.19.08.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 08:53:55 -0800 (PST)
-Date: Sun, 19 Nov 2023 08:53:53 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, kys@microsoft.com,
- wei.liu@kernel.org, decui@microsoft.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
- linux-kernel@vger.kernel.org, Long Li <longli@microsoft.com>,
- stable@vger.kernel.org
-Subject: Re: [PATCH net,v5, 3/3] hv_netvsc: Mark VF as slave before exposing
- it to user-mode
-Message-ID: <20231119085353.757792c1@hermes.local>
-In-Reply-To: <1700411023-14317-4-git-send-email-haiyangz@microsoft.com>
-References: <1700411023-14317-1-git-send-email-haiyangz@microsoft.com>
-	<1700411023-14317-4-git-send-email-haiyangz@microsoft.com>
+        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
+        b=a6KKiqg0LbRSSUjRNSHfjvCdU57O/TJ2JJhq6uo6chSql8vxEWTC0ik54W/Awx37en
+         l6tDPY1ttWMc/pzDgCIMSaNZb+c0k3V63Qow9sNssYGQK3oTqynz7MoDL3n5nW55yGhO
+         Qgd1AW+pl9yvrkxIf9rbRHiwrO2k2fFPf3fM4f8JGBnmdtJ5XwOruQvnbhA3cGmUR6Yy
+         RS4WgVIpLF4t5xWn7Hd1XdM1DzngmajHlduAbpeC4ok6bG3xDT1sE2X0kDFuvfXY0kA2
+         avQHCHt87TQVykaSNFrznEZGt4dNBvvdTbpVfIUBAzOUhgDDgOfkQhkIwnRo1ZhXZunS
+         uI+w==
+X-Gm-Message-State: AOJu0YxztpIqyIR61Z2lMbh3Na1Zc4TmRC8slYLN9RM/VKVnkXvquyI7
+	QLqeOqVM/Qk8AN+cNCbCxRvGb5A8ZlzCJZfsG1M=
+X-Google-Smtp-Source: AGHT+IFulNsssn+l6xqU9rqBq3L25Id628JbtMByDUp68JRj97BiSucEGCH6QTStb+jPqIiCUJQ2iAedBfKWlYdWxNc=
+X-Received: by 2002:a5d:5886:0:b0:32d:ad05:906c with SMTP id
+ n6-20020a5d5886000000b0032dad05906cmr4403585wrf.3.1700413009333; Sun, 19 Nov
+ 2023 08:56:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20231118225451.2132137-1-vadfed@meta.com> <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
+ <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev> <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
+ <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
+In-Reply-To: <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 19 Nov 2023 08:56:37 -0800
+Message-ID: <CAADnVQLKsOs7LSFWGbAtJ8WfZjnQ0B_7gwFA-ZMdLPmukMGZ1A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP programs
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Network Development <netdev@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 19 Nov 2023 08:23:43 -0800
-Haiyang Zhang <haiyangz@microsoft.com> wrote:
+On Sat, Nov 18, 2023 at 3:46=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> On 18/11/2023 18:35, Alexei Starovoitov wrote:
+> > On Sat, Nov 18, 2023 at 3:32=E2=80=AFPM Vadim Fedorenko
+> > <vadim.fedorenko@linux.dev> wrote:
+> >>
+> >> On 18/11/2023 18:23, Alexei Starovoitov wrote:
+> >>> On Sat, Nov 18, 2023 at 2:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.=
+com> wrote:
+> >>>>
+> >>>> +/**
+> >>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher c=
+ontext structure
+> >>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
+> >>>> + * @rcu:       The RCU head used to free the crypto context with RC=
+U safety.
+> >>>> + * @usage:     Object reference counter. When the refcount goes to =
+0, the
+> >>>> + *             memory is released back to the BPF allocator, which =
+provides
+> >>>> + *             RCU safety.
+> >>>> + */
+> >>>> +struct bpf_crypto_lskcipher_ctx {
+> >>>> +       struct crypto_lskcipher *tfm;
+> >>>> +       struct rcu_head rcu;
+> >>>> +       refcount_t usage;
+> >>>> +};
+> >>>> +
+> >>>> +__bpf_kfunc_start_defs();
+> >>>> +
+> >>>> +/**
+> >>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto =
+context.
+> >>>
+> >>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
+> >>> bpf users don't need to know the internal implementation details.
+> >>> bpf_crypto_encrypt/decrypt() is clear enough.
+> >>
+> >> The only reason I added it was the existence of AEAD subset of crypto
+> >> API. And this subset can also be implemented in bpf later, and there
+> >> will be inconsistency in naming then if we add aead in future names.
+> >> WDYT?
+> >
+> > You mean future async apis ? Just bpf_crypto_encrypt_async() ?
+>
+> Well, not only async. It's about Authenticated Encryption With
+> Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
+> ciphers with additional hmac function, like
+> 'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
+> difference of having Authenticated data in the encrypted block.
 
-> From: Long Li <longli@microsoft.com>
-> 
-> When a VF is being exposed form the kernel, it should be marked as "slave"
-> before exposing to the user-mode. The VF is not usable without netvsc
-> running as master. The user-mode should never see a VF without the "slave"
-> flag.
-> 
-> This commit moves the code of setting the slave flag to the time before
-> VF is exposed to user-mode.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 0c195567a8f6 ("netvsc: transparent VF management")
-> Signed-off-by: Long Li <longli@microsoft.com>
-> Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
-
-Acked-by: Stephen Hemminger <stephen@networkplumber.org>
-
-
+and ? I'm not following what you're trying to say.
+Where is the inconsistency ?
+My point again is that lskcipher vs skcipher vs foo is an implementation
+detail that shouldn't be exposed in the name.
 
