@@ -1,46 +1,48 @@
-Return-Path: <netdev+bounces-49035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6A37F0763
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:13:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7694B7F076A
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:19:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69861C203DA
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:13:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 219B51F21A90
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14EF14009;
-	Sun, 19 Nov 2023 16:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103FD4C60;
+	Sun, 19 Nov 2023 16:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3GZN/Kj6"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f0wyT6U7"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA083128;
-	Sun, 19 Nov 2023 08:13:23 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEA4F9
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 08:19:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NxAx9i/mT0ieuvpN0I81e9ihNgtBEyUhPumkp+2OoDA=; b=3GZN/Kj64dPIRCV6DXAM6TWSIO
-	v2c9K54yv/AWiXQTjquHsfhqhfC3G0XjXLe1F7iToGaB6jV9iHcOu7H4VlqOyD/e+mLfGWPzLlCSM
-	U6OO768MECXWfFbpMN9H2uG47xCishW2V+PJcHiXH04/5fYbUQpCF1ICNB9G9UlMZXuQ=;
+	bh=xPOxEf+NZ24lKgdIU2RmKY0Md/5YZZjsaANCVnQCO4o=; b=f0wyT6U7p78DnnZFsltB0nllVG
+	aC3nL2wxWa+UH6DSLqnTFbXFi5Sm8iDhik9lozv4hha9NdSbCjjIL2lW7hpe514tyeNx0j4brgzfT
+	v6KCVu2EqC6Vd91ST78IHZnlWD/83zt8SFj5EmWcIm777APICj1qO7/yRGmGv4JkZ8Mc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1r4kQA-000ZUg-MX; Sun, 19 Nov 2023 17:13:18 +0100
-Date: Sun, 19 Nov 2023 17:13:18 +0100
+	id 1r4kVV-000ZVy-8A; Sun, 19 Nov 2023 17:18:49 +0100
+Date: Sun, 19 Nov 2023 17:18:49 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: David Laight <David.Laight@aculab.com>
-Cc: =?iso-8859-1?Q?'Bj=F8rn?= Mork' <bjorn@mork.no>,
-	Oliver Neukum <oneukum@suse.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	USB list <linux-usb@vger.kernel.org>
-Subject: Re: question on random MAC in usbnet
-Message-ID: <20891d0a-6ec0-4865-bf61-406f29f2ac6a@lunn.ch>
-References: <53b66aee-c4ad-4aec-b59f-94649323bcd6@suse.com>
- <87zfzeexy8.fsf@miraculix.mork.no>
- <64dfec9e75a744cf8e7f50807140ba9a@AcuMS.aculab.com>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: HeinerKallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S.Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor.dooley@microchip.com>, netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [RFC] support built-in ethernet phy which needs some mmio
+ accesses
+Message-ID: <b8c29d27-e0a2-4378-ba5f-6d95a438c023@lunn.ch>
+References: <ZVoUPW8pJmv5AT10@xhacker>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,25 +51,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <64dfec9e75a744cf8e7f50807140ba9a@AcuMS.aculab.com>
+In-Reply-To: <ZVoUPW8pJmv5AT10@xhacker>
 
-> So you might want to save the MAC on device removal and
-> re-use it on the next insert.
-
-That gets interesting when you have multiple USB-Ethernet dongles.
-
-I have a machine with 20 of them, which i use for functional testing
-of Ethernet switches. Luckily for me, they all have a vendor assigned
-MAC address.
-
+On Sun, Nov 19, 2023 at 09:57:17PM +0800, Jisheng Zhang wrote:
+> Hi,
 > 
-> [1] We ended up putting the USB interface inside a 'bond'
-> in order to stop the interface everything was using
-> randomly disappearing due to common-mode noise on the
-> USB data lines causing a disconnect.
+> I want to upstream milkv duo (powered by cv1800b) ethernet support. The SoC
+> contains a built-in eth phy which also needs some initialization via.
+> mmio access during init. So, I need to do something like this(sol A):
 
-Maybe you should of just thrown the hardware away since it seems
-broken.
+What does this initialisation do?
 
-	Andrew
+If you are turning on clocks, write a common clock provider, which the
+PHY driver can use. If its a reset, write a reset driver. If its a
+regulator, write a regulator driver, etc.
+
+      Andrew
 
