@@ -1,64 +1,49 @@
-Return-Path: <netdev+bounces-49056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40CB17F0884
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:37:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CED77F0898
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:49:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1728B1C20756
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 19:37:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 620D6B2096A
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 19:49:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE6D12B6E;
-	Sun, 19 Nov 2023 19:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C71118E03;
+	Sun, 19 Nov 2023 19:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LV8Ajgez"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDebwZKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F09DA4
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 11:37:05 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-283a0b0bd42so1187877a91.0
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 11:37:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700422624; x=1701027424; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sY81OUKO7januhJYrCI14bRYmsaPi7S0SY/vFnt0YVw=;
-        b=LV8AjgezpTpCpggyEjWlk0gfzM7lsatGZ1ikFaTHgausKe9RtNuN0ImTcPUFpUs1cC
-         RQWpV9BQhqXDSEe/auGvQe+I9HfY1/TihqAnLLi85Po9JjI5R0eBWg/XDRyKi7If75kl
-         PtONcYoH+3koeJfFpUcbNtPYi9EUV2qDRZcGYi2QkyB4ZuuDLa9I/QpKvLy48wTCa3ob
-         XtKm/ZLFSAMRKnBuAfJIV9ZHdjtXhyMUcvIAUdVMWRTDINgq5zJNREJg2LjU3MBPEIuz
-         2IoPiU8+enRe+HpNB6ytUf048oji4QFKJ4cDErVDkKq0MlYLf00BHcViEiWhIFwddExV
-         70Vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700422624; x=1701027424;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sY81OUKO7januhJYrCI14bRYmsaPi7S0SY/vFnt0YVw=;
-        b=MeSZPmdXdiYkMGIQsraL0uz1nvupUzLH14jsvixYXYsoN64ANwyBcZaQNV7g4KCN7d
-         CwFuAYsKPk0/sMYwvrG4j++s4UDnjSH2VzxlZHHCM6/X4Yg/Tdv94ScV7s6//R0lIwRy
-         q4cGerO5n6Bagb02P5prUiGkcF2QF/NzdgrSEKndNfk+ke+PHn2L1NsZ86OjKur/evLH
-         zitKDcd1nrb1VozXpc9qk+RX2KjoEAbtwrxnhWHPlVAxPubSRLXLWp57N1DTMAB8zoHJ
-         oRI85I5x+C51VbF58nO5OFfFBH8SF8ENYMOb5I5c92R8EE7r3M8g6Wl89eJ9nGw8deE7
-         WNmw==
-X-Gm-Message-State: AOJu0YzOlTCkvhsAJXex9HdvIAEoF3gKdbzBsrmHFj+2hpEzqnRn9XfC
-	Gv8f2xrdce5JYvLKyMm/DKI=
-X-Google-Smtp-Source: AGHT+IHtfHCdBUzLh/R7ZTXP61tSrFNrSGGLU4abrguBDBFKgQdoQ4Wp950YMnHCji1MI/2de3wYUw==
-X-Received: by 2002:a17:90b:1650:b0:280:ca28:de58 with SMTP id il16-20020a17090b165000b00280ca28de58mr7510306pjb.4.1700422624435;
-        Sun, 19 Nov 2023 11:37:04 -0800 (PST)
-Received: from localhost ([2601:647:5b81:12a0:42ee:58:6bca:56cd])
-        by smtp.gmail.com with ESMTPSA id 27-20020a17090a001b00b00268b439a0cbsm4908406pja.23.2023.11.19.11.37.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 11:37:03 -0800 (PST)
-Date: Sun, 19 Nov 2023 11:37:02 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: rjmcmahon <rjmcmahon@rjmcmahon.com>
-Cc: Netdev <netdev@vger.kernel.org>
-Subject: Re: On TCP_CONGESTION & letter case
-Message-ID: <ZVpj3haO0V8Yx+zU@pop-os.localdomain>
-References: <5dca57c7a699ac4a613806e8c8772dd7@rjmcmahon.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D4A134AD;
+	Sun, 19 Nov 2023 19:49:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E537C433C7;
+	Sun, 19 Nov 2023 19:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700423375;
+	bh=Y65QvSsXHqm7VX9AgZ5BI+hkRtsvRDz99qPdNHT4aK8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NDebwZKRzTY+jbu34I1hOcnskpgvZxP1VCMbL15KXFLd06R0pzFNB/x58zVKpNCuc
+	 6scI15eSTKaDeIsb4QjT4GQ+w0FaPGLIk8cnW0rYrPtPgBjsGcWyucqn/asayFHZAN
+	 WK8vLf40QTB+aT7pc3FK/xueJlV8ElIrEcgsaOIUH/oR5fhrri7uen9KFk2kwLwzfu
+	 Tfo6cs/DnI07Dz8nNIA0SICm5u0ZFAw2cWRDnNoe2gkuaRsQe8WpirvvwzPMq0HHTU
+	 p3yk/BVUI+XR4XXgvjKw+9EUm6yvVj4SkAQ+WNpST5lniVxsnzhuxolkXYJMmXsIEJ
+	 Xpkcm+ne9B6/w==
+Date: Sun, 19 Nov 2023 19:49:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: Srujana Challa <schalla@marvell.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, bbrezillon@kernel.org, arno@natisbad.org,
+	kuba@kernel.org, ndabilpuram@marvell.com, sgoutham@marvell.com
+Subject: Re: [PATCH v1 02/10] crypto: octeontx2: add SGv2 support for CN10KB
+ or CN10KA B0
+Message-ID: <20231119194930.GG186930@vergenet.net>
+References: <20231103053306.2259753-1-schalla@marvell.com>
+ <20231103053306.2259753-3-schalla@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,20 +52,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5dca57c7a699ac4a613806e8c8772dd7@rjmcmahon.com>
+In-Reply-To: <20231103053306.2259753-3-schalla@marvell.com>
 
-On Sun, Nov 19, 2023 at 10:36:03AM -0800, rjmcmahon wrote:
-> Hi all,
+On Fri, Nov 03, 2023 at 11:02:58AM +0530, Srujana Challa wrote:
+
+Hi Srujana,
+
+some minor feedback from my side.
+
+> Scatter Gather input format for CPT has changed on CN10KB/CN10KA B0 HW
+> to make it comapatible with NIX Scatter Gather format to support SG mode
+
+nit: compatible
+
+> for inline IPsec. This patch modifies the code to make the driver works
+> for the same. This patch also enables CPT firmware load for these chips.
 > 
-> Will the CCA string in setsockopt and getsockopt for TCP_CONGESTION always
-> be lowercase?
-> 
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
 
-I am not aware of any such guarantee. From kernel's point of view, it is just
-a simple string search in /proc/sys/net/ipv4/tcp_available_congestion_control,
-so in the future we may add CCA with upper cases. And, since CCA can be
-a kernel module, _maybe_ there are already OOT modules using upper case
-names.
+...
 
-Thanks.
+> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+
+...
+
+> +static inline int sgv2io_components_setup(struct pci_dev *pdev,
+> +					  struct otx2_cpt_buf_ptr *list,
+> +					  int buf_count, u8 *buffer)
+> +{
+> +	struct cn10kb_cpt_sglist_component *sg_ptr = NULL;
+> +	int ret = 0, i, j;
+> +	int components;
+> +
+> +	if (unlikely(!list)) {
+> +		dev_err(&pdev->dev, "Input list pointer is NULL\n");
+> +		return -EFAULT;
+> +	}
+> +
+> +	for (i = 0; i < buf_count; i++) {
+> +		if (unlikely(!list[i].vptr))
+> +			continue;
+> +		list[i].dma_addr = dma_map_single(&pdev->dev, list[i].vptr,
+> +						  list[i].size,
+> +						  DMA_BIDIRECTIONAL);
+> +		if (unlikely(dma_mapping_error(&pdev->dev, list[i].dma_addr))) {
+> +			dev_err(&pdev->dev, "Dma mapping failed\n");
+> +			ret = -EIO;
+> +			goto sg_cleanup;
+> +		}
+> +	}
+> +	components = buf_count / 3;
+> +	sg_ptr = (struct cn10kb_cpt_sglist_component *)buffer;
+> +	for (i = 0; i < components; i++) {
+> +		sg_ptr->len0 = list[i * 3 + 0].size;
+> +		sg_ptr->len1 = list[i * 3 + 1].size;
+> +		sg_ptr->len2 = list[i * 3 + 2].size;
+> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
+> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
+> +		sg_ptr->ptr2 = list[i * 3 + 2].dma_addr;
+> +		sg_ptr->valid_segs = 3;
+> +		sg_ptr++;
+> +	}
+> +	components = buf_count % 3;
+> +
+> +	sg_ptr->valid_segs = components;
+> +	switch (components) {
+> +	case 2:
+> +		sg_ptr->len1 = list[i * 3 + 1].size;
+> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
+> +		fallthrough;
+> +	case 1:
+> +		sg_ptr->len0 = list[i * 3 + 0].size;
+> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +	return ret;
+
+The above fields of sg_ptr all have big-endian types
+but are being assigned values in host byte-order.
+
+As flagged by Sparse.
+
+> +
+> +sg_cleanup:
+> +	for (j = 0; j < i; j++) {
+> +		if (list[j].dma_addr) {
+> +			dma_unmap_single(&pdev->dev, list[j].dma_addr,
+> +					 list[j].size, DMA_BIDIRECTIONAL);
+> +		}
+> +
+> +		list[j].dma_addr = 0;
+> +	}
+> +	return ret;
+> +}
+> +
+> +static inline struct otx2_cpt_inst_info *cn10k_sgv2_info_create(struct pci_dev *pdev,
+> +					      struct otx2_cpt_req_info *req,
+> +					      gfp_t gfp)
+
+nit: I think it would be nicer to format the above as in a way
+that indentation isn't pushed so far to the right that alignment
+with the opening parentheses becomes impossible:
+
+static inline struct otx2_cpt_inst_info *
+cn10k_sgv2_info_create(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
+		       gfp_t gfp)
+
+Running ./checkpatch.pl --strict over this patch-set might also be useful.
+
+...
 
