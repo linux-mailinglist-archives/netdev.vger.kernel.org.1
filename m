@@ -1,123 +1,114 @@
-Return-Path: <netdev+bounces-49025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0567F06F3
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:50:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F40C87F06FA
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566DF1F22722
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 14:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30A181C203A7
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 14:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6582C101E5;
-	Sun, 19 Nov 2023 14:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DA712B75;
+	Sun, 19 Nov 2023 14:59:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/sTR+mG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="isHlqJcv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A248F11D;
-	Sun, 19 Nov 2023 06:50:24 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-32fa7d15f4eso2741947f8f.3;
-        Sun, 19 Nov 2023 06:50:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700405423; x=1701010223; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZBy2FynzJySNwoFbdoLCjlxvv36qfeTMfoj03QNsxyo=;
-        b=N/sTR+mGLrN3YyOkshGHeb7Z4R8mW1Mzq3GPp0oKhmTNwKpsUX+Y0cRrjJYdO5unkB
-         quTHmKrvnPP5nEzxTTPZk1jztZ/hLvcSXXoUmw51VviOh6BuLJK4n+bC96drvemafXJw
-         FrqUYpEzxnNfqFKWssXFB8FHRMjFW7t5b7UfzUQ0lcbPqtQQDSdG25rDbgsirhgvl6nx
-         LMvbKPtdH+QxsScJJyotCqj0gVMxozqB2ESLpSARebhl9gNTpvySTwkW92j1RICLx+4G
-         SXZxV+68w1YAc8W+4I6qgzQTXWdPuwzxAwbSiBtguvDTGrBuXG09CmPEs51bCJBw5lv3
-         xbvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700405423; x=1701010223;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZBy2FynzJySNwoFbdoLCjlxvv36qfeTMfoj03QNsxyo=;
-        b=MQLQGd3YE+inesUUUTsPJdDfqDDxkuEBQnxQ1HlG7VIJOf2bqt8I/X8/A1WyFLvAM8
-         RaWMleZYtxIajgw8L/zSAaANZFdAByA3T3XSg46hnVgyhi+21rl26rMSK4xy+MSVo2Pr
-         wj62ts2HH/6jwwBiWZ7+6ZRrC+K6zg7tjTEnDApBZ/kVPV7+/+IgbdhwJ2A8tE1lxCeC
-         couhX88dnidoKTIkWxgT+lcGTvEyHYTdCcoy/Z9nmnKu0flb9WnaYxZedKri4feim0Oi
-         mftbJXY+2Gc1QOfwNJIfP2PUWTwb1ywOWX6tjcUWS07UBMhzR7sDUvRlhPXHsZ6CDQDP
-         je+g==
-X-Gm-Message-State: AOJu0YzUsw47081SzXGmwhUkdku/TJOsxEGsBqGhm05GY1Plua39Bkfp
-	Tpb8dFvEPBpZnxalEaLjfH5dsApDZyg=
-X-Google-Smtp-Source: AGHT+IFhNrGV/AQm0viGUiqf/wW1h6qaQk1NwH4o8i5PU8ncxwa2CSxnIhrNxRFvNQ0LPFzLDJDNnQ==
-X-Received: by 2002:a5d:5f49:0:b0:32f:7d67:baf1 with SMTP id cm9-20020a5d5f49000000b0032f7d67baf1mr3589905wrb.35.1700405422767;
-        Sun, 19 Nov 2023 06:50:22 -0800 (PST)
-Received: from skbuf ([188.26.185.114])
-        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm6885022wrq.78.2023.11.19.06.50.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 06:50:22 -0800 (PST)
-Date: Sun, 19 Nov 2023 16:50:19 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	Landen Chao <Landen.Chao@mediatek.com>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com
-Subject: Re: [PATCH net-next 03/15] net: dsa: mt7530: store port 5 SGMII
- capability of MT7531
-Message-ID: <20231119145019.6gz4j4crwgyp46bf@skbuf>
-References: <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-1-arinc.unal@arinc9.com>
- <20231118123205.266819-4-arinc.unal@arinc9.com>
- <20231118123205.266819-4-arinc.unal@arinc9.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5991118B
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 14:59:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D8D0C433C8;
+	Sun, 19 Nov 2023 14:58:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700405940;
+	bh=v+bvGDCc4H/R+9epB47olgye+C8PmWk6XJjP7gmBq9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=isHlqJcvMuPPA4IL50CSAYqCXWHK73zv5/pYMAN1OYhz6Q3EBOI4pwifUzGQMpvDY
+	 IntzhlSDCs3P0ULl0nQKrsriakmQXkBwqKVoVvq6kgedGTbUH2eY5YlOoyqz4OjrgN
+	 3oQdL4xG6PZbFl2mKNrCYXT+P3CEpf5KOFS9DEERZwvqIIGd3ef3R+xZvmhVW6Bqee
+	 5C4lqceib9OoeqgOJHD7wdHigKQKyeZ/IZUrnFKvEco2bM1mmeNN35bkwj5WVTvAVD
+	 gebQ42Trj0O4hRzjkIK9GDav2ddHfvpYG7asoiNDvuFhICuQCoaYo+ncYhqvCQ+bzB
+	 agfTqgEqqy1jA==
+Date: Sun, 19 Nov 2023 14:58:55 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
+	jhs@mojatatu.com, johannes@sipsolutions.net,
+	andriy.shevchenko@linux.intel.com, amritha.nambiar@intel.com,
+	sdf@google.com
+Subject: Re: [patch net-next v2 6/9] netlink: introduce typedef for filter
+ function
+Message-ID: <20231119145855.GA186930@vergenet.net>
+References: <20231116164822.427485-1-jiri@resnulli.us>
+ <20231116164822.427485-7-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231118123205.266819-4-arinc.unal@arinc9.com>
- <20231118123205.266819-4-arinc.unal@arinc9.com>
+In-Reply-To: <20231116164822.427485-7-jiri@resnulli.us>
 
-On Sat, Nov 18, 2023 at 03:31:53PM +0300, Arınç ÜNAL wrote:
-> Introduce the p5_sgmii field to store the information for whether port 5
-> has got SGMII or not. Instead of reading the MT7531_TOP_SIG_SR register
-> multiple times, the register will be read once and the value will be
-> stored on the p5_sgmii field. This saves unnecessary reads of the
-> register.
+On Thu, Nov 16, 2023 at 05:48:18PM +0100, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
 > 
-> Move the comment about MT7531AE and MT7531BE to mt7531_setup(), where the
-> switch is identified.
+> Make the code using filter function a bit nicer by consolidating the
+> filter function arguments using typedef.
 > 
-> Get rid of mt7531_dual_sgmii_supported() now that priv->p5_sgmii stores the
-> information. Address the code where mt7531_dual_sgmii_supported() is used.
-> 
-> Get rid of mt7531_is_rgmii_port() which just prints the opposite of
-> priv->p5_sgmii.
-> 
-> Instead of calling mt7531_pll_setup() then returning, do not call it if
-> port 5 is SGMII.
-> 
-> Remove P5_INTF_SEL_GMAC5_SGMII. The p5_interface_select enum is supposed to
-> represent the mode that port 5 is being used in, not the hardware
-> information of port 5. Set p5_intf_sel to P5_INTF_SEL_GMAC5 instead, if
-> port 5 is not dsa_is_unused_port().
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 > ---
+> v1->v2:
+> - new patch
+> ---
+>  drivers/connector/connector.c | 5 ++---
+>  include/linux/connector.h     | 6 ++----
+>  include/linux/netlink.h       | 6 ++++--
+>  net/netlink/af_netlink.c      | 6 ++----
+>  4 files changed, 10 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+> index 7f7b94f616a6..4028e8eeba82 100644
+> --- a/drivers/connector/connector.c
+> +++ b/drivers/connector/connector.c
+> @@ -59,9 +59,8 @@ static int cn_already_initialized;
+>   * both, or if both are zero then the group is looked up and sent there.
+>   */
+>  int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+> -	gfp_t gfp_mask,
+> -	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
+> -	void *filter_data)
+> +			 gfp_t gfp_mask, netlink_filter_fn filter,
+> +			 void *filter_data)
+>  {
+>  	struct cn_callback_entry *__cbq;
+>  	unsigned int size;
+> diff --git a/include/linux/connector.h b/include/linux/connector.h
+> index cec2d99ae902..cb18d70d623f 100644
+> --- a/include/linux/connector.h
+> +++ b/include/linux/connector.h
+> @@ -98,10 +98,8 @@ void cn_del_callback(const struct cb_id *id);
+>   *
+>   * If there are no listeners for given group %-ESRCH can be returned.
+>   */
+> -int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+> -			 u32 group, gfp_t gfp_mask,
+> -			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
+> -				       void *data),
+> +int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+> +			 gfp_t gfp_mask, netlink_filter_fn filter,
+>  			 void *filter_data);
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+nit: It might be good to update the kernel doc to account for
+     group => group.
+     Curiously the kernel doc already documents filter_data rather
+     than data.
+
+...
 
