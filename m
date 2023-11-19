@@ -1,166 +1,84 @@
-Return-Path: <netdev+bounces-49057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CED77F0898
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:49:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C61A7F089F
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 20:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 620D6B2096A
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 19:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DD021C203DF
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 19:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C71118E03;
-	Sun, 19 Nov 2023 19:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D623E182DE;
+	Sun, 19 Nov 2023 19:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDebwZKR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mSHsCy6h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D4A134AD;
-	Sun, 19 Nov 2023 19:49:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E537C433C7;
-	Sun, 19 Nov 2023 19:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B916D199AE
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 19:50:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C5D1C433C9;
+	Sun, 19 Nov 2023 19:50:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700423375;
-	bh=Y65QvSsXHqm7VX9AgZ5BI+hkRtsvRDz99qPdNHT4aK8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NDebwZKRzTY+jbu34I1hOcnskpgvZxP1VCMbL15KXFLd06R0pzFNB/x58zVKpNCuc
-	 6scI15eSTKaDeIsb4QjT4GQ+w0FaPGLIk8cnW0rYrPtPgBjsGcWyucqn/asayFHZAN
-	 WK8vLf40QTB+aT7pc3FK/xueJlV8ElIrEcgsaOIUH/oR5fhrri7uen9KFk2kwLwzfu
-	 Tfo6cs/DnI07Dz8nNIA0SICm5u0ZFAw2cWRDnNoe2gkuaRsQe8WpirvvwzPMq0HHTU
-	 p3yk/BVUI+XR4XXgvjKw+9EUm6yvVj4SkAQ+WNpST5lniVxsnzhuxolkXYJMmXsIEJ
-	 Xpkcm+ne9B6/w==
-Date: Sun, 19 Nov 2023 19:49:30 +0000
-From: Simon Horman <horms@kernel.org>
-To: Srujana Challa <schalla@marvell.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, bbrezillon@kernel.org, arno@natisbad.org,
-	kuba@kernel.org, ndabilpuram@marvell.com, sgoutham@marvell.com
-Subject: Re: [PATCH v1 02/10] crypto: octeontx2: add SGv2 support for CN10KB
- or CN10KA B0
-Message-ID: <20231119194930.GG186930@vergenet.net>
-References: <20231103053306.2259753-1-schalla@marvell.com>
- <20231103053306.2259753-3-schalla@marvell.com>
+	s=k20201202; t=1700423423;
+	bh=BCt6WhVihJjrvA1IPS984F320NZ/JHPTtwnPPWptubk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mSHsCy6hnYkYp3Im74onfsOVG/+z8JWxRU+l0UgGj6cfeQfdGDBjYMV+/ZyQAI8kj
+	 Cu3rMNpK5mL0G2bFA4wfuJLWA+KFsLNaHHJEGkjQJue0TxhXMQZlmSrUtzdGfhQ/wl
+	 HGg6I9rv8zlId3wtGDhQOJE26+MsuVxuni5Uc8itnOud0Y7PioU1dCP64boKe7U8vJ
+	 VoIilowhvo7cHnH5MlEkIPnodS3NkBs3Ck+0ZUf4Hn6rjJ+TlnJDiKoaMMga1O4bkw
+	 plufsHXJ0M+yqUTLPHDJ0gxVo4Ff0soZBMzjM0YdwWEyhxTSDuHP/0LziHUsxAuA8t
+	 ZQaZWZzblSyhg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30F37E000A4;
+	Sun, 19 Nov 2023 19:50:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231103053306.2259753-3-schalla@marvell.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170042342319.11006.13933415217196728575.git-patchwork-notify@kernel.org>
+Date: Sun, 19 Nov 2023 19:50:23 +0000
+References: <20231117141733.3344158-1-edumazet@google.com>
+In-Reply-To: <20231117141733.3344158-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ Jason@zx2c4.com, liuhangbin@gmail.com
 
-On Fri, Nov 03, 2023 at 11:02:58AM +0530, Srujana Challa wrote:
+Hello:
 
-Hi Srujana,
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-some minor feedback from my side.
-
-> Scatter Gather input format for CPT has changed on CN10KB/CN10KA B0 HW
-> to make it comapatible with NIX Scatter Gather format to support SG mode
-
-nit: compatible
-
-> for inline IPsec. This patch modifies the code to make the driver works
-> for the same. This patch also enables CPT firmware load for these chips.
+On Fri, 17 Nov 2023 14:17:33 +0000 you wrote:
+> wg_xmit() can be called concurrently, KCSAN reported [1]
+> some device stats updates can be lost.
 > 
-> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> Use DEV_STATS_INC() for this unlikely case.
+> 
+> [1]
+> BUG: KCSAN: data-race in wg_xmit / wg_xmit
+> 
+> [...]
 
-...
+Here is the summary with links:
+  - [v2,net] wireguard: use DEV_STATS_INC()
+    https://git.kernel.org/netdev/net/c/93da8d75a665
 
-> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h b/drivers/crypto/marvell/octeontx2/otx2_cpt_reqmgr.h
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-...
 
-> +static inline int sgv2io_components_setup(struct pci_dev *pdev,
-> +					  struct otx2_cpt_buf_ptr *list,
-> +					  int buf_count, u8 *buffer)
-> +{
-> +	struct cn10kb_cpt_sglist_component *sg_ptr = NULL;
-> +	int ret = 0, i, j;
-> +	int components;
-> +
-> +	if (unlikely(!list)) {
-> +		dev_err(&pdev->dev, "Input list pointer is NULL\n");
-> +		return -EFAULT;
-> +	}
-> +
-> +	for (i = 0; i < buf_count; i++) {
-> +		if (unlikely(!list[i].vptr))
-> +			continue;
-> +		list[i].dma_addr = dma_map_single(&pdev->dev, list[i].vptr,
-> +						  list[i].size,
-> +						  DMA_BIDIRECTIONAL);
-> +		if (unlikely(dma_mapping_error(&pdev->dev, list[i].dma_addr))) {
-> +			dev_err(&pdev->dev, "Dma mapping failed\n");
-> +			ret = -EIO;
-> +			goto sg_cleanup;
-> +		}
-> +	}
-> +	components = buf_count / 3;
-> +	sg_ptr = (struct cn10kb_cpt_sglist_component *)buffer;
-> +	for (i = 0; i < components; i++) {
-> +		sg_ptr->len0 = list[i * 3 + 0].size;
-> +		sg_ptr->len1 = list[i * 3 + 1].size;
-> +		sg_ptr->len2 = list[i * 3 + 2].size;
-> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
-> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
-> +		sg_ptr->ptr2 = list[i * 3 + 2].dma_addr;
-> +		sg_ptr->valid_segs = 3;
-> +		sg_ptr++;
-> +	}
-> +	components = buf_count % 3;
-> +
-> +	sg_ptr->valid_segs = components;
-> +	switch (components) {
-> +	case 2:
-> +		sg_ptr->len1 = list[i * 3 + 1].size;
-> +		sg_ptr->ptr1 = list[i * 3 + 1].dma_addr;
-> +		fallthrough;
-> +	case 1:
-> +		sg_ptr->len0 = list[i * 3 + 0].size;
-> +		sg_ptr->ptr0 = list[i * 3 + 0].dma_addr;
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +	return ret;
-
-The above fields of sg_ptr all have big-endian types
-but are being assigned values in host byte-order.
-
-As flagged by Sparse.
-
-> +
-> +sg_cleanup:
-> +	for (j = 0; j < i; j++) {
-> +		if (list[j].dma_addr) {
-> +			dma_unmap_single(&pdev->dev, list[j].dma_addr,
-> +					 list[j].size, DMA_BIDIRECTIONAL);
-> +		}
-> +
-> +		list[j].dma_addr = 0;
-> +	}
-> +	return ret;
-> +}
-> +
-> +static inline struct otx2_cpt_inst_info *cn10k_sgv2_info_create(struct pci_dev *pdev,
-> +					      struct otx2_cpt_req_info *req,
-> +					      gfp_t gfp)
-
-nit: I think it would be nicer to format the above as in a way
-that indentation isn't pushed so far to the right that alignment
-with the opening parentheses becomes impossible:
-
-static inline struct otx2_cpt_inst_info *
-cn10k_sgv2_info_create(struct pci_dev *pdev, struct otx2_cpt_req_info *req,
-		       gfp_t gfp)
-
-Running ./checkpatch.pl --strict over this patch-set might also be useful.
-
-...
 
