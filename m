@@ -1,132 +1,217 @@
-Return-Path: <netdev+bounces-49047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFAC67F07AB
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:56:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D077F082F
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 18:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B3D1C20837
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:56:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DF491C2080C
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 17:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB44814292;
-	Sun, 19 Nov 2023 16:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULIuyBBp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A18511C97;
+	Sun, 19 Nov 2023 17:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3978911A;
-	Sun, 19 Nov 2023 08:56:51 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-32fadd4ad09so2687591f8f.1;
-        Sun, 19 Nov 2023 08:56:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700413009; x=1701017809; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
-        b=ULIuyBBpng4LRBCxeJ3S8O0R19NZ1zZOS4e43Q7u5u4KJW+bSpKZfdKFpfRyHRptcr
-         XDuewq3gKMwAU3APLNtexDxZ2hWfYXJ0VgnhiHlX6XFUTYran58dL26lMwVGU9wr9dFr
-         BeXYTIHwlgST0bb6PeH9gTUT545Gqn6uakC5WZzjOLx0TC6KPqd4g3aLNEDx8sX+26lt
-         Gdd0bDToKRRa8ygjTHnXAhyZx0mXig0uo70tJn9xxv7MEfMTT2Fwnd5RxtuA+HbyP/DB
-         ZwstDQVMJpSecnBaAgmPKUJTrpNXqtsInH4P48DCAyM6kJQMGmcg9QJi+zUwulH8w9K6
-         pcNw==
+Received: from mail-pg1-f208.google.com (mail-pg1-f208.google.com [209.85.215.208])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 616FDF2
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 09:53:25 -0800 (PST)
+Received: by mail-pg1-f208.google.com with SMTP id 41be03b00d2f7-5bd18d54a48so3977088a12.0
+        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 09:53:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700413009; x=1701017809;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7wIX8ORXLGy4iPlNpzgFGE4EPRBwYYYCdBAHOnzVq8k=;
-        b=a6KKiqg0LbRSSUjRNSHfjvCdU57O/TJ2JJhq6uo6chSql8vxEWTC0ik54W/Awx37en
-         l6tDPY1ttWMc/pzDgCIMSaNZb+c0k3V63Qow9sNssYGQK3oTqynz7MoDL3n5nW55yGhO
-         Qgd1AW+pl9yvrkxIf9rbRHiwrO2k2fFPf3fM4f8JGBnmdtJ5XwOruQvnbhA3cGmUR6Yy
-         RS4WgVIpLF4t5xWn7Hd1XdM1DzngmajHlduAbpeC4ok6bG3xDT1sE2X0kDFuvfXY0kA2
-         avQHCHt87TQVykaSNFrznEZGt4dNBvvdTbpVfIUBAzOUhgDDgOfkQhkIwnRo1ZhXZunS
-         uI+w==
-X-Gm-Message-State: AOJu0YxztpIqyIR61Z2lMbh3Na1Zc4TmRC8slYLN9RM/VKVnkXvquyI7
-	QLqeOqVM/Qk8AN+cNCbCxRvGb5A8ZlzCJZfsG1M=
-X-Google-Smtp-Source: AGHT+IFulNsssn+l6xqU9rqBq3L25Id628JbtMByDUp68JRj97BiSucEGCH6QTStb+jPqIiCUJQ2iAedBfKWlYdWxNc=
-X-Received: by 2002:a5d:5886:0:b0:32d:ad05:906c with SMTP id
- n6-20020a5d5886000000b0032dad05906cmr4403585wrf.3.1700413009333; Sun, 19 Nov
- 2023 08:56:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700416405; x=1701021205;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M+W4dYR6p0MuCMx9i/Xtc7RR141me0vHWQgYK7bRbNg=;
+        b=IlWNm39xrldBB+9h0+Yax/mHFaLHZNEleAVzw0fGAPzk3hxq3/o94qF82i2gHI44vF
+         klVPWOTp9vEFP3citqReGy9ifkOxv2b07SSYRus+w3HG3WvcOXj9EOIeUknm9PRbolp3
+         wWP+eRhElKBEVtT92IIbCS65SEyElRP8CMTryD6QvDRBLcmZcw7Ogv/uFkxNYmfbt725
+         Lk8gM8wQDxuMfDuWil9Edz8ePrNDCKBU31D2M3YGaBkbxATcHQCDZrwmCvO+2KZBUGJL
+         XTlnFxQlr3LSOow0mj9itHNXIMXSFtc1aTHgFGaJXLAN1hbX9BhxBjIXJNeMko6T0IoZ
+         ZUlw==
+X-Gm-Message-State: AOJu0YzLorSuf73ZsdU3Q3tl0NRsLFkJ9Gyiq+f3En7MPKBO+d2Y6QMq
+	33tBuVRcZ4Lypf1aKBn5CjjeA3i9+AkTkHe3iyRpGcGVojTK
+X-Google-Smtp-Source: AGHT+IEqIGz+YeHEMA6P+E8B/HMO3WfmjvdWVyuJwyb3E3y4ggX2Fl8SK/FTmiqdGjMUzrFj9PmZHrMi1IBWIjDDklb5DB96BB/W
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231118225451.2132137-1-vadfed@meta.com> <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
- <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev> <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
- <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
-In-Reply-To: <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 19 Nov 2023 08:56:37 -0800
-Message-ID: <CAADnVQLKsOs7LSFWGbAtJ8WfZjnQ0B_7gwFA-ZMdLPmukMGZ1A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP programs
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Network Development <netdev@vger.kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+X-Received: by 2002:a63:e110:0:b0:5bd:a359:7e0a with SMTP id
+ z16-20020a63e110000000b005bda3597e0amr1118829pgh.9.1700416404863; Sun, 19 Nov
+ 2023 09:53:24 -0800 (PST)
+Date: Sun, 19 Nov 2023 09:53:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c84343060a850bd0@google.com>
+Subject: [syzbot] [mm?] BUG: unable to handle kernel paging request in copy_from_kernel_nofault
+From: syzbot <syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, bp@alien8.de, bp@suse.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
+	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
+	x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 18, 2023 at 3:46=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 18/11/2023 18:35, Alexei Starovoitov wrote:
-> > On Sat, Nov 18, 2023 at 3:32=E2=80=AFPM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> >>
-> >> On 18/11/2023 18:23, Alexei Starovoitov wrote:
-> >>> On Sat, Nov 18, 2023 at 2:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.=
-com> wrote:
-> >>>>
-> >>>> +/**
-> >>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher c=
-ontext structure
-> >>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
-> >>>> + * @rcu:       The RCU head used to free the crypto context with RC=
-U safety.
-> >>>> + * @usage:     Object reference counter. When the refcount goes to =
-0, the
-> >>>> + *             memory is released back to the BPF allocator, which =
-provides
-> >>>> + *             RCU safety.
-> >>>> + */
-> >>>> +struct bpf_crypto_lskcipher_ctx {
-> >>>> +       struct crypto_lskcipher *tfm;
-> >>>> +       struct rcu_head rcu;
-> >>>> +       refcount_t usage;
-> >>>> +};
-> >>>> +
-> >>>> +__bpf_kfunc_start_defs();
-> >>>> +
-> >>>> +/**
-> >>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto =
-context.
-> >>>
-> >>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
-> >>> bpf users don't need to know the internal implementation details.
-> >>> bpf_crypto_encrypt/decrypt() is clear enough.
-> >>
-> >> The only reason I added it was the existence of AEAD subset of crypto
-> >> API. And this subset can also be implemented in bpf later, and there
-> >> will be inconsistency in naming then if we add aead in future names.
-> >> WDYT?
-> >
-> > You mean future async apis ? Just bpf_crypto_encrypt_async() ?
->
-> Well, not only async. It's about Authenticated Encryption With
-> Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
-> ciphers with additional hmac function, like
-> 'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
-> difference of having Authenticated data in the encrypted block.
+Hello,
 
-and ? I'm not following what you're trying to say.
-Where is the inconsistency ?
-My point again is that lskcipher vs skcipher vs foo is an implementation
-detail that shouldn't be exposed in the name.
+syzbot found the following issue on:
+
+HEAD commit:    1fda5bb66ad8 bpf: Do not allocate percpu memory at init st..
+git tree:       bpf
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12d99420e80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2ae0ccd6bfde5eb0
+dashboard link: https://syzkaller.appspot.com/bug?extid=72aa0161922eba61b50e
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16dff22f680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1027dc70e80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3e24d257ce8d/disk-1fda5bb6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eaa9caffb0e4/vmlinux-1fda5bb6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/16182bbed726/bzImage-1fda5bb6.xz
+
+The issue was bisected to:
+
+commit ca247283781d754216395a41c5e8be8ec79a5f1c
+Author: Andy Lutomirski <luto@kernel.org>
+Date:   Wed Feb 10 02:33:45 2021 +0000
+
+    x86/fault: Don't run fixups for SMAP violations
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=103d92db680000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=123d92db680000
+console output: https://syzkaller.appspot.com/x/log.txt?x=143d92db680000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com
+Fixes: ca247283781d ("x86/fault: Don't run fixups for SMAP violations")
+
+BUG: unable to handle page fault for address: ffffffffff600000
+#PF: supervisor read access in kernel mode
+#PF: error_code(0x0000) - not-present page
+PGD cd7a067 P4D cd7a067 PUD cd7c067 PMD cd9f067 PTE 0
+Oops: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 5071 Comm: syz-executor322 Not tainted 6.6.0-syzkaller-15867-g1fda5bb66ad8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/10/2023
+RIP: 0010:copy_from_kernel_nofault mm/maccess.c:36 [inline]
+RIP: 0010:copy_from_kernel_nofault+0x86/0x240 mm/maccess.c:24
+Code: ea 03 0f b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ab 01 00 00 41 83 85 6c 17 00 00 01 eb 1e e8 ba 23 cf ff <48> 8b 45 00 49 89 04 24 48 83 c5 08 49 83 c4 08 48 83 eb 08 e8 a1
+RSP: 0018:ffffc900038d7ae8 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000008 RCX: ffffffff81b8690c
+RDX: ffff888016ab0000 RSI: ffffffff81b868e6 RDI: 0000000000000007
+RBP: ffffffffff600000 R08: 0000000000000007 R09: 0000000000000007
+R10: 0000000000000008 R11: 0000000000000001 R12: ffffc900038d7b30
+R13: ffff888016ab0000 R14: dffffc0000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffff600000 CR3: 000000000cd77000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bpf_probe_read_kernel_common include/linux/bpf.h:2747 [inline]
+ ____bpf_probe_read_kernel kernel/trace/bpf_trace.c:236 [inline]
+ bpf_probe_read_kernel+0x26/0x70 kernel/trace/bpf_trace.c:233
+ bpf_prog_bd8b22826c103b08+0x42/0x44
+ bpf_dispatcher_nop_func include/linux/bpf.h:1196 [inline]
+ __bpf_prog_run include/linux/filter.h:651 [inline]
+ bpf_prog_run include/linux/filter.h:658 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2307 [inline]
+ bpf_trace_run2+0x14e/0x410 kernel/trace/bpf_trace.c:2346
+ trace_kfree include/trace/events/kmem.h:94 [inline]
+ kfree+0xec/0x150 mm/slab_common.c:1043
+ vma_numab_state_free include/linux/mm.h:638 [inline]
+ __vm_area_free+0x3e/0x140 kernel/fork.c:525
+ remove_vma+0x128/0x170 mm/mmap.c:146
+ exit_mmap+0x453/0xa70 mm/mmap.c:3332
+ __mmput+0x12a/0x4d0 kernel/fork.c:1349
+ mmput+0x62/0x70 kernel/fork.c:1371
+ exit_mm kernel/exit.c:567 [inline]
+ do_exit+0x9ad/0x2ae0 kernel/exit.c:858
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1021
+ __do_sys_exit_group kernel/exit.c:1032 [inline]
+ __se_sys_exit_group kernel/exit.c:1030 [inline]
+ __x64_sys_exit_group+0x3e/0x50 kernel/exit.c:1030
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x40/0x110 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fe1c24c2dc9
+Code: Unable to access opcode bytes at 0x7fe1c24c2d9f.
+RSP: 002b:00007ffd4d4b8dc8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fe1c24c2dc9
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
+RBP: 00007fe1c253e290 R08: ffffffffffffffb8 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fe1c253e290
+R13: 0000000000000000 R14: 00007fe1c253ece0 R15: 00007fe1c2494030
+ </TASK>
+Modules linked in:
+CR2: ffffffffff600000
+---[ end trace 0000000000000000 ]---
+RIP: 0010:copy_from_kernel_nofault mm/maccess.c:36 [inline]
+RIP: 0010:copy_from_kernel_nofault+0x86/0x240 mm/maccess.c:24
+Code: ea 03 0f b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 ab 01 00 00 41 83 85 6c 17 00 00 01 eb 1e e8 ba 23 cf ff <48> 8b 45 00 49 89 04 24 48 83 c5 08 49 83 c4 08 48 83 eb 08 e8 a1
+RSP: 0018:ffffc900038d7ae8 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000008 RCX: ffffffff81b8690c
+RDX: ffff888016ab0000 RSI: ffffffff81b868e6 RDI: 0000000000000007
+RBP: ffffffffff600000 R08: 0000000000000007 R09: 0000000000000007
+R10: 0000000000000008 R11: 0000000000000001 R12: ffffc900038d7b30
+R13: ffff888016ab0000 R14: dffffc0000000000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffffffff600000 CR3: 000000000cd77000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 1 bytes skipped:
+   0:	03 0f                	add    (%rdi),%ecx
+   2:	b6 14                	mov    $0x14,%dh
+   4:	02 48 89             	add    -0x77(%rax),%cl
+   7:	f8                   	clc
+   8:	83 e0 07             	and    $0x7,%eax
+   b:	83 c0 03             	add    $0x3,%eax
+   e:	38 d0                	cmp    %dl,%al
+  10:	7c 08                	jl     0x1a
+  12:	84 d2                	test   %dl,%dl
+  14:	0f 85 ab 01 00 00    	jne    0x1c5
+  1a:	41 83 85 6c 17 00 00 	addl   $0x1,0x176c(%r13)
+  21:	01
+  22:	eb 1e                	jmp    0x42
+  24:	e8 ba 23 cf ff       	call   0xffcf23e3
+* 29:	48 8b 45 00          	mov    0x0(%rbp),%rax <-- trapping instruction
+  2d:	49 89 04 24          	mov    %rax,(%r12)
+  31:	48 83 c5 08          	add    $0x8,%rbp
+  35:	49 83 c4 08          	add    $0x8,%r12
+  39:	48 83 eb 08          	sub    $0x8,%rbx
+  3d:	e8                   	.byte 0xe8
+  3e:	a1                   	.byte 0xa1
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
