@@ -1,132 +1,96 @@
-Return-Path: <netdev+bounces-49030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73E27F072F
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:28:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 528347F073E
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 16:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E3CE280D5E
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAD31C2037A
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6787EADB;
-	Sun, 19 Nov 2023 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CEE11CB4;
+	Sun, 19 Nov 2023 15:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u0wKdjaE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F18E126;
-	Sun, 19 Nov 2023 07:28:26 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R711e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=alibuda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VweoVTA_1700407699;
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0VweoVTA_1700407699)
-          by smtp.aliyun-inc.com;
-          Sun, 19 Nov 2023 23:28:23 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net v3] net/smc: avoid data corruption caused by decline
-Date: Sun, 19 Nov 2023 23:28:19 +0800
-Message-Id: <1700407699-97350-1-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB597D8;
+	Sun, 19 Nov 2023 07:50:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=BrFjk1O06Djb+g7yO9ZoZAhKKoqCsxrQIL6sYYG8A34=; b=u0wKdjaE1JGEA1CTCqJzgl6eVs
+	uNVW2PhbQEqnNtan5xFB4564+eELR7spYOcog/fhMsnmbI1NMBPwQo8M6wNGp0HY3untrZITysOqx
+	tfwD7bG4y1G8IdCwRqa4u41l4/uNAcK+O13I5prR1qr4QHY5JZ+WfJFYsXTuDOlO1grU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r4k4A-000ZPq-Sn; Sun, 19 Nov 2023 16:50:34 +0100
+Date: Sun, 19 Nov 2023 16:50:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: benno.lossin@proton.me, boqun.feng@gmail.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu,
+	miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v7 2/5] rust: net::phy add module_phy_driver
+ macro
+Message-ID: <8f7a7fe0-bfd3-4062-9b55-c1e18de2818a@lunn.ch>
+References: <ZVfncj5R9-8aU7vB@boqun-archlinux>
+ <66455d50-9a3c-4b5c-ba2c-5188dae247a9@lunn.ch>
+ <7f300ba1-44e1-4a98-9289-a53928204aa7@proton.me>
+ <20231119.182544.2069714044528296795.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231119.182544.2069714044528296795.fujita.tomonori@gmail.com>
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
+On Sun, Nov 19, 2023 at 06:25:44PM +0900, FUJITA Tomonori wrote:
+> On Fri, 17 Nov 2023 23:01:58 +0000
+> Benno Lossin <benno.lossin@proton.me> wrote:
+> 
+> > On 11/17/23 23:54, Andrew Lunn wrote:
+> >> Each kernel module should be in its own symbol name space. The only
+> >> symbols which are visible outside of the module are those exported
+> >> using EXPORT_SYMBOL_GPL() or EXPORT_SYMBOL(). A PHY driver does not
+> >> export anything, in general.
+> >> 
+> >> Being built in also does not change this.
+> >> 
+> >> Neither drivers/net/phy/ax88796b_rust.o nor
+> >> rust/doctests_kernel_generated.o should have exported this symbol.
+> >> 
+> >> I've no idea how this actually works, i guess there are multiple
+> >> passes through the linker? Maybe once to resolve symbols across object
+> >> files within a module. Normal global symbols are then made local,
+> >> leaving only those exported with EXPORT_SYMBOL_GPL() or
+> >> EXPORT_SYMBOL()? A second pass through linker then links all the
+> >> exported symbols thorough the kernel?
+> > 
+> > I brought this issue up in [1], but I was a bit confused by your last
+> > reply there, as I have no idea how the `EXPORT_SYMBOL` macros work.
+> > 
+> > IIRC on the Rust side all public items are automatically GPL exported.
+> 
+> Hmm, they are public but doesn't look like exported by EXPORT_SYMBOL()
+> or EXPORT_SYMBOL_GPL().
 
-We found a data corruption issue during testing of SMC-R on Redis
-applications.
+Do they need to be public? Generally, a PHY driver does not export
+anything. So you can probably make them private. We just however need
+to ensure the compiler/linker does not think they are unused, so
+throws them away.
 
-The benchmark has a low probability of reporting a strange error as
-shown below.
+I would however like to get an understanding how EXPORT_SYMBOL* is
+supposed to work in rust. Can it really be hidden away? Or should
+methods be explicitly marked like C code? What is the Rust equivalent
+of the three levels of symbol scope we have in C?
 
-"Error: Protocol error, got "\xe2" as reply type byte"
-
-Finally, we found that the retrieved error data was as follows:
-
-0xE2 0xD4 0xC3 0xD9 0x04 0x00 0x2C 0x20 0xA6 0x56 0x00 0x16 0x3E 0x0C
-0xCB 0x04 0x02 0x01 0x00 0x00 0x20 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0xE2
-
-It is quite obvious that this is a SMC DECLINE message, which means that
-the applications received SMC protocol message.
-We found that this was caused by the following situations:
-
-client                  server
-        ¦  proposal
-        ------------->
-        ¦  accept
-        <-------------
-        ¦  confirm
-        ------------->
-wait confirm
-
-        ¦failed llc confirm
-        ¦   x------
-(after 2s)timeout
-                        wait rsp
-
-wait decline
-
-(after 1s) timeout
-                        (after 2s) timeout
-        ¦   decline
-        -------------->
-        ¦   decline
-        <--------------
-
-As a result, a decline message was sent in the implementation, and this
-message was read from TCP by the already-fallback connection.
-
-This patch double the client timeout as 2x of the server value,
-With this simple change, the Decline messages should never cross or
-collide (during Confirm link timeout).
-
-This issue requires an immediate solution, since the protocol updates
-involve a more long-term solution.
-
-Fixes: 0fb0b02bd6fd ("net/smc: adapt SMC client code to use the LLC flow")
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
- net/smc/af_smc.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index abd2667..8615cc0 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -598,8 +598,12 @@ static int smcr_clnt_conf_first_link(struct smc_sock *smc)
- 	struct smc_llc_qentry *qentry;
- 	int rc;
- 
--	/* receive CONFIRM LINK request from server over RoCE fabric */
--	qentry = smc_llc_wait(link->lgr, NULL, SMC_LLC_WAIT_TIME,
-+	/* Receive CONFIRM LINK request from server over RoCE fabric.
-+	 * Increasing the client's timeout by twice as much as the server's
-+	 * timeout by default can temporarily avoid decline messages of
-+	 * both sides crossing or colliding
-+	 */
-+	qentry = smc_llc_wait(link->lgr, NULL, 2 * SMC_LLC_WAIT_TIME,
- 			      SMC_LLC_CONFIRM_LINK);
- 	if (!qentry) {
- 		struct smc_clc_msg_decline dclc;
--- 
-1.8.3.1
-
+	Andrew
 
