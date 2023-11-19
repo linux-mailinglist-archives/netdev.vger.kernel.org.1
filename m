@@ -1,107 +1,93 @@
-Return-Path: <netdev+bounces-49070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12B8F7F0914
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 22:08:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71EBF7F093D
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 22:58:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E24B11C20846
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 21:07:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B03CB20983
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 21:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297E1107AC;
-	Sun, 19 Nov 2023 21:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9165D182CF;
+	Sun, 19 Nov 2023 21:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RVHTk/yQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X5xLKXQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9EED115
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 13:07:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=514jJBS+4BvDFkMU7gnrmpLSn5y8EtqlN9K55rcFhco=; b=RVHTk/yQbW3vXCNJ6WB6fXtw5F
-	u4pUkCLAOVpbXCz2awHva+kGHXfm/soAxbqvkEVI6W9Jnw9oD5yXlXziaE6+EOuigRXlPe9pf5txl
-	q/v/LsjkfWk0oiyH8KRmfgXXGIOw2u/dy209NRldI66DK7YP9bYb+wX2Q6QYU+CRcqnIOe4MapsL8
-	TYNCzZor1CONyNNd9JhVW3XviI5KmS6JvXg8YmeMeFRRxJWMwlnmzlunMzQNIZMRUEvtDJ4NrOBkv
-	jX09osfNQZzmyeGpYXnp6Jq49jgtqppQZKXDOw7hHhnK/u7AmjJjt60VOwqssd893UhKaGskgSpx6
-	IBSJ14xg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58328 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1r4p13-0004kw-1P;
-	Sun, 19 Nov 2023 21:07:41 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1r4p15-00Cpxe-C7; Sun, 19 Nov 2023 21:07:43 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] net: phylink: use for_each_set_bit()
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AC8E107;
+	Sun, 19 Nov 2023 13:58:15 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-32f7c80ab33so2479447f8f.0;
+        Sun, 19 Nov 2023 13:58:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700431093; x=1701035893; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7DHInlKAixtjHWpCSSb9nsEcmRnYPF01P98gw/ou6aY=;
+        b=X5xLKXQ9sYzakXg8w1uPp7vdZ5El/h0D46ilttHnXh+8BTxaR7w4d8UU8FkVglEAhc
+         0Us/wGua7lDzVY5ahaa0gfFIcAkLAQ4XAOq+Gq2RAHhWdAO9wl6Jgyb7wvwAk/cL+HFY
+         8FeTDioAu8PxECEqgDbLiD+uz0MjFvAZeJhAGI7S/CBE/iLbEOZnoJIug+6fd3Zpd0/D
+         vr+x3rU0uADGzlfThOmjhj50xoTeeOzpytbfbTdKN7rbyaL2BGWpkrRp/0a6JBrGtkM9
+         LGKneVx9SXMb2jT0X632aoYa4lrw1D/DvrpVE1oBAkGaalTY4YrJ7lNAkmoVxUrlQLqF
+         kJQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700431093; x=1701035893;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7DHInlKAixtjHWpCSSb9nsEcmRnYPF01P98gw/ou6aY=;
+        b=lCE8ZSCg1JFUfyQxZD2ULa91apVzG+Gga/VyyDsgfje7tv45MFFgBlb8KpjqYuhmjh
+         ctqmgashQmfjtQA+WXIUHfbJDfkGQS3266RQGtbC2qpCaAlmiL/nQoWujgNgehOOx3Ue
+         FkAO+dnOsRKBt0UHnMsexPWMa5HUA1X9OYDcoDIrk1jVVRaoFfd2lAaVgQ3782IG1klc
+         yXzsOgfQa10KFMa8/KmaPnyXM67+OD3OycalKKdQ6uLkyKx3zElGw0yFJHB7qiIXy1Aj
+         Hm671XOwwqfSqXiGyt71G0Ii5gIC7GC31b5Iee2ijgLoOfsFlHsNu6cdqDk7fK/VnyZC
+         WZXw==
+X-Gm-Message-State: AOJu0Yz8d1EYQ/XFT1cSvMoCHnc1XJPVpLGyHC4J9cZ8rB90+xV6KUji
+	HjHLN5iv5MDOkG+iY0lZ8FpkK+aW8Z8FyiYqG4lcU+6R
+X-Google-Smtp-Source: AGHT+IGZM04mtNc46owlWHC1iRvF8ZmEk8CGAt5Ztp/xNz3uveCctVYkqYfV5uytJlgCfvg1hQigvUgo9oAIx9RePpY=
+X-Received: by 2002:adf:fd86:0:b0:32d:857c:d51d with SMTP id
+ d6-20020adffd86000000b0032d857cd51dmr3326047wrr.60.1700431093124; Sun, 19 Nov
+ 2023 13:58:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1r4p15-00Cpxe-C7@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sun, 19 Nov 2023 21:07:43 +0000
+References: <20231118225451.2132137-1-vadfed@meta.com> <20231118225451.2132137-2-vadfed@meta.com>
+In-Reply-To: <20231118225451.2132137-2-vadfed@meta.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 19 Nov 2023 13:58:01 -0800
+Message-ID: <CAADnVQ+tLbMppLNT7HOV5=k+8075qjjyO5wWEDvLRoPi5WALJw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 2/2] selftests: bpf: crypto skcipher algo selftests
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski <kuba@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Network Development <netdev@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use for_each_set_bit() rather than open coding the for() test_bit()
-loop.
+On Sat, Nov 18, 2023 at 2:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> w=
+rote:
+>
+> +
+> +SEC("fentry.s/bpf_fentry_test1")
+> +int BPF_PROG(skb_crypto_setup)
+> +{
+> +       struct bpf_crypto_lskcipher_ctx *cctx;
+> +       struct bpf_dynptr key =3D {};
+> +       int err =3D 0;
+> +
+> +       status =3D 0;
+> +
+> +       bpf_dynptr_from_mem(crypto_key, sizeof(crypto_key), 0, &key);
+> +       cctx =3D bpf_crypto_lskcipher_ctx_create(crypto_algo, &key, &err)=
+;
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phylink.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index d2fa949ff1ea..c276f9482f78 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -697,18 +697,16 @@ static int phylink_validate_mask(struct phylink *pl, unsigned long *supported,
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(all_s) = { 0, };
- 	__ETHTOOL_DECLARE_LINK_MODE_MASK(s);
- 	struct phylink_link_state t;
--	int intf;
-+	int interface;
- 
--	for (intf = 0; intf < PHY_INTERFACE_MODE_MAX; intf++) {
--		if (test_bit(intf, interfaces)) {
--			linkmode_copy(s, supported);
-+	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX) {
-+		linkmode_copy(s, supported);
- 
--			t = *state;
--			t.interface = intf;
--			if (!phylink_validate_mac_and_pcs(pl, s, &t)) {
--				linkmode_or(all_s, all_s, s);
--				linkmode_or(all_adv, all_adv, t.advertising);
--			}
-+		t = *state;
-+		t.interface = interface;
-+		if (!phylink_validate_mac_and_pcs(pl, s, &t)) {
-+			linkmode_or(all_s, all_s, s);
-+			linkmode_or(all_adv, all_adv, t.advertising);
- 		}
- 	}
- 
--- 
-2.30.2
-
+Direct string will work here, right?
+What's the reason to use global var?
 
