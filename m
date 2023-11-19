@@ -1,133 +1,174 @@
-Return-Path: <netdev+bounces-48992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-48995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F04017F04F8
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 10:25:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52A07F0502
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 10:41:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 710B7B2093F
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 09:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B1DC1F220FF
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 09:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C2A4400;
-	Sun, 19 Nov 2023 09:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0CV3fvz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7559A538F;
+	Sun, 19 Nov 2023 09:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70931AF;
-	Sun, 19 Nov 2023 01:25:46 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-6cb79883b7fso124024b3a.1;
-        Sun, 19 Nov 2023 01:25:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700385946; x=1700990746; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Eo1Z79+3qRKmg4q8xtjyQbLZNRbKvXEDTJteX8t8dJ8=;
-        b=b0CV3fvz2mtHdGKI/bvNMvVnaaidXPpuHyEvtT2ZQB0Dlh/lUsORTo0R8YfTcgRa8v
-         J7w2EUtKFLZQXchCt4F62IjnpYD5oInamOyy+jj54vpuXX82d9gnfHKKmVqNurIBcfIq
-         xzeJbO0p3biDpkU5LNV3TMM6BT7+ZUUvVR2xlCuB75wQaSruEjUlVUPyS+28EKPG2Ojt
-         pESzGkQSo+JJ8pDYgPl5SsxtlKp35oulHJGDwschG32VD1Ti0Fcf4EqKoMUWT7KJmHGu
-         0o+sbjlpq6Oj74rCxbru8XFdu7kJ9y8ftXlPU2jz8URq+VWVo0AMP8s3Kas9UA7H19Tk
-         DXew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700385946; x=1700990746;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Eo1Z79+3qRKmg4q8xtjyQbLZNRbKvXEDTJteX8t8dJ8=;
-        b=JoV86rH5oiNcOScUdEbYUFg8kv7Xg8aM1ofLupLxijgjS4AApvt+fvQH8KxC5eN+MX
-         Iap5Op1MspmrnV3UN+a03L0sn+hIA1ZDrnttKlNGeKl8XiWfNnSG5OZ2uVOZJpDDjV2Q
-         3cg4D7VJ9Jq/fwMmcatl9U4HiaLQxy5WrdMXL0PvifTxflxTEzaIY2YWVNLTdvegBHh0
-         R8N+tqzOuRNUl4ALEwZA2O97MCjdsPotrJEnqeuFI10EUPAqsbZOAJ3dHz0MNugZ22ak
-         94oyYrFQHVVlAEQnu9zIumQV2UETyYAU6W+r7wzi+ltM6mWsyDV4bKooBSYn4PGYgg2F
-         bs/Q==
-X-Gm-Message-State: AOJu0YwLvf4FYVC5ozuj8nALCLGhSypT8JixQ+PZZZK+qQkz5gLih50p
-	vrMUuIoSp//jvSOk2QgSKGvtIm/KIsRBgQ==
-X-Google-Smtp-Source: AGHT+IE4LPLwh+X2HZT7jOgOvkzT4bSLFtSZH6FcNrYV1ZWfa91q5VF1Q3XHFjM7ebAXDIfpxQ7YGw==
-X-Received: by 2002:a17:90a:ab87:b0:283:5405:9e90 with SMTP id n7-20020a17090aab8700b0028354059e90mr4258043pjq.3.1700385945719;
-        Sun, 19 Nov 2023 01:25:45 -0800 (PST)
-Received: from localhost (ec2-54-68-170-188.us-west-2.compute.amazonaws.com. [54.68.170.188])
-        by smtp.gmail.com with ESMTPSA id u5-20020a17090adb4500b0028524bf8e52sm54290pjx.37.2023.11.19.01.25.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 01:25:45 -0800 (PST)
-Date: Sun, 19 Nov 2023 18:25:44 +0900 (JST)
-Message-Id: <20231119.182544.2069714044528296795.fujita.tomonori@gmail.com>
-To: benno.lossin@proton.me
-Cc: andrew@lunn.ch, boqun.feng@gmail.com, fujita.tomonori@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu,
- miguel.ojeda.sandonis@gmail.com, wedsonaf@gmail.com
-Subject: Re: [PATCH net-next v7 2/5] rust: net::phy add module_phy_driver
- macro
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <7f300ba1-44e1-4a98-9289-a53928204aa7@proton.me>
-References: <ZVfncj5R9-8aU7vB@boqun-archlinux>
-	<66455d50-9a3c-4b5c-ba2c-5188dae247a9@lunn.ch>
-	<7f300ba1-44e1-4a98-9289-a53928204aa7@proton.me>
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 163F2F9
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 01:41:02 -0800 (PST)
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r4eIA-0005Rk-61; Sun, 19 Nov 2023 10:40:38 +0100
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r4eI6-00A5r4-UB; Sun, 19 Nov 2023 10:40:34 +0100
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1r4eI6-003a79-Kd; Sun, 19 Nov 2023 10:40:34 +0100
+Date: Sun, 19 Nov 2023 10:40:34 +0100
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>, kernel@pengutronix.de,
+	netdev@vger.kernel.org, Yunsheng Lin <linyunsheng@huawei.com>,
+	Ravi Gunasekaran <r-gunasekaran@ti.com>,
+	Marek Majtyka <alardam@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Simon Horman <horms@kernel.org>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	linux-omap@vger.kernel.org
+Subject: Re: [PATCH 2/7] net: ethernet: ti: cpsw: Don't error out in .remove()
+Message-ID: <20231119094034.qxsq3n6nuxn3e4je@pengutronix.de>
+References: <20231117091655.872426-1-u.kleine-koenig@pengutronix.de>
+ <20231117091655.872426-3-u.kleine-koenig@pengutronix.de>
+ <4cabffc1-7ff9-4277-b508-5902f42b47cb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-
-On Fri, 17 Nov 2023 23:01:58 +0000
-Benno Lossin <benno.lossin@proton.me> wrote:
-
-> On 11/17/23 23:54, Andrew Lunn wrote:
->> Each kernel module should be in its own symbol name space. The only
->> symbols which are visible outside of the module are those exported
->> using EXPORT_SYMBOL_GPL() or EXPORT_SYMBOL(). A PHY driver does not
->> export anything, in general.
->> 
->> Being built in also does not change this.
->> 
->> Neither drivers/net/phy/ax88796b_rust.o nor
->> rust/doctests_kernel_generated.o should have exported this symbol.
->> 
->> I've no idea how this actually works, i guess there are multiple
->> passes through the linker? Maybe once to resolve symbols across object
->> files within a module. Normal global symbols are then made local,
->> leaving only those exported with EXPORT_SYMBOL_GPL() or
->> EXPORT_SYMBOL()? A second pass through linker then links all the
->> exported symbols thorough the kernel?
-> 
-> I brought this issue up in [1], but I was a bit confused by your last
-> reply there, as I have no idea how the `EXPORT_SYMBOL` macros work.
-> 
-> IIRC on the Rust side all public items are automatically GPL exported.
-
-Hmm, they are public but doesn't look like exported by EXPORT_SYMBOL()
-or EXPORT_SYMBOL_GPL().
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4c7vy6dzxccj4rvj"
+Content-Disposition: inline
+In-Reply-To: <4cabffc1-7ff9-4277-b508-5902f42b47cb@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
-> But `#[no_mangle]` is probably a special case, since in userspace it
-> is usually used to do interop with C (and therefore the symbol is always
-> exported with the name not mangled).
-> 
-> One fix would be to make the name unique by using the type name supplied
-> in the macro.
-> 
-> [1]: https://lore.kernel.org/rust-for-linux/1aea7ddb-73b7-8228-161e-e2e4ff5bc98d@proton.me/
+--4c7vy6dzxccj4rvj
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I fixed this in a different way; declaring
-__mod_mdio__phydev_device_table only when built as a module.
+Hello Roger,
 
-(@device_table [$($dev:expr),+]) => {
- +        #[cfg(MODULE)]
-          #[no_mangle]
-          static __mod_mdio__phydev_device_table: [::kernel::bindings::mdio_device_id;
-              $crate::module_phy_driver!(@count_devices $($dev),+) + 1] = [
+[dropping Mugunthan V N from Cc, their address bounces, and adding the
+net maintainers that I failed to do for the original submission]
 
-This is used for dynamic loading so when a phy driver is built-in, we
-don't need this.
+On Sat, Nov 18, 2023 at 12:00:08PM +0200, Roger Quadros wrote:
+> > -	cpts_release(cpsw->cpts);
+> > -	cpdma_ctlr_destroy(cpsw->dma);
+> > +	if (ret >=3D 0) {
+> > +		cpts_release(cpsw->cpts);
+>=20
+> cpts_release() only does clk_unprepare().
+> Why not do that in the error path as well?
 
-When a driver is built as a module, the user-space tool converts this
-into moduole alias information. This __mod_mdio__phydev_device_table
-isn't loaded into kernel so no conflict even when multiple phy drivers
-are loaded.
+I thought I saw the pm suspend do a clk_unprepare, but I don't find
+that. Indeed this step shouldn't be skipped.
+
+> > +		cpdma_ctlr_destroy(cpsw->dma);
+>=20
+> cpdma_ctrl_destroy() not only stops the DMA controller
+> but also frees up the channel and calls dma_free_coherent?
+>=20
+> We still want to free up the channel and dma_free_coherent in the
+> error path?
+
+Then we need to split the function and only do the software part. I
+don't have hardware to test this change and getting it right without
+testing seems to be hard.
+
+May I suggest that only do the conversion to remove_new (that doesn't
+modify the resource leak behaviour) and you care for fixing the leaks?
+
+My change would then just look as follows:
+
+diff --git a/drivers/net/ethernet/ti/cpsw.c b/drivers/net/ethernet/ti/cpsw.c
+index ca4d4548f85e..1251160b563b 100644
+--- a/drivers/net/ethernet/ti/cpsw.c
++++ b/drivers/net/ethernet/ti/cpsw.c
+@@ -1722,14 +1722,16 @@ static int cpsw_probe(struct platform_device *pdev)
+ 	return ret;
+ }
+=20
+-static int cpsw_remove(struct platform_device *pdev)
++static void cpsw_remove(struct platform_device *pdev)
+ {
+ 	struct cpsw_common *cpsw =3D platform_get_drvdata(pdev);
+ 	int i, ret;
+=20
+ 	ret =3D pm_runtime_resume_and_get(&pdev->dev);
+-	if (ret < 0)
+-		return ret;
++	if (ret < 0) {
++		dev_err(&pdev->dev, "Failed to resume device (%pe)\n",
++			ERR_PTR(ret))
++	}
+=20
+ 	for (i =3D 0; i < cpsw->data.slaves; i++)
+ 		if (cpsw->slaves[i].ndev)
+@@ -1740,7 +1742,6 @@ static int cpsw_remove(struct platform_device *pdev)
+ 	cpsw_remove_dt(pdev);
+ 	pm_runtime_put_sync(&pdev->dev);
+ 	pm_runtime_disable(&pdev->dev);
+-	return 0;
+ }
+=20
+ #ifdef CONFIG_PM_SLEEP
+@@ -1795,7 +1796,7 @@ static struct platform_driver cpsw_driver =3D {
+ 		.of_match_table =3D cpsw_of_mtable,
+ 	},
+ 	.probe =3D cpsw_probe,
+-	.remove =3D cpsw_remove,
++	.remove_new =3D cpsw_remove,
+ };
+=20
+ module_platform_driver(cpsw_driver);
+
+A similar question for the other two cpsw drivers.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--4c7vy6dzxccj4rvj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmVZ2BEACgkQj4D7WH0S
+/k6iIwf5AYEnbzvJQJ7CBkRhXx9nLE7Qkrw2vQuskmtqFFlx4Nc8Z14qOLR1/EQp
+0XEcbQG7h5lVvUcjyDMq6iaFZAbW22mwgx0a0aE8g41auVSZWC7sAXXQLfNRKlyG
+aMV0qNSYQufU0K9mynMk36C+/+nXuUE3zXx1hhwcI1YI15O3xb+GBGHF4qeKViMF
+e7B98UDIVSv5GUrgBTRgGwVKx22Luk7xCMcDLmF479Vd2bxFRtLRQ17Rk7T7NJBg
+06YLa6OG5mUVO/LnUVuZzzSlrU4OXTiY7XgGCZQZYyVxwh0P4I4K1T53sIfPuQBA
+19YqZ/ftDCPh/yDYm45w8Y3p4HveWg==
+=WPwL
+-----END PGP SIGNATURE-----
+
+--4c7vy6dzxccj4rvj--
 
