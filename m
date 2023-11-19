@@ -1,308 +1,122 @@
-Return-Path: <netdev+bounces-49018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CA447F06B6
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 14:58:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F3A7F06B7
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 15:04:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 729A21C209D3
-	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 13:58:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4F971C203B4
+	for <lists+netdev@lfdr.de>; Sun, 19 Nov 2023 14:04:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EBC1118B;
-	Sun, 19 Nov 2023 13:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C1A1118B;
+	Sun, 19 Nov 2023 14:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6C71A6;
-	Sun, 19 Nov 2023 05:58:20 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=21;SR=0;TI=SMTPD_---0Vwecggm_1700402295;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Vwecggm_1700402295)
-          by smtp.aliyun-inc.com;
-          Sun, 19 Nov 2023 21:58:16 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kgraul@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	raspl@linux.ibm.com,
-	schnelle@linux.ibm.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 7/7] net/smc: manage system EID in SMC stack instead of ISM driver
-Date: Sun, 19 Nov 2023 21:57:57 +0800
-Message-Id: <1700402277-93750-8-git-send-email-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
-References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9F8E6;
+	Sun, 19 Nov 2023 06:04:37 -0800 (PST)
+X-UUID: fd166c3e721240ddbd62ef20f841775c-20231119
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:73491798-38e8-4b57-91e5-290706a0f642,IP:5,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-15
+X-CID-INFO: VERSION:1.1.32,REQID:73491798-38e8-4b57-91e5-290706a0f642,IP:5,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-15
+X-CID-META: VersionHash:5f78ec9,CLOUDID:ce9fd172-1bd3-4f48-b671-ada88705968c,B
+	ulkID:23111801152865C88OMS,BulkQuantity:3,Recheck:0,SF:19|44|64|66|24|17|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:11|1,File:nil,Bulk:40,QS:nil,BEC:nil,
+	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_ULN,TF_CID_SPAM_SNR,
+	TF_CID_SPAM_FAS
+X-UUID: fd166c3e721240ddbd62ef20f841775c-20231119
+X-User: chentao@kylinos.cn
+Received: from [172.20.15.254] [(116.128.244.169)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1059029858; Sun, 19 Nov 2023 22:04:19 +0800
+Message-ID: <d827c4a5-96f9-4d11-a731-03721f51e539@kylinos.cn>
+Date: Sun, 19 Nov 2023 22:04:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ipv4: Correct/silence an endian warning in
+ __ip_do_redirect
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, kunwu.chan@hotmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231117152728.2286551-1-chentao@kylinos.cn>
+ <CANn89iLHd9oxO6yXmZMfO5cTsnSzqa==ZBCnNEySKpiH86q54Q@mail.gmail.com>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <CANn89iLHd9oxO6yXmZMfO5cTsnSzqa==ZBCnNEySKpiH86q54Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The System EID (SEID) is an internal EID that is used by the SMCv2
-software stack that has a predefined and constant value representing
-the s390 physical machine that the OS is executing on. So it should
-be managed by SMC stack instead of ISM driver and be consistent for
-all ISMv2 device (including virtual ISM devices) on s390 architecture.
+Hi Eric,
+Thank you so much for taking the time to guide me, I'm a rookie who 
+really wants to do my part for the kernel, and I can't get started, so I 
+thought about eliminating some of the sparse warnings. I've looked at 
+some other commits and thought I could resolve the alert this way, sorry 
+for the trouble.
+Follow your suggestion:
+1. I will add a 'Fixes' tag as follows:
+'Fixes: 969447f226b4 ("ipv4: use new_gw for redirect neigh lookup")'
 
-Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- drivers/s390/net/ism.h     |  6 ------
- drivers/s390/net/ism_drv.c | 36 ++++--------------------------------
- include/linux/ism.h        |  1 -
- include/net/smc.h          |  1 -
- net/smc/smc_ism.c          | 40 ++++++++++++++++++++++++++++++----------
- net/smc/smc_ism.h          |  8 ++++++++
- 6 files changed, 42 insertions(+), 50 deletions(-)
+2. Refer to the modification method of commit 
+3c42b2019863b327caa233072c50739d4144dd16, and modify the patch to:
+'n = __ipv4_neigh_lookup(rt->dst.dev, (__force u32)new_gw); '
 
-diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
-index 70c5bbd..49ccbd68 100644
---- a/drivers/s390/net/ism.h
-+++ b/drivers/s390/net/ism.h
-@@ -192,12 +192,6 @@ struct ism_sba {
- #define ISM_CREATE_REQ(dmb, idx, sf, offset)		\
- 	((dmb) | (idx) << 24 | (sf) << 23 | (offset))
- 
--struct ism_systemeid {
--	u8	seid_string[24];
--	u8	serial_number[4];
--	u8	type[4];
--};
--
- static inline void __ism_read_cmd(struct ism_dev *ism, void *data,
- 				  unsigned long offset, unsigned long len)
- {
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 54b865b..4e5ff5d 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -37,6 +37,7 @@
- 						/* a list for fast mapping  */
- static u8 max_client;
- static DEFINE_MUTEX(clients_lock);
-+static bool ism_v2_capable;
- struct ism_dev_list {
- 	struct list_head list;
- 	struct mutex mutex; /* protects ism device list */
-@@ -477,32 +478,6 @@ int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
- }
- EXPORT_SYMBOL_GPL(ism_move);
- 
--static struct ism_systemeid SYSTEM_EID = {
--	.seid_string = "IBM-SYSZ-ISMSEID00000000",
--	.serial_number = "0000",
--	.type = "0000",
--};
--
--static void ism_create_system_eid(void)
--{
--	struct cpuid id;
--	u16 ident_tail;
--	char tmp[5];
--
--	get_cpu_id(&id);
--	ident_tail = (u16)(id.ident & ISM_IDENT_MASK);
--	snprintf(tmp, 5, "%04X", ident_tail);
--	memcpy(&SYSTEM_EID.serial_number, tmp, 4);
--	snprintf(tmp, 5, "%04X", id.machine);
--	memcpy(&SYSTEM_EID.type, tmp, 4);
--}
--
--u8 *ism_get_seid(void)
--{
--	return SYSTEM_EID.seid_string;
--}
--EXPORT_SYMBOL_GPL(ism_get_seid);
--
- static u16 ism_get_chid(struct ism_dev *ism)
- {
- 	if (!ism || !ism->pdev)
-@@ -607,7 +582,7 @@ static int ism_dev_init(struct ism_dev *ism)
- 
- 	if (!ism_add_vlan_id(ism, ISM_RESERVED_VLANID))
- 		/* hardware is V2 capable */
--		ism_create_system_eid();
-+		ism_v2_capable = true;
- 
- 	mutex_lock(&ism_dev_list.mutex);
- 	mutex_lock(&clients_lock);
-@@ -712,8 +687,7 @@ static void ism_dev_exit(struct ism_dev *ism)
- 	}
- 	mutex_unlock(&clients_lock);
- 
--	if (SYSTEM_EID.serial_number[0] != '0' ||
--	    SYSTEM_EID.type[0] != '0')
-+	if (ism_v2_capable)
- 		ism_del_vlan_id(ism, ISM_RESERVED_VLANID);
- 	unregister_ieq(ism);
- 	unregister_sba(ism);
-@@ -826,8 +800,7 @@ static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
- 
- static int smcd_supports_v2(void)
- {
--	return SYSTEM_EID.serial_number[0] != '0' ||
--		SYSTEM_EID.type[0] != '0';
-+	return ism_v2_capable;
- }
- 
- static void smcd_get_local_gid(struct smcd_dev *smcd,
-@@ -860,7 +833,6 @@ static inline struct device *smcd_get_dev(struct smcd_dev *dev)
- 	.signal_event = smcd_signal_ieq,
- 	.move_data = smcd_move,
- 	.supports_v2 = smcd_supports_v2,
--	.get_system_eid = ism_get_seid,
- 	.get_local_gid = smcd_get_local_gid,
- 	.get_chid = smcd_get_chid,
- 	.get_dev = smcd_get_dev,
-diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 9a4c204..5428edd 100644
---- a/include/linux/ism.h
-+++ b/include/linux/ism.h
-@@ -86,7 +86,6 @@ int  ism_register_dmb(struct ism_dev *dev, struct ism_dmb *dmb,
- int  ism_unregister_dmb(struct ism_dev *dev, struct ism_dmb *dmb);
- int  ism_move(struct ism_dev *dev, u64 dmb_tok, unsigned int idx, bool sf,
- 	      unsigned int offset, void *data, unsigned int size);
--u8  *ism_get_seid(void);
- 
- const struct smcd_ops *ism_get_smcd_ops(void);
- 
-diff --git a/include/net/smc.h b/include/net/smc.h
-index a0dc1187e..c9dcb30 100644
---- a/include/net/smc.h
-+++ b/include/net/smc.h
-@@ -73,7 +73,6 @@ struct smcd_ops {
- 			 bool sf, unsigned int offset, void *data,
- 			 unsigned int size);
- 	int (*supports_v2)(void);
--	u8* (*get_system_eid)(void);
- 	void (*get_local_gid)(struct smcd_dev *dev, struct smcd_gid *gid);
- 	u16 (*get_chid)(struct smcd_dev *dev);
- 	struct device* (*get_dev)(struct smcd_dev *dev);
-diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index a33f861..d463d05 100644
---- a/net/smc/smc_ism.c
-+++ b/net/smc/smc_ism.c
-@@ -43,6 +43,27 @@ static void smcd_handle_irq(struct ism_dev *ism, unsigned int dmbno,
- };
- #endif
- 
-+static void smc_ism_create_system_eid(void)
-+{
-+	struct smc_ism_seid *seid =
-+		(struct smc_ism_seid *)smc_ism_v2_system_eid;
-+#if IS_ENABLED(CONFIG_S390)
-+	struct cpuid id;
-+	u16 ident_tail;
-+	char tmp[5];
-+
-+	memcpy(seid->seid_string, "IBM-SYSZ-ISMSEID00000000", 24);
-+	get_cpu_id(&id);
-+	ident_tail = (u16)(id.ident & SMC_ISM_IDENT_MASK);
-+	snprintf(tmp, 5, "%04X", ident_tail);
-+	memcpy(seid->serial_number, tmp, 4);
-+	snprintf(tmp, 5, "%04X", id.machine);
-+	memcpy(seid->type, tmp, 4);
-+#else
-+	memset(seid, 0, SMC_MAX_EID_LEN);
-+#endif
-+}
-+
- /* Test if an ISM communication is possible - same CPC */
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
- 		    struct smcd_dev *smcd)
-@@ -70,6 +91,11 @@ bool smc_ism_is_v2_capable(void)
- 	return smc_ism_v2_capable;
- }
- 
-+void smc_ism_set_v2_capable(void)
-+{
-+	smc_ism_v2_capable = true;
-+}
-+
- /* Set a connection using this DMBE. */
- void smc_ism_set_conn(struct smc_connection *conn)
- {
-@@ -431,14 +457,8 @@ static void smcd_register_dev(struct ism_dev *ism)
- 
- 	mutex_lock(&smcd_dev_list.mutex);
- 	if (list_empty(&smcd_dev_list.list)) {
--		u8 *system_eid = NULL;
--
--		system_eid = smcd->ops->get_system_eid();
--		if (smcd->ops->supports_v2()) {
--			smc_ism_v2_capable = true;
--			memcpy(smc_ism_v2_system_eid, system_eid,
--			       SMC_MAX_EID_LEN);
--		}
-+		if (smcd->ops->supports_v2())
-+			smc_ism_set_v2_capable();
- 	}
- 	/* sort list: devices without pnetid before devices with pnetid */
- 	if (smcd->pnetid[0])
-@@ -542,10 +562,10 @@ int smc_ism_init(void)
- {
- 	int rc = 0;
- 
--#if IS_ENABLED(CONFIG_ISM)
- 	smc_ism_v2_capable = false;
--	memset(smc_ism_v2_system_eid, 0, SMC_MAX_EID_LEN);
-+	smc_ism_create_system_eid();
- 
-+#if IS_ENABLED(CONFIG_ISM)
- 	rc = ism_register_client(&smc_ism_client);
- #endif
- 	return rc;
-diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-index 0e5e563..6903cd5 100644
---- a/net/smc/smc_ism.h
-+++ b/net/smc/smc_ism.h
-@@ -16,6 +16,7 @@
- #include "smc.h"
- 
- #define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
-+#define SMC_ISM_IDENT_MASK		0x00FFFF
- 
- struct smcd_dev_list {	/* List of SMCD devices */
- 	struct list_head list;
-@@ -30,6 +31,12 @@ struct smc_ism_vlanid {			/* VLAN id set on ISM device */
- 	refcount_t refcnt;		/* Reference count */
- };
- 
-+struct smc_ism_seid {
-+	u8 seid_string[24];
-+	u8 serial_number[4];
-+	u8 type[4];
-+};
-+
- struct smcd_dev;
- 
- int smc_ism_cantalk(struct smcd_gid *peer_gid, unsigned short vlan_id,
-@@ -45,6 +52,7 @@ int smc_ism_register_dmb(struct smc_link_group *lgr, int buf_size,
- void smc_ism_get_system_eid(u8 **eid);
- u16 smc_ism_get_chid(struct smcd_dev *dev);
- bool smc_ism_is_v2_capable(void);
-+void smc_ism_set_v2_capable(void);
- int smc_ism_init(void);
- void smc_ism_exit(void);
- int smcd_nl_get_device(struct sk_buff *skb, struct netlink_callback *cb);
--- 
-1.8.3.1
-
+On 2023/11/18 01:15, Eric Dumazet wrote:
+> On Fri, Nov 17, 2023 at 6:07 PM Kunwu Chan <chentao@kylinos.cn> wrote:
+>>
+>> net/ipv4/route.c:783:46: warning: incorrect type in argument 2 (different base types)
+>> net/ipv4/route.c:783:46:    expected unsigned int [usertype] key
+>> net/ipv4/route.c:783:46:    got restricted __be32 [usertype] new_gw
+>>
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> 
+> We need Fixes: tag for networking patches.
+> 
+>> ---
+>>   net/ipv4/route.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+>> index 3290a4442b4a..e8a542c6b031 100644
+>> --- a/net/ipv4/route.c
+>> +++ b/net/ipv4/route.c
+>> @@ -780,7 +780,7 @@ static void __ip_do_redirect(struct rtable *rt, struct sk_buff *skb, struct flow
+>>                          goto reject_redirect;
+>>          }
+>>
+>> -       n = __ipv4_neigh_lookup(rt->dst.dev, new_gw);
+>> +       n = __ipv4_neigh_lookup(rt->dst.dev, be32_to_cpu(new_gw));
+>>          if (!n)
+>>                  n = neigh_create(&arp_tbl, &new_gw, rt->dst.dev);
+>>          if (!IS_ERR(n)) {
+>> --
+>> 2.34.1
+>>
+> 
+> How was this patch tested ?
+> 
+> You are 'fixing' sparse warnings by replacing them with real bugs.
+> 
+> be32_to_cpu() is going to swap bytes on x86, so the lookup will fail horribly.
+> 
+> Here, if you must silence sparse, you want (__force u32)new_gw
+> 
+> Look at this commit for a template.
+> 
+> commit 3c42b2019863b327caa233072c50739d4144dd16
 
