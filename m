@@ -1,49 +1,70 @@
-Return-Path: <netdev+bounces-49167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5ED7F0FD9
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:07:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0077F0FEB
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7AE01F2327E
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:07:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61C57281D48
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A3212B70;
-	Mon, 20 Nov 2023 10:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63A412B7D;
+	Mon, 20 Nov 2023 10:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qEyPPQ39"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jknRFWt9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5910C63D4
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:07:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62C23C433C8;
-	Mon, 20 Nov 2023 10:07:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700474857;
-	bh=TGfMgrwe2KSPbSi99VzqSOOv4ugU1e/nyk1zzOp92KM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qEyPPQ394vbJXExhh6eX21kitVT0AmfJLg1XKcXda1q+nqME91xRGKsNFonThOvQR
-	 i4K2EQ2/aMLkdO6ny8mWPfC7nc1LyQ9acrGHvoEqew8OGRCOdPngtBZZv70NlK5jK5
-	 A7heIR2lmBpYneiuMaE/IhxRZks3gCjVkP5M78zUU+SEA+HuRF3Ey/XS3XGNeS6RU1
-	 a8HpfkoeO+Gb6SVUz7LArSjoVrCaHQctl6SMHmXpVDuVIGnMcFRali1cw0Z+h5uyEc
-	 aQnD4ZCaKE4tu33Kapp+xme/8zxxLMfC1WHZnQWXyUkW5nIx3sqDFj6UnOpPxnFAtb
-	 BpXvxcB2YG5eg==
-Date: Mon, 20 Nov 2023 10:07:32 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: Kunwu Chan <chentao@kylinos.cn>, jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	kunwu.chan@hotmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: sched: Fix restricted __be16 degrades to integer
-Message-ID: <20231120100732.GN186930@vergenet.net>
-References: <20231117101815.1867175-1-chentao@kylinos.cn>
- <b9a9aaef-a306-4fcf-83df-28140d9311bf@mojatatu.com>
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3997D63
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:09:09 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-6c3363a2b93so4024768b3a.3
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:09:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700474949; x=1701079749; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vI6WE+WBYN1XuPQLStil+cx+ieN1FsNdjqfwcx5L8Ng=;
+        b=jknRFWt9CfVEPaa1r8Zinqg6ejbIvUKEubAzYl77Hd//7G7iX+6D83R1/sUefpfJMW
+         WwM8vfUZX+ephu1wQVbwAv3hf9dQCnAG/XKvwRtOsNePhUepRO1VfZVByNWOFWORLY6l
+         xi6G36p8VzlBpcRAlQQ2V2z2rzbWYstTPHZL+NxsrJvq/tbPbBLyhn3BAeWak4O6nHrx
+         I11VBut+ucO8gNgZQnudn4xSHItwP/XtbcFnIO/M3YRn1MO8fr/mX9OoVytbE9JgL/j3
+         cUt4NkOj2ZXKTAUsSC6/hbTcXJXCibMW7lzkY77gpp59qFwTrQ6AlwElgR7nj73ennHy
+         ZyBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700474949; x=1701079749;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vI6WE+WBYN1XuPQLStil+cx+ieN1FsNdjqfwcx5L8Ng=;
+        b=mx7tSq3bxwuibqJkr6fi3WfccO4N9kdGDlVJKwAHmdo9Ern/Hb0PRdkdgLtxPwGho0
+         qiODUH1JWKDLgnBk7zNs3ZSH0XYkXmdxivtpXnDdqhW/HsTJkIKRIEQAQ8F1f3d5JjfC
+         mrzeBrXFBFQkM03x/B3hYON2MU4oklX+zFrQLtA79jmKdGlbVM6XthzPjnQ7/k4fa0kp
+         X0qsKfDX6W+aJ8fRJNTWLfWplUyKz7pybFn3BMVgHjSNe2CrymzuAElwJuZEDvPVeezs
+         qcVPCxkifxkJ0AJ/xg+Ph3YFtLZgp8vqLKf54kQLUSNKuyErLDl4mMeQY2VfO3qYEPnX
+         Gnkg==
+X-Gm-Message-State: AOJu0YzZDI8i4njpCR7O3d86qfA2vMVui8AO7oOhTczmBjn32cjONd9X
+	S9pIXyzzjpzaTkeLprgy/l2dTmZEq1EKJr8G
+X-Google-Smtp-Source: AGHT+IFV0I6knaWy8ukT/hWBk0BRl1RkXst3IkcfIaJUkJC7FnY5VSSZ2Uenb4JtCowQOyiAc6dCnQ==
+X-Received: by 2002:a05:6a00:1888:b0:6c4:dd5b:9747 with SMTP id x8-20020a056a00188800b006c4dd5b9747mr10297747pfh.17.1700474949092;
+        Mon, 20 Nov 2023 02:09:09 -0800 (PST)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id f14-20020aa782ce000000b0068fcb70ccafsm5732191pfn.129.2023.11.20.02.09.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 02:09:08 -0800 (PST)
+Date: Mon, 20 Nov 2023 18:09:03 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, syzkaller@googlegroups.com
+Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
+Message-ID: <ZVswP0vvfCm0FlWO@Laptop-X1>
+References: <20231117141733.3344158-1-edumazet@google.com>
+ <170042342319.11006.13933415217196728575.git-patchwork-notify@kernel.org>
+ <CAHmME9q4uSKxtEnRmcM2h2GGSBcq9Hu_9tk3EX2_EVGFXr6KnQ@mail.gmail.com>
+ <CANn89iLm0SX4dF1Y29ui=SxO5ut=v66S6SvgFsD2cjU=JN1pmA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,47 +73,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b9a9aaef-a306-4fcf-83df-28140d9311bf@mojatatu.com>
+In-Reply-To: <CANn89iLm0SX4dF1Y29ui=SxO5ut=v66S6SvgFsD2cjU=JN1pmA@mail.gmail.com>
 
-On Fri, Nov 17, 2023 at 09:06:11AM -0300, Pedro Tammela wrote:
-> On 17/11/2023 07:18, Kunwu Chan wrote:
-> > net/sched/cls_api.c:2010:25: warning: restricted __be16 degrades to integer
-> > net/sched/cls_api.c:2695:50: warning: restricted __be16 degrades to integer
-> > 
-> > Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> > ---
-> >   net/sched/cls_api.c | 4 ++--
-> >   1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> > index f73f39f61f66..4c47490eb0c1 100644
-> > --- a/net/sched/cls_api.c
-> > +++ b/net/sched/cls_api.c
-> > @@ -2007,7 +2007,7 @@ static int tcf_fill_node(struct net *net, struct sk_buff *skb,
-> >   		tcm->tcm_ifindex = TCM_IFINDEX_MAGIC_BLOCK;
-> >   		tcm->tcm_block_index = block->index;
-> >   	}
-> > -	tcm->tcm_info = TC_H_MAKE(tp->prio, tp->protocol);
-> > +	tcm->tcm_info = TC_H_MAKE(tp->prio, be16_to_cpu(tp->protocol));
-> >   	if (nla_put_string(skb, TCA_KIND, tp->ops->kind))
-> >   		goto nla_put_failure;
-> >   	if (nla_put_u32(skb, TCA_CHAIN, tp->chain->index))
-> > @@ -2692,7 +2692,7 @@ static bool tcf_chain_dump(struct tcf_chain *chain, struct Qdisc *q, u32 parent,
-> >   		    TC_H_MAJ(tcm->tcm_info) != tp->prio)
-> >   			continue;
-> >   		if (TC_H_MIN(tcm->tcm_info) &&
-> > -		    TC_H_MIN(tcm->tcm_info) != tp->protocol)
-> > +		    TC_H_MIN(tcm->tcm_info) != be16_to_cpu(tp->protocol))
-> >   			continue;
-> >   		if (*p_index > index_start)
-> >   			memset(&cb->args[1], 0,
+On Mon, Nov 20, 2023 at 08:56:02AM +0100, Eric Dumazet wrote:
+> > I thought that, given my concerns, if this was to be committed, at
+> > least Eric (or you?) would expand on the rationale in the context of
+> > my concerns while (or before) doing so, rather than just applying this
+> > without further discussion. As I mentioned, this is fine with me if
+> > you feel strongly about it, but I would appreciate some expanded
+> > explanation, just for my own understanding of the matter.
+> >
+> > Jason
 > 
-> I don't believe there's something to fix here
+> Jason, I was in week end mode, so could not reply to your message.
+> 
+> This fix is rather obvious to me. I do not want to spend too much time on it,
+> and you gave an ACK if I am not mistaken.
+> 
+> If you prefer not letting syzbot find other bugs in wireguard (because
+> hitting this issue first),
+> this is fine by me. We can ask syzbot team to not include wireguard in
+> their kernels.
 
-Hi,
+Some performance test data may helps.
 
-as there are two patches addressing similar problems let's discuss
-an appropriate approach (or not) in one place. I'd like to suggest here:
+As I don't have good and same configure test machines. I just did a rough test.
 
-Link: https://lore.kernel.org/netdev/20231120100417.GM186930@vergenet.net/
+Client: RHEL9.2, CPU  Intel E5-2620, Memory 4096 MB, NIC I350
+Server: 6.7.0-rc1, CPU Intel Xeon Silver 4216, 196608 MB, NIC I350
+
+Before patch:
+=== 4in4 TCP_STREAM: 901.05 Mbits/sec ===
+=== 4in4 MPTCP_STREAM: 885.22 Mbits/sec ===
+=== 4in4 UDP_STREAM: 919.91 Mbits/sec ===
+=== 4in4 SCTP_STREAM: 903.12 Mbits/sec ===
+
+After patch:
+=== 4in4 TCP_STREAM: 901.07 Mbits/sec ===
+=== 4in4 MPTCP_STREAM: 885.24 Mbits/sec ===
+=== 4in4 UDP_STREAM: 919.91 Mbits/sec ===
+=== 4in4 SCTP_STREAM: 903.14 Mbits/sec ===
+
+Exchange the client/server role:
+
+Before patch:
+=== 4in4 TCP_STREAM: 901.08 Mbits/sec ===
+=== 4in4 MPTCP_STREAM: 885.12 Mbits/sec ===
+=== 4in4 UDP_STREAM: 919.94 Mbits/sec ===
+=== 4in4 SCTP_STREAM: 903.09 Mbits/sec ===
+
+After patch:
+=== 4in4 TCP_STREAM: 901.04 Mbits/sec ===
+=== 4in4 MPTCP_STREAM: 885.24 Mbits/sec ===
+=== 4in4 UDP_STREAM: 919.91 Mbits/sec ===
+=== 4in4 SCTP_STREAM: 903.11 Mbits/sec ===
+
+The result looks good to me.
+
+Thanks
+Hangbin
 
