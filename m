@@ -1,88 +1,113 @@
-Return-Path: <netdev+bounces-49105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D157F0D8C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:29:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3224C7F0DC5
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A7822817A8
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:29:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9434B211BD
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0915EF4EB;
-	Mon, 20 Nov 2023 08:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ig6RPiZa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C496FD0;
+	Mon, 20 Nov 2023 08:41:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D0E63C6
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:29:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62B2EC433C8;
-	Mon, 20 Nov 2023 08:29:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700468950;
-	bh=3CouQvwHRCHLRdvaRjTMN428V1X6HNQeCsP2HwMtMDw=;
-	h=From:Date:Subject:To:Cc:From;
-	b=ig6RPiZaPLBgrhmzxG3MPBdxSHECiwVFeH8xRLVZrl+HM8bQ660m1ZGBJNwKILIXC
-	 ro+bv8h9ta70hh8Px567vwTjh98qHW90zYGqjB+Rfk5+lcQv36GjZ0re8Lj/zogRrg
-	 NCRclp0VUDFPu/YpLH9dRktBaiJjuI9a6QTgch3xWaVGxd9v369exKdPcz339ZA1/b
-	 IxFHbyXGnRXAW1ucMh3+WYosTYXfdPNrEJkvG4cey/QSQcJWU5i8wperC6sy8ZlLb4
-	 9yE+KXS86U9uchqR6+kbz/3UlznadpX9jpoTjFrVsXB7jXotWYiIJUe1cgsKQf1PYQ
-	 Tr7I4Fw4iWupg==
-From: Simon Horman <horms@kernel.org>
-Date: Mon, 20 Nov 2023 08:28:40 +0000
-Subject: [PATCH net-next] MAINTAINERS: Add indirect_call_wrapper.h to
- NETWORKING [GENERAL]
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D8283;
+	Mon, 20 Nov 2023 00:41:36 -0800 (PST)
+Received: from [192.168.1.103] (31.173.86.165) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
+ 2023 11:41:25 +0300
+Subject: Re: [PATCH 12/14] arm64: dts: renesas: Improve documentation for
+ SW_SD0_DEV_SEL
+To: Claudiu <claudiu.beznea@tuxon.dev>, <s.shtylyov@omp.ru>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<linux@armlinux.org.uk>, <geert+renesas@glider.be>, <magnus.damm@gmail.com>,
+	<mturquette@baylibre.com>, <sboyd@kernel.org>, <linus.walleij@linaro.org>,
+	<p.zabel@pengutronix.de>, <arnd@arndb.de>, <m.szyprowski@samsung.com>,
+	<alexandre.torgue@foss.st.com>, <afd@ti.com>, <broonie@kernel.org>,
+	<alexander.stein@ew.tq-group.com>, <eugen.hristev@collabora.com>,
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, <biju.das.jz@bp.renesas.com>
+CC: <linux-renesas-soc@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-clk@vger.kernel.org>,
+	<linux-gpio@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120070024.4079344-13-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <87d30cc4-d7c3-42fd-a1b9-0e17c02e265b@omp.ru>
+Date: Mon, 20 Nov 2023 11:41:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20231120070024.4079344-13-claudiu.beznea.uj@bp.renesas.com>
 Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <20231120-indirect_call_wrapper-maintainer-v1-1-0a6bb1f7363e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALcYW2UC/x2N0QrCMAxFf2Xk2ULbgVN/RWRkbaaBGUtadDD27
- 4Y9HLjn5Z4NKilThVu3gdKXK3/EJJw6SC+UJznO5hB97EOI3rFkVkptTLgs40+xFFL3RpZm2Jy
- n6Tr0wZ8zXsBuitLM65G4g1BzQmuDx77/AWMD7S58AAAA
-To: Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.12.3
+X-Originating-IP: [31.173.86.165]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 08:12:39
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181469 [Nov 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.165 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.165 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.165
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/20/2023 08:18:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 7:13:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-indirect_call_wrapper.h  is not, strictly speaking, networking specific.
-However, it's git history indicates that in practice changes go through
-netdev and thus the netdev maintainers have effectively been taking
-responsibility for it.
+On 11/20/23 10:00 AM, Claudiu wrote:
 
-Formalise this by adding it to the NETWORKING [GENERAL] section in the
-MAINTAINERS file.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Add switch OFF/OFF description to values of SW_SD0_DEV_SEL for
 
-It is not clear how many other files under include/linux fall into this
-category and it would be interesting, as a follow-up, to audit that and
-propose further updates to the MAINTAINERS file as appropriate.
+   OFF/ON probably?
 
-Link: https://lore.kernel.org/netdev/20231116010310.4664dd38@kernel.org/
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+> better understanding.
+> 
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 482d428472e7..b0493ebd361a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15055,6 +15055,7 @@ F:	Documentation/networking/
- F:	Documentation/process/maintainer-netdev.rst
- F:	Documentation/userspace-api/netlink/
- F:	include/linux/in.h
-+F:	include/linux/indirect_call_wrapper.h
- F:	include/linux/net.h
- F:	include/linux/netdevice.h
- F:	include/net/
-
+MBR, Sergey
 
