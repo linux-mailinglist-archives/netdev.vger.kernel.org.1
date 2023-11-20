@@ -1,151 +1,104 @@
-Return-Path: <netdev+bounces-49411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 668FF7F1F35
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:33:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81127F1CED
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95F991C21480
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:33:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BEE4282702
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D173B38F83;
-	Mon, 20 Nov 2023 21:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3C613AFC;
+	Mon, 20 Nov 2023 18:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cluwzw5O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rNbB3zQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4712CA;
-	Mon, 20 Nov 2023 13:33:22 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id ffacd0b85a97d-3316c6e299eso2042547f8f.1;
-        Mon, 20 Nov 2023 13:33:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700516001; x=1701120801; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWNfORC9WXph6KKDiI7YmzeaXM5cXoqqihKDnt/tg2s=;
-        b=Cluwzw5OFtzeiZoa68ubC9KWbv4ROMqa9blzQBwHsvEDrEvN0CU1dd4ICeMSk+XkUH
-         ZlgkJG61pC/3+inc6II4Ogugv9n3VswVti5+Tr0YQ6IyXK1DP1QfI5jQrJ4HBvOWezg4
-         thqAtBl2kvSuIGHtNg2zeyXBF/PrxfUKg8+lj0r5dtZm2KerDwoNpcdy59pftvBXmmF6
-         lDl4ofcqF8UMxEh+42PtZbzJDl97JM7sDo6aEVYzzIwd2PuCLxcFBse4wp4tNpyWGsQs
-         6Ye9SQDAImc9Q37bWqAJdkZeS3nCaew82u3xJYzeZMcZf4dOyTW7V1itijKrL2pt+Lpo
-         WQ6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700516001; x=1701120801;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kWNfORC9WXph6KKDiI7YmzeaXM5cXoqqihKDnt/tg2s=;
-        b=aQBzt8l4+ohJT9w3v1jYM0fgz+itU72O783xWfK2X+BqcVH/a6MR5o+l3fT/taeJeU
-         h0No/u8oO1wNCm6H3NOWQOLFBrJMP1H2qHXchpIuD1lTafgDe+KzHaa/VWuHBpfa58LE
-         MBhnQI4IJra1yYRWnztmLKCD4D8JgTqouWl+IT2gM+Mr+//fOCbUWXZ+F1JM7bWjUJ0r
-         z7UcESifa2QWyJtv4NNteigP/EmM49tZlUrLdrQO/t+oGeL+AOZpCyUfecmARg+St+wL
-         y0eBeg1A0jjjnjuauJvAfVSbUwT+xxnoSoXtd3TeBu2a8DNuJoN2WM/rXwl+Tzkc3ijW
-         7p3w==
-X-Gm-Message-State: AOJu0YzZKXbERaY6CR/xA0wmgJc+fprJvU4aXOXtH1tJ4qjvWT8QCvyt
-	HU9X2K+6xSvlFABbi3QSIuE=
-X-Google-Smtp-Source: AGHT+IGWWKqhNx6gXBkuFHcXHhfK1w8N/HKv9y2WoU75JVgzVFjqqAOeK/jHkG5ym9ne0q6hzaMShg==
-X-Received: by 2002:adf:9b89:0:b0:332:c4b0:6a19 with SMTP id d9-20020adf9b89000000b00332c4b06a19mr4949954wrc.59.1700516000813;
-        Mon, 20 Nov 2023 13:33:20 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id c15-20020adfe70f000000b0032da8fb0d05sm12257843wrm.110.2023.11.20.13.33.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 13:33:20 -0800 (PST)
-Message-ID: <655bd0a0.df0a0220.568c3.92d9@mx.google.com>
-X-Google-Original-Message-ID: <ZVupN1rFPGIPryuG@Ansuel-xps.>
-Date: Mon, 20 Nov 2023 19:45:11 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDF7328C9;
+	Mon, 20 Nov 2023 18:51:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D3EC433C8;
+	Mon, 20 Nov 2023 18:51:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700506310;
+	bh=W2rRlTlnaz7y/dAe1I9YW0SDSX4YDJ+JQ3JUeJOiE0w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rNbB3zQeaasobMgO2bQs8/WPmiPXJbIDkO1FZ0gDFmszp9kZh9fbi93mFAZk5KlBd
+	 aQ/HZB1Wvnbt+upxuRvZIOsq8nMjK2X2djatxv59SNRwN0GZhzsPHrwnm9Fz+Z21v+
+	 5sB9bLtKXVL5JM10/YqtRfJH0rXWG2td1ME7SSqFfGLJ30Uc5o2I9DEowX8gvYXuHL
+	 PsT0QQvjlMIR78QjEmfipugjDOnyepK7FbfOEuEIfKEIQ/WgBXWBHPWtE1g/bcSgYd
+	 wIaDWgZxt1nw3dGOyO8be3NpJWV8nsMSt5HYtzpk0/q57sQba9DWI6UlWYrJs8xbKU
+	 DkJx+TKPlcsLg==
+Date: Mon, 20 Nov 2023 10:51:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <655bc8d6.050a0220.d22f2.315f@mx.google.com>
- <45784368-93e0-4d57-bb0c-5730f53f5a08@lunn.ch>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231120105148.064dc4bd@kernel.org>
+In-Reply-To: <157c68b0-687e-4333-9d59-fad3f5032345@lunn.ch>
+References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
+	<20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
+	<20231118183433.30ca1d1a@kernel.org>
+	<20231120104439.15bfdd09@kmaincent-XPS-13-7390>
+	<20231120105255.cgbart5amkg4efaz@skbuf>
+	<20231120121440.3274d44c@kmaincent-XPS-13-7390>
+	<20231120120601.ondrhbkqpnaozl2q@skbuf>
+	<20231120144929.3375317e@kmaincent-XPS-13-7390>
+	<20231120142316.d2emoaqeej2pg4s3@skbuf>
+	<20231120093723.4d88fb2a@kernel.org>
+	<157c68b0-687e-4333-9d59-fad3f5032345@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <45784368-93e0-4d57-bb0c-5730f53f5a08@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 20, 2023 at 10:25:10PM +0100, Andrew Lunn wrote:
-> > A real DT that use this is (ipq807x):
-> > 
-> > &mdio {
-> > 	status = "okay";
-> > 	pinctrl-0 = <&mdio_pins>;
-> > 	pinctrl-names = "default";
-> > 	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
-> > 
-> > 	ethernet-phy-package {
-> > 		compatible = "ethernet-phy-package";
-> > 		phy-mode = "psgmii";
-> > 
-> > 		global-phys = <&qca8075_4>, <&qca8075_psgmii>;
-> > 		global-phy-names = "combo", "analog_psgmii";
-> > 
-> > 		qca8075_0: ethernet-phy@0 {
-> > 			compatible = "ethernet-phy-ieee802.3-c22";
-> > 			reg = <0>;
-> > 		};
+On Mon, 20 Nov 2023 19:39:35 +0100 Andrew Lunn wrote:
+> > What about my use case of having a NIC which can stamp at a low rate
+> > at the PHY (for PTP) and high rate at the DMA block (for congestion
+> > control)? Both stamp points have the same PHC index.  
 > 
-> ...
-> 
-> > 	};
-> > 
-> > 	qca8081: ethernet-phy@28 {
-> > 		compatible = "ethernet-phy-id004d.d101";
-> > 		reg = <28>;
-> > 		reset-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
-> > 	};
-> 
-> I've no idea if DT allows this. The issue is that reg is the same for
-> both nodes within the ethernet-phy-package container, and
-> ethernet-phy@28. They are all addresses on the same MDIO bus.  We are
-> parsing this bus structure ourselves in __of_mdiobus_register(), so we
-> could make it work, but i don't know if we should make it work.
->
+> How theoretical is that? To me, it seems more likely you have two PHC.
 
-And that is why I have some reserve on the idea of defining a reg for
-ethernet-phy-package. Adding a reg would create some duplicate. Is it
-really a problem to have a node with no reg in the mdio node?
+Very practical. mlx5 does this today, based on guessing and private
+ethtool flags.
 
-(patch 04 of this series already updates the parsing function to check
-one level deeper in the presence of the ethernet-phy-compatible treating
-any node found as it was defined in the upper mdio node)
+> The PHY stamping tends to be slow because of the MDIO bus. If the MAC
+> has fast access to the PHC, it means its not on the MDIO bus. It
+> probably means you have the PHY integrated into the MAC/SoC, so the
+> MAC can access it. But if its integrated like this, i don't see why
+> PHY stamping should be particularly slow. So you can probably use it
+> for congestion control. And then you don't need DMA stamping.
 
--- 
-	Ansuel
+Tx stamps are harder to carry back to the host all the way from the PHY
+than from the DMA block when DMA completion is signaled. Rx stamps seem
+much easier to carry down the pipeline but apparently some vendors are
+incapable of doing that as well.
+
+> Do you know of real hardware with a MAC and a PHY sharing a PHC?
+
+mlx5 for sure, but other designs, too. PHY, NIC pipeline and PCIe PTM
+may all need to time stamp from a single time counter.
 
