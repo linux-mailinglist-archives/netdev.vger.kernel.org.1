@@ -1,166 +1,129 @@
-Return-Path: <netdev+bounces-49153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC4A7F0F33
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:39:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B4607F0F45
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:43:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8766AB20FC3
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:39:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C823B20EF5
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:43:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F6511724;
-	Mon, 20 Nov 2023 09:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024C51173A;
+	Mon, 20 Nov 2023 09:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1zw85evA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mo8sj5T0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C72E5
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:39:08 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9e62f903e88so541140666b.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:39:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700473147; x=1701077947; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NMyBN7G2JC9JpvRUATAVzyBjob3kzlSJovwE2rxghuU=;
-        b=1zw85evA4qYRJIKCg/oTn9Zhr2qYDSJAgV/QVUec5OO/fSWMYIXPLhgj8Zsx5Ux5Tl
-         nUJ/bzv0tSAwo8vDJt9g2fYewPtvDIwd9bO0PhbXJpjnvyflMEZ/J1OlkOMeG2WpeGqZ
-         VZxuhB0fnSRqQKVzJBWhFvWKfhteo6uLyJXE5BFklx1kxN9XQk7ZYaRw4kBWTu3ED9yO
-         u/4ru44UnOda6OPGZQ2142j6Bk86l+MT2fUWBwzxB3QL3K+VH0vFqNIst2+565RYI2hk
-         optjb0m+GjDEKjVSJlWl/bBMG75q5yZBQuaQ3uza/MwSFK/tsRt9EIGZ7O3cR9Smh/3Q
-         0U0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700473147; x=1701077947;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NMyBN7G2JC9JpvRUATAVzyBjob3kzlSJovwE2rxghuU=;
-        b=AjzltE33aB96RznbltPEikvGjDft8RRW7K2Wdc5iSy8P0r7a+dIMN2E6+CKmsVByK5
-         /lVP0MJXD+yZ5txZ2XgFPj4pDMTNgP0O9UrlmeeQNdsz59HnBmyWRSH8BWXz3VD84H61
-         ScuVpO5Y6vz9Bmh0vUmmF6Xe2eh2hkdtQ5i82FqiJ/X/J4AovJyRJC82RBKJt78NKLSt
-         b8EVG1SqjvyXMg4sUs6x5GJZAcw0S5Lchg6F6xHZs4kXfAYfHo7DYr/5kg3dH0WRkmtp
-         lOz2Dd6IDhTRdrYHXDxgGLhgQGGtmTOQtB2jzgvF7qBbtbx3iP5C441AnivPyPo2ZqJT
-         XMCQ==
-X-Gm-Message-State: AOJu0YyTbhEYd91T3yAIPKPdu+yz3KZ/F1LhdFdlSnYc+n21Ks1JgXSk
-	0Ozt3AQ4ZSGgrqURfarZsAYcGg==
-X-Google-Smtp-Source: AGHT+IG8QGNe4idCGDJRUI61ExZ2IQfiUxxsxAf+Uw6jPQfsk6fjV99rNBrxjYSweEYjSmlggPcm6A==
-X-Received: by 2002:a17:906:5ca:b0:9be:45b3:3116 with SMTP id t10-20020a17090605ca00b009be45b33116mr4912503ejt.71.1700473146955;
-        Mon, 20 Nov 2023 01:39:06 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id lh10-20020a170906f8ca00b009fd2028e62csm1388230ejb.71.2023.11.20.01.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 01:39:06 -0800 (PST)
-Date: Mon, 20 Nov 2023 10:39:04 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	deb.chatterjee@intel.com, anjali.singhai@intel.com,
-	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
-	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
-	toke@redhat.com, mattyk@nvidia.com, dan.daly@intel.com,
-	chris.sommers@keysight.com, john.andy.fingerhut@intel.com
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-Message-ID: <ZVspOBmzrwm8isiD@nanopsycho>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <655707db8d55e_55d7320812@john.notmuch>
- <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
- <6557b2e5f3489_5ada920871@john.notmuch>
- <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D897311724
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:43:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC75BC433C8;
+	Mon, 20 Nov 2023 09:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700473405;
+	bh=XdbbEndgrLLgoOL0YAb8kaKsEQaXmiCPqQaN1nt7NGs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mo8sj5T08LBbZ4Od5m/q0gS5FThloO4jdDSxzCAacd0KQI3eBIkozMCXfZWqgapCk
+	 OGikAOlXQPB+WoXc893g3DVm/HJBdu70seUwPpOmW8xkZP0LVFjq5s2E1pKepbhVNv
+	 e67/dPTRWZqAcfnxHlRrjTE5VRebCEZJkDT/X9hRgZcvZ9ywFxtBpfgifQm4yzP1QA
+	 DogsMfjgdeL71fMTc4a5hbcdMPuB2z/I9iMwNDYQHVsRdX5Pk+a6Xt6o1xJWVyaZqj
+	 j/cYDefFEhlemu9NC0xSUHJIR6rYs2W74vKe5uF5T1BdY3UyOIWzKrGqjJkQHadr7L
+	 ZOuOrVbXQ/9/A==
+Date: Mon, 20 Nov 2023 09:43:21 +0000
+From: Simon Horman <horms@kernel.org>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yinjun Zhang <yinjun.zhang@corigine.com>, netdev@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: Re: [PATCH net-next 1/2] nfp: add ethtool flow steering callbacks
+Message-ID: <20231120094321.GK186930@vergenet.net>
+References: <20231117071114.10667-1-louis.peens@corigine.com>
+ <20231117071114.10667-2-louis.peens@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
+In-Reply-To: <20231117071114.10667-2-louis.peens@corigine.com>
 
-Fri, Nov 17, 2023 at 09:46:11PM CET, jhs@mojatatu.com wrote:
->On Fri, Nov 17, 2023 at 1:37 PM John Fastabend <john.fastabend@gmail.com> wrote:
->>
->> Jamal Hadi Salim wrote:
->> > On Fri, Nov 17, 2023 at 1:27 AM John Fastabend <john.fastabend@gmail.com> wrote:
->> > >
->> > > Jamal Hadi Salim wrote:
+On Fri, Nov 17, 2023 at 09:11:13AM +0200, Louis Peens wrote:
+> From: Yinjun Zhang <yinjun.zhang@corigine.com>
+> 
+> This is the first part to implement flow steering. The communication
+> between ethtool and driver is done. User can use following commands
+> to display and set flows:
+> 
+> ethtool -n <netdev>
+> ethtool -N <netdev> flow-type ...
+> 
+> Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
+> Signed-off-by: Louis Peens <louis.peens@corigine.com>
 
-[...]
+Thanks Yinjun and Louis,
 
+The minor suggestion provided inline not withstanding this looks good to me.
 
->>
->> I think I'm judging the technical work here. Bullet points.
->>
->> 1. p4c-tc implementation looks like it should be slower than a
->>    in terms of pkts/sec than a bpf implementation. Meaning
->>    I suspect pipeline and objects laid out like this will lose
->>    to a BPF program with an parser and single lookup. The p4c-ebpf
->>    compiler should look to create optimized EBPF code not some
->>    emulated switch topology.
->>
->
->The parser is ebpf based. The other objects which require control
->plane interaction are not - those interact via netlink.
->We published perf data a while back - presented at the P4 workshop
->back in April (was in the cover letter)
->https://github.com/p4tc-dev/docs/blob/main/p4-conference-2023/2023P4WorkshopP4TC.pdf
->But do note: the correct abstraction is the first priority.
->Optimization is something we can teach the compiler over time. But
->even with the minimalist code generation you can see that our approach
->always beats ebpf in LPM and ternary. The other ones I am pretty sure
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Any idea why? Perhaps the existing eBPF maps are not that suitable for
-this kinds of lookups? I mean in theory, eBPF should be always faster.
+...
 
+> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> index e75cbb287625..d7896391b8ba 100644
+> --- a/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_ethtool.c
+> @@ -1317,6 +1317,116 @@ static int nfp_net_get_rss_hash_opts(struct nfp_net *nn,
+>  	return 0;
+>  }
+>  
+> +#define NFP_FS_MAX_ENTRY	1024
+> +
+> +static int nfp_net_fs_to_ethtool(struct nfp_fs_entry *entry, struct ethtool_rxnfc *cmd)
+> +{
+> +	struct ethtool_rx_flow_spec *fs = &cmd->fs;
+> +	unsigned int i;
+> +
+> +	switch (entry->flow_type & ~FLOW_RSS) {
+> +	case TCP_V4_FLOW:
+> +	case UDP_V4_FLOW:
+> +	case SCTP_V4_FLOW:
+> +		fs->h_u.tcp_ip4_spec.ip4src = entry->key.sip4;
+> +		fs->h_u.tcp_ip4_spec.ip4dst = entry->key.dip4;
+> +		fs->h_u.tcp_ip4_spec.psrc   = entry->key.sport;
+> +		fs->h_u.tcp_ip4_spec.pdst   = entry->key.dport;
+> +		fs->m_u.tcp_ip4_spec.ip4src = entry->msk.sip4;
+> +		fs->m_u.tcp_ip4_spec.ip4dst = entry->msk.dip4;
+> +		fs->m_u.tcp_ip4_spec.psrc   = entry->msk.sport;
+> +		fs->m_u.tcp_ip4_spec.pdst   = entry->msk.dport;
+> +		break;
+> +	case TCP_V6_FLOW:
+> +	case UDP_V6_FLOW:
+> +	case SCTP_V6_FLOW:
+> +		for (i = 0; i < 4; i++) {
+> +			fs->h_u.tcp_ip6_spec.ip6src[i] = entry->key.sip6[i];
+> +			fs->h_u.tcp_ip6_spec.ip6dst[i] = entry->key.dip6[i];
+> +			fs->m_u.tcp_ip6_spec.ip6src[i] = entry->msk.sip6[i];
+> +			fs->m_u.tcp_ip6_spec.ip6dst[i] = entry->msk.dip6[i];
+> +		}
 
->we can optimize over time.
->Your view of "single lookup" is true for simple programs but if you
->have 10 tables trying to model a 5G function then it doesnt make sense
->(and i think the data we published was clear that you gain no
->advantage using ebpf - as a matter of fact there was no perf
->difference between XDP and tc in such cases).
->
->> 2. p4c-tc control plan looks slower than a directly mmaped bpf
->>    map. Doing a simple update vs a netlink msg. The argument
->>    that BPF can't do CRUD (which we had offlist) seems incorrect
->>    to me. Correct me if I'm wrong with details about why.
->>
->
->So let me see....
->you want me to replace netlink and all its features and rewrite it
->using the ebpf system calls? Congestion control, event handling,
->arbitrary message crafting, etc and the years of work that went into
->netlink? NO to the HELL.
+I think the above loop can be more succinctly be expressed using a single
+memcpy(). For which I do see precedence in Intel drivers. Likewise
+elsewhere in this patch-set.
 
-Wait, I don't think John suggests anything like that. He just suggests
-to have the tables as eBPF maps. Honestly, I don't understand the
-fixation on netlink. Its socket messaging, memcpies, processing
-overhead, etc can't keep up with mmaped memory access at scale. Measure
-that and I bet you'll get drastically different results.
+I don't feel strongly about this, so feel free to take this suggestion,
+defer it to later, or dismiss it entirely.
 
-I mean, netlink is good for a lot of things, but does not mean it is an
-universal answer to userspace<->kernel data passing.
+> +		fs->h_u.tcp_ip6_spec.psrc = entry->key.sport;
+> +		fs->h_u.tcp_ip6_spec.pdst = entry->key.dport;
+> +		fs->m_u.tcp_ip6_spec.psrc = entry->msk.sport;
+> +		fs->m_u.tcp_ip6_spec.pdst = entry->msk.dport;
+> +		break;
 
-
->I should note: that there was an interesting talk at netdevconf 0x17
->where the speaker showed the challenges of dealing with ebpf on "day
->two" - slides or videos are not up yet, but link is:
->https://netdevconf.info/0x17/sessions/talk/is-scaling-ebpf-easy-yet-a-small-step-to-one-server-but-giant-leap-to-distributed-network.html
->The point the speaker was making is it's always easy to whip an ebpf
->program that can slice and dice packets and maybe even flush LEDs but
->the real work and challenge is in the control plane. I agree with the
->speaker based on my experiences. This discussion of replacing netlink
->with ebpf system calls is absolutely a non-starter. Let's just end the
->discussion and agree to disagree if you are going to keep insisting on
->that.
-
-
-[...]
+...
 
