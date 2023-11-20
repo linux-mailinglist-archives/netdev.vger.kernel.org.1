@@ -1,198 +1,142 @@
-Return-Path: <netdev+bounces-49383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2313C7F1DD1
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CC67F1DD4
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:12:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDD6A1F25EDD
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:11:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1A0F1F2603E
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94ECF37174;
-	Mon, 20 Nov 2023 20:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209BE374C6;
+	Mon, 20 Nov 2023 20:12:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qBIpbica"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dYMJBLkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F0737148
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 20:11:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F7DC433C8;
-	Mon, 20 Nov 2023 20:11:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700511080;
-	bh=nxbWzF54j0YEZFFUREyHOIJr7tRCdcgfC139caCW7yg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qBIpbicaQWPsMy947TRLqJ1WC7OYcSiylLPywTHDBXncnAakhpqHi5ovU2wfxOEq4
-	 9vWE7KjJN/AQgg37ZhMyudAnLX5QpF5e7EyRTmv2F1T6zt1aIblMqtp5tbkWT5Vssk
-	 X9KLiAlH0G379khgHUUyP2FPaz4913uNW5wB33QDLKQu1g1dQeORt3jQw+tbCPEQv0
-	 PHm3Uc7fhILLgXOqPPTUUhmPq0FaQrNBMRF8zDHg4tjk3YDoCPX+xDO1otY3UmQTNP
-	 Uy7oZJaZ0dbJwImjXVE+vFTVFWQSo8tKsB0e6DXSlU2WpKzQ+xD8qeIo3vh05Fa+Mj
-	 t+5cCp/835n5Q==
-Date: Mon, 20 Nov 2023 20:11:15 +0000
-From: Simon Horman <horms@kernel.org>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com
-Subject: Re: [net-next PATCH 1/2] octeontx2-af: Add new mbox to support
- multicast/mirror offload
-Message-ID: <20231120201115.GK245676@kernel.org>
-References: <20231116101601.3188711-1-sumang@marvell.com>
- <20231116101601.3188711-2-sumang@marvell.com>
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57258C7
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:12:19 -0800 (PST)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5ca53400c8bso14809087b3.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:12:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700511138; x=1701115938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=14nwulPEeUr0EpWytQxDZg4XoQQ8mZYNfFjDYt7nYIE=;
+        b=dYMJBLkCvkeZnduUNN9KzF/8QjZjY9Rf0NRFv/nRSAr72qA5tVl5oXzSQbypJ+0JJX
+         JIHGIb0Jf0Z/cIJaG7hA0PeUqcVruzm1rR8P26FNMWyyvIj8aeOj8dY7ZBPn+6WDXGLX
+         bzCImC1sYzTs80soWgF/+ESJHHcXgszemzIlx9yUHhY6M33wgYFIm8lyWCSUqZA1ROsy
+         x7E+N6ScyDE+7y43FQoPM7FulQL2elo1P8Hp4bm9+63iH3cbBQg0tGNDBqryLh9Yw6lu
+         VXicp6kdzNk4MISDlrYsNlGXiKEEmiI8ZkgHyrgLFAKSvml7LfA4QaTSA8DKWa5IGm/c
+         iIoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700511138; x=1701115938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=14nwulPEeUr0EpWytQxDZg4XoQQ8mZYNfFjDYt7nYIE=;
+        b=uqm/t2CHqbc3I3nCa342R+D3ZxDDltnTO0IhEtXFc3pb8gifJIxq01W+8WN6jZ5VCX
+         Vm5C7KoRk/Yf/UV5Wo0lwSu+x+Th3mK7+YzplR4XEXoZ4ZaWwOBnITsmVcb2s2+AVW5y
+         r4NvkEbnLwTzH9vZS9bHy7CrmIADWD1QnEcXNZHzn1fwC8hTHLhWXmB1DzjMAhqhK/wE
+         9gesZfz9oBI8xzvIh+6ulk4zN4W0Ym9rWNvNz1bdsww6OTNpDR4QPuS5j2fUw+4cstAz
+         +Y2MuSc3AedEMxeK2UPFyxCt3QiQ6Dz6Ejc7op+Hvk6TZHcLUOsEfuJ5sN3k/vAT/GZ2
+         516g==
+X-Gm-Message-State: AOJu0Yxi9RbSulLb5EItXZrfaY2zpQsuJ0ve/x+eGYrWvhV+g8fPMfw5
+	Qby7WnDW3MWBHi+ex89hSzES0VnUv+I8MorM253tsQ==
+X-Google-Smtp-Source: AGHT+IFJBVUwAPayK6m4ZeiyR3shdv888RLWySawUD7HjkgqZBfQjzlpvQoP231k5N/KslSpJRPYieN6RjgGDC5G8Sg=
+X-Received: by 2002:a0d:c402:0:b0:5c8:cc4d:2aca with SMTP id
+ g2-20020a0dc402000000b005c8cc4d2acamr9739511ywd.31.1700511138551; Mon, 20 Nov
+ 2023 12:12:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116101601.3188711-2-sumang@marvell.com>
+References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-10-jhs@mojatatu.com>
+ <ZVY/GBIC4ckerGSc@nanopsycho> <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
+ <bdbaa38c-5dd1-4060-b787-014daa2a0abe@kernel.org>
+In-Reply-To: <bdbaa38c-5dd1-4060-b787-014daa2a0abe@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 20 Nov 2023 15:12:07 -0500
+Message-ID: <CAM0EoM=VrMBYWmD5nZD+B-2M2i_QfeQ1uR4cH94Skn1DweSh2g@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
+ get, update, delete
+To: David Ahern <dsahern@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, deb.chatterjee@intel.com, 
+	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io, 
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
+	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
+	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com, 
+	toke@redhat.com, mattyk@nvidia.com, David Ahern <dsahern@gmail.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 16, 2023 at 03:46:00PM +0530, Suman Ghosh wrote:
-> A new mailbox is added to support offloading of multicast/mirror
-> functionality. The mailbox also supports dynamic updation of the
-> multicast/mirror list.
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+On Mon, Nov 20, 2023 at 1:20=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
+ote:
+>
+> On 11/17/23 4:09 AM, Jamal Hadi Salim wrote:
+> >>> diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
+> >>> index ba32dba66..4d33f44c1 100644
+> >>> --- a/include/uapi/linux/p4tc.h
+> >>> +++ b/include/uapi/linux/p4tc.h
+> >>> @@ -2,8 +2,71 @@
+> >>> #ifndef __LINUX_P4TC_H
+> >>> #define __LINUX_P4TC_H
+> >>>
+> >>> +#include <linux/types.h>
+> >>> +#include <linux/pkt_sched.h>
+> >>> +
+> >>> +/* pipeline header */
+> >>> +struct p4tcmsg {
+> >>> +      __u32 pipeid;
+> >>> +      __u32 obj;
+> >>> +};
+> >>
+> >> I don't follow. Is there any sane reason to use header instead of norm=
+al
+> >> netlink attribute? Moveover, you extend the existing RT netlink with
+> >> a huge amout of p4 things. Isn't this the good time to finally introdu=
+ce
+> >> generic netlink TC family with proper yaml spec with all the benefits =
+it
+> >> brings and implement p4 tc uapi there? Please?
+> >>
+>
+> There is precedence (new netdev APIs) to move new infra to genl, but it
+> is not clear to me if extending existing functionality should fall into
+> that required conversion.
+>
 
-...
+Big question is:  how does the genl (which i am assuming you mean the
+ynl stuff) fit back into iproute2?
+The yaml files approach is a great deal of help for maintenance IMO (a
+lot of repetitive code gone). But do we leave the rest of the masses
+out? What is the motivation for pushing anything to be shared? And if
+the answer is to convert everything onwards into genl then where is
+the central location to grab that code from? Is it still iproute2 or
+the kernel? etc
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+cheers,
+jamal
 
-...
-
-> +int rvu_mbox_handler_nix_mcast_grp_update(struct rvu *rvu,
-> +					  struct nix_mcast_grp_update_req *req,
-> +					  struct nix_mcast_grp_update_rsp *rsp)
-> +{
-> +	struct nix_mcast_grp_destroy_req dreq = { 0 };
-> +	struct npc_mcam *mcam = &rvu->hw->mcam;
-> +	struct nix_mcast_grp_elem *elem;
-> +	struct nix_mcast_grp *mcast_grp;
-> +	int blkaddr, err, npc_blkaddr;
-> +	u16 prev_count, new_count;
-> +	struct nix_mcast *mcast;
-> +	struct nix_hw *nix_hw;
-> +	int i, ret;
-> +
-> +	if (!req->num_mce_entry)
-> +		return 0;
-> +
-> +	err = nix_get_struct_ptrs(rvu, req->hdr.pcifunc, &nix_hw, &blkaddr);
-> +	if (err)
-> +		return err;
-> +
-> +	mcast_grp = &nix_hw->mcast_grp;
-> +	elem = rvu_nix_mcast_find_grp_elem(mcast_grp, req->mcast_grp_idx);
-> +	if (!elem)
-> +		return NIX_AF_ERR_INVALID_MCAST_GRP;
-> +
-> +	/* If any pcifunc matches the group's pcifunc, then we can
-> +	 * delete the entire group.
-> +	 */
-> +	if (req->op == NIX_MCAST_OP_DEL_ENTRY) {
-> +		for (i = 0; i < req->num_mce_entry; i++) {
-> +			if (elem->pcifunc == req->pcifunc[i]) {
-> +				/* Delete group */
-> +				dreq.hdr.pcifunc = elem->pcifunc;
-> +				dreq.mcast_grp_idx = elem->mcast_grp_idx;
-> +				rvu_mbox_handler_nix_mcast_grp_destroy(rvu, &dreq, NULL);
-> +				return 0;
-> +			}
-> +		}
-> +	}
-> +
-> +	mcast = &nix_hw->mcast;
-> +	mutex_lock(&mcast->mce_lock);
-> +	npc_blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
-> +	if (elem->mcam_index != -1)
-> +		npc_enable_mcam_entry(rvu, mcam, npc_blkaddr, elem->mcam_index, false);
-> +
-> +	prev_count = elem->mcast_mce_list.count;
-> +	if (req->op == NIX_MCAST_OP_ADD_ENTRY) {
-> +		new_count = prev_count + req->num_mce_entry;
-> +		if (prev_count)
-> +			nix_free_mce_list(mcast, prev_count, elem->mce_start_index, elem->dir);
-> +
-> +		elem->mce_start_index = nix_alloc_mce_list(mcast, new_count, elem->dir);
-> +
-> +		/* It is possible not to get contiguous memory */
-> +		if (elem->mce_start_index < 0) {
-> +			if (elem->mcam_index != -1) {
-> +				npc_enable_mcam_entry(rvu, mcam, npc_blkaddr,
-> +						      elem->mcam_index, true);
-> +				mutex_unlock(&mcast->mce_lock);
-> +				return NIX_AF_ERR_NON_CONTIG_MCE_LIST;
-> +			}
-> +		}
-> +
-> +		ret = nix_add_mce_list_entry(rvu, nix_hw, elem, req);
-> +		if (ret) {
-> +			nix_free_mce_list(mcast, new_count, elem->mce_start_index, elem->dir);
-> +			if (prev_count)
-> +				elem->mce_start_index = nix_alloc_mce_list(mcast,
-> +									   prev_count,
-> +									   elem->dir);
-> +
-> +			if (elem->mcam_index != -1)
-> +				npc_enable_mcam_entry(rvu, mcam, npc_blkaddr,
-> +						      elem->mcam_index, true);
-> +
-> +			mutex_unlock(&mcast->mce_lock);
-> +			return ret;
-> +		}
-> +	} else {
-> +		if (!prev_count || prev_count < req->num_mce_entry) {
-> +			if (elem->mcam_index != -1)
-> +				npc_enable_mcam_entry(rvu, mcam, npc_blkaddr,
-> +						      elem->mcam_index, true);
-
-Hi Suman,
-
-It looks like a mutex_unlock() is needed here.
-
-As flagged by Smatch.
-
-> +			return NIX_AF_ERR_INVALID_MCAST_DEL_REQ;
-> +		}
-> +
-> +		nix_free_mce_list(mcast, prev_count, elem->mce_start_index, elem->dir);
-> +		new_count = prev_count - req->num_mce_entry;
-> +		elem->mce_start_index = nix_alloc_mce_list(mcast, new_count, elem->dir);
-> +		ret = nix_del_mce_list_entry(rvu, nix_hw, elem, req);
-> +		if (ret) {
-> +			nix_free_mce_list(mcast, new_count, elem->mce_start_index, elem->dir);
-> +			elem->mce_start_index = nix_alloc_mce_list(mcast, prev_count, elem->dir);
-> +			if (elem->mcam_index != -1)
-> +				npc_enable_mcam_entry(rvu, mcam,
-> +						      npc_blkaddr,
-> +						      elem->mcam_index,
-> +						      true);
-> +
-> +			mutex_unlock(&mcast->mce_lock);
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	if (elem->mcam_index == -1) {
-> +		mutex_unlock(&mcast->mce_lock);
-> +		rsp->mce_start_index = elem->mce_start_index;
-> +		return 0;
-> +	}
-> +
-> +	nix_mcast_update_action(rvu, elem);
-> +	npc_enable_mcam_entry(rvu, mcam, npc_blkaddr, elem->mcam_index, true);
-> +	mutex_unlock(&mcast->mce_lock);
-> +	rsp->mce_start_index = elem->mce_start_index;
-> +	return 0;
-> +}
-
-...
+> >
+> > Several reasons:
+> > a) We are similar to current tc messaging with the subheader being
+> > there for multiplexing.
+> > b) Where does this leave iproute2? +Cc David and Stephen. Do other
+> > generic netlink conversions get contributed back to iproute2?
+> > c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
+> > based. i.e you have:
+> >  COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
+> > P4 programs from the control plane.
+> > d) we have spent many hours optimizing the control to the kernel so i
+> > am not sure what it would buy us to switch to generic netlink..
+> >
+>
 
