@@ -1,160 +1,191 @@
-Return-Path: <netdev+bounces-49226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0AC07F1389
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:38:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4EC7F13BE
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E86691C21573
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:38:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D557C281F3D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42ACC63C5;
-	Mon, 20 Nov 2023 12:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E7A15E9F;
+	Mon, 20 Nov 2023 12:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weidmueller.onmicrosoft.com header.i=@weidmueller.onmicrosoft.com header.b="jybMhXN/"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0xsiQydd"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2044.outbound.protection.outlook.com [40.107.8.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D746CD2;
-	Mon, 20 Nov 2023 04:38:12 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HLox1ZDi+dMCbZbq3MkXPt5MnZVjntl+koFu98vYXJq/1N8HEHn+BKCn/uKKgvmw7l33VnI8jMqdF/mRE3fQBvUydV+Ms3IFODFLa0HdUM8V2iOs1ZZASXhrATXkPaUNY07izLaRckwjhn9xdKJBxkunecxP79xEJn2ZpUR2aqiEDR+oN0z2u/GwiAnIffi1oxZhpssYA5nyXIqXl3UV9ThURS4oneCO8fPPLsgmjA4cBnaXc7gXI79XqQmpH7AiWP6svBl7CscqO9KGcTyaQ2Op4Oym2EB2HwqyOPOTJvSnAxd8ew5FQfGYD+akYr973oOz2Kpc46VbPNTSio0wfw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yV5zFv6E2j3sXGU7rI/iUY4u8BCL38Oe2P0dwiUJvco=;
- b=mq/ilTbkx+ktmB61eYgiq3fx+rrPLYmfyP7ZiZfOow0Dt3QfvNcYCC6GSCYqS74IcNhgxW9Xu0/oNGgKGjy58TyPYOpelvkz+3yEB3qR0jou/Pm7lE0hjWEXu3nJj+htiYAVMpUt7F8SV1bMoKQG7iW63RBxevoJBMhz7PO7mtN6uTWCxK0pelLNej0KH4c1zJwH69pjitJIJR3NnpheYXmICUEli3/cYQPa+avSz8llFDAwSCq4tofjMvQuDWw01hWdupKN/RmL/Nm3VH5c2mNR7LEwrR7PS4mrlEC5rjf7NRP+CCiTif3KbrHxcFb08X++cqSMx3xphdZb9hwfiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=weidmueller.com; dmarc=pass action=none
- header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF4410C
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:48:27 -0800 (PST)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5ca77fc0f04so7069577b3.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:48:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=weidmueller.onmicrosoft.com; s=selector1-weidmueller-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yV5zFv6E2j3sXGU7rI/iUY4u8BCL38Oe2P0dwiUJvco=;
- b=jybMhXN/uXY2Y2CX/NcFtYMv/wUH10p042kAW7YhVTM/PcB78MIBVuS8D2kBKic6Cm/DGQJd/G1B/HlQAt1LQDX1OpRGekLBhrVdHM3j2qdRHEO+xmnY1c/LKfEl4hIs0Tns3U3Xd2OAClycSsv2j7kkLk65KatNhywHIqIc/c0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=weidmueller.com;
-Received: from AS2PR08MB8431.eurprd08.prod.outlook.com (2603:10a6:20b:55a::18)
- by GVXPR08MB7773.eurprd08.prod.outlook.com (2603:10a6:150:68::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
- 2023 12:38:08 +0000
-Received: from AS2PR08MB8431.eurprd08.prod.outlook.com
- ([fe80::b914:d9b5:6462:13b6]) by AS2PR08MB8431.eurprd08.prod.outlook.com
- ([fe80::b914:d9b5:6462:13b6%5]) with mapi id 15.20.7002.027; Mon, 20 Nov 2023
- 12:38:08 +0000
-Message-ID: <2508da6b-a099-4271-a1d0-04cfe5d39daf@weidmueller.com>
-Date: Mon, 20 Nov 2023 13:38:06 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: Fix potential null pointer access
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lukas Funke <lukas.funke@weidmueller.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20231120093256.3642327-1-lukas.funke-oss@weidmueller.com>
- <ZVssJrplePACN3of@shell.armlinux.org.uk>
-From: Lukas Funke <lukas.funke-oss@weidmueller.com>
-In-Reply-To: <ZVssJrplePACN3of@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0450.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c6::11) To AS2PR08MB8431.eurprd08.prod.outlook.com
- (2603:10a6:20b:55a::18)
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700484506; x=1701089306; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+L7aWxjlLUJAVJQ6dAsBWIt9SAaqNdTI15A4k2k3f5M=;
+        b=0xsiQyddpKaaV5r6f3A0kcidhN+IBEbWFEW3PWH5IC3cScYLAtDEoW0HPNdMwhoKOi
+         xHmIDhcWS2oBl8jFWPs5luEa35hDbvM3bz3wfXv9R8u7if4ODnFBYCDyNppzRc9DEcWE
+         uCATO4yaekQeie6TxjP55L6r3xjwk3NbfcaAWJJQdo+s1MD3jhE0MQK/oihLT8GkLuAL
+         QUDJf/7KsCMJRCU8yREAGXpaGs5ZyanT0NkQxV4R/kasUO4ajWRtJLqcCmNHx603qF7m
+         f4D32mRtXvMDEhqSPMEUxXSP8o+9MwRjfWOXuzOX++wt+rUVNaCzTkXBBEDfw0AknVtg
+         HE1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700484506; x=1701089306;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+L7aWxjlLUJAVJQ6dAsBWIt9SAaqNdTI15A4k2k3f5M=;
+        b=tOiXY9AJsL907Crus3XwdQ1/ATaJ9MajP072YOCPE/jKBrbCy+LX873FrWBsVgCEw8
+         QiEkn4Rm+vcei2RYBMVwvw1iVD5vysbTwEvBi+NA7WTV5MwntF9IJMkpQIW6K0qbf1w+
+         skkdGktCmUeXFfjObCZTwSqB2+fEr2umy9GwKsKX81rBvCW6kpAxZkvPhuGG5nXvKsjg
+         JRh+E4qTfwOEGnJHrdkINsfoQDp5FW26ZKdpknR5TKDpXO9tPwcFl1wXiPCTI03U388/
+         Yhl3BjD5IiYoiGhvc2aRJTNDGa4HdhYyMA4Qj5DDSwU6ZeS2jafDhgQWv5cMFP2HXm2H
+         UYmg==
+X-Gm-Message-State: AOJu0Yzc6yCjLB0volujDS6fvBfHlytLTWSho7P0Vhz0TKldDPJGfqDZ
+	JSKUT3s3+ujCB0tJPHrfhDLRaCUMEWM26NbsAaEiRQ==
+X-Google-Smtp-Source: AGHT+IHycnc9QTfyKA28iQJmErLA6XhQ6tF31B7PvMkmBqmMTWFblKIBcx8MT/6NXLuzggGlAODAd3NegwPNRjeuj2I=
+X-Received: by 2002:a0d:d6d2:0:b0:5a7:be33:8bd4 with SMTP id
+ y201-20020a0dd6d2000000b005a7be338bd4mr5691724ywd.2.1700484506428; Mon, 20
+ Nov 2023 04:48:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2PR08MB8431:EE_|GVXPR08MB7773:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2b9c3ee6-50c8-4591-7a91-08dbe9c58c82
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Mh9LrxbBHTpchx7KVnob2y6s5WfSduBaYgzkSo/3/iZQQQivOGRi9LJmbSglUegfe5+rc0QRy+TnvpAQ/2hL2UJqV2jLZH71Z8a3cuDydNqIHXgSWp9GCYXVE0R3kQEgrTKxfGfL4BstdHd8MJ1Dn3Tdp8jzocd7Bud2Z8XIGEDWl5I8QtsWpMs6aVgtzUpRWWreZr7LrCfgj8rAjvcicqx7xsIglwX2+sluACkrCgFTxThHits4X8ep/PbGrz8HK+e4zycljzgRRFfSb+lae/TWNmC0kdk0bxAtVXgHp1VFwgHEglwxGO7JSf5LWjvB/k8gvox3hp/b8rH4mPLrNbLUev3XiJnZk+ffyotqqqUbA2WsS8NEJnqfQcqzA8wnfb60sZ+z/K+ZK/ALdCJAvEvHIZ1p1Ws8QQPseFD79J/5mKyrWjsSX2z5Wg0fSk5dFG53mJ9QXDvzae/8oT3Q7v95vre4RpSvT9/JHraG/QQHnyS+yEwXNBKdaj5gsrqeK5MkkX0HTfluFBJLcuKlH72hHvcxQS7lYf+A8AZxH7bT3ZkbEDPytDMQM3yTaJbeGCCmY1p5oSPlOw++qExSE7FhDplAiVGSQdanztaBvZlSMBD1YDdPJ11Om2ePfP5DUr94GAcSeN7YeFNSiowwxA==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB8431.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(346002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(4744005)(5660300002)(2906002)(26005)(2616005)(4326008)(8676002)(8936002)(31696002)(86362001)(41300700001)(83380400001)(36756003)(66946007)(66556008)(66476007)(54906003)(53546011)(6506007)(6916009)(316002)(478600001)(6486002)(6512007)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YlR4eWpPWERvQ3dMUEJzZWRhUnUxYlpYWkF3NG11NWtWY0s5R3pDMEdwSURx?=
- =?utf-8?B?WkNUc202NzNVRmpBeERYL1hDRzZKWTZpR2ZQNVlrak5WaVVPS2NIay9ZUEFs?=
- =?utf-8?B?RjRhRFdpZ0gyMWN6Y213QlZRa3RvMVp5U2VUV0JFblhVMitkTTB2N2piNDgz?=
- =?utf-8?B?R2ZIMWdaSm5EZEYzSWN6SGlKVmlmeWF3KzRodmo1bkVUSy9xeTJFVkRoVWRz?=
- =?utf-8?B?ZDllRnhrMWxSNit6TUJZTmNNcWxpdmFnRys4R3JOZUpIUCtjVWd3b01xeTBh?=
- =?utf-8?B?aVdadWp6KytDWVRsb1cydGVDZzQ3WlFCS2t6YmIwZlZYN2k4eGdDR0J2SWlR?=
- =?utf-8?B?eUpyWUNWdW9kaFBCdkRyMy9ubXVLRy9BRGthdEVpbGhUR1FmazhjOXVpVTBx?=
- =?utf-8?B?ancvVnlwTUFiRkZMWlVGZC9ROFdBcVJVYVRHRC9EVnV4ZWpOYVNFSTY2NnVj?=
- =?utf-8?B?TGhhcHcrNmgwRU9rOXk4NXpnYjR3M2Qwa3JvMGw1QTNhQkRsUzBvQnAxeU5R?=
- =?utf-8?B?UmhGTWtSZ0VTOXhOcTh4bnQ5YXFhV2creFFnQkZUUjV5TVN3K0x3VGlISFpX?=
- =?utf-8?B?QmVDeGpOdHQwWS9ESHlJL3EzRzVIdi9DKzBZanRSQlBmM0sveklYTHBtcVZ0?=
- =?utf-8?B?UGxaMXhiUVFsL0xQWUE3ZFU5akxqdGVzWXNFdVhkTEhkQlZmM2ZLT3Q4WkJP?=
- =?utf-8?B?YmZ0MnBQcWo3N0lGZW03T280RXh4b2xmY2N0WUFqUXdNczFFYzBvZXIrSExE?=
- =?utf-8?B?ekRPTXZ4ei9oZzhXbjU1TWlHb3o2QUpoMXExOW9sd01kdFhUaVJlZzhnc0RI?=
- =?utf-8?B?TWFTOXJYMWZMSmpRelhUU0huckFOUVNvV1Y5V0QySjlQUlhVZXFnL29ORXhP?=
- =?utf-8?B?L2tiOW10K3psVFNLUmQ2TnpPc1hXS2lHamZLVFRCM3JnY0t1TUc5OWdhT2VE?=
- =?utf-8?B?b0ZHUExZZXFJSWVoS1d4Wk1zWXV0WVN1QnRUbFRudE5ka0tzam5LdHhINHJJ?=
- =?utf-8?B?ekpRTzR2bk0zNGRRS2czTzg1dkxpc2dPT2Y2czI5R1dGVWZ6eWVUb1V6TkRW?=
- =?utf-8?B?VEpuWi9rWXdjRFREeXdhcFVndXBpQzNhREpxbHg1alJPZmNtYWsxR2lNYnF1?=
- =?utf-8?B?TU5zYWdzTU02ck1qUkl0QmNlRUUxa2srRlVlSmpBVHIzditnQjZKK3BTWjV4?=
- =?utf-8?B?YmZUU3NDN1E4U245c1JjYjliQnVJMUlja1lDZEhtbTdXOVJjQS9tRExBZTky?=
- =?utf-8?B?SHpOZFBKdCtLVndCZG1udU1QSUt4NkFPcGdRY1JiV0FJNFJsYXB1ZllySXUy?=
- =?utf-8?B?d1ZuenI4K2lyT3p2bzNxRCttU3d4eHV5QnhsU096T0NBOWd0QmJ5TTZtd0NF?=
- =?utf-8?B?VmZkd3JyNDUvRFhHTHp1Z3podm5adVViMkw0TDJES0piSy9BbmpTM2RTbmpt?=
- =?utf-8?B?K1hqbjUwdm1BZzhJWlRxVjg4SVFNUndad0ZjUVVSL1VtdlFYcjNBTTQwQSt0?=
- =?utf-8?B?ZlhtMnVjUnRHN0xBemZ0a0twSHlxVEg3bklyNGRxNXZWVGtXWDlQaFNhd2ZJ?=
- =?utf-8?B?d3VZYk40MzJaYmt0cUhycElud2FEb0FkaGRDSWlFLzlQQnFjUkNvN2xLdnVJ?=
- =?utf-8?B?VWdlZFFESGI0RHJISzdIaW5mQ1NJRzNiM3JlaE5TakJpMXdsN3VFb0hvMlZC?=
- =?utf-8?B?TTBrSHZpUmtybE0rZWJYSnRPNHFmYkNXRnB4OVlnSkRzMW5MSTZkUFgrbHY1?=
- =?utf-8?B?ZHBMS3RWOHhSc2tMZktqZ1pKOEYxNHJXOVRnbFhIMGRrdlBhTXRreXBVdXEz?=
- =?utf-8?B?eEV5NGh6SiswV2hZS3AzMjhCdENzbElQZzhlV1JsTnp5OEd4VlFzUEhXMlIv?=
- =?utf-8?B?UTBLcWpmV2UxT3RsK0QzWS9QMlQzVUtrRmR2MThxMHZhVnFMdS9iRkZ3UERF?=
- =?utf-8?B?eHQ5ZjU5RnRocFg0cTZGdXJqQ1R3NERjblpsd1Y4VnRSaFloa2wyUk5UTnVW?=
- =?utf-8?B?Tm1zZmhUcGhBek9EYjd2TTRlVmMydW5SdW4vODR5UVlLcmREcjVqUjEwZVdW?=
- =?utf-8?B?a01laGNDTVNqejBCSmdsMzloY1NTejQwR3Q1Qk5mVkFPZlhtWXpkTlR2UWUz?=
- =?utf-8?B?aUxpVWFvb3J2N1Yza042NE40RkJIaUg5QmJHdnlRV3FWM0hzY1RmN1JPZ0xO?=
- =?utf-8?B?Vnc9PQ==?=
-X-OriginatorOrg: weidmueller.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b9c3ee6-50c8-4591-7a91-08dbe9c58c82
-X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB8431.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 12:38:07.9141
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 44JFihAr8TGUvV4Iz0qAHv6IB6y/EeTvgNCjq7dKcsutnxPK441bOUurhZtAN597/c2imokc4PXtlZ+7JzUCPQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR08MB7773
+References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-10-jhs@mojatatu.com>
+ <ZVY/GBIC4ckerGSc@nanopsycho> <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
+ <ZVsWP29UyIzg4Jwq@nanopsycho>
+In-Reply-To: <ZVsWP29UyIzg4Jwq@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 20 Nov 2023 07:48:14 -0500
+Message-ID: <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
+ get, update, delete
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
+	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
+	David Ahern <dsahern@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russel,
+On Mon, Nov 20, 2023 at 3:18=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Fri, Nov 17, 2023 at 01:09:45PM CET, jhs@mojatatu.com wrote:
+> >On Thu, Nov 16, 2023 at 11:11=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
+rote:
+> >>
+> >> Thu, Nov 16, 2023 at 03:59:42PM CET, jhs@mojatatu.com wrote:
+> >>
+> >> [...]
+> >>
+> >>
+> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
+> >> >index ba32dba66..4d33f44c1 100644
+> >> >--- a/include/uapi/linux/p4tc.h
+> >> >+++ b/include/uapi/linux/p4tc.h
+> >> >@@ -2,8 +2,71 @@
+> >> > #ifndef __LINUX_P4TC_H
+> >> > #define __LINUX_P4TC_H
+> >> >
+> >> >+#include <linux/types.h>
+> >> >+#include <linux/pkt_sched.h>
+> >> >+
+> >> >+/* pipeline header */
+> >> >+struct p4tcmsg {
+> >> >+      __u32 pipeid;
+> >> >+      __u32 obj;
+> >> >+};
+> >>
+> >> I don't follow. Is there any sane reason to use header instead of norm=
+al
+> >> netlink attribute? Moveover, you extend the existing RT netlink with
+> >> a huge amout of p4 things. Isn't this the good time to finally introdu=
+ce
+> >> generic netlink TC family with proper yaml spec with all the benefits =
+it
+> >> brings and implement p4 tc uapi there? Please?
+> >>
+> >
+> >Several reasons:
+> >a) We are similar to current tc messaging with the subheader being
+> >there for multiplexing.
+>
+> Yeah, you don't need to carry 20year old burden in newly introduced
+> interface. That's my point.
 
-On 20.11.2023 10:51, Russell King (Oracle) wrote:
-> On Mon, Nov 20, 2023 at 10:32:54AM +0100, Lukas Funke wrote:
->> From: Lukas Funke <lukas.funke@weidmueller.com>
->>
->> When there is no driver associated with the phydev, there will be a
->> nullptr access. The commit checks if the phydev driver is set before
->> access.
-> 
-> What's the call path that we encounter a NULL drv pointer?
+Having a demux sub header is 20 year old burden? I didnt follow.
+
+>
+> >b) Where does this leave iproute2? +Cc David and Stephen. Do other
+> >generic netlink conversions get contributed back to iproute2?
+>
+> There is no conversion afaik, only extensions. And they has to be,
+> otherwise the user would not be able to use the newly introduced
+> features.
+
+The big question is does the collective who use iproute2 still get to
+use the same tooling or now they have to go and learn some new
+tooling. I understand the value of the new approach but is it a
+revolution or an evolution? We opted to put thing in iproute2 instead
+for example because that is widely available (and used).
+
+>
+> >c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
+> >based. i.e you have:
+> > COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
+> >P4 programs from the control plane.
+>
+> I'm pretty sure you can achieve the same over genetlink.
+>
+
+I think you are right.
+
+>
+> >d) we have spent many hours optimizing the control to the kernel so i
+> >am not sure what it would buy us to switch to generic netlink..
+>
+> All the benefits of ynl yaml tooling, at least.
+>
+
+Did you pay close attention to what we have? The user space code is
+written once into iproute2 and subsequent to that there is no
+recompilation  of any iproute2 code. The compiler generates a json
+file specific to a P4 program which is then introspected by the
+iproute2 code.
 
 
-The patch is a bit older and the path is reconstructed from my memory:
+cheers,
+jamal
 
-macb_phylink_connect -> phylink_of_phy_connect -> of_phy_connect -> 
-phy_connect_direct -> phy_request_interrupt
-
-It happend when we used the Xilinx gmii2rgmii phy driver. We did a 
-missconfiguration in the dt and bumped into the nullpointer exception. 
-Since other functions like phy_aneg_done() also check for driver 
-existence I thought it would be a good addition.
-
-> 
-> Thanks.
-> 
-
+>
+> >
+> >cheers,
+> >jamal
+> >
+> >>
+> >> >+
+> >> >+#define P4TC_MAXPIPELINE_COUNT 32
+> >> >+#define P4TC_MAXTABLES_COUNT 32
+> >> >+#define P4TC_MINTABLES_COUNT 0
+> >> >+#define P4TC_MSGBATCH_SIZE 16
+> >> >+
+> >> > #define P4TC_MAX_KEYSZ 512
+> >> >
+> >> >+#define TEMPLATENAMSZ 32
+> >> >+#define PIPELINENAMSIZ TEMPLATENAMSZ
+> >>
+> >> ugh. A prefix please?
+> >>
+> >> pw-bot: cr
+> >>
+> >> [...]
 
