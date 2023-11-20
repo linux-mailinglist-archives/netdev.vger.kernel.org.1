@@ -1,129 +1,141 @@
-Return-Path: <netdev+bounces-49329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F307F1BD7
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:00:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CADDA7F1BFB
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30AA61C208CC
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D691C20B6B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F8224A1E;
-	Mon, 20 Nov 2023 18:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5AA24A1E;
+	Mon, 20 Nov 2023 18:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hjw7Emvb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Q0MX+guX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C40E92;
-	Mon, 20 Nov 2023 10:00:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5wD7wBF+lHKdF+Dqen+lnC7hkw+eQyJUlyzbsg0+08c=; b=hjw7EmvbLqLK70QVQXYoHYyWgE
-	RaWMzEwXzQL+xor+owvdn5Wjz6Y5h8Epeo4tVEyFU0JK/NbxjR7oNneI5ZpBkBr4sh33W1orqVd2M
-	qpzH1sFnaWwBCtj6mv06ydHv1PZiHRm2u8s/SmRynOvHJesAIZyNGXRKzx5zDli7KgL8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r58Z1-000g3L-Tr; Mon, 20 Nov 2023 19:00:03 +0100
-Date: Mon, 20 Nov 2023 19:00:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: =?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/9] ethtool: Expand Ethernet Power Equipment
- with PoE alongside PoDL
-Message-ID: <2539b109-72ad-470a-9dae-9f53de4f64ec@lunn.ch>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
- <04cb7d87-bb6b-4997-878d-490c17bfdfd0@lunn.ch>
- <20231120110944.66938859@kmaincent-XPS-13-7390>
- <20231120111008.GC590719@pengutronix.de>
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [IPv6:2001:41d0:1004:224b::bb])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57555AC
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:09:04 -0800 (PST)
+Message-ID: <87f5aa88-c2f2-4fce-95f9-39b04b2950de@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1700503741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WuFo4Me8efhhswGKB4Vga4SYeHZboEX/eRXFfU3FvpA=;
+	b=Q0MX+guXc/q7Hw5xZgQo7sruoUAQd+cESI+PNlUCmq2S66iTZSeyWZLeHcxQINpg2lsiwu
+	m+7FynVsmY9l6TM3RXIfvXFV32RtGHw++XijEQWeb43bclMWCcvCAQhCjtTEkSBxqtPy88
+	WEJwjC3wSrmqHqqssiHApELq3hIb75w=
+Date: Mon, 20 Nov 2023 18:08:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231120111008.GC590719@pengutronix.de>
+Subject: Re: [PATCH bpf-next v5 1/2] bpf: add skcipher API support to TC/XDP
+ programs
+Content-Language: en-US
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko
+ <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ Network Development <netdev@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>
+References: <20231118225451.2132137-1-vadfed@meta.com>
+ <CAADnVQLBE1ex-B=F07R0xQKo-r22M0L6eiS8DjOAtsur-hEbFQ@mail.gmail.com>
+ <862c832a-da98-4bef-80ef-8294be1d4601@linux.dev>
+ <CAADnVQJ7__C06a=v0RfMvGQ_ohT21n=-1EUuaxqBe3aYU1izEg@mail.gmail.com>
+ <312531ec-aba5-4050-b236-dc9b456c7280@linux.dev>
+ <CAADnVQLKsOs7LSFWGbAtJ8WfZjnQ0B_7gwFA-ZMdLPmukMGZ1A@mail.gmail.com>
+ <c1e3db50-50bd-d728-a911-58fa1c77506a@linux.dev>
+ <CAADnVQJvfdPh7YXj30vsqkUF7a9M5SCaAkaB9qkmndS892Fu+w@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAADnVQJvfdPh7YXj30vsqkUF7a9M5SCaAkaB9qkmndS892Fu+w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> > > >  struct pse_control_config {
-> > > >  	enum ethtool_podl_pse_admin_state podl_admin_control;
-> > > > +	enum ethtool_pse_admin_state admin_control;  
-> > > 
-> > > When i look at this, it seems to me admin_control should be generic
-> > > across all schemes which put power down the cable, and
-> > > podl_admin_control is specific to how PoDL puts power down the cable.
-> > >
-> > > Since you appear to be adding support for a second way to put power
-> > > down the cable, i would expect something like poe_admin_control being
-> > > added here. But maybe that is in a later patch?
-> > 
-> > No as said above admin_control is for PoE and podl_admin_control is for PoDL.
-> > Maybe you prefer to use poe_admin_control, and add poe prefix in the poe
-> > variables. It will differ a bit from the IEEE standard naming but I agreed that
-> > it would be more understandable in the development part.
+On 20/11/2023 20:13, Alexei Starovoitov wrote:
+> On Sun, Nov 19, 2023 at 4:22 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 19.11.2023 16:56, Alexei Starovoitov wrote:
+>>> On Sat, Nov 18, 2023 at 3:46 PM Vadim Fedorenko
+>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>
+>>>> On 18/11/2023 18:35, Alexei Starovoitov wrote:
+>>>>> On Sat, Nov 18, 2023 at 3:32 PM Vadim Fedorenko
+>>>>> <vadim.fedorenko@linux.dev> wrote:
+>>>>>>
+>>>>>> On 18/11/2023 18:23, Alexei Starovoitov wrote:
+>>>>>>> On Sat, Nov 18, 2023 at 2:55 PM Vadim Fedorenko <vadfed@meta.com> wrote:
+>>>>>>>>
+>>>>>>>> +/**
+>>>>>>>> + * struct bpf_crypto_lskcipher_ctx - refcounted BPF sync skcipher context structure
+>>>>>>>> + * @tfm:       The pointer to crypto_sync_skcipher struct.
+>>>>>>>> + * @rcu:       The RCU head used to free the crypto context with RCU safety.
+>>>>>>>> + * @usage:     Object reference counter. When the refcount goes to 0, the
+>>>>>>>> + *             memory is released back to the BPF allocator, which provides
+>>>>>>>> + *             RCU safety.
+>>>>>>>> + */
+>>>>>>>> +struct bpf_crypto_lskcipher_ctx {
+>>>>>>>> +       struct crypto_lskcipher *tfm;
+>>>>>>>> +       struct rcu_head rcu;
+>>>>>>>> +       refcount_t usage;
+>>>>>>>> +};
+>>>>>>>> +
+>>>>>>>> +__bpf_kfunc_start_defs();
+>>>>>>>> +
+>>>>>>>> +/**
+>>>>>>>> + * bpf_crypto_lskcipher_ctx_create() - Create a mutable BPF crypto context.
+>>>>>>>
+>>>>>>> Let's drop 'lskcipher' from the kfunc names and ctx struct.
+>>>>>>> bpf users don't need to know the internal implementation details.
+>>>>>>> bpf_crypto_encrypt/decrypt() is clear enough.
+>>>>>>
+>>>>>> The only reason I added it was the existence of AEAD subset of crypto
+>>>>>> API. And this subset can also be implemented in bpf later, and there
+>>>>>> will be inconsistency in naming then if we add aead in future names.
+>>>>>> WDYT?
+>>>>>
+>>>>> You mean future async apis ? Just bpf_crypto_encrypt_async() ?
+>>>>
+>>>> Well, not only async. It's about Authenticated Encryption With
+>>>> Associated Data (AEAD) Cipher API defined in crypto/aead.h. It's
+>>>> ciphers with additional hmac function, like
+>>>> 'authenc(hmac(sha256),cbc(aes))'. It has very similar API with only
+>>>> difference of having Authenticated data in the encrypted block.
+>>>
+>>> and ? I'm not following what you're trying to say.
+>>> Where is the inconsistency ?
+>>> My point again is that lskcipher vs skcipher vs foo is an implementation
+>>> detail that shouldn't be exposed in the name.
+>>
+>> Well, I was trying to follow crypto subsystem naming. It might be easier for
+>> users to understand what part of crypto API is supported by BPF kfuncs.
+>>
+>> At the same we can agree that current implementation will be used for simple
+>> buffer encryption/decryption and any further implementations will have additions
+>> in the name of functions (like
+>> bpf_crypto_aead_crypt/bpf_crypto_shash_final/bpf_crypto_scomp_compress).
+>> It will be slightly inconsistent, but we will have to expose some implementation
+>> details unfortunately. If you are ok with this way, I'm ok to implement it.
 > 
-> Official name for "PoE" is "Power via Media Dependent Interface". PoE is
-> not used in the IEEE 802.3-2018. Using names not used in the specification,
-> make development even harder :)
-> Especially since there are even more marketing names (names not used in the
-> specification) for different PoE variants:
-> - 802.3af (802.3at Type 1), PoE
-> - 802.3at Type 2, PoE+
-> - 802.3bt Type 3, 4PPoE or PoE++
-> - 802.3bt Type 4, 4PPoE or PoE++
+> but shash vs scomp is the name of the algo ? Didn't you use it as
+> the 1st arg to bpf_crypto_create() ?
+> Take a look at AF_ALG. It's able to express all kinds of cryptos
+> through the same socket abstraction without creating a new name for
+> every algo. Everything is read/write through the socket fd.
+> In our case it will be bpf_crypto_encrypt/decrypt() kfuncs.
 
-From the 2018 standard:
+Ok, I got the idea. I'll make v6 more general, like AF_ALG, but it will
+support only one type (skcipher) for now. Thanks!
 
-  1.4.407 Power Sourcing Equipment (PSE): A DTE or midspan device that
-  provides the power to a single link section. PSEs are defined for
-  use with two different types of balanced twisted-pair PHYs. When
-  used with 2 or 4 pair balanced twisted-pair (BASE-T) PHYs, (see IEEE
-  Std 802.3, Clause 33), DTE powering is intended to provide a single
-  10BASE-T, 100BASE-TX, or 1000BASE-T device with a unified interface
-  for both the data it requires and the power to process these
-  data. When used with single balanced twisted-pair (BASE-T1) PHYs
-  (see IEEE Std 802.3, Clause 104), DTE powering is intended to
-  provide a single 100BASE-T1 or 1000BASE-T1 device with a unified
-  interface for both the data it requires and the power to process
-  these data. A PSE used with balanced single twisted-pair PHYs is
-  also referred to as a PoDL PSE.
-
-So it seems like, anything not PoDL PSE does not have a name :-(
-
-However, everything not PoDL PSE seems to be clause 33. So how about:
-
-	enum ethtool_podl_pse_admin_state podl_admin_control;
-	enum ethtool_c33_pse_admin_state c33_admin_control;  
-
-At least inside the kernel we use c22, c45, c37 etc. I'm not sure they
-are visible to userspace, but if we don't have a better name, maybe we
-have to use c33 in userspace as well.
-
-I do think naming like this makes it clear we are talking about two
-parallel technologies, not a generic layer and then extensions for
-podl.
-
-What do you think?
-
-	Andrew
 
