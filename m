@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-49233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E53A7F146B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:30:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3E957F1489
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:42:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59BC72815E6
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:30:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DFA1C21201
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E991A72B;
-	Mon, 20 Nov 2023 13:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F371A732;
+	Mon, 20 Nov 2023 13:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Adn5+nCR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sTkMdBg/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240981A5A8;
-	Mon, 20 Nov 2023 13:30:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BD7EC433C8;
-	Mon, 20 Nov 2023 13:30:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700487020;
-	bh=PHdu57Wzp+xZqOVNY9Pteh5+H3/OUfTVYEQwZtnjgaI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Adn5+nCRh7+2esCt06PpWOJ6Q7Sf9wGWzyL8OZ3xQ4KTuGsVYCl41uUSDvoZM1Qgh
-	 xYH9OzH46SDNykHqua+lZM2VDAFNJNwAhIazL4+HhuPw4y+ePFT4d4rp8a2u9mWmRp
-	 PnCbz5w1ll14XS8VhdWdJuOuFS0/ORhBUxPN9LZrU5nM5XwUgSrSc4kXfWDjHIHbGB
-	 JT3utmOA0eqk2DInnearZCiHRLiXuzkgmY4JBzfMGPTQF/bM9Mo53CgDyCMs/E4vK7
-	 vEYpztDFwP8Cf9bC1VZuImptYoTJCr3dqt3i1A+skz+dJKGH7DjDkXQ+BECL8kWBh6
-	 +vMaV+mcY9SLg==
-Date: Mon, 20 Nov 2023 13:30:08 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Herve Codina <herve.codina@bootlin.com>,
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8B9113;
+	Mon, 20 Nov 2023 05:42:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=c0jEFenPI665cRskmAiFDtYQkHXkawiJhPQ0fqLm3E0=; b=sTkMdBg/31M+ezs+Gyzl4C0S3w
+	lRA0kgzv9hRJIZO1T21tS2EDACESvMgOQY8l8AOwfG3q46V676MgC0WASxVGunZbqIa9/vQrOeU6r
+	K+OMfx+YscaNTWnVz2yKzAnFyjo4cEqTKpx1uXWurYefi6fWoARuUd2WsEnuJZE4jHr0jHhn94wEo
+	oWYbo1fU5MoXnTP8ovuR6/gL+9NupkqYR0Vhn3nKbaBMa3erjH6RIvkmbAc8y1O7pk22Z+UTUvHRP
+	7CJ3wmCoOEfbACxOxHTZxfWFB8G4XjxjKYRcJ4mk/W4ZCDaVwcsKOFJRn23nGwIldJ1KNEZWlln/2
+	y5hjw6zw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58828)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1r54XN-0005ch-01;
+	Mon, 20 Nov 2023 13:42:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1r54XN-0003Dr-Fk; Mon, 20 Nov 2023 13:42:05 +0000
+Date: Mon, 20 Nov 2023 13:42:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Lukas Funke <lukas.funke-oss@weidmueller.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Shengjiu Wang <shengjiu.wang@gmail.com>,
-	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
-	Nicolin Chen <nicoleotsuka@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
-	Simon Horman <horms@kernel.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v9 00/27] Add support for QMC HDLC, framer infrastructure
- and PEF2256 framer
-Message-ID: <573c9ca1-a560-4f7a-ba21-80673a2e162e@sirena.org.uk>
-References: <20231115144007.478111-1-herve.codina@bootlin.com>
- <20231117164746.0589e955@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lukas Funke <lukas.funke@weidmueller.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: Fix potential null pointer access
+Message-ID: <ZVtiLUpsOQhd2nm+@shell.armlinux.org.uk>
+References: <20231120093256.3642327-1-lukas.funke-oss@weidmueller.com>
+ <ZVssJrplePACN3of@shell.armlinux.org.uk>
+ <2508da6b-a099-4271-a1d0-04cfe5d39daf@weidmueller.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="HuVabfiR1A06kEJd"
-Content-Disposition: inline
-In-Reply-To: <20231117164746.0589e955@kernel.org>
-X-Cookie: <Manoj> I *like* the chicken
-
-
---HuVabfiR1A06kEJd
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <2508da6b-a099-4271-a1d0-04cfe5d39daf@weidmueller.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Nov 17, 2023 at 04:47:46PM -0800, Jakub Kicinski wrote:
-> On Wed, 15 Nov 2023 15:39:36 +0100 Herve Codina wrote:
-> >    - Removed Patches 6, 7 and 8 (patches applied)
-> >=20
-> >    - Patches 7, 20, 21, 23 (patches 10, 23, 24, 26 in v8)
-> >      Add 'Acked-by: Jakub Kicinski <kuba@kernel.org>'
+On Mon, Nov 20, 2023 at 01:38:06PM +0100, Lukas Funke wrote:
+> Hi Russel,
+> 
+> On 20.11.2023 10:51, Russell King (Oracle) wrote:
+> > On Mon, Nov 20, 2023 at 10:32:54AM +0100, Lukas Funke wrote:
+> > > From: Lukas Funke <lukas.funke@weidmueller.com>
+> > > 
+> > > When there is no driver associated with the phydev, there will be a
+> > > nullptr access. The commit checks if the phydev driver is set before
+> > > access.
+> > 
+> > What's the call path that we encounter a NULL drv pointer?
+> 
+> 
+> The patch is a bit older and the path is reconstructed from my memory:
+> 
+> macb_phylink_connect -> phylink_of_phy_connect -> of_phy_connect ->
+> phy_connect_direct -> phy_request_interrupt
+> 
+> It happend when we used the Xilinx gmii2rgmii phy driver. We did a
+> missconfiguration in the dt and bumped into the nullpointer exception. Since
+> other functions like phy_aneg_done() also check for driver existence I
+> thought it would be a good addition.
 
-> I thought someone (Mark?) asked for the networking stuff to be put=20
-> on a branch. If that's still the preference - is it possible to factor
-> these out as a standalone series, too?  Will they build on their own?
+So how does this happen in the path you indicate?
 
-Yes, can we *please* at least get the generic non-driver bits of this
-series moving - they seem uncontroversial as far as I can see and are a
-tiny portion of the overall 20 patches.  Patches 21-23 look like they
-can go on a branch in the net tree?
+phy_connect_direct() calls phy_attach_direct() before calling
+phy_request_interrupt(). If phy_attach_direct() needs to succeed for
+us to get to call phy_request_interrupt().
 
---HuVabfiR1A06kEJd
-Content-Type: application/pgp-signature; name="signature.asc"
+phy_attach_direct() checks to see whether the phydev is bound to a
+driver. If it isn't, it binds it to the appropriate genphy driver.
+As part of that binding, phydev->drv is guaranteed to be set
+(by phy_probe(), which will be called via d->driver->probe() if
+using one of the genphy drivers.
 
------BEGIN PGP SIGNATURE-----
+You mention using the gmii2rgmii driver, which does mess with
+phydev->drv, but I can't see a way in that driver where we would
+end up with a NULL pointer there.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVbX18ACgkQJNaLcl1U
-h9BhUQf/Y8e+dECLekhRMQLy8O0p4YRvMtVtYbyazFL0PEJyvuI93CnL/nqRzW/7
-x6zzsmJn2uab1/SmDbu8m5yE2PQDQs448v2ZAIcvu9SOQoH9ph+y/Li1dsCx0MQS
-b+VU0vl6YJcBmn8ycRkgBldpLgOoc6HU2tss4FQBAlR2R0Aw6KG97Smd+Py70Yyg
-ewedo+nXh+OkOHdJiG3Fbcbw6GwLEoQB+jj2MFy4QA3VilnEu+NBvRxIoegctggc
-mPB4GWRQNg9fb57iy6IqsME7oUq1hUb4SJ55O7s88qko3hFJ4ediuncLVP25kbl/
-HNP87K6I1Mebqh5LHTcVOvfo8zM/BQ==
-=n/vU
------END PGP SIGNATURE-----
+I think a bit mroe information is needed to describe how this comes
+about - and that needs to go in the commit message, so the reason
+for this patch is properly documented.
 
---HuVabfiR1A06kEJd--
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
