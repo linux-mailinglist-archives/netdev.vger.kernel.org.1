@@ -1,220 +1,167 @@
-Return-Path: <netdev+bounces-49324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D6157F1BB2
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:55:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 582677F1BB5
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:56:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC1A11F2518C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:55:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B30E5282286
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CD322327;
-	Mon, 20 Nov 2023 17:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C89B7241F9;
+	Mon, 20 Nov 2023 17:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2XHaLiv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e9jj7Qax"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5300A94
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:55:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700502948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6G9H3tkseCt3efcb3Be3wJxxKfn5uz65Box8O4djf1o=;
-	b=O2XHaLivP/evvKBqdNgex33f1gXhjCuZjS073DcnpeZ9NrpL01Q3W8b7x/FbV6vlbslPQl
-	3xwX4bgpo2bztv/XYRiE8Nzt9xoVmtQ7hZc8KtY+A3fh5DYEqOcq9wj8gurKaJSQwEWJaa
-	dYqS9TZ81Pp+EJ/ku3bQfuWx9z7ehmQ=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-102-tzwAAGVqNVq0GsfIxjQw7Q-1; Mon,
- 20 Nov 2023 12:55:45 -0500
-X-MC-Unique: tzwAAGVqNVq0GsfIxjQw7Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A998A380450C;
-	Mon, 20 Nov 2023 17:55:44 +0000 (UTC)
-Received: from [10.45.225.144] (unknown [10.45.225.144])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D7A221C060AE;
-	Mon, 20 Nov 2023 17:55:42 +0000 (UTC)
-Message-ID: <26b17c32-c9ad-4b4c-8193-3a9757e587db@redhat.com>
-Date: Mon, 20 Nov 2023 18:55:42 +0100
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5EBC1
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:56:05 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-548ae9a5eeaso266a12.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:56:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700502964; x=1701107764; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xLJOaSiMX4j029aOHc7oApRw+KVD1nkO9hjnIeQA3ws=;
+        b=e9jj7QaxGuoKYKJ/edph7ZXHgkEd1MqMMRfIhh+50RWMP30+7dG23wkhLc0gI3gL2j
+         bRlLvI7ubsRmP3mOJqGkZ9eQyrtjaQWU8UwawZbBxvI2gn1iymZOGxrrWTlWHuU0ycv5
+         Wkm+UYSGSlB5KqYbbsUupnF5M+wySXNuYLTM3/tZj0B21dqGBdrsllA90Bv/6dKmSPvG
+         Me6nNg2X+D65Yjm7J0ksXPWJCOqobHtBI2JaC/u8MGXHV9sC8OWU8+zrvs5dej47ibxr
+         RkXyMFOFAt8EHPCJeoJb7hBoi6P1I5PhOqrPJC771//Y6dlAMI/Ng33rtW/z1Xn0EdEu
+         KNXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700502964; x=1701107764;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xLJOaSiMX4j029aOHc7oApRw+KVD1nkO9hjnIeQA3ws=;
+        b=LaZqCYrTVgI6VQg16kDfFNZMklQaEICgwaRfZ8KbejUZikFxXVqCP6kknhpKqi3Vea
+         +dFZcu02LqoM9pHDYcPi5wlJJ4tOOJXoDYYKCYAK27+PxMzbvDTZo90GUei1ECRyjhy0
+         1buU24f67LaGyi7vq7YMPBj3/V5zxMocS7rDp8+zyI6KxvZks48Q6zzrmYtmkMxGsCns
+         OdOdA6C3zNCHXSy44235lNjJwUbRrlRHlV9/9akK9K8eAkPAE/aTI+yRCxEbKf4P4nOa
+         WQk0Ftt/X8Jnnc1bWqlGmAfgK8su/TcLeYu08Ggg77SSKM2ISB0ncFRZBEoiPvIfWP3k
+         CUhg==
+X-Gm-Message-State: AOJu0Yw36mqcD7TxkHOufPzHPlZdPiCysKRe+DCVLSNv2gxZ6OzoShVI
+	HRWF3O09u/GvaF888FsPLGe/S4Kv2aS7fu+nOMezsg==
+X-Google-Smtp-Source: AGHT+IGIb/35Hbinv4Qtgi95bh0B0EBvf1zLhZKPE3sBN4r4pQW5rheUbkcq+eL5EJQgnl8zIDYfaHDK3f1/wJQXPPw=
+X-Received: by 2002:a05:6402:3784:b0:544:24a8:ebd with SMTP id
+ et4-20020a056402378400b0054424a80ebdmr272603edb.4.1700502963990; Mon, 20 Nov
+ 2023 09:56:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3 3/5] i40e: Add helpers to find VSI and VEB by
- SEID and use them
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: intel-wired-lan@lists.osuosl.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>,
- Wojciech Drewek <wojciech.drewek@intel.com>, mschmidt@redhat.com,
- netdev@vger.kernel.org
-References: <20231116152114.88515-1-ivecera@redhat.com>
- <20231116152114.88515-4-ivecera@redhat.com>
- <20231120114224.GB223713@kernel.org>
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20231120114224.GB223713@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+References: <20231115210509.481514-1-vschneid@redhat.com> <20231115210509.481514-2-vschneid@redhat.com>
+In-Reply-To: <20231115210509.481514-2-vschneid@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 20 Nov 2023 18:55:50 +0100
+Message-ID: <CANn89iJPxrXi35=_OJqLsJjeNU9b8EFb_rk+EEMVCMiAOd2=5A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] tcp/dcpp: Un-pin tw_timer
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: dccp@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rt-users@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Tomas Glozar <tglozar@redhat.com>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Thomas Gleixner <tglx@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 15, 2023 at 10:05=E2=80=AFPM Valentin Schneider <vschneid@redha=
+t.com> wrote:
+>
+> The TCP timewait timer is proving to be problematic for setups where sche=
+duler
+> CPU isolation is achieved at runtime via cpusets (as opposed to staticall=
+y via
+> isolcpus=3Ddomains).
+>
+> What happens there is a CPU goes through tcp_time_wait(), arming the time=
+_wait
+> timer, then gets isolated. TCP_TIMEWAIT_LEN later, the timer fires, causi=
+ng
+> interference for the now-isolated CPU. This is conceptually similar to th=
+e issue
+> described in
+>   e02b93124855 ("workqueue: Unbind kworkers before sending them to exit()=
+")
+>
+> Keep softirqs disabled, but make the timer un-pinned and arm it *after* t=
+he
+> hashdance.
+>
+> This introduces the following (non-fatal) race:
+>
+>   CPU0                        CPU1
+>     allocates a tw
+>     insert it in hash table
+>                                 finds the TW and removes it
+>                                 (timer cancel does nothing)
+>     arms a TW timer, lasting
+>
+> This partially reverts
+>   ed2e92394589 ("tcp/dccp: fix timewait races in timer handling")
+> and
+>   ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashda=
+nce")
+>
+> This also reinstores a comment from
+>   ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashda=
+nce")
+> as inet_twsk_hashdance() had a "Step 1" and "Step 3" comment, but the "St=
+ep
+> 2" had gone missing.
+>
+> Link: https://lore.kernel.org/all/ZPhpfMjSiHVjQkTk@localhost.localdomain/
+> Signed-off-by: Valentin Schneider <vschneid@redhat.com>
+> ---
+>  net/dccp/minisocks.c          | 16 +++++++---------
+>  net/ipv4/inet_timewait_sock.c | 20 +++++++++++++++-----
+>  net/ipv4/tcp_minisocks.c      | 16 +++++++---------
+>  3 files changed, 29 insertions(+), 23 deletions(-)
+>
+> diff --git a/net/dccp/minisocks.c b/net/dccp/minisocks.c
+> index 64d805b27adde..2f0fad4255e36 100644
+> --- a/net/dccp/minisocks.c
+> +++ b/net/dccp/minisocks.c
+> @@ -53,16 +53,14 @@ void dccp_time_wait(struct sock *sk, int state, int t=
+imeo)
+>                 if (state =3D=3D DCCP_TIME_WAIT)
+>                         timeo =3D DCCP_TIMEWAIT_LEN;
+>
+> -               /* tw_timer is pinned, so we need to make sure BH are dis=
+abled
+> -                * in following section, otherwise timer handler could ru=
+n before
+> -                * we complete the initialization.
+> -                */
+> -               local_bh_disable();
+> -               inet_twsk_schedule(tw, timeo);
+> -               /* Linkage updates.
+> -                * Note that access to tw after this point is illegal.
+> -                */
+> +              local_bh_disable();
+> +
+> +               // Linkage updates
+>                 inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
+> +               inet_twsk_schedule(tw, timeo);
+
+We could arm a timer there, while another thread/cpu found the TW in
+the ehash table.
 
 
-On 20. 11. 23 12:42, Simon Horman wrote:
-> On Thu, Nov 16, 2023 at 04:21:12PM +0100, Ivan Vecera wrote:
->> Add two helpers i40e_(veb|vsi)_get_by_seid() to find corresponding
->> VEB or VSI by their SEID value and use these helpers to replace
->> existing open-coded loops.
->>
->> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> 
-> Hi Ivan,
-> 
-> some minor feedback from my side.
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
->> index 1e9266de270b..ca8997d29c02 100644
->> --- a/drivers/net/ethernet/intel/i40e/i40e.h
->> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
->> @@ -1360,4 +1360,38 @@ static inline struct i40e_pf *i40e_hw_to_pf(struct i40e_hw *hw)
->>   
->>   struct device *i40e_hw_to_dev(struct i40e_hw *hw);
->>   
->> +/**
->> + * i40e_pf_get_vsi_by_seid - find VSI by SEID
->> + * @pf: pointer to a PF
-> 
-> nit: @seid is missing here
-> 
->> + **/
->> +static inline struct i40e_vsi *
->> +i40e_pf_get_vsi_by_seid(struct i40e_pf *pf, u16 seid)
->> +{
->> +	struct i40e_vsi *vsi;
->> +	int i;
->> +
->> +	i40e_pf_for_each_vsi(pf, i, vsi)
->> +		if (vsi->seid == seid)
->> +			return vsi;
->> +
->> +	return NULL;
->> +}
->> +
->> +/**
->> + * i40e_pf_get_veb_by_seid - find VEB by SEID
->> + * @pf: pointer to a PF
-> 
-> Ditto
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> 
-> ...
-> 
->> @@ -14848,23 +14831,16 @@ struct i40e_veb *i40e_veb_setup(struct i40e_pf *pf, u16 flags,
->>   	}
->>   
->>   	/* make sure there is such a vsi and uplink */
->> -	i40e_pf_for_each_vsi(pf, vsi_idx, vsi)
->> -		if (vsi->seid == vsi_seid)
->> -			break;
->> -
->> -	if (vsi_idx == pf->num_alloc_vsi && vsi_seid != 0) {
->> -		dev_info(&pf->pdev->dev, "vsi seid %d not found\n",
->> -			 vsi_seid);
->> -		return NULL;
->> +	if (vsi_seid) {
->> +		vsi = i40e_pf_get_vsi_by_seid(pf, vsi_seid);
->> +		if (!vsi) {
->> +			dev_err(&pf->pdev->dev, "vsi seid %d not found\n",
->> +				vsi_seid);
->> +			return NULL;
->> +		}
->>   	}
->> -
->>   	if (uplink_seid && uplink_seid != pf->mac_seid) {
->> -		i40e_pf_for_each_veb(pf, veb_idx, veb) {
->> -			if (veb->seid == uplink_seid) {
->> -				uplink_veb = veb;
->> -				break;
->> -			}
->> -		}
->> +		uplink_veb = i40e_pf_get_veb_by_seid(pf, uplink_seid);
->>   		if (!uplink_veb) {
->>   			dev_info(&pf->pdev->dev,
->>   				 "uplink seid %d not found\n", uplink_seid);
-> 
-> The next part of this function looks like this:
-> 
-> 		if (!uplink_veb) {
-> 			dev_info(&pf->pdev->dev,
-> 				 "uplink seid %d not found\n", uplink_seid);
-> 			return NULL;
-> 		}
-> 	}
-> 	/* get veb sw struct */
-> 	veb_idx = i40e_veb_mem_alloc(pf);
-> 	if (veb_idx < 0)
-> 		goto err_alloc;
-> 	veb = pf->veb[veb_idx];
-> 	veb->flags = flags;
-> 	veb->uplink_seid = uplink_seid;
-> 	veb->veb_idx = (uplink_veb ? uplink_veb->idx : I40E_NO_VEB);
-> 	veb->enabled_tc = (enabled_tc ? enabled_tc : 0x1);
-> 
-> 	/* create the VEB in the switch */
-> 	ret = i40e_add_veb(veb, vsi);
-> 
-> Smatch complains that vsi may be used uninitialised here.
-> Which does seem possible to me if vsi_seid is 0.
 
-Yes, the support for floating VEBs is and WAS broken prior this patch 
-and it is fixed by the following patch.
+> +               // Access to tw after this point is illegal.
+> +               inet_twsk_put(tw);
 
-Prior this patch... Let's vsi_seid == 0:
+This would eventually call inet_twsk_free() while the timer is armed.
 
-	/* make sure there is such a vsi and uplink */
-	i40e_pf_for_each_vsi(pf, vsi_idx, vsi)
-		if (vsi->seid == vsi_seid)
-			break;
--> here vsi_idx == pf->num_alloc_vsi because there cannot be VSI with 
-SEID == 0... and VSI points after the pf->vsi[] array.
+I think more work is needed.
 
-	if (vsi_idx == pf->num_alloc_vsi && vsi_seid != 0) {
-		dev_info(&pf->pdev->dev, "vsi seid %d not found\n",
-			 vsi_seid);
-		return NULL;
-	}
-
-This condition is not met, although vsi_idx == pf->num_alloc_vsi but 
-vsi_seid == 0 so the rest of code ended by:
-
-	ret = i40e_add_veb(veb, vsi);
-
-and vsi pointer points to invalid area (item after the last one from 
-pf->vsi).
-
-As I mentioned the broken floating VEB functionality (where vsi_seid == 
-0 and uplink_seid == 0) is fixed by the following patch.
-
-Thanks,
-Ivan
-
+Perhaps make sure that a live timer owns a reference on tw->tw_refcnt
+(This is not the case atm)
 
