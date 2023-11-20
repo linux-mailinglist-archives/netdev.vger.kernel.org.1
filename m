@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-49110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B047F0DE4
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:46:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF6E7F0DEA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21BD1C2115A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:46:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97789281A67
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E2F79D9;
-	Mon, 20 Nov 2023 08:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11671F4FB;
+	Mon, 20 Nov 2023 08:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="P92POmTi"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="WXJyXxq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CCA39F
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:18 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id 2adb3069b0e04-50943ccbbaeso5698477e87.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:18 -0800 (PST)
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D097B9
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:20 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id 5b1f17b1804b1-40907b82ab9so7910895e9.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700469977; x=1701074777; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sOUwHQ3tIEPqVxD003y/axANZjYq9yXWHmQwKicRxv4=;
-        b=P92POmTiejhtLFaKk/Zb3U4EsmqIV2OndDcFEc7nNsB0JqJMB/HCB7o9MspiH5oH+m
-         O5YNOXGGjvXw0wEn++AanepKVZckI5GIlWm3FyFQkVkBxmYLY3Jw1y259T+7+PXK/RLk
-         BiSRwOnOYFoVV/p6IQnGJc74iDvOuk6HqDxJ63OFu3kyZoumVPX2mGeWirDJOD8CXLMV
-         ooMJXRlK0fO7nOHhfd+xpknj4enkjPTTQDzIPxEp8L7GvHrjsJQirnpw1Azem4hESCKi
-         0qh3Upwwz7629XZCVt4cB37lJWpe1X9E+ICzR0sqVpTz10wRhjPCMob+2IznSwg6IHQ1
-         5RBQ==
+        d=tuxon.dev; s=google; t=1700469978; x=1701074778; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O/Q1YDzSiSuqzbLh5eHVltDp4epdTy0gP5JRv4NY97M=;
+        b=WXJyXxq69lQKY0+sRMGanqJ6zHo+duWpMv5PPux7HPsPyOTuf6eKj+P8QwF67lBNa/
+         dn06P7rsXm6xvqBmJIyBF2cDU/K+3aQumTm9Jlbnjw1dl9fXAGVgpSAwqbfRRBoi5+3H
+         y85zUXqX0ox9OtA74y7CmAOw/5SJEjdinYMRj7UsOZBlJIeqHZRqXS2fU5exQiBPfftz
+         dSGZaZAJfZ3X8+yHu3Ule7Wbxpl4sVJWlON1/fzsA0R/v/Nct6KXRsFk/fUVgf9cfJE5
+         U2vi7G8gPNnT9WOU+7eVEkJp2NCiaKEEvLI1R7xadTyr4NK6ViWoim2xIOPb0J6ORFDa
+         0lHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700469977; x=1701074777;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sOUwHQ3tIEPqVxD003y/axANZjYq9yXWHmQwKicRxv4=;
-        b=rT6eaJcLOLUbGl+QtrnwRxjO0V+JRRj9+TSI0H4aCd88kWe1pGQV/Dkmtq7u0wNA5Q
-         WwtkNRrnpFdEPWSqUZ5ZGse2Ha3lDbak3b8O4hofAhjrfbVP7DF7QRWuh87G2xPEY/8u
-         sGpAYXTwxrh4/9fVKMB67cqlyFu/VuoPbKh5BlNH+rl4S24pMZrzRbIE9G0kE6bPnwlT
-         H54KXN5tE9QtQ/0PImEg8s4drP0OWbTOdJuHvn3Im8w5zZWb272PkwiqwGGDz/QobE5l
-         sbwo3eW5Ibv3x50tCg3PkSOsYosicqftpjSMBa1tdYiG3XNNL1pus9x/nYvulCucQdne
-         dloA==
-X-Gm-Message-State: AOJu0Yylf4oCYxxRCFPTzyfSGpJLWHcDynx/QDbRt0ePyw+AF6eZ87RM
-	h9KQs91YMvkPN5jLH1AkfS7aWVplMQxuH4rp1iQ=
-X-Google-Smtp-Source: AGHT+IGA8m5mvMi46rvFWOb3dW/RQ2+4PUYMypdqU5+qjOpHXpylOvvBjm42GzDhIUkn/YKsVRHuSA==
-X-Received: by 2002:ac2:549c:0:b0:507:b935:9f5f with SMTP id t28-20020ac2549c000000b00507b9359f5fmr5263073lfk.24.1700469976750;
-        Mon, 20 Nov 2023 00:46:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700469978; x=1701074778;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O/Q1YDzSiSuqzbLh5eHVltDp4epdTy0gP5JRv4NY97M=;
+        b=gIGqz8e1IDu4NrTQ1Wt0u8/+NWfBlsLNe0SrqrbvaQ5jGHQLp/+Xos/l68GOM+pp7u
+         evQSyLvzxPf6pJu3q95SsJSYOxkmzYidwvfiIcdhalQJKHL+Xeakc0nDw3apm8tA+o3g
+         5j60ez0tHXSJPMktNmtRcO78iOWCmEMGqGhkmKq8ZGCQwh8JUNzMlsfTASYxgLU4tMjD
+         yCN3/ICmPQKsmhJQvunQ7EAfLvp1+V2xtIhpVWRfICAMXrtbBR+SraXJVjR8k1O6ICYj
+         1Vfm4onERtbGXYkFv2tDBxZOgDUL0D//rprKTavFi4TSCVcrVGgyEnkjdxvryNTs0NJp
+         JjgA==
+X-Gm-Message-State: AOJu0Yy8tA1k39AAd+fe89C2igSp3XgEKv6jYM0ubz1vlbkUNTeW3Jhs
+	OYXjKZD16LvmUPr4C/NcdlzgPQ==
+X-Google-Smtp-Source: AGHT+IGguzzps8WTXHQDOz4RLWoYc1q9Kn2P1FSlhPOyUbpQ66wry2laGEFnLXjuLpuT8sqFntGuUw==
+X-Received: by 2002:adf:e7c9:0:b0:32d:d2aa:ed21 with SMTP id e9-20020adfe7c9000000b0032dd2aaed21mr8616747wrn.28.1700469978402;
+        Mon, 20 Nov 2023 00:46:18 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id b8-20020a5d45c8000000b003142e438e8csm10435267wrs.26.2023.11.20.00.46.14
+        by smtp.gmail.com with ESMTPSA id b8-20020a5d45c8000000b003142e438e8csm10435267wrs.26.2023.11.20.00.46.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 00:46:16 -0800 (PST)
+        Mon, 20 Nov 2023 00:46:18 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -72,52 +73,50 @@ Cc: netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 00/13] net: ravb: Add suspend to RAM and runtime PM support for RZ/G3S
-Date: Mon, 20 Nov 2023 10:45:53 +0200
-Message-Id: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH 01/13] net: ravb: Check return value of reset_control_deassert()
+Date: Mon, 20 Nov 2023 10:45:54 +0200
+Message-Id: <20231120084606.4083194-2-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Hi,
+reset_control_deassert() could return an error. Some devices cannot work
+if reset signal de-assert operation fails. To avoid this check the return
+code of reset_control_deassert() in ravb_probe() and take proper action.
 
-This series adds suspend to RAM and runtime PM support for Ethernet
-IP available on RZ/G3S (R9A08G045) SoC.
+Fixes: 0d13a1a464a0 ("ravb: Add reset support")
+Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+---
+ drivers/net/ethernet/renesas/ravb_main.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Along with it series contains preparatory fixes and cleanups.
-
-Thank you,
-Claudiu Beznea
-
-Claudiu Beznea (13):
-  net: ravb: Check return value of reset_control_deassert()
-  net: ravb: Use pm_runtime_resume_and_get()
-  net: ravb: Make write access to CXR35 first before accessing other
-    EMAC registers
-  net: ravb: Start TX queues after HW initialization succeeded
-  net: ravb: Stop DMA in case of failures on ravb_open()
-  net: ravb: Let IP specific receive function to interrogate descriptors
-  net: ravb: Rely on PM domain to enable gptp_clk
-  net: ravb: Rely on PM domain to enable refclk
-  net: ravb: Make reset controller support mandatory
-  net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
-    pm_ptr()
-  net: ravb: Use tabs instead of spaces
-  net: ravb: Assert/deassert reset on suspend/resume
-  net: ravb: Add runtime PM support
-
- drivers/net/ethernet/renesas/ravb.h      |   2 +
- drivers/net/ethernet/renesas/ravb_main.c | 220 ++++++++++++++++-------
- 2 files changed, 160 insertions(+), 62 deletions(-)
-
+diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+index c70cff80cc99..342978bdbd7e 100644
+--- a/drivers/net/ethernet/renesas/ravb_main.c
++++ b/drivers/net/ethernet/renesas/ravb_main.c
+@@ -2645,7 +2645,12 @@ static int ravb_probe(struct platform_device *pdev)
+ 	ndev->features = info->net_features;
+ 	ndev->hw_features = info->net_hw_features;
+ 
+-	reset_control_deassert(rstc);
++	error = reset_control_deassert(rstc);
++	if (error) {
++		free_netdev(ndev);
++		return error;
++	}
++
+ 	pm_runtime_enable(&pdev->dev);
+ 	pm_runtime_get_sync(&pdev->dev);
+ 
 -- 
 2.39.2
 
