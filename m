@@ -1,30 +1,30 @@
-Return-Path: <netdev+bounces-49346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3327F1C62
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:28:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2F17F1C63
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F831282744
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:28:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9476228219C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072203218C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2331C32196;
 	Mon, 20 Nov 2023 18:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H9yqJ6vt"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z0E3HT7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2059.outbound.protection.outlook.com [40.107.102.59])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04D72C9
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:28:27 -0800 (PST)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2047.outbound.protection.outlook.com [40.107.94.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11F1FCB
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:28:28 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IVIcKydsFEwrDHj46UWuSxoHI6lvIRyPhisWQQmXLWAwUqVpnbkv7Z25r6dk6JALIY4cw04XdnMo8mYjTrO2vxpVipYkQDMHOi332HbfLPsvygqmQ0+Vc1wFlnqelVyqIcotb7Jepci3Fu23tjNfVUmsESXRvYTJAgQ/ptoC5nTA5Mn0P8MyCZXMwewA4Jy8U3hSIaUlKEi2a/ZiEmhcymVow0k/leFDB3BOF3se2kJIzdPQcLQaTrmNPZ47SMFOrXLASuAC7pHcOS+o/HvDOSZrad3qc+vb3F7qdMROxpElZpIDmvIeIsyj/TUjU7jT+XLvlNww8dAnmPurYS1PXA==
+ b=SQXn1XjP3NT4wnEkGMduj+Anw28BKDnRBh/5ndHDTy7Z3i9FLgz3xUHCgtHWV5I5rQlhNG0L+KdvTk5jQ+HM4exoEB6FWtpZH3ajk2oJ19l/Z2wdAv3NK8Z7DyPNrv/dE3PxiR9rUn8w5Vd0LI46rB1RcytB0I89OC1RZFwsiIlh+/npDAmWgdF+jTAePnRY19ocms+G0zHtxmCDa1kpCHQCEghTZttLZTkNIy0U6qHv9re7tCXNzsaaP9VMEDnPB8OBNWpMn6IBI5fVgpBPQNzZeAv9mk9DiI0RIjfmIcBDqtbTv4SbTusMZMom3bT0eeZE+331XOMZAQh42o7SOQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+gkQXBdyhXkCNtibjUG2Ksq/B4pCIHZgZFyenwsgK5M=;
- b=Rs7VKJkdR46KoAV6lSjZSrI99oYcJfnI2Q7nCx8rKQdW4hX97Wh18E93P+n5YdrNtMiaPynI8AIsvxNOtid3SQ2Fk1jFZQ+o2PXabbhj1D20GrbCbGX5jxXRr1XCC9jtoY+fcJg6/nbuMu7p4YARByfKCmquDmCEcsU5Ywk5jsCDxds3ZHuY9lyEE0es6NflU/adInQ1h7LINIr0n2s2OSpWgi+XuhWQ6YFigT6UnSAuvfcLOlmFlFbJHNrH/nmgZAGaKXEfv4kXY/d1/NXSkGwfJ6rpV+qs+7MB8br1upDWObNu/DZ1Cb1FZO4oYCnzyaTPxuo7Qu/t6mJa+GBd6A==
+ bh=04dmNv8DhQrvHPVWuL0/GWFk4U5bdhfw+MzQyPg6+Y0=;
+ b=B7oD6P/oh6LF6DvDNluh+dg/CphUEkPpEYcrRu6e/YmATPdGLFP8xfFe8owk9WhUuoptWA/DI/q9x4/N/pxjDXlZki0oapAaGE/TbsOnE/WtQlBktRC/GPy3UkmTsbVcKkemwrE9JfVO9t6nMI7AMFEjN6CKyBIe9wfZoSsPvFrXaY7tmjSMXl1fU6D1QfC0Hk7U4k9pCVsylUuEwpBZWXmYxQs4OFtQRoHLqtnxEZTmTnxJ5809DPQ2PV8R1UMWlH1yfGR0qS3rMaZ0BvMtIYAMKr9AWap01hRQz70drj04FOLSPAhqJaVPiJ7yT79u1/EuA1F7YqrHdCpMCUXHPg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -32,18 +32,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+gkQXBdyhXkCNtibjUG2Ksq/B4pCIHZgZFyenwsgK5M=;
- b=H9yqJ6vtE0o1xxD3lXxiK5U/7IAMeB0jVOjfQy3S/Xn8CkpyFk5bPe5RzFPZRhN+gCUCebq5LtSOp5gu80SObWbhooobS+mFPPc853e7EvEvsr8IBq0vv9vuRVP2sJGehdxJkd3T9ZO4QEK0N4tNvcK6p26PNehIHxO/fz/3oHFXGhKwYkDTzeZjCSM6QvIGERHfYIAE02Y2rzqEKnGwPnjU4+tnyD3jFDg1l9wMMbaOzqaFVulgEmv0osFW3pywCTfrPjNz0Y7B1c6OB9vOQxIv4xy5Re/Ze+3aMTjDq0X7COQs25YfmNgOLc1EsTxrabgFFmQfGOFQcvo115tYUQ==
-Received: from CH0PR03CA0008.namprd03.prod.outlook.com (2603:10b6:610:b0::13)
- by BL1PR12MB5160.namprd12.prod.outlook.com (2603:10b6:208:311::11) with
+ bh=04dmNv8DhQrvHPVWuL0/GWFk4U5bdhfw+MzQyPg6+Y0=;
+ b=Z0E3HT7E46QFw3MxDISf4WfXlHzvRsQQoWiIj3QNCnp9e+ZLkDvD/nWU9CeO0LiGbfVZAziieVrrkUd7APbEGLL97by+rnG3jh5O+7aaFticUXGJLo926553FR1aSCsEDbvN98/NLf1Mih23LCokjB3M3/SI6LlAgFU0X9VlAh20kn0Y3RMS+gBoiGQJ16sIE9BS2htbEdx6eDoJdp8sFiWROWaXbFfeTAVGsVzw95v9f0VZikvTUoY4+MDGOfn5bIjnZdy/z5ICR0jv24iCRAAoI/7P38AjeEltTYeUu1kmvKjBDiJpPlCBOsUMkURklxf2XU30AXD2bFboMSdq9g==
+Received: from DM6PR04CA0029.namprd04.prod.outlook.com (2603:10b6:5:334::34)
+ by MW4PR12MB7357.namprd12.prod.outlook.com (2603:10b6:303:219::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Mon, 20 Nov
- 2023 18:28:22 +0000
-Received: from DS1PEPF00017090.namprd03.prod.outlook.com
- (2603:10b6:610:b0:cafe::c0) by CH0PR03CA0008.outlook.office365.com
- (2603:10b6:610:b0::13) with Microsoft SMTP Server (version=TLS1_2,
+ 2023 18:28:25 +0000
+Received: from DS1PEPF00017092.namprd03.prod.outlook.com
+ (2603:10b6:5:334:cafe::af) by DM6PR04CA0029.outlook.office365.com
+ (2603:10b6:5:334::34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27 via Frontend
- Transport; Mon, 20 Nov 2023 18:28:22 +0000
+ Transport; Mon, 20 Nov 2023 18:28:25 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -51,26 +51,26 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF00017090.mail.protection.outlook.com (10.167.17.132) with Microsoft
+ DS1PEPF00017092.mail.protection.outlook.com (10.167.17.135) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7025.12 via Frontend Transport; Mon, 20 Nov 2023 18:28:22 +0000
+ 15.20.7025.12 via Frontend Transport; Mon, 20 Nov 2023 18:28:25 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 20 Nov
- 2023 10:28:07 -0800
+ 2023 10:28:11 -0800
 Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 20 Nov
- 2023 10:28:04 -0800
+ 2023 10:28:08 -0800
 From: Petr Machata <petrm@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>
 CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
  Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
-Subject: [PATCH net-next 12/14] mlxsw: spectrum_fid: Extract SFMR packing into a helper
-Date: Mon, 20 Nov 2023 19:25:29 +0100
-Message-ID: <31f32b4d767183f6cb197148d0792feab2efadba.1700503644.git.petrm@nvidia.com>
+Subject: [PATCH net-next 13/14] mlxsw: spectrum_router: Add a helper to get subport number from a RIF
+Date: Mon, 20 Nov 2023 19:25:30 +0100
+Message-ID: <d7ab43cf5b021f785f363f236e4b6780d10eea93.1700503644.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <cover.1700503643.git.petrm@nvidia.com>
 References: <cover.1700503643.git.petrm@nvidia.com>
@@ -87,108 +87,87 @@ X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017090:EE_|BL1PR12MB5160:EE_
-X-MS-Office365-Filtering-Correlation-Id: 678d219d-c4d7-4460-be29-08dbe9f67a16
+X-MS-TrafficTypeDiagnostic: DS1PEPF00017092:EE_|MW4PR12MB7357:EE_
+X-MS-Office365-Filtering-Correlation-Id: 45080871-73e1-4cbe-e8bd-08dbe9f67bdd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	JYoev8ug9mCrAhl0PCQTwYqSqT7ztlT40HBY7RWbQ5NAaUg/bH1/SEsrsy8YfXnUEqRgBj68MpLBF18bJX6Rie3Zedl3ZRN8Lh87GNs4Lc8ZuPy6yC6s9fUEgABiyIWw2UqD9NNgzOkiR2go3pt/PRZoujWhdEXnXYMPJ9J8Lx25QcDT/thcBvk66957P6S3LvoIy/CLFMBidpAbb/vounwEf7d/cuDWjl8VjvTRVLJiO1pLh7pQwuMFWqhmY4sPl1FzU3e7GZRtWJDIXYebWMTMlXxxKv2rfzcCxh5Mbnfhqd3CJYJdVUYqxOghxP3ICMMukz50esQhpXeG6DlXMTly+vs6tQmlZgfT91BAijF/9K/rdJ8w89l92FiG7Ihq99Ols4sLN6MEnz/MszOO+dHVH+VesKLEUvoRK+WFUpieuyayfaLJlae0tmB5Yv81cb1zamQBFYV6x+y6HGA3DJ1qR3afQ5kJ/6XDv7ihBMhlq20NsJ6jnOIdj3772yEIPBfc3eO7BynSaU7sXb3NPk0sGwpFH2/UqaiWXaIHSbdItlptP/9OrdsoXj/GGSew3pQ8xHynJYShg8BAPSK1czJ37zLa1oTTTG6/BtNZVOEEc76tFJJJ0lUrxFrT7HOlo5O54R7iIkdLGaApfISZuD8M6dLmVdvuE74fnuVeWoYBepfUmRDH5iyr+GX9mSlf1trhVdzAVJJBKCaOt0LeaVb6Uvbog1N1jPW42VlqeaE=
+	4QPaw9et5S4o+Ow9LOVhkR4bX6EexgE2bHBbZOBENksofAj92HResuZiCQlxN/f6t9erri/bZqadiYiPfU4+HZW/EysZS5AgXF6kzJeWaX43dvg0uvLxjJD14+0Sv2q9CT+jYL6pR3gDY2natvUILLsAjB1rIuLwHg+UsXX1Zxnc48VxszYy/r0xqMb0L5mUtgcO31H/HlKU1slmaGszeIorcx3W5IApJ+pukhZE0bCnjQBJeckXSXh02uAgfzm813SFyP7cLo8Flo6WQbI+o3ExoEcfMFp7awwIrhN+VGgx4t/nPudLN8YI4YGnRbHHDT+Q+7zaA8tmiSIh9uuwlFT651WW0ZvRvujcxXMT/jRH7KJszjK7UeKXDoF6EaaQ+NHi/GKMKu7G30JFRsP/udE6kFRAEk9bS5BTQgms46rjz971qyETB1Sr4b+wP2tF02zPPAkV4qTQuvvR5qRHLzrou+kr95Yez4/PZpG/vRHxpWCFjrLtRDYEgnZK5KXFXbvxEUb9k2R5de3HNpl1QaGf4GziV5q5zg9UnJQ39IcdTq8gmBjgssi1zMhaauhLxUw2iIapADbTLG/JsO/jKJdbHRwLxzd0QfwJ6VXPAHp+VfTgIRvqxtXDWSpZCzhL5pKmT/YSKIi90tTkMx4h32T6OwFyaURnSsqVwgQswYocekoJKSDDg/YicIDqaYbsmNyUnTDcBPiZB4kLOkohXeT2C4tgr/BGEUeGsnkxN1yn0GHDIAQfXjmk2fp59CY3
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(39860400002)(396003)(346002)(376002)(230922051799003)(186009)(1800799012)(64100799003)(82310400011)(451199024)(36840700001)(40470700004)(46966006)(82740400003)(26005)(16526019)(6666004)(83380400001)(426003)(336012)(2616005)(107886003)(54906003)(40480700001)(110136005)(70586007)(478600001)(70206006)(47076005)(36860700001)(7636003)(356005)(316002)(8936002)(4326008)(8676002)(40460700003)(5660300002)(41300700001)(2906002)(36756003)(86362001);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(346002)(396003)(39860400002)(376002)(136003)(230922051799003)(451199024)(82310400011)(64100799003)(1800799012)(186009)(36840700001)(40470700004)(46966006)(41300700001)(36756003)(86362001)(5660300002)(2906002)(40460700003)(7636003)(356005)(40480700001)(47076005)(2616005)(6666004)(82740400003)(66574015)(426003)(336012)(107886003)(478600001)(16526019)(26005)(70586007)(70206006)(316002)(54906003)(4326008)(8676002)(8936002)(110136005)(36860700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 18:28:22.1032
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 18:28:25.0861
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 678d219d-c4d7-4460-be29-08dbe9f67a16
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45080871-73e1-4cbe-e8bd-08dbe9f67bdd
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017090.namprd03.prod.outlook.com
+	DS1PEPF00017092.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5160
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7357
 
-Both mlxsw_sp_fid_op() and mlxsw_sp_fid_edit_op() pack the core of SFMR the
-same way. Extract the common code into a helper and call that. Extract out
-of that a wrapper that just calls mlxsw_reg_sfmr_pack(), because it will
-be useful for the dummy family later on.
+In the CFF flood mode, responsibility for management of the PGT entries for
+rFIDs is moved from FW to the driver. All rFIDs are based off either a
+front panel port, or a LAG port. The flood vectors for port-based rFIDs
+enable just the port itself, the ones for LAG-based rFIDs enable all member
+ports of the LAG in question.
+
+Since all rFIDs based off the same port have the same flood vector, and
+similarly for LAG-based rFIDs, the flood entries are shared. The PGT
+address of the flood vector is therefore determined based on the port (or
+LAG) number of the RIF connected with the rFID.
+
+Add a helper to determine subport number given a RIF, to be used in these
+calculations.
 
 Signed-off-by: Petr Machata <petrm@nvidia.com>
 Reviewed-by: Amit Cohen <amcohen@nvidia.com>
 Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 ---
- .../ethernet/mellanox/mlxsw/spectrum_fid.c    | 45 ++++++++++---------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum.h     |  2 ++
+ .../net/ethernet/mellanox/mlxsw/spectrum_router.c  | 14 ++++++++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
-index d7fc579f3b29..aad4bb17dfb1 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_fid.c
-@@ -424,21 +424,35 @@ static enum mlxsw_reg_sfmr_op mlxsw_sp_sfmr_op(bool valid)
- 		       MLXSW_REG_SFMR_OP_DESTROY_FID;
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+index c70333b460ea..800c461deefa 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.h
+@@ -753,6 +753,8 @@ union mlxsw_sp_l3addr {
+ };
+ 
+ u16 mlxsw_sp_rif_index(const struct mlxsw_sp_rif *rif);
++int mlxsw_sp_rif_subport_port(const struct mlxsw_sp_rif *rif,
++			      u16 *port, bool *is_lag);
+ int mlxsw_sp_router_init(struct mlxsw_sp *mlxsw_sp,
+ 			 struct netlink_ext_ack *extack);
+ void mlxsw_sp_router_fini(struct mlxsw_sp *mlxsw_sp);
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+index 82a95125d9ca..a358ceb4e1d0 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c
+@@ -8660,6 +8660,20 @@ mlxsw_sp_rif_subport_rif(const struct mlxsw_sp_rif *rif)
+ 	return container_of(rif, struct mlxsw_sp_rif_subport, common);
  }
  
-+static void mlxsw_sp_fid_pack(char *sfmr_pl,
-+			      const struct mlxsw_sp_fid *fid,
-+			      enum mlxsw_reg_sfmr_op op)
++int mlxsw_sp_rif_subport_port(const struct mlxsw_sp_rif *rif,
++			      u16 *port, bool *is_lag)
 +{
-+	u16 smpe;
++	struct mlxsw_sp_rif_subport *rif_subport;
 +
-+	smpe = fid->fid_family->smpe_index_valid ? fid->fid_index : 0;
++	if (WARN_ON(rif->ops->type != MLXSW_SP_RIF_TYPE_SUBPORT))
++		return -EINVAL;
 +
-+	mlxsw_reg_sfmr_pack(sfmr_pl, op, fid->fid_index,
-+			    fid->fid_family->smpe_index_valid, smpe);
++	rif_subport = mlxsw_sp_rif_subport_rif(rif);
++	*is_lag = rif_subport->lag;
++	*port = *is_lag ? rif_subport->lag_id : rif_subport->system_port;
++	return 0;
 +}
 +
-+static void mlxsw_sp_fid_pack_ctl(char *sfmr_pl,
-+				  const struct mlxsw_sp_fid *fid,
-+				  enum mlxsw_reg_sfmr_op op)
-+{
-+	mlxsw_sp_fid_pack(sfmr_pl, fid, op);
-+	mlxsw_reg_sfmr_fid_offset_set(sfmr_pl, fid->fid_offset);
-+	mlxsw_reg_sfmr_flood_rsp_set(sfmr_pl, fid->fid_family->flood_rsp);
-+	mlxsw_reg_sfmr_flood_bridge_type_set(sfmr_pl,
-+					     fid->fid_family->bridge_type);
-+}
-+
- static int mlxsw_sp_fid_op(const struct mlxsw_sp_fid *fid, bool valid)
- {
- 	struct mlxsw_sp *mlxsw_sp = fid->fid_family->mlxsw_sp;
- 	char sfmr_pl[MLXSW_REG_SFMR_LEN];
--	u16 smpe;
--
--	smpe = fid->fid_family->smpe_index_valid ? fid->fid_index : 0;
--
--	mlxsw_reg_sfmr_pack(sfmr_pl, mlxsw_sp_sfmr_op(valid), fid->fid_index,
--			    fid->fid_family->smpe_index_valid, smpe);
--	mlxsw_reg_sfmr_fid_offset_set(sfmr_pl, fid->fid_offset);
--	mlxsw_reg_sfmr_flood_rsp_set(sfmr_pl, fid->fid_family->flood_rsp);
--	mlxsw_reg_sfmr_flood_bridge_type_set(sfmr_pl,
--					     fid->fid_family->bridge_type);
- 
-+	mlxsw_sp_fid_pack_ctl(sfmr_pl, fid, mlxsw_sp_sfmr_op(valid));
- 	return mlxsw_reg_write(mlxsw_sp->core, MLXSW_REG(sfmr), sfmr_pl);
- }
- 
-@@ -447,17 +461,8 @@ static int mlxsw_sp_fid_edit_op(const struct mlxsw_sp_fid *fid,
- {
- 	struct mlxsw_sp *mlxsw_sp = fid->fid_family->mlxsw_sp;
- 	char sfmr_pl[MLXSW_REG_SFMR_LEN];
--	u16 smpe;
- 
--	smpe = fid->fid_family->smpe_index_valid ? fid->fid_index : 0;
--
--	mlxsw_reg_sfmr_pack(sfmr_pl, MLXSW_REG_SFMR_OP_CREATE_FID,
--			    fid->fid_index,
--			    fid->fid_family->smpe_index_valid, smpe);
--	mlxsw_reg_sfmr_fid_offset_set(sfmr_pl, fid->fid_offset);
--	mlxsw_reg_sfmr_flood_rsp_set(sfmr_pl, fid->fid_family->flood_rsp);
--	mlxsw_reg_sfmr_flood_bridge_type_set(sfmr_pl,
--					     fid->fid_family->bridge_type);
-+	mlxsw_sp_fid_pack_ctl(sfmr_pl, fid, MLXSW_REG_SFMR_OP_CREATE_FID);
- 	mlxsw_reg_sfmr_vv_set(sfmr_pl, fid->vni_valid);
- 	mlxsw_reg_sfmr_vni_set(sfmr_pl, be32_to_cpu(fid->vni));
- 	mlxsw_reg_sfmr_vtfp_set(sfmr_pl, fid->nve_flood_index_valid);
+ static struct mlxsw_sp_rif *
+ mlxsw_sp_rif_subport_get(struct mlxsw_sp *mlxsw_sp,
+ 			 const struct mlxsw_sp_rif_params *params,
 -- 
 2.41.0
 
