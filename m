@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-49447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE8277F218F
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:44:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9CA7F2190
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:44:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DDF5B21966
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:44:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D944B219EA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03693B783;
-	Mon, 20 Nov 2023 23:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EF93B787;
+	Mon, 20 Nov 2023 23:44:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ibb6NuDz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K/8VRauR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F6FC3
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:38 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-41feb963f60so41924611cf.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:37 -0800 (PST)
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEFCC7
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:39 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id d75a77b69052e-42033328ad0so29939321cf.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1700523877; x=1701128677; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1700523878; x=1701128678; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FHM+sryUZM0YAe3w2WUaneVLgkyeK6T8H2Goa73kBR4=;
-        b=Ibb6NuDzyaTwttHmPAYX6r3KSmov1sc3SV1tKutwrUqLdt9+2Z/rLanFKAgpxpoIIf
-         X+pBleygHCpPGdcaduHnCIz+KbRtRWqFcl8r28SXAl8tXXM96nZb2F/lNKeLMPVD3VTR
-         XKzj2eaRPe86RODsVz3oaYNTf+NMC+DCSFlgk=
+        bh=atj0wcg9XYQePoheikbPi9EKAIZzEF9jPNFTWltqhrY=;
+        b=K/8VRauRGnvpKAovrzK5PWyQJLz7GorhsdgPnc3kjTvuFojMF7b5mMmFkDmZRnNR2U
+         kwu+dkHfgEv9P6NZkclDdV9gruHwwj1t4o5yffDBT4K+IevJ2uQmiFk18kl0/zgAIqA/
+         wfmYh5doVR0YR23PzcscXuRgl/ggEEJDBkxOE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700523877; x=1701128677;
+        d=1e100.net; s=20230601; t=1700523878; x=1701128678;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FHM+sryUZM0YAe3w2WUaneVLgkyeK6T8H2Goa73kBR4=;
-        b=FDmxhMtTHRxa9GXBnRXs8pxm+9w+WpYTAlKi2woApwVCZZx8wcOpvfPQ2p2GpHFYSE
-         qlz/aLiWQ89jNW4CX6uaV+aeGn+kSwp4803b+gEAFrmFUc940977nmRagsTMoRt4sG1T
-         YdDGHof9TsUDZgqte73y3lYoLk8TL+RTqLKGk93nX08koCfWTl7lOx0uUYazIJCgY5Aw
-         /N64f/eZVUSZD590eFSWHejz9SQR+KossRaoFUlfYsMVKbvMYe3OIk6pr0HAhfsi2IGv
-         XX0I3tXOasGXho8FNvnVCY4fdo2z3ObrwGuugdboSzAEiRkU4cJPkPYcFD4ujcbVEEig
-         LnkQ==
-X-Gm-Message-State: AOJu0YynxclAvVSRBMml4kGSLW7rvnTZ48Z6FV9BsSQ4Wo9fjs9OL1Kv
-	FRuc8aZrUGbyo/YiH2x27H/IPy1HfTbHzBbBXps=
-X-Google-Smtp-Source: AGHT+IFHdoEWyyi1oZI1F7yEp0ccJo3oxEjINof+rcIQTNvEiRA0ilKZfULD4sRKLq/cT24m+QmVtw==
-X-Received: by 2002:a05:622a:15c2:b0:417:af0a:70a0 with SMTP id d2-20020a05622a15c200b00417af0a70a0mr1726341qty.14.1700523877056;
-        Mon, 20 Nov 2023 15:44:37 -0800 (PST)
+        bh=atj0wcg9XYQePoheikbPi9EKAIZzEF9jPNFTWltqhrY=;
+        b=ZOph2JqOt8kao0BYBA7eUhECQmebVjBolRVbi6lrrsLT694YHYrYXju6n4Yw4xSBxf
+         GVebX1bwYbPdMMMhuNLPjy1+252Jqwf4QQYM+BKLosYtTyz9N0L78//idwAeNOzdfzR2
+         1RYsjZZOcpA96RX8J3vDCFZ+aa4iyW7N4ndPwoXqnTCPnsTeQhlci5RVQ2GIhZ2/128W
+         5bw08+DuARnyN2wTJgcIFvkL0jukjjCvlqt0KZJzBowtgfulj9aXpRFtAvry6Ex8ltwb
+         haaPsiVzK3g96MrB/5SdOqje1go7mBf4HiPBUylxxm/udJj/wTzD3mK5i0ASSiHWbeCH
+         u1rg==
+X-Gm-Message-State: AOJu0YxnuIyuHJXHhWvGa7zHbI07gSwkMjO5tl5PHN9NfGUZAp9IkM9l
+	iGoHaX35leS3X6Yfu7/JGZT7TA==
+X-Google-Smtp-Source: AGHT+IHlT+BNCYyJ3G1giaXbfyf3KH+fE7GUOntzEBLAU3l021t0YOBEVDN72auwvP3ySc1Yjynd7A==
+X-Received: by 2002:a05:622a:50b:b0:418:15ab:85b8 with SMTP id l11-20020a05622a050b00b0041815ab85b8mr10844638qtx.13.1700523878329;
+        Mon, 20 Nov 2023 15:44:38 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i9-20020ac871c9000000b0041803dfb240sm3053384qtp.45.2023.11.20.15.44.35
+        by smtp.gmail.com with ESMTPSA id i9-20020ac871c9000000b0041803dfb240sm3053384qtp.45.2023.11.20.15.44.37
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 Nov 2023 15:44:36 -0800 (PST)
+        Mon, 20 Nov 2023 15:44:38 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,11 +55,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
 	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 01/13] bnxt_en: The caller of bnxt_alloc_ctx_mem() should always free bp->ctx
-Date: Mon, 20 Nov 2023 15:43:53 -0800
-Message-Id: <20231120234405.194542-2-michael.chan@broadcom.com>
+Subject: [PATCH net-next 02/13] bnxt_en: Free bp->ctx inside bnxt_free_ctx_mem()
+Date: Mon, 20 Nov 2023 15:43:54 -0800
+Message-Id: <20231120234405.194542-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231120234405.194542-1-michael.chan@broadcom.com>
 References: <20231120234405.194542-1-michael.chan@broadcom.com>
@@ -70,57 +69,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a49cda060a9e11a8"
+	boundary="000000000000b89eb7060a9e117f"
 
---000000000000a49cda060a9e11a8
+--000000000000b89eb7060a9e117f
 Content-Transfer-Encoding: 8bit
 
-bnxt_alloc_ctx_mem() calls bnxt_hwrm_func_backing_store_qcaps() to
-allocate the memory for bp->ctx.  Initialize bp->ctx with the allocated
-memory and let the caller free it during unwind.  The unwind logic is
-already there, we just need to always set bp->ctx to the allocated
-memory so the caller will always free it.  This simplifies the logic
-and makes it easier to expand on the backing store logic.
+We always free bp->ctx right after calling bnxt_free_ctx_mem(), so just
+free it at the end of that function to make things simpler.
 
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 14 ++------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c |  2 --
+ 2 files changed, 2 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index e6ac1bd21bb3..6b19d5b8d95a 100644
+index 6b19d5b8d95a..8ff21768e592 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7233,6 +7233,8 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
- 			rc = -ENOMEM;
- 			goto ctx_err;
+@@ -7552,6 +7552,8 @@ void bnxt_free_ctx_mem(struct bnxt *bp)
+ 	bnxt_free_ctx_pg_tbls(bp, &ctx->srq_mem);
+ 	bnxt_free_ctx_pg_tbls(bp, &ctx->qp_mem);
+ 	ctx->flags &= ~BNXT_CTX_FLAG_INITED;
++	kfree(ctx);
++	bp->ctx = NULL;
+ }
+ 
+ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+@@ -10321,8 +10323,6 @@ static int bnxt_hwrm_if_change(struct bnxt *bp, bool up)
+ 			if (!test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
+ 				bnxt_ulp_stop(bp);
+ 			bnxt_free_ctx_mem(bp);
+-			kfree(bp->ctx);
+-			bp->ctx = NULL;
+ 			bnxt_dcb_free(bp);
+ 			rc = bnxt_fw_init_one(bp);
+ 			if (rc) {
+@@ -11948,8 +11948,6 @@ static void bnxt_fw_reset_close(struct bnxt *bp)
+ 	if (pci_is_enabled(bp->pdev))
+ 		pci_disable_device(bp->pdev);
+ 	bnxt_free_ctx_mem(bp);
+-	kfree(bp->ctx);
+-	bp->ctx = NULL;
+ }
+ 
+ static bool is_bnxt_fw_ok(struct bnxt *bp)
+@@ -13368,8 +13366,6 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+ 	bp->fw_health = NULL;
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp);
+-	kfree(bp->ctx);
+-	bp->ctx = NULL;
+ 	kfree(bp->rss_indir_tbl);
+ 	bp->rss_indir_tbl = NULL;
+ 	bnxt_free_port_stats(bp);
+@@ -13969,8 +13965,6 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bp->fw_health = NULL;
+ 	bnxt_cleanup_pci(bp);
+ 	bnxt_free_ctx_mem(bp);
+-	kfree(bp->ctx);
+-	bp->ctx = NULL;
+ 	kfree(bp->rss_indir_tbl);
+ 	bp->rss_indir_tbl = NULL;
+ 
+@@ -14023,8 +14017,6 @@ static int bnxt_suspend(struct device *device)
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
+ 	pci_disable_device(bp->pdev);
+ 	bnxt_free_ctx_mem(bp);
+-	kfree(bp->ctx);
+-	bp->ctx = NULL;
+ 	rtnl_unlock();
+ 	return rc;
+ }
+@@ -14121,8 +14113,6 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
+ 	if (pci_is_enabled(pdev))
+ 		pci_disable_device(pdev);
+ 	bnxt_free_ctx_mem(bp);
+-	kfree(bp->ctx);
+-	bp->ctx = NULL;
+ 	rtnl_unlock();
+ 
+ 	/* Request a slot slot reset. */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+index f302dac56599..10b842539b08 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_devlink.c
+@@ -469,8 +469,6 @@ static int bnxt_dl_reload_down(struct devlink *dl, bool netns_change,
  		}
-+		bp->ctx = ctx;
-+
- 		ctx->qp_max_entries = le32_to_cpu(resp->qp_max_entries);
- 		ctx->qp_min_qp1_entries = le16_to_cpu(resp->qp_min_qp1_entries);
- 		ctx->qp_max_l2_entries = le16_to_cpu(resp->qp_max_l2_entries);
-@@ -7276,13 +7278,11 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
- 		tqm_rings = ctx->tqm_fp_rings_count + BNXT_MAX_TQM_SP_RINGS;
- 		ctx_pg = kcalloc(tqm_rings, sizeof(*ctx_pg), GFP_KERNEL);
- 		if (!ctx_pg) {
--			kfree(ctx);
- 			rc = -ENOMEM;
- 			goto ctx_err;
- 		}
- 		for (i = 0; i < tqm_rings; i++, ctx_pg++)
- 			ctx->tqm_mem[i] = ctx_pg;
--		bp->ctx = ctx;
- 	} else {
- 		rc = 0;
+ 		bnxt_cancel_reservations(bp, false);
+ 		bnxt_free_ctx_mem(bp);
+-		kfree(bp->ctx);
+-		bp->ctx = NULL;
+ 		break;
  	}
+ 	case DEVLINK_RELOAD_ACTION_FW_ACTIVATE: {
 -- 
 2.30.1
 
 
---000000000000a49cda060a9e11a8
+--000000000000b89eb7060a9e117f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -191,14 +239,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJobNTbKzSHneB88ErqGRha7WZAwx29y
-gM4qMr/7dDAzMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEy
-MDIzNDQzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIN8gs2rRKEoe9HaxnkHxIiPxnyfngNw3
+uB9ssy4Evi5WMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEy
+MDIzNDQzOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAUmPK/vXRHAh4JV+rdHMpppUXnJykQX/kt6Li4x3WYXLKYI8su
-iJaFBPVuyapTPDk8LfXCWM14i9G4voG03sGsf1rpQh2+Qn++KYSV7CLJ+uP3oJl0MCWfteQ0ZJQn
-TaMESWSNd2YiPXWka0gT/Ca7Gn21rTT0dWzpgJZqN3+LS8ZUkqn3DLWvtVWw3QSWTDgBsY+9INqR
-pp4GenJwiAb7BS3a/m0N/2LDOqj5Nyu4iI3QerKZO57X8Q+qtZV9G/vHaWc4pzLQUbJut107TXrG
-d5urM069o2gHMnv348D7SuhyKweFDuGBnsJWgC0uDX96GTbgMQTYOS+gkzoAx2mu
---000000000000a49cda060a9e11a8--
+ATANBgkqhkiG9w0BAQEFAASCAQCvDnvHIvs9VOK/cRcjuR+0RUmes5GcjcJ+Is4l1kpnZNVPxJfZ
+bPBSdJxs37GkFYnd4L7nOqAckP4pYJqsOMpe7BVkUVQE4eAQHhcgv7RgnZCh0AxY8xb6T17CnezT
+kMZeLeKXJRRQaku1lY+QjxeFZCt0GYiuAdpRAqqkCqyoAj8OZcYWLHS50/Z7Y8sxmILSwG5Med9k
+HoA+vStnV11ComurxHGMMYCPaiH3/wtf21NNzHZXWEiQstMvpRo/TT94hhoESEPsbE7PGVt6sD3B
+EX62vaGfqku71dYLPHk32QNz+RRPrODTxjVTR0ZV1IIDhsuPc0QAqcu/0HsemzAb
+--000000000000b89eb7060a9e117f--
 
