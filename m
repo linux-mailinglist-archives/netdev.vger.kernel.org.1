@@ -1,184 +1,198 @@
-Return-Path: <netdev+bounces-49182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 529177F10E7
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:55:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C51707F10EE
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC5331F2379C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:55:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C10D6B21682
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C8879FE;
-	Mon, 20 Nov 2023 10:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEF48485;
+	Mon, 20 Nov 2023 10:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YSN0UEJ9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a9JKPpKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF6585
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:55:01 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-40a4d04af5cso12128315e9.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:55:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700477700; x=1701082500; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S7yigsWpqo5NnEMD9rs1RxI3LcZvc/Yo1+fclqVDtR0=;
-        b=YSN0UEJ90UZ6lQ8BkbRBAVugn9rUh79lyEiB3i1DGJymQ0kj4s+B3vYuId6XXXdHVm
-         VPtUk0JM6arXTIbqRFPbHkwVpxr0sDB2RQ4zxZQCt4xspdZUuOclI60nQHqiWgIz1kj0
-         ZZpFXFf6QiQmQufnPn8ESTN6FUnucugG3SY+1j6Y8M46QtfSKqB7Rnn3+DbLCppsVOIp
-         HxOtLd81B3ZINczp7Zcm7SOOR8vIkXm199Tdg5kwRXC37akdPBg3OE4LDdUrYkWMO65A
-         x6ERv4E1gzUNjfE/IUwddbahtucnf6tQ1hZe3ofmG+hKCPahOMuDtyV4wPJQZW0J1Z93
-         2qUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700477700; x=1701082500;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S7yigsWpqo5NnEMD9rs1RxI3LcZvc/Yo1+fclqVDtR0=;
-        b=HZ67AuUdo+Dm9MqDSF/zI4b2PSfG8LlnQ/3i6KFKWQZ2uiHf02cMpeZ3svnSm4oSgL
-         fF+aCKuRPmLrCqGOUf6DsI0JZ3qJR1lydINnhNM1W4gzXAI2OPgI152F5dNE74O5WYdt
-         rWhJews/3wQBoWoxomMVqwQyZnU1otfwZqMdKIAicr0O3DsXKyYViDfrT5AdUqA78Pn/
-         znGACQjFeW02BPc+ZWsAA3QBD6UK8GY60KlOMAT0LungnRmsnod5i55MzvapA8ZhZGqZ
-         XOV9tycDTDm+OxcszZONL2eM1N9ZN52vy4nNxZCbkIj5cM0Igi+xdtOdn23JKZ501gXF
-         sxHg==
-X-Gm-Message-State: AOJu0YzZGbL3YwTfsZd94DQcuvn0PYfKDSF4qkjxgYP5xo+j8EODkgFm
-	3aPxWBeeHoS6z6TkYvyeMhPsVO/jlX0j34nxCVk=
-X-Google-Smtp-Source: AGHT+IETDFg3+zhHdqRS0r+kKYhNfXKDAirf7sGch5NG5N8rbdEccC65Ia69iOIzuyn3kUAe49YETw==
-X-Received: by 2002:a05:600c:4e92:b0:405:4daa:6e3d with SMTP id f18-20020a05600c4e9200b004054daa6e3dmr5790050wmq.39.1700477700200;
-        Mon, 20 Nov 2023 02:55:00 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id fb11-20020a05600c520b00b004076f522058sm17346948wmb.0.2023.11.20.02.54.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 02:54:59 -0800 (PST)
-From: Dan Carpenter <dan.carpenter@linaro.org>
-X-Google-Original-From: Dan Carpenter <dan.carpenter@oracle.com>
-Date: Mon, 20 Nov 2023 05:54:56 -0500
-To: oe-kbuild@lists.linux.dev, Min Li <lnimi@hotmail.com>,
-	richardcochran@gmail.com, lee@kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Min Li <min.li.xe@renesas.com>
-Subject: Re: [PATCH net-next v2 1/1] ptp: clockmatrix: support 32-bit address
- space
-Message-ID: <03e74acd-bb49-472a-b200-e84e11ae2865@suswa.mountain>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEAC79FE
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:55:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A925DC433C7;
+	Mon, 20 Nov 2023 10:55:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700477750;
+	bh=JNOXOdMOojAeZTWbU9byZOU6PtaixYj9Wh0/k1bc3mk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=a9JKPpKsvo/0/BW56ePSrrLHa0p5i/Ru9Zkn8gVbkwN6cA1scm7rRbvoN08W1Amrh
+	 kN58pGCpIWvIWOnPfPUzY+Bpw+oAnk+ouW8Aoh6bdr8dF7SmKoLHHFSo/+pPWIzUKb
+	 g5oR40me2x63tv8TpYM6cIMOeaXYME6hGghY+R7vu55Qa8URACng7cONXhiHs6UzwG
+	 xZ923MXAeAcDuHwIUcOgtHkrAWwip6zm5ZXYzUckxo7zE6cJefRrHXhctXUuQSaVk/
+	 hjaudb+9GZv3ICtMX+eoxAGpmBmOj9Yt3ynFhidQ5HIGh4x20ZKVyh0t/NXsTtWis5
+	 5MmW+y5hNuG3A==
+Date: Mon, 20 Nov 2023 11:55:46 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: =?utf-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Toshiaki Makita <toshiaki.makita1@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [External] Re: [PATCH net] veth: fix ethtool statistical errors
+Message-ID: <ZVs7MthVYdIBq9lz@lore-desk>
+References: <20231116114150.48639-1-huangjie.albert@bytedance.com>
+ <ZVcxmwm/DRTB8QwO@lore-desk>
+ <CABKxMyPMboVYs01KfPEdxPbx-LT88Qe1pcDMaT0NiNWhA-5emg@mail.gmail.com>
+ <ZVssMWXZYxM0eKiY@lore-desk>
+ <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="hhq9HwkAJFZbaTuH"
 Content-Disposition: inline
-In-Reply-To: <MW5PR03MB6932A4AAD4F612B45E9F6856A0AFA@MW5PR03MB6932.namprd03.prod.outlook.com>
+In-Reply-To: <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
 
-Hi Min,
 
-kernel test robot noticed the following build warnings:
+--hhq9HwkAJFZbaTuH
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Min-Li/ptp-clockmatrix-support-32-bit-address-space/20231110-044554
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/MW5PR03MB6932A4AAD4F612B45E9F6856A0AFA%40MW5PR03MB6932.namprd03.prod.outlook.com
-patch subject: [PATCH net-next v2 1/1] ptp: clockmatrix: support 32-bit address space
-config: i386-randconfig-141-20231111 (https://download.01.org/0day-ci/archive/20231111/202311110542.BjfgVNxz-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20231111/202311110542.BjfgVNxz-lkp@intel.com/reproduce)
+> Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=8820=
+=E6=97=A5=E5=91=A8=E4=B8=80 17:52=E5=86=99=E9=81=93=EF=BC=9A
+> >
+> > > Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=
+=8817=E6=97=A5=E5=91=A8=E4=BA=94 17:26=E5=86=99=E9=81=93=EF=BC=9A
+> > > >
+> > > > > if peer->real_num_rx_queues > 1, the ethtool -s command for
+> > > > > veth network device will display some error statistical values.
+> > > > > The value of tx_idx is reset with each iteration, so even if
+> > > > > peer->real_num_rx_queues is greater than 1, the value of tx_idx
+> > > > > will remain constant. This results in incorrect statistical value=
+s.
+> > > > > To fix this issue, assign the value of pp_idx to tx_idx.
+> > > > >
+> > > > > Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit=
+ accounting")
+> > > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> > > > > ---
+> > > > >  drivers/net/veth.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> > > > > index 0deefd1573cf..3a8e3fc5eeb5 100644
+> > > > > --- a/drivers/net/veth.c
+> > > > > +++ b/drivers/net/veth.c
+> > > > > @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net=
+_device *dev,
+> > > > >       for (i =3D 0; i < peer->real_num_rx_queues; i++) {
+> > > > >               const struct veth_rq_stats *rq_stats =3D &rcv_priv-=
+>rq[i].stats;
+> > > > >               const void *base =3D (void *)&rq_stats->vs;
+> > > > > -             unsigned int start, tx_idx =3D idx;
+> > > > > +             unsigned int start, tx_idx =3D pp_idx;
+> > > > >               size_t offset;
+> > > > >
+> > > > >               tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ=
+_STATS_LEN;
+> > > > > --
+> > > > > 2.20.1
+> > > > >
+> > > >
+> > > > Hi Albert,
+> > > >
+> > > > Can you please provide more details about the issue you are facing?
+> > > > In particular, what is the number of configured tx and rx queues fo=
+r both
+> > > > peers?
+> > >
+> > > Hi, Lorenzo
+> > > I found this because I wanted to add more echo information in ethttoo=
+l=EF=BC=88for veth,
+> > > but I found that the information was incorrect. That's why I paid
+> > > attention here.
+> >
+> > ack. Could you please share the veth pair tx/rx queue configuration?
+> >
+>=20
+> dev: tx --->4.  rx--->4
+> peer: tx--->1 rx---->1
+>=20
+> Could the following code still be problematic? pp_idx not updated correct=
+ly.
+> page_pool_stats:
+> veth_get_page_pool_stats(dev, &data[pp_idx]);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <error27@gmail.com>
-| Closes: https://lore.kernel.org/r/202311110542.BjfgVNxz-lkp@intel.com/
+Thx for pointing this out. This part is a bit tricky but I think I can see =
+the
+issue now. Since we have just one peer rx queue, when we run ndo_xdp_xmit
+pointer on dev, we will squash all dev xmit queues on the single peer rx one
+(where we do do the accounting) [0].
+The issue is ethtool will display all dev xmit queues so we need to set pp_=
+idx
+properly in veth_get_ethtool_stats().
+Can you please take a look to the patch below?
 
-New smatch warnings:
-drivers/ptp/ptp_clockmatrix.c:1257 idtcm_load_firmware() warn: '(537972560)' 537972560 can't fit into 65535 'scratch'
+Regards,
+Lorenzo
 
-vim +1257 drivers/ptp/ptp_clockmatrix.c
+[0] https://github.com/LorenzoBianconi/net-next/blob/master/drivers/net/vet=
+h.c#L417
 
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1254  static int idtcm_load_firmware(struct idtcm *idtcm,
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1255  			       struct device *dev)
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1256  {
-794c3dffacc166 Min Li        2021-09-13 @1257  	u16 scratch = IDTCM_FW_REG(idtcm->fw_ver, V520, SCRATCH);
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 9980517ed8b0..8607eb8cf458 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -236,8 +236,8 @@ static void veth_get_ethtool_stats(struct net_device *d=
+ev,
+ 				data[tx_idx + j] +=3D *(u64 *)(base + offset);
+ 			}
+ 		} while (u64_stats_fetch_retry(&rq_stats->syncp, start));
+-		pp_idx =3D tx_idx + VETH_TQ_STATS_LEN;
+ 	}
++	pp_idx =3D idx + dev->real_num_tx_queues * VETH_TQ_STATS_LEN;
+=20
+ page_pool_stats:
+ 	veth_get_page_pool_stats(dev, &data[pp_idx]);
 
--#define SCRATCH_V520                      0xcf4c
-+#define SCRATCH_V520                      0x2010cf4c
+>=20
+> BR
+> Albert
+>=20
+> > Rergards,
+> > Lorenzo
+> >
+> > >
+> > > > tx_idx is the index of the current (local) tx queue and it must res=
+tart from
+> > > > idx in each iteration otherwise we will have an issue when
+> > > > peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
+> > > >
+> > > OK. I don't know if this is a known issue.
+> > >
+> > > BR
+> > > Albert
+> > >
+> > >
+> > > > Regards,
+> > > > Lorenzo
 
-This doesn't fit into a u16 any more.  I'm not sure this a bug, but it's
-a bit ugly.
+--hhq9HwkAJFZbaTuH
+Content-Type: application/pgp-signature; name="signature.asc"
 
-7ea5fda2b1325e Min Li        2020-07-28  1258  	char fname[128] = FW_FILENAME;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1259  	const struct firmware *fw;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1260  	struct idtcm_fwrc *rec;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1261  	u32 regaddr;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1262  	int err;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1263  	s32 len;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1264  	u8 val;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1265  	u8 loaddr;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1266  
-7ea5fda2b1325e Min Li        2020-07-28  1267  	if (firmware) /* module parameter */
-7ea5fda2b1325e Min Li        2020-07-28  1268  		snprintf(fname, sizeof(fname), "%s", firmware);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1269  
-930dfa56315517 Min Li        2021-09-24  1270  	dev_info(idtcm->dev, "requesting firmware '%s'", fname);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1271  
-7ea5fda2b1325e Min Li        2020-07-28  1272  	err = request_firmware(&fw, fname, dev);
-7ea5fda2b1325e Min Li        2020-07-28  1273  	if (err) {
-930dfa56315517 Min Li        2021-09-24  1274  		dev_err(idtcm->dev,
-1c49d3e947783b Vincent Cheng 2021-02-17  1275  			"Failed at line %d in %s!", __LINE__, __func__);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1276  		return err;
-7ea5fda2b1325e Min Li        2020-07-28  1277  	}
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1278  
-930dfa56315517 Min Li        2021-09-24  1279  	dev_dbg(idtcm->dev, "firmware size %zu bytes", fw->size);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1280  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1281  	rec = (struct idtcm_fwrc *) fw->data;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1282  
-794c3dffacc166 Min Li        2021-09-13  1283  	if (contains_full_configuration(idtcm, fw))
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1284  		idtcm_state_machine_reset(idtcm);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1285  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1286  	for (len = fw->size; len > 0; len -= sizeof(*rec)) {
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1287  		if (rec->reserved) {
-930dfa56315517 Min Li        2021-09-24  1288  			dev_err(idtcm->dev,
-1c49d3e947783b Vincent Cheng 2021-02-17  1289  				"bad firmware, reserved field non-zero");
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1290  			err = -EINVAL;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1291  		} else {
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1292  			regaddr = rec->hiaddr << 8;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1293  			regaddr |= rec->loaddr;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1294  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1295  			val = rec->value;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1296  			loaddr = rec->loaddr;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1297  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1298  			rec++;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1299  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1300  			err = check_and_set_masks(idtcm, regaddr, val);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1301  		}
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1302  
-7ea5fda2b1325e Min Li        2020-07-28  1303  		if (err != -EINVAL) {
-7ea5fda2b1325e Min Li        2020-07-28  1304  			err = 0;
-7ea5fda2b1325e Min Li        2020-07-28  1305  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1306  			/* Top (status registers) and bottom are read-only */
-9fe9b9792d7236 Min Li        2023-11-09  1307  			if (regaddr < SCSR_ADDR(GPIO_USER_CONTROL) || regaddr >= scratch)
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1308  				continue;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1309  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1310  			/* Page size 128, last 4 bytes of page skipped */
-77fdb168a3e2a6 Vincent Cheng 2021-02-17  1311  			if ((loaddr > 0x7b && loaddr <= 0x7f) || loaddr > 0xfb)
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1312  				continue;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1313  
-9fe9b9792d7236 Min Li        2023-11-09  1314  			err = idtcm_write(idtcm, SCSR_BASE, regaddr, &val, sizeof(val));
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1315  		}
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1316  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1317  		if (err)
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1318  			goto out;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1319  	}
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1320  
-7ea5fda2b1325e Min Li        2020-07-28  1321  	display_pll_and_masks(idtcm);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1322  
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1323  out:
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1324  	release_firmware(fw);
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1325  	return err;
-3a6ba7dc779935 Vincent Cheng 2019-10-31  1326  }
+-----BEGIN PGP SIGNATURE-----
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZVs7MgAKCRA6cBh0uS2t
+rLj+AP9vMII6nwXW7ZJdM5Pl3vPFbXaHYgnoCiPxk2vp0r8g3AEAxtnUvbbKUYtH
+TksmG8p8EEEdw92st5fryqBiqa53HAM=
+=Dba7
+-----END PGP SIGNATURE-----
 
+--hhq9HwkAJFZbaTuH--
 
