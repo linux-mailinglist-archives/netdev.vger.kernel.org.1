@@ -1,159 +1,96 @@
-Return-Path: <netdev+bounces-49165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419437F0FAF
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:03:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F1F7F0FBC
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F189A281A17
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:03:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 010191F232B1
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953CD125A5;
-	Mon, 20 Nov 2023 10:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD19125D2;
+	Mon, 20 Nov 2023 10:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="KdwCFp2Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dsMU4UPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3416CEB
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:03:01 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c50906f941so56693181fa.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:03:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700474579; x=1701079379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hg4iUdv1qOzfMKdHlqA4NidrBnEmUd5kiYhnaCQ/qFE=;
-        b=KdwCFp2Qk1NKZqF5AMMZHjE+sb51l7I0A4A0OeciwZeHKeb4e88pPteF8WD3IrhpIp
-         Tim5edihXx2AI61W/BSbj+SPvAJC4cEAoyUHvmzrdXopPSP8wDwxRyHJF1MhfzeAvDTw
-         0fUyHcpPX4Gt4WvfuwV4RjPtgjxAbnlZQ0vJFtIq+oO01Jyuua7+E9rJPfz5/mVqiT4i
-         xkcjHWmKxWmqA3L7bK8vIXXZUNfcOuDsgc1A3OrewMCMmOecqRGvqSx+QF0KJjYJB8Gv
-         aOmNEwWZqN7sAW/h4YS70+fnCa2jAeYbKspzVPHsyuOSeAsTSrzqJTOZKaK71+SD8VD7
-         6efQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700474579; x=1701079379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hg4iUdv1qOzfMKdHlqA4NidrBnEmUd5kiYhnaCQ/qFE=;
-        b=QA4j9NBn5wTybW1vLbtRsJSTvLBO23kKVVbvD6FVhNuYPf1TPYtNfTgoqTUj2otZ6g
-         gKf0QCqejLAJFEQgSaAwnq9EN9L8aijYweIG9wnDzCpyZAI0x3hy1bsB0w7whSbgn6RR
-         zurkLfXZT3WO8LxfAFu3JWUiyvazYHmzcbXrJCxnLkTt9VJMxqE6LA15t4s6cAGKnzq8
-         qrJAsc4KLtcDnxip7FpX3sLmlpVdplH6diZJl6WAysyCovSVIT3Gbd/pkBP6ZB7XEpqU
-         zSpZK+OqcRILpTviHYfiXXaNHTgWZ9QsB49xBcakxEvGI2G7X2sqSj6AyeE2jbB17CuN
-         pTrw==
-X-Gm-Message-State: AOJu0Yya/8JRCIg83QhMk6+2xoBJpt1o6YLfcAbYqYVHaZpf3R0ZDrJy
-	wCG37l56B9AH/9uPWsygVKGEn6IiUd7aHFCZqrOo+Q==
-X-Google-Smtp-Source: AGHT+IGOGzsxb9JzoTvfjQfhK63XDXa5QAto8SzapsM1POYVzgQm+Sd10mobBmXLkGcgr1PH4L1jqpTpPPL6XWlXN4E=
-X-Received: by 2002:a2e:8e32:0:b0:2c8:7665:9ede with SMTP id
- r18-20020a2e8e32000000b002c876659edemr3437930ljk.19.1700474579085; Mon, 20
- Nov 2023 02:02:59 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208111097F
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:04:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D76C433C9;
+	Mon, 20 Nov 2023 10:04:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700474662;
+	bh=4H0g9l8qPbZHx0o2tup3kRVj6Ms8Oh/f28F+uFeqY3w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dsMU4UPH2z8Z4cHk8L+ybaatostzNMg2W9yOT0EZ5rWlolBqKL8SlsdP7oPRy7gyk
+	 wiEJ0YvGuwe29ukqrTIZ8hU+Pc92YarIyAn+C+V5xTiN7g9IatNRO5n/GakfQmR7kW
+	 xw6cL1DrAxF7M7Dkv/FlpGDcAqpgFk5Wgi6qp/QIs1OIw3vVa3MDifLdaqOK13CZbc
+	 r/z1k/hWrPb5FabghnA6dr4UHtfYByyrySDQU6/O9WqE3RJuAuYBeiBdDF0W3ZaM8w
+	 xImHZORtRoyYA8Pb/e0jX4fkqgL/kcZvbJNtGU4mdzmm81a0iJjgX2MFEfbm3rrhSf
+	 baMKOAssy6H7A==
+Date: Mon, 20 Nov 2023 10:04:17 +0000
+From: Simon Horman <horms@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Kunwu Chan <chentao@kylinos.cn>, jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	kunwu.chan@hotmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: sched: Fix an endian bug in tcf_proto_create
+Message-ID: <20231120100417.GM186930@vergenet.net>
+References: <20231117093110.1842011-1-chentao@kylinos.cn>
+ <16c758c6-479b-4c54-ad51-88c26a56b4c9@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116114150.48639-1-huangjie.albert@bytedance.com>
- <ZVcxmwm/DRTB8QwO@lore-desk> <CABKxMyPMboVYs01KfPEdxPbx-LT88Qe1pcDMaT0NiNWhA-5emg@mail.gmail.com>
- <ZVssMWXZYxM0eKiY@lore-desk>
-In-Reply-To: <ZVssMWXZYxM0eKiY@lore-desk>
-From: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Date: Mon, 20 Nov 2023 18:02:47 +0800
-Message-ID: <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH net] veth: fix ethtool statistical errors
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Toshiaki Makita <toshiaki.makita1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <16c758c6-479b-4c54-ad51-88c26a56b4c9@mojatatu.com>
 
-Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=8820=
-=E6=97=A5=E5=91=A8=E4=B8=80 17:52=E5=86=99=E9=81=93=EF=BC=9A
->
-> > Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=88=
-17=E6=97=A5=E5=91=A8=E4=BA=94 17:26=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > > if peer->real_num_rx_queues > 1, the ethtool -s command for
-> > > > veth network device will display some error statistical values.
-> > > > The value of tx_idx is reset with each iteration, so even if
-> > > > peer->real_num_rx_queues is greater than 1, the value of tx_idx
-> > > > will remain constant. This results in incorrect statistical values.
-> > > > To fix this issue, assign the value of pp_idx to tx_idx.
-> > > >
-> > > > Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit a=
-ccounting")
-> > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > > > ---
-> > > >  drivers/net/veth.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> > > > index 0deefd1573cf..3a8e3fc5eeb5 100644
-> > > > --- a/drivers/net/veth.c
-> > > > +++ b/drivers/net/veth.c
-> > > > @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net_d=
-evice *dev,
-> > > >       for (i =3D 0; i < peer->real_num_rx_queues; i++) {
-> > > >               const struct veth_rq_stats *rq_stats =3D &rcv_priv->r=
-q[i].stats;
-> > > >               const void *base =3D (void *)&rq_stats->vs;
-> > > > -             unsigned int start, tx_idx =3D idx;
-> > > > +             unsigned int start, tx_idx =3D pp_idx;
-> > > >               size_t offset;
-> > > >
-> > > >               tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ_S=
-TATS_LEN;
-> > > > --
-> > > > 2.20.1
-> > > >
-> > >
-> > > Hi Albert,
-> > >
-> > > Can you please provide more details about the issue you are facing?
-> > > In particular, what is the number of configured tx and rx queues for =
-both
-> > > peers?
-> >
-> > Hi, Lorenzo
-> > I found this because I wanted to add more echo information in ethttool=
-=EF=BC=88for veth,
-> > but I found that the information was incorrect. That's why I paid
-> > attention here.
->
-> ack. Could you please share the veth pair tx/rx queue configuration?
->
+On Fri, Nov 17, 2023 at 09:06:45AM -0300, Pedro Tammela wrote:
+> On 17/11/2023 06:31, Kunwu Chan wrote:
+> > net/sched/cls_api.c:390:22: warning: incorrect type in assignment (different base types)
+> > net/sched/cls_api.c:390:22:    expected restricted __be16 [usertype] protocol
+> > net/sched/cls_api.c:390:22:    got unsigned int [usertype] protocol
+> > 
+> > Fixes: 33a48927c193 ("sched: push TC filter protocol creation into a separate function")
+> > 
+> > Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> > ---
+> >   net/sched/cls_api.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+> > index 1976bd163986..f73f39f61f66 100644
+> > --- a/net/sched/cls_api.c
+> > +++ b/net/sched/cls_api.c
+> > @@ -387,7 +387,7 @@ static struct tcf_proto *tcf_proto_create(const char *kind, u32 protocol,
+> >   		goto errout;
+> >   	}
+> >   	tp->classify = tp->ops->classify;
+> > -	tp->protocol = protocol;
+> > +	tp->protocol = cpu_to_be16(protocol);
+> >   	tp->prio = prio;
+> >   	tp->chain = chain;
+> >   	spin_lock_init(&tp->lock);
+> I don't believe there's something to fix here either
 
-dev: tx --->4.  rx--->4
-peer: tx--->1 rx---->1
+Hi Pedro and Kunwu,
 
-Could the following code still be problematic? pp_idx not updated correctly=
-.
-page_pool_stats:
-veth_get_page_pool_stats(dev, &data[pp_idx]);
+I suspect that updating the byte order of protocol isn't correct
+here - else I'd assume we would have seen a user-visible bug on
+little-endian systems buy now.
 
-BR
-Albert
-
-> Rergards,
-> Lorenzo
->
-> >
-> > > tx_idx is the index of the current (local) tx queue and it must resta=
-rt from
-> > > idx in each iteration otherwise we will have an issue when
-> > > peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
-> > >
-> > OK. I don't know if this is a known issue.
-> >
-> > BR
-> > Albert
-> >
-> >
-> > > Regards,
-> > > Lorenzo
+But nonetheless I think there is a problem, which is that the appropriate
+types aren't being used, which means the tooling isn't helping us wrt any
+bugs that might subsequently be added or already lurking. So I think an
+appropriate question is, what is the endien and width of protocol, and how
+can we use an appropriate type throughout the call-path?
 
