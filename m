@@ -1,39 +1,60 @@
-Return-Path: <netdev+bounces-49332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 448FD7F1C32
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:20:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3F717F1C4D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED7931F24D41
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:20:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DAEF28254D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A3B3034F;
-	Mon, 20 Nov 2023 18:20:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E7530656;
+	Mon, 20 Nov 2023 18:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FA0A3uMg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+wdhtbz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BE11F19B;
-	Mon, 20 Nov 2023 18:20:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 205C2C43391;
-	Mon, 20 Nov 2023 18:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700504448;
-	bh=5WM+zXnPGVEUlM/ODYB/AVlub+QRpW4QdPXZj85OpQw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=FA0A3uMg/EOpWD/7UJSVoTMFdLyhi8tMCLt9XmTH8FBpLWOyVRtg/afZxfaSymxuG
-	 8dhYllmAzEDCxxd9fQ3WF5EpKilracrwY5uk/3E9EbBobSfmQkcxNtGQPYjwTqxHwN
-	 ST5a4vXUvcEWHc8nRN7YT82TFDfWRcJZD6+cWT/QVkF6h871bDUJgnIDdeRWSSAE7V
-	 MkCw2K/YGqSdxnuJUhfUUZBS0NTcG6u2+9SbFOGlBdUKSAuMRBkNqncmWt4LU9MljC
-	 YNwjdpyN3SxtRRcV96xPWnACwHriLtvgTxvQi5/TRRrSbcnp4j+dCnpS1QTe0F5hRy
-	 voJk2KC+Fzh0w==
-Message-ID: <bdbaa38c-5dd1-4060-b787-014daa2a0abe@kernel.org>
-Date: Mon, 20 Nov 2023 10:20:46 -0800
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC8AC8;
+	Mon, 20 Nov 2023 10:23:54 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cc9b626a96so34069135ad.2;
+        Mon, 20 Nov 2023 10:23:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700504634; x=1701109434; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KWt2/ngqRZl5QuD4sv4zP0M/aVeTZYIc/05gHj626E0=;
+        b=S+wdhtbzJQrxem8qosDtNISOLMdN7jSlgRs/qcGbAgyPbiLaTxuztYL7g5cI6KDv2D
+         oVGLsOECLBx98DXzTGPIra3OV6LdwcL0ZVk9npVhQkhp59NimQYjQ/WpRjx/CY0vF+ap
+         kP8Hcx38memWh2BV4d9MCI82dj+an5eXJlZcsVOARD6ed3G1yencgRtlMe6nREmbdZ99
+         1NUjUDCwGFnPbUrmjHHc53bjc4lL++j1MCg+dOlCmZGwZL/cE/M6koJhu6cSobegVwy2
+         ES0MjgFSI1LVrPNTnYL+m4Gok4uUZw0YPyT/NLL5H6S637+Rp4EWN8Kl97jXWYm60TM1
+         HyHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700504634; x=1701109434;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KWt2/ngqRZl5QuD4sv4zP0M/aVeTZYIc/05gHj626E0=;
+        b=R35lBeKCHS+S/5UvFWYIE3AKOqMYO2vWOrBauHy78IkdJqJNF4cveaAO4f9yORAA1Z
+         jvJLhfIwJUZwuInychpcMYyTXXuUSPMFN2tpf/MyN0TnryDded6d6JuRDU2IFXn3kk0F
+         3V74dw1d//27qiRV3FEeBZvwt1g2MRAx+0GknbCoG92/qSH7xddmeL9h5qaddJ2QmEc2
+         f6EGa/Zz00mjBqiGvm5SiodtoNZ94/5EIWz4clRo3FsJytJPvtmwGdd3DifqVmSuwtab
+         lzOhbd7B2yjKRkAtlR9lOWILbLuuNybIqdRY0SJNnHFpmNotjxmsFrBTXSkx0TufWY9b
+         4hpw==
+X-Gm-Message-State: AOJu0YxgZw4WZ4ee4qGTowbVQr3/Rsm4MIQnBD+qVmuO/IMPp7a66m6/
+	CRhVA0fB/UE2vAQ1K+gORYg=
+X-Google-Smtp-Source: AGHT+IHrha1hJaeUAEfyDeFwDKziEKc0iFZt+aGntiYuaF6IHyvLDYgaoz7VSZSlPyBlwO1InKAh6w==
+X-Received: by 2002:a17:902:ecd0:b0:1ce:6687:c93e with SMTP id a16-20020a170902ecd000b001ce6687c93emr7650636plh.69.1700504633709;
+        Mon, 20 Nov 2023 10:23:53 -0800 (PST)
+Received: from [192.168.1.100] (bb220-255-254-193.singnet.com.sg. [220.255.254.193])
+        by smtp.gmail.com with ESMTPSA id bj11-20020a170902850b00b001c739768214sm6401716plb.92.2023.11.20.10.23.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 10:23:53 -0800 (PST)
+Message-ID: <8bce1251-7a6b-4b4c-b700-9d97c664689f@gmail.com>
+Date: Tue, 21 Nov 2023 02:23:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,67 +62,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
- get, update, delete
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
- anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
- mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com,
- xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
- daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
- toke@redhat.com, mattyk@nvidia.com, David Ahern <dsahern@gmail.com>,
- Stephen Hemminger <stephen@networkplumber.org>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <20231116145948.203001-10-jhs@mojatatu.com> <ZVY/GBIC4ckerGSc@nanopsycho>
- <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
+Subject: Re: [PATCH] nfc: virtual_ncidev: Add variable to check if ndev is
+ running
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ bongsu.jeon@samsung.com
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
+ <syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>
+References: <20231119164705.1991375-1-phind.uet@gmail.com>
+ <CGME20231119164714epcas2p2c0480d014abc4f0f780c714a445881ca@epcms2p4>
+ <20231120044706epcms2p48c4579db14cc4f3274031036caac4718@epcms2p4>
+ <bafc3707-8eae-4d63-bc64-8d415d32c4b9@linaro.org>
+ <20d93e83-66c0-28d9-4426-a0d4c098f303@gmail.com>
+ <d82e5a5f-1bbc-455e-b6a7-c636b23591f7@linaro.org>
 Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Phi Nguyen <phind.uet@gmail.com>
+In-Reply-To: <d82e5a5f-1bbc-455e-b6a7-c636b23591f7@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11/17/23 4:09 AM, Jamal Hadi Salim wrote:
->>> diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
->>> index ba32dba66..4d33f44c1 100644
->>> --- a/include/uapi/linux/p4tc.h
->>> +++ b/include/uapi/linux/p4tc.h
->>> @@ -2,8 +2,71 @@
->>> #ifndef __LINUX_P4TC_H
->>> #define __LINUX_P4TC_H
+On 11/20/2023 6:45 PM, Krzysztof Kozlowski wrote:
+> On 20/11/2023 11:39, Nguyen Dinh Phi wrote:
+>>>>>            mutex_lock(&vdev->mtx);
+>>>>>            kfree_skb(vdev->send_buff);
+>>>>>            vdev->send_buff = NULL;
+>>>>> +        vdev->running = false;
+>>>>>            mutex_unlock(&vdev->mtx);
+>>>>>    
+>>>>>            return 0;
+>>>>> @@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
+>>>>>            struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+>>>>>    
+>>>>>            mutex_lock(&vdev->mtx);
+>>>>> -        if (vdev->send_buff) {
+>>>>> +        if (vdev->send_buff || !vdev->running) {
+>>>>
+>>>> Dear Krzysztof,
+>>>>
+>>>> I agree this defensive code.
+>>>> But i think NFC submodule has to avoid this situation.(calling send function of closed nci_dev)
+>>>> Could you check this?
 >>>
->>> +#include <linux/types.h>
->>> +#include <linux/pkt_sched.h>
->>> +
->>> +/* pipeline header */
->>> +struct p4tcmsg {
->>> +      __u32 pipeid;
->>> +      __u32 obj;
->>> +};
+>>> This code looks not effective. At this point vdev->send_buff is always
+>>> false, so the additional check would not bring any value.
+>>>
+>>> I don't see this fixing anything. Syzbot also does not seem to agree.
+>>>
+>>> Nguyen, please test your patches against syzbot *before* sending them.
+>>> If you claim this fixes the report, please provide me the link to syzbot
+>>> test results confirming it is fixed.
+>>>
+>>> I looked at syzbot dashboard and do not see this issue fixed with this
+>>> patch.
+>>>
+>>> Best regards,
+>>> Krzysztof
+>>>
 >>
->> I don't follow. Is there any sane reason to use header instead of normal
->> netlink attribute? Moveover, you extend the existing RT netlink with
->> a huge amout of p4 things. Isn't this the good time to finally introduce
->> generic netlink TC family with proper yaml spec with all the benefits it
->> brings and implement p4 tc uapi there? Please?
+>> Hi Krzysztof,
 >>
-
-There is precedence (new netdev APIs) to move new infra to genl, but it
-is not clear to me if extending existing functionality should fall into
-that required conversion.
-
+>> I've submitted it to syzbot, it is the test request that created at
+>> [2023/11/20 09:39] in dashboard link
+>> https://syzkaller.appspot.com/bug?extid=6eb09d75211863f15e3e
 > 
-> Several reasons:
-> a) We are similar to current tc messaging with the subheader being
-> there for multiplexing.
-> b) Where does this leave iproute2? +Cc David and Stephen. Do other
-> generic netlink conversions get contributed back to iproute2?
-> c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
-> based. i.e you have:
->  COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
-> P4 programs from the control plane.
-> d) we have spent many hours optimizing the control to the kernel so i
-> am not sure what it would buy us to switch to generic netlink..
+> ...and I see there two errors.
+> 
+These are because I sent email wrongly and syzbot truncates the patch 
+and can not compile
+
+> I don't know, maybe I miss something obvious (our brains like to do it
+> sometimes), but please explain me how this could fix anything?
+> 
+> Best regards,
+> Krzysztof
 > 
 
+The issue arises when an skb is added to the send_buff after invoking 
+ndev->ops->close() but before unregistering the device. In such cases, 
+the virtual device will generate a copy of skb, but with no consumer 
+thereafter. Consequently, this object persists indefinitely.
+
+This problem seems to stem from the existence of time gaps between 
+ops->close() and the destruction of the workqueue. During this interval, 
+incoming requests continue to trigger the send function.
+
+best regards,
+Phi
 
