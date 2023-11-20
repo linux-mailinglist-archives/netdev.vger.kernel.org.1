@@ -1,173 +1,78 @@
-Return-Path: <netdev+bounces-49414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53A4F7F1F51
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:39:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65C37F1F59
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D806281CF0
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:39:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F76DB210B9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B14DD38F87;
-	Mon, 20 Nov 2023 21:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F6338F88;
+	Mon, 20 Nov 2023 21:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GcYKFBPp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddacDttk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A2ECA
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:39:11 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1cf5901b1a9so25583335ad.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:39:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700516351; x=1701121151; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZG1vDgWu2nKSdBVzCq8kAu+r1Dbdevu3C444hSj0rlg=;
-        b=GcYKFBPpGNxwdHHQFscglbYbuHfT1DH0C0Mu4K5EUJ48EfGHae7TN1nSMK+1S8cj4r
-         0j8O3xXnr7PDgiofQFkCwi/UWJx5UlpH0UMnND4bjYX7rDN+FHK2PpcWLmrPrEZClqSi
-         MxAkD62UWJ8DNX7c6wIKYTSRUQp7zT5Qp43x7wtlkrKrWo1Ie73kchErZMlw3HC4vhUB
-         +m9p/68qL2ihouPN1WYtZxdi7vUHT7frCqnF5ZAu1UY0VKNZcXtOqj+NTZQLE9o8VCqu
-         QWvkuyqxdYwLOdWmRg92la27eE66kAAVg3PQRUdUKb7dsRJXwtkFWUEhTIyxmB7bK0ha
-         qP6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700516351; x=1701121151;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZG1vDgWu2nKSdBVzCq8kAu+r1Dbdevu3C444hSj0rlg=;
-        b=AkIK39k2SnAb9srZelTNFmhK9n46TUFxKsLdNYwod6s4PowICZ1GY1THxmzyMSVpr9
-         Pf3sJVQJd+J4cd5NfueigSWKru/q3SRy0VpE2+bJPyS8LOwYZf8q6zg/zj7723aa1xeF
-         C0vabaa4LAydBsRmRG7Dt6WCYNZW3nKZGs9Ag/rdNWWxitQXIOYAuq/Xi3uTjYCzttCU
-         XViDT5GybWfseR6VWeZQvioMtBLwqbbT2LA2+fCrC7bVbycRV3HGbnrxiq8wPyyRh2Wo
-         rNvZhxgbOH5D3Kwo6mk9xjRRFXvwUs3tlSzJ8h5OIx6a44pogcdQlJimNwbNpBCjU00b
-         hW6Q==
-X-Gm-Message-State: AOJu0YxE7h9mx6nkyObiXF2guvzyc4dmPg66eFg6lukKsfyPcLJkao2o
-	DBUNgONlOinZ6P5Ob1NVfL+Mtqw=
-X-Google-Smtp-Source: AGHT+IE6HMKV3e822phR9t0E3N3YA0C18ABXo35ybFcnnPVw7dOBk1yIOwnYxo5D0z70IOi/dBH01oM=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:ce81:b0:1cc:2bd6:b54a with SMTP id
- f1-20020a170902ce8100b001cc2bd6b54amr2761974plg.10.1700516351192; Mon, 20 Nov
- 2023 13:39:11 -0800 (PST)
-Date: Mon, 20 Nov 2023 13:39:09 -0800
-In-Reply-To: <20231114045453.1816995-3-sdf@google.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F24A36B0F
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 21:40:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C73C433C7;
+	Mon, 20 Nov 2023 21:40:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700516443;
+	bh=ZBKA/GCLs/tmb/zfGdWfsnHF7Ch0Fck3AdnZ1jAdNmM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ddacDttkY4g1j6QzWklwDizHdosj6dO77k2YO3qkXTcixeik0yeVQcayye2ixYIYw
+	 qeZv4MOWHdiuC7Q649y8tK/IbvYbK9Ld/+xoP7Nkfg69huvv9zal9tpPWnFejM087q
+	 Bskyf0883tpoxQ4shkPsG+rTy6NGhdljI0Z4QC1a89IBFypqykpOzYvorIUQedOIUg
+	 BgmSJMt87mGKtUN7PLiISRwNIttpnXZxvW7MbSdhuSD5YU5cp09LTIFTTIjXVf9Y/3
+	 SOrM5G/8wZa9TOL5+HQq7CH96WQpADnn6TMEK1BybF5Bwyz73FU/hvnficeW07UqAs
+	 134X3vdW2YpzQ==
+Message-ID: <40a74dfd-e7cf-46fc-9c79-517ce2d6c51b@kernel.org>
+Date: Mon, 20 Nov 2023 13:40:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231114045453.1816995-1-sdf@google.com> <20231114045453.1816995-3-sdf@google.com>
-Message-ID: <ZVvR_fu2TIe4Puii@google.com>
-Subject: Re: [PATCH bpf-next 2/2] bpf: bring back removal of dev-bound id from idr
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, haoluo@google.com, jolsa@kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2 v2] ip, link: Add support for netkit
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: razor@blackwall.org, martin.lau@kernel.org, netdev@vger.kernel.org
+References: <20231120211054.8750-1-daniel@iogearbox.net>
+ <20231120133037.7b86ec78@hermes.local>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20231120133037.7b86ec78@hermes.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 11/13, Stanislav Fomichev wrote:
-> Commit ef01f4e25c17 ("bpf: restore the ebpf program ID for BPF_AUDIT_UNLOAD
-> and PERF_BPF_EVENT_PROG_UNLOAD") stopped removing program's id from
-> idr when the offloaded/bound netdev goes away. I was supposed to
-> take a look and check in [0], but apparently I did not.
+On 11/20/23 1:30 PM, Stephen Hemminger wrote:
+> On Mon, 20 Nov 2023 22:10:54 +0100
+> Daniel Borkmann <daniel@iogearbox.net> wrote:
 > 
-> The purpose of idr removal is to avoid BPF_PROG_GET_NEXT_ID returning
-> stale ids for the programs that have a dead netdev. This functionality
-> is verified by test_offload.py, but we don't run this test in the CI.
+>> +static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+>> +{
+>> +	if (!tb)
+>> +		return;
+>> +	if (tb[IFLA_NETKIT_MODE]) {
+>> +		__u32 mode = rta_getattr_u32(tb[IFLA_NETKIT_MODE]);
+>> +
+>> +		print_string(PRINT_ANY, "mode", "mode %s ",
+>> +			     netkit_mode_strings[mode]);
 > 
-> Introduce new bpf_prog_remove_from_idr which takes care of correctly
-> dealing with potential double idr_remove() via separate skip_idr_remove
-> flag in the aux.
+> What if kernel adds a new mode in future?
+> Probably want something like:
 > 
-> Verified by running the test manually:
-> test_offload.py: OK
-> 
-> 0: https://lore.kernel.org/all/CAKH8qBtyR20ZWAc11z1-6pGb3Hd47AQUTbE_cfoktG59TqaJ7Q@mail.gmail.com/
-> 
-> Fixes: ef01f4e25c17 ("bpf: restore the ebpf program ID for BPF_AUDIT_UNLOAD and PERF_BPF_EVENT_PROG_UNLOAD")
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
->  include/linux/bpf.h  |  2 ++
->  kernel/bpf/offload.c |  3 +++
->  kernel/bpf/syscall.c | 15 +++++++++++----
->  3 files changed, 16 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index 4001d11be151..d2aa4b59bf1e 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -1414,6 +1414,7 @@ struct bpf_prog_aux {
->  	bool xdp_has_frags;
->  	bool exception_cb;
->  	bool exception_boundary;
-> +	bool skip_idr_remove;
->  	/* BTF_KIND_FUNC_PROTO for valid attach_btf_id */
->  	const struct btf_type *attach_func_proto;
->  	/* function name for valid attach_btf_id */
-> @@ -2049,6 +2050,7 @@ void bpf_prog_inc(struct bpf_prog *prog);
->  struct bpf_prog * __must_check bpf_prog_inc_not_zero(struct bpf_prog *prog);
->  void bpf_prog_put(struct bpf_prog *prog);
->  
-> +void bpf_prog_remove_from_idr(struct bpf_prog *prog);
->  void bpf_prog_free_id(struct bpf_prog *prog);
->  void bpf_map_free_id(struct bpf_map *map);
->  
-> diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
-> index 1a4fec330eaa..6f4fe492ee2a 100644
-> --- a/kernel/bpf/offload.c
-> +++ b/kernel/bpf/offload.c
-> @@ -112,6 +112,9 @@ static void __bpf_prog_offload_destroy(struct bpf_prog *prog)
->  	if (offload->dev_state)
->  		offload->offdev->ops->destroy(prog);
->  
-> +	/* Make sure BPF_PROG_GET_NEXT_ID can't find this dead program */
-> +	bpf_prog_remove_from_idr(prog);
-> +
->  	list_del_init(&offload->offloads);
->  	kfree(offload);
->  	prog->aux->offload = NULL;
-> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-> index 0ed286b8a0f0..bc813e03e2cf 100644
-> --- a/kernel/bpf/syscall.c
-> +++ b/kernel/bpf/syscall.c
-> @@ -2083,10 +2083,19 @@ static int bpf_prog_alloc_id(struct bpf_prog *prog)
->  	return id > 0 ? 0 : id;
->  }
->  
-> -void bpf_prog_free_id(struct bpf_prog *prog)
-> +void bpf_prog_remove_from_idr(struct bpf_prog *prog)
->  {
->  	unsigned long flags;
->  
-> +	spin_lock_irqsave(&prog_idr_lock, flags);
-> +	if (!prog->aux->skip_idr_remove)
-> +		idr_remove(&prog_idr, prog->aux->id);
-> +	prog->aux->skip_idr_remove = 1;
-> +	spin_unlock_irqrestore(&prog_idr_lock, flags);
-> +}
-> +
-> +void bpf_prog_free_id(struct bpf_prog *prog)
-> +{
->  	/* cBPF to eBPF migrations are currently not in the idr store.
->  	 * Offloaded programs are removed from the store when their device
->  	 * disappears - even if someone grabs an fd to them they are unusable,
-> @@ -2095,10 +2104,8 @@ void bpf_prog_free_id(struct bpf_prog *prog)
->  	if (!prog->aux->id)
->  		return;
->  
-> -	spin_lock_irqsave(&prog_idr_lock, flags);
-> -	idr_remove(&prog_idr, prog->aux->id);
-> +	bpf_prog_remove_from_idr(prog);
->  	prog->aux->id = 0;
-> -	spin_unlock_irqrestore(&prog_idr_lock, flags);
->  }
->  
->  static void __bpf_prog_put_rcu(struct rcu_head *rcu)
-> -- 
-> 2.42.0.869.gea05f2083d-goog
-> 
+> 		print_string(PRINT_ANY, "mode", "mode %s ",
+> 			mode >= ARRAY_SIZE(netkit_mode_strings) ? "UNKNOWN" : netkit_mode_strings[mode]);
 
-Same here, should have been CC'ed to netdev.
+that is why I asked for a table driven helper. Helper handles the mode
+>= ARRAY_SIZE.
 
