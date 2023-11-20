@@ -1,180 +1,244 @@
-Return-Path: <netdev+bounces-49215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22507F12AE
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:06:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8CCB7F12B3
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:06:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D0E0282462
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:06:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CF8CB21828
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FDE18E15;
-	Mon, 20 Nov 2023 12:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B2B18E25;
+	Mon, 20 Nov 2023 12:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="nxBLRFE7"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="HnO/ppiz"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2086.outbound.protection.outlook.com [40.107.241.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC701A7;
-	Mon, 20 Nov 2023 04:06:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Lt2nXTiLFyXIDV4DUk80JrN/6pNXoHfS6UgtZXcWGlywA7SVU/lafO9eP71XMB/zHbChEKsS0q1d23RhPP11JSgFVdxqG5DMgys02i7m5GRbYjGhGMvyoo8KQuZIhHn8V4WS+78unc/Exu+rF3VvwMKJCotrWBkRPa5g45UKHteGi4RD8Dj/Lfb0P+8gH+teYww0vRzmehmhrgDrYnodQ462B10aCW1MIErBBSQE90dwt9NqyeIFOyK7UQsFHueBMQ11gDAril8BMHejpspg4CAzKh1hiAVyf+vsr89UCCNDWX2c9/CW2mFjT6OGOYViQplSGSefxxX0kadfsctVOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HDQle/PzHCaZ5EZ3wdcZOKFKkM6smXkz9B5bQpmLh/g=;
- b=SKpoC9pyFLZpUrSUVbRCqEeIkRXIjV8bEqaOeApT0cq3PECU28bpCGvDy3gnKc+imNqb48Une+wpvLfmp1sW4TtoazNrB+6Iiri/UGXyr31YXF0OsVqBlZwc0HRiDtrkkqpH8aEvShrjt194QVwXw7IDr+aM/i/w3lNWa0/Fo2rWPEF3Ql+/oeU0V2dvM36GhfsjCQSk5F/McqzJwpAIMzrhyeG3f4CbjpCJCbwhyniiY/lHZATqeapK9F9YavBlT6kwidl+B2roIADvMlXpBU+jWadEshMa1PB6aFCg+wdUSxV3obXYzNDxJ44a6iBkLv+SGmLoY3WEIsH5ji72hQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HDQle/PzHCaZ5EZ3wdcZOKFKkM6smXkz9B5bQpmLh/g=;
- b=nxBLRFE77mYlSUweZwRNnvh2OkmnC8t5RAKtJbuTfw7ZL7dVd5trAWWeNvdMVXFaQzyoozd9A2igIutpji4v86RO8I0GbyAZDKHpHDcHdlv7weT0xr27QrYsUtLMgfouBz7Pgz5UUw3axM/BiPyXK9N2F2wunKHZcWr9ylGjjGc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DBBPR04MB7659.eurprd04.prod.outlook.com (2603:10a6:10:209::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.16; Mon, 20 Nov
- 2023 12:06:06 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.015; Mon, 20 Nov 2023
- 12:06:06 +0000
-Date: Mon, 20 Nov 2023 14:06:01 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231120120601.ondrhbkqpnaozl2q@skbuf>
-References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
- <20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
- <20231118183433.30ca1d1a@kernel.org>
- <20231120104439.15bfdd09@kmaincent-XPS-13-7390>
- <20231120105255.cgbart5amkg4efaz@skbuf>
- <20231120121440.3274d44c@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231120121440.3274d44c@kmaincent-XPS-13-7390>
-X-ClientProxiedBy: AM0PR02CA0073.eurprd02.prod.outlook.com
- (2603:10a6:208:154::14) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2910B3
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc3542e328so30915845ad.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1700481985; x=1701086785; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
+        b=HnO/ppizM8cfSWaDgEGbMcPd5eBa6UOHmyWL7vaiT0FimNmOQS+KH/RwTiQQcMrcjb
+         zfW42PV534nwcpjPD254kGcioPcFz+CGzh56ywJ1SMT9tXEARKtKrEJBjWzzqolJpS0j
+         UMqXmD3v/LwBsp/hueOrfYFBXSAC5yHr2/Do6hcc/GgWTLzUFq68ERCpAkRiWpnkxVPF
+         OSplZVF+Lg1nqgqByLBnijiv5SmMEMe2NafCH66ay20UT18bM8KAZzgzofbSshuJ13do
+         kZOwDOUuew7681N/rnIuBkFME11xa/N01B/ttdl81/hnNDiFVgyjZyEILEMBR1Y2IwEx
+         J6Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700481985; x=1701086785;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
+        b=tfEVoQFsIjF25oGN5twaBUbe48BMT8EFOIUqjFqMcooIn4Kk6sC98+WSYuvLijZg7k
+         J+NN+IBrBGOzB7o8yrJqiubZ6kMKW512AKc8JIETBRXJkWx85F2Ovh4RZrGXJ8OUCj2I
+         UIb8eWH2i9cCaa4MlOV5tsfIoS23E66Fpgzbwyzk7GVGdOa8bxlXVgrliHHKvrg2MV5n
+         jXRqNESqXC6V7ZiN0hci0r7jf9bGbAWsFNHZ5M4NgGl6eHsfSScLps9W8M0aFfC5bYpQ
+         JimTBRtO/+0ogG6H3ZvdfAt52nqb76GiCzLED7jqbmxBZAXjoO1BiWP9ryKpexDl+u3O
+         Y++A==
+X-Gm-Message-State: AOJu0Yz5CCzupjHtrFJ5oHAo5AYWyhi2hj2CydZwxrZFVRjPRrhy/nRQ
+	Mz7ChfKx6SENe6fkU/RaprpsZA==
+X-Google-Smtp-Source: AGHT+IGM1XuWCU5poSeUzc7w4cvTyjbzDfnxMsuQyhs+1L/NEmEH7PI3Hq6+FgbcpyTkz6qgnpHy0A==
+X-Received: by 2002:a17:902:c18b:b0:1cf:5673:3630 with SMTP id d11-20020a170902c18b00b001cf56733630mr3480320pld.6.1700481985103;
+        Mon, 20 Nov 2023 04:06:25 -0800 (PST)
+Received: from [10.4.27.171] ([139.177.225.255])
+        by smtp.gmail.com with ESMTPSA id t1-20020a170902bc4100b001c60a2b5c61sm2170268plz.134.2023.11.20.04.06.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 04:06:20 -0800 (PST)
+Message-ID: <06613204-b279-4f66-a786-e5e26bccd42e@bytedance.com>
+Date: Mon, 20 Nov 2023 20:06:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DBBPR04MB7659:EE_
-X-MS-Office365-Filtering-Correlation-Id: e40c0d04-1e71-495c-b13d-08dbe9c112db
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	99bqGn39xs3X0F48Z7ro8ELl/ujSt7NfEs88QjlAvVAd9fwttoUSoIRxAKIJ1+RYb2CIRx3fu9w2UwzpXKQv09q/pMcY1ZIs7fDGtpd2X8QAfMKRDmPngrEwjYe6ailjytaIb93uvJM/2oCehRxMNDWzXEzYbZ6x9HUOgqTXIBIWcDYw33rEy7/+cg/4N0XQ3Y2yzVO2skLf6cEWppMO2oPUiYI9tAAXAq29Qa4Ls7pmXU4l53Sqyus5Q4TatFHcsvDCA59PGJy1G0h0+weOiwTcpQL7XnUerST07OlrHvCEKfcwFpN201skVJDUMIFiSqzjXs0RuIPn6m+5hOfADD99VFSCdKpcLsof4J4StYEQmFewVTLpaQtd5aXyqC4uHfVCFd1HzlZSiYEnJpmFtjvq8tmPjbdVXryfMn150+uyrwT5Xwyl8s7sAH/FtvKgN+dYPSqU/5yqvMnBU9/fF+dGRc6Wo58nk1gHOBhP9KIOlIVjGz4UgvET8MEnajymCovQZGu//sRV0TtbD0F7OybLH0f8wKCdnlWaEkYIlIFzrdHN+AR6/YEX4kctjpOy
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(376002)(366004)(346002)(136003)(39860400002)(230922051799003)(1800799012)(186009)(451199024)(64100799003)(478600001)(6512007)(9686003)(6486002)(1076003)(6666004)(6506007)(26005)(54906003)(66946007)(66556008)(66476007)(316002)(6916009)(33716001)(86362001)(2906002)(44832011)(41300700001)(5660300002)(7416002)(38100700002)(8676002)(4326008)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?Ogfi4AwMtMhLkzM764tRKFJyT1U70sWfLzCJgDhx/jMkDA7hzOR5gGSRiY?=
- =?iso-8859-1?Q?JjBCjuHWdPLvuxPTm9N34xSGuprUkPimV7VZiXYS+0l2kX/poQgUX7yBMw?=
- =?iso-8859-1?Q?WCUTk49UUCsMYBRzLzilg1JS9KChJG9hEgEKlIIqUVZ5jRIIA5GZ/4PX6h?=
- =?iso-8859-1?Q?i6CkIf+Ua5qX2d4LGbR8DjWzQ0bciut8ZAWJao69oylIIfNOqvriiwEOqW?=
- =?iso-8859-1?Q?/sPEq/v1aHJSZCFQTqhLsxi6cv9NGSML22nz2SVh+eP/l75BkE0P413Zln?=
- =?iso-8859-1?Q?/1MEUK5WieDKaArWa75TtKTcF69MoSZP0aZ11HfhChl4WLNA6XPn0C1l5l?=
- =?iso-8859-1?Q?oBPrakbBePv12VJYIZTzwut2947to6b0RTcfLfVLBRmDdKtQg6sYQcnWvc?=
- =?iso-8859-1?Q?y0ocoOwA5GfnroBbhjGwS16KWwJkNGwbUYSBEzgOGQwOXvy8iFacRTpg4E?=
- =?iso-8859-1?Q?b4Z+heSCdUjCRzXmf2ypBXfHO4KjadHo3op0TYDi5xYRE98D9EneWimDd1?=
- =?iso-8859-1?Q?O2L6OsS3+TdjBIgkGcLtYHANcITsgVrOlMeQxUEZYFSt7BQP+Fs35nYS6A?=
- =?iso-8859-1?Q?lumAji9nALFVJauhHniOe7CyJvwj72yQD3mjkvAWqbIUxXdfRSw3lms/Zb?=
- =?iso-8859-1?Q?hkrZN8PGgNeUUIprw4hbUGB3lpJ49XUaaavi1iNB+s8iucHlj9strBi0kJ?=
- =?iso-8859-1?Q?5IU0xKQw5AVmQjz0NHF27BFbD32XJLCsEMGHH1Xv9x7xh9KRJA5mfCRAks?=
- =?iso-8859-1?Q?0U6z8ZkDXxPItxzDjvarwqTr7XpHt8KTTsID2e8UrBX5XY+xogd653TBrD?=
- =?iso-8859-1?Q?Nl/c/xjKgYJF9FvK/aQ1k9G9hGOAkzlhY9WmZSvhpRBbl3DRyrOk20OfQ8?=
- =?iso-8859-1?Q?9x6+L1FW2g98yDVRZPi//SErsdi7efOa2E0k1xfGfS/udxpE46bSV0eBle?=
- =?iso-8859-1?Q?d6VjOHwQ9r3KKi7Ly+A9SNsN4SGtFTma6v11Apjl07jf9RVGhYGNkJ03x9?=
- =?iso-8859-1?Q?vRlNMj6bb4Vnq3tHaGdOo//MSiOx2Z+VrMuONK+22u5BiVWmagmEUOb+KF?=
- =?iso-8859-1?Q?4OFfbHc/zFEpnIz+g4ABEkTtzuKIE5PuTP/sGapqsnZXmdPQsu2+Mwa3ph?=
- =?iso-8859-1?Q?gsFljwOtIYLKPIctwETjzmjeOpX8kokSymGIgqAC+60srCbQLgX6e+bqSk?=
- =?iso-8859-1?Q?JDZFoSGHA5vmIQGO0B2UFL+VflOTaPS1sTFPdgoPX+by22oPCoJVtBMQZT?=
- =?iso-8859-1?Q?iCyeLPlGC1aNvp/WSVX2PIkSQg3Ykzndq0qDjeMM+iySNXU2Q779BxZQd5?=
- =?iso-8859-1?Q?kazT5qgTscqEiqCwTUbD4jTF0vki+O43HD7FMveVXiq4J1m+2BtmiNoj8U?=
- =?iso-8859-1?Q?GwBuaJSfWsbrd9PPWpPiV3YBn8c86aGzkZ0OHln6yO42lAfn4JiDtaT4Ex?=
- =?iso-8859-1?Q?0UixY7+wVbpvvrNrkrccFi/rLxm6TPS6W7FQdcnFk1wDtfojGZ5U6G71KT?=
- =?iso-8859-1?Q?D8+ZIgWottOAeWEX82ZzYyUowjnFHYxoMiH8gBpBYQPopJdn9wlW6vdUIA?=
- =?iso-8859-1?Q?k+BdyV2rZ6oSPO9skfXpqEbRhcaVge+GtzApzlga2+/aPEd1IQXOoeJ/nP?=
- =?iso-8859-1?Q?NW1FjxnxvDMzjQ/Jm8oNb30ZzfRzArWlY4ZjiqDu+anArz+UQ+xt9TyA?=
- =?iso-8859-1?Q?=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e40c0d04-1e71-495c-b13d-08dbe9c112db
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 12:06:05.9868
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bjCrl9FYdS77zYGdOkm+E4kh61lYDHQdLLWfucpv5cfdwC8Rj/m+UJcQkFJD/OmZEhDbliJQWgx5I6ic/npwaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7659
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Content-Language: en-US
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+ Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
+ <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
+From: Abel Wu <wuyun.abel@bytedance.com>
+In-Reply-To: <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 20, 2023 at 12:14:40PM +0100, Köry Maincent wrote:
-> > Does your UAPI proposal make it possible in any way to select
-> > timestamping in phylib PHY A rather than PHY B? Or do you think it is
-> > extensible to support that, somehow?
+On 11/20/23 6:56 PM, Peter Zijlstra Wrote:
+> On Sat, Nov 18, 2023 at 01:14:32PM +0800, Abel Wu wrote:
 > 
-> It does not support it for now.
-> I didn't want to base my work on his series as it could work without it for now
-> and I didn't want to wait to have his series accepted. It is more a future
-> possible support as I don't have anything to test it and I don't know if such
-> hardware exists right now.
-> I think it will be extensible to support that, my thinking was to create this
-> struct in net_device struct:
+>> Hi Peter, I'm a little confused here. As we adopt placement strategy #1
+>> when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
+>> Given that the weight doesn't change, we have:
+>>
+>> 	vl' = vl
+>>
+>> But in fact it is scaled on placement:
+>>
+>> 	vl' = vl * W/(W + w)
 > 
-> struct {
-> 	enum layer;
-> 	u32 id;
-> } ts;
+> (W+w)/W
+
+Ah, right. I misunderstood (again) the comment which says:
+
+	vl_i = (W + w_i)*vl'_i / W
+
+So the current implementation is:
+
+	v' = V - vl'
+
+and what I was proposing is:
+
+	v' = V' - vl
+
+and they are equal in fact.
+
 > 
-> With id saving the phy_index of the PHY X used when the layer PHY is selected.
-> This id could also be used to store the timestamp point in case of several
-> timestamp in a MAC.
+>>
+>> Does this intended?
+> 
+> The scaling, yes that's intended and the comment explains why. So now
+> you have me confused too :-)
+> 
+> Specifically, I want the lag after placement to be equal to the lag we
+> come in with. Since placement will affect avg_vruntime (adding one
+> element to the average changes the average etc..) the placement also
+> affects the lag as measured after placement.
 
-Ok, and I suppose the "u32 id" would be numerically the same as the
-ETHTOOL_A_HEADER_PHY_INDEX nlattr that Maxime is proposing?
+Yes. You did the math in an iterative fashion and mine is facing the
+final state:
 
-The next question would be: if a driver performs PHY management in
-firmware, and does not use phylib, how should user space interact with it?
-What timestamping layer and upon what should the ID be chosen?
+	v' = V' - vlag
+	V' = (WV + wv') / (W + w)
 
-Finally (and unrelated to the question above), why is SOFTWARE_TIMESTAMPING
-even a layer exposed in the UAPI? My understanding of this patch set is
-that it is meant to select the source of hardware timestamps that are
-given to a socket. What gap in the UAPI does the introduction of a
-SOFTWARE_TIMESTAMPING hwtstamping layer cover?
+which gives:
+
+	V' = V - w * vlag / W
+
+> 
+> Or rather, if you enqueue and dequeue, I want the lag to be preserved.
+> If you do not take placement into consideration, lag will dissipate real
+> quick.
+> 
+>> And to illustrate my understanding of strategy #1:
+> 
+>> @@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+>>   		 * vl_i is given by:
+>>   		 *
+>>   		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
+>> -		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
+>> -		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
+>> -		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
+>> -		 *      = V - w_i*vl_i / (W + w_i)
+>> -		 *
+>> -		 * And the actual lag after adding an entity with vl_i is:
+>> -		 *
+>> -		 *   vl'_i = V' - v_i
+>> -		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
+>> -		 *         = vl_i - w_i*vl_i / (W + w_i)
+>> -		 *
+>> -		 * Which is strictly less than vl_i. So in order to preserve lag
+>> -		 * we should inflate the lag before placement such that the
+>> -		 * effective lag after placement comes out right.
+>> -		 *
+>> -		 * As such, invert the above relation for vl'_i to get the vl_i
+>> -		 * we need to use such that the lag after placement is the lag
+>> -		 * we computed before dequeue.
+>> +		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
+>> +		 *      = V - w_i*vl_i / W
+>>   		 *
+>> -		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
+>> -		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
+>> -		 *
+>> -		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
+>> -		 *                   = W*vl_i
+>> -		 *
+>> -		 *   vl_i = (W + w_i)*vl'_i / W
+>>   		 */
+>>   		load = cfs_rq->avg_load;
+>>   		if (curr && curr->on_rq)
+>>   			load += scale_load_down(curr->load.weight);
+>> -
+>> -		lag *= load + scale_load_down(se->load.weight);
+>>   		if (WARN_ON_ONCE(!load))
+>>   			load = 1;
+>> -		lag = div_s64(lag, load);
+>> +
+>> +		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
+>>   	}
+>>   	se->vruntime = vruntime - lag;
+> 
+> 
+> So you're proposing we do:
+> 
+> 	v = V - (lag * w) / (W + w) - lag
+
+What I 'm proposing is:
+
+	V' = V - w * vlag / W
+
+so we have:
+
+	v' = V' - vlag
+	   = V - vlag * w/W - vlag
+	   = V - vlag * (W + w)/W
+
+which is exactly the same as current implementation.
+
+> 
+> ?
+> 
+> That can be written like:
+> 
+> 	v = V - (lag * w) / (W+w) - (lag * (W+w)) / (W+w)
+> 	  = V - (lag * (W+w) + lag * w) / (W+w)
+> 	  = V - (lag * (W+2w)) / (W+w)
+> 
+> And that turns into a mess AFAICT.
+> 
+> 
+> Let me repeat my earlier argument. Suppose v,w,l are the new element.
+> V,W are the old avg_vruntime and sum-weight.
+> 
+> Then: V = V*W / W, and by extention: V' = (V*W + v*w) / (W + w).
+> 
+> The new lag, after placement:
+> 
+> l' = V' - v = (V*W + v*w) / (W+w) - v
+>              = (V*W + v*w) / (W+w) - v * (W+w) / (W+v)
+> 	    = (V*W + v*w -v*W - v*w) / (W+w)
+> 	    = (V*W - v*W) / (W+w)
+> 	    = W*(V-v) / (W+w)
+> 	    = W/(W+w) * (V-v)
+> 
+> Substitute: v = V - (W+w)/W * l, my scaling thing, to obtain:
+> 
+> l' = W/(W+w) * (V - (V - (W+w)/W * l))
+>     = W/(W+w) * (V - V + (W+w)/W * l)
+>     = W/(W+w) * (W+w)/W * l
+>     = l
+> 
+> So by scaling, we've preserved lag across placement.
+> 
+> That make sense?
+
+Yes, I think I won't misunderstand again for the 3rd time :)
+
+Thanks!
+	Abel
 
