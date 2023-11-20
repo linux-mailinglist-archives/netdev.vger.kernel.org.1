@@ -1,106 +1,96 @@
-Return-Path: <netdev+bounces-49351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF7A7F1CC6
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:39:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03D5C7F1CCA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97A5B28272B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:39:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C3F1C216D2
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A1F241F9;
-	Mon, 20 Nov 2023 18:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E649225CD;
+	Mon, 20 Nov 2023 18:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hwfJORHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFECB10C0;
-	Mon, 20 Nov 2023 10:39:35 -0800 (PST)
-Received: from [192.168.1.103] (178.176.77.202) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
- 2023 21:39:30 +0300
-Subject: Re: [PATCH 09/14] dt-bindings: net: renesas,etheravb: Document RZ/G3S
- support
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <linux@armlinux.org.uk>, <geert+renesas@glider.be>,
-	<magnus.damm@gmail.com>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
-	<linus.walleij@linaro.org>, <p.zabel@pengutronix.de>, <arnd@arndb.de>,
-	<m.szyprowski@samsung.com>, <alexandre.torgue@foss.st.com>, <afd@ti.com>,
-	<broonie@kernel.org>, <alexander.stein@ew.tq-group.com>,
-	<eugen.hristev@collabora.com>, <sergei.shtylyov@gmail.com>,
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, <biju.das.jz@bp.renesas.com>
-CC: <linux-renesas-soc@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-clk@vger.kernel.org>,
-	<linux-gpio@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-10-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <c3813f98-3d11-bbf2-7510-c22f7610df62@omp.ru>
-Date: Mon, 20 Nov 2023 21:39:29 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08FEC8;
+	Mon, 20 Nov 2023 10:39:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1xq3rnDkxbQv8ZOGxbeVruFwb6C2miBEOHlkxHgkY+s=; b=hwfJORHrC8ylIS5wpRzrPloLok
+	iS0Q1+kpLIrt+0MNZWgWUYsDgUi0IOOrvxcVLMY8PHIZY4IGFqeimq6laToXIHnpfAD1kQPHRwXF4
+	u54LycpwIZFUEsYIr1+T2szIC69LVzUuy485cAJGO/TqW0CVc+AkBQSep0JbQqo93DX0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r59BH-000gF9-Mp; Mon, 20 Nov 2023 19:39:35 +0100
+Date: Mon, 20 Nov 2023 19:39:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <157c68b0-687e-4333-9d59-fad3f5032345@lunn.ch>
+References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
+ <20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
+ <20231118183433.30ca1d1a@kernel.org>
+ <20231120104439.15bfdd09@kmaincent-XPS-13-7390>
+ <20231120105255.cgbart5amkg4efaz@skbuf>
+ <20231120121440.3274d44c@kmaincent-XPS-13-7390>
+ <20231120120601.ondrhbkqpnaozl2q@skbuf>
+ <20231120144929.3375317e@kmaincent-XPS-13-7390>
+ <20231120142316.d2emoaqeej2pg4s3@skbuf>
+ <20231120093723.4d88fb2a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231120070024.4079344-10-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [178.176.77.202]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 18:21:05
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 181488 [Nov 20 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.202
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/20/2023 18:25:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 4:24:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231120093723.4d88fb2a@kernel.org>
 
-On 11/20/23 10:00 AM, Claudiu wrote:
+> What about my use case of having a NIC which can stamp at a low rate
+> at the PHY (for PTP) and high rate at the DMA block (for congestion
+> control)? Both stamp points have the same PHC index.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Document Ethernet RZ/G3S support. Ethernet IP is similar to the one
-> available on RZ/G2L devices.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+How theoretical is that? To me, it seems more likely you have two PHC.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+The PHY stamping tends to be slow because of the MDIO bus. If the MAC
+has fast access to the PHC, it means its not on the MDIO bus. It
+probably means you have the PHY integrated into the MAC/SoC, so the
+MAC can access it. But if its integrated like this, i don't see why
+PHY stamping should be particularly slow. So you can probably use it
+for congestion control. And then you don't need DMA stamping.
 
-[...]
+Do you know of real hardware with a MAC and a PHY sharing a PHC?
 
-MBR, Sergey
+   Andrew
 
