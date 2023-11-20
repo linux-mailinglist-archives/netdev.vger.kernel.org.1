@@ -1,186 +1,183 @@
-Return-Path: <netdev+bounces-49100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 027097F0D28
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:05:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AEBA7F0D41
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F1F28197A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:05:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 525782818F2
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FB2DDB1;
-	Mon, 20 Nov 2023 08:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C7DDDD0;
+	Mon, 20 Nov 2023 08:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="OGRyE6wZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F1pcShc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F2CD5
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:05:47 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6ba54c3ed97so4252359b3a.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:05:47 -0800 (PST)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1902CBF
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:13:42 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-40a426872c6so74035e9.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:13:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1700467547; x=1701072347; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n4NoqTxZnppS8i0nP/xGCXWB/hxXsx67zIl1hkFjXDo=;
-        b=OGRyE6wZHDiPSa6gF4QXDy5G++VYIEFZkEWmeZEiaskWAB2wUBXtzA5uds46mPpmIB
-         tOe9lhtEvqHdhC3ulemjpZKATvLGbU8hgBrIG5BVVwHGG2ZUNIuZQYotukauA/hBuIRG
-         YptTDtk2RaTYWz51aEQzGQB18IalXh2sqC4SErvC7mZ+3fQwRJA42NBV3fQTU85VvVmv
-         F7RoQe10E6yMVAKEEJcC5js3pXvwarz8J+wa5FW5c4E2S4VaqaBKERXUG+DhVfT2Urnp
-         kRLqGRCEzdGsy85oOI2lKINxkTEKWq3ChqOIkRxk6eeU4aDNjhfThaO37pT2P9HxPaAA
-         b44w==
+        d=google.com; s=20230601; t=1700468020; x=1701072820; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ySw0qtg+WxhKLGI52I8kF3Irzl2p1qKlTqN2J/L3ZEY=;
+        b=F1pcShc/E9pTjouRr3oAjozw1km843+oW21ak3cOV1eMVDvKfTYHrHEY8wvZrONvNC
+         0swgsd+mt+LpFTOVJ5tSOFEO2+9SNyu+w455gAHRxGlhLqEJ22NiB/oJepjpQqvkWhe8
+         4LZrd9U1ig9H0o250kqG5LztaOzEYg5TIK1zH5jvrMs/vdpkL2/0ssWw6XdAaosbqT68
+         tjhGqlI6mhkqk3zJmTQBGWVs5H875p9qsGhra1I6ChR7pOfzQNfQG0YwsIBxcqaZl1OU
+         1u+4SikG+ofkBD9JZXHdrwiwBSiXdO7aKVrbnzmzDwmqQw0cyb/v2WaVGvzDvVQHvh/0
+         opiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700467547; x=1701072347;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n4NoqTxZnppS8i0nP/xGCXWB/hxXsx67zIl1hkFjXDo=;
-        b=VllJc/XjDAflaKGwqKu+WuNAKpvoM5BToLOQdMDwc7fzEEiZ+IoBR7Gn91YrW4WJF4
-         XtIPQDxJslZe7bwAXKBjJJEQNB5C3juDTAxaFS3A+Mo5VNXqJ7TuoXR9CYcBgmWPjkgC
-         rCD044bIH0epTSjw3xQb0Zf35UM7DEY/fVgP4k1VkTjDQHEWKghTkpwEUo+uVxLnm/oq
-         fmnrqnQEv8UCKDTPT9q4wF58DsgM80VKk3sYZeNAM63Bpqp8aIuE+3YAJ/nFSb7A8eAu
-         ATYKrNJIHQYHMfVDqpvohbNMomeplVbcLDCJlxyZxeSMkFcD4STK6Z/1v1enzBuiJlHp
-         rd6A==
-X-Gm-Message-State: AOJu0YzcKi8jXkNWo3pqJ+fxexFMxoQuCKKzWHiVTAQBmcdMURwRkyvV
-	bZsFJOMQcSyGLKh3/yIpkdaV6Q==
-X-Google-Smtp-Source: AGHT+IGssdhQXa2d+roUN7IT+TTU6LwlrMuPiMYOCQM48dnmpaA4XEU9k505dahywkNiyYYGiT6THg==
-X-Received: by 2002:a05:6a00:80a:b0:6cb:910a:c6fe with SMTP id m10-20020a056a00080a00b006cb910ac6femr3670261pfk.7.1700467547194;
-        Mon, 20 Nov 2023 00:05:47 -0800 (PST)
-Received: from [157.82.205.15] ([157.82.205.15])
-        by smtp.gmail.com with ESMTPSA id f32-20020a056a000b2000b006c5da63556dsm5673415pfu.178.2023.11.20.00.05.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 00:05:46 -0800 (PST)
-Message-ID: <a1f09866-a443-4f74-8025-6cdb32eb1d2c@daynix.com>
-Date: Mon, 20 Nov 2023 17:05:40 +0900
+        d=1e100.net; s=20230601; t=1700468020; x=1701072820;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ySw0qtg+WxhKLGI52I8kF3Irzl2p1qKlTqN2J/L3ZEY=;
+        b=Ym7yYJdGJEBkZz8/4A7UNsSDMnOY0ODUqon1mULEopI8UxdiMmFt9IPfoAVZaEQDwm
+         vGg+cbDfT9/NWCCd8QLHYRtcvBtujopoeAjIPG+9G8FWW5jGiyH7duGYGANAFzDxOVvb
+         0ttmCn04onsPUDGh7x7Jd5siolgwexF+gxXTXG/IFwQDn5VBmgE9RnZVBzLZxIcnvat/
+         LJeqp9n1mnx9CG9mGTK18DI31OP2g7WrO/nJWA2yearXb0p8ew85q/5fc5EOKAWFhzsp
+         vfE8bQlUAh4ZhIBT/zxtksywQqxvKZfYmTJg266E31RCOwcnzJoDs3DgEJz1Ukr0VFPW
+         xlgg==
+X-Gm-Message-State: AOJu0YzqUFOMCRE9kUGS0coM6uhoKZ1zRV+pVQhY+NIAoXoU+byrnsRp
+	UAiYazL1iIBI3b81tlPJHC+uOhjfUvpLe3/klPIfJw==
+X-Google-Smtp-Source: AGHT+IGruP2/Cey+KzuQd6wI8ibOlce8NTI4ucuag38htThS4b+/fELbYPTj62639XqqIaMhc8GkZVGHtAkTy0dlOwE=
+X-Received: by 2002:a05:600c:5013:b0:405:35bf:7362 with SMTP id
+ n19-20020a05600c501300b0040535bf7362mr364310wmr.0.1700468020195; Mon, 20 Nov
+ 2023 00:13:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
-To: Song Liu <song@kernel.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>
-References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
- <20231015141644.260646-2-akihiko.odaki@daynix.com>
- <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
- <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com>
- <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
- <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
- <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
- <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com>
- <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
- <CAPhsuW5JYoM-Mkehdy=FQsG1nvjbYGzwRZx8BkpG1P7cHdD=eQ@mail.gmail.com>
- <dba89d4b-84aa-4c9f-b016-56fd3ade04b2@daynix.com>
- <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20231117141733.3344158-1-edumazet@google.com> <170042342319.11006.13933415217196728575.git-patchwork-notify@kernel.org>
+ <CAHmME9q4uSKxtEnRmcM2h2GGSBcq9Hu_9tk3EX2_EVGFXr6KnQ@mail.gmail.com> <CANn89iLm0SX4dF1Y29ui=SxO5ut=v66S6SvgFsD2cjU=JN1pmA@mail.gmail.com>
+In-Reply-To: <CANn89iLm0SX4dF1Y29ui=SxO5ut=v66S6SvgFsD2cjU=JN1pmA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 20 Nov 2023 09:13:29 +0100
+Message-ID: <CANn89iJx-fbmd2v6PaKKSNY30X7Wz-TwM_ZxPs=5aNMV51x+iw@mail.gmail.com>
+Subject: Re: [PATCH v2 net] wireguard: use DEV_STATS_INC()
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzkaller@googlegroups.com, liuhangbin@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2023/11/20 6:02, Song Liu wrote:
-> On Sun, Nov 19, 2023 at 12:03 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
-> [...]
->>
->> Unfortunately no. The communication with the userspace can be done with
->> two different means:
->> - usual socket read/write
->> - vhost for direct interaction with a KVM guest
->>
->> The BPF map may be a valid option for socket read/write, but it is not
->> for vhost. In-kernel vhost may fetch hash from the BPF map, but I guess
->> it's not a standard way to have an interaction between the kernel code
->> and a BPF program.
-> 
-> I am very new to areas like vhost and KVM. So I don't really follow.
-> Does this mean we have the guest kernel reading data from host eBPF
-> programs (loaded by Qemu)?
+On Mon, Nov 20, 2023 at 8:56=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
 
-Yes, the guest will read hashes calculated by the host, and the 
-interface is strictly defined with the virtio-net specification.
+> Jason, I was in week end mode, so could not reply to your message.
+>
+> This fix is rather obvious to me. I do not want to spend too much time on=
+ it,
+> and you gave an ACK if I am not mistaken.
+>
+> If you prefer not letting syzbot find other bugs in wireguard (because
+> hitting this issue first),
+> this is fine by me. We can ask syzbot team to not include wireguard in
+> their kernels.
 
-> 
->>>
->>>>
->>>> Unfortunately, however, it is not acceptable for the BPF subsystem
->>>> because the "stable" BPF is completely fixed these days. The
->>>> "unstable/kfunc" BPF is an alternative, but the eBPF program will be
->>>> shipped with a portable userspace program (QEMU)[1] so the lack of
->>>> interface stability is not tolerable.
->>>
->>> bpf kfuncs are as stable as exported symbols. Is exported symbols
->>> like stability enough for the use case? (I would assume yes.)
->>>
->>>>
->>>> Another option is to hardcode the algorithm that was conventionally
->>>> implemented with eBPF steering program in the kernel[2]. It is possible
->>>> because the algorithm strictly follows the virtio-net specification[3].
->>>> However, there are proposals to add different algorithms to the
->>>> specification[4], and hardcoding the algorithm to the kernel will
->>>> require to add more UAPIs and code each time such a specification change
->>>> happens, which is not good for tuntap.
->>>
->>> The requirement looks similar to hid-bpf. Could you explain why that
->>> model is not enough? HID also requires some stability AFAICT.
->>
->> I have little knowledge with hid-bpf, but I assume it is more like a
->> "safe" kernel module; in my understanding, it affects the system state
->> and is intended to be loaded with some kind of a system daemon. It is
->> fine to have the same lifecycle with the kernel for such a BPF program;
->> whenever the kernel is updated, the distributor can recompile the BPF
->> program with the new kernel headers and ship it along with the kernel
->> just as like a kernel module.
->>
->> In contrast, our intended use case is more like a normal application.
->> So, for example, a user may download a container and run QEMU (including
->> the BPF program) installed in the container. As such, it is nice if the
->> ABI is stable across kernel releases, but it is not guaranteed for
->> kfuncs. Such a use case is already covered with the eBPF steering
->> program so I want to maintain it if possible.
-> 
-> TBH, I don't think stability should be a concern for kfuncs used by QEMU.
-> Many core BPF APIs are now implemented as kfuncs: bpf_dynptr_*,
-> bpf_rcu_*, etc. As long as there are valid use cases,these kfuncs will
-> be supported.
+BTW, while cooking the patch I found that wireguard was incorrectly
+using dev_kfree_skb() instead of kfree_skb().
 
-Documentation/bpf/kfuncs.rst still says:
- > kfuncs provide a kernel <-> kernel API, and thus are not bound by any
- > of the strict stability restrictions associated with kernel <-> user
- > UAPIs.
+dev_kfree_skb() is really a consume_skb(), which gives different drop
+monitor signals
 
-Is it possible to change the statement like as follows:
-"Most kfuncs provide a kernel <-> kernel API, and thus are not bound by 
-any of the strict stability restrictions associated with kernel <-> user
-UAPIs. kfuncs that have same stability restrictions associated with 
-UAPIs are exceptional, and must be carefully reviewed by subsystem (and 
-BPF?) maintainers as any other UAPIs are."
+(perf record -a -e skb:kfree_skb)  vs (perf record -a -e skb:consume_skb)
 
-Regards,
-Akihiko Odaki
+I would suggest you take a look.
+
+Ideally, using kfree_skb_reason(skb, reason) (for net-next tree) would
+help future diagnostics.
+
+For net tree I would suggest
+
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.=
+c
+index 258dcc1039216f311a223fd348295d4b5e03a3ed..0b0e2a9fd14d14fb3c77004074e=
+2b088364d332a
+100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -209,7 +209,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb,
+struct net_device *dev)
+         * we don't remove GSO segments that are in excess.
+         */
+        while (skb_queue_len(&peer->staged_packet_queue) > MAX_STAGED_PACKE=
+TS) {
+-               dev_kfree_skb(__skb_dequeue(&peer->staged_packet_queue));
++               kfree_skb(__skb_dequeue(&peer->staged_packet_queue));
+                ++dev->stats.tx_dropped;
+        }
+        skb_queue_splice_tail(&packets, &peer->staged_packet_queue);
+diff --git a/drivers/net/wireguard/receive.c b/drivers/net/wireguard/receiv=
+e.c
+index 0b3f0c843550957ee1fe3bed7185a7d990246c2b..a9e76722b22cad65bda91f306fa=
+d11cdb6acff09
+100644
+--- a/drivers/net/wireguard/receive.c
++++ b/drivers/net/wireguard/receive.c
+@@ -432,7 +432,7 @@ static void wg_packet_consume_data_done(struct
+wg_peer *peer,
+        ++dev->stats.rx_length_errors;
+        goto packet_processed;
+ packet_processed:
+-       dev_kfree_skb(skb);
++       kfree_skb(skb);
+ }
+
+ int wg_packet_rx_poll(struct napi_struct *napi, int budget)
+@@ -478,7 +478,7 @@ int wg_packet_rx_poll(struct napi_struct *napi, int bud=
+get)
+                wg_noise_keypair_put(keypair, false);
+                wg_peer_put(peer);
+                if (unlikely(free))
+-                       dev_kfree_skb(skb);
++                       kfree_skb(skb);
+
+                if (++work_done >=3D budget)
+                        break;
+@@ -536,7 +536,7 @@ static void wg_packet_consume_data(struct
+wg_device *wg, struct sk_buff *skb)
+ err_keypair:
+        rcu_read_unlock_bh();
+        wg_peer_put(peer);
+-       dev_kfree_skb(skb);
++       kfree_skb(skb);
+ }
+
+ void wg_packet_receive(struct wg_device *wg, struct sk_buff *skb)
+@@ -582,5 +582,5 @@ void wg_packet_receive(struct wg_device *wg,
+struct sk_buff *skb)
+        return;
+
+ err:
+-       dev_kfree_skb(skb);
++       kfree_skb(skb);
+ }
+diff --git a/drivers/net/wireguard/socket.c b/drivers/net/wireguard/socket.=
+c
+index 0414d7a6ce74141cd2ca365bfd1da727691e27ec..7e773a2c8a8532caef06205f53e=
+6b505dbe9ff57
+100644
+--- a/drivers/net/wireguard/socket.c
++++ b/drivers/net/wireguard/socket.c
+@@ -178,7 +178,7 @@ int wg_socket_send_skb_to_peer(struct wg_peer
+*peer, struct sk_buff *skb, u8 ds)
+                ret =3D send6(peer->device, skb, &peer->endpoint, ds,
+                            &peer->endpoint_cache);
+        else
+-               dev_kfree_skb(skb);
++               kfree_skb(skb);
+        if (likely(!ret))
+                peer->tx_bytes +=3D skb_len;
+        read_unlock_bh(&peer->endpoint_lock);
 
