@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DBB7F181B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:03:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E75C47F181C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A211C1C217B4
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:03:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23D0A1C21864
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:03:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6007F1DFF9;
-	Mon, 20 Nov 2023 16:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F2D1E502;
+	Mon, 20 Nov 2023 16:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="syTMbxR/"
+	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="vJXcUxqz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63309114
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:34 -0800 (PST)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2c88750e7d1so6720981fa.3
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:34 -0800 (PST)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA764AA
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:35 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50970c2115eso6535325e87.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700496212; x=1701101012; darn=vger.kernel.org;
+        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700496214; x=1701101014; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WWR8mH0snzJeJ0OqKxEnUfckbbEo5Y+jU7UsXhSvYEg=;
-        b=syTMbxR/1W+Ye7l3Fhe/hdFfCcGkNhzawL+Y92c5BM7k9fIjox0pxbrOSbhqB1T5pf
-         w7Igyp0DbCnmjAF2UVDYrVeDqpZ0gxZnYavNHZLpbejQcZxp0+3RruD4SQxuI7uqRq/Q
-         IRqVLefLrw763tc5yt0f0zgvkuYfuBnQzTatbxuqxZPnuZoMn5Sqmg6GYOitDBui9TTb
-         gtOuKKAndK+W0v2JO1aphzqQuquu92JC44ZnyGTwTp6BVv/p3siAZpXbEdK0muFqx0UH
-         fqNQSBDal8tIa618rmnRDwS/+JGFhgZ57tqfQthBdfAX03SNQwgS6rbCiJdwlXYU6LJU
-         vXfQ==
+        bh=Qer5SIgtLUsRnvdV4wIK4MVmII4A/reZeCq78BgyVHs=;
+        b=vJXcUxqzL69qzWIxz964/H4wl6qOFllrt407lDIkJPzcIC4M+xELDMYj1WHO1HWBiV
+         7DeEyPqFMGJOtPoYdmZq6vIkQJGltTWM6tB32PEWSbd59z2DR4ZIQGcrYqcp5LJVDoY1
+         7xuLkR7SUaKhCEhVNM29q85P6HXrzI/1FGwa/zWXdViKfIWc9rASAtg/ZBpaeQ4xp599
+         uIgLZa9u2FYxCnrp65ZvmlQekknofj1urtiy7tVUMFk6ZwGCUVT0MqIPmFQ7o4KFXgel
+         uSDmjElUWBLQCWbo8T0kD1sdGqM+wzGGkJUILDKF7N07wAQ2hN+cIPB0vSFhan20LDOa
+         pLTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700496212; x=1701101012;
+        d=1e100.net; s=20230601; t=1700496214; x=1701101014;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WWR8mH0snzJeJ0OqKxEnUfckbbEo5Y+jU7UsXhSvYEg=;
-        b=YLa4+OAfxTz6jrQmmqhUbJH+CyApBuGO9x1S/ZFIvHypi79Oao1YmTPv3ca3C2ujtS
-         Eo8N4cwBqIpfLgUw14En/yg2wUp0zF8RaK0qStJFXONOI5AIFkv5XFqHZ0gDSCsCppad
-         1Y/MymJb+xLHSY2SKcWjDzJ84+RfZfQEhPRfQKLvSLEfeD+7V6veJQMmgDanbXrcJqls
-         Cz7c6/QzjVFbCuyg7D6uIPIy+m13+uneT+6Ln+z1QXlwTuSavMzZD0uyEUYakIQzsxnw
-         LgUqWuyOigN2mIQs6oCSpHlZirCBTnu4Ok+Q+9X0LlLwzVx3v2SdP4vgVpbcHEOMnMpP
-         xOtg==
-X-Gm-Message-State: AOJu0YwUgGS+lf+OXAHjaQq/j50OGHDf4zSf2MamSl1flJHnubi15XWx
-	sgLNzys2tp+roNJkZRt0ET2gBA==
-X-Google-Smtp-Source: AGHT+IFWxADQkF/OwNhFoaa3Lm6bCrCfgTEaR5/3SxqpH39mcIVeYXeRfrfdcrPUNFNYoyVJlqfDrQ==
-X-Received: by 2002:a05:651c:382:b0:2c8:87d6:1fbb with SMTP id e2-20020a05651c038200b002c887d61fbbmr756247ljp.31.1700496212571;
-        Mon, 20 Nov 2023 08:03:32 -0800 (PST)
+        bh=Qer5SIgtLUsRnvdV4wIK4MVmII4A/reZeCq78BgyVHs=;
+        b=jXg47pmC67dCBOuJFNd3rXMtO8WGkWJo7Uc2frTBkDJi/LDTldf59ANH84SkcX2l6o
+         fr0+0DpLTdgqz8DCIG0xL0YdIsepBpPLbfddDH7Ak9DIEGWpk5MlSO0JRCOCSE17G+Cc
+         QdZqs/aaMoGdadgOJG1Ae7Ed8fibWfymzoCeUd1P4ocF1m39Cwmthg3IZWb7KlAbFoeS
+         7mpDUAl3sJzg5PpzmL0w+6en1P2z4lxbgOjVOJpqYQiJeFPorCaa182hLPJ+F25SsEPx
+         YoHPRqPaQK2/nHeMaxQqQc0KS0HzO2CWng2LT7YoR0bKeF68Y5PP6OyEnpnIvTsdMn7V
+         eZ1g==
+X-Gm-Message-State: AOJu0Ywo1ooFzMryPsiVFG6Y5sEnex7698hvEOntI94VD+CzpM7PvrJL
+	A65LL6j85w/iUcFtQkLDsEYDpQ==
+X-Google-Smtp-Source: AGHT+IE/JH4O1AgW0MQmqNiPFcTJsQoZ04eHzRRpqqhKljW8mWvlGUoQAFLMlaGmIk9pUbyHaE5lpg==
+X-Received: by 2002:ac2:44a9:0:b0:507:a9b7:f071 with SMTP id c9-20020ac244a9000000b00507a9b7f071mr5100756lfm.1.1700496213929;
+        Mon, 20 Nov 2023 08:03:33 -0800 (PST)
 Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
-        by smtp.googlemail.com with ESMTPSA id m21-20020a7bce15000000b004080f0376a0sm13564631wmc.42.2023.11.20.08.03.31
+        by smtp.googlemail.com with ESMTPSA id m21-20020a7bce15000000b004080f0376a0sm13564631wmc.42.2023.11.20.08.03.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 08:03:31 -0800 (PST)
+        Mon, 20 Nov 2023 08:03:33 -0800 (PST)
 From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -61,11 +61,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Richard Cochran <richardcochran@gmail.com>,
 	netdev@vger.kernel.org
 Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [net-next v2 4/5] net: ethernet: renesas: rcar_gen4_ptp: Get clock increment from clock rate
-Date: Mon, 20 Nov 2023 17:01:17 +0100
-Message-ID: <20231120160118.3524309-5-niklas.soderlund+renesas@ragnatech.se>
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next v2 5/5] net: ethernet: renesas: rcar_gen4_ptp: Break out to module
+Date: Mon, 20 Nov 2023 17:01:18 +0100
+Message-ID: <20231120160118.3524309-6-niklas.soderlund+renesas@ragnatech.se>
 X-Mailer: git-send-email 2.42.1
 In-Reply-To: <20231120160118.3524309-1-niklas.soderlund+renesas@ragnatech.se>
 References: <20231120160118.3524309-1-niklas.soderlund+renesas@ragnatech.se>
@@ -78,101 +77,87 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Instead of using hard coded clock increment values for each SoC derive
-the clock increment from the module clock. This is done in preparation
-to support a second platform, R-Car V4H that uses a 200Mhz clock
-compared with the 320Mhz clock used on R-Car S4.
+The Gen4 gPTP support will be shared between the existing Renesas
+Ethernet Switch driver and the upcoming Renesas Ethernet-TSN driver. In
+preparation for this break out the gPTP support to its own module.
 
-Tested on both SoCs,
-
-S4 reports a clock of 320000000Hz which gives a value of 0x19000000.
-Documentation says a 320Mhz clock is used and the correct increment for
-that clock is 0x19000000.
-
-V4H reports a clock of 199999992Hz which gives a value of 0x2800001a.
-Documentation says a 200Mhz clock is used and the correct increment for
-that clock is 0x28000000.
-
-Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 ---
 * Changes since v1
-- New in v2. In v1 a patch adding a new hard coded value for V4H was
-  present, that patch have been dropped in favor of this approach.
+- s/Gen3/Gen4/ in commit message.
+- Add missing MODULE_AUTHOR() and MODULE_DESCRIPTION() definitions.
+- Make Kconfig tristate depend on COMPILE_TEST. All drivers that make
+  use of the shared code auto selects this anyhow.
 ---
- drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 14 ++++++++++++--
- drivers/net/ethernet/renesas/rcar_gen4_ptp.h |  4 +---
- drivers/net/ethernet/renesas/rswitch.c       |  2 +-
- 3 files changed, 14 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/renesas/Kconfig         | 10 ++++++++++
+ drivers/net/ethernet/renesas/Makefile        |  5 +++--
+ drivers/net/ethernet/renesas/rcar_gen4_ptp.c |  7 +++++++
+ 3 files changed, 20 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
+index 8ef5b0241e64..5a2e7da90e69 100644
+--- a/drivers/net/ethernet/renesas/Kconfig
++++ b/drivers/net/ethernet/renesas/Kconfig
+@@ -44,7 +44,17 @@ config RENESAS_ETHER_SWITCH
+ 	select CRC32
+ 	select MII
+ 	select PHYLINK
++	select RENESAS_GEN4_PTP
+ 	help
+ 	  Renesas Ethernet Switch device driver.
+ 
++config RENESAS_GEN4_PTP
++	tristate "Renesas R-Car Gen4 gPTP support" if COMPILE_TEST
++	depends on ARCH_RENESAS || COMPILE_TEST
++	select CRC32
++	select MII
++	select PHYLIB
++	help
++	  Renesas R-Car Gen4 gPTP device driver.
++
+ endif # NET_VENDOR_RENESAS
+diff --git a/drivers/net/ethernet/renesas/Makefile b/drivers/net/ethernet/renesas/Makefile
+index e8fd85b5fe8f..9070acfd6aaf 100644
+--- a/drivers/net/ethernet/renesas/Makefile
++++ b/drivers/net/ethernet/renesas/Makefile
+@@ -8,5 +8,6 @@ obj-$(CONFIG_SH_ETH) += sh_eth.o
+ ravb-objs := ravb_main.o ravb_ptp.o
+ obj-$(CONFIG_RAVB) += ravb.o
+ 
+-rswitch_drv-objs := rswitch.o rcar_gen4_ptp.o
+-obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch_drv.o
++obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch.o
++
++obj-$(CONFIG_RENESAS_GEN4_PTP) += rcar_gen4_ptp.o
 diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-index 59f6351e9ae9..9583894634ae 100644
+index 9583894634ae..72e7fcc56693 100644
 --- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
 +++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-@@ -141,8 +141,18 @@ static int rcar_gen4_ptp_set_offs(struct rcar_gen4_ptp_private *ptp_priv,
+@@ -176,6 +176,7 @@ int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
+ 
  	return 0;
  }
++EXPORT_SYMBOL_GPL(rcar_gen4_ptp_register);
  
-+static s64 rcar_gen4_ptp_rate_to_increment(u32 rate)
-+{
-+	/* Timer increment in ns.
-+	 * bit[31:27] - integer
-+	 * bit[26:0]  - decimal
-+	 * increment[ns] = perid[ns] * 2^27 => (1ns * 2^27) / rate[hz]
-+	 */
-+	return div_s64(1000000000LL << 27, rate);
-+}
-+
- int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
--			   enum rcar_gen4_ptp_reg_layout layout, u32 clock)
-+			   enum rcar_gen4_ptp_reg_layout layout, u32 rate)
+ int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
  {
- 	int ret;
+@@ -183,6 +184,7 @@ int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
  
-@@ -155,7 +165,7 @@ int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
- 	if (ret)
- 		return ret;
+ 	return ptp_clock_unregister(ptp_priv->clock);
+ }
++EXPORT_SYMBOL_GPL(rcar_gen4_ptp_unregister);
  
--	ptp_priv->default_addend = clock;
-+	ptp_priv->default_addend = rcar_gen4_ptp_rate_to_increment(rate);
- 	iowrite32(ptp_priv->default_addend, ptp_priv->addr + ptp_priv->offs->increment);
- 	ptp_priv->clock = ptp_clock_register(&ptp_priv->info, NULL);
- 	if (IS_ERR(ptp_priv->clock))
-diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.h b/drivers/net/ethernet/renesas/rcar_gen4_ptp.h
-index 35664d1dc472..e22da5acd53d 100644
---- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.h
-+++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.h
-@@ -9,8 +9,6 @@
+ struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
+ {
+@@ -196,3 +198,8 @@ struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
  
- #include <linux/ptp_clock_kernel.h>
- 
--#define PTPTIVC_INIT			0x19000000	/* 320MHz */
--#define RCAR_GEN4_PTP_CLOCK_S4		PTPTIVC_INIT
- #define RCAR_GEN4_GPTP_OFFSET_S4	0x00018000
- 
- enum rcar_gen4_ptp_reg_layout {
-@@ -64,7 +62,7 @@ struct rcar_gen4_ptp_private {
- };
- 
- int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
--			   enum rcar_gen4_ptp_reg_layout layout, u32 clock);
-+			   enum rcar_gen4_ptp_reg_layout layout, u32 rate);
- int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv);
- struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev);
- 
-diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-index e1e29a2caf22..d6089429f654 100644
---- a/drivers/net/ethernet/renesas/rswitch.c
-+++ b/drivers/net/ethernet/renesas/rswitch.c
-@@ -1829,7 +1829,7 @@ static int rswitch_init(struct rswitch_private *priv)
- 	rswitch_fwd_init(priv);
- 
- 	err = rcar_gen4_ptp_register(priv->ptp_priv, RCAR_GEN4_PTP_REG_LAYOUT,
--				     RCAR_GEN4_PTP_CLOCK_S4);
-+				     clk_get_rate(priv->clk));
- 	if (err < 0)
- 		goto err_ptp_register;
- 
+ 	return ptp;
+ }
++EXPORT_SYMBOL_GPL(rcar_gen4_ptp_alloc);
++
++MODULE_AUTHOR("Yoshihiro Shimoda");
++MODULE_DESCRIPTION("Renesas R-Car Gen4 gPTP driver");
++MODULE_LICENSE("GPL");
 -- 
 2.42.1
 
