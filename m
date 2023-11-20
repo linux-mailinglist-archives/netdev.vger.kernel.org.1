@@ -1,225 +1,196 @@
-Return-Path: <netdev+bounces-49460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C38D47F21AB
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:53:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EC487F21B1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AF842813DB
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:53:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E589F2813DE
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227913B2BF;
-	Mon, 20 Nov 2023 23:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E023B787;
+	Mon, 20 Nov 2023 23:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LTHK5K0L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZNse8Wwy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC5DFBE;
-	Mon, 20 Nov 2023 15:53:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1700524431; x=1732060431;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mg4p26py9pHGYuitsXG9evIpxpd/jBytLWDUhd8t3KA=;
-  b=LTHK5K0LG4ZFP+TZI+9XQDkvx1kHwzawRE2A7gC8Omw76Fd+GYp2sWAg
-   vqSsMnJZGXyj/PFZcgS24UKpQm4LKzyZm6JI4vu2KIkDYdCWsvgm7DfNT
-   dm7grb7B8V2avifQCUcwQ7w69+XNsuvLWysQ/fdxhXCHG0n1PRBO8hel5
-   E=;
-X-IronPort-AV: E=Sophos;i="6.04,214,1695686400"; 
-   d="scan'208";a="45092405"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 23:53:49 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2a-m6i4x-1197e3af.us-west-2.amazon.com (Postfix) with ESMTPS id 61E58100E2C;
-	Mon, 20 Nov 2023 23:53:49 +0000 (UTC)
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:15239]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.99:2525] with esmtp (Farcaster)
- id f93ebc59-f30e-41a4-b33f-beb97486a1f1; Mon, 20 Nov 2023 23:53:49 +0000 (UTC)
-X-Farcaster-Flow-ID: f93ebc59-f30e-41a4-b33f-beb97486a1f1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 20 Nov 2023 23:53:41 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.26) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.39; Mon, 20 Nov 2023 23:53:39 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ivan@cloudflare.com>
-CC: <edumazet@google.com>, <hdanton@sina.com>, <kernel-team@cloudflare.com>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: wait_for_unix_gc can cause CPU overload for well behaved programs
-Date: Mon, 20 Nov 2023 15:53:30 -0800
-Message-ID: <20231120235330.60326-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CABWYdi31mJmLhKUnCmFpJoEfO8F03tQhDoLxCuu6sJn3Tytbng@mail.gmail.com>
-References: <CABWYdi31mJmLhKUnCmFpJoEfO8F03tQhDoLxCuu6sJn3Tytbng@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7963B2B2
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 23:54:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75D2EC433C7;
+	Mon, 20 Nov 2023 23:54:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700524477;
+	bh=Vezd9uq13hNO4AeXpO85JVgRRoWUvfwGAjAydyFIRSQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZNse8WwyocClfO55Rgn2mR0r2oRIP6C5XdD0aFWOOddSq9HFTcs2Su/OCEXp+1C/T
+	 qKayOQRGZdtGjnYOQ7dEYDhPFgvUuAgvQr3yYehbmh4mIOEjQJC5eHc+BLMWtCruAV
+	 Zpj97bU50ze4+iP8osDD7zcARnbbq2UZI794ut2T1cK6Sdj4G0vbC7PQZf10GkmgwW
+	 g3ED1TSEt3clodam80xXjy3+shsxcSAfhuvFuAYscnyDyRz+fEIa6bd0gaPVD7LEnp
+	 xzSblkhSEzJe9GL1Awzqczo1V/yKs1biaecQihv7DaWY6dlDJWJzhQiGQqasFxROwd
+	 o1d4zlhpV5LNg==
+Date: Mon, 20 Nov 2023 15:54:36 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Amritha Nambiar <amritha.nambiar@intel.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, sridhar.samudrala@intel.com
+Subject: Re: [net-next PATCH v8 02/10] net: Add queue and napi association
+Message-ID: <20231120155436.32ae11c6@kernel.org>
+In-Reply-To: <170018380870.3767.15478317180336448511.stgit@anambiarhost.jf.intel.com>
+References: <170018355327.3767.5169918029687620348.stgit@anambiarhost.jf.intel.com>
+	<170018380870.3767.15478317180336448511.stgit@anambiarhost.jf.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.26]
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Mon, 20 Nov 2023 14:30:52 -0800
-> > > A bit of a problem here is that unix_gc is called unconditionally in
-> > > unix_release_sock.
-> >
-> > unix_release_sock() calls gc only when there is a inflight socket.
-> >
-> >
-> > > It's done asynchronously now and it can only
-> > > consume a single CPU with your changes, which is a lot better than
-> > > before. I am wondering if we can still do better to only trigger gc
-> > > when it touches unix sockets that have inflight fds.
-> > >
-> > > Commit 3c32da19a858 ("unix: Show number of pending scm files of
-> > > receive queue in fdinfo") added "struct scm_stat" to "struct
-> > > unix_sock", which can be used to check for the number of inflight fds
-> > > in the unix socket. Can we use that to drive the GC?
-> >
-> > I don't think the stat is useful to trigger gc.  Unless the receiver
-> > is accessible via sendmsg(), it's not a gc candidate and we need not
-> > care about its stats about valid FDs that are ready to be processed
-> > and never cleaned up by gc until close().
-> 
-> I'm not quite following why it's not useful, could you elaborate? The
-> GC call today is conditioned by 16k system-wide inflight unix fds:
-> 
-> * https://github.com/torvalds/linux/blob/v6.7-rc2/net/unix/af_unix.c#L2204
-> * https://github.com/torvalds/linux/blob/master/net/unix/garbage.c#L191
-> 
-> The only way checking for inflight fds is worse is if there non-unix
-> fds inflight. This can be easily alleviated by checking for non-zero
-> inflight fds on the socket + system-wide unix fds check, making it
-> better than just checking the system-wide gauge. What am I missing?
+On Thu, 16 Nov 2023 17:16:48 -0800 Amritha Nambiar wrote:
+> Add the napi pointer in netdev queue for tracking the napi
+> instance for each queue. This achieves the queue<->napi mapping.
 
-unix_tot_inflight is the number of inflight AF_UNIX socket, excluding
-non-unix fds.  (See unix_inflight())
+I took the series for a spin. I'll send a bnxt patch in a separate
+reply, please add it to the series.
 
-Let's say sk-A passes its fd to sk-B, and vice versa, and then, we
-close sk-A and sk-B.  Each fd passing increments the refcnt of both
-"file", so unix_release_sock() is not called for _both_ sockets.
+Three high level comments:
 
-And if we check each socket's inflight fd to trigger gc, and no one
-sends fd, we never trigger gc for sk-A and sk-B.  In other words,
-unix_gc() call in unix_release_sock() is basically for _other_ sockets,
-not for the socket being destroyed there.
+ - the netif_queue_set_napi() vs __netif_queue_set_napi() gave me pause;
+   developers may be used to calling netif_*() functions from open/stop
+   handlers, without worrying about locking.
+   I think that netif_queue_set_napi() should assume rtnl_lock was
+   already taken, as it will be in 90% of cases. A rare driver which
+   does not hold it should take it locally for now.
 
-So, here we need to check the number of inflight fds in other sockets.
-We needed to clean up all inflight dead fd when we close() all AF_UNIX
-sockets (because AF_UNIX could be modulised and unloaded).
+ - drivers don't set real_num_*_queues to 0 when they go down,
+   currently. So even tho we don't list any disabled queues when
+   device is UP, we list queues when device is down.
+   I mean:
 
-It can no longer be a module, so technically, we need not run gc at
-close() now, but it would be better to not leave the dead fd so long.
-We need not wait gc though.
+   $ ifup eth0
+   $ ethtool -L eth0 combined 4
+   $ ./get-queues my-device
+   ... will list 4 rx and 4 rx queues ...
+   $ ethtool -L eth0 combined 2
+   $ ./get-queues my-device
+   ... will list 2 rx and 2 rx queues ...
+   $ ifdown eth0
+   $ ./get-queues my-device
+   ... will list 2 rx and 2 rx queues ...
+   ... even tho practically speaking there are no active queues ...
 
-> 
-> > > I think we can:
-> > >
-> > > * Trigger unix_gc from unix_release_sock if there's a non-zero number
-> > > of inflight fds in the socket being destroyed.
-> >
-> > This is the case of now.
-> 
-> It's not, unless I'm misunderstanding something.
+   I think we should skip listing queue and NAPI info of devices which
+   are DOWN. Do you have any use case which would need looking at those?
 
-Sorry, I just skipped "in the socket being destroyed", but as mentioned
-above, we need to check the system-wide unix_tot_inflight anyway.
+ - We need a way to detach queues form NAPI. This is sort-of related to
+   the above, maybe its not as crucial once we skip DOWN devices but
+   nonetheless for symmetry we should let the driver clear the NAPI
+   pointer. NAPIs may be allocated dynamically, the queue::napi pointer
+   may get stale.
 
+I hacked together the following for my local testing, feel free to fold
+appropriate parts into your patches:
 
-> The check today is
-> for any inflight fds _system-wide_:
-> 
-> * https://github.com/torvalds/linux/blob/v6.7-rc2/net/unix/af_unix.c#L684-L685
-> 
-> My suggestion is to check this _per socket_, making sockets that do
-> not pass any fds (likely an overwhelming majority) unaffected.
-> 
-> > > * Trigger wait_for_unix_gc from the write path only if the write
-> > > contains fds or if the socket contains inflight fds. Alternatively, we
-> > > can run gc at the end of the write path and only check for inflight
-> > > fds on the socket there, which is probably simpler.
-> >
-> > I don't think it's better to call gc at the end of sendmsg() as there
-> > would be small chance to consume memory compared to running gc in the
-> > beginning of sendmsg().
-> 
-> There is no guarantee that GC frees any memory either way.
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 1a0603b3529d..2ed7a3aeec40 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2948,10 +2948,11 @@ static void
+ ice_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
+ 		   struct napi_struct *napi, bool locked)
+ {
+-	if (locked)
+-		__netif_queue_set_napi(queue_index, type, napi);
+-	else
+-		netif_queue_set_napi(queue_index, type, napi);
++	if (!locked)
++		rtnl_lock();
++	netif_queue_set_napi(napi->dev, queue_index, type, napi);
++	if (!locked)
++		rtnl_unlock();
+ }
+ 
+ /**
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index dbc4ea74b8d6..e09a039a092a 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2644,13 +2644,10 @@ static inline void *netdev_priv(const struct net_device *dev)
+  */
+ #define SET_NETDEV_DEVTYPE(net, devtype)	((net)->dev.type = (devtype))
+ 
+-void netif_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
++void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
++			  enum netdev_queue_type type,
+ 			  struct napi_struct *napi);
+ 
+-void __netif_queue_set_napi(unsigned int queue_index,
+-			    enum netdev_queue_type type,
+-			    struct napi_struct *napi);
+-
+ static inline void netif_napi_set_irq(struct napi_struct *napi, int irq)
+ {
+ 	napi->irq = irq;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 99ca59e18abf..bb93240c69b9 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6400,25 +6400,27 @@ int dev_set_threaded(struct net_device *dev, bool threaded)
+ EXPORT_SYMBOL(dev_set_threaded);
+ 
+ /**
+- * __netif_queue_set_napi - Associate queue with the napi
++ * netif_queue_set_napi - Associate queue with the napi
++ * @dev: device to which NAPI and queue belong
+  * @queue_index: Index of queue
+  * @type: queue type as RX or TX
+- * @napi: NAPI context
++ * @napi: NAPI context, pass NULL to clear previously set NAPI
+  *
+  * Set queue with its corresponding napi context. This should be done after
+  * registering the NAPI handler for the queue-vector and the queues have been
+  * mapped to the corresponding interrupt vector.
+  */
+-void __netif_queue_set_napi(unsigned int queue_index,
+-			    enum netdev_queue_type type,
+-			    struct napi_struct *napi)
++void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
++			  enum netdev_queue_type type,
++			  struct napi_struct *napi)
+ {
+-	struct net_device *dev = napi->dev;
+ 	struct netdev_rx_queue *rxq;
+ 	struct netdev_queue *txq;
+ 
+-	if (WARN_ON_ONCE(!dev))
++	if (WARN_ON_ONCE(napi && !napi->dev))
+ 		return;
++	if (dev->reg_state >= NETREG_REGISTERED)
++		ASSERT_RTNL();
+ 
+ 	switch (type) {
+ 	case NETDEV_QUEUE_TYPE_RX:
+@@ -6433,15 +6435,6 @@ void __netif_queue_set_napi(unsigned int queue_index,
+ 		return;
+ 	}
+ }
+-EXPORT_SYMBOL(__netif_queue_set_napi);
+-
+-void netif_queue_set_napi(unsigned int queue_index, enum netdev_queue_type type,
+-			  struct napi_struct *napi)
+-{
+-	rtnl_lock();
+-	__netif_queue_set_napi(queue_index, type, napi);
+-	rtnl_unlock();
+-}
+ EXPORT_SYMBOL(netif_queue_set_napi);
+ 
+ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+-- 
+2.42.0
 
-Right.
-
-> 
-> > > GC only applies to unix sockets inflight of other unix sockets, so GC
-> > > can still affect sockets passing regular fds around, but it wouldn't
-> > > affect non-fd-passing unix sockets, which are usually in the data
-> > > path.
-> >
-> > I think we can run gc only when scm contains AF_UNIX sockets by tweaking
-> > a little bit scm processing.
-> 
-> That's even better than what I'm proposing (all inflight fds -> just
-> unix inflight fds being the difference), but probably requires a bit
-> more code changes. I'm happy to test a patch when you have it.
-> 
-> > > This way we don't have to check for per-user inflight fds, which means
-> > > that services running as "nobody" wouldn't be punished for other
-> > > services running as "nobody" screwing up.
-> >
-> > If we do not check user, a user could send 16000 AF_UNIX fds and
-> > other innocent users sending fds must wait gc.
-> 
-> In my proposal we check for infight fds per socket and if there are
-> none, there is no GC at all.
-
-Again, we need to check the system wide unix_tot_inflight at least
-for other sockets that is already close()d and not accessible from
-user.  (If we can check the per-socket stat in sendmsg(), the receiver
-socket must have its valid fd and is not a gc candidate.)
-
-So, we need to schedule gc when unix_tot_inflight > 16K anyway, and
-we need to decide who should wait.  If user has not-yet-received fd,
-it could be in the dead fd's recv queue, so the user should wait.
-
-OTOH, the fds that you are suggesting to check are still valid and
-not dead at least.
-
-  * if the process is sending AF_UNIX fds
-  * if the receiver has inflight fds in recv queue
-
-Botth cases could contribute to trigger gc, but there is less certainty
-than user's inflight count.
-
-
-> 
-> > I think isolating users would make more sense so you can sandbox
-> > a suspicious process.
-> 
-> Sure, but that's somewhat beside the point. Ideally things should work
-> well outside the box.
-> 
-> > Probably we can move flush_work() in the preceding if.  Then, the
-> > number of gc invocation in the "nobody" case is the same as before.
-> 
-> Just to make sure I get my point across: I want to have no GC if a
-> socket does not possibly contribute any garbage to be collected. If my
-> program just passes bytes back and forth and churns through unix
-> sockets, it shouldn't be penalized with GC and it shouldn't try to
-> schedule GC, no matter what else is going on in the system
-> 
-> Hope this makes sense.
-
-Yes, that makes sense, and I understnad that sendmsg() with no fds need
-not wait, but the point is who is responsible to wait for gc to finish.
 
