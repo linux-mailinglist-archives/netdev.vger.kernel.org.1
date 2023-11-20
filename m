@@ -1,296 +1,132 @@
-Return-Path: <netdev+bounces-49391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC78B7F1E22
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:45:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3737F1E2B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 909C51C2160B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:45:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 990331C20FBD
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773A02033D;
-	Mon, 20 Nov 2023 20:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IXU4Xf0i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFC61F924;
+	Mon, 20 Nov 2023 20:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0CA7CF
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:45:02 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-28032fd5866so6455793a91.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:45:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1700513102; x=1701117902; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q0+j8fQL1sJz92+chsBB43nsB2MtdrD3vnFCGs59vhU=;
-        b=IXU4Xf0iscpIH2PIGHbG8gkanThOZrAirMSJHN8XLqmCjUouAC//ikxcgIR/weQvXf
-         LNuvTK2kHfOVhmvx5aH6/CO4dsSv7rmljODHkBShSxFiLxsOHcWil6fiWLOAu9SmkmSo
-         GFAW3bzdsOWEM3xJOzKK1OA7BBoDOn8TOLhIhpf4otwS+AHY/CMbro2eEJ5uNXOHwL2M
-         QJUPqzvfFLP/Cag7OMwaETZdsW3v8AskJ3uYcRZ/nx7RMZW2s2B8zMZqXBvmvdnbkJTt
-         7RPfepxTToeYqTOCDzRebZ+bpWus4Uak8Tdp/WcgbUfBszA1Uc7sbZqBjw+tr8OZ10Sz
-         d09A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700513102; x=1701117902;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Q0+j8fQL1sJz92+chsBB43nsB2MtdrD3vnFCGs59vhU=;
-        b=i1ePYM62m+zF0Co0G7koQ9OD/nJ02HP5qtZeB14q/4qleo8L04ZDu/rl8IdWNY+uNe
-         XQoyFQh/TA6ZIIkQn1EuiDDqppteRJ/IHYn3VssrBjySbexwKKJyqti7REv+MMOuwH3a
-         TVtCfuwtvoOucMwdnB/KZJTGpfCGv4j2zxbbXqBCx43/I45HXSn3RnNzZxMPTKaKoCFF
-         H+sGkOVlHnwl545OOakJRM5NCU/CWbtWTy5lb0c9s4KwiH5yeTvxUvSomqMpqZcQEqnA
-         9L2A7Ppspdp6YjBy29wpRSyIMp4YBc4VZ+OL31vnBD/jXWvxPxbNw8la/D8UJCUP2o/Q
-         jdSg==
-X-Gm-Message-State: AOJu0YxYRiP2lhfpZ09qGA0U9inLtjyaqEEdan3GhNI1gL+0Gvovh4c0
-	PXeuBoqXNjQYGJyBhSnUZG0n/+A=
-X-Google-Smtp-Source: AGHT+IFf16w/HlmsFcKaSkyBb7ftE+eaSs3vM0zSXLvq2PgaNAM02ekw9Tn4BBTkGGulNt//3vU2tnQ=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:90a:6586:b0:283:9a71:457a with SMTP id
- k6-20020a17090a658600b002839a71457amr2258267pjj.6.1700513102471; Mon, 20 Nov
- 2023 12:45:02 -0800 (PST)
-Date: Mon, 20 Nov 2023 12:45:00 -0800
-In-Reply-To: <a0dc04da-eb36-4824-b774-fd16f3f65875@kernel.org>
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBBA8CC;
+	Mon, 20 Nov 2023 12:48:44 -0800 (PST)
+Received: from [192.168.1.103] (178.176.77.202) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
+ 2023 23:48:34 +0300
+Subject: Re: [PATCH 00/13] net: ravb: Add suspend to RAM and runtime PM
+ support for RZ/G3S
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
+	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
+	<masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <c6f3f8f6-0588-3f0e-0be1-a5b000ace19d@omp.ru>
+Date: Mon, 20 Nov 2023 23:48:34 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231102225837.1141915-1-sdf@google.com> <20231102225837.1141915-3-sdf@google.com>
- <c9bfe356-1942-4e49-b025-115faeec39dd@kernel.org> <CAKH8qBtiv8ArtbbMW9+c75y+NfkX-Tk-rcPuHBVdKDMmmFdtdA@mail.gmail.com>
- <2ed17b27-f211-4f58-95b5-5a71914264f3@kernel.org> <ZVJWuB4qtWfC-W_h@google.com>
- <be6186c1-52ee-42aa-b53c-39781af3a1ec@kernel.org> <ZVTJpLoSCaLoBa67@google.com>
- <a0dc04da-eb36-4824-b774-fd16f3f65875@kernel.org>
-Message-ID: <ZVvFTFD1k-aRc3rY@google.com>
-Subject: Re: [PATCH bpf-next v5 02/13] xsk: Add TX timestamp and TX checksum
- offload support
-From: Stanislav Fomichev <sdf@google.com>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, kuba@kernel.org, toke@kernel.org, willemb@google.com, 
-	dsahern@kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org, 
-	maciej.fijalkowski@intel.com, yoong.siang.song@intel.com, 
-	netdev@vger.kernel.org, xdp-hints@xdp-project.net
+MIME-Version: 1.0
+In-Reply-To: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.77.202]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 20:31:37
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181488 [Nov 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.202
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/20/2023 20:36:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 5:53:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 11/16, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 11/15/23 14:37, Stanislav Fomichev wrote:
-> > On 11/15, Jesper Dangaard Brouer wrote:
-> > >=20
-> > >=20
-> > > On 11/13/23 18:02, Stanislav Fomichev wrote:
-> > > > On 11/13, Jesper Dangaard Brouer wrote:
-> > > > >=20
-> > > > >=20
-> > > > > On 11/13/23 15:10, Stanislav Fomichev wrote:
-> > > > > > On Mon, Nov 13, 2023 at 5:16=E2=80=AFAM Jesper Dangaard Brouer =
-<hawk@kernel.org> wrote:
-> > > > > > >=20
-> > > > > > >=20
-> > > > > > > On 11/2/23 23:58, Stanislav Fomichev wrote:
-> > > > > > > > diff --git a/include/uapi/linux/if_xdp.h b/include/uapi/lin=
-ux/if_xdp.h
-> > > > > > > > index 2ecf79282c26..b0ee7ad19b51 100644
-> > > > > > > > --- a/include/uapi/linux/if_xdp.h
-> > > > > > > > +++ b/include/uapi/linux/if_xdp.h
-> > > > > > > > @@ -106,6 +106,41 @@ struct xdp_options {
-> > > > > > > >      #define XSK_UNALIGNED_BUF_ADDR_MASK \
-> > > > > > > >          ((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
-> > > > > > > >=20
-> > > > > > > > +/* Request transmit timestamp. Upon completion, put it int=
-o tx_timestamp
-> > > > > > > > + * field of struct xsk_tx_metadata.
-> > > > > > > > + */
-> > > > > > > > +#define XDP_TXMD_FLAGS_TIMESTAMP             (1 << 0)
-> > > > > > > > +
-> > > > > > > > +/* Request transmit checksum offload. Checksum start posit=
-ion and offset
-> > > > > > > > + * are communicated via csum_start and csum_offset fields =
-of struct
-> > > > > > > > + * xsk_tx_metadata.
-> > > > > > > > + */
-> > > > > > > > +#define XDP_TXMD_FLAGS_CHECKSUM                      (1 <<=
- 1)
-> > > > > > > > +
-> > > > > > > > +/* AF_XDP offloads request. 'request' union member is cons=
-umed by the driver
-> > > > > > > > + * when the packet is being transmitted. 'completion' unio=
-n member is
-> > > > > > > > + * filled by the driver when the transmit completion arriv=
-es.
-> > > > > > > > + */
-> > > > > > > > +struct xsk_tx_metadata {
-> > > > > > > > +     union {
-> > > > > > > > +             struct {
-> > > > > > > > +                     __u32 flags;
-> > > > > > > > +
-> > > > > > > > +                     /* XDP_TXMD_FLAGS_CHECKSUM */
-> > > > > > > > +
-> > > > > > > > +                     /* Offset from desc->addr where check=
-summing should start. */
-> > > > > > > > +                     __u16 csum_start;
-> > > > > > > > +                     /* Offset from csum_start where check=
-sum should be stored. */
-> > > > > > > > +                     __u16 csum_offset;
-> > > > > > > > +             } request;
-> > > > > > > > +
-> > > > > > > > +             struct {
-> > > > > > > > +                     /* XDP_TXMD_FLAGS_TIMESTAMP */
-> > > > > > > > +                     __u64 tx_timestamp;
-> > > > > > > > +             } completion;
-> > > > > > > > +     };
-> > > > > > > > +};
-> > > > > > >=20
-> > > > > > > This looks wrong to me. It looks like member @flags is not av=
-ail at
-> > > > > > > completion time.  At completion time, I assume we also want t=
-o know if
-> > > > > > > someone requested to get the timestamp for this packet (else =
-we could
-> > > > > > > read garbage).
-> > > > > >=20
-> > > > > > I've moved the parts that are preserved across tx and tx comple=
-tion
-> > > > > > into xsk_tx_metadata_compl.
-> > > > > > This is to address Magnus/Maciej feedback where userspace might=
- race
-> > > > > > with the kernel.
-> > > > > > See: https://lore.kernel.org/bpf/ZNoJenzKXW5QSR3E@boxer/
-> > > > > >=20
-> > > > >=20
-> > > > > Does this mean that every driver have to extend their TX-desc rin=
-g with
-> > > > > sizeof(struct xsk_tx_metadata_compl)?
-> > > > > Won't this affect the performance of this V5?
-> > > >=20
-> > > > Yes, but it doesn't have to be a descriptor. Might be some internal
-> > > > driver completion queue (as in the case of mlx5). And definitely do=
-es
-> > > > affect performance :-( (see all the static branches to disable it)
-> > > > >    $ pahole -C xsk_tx_metadata_compl
-> > > > > ./drivers/net/ethernet/stmicro/stmmac/stmmac.ko
-> > > > >    struct xsk_tx_metadata_compl {
-> > > > > 	__u64 *              tx_timestamp;         /*     0     8 */
-> > > > >=20
-> > > > > 	/* size: 8, cachelines: 1, members: 1 */
-> > > > > 	/* last cacheline: 8 bytes */
-> > > > >    };
-> > > > >=20
-> > > > > Guess, I must be misunderstanding, as I was expecting to see the =
-@flags
-> > > > > member being preserved across, as I get the race there.
-> > > > >=20
-> > > > > Looking at stmmac driver, it does look like this xsk_tx_metadata_=
-compl
-> > > > > is part of the TX-ring for completion (tx_skbuff_dma) and the
-> > > > > tx_timestamp data is getting stored here.  How is userspace AF_XD=
-P
-> > > > > application getting access to the tx_timestamp data?
-> > > > > I though this was suppose to get stored in metadata data area (um=
-em)?
-> > > > >=20
-> > > > > Also looking at the code, the kernel would not have a "crash" rac=
-e on
-> > > > > the flags member (if we preserve in struct), because the code che=
-cks the
-> > > > > driver HW-TS config-state + TX-descriptor for the availability of=
- a
-> > > > > HW-TS in the descriptor.
-> > > >=20
-> > > > xsk_tx_metadata_compl stores a pointer to the completion timestamp
-> > > > in the umem, so everything still arrives via the metadata area.
-> > > >=20
-> > > > We want to make sure the flags are not changing across tx and tx co=
-mpletion.
-> > > > Instead of saving the flags, we just use that xsk_tx_metadata_compl=
- to
-> > > > signal to the completion that "I know that I've requested the tx
-> > > > completion timestamp, please put it at this address in umem".
-> > > >=20
-> > > > I store the pointer instead of flags to avoid doing pointer math ag=
-ain
-> > > > at completion. But it's an implementation detail and somewhat abstr=
-acted
-> > > > from the drivers (besides the fact that it's probably has to fit in=
- 8
-> > > > bytes).
-> > >=20
-> > > I see it now (what I missed). At TX time you are storing a pointer wh=
-ere
-> > > to (later) write the TS at completion time.  It just seems overkill t=
-o
-> > > store 8 byte (pointer) to signal (via NULL) if the HWTS was requested=
-.
-> > > Space in the drivers TX-ring is performance critical, and I think dri=
-ver
-> > > developers would prefer to find a bit to indicate HWTS requested.
-> > >=20
-> > > If HWTS was *NOT* requested, then the metadata area will not be updat=
-ed
-> > > (right, correct?). Then memory area is basically garbage that survive=
-d.
-> > > How does the AF_XDP application know this packet contains a HWTS or n=
-ot?
-> > >=20
-> > >  From an UAPI PoV wouldn't it be easier to use (and extend) via keepi=
-ng
-> > > the @flags member (in struct xsk_tx_metadata), but (as you already do=
-)
-> > > not let kernel checks depend on it (to avoid the races).
-> >=20
-> > I was assuming the userspace can keep this signal out of band or use
-> > the same idea as suggested with padding struct xsk_tx_metadata to keep
-> > some data around. But I see your point, it might be convenient to
-> > keep the original flags around during completion on the uapi side.
-> >=20
-> > I think I can just move flags from the request union member to the oute=
-r
-> > struct. So the struct xsk_tx_metadata would look like:
-> >=20
-> > struct xsk_tx_metadata {
-> > 	__u32 flags; /* maybe can even make this u64? */
-> >=20
->=20
-> Yes to u64 for two reasons (1) this becomes UAPI and
-> (2) better alignment for tx_timestamp.
-> But I'm open to keeping it u32.
->=20
-> > 	union {
-> > 		__u16 csum_start;
-> > 		__u16 csum_offset;
-> > 	} request;
-> >=20
-> > 	union {
-> > 		__u64 tx_timestamp;
-> > 	} completion;
-> >=20
-> > 	__u32 padding; /* to drop this padding */
-> > };
-> >=20
-> > But I'd also keep the existing xsk_tx_metadata_compl to carry the
-> > pointer+signal around. As I mentioned previously, it's completely
-> > opaque to the driver and we can change the internals in the future.
-> >=20
->=20
-> Sure, it is an implementation detail and my objections are mostly that I
-> don't find it as a pretty code approach that can be hard to follow.
-> Maybe driver developer will object and change this later if it cost too
-> much to increase the element size in their TX-ring queues.
+On 11/20/23 11:45 AM, Claudiu wrote:
 
-To make sure I understand, your preference is to save the flags, right?
-A potential problem with that approach might be that we'd also have to
-carry the pointer to the original umem chunk (blowing the overhead by extra
-8 bytes) or pulling it of the tx completion descriptors in the drivers (ext=
-ra
-complexity). Pulling it out of the tx completion also might be
-problematic because because we store iova/dma addresses in the
-descriptors?
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> Hi,
+> 
+> This series adds suspend to RAM and runtime PM support for Ethernet
+> IP available on RZ/G3S (R9A08G045) SoC.
+> 
+> Along with it series contains preparatory fixes and cleanups.
+> 
+> Thank you,
+> Claudiu Beznea
+> 
+> Claudiu Beznea (13):
+>   net: ravb: Check return value of reset_control_deassert()
+>   net: ravb: Use pm_runtime_resume_and_get()
+>   net: ravb: Make write access to CXR35 first before accessing other
+>     EMAC registers
+>   net: ravb: Start TX queues after HW initialization succeeded
+>   net: ravb: Stop DMA in case of failures on ravb_open()
+
+   Like I've said, the fixes should be submitted separately.
+
+>   net: ravb: Let IP specific receive function to interrogate descriptors
+>   net: ravb: Rely on PM domain to enable gptp_clk
+>   net: ravb: Rely on PM domain to enable refclk
+>   net: ravb: Make reset controller support mandatory
+>   net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
+>     pm_ptr()
+>   net: ravb: Use tabs instead of spaces
+>   net: ravb: Assert/deassert reset on suspend/resume
+>   net: ravb: Add runtime PM support
+
+   I'll continue reviewing the rest of the series tomorrow...
+
+[...]
+
+MBR, Sergey
 
