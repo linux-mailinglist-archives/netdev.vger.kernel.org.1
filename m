@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-49315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874047F1A50
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:35:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B11307F1A69
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DAA1F254F1
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BF5F281E8F
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426FC22331;
-	Mon, 20 Nov 2023 17:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88069210F9;
+	Mon, 20 Nov 2023 17:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3XwzmVc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hm9zRZLg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDCB22330
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:35:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45543C433C8;
-	Mon, 20 Nov 2023 17:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6985E22328
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:36:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B960CC433C7;
+	Mon, 20 Nov 2023 17:35:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700501720;
-	bh=qAqDABdLidiX3t3Zps3jWa2tM42jqufzz5C/5QP6aGs=;
+	s=k20201202; t=1700501760;
+	bh=ZQ8jpw1GNEmFueOwbEPGOnNhSPON5CvKL9DkohvqMvk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=g3XwzmVc9y70UG7QT3wq3leq2FynkAP6UeQk8vzDeolLzKUD2+CC8cJXlluva/I/x
-	 Gd3HPbon2SeZJGo58a6XeWH/jwyO8JQ6OZ+9IswcjmEpJKHwLxlWjk8GevyBWFOzY8
-	 8IBJ6uKxifLlOvz/nmmJ7vfxy2tnPGVslf1A5CDBwK/+dMU63QL1GjE02GzqKYuJe/
-	 2snwSUPTQLkQRhM99sTS3MUgO2/jHJkpMFfxTLamS7I8qMdiCq2lp7jy/p+HqpHbVB
-	 d59HX5x6rQPrHrCJi7lknUqU+wi+n+SA5XnAv+Fgiu1ber5HAS+QHkM+nMZCeIjXEz
-	 MCUGVVbRUQ5cw==
-Date: Mon, 20 Nov 2023 17:35:15 +0000
+	b=Hm9zRZLg/lrFb9Gytr4pkkKm96odIc81fLCgHYQdMP5lO1jauXS187WAyooyUlBwK
+	 Ykp4xeFS2DptygzlSXpb0ZrGuf5c0Aey9cS8MDVqptejoI2UxfbbFg5MSm4qHLUq2i
+	 PAe3f5uZFKHHEC1Fxg/u/0mNfzN7d/qUS7R9Kdi/AM3Q6y2r0thK/Hu/Ken14QL29A
+	 M8YTddr0lC5mpywgQxmIx5xDnTssWW0wG/6gru+oOwu0CFuH7DpqxpHeXwvagid2sO
+	 TQnUCi5O8/mjZgOSM1y4cMB6044QommOnUb+78rGbwP1GQmEz4YgzPD7NeyHu329OJ
+	 gV6Pk+glIoAXw==
+Date: Mon, 20 Nov 2023 17:35:55 +0000
 From: Simon Horman <horms@kernel.org>
 To: Pedro Tammela <pctammela@mojatatu.com>
 Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
 	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
 	victor@mojatatu.com
-Subject: Re: [PATCH net-next 3/6] selftests: tc-testing: use netns delete
- from pyroute2
-Message-ID: <20231120173515.GD245676@kernel.org>
+Subject: Re: [PATCH net-next 5/6] selftests: tc-testing: timeout on unbounded
+ loops
+Message-ID: <20231120173555.GE245676@kernel.org>
 References: <20231117171208.2066136-1-pctammela@mojatatu.com>
- <20231117171208.2066136-4-pctammela@mojatatu.com>
+ <20231117171208.2066136-6-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,55 +52,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231117171208.2066136-4-pctammela@mojatatu.com>
+In-Reply-To: <20231117171208.2066136-6-pctammela@mojatatu.com>
 
-On Fri, Nov 17, 2023 at 02:12:05PM -0300, Pedro Tammela wrote:
-> When pyroute2 is available, use the native netns delete routine instead
-> of calling iproute2 to do it. As forks are expensive with some kernel
-> configs, minimize its usage to avoid kselftests timeouts.
+On Fri, Nov 17, 2023 at 02:12:07PM -0300, Pedro Tammela wrote:
+> In the spirit of failing early, timeout on unbounded loops that take
+> longer than 20 ticks to complete. Such loops are to ensure that objects
+> created are already visible so tests can proceed without any issues.
+> 
+> If a test setup takes more than 20 ticks to see an object, there's
+> definetely something wrong.
 > 
 > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 
-I have a suggestion for a follow up below, but this change looks good to me.
+Hi Pedro,
+
+no need to respin because of this, but 'definitely' is misspelt above.
+
+Moving on, I am very pleased to see these loops become bounded in time.
+So the above nit notwithstanding,
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-> ---
->  .../testing/selftests/tc-testing/plugin-lib/nsPlugin.py  | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-> index 2b8cbfdf1083..920dcbedc395 100644
-> --- a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-> +++ b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-> @@ -64,7 +64,10 @@ class SubPlugin(TdcPlugin):
->          if self.args.verbose:
->              print('{}.post_case'.format(self.sub_class))
->  
-> -        self._ns_destroy()
-> +        if netlink == True:
-> +            self._nl_ns_destroy()
-> +        else:
-> +            self._ns_destroy()
-
-As an aside, I think it would to rename _ns_* to
-_iproute2_ns_* or similar, to make the distinction with _nl_ns_* clearer.
-
->  
->      def post_suite(self, index):
->          if self.args.verbose:
-> @@ -174,6 +177,10 @@ class SubPlugin(TdcPlugin):
->          '''
->          self._exec_cmd_batched('pre', self._ns_create_cmds())
->  
-> +    def _nl_ns_destroy(self):
-> +        ns = self.args.NAMES['NS']
-> +        netns.remove(ns)
-> +
->      def _ns_destroy_cmd(self):
->          return self._replace_keywords('netns delete {}'.format(self.args.NAMES['NS']))
->  
-> -- 
-> 2.40.1
-> 
+...
 
