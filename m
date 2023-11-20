@@ -1,169 +1,138 @@
-Return-Path: <netdev+bounces-49080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5B2A7F0B7A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 05:47:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B167F0BB4
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 06:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 098EE1C2074A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 04:47:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 862EC280ABA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 05:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CBB39D;
-	Mon, 20 Nov 2023 04:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815611876;
+	Mon, 20 Nov 2023 05:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ftMXhMqB"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ig2yUXIE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D0CADE
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 20:47:10 -0800 (PST)
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20231120044708epoutp02af037a37859bf93ee6625ba4c5f1e02c~ZO2JgkTpM2711927119epoutp02Z
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:47:08 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20231120044708epoutp02af037a37859bf93ee6625ba4c5f1e02c~ZO2JgkTpM2711927119epoutp02Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1700455628;
-	bh=1Ubo85pbdvTXN6wPClLCAMAFVLHGFNFWy1sBF7ODcUo=;
-	h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-	b=ftMXhMqBwvvWXZgIIW+xjZpL+skU2CO3DuUS7wlUho2qMUBtblHyWQRZd3jKwZBL4
-	 y5OpXbObhz5/fi8qeVeTYoIVxqnZ343qEqehJ3OiwIa+JVcjxHAauXMvluOlmXA6cl
-	 6ZlIiTU1AbN8Yn2KaRKbHM1cTOpWE0BCGNSTC4Go=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-	epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-	20231120044707epcas2p48e30f2ea8d8da56bd273ee83ac704bcf~ZO2JCJA4e2770527705epcas2p4H;
-	Mon, 20 Nov 2023 04:47:07 +0000 (GMT)
-Received: from epsmgec2p1-new.samsung.com (unknown [182.195.36.68]) by
-	epsnrtp2.localdomain (Postfix) with ESMTP id 4SYZjk6VLFz4x9Q6; Mon, 20 Nov
-	2023 04:47:06 +0000 (GMT)
-X-AuditID: b6c32a4d-9f7ff70000004a32-1a-655ae4ca8d08
-Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
-	epsmgec2p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
-	3E.B1.18994.AC4EA556; Mon, 20 Nov 2023 13:47:06 +0900 (KST)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94A27C5;
+	Sun, 19 Nov 2023 21:51:59 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AK2ixcu029495;
+	Sun, 19 Nov 2023 21:51:47 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=S8dVyNkVOWEw+9SFPLtXKuGnffnZDVos0PuHKA1XzVc=;
+ b=ig2yUXIEbcBZOdRJcwPgLO2a8vU0j4qLNBfPi9MCyZ15Xgkv2tXITZ3S+AU5aSYuV8ce
+ jPAwm14lSgb/EIbclkxHTVxE28rPblFAA7P2HbCWRXcluQWH2qKRznZQQ/6/2OfGWp/A
+ Qkky5I3TNSrEXH0bxPE2MFAk0aHLOdoOkYNjhoE/hQQo6DW5FSpM4rKXUFLi/X788OVY
+ c/MDBTscl/loNnpw2c+U0ps/ePIPrCLNDJFy+t8BxTQTl4ASsnr2t3w1GKY5ZLYcOaCr
+ LdFWzMyd6N9MuhoOEI/8l9YvmqSFLSGwriGi7vovsDiEyItWyrmvyMKo2BhV6QnNxekZ 0A== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3ueuguujya-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 19 Nov 2023 21:51:47 -0800
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 19 Nov
+ 2023 21:51:46 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 19 Nov 2023 21:51:45 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id DF4BE3F7081;
+	Sun, 19 Nov 2023 21:51:41 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <horms@kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Fix ntuple rule creation to direct packet to VF with higher Rx queue than its PF
+Date: Mon, 20 Nov 2023 11:21:38 +0530
+Message-ID: <20231120055138.3602102-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Subject: Re: [PATCH] nfc: virtual_ncidev: Add variable to check if ndev is
- running
-Reply-To: bongsu.jeon@samsung.com
-Sender: Bongsu Jeon <bongsu.jeon@samsung.com>
-From: Bongsu Jeon <bongsu.jeon@samsung.com>
-To: Nguyen Dinh Phi <phind.uet@gmail.com>, Bongsu Jeon
-	<bongsu.jeon@samsung.com>, "krzysztof.kozlowski@linaro.org"
-	<krzysztof.kozlowski@linaro.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
-	<syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20231119164705.1991375-1-phind.uet@gmail.com>
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20231120044706epcms2p48c4579db14cc4f3274031036caac4718@epcms2p4>
-Date: Mon, 20 Nov 2023 13:47:06 +0900
-X-CMS-MailID: 20231120044706epcms2p48c4579db14cc4f3274031036caac4718
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpik+LIzCtJLcpLzFFi42LZdljTTPfUk6hUg8MfjC22NE9it9j7eiu7
-	xeVdc9gsji0Qs5j34jWTxeY5d5gc2Dx2zrrL7nHn2h42j74tqxg9Zr5V8/i8SS6ANSrbJiM1
-	MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VWycUnQNctMwdov5JCWWJOKVAo
-	ILG4WEnfzqYov7QkVSEjv7jEVim1ICWnwLxArzgxt7g0L10vL7XEytDAwMgUqDAhO2P13D2M
-	BR8FK46+3c3awNjI28XIySEhYCLxfMd1FhBbSGAPo8TsHdZdjBwcvAKCEn93CIOEhQVCJGbs
-	fwxVoijxv+McG0RcV+LF36NgNpuAtsTao41MILaIwHRGiSPPeLoYuTiYBV4zSpxrOccMsYtX
-	Ykb7UxYIW1pi+/KtjCA2p4C1xJ1Txxgh4hoSP5b1QtWLStxc/ZYdxn5/bD5UjYhE672zUDWC
-	Eg9+7oaKS0l8eniGFeR+CYFsie99bCA3SAg0MErceXsXaq++xLR7C8BsXgFfiZ1/p4DZLAKq
-	ErM/v4aqcZF4cmM32GPMAvIS29/OYQaZySygKbF+lz7EeGWJI7dYICr4JDoO/2WH+XDHvCdM
-	ELaqRG/zFyaYbyfPboG60kPi/u3vbBMYFWchAnoWkl2zEHYtYGRexSiVWlCcm56abFRgqJuX
-	Wg6P3uT83E2M4MSo5buD8fX6v3qHGJk4GA8xSnAwK4nwfhOKSBXiTUmsrEotyo8vKs1JLT7E
-	aAr06URmKdHkfGBqziuJNzSxNDAxMzM0NzI1MFcS573XOjdFSCA9sSQ1OzW1ILUIpo+Jg1Oq
-	gcln1f9z7DrzCi9ffbOv9UfhjUJRkfuLXri/25aSI3dwU6mA7K9zP62FKlhalequvYzJ5Tep
-	ia61XTBlv+uiIwtzHx+ayPt92bdqpwtZH5ITX5+umsK+vGtO15vzTdxm70+vMP6/c6OjxMug
-	3OW9K9bwmiypmKDO6Gr1P6dj7/xkZdcljR9390XekMkpOZo/74fJwtzSw1MZLc6ckr3jaBVw
-	42LZrEj566ezFpn8vn5c50RP+bOX4suXL5tvJ/BOIXK53zvle57WCRc/MCj/nSHvWrVw0bOi
-	qNWhO985SXXoG1tlqzWnO0tEvw9S1n0n903+1AEHBrXsa5XPvLNLY1VevJnjJrI5qE+j68iP
-	bZxKLMUZiYZazEXFiQAdpeLoFQQAAA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20231119164714epcas2p2c0480d014abc4f0f780c714a445881ca
-References: <20231119164705.1991375-1-phind.uet@gmail.com>
-	<CGME20231119164714epcas2p2c0480d014abc4f0f780c714a445881ca@epcms2p4>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: EHNlnzMSN3WlnvgNQPnBdJvH-4KyNsFc
+X-Proofpoint-ORIG-GUID: EHNlnzMSN3WlnvgNQPnBdJvH-4KyNsFc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-20_03,2023-11-17_01,2023-05-22_02
 
+It is possible to add a ntuple rule which would like to direct packet to
+a VF whose number of queues are greater/less than its PF's queue numbers.
+For example a PF can have 2 Rx queues but a VF created on that PF can have
+8 Rx queues. As of today, ntuple rule will reject rule because it is
+checking the requested queue number against PF's number of Rx queues.
+As a part of this fix if the action of a ntuple rule is to move a packet
+to a VF's queue then the check is removed. Also, a debug information is
+printed to aware user that it is user's responsibility to cross check if
+the requested queue number on that VF is a valid one.
 
-On 20/11/2023 01:47, Nguyen Dinh Phi wrote:
+Fixes: f0a1913f8a6f ("octeontx2-pf: Add support for ethtool ntuple filters")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ .../marvell/octeontx2/nic/otx2_flows.c        | 21 +++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-> syzbot reported an memory leak that happens when an skb is add to
-> send_buff after virtual nci closed.
-> This patch adds a variable to track if the ndev is running before
-> handling new skb in send function.
-> 
-> Reported-by: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/lkml/00000000000075472b06007df4fb@google.com
-> Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
-> ---
->  drivers/nfc/virtual_ncidev.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
-> index b027be0b0b6f..ac8226db54e2 100644
-> --- a/drivers/nfc/virtual_ncidev.c
-> +++ b/drivers/nfc/virtual_ncidev.c
-> @@ -20,26 +20,31 @@
->                                   NFC_PROTO_ISO14443_MASK | \
->                                   NFC_PROTO_ISO14443_B_MASK | \
->                                   NFC_PROTO_ISO15693_MASK)
-> +#define NCIDEV_RUNNING 0
-This define isn't used.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 4762dbea64a1..4200f2d387f6 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -1088,6 +1088,7 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
+ 	struct ethhdr *eth_hdr;
+ 	bool new = false;
+ 	int err = 0;
++	u64 vf_num;
+ 	u32 ring;
+ 
+ 	if (!flow_cfg->max_flows) {
+@@ -1100,9 +1101,26 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
+ 	if (!(pfvf->flags & OTX2_FLAG_NTUPLE_SUPPORT))
+ 		return -ENOMEM;
+ 
++	/* Number of queues on a VF can be greater or less than
++	 * the PF's queue. Hence no need to check for the
++	 * queue count. Hence no need to check queue count if PF
++	 * is installing for its VF. Below is the expected vf_num value
++	 * based on the ethtool commands.
++	 *
++	 * e.g.
++	 * 1. ethtool -U <netdev> ... action -1  ==> vf_num:255
++	 * 2. ethtool -U <netdev> ... action <queue_num>  ==> vf_num:0
++	 * 3. ethtool -U <netdev> ... vf <vf_idx> queue <queue_num>  ==>
++	 *    vf_num:vf_idx+1
++	 */
++	vf_num = ethtool_get_flow_spec_ring_vf(fsp->ring_cookie);
++	if (!is_otx2_vf(pfvf->pcifunc) && vf_num)
++		goto bypass_queue_check;
++
+ 	if (ring >= pfvf->hw.rx_queues && fsp->ring_cookie != RX_CLS_FLOW_DISC)
+ 		return -EINVAL;
+ 
++bypass_queue_check:
+ 	if (fsp->location >= otx2_get_maxflows(flow_cfg))
+ 		return -EINVAL;
+ 
+@@ -1182,6 +1200,9 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct ethtool_rxnfc *nfc)
+ 		flow_cfg->nr_flows++;
+ 	}
+ 
++	if (flow->is_vf)
++		netdev_info(pfvf->netdev,
++			    "Make sure that VF's queue number is within its queue limit\n");
+ 	return 0;
+ }
+ 
+-- 
+2.25.1
 
->  
->  struct virtual_nci_dev {
->          struct nci_dev *ndev;
->          struct mutex mtx;
->          struct sk_buff *send_buff;
->          struct wait_queue_head wq;
-> +        bool running;
->  };
->  
->  static int virtual_nci_open(struct nci_dev *ndev)
->  {
-> +        struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
-> +
-> +        vdev->running = true;
->          return 0;
->  }
->  
->  static int virtual_nci_close(struct nci_dev *ndev)
->  {
->          struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
-> -
->          mutex_lock(&vdev->mtx);
->          kfree_skb(vdev->send_buff);
->          vdev->send_buff = NULL;
-> +        vdev->running = false;
->          mutex_unlock(&vdev->mtx);
->  
->          return 0;
-> @@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
->          struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
->  
->          mutex_lock(&vdev->mtx);
-> -        if (vdev->send_buff) {
-> +        if (vdev->send_buff || !vdev->running) {
-
-Dear Krzysztof,
-
-I agree this defensive code.
-But i think NFC submodule has to avoid this situation.(calling send function of closed nci_dev)
-Could you check this?
-
-Best regards,
-Bongsu
 
