@@ -1,152 +1,234 @@
-Return-Path: <netdev+bounces-49333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F717F1C4D
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:24:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B807F1C56
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:27:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DAEF28254D
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:24:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81C83B210CD
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E7530656;
-	Mon, 20 Nov 2023 18:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699393067C;
+	Mon, 20 Nov 2023 18:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+wdhtbz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Jxa92r5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CC8AC8;
-	Mon, 20 Nov 2023 10:23:54 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1cc9b626a96so34069135ad.2;
-        Mon, 20 Nov 2023 10:23:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700504634; x=1701109434; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KWt2/ngqRZl5QuD4sv4zP0M/aVeTZYIc/05gHj626E0=;
-        b=S+wdhtbzJQrxem8qosDtNISOLMdN7jSlgRs/qcGbAgyPbiLaTxuztYL7g5cI6KDv2D
-         oVGLsOECLBx98DXzTGPIra3OV6LdwcL0ZVk9npVhQkhp59NimQYjQ/WpRjx/CY0vF+ap
-         kP8Hcx38memWh2BV4d9MCI82dj+an5eXJlZcsVOARD6ed3G1yencgRtlMe6nREmbdZ99
-         1NUjUDCwGFnPbUrmjHHc53bjc4lL++j1MCg+dOlCmZGwZL/cE/M6koJhu6cSobegVwy2
-         ES0MjgFSI1LVrPNTnYL+m4Gok4uUZw0YPyT/NLL5H6S637+Rp4EWN8Kl97jXWYm60TM1
-         HyHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700504634; x=1701109434;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KWt2/ngqRZl5QuD4sv4zP0M/aVeTZYIc/05gHj626E0=;
-        b=R35lBeKCHS+S/5UvFWYIE3AKOqMYO2vWOrBauHy78IkdJqJNF4cveaAO4f9yORAA1Z
-         jvJLhfIwJUZwuInychpcMYyTXXuUSPMFN2tpf/MyN0TnryDded6d6JuRDU2IFXn3kk0F
-         3V74dw1d//27qiRV3FEeBZvwt1g2MRAx+0GknbCoG92/qSH7xddmeL9h5qaddJ2QmEc2
-         f6EGa/Zz00mjBqiGvm5SiodtoNZ94/5EIWz4clRo3FsJytJPvtmwGdd3DifqVmSuwtab
-         lzOhbd7B2yjKRkAtlR9lOWILbLuuNybIqdRY0SJNnHFpmNotjxmsFrBTXSkx0TufWY9b
-         4hpw==
-X-Gm-Message-State: AOJu0YxgZw4WZ4ee4qGTowbVQr3/Rsm4MIQnBD+qVmuO/IMPp7a66m6/
-	CRhVA0fB/UE2vAQ1K+gORYg=
-X-Google-Smtp-Source: AGHT+IHrha1hJaeUAEfyDeFwDKziEKc0iFZt+aGntiYuaF6IHyvLDYgaoz7VSZSlPyBlwO1InKAh6w==
-X-Received: by 2002:a17:902:ecd0:b0:1ce:6687:c93e with SMTP id a16-20020a170902ecd000b001ce6687c93emr7650636plh.69.1700504633709;
-        Mon, 20 Nov 2023 10:23:53 -0800 (PST)
-Received: from [192.168.1.100] (bb220-255-254-193.singnet.com.sg. [220.255.254.193])
-        by smtp.gmail.com with ESMTPSA id bj11-20020a170902850b00b001c739768214sm6401716plb.92.2023.11.20.10.23.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 10:23:53 -0800 (PST)
-Message-ID: <8bce1251-7a6b-4b4c-b700-9d97c664689f@gmail.com>
-Date: Tue, 21 Nov 2023 02:23:51 +0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2079.outbound.protection.outlook.com [40.107.220.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9845792
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:27:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UpfbvE9o3dCzmZnDAONya0Atj1Z6e1e5tueA0KpEh680SxLGR+sJ9N3FfQPkyHgsZSJUpseeaD2mAz80g9a0ZY8yp7G93qNCfJ0+QOTKunyBBsfWxqgRpTl1DE3IyOXLr3I8Ig5sFU3jakugxFs7LbixzaMY29KSbI1Zi6RsVNqKhv9bnXUB4YoWYEt7C47dv0+pukvOYivXf067CsJ+YjPhQZxOYgoaTlBTgT9WtXHuf1lv6iE2IAk37SeNll2mN2eLCP/HddICR/FoQuXrxcRx7ZOTiSeMccCenJtPKXQKCagqaig7AK+8PSQifLxosshoFxWDRxeC8fY1pLWPAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eBhohRwzrHPiuolHkJhlK8s7RfmIXE3GRDTupRG7RoA=;
+ b=gJUPQJL3+Ee4KLmCbryCmNK69rKjgNalGPf9wltytAQtm/tsJ4GMapCPksEp33uYEs0/BTu44PII+x2S9Iw7y/eqvkMgWwtST6w93qggulwzfD4l8v12KVHUA2DOSW9jZis+NefbzQKs6ryj0qgOw986SYowYoGxwj///SHaFu2J3WX3MWz3aQEveDFDsuNKMQ1RxewacbEqgbQ4CWwE2ftlUY3U/r7/LWfSbjHuctEmetCwkxPJZC0/JD9fmRwWwEsSwXRMqMrzSSZTmERP1DspfTnSKNyMkMgIoIKpvxaOHC+w8WrElQQXGXEG21EVv0c0cGqjppRAk8B3JVEq4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eBhohRwzrHPiuolHkJhlK8s7RfmIXE3GRDTupRG7RoA=;
+ b=Jxa92r5iZbjaRkowqu9CoE3mP6/HXugl+3TdSPnPcreFSb8vLKiN1gJUm3E1HjbOQFy2peDkcL3tXkqro8vkzylo+jAEsRJm3HgfNVFCTFgUlZvipT9hnMKn2Zrg7AfRG0mk+KYqlOfOvw8JXZZJjwEkuCBjTY7xlpJdQluf+19iHRSKU3bGNkkMH1dK9wRi4UhF2ElR2izxKuWuZk2/UUddSBeUThTMQ/Tyj6Z6E84qk0qNtS9p9B2xnylK/Xss5I/rlvpCyVTBi0XXtV1tmnMkriNZr3p13vU2WGupeopg1mCd8WT3CyioXpjlAYChzD10p7zLGYh7m4j1Wn7roA==
+Received: from DM6PR06CA0034.namprd06.prod.outlook.com (2603:10b6:5:120::47)
+ by MN0PR12MB6294.namprd12.prod.outlook.com (2603:10b6:208:3c1::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
+ 2023 18:27:41 +0000
+Received: from DS2PEPF00003440.namprd02.prod.outlook.com
+ (2603:10b6:5:120:cafe::57) by DM6PR06CA0034.outlook.office365.com
+ (2603:10b6:5:120::47) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27 via Frontend
+ Transport; Mon, 20 Nov 2023 18:27:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS2PEPF00003440.mail.protection.outlook.com (10.167.18.43) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7025.12 via Frontend Transport; Mon, 20 Nov 2023 18:27:40 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 20 Nov
+ 2023 10:27:26 -0800
+Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 20 Nov
+ 2023 10:27:23 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Amit
+ Cohen" <amcohen@nvidia.com>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next 00/14] mlxsw: Preparations for support of CFF flood mode
+Date: Mon, 20 Nov 2023 19:25:17 +0100
+Message-ID: <cover.1700503643.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] nfc: virtual_ncidev: Add variable to check if ndev is
- running
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- bongsu.jeon@samsung.com
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
- <syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>
-References: <20231119164705.1991375-1-phind.uet@gmail.com>
- <CGME20231119164714epcas2p2c0480d014abc4f0f780c714a445881ca@epcms2p4>
- <20231120044706epcms2p48c4579db14cc4f3274031036caac4718@epcms2p4>
- <bafc3707-8eae-4d63-bc64-8d415d32c4b9@linaro.org>
- <20d93e83-66c0-28d9-4426-a0d4c098f303@gmail.com>
- <d82e5a5f-1bbc-455e-b6a7-c636b23591f7@linaro.org>
-Content-Language: en-US
-From: Phi Nguyen <phind.uet@gmail.com>
-In-Reply-To: <d82e5a5f-1bbc-455e-b6a7-c636b23591f7@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003440:EE_|MN0PR12MB6294:EE_
+X-MS-Office365-Filtering-Correlation-Id: 06956be1-7ee2-48c7-c5f2-08dbe9f66187
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	VGUKd2HmFgf+zTRC4vLm/m0oC8NDahEpxM4BhpAPsiz0hULdme7jsRj0LCS8dEDGHjUjg354NU24mfIS+51O92Fev1KnNCt48iyMGsu2AQBnYqB6QDH9oYFoBFJV+LYQ0mcJm0Sx/Hs58fgNa5kexB2gXO8wQLoHUPE/PsHI0yZkdrH0uPn2QuDOs1CIKgoCbk2ZcfYD6l8g9vWoNWsF1npaTE6xRFn+fQd/WYduTY9UiKbqZdPWwxcg87s5Qf9zPSOX/H/NGEN9IhmmtkFmYRIinSgA3J4C+YniLrN0YamVfMrhCfBaDo01Uo8V3ryEDN9EJSEp2KWnXBSndqJZGaX4XxrZc6tKfOKPu37T7VGuDwysVfudbyhexHymtDbsQ4Y5TwkDasiUsB5PGkXTOl6gynt5lT2oJfhrdel9wFM2mUwDiGuN61eoSgdzPU9ibC+4/dTwJu3h3oMTCiF8I7PiGCNoMEG6ck17A99NU0Yh+D7rTaKIR459BozvcPDGYeEDZcbAlGZmbSCxpkRknNh8h1kaCrXE4sYzK0xk5JMoHk/n4cofV2TrQhLYjtVWBv8os7uvWf9KQQwUycVf13uGgqB4gfguVyhCl2DBsi99D7OXJMoYMsSppd4TGdVuNo2e1ys5jYEKluE0T5Xhwcf5c/Bb8hy2B0EQ9mn+lutqxfMUfdsy2KRNHUfWavxbkog/aSXcdWWabDV0T25JCC7z1hOFTe9SU+RvuRdNDsw=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(136003)(39860400002)(396003)(230922051799003)(451199024)(186009)(64100799003)(1800799012)(82310400011)(36840700001)(40470700004)(46966006)(40460700003)(16526019)(26005)(66574015)(336012)(83380400001)(107886003)(6666004)(2616005)(47076005)(478600001)(8676002)(5660300002)(41300700001)(4326008)(8936002)(2906002)(426003)(86362001)(316002)(110136005)(70206006)(70586007)(54906003)(36756003)(356005)(82740400003)(7636003)(36860700001)(40480700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 18:27:40.9009
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06956be1-7ee2-48c7-c5f2-08dbe9f66187
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS2PEPF00003440.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6294
 
-On 11/20/2023 6:45 PM, Krzysztof Kozlowski wrote:
-> On 20/11/2023 11:39, Nguyen Dinh Phi wrote:
->>>>>            mutex_lock(&vdev->mtx);
->>>>>            kfree_skb(vdev->send_buff);
->>>>>            vdev->send_buff = NULL;
->>>>> +        vdev->running = false;
->>>>>            mutex_unlock(&vdev->mtx);
->>>>>    
->>>>>            return 0;
->>>>> @@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
->>>>>            struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
->>>>>    
->>>>>            mutex_lock(&vdev->mtx);
->>>>> -        if (vdev->send_buff) {
->>>>> +        if (vdev->send_buff || !vdev->running) {
->>>>
->>>> Dear Krzysztof,
->>>>
->>>> I agree this defensive code.
->>>> But i think NFC submodule has to avoid this situation.(calling send function of closed nci_dev)
->>>> Could you check this?
->>>
->>> This code looks not effective. At this point vdev->send_buff is always
->>> false, so the additional check would not bring any value.
->>>
->>> I don't see this fixing anything. Syzbot also does not seem to agree.
->>>
->>> Nguyen, please test your patches against syzbot *before* sending them.
->>> If you claim this fixes the report, please provide me the link to syzbot
->>> test results confirming it is fixed.
->>>
->>> I looked at syzbot dashboard and do not see this issue fixed with this
->>> patch.
->>>
->>> Best regards,
->>> Krzysztof
->>>
->>
->> Hi Krzysztof,
->>
->> I've submitted it to syzbot, it is the test request that created at
->> [2023/11/20 09:39] in dashboard link
->> https://syzkaller.appspot.com/bug?extid=6eb09d75211863f15e3e
-> 
-> ...and I see there two errors.
-> 
-These are because I sent email wrongly and syzbot truncates the patch 
-and can not compile
+PGT is an in-HW table that maps addresses to sets of ports. Then when some
+HW process needs a set of ports as an argument, instead of embedding the
+actual set in the dynamic configuration, what gets configured is the
+address referencing the set. The HW then works with the appropriate PGT
+entry.
 
-> I don't know, maybe I miss something obvious (our brains like to do it
-> sometimes), but please explain me how this could fix anything?
-> 
-> Best regards,
-> Krzysztof
-> 
+Among other allocations, the PGT currently contains two large blocks for
+bridge flooding: one for 802.1q and one for 802.1d. Within each of these
+blocks are three tables, for unknown-unicast, multicast and broadcast
+flooding:
 
-The issue arises when an skb is added to the send_buff after invoking 
-ndev->ops->close() but before unregistering the device. In such cases, 
-the virtual device will generate a copy of skb, but with no consumer 
-thereafter. Consequently, this object persists indefinitely.
+      . . . |    802.1q    |    802.1d    | . . .
+            | UC | MC | BC | UC | MC | BC |
+             \______ _____/ \_____ ______/
+                    v             v
+                   FID flood vectors
 
-This problem seems to stem from the existence of time gaps between 
-ops->close() and the destruction of the workqueue. During this interval, 
-incoming requests continue to trigger the send function.
+Thus each FID (which corresponds to an 802.1d bridge or one VLAN in an
+802.1q bridge) uses three flood vectors spread across a fairly large region
+of PGT.
 
-best regards,
-Phi
+This way of organizing the flood table (called "controlled") is not very
+flexible. E.g. to decrease a bridge scale and store more IP MC vectors, one
+would need to completely rewrite the bridge PGT blocks, or resort to hacks
+such as storing individual MC flood vectors into unused part of the bridge
+table.
+
+In order to address these shortcomings, Spectrum-2 and above support what
+is called CFF flood mode, for Compressed FID Flooding. In CFF flood mode,
+each FID has a little table of its own, with three entries adjacent to each
+other, one for unknown-UC, one for MC, one for BC. This allows for a much
+more fine-grained approach to PGT management, where bits of it are
+allocated on demand.
+
+      . . . | FID | FID | FID | FID | FID | . . .
+            |U|M|B|U|M|B|U|M|B|U|M|B|U|M|B|
+             \_____________ _____________/
+                           v
+                   FID flood vectors
+
+Besides the FID table organization, the CFF flood mode also impacts Router
+Subport (RSP) table. This table contains flood vectors for rFIDs, which are
+FIDs that reference front panel ports or LAGs. The RSP table contains two
+entries per front panel port and LAG, one for unknown-UC traffic, and one
+for everything else. Currently, the FW allocates and manages the table in
+its own part of PGT. rFIDs are marked with flood_rsp bit and managed
+specially. In CFF mode, rFIDs are managed as all other FIDs. The driver
+therefore has to allocate and maintain the flood vectors. Like with bridge
+FIDs, this is more work, but increases flexibility of the system.
+
+The FW currently supports both the controlled and CFF flood modes. To shed
+complexity, in the future it should only support CFF flood mode. Hence this
+patchset, which is the first in series of two to add CFF flood mode support
+to mlxsw.
+
+
+There are FW versions out there that do not support CFF flood mode, and on
+Spectrum-1 in particular, there is no plan to support it at all. mlxsw will
+therefore have to support both controlled flood mode as well as CFF.
+
+Another aspect is that at least on Spectrum-1, there are FW versions out
+there that claim to support CFF flood mode, but then reject or ignore
+configurations enabling the same. The driver thus has to have a say in
+whether an attempt to configure CFF flood mode should even be made.
+
+Much like with the LAG mode, the feature is therefore expressed in terms of
+"does the driver prefer CFF flood mode?", and "what flood mode the PCI
+module managed to configure the FW with". This gives to the driver a chance
+to determine whether CFF flood mode configuration should be attempted.
+
+
+In this patchset, we lay the ground with new definitions, registers and
+their fields, and some minor code shaping. The next patchset will be more
+focused on introducing necessary abstractions and implementation.
+
+- Patches #1 and #2 add CFF-related items to the command interface.
+
+- Patch #3 adds a new resource, for maximum number of flood profiles
+  supported. (A flood profile is a mapping between traffic type and offset
+  in the per-FID flood vector table.)
+
+- Patches #4 to #8 adjust reg.h. The SFFP register is added, which is used
+  for configuring the abovementioned traffic-type-to-offset mapping. The
+  SFMR, register, which serves for FID configuration, is extended with
+  fields specific to CFF mode. And other minor adjustments.
+
+- Patches #9 and #10 add the plumbing for CFF mode: a way to request that
+  CFF flood mode be configured, and a way to query the flood mode that was
+  actually configured.
+
+- Patch #11 removes dead code.
+
+- Patches #12 and #13 add helpers that the next patchset will make use of.
+  Patch #14 moves RIF setup ahead so that FID code can make use of it.
+
+Petr Machata (14):
+  mlxsw: cmd: Add cmd_mbox.query_fw.cff_support
+  mlxsw: cmd: Add MLXSW_CMD_MBOX_CONFIG_PROFILE_FLOOD_MODE_CFF
+  mlxsw: resources: Add max_cap_nve_flood_prf
+  mlxsw: reg: Add Switch FID Flooding Profiles Register
+  mlxsw: reg: Mark SFGC & some SFMR fields as reserved in CFF mode
+  mlxsw: reg: Drop unnecessary writes from mlxsw_reg_sfmr_pack()
+  mlxsw: reg: Extract flood-mode specific part of mlxsw_reg_sfmr_pack()
+  mlxsw: reg: Add to SFMR register the fields related to CFF flood mode
+  mlxsw: core, pci: Add plumbing related to CFF mode
+  mlxsw: pci: Permit enabling CFF mode
+  mlxsw: spectrum_fid: Drop unnecessary conditions
+  mlxsw: spectrum_fid: Extract SFMR packing into a helper
+  mlxsw: spectrum_router: Add a helper to get subport number from a RIF
+  mlxsw: spectrum_router: Call RIF setup before obtaining FID
+
+ drivers/net/ethernet/mellanox/mlxsw/cmd.h     | 11 +++
+ drivers/net/ethernet/mellanox/mlxsw/core.c    |  7 ++
+ drivers/net/ethernet/mellanox/mlxsw/core.h    |  9 +++
+ drivers/net/ethernet/mellanox/mlxsw/pci.c     | 27 ++++++-
+ drivers/net/ethernet/mellanox/mlxsw/reg.h     | 78 +++++++++++++++++--
+ .../net/ethernet/mellanox/mlxsw/resources.h   |  2 +
+ .../net/ethernet/mellanox/mlxsw/spectrum.h    |  2 +
+ .../ethernet/mellanox/mlxsw/spectrum_fid.c    | 46 ++++++-----
+ .../ethernet/mellanox/mlxsw/spectrum_router.c | 20 ++++-
+ 9 files changed, 170 insertions(+), 32 deletions(-)
+
+-- 
+2.41.0
+
 
