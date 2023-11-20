@@ -1,110 +1,131 @@
-Return-Path: <netdev+bounces-49306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8ED57F1992
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:16:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 881017F199A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:17:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F1821F2565F
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:16:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CE041F2572A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FD21DFE9;
-	Mon, 20 Nov 2023 17:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C0E2032D;
+	Mon, 20 Nov 2023 17:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahP+0DGA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NqRwhY2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2396B1A5B9;
-	Mon, 20 Nov 2023 17:16:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCC2C433C8;
-	Mon, 20 Nov 2023 17:16:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700500597;
-	bh=jw/RJ/xWZ1Od9+kY38sBvcmKbT0pOQI6jAiYg5L6Gwk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ahP+0DGA1nAJt7p+vgHJpU6UpjyVaqVjB5Zz9ZBLbjSLBcP9MvtS+7ZWslBAPhnkD
-	 XpgP2dhKRtAmABl96o2ye3sDAIXgGnw2RVHqf2yOvfKIaTNrNwSifCSkUzexNhiHfs
-	 Ejpz6TdbSSXYxS1s8L/nclrCAhmpeagz/n0jC/4sOVjpRQeWxFiUueRbyYFM1HsUvd
-	 RxZMTIjp8QfhYfh87JGaAqrH307KnFw3xF+LwvTAB7M5AWO9D3Alm2sV+m7p4aR4To
-	 hMYNxBq3+/hmYdimYscdMB84FF5GUPY7YB3NISeGwxldJQ63rf1Rb6vwFQk00crxuA
-	 vSM6jygvmQbjA==
-Date: Mon, 20 Nov 2023 17:16:31 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Michalik <michal.michalik@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com, jonathan.lemon@gmail.com,
-	pabeni@redhat.com, poros@redhat.com, milena.olech@intel.com,
-	mschmidt@redhat.com, linux-clk@vger.kernel.org, bvanassche@acm.org,
-	kuba@kernel.org, davem@davemloft.net, edumazet@google.com
-Subject: Re: [PATCH RFC net-next v3 2/2] selftests/dpll: add DPLL system
- integration selftests
-Message-ID: <20231120171631.GB245676@kernel.org>
-References: <20231117190505.7819-1-michal.michalik@intel.com>
- <20231117190505.7819-3-michal.michalik@intel.com>
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07AFC3;
+	Mon, 20 Nov 2023 09:17:40 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 986E51BF205;
+	Mon, 20 Nov 2023 17:17:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700500659;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w4teWHQnp+D0qkH3bihHdSeNOl/p47PRZpIXgUC4HDY=;
+	b=NqRwhY2+f05Nry1E99Svu6kbDoDud6ovruayP+67cj6ikMO9tA+TJuC3IH4SESgIPsemRT
+	fGkab3bnPX3EUgU/FU9lsonOIavDqVKlcT9mGWoz07ecxNsmsWSI09ojOAYIcSB7aa0qp0
+	gmUw0w1fER66sYDijIp6/pe/uX78wwvEgOiqxzXEGvZ9C60uU7MtOU7fPNSStzveJuG5XT
+	ILuLCyZ/dwK/EPjVO1O1rr/xq3AeZ2DQoz1nDpxG4QphnpUuvpYyYtUqhbR1bPdgyw7o9e
+	PN8Nw0GzMcuT8AsbanrXDda+qcypNB7OXjUJ67L61CLOwwiVcm769G4RnMJp6g==
+Date: Mon, 20 Nov 2023 18:17:36 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231120181736.058fd6e2@kmaincent-XPS-13-7390>
+In-Reply-To: <20231120161004.flnwqv5dousiltcb@skbuf>
+References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
+	<20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
+	<20231118183433.30ca1d1a@kernel.org>
+	<20231120104439.15bfdd09@kmaincent-XPS-13-7390>
+	<20231120105255.cgbart5amkg4efaz@skbuf>
+	<20231120121440.3274d44c@kmaincent-XPS-13-7390>
+	<20231120120601.ondrhbkqpnaozl2q@skbuf>
+	<20231120144929.3375317e@kmaincent-XPS-13-7390>
+	<20231120142316.d2emoaqeej2pg4s3@skbuf>
+	<20231120155344.14cd69d9@kmaincent-XPS-13-7390>
+	<20231120161004.flnwqv5dousiltcb@skbuf>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231117190505.7819-3-michal.michalik@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Fri, Nov 17, 2023 at 08:05:05PM +0100, Michal Michalik wrote:
-> The tests are written in Python3 (3.7+) and pytest testing framework.
-> Framework is basing on the ynl library available in the kernel tree
-> at: tools/net/ynl
-> 
-> High level flow of DPLL subsystem integration selftests:
-> (after running run_dpll_tests.sh or 'make -C tools/testing/selftests')
-> 1) check if Python in correct version is installed,
-> 2) create temporary Python virtual environment,
-> 3) install all the required libraries,
-> 4) run the tests,
-> 5) do cleanup.
-> 
-> The DPLL system integration tests are meant to be part of selftests, so
-> they can be build and run using command:
->   make -C tools/testing/selftests
-> 
-> Alternatively, they can be run using single command [1]:
->   make kselftest
-> 
-> If we want to run only DPLL tests, we should set the TARGETS variable:
->   make -C tools/testing/selftests TARGETS=drivers/net/netdevsim/dpll
-> 
-> They can also be run standalone using starter script:
->   ./run_dpll_tests.sh
-> 
-> There is a possibliy to set optional PYTEST_PARAMS environment variable
-> to set the pytest options, like tests filtering ("-k <filter>") or
-> verbose output ("-v").
-> 
-> [1] https://www.kernel.org/doc/html/v5.0/dev-tools/kselftest.html
-> 
-> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+On Mon, 20 Nov 2023 18:10:04 +0200
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 
-...
+> On Mon, Nov 20, 2023 at 03:53:44PM +0100, K=C3=B6ry Maincent wrote:
+> > I did thought about it but I got stuck by the case of hardware timestam=
+ping
+> > without PHC. Richard explained the reason of its existence here:
+> > https://lore.kernel.org/netdev/ZS3MKWlnPqTe8gkq@hoboy.vegasvil.org/#t
+> >=20
+> > Maybe I got a bit stuck in my implementation and should investigate more
+> > your proposition and how to deal with this case. Do you have an idea on=
+ how
+> > to solve it? =20
+>=20
+> I would take what Richard said with a grain of salt, and interpret as
+> "there exists hardware with hwts but w/o PHC, and that may work for
+> marginal use cases", not that "we should design having that as a
+> first-class citizen in mind".
 
-> diff --git a/tools/testing/selftests/drivers/net/netdevsim/dpll/run_dpll_tests.sh b/tools/testing/selftests/drivers/net/netdevsim/dpll/run_dpll_tests.sh
-> new file mode 100755
-> index 0000000..3bed221
-> --- /dev/null
-> +++ b/tools/testing/selftests/drivers/net/netdevsim/dpll/run_dpll_tests.sh
-> @@ -0,0 +1,75 @@
-> +#!/usr/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Wraper script for running the DPLL system integration tests.
+> When elected as master, it kinda works, and does synchronize with a
+> slave, even if ptp4l gets confused about the phc_index being -1.
+>=20
+> But when elected as a slave by the BMCA, ptp4l gets confused and thinks
+> that phc_index =3D=3D -1 means that it's supposed to use software timesta=
+mping.
+>=20
+> So, I guess the only thing we need to do to this kind of setup is not do
+> too much harm to it.
+>=20
+> We break nothing if we make the phc_index the central aspect of hwts
+> layer selection - except for the fact that such a MAC won't be able to
+> change its timestamping layer to be a PHY.
+>=20
+> If we wanted to add such a capability to that MAC driver, the obvious
+> way to solve the lack of a PHC is to create a PHC that returns
+> -EOPNOTSUPP for all of its ptp_clock_info operations (gettime, settime
+> etc). It may possibly be that, in the worst case, ptp4l needs to probe
+> for each syscall on the NIC's PHC being operational before deciding what
+> can be done with it. But that's already an improvement over the current
+> handling to make it more graceful, it's not to keep things on par.
 
-nit: Wrapper
+Ok, you convinced me.
+Thanks for your arguments and spending time explaining it.
 
-     Also elsewhere in this patch.
 
-...
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
