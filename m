@@ -1,100 +1,81 @@
-Return-Path: <netdev+bounces-49279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F1B7F1780
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:40:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C9CE7F17EB
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:55:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B26C2282462
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:40:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA40F2826C0
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5B31DA29;
-	Mon, 20 Nov 2023 15:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD5B1DA30;
+	Mon, 20 Nov 2023 15:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oCgpEN1Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yjvQIh0F"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17DD1D55D;
-	Mon, 20 Nov 2023 15:39:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 161FBC433C9;
-	Mon, 20 Nov 2023 15:39:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700494797;
-	bh=JgmVlAD0SVlJwutybmB0QZ20Wz0K+sINDxYtLsbPzX8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oCgpEN1YXbuhuRySf7/jaCTIIj+j7Wj8bejNx/SYNsjABBuzqqSdM0NgPT05UNIWa
-	 Nvsx8gG6Ky9D8CNCBGuarzZ4hFb81oa9J8Kg4ehL4qcB6vck3OjH9LJOa1tZ72L0iA
-	 csiBwFfp31jDIAE2EbzI8KB2OdD0YXNLMFrHMMsSw/ZcxmeB8oBempmRHAWwapwObs
-	 GGzWEMdvXDducbBRvFYQE7cyngvjnPVbqOoAx4p11NBLrVw84zBZtphM2i7hItc8Xv
-	 XJzqlyXDQmpOfqhlnH6PH0/U3FVWaIXfg/0X9LTuBnDJdjpzVRL9CIP3VyTzKgYA51
-	 5+zB6irvoN7Xw==
-Date: Mon, 20 Nov 2023 15:39:48 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Claudiu <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	linux@armlinux.org.uk, geert+renesas@glider.be,
-	magnus.damm@gmail.com, mturquette@baylibre.com, sboyd@kernel.org,
-	linus.walleij@linaro.org, p.zabel@pengutronix.de, arnd@arndb.de,
-	m.szyprowski@samsung.com, alexandre.torgue@foss.st.com, afd@ti.com,
-	broonie@kernel.org, alexander.stein@ew.tq-group.com,
-	eugen.hristev@collabora.com, sergei.shtylyov@gmail.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.jz@bp.renesas.com,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: Re: [PATCH 09/14] dt-bindings: net: renesas,etheravb: Document
- RZ/G3S support
-Message-ID: <20231120-colonize-stagnant-014b8c3e088a@spud>
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-10-claudiu.beznea.uj@bp.renesas.com>
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA521A7
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:54:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xG7MmkhhfDASThdLFI7jdgsl+nkmbg8g3VVsC+Rw/3A=; b=yjvQIh0FOXAmL5mMJvOy7gZm6G
+	bvm/LnwnGmMMyADy8vrtmVZrblKwp3Ho7/MXqX8/g+/kfv+eR5ogoBUNSzoj8Sbq+8S7692v6indO
+	ZxdUndnuBntK7ImW1yvqYNHaq0f1U+tmuZgOhd7wQ12EyrblNy4AHlCJDFv+/hPWLmq4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r56bo-000f3Z-Rm; Mon, 20 Nov 2023 16:54:48 +0100
+Date: Mon, 20 Nov 2023 16:54:48 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jisheng Zhang <jszhang@kernel.org>
+Cc: HeinerKallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S.Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor.dooley@microchip.com>, netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [RFC] support built-in ethernet phy which needs some mmio
+ accesses
+Message-ID: <e3337e9e-a53d-4480-9a99-4594625450a1@lunn.ch>
+References: <ZVoUPW8pJmv5AT10@xhacker>
+ <b8c29d27-e0a2-4378-ba5f-6d95a438c023@lunn.ch>
+ <ZVtnRHsnDd+ZdZpq@xhacker>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EsTjh6DiHZ+G5q0D"
-Content-Disposition: inline
-In-Reply-To: <20231120070024.4079344-10-claudiu.beznea.uj@bp.renesas.com>
-
-
---EsTjh6DiHZ+G5q0D
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ZVtnRHsnDd+ZdZpq@xhacker>
 
-On Mon, Nov 20, 2023 at 09:00:19AM +0200, Claudiu wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->=20
-> Document Ethernet RZ/G3S support. Ethernet IP is similar to the one
-> available on RZ/G2L devices.
->=20
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> Per my understanding of the vendor code, it reads calibration data from
+> efuse
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Linux should have an API for accessing efuse data. So please make use
+of that.
 
-Cheers,
-Conor.
+What address space is
 
---EsTjh6DiHZ+G5q0D
-Content-Type: application/pgp-signature; name="signature.asc"
+#define REG_EPHY_TOP_WRAP 0x03009800
+#define REG_EPHY_BASE 0x03009000
 
------BEGIN PGP SIGNATURE-----
+in? Is this range dedicated to the PHY? Is it within the MAC address
+space?
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZVt9xAAKCRB4tDGHoIJi
-0pyUAP4uVNs4gjXhcdJ2Mkl6p+n4LaYxSVRlvGqfTmIxUltbsQD8CiHoPxqOlRnY
-S3CJKejSMjx7ZsCqXgD0ENkvFY5Pww8=
-=dkRN
------END PGP SIGNATURE-----
+Does the datasheet describe the PHY pages? I'm wondering if you can
+access the same registers via MDIO?
 
---EsTjh6DiHZ+G5q0D--
+Where is the MDIO driver? Since this is integrated into the silicon,
+it could be MDIO is not actually MDIO and is much faster. If you can
+access the same registers via MIDO, that would be the cleaner way to
+do it.
+
+   Andrew
 
