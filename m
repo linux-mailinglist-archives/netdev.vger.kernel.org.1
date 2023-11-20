@@ -1,73 +1,117 @@
-Return-Path: <netdev+bounces-49362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B64E7F1D31
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:17:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C088F7F1D45
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45D771C21480
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:17:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B84491C21522
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17ED5249FF;
-	Mon, 20 Nov 2023 19:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fEBfi4g6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72AF30F94;
+	Mon, 20 Nov 2023 19:24:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F055234546
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 19:17:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E71EC433C7;
-	Mon, 20 Nov 2023 19:17:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700507861;
-	bh=Fv3vr/kjHZEqkRI4ksHx4P5zjJGxHwUUPir/TAi533Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fEBfi4g6aMCmWAdb2Ha0H+ETu17ancDylb3UWYuDj3mP/fVL04ZkTuODpjOY9dmTc
-	 qT1vogF3BLKKnIudo4134BmYWC4FP1zh1Mxo63GGhEJhHL4E2WiIteiXTXgWA3jslQ
-	 XKUsdycBb6RuEPwN23kvbx6nyLs0tUPTG2qL+AjwbN6jtTG110Ov/Y3AY4V5nCPsdD
-	 0KHvp08/K/uPKWBQD64y/vMzRGPA7+SZoF4qzGtZO04gHOYSzz0HEEayHMhxqHmLsY
-	 rFkhpGywtisTw6EfmcX3xmjlTbXaEraCIwK9dJh96ZEVrwr95shNKkTwCmxkIp6FM5
-	 PoSjEvghxZarA==
-Date: Mon, 20 Nov 2023 11:17:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wintera@linux.ibm.com, wenjia@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, kgraul@linux.ibm.com,
- jaka@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com, raspl@linux.ibm.com,
- schnelle@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 5/7] net/smc: compatible with 128-bits extend
- GID of virtual ISM device
-Message-ID: <20231120111739.31baf90a@kernel.org>
-In-Reply-To: <1700402277-93750-6-git-send-email-guwen@linux.alibaba.com>
-References: <1700402277-93750-1-git-send-email-guwen@linux.alibaba.com>
-	<1700402277-93750-6-git-send-email-guwen@linux.alibaba.com>
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32062BB;
+	Mon, 20 Nov 2023 11:24:06 -0800 (PST)
+Received: from [192.168.1.103] (178.176.77.202) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
+ 2023 22:23:57 +0300
+Subject: Re: [PATCH 02/13] net: ravb: Use pm_runtime_resume_and_get()
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
+	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
+	<masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120084606.4083194-3-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a465e1fb-6ef8-0e10-1dc9-c6a17b955d11@omp.ru>
+Date: Mon, 20 Nov 2023 22:23:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20231120084606.4083194-3-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.77.202]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 19:12:43
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181488 [Nov 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.202
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/20/2023 19:16:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 4:24:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Sun, 19 Nov 2023 21:57:55 +0800 Wen Gu wrote:
-> According to virtual ISM support feature defined by SMCv2.1, GIDs of
-> virtual ISM device are UUIDs defined by RFC4122, which are 128-bits
-> long. So some adaptation work is required. And note that the GIDs of
-> existing platform firmware ISM devices still remain 64-bits long.
+On 11/20/23 11:45 AM, Claudiu wrote:
 
-sparse (C=1 build) complains:
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> pm_runtime_get_sync() may return with error. In case it returns with error
+> dev->power.usage_count needs to be decremented. pm_runtime_resume_and_get()
+> takes care of this. Thus use it.
+> 
+> Along with this pm_runtime_resume_and_get() and reset_control_deassert()
+> were moved before alloc_etherdev_mqs() to simplify the error path.
 
-net/smc/smc_clc.c:944:73: warning: incorrect type in argument 1 (different base types)
-net/smc/smc_clc.c:944:73:    expected unsigned short [usertype] chid
-net/smc/smc_clc.c:944:73:    got restricted __be16 [usertype] chid
--- 
-pw-bot: cr
+   I don't see how it simplifies the error path...
+   Re-ordering the statements at the end of the error path seems cheaper than
+what you do.
+
+> Also, in case pm_runtime_resume_and_get() returns error the reset signal
+> is deasserted and runtime PM is disabled (by jumping to the proper
+> error handling label).
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
+
+MBR, Sergey
 
