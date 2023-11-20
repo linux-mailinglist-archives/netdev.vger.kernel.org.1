@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F6B7F0C4A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:02:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85BD87F0C4E
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3FCF1C20CB3
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:02:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A6BA2812F9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5F653AC;
-	Mon, 20 Nov 2023 07:01:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7606FA5;
+	Mon, 20 Nov 2023 07:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="M4uAiFT6"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="BFOFMem4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E286C1726
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:30 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-3316c6e299eso1504307f8f.1
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:30 -0800 (PST)
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB721989
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:34 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3316bb1303bso1586039f8f.0
+        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700463689; x=1701068489; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1700463692; x=1701068492; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kf6nqUoubfvF4vGSjIN2fyq3fdRNvhqZWqSw1FrX9lg=;
-        b=M4uAiFT6YUuDV/y0uCUdOzfcYkM0BOPWxND9Zsvj5w+dWvtLStoWToeu/qnyvw9EyQ
-         FYeodN/JdPpi2wvLND7BnmEGmCtLaOsFAfUW4J/bdbOvizCtsfjHsruheAnoA8F+xJcj
-         51eE3pWRllev+b0ZrQWwq13reJt30rd3govBEQYqWJRziI0PlIEGD61H9b5q6UjDmIcw
-         5AzqxPoZkyrV5QTT/c7LtpcT88v3c3sE55mVk3aGkZNSOeQ/eJRkMTReGzJp7us9nJZw
-         6m76igSsVYXT/nFlFG7yWp1Z9Tuv4XOYcAhNKEf6HBd30dkxPjIP162P4SOZkS+CSeRb
-         0hMQ==
+        bh=nkcJv/n25yVcOiFtcSZqk6XZG7ziIP0OV/0d8NOsfDc=;
+        b=BFOFMem4itbBhisA6WH4jN48nS0ZNRBh4t2Ptd7TZzo2t1IaLM4ZkLR/KdJ7J+6dtJ
+         mLYKQ68WxQSsh9oRdyez6fXFQ4vLpSNpfWrv7LB5e5LEEYDu6dAqg3ZRk64QAKu8Tpf7
+         OZbNPzLsSIWUzCQ9X3ySLxMGb71G/m6Auu6SGey0pmBBsdC+PRcTv4OZJfeyvrZmgS4G
+         VbvLDHus6g4o2CQWPnHEa0inuwtU19h3NzPu96s3xVqupDaSRwjEXgoRPBAQbUStiHoG
+         ieSey+YhM1+7rWs/f6mx6w2RJnWTD+3Mx5VuWceh6Q+WbfcjAHucjwnzZmmPEVkziNyj
+         YODA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700463689; x=1701068489;
+        d=1e100.net; s=20230601; t=1700463692; x=1701068492;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kf6nqUoubfvF4vGSjIN2fyq3fdRNvhqZWqSw1FrX9lg=;
-        b=OHuFRAkbFk927f+MpUThc7UA+7vEPtQXAHYekbyzM5N2bwZW7mzBJ6OcO+fNd+5uKU
-         /faXTTSfX6kvoQ7AWmbj1jpx6F3uSghX6mfQKhlo3OCj4T8AhlwJArmVwNYOer36+y3E
-         ZZpAY2JNdZfZ+yyQUIbh6Ra1H05jvUsXGTo4QlwCtdBO0ZAEkMy+ZkGCKTPEgQ3C4Lrb
-         F29NegT8dYetiGPAOP9kqGsct2noarfp+5uJYuAKT81YY6BM3gSx30TCmGmbe+M1IaQb
-         9Nh2RsjdC1wJVSNqYqNH1NZXmjWFdfTUk7sAsGZbjbdvrQsO+UpIXt9uum+xUHpvd8SU
-         3qww==
-X-Gm-Message-State: AOJu0YwoP6SGD6gZMoMzuqbw78byabP6tcZta32lfxth7AXzkO8p/uTm
-	dGhNMdWiiSrm3chxBrP9VCuBLvDHcGpxJk7bBLc=
-X-Google-Smtp-Source: AGHT+IEYA480uU3PYmOPPZkYag60VVo3otAt6tbJovUushdq8KM2+SzL0I4iXX1GYwhzP5W6ORWA7w==
-X-Received: by 2002:a5d:5f89:0:b0:32f:7bf6:db01 with SMTP id dr9-20020a5d5f89000000b0032f7bf6db01mr4597804wrb.67.1700463689323;
-        Sun, 19 Nov 2023 23:01:29 -0800 (PST)
+        bh=nkcJv/n25yVcOiFtcSZqk6XZG7ziIP0OV/0d8NOsfDc=;
+        b=dtVf9p+9q62vVA1hLTpNMgyteZPlRpU2/vFtUlaK/VXbSJNDwcBZYevlMazzi63ABQ
+         xLvwmAlszRtmmeqgnnuKMf/b/mXMVSHTUYg62OPgK2j7kfHQHzS8+cWuDOpOO+8wfuB1
+         eZqbZr90ppo/HJ7O0GC8TWZBumyTHNU+Hevt2cpI48pIpVN27qhqwLZn5xEht/Heh9dJ
+         PgvwFKa9a28m31LHt+YWbZM34JWdj3zSZfrGymj/E8QamURWMJAe/cGMTawNC10iYaaA
+         GkMZgQoGUvsVZb9fK+UMXFsPI/FhOKiKvnBJeP+MlSW6CVUTVwJhTHfnKJCL72LEV968
+         Lotw==
+X-Gm-Message-State: AOJu0YwamiTQBwWt2LSLxGk5caHiNSDnW6oxaauGdq5cgCsb7FW5GAKH
+	CADo9smBKCK6yVXgIIr3j/j7NA==
+X-Google-Smtp-Source: AGHT+IEBLuefbg1njE14kEGbqq0fRVMDaq5GwcjTSHn9CnqkZZMPo7YgEjo/NJi89a64TaVjABT6og==
+X-Received: by 2002:adf:e98d:0:b0:31f:9838:dfc4 with SMTP id h13-20020adfe98d000000b0031f9838dfc4mr3893259wrm.33.1700463692126;
+        Sun, 19 Nov 2023 23:01:32 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.26
+        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 23:01:29 -0800 (PST)
+        Sun, 19 Nov 2023 23:01:31 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -89,9 +89,9 @@ Cc: linux-renesas-soc@vger.kernel.org,
 	linux-gpio@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 09/14] dt-bindings: net: renesas,etheravb: Document RZ/G3S support
-Date: Mon, 20 Nov 2023 09:00:19 +0200
-Message-Id: <20231120070024.4079344-10-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH 10/14] arm64: renesas: r9a08g045: Add Ethernet nodes
+Date: Mon, 20 Nov 2023 09:00:20 +0200
+Message-Id: <20231120070024.4079344-11-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
@@ -105,26 +105,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Document Ethernet RZ/G3S support. Ethernet IP is similar to the one
-available on RZ/G2L devices.
+Add Ethernet nodes available on RZ/G3S (R9A08G045).
 
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 ---
- Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/renesas/r9a08g045.dtsi | 32 ++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-index 5d074f27d462..38b71e687513 100644
---- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-+++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-@@ -58,6 +58,7 @@ properties:
-               - renesas,r9a07g043-gbeth # RZ/G2UL
-               - renesas,r9a07g044-gbeth # RZ/G2{L,LC}
-               - renesas,r9a07g054-gbeth # RZ/V2L
-+              - renesas,r9a08g045-gbeth # RZ/G3S
-           - const: renesas,rzg2l-gbeth  # RZ/{G2L,G2UL,V2L} family
+diff --git a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
+index 6c7b29b69d0e..1caa0587fdd4 100644
+--- a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
++++ b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
+@@ -149,6 +149,38 @@ sdhi2: mmc@11c20000 {
+ 			status = "disabled";
+ 		};
  
-   reg: true
++		eth0: ethernet@11c30000 {
++			compatible = "renesas,r9a08g045-gbeth", "renesas,rzg2l-gbeth";
++			reg = <0 0x11c30000 0 0x10000>;
++			interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "mux", "fil", "arp_ns";
++			clocks = <&cpg CPG_MOD R9A08G045_ETH0_CLK_AXI>,
++				 <&cpg CPG_MOD R9A08G045_ETH0_CLK_CHI>,
++				 <&cpg CPG_MOD R9A08G045_ETH0_REFCLK>;
++			clock-names = "axi", "chi", "refclk";
++			resets = <&cpg R9A08G045_ETH0_RST_HW_N>;
++			power-domains = <&cpg>;
++			status = "disabled";
++		};
++
++		eth1: ethernet@11c40000 {
++			compatible = "renesas,r9a08g045-gbeth", "renesas,rzg2l-gbeth";
++			reg = <0 0x11c40000 0 0x10000>;
++			interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
++			interrupt-names = "mux", "fil", "arp_ns";
++			clocks = <&cpg CPG_MOD R9A08G045_ETH1_CLK_AXI>,
++				 <&cpg CPG_MOD R9A08G045_ETH1_CLK_CHI>,
++				 <&cpg CPG_MOD R9A08G045_ETH1_REFCLK>;
++			clock-names = "axi", "chi", "refclk";
++			resets = <&cpg R9A08G045_ETH1_RST_HW_N>;
++			power-domains = <&cpg>;
++			status = "disabled";
++		};
++
+ 		gic: interrupt-controller@12400000 {
+ 			compatible = "arm,gic-v3";
+ 			#interrupt-cells = <3>;
 -- 
 2.39.2
 
