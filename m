@@ -1,113 +1,101 @@
-Return-Path: <netdev+bounces-49106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3224C7F0DC5
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:41:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468C57F0DC9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9434B211BD
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:41:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01DA12816CA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C496FD0;
-	Mon, 20 Nov 2023 08:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA807474;
+	Mon, 20 Nov 2023 08:42:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcJ9DPOg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39D8283;
-	Mon, 20 Nov 2023 00:41:36 -0800 (PST)
-Received: from [192.168.1.103] (31.173.86.165) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
- 2023 11:41:25 +0300
-Subject: Re: [PATCH 12/14] arm64: dts: renesas: Improve documentation for
- SW_SD0_DEV_SEL
-To: Claudiu <claudiu.beznea@tuxon.dev>, <s.shtylyov@omp.ru>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<linux@armlinux.org.uk>, <geert+renesas@glider.be>, <magnus.damm@gmail.com>,
-	<mturquette@baylibre.com>, <sboyd@kernel.org>, <linus.walleij@linaro.org>,
-	<p.zabel@pengutronix.de>, <arnd@arndb.de>, <m.szyprowski@samsung.com>,
-	<alexandre.torgue@foss.st.com>, <afd@ti.com>, <broonie@kernel.org>,
-	<alexander.stein@ew.tq-group.com>, <eugen.hristev@collabora.com>,
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, <biju.das.jz@bp.renesas.com>
-CC: <linux-renesas-soc@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-clk@vger.kernel.org>,
-	<linux-gpio@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
- <20231120070024.4079344-13-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <87d30cc4-d7c3-42fd-a1b9-0e17c02e265b@omp.ru>
-Date: Mon, 20 Nov 2023 11:41:24 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9206FAD;
+	Mon, 20 Nov 2023 08:42:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13542C433C7;
+	Mon, 20 Nov 2023 08:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700469729;
+	bh=fLc5vRlCd94li3PsvI3TLAtWvXpeLlLbzMXnMlcIdI8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BcJ9DPOgFkqPd7ZJjvJ2Qr6UnvMDCu7Zuc/oJqUVY6BTzNPb5buqv26BDe0TtDK6p
+	 kSO/Xr1IwDi0B3kVDdJSpQeNFV4gaB2au8VC50tp48ZM4j5g9yCVj2RZ/G8+2VU9lv
+	 4nr20aovcyOcZCPqgYBYsxfJNvbA+HX6w5mAP83MQwuA4YgS9Z37Llnc+JgY0p3AYK
+	 U5VEL4PX/Cx8eCNNyWeng2gwTYpDMf5BLk14ZWvD0+uQXJgS6IvPcKVYjQ5E6nE4fX
+	 m5b77KdG8BsnqY+OB7H2zWt7YQbTCo3W5kuZIo6pSm45XXmVMv6+QQvKhi/ukca3Oe
+	 WnhgmYemLbrKw==
+Date: Mon, 20 Nov 2023 08:42:05 +0000
+From: Simon Horman <horms@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next] selftests: net: verify fq per-band packet limit
+Message-ID: <20231120084205.GI186930@vergenet.net>
+References: <20231116203449.2627525-1-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20231120070024.4079344-13-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [31.173.86.165]
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 08:12:39
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 181469 [Nov 20 2023]
-X-KSE-AntiSpam-Info: Version: 6.0.0.2
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.165 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.165 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.165
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 11/20/2023 08:18:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 7:13:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116203449.2627525-1-willemdebruijn.kernel@gmail.com>
 
-On 11/20/23 10:00 AM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On Thu, Nov 16, 2023 at 03:34:43PM -0500, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
-> Add switch OFF/OFF description to values of SW_SD0_DEV_SEL for
-
-   OFF/ON probably?
-
-> better understanding.
+> Commit 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR
+> scheduling") introduces multiple traffic bands, and per-band maximum
+> packet count.
 > 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+> Per-band limits ensures that packets in one class cannot fill the
+> entire qdisc and so cause DoS to the traffic in the other classes.
+> 
+> Verify this behavior:
+>   1. set the limit to 10 per band
+>   2. send 20 pkts on band A: verify that 10 are queued, 10 dropped
+>   3. send 20 pkts on band A: verify that  0 are queued, 20 dropped
+>   4. send 20 pkts on band B: verify that 10 are queued, 10 dropped
+> 
+> Packets must remain queued for a period to trigger this behavior.
+> Use SO_TXTIME to store packets for 100 msec.
+> 
+> The test reuses existing upstream test infra. The script is a fork of
+> cmsg_time.sh. The scripts call cmsg_sender.
+> 
+> The test extends cmsg_sender with two arguments:
+> 
+> * '-P' SO_PRIORITY
+>   There is a subtle difference between IPv4 and IPv6 stack behavior:
+>   PF_INET/IP_TOS        sets IP header bits and sk_priority
+>   PF_INET6/IPV6_TCLASS  sets IP header bits BUT NOT sk_priority
+> 
+> * '-n' num pkts
+>   Send multiple packets in quick succession.
+>   I first attempted a for loop in the script, but this is too slow in
+>   virtualized environments, causing flakiness as the 100ms timeout is
+>   reached and packets are dequeued.
+> 
+> Also do not wait for timestamps to be queued unless timestamps are
+> requested.
+> 
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-MBR, Sergey
+Thanks Willem,
+
+this looks nice and clean to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
