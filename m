@@ -1,209 +1,92 @@
-Return-Path: <netdev+bounces-49269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 181C47F159B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:24:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FF47F15C9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:35:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 183571C2166C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:24:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E7D828243B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B705B1C29C;
-	Mon, 20 Nov 2023 14:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="CMy+wbKa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A961C13FEC;
+	Mon, 20 Nov 2023 14:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1848CED
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:24:12 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-5ac376d311aso46955207b3.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:24:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700490251; x=1701095051; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+gEPY1LrqSmpJpaiBqSwRLrjpD0QQobLoZxYD8R11t8=;
-        b=CMy+wbKa4VEfIl3m/M9h9ipgnwqgTeRjDHng4c134YI4jiRzA0qngHWj/9iuQIQvUC
-         om45wbJqgTqRqvYK7qYisyx1kc8Qq8OuoaFZxdgLxF0nwLSok6eZ/QKMS6UU0JRLYIZu
-         P4FwHVDzGd4k39ogmv2g2XORDrF0BXKEli7+BFjcBC67YGSk2bk/QU66+HJV+Tzra0mZ
-         rTktotfvK6/kOGHcl3KqMsCpoqzyZdVQfvAs840JADyGJ5ypyVLP8VfOSR0g6P+6U3ec
-         0KfrKPFB8p71YBB6LWVEtAlqnroMrX3RdmLWFoc93NYzIdWEK7sufE14TBmEu8YNi+ar
-         YeTw==
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67322138
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:35:21 -0800 (PST)
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5b9344d72bbso5985540a12.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:35:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700490251; x=1701095051;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+gEPY1LrqSmpJpaiBqSwRLrjpD0QQobLoZxYD8R11t8=;
-        b=qKDU8U7r5m9FZsxjnkBxBRYwIpdD7jZGJwnq2tGIVwQbmLjstbM2gEic6UT54L3Ozy
-         5Yj6slBY9O9O4N8bgx/uVbKbC5Nivn0CQygUgdSVJdzenBRwtgDVxgGn46NawlpDmQGG
-         Wp7bdv3vNaFSHjzWoPxAVoFynOVKeBprT4twRC4wseAjXo8G0Ko3NJlzGqaJmQciLtX7
-         W3xenMjT6jKfOot6/5RmJO2X61soxs8FV91KMVqAsW90Nne1vruW1CNO3gPjv32i+bvV
-         WQfBh+RPvMlXJvpp7yAmfu12te5WlF+xGdQtWOq6lna56okhAedCx843CAGGaNSFUyOv
-         obsg==
-X-Gm-Message-State: AOJu0YzQtB/9txbLrMTQ1KRaqfEfjnIjscoKxVtRqDsdg3a/1R7Zo02S
-	bhR5HtlEZyMO2h9S1a+pH44waEb+dVqhNk1iWtl5HA==
-X-Google-Smtp-Source: AGHT+IFeHC4UiMPvP5jBdv2iBd5hnYUbS8LGBIcinijndQSUO2w/jcwpjHm5CaA9CaIcgZsQjXigkctZPJI/ItLcqcs=
-X-Received: by 2002:a81:7e50:0:b0:5ca:d5b9:9da3 with SMTP id
- p16-20020a817e50000000b005cad5b99da3mr1608670ywn.41.1700490251213; Mon, 20
- Nov 2023 06:24:11 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700490921; x=1701095721;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l7LnU8RknCJWsPsqm7RXDpRlRmyk9PFdTymemdD1BB0=;
+        b=ZJL19H01qKXCFzZTr//ms1teKCEgcCcomLiQNtXY6KMLczBmvGCY7GwAAQ8OiwlRHy
+         Mfh4kL7qDLEjteO+UvBsmQ87iRTK7FBz1bipCKajzeR9O+Z2NaIyqOQfO96GLgwQWDJS
+         cb27gr8xMB/L7p0z93PXhNn3V06l6dE/hFxIPW0zz7olIRPUutpY/P0RXMQFAkHDcCoo
+         AiunYfkNd/Mopr5SvqDbS9+l89e3aX3sH5jJ99xyTTryw7KgH6SBiqi0CHMJRjkqkgXp
+         uVY1TP7uZw0yt8F8pKzuuXPgG91I94nAu+I6rGZxP0ASi6bmpGSc72FzpXZvYmyp0t8/
+         36Ww==
+X-Gm-Message-State: AOJu0Yy8YmONdM4S5yVLlalxACTB8s5aS4HFx8KrRC0LqK0X/+L40rnK
+	O1Shalwxn5NZG/Q1sKhgX4GABwIaTAscrWsfXiOCho9+QOhM
+X-Google-Smtp-Source: AGHT+IEzo56JbmoqVwXpNg8mySCpYTtfjo3yW4Qe9XqQZVtkbrSYD8LRgMtcpz+jO1iIYLRpugHW71s2+YOd//5V4KN6QrJvxIwu
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116145948.203001-1-jhs@mojatatu.com> <655707db8d55e_55d7320812@john.notmuch>
- <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
- <6557b2e5f3489_5ada920871@john.notmuch> <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
- <ZVspOBmzrwm8isiD@nanopsycho>
-In-Reply-To: <ZVspOBmzrwm8isiD@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 20 Nov 2023 09:23:59 -0500
-Message-ID: <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org, 
-	deb.chatterjee@intel.com, anjali.singhai@intel.com, Vipin.Jain@amd.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
-	dan.daly@intel.com, chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+X-Received: by 2002:a65:6897:0:b0:5c2:1816:24c5 with SMTP id
+ e23-20020a656897000000b005c2181624c5mr1598710pgt.10.1700490920919; Mon, 20
+ Nov 2023 06:35:20 -0800 (PST)
+Date: Mon, 20 Nov 2023 06:35:20 -0800
+In-Reply-To: <0000000000009393ba059691c6a3@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000490858060a96651c@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in j1939_session_get_by_addr
+From: syzbot <syzbot+d9536adc269404a984f8@syzkaller.appspotmail.com>
+To: Jose.Abreu@synopsys.com, arvid.brodin@alten.se, davem@davemloft.net, 
+	dvyukov@google.com, ilias.apalodimas@linaro.org, joabreu@synopsys.com, 
+	jose.abreu@synopsys.com, kernel@pengutronix.de, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux@rempel-privat.de, mkl@pengutronix.de, 
+	netdev@vger.kernel.org, nogikh@google.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com, 
+	tonymarislogistics@yandex.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 20, 2023 at 4:39=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Nov 17, 2023 at 09:46:11PM CET, jhs@mojatatu.com wrote:
-> >On Fri, Nov 17, 2023 at 1:37=E2=80=AFPM John Fastabend <john.fastabend@g=
-mail.com> wrote:
-> >>
-> >> Jamal Hadi Salim wrote:
-> >> > On Fri, Nov 17, 2023 at 1:27=E2=80=AFAM John Fastabend <john.fastabe=
-nd@gmail.com> wrote:
-> >> > >
-> >> > > Jamal Hadi Salim wrote:
->
-> [...]
->
->
-> >>
-> >> I think I'm judging the technical work here. Bullet points.
-> >>
-> >> 1. p4c-tc implementation looks like it should be slower than a
-> >>    in terms of pkts/sec than a bpf implementation. Meaning
-> >>    I suspect pipeline and objects laid out like this will lose
-> >>    to a BPF program with an parser and single lookup. The p4c-ebpf
-> >>    compiler should look to create optimized EBPF code not some
-> >>    emulated switch topology.
-> >>
-> >
-> >The parser is ebpf based. The other objects which require control
-> >plane interaction are not - those interact via netlink.
-> >We published perf data a while back - presented at the P4 workshop
-> >back in April (was in the cover letter)
-> >https://github.com/p4tc-dev/docs/blob/main/p4-conference-2023/2023P4Work=
-shopP4TC.pdf
-> >But do note: the correct abstraction is the first priority.
-> >Optimization is something we can teach the compiler over time. But
-> >even with the minimalist code generation you can see that our approach
-> >always beats ebpf in LPM and ternary. The other ones I am pretty sure
->
-> Any idea why? Perhaps the existing eBPF maps are not that suitable for
-> this kinds of lookups? I mean in theory, eBPF should be always faster.
+This bug is marked as fixed by commit:
+can: j1939: transport: make sure the aborted session will be deactivated only once
 
-We didnt look closely; however, that is not the point - the point is
-the perf difference if there is one, is not big with the big win being
-proper P4 abstraction. For LPM for sure our algorithmic approach is
-better. For ternary the compute intensity in looping is better done in
-C. And for exact i believe that ebpf uses better hashing.
-Again, that is not the point we were trying to validate in those experiment=
-s..
+But I can't find it in the tested trees[1] for more than 90 days.
+Is it a correct commit? Please update it by replying:
 
-On your point of "maps are not that suitable" P4 tables tend to have
-very specific attributes (examples associated meters, counters,
-default hit and miss actions, etc).
+#syz fix: exact-commit-title
 
-> >we can optimize over time.
-> >Your view of "single lookup" is true for simple programs but if you
-> >have 10 tables trying to model a 5G function then it doesnt make sense
-> >(and i think the data we published was clear that you gain no
-> >advantage using ebpf - as a matter of fact there was no perf
-> >difference between XDP and tc in such cases).
-> >
-> >> 2. p4c-tc control plan looks slower than a directly mmaped bpf
-> >>    map. Doing a simple update vs a netlink msg. The argument
-> >>    that BPF can't do CRUD (which we had offlist) seems incorrect
-> >>    to me. Correct me if I'm wrong with details about why.
-> >>
-> >
-> >So let me see....
-> >you want me to replace netlink and all its features and rewrite it
-> >using the ebpf system calls? Congestion control, event handling,
-> >arbitrary message crafting, etc and the years of work that went into
-> >netlink? NO to the HELL.
->
-> Wait, I don't think John suggests anything like that. He just suggests
-> to have the tables as eBPF maps.
+Until then the bug is still considered open and new crashes with
+the same signature are ignored.
 
-What's the difference? Unless maps can do netlink.
+Kernel: Linux
+Dashboard link: https://syzkaller.appspot.com/bug?extid=d9536adc269404a984f8
 
-> Honestly, I don't understand the
-> fixation on netlink. Its socket messaging, memcpies, processing
-> overhead, etc can't keep up with mmaped memory access at scale. Measure
-> that and I bet you'll get drastically different results.
->
-> I mean, netlink is good for a lot of things, but does not mean it is an
-> universal answer to userspace<->kernel data passing.
+---
+[1] I expect the commit to be present in:
 
-Here's a small sample of our requirements that are satisfied by
-netlink for P4 object hierarchy[1]:
-1. Msg construction/parsing
-2. Multi-user request/response messaging
-3. Multi-user event subscribe/publish messaging
+1. for-kernelci branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git
 
-I dont think i need to provide an explanation on the differences here
-visavis what ebpf system calls provide vs what netlink provides and
-how netlink is a clear fit. If it is not clear i can give more
-breakdown. And of course there's more but above is a good sample.
+2. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git
 
-The part that is taken for granted is the control plane code and
-interaction which is an extremely important detail. P4 Abstraction
-requires hierarchies with different compiler generated encoded path
-ids etc. This ID mapping gets exacerbated by having multitudes of  P4
-programs which have different requirements. Netlink is a natural fit
-for this P4 abstraction. Not to mention the netlink/tc path (and in
-particular the ID mapping) provides a conduit for offload when that is
-needed.
-eBPF is just a tool - and the objects are intended to be generic - and
-i dont see how any of this could be achieved without retooling to make
-it more specific to P4.
+3. master branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
 
-cheers,
-jamal
+4. main branch of
+git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git
 
-
-
->
-> >I should note: that there was an interesting talk at netdevconf 0x17
-> >where the speaker showed the challenges of dealing with ebpf on "day
-> >two" - slides or videos are not up yet, but link is:
-> >https://netdevconf.info/0x17/sessions/talk/is-scaling-ebpf-easy-yet-a-sm=
-all-step-to-one-server-but-giant-leap-to-distributed-network.html
-> >The point the speaker was making is it's always easy to whip an ebpf
-> >program that can slice and dice packets and maybe even flush LEDs but
-> >the real work and challenge is in the control plane. I agree with the
-> >speaker based on my experiences. This discussion of replacing netlink
-> >with ebpf system calls is absolutely a non-starter. Let's just end the
-> >discussion and agree to disagree if you are going to keep insisting on
-> >that.
->
->
-> [...]
+The full list of 9 trees can be found at
+https://syzkaller.appspot.com/upstream/repos
 
