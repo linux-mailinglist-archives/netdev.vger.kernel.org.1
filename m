@@ -1,90 +1,73 @@
-Return-Path: <netdev+bounces-49148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FF67F0EE9
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:22:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137807F0EEF
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 264DB1C21197
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:22:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C66CB21623
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC1E10A29;
-	Mon, 20 Nov 2023 09:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F3D11184;
+	Mon, 20 Nov 2023 09:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gDJG1iyf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hgTshboG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F3AB8;
-	Mon, 20 Nov 2023 01:22:23 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AEDD340011;
-	Mon, 20 Nov 2023 09:22:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700472142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hUL7lI12RbRGqL5GHxALD646PpmFiPkKK5/6ME+lyzs=;
-	b=gDJG1iyfmHtwajMwEaMwCMFpErFIGtH6+SVMJLqpGGmpw0Sbp3H5VHoTstybcIsxR4wM0S
-	C8Xq5yefllEnsTlI8ZlP/EUro8VW3sF5EI/LMUMsK9AyFykUHnzaHIzDr6nhcFA9m6xGLe
-	GIrU2cuw9sHQLJY+TZNQXY9LVyPFeHDz3qGOW0pZ+1GZF+C+BMIH1DRy4H38HcdxBjdnt/
-	bDjozbjFNy9/JsPdo7Lm5qXSHJ0SWhsxwCOxhcyOvWEJe1qGrY3YWuKICio2g0/KREMKFo
-	+mEKxlohtQ28qkblRZzSfYicOJepHQsJhIyJKyD6ibu/EXJCF1GroxM7DeVtFA==
-Date: Mon, 20 Nov 2023 10:22:20 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3E510A2C
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:24:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F54C433C8;
+	Mon, 20 Nov 2023 09:24:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700472258;
+	bh=fxoh0pL86/4smqTnSz9uKd5qu4zvJ+xr/Q1R84vNLWI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hgTshboGGQ6fGpXAFrlgRaNE1lTG+TrNz3ovLNYYeMS21Fxm0FZwEFNl9JGdU16l5
+	 B/Yn1RZQYHpZaEua2Vcpivx0aV51hisexo/ZHwUqFLAkpsXTu5hpB6+F6KPv7isr5p
+	 VYzMdFLpl+DJsgOhutSTecygoVI0SQgDNHP6mWWGPUl2+qo7khZddxw9gaqLTiPdpA
+	 /rnSIUKz/izvwehsN7/iBifoZ8EnW7b20A05qWfoxopWZuimCswm3tBzg0gruONpW+
+	 +rZjUxE65Xpt1ibUi5sWqSp0vXCU6tQb3PiUQ0yfRNuBy05VmHNdes/XHQF8xAKQLO
+	 XuNu7iMG321yQ==
+Date: Mon, 20 Nov 2023 09:24:14 +0000
+From: Simon Horman <horms@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 0/9] net: Add support for Power over Ethernet
- (PoE)
-Message-ID: <20231120102220.01528782@kmaincent-XPS-13-7390>
-In-Reply-To: <20231118155937.4c297ddb@kernel.org>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
-	<20231118155937.4c297ddb@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Cc: Tobias Klauser <tklauser@distanz.ch>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next] indirect_call_wrapper: Fix typo in
+ INDIRECT_CALL_$NR kerneldoc
+Message-ID: <20231120092414.GJ186930@vergenet.net>
+References: <20231114104202.4680-1-tklauser@distanz.ch>
+ <20231115175626.GW74656@kernel.org>
+ <20231116010310.4664dd38@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231116010310.4664dd38@kernel.org>
 
-On Sat, 18 Nov 2023 15:59:37 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, Nov 16, 2023 at 01:03:10AM -0500, Jakub Kicinski wrote:
+> On Wed, 15 Nov 2023 17:56:26 +0000 Simon Horman wrote:
+> > To the netdev maintainers: get_maintainer.pl doesn't seem to
+> > know much about include/linux/indirect_call_wrapper.h.
+> > Should that be fixed?
+> 
+> I'm curious how many of such files exist under include/linux.
+> Files which are not really networking specific but only tree
+> the changes ever went thru is netdev.. 
+> But yes, in the interest of "taking responsibility" we should
+> probably claim it.
 
-> On Thu, 16 Nov 2023 15:01:32 +0100 Kory Maincent wrote:
-> > This patch series aims at adding support for PoE (Power over Ethernet),
-> > based on the already existing support for PoDL (Power over Data Line)
-> > implementation. In addition, it adds support for one specific PoE
-> > controller, the Microchip PD692x0.
-> >=20
-> > In detail:
-> > - Patch 1 to 6 prepare net to support PoE devices.
-> > - Patch 7 adds a new error code to firmware upload API.
-> > - Patch 8 and 9 add PD692x0 PoE PSE controller driver and its binding. =
-=20
->=20
-> You haven't CCed Oleksij or am I blind?
+Thanks, patch sent.
 
-
-Oh right, I forgot he was not described as maintainer for pse-pd drivers
-subsystem.
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Link: https://lore.kernel.org/netdev/20231120-indirect_call_wrapper-maintainer-v1-1-0a6bb1f7363e@kernel.org/
 
