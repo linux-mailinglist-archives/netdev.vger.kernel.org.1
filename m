@@ -1,138 +1,219 @@
-Return-Path: <netdev+bounces-49267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47E77F1593
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:22:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC91B7F1599
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C28C281FF6
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:22:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B20EB21791
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397981C68E;
-	Mon, 20 Nov 2023 14:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5BF1C68F;
+	Mon, 20 Nov 2023 14:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="geChQ2qN"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="VIyvLhG2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7F8CA
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:22:13 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-548d1f8b38bso1083564a12.3
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:22:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1700490132; x=1701094932; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cZQIuPK229h/rgcRWK4xDP2y2LX7BP7lfAx4sG2QoMQ=;
-        b=geChQ2qNL0kQc7J2zvWkk3mcpXnnaMIRr0duooFTzRugGMMzYGemmxTz1rCP4NXfSZ
-         /9m/Kc5rRm/pngb3lBzXE1uCpOs9eYDCZ0pJ3Kcp4FgRZ2oDoY3XKbjSeQMqvz5RdIPQ
-         evBf2KE3b3WEuqnUVLGNKGH6vGNyvo7r5xmrStVsKixREJsV4a9JPGAE4YENwd614io3
-         JkBDA4JztPd0rp5I2W7yhrid1VQZlbh/DV2Wez7clfY1hIQxrGhaiBlgp5XuvZeaFbiW
-         VQQtCvNa0YPu5M34bJhHm2Pvjwy5Xz4WKyo+3oySs1SOs1MkJHIM5Ol8W5wkRz3Z9n+L
-         O6aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700490132; x=1701094932;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cZQIuPK229h/rgcRWK4xDP2y2LX7BP7lfAx4sG2QoMQ=;
-        b=RIsJk2IsJekVeiCOUImORqxcu6uct/p5Q+lp9gAqKZ/uUw+Ydtlu1uFURIy2OqMDxH
-         aZBxRQm669sjzcIjxYAaA1ZEAGPPEq5vIDdPCSx7XO0BBP0W38SSGtPtqiVosrDlTUWR
-         8Q//8pg6B7xDnjt5iZ13tvtRqEu9XTHQXqi0JopbH4kPzCx0dMsqQq0n36OjSww2e5oY
-         N3xAMmFuG4ncRfU+cIdUzixJfQOrGX/nwSXB93XpTzlIF99DLJw5dL/UPG9MaaBzkXxA
-         qzH1SxQ1nu1s8sQkVjENeI+CA5XPDnGF/jp5ytHS2QaLNOTXDsfKNYO4qac5uXrQToIR
-         CiqA==
-X-Gm-Message-State: AOJu0YzEYXLWf2tICgBk+ktEi4bQCGKHETUJDjYtFngmVt4eJVzmKzdX
-	+IzC6B3iV3oTyNvA8tmGIO9G9j1wQ3DsF30tqTo=
-X-Google-Smtp-Source: AGHT+IE/63QjYOZe7XTDmHiKSmQP0pwu5jCqTNBHPW13CP9eV453g3SUyQgky9XTo4Zw3wJWDDkz+Q==
-X-Received: by 2002:a17:906:4a50:b0:9c2:a072:78bf with SMTP id a16-20020a1709064a5000b009c2a07278bfmr5527291ejv.26.1700490131960;
-        Mon, 20 Nov 2023 06:22:11 -0800 (PST)
-Received: from [192.168.201.100] (178235187204.dynamic-4-waw-k-2-3-0.vectranet.pl. [178.235.187.204])
-        by smtp.gmail.com with ESMTPSA id lx23-20020a170906af1700b009b65a834dd6sm3897400ejb.215.2023.11.20.06.22.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 06:22:11 -0800 (PST)
-Message-ID: <10dc0fff-fc00-4c1f-97cf-30c5e5e8f983@linaro.org>
-Date: Mon, 20 Nov 2023 15:22:08 +0100
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2084.outbound.protection.outlook.com [40.107.7.84])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF60ED;
+	Mon, 20 Nov 2023 06:23:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XTbRu9DXMDB5w+dTFQttsrAYUVLjEJ922Re3zQxIiZAmLoIFbusOHplmUrYYmtye6kdNTNA6GMBhL4PGrpe/UeZrhldzjdHAwlUBPZHMoMMgy1HUmyrPAq0rvu5jwFBydiXcKDbRHJzvlSG99vpGwQqUXWF0cgzaFphB9rUpAVLjBi0rUlUSA3F5kQQMLBGZGmWZZwWghN6pHyYd1y7JomNeZz+MMcwaEpFcI7Q/m+LCjPaf7J3r9cRw14/iSsWk5lJOi2HAcdVaCLSTktI3XgYl36oVGuzF4s7RtZIKA/WuxzGZnEfw0Xpn7JU5SXP2XDmqP077CqUCo4DQY5HROA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z9Rp6BhjePW4n7yLGOUpJXrOov3HVfU9u50Aa9xjNaw=;
+ b=BoDzLw5E2GopaedvGSdAL4UAxKpRB+lCgfvW4Q4EcDAUhnugl9MMtX0tYSkFAJElTLD5hkQm9bhrecJ4/3t0GbOn8fRDX05u2sgv6HFXy9CLlYbGq1MGq2herio/ZoJ8jCLFxXubZdXhJgrI/cRZ0cwxDSAO0zkBR1vse9ZsYcsnVroSecCbc0pDoey/VdWWzs9O5qK+0sioNsBbwOQ0QAivmNk9fYh6ykkQQy0qJgTEbwQZytsGZ9xDpFHh5A6qYlL2694sUCjIR8gol40iFL143jQBlPGVlyvtNQf3JxUSziP8QxuYRMvDjnTcQsy2EXUuj20vc67Y0GyJ70Jo9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z9Rp6BhjePW4n7yLGOUpJXrOov3HVfU9u50Aa9xjNaw=;
+ b=VIyvLhG2CgWyhGs12SXBGl4sgdRzAeuPD9Vf96/DpTfjfrTOSt+F6af+cSIGNTd5b608MlWKVjvRClDTrOkxfqbaW7WyNovg9N8DGWh6wF/MuDKpGEIOKndCYgsqrS+O4Bf6lwloMK7Q48yD6VYe0vdVG50DMS8w1vV+qVPBF1Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by PR3PR04MB7468.eurprd04.prod.outlook.com (2603:10a6:102:8d::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7025.16; Mon, 20 Nov
+ 2023 14:23:20 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::dd33:f07:7cfd:afa4%7]) with mapi id 15.20.7025.015; Mon, 20 Nov 2023
+ 14:23:20 +0000
+Date: Mon, 20 Nov 2023 16:23:16 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231120142316.d2emoaqeej2pg4s3@skbuf>
+References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
+ <20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
+ <20231118183433.30ca1d1a@kernel.org>
+ <20231120104439.15bfdd09@kmaincent-XPS-13-7390>
+ <20231120105255.cgbart5amkg4efaz@skbuf>
+ <20231120121440.3274d44c@kmaincent-XPS-13-7390>
+ <20231120120601.ondrhbkqpnaozl2q@skbuf>
+ <20231120144929.3375317e@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231120144929.3375317e@kmaincent-XPS-13-7390>
+X-ClientProxiedBy: AS4PR09CA0001.eurprd09.prod.outlook.com
+ (2603:10a6:20b:5e0::7) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] net: mdio: ipq4019: Enable the clocks for ipq5332
- platform
-Content-Language: en-US
-To: Luo Jie <quic_luoj@quicinc.com>, agross@kernel.org, andersson@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, robert.marko@sartura.hr
-Cc: linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- quic_srichara@quicinc.com
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-3-quic_luoj@quicinc.com>
-From: Konrad Dybcio <konrad.dybcio@linaro.org>
-Autocrypt: addr=konrad.dybcio@linaro.org; keydata=
- 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
- izWDgYvmBE8=
-In-Reply-To: <20231115032515.4249-3-quic_luoj@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|PR3PR04MB7468:EE_
+X-MS-Office365-Filtering-Correlation-Id: 824bc22b-a8a1-467f-2997-08dbe9d43f03
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	s77GlYJDL4Huga4N5iMx7G/kNieA4sFCH38zrxbSlX6svEwqiAHISjFLcvOZ/Y5Q0ssb9X0jQhCOZPcXco2OMZBnSPVDI1UsiLnHi81DTfquM+O1L/kF+/feUC2wCTouc40mKL2cA/WqlJCcDJ3sjpHKQ/ctsY9n6BVyT3k5pmIT5INvg1qBG4s3B+kT0kzTHft5nRxsluc6J9KYQ9Q/wor1H/kTv5CQ5a6rSK5pAZxB+N59JwyjB28g61J9qUSj/4xa2OKrkVY1pzP/7W6h6VC8QVnPxqJG+b1di5v1TcsQBt/mS+lfAb2DgYTyxPgDFM0sxSi8cwgF1+olhauMuRjQezQDrMQZAnP5/mhtGPw1zftaFuTdQ2mDQR9N/vbQD0RlwUIOS9W03C9U9VeyVQoHiR9M2EjiIgyJVOl4ebLTf5BD7Tm6ev5ZAPcM1DQ4oUdL2C19c7UpwvzQZjOMqF+7L4zSBbWWWaG4U5D4oE3jVmEsZrRpWFJh16IUHhpq2G6tKnaMNNqnnjCnCo9jCsXgh19m9NmylVM+qYXOrFU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39860400002)(376002)(396003)(366004)(346002)(136003)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(54906003)(66476007)(66556008)(316002)(6916009)(6506007)(66946007)(6486002)(478600001)(966005)(6666004)(9686003)(6512007)(38100700002)(26005)(2906002)(8676002)(8936002)(4326008)(5660300002)(1076003)(7416002)(83380400001)(41300700001)(44832011)(66899024)(86362001)(33716001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?zgMjhw2lzm6ArnZ2G9jsIltBL0VRyB7Fk+Qx/TCK4PCSt6Nl6y98ibZOBK?=
+ =?iso-8859-1?Q?bsuBtrrVsq5nFopoFAGar9hAd3vjCazVchgg/PFWOKU0sgLe4ciMzRY230?=
+ =?iso-8859-1?Q?tznvCiB9J6v9Br2l+VDdZCOaNULEoi4/J8OCnq1kRHwvVxOXO7Eb0dr31B?=
+ =?iso-8859-1?Q?M+b33i3lC0MYjj7fnZbdmuKWpvdcCGeoUq6+0Pr5GZgwEBvgAxj3ziIKKD?=
+ =?iso-8859-1?Q?p2NbgNRrOH5+WYpeWR5/SYwrYiIvAwnERUCdEPmQ35jYHy52ydB0pjkGFe?=
+ =?iso-8859-1?Q?vCV3qzBCXSwNN61WzfgMWojBqCNCGIO68knwBsljhhO5srirRNmjCgVOl3?=
+ =?iso-8859-1?Q?BXr/t/fsbRola9vXcpc+x4Nx/FJYU+y6aDxf0OTDzeEAxk8Gw9fypT1Ef0?=
+ =?iso-8859-1?Q?CEj//YTE+8woMVRghMIysjkrPa5LVTkEHn4y6DV/EnymvwNWkba9Gv7pY7?=
+ =?iso-8859-1?Q?zEsI+0+0QP570gdaKv9AosDyu3Znmksa3tYq8u8s0eQDnPWctEs/pwwgf/?=
+ =?iso-8859-1?Q?EXMZAZKh3/DTaCpLw+Z1N5OqNuSGsFCmguTJmDM0Sy7AoP2KfOjV5oPB4M?=
+ =?iso-8859-1?Q?fJ6E5Vb1ARvPtbQawbdcWUpU/J0HrugalpokvAdOrLQT5hUwVdyAzNezgZ?=
+ =?iso-8859-1?Q?SwObbbro2885ASEiYLSlDZtrsmatB80PbQ8J6yz3k7fvDauU8q4lMHMUtW?=
+ =?iso-8859-1?Q?UNwI3bHg5tGFNU0BmQfSDa+G5+so3JRANnxhglhijIuMAPOCwLQFbx6WBF?=
+ =?iso-8859-1?Q?0kN25FPHZTvhPqyweoJvdY3Tmtd+VnK2qxpEpQ6/ytFY3/CsT4VpV/2oJ/?=
+ =?iso-8859-1?Q?Rwnb+oU1Gg3fGbkBRfALyptAf1K1bSfi0jNdoq4q0AJRJ2W1TShAzc0giZ?=
+ =?iso-8859-1?Q?PsDutSI8fmxFeafj7yaZum7v13Cx4l5t4jh37YH7ZhVKTWAqVilZZn2mOu?=
+ =?iso-8859-1?Q?CARo4Hvzx/VzTzbM0iBkd3XNEI1QurO1Wwc0iJo7fGLlS9ccq+argxgwU7?=
+ =?iso-8859-1?Q?WKzHfA0iuIG48QkBdbzXmF+pWAB3UNw0t0ikU+l/GWq0dcYW1IFhFGMW4C?=
+ =?iso-8859-1?Q?Cz29gcLtXCWHcCSrlTPbMFUBVfiG3Qsd10MZtmYxrd5xn+8k+b9SgE4uaI?=
+ =?iso-8859-1?Q?9U332RvUGEsfzVetBmHBq0IF+P1osaKMZzcJVNbrGpu+KOIaX3O0ZJGeVZ?=
+ =?iso-8859-1?Q?Y+ZzEwM4p0sdCGxeefSrOeidVCwv5A9VotCqAiRftCGmNKkWFWHDFbrwbO?=
+ =?iso-8859-1?Q?TtlERwlza4tMQaTrJaxGnx2Axky7CRnSJW4J5qmMAQoa4uTVOWasez6TRF?=
+ =?iso-8859-1?Q?zTb21crfl29GO6eq7MgmpY5j1nZjpBSFrC2y3GWOyxbrSyHD8DT9yTdaDb?=
+ =?iso-8859-1?Q?UsjFoSNMwp0/OxLocHfYB5UCyeqpYhhZtZZaCL7s0qbsbeCGAI+m/S4dH8?=
+ =?iso-8859-1?Q?8JZONwz2fs0QkGro60daO6YbIx+ftzMqxhYgrTP+J0j0/CNT6KSWtwIBwm?=
+ =?iso-8859-1?Q?/c39aghbvfEjvVNEGwbeu09H9dQdlJGiGJvJXcBE1dG9hpgUyg9bROjUs5?=
+ =?iso-8859-1?Q?I9L6tpbky5M6iDu14mJqiDfYiRBshVs/fkQqR3avpHmV+THIL6BOkmVN8S?=
+ =?iso-8859-1?Q?xeJnBuxmg3GqzdgwBdCS+0dcR6B3336Jd0f78ewxfn278eZjjdEbRpkQ?=
+ =?iso-8859-1?Q?=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 824bc22b-a8a1-467f-2997-08dbe9d43f03
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 14:23:20.4585
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eZCCV/GGihoRzApZNS4EJHFeroKCeQ/9wDPRVCc0JRdy8HUQbINd4ZqKesBIr+6UQTW/dgPDNi52Xx8QFGIs/w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR04MB7468
 
-On 15.11.2023 04:25, Luo Jie wrote:
-> For the platform ipq5332, the related GCC clocks need to be enabled
-> to make the GPIO reset of the MDIO slave devices taking effect.
+On Mon, Nov 20, 2023 at 02:49:29PM +0100, Köry Maincent wrote:
+> > The next question would be: if a driver performs PHY management in
+> > firmware, and does not use phylib, how should user space interact with it?
+> > What timestamping layer and upon what should the ID be chosen?
 > 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-[...]
+> In that case it could be the second options I refereed to.
+> Using the id to select the right timestamp within the NIC driver.
+> It indeed won't be called PHY timestamping as it is managed by the NIC firmware
+> but as it is managed by only one firmware and driver using the id to separate
+> the available timestamp seems a good idea.
+> 
+> Another solution would be to create another value in the layer enumeration.
+> PHY_NIC_TIMESTAMPING? Better idea? I am not good at naming.
 
->  static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
-> @@ -212,6 +231,38 @@ static int ipq_mdio_reset(struct mii_bus *bus)
->  	u32 val;
->  	int ret;
->  
-> +	/* For the platform ipq5332, there are two uniphy available to connect the
-> +	 * ethernet devices, the uniphy gcc clock should be enabled for resetting
-> +	 * the connected device such as qca8386 switch or qca8081 PHY effectively.
-> +	 */
-> +	if (of_device_is_compatible(bus->parent->of_node, "qcom,ipq5332-mdio")) {
-Would that not also be taken care of in the phy driver?
+The point I was trying to make is that your current choice of exposing
+PHY_TIMESTAMPING in UAPI, when it really only refers to phylib PHYs,
+would lead exactly to this sort of UAPI balkanization where everyone
+wants to add more timestamping layers, and to define IDs to be specific
+to their own invented layer. Maybe the concept of timestamping layers is
+not what user space should see at all.
 
-Konrad
+In previous email discussions, I was proposing to Jakub and you "what if
+we didn't let user space select a specific layer like PHY_TIMESTAMPING
+or MAC_TIMESTAMPING at all, but just select a specific phc_index as the
+provider of hardware timestamps"?
+
+The limitation we're trying to lift is that currently, there can be only
+a single provider of hardware timestamps. We make that provider customizable.
+There is already a good understanding from user space that, if "ethtool -T"
+on an interface says there is no PHC, then there are going to be no
+hardware timestamps. So I thought it would be much more intuitive if the
+timestamping layer could be selected by the user merely by an unified
+phc_index (provided by a phylib phy or firmware based driver or whatever),
+and everything else would just be an implementation detail of the kernel.
+No one should care that it's a phylib phy, and shouldn't use a different
+procedure to identify its ID based on whether it's a phylib or firmware
+PHY.
+
+It's a bit hard to align my expectation of what this series should offer
+with yours. I think we're talking past each other, which unfortunately
+makes me lose track and interest. I wish you could have answered my
+earlier question about this alternative proposal.
+https://lore.kernel.org/netdev/20231013170903.p3ycicebnfrsmoks@skbuf/
+
+> > Finally (and unrelated to the question above), why is SOFTWARE_TIMESTAMPING
+> > even a layer exposed in the UAPI? My understanding of this patch set is
+> > that it is meant to select the source of hardware timestamps that are
+> > given to a socket. What gap in the UAPI does the introduction of a
+> > SOFTWARE_TIMESTAMPING hwtstamping layer cover?
+> 
+> As I explained to Jakub:
+> The software timestamping comes from the MAC driver capabilities and I decided
+> to separate software and MAC timestamping.
+
+Why? What was the problem? This confuses me because I don't understand
+what is the problem that the solution is trying to address, and whether
+the solution is orthogonal to all the other UAPI that exists for
+software and hardware timestamping at the socket layer - which AFAIK can
+happily coexist.
+
+> If we select PHY timestamping we can't use software timestamping and
+> for an user, selecting the MAC as timestamping seems not logical to
+> use software timestamping (I got confused myself when I first dig into
+> it long time ago). Be able to select directly Software timestamping
+> seems appropriate and won't bring any harm. What do you think?
+
+Hmm, can you please explain what is the reason why software timestamping
+can't coexist with PHY timestamping? It is a genuine question to which I
+don't have an answer - I haven't used PHY timestamping. It must be
+something specific to that, since I do know that MAC + software
+timestamping work simultaneously just fine.
 
