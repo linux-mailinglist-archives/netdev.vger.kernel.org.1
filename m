@@ -1,91 +1,106 @@
-Return-Path: <netdev+bounces-49314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FF617F1A4F
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:35:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874047F1A50
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A1ECB2173F
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DAA1F254F1
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA1B210F9;
-	Mon, 20 Nov 2023 17:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426FC22331;
+	Mon, 20 Nov 2023 17:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Vkv5rDtJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3XwzmVc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89F1910C1
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:35:16 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-6b709048d8eso4062631b3a.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:35:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700501716; x=1701106516; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uDDPuUZnZdMKmQdUKdIyreDp7J0qQAcUgBVUsxEmnZo=;
-        b=Vkv5rDtJRsN1Q2xaA6v0i2LpErcbuGhZO7vPwUg8z6NqqplSL7yZuzFE8B0QFW7BqM
-         iSWj2G33G5PGLM+ctFiJkg5CYP014bNdpXwfF/CldDG/bGXGq2trIxUzyrP+wB55oNwh
-         N9Vg+z9BIEBEjZzaugzVbjVPLLxDAVBVC2IWAyIi0q++D8vHvMkIF1s0bnCAHtl3FaTb
-         J11RpTo/CosIOct6O6U7O8lWMGwMsPg9UOZLPkL/Vb2Ro9MLBd0dN0q3RBQT1hXhjwrg
-         jgNTGQf+HULuagbKTo7lcTGqBqrTeDXbIXFw60/nezSUtNNIwQ86Zxzp1FwrN8Gu7Ii1
-         cmZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700501716; x=1701106516;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uDDPuUZnZdMKmQdUKdIyreDp7J0qQAcUgBVUsxEmnZo=;
-        b=Sk47BW5FcqzwI+2wyzgHWt/c3n9511pIOLl+48QJnCxSUcN+mbWaVx6UAkpSHUPtJH
-         E7IN7SsqXwKptTGM/LMqyZH4xdTwaViYEO7yEAYPt6Hx0lkI41m89gEHxT307L/G/RKE
-         7sz+mFEj46o5m78GE6P0phC+sICr+RQlLVauvFp+3BECiiPmKwgiMvfNZPRN5oxuhIna
-         MCLvGE8Wi8kvnQgjzGrUcjjEYNFpE6F8jiVzv7f4jHPGXUfqnE/xuykf0bG0B2GAHn+f
-         nraqL1uKKIxlecrnFOozA38QPee84KpOW3PpkyMERayeRTWVqBAGMuXUyx3R5iFCItbZ
-         BOPg==
-X-Gm-Message-State: AOJu0YywFwAi61IQ3mx3B0XiyWn9Di63ybct1CM7CtAcdaJ23r4QxWX3
-	/9m+HZM3c+ynOyFUA0jErX4JboigSyoVMJ4XAws=
-X-Google-Smtp-Source: AGHT+IG2qQnI6wrVfQYRi7bWXfz5T8E54VkqY0glDVXCCy6Ndtl4eaLmJ7Eq+codM0SZCi0Vgsy4TA==
-X-Received: by 2002:a05:6a00:887:b0:6bd:2c0a:e82 with SMTP id q7-20020a056a00088700b006bd2c0a0e82mr7872076pfj.7.1700501715971;
-        Mon, 20 Nov 2023 09:35:15 -0800 (PST)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id k16-20020aa788d0000000b006c107a9e8f0sm6281129pff.128.2023.11.20.09.35.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 09:35:15 -0800 (PST)
-Date: Mon, 20 Nov 2023 09:35:14 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: rjmcmahon <rjmcmahon@rjmcmahon.com>
-Cc: Netdev <netdev@vger.kernel.org>
-Subject: Re: On TCP_CONGESTION & letter case
-Message-ID: <20231120093514.24a5bedc@hermes.local>
-In-Reply-To: <5dca57c7a699ac4a613806e8c8772dd7@rjmcmahon.com>
-References: <5dca57c7a699ac4a613806e8c8772dd7@rjmcmahon.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDCB22330
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:35:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45543C433C8;
+	Mon, 20 Nov 2023 17:35:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700501720;
+	bh=qAqDABdLidiX3t3Zps3jWa2tM42jqufzz5C/5QP6aGs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=g3XwzmVc9y70UG7QT3wq3leq2FynkAP6UeQk8vzDeolLzKUD2+CC8cJXlluva/I/x
+	 Gd3HPbon2SeZJGo58a6XeWH/jwyO8JQ6OZ+9IswcjmEpJKHwLxlWjk8GevyBWFOzY8
+	 8IBJ6uKxifLlOvz/nmmJ7vfxy2tnPGVslf1A5CDBwK/+dMU63QL1GjE02GzqKYuJe/
+	 2snwSUPTQLkQRhM99sTS3MUgO2/jHJkpMFfxTLamS7I8qMdiCq2lp7jy/p+HqpHbVB
+	 d59HX5x6rQPrHrCJi7lknUqU+wi+n+SA5XnAv+Fgiu1ber5HAS+QHkM+nMZCeIjXEz
+	 MCUGVVbRUQ5cw==
+Date: Mon, 20 Nov 2023 17:35:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+	victor@mojatatu.com
+Subject: Re: [PATCH net-next 3/6] selftests: tc-testing: use netns delete
+ from pyroute2
+Message-ID: <20231120173515.GD245676@kernel.org>
+References: <20231117171208.2066136-1-pctammela@mojatatu.com>
+ <20231117171208.2066136-4-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117171208.2066136-4-pctammela@mojatatu.com>
 
-On Sun, 19 Nov 2023 10:36:03 -0800
-rjmcmahon <rjmcmahon@rjmcmahon.com> wrote:
+On Fri, Nov 17, 2023 at 02:12:05PM -0300, Pedro Tammela wrote:
+> When pyroute2 is available, use the native netns delete routine instead
+> of calling iproute2 to do it. As forks are expensive with some kernel
+> configs, minimize its usage to avoid kselftests timeouts.
+> 
+> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 
-> Hi all,
-> 
-> Will the CCA string in setsockopt and getsockopt for TCP_CONGESTION 
-> always be lowercase?
-> 
-> Sorry if this question has been asked and answered somewhere else.
-> 
-> Thanks,
-> Bob
-> 
+I have a suggestion for a follow up below, but this change looks good to me.
 
-The convention has to always use lower case since this is what is
-used by many other places, filesystem types, queue disciplines, etc.
-In theory, mixed UglyCamelCase is possible but would end up being
-bike shedded during review process.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+> ---
+>  .../testing/selftests/tc-testing/plugin-lib/nsPlugin.py  | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+> index 2b8cbfdf1083..920dcbedc395 100644
+> --- a/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+> +++ b/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
+> @@ -64,7 +64,10 @@ class SubPlugin(TdcPlugin):
+>          if self.args.verbose:
+>              print('{}.post_case'.format(self.sub_class))
+>  
+> -        self._ns_destroy()
+> +        if netlink == True:
+> +            self._nl_ns_destroy()
+> +        else:
+> +            self._ns_destroy()
+
+As an aside, I think it would to rename _ns_* to
+_iproute2_ns_* or similar, to make the distinction with _nl_ns_* clearer.
+
+>  
+>      def post_suite(self, index):
+>          if self.args.verbose:
+> @@ -174,6 +177,10 @@ class SubPlugin(TdcPlugin):
+>          '''
+>          self._exec_cmd_batched('pre', self._ns_create_cmds())
+>  
+> +    def _nl_ns_destroy(self):
+> +        ns = self.args.NAMES['NS']
+> +        netns.remove(ns)
+> +
+>      def _ns_destroy_cmd(self):
+>          return self._replace_keywords('netns delete {}'.format(self.args.NAMES['NS']))
+>  
+> -- 
+> 2.40.1
+> 
 
