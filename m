@@ -1,49 +1,60 @@
-Return-Path: <netdev+bounces-49139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B61B7F0E53
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:00:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45F277F0E6B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:05:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3EC1C21461
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:00:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 761781C2172A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC751078B;
-	Mon, 20 Nov 2023 09:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7EF10799;
+	Mon, 20 Nov 2023 09:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GPqCbXQQ"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="hUo+Pljd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B7FDA4;
-	Mon, 20 Nov 2023 01:00:36 -0800 (PST)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AK7UsT4005271;
-	Mon, 20 Nov 2023 09:00:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=ImZ/n8GsSZ5bTYTGhlLv233vn4tN8DfN0BIWCHbNEvk=;
- b=GPqCbXQQRMT40iAKaF1Hshfsp5TAyOHjtnZSAva9dZ0g/jLDLUi8P53QMeq4q20bogC+
- u9Lo7Y+Yi0EnA1b3xroxekriDbUBb3kOUiWqDTKPDz4jRlcKMpTBqrS2g/X1K0q49AK2
- sc4nOt+JqYQEs8Bic23IwUqT/1G9tjD0+/hhF3TsAXp/nr7njhdqZxtKho+QiEhSCelc
- w1CaBsN2Z9XTyTOqna2AkurRsWXgJkueHNGKW+OeKGxlJqUJlyLzxaBuPG3+6gWdCQzZ
- n0EbUY+c4B9DmNnM5x5nYCVNfflLkrDDjong1zf8eeAqo0RrIpYXyOFcBpN1er9XTnDI BQ== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ug34u0550-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Nov 2023 09:00:21 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3AK90KTi028454
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 Nov 2023 09:00:20 GMT
-Received: from [10.253.8.221] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 20 Nov
- 2023 01:00:15 -0800
-Message-ID: <2d4818f6-3935-4621-bf96-d84747cbefa3@quicinc.com>
-Date: Mon, 20 Nov 2023 17:00:13 +0800
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 110B5D5B
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:05:15 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-40891d38e3fso12220575e9.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:05:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1700471113; x=1701075913; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bkLluJIfs9A2WfK4ws6uTuiWflu7QIwTGk5lEdGrZ8Q=;
+        b=hUo+Pljdj6x5DCjR/jo7P1BtRCgtwcj5R+aXWuUgcTe5aDpa5k2//Bgtbu3Ls9SCsB
+         fJ2CtzrsxrCXB80LUyj8UGgvAgyKbVbVjJOYubMepvOEjjpW6ANw1i+GQnzRRNztUK5x
+         5EG+fr9meG3V1P5Py6rBU8Kp08piIKFYOpJN8aCN2HgPWjtSYVYfOOlwCyokisJYwdUC
+         gOWjAHZen9uqfhrBOxF+m6RcQPhCgMA0hbgQ8tfcUd1pPlf0sZGggvNWKWvH5KMDiBoC
+         /cRHWUF2epMv2Ml/Kbw7xmZ6HSavMtv+5mlRsddVFUVk1Il5fRcBN5T85wXqYcW2QE8x
+         m5vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700471113; x=1701075913;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bkLluJIfs9A2WfK4ws6uTuiWflu7QIwTGk5lEdGrZ8Q=;
+        b=Yghl+ef0fXNvAET5WkFjf4SGdQGFAnELwY/h95o8rcXuyU8tBENti2vg5rFimdKneb
+         I9UzIRA7565o07S/a4wimbsJ8w0lcprO2R6pTUw0Ei9ovui57jgPtwAWZN9LeuhDMuWB
+         KTtRspdZjspLK4x7fhHMDZVSMPCNkQK1Rq2Mjbcfl4CLJ+ED5F7c9iDAuP4qJH72BhJk
+         1pE7711s9aIV/ktHYeyLdhU2TYumMO3j3YfqGwx7FKYgP1qRUVRJY15T+n3YKdu6cqsx
+         N0oZ0Ahi6QXfo2KE4oDpSu08zSJv6BlW9FF1Ym6bNIiHSIxdREYxaHntq2MaCL6Sjtqc
+         cmLA==
+X-Gm-Message-State: AOJu0YyLSIWcjWchDdtTn72aEiZL7U5CiQrtp+23Byf8AMKXRXmWhUZo
+	XrYYE/jfE89/4UW5dwygcKD4aQ==
+X-Google-Smtp-Source: AGHT+IFq74/v4yVRRxE+pvLLMGOf1Rfctzf+CaYkqnL15lGut/2IP8miObeas0tpSho4tWROmvLB0w==
+X-Received: by 2002:a05:6000:2c1:b0:32f:c369:6b00 with SMTP id o1-20020a05600002c100b0032fc3696b00mr5665046wry.14.1700471112833;
+        Mon, 20 Nov 2023 01:05:12 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.183])
+        by smtp.gmail.com with ESMTPSA id z18-20020a5d4c92000000b00331424a1266sm10473085wrs.84.2023.11.20.01.05.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 01:05:12 -0800 (PST)
+Message-ID: <ea3567ef-1293-4679-bd25-730c1b3e60b9@tuxon.dev>
+Date: Mon, 20 Nov 2023 11:05:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,92 +62,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] dt-bindings: net: ipq4019-mdio: Document ipq5332
- platform
+Subject: Re: [PATCH 14/14] arm: multi_v7_defconfig: Enable CONFIG_RAVB
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>, <linux-arm-msm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-10-quic_luoj@quicinc.com>
- <834cbb58-3a88-4ba6-8db6-10440a4d0893@linaro.org>
- <76e081ba-9d5a-41df-9c1b-d782e5656973@quicinc.com>
- <2a9bb683-da73-47af-8800-f14a833e8ee4@linaro.org>
- <386fcee0-1eab-4c0b-8866-a67821a487ee@quicinc.com>
- <77a194cd-d6a4-4c9b-87f5-373ed335528f@linaro.org>
- <de4fa95e-4bc7-438a-94bb-4b31b1b89704@quicinc.com>
- <6e10604f-d463-499b-b00a-57ef22a936bb@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <6e10604f-d463-499b-b00a-57ef22a936bb@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IZbdL7Cw6EyPK_TPVWMlvGauFNWvvZcm
-X-Proofpoint-GUID: IZbdL7Cw6EyPK_TPVWMlvGauFNWvvZcm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-20_06,2023-11-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- suspectscore=0 phishscore=0 spamscore=0 adultscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=987 malwarescore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311200059
+To: Geert Uytterhoeven <geert@linux-m68k.org>, Arnd Bergmann <arnd@arndb.de>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ krzysztof.kozlowski+dt@linaro.org, Conor Dooley <conor+dt@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Magnus Damm <magnus.damm@gmail.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Davis <afd@ti.com>,
+ Mark Brown <broonie@kernel.org>,
+ Alexander Stein <alexander.stein@ew.tq-group.com>,
+ eugen.hristev@collabora.com, sergei.shtylyov@gmail.com,
+ "Lad, Prabhakar" <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-clk@vger.kernel.org,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120070024.4079344-15-claudiu.beznea.uj@bp.renesas.com>
+ <bd25377b-b191-4d81-b144-2936cb5139d9@app.fastmail.com>
+ <CAMuHMdUkVO7cXpsHd_oGvEpZdJpP6GP+VC8H5GAZ94KJf2joLA@mail.gmail.com>
+From: claudiu beznea <claudiu.beznea@tuxon.dev>
+In-Reply-To: <CAMuHMdUkVO7cXpsHd_oGvEpZdJpP6GP+VC8H5GAZ94KJf2joLA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
 
-On 11/18/2023 11:36 PM, Andrew Lunn wrote:
->> The clock arguments are provided in the later part as below. i will also
->> provide more detail clock names for the new added clocks for the ipq5332
->> platform in description.
->>
->>    - if:
->>
->>        properties:
->>
->>          compatible:
->>
->>            contains:
->>
->>              enum:
->>
->>                - qcom,ipq5332-mdio
->>
->>      then:
->>
->>        properties:
->>
->>          clocks:
->>
->>            items:
->>
->>              - description: MDIO clock source frequency fixed to 100MHZ
->>
->>              - description: UNIPHY0 AHB clock source frequency fixed to
->> 100MHZ
->>              - description: UNIPHY0 SYS clock source frequency fixed to 24MHZ
->>              - description: UNIPHY1 AHB clock source frequency fixed to
->> 100MHZ
->>              - description: UNIPHY1 SYS clock source frequency fixed to 24MHZ
+On 20.11.2023 10:58, Geert Uytterhoeven wrote:
+> On Mon, Nov 20, 2023 at 9:44 AM Arnd Bergmann <arnd@arndb.de> wrote:
+>> On Mon, Nov 20, 2023, at 08:00, Claudiu wrote:
+>>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>>
+>>> ravb driver is used by RZ/G1H. Enable it in multi_v7_defconfig.
 > 
-> As i said before, the frequency of the clocks does not matter
-> here. That appears to be the drivers problem. I assume every board
-> design, with any sort of PHY, needs the same clock configuration?
+> Used by:
+>   - iWave-RZ/G1M/G1N Qseven carrier board,
+>   - iWave-RZ/G1H Qseven board,
+>   - iWave-RZG1E SODIMM carrier board,
+>   - iWave-RZ/G1C single board computer.
 > 
->        Andrew
+> So I'd write "used by various iWave RZ/G1 development boards".
 
-Yes, Andrew, no matter what kind of PHY is connected, these clocks are
-fix clocks, the clock rates are same as mentioned above, which are the 
-SOC clock configurations.
+OK, I'll update it in v2.
 
+I noticed it is needed while checking various bits on a RZ/G1H based board
+so I considered that if there is at least one user for it it is enough to
+have it enabled.
+
+Thank you,
+Claudiu Beznea
+
+> 
+>>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>>
+>> We have a mix of =y and =m for ethernet drivers, and usually
+>> only have drivers built-in when they are frequently tested
+>> with NFS root booting.
+>>
+>> Do you need this as well, or could it be =m instead?
+> 
+> As the default chosen/bootargs for the iWave-RZ/G1M/G1N Qseven carrier
+> board contains root=/dev/nfs, builtin is appropriate.
+> The iWave-RZ/G1H Qseven board defaults to root=/dev/mmcblk0p1.
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
 
