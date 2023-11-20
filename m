@@ -1,364 +1,103 @@
-Return-Path: <netdev+bounces-49235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C5A47F1493
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:45:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98E327F149A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:48:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AECFE1C209DD
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:45:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C99931C2164C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E5D1A5AB;
-	Mon, 20 Nov 2023 13:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB341B270;
+	Mon, 20 Nov 2023 13:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Rc8lC6aM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCG0phmk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26674114
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:45:37 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-5cacfd8ef23so5946127b3.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:45:37 -0800 (PST)
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5603EE
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:48:22 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id 4fb4d7f45d1cf-5409bc907edso6054781a12.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:48:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700487936; x=1701092736; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4UdxwSH2pr0LxBVMvpPG4tS6EZvsd9DC2/01GfC1RPM=;
-        b=Rc8lC6aMfdSRUgoGMnoPhZvKymjjM68W2mKIeaBLRjbik1btEEjqvIo0BhWvM5kDEi
-         HrThgRCK5taXMbyrU8wCv49jFRETXF5/8KgKmJO31TXGyUEuYzalKP8xHDlOtvm+irIX
-         bK7potAy++QR7IQmbWuV3KqkKLTtLpIAeLf01OcXIBhywZeqhQL3vHO4q4p+RgAJeIEt
-         QipVgNmzkJDWU8+PD5fIFf8G8RQ8d8dnrS+26Ov5xgeNKjCmHmLTulVxK9133UVTSizO
-         Pb6KX3sA3z99aUunKFWnmE6uZQGCTJCxFWk5Qb2GLPi0XzK+pNzxQRU2qADtpLeNmvFc
-         6fMw==
+        d=gmail.com; s=20230601; t=1700488101; x=1701092901; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RJEcPrftOCQiwoBUv/LVvltgaVFjTmTbPTakja1VzxI=;
+        b=XCG0phmkBQn81qZ1K6KIzf642ydtOphGXC9nrC1NnNXuq16i4g/Pmc4+aH9/sa/NTU
+         veJoPJRwfJJZM3A8GX/h/oZL/dyBTBH3i4VdEjEcV08TaSrrEhjLmR9b0p2zZtuV/FhW
+         czV0qrjNQHLLLN23wqjbPvx23xcGe5zmnNDk+s4uAeg9ZEWCf/RgAUizRecn0i3MeYxS
+         oHBlwzY4e1BVZcgY0zAdWUkfxTXVUTKTAEjYrApBi9jVZWIwn9CYIR51IgsqGQR1T3zo
+         XDqmsJljLcMLrSJ8DUzyfDIBn8JALcLm30oHEFxgz9nL9MWMGVBxdVh5fhUFSEIVwSBM
+         ZyQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700487936; x=1701092736;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4UdxwSH2pr0LxBVMvpPG4tS6EZvsd9DC2/01GfC1RPM=;
-        b=W09XJZzdyIShXK7RwoV43PRUTatoQzkm89tq5GHZ/r1jccowTPpxODPML1SsiZHB9O
-         vbdaONoNTEUOuSXTnIShRh5ra3e3jSPoYwmr3knPMI9Q8m3HdVxIdSlFQDO/+dVWOx7C
-         rKCiRED8eMgGrPneUbS5CmubFVsU4HkBsYm82QvoUMneSBssRwEJDtLpUt2ZlEzbq15h
-         TJnbwA4JI+hrJiGwJLFjSb2rEK69sVkiHvsbcYBXP+f02bspy8nDeyx6ilob2OIjBkVN
-         U4jMW9MFwXzSQmeXxEObEKAjku2HebBoGNJyiVFmLxpma4qyLJnt6wyp0wdQX9rvwe3a
-         LuZQ==
-X-Gm-Message-State: AOJu0YxWnHL+CLjP36KhjObKeHKIHXNX9mdlPm2zW9A+7wmzh6lTVo0S
-	LJ0hIxnx1kYpgNsncXnz21XxeTQOomHCGm3Im/nRFQ==
-X-Google-Smtp-Source: AGHT+IHX4f1fSYRnY/sVM8KptmuTyQZLOoNVM1vAprFpJS7ZQXkacdH6Gze0jtF4rD6SWspopO/fDqgEp0K7i6O1d3g=
-X-Received: by 2002:a05:690c:34c6:b0:5c9:eaf7:2005 with SMTP id
- fp6-20020a05690c34c600b005c9eaf72005mr3618945ywb.12.1700487936352; Mon, 20
- Nov 2023 05:45:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700488101; x=1701092901;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RJEcPrftOCQiwoBUv/LVvltgaVFjTmTbPTakja1VzxI=;
+        b=DBeR967tmZ0xC12HGHLvJvISmZ5/I4WrpWd5TlogAV524MIg9Htkml7oX3TEwkWmUL
+         MfgmJrZAz0yVGttuu2+1SFzkQ3Cow+w3iRMM/cO1LhWjhwjuJcEYaqCbuwsUjh6kJHtT
+         UwjYf097bMCNNBdu3iViN0qXCIJxcekGCTHSO4MmASYRGcXJfIrviG5bEZ2k2FWSOfib
+         +GcBXXLLvxOhlcwfH1bpc842Faz+bGGp5yjBI7yS1xKopW7nO/Kvq2uQLFm3kVHIv91l
+         J4HoZDsrtiR8MedArNBedOY8m+bz5GOZHDnm6xIWBJcVb9NCtgOvFejT80AAyMxtagLu
+         65dg==
+X-Gm-Message-State: AOJu0YyDUj9Vv6/2g6Pz5VcyWdirsDhQ55ODfOI9w1oeqNYjbJi95n7Q
+	TqZYe61RXZJirPFUSmWABAw=
+X-Google-Smtp-Source: AGHT+IGm1XZhsFHXBEo+khoKSlVIdMKuhetC8vQj+pXdFLMi17zNCnlOmZl7LGdiknsW9mDTt1X28g==
+X-Received: by 2002:a17:907:c007:b0:9d3:f436:61e5 with SMTP id ss7-20020a170907c00700b009d3f43661e5mr7011101ejc.29.1700488100907;
+        Mon, 20 Nov 2023 05:48:20 -0800 (PST)
+Received: from skbuf ([188.26.184.68])
+        by smtp.gmail.com with ESMTPSA id m20-20020a1709062b9400b009f2c769b4ebsm3880566ejg.151.2023.11.20.05.48.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 05:48:20 -0800 (PST)
+Date: Mon, 20 Nov 2023 15:48:18 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
+	linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
+	f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com
+Subject: Re: [net-next 2/2] net: dsa: realtek: load switch variants on demand
+Message-ID: <20231120134818.e2k673xsjec5scy5@skbuf>
+References: <20231117235140.1178-1-luizluca@gmail.com>
+ <20231117235140.1178-3-luizluca@gmail.com>
+ <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-11-jhs@mojatatu.com>
- <ZVZDH9OzqFvc3VSS@nanopsycho> <CAM0EoM=KrC5dD=cC1H7+LsSXfxj386AD=Xpy3sG19QWaiFipCg@mail.gmail.com>
- <ZVsWnWAWvzbgn2p4@nanopsycho>
-In-Reply-To: <ZVsWnWAWvzbgn2p4@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 20 Nov 2023 08:45:24 -0500
-Message-ID: <CAM0EoMn0v2_7w2ZXnBn4w1AyEE=-sWMvcUdiNPf-ifYSfx6o3A@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 10/15] p4tc: add action template create,
- update, delete, get, flush and dump
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9460eced-5a3b-41c0-b821-e327f6bd06c9@kernel.org>
 
-On Mon, Nov 20, 2023 at 3:19=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Nov 17, 2023 at 04:11:29PM CET, jhs@mojatatu.com wrote:
-> >On Thu, Nov 16, 2023 at 11:28=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
-rote:
-> >>
-> >> Thu, Nov 16, 2023 at 03:59:43PM CET, jhs@mojatatu.com wrote:
-> >>
-> >> [...]
-> >>
-> >>
-> >> >diff --git a/include/net/act_api.h b/include/net/act_api.h
-> >> >index cd5a8e86f..b95a9bc29 100644
-> >> >--- a/include/net/act_api.h
-> >> >+++ b/include/net/act_api.h
-> >> >@@ -70,6 +70,7 @@ struct tc_action {
-> >> > #define TCA_ACT_FLAGS_AT_INGRESS      (1U << (TCA_ACT_FLAGS_USER_BIT=
-S + 4))
-> >> > #define TCA_ACT_FLAGS_PREALLOC        (1U << (TCA_ACT_FLAGS_USER_BIT=
-S + 5))
-> >> > #define TCA_ACT_FLAGS_UNREFERENCED    (1U << (TCA_ACT_FLAGS_USER_BIT=
-S + 6))
-> >> >+#define TCA_ACT_FLAGS_FROM_P4TC       (1U << (TCA_ACT_FLAGS_USER_BIT=
-S + 7))
-> >> >
-> >> > /* Update lastuse only if needed, to avoid dirtying a cache line.
-> >> >  * We use a temp variable to avoid fetching jiffies twice.
-> >> >diff --git a/include/net/p4tc.h b/include/net/p4tc.h
-> >> >index ccb54d842..68b00fa72 100644
-> >> >--- a/include/net/p4tc.h
-> >> >+++ b/include/net/p4tc.h
-> >> >@@ -9,17 +9,23 @@
-> >> > #include <linux/refcount.h>
-> >> > #include <linux/rhashtable.h>
-> >> > #include <linux/rhashtable-types.h>
-> >> >+#include <net/tc_act/p4tc.h>
-> >> >+#include <net/p4tc_types.h>
-> >> >
-> >> > #define P4TC_DEFAULT_NUM_TABLES P4TC_MINTABLES_COUNT
-> >> > #define P4TC_DEFAULT_MAX_RULES 1
-> >> > #define P4TC_PATH_MAX 3
-> >> >+#define P4TC_MAX_TENTRIES 33554432
-> >>
-> >> Seeing define like this one always makes me happier. Where does it com=
-e
-> >> from? Why not 0x2000000 at least?
-> >
-> >I dont recall why we decided to do decimal - will change it.
-> >
-> >>
-> >> >
-> >> > #define P4TC_KERNEL_PIPEID 0
-> >> >
-> >> > #define P4TC_PID_IDX 0
-> >> >+#define P4TC_AID_IDX 1
-> >> >+#define P4TC_PARSEID_IDX 1
-> >> >
-> >> > struct p4tc_dump_ctx {
-> >> >       u32 ids[P4TC_PATH_MAX];
-> >> >+      struct rhashtable_iter *iter;
-> >> > };
-> >> >
-> >> > struct p4tc_template_common;
-> >> >@@ -63,8 +69,10 @@ extern const struct p4tc_template_ops p4tc_pipelin=
-e_ops;
-> >> >
-> >> > struct p4tc_pipeline {
-> >> >       struct p4tc_template_common common;
-> >> >+      struct idr                  p_act_idr;
-> >> >       struct rcu_head             rcu;
-> >> >       struct net                  *net;
-> >> >+      u32                         num_created_acts;
-> >> >       /* Accounts for how many entities are referencing this pipelin=
-e.
-> >> >        * As for now only P4 filters can refer to pipelines.
-> >> >        */
-> >> >@@ -109,18 +117,157 @@ p4tc_pipeline_find_byany_unsealed(struct net *=
-net, const char *p_name,
-> >> >                                 const u32 pipeid,
-> >> >                                 struct netlink_ext_ack *extack);
-> >> >
-> >> >+struct p4tc_act *tcf_p4_find_act(struct net *net,
-> >> >+                               const struct tc_action_ops *a_o,
-> >> >+                               struct netlink_ext_ack *extack);
-> >> >+void
-> >> >+tcf_p4_put_prealloc_act(struct p4tc_act *act, struct tcf_p4act *p4_a=
-ct);
-> >> >+
-> >> > static inline int p4tc_action_destroy(struct tc_action **acts)
-> >> > {
-> >> >+      struct tc_action *acts_non_prealloc[TCA_ACT_MAX_PRIO] =3D {NUL=
-L};
-> >> >       int ret =3D 0;
-> >> >
-> >> >       if (acts) {
-> >> >-              ret =3D tcf_action_destroy(acts, TCA_ACT_UNBIND);
-> >> >+              int j =3D 0;
-> >> >+              int i;
-> >>
-> >> Move declarations to the beginning of the if body.
-> >>
-> >
-> >Didnt follow - which specific declaration?
->
-> It should look like this:
->
->                 int j =3D 0;
->                 int i;
->
->                 ret =3D tcf_action_destroy(acts, TCA_ACT_UNBIND);
+Hi Krzysztof,
 
-Huh? It does look like that already ;-> Note there's a "-" on that line.
+On Mon, Nov 20, 2023 at 10:20:13AM +0100, Krzysztof Kozlowski wrote:
+> No, why do you need it? You should not need MODULE_ALIAS() in normal
+> cases. If you need it, usually it means your device ID table is wrong
+> (e.g. misses either entries or MODULE_DEVICE_TABLE()). MODULE_ALIAS() is
+> not a substitute for incomplete ID table.
+> 
+> Entire abstraction/macro is pointless and make the code less readable.
 
->
-> >
-> >> [...]
-> >>
-> >>
-> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-> >> >index 4d33f44c1..7b89229a7 100644
-> >> >--- a/include/uapi/linux/p4tc.h
-> >> >+++ b/include/uapi/linux/p4tc.h
-> >> >@@ -4,6 +4,7 @@
-> >> >
-> >> > #include <linux/types.h>
-> >> > #include <linux/pkt_sched.h>
-> >> >+#include <linux/pkt_cls.h>
-> >> >
-> >> > /* pipeline header */
-> >> > struct p4tcmsg {
-> >> >@@ -17,9 +18,12 @@ struct p4tcmsg {
-> >> > #define P4TC_MSGBATCH_SIZE 16
-> >> >
-> >> > #define P4TC_MAX_KEYSZ 512
-> >> >+#define P4TC_DEFAULT_NUM_PREALLOC 16
-> >> >
-> >> > #define TEMPLATENAMSZ 32
-> >> > #define PIPELINENAMSIZ TEMPLATENAMSZ
-> >> >+#define ACTTMPLNAMSIZ TEMPLATENAMSZ
-> >> >+#define ACTPARAMNAMSIZ TEMPLATENAMSZ
-> >>
-> >> Prefix? This is uapi. Could you please be more careful with naming at
-> >> least in the uapi area?
-> >
-> >Good point.
-> >
-> >>
-> >> [...]
-> >>
-> >>
-> >> >diff --git a/net/sched/p4tc/p4tc_action.c b/net/sched/p4tc/p4tc_actio=
-n.c
-> >> >new file mode 100644
-> >> >index 000000000..19db0772c
-> >> >--- /dev/null
-> >> >+++ b/net/sched/p4tc/p4tc_action.c
-> >> >@@ -0,0 +1,2242 @@
-> >> >+// SPDX-License-Identifier: GPL-2.0-or-later
-> >> >+/*
-> >> >+ * net/sched/p4tc_action.c    P4 TC ACTION TEMPLATES
-> >> >+ *
-> >> >+ * Copyright (c) 2022-2023, Mojatatu Networks
-> >> >+ * Copyright (c) 2022-2023, Intel Corporation.
-> >> >+ * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
-> >> >+ *              Victor Nogueira <victor@mojatatu.com>
-> >> >+ *              Pedro Tammela <pctammela@mojatatu.com>
-> >> >+ */
-> >> >+
-> >> >+#include <linux/err.h>
-> >> >+#include <linux/errno.h>
-> >> >+#include <linux/init.h>
-> >> >+#include <linux/kernel.h>
-> >> >+#include <linux/kmod.h>
-> >> >+#include <linux/list.h>
-> >> >+#include <linux/module.h>
-> >> >+#include <linux/netdevice.h>
-> >> >+#include <linux/skbuff.h>
-> >> >+#include <linux/slab.h>
-> >> >+#include <linux/string.h>
-> >> >+#include <linux/types.h>
-> >> >+#include <net/flow_offload.h>
-> >> >+#include <net/net_namespace.h>
-> >> >+#include <net/netlink.h>
-> >> >+#include <net/pkt_cls.h>
-> >> >+#include <net/p4tc.h>
-> >> >+#include <net/sch_generic.h>
-> >> >+#include <net/sock.h>
-> >> >+#include <net/tc_act/p4tc.h>
-> >> >+
-> >> >+static LIST_HEAD(dynact_list);
-> >> >+
-> >> >+#define SEPARATOR "/"
-> >>
-> >> Prefix? Btw, why exactly do you need this. It is used only once.
-> >>
-> >
-> >We'll get rid of it.
-> >
-> >> To quote a few function names in this file:
-> >>
-> >> >+static void set_param_indices(struct idr *params_idr)
-> >> >+static void generic_free_param_value(struct p4tc_act_param *param)
-> >> >+static int dev_init_param_value(struct net *net, struct p4tc_act_par=
-am_ops *op,
-> >> >+static void dev_free_param_value(struct p4tc_act_param *param)
-> >> >+static void tcf_p4_act_params_destroy_rcu(struct rcu_head *head)
-> >> >+static int __tcf_p4_dyna_init_set(struct p4tc_act *act, struct tc_ac=
-tion **a,
-> >> >+static int tcf_p4_dyna_template_init(struct net *net, struct tc_acti=
-on **a,
-> >> >+init_prealloc_param(struct p4tc_act *act, struct idr *params_idr,
-> >> >+static void p4tc_param_put(struct p4tc_act_param *param)
-> >> >+static void free_intermediate_param(struct p4tc_act_param *param)
-> >> >+static void free_intermediate_params_list(struct list_head *params_l=
-ist)
-> >> >+static int init_prealloc_params(struct p4tc_act *act,
-> >> >+struct p4tc_act *p4tc_action_find_byid(struct p4tc_pipeline *pipelin=
-e,
-> >> >+static void tcf_p4_prealloc_list_add(struct p4tc_act *act_tmpl,
-> >> >+static int tcf_p4_prealloc_acts(struct net *net, struct p4tc_act *ac=
-t,
-> >> >+tcf_p4_get_next_prealloc_act(struct p4tc_act *act)
-> >> >+void tcf_p4_set_init_flags(struct tcf_p4act *p4act)
-> >> >+static void __tcf_p4_put_prealloc_act(struct p4tc_act *act,
-> >> >+tcf_p4_put_prealloc_act(struct p4tc_act *act, struct tcf_p4act *p4ac=
-t)
-> >> >+static int generic_dump_param_value(struct sk_buff *skb, struct p4tc=
-_type *type,
-> >> >+static int generic_init_param_value(struct p4tc_act_param *nparam,
-> >> >+static struct p4tc_act_param *param_find_byname(struct idr *params_i=
-dr,
-> >> >+tcf_param_find_byany(struct p4tc_act *act,
-> >> >+tcf_param_find_byanyattr(struct p4tc_act *act, struct nlattr *name_a=
-ttr,
-> >> >+static int __p4_init_param_type(struct p4tc_act_param *param,
-> >> >+static int tcf_p4_act_init_params(struct net *net,
-> >> >+static struct p4tc_act *p4tc_action_find_byname(const char *act_name=
-,
-> >> >+static int tcf_p4_dyna_init(struct net *net, struct nlattr *nla,
-> >> >+static int tcf_act_fill_param_type(struct sk_buff *skb,
-> >> >+static void tcf_p4_dyna_cleanup(struct tc_action *a)
-> >> >+struct p4tc_act *p4tc_action_find_get(struct p4tc_pipeline *pipeline=
-,
-> >> >+p4tc_action_find_byanyattr(struct nlattr *act_name_attr, const u32 a=
-_id,
-> >> >+static void p4_put_many_params(struct idr *params_idr)
-> >> >+static int p4_init_param_type(struct p4tc_act_param *param,
-> >> >+static struct p4tc_act_param *p4_create_param(struct p4tc_act *act,
-> >> >+static struct p4tc_act_param *p4_update_param(struct p4tc_act *act,
-> >> >+static struct p4tc_act_param *p4_act_init_param(struct p4tc_act *act=
-,
-> >> >+static void p4tc_action_net_exit(struct tc_action_net *tn)
-> >> >+static void p4_act_params_put(struct p4tc_act *act)
-> >> >+static int __tcf_act_put(struct net *net, struct p4tc_pipeline *pipe=
-line,
-> >> >+static int _tcf_act_fill_nlmsg(struct net *net, struct sk_buff *skb,
-> >> >+static int tcf_act_fill_nlmsg(struct net *net, struct sk_buff *skb,
-> >> >+static int tcf_act_flush(struct sk_buff *skb, struct net *net,
-> >> >+static void p4tc_params_replace_many(struct p4tc_act *act,
-> >> >+                                   struct idr *params_idr)
-> >> >+static struct p4tc_act *tcf_act_create(struct net *net, struct nlatt=
-r **tb,
-> >> >+tcf_act_cu(struct net *net, struct nlmsghdr *n, struct nlattr *nla,
-> >>
-> >> Is there some secret key how you name the functions? To me, this looks
-> >> completely inconsistent :/
-> >
-> >What would be better? tcf_p4_xxxx?
->
-> Idk, up to you, just please maintain some basic naming consistency and
-> prefixes.
->
+Are you saying that the line
 
-We'll come up with something.
+MODULE_DEVICE_TABLE(of, realtek_common_of_match);
 
-cheers,
-jamal
+should be put in all of realtek-mdio.c, realtek-smi.c, rtl8365mb.c and
+rtl8366rb.c, but not in realtek-common.c?
 
->
-> >A lot of the tcf_xxx is because that convention is used in that file
-> >but we can change it.
-> >
-> >cheers,
-> >jamal
-> >>
+There are 5 kernel modules involved, 2 for interfaces and 2 for switches.
+
+Even if the same OF device ID table could be used to load multiple
+modules, I'm not sure
+(a) how to avoid loading the interface driver which will not be used
+    (SMI if it's a MDIO-connected switch, or MDIO if it's an SMI
+    connected switch)
+(b) how to ensure that the drivers are loaded in the right order, i.e.
+    the switch drivers are loaded before the interface drivers
 
