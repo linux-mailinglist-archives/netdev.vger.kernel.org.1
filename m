@@ -1,197 +1,178 @@
-Return-Path: <netdev+bounces-49173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647E77F107F
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:35:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D8E7F1086
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:39:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04039B21062
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:35:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2049C1C21640
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:39:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C4A2101EC;
-	Mon, 20 Nov 2023 10:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6466A6FA5;
+	Mon, 20 Nov 2023 10:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3VQra6l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qu8fla+c"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 782D2C5
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:35:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700476513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WDa5Zifa699JA7DgA6NqBUl602nqWvF/0Qs0z1ItO6s=;
-	b=K3VQra6lqO0waVNVRr+v+4df5PsVdjivsP8PVEWrvLoglfZIhtlf+m2JPAgTYi2kpi8EyJ
-	7x0ZmV5jI1S3lylfv2a3/1qNISDgznx7vw7YKNJEbxCLpR3AOGKBD/eEJbjfvLdFjrkNjV
-	IcVaHLOgLOJDiNEiSclY3Mx5axCgrxQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-rK7Y0Ks8MOKBVQOlX9xR9w-1; Mon, 20 Nov 2023 05:35:09 -0500
-X-MC-Unique: rK7Y0Ks8MOKBVQOlX9xR9w-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9d30a6a67abso304559466b.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 02:35:09 -0800 (PST)
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41AD1CA;
+	Mon, 20 Nov 2023 02:39:50 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-6cb7951d713so733817b3a.1;
+        Mon, 20 Nov 2023 02:39:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700476790; x=1701081590; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XtGGo061f2WLq9ZLa8o2ICbUORkS2hheIq/oEVkB6Kk=;
+        b=Qu8fla+c/RSPB78V0wBKbGu3voQMw9ke2/RHsHMtSmuqEcOcmv21YhOU5ZPPeJN6hY
+         Sv1DJL8FOH76T+uw3BzZbmNeB+1pvkMbfxy6iVCLUawYXGlOgG3NsIxG2Ma1qmDEtCeU
+         X8VBkmFe97jls1QBZ5gQDzJUjtYVIgIEe+1bxZhT30fmCRpOYKx3N3D671jWLv0u2hm2
+         OOqu0I5GMKyrZTD/gf0gUf3cX8ZytmbiqGYij1xUykCAOxJIrhWGrhF+F1bH0NnY4BrE
+         cl0tziUeWdBrat/3D4DXZyxtQgNEXqNvSeiT+hyeyq/yRMTv7E73BiZdHKte5KB7yRvl
+         IL0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700476508; x=1701081308;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDa5Zifa699JA7DgA6NqBUl602nqWvF/0Qs0z1ItO6s=;
-        b=OBK1MXbHu3x+kidjm797PaguQFkM5grYihk7cEAPJVannYkPh7sUZLw2ZSdBTeJ6uB
-         fB0qqdFAb6xAcJBxfPFZJpJ6PKA5LNNp1TGTxR2JCEYr3IBnOpezGhLmIccoYRjaJxtD
-         pMeKwNSjYsBAJ3/mMe0wCFhbfwxoNzo8lIAorC/GtO1d4Joq9oRuTK4ydOBvQOWsOZFt
-         uyEn6dwAV5bVzMLReYkwLQn6gLvXWKfAqTbPH1/ro7akAmktILYgNXVenNnNXF4bzHtu
-         vuscr6WJjcUltHLdNASTMJvd0sCQGdu0DO1R49gsO8SnD0gWjvajSh0ZONT/83pflhYL
-         ZO7w==
-X-Gm-Message-State: AOJu0Yxq5nASaedqJHzuzAeSqNKA3vhnvsNM/iXI6rhkZL2WfNNS4qky
-	YqBbpG0vEMn0RqcZOEMasykb84eyvKvyNs7vxpKGbvPldAy79BcKdC8sDClkqfFFTcnF8oJJ9jq
-	YkFZryYIoJPf7m5Nr
-X-Received: by 2002:a17:907:c24b:b0:9ae:6ad0:f6db with SMTP id tj11-20020a170907c24b00b009ae6ad0f6dbmr6930267ejc.71.1700476508608;
-        Mon, 20 Nov 2023 02:35:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFtYB3LpQ2jUhXembvmGnwIAULaeNK5MwYtq0w1lhRVzSiXtm7qVIWAoEoosVuqDagxql3aow==
-X-Received: by 2002:a17:907:c24b:b0:9ae:6ad0:f6db with SMTP id tj11-20020a170907c24b00b009ae6ad0f6dbmr6930238ejc.71.1700476507968;
-        Mon, 20 Nov 2023 02:35:07 -0800 (PST)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id p27-20020a1709060ddb00b009fc50ebb062sm1745968eji.4.2023.11.20.02.35.06
+        d=1e100.net; s=20230601; t=1700476790; x=1701081590;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XtGGo061f2WLq9ZLa8o2ICbUORkS2hheIq/oEVkB6Kk=;
+        b=P/34tuOaTryRetGKJwawFZAnhAjErSLaE88pluzToeU/fVlvPmNpu4a1kr51p5k/jS
+         igvXbZx6oUvX+HeHg/ckjUNSdYsNy6JRQ8mvxUEtXTVb8TXrHEOVu21Fyl25XK33YKSX
+         PQBp+oBA/X1IFU8LgQc8t9d54oc2DIkGQrS5fL0VQUzBQG3yWFLKhhhHhSqPeLbFppXK
+         zEMOAcq4vfTXWWoRjoJ/0akLEtriWxmjcBr0GyAPkzrK2j1dfVCUEcuhsQ9eUo6GtPTJ
+         z5+1RGyaQsoAl5kGeLlwG8wYhRr/nk+JLiDS3M1D1ejYqPEj69rmy6YMilZcjbTlClJU
+         QSQg==
+X-Gm-Message-State: AOJu0YymXxt5Y+tpxUBMxbmGQznvxd3ERLXf5cHykGbQsja8+CBqGoG9
+	t7icrTUusn13a0bXoFIog3GvGCXOYEnZcA==
+X-Google-Smtp-Source: AGHT+IGO8mgfpnclh/QMCKbAYzY+SEuOzgS/o9v3Mwbk4WJmXk77yN9OElYeMACTlb0XmPSW5UEeLg==
+X-Received: by 2002:a05:6a00:310f:b0:6c4:d6fa:ee9d with SMTP id bi15-20020a056a00310f00b006c4d6faee9dmr16513072pfb.1.1700476789595;
+        Mon, 20 Nov 2023 02:39:49 -0800 (PST)
+Received: from [10.22.76.35] ([122.11.166.8])
+        by smtp.gmail.com with ESMTPSA id h10-20020a056a00218a00b006cb4ad55fbasm4172931pfi.179.2023.11.20.02.39.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 02:35:07 -0800 (PST)
-Message-ID: <db2051d0-c847-4d3b-98da-4f4f68a5b30b@redhat.com>
-Date: Mon, 20 Nov 2023 11:35:06 +0100
+        Mon, 20 Nov 2023 02:39:49 -0800 (PST)
+Message-ID: <20d93e83-66c0-28d9-4426-a0d4c098f303@gmail.com>
+Date: Mon, 20 Nov 2023 18:39:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 1/9] Documentation/driver-api: Add document about WBRF
- mechanism
-Content-Language: en-US, nl
-To: Ma Jun <Jun.Ma2@amd.com>, amd-gfx@lists.freedesktop.org, lenb@kernel.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, alexander.deucher@amd.com,
- Lijo.Lazar@amd.com, mario.limonciello@amd.com
-Cc: majun@amd.com, netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- platform-driver-x86@vger.kernel.org
-References: <20231017025358.1773598-1-Jun.Ma2@amd.com>
- <20231017025358.1773598-2-Jun.Ma2@amd.com>
-From: Hans de Goede <hdegoede@redhat.com>
-In-Reply-To: <20231017025358.1773598-2-Jun.Ma2@amd.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.2.0
+Subject: Re: [PATCH] nfc: virtual_ncidev: Add variable to check if ndev is
+ running
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ bongsu.jeon@samsung.com
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com"
+ <syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com>
+References: <20231119164705.1991375-1-phind.uet@gmail.com>
+ <CGME20231119164714epcas2p2c0480d014abc4f0f780c714a445881ca@epcms2p4>
+ <20231120044706epcms2p48c4579db14cc4f3274031036caac4718@epcms2p4>
+ <bafc3707-8eae-4d63-bc64-8d415d32c4b9@linaro.org>
+From: Nguyen Dinh Phi <phind.uet@gmail.com>
+In-Reply-To: <bafc3707-8eae-4d63-bc64-8d415d32c4b9@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi,
 
-On 10/17/23 04:53, Ma Jun wrote:
-> Add documentation about AMD's Wifi band RFI mitigation (WBRF) mechanism
-> explaining the theory and how it is used.
+
+On 20/11/23 5:06 pm, Krzysztof Kozlowski wrote:
+> On 20/11/2023 05:47, Bongsu Jeon wrote:
+>>
+>> On 20/11/2023 01:47, Nguyen Dinh Phi wrote:
+>>
+>>> syzbot reported an memory leak that happens when an skb is add to
+>>> send_buff after virtual nci closed.
+>>> This patch adds a variable to track if the ndev is running before
+>>> handling new skb in send function.
+>>>
+>>> Reported-by: syzbot+6eb09d75211863f15e3e@syzkaller.appspotmail.com
+>>> Closes: https://lore.kernel.org/lkml/00000000000075472b06007df4fb@google.com
+>>> Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
+>>> ---
+>>>   drivers/nfc/virtual_ncidev.c | 9 +++++++--
+>>>   1 file changed, 7 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/nfc/virtual_ncidev.c b/drivers/nfc/virtual_ncidev.c
+>>> index b027be0b0b6f..ac8226db54e2 100644
+>>> --- a/drivers/nfc/virtual_ncidev.c
+>>> +++ b/drivers/nfc/virtual_ncidev.c
+>>> @@ -20,26 +20,31 @@
+>>>                                    NFC_PROTO_ISO14443_MASK | \
+>>>                                    NFC_PROTO_ISO14443_B_MASK | \
+>>>                                    NFC_PROTO_ISO15693_MASK)
+>>> +#define NCIDEV_RUNNING 0
+>> This define isn't used.
+>>
+>>>   
+>>>   struct virtual_nci_dev {
+>>>           struct nci_dev *ndev;
+>>>           struct mutex mtx;
+>>>           struct sk_buff *send_buff;
+>>>           struct wait_queue_head wq;
+>>> +        bool running;
+>>>   };
+>>>   
+>>>   static int virtual_nci_open(struct nci_dev *ndev)
+>>>   {
+>>> +        struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+>>> +
+>>> +        vdev->running = true;
+>>>           return 0;
+>>>   }
+>>>   
+>>>   static int virtual_nci_close(struct nci_dev *ndev)
+>>>   {
+>>>           struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+>>> -
+>>>           mutex_lock(&vdev->mtx);
+>>>           kfree_skb(vdev->send_buff);
+>>>           vdev->send_buff = NULL;
+>>> +        vdev->running = false;
+>>>           mutex_unlock(&vdev->mtx);
+>>>   
+>>>           return 0;
+>>> @@ -50,7 +55,7 @@ static int virtual_nci_send(struct nci_dev *ndev, struct sk_buff *skb)
+>>>           struct virtual_nci_dev *vdev = nci_get_drvdata(ndev);
+>>>   
+>>>           mutex_lock(&vdev->mtx);
+>>> -        if (vdev->send_buff) {
+>>> +        if (vdev->send_buff || !vdev->running) {
+>>
+>> Dear Krzysztof,
+>>
+>> I agree this defensive code.
+>> But i think NFC submodule has to avoid this situation.(calling send function of closed nci_dev)
+>> Could you check this?
 > 
-> Signed-off-by: Ma Jun <Jun.Ma2@amd.com>
-> ---
->  Documentation/driver-api/wbrf.rst | 73 +++++++++++++++++++++++++++++++
->  1 file changed, 73 insertions(+)
->  create mode 100644 Documentation/driver-api/wbrf.rst
+> This code looks not effective. At this point vdev->send_buff is always
+> false, so the additional check would not bring any value.
 > 
-> diff --git a/Documentation/driver-api/wbrf.rst b/Documentation/driver-api/wbrf.rst
-> new file mode 100644
-> index 000000000000..8561840263b3
-> --- /dev/null
-> +++ b/Documentation/driver-api/wbrf.rst
-> @@ -0,0 +1,73 @@
-> +.. SPDX-License-Identifier: GPL-2.0-or-later
-> +
-> +=================================
-> +WBRF - Wifi Band RFI Mitigations
-> +=================================
-> +Due to electrical and mechanical constraints in certain platform designs
-> +there may be likely interference of relatively high-powered harmonics of
-> +the GPU memory clocks with local radio module frequency bands used by
-> +certain Wifi bands.
-> +
-> +To mitigate possible RFI interference producers can advertise the
-> +frequencies in use and consumers can use this information to avoid using
-> +these frequencies for sensitive features.
-> +
-> +When a platform is known to have this issue with any contained devices,
-> +the platform designer will advertise the availability of this feature via
-> +ACPI devices with a device specific method (_DSM).
-> +* Producers with this _DSM will be able to advertise the frequencies in use.
-> +* Consumers with this _DSM will be able to register for notifications of
-> +frequencies in use.
-> +
-> +Some general terms
-> +==================
-> +Producer: such component who can produce high-powered radio frequency
-> +Consumer: such component who can adjust its in-use frequency in
-> +           response to the radio frequencies of other components to
-> +           mitigate the possible RFI.
-> +
-> +To make the mechanism function, those producers should notify active use
-> +of their particular frequencies so that other consumers can make relative
-> +internal adjustments as necessary to avoid this resonance.
-> +
-> +ACPI interface
-> +==============
-> +Although initially used by for wifi + dGPU use cases, the ACPI interface
-> +can be scaled to any type of device that a platform designer discovers
-> +can cause interference.
-> +
-> +The GUID used for the _DSM is 7B7656CF-DC3D-4C1C-83E9-66E721DE3070.
-> +
-> +3 functions are available in this _DSM:
-> +
-> +* 0: discover # of functions available
-> +* 1: record RF bands in use
-> +* 2: retrieve RF bands in use
-> +
-> +Driver programming interface
-> +============================
-> +.. kernel-doc:: drivers/platform/x86/amd/wbrf.c
-> +
-> +Sample Usage
-> +=============
-> +The expected flow for the producers:
-> +1) During probe, call `acpi_amd_wbrf_supported_producer` to check if WBRF
-> +can be enabled for the device.
-> +2) On using some frequency band, call `acpi_amd_wbrf_add_remove` with 'add'
-> +param to get other consumers properly notified.
-> +3) Or on stopping using some frequency band, call
-> +`acpi_amd_wbrf_add_remove` with 'remove' param to get other consumers notified.
-> +
-> +The expected flow for the consumers:
-> +1) During probe, call `acpi_amd_wbrf_supported_consumer` to check if WBRF
-> +can be enabled for the device.
-> +2) Call `amd_wbrf_register_notifier` to register for notification
-> +of frequency band change(add or remove) from other producers.
+> I don't see this fixing anything. Syzbot also does not seem to agree.
+> 
+> Nguyen, please test your patches against syzbot *before* sending them.
+> If you claim this fixes the report, please provide me the link to syzbot
+> test results confirming it is fixed.
+> 
+> I looked at syzbot dashboard and do not see this issue fixed with this
+> patch.
+> 
+> Best regards,
+> Krzysztof
+> 
 
-> +3) Call the `amd_wbrf_retrieve_freq_band` intentionally to retrieve
-> +current active frequency bands considering some producers may broadcast
-> +such information before the consumer is up.
+Hi Krzysztof,
 
-"intentionally" in this sentence should be "initially" (I presume).
+I've submitted it to syzbot, it is the test request that created at 
+[2023/11/20 09:39] in dashboard link 
+https://syzkaller.appspot.com/bug?extid=6eb09d75211863f15e3e
 
-With that fixed and Ilpo's review comments addressed you may add my:
-
-Reviewed-by: Hans de Goede <hdegoede@redhat.com>
-
-to this patch.
-
-Regards,
-
-Hans
-
-
-
-
-> +4) On receiving a notification for frequency band change, run
-> +`amd_wbrf_retrieve_freq_band` again to retrieve the latest
-> +active frequency bands.
-> +5) During driver cleanup, call `amd_wbrf_unregister_notifier` to
-> +unregister the notifier.
-
+Best regards,
+Phi
 
