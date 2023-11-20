@@ -1,125 +1,103 @@
-Return-Path: <netdev+bounces-49277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D094D7F1761
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:33:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97E727F176B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A125282731
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:33:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8D2A1C20E3D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52A81D6BD;
-	Mon, 20 Nov 2023 15:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EDA1D55A;
+	Mon, 20 Nov 2023 15:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aZdT4nG3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MZhPMwca"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7F7BE
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:33:30 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c39ad730aaso3591092b3a.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:33:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700494410; x=1701099210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c/vkPNph5u5OOrRSn6FR5rf84/Y5x7U2iw601QDwn1w=;
-        b=aZdT4nG3nvtH4hK5HbpH/8dFyeH4vzz7mKT3IuUwrCXWFtDxiZq25X/8UNdVxq2ZM1
-         aDTsbkN4J3U00zRJwKv4akimkV6+37zdwvANSSGDyNsjUupOdT9FZyJqqk9C/DNAuC/W
-         7UODD+2NpIS3ifS1e0Qh+tlPENT28R0QXknGwMAx3BbC60M1fBoGKLt5WAOgTK3jPRDx
-         d2Qcpz2zg8EVd/tQR0CO93BtJrqO1laIzOEuxlIs775FzSQ0afBB9hWAEbTyR1p8x8K0
-         nhIaqyybEMNJ+YnF5/kqtJlXxTArpSR7Xaeq4WRyS+jOR05e7+/TL+AlvKIzs8l8vTsC
-         +qLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700494410; x=1701099210;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c/vkPNph5u5OOrRSn6FR5rf84/Y5x7U2iw601QDwn1w=;
-        b=pYW1+UbT5LEUtUxLGKUHn44Yx6t04/TC/c6D060gZ7edlIsBN3rHt5TJ6mDFyE+O0B
-         Rw5A68AIj+RBDpZqhTIved5K0W5IH0BKCcHqm/m/aKMnQuQqmIxww6RbMnLoOK/ZzXe3
-         P1ham63XgP/9jzYjGCmmTcs01lSEl5J39fXMj+Dt4Ed8ifildDIaZ/Q+w0Fs8gu6RQQ4
-         ozVbKlY1QRYlYr8ooEg8leSEeoLXm/vEiuSgA0RJ77G4rve4hLTiLfgtYSh3IpBBhv5L
-         SFoX+ai+kuDFLsAj0lFNUqJq2SqdyCAsS1ZbNjaGaoHPqKPPHyGnkgn1eS7beeCFrFD+
-         zVBQ==
-X-Gm-Message-State: AOJu0Yw1TV63A22X/HmsVlMBoVhHmNiVr0CuTNsRUXVMNdop3ZxV2s8b
-	ss54EArz7xYQ1+TJfdIL1SGwbA==
-X-Google-Smtp-Source: AGHT+IEaOg3mR+ohRZuseHeSMp/v9lZVJmrM5ClJ/D9paZFo3jQd/TqgotiBGO5yQ4v6OMwgefFCIA==
-X-Received: by 2002:a05:6a20:8e10:b0:187:f6b3:3ca5 with SMTP id y16-20020a056a208e1000b00187f6b33ca5mr6106464pzj.52.1700494407205;
-        Mon, 20 Nov 2023 07:33:27 -0800 (PST)
-Received: from [192.168.50.25] ([201.17.86.134])
-        by smtp.gmail.com with ESMTPSA id p16-20020a056a000b5000b006cbb3512266sm1195791pfo.1.2023.11.20.07.33.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 07:33:26 -0800 (PST)
-Message-ID: <5e9c5ecb-c3c7-4e5f-ae9e-ff688f4c2e2f@mojatatu.com>
-Date: Mon, 20 Nov 2023 12:33:21 -0300
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A4F9F;
+	Mon, 20 Nov 2023 07:35:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=o0mw2JgobxwE3CByukMe4G5waOUJCs1Oqg/+hT2lg0M=; b=MZhPMwcajRhLZ9BHsVAMYvESlP
+	unjmzfPzaUvwIeYdhuX++Sh2goFYq41AnneW4mEzZduSkQu0TCF5uFbT7UXMFxo0xAiQYrzZhZehi
+	HCwTGcu1aMnsiFKPW9OgnQBF7yiwyWyw28BTWjA4EUg0mVDZdAB5AevPSZjr8XkxnLus=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r56IZ-000ewk-Vn; Mon, 20 Nov 2023 16:34:55 +0100
+Date: Mon, 20 Nov 2023 16:34:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, corbet@lwn.net,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
+Message-ID: <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
+References: <20231118062754.2453-1-quic_luoj@quicinc.com>
+ <20231118062754.2453-4-quic_luoj@quicinc.com>
+ <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
+ <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+ <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
+ <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: sched: Fix an endian bug in tcf_proto_create
-To: Simon Horman <horms@kernel.org>
-Cc: Kunwu Chan <chentao@kylinos.cn>, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kunwu.chan@hotmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231117093110.1842011-1-chentao@kylinos.cn>
- <16c758c6-479b-4c54-ad51-88c26a56b4c9@mojatatu.com>
- <20231120100417.GM186930@vergenet.net>
-Content-Language: en-US
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20231120100417.GM186930@vergenet.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
 
-On 20/11/2023 07:04, Simon Horman wrote:
-> On Fri, Nov 17, 2023 at 09:06:45AM -0300, Pedro Tammela wrote:
->> On 17/11/2023 06:31, Kunwu Chan wrote:
->>> net/sched/cls_api.c:390:22: warning: incorrect type in assignment (different base types)
->>> net/sched/cls_api.c:390:22:    expected restricted __be16 [usertype] protocol
->>> net/sched/cls_api.c:390:22:    got unsigned int [usertype] protocol
->>>
->>> Fixes: 33a48927c193 ("sched: push TC filter protocol creation into a separate function")
->>>
->>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
->>> ---
->>>    net/sched/cls_api.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
->>> index 1976bd163986..f73f39f61f66 100644
->>> --- a/net/sched/cls_api.c
->>> +++ b/net/sched/cls_api.c
->>> @@ -387,7 +387,7 @@ static struct tcf_proto *tcf_proto_create(const char *kind, u32 protocol,
->>>    		goto errout;
->>>    	}
->>>    	tp->classify = tp->ops->classify;
->>> -	tp->protocol = protocol;
->>> +	tp->protocol = cpu_to_be16(protocol);
->>>    	tp->prio = prio;
->>>    	tp->chain = chain;
->>>    	spin_lock_init(&tp->lock);
->> I don't believe there's something to fix here either
+> Hi Andrew,
+> The interface mode 10G_QXGMII is a type of USXGMII-M, the other modes
+> such as 20G-QXGMII, 20G-OXGMII...
 > 
-> Hi Pedro and Kunwu,
+> As for the interface mode 10G-QXGMII, there is a multiplexer for 4 PHYs,
+> then do 66bit/68bit encode in xpcs and pass to PMA, the link topology:
+> quad PHY --- multiplexer ---XPCS --- PMA.
+> the 10G-QXGMII interface block includes multiplexer, XPCS and PMA.
 > 
-> I suspect that updating the byte order of protocol isn't correct
-> here - else I'd assume we would have seen a user-visible bug on
-> little-endian systems buy now.
-> 
-> But nonetheless I think there is a problem, which is that the appropriate
-> types aren't being used, which means the tooling isn't helping us wrt any
-> bugs that might subsequently be added or already lurking. So I think an
-> appropriate question is, what is the endien and width of protocol, and how
-> can we use an appropriate type throughout the call-path?
+> when the PHY works on SGMII mode, then there is no xpcs, the only fourth
+> PHY of qca8084 can work on SGMII mode, the link topology:
+> the fourth PHY --- PCS --- PMA, the SGMII block includes PCS and PMA.
 
-Agreed and I'm all in for improving any tooling integration.
-I believe a better patch would be to have protocol as a be16 since it's 
-creation everywhere. I looked quickly and it will be a "viral" change, 
-meaning a couple of places will require a one line change.
+What i missed is that you have two different PMA blocks. PHY4 can be
+muxed to either the QXGMII PMA or the 2500BaseX PMA. This is not clear
+in the commit message, and i think why you are getting questions about
+how 2500BaseX can work over QXGMII. Please expand you commit message
+to explain the architecture in more detail.
+
+So, next question. How do you control what PMA PHY4 is connected to?
+Is this going to be based on interface mode? QXGMII it is configured
+to use the QXGMII PMA? SGMII, 1000BaseX, and 2500BaseX it is
+configured to the other PMA?
+
+> Here is a problem as Russell mentioned earlier, we need to know which PHY
+> device is changing the link status when the 10G-QXGMII mode is used,
+> since there are 4 PHYs, when one of them has the link change, there is no
+> PHY device information passed to the PHYLINK, so the PCS driver don't
+> which PHY is changing link status and 10G-QXGMII mode don't know which
+> channel(mapped to PHY) should be configured.
+
+This is the first time QXGMII has been seen in mainline, so its good
+to explain the background.
+
+Are you saying there is a USXGMII-M level link change status? The link
+between the SoC and the PHY package is up/down? If it is down, all
+four MAC-PHY links are down. If it is up, it is possible to carry
+frames between the SoC and the PHY package, but maybe the PHYs
+themselves are down?
+
+Withing the four multiplex streams, is there a per stream link change
+indication?
+
+	Andrew
 
