@@ -1,361 +1,136 @@
-Return-Path: <netdev+bounces-49438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579687F2068
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:31:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 438647F2073
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44DFF1C216AD
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745E71C21572
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5C930CF1;
-	Mon, 20 Nov 2023 22:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="NLAhYOL9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA0A936B15;
+	Mon, 20 Nov 2023 22:38:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19130CF
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 14:31:05 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id 4fb4d7f45d1cf-5409bc907edso6811889a12.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 14:31:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1700519463; x=1701124263; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xg3KYTOpaHUPxoe0mAh59rcd06Dnxc8kFcQ0VbmJou8=;
-        b=NLAhYOL9VRDrDJUJkgMBxc9kqpPvHLsYvRxnKqC0homPBZe3GsjNopKg0qBOyVFKlM
-         TpPAvSivNhh6wHXxDWznJlLozHs0ig8RI6ZdPT4Wa20TUXEhBfarJy2c2usmiiz03FZc
-         hbIs+RR3NN6hFeuFXQqK7wO0KiNHihtscwIirPtgsKONOkftqIIJyUOAsBKsV7eht82V
-         M6+8pNqnn6v3ecfWwOAfQvLo5Sf8lIL35eGi7EYKADYmM4GhyHoocyOJdttvKrnSvjye
-         SUFZThkUiA9o4ZPvAPCLaTBQv+e4YSzoUvE/hqzB8z05P0oD34TRQ6w6JIYFBHYs4Vf6
-         qb1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700519463; x=1701124263;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xg3KYTOpaHUPxoe0mAh59rcd06Dnxc8kFcQ0VbmJou8=;
-        b=Lyjo4hNW0Lgi+kgUfm/TdQ4hC0kKZDnYc/+Yv9pPZc8pLrDGntGA5SjoKMHfi3zKee
-         q1K0xQQS6vnkwXl8RCWMjBBr5msH76nE0UCDf6HbSI6+qLq5GJUXln47+LCKUTWnX/9s
-         7cETPLvXm1a86YwVJd3vZyIXEPPRYUElHc0u/PNTPXYLJTMRmZsI5dvnzYyhyLlq3BYB
-         ISg61abxqfCg0zVFfeETSK+jQ9wYkmbbfgScaOHHi3ko66sTk6yQAWxRxPTk8ixFjryf
-         s2fKqyI/iGmuIiLVM1dKZnVqOXp+9LJMI83476BQmbYpoWIAvfG5bKRT7UPNonCWJpX6
-         ozdw==
-X-Gm-Message-State: AOJu0Ywgq0DOORoqY9s3o7Om1gMRV+nGD1YWXr0V55lLVqTX5qpzFBkb
-	ITQVRU3VfsA7JjPnYKLeQn9Fu+94TnKcbQqwlRBS6w==
-X-Google-Smtp-Source: AGHT+IE3Ovz+frJ9dXJymoRCMr429yTI0Z0DSZ+I2cvlEb4YQCn/4L/YlBzxib/xVjsTQTnkYd5750/khF4ByFUoVlQ=
-X-Received: by 2002:a17:907:a705:b0:9da:f391:409a with SMTP id
- vw5-20020a170907a70500b009daf391409amr7669748ejc.26.1700519463417; Mon, 20
- Nov 2023 14:31:03 -0800 (PST)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19D9A2
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 14:38:39 -0800 (PST)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-ub7cuVfPNN-Hr6ACF8IZ4A-1; Mon, 20 Nov 2023 17:38:35 -0500
+X-MC-Unique: ub7cuVfPNN-Hr6ACF8IZ4A-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 11445887E40;
+	Mon, 20 Nov 2023 22:38:35 +0000 (UTC)
+Received: from hog (unknown [10.39.192.24])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 23A43492BFA;
+	Mon, 20 Nov 2023 22:38:33 +0000 (UTC)
+Date: Mon, 20 Nov 2023 23:38:32 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Christian Hopps <chopps@labn.net>
+Subject: Re: [RFC ipsec-next v2 2/8] iptfs: uapi: ip: add ip_tfs_*_hdr packet
+ formats
+Message-ID: <ZVvf6D-t7kcg3MDC@hog>
+References: <20231113035219.920136-1-chopps@chopps.org>
+ <20231113035219.920136-3-chopps@chopps.org>
+ <ZVt7Nud5U5FbUJ3f@hog>
+ <m2sf50yxym.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABWYdi2JmfMBK43KrkAGsz+MN8KyFSjg0QZv5G_cuA1k1c0f7w@mail.gmail.com>
- <20231120192913.28629-1-kuniyu@amazon.com>
-In-Reply-To: <20231120192913.28629-1-kuniyu@amazon.com>
-From: Ivan Babrou <ivan@cloudflare.com>
-Date: Mon, 20 Nov 2023 14:30:52 -0800
-Message-ID: <CABWYdi31mJmLhKUnCmFpJoEfO8F03tQhDoLxCuu6sJn3Tytbng@mail.gmail.com>
-Subject: Re: wait_for_unix_gc can cause CPU overload for well behaved programs
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: edumazet@google.com, hdanton@sina.com, kernel-team@cloudflare.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <m2sf50yxym.fsf@ja.int.chopps.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 20, 2023 at 11:29=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: Ivan Babrou <ivan@cloudflare.com>
-> Date: Fri, 17 Nov 2023 15:38:42 -0800
-> > On Mon, Oct 23, 2023 at 4:46=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazo=
-n.com> wrote:
-> > >
-> > > From: Ivan Babrou <ivan@cloudflare.com>
-> > > Date: Mon, 23 Oct 2023 16:22:35 -0700
-> > > > On Fri, Oct 20, 2023 at 6:23=E2=80=AFPM Hillf Danton <hdanton@sina.=
-com> wrote:
-> > > > >
-> > > > > On Fri, 20 Oct 2023 10:25:25 -0700 Ivan Babrou <ivan@cloudflare.c=
-om>
-> > > > > >
-> > > > > > This could solve wait_for_unix_gc spinning, but it wouldn't aff=
-ect
-> > > > > > unix_gc itself, from what I understand. There would always be o=
-ne
-> > > > > > socket writer or destroyer punished by running the gc still.
-> > > > >
-> > > > > See what you want. The innocents are rescued by kicking a worker =
-off.
-> > > > > Only for thoughts.
-> > > > >
-> > > > > --- x/net/unix/garbage.c
-> > > > > +++ y/net/unix/garbage.c
-> > > > > @@ -86,7 +86,6 @@
-> > > > >  /* Internal data structures and random procedures: */
-> > > > >
-> > > > >  static LIST_HEAD(gc_candidates);
-> > > > > -static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
-> > > > >
-> > > > >  static void scan_inflight(struct sock *x, void (*func)(struct un=
-ix_sock *),
-> > > > >                           struct sk_buff_head *hitlist)
-> > > > > @@ -185,24 +184,25 @@ static void inc_inflight_move_tail(struc
-> > > > >                 list_move_tail(&u->link, &gc_candidates);
-> > > > >  }
-> > > > >
-> > > > > -static bool gc_in_progress;
-> > > > > +static void __unix_gc(struct work_struct *w);
-> > > > > +static DECLARE_WORK(unix_gc_work, __unix_gc);
-> > > > > +
-> > > > >  #define UNIX_INFLIGHT_TRIGGER_GC 16000
-> > > > >
-> > > > >  void wait_for_unix_gc(void)
-> > > > >  {
-> > > > >         /* If number of inflight sockets is insane,
-> > > > > -        * force a garbage collect right now.
-> > > > > -        * Paired with the WRITE_ONCE() in unix_inflight(),
-> > > > > -        * unix_notinflight() and gc_in_progress().
-> > > > > -        */
-> > > > > -       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_=
-GC &&
-> > > > > -           !READ_ONCE(gc_in_progress))
-> > > > > -               unix_gc();
-> > > > > -       wait_event(unix_gc_wait, gc_in_progress =3D=3D false);
-> > > > > +        * kick a garbage collect right now.
-> > > > > +        *
-> > > > > +        * todo s/wait_for_unix_gc/kick_unix_gc/
-> > > > > +        */
-> > > > > +       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_=
-GC /2)
-> > > > > +               queue_work(system_unbound_wq, &unix_gc_work);
-> > > > >  }
-> > > > >
-> > > > > -/* The external entry point: unix_gc() */
-> > > > > -void unix_gc(void)
-> > > > > +static DEFINE_MUTEX(unix_gc_mutex);
-> > > > > +
-> > > > > +static void __unix_gc(struct work_struct *w)
-> > > > >  {
-> > > > >         struct sk_buff *next_skb, *skb;
-> > > > >         struct unix_sock *u;
-> > > > > @@ -211,15 +211,10 @@ void unix_gc(void)
-> > > > >         struct list_head cursor;
-> > > > >         LIST_HEAD(not_cycle_list);
-> > > > >
-> > > > > +       if (!mutex_trylock(&unix_gc_mutex))
-> > > > > +               return;
-> > > > >         spin_lock(&unix_gc_lock);
-> > > > >
-> > > > > -       /* Avoid a recursive GC. */
-> > > > > -       if (gc_in_progress)
-> > > > > -               goto out;
-> > > > > -
-> > > > > -       /* Paired with READ_ONCE() in wait_for_unix_gc(). */
-> > > > > -       WRITE_ONCE(gc_in_progress, true);
-> > > > > -
-> > > > >         /* First, select candidates for garbage collection.  Only
-> > > > >          * in-flight sockets are considered, and from those only =
-ones
-> > > > >          * which don't have any external reference.
-> > > > > @@ -325,11 +320,12 @@ void unix_gc(void)
-> > > > >         /* All candidates should have been detached by now. */
-> > > > >         BUG_ON(!list_empty(&gc_candidates));
-> > > > >
-> > > > > -       /* Paired with READ_ONCE() in wait_for_unix_gc(). */
-> > > > > -       WRITE_ONCE(gc_in_progress, false);
-> > > > > -
-> > > > > -       wake_up(&unix_gc_wait);
-> > > > > -
-> > > > > - out:
-> > > > >         spin_unlock(&unix_gc_lock);
-> > > > > +       mutex_unlock(&unix_gc_mutex);
-> > > > > +}
-> > > > > +
-> > > > > +/* The external entry point: unix_gc() */
-> > > > > +void unix_gc(void)
-> > > > > +{
-> > > > > +       __unix_gc(NULL);
-> > > > >  }
-> > > > > --
-> > > >
-> > > > This one results in less overall load than Kuniyuki's proposed patc=
-h
-> > > > with my repro:
-> > > >
-> > > > * https://lore.kernel.org/netdev/20231020220511.45854-1-kuniyu@amaz=
-on.com/
-> > > >
-> > > > My guess is that's because my repro is the one that is getting pena=
-lized there.
-> > >
-> > > Thanks for testing, and yes.
-> > >
-> > > It would be good to split the repro to one offender and one normal
-> > > process, run them on different users, and measure load on the normal
-> > > process.
-> > >
-> > >
-> > > > There's still a lot work done in unix_release_sock here, where GC r=
-uns
-> > > > as long as you have any fds inflight:
-> > > >
-> > > > * https://elixir.bootlin.com/linux/v6.1/source/net/unix/af_unix.c#L=
-670
-> > > >
-> > > > Perhaps it can be improved.
-> > >
-> > > Yes, it also can be done async by worker as done in my first patch.
-> > > I replaced schedule_work() with queue_work() to avoid using system_wq
-> > > as gc could take long.
-> > >
-> > > Could you try this ?
-> >
-> > Apologies for the long wait, I was OOO.
-> >
-> > A bit of a problem here is that unix_gc is called unconditionally in
-> > unix_release_sock.
->
-> unix_release_sock() calls gc only when there is a inflight socket.
->
->
-> > It's done asynchronously now and it can only
-> > consume a single CPU with your changes, which is a lot better than
-> > before. I am wondering if we can still do better to only trigger gc
-> > when it touches unix sockets that have inflight fds.
-> >
-> > Commit 3c32da19a858 ("unix: Show number of pending scm files of
-> > receive queue in fdinfo") added "struct scm_stat" to "struct
-> > unix_sock", which can be used to check for the number of inflight fds
-> > in the unix socket. Can we use that to drive the GC?
->
-> I don't think the stat is useful to trigger gc.  Unless the receiver
-> is accessible via sendmsg(), it's not a gc candidate and we need not
-> care about its stats about valid FDs that are ready to be processed
-> and never cleaned up by gc until close().
+2023-11-20, 15:18:49 -0500, Christian Hopps wrote:
+>=20
+> Sabrina Dubroca <sd@queasysnail.net> writes:
+>=20
+> > 2023-11-12, 22:52:13 -0500, Christian Hopps wrote:
+> > > From: Christian Hopps <chopps@labn.net>
+> > >=20
+> > > Add the on-wire basic and congestion-control IP-TFS packet headers.
+> > >=20
+> > > Signed-off-by: Christian Hopps <chopps@labn.net>
+> > > ---
+> > >  include/uapi/linux/ip.h | 17 +++++++++++++++++
+> > >  1 file changed, 17 insertions(+)
+> > >=20
+> > > diff --git a/include/uapi/linux/ip.h b/include/uapi/linux/ip.h
+> > > index 283dec7e3645..cc83878ecf08 100644
+> > > --- a/include/uapi/linux/ip.h
+> > > +++ b/include/uapi/linux/ip.h
+> > > @@ -137,6 +137,23 @@ struct ip_beet_phdr {
+> > >  =09__u8 reserved;
+> > >  };
+> > >=20
+> > > +struct ip_iptfs_hdr {
+> > > +=09__u8 subtype;=09=09/* 0*: basic, 1: CC */
+> > > +=09__u8 flags;
+> > > +=09__be16 block_offset;
+> > > +};
+> > > +
+> > > +struct ip_iptfs_cc_hdr {
+> > > +=09__u8 subtype;=09=09/* 0: basic, 1*: CC */
+> > > +=09__u8 flags;
+> > > +=09__be16 block_offset;
+> > > +=09__be32 loss_rate;
+> > > +=09__u8 rtt_and_adelay1[4];
+> > > +=09__u8 adelay2_and_xdelay[4];
+> >=20
+> > Given how the fields are split, wouldn't it be more convenient to have
+> > a single __be64, rather than reading some bits from multiple __u8?
+>=20
+> This is a good point, I carried this over from an earlier implementation,=
+ let me give it some though but probably change it.
+>=20
+> > > +=09__be32 tval;
+> > > +=09__be32 techo;
+> > > +};
+>=20
+> > I don't think these need to be part of uapi. Can we move them to
+> > include/net/iptfs.h (or possibly net/xfrm/xfrm_iptfs.c)? It would also
+> > make more sense to have them near the definitions for
+> > IPTFS_SUBTYPE_*. And it would be easier to change how we split and
+> > name fields for kernel consumption if we're not stuck with whatever we
+> > put in uapi.
+>=20
+> The other ipsec modes headers were added here, so I was simply
+> following along. I don't mind moving things but would like to
+> understand why iptfs would be different from the other modes, for
+> example, `struct ip_comp_hdr` and `struct ip_beet_phdr` appears in
+> this file.
 
-I'm not quite following why it's not useful, could you elaborate? The
-GC call today is conditioned by 16k system-wide inflight unix fds:
+IMHO it was a mistake that was made when include/uapi was created,
+they should not have been part of uapi since there's never an exchange
+between kernel and userspace using those. I guess it's less
+problematic because the header formats are simple (everything fits
+nicely into a u8/u16/u32) and they were already used in the kernel for
+a long time so pretty much stable (ie no doubt about whether the
+split and naming that was chosen was right).
 
-* https://github.com/torvalds/linux/blob/v6.7-rc2/net/unix/af_unix.c#L2204
-* https://github.com/torvalds/linux/blob/master/net/unix/garbage.c#L191
+But if others feel strongly about putting those structs in uapi, I can
+live with that.
 
-The only way checking for inflight fds is worse is if there non-unix
-fds inflight. This can be easily alleviated by checking for non-zero
-inflight fds on the socket + system-wide unix fds check, making it
-better than just checking the system-wide gauge. What am I missing?
+I'll send comments on the rest of the series as I continue making my
+way through it. The main patch is going to take me a while :(
 
-> > I think we can:
-> >
-> > * Trigger unix_gc from unix_release_sock if there's a non-zero number
-> > of inflight fds in the socket being destroyed.
->
-> This is the case of now.
+--=20
+Sabrina
 
-It's not, unless I'm misunderstanding something. The check today is
-for any inflight fds _system-wide_:
-
-* https://github.com/torvalds/linux/blob/v6.7-rc2/net/unix/af_unix.c#L684-L=
-685
-
-My suggestion is to check this _per socket_, making sockets that do
-not pass any fds (likely an overwhelming majority) unaffected.
-
-> > * Trigger wait_for_unix_gc from the write path only if the write
-> > contains fds or if the socket contains inflight fds. Alternatively, we
-> > can run gc at the end of the write path and only check for inflight
-> > fds on the socket there, which is probably simpler.
->
-> I don't think it's better to call gc at the end of sendmsg() as there
-> would be small chance to consume memory compared to running gc in the
-> beginning of sendmsg().
-
-There is no guarantee that GC frees any memory either way.
-
-> > GC only applies to unix sockets inflight of other unix sockets, so GC
-> > can still affect sockets passing regular fds around, but it wouldn't
-> > affect non-fd-passing unix sockets, which are usually in the data
-> > path.
->
-> I think we can run gc only when scm contains AF_UNIX sockets by tweaking
-> a little bit scm processing.
-
-That's even better than what I'm proposing (all inflight fds -> just
-unix inflight fds being the difference), but probably requires a bit
-more code changes. I'm happy to test a patch when you have it.
-
-> > This way we don't have to check for per-user inflight fds, which means
-> > that services running as "nobody" wouldn't be punished for other
-> > services running as "nobody" screwing up.
->
-> If we do not check user, a user could send 16000 AF_UNIX fds and
-> other innocent users sending fds must wait gc.
-
-In my proposal we check for infight fds per socket and if there are
-none, there is no GC at all.
-
-> I think isolating users would make more sense so you can sandbox
-> a suspicious process.
-
-Sure, but that's somewhat beside the point. Ideally things should work
-well outside the box.
-
-> Probably we can move flush_work() in the preceding if.  Then, the
-> number of gc invocation in the "nobody" case is the same as before.
-
-Just to make sure I get my point across: I want to have no GC if a
-socket does not possibly contribute any garbage to be collected. If my
-program just passes bytes back and forth and churns through unix
-sockets, it shouldn't be penalized with GC and it shouldn't try to
-schedule GC, no matter what else is going on in the system
-
-Hope this makes sense.
-
-> ---8<---
-> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-> index 51f30f89bacb..74fc208c8858 100644
-> --- a/net/unix/garbage.c
-> +++ b/net/unix/garbage.c
-> @@ -198,12 +198,13 @@ void wait_for_unix_gc(void)
->          * Paired with the WRITE_ONCE() in unix_inflight(),
->          * unix_notinflight().
->          */
-> -       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC)
-> +       if (READ_ONCE(unix_tot_inflight) > UNIX_INFLIGHT_TRIGGER_GC) {
->                 queue_work(system_unbound_wq, &unix_gc_work);
->
-> -       /* Penalise senders of not-yet-received-fd */
-> -       if (READ_ONCE(user->unix_inflight))
-> -               flush_work(&unix_gc_work);
-> +               /* Penalise senders of not-yet-received-fd */
-> +               if (READ_ONCE(user->unix_inflight))
-> +                       flush_work(&unix_gc_work);
-> +       }
->  }
->
->  static void __unix_gc(struct work_struct *work)
-> ---8<---
->
->
-> >
-> > Does this sound like a reasonable approach?
-> >
-> [...]
-> > > -static bool gc_in_progress;
-> > > -#define UNIX_INFLIGHT_TRIGGER_GC 16000
-> > > +#define UNIX_INFLIGHT_TRIGGER_GC 16
-> >
-> > It's probably best to keep it at 16k.
->
-> Oops, this is just for testing on my local machine easily :p
->
-> Anyway, I'll post a formal patch this week.
->
-> Thanks!
 
