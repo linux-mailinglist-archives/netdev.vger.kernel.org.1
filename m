@@ -1,73 +1,68 @@
-Return-Path: <netdev+bounces-49291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E75C47F181C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:03:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF4B7F1829
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23D0A1C21864
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:03:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 189B7281657
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:08:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F2D1E502;
-	Mon, 20 Nov 2023 16:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC8D1DDFA;
+	Mon, 20 Nov 2023 16:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="vJXcUxqz"
+	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="jDZ9tXbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA764AA
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:35 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-50970c2115eso6535325e87.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:03:35 -0800 (PST)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2363A7
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:08:28 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-4084de32db5so20565005e9.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 08:08:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700496214; x=1701101014; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qer5SIgtLUsRnvdV4wIK4MVmII4A/reZeCq78BgyVHs=;
-        b=vJXcUxqzL69qzWIxz964/H4wl6qOFllrt407lDIkJPzcIC4M+xELDMYj1WHO1HWBiV
-         7DeEyPqFMGJOtPoYdmZq6vIkQJGltTWM6tB32PEWSbd59z2DR4ZIQGcrYqcp5LJVDoY1
-         7xuLkR7SUaKhCEhVNM29q85P6HXrzI/1FGwa/zWXdViKfIWc9rASAtg/ZBpaeQ4xp599
-         uIgLZa9u2FYxCnrp65ZvmlQekknofj1urtiy7tVUMFk6ZwGCUVT0MqIPmFQ7o4KFXgel
-         uSDmjElUWBLQCWbo8T0kD1sdGqM+wzGGkJUILDKF7N07wAQ2hN+cIPB0vSFhan20LDOa
-         pLTw==
+        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700496507; x=1701101307; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rN7cv6tR5ORx4EtDkeIVWzgXGY477LbEUt3Uc2LZoqI=;
+        b=jDZ9tXbJ+blLD3uy9FaW4n9A2RxOlzXPh0ilRIJ7J5zmCzR4eKX/v14VnQ+1cGwi2r
+         HNdVFwloltkLs+CPqmvOcxoDa+K+FrllbQAnK4A+I57kH5avTyimcnlj9IOhmzHKsFUQ
+         Caq0SgiCgOZGK2focPpYeVmIEvLxIURyIFve3IzcfC7GhzeSpj+JJXGolGo3Phr9iT1S
+         IAGsrW7XwSERT+Igr8wsuqaG4oxGcbkxnvaaN7+5jMczhW1MTlcalC9QksaM/ku1djtW
+         ELK9k4x45SEBItrcgkAc1iMQZQZUiqTvop48lsBmWpNh62iUj370/EsxtVRWGdz8JvtA
+         Z3Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700496214; x=1701101014;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qer5SIgtLUsRnvdV4wIK4MVmII4A/reZeCq78BgyVHs=;
-        b=jXg47pmC67dCBOuJFNd3rXMtO8WGkWJo7Uc2frTBkDJi/LDTldf59ANH84SkcX2l6o
-         fr0+0DpLTdgqz8DCIG0xL0YdIsepBpPLbfddDH7Ak9DIEGWpk5MlSO0JRCOCSE17G+Cc
-         QdZqs/aaMoGdadgOJG1Ae7Ed8fibWfymzoCeUd1P4ocF1m39Cwmthg3IZWb7KlAbFoeS
-         7mpDUAl3sJzg5PpzmL0w+6en1P2z4lxbgOjVOJpqYQiJeFPorCaa182hLPJ+F25SsEPx
-         YoHPRqPaQK2/nHeMaxQqQc0KS0HzO2CWng2LT7YoR0bKeF68Y5PP6OyEnpnIvTsdMn7V
-         eZ1g==
-X-Gm-Message-State: AOJu0Ywo1ooFzMryPsiVFG6Y5sEnex7698hvEOntI94VD+CzpM7PvrJL
-	A65LL6j85w/iUcFtQkLDsEYDpQ==
-X-Google-Smtp-Source: AGHT+IE/JH4O1AgW0MQmqNiPFcTJsQoZ04eHzRRpqqhKljW8mWvlGUoQAFLMlaGmIk9pUbyHaE5lpg==
-X-Received: by 2002:ac2:44a9:0:b0:507:a9b7:f071 with SMTP id c9-20020ac244a9000000b00507a9b7f071mr5100756lfm.1.1700496213929;
-        Mon, 20 Nov 2023 08:03:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700496507; x=1701101307;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rN7cv6tR5ORx4EtDkeIVWzgXGY477LbEUt3Uc2LZoqI=;
+        b=fBdQ4HVFiDULpbfdLlDaRMm77sM7bt2Lo2ocydGeSvXxOr4999cpOSAP8/CjUTpuEE
+         QXZHgeDmzfKekdo1T7ivbPvvdPziq/mmsbqXClZ6cT3mUx8VkNyKeoD6TYPb88UqNsU1
+         ITBQ5xIqXvLI+aO9w1HKZ66qKpq2UM+8+xDaIsyG+I/IuXLkBGYMJz6K0UB1UbAVGIdJ
+         18vCPNtaNN4VEnMwEKq1piKyMOVUOSUH1KZYJa2XbgJf1cFtrjDKehF+hYhFpVbl3LP1
+         r0NzTsSERTzbnSyJj70bx/ah0sgh6b/Jzcvj52/TJ5g/rcG6SvazCDtIRfWg0psFEFlL
+         dWlQ==
+X-Gm-Message-State: AOJu0YztuLbIVmgrCmM1HDDbiWW4bqJOcm9SLa003XWazueurR0dpSAN
+	3R2boC3+J9BDb1Dlrciu2IWaFw==
+X-Google-Smtp-Source: AGHT+IE8rKJqTzJ2hEHRnM3XtzK/67dl+S7PmkbbX/LiIG1cZhbXQYpaU+QDcg9tYkevvwNDu4EEmA==
+X-Received: by 2002:a05:600c:350f:b0:402:ee71:29 with SMTP id h15-20020a05600c350f00b00402ee710029mr7985778wmq.10.1700496507310;
+        Mon, 20 Nov 2023 08:08:27 -0800 (PST)
 Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
-        by smtp.googlemail.com with ESMTPSA id m21-20020a7bce15000000b004080f0376a0sm13564631wmc.42.2023.11.20.08.03.32
+        by smtp.googlemail.com with ESMTPSA id x18-20020a05600c421200b00406443c8b4fsm17827301wmh.19.2023.11.20.08.08.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 08:03:33 -0800 (PST)
+        Mon, 20 Nov 2023 08:08:26 -0800 (PST)
 From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
+To: Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
 	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [net-next v2 5/5] net: ethernet: renesas: rcar_gen4_ptp: Break out to module
-Date: Mon, 20 Nov 2023 17:01:18 +0100
-Message-ID: <20231120160118.3524309-6-niklas.soderlund+renesas@ragnatech.se>
+Subject: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for Ethernet TSN
+Date: Mon, 20 Nov 2023 17:07:40 +0100
+Message-ID: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
 X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20231120160118.3524309-1-niklas.soderlund+renesas@ragnatech.se>
-References: <20231120160118.3524309-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,87 +72,154 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The Gen4 gPTP support will be shared between the existing Renesas
-Ethernet Switch driver and the upcoming Renesas Ethernet-TSN driver. In
-preparation for this break out the gPTP support to its own module.
+Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
+device provides Ethernet network.
 
 Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 ---
-* Changes since v1
-- s/Gen3/Gen4/ in commit message.
-- Add missing MODULE_AUTHOR() and MODULE_DESCRIPTION() definitions.
-- Make Kconfig tristate depend on COMPILE_TEST. All drivers that make
-  use of the shared code auto selects this anyhow.
----
- drivers/net/ethernet/renesas/Kconfig         | 10 ++++++++++
- drivers/net/ethernet/renesas/Makefile        |  5 +++--
- drivers/net/ethernet/renesas/rcar_gen4_ptp.c |  7 +++++++
- 3 files changed, 20 insertions(+), 2 deletions(-)
+ .../bindings/net/renesas,ethertsn.yaml        | 133 ++++++++++++++++++
+ 1 file changed, 133 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
 
-diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
-index 8ef5b0241e64..5a2e7da90e69 100644
---- a/drivers/net/ethernet/renesas/Kconfig
-+++ b/drivers/net/ethernet/renesas/Kconfig
-@@ -44,7 +44,17 @@ config RENESAS_ETHER_SWITCH
- 	select CRC32
- 	select MII
- 	select PHYLINK
-+	select RENESAS_GEN4_PTP
- 	help
- 	  Renesas Ethernet Switch device driver.
- 
-+config RENESAS_GEN4_PTP
-+	tristate "Renesas R-Car Gen4 gPTP support" if COMPILE_TEST
-+	depends on ARCH_RENESAS || COMPILE_TEST
-+	select CRC32
-+	select MII
-+	select PHYLIB
-+	help
-+	  Renesas R-Car Gen4 gPTP device driver.
+diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+new file mode 100644
+index 000000000000..255c8f3a5a3b
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+@@ -0,0 +1,133 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/renesas,ethertsn.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- endif # NET_VENDOR_RENESAS
-diff --git a/drivers/net/ethernet/renesas/Makefile b/drivers/net/ethernet/renesas/Makefile
-index e8fd85b5fe8f..9070acfd6aaf 100644
---- a/drivers/net/ethernet/renesas/Makefile
-+++ b/drivers/net/ethernet/renesas/Makefile
-@@ -8,5 +8,6 @@ obj-$(CONFIG_SH_ETH) += sh_eth.o
- ravb-objs := ravb_main.o ravb_ptp.o
- obj-$(CONFIG_RAVB) += ravb.o
- 
--rswitch_drv-objs := rswitch.o rcar_gen4_ptp.o
--obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch_drv.o
-+obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch.o
++title: Renesas Ethernet TSN End-station
 +
-+obj-$(CONFIG_RENESAS_GEN4_PTP) += rcar_gen4_ptp.o
-diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-index 9583894634ae..72e7fcc56693 100644
---- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-+++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-@@ -176,6 +176,7 @@ int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_register);
- 
- int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
- {
-@@ -183,6 +184,7 @@ int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
- 
- 	return ptp_clock_unregister(ptp_priv->clock);
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_unregister);
- 
- struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
- {
-@@ -196,3 +198,8 @@ struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
- 
- 	return ptp;
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_alloc);
++maintainers:
++  - Niklas Söderlund <niklas.soderlund@ragnatech.se>
 +
-+MODULE_AUTHOR("Yoshihiro Shimoda");
-+MODULE_DESCRIPTION("Renesas R-Car Gen4 gPTP driver");
-+MODULE_LICENSE("GPL");
++description:
++  The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
++  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - enum:
++              - renesas,ethertsn-r8a779g0      # R-Car V4H
++
++  reg:
++    items:
++      - description: TSN End Station target
++      - description: generalized Precision Time Protocol target
++
++  reg-names:
++    items:
++      - const: tsnes
++      - const: gptp
++
++  interrupts:
++    items:
++      - description: TX data interrupt
++      - description: RX data interrupt
++
++  interrupt-names:
++    items:
++      - const: tx_data
++      - const: rx_data
++
++  clocks:
++    maxItems: 1
++
++  power-domains:
++    maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  phy-mode:
++    contains:
++      enum:
++        - mii
++        - rgmii
++
++  phy-handle:
++    $ref: /schemas/types.yaml#/definitions/phandle
++    description:
++      Specifies a reference to a node representing a PHY device.
++
++  renesas,rx-internal-delay:
++    type: boolean
++    description:
++      Enable internal Rx clock delay, typically 1.8ns.
++
++  renesas,tx-internal-delay:
++    type: boolean
++    description:
++      Enable internal Tx clock delay, typically 2.0ns.
++
++  '#address-cells':
++    const: 1
++
++  '#size-cells':
++    const: 0
++
++patternProperties:
++  "^ethernet-phy@[0-9a-f]$":
++    type: object
++    $ref: ethernet-phy.yaml#
++
++required:
++  - compatible
++  - reg
++  - reg-names
++  - interrupts
++  - interrupt-names
++  - clocks
++  - power-domains
++  - resets
++  - phy-mode
++  - phy-handle
++  - '#address-cells'
++  - '#size-cells'
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/r8a779g0-cpg-mssr.h>
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/power/r8a779g0-sysc.h>
++    #include <dt-bindings/gpio/gpio.h>
++
++    tsn0: ethernet@e6460000 {
++        compatible = "renesas,ethertsn-r8a779g0";
++        reg = <0xe6460000 0x7000>,
++              <0xe6449000 0x500>;
++        reg-names = "tsnes", "gptp";
++        interrupts = <GIC_SPI 429 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 430 IRQ_TYPE_LEVEL_HIGH>;
++        interrupt-names = "tx_data", "rx_data";
++        clocks = <&cpg CPG_MOD 2723>;
++        power-domains = <&sysc R8A779G0_PD_ALWAYS_ON>;
++        resets = <&cpg 2723>;
++
++        phy-mode = "rgmii";
++        renesas,tx-internal-delay;
++        phy-handle = <&phy3>;
++
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        phy3: ethernet-phy@3 {
++            compatible = "ethernet-phy-ieee802.3-c45";
++            reg = <0>;
++            interrupt-parent = <&gpio4>;
++            interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
++            reset-gpios = <&gpio1 23 GPIO_ACTIVE_LOW>;
++        };
++    };
 -- 
 2.42.1
 
