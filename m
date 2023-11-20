@@ -1,141 +1,186 @@
-Return-Path: <netdev+bounces-49099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF187F0D11
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:58:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027097F0D28
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4C5E1C210E6
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:58:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F1F28197A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:05:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A70D513;
-	Mon, 20 Nov 2023 07:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FB2DDB1;
+	Mon, 20 Nov 2023 08:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="raiDCEx5"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="OGRyE6wZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3B65B9
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:58:09 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-9f2a53704aaso527440466b.3
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:58:09 -0800 (PST)
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8F2CD5
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:05:47 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id d2e1a72fcca58-6ba54c3ed97so4252359b3a.2
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:05:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700467088; x=1701071888; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SFM17V6sxpc3n6Rd90VeEKHwn5w1C7DDXqAsMGbFouo=;
-        b=raiDCEx5T9de6puc/n3kYBrqihCoux8r/vheCW963i3Sp3+R6B5ZFcATRh7PIVy3Ni
-         pTkguyZ9VAwI8tA6p/orvrBMu+QbVpWCPuou/90sTo80N5/E8okdd3NaoZ2vP+d4iaLy
-         XS7UcbNXKr4jVUuNI1EBJ1XT1XSlve/tBXbUKbhmK7MDJM5Qys3AxViWeoSyKAytKAZ8
-         IxFKyhcGQBAJt+TwMBhDufLoZUwuuLs316YkOahLmgUBrEkSCYFpTlCBMlEDG5kZo9F+
-         xFfTq+1yKVekRwKjKyjbWu9n8PybHBgWrOrqeZ+T9o/nx0KNyD7Rq7yWSW4+tuwbs5AQ
-         U3YQ==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1700467547; x=1701072347; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n4NoqTxZnppS8i0nP/xGCXWB/hxXsx67zIl1hkFjXDo=;
+        b=OGRyE6wZHDiPSa6gF4QXDy5G++VYIEFZkEWmeZEiaskWAB2wUBXtzA5uds46mPpmIB
+         tOe9lhtEvqHdhC3ulemjpZKATvLGbU8hgBrIG5BVVwHGG2ZUNIuZQYotukauA/hBuIRG
+         YptTDtk2RaTYWz51aEQzGQB18IalXh2sqC4SErvC7mZ+3fQwRJA42NBV3fQTU85VvVmv
+         F7RoQe10E6yMVAKEEJcC5js3pXvwarz8J+wa5FW5c4E2S4VaqaBKERXUG+DhVfT2Urnp
+         kRLqGRCEzdGsy85oOI2lKINxkTEKWq3ChqOIkRxk6eeU4aDNjhfThaO37pT2P9HxPaAA
+         b44w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700467088; x=1701071888;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SFM17V6sxpc3n6Rd90VeEKHwn5w1C7DDXqAsMGbFouo=;
-        b=V4xK0XwPu+Zsn6PUVJu5p69ESbEcRGAuEINaJOMwb+1FTp1pmGQqIC0RZw32f30KNL
-         /gFCNyAbx+ZBFKpzaEue5ppVqomD35URheNSmbhLinnb1os7KENDX8p4O7exOsHn2Ilo
-         yrqY7ha/BCYLvi7WwXUpIj2uJPAt9NNFonC8dTblaTts75eP+GLQLnmuygzDjifdrxFn
-         J10vGFQhLOiiN0rnpD5kL70ZmXoEVhWyGV0lCXtAl51gW9kFM54pLJA5pwu3rJV9RHi4
-         BFXQlvu97m6X6sjhViiD5qZgLHulRiQtmGYlwvqZcQBfxVFyY6he2H31fBZcETlCJmut
-         4LAg==
-X-Gm-Message-State: AOJu0YyeHk6tCVALNYHDPxiXHzz8GZ2WWehKF67kD/wnLQc/emOexywP
-	A7+Rt9Vb7kQUzMsFZLwQtZ0zVg==
-X-Google-Smtp-Source: AGHT+IH6RD1dn65fAJTVmhMS/a2BCRxcxHoRxJi2U7hQKZvQK7WNZG8jiLc0NOgw4QpI7/ZFcIJxnQ==
-X-Received: by 2002:a17:906:5188:b0:9e5:19c2:e5f9 with SMTP id y8-20020a170906518800b009e519c2e5f9mr5125471ejk.12.1700467088333;
-        Sun, 19 Nov 2023 23:58:08 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id m23-20020a1709062ad700b0099297782aa9sm3609029eje.49.2023.11.19.23.58.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 23:58:07 -0800 (PST)
-Date: Mon, 20 Nov 2023 08:58:06 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, jacob.e.keller@intel.com,
-	jhs@mojatatu.com, johannes@sipsolutions.net,
-	andriy.shevchenko@linux.intel.com, amritha.nambiar@intel.com,
-	sdf@google.com
-Subject: Re: [patch net-next v2 6/9] netlink: introduce typedef for filter
- function
-Message-ID: <ZVsRjiMg2/vGnBCi@nanopsycho>
-References: <20231116164822.427485-1-jiri@resnulli.us>
- <20231116164822.427485-7-jiri@resnulli.us>
- <20231119145855.GA186930@vergenet.net>
+        d=1e100.net; s=20230601; t=1700467547; x=1701072347;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n4NoqTxZnppS8i0nP/xGCXWB/hxXsx67zIl1hkFjXDo=;
+        b=VllJc/XjDAflaKGwqKu+WuNAKpvoM5BToLOQdMDwc7fzEEiZ+IoBR7Gn91YrW4WJF4
+         XtIPQDxJslZe7bwAXKBjJJEQNB5C3juDTAxaFS3A+Mo5VNXqJ7TuoXR9CYcBgmWPjkgC
+         rCD044bIH0epTSjw3xQb0Zf35UM7DEY/fVgP4k1VkTjDQHEWKghTkpwEUo+uVxLnm/oq
+         fmnrqnQEv8UCKDTPT9q4wF58DsgM80VKk3sYZeNAM63Bpqp8aIuE+3YAJ/nFSb7A8eAu
+         ATYKrNJIHQYHMfVDqpvohbNMomeplVbcLDCJlxyZxeSMkFcD4STK6Z/1v1enzBuiJlHp
+         rd6A==
+X-Gm-Message-State: AOJu0YzcKi8jXkNWo3pqJ+fxexFMxoQuCKKzWHiVTAQBmcdMURwRkyvV
+	bZsFJOMQcSyGLKh3/yIpkdaV6Q==
+X-Google-Smtp-Source: AGHT+IGssdhQXa2d+roUN7IT+TTU6LwlrMuPiMYOCQM48dnmpaA4XEU9k505dahywkNiyYYGiT6THg==
+X-Received: by 2002:a05:6a00:80a:b0:6cb:910a:c6fe with SMTP id m10-20020a056a00080a00b006cb910ac6femr3670261pfk.7.1700467547194;
+        Mon, 20 Nov 2023 00:05:47 -0800 (PST)
+Received: from [157.82.205.15] ([157.82.205.15])
+        by smtp.gmail.com with ESMTPSA id f32-20020a056a000b2000b006c5da63556dsm5673415pfu.178.2023.11.20.00.05.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 00:05:46 -0800 (PST)
+Message-ID: <a1f09866-a443-4f74-8025-6cdb32eb1d2c@daynix.com>
+Date: Mon, 20 Nov 2023 17:05:40 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231119145855.GA186930@vergenet.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 1/7] bpf: Introduce BPF_PROG_TYPE_VNET_HASH
+To: Song Liu <song@kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, bpf <bpf@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>
+References: <20231015141644.260646-1-akihiko.odaki@daynix.com>
+ <20231015141644.260646-2-akihiko.odaki@daynix.com>
+ <CAADnVQLfUDmgYng8Cw1hiZOMfWNWLjbn7ZGc4yOEz-XmeFEz5Q@mail.gmail.com>
+ <2594bb24-74dc-4785-b46d-e1bffcc3e7ed@daynix.com>
+ <CAADnVQ+J+bOtvEfdvgUse_Rr07rM5KOZ5DtAmHDgRmi70W68+g@mail.gmail.com>
+ <CACGkMEs22078F7rSLEz6eQabkZZ=kujSONUNMThZz5Gp=YiidQ@mail.gmail.com>
+ <CAADnVQLt8NWvP8qGWMPx=12PwWWE69P7aS2dbm=khAJkCnJEoQ@mail.gmail.com>
+ <9a4853ad-5ef4-4b15-a49e-9edb5ae4468e@daynix.com>
+ <6253fb6b-9a53-484a-9be5-8facd46c051e@daynix.com>
+ <CAPhsuW5JYoM-Mkehdy=FQsG1nvjbYGzwRZx8BkpG1P7cHdD=eQ@mail.gmail.com>
+ <dba89d4b-84aa-4c9f-b016-56fd3ade04b2@daynix.com>
+ <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CAPhsuW5KLgt_gsih7zi+T99iYVbt7hk7=OCwYzin-H3=OhF54Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Sun, Nov 19, 2023 at 03:58:55PM CET, horms@kernel.org wrote:
->On Thu, Nov 16, 2023 at 05:48:18PM +0100, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> Make the code using filter function a bit nicer by consolidating the
->> filter function arguments using typedef.
->> 
->> Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->> v1->v2:
->> - new patch
->> ---
->>  drivers/connector/connector.c | 5 ++---
->>  include/linux/connector.h     | 6 ++----
->>  include/linux/netlink.h       | 6 ++++--
->>  net/netlink/af_netlink.c      | 6 ++----
->>  4 files changed, 10 insertions(+), 13 deletions(-)
->> 
->> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
->> index 7f7b94f616a6..4028e8eeba82 100644
->> --- a/drivers/connector/connector.c
->> +++ b/drivers/connector/connector.c
->> @@ -59,9 +59,8 @@ static int cn_already_initialized;
->>   * both, or if both are zero then the group is looked up and sent there.
->>   */
->>  int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
->> -	gfp_t gfp_mask,
->> -	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
->> -	void *filter_data)
->> +			 gfp_t gfp_mask, netlink_filter_fn filter,
->> +			 void *filter_data)
->>  {
->>  	struct cn_callback_entry *__cbq;
->>  	unsigned int size;
->> diff --git a/include/linux/connector.h b/include/linux/connector.h
->> index cec2d99ae902..cb18d70d623f 100644
->> --- a/include/linux/connector.h
->> +++ b/include/linux/connector.h
->> @@ -98,10 +98,8 @@ void cn_del_callback(const struct cb_id *id);
->>   *
->>   * If there are no listeners for given group %-ESRCH can be returned.
->>   */
->> -int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
->> -			 u32 group, gfp_t gfp_mask,
->> -			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
->> -				       void *data),
->> +int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
->> +			 gfp_t gfp_mask, netlink_filter_fn filter,
->>  			 void *filter_data);
->
->nit: It might be good to update the kernel doc to account for
->     group => group.
->     Curiously the kernel doc already documents filter_data rather
->     than data.
+On 2023/11/20 6:02, Song Liu wrote:
+> On Sun, Nov 19, 2023 at 12:03 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+> [...]
+>>
+>> Unfortunately no. The communication with the userspace can be done with
+>> two different means:
+>> - usual socket read/write
+>> - vhost for direct interaction with a KVM guest
+>>
+>> The BPF map may be a valid option for socket read/write, but it is not
+>> for vhost. In-kernel vhost may fetch hash from the BPF map, but I guess
+>> it's not a standard way to have an interaction between the kernel code
+>> and a BPF program.
+> 
+> I am very new to areas like vhost and KVM. So I don't really follow.
+> Does this mean we have the guest kernel reading data from host eBPF
+> programs (loaded by Qemu)?
 
-Ah, I copied this from .c file. There is an inconsistency in the
-existing code. Will keep the inconsistency.
+Yes, the guest will read hashes calculated by the host, and the 
+interface is strictly defined with the virtio-net specification.
 
+> 
+>>>
+>>>>
+>>>> Unfortunately, however, it is not acceptable for the BPF subsystem
+>>>> because the "stable" BPF is completely fixed these days. The
+>>>> "unstable/kfunc" BPF is an alternative, but the eBPF program will be
+>>>> shipped with a portable userspace program (QEMU)[1] so the lack of
+>>>> interface stability is not tolerable.
+>>>
+>>> bpf kfuncs are as stable as exported symbols. Is exported symbols
+>>> like stability enough for the use case? (I would assume yes.)
+>>>
+>>>>
+>>>> Another option is to hardcode the algorithm that was conventionally
+>>>> implemented with eBPF steering program in the kernel[2]. It is possible
+>>>> because the algorithm strictly follows the virtio-net specification[3].
+>>>> However, there are proposals to add different algorithms to the
+>>>> specification[4], and hardcoding the algorithm to the kernel will
+>>>> require to add more UAPIs and code each time such a specification change
+>>>> happens, which is not good for tuntap.
+>>>
+>>> The requirement looks similar to hid-bpf. Could you explain why that
+>>> model is not enough? HID also requires some stability AFAICT.
+>>
+>> I have little knowledge with hid-bpf, but I assume it is more like a
+>> "safe" kernel module; in my understanding, it affects the system state
+>> and is intended to be loaded with some kind of a system daemon. It is
+>> fine to have the same lifecycle with the kernel for such a BPF program;
+>> whenever the kernel is updated, the distributor can recompile the BPF
+>> program with the new kernel headers and ship it along with the kernel
+>> just as like a kernel module.
+>>
+>> In contrast, our intended use case is more like a normal application.
+>> So, for example, a user may download a container and run QEMU (including
+>> the BPF program) installed in the container. As such, it is nice if the
+>> ABI is stable across kernel releases, but it is not guaranteed for
+>> kfuncs. Such a use case is already covered with the eBPF steering
+>> program so I want to maintain it if possible.
+> 
+> TBH, I don't think stability should be a concern for kfuncs used by QEMU.
+> Many core BPF APIs are now implemented as kfuncs: bpf_dynptr_*,
+> bpf_rcu_*, etc. As long as there are valid use cases,these kfuncs will
+> be supported.
 
->
->...
+Documentation/bpf/kfuncs.rst still says:
+ > kfuncs provide a kernel <-> kernel API, and thus are not bound by any
+ > of the strict stability restrictions associated with kernel <-> user
+ > UAPIs.
+
+Is it possible to change the statement like as follows:
+"Most kfuncs provide a kernel <-> kernel API, and thus are not bound by 
+any of the strict stability restrictions associated with kernel <-> user
+UAPIs. kfuncs that have same stability restrictions associated with 
+UAPIs are exceptional, and must be carefully reviewed by subsystem (and 
+BPF?) maintainers as any other UAPIs are."
+
+Regards,
+Akihiko Odaki
 
