@@ -1,240 +1,232 @@
-Return-Path: <netdev+bounces-49402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F697F1E74
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:00:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9D437F1C07
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0D841F216C0
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:00:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6B51C21531
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED2C3315B3;
-	Mon, 20 Nov 2023 21:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEE330338;
+	Mon, 20 Nov 2023 18:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LhyQ6Hyg"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="N3F0VHT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CBDA2;
-	Mon, 20 Nov 2023 13:00:08 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-4079ed65471so21334415e9.1;
-        Mon, 20 Nov 2023 13:00:08 -0800 (PST)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE071C8
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:10:17 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-5409bc907edso6520166a12.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:10:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700514007; x=1701118807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jYKLLE+jJbOuTTyZediGWw7197Qa90AHY4Go8ZX9f18=;
-        b=LhyQ6Hyg9/4JPaQMpQYcoikvP6HmTagLd+gZVTUT0HbbnHCMRUYMpoCPt81JSej1Wu
-         oU6QS/j/JeKKiCmhzY9I0GgXp6KAAXOKlxzJS/flQOUoDkb9GR4sR5FvnzqIKqCJj8Cf
-         qJzsYr5XX+nSmRJuqVkUENYAjK4ZTIwPj2Oh7XH0bDEUeiYFtTzZYF3aoeU0qCCfpeZh
-         UYtP1tPf4OC5/3+o39ptNsEJ7d1iYCtkd1gcndJJKkit32w2vpji245+/7SZuty2Asyk
-         A14Kr+KlnSZuaBggCYSXVGDFGFs+0YArdo6CE4nk7VHSkg7lE+1Mz+dHWIJhsb7b+02B
-         gbsA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700503816; x=1701108616; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Im3tYWVO+LRZrM7NFMlzk7H5GIoIMMlBQ7FkUz9ocr4=;
+        b=N3F0VHT0/KXzVj3HaD+0YuJL3JeaqWRDLpst446ul4f23TtBtakP8kgVcrSgzgWTsc
+         iCoPztox8xArWuazH9aGupoN4H9bgtMbcG4QakP1lXSNFXJgx9nEnRRwynlHt6hBXvNN
+         JtlI825a4mk7XiU5TU9ImLhHjr+DYmbZPXIcQbcAf1V6Bpibk7aQfhLWA9qJ5/a39NQN
+         kVdq46YFaXKargUGiNSCyCSq9JWaJ/fSptkZKGjBUjp57N1D3V43zIFQv6/yqx1X25uS
+         tTg00TRQ9nIyTK2NjaKDw8ptGsq6m35TnMpo1Yes/FKgau4xZKEXibQUCSPNbUd37cd7
+         9LPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700514007; x=1701118807;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jYKLLE+jJbOuTTyZediGWw7197Qa90AHY4Go8ZX9f18=;
-        b=atEoazu2QE22NV1RXA0jkpF4Jy8F0dWRKJmUgqMTdmSwyQ+adxDy405HUsYGFfq2Xz
-         Sz9gMVvLUcWPOHDWm8SlfMMQogg3IqdngrE8RGPzYx3ic8LMLcW/ZJ2INZ8Ky1n3xPjZ
-         7C+j7gu+RRtGAkR0VXgzEp+JzytSrjYDRnPVhjjaF34jWIr1n7HaU9f5jd2YjQHMhh/h
-         31u1BeB8R9WV0k8UHmiKBVwHjQYS48njJ++lS8n7iYcRe5jjllAUFlKx0B+OGokEeXlz
-         aWwqFBJTl6x3k/wNh0tC/U0fc4Q0FPPlDOlHL0PvRxoErF0cgYPay6wqwmEZI4qnrc9K
-         rhZg==
-X-Gm-Message-State: AOJu0YwrXU16aQ2XZ1O4rswyqrcGOLO3B92FfvSyUmxPhYUH0b1oWvEu
-	iO90UrendafT+M0KvHByaBs=
-X-Google-Smtp-Source: AGHT+IFp1HLEPbyavvdDiwhKJ8BkAi0jfFUb1yVWVJkvHyRyRHYQ7STDgdXMMPdlUQts0uv0rR4Yww==
-X-Received: by 2002:a05:600c:524c:b0:40a:28b1:70f8 with SMTP id fc12-20020a05600c524c00b0040a28b170f8mr6734823wmb.21.1700514006622;
-        Mon, 20 Nov 2023 13:00:06 -0800 (PST)
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id p13-20020a05600c358d00b0040841e79715sm14886075wmq.27.2023.11.20.13.00.04
+        d=1e100.net; s=20230601; t=1700503816; x=1701108616;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Im3tYWVO+LRZrM7NFMlzk7H5GIoIMMlBQ7FkUz9ocr4=;
+        b=GnPJbar+uW+AHa4dhzrl/pC2LABGRYMJMtJ9vXZXqSKQ1kZzNQatplX7pjYRz7JuHu
+         i/WkT9o7q+4GtabvAWNe7QNy8Vl59twcnevXqcHtacnXiEqo8GiG5dRLzQ8m8FuLZcFc
+         h9/XoALsk8WS89dd/gWnGqPpbu8QHRxtte8mkGldrFxQ1noa4aGjWRCTXtbOLwN0aswc
+         9tWwkEUgRYEMahrFT5CkXpkZmyZTyxFOlhsReWOyKGfYVbEt1Y6zeeq8aOpBiFjWKmeC
+         RubAaGldXrfuPhz61T3haeBTHKaP5/0rXsuGg+YfYXoO39Ub77d8gEn25sVZjGODB0CW
+         4vQw==
+X-Gm-Message-State: AOJu0YwD2u/hH5d59KFEv2+SDAA2qgWXDGf+mdnRETJDsLs+NiD97Fil
+	F1npfXOfpP6mf25GorER9hz0qj3v8kW1G3+8RYH6jg==
+X-Google-Smtp-Source: AGHT+IHnPTI9nGiRC+OjgCLGh7ODbwTqhq4Tp2oQC5T7at+donh8y1CBZiGdF2MLwQ1Fean+N/kNYA==
+X-Received: by 2002:aa7:cfd1:0:b0:540:37d6:c1f3 with SMTP id r17-20020aa7cfd1000000b0054037d6c1f3mr143374edy.11.1700503816255;
+        Mon, 20 Nov 2023 10:10:16 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id f2-20020a50ee82000000b00548c4c4b8d5sm1170061edr.13.2023.11.20.10.10.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 13:00:06 -0800 (PST)
-Message-ID: <655bc8d6.050a0220.d22f2.315f@mx.google.com>
-X-Google-Original-Message-ID: <ZVugxvXKbZqD3MXC@Ansuel-xps.>
-Date: Mon, 20 Nov 2023 19:09:10 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+        Mon, 20 Nov 2023 10:10:15 -0800 (PST)
+Date: Mon, 20 Nov 2023 19:10:14 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	deb.chatterjee@intel.com, anjali.singhai@intel.com,
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
+	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
+	toke@redhat.com, mattyk@nvidia.com, dan.daly@intel.com,
+	chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+Message-ID: <ZVuhBlYRwi8eGiSF@nanopsycho>
+References: <20231116145948.203001-1-jhs@mojatatu.com>
+ <655707db8d55e_55d7320812@john.notmuch>
+ <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
+ <6557b2e5f3489_5ada920871@john.notmuch>
+ <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
+ <ZVspOBmzrwm8isiD@nanopsycho>
+ <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
 
-On Mon, Nov 20, 2023 at 09:44:58PM +0100, Andrew Lunn wrote:
-> On Mon, Nov 20, 2023 at 02:50:30PM +0100, Christian Marangi wrote:
-> > Document ethernet PHY package nodes used to describe PHY shipped in
-> > bundle of 4-5 PHY. These particular PHY require specific PHY in the
-> > package for global onfiguration of the PHY package.
-> > 
-> > Example are PHY package that have some regs only in one PHY of the
-> > package and will affect every other PHY in the package, for example
-> > related to PHY interface mode calibration or global PHY mode selection.
-> 
-> I think you are being overly narrow here. The 'global' registers could
-> be spread over multiple addresses. Particularly for a C22 PHY. I
-> suppose they could even be in a N+1 address space, where there is no
-> PHY at all.
-> 
-> Where the global registers are is specific to a PHY package
-> vendor/model. The PHY driver should know this. All the PHY driver
-> needs to know is some sort of base offset. PHY0 in this package is
-> using address X. It can then use relative addressing from this base to
-> access the global registers for this package.
+Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
+>On Mon, Nov 20, 2023 at 4:39 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Fri, Nov 17, 2023 at 09:46:11PM CET, jhs@mojatatu.com wrote:
+>> >On Fri, Nov 17, 2023 at 1:37 PM John Fastabend <john.fastabend@gmail.com> wrote:
+>> >>
+>> >> Jamal Hadi Salim wrote:
+>> >> > On Fri, Nov 17, 2023 at 1:27 AM John Fastabend <john.fastabend@gmail.com> wrote:
+>> >> > >
+>> >> > > Jamal Hadi Salim wrote:
+>>
+>> [...]
+>>
+>>
+>> >>
+>> >> I think I'm judging the technical work here. Bullet points.
+>> >>
+>> >> 1. p4c-tc implementation looks like it should be slower than a
+>> >>    in terms of pkts/sec than a bpf implementation. Meaning
+>> >>    I suspect pipeline and objects laid out like this will lose
+>> >>    to a BPF program with an parser and single lookup. The p4c-ebpf
+>> >>    compiler should look to create optimized EBPF code not some
+>> >>    emulated switch topology.
+>> >>
+>> >
+>> >The parser is ebpf based. The other objects which require control
+>> >plane interaction are not - those interact via netlink.
+>> >We published perf data a while back - presented at the P4 workshop
+>> >back in April (was in the cover letter)
+>> >https://github.com/p4tc-dev/docs/blob/main/p4-conference-2023/2023P4WorkshopP4TC.pdf
+>> >But do note: the correct abstraction is the first priority.
+>> >Optimization is something we can teach the compiler over time. But
+>> >even with the minimalist code generation you can see that our approach
+>> >always beats ebpf in LPM and ternary. The other ones I am pretty sure
+>>
+>> Any idea why? Perhaps the existing eBPF maps are not that suitable for
+>> this kinds of lookups? I mean in theory, eBPF should be always faster.
+>
+>We didnt look closely; however, that is not the point - the point is
+>the perf difference if there is one, is not big with the big win being
+>proper P4 abstraction. For LPM for sure our algorithmic approach is
+>better. For ternary the compute intensity in looping is better done in
+>C. And for exact i believe that ebpf uses better hashing.
+>Again, that is not the point we were trying to validate in those experiments..
+>
+>On your point of "maps are not that suitable" P4 tables tend to have
+>very specific attributes (examples associated meters, counters,
+>default hit and miss actions, etc).
+>
+>> >we can optimize over time.
+>> >Your view of "single lookup" is true for simple programs but if you
+>> >have 10 tables trying to model a 5G function then it doesnt make sense
+>> >(and i think the data we published was clear that you gain no
+>> >advantage using ebpf - as a matter of fact there was no perf
+>> >difference between XDP and tc in such cases).
+>> >
+>> >> 2. p4c-tc control plan looks slower than a directly mmaped bpf
+>> >>    map. Doing a simple update vs a netlink msg. The argument
+>> >>    that BPF can't do CRUD (which we had offlist) seems incorrect
+>> >>    to me. Correct me if I'm wrong with details about why.
+>> >>
+>> >
+>> >So let me see....
+>> >you want me to replace netlink and all its features and rewrite it
+>> >using the ebpf system calls? Congestion control, event handling,
+>> >arbitrary message crafting, etc and the years of work that went into
+>> >netlink? NO to the HELL.
+>>
+>> Wait, I don't think John suggests anything like that. He just suggests
+>> to have the tables as eBPF maps.
+>
+>What's the difference? Unless maps can do netlink.
+>
+>> Honestly, I don't understand the
+>> fixation on netlink. Its socket messaging, memcpies, processing
+>> overhead, etc can't keep up with mmaped memory access at scale. Measure
+>> that and I bet you'll get drastically different results.
+>>
+>> I mean, netlink is good for a lot of things, but does not mean it is an
+>> universal answer to userspace<->kernel data passing.
+>
+>Here's a small sample of our requirements that are satisfied by
+>netlink for P4 object hierarchy[1]:
+>1. Msg construction/parsing
+>2. Multi-user request/response messaging
 
-Yes that would also work but adds extra fragile code in PHY driver.
-An idea might be define PHY package node with a reg that is the base
-addr... and if we really want every PHY in the PHY package node is an
-offset of the base addr.
+What is actually a usecase for having multiple users program p4 pipeline
+in parallel?
 
->  
-> > It's also possible to specify the property phy-mode to specify that the
-> > PHY package sets a global PHY interface mode and every PHY of the
-> > package requires to have the same PHY interface mode.
-> 
-> I don't think it is what simple. See the QCA8084 for example. 3 of the
-> 4 PHYs must use QXGMII. The fourth PHY can also use QXGMII but it can
-> be multiplexed to a different PMA and use 1000BaseX, SGMII or
-> 2500BaseX.
+>3. Multi-user event subscribe/publish messaging
 
-Yes that is totally a problem but I think it can only be handled with
-some validation in the PHY driver... I assume probe_once would validate
-the modes?
+Same here. What is the usecase for multiple users receiving p4 events?
 
-> 
-> I do think we need somewhere to put package properties. But i don't
-> think phy-mode is such a property. At the moment, i don't have a good
-> example of a package property.
-> 
 
-And this is the main problem with this thing... Find a good way to
-define them that everyone is OK with.
+>
+>I dont think i need to provide an explanation on the differences here
+>visavis what ebpf system calls provide vs what netlink provides and
+>how netlink is a clear fit. If it is not clear i can give more
 
-Another idea might be introduce to each PHY a property that point to the
-PHY package node (phandle) with all the info... But where to place
-that??? Outside mdio node? That would be confusing... This is why I like
-this subnode way.
+It is not :/
 
-I know it deviates a bit from the normal way of defining small node in
-the mdio node one for each PHY.
 
-> > +examples:
-> > +  - |
-> > +    ethernet {
-> > +        #address-cells = <1>;
-> > +        #size-cells = <0>;
-> > +
-> > +        ethernet-phy-package {
-> > +            compatible = "ethernet-phy-package";
-> > +            #address-cells = <1>;
-> > +            #size-cells = <0>;
-> 
-> You have the PHYs within the Ethernet node. This is allowed by DT, for
-> historic reasons. However, i don't remember the last time a patch was
-> submitted that actually used this method. Now a days, PHYs are on an
-> MDIO bus, and they are children of that bus in the DT representation.
-> However you represent the package needs to work with MDIO busses.
-> 
+>breakdown. And of course there's more but above is a good sample.
+>
+>The part that is taken for granted is the control plane code and
+>interaction which is an extremely important detail. P4 Abstraction
+>requires hierarchies with different compiler generated encoded path
+>ids etc. This ID mapping gets exacerbated by having multitudes of  P4
 
-Using the ethernet node was an oversight and actually this is defined as
-a subnode in the mdio node.
+Why the actual eBFP mapping does not serve the same purpose as ID?
+ID:mapping
+1 :1
+?
 
-A real DT that use this is (ipq807x):
 
-&mdio {
-	status = "okay";
-	pinctrl-0 = <&mdio_pins>;
-	pinctrl-names = "default";
-	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
-
-	ethernet-phy-package {
-		compatible = "ethernet-phy-package";
-		phy-mode = "psgmii";
-
-		global-phys = <&qca8075_4>, <&qca8075_psgmii>;
-		global-phy-names = "combo", "analog_psgmii";
-
-		qca8075_0: ethernet-phy@0 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <0>;
-		};
-
-		qca8075_1: ethernet-phy@1 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <1>;
-		};
-
-		qca8075_2: ethernet-phy@2 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <2>;
-		};
-
-		qca8075_3: ethernet-phy@3 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <3>;
-		};
-
-		qca8075_4: ethernet-phy@4 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <4>;
-		};
-
-		qca8075_psgmii: ethernet-phy@5 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <5>;
-		};
-	};
-
-	qca8081: ethernet-phy@28 {
-		compatible = "ethernet-phy-id004d.d101";
-		reg = <28>;
-		reset-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
-	};
-
-	aqr113c: ethernet-phy@8 {
-		compatible = "ethernet-phy-ieee802.3-c45";
-		reg = <8>;
-		reset-gpios = <&tlmm 63 GPIO_ACTIVE_LOW>;
-	};
-};
-
--- 
-	Ansuel
+>programs which have different requirements. Netlink is a natural fit
+>for this P4 abstraction. Not to mention the netlink/tc path (and in
+>particular the ID mapping) provides a conduit for offload when that is
+>needed.
+>eBPF is just a tool - and the objects are intended to be generic - and
+>i dont see how any of this could be achieved without retooling to make
+>it more specific to P4.
+>
+>cheers,
+>jamal
+>
+>
+>
+>>
+>> >I should note: that there was an interesting talk at netdevconf 0x17
+>> >where the speaker showed the challenges of dealing with ebpf on "day
+>> >two" - slides or videos are not up yet, but link is:
+>> >https://netdevconf.info/0x17/sessions/talk/is-scaling-ebpf-easy-yet-a-small-step-to-one-server-but-giant-leap-to-distributed-network.html
+>> >The point the speaker was making is it's always easy to whip an ebpf
+>> >program that can slice and dice packets and maybe even flush LEDs but
+>> >the real work and challenge is in the control plane. I agree with the
+>> >speaker based on my experiences. This discussion of replacing netlink
+>> >with ebpf system calls is absolutely a non-starter. Let's just end the
+>> >discussion and agree to disagree if you are going to keep insisting on
+>> >that.
+>>
+>>
+>> [...]
 
