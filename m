@@ -1,116 +1,113 @@
-Return-Path: <netdev+bounces-49379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60B267F1DAA
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:01:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47E7A7F1DAC
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:01:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 253092828D0
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:01:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E665E1F2441F
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FB037154;
-	Mon, 20 Nov 2023 20:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5qECeYs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E616A37150;
+	Mon, 20 Nov 2023 20:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10DC419BC2;
-	Mon, 20 Nov 2023 20:01:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2FDC433C8;
-	Mon, 20 Nov 2023 20:01:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700510472;
-	bh=xhLK50jLAz04UHazu67omTgum5sysPJRblqRFVwcoQM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=k5qECeYsVfWze77kgqY/oCQAC1fqRDNultn3l8W2z1cbdec99TBye+DVRcUkhJuJA
-	 0vP2dfmOjTqCYKFYdUMfngUr3LKDT7iO0xvPAcNZSZk/FkprASJhzqvOOD2VPT9JQ/
-	 /5IVwLlZfHuFpqGBj1SDVJMDJkNUnSq6gHr5fmPMm1sWq/0Cme2ipthhdB7Ke3Iulb
-	 x/cvEPsJW91cHAP8KriLIkreYSov0UPTSUvv+xvqzCK2RF6qumRKLo/5GUCk+k7GVv
-	 5jZuN5qZmIGo1/8fJsQO//3U270ky986bQJSTHia1yzwxqGuhQha44yRpPthEWGFVc
-	 eqp2dRfCXhTZA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	Jakub Kicinski <kuba@kernel.org>,
-	corbet@lwn.net,
-	workflows@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net] docs: netdev: try to guide people on dealing with silence
-Date: Mon, 20 Nov 2023 12:01:09 -0800
-Message-ID: <20231120200109.620392-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.42.0
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0546FDC;
+	Mon, 20 Nov 2023 12:01:35 -0800 (PST)
+Received: from [192.168.1.103] (178.176.77.202) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 20 Nov
+ 2023 23:01:26 +0300
+Subject: Re: [PATCH 05/13] net: ravb: Stop DMA in case of failures on
+ ravb_open()
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<p.zabel@pengutronix.de>, <yoshihiro.shimoda.uh@renesas.com>,
+	<geert+renesas@glider.be>, <wsa+renesas@sang-engineering.com>,
+	<biju.das.jz@bp.renesas.com>, <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	<sergei.shtylyov@cogentembedded.com>, <mitsuhiro.kimura.kc@renesas.com>,
+	<masaru.nagai.vx@renesas.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+ <20231120084606.4083194-6-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <a03ac3b4-fdd3-c762-2c31-444d88d31141@omp.ru>
+Date: Mon, 20 Nov 2023 23:01:26 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20231120084606.4083194-6-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [178.176.77.202]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/20/2023 19:40:04
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 181488 [Nov 20 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.77.202 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.77.202
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/20/2023 19:44:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/20/2023 5:53:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-There has been more than a few threads which went idle before
-the merge window and now people came back to them and started
-asking about next steps.
+On 11/20/23 11:45 AM, Claudiu wrote:
 
-We currently tell people to be patient and not to repost too
-often. Our "not too often", however, is still a few orders of
-magnitude faster than other subsystems. Or so I feel after
-hearing people talk about review rates at LPC.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> In case ravb_phy_start() returns with error the settings applied in
+> ravb_dma_init() are not reverted (e.g. config mode). For this call
 
-Clarify in the doc that if the discussion went idle for a week
-on netdev, 95% of the time there's no point waiting longer.
+   It's called ravb_dmac_init().
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - rephrase the first paragraph
-v1: https://lore.kernel.org/all/20231118152232.787e9ea2@kernel.org/
+> ravb_stop_dma() on failure path of ravb_open().
+> 
+> Fixes: a0d2f20650e8 ("Renesas Ethernet AVB PTP clock driver")
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-CC: corbet@lwn.net
-CC: workflows@vger.kernel.org
-CC: linux-doc@vger.kernel.org
----
- Documentation/process/maintainer-netdev.rst | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 7feacc20835e..84ee60fceef2 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -193,9 +193,23 @@ Review timelines
- Generally speaking, the patches get triaged quickly (in less than
- 48h). But be patient, if your patch is active in patchwork (i.e. it's
- listed on the project's patch list) the chances it was missed are close to zero.
--Asking the maintainer for status updates on your
--patch is a good way to ensure your patch is ignored or pushed to the
--bottom of the priority list.
-+
-+The high volume of development on netdev makes reviewers move on
-+from discussions relatively quickly. New comments and replies
-+are very unlikely to arrive after a week of silence. If a patch
-+is no longer active in patchwork and the thread went idle for more
-+than a week - clarify the next steps and/or post the next version.
-+
-+For RFC postings specifically, if nobody responded in a week - reviewers
-+either missed the posting or have no strong opinions. If the code is ready,
-+repost as a PATCH.
-+
-+Emails saying just "ping" or "bump" are considered rude. If you can't figure
-+out the status of the patch from patchwork or where the discussion has
-+landed - describe your best guess and ask if it's correct. For example::
-+
-+  I don't understand what the next steps are. Person X seems to be unhappy
-+  with A, should I do B and repost the patches?
- 
- .. _Changes requested:
- 
--- 
-2.42.0
+[...]
 
+MBR, Sergey
 
