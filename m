@@ -1,116 +1,92 @@
-Return-Path: <netdev+bounces-49409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C723E7F1F24
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:25:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8D47F1F2F
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D351C1C2143A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:25:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0D01C21032
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD7E38DE2;
-	Mon, 20 Nov 2023 21:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61EF38DE6;
+	Mon, 20 Nov 2023 21:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LxeEzEeS"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="hFykOVTU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD57C99;
-	Mon, 20 Nov 2023 13:25:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vTiej26Yh66vUupMXOZ8FNGPsbQnKj9z0H8vgIBxYBg=; b=LxeEzEeSpN0Fpj0ZYVs+2MyM++
-	NMvgFyArPgGSngt3mWVaHMhRnEUzvoPGekmJsYhOZyMaSqYEdUzNiE0qlvMSpLwsU3d72pBf2863c
-	n3u2XkWDfI9BiRlKHJK2mD+1hPOzTWQhpTqTJCKOsLPUMEzkYu8wdHMC+pHcXfo+Udl0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1r5BlW-000h20-H5; Mon, 20 Nov 2023 22:25:10 +0100
-Date: Mon, 20 Nov 2023 22:25:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	David Epping <david.epping@missinglinkelectronics.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Harini Katakam <harini.katakam@amd.com>,
-	Simon Horman <horms@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [net-next RFC PATCH 03/14] dt-bindings: net: document ethernet
- PHY package nodes
-Message-ID: <45784368-93e0-4d57-bb0c-5730f53f5a08@lunn.ch>
-References: <20231120135041.15259-1-ansuelsmth@gmail.com>
- <20231120135041.15259-4-ansuelsmth@gmail.com>
- <c21ff90d-6e05-4afc-b39c-2c71d8976826@lunn.ch>
- <655bc8d6.050a0220.d22f2.315f@mx.google.com>
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13D2CA
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:30:40 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id 98e67ed59e1d1-280200949c3so3270984a91.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:30:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1700515840; x=1701120640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J5q0EYm+eZI0fgXpCenD8K3w2uKG3crMC/aZSxiYVRo=;
+        b=hFykOVTUtbrmYJCfU/EsePAlZb/dtC+RxqRG8agzww1BuCEeOI01kQibvmO7/MOcpM
+         RLv2AUx+KRsWvBAFKodbTGhDgYl3Pmb73KRW4vqW+KmEH88PPB85hdXqCH7PDnthB23h
+         VL3z+dU5d2ezYeOMG29UT/FGPA56a+ye1k1joze6j+ncHpbGNbBL4SozNHct/ksxO/uN
+         nkVPBfiuC4cqwljGxTubTJambqqbSFWVoEGD5PA7J1FNbBVdXQnSMgmLQ/3kJReeXqFr
+         fzlM9PuRR6KqX5Dkd9H8kRRFjrUc6TEoVMFseElWo0dxRwssa9q0FpZk1ZX/Dq7g+6Du
+         Lzdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700515840; x=1701120640;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J5q0EYm+eZI0fgXpCenD8K3w2uKG3crMC/aZSxiYVRo=;
+        b=DjEd/W6MmO/bWcbEKf5iEK1PMGAfC1Zy5liU7WjA9Bo3CKyKfE3+JYERnJod0re//2
+         JwkXWYxtZ5a844+lMAFdbwDgV3zseHJ3Tm5EPsCbPW209um6td3JcbAVr97yEfnnrxxf
+         +IHwNND54PhIQaqAAtYZRi5c432avGZiEXwhK/++2QgQ7HiZXm5ctE4No5vsa0kAciYu
+         ZzBfH4aRdQg5DvYpFgYYAoVNESBk3sc97vjJSaLOgYfflfX46Y3MtGsMwGtd4LYPnkrM
+         dYdv6yGFwcR8HsDR4Nff9/iLqg8glZZ30o1Bth/So13dWhyqzpq3Ll0V8wzctwxDBrCI
+         YAuw==
+X-Gm-Message-State: AOJu0YxnRMETUUyCUSsC2ia5GHMNS1VoKn/4W3/R5qfNtDIOe2I/0yQT
+	6KKi7VuagaDYjWUVvTCLgZ9YstCfO8J7EQCMaDY=
+X-Google-Smtp-Source: AGHT+IHSeawXByu456oZ+QXQfTrI61sinCpo0L4LXFTpLT0RlCbdk+UqZs47FbOWh5anZXhSW0C1+A==
+X-Received: by 2002:a17:90b:1bcc:b0:27d:75f2:a3ee with SMTP id oa12-20020a17090b1bcc00b0027d75f2a3eemr6240853pjb.10.1700515840043;
+        Mon, 20 Nov 2023 13:30:40 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id p14-20020a17090a2d8e00b00276cb03a0e9sm5838161pjd.46.2023.11.20.13.30.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 13:30:39 -0800 (PST)
+Date: Mon, 20 Nov 2023 13:30:37 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: razor@blackwall.org, martin.lau@kernel.org, dsahern@kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 v2] ip, link: Add support for netkit
+Message-ID: <20231120133037.7b86ec78@hermes.local>
+In-Reply-To: <20231120211054.8750-1-daniel@iogearbox.net>
+References: <20231120211054.8750-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <655bc8d6.050a0220.d22f2.315f@mx.google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> A real DT that use this is (ipq807x):
-> 
-> &mdio {
-> 	status = "okay";
-> 	pinctrl-0 = <&mdio_pins>;
-> 	pinctrl-names = "default";
-> 	reset-gpios = <&tlmm 37 GPIO_ACTIVE_LOW>;
-> 
-> 	ethernet-phy-package {
-> 		compatible = "ethernet-phy-package";
-> 		phy-mode = "psgmii";
-> 
-> 		global-phys = <&qca8075_4>, <&qca8075_psgmii>;
-> 		global-phy-names = "combo", "analog_psgmii";
-> 
-> 		qca8075_0: ethernet-phy@0 {
-> 			compatible = "ethernet-phy-ieee802.3-c22";
-> 			reg = <0>;
-> 		};
+On Mon, 20 Nov 2023 22:10:54 +0100
+Daniel Borkmann <daniel@iogearbox.net> wrote:
 
-...
+> +static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+> +{
+> +	if (!tb)
+> +		return;
+> +	if (tb[IFLA_NETKIT_MODE]) {
+> +		__u32 mode = rta_getattr_u32(tb[IFLA_NETKIT_MODE]);
+> +
+> +		print_string(PRINT_ANY, "mode", "mode %s ",
+> +			     netkit_mode_strings[mode]);
 
-> 	};
-> 
-> 	qca8081: ethernet-phy@28 {
-> 		compatible = "ethernet-phy-id004d.d101";
-> 		reg = <28>;
-> 		reset-gpios = <&tlmm 31 GPIO_ACTIVE_LOW>;
-> 	};
+What if kernel adds a new mode in future?
+Probably want something like:
 
-I've no idea if DT allows this. The issue is that reg is the same for
-both nodes within the ethernet-phy-package container, and
-ethernet-phy@28. They are all addresses on the same MDIO bus.  We are
-parsing this bus structure ourselves in __of_mdiobus_register(), so we
-could make it work, but i don't know if we should make it work.
-
-      Andrew
-
+		print_string(PRINT_ANY, "mode", "mode %s ",
+			mode >= ARRAY_SIZE(netkit_mode_strings) ? "UNKNOWN" : netkit_mode_strings[mode]);
 
