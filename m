@@ -1,115 +1,235 @@
-Return-Path: <netdev+bounces-49423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C7CF7F2022
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:20:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B791E7F1D6F
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:41:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74F9FB20E94
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:20:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31C451F25A8E
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 19:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC59839858;
-	Mon, 20 Nov 2023 22:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D5636AF7;
+	Mon, 20 Nov 2023 19:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bSkcjujV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mJI/HRGW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E1AD12A;
-	Mon, 20 Nov 2023 14:20:08 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-40b26d700a1so2531985e9.0;
-        Mon, 20 Nov 2023 14:20:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700518806; x=1701123606; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+WAcz7z2EchyAwpWIM7/dxS2+rVeXdmwsl1o0TskhuM=;
-        b=bSkcjujVEc+Hy/rmqa/TY6sKbAeO2Dv9mO9+cjLo0Js6D8Kca4I0+KYddHK1E+/d4x
-         f/ILLqlo4EqzWyqrWSKOTyYr6+A9tqf3fueGrYVTKWluwxrUat/XGSSGruybzJUSvH0g
-         YCpZNJW1A/8vi18WkABgokoXHU5l49W2Wzqxwmpgi+I5fN/2teMqmWG9mzpJPutQK+4/
-         KMHfTwH9CX74uOIojxMbF0ftNWVw3oZL96NrE4Jls6oU6PVB8ioxOTt4LVFRdZeYSVSl
-         PeNXM9yXEczt5KoL6wj1OFBFWgNm3JIF+xbqALh7hlv0IFeeKm1A3dY4jvFCV6DZrKZe
-         LWdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700518806; x=1701123606;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+WAcz7z2EchyAwpWIM7/dxS2+rVeXdmwsl1o0TskhuM=;
-        b=BMv6KvGnZwnvsctvDQw3mJbUqFWzVZ4j09fyOmXBoqw78Ljg/KEA/8TYS9lxc0/z4Q
-         hlCKcWzJYyjjC4uQkWAbg5Igd83/qGPfp4JER6Rgy9e/T4FXSs7cfkl0sU0KQGeXhbqt
-         IbjVP4oknPOpJewimStCv5ipYO/yXNGxmrSj4INxeQyIDoyuPTBKdnyAuULt+22GhD9L
-         9tivD8slOaS81SnVRHlOtLc2gw3uX76AQxuOEemjmnq+dukwIXPj4bgdb+x7C0d9lSya
-         3g4FQpQ0FUdSlnm7nfsTewnW4X1rlwDMUgsDUGKCkpMVJZ4+yA65nABdQsAIE6iRwMfS
-         mU+A==
-X-Gm-Message-State: AOJu0YxnojhRK0tit5aMzLnikdHLFQ7nmh+Dpis3HrWKNNwLtawmpwMO
-	SnBJinrEnrdsBOhTbjGa12w=
-X-Google-Smtp-Source: AGHT+IGmCnUatVvq0MESDezOL9cHV1WEG+GyZwirREnYHbta0QT4AB+/RYdJnjboU7QZylGq0kI/gg==
-X-Received: by 2002:a5d:688e:0:b0:317:6ea5:ab71 with SMTP id h14-20020a5d688e000000b003176ea5ab71mr5078027wru.30.1700518806281;
-        Mon, 20 Nov 2023 14:20:06 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id f18-20020adfdb52000000b00332cbda1970sm1739089wrj.30.2023.11.20.14.20.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 14:20:05 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DC736AED;
+	Mon, 20 Nov 2023 19:41:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 532A4C433C8;
+	Mon, 20 Nov 2023 19:41:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700509275;
+	bh=Lr3mKQ94fwm7siGM06WAsHZ8psEWqwiymuFwzRs9H0M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mJI/HRGWLBCNAfUdKjEafFXsUs6lQCId2SUGlEjK3LuCHq9Kmbgo5iHeFgoWXQ2S6
+	 +RgeZq6OeNOlh60XpJHMsZIXlmAlEOUgLrlgCTv9TIzMDEb7JPU4WikKRSLZh8NRC2
+	 qqoqn7e7S2csqdSkdHHwhYwLbM2U/56X1onLjq3DTzZ/EG2xjBcsrszP3K+xDTUNAe
+	 tISdYEU3IBiklSIo+UtM21si2q287vn6eUR3BJRf8YnjKsd6FlYoE/2b4m21zVWrM2
+	 DPZLBRQT/OQBkyrSBRjHxTDDP7g1+9MKS2hEO0Ebpd1xlQt3TE0+nF9ybw63PRLnOP
+	 mYTf0zFcecjjg==
+Date: Mon, 20 Nov 2023 12:41:12 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Coco Li <lixiaoyan@google.com>
+Cc: kernel test robot <lkp@intel.com>, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Robert Marko <robimarko@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kernel test robot <lkp@intel.com>
-Subject: [net-next PATCH] net: phy: aquantia: make mailbox interface4 lsw addr mask more specific
-Date: Mon, 20 Nov 2023 20:35:04 +0100
-Message-Id: <20231120193504.5922-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
+	Neal Cardwell <ncardwell@google.com>,
+	Mubashir Adnan Qureshi <mubashirq@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>, llvm@lists.linux.dev,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>,
+	Pradeep Nemavat <pnemavat@google.com>
+Subject: Re: [PATCH v7 net-next 4/5] net-device: reorganize net_device fast
+ path variables
+Message-ID: <20231120194112.GA276812@dev-arch.thelio-3990X>
+References: <20231113233301.1020992-5-lixiaoyan@google.com>
+ <202311162002.m26ObVLU-lkp@intel.com>
+ <CADjXwjjPrhDF3hfPWKrXxCkJjwBJDfumFkAvCPg2gvOBme2sTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADjXwjjPrhDF3hfPWKrXxCkJjwBJDfumFkAvCPg2gvOBme2sTA@mail.gmail.com>
 
-It seems some arch (s390) require a more specific mask for FIELD_PREP
-and doesn't like using GENMASK(15, 2) for u16 values.
+On Fri, Nov 17, 2023 at 11:44:41AM -0800, Coco Li wrote:
+> Spending some time setting up a clang17 compatible environment, will
+> update soon.
 
-Fix the compilation error by adding the additional mask for the BITS
-that the PHY ignore and AND the passed addr with the real mask that the
-PHY will parse for the mailbox interface 4 addr to make sure extra
-values are correctly removed.
+In case you have not seen it, I have prebuilt LLVM toolchains available
+on kernel.org that should make working in your current environment
+easier:
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202311210414.sEJZjlcD-lkp@intel.com/
-Fixes: e93984ebc1c8 ("net: phy: aquantia: add firmware load support")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/aquantia/aquantia.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+https://mirrors.edge.kernel.org/pub/tools/llvm/
 
-diff --git a/drivers/net/phy/aquantia/aquantia.h b/drivers/net/phy/aquantia/aquantia.h
-index 9ed38972abdb..7685bfaf0b07 100644
---- a/drivers/net/phy/aquantia/aquantia.h
-+++ b/drivers/net/phy/aquantia/aquantia.h
-@@ -30,7 +30,10 @@
- #define VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE3_MSW_ADDR_MASK, (u16)((x) >> 16))
- #define VEND1_GLOBAL_MAILBOX_INTERFACE4			0x0203
- #define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK	GENMASK(15, 2)
--#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK, (u16)(x))
-+#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_DONT_CARE_MASK	GENMASK(1, 0)
-+#define VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(x)	FIELD_PREP(VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK | \
-+								   VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_DONT_CARE_MASK, \
-+								   (u16)((x) & VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR_MASK))
- 
- #define VEND1_GLOBAL_MAILBOX_INTERFACE5			0x0204
- #define VEND1_GLOBAL_MAILBOX_INTERFACE5_MSW_DATA_MASK	GENMASK(15, 0)
--- 
-2.40.1
+For example, I just tested with:
 
+  $ mkdir -p $HOME/toolchains
+
+  $ curl -LSs https://mirrors.edge.kernel.org/pub/tools/llvm/files/llvm-17.0.5-"$(uname -m)".tar.xz | tar -C $HOME/toolchains -xJf -
+
+  $ curl -LSso .config https://download.01.org/0day-ci/archive/20231116/202311162002.m26ObVLU-lkp@intel.com/config
+
+  $ make -skj"$(nproc)" ARCH=powerpc LLVM=$HOME/toolchains/llvm-17.0.5-"$(uname -m)"/bin/ olddefconfig net/core/dev.o
+  net/core/dev.c:11547:2: error: call to '__compiletime_assert_971' declared with 'error' attribute: BUILD_BUG_ON failed: offsetof(struct net_device, __cacheline_group_end__net_device_read_txrx) - offsetofend(struct net_device, __cacheline_group_begin__net_device_read_txrx) > 24
+   11547 |         CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 24);
+         |         ^
+  include/linux/cache.h:108:2: note: expanded from macro 'CACHELINE_ASSERT_GROUP_SIZE'
+    108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP) - \
+        |         ^
+  include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
+     50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+        |         ^
+  include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+     39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+        |                                     ^
+  note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+  include/linux/compiler_types.h:423:2: note: expanded from macro '_compiletime_assert'
+    423 |         __compiletime_assert(condition, msg, prefix, suffix)
+        |         ^
+  include/linux/compiler_types.h:416:4: note: expanded from macro '__compiletime_assert'
+    416 |                         prefix ## suffix();                             \
+        |                         ^
+  <scratch space>:11:1: note: expanded from here
+     11 | __compiletime_assert_971
+        | ^
+  1 error generated.
+
+See the Kbuild documentation if you have any other questions (or just
+ask me directly):
+
+https://kernel.org/doc/html/latest/kbuild/llvm.html
+
+Cheers,
+Nathan
+
+> On Thu, Nov 16, 2023 at 4:40 AM kernel test robot <lkp@intel.com> wrote:
+> >
+> > Hi Coco,
+> >
+> > kernel test robot noticed the following build errors:
+> >
+> > [auto build test ERROR on net-next/main]
+> >
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Coco-Li/Documentations-Analyze-heavily-used-Networking-related-structs/20231114-073648
+> > base:   net-next/main
+> > patch link:    https://lore.kernel.org/r/20231113233301.1020992-5-lixiaoyan%40google.com
+> > patch subject: [PATCH v7 net-next 4/5] net-device: reorganize net_device fast path variables
+> > config: powerpc-mpc8313_rdb_defconfig (https://download.01.org/0day-ci/archive/20231116/202311162002.m26ObVLU-lkp@intel.com/config)
+> > compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20231116/202311162002.m26ObVLU-lkp@intel.com/reproduce)
+> >
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202311162002.m26ObVLU-lkp@intel.com/
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    net/core/dev.c:4079:1: warning: unused function 'sch_handle_ingress' [-Wunused-function]
+> >     4079 | sch_handle_ingress(struct sk_buff *skb, struct packet_type **pt_prev, int *ret,
+> >          | ^
+> >    net/core/dev.c:4086:1: warning: unused function 'sch_handle_egress' [-Wunused-function]
+> >     4086 | sch_handle_egress(struct sk_buff *skb, int *ret, struct net_device *dev)
+> >          | ^
+> >    net/core/dev.c:5296:19: warning: unused function 'nf_ingress' [-Wunused-function]
+> >     5296 | static inline int nf_ingress(struct sk_buff *skb, struct packet_type **pt_prev,
+> >          |                   ^
+> > >> net/core/dev.c:11547:2: error: call to '__compiletime_assert_971' declared with 'error' attribute: BUILD_BUG_ON failed: offsetof(struct net_device, __cacheline_group_end__net_device_read_txrx) - offsetofend(struct net_device, __cacheline_group_begin__net_device_read_txrx) > 24
+> >     11547 |         CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 24);
+> >           |         ^
+> >    include/linux/cache.h:108:2: note: expanded from macro 'CACHELINE_ASSERT_GROUP_SIZE'
+> >      108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP) - \
+> >          |         ^
+> >    include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
+> >       50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+> >          |         ^
+> >    include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+> >       39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+> >          |                                     ^
+> >    note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+> >    include/linux/compiler_types.h:423:2: note: expanded from macro '_compiletime_assert'
+> >      423 |         __compiletime_assert(condition, msg, prefix, suffix)
+> >          |         ^
+> >    include/linux/compiler_types.h:416:4: note: expanded from macro '__compiletime_assert'
+> >      416 |                         prefix ## suffix();                             \
+> >          |                         ^
+> >    <scratch space>:11:1: note: expanded from here
+> >       11 | __compiletime_assert_971
+> >          | ^
+> >    3 warnings and 1 error generated.
+> >
+> >
+> > vim +11547 net/core/dev.c
+> >
+> >  11515
+> >  11516  static void __init net_dev_struct_check(void)
+> >  11517  {
+> >  11518          /* TX read-mostly hotpath */
+> >  11519          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, priv_flags);
+> >  11520          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, netdev_ops);
+> >  11521          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, header_ops);
+> >  11522          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, _tx);
+> >  11523          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, real_num_tx_queues);
+> >  11524          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_size);
+> >  11525          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_ipv4_max_size);
+> >  11526          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, gso_max_segs);
+> >  11527          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, num_tc);
+> >  11528          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, mtu);
+> >  11529          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, needed_headroom);
+> >  11530          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tc_to_txq);
+> >  11531  #ifdef CONFIG_XPS
+> >  11532          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, xps_maps);
+> >  11533  #endif
+> >  11534  #ifdef CONFIG_NETFILTER_EGRESS
+> >  11535          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, nf_hooks_egress);
+> >  11536  #endif
+> >  11537  #ifdef CONFIG_NET_XGRESS
+> >  11538          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_tx, tcx_egress);
+> >  11539  #endif
+> >  11540          CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_tx, 152);
+> >  11541
+> >  11542          /* TXRX read-mostly hotpath */
+> >  11543          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, flags);
+> >  11544          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, hard_header_len);
+> >  11545          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, features);
+> >  11546          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, ip6_ptr);
+> >  11547          CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 24);
+> >  11548
+> >  11549          /* RX read-mostly hotpath */
+> >  11550          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ptype_specific);
+> >  11551          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ifindex);
+> >  11552          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, real_num_rx_queues);
+> >  11553          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, _rx);
+> >  11554          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_flush_timeout);
+> >  11555          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, napi_defer_hard_irqs);
+> >  11556          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_max_size);
+> >  11557          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_ipv4_max_size);
+> >  11558          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler);
+> >  11559          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler_data);
+> >  11560          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, nd_net);
+> >  11561  #ifdef CONFIG_NETPOLL
+> >  11562          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, npinfo);
+> >  11563  #endif
+> >  11564  #ifdef CONFIG_NET_XGRESS
+> >  11565          CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
+> >  11566  #endif
+> >  11567          CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 96);
+> >  11568  }
+> >  11569
+> >
+> > --
+> > 0-DAY CI Kernel Test Service
+> > https://github.com/intel/lkp-tests/wiki
+> 
 
