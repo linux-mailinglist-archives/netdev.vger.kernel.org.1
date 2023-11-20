@@ -1,108 +1,135 @@
-Return-Path: <netdev+bounces-49156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3817F0F4C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:44:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB127F0F51
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:46:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A862B20FE5
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:44:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06AEC2813B7
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA4E11C94;
-	Mon, 20 Nov 2023 09:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 887C011CA0;
+	Mon, 20 Nov 2023 09:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CgzvaRl9"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="em0LFo0+"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::226])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B800394;
-	Mon, 20 Nov 2023 01:44:43 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5DD06C0007;
-	Mon, 20 Nov 2023 09:44:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700473482;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KRwo00+jtt7LDV8N20Ju5aZbZkWbKyYh1LA49h3QOv0=;
-	b=CgzvaRl9Tf8DVnPQ5vTuF4NUswYQSOr+/LRzIO4OVH9761SFi8DqK3q6umgXbPC7PvsrOf
-	R6i9fUhyZkmwdJzMZj0vu95uyitf2mdnmE49UjpRV2O3zWvqfm7Q5nOriP61qTNWvnqnG6
-	95x9PRYTkhGS9t7PvN8ILkpSrmJARR0vHeGGjGI6VwF7kwzk38jmnDPceqdYMB0sQ2IAMj
-	S5wpowHzmDyHW4SW8Dj1zIiBi2Ac9BVGBMX0sIgDqhcnaQbnIaYPzgwLZ5ctXZDS2x97nl
-	fNNgtYVIj0+K4aQE5bTOxrELFrAr/yp9iES50Bl8CBh+nsH7F17rYwf0hgHnZQ==
-Date: Mon, 20 Nov 2023 10:44:39 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231120104439.15bfdd09@kmaincent-XPS-13-7390>
-In-Reply-To: <20231118183433.30ca1d1a@kernel.org>
-References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
-	<20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
-	<20231118183433.30ca1d1a@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E00295
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:46:01 -0800 (PST)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2c503dbe50dso54490091fa.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:46:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1700473559; x=1701078359; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zkX770QsciZgmyIjGlD/aDGrwKJCqahJAwyCfq7+gms=;
+        b=em0LFo0+cNdIwjHui+KvAJqhsgPFIryudKSw7lvCaZkfx5RO7o8Mqc7OrgvX6AyGuH
+         PhkeM8C5Us3U6x/f1oeEjd5/4IW98UwJK0lzs0fM5/5LMwfluNFD6GHv14CXje6Vw92m
+         oXuWl7mhIf2tp2bD9maiczdrRXQtRVjNRDQucBbBQIiJ2SbGgZGsgvHFtqMQhgl0qxoP
+         zXeAub3ZG6LY8bFr1tI/FZQtylF+Xz9ryw/lVGpKRgYQbQskQJg+Wfst3Vswdk2zRde5
+         C9sXJQY8Kl3n1wC8/tJloR9et6V7DOoQrXvJzOoGeG5tuwqVJV3JUF98qYMLZgHz35fY
+         wQrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700473559; x=1701078359;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zkX770QsciZgmyIjGlD/aDGrwKJCqahJAwyCfq7+gms=;
+        b=ssMCdrUmVsW64MwNGXVbahtENFLPx+o5Q+QwP8haJVOJNjjEfucs/KA3YESUuruFsj
+         xoRzzw2cDnrSiW5dNwhEpwRnvM31VHFgDOxOpB2qYeTitOpZneosyb/X16Ra/79pBcxz
+         5KN9POZrYI4mQevCbETo5onBl/aGmOnh6YhCt6GjqLOYCQGteElLJ7vkNbEtPNAOOBtE
+         925y+euQWhNNKhjXy/kp1k0gn5yS7vdnUGiOP1BVlvMVuyfOU5GhArW6zBQ3DOi+egI7
+         tGIDSXXjjF4PTC3slt9Em+rWRE3tSHj9PIB2YzQE4xChl06rXLuasfFY9BBV3jJthCJ5
+         qanw==
+X-Gm-Message-State: AOJu0YzSZCeo4TsonJ+GkxiBVEtORsoqscQMgClej3+QzxacbbIItvj3
+	/RvDcmhILcIN6G18g4LY5HtZkI/HmEAFEmrtafMOxy1PpDORYFDNNqoxyLc4
+X-Google-Smtp-Source: AGHT+IEXtmIeiiZFXoFRKaKbc0qrn9hxoDeZVP3wrl6QX3VQYn1t47LiuGEcBE/xagf4bs0P7gMKS4so7X7kWUS/TJM=
+X-Received: by 2002:a2e:8e38:0:b0:2c6:ed5e:bbf0 with SMTP id
+ r24-20020a2e8e38000000b002c6ed5ebbf0mr4711811ljk.34.1700473559467; Mon, 20
+ Nov 2023 01:45:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20231116114150.48639-1-huangjie.albert@bytedance.com> <ZVcxmwm/DRTB8QwO@lore-desk>
+In-Reply-To: <ZVcxmwm/DRTB8QwO@lore-desk>
+From: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
+Date: Mon, 20 Nov 2023 17:45:47 +0800
+Message-ID: <CABKxMyPMboVYs01KfPEdxPbx-LT88Qe1pcDMaT0NiNWhA-5emg@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH net] veth: fix ethtool statistical errors
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Toshiaki Makita <toshiaki.makita1@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Sat, 18 Nov 2023 18:34:33 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=8817=
+=E6=97=A5=E5=91=A8=E4=BA=94 17:26=E5=86=99=E9=81=93=EF=BC=9A
+>
+> > if peer->real_num_rx_queues > 1, the ethtool -s command for
+> > veth network device will display some error statistical values.
+> > The value of tx_idx is reset with each iteration, so even if
+> > peer->real_num_rx_queues is greater than 1, the value of tx_idx
+> > will remain constant. This results in incorrect statistical values.
+> > To fix this issue, assign the value of pp_idx to tx_idx.
+> >
+> > Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit accou=
+nting")
+> > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
+> > ---
+> >  drivers/net/veth.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> > index 0deefd1573cf..3a8e3fc5eeb5 100644
+> > --- a/drivers/net/veth.c
+> > +++ b/drivers/net/veth.c
+> > @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net_devic=
+e *dev,
+> >       for (i =3D 0; i < peer->real_num_rx_queues; i++) {
+> >               const struct veth_rq_stats *rq_stats =3D &rcv_priv->rq[i]=
+.stats;
+> >               const void *base =3D (void *)&rq_stats->vs;
+> > -             unsigned int start, tx_idx =3D idx;
+> > +             unsigned int start, tx_idx =3D pp_idx;
+> >               size_t offset;
+> >
+> >               tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ_STATS=
+_LEN;
+> > --
+> > 2.20.1
+> >
+>
+> Hi Albert,
+>
+> Can you please provide more details about the issue you are facing?
+> In particular, what is the number of configured tx and rx queues for both
+> peers?
 
-> On Tue, 14 Nov 2023 12:28:43 +0100 Kory Maincent wrote:
-> > +	if (!tb[ETHTOOL_A_TS_LAYER])
-> > +		return 0; =20
->=20
-> GENL_REQ_ATTR_CHECK(), not sure why anyone would issue this command
-> without any useful attr.
->=20
-> > +	/* Disable time stamping in the current layer. */
-> > +	if (netif_device_present(dev) &&
-> > +	    (dev->ts_layer =3D=3D PHY_TIMESTAMPING ||
-> > +	    dev->ts_layer =3D=3D MAC_TIMESTAMPING)) {
-> > +		ret =3D dev_set_hwtstamp_phylib(dev, &config, info->extack);
-> > +		if (ret < 0)
-> > +			return ret; =20
->=20
-> So you only support PHYLIB?
->=20
-> The semantics need to be better documented :(
+Hi, Lorenzo
+I found this because I wanted to add more echo information in ethttool=EF=
+=BC=88for veth,
+but I found that the information was incorrect. That's why I paid
+attention here.
 
-Yes as we don't really know how each MAC deal with the timestamping
-before ndo_hwstamp_get/set. Using phylib only allows us to be sure these ND=
-O are
-implemented and the management of timestamping is coherent in the MAC. Also=
- It
-will push people to move on to these NDOs.
+> tx_idx is the index of the current (local) tx queue and it must restart f=
+rom
+> idx in each iteration otherwise we will have an issue when
+> peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
+>
+OK. I don't know if this is a known issue.
 
-Ok I will add documentation.
+BR
+Albert
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+
+> Regards,
+> Lorenzo
 
