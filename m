@@ -1,244 +1,128 @@
-Return-Path: <netdev+bounces-49216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8CCB7F12B3
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:06:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD087F12BC
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CF8CB21828
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:06:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEF751C209A4
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B2B18E25;
-	Mon, 20 Nov 2023 12:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B7F18E16;
+	Mon, 20 Nov 2023 12:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="HnO/ppiz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="feyk5uCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2910B3
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d9443c01a7336-1cc3542e328so30915845ad.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:06:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700481985; x=1701086785; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
-        b=HnO/ppizM8cfSWaDgEGbMcPd5eBa6UOHmyWL7vaiT0FimNmOQS+KH/RwTiQQcMrcjb
-         zfW42PV534nwcpjPD254kGcioPcFz+CGzh56ywJ1SMT9tXEARKtKrEJBjWzzqolJpS0j
-         UMqXmD3v/LwBsp/hueOrfYFBXSAC5yHr2/Do6hcc/GgWTLzUFq68ERCpAkRiWpnkxVPF
-         OSplZVF+Lg1nqgqByLBnijiv5SmMEMe2NafCH66ay20UT18bM8KAZzgzofbSshuJ13do
-         kZOwDOUuew7681N/rnIuBkFME11xa/N01B/ttdl81/hnNDiFVgyjZyEILEMBR1Y2IwEx
-         J6Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700481985; x=1701086785;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xVcC8hR/V0NYT0+DB0uWFXv4sVGxkELPBpe0/v11m1o=;
-        b=tfEVoQFsIjF25oGN5twaBUbe48BMT8EFOIUqjFqMcooIn4Kk6sC98+WSYuvLijZg7k
-         J+NN+IBrBGOzB7o8yrJqiubZ6kMKW512AKc8JIETBRXJkWx85F2Ovh4RZrGXJ8OUCj2I
-         UIb8eWH2i9cCaa4MlOV5tsfIoS23E66Fpgzbwyzk7GVGdOa8bxlXVgrliHHKvrg2MV5n
-         jXRqNESqXC6V7ZiN0hci0r7jf9bGbAWsFNHZ5M4NgGl6eHsfSScLps9W8M0aFfC5bYpQ
-         JimTBRtO/+0ogG6H3ZvdfAt52nqb76GiCzLED7jqbmxBZAXjoO1BiWP9ryKpexDl+u3O
-         Y++A==
-X-Gm-Message-State: AOJu0Yz5CCzupjHtrFJ5oHAo5AYWyhi2hj2CydZwxrZFVRjPRrhy/nRQ
-	Mz7ChfKx6SENe6fkU/RaprpsZA==
-X-Google-Smtp-Source: AGHT+IGM1XuWCU5poSeUzc7w4cvTyjbzDfnxMsuQyhs+1L/NEmEH7PI3Hq6+FgbcpyTkz6qgnpHy0A==
-X-Received: by 2002:a17:902:c18b:b0:1cf:5673:3630 with SMTP id d11-20020a170902c18b00b001cf56733630mr3480320pld.6.1700481985103;
-        Mon, 20 Nov 2023 04:06:25 -0800 (PST)
-Received: from [10.4.27.171] ([139.177.225.255])
-        by smtp.gmail.com with ESMTPSA id t1-20020a170902bc4100b001c60a2b5c61sm2170268plz.134.2023.11.20.04.06.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Nov 2023 04:06:20 -0800 (PST)
-Message-ID: <06613204-b279-4f66-a786-e5e26bccd42e@bytedance.com>
-Date: Mon, 20 Nov 2023 20:06:08 +0800
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 626BEF2
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:07:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700482019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E4L8bVjqEkvHhs/ZW+HMgpg1xC58k9+Ym9UYgqEjP94=;
+	b=feyk5uCzI4TRmZyPvjH9O8HoDGRnLCHdwVzn2RspNpIksTgyIVcdJBFUkwwNnNBYffv8Q0
+	RUQg6SW0/vmpLlO9O22CuwlTJ5tb9LoOOv1GZeLb7pVLv9/R3b1yWR238nCnh1MazhbPL6
+	M7iuWBaXwOy+ptfPFxseR14M7QgpsEo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-U29Fn8xzOjKBHZFCT7zRzw-1; Mon, 20 Nov 2023 07:06:56 -0500
+X-MC-Unique: U29Fn8xzOjKBHZFCT7zRzw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DA174185A782;
+	Mon, 20 Nov 2023 12:06:55 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.193.97])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 79E8E2166B26;
+	Mon, 20 Nov 2023 12:06:52 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: pabeni@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	weihao.bj@ieisystem.com
+Subject: [PATCH v2 1/2] net: usb: ax88179_178a: fix failed operations during ax88179_reset
+Date: Mon, 20 Nov 2023 13:06:29 +0100
+Message-ID: <20231120120642.54334-1-jtornosm@redhat.com>
+In-Reply-To: <020ff11184bb22909287ef68d97c00f7d2c73bd6.camel@redhat.com>
+References: <020ff11184bb22909287ef68d97c00f7d2c73bd6.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Content-Language: en-US
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Tobias Huschle <huschle@linux.ibm.com>,
- Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com
-References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
- <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
- <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
- <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
-From: Abel Wu <wuyun.abel@bytedance.com>
-In-Reply-To: <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On 11/20/23 6:56 PM, Peter Zijlstra Wrote:
-> On Sat, Nov 18, 2023 at 01:14:32PM +0800, Abel Wu wrote:
-> 
->> Hi Peter, I'm a little confused here. As we adopt placement strategy #1
->> when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
->> Given that the weight doesn't change, we have:
->>
->> 	vl' = vl
->>
->> But in fact it is scaled on placement:
->>
->> 	vl' = vl * W/(W + w)
-> 
-> (W+w)/W
+Using generic ASIX Electronics Corp. AX88179 Gigabit Ethernet device,
+the following test cycle has been implemented:
+    - power on
+    - check logs
+    - shutdown
+    - after detecting the system shutdown, disconnect power
+    - after approximately 60 seconds of sleep, power is restored
+Running some cycles, sometimes error logs like this appear:
+    kernel: ax88179_178a 2-9:1.0 (unnamed net_device) (uninitialized): Failed to write reg index 0x0001: -19
+    kernel: ax88179_178a 2-9:1.0 (unnamed net_device) (uninitialized): Failed to read reg index 0x0001: -19
+    ...
+These failed operation are happening during ax88179_reset execution, so
+the initialization could not be correct.
 
-Ah, right. I misunderstood (again) the comment which says:
+In order to avoid this, we need to increase the delay after reset and
+clock initial operations. By using these larger values, many cycles
+have been run and no failed operations appear.
 
-	vl_i = (W + w_i)*vl'_i / W
+It would be better to check some status register to verify when the
+operation has finished, but I do not have found any available information
+(neither in the public datasheets nor in the manufacturer's driver). The
+only available information for the necessary delays is the maufacturer's
+driver (original values) but the proposed values are not enough for the
+tested devices.
 
-So the current implementation is:
+Fixes: e2ca90c276e1f ("ax88179_178a: ASIX AX88179_178A USB 3.0/2.0 to gigabit ethernet adapter driver")
+Reported-by: Herb Wei <weihao.bj@ieisystem.com>
+Tested-by: Herb Wei <weihao.bj@ieisystem.com>
+Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+---
+V1 -> V2:
+- Add Fixes tag.
+- Comments about the available information and manufacturer's driver
+  reference to complete why the new values are needed.
 
-	v' = V - vl'
+ drivers/net/usb/ax88179_178a.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-and what I was proposing is:
+diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
+index aff39bf3161d..4ea0e155bb0d 100644
+--- a/drivers/net/usb/ax88179_178a.c
++++ b/drivers/net/usb/ax88179_178a.c
+@@ -1583,11 +1583,11 @@ static int ax88179_reset(struct usbnet *dev)
+ 
+ 	*tmp16 = AX_PHYPWR_RSTCTL_IPRL;
+ 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_PHYPWR_RSTCTL, 2, 2, tmp16);
+-	msleep(200);
++	msleep(500);
+ 
+ 	*tmp = AX_CLK_SELECT_ACS | AX_CLK_SELECT_BCS;
+ 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_CLK_SELECT, 1, 1, tmp);
+-	msleep(100);
++	msleep(200);
+ 
+ 	/* Ethernet PHY Auto Detach*/
+ 	ax88179_auto_detach(dev);
+-- 
+2.42.0
 
-	v' = V' - vl
-
-and they are equal in fact.
-
-> 
->>
->> Does this intended?
-> 
-> The scaling, yes that's intended and the comment explains why. So now
-> you have me confused too :-)
-> 
-> Specifically, I want the lag after placement to be equal to the lag we
-> come in with. Since placement will affect avg_vruntime (adding one
-> element to the average changes the average etc..) the placement also
-> affects the lag as measured after placement.
-
-Yes. You did the math in an iterative fashion and mine is facing the
-final state:
-
-	v' = V' - vlag
-	V' = (WV + wv') / (W + w)
-
-which gives:
-
-	V' = V - w * vlag / W
-
-> 
-> Or rather, if you enqueue and dequeue, I want the lag to be preserved.
-> If you do not take placement into consideration, lag will dissipate real
-> quick.
-> 
->> And to illustrate my understanding of strategy #1:
-> 
->> @@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
->>   		 * vl_i is given by:
->>   		 *
->>   		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
->> -		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
->> -		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
->> -		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
->> -		 *      = V - w_i*vl_i / (W + w_i)
->> -		 *
->> -		 * And the actual lag after adding an entity with vl_i is:
->> -		 *
->> -		 *   vl'_i = V' - v_i
->> -		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
->> -		 *         = vl_i - w_i*vl_i / (W + w_i)
->> -		 *
->> -		 * Which is strictly less than vl_i. So in order to preserve lag
->> -		 * we should inflate the lag before placement such that the
->> -		 * effective lag after placement comes out right.
->> -		 *
->> -		 * As such, invert the above relation for vl'_i to get the vl_i
->> -		 * we need to use such that the lag after placement is the lag
->> -		 * we computed before dequeue.
->> +		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
->> +		 *      = V - w_i*vl_i / W
->>   		 *
->> -		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
->> -		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
->> -		 *
->> -		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
->> -		 *                   = W*vl_i
->> -		 *
->> -		 *   vl_i = (W + w_i)*vl'_i / W
->>   		 */
->>   		load = cfs_rq->avg_load;
->>   		if (curr && curr->on_rq)
->>   			load += scale_load_down(curr->load.weight);
->> -
->> -		lag *= load + scale_load_down(se->load.weight);
->>   		if (WARN_ON_ONCE(!load))
->>   			load = 1;
->> -		lag = div_s64(lag, load);
->> +
->> +		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
->>   	}
->>   	se->vruntime = vruntime - lag;
-> 
-> 
-> So you're proposing we do:
-> 
-> 	v = V - (lag * w) / (W + w) - lag
-
-What I 'm proposing is:
-
-	V' = V - w * vlag / W
-
-so we have:
-
-	v' = V' - vlag
-	   = V - vlag * w/W - vlag
-	   = V - vlag * (W + w)/W
-
-which is exactly the same as current implementation.
-
-> 
-> ?
-> 
-> That can be written like:
-> 
-> 	v = V - (lag * w) / (W+w) - (lag * (W+w)) / (W+w)
-> 	  = V - (lag * (W+w) + lag * w) / (W+w)
-> 	  = V - (lag * (W+2w)) / (W+w)
-> 
-> And that turns into a mess AFAICT.
-> 
-> 
-> Let me repeat my earlier argument. Suppose v,w,l are the new element.
-> V,W are the old avg_vruntime and sum-weight.
-> 
-> Then: V = V*W / W, and by extention: V' = (V*W + v*w) / (W + w).
-> 
-> The new lag, after placement:
-> 
-> l' = V' - v = (V*W + v*w) / (W+w) - v
->              = (V*W + v*w) / (W+w) - v * (W+w) / (W+v)
-> 	    = (V*W + v*w -v*W - v*w) / (W+w)
-> 	    = (V*W - v*W) / (W+w)
-> 	    = W*(V-v) / (W+w)
-> 	    = W/(W+w) * (V-v)
-> 
-> Substitute: v = V - (W+w)/W * l, my scaling thing, to obtain:
-> 
-> l' = W/(W+w) * (V - (V - (W+w)/W * l))
->     = W/(W+w) * (V - V + (W+w)/W * l)
->     = W/(W+w) * (W+w)/W * l
->     = l
-> 
-> So by scaling, we've preserved lag across placement.
-> 
-> That make sense?
-
-Yes, I think I won't misunderstand again for the 3rd time :)
-
-Thanks!
-	Abel
 
