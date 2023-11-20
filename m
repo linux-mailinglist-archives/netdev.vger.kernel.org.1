@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC7F7F0C27
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:01:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E637F0C32
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:01:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB323280C61
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:01:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26E31280F6B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:01:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD8E3523E;
-	Mon, 20 Nov 2023 07:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83E5263D4;
+	Mon, 20 Nov 2023 07:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="iXigQ3gu"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="QTf9lhew"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6B9186
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:09 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-332cb136335so50250f8f.0
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:09 -0800 (PST)
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9912E126
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:12 -0800 (PST)
+Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-5079f6efd64so5148172e87.2
+        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700463668; x=1701068468; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1700463671; x=1701068471; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oDJFuAkxoAAAFxgz7hC7RfGlOkGB3yAjNrGdDF3wBw8=;
-        b=iXigQ3gumKghlUB4EcJqvu/PGx6Vj4LyTq9i8JWgpique6ct9SM5hVYsZvzugmZwWa
-         e1GlCOY9vn/Uw8Uwf0L1Bw6xsiZ1pH1vmAuYNu/rpovXsZKuxaofNjUPo6XxaNYf7DKK
-         mt4Y8hBDtK0Jhmb1wB/imOBEv+C/cz9fEZDjvDgjOQHrFhqoijp41CsJE/Q8a+HtFqoJ
-         vJ5ao4Ve+tt9sDXMSrmqkTCHBOAwieljLJplemznDb+Qurgs3KjvMTm1Wb6PJivW/H4e
-         ECwcv3Od0oe9dNvjUaMbCWSj8ZKQUv2loLWksWB7qvWM0W31uNmq4AstXtDBj544IR+W
-         HQYw==
+        bh=2en4yv4YpXFN3VCi3B3SISp0lZy/QFymnnSLRtY+3pY=;
+        b=QTf9lhewJfbzft3XCWSxCFS1TXo0hw638GArgBf5I6Ts0Jc7CBcZlhMPEVQBugIwA4
+         SqtYXkjyRQ6bbObhwze5jmBhGRtyD9p0MnzcFwazTKLKD2it6H/PWDXuhdEvpMlBQ4C0
+         nui32BEWxaDLa2B6G7eIQAnSZjKwNqWUsxQ+a4J5qWMjQ07gHbOArTTQxX/sEYeF1j5J
+         SWaJ00pfZyJv+K7wf78KMmmOF9gJPWUKXayfK1OvpfUhuiN56ohx6EIRvrCl/amDlmF+
+         vqXPrbi5n79cDGn5P47VnIgtWNaQjm+sw7xEpL78nPBONkZFal8NQVpvVPamhPVaowYR
+         8NVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700463668; x=1701068468;
+        d=1e100.net; s=20230601; t=1700463671; x=1701068471;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oDJFuAkxoAAAFxgz7hC7RfGlOkGB3yAjNrGdDF3wBw8=;
-        b=WCGJ+kmTHxp+o81fgTut/gpWKICb3thhSxg0RWRobb2mpg8Jq03KWIkd4dpxgAxJhy
-         eLBPgIj0XILtcpd3z5Yq2pQXAjvblW+INVSwJZvSyKqD/G09Kp5hVpIU74VJOICmzg5K
-         Ci0fgIL23RRVUu9J6zay+zsDLa2BUUuES7oNW5q+oQBkcH7Ha+adDSl8db1cqKMa5Hcg
-         JYSb1TvAiCdScMzX9ExYkUkObM/PKZyz8rmUgYrEytfsYP/0fjeJoCecZE4dpc43b8Ct
-         ZV6IgQLtA31p1u5HIAWbYa3YnZ2FgGgIBLjwr9XS5pXtcFO60tuL3jisd2ecLxwkKyVj
-         PWoQ==
-X-Gm-Message-State: AOJu0YzmJBx206lnJ59ppJvqoEX6UWdIRMlBwr1h5g0a6obu5Ir2dFYY
-	aOXM7pq5IweV6ENR53CGJgd0lA==
-X-Google-Smtp-Source: AGHT+IFdZD01DHq4eQNzHXtPEzp6vTkd1cCzbxzLp4oTOb/wADDYmHoaiTF9FA7lphWv7r0vUz/O4g==
-X-Received: by 2002:a05:6000:186d:b0:32d:a54a:f57c with SMTP id d13-20020a056000186d00b0032da54af57cmr5218229wri.25.1700463667954;
-        Sun, 19 Nov 2023 23:01:07 -0800 (PST)
+        bh=2en4yv4YpXFN3VCi3B3SISp0lZy/QFymnnSLRtY+3pY=;
+        b=H8PQaNnlizPQdZV5UFeyXZuRUZBk0vDNmG7xMYBhUmd5aX6NMJaS3SIraBMurQz0zx
+         rBuKZbFoF7QmFd8BDWqsAFExRG9iNlHFKJ9qmjbHT3KxrNNDNbrxS9WL1g/u9CaryeMk
+         2/Uk0tyt3jxs/Mqmys7CHhudCPUb2sfyiQG5ABkUqbQcUyExQ7yBopCElEnF6xv0K64F
+         tVanqe/nxt4Kg9x2NhYKbPq4mhUPhYEcpyrL9cvcfIa6vl/tGzXpAgTpSDzdi2XJaqgX
+         YLWa5TDU5crBx4HIsnFyV2f1OIpEHzyY0+shMH4RwNmwjYg4Vs+gjeGMP/7QIRWaYzQE
+         Fq0Q==
+X-Gm-Message-State: AOJu0YwNTOMoqPlJLPDf4QMqmZvbD44fo74Ya2aBZQ7u6ltbO/eiZPoO
+	69TR8VwnQPwQ5ETpH+rvaVxszg==
+X-Google-Smtp-Source: AGHT+IGwg2J8+I0uPjj9+o2L6Muf2cF2j1P+TgbE6Op0BXx+lqxUHN1EuXRuAKc54dfHijcSYIEOVw==
+X-Received: by 2002:ac2:599b:0:b0:503:2deb:bbc1 with SMTP id w27-20020ac2599b000000b005032debbbc1mr4294366lfn.22.1700463670849;
+        Sun, 19 Nov 2023 23:01:10 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.05
+        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 23:01:07 -0800 (PST)
+        Sun, 19 Nov 2023 23:01:10 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -89,9 +89,9 @@ Cc: linux-renesas-soc@vger.kernel.org,
 	linux-gpio@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 04/14] clk: renesas: r9a08g045-cpg: Add clock and reset support for ETH0 and ETH1
-Date: Mon, 20 Nov 2023 09:00:14 +0200
-Message-Id: <20231120070024.4079344-5-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH 05/14] pinctrl: renesas: rzg2l: Move arg in the main function block
+Date: Mon, 20 Nov 2023 09:00:15 +0200
+Message-Id: <20231120070024.4079344-6-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
@@ -105,56 +105,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-RZ/G3S has 2 Gigabit Ethernet interfaces available. Add clock and reset
-support for both of them.
+Move arg in the main block of the function as this is used by 3 out of 4
+case blocks of switch-case. In this way some lines of code are removed.
 
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 ---
- drivers/clk/renesas/r9a08g045-cpg.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/pinctrl/renesas/pinctrl-rzg2l.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/clk/renesas/r9a08g045-cpg.c b/drivers/clk/renesas/r9a08g045-cpg.c
-index 6ff40763a00a..e78dbc74df27 100644
---- a/drivers/clk/renesas/r9a08g045-cpg.c
-+++ b/drivers/clk/renesas/r9a08g045-cpg.c
-@@ -181,9 +181,11 @@ static const struct cpg_core_clk r9a08g045_core_clks[] __initconst = {
- 	DEF_G3S_DIV("P3", R9A08G045_CLK_P3, CLK_PLL3_DIV2_4, DIVPL3C, G3S_DIVPL3C_STS,
- 		    dtable_1_32, 0, 0, 0, NULL),
- 	DEF_FIXED("P3_DIV2", CLK_P3_DIV2, R9A08G045_CLK_P3, 1, 2),
-+	DEF_FIXED("ZT", R9A08G045_CLK_ZT, CLK_PLL3_DIV2_8, 1, 1),
- 	DEF_FIXED("S0", R9A08G045_CLK_S0, CLK_SEL_PLL4, 1, 2),
- 	DEF_FIXED("OSC", R9A08G045_OSCCLK, CLK_EXTAL, 1, 1),
- 	DEF_FIXED("OSC2", R9A08G045_OSCCLK2, CLK_EXTAL, 1, 3),
-+	DEF_FIXED("HP", R9A08G045_CLK_HP, CLK_PLL6, 1, 2),
- };
+diff --git a/drivers/pinctrl/renesas/pinctrl-rzg2l.c b/drivers/pinctrl/renesas/pinctrl-rzg2l.c
+index 9de350ad7e7d..21ee628363fa 100644
+--- a/drivers/pinctrl/renesas/pinctrl-rzg2l.c
++++ b/drivers/pinctrl/renesas/pinctrl-rzg2l.c
+@@ -842,7 +842,7 @@ static int rzg2l_pinctrl_pinconf_set(struct pinctrl_dev *pctldev,
+ 	struct rzg2l_pinctrl_pin_settings settings = pctrl->settings[_pin];
+ 	unsigned int *pin_data = pin->drv_data;
+ 	enum pin_config_param param;
+-	unsigned int i;
++	unsigned int i, arg;
+ 	u32 cfg, off;
+ 	int ret;
+ 	u8 bit;
+@@ -865,8 +865,7 @@ static int rzg2l_pinctrl_pinconf_set(struct pinctrl_dev *pctldev,
+ 		param = pinconf_to_config_param(_configs[i]);
+ 		switch (param) {
+ 		case PIN_CONFIG_INPUT_ENABLE: {
+-			unsigned int arg =
+-					pinconf_to_config_argument(_configs[i]);
++			arg = pinconf_to_config_argument(_configs[i]);
  
- static const struct rzg2l_mod_clk r9a08g045_mod_clks[] = {
-@@ -217,6 +219,16 @@ static const struct rzg2l_mod_clk r9a08g045_mod_clks[] = {
- 					MSTOP(PERI_COM, BIT(11))),
- 	DEF_MOD("sdhi2_aclk",		R9A08G045_SDHI2_ACLK, R9A08G045_CLK_P1, 0x554, 11,
- 					MSTOP(PERI_COM, BIT(11))),
-+	DEF_COUPLED("eth0_axi",		R9A08G045_ETH0_CLK_AXI, R9A08G045_CLK_M0, 0x57c, 0,
-+					MSTOP(PERI_COM, BIT(2))),
-+	DEF_COUPLED("eth0_chi",		R9A08G045_ETH0_CLK_CHI, R9A08G045_CLK_ZT, 0x57c, 0,
-+					MSTOP(PERI_COM, BIT(2))),
-+	DEF_MOD("eth0_refclk",		R9A08G045_ETH0_REFCLK, R9A08G045_CLK_HP, 0x57c, 8, 0),
-+	DEF_COUPLED("eth1_axi",		R9A08G045_ETH1_CLK_AXI, R9A08G045_CLK_M0, 0x57c, 1,
-+					MSTOP(PERI_COM, BIT(3))),
-+	DEF_COUPLED("eth1_chi",		R9A08G045_ETH1_CLK_CHI, R9A08G045_CLK_ZT, 0x57c, 1,
-+					MSTOP(PERI_COM, BIT(3))),
-+	DEF_MOD("eth1_refclk",		R9A08G045_ETH1_REFCLK, R9A08G045_CLK_HP, 0x57c, 9, 0),
- 	DEF_MOD("scif0_clk_pck",	R9A08G045_SCIF0_CLK_PCK, R9A08G045_CLK_P0, 0x584, 0,
- 					MSTOP(MCPU2, BIT(1))),
- 	DEF_MOD("gpio_hclk",		R9A08G045_GPIO_HCLK, R9A08G045_OSCCLK, 0x598, 0, 0),
-@@ -228,6 +240,8 @@ static const struct rzg2l_reset r9a08g045_resets[] = {
- 	DEF_RST(R9A08G045_SDHI0_IXRST, 0x854, 0),
- 	DEF_RST(R9A08G045_SDHI1_IXRST, 0x854, 1),
- 	DEF_RST(R9A08G045_SDHI2_IXRST, 0x854, 2),
-+	DEF_RST(R9A08G045_ETH0_RST_HW_N, 0x87c, 0),
-+	DEF_RST(R9A08G045_ETH1_RST_HW_N, 0x87c, 1),
- 	DEF_RST(R9A08G045_SCIF0_RST_SYSTEM_N, 0x884, 0),
- 	DEF_RST(R9A08G045_GPIO_RSTN, 0x898, 0),
- 	DEF_RST(R9A08G045_GPIO_PORT_RESETN, 0x898, 1),
+ 			if (!(cfg & PIN_CFG_IEN))
+ 				return -EINVAL;
+@@ -880,9 +879,10 @@ static int rzg2l_pinctrl_pinconf_set(struct pinctrl_dev *pctldev,
+ 			break;
+ 
+ 		case PIN_CONFIG_DRIVE_STRENGTH: {
+-			unsigned int arg = pinconf_to_config_argument(_configs[i]);
+ 			unsigned int index;
+ 
++			arg = pinconf_to_config_argument(_configs[i]);
++
+ 			if (!(cfg & PIN_CFG_IOLH_A) || hwcfg->drive_strength_ua)
+ 				return -EINVAL;
+ 
+@@ -907,9 +907,10 @@ static int rzg2l_pinctrl_pinconf_set(struct pinctrl_dev *pctldev,
+ 			break;
+ 
+ 		case PIN_CONFIG_OUTPUT_IMPEDANCE_OHMS: {
+-			unsigned int arg = pinconf_to_config_argument(_configs[i]);
+ 			unsigned int index;
+ 
++			arg = pinconf_to_config_argument(_configs[i]);
++
+ 			if (!(cfg & PIN_CFG_IOLH_B) || !hwcfg->iolh_groupb_oi[0])
+ 				return -EINVAL;
+ 
 -- 
 2.39.2
 
