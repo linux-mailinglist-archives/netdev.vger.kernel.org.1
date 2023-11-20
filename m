@@ -1,152 +1,166 @@
-Return-Path: <netdev+bounces-49152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255A17F0F22
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:33:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC4A7F0F33
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90043B20B4D
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:33:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8766AB20FC3
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3B71170F;
-	Mon, 20 Nov 2023 09:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F6511724;
+	Mon, 20 Nov 2023 09:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weidmueller.onmicrosoft.com header.i=@weidmueller.onmicrosoft.com header.b="VoeiUZJN"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1zw85evA"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2059.outbound.protection.outlook.com [40.107.21.59])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522CE94;
-	Mon, 20 Nov 2023 01:33:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Xew8easM797R04uzYfNa+vxg/KtYf6a62Eaq7Mba3VBDAv1euEPZ+5aP+1hjoXntkVX+ohTWg/GbKnD9XgLZ2ETjzSy73Q58RCosl5jeHXLWMVoLMrfDR1ecO8vS+lmtqyDfExndZY5rs2BrJGIv184BxNnWEbRvg0SgRyRUl4NfYUQn4zdUCf3b92DjmzbucXz38vMiKDof2f3baGCbkpqKCo8Rtq3+qNH6Gr7g7g+lsynXxHqTi64CvWB+gZmNKS0OZHsW0M1s8Q8oIx/YmPYV4Mamc0cwYyt0SpxYRmPeONjXB6Fw1Wt82R6pT4tQbvIhlgKqOUMFLYlJAC9DtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=55lqGfXT1D7SkZI+/fbeZ4iSXeNWCNOkJlMpAeK/k7w=;
- b=PuFtgDYWKHZy9AzfVkGo2GmLWslpH0AZ1rsHF9I7PgCvCkecxfu7JUS7uecxfFhS9O5FyCPbUXc8HX16lPDZ54YB0dXnQVghOhkmAsjpGwdLWoHu+jFK3MPrnTe1C4Rp2wNumSwYJ0gBxylF475+Zq+Kd/jydUwkYUactMCF1M6L+/fyle+JouDy0IBjkASF70D7N90Jn6Eg0odoDum0aTbHmWvVago04Coow52NOPTDRZhr0VbiUDEUrc+MQPUkuS6lWFHMo7Wj1m51CM+P7dg5DRpUriM/XpNJAKgN84ujUvuP0VwvJnEet9q3s59skqmA/0QFqkz2LV8HiaZqeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=weidmueller.com; dmarc=pass action=none
- header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87C72E5
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:39:08 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9e62f903e88so541140666b.2
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 01:39:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=weidmueller.onmicrosoft.com; s=selector1-weidmueller-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=55lqGfXT1D7SkZI+/fbeZ4iSXeNWCNOkJlMpAeK/k7w=;
- b=VoeiUZJNg9TQXUg8QOqz3I19ViT7vpakNyiqu8jgL0YqPUafZcWMwqf7TwbYQ3iaHjrqCwaBFZ2LTgVctYtDYnkGt/KvmA+8v10NyoC0qw9bYzCs7zAj3Pj/w6mYL24Y+2xk+MtJvS0x8tnJUcWChyFTGYwBmp0x8imzsK/zpU0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=weidmueller.com;
-Received: from AS2PR08MB8431.eurprd08.prod.outlook.com (2603:10a6:20b:55a::18)
- by PAXPR08MB6592.eurprd08.prod.outlook.com (2603:10a6:102:158::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
- 2023 09:33:05 +0000
-Received: from AS2PR08MB8431.eurprd08.prod.outlook.com
- ([fe80::b914:d9b5:6462:13b6]) by AS2PR08MB8431.eurprd08.prod.outlook.com
- ([fe80::b914:d9b5:6462:13b6%5]) with mapi id 15.20.7002.027; Mon, 20 Nov 2023
- 09:33:05 +0000
-From: Lukas Funke <lukas.funke-oss@weidmueller.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Lukas Funke <lukas.funke@weidmueller.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: phy: Fix potential null pointer access
-Date: Mon, 20 Nov 2023 10:32:54 +0100
-Message-Id: <20231120093256.3642327-1-lukas.funke-oss@weidmueller.com>
-X-Mailer: git-send-email 2.30.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0445.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:c6::18) To AS2PR08MB8431.eurprd08.prod.outlook.com
- (2603:10a6:20b:55a::18)
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700473147; x=1701077947; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NMyBN7G2JC9JpvRUATAVzyBjob3kzlSJovwE2rxghuU=;
+        b=1zw85evA4qYRJIKCg/oTn9Zhr2qYDSJAgV/QVUec5OO/fSWMYIXPLhgj8Zsx5Ux5Tl
+         nUJ/bzv0tSAwo8vDJt9g2fYewPtvDIwd9bO0PhbXJpjnvyflMEZ/J1OlkOMeG2WpeGqZ
+         VZxuhB0fnSRqQKVzJBWhFvWKfhteo6uLyJXE5BFklx1kxN9XQk7ZYaRw4kBWTu3ED9yO
+         u/4ru44UnOda6OPGZQ2142j6Bk86l+MT2fUWBwzxB3QL3K+VH0vFqNIst2+565RYI2hk
+         optjb0m+GjDEKjVSJlWl/bBMG75q5yZBQuaQ3uza/MwSFK/tsRt9EIGZ7O3cR9Smh/3Q
+         0U0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700473147; x=1701077947;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NMyBN7G2JC9JpvRUATAVzyBjob3kzlSJovwE2rxghuU=;
+        b=AjzltE33aB96RznbltPEikvGjDft8RRW7K2Wdc5iSy8P0r7a+dIMN2E6+CKmsVByK5
+         /lVP0MJXD+yZ5txZ2XgFPj4pDMTNgP0O9UrlmeeQNdsz59HnBmyWRSH8BWXz3VD84H61
+         ScuVpO5Y6vz9Bmh0vUmmF6Xe2eh2hkdtQ5i82FqiJ/X/J4AovJyRJC82RBKJt78NKLSt
+         b8EVG1SqjvyXMg4sUs6x5GJZAcw0S5Lchg6F6xHZs4kXfAYfHo7DYr/5kg3dH0WRkmtp
+         lOz2Dd6IDhTRdrYHXDxgGLhgQGGtmTOQtB2jzgvF7qBbtbx3iP5C441AnivPyPo2ZqJT
+         XMCQ==
+X-Gm-Message-State: AOJu0YyTbhEYd91T3yAIPKPdu+yz3KZ/F1LhdFdlSnYc+n21Ks1JgXSk
+	0Ozt3AQ4ZSGgrqURfarZsAYcGg==
+X-Google-Smtp-Source: AGHT+IG8QGNe4idCGDJRUI61ExZ2IQfiUxxsxAf+Uw6jPQfsk6fjV99rNBrxjYSweEYjSmlggPcm6A==
+X-Received: by 2002:a17:906:5ca:b0:9be:45b3:3116 with SMTP id t10-20020a17090605ca00b009be45b33116mr4912503ejt.71.1700473146955;
+        Mon, 20 Nov 2023 01:39:06 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id lh10-20020a170906f8ca00b009fd2028e62csm1388230ejb.71.2023.11.20.01.39.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 01:39:06 -0800 (PST)
+Date: Mon, 20 Nov 2023 10:39:04 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	deb.chatterjee@intel.com, anjali.singhai@intel.com,
+	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
+	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
+	toke@redhat.com, mattyk@nvidia.com, dan.daly@intel.com,
+	chris.sommers@keysight.com, john.andy.fingerhut@intel.com
+Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
+Message-ID: <ZVspOBmzrwm8isiD@nanopsycho>
+References: <20231116145948.203001-1-jhs@mojatatu.com>
+ <655707db8d55e_55d7320812@john.notmuch>
+ <CAM0EoM=vbyKD9+t=UQ73AyLZtE2xP9i9RKCVMqeXwEh+j-nyjQ@mail.gmail.com>
+ <6557b2e5f3489_5ada920871@john.notmuch>
+ <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2PR08MB8431:EE_|PAXPR08MB6592:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f3e8210-6f11-433a-8c28-08dbe9abb2d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	rfMEUSp0cBQCXFSaRMgIOzVce54lWFC1iq9ktqdirE2M9RqsozxxSYcK96zIyJYblh47heZVWJ0vDCrYyG2kgGs/6lOhe6mR6SXku4/S6w/WdFZuxexzg4ZoMG7WAj+tBerQnUMj2d2YFbztFe//+sYrYMqK0iDxX8z0jg+llRF4JxGG/HFaDmn2r3/yK0o7ql3Nf30Aq2nAk4cPBZB1qP29LH2qYUPcaZGts8qfUzIMP6SVf3mrA27wAEvuankkAi7hcWzz/qul35QE/QCx78iAji+maxI7htmtqs1wKI7/W9AvEk2nQvEShzBlsmp9rQcuTVymX0yHZwt70Mf1SECV4aRK/acJPEA08qIz6bgDuBRudk/FkrWle7Up9YD6wuiOF2WvtGlzXBflGmGwfCDHl7YqUMoEA+HKHK0dzVBd/C4urHHythnXtoLtJJXLzrFS/pi+exGQqswKoXiXwL8ocUZYNL/nmj62uywTXvSeJoF//E+VUducgE6pmMLlACs5KBQk9djl8a/tpUP5kk9JusLiFlOa2I9pQjPmuSzDpLPL4kLsfce9GW7t8OEVsZoqCkt6EovJvtPwUnvawYZY4GEfwHFVZOy22hZ9bHHu4NaAR9ddRl1dY/aECOv4
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB8431.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(39860400002)(346002)(136003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(2906002)(41300700001)(8936002)(8676002)(4326008)(5660300002)(4744005)(66476007)(66556008)(66946007)(316002)(110136005)(38100700002)(6512007)(36756003)(52116002)(6506007)(6666004)(86362001)(6486002)(478600001)(83380400001)(38350700005)(26005)(2616005)(1076003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nzwm7PiGmF82ax/8V9OMvEaGqGSFajkogdceNHimL+a29Ji/ZQsIpWNN3kfw?=
- =?us-ascii?Q?q6Q6e0x5rMmhCWgxNp2nmfXF4/Yu1aC22ZZhWU/tirtk63+1ttRnNj4UQuuo?=
- =?us-ascii?Q?cu9/FljTGWkW+oa8gKf8P++4swChcNEZgXygsuKU+ob0uQK/C5z5gNz4PFDi?=
- =?us-ascii?Q?hoJV0rGR58jYT2dW+4e9PiauijbKEGgmgA5NLiQdt56up+dj4OoxxivJ12Dr?=
- =?us-ascii?Q?MLlj2lqkssTNezstP9fbfJ+rh2U7ZAJMpLlB95ZIPr7HRl/Ud5VH5mLFT5PP?=
- =?us-ascii?Q?k5kkvrp3BvGWjJ9txCEh4wiCXySJURNmTTUNp4QiebqFEuiFU5CDKOB9NcxR?=
- =?us-ascii?Q?+4WGhJ3LzatGPnb1jVHvkD9ICqyJerIO9wZG7MDzo8t3ory84yttLA7p5V2H?=
- =?us-ascii?Q?WT0k/dnd4dR2Pm7mYYMpDnXWDNb1A20A7Capiz+V23eoPejz8/tnpF7ofEOP?=
- =?us-ascii?Q?5ISgobmCFtBEi3jIBXXnYmFXMJ82AzfPA4pJT5pMxFkgsTgLZ7DZf4NjJbn6?=
- =?us-ascii?Q?2jAMfIQsN0eYUVI30t8HeW5xbAO/mQyQy974PAegzYNkYuihw0Lbi5ZypIyi?=
- =?us-ascii?Q?B24n2aD635KyYDFDTpdADnHYmoDt2GYmR/v37Jjm4Jb0Q7d+lJYzMjuKNC8J?=
- =?us-ascii?Q?xtig/OGr0U0aExhGvz2vj5Rtt8NVEH/fygTqajNxx1pMbZTKzWTq9MpQnnxq?=
- =?us-ascii?Q?FPaqTzAS5imdW3ow8yf/ZMPlQuqgYDUFBokoBERvlPvwu15u/M6rTAIBA0Da?=
- =?us-ascii?Q?Xm8aEFngvrrsucCq2BO49jn7cILCG3/cR/gBTepWATI8bdzG99sDMJSw7wGG?=
- =?us-ascii?Q?1gKh+fFgazKw7DIo7AAY8qfthT7QvqoWaeOPUf3f9DihdEMJ63yQSp2F6PMX?=
- =?us-ascii?Q?jOFGljsaRtm7GHLDDscSEJsZfVkjSSPu9u4KF3v2t4PuCoY4wGN2gUUSqajc?=
- =?us-ascii?Q?Tggz3Xl17i9q8fHto19zsW9VJSpk2GjT02PzN5rA3QwP9FtCKmwmmzMYyeT/?=
- =?us-ascii?Q?iJKxxfYAXlR3yZHNIUCwEcUnYyaHXMnM4QWkxrQdQOILZFeBvms2bkc8001C?=
- =?us-ascii?Q?xwb5myLnoyqq/oav+NlrVrjMG/vOJw9V6Moe4YQl9IGUxLPrFfSsIwBrI+oV?=
- =?us-ascii?Q?1FJ8VTZa86QFdxPZTAEjTfaqAbA+wlwCiMbL0zfksxN9ZvgrFV6Z0i24MMXX?=
- =?us-ascii?Q?8NpXgfL4YOJ2zgOa+qA319/KsDNhYv33t+dIlsFeaTWNcaTrdtVlixKQdpbN?=
- =?us-ascii?Q?K/9QMI72Y6FP/DAnI/UrcAoJIkLSiOXb73evmSqoJJfu9gJ65FLi7BlhRql9?=
- =?us-ascii?Q?IYpEvuJs7rV4IxrZDprWaH+mpn/Ggn9vKTc9jHoPevr3z/4mMAerN9FhG9zN?=
- =?us-ascii?Q?RnRnxWHltmLZjsr8rcY/MnJUsTX7F4K5B6XYUc1nO7cucmOgPFAMOwdJscaQ?=
- =?us-ascii?Q?fmE25cyvzjpql21aoMQeGfgmwqDaTNBaSOtdg80uQVLSaaZFmZP7eih7sOQo?=
- =?us-ascii?Q?9qpwZQXaBOCumOpJ269MJX6ZVq8tlAty6K32cGn7jO1QkYqvdBgd2tPy6LLv?=
- =?us-ascii?Q?Xi0Ms+/yVNo4MepJ/JkEvVrFMFnVgwG8r9fBD9OFHy0C/YXVXns99JbTPx83?=
- =?us-ascii?Q?Bw=3D=3D?=
-X-OriginatorOrg: weidmueller.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f3e8210-6f11-433a-8c28-08dbe9abb2d1
-X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB8431.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 09:33:05.3157
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VHFPgfTga3niZGM0xJ+aZgzsLNNUNI9OaK/ryzDlHb/8BbrwFEqpLBntHMU5Qkz5XOeCEIIS17Rr34pvO13oRw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB6592
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
 
-From: Lukas Funke <lukas.funke@weidmueller.com>
+Fri, Nov 17, 2023 at 09:46:11PM CET, jhs@mojatatu.com wrote:
+>On Fri, Nov 17, 2023 at 1:37 PM John Fastabend <john.fastabend@gmail.com> wrote:
+>>
+>> Jamal Hadi Salim wrote:
+>> > On Fri, Nov 17, 2023 at 1:27 AM John Fastabend <john.fastabend@gmail.com> wrote:
+>> > >
+>> > > Jamal Hadi Salim wrote:
 
-When there is no driver associated with the phydev, there will be a
-nullptr access. The commit checks if the phydev driver is set before
-access.
+[...]
 
-Signed-off-by: Lukas Funke <lukas.funke@weidmueller.com>
----
- drivers/net/phy/phy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 1135e63a4a76..4de83e3cab77 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -136,7 +136,7 @@ EXPORT_SYMBOL(phy_print_status);
- static int phy_config_interrupt(struct phy_device *phydev, bool interrupts)
- {
- 	phydev->interrupts = interrupts ? 1 : 0;
--	if (phydev->drv->config_intr)
-+	if (phydev->drv && phydev->drv->config_intr)
- 		return phydev->drv->config_intr(phydev);
- 
- 	return 0;
--- 
-2.30.2
+>>
+>> I think I'm judging the technical work here. Bullet points.
+>>
+>> 1. p4c-tc implementation looks like it should be slower than a
+>>    in terms of pkts/sec than a bpf implementation. Meaning
+>>    I suspect pipeline and objects laid out like this will lose
+>>    to a BPF program with an parser and single lookup. The p4c-ebpf
+>>    compiler should look to create optimized EBPF code not some
+>>    emulated switch topology.
+>>
+>
+>The parser is ebpf based. The other objects which require control
+>plane interaction are not - those interact via netlink.
+>We published perf data a while back - presented at the P4 workshop
+>back in April (was in the cover letter)
+>https://github.com/p4tc-dev/docs/blob/main/p4-conference-2023/2023P4WorkshopP4TC.pdf
+>But do note: the correct abstraction is the first priority.
+>Optimization is something we can teach the compiler over time. But
+>even with the minimalist code generation you can see that our approach
+>always beats ebpf in LPM and ternary. The other ones I am pretty sure
 
+Any idea why? Perhaps the existing eBPF maps are not that suitable for
+this kinds of lookups? I mean in theory, eBPF should be always faster.
+
+
+>we can optimize over time.
+>Your view of "single lookup" is true for simple programs but if you
+>have 10 tables trying to model a 5G function then it doesnt make sense
+>(and i think the data we published was clear that you gain no
+>advantage using ebpf - as a matter of fact there was no perf
+>difference between XDP and tc in such cases).
+>
+>> 2. p4c-tc control plan looks slower than a directly mmaped bpf
+>>    map. Doing a simple update vs a netlink msg. The argument
+>>    that BPF can't do CRUD (which we had offlist) seems incorrect
+>>    to me. Correct me if I'm wrong with details about why.
+>>
+>
+>So let me see....
+>you want me to replace netlink and all its features and rewrite it
+>using the ebpf system calls? Congestion control, event handling,
+>arbitrary message crafting, etc and the years of work that went into
+>netlink? NO to the HELL.
+
+Wait, I don't think John suggests anything like that. He just suggests
+to have the tables as eBPF maps. Honestly, I don't understand the
+fixation on netlink. Its socket messaging, memcpies, processing
+overhead, etc can't keep up with mmaped memory access at scale. Measure
+that and I bet you'll get drastically different results.
+
+I mean, netlink is good for a lot of things, but does not mean it is an
+universal answer to userspace<->kernel data passing.
+
+
+>I should note: that there was an interesting talk at netdevconf 0x17
+>where the speaker showed the challenges of dealing with ebpf on "day
+>two" - slides or videos are not up yet, but link is:
+>https://netdevconf.info/0x17/sessions/talk/is-scaling-ebpf-easy-yet-a-small-step-to-one-server-but-giant-leap-to-distributed-network.html
+>The point the speaker was making is it's always easy to whip an ebpf
+>program that can slice and dice packets and maybe even flush LEDs but
+>the real work and challenge is in the control plane. I agree with the
+>speaker based on my experiences. This discussion of replacing netlink
+>with ebpf system calls is absolutely a non-starter. Let's just end the
+>discussion and agree to disagree if you are going to keep insisting on
+>that.
+
+
+[...]
 
