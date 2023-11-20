@@ -1,442 +1,208 @@
-Return-Path: <netdev+bounces-49445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BFF07F2174
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:33:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259F27F218E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:44:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C540281EA1
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:33:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65861F25FCB
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19383AC32;
-	Mon, 20 Nov 2023 23:33:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9E838F8F;
+	Mon, 20 Nov 2023 23:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="q36Z+HUa"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HKXU+bjk"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FCFC1
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:33:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=h9T+bp1RGC1YzPgRLHOilVpswINtR5TVBdFtmwUEClo=; b=q36Z+HUa9I4CsV07IK9StJhPsh
-	rVg/e3jRITV43kw4x7af68oz5980qZTwiF0LW9MaSXSYlEZRQEvAiIzSQzFhx2W7nLZTKjh+2NeDR
-	CdHJMemIOpq0rpQV8GyCQIEUx/xm74G3lq3HB+ngRzr5+o/WRshueFBOBRPOXw3MeUWkYQRrLE/Gl
-	foMs/vvNBaU4JDaqta5yCfDQZ8m6m0MZElJx3GVrHfdiQdgtfxzffyd5lDBUAJlrEXoLJpwXnXaKa
-	OvvhPxbTHMsYK1QvxCE68jZ+52/CMyACJK24GxcUQsPHmyIkyiVUP6Uhl2Vo/33z1pCB2x90ki61d
-	bfIAZb5A==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1r5Dlv-000I6g-IC; Tue, 21 Nov 2023 00:33:43 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: stephen@networkplumber.org
-Cc: razor@blackwall.org,
-	martin.lau@kernel.org,
-	dsahern@kernel.org,
-	netdev@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>
-Subject: [PATCH iproute2 v3] ip, link: Add support for netkit
-Date: Tue, 21 Nov 2023 00:33:41 +0100
-Message-Id: <20231120233341.21815-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 913C995
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:36 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id d75a77b69052e-41e3e77e675so29958401cf.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1700523875; x=1701128675; darn=vger.kernel.org;
+        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EYoz/+wnToH56lfSR7Byrlt9hWuIDzUd0t+kVUoaWcg=;
+        b=HKXU+bjkAoFv7PSIxjbUpkcS/jTwYtyNRcyDh4y62ovE/90O2JT17wU+JqOrEiplQq
+         uOMqdeqBWdc6lItdADfGzCaiNSHvukBwMBl4DaCoYuu7fcBIp2lmkI1riktFWKOAA0lR
+         ENfWdLmpOXTn8rqLzaMhJ7FRqrYZH49jH5hh8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700523875; x=1701128675;
+        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EYoz/+wnToH56lfSR7Byrlt9hWuIDzUd0t+kVUoaWcg=;
+        b=n5JMhnSevdrLbHA4xRkNMsnCcnPHJxvsE8YuNjg0ei4ADYJ9HkH1Cr6tExJvwWT4si
+         VnlDiG9QpNzm9qLSi3jys5NkOQb3UaHriDUKG3MUy2VV0zH+Vabg/t3otYzn5lqQnvTd
+         nwtZrfVHkdDScQkZU+Kx2E7TBXvCK+xn27tgPfeCJhhofzf+W2G/yJVCL3INi+tJs98p
+         c78GcaVLaEKZYOY/D228zIsQpFYz3QMZHrmgAp51HKkCYAscs5HeRskoHBzFG9zARL3I
+         q1pUrAX5b+B1cx8QPmUJE4BH9v5JN9RX+beDuhAsNUauwK12cXo7PK2hQmXXlJ30ykJj
+         hhRw==
+X-Gm-Message-State: AOJu0YztCE67YGX/lH8sPz+xx/KF2RK+0+UKkuUUDuGZNqBVsqdt0lVw
+	mJy6GoBZ5zk8pdjq6eUsoADPUw==
+X-Google-Smtp-Source: AGHT+IFcCUbrYoc7Akf6QHzuX0myBbcemN0qgM8QOcgXtbDuSe7XX3X+QnqtLC4j0fA8Q1CMzvHKTw==
+X-Received: by 2002:a05:622a:587:b0:41b:7774:96bc with SMTP id c7-20020a05622a058700b0041b777496bcmr12264133qtb.10.1700523875537;
+        Mon, 20 Nov 2023 15:44:35 -0800 (PST)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id i9-20020ac871c9000000b0041803dfb240sm3053384qtp.45.2023.11.20.15.44.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 20 Nov 2023 15:44:35 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gospo@broadcom.com
+Subject: [PATCH net-next 00/13] bnxt_en: Prepare to support new P7 chips
+Date: Mon, 20 Nov 2023 15:43:52 -0800
+Message-Id: <20231120234405.194542-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000008e9c50060a9e1178"
+
+--0000000000008e9c50060a9e1178
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27099/Mon Nov 20 09:39:02 2023)
 
-Add base support for creating/dumping netkit devices.
+This patchset is to prepare the driver to support the new P7 chips by
+refactoring and modifying the code.  The P7 chip is built on the P5
+chip and many code paths can be modified to support both chips.  The
+whole patchset to have basic support for P7 chips is about 20 patches so
+a follow-on patchset will complete the support and add the new PCI IDs.
 
-Minimal example usage:
+The first 8 patches are changes to the backing store logic to support
+both chips with mostly common code paths and datastructures.  Both
+chips require host backing store memory but the relevant firmware APIs
+have been modified to make it easier to support new backing store
+memory types.
 
-  # ip link add type netkit
-  # ip -d a
-  [...]
-  7: nk0@nk1: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    netkit mode l3 type peer policy forward numtxqueues 1 numrxqueues 1 [...]
-  8: nk1@nk0: <BROADCAST,MULTICAST,NOARP,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-    netkit mode l3 type primary policy forward numtxqueues 1 numrxqueues 1 [...]
+The next 4 patches are changes to TX and RX ring indexing logic and NAPI
+logic.  The main changes are to increment the TX and RX producers
+unbounded and to do any masking only when needed.  These changes are
+needed to support the P7 chips which require additional higher bits in
+these producer indices.  The NAPI logic is also slightly modifed.
 
-Example usage with netns (for BPF examples, see BPF selftests linked below):
+The last patch is a rename of BNXT_FLAG_CHIP_P5 to BNXT_FLAG_P5_PLUS and
+other related macro changes to make it clear that the P5_PLUS macro
+applies to P5 and newer chips.
 
-  # ip netns add blue
-  # ip link add nk0 type netkit peer nk1 netns blue
-  # ip link set up nk0
-  # ip addr add 10.0.0.1/24 dev nk0
-  # ip -n blue link set up nk1
-  # ip -n blue addr add 10.0.0.2/24 dev nk1
-  # ping -c1 10.0.0.2
-  PING 10.0.0.2 (10.0.0.2) 56(84) bytes of data.
-  64 bytes from 10.0.0.2: icmp_seq=1 ttl=64 time=0.021 ms
+Michael Chan (12):
+  bnxt_en: The caller of bnxt_alloc_ctx_mem() should always free bp->ctx
+  bnxt_en: Free bp->ctx inside bnxt_free_ctx_mem()
+  bnxt_en: Restructure context memory data structures
+  bnxt_en: Add page info to struct bnxt_ctx_mem_type
+  bnxt_en: Use the pg_info field in bnxt_ctx_mem_type struct
+  bnxt_en: Add bnxt_setup_ctxm_pg_tbls() helper function
+  bnxt_en: Add support for new backing store query firmware API
+  bnxt_en: Add support for HWRM_FUNC_BACKING_STORE_CFG_V2 firmware calls
+  bnxt_en: Add db_ring_mask and related macro to bnxt_db_info struct.
+  bnxt_en: Modify TX ring indexing logic.
+  bnxt_en: Modify RX ring indexing logic.
+  bnxt_en: Modify the NAPI logic for the new P7 chips
 
-Example usage with L2 mode and peer blackholing when no BPF is attached:
+Randy Schacher (1):
+  bnxt_en: Rename some macros for the P5 chips
 
-  # ip link add foo type netkit mode l2 forward peer blackhole bar
-  # ip -d a
-  [...]
-  13: bar@foo: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-     link/ether 5e:5b:81:17:02:27 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-     netkit mode l2 type peer policy blackhole numtxqueues 1 numrxqueues 1 [...]
-  14: foo@bar: <BROADCAST,MULTICAST,M-DOWN> mtu 1500 qdisc noop state DOWN group default qlen 1000
-     link/ether de:01:a5:88:9e:99 brd ff:ff:ff:ff:ff:ff promiscuity 0 allmulti 0 minmtu 68 maxmtu 65535
-     netkit mode l2 type primary policy forward numtxqueues 1 numrxqueues 1 [...]
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 921 +++++++++++-------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 161 +--
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |  10 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c |   4 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |   8 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |   2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  14 +-
+ 8 files changed, 677 insertions(+), 449 deletions(-)
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Link: https://git.kernel.org/torvalds/c/35dfaad7188c
-Link: https://git.kernel.org/torvalds/c/05c31b4ab205
-Link: https://git.kernel.org/torvalds/c/ace15f91e569
----
- [ Targetted for iproute2 6.7 release. ]
-
- v2 -> v3:
- - Add small helper for policy and mode string dump
- - Add Reviewed-by tag
- v1 -> v2:
- - Add table-driven approach for netlink settings dump
- - Remove matches, use strcmp
- - Fix nit with braces
- - Add maintainers entry
-
- MAINTAINERS              |   6 ++
- ip/Makefile              |   2 +-
- ip/iplink.c              |   4 +-
- ip/iplink_netkit.c       | 183 +++++++++++++++++++++++++++++++++++++++
- man/man8/ip-address.8.in |   3 +-
- man/man8/ip-link.8.in    |  44 ++++++++++
- 6 files changed, 238 insertions(+), 4 deletions(-)
- create mode 100644 ip/iplink_netkit.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 85e21a2c..1b49d69e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -39,6 +39,12 @@ devlink
- M: Jiri Pirko <jiri@resnulli.us>
- F: devlink/*
- 
-+netkit
-+M: Daniel Borkmann <daniel@iogearbox.net>
-+M: Nikolay Aleksandrov <razor@blackwall.org>
-+L: bpf@vger.kernel.org
-+F: ip/iplink_netkit.c
-+
- Remote DMA - rdma
- M: Leon Romanovsky <leon@kernel.org>
- F: rdma/*
-diff --git a/ip/Makefile b/ip/Makefile
-index 8fd9e295..3535ba78 100644
---- a/ip/Makefile
-+++ b/ip/Makefile
-@@ -13,7 +13,7 @@ IPOBJ=ip.o ipaddress.o ipaddrlabel.o iproute.o iprule.o ipnetns.o \
-     ipvrf.o iplink_xstats.o ipseg6.o iplink_netdevsim.o iplink_rmnet.o \
-     ipnexthop.o ipmptcp.o iplink_bareudp.o iplink_wwan.o ipioam6.o \
-     iplink_amt.o iplink_batadv.o iplink_gtp.o iplink_virt_wifi.o \
--    ipstats.o
-+    iplink_netkit.o ipstats.o
- 
- RTMONOBJ=rtmon.o
- 
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 9a548dd3..6989cc4d 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -46,8 +46,8 @@ void iplink_types_usage(void)
- 		"          dsa | dummy | erspan | geneve | gre | gretap | gtp | ifb |\n"
- 		"          ip6erspan | ip6gre | ip6gretap | ip6tnl |\n"
- 		"          ipip | ipoib | ipvlan | ipvtap |\n"
--		"          macsec | macvlan | macvtap |\n"
--		"          netdevsim | nlmon | rmnet | sit | team | team_slave |\n"
-+		"          macsec | macvlan | macvtap | netdevsim |\n"
-+		"          netkit | nlmon | rmnet | sit | team | team_slave |\n"
- 		"          vcan | veth | vlan | vrf | vti | vxcan | vxlan | wwan |\n"
- 		"          xfrm | virt_wifi }\n");
- }
-diff --git a/ip/iplink_netkit.c b/ip/iplink_netkit.c
-new file mode 100644
-index 00000000..a838a410
---- /dev/null
-+++ b/ip/iplink_netkit.c
-@@ -0,0 +1,183 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * iplink_netkit.c netkit device management
-+ *
-+ * Authors:        Daniel Borkmann <daniel@iogearbox.net>
-+ */
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <linux/if_link.h>
-+
-+#include "rt_names.h"
-+#include "utils.h"
-+#include "ip_common.h"
-+
-+static const char * const netkit_mode_strings[] = {
-+	[NETKIT_L2]		= "l2",
-+	[NETKIT_L3]		= "l3",
-+};
-+
-+static const char * const netkit_policy_strings[] = {
-+	[NETKIT_PASS]		= "forward",
-+	[NETKIT_DROP]		= "blackhole",
-+};
-+
-+static void explain(struct link_util *lu, FILE *f)
-+{
-+	fprintf(f,
-+		"Usage: ... %s [ mode MODE ] [ POLICY ] [ peer [ POLICY <options> ] ]\n"
-+		"\n"
-+		"MODE: l3 | l2\n"
-+		"POLICY: forward | blackhole\n"
-+		"(first values are the defaults if nothing is specified)\n"
-+		"\n"
-+		"To get <options> type 'ip link add help'.\n",
-+		lu->id);
-+}
-+
-+static int netkit_parse_opt(struct link_util *lu, int argc, char **argv,
-+			    struct nlmsghdr *n)
-+{
-+	__u32 ifi_flags, ifi_change, ifi_index;
-+	struct ifinfomsg *ifm, *peer_ifm;
-+	static bool seen_mode, seen_peer;
-+	static struct rtattr *data;
-+	int err;
-+
-+	ifm = NLMSG_DATA(n);
-+	ifi_flags = ifm->ifi_flags;
-+	ifi_change = ifm->ifi_change;
-+	ifi_index = ifm->ifi_index;
-+	ifm->ifi_flags = 0;
-+	ifm->ifi_change = 0;
-+	ifm->ifi_index = 0;
-+	while (argc > 0) {
-+		if (strcmp(*argv, "mode") == 0) {
-+			__u32 mode = 0;
-+
-+			NEXT_ARG();
-+			if (seen_mode)
-+				duparg("mode", *argv);
-+			seen_mode = true;
-+
-+			if (strcmp(*argv, "l3") == 0) {
-+				mode = NETKIT_L3;
-+			} else if (strcmp(*argv, "l2") == 0) {
-+				mode = NETKIT_L2;
-+			} else {
-+				fprintf(stderr, "Error: argument of \"mode\" must be either \"l3\" or \"l2\"\n");
-+				return -1;
-+			}
-+			addattr32(n, 1024, IFLA_NETKIT_MODE, mode);
-+		} else if (strcmp(*argv, "forward") == 0 ||
-+			   strcmp(*argv, "blackhole") == 0) {
-+			int attr_name = seen_peer ?
-+					IFLA_NETKIT_PEER_POLICY :
-+					IFLA_NETKIT_POLICY;
-+			__u32 policy = 0;
-+
-+			if (strcmp(*argv, "forward") == 0) {
-+				policy = NETKIT_PASS;
-+			} else if (strcmp(*argv, "blackhole") == 0) {
-+				policy = NETKIT_DROP;
-+			} else {
-+				fprintf(stderr, "Error: policy must be either \"forward\" or \"blackhole\"\n");
-+				return -1;
-+			}
-+			addattr32(n, 1024, attr_name, policy);
-+		} else if (strcmp(*argv, "peer") == 0) {
-+			if (seen_peer)
-+				duparg("peer", *(argv + 1));
-+			seen_peer = true;
-+		} else {
-+			char *type = NULL;
-+
-+			if (seen_peer) {
-+				data = addattr_nest(n, 1024, IFLA_NETKIT_PEER_INFO);
-+				n->nlmsg_len += sizeof(struct ifinfomsg);
-+				err = iplink_parse(argc, argv, (struct iplink_req *)n, &type);
-+				if (err < 0)
-+					return err;
-+				if (type)
-+					duparg("type", argv[err]);
-+				goto out_ok;
-+			}
-+			fprintf(stderr, "%s: unknown option \"%s\"?\n",
-+				lu->id, *argv);
-+			explain(lu, stderr);
-+			return -1;
-+		}
-+		argc--;
-+		argv++;
-+	}
-+out_ok:
-+	if (data) {
-+		peer_ifm = RTA_DATA(data);
-+		peer_ifm->ifi_index = ifm->ifi_index;
-+		peer_ifm->ifi_flags = ifm->ifi_flags;
-+		peer_ifm->ifi_change = ifm->ifi_change;
-+		addattr_nest_end(n, data);
-+	}
-+	ifm->ifi_flags = ifi_flags;
-+	ifm->ifi_change = ifi_change;
-+	ifm->ifi_index = ifi_index;
-+	return 0;
-+}
-+
-+static const char *netkit_print_policy(__u32 policy)
-+{
-+	const char *inv = "UNKNOWN";
-+
-+	if (policy >= ARRAY_SIZE(netkit_policy_strings))
-+		return inv;
-+	return netkit_policy_strings[policy] ? : inv;
-+}
-+
-+static const char *netkit_print_mode(__u32 mode)
-+{
-+	const char *inv = "UNKNOWN";
-+
-+	if (mode >= ARRAY_SIZE(netkit_mode_strings))
-+		return inv;
-+	return netkit_mode_strings[mode] ? : inv;
-+}
-+
-+static void netkit_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
-+{
-+	if (!tb)
-+		return;
-+	if (tb[IFLA_NETKIT_MODE]) {
-+		__u32 mode = rta_getattr_u32(tb[IFLA_NETKIT_MODE]);
-+
-+		print_string(PRINT_ANY, "mode", "mode %s ",
-+			     netkit_print_mode(mode));
-+	}
-+	if (tb[IFLA_NETKIT_PRIMARY]) {
-+		__u8 primary = rta_getattr_u8(tb[IFLA_NETKIT_PRIMARY]);
-+
-+		print_string(PRINT_ANY, "type", "type %s ",
-+			     primary ? "primary" : "peer");
-+	}
-+	if (tb[IFLA_NETKIT_POLICY]) {
-+		__u32 policy = rta_getattr_u32(tb[IFLA_NETKIT_POLICY]);
-+
-+		print_string(PRINT_ANY, "policy", "policy %s ",
-+			     netkit_print_policy(policy));
-+	}
-+}
-+
-+static void netkit_print_help(struct link_util *lu,
-+			      int argc, char **argv, FILE *f)
-+{
-+	explain(lu, f);
-+}
-+
-+struct link_util netkit_link_util = {
-+	.id		= "netkit",
-+	.maxattr	= IFLA_NETKIT_MAX,
-+	.parse_opt	= netkit_parse_opt,
-+	.print_opt	= netkit_print_opt,
-+	.print_help	= netkit_print_help,
-+};
-diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
-index b9a476a5..9d34a6a1 100644
---- a/man/man8/ip-address.8.in
-+++ b/man/man8/ip-address.8.in
-@@ -146,7 +146,8 @@ ip-address \- protocol address management
- .BR ipvlan " |"
- .BR lowpan " |"
- .BR geneve " |"
--.BR macsec " ]"
-+.BR macsec " |"
-+.BR netkit " ]"
- 
- .SH "DESCRIPTION"
- The
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index e82b2dbb..ca49b008 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -247,6 +247,7 @@ ip-link \- network device configuration
- .BR macvlan  " | "
- .BR macvtap  " | "
- .BR netdevsim " |"
-+.BR netkit " |"
- .BR nlmon " |"
- .BR rmnet " |"
- .BR sit " |"
-@@ -384,6 +385,9 @@ Link types:
- .BR netdevsim
- - Interface for netdev API tests
- .sp
-+.BR netkit
-+- BPF-programmable network device
-+.sp
- .BR nlmon
- - Netlink monitoring device
- .sp
-@@ -848,6 +852,46 @@ tunnel.
- 
- .in -8
- 
-+.TP
-+netkit Type Support
-+For a link of type
-+.I netkit
-+the following additional arguments are supported:
-+
-+.BI "ip link add " DEVICE
-+.BR type " netkit "
-+[
-+.BI mode " MODE "
-+] [
-+.I "POLICY "
-+] [
-+.BR peer
-+[
-+.I "POLICY "
-+] [
-+.I "NAME "
-+] ]
-+
-+.in +8
-+
-+.sp
-+.BI mode " MODE"
-+- specifies the operation mode of the netkit device with "l3" and "l2"
-+as possible values. Default option is "l3".
-+
-+.sp
-+.I "POLICY"
-+- specifies the default device policy when no BPF programs are attached
-+with "forward" and "blackhole" as possible values. Default option is
-+"forward". Specifying policy before the peer option refers to the primary
-+device, after the peer option refers to the peer device.
-+
-+.sp
-+.I "NAME"
-+- specifies the device name of the peer device.
-+
-+.in -8
-+
- .TP
- IPIP, SIT Type Support
- For a link of type
 -- 
-2.34.1
+2.30.1
 
+
+--0000000000008e9c50060a9e1178
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIyrslERMNynXaJHaplDQR6woqc6Hzgg
+7VnZwpDjNXnBMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEy
+MDIzNDQzNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCkSipldTgenxSlUpgCjVonftfQz7MMbS3WKEuyqVNCW2fNSv+c
+1OL64t4mde/L6EwGLUaRXV0jXTXTMMZvwVkJ06X71n6UmWbsqKzyCQ1SWfXAhOF/LHEB3PZ2sK4j
+fAQcaQqsk0M1nwwFJeptbppdyD4wBDJi3OYvN/V6YmFF9Zb6TgHI73/lM9pS6h8kF7D54yGamoVC
+HnF0qZ7nPvtZHpXAigdurQL4Pxj0/o3/IKr8EdgVF+6a6kS463NIRC/R3nthS6OywO7F/DHzNLqJ
+qEqr9VHepKM828e2/RTT7+3IrmOMlIKcZNi021GOo1qdhNv++dmdTO8/lvgx+J25
+--0000000000008e9c50060a9e1178--
 
