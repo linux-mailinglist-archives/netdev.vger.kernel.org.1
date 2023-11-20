@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCA87F0E10
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:47:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C537F0E11
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:47:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28672282084
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:47:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 733551C215E2
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:47:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E09910790;
-	Mon, 20 Nov 2023 08:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD55107B9;
+	Mon, 20 Nov 2023 08:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="02SWU+pD"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Yo2S7mxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A66110F7
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:08 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-9ffb5a4f622so35565266b.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:08 -0800 (PST)
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189891BC3
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:11 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-543456dbd7bso9896398a12.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700470027; x=1701074827; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700470029; x=1701074829; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CDezKWz0doJAOlG7AP9dGlF4Zqe7hOwSp2BSLUMy+RQ=;
-        b=02SWU+pDgxjU5+BlGW/9x8TMozlBSquuuWtf+1StqZu8NggbA5e0CzCwuPyrasMRO0
-         y8YoGNRdxg3VxVQsw41yNQ+bccMh7+jLeQQgqT134IDFuRk/0d0cOi9B88+PHJIzhdxO
-         YU6l6upIGAt7F9VN98S1CPY7gPPVahtI4B/VzWYwBtdORlQM/pvNkfp/NnPKpcrNHTD9
-         eIpoHsIF4a+Fdh7uAf0ERKeIf0gbHbraBq0LCEDj9owQhDQVanGW7yhBNjePoTIxR7s5
-         GjfIibA6aQmDTsu48rIEt/yW+4a+NsAL+qnGOGYKlQ1j+Anwyv0b+aBQI33O64tIp73w
-         N6FQ==
+        bh=7Loj6eye+Xg8SMV+GCvDdSe8coR7xpViOIIZYOTm3lQ=;
+        b=Yo2S7mxRa04bpR+nGXnR+l22Ri1BxoTcMc8EGTTmHzIODGIbjf8udVLWUJGND6shz9
+         vg+aqOLD1mkH12J0sG+ZPyVk+OeyTNBcfquI1xxyDQqyxF0XhBnYwa7EgQho+3gOHMG3
+         D3hU0Hk91lU01xaXxJPLiz6jy4PIeCDRPty8vyqSBIHYWhrUE2/NW0qZVzU3cQ8rJgkA
+         S21oIAClHFAGTbnerDfXjqEXZAglJcVMyEVmDoEA32waTYxrJstkrNTFYPEsaJtmcWHH
+         0Zt7gG+1ZEwlJmrjufJ8Qs6u8tATFaGlDbjMWPHkhNgC9FFK/JZbU/EcnhJIfrOwqJN3
+         U9KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700470027; x=1701074827;
+        d=1e100.net; s=20230601; t=1700470029; x=1701074829;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CDezKWz0doJAOlG7AP9dGlF4Zqe7hOwSp2BSLUMy+RQ=;
-        b=jbiQi+XuyYx6s0i4mCjtBX2gy4EVesHjCNzhr2XQ15SJfHvgRW9WNNwhyshLKp3EpX
-         NtrPfe1nYwuctmyeQZ41j1JeHU2CZkho0YSCs3jOIYbjKBtmu+EhPOcETrqyyS7ArofP
-         01dUvDyQiCxNQUSfWpminPgPyJPd90KYsbB7T185r2vWGHcYUhc3tMgHoG1hAlN9uPw4
-         THovqg/KOYZZoCHmqtCBb7G+/vD6bItFpH3sU69jchGlFqhK19if3tubC2rRaM9ehwmM
-         OuDMs4wUDkTGNcAmYG/RvpYK3e59pjOG+px3lbLFCSFpmJq1LBeayV20kyTSI6iq82Lk
-         YBDg==
-X-Gm-Message-State: AOJu0Yz0cO7e4R7zUmWDJHz2i3E72v0WuRUYQwKvXZQDIwlTP41ceHzf
-	7zs2HQjVgoZHq/hc2Pr+eHjdQv3pn0JN2pFkQE+piQ==
-X-Google-Smtp-Source: AGHT+IF4HdB+Othm2BjxAsjUfYFWs44rbT1opU27zhrwsMn1vPBCArcgWfuztiPFiPAdSvWMEu+mOg==
-X-Received: by 2002:a17:906:2d2:b0:a00:76fe:9016 with SMTP id 18-20020a17090602d200b00a0076fe9016mr31624ejk.21.1700470027273;
-        Mon, 20 Nov 2023 00:47:07 -0800 (PST)
+        bh=7Loj6eye+Xg8SMV+GCvDdSe8coR7xpViOIIZYOTm3lQ=;
+        b=Q2P1brHDggVHQAQU4HNr3OzPYAomiafrICThinqveGdesk4TdbiKZN5ODPczlomKYW
+         HEmpnsoCyZzzJrF8hfJFNkAGil+sKiKsk/3iiHbXC55IvUFcqi3+zqin2oFd8rp29eam
+         Mq6v1kkZYEM3oSCdNzmGQbYvKPWpNEWDPco066BVSyw9VmEcJd89m996NCfFpYWvIfEO
+         hai1Ctk7TCEvdIjI+tZxxKOQRlb6WK6K1biSiJbdG4t0ZaUx04YmQKtSKmu6MtFLi/Uy
+         cDmDem7OQGu7uyGFFSY5Mi9ZNiY3QinFq90iB8bWVNRzr+0Ie86zKI8Q5sdjlcWr1L/6
+         OLog==
+X-Gm-Message-State: AOJu0YxrRApJPyf3sOeeB3bpMYTgEXkIF4EqNkNCcAKBkf6Y3KtNx+Fe
+	pG24+rjcTXZPULHnIqqlAhogNxFnn11kLw/Ed2n9cw==
+X-Google-Smtp-Source: AGHT+IErDyyPKBi0mRbhyTP3J6BOB8omO/JVDhSDRTEHZw5B+b0pgBzRMd8Am8JV2uHrXUDa4oduRw==
+X-Received: by 2002:a17:906:25c9:b0:9b2:be5e:3674 with SMTP id n9-20020a17090625c900b009b2be5e3674mr1084435ejb.36.1700470029253;
+        Mon, 20 Nov 2023 00:47:09 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id b19-20020a170906709300b009e5eaf7a9b6sm3673222ejk.139.2023.11.20.00.47.06
+        by smtp.gmail.com with ESMTPSA id g15-20020a170906538f00b0099ce025f8ccsm3642005ejo.186.2023.11.20.00.47.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 00:47:06 -0800 (PST)
+        Mon, 20 Nov 2023 00:47:08 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	amritha.nambiar@intel.com,
 	sdf@google.com,
 	horms@kernel.org
-Subject: [patch net-next v3 4/9] devlink: introduce a helper for netlink multicast send
-Date: Mon, 20 Nov 2023 09:46:52 +0100
-Message-ID: <20231120084657.458076-5-jiri@resnulli.us>
+Subject: [patch net-next v3 5/9] genetlink: implement release callback and free sk_user_data there
+Date: Mon, 20 Nov 2023 09:46:53 +0100
+Message-ID: <20231120084657.458076-6-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231120084657.458076-1-jiri@resnulli.us>
 References: <20231120084657.458076-1-jiri@resnulli.us>
@@ -82,183 +82,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Introduce a helper devlink_nl_notify_send() so each object notification
-function does not have to call genlmsg_multicast_netns() with the same
-arguments.
+If any generic netlink family would like to allocate data store the
+pointer to sk_user_data, there is no way to do cleanup in the family
+code.
+
+Assume that kfree() is good for now, as the only user introduced by the
+follow-up patch (devlink) will use kzalloc() for the allocation of
+the memory pointed by a pointer stored in sk_user_data. If later on
+this needs to be implemented per-family, a callback is going
+to be needed. Until then (if ever), do this in a simple way.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/devlink/dev.c           | 6 ++----
- net/devlink/devl_internal.h | 7 +++++++
- net/devlink/health.c        | 3 +--
- net/devlink/linecard.c      | 3 +--
- net/devlink/param.c         | 3 +--
- net/devlink/port.c          | 3 +--
- net/devlink/rate.c          | 3 +--
- net/devlink/region.c        | 3 +--
- net/devlink/trap.c          | 9 +++------
- 9 files changed, 18 insertions(+), 22 deletions(-)
+ net/netlink/genetlink.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/net/devlink/dev.c b/net/devlink/dev.c
-index 582b5177f403..ecbc6d51b624 100644
---- a/net/devlink/dev.c
-+++ b/net/devlink/dev.c
-@@ -216,8 +216,7 @@ static void devlink_notify(struct devlink *devlink, enum devlink_command cmd)
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
+diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+index 92ef5ed2e7b0..905c5a167f53 100644
+--- a/net/netlink/genetlink.c
++++ b/net/netlink/genetlink.c
+@@ -1699,12 +1699,18 @@ static int genl_bind(struct net *net, int group)
+ 	return ret;
  }
  
- int devlink_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
-@@ -991,8 +990,7 @@ static void __devlink_flash_update_notify(struct devlink *devlink,
- 	if (err)
- 		goto out_free_msg;
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- 	return;
- 
- out_free_msg:
-diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
-index 8b48a07eb7b7..e19e8dd47092 100644
---- a/net/devlink/devl_internal.h
-+++ b/net/devlink/devl_internal.h
-@@ -178,6 +178,13 @@ static inline bool devlink_nl_notify_need(struct devlink *devlink)
- 				  DEVLINK_MCGRP_CONFIG);
- }
- 
-+static inline void devlink_nl_notify_send(struct devlink *devlink,
-+					  struct sk_buff *msg)
++static void genl_release(struct sock *sk, unsigned long *groups)
 +{
-+	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
-+				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
++	kfree(sk->sk_user_data);
 +}
 +
- /* Notify */
- void devlink_notify_register(struct devlink *devlink);
- void devlink_notify_unregister(struct devlink *devlink);
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index 93eae8b5d2d3..2f06e4ddbf3b 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -509,8 +509,7 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
- 		return;
- 	}
+ static int __net_init genl_pernet_init(struct net *net)
+ {
+ 	struct netlink_kernel_cfg cfg = {
+ 		.input		= genl_rcv,
+ 		.flags		= NL_CFG_F_NONROOT_RECV,
+ 		.bind		= genl_bind,
++		.release	= genl_release,
+ 	};
  
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void
-diff --git a/net/devlink/linecard.c b/net/devlink/linecard.c
-index 45b36975ee6f..67f70a621d27 100644
---- a/net/devlink/linecard.c
-+++ b/net/devlink/linecard.c
-@@ -150,8 +150,7 @@ static void devlink_linecard_notify(struct devlink_linecard *linecard,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_linecards_notify_register(struct devlink *devlink)
-diff --git a/net/devlink/param.c b/net/devlink/param.c
-index 6bb6aee5d937..854a3af65db9 100644
---- a/net/devlink/param.c
-+++ b/net/devlink/param.c
-@@ -356,8 +356,7 @@ static void devlink_param_notify(struct devlink *devlink,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- static void devlink_params_notify(struct devlink *devlink,
-diff --git a/net/devlink/port.c b/net/devlink/port.c
-index 32f4d0331e63..758df3000a1b 100644
---- a/net/devlink/port.c
-+++ b/net/devlink/port.c
-@@ -525,8 +525,7 @@ static void devlink_port_notify(struct devlink_port *devlink_port,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- static void devlink_ports_notify(struct devlink *devlink,
-diff --git a/net/devlink/rate.c b/net/devlink/rate.c
-index 0371a2dd3e0a..7139e67e93ae 100644
---- a/net/devlink/rate.c
-+++ b/net/devlink/rate.c
-@@ -159,8 +159,7 @@ static void devlink_rate_notify(struct devlink_rate *devlink_rate,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_rates_notify_register(struct devlink *devlink)
-diff --git a/net/devlink/region.c b/net/devlink/region.c
-index f1402da66277..fd6bfabc0c33 100644
---- a/net/devlink/region.c
-+++ b/net/devlink/region.c
-@@ -242,8 +242,7 @@ static void devlink_nl_region_notify(struct devlink_region *region,
- 	if (IS_ERR(msg))
- 		return;
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink), msg,
--				0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_regions_notify_register(struct devlink *devlink)
-diff --git a/net/devlink/trap.c b/net/devlink/trap.c
-index 3ca1ca7e2e64..5d18c7424df1 100644
---- a/net/devlink/trap.c
-+++ b/net/devlink/trap.c
-@@ -1188,8 +1188,7 @@ devlink_trap_group_notify(struct devlink *devlink,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_trap_groups_notify_register(struct devlink *devlink)
-@@ -1249,8 +1248,7 @@ static void devlink_trap_notify(struct devlink *devlink,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_traps_notify_register(struct devlink *devlink)
-@@ -1727,8 +1725,7 @@ devlink_trap_policer_notify(struct devlink *devlink,
- 		return;
- 	}
- 
--	genlmsg_multicast_netns(&devlink_nl_family, devlink_net(devlink),
--				msg, 0, DEVLINK_MCGRP_CONFIG, GFP_KERNEL);
-+	devlink_nl_notify_send(devlink, msg);
- }
- 
- void devlink_trap_policers_notify_register(struct devlink *devlink)
+ 	/* we'll bump the group number right afterwards */
 -- 
 2.41.0
 
