@@ -1,249 +1,125 @@
-Return-Path: <netdev+bounces-49276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C937F174E
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:30:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D094D7F1761
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 16:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0404E282727
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:30:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A125282731
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A4A1D552;
-	Mon, 20 Nov 2023 15:30:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52A81D6BD;
+	Mon, 20 Nov 2023 15:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="XzOmjMW+"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aZdT4nG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826A4BE
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:30:23 -0800 (PST)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-5a7dd65052aso50448547b3.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:30:23 -0800 (PST)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA7F7BE
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:33:30 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-6c39ad730aaso3591092b3a.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 07:33:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700494222; x=1701099022; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JASRnr1MIQ1rI3DfOcT6HlzVP5tWS5+csjwBSo3Wdtk=;
-        b=XzOmjMW+5ioVE22yrnLRRo3YIMDAD3U72iyrHhgTPf3EY5OUyfa3s3/VX4o2rlG61X
-         mi0R4W/hGTQYLOO8Y54CjLEj7rnppDW/68XmrnxQSmIGU85hLU0AiarNS9T1I/AaNcRy
-         0VEITHo7Dk7+SZEjIdLv6rY5i1k3a0tvSE3MRaxjRXdBX4U6S7FUt3cvhKPoQQsYmFEs
-         HkvwHo7z0HtshpJSOoyEXqKJHlAAjkHKhxbxc+X/213ZujoOLNikonno+Yk7TSYpzKEH
-         YeaiD3L5I2epHDlVes3v8oKrXzwNEURg7bMY6qgX4p0EXn9ujF8x4fMiq0ql9t01yEPI
-         edMA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700494410; x=1701099210; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c/vkPNph5u5OOrRSn6FR5rf84/Y5x7U2iw601QDwn1w=;
+        b=aZdT4nG3nvtH4hK5HbpH/8dFyeH4vzz7mKT3IuUwrCXWFtDxiZq25X/8UNdVxq2ZM1
+         aDTsbkN4J3U00zRJwKv4akimkV6+37zdwvANSSGDyNsjUupOdT9FZyJqqk9C/DNAuC/W
+         7UODD+2NpIS3ifS1e0Qh+tlPENT28R0QXknGwMAx3BbC60M1fBoGKLt5WAOgTK3jPRDx
+         d2Qcpz2zg8EVd/tQR0CO93BtJrqO1laIzOEuxlIs775FzSQ0afBB9hWAEbTyR1p8x8K0
+         nhIaqyybEMNJ+YnF5/kqtJlXxTArpSR7Xaeq4WRyS+jOR05e7+/TL+AlvKIzs8l8vTsC
+         +qLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700494222; x=1701099022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JASRnr1MIQ1rI3DfOcT6HlzVP5tWS5+csjwBSo3Wdtk=;
-        b=ZM+8ugDpzjSXI1f+wN87GnEV7MhHe+VJVlRIGq10o2lZeJXkrH7jjSpzGN6XXrPgH9
-         S5S/8EogHPSoBHJj3YWSwqYsIgS2KrVJ6WC5nkiMsnrrD0I7WCP/CP54Dr3Jvek83IPv
-         6rNfHJ9IdlB0tWSIR8+p6StMK8XJkT53Dz3ggEAJnz3DbsYxgfJCt0HMQLUWRnSqlqLB
-         nB9q0NMl4D2oeZR/kqKuyj4+d3PC81iRvvp0NTaZ1yNnNLfpVzXvVPPzYG50mArMg/9Z
-         4nZXpf9eQFEnPhzT+H2xoUjsCRjJa4Ru3Qn1HniJWcX03CcblFysszk8qR1jG73v1rIf
-         GFDQ==
-X-Gm-Message-State: AOJu0YyHo7qggVf0ZubsUr5wVVoVQDWTztuP5qyvyzE8l1hdp1wAYdL0
-	J5nnJUg2KJP96hAcYdgd8sGWIz+uCKpyGtbfX617Iw==
-X-Google-Smtp-Source: AGHT+IHNZeBo7o6Ma45ri2i5HB6gCwcvUW8HyMidt+EjxTSwE88AXLSUgXVczkifB71KlmwFQ4A4QPUiHdFmlYsepPI=
-X-Received: by 2002:a81:bb47:0:b0:5a7:bbd1:ec1d with SMTP id
- a7-20020a81bb47000000b005a7bbd1ec1dmr7619169ywl.17.1700494222740; Mon, 20 Nov
- 2023 07:30:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700494410; x=1701099210;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c/vkPNph5u5OOrRSn6FR5rf84/Y5x7U2iw601QDwn1w=;
+        b=pYW1+UbT5LEUtUxLGKUHn44Yx6t04/TC/c6D060gZ7edlIsBN3rHt5TJ6mDFyE+O0B
+         Rw5A68AIj+RBDpZqhTIved5K0W5IH0BKCcHqm/m/aKMnQuQqmIxww6RbMnLoOK/ZzXe3
+         P1ham63XgP/9jzYjGCmmTcs01lSEl5J39fXMj+Dt4Ed8ifildDIaZ/Q+w0Fs8gu6RQQ4
+         ozVbKlY1QRYlYr8ooEg8leSEeoLXm/vEiuSgA0RJ77G4rve4hLTiLfgtYSh3IpBBhv5L
+         SFoX+ai+kuDFLsAj0lFNUqJq2SqdyCAsS1ZbNjaGaoHPqKPPHyGnkgn1eS7beeCFrFD+
+         zVBQ==
+X-Gm-Message-State: AOJu0Yw1TV63A22X/HmsVlMBoVhHmNiVr0CuTNsRUXVMNdop3ZxV2s8b
+	ss54EArz7xYQ1+TJfdIL1SGwbA==
+X-Google-Smtp-Source: AGHT+IEaOg3mR+ohRZuseHeSMp/v9lZVJmrM5ClJ/D9paZFo3jQd/TqgotiBGO5yQ4v6OMwgefFCIA==
+X-Received: by 2002:a05:6a20:8e10:b0:187:f6b3:3ca5 with SMTP id y16-20020a056a208e1000b00187f6b33ca5mr6106464pzj.52.1700494407205;
+        Mon, 20 Nov 2023 07:33:27 -0800 (PST)
+Received: from [192.168.50.25] ([201.17.86.134])
+        by smtp.gmail.com with ESMTPSA id p16-20020a056a000b5000b006cbb3512266sm1195791pfo.1.2023.11.20.07.33.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Nov 2023 07:33:26 -0800 (PST)
+Message-ID: <5e9c5ecb-c3c7-4e5f-ae9e-ff688f4c2e2f@mojatatu.com>
+Date: Mon, 20 Nov 2023 12:33:21 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-10-jhs@mojatatu.com>
- <ZVY/GBIC4ckerGSc@nanopsycho> <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
- <ZVsWP29UyIzg4Jwq@nanopsycho> <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
- <ZVtcEwICZHsTtija@nanopsycho>
-In-Reply-To: <ZVtcEwICZHsTtija@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 20 Nov 2023 10:30:11 -0500
-Message-ID: <CAM0EoM=EFJTqeEsJHQZw-3x6TnEMFYT1+Rsm7f4aSKh0QLqBnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
- get, update, delete
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
-	David Ahern <dsahern@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: sched: Fix an endian bug in tcf_proto_create
+To: Simon Horman <horms@kernel.org>
+Cc: Kunwu Chan <chentao@kylinos.cn>, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kunwu.chan@hotmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20231117093110.1842011-1-chentao@kylinos.cn>
+ <16c758c6-479b-4c54-ad51-88c26a56b4c9@mojatatu.com>
+ <20231120100417.GM186930@vergenet.net>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20231120100417.GM186930@vergenet.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 20, 2023 at 8:16=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Mon, Nov 20, 2023 at 01:48:14PM CET, jhs@mojatatu.com wrote:
-> >On Mon, Nov 20, 2023 at 3:18=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> Fri, Nov 17, 2023 at 01:09:45PM CET, jhs@mojatatu.com wrote:
-> >> >On Thu, Nov 16, 2023 at 11:11=E2=80=AFAM Jiri Pirko <jiri@resnulli.us=
-> wrote:
-> >> >>
-> >> >> Thu, Nov 16, 2023 at 03:59:42PM CET, jhs@mojatatu.com wrote:
-> >> >>
-> >> >> [...]
-> >> >>
-> >> >>
-> >> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-> >> >> >index ba32dba66..4d33f44c1 100644
-> >> >> >--- a/include/uapi/linux/p4tc.h
-> >> >> >+++ b/include/uapi/linux/p4tc.h
-> >> >> >@@ -2,8 +2,71 @@
-> >> >> > #ifndef __LINUX_P4TC_H
-> >> >> > #define __LINUX_P4TC_H
-> >> >> >
-> >> >> >+#include <linux/types.h>
-> >> >> >+#include <linux/pkt_sched.h>
-> >> >> >+
-> >> >> >+/* pipeline header */
-> >> >> >+struct p4tcmsg {
-> >> >> >+      __u32 pipeid;
-> >> >> >+      __u32 obj;
-> >> >> >+};
-> >> >>
-> >> >> I don't follow. Is there any sane reason to use header instead of n=
-ormal
-> >> >> netlink attribute? Moveover, you extend the existing RT netlink wit=
-h
-> >> >> a huge amout of p4 things. Isn't this the good time to finally intr=
-oduce
-> >> >> generic netlink TC family with proper yaml spec with all the benefi=
-ts it
-> >> >> brings and implement p4 tc uapi there? Please?
-> >> >>
-> >> >
-> >> >Several reasons:
-> >> >a) We are similar to current tc messaging with the subheader being
-> >> >there for multiplexing.
-> >>
-> >> Yeah, you don't need to carry 20year old burden in newly introduced
-> >> interface. That's my point.
-> >
-> >Having a demux sub header is 20 year old burden? I didnt follow.
->
-> You don't need the header, that's my point.
->
+On 20/11/2023 07:04, Simon Horman wrote:
+> On Fri, Nov 17, 2023 at 09:06:45AM -0300, Pedro Tammela wrote:
+>> On 17/11/2023 06:31, Kunwu Chan wrote:
+>>> net/sched/cls_api.c:390:22: warning: incorrect type in assignment (different base types)
+>>> net/sched/cls_api.c:390:22:    expected restricted __be16 [usertype] protocol
+>>> net/sched/cls_api.c:390:22:    got unsigned int [usertype] protocol
+>>>
+>>> Fixes: 33a48927c193 ("sched: push TC filter protocol creation into a separate function")
+>>>
+>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>>> ---
+>>>    net/sched/cls_api.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>>> index 1976bd163986..f73f39f61f66 100644
+>>> --- a/net/sched/cls_api.c
+>>> +++ b/net/sched/cls_api.c
+>>> @@ -387,7 +387,7 @@ static struct tcf_proto *tcf_proto_create(const char *kind, u32 protocol,
+>>>    		goto errout;
+>>>    	}
+>>>    	tp->classify = tp->ops->classify;
+>>> -	tp->protocol = protocol;
+>>> +	tp->protocol = cpu_to_be16(protocol);
+>>>    	tp->prio = prio;
+>>>    	tp->chain = chain;
+>>>    	spin_lock_init(&tp->lock);
+>> I don't believe there's something to fix here either
+> 
+> Hi Pedro and Kunwu,
+> 
+> I suspect that updating the byte order of protocol isn't correct
+> here - else I'd assume we would have seen a user-visible bug on
+> little-endian systems buy now.
+> 
+> But nonetheless I think there is a problem, which is that the appropriate
+> types aren't being used, which means the tooling isn't helping us wrt any
+> bugs that might subsequently be added or already lurking. So I think an
+> appropriate question is, what is the endien and width of protocol, and how
+> can we use an appropriate type throughout the call-path?
 
-Let me see if i understand you:
-We have multiple object types per pipeline - this info is _omni
-present and it is never going to change_.
-Your view is, have a hierarchy of attributes and put this subheader in
-probably one attribute at the root.
-You parse the root, you find the obj and pipeid and then you use that
-to parse the rest of the per-object specific
-attributes?
-
-I dont know if a hierarchical attribute layout gives you any advantage
-over the subheader approach - unless we figure a way to annotate
-attributes as "optional" vs "must be present". I agree that getting
-the validation for free is a bonus ..
-
-
-> >
-> >>
-> >> >b) Where does this leave iproute2? +Cc David and Stephen. Do other
-> >> >generic netlink conversions get contributed back to iproute2?
-> >>
-> >> There is no conversion afaik, only extensions. And they has to be,
-> >> otherwise the user would not be able to use the newly introduced
-> >> features.
-> >
-> >The big question is does the collective who use iproute2 still get to
-> >use the same tooling or now they have to go and learn some new
-> >tooling. I understand the value of the new approach but is it a
-> >revolution or an evolution? We opted to put thing in iproute2 instead
-> >for example because that is widely available (and used).
->
-> I don't see why iproute2 user facing interface would be any different
-> depending on if you user RTnetlink or genetlink as backend channel...
->
-
-iproute2 supports plenty of genetlink already.
-We need to find a way to have the best of both worlds.
-
->
-> >
-> >>
-> >> >c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
-> >> >based. i.e you have:
-> >> > COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrar=
-y
-> >> >P4 programs from the control plane.
-> >>
-> >> I'm pretty sure you can achieve the same over genetlink.
-> >>
-> >
-> >I think you are right.
-> >
-> >>
-> >> >d) we have spent many hours optimizing the control to the kernel so i
-> >> >am not sure what it would buy us to switch to generic netlink..
-> >>
-> >> All the benefits of ynl yaml tooling, at least.
-> >>
-> >
-> >Did you pay close attention to what we have? The user space code is
-> >written once into iproute2 and subsequent to that there is no
-> >recompilation  of any iproute2 code. The compiler generates a json
-> >file specific to a P4 program which is then introspected by the
-> >iproute2 code.
->
-> Right, but in real life, netlink is used directly by many apps. I don't
-> see why this is any different.
->
-
-Not sure if you were referring to what i said about the json file or
-something else. The main value is not just kernel independence but
-also iproute2 independence i.e not need to compile any code.
-
-> Plus, the very best part of yaml from user perpective I see is,
-> you just need the kernel-git yaml file and you can submit all commands.
-> No userspace implementation needed.
-
-Two different tacts: i can see this as being developer friendly (and
-we are more trying to be operator friendly).
-I need to take a closer look. Sounds like it should be polyglot
-friendly as well. If i am not mistaken you still have to compile code
-as a result of generation from the yaml?
-
-cheers,
-jamal
-
->
-> >
-> >
-> >cheers,
-> >jamal
-> >
-> >>
-> >> >
-> >> >cheers,
-> >> >jamal
-> >> >
-> >> >>
-> >> >> >+
-> >> >> >+#define P4TC_MAXPIPELINE_COUNT 32
-> >> >> >+#define P4TC_MAXTABLES_COUNT 32
-> >> >> >+#define P4TC_MINTABLES_COUNT 0
-> >> >> >+#define P4TC_MSGBATCH_SIZE 16
-> >> >> >+
-> >> >> > #define P4TC_MAX_KEYSZ 512
-> >> >> >
-> >> >> >+#define TEMPLATENAMSZ 32
-> >> >> >+#define PIPELINENAMSIZ TEMPLATENAMSZ
-> >> >>
-> >> >> ugh. A prefix please?
-> >> >>
-> >> >> pw-bot: cr
-> >> >>
-> >> >> [...]
+Agreed and I'm all in for improving any tooling integration.
+I believe a better patch would be to have protocol as a be16 since it's 
+creation everywhere. I looked quickly and it will be a "viral" change, 
+meaning a couple of places will require a one line change.
 
