@@ -1,112 +1,118 @@
-Return-Path: <netdev+bounces-49412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAC017F1F48
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:37:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50CC17F1F4A
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 22:38:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 670DEB210AF
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:37:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 098D4281B3D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A87374DC;
-	Mon, 20 Nov 2023 21:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C46238F87;
+	Mon, 20 Nov 2023 21:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CdNq4Agx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BiNUXGpP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EECA38F87;
-	Mon, 20 Nov 2023 21:37:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75AEDC433C7;
-	Mon, 20 Nov 2023 21:37:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700516259;
-	bh=R8d5DEDGigkNAFbk6cm05T5sdaFfbW9r9xeJSv+nEM0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CdNq4Agx/5Lh12IrFa4SP/P1QMpBsjmDsuWTwI9ap1y4jYystf2HHApsKQhXiirfw
-	 5wY3x1qwWbiKKIpCRvpGud1kG2ogyUQRrQL8Q6vvcrQoDGcBV3UFNjOxjyf25d/ft4
-	 PfGOHq9VsS8cPA5DIck4yFwBqfOQs3UPdg6PqrlUbgOPpO7JCom4GiEqOApwI3MPUW
-	 LFpAdCyDJ0WBxv9QPlPe6uVS9Sr1RhYdqc7L0WOWqUiRheguE7EI5nt3lbVZByXnFV
-	 7F8s9kjj59a27dj6fU3Aub768mo2q2fqzMS6uwHl+HuzbJ+03R8KTgD4WC3WACLxBx
-	 4uWi/Qt89VEfw==
-Date: Mon, 20 Nov 2023 13:37:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231120133737.70dde657@kernel.org>
-In-Reply-To: <20231120211759.j5uvijsrgt2jqtwx@skbuf>
-References: <20231118183433.30ca1d1a@kernel.org>
-	<20231120104439.15bfdd09@kmaincent-XPS-13-7390>
-	<20231120105255.cgbart5amkg4efaz@skbuf>
-	<20231120121440.3274d44c@kmaincent-XPS-13-7390>
-	<20231120120601.ondrhbkqpnaozl2q@skbuf>
-	<20231120144929.3375317e@kmaincent-XPS-13-7390>
-	<20231120142316.d2emoaqeej2pg4s3@skbuf>
-	<20231120093723.4d88fb2a@kernel.org>
-	<20231120190023.ymog4yb2hcydhmua@skbuf>
-	<20231120115839.74ee5492@kernel.org>
-	<20231120211759.j5uvijsrgt2jqtwx@skbuf>
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7B0BA4
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:38:10 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5ae5b12227fso70510747b3.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 13:38:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1700516290; x=1701121090; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dq4CfKUj5/ZaNFEkeLfqEzl0ki2CvJ4LAjxnKGFqLpY=;
+        b=BiNUXGpP5wlEY+v5NUBfPrzAiXeoa31DcGU9rl1ZCVXkuOJ3GtBA/ZuyzlzDU8CaiD
+         s2w659socGpf7dBbS7xZhnNlsXlPXmfjy+Qh1qZ+oSSF+00C2Vvpgp187QE1eAn9kSyV
+         ntOjH31OFRbBF+Tb2Mim3UZge8rxIr3IMzU75HYw2HFMDBc/XQE01JOYo/wVT6GNhthe
+         KM9QG+5Qf+02Ekx6bQmfzBthDVPoO3f9jxrORF4LwXNpJW4TIEmsYBPWDlV+f8n+rdHo
+         a7CD9EDyFGiyOM1jVhVIQSSaD5uhwpmtKY3IPWB7LTep2xzG4cCBuW23PzATkYoNmIWq
+         KKIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700516290; x=1701121090;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dq4CfKUj5/ZaNFEkeLfqEzl0ki2CvJ4LAjxnKGFqLpY=;
+        b=Nwa/+uWkvKZXT9YO8llIPj038Qre2qKwxdYZ8Zf//TWqyIZJw5OgMUjWWcz7jyIDwl
+         icSnG8mcYg29jQK8l+agYqL8ufp1Y6+FdEaNTSoiN0nOD6YJf5Fx/7ZL/XwRFYP1NLRv
+         QHZYf3Zkm9JYD9Hq3VHNErxwUO74hTIGrofW2D1BK1VaKBCy1GZaolhRaKVrhjlzrqo3
+         FFd3DrzqOn39fUMcrD8HB3edMDDwj+z/wfHqCJqsRV+L4RVtAz6ajyGjKNvoyzN2MJW+
+         iWdIkgyiwDwJzjkT9CNn2bEKmf4FCurtRczWLfzjRTB1EuR4zoWeRea30dkWuKHGFnyk
+         pkjg==
+X-Gm-Message-State: AOJu0YyRPrljMKGOIIdkLKP2fV8HdnhFl/Pb6pib31Co9+ANugE4rTV0
+	9Ahyvzl7YOvxXWnRAu0r7cP2FtI=
+X-Google-Smtp-Source: AGHT+IF5G39joqJfR/xXRnSv4jxlxoWo/M6mCYoU1xlmcfGOaqHKjpRBNQ9Ynfdgyr6ADX0c2lsN080=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:690c:2a8f:b0:5c9:b457:d73 with SMTP id
+ ek15-20020a05690c2a8f00b005c9b4570d73mr132946ywb.6.1700516289968; Mon, 20 Nov
+ 2023 13:38:09 -0800 (PST)
+Date: Mon, 20 Nov 2023 13:38:08 -0800
+In-Reply-To: <20231114045453.1816995-2-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20231114045453.1816995-1-sdf@google.com> <20231114045453.1816995-2-sdf@google.com>
+Message-ID: <ZVvRwIUFOAP5lacY@google.com>
+Subject: Re: [PATCH bpf-next 1/2] netdevsim: don't accept device bound programs
+From: Stanislav Fomichev <sdf@google.com>
+To: bpf@vger.kernel.org, netdev@vger.kernel.org
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, haoluo@google.com, jolsa@kernel.org, 
+	Dipendra Khadka <kdipendra88@gmail.com>, 
+	syzbot+44c2416196b7c607f226@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="utf-8"
 
-On Mon, 20 Nov 2023 23:17:59 +0200 Vladimir Oltean wrote:
-> Forget the concept of an active hwtstamp provider, just open up the
-> knobs of _all_ possible hwtstamp providers for a NIC. Simultaneously!
-> To make one active and all the others inactive, just use
-> HWTSTAMP_FILTER_NONE/HWTSTAMP_TX_OFF for all except one, and the desired
-> enum hwtstamp_rx_filters / enum hwtstamp_tx_types for the active one.
-> Live with this expanded configuration model for a while, just restricted
-> for a single active timestamping layer, and then, once user space is
-> ready for an enhanced struct scm_timestamping which supports potentially
-> multiple cmsgs with distinct hwtstamps, remove the restriction and let
-> it all rip! Everybody gets their pony!
+On 11/13, Stanislav Fomichev wrote:
+> Commit 2b3486bc2d23 ("bpf: Introduce device-bound XDP programs")
+> introduced device-bound programs by largely reusing existing
+> offloading infrastructure. This changed the semantics of
+> 'prog->aux->offload' a bit. Now, it's non-null for both
+> offloaded and device-bound programs.
 > 
-> Additionally, SIOCSHWTSTAMP is kinda rusty, has a fixed binary format,
-> and is not extensible to target a specific hwtstamp provider. So a
-> netlink conversion of that, as a first step, would of course be great.
+> Instead of looking at 'prog->aux->offload' let's call
+> bpf_prog_is_offloaded which should be true iff the program
+> is offloaded and not merely device-bound.
 > 
-> Is it an accurate summary?
-
-Yes.
-
-For now we can impose the requirement that only one can be active 
-easily at the kernel level. But the uAPI should allow expressing more.
-
-> You've partially answered above. The mix of timestamps coming from the
-> PHY/MAC and those coming from the DMA is unrepresentable in today's
-> UAPI, and is just fine-tuned to work for the existing use case of "PTP
-> gets PHY/MAC, everything else gets DMA".
+> Cc: Dipendra Khadka <kdipendra88@gmail.com>
+> Reported-by: syzbot+44c2416196b7c607f226@syzkaller.appspotmail.com
+> Fixes: 2b3486bc2d23 ("bpf: Introduce device-bound XDP programs")
+> Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> ---
+>  drivers/net/netdevsim/bpf.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Still not 100% clear what would the proper UAPI (separate user-controllable
-> RX filters for PHY, MAC and DMA) gain, in addition to what exists in mlx5.
+> diff --git a/drivers/net/netdevsim/bpf.c b/drivers/net/netdevsim/bpf.c
+> index f60eb97e3a62..608953d4f98d 100644
+> --- a/drivers/net/netdevsim/bpf.c
+> +++ b/drivers/net/netdevsim/bpf.c
+> @@ -93,7 +93,7 @@ static void nsim_prog_set_loaded(struct bpf_prog *prog, bool loaded)
+>  {
+>  	struct nsim_bpf_bound_prog *state;
+>  
+> -	if (!prog || !prog->aux->offload)
+> +	if (!prog || !bpf_prog_is_offloaded(prog->aux))
+>  		return;
+>  
+>  	state = prog->aux->offload->dev_priv;
+> @@ -311,7 +311,7 @@ nsim_setup_prog_hw_checks(struct netdevsim *ns, struct netdev_bpf *bpf)
+>  	if (!bpf->prog)
+>  		return 0;
+>  
+> -	if (!bpf->prog->aux->offload) {
+> +	if (!bpf_prog_is_offloaded(bpf->prog->aux)) {
+>  		NSIM_EA(bpf->extack, "xdpoffload of non-bound program");
+>  		return -EINVAL;
+>  	}
+> -- 
+> 2.42.0.869.gea05f2083d-goog
+> 
 
-Too late for mlx5 but I'm anticipating that more vendors will start
-needing such configuration in the future. At which point it will be
-good to have an API in place.
+Forgot to CC netdev of these..
 
