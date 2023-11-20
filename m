@@ -1,214 +1,89 @@
-Return-Path: <netdev+bounces-49230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FFE57F1425
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:16:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEF37F144F
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:23:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF97C1C21531
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:16:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D411FB217F3
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF351A727;
-	Mon, 20 Nov 2023 13:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LPp30pGP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44413199DC;
+	Mon, 20 Nov 2023 13:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F435112
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:16:07 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-548696eac92so2982210a12.3
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:16:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700486165; x=1701090965; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=paXWmZJjkzeTHk9KbxsJ5PCYxiV+9eLWIGBAJo/o7w8=;
-        b=LPp30pGP66A+V3hrUWdHnljY/Jl8ueyxCPhErg80swGZg5aDtQzOB5W16XnLYWRaoV
-         0Ihe0MgX/9gNPDc8o8ylxQKR2kG6C6rcQy2i5nbfBwmtHTI9xejFC5L1EJuFyWBLYeul
-         diLNn31VQtxhw2/980OGnVWn+iJmY4baHgcV7hFTdPBTX+PIe1/jUP2djP4XCOuH5rcF
-         QBPm7oxwv/n16I+ldw209C8ZVqnpfwOm/g8bPrYfMQgbxR9KYriAHB43v0xv4BAMjOyd
-         sPCtG8mlmMzhojO2f+M16ze2SJz2KgYiA7wJfeAJ7uJB89xtTtb+qXBaLfjDCUZhstuM
-         vybg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700486165; x=1701090965;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=paXWmZJjkzeTHk9KbxsJ5PCYxiV+9eLWIGBAJo/o7w8=;
-        b=XMrvYM1Z8Ura2+8QPI2d/J5dSFpAKiw2ZnM9W1yFddU+nAthieMWe9fxMyWXh9X2a5
-         kB1OmFYgCA7Aqg49lFd/ORQPiJc3fANJ2yKLgD56Ht672hpJLBXqrXCRgbhAkL19sxYm
-         mm54JWJZV/nd4a/89JiuwoJZMc3+8BpHuoCPLJLgou1DXLSii4elWJDDswgyEantsR2X
-         yM+LsDJpnUsCO05EiruMiSOn69MW6IIMknZs/LYW+z2ZTx/TmdsOZ9snPOwL3aa/pkwQ
-         dEj8Ih0uXC+oHQp4kp5X98G+8ITOSyVVLa7qSBqc5QFgLFVRIOiFsga0iMG5/UD3y7Ib
-         3GSw==
-X-Gm-Message-State: AOJu0Yzz3SZ+JflXjN4Kryp31B/TQmeTZSPEifKcC2Rv09cb2dNZHlWJ
-	bYTJ/9R7+EqqAsB3C0aD3ZA/Ow==
-X-Google-Smtp-Source: AGHT+IEWyPu++B3DE+4d8255KgTG/8MpKf+RTbXjZHmp0gcLahMNvhvPxYv5IOqWBy5p1Lr9nmPYfQ==
-X-Received: by 2002:a05:6402:2d7:b0:53d:b59c:8f91 with SMTP id b23-20020a05640202d700b0053db59c8f91mr5458780edx.27.1700486165430;
-        Mon, 20 Nov 2023 05:16:05 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o9-20020a509b09000000b0053deb97e8e6sm3732932edi.28.2023.11.20.05.16.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 05:16:04 -0800 (PST)
-Date: Mon, 20 Nov 2023 14:16:03 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
-	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
-	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
-	toke@redhat.com, mattyk@nvidia.com, David Ahern <dsahern@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
- get, update, delete
-Message-ID: <ZVtcEwICZHsTtija@nanopsycho>
-References: <20231116145948.203001-1-jhs@mojatatu.com>
- <20231116145948.203001-10-jhs@mojatatu.com>
- <ZVY/GBIC4ckerGSc@nanopsycho>
- <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
- <ZVsWP29UyIzg4Jwq@nanopsycho>
- <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E641D6D;
+	Mon, 20 Nov 2023 05:23:04 -0800 (PST)
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 3AKDMZCI0801065, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 3AKDMZCI0801065
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Nov 2023 21:22:35 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.17; Mon, 20 Nov 2023 21:22:35 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.34; Mon, 20 Nov 2023 21:22:32 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7]) by
+ RTEXMBS04.realtek.com.tw ([fe80::40c2:6c24:2df4:e6c7%5]) with mapi id
+ 15.01.2375.007; Mon, 20 Nov 2023 21:22:32 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>, Ping-Ke Shih <pkshih@realtek.com>,
+        Larry Chiu
+	<larry.chiu@realtek.com>
+Subject: RE: [PATCH net-next v11 05/13] net:ethernet:realtek:rtase: Implement hardware configuration function
+Thread-Topic: [PATCH net-next v11 05/13] net:ethernet:realtek:rtase: Implement
+ hardware configuration function
+Thread-Index: AQHaF8h2HvTf1F/vj0i3mzSIlPQ+NLCALagAgAMLV4A=
+Date: Mon, 20 Nov 2023 13:22:32 +0000
+Message-ID: <c3b6122e8cd14654ae78d464f4ace3e7@realtek.com>
+References: <20231115133414.1221480-1-justinlai0215@realtek.com>
+	<20231115133414.1221480-6-justinlai0215@realtek.com>
+ <20231118145046.7bb8efca@kernel.org>
+In-Reply-To: <20231118145046.7bb8efca@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+x-originating-ip: [172.21.210.185]
+x-kse-serverinfo: RTEXMBS05.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-Mon, Nov 20, 2023 at 01:48:14PM CET, jhs@mojatatu.com wrote:
->On Mon, Nov 20, 2023 at 3:18 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Fri, Nov 17, 2023 at 01:09:45PM CET, jhs@mojatatu.com wrote:
->> >On Thu, Nov 16, 2023 at 11:11 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> Thu, Nov 16, 2023 at 03:59:42PM CET, jhs@mojatatu.com wrote:
->> >>
->> >> [...]
->> >>
->> >>
->> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
->> >> >index ba32dba66..4d33f44c1 100644
->> >> >--- a/include/uapi/linux/p4tc.h
->> >> >+++ b/include/uapi/linux/p4tc.h
->> >> >@@ -2,8 +2,71 @@
->> >> > #ifndef __LINUX_P4TC_H
->> >> > #define __LINUX_P4TC_H
->> >> >
->> >> >+#include <linux/types.h>
->> >> >+#include <linux/pkt_sched.h>
->> >> >+
->> >> >+/* pipeline header */
->> >> >+struct p4tcmsg {
->> >> >+      __u32 pipeid;
->> >> >+      __u32 obj;
->> >> >+};
->> >>
->> >> I don't follow. Is there any sane reason to use header instead of normal
->> >> netlink attribute? Moveover, you extend the existing RT netlink with
->> >> a huge amout of p4 things. Isn't this the good time to finally introduce
->> >> generic netlink TC family with proper yaml spec with all the benefits it
->> >> brings and implement p4 tc uapi there? Please?
->> >>
->> >
->> >Several reasons:
->> >a) We are similar to current tc messaging with the subheader being
->> >there for multiplexing.
->>
->> Yeah, you don't need to carry 20year old burden in newly introduced
->> interface. That's my point.
->
->Having a demux sub header is 20 year old burden? I didnt follow.
+> On Wed, 15 Nov 2023 21:34:06 +0800 Justin Lai wrote:
+> > +     .ndo_vlan_rx_add_vid =3D rtase_vlan_rx_add_vid,
+> > +     .ndo_vlan_rx_kill_vid =3D rtase_vlan_rx_kill_vid, #ifdef
+> > +CONFIG_NET_POLL_CONTROLLER
+> > +     .ndo_poll_controller =3D rtase_netpoll, #endif
+> > +     .ndo_setup_tc =3D rtase_setup_tc,
+>=20
+> This patch is still way too huge. Please remove more functionality from t=
+he
+> initial version of the driver. You certainly don't need VLAN support or C=
+BS
+> offload to pass packets.
 
-You don't need the header, that's my point.
-
-
->
->>
->> >b) Where does this leave iproute2? +Cc David and Stephen. Do other
->> >generic netlink conversions get contributed back to iproute2?
->>
->> There is no conversion afaik, only extensions. And they has to be,
->> otherwise the user would not be able to use the newly introduced
->> features.
->
->The big question is does the collective who use iproute2 still get to
->use the same tooling or now they have to go and learn some new
->tooling. I understand the value of the new approach but is it a
->revolution or an evolution? We opted to put thing in iproute2 instead
->for example because that is widely available (and used).
-
-I don't see why iproute2 user facing interface would be any different
-depending on if you user RTnetlink or genetlink as backend channel...
-
-
->
->>
->> >c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
->> >based. i.e you have:
->> > COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
->> >P4 programs from the control plane.
->>
->> I'm pretty sure you can achieve the same over genetlink.
->>
->
->I think you are right.
->
->>
->> >d) we have spent many hours optimizing the control to the kernel so i
->> >am not sure what it would buy us to switch to generic netlink..
->>
->> All the benefits of ynl yaml tooling, at least.
->>
->
->Did you pay close attention to what we have? The user space code is
->written once into iproute2 and subsequent to that there is no
->recompilation  of any iproute2 code. The compiler generates a json
->file specific to a P4 program which is then introspected by the
->iproute2 code.
-
-Right, but in real life, netlink is used directly by many apps. I don't
-see why this is any different.
-
-Plus, the very best part of yaml from user perpective I see is,
-you just need the kernel-git yaml file and you can submit all commands.
-No userspace implementation needed.
-
-
->
->
->cheers,
->jamal
->
->>
->> >
->> >cheers,
->> >jamal
->> >
->> >>
->> >> >+
->> >> >+#define P4TC_MAXPIPELINE_COUNT 32
->> >> >+#define P4TC_MAXTABLES_COUNT 32
->> >> >+#define P4TC_MINTABLES_COUNT 0
->> >> >+#define P4TC_MSGBATCH_SIZE 16
->> >> >+
->> >> > #define P4TC_MAX_KEYSZ 512
->> >> >
->> >> >+#define TEMPLATENAMSZ 32
->> >> >+#define PIPELINENAMSIZ TEMPLATENAMSZ
->> >>
->> >> ugh. A prefix please?
->> >>
->> >> pw-bot: cr
->> >>
->> >> [...]
+Thanks for your review, I will remove some less necessary functions and mak=
+e the patch smaller.
 
