@@ -1,130 +1,124 @@
-Return-Path: <netdev+bounces-49203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA5E7F117B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:14:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 590297F1193
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:16:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A648E1C20D57
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:14:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92D921C20BB8
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB5013AC3;
-	Mon, 20 Nov 2023 11:14:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZmThG8/n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDE46FBE;
+	Mon, 20 Nov 2023 11:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55890F0;
-	Mon, 20 Nov 2023 03:14:44 -0800 (PST)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 98CF31C000D;
-	Mon, 20 Nov 2023 11:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1700478883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4fOmr1EeD2uGJyE5b6S6DHbDXU7wDK5HnO7BStGLZ7U=;
-	b=ZmThG8/njdOgch0QqfERanqoa7ROiFYwMdVehhBXSBXv6M/Bs5YtwXRvadRrFJKOK2jJZ2
-	ykPahvc5xvDZcxQSqPm3VLdqOqG4oLhrwr1/qsZBeMZoiviapny0f5T4xfNtVtC5UU58gy
-	Y0R3Eg3Pne48VT1UfGWZz2PjmtbNvL3uOS89a4USeBNd8gGO7lgLCndb29rnWgDBPjXGZX
-	7GyDSWEoJfXwckKtkkFHVnFoKVPbPPiwYMGvuaQrNbP1mwyIPIPEBEp5ZNrV0YZz4xutdB
-	xHWmRNHnXfSqMO9PWRm88UhBgOjb/qnT9DnY6sdcTdL8Ks2Nl5N6AVMyohi0RQ==
-Date: Mon, 20 Nov 2023 12:14:40 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
- stamping layer be selectable
-Message-ID: <20231120121440.3274d44c@kmaincent-XPS-13-7390>
-In-Reply-To: <20231120105255.cgbart5amkg4efaz@skbuf>
-References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
-	<20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
-	<20231118183433.30ca1d1a@kernel.org>
-	<20231120104439.15bfdd09@kmaincent-XPS-13-7390>
-	<20231120105255.cgbart5amkg4efaz@skbuf>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CED9F10E4;
+	Mon, 20 Nov 2023 03:16:10 -0800 (PST)
+X-UUID: beef4f8ad89d4ec4931d5c243f55d868-20231120
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.32,REQID:412260c0-b0b1-4902-84f2-0ed738ad25c1,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.32,REQID:412260c0-b0b1-4902-84f2-0ed738ad25c1,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5f78ec9,CLOUDID:e38adb72-1bd3-4f48-b671-ada88705968c,B
+	ulkID:231120180427G1WW4E38,BulkQuantity:4,Recheck:0,SF:24|17|19|44|64|66|3
+	8|102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,
+	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: beef4f8ad89d4ec4931d5c243f55d868-20231120
+X-User: chentao@kylinos.cn
+Received: from [172.21.13.26] [(116.128.244.171)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 2086711540; Mon, 20 Nov 2023 19:15:59 +0800
+Message-ID: <69a4bc75-d1a7-482d-9848-26fdc1de78b4@kylinos.cn>
+Date: Mon, 20 Nov 2023 19:15:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: sched: Fix an endian bug in tcf_proto_create
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>, Pedro Tammela <pctammela@mojatatu.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kunwu.chan@hotmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231117093110.1842011-1-chentao@kylinos.cn>
+ <16c758c6-479b-4c54-ad51-88c26a56b4c9@mojatatu.com>
+ <20231120100417.GM186930@vergenet.net>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <20231120100417.GM186930@vergenet.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 20 Nov 2023 12:52:55 +0200
-Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+Hi Simon,
 
-> > > So you only support PHYLIB?
-> > >=20
-> > > The semantics need to be better documented :( =20
-> >=20
-> > Yes as we don't really know how each MAC deal with the timestamping
-> > before ndo_hwstamp_get/set. Using phylib only allows us to be sure these
-> > NDO are implemented and the management of timestamping is coherent in t=
-he
-> > MAC. Also It will push people to move on to these NDOs.
-> >=20
-> > Ok I will add documentation.
->=20
-> When Jakub says "the semantics need to be better documented", I'm also
-> thinking of a different direction.
->=20
-> From what I understand, Maxime is working on representing multiple
-> phylib PHYs in the UAPI:
-> https://patchwork.kernel.org/project/netdevbpf/cover/20231117162323.62697=
-9-1-maxime.chevallier@bootlin.com/
+Thanks for your reply.
+For a lot of newcomers who aren't proficient in this part of the code, 
+like me, it might be confusing what is the  correct endien and width of 
+a protocol.
 
-Yes I am also following his patch series.=20
-=20
-> Does your UAPI proposal make it possible in any way to select
-> timestamping in phylib PHY A rather than PHY B? Or do you think it is
-> extensible to support that, somehow?
+In response to your question, I wonder if it is necessary to implement a 
+unified checking mechanism with a strict parameter validation for all 
+invocation parameters?
 
-It does not support it for now.
-I didn't want to base my work on his series as it could work without it for=
- now
-and I didn't want to wait to have his series accepted. It is more a future
-possible support as I don't have anything to test it and I don't know if su=
-ch
-hardware exists right now.
-I think it will be extensible to support that, my thinking was to create th=
-is
-struct in net_device struct:
+For example, add an input parameter to the 'tcf_proto_create' to 
+represent the endien and width of the protocol, and check the validity 
+of the input parameter at the beginning of the function.
 
-struct {
-	enum layer;
-	u32 id;
-} ts;
+I don't have a good idea of how to make sure that the right type is used 
+in the call path.
+This is just my personal opinion, welcome to discuss.
 
-With id saving the phy_index of the PHY X used when the layer PHY is select=
-ed.
-This id could also be used to store the timestamp point in case of several
-timestamp in a MAC.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+On 2023/11/20 18:04, Simon Horman wrote:
+> On Fri, Nov 17, 2023 at 09:06:45AM -0300, Pedro Tammela wrote:
+>> On 17/11/2023 06:31, Kunwu Chan wrote:
+>>> net/sched/cls_api.c:390:22: warning: incorrect type in assignment (different base types)
+>>> net/sched/cls_api.c:390:22:    expected restricted __be16 [usertype] protocol
+>>> net/sched/cls_api.c:390:22:    got unsigned int [usertype] protocol
+>>>
+>>> Fixes: 33a48927c193 ("sched: push TC filter protocol creation into a separate function")
+>>>
+>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>>> ---
+>>>    net/sched/cls_api.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+>>> index 1976bd163986..f73f39f61f66 100644
+>>> --- a/net/sched/cls_api.c
+>>> +++ b/net/sched/cls_api.c
+>>> @@ -387,7 +387,7 @@ static struct tcf_proto *tcf_proto_create(const char *kind, u32 protocol,
+>>>    		goto errout;
+>>>    	}
+>>>    	tp->classify = tp->ops->classify;
+>>> -	tp->protocol = protocol;
+>>> +	tp->protocol = cpu_to_be16(protocol);
+>>>    	tp->prio = prio;
+>>>    	tp->chain = chain;
+>>>    	spin_lock_init(&tp->lock);
+>> I don't believe there's something to fix here either
+> 
+> Hi Pedro and Kunwu,
+> 
+> I suspect that updating the byte order of protocol isn't correct
+> here - else I'd assume we would have seen a user-visible bug on
+> little-endian systems buy now.
+> 
+> But nonetheless I think there is a problem, which is that the appropriate
+> types aren't being used, which means the tooling isn't helping us wrt any
+> bugs that might subsequently be added or already lurking. So I think an
+> appropriate question is, what is the endien and width of protocol, and how
+> can we use an appropriate type throughout the call-path?
 
