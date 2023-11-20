@@ -1,53 +1,73 @@
-Return-Path: <netdev+bounces-49312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B5C17F19B8
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:20:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DC927F19F4
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 18:31:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C32F1C20EC7
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:20:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D6031C21171
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 17:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA6D208B0;
-	Mon, 20 Nov 2023 17:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="icfGi8h2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DB6200C7;
+	Mon, 20 Nov 2023 17:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED3A2033D
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:20:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42BD4C433C8;
-	Mon, 20 Nov 2023 17:20:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700500805;
-	bh=fh/Fnb3D79vkiKSIQU25iYNbWPO/hVFQYUlVkr0RMJQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=icfGi8h23q6UoVe8KFbD0E+5CODEOmcSs2tgxZlWz8Gy51Duf/gOw82CopoU6gxdi
-	 lrglh1QIuJxxYmHftI+sSG+nkgsPMrR38nTbgpGdADPxPRhZC7Dk3hHRZ4rAqle8Wn
-	 ofzZEBIYsKg/9Q6XFBY0WUjsp+qf4fbykY07GHUdX5BYqakPJ+eO6rDyy2u/ZLbECK
-	 Z0yXO8s8BmznRA0xfd7sbbmM728TVoqj0Wi92vgWC9co6b4KKARESJmwDof5BpGjtM
-	 mG9bBNyc5GysXcXNd8echybCBoKI3+kTaR5Auz4I5zp8MsHTpVnv9J1wGbXaSbPJj6
-	 mzk/9hgERBa3w==
-Date: Mon, 20 Nov 2023 17:19:59 +0000
-From: Simon Horman <horms@kernel.org>
-To: Coco Li <lixiaoyan@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Mubashir Adnan Qureshi <mubashirq@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	Jonathan Corbet <corbet@lwn.net>, David Ahern <dsahern@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	Chao Wu <wwchao@google.com>, Wei Wang <weiwan@google.com>,
-	Pradeep Nemavat <pnemavat@google.com>
-Subject: Re: [PATCH v7 net-next 1/5] Documentations: Analyze heavily used
- Networking related structs
-Message-ID: <20231120171959.GC245676@kernel.org>
-References: <20231113233301.1020992-1-lixiaoyan@google.com>
- <20231113233301.1020992-2-lixiaoyan@google.com>
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1402EE8;
+	Mon, 20 Nov 2023 09:30:54 -0800 (PST)
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-7b0683ff3c8so147707939f.0;
+        Mon, 20 Nov 2023 09:30:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700501453; x=1701106253;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VSW3E3xtPlVB/b2ss56BvmwvXcGMmo75cWYtJjq8ld8=;
+        b=hnqjB8JZDlkWyl7IL9xqgZVU723YQqOxBV0MkPEjQ0yhB1hs+VPT1i4bfkvw4oWj0y
+         kxMNSOCR3oDddDRXnchXRC2+bbVjSmp5WZcycyaC4dCtpZzvGPoPMGYlVqbZUZ05XQKN
+         3SQAxhzBoklsA+wklXAHUCHHpXI5aIkcGXnBwuWOU/YJP+aRr3E6Uyl0pZnaUPMPiYb+
+         OgN5ZUqrO4fFALgBj4vGjsORRscT34VG5DjhUnyqm6hJBrR0o8IRBk065aXt7EMjlZH3
+         LjSQ9McuLDvLKoX/xLDaHBt+bWsh3ioE7+/lKaAqbgIYdJ7H/uV6XCjwLhSsva/qPw4o
+         9c+w==
+X-Gm-Message-State: AOJu0YykgSq5tCAxMmka6WC7GPYjao8Khp7knQrFkFBmyy934TdvIK5z
+	FjS/DsCZuLtOFfXU+K0zdQ==
+X-Google-Smtp-Source: AGHT+IEqf3gdWs75Wxke7gxzZzNuRkHoVMvLJ/fF9+7hFDSkhKvpLh/DRcbrtvhjf3YBRL53EDCZ8w==
+X-Received: by 2002:a5d:8199:0:b0:798:2415:1189 with SMTP id u25-20020a5d8199000000b0079824151189mr10731727ion.12.1700501453017;
+        Mon, 20 Nov 2023 09:30:53 -0800 (PST)
+Received: from herring.priv ([64.188.179.252])
+        by smtp.gmail.com with ESMTPSA id u13-20020a056638134d00b00466593d380fsm751194jad.53.2023.11.20.09.30.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Nov 2023 09:30:52 -0800 (PST)
+Received: (nullmailer pid 2441844 invoked by uid 1000);
+	Mon, 20 Nov 2023 17:30:49 -0000
+Date: Mon, 20 Nov 2023 10:30:49 -0700
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	Daniel Golle <daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, 
+	SkyLake Huang <SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	David Epping <david.epping@missinglinkelectronics.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+	Harini Katakam <harini.katakam@amd.com>, Simon Horman <horms@kernel.org>, 
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org
+Subject: Re: [net-next RFC PATCH 02/14] dt-bindings: net: move PHY modes to
+ common PHY mode types definition
+Message-ID: <20231120173049.GA2378814-robh@kernel.org>
+References: <20231120135041.15259-1-ansuelsmth@gmail.com>
+ <20231120135041.15259-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,72 +76,243 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20231113233301.1020992-2-lixiaoyan@google.com>
+In-Reply-To: <20231120135041.15259-3-ansuelsmth@gmail.com>
 
-On Mon, Nov 13, 2023 at 11:32:57PM +0000, Coco Li wrote:
-> Analyzed a few structs in the networking stack by looking at variables
-> within them that are used in the TCP/IP fast path.
+On Mon, Nov 20, 2023 at 02:50:29PM +0100, Christian Marangi wrote:
+> Move PHY modes from ethernet-controller schema to dedicated common PHY
+> mode types definition. This is needed to have a centralized place to
+> define PHY interface mode and permit usage and reference of these modes
+> in other schemas.
 > 
-> Fast path is defined as TCP path where data is transferred from sender to
-> receiver unidirectionally. It doesn't include phases other than
-> TCP_ESTABLISHED, nor does it look at error paths.
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  .../bindings/net/ethernet-controller.yaml     |  47 +------
+>  .../bindings/net/ethernet-phy-mode-types.yaml | 132 ++++++++++++++++++
+>  2 files changed, 133 insertions(+), 46 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-phy-mode-types.yaml
 > 
-> We hope to re-organizing variables that span many cachelines whose fast
-> path variables are also spread out, and this document can help future
-> developers keep networking fast path cachelines small.
-> 
-> Optimized_cacheline field is computed as
-> (Fastpath_Bytes/L3_cacheline_size_x86), and not the actual organized
-> results (see patches to come for these).
-> 
-> Investigation is done on 6.5
-> 
-> Name	                Struct_Cachelines  Cur_fastpath_cache Fastpath_Bytes Optimized_cacheline
-> tcp_sock	        42 (2664 Bytes)	   12   		396		8
-> net_device	        39 (2240 bytes)	   12			234		4
-> inet_sock	        15 (960 bytes)	   14			922		14
-> Inet_connection_sock	22 (1368 bytes)	   18			1166		18
-> Netns_ipv4 (sysctls)	12 (768 bytes)     4			77		2
-> linux_mib	        16 (1060)	   6			104		2
-> 
-> Note how there isn't much improvement space for inet_sock and
-> Inet_connection_sock because sk and icsk_inet respectively takes up so
-> much of the struct that rest of the variables become a small portion of
-> the struct size.
-> 
-> So, we decided to reorganize tcp_sock, net_device, Netns_ipv4, linux_mib
-> 
-> Signed-off-by: Coco Li <lixiaoyan@google.com>
-> Suggested-by: Eric Dumazet <edumazet@google.com>
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-controller.yaml b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> index 9f6a5ccbcefe..40c1daff2a48 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-controller.yaml
+> @@ -55,55 +55,10 @@ properties:
+>      const: mac-address
+>  
+>    phy-connection-type:
+> +    $ref: /schemas/net/ethernet-phy-mode-types.yaml#definitions/phy-connection-type
 
-...
+You need a '/' after '#' or it is not a JSON pointer.
 
-> diff --git a/Documentation/networking/net_cachelines/index.rst b/Documentation/networking/net_cachelines/index.rst
+>      description:
+>        Specifies interface type between the Ethernet device and a physical
+>        layer (PHY) device.
+> -    enum:
+> -      # There is not a standard bus between the MAC and the PHY,
+> -      # something proprietary is being used to embed the PHY in the
+> -      # MAC.
+> -      - internal
+> -      - mii
+> -      - gmii
+> -      - sgmii
+> -      - psgmii
+> -      - qsgmii
+> -      - qusgmii
+> -      - tbi
+> -      - rev-mii
+> -      - rmii
+> -      - rev-rmii
+> -      - moca
+> -
+> -      # RX and TX delays are added by the MAC when required
+> -      - rgmii
+> -
+> -      # RGMII with internal RX and TX delays provided by the PHY,
+> -      # the MAC should not add the RX or TX delays in this case
+> -      - rgmii-id
+> -
+> -      # RGMII with internal RX delay provided by the PHY, the MAC
+> -      # should not add an RX delay in this case
+> -      - rgmii-rxid
+> -
+> -      # RGMII with internal TX delay provided by the PHY, the MAC
+> -      # should not add an TX delay in this case
+> -      - rgmii-txid
+> -      - rtbi
+> -      - smii
+> -      - xgmii
+> -      - trgmii
+> -      - 1000base-x
+> -      - 2500base-x
+> -      - 5gbase-r
+> -      - rxaui
+> -      - xaui
+> -
+> -      # 10GBASE-KR, XFI, SFI
+> -      - 10gbase-kr
+> -      - usxgmii
+> -      - 10gbase-r
+> -      - 25gbase-r
+>  
+>    phy-mode:
+>      $ref: "#/properties/phy-connection-type"
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy-mode-types.yaml b/Documentation/devicetree/bindings/net/ethernet-phy-mode-types.yaml
 > new file mode 100644
-> index 0000000000000..92a6fbe93af35
+> index 000000000000..6d15743b4ffa
 > --- /dev/null
-> +++ b/Documentation/networking/net_cachelines/index.rst
-> @@ -0,0 +1,13 @@
-
-Hi Coco,
-
-A minor nit from my side: an SPDX header is probably appropriate at the top
-of each .rst file
-
- 
-> +===================================
-> +Common Networking Struct Cachelines
-> +===================================
+> +++ b/Documentation/devicetree/bindings/net/ethernet-phy-mode-types.yaml
+> @@ -0,0 +1,132 @@
+> +# SPDX-License-Identifier: GPL-2.0-only OR BSD-2-Clause
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/ethernet-phy-mode-types.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
 > +
-> +.. toctree::
-> +   :maxdepth: 1
+> +title: Ethernet PHY Common Mode Types
 > +
-> +   inet_connection_sock
-> +   inet_sock
-> +   net_device
-> +   netns_ipv4_sysctl
-> +   snmp
-> +   tcp_sock
+> +maintainers:
+> +  - David S. Miller <davem@davemloft.net>
+> +
+> +definitions:
 
-...
+Use '$defs'
+
+'definitions' is special in that we don't process it at all. That's 
+probably why you ended up with this overly complicated schema below.
+
+But really, there's no need to use $defs or definitions at all here. 
+Just put it under 'properties' And move the references up a level (i.e. 
+to the node, not a property).
+
+> +  phy-connection-type:
+> +    # const: "internal"
+> +    allOf:
+> +      - $ref: /schemas/types.yaml#/definitions/string
+> +      - oneOf:
+> +        # There is not a standard bus between the MAC and the PHY,
+> +        # something proprietary is being used to embed the PHY in the
+> +        # MAC.
+> +        - items:
+
+'items' is for arrays, but you just said this is a 'string', not 
+'string-array'. 
+
+> +            - type: string
+
+Already covered by the type $ref.
+
+This can all be expressed with just 1 'enum' as it was before.
+
+> +              const: internal
+> +        - items:
+> +            - type: string
+> +              const: mii
+> +        - items:
+> +            - type: string
+> +              const: gmii
+> +        - items:
+> +            - type: string
+> +              const: sgmii
+> +        - items:
+> +            - type: string
+> +              const: psgmii
+> +        - items:
+> +            - type: string
+> +              const: qsgmii
+> +        - items:
+> +            - type: string
+> +              const: qusgmii
+> +        - items:
+> +            - type: string
+> +              const: tbi
+> +        - items:
+> +            - type: string
+> +              const: rev-mii
+> +        - items:
+> +            - type: string
+> +              const: rmii
+> +        - items:
+> +            - type: string
+> +              const: rev-rmii
+> +        - items:
+> +            - type: string
+> +              const: moca
+> +
+> +        # RX and TX delays are added by the MAC when required
+> +        - items:
+> +            - type: string
+> +              const: rgmii
+> +
+> +        # RGMII with internal RX and TX delays provided by the PHY,
+> +        # the MAC should not add the RX or TX delays in this case
+> +        - items:
+> +            - type: string
+> +              const: rgmii-id
+> +
+> +        # RGMII with internal RX delay provided by the PHY, the MAC
+> +        # should not add an RX delay in this case
+> +        - items:
+> +            - type: string
+> +              const: rgmii-rxid
+> +
+> +        # RGMII with internal TX delay provided by the PHY, the MAC
+> +        # should not add an TX delay in this case
+> +        - items:
+> +            - type: string
+> +              const: rgmii-txid
+> +
+> +        - items:
+> +            - type: string
+> +              const: rtbi
+> +
+> +        - items:
+> +            - type: string
+> +              const: smii
+> +
+> +        - items:
+> +            - type: string
+> +              const: xgmii
+> +
+> +        - items:
+> +            - type: string
+> +              const: trgmii
+> +
+> +        - items:
+> +            - type: string
+> +              const: 1000base-x
+> +
+> +        - items:
+> +            - type: string
+> +              const: 2500base-x
+> +
+> +        - items:
+> +            - type: string
+> +              const: 5gbase-r
+> +
+> +        - items:
+> +            - type: string
+> +              const: rxaui
+> +
+> +        - items:
+> +            - type: string
+> +              const: xaui
+> +
+> +        # 10GBASE-KR, XFI, SFI
+> +        - items:
+> +            - type: string
+> +              const: 10gbase-kr
+> +
+> +        - items:
+> +            - type: string
+> +              const: usxgmii
+> +
+> +        - items:
+> +            - type: string
+> +              const: 10gbase-r
+> +
+> +        - items:
+> +            - type: string
+> +              const: 25gbase-r
+> -- 
+> 2.40.1
+> 
 
