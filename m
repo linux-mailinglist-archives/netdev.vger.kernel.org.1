@@ -1,198 +1,177 @@
-Return-Path: <netdev+bounces-49183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51707F10EE
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:55:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415417F1106
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C10D6B21682
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:55:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0AA28215C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEF48485;
-	Mon, 20 Nov 2023 10:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C263C8D6;
+	Mon, 20 Nov 2023 10:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a9JKPpKs"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gyci+U9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEAC79FE
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 10:55:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A925DC433C7;
-	Mon, 20 Nov 2023 10:55:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700477750;
-	bh=JNOXOdMOojAeZTWbU9byZOU6PtaixYj9Wh0/k1bc3mk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=a9JKPpKsvo/0/BW56ePSrrLHa0p5i/Ru9Zkn8gVbkwN6cA1scm7rRbvoN08W1Amrh
-	 kN58pGCpIWvIWOnPfPUzY+Bpw+oAnk+ouW8Aoh6bdr8dF7SmKoLHHFSo/+pPWIzUKb
-	 g5oR40me2x63tv8TpYM6cIMOeaXYME6hGghY+R7vu55Qa8URACng7cONXhiHs6UzwG
-	 xZ923MXAeAcDuHwIUcOgtHkrAWwip6zm5ZXYzUckxo7zE6cJefRrHXhctXUuQSaVk/
-	 hjaudb+9GZv3ICtMX+eoxAGpmBmOj9Yt3ynFhidQ5HIGh4x20ZKVyh0t/NXsTtWis5
-	 5MmW+y5hNuG3A==
-Date: Mon, 20 Nov 2023 11:55:46 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: =?utf-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Toshiaki Makita <toshiaki.makita1@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [External] Re: [PATCH net] veth: fix ethtool statistical errors
-Message-ID: <ZVs7MthVYdIBq9lz@lore-desk>
-References: <20231116114150.48639-1-huangjie.albert@bytedance.com>
- <ZVcxmwm/DRTB8QwO@lore-desk>
- <CABKxMyPMboVYs01KfPEdxPbx-LT88Qe1pcDMaT0NiNWhA-5emg@mail.gmail.com>
- <ZVssMWXZYxM0eKiY@lore-desk>
- <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEDAF4;
+	Mon, 20 Nov 2023 02:56:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=PErohMmpIxRK4QMw8WDDj/1lAS30uf8VYTViuVX+yvU=; b=gyci+U9vXHgasjfs8HQnCINXBZ
+	ZDoZmXXpDs6km4JJ5GN+f2afjIVMNZlLYWIwBzNxuGhb1MFSjy19O4mMHk/uvdJaEPtagLjaXXYgx
+	iZ7DLa036MxGvEZDJS9uWkcaHd6+7S63p3QiD9oaTbE9OcTSjV79jjlg1psAyFzhq1QhbCG/Zw3HM
+	gyTjvkHjWqaRZEmmxZNdjqk/jJEoNmxfgLf4M2jpNJb/+uEcoL/xg7TF+J88ZQzjvkJ2UImzMQFT7
+	9PJDvI7bQ4VCxmD03RT33OOYV4hvpOfE7P0mfQ0xwHVo9G3GhfzPi0OQRq04zfO6h5t/RNbu3eRgE
+	333t+i2g==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1r51wm-00AvJl-1N;
+	Mon, 20 Nov 2023 10:56:08 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B814F300419; Mon, 20 Nov 2023 11:56:06 +0100 (CET)
+Date: Mon, 20 Nov 2023 11:56:06 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Abel Wu <wuyun.abel@bytedance.com>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com
+Subject: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair:
+ Add lag based placement)
+Message-ID: <20231120105606.GQ8262@noisy.programming.kicks-ass.net>
+References: <c7b38bc27cc2c480f0c5383366416455@linux.ibm.com>
+ <20231117092318.GJ8262@noisy.programming.kicks-ass.net>
+ <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hhq9HwkAJFZbaTuH"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
+In-Reply-To: <2c7509e3-6db0-461e-991b-026553157dbe@bytedance.com>
+
+On Sat, Nov 18, 2023 at 01:14:32PM +0800, Abel Wu wrote:
+
+> Hi Peter, I'm a little confused here. As we adopt placement strategy #1
+> when PLACE_LAG is enabled, the lag of that entity needs to be preserved.
+> Given that the weight doesn't change, we have:
+> 
+> 	vl' = vl
+> 
+> But in fact it is scaled on placement:
+> 
+> 	vl' = vl * W/(W + w)
+
+(W+w)/W
+
+> 
+> Does this intended? 
+
+The scaling, yes that's intended and the comment explains why. So now
+you have me confused too :-)
+
+Specifically, I want the lag after placement to be equal to the lag we
+come in with. Since placement will affect avg_vruntime (adding one
+element to the average changes the average etc..) the placement also
+affects the lag as measured after placement.
+
+Or rather, if you enqueue and dequeue, I want the lag to be preserved.
+If you do not take placement into consideration, lag will dissipate real
+quick.
+
+> And to illustrate my understanding of strategy #1:
+
+> @@ -5162,41 +5165,17 @@ place_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)
+>  		 * vl_i is given by:
+>  		 *
+>  		 *   V' = (\Sum w_j*v_j + w_i*v_i) / (W + w_i)
+> -		 *      = (W*V + w_i*(V - vl_i)) / (W + w_i)
+> -		 *      = (W*V + w_i*V - w_i*vl_i) / (W + w_i)
+> -		 *      = (V*(W + w_i) - w_i*l) / (W + w_i)
+> -		 *      = V - w_i*vl_i / (W + w_i)
+> -		 *
+> -		 * And the actual lag after adding an entity with vl_i is:
+> -		 *
+> -		 *   vl'_i = V' - v_i
+> -		 *         = V - w_i*vl_i / (W + w_i) - (V - vl_i)
+> -		 *         = vl_i - w_i*vl_i / (W + w_i)
+> -		 *
+> -		 * Which is strictly less than vl_i. So in order to preserve lag
+> -		 * we should inflate the lag before placement such that the
+> -		 * effective lag after placement comes out right.
+> -		 *
+> -		 * As such, invert the above relation for vl'_i to get the vl_i
+> -		 * we need to use such that the lag after placement is the lag
+> -		 * we computed before dequeue.
+> +		 *      = (W*V + w_i*(V' - vl_i)) / (W + w_i)
+> +		 *      = V - w_i*vl_i / W
+>  		 *
+> -		 *   vl'_i = vl_i - w_i*vl_i / (W + w_i)
+> -		 *         = ((W + w_i)*vl_i - w_i*vl_i) / (W + w_i)
+> -		 *
+> -		 *   (W + w_i)*vl'_i = (W + w_i)*vl_i - w_i*vl_i
+> -		 *                   = W*vl_i
+> -		 *
+> -		 *   vl_i = (W + w_i)*vl'_i / W
+>  		 */
+>  		load = cfs_rq->avg_load;
+>  		if (curr && curr->on_rq)
+>  			load += scale_load_down(curr->load.weight);
+> -
+> -		lag *= load + scale_load_down(se->load.weight);
+>  		if (WARN_ON_ONCE(!load))
+>  			load = 1;
+> -		lag = div_s64(lag, load);
+> +
+> +		vruntime -= div_s64(lag * scale_load_down(se->load.weight), load);
+>  	}
+>  	se->vruntime = vruntime - lag;
 
 
---hhq9HwkAJFZbaTuH
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+So you're proposing we do:
 
-> Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=8820=
-=E6=97=A5=E5=91=A8=E4=B8=80 17:52=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > > Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=
-=8817=E6=97=A5=E5=91=A8=E4=BA=94 17:26=E5=86=99=E9=81=93=EF=BC=9A
-> > > >
-> > > > > if peer->real_num_rx_queues > 1, the ethtool -s command for
-> > > > > veth network device will display some error statistical values.
-> > > > > The value of tx_idx is reset with each iteration, so even if
-> > > > > peer->real_num_rx_queues is greater than 1, the value of tx_idx
-> > > > > will remain constant. This results in incorrect statistical value=
-s.
-> > > > > To fix this issue, assign the value of pp_idx to tx_idx.
-> > > > >
-> > > > > Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit=
- accounting")
-> > > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > > > > ---
-> > > > >  drivers/net/veth.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> > > > > index 0deefd1573cf..3a8e3fc5eeb5 100644
-> > > > > --- a/drivers/net/veth.c
-> > > > > +++ b/drivers/net/veth.c
-> > > > > @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net=
-_device *dev,
-> > > > >       for (i =3D 0; i < peer->real_num_rx_queues; i++) {
-> > > > >               const struct veth_rq_stats *rq_stats =3D &rcv_priv-=
->rq[i].stats;
-> > > > >               const void *base =3D (void *)&rq_stats->vs;
-> > > > > -             unsigned int start, tx_idx =3D idx;
-> > > > > +             unsigned int start, tx_idx =3D pp_idx;
-> > > > >               size_t offset;
-> > > > >
-> > > > >               tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ=
-_STATS_LEN;
-> > > > > --
-> > > > > 2.20.1
-> > > > >
-> > > >
-> > > > Hi Albert,
-> > > >
-> > > > Can you please provide more details about the issue you are facing?
-> > > > In particular, what is the number of configured tx and rx queues fo=
-r both
-> > > > peers?
-> > >
-> > > Hi, Lorenzo
-> > > I found this because I wanted to add more echo information in ethttoo=
-l=EF=BC=88for veth,
-> > > but I found that the information was incorrect. That's why I paid
-> > > attention here.
-> >
-> > ack. Could you please share the veth pair tx/rx queue configuration?
-> >
->=20
-> dev: tx --->4.  rx--->4
-> peer: tx--->1 rx---->1
->=20
-> Could the following code still be problematic? pp_idx not updated correct=
-ly.
-> page_pool_stats:
-> veth_get_page_pool_stats(dev, &data[pp_idx]);
+	v = V - (lag * w) / (W + w) - lag
 
-Thx for pointing this out. This part is a bit tricky but I think I can see =
-the
-issue now. Since we have just one peer rx queue, when we run ndo_xdp_xmit
-pointer on dev, we will squash all dev xmit queues on the single peer rx one
-(where we do do the accounting) [0].
-The issue is ethtool will display all dev xmit queues so we need to set pp_=
-idx
-properly in veth_get_ethtool_stats().
-Can you please take a look to the patch below?
+?
 
-Regards,
-Lorenzo
+That can be written like:
 
-[0] https://github.com/LorenzoBianconi/net-next/blob/master/drivers/net/vet=
-h.c#L417
+	v = V - (lag * w) / (W+w) - (lag * (W+w)) / (W+w)
+	  = V - (lag * (W+w) + lag * w) / (W+w)
+	  = V - (lag * (W+2w)) / (W+w)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 9980517ed8b0..8607eb8cf458 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -236,8 +236,8 @@ static void veth_get_ethtool_stats(struct net_device *d=
-ev,
- 				data[tx_idx + j] +=3D *(u64 *)(base + offset);
- 			}
- 		} while (u64_stats_fetch_retry(&rq_stats->syncp, start));
--		pp_idx =3D tx_idx + VETH_TQ_STATS_LEN;
- 	}
-+	pp_idx =3D idx + dev->real_num_tx_queues * VETH_TQ_STATS_LEN;
-=20
- page_pool_stats:
- 	veth_get_page_pool_stats(dev, &data[pp_idx]);
+And that turns into a mess AFAICT.
 
->=20
-> BR
-> Albert
->=20
-> > Rergards,
-> > Lorenzo
-> >
-> > >
-> > > > tx_idx is the index of the current (local) tx queue and it must res=
-tart from
-> > > > idx in each iteration otherwise we will have an issue when
-> > > > peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
-> > > >
-> > > OK. I don't know if this is a known issue.
-> > >
-> > > BR
-> > > Albert
-> > >
-> > >
-> > > > Regards,
-> > > > Lorenzo
 
---hhq9HwkAJFZbaTuH
-Content-Type: application/pgp-signature; name="signature.asc"
+Let me repeat my earlier argument. Suppose v,w,l are the new element.
+V,W are the old avg_vruntime and sum-weight.
 
------BEGIN PGP SIGNATURE-----
+Then: V = V*W / W, and by extention: V' = (V*W + v*w) / (W + w).
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZVs7MgAKCRA6cBh0uS2t
-rLj+AP9vMII6nwXW7ZJdM5Pl3vPFbXaHYgnoCiPxk2vp0r8g3AEAxtnUvbbKUYtH
-TksmG8p8EEEdw92st5fryqBiqa53HAM=
-=Dba7
------END PGP SIGNATURE-----
+The new lag, after placement: 
 
---hhq9HwkAJFZbaTuH--
+l' = V' - v = (V*W + v*w) / (W+w) - v
+            = (V*W + v*w) / (W+w) - v * (W+w) / (W+v)
+	    = (V*W + v*w -v*W - v*w) / (W+w)
+	    = (V*W - v*W) / (W+w)
+	    = W*(V-v) / (W+w)
+	    = W/(W+w) * (V-v)
+
+Substitute: v = V - (W+w)/W * l, my scaling thing, to obtain:
+
+l' = W/(W+w) * (V - (V - (W+w)/W * l))
+   = W/(W+w) * (V - V + (W+w)/W * l)
+   = W/(W+w) * (W+w)/W * l
+   = l
+
+So by scaling, we've preserved lag across placement.
+
+That make sense?
 
