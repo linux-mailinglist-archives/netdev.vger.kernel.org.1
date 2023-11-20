@@ -1,167 +1,130 @@
-Return-Path: <netdev+bounces-49202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 932567F1165
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:10:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AA5E7F117B
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1FC61C20BE0
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:10:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A648E1C20D57
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D55134A5;
-	Mon, 20 Nov 2023 11:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB5013AC3;
+	Mon, 20 Nov 2023 11:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZmThG8/n"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [IPv6:2a0a:edc0:2:b01:1d::104])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E451198D
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 03:10:43 -0800 (PST)
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r52AM-000764-P7; Mon, 20 Nov 2023 12:10:10 +0100
-Received: from [2a0a:edc0:2:b01:1d::c0] (helo=ptx.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r52AK-00AKxL-MV; Mon, 20 Nov 2023 12:10:08 +0100
-Received: from ore by ptx.whiteo.stw.pengutronix.de with local (Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1r52AK-002x1I-Iw; Mon, 20 Nov 2023 12:10:08 +0100
-Date: Mon, 20 Nov 2023 12:10:08 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: =?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next 2/9] ethtool: Expand Ethernet Power Equipment
- with PoE alongside PoDL
-Message-ID: <20231120111008.GC590719@pengutronix.de>
-References: <20231116-feature_poe-v1-0-be48044bf249@bootlin.com>
- <20231116-feature_poe-v1-2-be48044bf249@bootlin.com>
- <04cb7d87-bb6b-4997-878d-490c17bfdfd0@lunn.ch>
- <20231120110944.66938859@kmaincent-XPS-13-7390>
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55890F0;
+	Mon, 20 Nov 2023 03:14:44 -0800 (PST)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 98CF31C000D;
+	Mon, 20 Nov 2023 11:14:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1700478883;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4fOmr1EeD2uGJyE5b6S6DHbDXU7wDK5HnO7BStGLZ7U=;
+	b=ZmThG8/njdOgch0QqfERanqoa7ROiFYwMdVehhBXSBXv6M/Bs5YtwXRvadRrFJKOK2jJZ2
+	ykPahvc5xvDZcxQSqPm3VLdqOqG4oLhrwr1/qsZBeMZoiviapny0f5T4xfNtVtC5UU58gy
+	Y0R3Eg3Pne48VT1UfGWZz2PjmtbNvL3uOS89a4USeBNd8gGO7lgLCndb29rnWgDBPjXGZX
+	7GyDSWEoJfXwckKtkkFHVnFoKVPbPPiwYMGvuaQrNbP1mwyIPIPEBEp5ZNrV0YZz4xutdB
+	xHWmRNHnXfSqMO9PWRm88UhBgOjb/qnT9DnY6sdcTdL8Ks2Nl5N6AVMyohi0RQ==
+Date: Mon, 20 Nov 2023 12:14:40 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
+ <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Radu Pirea
+ <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
+ <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Thomas
+ Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v7 15/16] net: ethtool: ts: Let the active time
+ stamping layer be selectable
+Message-ID: <20231120121440.3274d44c@kmaincent-XPS-13-7390>
+In-Reply-To: <20231120105255.cgbart5amkg4efaz@skbuf>
+References: <20231114-feature_ptp_netnext-v7-0-472e77951e40@bootlin.com>
+	<20231114-feature_ptp_netnext-v7-15-472e77951e40@bootlin.com>
+	<20231118183433.30ca1d1a@kernel.org>
+	<20231120104439.15bfdd09@kmaincent-XPS-13-7390>
+	<20231120105255.cgbart5amkg4efaz@skbuf>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20231120110944.66938859@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Köry,
+On Mon, 20 Nov 2023 12:52:55 +0200
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 
-On Mon, Nov 20, 2023 at 11:09:44AM +0100, Köry Maincent wrote:
-> +Oleksij
-> 
-> Sorry forgot to CC you the series.
-> Maybe you should add yourself to the MAINTAINERS of pse-pd drivers subsystem?
+> > > So you only support PHYLIB?
+> > >=20
+> > > The semantics need to be better documented :( =20
+> >=20
+> > Yes as we don't really know how each MAC deal with the timestamping
+> > before ndo_hwstamp_get/set. Using phylib only allows us to be sure these
+> > NDO are implemented and the management of timestamping is coherent in t=
+he
+> > MAC. Also It will push people to move on to these NDOs.
+> >=20
+> > Ok I will add documentation.
+>=20
+> When Jakub says "the semantics need to be better documented", I'm also
+> thinking of a different direction.
+>=20
+> From what I understand, Maxime is working on representing multiple
+> phylib PHYs in the UAPI:
+> https://patchwork.kernel.org/project/netdevbpf/cover/20231117162323.62697=
+9-1-maxime.chevallier@bootlin.com/
 
-ack, i'll take a look at this.
+Yes I am also following his patch series.=20
+=20
+> Does your UAPI proposal make it possible in any way to select
+> timestamping in phylib PHY A rather than PHY B? Or do you think it is
+> extensible to support that, somehow?
 
-> On Sat, 18 Nov 2023 18:38:43 +0100
-> Andrew Lunn <andrew@lunn.ch> wrote:
-> 
-> > On Thu, Nov 16, 2023 at 03:01:34PM +0100, Kory Maincent wrote:
-> > > In the current PSE interface for Ethernet Power Equipment, support is
-> > > limited to PoDL. This patch extends the interface to accommodate the
-> > > objects specified in IEEE 802.3-2022 145.2 for Power sourcing
-> > > Equipment (PSE).  
-> > 
-> > Sorry for taking a while getting to these patches. Plumbers and other
-> > patches have been keeping me busy.
-> 
-> Don't worry you are doing a great job as a net maintainer and I won't raise any
-> remarks on delay considering how you are doing your job.
-> Thanks again for your review!!
-> 
-> > I'm trying to get my head around naming... Is there some sort of
-> > hierarchy? Is PSE the generic concept for putting power down the
-> > cable? Then you have the sub-type PoDL, and the sub-type PoE?
-> 
-> In fact as we discussed with Oleksij I decided to keep the naming as close as
-> possible to the IEEE 802.3 standard.
-> On the standard the PODL is naming like this aPoDLPSE* (ex: aPoDLPSEAdminState)
-> and the PSE is naming like this aPSE* (ex: aPSEAdminState) without any PoE
-> prefix. Maybe it is due to PoE being supported before PoDL and they didn't
-> expect the PoDL part.
+It does not support it for now.
+I didn't want to base my work on his series as it could work without it for=
+ now
+and I didn't want to wait to have his series accepted. It is more a future
+possible support as I don't have anything to test it and I don't know if su=
+ch
+hardware exists right now.
+I think it will be extensible to support that, my thinking was to create th=
+is
+struct in net_device struct:
 
-"PoE" (initially Power via MDI?) and PoDL have kind of different technologies.
-They use different negotiation and need different physical implementation.
-IEEE 802.3 standard is trying to be backwards and kind of forwards compatible
-for PoE. But not compatible between PoE and PoDL.
+struct {
+	enum layer;
+	u32 id;
+} ts;
 
-In general, it is not just about enabling or disabling power.
-"admin_state" == enable is other way to say - "do the right thing".
-And the "right thing" may include some kind of communication between PSE
-(Power Source Equipment) and PD (Powered Device).
-
-Since, some variants of  Single Pair Ethernet (SPE) are using same
-auto negotiation protocol as not SPE variants. I can imagine, that some
-day we will see a hybrid (SPE+nonSPE) devices. Wich will need to
-support both: PoE and PoDL. I assume, in that case, we wont to be able
-to control both variants separately.
-
-This is why I prefer to have mapping of IEEE 802.3 specification to the
-user space as close as possible.
-
-> > >  struct pse_control_config {
-> > >  	enum ethtool_podl_pse_admin_state podl_admin_control;
-> > > +	enum ethtool_pse_admin_state admin_control;  
-> > 
-> > When i look at this, it seems to me admin_control should be generic
-> > across all schemes which put power down the cable, and
-> > podl_admin_control is specific to how PoDL puts power down the cable.
-> >
-> > Since you appear to be adding support for a second way to put power
-> > down the cable, i would expect something like poe_admin_control being
-> > added here. But maybe that is in a later patch?
-> 
-> No as said above admin_control is for PoE and podl_admin_control is for PoDL.
-> Maybe you prefer to use poe_admin_control, and add poe prefix in the poe
-> variables. It will differ a bit from the IEEE standard naming but I agreed that
-> it would be more understandable in the development part.
-
-Official name for "PoE" is "Power via Media Dependent Interface". PoE is
-not used in the IEEE 802.3-2018. Using names not used in the specification,
-make development even harder :)
-Especially since there are even more marketing names (names not used in the
-specification) for different PoE variants:
-- 802.3af (802.3at Type 1), PoE
-- 802.3at Type 2, PoE+
-- 802.3bt Type 3, 4PPoE or PoE++
-- 802.3bt Type 4, 4PPoE or PoE++
+With id saving the phy_index of the PHY X used when the layer PHY is select=
+ed.
+This id could also be used to store the timestamp point in case of several
+timestamp in a MAC.
 
 Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
