@@ -1,399 +1,160 @@
-Return-Path: <netdev+bounces-49225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2449E7F137E
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:38:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0AC07F1389
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 982E61F241B4
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:38:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E86691C21573
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:38:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54F981B26C;
-	Mon, 20 Nov 2023 12:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42ACC63C5;
+	Mon, 20 Nov 2023 12:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=weidmueller.onmicrosoft.com header.i=@weidmueller.onmicrosoft.com header.b="jybMhXN/"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88879D2
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:37:43 -0800 (PST)
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VwncioG_1700483860;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VwncioG_1700483860)
-          by smtp.aliyun-inc.com;
-          Mon, 20 Nov 2023 20:37:41 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org
-Cc: jasowang@redhat.com,
-	mst@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	ast@kernel.org,
-	horms@kernel.org,
-	xuanzhuo@linux.alibaba.com
-Subject: [PATCH net-next v4 4/4] virtio-net: support rx netdim
-Date: Mon, 20 Nov 2023 20:37:34 +0800
-Message-Id: <c00b526f32d9f9a5cd2e98a212ee5306d6b6d71c.1700478183.git.hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <cover.1700478183.git.hengqi@linux.alibaba.com>
-References: <cover.1700478183.git.hengqi@linux.alibaba.com>
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2044.outbound.protection.outlook.com [40.107.8.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D746CD2;
+	Mon, 20 Nov 2023 04:38:12 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HLox1ZDi+dMCbZbq3MkXPt5MnZVjntl+koFu98vYXJq/1N8HEHn+BKCn/uKKgvmw7l33VnI8jMqdF/mRE3fQBvUydV+Ms3IFODFLa0HdUM8V2iOs1ZZASXhrATXkPaUNY07izLaRckwjhn9xdKJBxkunecxP79xEJn2ZpUR2aqiEDR+oN0z2u/GwiAnIffi1oxZhpssYA5nyXIqXl3UV9ThURS4oneCO8fPPLsgmjA4cBnaXc7gXI79XqQmpH7AiWP6svBl7CscqO9KGcTyaQ2Op4Oym2EB2HwqyOPOTJvSnAxd8ew5FQfGYD+akYr973oOz2Kpc46VbPNTSio0wfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yV5zFv6E2j3sXGU7rI/iUY4u8BCL38Oe2P0dwiUJvco=;
+ b=mq/ilTbkx+ktmB61eYgiq3fx+rrPLYmfyP7ZiZfOow0Dt3QfvNcYCC6GSCYqS74IcNhgxW9Xu0/oNGgKGjy58TyPYOpelvkz+3yEB3qR0jou/Pm7lE0hjWEXu3nJj+htiYAVMpUt7F8SV1bMoKQG7iW63RBxevoJBMhz7PO7mtN6uTWCxK0pelLNej0KH4c1zJwH69pjitJIJR3NnpheYXmICUEli3/cYQPa+avSz8llFDAwSCq4tofjMvQuDWw01hWdupKN/RmL/Nm3VH5c2mNR7LEwrR7PS4mrlEC5rjf7NRP+CCiTif3KbrHxcFb08X++cqSMx3xphdZb9hwfiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=weidmueller.onmicrosoft.com; s=selector1-weidmueller-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yV5zFv6E2j3sXGU7rI/iUY4u8BCL38Oe2P0dwiUJvco=;
+ b=jybMhXN/uXY2Y2CX/NcFtYMv/wUH10p042kAW7YhVTM/PcB78MIBVuS8D2kBKic6Cm/DGQJd/G1B/HlQAt1LQDX1OpRGekLBhrVdHM3j2qdRHEO+xmnY1c/LKfEl4hIs0Tns3U3Xd2OAClycSsv2j7kkLk65KatNhywHIqIc/c0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=weidmueller.com;
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com (2603:10a6:20b:55a::18)
+ by GVXPR08MB7773.eurprd08.prod.outlook.com (2603:10a6:150:68::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
+ 2023 12:38:08 +0000
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6]) by AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6%5]) with mapi id 15.20.7002.027; Mon, 20 Nov 2023
+ 12:38:08 +0000
+Message-ID: <2508da6b-a099-4271-a1d0-04cfe5d39daf@weidmueller.com>
+Date: Mon, 20 Nov 2023 13:38:06 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: Fix potential null pointer access
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Lukas Funke <lukas.funke@weidmueller.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20231120093256.3642327-1-lukas.funke-oss@weidmueller.com>
+ <ZVssJrplePACN3of@shell.armlinux.org.uk>
+From: Lukas Funke <lukas.funke-oss@weidmueller.com>
+In-Reply-To: <ZVssJrplePACN3of@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0450.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c6::11) To AS2PR08MB8431.eurprd08.prod.outlook.com
+ (2603:10a6:20b:55a::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2PR08MB8431:EE_|GVXPR08MB7773:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2b9c3ee6-50c8-4591-7a91-08dbe9c58c82
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Mh9LrxbBHTpchx7KVnob2y6s5WfSduBaYgzkSo/3/iZQQQivOGRi9LJmbSglUegfe5+rc0QRy+TnvpAQ/2hL2UJqV2jLZH71Z8a3cuDydNqIHXgSWp9GCYXVE0R3kQEgrTKxfGfL4BstdHd8MJ1Dn3Tdp8jzocd7Bud2Z8XIGEDWl5I8QtsWpMs6aVgtzUpRWWreZr7LrCfgj8rAjvcicqx7xsIglwX2+sluACkrCgFTxThHits4X8ep/PbGrz8HK+e4zycljzgRRFfSb+lae/TWNmC0kdk0bxAtVXgHp1VFwgHEglwxGO7JSf5LWjvB/k8gvox3hp/b8rH4mPLrNbLUev3XiJnZk+ffyotqqqUbA2WsS8NEJnqfQcqzA8wnfb60sZ+z/K+ZK/ALdCJAvEvHIZ1p1Ws8QQPseFD79J/5mKyrWjsSX2z5Wg0fSk5dFG53mJ9QXDvzae/8oT3Q7v95vre4RpSvT9/JHraG/QQHnyS+yEwXNBKdaj5gsrqeK5MkkX0HTfluFBJLcuKlH72hHvcxQS7lYf+A8AZxH7bT3ZkbEDPytDMQM3yTaJbeGCCmY1p5oSPlOw++qExSE7FhDplAiVGSQdanztaBvZlSMBD1YDdPJ11Om2ePfP5DUr94GAcSeN7YeFNSiowwxA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB8431.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(396003)(346002)(366004)(39860400002)(230922051799003)(451199024)(64100799003)(186009)(1800799012)(4744005)(5660300002)(2906002)(26005)(2616005)(4326008)(8676002)(8936002)(31696002)(86362001)(41300700001)(83380400001)(36756003)(66946007)(66556008)(66476007)(54906003)(53546011)(6506007)(6916009)(316002)(478600001)(6486002)(6512007)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YlR4eWpPWERvQ3dMUEJzZWRhUnUxYlpYWkF3NG11NWtWY0s5R3pDMEdwSURx?=
+ =?utf-8?B?WkNUc202NzNVRmpBeERYL1hDRzZKWTZpR2ZQNVlrak5WaVVPS2NIay9ZUEFs?=
+ =?utf-8?B?RjRhRFdpZ0gyMWN6Y213QlZRa3RvMVp5U2VUV0JFblhVMitkTTB2N2piNDgz?=
+ =?utf-8?B?R2ZIMWdaSm5EZEYzSWN6SGlKVmlmeWF3KzRodmo1bkVUSy9xeTJFVkRoVWRz?=
+ =?utf-8?B?ZDllRnhrMWxSNit6TUJZTmNNcWxpdmFnRys4R3JOZUpIUCtjVWd3b01xeTBh?=
+ =?utf-8?B?aVdadWp6KytDWVRsb1cydGVDZzQ3WlFCS2t6YmIwZlZYN2k4eGdDR0J2SWlR?=
+ =?utf-8?B?eUpyWUNWdW9kaFBCdkRyMy9ubXVLRy9BRGthdEVpbGhUR1FmazhjOXVpVTBx?=
+ =?utf-8?B?ancvVnlwTUFiRkZMWlVGZC9ROFdBcVJVYVRHRC9EVnV4ZWpOYVNFSTY2NnVj?=
+ =?utf-8?B?TGhhcHcrNmgwRU9rOXk4NXpnYjR3M2Qwa3JvMGw1QTNhQkRsUzBvQnAxeU5R?=
+ =?utf-8?B?UmhGTWtSZ0VTOXhOcTh4bnQ5YXFhV2creFFnQkZUUjV5TVN3K0x3VGlISFpX?=
+ =?utf-8?B?QmVDeGpOdHQwWS9ESHlJL3EzRzVIdi9DKzBZanRSQlBmM0sveklYTHBtcVZ0?=
+ =?utf-8?B?UGxaMXhiUVFsL0xQWUE3ZFU5akxqdGVzWXNFdVhkTEhkQlZmM2ZLT3Q4WkJP?=
+ =?utf-8?B?YmZ0MnBQcWo3N0lGZW03T280RXh4b2xmY2N0WUFqUXdNczFFYzBvZXIrSExE?=
+ =?utf-8?B?ekRPTXZ4ei9oZzhXbjU1TWlHb3o2QUpoMXExOW9sd01kdFhUaVJlZzhnc0RI?=
+ =?utf-8?B?TWFTOXJYMWZMSmpRelhUU0huckFOUVNvV1Y5V0QySjlQUlhVZXFnL29ORXhP?=
+ =?utf-8?B?L2tiOW10K3psVFNLUmQ2TnpPc1hXS2lHamZLVFRCM3JnY0t1TUc5OWdhT2VE?=
+ =?utf-8?B?b0ZHUExZZXFJSWVoS1d4Wk1zWXV0WVN1QnRUbFRudE5ka0tzam5LdHhINHJJ?=
+ =?utf-8?B?ekpRTzR2bk0zNGRRS2czTzg1dkxpc2dPT2Y2czI5R1dGVWZ6eWVUb1V6TkRW?=
+ =?utf-8?B?VEpuWi9rWXdjRFREeXdhcFVndXBpQzNhREpxbHg1alJPZmNtYWsxR2lNYnF1?=
+ =?utf-8?B?TU5zYWdzTU02ck1qUkl0QmNlRUUxa2srRlVlSmpBVHIzditnQjZKK3BTWjV4?=
+ =?utf-8?B?YmZUU3NDN1E4U245c1JjYjliQnVJMUlja1lDZEhtbTdXOVJjQS9tRExBZTky?=
+ =?utf-8?B?SHpOZFBKdCtLVndCZG1udU1QSUt4NkFPcGdRY1JiV0FJNFJsYXB1ZllySXUy?=
+ =?utf-8?B?d1ZuenI4K2lyT3p2bzNxRCttU3d4eHV5QnhsU096T0NBOWd0QmJ5TTZtd0NF?=
+ =?utf-8?B?VmZkd3JyNDUvRFhHTHp1Z3podm5adVViMkw0TDJES0piSy9BbmpTM2RTbmpt?=
+ =?utf-8?B?K1hqbjUwdm1BZzhJWlRxVjg4SVFNUndad0ZjUVVSL1VtdlFYcjNBTTQwQSt0?=
+ =?utf-8?B?ZlhtMnVjUnRHN0xBemZ0a0twSHlxVEg3bklyNGRxNXZWVGtXWDlQaFNhd2ZJ?=
+ =?utf-8?B?d3VZYk40MzJaYmt0cUhycElud2FEb0FkaGRDSWlFLzlQQnFjUkNvN2xLdnVJ?=
+ =?utf-8?B?VWdlZFFESGI0RHJISzdIaW5mQ1NJRzNiM3JlaE5TakJpMXdsN3VFb0hvMlZC?=
+ =?utf-8?B?TTBrSHZpUmtybE0rZWJYSnRPNHFmYkNXRnB4OVlnSkRzMW5MSTZkUFgrbHY1?=
+ =?utf-8?B?ZHBMS3RWOHhSc2tMZktqZ1pKOEYxNHJXOVRnbFhIMGRrdlBhTXRreXBVdXEz?=
+ =?utf-8?B?eEV5NGh6SiswV2hZS3AzMjhCdENzbElQZzhlV1JsTnp5OEd4VlFzUEhXMlIv?=
+ =?utf-8?B?UTBLcWpmV2UxT3RsK0QzWS9QMlQzVUtrRmR2MThxMHZhVnFMdS9iRkZ3UERF?=
+ =?utf-8?B?eHQ5ZjU5RnRocFg0cTZGdXJqQ1R3NERjblpsd1Y4VnRSaFloa2wyUk5UTnVW?=
+ =?utf-8?B?Tm1zZmhUcGhBek9EYjd2TTRlVmMydW5SdW4vODR5UVlLcmREcjVqUjEwZVdW?=
+ =?utf-8?B?a01laGNDTVNqejBCSmdsMzloY1NTejQwR3Q1Qk5mVkFPZlhtWXpkTlR2UWUz?=
+ =?utf-8?B?aUxpVWFvb3J2N1Yza042NE40RkJIaUg5QmJHdnlRV3FWM0hzY1RmN1JPZ0xO?=
+ =?utf-8?B?Vnc9PQ==?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b9c3ee6-50c8-4591-7a91-08dbe9c58c82
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB8431.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 12:38:07.9141
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 44JFihAr8TGUvV4Iz0qAHv6IB6y/EeTvgNCjq7dKcsutnxPK441bOUurhZtAN597/c2imokc4PXtlZ+7JzUCPQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR08MB7773
 
-By comparing the traffic information in the complete napi processes,
-let the virtio-net driver automatically adjust the coalescing
-moderation parameters of each receive queue.
+Hi Russel,
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
-v2->v3:
-- Some minor modifications.
+On 20.11.2023 10:51, Russell King (Oracle) wrote:
+> On Mon, Nov 20, 2023 at 10:32:54AM +0100, Lukas Funke wrote:
+>> From: Lukas Funke <lukas.funke@weidmueller.com>
+>>
+>> When there is no driver associated with the phydev, there will be a
+>> nullptr access. The commit checks if the phydev driver is set before
+>> access.
+> 
+> What's the call path that we encounter a NULL drv pointer?
 
-v1->v2:
-- Improved the judgment of dim switch conditions.
-- Cancel the work when vq reset.
 
- drivers/net/virtio_net.c | 191 ++++++++++++++++++++++++++++++++++-----
- 1 file changed, 169 insertions(+), 22 deletions(-)
+The patch is a bit older and the path is reconstructed from my memory:
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 69fe09e99b3c..bc32d5aae005 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -19,6 +19,7 @@
- #include <linux/average.h>
- #include <linux/filter.h>
- #include <linux/kernel.h>
-+#include <linux/dim.h>
- #include <net/route.h>
- #include <net/xdp.h>
- #include <net/net_failover.h>
-@@ -172,6 +173,17 @@ struct receive_queue {
- 
- 	struct virtnet_rq_stats stats;
- 
-+	/* The number of rx notifications */
-+	u16 calls;
-+
-+	/* Is dynamic interrupt moderation enabled? */
-+	bool dim_enabled;
-+
-+	/* Dynamic Interrupt Moderation */
-+	struct dim dim;
-+
-+	u32 packets_in_napi;
-+
- 	struct virtnet_interrupt_coalesce intr_coal;
- 
- 	/* Chain pages by the private ptr. */
-@@ -305,6 +317,9 @@ struct virtnet_info {
- 	u8 duplex;
- 	u32 speed;
- 
-+	/* Is rx dynamic interrupt moderation enabled? */
-+	bool rx_dim_enabled;
-+
- 	/* Interrupt coalescing settings */
- 	struct virtnet_interrupt_coalesce intr_coal_tx;
- 	struct virtnet_interrupt_coalesce intr_coal_rx;
-@@ -2001,6 +2016,7 @@ static void skb_recv_done(struct virtqueue *rvq)
- 	struct virtnet_info *vi = rvq->vdev->priv;
- 	struct receive_queue *rq = &vi->rq[vq2rxq(rvq)];
- 
-+	rq->calls++;
- 	virtqueue_napi_schedule(&rq->napi, rvq);
- }
- 
-@@ -2141,6 +2157,26 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
- 	}
- }
- 
-+static void virtnet_rx_dim_work(struct work_struct *work);
-+
-+static void virtnet_rx_dim_update(struct virtnet_info *vi, struct receive_queue *rq)
-+{
-+	struct dim_sample cur_sample = {};
-+
-+	if (!rq->packets_in_napi)
-+		return;
-+
-+	u64_stats_update_begin(&rq->stats.syncp);
-+	dim_update_sample(rq->calls,
-+			  u64_stats_read(&rq->stats.packets),
-+			  u64_stats_read(&rq->stats.bytes),
-+			  &cur_sample);
-+	u64_stats_update_end(&rq->stats.syncp);
-+
-+	net_dim(&rq->dim, cur_sample);
-+	rq->packets_in_napi = 0;
-+}
-+
- static int virtnet_poll(struct napi_struct *napi, int budget)
- {
- 	struct receive_queue *rq =
-@@ -2149,17 +2185,22 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	struct send_queue *sq;
- 	unsigned int received;
- 	unsigned int xdp_xmit = 0;
-+	bool napi_complete;
- 
- 	virtnet_poll_cleantx(rq);
- 
- 	received = virtnet_receive(rq, budget, &xdp_xmit);
-+	rq->packets_in_napi += received;
- 
- 	if (xdp_xmit & VIRTIO_XDP_REDIR)
- 		xdp_do_flush();
- 
- 	/* Out of packets? */
--	if (received < budget)
--		virtqueue_napi_complete(napi, rq->vq, received);
-+	if (received < budget) {
-+		napi_complete = virtqueue_napi_complete(napi, rq->vq, received);
-+		if (napi_complete && rq->dim_enabled)
-+			virtnet_rx_dim_update(vi, rq);
-+	}
- 
- 	if (xdp_xmit & VIRTIO_XDP_TX) {
- 		sq = virtnet_xdp_get_sq(vi);
-@@ -2179,6 +2220,7 @@ static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
- 	virtnet_napi_tx_disable(&vi->sq[qp_index].napi);
- 	napi_disable(&vi->rq[qp_index].napi);
- 	xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
-+	cancel_work_sync(&vi->rq[qp_index].dim.work);
- }
- 
- static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
-@@ -2196,6 +2238,9 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
- 	if (err < 0)
- 		goto err_xdp_reg_mem_model;
- 
-+	INIT_WORK(&vi->rq[qp_index].dim.work, virtnet_rx_dim_work);
-+	vi->rq[qp_index].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+
- 	virtnet_napi_enable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
- 	virtnet_napi_tx_enable(vi, vi->sq[qp_index].vq, &vi->sq[qp_index].napi);
- 
-@@ -2393,8 +2438,10 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 
- 	qindex = rq - vi->rq;
- 
--	if (running)
-+	if (running) {
- 		napi_disable(&rq->napi);
-+		cancel_work_sync(&rq->dim.work);
-+	}
- 
- 	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_free_unused_buf);
- 	if (err)
-@@ -2403,8 +2450,10 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 	if (!try_fill_recv(vi, rq, GFP_KERNEL))
- 		schedule_delayed_work(&vi->refill, 0);
- 
--	if (running)
-+	if (running) {
-+		INIT_WORK(&rq->dim.work, virtnet_rx_dim_work);
- 		virtnet_napi_enable(rq->vq, &rq->napi);
-+	}
- 	return err;
- }
- 
-@@ -3341,24 +3390,55 @@ static int virtnet_send_tx_notf_coal_cmds(struct virtnet_info *vi,
- static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
- 					  struct ethtool_coalesce *ec)
- {
-+	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
-+	bool update = false, switch_dim;
- 	struct scatterlist sgs_rx;
- 	int i;
- 
--	vi->ctrl->coal_rx.rx_usecs = cpu_to_le32(ec->rx_coalesce_usecs);
--	vi->ctrl->coal_rx.rx_max_packets = cpu_to_le32(ec->rx_max_coalesced_frames);
--	sg_init_one(&sgs_rx, &vi->ctrl->coal_rx, sizeof(vi->ctrl->coal_rx));
--
--	if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
--				  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
--				  &sgs_rx))
--		return -EINVAL;
-+	switch_dim = rx_ctrl_dim_on != vi->rx_dim_enabled;
-+	if (switch_dim) {
-+		if (rx_ctrl_dim_on) {
-+			if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+				vi->rx_dim_enabled = true;
-+				for (i = 0; i < vi->max_queue_pairs; i++)
-+					vi->rq[i].dim_enabled = true;
-+			} else {
-+				return -EOPNOTSUPP;
-+			}
-+		} else {
-+			vi->rx_dim_enabled = false;
-+			for (i = 0; i < vi->max_queue_pairs; i++)
-+				vi->rq[i].dim_enabled = false;
-+		}
-+	} else {
-+		if (ec->rx_coalesce_usecs != vi->intr_coal_rx.max_usecs ||
-+		    ec->rx_max_coalesced_frames != vi->intr_coal_rx.max_packets)
-+			update = true;
- 
--	/* Save parameters */
--	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
--	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
--	for (i = 0; i < vi->max_queue_pairs; i++) {
--		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
--		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-+		if (vi->rx_dim_enabled) {
-+			if (update)
-+				return -EINVAL;
-+		} else {
-+			/* Since the per-queue coalescing params can be set,
-+			 * we need apply the global new params even if they
-+			 * are not updated.
-+			 */
-+			vi->ctrl->coal_rx.rx_usecs = cpu_to_le32(ec->rx_coalesce_usecs);
-+			vi->ctrl->coal_rx.rx_max_packets = cpu_to_le32(ec->rx_max_coalesced_frames);
-+			sg_init_one(&sgs_rx, &vi->ctrl->coal_rx, sizeof(vi->ctrl->coal_rx));
-+
-+			if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_NOTF_COAL,
-+						  VIRTIO_NET_CTRL_NOTF_COAL_RX_SET,
-+						  &sgs_rx))
-+				return -EINVAL;
-+
-+			vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
-+			vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
-+			for (i = 0; i < vi->max_queue_pairs; i++) {
-+				vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
-+				vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-+			}
-+		}
- 	}
- 
- 	return 0;
-@@ -3380,15 +3460,54 @@ static int virtnet_send_notf_coal_cmds(struct virtnet_info *vi,
- 	return 0;
- }
- 
-+static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
-+					     struct ethtool_coalesce *ec,
-+					     u16 queue)
-+{
-+	bool rx_ctrl_dim_on = !!ec->use_adaptive_rx_coalesce;
-+	bool cur_rx_dim = vi->rq[queue].dim_enabled;
-+	bool update = false, switch_dim;
-+	u32 max_usecs, max_packets;
-+	int err;
-+
-+	switch_dim = rx_ctrl_dim_on != cur_rx_dim;
-+	if (switch_dim) {
-+		if (rx_ctrl_dim_on)
-+			vi->rq[queue].dim_enabled = true;
-+		else
-+			vi->rq[queue].dim_enabled = false;
-+	} else {
-+		max_usecs = vi->rq[queue].intr_coal.max_usecs;
-+		max_packets = vi->rq[queue].intr_coal.max_packets;
-+		if (ec->rx_coalesce_usecs != max_usecs ||
-+		    ec->rx_max_coalesced_frames != max_packets)
-+			update = true;
-+
-+		if (cur_rx_dim) {
-+			if (update)
-+				return -EINVAL;
-+		} else {
-+			if (!update)
-+				return 0;
-+
-+			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
-+							       ec->rx_coalesce_usecs,
-+							       ec->rx_max_coalesced_frames);
-+			if (err)
-+				return err;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- 					  struct ethtool_coalesce *ec,
- 					  u16 queue)
- {
- 	int err;
- 
--	err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, queue,
--					       ec->rx_coalesce_usecs,
--					       ec->rx_max_coalesced_frames);
-+	err = virtnet_send_rx_notf_coal_vq_cmds(vi, ec, queue);
- 	if (err)
- 		return err;
- 
-@@ -3401,6 +3520,32 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- 	return 0;
- }
- 
-+static void virtnet_rx_dim_work(struct work_struct *work)
-+{
-+	struct dim *dim = container_of(work, struct dim, work);
-+	struct receive_queue *rq = container_of(dim,
-+			struct receive_queue, dim);
-+	struct virtnet_info *vi = rq->vq->vdev->priv;
-+	struct net_device *dev = vi->dev;
-+	struct dim_cq_moder update_moder;
-+	int qnum = rq - vi->rq, err;
-+
-+	update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-+	if (update_moder.usec != vi->rq[qnum].intr_coal.max_usecs ||
-+	    update_moder.pkts != vi->rq[qnum].intr_coal.max_packets) {
-+		rtnl_lock();
-+		err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-+						       update_moder.usec,
-+						       update_moder.pkts);
-+		if (err)
-+			pr_debug("%s: Failed to send dim parameters on rxq%d\n",
-+				 dev->name, (int)(rq - vi->rq));
-+		rtnl_unlock();
-+	}
-+
-+	dim->state = DIM_START_MEASURE;
-+}
-+
- static int virtnet_coal_params_supported(struct ethtool_coalesce *ec)
- {
- 	/* usecs coalescing is supported only if VIRTIO_NET_F_NOTF_COAL
-@@ -3482,6 +3627,7 @@ static int virtnet_get_coalesce(struct net_device *dev,
- 		ec->tx_coalesce_usecs = vi->intr_coal_tx.max_usecs;
- 		ec->tx_max_coalesced_frames = vi->intr_coal_tx.max_packets;
- 		ec->rx_max_coalesced_frames = vi->intr_coal_rx.max_packets;
-+		ec->use_adaptive_rx_coalesce = vi->rx_dim_enabled;
- 	} else {
- 		ec->rx_max_coalesced_frames = 1;
- 
-@@ -3539,6 +3685,7 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
- 		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
- 		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
- 		ec->rx_max_coalesced_frames = vi->rq[queue].intr_coal.max_packets;
-+		ec->use_adaptive_rx_coalesce = vi->rq[queue].dim_enabled;
- 	} else {
- 		ec->rx_max_coalesced_frames = 1;
- 
-@@ -3664,7 +3811,7 @@ static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
- 
- static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
--		ETHTOOL_COALESCE_USECS,
-+		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
- 	.get_drvinfo = virtnet_get_drvinfo,
- 	.get_link = ethtool_op_get_link,
- 	.get_ringparam = virtnet_get_ringparam,
--- 
-2.19.1.6.gb485710b
+macb_phylink_connect -> phylink_of_phy_connect -> of_phy_connect -> 
+phy_connect_direct -> phy_request_interrupt
+
+It happend when we used the Xilinx gmii2rgmii phy driver. We did a 
+missconfiguration in the dt and bumped into the nullpointer exception. 
+Since other functions like phy_aneg_done() also check for driver 
+existence I thought it would be a good addition.
+
+> 
+> Thanks.
+> 
 
 
