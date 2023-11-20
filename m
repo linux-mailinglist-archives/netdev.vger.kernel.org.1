@@ -1,84 +1,74 @@
-Return-Path: <netdev+bounces-49123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 633607F0E0A
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:47:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B83D7F0E0C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:47:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86F461C21557
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:47:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 462661F22B77
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849F2F509;
-	Mon, 20 Nov 2023 08:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EE5DF45;
+	Mon, 20 Nov 2023 08:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="VO0kq44x"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QWa7XmH1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C7F41724
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:47 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-507f1c29f25so5409029e87.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:46:47 -0800 (PST)
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D7119A2
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:01 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-543456dbd7bso9896154a12.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700470005; x=1701074805; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7FNYhRa/kTA6OUz1GxKxTdj30g/SDXO/leUXkzzIoxw=;
-        b=VO0kq44x/Wrch2l5+Q2+FYZCPkFeiV1TaJFx3HDqz3Qc91dlnm32ICrOeS/za1WGy9
-         +cde5RstXHKniIsl87ENRryRktE/DkdZDv5gVDf/oUxRlxZ4YV3tibfOs0KgTv8I4fW0
-         nPTG2Tw7uzh5ii5xHD5V8l7XHid40OzAGTtsxetw7v7Ann2CTwcLzLeLYCKwz+AC1IQ7
-         TBjrzVz+5tMAQd/rnNKI43ebYbMy9gv/RMR058K0GwBs0kis6Ca9WwFFKLZajunWpuKa
-         Q8SliCxbuLzFClSwuu3EYYHqRMdxqCw7Hhn9F7euMV+kTuMCNv2GqKo+Y4sZ39Nv/a6v
-         PMSg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700470019; x=1701074819; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/0VeT3zLu+fykyYzLs7U6Fq+OwTbJ76CUKQLeEFbm18=;
+        b=QWa7XmH1DxuhEBgPfJukJ0Cj1Tpo6rQyOZ+6hz53ihC+vphJeROrCZMmMzqa7k+Hc3
+         OsI6RbF2qI2vLMCuG/3gk99AeF2+h28V3g4qIORRJ7doNNotmi1vXgWtUyblQRBk9oOS
+         J1KayVTW6+5OSy1/Fr83pVcYU60EJ87T/YrVv4txJHpbVJI8Qif1rJyIElpkLbRoBaH3
+         e5xZpW3hWiMtoYrpkXSBB6dzTVYMILMDAx3YyniKFSYGSYRMER2xjN2fUUWCewjaxQLr
+         nsn3P/rvTRajIYC8NsJO5FjN0VLIfGzi4LG0cA6+OhfsEwgsqM5pZ/W/feO81zhs++pA
+         QzXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700470005; x=1701074805;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7FNYhRa/kTA6OUz1GxKxTdj30g/SDXO/leUXkzzIoxw=;
-        b=Krd1FbFeu6A3FPkXFZZaQySaAIQp+7z6amP2TKhsyZxI7asvTMZzESNVUe3wS1of1s
-         bVH8YHP05mtCUTLcu9RKm9M8nIKkTuqhuaOTxrsIalluJwapzw0yBIcqWD4aAcYfdFk2
-         OlOC3Q0YJePfZOhhl1Nc6wWKQMZ3aqD04hoETyQV5dg3/CBVJiyc+mXrOk6i+tvNWYn8
-         dP9KDoGoFFPV43VpcpvMGcCOJP1XJij5RvtR3/24rA+0jQuPegcmbdekfSS5gVPmGw1t
-         mScHonMhVj5mwmep66yRZV3G1QXhQ+YMpdwXPQshe447sGVjkUIBj7X/0i4XgCnOtb6F
-         cTrw==
-X-Gm-Message-State: AOJu0Yw9yU9JUbREmZlezmuu+bULeWivJ0Bw4qFrBTcc3YBiFyzuzCgx
-	hcmo0UWVyrXFtHrS4JAgYA6zPw==
-X-Google-Smtp-Source: AGHT+IHtxPlpXQ4BayjBdJJbq3iQegNvuqGSMbNIEngr6vOZDv3NmG/e15q/dsXWFZlOZoNSSCnIIQ==
-X-Received: by 2002:a05:6512:208:b0:509:75b8:637b with SMTP id a8-20020a056512020800b0050975b8637bmr5013308lfo.30.1700470005365;
-        Mon, 20 Nov 2023 00:46:45 -0800 (PST)
-Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id b8-20020a5d45c8000000b003142e438e8csm10435267wrs.26.2023.11.20.00.46.43
+        d=1e100.net; s=20230601; t=1700470019; x=1701074819;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/0VeT3zLu+fykyYzLs7U6Fq+OwTbJ76CUKQLeEFbm18=;
+        b=WTimRIupxY/t2pi0aq5eb0nwLxu3/f2/BQT8OsEZ9YknIm8NpExKTT5CncdQ2okKJk
+         D8lbkj75PEpKwaZztRs8VV4llqvM9XwEJWqiX56iFh0Rhwo3Z3jIpsEBbBGpgS5nEgGW
+         mWP1p1FRgyeCtlQDC9Sa7lVKllcXh9IR2IbaCsoiFXsHzuga0JHbWA2doyF+xs+PgbDd
+         C5HbL8OpxXLSbcDLDGvGK6KkPZNIF2WikdgqVrGUBbjcW9cWrHR6yUGB6vNomxSlSyi2
+         BXeE+P3ACZyE+jKi9moTFcFg4kPG85NhOr50AonQK92G7NvoJRkdGf+q6wS9Rwfpk6uQ
+         0kGQ==
+X-Gm-Message-State: AOJu0Yy/JxjuZWdSpeDiamuZKxp2fJIN7SyR/WvYf0cIk22X0OxHG8lT
+	XCWUABKkpwX6mIg2gXOV9xcR0uMY8CSsrzWTZfJ1Kg==
+X-Google-Smtp-Source: AGHT+IHgMpd3Ws7h8OFdjbNqrk7zpNe2njuCTIe3oTo03bu4H7R5WmIaG6uz2tCQcFv1Ly0whKAYmQ==
+X-Received: by 2002:a17:906:224d:b0:9a9:f0e6:904e with SMTP id 13-20020a170906224d00b009a9f0e6904emr1511656ejr.16.1700470019575;
+        Mon, 20 Nov 2023 00:46:59 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id ci24-20020a170906c35800b009fdaab907fbsm1158033ejb.188.2023.11.20.00.46.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 00:46:45 -0800 (PST)
-From: Claudiu <claudiu.beznea@tuxon.dev>
-X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
-To: s.shtylyov@omp.ru,
+        Mon, 20 Nov 2023 00:46:58 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	p.zabel@pengutronix.de,
-	yoshihiro.shimoda.uh@renesas.com,
-	geert+renesas@glider.be,
-	wsa+renesas@sang-engineering.com,
-	biju.das.jz@bp.renesas.com,
-	prabhakar.mahadev-lad.rj@bp.renesas.com,
-	sergei.shtylyov@cogentembedded.com,
-	mitsuhiro.kimura.kc@renesas.com,
-	masaru.nagai.vx@renesas.com
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 13/13] net: ravb: Add runtime PM support
-Date: Mon, 20 Nov 2023 10:46:06 +0200
-Message-Id: <20231120084606.4083194-14-claudiu.beznea.uj@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
-References: <20231120084606.4083194-1-claudiu.beznea.uj@bp.renesas.com>
+	jacob.e.keller@intel.com,
+	jhs@mojatatu.com,
+	johannes@sipsolutions.net,
+	andriy.shevchenko@linux.intel.com,
+	amritha.nambiar@intel.com,
+	sdf@google.com,
+	horms@kernel.org
+Subject: [patch net-next v3 0/9] devlink: introduce notifications filtering
+Date: Mon, 20 Nov 2023 09:46:48 +0100
+Message-ID: <20231120084657.458076-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,291 +77,108 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+From: Jiri Pirko <jiri@nvidia.com>
 
-RZ/G3S supports enabling/disabling clocks for its modules (including
-Ethernet module). For this commit adds runtime PM support which
-relies on PM domain to enable/disable Ethernet clocks.
+Currently the user listening on a socket for devlink notifications
+gets always all messages for all existing devlink instances and objects,
+even if he is interested only in one of those. That may cause
+unnecessary overhead on setups with thousands of instances present.
 
-At the end of probe ravb_pm_runtime_put() is called which will turn
-off the Ethernet clocks (if no other request arrives at the driver).
-After that if the interface is brought up (though ravb_open()) then
-the clocks remain enabled until interface is brought down (operation
-done though ravb_close()).
+User is currently able to narrow down the devlink objects replies
+to dump commands by specifying select attributes.
 
-If any request arrives to the driver while the interface is down the
-clocks are enabled to serve the request and then disabled.
+Allow similar approach for notifications providing user a new
+notify-filter-set command to select attributes with values
+the notification message has to match. In that case, it is delivered
+to the socket.
 
-Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Note that the filtering is done per-socket, so multiple users may
+specify different selection of attributes with values.
+
+This patchset initially introduces support for following attributes:
+DEVLINK_ATTR_BUS_NAME
+DEVLINK_ATTR_DEV_NAME
+DEVLINK_ATTR_PORT_INDEX
+
+Patches #1 - #4 are preparations in devlink code, patch #3 is
+                an optimization done on the way.
+Patches #5 - #7 are preparations in netlink and generic netlink code.
+Patch #8 is the main one in this set implementing of
+         the notify-filter-set command and the actual
+         per-socket filtering.
+Patch #0 extends the infrastructure allowing to filter according
+         to a port index.
+
+Example:
+$ devlink mon port pci/0000:08:00.0/32768
+[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth netdev eth3 flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type eth flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,new] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+[port,del] pci/0000:08:00.0/32768: type notset flavour pcisf controller 0 pfnum 0 sfnum 107 splittable false
+  function:
+    hw_addr 00:00:00:00:00:00 state inactive opstate detached roce enable
+
 ---
- drivers/net/ethernet/renesas/ravb.h      |  1 +
- drivers/net/ethernet/renesas/ravb_main.c | 99 ++++++++++++++++++++++--
- 2 files changed, 93 insertions(+), 7 deletions(-)
+v2->v3:
+- small cosmetical fixes in patch #6
+v1->v2:
+- added patch #6, fixed generated docs
+- see individual patches for details
 
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index c2d8d890031f..50f358472aab 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -1044,6 +1044,7 @@ struct ravb_hw_info {
- 	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */
- 	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
- 	unsigned refclk_in_pd:1;	/* Reference clock is part of a power domain. */
-+	unsigned rpm:1;			/* Runtime PM available. */
- };
- 
- struct ravb_private {
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index f4634ac0c972..d70ed7e5f7f6 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -145,12 +145,41 @@ static void ravb_read_mac_address(struct device_node *np,
- 	}
- }
- 
-+static int ravb_pm_runtime_get(struct ravb_private *priv)
-+{
-+	const struct ravb_hw_info *info = priv->info;
-+
-+	if (!info->rpm)
-+		return 0;
-+
-+	return pm_runtime_resume_and_get(&priv->pdev->dev);
-+}
-+
-+static void ravb_pm_runtime_put(struct ravb_private *priv)
-+{
-+	const struct ravb_hw_info *info = priv->info;
-+	struct device *dev = &priv->pdev->dev;
-+
-+	if (!info->rpm)
-+		return;
-+
-+	pm_runtime_mark_last_busy(dev);
-+	pm_runtime_put_autosuspend(dev);
-+}
-+
- static void ravb_mdio_ctrl(struct mdiobb_ctrl *ctrl, u32 mask, int set)
- {
- 	struct ravb_private *priv = container_of(ctrl, struct ravb_private,
- 						 mdiobb);
-+	int ret;
-+
-+	ret = ravb_pm_runtime_get(priv);
-+	if (ret < 0)
-+		return;
- 
- 	ravb_modify(priv->ndev, PIR, mask, set ? mask : 0);
-+
-+	ravb_pm_runtime_put(priv);
- }
- 
- /* MDC pin control */
-@@ -176,8 +205,17 @@ static int ravb_get_mdio_data(struct mdiobb_ctrl *ctrl)
- {
- 	struct ravb_private *priv = container_of(ctrl, struct ravb_private,
- 						 mdiobb);
-+	int ret;
- 
--	return (ravb_read(priv->ndev, PIR) & PIR_MDI) != 0;
-+	ret = ravb_pm_runtime_get(priv);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = (ravb_read(priv->ndev, PIR) & PIR_MDI) != 0;
-+
-+	ravb_pm_runtime_put(priv);
-+
-+	return ret;
- }
- 
- /* MDIO bus control struct */
-@@ -1796,10 +1834,14 @@ static int ravb_open(struct net_device *ndev)
- 		}
- 	}
- 
-+	error = ravb_pm_runtime_get(priv);
-+	if (error < 0)
-+		return error;
-+
- 	/* Device init */
- 	error = ravb_dmac_init(ndev);
- 	if (error)
--		goto out_free_irq_mgmta;
-+		goto pm_runtime_put;
- 	ravb_emac_init(ndev);
- 
- 	/* Initialise PTP Clock driver */
-@@ -1820,7 +1862,8 @@ static int ravb_open(struct net_device *ndev)
- 	if (info->gptp)
- 		ravb_ptp_stop(ndev);
- 	ravb_stop_dma(ndev);
--out_free_irq_mgmta:
-+pm_runtime_put:
-+	ravb_pm_runtime_put(priv);
- 	if (!info->multi_irqs)
- 		goto out_free_irq;
- 	if (info->err_mgmt_irqs)
-@@ -2064,6 +2107,11 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
- 	struct net_device_stats *nstats, *stats0, *stats1;
-+	int ret;
-+
-+	ret = ravb_pm_runtime_get(priv);
-+	if (ret < 0)
-+		return NULL;
- 
- 	nstats = &ndev->stats;
- 	stats0 = &priv->stats[RAVB_BE];
-@@ -2107,6 +2155,8 @@ static struct net_device_stats *ravb_get_stats(struct net_device *ndev)
- 		nstats->rx_over_errors += stats1->rx_over_errors;
- 	}
- 
-+	ravb_pm_runtime_put(priv);
-+
- 	return nstats;
- }
- 
-@@ -2115,11 +2165,18 @@ static void ravb_set_rx_mode(struct net_device *ndev)
- {
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	unsigned long flags;
-+	int ret;
-+
-+	ret = ravb_pm_runtime_get(priv);
-+	if (ret < 0)
-+		return;
- 
- 	spin_lock_irqsave(&priv->lock, flags);
- 	ravb_modify(ndev, ECMR, ECMR_PRM,
- 		    ndev->flags & IFF_PROMISC ? ECMR_PRM : 0);
- 	spin_unlock_irqrestore(&priv->lock, flags);
-+
-+	ravb_pm_runtime_put(priv);
- }
- 
- /* Device close function for Ethernet AVB */
-@@ -2187,6 +2244,11 @@ static int ravb_close(struct net_device *ndev)
- 	if (info->nc_queues)
- 		ravb_ring_free(ndev, RAVB_NC);
- 
-+	/* Note that if RPM is enabled on plaforms with ccc_gac=1 this needs to be skipped and
-+	 * added to suspend function after PTP is stopped.
-+	 */
-+	ravb_pm_runtime_put(priv);
-+
- 	return 0;
- }
- 
-@@ -2503,6 +2565,7 @@ static const struct ravb_hw_info gbeth_hw_info = {
- 	.carrier_counters = 1,
- 	.half_duplex = 1,
- 	.refclk_in_pd = 1,
-+	.rpm = 1,
- };
- 
- static const struct of_device_id ravb_match_table[] = {
-@@ -2636,6 +2699,12 @@ static int ravb_probe(struct platform_device *pdev)
- 	if (error)
- 		return error;
- 
-+	info = of_device_get_match_data(&pdev->dev);
-+
-+	if (info->rpm) {
-+		pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-+		pm_runtime_use_autosuspend(&pdev->dev);
-+	}
- 	pm_runtime_enable(&pdev->dev);
- 	error = pm_runtime_resume_and_get(&pdev->dev);
- 	if (error < 0)
-@@ -2647,7 +2716,6 @@ static int ravb_probe(struct platform_device *pdev)
- 		error = -ENOMEM;
- 		goto pm_runtime_put;
- 	}
--	info = of_device_get_match_data(&pdev->dev);
- 
- 	ndev->features = info->net_features;
- 	ndev->hw_features = info->net_hw_features;
-@@ -2856,6 +2924,8 @@ static int ravb_probe(struct platform_device *pdev)
- 
- 	platform_set_drvdata(pdev, ndev);
- 
-+	ravb_pm_runtime_put(priv);
-+
- 	return 0;
- 
- out_napi_del:
-@@ -2880,6 +2950,8 @@ static int ravb_probe(struct platform_device *pdev)
- 	pm_runtime_put(&pdev->dev);
- pm_runtime_disable:
- 	pm_runtime_disable(&pdev->dev);
-+	if (info->rpm)
-+		pm_runtime_dont_use_autosuspend(&pdev->dev);
- 	reset_control_assert(rstc);
- 	return error;
- }
-@@ -2889,6 +2961,11 @@ static void ravb_remove(struct platform_device *pdev)
- 	struct net_device *ndev = platform_get_drvdata(pdev);
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *info = priv->info;
-+	int error;
-+
-+	error = ravb_pm_runtime_get(priv);
-+	if (error < 0)
-+		return;
- 
- 	/* Stop PTP Clock driver */
- 	if (info->ccc_gac)
-@@ -2908,6 +2985,8 @@ static void ravb_remove(struct platform_device *pdev)
- 			  priv->desc_bat_dma);
- 	pm_runtime_put_sync(&pdev->dev);
- 	pm_runtime_disable(&pdev->dev);
-+	if (info->rpm)
-+		pm_runtime_dont_use_autosuspend(&pdev->dev);
- 	reset_control_assert(priv->rstc);
- 	free_netdev(ndev);
- 	platform_set_drvdata(pdev, NULL);
-@@ -2989,6 +3068,10 @@ static int ravb_resume(struct device *dev)
- 	if (ret)
- 		return ret;
- 
-+	ret = ravb_pm_runtime_get(priv);
-+	if (ret < 0)
-+		return ret;
-+
- 	/* If WoL is enabled set reset mode to rearm the WoL logic */
- 	if (priv->wol_enabled)
- 		ravb_write(ndev, CCC_OPC_RESET, CCC);
-@@ -3005,7 +3088,7 @@ static int ravb_resume(struct device *dev)
- 		/* Set GTI value */
- 		ret = ravb_set_gti(ndev);
- 		if (ret)
--			return ret;
-+			goto pm_runtime_put;
- 
- 		/* Request GTI loading */
- 		ravb_modify(ndev, GCCR, GCCR_LTI, GCCR_LTI);
-@@ -3024,15 +3107,17 @@ static int ravb_resume(struct device *dev)
- 		if (priv->wol_enabled) {
- 			ret = ravb_wol_restore(ndev);
- 			if (ret)
--				return ret;
-+				goto pm_runtime_put;
- 		}
- 		ret = ravb_open(ndev);
- 		if (ret < 0)
--			return ret;
-+			goto pm_runtime_put;
- 		ravb_set_rx_mode(ndev);
- 		netif_device_attach(ndev);
- 	}
- 
-+pm_runtime_put:
-+	ravb_pm_runtime_put(priv);
- 	return ret;
- }
- 
+Jiri Pirko (9):
+  devlink: use devl_is_registered() helper instead xa_get_mark()
+  devlink: introduce __devl_is_registered() helper and use it instead of
+    xa_get_mark()
+  devlink: send notifications only if there are listeners
+  devlink: introduce a helper for netlink multicast send
+  genetlink: implement release callback and free sk_user_data there
+  netlink: introduce typedef for filter function
+  genetlink: introduce helpers to do filtered multicast
+  devlink: add a command to set notification filter and use it for
+    multicasts
+  devlink: extend multicast filtering by port index
+
+ Documentation/netlink/specs/devlink.yaml | 11 ++++
+ drivers/connector/connector.c            |  5 +-
+ include/linux/connector.h                |  3 +-
+ include/linux/netlink.h                  |  6 +-
+ include/net/genetlink.h                  | 35 +++++++++--
+ include/net/netlink.h                    | 31 ++++++++--
+ include/uapi/linux/devlink.h             |  2 +
+ net/devlink/dev.c                        | 13 ++--
+ net/devlink/devl_internal.h              | 58 +++++++++++++++++-
+ net/devlink/health.c                     | 10 ++-
+ net/devlink/linecard.c                   |  5 +-
+ net/devlink/netlink.c                    | 77 ++++++++++++++++++++++++
+ net/devlink/netlink_gen.c                | 16 ++++-
+ net/devlink/netlink_gen.h                |  4 +-
+ net/devlink/param.c                      |  5 +-
+ net/devlink/port.c                       |  8 ++-
+ net/devlink/rate.c                       |  5 +-
+ net/devlink/region.c                     |  6 +-
+ net/devlink/trap.c                       | 18 +++---
+ net/netlink/af_netlink.c                 |  3 +-
+ net/netlink/genetlink.c                  |  6 ++
+ tools/net/ynl/generated/devlink-user.c   | 33 ++++++++++
+ tools/net/ynl/generated/devlink-user.h   | 56 +++++++++++++++++
+ 23 files changed, 364 insertions(+), 52 deletions(-)
+
 -- 
-2.39.2
+2.41.0
 
 
