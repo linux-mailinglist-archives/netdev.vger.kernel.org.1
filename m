@@ -1,142 +1,91 @@
-Return-Path: <netdev+bounces-49384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35CC67F1DD4
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:12:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8297F1DDA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1A0F1F2603E
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:12:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DA67B20DA9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:13:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209BE374C6;
-	Mon, 20 Nov 2023 20:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15AA837177;
+	Mon, 20 Nov 2023 20:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="dYMJBLkC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pmySCxX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57258C7
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:12:19 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-5ca53400c8bso14809087b3.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:12:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700511138; x=1701115938; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=14nwulPEeUr0EpWytQxDZg4XoQQ8mZYNfFjDYt7nYIE=;
-        b=dYMJBLkCvkeZnduUNN9KzF/8QjZjY9Rf0NRFv/nRSAr72qA5tVl5oXzSQbypJ+0JJX
-         JIHGIb0Jf0Z/cIJaG7hA0PeUqcVruzm1rR8P26FNMWyyvIj8aeOj8dY7ZBPn+6WDXGLX
-         bzCImC1sYzTs80soWgF/+ESJHHcXgszemzIlx9yUHhY6M33wgYFIm8lyWCSUqZA1ROsy
-         x7E+N6ScyDE+7y43FQoPM7FulQL2elo1P8Hp4bm9+63iH3cbBQg0tGNDBqryLh9Yw6lu
-         VXicp6kdzNk4MISDlrYsNlGXiKEEmiI8ZkgHyrgLFAKSvml7LfA4QaTSA8DKWa5IGm/c
-         iIoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700511138; x=1701115938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=14nwulPEeUr0EpWytQxDZg4XoQQ8mZYNfFjDYt7nYIE=;
-        b=uqm/t2CHqbc3I3nCa342R+D3ZxDDltnTO0IhEtXFc3pb8gifJIxq01W+8WN6jZ5VCX
-         Vm5C7KoRk/Yf/UV5Wo0lwSu+x+Th3mK7+YzplR4XEXoZ4ZaWwOBnITsmVcb2s2+AVW5y
-         r4NvkEbnLwTzH9vZS9bHy7CrmIADWD1QnEcXNZHzn1fwC8hTHLhWXmB1DzjMAhqhK/wE
-         9gesZfz9oBI8xzvIh+6ulk4zN4W0Ym9rWNvNz1bdsww6OTNpDR4QPuS5j2fUw+4cstAz
-         +Y2MuSc3AedEMxeK2UPFyxCt3QiQ6Dz6Ejc7op+Hvk6TZHcLUOsEfuJ5sN3k/vAT/GZ2
-         516g==
-X-Gm-Message-State: AOJu0Yxi9RbSulLb5EItXZrfaY2zpQsuJ0ve/x+eGYrWvhV+g8fPMfw5
-	Qby7WnDW3MWBHi+ex89hSzES0VnUv+I8MorM253tsQ==
-X-Google-Smtp-Source: AGHT+IFJBVUwAPayK6m4ZeiyR3shdv888RLWySawUD7HjkgqZBfQjzlpvQoP231k5N/KslSpJRPYieN6RjgGDC5G8Sg=
-X-Received: by 2002:a0d:c402:0:b0:5c8:cc4d:2aca with SMTP id
- g2-20020a0dc402000000b005c8cc4d2acamr9739511ywd.31.1700511138551; Mon, 20 Nov
- 2023 12:12:18 -0800 (PST)
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB13337174;
+	Mon, 20 Nov 2023 20:13:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8765AC433C8;
+	Mon, 20 Nov 2023 20:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700511204;
+	bh=4sUDEp6FYMfD2QrfOBC4znr4NhcbtUaY8p3AqsjaVX8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pmySCxX1nvFtdQ8UsIeucqu8wgXj0Q3rdUEYubyupWh6P7ZWXqu9pglCx7VFRrVzq
+	 Jj+65pdeF0zLXsCGOO9B6c6RdpYMmpkN87Brsa2BykPRiNMS51ZlFfPk3dwlBKLSJh
+	 94ZMOlh+ksE2Yt2DPLiUkLvCqMTo2Htk92h7Cer17OmW8gYolLT8LRDpV2a2dhGjzR
+	 +q5totgxMTv0OU7XoB+gQ/0+SpcGpky89v80FB9KUFp97xwdhrC/i5JSDRtFMRgcoB
+	 rKwVkk9S7NsBznSw/9kUbx4dbi0yRxFA74tTZTbaXwgBa0dyK95gK65q+YSChZSYb+
+	 u2+5NGOfjzPgQ==
+Date: Mon, 20 Nov 2023 20:13:19 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew@lunn.ch, corbet@lwn.net,
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: netdev: try to guide people on dealing with
+ silence
+Message-ID: <0d80ee23-e106-487e-a824-b048948a859a@sirena.org.uk>
+References: <20231120200109.620392-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-10-jhs@mojatatu.com>
- <ZVY/GBIC4ckerGSc@nanopsycho> <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
- <bdbaa38c-5dd1-4060-b787-014daa2a0abe@kernel.org>
-In-Reply-To: <bdbaa38c-5dd1-4060-b787-014daa2a0abe@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 20 Nov 2023 15:12:07 -0500
-Message-ID: <CAM0EoM=VrMBYWmD5nZD+B-2M2i_QfeQ1uR4cH94Skn1DweSh2g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
- get, update, delete
-To: David Ahern <dsahern@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, deb.chatterjee@intel.com, 
-	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io, 
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, 
-	xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org, 
-	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com, 
-	toke@redhat.com, mattyk@nvidia.com, David Ahern <dsahern@gmail.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="RbKDKJRhjswcAM1A"
+Content-Disposition: inline
+In-Reply-To: <20231120200109.620392-1-kuba@kernel.org>
+X-Cookie: <Manoj> I *like* the chicken
 
-On Mon, Nov 20, 2023 at 1:20=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 11/17/23 4:09 AM, Jamal Hadi Salim wrote:
-> >>> diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-> >>> index ba32dba66..4d33f44c1 100644
-> >>> --- a/include/uapi/linux/p4tc.h
-> >>> +++ b/include/uapi/linux/p4tc.h
-> >>> @@ -2,8 +2,71 @@
-> >>> #ifndef __LINUX_P4TC_H
-> >>> #define __LINUX_P4TC_H
-> >>>
-> >>> +#include <linux/types.h>
-> >>> +#include <linux/pkt_sched.h>
-> >>> +
-> >>> +/* pipeline header */
-> >>> +struct p4tcmsg {
-> >>> +      __u32 pipeid;
-> >>> +      __u32 obj;
-> >>> +};
-> >>
-> >> I don't follow. Is there any sane reason to use header instead of norm=
-al
-> >> netlink attribute? Moveover, you extend the existing RT netlink with
-> >> a huge amout of p4 things. Isn't this the good time to finally introdu=
-ce
-> >> generic netlink TC family with proper yaml spec with all the benefits =
-it
-> >> brings and implement p4 tc uapi there? Please?
-> >>
->
-> There is precedence (new netdev APIs) to move new infra to genl, but it
-> is not clear to me if extending existing functionality should fall into
-> that required conversion.
->
 
-Big question is:  how does the genl (which i am assuming you mean the
-ynl stuff) fit back into iproute2?
-The yaml files approach is a great deal of help for maintenance IMO (a
-lot of repetitive code gone). But do we leave the rest of the masses
-out? What is the motivation for pushing anything to be shared? And if
-the answer is to convert everything onwards into genl then where is
-the central location to grab that code from? Is it still iproute2 or
-the kernel? etc
+--RbKDKJRhjswcAM1A
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-cheers,
-jamal
+On Mon, Nov 20, 2023 at 12:01:09PM -0800, Jakub Kicinski wrote:
 
-> >
-> > Several reasons:
-> > a) We are similar to current tc messaging with the subheader being
-> > there for multiplexing.
-> > b) Where does this leave iproute2? +Cc David and Stephen. Do other
-> > generic netlink conversions get contributed back to iproute2?
-> > c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
-> > based. i.e you have:
-> >  COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
-> > P4 programs from the control plane.
-> > d) we have spent many hours optimizing the control to the kernel so i
-> > am not sure what it would buy us to switch to generic netlink..
-> >
->
+> +Emails saying just "ping" or "bump" are considered rude. If you can't figure
+> +out the status of the patch from patchwork or where the discussion has
+> +landed - describe your best guess and ask if it's correct. For example::
+
+> +  I don't understand what the next steps are. Person X seems to be unhappy
+> +  with A, should I do B and repost the patches?
+
+This bit (modulo the reference to patchwork) feels like it's generically
+good advice and could find a home in submitting-patches.rst or similar,
+not that it isn't worth repeating here.
+
+--RbKDKJRhjswcAM1A
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmVbvd4ACgkQJNaLcl1U
+h9D67Qf9HPgF7lQhJm9GidXfuMsvjIBSe0kH7WnFQND6lioBmMb3AdRniHDNKLx1
+YJLSKE2SAdlUXuFpGtfqwvf4AzaYnkNcDpxPdJBJpeuN+DkJXRguKy6fuzux4CzL
+FKjz8d7B+MIVxB7eaZCi6nuLPoHetW13OSZ/b1mepPRfSkaNDMQtUJ0kJadbzvR4
+eeW+qjZVhislHHtjneQYsgmY6qQRCDBeFryFKdN0ucc5sy/NRzKseWL5dMAzr92D
+9p54Exvw5g8ndtMCarOR2/ULR76NRJfDRBd1gKp1MflakE778m3MZsoG7k5342B4
+3YcT26WP6qpUpLZ7QjTiLGycXUVM/g==
+=d0ou
+-----END PGP SIGNATURE-----
+
+--RbKDKJRhjswcAM1A--
 
