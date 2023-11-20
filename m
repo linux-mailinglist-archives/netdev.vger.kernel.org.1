@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-49082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0F37F0C18
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:01:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E33C27F0C19
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 850B21C208C3
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:01:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74E61280C5C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFCB46B4;
-	Mon, 20 Nov 2023 07:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CFB5224;
+	Mon, 20 Nov 2023 07:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="Ql+mDJju"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="bk9qi9Qz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9B64186
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:00:58 -0800 (PST)
-Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-32fb190bf9bso2983999f8f.1
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:00:58 -0800 (PST)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D196126
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:01 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3316bd84749so1625597f8f.2
+        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700463657; x=1701068457; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KwevGdkeW/EqmdjRRf8uL4/0rWQsUrZxtLsAgN3TSxo=;
-        b=Ql+mDJjuFXalBHoH07uDQji+lUn7Ntuo8d2tfEotw3hwHrpsgtmnlyFN8j8vE/C2yV
-         165cy9H1cJ7UtrYxg7VQ+U15neIBWwXYx3GGzG6NYd7z5uY75ukmY6K1EnKxMNHHZ5wi
-         3yrcMi+cX+ZkVxIhAuRyqfti6PJjpqgQfpSmmHn7iBaf9L8Uve5VuLX7Q3dd8UBtgVrc
-         dpTBg0ScnEUS1BxwsbUMI9LeSkIKC4AQ0xxKtuIrTgCzTE/VQ8rttuaLwDIgzzK6pS57
-         l4d5kmkhsjjLfDeaJ4xwjgaulManPRmZJX0Yy2JdCv/Ebal/BgbyIo/nPH5wOmDNDZGs
-         ldOg==
+        d=tuxon.dev; s=google; t=1700463659; x=1701068459; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qvVQDVzWJ+CyhFQxQLIJ69wjbv3n+I6qePm2Xo8n7Gc=;
+        b=bk9qi9QzACH/BjI8KLeYj1qmi8Z19+IYrfoLnRLkNekVWH4HaGkhpuHD06YD1O/9oQ
+         YYyEvjo+N9syjmKzHk/eypepK/2oawWZhRrRRLNTUDiua76k9+xWwVE3Wy6A/oX+LM2y
+         BMgXowShkOfctxdSjSFrl7VQobPucQmwbPYPiQYQNuLE7s4z+tNS/xH3IwSO9hW+3IkM
+         DaUaOeTzfWQleXVLn/OSfdbVSRNplnj3QW4FmP3OButZe+uciNht4PVCzBsAwbYQBDyi
+         npM9XA+nnEbCRbIVE0pc5Fvjhr0tdvBVHzRwGGfccxTzacp2UtSeLUyM0aCuC8p5PdNS
+         5duw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700463657; x=1701068457;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KwevGdkeW/EqmdjRRf8uL4/0rWQsUrZxtLsAgN3TSxo=;
-        b=bomKvFs/rVCdy5PHBJXVv4epm3uP3jdV4LhRLuiUY1sepJdajv5nZCqx1A30lVhE5M
-         z8fI6H6ajmb9ON7t/S0q60E6kmOiMf2oZWISz4CAHs0Tbz7KE4Yt0jwq3XTVGTOAnFnn
-         XdZ6NxzT/+NLv/RwDr31LKbJcnBzpcmhlPEP/W9x7+Muqpr1OXkJ1ttysHBemHi1uV9X
-         W/wD9T3gitEOp93/esFko5oyue8m3mn2JAZbDL3qKA6k8c3cMmHA1ExapTCejdnnxlDF
-         EpMj5MPfK3XVmRretMq8y6OtOqK2ndCN9Ye0mVNjTyspt7uWX+JWU1oyzFwyV7pF/dAI
-         zT/g==
-X-Gm-Message-State: AOJu0YyCEc3WITutDBZsIUYo1I4oEzzBmv5CpsahootIX6n1eovzlusF
-	1X98OUBVSZfplhd2z2nPxxijfQ==
-X-Google-Smtp-Source: AGHT+IHAdVnQoSWtCtHmQxcPOkXYnnh4RinKnklxlmmTnyowZWsyJ8QW2bmmGUpYQcAPA1Di3ZT2ZA==
-X-Received: by 2002:a5d:5cc2:0:b0:332:c9c2:dd4e with SMTP id cg2-20020a5d5cc2000000b00332c9c2dd4emr639485wrb.31.1700463656622;
-        Sun, 19 Nov 2023 23:00:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1700463659; x=1701068459;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qvVQDVzWJ+CyhFQxQLIJ69wjbv3n+I6qePm2Xo8n7Gc=;
+        b=ZVdj3xqGM26ORSZdc7hh14Y0ueCey/otC18SVq2tEdH7ErohOD+xAjmVeIT0qoUmZY
+         bh4LQ3yPsC2bO8M8nqJkhkqbaXTnx74tcJzN3rovJuK2IK4GcXVCVrfm2xj+lcip92kI
+         kBxKPD3z6qITkasBI2QqhxAFeM+GvRalKGPwpsZfSZ3CSPFYY3JShosDWD5Zb3OktiiM
+         wTev2H1f5pDKThsL91BWzndV6tjunzHYCJy/bd5uDz0LtC9PDHfB3S5kYgQJLaLL/ibp
+         68IyxR5pa1fWgoz9fBvpFEEiW/UYa2+gsj+JBxO7v1XUJXRfvKIyE9RsOpy/UprgxsZe
+         YJBg==
+X-Gm-Message-State: AOJu0YxMBNXx7xmz8koASXKNHIJYG6NFRvZ50xJgytJe9/srSKwCchYB
+	JQZSlAm4Lx7sQWGQqJN1h0buzr5W3LuzRMN5lBk=
+X-Google-Smtp-Source: AGHT+IGfTPFlP3Fps1jXx2D8NtfyUEZnxAphWc5ESbDftl9ZuQTNbxAvSON6SHmfbEPMtENC09wVUA==
+X-Received: by 2002:adf:dd8c:0:b0:32f:7db1:22fb with SMTP id x12-20020adfdd8c000000b0032f7db122fbmr3678754wrl.28.1700463659555;
+        Sun, 19 Nov 2023 23:00:59 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.00.54
+        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.00.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 23:00:56 -0800 (PST)
+        Sun, 19 Nov 2023 23:00:59 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -88,10 +89,12 @@ Cc: linux-renesas-soc@vger.kernel.org,
 	linux-gpio@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 00/14] renesas: rzg3s: Add support for Ethernet
-Date: Mon, 20 Nov 2023 09:00:10 +0200
-Message-Id: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH 01/14] clk: renesas: rzg2l-cpg: Reuse code in rzg2l_cpg_reset()
+Date: Mon, 20 Nov 2023 09:00:11 +0200
+Message-Id: <20231120070024.4079344-2-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
+References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,51 +105,71 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Hi,
+Code in rzg2l_cpg_reset() is equivalent with the combined code of
+rzg2l_cpg_assert() and rzg2l_cpg_deassert(). There is no need to have
+different versions thus re-use rzg2l_cpg_assert() and rzg2l_cpg_deassert().
 
-Series adds Ethernet support for Renesas RZ/G3S Ethernet.
-Along with it preparatory cleanups and fixes were included.
+Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+---
+ drivers/clk/renesas/rzg2l-cpg.c | 38 +++++++++++++--------------------
+ 1 file changed, 15 insertions(+), 23 deletions(-)
 
-Patches 1-4 are clock specific.
-Patches 5-8 are pinctrl specific.
-Patches 9-13 are device tree specific.
-Patch 14 updates multi_v7_defconfig with RAVB flag.
-
-Thank you,
-Claudiu Beznea
-
-Claudiu Beznea (14):
-  clk: renesas: rzg2l-cpg: Reuse code in rzg2l_cpg_reset()
-  clk: renesas: rzg2l-cpg: Check reset monitor registers
-  clk: renesas: rzg2l-cpg: Add support for MSTOP
-  clk: renesas: r9a08g045-cpg: Add clock and reset support for ETH0 and
-    ETH1
-  pinctrl: renesas: rzg2l: Move arg in the main function block
-  pinctrl: renesas: rzg2l: Add pin configuration support for pinmux
-    groups
-  pinctrl: renesas: rzg2l: Add support to select power source for
-    Ethernet pins
-  pinctrl: renesas: rzg2l: add output enable support
-  dt-bindings: net: renesas,etheravb: Document RZ/G3S support
-  arm64: renesas: r9a08g045: Add Ethernet nodes
-  arm64: renesas: rzg3s-smarc-som: Invert the logic for SW_SD2_EN macro
-  arm64: dts: renesas: Improve documentation for SW_SD0_DEV_SEL
-  arm64: dts: renesas: rzg3s-smarc-som: Enable Ethernet interfaces
-  arm: multi_v7_defconfig: Enable CONFIG_RAVB
-
- .../bindings/net/renesas,etheravb.yaml        |   1 +
- arch/arm/configs/multi_v7_defconfig           |   1 +
- arch/arm64/boot/dts/renesas/r9a08g045.dtsi    |  32 ++++
- .../boot/dts/renesas/rzg3s-smarc-som.dtsi     | 153 +++++++++++++++-
- drivers/clk/renesas/r9a07g043-cpg.c           | 116 ++++++------
- drivers/clk/renesas/r9a07g044-cpg.c           | 158 ++++++++---------
- drivers/clk/renesas/r9a08g045-cpg.c           |  64 +++++--
- drivers/clk/renesas/r9a09g011-cpg.c           | 116 ++++++------
- drivers/clk/renesas/rzg2l-cpg.c               | 166 +++++++++++++++---
- drivers/clk/renesas/rzg2l-cpg.h               |  21 ++-
- drivers/pinctrl/renesas/pinctrl-rzg2l.c       | 166 ++++++++++++++++--
- 11 files changed, 736 insertions(+), 258 deletions(-)
-
+diff --git a/drivers/clk/renesas/rzg2l-cpg.c b/drivers/clk/renesas/rzg2l-cpg.c
+index 764bd72cf059..3189c3167ba8 100644
+--- a/drivers/clk/renesas/rzg2l-cpg.c
++++ b/drivers/clk/renesas/rzg2l-cpg.c
+@@ -1410,29 +1410,6 @@ rzg2l_cpg_register_mod_clk(const struct rzg2l_mod_clk *mod,
+ 
+ #define rcdev_to_priv(x)	container_of(x, struct rzg2l_cpg_priv, rcdev)
+ 
+-static int rzg2l_cpg_reset(struct reset_controller_dev *rcdev,
+-			   unsigned long id)
+-{
+-	struct rzg2l_cpg_priv *priv = rcdev_to_priv(rcdev);
+-	const struct rzg2l_cpg_info *info = priv->info;
+-	unsigned int reg = info->resets[id].off;
+-	u32 dis = BIT(info->resets[id].bit);
+-	u32 we = dis << 16;
+-
+-	dev_dbg(rcdev->dev, "reset id:%ld offset:0x%x\n", id, CLK_RST_R(reg));
+-
+-	/* Reset module */
+-	writel(we, priv->base + CLK_RST_R(reg));
+-
+-	/* Wait for at least one cycle of the RCLK clock (@ ca. 32 kHz) */
+-	udelay(35);
+-
+-	/* Release module from reset state */
+-	writel(we | dis, priv->base + CLK_RST_R(reg));
+-
+-	return 0;
+-}
+-
+ static int rzg2l_cpg_assert(struct reset_controller_dev *rcdev,
+ 			    unsigned long id)
+ {
+@@ -1463,6 +1440,21 @@ static int rzg2l_cpg_deassert(struct reset_controller_dev *rcdev,
+ 	return 0;
+ }
+ 
++static int rzg2l_cpg_reset(struct reset_controller_dev *rcdev,
++			   unsigned long id)
++{
++	int ret;
++
++	ret = rzg2l_cpg_assert(rcdev, id);
++	if (ret)
++		return ret;
++
++	/* Wait for at least one cycle of the RCLK clock (@ ca. 32 kHz) */
++	udelay(35);
++
++	return rzg2l_cpg_deassert(rcdev, id);
++}
++
+ static int rzg2l_cpg_status(struct reset_controller_dev *rcdev,
+ 			    unsigned long id)
+ {
 -- 
 2.39.2
 
