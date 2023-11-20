@@ -1,191 +1,355 @@
-Return-Path: <netdev+bounces-49227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4EC7F13BE
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:48:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E0A7F13EC
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:06:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D557C281F3D
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:48:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 976BC1C20FC9
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E7A15E9F;
-	Mon, 20 Nov 2023 12:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765B914ABD;
+	Mon, 20 Nov 2023 13:06:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0xsiQydd"
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="TQnohzqH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF4410C
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:48:27 -0800 (PST)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-5ca77fc0f04so7069577b3.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 04:48:27 -0800 (PST)
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC1D137;
+	Mon, 20 Nov 2023 05:06:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700484506; x=1701089306; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+L7aWxjlLUJAVJQ6dAsBWIt9SAaqNdTI15A4k2k3f5M=;
-        b=0xsiQyddpKaaV5r6f3A0kcidhN+IBEbWFEW3PWH5IC3cScYLAtDEoW0HPNdMwhoKOi
-         xHmIDhcWS2oBl8jFWPs5luEa35hDbvM3bz3wfXv9R8u7if4ODnFBYCDyNppzRc9DEcWE
-         uCATO4yaekQeie6TxjP55L6r3xjwk3NbfcaAWJJQdo+s1MD3jhE0MQK/oihLT8GkLuAL
-         QUDJf/7KsCMJRCU8yREAGXpaGs5ZyanT0NkQxV4R/kasUO4ajWRtJLqcCmNHx603qF7m
-         f4D32mRtXvMDEhqSPMEUxXSP8o+9MwRjfWOXuzOX++wt+rUVNaCzTkXBBEDfw0AknVtg
-         HE1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700484506; x=1701089306;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+L7aWxjlLUJAVJQ6dAsBWIt9SAaqNdTI15A4k2k3f5M=;
-        b=tOiXY9AJsL907Crus3XwdQ1/ATaJ9MajP072YOCPE/jKBrbCy+LX873FrWBsVgCEw8
-         QiEkn4Rm+vcei2RYBMVwvw1iVD5vysbTwEvBi+NA7WTV5MwntF9IJMkpQIW6K0qbf1w+
-         skkdGktCmUeXFfjObCZTwSqB2+fEr2umy9GwKsKX81rBvCW6kpAxZkvPhuGG5nXvKsjg
-         JRh+E4qTfwOEGnJHrdkINsfoQDp5FW26ZKdpknR5TKDpXO9tPwcFl1wXiPCTI03U388/
-         Yhl3BjD5IiYoiGhvc2aRJTNDGa4HdhYyMA4Qj5DDSwU6ZeS2jafDhgQWv5cMFP2HXm2H
-         UYmg==
-X-Gm-Message-State: AOJu0Yzc6yCjLB0volujDS6fvBfHlytLTWSho7P0Vhz0TKldDPJGfqDZ
-	JSKUT3s3+ujCB0tJPHrfhDLRaCUMEWM26NbsAaEiRQ==
-X-Google-Smtp-Source: AGHT+IHycnc9QTfyKA28iQJmErLA6XhQ6tF31B7PvMkmBqmMTWFblKIBcx8MT/6NXLuzggGlAODAd3NegwPNRjeuj2I=
-X-Received: by 2002:a0d:d6d2:0:b0:5a7:be33:8bd4 with SMTP id
- y201-20020a0dd6d2000000b005a7be338bd4mr5691724ywd.2.1700484506428; Mon, 20
- Nov 2023 04:48:26 -0800 (PST)
+  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+  t=1700485599; x=1732021599;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wOA5ZKCk3xkKMsTsFBYk9CrteET1+KAb4Z9HePf96X0=;
+  b=TQnohzqH4xhOmIQxXv49fTu6p8jqVkbuF2lz75mWfgIK27h9RiTsJFGA
+   iJzArd7Zz3zG2rdn3lZQQqq2n6dvAvDzF4aNcA9ysw99OteSiq7x/ABUx
+   aXyUisRYzcuTqLqX95rIRK8R4FBcrCwsKN4fbOGoZfavu/SxP8X3sSL37
+   w=;
+X-IronPort-AV: E=Sophos;i="6.04,213,1695686400"; 
+   d="scan'208";a="254156176"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 13:06:37 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
+	by email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com (Postfix) with ESMTPS id A7B4DA0E1F;
+	Mon, 20 Nov 2023 13:06:35 +0000 (UTC)
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.10.100:26056]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.81:2525] with esmtp (Farcaster)
+ id e1adcf6a-90d0-46c7-a5b9-62cc05cfe7ab; Mon, 20 Nov 2023 13:06:34 +0000 (UTC)
+X-Farcaster-Flow-ID: e1adcf6a-90d0-46c7-a5b9-62cc05cfe7ab
+Received: from EX19D008EUC001.ant.amazon.com (10.252.51.165) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Mon, 20 Nov 2023 13:06:34 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D008EUC001.ant.amazon.com (10.252.51.165) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.39; Mon, 20 Nov 2023 13:06:33 +0000
+Received: from dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (10.15.57.183)
+ by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP Server id
+ 15.2.1118.39 via Frontend Transport; Mon, 20 Nov 2023 13:06:33 +0000
+Received: by dev-dsk-mheyne-1b-c1362c4d.eu-west-1.amazon.com (Postfix, from userid 5466572)
+	id 9FACB3368; Mon, 20 Nov 2023 13:06:32 +0000 (UTC)
+From: Maximilian Heyne <mheyne@amazon.de>
+To: 
+CC: <stable@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, syzbot
+	<syzkaller@googlegroups.com>, Dmitry Vyukov <dvyukov@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Maximilian Heyne <mheyne@amazon.de>, "Jamal Hadi
+ Salim" <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH 4.14] net: sched: fix race condition in qdisc_graft()
+Date: Mon, 20 Nov 2023 13:06:13 +0000
+Message-ID: <20231120130613.4659-1-mheyne@amazon.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-10-jhs@mojatatu.com>
- <ZVY/GBIC4ckerGSc@nanopsycho> <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
- <ZVsWP29UyIzg4Jwq@nanopsycho>
-In-Reply-To: <ZVsWP29UyIzg4Jwq@nanopsycho>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 20 Nov 2023 07:48:14 -0500
-Message-ID: <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
- get, update, delete
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
-	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com, 
-	David Ahern <dsahern@gmail.com>, Stephen Hemminger <stephen@networkplumber.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Precedence: Bulk
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 20, 2023 at 3:18=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Fri, Nov 17, 2023 at 01:09:45PM CET, jhs@mojatatu.com wrote:
-> >On Thu, Nov 16, 2023 at 11:11=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
-rote:
-> >>
-> >> Thu, Nov 16, 2023 at 03:59:42PM CET, jhs@mojatatu.com wrote:
-> >>
-> >> [...]
-> >>
-> >>
-> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-> >> >index ba32dba66..4d33f44c1 100644
-> >> >--- a/include/uapi/linux/p4tc.h
-> >> >+++ b/include/uapi/linux/p4tc.h
-> >> >@@ -2,8 +2,71 @@
-> >> > #ifndef __LINUX_P4TC_H
-> >> > #define __LINUX_P4TC_H
-> >> >
-> >> >+#include <linux/types.h>
-> >> >+#include <linux/pkt_sched.h>
-> >> >+
-> >> >+/* pipeline header */
-> >> >+struct p4tcmsg {
-> >> >+      __u32 pipeid;
-> >> >+      __u32 obj;
-> >> >+};
-> >>
-> >> I don't follow. Is there any sane reason to use header instead of norm=
-al
-> >> netlink attribute? Moveover, you extend the existing RT netlink with
-> >> a huge amout of p4 things. Isn't this the good time to finally introdu=
-ce
-> >> generic netlink TC family with proper yaml spec with all the benefits =
-it
-> >> brings and implement p4 tc uapi there? Please?
-> >>
-> >
-> >Several reasons:
-> >a) We are similar to current tc messaging with the subheader being
-> >there for multiplexing.
->
-> Yeah, you don't need to carry 20year old burden in newly introduced
-> interface. That's my point.
+From: Eric Dumazet <edumazet@google.com>
 
-Having a demux sub header is 20 year old burden? I didnt follow.
+commit ebda44da44f6f309d302522b049f43d6f829f7aa upstream.
 
->
-> >b) Where does this leave iproute2? +Cc David and Stephen. Do other
-> >generic netlink conversions get contributed back to iproute2?
->
-> There is no conversion afaik, only extensions. And they has to be,
-> otherwise the user would not be able to use the newly introduced
-> features.
+We had one syzbot report [1] in syzbot queue for a while.
+I was waiting for more occurrences and/or a repro but
+Dmitry Vyukov spotted the issue right away.
 
-The big question is does the collective who use iproute2 still get to
-use the same tooling or now they have to go and learn some new
-tooling. I understand the value of the new approach but is it a
-revolution or an evolution? We opted to put thing in iproute2 instead
-for example because that is widely available (and used).
+<quoting Dmitry>
+qdisc_graft() drops reference to qdisc in notify_and_destroy
+while it's still assigned to dev->qdisc
+</quoting>
 
->
-> >c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
-> >based. i.e you have:
-> > COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
-> >P4 programs from the control plane.
->
-> I'm pretty sure you can achieve the same over genetlink.
->
+Indeed, RCU rules are clear when replacing a data structure.
+The visible pointer (dev->qdisc in this case) must be updated
+to the new object _before_ RCU grace period is started
+(qdisc_put(old) in this case).
 
-I think you are right.
+[1]
+BUG: KASAN: use-after-free in __tcf_qdisc_find.part.0+0xa3a/0xac0 net/sched/cls_api.c:1066
+Read of size 4 at addr ffff88802065e038 by task syz-executor.4/21027
 
->
-> >d) we have spent many hours optimizing the control to the kernel so i
-> >am not sure what it would buy us to switch to generic netlink..
->
-> All the benefits of ynl yaml tooling, at least.
->
+CPU: 0 PID: 21027 Comm: syz-executor.4 Not tainted 6.0.0-rc3-syzkaller-00363-g7726d4c3e60b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/26/2022
+Call Trace:
+<TASK>
+__dump_stack lib/dump_stack.c:88 [inline]
+dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+print_address_description mm/kasan/report.c:317 [inline]
+print_report.cold+0x2ba/0x719 mm/kasan/report.c:433
+kasan_report+0xb1/0x1e0 mm/kasan/report.c:495
+__tcf_qdisc_find.part.0+0xa3a/0xac0 net/sched/cls_api.c:1066
+__tcf_qdisc_find net/sched/cls_api.c:1051 [inline]
+tc_new_tfilter+0x34f/0x2200 net/sched/cls_api.c:2018
+rtnetlink_rcv_msg+0x955/0xca0 net/core/rtnetlink.c:6081
+netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2501
+netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+netlink_unicast+0x543/0x7f0 net/netlink/af_netlink.c:1345
+netlink_sendmsg+0x917/0xe10 net/netlink/af_netlink.c:1921
+sock_sendmsg_nosec net/socket.c:714 [inline]
+sock_sendmsg+0xcf/0x120 net/socket.c:734
+____sys_sendmsg+0x6eb/0x810 net/socket.c:2482
+___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
+__sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f5efaa89279
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f5efbc31168 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f5efab9bf80 RCX: 00007f5efaa89279
+RDX: 0000000000000000 RSI: 0000000020000140 RDI: 0000000000000005
+RBP: 00007f5efaae32e9 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f5efb0cfb1f R14: 00007f5efbc31300 R15: 0000000000022000
+</TASK>
 
-Did you pay close attention to what we have? The user space code is
-written once into iproute2 and subsequent to that there is no
-recompilation  of any iproute2 code. The compiler generates a json
-file specific to a P4 program which is then introspected by the
-iproute2 code.
+Allocated by task 21027:
+kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
+kasan_set_track mm/kasan/common.c:45 [inline]
+set_alloc_info mm/kasan/common.c:437 [inline]
+____kasan_kmalloc mm/kasan/common.c:516 [inline]
+____kasan_kmalloc mm/kasan/common.c:475 [inline]
+__kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:525
+kmalloc_node include/linux/slab.h:623 [inline]
+kzalloc_node include/linux/slab.h:744 [inline]
+qdisc_alloc+0xb0/0xc50 net/sched/sch_generic.c:938
+qdisc_create_dflt+0x71/0x4a0 net/sched/sch_generic.c:997
+attach_one_default_qdisc net/sched/sch_generic.c:1152 [inline]
+netdev_for_each_tx_queue include/linux/netdevice.h:2437 [inline]
+attach_default_qdiscs net/sched/sch_generic.c:1170 [inline]
+dev_activate+0x760/0xcd0 net/sched/sch_generic.c:1229
+__dev_open+0x393/0x4d0 net/core/dev.c:1441
+__dev_change_flags+0x583/0x750 net/core/dev.c:8556
+rtnl_configure_link+0xee/0x240 net/core/rtnetlink.c:3189
+rtnl_newlink_create net/core/rtnetlink.c:3371 [inline]
+__rtnl_newlink+0x10b8/0x17e0 net/core/rtnetlink.c:3580
+rtnl_newlink+0x64/0xa0 net/core/rtnetlink.c:3593
+rtnetlink_rcv_msg+0x43a/0xca0 net/core/rtnetlink.c:6090
+netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2501
+netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+netlink_unicast+0x543/0x7f0 net/netlink/af_netlink.c:1345
+netlink_sendmsg+0x917/0xe10 net/netlink/af_netlink.c:1921
+sock_sendmsg_nosec net/socket.c:714 [inline]
+sock_sendmsg+0xcf/0x120 net/socket.c:734
+____sys_sendmsg+0x6eb/0x810 net/socket.c:2482
+___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
+__sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Freed by task 21020:
+kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
+kasan_set_track+0x21/0x30 mm/kasan/common.c:45
+kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:370
+____kasan_slab_free mm/kasan/common.c:367 [inline]
+____kasan_slab_free+0x166/0x1c0 mm/kasan/common.c:329
+kasan_slab_free include/linux/kasan.h:200 [inline]
+slab_free_hook mm/slub.c:1754 [inline]
+slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1780
+slab_free mm/slub.c:3534 [inline]
+kfree+0xe2/0x580 mm/slub.c:4562
+rcu_do_batch kernel/rcu/tree.c:2245 [inline]
+rcu_core+0x7b5/0x1890 kernel/rcu/tree.c:2505
+__do_softirq+0x1d3/0x9c6 kernel/softirq.c:571
+
+Last potentially related work creation:
+kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
+__kasan_record_aux_stack+0xbe/0xd0 mm/kasan/generic.c:348
+call_rcu+0x99/0x790 kernel/rcu/tree.c:2793
+qdisc_put+0xcd/0xe0 net/sched/sch_generic.c:1083
+notify_and_destroy net/sched/sch_api.c:1012 [inline]
+qdisc_graft+0xeb1/0x1270 net/sched/sch_api.c:1084
+tc_modify_qdisc+0xbb7/0x1a00 net/sched/sch_api.c:1671
+rtnetlink_rcv_msg+0x43a/0xca0 net/core/rtnetlink.c:6090
+netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2501
+netlink_unicast_kernel net/netlink/af_netlink.c:1319 [inline]
+netlink_unicast+0x543/0x7f0 net/netlink/af_netlink.c:1345
+netlink_sendmsg+0x917/0xe10 net/netlink/af_netlink.c:1921
+sock_sendmsg_nosec net/socket.c:714 [inline]
+sock_sendmsg+0xcf/0x120 net/socket.c:734
+____sys_sendmsg+0x6eb/0x810 net/socket.c:2482
+___sys_sendmsg+0x110/0x1b0 net/socket.c:2536
+__sys_sendmsg+0xf3/0x1c0 net/socket.c:2565
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+Second to last potentially related work creation:
+kasan_save_stack+0x1e/0x40 mm/kasan/common.c:38
+__kasan_record_aux_stack+0xbe/0xd0 mm/kasan/generic.c:348
+kvfree_call_rcu+0x74/0x940 kernel/rcu/tree.c:3322
+neigh_destroy+0x431/0x630 net/core/neighbour.c:912
+neigh_release include/net/neighbour.h:454 [inline]
+neigh_cleanup_and_release+0x1f8/0x330 net/core/neighbour.c:103
+neigh_del net/core/neighbour.c:225 [inline]
+neigh_remove_one+0x37d/0x460 net/core/neighbour.c:246
+neigh_forced_gc net/core/neighbour.c:276 [inline]
+neigh_alloc net/core/neighbour.c:447 [inline]
+___neigh_create+0x18b5/0x29a0 net/core/neighbour.c:642
+ip6_finish_output2+0xfb8/0x1520 net/ipv6/ip6_output.c:125
+__ip6_finish_output net/ipv6/ip6_output.c:195 [inline]
+ip6_finish_output+0x690/0x1160 net/ipv6/ip6_output.c:206
+NF_HOOK_COND include/linux/netfilter.h:296 [inline]
+ip6_output+0x1ed/0x540 net/ipv6/ip6_output.c:227
+dst_output include/net/dst.h:451 [inline]
+NF_HOOK include/linux/netfilter.h:307 [inline]
+NF_HOOK include/linux/netfilter.h:301 [inline]
+mld_sendpack+0xa09/0xe70 net/ipv6/mcast.c:1820
+mld_send_cr net/ipv6/mcast.c:2121 [inline]
+mld_ifc_work+0x71c/0xdc0 net/ipv6/mcast.c:2653
+process_one_work+0x991/0x1610 kernel/workqueue.c:2289
+worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+kthread+0x2e4/0x3a0 kernel/kthread.c:376
+ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+
+The buggy address belongs to the object at ffff88802065e000
+which belongs to the cache kmalloc-1k of size 1024
+The buggy address is located 56 bytes inside of
+1024-byte region [ffff88802065e000, ffff88802065e400)
+
+The buggy address belongs to the physical page:
+page:ffffea0000819600 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x20658
+head:ffffea0000819600 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0xfff00000010200(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000010200 0000000000000000 dead000000000001 ffff888011841dc0
+raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 3523, tgid 3523 (sshd), ts 41495190986, free_ts 41417713212
+prep_new_page mm/page_alloc.c:2532 [inline]
+get_page_from_freelist+0x109b/0x2ce0 mm/page_alloc.c:4283
+__alloc_pages+0x1c7/0x510 mm/page_alloc.c:5515
+alloc_pages+0x1a6/0x270 mm/mempolicy.c:2270
+alloc_slab_page mm/slub.c:1824 [inline]
+allocate_slab+0x27e/0x3d0 mm/slub.c:1969
+new_slab mm/slub.c:2029 [inline]
+___slab_alloc+0x7f1/0xe10 mm/slub.c:3031
+__slab_alloc.constprop.0+0x4d/0xa0 mm/slub.c:3118
+slab_alloc_node mm/slub.c:3209 [inline]
+__kmalloc_node_track_caller+0x2f2/0x380 mm/slub.c:4955
+kmalloc_reserve net/core/skbuff.c:358 [inline]
+__alloc_skb+0xd9/0x2f0 net/core/skbuff.c:430
+alloc_skb_fclone include/linux/skbuff.h:1307 [inline]
+tcp_stream_alloc_skb+0x38/0x580 net/ipv4/tcp.c:861
+tcp_sendmsg_locked+0xc36/0x2f80 net/ipv4/tcp.c:1325
+tcp_sendmsg+0x2b/0x40 net/ipv4/tcp.c:1483
+inet_sendmsg+0x99/0xe0 net/ipv4/af_inet.c:819
+sock_sendmsg_nosec net/socket.c:714 [inline]
+sock_sendmsg+0xcf/0x120 net/socket.c:734
+sock_write_iter+0x291/0x3d0 net/socket.c:1108
+call_write_iter include/linux/fs.h:2187 [inline]
+new_sync_write fs/read_write.c:491 [inline]
+vfs_write+0x9e9/0xdd0 fs/read_write.c:578
+ksys_write+0x1e8/0x250 fs/read_write.c:631
+page last free stack trace:
+reset_page_owner include/linux/page_owner.h:24 [inline]
+free_pages_prepare mm/page_alloc.c:1449 [inline]
+free_pcp_prepare+0x5e4/0xd20 mm/page_alloc.c:1499
+free_unref_page_prepare mm/page_alloc.c:3380 [inline]
+free_unref_page+0x19/0x4d0 mm/page_alloc.c:3476
+__unfreeze_partials+0x17c/0x1a0 mm/slub.c:2548
+qlink_free mm/kasan/quarantine.c:168 [inline]
+qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:187
+kasan_quarantine_reduce+0x180/0x200 mm/kasan/quarantine.c:294
+__kasan_slab_alloc+0xa2/0xc0 mm/kasan/common.c:447
+kasan_slab_alloc include/linux/kasan.h:224 [inline]
+slab_post_alloc_hook mm/slab.h:727 [inline]
+slab_alloc_node mm/slub.c:3243 [inline]
+slab_alloc mm/slub.c:3251 [inline]
+__kmem_cache_alloc_lru mm/slub.c:3258 [inline]
+kmem_cache_alloc+0x267/0x3b0 mm/slub.c:3268
+kmem_cache_zalloc include/linux/slab.h:723 [inline]
+alloc_buffer_head+0x20/0x140 fs/buffer.c:2974
+alloc_page_buffers+0x280/0x790 fs/buffer.c:829
+create_empty_buffers+0x2c/0xee0 fs/buffer.c:1558
+ext4_block_write_begin+0x1004/0x1530 fs/ext4/inode.c:1074
+ext4_da_write_begin+0x422/0xae0 fs/ext4/inode.c:2996
+generic_perform_write+0x246/0x560 mm/filemap.c:3738
+ext4_buffered_write_iter+0x15b/0x460 fs/ext4/file.c:270
+ext4_file_write_iter+0x44a/0x1660 fs/ext4/file.c:679
+call_write_iter include/linux/fs.h:2187 [inline]
+new_sync_write fs/read_write.c:491 [inline]
+vfs_write+0x9e9/0xdd0 fs/read_write.c:578
+
+Fixes: af356afa010f ("net_sched: reintroduce dev->qdisc for use by sch_api")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Diagnosed-by: Dmitry Vyukov <dvyukov@google.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/r/20221018203258.2793282-1-edumazet@google.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+This is CVE-2023-0590.
+
+[ mheyne: removed rtnl_dereference due to missing commit 5891cd5ec46c
+  ("net_sched: add __rcu annotation to netdev->qdisc") ]
+Signed-off-by: Maximilian Heyne <mheyne@amazon.de>
+---
+ net/sched/sch_api.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index f305eb44bf36..165823ab13d6 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -938,12 +938,13 @@ static int qdisc_graft(struct net_device *dev, struct Qdisc *parent,
+ 
+ skip:
+ 		if (!ingress) {
+-			notify_and_destroy(net, skb, n, classid,
+-					   dev->qdisc, new);
++			old = dev->qdisc;
+ 			if (new && !new->ops->attach)
+ 				qdisc_refcount_inc(new);
+ 			dev->qdisc = new ? : &noop_qdisc;
+ 
++			notify_and_destroy(net, skb, n, classid, old, new);
++
+ 			if (new && new->ops->attach)
+ 				new->ops->attach(new);
+ 		} else {
+-- 
+2.40.1
 
 
-cheers,
-jamal
 
->
-> >
-> >cheers,
-> >jamal
-> >
-> >>
-> >> >+
-> >> >+#define P4TC_MAXPIPELINE_COUNT 32
-> >> >+#define P4TC_MAXTABLES_COUNT 32
-> >> >+#define P4TC_MINTABLES_COUNT 0
-> >> >+#define P4TC_MSGBATCH_SIZE 16
-> >> >+
-> >> > #define P4TC_MAX_KEYSZ 512
-> >> >
-> >> >+#define TEMPLATENAMSZ 32
-> >> >+#define PIPELINENAMSIZ TEMPLATENAMSZ
-> >>
-> >> ugh. A prefix please?
-> >>
-> >> pw-bot: cr
-> >>
-> >> [...]
+
+Amazon Development Center Germany GmbH
+Krausenstr. 38
+10117 Berlin
+Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
+Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
+Sitz: Berlin
+Ust-ID: DE 289 237 879
+
+
+
 
