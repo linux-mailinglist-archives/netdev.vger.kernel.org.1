@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C537F0E11
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:47:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 621AB7F0E12
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:48:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 733551C215E2
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:47:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03700B212A2
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD55107B9;
-	Mon, 20 Nov 2023 08:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E7ADF45;
+	Mon, 20 Nov 2023 08:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Yo2S7mxR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="h+K40tq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189891BC3
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:11 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id 4fb4d7f45d1cf-543456dbd7bso9896398a12.1
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:10 -0800 (PST)
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA9271BD6
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:12 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id 4fb4d7f45d1cf-5409bc907edso5606877a12.0
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 00:47:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700470029; x=1701074829; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700470031; x=1701074831; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7Loj6eye+Xg8SMV+GCvDdSe8coR7xpViOIIZYOTm3lQ=;
-        b=Yo2S7mxRa04bpR+nGXnR+l22Ri1BxoTcMc8EGTTmHzIODGIbjf8udVLWUJGND6shz9
-         vg+aqOLD1mkH12J0sG+ZPyVk+OeyTNBcfquI1xxyDQqyxF0XhBnYwa7EgQho+3gOHMG3
-         D3hU0Hk91lU01xaXxJPLiz6jy4PIeCDRPty8vyqSBIHYWhrUE2/NW0qZVzU3cQ8rJgkA
-         S21oIAClHFAGTbnerDfXjqEXZAglJcVMyEVmDoEA32waTYxrJstkrNTFYPEsaJtmcWHH
-         0Zt7gG+1ZEwlJmrjufJ8Qs6u8tATFaGlDbjMWPHkhNgC9FFK/JZbU/EcnhJIfrOwqJN3
-         U9KA==
+        bh=xB8pRDpjBJKVYNvoedXvmF/zyOfIVdCrEmjN7Ra0bnk=;
+        b=h+K40tq0RQDlCRufx0ADDbwbfc8LbKY2uchYyCsJ1ZX5Qt2aFi8W4Y17fRoVcRoRGm
+         vw8KiKrHdjTjQ6V6DjX/n5eZNQSpZT6OjYA8de8a9vdp1hKXtTHZzRiixFJIzEyySHo/
+         6qR2p8PeyW9KXOMK2b8pCJFcPgpHuUsls/A9s0m9qE9ZevTqUfKoj2Os9L0ioeRVUFVr
+         GCz0WI3P9VZoEa1GNoKnZN6Gb40D4pJA+21qYzh7lHPqbTWO3sLLpNbVuZCF0EE7NWxm
+         bS6VhSwIm3Q6lwU5r317kLGlE9G0knEzPBgzXa8zJ5CP9o5cog8V/JJwmnMDjmlud5iJ
+         9C3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700470029; x=1701074829;
+        d=1e100.net; s=20230601; t=1700470031; x=1701074831;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7Loj6eye+Xg8SMV+GCvDdSe8coR7xpViOIIZYOTm3lQ=;
-        b=Q2P1brHDggVHQAQU4HNr3OzPYAomiafrICThinqveGdesk4TdbiKZN5ODPczlomKYW
-         HEmpnsoCyZzzJrF8hfJFNkAGil+sKiKsk/3iiHbXC55IvUFcqi3+zqin2oFd8rp29eam
-         Mq6v1kkZYEM3oSCdNzmGQbYvKPWpNEWDPco066BVSyw9VmEcJd89m996NCfFpYWvIfEO
-         hai1Ctk7TCEvdIjI+tZxxKOQRlb6WK6K1biSiJbdG4t0ZaUx04YmQKtSKmu6MtFLi/Uy
-         cDmDem7OQGu7uyGFFSY5Mi9ZNiY3QinFq90iB8bWVNRzr+0Ie86zKI8Q5sdjlcWr1L/6
-         OLog==
-X-Gm-Message-State: AOJu0YxrRApJPyf3sOeeB3bpMYTgEXkIF4EqNkNCcAKBkf6Y3KtNx+Fe
-	pG24+rjcTXZPULHnIqqlAhogNxFnn11kLw/Ed2n9cw==
-X-Google-Smtp-Source: AGHT+IErDyyPKBi0mRbhyTP3J6BOB8omO/JVDhSDRTEHZw5B+b0pgBzRMd8Am8JV2uHrXUDa4oduRw==
-X-Received: by 2002:a17:906:25c9:b0:9b2:be5e:3674 with SMTP id n9-20020a17090625c900b009b2be5e3674mr1084435ejb.36.1700470029253;
-        Mon, 20 Nov 2023 00:47:09 -0800 (PST)
+        bh=xB8pRDpjBJKVYNvoedXvmF/zyOfIVdCrEmjN7Ra0bnk=;
+        b=H4jB/iFS5EgynfKnwzTGNxO6ANO9ntFee8NmKHGAWJJFjD5YEgUu7pdqv7bR3hGvU4
+         qTB9njm9sy8ZOeFeLWVAHQ0VRXV2bBGEKgjWTb6PBqANLTFaQhpAHVbakiIggJJiOyIh
+         XnjXD5Khl0Ct5NDyL/Jm8nzGRdku8UisH9x6QxKk60y9MDVJ8SyLxN9xvCA3JMNCQH2i
+         lZ1KvS+Uhg/CX4vJrk5bYSjYUHX2j2ggwPnpwuKiY/lrr8dhjr+9jy/Rxu9Tenk+tSki
+         gUQCsHchaLmnYoffyIQMyOSPbPYyrYefkf9Lo49u97xi1qMWhy3UH00lrj63RJKfp25y
+         ekcg==
+X-Gm-Message-State: AOJu0Yyndyo9bzZ/59hzgUUIlIRfpyOMX30AhON1T3Mvvn64tnuBFxZJ
+	8maUk/xQjKFNG32svO67eRe+Kdds0N46lzh9ps3ASA==
+X-Google-Smtp-Source: AGHT+IFLXwss30abruvRcW6VS8hpZjIgGXFSC/18WXLqUR+feS442j2VhGx6S+cV4BopherjbTPn8g==
+X-Received: by 2002:a17:907:82a2:b0:9df:bc50:250d with SMTP id mr34-20020a17090782a200b009dfbc50250dmr3642661ejc.54.1700470031170;
+        Mon, 20 Nov 2023 00:47:11 -0800 (PST)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id g15-20020a170906538f00b0099ce025f8ccsm3642005ejo.186.2023.11.20.00.47.08
+        by smtp.gmail.com with ESMTPSA id g24-20020a170906c19800b009a1b857e3a5sm3702548ejz.54.2023.11.20.00.47.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 00:47:08 -0800 (PST)
+        Mon, 20 Nov 2023 00:47:10 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -66,9 +66,9 @@ Cc: kuba@kernel.org,
 	amritha.nambiar@intel.com,
 	sdf@google.com,
 	horms@kernel.org
-Subject: [patch net-next v3 5/9] genetlink: implement release callback and free sk_user_data there
-Date: Mon, 20 Nov 2023 09:46:53 +0100
-Message-ID: <20231120084657.458076-6-jiri@resnulli.us>
+Subject: [patch net-next v3 6/9] netlink: introduce typedef for filter function
+Date: Mon, 20 Nov 2023 09:46:54 +0100
+Message-ID: <20231120084657.458076-7-jiri@resnulli.us>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20231120084657.458076-1-jiri@resnulli.us>
 References: <20231120084657.458076-1-jiri@resnulli.us>
@@ -82,44 +82,88 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-If any generic netlink family would like to allocate data store the
-pointer to sk_user_data, there is no way to do cleanup in the family
-code.
+Make the code using filter function a bit nicer by consolidating the
+filter function arguments using typedef.
 
-Assume that kfree() is good for now, as the only user introduced by the
-follow-up patch (devlink) will use kzalloc() for the allocation of
-the memory pointed by a pointer stored in sk_user_data. If later on
-this needs to be implemented per-family, a callback is going
-to be needed. Until then (if ever), do this in a simple way.
-
+Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 ---
- net/netlink/genetlink.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+v2->v3:
+- left the original .c and .h arg names and types
+  inconsistencies for cn_netlink_send_mult() and
+  netlink_broadcast_filtered()
+v1->v2:
+- new patch
+---
+ drivers/connector/connector.c | 5 ++---
+ include/linux/connector.h     | 3 +--
+ include/linux/netlink.h       | 6 ++++--
+ net/netlink/af_netlink.c      | 3 +--
+ 4 files changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-index 92ef5ed2e7b0..905c5a167f53 100644
---- a/net/netlink/genetlink.c
-+++ b/net/netlink/genetlink.c
-@@ -1699,12 +1699,18 @@ static int genl_bind(struct net *net, int group)
- 	return ret;
- }
- 
-+static void genl_release(struct sock *sk, unsigned long *groups)
-+{
-+	kfree(sk->sk_user_data);
-+}
-+
- static int __net_init genl_pernet_init(struct net *net)
+diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+index 7f7b94f616a6..4028e8eeba82 100644
+--- a/drivers/connector/connector.c
++++ b/drivers/connector/connector.c
+@@ -59,9 +59,8 @@ static int cn_already_initialized;
+  * both, or if both are zero then the group is looked up and sent there.
+  */
+ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+-	gfp_t gfp_mask,
+-	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
+-	void *filter_data)
++			 gfp_t gfp_mask, netlink_filter_fn filter,
++			 void *filter_data)
  {
- 	struct netlink_kernel_cfg cfg = {
- 		.input		= genl_rcv,
- 		.flags		= NL_CFG_F_NONROOT_RECV,
- 		.bind		= genl_bind,
-+		.release	= genl_release,
- 	};
+ 	struct cn_callback_entry *__cbq;
+ 	unsigned int size;
+diff --git a/include/linux/connector.h b/include/linux/connector.h
+index cec2d99ae902..70bc1160f3d8 100644
+--- a/include/linux/connector.h
++++ b/include/linux/connector.h
+@@ -100,8 +100,7 @@ void cn_del_callback(const struct cb_id *id);
+  */
+ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+ 			 u32 group, gfp_t gfp_mask,
+-			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
+-				       void *data),
++			 netlink_filter_fn filter,
+ 			 void *filter_data);
  
- 	/* we'll bump the group number right afterwards */
+ /**
+diff --git a/include/linux/netlink.h b/include/linux/netlink.h
+index 75d7de34c908..d30f599a4c6b 100644
+--- a/include/linux/netlink.h
++++ b/include/linux/netlink.h
+@@ -228,10 +228,12 @@ bool netlink_strict_get_check(struct sk_buff *skb);
+ int netlink_unicast(struct sock *ssk, struct sk_buff *skb, __u32 portid, int nonblock);
+ int netlink_broadcast(struct sock *ssk, struct sk_buff *skb, __u32 portid,
+ 		      __u32 group, gfp_t allocation);
++
++typedef int (*netlink_filter_fn)(struct sock *dsk, struct sk_buff *skb, void *data);
++
+ int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb,
+ 			       __u32 portid, __u32 group, gfp_t allocation,
+-			       int (*filter)(struct sock *dsk,
+-					     struct sk_buff *skb, void *data),
++			       netlink_filter_fn filter,
+ 			       void *filter_data);
+ int netlink_set_err(struct sock *ssk, __u32 portid, __u32 group, int code);
+ int netlink_register_notifier(struct notifier_block *nb);
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index eb086b06d60d..c81dc7c60e02 100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -1520,8 +1520,7 @@ static void do_one_broadcast(struct sock *sk,
+ int netlink_broadcast_filtered(struct sock *ssk, struct sk_buff *skb,
+ 			       u32 portid,
+ 			       u32 group, gfp_t allocation,
+-			       int (*filter)(struct sock *dsk,
+-					     struct sk_buff *skb, void *data),
++			       netlink_filter_fn filter,
+ 			       void *filter_data)
+ {
+ 	struct net *net = sock_net(ssk);
 -- 
 2.41.0
 
