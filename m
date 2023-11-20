@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-49451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2410C7F2193
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F9937F2194
 	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F800B219A7
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:45:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB3D1C218A8
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 23:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9534D3B2BD;
-	Mon, 20 Nov 2023 23:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7669C3BB49;
+	Mon, 20 Nov 2023 23:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e+3uxdvq"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hG9oYKZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F53BC8
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:44 -0800 (PST)
-Received: by mail-vs1-xe29.google.com with SMTP id ada2fe7eead31-4629ef1dbc4so481696137.2
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:44 -0800 (PST)
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01E8BAA
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:46 -0800 (PST)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-5842a7fdc61so2580412eaf.3
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 15:44:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1700523883; x=1701128683; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1700523885; x=1701128685; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fvmlDgPm/OTGtsNIlrjV63lUUeoMPCn1z8AQkCDM9lA=;
-        b=e+3uxdvqe+ka9TEv4IY0M2cFA59jA4KlN5ONFxoN4H5lHYl+dJ/b6C+WQaOVhjWgz0
-         uZaMzYGB61L4nOezaDlRQJs5shkwUV7YXx8W4bruM6JltFU65SLhSkRjPFlpzkoURc+l
-         JWXQ/E/+OcdEXUKkF888+55gsoYIpecNy7Ws4=
+        bh=jpwEa1tyAbByi1gRfGpj2gZgjDD2BUbcV1qdbEpVvQc=;
+        b=hG9oYKZNZ6jFbb2kIuYeGduEU456mZFs68tUcDXLUx0nJ6camZ9exnCrFp5rXPtxNF
+         cXmtPxl3sy2ZQJ+7ZZyuYYMr7VfdWQ85gfp+KCgFv0cPXNdrKX4faL4LP2BvCl46Rvcw
+         pf/m8sIZBDXBL1MqEUtzFEpCH38auH1oagNYg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700523883; x=1701128683;
+        d=1e100.net; s=20230601; t=1700523885; x=1701128685;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fvmlDgPm/OTGtsNIlrjV63lUUeoMPCn1z8AQkCDM9lA=;
-        b=J6GxaCsjA8OXlhPZ2LYPJrVdjKGf3ckvzmX2IcoSgrT0Yuztb5k2aX4CCp5Z2ENEWl
-         /xjaMJqXe7WzL2TZUR67W/2VuadlNcJlkMMua5+n+cofiQrqDBZ8GRWA6eCldkL+m48K
-         m1ep58Gzpy+yx9zXiAIfSWWJJLO+nd7Her99fkIb/E+kxHHmS5K7mcNvjXcUnmfpSXp2
-         wgqpAcEPUBy2DGNJKZhPnimHLPZOBrHasPLC2HnbNq4tLuIkQpEQbTq7424ixJH0DspK
-         hq9bs5n6FyeNHhppxWOTXVYqR2lBEeqxhYlAOL+BWxlHIRMTYw/JGZzKDzeyLausd4G2
-         +Pfw==
-X-Gm-Message-State: AOJu0YxWsIGWTkJVnfM70agy0EXasbs0piITbq8QKzOkvMOfJRUXiTPK
-	BYxvFA37SdOd16ilBd3RNi2yBg==
-X-Google-Smtp-Source: AGHT+IGAzHblxlRVXBLJqyvk64uAIGQrRygql3deliOQIQaTysD6VPiem1/NWnVw6W7LLW4fBpaGsg==
-X-Received: by 2002:a05:6102:1162:b0:462:ad97:c412 with SMTP id k2-20020a056102116200b00462ad97c412mr2099512vsg.26.1700523883081;
-        Mon, 20 Nov 2023 15:44:43 -0800 (PST)
+        bh=jpwEa1tyAbByi1gRfGpj2gZgjDD2BUbcV1qdbEpVvQc=;
+        b=tsqFVYffLkMKiVJjCDO5ZT0IzhDz/ofrG2w8pJ/CsZlkcMMJ9Ouxfls6/4RGhfXpIt
+         KrGP9FZHv/zMcIaFGhZyCtNBmmuxt5UFCtNreI7+QzTaRu22cs0n5k8ZdqSP8zSxbW1B
+         3KUXDoDX2hWZ7KImOoFt6cR8UV7/4RWkv0/FWO1c7KKgTo/xmTMiMJTDdLJv2T/14u8q
+         ccxMhLtpSVo2GWQLmpvS3idsMWdWE1leGOOg9PJNt3CK3zlLseqz+0go9xyCM1SfVgVv
+         1gxi58WO/dIbyUF8be1Z/qtEf55P4D/66mIQ0PjF8vF8rMiPfBb6rwrRxNsCUzIO73DU
+         uHmA==
+X-Gm-Message-State: AOJu0Yyy8etEpdTnH+wlkKdahx4BEKeQSHDnbZJmpCpliC+rluB9qG3g
+	3kimaGN4rt1VDimjL7aGUSsYJQ==
+X-Google-Smtp-Source: AGHT+IFhNbpqW4JDk17M/D1gDpXjp98CCBx4tJZzV6y6bzeqqSVEE215bZqJEV6zxgKkhE+T+DwA0A==
+X-Received: by 2002:a05:6358:9209:b0:169:9c45:ca12 with SMTP id d9-20020a056358920900b001699c45ca12mr10695254rwb.23.1700523884955;
+        Mon, 20 Nov 2023 15:44:44 -0800 (PST)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id i9-20020ac871c9000000b0041803dfb240sm3053384qtp.45.2023.11.20.15.44.41
+        by smtp.gmail.com with ESMTPSA id i9-20020ac871c9000000b0041803dfb240sm3053384qtp.45.2023.11.20.15.44.43
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 Nov 2023 15:44:42 -0800 (PST)
+        Mon, 20 Nov 2023 15:44:44 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -55,10 +55,10 @@ Cc: netdev@vger.kernel.org,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	gospo@broadcom.com,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next 05/13] bnxt_en: Use the pg_info field in bnxt_ctx_mem_type struct
-Date: Mon, 20 Nov 2023 15:43:57 -0800
-Message-Id: <20231120234405.194542-6-michael.chan@broadcom.com>
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next 06/13] bnxt_en: Add bnxt_setup_ctxm_pg_tbls() helper function
+Date: Mon, 20 Nov 2023 15:43:58 -0800
+Message-Id: <20231120234405.194542-7-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20231120234405.194542-1-michael.chan@broadcom.com>
 References: <20231120234405.194542-1-michael.chan@broadcom.com>
@@ -69,283 +69,231 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000000892bf060a9e1202"
+	boundary="00000000000020d410060a9e1226"
 
---0000000000000892bf060a9e1202
+--00000000000020d410060a9e1226
 Content-Transfer-Encoding: 8bit
 
-Use the newly added pg_info field in bnxt_ctx_mem_type struct and
-remove the standalone page info structures in bnxt_ctx_mem_info.
-This now completes the reorganization of the context memory
-structures to work better with the new and more flexible firmware
-interface for newer chips.
+In bnxt_alloc_ctx_mem(), the logic to set up the context memory entries
+and to allocate the context memory tables is done repetitively.  Add
+a helper function to simplify the code.
 
-Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+The setup of the Fast Path TQM entries relies on some information from
+the Slow Path TQM entries.  Copy the SP_TQM entries to the FP_TQM
+entries to simplify the logic.
+
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 74 +++++++++--------------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  9 ---
- 2 files changed, 29 insertions(+), 54 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 133 ++++++++++------------
+ 1 file changed, 59 insertions(+), 74 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 3b18bcee151a..524023b8e959 100644
+index 524023b8e959..e42c82ed0fd5 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7224,11 +7224,9 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
- 	resp = hwrm_req_hold(bp, req);
- 	rc = hwrm_req_send_silent(bp, req);
- 	if (!rc) {
--		struct bnxt_ctx_pg_info *ctx_pg;
- 		struct bnxt_ctx_mem_type *ctxm;
- 		struct bnxt_ctx_mem_info *ctx;
- 		u8 init_val, init_idx = 0;
--		int i, tqm_rings;
- 		u16 init_mask;
+@@ -7307,6 +7307,7 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
+ 			ctx->tqm_fp_rings_count = BNXT_MAX_TQM_FP_RINGS;
  
- 		ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
-@@ -7311,14 +7309,6 @@ static int bnxt_hwrm_func_backing_store_qcaps(struct bnxt *bp)
  		ctxm = &ctx->ctx_arr[BNXT_CTX_FTQM];
++		memcpy(ctxm, &ctx->ctx_arr[BNXT_CTX_STQM], sizeof(*ctxm));
  		ctxm->instance_bmap = (1 << ctx->tqm_fp_rings_count) - 1;
  
--		tqm_rings = ctx->tqm_fp_rings_count + BNXT_MAX_TQM_SP_RINGS;
--		ctx_pg = kcalloc(tqm_rings, sizeof(*ctx_pg), GFP_KERNEL);
--		if (!ctx_pg) {
--			rc = -ENOMEM;
--			goto ctx_err;
--		}
--		for (i = 0; i < tqm_rings; i++, ctx_pg++)
--			ctx->tqm_mem[i] = ctx_pg;
  		rc = bnxt_alloc_all_ctx_pg_info(bp, BNXT_CTX_MAX);
- 	} else {
- 		rc = 0;
-@@ -7380,8 +7370,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
+@@ -7574,6 +7575,30 @@ static void bnxt_free_ctx_pg_tbls(struct bnxt *bp,
+ 	ctx_pg->nr_pages = 0;
+ }
  
- 	req->enables = cpu_to_le32(enables);
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_QP) {
--		ctx_pg = &ctx->qp_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_QP];
-+		ctx_pg = ctxm->pg_info;
- 		req->qp_num_entries = cpu_to_le32(ctx_pg->entries);
- 		req->qp_num_qp1_entries = cpu_to_le16(ctxm->qp_qp1_entries);
- 		req->qp_num_l2_entries = cpu_to_le16(ctxm->qp_l2_entries);
-@@ -7391,8 +7381,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 				      &req->qpc_page_dir);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_SRQ) {
--		ctx_pg = &ctx->srq_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_SRQ];
-+		ctx_pg = ctxm->pg_info;
- 		req->srq_num_entries = cpu_to_le32(ctx_pg->entries);
- 		req->srq_num_l2_entries = cpu_to_le16(ctxm->srq_l2_entries);
- 		req->srq_entry_size = cpu_to_le16(ctxm->entry_size);
-@@ -7401,8 +7391,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 				      &req->srq_page_dir);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_CQ) {
--		ctx_pg = &ctx->cq_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_CQ];
-+		ctx_pg = ctxm->pg_info;
- 		req->cq_num_entries = cpu_to_le32(ctx_pg->entries);
- 		req->cq_num_l2_entries = cpu_to_le16(ctxm->cq_l2_entries);
- 		req->cq_entry_size = cpu_to_le16(ctxm->entry_size);
-@@ -7411,8 +7401,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 				      &req->cq_page_dir);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_VNIC) {
--		ctx_pg = &ctx->vnic_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_VNIC];
-+		ctx_pg = ctxm->pg_info;
- 		req->vnic_num_vnic_entries = cpu_to_le16(ctxm->vnic_entries);
- 		req->vnic_num_ring_table_entries =
- 			cpu_to_le16(ctxm->max_entries - ctxm->vnic_entries);
-@@ -7422,8 +7412,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 				      &req->vnic_page_dir);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_STAT) {
--		ctx_pg = &ctx->stat_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_STAT];
-+		ctx_pg = ctxm->pg_info;
- 		req->stat_num_entries = cpu_to_le32(ctxm->max_entries);
- 		req->stat_entry_size = cpu_to_le16(ctxm->entry_size);
- 		bnxt_hwrm_set_pg_attr(&ctx_pg->ring_mem,
-@@ -7433,8 +7423,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV) {
- 		u32 units;
- 
--		ctx_pg = &ctx->mrav_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_MRAV];
-+		ctx_pg = ctxm->pg_info;
- 		req->mrav_num_entries = cpu_to_le32(ctx_pg->entries);
- 		units = ctxm->mrav_num_entries_units;
- 		if (units) {
-@@ -7452,8 +7442,8 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 				      &req->mrav_page_dir);
- 	}
- 	if (enables & FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM) {
--		ctx_pg = &ctx->tim_mem;
- 		ctxm = &ctx->ctx_arr[BNXT_CTX_TIM];
-+		ctx_pg = ctxm->pg_info;
- 		req->tim_num_entries = cpu_to_le32(ctx_pg->entries);
- 		req->tim_entry_size = cpu_to_le16(ctxm->entry_size);
- 		bnxt_hwrm_set_pg_attr(&ctx_pg->ring_mem,
-@@ -7464,14 +7454,15 @@ static int bnxt_hwrm_func_backing_store_cfg(struct bnxt *bp, u32 enables)
- 	for (i = 0, num_entries = &req->tqm_sp_num_entries,
- 	     pg_attr = &req->tqm_sp_pg_size_tqm_sp_lvl,
- 	     pg_dir = &req->tqm_sp_page_dir,
--	     ena = FUNC_BACKING_STORE_CFG_REQ_ENABLES_TQM_SP;
-+	     ena = FUNC_BACKING_STORE_CFG_REQ_ENABLES_TQM_SP,
-+	     ctx_pg = ctxm->pg_info;
- 	     i < BNXT_MAX_TQM_RINGS;
-+	     ctx_pg = &ctx->ctx_arr[BNXT_CTX_FTQM].pg_info[i],
- 	     i++, num_entries++, pg_attr++, pg_dir++, ena <<= 1) {
- 		if (!(enables & ena))
- 			continue;
- 
- 		req->tqm_entry_size = cpu_to_le16(ctxm->entry_size);
--		ctx_pg = ctx->tqm_mem[i];
- 		*num_entries = cpu_to_le32(ctx_pg->entries);
- 		bnxt_hwrm_set_pg_attr(&ctx_pg->ring_mem, pg_attr, pg_dir);
- 	}
-@@ -7587,30 +7578,23 @@ void bnxt_free_ctx_mem(struct bnxt *bp)
++static int bnxt_setup_ctxm_pg_tbls(struct bnxt *bp,
++				   struct bnxt_ctx_mem_type *ctxm, u32 entries,
++				   u8 pg_lvl)
++{
++	struct bnxt_ctx_pg_info *ctx_pg = ctxm->pg_info;
++	int i, rc = 0, n = 1;
++	u32 mem_size;
++
++	if (!ctxm->entry_size || !ctx_pg)
++		return -EINVAL;
++	if (ctxm->instance_bmap)
++		n = hweight32(ctxm->instance_bmap);
++	if (ctxm->entry_multiple)
++		entries = roundup(entries, ctxm->entry_multiple);
++	entries = clamp_t(u32, entries, ctxm->min_entries, ctxm->max_entries);
++	mem_size = entries * ctxm->entry_size;
++	for (i = 0; i < n && !rc; i++) {
++		ctx_pg[i].entries = entries;
++		rc = bnxt_alloc_ctx_pg_tbls(bp, &ctx_pg[i], mem_size, pg_lvl,
++					    ctxm->init_value ? ctxm : NULL);
++	}
++	return rc;
++}
++
+ void bnxt_free_ctx_mem(struct bnxt *bp)
  {
  	struct bnxt_ctx_mem_info *ctx = bp->ctx;
- 	u16 type;
--	int i;
+@@ -7605,13 +7630,11 @@ void bnxt_free_ctx_mem(struct bnxt *bp)
  
- 	if (!ctx)
- 		return;
- 
--	if (ctx->tqm_mem[0]) {
--		for (i = 0; i < ctx->tqm_fp_rings_count + 1; i++)
--			bnxt_free_ctx_pg_tbls(bp, ctx->tqm_mem[i]);
--		kfree(ctx->tqm_mem[0]);
--		ctx->tqm_mem[0] = NULL;
--	}
--
--	bnxt_free_ctx_pg_tbls(bp, &ctx->tim_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->mrav_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->stat_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->vnic_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->cq_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->srq_mem);
--	bnxt_free_ctx_pg_tbls(bp, &ctx->qp_mem);
--
- 	for (type = 0; type < BNXT_CTX_MAX; type++) {
- 		struct bnxt_ctx_mem_type *ctxm = &ctx->ctx_arr[type];
-+		struct bnxt_ctx_pg_info *ctx_pg = ctxm->pg_info;
-+		int i, n = 1;
-+
-+		if (!ctx_pg)
-+			continue;
-+		if (ctxm->instance_bmap)
-+			n = hweight32(ctxm->instance_bmap);
-+		for (i = 0; i < n; i++)
-+			bnxt_free_ctx_pg_tbls(bp, &ctx_pg[i]);
- 
--		kfree(ctxm->pg_info);
-+		kfree(ctx_pg);
- 		ctxm->pg_info = NULL;
- 	}
- 
-@@ -7658,7 +7642,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+ {
+-	struct bnxt_ctx_pg_info *ctx_pg;
+ 	struct bnxt_ctx_mem_type *ctxm;
+ 	struct bnxt_ctx_mem_info *ctx;
+ 	u32 l2_qps, qp1_qps, max_qps;
+-	u32 mem_size, ena, entries;
+-	u32 entries_sp, min;
+-	u32 srqs, max_srqs;
++	u32 ena, entries_sp, entries;
++	u32 srqs, max_srqs, min;
+ 	u32 num_mr, num_ah;
+ 	u32 extra_srqs = 0;
+ 	u32 extra_qps = 0;
+@@ -7642,61 +7665,37 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
  	}
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_QP];
--	ctx_pg = &ctx->qp_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = l2_qps + qp1_qps + extra_qps;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7668,7 +7652,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	}
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = l2_qps + qp1_qps + extra_qps;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, pg_lvl, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, l2_qps + qp1_qps + extra_qps,
++				     pg_lvl);
++	if (rc)
++		return rc;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_SRQ];
--	ctx_pg = &ctx->srq_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = srqs + extra_srqs;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7678,7 +7662,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	}
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = srqs + extra_srqs;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, pg_lvl, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, srqs + extra_srqs, pg_lvl);
++	if (rc)
++		return rc;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_CQ];
--	ctx_pg = &ctx->cq_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = ctxm->cq_l2_entries + extra_qps * 2;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7688,7 +7672,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	}
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = ctxm->cq_l2_entries + extra_qps * 2;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, pg_lvl, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, ctxm->cq_l2_entries +
++				     extra_qps * 2, pg_lvl);
++	if (rc)
++		return rc;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_VNIC];
--	ctx_pg = &ctx->vnic_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = ctxm->max_entries;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7698,7 +7682,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	}
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = ctxm->max_entries;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, 1, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, ctxm->max_entries, 1);
++	if (rc)
++		return rc;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_STAT];
--	ctx_pg = &ctx->stat_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = ctxm->max_entries;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7712,7 +7696,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = ctxm->max_entries;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, 1, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, ctxm->max_entries, 1);
++	if (rc)
++		return rc;
+ 
+ 	ena = 0;
+ 	if (!(bp->flags & BNXT_FLAG_ROCE_CAP))
  		goto skip_rdma;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_MRAV];
--	ctx_pg = &ctx->mrav_mem;
-+	ctx_pg = ctxm->pg_info;
+-	ctx_pg = ctxm->pg_info;
  	/* 128K extra is needed to accommodate static AH context
  	 * allocation by f/w.
  	 */
-@@ -7732,7 +7716,7 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+@@ -7706,24 +7705,15 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+ 	if (!ctxm->mrav_av_entries || ctxm->mrav_av_entries > num_ah)
+ 		ctxm->mrav_av_entries = num_ah;
+ 
+-	ctx_pg->entries = num_mr + num_ah;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, 2, ctxm);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, num_mr + num_ah, 2);
++	if (rc)
++		return rc;
  	ena = FUNC_BACKING_STORE_CFG_REQ_ENABLES_MRAV;
  
  	ctxm = &ctx->ctx_arr[BNXT_CTX_TIM];
--	ctx_pg = &ctx->tim_mem;
-+	ctx_pg = ctxm->pg_info;
- 	ctx_pg->entries = l2_qps + qp1_qps + extra_qps;
- 	if (ctxm->entry_size) {
- 		mem_size = ctxm->entry_size * ctx_pg->entries;
-@@ -7751,8 +7735,8 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
- 	entries = l2_qps + 2 * (extra_qps + qp1_qps);
- 	entries = roundup(entries, ctxm->entry_multiple);
- 	entries = clamp_t(u32, entries, min, ctxm->max_entries);
--	for (i = 0; i < ctx->tqm_fp_rings_count + 1; i++) {
--		ctx_pg = ctx->tqm_mem[i];
-+	for (i = 0, ctx_pg = ctxm->pg_info; i < ctx->tqm_fp_rings_count + 1;
-+	     ctx_pg = &ctx->ctx_arr[BNXT_CTX_FTQM].pg_info[i], i++) {
- 		ctx_pg->entries = i ? entries : entries_sp;
- 		if (ctxm->entry_size) {
- 			mem_size = ctxm->entry_size * ctx_pg->entries;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 7e67df57b8af..067a66eedf36 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1609,15 +1609,6 @@ struct bnxt_ctx_mem_info {
- 	u32	flags;
- 	#define BNXT_CTX_FLAG_INITED	0x01
- 	struct bnxt_ctx_mem_type	ctx_arr[BNXT_CTX_MAX];
--
--	struct bnxt_ctx_pg_info qp_mem;
--	struct bnxt_ctx_pg_info srq_mem;
--	struct bnxt_ctx_pg_info cq_mem;
--	struct bnxt_ctx_pg_info vnic_mem;
--	struct bnxt_ctx_pg_info stat_mem;
--	struct bnxt_ctx_pg_info mrav_mem;
--	struct bnxt_ctx_pg_info tim_mem;
--	struct bnxt_ctx_pg_info *tqm_mem[BNXT_MAX_TQM_RINGS];
- };
+-	ctx_pg = ctxm->pg_info;
+-	ctx_pg->entries = l2_qps + qp1_qps + extra_qps;
+-	if (ctxm->entry_size) {
+-		mem_size = ctxm->entry_size * ctx_pg->entries;
+-		rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, 1, NULL);
+-		if (rc)
+-			return rc;
+-	}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, l2_qps + qp1_qps + extra_qps, 1);
++	if (rc)
++		return rc;
+ 	ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_TIM;
  
- enum bnxt_health_severity {
+ skip_rdma:
+@@ -7731,22 +7721,17 @@ static int bnxt_alloc_ctx_mem(struct bnxt *bp)
+ 	min = ctxm->min_entries;
+ 	entries_sp = ctx->ctx_arr[BNXT_CTX_VNIC].vnic_entries + l2_qps +
+ 		     2 * (extra_qps + qp1_qps) + min;
+-	entries_sp = roundup(entries_sp, ctxm->entry_multiple);
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, entries_sp, 2);
++	if (rc)
++		return rc;
++
++	ctxm = &ctx->ctx_arr[BNXT_CTX_FTQM];
+ 	entries = l2_qps + 2 * (extra_qps + qp1_qps);
+-	entries = roundup(entries, ctxm->entry_multiple);
+-	entries = clamp_t(u32, entries, min, ctxm->max_entries);
+-	for (i = 0, ctx_pg = ctxm->pg_info; i < ctx->tqm_fp_rings_count + 1;
+-	     ctx_pg = &ctx->ctx_arr[BNXT_CTX_FTQM].pg_info[i], i++) {
+-		ctx_pg->entries = i ? entries : entries_sp;
+-		if (ctxm->entry_size) {
+-			mem_size = ctxm->entry_size * ctx_pg->entries;
+-			rc = bnxt_alloc_ctx_pg_tbls(bp, ctx_pg, mem_size, 1,
+-						    NULL);
+-			if (rc)
+-				return rc;
+-		}
++	rc = bnxt_setup_ctxm_pg_tbls(bp, ctxm, entries, 2);
++	if (rc)
++		return rc;
++	for (i = 0; i < ctx->tqm_fp_rings_count + 1; i++)
+ 		ena |= FUNC_BACKING_STORE_CFG_REQ_ENABLES_TQM_SP << i;
+-	}
+ 	ena |= FUNC_BACKING_STORE_CFG_REQ_DFLT_ENABLES;
+ 	rc = bnxt_hwrm_func_backing_store_cfg(bp, ena);
+ 	if (rc) {
 -- 
 2.30.1
 
 
---0000000000000892bf060a9e1202
+--00000000000020d410060a9e1226
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -416,14 +364,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJriDjwaajnjIjD244S9Mod7mUTStLjD
-IVvamqJTfzhIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEy
-MDIzNDQ0M1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINipSY6ilLwiYfGIbsyJHBsOQQnnL3sC
+YGZabeKb6sr1MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMTEy
+MDIzNDQ0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBgCKtLqiGt8uq94MW//cxbFpJsVaAAj6mPUpJPHdBjdOsA2OZ6
-zqbSccKp7aoOR55OA2zUStOXHPuHRA6C3ksJSCvR4/mmzILCRepCSzfCdLuV+PADjs1jtxErruCv
-8nOWoXsNlcl6Vbic61J+sEEzI06535QWsNBfxPJAxDyNKYnRTeUltk5VvWKKIFlYuTu4mzjrvxRx
-PcKj91+3/8FE5oRW5yv32kQ7DKsoXULhiztOQU10QUqKhb9TLLTfBJTDCvbVZBAk8w83JeGwXvoa
-QE2HHc6XLjhsAtIm4oFSfWrjAxCSMHc0SCVGpnfIEbdnJin6u/Ix1CboxN5zf1eg
---0000000000000892bf060a9e1202--
+ATANBgkqhkiG9w0BAQEFAASCAQBqyMpBYDkdl4hokRI+OX6WBKDPFawB01BsR1VpwmXo32nEaypa
+e9WtxbcZ5/8DzEDV70cKc0EVMsqUGvzH6vmUfgK7TjVFkhpWeH8ctpYS7e2qNhiEzsmyGuxX2Znu
+mR0BXpMqgH0+DR0F1hiOQDfS8++/7zvKsajN01pNERIlY/97bvO9XviPy7aW+AJ22E+gvX22/a2I
+9juA5b9voEOu+v5hVyncTdI1g+Lck6+5CxvYaUOh2k3hSN+TNUbUEAowORM7ax9tA0BAz1gYKHhE
+nU4/noTMdypTLBu69xllcTsJAYRiNoL1pyrCJVN7J9Gbxc3gGpMH3Ln0+ARXa0e3
+--00000000000020d410060a9e1226--
 
