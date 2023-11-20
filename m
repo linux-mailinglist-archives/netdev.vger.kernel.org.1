@@ -1,99 +1,152 @@
-Return-Path: <netdev+bounces-49151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E79E7F0F1F
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:32:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 255A17F0F22
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 10:33:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDBCFB20B0B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:32:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90043B20B4D
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1608F111BA;
-	Mon, 20 Nov 2023 09:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A3B71170F;
+	Mon, 20 Nov 2023 09:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqsb3hP+"
+	dkim=pass (1024-bit key) header.d=weidmueller.onmicrosoft.com header.i=@weidmueller.onmicrosoft.com header.b="VoeiUZJN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB63E111B0
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 09:32:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E36C433C8;
-	Mon, 20 Nov 2023 09:32:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700472725;
-	bh=B5OTO9fXksNT8jTphZupJqAgZrBhx/cbFTutmYcoXIc=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=oqsb3hP+LkGmQPGqV6aAaVoPT01GPyEnqOckib4/9CVYAsw7KghImKXhL5TV21smK
-	 dtzZEBez40gY6sFKxKgH2t7o11xOTts495/tonq+lIkGsgbviULx8DZ59kX5pOPcK0
-	 mf6fPKUn9AUKRBOesQ5ETSCM+bj1VxG4X1EOupPu1EmVfzTkrc2YhbNS8yfmxeC3+l
-	 fux8FLaanIOXfsFoxyzrFQ1llL6nADwL61h9D4fGacgS7Y/CIyJ5tWZPaveCx+hWcr
-	 05RWkw95lQPfedOJuZ2Gatz2RA0094TUXv5RVZ5F9GGYcIo+PEiEoLEAOpz/I0pLIP
-	 GOcA/9MeDMo/g==
-Content-Type: text/plain; charset="utf-8"
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2059.outbound.protection.outlook.com [40.107.21.59])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522CE94;
+	Mon, 20 Nov 2023 01:33:08 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xew8easM797R04uzYfNa+vxg/KtYf6a62Eaq7Mba3VBDAv1euEPZ+5aP+1hjoXntkVX+ohTWg/GbKnD9XgLZ2ETjzSy73Q58RCosl5jeHXLWMVoLMrfDR1ecO8vS+lmtqyDfExndZY5rs2BrJGIv184BxNnWEbRvg0SgRyRUl4NfYUQn4zdUCf3b92DjmzbucXz38vMiKDof2f3baGCbkpqKCo8Rtq3+qNH6Gr7g7g+lsynXxHqTi64CvWB+gZmNKS0OZHsW0M1s8Q8oIx/YmPYV4Mamc0cwYyt0SpxYRmPeONjXB6Fw1Wt82R6pT4tQbvIhlgKqOUMFLYlJAC9DtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=55lqGfXT1D7SkZI+/fbeZ4iSXeNWCNOkJlMpAeK/k7w=;
+ b=PuFtgDYWKHZy9AzfVkGo2GmLWslpH0AZ1rsHF9I7PgCvCkecxfu7JUS7uecxfFhS9O5FyCPbUXc8HX16lPDZ54YB0dXnQVghOhkmAsjpGwdLWoHu+jFK3MPrnTe1C4Rp2wNumSwYJ0gBxylF475+Zq+Kd/jydUwkYUactMCF1M6L+/fyle+JouDy0IBjkASF70D7N90Jn6Eg0odoDum0aTbHmWvVago04Coow52NOPTDRZhr0VbiUDEUrc+MQPUkuS6lWFHMo7Wj1m51CM+P7dg5DRpUriM/XpNJAKgN84ujUvuP0VwvJnEet9q3s59skqmA/0QFqkz2LV8HiaZqeA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=weidmueller.com; dmarc=pass action=none
+ header.from=weidmueller.com; dkim=pass header.d=weidmueller.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=weidmueller.onmicrosoft.com; s=selector1-weidmueller-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=55lqGfXT1D7SkZI+/fbeZ4iSXeNWCNOkJlMpAeK/k7w=;
+ b=VoeiUZJNg9TQXUg8QOqz3I19ViT7vpakNyiqu8jgL0YqPUafZcWMwqf7TwbYQ3iaHjrqCwaBFZ2LTgVctYtDYnkGt/KvmA+8v10NyoC0qw9bYzCs7zAj3Pj/w6mYL24Y+2xk+MtJvS0x8tnJUcWChyFTGYwBmp0x8imzsK/zpU0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=weidmueller.com;
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com (2603:10a6:20b:55a::18)
+ by PAXPR08MB6592.eurprd08.prod.outlook.com (2603:10a6:102:158::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.26; Mon, 20 Nov
+ 2023 09:33:05 +0000
+Received: from AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6]) by AS2PR08MB8431.eurprd08.prod.outlook.com
+ ([fe80::b914:d9b5:6462:13b6%5]) with mapi id 15.20.7002.027; Mon, 20 Nov 2023
+ 09:33:05 +0000
+From: Lukas Funke <lukas.funke-oss@weidmueller.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Lukas Funke <lukas.funke@weidmueller.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: phy: Fix potential null pointer access
+Date: Mon, 20 Nov 2023 10:32:54 +0100
+Message-Id: <20231120093256.3642327-1-lukas.funke-oss@weidmueller.com>
+X-Mailer: git-send-email 2.30.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0445.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:c6::18) To AS2PR08MB8431.eurprd08.prod.outlook.com
+ (2603:10a6:20b:55a::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <85f52258-d1cb-9c3c-0ea4-602954e929e8@ssi.bg>
-References: <20231117114837.36100-1-atenart@kernel.org> <85f52258-d1cb-9c3c-0ea4-602954e929e8@ssi.bg>
-Subject: Re: [PATCH net-next] net: ipv4: replace the right route in case prefsrc is used
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org, liuhangbin@gmail.com
-To: Julian Anastasov <ja@ssi.bg>
-Date: Mon, 20 Nov 2023 10:32:02 +0100
-Message-ID: <170047272220.4264.16199175262224821201@kwain>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2PR08MB8431:EE_|PAXPR08MB6592:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f3e8210-6f11-433a-8c28-08dbe9abb2d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	rfMEUSp0cBQCXFSaRMgIOzVce54lWFC1iq9ktqdirE2M9RqsozxxSYcK96zIyJYblh47heZVWJ0vDCrYyG2kgGs/6lOhe6mR6SXku4/S6w/WdFZuxexzg4ZoMG7WAj+tBerQnUMj2d2YFbztFe//+sYrYMqK0iDxX8z0jg+llRF4JxGG/HFaDmn2r3/yK0o7ql3Nf30Aq2nAk4cPBZB1qP29LH2qYUPcaZGts8qfUzIMP6SVf3mrA27wAEvuankkAi7hcWzz/qul35QE/QCx78iAji+maxI7htmtqs1wKI7/W9AvEk2nQvEShzBlsmp9rQcuTVymX0yHZwt70Mf1SECV4aRK/acJPEA08qIz6bgDuBRudk/FkrWle7Up9YD6wuiOF2WvtGlzXBflGmGwfCDHl7YqUMoEA+HKHK0dzVBd/C4urHHythnXtoLtJJXLzrFS/pi+exGQqswKoXiXwL8ocUZYNL/nmj62uywTXvSeJoF//E+VUducgE6pmMLlACs5KBQk9djl8a/tpUP5kk9JusLiFlOa2I9pQjPmuSzDpLPL4kLsfce9GW7t8OEVsZoqCkt6EovJvtPwUnvawYZY4GEfwHFVZOy22hZ9bHHu4NaAR9ddRl1dY/aECOv4
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS2PR08MB8431.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(39860400002)(346002)(136003)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(2906002)(41300700001)(8936002)(8676002)(4326008)(5660300002)(4744005)(66476007)(66556008)(66946007)(316002)(110136005)(38100700002)(6512007)(36756003)(52116002)(6506007)(6666004)(86362001)(6486002)(478600001)(83380400001)(38350700005)(26005)(2616005)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nzwm7PiGmF82ax/8V9OMvEaGqGSFajkogdceNHimL+a29Ji/ZQsIpWNN3kfw?=
+ =?us-ascii?Q?q6Q6e0x5rMmhCWgxNp2nmfXF4/Yu1aC22ZZhWU/tirtk63+1ttRnNj4UQuuo?=
+ =?us-ascii?Q?cu9/FljTGWkW+oa8gKf8P++4swChcNEZgXygsuKU+ob0uQK/C5z5gNz4PFDi?=
+ =?us-ascii?Q?hoJV0rGR58jYT2dW+4e9PiauijbKEGgmgA5NLiQdt56up+dj4OoxxivJ12Dr?=
+ =?us-ascii?Q?MLlj2lqkssTNezstP9fbfJ+rh2U7ZAJMpLlB95ZIPr7HRl/Ud5VH5mLFT5PP?=
+ =?us-ascii?Q?k5kkvrp3BvGWjJ9txCEh4wiCXySJURNmTTUNp4QiebqFEuiFU5CDKOB9NcxR?=
+ =?us-ascii?Q?+4WGhJ3LzatGPnb1jVHvkD9ICqyJerIO9wZG7MDzo8t3ory84yttLA7p5V2H?=
+ =?us-ascii?Q?WT0k/dnd4dR2Pm7mYYMpDnXWDNb1A20A7Capiz+V23eoPejz8/tnpF7ofEOP?=
+ =?us-ascii?Q?5ISgobmCFtBEi3jIBXXnYmFXMJ82AzfPA4pJT5pMxFkgsTgLZ7DZf4NjJbn6?=
+ =?us-ascii?Q?2jAMfIQsN0eYUVI30t8HeW5xbAO/mQyQy974PAegzYNkYuihw0Lbi5ZypIyi?=
+ =?us-ascii?Q?B24n2aD635KyYDFDTpdADnHYmoDt2GYmR/v37Jjm4Jb0Q7d+lJYzMjuKNC8J?=
+ =?us-ascii?Q?xtig/OGr0U0aExhGvz2vj5Rtt8NVEH/fygTqajNxx1pMbZTKzWTq9MpQnnxq?=
+ =?us-ascii?Q?FPaqTzAS5imdW3ow8yf/ZMPlQuqgYDUFBokoBERvlPvwu15u/M6rTAIBA0Da?=
+ =?us-ascii?Q?Xm8aEFngvrrsucCq2BO49jn7cILCG3/cR/gBTepWATI8bdzG99sDMJSw7wGG?=
+ =?us-ascii?Q?1gKh+fFgazKw7DIo7AAY8qfthT7QvqoWaeOPUf3f9DihdEMJ63yQSp2F6PMX?=
+ =?us-ascii?Q?jOFGljsaRtm7GHLDDscSEJsZfVkjSSPu9u4KF3v2t4PuCoY4wGN2gUUSqajc?=
+ =?us-ascii?Q?Tggz3Xl17i9q8fHto19zsW9VJSpk2GjT02PzN5rA3QwP9FtCKmwmmzMYyeT/?=
+ =?us-ascii?Q?iJKxxfYAXlR3yZHNIUCwEcUnYyaHXMnM4QWkxrQdQOILZFeBvms2bkc8001C?=
+ =?us-ascii?Q?xwb5myLnoyqq/oav+NlrVrjMG/vOJw9V6Moe4YQl9IGUxLPrFfSsIwBrI+oV?=
+ =?us-ascii?Q?1FJ8VTZa86QFdxPZTAEjTfaqAbA+wlwCiMbL0zfksxN9ZvgrFV6Z0i24MMXX?=
+ =?us-ascii?Q?8NpXgfL4YOJ2zgOa+qA319/KsDNhYv33t+dIlsFeaTWNcaTrdtVlixKQdpbN?=
+ =?us-ascii?Q?K/9QMI72Y6FP/DAnI/UrcAoJIkLSiOXb73evmSqoJJfu9gJ65FLi7BlhRql9?=
+ =?us-ascii?Q?IYpEvuJs7rV4IxrZDprWaH+mpn/Ggn9vKTc9jHoPevr3z/4mMAerN9FhG9zN?=
+ =?us-ascii?Q?RnRnxWHltmLZjsr8rcY/MnJUsTX7F4K5B6XYUc1nO7cucmOgPFAMOwdJscaQ?=
+ =?us-ascii?Q?fmE25cyvzjpql21aoMQeGfgmwqDaTNBaSOtdg80uQVLSaaZFmZP7eih7sOQo?=
+ =?us-ascii?Q?9qpwZQXaBOCumOpJ269MJX6ZVq8tlAty6K32cGn7jO1QkYqvdBgd2tPy6LLv?=
+ =?us-ascii?Q?Xi0Ms+/yVNo4MepJ/JkEvVrFMFnVgwG8r9fBD9OFHy0C/YXVXns99JbTPx83?=
+ =?us-ascii?Q?Bw=3D=3D?=
+X-OriginatorOrg: weidmueller.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f3e8210-6f11-433a-8c28-08dbe9abb2d1
+X-MS-Exchange-CrossTenant-AuthSource: AS2PR08MB8431.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 09:33:05.3157
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e4289438-1c5f-4c95-a51a-ee553b8b18ec
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VHFPgfTga3niZGM0xJ+aZgzsLNNUNI9OaK/ryzDlHb/8BbrwFEqpLBntHMU5Qkz5XOeCEIIS17Rr34pvO13oRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR08MB6592
 
-Quoting Julian Anastasov (2023-11-17 17:56:57)
-> On Fri, 17 Nov 2023, Antoine Tenart wrote:
-> >=20
-> > Note: a selftest wasn't added as `ip route` use NLM_F_EXCL which
-> > prevents us from constructing the above routes. But this is a valid
->=20
-> ip route append/prepend are standard way to create alternative routes,
-> if you want to encode a selftest.
+From: Lukas Funke <lukas.funke@weidmueller.com>
 
-Thanks for the pointer.
+When there is no driver associated with the phydev, there will be a
+nullptr access. The commit checks if the phydev driver is set before
+access.
 
-> > +                     if (cfg->fc_prefsrc &&
-> > +                         cfg->fc_prefsrc =3D=3D fa->fa_info->fib_prefs=
-rc)
->=20
->         You may prefer to restrict it for the change operation by
-> adding && (cfg->fc_nlflags & NLM_F_REPLACE) check, otherwise if
-> we change the prepend position (fa_first) route with such prefsrc
-> can not be installed as first one:
+Signed-off-by: Lukas Funke <lukas.funke@weidmueller.com>
+---
+ drivers/net/phy/phy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Good point, I'll fix in v2 (if any).
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 1135e63a4a76..4de83e3cab77 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -136,7 +136,7 @@ EXPORT_SYMBOL(phy_print_status);
+ static int phy_config_interrupt(struct phy_device *phydev, bool interrupts)
+ {
+ 	phydev->interrupts = interrupts ? 1 : 0;
+-	if (phydev->drv->config_intr)
++	if (phydev->drv && phydev->drv->config_intr)
+ 		return phydev->drv->config_intr(phydev);
+ 
+ 	return 0;
+-- 
+2.30.2
 
->         Even if we consider just the change operation, this patch
-> will change the expectation that we replace the first alternative
-> route. But I don't know if one uses alternative routes that
-> differ in prefsrc.
-
-For example NetworkManager does, but I don't think NLM_F_REPLACE is
-used. One could do it manually, but I don't think that is used in
-practice either.
-
->         Note that link routes (nhc_scope RT_SCOPE_HOST) or
-> routes with prefixlen!=3D0 (fib_select_path) are not considered
-> as alternatives by the kernel. So, even if we can create such
-> routes, they are probably not used. So, deleting link routes
-> by prefsrc is good as we remove routes with deleted prefsrc
-> but for routing we are using just the first link route.
-
-Right. Replacing routes by prefsrc could help configuring those routes
-so they have the right config when the first link route is deleted, but
-that's theoretical too. Reasoning here was since we can delete by
-prefsrc, we might want to allow to replace too. As you said, there is a
-good reason to allow this for route deletion which might not extend to
-the change operation.
-
-Thanks!
-Antoine
 
