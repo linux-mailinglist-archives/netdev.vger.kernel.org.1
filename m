@@ -1,372 +1,150 @@
-Return-Path: <netdev+bounces-49262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195E57F151C
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:02:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 648EF7F1526
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 15:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4ECB28266B
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:02:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12EC028259C
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1931BDE6;
-	Mon, 20 Nov 2023 14:02:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0824D1BDEA;
+	Mon, 20 Nov 2023 14:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XnqJTQqq"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="LC/g2Dpn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA631BDE1
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 14:02:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7BFFC43397;
-	Mon, 20 Nov 2023 14:02:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700488941;
-	bh=zoDj5JTzNLXw3O0F9U8/CC9o+AyTb4NvkCJ1DslibXY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XnqJTQqqx97Wm8fEvuzMmBeQEvNV9Oowrl3om2AtymK6Ob9wT2jyo+Q1LcxVT1ffx
-	 s85GfvcO7oskHDb4K4XMrV1yxj5Ox9gHdXvks/TQmL/DPdwdEjfAP15wamA4s/t3KE
-	 w155Si3P9EZwI5wSY7k706GjKLK4jAXpLKfXg5LhvxOeNRGECLaEZFDU8oFAP3C/R3
-	 wUXnNfXpxRcEB4XhvCE9lNZ/CkOlDWFF0wfMDusUL+POOUtrU2tRxN0gJzOSlD1k4r
-	 wLLhJveCtTrrdSfWM6f1ZCTHF0aW61x4DjTdFwOF/x4lbqZZ1iGtbUH/bi2NUoxNA6
-	 U4euSEZ+ja5vA==
-From: Roger Quadros <rogerq@kernel.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: vladimir.oltean@nxp.com,
-	s-vadapalli@ti.com,
-	r-gunasekaran@ti.com,
-	vigneshr@ti.com,
-	srk@ti.com,
-	horms@kernel.org,
-	p-varis@ti.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Subject: [PATCH v6 net-next 7/7] net: ethernet: ti: am65-cpsw: add sw tx/rx irq coalescing based on hrtimers
-Date: Mon, 20 Nov 2023 16:01:47 +0200
-Message-Id: <20231120140147.78726-8-rogerq@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20231120140147.78726-1-rogerq@kernel.org>
-References: <20231120140147.78726-1-rogerq@kernel.org>
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B43D1BC1
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:03:01 -0800 (PST)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-5a82f176860so46321377b3.1
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 06:03:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1700488981; x=1701093781; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bsm350Oy6uBYyP5hs0aT4LV3EylHgOadx5PqVgsUsmw=;
+        b=LC/g2DpnLffW2I5EJ9aV61Zq7Ux6w2babBlD/mn0jOHe6ffo3FOwvy3xUr6hMZW8ZH
+         j/dzjkqkPF8lTFT4sIXr+AkL5VsHcyuEkv8gB4DCoKsHdksmVKlrU8x5hqp3cU5kTMx6
+         5CbkNh85iTJXKOoBMX7oYpSqPuNLzSWkBiz/r+ASd9smYBIC7dCpKWo3hi9b9ktDsjGY
+         3aCs5RH8n1wNvzdb1rk7/Xd3MS97xkSpB/1t6Np4yfaFTVhXZTD3+bZqetyL7WTfgiCc
+         6C9kqARj+oElrKh0GnlpZ7fqn2JWMFiaKZi629sIHlROSesbd21J73U618rvaFSSiPp+
+         i8Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700488981; x=1701093781;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Bsm350Oy6uBYyP5hs0aT4LV3EylHgOadx5PqVgsUsmw=;
+        b=jj5OihCM+r7Y1MgQVEWN50RXEI2FQ23X3F4ixXd89EhfZWvoc3KTTmbIC0dW7wuccr
+         llhcG4TAe7epS2KXJ/dMbxymDI2/Y4+7g6FexxmiIdwBEkGCFiTBBZCIjp7OnMf61fGb
+         Jy8agyebXGjZdRjTqLhH1wCQCQCi6nixuEeNH6bagQ95fXaPy+ViLSFQlZvZHvmjp291
+         OAGFJNMQ5EfoSB2XIbHaayaq5RNkQNUS7LQI6MQqInWxveTwrZmvWKxKnEx8nLP94FTA
+         IRys+uGLOMj6EzputomVyKtkZJRbfkGj0pTLC4/NAAKwwL/Icf5EV2I7JJs2b2PpnoVo
+         t0Yw==
+X-Gm-Message-State: AOJu0YyaOle+eg5ew6RK1ccIzMWjmECmJJ55FaSs6bkWGMHpajzJqmnz
+	V0i2U5o26F2JQjnbrEk/metJttX0iWSYG1yfCbzdOg==
+X-Google-Smtp-Source: AGHT+IFKlKhCbUeYEIU3PGNDhZdrY+ZFQeiayHFPDQ9mZ1GypHbf1/HfB9bx/9Jos8iGlYVqGJeODLAuCmaYMZ2bFZk=
+X-Received: by 2002:a0d:d247:0:b0:589:f9f0:2e8c with SMTP id
+ u68-20020a0dd247000000b00589f9f02e8cmr2138727ywd.48.1700488981033; Mon, 20
+ Nov 2023 06:03:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20231116145948.203001-1-jhs@mojatatu.com> <20231116145948.203001-16-jhs@mojatatu.com>
+ <ZVZGYQDk/LyC7+8z@nanopsycho> <CAM0EoMkW1-a8yuxjEsqSnrmUx+ozn3CxvXTTwvEEPUrpk5UPRA@mail.gmail.com>
+ <ZVsXKkD6ts+XcfE6@nanopsycho>
+In-Reply-To: <ZVsXKkD6ts+XcfE6@nanopsycho>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 20 Nov 2023 09:02:49 -0500
+Message-ID: <CAM0EoMnD0yWUyd3f42NaXsWmJZ5iuPZcySroFfRFSkk=p2e06g@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 15/15] p4tc: Add P4 extern interface
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+	namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+	Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	vladbu@nvidia.com, horms@kernel.org, daniel@iogearbox.net, 
+	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com, mattyk@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Grygorii Strashko <grygorii.strashko@ti.com>
+On Mon, Nov 20, 2023 at 3:22=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
+:
+>
+> Fri, Nov 17, 2023 at 01:14:43PM CET, jhs@mojatatu.com wrote:
+> >On Thu, Nov 16, 2023 at 11:42=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
+rote:
+> >>
+> >> Thu, Nov 16, 2023 at 03:59:48PM CET, jhs@mojatatu.com wrote:
+> >>
+> >> [...]
+> >>
+> >> > include/net/p4tc.h                |  161 +++
+> >> > include/net/p4tc_ext_api.h        |  199 +++
+> >> > include/uapi/linux/p4tc.h         |   61 +
+> >> > include/uapi/linux/p4tc_ext.h     |   36 +
+> >> > net/sched/p4tc/Makefile           |    2 +-
+> >> > net/sched/p4tc/p4tc_bpf.c         |   79 +-
+> >> > net/sched/p4tc/p4tc_ext.c         | 2204 +++++++++++++++++++++++++++=
++
+> >> > net/sched/p4tc/p4tc_pipeline.c    |   34 +-
+> >> > net/sched/p4tc/p4tc_runtime_api.c |   10 +-
+> >> > net/sched/p4tc/p4tc_table.c       |   57 +-
+> >> > net/sched/p4tc/p4tc_tbl_entry.c   |   25 +-
+> >> > net/sched/p4tc/p4tc_tmpl_api.c    |    4 +
+> >> > net/sched/p4tc/p4tc_tmpl_ext.c    | 2221 +++++++++++++++++++++++++++=
+++
+> >> > 13 files changed, 5083 insertions(+), 10 deletions(-)
+> >>
+> >> This is for this patch. Now for the whole patchset you have:
+> >>  30 files changed, 16676 insertions(+), 39 deletions(-)
+> >>
+> >> I understand that you want to fit into 15 patches with all the work.
+> >> But sorry, patches like this are unreviewable. My suggestion is to spl=
+it
+> >> the patchset into multiple ones including smaller patches and allow
+> >> people to digest this. I don't believe that anyone can seriously stand
+> >> to review a patch with more than 200 lines changes.
+> >
+> >This specific patch is not difficult to split into two. I can do that
+> >and send out minus the first 8 trivial patches - but not familiar with
+> >how to do "here's part 1 of the patches" and "here's patchset two".
+>
+> Split into multiple patchsets and send one by one. No need to have all
+> in at once.
+>
+>
+> >There's dependency between them so not clear how patchwork and
+>
+> What dependency. It should compile. Introduce some basic functionality
+> first and extend it incrementally with other patchsets. The usual way.
+>
 
-Add SW IRQ coalescing based on hrtimers for TX and RX data path which
-can be enabled by ethtool commands:
+Sorry, still not following:
+Lets say i split the current patchset 1 with patch 1-8 (which are
+trivial and have been reviewed) then make the rest into patchset 2
+with a new set 1-8. I dont see how patchset 2 compiles unless it has
+access to code from patchset 1. Unless patchset 1 is merged i dont see
+how this works with patchwork or reviewers. Am i missing something?
 
-- RX coalescing
-  ethtool -C eth1 rx-usecs 50
+cheers,
+jamal
 
-- TX coalescing can be enabled per TX queue
-
-  - by default enables coalesing for TX0
-  ethtool -C eth1 tx-usecs 50
-  - configure TX0
-  ethtool -Q eth0 queue_mask 1 --coalesce tx-usecs 100
-  - configure TX1
-  ethtool -Q eth0 queue_mask 2 --coalesce tx-usecs 100
-  - configure TX0 and TX1
-  ethtool -Q eth0 queue_mask 3 --coalesce tx-usecs 100 --coalesce tx-usecs 100
-
-  show configuration for TX0 and TX1:
-  ethtool -Q eth0 queue_mask 3 --show-coalesce
-
-Comparing to gro_flush_timeout and napi_defer_hard_irqs, this patch
-allows to enable IRQ coalesing for RX path separately.
-
-Signed-off-by: Grygorii Strashko <grygorii.strashko@ti.com>
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-ethtool.c | 79 +++++++++++++++++++++
- drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 59 ++++++++++++---
- drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  4 ++
- 3 files changed, 134 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-index 6af00640e99c..0685420368d1 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
-@@ -892,6 +892,80 @@ static void am65_cpsw_get_mm_stats(struct net_device *ndev,
- 	s->MACMergeHoldCount = readl(base + AM65_CPSW_STATN_IET_TX_HOLD);
- }
- 
-+static int am65_cpsw_get_coalesce(struct net_device *ndev, struct ethtool_coalesce *coal,
-+				  struct kernel_ethtool_coalesce *kernel_coal,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	tx_chn = &common->tx_chns[0];
-+
-+	coal->rx_coalesce_usecs = common->rx_pace_timeout / 1000;
-+	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_get_per_queue_coalesce(struct net_device *ndev, u32 queue,
-+					    struct ethtool_coalesce *coal)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-+		return -EINVAL;
-+
-+	tx_chn = &common->tx_chns[queue];
-+
-+	coal->tx_coalesce_usecs = tx_chn->tx_pace_timeout / 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_set_coalesce(struct net_device *ndev, struct ethtool_coalesce *coal,
-+				  struct kernel_ethtool_coalesce *kernel_coal,
-+				  struct netlink_ext_ack *extack)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	tx_chn = &common->tx_chns[0];
-+
-+	if (coal->rx_coalesce_usecs && coal->rx_coalesce_usecs < 20)
-+		return -EINVAL;
-+
-+	if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20)
-+		return -EINVAL;
-+
-+	common->rx_pace_timeout = coal->rx_coalesce_usecs * 1000;
-+	tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_set_per_queue_coalesce(struct net_device *ndev, u32 queue,
-+					    struct ethtool_coalesce *coal)
-+{
-+	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-+	struct am65_cpsw_tx_chn *tx_chn;
-+
-+	if (queue >= AM65_CPSW_MAX_TX_QUEUES)
-+		return -EINVAL;
-+
-+	tx_chn = &common->tx_chns[queue];
-+
-+	if (coal->tx_coalesce_usecs && coal->tx_coalesce_usecs < 20) {
-+		dev_info(common->dev, "defaulting to min value of 20us for tx-usecs for tx-%u\n",
-+			 queue);
-+		coal->tx_coalesce_usecs = 20;
-+	}
-+
-+	tx_chn->tx_pace_timeout = coal->tx_coalesce_usecs * 1000;
-+
-+	return 0;
-+}
-+
- const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.begin			= am65_cpsw_ethtool_op_begin,
- 	.complete		= am65_cpsw_ethtool_op_complete,
-@@ -910,6 +984,11 @@ const struct ethtool_ops am65_cpsw_ethtool_ops_slave = {
- 	.get_ts_info		= am65_cpsw_get_ethtool_ts_info,
- 	.get_priv_flags		= am65_cpsw_get_ethtool_priv_flags,
- 	.set_priv_flags		= am65_cpsw_set_ethtool_priv_flags,
-+	.supported_coalesce_params = ETHTOOL_COALESCE_USECS,
-+	.get_coalesce           = am65_cpsw_get_coalesce,
-+	.set_coalesce           = am65_cpsw_set_coalesce,
-+	.get_per_queue_coalesce = am65_cpsw_get_per_queue_coalesce,
-+	.set_per_queue_coalesce = am65_cpsw_set_per_queue_coalesce,
- 
- 	.get_link		= ethtool_op_get_link,
- 	.get_link_ksettings	= am65_cpsw_get_link_ksettings,
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 594f95c9415c..2fce480fb59a 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -596,8 +596,10 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 					msecs_to_jiffies(1000));
- 	if (!i)
- 		dev_err(common->dev, "tx timeout\n");
--	for (i = 0; i < common->tx_ch_num; i++)
-+	for (i = 0; i < common->tx_ch_num; i++) {
- 		napi_disable(&common->tx_chns[i].napi_tx);
-+		hrtimer_cancel(&common->tx_chns[i].tx_hrtimer);
-+	}
- 
- 	for (i = 0; i < common->tx_ch_num; i++) {
- 		k3_udma_glue_reset_tx_chn(common->tx_chns[i].tx_chn,
-@@ -616,6 +618,7 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 	}
- 
- 	napi_disable(&common->napi_rx);
-+	hrtimer_cancel(&common->rx_hrtimer);
- 
- 	for (i = 0; i < AM65_CPSW_MAX_RX_FLOWS; i++)
- 		k3_udma_glue_reset_rx_chn(common->rx_chns.rx_chn, i,
-@@ -885,6 +888,15 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_common *common,
- 	return ret;
- }
- 
-+static enum hrtimer_restart am65_cpsw_nuss_rx_timer_callback(struct hrtimer *timer)
-+{
-+	struct am65_cpsw_common *common =
-+			container_of(timer, struct am65_cpsw_common, rx_hrtimer);
-+
-+	enable_irq(common->rx_chns.irq);
-+	return HRTIMER_NORESTART;
-+}
-+
- static int am65_cpsw_nuss_rx_poll(struct napi_struct *napi_rx, int budget)
- {
- 	struct am65_cpsw_common *common = am65_cpsw_napi_to_common(napi_rx);
-@@ -912,7 +924,13 @@ static int am65_cpsw_nuss_rx_poll(struct napi_struct *napi_rx, int budget)
- 	if (num_rx < budget && napi_complete_done(napi_rx, num_rx)) {
- 		if (common->rx_irq_disabled) {
- 			common->rx_irq_disabled = false;
--			enable_irq(common->rx_chns.irq);
-+			if (unlikely(common->rx_pace_timeout)) {
-+				hrtimer_start(&common->rx_hrtimer,
-+					      ns_to_ktime(common->rx_pace_timeout),
-+					      HRTIMER_MODE_REL_PINNED);
-+			} else {
-+				enable_irq(common->rx_chns.irq);
-+			}
- 		}
- 	}
- 
-@@ -968,7 +986,7 @@ static void am65_cpsw_nuss_tx_wake(struct am65_cpsw_tx_chn *tx_chn, struct net_d
- }
- 
- static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
--					   int chn, unsigned int budget)
-+					   int chn, unsigned int budget, bool *tdown)
- {
- 	struct device *dev = common->dev;
- 	struct am65_cpsw_tx_chn *tx_chn;
-@@ -991,6 +1009,7 @@ static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
- 		if (cppi5_desc_is_tdcm(desc_dma)) {
- 			if (atomic_dec_and_test(&common->tdown_cnt))
- 				complete(&common->tdown_complete);
-+			*tdown = true;
- 			break;
- 		}
- 
-@@ -1013,7 +1032,7 @@ static int am65_cpsw_nuss_tx_compl_packets(struct am65_cpsw_common *common,
- }
- 
- static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
--					      int chn, unsigned int budget)
-+					      int chn, unsigned int budget, bool *tdown)
- {
- 	struct device *dev = common->dev;
- 	struct am65_cpsw_tx_chn *tx_chn;
-@@ -1034,6 +1053,7 @@ static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
- 		if (cppi5_desc_is_tdcm(desc_dma)) {
- 			if (atomic_dec_and_test(&common->tdown_cnt))
- 				complete(&common->tdown_complete);
-+			*tdown = true;
- 			break;
- 		}
- 
-@@ -1059,21 +1079,40 @@ static int am65_cpsw_nuss_tx_compl_packets_2g(struct am65_cpsw_common *common,
- 	return num_tx;
- }
- 
-+static enum hrtimer_restart am65_cpsw_nuss_tx_timer_callback(struct hrtimer *timer)
-+{
-+	struct am65_cpsw_tx_chn *tx_chns =
-+			container_of(timer, struct am65_cpsw_tx_chn, tx_hrtimer);
-+
-+	enable_irq(tx_chns->irq);
-+	return HRTIMER_NORESTART;
-+}
-+
- static int am65_cpsw_nuss_tx_poll(struct napi_struct *napi_tx, int budget)
- {
- 	struct am65_cpsw_tx_chn *tx_chn = am65_cpsw_napi_to_tx_chn(napi_tx);
-+	bool tdown = false;
- 	int num_tx;
- 
- 	if (AM65_CPSW_IS_CPSW2G(tx_chn->common))
--		num_tx = am65_cpsw_nuss_tx_compl_packets_2g(tx_chn->common, tx_chn->id, budget);
-+		num_tx = am65_cpsw_nuss_tx_compl_packets_2g(tx_chn->common, tx_chn->id,
-+							    budget, &tdown);
- 	else
--		num_tx = am65_cpsw_nuss_tx_compl_packets(tx_chn->common, tx_chn->id, budget);
-+		num_tx = am65_cpsw_nuss_tx_compl_packets(tx_chn->common,
-+							 tx_chn->id, budget, &tdown);
- 
- 	if (num_tx >= budget)
- 		return budget;
- 
--	if (napi_complete_done(napi_tx, num_tx))
--		enable_irq(tx_chn->irq);
-+	if (napi_complete_done(napi_tx, num_tx)) {
-+		if (unlikely(tx_chn->tx_pace_timeout && !tdown)) {
-+			hrtimer_start(&tx_chn->tx_hrtimer,
-+				      ns_to_ktime(tx_chn->tx_pace_timeout),
-+				      HRTIMER_MODE_REL_PINNED);
-+		} else {
-+			enable_irq(tx_chn->irq);
-+		}
-+	}
- 
- 	return 0;
- }
-@@ -1705,6 +1744,8 @@ static int am65_cpsw_nuss_ndev_add_tx_napi(struct am65_cpsw_common *common)
- 
- 		netif_napi_add_tx(common->dma_ndev, &tx_chn->napi_tx,
- 				  am65_cpsw_nuss_tx_poll);
-+		hrtimer_init(&tx_chn->tx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-+		tx_chn->tx_hrtimer.function = &am65_cpsw_nuss_tx_timer_callback;
- 
- 		ret = devm_request_irq(dev, tx_chn->irq,
- 				       am65_cpsw_nuss_tx_irq,
-@@ -1930,6 +1971,8 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 
- 	netif_napi_add(common->dma_ndev, &common->napi_rx,
- 		       am65_cpsw_nuss_rx_poll);
-+	hrtimer_init(&common->rx_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
-+	common->rx_hrtimer.function = &am65_cpsw_nuss_rx_timer_callback;
- 
- 	ret = devm_request_irq(dev, rx_chn->irq,
- 			       am65_cpsw_nuss_rx_irq,
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-index 1e4a045057fc..7da0492dc091 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -75,6 +75,8 @@ struct am65_cpsw_tx_chn {
- 	struct k3_cppi_desc_pool *desc_pool;
- 	struct k3_udma_glue_tx_channel *tx_chn;
- 	spinlock_t lock; /* protect TX rings in multi-port mode */
-+	struct hrtimer tx_hrtimer;
-+	unsigned long tx_pace_timeout;
- 	int irq;
- 	u32 id;
- 	u32 descs_num;
-@@ -138,6 +140,8 @@ struct am65_cpsw_common {
- 	struct napi_struct	napi_rx;
- 
- 	bool			rx_irq_disabled;
-+	struct hrtimer		rx_hrtimer;
-+	unsigned long		rx_pace_timeout;
- 
- 	u32			nuss_ver;
- 	u32			cpsw_ver;
--- 
-2.34.1
-
+>
+> >reviewers would deal with it. Thoughts?
+> >
+> >Note: The code machinery is really repeatable; for example if you look
+> >at the tables control you will see very similar patterns to actions
+> >etc. i.e spending time to review one will make it easy for the rest.
+> >
+> >cheers,
+> >jamal
+> >
+> >> [...]
 
