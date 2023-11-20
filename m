@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-49092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BD87F0C4E
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:02:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A6B7F0C51
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A6BA2812F9
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:02:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 851281C20E27
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 07:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7606FA5;
-	Mon, 20 Nov 2023 07:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67DC63C0;
+	Mon, 20 Nov 2023 07:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="BFOFMem4"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="gvhZSfHr"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DB721989
-	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:34 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-3316bb1303bso1586039f8f.0
-        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:34 -0800 (PST)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BA119A6
+	for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:36 -0800 (PST)
+Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-32d81864e3fso2513842f8f.2
+        for <netdev@vger.kernel.org>; Sun, 19 Nov 2023 23:01:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1700463692; x=1701068492; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1700463695; x=1701068495; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nkcJv/n25yVcOiFtcSZqk6XZG7ziIP0OV/0d8NOsfDc=;
-        b=BFOFMem4itbBhisA6WH4jN48nS0ZNRBh4t2Ptd7TZzo2t1IaLM4ZkLR/KdJ7J+6dtJ
-         mLYKQ68WxQSsh9oRdyez6fXFQ4vLpSNpfWrv7LB5e5LEEYDu6dAqg3ZRk64QAKu8Tpf7
-         OZbNPzLsSIWUzCQ9X3ySLxMGb71G/m6Auu6SGey0pmBBsdC+PRcTv4OZJfeyvrZmgS4G
-         VbvLDHus6g4o2CQWPnHEa0inuwtU19h3NzPu96s3xVqupDaSRwjEXgoRPBAQbUStiHoG
-         ieSey+YhM1+7rWs/f6mx6w2RJnWTD+3Mx5VuWceh6Q+WbfcjAHucjwnzZmmPEVkziNyj
-         YODA==
+        bh=1yFiK0NYk7EGIuf8SEqCXaymTTx+naIJSOZMfzmUUGc=;
+        b=gvhZSfHr9dZaSElx5dbxLYdnQ3ymh01YZ4Eqt3Y5Lx3NDHtvCzrT117Xe7DinFXfKA
+         j79pBaKT0tgjxiyCPMHboU5Cr/8n4Gl0yWdG65VfU7qHEpxPUPy9TUvQ3mlxmiMH/v1u
+         SZf13pD/9rSBEeRMd4exUYQMzpknJjzvTcctiqCQojVggF49qF5wZGFw1mYoQHLCEqQz
+         +3KZCf0yVZ82qVoJP0m0B6C1nos2KHCQcSxWOSvXgaflXZH5OrbD8hz2V5QahXA5WKy9
+         +L1exMmspO1hrdkgYr8DKlk0ZrVVoR0FDjUbGxYZwrioFaYEDwTh11fnfCZ3woOs5ZMr
+         CaBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700463692; x=1701068492;
+        d=1e100.net; s=20230601; t=1700463695; x=1701068495;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nkcJv/n25yVcOiFtcSZqk6XZG7ziIP0OV/0d8NOsfDc=;
-        b=dtVf9p+9q62vVA1hLTpNMgyteZPlRpU2/vFtUlaK/VXbSJNDwcBZYevlMazzi63ABQ
-         xLvwmAlszRtmmeqgnnuKMf/b/mXMVSHTUYg62OPgK2j7kfHQHzS8+cWuDOpOO+8wfuB1
-         eZqbZr90ppo/HJ7O0GC8TWZBumyTHNU+Hevt2cpI48pIpVN27qhqwLZn5xEht/Heh9dJ
-         PgvwFKa9a28m31LHt+YWbZM34JWdj3zSZfrGymj/E8QamURWMJAe/cGMTawNC10iYaaA
-         GkMZgQoGUvsVZb9fK+UMXFsPI/FhOKiKvnBJeP+MlSW6CVUTVwJhTHfnKJCL72LEV968
-         Lotw==
-X-Gm-Message-State: AOJu0YwamiTQBwWt2LSLxGk5caHiNSDnW6oxaauGdq5cgCsb7FW5GAKH
-	CADo9smBKCK6yVXgIIr3j/j7NA==
-X-Google-Smtp-Source: AGHT+IEBLuefbg1njE14kEGbqq0fRVMDaq5GwcjTSHn9CnqkZZMPo7YgEjo/NJi89a64TaVjABT6og==
-X-Received: by 2002:adf:e98d:0:b0:31f:9838:dfc4 with SMTP id h13-20020adfe98d000000b0031f9838dfc4mr3893259wrm.33.1700463692126;
-        Sun, 19 Nov 2023 23:01:32 -0800 (PST)
+        bh=1yFiK0NYk7EGIuf8SEqCXaymTTx+naIJSOZMfzmUUGc=;
+        b=dKEnp1OqRzJy+9d2ni8KjKLoy8KvQr3bPlfKllQx1xQISsypitotAEoEZNK7Q4qBCT
+         CkpQt6uMXBtTAJxOZ+YBcC2q86oN934ZcTnmADU5KSUa9pi5jyHxaw+AEoJErGRyNv1T
+         PA3sf338HjFHfrGw6NrqOyUvPPYek+UqjLHhFWReqzhI+wWw6LaztEV/GD3NKmAXtkeB
+         HIlcOtmcw5UVI+8cwxQR4RDkkM95cERdmdAVpMXEOCtR3uOH/ySeCyPbwJHhiJn/Pbu5
+         AK58nSIa99aARVmSEzIsRjBHm4J2D/PYqfD8+tj/kfr4emNfqZprN9QHL60LlKchLKZJ
+         N0/Q==
+X-Gm-Message-State: AOJu0YzbCkwxrhsaVrrHA4HOVia7z0KRM5zDrYtxcVCK0BAPDoZJSr63
+	K9twN5vPASLziBm+OYdRQot01g==
+X-Google-Smtp-Source: AGHT+IHFhn4rk06q1oY1f3B4pJ5xJnFUhqo1ZH0o2iwWyO79GIKvQxqOYw64f2oyrMqqXwmSG8nMAQ==
+X-Received: by 2002:adf:e912:0:b0:32d:8e54:29f7 with SMTP id f18-20020adfe912000000b0032d8e5429f7mr4002366wrm.64.1700463694977;
+        Sun, 19 Nov 2023 23:01:34 -0800 (PST)
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.183])
-        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.29
+        by smtp.gmail.com with ESMTPSA id p2-20020a5d4582000000b003316d1a3b05sm8777667wrq.78.2023.11.19.23.01.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Nov 2023 23:01:31 -0800 (PST)
+        Sun, 19 Nov 2023 23:01:34 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -89,9 +89,9 @@ Cc: linux-renesas-soc@vger.kernel.org,
 	linux-gpio@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH 10/14] arm64: renesas: r9a08g045: Add Ethernet nodes
-Date: Mon, 20 Nov 2023 09:00:20 +0200
-Message-Id: <20231120070024.4079344-11-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH 11/14] arm64: renesas: rzg3s-smarc-som: Invert the logic for SW_SD2_EN macro
+Date: Mon, 20 Nov 2023 09:00:21 +0200
+Message-Id: <20231120070024.4079344-12-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20231120070024.4079344-1-claudiu.beznea.uj@bp.renesas.com>
@@ -105,56 +105,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Add Ethernet nodes available on RZ/G3S (R9A08G045).
+The intention of SW_SD2_EN macro was to reflect the state of SW_CONFIG3
+switch available on RZ/G3S Smarc Module. According to documentation SD2
+is enabled when switch is in OFF state. For this, changed the logic of
+marco to map value 0 to switch's OFF state and value 1 to switch's ON
+state. Along with this update the description for each state for better
+understanding.
 
+The value of SW_SD2_EN macro was not changed in file because, according to
+documentation, the default state for this switch is ON.
+
+Fixes: adb4f0c5699c ("arm64: dts: renesas: Add initial support for RZ/G3S SMARC SoM")
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 ---
- arch/arm64/boot/dts/renesas/r9a08g045.dtsi | 32 ++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-index 6c7b29b69d0e..1caa0587fdd4 100644
---- a/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-+++ b/arch/arm64/boot/dts/renesas/r9a08g045.dtsi
-@@ -149,6 +149,38 @@ sdhi2: mmc@11c20000 {
- 			status = "disabled";
- 		};
+diff --git a/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi b/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+index 01a4a9da7afc..275b14acd2ee 100644
+--- a/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg3s-smarc-som.dtsi
+@@ -14,8 +14,8 @@
+  *	0 - SD0 is connected to eMMC
+  *	1 - SD0 is connected to uSD0 card
+  * @SW_SD2_EN:
+- *	0 - SCIF1, SSI0, IRQ0, IRQ1 connected to SoC
+- *	1 - SD2 is connected to SoC
++ *	0 - (switch OFF) SD2 is connected to SoC
++ *	1 - (switch ON)  SCIF1, SSI0, IRQ0, IRQ1 connected to SoC
+  */
+ #define SW_SD0_DEV_SEL	1
+ #define SW_SD2_EN	1
+@@ -25,7 +25,7 @@ / {
  
-+		eth0: ethernet@11c30000 {
-+			compatible = "renesas,r9a08g045-gbeth", "renesas,rzg2l-gbeth";
-+			reg = <0 0x11c30000 0 0x10000>;
-+			interrupts = <GIC_SPI 68 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "mux", "fil", "arp_ns";
-+			clocks = <&cpg CPG_MOD R9A08G045_ETH0_CLK_AXI>,
-+				 <&cpg CPG_MOD R9A08G045_ETH0_CLK_CHI>,
-+				 <&cpg CPG_MOD R9A08G045_ETH0_REFCLK>;
-+			clock-names = "axi", "chi", "refclk";
-+			resets = <&cpg R9A08G045_ETH0_RST_HW_N>;
-+			power-domains = <&cpg>;
-+			status = "disabled";
-+		};
-+
-+		eth1: ethernet@11c40000 {
-+			compatible = "renesas,r9a08g045-gbeth", "renesas,rzg2l-gbeth";
-+			reg = <0 0x11c40000 0 0x10000>;
-+			interrupts = <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
-+				     <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
-+			interrupt-names = "mux", "fil", "arp_ns";
-+			clocks = <&cpg CPG_MOD R9A08G045_ETH1_CLK_AXI>,
-+				 <&cpg CPG_MOD R9A08G045_ETH1_CLK_CHI>,
-+				 <&cpg CPG_MOD R9A08G045_ETH1_REFCLK>;
-+			clock-names = "axi", "chi", "refclk";
-+			resets = <&cpg R9A08G045_ETH1_RST_HW_N>;
-+			power-domains = <&cpg>;
-+			status = "disabled";
-+		};
-+
- 		gic: interrupt-controller@12400000 {
- 			compatible = "arm,gic-v3";
- 			#interrupt-cells = <3>;
+ 	aliases {
+ 		mmc0 = &sdhi0;
+-#if SW_SD2_EN
++#if !SW_SD2_EN
+ 		mmc2 = &sdhi2;
+ #endif
+ 	};
+@@ -116,7 +116,7 @@ &sdhi0 {
+ };
+ #endif
+ 
+-#if SW_SD2_EN
++#if !SW_SD2_EN
+ &sdhi2 {
+ 	pinctrl-0 = <&sdhi2_pins>;
+ 	pinctrl-names = "default";
 -- 
 2.39.2
 
