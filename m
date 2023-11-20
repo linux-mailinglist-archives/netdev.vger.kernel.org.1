@@ -1,99 +1,116 @@
-Return-Path: <netdev+bounces-49378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AA67F1DA5
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:00:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60B267F1DAA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 21:01:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7164D1F23819
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 253092828D0
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 20:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76C5337145;
-	Mon, 20 Nov 2023 20:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FB037154;
+	Mon, 20 Nov 2023 20:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="hFNekEaR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5qECeYs"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.168])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBBB7AA
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 12:00:46 -0800 (PST)
-X-KPN-MessageId: 753e81d8-87df-11ee-b097-005056aba152
-Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 753e81d8-87df-11ee-b097-005056aba152;
-	Mon, 20 Nov 2023 21:00:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=koJ4NwFrkgltfcs3Z+z3lRHPXaiC2cO6U3kNrXAsod8=;
-	b=hFNekEaRZino3MGBkmRoKiJE1xK2mlzQWLgK9s4VM2LZPX8MyI3GyR4UaR7bcrctb8KILIrp2Z1of
-	 j3Ya62agWvaMHxHF3qPy1lWDPkjWvgnhDrBQnDqQmpYHow9uGnShVlpkr0yeNgEO43YM8QyJtAbPlG
-	 01XPq9gXunHV/30Y=
-X-KPN-MID: 33|gvCesEb7+NjDLNv/axqviVy69+WCxGxYN/zaRIHL9o2CRKz/uHstBHSPsXtV30H
- DggdJXduRaNNn4dCmdkANpZOGlZ2M5aRD1avnkWntbLk=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|VcBONr9d9f/oP+v4DJ0XWQKmtC9N9CiyxEZZneKfTnjVQQ7pJnBwHHOPrlorn6P
- LNJVwF9sFQ1Jo6g+mXCyqrg==
-X-Originating-IP: 213.10.186.43
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 7cba2e88-87df-11ee-a7b1-005056ab7447;
-	Mon, 20 Nov 2023 21:00:44 +0100 (CET)
-Date: Mon, 20 Nov 2023 21:00:43 +0100
-From: Antony Antony <antony@phenome.org>
-To: Christian Hopps <chopps@labn.net>
-Cc: Andrew Cagney <andrew.cagney@gmail.com>, devel@linux-ipsec.org,
-	netdev@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [DKIM] Re: [devel-ipsec] [RFC ipsec-next v2 0/8] Add IP-TFS mode
- to xfrm
-Message-ID: <ZVu668MJ2iEr4fRG@Antony2201.local>
-References: <20231113035219.920136-1-chopps@chopps.org>
- <ZVHNI7NaK/KtABIL@gauss3.secunet.de>
- <CAJeAr6t_k32cqnzxqeuF8Kca6Q4w1FrDbKYABptKGz+HYAkyCw@mail.gmail.com>
- <m21qck1cxz.fsf@ja.int.chopps.org>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10DC419BC2;
+	Mon, 20 Nov 2023 20:01:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E2FDC433C8;
+	Mon, 20 Nov 2023 20:01:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700510472;
+	bh=xhLK50jLAz04UHazu67omTgum5sysPJRblqRFVwcoQM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=k5qECeYsVfWze77kgqY/oCQAC1fqRDNultn3l8W2z1cbdec99TBye+DVRcUkhJuJA
+	 0vP2dfmOjTqCYKFYdUMfngUr3LKDT7iO0xvPAcNZSZk/FkprASJhzqvOOD2VPT9JQ/
+	 /5IVwLlZfHuFpqGBj1SDVJMDJkNUnSq6gHr5fmPMm1sWq/0Cme2ipthhdB7Ke3Iulb
+	 x/cvEPsJW91cHAP8KriLIkreYSov0UPTSUvv+xvqzCK2RF6qumRKLo/5GUCk+k7GVv
+	 5jZuN5qZmIGo1/8fJsQO//3U270ky986bQJSTHia1yzwxqGuhQha44yRpPthEWGFVc
+	 eqp2dRfCXhTZA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	Jakub Kicinski <kuba@kernel.org>,
+	corbet@lwn.net,
+	workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net] docs: netdev: try to guide people on dealing with silence
+Date: Mon, 20 Nov 2023 12:01:09 -0800
+Message-ID: <20231120200109.620392-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <m21qck1cxz.fsf@ja.int.chopps.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 20, 2023 at 01:39:50PM -0500, Christian Hopps via Devel wrote:
-> 
-> Andrew Cagney <andrew.cagney@gmail.com> writes:
-> 
-> > > I did a multiple days peer review with Chris on this pachset. So my
-> > > concerns are already addressed.
-> > > 
-> > > Further reviews are welcome! This is a bigger change and it would
-> > > be nice if more people could look at it.
-> > 
-> > I have a usability question.  What name should appear when a user
-> > interacts with and sees log messages from this feature?
-> >     ip-tfs, IP-TFS, IP_TFS
-> > or:
-> >    iptfs, IPTFS, ...
-> 
-> I think no `-` or `_` in the code/api. For documentation it is probably better to hew closer to the RFC and use `IP-TFS`.
+There has been more than a few threads which went idle before
+the merge window and now people came back to them and started
+asking about next steps.
 
-That sounds good. However,
-iproute2 output, ip xfrm state, or "ip xfrm policy" is that documentation or code?
+We currently tell people to be patient and not to repost too
+often. Our "not too often", however, is still a few orders of
+magnitude faster than other subsystems. Or so I feel after
+hearing people talk about review rates at LPC.
 
-current unsubmitted patch shows: "iptfs"
+Clarify in the doc that if the discussion went idle for a week
+on netdev, 95% of the time there's no point waiting longer.
 
-src 192.1.2.23 dst 192.1.2.45
-	proto esp spi 0x76ee6b87(1995336583) reqid 16389(0x00004005) mode iptfs
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2:
+ - rephrase the first paragraph
+v1: https://lore.kernel.org/all/20231118152232.787e9ea2@kernel.org/
 
-root@west:/testing/pluto/ikev2-74-iptfs-01 (iptfs-aa-20231120)# ip  x p
-src 192.0.1.0/24 dst 192.0.2.0/24
-	dir out priority 1757393 ptype main
-	tmpl src 192.1.2.45 dst 192.1.2.23
-		proto esp reqid 16389 mode iptfs
+CC: corbet@lwn.net
+CC: workflows@vger.kernel.org
+CC: linux-doc@vger.kernel.org
+---
+ Documentation/process/maintainer-netdev.rst | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
--antony
+diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+index 7feacc20835e..84ee60fceef2 100644
+--- a/Documentation/process/maintainer-netdev.rst
++++ b/Documentation/process/maintainer-netdev.rst
+@@ -193,9 +193,23 @@ Review timelines
+ Generally speaking, the patches get triaged quickly (in less than
+ 48h). But be patient, if your patch is active in patchwork (i.e. it's
+ listed on the project's patch list) the chances it was missed are close to zero.
+-Asking the maintainer for status updates on your
+-patch is a good way to ensure your patch is ignored or pushed to the
+-bottom of the priority list.
++
++The high volume of development on netdev makes reviewers move on
++from discussions relatively quickly. New comments and replies
++are very unlikely to arrive after a week of silence. If a patch
++is no longer active in patchwork and the thread went idle for more
++than a week - clarify the next steps and/or post the next version.
++
++For RFC postings specifically, if nobody responded in a week - reviewers
++either missed the posting or have no strong opinions. If the code is ready,
++repost as a PATCH.
++
++Emails saying just "ping" or "bump" are considered rude. If you can't figure
++out the status of the patch from patchwork or where the discussion has
++landed - describe your best guess and ask if it's correct. For example::
++
++  I don't understand what the next steps are. Person X seems to be unhappy
++  with A, should I do B and repost the patches?
+ 
+ .. _Changes requested:
+ 
+-- 
+2.42.0
+
 
