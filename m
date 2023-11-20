@@ -1,131 +1,214 @@
-Return-Path: <netdev+bounces-49229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 306B57F1423
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:16:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FFE57F1425
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 14:16:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62C831C20FC9
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:16:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF97C1C21531
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 13:16:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1457182A0;
-	Mon, 20 Nov 2023 13:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF351A727;
+	Mon, 20 Nov 2023 13:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LjntltSi"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LPp30pGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCF7F7;
-	Mon, 20 Nov 2023 05:16:04 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-32faea0fa1fso2521630f8f.1;
-        Mon, 20 Nov 2023 05:16:04 -0800 (PST)
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F435112
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:16:07 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id 4fb4d7f45d1cf-548696eac92so2982210a12.3
+        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 05:16:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1700486163; x=1701090963; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=X7rYESumyoHA+3OjYLlWpPoNiAXnvgYxNGxcQD7theY=;
-        b=LjntltSiwd5fVAQ+LoTCzOqNscxspe91SWRZ15AIYLYTarZ9KKOe66h5ohaI0AwNgm
-         ZGUuBpIkQlzTecwW+y/3ClbfrAGsWQZ9nl1vUgDIEPOyvxMnWbiIletrXrrOzS1eFUwD
-         SRcpd6ayU6kkqH80vzxVqQjf1roD5m5kz0YBMq9jn0pRwh3gnSa0BmjX9+f+kxqcU1Sr
-         KOlWtpWu0MLrPl5IyqEvfnFonuGKJjDhsapb/mfxMWNp2LFJWYP+2m5hRJh+4eM4CQ+x
-         CKDvfln2cjSk49CXdoqsoOl07AXmW1zt2oMa/2IYR5p2g8+uRadIz/dlEpz7O2CYZ8tN
-         9R3g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700486165; x=1701090965; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=paXWmZJjkzeTHk9KbxsJ5PCYxiV+9eLWIGBAJo/o7w8=;
+        b=LPp30pGP66A+V3hrUWdHnljY/Jl8ueyxCPhErg80swGZg5aDtQzOB5W16XnLYWRaoV
+         0Ihe0MgX/9gNPDc8o8ylxQKR2kG6C6rcQy2i5nbfBwmtHTI9xejFC5L1EJuFyWBLYeul
+         diLNn31VQtxhw2/980OGnVWn+iJmY4baHgcV7hFTdPBTX+PIe1/jUP2djP4XCOuH5rcF
+         QBPm7oxwv/n16I+ldw209C8ZVqnpfwOm/g8bPrYfMQgbxR9KYriAHB43v0xv4BAMjOyd
+         sPCtG8mlmMzhojO2f+M16ze2SJz2KgYiA7wJfeAJ7uJB89xtTtb+qXBaLfjDCUZhstuM
+         vybg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700486163; x=1701090963;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X7rYESumyoHA+3OjYLlWpPoNiAXnvgYxNGxcQD7theY=;
-        b=OzvdXfB45xgYZeSmwWD5nfxMlUVyiKWRJHLtlsbHyAm2VO5R6L1f4z2H+h1wypzY6j
-         52LLvmVx+c4c1tzScNjbg6tl+ITbCEjIXfbtCyIqMwAOuoSs30liHIiNzc3bkWUBK5PQ
-         u3fJNz7F6t67HawdPyPbfQbfE5rtbRAkHXhTrrvHV+GnDmet7I5EOhC860ZkRPWGyfcW
-         MRuCaUsjg+RYI0LKwDZTTvD0OUbchWpbf62IdXJ9aMyewnb3RqB5hnxcmgtSxBjmRnA8
-         wiMRV4DvymZtbgEcKU4S6GIwPyEUKsdA/iTD4ThL5pUFJ6uSRpM1LG3y7j95G/GqlFqk
-         WFxg==
-X-Gm-Message-State: AOJu0YzS9fpsxN/52jizAuC5drjbOdQhL9jO9mA53ZdJOqQYgzvabhie
-	+bXMQd6LnUfY23TTa+kg2CM=
-X-Google-Smtp-Source: AGHT+IG6s1Jds+Zuru44pKEyKGL05CUjKqyizG986Dljc4Lv0QX6uapDHZLi4cDI1GqwQMM4JsVB1g==
-X-Received: by 2002:adf:d1ca:0:b0:331:6a14:b8d5 with SMTP id b10-20020adfd1ca000000b003316a14b8d5mr7650035wrd.29.1700486162654;
-        Mon, 20 Nov 2023 05:16:02 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id x11-20020adff0cb000000b00332cb4697ebsm1263592wro.55.2023.11.20.05.16.01
+        d=1e100.net; s=20230601; t=1700486165; x=1701090965;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=paXWmZJjkzeTHk9KbxsJ5PCYxiV+9eLWIGBAJo/o7w8=;
+        b=XMrvYM1Z8Ura2+8QPI2d/J5dSFpAKiw2ZnM9W1yFddU+nAthieMWe9fxMyWXh9X2a5
+         kB1OmFYgCA7Aqg49lFd/ORQPiJc3fANJ2yKLgD56Ht672hpJLBXqrXCRgbhAkL19sxYm
+         mm54JWJZV/nd4a/89JiuwoJZMc3+8BpHuoCPLJLgou1DXLSii4elWJDDswgyEantsR2X
+         yM+LsDJpnUsCO05EiruMiSOn69MW6IIMknZs/LYW+z2ZTx/TmdsOZ9snPOwL3aa/pkwQ
+         dEj8Ih0uXC+oHQp4kp5X98G+8ITOSyVVLa7qSBqc5QFgLFVRIOiFsga0iMG5/UD3y7Ib
+         3GSw==
+X-Gm-Message-State: AOJu0Yzz3SZ+JflXjN4Kryp31B/TQmeTZSPEifKcC2Rv09cb2dNZHlWJ
+	bYTJ/9R7+EqqAsB3C0aD3ZA/Ow==
+X-Google-Smtp-Source: AGHT+IEWyPu++B3DE+4d8255KgTG/8MpKf+RTbXjZHmp0gcLahMNvhvPxYv5IOqWBy5p1Lr9nmPYfQ==
+X-Received: by 2002:a05:6402:2d7:b0:53d:b59c:8f91 with SMTP id b23-20020a05640202d700b0053db59c8f91mr5458780edx.27.1700486165430;
+        Mon, 20 Nov 2023 05:16:05 -0800 (PST)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id o9-20020a509b09000000b0053deb97e8e6sm3732932edi.28.2023.11.20.05.16.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Nov 2023 05:16:02 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH] net: phy: correctly check soft_reset ret ONLY if defined for PHY
-Date: Mon, 20 Nov 2023 14:15:40 +0100
-Message-Id: <20231120131540.9442-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.40.1
+        Mon, 20 Nov 2023 05:16:04 -0800 (PST)
+Date: Mon, 20 Nov 2023 14:16:03 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com,
+	anjali.singhai@intel.com, namrata.limaye@intel.com, tom@sipanda.io,
+	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
+	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
+	daniel@iogearbox.net, bpf@vger.kernel.org, khalidm@nvidia.com,
+	toke@redhat.com, mattyk@nvidia.com, David Ahern <dsahern@gmail.com>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: Re: [PATCH net-next v8 09/15] p4tc: add template pipeline create,
+ get, update, delete
+Message-ID: <ZVtcEwICZHsTtija@nanopsycho>
+References: <20231116145948.203001-1-jhs@mojatatu.com>
+ <20231116145948.203001-10-jhs@mojatatu.com>
+ <ZVY/GBIC4ckerGSc@nanopsycho>
+ <CAM0EoMkdOnvzK3J1caSeKzVj+h-XrkLPfsfwRCS_udHem-C29g@mail.gmail.com>
+ <ZVsWP29UyIzg4Jwq@nanopsycho>
+ <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM0EoM=nANF_-HaMKmk0j6JXqGeuEUZVU3fxZp4VoB9GzZwjUQ@mail.gmail.com>
 
-soft_reset call for phy_init_hw had multiple revision across the years
-and the implementation goes back to 2014. Originally was a simple call
-to write the generic PHY reset BIT, it was then moved to a dedicated
-function. It was then added the option for PHY driver to define their
-own special way to reset the PHY. Till this change, checking for ret was
-correct as it was always filled by either the generic reset or the
-custom implementation. This changed tho with commit 6e2d85ec0559 ("net:
-phy: Stop with excessive soft reset"), as the generic reset call to PHY
-was dropped but the ret check was never made entirely optional and
-dependent whether soft_reset was defined for the PHY driver or not.
+Mon, Nov 20, 2023 at 01:48:14PM CET, jhs@mojatatu.com wrote:
+>On Mon, Nov 20, 2023 at 3:18 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Fri, Nov 17, 2023 at 01:09:45PM CET, jhs@mojatatu.com wrote:
+>> >On Thu, Nov 16, 2023 at 11:11 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >>
+>> >> Thu, Nov 16, 2023 at 03:59:42PM CET, jhs@mojatatu.com wrote:
+>> >>
+>> >> [...]
+>> >>
+>> >>
+>> >> >diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
+>> >> >index ba32dba66..4d33f44c1 100644
+>> >> >--- a/include/uapi/linux/p4tc.h
+>> >> >+++ b/include/uapi/linux/p4tc.h
+>> >> >@@ -2,8 +2,71 @@
+>> >> > #ifndef __LINUX_P4TC_H
+>> >> > #define __LINUX_P4TC_H
+>> >> >
+>> >> >+#include <linux/types.h>
+>> >> >+#include <linux/pkt_sched.h>
+>> >> >+
+>> >> >+/* pipeline header */
+>> >> >+struct p4tcmsg {
+>> >> >+      __u32 pipeid;
+>> >> >+      __u32 obj;
+>> >> >+};
+>> >>
+>> >> I don't follow. Is there any sane reason to use header instead of normal
+>> >> netlink attribute? Moveover, you extend the existing RT netlink with
+>> >> a huge amout of p4 things. Isn't this the good time to finally introduce
+>> >> generic netlink TC family with proper yaml spec with all the benefits it
+>> >> brings and implement p4 tc uapi there? Please?
+>> >>
+>> >
+>> >Several reasons:
+>> >a) We are similar to current tc messaging with the subheader being
+>> >there for multiplexing.
+>>
+>> Yeah, you don't need to carry 20year old burden in newly introduced
+>> interface. That's my point.
+>
+>Having a demux sub header is 20 year old burden? I didnt follow.
 
-Luckly nothing was ever added before the soft_reset call so the ret
-check (in the case where a PHY didn't had soft_reset defined) although
-wrong, never caused problems as ret was init 0 at the start of
-phy_init_hw.
+You don't need the header, that's my point.
 
-To prevent any kind of problem and to make the function cleaner and more
-robust, correctly move the ret check if the soft_reset section making it
-optional and needed only with the function defined.
 
-Fixes: 6e2d85ec0559 ("net: phy: Stop with excessive soft reset")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/phy_device.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+>
+>>
+>> >b) Where does this leave iproute2? +Cc David and Stephen. Do other
+>> >generic netlink conversions get contributed back to iproute2?
+>>
+>> There is no conversion afaik, only extensions. And they has to be,
+>> otherwise the user would not be able to use the newly introduced
+>> features.
+>
+>The big question is does the collective who use iproute2 still get to
+>use the same tooling or now they have to go and learn some new
+>tooling. I understand the value of the new approach but is it a
+>revolution or an evolution? We opted to put thing in iproute2 instead
+>for example because that is widely available (and used).
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 2ce74593d6e4..478126f6b5bc 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -1235,14 +1235,13 @@ int phy_init_hw(struct phy_device *phydev)
- 
- 	if (phydev->drv->soft_reset) {
- 		ret = phydev->drv->soft_reset(phydev);
-+		if (ret < 0)
-+			return ret;
-+
- 		/* see comment in genphy_soft_reset for an explanation */
--		if (!ret)
--			phydev->suspended = 0;
-+		phydev->suspended = 0;
- 	}
- 
--	if (ret < 0)
--		return ret;
--
- 	ret = phy_scan_fixups(phydev);
- 	if (ret < 0)
- 		return ret;
--- 
-2.40.1
+I don't see why iproute2 user facing interface would be any different
+depending on if you user RTnetlink or genetlink as backend channel...
 
+
+>
+>>
+>> >c) note: Our API is CRUD-ish instead of RPC(per generic netlink)
+>> >based. i.e you have:
+>> > COMMAND <PATH/TO/OBJECT> [optional data]  so we can support arbitrary
+>> >P4 programs from the control plane.
+>>
+>> I'm pretty sure you can achieve the same over genetlink.
+>>
+>
+>I think you are right.
+>
+>>
+>> >d) we have spent many hours optimizing the control to the kernel so i
+>> >am not sure what it would buy us to switch to generic netlink..
+>>
+>> All the benefits of ynl yaml tooling, at least.
+>>
+>
+>Did you pay close attention to what we have? The user space code is
+>written once into iproute2 and subsequent to that there is no
+>recompilation  of any iproute2 code. The compiler generates a json
+>file specific to a P4 program which is then introspected by the
+>iproute2 code.
+
+Right, but in real life, netlink is used directly by many apps. I don't
+see why this is any different.
+
+Plus, the very best part of yaml from user perpective I see is,
+you just need the kernel-git yaml file and you can submit all commands.
+No userspace implementation needed.
+
+
+>
+>
+>cheers,
+>jamal
+>
+>>
+>> >
+>> >cheers,
+>> >jamal
+>> >
+>> >>
+>> >> >+
+>> >> >+#define P4TC_MAXPIPELINE_COUNT 32
+>> >> >+#define P4TC_MAXTABLES_COUNT 32
+>> >> >+#define P4TC_MINTABLES_COUNT 0
+>> >> >+#define P4TC_MSGBATCH_SIZE 16
+>> >> >+
+>> >> > #define P4TC_MAX_KEYSZ 512
+>> >> >
+>> >> >+#define TEMPLATENAMSZ 32
+>> >> >+#define PIPELINENAMSIZ TEMPLATENAMSZ
+>> >>
+>> >> ugh. A prefix please?
+>> >>
+>> >> pw-bot: cr
+>> >>
+>> >> [...]
 
