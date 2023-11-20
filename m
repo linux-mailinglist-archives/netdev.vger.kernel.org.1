@@ -1,171 +1,193 @@
-Return-Path: <netdev+bounces-49198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A6B7F112D
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:01:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CD67F1144
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 12:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C8A61F23AF8
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:01:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D3C91F20FA7
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 11:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9AC125BB;
-	Mon, 20 Nov 2023 11:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2AE12B71;
+	Mon, 20 Nov 2023 11:05:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OONPdmZ1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sp5o9nfw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DC9B10C
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 03:01:30 -0800 (PST)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2c87adce180so16691511fa.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 03:01:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1700478088; x=1701082888; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8PPW06YC38erq8SZWtv+ncf66iEcbQv3rHXBqyT0lxI=;
-        b=OONPdmZ1Yiv1fuSttkzmSfdEaygm7Oz6P1uEM1iBmrP9C/zMyf+VOuVL2tmNdhcDvX
-         K2zY+U2A5aIJ+mngg9/K7fLtmg6vDRgF8KKcDqcPdNSh6epIqvAytnt35JgZchJBnN7z
-         UtH3Aisk7IAr1maAbKJGNlx3/52piaq3ButxyH/7bfm3mg445rir59Abx9RieW2eKnxF
-         1X4rJijFScvemdVc8eX8fjX5dTS1ei4fPdLsV5FljGDNC1aeJcckhbu1atWvVOdeLDRY
-         4pirimsf97CzoxTiS7a+f6f+ZjHSyk0Y3BzAVdw7HlatsHmo1RfhkrYbzQY6F6NkLphf
-         /SlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700478088; x=1701082888;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8PPW06YC38erq8SZWtv+ncf66iEcbQv3rHXBqyT0lxI=;
-        b=cDdJ253gLeJuqB0i5tmM7ce3mTYpru0UBrp+KyccREf9iAKRFkHo8NvPyUkpWb8T/f
-         ViYRjipRlBrPtPuSN68ED1BaFWpAd5aXg4Jbc+3VG3beqIXPw2ZZOF4XKbLLiEr8LDq3
-         EG4RCa/mtY2rNNoeJ085P5BSjFYAFyvdPYs8LQHPce1lP3yHRmuUgN4y9rwcnvRY/0Wk
-         V2glraZ2443tmnAbMgiT0Za6WXvynxLDa4J1QnRZSRHytzx9PzEaB726Iw+WdGKrpkX+
-         2jMKHPVJJM3CfmqnXsTqxvkfe8IWRHkN97ovCehcXrGbXMwNFyHq5lDQS5jnohhHP7Pz
-         19fQ==
-X-Gm-Message-State: AOJu0Ywk1pJ2W4sBAozu4TOjyiVM1HMpQH1I1yRPqOFaoPsIIuEni+za
-	wZNmvLYFjj+wOMO68p9APCjsoZTqGXnq9yxTrCQHUw==
-X-Google-Smtp-Source: AGHT+IGqrl+BKwsuiltU8GvpE7zptGLvkTub9X/9cMNcMb3F3anQAwtf3Dxg4wx6drjoVWqrc6khwBJvqgi+N0M4OTM=
-X-Received: by 2002:a2e:b60c:0:b0:2ba:6519:c50f with SMTP id
- r12-20020a2eb60c000000b002ba6519c50fmr4938095ljn.52.1700478088590; Mon, 20
- Nov 2023 03:01:28 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00ECC9D;
+	Mon, 20 Nov 2023 03:05:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700478305; x=1732014305;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jCN1ZXjJQAjwPakA/BMyE0wF8PHfwDwgb/JQxyLX2N0=;
+  b=Sp5o9nfwu4S8bGycFuQ9oHYr7MVfN7CPxpoSWCk9OCMaOwd0TBUIW+kG
+   dbyPNYQ/5oFn6knr4hGyR31FL/YSUxV+MC41w4XHPRu4RhG075f868RNy
+   beuKx7YJP4Bh5gan/5de23/Pl+ZWv2YTDIjJ5r2wXDNi6mYpuVM1qAEv4
+   KDdznKQ+yTjQteEQyEYkNDgTCPGFEg2iId+lYLIdZ69/Q3JYfkiL1WGFj
+   LX9CbLrR9BYQmV7ZDEHEn/MbiYbjXsGfx8XJ3LL/YazbGEpO7kvM9bZq2
+   RcdBoJvzdCUy6/6oBUhmVFiLtZ/c7QrBjOr9Ka5v+ffy2A95nRWq5Qr+W
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="370941677"
+X-IronPort-AV: E=Sophos;i="6.04,213,1695711600"; 
+   d="scan'208";a="370941677"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 03:05:04 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10899"; a="889890339"
+X-IronPort-AV: E=Sophos;i="6.04,213,1695711600"; 
+   d="scan'208";a="889890339"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Nov 2023 03:05:04 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 20 Nov 2023 03:05:03 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34; Mon, 20 Nov 2023 03:05:03 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.34 via Frontend Transport; Mon, 20 Nov 2023 03:05:03 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.34; Mon, 20 Nov 2023 03:05:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QMh1D4j9DcUTo8khhbwOioV0lqRFYKrFm/4LM1yZfmQmIcjWkCDQAJtdz+XAFQ+BFF2NcER8EFEpOmO62k39aKW0L5QJHCsZqrwYoFR7W8U1+B9SbxibucATj0uyQcx5Gq7V02U5H8HJdp6WvUuv4vUlF10JlbnjMiYXXQkwtRw0gOqBV7UX1UepXVVNzjILA+yP7QyxnOJadGBZaMGP5F4eT9pcAjcJdEFMsI+7ntFvqfJ2omAZplmJlzDGXktbEWGdgbO11BiSkGkWCrB/vMzyj7qGNvoudHrKXqYcYRAx+88IrMMDh+zsLzaR9f1fzfxviv7gS9ZaNOR2wbMLew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ATxkAaxdXMkNshJVIdS0/At9NJ785iyeXfrpVbtaLPs=;
+ b=lx08z8NMZAcJLf85uJa6gkuGR+gA9RYoawU4eUY3So4BYIEqmlxUpDYQJrOk/LvNHBa6IuSzAPuUeAScwCSsqGTJCKM4AJRgOgH0y4VBbxdwtiov0vIejqDiiHsS/1Sh88O47rIcvfAcN7WgLnyIfKG9/LiwGSfKtD5Q7RRZsGlDfJuT4uPe9HXRs5816EWpf8IssphmZKWCI9NF7HlhFTaSkggP2sFKrJvPItN+0WBl0Qk709T4RwpLPtUE2Nr1rwBwdXmE4OEYJjNXp10F0aY7L7JF3WS9vGQmoC+YII2s6pKw3aAt6IEgusUuqTzUfaP4vHE6Lazp9TL49ATXxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by IA0PR11MB8419.namprd11.prod.outlook.com (2603:10b6:208:48b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7002.27; Mon, 20 Nov
+ 2023 11:05:01 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::36be:aaee:c5fe:2b80%7]) with mapi id 15.20.7002.026; Mon, 20 Nov 2023
+ 11:05:01 +0000
+Message-ID: <76fe4252-dc61-4d1f-891e-e1cf47da728d@intel.com>
+Date: Mon, 20 Nov 2023 12:04:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/11] bitmap: prereqs for ip_tunnel flags conversion
+To: Yury Norov <yury.norov@gmail.com>
+CC: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes
+	<linux@rasmusvillemoes.dk>, Alexander Potapenko <glider@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	<netdev@vger.kernel.org>, <linux-btrfs@vger.kernel.org>,
+	<dm-devel@redhat.com>, <ntfs3@lists.linux.dev>, <linux-s390@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20231113173717.927056-1-aleksander.lobakin@intel.com>
+Content-Language: en-US
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20231113173717.927056-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0232.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e9::13) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231116114150.48639-1-huangjie.albert@bytedance.com>
- <ZVcxmwm/DRTB8QwO@lore-desk> <CABKxMyPMboVYs01KfPEdxPbx-LT88Qe1pcDMaT0NiNWhA-5emg@mail.gmail.com>
- <ZVssMWXZYxM0eKiY@lore-desk> <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
-In-Reply-To: <CABKxMyPNYS=6BHhaMDOSSMu8F0C5jkoa5Tck1dE6QnLa6--6UQ@mail.gmail.com>
-From: =?UTF-8?B?6buE5p2w?= <huangjie.albert@bytedance.com>
-Date: Mon, 20 Nov 2023 19:01:16 +0800
-Message-ID: <CABKxMyO0oExMvKbZ32_Qh+3ezcY8CK0AYjxL6B2iD3DQ26J_Kg@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH net] veth: fix ethtool statistical errors
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Toshiaki Makita <toshiaki.makita1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|IA0PR11MB8419:EE_
+X-MS-Office365-Filtering-Correlation-Id: 852a48f3-34a8-4c51-ed96-08dbe9b88ab1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Gz/aJiZznd3fO5splqG3E+rqttm7p3xnTgEnOAxKuoey6T3IZngA3G5ydAqUSWnV8K2UsnUAh/r/00vEqwnhxzyrhUWdGG3L82bsrb9sjAK/zwTPsxPQImoBLAowTgTPVsnfr1VPznNAmH2YfVU9UgxLtwy/BWjzqQoF5I4AGhj7rAGu/NmOV8lg4eFP45NPARLWGVHUl4EAJzwH5JE5gkG26QbSDaa6Kf00q9HVaZwG6D+aKhSmVfV3BHgiza3UtxyArNs+oV9MTA/oBgcCFsXDIm9KCIZ/kJsfZ5W7JXZMRS3BXYjJpRIG82E9+voDRqOsbQw/e4Ahn5fHF3o71Qo7P4wAWoRNTMTA/aMVmeODAJ57CRaqu3GOSIc2y3zJariSH+ySM50faROOzQKAtBs9ImaXooWrYUIdNqLsEiB0N5Kd9BNsPFgXG3IfZtSWyLeFacSf15cxflQ/CIyMG0ow5Rj8pPaWR2rGlH/ALiMwTFmE7XzwcHvqIumxljru4RN++94+0KwEPfDUyhffWfqEdSJoTT0Vrbo9den0XlNzoUgQiEDAByNGzA9UkRQA3ojBgpRcLOVthu+mCfmPRWIDPtuHvMlmNVpBwvnKJIvt/TOPKXaNk/40mAI+U48rjoT9U9f6xmr5sQPRvGAykxq/ROzen6HmhABS4b95C7E=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(366004)(376002)(396003)(39860400002)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(6916009)(316002)(66556008)(66476007)(26005)(2616005)(41300700001)(54906003)(66946007)(478600001)(6506007)(6512007)(6486002)(966005)(31686004)(6666004)(8936002)(8676002)(4326008)(7416002)(4744005)(2906002)(5660300002)(36756003)(38100700002)(86362001)(82960400001)(31696002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZEdTcUhKMEI4bm1CSkk0MG0zOVM2RVlQWWdCRENEYm9ycVhDQTZwdG5DeXJz?=
+ =?utf-8?B?anJmYUhjVGh6Y09WcGdxUFczWmJRWUhrT1VtMExDT1czR0N6QXc5OVFjYzVB?=
+ =?utf-8?B?SDQzWURwN3RENWszdjdQZVJybUtRcU1mcWVzK3JnclhmZ1FUa0NlSTVHcis3?=
+ =?utf-8?B?a3JjbnIwcHg3WXkzWWd2L0x3OFNYbDBOZzdSQnl6QXhYMG9PS1ZNQ1hadENq?=
+ =?utf-8?B?cTZzVjY0bXZCemdSZVlJMjYzbGxTSXhYVjZNNi9VbURGYXNvNHNUTXM2YW0r?=
+ =?utf-8?B?RURMSmRrZWRlUGN5bXI1ZFU3UFFteENkNzBWd1dhRnloN3FWTm5NdTRPQU9k?=
+ =?utf-8?B?RlROb29ZUzU5eElZdERZN0RoYmdibGpXaDBMdDZjTkVUK2NGZTVzZVpBWWxL?=
+ =?utf-8?B?dUl5UnRLTDJ5TEs1eCtsVWEzRmpxMGlaQVNHd09xa21WdVI0RnMydTJlVnU3?=
+ =?utf-8?B?dnA3OHFTMXZMaVVnNFp6MGh3aVBDU0NReEtjd2g5NG9jcGxTRjFPY2FMbURl?=
+ =?utf-8?B?bVhZazI2UFduaE1JVkw0S2svNHVKSmFCRXVWZ0NWS3Z4RkZ6amJFZEdUM3Ft?=
+ =?utf-8?B?ZFFwd2VEVGNpaDkxbVJ3dDR5Nk9Qb1BVdmxvcTgzZU03NDFMMHBLWThFK0Na?=
+ =?utf-8?B?UEYvdG5CY3FUR3hlVWZOTUNoQ2NQYlBCQXFSUnhJYnNSSmJ3emdQQjNCNnQ1?=
+ =?utf-8?B?VUZqdzkwZVhUZVBjblhKbGtVazhjWXBtYVB5T0xwS2E3bWJtZnJBK0poMkhs?=
+ =?utf-8?B?VXBtcCtLd3Z5akc1QzBGSlNNOEsvL0F0cDRGWnQzaDRKQWp0WEVYOG5QcG15?=
+ =?utf-8?B?ZnQraE1Mblp5djc1bjZyYzd6TmFtTE1YLzhXOXpmaDRtTnFNbUR0YzVHVzVj?=
+ =?utf-8?B?NHhaNlRlYkdnWngwbE1jSDA3MzYwQ2xxeS9hMTlwZWQ5dnkxUXdsYVNiQzJa?=
+ =?utf-8?B?azltd1M1dzdKd0FKUWZxYzYvZjdnV1BCRUozUE9vZWZUQlU5MnVUV3hWQUFp?=
+ =?utf-8?B?ckU0aDRlS1lvakExTE5BemdjdVZncGgvMTV0Znc2Q29NeTE3M0liL3dvekxM?=
+ =?utf-8?B?dVIrcWNrVlFRcHRXSGNXMnVPZ2J0QUJ3ZzFOaFlYUnZGZUJPQVVsOE5JOEhW?=
+ =?utf-8?B?Y0IvVHBrRVdNR0pZT3dER25CWEgva080d1A5TVdPQkxhWXozMkUybVhIcTB0?=
+ =?utf-8?B?MXlyWGFJK2drNWJyRkc3MTlhN21pSldkSXF5ZWh5VUV1VTd6UjV4Rld1dGxF?=
+ =?utf-8?B?QXhKMlFVMVNwMzZueXJRRlBGV3VXbmx2eDJHcXQ5c0JZQ2o2RUhwTEVtSHN2?=
+ =?utf-8?B?VjQ4S2ZtaHgzNXdyTW11MXpzL2Jsb3VTcy9qTzVONi8vOUFWcWN1d2JFQkd6?=
+ =?utf-8?B?VjRiN3RCMmtBenorMjh5UndmQ3I1eE04R01IS3FzVHUyZHYrd0Z6QVVUeDE1?=
+ =?utf-8?B?Wkp4Z3JPaTQvL3JFaXJlaTJPaHM1RUpDd0pjOHBwT2d5N1hDeWwwYnpWZVkx?=
+ =?utf-8?B?aTA3WExtcWptOVJ2dWZLbEtnZ0JJbGdpNE85UzU4T1hmVjNyTWlhc3Z1dE1V?=
+ =?utf-8?B?V1A3WW9leGlyTjlnVUJJcjQyTVlXbGdCOWprOVdzeEsySUcxSWNCT21oTkto?=
+ =?utf-8?B?NkxQUnlwby9uUjR3eDJGb2NZdWRwbkI1RXM2TXV2T2xXajFubDN0RUNsbzI5?=
+ =?utf-8?B?NUVyVDRmR3Bkb3NudWtrVGhhNFBGWEVPUFllbm85L2pCWkVqOVMrK215bmxO?=
+ =?utf-8?B?MjhTNWhlcVRVYytJaGUxMWZYczVPd3RYT2FqOTJUdTJqem96NW9vekJMSVpQ?=
+ =?utf-8?B?blRHUjJEeHlRQjhkcGVqZ2dQK2JjSkVOb0lKamVuYmoyYmp2aHM5cjI1WjJl?=
+ =?utf-8?B?Z3BtQXN6R1gwdXNUekxGeDJ2cjJQME9reHliS3FYTkg3MURLTEJMM28vc3Fz?=
+ =?utf-8?B?ckkvSDA5aTdUTlNjWThQU1p2VDJRdXBORFY4amRaM2ZkREk5NGsyU2lITjZV?=
+ =?utf-8?B?RWxYaXg0YWRuYTlIc04wcVdzUFpVTHdyMjVvUW5TQjduQ2huWTdrUjMvbDlH?=
+ =?utf-8?B?S3NvOVNpNVhkbEZYZFVQRzFJNlZsR0VaNERtSzFGMFFjcWlZcTh5REVkQTdL?=
+ =?utf-8?B?bll0azJFUUlsWlRYdmVCMXBpc1RCZ2xwYTNGayt1ZHRmQmJCeGhTTG01TU9M?=
+ =?utf-8?B?MlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 852a48f3-34a8-4c51-ed96-08dbe9b88ab1
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2023 11:05:01.5862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: As5phAT786M5k1Cc7ASxib41UI1XiCOoQl1bPpn8SnixG5hQu8gZEVtl9oQmtabbwEJocqYi1kOYlN8aYHAo4dWyrx5QnytRIk1fmcpJ9rQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8419
+X-OriginatorOrg: intel.com
 
-=E9=BB=84=E6=9D=B0 <huangjie.albert@bytedance.com> =E4=BA=8E2023=E5=B9=B411=
-=E6=9C=8820=E6=97=A5=E5=91=A8=E4=B8=80 18:02=E5=86=99=E9=81=93=EF=BC=9A
->
-> Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=8820=
-=E6=97=A5=E5=91=A8=E4=B8=80 17:52=E5=86=99=E9=81=93=EF=BC=9A
-> >
-> > > Lorenzo Bianconi <lorenzo@kernel.org> =E4=BA=8E2023=E5=B9=B411=E6=9C=
-=8817=E6=97=A5=E5=91=A8=E4=BA=94 17:26=E5=86=99=E9=81=93=EF=BC=9A
-> > > >
-> > > > > if peer->real_num_rx_queues > 1, the ethtool -s command for
-> > > > > veth network device will display some error statistical values.
-> > > > > The value of tx_idx is reset with each iteration, so even if
-> > > > > peer->real_num_rx_queues is greater than 1, the value of tx_idx
-> > > > > will remain constant. This results in incorrect statistical value=
-s.
-> > > > > To fix this issue, assign the value of pp_idx to tx_idx.
-> > > > >
-> > > > > Fixes: 5fe6e56776ba ("veth: rely on peer veth_rq for ndo_xdp_xmit=
- accounting")
-> > > > > Signed-off-by: Albert Huang <huangjie.albert@bytedance.com>
-> > > > > ---
-> > > > >  drivers/net/veth.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> > > > > index 0deefd1573cf..3a8e3fc5eeb5 100644
-> > > > > --- a/drivers/net/veth.c
-> > > > > +++ b/drivers/net/veth.c
-> > > > > @@ -225,7 +225,7 @@ static void veth_get_ethtool_stats(struct net=
-_device *dev,
-> > > > >       for (i =3D 0; i < peer->real_num_rx_queues; i++) {
-> > > > >               const struct veth_rq_stats *rq_stats =3D &rcv_priv-=
->rq[i].stats;
-> > > > >               const void *base =3D (void *)&rq_stats->vs;
-> > > > > -             unsigned int start, tx_idx =3D idx;
-> > > > > +             unsigned int start, tx_idx =3D pp_idx;
-> > > > >               size_t offset;
-> > > > >
-> > > > >               tx_idx +=3D (i % dev->real_num_tx_queues) * VETH_TQ=
-_STATS_LEN;
-> > > > > --
-> > > > > 2.20.1
-> > > > >
-> > > >
-> > > > Hi Albert,
-> > > >
-> > > > Can you please provide more details about the issue you are facing?
-> > > > In particular, what is the number of configured tx and rx queues fo=
-r both
-> > > > peers?
-> > >
-> > > Hi, Lorenzo
-> > > I found this because I wanted to add more echo information in ethttoo=
-l=EF=BC=88for veth,
-> > > but I found that the information was incorrect. That's why I paid
-> > > attention here.
-> >
-> > ack. Could you please share the veth pair tx/rx queue configuration?
-> >
->
-> dev: tx --->4.  rx--->4
-> peer: tx--->1 rx---->1
->
-> Could the following code still be problematic? pp_idx not updated correct=
-ly.
-> page_pool_stats:
-> veth_get_page_pool_stats(dev, &data[pp_idx]);
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Date: Mon, 13 Nov 2023 18:37:06 +0100
 
-I did the test locally and there is no problem with this place. I
-didn't fully understand
-this piece of code before
-thanks.
-BR
-Albert.
+> Based on top of "lib/bitmap: add bitmap_{read,write}()"[0] from Alexander
+> Potapenko as it uses those new bitmap_{read,write}() functions to not
+> introduce another pair of similar ones.
+> 
+> Derived from the PFCP support series[1] as this grew bigger (2 -> 13
+> commits in v2) and involved more core bitmap changes, finally transforming
+> into a pure bitmap series. The actual mentioned ip_tunnel flags conversion
+> from `__be16` to bitmaps will be submitted bundled with the PFCP set after
+> this one lands.
+> 
+> Little breakdown:
+>  * #1, #8, #10: misc cleanups;
+>  * #2, #5, #6, #7: symbol scope, name collisions;
+>  * #3, #4, #9, #11: compile-time optimizations.
 
->
-> BR
-> Albert
->
-> > Rergards,
-> > Lorenzo
-> >
-> > >
-> > > > tx_idx is the index of the current (local) tx queue and it must res=
-tart from
-> > > > idx in each iteration otherwise we will have an issue when
-> > > > peer->real_num_rx_queues is greater than dev->real_num_tx_queues.
-> > > >
-> > > OK. I don't know if this is a known issue.
-> > >
-> > > BR
-> > > Albert
-> > >
-> > >
-> > > > Regards,
-> > > > Lorenzo
+Ping?
+
+> 
+> [0] https://lore.kernel.org/lkml/20231109151106.2385155-1-glider@google.com
+> [1] https://lore.kernel.org/netdev/20230721071532.613888-1-marcin.szycik@linux.intel.com
+[...]
+
+Thanks,
+Olek
 
