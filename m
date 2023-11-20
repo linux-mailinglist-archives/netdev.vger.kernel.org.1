@@ -1,101 +1,155 @@
-Return-Path: <netdev+bounces-49107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468C57F0DC9
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:42:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 666F57F0DDA
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 09:44:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01DA12816CA
-	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:42:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DC8B1C21178
+	for <lists+netdev@lfdr.de>; Mon, 20 Nov 2023 08:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA807474;
-	Mon, 20 Nov 2023 08:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBE07491;
+	Mon, 20 Nov 2023 08:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcJ9DPOg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NgIMl6ot"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9206FAD;
-	Mon, 20 Nov 2023 08:42:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13542C433C7;
-	Mon, 20 Nov 2023 08:42:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700469729;
-	bh=fLc5vRlCd94li3PsvI3TLAtWvXpeLlLbzMXnMlcIdI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BcJ9DPOgFkqPd7ZJjvJ2Qr6UnvMDCu7Zuc/oJqUVY6BTzNPb5buqv26BDe0TtDK6p
-	 kSO/Xr1IwDi0B3kVDdJSpQeNFV4gaB2au8VC50tp48ZM4j5g9yCVj2RZ/G8+2VU9lv
-	 4nr20aovcyOcZCPqgYBYsxfJNvbA+HX6w5mAP83MQwuA4YgS9Z37Llnc+JgY0p3AYK
-	 U5VEL4PX/Cx8eCNNyWeng2gwTYpDMf5BLk14ZWvD0+uQXJgS6IvPcKVYjQ5E6nE4fX
-	 m5b77KdG8BsnqY+OB7H2zWt7YQbTCo3W5kuZIo6pSm45XXmVMv6+QQvKhi/ukca3Oe
-	 WnhgmYemLbrKw==
-Date: Mon, 20 Nov 2023 08:42:05 +0000
-From: Simon Horman <horms@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com,
-	linux-kselftest@vger.kernel.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next] selftests: net: verify fq per-band packet limit
-Message-ID: <20231120084205.GI186930@vergenet.net>
-References: <20231116203449.2627525-1-willemdebruijn.kernel@gmail.com>
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48F61A4;
+	Mon, 20 Nov 2023 00:44:36 -0800 (PST)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3AK8MOLC000933;
+	Mon, 20 Nov 2023 08:44:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TxJZRF8ZNaeh/lNriJCrTeKh8nkctlArLTJQkMSpmIo=;
+ b=NgIMl6ot6UQjjRkuNTnJmksTKF/Dud179qfkaDAlLGfjvh2JemOIsovpXeiSEwoehEyf
+ wT1PyJWlwo2DD36Re9H3niH7T0vkc/ZePkePlkICKQuz1kPvtRQe+DDb9rNc+1zKgGLS
+ aLlRKBDfH3gKgolXo/qCK/bjl+1zdFmVtdGO/euB/AQZqvrFD2XoJ5B4+zsIb1LGde9H
+ NR8ircjeezb7mlnUAlIS+5ikvKBh8KL3nAjMMIC6Ai7gObWnE3b7LUzZSsaV+L74aj9f
+ +2GBk5Y6Gnx+j4Vu97A5tuco8CJbXeNnCYCvMfCzqhCzVm/fHQjfL73SHfSz+gh5rnmw MQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ug3vprm48-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Nov 2023 08:44:09 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3AK8NrQe004350;
+	Mon, 20 Nov 2023 08:44:08 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ug3vprkst-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Nov 2023 08:44:08 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3AK7KTi6008982;
+	Mon, 20 Nov 2023 08:43:59 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3uf7yy853w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Nov 2023 08:43:59 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3AK8huwi42664686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Nov 2023 08:43:56 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 261032004E;
+	Mon, 20 Nov 2023 08:43:56 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EA39320075;
+	Mon, 20 Nov 2023 08:43:54 +0000 (GMT)
+Received: from [9.171.73.39] (unknown [9.171.73.39])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Nov 2023 08:43:54 +0000 (GMT)
+Message-ID: <04ff08d1-5892-44e8-bf74-802a225eeeda@linux.ibm.com>
+Date: Mon, 20 Nov 2023 09:43:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231116203449.2627525-1-willemdebruijn.kernel@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 29/34] net: smc: fix opencoded find_and_set_bit() in
+ smc_wr_tx_get_free_slot_index()
+Content-Language: en-US
+To: Yury Norov <yury.norov@gmail.com>, linux-kernel@vger.kernel.org,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org
+Cc: Jan Kara <jack@suse.cz>, Mirsad Todorovac
+ <mirsad.todorovac@alu.unizg.hr>,
+        Matthew Wilcox <willy@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Maxim Kuvyrkov <maxim.kuvyrkov@linaro.org>,
+        Alexey Klimov <klimov.linux@gmail.com>
+References: <20231118155105.25678-1-yury.norov@gmail.com>
+ <20231118155105.25678-30-yury.norov@gmail.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20231118155105.25678-30-yury.norov@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: RCGHS0U65x8_e0nDUsvDqhplocMS6oNa
+X-Proofpoint-GUID: sLbkG6D89j2LFxlDlB5wgMhttmCPU6Pq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-20_06,2023-11-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ mlxscore=0 malwarescore=0 adultscore=0 priorityscore=1501
+ lowpriorityscore=0 mlxlogscore=933 suspectscore=0 bulkscore=0 phishscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311200057
 
-On Thu, Nov 16, 2023 at 03:34:43PM -0500, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Commit 29f834aa326e ("net_sched: sch_fq: add 3 bands and WRR
-> scheduling") introduces multiple traffic bands, and per-band maximum
-> packet count.
-> 
-> Per-band limits ensures that packets in one class cannot fill the
-> entire qdisc and so cause DoS to the traffic in the other classes.
-> 
-> Verify this behavior:
->   1. set the limit to 10 per band
->   2. send 20 pkts on band A: verify that 10 are queued, 10 dropped
->   3. send 20 pkts on band A: verify that  0 are queued, 20 dropped
->   4. send 20 pkts on band B: verify that 10 are queued, 10 dropped
-> 
-> Packets must remain queued for a period to trigger this behavior.
-> Use SO_TXTIME to store packets for 100 msec.
-> 
-> The test reuses existing upstream test infra. The script is a fork of
-> cmsg_time.sh. The scripts call cmsg_sender.
-> 
-> The test extends cmsg_sender with two arguments:
-> 
-> * '-P' SO_PRIORITY
->   There is a subtle difference between IPv4 and IPv6 stack behavior:
->   PF_INET/IP_TOS        sets IP header bits and sk_priority
->   PF_INET6/IPV6_TCLASS  sets IP header bits BUT NOT sk_priority
-> 
-> * '-n' num pkts
->   Send multiple packets in quick succession.
->   I first attempted a for loop in the script, but this is too slow in
->   virtualized environments, causing flakiness as the 100ms timeout is
->   reached and packets are dequeued.
-> 
-> Also do not wait for timestamps to be queued unless timestamps are
-> requested.
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
 
-Thanks Willem,
 
-this looks nice and clean to me.
+On 18.11.23 16:51, Yury Norov wrote:
+> The function opencodes find_and_set_bit() with a for_each() loop. Fix
+> it, and make the whole function a simple almost one-liner.
+> 
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> ---
+>  net/smc/smc_wr.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
+> index 0021065a600a..b6f0cfc52788 100644
+> --- a/net/smc/smc_wr.c
+> +++ b/net/smc/smc_wr.c
+> @@ -170,15 +170,11 @@ void smc_wr_tx_cq_handler(struct ib_cq *ib_cq, void *cq_context)
+>  
+>  static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
+>  {
+> -	*idx = link->wr_tx_cnt;
+>  	if (!smc_link_sendable(link))
+>  		return -ENOLINK;
+> -	for_each_clear_bit(*idx, link->wr_tx_mask, link->wr_tx_cnt) {
+> -		if (!test_and_set_bit(*idx, link->wr_tx_mask))
+> -			return 0;
+> -	}
+> -	*idx = link->wr_tx_cnt;
+> -	return -EBUSY;
+> +
+> +	*idx = find_and_set_bit(link->wr_tx_mask, link->wr_tx_cnt);
+> +	return *idx < link->wr_tx_cnt ? 0 : -EBUSY;
+>  }
+>  
+>  /**
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 
+My understanding is that you can omit the lines with
+> -	*idx = link->wr_tx_cnt;
+because they only apply to the error paths and you checked that the calling function
+does not use the idx variable in the error cases. Do I understand this correct?
+
+If so the removal of these 2 lines is not related to your change of using find_and_set_bit(),
+do I understand that correctly?
+
+If so, it may be worth mentioning that in the commit message.
 
