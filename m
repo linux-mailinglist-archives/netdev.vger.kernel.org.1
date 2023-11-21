@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D33B7F21E1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B84197F21E2
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:01:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87B34B21AA4
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F34E21C2195C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6E23C098;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72223C49F;
 	Tue, 21 Nov 2023 00:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7wAPJOZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NsrDYPd0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A4E3C095
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93743C475
 	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:01:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77674C433CC;
-	Tue, 21 Nov 2023 00:01:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E895C433CB;
+	Tue, 21 Nov 2023 00:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700524862;
-	bh=7ZmaeQ1cF12GrDwqcSNdpNolUC2YY4x2c7OD6O31uSs=;
+	s=k20201202; t=1700524863;
+	bh=YThdnmZoPNuHhVZ+EdbJkvWc6JlaPBcyHLTu/aZYFWw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r7wAPJOZd3XOmoFcCyqa+9m+QWzgICaRRQj3ajejYY3DViPOFcMCCetpL/AAs91qw
-	 Jkri13lDXQPLqfhx5QUdxQSTQfWeagTFB7RFu/gdDhQGjeIX1WNo95Z23dxztG7+xv
-	 LrbYanzR2ZsCUyZ+0Z955Nkk9FoVo3NDcS0PU979QRw34FZu+EwE5Kc1zhYF6rbGsS
-	 DiGP0oUU8COdQjNn1Y+SMK/nOkjaTxfUrxZON9DDZus9IAOTsRyNoPeLr0d5iCdeht
-	 yBO7MaDiS6QdEorG/WVt/KeUZP5nhCzWw+agn8mmEX+k+nOZWRGSMAoO/Us8fdvYjV
-	 xKJuQmQOcx+LQ==
+	b=NsrDYPd064/6MVjSioIEKjnnPe//pIt99p1+9Hcjr3AwEXaJbf/x0tCGhhW0MTjyH
+	 bj8h3XHO/yYQz2EiLmMhz5oF9hufMjJqU225S3dZfUH6pw6cBbMTJ6EA3Ykr9cFygd
+	 31idg8EgEL6qvTVzZD9v+E9e+Ke8bsmmkeWZGCDf4VfXq/JW6IYD2ESnOFC1KEisb8
+	 l4xailvard5dcYOzn87raOSSyFcLdedxvejpiEYlKlrioiRvqEiH1ax50RCjOolxE7
+	 IwoQ8H+2+B+xgcJT5njhHu5tgpxsCkPzGW0AbRX8K01QD3VhnNnC21OkRkfsUdFKs0
+	 I38tI1fiziiSQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc: netdev@vger.kernel.org,
 	dsahern@gmail.com,
 	dtatulea@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 10/15] net: page_pool: add netlink notifications for state changes
-Date: Mon, 20 Nov 2023 16:00:43 -0800
-Message-ID: <20231121000048.789613-11-kuba@kernel.org>
+Subject: [PATCH net-next v2 11/15] net: page_pool: report amount of memory held by page pools
+Date: Mon, 20 Nov 2023 16:00:44 -0800
+Message-ID: <20231121000048.789613-12-kuba@kernel.org>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20231121000048.789613-1-kuba@kernel.org>
 References: <20231121000048.789613-1-kuba@kernel.org>
@@ -57,162 +57,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Generate netlink notifications about page pool state changes.
+Advanced deployments need the ability to check memory use
+of various system components. It makes it possible to make informed
+decisions about memory allocation and to find regressions and leaks.
+
+Report memory use of page pools. Report both number of references
+and bytes held.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/netdev.yaml | 20 ++++++++++++++
- include/uapi/linux/netdev.h             |  4 +++
- net/core/netdev-genl-gen.c              |  1 +
- net/core/netdev-genl-gen.h              |  1 +
- net/core/page_pool_user.c               | 36 +++++++++++++++++++++++++
- 5 files changed, 62 insertions(+)
+ Documentation/netlink/specs/netdev.yaml | 13 +++++++++++++
+ include/uapi/linux/netdev.h             |  2 ++
+ net/core/page_pool.c                    | 13 +++++++++----
+ net/core/page_pool_priv.h               |  2 ++
+ net/core/page_pool_user.c               |  8 ++++++++
+ 5 files changed, 34 insertions(+), 4 deletions(-)
 
 diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 84ca3c2ab872..82fbe81f7a49 100644
+index 82fbe81f7a49..85209e19dca9 100644
 --- a/Documentation/netlink/specs/netdev.yaml
 +++ b/Documentation/netlink/specs/netdev.yaml
-@@ -166,8 +166,28 @@ name: netdev
+@@ -114,6 +114,17 @@ name: netdev
+         checks:
+           min: 1
+           max: u32-max
++      -
++        name: inflight
++        type: uint
++        doc: |
++          Number of outstanding references to this page pool (allocated
++          but yet to be freed pages).
++      -
++        name: inflight-mem
++        type: uint
++        doc: |
++          Amount of memory held by inflight pages.
+ 
+ operations:
+   list:
+@@ -163,6 +174,8 @@ name: netdev
+             - id
+             - ifindex
+             - napi-id
++            - inflight
++            - inflight-mem
        dump:
          reply: *pp-reply
        config-cond: page-pool
-+    -
-+      name: page-pool-add-ntf
-+      doc: Notification about page pool appearing.
-+      notify: page-pool-get
-+      mcgrp: page-pool
-+      config-cond: page-pool
-+    -
-+      name: page-pool-del-ntf
-+      doc: Notification about page pool disappearing.
-+      notify: page-pool-get
-+      mcgrp: page-pool
-+      config-cond: page-pool
-+    -
-+      name: page-pool-change-ntf
-+      doc: Notification about page pool configuration being changed.
-+      notify: page-pool-get
-+      mcgrp: page-pool
-+      config-cond: page-pool
- 
- mcast-groups:
-   list:
-     -
-       name: mgmt
-+    -
-+      name: page-pool
 diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 176665bcf0da..beb158872226 100644
+index beb158872226..26ae5bdd3187 100644
 --- a/include/uapi/linux/netdev.h
 +++ b/include/uapi/linux/netdev.h
-@@ -79,11 +79,15 @@ enum {
- 	NETDEV_CMD_DEV_DEL_NTF,
- 	NETDEV_CMD_DEV_CHANGE_NTF,
- 	NETDEV_CMD_PAGE_POOL_GET,
-+	NETDEV_CMD_PAGE_POOL_ADD_NTF,
-+	NETDEV_CMD_PAGE_POOL_DEL_NTF,
-+	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
+@@ -68,6 +68,8 @@ enum {
+ 	NETDEV_A_PAGE_POOL_ID = 1,
+ 	NETDEV_A_PAGE_POOL_IFINDEX,
+ 	NETDEV_A_PAGE_POOL_NAPI_ID,
++	NETDEV_A_PAGE_POOL_INFLIGHT,
++	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
  
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
- };
+ 	__NETDEV_A_PAGE_POOL_MAX,
+ 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index a8d96ea38d18..566390759294 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -529,7 +529,7 @@ EXPORT_SYMBOL(page_pool_alloc_pages);
+  */
+ #define _distance(a, b)	(s32)((a) - (b))
  
- #define NETDEV_MCGRP_MGMT	"mgmt"
-+#define NETDEV_MCGRP_PAGE_POOL	"page-pool"
+-static s32 page_pool_inflight(struct page_pool *pool)
++s32 page_pool_inflight(const struct page_pool *pool, bool strict)
+ {
+ 	u32 release_cnt = atomic_read(&pool->pages_state_release_cnt);
+ 	u32 hold_cnt = READ_ONCE(pool->pages_state_hold_cnt);
+@@ -537,8 +537,13 @@ static s32 page_pool_inflight(struct page_pool *pool)
  
- #endif /* _UAPI_LINUX_NETDEV_H */
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 9d34b451cfa7..278b43f5ed50 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -60,6 +60,7 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+ 	inflight = _distance(hold_cnt, release_cnt);
  
- static const struct genl_multicast_group netdev_nl_mcgrps[] = {
- 	[NETDEV_NLGRP_MGMT] = { "mgmt", },
-+	[NETDEV_NLGRP_PAGE_POOL] = { "page-pool", },
- };
+-	trace_page_pool_release(pool, inflight, hold_cnt, release_cnt);
+-	WARN(inflight < 0, "Negative(%d) inflight packet-pages", inflight);
++	if (strict) {
++		trace_page_pool_release(pool, inflight, hold_cnt, release_cnt);
++		WARN(inflight < 0, "Negative(%d) inflight packet-pages",
++		     inflight);
++	} else {
++		inflight = max(0, inflight);
++	}
  
- struct genl_family netdev_nl_family __ro_after_init = {
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index a011d12abff4..738097847100 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -19,6 +19,7 @@ int netdev_nl_page_pool_get_dumpit(struct sk_buff *skb,
+ 	return inflight;
+ }
+@@ -881,7 +886,7 @@ static int page_pool_release(struct page_pool *pool)
+ 	int inflight;
  
- enum {
- 	NETDEV_NLGRP_MGMT,
-+	NETDEV_NLGRP_PAGE_POOL,
- };
+ 	page_pool_scrub(pool);
+-	inflight = page_pool_inflight(pool);
++	inflight = page_pool_inflight(pool, true);
+ 	if (!inflight)
+ 		__page_pool_destroy(pool);
  
- extern struct genl_family netdev_nl_family;
+diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
+index c17ea092b4ab..72fb21ea1ddc 100644
+--- a/net/core/page_pool_priv.h
++++ b/net/core/page_pool_priv.h
+@@ -3,6 +3,8 @@
+ #ifndef __PAGE_POOL_PRIV_H
+ #define __PAGE_POOL_PRIV_H
+ 
++s32 page_pool_inflight(const struct page_pool *pool, bool strict);
++
+ int page_pool_list(struct page_pool *pool);
+ void page_pool_unlist(struct page_pool *pool);
+ 
 diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 24f4e54f6266..35c56fb41c46 100644
+index 35c56fb41c46..d889b347f8f4 100644
 --- a/net/core/page_pool_user.c
 +++ b/net/core/page_pool_user.c
-@@ -135,6 +135,37 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 	return -EMSGSIZE;
- }
- 
-+static void netdev_nl_page_pool_event(const struct page_pool *pool, u32 cmd)
-+{
-+	struct genl_info info;
-+	struct sk_buff *ntf;
-+	struct net *net;
-+
-+	lockdep_assert_held(&page_pools_lock);
-+
-+	/* 'invisible' page pools don't matter */
-+	if (hlist_unhashed(&pool->user.list))
-+		return;
-+	net = dev_net(pool->slow.netdev);
-+
-+	if (!genl_has_listeners(&netdev_nl_family, net, NETDEV_NLGRP_PAGE_POOL))
-+		return;
-+
-+	genl_info_init_ntf(&info, &netdev_nl_family, cmd);
-+
-+	ntf = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!ntf)
-+		return;
-+
-+	if (page_pool_nl_fill(ntf, pool, &info)) {
-+		nlmsg_free(ntf);
-+		return;
-+	}
-+
-+	genlmsg_multicast_netns(&netdev_nl_family, net, ntf,
-+				0, NETDEV_NLGRP_PAGE_POOL, GFP_KERNEL);
-+}
-+
- int netdev_nl_page_pool_get_doit(struct sk_buff *skb, struct genl_info *info)
+@@ -110,6 +110,7 @@ static int
+ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
+ 		  const struct genl_info *info)
  {
- 	u32 id;
-@@ -168,6 +199,8 @@ int page_pool_list(struct page_pool *pool)
- 		hlist_add_head(&pool->user.list,
- 			       &pool->slow.netdev->page_pools);
- 		pool->user.napi_id = pool->p.napi ? pool->p.napi->napi_id : 0;
-+
-+		netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_ADD_NTF);
- 	}
++	size_t inflight, refsz;
+ 	void *hdr;
  
- 	mutex_unlock(&page_pools_lock);
-@@ -181,6 +214,7 @@ int page_pool_list(struct page_pool *pool)
- void page_pool_unlist(struct page_pool *pool)
- {
- 	mutex_lock(&page_pools_lock);
-+	netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_DEL_NTF);
- 	xa_erase(&page_pools, pool->user.id);
- 	hlist_del(&pool->user.list);
- 	mutex_unlock(&page_pools_lock);
-@@ -216,6 +250,8 @@ static void page_pool_unreg_netdev(struct net_device *netdev)
- 	last = NULL;
- 	hlist_for_each_entry(pool, &netdev->page_pools, user.list) {
- 		pool->slow.netdev = lo;
-+		netdev_nl_page_pool_event(pool,
-+					  NETDEV_CMD_PAGE_POOL_CHANGE_NTF);
- 		last = pool;
- 	}
- 	if (last)
+ 	hdr = genlmsg_iput(rsp, info);
+@@ -127,6 +128,13 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
+ 	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_NAPI_ID, pool->user.napi_id))
+ 		goto err_cancel;
+ 
++	inflight = page_pool_inflight(pool, false);
++	refsz =	PAGE_SIZE << pool->p.order;
++	if (nla_put_uint(rsp, NETDEV_A_PAGE_POOL_INFLIGHT, inflight) ||
++	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
++			 inflight * refsz))
++		goto err_cancel;
++
+ 	genlmsg_end(rsp, hdr);
+ 
+ 	return 0;
 -- 
 2.42.0
 
