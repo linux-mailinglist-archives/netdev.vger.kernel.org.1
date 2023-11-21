@@ -1,39 +1,49 @@
-Return-Path: <netdev+bounces-49604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C2497F2B5A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:03:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A40737F2B7C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E15B1C20CAD
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:02:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E72628234E
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD81482D6;
-	Tue, 21 Nov 2023 11:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61FB4482F6;
+	Tue, 21 Nov 2023 11:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2KGQbZC"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZbfiNtiK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1B9046521
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 11:02:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56219C433C7;
-	Tue, 21 Nov 2023 11:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700564576;
-	bh=qbBQQ+xTLVRxtOoCnyW5Y0nAas6xySFxXREpgHxH8qs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f2KGQbZCx+OedcFxXRR0i87UB4T9cFhhz594mg3lSpd9gsyIsejPTLqrSKVbpa6ga
-	 HQ9dN/oZpOnRb2cM1gagQa4KotGW62FOn9B2gO+jvwHTB3dwswwUnwIeBWeLYIHs+r
-	 Ay42VnSH9deh7MYQhKZFoTnfvlrb34KZQ57AoXcN8W+MZydgw5UBxk8J4+XCyK+R3b
-	 M7ER8OnGmfczrCBU2LK4oDbb1unqTsxFfrEAL3/krgjGsjIL6wX3uVvIyWuEKjc9MU
-	 ICRPU8FqKk2Gws5+j6G897ghZQXGE9K3DvVPmW+zYhjBjTmnrKMzJTQp0y0/REnTng
-	 +91K3ZtlQAt5A==
-Message-ID: <eeea995b-a294-4a46-aa3e-93fc2b274504@kernel.org>
-Date: Tue, 21 Nov 2023 13:02:50 +0200
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2964CA;
+	Tue, 21 Nov 2023 03:10:27 -0800 (PST)
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALA8dXl004669;
+	Tue, 21 Nov 2023 11:10:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=3jkvNomu/T+rw84AfhK9x8vxgbep/obiHslHag7pVzw=;
+ b=ZbfiNtiKqLpZB72rn5PMgIJXP29IFWS5oTLLk/EYxtlsLBsvIVAjupHcC72ui1t0+5jK
+ faGkvwA09LZJeRzjmBsLwIifytMbacI2p3wn44Ha07tYY3pOtAdmQI882pH7/nOWmvft
+ 7TD581A4cMzXhn7ThrYLzkD5hSgPimVuQSZtaUtDNqdXdga5rJWuFNxlIb89O0ugiFIy
+ JEtWIblwEL2ROWctx5n6IWjj33TdBqFEaxhvDGnD4aRZgk8g/3xWgzA3e2USLCB4BMi/
+ foH3he8OU01QgETG4uOllOLOIdJ7ed39aqpNyUMrn6+LgTTFqbRmgee+Q4DdjkGSPwhc ng== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ugge19ean-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 11:10:15 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ALBAEJP029315
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 11:10:14 GMT
+Received: from [10.253.72.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 21 Nov
+ 2023 03:10:10 -0800
+Message-ID: <316fb626-4dc3-4540-9cc4-e45840e36f77@quicinc.com>
+Date: Tue, 21 Nov 2023 19:10:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,349 +51,128 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 6/7] net: ethernet: ti: am65-cpsw-qos: Add
- Frame Preemption MAC Merge support
+Subject: Re: [PATCH v5 3/6] net: phy: at803x: add QCA8084 ethernet phy support
 Content-Language: en-US
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- vigneshr@ti.com, srk@ti.com, horms@kernel.org, p-varis@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20231120140147.78726-1-rogerq@kernel.org>
- <20231120140147.78726-7-rogerq@kernel.org>
- <20231120232620.uciap4bazypzlg3g@skbuf>
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20231120232620.uciap4bazypzlg3g@skbuf>
-Content-Type: text/plain; charset=UTF-8
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "Russell King (Oracle)" <linux@armlinux.org.uk>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <hkallweit1@gmail.com>, <corbet@lwn.net>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>
+References: <20231118062754.2453-1-quic_luoj@quicinc.com>
+ <20231118062754.2453-4-quic_luoj@quicinc.com>
+ <1eb60a08-f095-421a-bec6-96f39db31c09@lunn.ch>
+ <ZVkRkhMHWcAR37fW@shell.armlinux.org.uk>
+ <eee39816-b0b8-475c-aa4a-8500ba488a29@lunn.ch>
+ <fef2ab86-ccd7-4693-8a7e-2dac2c80fd53@quicinc.com>
+ <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <1d4d7761-6b42-48ec-af40-747cb4b84ca5@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: uyxGtoquF84BMYww-SOI5QCz__Kbc_ad
+X-Proofpoint-ORIG-GUID: uyxGtoquF84BMYww-SOI5QCz__Kbc_ad
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-21_04,2023-11-21_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ malwarescore=0 mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0
+ priorityscore=1501 bulkscore=0 suspectscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311060000 definitions=main-2311210086
 
 
-On 21/11/2023 01:26, Vladimir Oltean wrote:
-> On Mon, Nov 20, 2023 at 04:01:46PM +0200, Roger Quadros wrote:
->> Changelog:
+
+On 11/20/2023 11:34 PM, Andrew Lunn wrote:
+>> Hi Andrew,
+>> The interface mode 10G_QXGMII is a type of USXGMII-M, the other modes
+>> such as 20G-QXGMII, 20G-OXGMII...
 >>
->> v6:
->> - get mutex around am65_cpsw_iet_commit_preemptible_tcs() in
->>   am65_cpsw_iet_change_preemptible_tcs()
->> - use "preemption" instead of "pre-emption"
->> - call am65_cpsw_setup_mqprio() from within am65_cpsw_setup_taprio()
->> - Now works with kselftest except the last test which fails
+>> As for the interface mode 10G-QXGMII, there is a multiplexer for 4 PHYs,
+>> then do 66bit/68bit encode in xpcs and pass to PMA, the link topology:
+>> quad PHY --- multiplexer ---XPCS --- PMA.
+>> the 10G-QXGMII interface block includes multiplexer, XPCS and PMA.
 >>
->> root@am62xx:~/kselftest# ./run_kselftest.sh -t net/forwarding:ethtool_mm.sh
->> # TEST: Manual configuration with verification: eth0 to eth1          [ OK ]
->> # TEST: Manual configuration with verification: eth1 to eth0          [ OK ]
->> # TEST: Manual configuration without verification: eth0 to eth1       [ OK ]
->> # TEST: Manual configuration without verification: eth1 to eth0       [ OK ]
->> # TEST: Manual configuration with failed verification: eth0 to eth1   [ OK ]
->> # TEST: Manual configuration with failed verification: eth1 to eth0   [ OK ]
->> # Warning: Stopping lldpad.service, but it can still be activated by:
->> #   lldpad.socket
->> # TEST: LLDP                                                          [FAIL]
->> #       eth0 pMAC TX is not active
+>> when the PHY works on SGMII mode, then there is no xpcs, the only fourth
+>> PHY of qca8084 can work on SGMII mode, the link topology:
+>> the fourth PHY --- PCS --- PMA, the SGMII block includes PCS and PMA.
 > 
-> Interesting, but why?
-> 
-> Could you disable all tests except the one that fails, then re-run with
-> verbose shell output, spawn a child interactive shell right after the
-> command that fails, run it by hand without the grep (copying it from the
-> verbose output just one line above) and see what output it gives,
-> compared to what it should?
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/ethtool_mm.sh b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> index 39e736f30322..2340051742b6 100755
-> --- a/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> +++ b/tools/testing/selftests/net/forwarding/ethtool_mm.sh
-> @@ -2,12 +2,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
->  ALL_TESTS="
-> -	manual_with_verification_h1_to_h2
-> -	manual_with_verification_h2_to_h1
-> -	manual_without_verification_h1_to_h2
-> -	manual_without_verification_h2_to_h1
-> -	manual_failed_verification_h1_to_h2
-> -	manual_failed_verification_h2_to_h1
->  	lldp
->  "
->  
-> @@ -170,6 +164,8 @@ lldp()
->  {
->  	RET=0
->  
-> +	set -x
-> +
->  	systemctl start lldpad
->  
->  	# Configure the interfaces to receive and transmit LLDPDUs
-> @@ -185,6 +181,10 @@ lldp()
->  
->  	lldptool -i $h1 -t -n -V addEthCaps | \
->  		grep -q "Preemption capability active"
-> +
-> +	set +x
-> +	bash
-> +
->  	check_err "$?" "$h1 pMAC TX is not active"
->  
->  	lldptool -i $h2 -t -n -V addEthCaps | \
-> 
-> You have the openlldp compiled from the master branch so that it has
-> preemption/MAC merge support, right? We just "require_command lldptool"
-> but we don't probe for this functionality, as opposed to tc and ethtool.
+> What i missed is that you have two different PMA blocks. PHY4 can be
+> muxed to either the QXGMII PMA or the 2500BaseX PMA. This is not clear
+> in the commit message, and i think why you are getting questions about
+> how 2500BaseX can work over QXGMII. Please expand you commit message
+> to explain the architecture in more detail.
 
-Yes I'm using openlldp master.
+Ok, Andrew, i will give more detail about the pcs utilized in the next
+patch set.
 
-So I just dumped the "ethtool --show-mm" right before the "lldptool -i $h1 -t -n -V addEthCaps"
-and this is what I see
+when pcs is configured to QXGMII mode, quad phy can reach to maximum
+speed 2.5G, it is still in qxgmii mode.
 
-# MAC Merge layer state for eth0:
-# pMAC enabled: on
-# TX enabled: off
-# TX active: off
-# TX minimum fragment size: 252
-# RX minimum fragment size: 124
-# Verify enabled: off
-# Verify time: 10
-# Max verify time: 134
-# Verification status: DISABLED
-# 
-# MAC Merge layer state for eth1:
-# pMAC enabled: on
-# TX enabled: off
-# TX active: off
-# TX minimum fragment size: 124
-# RX minimum fragment size: 124
-# Verify enabled: off
-# Verify time: 10
-# Max verify time: 134
-# Verification status: DISABLED
-# 
-# Additional Ethernet Capabilities TLV
-#       Preemption capability supported
-#       Preemption capability not enabled
-#       Preemption capability not active
-#       Additional fragment size: 3 (252 octets)
-# Additional Ethernet Capabilities TLV
-#       Preemption capability supported
-#       Preemption capability not enabled
-#       Preemption capability not active
-#       Additional fragment size: 1 (124 octets)
-# Warning: Stopping lldpad.service, but it can still be activated by:
-#   lldpad.socket
-# TEST: LLDP                                                          [FAIL]
-
-
-If I add the following lines at the beginning of lldp() routine,
-then it works.
-
-lldp()
-{
-        RET=0
-
-+        ethtool --set-mm $h1 tx-enabled on verify-enabled on
-+        ethtool --set-mm $h2 tx-enabled on verify-enabled on
-...
-}
-
-Is lldp supposed to turn on tx-enabled and verify-enabled for us
-or it is test scritps responsibility?
-
-The test fails later at "addFragSize 0", but that is because we don't
-support RX fragment size 60 due to errata.
-If I skip that test then all the rest of the tests pass.
+when pcs is configured to SGMII mode, the fourth PHY can reach to
+maximum speed 2.5G(2500BaseT) that is reached by increasing the clock
+rate to 312.5MHZ from 125MHZ of 1G speed, but there is no corresponding
+interface mode can be used to reflect this 2.5G speed mode(sgmii+), so
+i use 2500BaseX to reflect this 2.5G link speed, which is same as
+qca8081 PHY. Actually we should add a new interface mode such as sgmii+
+to reflect this 2.5G speed of sgmii, so that the PHYLINK can support
+all supported link speeds(10/100/1000/2500M) with the interface mode
+sgmii+, currently 2500BaseX only advertise 2.5G, sgmii advertise
+10/100/1000 in the PHYLINK framework. but actually qca808x supports
+10/100/1000/2500 speed. how do you think?
 
 > 
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> index b9e1d568604b..6af00640e99c 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-ethtool.c
->> @@ -740,6 +741,157 @@ static int am65_cpsw_set_ethtool_priv_flags(struct net_device *ndev, u32 flags)
->>  	return 0;
->>  }
->>  
->> +static int am65_cpsw_set_mm(struct net_device *ndev, struct ethtool_mm_cfg *cfg,
->> +			    struct netlink_ext_ack *extack)
->> +{
->> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
->> +	struct am65_cpsw_ndev_priv *priv = netdev_priv(ndev);
->> +	struct am65_cpsw_iet *iet = &port->qos.iet;
->> +	u32 val, add_frag_size;
->> +	int err;
->> +
->> +	err = ethtool_mm_frag_size_min_to_add(cfg->tx_min_frag_size, &add_frag_size, extack);
->> +	if (err)
->> +		return err;
->> +
->> +	mutex_lock(&priv->mm_lock);
->> +
->> +	if (cfg->pmac_enabled) {
->> +		/* change TX & RX FIFO MAX_BLKS as per TRM recommendation */
->> +		if (!iet->original_max_blks)
->> +			iet->original_max_blks = readl(port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
->> +
->> +		writel(AM65_CPSW_PN_TX_RX_MAX_BLKS_IET,
->> +		       port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
->> +	} else {
->> +		/* restore RX & TX FIFO MAX_BLKS */
->> +		if (iet->original_max_blks) {
-> 
-> else {
-> 	if ()
-> }
-> 
-> can be written as
-> 
-> else if () {
-> }
+> So, next question. How do you control what PMA PHY4 is connected to?
+> Is this going to be based on interface mode? QXGMII it is configured
+> to use the QXGMII PMA? SGMII, 1000BaseX, and 2500BaseX it is
+> configured to the other PMA?
 
-ok.
+Yes, there are two different PCS to work on qxgmii and sgmii mode.
+one PCS can be connected with quad phy, another pcs can be connected
+with PHY4.
 
 > 
->> +			writel(iet->original_max_blks,
->> +			       port->port_base + AM65_CPSW_PN_REG_MAX_BLKS);
->> +		}
->> +	}
->> +
->> +	am65_cpsw_port_iet_rx_enable(port, cfg->pmac_enabled);
->> +	am65_cpsw_port_iet_tx_enable(port, cfg->tx_enabled);
->> +
->> +	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
->> +	if (cfg->verify_enabled) {
->> +		val &= ~AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
->> +		/* Reset Verify state machine. Verification won't start here.
->> +		 * Verification will be done once link-up.
->> +		 */
->> +		val |= AM65_CPSW_PN_IET_MAC_LINKFAIL;
->> +	} else {
->> +		val |= AM65_CPSW_PN_IET_MAC_DISABLEVERIFY;
->> +		/* Clear LINKFAIL to allow verify/response packets */
->> +		val &= ~AM65_CPSW_PN_IET_MAC_LINKFAIL;
->> +	}
->> +
->> +	val &= ~AM65_CPSW_PN_IET_MAC_MAC_ADDFRAGSIZE_MASK;
->> +	val |= AM65_CPSW_PN_IET_MAC_SET_ADDFRAGSIZE(add_frag_size);
->> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
->> +
->> +	/* verify_timeout_count can only be set at valid link */
->> +	if (cfg->verify_time > 0)
->> +		port->qos.iet.verify_time_ms = cfg->verify_time;
->> +	else
->> +		port->qos.iet.verify_time_ms = 10;
->> +
->> +	/* enable/disable preemption based on link status */
->> +	am65_cpsw_iet_commit_preemptible_tcs(port);
->> +
->> +	mutex_unlock(&priv->mm_lock);
->> +
->> +	return 0;
->> +}
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-qos.c b/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> index 60f625e1350b..8443c13c9ff6 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-qos.c
->> @@ -4,9 +4,11 @@
->>   *
->>   * quality of service module includes:
->>   * Enhanced Scheduler Traffic (EST - P802.1Qbv/D2.2)
->> + * Interspersed Express Traffic (IET - P802.3br/D2.0)
->>   */
->>  
->>  #include <linux/pm_runtime.h>
->> +#include <linux/units.h>
+>> Here is a problem as Russell mentioned earlier, we need to know which PHY
+>> device is changing the link status when the 10G-QXGMII mode is used,
+>> since there are 4 PHYs, when one of them has the link change, there is no
+>> PHY device information passed to the PHYLINK, so the PCS driver don't
+>> which PHY is changing link status and 10G-QXGMII mode don't know which
+>> channel(mapped to PHY) should be configured.
 > 
-> If this was ordered alphabetically, u comes after t.
-> 
+> This is the first time QXGMII has been seen in mainline, so its good
+> to explain the background.
 
-ok.
-
->>  #include <linux/time.h>
->>  #include <net/pkt_cls.h>
->>  
->> @@ -259,6 +266,196 @@ static int am65_cpsw_setup_mqprio(struct net_device *ndev, void *type_data)
->>  	return ret;
->>  }
->>  
->> +static int am65_cpsw_iet_set_verify_timeout_count(struct am65_cpsw_port *port)
->> +{
->> +	int verify_time_ms = port->qos.iet.verify_time_ms;
->> +	int link_speed = port->qos.link_speed;
->> +	u32 val;
->> +
->> +	if (WARN_ON(link_speed == SPEED_UNKNOWN))
->> +		return -ENODEV;
->> +
->> +	/* The number of wireside clocks contained in the verify
->> +	 * timeout counter. The default is 0x1312d0
->> +	 * (10ms at 125Mhz in 1G mode).
->> +	 */
->> +	val = 125 * HZ_PER_MHZ;	/* assuming 125MHz wireside clock */
->> +
->> +	val /= MILLIHZ_PER_HZ;		/* count per ms timeout */
->> +	val *= verify_time_ms;		/* count for timeout ms */
->> +	if (link_speed < SPEED_1000)
->> +		val <<= 1;	/* FIXME: Is this correct? */
-> 
-> Is there any way to find out and remove the FIXME? Like running the
-> selftest at SPEED_100?
-
-I will give this a try.
+ From PCS hardware perspective, there is only one QXGMII mode instance
+for 4 PHYs and MACs, and the each PHY is related with the channel of
+QXGMII.
 
 > 
->> +
->> +	if (val > AM65_CPSW_PN_MAC_VERIFY_CNT_MASK)
->> +		return -EINVAL;
->> +
->> +	writel(val, port->port_base + AM65_CPSW_PN_REG_IET_VERIFY);
->> +
->> +	return 0;
->> +}
->> +
->> +/* CPSW does not have an IRQ to notify changes to the MAC Merge TX status
->> + * (active/inactive), but the preemptible traffic classes should only be
->> + * committed to hardware once TX is active. Resort to polling.
->> + */
->> +void am65_cpsw_iet_commit_preemptible_tcs(struct am65_cpsw_port *port)
->> +{
->> +	u8 preemptible_tcs = 0;
+> Are you saying there is a USXGMII-M level link change status? The link
+> between the SoC and the PHY package is up/down? If it is down, all
+> four MAC-PHY links are down. If it is up, it is possible to carry
+> frames between the SoC and the PHY package, but maybe the PHYs
+> themselves are down?
 > 
-> I don't think the zero-initialization helps, since the value is later
-> unconditionally overwritten.
 
-OK, will drop it.
+There is a per channel(for each PHY) configurations in XPCS XGMII mode,
+if one PHY has the link change, the related channel should be
+configured for this PHY, and multiplex is also used for the connected 4
+MACs, the link change on one phy does not effect the other PHYs.
+
+If the PHY is down, the pipeline of the related channel can't transfer
+data, the phy link status is reflected to XPCS.
+
+> Withing the four multiplex streams, is there a per stream link change
+> indication?
+
+Yes, it is per channel(for each PHY) link change indication in QXGMII.
 
 > 
->> +	int err;
->> +	u32 val;
->> +
->> +	if (port->qos.link_speed == SPEED_UNKNOWN)
->> +		return;
->> +
->> +	val = readl(port->port_base + AM65_CPSW_PN_REG_CTL);
->> +	if (!(val & AM65_CPSW_PN_CTL_IET_PORT_EN))
->> +		return;
->> +
->> +	/* update common IET enable */
->> +	am65_cpsw_iet_common_enable(port->common);
->> +
->> +	/* update verify count */
->> +	err = am65_cpsw_iet_set_verify_timeout_count(port);
->> +	if (err) {
->> +		netdev_err(port->ndev, "couldn't set verify count: %d\n", err);
->> +		return;
->> +	}
->> +
->> +	val = readl(port->port_base + AM65_CPSW_PN_REG_IET_CTRL);
->> +	if (!(val & AM65_CPSW_PN_IET_MAC_DISABLEVERIFY)) {
->> +		err = am65_cpsw_iet_verify_wait(port);
->> +		if (err)
->> +			return;
->> +	}
->> +
->> +	preemptible_tcs = port->qos.iet.preemptible_tcs;
->> +	am65_cpsw_iet_set_preempt_mask(port, preemptible_tcs);
->> +}
-
--- 
-cheers,
--roger
+> 	Andrew
 
