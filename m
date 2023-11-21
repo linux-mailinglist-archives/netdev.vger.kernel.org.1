@@ -1,240 +1,212 @@
-Return-Path: <netdev+bounces-49668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E797F3085
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:19:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8E27F308A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:19:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 903F0B21310
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:19:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BE1A282D66
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:19:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62DE154FA5;
-	Tue, 21 Nov 2023 14:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BF455C04;
+	Tue, 21 Nov 2023 14:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VN45qNfN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NCvcKunL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01685D51
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 06:19:31 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-548b54ed16eso3226975a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 06:19:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1700576370; x=1701181170; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=e8K28uZW8oyz1ITv5WcBkYgFfeOANX2aUzq122lE7GA=;
-        b=VN45qNfNGcNHoDxD5j8uCly2RipTyAeev6DlWGyrBAk99kuiIGdXJQbQUB1Sd3owYi
-         SrMCgVjO9q7Kt92H5kM8x6Lj7pyh1f8WzLHkUEU5xJDNIHj335g7FyhTJdQ3UvpSaUhR
-         pVgvmDUiOBqomRxQwB1WD2dtg6ug4LQcIocqwCAvi8tW76TW6dSBKDo+xkmZ7jZutHih
-         +M4G+b3J+hrdJFJb3R90+SANREJ8CapMrrRnxf3p1jYikrCgo2hR3vX3GlB6QWtny/6/
-         RUNeInCjZIw9LZFFf6BXpWFmagRhbE363g3OftKS1zNneC5JmwESQSj1pfD4/0HiyxH+
-         Q0Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700576370; x=1701181170;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e8K28uZW8oyz1ITv5WcBkYgFfeOANX2aUzq122lE7GA=;
-        b=L6mpFytRFKJYwAQ/z0ssXuRPmXmWGfGuuUiEPn01UuX7wdD1qH+wZpyBGtJQD7wGQ1
-         vW/qXoBmttBcUoMERQdSsLqDS//+0WzUpMC2Wyjk/BX1b8WajS8Vepv7ifQ771aP10SF
-         3SdoIiO3c5FcYTKw97jWhqhN0x97lFa65aSthzLtDN8P9TtwSnUOTtU6kSVTO+wIuaqM
-         xoxAYyyQ/znIi82o3s/asBWAzxtVHaQlbFe0hfpgy1On8Fk1hPl/fKZCi2ZKoJuUeqjz
-         0xean+k2j/vKAQ5/Q6NRqaPSTorNw+c9NWCrLDGjn6ihrzgGydanFlXlSJ1JH1Lf505J
-         alEg==
-X-Gm-Message-State: AOJu0YyEqHdIkJpdDjr6Gif6VForcGJCFASrWjT6PTJt8dshQy7Bols/
-	XoO9NF5IW2lORN4cm6tBiBXpdg==
-X-Google-Smtp-Source: AGHT+IFo4FFvmi6KsXzD1NJWuPO/XLIm3WToMarTRXfcWRSX8leZtAiBb/g8iXyJjqnpqgwWpiSwlg==
-X-Received: by 2002:a17:906:4712:b0:a00:2686:6b42 with SMTP id y18-20020a170906471200b00a0026866b42mr3644355ejq.10.1700576370253;
-        Tue, 21 Nov 2023 06:19:30 -0800 (PST)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id k26-20020a170906681a00b009dd678d7d3fsm5314093ejr.211.2023.11.21.06.19.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 06:19:29 -0800 (PST)
-Date: Tue, 21 Nov 2023 15:19:28 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	deb.chatterjee@intel.com, anjali.singhai@intel.com,
-	Vipin.Jain@amd.com, namrata.limaye@intel.com, tom@sipanda.io,
-	mleitner@redhat.com, Mahesh.Shirshyad@amd.com,
-	tomasz.osinski@intel.com, xiyou.wangcong@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, vladbu@nvidia.com, horms@kernel.org,
-	bpf@vger.kernel.org, khalidm@nvidia.com, toke@redhat.com,
-	mattyk@nvidia.com, dan.daly@intel.com, chris.sommers@keysight.com,
-	john.andy.fingerhut@intel.com
-Subject: Re: [PATCH net-next v8 00/15] Introducing P4TC
-Message-ID: <ZVy8cEjs9VK2OVxE@nanopsycho>
-References: <6557b2e5f3489_5ada920871@john.notmuch>
- <CAM0EoMkrb4kv+bjQqrFKFo9mxGFs6tjQtq4D-FtcemBV_WYNUQ@mail.gmail.com>
- <ZVspOBmzrwm8isiD@nanopsycho>
- <CAM0EoMm3whh6xaAdKcT=a9FcSE4EMn=xJxkXY5ked=nwGaGFeQ@mail.gmail.com>
- <ZVuhBlYRwi8eGiSF@nanopsycho>
- <CAM0EoMknA01gmGX-XLH4fT_yW9H82bN3iNYEvFRypvTwARiNqg@mail.gmail.com>
- <2a7d6f27-3464-c57b-b09d-55c03bc5eae6@iogearbox.net>
- <CAM0EoMkBHqRU9tprJ-SK3tKMfcGsnydp0UA9cH2ALjpSNyJhig@mail.gmail.com>
- <ZVyrRFDrVqluD9k/@nanopsycho>
- <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D991C54FA5
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 14:19:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0D3DC433C7;
+	Tue, 21 Nov 2023 14:19:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700576383;
+	bh=91ir09va3b/H9LjbJcI2+NmYoDK/78DDmA5RT95vnhc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NCvcKunLfIMj+lkAP7p1hSjaDb+m7H7dlKGEp3zTOH7lpbO8gUt7+KK49OPGdyPLb
+	 5V4wRshRuFDZxCAVv39/p6gqHUCnjPTmWRz9MPIA7duF4qT5GfuVMD6kEqk3r+Xiq5
+	 DX1O3RxVNr5CJGS1ahOXX/nftkWpBBzBHDdlgTpYLH7g/j8mmdZhW0r2QJBV/AjwSO
+	 vfORVMXZw+SSItRZxTl32/fzsE2W/uySKQDP2Z+sD24mekgfxDgXy+k6hSmQd4zreZ
+	 hYw0aQKDvh14WY6pS+61tpNzHjk5nmpAVisoCUS2EBchWM3vef2d0F4KGZPWEmNSPh
+	 YaRCzYtOPxc8A==
+Message-ID: <13087238-6a57-439e-b7cb-b465b9e27cd6@kernel.org>
+Date: Wed, 22 Nov 2023 00:19:38 +1000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMkUFzZ=Qnk3kWCGw83apANybjvNUZHHAi5is4ewag5xOA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phylink: require supported_interfaces to be
+ filled
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <E1q0K1u-006EIP-ET@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Greg Ungerer <gerg@kernel.org>
+In-Reply-To: <E1q0K1u-006EIP-ET@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Tue, Nov 21, 2023 at 02:47:40PM CET, jhs@mojatatu.com wrote:
->On Tue, Nov 21, 2023 at 8:06 AM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Mon, Nov 20, 2023 at 11:56:50PM CET, jhs@mojatatu.com wrote:
->> >On Mon, Nov 20, 2023 at 4:49 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
->> >>
->> >> On 11/20/23 8:56 PM, Jamal Hadi Salim wrote:
->> >> > On Mon, Nov 20, 2023 at 1:10 PM Jiri Pirko <jiri@resnulli.us> wrote:
->> >> >> Mon, Nov 20, 2023 at 03:23:59PM CET, jhs@mojatatu.com wrote:
->>
->> [...]
->>
->> >
->> >> tc BPF and XDP already have widely used infrastructure and can be developed
->> >> against libbpf or other user space libraries for a user space control plane.
->> >> With 'control plane' you refer here to the tc / netlink shim you've built,
->> >> but looking at the tc command line examples, this doesn't really provide a
->> >> good user experience (you call it p4 but people load bpf obj files). If the
->> >> expectation is that an operator should run tc commands, then neither it's
->> >> a nice experience for p4 nor for BPF folks. From a BPF PoV, we moved over
->> >> to bpf_mprog and plan to also extend this for XDP to have a common look and
->> >> feel wrt networking for developers. Why can't this be reused?
->> >
->> >The filter loading which loads the program is considered pipeline
->> >instantiation - consider it as "provisioning" more than "control"
->> >which runs at runtime. "control" is purely netlink based. The iproute2
->> >code we use links libbpf for example for the filter. If we can achieve
->> >the same with bpf_mprog then sure - we just dont want to loose
->> >functionality though.  off top of my head, some sample space:
->> >- we could have multiple pipelines with different priorities (which tc
->> >provides to us) - and each pipeline may have its own logic with many
->> >tables etc (and the choice to iterate the next one is essentially
->> >encoded in the tc action codes)
->> >- we use tc block to map groups of ports (which i dont think bpf has
->> >internal access of)
->> >
->> >In regards to usability: no i dont expect someone doing things at
->> >scale to use command line tc. The APIs are via netlink. But the tc cli
->> >is must for the rest of the masses per our traditions. Also i really
->>
->> I don't follow. You repeatedly mention "the must of the traditional tc
->> cli", but what of the existing traditional cli you use for p4tc?
->> If I look at the examples, pretty much everything looks new to me.
->> Example:
->>
->>   tc p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
->>     action send_to_port param port eno1
->>
->> This is just TC/RTnetlink used as a channel to pass new things over. If
->> that is the case, what's traditional here?
->>
->
->
->What is not traditional about it?
+Hi Russell,
 
-Okay, so in that case, the following example communitating with
-userspace deamon using imaginary "p4ctrl" app is equally traditional:
-  $ p4ctrl create myprog/table/mytable dstAddr 10.0.1.2/32 \
-     action send_to_port param port eno1
+On 20/5/23 20:41, Russell King (Oracle) wrote:
+> We have been requiring the supported_interfaces bitmap to be filled in
+> by MAC drivers that have a mac_select_pcs() method. Now that all MAC
+> drivers fill in the supported_interfaces bitmap, it is time to enforce
+> this. We have already required supported_interfaces to be set in order
+> for optical SFPs to be configured in commit f81fa96d8a6c ("net: phylink:
+> use phy_interface_t bitmaps for optical modules").
+> 
+> Refuse phylink creation if supported_interfaces is empty, and remove
+> code to deal with cases where this mask is empty.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> I believe what I've said above is indeed the case, but there is always
+> the chance that something has been missed and this will cause breakage.
+> I would post as RFC and ask for testing, but in my experience that is
+> a complete waste of time as it doesn't result in any testing feedback.
+> So, it's probably better to get it merged into net-next and then wait
+> for any reports of breakage.
+
+This commit breaks a platform I have with a Marvell 88e6350 switch.
+During boot up it now fails with:
+
+     ...
+     mv88e6085 d0072004.mdio-mii:11: switch 0x3710 detected: Marvell 88E6350, revision 2
+     mv88e6085 d0072004.mdio-mii:11: phylink: error: empty supported_interfaces
+     error creating PHYLINK: -22
+     mv88e6085: probe of d0072004.mdio-mii:11 failed with error -22
+     ...
+
+The 6350 looks to be similar to the 6352 in many respects, though it lacks
+a SERDES interface, but it otherwise mostly seems compatible. Using the 6352
+phylink_get_caps function instead of the 6185 one fixes this:
+
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -5418,7 +5418,7 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
+         .set_max_frame_size = mv88e6185_g1_set_max_frame_size,
+         .stu_getnext = mv88e6352_g1_stu_getnext,
+         .stu_loadpurge = mv88e6352_g1_stu_loadpurge,
+-       .phylink_get_caps = mv88e6185_phylink_get_caps,
++       .phylink_get_caps = mv88e6352_phylink_get_caps,
+  };
+
+  static const struct mv88e6xxx_ops mv88e6351_ops = {
 
 
->
->>
->> >didnt even want to use ebpf at all for operator experience reasons -
->> >it requires a compilation of the code and an extra loading compared to
->> >what our original u32/pedit code offered.
->> >
->> >> I don't quite follow why not most of this could be implemented entirely in
->> >> user space without the detour of this and you would provide a developer
->> >> library which could then be integrated into a p4 runtime/frontend? This
->> >> way users never interface with ebpf parts nor tc given they also shouldn't
->> >> have to - it's an implementation detail. This is what John was also pointing
->> >> out earlier.
->> >>
->> >
->> >Netlink is the API. We will provide a library for object manipulation
->> >which abstracts away the need to know netlink. Someone who for their
->> >own reasons wants to use p4runtime or TDI could write on top of this.
->> >I would not design a kernel interface to just meet p4runtime (we
->> >already have TDI which came later which does things differently). So i
->> >expect us to support both those two. And if i was to do something on
->> >SDN that was more robust i would write my own that still uses these
->> >netlink interfaces.
->>
->> Actually, what Daniel says about the p4 library used as a backend to p4
->> frontend is pretty much aligned what I claimed on the p4 calls couple of
->> times. If you have this p4 userspace tooling, it is easy for offloads to
->> replace the backed by vendor-specific library which allows p4 offload
->> suitable for all vendors (your plan of p4tc offload does not work well
->> for our hw, as we repeatedly claimed).
->>
->
->That's you - NVIDIA. You have chosen a path away from the kernel
->towards DOCA. I understand NVIDIA's frustration with dealing with
->upstream process (which has been cited to me as a good reason for
->DOCA) but please dont impose these values and your politics on other
->vendors(Intel, AMD for example) who are more than willing to invest
->into making the kernel interfaces the path forward. Your choice.
+The story doesn't quite end here though. With this fix in place support
+for the 6350 is then again broken by commit b92143d4420f ("net: dsa:
+mv88e6xxx: add infrastructure for phylink_pcs"). This results in a dump
+on boot up:
 
-No, you are missing the point. This has nothing to do with DOCA. This
-has to do with the simple limitation of your offload assuming there are
-no runtime changes in the compiled pipeline. For Intel, maybe they
-aren't, and it's a good fit for them. All I say is, that it is not the
-good fit for everyone.
+     ...
+     mv88e6085 d0072004.mdio-mii:11: switch 0x3710 detected: Marvell 88E6350, revision 2
+     8<--- cut here ---
+     Unable to handle kernel NULL pointer dereference at virtual address 00000000 when read
+     [00000000] *pgd=00000000
+     Internal error: Oops: 5 [#1] ARM
+     Modules linked in:
+     CPU: 0 PID: 8 Comm: kworker/u2:0 Not tainted 6.7.0-rc2-dirty #26
+     Hardware name: Marvell Armada 370/XP (Device Tree)
+     Workqueue: events_unbound deferred_probe_work_func
+     PC is at mv88e6xxx_port_setup+0x1c/0x44
+     LR is at dsa_port_devlink_setup+0x74/0x154
+     pc : [<c057ea24>]    lr : [<c0819598>]    psr: a0000013
+     sp : c184fce0  ip : c542b8f4  fp : 00000000
+     r10: 00000001  r9 : c542a540  r8 : c542bc00
+     r7 : c542b838  r6 : c5244580  r5 : 00000005  r4 : c5244580
+     r3 : 00000000  r2 : c542b840  r1 : 00000005  r0 : c1a02040
+     ...
+
+I can see that the mv88e6350_ops struct doesn't have an initializer for
+pcs_ops. Based on the similarity with the 6352 again I tried using the
+mv88e6352_pcs_ops for that:
+
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -5069,7 +5069,8 @@ static const struct mv88e6xxx_ops mv88e6350_ops = {
+         .vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+         .stu_getnext = mv88e6352_g1_stu_getnext,
+         .stu_loadpurge = mv88e6352_g1_stu_loadpurge,
+-       .phylink_get_caps = mv88e6185_phylink_get_caps,
++       .phylink_get_caps = mv88e6352_phylink_get_caps,
++       .pcs_ops = &mv88e6352_pcs_ops,
+  };
 
 
->Nobody is stopping you from offering your customers proprietary
->solutions which include a specific ebpf approach alongside DOCA. We
->believe that a singular interface regardless of the vendor is the
->right way forward. IMHO, this siloing that unfortunately is also added
->by eBPF being a double edged sword is not good for the community.
->
->> As I also said on the p4 call couple of times, I don't see the kernel
->> as the correct place to do the p4 abstractions. Why don't you do it in
->> userspace and give vendors possiblity to have p4 backends with compilers,
->> runtime optimizations etc in userspace, talking to the HW in the
->> vendor-suitable way too. Then the SW implementation could be easily eBPF
->> and the main reason (I believe) why you need to have this is TC
->> (offload) is then void.
->>
->> The "everyone wants to use TC/netlink" claim does not seem correct
->> to me. Why not to have one Linux p4 solution that fits everyones needs?
->
->You mean more fitting to the DOCA world? no, because iam a kernel
+This gets the 6350 switch back to working again (on current linux 6.7-rc2).
+I am not entirely sure if this needs a dedicated phylink_get_caps
+and pcs_ops for the 6350, or if it is safe to use the 6352 ones?
 
-Again, this has 0 relation to DOCA.
+Looking at the mv88e6351_ops I am guessing it is going to suffer the
+same problems too.
+
+Regards
+Greg
 
 
->first person and kernel interfaces are good for everyone.
 
-Yeah, not really. Not always the kernel is the right answer. Your/Intel
-plan to handle the offload by:
-1) abuse devlink to flash p4 binary
-2) parse the binary in kernel to match to the table ids of rules coming
-   from p4tc ndo_setup_tc
-3) abuse devlink to flash p4 binary for tc-flower
-4) parse the binary in kernel to match to the table ids of rules coming
-   from tc-flower ndo_setup_tc
-is really something that is making me a little bit nauseous.
-
-If you don't have a feasible plan to do the offload, p4tc does not make
-sense to me to be honest.
-
-
->
->cheers,
->jamal
+>   drivers/net/phy/phylink.c | 26 +++++++++++---------------
+>   1 file changed, 11 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index a4dd5197355a..093b7b6e0263 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -712,14 +712,11 @@ static int phylink_validate(struct phylink *pl, unsigned long *supported,
+>   {
+>   	const unsigned long *interfaces = pl->config->supported_interfaces;
+>   
+> -	if (!phy_interface_empty(interfaces)) {
+> -		if (state->interface == PHY_INTERFACE_MODE_NA)
+> -			return phylink_validate_mask(pl, supported, state,
+> -						     interfaces);
+> +	if (state->interface == PHY_INTERFACE_MODE_NA)
+> +		return phylink_validate_mask(pl, supported, state, interfaces);
+>   
+> -		if (!test_bit(state->interface, interfaces))
+> -			return -EINVAL;
+> -	}
+> +	if (!test_bit(state->interface, interfaces))
+> +		return -EINVAL;
+>   
+>   	return phylink_validate_mac_and_pcs(pl, supported, state);
+>   }
+> @@ -1513,19 +1510,18 @@ struct phylink *phylink_create(struct phylink_config *config,
+>   	struct phylink *pl;
+>   	int ret;
+>   
+> -	if (mac_ops->mac_select_pcs &&
+> -	    mac_ops->mac_select_pcs(config, PHY_INTERFACE_MODE_NA) !=
+> -	      ERR_PTR(-EOPNOTSUPP))
+> -		using_mac_select_pcs = true;
+> -
+>   	/* Validate the supplied configuration */
+> -	if (using_mac_select_pcs &&
+> -	    phy_interface_empty(config->supported_interfaces)) {
+> +	if (phy_interface_empty(config->supported_interfaces)) {
+>   		dev_err(config->dev,
+> -			"phylink: error: empty supported_interfaces but mac_select_pcs() method present\n");
+> +			"phylink: error: empty supported_interfaces\n");
+>   		return ERR_PTR(-EINVAL);
+>   	}
+>   
+> +	if (mac_ops->mac_select_pcs &&
+> +	    mac_ops->mac_select_pcs(config, PHY_INTERFACE_MODE_NA) !=
+> +	      ERR_PTR(-EOPNOTSUPP))
+> +		using_mac_select_pcs = true;
+> +
+>   	pl = kzalloc(sizeof(*pl), GFP_KERNEL);
+>   	if (!pl)
+>   		return ERR_PTR(-ENOMEM);
 
