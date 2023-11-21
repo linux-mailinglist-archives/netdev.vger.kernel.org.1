@@ -1,122 +1,91 @@
-Return-Path: <netdev+bounces-49632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E097E7F2D12
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:26:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6867B7F2D23
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A38E280EDB
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:26:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC344B21717
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6512C4A99A;
-	Tue, 21 Nov 2023 12:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1762F4A99C;
+	Tue, 21 Nov 2023 12:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8209419F
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 04:25:51 -0800 (PST)
-Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.53])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4SZNmY1WWrz1P8g6;
-	Tue, 21 Nov 2023 20:22:21 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 21 Nov 2023 20:25:48 +0800
-Message-ID: <05108fe1-ab34-6d67-4265-2ec478ce0368@huawei.com>
-Date: Tue, 21 Nov 2023 20:25:47 +0800
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43DE2E7;
+	Tue, 21 Nov 2023 04:28:22 -0800 (PST)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1r5PrY-0005Ax-Sz; Tue, 21 Nov 2023 13:28:20 +0100
+From: Florian Westphal <fw@strlen.de>
+To: <netfilter-devel@vger.kernel.org>
+Cc: lorenzo@kernel.org,
+	<netdev@vger.kernel.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH nf-next 0/8] netfilter: make nf_flowtable lifetime differ from container struct
+Date: Tue, 21 Nov 2023 13:27:43 +0100
+Message-ID: <20231121122800.13521-1-fw@strlen.de>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net-next,v4] bonding: return -ENOMEM instead of BUG in
- alb_upper_dev_walk
-To: Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>
-CC: <j.vosburgh@gmail.com>, <andy@greyhouse.net>, <weiyongjun1@huawei.com>,
-	<yuehaibing@huawei.com>
-References: <20231118081653.1481260-1-shaozhengchao@huawei.com>
- <0a1642c47f37cbab531fdfdcac187bf2bd392dbf.camel@redhat.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <0a1642c47f37cbab531fdfdcac187bf2bd392dbf.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.66]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 
+This series detaches nf_flowtable from the two existing container
+structures.
 
+Allocation and freeing is moved to the flowtable core.
+Then, memory release is changed so it passes through another
+synchronize_rcu() call.
 
-On 2023/11/21 19:41, Paolo Abeni wrote:
-> On Sat, 2023-11-18 at 16:16 +0800, Zhengchao Shao wrote:
->> If failed to allocate "tags" or could not find the final upper device from
->> start_dev's upper list in bond_verify_device_path(), only the loopback
->> detection of the current upper device should be affected, and the system is
->> no need to be panic.
->> So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
->> information when failed to allocate memory for vlan tags in
->> bond_verify_device_path.
->>
->> I also think that the following function calls
->> netdev_walk_all_upper_dev_rcu
->> ---->>>alb_upper_dev_walk
->> ---------->>>bond_verify_device_path
->>>  From this way, "end device" can eventually be obtained from "start device"
->> in bond_verify_device_path, IS_ERR(tags) could be instead of
->> IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
->>
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
->> ---
->> v4: print information instead of warn
->> v3: return -ENOMEM instead of zero to stop walk
->> v2: use WARN_ON_ONCE instead of WARN_ON
->> ---
->>   drivers/net/bonding/bond_alb.c  | 3 ++-
->>   drivers/net/bonding/bond_main.c | 5 ++++-
->>   2 files changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
->> index dc2c7b979656..7edf0fd58c34 100644
->> --- a/drivers/net/bonding/bond_alb.c
->> +++ b/drivers/net/bonding/bond_alb.c
->> @@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *upper,
->>   	if (netif_is_macvlan(upper) && !strict_match) {
->>   		tags = bond_verify_device_path(bond->dev, upper, 0);
->>   		if (IS_ERR_OR_NULL(tags))
->> -			BUG();
->> +			return -ENOMEM;
->> +
->>   		alb_send_lp_vid(slave, upper->dev_addr,
->>   				tags[0].vlan_proto, tags[0].vlan_id);
->>   		kfree(tags);
->> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
->> index 51d47eda1c87..1a40bd08f984 100644
->> --- a/drivers/net/bonding/bond_main.c
->> +++ b/drivers/net/bonding/bond_main.c
->> @@ -2967,8 +2967,11 @@ struct bond_vlan_tag *bond_verify_device_path(struct net_device *start_dev,
->>   
->>   	if (start_dev == end_dev) {
->>   		tags = kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
->> -		if (!tags)
->> +		if (!tags) {
->> +			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
->> +					    __func__, start_dev->name);
-> 
-> I'm sorry for the repeated back and forth, but checkpatch points out
-> that the above warning adds little value: if the memory allocation
-> fails, the mm layer will emit a lot warning comprising the backtrace.
-> 
-> I suggest to drop it, thanks!
-Thank you for your advice. And I will send v5 later.
+Next, a new nftables flowtable flag is introduced to mark a flowtable
+for explicit XDP-based offload.
 
-Zhengchao Shao
-> 
-> Paolo
-> 
+Such flowtables have more restrictions,
+in particular, if two flowtables are tagged as 'xdp offloaded', they
+cannot share any net devices.
+
+It would be possible to avoid such new 'xdp flag', but I see no way
+to do so without breaking backwards compatbility: at this time the same
+net_device can be part of any number of flowtables, this is very
+inefficient from an XDP point of view: it would have to perform lookups
+in all associated flowtables in a loop until a match is found.
+
+This is hardly desirable.
+
+Last two patches expose the hash table mapping and make utility
+function available for XDP.
+
+The XDP kfunc will be added in a followup patch.
+
+Florian Westphal (8):
+  netfilter: flowtable: move nf_flowtable out of container structures
+  netfilter: nf_flowtable: replace init callback with a create one
+  netfilter: nf_flowtable: make free a real free function
+  netfilter: nf_flowtable: delay flowtable release a second time
+  netfilter: nf_tables: reject flowtable hw offload for same device
+  netfilter: nf_tables: add xdp offload flag
+  netfilter: nf_tables: add flowtable map for xdp offload
+  netfilter: nf_tables: permit duplicate flowtable mappings
+
+ include/net/netfilter/nf_flow_table.h    |  15 ++-
+ include/net/netfilter/nf_tables.h        |  15 ++-
+ include/uapi/linux/netfilter/nf_tables.h |   5 +-
+ net/netfilter/nf_flow_table_core.c       |  39 ++++--
+ net/netfilter/nf_flow_table_inet.c       |   6 +-
+ net/netfilter/nf_flow_table_offload.c    | 157 ++++++++++++++++++++++-
+ net/netfilter/nf_tables_api.c            | 113 +++++++++++-----
+ net/netfilter/nft_flow_offload.c         |   4 +-
+ net/sched/act_ct.c                       |  37 +++---
+ 9 files changed, 315 insertions(+), 76 deletions(-)
+
+-- 
+2.41.0
+
 
