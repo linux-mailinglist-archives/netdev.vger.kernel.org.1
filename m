@@ -1,130 +1,93 @@
-Return-Path: <netdev+bounces-49682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30E4B7F30F1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:32:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B3DB7F3106
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:35:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE22D1F24383
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B1F283785
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 14:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FBD56740;
-	Tue, 21 Nov 2023 14:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5B055C22;
+	Tue, 21 Nov 2023 14:35:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KBnYgtro"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h54+mbZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBBC810C1;
-	Tue, 21 Nov 2023 06:32:07 -0800 (PST)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALE1vW7001454;
-	Tue, 21 Nov 2023 14:31:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : date :
- subject : mime-version : content-type : content-transfer-encoding :
- message-id : references : in-reply-to : to : cc; s=qcppdkim1;
- bh=lKNJ2NGqgcTSmiaNvFQy7vJnLz7xIii1mepwcE2VVDI=;
- b=KBnYgtroA2tkzL+22s38Pxof7U4zdsiKIFUqW3zXN1aiTICkshGO17z0tOkBGqnz0DkL
- 8wk82e0uWIzfgr2e/6UZ+VYdZt58xBG5DGEUkv7fEXZw/pmnwjRkPgnI/ANHew89Xgke
- Ls95xcOSQbR2yQ01xzXFRWe2jScAY/ey1EBagpL/QCWUiIqc0ljDzLPNsh6MSnr4WT58
- 7gLFnihec/Ordy1UsYL45qk04DKg7pczr7qjZPaCxX1r3nu/Ey2UzCfCNCAfrSH6ryDf
- ej0YnQpGVLpz9jas46ZYBh7DEFOl+fXUmXuuQ3CwHNVJ/vOdCAC6HYFHtm7SPa34dRnE jw== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ugcqs2te2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Nov 2023 14:31:59 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ALEVwxD008435
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Nov 2023 14:31:58 GMT
-Received: from hu-kathirav-blr.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 21 Nov 2023 06:31:53 -0800
-From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-Date: Tue, 21 Nov 2023 20:00:51 +0530
-Subject: [PATCH v2 9/9] arm64: defconfig: build NSS Clock Controller driver
- for Qualcomm IPQ5332
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888B81A3;
+	Tue, 21 Nov 2023 06:35:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QKGUm3YOEgFjR/qZttfUWApAFjwkLqqdBvdeGQxH6vg=; b=h54+mbZFXArzqshetgeGPPBTIF
+	o5gpQfR4+aIlRkUd1ZHanwKfUHyipyyh7QdK/sSDK2hoUIeSx9i3EN0OxBG5fIhnYwhcLa5lGE5zw
+	T2tSAFDwADYzcG6h1b1F718eG0L7CUgX2FTS3dNrhpgx90M0fCqfknvu5JI+EBbaYzSc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5RqR-000lXq-O1; Tue, 21 Nov 2023 15:35:19 +0100
+Date: Tue, 21 Nov 2023 15:35:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>
+Subject: Re: [RFC PATCH net-next v2 03/10] net: phy: add helpers to handle
+ sfp phy connect/disconnect
+Message-ID: <cd66774b-701a-43c8-9677-d3d7fd13b059@lunn.ch>
+References: <20231117162323.626979-1-maxime.chevallier@bootlin.com>
+ <20231117162323.626979-4-maxime.chevallier@bootlin.com>
+ <ac7d9aa6-e403-482b-a12a-d5821787dd4c@lunn.ch>
+ <ZVyBgNcFrSubz2jn@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20231121-ipq5332-nsscc-v2-9-a7ff61beab72@quicinc.com>
-References: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
-In-Reply-To: <20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com>
-To: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Catalin Marinas
-	<catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        "Kathiravan
- Thirumoorthy" <quic_kathirav@quicinc.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1700577061; l=805;
- i=quic_kathirav@quicinc.com; s=20230906; h=from:subject:message-id;
- bh=54GjomXoINQC2+jck1NY8lQcoGQ3H3dg5VLy6r9f7v8=;
- b=qtiSiG6/ytLPi4jSYosubQcrYCO/OjmO+6XTNRYmPucsoe41vg0IbI/fzwE8K3PLv+OS+SkKm
- 6qA6vBMLHK1B3n3m9/oLhyFhRYzSRgvNflBnuYQPnAXuFPoNcsmqviW
-X-Developer-Key: i=quic_kathirav@quicinc.com; a=ed25519;
- pk=xWsR7pL6ch+vdZ9MoFGEaP61JUaRf0XaZYWztbQsIiM=
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: efM3ZfnufRw-eUs0oOtmqjB7JaQES_8s
-X-Proofpoint-GUID: efM3ZfnufRw-eUs0oOtmqjB7JaQES_8s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-21_07,2023-11-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 phishscore=0 bulkscore=0 clxscore=1015 mlxlogscore=851
- mlxscore=0 spamscore=0 lowpriorityscore=0 impostorscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311210114
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZVyBgNcFrSubz2jn@shell.armlinux.org.uk>
 
-NSSCC driver is needed to enable the ethernet interfaces and not
-necessary for the bootup of the SoC, hence build it as a module.
+On Tue, Nov 21, 2023 at 10:08:00AM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 21, 2023 at 01:57:24AM +0100, Andrew Lunn wrote:
+> > > +/**
+> > > + * phy_sfp_connect_phy - Connect the SFP module's PHY to the upstream PHY
+> > > + * @upstream: pointer to the upstream phy device
+> > > + * @phy: pointer to the SFP module's phy device
+> > > + *
+> > > + * This helper allows keeping track of PHY devices on the link. It adds the
+> > > + * SFP module's phy to the phy namespace of the upstream phy
+> > > + */
+> > > +int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
+> > > +{
+> > > +	struct phy_device *phydev = upstream;
+> > 
+> > Will this function only ever be called from a PHY driver? If so, we
+> > know upstream is PHY. So we can avoid using void * and make it a
+> > struct phy_device *. 
+> 
+> No. This function is hooked into the .connect_phy method of
+> sfp_upstream_ops, and the SFP bus layer has no idea what the
+> "upstream" is. In this case, it's a PHY. In the case of phylink,
+> it's the phylink struct. So no, "struct phy_device *" here will
+> cause build errors.
 
-Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
----
-Changes in V2:
-	- Repharse the commit message to indicate why driver should be
-	  built as m.
----
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+O.K, thanks for checking this. It would of been nice to have some
+compile time checking what is passed is what we expect in terms of
+type, but C does not allow that in this case.
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index b60aa1f89343..c075202d255d 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1223,6 +1223,7 @@ CONFIG_QCOM_CLK_SMD_RPM=y
- CONFIG_QCOM_CLK_RPMH=y
- CONFIG_IPQ_APSS_6018=y
- CONFIG_IPQ_GCC_5332=y
-+CONFIG_IPQ_NSSCC_5332=m
- CONFIG_IPQ_APSS_5018=y
- CONFIG_IPQ_GCC_5018=y
- CONFIG_IPQ_GCC_6018=y
-
--- 
-2.34.1
-
+	 Andrew
 
