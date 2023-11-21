@@ -1,272 +1,148 @@
-Return-Path: <netdev+bounces-49748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBAF77F3564
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:56:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851107F35DE
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:24:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FDFD2824DE
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:56:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5C521C20D4C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14345A113;
-	Tue, 21 Nov 2023 17:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0205822093;
+	Tue, 21 Nov 2023 18:24:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Aa0nTlqo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fd9CfIlf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40CD212C;
-	Tue, 21 Nov 2023 09:56:45 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id EDBBF1F8B8;
-	Tue, 21 Nov 2023 17:56:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1700589403; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BRUlXAJOlgJyfK030JbpQyqs8hbHXrZ60DaHyZm0foM=;
-	b=Aa0nTlqoq8GQwGFbCKlcATI6TKWypBO1S8mLSDWoN1QWlYgPTnoZPEgKGgQeUdH/mNfxfL
-	tOnDSnshswlu1ORBBjUaWdxvsCrXMNDjE9F6LYCTYnlPQiQMj01cvaFzhnOcBlXSZkNX9Z
-	8qoKsMQvqPXf7OGRwxGPZYdTS0PB//0=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9221C139FD;
-	Tue, 21 Nov 2023 17:56:42 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id O3x5IlrvXGW1QAAAMHmgww
-	(envelope-from <mkoutny@suse.com>); Tue, 21 Nov 2023 17:56:42 +0000
-From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Petr Pavlu <ppavlu@suse.cz>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	Martin Wilck <mwilck@suse.com>
-Subject: [PATCH] net/sched: cls: Load net classifier modules via alias
-Date: Tue, 21 Nov 2023 18:56:40 +0100
-Message-ID: <20231121175640.9981-1-mkoutny@suse.com>
-X-Mailer: git-send-email 2.42.1
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 238B897
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 10:24:09 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-41cd444d9d0so34247671cf.2
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 10:24:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1700591048; x=1701195848; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WnlM3z4xwkBnzJcR0HXYmhuC08BZvq4CiHKFX7J9S0Q=;
+        b=Fd9CfIlfYt72awP22YAPGzO2VgkfXKavdASOv7f8eBl9T2KQLWTA4d7l06zo8APoLT
+         ra7b0IL6E5esaLUlq36qIyxb3pNbQVZF++bP9jStGDW8Kaqq4cisjpm591EV+jHh+vA6
+         hicTwg7utlZIaJvJ4/owbTMyqIzqKIgsFjEIEO5V1B1KTLhC1BXS7mKVo7e6igh86gfJ
+         EipVOKDTn6ieVthW4GQLTNhJyeINAs4n2kSV3g9NKAVUgdlPfjm0XLiYh7zZV9qr15KQ
+         qOm2FkZiOcowAUgTw7oEjgh7oo8QjFhSGOJFLjjyqaPKsVA6bahyX6jl1nmYiOUM/2bb
+         vpAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700591048; x=1701195848;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WnlM3z4xwkBnzJcR0HXYmhuC08BZvq4CiHKFX7J9S0Q=;
+        b=RlZ9TB93GwvJgWNu07Y7KhYsAO+aop+nOOwfMNoYocBugI0rdiNcVDS5zAUfdrcAr7
+         DJiqjyG0q/n3Y8mXxy90HSafCEKn+YpQ1WeAwLFUgu8o/feIbDr6r1OIP3SMzUTjGJxQ
+         idSYgxdJnovV5K77poTu/gFLmW4SA8ROq+U/odeQdxVso/KvsyBaS8ayfwI51MX40v2h
+         O7wZ96v5zbSoGPSGtOh/B06UtIilIp68TGdO+EL9l+Yr+KHrPlhcgw1ttavWHThL+1OK
+         Vtm+jM3towjIXbI2N0q/q4MsXdM0FyD+tSFnuLB6vjDrjuP9G3XJxCihBL0rKHI/3mYb
+         E9SQ==
+X-Gm-Message-State: AOJu0Yzr8jIxCztApivBhzKGP85D3+PWj2aITcW4HZQJFSLXBCuBNTLl
+	Pgcm4e9brpmPEb2Nk5+natw=
+X-Google-Smtp-Source: AGHT+IFFBfVVwXADhGATKPS47bSRpWC5YDsXGog+TdG+OVtlAA9b3MVvtvGQimdaXkIyk24qaqdnig==
+X-Received: by 2002:ac8:71c1:0:b0:423:724a:9a26 with SMTP id i1-20020ac871c1000000b00423724a9a26mr2131890qtp.68.1700591048227;
+        Tue, 21 Nov 2023 10:24:08 -0800 (PST)
+Received: from localhost (240.157.150.34.bc.googleusercontent.com. [34.150.157.240])
+        by smtp.gmail.com with ESMTPSA id b9-20020ac86bc9000000b0041817637873sm3791438qtt.9.2023.11.21.10.24.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 10:24:07 -0800 (PST)
+Date: Tue, 21 Nov 2023 13:24:07 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ almasrymina@google.com, 
+ hawk@kernel.org, 
+ ilias.apalodimas@linaro.org, 
+ dsahern@gmail.com, 
+ dtatulea@nvidia.com, 
+ Jakub Kicinski <kuba@kernel.org>
+Message-ID: <655cf5c7874bd_378cc9294f4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20231121000048.789613-9-kuba@kernel.org>
+References: <20231121000048.789613-1-kuba@kernel.org>
+ <20231121000048.789613-9-kuba@kernel.org>
+Subject: Re: [PATCH net-next v2 08/15] net: page_pool: add nlspec for basic
+ access to page pools
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -1.80
-X-Spamd-Result: default: False [-1.80 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 RCVD_TLS_ALL(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 BAYES_HAM(-3.00)[100.00%];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_TWELVE(0.00)[24];
-	 MID_CONTAINS_FROM(1.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,iogearbox.net,linux.dev,suse.cz,suse.com];
-	 RCVD_COUNT_TWO(0.00)[2];
-	 SUSPICIOUS_RECIPS(1.50)[]
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The classifier modules may be loaded lazily without user's awareness and
-control. Add respective aliases to modules and request them under these
-aliases so that modprobe's blacklisting mechanism works also for
-classifier modules. (The same pattern exists e.g. for filesystem
-modules.)
+Jakub Kicinski wrote:
+> Add a Netlink spec in YAML for getting very basic information
+> about page pools.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  Documentation/netlink/specs/netdev.yaml | 46 +++++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
+> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+> index 14511b13f305..84ca3c2ab872 100644
+> --- a/Documentation/netlink/specs/netdev.yaml
+> +++ b/Documentation/netlink/specs/netdev.yaml
+> @@ -86,6 +86,34 @@ name: netdev
+>               See Documentation/networking/xdp-rx-metadata.rst for more details.
+>          type: u64
+>          enum: xdp-rx-metadata
+> +  -
+> +    name: page-pool
+> +    attributes:
+> +      -
+> +        name: id
+> +        doc: Unique ID of a Page Pool instance.
+> +        type: uint
+> +        checks:
+> +          min: 1
+> +          max: u32-max
+> +      -
+> +        name: ifindex
+> +        doc: |
+> +          ifindex of the netdev to which the pool belongs.
+> +          May be reported as 0 if the page pool was allocated for a netdev
+> +          which got destroyed already (page pools may outlast their netdevs
+> +          because they wait for all memory to be returned).
+> +        type: u32
+> +        checks:
+> +          min: 1
+> +          max: s32-max
+> +      -
+> +        name: napi-id
+> +        doc: Id of NAPI using this Page Pool instance.
+> +        type: uint
+> +        checks:
+> +          min: 1
+> +          max: u32-max
 
-Original module names remain unchanged.
+Do you want to introduce a separate ID for page pools? That brings some
+issues regarding network namespace isolation.
 
-Signed-off-by: Michal Koutný <mkoutny@suse.com>
----
- include/net/pkt_cls.h    | 1 +
- net/sched/cls_api.c      | 2 +-
- net/sched/cls_basic.c    | 1 +
- net/sched/cls_bpf.c      | 1 +
- net/sched/cls_cgroup.c   | 1 +
- net/sched/cls_flow.c     | 1 +
- net/sched/cls_flower.c   | 1 +
- net/sched/cls_fw.c       | 1 +
- net/sched/cls_matchall.c | 1 +
- net/sched/cls_route.c    | 1 +
- net/sched/cls_u32.c      | 1 +
- 11 files changed, 11 insertions(+), 1 deletion(-)
+As a user API, it is also possible (and intuitive?) to refer to a
+page_pool by (namespacified) ifindex plus netdev_rx_queue index,
+or napi_id.
 
-This is primarily for TC subsystem maintainers where the
-request_module() resides but Cc list is large because of touches in
-various classifier modules.
+In fairness, napi_id is also global, not per netns.
 
-diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-index a76c9171db0e..424b4f889feb 100644
---- a/include/net/pkt_cls.h
-+++ b/include/net/pkt_cls.h
-@@ -24,6 +24,7 @@ struct tcf_walker {
- 
- int register_tcf_proto_ops(struct tcf_proto_ops *ops);
- void unregister_tcf_proto_ops(struct tcf_proto_ops *ops);
-+#define MODULE_ALIAS_TCF(kind)	MODULE_ALIAS("tcf-" __stringify(kind))
- 
- struct tcf_block_ext_info {
- 	enum flow_block_binder_type binder_type;
-diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-index 1976bd163986..02fdcceee083 100644
---- a/net/sched/cls_api.c
-+++ b/net/sched/cls_api.c
-@@ -257,7 +257,7 @@ tcf_proto_lookup_ops(const char *kind, bool rtnl_held,
- #ifdef CONFIG_MODULES
- 	if (rtnl_held)
- 		rtnl_unlock();
--	request_module("cls_%s", kind);
-+	request_module("tcf-%s", kind);
- 	if (rtnl_held)
- 		rtnl_lock();
- 	ops = __tcf_proto_lookup_ops(kind);
-diff --git a/net/sched/cls_basic.c b/net/sched/cls_basic.c
-index a1f56931330c..a3500ac7fc1a 100644
---- a/net/sched/cls_basic.c
-+++ b/net/sched/cls_basic.c
-@@ -328,6 +328,7 @@ static struct tcf_proto_ops cls_basic_ops __read_mostly = {
- 	.bind_class	=	basic_bind_class,
- 	.owner		=	THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("basic");
- 
- static int __init init_basic(void)
- {
-diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-index 382c7a71f81f..8d57ac155c0c 100644
---- a/net/sched/cls_bpf.c
-+++ b/net/sched/cls_bpf.c
-@@ -693,6 +693,7 @@ static struct tcf_proto_ops cls_bpf_ops __read_mostly = {
- 	.dump		=	cls_bpf_dump,
- 	.bind_class	=	cls_bpf_bind_class,
- };
-+MODULE_ALIAS_TCF("bpf");
- 
- static int __init cls_bpf_init_mod(void)
- {
-diff --git a/net/sched/cls_cgroup.c b/net/sched/cls_cgroup.c
-index 7ee8dbf49ed0..0ded7d79894c 100644
---- a/net/sched/cls_cgroup.c
-+++ b/net/sched/cls_cgroup.c
-@@ -209,6 +209,7 @@ static struct tcf_proto_ops cls_cgroup_ops __read_mostly = {
- 	.dump		=	cls_cgroup_dump,
- 	.owner		=	THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("cgroup");
- 
- static int __init init_cgroup_cls(void)
- {
-diff --git a/net/sched/cls_flow.c b/net/sched/cls_flow.c
-index 6ab317b48d6c..2806aa1254e1 100644
---- a/net/sched/cls_flow.c
-+++ b/net/sched/cls_flow.c
-@@ -702,6 +702,7 @@ static struct tcf_proto_ops cls_flow_ops __read_mostly = {
- 	.walk		= flow_walk,
- 	.owner		= THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("flow");
- 
- static int __init cls_flow_init(void)
- {
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index e5314a31f75a..739e09e0fa57 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -3633,6 +3633,7 @@ static struct tcf_proto_ops cls_fl_ops __read_mostly = {
- 	.owner		= THIS_MODULE,
- 	.flags		= TCF_PROTO_OPS_DOIT_UNLOCKED,
- };
-+MODULE_ALIAS_TCF("flower");
- 
- static int __init cls_fl_init(void)
- {
-diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
-index afc534ee0a18..86c833885a2d 100644
---- a/net/sched/cls_fw.c
-+++ b/net/sched/cls_fw.c
-@@ -433,6 +433,7 @@ static struct tcf_proto_ops cls_fw_ops __read_mostly = {
- 	.bind_class	=	fw_bind_class,
- 	.owner		=	THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("fw");
- 
- static int __init init_fw(void)
- {
-diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
-index c4ed11df6254..21ba73978c6a 100644
---- a/net/sched/cls_matchall.c
-+++ b/net/sched/cls_matchall.c
-@@ -398,6 +398,7 @@ static struct tcf_proto_ops cls_mall_ops __read_mostly = {
- 	.bind_class	= mall_bind_class,
- 	.owner		= THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("matchall");
- 
- static int __init cls_mall_init(void)
- {
-diff --git a/net/sched/cls_route.c b/net/sched/cls_route.c
-index 12a505db4183..a4701c0752df 100644
---- a/net/sched/cls_route.c
-+++ b/net/sched/cls_route.c
-@@ -671,6 +671,7 @@ static struct tcf_proto_ops cls_route4_ops __read_mostly = {
- 	.bind_class	=	route4_bind_class,
- 	.owner		=	THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("route");
- 
- static int __init init_route4(void)
- {
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index d5bdfd4a7655..a969adbd7423 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -1453,6 +1453,7 @@ static struct tcf_proto_ops cls_u32_ops __read_mostly = {
- 	.bind_class	=	u32_bind_class,
- 	.owner		=	THIS_MODULE,
- };
-+MODULE_ALIAS_TCF("u32");
- 
- static int __init init_u32(void)
- {
--- 
-2.42.1
+By iterating over "for_each_netdev(net, ..", dump already limits
+output to pools in the same netns and get only reports pools that
+match the netns.
 
+So it's only a minor matter of visible numbering, and perhaps
+superfluous new id.
+
+No technical comments to this series. Looks solid to me.
 
