@@ -1,53 +1,55 @@
-Return-Path: <netdev+bounces-49842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A409C7F3A79
-	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:48:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC547F3A86
+	for <lists+netdev@lfdr.de>; Wed, 22 Nov 2023 00:58:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3389CB216F1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 375C2281B1F
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB195B1F9;
-	Tue, 21 Nov 2023 23:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB632BB03;
+	Tue, 21 Nov 2023 23:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6zg6XxO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jD0Q3Q7N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3708F584FA;
-	Tue, 21 Nov 2023 23:48:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF57EC433C8;
-	Tue, 21 Nov 2023 23:48:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7E82BB01
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 23:58:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FED0C433C7;
+	Tue, 21 Nov 2023 23:58:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700610523;
-	bh=IuQ9syHF5a/ttnK8/3v7I9YDeXgz5xrYtfAaCkHYAm0=;
+	s=k20201202; t=1700611094;
+	bh=RpcmV04Y5XssEbTca1q02Yjdopi3rB3NOK/3fMzbaj0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h6zg6XxOGmLyRKK8wojFBLWbsbJAqER2kmK+0GVLbdxv1vzmN6PuLNce1Q6D/wLBt
-	 3Ka6Vc/UAndkBePbQu3ooUPzWkbUtZ5a0GzQykR2kcVgqiyp/tqZga0uRrrs7m6ABP
-	 Lspva4iI49ltuy8GSp1DwL6R7b1aGdawhCn+QRdmDegFDUSuIu0J8qWBEB2SgBP0w2
-	 fNsuM3YuLpeSFsBP9iWXH8IkjoKHCA3i8erCKXcjh8DQbP+Btf5raw6jrgp4f0lgM9
-	 1jiBWGGdTx7BjjJnQfP70oCshUiTu+SdoxJDlKyHI+tjD9JFlrWDY0EcNL+8HOlC+i
-	 GdV1LB1Me0lzA==
-Date: Tue, 21 Nov 2023 15:48:41 -0800
+	b=jD0Q3Q7N3DsvX6sLJReEOxJuUr9/ay4yEYPRnx698HUHlGRgTCPpBt3q4r9+o6gZe
+	 CdEpwa3ZmVSqGU/WfS8ZmnVNqQzDwM+cTK/9oWT4kpNOPYnGaYavXIfHnC9zmYE8Ec
+	 1h0u+oVutz7lXx5+R7W+J1NL8A9By3MsAVg1RHyoEr+uMQbkkeniXaz3mvDF49v7ae
+	 UH0ZZ8Emd1vsM7p0XPScgRve5l+PVPeBcdP2kz2bENuCJvP6bCsMHZErIl4HONK0uO
+	 xIb1Ue7tcP2TFfd3TweP38mRGs5X74zX1VYyBI5VSZHjM8k2lLcHNW3dYHhmpM1AOF
+	 jt/jgsQi9wk5w==
+Date: Tue, 21 Nov 2023 15:58:12 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, longli@microsoft.com, sharmaajay@microsoft.com,
- leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
- vkuznets@redhat.com, tglx@linutronix.de, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
- paulros@microsoft.com
-Subject: Re: [PATCH V2 net-next] net: mana: Assigning IRQ affinity on HT
- cores
-Message-ID: <20231121154841.7fc019c8@kernel.org>
-In-Reply-To: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
-References: <1700574877-6037-1-git-send-email-schakrabarti@linux.microsoft.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Robert Marko <robimarko@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel test robot
+ <lkp@intel.com>
+Subject: Re: [net-next PATCH] net: phy: aquantia: make mailbox interface4
+ lsw addr mask more specific
+Message-ID: <20231121155812.03113405@kernel.org>
+In-Reply-To: <655d41b4.050a0220.36e34.359e@mx.google.com>
+References: <20231120193504.5922-1-ansuelsmth@gmail.com>
+	<20231121150859.7f934627@kernel.org>
+	<655d3e2b.df0a0220.50550.b235@mx.google.com>
+	<20231121153918.4234973d@kernel.org>
+	<655d41b4.050a0220.36e34.359e@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,16 +59,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 21 Nov 2023 05:54:37 -0800 Souradeep Chakrabarti wrote:
-> Existing MANA design assigns IRQ to every CPUs, including sibling hyper-threads
-> in a core. This causes multiple IRQs to work on same CPU and may reduce the network
-> performance with RSS.
-> 
-> Improve the performance by adhering the configuration for RSS, which assigns IRQ
-> on HT cores.
+On Wed, 22 Nov 2023 00:48:01 +0100 Christian Marangi wrote:
+> > Not so sure about this one, it puts the u32 on the stack, and takes 
+> > the address of it:
+> > 
+> > 	u32 word;
+> > 
+> > 	word = (__force u32)cpu_to_be32(word);
+> > 	crc = crc_ccitt_false(crc, (u8 *)&word, sizeof(word));
+> > 
+> > so the endian will matter here. My guess is that this part is correct.  
 
-Drivers should not have to carry 120 LoC for something as basic as
-spreading IRQs. Please take a look at include/linux/topology.h and
-if there's nothing that fits your needs there - add it. That way
-other drivers can reuse it.
+Actually I'm wrong about this, you're reading and writing the data,
+so endian conversion happens twice. Canceling itself out.
+
+> Ehhh this is problematic. Data comes from nvmem or filesystem, in theory
+> they should not be touched/converted.
+> 
+> nvmem_cell_read or request_firmware return pointer to u8 and it's the
+> firmware (that is always in LE)
+> 
+> If data is not converted and passed AS IS from what is read to the
+> allocated data, then data should be always swapped.
+> (this PHY is fun... it's probably BE internally but expect LE stuff in
+> the mailbox, as it does emit BE CRC.)
+> 
+> Any idea where I can verify if nvmem_cell_read or request_firmware makes
+> any kind of endianess conversion on the data it does read?
+
+The underlying storage should be byte-accessible, so neither interface
+should change anything about the endian.
+
+You should probably switch get_unaligned_le32() for reading it into 
+the word variable, tho.
 
