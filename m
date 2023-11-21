@@ -1,46 +1,47 @@
-Return-Path: <netdev+bounces-49646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBFD27F2D43
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:35:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A0097F2D4A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 13:35:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 972F528263D
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:35:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A394BB2169A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AF33B7BC;
-	Tue, 21 Nov 2023 12:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47914A9A6;
+	Tue, 21 Nov 2023 12:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NDMrL6u0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D1D9DF/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FB8A192;
-	Tue, 21 Nov 2023 04:35:06 -0800 (PST)
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5900CD65;
+	Tue, 21 Nov 2023 04:35:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700570106; x=1732106106;
+  t=1700570118; x=1732106118;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HMH5KEeZn7aezfXFMh9Smzjm5lwAV6MHWZcT0k35UEI=;
-  b=NDMrL6u0A19a4BQN7FwVKiBagSxC6K90L+TAke/huAwlnLWOq+6FG/eb
-   ElWMdOcuJNJRvoXHIfXPMk7hSpvP1XricaqS4EYY6Elz1yBkKNLPzgADw
-   4yI5rKoSGRjlxyKN/ygbau90HVAaprERO1nitMigObYz/5SZYqsq/g4jB
-   KSRP4GveBPYV3Y+ytO4ceCzv1qNVzOMTZPsDt1Kt8rPo3IRLy8oEUDvfP
-   IS1PwaPiJ0TJR2LV+1UEy8tiC78u/O5KdnOFv50jQ0Mn5eTQzBwNKBgdZ
-   V91dYypSOXimqahZ1dmC9hQgNc8podD20zEXc2ScLcGGxbRonHBtaZ/I/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="10496099"
+  bh=nivaZQ+9P0ZV/opmlAd8c2iOR56SU+o3ql7tnZt2R+U=;
+  b=D1D9DF/l34RN+o4MhIIZvE1SAi13aICV6oWBa48iBCMBGm23hWQrmP6s
+   uEhOGywmxtlqe+LnBE8YkifDTUI3ebqZh1r2Mr7go4q+r01oe7DLCEc5E
+   08uZl947mLlAIwL1+ItJzh4uRu1vemyWtfdYjZfOou80tDO4gR02isduV
+   23h8BCW6LayfdJNYYVs+dJI02YqxiJJNeFd8PHkVLbI1VNM4KuecguNCF
+   w02XkpRkKwck2wNTi1gOH4KawTSZyvwwOKNxzZ+xK0sLMp7FG8RPrrJAQ
+   mhfkMRAq1KktgtV2ya3+U7Z4xEoA0CfSYFkDbZkX6z7mh+3igwnmuq+tG
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="458327794"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="10496099"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:05 -0800
+   d="scan'208";a="458327794"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:17 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="837044350"
 X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="14496390"
+   d="scan'208";a="837044350"
 Received: from wpastern-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.57.17])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:01 -0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 04:35:13 -0800
 From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -53,9 +54,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	linux-kernel@vger.kernel.org
 Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Subject: [PATCH v4 2/3] e1000e: Use PCI_EXP_LNKSTA_NLW & FIELD_GET() instead of custom defines/code
-Date: Tue, 21 Nov 2023 14:34:27 +0200
-Message-Id: <20231121123428.20907-3-ilpo.jarvinen@linux.intel.com>
+Subject: [PATCH v4 3/3] e1000e: Use pcie_capability_read_word() for reading LNKSTA
+Date: Tue, 21 Nov 2023 14:34:28 +0200
+Message-Id: <20231121123428.20907-4-ilpo.jarvinen@linux.intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20231121123428.20907-1-ilpo.jarvinen@linux.intel.com>
 References: <20231121123428.20907-1-ilpo.jarvinen@linux.intel.com>
@@ -68,56 +69,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-e1000e has own copy of PCI Negotiated Link Width field defines. Use the
-ones from include/uapi/linux/pci_regs.h instead of the custom ones and
-remove the custom ones and convert to FIELD_GET().
+Use pcie_capability_read_word() for reading LNKSTA and remove the
+custom define that matches to PCI_EXP_LNKSTA.
 
-Suggested-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+As only single user for cap_offset remains, replace it with a call to
+pci_pcie_cap(). Instead of e1000_adapter, make local variable out of
+pci_dev because both users are interested in it.
+
 Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 ---
- drivers/net/ethernet/intel/e1000e/defines.h | 2 --
- drivers/net/ethernet/intel/e1000e/mac.c     | 7 ++++---
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/e1000e/defines.h |  1 -
+ drivers/net/ethernet/intel/e1000e/mac.c     | 11 ++++-------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
-index 63c3c79380a1..a4d29c9e03a6 100644
+index a4d29c9e03a6..23a58cada43a 100644
 --- a/drivers/net/ethernet/intel/e1000e/defines.h
 +++ b/drivers/net/ethernet/intel/e1000e/defines.h
-@@ -681,8 +681,6 @@
- #define PCIE_LINK_STATUS             0x12
+@@ -678,7 +678,6 @@
+ 
+ /* PCI/PCI-X/PCI-EX Config space */
+ #define PCI_HEADER_TYPE_REGISTER     0x0E
+-#define PCIE_LINK_STATUS             0x12
  
  #define PCI_HEADER_TYPE_MULTIFUNC    0x80
--#define PCIE_LINK_WIDTH_MASK         0x3F0
--#define PCIE_LINK_WIDTH_SHIFT        4
  
- #define PHY_REVISION_MASK      0xFFFFFFF0
- #define MAX_PHY_REG_ADDRESS    0x1F  /* 5 bit address bus (0-0x1F) */
 diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
-index 5df7ad93f3d7..5340cf73778d 100644
+index 5340cf73778d..694a779e718d 100644
 --- a/drivers/net/ethernet/intel/e1000e/mac.c
 +++ b/drivers/net/ethernet/intel/e1000e/mac.c
-@@ -1,6 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright(c) 1999 - 2018 Intel Corporation. */
+@@ -17,16 +17,13 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
+ {
+ 	struct e1000_mac_info *mac = &hw->mac;
+ 	struct e1000_bus_info *bus = &hw->bus;
+-	struct e1000_adapter *adapter = hw->adapter;
+-	u16 pcie_link_status, cap_offset;
++	struct pci_dev *pdev = hw->adapter->pdev;
++	u16 pcie_link_status;
  
-+#include <linux/bitfield.h>
-+
- #include "e1000.h"
- 
- /**
-@@ -25,9 +27,8 @@ s32 e1000e_get_bus_info_pcie(struct e1000_hw *hw)
- 		pci_read_config_word(adapter->pdev,
- 				     cap_offset + PCIE_LINK_STATUS,
- 				     &pcie_link_status);
--		bus->width = (enum e1000_bus_width)((pcie_link_status &
--						     PCIE_LINK_WIDTH_MASK) >>
--						    PCIE_LINK_WIDTH_SHIFT);
-+		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
-+							     pcie_link_status);
+-	cap_offset = adapter->pdev->pcie_cap;
+-	if (!cap_offset) {
++	if (!pci_pcie_cap(pdev)) {
+ 		bus->width = e1000_bus_width_unknown;
+ 	} else {
+-		pci_read_config_word(adapter->pdev,
+-				     cap_offset + PCIE_LINK_STATUS,
+-				     &pcie_link_status);
++		pcie_capability_read_word(pdev, PCI_EXP_LNKSTA, &pcie_link_status);
+ 		bus->width = (enum e1000_bus_width)FIELD_GET(PCI_EXP_LNKSTA_NLW,
+ 							     pcie_link_status);
  	}
- 
- 	mac->ops.set_lan_id(hw);
 -- 
 2.30.2
 
