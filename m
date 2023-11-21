@@ -1,84 +1,107 @@
-Return-Path: <netdev+bounces-49600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB52F7F2B08
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:55:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4CD7F2B1C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:59:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73B34281F3A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:55:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7698A2825B1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490622D603;
-	Tue, 21 Nov 2023 10:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; dkim=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96083482C9;
+	Tue, 21 Nov 2023 10:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YohrnUds"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC4CC1
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:55:04 -0800 (PST)
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5be09b7d01fso5902421a12.1
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:55:04 -0800 (PST)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BBA11A
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:59:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700564341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZlG9WPRpH5aLXxN0geSA1wmhi349BNl6rxlB9y+EYI8=;
+	b=YohrnUdsT2ps/13eLXkFY2X2uZuuNGFPgdKiVyfCrqiqcr022o3BuPVsWwKd3T5SqFai7k
+	RforfgDf5JAqZHVHdSny9DSBF25y2Z0q3szhYeWuURdOioEckczneBeuK73tdGekxuglBa
+	/fJPTIhtJy/YCnAm/o0vGIdLVDCaczg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-513-HKv1XvUHNYKUPXgg8juIxA-1; Tue, 21 Nov 2023 05:58:59 -0500
+X-MC-Unique: HKv1XvUHNYKUPXgg8juIxA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9ff9b339e8cso16610466b.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:58:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700564104; x=1701168904;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MucVPlPO96ILTl/BV8ROPTsisZcP2/vhsy4x7IWNNfc=;
-        b=xGtfPHZO6pc1vMxg+TbmHgSEszJWrTSfpe2ZDzLiCx6BMEnqvZHOJiKZ2DqvzqpXSm
-         OcMSvpT2oaRyS+dM8TalK7/JS7oauvv9arUuCrwTOuPiTJi70MHUq8wk7oG5RDs44+AZ
-         jMLCtm+iKdHEiwdEsO1eWiDXcaQhtHsTKjeGFn+3Vx2e1wswJnuT38TscnBSltuw+UIE
-         zuIBc+v88v+DdGTNRWjLeqjglDiUWyOOd9CSWz6k7HMnbbLiTWKINJBSkIzM4/MStU7t
-         dcoRvcHTld6I4MXbY1HUi2HAO2109o79wS8GvkA1R/+UEGbt3o+xd13erUQ7P9Bjk9Hc
-         +IYg==
-X-Gm-Message-State: AOJu0YzYeuC5Ua/sknrLZaWw0s8fRa+wiW0jxQAz8Q5tTFm2NeY3dHJE
-	ZejSG/cOETem9TdBgQr00ssETUMx7vmnuxPkoWGuEPW9ugVZ
-X-Google-Smtp-Source: AGHT+IG8ioXPYyO1oJsiFIQ7AFgEZu9Y+SvUceib759BZiDwK4pCkyKZ9Fnjg0bhNBDSdS8gRMqei0g4IcW2h6EnHa/2dyw3Kq/b
+        d=1e100.net; s=20230601; t=1700564338; x=1701169138;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ZlG9WPRpH5aLXxN0geSA1wmhi349BNl6rxlB9y+EYI8=;
+        b=HihqzTIsFrvZMvIx2WyIh69KQfa5sSnK1Ts9agKK8qZ4bIWeCuW+8wa9DZdFWz19gv
+         UbHpcJn8DcS/7VENaRsbiRMAhHDv92bBHbm++BkIEhN18++9wV9TNqhmSxUWwW2ABYFS
+         od1bF11muwuIOQEqqgZ0hSx9ssxcfKnQ4pQc1ADYfySEPpZ+1VC/JsMkCd9UhHgMGUCv
+         BPqNaDwGDWyOQt1h+J4gmZ1VQcQHM6y6PVNd/hrVVCCp4qlrX6oGEA5RDumcdc4JG0Vg
+         ICKXjJ607uZ8h1bY4daZ8W75mgB3j5Rq1CNP0ytGdVPF1edHw9eofBBFISnOM15MfYMv
+         9gGQ==
+X-Gm-Message-State: AOJu0YyGdI0Gdmrx3rjk+LMaqkyjnurHXycgl7dcsshyVlE1d4o0vC7j
+	/ZCOKdRhxFEB8H/iDqUTUwM4k0zFMASWSbDxdJIGh2VwXE8uy+H//5Owzi/lw0sKLYa/GZacgXm
+	L05sjVr6ShNeELr+d
+X-Received: by 2002:a17:907:78d5:b0:a01:b9bd:87a with SMTP id kv21-20020a17090778d500b00a01b9bd087amr1071758ejc.7.1700564337997;
+        Tue, 21 Nov 2023 02:58:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEAG5ipzdlI8GZfIF0WyvN4yVli0RfO8w5wk/nbUnc7CLOu/xfgWAvds4G/6A6bAIl7P5Wpqg==
+X-Received: by 2002:a17:907:78d5:b0:a01:b9bd:87a with SMTP id kv21-20020a17090778d500b00a01b9bd087amr1071737ejc.7.1700564337586;
+        Tue, 21 Nov 2023 02:58:57 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-234-2.dyn.eolo.it. [146.241.234.2])
+        by smtp.gmail.com with ESMTPSA id qu14-20020a170907110e00b009fc6e3ef4e4sm3031062ejb.42.2023.11.21.02.58.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 02:58:57 -0800 (PST)
+Message-ID: <4b534e6aab6e4cf461f07680466f146e65b3fb25.camel@redhat.com>
+Subject: Re: [PATCH 0/2] usb: fix port mapping for ZTE MF290 modem
+From: Paolo Abeni <pabeni@redhat.com>
+To: Lech Perczak <lech.perczak@gmail.com>, netdev@vger.kernel.org, 
+	linux-usb@vger.kernel.org, Johan Hovold <johan@kernel.org>
+Date: Tue, 21 Nov 2023 11:58:56 +0100
+In-Reply-To: <08e17879fe0c0be1f82da31fdb39931ed38f7155.camel@redhat.com>
+References: <20231117231918.100278-1-lech.perczak@gmail.com>
+	 <08e17879fe0c0be1f82da31fdb39931ed38f7155.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:9304:b0:1cc:20dd:8811 with SMTP id
- bc4-20020a170902930400b001cc20dd8811mr2954783plb.5.1700564104429; Tue, 21 Nov
- 2023 02:55:04 -0800 (PST)
-Date: Tue, 21 Nov 2023 02:55:04 -0800
-In-Reply-To: <000000000000959f6b05ed853d12@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000005ccaa8060aa76f91@google.com>
-Subject: Re: [syzbot] [net?] [nfc?] INFO: task hung in nfc_rfkill_set_block
-From: syzbot <syzbot+3e3c2f8ca188e30b1427@syzkaller.appspotmail.com>
-To: brauner@kernel.org, broonie@kernel.org, catalin.marinas@arm.com, 
-	davem@davemloft.net, edumazet@google.com, faenkhauser@gmail.com, 
-	hdanton@sina.com, johannes.berg@intel.com, johannes@sipsolutions.net, 
-	krzysztof.kozlowski@linaro.org, kuba@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-nfc@lists.01.org, linux-wireless@vger.kernel.org, 
-	luiz.von.dentz@intel.com, madvenka@linux.microsoft.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, scott@os.amperecomputing.com, 
-	syzkaller-bugs@googlegroups.com, will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot suspects this issue was fixed by commit:
+On Tue, 2023-11-21 at 11:49 +0100, Paolo Abeni wrote:
+> On Sat, 2023-11-18 at 00:19 +0100, Lech Perczak wrote:
+> > This modem is used iside ZTE MF28D LTE CPE router. It can already
+> > establish PPP connections. This series attempts to adjust its
+> > configuration to properly support QMI interface which is available and
+> > preferred over that. This is a part of effort to get the device
+> > supported b OpenWrt.
+> >=20
+> > Lech Perczak (2):
+> >   usb: serial: option: don't claim interface 4 for ZTE MF290
+> >   net: usb: qmi_wwan: claim interface 4 for ZTE MF290
+>=20
+> It looks like patch 1 targets the usb-serial tree, patch 2 targets the
+> netdev tree and there no dependencies between them.
 
-commit 2c3dfba4cf84ac4f306cc6653b37b6dd6859ae9d
-Author: Johannes Berg <johannes.berg@intel.com>
-Date:   Thu Sep 14 13:45:17 2023 +0000
+Sorry, ENOCOFFEE here. I see the inter-dependency now. I guess it's
+better to pull both patches via the same tree.
 
-    rfkill: sync before userspace visibility/changes
+@Johan: do you have any preferences? We don't see changes on=20
+qmi_wwan.c too often, hopefully we should not hit conflicts up to the
+next RC.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10d68677680000
-start commit:   ae8373a5add4 Merge tag 'x86_urgent_for_6.4-rc4' of git://g..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=927d4df6d674370e
-dashboard link: https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1099e2c5280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=113f66b1280000
+Cheers,
 
-If the result looks correct, please mark the issue as fixed by replying with:
+Paolo
 
-#syz fix: rfkill: sync before userspace visibility/changes
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
