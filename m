@@ -1,152 +1,563 @@
-Return-Path: <netdev+bounces-49615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDAA7F2BF3
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:41:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116E97F2C09
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 12:49:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCC5E282259
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:41:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A52AB21031
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EAE487A5;
-	Tue, 21 Nov 2023 11:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1P5Mzfc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 702E0487AF;
+	Tue, 21 Nov 2023 11:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A1810F
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 03:41:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1700566887;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QZq9k7yCuLBh1RGCYnoDEbpVMTs0DA2DlRMJfxcoyaY=;
-	b=L1P5MzfcIFtMph1P2vtiIOrjpKx4zWjEqF6/Ynm0wOzitKda8hxtaroR0BgijZ7jJf6D7N
-	C+gYxCU24+3va5wCeZSmVYJtLpERBYTQc57SlU1Lwopzy9M6R4AjjBSdPsFOM/jAR8+e46
-	6gNK8SGHUGllGy0ATC1w9v3tZXUYvEc=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-T7_QphvXNhi-a1eh2mTa3g-1; Tue, 21 Nov 2023 06:41:26 -0500
-X-MC-Unique: T7_QphvXNhi-a1eh2mTa3g-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-5b596737797so8084167b3.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 03:41:26 -0800 (PST)
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5FE114;
+	Tue, 21 Nov 2023 03:49:14 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-54366784377so7541364a12.3;
+        Tue, 21 Nov 2023 03:49:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700566885; x=1701171685;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QZq9k7yCuLBh1RGCYnoDEbpVMTs0DA2DlRMJfxcoyaY=;
-        b=G2lS0OKq/FcgmftI+4Q/lb9zRSdoS0SDmJSRE70VcAdgZDCMMm2I6qvu0NHVKKmDZJ
-         sRIhNf4teimMWm1DnpLP2VufQFSjM9kYk21HIdhxThEsq5DCvRGeaOWZw+GaJBuArM3u
-         WQX/1fZqIkmGhpWmXrDq135rbnYdRVpjhI1PryGHHL1OzPnviDst7kIUTbcWwfdRRehI
-         GxI55ZzBxklwMWz0HfkkGkrz7XYtU7bhLtI1ueYuBmrkD2G2KCjcTZswIi76FZmwdyd1
-         GRyFl+lkLIXHrMmajRaJk3r0uyuTff24ECZ5GImzFgbJiVlb7KhloPur6aOIBO73Ap3r
-         6lTQ==
-X-Gm-Message-State: AOJu0YzX8t4vDLWfaTZXGfAsty9N/UPTkBqhBtTec/03Et1UDHG3UnEK
-	jBLHqO5QDudafme/0d+ebrohUioJ/Z8n9RO/L2uh2R2KuQbLiK/yimaakLLjM0LQKiEBNcAYYw+
-	qUTNkRpM8t7Tdhg/P
-X-Received: by 2002:a05:690c:3208:b0:5a8:9e9:e661 with SMTP id ff8-20020a05690c320800b005a809e9e661mr5637254ywb.1.1700566885655;
-        Tue, 21 Nov 2023 03:41:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEwhc0RwQe5J5Iw97xw38v0Hfk1EfHRdS/CFAeW0SmQ+TnXxXLERR2nODewjkp5Apr9InvKpA==
-X-Received: by 2002:a05:690c:3208:b0:5a8:9e9:e661 with SMTP id ff8-20020a05690c320800b005a809e9e661mr5637235ywb.1.1700566885301;
-        Tue, 21 Nov 2023 03:41:25 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-234-2.dyn.eolo.it. [146.241.234.2])
-        by smtp.gmail.com with ESMTPSA id z37-20020a81ac65000000b005c9e401400fsm1655701ywj.48.2023.11.21.03.41.23
+        d=1e100.net; s=20230601; t=1700567353; x=1701172153;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BoNlAoP8Se/Bi79SOE77aDYGWRLRtUcUIIaZs7kWmj0=;
+        b=hrDrL2LHDjLYHpyD9JBX7cuf86zn/tFg44GasBiCFzGrfqNizdQqORiXy5vb2Y7vxz
+         ZuzHM7G9qNYg8VygOhue6rfccnPHK68h60Dy55mzn2FFid+DM5pRBIGDiQeZqOxMTgaU
+         jv4oLF7WA1paYBmzN7HuaXImO+0DZqR/fstWLCutyNPuVcwpQDlvP4BI3P4+E53mkt7z
+         qeXSaEXTJrvjtYm3DrzXdTfdpvHTWtZwhSLJBamaaxy/Nlya8i1hjkq+QnObsC5rN4QY
+         tzlQRGJubEa1Q7YFVBLHSJ1MbFpof9LNcOxiq2BVrhYkJcAdBm56eXqfgLm4ehUTC/cb
+         APQw==
+X-Gm-Message-State: AOJu0YxzGWTPtYTJnDI8ov9OYk2+QbFBDZgjjAcCDVNV/qUAMW0HeWqM
+	tM1rSaLpa1f89GwnUo6xDgQ=
+X-Google-Smtp-Source: AGHT+IEnQND2iaYtwcR98j3P7GBwMjnYQib/btoSrKWHxBNKPG61M0VK14+st7F4A7+EXhpdgnzZow==
+X-Received: by 2002:aa7:c412:0:b0:543:6828:f129 with SMTP id j18-20020aa7c412000000b005436828f129mr1682413edq.23.1700567352565;
+        Tue, 21 Nov 2023 03:49:12 -0800 (PST)
+Received: from localhost (fwdproxy-cln-118.fbsv.net. [2a03:2880:31ff:76::face:b00c])
+        by smtp.gmail.com with ESMTPSA id l13-20020aa7cacd000000b005486f7f654dsm3682924edt.7.2023.11.21.03.49.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 03:41:25 -0800 (PST)
-Message-ID: <0a1642c47f37cbab531fdfdcac187bf2bd392dbf.camel@redhat.com>
-Subject: Re: [PATCH net-next,v4] bonding: return -ENOMEM instead of BUG in
- alb_upper_dev_walk
-From: Paolo Abeni <pabeni@redhat.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org
-Cc: j.vosburgh@gmail.com, andy@greyhouse.net, weiyongjun1@huawei.com, 
-	yuehaibing@huawei.com
-Date: Tue, 21 Nov 2023 12:41:21 +0100
-In-Reply-To: <20231118081653.1481260-1-shaozhengchao@huawei.com>
-References: <20231118081653.1481260-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Tue, 21 Nov 2023 03:49:12 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: corbet@lwn.net,
+	kuba@kernel.org
+Cc: linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH v3] Documentation: Document each netlink family
+Date: Tue, 21 Nov 2023 03:48:31 -0800
+Message-Id: <20231121114831.3033560-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 2023-11-18 at 16:16 +0800, Zhengchao Shao wrote:
-> If failed to allocate "tags" or could not find the final upper device fro=
-m
-> start_dev's upper list in bond_verify_device_path(), only the loopback
-> detection of the current upper device should be affected, and the system =
-is
-> no need to be panic.
-> So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
-> information when failed to allocate memory for vlan tags in
-> bond_verify_device_path.
->=20
-> I also think that the following function calls
-> netdev_walk_all_upper_dev_rcu
-> ---->>>alb_upper_dev_walk
-> ---------->>>bond_verify_device_path
-> > From this way, "end device" can eventually be obtained from "start devi=
-ce"
-> in bond_verify_device_path, IS_ERR(tags) could be instead of
-> IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
->=20
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
-> v4: print information instead of warn
-> v3: return -ENOMEM instead of zero to stop walk
-> v2: use WARN_ON_ONCE instead of WARN_ON
-> ---
->  drivers/net/bonding/bond_alb.c  | 3 ++-
->  drivers/net/bonding/bond_main.c | 5 ++++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_al=
-b.c
-> index dc2c7b979656..7edf0fd58c34 100644
-> --- a/drivers/net/bonding/bond_alb.c
-> +++ b/drivers/net/bonding/bond_alb.c
-> @@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *uppe=
-r,
->  	if (netif_is_macvlan(upper) && !strict_match) {
->  		tags =3D bond_verify_device_path(bond->dev, upper, 0);
->  		if (IS_ERR_OR_NULL(tags))
-> -			BUG();
-> +			return -ENOMEM;
-> +
->  		alb_send_lp_vid(slave, upper->dev_addr,
->  				tags[0].vlan_proto, tags[0].vlan_id);
->  		kfree(tags);
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
-> index 51d47eda1c87..1a40bd08f984 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -2967,8 +2967,11 @@ struct bond_vlan_tag *bond_verify_device_path(stru=
-ct net_device *start_dev,
-> =20
->  	if (start_dev =3D=3D end_dev) {
->  		tags =3D kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
-> -		if (!tags)
-> +		if (!tags) {
-> +			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
-> +					    __func__, start_dev->name);
+This is a simple script that parses the Netlink YAML spec files
+(Documentation/netlink/specs/), and generates RST files to be rendered
+in the Network -> Netlink Specification documentation page.
 
-I'm sorry for the repeated back and forth, but checkpatch points out
-that the above warning adds little value: if the memory allocation
-fails, the mm layer will emit a lot warning comprising the backtrace.
+Create a python script that is invoked during 'make htmldocs', reads the
+YAML specs input file and generate the correspondent RST file.
 
-I suggest to drop it, thanks!
+Create a new Documentation/networking/netlink_spec index page, and
+reference each Netlink RST file that was processed above in this main
+index.rst file.
 
-Paolo
+In case of any exception during the parsing, dump the error and skip
+the file.
+
+Do not regenerate the RST files if the input files (YAML) were not
+changed in-between invocations.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+
+----
+Changelog:
+
+V3:
+	* Do not regenerate the RST files if the input files were not
+	  changed. In order to do it, a few things changed:
+	  - Rely on Makefile more to find what changed, and trigger
+	    individual file processing
+	  - The script parses file by file now (instead of batches)
+	  - Create a new option to generate the index file
+
+V2:
+	* Moved the logic from a sphinx extension to a external script
+	* Adjust some formatting as suggested by Donald Hunter and Jakub
+	* Auto generating all the rsts instead of having stubs
+	* Handling error gracefully
+---
+ Documentation/Makefile                        |  16 +-
+ Documentation/networking/index.rst            |   1 +
+ .../networking/netlink_spec/.gitignore        |   1 +
+ .../networking/netlink_spec/readme.txt        |   4 +
+ tools/net/ynl/ynl-gen-rst.py                  | 388 ++++++++++++++++++
+ 5 files changed, 409 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/networking/netlink_spec/.gitignore
+ create mode 100644 Documentation/networking/netlink_spec/readme.txt
+ create mode 100755 tools/net/ynl/ynl-gen-rst.py
+
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index 2f35793acd2a..5c156fbb6cdf 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -97,7 +97,21 @@ quiet_cmd_sphinx = SPHINX  $@ --> file://$(abspath $(BUILDDIR)/$3/$4)
+ 		cp $(if $(patsubst /%,,$(DOCS_CSS)),$(abspath $(srctree)/$(DOCS_CSS)),$(DOCS_CSS)) $(BUILDDIR)/$3/_static/; \
+ 	fi
+ 
+-htmldocs:
++YNL_INDEX:=$(srctree)/Documentation/networking/netlink_spec/index.rst
++YNL_RST_DIR:=$(srctree)/Documentation/networking/netlink_spec
++YNL_YAML_DIR:=$(srctree)/Documentation/netlink/specs
++YNL_TOOL:=$(srctree)/tools/net/ynl/ynl-gen-rst.py
++
++YNL_RST_FILES_TMP := $(patsubst %.yaml,%.rst,$(wildcard $(YNL_YAML_DIR)/*.yaml))
++YNL_RST_FILES := $(patsubst $(YNL_YAML_DIR)%,$(YNL_RST_DIR)%, $(YNL_RST_FILES_TMP))
++
++$(YNL_INDEX): $(YNL_RST_FILES)
++	@$(YNL_TOOL) -o $@ -x
++
++$(YNL_RST_DIR)/%.rst: $(YNL_YAML_DIR)/%.yaml
++	@$(YNL_TOOL) -i $< -o $@
++
++htmldocs: $(YNL_INDEX)
+ 	@$(srctree)/scripts/sphinx-pre-install --version-check
+ 	@+$(foreach var,$(SPHINXDIRS),$(call loop_cmd,sphinx,html,$(var),,$(var)))
+ 
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index 683eb42309cc..cb435c141794 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -55,6 +55,7 @@ Contents:
+    filter
+    generic-hdlc
+    generic_netlink
++   netlink_spec/index
+    gen_stats
+    gtp
+    ila
+diff --git a/Documentation/networking/netlink_spec/.gitignore b/Documentation/networking/netlink_spec/.gitignore
+new file mode 100644
+index 000000000000..30d85567b592
+--- /dev/null
++++ b/Documentation/networking/netlink_spec/.gitignore
+@@ -0,0 +1 @@
++*.rst
+diff --git a/Documentation/networking/netlink_spec/readme.txt b/Documentation/networking/netlink_spec/readme.txt
+new file mode 100644
+index 000000000000..6763f99d216c
+--- /dev/null
++++ b/Documentation/networking/netlink_spec/readme.txt
+@@ -0,0 +1,4 @@
++SPDX-License-Identifier: GPL-2.0
++
++This file is populated during the build of the documentation (htmldocs) by the
++tools/net/ynl/ynl-gen-rst.py script.
+diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+new file mode 100755
+index 000000000000..b6292109e236
+--- /dev/null
++++ b/tools/net/ynl/ynl-gen-rst.py
+@@ -0,0 +1,388 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++# -*- coding: utf-8; mode: python -*-
++
++"""
++    Script to auto generate the documentation for Netlink specifications.
++
++    :copyright:  Copyright (C) 2023  Breno Leitao <leitao@debian.org>
++    :license:    GPL Version 2, June 1991 see linux/COPYING for details.
++
++    This script performs extensive parsing to the Linux kernel's netlink YAML
++    spec files, in an effort to avoid needing to heavily mark up the original
++    YAML file.
++
++    This code is split in three big parts:
++        1) RST formatters: Use to convert a string to a RST output
++        2) Parser helpers: Functions to parse the YAML data structure
++        3) Main function and small helpers
++"""
++
++from typing import Any, Dict, List
++import os.path
++import sys
++import argparse
++import logging
++import yaml
++
++
++SPACE_PER_LEVEL = 4
++
++
++# RST Formatters
++# ==============
++def headroom(level: int) -> str:
++    """Return space to format"""
++    return " " * (level * SPACE_PER_LEVEL)
++
++
++def bold(text: str) -> str:
++    """Format bold text"""
++    return f"**{text}**"
++
++
++def inline(text: str) -> str:
++    """Format inline text"""
++    return f"``{text}``"
++
++
++def sanitize(text: str) -> str:
++    """Remove newlines and multiple spaces"""
++    # This is useful for some fields that are spread across multiple lines
++    return str(text).replace("\n", "").strip()
++
++
++def rst_fields(key: str, value: str, level: int = 0) -> str:
++    """Return a RST formatted field"""
++    return headroom(level) + f":{key}: {value}"
++
++
++def rst_definition(key: str, value: Any, level: int = 0) -> str:
++    """Format a single rst definition"""
++    return headroom(level) + key + "\n" + headroom(level + 1) + str(value)
++
++
++def rst_paragraph(paragraph: str, level: int = 0) -> str:
++    """Return a formatted paragraph"""
++    return headroom(level) + paragraph
++
++
++def rst_bullet(item: str, level: int = 0) -> str:
++    """Return a formatted a bullet"""
++    return headroom(level) + f" - {item}"
++
++
++def rst_subsection(title: str) -> str:
++    """Add a sub-section to the document"""
++    return f"{title}\n" + "-" * len(title)
++
++
++def rst_subsubsection(title: str) -> str:
++    """Add a sub-sub-section to the document"""
++    return f"{title}\n" + "~" * len(title)
++
++
++def rst_section(title: str) -> str:
++    """Add a section to the document"""
++    return f"\n{title}\n" + "=" * len(title)
++
++
++def rst_subtitle(title: str) -> str:
++    """Add a subtitle to the document"""
++    return "\n" + "-" * len(title) + f"\n{title}\n" + "-" * len(title) + "\n\n"
++
++
++def rst_title(title: str) -> str:
++    """Add a title to the document"""
++    return "=" * len(title) + f"\n{title}\n" + "=" * len(title) + "\n\n"
++
++
++def rst_list_inline(list_: List[str], level: int = 0) -> str:
++    """Format a list using inlines"""
++    return headroom(level) + "[" + ", ".join(inline(i) for i in list_) + "]"
++
++
++def rst_header() -> str:
++    """The headers for all the auto generated RST files"""
++    lines = []
++
++    lines.append(rst_paragraph(".. SPDX-License-Identifier: GPL-2.0"))
++    lines.append(rst_paragraph(".. NOTE: This document was auto-generated.\n\n"))
++
++    return "\n".join(lines)
++
++
++def rst_toctree(maxdepth: int = 2) -> str:
++    """Generate a toctree RST primitive"""
++    lines = []
++
++    lines.append(".. toctree::")
++    lines.append(f"   :maxdepth: {maxdepth}\n\n")
++
++    return "\n".join(lines)
++
++
++# Parsers
++# =======
++
++
++def parse_mcast_group(mcast_group: List[Dict[str, Any]]) -> str:
++    """Parse 'multicast' group list and return a formatted string"""
++    lines = []
++    for group in mcast_group:
++        lines.append(rst_bullet(group["name"]))
++
++    return "\n".join(lines)
++
++
++def parse_do(do_dict: Dict[str, Any], level: int = 0) -> str:
++    """Parse 'do' section and return a formatted string"""
++    lines = []
++    for key in do_dict.keys():
++        lines.append(rst_paragraph(bold(key), level + 1))
++        lines.append(parse_do_attributes(do_dict[key], level + 1) + "\n")
++
++    return "\n".join(lines)
++
++
++def parse_do_attributes(attrs: Dict[str, Any], level: int = 0) -> str:
++    """Parse 'attributes' section"""
++    if "attributes" not in attrs:
++        return ""
++    lines = [rst_fields("attributes", rst_list_inline(attrs["attributes"]), level + 1)]
++
++    return "\n".join(lines)
++
++
++def parse_operations(operations: List[Dict[str, Any]]) -> str:
++    """Parse operations block"""
++    preprocessed = ["name", "doc", "title", "do", "dump"]
++    lines = []
++
++    for operation in operations:
++        lines.append(rst_section(operation["name"]))
++        lines.append(rst_paragraph(sanitize(operation["doc"])) + "\n")
++
++        for key in operation.keys():
++            if key in preprocessed:
++                # Skip the special fields
++                continue
++            lines.append(rst_fields(key, operation[key], 0))
++
++        if "do" in operation:
++            lines.append(rst_paragraph(":do:", 0))
++            lines.append(parse_do(operation["do"], 0))
++        if "dump" in operation:
++            lines.append(rst_paragraph(":dump:", 0))
++            lines.append(parse_do(operation["dump"], 0))
++
++        # New line after fields
++        lines.append("\n")
++
++    return "\n".join(lines)
++
++
++def parse_entries(entries: List[Dict[str, Any]], level: int) -> str:
++    """Parse a list of entries"""
++    lines = []
++    for entry in entries:
++        if isinstance(entry, dict):
++            # entries could be a list or a dictionary
++            lines.append(
++                rst_fields(entry.get("name", ""), sanitize(entry.get("doc", "")), level)
++            )
++        elif isinstance(entry, list):
++            lines.append(rst_list_inline(entry, level))
++        else:
++            lines.append(rst_bullet(inline(sanitize(entry)), level))
++
++    lines.append("\n")
++    return "\n".join(lines)
++
++
++def parse_definitions(defs: Dict[str, Any]) -> str:
++    """Parse definitions section"""
++    preprocessed = ["name", "entries", "members"]
++    ignored = ["render-max"]  # This is not printed
++    lines = []
++
++    for definition in defs:
++        lines.append(rst_section(definition["name"]))
++        for k in definition.keys():
++            if k in preprocessed + ignored:
++                continue
++            lines.append(rst_fields(k, sanitize(definition[k]), 0))
++
++        # Field list needs to finish with a new line
++        lines.append("\n")
++        if "entries" in definition:
++            lines.append(rst_paragraph(":entries:", 0))
++            lines.append(parse_entries(definition["entries"], 1))
++        if "members" in definition:
++            lines.append(rst_paragraph(":members:", 0))
++            lines.append(parse_entries(definition["members"], 1))
++
++    return "\n".join(lines)
++
++
++def parse_attr_sets(entries: List[Dict[str, Any]]) -> str:
++    """Parse attribute from attribute-set"""
++    preprocessed = ["name", "type"]
++    ignored = ["checks"]
++    lines = []
++
++    for entry in entries:
++        lines.append(rst_section(entry["name"]))
++        for attr in entry["attributes"]:
++            type_ = attr.get("type")
++            attr_line = bold(attr["name"])
++            if type_:
++                # Add the attribute type in the same line
++                attr_line += f" ({inline(type_)})"
++
++            lines.append(rst_subsubsection(attr_line))
++
++            for k in attr.keys():
++                if k in preprocessed + ignored:
++                    continue
++                lines.append(rst_fields(k, sanitize(attr[k]), 2))
++            lines.append("\n")
++
++    return "\n".join(lines)
++
++
++def parse_yaml(obj: Dict[str, Any]) -> str:
++    """Format the whole YAML into a RST string"""
++    lines = []
++
++    # Main header
++
++    lines.append(rst_header())
++
++    title = f"Family ``{obj['name']}`` netlink specification"
++    lines.append(rst_title(title))
++    lines.append(rst_paragraph(".. contents::\n"))
++
++    if "doc" in obj:
++        lines.append(rst_subtitle("Summary"))
++        lines.append(rst_paragraph(obj["doc"], 0))
++
++    # Operations
++    if "operations" in obj:
++        lines.append(rst_subtitle("Operations"))
++        lines.append(parse_operations(obj["operations"]["list"]))
++
++    # Multicast groups
++    if "mcast-groups" in obj:
++        lines.append(rst_subtitle("Multicast groups"))
++        lines.append(parse_mcast_group(obj["mcast-groups"]["list"]))
++
++    # Definitions
++    if "definitions" in obj:
++        lines.append(rst_subtitle("Definitions"))
++        lines.append(parse_definitions(obj["definitions"]))
++
++    # Attributes set
++    if "attribute-sets" in obj:
++        lines.append(rst_subtitle("Attribute sets"))
++        lines.append(parse_attr_sets(obj["attribute-sets"]))
++
++    return "\n".join(lines)
++
++
++# Main functions
++# ==============
++
++
++def parse_arguments() -> argparse.Namespace:
++    """Parse arguments from user"""
++    parser = argparse.ArgumentParser(description="Netlink RST generator")
++
++    parser.add_argument("-v", "--verbose", action="store_true")
++    parser.add_argument("-o", "--output", help="Output file name")
++
++    # Index and input are mutually exclusive
++    group = parser.add_mutually_exclusive_group()
++    group.add_argument(
++        "-x", "--index", action="store_true", help="Generate the index page"
++    )
++    group.add_argument("-i", "--input", help="YAML file name")
++
++    args = parser.parse_args()
++
++    if args.verbose:
++        logging.basicConfig(level=logging.DEBUG)
++
++    if args.input and not os.path.isfile(args.input):
++        logging.warning("%s is not a valid file.", args.input)
++        sys.exit(-1)
++
++    if not args.output:
++        logging.error("No output file specified.")
++        sys.exit(-1)
++
++    if os.path.isfile(args.output):
++        logging.debug("%s already exists. Overwriting it.", args.output)
++
++    return args
++
++
++def parse_yaml_file(filename: str) -> str:
++    """Transform the YAML specified by filename into a rst-formmated string"""
++    with open(filename, "r", encoding="utf-8") as spec_file:
++        yaml_data = yaml.safe_load(spec_file)
++        content = parse_yaml(yaml_data)
++
++    return content
++
++
++def write_to_rstfile(content: str, filename: str) -> None:
++    """Write the generated content into an RST file"""
++    logging.debug("Saving RST file to %s", filename)
++
++    with open(filename, "w", encoding="utf-8") as rst_file:
++        rst_file.write(content)
++
++
++def generate_main_index_rst(output: str) -> None:
++    """Generate the `networking_spec/index` content and write to the file"""
++    lines = []
++
++    lines.append(rst_header())
++    lines.append(rst_title("Netlink Specification"))
++    lines.append(rst_toctree(1))
++
++    index_dir = os.path.dirname(output)
++    logging.debug("Looking for .rst files in %s", index_dir)
++    for filename in os.listdir(index_dir):
++        if not filename.endswith(".rst") or filename == "index.rst":
++            continue
++        lines.append(f"   {filename.replace('.rst', '')}\n")
++
++    logging.debug("Writing an index file at %s", output)
++    write_to_rstfile("".join(lines), output)
++
++
++def main() -> None:
++    """Main function that reads the YAML files and generates the RST files"""
++
++    args = parse_arguments()
++
++    if args.input:
++        logging.debug("Parsing %s", args.input)
++        try:
++            content = parse_yaml_file(os.path.join(args.input))
++        except Exception as exception:
++            logging.warning("Failed to parse %s.", args.input)
++            logging.warning(exception)
++            sys.exit(-1)
++
++        write_to_rstfile(content, args.output)
++
++    if args.index:
++        # Generate the index RST file
++        generate_main_index_rst(args.output)
++
++
++if __name__ == "__main__":
++    main()
+-- 
+2.34.1
 
 
