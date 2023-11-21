@@ -1,167 +1,297 @@
-Return-Path: <netdev+bounces-49485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26BF97F2301
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:20:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03EE57F230B
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:28:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 965941F20EEA
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:20:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D67E282268
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 040A65CBE;
-	Tue, 21 Nov 2023 01:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C5663D3;
+	Tue, 21 Nov 2023 01:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="fYZo3G42"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EH5RObR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8082D91
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:20:06 -0800 (PST)
-Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id AD7C93F335
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 01:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1700529603;
-	bh=Vr9a4uEdlLSG60iE0prA4e6fQhmhmrVr96oFin4o/vw=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=fYZo3G42myfpyK7Pmpd1BWqTZHx7vORlPst86gCj1om1FMNJzgxnd1qadaDSP1bZL
-	 Gv3cBGvAVAOH6fMTezACtFCeUhvQvX+bSf12S6LI/y0ADu1y8bUz8jpeMMO6tu+Zfp
-	 a2gW1eak1jb+gKeumEexJYDBnjHxfSRtiNzlO6Bt1WIS0hDE2Z+r/exGdjyyIL2Htp
-	 JSjZsxDK7KqkOa3lzIDedzusQ8WYg8X2yYYNL6DOJmVQseXTYnYIztpQ3GkWwNlrmr
-	 aSKJyzWHeNpmmvBhxa4+/1n7Rm+mS84qJxbqW6HxLZmkhkskLg3FM4K1wHOfU+Qq1h
-	 0EKTx6DlVs34g==
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1cf62ae2df2so18209115ad.0
-        for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:20:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700529602; x=1701134402;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vr9a4uEdlLSG60iE0prA4e6fQhmhmrVr96oFin4o/vw=;
-        b=F9sYZJG8afK+Uu3v2kc8BXTOUgDTwYoO52aI6z3HwmPAYdH/x7pTRCwYpGdFr4LCN4
-         cJejpK6FVu6Y4qKEya89+oODQJ4x4MDiFIuWKSYxXsCo68qXzQNuWeGOqW5rgI4WBoHC
-         HtJTw7c5APoGZ1UFAzZYet10WKxmF+3BNBtYvIxLEjAArqPAgIj23Kp0FLBY+7M42yzd
-         qchoz8liZy/d2iTe7imtTRsdIJCgx77NlsgAtSOaqxnYXOWOHYlRr6Z/m2IHllAM45IJ
-         agvK2mayL8umk1VHf7kV5afED6sC8KGQXhGTSAV9UY3iv+4CRAfAdTaThEZS9PurRXzn
-         OP0w==
-X-Gm-Message-State: AOJu0YwFgTzSBVROxV6WKGoDOcYRxxnYcWYydzl+azMS5oU8WuZGYpjw
-	n7n36ZSGidKgW5tWjz8zk3/ryo6etYL6xB/KmLY0ywVTgl6l5QCt8hEcA8VRRmIp7pD44B5c2ph
-	7qX8x6myTn4lfk/v7lHidCKSp7lP47d1eKA==
-X-Received: by 2002:a17:902:e74b:b0:1c0:cbaf:6930 with SMTP id p11-20020a170902e74b00b001c0cbaf6930mr11156871plf.54.1700529602282;
-        Mon, 20 Nov 2023 17:20:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEOmw8eEHQVAHuncQin8z4SkLhl/8bj7De6Sh2qlrQDHJ4FtmaliEeIafP9Gcqblv2/P2p3sg==
-X-Received: by 2002:a17:902:e74b:b0:1c0:cbaf:6930 with SMTP id p11-20020a170902e74b00b001c0cbaf6930mr11156854plf.54.1700529601952;
-        Mon, 20 Nov 2023 17:20:01 -0800 (PST)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id w17-20020a170902e89100b001c9cc44eb60sm3459045plg.201.2023.11.20.17.20.01
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 20 Nov 2023 17:20:01 -0800 (PST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 2D1245FEC8; Mon, 20 Nov 2023 17:20:01 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 25D549F88E;
-	Mon, 20 Nov 2023 17:20:01 -0800 (PST)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-    kuba@kernel.org, pabeni@redhat.com, andy@greyhouse.net,
-    weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net-next,v4] bonding: return -ENOMEM instead of BUG in alb_upper_dev_walk
-In-reply-to: <20231118081653.1481260-1-shaozhengchao@huawei.com>
-References: <20231118081653.1481260-1-shaozhengchao@huawei.com>
-Comments: In-reply-to Zhengchao Shao <shaozhengchao@huawei.com>
-   message dated "Sat, 18 Nov 2023 16:16:53 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57E6DBC
+	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:28:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700530115; x=1732066115;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NAkWlNsjEP1jkTQmAKyhtoZE/VJMQVOUE6yo4aBfDMA=;
+  b=EH5RObR7dzorjudNHsRgjj4WHrkVWZeNBUoPDWSNLGejzkB9vtz5wzJw
+   WjfpVderdK3f698jfRj4i2mohiXgk6GF4nmF1aMU3neV8RPKXCfqo0fRj
+   MS2h+PZnFvPqT9u9+pkROPR3Boayy4JFtvKrsvqwMH5E3vKw9JyUUNXCe
+   1e2i0XAcBJFQGle3IdwQRJ/Z8s2Cp8BCw12bv4Pk+ensGxhelv5sHu6TY
+   +Z0XjY5ml5F1GSdJpN7pieYORCu/M3Z2eIbFwIdtrji+/NIWoCS4Y3Zs1
+   +ufG0YdbvGD0EbGSe4V4WfpTG5gqiKTWaassDMk/Q8Jr46GPg+0KuS0z8
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="456077075"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="456077075"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 17:28:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="742887024"
+X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
+   d="scan'208";a="742887024"
+Received: from c3-1-server.sj.intel.com ([10.232.18.246])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 17:28:34 -0800
+From: Pawel Kaminski <pawel.kaminski@intel.com>
+To: intel-wired-lan@osuosl.org
+Cc: netdev@vger.kernel.org,
+	Pawel Kaminski <pawel.kaminski@intel.com>,
+	Michal Wilczynski <michal.wilczynski@intel.com>
+Subject: [PATCH iwl-next] ice: Add support for devlink loopback param.
+Date: Mon, 20 Nov 2023 17:28:30 -0800
+Message-ID: <20231121012830.2261-1-pawel.kaminski@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <14620.1700529601.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Nov 2023 17:20:01 -0800
-Message-ID: <14621.1700529601@famine>
+Content-Transfer-Encoding: 8bit
 
-Zhengchao Shao <shaozhengchao@huawei.com> wrote:
+Add support for devlink loopback param. Supported values are "enabled",
+"disabled" and "prioritized". Default configuration is set to "enabled.
 
->If failed to allocate "tags" or could not find the final upper device fro=
-m
->start_dev's upper list in bond_verify_device_path(), only the loopback
->detection of the current upper device should be affected, and the system =
-is
->no need to be panic.
->So return -ENOMEM in alb_upper_dev_walk to stop walking, print some warn
->information when failed to allocate memory for vlan tags in
->bond_verify_device_path.
->
->I also think that the following function calls
->netdev_walk_all_upper_dev_rcu
->---->>>alb_upper_dev_walk
->---------->>>bond_verify_device_path
->From this way, "end device" can eventually be obtained from "start device=
-"
->in bond_verify_device_path, IS_ERR(tags) could be instead of
->IS_ERR_OR_NULL(tags) in alb_upper_dev_walk.
->
->Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+By default loopback traffic BW is locked to PF configured BW. HW is
+capable of higher speeds on loopback traffic. Loopback param set to
+"prioritized" enables HW BW prioritization for VF to VF traffic,
+effectively increasing BW between VFs. Applicable to 8x10G and 4x25G
+cards.
 
-Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
+Recommendation for user:
+ - Make, as much as possible, fair distribution of loopback usages
+   between groups to gain maximal loopback BW.
+ - Try to dedicate ports for loopback only traffic, with minimal network
+   traffic.
 
->---
->v4: print information instead of warn
->v3: return -ENOMEM instead of zero to stop walk
->v2: use WARN_ON_ONCE instead of WARN_ON
->---
-> drivers/net/bonding/bond_alb.c  | 3 ++-
-> drivers/net/bonding/bond_main.c | 5 ++++-
-> 2 files changed, 6 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_al=
-b.c
->index dc2c7b979656..7edf0fd58c34 100644
->--- a/drivers/net/bonding/bond_alb.c
->+++ b/drivers/net/bonding/bond_alb.c
->@@ -985,7 +985,8 @@ static int alb_upper_dev_walk(struct net_device *uppe=
-r,
-> 	if (netif_is_macvlan(upper) && !strict_match) {
-> 		tags =3D bond_verify_device_path(bond->dev, upper, 0);
-> 		if (IS_ERR_OR_NULL(tags))
->-			BUG();
->+			return -ENOMEM;
->+
-> 		alb_send_lp_vid(slave, upper->dev_addr,
-> 				tags[0].vlan_proto, tags[0].vlan_id);
-> 		kfree(tags);
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 51d47eda1c87..1a40bd08f984 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -2967,8 +2967,11 @@ struct bond_vlan_tag *bond_verify_device_path(stru=
-ct net_device *start_dev,
-> =
+Changing loopback configuration will trigger CORER reset in order to take
+effect.
 
-> 	if (start_dev =3D=3D end_dev) {
-> 		tags =3D kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
->-		if (!tags)
->+		if (!tags) {
->+			net_err_ratelimited("%s: %s: Failed to allocate tags\n",
->+					    __func__, start_dev->name);
-> 			return ERR_PTR(-ENOMEM);
->+		}
-> 		tags[level].vlan_proto =3D BOND_VLAN_PROTO_NONE;
-> 		return tags;
-> 	}
->-- =
+Example command to change current value:
+devlink dev param set pci/0000:b2:00.3 name loopback value prioritized \
+        cmode permanent
 
->2.34.1
->
->
+Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
+Co-developed-by: Michal Wilczynski <michal.wilczynski@intel.com>
+Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
+---
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   7 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   7 +-
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 127 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 4 files changed, 139 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 838d9b274d68..2f6b32b6bcdc 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -232,7 +232,12 @@ struct ice_aqc_set_port_params {
+ #define ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA	BIT(2)
+ 	__le16 bad_frame_vsi;
+ 	__le16 swid;
+-	u8 reserved[10];
++	u8 loopback_mode;
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID BIT(2)
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NORMAL 0x00
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NO 0x01
++#define ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_HIGH 0x02
++	u8 reserved[9];
+ };
+ 
+ /* These resource type defines are used for all switch resource
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 0157f6e98d3e..cb127c21cd42 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1121,7 +1121,8 @@ int ice_init_hw(struct ice_hw *hw)
+ 		status = -ENOMEM;
+ 		goto err_unroll_cqinit;
+ 	}
+-
++	hw->port_info->loopback_mode =
++		ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NORMAL;
+ 	/* set the back pointer to HW */
+ 	hw->port_info->hw = hw;
+ 
+@@ -2924,6 +2925,10 @@ ice_aq_set_port_params(struct ice_port_info *pi, bool double_vlan,
+ 	cmd = &desc.params.set_port_params;
+ 
+ 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_set_port_params);
++
++	cmd->loopback_mode = pi->loopback_mode |
++				ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_VALID;
++
+ 	if (double_vlan)
+ 		cmd_flags |= ICE_AQC_SET_P_PARAMS_DOUBLE_VLAN_ENA;
+ 	cmd->cmd_flags = cpu_to_le16(cmd_flags);
+diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+index bc44cc220818..4475cce03967 100644
+--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
++++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+@@ -1382,6 +1382,126 @@ ice_devlink_enable_iw_validate(struct devlink *devlink, u32 id,
+ 	return 0;
+ }
+ 
++#define DEVLINK_LPBK_DISABLED "disabled"
++#define DEVLINK_LPBK_ENABLED "enabled"
++#define DEVLINK_LPBK_PRIORITIZED "prioritized"
++
++/**
++ * ice_devlink_loopback_mode_to_str - Get string for lpbk mode
++ * @loopback_mode: loopback_mode used in port_info struct
++ *
++ * Returns mode respective string or "Invalid".
++ */
++static const char *ice_devlink_loopback_mode_to_str(u32 loopback_mode)
++{
++	switch (loopback_mode) {
++	case ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NORMAL:
++		return DEVLINK_LPBK_ENABLED;
++	case ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_HIGH:
++		return DEVLINK_LPBK_PRIORITIZED;
++	case ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NO:
++		return DEVLINK_LPBK_DISABLED;
++	}
++
++	return "Invalid mode";
++}
++
++/**
++ * ice_devlink_loopback_str_to_mode - Get lpbk mode from string name
++ * @mode_str: loopback mode string
++ *
++ * Returns mode value or -1 if invalid.
++ */
++static int ice_devlink_loopback_str_to_mode(const char *mode_str)
++{
++	if (!strcmp(mode_str, DEVLINK_LPBK_ENABLED))
++		return ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NORMAL;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_PRIORITIZED))
++		return ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_HIGH;
++	else if (!strcmp(mode_str, DEVLINK_LPBK_DISABLED))
++		return ICE_AQC_SET_P_PARAMS_LOOPBACK_MODE_NO;
++
++	return -EINVAL;
++}
++
++/**
++ * ice_devlink_loopback_get - Get loopback parameter
++ * @devlink: pointer to the devlink instance
++ * @id: the parameter ID to set
++ * @ctx: context to store the parameter value
++ *
++ * Returns zero on success.
++ */
++static int ice_devlink_loopback_get(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx)
++{
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_port_info *pi = pf->hw.port_info;
++	const char *mode_str;
++
++	mode_str = ice_devlink_loopback_mode_to_str(pi->loopback_mode);
++	snprintf(ctx->val.vstr, sizeof(ctx->val.vstr), "%s", mode_str);
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_set - Set loopback parameter
++ * @devlink: pointer to the devlink instance
++ * @id: the parameter ID to set
++ * @ctx: context to get the parameter value
++ *
++ * Returns zero on success.
++ */
++static int ice_devlink_loopback_set(struct devlink *devlink, u32 id,
++				    struct devlink_param_gset_ctx *ctx)
++{
++	int new_loopback_mode = ice_devlink_loopback_str_to_mode(ctx->val.vstr);
++	struct ice_pf *pf = devlink_priv(devlink);
++	struct ice_port_info *pi = pf->hw.port_info;
++	struct device *dev = ice_pf_to_dev(pf);
++
++	if (pi->loopback_mode != new_loopback_mode) {
++		pi->loopback_mode = new_loopback_mode;
++		dev_info(dev, "Setting loopback to %s\n", ctx->val.vstr);
++		ice_schedule_reset(pf, ICE_RESET_CORER);
++	}
++
++	return 0;
++}
++
++/**
++ * ice_devlink_loopback_validate - Validate passed loopback parameter value
++ * @devlink: unused pointer to devlink instance
++ * @id: the parameter ID to validate
++ * @val: value to validate
++ * @extack: netlink extended ACK structure
++ *
++ * Supported values are:
++ * "enabled" - loopback is enabled, "disabled" - loopback is disabled
++ * "prioritized" - loopback traffic is prioritized in scheduling
++ *
++ * Returns zero when passed parameter value is supported. Negative value on
++ * error.
++ */
++static int ice_devlink_loopback_validate(struct devlink *devlink, u32 id,
++					 union devlink_param_value val,
++					 struct netlink_ext_ack *extack)
++{
++	if (ice_devlink_loopback_str_to_mode(val.vstr) < 0) {
++		NL_SET_ERR_MSG_MOD(extack,
++				   "Error: Requested value is not supported.");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++enum ice_param_id {
++	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
++	ICE_DEVLINK_PARAM_ID_TX_LOOPBACK,
++};
++
+ static const struct devlink_param ice_devlink_params[] = {
+ 	DEVLINK_PARAM_GENERIC(ENABLE_ROCE, BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+ 			      ice_devlink_enable_roce_get,
+@@ -1391,7 +1511,12 @@ static const struct devlink_param ice_devlink_params[] = {
+ 			      ice_devlink_enable_iw_get,
+ 			      ice_devlink_enable_iw_set,
+ 			      ice_devlink_enable_iw_validate),
+-
++	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_LOOPBACK,
++			"loopback", DEVLINK_PARAM_TYPE_STRING,
++			BIT(DEVLINK_PARAM_CMODE_PERMANENT),
++			ice_devlink_loopback_get,
++			ice_devlink_loopback_set,
++			ice_devlink_loopback_validate),
+ };
+ 
+ static void ice_devlink_free(void *devlink_ptr)
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index a09556e57803..822e44562302 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -700,6 +700,7 @@ struct ice_port_info {
+ 	u16 sw_id;			/* Initial switch ID belongs to port */
+ 	u16 pf_vf_num;
+ 	u8 port_state;
++	u8 loopback_mode;
+ #define ICE_SCHED_PORT_STATE_INIT	0x0
+ #define ICE_SCHED_PORT_STATE_READY	0x1
+ 	u8 lport;
+-- 
+2.41.0
+
 
