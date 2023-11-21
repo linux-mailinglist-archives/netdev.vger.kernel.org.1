@@ -1,129 +1,125 @@
-Return-Path: <netdev+bounces-49489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8277F2315
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:32:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2284E7F2328
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 02:35:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10F21B213AA
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:32:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0520282257
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:35:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874976FA4;
-	Tue, 21 Nov 2023 01:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A01B46FC9;
+	Tue, 21 Nov 2023 01:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KK43/EvQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ynCgLiPM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121A4D8
-	for <netdev@vger.kernel.org>; Mon, 20 Nov 2023 17:32:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1700530328; x=1732066328;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=AzKviix/mh52ouO+kzJmJwKfcmsPzwvmNbjZKSF67es=;
-  b=KK43/EvQyn9nwdgK7+XwMc4Of6uE0gd/1Tx5ZRSuyyZs0qlF4h1F7De/
-   wfiS/vJqJ//wlMjy6ys/uFOLO3PRVmpJXA84aKsitKR0ZRfs/od2O3ulE
-   cyES5qxeXua3UooXfeQwN4rHlF0zDBnaMyQXW72FCndRLzvTBzwfkh6Ok
-   pdYsQ06K2BJCYpNloC/rJAYYlv8zYv3HsNp4t4KZPahhLjhz7rK6+QIiP
-   OlzTHIKNUvfL8vwtynkZpWdnLXNmGTU4FK0zurAMaIYV0ASXARkdeRiRD
-   7xMLfOtTzgDHyTUMU03WTZg/pbPTXQ1GQ+zucMZDaD9ZsfwZJmH/M2OE9
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="456077777"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="456077777"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 17:32:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10900"; a="742887425"
-X-IronPort-AV: E=Sophos;i="6.04,215,1695711600"; 
-   d="scan'208";a="742887425"
-Received: from c3-1-server.sj.intel.com ([10.232.18.246])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2023 17:32:09 -0800
-From: Pawel Kaminski <pawel.kaminski@intel.com>
-To: intel-wired-lan@osuosl.org
-Cc: netdev@vger.kernel.org,
-	Pawel Kaminski <pawel.kaminski@intel.com>,
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF6FD10CE;
+	Mon, 20 Nov 2023 17:34:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Am/1to/V8gkq755Qh9tO2gkpYjOcdKhlEYTmnGsC1fw=; b=ynCgLiPMN+NFUNWiq84dU/mY51
+	2JQeUI/TsS98fJ3QddRjeKyF5NQpjXlYkJhHw8LZHPnHnJt311d6eVQawVRZlQ4u/G+A40iXdFy5B
+	ToH5wvAyxJQm3oSf7EN38KERrYFpeP4syJJa2R5e7bUznCnEa9KuRaQPprbj+QjjiGJU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1r5Ff6-000i5g-W8; Tue, 21 Nov 2023 02:34:49 +0100
+Date: Tue, 21 Nov 2023 02:34:48 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
 	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: [PATCH iwl-next v1] ice: Improve logs for max ntuple errors
-Date: Mon, 20 Nov 2023 17:32:06 -0800
-Message-ID: <20231121013206.2321-1-pawel.kaminski@intel.com>
-X-Mailer: git-send-email 2.41.0
+Subject: Re: [RFC PATCH net-next v2 06/10] net: ethtool: Introduce a command
+ to list PHYs on an interface
+Message-ID: <fcb77cb3-e57d-4b66-bb55-63d3b1410e8f@lunn.ch>
+References: <20231117162323.626979-1-maxime.chevallier@bootlin.com>
+ <20231117162323.626979-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231117162323.626979-7-maxime.chevallier@bootlin.com>
 
-Supported number of ntuple filters affect also maximum location value that
-can be provided to ethtool command. Update error message to provide info
-about max supported value.
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index 2540c70952ff..29ef675f45c0 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -57,6 +57,7 @@ Structure of this header is
+>    ``ETHTOOL_A_HEADER_DEV_INDEX``  u32     device ifindex
+>    ``ETHTOOL_A_HEADER_DEV_NAME``   string  device name
+>    ``ETHTOOL_A_HEADER_FLAGS``      u32     flags common for all requests
+> +  ``ETHTOOL_A_HEADER_PHY_INDEX``  u32     phy device index
+>    ==============================  ======  =============================
+>  
+>  ``ETHTOOL_A_HEADER_DEV_INDEX`` and ``ETHTOOL_A_HEADER_DEV_NAME`` identify the
+> @@ -81,6 +82,12 @@ the behaviour is backward compatible, i.e. requests from old clients not aware
+>  of the flag should be interpreted the way the client expects. A client must
+>  not set flags it does not understand.
+>  
+> +``ETHTOOL_A_HEADER_PHY_INDEX`` identify the ethernet PHY the message relates to.
+> +As there are numerous commands that are related to PHY configuration, and because
+> +we can have more than one PHY on the link, the PHY index can be passed in the
+> +request for the commands that needs it. It is however not mandatory, and if it
+> +is not passed for commands that target a PHY, the net_device.phydev pointer
+> +is used, as a fallback that keeps the legacy behaviour.
 
-Fix double spaces in the error messages.
+O.K, you did document it :-)
 
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Pawel Kaminski <pawel.kaminski@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+But i would make this part of the previous patch.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index d151e5bacfec..3cc9d703428e 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -668,7 +668,7 @@ ice_fdir_set_hw_fltr_rule(struct ice_pf *pf, struct ice_flow_seg_info *seg,
- 		 * then return error.
- 		 */
- 		if (hw->fdir_fltr_cnt[flow]) {
--			dev_err(dev, "Failed to add filter.  Flow director filters on each port must have the same input set.\n");
-+			dev_err(dev, "Failed to add filter. Flow director filters on each port must have the same input set.\n");
- 			return -EINVAL;
- 		}
- 
-@@ -770,7 +770,7 @@ ice_fdir_set_hw_fltr_rule(struct ice_pf *pf, struct ice_flow_seg_info *seg,
- 	ice_flow_rem_entry(hw, ICE_BLK_FD, entry1_h);
- err_prof:
- 	ice_flow_rem_prof(hw, ICE_BLK_FD, prof_id);
--	dev_err(dev, "Failed to add filter.  Flow director filters on each port must have the same input set.\n");
-+	dev_err(dev, "Failed to add filter. Flow director filters on each port must have the same input set.\n");
- 
- 	return err;
- }
-@@ -1853,6 +1853,7 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
- 	struct ice_pf *pf;
- 	struct ice_hw *hw;
- 	int fltrs_needed;
-+	u32 max_location;
- 	u16 tunnel_port;
- 	int ret;
- 
-@@ -1884,8 +1885,10 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
- 	if (ret)
- 		return ret;
- 
--	if (fsp->location >= ice_get_fdir_cnt_all(hw)) {
--		dev_err(dev, "Failed to add filter.  The maximum number of flow director filters has been reached.\n");
-+	max_location = ice_get_fdir_cnt_all(hw);
-+	if (fsp->location >= max_location) {
-+		dev_err(dev, "Failed to add filter. The number of ntuple filters or provided location exceed max %d.\n",
-+			max_location);
- 		return -ENOSPC;
- 	}
- 
-@@ -1893,7 +1896,7 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
- 	fltrs_needed = ice_get_open_tunnel_port(hw, &tunnel_port, TNL_ALL) ? 2 : 1;
- 	if (!ice_fdir_find_fltr_by_idx(hw, fsp->location) &&
- 	    ice_fdir_num_avail_fltr(hw, pf->vsi[vsi->idx]) < fltrs_needed) {
--		dev_err(dev, "Failed to add filter.  The maximum number of flow director filters has been reached.\n");
-+		dev_err(dev, "Failed to add filter. The maximum number of flow director filters has been reached.\n");
- 		return -ENOSPC;
- 	}
- 
--- 
-2.41.0
+> +Kernel response contents:
+> +
+> +  =================================     ======  ==========================
+> +  ``ETHTOOL_A_PHY_HEADER``              nested  request header
+> +  ``ETHTOOL_A_PHY_INDEX``               u32     the phy's unique index, that can
+> +                                                be used for phy-specific requests
+> +  ``ETHTOOL_A_PHY_DRVNAME``             string  the phy driver name
+> +  ``ETHTOOL_A_PHY_NAME``                string  the phy device name
+> +  ``ETHTOOL_A_PHY_UPSTREAM_TYPE``       u32     the type of device this phy is
+> +                                                connected to
+> +  ``ETHTOOL_A_PHY_UPSTREAM_PHY``        nested  if the phy is connected to another
+> +                                                phy, this nest contains info on
+> +                                                that connection
+> +  ``ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME`` string  if the phy controls an sfp bus,
+> +                                                the name of the sfp bus
+> +  ``ETHTOOL_A_PHY_ID``                  u32     the phy id if the phy is C22
 
+Maybe a future extension. We could make phy_bus_match() set
+phydev->phy_id to the ID it matched to the driver when doing C45. We
+would then always have a value here.
+
+> --- a/include/linux/ethtool_netlink.h
+> +++ b/include/linux/ethtool_netlink.h
+> @@ -118,5 +118,10 @@ static inline bool ethtool_dev_mm_supported(struct net_device *dev)
+>  	return false;
+>  }
+>  
+> +int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+
+This is a header file, so should probably be static inline.
+
+     Andrew
 
