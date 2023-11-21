@@ -1,976 +1,177 @@
-Return-Path: <netdev+bounces-49478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42E287F21E6
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:02:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B3A7F2217
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 01:23:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBB09282A1F
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 202171C217FE
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 00:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F16A3D380;
-	Tue, 21 Nov 2023 00:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 864F7811;
+	Tue, 21 Nov 2023 00:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QOEPzFNe"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="EpJH6Dwi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F163C6BD
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 00:01:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAD8CC433C8;
-	Tue, 21 Nov 2023 00:01:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700524866;
-	bh=Ss4mGXWk5JCzPCZ7jnZ0waqr0mlfBJiNSYi+zYjMV/A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QOEPzFNei6dX/VACviTrstBZTQRdvB1IEUP3a//YTPXVdE+a5R+jWSD4xUgy9jMc1
-	 hLTFCo0N9a+V5rwCwSfR2G3nEQWr6qn9no96vvMMQj6yTJXqaudH5fTE4dWyaK0QAT
-	 Zr/jbFZ7UK9FpufJf3V56MVYCT6JxZwtAD5YUPKkEednBY/as/O0P3U6/7RVgu0Iz5
-	 b8g5TiBPmXq8XsULAnNz3N/bLZkW4yNM4byQSQgp7GpSGVdSuqLK3z5e3yHW49J7kc
-	 yhXhjWIC9tfQn2jF/WPh9eAI1i4qQjPWk5caaIj+YHPP093GlDEDMMAZrvzRc1DTSN
-	 g/qBBJSzQh9qw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	almasrymina@google.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	dsahern@gmail.com,
-	dtatulea@nvidia.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 15/15] tools: ynl: add sample for getting page-pool information
-Date: Mon, 20 Nov 2023 16:00:48 -0800
-Message-ID: <20231121000048.789613-16-kuba@kernel.org>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20231121000048.789613-1-kuba@kernel.org>
-References: <20231121000048.789613-1-kuba@kernel.org>
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2127.outbound.protection.outlook.com [40.107.223.127])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA8FB9;
+	Mon, 20 Nov 2023 16:23:46 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SH9INZaP34l3blKEsyxhVzIR0eTUW92J/Fw2yH8JENqaFgZIZPS+GIWxm61YJq6keOrGaOJCGv4Lwp0PCbRmhzUkp4s8jUHMwUOZnoqp8Rp84X12MKOshjhVUrt5+XKlFBlA20dreRcXETDgVGia6238prQSduRKl0VPb/ZbznCVZfwoUiWBG19XnDLgSkDsjdAKaxDC0kE8yFHyyBXtDifqI6UokJPs2G4JXkr3m16gMAG9TT1Kdw0Nsvfa8+dxwcp+pJ5uDI0IiHMSvCfA7Z/c8Sad+lgYTzTsMBYArJji5WA0bnnWFDs2Qci+cBIv3wFzHCCYSJFIMH8TWcfwUA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=98X5uKpe/5lFiSb+gz9fkb1SSkVYPOrzm7E5PkhNXBA=;
+ b=Nxzo13YWJsWkEeJ9FqhrLAaxTcMsu6lXVjaAsWkAEvgIItbSiS9qZWkbRYnVQa38RYf18/BrS8m/Hz2xdQ6xqvs+ZCnhYlcOvFk1r3CWhbFSk/ccta7zMnTFM3cgDdQRR3YASjunieLxuqPkGOXWh8qNoP10oH8iHS0cONNqeKN++Y4BbYeYjw75NDYQeH3SNQ+8b6JO5DwliOOLioWlKLSBQ6ZtdBsECxQd4rgtSVUsgU0OVV/l3BF1uaXTAciVs3TSlzLoGMPhKbiD2Yi1Nhq1G+9aAqr8Vmi1v7Qv7AahJMezFrJ95PgznufRrdYG8K7WoN5XR63XcoyYC1GVjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=98X5uKpe/5lFiSb+gz9fkb1SSkVYPOrzm7E5PkhNXBA=;
+ b=EpJH6Dwi1j6dghmaU2YYaxbQkB6Hf8UHTa5tbQy6q/ejY59QAvWFowp4zXv8YCy+aWzhwItMRjDZhkuWaVcDY2RlXtCiMVlRNDM3YnbLAqa/byOGt6leQBbm77Jbf3PceKAWVdVF3LFnVBeSzFgKBjhQtiJtWc72LcAqwMfTaZU=
+Received: from PH7PR21MB3263.namprd21.prod.outlook.com (2603:10b6:510:1db::16)
+ by SA1PR21MB1319.namprd21.prod.outlook.com (2603:10b6:806:1f2::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7046.9; Tue, 21 Nov
+ 2023 00:23:42 +0000
+Received: from PH7PR21MB3263.namprd21.prod.outlook.com
+ ([fe80::3c1:f565:8d:2954]) by PH7PR21MB3263.namprd21.prod.outlook.com
+ ([fe80::3c1:f565:8d:2954%7]) with mapi id 15.20.7046.004; Tue, 21 Nov 2023
+ 00:23:41 +0000
+From: Long Li <longli@microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>, stephen <stephen@networkplumber.org>
+CC: "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>, KY Srinivasan
+	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next v4] hv_netvsc: Mark VF as slave before exposing
+ it to user-mode
+Thread-Topic: [PATCH net-next v4] hv_netvsc: Mark VF as slave before exposing
+ it to user-mode
+Thread-Index:
+ AQHaEpbleF6H2i0O6EK5idFzE7vPXbBxP20AgAAPDICAAq7HgIAHmxUAgATOqoCAA5TaEA==
+Date: Tue, 21 Nov 2023 00:23:40 +0000
+Message-ID:
+ <PH7PR21MB326308608D52C45BFE16B05BCEBBA@PH7PR21MB3263.namprd21.prod.outlook.com>
+References: <1699484212-24079-1-git-send-email-longli@linuxonhyperv.com>
+	<20231108181318.5360af18@kernel.org>
+	<PH7PR21MB3263EBCF9600EEBD6D962B6ECEAEA@PH7PR21MB3263.namprd21.prod.outlook.com>
+	<20231110120513.45ed505c@kernel.org>	<20231115081406.1bd9a4ed@hermes.local>
+ <20231118093849.14e36043@kernel.org>
+In-Reply-To: <20231118093849.14e36043@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=b93cf709-6b7e-4dcd-8991-3483ff0f134b;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2023-11-21T00:20:21Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR21MB3263:EE_|SA1PR21MB1319:EE_
+x-ms-office365-filtering-correlation-id: c5ae9f75-e709-4096-6667-08dbea281cf2
+x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ ZRaCtTsiZ4drzHQ6+pfRMSlLJ94IaiVmzQM6smF/c0dBFlRkXqkTPVL1W/90ttBByknjdmpEdRlS/TZf41eZ01x/aIO1t2NIZoblVwRqclOFxCEPssuLM+dG4Gy+PXiTIy6lffNDf24yXvDCAsa/9c+V2q71AEcyTDXLr5NGCVXBD1L0wCd0rBOw7o6V0HuJbDRVlcQbirND8KrkIE4DQjjxv4J++CcPu4IN/vftO3UnJjXYE+vqoq7vk64AZ30eZJUopTf3Ti4023pYZjtOwqqeJVr6a8/tPhRtH+uJSBDW+n9ClDbYQIi5uKMu/vLs8nc6O7VJT+2m0dxINdriKAeADdmKVN/WBYviHyFQGzQtxHdBS/wOXivqPIf6B4nSSDeWXtw7fD9TT2j9kLux6aK7LTsDN6E7BRLaZkELdpbVHSg0AtVpMNZwYeabLWGa1hQT2s14L85G/guOd9mAAxBNykMe41T9Z9UHVFdb0g3BtWyebQ4R1rK1gXmzLTn/GnscLRz1n19bij04ae5TD/OycYRqRpbcXJa2zoUKpPczVMRbhO/ngTOmCnjc6zRO4h8wZWxQ7x+bSYcCu5DU78vpoSGb5jQjIUiQlv1JIwYLR5D3o5lXHPRag/a56cGaHHSLXDQ03WW5E+14ukcpXaTT2Ewtm7v5k2KBLgZwXX4=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3263.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(136003)(376002)(366004)(396003)(346002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(122000001)(66899024)(38070700009)(26005)(82960400001)(82950400001)(52536014)(110136005)(86362001)(64756008)(5660300002)(76116006)(66476007)(66556008)(66946007)(66446008)(316002)(8676002)(4326008)(8936002)(7416002)(54906003)(6506007)(7696005)(41300700001)(8990500004)(9686003)(71200400001)(478600001)(10290500003)(33656002)(2906002)(55016003)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?UO83f/ovzyk+eX0SOiSsGzzVkFCmQseAh4tmrMRe/xbcc+B6IwU49Is+iaky?=
+ =?us-ascii?Q?P+rOw5KsDmk0qHzV0pjFbXW/h9c3o4rzeHsxeg+nCjSbFpN/RLrjf+CKTbgw?=
+ =?us-ascii?Q?gHZlrYKrTUR4kCfW6g58Ts2e6Uvp3HvWZmE2zQQTzw8haxb7AzMdKQ6MG7RY?=
+ =?us-ascii?Q?IPCtFGl72w22L0D3sRQ4J/isvvgoUVEfSUpm/1HP4LKHsGV5/06IDmNRpSe+?=
+ =?us-ascii?Q?alLJZXWe3cJabUdTG+gPmt8Yp29ewb6Z+Z7EZ1cUcdtPYznl2PdHt1XmnWAV?=
+ =?us-ascii?Q?9MeH+KqA+kPnpc3KgMUheSAbf8PNREx5b5XVDL1z/PvkV5GVOOL064Jm/0vv?=
+ =?us-ascii?Q?zwCVJZB38bI/Vy2QR2XxES39oxLi3gBU+ikhiDTWmGpHgdQWc/47aodM9+0u?=
+ =?us-ascii?Q?1gnSan9l5u3qDznrVAxl0vTv6ZnLm/Mx+ZAHpDLcDZvnxcjBsvtZVQuEzf64?=
+ =?us-ascii?Q?i7Rn/XEefmlSVKiT9praCiPAgX52GjTurFt5xjaNhk+jAPmdt+g9v2A9Dsag?=
+ =?us-ascii?Q?uECD7RFq2mGXjTUMTgaqe/ce98c+SrJOYU1o0wkaq44XHBhL5/2kiai/lWIw?=
+ =?us-ascii?Q?Ifaw7BQSKuh7I626xM/5BT3Cq7V5zN9Afq/2XsBJgcT3mUJPJNNyI9J+Us6b?=
+ =?us-ascii?Q?/2JexVRo/DY3BS9/mscaqkihZrppZT2FOb0xF5lwQzF4JviLcMM8kz3491pV?=
+ =?us-ascii?Q?k8u3nGDSNzViTmRw4UX2mlRX6KCYilasNVTgOih9uBLJI8k5Bo0jnuTlH+yp?=
+ =?us-ascii?Q?6puPxaXRoq7FazlHWvbb0OwhpoKOB83BZGe+QDpYVY46YX+w1yCtbke+d7jh?=
+ =?us-ascii?Q?bb1rhalLwuxRxPyVioQL2eAtaBbayhK1oOKJ+gHkfvIgxSwjGX/ODcqr+K3B?=
+ =?us-ascii?Q?ZReQtokfPXMdJqkVrNP0gzMuZ5AD1FO/RtynpZZwh7r7e8K6smUuDNPURbH1?=
+ =?us-ascii?Q?/okKtZp8RVX3PKHWusX4nr+vFw/tniWs0emmeyb/B/etg1q7brad8+kUDDnR?=
+ =?us-ascii?Q?dD077CC5Gs7+rCEl4T0s/eBJO1x98a8AiOIJhGSVk4V6JWBG6D3lNU0SCjFw?=
+ =?us-ascii?Q?JHsS8ZY3ktAxM9I2kv/awaniaVuvpSI4RpGFGuT6f4hQ1kBKb4+5+lNNJcJr?=
+ =?us-ascii?Q?gysTHnK5zkkI177bn7DX4Qt4pelELgPLg2yrKHOV2Xx4h93Z82UOfx00BT+S?=
+ =?us-ascii?Q?tkPvBXUgHZE4jhevQSfLKp3unhwp7WUMfL5CyfXv9FFTnN0I6A0dAhi8dvu5?=
+ =?us-ascii?Q?40hjm/RpB8w80SqeeLCVYPhZDvqK7HUmMrCX083+56Oxa9BD/xB8pWB8Y+e0?=
+ =?us-ascii?Q?KtRvx8W+oJSRHPTEK22CvT9D5rG2mPIiAZfORYZorIVBoYPJj2yLqXxm/pRr?=
+ =?us-ascii?Q?mT75CXpLN/hLFgRbcL6001sRb9zcyUREuzWkcAuDRLDkR3zWpInwquPrulK5?=
+ =?us-ascii?Q?5o64wIk0rAO+I6CzHvF39V6FdVEu+3Y512TN5XH8QqX+NBz/LD8T0q54IpBF?=
+ =?us-ascii?Q?OGA4L8Myb4ER5GH8MhoGpA7Q6tpuat+YeMmnZwHk3q19uZqgCoO+Ji59QDjJ?=
+ =?us-ascii?Q?n3uk5a3hZZ2EYhJPpmcAZKu+NQlyvJSonWJZzEJx?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3263.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5ae9f75-e709-4096-6667-08dbea281cf2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2023 00:23:40.7695
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DQRINEvGybcvaamLvLiACFRPdgXvYscfMcT99d/4fO4ZMGdNzINpnn0+JDRXSum+PAai/0cqeWwim7WZJ8f+tQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR21MB1319
 
-Regenerate the tools/ code after netdev spec changes.
+> On Wed, 15 Nov 2023 08:14:06 -0800 Stephen Hemminger wrote:
+> > Jakub is right that in an ideal world, this could all be managed by
+> > userspace. But the management of network devices in Linux is a
+> > dumpster fire! Every distro invents there own solution, last time I
+> > counted there were six different tools claiming to be the "one network
+> > device manager to rule them all". And that doesn't include all the
+> > custom scripts and vendor appliances.
+>=20
+> To be clear, I thought Long Li was saying that the goal is work around ca=
+ses where
+> VF is probed before netvsc. That seems like something that can be prevent=
+ed by
+> the hypervisor.
 
-Add sample to query page-pool info in a concise fashion:
+Hi Jakub,
 
-$ ./page-pool
-    eth0[2]	page pools: 10 (zombies: 0)
-		refs: 41984 bytes: 171966464 (refs: 0 bytes: 0)
-		recycling: 90.3% (alloc: 656:397681 recycle: 89652:270201)
+I think you misunderstood my response, here is the response again.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/include/uapi/linux/netdev.h     |  36 +++
- tools/net/ynl/generated/netdev-user.c | 419 ++++++++++++++++++++++++++
- tools/net/ynl/generated/netdev-user.h | 171 +++++++++++
- tools/net/ynl/lib/ynl.h               |   2 +-
- tools/net/ynl/samples/.gitignore      |   1 +
- tools/net/ynl/samples/Makefile        |   2 +-
- tools/net/ynl/samples/page-pool.c     | 147 +++++++++
- 7 files changed, 776 insertions(+), 2 deletions(-)
- create mode 100644 tools/net/ynl/samples/page-pool.c
+(quote)
 
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 2943a151d4f1..9d0a48717d1f 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -64,16 +64,52 @@ enum {
- 	NETDEV_A_DEV_MAX = (__NETDEV_A_DEV_MAX - 1)
- };
- 
-+enum {
-+	NETDEV_A_PAGE_POOL_ID = 1,
-+	NETDEV_A_PAGE_POOL_IFINDEX,
-+	NETDEV_A_PAGE_POOL_NAPI_ID,
-+	NETDEV_A_PAGE_POOL_INFLIGHT,
-+	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
-+	NETDEV_A_PAGE_POOL_DESTROYED,
-+
-+	__NETDEV_A_PAGE_POOL_MAX,
-+	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-+};
-+
-+enum {
-+	NETDEV_A_PAGE_POOL_STATS_INFO = 1,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST = 8,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL,
-+	NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL,
-+	NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT,
-+
-+	__NETDEV_A_PAGE_POOL_STATS_MAX,
-+	NETDEV_A_PAGE_POOL_STATS_MAX = (__NETDEV_A_PAGE_POOL_STATS_MAX - 1)
-+};
-+
- enum {
- 	NETDEV_CMD_DEV_GET = 1,
- 	NETDEV_CMD_DEV_ADD_NTF,
- 	NETDEV_CMD_DEV_DEL_NTF,
- 	NETDEV_CMD_DEV_CHANGE_NTF,
-+	NETDEV_CMD_PAGE_POOL_GET,
-+	NETDEV_CMD_PAGE_POOL_ADD_NTF,
-+	NETDEV_CMD_PAGE_POOL_DEL_NTF,
-+	NETDEV_CMD_PAGE_POOL_CHANGE_NTF,
-+	NETDEV_CMD_PAGE_POOL_STATS_GET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
- };
- 
- #define NETDEV_MCGRP_MGMT	"mgmt"
-+#define NETDEV_MCGRP_PAGE_POOL	"page-pool"
- 
- #endif /* _UAPI_LINUX_NETDEV_H */
-diff --git a/tools/net/ynl/generated/netdev-user.c b/tools/net/ynl/generated/netdev-user.c
-index b5ffe8cd1144..f9a000584493 100644
---- a/tools/net/ynl/generated/netdev-user.c
-+++ b/tools/net/ynl/generated/netdev-user.c
-@@ -18,6 +18,11 @@ static const char * const netdev_op_strmap[] = {
- 	[NETDEV_CMD_DEV_ADD_NTF] = "dev-add-ntf",
- 	[NETDEV_CMD_DEV_DEL_NTF] = "dev-del-ntf",
- 	[NETDEV_CMD_DEV_CHANGE_NTF] = "dev-change-ntf",
-+	[NETDEV_CMD_PAGE_POOL_GET] = "page-pool-get",
-+	[NETDEV_CMD_PAGE_POOL_ADD_NTF] = "page-pool-add-ntf",
-+	[NETDEV_CMD_PAGE_POOL_DEL_NTF] = "page-pool-del-ntf",
-+	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] = "page-pool-change-ntf",
-+	[NETDEV_CMD_PAGE_POOL_STATS_GET] = "page-pool-stats-get",
- };
- 
- const char *netdev_op_str(int op)
-@@ -59,6 +64,16 @@ const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value)
- }
- 
- /* Policies */
-+struct ynl_policy_attr netdev_page_pool_info_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_info_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_MAX,
-+	.table = netdev_page_pool_info_policy,
-+};
-+
- struct ynl_policy_attr netdev_dev_policy[NETDEV_A_DEV_MAX + 1] = {
- 	[NETDEV_A_DEV_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
- 	[NETDEV_A_DEV_PAD] = { .name = "pad", .type = YNL_PT_IGNORE, },
-@@ -72,7 +87,85 @@ struct ynl_policy_nest netdev_dev_nest = {
- 	.table = netdev_dev_policy,
- };
- 
-+struct ynl_policy_attr netdev_page_pool_policy[NETDEV_A_PAGE_POOL_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_ID] = { .name = "id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_IFINDEX] = { .name = "ifindex", .type = YNL_PT_U32, },
-+	[NETDEV_A_PAGE_POOL_NAPI_ID] = { .name = "napi-id", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_INFLIGHT] = { .name = "inflight", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_INFLIGHT_MEM] = { .name = "inflight-mem", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_DESTROYED] = { .name = "destroyed", .type = YNL_PT_UINT, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_MAX,
-+	.table = netdev_page_pool_policy,
-+};
-+
-+struct ynl_policy_attr netdev_page_pool_stats_policy[NETDEV_A_PAGE_POOL_STATS_MAX + 1] = {
-+	[NETDEV_A_PAGE_POOL_STATS_INFO] = { .name = "info", .type = YNL_PT_NEST, .nest = &netdev_page_pool_info_nest, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST] = { .name = "alloc-fast", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW] = { .name = "alloc-slow", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER] = { .name = "alloc-slow-high-order", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY] = { .name = "alloc-empty", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL] = { .name = "alloc-refill", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE] = { .name = "alloc-waive", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED] = { .name = "recycle-cached", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL] = { .name = "recycle-cache-full", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING] = { .name = "recycle-ring", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL] = { .name = "recycle-ring-full", .type = YNL_PT_UINT, },
-+	[NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT] = { .name = "recycle-released-refcnt", .type = YNL_PT_UINT, },
-+};
-+
-+struct ynl_policy_nest netdev_page_pool_stats_nest = {
-+	.max_attr = NETDEV_A_PAGE_POOL_STATS_MAX,
-+	.table = netdev_page_pool_stats_policy,
-+};
-+
- /* Common nested types */
-+void netdev_page_pool_info_free(struct netdev_page_pool_info *obj)
-+{
-+}
-+
-+int netdev_page_pool_info_put(struct nlmsghdr *nlh, unsigned int attr_type,
-+			      struct netdev_page_pool_info *obj)
-+{
-+	struct nlattr *nest;
-+
-+	nest = mnl_attr_nest_start(nlh, attr_type);
-+	if (obj->_present.id)
-+		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, obj->id);
-+	if (obj->_present.ifindex)
-+		mnl_attr_put_u32(nlh, NETDEV_A_PAGE_POOL_IFINDEX, obj->ifindex);
-+	mnl_attr_nest_end(nlh, nest);
-+
-+	return 0;
-+}
-+
-+int netdev_page_pool_info_parse(struct ynl_parse_arg *yarg,
-+				const struct nlattr *nested)
-+{
-+	struct netdev_page_pool_info *dst = yarg->data;
-+	const struct nlattr *attr;
-+
-+	mnl_attr_for_each_nested(attr, nested) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.id = 1;
-+			dst->id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* ============== NETDEV_CMD_DEV_GET ============== */
- /* NETDEV_CMD_DEV_GET - do */
- void netdev_dev_get_req_free(struct netdev_dev_get_req *req)
-@@ -197,6 +290,314 @@ void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp)
- 	free(rsp);
- }
- 
-+/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_GET - do */
-+void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req)
-+{
-+	free(req);
-+}
-+
-+void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp)
-+{
-+	free(rsp);
-+}
-+
-+int netdev_page_pool_get_rsp_parse(const struct nlmsghdr *nlh, void *data)
-+{
-+	struct netdev_page_pool_get_rsp *dst;
-+	struct ynl_parse_arg *yarg = data;
-+	const struct nlattr *attr;
-+
-+	dst = yarg->data;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.id = 1;
-+			dst->id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_IFINDEX) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.ifindex = 1;
-+			dst->ifindex = mnl_attr_get_u32(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_NAPI_ID) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.napi_id = 1;
-+			dst->napi_id = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.inflight = 1;
-+			dst->inflight = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_INFLIGHT_MEM) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.inflight_mem = 1;
-+			dst->inflight_mem = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_DESTROYED) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.destroyed = 1;
-+			dst->destroyed = mnl_attr_get_uint(attr);
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+struct netdev_page_pool_get_rsp *
-+netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_page_pool_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
-+	ys->req_policy = &netdev_page_pool_nest;
-+	yrs.yarg.rsp_policy = &netdev_page_pool_nest;
-+
-+	if (req->_present.id)
-+		mnl_attr_put_uint(nlh, NETDEV_A_PAGE_POOL_ID, req->id);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_page_pool_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_page_pool_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - dump */
-+void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp)
-+{
-+	struct netdev_page_pool_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_page_pool_get_list *
-+netdev_page_pool_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_page_pool_get_list);
-+	yds.cb = netdev_page_pool_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_GET;
-+	yds.rsp_policy = &netdev_page_pool_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_page_pool_get_list_free(yds.first);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - notify */
-+void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp)
-+{
-+	free(rsp);
-+}
-+
-+/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
-+void
-+netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req)
-+{
-+	netdev_page_pool_info_free(&req->info);
-+	free(req);
-+}
-+
-+void
-+netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp)
-+{
-+	netdev_page_pool_info_free(&rsp->info);
-+	free(rsp);
-+}
-+
-+int netdev_page_pool_stats_get_rsp_parse(const struct nlmsghdr *nlh,
-+					 void *data)
-+{
-+	struct netdev_page_pool_stats_get_rsp *dst;
-+	struct ynl_parse_arg *yarg = data;
-+	const struct nlattr *attr;
-+	struct ynl_parse_arg parg;
-+
-+	dst = yarg->data;
-+	parg.ys = yarg->ys;
-+
-+	mnl_attr_for_each(attr, nlh, sizeof(struct genlmsghdr)) {
-+		unsigned int type = mnl_attr_get_type(attr);
-+
-+		if (type == NETDEV_A_PAGE_POOL_STATS_INFO) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.info = 1;
-+
-+			parg.rsp_policy = &netdev_page_pool_info_nest;
-+			parg.data = &dst->info;
-+			if (netdev_page_pool_info_parse(&parg, attr))
-+				return MNL_CB_ERROR;
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_FAST) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_fast = 1;
-+			dst->alloc_fast = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_slow = 1;
-+			dst->alloc_slow = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_SLOW_HIGH_ORDER) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_slow_high_order = 1;
-+			dst->alloc_slow_high_order = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_EMPTY) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_empty = 1;
-+			dst->alloc_empty = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_REFILL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_refill = 1;
-+			dst->alloc_refill = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_ALLOC_WAIVE) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.alloc_waive = 1;
-+			dst->alloc_waive = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHED) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_cached = 1;
-+			dst->recycle_cached = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_CACHE_FULL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_cache_full = 1;
-+			dst->recycle_cache_full = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_ring = 1;
-+			dst->recycle_ring = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RING_FULL) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_ring_full = 1;
-+			dst->recycle_ring_full = mnl_attr_get_uint(attr);
-+		} else if (type == NETDEV_A_PAGE_POOL_STATS_RECYCLE_RELEASED_REFCNT) {
-+			if (ynl_attr_validate(yarg, attr))
-+				return MNL_CB_ERROR;
-+			dst->_present.recycle_released_refcnt = 1;
-+			dst->recycle_released_refcnt = mnl_attr_get_uint(attr);
-+		}
-+	}
-+
-+	return MNL_CB_OK;
-+}
-+
-+struct netdev_page_pool_stats_get_rsp *
-+netdev_page_pool_stats_get(struct ynl_sock *ys,
-+			   struct netdev_page_pool_stats_get_req *req)
-+{
-+	struct ynl_req_state yrs = { .yarg = { .ys = ys, }, };
-+	struct netdev_page_pool_stats_get_rsp *rsp;
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	nlh = ynl_gemsg_start_req(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
-+	ys->req_policy = &netdev_page_pool_stats_nest;
-+	yrs.yarg.rsp_policy = &netdev_page_pool_stats_nest;
-+
-+	if (req->_present.info)
-+		netdev_page_pool_info_put(nlh, NETDEV_A_PAGE_POOL_STATS_INFO, &req->info);
-+
-+	rsp = calloc(1, sizeof(*rsp));
-+	yrs.yarg.data = rsp;
-+	yrs.cb = netdev_page_pool_stats_get_rsp_parse;
-+	yrs.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
-+
-+	err = ynl_exec(ys, nlh, &yrs);
-+	if (err < 0)
-+		goto err_free;
-+
-+	return rsp;
-+
-+err_free:
-+	netdev_page_pool_stats_get_rsp_free(rsp);
-+	return NULL;
-+}
-+
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
-+void
-+netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp)
-+{
-+	struct netdev_page_pool_stats_get_list *next = rsp;
-+
-+	while ((void *)next != YNL_LIST_END) {
-+		rsp = next;
-+		next = rsp->next;
-+
-+		netdev_page_pool_info_free(&rsp->obj.info);
-+		free(rsp);
-+	}
-+}
-+
-+struct netdev_page_pool_stats_get_list *
-+netdev_page_pool_stats_get_dump(struct ynl_sock *ys)
-+{
-+	struct ynl_dump_state yds = {};
-+	struct nlmsghdr *nlh;
-+	int err;
-+
-+	yds.ys = ys;
-+	yds.alloc_sz = sizeof(struct netdev_page_pool_stats_get_list);
-+	yds.cb = netdev_page_pool_stats_get_rsp_parse;
-+	yds.rsp_cmd = NETDEV_CMD_PAGE_POOL_STATS_GET;
-+	yds.rsp_policy = &netdev_page_pool_stats_nest;
-+
-+	nlh = ynl_gemsg_start_dump(ys, ys->family_id, NETDEV_CMD_PAGE_POOL_STATS_GET, 1);
-+
-+	err = ynl_exec_dump(ys, nlh, &yds);
-+	if (err < 0)
-+		goto free_list;
-+
-+	return yds.first;
-+
-+free_list:
-+	netdev_page_pool_stats_get_list_free(yds.first);
-+	return NULL;
-+}
-+
- static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 	[NETDEV_CMD_DEV_ADD_NTF] =  {
- 		.alloc_sz	= sizeof(struct netdev_dev_get_ntf),
-@@ -216,6 +617,24 @@ static const struct ynl_ntf_info netdev_ntf_info[] =  {
- 		.policy		= &netdev_dev_nest,
- 		.free		= (void *)netdev_dev_get_ntf_free,
- 	},
-+	[NETDEV_CMD_PAGE_POOL_ADD_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
-+	[NETDEV_CMD_PAGE_POOL_DEL_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
-+	[NETDEV_CMD_PAGE_POOL_CHANGE_NTF] =  {
-+		.alloc_sz	= sizeof(struct netdev_page_pool_get_ntf),
-+		.cb		= netdev_page_pool_get_rsp_parse,
-+		.policy		= &netdev_page_pool_nest,
-+		.free		= (void *)netdev_page_pool_get_ntf_free,
-+	},
- };
- 
- const struct ynl_family ynl_netdev_family =  {
-diff --git a/tools/net/ynl/generated/netdev-user.h b/tools/net/ynl/generated/netdev-user.h
-index 4fafac879df3..f27ad84fe020 100644
---- a/tools/net/ynl/generated/netdev-user.h
-+++ b/tools/net/ynl/generated/netdev-user.h
-@@ -21,6 +21,16 @@ const char *netdev_xdp_act_str(enum netdev_xdp_act value);
- const char *netdev_xdp_rx_metadata_str(enum netdev_xdp_rx_metadata value);
- 
- /* Common nested types */
-+struct netdev_page_pool_info {
-+	struct {
-+		__u32 id:1;
-+		__u32 ifindex:1;
-+	} _present;
-+
-+	__u64 id;
-+	__u32 ifindex;
-+};
-+
- /* ============== NETDEV_CMD_DEV_GET ============== */
- /* NETDEV_CMD_DEV_GET - do */
- struct netdev_dev_get_req {
-@@ -87,4 +97,165 @@ struct netdev_dev_get_ntf {
- 
- void netdev_dev_get_ntf_free(struct netdev_dev_get_ntf *rsp);
- 
-+/* ============== NETDEV_CMD_PAGE_POOL_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_GET - do */
-+struct netdev_page_pool_get_req {
-+	struct {
-+		__u32 id:1;
-+	} _present;
-+
-+	__u64 id;
-+};
-+
-+static inline struct netdev_page_pool_get_req *
-+netdev_page_pool_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_page_pool_get_req));
-+}
-+void netdev_page_pool_get_req_free(struct netdev_page_pool_get_req *req);
-+
-+static inline void
-+netdev_page_pool_get_req_set_id(struct netdev_page_pool_get_req *req, __u64 id)
-+{
-+	req->_present.id = 1;
-+	req->id = id;
-+}
-+
-+struct netdev_page_pool_get_rsp {
-+	struct {
-+		__u32 id:1;
-+		__u32 ifindex:1;
-+		__u32 napi_id:1;
-+		__u32 inflight:1;
-+		__u32 inflight_mem:1;
-+		__u32 destroyed:1;
-+	} _present;
-+
-+	__u64 id;
-+	__u32 ifindex;
-+	__u64 napi_id;
-+	__u64 inflight;
-+	__u64 inflight_mem;
-+	__u64 destroyed;
-+};
-+
-+void netdev_page_pool_get_rsp_free(struct netdev_page_pool_get_rsp *rsp);
-+
-+/*
-+ * Get / dump information about Page Pools.
-+(Only Page Pools associated with a net_device can be listed.)
-+
-+ */
-+struct netdev_page_pool_get_rsp *
-+netdev_page_pool_get(struct ynl_sock *ys, struct netdev_page_pool_get_req *req);
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - dump */
-+struct netdev_page_pool_get_list {
-+	struct netdev_page_pool_get_list *next;
-+	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void netdev_page_pool_get_list_free(struct netdev_page_pool_get_list *rsp);
-+
-+struct netdev_page_pool_get_list *
-+netdev_page_pool_get_dump(struct ynl_sock *ys);
-+
-+/* NETDEV_CMD_PAGE_POOL_GET - notify */
-+struct netdev_page_pool_get_ntf {
-+	__u16 family;
-+	__u8 cmd;
-+	struct ynl_ntf_base_type *next;
-+	void (*free)(struct netdev_page_pool_get_ntf *ntf);
-+	struct netdev_page_pool_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void netdev_page_pool_get_ntf_free(struct netdev_page_pool_get_ntf *rsp);
-+
-+/* ============== NETDEV_CMD_PAGE_POOL_STATS_GET ============== */
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - do */
-+struct netdev_page_pool_stats_get_req {
-+	struct {
-+		__u32 info:1;
-+	} _present;
-+
-+	struct netdev_page_pool_info info;
-+};
-+
-+static inline struct netdev_page_pool_stats_get_req *
-+netdev_page_pool_stats_get_req_alloc(void)
-+{
-+	return calloc(1, sizeof(struct netdev_page_pool_stats_get_req));
-+}
-+void
-+netdev_page_pool_stats_get_req_free(struct netdev_page_pool_stats_get_req *req);
-+
-+static inline void
-+netdev_page_pool_stats_get_req_set_info_id(struct netdev_page_pool_stats_get_req *req,
-+					   __u64 id)
-+{
-+	req->_present.info = 1;
-+	req->info._present.id = 1;
-+	req->info.id = id;
-+}
-+static inline void
-+netdev_page_pool_stats_get_req_set_info_ifindex(struct netdev_page_pool_stats_get_req *req,
-+						__u32 ifindex)
-+{
-+	req->_present.info = 1;
-+	req->info._present.ifindex = 1;
-+	req->info.ifindex = ifindex;
-+}
-+
-+struct netdev_page_pool_stats_get_rsp {
-+	struct {
-+		__u32 info:1;
-+		__u32 alloc_fast:1;
-+		__u32 alloc_slow:1;
-+		__u32 alloc_slow_high_order:1;
-+		__u32 alloc_empty:1;
-+		__u32 alloc_refill:1;
-+		__u32 alloc_waive:1;
-+		__u32 recycle_cached:1;
-+		__u32 recycle_cache_full:1;
-+		__u32 recycle_ring:1;
-+		__u32 recycle_ring_full:1;
-+		__u32 recycle_released_refcnt:1;
-+	} _present;
-+
-+	struct netdev_page_pool_info info;
-+	__u64 alloc_fast;
-+	__u64 alloc_slow;
-+	__u64 alloc_slow_high_order;
-+	__u64 alloc_empty;
-+	__u64 alloc_refill;
-+	__u64 alloc_waive;
-+	__u64 recycle_cached;
-+	__u64 recycle_cache_full;
-+	__u64 recycle_ring;
-+	__u64 recycle_ring_full;
-+	__u64 recycle_released_refcnt;
-+};
-+
-+void
-+netdev_page_pool_stats_get_rsp_free(struct netdev_page_pool_stats_get_rsp *rsp);
-+
-+/*
-+ * Get page pool statistics.
-+ */
-+struct netdev_page_pool_stats_get_rsp *
-+netdev_page_pool_stats_get(struct ynl_sock *ys,
-+			   struct netdev_page_pool_stats_get_req *req);
-+
-+/* NETDEV_CMD_PAGE_POOL_STATS_GET - dump */
-+struct netdev_page_pool_stats_get_list {
-+	struct netdev_page_pool_stats_get_list *next;
-+	struct netdev_page_pool_stats_get_rsp obj __attribute__((aligned(8)));
-+};
-+
-+void
-+netdev_page_pool_stats_get_list_free(struct netdev_page_pool_stats_get_list *rsp);
-+
-+struct netdev_page_pool_stats_get_list *
-+netdev_page_pool_stats_get_dump(struct ynl_sock *ys);
-+
- #endif /* _LINUX_NETDEV_GEN_H */
-diff --git a/tools/net/ynl/lib/ynl.h b/tools/net/ynl/lib/ynl.h
-index e974378e3b8c..075d868f3b57 100644
---- a/tools/net/ynl/lib/ynl.h
-+++ b/tools/net/ynl/lib/ynl.h
-@@ -239,7 +239,7 @@ int ynl_error_parse(struct ynl_parse_arg *yarg, const char *msg);
- #ifndef MNL_HAS_AUTO_SCALARS
- static inline uint64_t mnl_attr_get_uint(const struct nlattr *attr)
- {
--	if (mnl_attr_get_len(attr) == 4)
-+	if (mnl_attr_get_payload_len(attr) == 4)
- 		return mnl_attr_get_u32(attr);
- 	return mnl_attr_get_u64(attr);
- }
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 2aae60c4829f..49637b26c482 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -1,3 +1,4 @@
- ethtool
- devlink
- netdev
-+page-pool
-\ No newline at end of file
-diff --git a/tools/net/ynl/samples/Makefile b/tools/net/ynl/samples/Makefile
-index 3dbb106e87d9..1afefc266b7a 100644
---- a/tools/net/ynl/samples/Makefile
-+++ b/tools/net/ynl/samples/Makefile
-@@ -18,7 +18,7 @@ include $(wildcard *.d)
- 
- all: $(BINS)
- 
--$(BINS): ../lib/ynl.a ../generated/protos.a
-+$(BINS): ../lib/ynl.a ../generated/protos.a $(SRCS)
- 	@echo -e '\tCC sample $@'
- 	@$(COMPILE.c) $(CFLAGS_$@) $@.c -o $@.o
- 	@$(LINK.c) $@.o -o $@  $(LDLIBS)
-diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
-new file mode 100644
-index 000000000000..18d359713469
---- /dev/null
-+++ b/tools/net/ynl/samples/page-pool.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE
-+
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <ynl.h>
-+
-+#include <net/if.h>
-+
-+#include "netdev-user.h"
-+
-+struct stat {
-+	unsigned int ifc;
-+
-+	struct {
-+		unsigned int cnt;
-+		size_t refs, bytes;
-+	} live[2];
-+
-+	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
-+};
-+
-+struct stats_array {
-+	unsigned int i, max;
-+	struct stat *s;
-+};
-+
-+static struct stat *find_ifc(struct stats_array *a, unsigned int ifindex)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < a->i; i++) {
-+		if (a->s[i].ifc == ifindex)
-+			return &a->s[i];
-+	}
-+
-+	a->i++;
-+	if (a->i == a->max) {
-+		a->max *= 2;
-+		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
-+	}
-+	a->s[i].ifc = ifindex;
-+	return &a->s[i];
-+}
-+
-+static void count(struct stat *s, unsigned int l,
-+		  struct netdev_page_pool_get_rsp *pp)
-+{
-+	s->live[l].cnt++;
-+	if (pp->_present.inflight)
-+		s->live[l].refs += pp->inflight;
-+	if (pp->_present.inflight_mem)
-+		s->live[l].bytes += pp->inflight_mem;
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct netdev_page_pool_stats_get_list *pp_stats;
-+	struct netdev_page_pool_get_list *pools;
-+	struct stats_array a = {};
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return 1;
-+	}
-+
-+	a.max = 128;
-+	a.s = calloc(a.max, sizeof(*a.s));
-+	if (!a.s)
-+		goto err_close;
-+
-+	pools = netdev_page_pool_get_dump(ys);
-+	if (!pools)
-+		goto err_free;
-+
-+	ynl_dump_foreach(pools, pp) {
-+		struct stat *s = find_ifc(&a, pp->ifindex);
-+
-+		count(s, 1, pp);
-+		if (pp->_present.destroyed)
-+			count(s, 0, pp);
-+	}
-+	netdev_page_pool_get_list_free(pools);
-+
-+	pp_stats = netdev_page_pool_stats_get_dump(ys);
-+	if (!pp_stats)
-+		goto err_free;
-+
-+	ynl_dump_foreach(pp_stats, pp) {
-+		struct stat *s = find_ifc(&a, pp->info.ifindex);
-+
-+		if (pp->_present.alloc_fast)
-+			s->alloc_fast += pp->alloc_fast;
-+		if (pp->_present.alloc_slow)
-+			s->alloc_slow += pp->alloc_slow;
-+		if (pp->_present.recycle_ring)
-+			s->recycle_ring += pp->recycle_ring;
-+		if (pp->_present.recycle_cached)
-+			s->recycle_cache += pp->recycle_cached;
-+	}
-+	netdev_page_pool_stats_get_list_free(pp_stats);
-+
-+	for (unsigned int i = 0; i < a.i; i++) {
-+		char ifname[IF_NAMESIZE];
-+		struct stat *s = &a.s[i];
-+		const char *name;
-+		double recycle;
-+
-+		if (!s->ifc) {
-+			name = "<orphan>\t";
-+		} else {
-+			name = if_indextoname(s->ifc, ifname);
-+			if (name)
-+				printf("%8s", name);
-+			printf("[%d]\t", s->ifc);
-+		}
-+
-+		printf("page pools: %u (zombies: %u)\n",
-+		       s->live[1].cnt, s->live[0].cnt);
-+		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
-+		       s->live[1].refs, s->live[1].bytes,
-+		       s->live[0].refs, s->live[0].bytes);
-+
-+		/* We don't know how many pages are sitting in cache and ring
-+		 * so we will under-count the recycling rate a bit.
-+		 */
-+		recycle = (double)(s->recycle_ring + s->recycle_cache) /
-+			(s->alloc_fast + s->alloc_slow) * 100;
-+		printf("\t\trecycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)\n",
-+		       recycle, s->alloc_slow, s->alloc_fast,
-+		       s->recycle_ring, s->recycle_cache);
-+	}
-+
-+	ynl_sock_destroy(ys);
-+	return 0;
-+
-+err_free:
-+	free(a.s);
-+err_close:
-+	fprintf(stderr, "YNL: %s\n", ys->err.msg);
-+	ynl_sock_destroy(ys);
-+	return 2;
-+}
--- 
-2.42.0
+The current workflow in the kernel looks like this:
+1. VF net device is created and expose to user-mode 2. VF is bonded to NETV=
+SC (if NETVSC exists on the system)
 
+With the current kernel behavior, the user-mode can possibly see the VF aft=
+er 1, and before 2 when VF is bonded. When this happens, the user-mode does=
+n't know if the VF will be bonded in the future (it may never happen on sys=
+tems without NETVSC). In this case, it doesn't know if it should configure =
+the VF or not.
+
+(end quote)
+
+The problem is not that VF could be probed before netvsc. The problem is th=
+at it's possible that VF is probed, exposed to user-mode earlier than netvs=
+c has a chance to bond it.
+
+Thanks,
+
+Long
 
