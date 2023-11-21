@@ -1,117 +1,99 @@
-Return-Path: <netdev+bounces-49597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AF177F2A65
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:29:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C7847F2AF6
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 11:49:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A152822A1
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:29:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA80A2825BC
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 10:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D44B46526;
-	Tue, 21 Nov 2023 10:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12A447796;
+	Tue, 21 Nov 2023 10:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Jh/aqU1Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YhLbzar5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D4AC1;
-	Tue, 21 Nov 2023 02:29:14 -0800 (PST)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALA99hV009701;
-	Tue, 21 Nov 2023 10:29:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=d3laBOY3VBa/FKo6wvUDPd9NbPmzQBMNTTTgijWw53Q=;
- b=Jh/aqU1YxpkX6X0hwK7EuvHYGlewXCD+1fdpk4TriHDnowU5IINaqfcd9HwXsdKLQQqG
- IzCbWXP+tj/JMd175+8ukga13e203LkF2bWcnDVYliQy2vwRyZJp/wdKjVFQ7JJnXDoY
- gEAhXTJ3Dyumsjqvf/SKdfn180tPmNj51ya1KZhE+L+sgMfe9k55gLQ4XKjTFCEhn2V5
- X068esLtEfMgD3yvrQuGkAa3p56lsnjxH8V9n/WPWOddIDg8qNDOGOiFdKUjEX1nRamF
- hrQN3QoQxrm4EORY3X74ayoE5LdOVEgI8y3Ll7xkrSvVkTffUCdzhQwvLZqwe0h+qKzB Dg== 
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ugr85rcr8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Nov 2023 10:29:01 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3ALAT0VN026093
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Nov 2023 10:29:00 GMT
-Received: from [10.253.72.26] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 21 Nov
- 2023 02:28:56 -0800
-Message-ID: <9acace07-d758-4d5d-8321-de75ee53355d@quicinc.com>
-Date: Tue, 21 Nov 2023 18:28:54 +0800
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5AAEC1
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:49:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1700563744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UiDMghG+Flxsy1/Ts+2LH0I9Mj0dh63yWYboQjw4BX4=;
+	b=YhLbzar5U0RM6/rDkx2Ycj2h7cJKf7GRlbjT63IJimI0ZD8r6VsE/5p11ZTvK/NTd9Mvmd
+	ixfeol0Meh7HY0aNZ0LXl612ML0AlAQj1UCuHl11YX1Jn65vFzSEVLEBYONV4Tl7m2sdiJ
+	OK9QNj1yFOH8UQW0GLuuj/npHAEmFWI=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-30-AmyHPRDUM7KUDHVzMoeh3w-1; Tue, 21 Nov 2023 05:49:03 -0500
+X-MC-Unique: AmyHPRDUM7KUDHVzMoeh3w-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-9fe081ac4b8so18975666b.1
+        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 02:49:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1700563742; x=1701168542;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=UiDMghG+Flxsy1/Ts+2LH0I9Mj0dh63yWYboQjw4BX4=;
+        b=gySgUsaH0UxfeMYlkSiMUuM8g/nzueUOvcAh3u9QyqCb63BkDIUerGN2PBAsoxaG1w
+         g1c3QQB+mlA9VpBT9e+JUPaREDkG7MKed33CpDpfYeE3cuU19rJf6AnKEgNRTCxJYLTF
+         SSlkOB8wQjFGvCgUuUGpnUprBAvGVZdMc5uqc3vc7XoyVY0YUFoaYGxGvPx+uR7NsZ/F
+         /x18YRKwoCUAbEit+56di80vt9NmL1tZu8Oe/Uz2BB7CfJol6zFouL2sJsmqbhTloYzO
+         zbQ6NxPw9SWTSKh5/7iWhxykJeKKCGWXWylp8zQ331aBAYuRqUtoI+2CTyVTSIXZnbao
+         7+Hg==
+X-Gm-Message-State: AOJu0YyzbyDfUeoKEJ9SfdTctMKrxadXwNsi/pEbRgFegz1aQDcwLOQY
+	3jSkJUaEkTni8I/DmkKBmxmWEU7Nu6HBDqcgXRXmm+G/6LlaG6W3+LwKPgHXoFWFokPSq5YOX5f
+	+i7QMH9e+Gd4HBdEO
+X-Received: by 2002:a17:906:3089:b0:a01:ae7b:d19b with SMTP id 9-20020a170906308900b00a01ae7bd19bmr979119ejv.7.1700563741982;
+        Tue, 21 Nov 2023 02:49:01 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGd+7Qdpd47XJ0PbtYqHKtcRMfbM2Cg5As0yatVia19icpDdakWkj/5dSH7l6+nS0prVP7g7w==
+X-Received: by 2002:a17:906:3089:b0:a01:ae7b:d19b with SMTP id 9-20020a170906308900b00a01ae7bd19bmr979113ejv.7.1700563741649;
+        Tue, 21 Nov 2023 02:49:01 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-234-2.dyn.eolo.it. [146.241.234.2])
+        by smtp.gmail.com with ESMTPSA id lh3-20020a170906f8c300b009dd7097ca22sm5123883ejb.194.2023.11.21.02.49.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Nov 2023 02:49:01 -0800 (PST)
+Message-ID: <08e17879fe0c0be1f82da31fdb39931ed38f7155.camel@redhat.com>
+Subject: Re: [PATCH 0/2] usb: fix port mapping for ZTE MF290 modem
+From: Paolo Abeni <pabeni@redhat.com>
+To: Lech Perczak <lech.perczak@gmail.com>, netdev@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Date: Tue, 21 Nov 2023 11:49:00 +0100
+In-Reply-To: <20231117231918.100278-1-lech.perczak@gmail.com>
+References: <20231117231918.100278-1-lech.perczak@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/9] net: mdio: ipq4019: Enable the clocks for ipq5332
- platform
-To: Konrad Dybcio <konrad.dybcio@linaro.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <robert.marko@sartura.hr>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_srichara@quicinc.com>
-References: <20231115032515.4249-1-quic_luoj@quicinc.com>
- <20231115032515.4249-3-quic_luoj@quicinc.com>
- <10dc0fff-fc00-4c1f-97cf-30c5e5e8f983@linaro.org>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <10dc0fff-fc00-4c1f-97cf-30c5e5e8f983@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YjbUSm6vdQOT78gkogteKn3mp-3fs216
-X-Proofpoint-ORIG-GUID: YjbUSm6vdQOT78gkogteKn3mp-3fs216
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2023-11-21_03,2023-11-21_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- phishscore=0 suspectscore=0 adultscore=0 malwarescore=0 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 clxscore=1015
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311060000 definitions=main-2311210081
 
+On Sat, 2023-11-18 at 00:19 +0100, Lech Perczak wrote:
+> This modem is used iside ZTE MF28D LTE CPE router. It can already
+> establish PPP connections. This series attempts to adjust its
+> configuration to properly support QMI interface which is available and
+> preferred over that. This is a part of effort to get the device
+> supported b OpenWrt.
+>=20
+> Lech Perczak (2):
+>   usb: serial: option: don't claim interface 4 for ZTE MF290
+>   net: usb: qmi_wwan: claim interface 4 for ZTE MF290
 
+It looks like patch 1 targets the usb-serial tree, patch 2 targets the
+netdev tree and there no dependencies between them.
 
-On 11/20/2023 10:22 PM, Konrad Dybcio wrote:
-> On 15.11.2023 04:25, Luo Jie wrote:
->> For the platform ipq5332, the related GCC clocks need to be enabled
->> to make the GPIO reset of the MDIO slave devices taking effect.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> [...]
-> 
->>   static int ipq4019_mdio_wait_busy(struct mii_bus *bus)
->> @@ -212,6 +231,38 @@ static int ipq_mdio_reset(struct mii_bus *bus)
->>   	u32 val;
->>   	int ret;
->>   
->> +	/* For the platform ipq5332, there are two uniphy available to connect the
->> +	 * ethernet devices, the uniphy gcc clock should be enabled for resetting
->> +	 * the connected device such as qca8386 switch or qca8081 PHY effectively.
->> +	 */
->> +	if (of_device_is_compatible(bus->parent->of_node, "qcom,ipq5332-mdio")) {
-> Would that not also be taken care of in the phy driver?
-> 
-> Konrad
+I think it would be cleaner if you re-submit the patches separately,
+thanks!
 
-Hi Konrad,
-These clocks are the SOC clocks that is not related to the PHY type.
-no matter what kind of PHY is connected, we also need to configure
-these clocks.
+Paolo
+
 
