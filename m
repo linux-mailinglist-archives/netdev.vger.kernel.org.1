@@ -1,59 +1,56 @@
-Return-Path: <netdev+bounces-49808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F697F383B
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:24:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E60B77F3805
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5011C20D6B
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:24:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFE9BB218C7
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 21:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36149584C2;
-	Tue, 21 Nov 2023 21:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035955466F;
+	Tue, 21 Nov 2023 21:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="AjInmCZV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PJ0jkGZa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4166CDD;
-	Tue, 21 Nov 2023 13:24:39 -0800 (PST)
-Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id D216F12005A;
-	Wed, 22 Nov 2023 00:24:37 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru D216F12005A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1700601877;
-	bh=u9fx6BXWHsu28OWJVt3WPYYDtH1LMdQKdP1Xw3XIl5s=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=AjInmCZV1UUpTgDFNZFOTjad3x5OnA/ZVlSCqOXc/2QSVThYwVASfDgh27Ghq1s2Q
-	 UErvgpmiuUp4Jj0SgmIpMRes1ox/t1O9qtuRsgP8ScHoeUgEUv5Ktq2F18Ycu1pr3g
-	 EFXWwrWnKkjC+a7LfNh1JYAv3njvu5MiB85xd+G5a8DwGOHZP075lAdgYSNogJ0+SF
-	 YKQk1x8bY5PNvVh8bpjNo0Nix56+NKXT6RdO1HFkLQ4c+hNl/tfK8l/fL4PKY38oUv
-	 G31/Wtw9bv2J6B31s4dyd0pPkpHg7N4CEXSD5RSbrwwrkPNU5GnLFFbxGUyTmVsdJ6
-	 VjEbX000XvYDQ==
-Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 22 Nov 2023 00:24:37 +0300 (MSK)
-Received: from localhost.localdomain (100.64.160.123) by
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Wed, 22 Nov 2023 00:24:37 +0300
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
-	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@salutedevices.com>
-Subject: [PATCH net v1] vsock/test: fix SEQPACKET message bounds test
-Date: Wed, 22 Nov 2023 00:16:42 +0300
-Message-ID: <20231121211642.163474-1-avkrasnov@salutedevices.com>
-X-Mailer: git-send-email 2.35.0
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9131819E
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 13:19:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1700601579; x=1732137579;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7Qft3Kif2jDd7FcxoyFTaYULEq5BlIfAq0P2rkH/uL0=;
+  b=PJ0jkGZaZ3cOZxrtUKUtmQDYBZwqu40J/Xk5AcK3YZRQozRLNrsAOQVv
+   m4LQAzfOSIpo8xowrKbe7/ITdhlV+dPOi9q5fdTZvLbiDc810LvIZxrPg
+   SZBqfrVO9QcgRK4HO1B5a6vB+qMBj1zqyPpf0+aJAg7YanuGJMjADtgQ1
+   /dU3ESoZXdnn+DRW0Crh47gu/PhRZN7TmX7HIHwHy8k8GJLwuqcuONV7p
+   eF8uL55MEjqx/ckJV2Ni7MGtWw4tPLLbTnk+H2edDYlwFECz8AqCX0g7t
+   eFeZIqSPBunc4ysf1zzyDW460/4YX+m8N9mE7NnPn3OCWK+7EpICWvVth
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="423022062"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="423022062"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 13:19:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10901"; a="716630528"
+X-IronPort-AV: E=Sophos;i="6.04,216,1695711600"; 
+   d="scan'208";a="716630528"
+Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Nov 2023 13:19:37 -0800
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next v1 00/13] intel: use FIELD_PREP and FIELD_GET
+Date: Tue, 21 Nov 2023 13:19:08 -0800
+Message-Id: <20231121211921.19834-1-jesse.brandeburg@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,109 +58,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
- p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 181514 [Nov 21 2023]
-X-KSMG-AntiSpam-Version: 6.0.0.2
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 3 0.3.3 e5c6a18a9a9bff0226d530c5b790210c0bd117c8, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;p-i-exch-sc-m01.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2023/11/21 19:56:00 #22495758
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-Tune message length calculation to make this test work on machines
-where 'getpagesize()' returns >32KB. Now maximum message length is not
-hardcoded (on machines above it was smaller than 'getpagesize()' return
-value, thus we get negative value and test fails), but calculated at
-runtime and always bigger than 'getpagesize()' result. Reproduced on
-aarch64 with 64KB page size.
+After repeatedly getting review comments on new patches, and sporadic
+patches to fix parts of our drivers, we should just convert the Intel code
+to use FIELD_PREP() and FIELD_GET().  It's then "common" in the code and
+hopefully future change-sets will see the context and do-the-right-thing.
 
-Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
-Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
----
- tools/testing/vsock/vsock_test.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+This conversion was done with a coccinelle script which is mentioned in the
+commit messages. Generally there were only a couple conversions that were
+"undone" after the automatic changes because they tried to convert a
+non-contiguous mask.
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index f5623b8d76b7..691e44c746bf 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -353,11 +353,12 @@ static void test_stream_msg_peek_server(const struct test_opts *opts)
- }
- 
- #define SOCK_BUF_SIZE (2 * 1024 * 1024)
--#define MAX_MSG_SIZE (32 * 1024)
-+#define MAX_MSG_PAGES 4
- 
- static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- {
- 	unsigned long curr_hash;
-+	size_t max_msg_size;
- 	int page_size;
- 	int msg_count;
- 	int fd;
-@@ -373,7 +374,8 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- 
- 	curr_hash = 0;
- 	page_size = getpagesize();
--	msg_count = SOCK_BUF_SIZE / MAX_MSG_SIZE;
-+	max_msg_size = MAX_MSG_PAGES * page_size;
-+	msg_count = SOCK_BUF_SIZE / max_msg_size;
- 
- 	for (int i = 0; i < msg_count; i++) {
- 		size_t buf_size;
-@@ -383,7 +385,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
- 		/* Use "small" buffers and "big" buffers. */
- 		if (i & 1)
- 			buf_size = page_size +
--					(rand() % (MAX_MSG_SIZE - page_size));
-+					(rand() % (max_msg_size - page_size));
- 		else
- 			buf_size = 1 + (rand() % page_size);
- 
-@@ -429,7 +431,6 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
- 	unsigned long remote_hash;
- 	unsigned long curr_hash;
- 	int fd;
--	char buf[MAX_MSG_SIZE];
- 	struct msghdr msg = {0};
- 	struct iovec iov = {0};
- 
-@@ -457,8 +458,13 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
- 	control_writeln("SRVREADY");
- 	/* Wait, until peer sends whole data. */
- 	control_expectln("SENDDONE");
--	iov.iov_base = buf;
--	iov.iov_len = sizeof(buf);
-+	iov.iov_len = MAX_MSG_PAGES * getpagesize();
-+	iov.iov_base = malloc(iov.iov_len);
-+	if (!iov.iov_base) {
-+		perror("malloc");
-+		exit(EXIT_FAILURE);
-+	}
-+
- 	msg.msg_iov = &iov;
- 	msg.msg_iovlen = 1;
- 
-@@ -483,6 +489,7 @@ static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
- 		curr_hash += hash_djb2(msg.msg_iov[0].iov_base, recv_size);
- 	}
- 
-+	free(iov.iov_base);
- 	close(fd);
- 	remote_hash = control_readulong();
- 
+Patch 1 is required at the beginning of this series to fix a "forever"
+issue in the e1000e driver that fails the compilation test after conversion
+because the shift / mask was out of range.
+
+The second patch just adds all the new #includes in one go.
+
+The patch titled: "ice: fix pre-shifted bit usage" is needed to allow the
+use of the FIELD_* macros and fix up the unexpected "shifts included"
+defines found while creating this series.
+
+The rest are the conversion to use FIELD_PREP()/FIELD_GET().
+
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+
+Jesse Brandeburg (13):
+  e1000e: make lost bits explicit
+  intel: add bit macro includes where needed
+  intel: legacy: field prep conversion
+  i40e: field prep conversion
+  iavf: field prep conversion
+  ice: field prep conversion
+  ice: fix pre-shifted bit usage
+  igc: field prep conversion
+  intel: legacy: field get conversion
+  igc: field get conversion
+  i40e: field get conversion
+  iavf: field get conversion
+  ice: field get conversion
+
+ drivers/net/ethernet/intel/e1000/e1000_hw.c   |  46 ++-
+ .../net/ethernet/intel/e1000e/80003es2lan.c   |  23 +-
+ drivers/net/ethernet/intel/e1000e/82571.c     |   3 +-
+ drivers/net/ethernet/intel/e1000e/ethtool.c   |   7 +-
+ drivers/net/ethernet/intel/e1000e/ich8lan.c   |  18 +-
+ drivers/net/ethernet/intel/e1000e/mac.c       |   8 +-
+ drivers/net/ethernet/intel/e1000e/netdev.c    |  11 +-
+ drivers/net/ethernet/intel/e1000e/phy.c       |  24 +-
+ drivers/net/ethernet/intel/fm10k/fm10k_pf.c   |   7 +-
+ drivers/net/ethernet/intel/fm10k/fm10k_vf.c   |  10 +-
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 140 ++++-----
+ drivers/net/ethernet/intel/i40e/i40e_dcb.c    | 276 +++++++-----------
+ drivers/net/ethernet/intel/i40e/i40e_dcb_nl.c |   3 +-
+ drivers/net/ethernet/intel/i40e/i40e_ddp.c    |   4 +-
+ .../net/ethernet/intel/i40e/i40e_ethtool.c    |   7 +-
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  85 +++---
+ drivers/net/ethernet/intel/i40e/i40e_nvm.c    |  14 +-
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c    |   4 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  70 ++---
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  27 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c |  34 +--
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    |   8 +-
+ drivers/net/ethernet/intel/iavf/iavf_fdir.c   |   3 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |  21 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  18 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     |  32 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |  38 ++-
+ drivers/net/ethernet/intel/ice/ice_dcb.c      |  77 ++---
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_nl.c   |   2 +-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c  |   4 +-
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c |   3 +-
+ drivers/net/ethernet/intel/ice/ice_fdir.c     |  69 ++---
+ .../net/ethernet/intel/ice/ice_flex_pipe.c    |   8 +-
+ drivers/net/ethernet/intel/ice/ice_flow.c     |   2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  64 ++--
+ drivers/net/ethernet/intel/ice/ice_main.c     |  48 ++-
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |  15 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  13 +-
+ drivers/net/ethernet/intel/ice/ice_sched.c    |   3 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  41 +--
+ drivers/net/ethernet/intel/ice/ice_switch.c   |  61 ++--
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  14 +-
+ .../ethernet/intel/ice/ice_virtchnl_fdir.c    |  15 +-
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c |  35 +--
+ drivers/net/ethernet/intel/igb/e1000_82575.c  |  29 +-
+ drivers/net/ethernet/intel/igb/e1000_i210.c   |  19 +-
+ drivers/net/ethernet/intel/igb/e1000_mac.c    |   7 +-
+ drivers/net/ethernet/intel/igb/e1000_nvm.c    |  18 +-
+ drivers/net/ethernet/intel/igb/e1000_phy.c    |  17 +-
+ drivers/net/ethernet/intel/igb/igb_ethtool.c  |  11 +-
+ drivers/net/ethernet/intel/igb/igb_main.c     |  13 +-
+ drivers/net/ethernet/intel/igbvf/mbx.c        |   1 +
+ drivers/net/ethernet/intel/igbvf/netdev.c     |  33 +--
+ drivers/net/ethernet/intel/igc/igc_base.c     |   6 +-
+ drivers/net/ethernet/intel/igc/igc_i225.c     |   6 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |  10 +-
+ drivers/net/ethernet/intel/igc/igc_phy.c      |   5 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |   2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |  30 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |   4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |   8 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   8 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |   8 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |  19 +-
+ include/linux/avf/virtchnl.h                  |   1 +
+ 69 files changed, 705 insertions(+), 978 deletions(-)
+
 -- 
-2.25.1
+2.39.3
 
 
