@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-49768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73F67F36A0
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:09:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 079D67F36AE
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 20:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29721C20434
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:09:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E46831C20986
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 19:13:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F9559161;
-	Tue, 21 Nov 2023 19:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B211220DE4;
+	Tue, 21 Nov 2023 19:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ps8VatJ6"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cXZ1D/3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944BC20DE4
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 19:09:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5E2DC433C7;
-	Tue, 21 Nov 2023 19:09:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1700593741;
-	bh=PNP7cC07/dqSCbuK3E8a42Exisr/9Hepjuctq0/I9vE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ps8VatJ6YmjGBNbrl5/e3IGAFnacaRMMfgdTd/YGyfJMZqgO2BpQ9e5Xi4N3AdTfj
-	 McfalGgyuwDN5XL9lQdVBVFpFUfzujQtMZbmAINplwi9e9ur5MM9912Gjefe6fFArV
-	 q3/1zsdzPHRJGMOwMSc29TZOvwmWGHV9pEwRsQlckH2LfaN38ey2f0e/qrRr4HN4cc
-	 3YSbC0Wk93curUywRkup17/M0ww8aIpwN/Uv90zYoQXJBAgeBYOyKiEslVUbaVANiD
-	 gc47/wdwXAN/8oeKvlPiNB1O5FHfeESgtBj7/5dJjuFgvDW5XxK0LOG51pa/+C7FTu
-	 3ZNzhGQBsNn8A==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	lorenzo.bianconi@redhat.com,
-	huangjie.albert@bytedance.com,
-	toshiaki.makita1@gmail.com
-Subject: [PATCH net] net: veth: fix ethtool stats reporting
-Date: Tue, 21 Nov 2023 20:08:44 +0100
-Message-ID: <c5b5d0485016836448453f12846c7c4ab75b094a.1700593593.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.42.0
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C9991;
+	Tue, 21 Nov 2023 11:13:02 -0800 (PST)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3ALI8HKM008875;
+	Tue, 21 Nov 2023 11:12:55 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=AWKC+GczEkhuiGyImuPiTHSlgjHzmEvA5QGEFZps9BA=;
+ b=cXZ1D/3h4P93mDyunsMEDn2UiRv5CkosraWU9trNJw3gWMnbsZ/pTR/4gMw1/+BIiMRl
+ GaFYTwrFbzYnVz4qo631F5+URpNeqw3hgul8hu9Vlv3nT6WlaMCIhnNDvasojhPT+Q5n
+ XmOhjQTY2Nv01enj+nm6WOn6LXowdmcY3VQCWof3oYp7kRa60EjDjuvYrxA8O+bie/yM
+ ruhL10ckUBCP60kJ5jh+b0zUoj7H7auUCMxwEk19WLrpQHHa+tJSMQA/UqAzgrH3vgOy
+ i/xXM/ZkT8o2ABwMhM1+rZmjfA/PHOpPFT+sXfxIb8fdDsuoHvNZJ36cbzweHL9fmXB/ SA== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3uh1jb87a8-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 21 Nov 2023 11:12:55 -0800
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 21 Nov
+ 2023 11:12:54 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 21 Nov 2023 11:12:54 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 226395B6922;
+	Tue, 21 Nov 2023 11:12:54 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+        <kuba@kernel.org>, <davem@davemloft.net>, <wizhao@redhat.com>,
+        <konguyen@redhat.com>, Shinas Rasheed <srasheed@marvell.com>,
+        "Veerasenareddy
+ Burru" <vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        Eric Dumazet
+	<edumazet@google.com>
+Subject: [PATCH net-next v1] octeon_ep: get max rx packet length from firmware
+Date: Tue, 21 Nov 2023 11:12:23 -0800
+Message-ID: <20231121191224.2489474-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +64,101 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: eTbUaV7jKAe1Ld-2L-H9UrIGKwgh5hvy
+X-Proofpoint-GUID: eTbUaV7jKAe1Ld-2L-H9UrIGKwgh5hvy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.987,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2023-11-21_10,2023-11-21_01,2023-05-22_02
 
-Fix a possible misalignment between page_pool stats and tx xdp_stats
-reported in veth_get_ethtool_stats routine.
-The issue can be reproduced configuring the veth pair with the
-following tx/rx queues:
+Fill max rx packet length value from firmware.
 
-$ip link add v0 numtxqueues 2 numrxqueues 4 type veth peer name v1 \
- numtxqueues 1 numrxqueues 1
-
-and loading a simple XDP program on v0 that just returns XDP_PASS.
-In this case on v0 the page_pool stats overwrites tx xdp_stats for queue 1.
-Fix the issue incrementing pp_idx of dev->real_num_tx_queues * VETH_TQ_STATS_LEN
-since we always report xdp_stats for all tx queues in ethtool.
-
-Fixes: 4fc418053ec7 ("net: veth: add page_pool stats")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 ---
- drivers/net/veth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../marvell/octeon_ep/octep_ctrl_net.c         | 18 ++++++++++++++++++
+ .../marvell/octeon_ep/octep_ctrl_net.h         |  9 +++++++++
+ .../ethernet/marvell/octeon_ep/octep_main.c    | 10 +++++++++-
+ 3 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 9980517ed8b0..8607eb8cf458 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -236,8 +236,8 @@ static void veth_get_ethtool_stats(struct net_device *dev,
- 				data[tx_idx + j] += *(u64 *)(base + offset);
- 			}
- 		} while (u64_stats_fetch_retry(&rq_stats->syncp, start));
--		pp_idx = tx_idx + VETH_TQ_STATS_LEN;
- 	}
-+	pp_idx = idx + dev->real_num_tx_queues * VETH_TQ_STATS_LEN;
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+index 6dd3d03c1c0f..c9fcebb9bd9b 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
+@@ -198,6 +198,24 @@ int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
+ 	return octep_send_mbox_req(oct, &d, wait_for_response);
+ }
  
- page_pool_stats:
- 	veth_get_page_pool_stats(dev, &data[pp_idx]);
++int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid)
++{
++	struct octep_ctrl_net_wait_data d = {0};
++	struct octep_ctrl_net_h2f_req *req;
++	int err;
++
++	req = &d.data.req;
++	init_send_req(&d.msg, req, mtu_sz, vfid);
++	req->hdr.s.cmd = OCTEP_CTRL_NET_H2F_CMD_MTU;
++	req->mtu.cmd = OCTEP_CTRL_NET_CMD_GET;
++
++	err = octep_send_mbox_req(oct, &d, true);
++	if (err < 0)
++		return err;
++
++	return d.data.resp.mtu.val;
++}
++
+ int octep_ctrl_net_set_mtu(struct octep_device *oct, int vfid, int mtu,
+ 			   bool wait_for_response)
+ {
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+index 4bb97ad1f1c6..46ddaa5c64d1 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
+@@ -282,6 +282,15 @@ int octep_ctrl_net_get_mac_addr(struct octep_device *oct, int vfid, u8 *addr);
+ int octep_ctrl_net_set_mac_addr(struct octep_device *oct, int vfid, u8 *addr,
+ 				bool wait_for_response);
+ 
++/** Get max MTU from firmware.
++ *
++ * @param oct: non-null pointer to struct octep_device.
++ * @param vfid: Index of virtual function.
++ *
++ * return value: mtu on success, -errno on failure.
++ */
++int octep_ctrl_net_get_mtu(struct octep_device *oct, int vfid);
++
+ /** Set mtu in firmware.
+  *
+  * @param oct: non-null pointer to struct octep_device.
+diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+index 3cee69b3ac38..f9c539178114 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep/octep_main.c
+@@ -1276,6 +1276,7 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ {
+ 	struct octep_device *octep_dev = NULL;
+ 	struct net_device *netdev;
++	int max_rx_pktlen;
+ 	int err;
+ 
+ 	err = pci_enable_device(pdev);
+@@ -1346,8 +1347,15 @@ static int octep_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 
+ 	netdev->hw_features = NETIF_F_SG;
+ 	netdev->features |= netdev->hw_features;
++
++	max_rx_pktlen = octep_ctrl_net_get_mtu(octep_dev, OCTEP_CTRL_NET_INVALID_VFID);
++	if (max_rx_pktlen < 0) {
++		dev_err(&octep_dev->pdev->dev,
++			"Failed to get max receive packet size; err = %d\n", max_rx_pktlen);
++		goto register_dev_err;
++	}
+ 	netdev->min_mtu = OCTEP_MIN_MTU;
+-	netdev->max_mtu = OCTEP_MAX_MTU;
++	netdev->max_mtu = max_rx_pktlen - (ETH_HLEN + ETH_FCS_LEN);
+ 	netdev->mtu = OCTEP_DEFAULT_MTU;
+ 
+ 	err = octep_ctrl_net_get_mac_addr(octep_dev, OCTEP_CTRL_NET_INVALID_VFID,
 -- 
-2.42.0
+2.25.1
 
 
