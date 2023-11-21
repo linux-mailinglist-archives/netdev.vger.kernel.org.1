@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-49822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB137F395B
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:40:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B47F7F395C
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 23:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB4B71C20E9A
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:40:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24FF61F22AE1
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 22:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426323BB2B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A8F4204B;
 	Tue, 21 Nov 2023 22:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xupgcuot"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIjUgw63"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24367584C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243A513FED;
 	Tue, 21 Nov 2023 22:40:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BAA1EC433D9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 85C1BC433C9;
 	Tue, 21 Nov 2023 22:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1700606424;
-	bh=BCqZvJQBa/wE6TafX7ndIlv2XcDSydEYgzFZ8mfueQs=;
+	bh=JgXzXBcdw/xxhUYx9RjTOgLiSSE5qUg3lb9e/+H8kE4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XupgcuotIa2srbEszQDG45/XAkGEU1Owo0a1PTXnu91iRoCHt4z/uxFVqO83ZS1MH
-	 kcCulnq3sNCSoWgFv1V0tYyvdE9TCujTB8sBKhvS9SgcBmiseWsJPsFUK947V6/KHC
-	 9PiIAcn8bsghK8DYiQSAHiChNpchrUVAw4oX1UOEEL0sR87iTu7AQHd2f6bCRKwyjc
-	 YrNQ6tC6mPGW267Iz8yWfFhg4+ozEGLClCg2ru3bsVNGodprKV8dCBQ7Vw2+iaeUkP
-	 HdXhklwj5Fne/e0OaOKFb8fym/6QRZ3qnj3BuMeufrNFGDICvv6oxP2nRk1Sn28ptr
-	 esn6PTkHlvHLA==
+	b=aIjUgw63PfLKleuS/Pocr7mtZX2ua9oQ7TCQltUJXJ/qIOZTg2GLsJZ0t+yhMPAPt
+	 NfaOHRJrl7t91JkmJKkgxygCtSjvTWx6HdXk7j6IFH1XIsQjVLbDBqG9IELYarN/EA
+	 T3jaO31ej1enDGbRGFguA3ETFltmn2hk8htuGyuZRqSNGqw/GNtbhm3OgHGyYM900/
+	 cgbvjB4cAyDH0sM+wAhXw5mGbfuJbA7jrjn2NAelKKSzieklW1tDi5Ngwpj1m6pOD+
+	 Z5K9RStgFCf/FSvC9BW97nDEF3+LNmnaw2Ih//BRub6PGBeLPqYXN8gLBiUjc6CWGn
+	 wVgG33bYDq4Ew==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A16FDC691E1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6964CC595D0;
 	Tue, 21 Nov 2023 22:40:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -47,7 +47,7 @@ Subject: Re: [PATCH v2 1/2] net: usb: ax88179_178a: fix failed operations during
  ax88179_reset
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170060642465.8112.10987867450533291011.git-patchwork-notify@kernel.org>
+ <170060642442.8112.7703368423240582165.git-patchwork-notify@kernel.org>
 Date: Tue, 21 Nov 2023 22:40:24 +0000
 References: <20231120120642.54334-1-jtornosm@redhat.com>
 In-Reply-To: <20231120120642.54334-1-jtornosm@redhat.com>
@@ -58,7 +58,7 @@ Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
 On Mon, 20 Nov 2023 13:06:29 +0100 you wrote:
@@ -80,9 +80,9 @@ On Mon, 20 Nov 2023 13:06:29 +0100 you wrote:
 
 Here is the summary with links:
   - [v2,1/2] net: usb: ax88179_178a: fix failed operations during ax88179_reset
-    (no matching commit)
+    https://git.kernel.org/netdev/net/c/0739af07d1d9
   - [v2,2/2] net: usb: ax88179_178a: avoid two consecutive device resets
-    https://git.kernel.org/netdev/net-next/c/d2689b6a86b9
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
