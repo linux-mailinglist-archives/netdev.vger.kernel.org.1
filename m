@@ -1,112 +1,112 @@
-Return-Path: <netdev+bounces-49569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBEE47F27CB
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:45:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C9F7F282A
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 09:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 738DCB21B3F
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:45:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3202281DC0
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 08:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26EDA1EA84;
-	Tue, 21 Nov 2023 08:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12909208BE;
+	Tue, 21 Nov 2023 08:55:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; dkim=none
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DB695;
-	Tue, 21 Nov 2023 00:45:45 -0800 (PST)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-5ca9114e0e2so17825267b3.3;
-        Tue, 21 Nov 2023 00:45:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700556345; x=1701161145;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pXX+oO634C+6kGvfLSOYqVmvQcGTaXU8w507eH4BnOo=;
-        b=eueQjH/KsfKFuTC5gzmbYbMJp6x0j2RHc2ajU/JiYOVX5VpjPviMDQF96Asmf+2UL0
-         ASp8Z6kW+xswEZvasVPucvyLk1aorccmqW6z5DG46gm9xaRwkppCoeGb7IN6d9tyfFUp
-         F37bEGvPPzlC45gE+cDzOdDiPBDpJMkFbs2yIWY8d3ISttHMDFwKLcRIexD2zjDMmkK5
-         rUbhO20TwaSeBELTyI3JRuJ51U70iAdfAAbF+FX+BYe1t2GbcLDn0rnh4vcMf/X/e3HR
-         bV85s9A4H8Q6v9CB061BBbOz0quAZ3wkqd183kAij6Nf9ly84U36ix4Kkxi+NRgXNfQ4
-         HDNg==
-X-Gm-Message-State: AOJu0YzSBU6qp5g8Ag33C8NdEC6OOx57y2DeWPjw2Mence8ljTh5/jbn
-	GBDYv+kvBuEBeHfwMxUyXjFOjAE+MXrvT9AC
-X-Google-Smtp-Source: AGHT+IGqpKj3rQ+9MGJGdFv5kTv4fSPWqwnWokF01pWyHH3Y4KJzBtSeNrr93o8qwueVx/2d06jMNw==
-X-Received: by 2002:a81:af59:0:b0:5cb:b5fd:c0c3 with SMTP id x25-20020a81af59000000b005cbb5fdc0c3mr607108ywj.16.1700556344849;
-        Tue, 21 Nov 2023 00:45:44 -0800 (PST)
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com. [209.85.128.180])
-        by smtp.gmail.com with ESMTPSA id a190-20020a0dd8c7000000b005a8d713a91esm2888427ywe.15.2023.11.21.00.45.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Nov 2023 00:45:44 -0800 (PST)
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-5ca9114e0e2so17825097b3.3;
-        Tue, 21 Nov 2023 00:45:44 -0800 (PST)
-X-Received: by 2002:a05:690c:398:b0:5a8:204c:5c9b with SMTP id
- bh24-20020a05690c039800b005a8204c5c9bmr11702029ywb.18.1700556344413; Tue, 21
- Nov 2023 00:45:44 -0800 (PST)
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8807AF9;
+	Tue, 21 Nov 2023 00:55:46 -0800 (PST)
+Received: from [192.168.1.103] (31.173.81.93) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 21 Nov
+ 2023 11:55:42 +0300
+Subject: Re: [PATCH net] net: rswitch: Fix error path in rswitch_start_xmit()
+To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>
+References: <20231121055255.3627949-1-yoshihiro.shimoda.uh@renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <7b8197aa-edb8-76ed-57be-6fd8ab247a9c@omp.ru>
+Date: Tue, 21 Nov 2023 11:55:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231120160740.3532848-1-niklas.soderlund+renesas@ragnatech.se>
- <2ab74479-f1fb-4faf-b223-ae750b4c08ce@linaro.org> <CAMuHMdUkfyJ9f22joXpAW1Gwk+zE9cqx+hbFqeK7Xc7ZTW1Faw@mail.gmail.com>
- <c187f8d6-6178-4ef2-958b-16e274a49b91@linaro.org>
-In-Reply-To: <c187f8d6-6178-4ef2-958b-16e274a49b91@linaro.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 21 Nov 2023 09:45:32 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWSXHF8wQkK+bQHczCRyQTp3x74JOj-ue7v6HzPvRVjdQ@mail.gmail.com>
-Message-ID: <CAMuHMdWSXHF8wQkK+bQHczCRyQTp3x74JOj-ue7v6HzPvRVjdQ@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: net: renesas,ethertsn: Add bindings for
- Ethernet TSN
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, devicetree@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20231121055255.3627949-1-yoshihiro.shimoda.uh@renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [31.173.81.93]
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.0.0, Database issued on: 11/21/2023 08:21:59
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 181497 [Nov 21 2023]
+X-KSE-AntiSpam-Info: Version: 6.0.0.2
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 543 543 1e3516af5cdd92079dfeb0e292c8747a62cb1ee4
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;31.173.81.93:7.1.2;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.81.93
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 11/21/2023 08:27:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 11/21/2023 7:01:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Krzysztof,
+On 11/21/23 8:52 AM, Yoshihiro Shimoda wrote:
 
-On Tue, Nov 21, 2023 at 9:40=E2=80=AFAM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-> On 21/11/2023 09:00, Geert Uytterhoeven wrote:
-> > On Tue, Nov 21, 2023 at 8:45=E2=80=AFAM Krzysztof Kozlowski
-> > <krzysztof.kozlowski@linaro.org> wrote:
-> >> On 20/11/2023 17:07, Niklas S=C3=B6derlund wrote:
-> >>> Add bindings for Renesas R-Car Ethernet TSN End-station IP. The RTSN
-> >>> device provides Ethernet network.
-> >>>
-> >>> Signed-off-by: Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnat=
-ech.se>
-> >
-> >>> --- /dev/null
-> >>> +++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+> This .ndo_start_xmit() function should return netdev_tx_t value,
+> not -ENOMEM. Also, before returning the function, dev_kfree_skb_any()
+> should be called. So, fix them.
 
-> >>> +          - enum:
-> >>> +              - renesas,ethertsn-r8a779g0      # R-Car V4H
-> >
-> > renesas,r8a779g0-ethertsn
->
-> You can try to make a schema for this. See for examples:
-> Documentation/devicetree/bindings/arm/qcom-soc.yaml
+   Sounds like 2 separate issues -- each needing a patch of its own...
 
-Thanks for the pointer!  Added to (long) TODO list...
+> Fixes: 33f5d733b589 ("net: renesas: rswitch: Improve TX timestamp accuracy")
+> Signed-off-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> ---
+>  drivers/net/ethernet/renesas/rswitch.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
+> index 43a7795d6591..fc9dcf5fa166 100644
+> --- a/drivers/net/ethernet/renesas/rswitch.c
+> +++ b/drivers/net/ethernet/renesas/rswitch.c
+> @@ -1535,7 +1535,8 @@ static netdev_tx_t rswitch_start_xmit(struct sk_buff *skb, struct net_device *nd
+>  		ts_info = kzalloc(sizeof(*ts_info), GFP_ATOMIC);
+>  		if (!ts_info) {
+>  			dma_unmap_single(ndev->dev.parent, dma_addr, skb->len, DMA_TO_DEVICE);
+> -			return -ENOMEM;
+> +			dev_kfree_skb_any(skb);
+> +			return ret;
 
-Gr{oetje,eeting}s,
+   Looks like we have the same error path as when dma_mapping_error()
+returns error. Shouldn't we use *goto*? Although probably can be done
+later, as a cleanup...
 
-                        Geert
+[...]
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+MBR, Sergey
 
