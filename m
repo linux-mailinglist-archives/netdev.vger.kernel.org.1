@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-49726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0776F7F33BC
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:30:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC947F33BE
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:30:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B70AD283056
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:30:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB9F8B21F5B
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D8F56762;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45965B1EB;
 	Tue, 21 Nov 2023 16:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="l3e+XLIt"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="ep89LGv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE15191;
-	Tue, 21 Nov 2023 08:30:42 -0800 (PST)
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D1E19A;
+	Tue, 21 Nov 2023 08:30:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
 	s=s31663417; t=1700584229; x=1701189029; i=wahrenst@gmx.net;
-	bh=6XwkQvqwtcVy28fKXdFyyWyhmGSZ18nQMs5LnwizKy4=;
+	bh=JoGHBVdoQHC+Hv6Wibo5CgNTW7akgW6n35LRv1PZupQ=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:
 	 References;
-	b=l3e+XLItZJ0ct7Amnq0EGnKj4t+muboZX8GnWlUPolo6RRnjAeN2hi9bl6VHuAqg
-	 x7jm6cSZz3gAnH2uMypbh1P+uh5/RhXvQHWJH4O7lXALWhQpMIqpZHnvtfy7mb3SC
-	 STjSvYDvSAf1oFI5EniP/LbTyIWtgptCL9ouE8PUq9vEP6VP3yB3RQZWcEIJ1CwHr
-	 zIgTlt2tCbhUjAaRfGg7JFuj2+D+nWLKcgVae4MHYIOq/o6kcHdC++oD8imhV+TRm
-	 eojjvaY6ucxXhUcTfRiZb9ufGGxdrTT8j4IUMTEjagZYLk5bUnqGoR2AKWGaOW4/s
-	 +5vvQN4pr13bYB9pRA==
+	b=ep89LGv1rx9UT5YbrIdIfvDUulLILkxBdvGeCDVbWp3ydd9NZWYnG+zL3P8Au4mK
+	 7DS+Am6nLm5CDB18U1FA6eYDc22xINzVr1/HhrhczwL1zu+wVtJJcrwxO3ZTqczji
+	 J75cVhpPuM2WIjaW2lx7EE8xwEVpEz3JNZ2cwsHn9RGCoRgdCnw226zGAazZecVgo
+	 JhJIIwxYdRWwXa+xLpFdbcViiCyLL7l3a03zTiZVN1pXM+M5GImVq48KLU4aT08kI
+	 zHHEAUmrGqq0qmRGDNO4htEVuDEskVhBZ3D2ge0qu3HB5SWk5aXCEO728YrTmZbNe
+	 kPVTatLFfYHQxQ1N+Q==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MJE27-1qmQIA0CGx-00Kir0; Tue, 21
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Ml6qC-1rk4FN1m3w-00lUrh; Tue, 21
  Nov 2023 17:30:29 +0100
 From: Stefan Wahren <wahrenst@gmx.net>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -43,9 +43,9 @@ Cc: Lino Sanfilippo <LinoSanfilippo@gmx.de>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH 3/4 net] qca_spi: Fix ethtool -G iface tx behavior
-Date: Tue, 21 Nov 2023 17:30:03 +0100
-Message-Id: <20231121163004.21232-4-wahrenst@gmx.net>
+Subject: [PATCH 4/4 net] qca_spi: Fix reset behavior
+Date: Tue, 21 Nov 2023 17:30:04 +0100
+Message-Id: <20231121163004.21232-5-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20231121163004.21232-1-wahrenst@gmx.net>
 References: <20231121163004.21232-1-wahrenst@gmx.net>
@@ -56,55 +56,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:WKlRcSkBLRRiKS9ZuJyqRBCwJ2sZ/WAUwE0tXUKbMppH1MFeGgN
- N4B0/OfKV+wEG1ZVx+x3qhALHSFoCBSgCC1tEYtD4Y0c12YJLJdvxI778yxRZlXdhj3y211
- 3Bzmk7FSTiiCUvayP1y5sM7hZ4ujbe9Whlib+ybnHJ/Xm7g7pAVYXMPxlN5edLfvacTSfS0
- YHWuJyxJR0cMAw6rEeBMg==
-UI-OutboundReport: notjunk:1;M01:P0:bJMrRyWKH2I=;PrQAAqPOW3nRV6QkuaX8q6PbZV7
- sPGSMIlxPcK2aSE7IEYBP+P+7vcAcZVIu9pJPC2fN7vxRvFNO4/Q6wluw7yosMhurtVWXhxeH
- BnAL+GDbAmr2Ww9RvoATZhq7CafcnOYFdFB2JbwfE8tAlbkZFsLJulumwJL6yWV19PZI65qrO
- YVeIyZv2h4EYI21UhnihDhUb4voPl0p4bp51joYnCqznvuVRsUUYR0NwV4oUfo2b9/XW8+TNJ
- IPQL3ZW8l2/ZTVFjgN00DyBDxFcdcxz3bB77mqNdY7ScKlynb2vpuR8OZSX1ly0KwKjGpP82r
- ZSLORRughHyI1PurXEWfiS+eQM7HLkEShw9CVnBq1WLXOLBqWCiuyW4X0sDLw4dRWjoLLE8Yn
- d/NUYQUGZzDNhLWrZSNobeKwZ35CpH8tiJ7IWPEHNrZtXfB6WSadI5/mIEHZy06b36nSLddXs
- Z9wqudgBg8lBGVklkBDxR9rr1x3nVk/MPN17o1HJZotviIxBiz8tUhCXcyqnXvgR2QJDBbpe1
- 3wo7H1BFEVK92cFe/Uh2rNPmcVkB7phWQGP2nRltJwkLuKJxhBRCplfvbR/HdcdLwQ0scuJDw
- v1XRe8vYjJqEHGozxudQjQ3V7ep1v5xqpFRsbzUnr7fLbiP8dglq1+V90AWSLstrFkZ1qWfZh
- bTY1P4eyN+gz2RRyKuMBE2RqRMSfvR/F55ohKLewPHRAqzlA8djzYtA50Zz1/XIwd6PCPKGDD
- PUZiKTQFjp81/NEGFIaqVjQw5tAoRbGT+iaaqbyEeuoFnOwdu1M6hXGgDV7JSxC+ilDlzj5iB
- wSuTUa++WguAB6iLPL/6eaT+W8Tgy6xJEu0eKNlN3SKcb04UjYpIihT5bJi8L2YtjY6ApvSj8
- 1TCKSt+DgCCGCZ6MELJjhDOjHVBqInQYyP7bWnSVTi+toZD36RUlrIj0DJJ2w5PYZUhipuncV
- bdcx/A==
+X-Provags-ID: V03:K1:bvNYFCb4jDy2CsUdTWKcRtEIeHiKsPwaWtJYrrPMVRe7BQl3yHl
+ mYrfz8dy7457KSPmfewTUOV+APtuGdFtt3C+7GtzUrR8B4YIubJzoddH2olZP+4tc5Cvhdx
+ Dq7/7Cp6cdAB0C99WrNKkATjOnuMyD7jqnpgSL5RivTo/nnpWJMojWgYWDeglYXlC1DRQQM
+ rioKwcU0J5mjSrxvknKzQ==
+UI-OutboundReport: notjunk:1;M01:P0:iaqnJNZY4yM=;SPAh/8736h479Vilzu/1j7j+pos
+ h7Fn0rUAVg+FHoO2B+2u9MWRa3xGpA4Rf4WOIZs7heabaOoZmwYd8lYu106dS0SmNY/MguGc9
+ oH13Z3i42/Fihi6Ycpqw6i6+inuAZQ473d1uo5FCrk0I2ZHvUycG+rJSooVxwq7b84uw0JGx+
+ +KO0S6zrl4NGOi7IeItG5OK2sdk1hTkxtbKkytPWvcIqR5RQ8mN0Li+uq8d0zdpgLjifDRK8N
+ tejp/3fnHnrFK/YP+S4BiSTb9eZuO4tK7Mpd6JzYAMf0EY/YsZscfWBTBZQOdhuiMyffkjnNA
+ qzQoUofxHvSLNbRHT8g9iFbUEgq6hdcMMPORKZuD87QxQz/tFkYACrHUmlpsEaEFL7Yt2tGqd
+ 8CjLXvwdAOhYbsiWt/s0YCrT08xIjb5W7b0H9WLUayMsx6j8g5HF2NJIDaCafaGzlfb2u2eX8
+ diKR3HQMF5PfoUD9o4MGwNBCc9cFL0/ORBiQaeCksZGJX7nXcsDboH0TtANT1JiD3FyI3vyw6
+ 9Mre0AD+EFt21kem+Y96faGWIcIokkp9G11zcuBivH+yfoJPiwoa9zwzKH2G+T2d5mDasA2Ay
+ +uulkfuqc0FkJIiI6ChFZqECeUrbjZ1yejl4sLgTeMgLi6ofwe4vY1kTZ9Cw5g9cJEBMtWpCV
+ fm1n+suGtrKs3fOWargxiHlk4FtsPsiXfnqBaDjKdCBNharJyFn2BMdJFWGq/tdNzuLXn9JFi
+ s2Aarq/ZwfZl+EUp6KYdnO89NvcjcG1AgXxjZEdXTag8YRUmkXgLf6xIpOGvKStQ4qSra3ITc
+ RATATel/zLU3rvtubXIpj3rf67M/eyOa6NfNT7/nDNT8FMglq8sjIUnW2CSw5KGaobfRcnjNR
+ YPbc8V7pWmHyNt29MZG6vOjrk5cdHV6i49LPii6W3M9bXs4B5pcovxEFainZQvbrqT4nHN+Db
+ gT31uZ/9DXPKHF9XIickBNMmvKI=
 
-After calling ethtool -g it was not possible to adjust the TX ring size
-again. The reason for this is that the readonly setting rx_pending get
-initialized and after that the range check in qcaspi_set_ringparam()
-fails regardless of the provided parameter. Since there is no adjustable
-RX ring at all, drop it from qcaspi_get_ringparam().
+In case of a reset triggered by the QCA7000 itself, the behavior of the
+qca_spi driver was not quite correct:
+- in case of a pending RX frame decoding the drop counter must be
+  incremented and decoding state machine reseted
+- also the reset counter must always be incremented regardless of sync
+  state
 
 Fixes: 291ab06ecf67 ("net: qualcomm: new Ethernet over SPI driver for QCA7=
 000")
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/qualcomm/qca_debug.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/net/ethernet/qualcomm/qca_spi.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qualcomm/qca_debug.c b/drivers/net/ether=
-net/qualcomm/qca_debug.c
-index 6f2fa2a42770..613eb688cba2 100644
-=2D-- a/drivers/net/ethernet/qualcomm/qca_debug.c
-+++ b/drivers/net/ethernet/qualcomm/qca_debug.c
-@@ -252,9 +252,7 @@ qcaspi_get_ringparam(struct net_device *dev, struct et=
-htool_ringparam *ring,
- {
- 	struct qcaspi *qca =3D netdev_priv(dev);
+diff --git a/drivers/net/ethernet/qualcomm/qca_spi.c b/drivers/net/etherne=
+t/qualcomm/qca_spi.c
+index b2573eea8a7a..844d255f5d55 100644
+=2D-- a/drivers/net/ethernet/qualcomm/qca_spi.c
++++ b/drivers/net/ethernet/qualcomm/qca_spi.c
+@@ -613,11 +613,17 @@ qcaspi_spi_thread(void *data)
+ 			if (intr_cause & SPI_INT_CPU_ON) {
+ 				qcaspi_qca7k_sync(qca, QCASPI_EVENT_CPUON);
 
--	ring->rx_max_pending =3D 4;
- 	ring->tx_max_pending =3D TX_RING_MAX_LEN;
--	ring->rx_pending =3D 4;
- 	ring->tx_pending =3D qca->txr.count;
- }
++				/* Frame decoding in progress */
++				if (qca->frm_handle.state !=3D qca->frm_handle.init)
++					qca->net_dev->stats.rx_dropped++;
++
++				qcafrm_fsm_init_spi(&qca->frm_handle);
++				qca->stats.device_reset++;
++
+ 				/* not synced. */
+ 				if (qca->sync !=3D QCASPI_SYNC_READY)
+ 					continue;
 
+-				qca->stats.device_reset++;
+ 				netif_wake_queue(qca->net_dev);
+ 				netif_carrier_on(qca->net_dev);
+ 			}
 =2D-
 2.34.1
 
