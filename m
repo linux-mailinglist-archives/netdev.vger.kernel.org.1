@@ -1,105 +1,183 @@
-Return-Path: <netdev+bounces-49736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195DF7F34AB
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:13:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F2C7F34D4
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 18:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78A42B20E70
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:13:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1C13B20FB7
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 17:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E72859140;
-	Tue, 21 Nov 2023 17:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E5B85A118;
+	Tue, 21 Nov 2023 17:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yKoRbjsw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i837O3Jj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1zRgp1S"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B974010F3;
-	Tue, 21 Nov 2023 09:13:39 -0800 (PST)
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1700586817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I1cohRsqh/gMhQXdMjmF/EuQWloEkKiFSISrxy+k+Yc=;
-	b=yKoRbjsw+M17klBqF2oTGsSjab+urRzwkmf3bgaPsgI9SRyvP3MOQsRW73SchXHd+8bDQ7
-	dekfagNyy3HkIjpcObwWt9cVMGdAXaik7+XrPsUQG/BdvtVOS3tJQQgtiYK9MsZoinXYUe
-	nNiqkC85nrXyE/1Au4nKbrd2GX0IR0XfqT9s7fNhxhdHGqwuPIwURGGD+0RtT/BuqthHDf
-	JRpq3q5QppnAtDvmHLB3YMVKrS8viAl2nsOye3jv766JCtcy3exvkN/5h3tWgJsFVdXG/I
-	PsNLGmndD/Grb30YnMwUJ/2kbH7r1oUfbDwdWLbanRpFPp5Acwrc5eMmYOPeqA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1700586817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=I1cohRsqh/gMhQXdMjmF/EuQWloEkKiFSISrxy+k+Yc=;
-	b=i837O3Jj13QAzuwzURXhtUBgENdXHytu9f4mzpfzuKO8+CNfdSBX0StCX4uHyyZAcZCwlg
-	KF+oUz4ZAoaLJJDA==
-To: syzbot <syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com>,
- akpm@linux-foundation.org, bp@alien8.de, bp@suse.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com,
- netdev@vger.kernel.org, peterz@infradead.org,
- syzkaller-bugs@googlegroups.com, x86@kernel.org
-Subject: Re: [syzbot] [mm?] BUG: unable to handle kernel paging request in
- copy_from_kernel_nofault
-In-Reply-To: <000000000000c84343060a850bd0@google.com>
-References: <000000000000c84343060a850bd0@google.com>
-Date: Tue, 21 Nov 2023 18:13:36 +0100
-Message-ID: <87jzqb1133.ffs@tglx>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BE3537E1
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 17:20:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A7EC433C7;
+	Tue, 21 Nov 2023 17:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700587230;
+	bh=uRqiRzLlvGBgCBvlICc1h/HlCqP0mTq4GMStsSNxNIM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=P1zRgp1SRQHb5SvqCgZmFc/zgt+zZjQKXFY7vWioGHcMk/nAUu05ZteAENlfoqfzo
+	 KspzPYiKuNqyq+sIPIKMLy9CmMW5pV5OwH0qxQCh6ikRAoxk+e505V3kp5mWdYsJJj
+	 Cin5l5lVMRYxHhe3GmOMi029D7QckCvUABHYT6NWmukkueqk4hK4u1YjFhqgmgncC3
+	 BNioWH0lmcbpep61Nk6VtMrjB0nS+EuWbMneDMFF+l83TaIHdrGZnI5IqSqX6k08Da
+	 6RWqlg+q7j8obFrRoTsmTfuKG1VKxWgKERT8kBafH/ZuH0MPt9b2lVgU9GUe85recG
+	 U1v0DYQN3nU1A==
+From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+To: netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
+Subject: [PATCH net-next] net: sfp: rework the RollBall PHY waiting code
+Date: Tue, 21 Nov 2023 18:20:24 +0100
+Message-ID: <20231121172024.19901-1-kabel@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 19 2023 at 09:53, syzbot wrote:
-> HEAD commit:    1fda5bb66ad8 bpf: Do not allocate percpu memory at init st..
-> git tree:       bpf
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=12d99420e80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2ae0ccd6bfde5eb0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=72aa0161922eba61b50e
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16dff22f680000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1027dc70e80000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/3e24d257ce8d/disk-1fda5bb6.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/eaa9caffb0e4/vmlinux-1fda5bb6.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/16182bbed726/bzImage-1fda5bb6.xz
->
-> The issue was bisected to:
->
-> commit ca247283781d754216395a41c5e8be8ec79a5f1c
-> Author: Andy Lutomirski <luto@kernel.org>
-> Date:   Wed Feb 10 02:33:45 2021 +0000
->
->     x86/fault: Don't run fixups for SMAP violations
+RollBall SFP modules allow the access to PHY registers only after a
+certain time has passed. Until then, the registers read 0xffff.
 
-Reverting that makes the Ooops go away, but wrongly so.
+Currently we have quirks for modules where we need to wait either 25
+seconds or 4 seconds, but recently I got hands on another module where
+the wait is even shorter.
 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=103d92db680000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=123d92db680000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=143d92db680000
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+72aa0161922eba61b50e@syzkaller.appspotmail.com
-> Fixes: ca247283781d ("x86/fault: Don't run fixups for SMAP violations")
->
-> BUG: unable to handle page fault for address: ffffffffff600000
+Instead of hardcoding different wait times, lets rework the code:
+- increase the PHY retry count to 25
+- when RollBall module is detected, increase the PHY retry time from
+  50ms to 1s
 
-This is VSYSCALL_ADDR.
+Signed-off-by: Marek Behún <kabel@kernel.org>
+---
+ drivers/net/phy/sfp.c | 41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
 
-So the real question is why the BPF program tries to copy from the
-VSYSCALL page, which is not mapped.
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 5468bd209fab..5eb00295b8bf 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -191,7 +191,7 @@ static const enum gpiod_flags gpio_flags[] = {
+  * R_PHY_RETRY is the number of attempts.
+  */
+ #define T_PHY_RETRY		msecs_to_jiffies(50)
+-#define R_PHY_RETRY		12
++#define R_PHY_RETRY		25
+ 
+ /* SFP module presence detection is poor: the three MOD DEF signals are
+  * the same length on the PCB, which means it's possible for MOD DEF 0 to
+@@ -274,7 +274,7 @@ struct sfp {
+ 	struct sfp_eeprom_id id;
+ 	unsigned int module_power_mW;
+ 	unsigned int module_t_start_up;
+-	unsigned int module_t_wait;
++	unsigned int phy_t_retry;
+ 
+ 	unsigned int rate_kbd;
+ 	unsigned int rs_threshold_kbd;
+@@ -372,18 +372,22 @@ static void sfp_fixup_10gbaset_30m(struct sfp *sfp)
+ 	sfp->id.base.extended_cc = SFF8024_ECC_10GBASE_T_SR;
+ }
+ 
+-static void sfp_fixup_rollball_proto(struct sfp *sfp, unsigned int secs)
++static void sfp_fixup_rollball(struct sfp *sfp)
+ {
+ 	sfp->mdio_protocol = MDIO_I2C_ROLLBALL;
+-	sfp->module_t_wait = msecs_to_jiffies(secs * 1000);
++
++	/* RollBall modules may disallow access to PHY registers for up to 25
++	 * seconds, and the reads return 0xffff before that. Increase the time
++	 * between PHY probe retries from 50ms to 1s so that we will wait for
++	 * the PHY for a sufficient amount of time.
++	 */
++	sfp->phy_t_retry = msecs_to_jiffies(1000);
+ }
+ 
+ static void sfp_fixup_fs_10gt(struct sfp *sfp)
+ {
+ 	sfp_fixup_10gbaset_30m(sfp);
+-
+-	// These SFPs need 4 seconds before the PHY can be accessed
+-	sfp_fixup_rollball_proto(sfp, 4);
++	sfp_fixup_rollball(sfp);
+ }
+ 
+ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+@@ -395,12 +399,6 @@ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+ 	sfp->state_hw_mask &= ~(SFP_F_TX_FAULT | SFP_F_LOS);
+ }
+ 
+-static void sfp_fixup_rollball(struct sfp *sfp)
+-{
+-	// Rollball SFPs need 25 seconds before the PHY can be accessed
+-	sfp_fixup_rollball_proto(sfp, 25);
+-}
+-
+ static void sfp_fixup_rollball_cc(struct sfp *sfp)
+ {
+ 	sfp_fixup_rollball(sfp);
+@@ -2331,7 +2329,7 @@ static int sfp_sm_mod_probe(struct sfp *sfp, bool report)
+ 		mask |= SFP_F_RS1;
+ 
+ 	sfp->module_t_start_up = T_START_UP;
+-	sfp->module_t_wait = T_WAIT;
++	sfp->phy_t_retry = T_PHY_RETRY;
+ 
+ 	sfp->state_ignore_mask = 0;
+ 
+@@ -2568,10 +2566,9 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 
+ 		/* We need to check the TX_FAULT state, which is not defined
+ 		 * while TX_DISABLE is asserted. The earliest we want to do
+-		 * anything (such as probe for a PHY) is 50ms (or more on
+-		 * specific modules).
++		 * anything (such as probe for a PHY) is 50ms.
+ 		 */
+-		sfp_sm_next(sfp, SFP_S_WAIT, sfp->module_t_wait);
++		sfp_sm_next(sfp, SFP_S_WAIT, T_WAIT);
+ 		break;
+ 
+ 	case SFP_S_WAIT:
+@@ -2585,8 +2582,8 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 			 * deasserting.
+ 			 */
+ 			timeout = sfp->module_t_start_up;
+-			if (timeout > sfp->module_t_wait)
+-				timeout -= sfp->module_t_wait;
++			if (timeout > T_WAIT)
++				timeout -= T_WAIT;
+ 			else
+ 				timeout = 1;
+ 
+@@ -2629,7 +2626,11 @@ static void sfp_sm_main(struct sfp *sfp, unsigned int event)
+ 		ret = sfp_sm_probe_for_phy(sfp);
+ 		if (ret == -ENODEV) {
+ 			if (--sfp->sm_phy_retries) {
+-				sfp_sm_next(sfp, SFP_S_INIT_PHY, T_PHY_RETRY);
++				sfp_sm_next(sfp, SFP_S_INIT_PHY,
++					    sfp->phy_t_retry);
++				dev_dbg(sfp->dev,
++					"no PHY detected, %u tries left\n",
++					sfp->sm_phy_retries);
+ 				break;
+ 			} else {
+ 				dev_info(sfp->dev, "no PHY detected\n");
+-- 
+2.41.0
 
-Thanks,
-
-        tglx
 
