@@ -1,167 +1,136 @@
-Return-Path: <netdev+bounces-49715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-49716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21BD77F32D0
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:54:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D9FC7F32D7
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 16:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46005B22038
-	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56E65281229
+	for <lists+netdev@lfdr.de>; Tue, 21 Nov 2023 15:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384A75916C;
-	Tue, 21 Nov 2023 15:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC0056764;
+	Tue, 21 Nov 2023 15:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech-se.20230601.gappssmtp.com header.i=@ragnatech-se.20230601.gappssmtp.com header.b="C4Q2Qi4V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5/NHoEi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9C01AA
-	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:53:46 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id 4fb4d7f45d1cf-5482df11e73so6316506a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 07:53:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech-se.20230601.gappssmtp.com; s=20230601; t=1700582024; x=1701186824; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+7NjNd9CEagYnBdGkDCsdTNCadER1wmGC0fqJQ3aE7s=;
-        b=C4Q2Qi4VCvAaszVloUiwBH0/nK9zWdcHAA/qlTrjrrXeTxampcTN9Oljy6XZ7dDiXY
-         9QHN4R2LCYAnovYA1xDCwS167UNGVf3D100fXVpJDlMt3+oXiYESd8H0c6ZvAb9oDcNp
-         0v9SODbrGJcf2a57+xSuhAd6ix9PNYuefoTmNAiqhkOoPzkVhUG44lwvhpIilLqkfr7i
-         fNceqsrZ3sG3ISL5DHfgQc00juDIPqNqi7dXFPwoCqlBWgL0lqY1k9HGbrYgmgQxiM0Q
-         D1nQVFPyQLHBC2eWUoHu/EzZJlH1MbuLSrSSrfv/1xUAsK+GrwmKdGOd/J5OV8j9V+qF
-         t0Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1700582024; x=1701186824;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+7NjNd9CEagYnBdGkDCsdTNCadER1wmGC0fqJQ3aE7s=;
-        b=svBpA7/KS2Ezrn9QH+RM9boQaqvtPkevR4V9QkvATAADecHXaLxwoqKsxF3qE3FWsZ
-         idQ/teSB/wbomYN3eRSM7IyepRDPoJnQC8zoLMvuFKOr2rXtFdNCg06eVOCQ1WzGZeGA
-         UIWpf9PhVtc/GKW3cdEQxT+uOvYLXytdlZoaL6vPkBgKLDQnORcIqVsTk1qjh5G/ku5y
-         2ikVDZK7yCQPV7GwOGem9XYKYd0so3F664Qvl4XWxC6IMdmsHdCHJ/oSi9giw0RafLcj
-         szD9ucEFGAqifE6pzTU7Fy49bBeyTyEVEoNEoIanYmOQXpF8PWzktLm6ckDj8DqjxRLT
-         ljtg==
-X-Gm-Message-State: AOJu0YzhVYQpYBQV76bQHRGl7rn4tMn9GvG5RcvMWQuJqhbgsscRL2oj
-	oA06ErwlBRKQp9LZyX2v9sohIA==
-X-Google-Smtp-Source: AGHT+IGaeCwvreDI3HuvQec1U9qsXvmgbpGRw6bV3x2kFKHLQWUSgeA4BoBICB4OpuMZZDihPh+2DQ==
-X-Received: by 2002:a17:907:971d:b0:a00:40e7:c311 with SMTP id jg29-20020a170907971d00b00a0040e7c311mr3810382ejc.27.1700582024619;
-        Tue, 21 Nov 2023 07:53:44 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8a96.dip0.t-ipconnect.de. [79.204.138.150])
-        by smtp.googlemail.com with ESMTPSA id dv8-20020a170906b80800b009fdc15b5304sm2896853ejb.102.2023.11.21.07.53.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Nov 2023 07:53:44 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [net-next v3 5/5] net: ethernet: renesas: rcar_gen4_ptp: Break out to module
-Date: Tue, 21 Nov 2023 16:53:06 +0100
-Message-ID: <20231121155306.515446-6-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20231121155306.515446-1-niklas.soderlund+renesas@ragnatech.se>
-References: <20231121155306.515446-1-niklas.soderlund+renesas@ragnatech.se>
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A124D46439
+	for <netdev@vger.kernel.org>; Tue, 21 Nov 2023 15:55:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 659A4C433C9;
+	Tue, 21 Nov 2023 15:55:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1700582117;
+	bh=WXTh9KkihGvv02JqYKRZ1ui0JyrCN72YLog0gJ1noz0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p5/NHoEiLsn0t2mf51cbLXNrcJmuefxFzAW3+DI2UFV7qU6M6LLlOQeZDpqM7jeOk
+	 nisp1AJaakUo8egWB/JDrcsZnP1hwCh2CZWsVou8rlPkCif6mnXxECkpa32tShr7iO
+	 7HzSpbN4yfmQiAKLtf9DEgVFj/OIQo4Kvx7VwmetA+5GKxjrN1TpCAOSeXg5o9DBU+
+	 TDbYCyUPmrbCK4XT+ewK0mwaAukG9zVslk4UtrnsKB4eWBxO+QkJU9dqcgL2224Ob7
+	 wIaBWFxV5Ux455tWtbbbW3hpMA0dbS6+VA2s+xNR/Ujq5hEeYO3nM9d1RX4/PzaQff
+	 gFmw54MWUUOiw==
+Date: Tue, 21 Nov 2023 15:55:11 +0000
+From: Simon Horman <horms@kernel.org>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: Wojciech Drewek <wojciech.drewek@intel.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Jerin Jacob Kollanukkaran <jerinj@marvell.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXT] Re: [net PATCH] octeontx2-pf: Fix ntuple rule creation to
+ direct packet to VF with higher Rx queue than its PF
+Message-ID: <20231121155511.GC269041@kernel.org>
+References: <20231120055138.3602102-1-sumang@marvell.com>
+ <745e6518-6253-4ef0-8f05-1421ee4e1fef@intel.com>
+ <SJ0PR18MB52164E2721E056366EC30139DBBBA@SJ0PR18MB5216.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SJ0PR18MB52164E2721E056366EC30139DBBBA@SJ0PR18MB5216.namprd18.prod.outlook.com>
 
-The Gen4 gPTP support will be shared between the existing Renesas
-Ethernet Switch driver and the upcoming Renesas Ethernet-TSN driver. In
-preparation for this break out the gPTP support to its own module.
+On Tue, Nov 21, 2023 at 09:54:00AM +0000, Suman Ghosh wrote:
+> >> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> >> ---
+> >>  .../marvell/octeontx2/nic/otx2_flows.c        | 21
+> >+++++++++++++++++++
+> >>  1 file changed, 21 insertions(+)
+> >>
+> >> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> >> b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> >> index 4762dbea64a1..4200f2d387f6 100644
+> >> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> >> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> >> @@ -1088,6 +1088,7 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct
+> >ethtool_rxnfc *nfc)
+> >>  	struct ethhdr *eth_hdr;
+> >>  	bool new = false;
+> >>  	int err = 0;
+> >> +	u64 vf_num;
+> >>  	u32 ring;
+> >>
+> >>  	if (!flow_cfg->max_flows) {
+> >> @@ -1100,9 +1101,26 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct
+> >ethtool_rxnfc *nfc)
+> >>  	if (!(pfvf->flags & OTX2_FLAG_NTUPLE_SUPPORT))
+> >>  		return -ENOMEM;
+> >>
+> >> +	/* Number of queues on a VF can be greater or less than
+> >> +	 * the PF's queue. Hence no need to check for the
+> >> +	 * queue count. Hence no need to check queue count if PF
+> >> +	 * is installing for its VF. Below is the expected vf_num value
+> >> +	 * based on the ethtool commands.
+> >> +	 *
+> >> +	 * e.g.
+> >> +	 * 1. ethtool -U <netdev> ... action -1  ==> vf_num:255
+> >> +	 * 2. ethtool -U <netdev> ... action <queue_num>  ==> vf_num:0
+> >> +	 * 3. ethtool -U <netdev> ... vf <vf_idx> queue <queue_num>  ==>
+> >> +	 *    vf_num:vf_idx+1
+> >> +	 */
+> >> +	vf_num = ethtool_get_flow_spec_ring_vf(fsp->ring_cookie);
+> >> +	if (!is_otx2_vf(pfvf->pcifunc) && vf_num)
+> >> +		goto bypass_queue_check;
+> >
+> >Let's just add this condition to the next if, no need for goto.
+> [Suman] I kept it a separate check to make the code more readable. Otherwise the next if condition will be complicated.
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
-* Changes since v2
-- Drop the unneeded 'depends on' line from Kconfig symbol
-  RENESAS_GEN4_PTP.
+Readability is subjective, but, FWIIW, I'd also prefer
+to avoid a goto here.
 
-* Changes since v1
-- s/Gen3/Gen4/ in commit message.
-- Add missing MODULE_AUTHOR() and MODULE_DESCRIPTION() definitions.
-- Make Kconfig tristate depend on COMPILE_TEST. All drivers that make
-  use of the shared code auto selects this anyhow.
----
- drivers/net/ethernet/renesas/Kconfig         | 9 +++++++++
- drivers/net/ethernet/renesas/Makefile        | 5 +++--
- drivers/net/ethernet/renesas/rcar_gen4_ptp.c | 7 +++++++
- 3 files changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/Kconfig b/drivers/net/ethernet/renesas/Kconfig
-index 8ef5b0241e64..733cbb6eb3ed 100644
---- a/drivers/net/ethernet/renesas/Kconfig
-+++ b/drivers/net/ethernet/renesas/Kconfig
-@@ -44,7 +44,16 @@ config RENESAS_ETHER_SWITCH
- 	select CRC32
- 	select MII
- 	select PHYLINK
-+	select RENESAS_GEN4_PTP
- 	help
- 	  Renesas Ethernet Switch device driver.
- 
-+config RENESAS_GEN4_PTP
-+	tristate "Renesas R-Car Gen4 gPTP support" if COMPILE_TEST
-+	select CRC32
-+	select MII
-+	select PHYLIB
-+	help
-+	  Renesas R-Car Gen4 gPTP device driver.
-+
- endif # NET_VENDOR_RENESAS
-diff --git a/drivers/net/ethernet/renesas/Makefile b/drivers/net/ethernet/renesas/Makefile
-index e8fd85b5fe8f..9070acfd6aaf 100644
---- a/drivers/net/ethernet/renesas/Makefile
-+++ b/drivers/net/ethernet/renesas/Makefile
-@@ -8,5 +8,6 @@ obj-$(CONFIG_SH_ETH) += sh_eth.o
- ravb-objs := ravb_main.o ravb_ptp.o
- obj-$(CONFIG_RAVB) += ravb.o
- 
--rswitch_drv-objs := rswitch.o rcar_gen4_ptp.o
--obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch_drv.o
-+obj-$(CONFIG_RENESAS_ETHER_SWITCH) += rswitch.o
-+
-+obj-$(CONFIG_RENESAS_GEN4_PTP) += rcar_gen4_ptp.o
-diff --git a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-index 9583894634ae..72e7fcc56693 100644
---- a/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-+++ b/drivers/net/ethernet/renesas/rcar_gen4_ptp.c
-@@ -176,6 +176,7 @@ int rcar_gen4_ptp_register(struct rcar_gen4_ptp_private *ptp_priv,
- 
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_register);
- 
- int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
- {
-@@ -183,6 +184,7 @@ int rcar_gen4_ptp_unregister(struct rcar_gen4_ptp_private *ptp_priv)
- 
- 	return ptp_clock_unregister(ptp_priv->clock);
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_unregister);
- 
- struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
- {
-@@ -196,3 +198,8 @@ struct rcar_gen4_ptp_private *rcar_gen4_ptp_alloc(struct platform_device *pdev)
- 
- 	return ptp;
- }
-+EXPORT_SYMBOL_GPL(rcar_gen4_ptp_alloc);
-+
-+MODULE_AUTHOR("Yoshihiro Shimoda");
-+MODULE_DESCRIPTION("Renesas R-Car Gen4 gPTP driver");
-+MODULE_LICENSE("GPL");
--- 
-2.42.1
-
+> >> +
+> >>  	if (ring >= pfvf->hw.rx_queues && fsp->ring_cookie !=
+> >RX_CLS_FLOW_DISC)
+> >>  		return -EINVAL;
+> >>
+> >> +bypass_queue_check:
+> >>  	if (fsp->location >= otx2_get_maxflows(flow_cfg))
+> >>  		return -EINVAL;
+> >>
+> >> @@ -1182,6 +1200,9 @@ int otx2_add_flow(struct otx2_nic *pfvf, struct
+> >ethtool_rxnfc *nfc)
+> >>  		flow_cfg->nr_flows++;
+> >>  	}
+> >>
+> >> +	if (flow->is_vf)
+> >> +		netdev_info(pfvf->netdev,
+> >> +			    "Make sure that VF's queue number is within its queue
+> >> +limit\n");
+> >>  	return 0;
+> >>  }
+> >>
 
